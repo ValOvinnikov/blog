@@ -1,0 +1,26 @@
+{
+  "name": "cms",
+  "private": true,
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "typegen": "sanity schema extract && sanity typegen generate",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "sanity": "^4.0.0",
+    "@sanity/vision": "^4.0.0",
+    "@sanity/image-url": "^1.1.0",
+    "@sanity/code-input": "^5.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "styled-components": "^6.1.0"
+  },
+  "devDependencies": {
+    "@blog/config": "workspace:*",
+    "@sanity/cli": "^4.0.0",
+    "typescript": "^5.7.0"
+  }
+}

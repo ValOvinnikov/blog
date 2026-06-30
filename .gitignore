@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment — never commit secrets. Templates (*.env.example) are kept.
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# Next.js (apps/web)
+.next/
+out/
+next-env.d.ts
+
+# Sanity (apps/cms)
+dist/
+.sanity/
+
+# Turborepo
+.turbo/
+
+# Build / type info
+*.tsbuildinfo
+*.tsbuildinfo.*
+
+# Tests / coverage
+coverage/
+.vitest/
+
+# Deployment
+.vercel/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Claude Code — share project config, ignore local overrides
+.claude/settings.local.json

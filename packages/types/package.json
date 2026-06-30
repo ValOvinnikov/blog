@@ -1,0 +1,14 @@
+{
+  "name": "@blog/types",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@blog/config": "workspace:*",
+    "typescript": "^5.7.0"
+  }
+}

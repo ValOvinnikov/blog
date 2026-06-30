@@ -1,0 +1,23 @@
+{
+  "name": "@blog/service",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@blog/types": "workspace:*",
+    "next-sanity": "^9.8.0",
+    "@sanity/image-url": "^1.1.0"
+  },
+  "devDependencies": {
+    "@blog/config": "workspace:*",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build", "typegen"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    },
+    "dev": { "cache": false, "persistent": true },
+    "lint": {},
+    "type-check": { "dependsOn": ["^type-check"] },
+    "test": { "dependsOn": ["^build", "typegen"] },
+    "test:watch": { "cache": false, "persistent": true },
+    "typegen": { "cache": false, "outputs": ["src/sanity.types.ts"] }
+  }
+}
