@@ -1,73 +1,73 @@
-import { defineArrayMember, defineField, defineType } from "sanity";
+import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export default defineType({
-  name: "author",
-  title: "Author",
-  type: "document",
+  name: 'author',
+  title: 'Author',
+  type: 'document',
   fields: [
     defineField({
-      name: "name",
-      title: "Name",
-      type: "string",
+      name: 'name',
+      title: 'Name',
+      type: 'string',
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: "slug",
-      title: "Slug",
-      type: "slug",
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
       options: {
-        source: "name",
+        source: 'name',
         maxLength: 96,
       },
     }),
     defineField({
-      name: "image",
-      title: "Image",
-      type: "image",
+      name: 'image',
+      title: 'Image',
+      type: 'image',
       options: { hotspot: true },
       fields: [
         defineField({
-          name: "alt",
-          title: "Alternative Text",
-          type: "string",
+          name: 'alt',
+          title: 'Alternative Text',
+          type: 'string',
           validation: (rule) => rule.required(),
         }),
       ],
     }),
     defineField({
-      name: "bio",
-      title: "Bio",
-      type: "array",
-      of: [defineArrayMember({ type: "block" })],
+      name: 'bio',
+      title: 'Bio',
+      type: 'array',
+      of: [defineArrayMember({ type: 'block' })],
     }),
     defineField({
-      name: "role",
-      title: "Role",
-      type: "string",
+      name: 'role',
+      title: 'Role',
+      type: 'string',
     }),
     defineField({
-      name: "socialLinks",
-      title: "Social Links",
-      type: "array",
+      name: 'socialLinks',
+      title: 'Social Links',
+      type: 'array',
       of: [
         defineArrayMember({
-          type: "object",
+          type: 'object',
           fields: [
             defineField({
-              name: "platform",
-              title: "Platform",
-              type: "string",
+              name: 'platform',
+              title: 'Platform',
+              type: 'string',
               validation: (rule) => rule.required(),
             }),
             defineField({
-              name: "url",
-              title: "URL",
-              type: "url",
+              name: 'url',
+              title: 'URL',
+              type: 'url',
               validation: (rule) => rule.required(),
             }),
           ],
           preview: {
-            select: { title: "platform", subtitle: "url" },
+            select: { title: 'platform', subtitle: 'url' },
           },
         }),
       ],
@@ -75,8 +75,8 @@ export default defineType({
   ],
   preview: {
     select: {
-      title: "name",
-      media: "image",
+      title: 'name',
+      media: 'image',
     },
   },
 });

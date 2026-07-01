@@ -1,5 +1,5 @@
-import react from "@vitejs/plugin-react";
-import { defineConfig } from "vitest/config";
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vitest/config';
 
 /**
  * Shared Vitest preset.
@@ -20,7 +20,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     globals: true,
-    include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
     css: false,
   },
 });

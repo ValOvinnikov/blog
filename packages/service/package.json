@@ -3,10 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
+    "format": "prettier --write . --ignore-path ../../.prettierignore",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
@@ -17,6 +20,7 @@
   },
   "devDependencies": {
     "@blog/config": "workspace:*",
+    "prettier": "^3.4.0",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
   }

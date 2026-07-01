@@ -3,12 +3,16 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write . --ignore-path ../../.prettierignore"
   },
   "devDependencies": {
     "@blog/config": "workspace:*",
+    "prettier": "^3.4.0",
     "typescript": "^5.7.0"
   }
 }

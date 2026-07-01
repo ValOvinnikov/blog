@@ -1,0 +1,9 @@
+node_modules
+**/.next
+**/dist
+**/build
+**/.turbo
+**/.sanity
+pnpm-lock.yaml
+**/sanity.types.ts
+apps/cms/schema.json

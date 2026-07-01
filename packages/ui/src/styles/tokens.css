@@ -7,8 +7,8 @@
   --color-accent: #2563eb;
   --color-border: #e4e4e7;
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Fira Code", monospace;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
 }
 
 @media (prefers-color-scheme: dark) {
