@@ -2,7 +2,9 @@
   "name": "blog",
   "private": true,
   "packageManager": "pnpm@9.15.0",
-  "engines": { "node": ">=20.19" },
+  "engines": {
+    "node": ">=20.19"
+  },
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
@@ -11,11 +13,17 @@
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
     "typegen": "turbo run typegen",
-    "format": "prettier --write \"**/*.{ts,tsx,md,json}\""
+    "format": "turbo run format",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "**/*.{ts,tsx,js,json,md,css}": "prettier --write"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.4.0",
     "turbo": "^2.5.0",
-    "typescript": "^5.7.0",
-    "prettier": "^3.4.0"
+    "typescript": "^5.7.0"
   }
 }

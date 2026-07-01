@@ -1,2 +1,2 @@
-import config from "@blog/config/eslint";
+import config from '@blog/config/eslint';
 export default config;

@@ -1,0 +1,8 @@
+node_modules
+pnpm-lock.yaml
+**/sanity.types.ts
+apps/cms/schema.json
+apps/cms/dist
+apps/cms/.sanity
+apps/web/.next
+packages/ui/storybook-static

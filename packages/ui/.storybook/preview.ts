@@ -1,5 +1,5 @@
-import type { Preview } from "@storybook/react";
-import "../src/styles/tokens.css";
+import type { Preview } from '@storybook/react';
+import '../src/styles/tokens.css';
 
 const preview: Preview = {
   parameters: {
@@ -9,7 +9,7 @@ const preview: Preview = {
         date: /date$/i,
       },
     },
-    layout: "centered",
+    layout: 'centered',
   },
 };
 export default preview;

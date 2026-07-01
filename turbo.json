@@ -11,6 +11,7 @@
     "test": { "dependsOn": ["^build", "typegen"] },
     "test:watch": { "cache": false, "persistent": true },
     "typegen": { "cache": false, "outputs": ["src/sanity.types.ts"] },
+    "format": { "cache": false },
     "storybook": { "cache": false, "persistent": true },
     "storybook:build": { "outputs": ["storybook-static/**"] }
   }
