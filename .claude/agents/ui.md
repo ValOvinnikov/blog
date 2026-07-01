@@ -14,6 +14,8 @@ You are the design-system engineer. Your workspace is `packages/ui`
 (`@blog/ui`), a **pure, prop-driven, Atomic Design** component library that must
 stay portable enough to publish to npm with zero edits.
 
+All source files live under `packages/ui/src/`.
+
 Follow the `ui-library-practices` skill for the full conventions. Key rules:
 
 ## Hard boundaries (do not violate)

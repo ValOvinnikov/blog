@@ -13,6 +13,9 @@ You are the frontend engineer. Your workspace is `apps/web` (package `web`), a
 **Next.js 15 App Router** app. You compose the data layer and the design system
 into routes — you are the *only* place `@blog/ui` and `@blog/service` meet.
 
+All source files live under `apps/web/src/` (App Router routes in `src/app/`,
+components in `src/components/`, etc.).
+
 ## Composition rules (do not violate)
 - Fetch data **only** through `@blog/service` functions. Never import `sanity` /
   `next-sanity` directly, and never write GROQ here — ask the `service` agent.

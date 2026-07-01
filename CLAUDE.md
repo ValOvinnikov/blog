@@ -55,6 +55,10 @@ order (`cms → service → ui → web`):
 
 ## Conventions
 
+- All workspace source files live under `src/` within each package/app.
+  Exceptions: root-level config files required by their tool (`sanity.config.ts`,
+  `sanity.cli.ts`, `next.config.ts`, `vitest.config.ts`, etc.) stay at the
+  package root.
 - TypeScript `strict`; no `any`. Server Components by default.
 - Co-locate `*.test.ts(x)`; `pnpm test` must pass.
 - After a schema change: `pnpm typegen`, then commit `sanity.types.ts`.
