@@ -47,6 +47,7 @@ order (`cms → service → ui → web`):
 - `testing-practices` when adding/updating tests.
 - `seo-and-metadata` when changing routes, metadata, or feeds.
 - `code-review-practices` before opening a PR.
+- `open-pull-request` when shipping an issue: branch → work → PR → assign (push is human-gated).
 
 ## Conventions
 

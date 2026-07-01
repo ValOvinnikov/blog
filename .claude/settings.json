@@ -41,8 +41,7 @@
       "Bash(printenv:*)",
       "Bash(env)",
       "Bash(pnpm --filter cms deploy:*)",
-      "Bash(npx sanity deploy:*)",
-      "Bash(git push:*)"
+      "Bash(npx sanity deploy:*)"
     ]
   }
 }
