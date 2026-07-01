@@ -19,7 +19,7 @@
     "typescript-eslint": "^8.18.0"
   },
   "scripts": {
-    "format": "prettier --write . --ignore-path ../../.prettierignore"
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "prettier": "^3.4.0",

@@ -8,7 +8,7 @@
     "typegen": "sanity schema extract && sanity typegen generate",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
-    "format": "prettier --write . --ignore-path ../../.prettierignore"
+    "format": "prettier --write ."
   },
   "dependencies": {
     "sanity": "^4.0.0",

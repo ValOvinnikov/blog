@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
-    "format": "prettier --write . --ignore-path ../../.prettierignore",
+    "format": "prettier --write .",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "storybook": "storybook dev -p 6006",
