@@ -19,11 +19,23 @@ part*. Run it at the start of any non-trivial task.
 - Spans multiple layers → use the `add-content-type` recipe and delegate per
   layer as below.
 
-## 1. Investigate (main session)
+## 1. Investigate + set status (main session)
 - Restate the task and acceptance criteria. Read `SPEC.md` for the contracts.
 - Locate the affected files/layers (Grep/Glob/Read). Identify which workspaces
   change: `cms`, `service`, `ui`, `web`.
 - Surface unknowns early; ask the user only if a decision is genuinely theirs.
+- **Move the GitHub Project item to "In Progress"** as soon as work begins:
+  ```
+  gh api graphql -f query='mutation {
+    updateProjectV2ItemFieldValue(input:{
+      projectId:"PVT_kwHOAIMQW84BcK3T"
+      itemId:"<ITEM_ID>"
+      fieldId:"PVTSSF_lAHOAIMQW84BcK3TzhW1nPs"
+      value:{singleSelectOptionId:"47fc9ee4"}
+    }) { projectV2Item { id } }
+  }'
+  ```
+  Item IDs → see the Project board or query once via GraphQL (see `open-pull-request` skill for the query pattern). Status option IDs for this board: `f75ad846` Todo · `47fc9ee4` In Progress · `98236657` Done.
 
 ## 2. Plan (main session)
 - Write the change as ordered steps **in dependency order**:
@@ -55,9 +67,12 @@ agent rules and skill.
 - Run the `code-review-practices` skill over `git diff`. Fix boundary/type
   issues (blocking) before anything else.
 
-## 7. Commit (only when the user asks)
-- Conventional commit, one concern per commit/PR. Do **not** `git push` or open
-  a PR unless the user asks — pushing is gated in `.claude/settings.json`.
+## 7. Commit + ship (only when the user asks)
+- Conventional commit, one concern per commit/PR.
+- For push + PR, follow the `open-pull-request` skill (push is confirm-gated).
+- **When the PR is opened, move the Project item to "Done"** (same mutation as
+  step 1, option id `98236657`). The merge will auto-close the issue via
+  `Closes #n` in the PR body.
 
 ## 8. Deploy — human-gated, never automatic
 - `sanity deploy` (cms) and Vercel deploys are **manual, human-run** steps. Do
