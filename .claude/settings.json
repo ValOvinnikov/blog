@@ -16,6 +16,7 @@
       "Bash(npx sanity:*)",
       "Bash(pnpm create:*)",
       "Bash(vitest:*)",
+      "Bash(pnpm storybook:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",

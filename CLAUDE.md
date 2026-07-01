@@ -42,6 +42,8 @@ order (`cms → service → ui → web`):
 - `develop-feature` at the start of any non-trivial task (lifecycle + delegation).
 - `add-content-type` when a change spans more than one workspace.
 - `ui-library-practices` when touching `packages/ui`.
+- `ui-storybook` when adding or editing stories in `packages/ui`.
+- `web-storybook` when adding or editing stories in `apps/web`.
 - `testing-practices` when adding/updating tests.
 - `seo-and-metadata` when changing routes, metadata, or feeds.
 - `code-review-practices` before opening a PR.
