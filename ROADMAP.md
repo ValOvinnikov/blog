@@ -54,16 +54,16 @@ config → consumed by all
 
 **Owner:** `web` · **Skill:** `develop-feature` · **Prereq:** none.
 
-- [ ] Initialise Turborepo + pnpm workspaces; create `apps/*` and `packages/*` per IMPLEMENTATION_BRIEF §2.
-- [ ] Build `@blog/config`: `tsconfig/base.json` (`strict: true`, `noUncheckedIndexedAccess`), `tailwind/preset.ts`, `eslint/index.js`, `vitest/preset.ts`.
-- [ ] Every package's `tsconfig.json` extends `@blog/config/tsconfig/base.json`.
-- [ ] `turbo.json` pipeline: `build.dependsOn: ["^build", "typegen"]`, plus `type-check`, `lint`, `test`.
-- [ ] Add `.claude/agents/` (cms, service, ui, web) and `.claude/skills/` per SPEC §8; add `.claude/settings.json` allowlist (pnpm, turbo, sanity, git, vitest, drizzle-kit).
-- [ ] CI workflow running `type-check`, `lint`, `test`, `build` on PRs.
+- [x] Initialise Turborepo + pnpm workspaces; create `apps/*` and `packages/*` per IMPLEMENTATION_BRIEF §2.
+- [x] Build `@blog/config`: `tsconfig/base.json` (`strict: true`, `noUncheckedIndexedAccess`), `tailwind/preset.ts`, `eslint/index.js`, `vitest/preset.ts`.
+- [x] Every package's `tsconfig.json` extends `@blog/config/tsconfig/base.json`.
+- [x] `turbo.json` pipeline: `build.dependsOn: ["^build", "typegen"]`, plus `type-check`, `lint`, `test`.
+- [x] Add `.claude/agents/` (cms, service, ui, web) and `.claude/skills/` per SPEC §8; add `.claude/settings.json` allowlist (pnpm, turbo, sanity, git, vitest, drizzle-kit).
+- [x] CI workflow running `type-check`, `lint`, `test`, `build` on PRs.
 
 **Acceptance gate**
-- [ ] `pnpm install` succeeds; `pnpm type-check` and `pnpm build` pass from root.
-- [ ] CI is green on an empty/first PR.
+- [x] `pnpm install` succeeds; `pnpm type-check` and `pnpm build` pass from root.
+- [x] CI is green on an empty/first PR.
 
 ---
 
