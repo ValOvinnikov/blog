@@ -3,8 +3,9 @@
   "extends": "@blog/config/tsconfig/base.json",
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
-    "noEmit": true
+    "noEmit": true,
+    "tsBuildInfoFile": "tsconfig.tsbuildinfo"
   },
-  "//": "No sources yet — Sanity Studio is scaffolded in Phase 1. Replace `files: []` with `include: [\"**/*.ts\", \"**/*.tsx\"]` once schema sources exist.",
-  "files": []
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "dist", ".sanity"]
 }

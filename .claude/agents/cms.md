@@ -17,8 +17,11 @@ types you generate are consumed by every other layer.
 - Work only inside `apps/cms`. Do not edit `packages/ui`, `packages/service`, or
   `apps/web` — if a schema change requires downstream work, describe it and let
   the `service`/`web` agents handle it.
-- Schemas live in `apps/cms/schemaTypes`. Each type is its own file with a
-  default export from `defineType`, registered in the schema index.
+- All source files live under `apps/cms/src/`. Schemas live in
+  `apps/cms/src/schemaTypes`. Each type is its own file with a default export
+  from `defineType`, registered in `src/schemaTypes/index.ts`.
+- `sanity.config.ts` and `sanity.cli.ts` stay at the package root (Sanity CLI
+  convention); everything else goes under `src/`.
 - `cms` may depend on `@blog/types` conceptually but **generates** the types —
   never hand-write content shapes that typegen should produce.
 
@@ -31,8 +34,11 @@ types you generate are consumed by every other layer.
 - A single `siteSettings` document enforced through desk structure.
 
 ## Typegen contract (critical)
-- `apps/cms/sanity-typegen.json` must emit to the shared package:
-  `{ "path": "./schemaTypes/**/*.{ts,tsx}", "generates": "../../packages/types/src/sanity.types.ts" }`
+- Typegen is configured in `apps/cms/sanity.cli.ts` (not `sanity-typegen.json`,
+  which is deprecated). The `typegen` key points output to
+  `../../packages/types/src/sanity.types.ts`.
+- The typegen script runs two steps: `sanity schema extract && sanity typegen generate`.
+  The intermediate `schema.json` is gitignored.
 - After any schema change run `pnpm --filter cms typegen` and confirm
   `packages/types/src/sanity.types.ts` regenerates. Commit the generated file.
 

@@ -13,6 +13,8 @@ You are the data-layer (backend) engineer. Your workspace is
 `packages/service` (`@blog/service`). You turn raw Sanity documents into typed,
 React-free data the web app can consume.
 
+All source files live under `packages/service/src/`.
+
 ## Hard boundaries (do not violate)
 - **Never import React** or anything from `@blog/ui`. This package is pure data.
 - **Only** `@blog/service` imports `sanity` / `next-sanity` / `@sanity/image-url`.
