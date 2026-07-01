@@ -1,12 +1,12 @@
 ---
 name: open-pull-request
 description: >-
-  Use when the user asks to put work on a branch, open a pull request, ship an
-  issue for review, or assign a PR reviewer/assignee in this repo. Covers the
-  branch → work → verify → PR → assign loop and the human-gated push rules.
+  Use when the user asks to put work on a branch, open a pull request, or ship
+  an issue for review in this repo. Covers the branch → work → verify → PR loop
+  and the human-gated push rules.
 ---
 
-# Open a pull request (branch → work → PR → assign)
+# Open a pull request (branch → work → PR)
 
 The delivery loop for this repo. `develop-feature` says how to *build* a change;
 this skill says how to *ship it for review*. Work never lands directly on
@@ -38,7 +38,7 @@ this skill says how to *ship it for review*. Work never lands directly on
 5. **On confirm — push + PR:**
    ```
    git push -u origin issue/<n>-<short-slug>
-   gh pr create --base main --assignee ValOvinnikov \
+   gh pr create --base main \
      --title "<conventional title>" \
      --body "<summary + test plan + Closes #<n>>"
    ```
@@ -46,11 +46,11 @@ this skill says how to *ship it for review*. Work never lands directly on
 
 ## Gotchas
 
-- **Assign the owner as `--assignee`, NOT `--reviewer`.** The PR is authored by
-  the owner's own `gh` token (`ValOvinnikov`), and GitHub **rejects requesting
-  review from the PR author**. `--assignee ValOvinnikov` puts it on their plate;
-  `--reviewer ValOvinnikov` errors. (If a second collaborator ever exists, use
-  `--reviewer <them>`.)
+- **Do not set `--assignee` or `--reviewer` on the PR.** The PR is authored by
+  the owner's own `gh` token, so they're already the author. Using `--assignee`
+  blocks them from approving their own PR under GitHub's branch protection rules;
+  `--reviewer` errors because GitHub rejects review requests from the PR author.
+  If a second collaborator ever exists, use `--reviewer <them>`.
 - **Push/PR prompt every time by design.** They're deliberately kept out of the
   `allow` list so each is confirm-gated. Don't try to "fix" the prompt by
   allow-listing them without the user asking.
