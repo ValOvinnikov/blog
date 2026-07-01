@@ -23,6 +23,9 @@ part*. Run it at the start of any non-trivial task.
 - Restate the task and acceptance criteria. Read `SPEC.md` for the contracts.
 - Locate the affected files/layers (Grep/Glob/Read). Identify which workspaces
   change: `cms`, `service`, `ui`, `web`.
+- If the task touches a library API, CLI command, or config format you are not
+  certain of, run the `use-context7` skill **before** writing the plan — fetch
+  the relevant docs now, not mid-implementation.
 - Surface unknowns early; ask the user only if a decision is genuinely theirs.
 - **Move the GitHub Project item to "In Progress"** as soon as work begins:
   ```

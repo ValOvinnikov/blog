@@ -5,7 +5,7 @@
     "dev": "sanity dev",
     "build": "sanity build",
     "deploy": "sanity deploy",
-    "typegen": "echo 'skipped: Sanity Studio not scaffolded yet (Phase 1)'",
+    "typegen": "sanity schema extract && sanity typegen generate",
     "lint": "eslint .",
     "type-check": "tsc --noEmit"
   },

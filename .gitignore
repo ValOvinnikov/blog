@@ -16,6 +16,7 @@ next-env.d.ts
 # Sanity (apps/cms)
 dist/
 .sanity/
+apps/cms/schema.json
 
 # Turborepo
 .turbo/

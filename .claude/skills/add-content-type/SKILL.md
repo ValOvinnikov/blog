@@ -27,6 +27,9 @@ Build in dependency order. Never skip a layer; never reverse the arrows.
 - Add `validation: rule => rule.required()` on any field consumers will assume;
   images get `options: { hotspot: true }` + a required `alt`.
 - Register it in the schema index (and desk structure if it's a singleton).
+- If any `defineType`/`defineField`/`defineArrayMember` option or the typegen
+  workflow is uncertain, use the `use-context7` skill to fetch Sanity v4 docs
+  before writing schema code.
 
 ## Step 2 — Typegen (`apps/cms`)  · agent: `cms`
 - Run `pnpm --filter cms typegen`. Confirm the shape appears in

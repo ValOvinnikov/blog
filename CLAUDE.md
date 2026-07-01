@@ -48,6 +48,10 @@ order (`cms → service → ui → web`):
 - `seo-and-metadata` when changing routes, metadata, or feeds.
 - `code-review-practices` before opening a PR.
 - `open-pull-request` when shipping an issue: branch → work → PR → assign (push is human-gated).
+- `use-context7` before implementing against any library API you are not certain
+  of — resolves live, version-matched docs via the context7 MCP server. Use
+  whenever you hit a deprecation, an unfamiliar config format, or a CLI flag you
+  would otherwise guess at.
 
 ## Conventions
 
