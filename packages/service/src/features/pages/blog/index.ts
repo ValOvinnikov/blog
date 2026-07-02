@@ -1,2 +1,2 @@
-export { getBlogPage } from './loader';
-export type { TBlogPage } from './loader';
+export type { TBlogPage } from './adaptor/types';
+export { createBlogService } from './application/service';

@@ -1,2 +1,2 @@
-export { getSiteSettings } from './loader';
-export type { TSiteSettings } from './loader';
+export type { TNavItem, TSiteSettings } from './adaptor/types';
+export { createSiteSettingsService } from './application/service';

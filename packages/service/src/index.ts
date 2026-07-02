@@ -1,36 +1,42 @@
-// Public surface of the data layer.
-// web imports these — never the raw Sanity client; never imports React here.
+// Public surface of the data layer. web imports `service` — never the raw client.
 
-// Loader functions
-export { getHomePage } from './features/pages/home';
-export { getBlogPage } from './features/pages/blog';
-export { getPost } from './features/pages/post';
-export { getCategoryPage } from './features/pages/category';
-export { getSiteSettings } from './features/global/site-settings';
-export { getCategories } from './features/global/categories';
-export { getAuthor } from './features/global/author';
+import { createAuthorService } from './features/entities/author';
+import { createCategoriesService } from './features/entities/categories';
+import { createSiteSettingsService } from './features/global/site-settings';
+import { createBlogService } from './features/pages/blog';
+import { createCategoryService } from './features/pages/category';
+import { createHomeService } from './features/pages/home';
+import { createPostService } from './features/pages/post';
 
-// View-model types (T-prefixed)
-export type { THomePage } from './features/pages/home';
+export const service = {
+  pages: {
+    home: createHomeService(),
+    blog: createBlogService(),
+    post: createPostService(),
+    category: createCategoryService(),
+  },
+  entities: {
+    author: createAuthorService(),
+    categories: createCategoriesService(),
+  },
+  global: {
+    siteSettings: createSiteSettingsService(),
+  },
+};
+
+export type { TAuthorDetail } from './features/entities/author';
+export type { TCategoriesList } from './features/entities/categories';
+export type { TNavItem, TSiteSettings } from './features/global/site-settings';
 export type { TBlogPage } from './features/pages/blog';
-export type { TPostDetail } from './features/pages/post';
 export type { TCategoryPage } from './features/pages/category';
-export type { TSiteSettings } from './features/global/site-settings';
-export type { TCategoriesList } from './features/global/categories';
-export type { TAuthorDetail } from './features/global/author';
-
-// Shared sub-types used in view-models
+export type { THomePage } from './features/pages/home';
+export type { TPostDetail, TPostDetailAuthor } from './features/pages/post';
+export { urlForImage } from './sanity/image';
+export type { TCategory } from './shared/transformers/to-category';
 export type {
   TPostCard,
   TPostCardAuthor,
   TPostCardCategory,
-  TPostDetailAuthor,
-  TCategory,
-  TNavItem,
-  TSocialLink,
-  TImage,
-  TSeoMeta,
-} from './shared/types';
-
-// Image URL builder
-export { urlForImage } from './sanity/image';
+} from './shared/transformers/to-post-card';
+export type { TSeoMeta } from './shared/transformers/to-seo-meta';
+export type { TSocialLink } from './shared/transformers/to-social-link';

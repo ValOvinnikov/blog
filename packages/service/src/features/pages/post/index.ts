@@ -1,2 +1,2 @@
-export { getPost } from './loader';
-export type { TPostDetail } from './loader';
+export type { TPostDetail, TPostDetailAuthor } from './adaptor/detail/types';
+export { createPostService } from './application/service';
