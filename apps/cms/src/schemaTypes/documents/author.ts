@@ -12,7 +12,7 @@ export default defineType({
       title: 'Name',
       type: 'string',
       description: 'Full display name shown on posts and the author page.',
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().min(1).max(100),
     }),
     defineField({
       name: 'slug',
@@ -24,12 +24,14 @@ export default defineType({
         source: 'name',
         maxLength: 96,
       },
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'image',
       title: 'Image',
       type: 'imageWithAlt',
       description: 'Avatar shown on posts and the author profile page.',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'bio',
@@ -43,6 +45,7 @@ export default defineType({
       type: 'string',
       description:
         'Job title or role shown beneath the author name (e.g. "Senior Engineer").',
+      validation: (rule) => rule.max(100),
     }),
     defineField({
       name: 'socialLinks',

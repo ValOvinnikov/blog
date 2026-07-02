@@ -12,7 +12,7 @@ export default defineType({
       title: 'Title',
       type: 'string',
       description: 'The headline displayed on the post page and in cards.',
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().min(1).max(120),
     }),
     defineField({
       name: 'slug',
@@ -31,7 +31,7 @@ export default defineType({
       type: 'text',
       description:
         'Short summary shown in cards, meta description, and RSS feed.',
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().min(50).max(300),
     }),
     defineField({
       name: 'mainImage',
@@ -39,6 +39,7 @@ export default defineType({
       type: 'imageWithAlt',
       description:
         'Hero image shown at the top of the post and in social shares.',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'author',
@@ -59,6 +60,7 @@ export default defineType({
           to: [{ type: 'category' }],
         }),
       ],
+      validation: (rule) => rule.required().min(1),
     }),
     defineField({
       name: 'tags',
@@ -81,6 +83,7 @@ export default defineType({
       type: 'portableText',
       description:
         'Full post content — supports rich text, images, and code blocks.',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'featured',
