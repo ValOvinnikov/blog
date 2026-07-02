@@ -7,6 +7,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+import checkFile from 'eslint-plugin-check-file';
 import prettier from 'eslint-config-prettier';
 
 /** @type {import("eslint").Linter.Config[]} */
@@ -29,6 +30,20 @@ export default [
       '@typescript-eslint/consistent-type-imports': 'warn',
     },
     settings: { react: { version: 'detect' } },
+  },
+  {
+    plugins: { 'check-file': checkFile },
+    rules: {
+      'check-file/filename-naming-convention': [
+        'error',
+        { '**/*.{ts,tsx,js}': 'KEBAB_CASE' },
+        { ignoreMiddleExtensions: true },
+      ],
+      'check-file/folder-naming-convention': [
+        'error',
+        { 'src/**/': 'KEBAB_CASE' },
+      ],
+    },
   },
   prettier,
 ];
