@@ -17,6 +17,8 @@ export type Seo = {
   _type: 'seo';
   metaTitle?: string;
   metaDescription?: string;
+  ogTitle?: string;
+  ogDescription?: string;
   ogImage?: ImageWithAlt;
 };
 
@@ -103,6 +105,8 @@ export type SiteSettings = {
   tagline?: string;
   logo?: ImageWithAlt;
   ogImage?: ImageWithAlt;
+  ogTitle?: string;
+  ogDescription?: string;
   navigation?: Array<
     {
       _key: string;

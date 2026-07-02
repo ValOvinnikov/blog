@@ -12,7 +12,7 @@ export default defineType({
       title: 'Title',
       type: 'string',
       description: 'Category name shown in filters and navigation.',
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().max(60),
     }),
     defineField({
       name: 'slug',
@@ -24,6 +24,7 @@ export default defineType({
         source: 'title',
         maxLength: 96,
       },
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'description',
@@ -31,6 +32,7 @@ export default defineType({
       type: 'text',
       description:
         'Brief explanation of what this category covers, shown on the category page.',
+      validation: (rule) => rule.max(300),
     }),
   ],
 });

@@ -3,7 +3,7 @@ import { structureTool } from 'sanity/structure';
 import { visionTool } from '@sanity/vision';
 import { codeInput } from '@sanity/code-input';
 
-import { schemaTypes } from './src/schemaTypes';
+import { schemaTypes } from './src/schema-types';
 
 const SINGLETON_TYPES = new Set(['siteSettings']);
 

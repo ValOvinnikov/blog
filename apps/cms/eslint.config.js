@@ -1,2 +1,7 @@
 import config from '@blog/config/eslint';
-export default [{ ignores: ['dist/**', '.sanity/**'] }, ...config];
+import { fileNamingConfig } from '@blog/config/eslint/file-naming';
+export default [
+  { ignores: ['dist/**', '.sanity/**'] },
+  ...config,
+  ...fileNamingConfig,
+];

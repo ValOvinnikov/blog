@@ -12,6 +12,7 @@ export default defineType({
       title: 'Title',
       type: 'string',
       description: 'Page headline shown in the browser tab and as the H1.',
+      validation: (rule) => rule.required().max(120),
     }),
     defineField({
       name: 'slug',
@@ -22,6 +23,7 @@ export default defineType({
         source: 'title',
         maxLength: 96,
       },
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'body',
@@ -29,6 +31,7 @@ export default defineType({
       type: 'portableText',
       description:
         'Page content — supports rich text, images, and code blocks.',
+      validation: (rule) => rule.required(),
     }),
   ],
 });
