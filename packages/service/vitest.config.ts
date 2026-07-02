@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'node:url';
+
 import { defineConfig } from 'vitest/config';
 
 // Service is pure, React-free logic — a minimal node config (no React plugin).
