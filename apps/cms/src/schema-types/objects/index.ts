@@ -1,9 +1,9 @@
-import imageWithAlt from './image-with-alt';
-import portableText from './portable-text';
 import blockText from './block-text';
-import socialLink from './social-link';
+import imageWithAlt from './image-with-alt';
 import navItem from './nav-item';
+import portableText from './portable-text';
 import seo from './seo';
+import socialLink from './social-link';
 
 export const objects = [
   imageWithAlt,

@@ -1,0 +1,48 @@
+import { describe, expect, it, vi } from 'vitest';
+
+import { makeRawCategory } from '#/testing/entities/fixtures';
+import { mockRun } from '#/testing/mock-run-query';
+import { makeRawPostCard } from '#/testing/pages/fixtures';
+
+import { getCategoryPage } from './loader';
+
+vi.mock('#/sanity/query', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('#/sanity/query')>()),
+  runQuery: vi.fn(),
+}));
+
+describe('getCategoryPage', () => {
+  it('returns null when the category is not found', async () => {
+    mockRun.mockResolvedValueOnce(null).mockResolvedValueOnce([]);
+
+    const result = await getCategoryPage('missing');
+
+    expect(result).toBeNull();
+  });
+
+  it('maps the category and its posts into a page object', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawCategory({ _id: 'cat-abc', title: 'Design' })
+      )
+      .mockResolvedValueOnce([
+        makeRawPostCard(),
+        makeRawPostCard({ _id: 'post-2' }),
+      ]);
+
+    const result = await getCategoryPage('design');
+
+    expect(result).not.toBeNull();
+    expect(result?.category.id).toBe('cat-abc');
+    expect(result?.category.title).toBe('Design');
+    expect(result?.posts).toHaveLength(2);
+  });
+
+  it('returns an empty posts list when no posts belong to the category', async () => {
+    mockRun.mockResolvedValueOnce(makeRawCategory()).mockResolvedValueOnce([]);
+
+    const result = await getCategoryPage('engineering');
+
+    expect(result?.posts).toEqual([]);
+  });
+});
