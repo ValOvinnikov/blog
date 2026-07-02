@@ -1,2 +1,3 @@
 import config from '@blog/config/eslint';
-export default config;
+import { namingConventionConfig } from '@blog/config/eslint/naming';
+export default [...config, ...namingConventionConfig];

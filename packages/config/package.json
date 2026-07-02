@@ -7,6 +7,7 @@
     "./tsconfig/base.json": "./tsconfig/base.json",
     "./tailwind/preset": "./tailwind/preset.ts",
     "./eslint": "./eslint/index.js",
+    "./eslint/naming": "./eslint/naming.js",
     "./vitest/preset": "./vitest/preset.ts"
   },
   "dependencies": {
