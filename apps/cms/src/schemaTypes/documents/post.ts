@@ -1,20 +1,24 @@
+import { ComposeIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export default defineType({
   name: 'post',
   title: 'Post',
   type: 'document',
+  icon: ComposeIcon,
   fields: [
     defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
+      description: 'The headline displayed on the post page and in cards.',
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
+      description: 'URL path segment — auto-generated from the title.',
       options: {
         source: 'title',
         maxLength: 96,
@@ -25,27 +29,22 @@ export default defineType({
       name: 'excerpt',
       title: 'Excerpt',
       type: 'text',
-      description: 'Summary for cards, meta description, and RSS.',
+      description:
+        'Short summary shown in cards, meta description, and RSS feed.',
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'mainImage',
       title: 'Main Image',
-      type: 'image',
-      options: { hotspot: true },
-      fields: [
-        defineField({
-          name: 'alt',
-          title: 'Alternative Text',
-          type: 'string',
-          validation: (rule) => rule.required(),
-        }),
-      ],
+      type: 'imageWithAlt',
+      description:
+        'Hero image shown at the top of the post and in social shares.',
     }),
     defineField({
       name: 'author',
       title: 'Author',
       type: 'reference',
+      description: 'The person who wrote this post.',
       to: [{ type: 'author' }],
       validation: (rule) => rule.required(),
     }),
@@ -53,6 +52,7 @@ export default defineType({
       name: 'categories',
       title: 'Categories',
       type: 'array',
+      description: 'Topic categories used for filtering and navigation.',
       of: [
         defineArrayMember({
           type: 'reference',
@@ -64,6 +64,7 @@ export default defineType({
       name: 'tags',
       title: 'Tags',
       type: 'array',
+      description: 'Freeform tags for additional discovery.',
       of: [defineArrayMember({ type: 'string' })],
       options: { layout: 'tags' },
     }),
@@ -71,56 +72,28 @@ export default defineType({
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',
+      description: 'Controls sort order and the date shown to readers.',
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'body',
       title: 'Body',
-      type: 'array',
-      of: [
-        defineArrayMember({ type: 'block' }),
-        defineArrayMember({
-          type: 'image',
-          options: { hotspot: true },
-          fields: [
-            defineField({
-              name: 'alt',
-              title: 'Alternative Text',
-              type: 'string',
-              validation: (rule) => rule.required(),
-            }),
-          ],
-        }),
-        defineArrayMember({ type: 'code' }),
-      ],
+      type: 'portableText',
+      description:
+        'Full post content — supports rich text, images, and code blocks.',
     }),
     defineField({
       name: 'featured',
       title: 'Featured',
       type: 'boolean',
+      description: 'Pin this post to the featured slot on the home page.',
     }),
     defineField({
       name: 'seo',
       title: 'SEO',
-      type: 'object',
-      fields: [
-        defineField({
-          name: 'metaTitle',
-          title: 'Meta Title',
-          type: 'string',
-        }),
-        defineField({
-          name: 'metaDescription',
-          title: 'Meta Description',
-          type: 'text',
-        }),
-        defineField({
-          name: 'ogImage',
-          title: 'OG Image',
-          type: 'image',
-          options: { hotspot: true },
-        }),
-      ],
+      type: 'seo',
+      description:
+        'Override meta title, description, and OG image for search engines.',
     }),
   ],
   preview: {
