@@ -13,7 +13,7 @@ export default defineType({
       type: 'string',
       description:
         'Used in the browser tab, RSS feed, and as the default SEO title prefix.',
-      validation: (rule) => rule.required().min(1).max(60),
+      validation: (rule) => rule.required().max(60),
     }),
     defineField({
       name: 'description',

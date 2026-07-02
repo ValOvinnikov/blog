@@ -12,7 +12,7 @@ export default defineType({
       title: 'Title',
       type: 'string',
       description: 'Category name shown in filters and navigation.',
-      validation: (rule) => rule.required().min(1).max(60),
+      validation: (rule) => rule.required().max(60),
     }),
     defineField({
       name: 'slug',

@@ -12,7 +12,7 @@ export default defineType({
       title: 'Name',
       type: 'string',
       description: 'Full display name shown on posts and the author page.',
-      validation: (rule) => rule.required().min(1).max(100),
+      validation: (rule) => rule.required().max(100),
     }),
     defineField({
       name: 'slug',

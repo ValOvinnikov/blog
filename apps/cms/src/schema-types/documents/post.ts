@@ -12,7 +12,7 @@ export default defineType({
       title: 'Title',
       type: 'string',
       description: 'The headline displayed on the post page and in cards.',
-      validation: (rule) => rule.required().min(1).max(120),
+      validation: (rule) => rule.required().max(120),
     }),
     defineField({
       name: 'slug',
@@ -60,7 +60,7 @@ export default defineType({
           to: [{ type: 'category' }],
         }),
       ],
-      validation: (rule) => rule.required().min(1),
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'tags',
