@@ -8,8 +8,8 @@ description: >-
 
 # Open a pull request (branch → work → PR)
 
-The delivery loop for this repo. `develop-feature` says how to *build* a change;
-this skill says how to *ship it for review*. Work never lands directly on
+The delivery loop for this repo. `develop-feature` says how to _build_ a change;
+this skill says how to _ship it for review_. Work never lands directly on
 `main` — each issue gets a branch and a PR that the owner reviews.
 
 ## Core rules (do not violate)
@@ -19,7 +19,7 @@ this skill says how to *ship it for review*. Work never lands directly on
   approves. Only push **after the user says to** ("ship it" / approves the
   prompt) — never proactively, and never to `main`.
 - **PR creation is confirm-gated too.** `gh` isn't denied; running `gh pr
-  create` prompts once. Push the branch, then open the PR on the same go-ahead.
+create` prompts once. Push the branch, then open the PR on the same go-ahead.
 - **Deploys stay denied** (`sanity deploy`, Vercel) — human-run only.
 - **Never merge.** Merging and deploys are the human's call.
 - **One concern per PR.** Conventional commits; verify the gates first.
@@ -42,7 +42,24 @@ this skill says how to *ship it for review*. Work never lands directly on
      --title "<conventional title>" \
      --body "<summary + test plan + Closes #<n>>"
    ```
-6. **Report the PR URL.** Leave it for the owner to review and merge.
+6. **Move the issue to "Code Review" on the project board.**
+   After the PR is created, update the GitHub Project status so the board
+   reflects reality immediately (don't wait for merge):
+   ```
+   # get project + item IDs
+   gh project list --owner <owner> --format json
+   ITEM_ID=$(gh project item-list <project-number> --owner <owner> --format json \
+     | node -e "const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); \
+       console.log(d.items.find(i=>i.content?.number===<n>)?.id)")
+   FIELD_ID=$(gh project field-list <project-number> --owner <owner> --format json \
+     | node -e "const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); \
+       console.log(d.fields.find(f=>f.name==='Status')?.id)")
+   # get the "Code Review" option id from the field list output, then:
+   gh project item-edit --project-id <project-id> --id "$ITEM_ID" \
+     --field-id "$FIELD_ID" --single-select-option-id <code-review-option-id>
+   ```
+   Verify with `gh issue view <n> --json projectItems -q '.projectItems[].status.name'`.
+7. **Report the PR URL.** Leave it for the owner to review and merge.
 
 ## Gotchas
 
@@ -54,8 +71,9 @@ this skill says how to *ship it for review*. Work never lands directly on
 - **Push/PR prompt every time by design.** They're deliberately kept out of the
   `allow` list so each is confirm-gated. Don't try to "fix" the prompt by
   allow-listing them without the user asking.
-- **Link the issue** with `Closes #<n>` in the body so the merge auto-closes it
-  and updates the Project board.
+- **Link the issue** with `Closes #<n>` in the body so the merge auto-closes it.
+  The Project board status is updated manually in step 6 (→ "Code Review")
+  immediately after PR creation; the board moves to "Done" automatically on merge.
 
 ## PR body template
 
