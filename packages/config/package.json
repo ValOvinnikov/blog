@@ -8,6 +8,7 @@
     "./tailwind/preset": "./tailwind/preset.ts",
     "./eslint": "./eslint/index.js",
     "./eslint/naming": "./eslint/naming.js",
+    "./eslint/file-naming": "./eslint/file-naming.js",
     "./vitest/preset": "./vitest/preset.ts"
   },
   "dependencies": {
