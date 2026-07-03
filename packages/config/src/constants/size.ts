@@ -1,3 +1,5 @@
+import { TValueOf } from '../utils';
+
 export const Size = {
   XS: 'XS',
   SM: 'SM',
@@ -7,4 +9,4 @@ export const Size = {
   XXL: 'XXL',
 } as const;
 
-export type TSize = (typeof Size)[keyof typeof Size];
+export type TSize = TValueOf<typeof Size>;
