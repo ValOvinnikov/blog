@@ -1,19 +1,23 @@
-// Shared flat ESLint config for every workspace.
-// Usage in a package's eslint.config.js:
-//   import config from "@blog/config/eslint";
-//   export default config;
 import js from '@eslint/js';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
+import checkFile from 'eslint-plugin-check-file';
+import importX from 'eslint-plugin-import-x';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
-import prettier from 'eslint-config-prettier';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
-import importX from 'eslint-plugin-import-x';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+import prettier from 'eslint-config-prettier';
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
-  { ignores: ['dist/**', '.next/**', 'node_modules/**', '**/sanity.types.ts'] },
+  {
+    ignores: [
+      'dist/**',
+      '.next/**',
+      'node_modules/**',
+      '**/sanity/generated/types.ts',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -37,12 +41,31 @@ export default [
         'warn',
         { disallowTypeAnnotations: false },
       ],
+      '@typescript-eslint/naming-convention': [
+        'error',
+        { selector: 'typeAlias', format: ['PascalCase'], prefix: ['T'] },
+        { selector: 'interface', format: ['PascalCase'], prefix: ['I'] },
+      ],
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
       'import-x/first': 'error',
       'import-x/no-duplicates': 'error',
     },
     settings: { react: { version: 'detect' } },
+  },
+  {
+    plugins: { 'check-file': checkFile },
+    rules: {
+      'check-file/filename-naming-convention': [
+        'error',
+        { '**/*.{ts,tsx,js}': 'KEBAB_CASE' },
+        { ignoreMiddleExtensions: true },
+      ],
+      'check-file/folder-naming-convention': [
+        'error',
+        { 'src/**/': 'KEBAB_CASE' },
+      ],
+    },
   },
   prettier,
 ];

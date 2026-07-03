@@ -1,4 +1,4 @@
 /* Storybook CSS entry — mirrors apps/web/app/globals.css without the @source directive */
 @import 'tailwindcss';
-@import '@blog/config/tailwind/theme.css';
+@import '../../../../configs/tailwind/theme.css';
 @import './tokens.css';
