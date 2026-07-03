@@ -1,0 +1,73 @@
+/*
+ * @blog/config — Tailwind v4 theme wiring.
+ *
+ * Import order in apps/web/app/globals.css:
+ *   @import "tailwindcss";
+ *   @import "@blog/config/tailwind/theme.css";   <- this file
+ *   @import "@blog/ui/styles/tokens.css";        <- token *values* (:root / .dark)
+ *   @source "../../../packages/ui/src/**\/*.{ts,tsx}";
+ *
+ * Colours and fonts are mapped with `@theme inline`, so the generated utilities
+ * reference the runtime CSS variables rather than baking in a value — that is what
+ * lets the `.dark` class swap the whole palette live. Static design values
+ * (radius, type scale) go in a plain `@theme` block.
+ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  /* colour → utilities: bg-bg, bg-surface, text-text, text-text-muted,
+     border-border, bg-accent, text-accent, text-accent-contrast, ... */
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-muted: var(--accent-muted);
+  --color-accent-contrast: var(--accent-contrast);
+
+  /* font utilities: font-display, font-body, font-mono.
+     The referenced variables are provided by next/font in the web app's root layout. */
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+@theme {
+  /* shape */
+  --radius-sm: 3px;
+  --radius: 6px;
+  --radius-lg: 10px;
+
+  /* fluid type scale — utilities: text-xs ... text-3xl, text-display */
+  --text-xs: 0.78rem;
+  --text-xs--line-height: 1.4;
+
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.7;
+
+  --text-lg: 1.2rem;
+  --text-lg--line-height: 1.6;
+
+  --text-xl: clamp(1.35rem, 1.15rem + 0.7vw, 1.6rem);
+  --text-xl--line-height: 1.35;
+
+  --text-2xl: clamp(1.7rem, 1.35rem + 1.4vw, 2.2rem);
+  --text-2xl--line-height: 1.2;
+
+  --text-3xl: clamp(2.1rem, 1.6rem + 2.2vw, 3rem);
+  --text-3xl--line-height: 1.1;
+
+  --text-display: clamp(2.6rem, 1.8rem + 3.6vw, 4.6rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.02em;
+}
