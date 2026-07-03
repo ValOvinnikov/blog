@@ -6,6 +6,7 @@
   "exports": {
     "./tsconfig/base.json": "./tsconfig/base.json",
     "./tailwind/preset": "./tailwind/preset.ts",
+    "./tailwind/theme.css": "./tailwind/theme.css",
     "./eslint": "./eslint/index.js",
     "./eslint/naming": "./eslint/naming.js",
     "./eslint/file-naming": "./eslint/file-naming.js",
