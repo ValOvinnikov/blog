@@ -1,3 +1,4 @@
+import { Size } from '@blog/config';
 import { render, screen } from '@testing-library/react';
 
 import { Tag } from './tag';
@@ -19,7 +20,7 @@ describe(`<${Tag.name}/>`, () => {
   });
 
   it('sm size applies text-xs class', () => {
-    render(<Tag size="sm">Label</Tag>);
+    render(<Tag size={Size.SM}>Label</Tag>);
     expect(screen.getByText('Label').className).toContain('text-xs');
   });
 });

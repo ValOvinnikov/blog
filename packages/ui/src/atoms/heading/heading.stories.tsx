@@ -1,3 +1,4 @@
+import { Size } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Heading } from './heading';
@@ -28,5 +29,5 @@ export const H4: TStory = {
 };
 
 export const WithSizeOverride: TStory = {
-  args: { level: 2, size: 'xs', children: 'H2 with xs size override' },
+  args: { level: 2, size: Size.XS, children: 'H2 with xs size override' },
 };

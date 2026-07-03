@@ -1,3 +1,4 @@
+import { Size } from '@blog/config';
 import { type HTMLAttributes } from 'react';
 import { type VariantProps } from 'tailwind-variants';
 
@@ -11,10 +12,10 @@ export type THeadingProps = HTMLAttributes<HTMLHeadingElement> & {
 type TSize = NonNullable<VariantProps<typeof headingVariants>['size']>;
 
 const defaultSizes: Record<1 | 2 | 3 | 4, TSize> = {
-  1: '2xl',
-  2: 'xl',
-  3: 'lg',
-  4: 'md',
+  1: Size.XXL,
+  2: Size.XL,
+  3: Size.LG,
+  4: Size.MD,
 };
 
 export function Heading({ level, size, className, ...rest }: THeadingProps) {

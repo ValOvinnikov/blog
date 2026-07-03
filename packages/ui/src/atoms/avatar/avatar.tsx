@@ -1,10 +1,12 @@
+import type { Size } from '@blog/config';
+
 import { avatarImageVariants, avatarVariants } from './avatar-variants';
 
 export type TAvatarProps = {
   src?: string;
   alt: string;
   name: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: typeof Size.SM | typeof Size.MD | typeof Size.LG;
   className?: string;
 };
 

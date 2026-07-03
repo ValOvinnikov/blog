@@ -1,3 +1,4 @@
+import { Size } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Button } from './button';
@@ -12,7 +13,7 @@ export default meta;
 type TStory = StoryObj<typeof Button>;
 
 export const Default: TStory = {
-  args: { children: 'Button', variant: 'primary', size: 'md' },
+  args: { children: 'Button', variant: 'primary', size: Size.MD },
 };
 
 export const Secondary: TStory = {
@@ -24,11 +25,11 @@ export const Ghost: TStory = {
 };
 
 export const Small: TStory = {
-  args: { children: 'Button', size: 'sm' },
+  args: { children: 'Button', size: Size.SM },
 };
 
 export const Large: TStory = {
-  args: { children: 'Button', size: 'lg' },
+  args: { children: 'Button', size: Size.LG },
 };
 
 export const Disabled: TStory = {

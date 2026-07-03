@@ -1,3 +1,4 @@
+import { Size } from '@blog/config';
 import { render, screen } from '@testing-library/react';
 
 import { Heading } from './heading';
@@ -44,7 +45,7 @@ describe(`<${Heading.name}/>`, () => {
 
   it('applies size override', () => {
     render(
-      <Heading level={1} size="sm">
+      <Heading level={1} size={Size.SM}>
         Small Heading
       </Heading>
     );

@@ -50,3 +50,4 @@ Thumbs.db
 
 # Claude Code — share project config, ignore local overrides
 .claude/settings.local.json
+.claude/worktrees/

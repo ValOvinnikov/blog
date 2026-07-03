@@ -1,3 +1,4 @@
+import { Size } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Tag } from './tag';
@@ -12,7 +13,7 @@ export default meta;
 type TStory = StoryObj<typeof Tag>;
 
 export const Default: TStory = {
-  args: { children: 'Tag', variant: 'default', size: 'md' },
+  args: { children: 'Tag', variant: 'default', size: Size.MD },
 };
 
 export const Accent: TStory = {
@@ -20,9 +21,9 @@ export const Accent: TStory = {
 };
 
 export const Small: TStory = {
-  args: { children: 'Tag', size: 'sm' },
+  args: { children: 'Tag', size: Size.SM },
 };
 
 export const AccentSmall: TStory = {
-  args: { children: 'Tag', variant: 'accent', size: 'sm' },
+  args: { children: 'Tag', variant: 'accent', size: Size.SM },
 };

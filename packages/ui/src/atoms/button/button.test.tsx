@@ -1,3 +1,4 @@
+import { Size } from '@blog/config';
 import { render, screen } from '@testing-library/react';
 
 import { Button } from './button';
@@ -35,13 +36,13 @@ describe(`<${Button.name}/>`, () => {
   });
 
   it('renders sm size', () => {
-    render(<Button size="sm">Small</Button>);
+    render(<Button size={Size.SM}>Small</Button>);
     const btn = screen.getByRole('button', { name: 'Small' });
     expect(btn.className).toContain('h-8');
   });
 
   it('renders lg size', () => {
-    render(<Button size="lg">Large</Button>);
+    render(<Button size={Size.LG}>Large</Button>);
     const btn = screen.getByRole('button', { name: 'Large' });
     expect(btn.className).toContain('h-12');
   });
