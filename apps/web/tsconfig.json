@@ -7,7 +7,7 @@
     "noEmit": true,
     "moduleResolution": "Bundler",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     },
     "plugins": [
       {
@@ -17,8 +17,8 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     ".next/types/**/*.ts",
     ".storybook/**/*.ts",
     ".storybook/**/*.tsx"
