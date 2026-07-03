@@ -19,7 +19,9 @@ must stay portable enough to publish to npm with zero edits.
 - **No app coupling.** No `next/*` imports except `next/image`/`next/link` only
   if passed in as props/slots — prefer accepting `as`/`children` so the app
   owns framework specifics. Default to plain elements.
-- Depend only on `@blog/types` for shapes. No business logic.
+- Depend only on `@blog/config` for shapes. No business logic.
+- **No `"use client"` directive.** `@blog/ui` must be fully server-component-safe.
+  Client boundaries are declared in `apps/web` only — never inside the library.
 
 ## Atomic Design layering
 
@@ -63,10 +65,12 @@ src/atoms/theme-toggle/
   (`React.ComponentPropsWithoutRef<"button">`) and spread `...rest` so
   consumers can pass `aria-*`, `id`, etc.
 - **Every interactive component prop interface must extend `IWithDataTestId`**
-  from `@blog/types`. Wire `dataTestId` to the root interactive element's
+  from `@blog/config`. Wire `dataTestId` to the root interactive element's
   `data-testid` attribute:
   ```tsx
-  import type { IWithDataTestId } from '@blog/types';
+  import type { IWithDataTestId } from '@blog/config';
+  import { type VariantProps } from 'tailwind-variants';
+  import { myComponentVariants } from './my-component-variants';
 
   export interface IMyComponentProps extends IWithDataTestId {
     className?: string;
@@ -75,7 +79,7 @@ src/atoms/theme-toggle/
   export const MyComponent = ({ className, dataTestId }: IMyComponentProps) => (
     <button
       data-testid={dataTestId}
-      className={cn(myComponentVariants(), className)}
+      className={myComponentVariants({ class: className })}
     >
       ...
     </button>
@@ -84,7 +88,7 @@ src/atoms/theme-toggle/
 - Always forward `className`; merge with the `cn()` helper (`clsx` +
   `tailwind-merge`) so consumers can safely override tokens.
 - Prefer composition (`children`, slots) over boolean prop explosions.
-- Server-component-safe by default; add `"use client"` only for interactivity.
+- Server-component-safe by default. **No `"use client"` allowed** — see Purity rules.
 
 ## Styling
 
@@ -92,51 +96,58 @@ src/atoms/theme-toggle/
   Never put Tailwind class strings inline in the component JSX — this includes
   every element in the component, not just the root. Placeholder spans,
   icons wrappers, inner elements: all classes go through the variants file.
-- Use `class-variance-authority` (`cva`) in the variants file for all
-  base styles, variants, and sizes. Even components with no variants still
-  define a `cva`.
-- **Group classes by concern inside a `cva` array** — one string per concern,
+- Use `tailwind-variants` (`tv`) in the variants file for all base styles,
+  variants, and sizes. Even components with no variants still define a `tv`.
+  `tv` handles `tailwind-merge` internally — do **not** wrap the call with `cn()`.
+- **Group classes by concern inside the `base` array** — one string per concern,
   not one long unreadable string:
   ```ts
   // ✅ correct — grouped, readable, no comments
-  export const buttonVariants = cva([
-    'inline-flex items-center justify-center',
-    'rounded-sm px-4 py-2',
-    'text-sm font-medium',
-    'bg-accent text-accent-contrast',
-    'transition-colors duration-[var(--dur-fast)]',
-    'hover:bg-accent-hover',
-    'focus-visible:outline-none focus-visible:ring-2',
-    'disabled:pointer-events-none disabled:opacity-50',
-  ]);
+  export const buttonVariants = tv({
+    base: [
+      'inline-flex items-center justify-center',
+      'rounded-sm px-4 py-2',
+      'text-sm font-medium',
+      'bg-accent text-accent-contrast',
+      'transition-colors duration-[var(--dur-fast)]',
+      'hover:bg-accent-hover',
+      'focus-visible:outline-none focus-visible:ring-2',
+      'disabled:pointer-events-none disabled:opacity-50',
+    ],
+    variants: { ... },
+    defaultVariants: { ... },
+  });
 
   // ❌ wrong — single unreadable string
-  export const buttonVariants = cva(
-    'inline-flex items-center justify-center rounded-sm px-4 py-2 text-sm font-medium bg-accent ...'
-  );
+  export const buttonVariants = tv({
+    base: 'inline-flex items-center justify-center rounded-sm px-4 py-2 ...',
+  });
 
   // ❌ wrong — comments in the array
-  export const buttonVariants = cva([
-    'inline-flex items-center justify-center', // layout
-    'rounded-sm px-4 py-2', // shape
-  ]);
+  export const buttonVariants = tv({
+    base: [
+      'inline-flex items-center justify-center', // layout
+      'rounded-sm px-4 py-2', // shape
+    ],
+  });
   ```
   The grouping is self-evident from the classes themselves — no comments needed.
-  ```
-
-  ```
 - Every named element in the component (including inner spans or wrappers)
   gets its own named export in the variants file:
   ```ts
-  export const themeToggleVariants = cva([...]);
-  export const themeTogglePlaceholderVariants = cva(['block h-[18px] w-[18px]']);
+  export const themeToggleVariants = tv({ base: [...] });
+  export const themeTogglePlaceholderVariants = tv({ base: ['block h-[18px] w-[18px]'] });
   ```
-- In the component, call the variant function and merge with `cn()`:
+- In the component, pass `class: className` into the `tv` call — no `cn()` import needed:
   ```tsx
-  import { cn } from '../../utils/cn';
+  import { type VariantProps } from 'tailwind-variants';
   import { myComponentVariants } from './my-component-variants';
 
-  className={cn(myComponentVariants({ variant, size }), className)}
+  className={myComponentVariants({ variant, size, class: className })}
+  ```
+  For components with no variants (className override only):
+  ```tsx
+  className={myComponentVariants({ class: className })}
   ```
 - Use token utilities (`bg-bg`, `text-text`, `text-accent`, `border-border`,
   `font-display`, `font-body`, `font-mono`). No hard-coded hex values.
@@ -202,13 +213,13 @@ src/atoms/theme-toggle/
 
 ## Checklist before finishing
 
-- [ ] No `service`/`sanity`/`fetch` imports.
+- [ ] No `service`/`sanity`/`fetch` imports. No `"use client"` directive.
 - [ ] Arrow function component; no helper components in the same file.
-- [ ] Props interface extends `IWithDataTestId` from `@blog/types`; `dataTestId`
+- [ ] Props interface extends `IWithDataTestId` from `@blog/config`; `dataTestId`
       wired to the root interactive element's `data-testid`.
 - [ ] Props typed (`I`-prefix interface or `T`-prefix type); `className`
       forwarded and merged with `cn()`.
-- [ ] All Tailwind classes in `{component}-variants.ts`; none inline in JSX on any element. Classes grouped by concern in arrays inside `cva`.
+- [ ] All Tailwind classes in `{component}-variants.ts`; none inline in JSX on any element. Classes grouped by concern in `base` arrays inside `tv`. No `cn()` wrapping the `tv` call.
 - [ ] Icons from `lucide-react`; no inline SVG.
 - [ ] `describe(Component.name, ...)` and `beforeEach` for shared setup.
 - [ ] Uses token utilities; dark mode intact.

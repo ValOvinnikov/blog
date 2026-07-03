@@ -4,7 +4,6 @@ import type { IWithDataTestId } from '@blog/config';
 import { Moon, Sun } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { cn } from '../../utils/cn';
 import {
   themeTogglePlaceholderVariants,
   themeToggleVariants,
@@ -60,7 +59,7 @@ export const ThemeToggle = ({
       aria-label={label}
       title={label}
       data-testid={dataTestId}
-      className={cn(themeToggleVariants(), className)}
+      className={themeToggleVariants({ class: className })}
     >
       {mounted ? (
         isDark ? (
