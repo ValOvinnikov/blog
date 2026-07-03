@@ -1,12 +1,13 @@
 # Blog — Product & Architecture Spec
 
-> Durable reference for the project. The [`IMPLEMENTATION_BRIEF.md`](./IMPLEMENTATION_BRIEF.md) is the build playbook (ordered steps + acceptance gates); this document is the *why* and the long-lived contract between workspaces. Keep it in sync when architecture changes.
+> Durable reference for the project. The [`IMPLEMENTATION_BRIEF.md`](./IMPLEMENTATION_BRIEF.md) is the build playbook (ordered steps + acceptance gates); this document is the _why_ and the long-lived contract between workspaces. Keep it in sync when architecture changes.
 
 ## 1. Product summary
 
 A headless-CMS blog: editors author long-form articles in a Sanity Studio; readers browse a fast, statically-rendered Next.js site. Content is fully typed end-to-end — a schema change in the CMS surfaces as a TypeScript error in the frontend if a consumer is out of date.
 
 **Primary surfaces**
+
 - **Home** — featured + latest posts.
 - **Post** (`/blog/[slug]`) — Portable Text article with code blocks, author byline, categories, share links, SEO + structured data.
 - **Category** (`/category/[slug]`) — posts filtered by category.
@@ -23,13 +24,13 @@ A headless-CMS blog: editors author long-form articles in a Sanity Studio; reade
 
 ## 3. Layer contracts
 
-| Layer | Imports | Exposes | Must never |
-|---|---|---|---|
-| `@blog/types` | — | Generated Sanity types + shared shapes (`NavLink`, etc.) | depend on any sibling |
-| `@blog/service` | `types` | Async typed functions: `getPosts`, `getPost`, `getPostsByCategory`, `getCategories`, `getAuthor`, `getPage`, `getSiteSettings`, `urlForImage` | import React, return raw Sanity docs |
-| `@blog/ui` | `types` | Atomic-design components (pure, prop-driven) | import `service`, `sanity`, or fetch data |
-| `web` | `ui`, `service`, `types` | Routes, metadata, feeds, composition | put data logic in components or presentation in routes |
-| `@blog/config` | — | tsconfig base, Tailwind preset, eslint config, Vitest preset | contain app logic |
+| Layer           | Imports                  | Exposes                                                                                                                                                                                                                                                    | Must never                                             |
+| --------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `@blog/types`   | —                        | Generated Sanity types + shared shapes (`NavLink`, etc.)                                                                                                                                                                                                   | depend on any sibling                                  |
+| `@blog/service` | `types`                  | Async typed functions: `getPosts`, `getPost`, `getPostsByCategory`, `getCategories`, `getAuthor`, `getPage`, `getSiteSettings`, `urlForImage`                                                                                                              | import React, return raw Sanity docs                   |
+| `@blog/ui`      | `types`                  | Atomic-design components up to organisms (pure, prop-driven). No template layer — page composition belongs in `web`.                                                                                                                                       | import `service`, `sanity`, or fetch data              |
+| `web`           | `ui`, `service`, `types` | Routes, metadata, feeds, page composition via Next.js App Router layouts and Server Components. Owns `PortableTextRenderer` — a generic component that maps Sanity block types to `@blog/ui` atoms/molecules via `@portabletext/react` component mappings. | put data logic in components or presentation in routes |
+| `@blog/config`  | —                        | tsconfig base, Tailwind preset, eslint config, Vitest preset                                                                                                                                                                                               | contain app logic                                      |
 
 ## 4. Data flow
 
