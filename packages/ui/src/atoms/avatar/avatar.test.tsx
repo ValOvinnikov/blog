@@ -1,0 +1,43 @@
+import { render, screen } from '@testing-library/react';
+
+import { Avatar } from './avatar';
+
+describe(`<${Avatar.name}/>`, () => {
+  it('renders img when src is provided', () => {
+    render(<Avatar src="/photo.jpg" alt="Profile photo" name="Jane Doe" />);
+    expect(
+      screen.getByRole('img', { name: 'Profile photo' })
+    ).toBeInTheDocument();
+  });
+
+  it('renders initials when no src', () => {
+    render(<Avatar alt="Jane Doe" name="Jane Doe" />);
+    expect(screen.getByText('JD')).toBeInTheDocument();
+  });
+
+  it('caps initials at 2 chars', () => {
+    render(<Avatar alt="John Michael Doe" name="John Michael Doe" />);
+    expect(screen.getByText('JM')).toBeInTheDocument();
+  });
+
+  it('merges extra className', () => {
+    const { container } = render(
+      <Avatar alt="Jane Doe" name="Jane Doe" className="ring-2" />
+    );
+    expect(container.firstChild).toHaveClass('ring-2');
+  });
+
+  it('applies sm size class', () => {
+    const { container } = render(
+      <Avatar alt="Jane Doe" name="Jane Doe" size="sm" />
+    );
+    expect(container.firstChild).toHaveClass('h-8');
+  });
+
+  it('applies lg size class', () => {
+    const { container } = render(
+      <Avatar alt="Jane Doe" name="Jane Doe" size="lg" />
+    );
+    expect(container.firstChild).toHaveClass('h-14');
+  });
+});
