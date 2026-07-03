@@ -1,6 +1,6 @@
+import { Size } from '@blog/config';
 import { type HTMLAttributes } from 'react';
 import { type VariantProps } from 'tailwind-variants';
-import { Size } from '@blog/config';
 
 import { headingVariants } from './heading-variants';
 

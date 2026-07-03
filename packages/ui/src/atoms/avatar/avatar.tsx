@@ -1,4 +1,4 @@
-import { Size } from '@blog/config';
+import type { Size } from '@blog/config';
 
 import { avatarImageVariants, avatarVariants } from './avatar-variants';
 

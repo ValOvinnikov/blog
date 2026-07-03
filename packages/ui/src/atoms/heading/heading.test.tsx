@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
 import { Size } from '@blog/config';
+import { render, screen } from '@testing-library/react';
 
 import { Heading } from './heading';
 

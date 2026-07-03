@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
 import { Size } from '@blog/config';
+import type { Meta, StoryObj } from '@storybook/react';
 
 import { Tag } from './tag';
 
