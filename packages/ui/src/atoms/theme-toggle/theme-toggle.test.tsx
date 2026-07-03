@@ -10,7 +10,7 @@ describe(`<${ThemeToggle.name}/>`, () => {
   });
 
   it('renders a button', () => {
-    expect(screen.getByRole('button')).toBeInTheDocument();
+    expect(screen.getByRole('button')).toBeVisible();
   });
 
   it('shows "Switch to dark theme" label in light mode', () => {

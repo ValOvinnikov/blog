@@ -6,9 +6,7 @@ import { Button } from './button';
 describe(`<${Button.name}/>`, () => {
   it('renders a button element', () => {
     render(<Button>Click me</Button>);
-    expect(
-      screen.getByRole('button', { name: 'Click me' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Click me' })).toBeVisible();
   });
 
   it('forwards disabled attribute', () => {

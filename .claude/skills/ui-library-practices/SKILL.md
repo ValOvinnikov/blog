@@ -196,7 +196,7 @@ src/atoms/theme-toggle/
     });
 
     it('renders a button', () => {
-      expect(screen.getByRole('button')).toBeInTheDocument();
+      expect(screen.getByRole('button')).toBeVisible();
     });
   });
 
@@ -206,6 +206,16 @@ src/atoms/theme-toggle/
       expect(screen.getByRole('button').className).toContain('ml-2');
     });
   });
+  ```
+- **Use `.toBeVisible()` for positive render assertions, not `.toBeInTheDocument()`.**
+  `.toBeInTheDocument()` is only valid with `.not` to assert an element is absent:
+  ```tsx
+  // ✅ correct
+  expect(screen.getByRole('button')).toBeVisible();
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+  // ❌ wrong
+  expect(screen.getByRole('button')).toBeInTheDocument();
   ```
 - **Do not write a dedicated test for `dataTestId`.** If a test uses
   `screen.getByTestId(...)` and the attribute is missing, the test fails on its

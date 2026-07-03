@@ -8,28 +8,28 @@ describe(`<${Heading.name}/>`, () => {
     render(<Heading level={1}>Title</Heading>);
     expect(
       screen.getByRole('heading', { level: 1, name: 'Title' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders h2 for level 2', () => {
     render(<Heading level={2}>Subtitle</Heading>);
     expect(
       screen.getByRole('heading', { level: 2, name: 'Subtitle' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders h3 for level 3', () => {
     render(<Heading level={3}>Section</Heading>);
     expect(
       screen.getByRole('heading', { level: 3, name: 'Section' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders h4 for level 4', () => {
     render(<Heading level={4}>Subsection</Heading>);
     expect(
       screen.getByRole('heading', { level: 4, name: 'Subsection' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('merges extra className', () => {

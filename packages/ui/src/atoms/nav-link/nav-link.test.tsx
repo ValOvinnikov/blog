@@ -5,7 +5,7 @@ import { NavLink } from './nav-link';
 describe(`<${NavLink.name}/>`, () => {
   it('renders children', () => {
     render(<NavLink href="/">Home</NavLink>);
-    expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Home' })).toBeVisible();
   });
 
   it('has correct href when passed', () => {
