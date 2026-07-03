@@ -1,3 +1,4 @@
+import { Size } from '@blog/config';
 import { tv } from 'tailwind-variants';
 
 export const buttonVariants = tv({
@@ -15,13 +16,13 @@ export const buttonVariants = tv({
       ghost: 'text-fg hover:bg-border',
     },
     size: {
-      sm: 'h-8 px-3 text-sm',
-      md: 'h-10 px-4 text-base',
-      lg: 'h-12 px-6 text-lg',
+      [Size.SM]: 'h-8 px-3 text-sm',
+      [Size.MD]: 'h-10 px-4 text-base',
+      [Size.LG]: 'h-12 px-6 text-lg',
     },
   },
   defaultVariants: {
     variant: 'primary',
-    size: 'md',
+    size: Size.MD,
   },
 });

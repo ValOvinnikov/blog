@@ -1,3 +1,4 @@
+import { Size } from '@blog/config';
 import { tv } from 'tailwind-variants';
 
 export const tagVariants = tv({
@@ -11,12 +12,12 @@ export const tagVariants = tv({
       accent: 'bg-accent text-bg',
     },
     size: {
-      sm: 'px-2 py-0.5 text-xs',
-      md: 'px-2.5 py-1 text-sm',
+      [Size.SM]: 'px-2 py-0.5 text-xs',
+      [Size.MD]: 'px-2.5 py-1 text-sm',
     },
   },
   defaultVariants: {
     variant: 'default',
-    size: 'md',
+    size: Size.MD,
   },
 });

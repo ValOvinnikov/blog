@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { Size } from '@blog/config';
 
 import { Avatar } from './avatar';
 
@@ -16,7 +17,7 @@ export const WithImage: TStory = {
     src: 'https://i.pravatar.cc/150?img=1',
     alt: 'Jane Doe',
     name: 'Jane Doe',
-    size: 'md',
+    size: Size.MD,
   },
 };
 
@@ -24,7 +25,7 @@ export const Initials: TStory = {
   args: {
     alt: 'Jane Doe',
     name: 'Jane Doe',
-    size: 'md',
+    size: Size.MD,
   },
 };
 
@@ -32,7 +33,7 @@ export const Small: TStory = {
   args: {
     alt: 'Jane Doe',
     name: 'Jane Doe',
-    size: 'sm',
+    size: Size.SM,
   },
 };
 
@@ -40,6 +41,6 @@ export const Large: TStory = {
   args: {
     alt: 'Jane Doe',
     name: 'Jane Doe',
-    size: 'lg',
+    size: Size.LG,
   },
 };

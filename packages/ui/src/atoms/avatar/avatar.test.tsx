@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { Size } from '@blog/config';
 
 import { Avatar } from './avatar';
 
@@ -29,14 +30,14 @@ describe(`<${Avatar.name}/>`, () => {
 
   it('applies sm size class', () => {
     const { container } = render(
-      <Avatar alt="Jane Doe" name="Jane Doe" size="sm" />
+      <Avatar alt="Jane Doe" name="Jane Doe" size={Size.SM} />
     );
     expect(container.firstChild).toHaveClass('h-8');
   });
 
   it('applies lg size class', () => {
     const { container } = render(
-      <Avatar alt="Jane Doe" name="Jane Doe" size="lg" />
+      <Avatar alt="Jane Doe" name="Jane Doe" size={Size.LG} />
     );
     expect(container.firstChild).toHaveClass('h-14');
   });
