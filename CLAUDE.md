@@ -65,8 +65,23 @@ order (`cms → service → ui → web`):
 - Verify with `pnpm type-check`, `pnpm lint`, `pnpm test`, `pnpm build` from root.
 - Conventional commits, one concern per PR.
 
+## Delivery gate sequence (mandatory — never skip or bundle)
+
+Every issue follows this exact order. **Stop and wait for explicit user approval at each gate.**
+
+1. Set issue → In Progress on the board
+2. Checkout branch from `main`
+3. Do the work + run quality gates
+4. **Ask to commit** — present "commit now" vs "review first"; wait for answer
+5. **Ask to push** — separate question, after commit; wait for answer
+6. **Ask to open PR** — separate question, after push; wait for answer
+7. Set issue → Code Review on the board immediately after PR is created
+
+**Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work only — never the commit, push, or PR.** Those three gates always require fresh, explicit confirmation.
+
 ## Don't
 
 - Run `sanity deploy` / Vercel deploys (human-gated).
 - Read or commit `.env*` files.
 - Add a cross-layer import that creates a cycle.
+- Commit, push, or open a PR without explicit approval for that specific action.
