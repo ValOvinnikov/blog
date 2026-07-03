@@ -49,7 +49,7 @@ src/atoms/theme-toggle/
   theme-toggle-variants.ts   # cva variants (see Styling section)
   theme-toggle.test.tsx      # co-located tests
   theme-toggle.stories.tsx   # Storybook stories
-  index.ts                   # named barrel export
+  index.ts                   # named barrel — component + props only, never variants
   components/                # sub-components used only by this component
     some-child.tsx
 ```
@@ -196,7 +196,7 @@ src/atoms/theme-toggle/
     });
 
     it('renders a button', () => {
-      expect(screen.getByRole('button')).toBeInTheDocument();
+      expect(screen.getByRole('button')).toBeVisible();
     });
   });
 
@@ -207,21 +207,43 @@ src/atoms/theme-toggle/
     });
   });
   ```
+- **Use `.toBeVisible()` for positive render assertions, not `.toBeInTheDocument()`.**
+  `.toBeInTheDocument()` is only valid with `.not` to assert an element is absent:
+  ```tsx
+  // ✅ correct
+  expect(screen.getByRole('button')).toBeVisible();
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+  // ❌ wrong
+  expect(screen.getByRole('button')).toBeInTheDocument();
+  ```
 - **Do not write a dedicated test for `dataTestId`.** If a test uses
   `screen.getByTestId(...)` and the attribute is missing, the test fails on its
   own — an explicit assertion adds no value.
 - See `testing-practices` for the full testing guide.
 
+## Quality gates (run in this order before finishing)
+
+```bash
+pnpm --filter @blog/ui format   # format ALL created/edited files first
+pnpm --filter @blog/ui type-check
+pnpm --filter @blog/ui test
+pnpm lint
+```
+
+All four must pass. Fix failures before reporting back. **Format runs first** — it prevents lint noise from style issues and ensures every file committed is consistently formatted.
+
 ## Checklist before finishing
 
+- [ ] **Ran `pnpm --filter @blog/ui format`** on all created and edited files.
 - [ ] No `service`/`sanity`/`fetch` imports. No `"use client"` directive.
-- [ ] Arrow function component; no helper components in the same file.
+- [ ] Named function export (`export function MyComponent`); no helper components in the same file.
 - [ ] Props interface extends `IWithDataTestId` from `@blog/config`; `dataTestId`
       wired to the root interactive element's `data-testid`.
-- [ ] Props typed (`I`-prefix interface or `T`-prefix type); `className`
-      forwarded and merged with `cn()`.
+- [ ] Props typed (`I`-prefix interface or `T`-prefix type); `className` forwarded via `class:` key in `tv()` call.
 - [ ] All Tailwind classes in `{component}-variants.ts`; none inline in JSX on any element. Classes grouped by concern in `base` arrays inside `tv`. No `cn()` wrapping the `tv` call.
+- [ ] Stories file `{component}.stories.tsx` created alongside the component.
 - [ ] Icons from `lucide-react`; no inline SVG.
 - [ ] `describe(Component.name, ...)` and `beforeEach` for shared setup.
 - [ ] Uses token utilities; dark mode intact.
-- [ ] Exported from the barrel (`index.ts` → `atoms/index.ts` → `src/index.ts`).
+- [ ] Exported from the barrel (`index.ts` → `atoms/index.ts` → `src/index.ts`). The component `index.ts` exports **only the component and its props interface** — never the variants file. Variants are an implementation detail.

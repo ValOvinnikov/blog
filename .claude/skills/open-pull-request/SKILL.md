@@ -37,7 +37,7 @@ Work through these gates in order. **Stop at each gate and wait for the user.**
    gh api graphql -f query='{ user(login:"ValOvinnikov") { projectV2(number:2) {
      items(first:50) { nodes { id content { ... on Issue { number } } } } } } }'
    ```
-2. Set status → **In Progress** (`47fc9ee4`):
+2. Set status → **In Progress** (`47fc9ee4`) for the issue being worked on:
    ```
    gh api graphql -f query='mutation {
      updateProjectV2ItemFieldValue(input:{
@@ -48,7 +48,18 @@ Work through these gates in order. **Stop at each gate and wait for the user.**
      }) { projectV2Item { id } }
    }'
    ```
-3. Checkout a new branch from up-to-date `main`:
+3. **If the issue is a sub-issue, also set its parent to In Progress.**
+   Check whether the issue has a parent:
+
+   ```
+   gh api graphql -f query='{ repository(owner:"ValOvinnikov", name:"blog") {
+     issue(number:<n>) { parent { number } } } }'
+   ```
+
+   If a parent exists and is not already In Progress, set it to In Progress using
+   the same mutation with the parent's project item ID.
+
+4. Checkout a new branch from up-to-date `main`:
    ```
    git switch main && git pull --ff-only
    git switch -c issue/<n>-<short-slug>
