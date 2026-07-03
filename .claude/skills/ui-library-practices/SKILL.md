@@ -124,15 +124,31 @@ src/atoms/theme-toggle/
     base: 'inline-flex items-center justify-center rounded-sm px-4 py-2 ...',
   });
 
-  // ❌ wrong — comments in the array
+  // ❌ wrong — inline comments on each group
   export const buttonVariants = tv({
     base: [
       'inline-flex items-center justify-center', // layout
       'rounded-sm px-4 py-2', // shape
     ],
   });
+
+  // ❌ wrong — section label comments
+  export const buttonVariants = tv({
+    base: [
+      // layout
+      'inline-flex items-center justify-center',
+      // shape
+      'rounded-sm px-4 py-2',
+    ],
+  });
+
+  // ❌ wrong — JSDoc block above the export
+  /**
+   * Layout variants for the Header organism.
+   */
+  export const headerVariants = tv({ ... });
   ```
-  The grouping is self-evident from the classes themselves — no comments needed.
+  The grouping is self-evident from the classes themselves — **no comments of any kind** in variants files or stories files unless the reason is genuinely non-obvious (e.g. a browser workaround or a z-index constraint that would surprise a reader). Story names and export identifiers are self-documenting; JSDoc blocks above story exports are forbidden.
 - Every named element in the component (including inner spans or wrappers)
   gets its own named export in the variants file:
   ```ts
