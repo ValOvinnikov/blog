@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants';
 export const postCardVariants = tv({
   slots: {
     root: [
-      'flex flex-col overflow-hidden rounded-lg',
+      'flex flex-col h-full overflow-hidden rounded-lg',
       'bg-bg border border-border',
       'transition-shadow hover:shadow-md',
     ],
