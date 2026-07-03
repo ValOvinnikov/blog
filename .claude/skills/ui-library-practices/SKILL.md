@@ -31,8 +31,9 @@ must stay portable enough to publish to npm with zero edits.
   CategoryPill, ShareButtons).
 - `organisms/` — page sections (Hero, PostGrid, Header, Footer, PostMeta,
   Pagination).
-- `templates/` — layout shells (PageLayout, PostLayout). **Portable Text is
-  rendered here, not in `web`.**
+- **No template layer.** Page-level composition (layout shells, Portable Text
+  rendering) belongs in `apps/web` using Next.js App Router layouts and Server
+  Components. `@blog/ui` stops at organisms.
 - Each layer only composes layers below it. Re-export everything from
   `src/index.ts`.
 
