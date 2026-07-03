@@ -1,7 +1,3 @@
-import config from '@blog/config/eslint';
-import { namingConventionConfig } from '@blog/config/eslint/naming';
-export default [
-  { ignores: ['next-env.d.ts'] },
-  ...config,
-  ...namingConventionConfig,
-];
+import config from '../../configs/eslint/index.js';
+
+export default [{ ignores: ['next-env.d.ts'] }, ...config];

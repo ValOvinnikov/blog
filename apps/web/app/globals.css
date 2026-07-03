@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import '@blog/config/tailwind/theme.css';
+@import '../../../configs/tailwind/theme.css';
 @import '@blog/ui/styles.css';
 
 /* Tell Tailwind to scan ui package source for class names */

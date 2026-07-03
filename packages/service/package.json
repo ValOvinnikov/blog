@@ -17,13 +17,12 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@blog/types": "workspace:*",
+    "@blog/config": "workspace:*",
     "@sanity/image-url": "^1.1.0",
     "groqd": "^1.7.1",
     "next-sanity": "^9.8.0"
   },
   "devDependencies": {
-    "@blog/config": "workspace:*",
     "@types/node": "^20",
     "prettier": "^3.4.0",
     "typescript": "^5.7.0",

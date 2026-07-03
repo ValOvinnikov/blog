@@ -1,4 +1,4 @@
-import type { BlockText } from '@blog/types';
+import type { BlockText } from '@blog/config';
 
 import type { TSocialLink } from '#/shared/transformers/to-social-link';
 

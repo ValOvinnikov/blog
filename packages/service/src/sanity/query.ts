@@ -1,7 +1,7 @@
 import type {
   AllSanitySchemaTypes,
   internalGroqTypeReferenceTo,
-} from '@blog/types';
+} from '@blog/config';
 import { createGroqBuilder, makeSafeQueryRunner } from 'groqd';
 
 import { client } from './client';

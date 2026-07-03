@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@blog/config/tsconfig/base.json",
+  "extends": "../../configs/tsconfig/base.json",
   "compilerOptions": {
     "noEmit": true,
     "paths": {

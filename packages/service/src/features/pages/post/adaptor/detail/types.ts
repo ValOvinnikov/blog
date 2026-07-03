@@ -1,4 +1,4 @@
-import type { BlockText, PortableText } from '@blog/types';
+import type { BlockText, PortableText } from '@blog/config';
 
 import type { TCategory } from '#/shared/transformers/to-category';
 import type { TPostCard } from '#/shared/transformers/to-post-card';

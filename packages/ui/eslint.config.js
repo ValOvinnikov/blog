@@ -1,3 +1,3 @@
-import config from '@blog/config/eslint';
-import { namingConventionConfig } from '@blog/config/eslint/naming';
-export default [...config, ...namingConventionConfig];
+import config from '../../configs/eslint/index.js';
+
+export default [...config];
