@@ -1,9 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@blog/config/tsconfig/base.json",
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {}
-  },
   "include": ["src", ".storybook"]
 }
