@@ -1,0 +1,17 @@
+import { type ButtonHTMLAttributes } from 'react';
+import { type VariantProps } from 'tailwind-variants';
+
+import { buttonVariants } from './button-variants';
+
+export type TButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+  VariantProps<typeof buttonVariants>;
+
+export function Button({ className, variant, size, ...rest }: TButtonProps) {
+  return (
+    <button
+      type="button"
+      className={buttonVariants({ variant, size, class: className })}
+      {...rest}
+    />
+  );
+}
