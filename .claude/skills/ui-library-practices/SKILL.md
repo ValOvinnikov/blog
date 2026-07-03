@@ -155,6 +155,35 @@ src/atoms/theme-toggle/
 - Dark mode is handled by token values switching under `.dark` — no manual
   `dark:` utilities needed for colour tokens.
 
+## Responsive design
+
+- **Mobile-first.** Author base (unprefixed) classes for mobile; layer up with
+  `md:` then `lg:`. Never author desktop-first and scale down.
+- **Two primary breakpoints only.** Use Tailwind's default `md` (768px, tablet)
+  and `lg` (1024px, desktop) as the layout-shifting tiers — e.g. `grid-cols-1
+md:grid-cols-2 lg:grid-cols-3`, `hidden md:flex`. Reserve `sm`/`xl`/`2xl` for
+  genuine exceptions; don't reach for every tier out of habit.
+- **No custom breakpoints.** Tailwind v4 defaults (`sm` 640, `md` 768, `lg`
+  1024, `xl` 1280, `2xl` 1536) are the project standard — do not define
+  `--breakpoint-*` overrides.
+- **Prefer fluid tokens over breakpoint-specific values** wherever a smooth
+  scale suffices. The type scale (`text-xl` through `text-display` in
+  `configs/tailwind/theme.css`) is already `clamp()`-based and needs no
+  responsive prefix. Layout spacing uses the same approach: `gap-gutter`,
+  `px-gutter`, `py-section`, `gap-section` (all fluid via `clamp()`) instead of
+  hand-picking per-breakpoint spacing values.
+- **Page width belongs to `apps/web`, not `@blog/ui`.** Components stay
+  width-agnostic (`w-full`); the consuming app applies `max-w-content` /
+  `max-w-measure` containers.
+- Responsive classes follow the same rule as all Tailwind classes: they live
+  in the `*-variants.ts` file via `tv`, grouped by concern — never inline in
+  JSX. Example (PostGrid-style responsive grid):
+  ```ts
+  export const postGridVariants = tv({
+    base: ['grid grid-cols-1 gap-gutter', 'md:grid-cols-2', 'lg:grid-cols-3'],
+  });
+  ```
+
 ## Icons
 
 - **Use `lucide-react` for all icons.** Do not write inline SVG in components.
@@ -247,3 +276,4 @@ All four must pass. Fix failures before reporting back. **Format runs first** �
 - [ ] `describe(Component.name, ...)` and `beforeEach` for shared setup.
 - [ ] Uses token utilities; dark mode intact.
 - [ ] Exported from the barrel (`index.ts` → `atoms/index.ts` → `src/index.ts`). The component `index.ts` exports **only the component and its props interface** — never the variants file. Variants are an implementation detail.
+- [ ] If the component has more than one layout arrangement (grid, stacking nav, columns), it is mobile-first with `md:`/`lg:` only — no custom breakpoints, no page-width `max-w-*` baked into the component.
