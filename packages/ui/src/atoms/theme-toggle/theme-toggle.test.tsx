@@ -15,7 +15,7 @@ describe(`<${ThemeToggle.name}/>`, () => {
 
   it('shows "Switch to dark theme" label in light mode', () => {
     expect(screen.getByRole('button')).toHaveAccessibleName(
-      'Switch to dark theme'
+      'Switch to dark theme',
     );
   });
 

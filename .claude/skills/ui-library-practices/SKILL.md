@@ -212,15 +212,27 @@ src/atoms/theme-toggle/
   own — an explicit assertion adds no value.
 - See `testing-practices` for the full testing guide.
 
+## Quality gates (run in this order before finishing)
+
+```bash
+pnpm --filter @blog/ui format   # format ALL created/edited files first
+pnpm --filter @blog/ui type-check
+pnpm --filter @blog/ui test
+pnpm lint
+```
+
+All four must pass. Fix failures before reporting back. **Format runs first** — it prevents lint noise from style issues and ensures every file committed is consistently formatted.
+
 ## Checklist before finishing
 
+- [ ] **Ran `pnpm --filter @blog/ui format`** on all created and edited files.
 - [ ] No `service`/`sanity`/`fetch` imports. No `"use client"` directive.
-- [ ] Arrow function component; no helper components in the same file.
+- [ ] Named function export (`export function MyComponent`); no helper components in the same file.
 - [ ] Props interface extends `IWithDataTestId` from `@blog/config`; `dataTestId`
       wired to the root interactive element's `data-testid`.
-- [ ] Props typed (`I`-prefix interface or `T`-prefix type); `className`
-      forwarded and merged with `cn()`.
+- [ ] Props typed (`I`-prefix interface or `T`-prefix type); `className` forwarded via `class:` key in `tv()` call.
 - [ ] All Tailwind classes in `{component}-variants.ts`; none inline in JSX on any element. Classes grouped by concern in `base` arrays inside `tv`. No `cn()` wrapping the `tv` call.
+- [ ] Stories file `{component}.stories.tsx` created alongside the component.
 - [ ] Icons from `lucide-react`; no inline SVG.
 - [ ] `describe(Component.name, ...)` and `beforeEach` for shared setup.
 - [ ] Uses token utilities; dark mode intact.

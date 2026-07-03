@@ -7,7 +7,7 @@ describe(`<${Avatar.name}/>`, () => {
   it('renders img when src is provided', () => {
     render(<Avatar src="/photo.jpg" alt="Profile photo" name="Jane Doe" />);
     expect(
-      screen.getByRole('img', { name: 'Profile photo' })
+      screen.getByRole('img', { name: 'Profile photo' }),
     ).toBeInTheDocument();
   });
 
@@ -23,21 +23,21 @@ describe(`<${Avatar.name}/>`, () => {
 
   it('merges extra className', () => {
     const { container } = render(
-      <Avatar alt="Jane Doe" name="Jane Doe" className="ring-2" />
+      <Avatar alt="Jane Doe" name="Jane Doe" className="ring-2" />,
     );
     expect(container.firstChild).toHaveClass('ring-2');
   });
 
   it('applies sm size class', () => {
     const { container } = render(
-      <Avatar alt="Jane Doe" name="Jane Doe" size={Size.SM} />
+      <Avatar alt="Jane Doe" name="Jane Doe" size={Size.SM} />,
     );
     expect(container.firstChild).toHaveClass('h-8');
   });
 
   it('applies lg size class', () => {
     const { container } = render(
-      <Avatar alt="Jane Doe" name="Jane Doe" size={Size.LG} />
+      <Avatar alt="Jane Doe" name="Jane Doe" size={Size.LG} />,
     );
     expect(container.firstChild).toHaveClass('h-14');
   });
