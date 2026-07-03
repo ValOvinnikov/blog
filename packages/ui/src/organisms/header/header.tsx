@@ -1,5 +1,5 @@
 import type { IWithDataTestId } from '@blog/config';
-import type { HTMLAttributes } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 
 import { NavLink } from '../../atoms/nav-link';
 import { ThemeToggle } from '../../atoms/theme-toggle';
@@ -15,16 +15,24 @@ export interface IHeaderProps
   extends Omit<HTMLAttributes<HTMLElement>, 'children'>, IWithDataTestId {
   title: string;
   navLinks: INavLinkItem[];
+  mobileTrigger?: ReactNode;
 }
 
 export function Header({
   title,
   navLinks,
+  mobileTrigger,
   className,
   dataTestId,
   ...rest
 }: IHeaderProps) {
-  const { root, brand, nav, actions } = headerVariants();
+  const {
+    root,
+    brand,
+    nav,
+    actions,
+    mobileTrigger: mobileTriggerSlot,
+  } = headerVariants();
 
   return (
     <header
@@ -43,6 +51,9 @@ export function Header({
       </nav>
 
       <div className={actions()}>
+        {mobileTrigger && (
+          <div className={mobileTriggerSlot()}>{mobileTrigger}</div>
+        )}
         <ThemeToggle />
       </div>
     </header>

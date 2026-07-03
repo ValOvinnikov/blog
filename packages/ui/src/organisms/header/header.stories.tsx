@@ -36,3 +36,9 @@ export const BrandOnly: TStory = {
     navLinks: [],
   },
 };
+
+export const WithMobileTrigger: TStory = {
+  args: {
+    mobileTrigger: <button aria-label="Open menu">☰</button>,
+  },
+};

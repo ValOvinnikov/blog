@@ -65,4 +65,22 @@ describe(`<${Header.name}/>`, () => {
     render(<Header title="My Blog" navLinks={[]} dataTestId="site-header" />);
     expect(screen.getByTestId('site-header')).toBeVisible();
   });
+
+  it('renders the mobileTrigger when provided', () => {
+    render(
+      <Header
+        title="My Blog"
+        navLinks={[]}
+        mobileTrigger={<button>Menu</button>}
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Menu' })).toBeVisible();
+  });
+
+  it('does not render a mobileTrigger wrapper when omitted', () => {
+    render(<Header title="My Blog" navLinks={[]} />);
+    expect(
+      screen.queryByRole('button', { name: 'Menu' }),
+    ).not.toBeInTheDocument();
+  });
 });

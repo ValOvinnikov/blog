@@ -14,7 +14,8 @@ export const headerVariants = tv({
       'transition-colors hover:text-accent',
       'mr-8',
     ],
-    nav: ['flex items-center gap-4'],
+    nav: ['hidden items-center gap-gutter', 'md:flex'],
     actions: ['flex items-center gap-2'],
+    mobileTrigger: ['md:hidden'],
   },
 });
