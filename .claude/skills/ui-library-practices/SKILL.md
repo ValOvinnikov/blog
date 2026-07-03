@@ -49,7 +49,7 @@ src/atoms/theme-toggle/
   theme-toggle-variants.ts   # cva variants (see Styling section)
   theme-toggle.test.tsx      # co-located tests
   theme-toggle.stories.tsx   # Storybook stories
-  index.ts                   # named barrel export
+  index.ts                   # named barrel — component + props only, never variants
   components/                # sub-components used only by this component
     some-child.tsx
 ```
@@ -236,4 +236,4 @@ All four must pass. Fix failures before reporting back. **Format runs first** �
 - [ ] Icons from `lucide-react`; no inline SVG.
 - [ ] `describe(Component.name, ...)` and `beforeEach` for shared setup.
 - [ ] Uses token utilities; dark mode intact.
-- [ ] Exported from the barrel (`index.ts` → `atoms/index.ts` → `src/index.ts`).
+- [ ] Exported from the barrel (`index.ts` → `atoms/index.ts` → `src/index.ts`). The component `index.ts` exports **only the component and its props interface** — never the variants file. Variants are an implementation detail.
