@@ -17,7 +17,7 @@ export interface IHeroProps
   publishedAt?: string;
 }
 
-export function Hero({
+export const Hero = ({
   title,
   excerpt,
   href,
@@ -28,7 +28,7 @@ export function Hero({
   className,
   dataTestId,
   ...rest
-}: IHeroProps) {
+}: IHeroProps) => {
   const {
     root,
     image: imageSlot,
@@ -88,4 +88,4 @@ export function Hero({
       </div>
     </section>
   );
-}
+};
