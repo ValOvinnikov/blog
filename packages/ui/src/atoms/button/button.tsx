@@ -6,7 +6,7 @@ import { buttonVariants } from './button-variants';
 export type TButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
   VariantProps<typeof buttonVariants>;
 
-export function Button({ className, variant, size, ...rest }: TButtonProps) {
+export const Button = ({ className, variant, size, ...rest }: TButtonProps) => {
   return (
     <button
       type="button"
@@ -14,4 +14,4 @@ export function Button({ className, variant, size, ...rest }: TButtonProps) {
       {...rest}
     />
   );
-}
+};

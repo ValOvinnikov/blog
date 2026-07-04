@@ -1,6 +1,10 @@
 import type { Size } from '@blog/config';
 
-import { avatarImageVariants, avatarVariants } from './avatar-variants';
+import {
+  avatarImageVariants,
+  avatarNameVariants,
+  avatarVariants,
+} from './avatar-variants';
 
 export type TAvatarProps = {
   src?: string;
@@ -10,7 +14,7 @@ export type TAvatarProps = {
   className?: string;
 };
 
-export function Avatar({ src, alt, name, size, className }: TAvatarProps) {
+export const Avatar = ({ src, alt, name, size, className }: TAvatarProps) => {
   const initials = name
     .split(/\s+/)
     .slice(0, 2)
@@ -25,9 +29,9 @@ export function Avatar({ src, alt, name, size, className }: TAvatarProps) {
       ) : (
         <>
           <span aria-hidden="true">{initials}</span>
-          <span className="sr-only">{name}</span>
+          <span className={avatarNameVariants()}>{name}</span>
         </>
       )}
     </span>
   );
-}
+};
