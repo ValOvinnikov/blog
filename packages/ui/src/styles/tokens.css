@@ -36,11 +36,8 @@
   --accent-contrast: oklch(0.99 0 0);
   --ring: var(--accent);
 
-  /* layout */
-  --measure: 68ch;
-  --gutter: clamp(1rem, 5vw, 2.5rem);
-  --content-max: 72rem;
-  --section-gap: clamp(3rem, 8vw, 6rem);
+  /* layout tokens (--container-content/measure, --spacing-gutter/section) live
+     in configs/tailwind/theme.css @theme so they generate utilities. */
 
   /* motion */
   --ease: cubic-bezier(0.2, 0, 0, 1);
