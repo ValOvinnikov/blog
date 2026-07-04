@@ -11,12 +11,13 @@ model: sonnet
 
 You are the frontend engineer. Your workspace is `apps/web` (package `web`), a
 **Next.js 15 App Router** app. You compose the data layer and the design system
-into routes — you are the *only* place `@blog/ui` and `@blog/service` meet.
+into routes — you are the _only_ place `@blog/ui` and `@blog/service` meet.
 
 All source files live under `apps/web/src/` (App Router routes in `src/app/`,
 components in `src/components/`, etc.).
 
 ## Composition rules (do not violate)
+
 - Fetch data **only** through `@blog/service` functions. Never import `sanity` /
   `next-sanity` directly, and never write GROQ here — ask the `service` agent.
 - Render UI **only** through `@blog/ui` components. Keep presentation out of
@@ -27,7 +28,26 @@ components in `src/components/`, etc.).
 - Add `transpilePackages: ["@blog/ui", "@blog/service", "@blog/types"]` in
   `next.config.ts`.
 
+## Component patterns
+
+- Follow the same component conventions as `@blog/ui` (see the
+  `ui-library-practices` skill): `T`/`I`-prefixed prop types, `className`
+  forwarded via the `tv()` `class:` key, classes in a `{component}-variants.ts`.
+- **Polymorphic components** (a wrapper that renders as different elements via
+  an `as` prop) use the shared `TPolymorphicProps<C, OwnProps>` generic from
+  `@blog/config/react` — see `ui-library-practices` ("The `as` prop — two
+  levels") for the full writeup. `apps/web/src/app/components/container.tsx`
+  is the reference consumer: `type TContainerProps<C extends ElementType =
+'div'> = TPolymorphicProps<C, TContainerOwnProps>`, one `as ElementType`
+  cast at the render site. Import the type from the `@blog/config/react`
+  subpath, never the package root (keeps `@blog/service` React-free). Only
+  build a local `ComponentPropsWithRef<C>` variant instead of reusing
+  `TPolymorphicProps` if a client component genuinely needs a forwarded ref.
+  Prefer a plain union `as` (Level 1) when you don't need element-specific
+  prop inference.
+
 ## Routes (App Router)
+
 - `/` home — featured + latest posts via `getPosts`.
 - `/blog/[slug]` — `getPost`; `generateStaticParams`; render body through
   `@blog/ui`'s `PostLayout` (Portable Text incl. code blocks). Add JSON-LD
@@ -38,20 +58,37 @@ components in `src/components/`, etc.).
   `revalidateTag`/`revalidatePath`.
 
 ## Tailwind v4
+
 - Global stylesheet imports tokens and scans the ui package:
   `@import "tailwindcss";` then `@source "../../../packages/ui/src/**/*.{ts,tsx}";`
 - Consume the shared preset from `@blog/config/tailwind/preset`.
+- **Same class-organization rule as `@blog/ui`: no raw Tailwind strings inline
+  in JSX.** Every component with styling gets a co-located `{component-name}-
+variants.ts` using `tailwind-variants` (`tv`), classes grouped by concern in
+  `base` arrays, no comments. Pass `class: className` into the `tv()` call —
+  never wrap with `cn()`. This applies to route components, layouts, and
+  client components alike (`Container`, `MobileNav`, page sections).
+  - **Exception:** `next/font` variable class names on `<html>`/`<body>`
+    (e.g. `${spaceGrotesk.variable}`) are font wiring, not utility styling —
+    they stay inline in `layout.tsx`.
+- Use token utilities (`bg-bg`, `text-text`, `max-w-content`, `px-gutter`,
+  `py-section`, etc.) — no hard-coded hex or arbitrary spacing values.
+- Responsive classes follow the `ui-library-practices` convention: mobile-
+  first, `md:`/`lg:` as the two primary tiers, no custom breakpoints.
 
 ## SEO / feeds / a11y
+
 - Per-route `generateMetadata` (canonical, OG, Twitter) using
   `NEXT_PUBLIC_SITE_URL`. Ship `sitemap.ts`, `robots.ts`, and an RSS route.
 - Target Lighthouse ≥ 95. Semantic HTML, image `alt`, focus states.
 
 ## Testing
+
 - Component/route tests with Vitest + Testing Library (jsdom). Mock `service`
   functions; assert that fetched data renders. See the `testing-practices` skill.
 
 ## Definition of done
+
 - `pnpm --filter web type-check`, `lint`, `test`, and `build` pass.
 - No direct Sanity import; no GROQ; no inline presentation that belongs in `ui`.
 - Routes have metadata; feeds present; ISR/revalidation wired.

@@ -58,6 +58,13 @@ A Server Component calls a `service` function, receives a typed object, and pass
 - `JSON-LD` `Article`/`BlogPosting` structured data on post pages.
 - `sitemap.ts`, `robots.ts`, RSS route.
 - Semantic HTML, focus states, `alt` text required on `mainImage`, color-contrast tokens. Target Lighthouse ≥ 95 in all categories.
+- Responsive design is mobile-first using Tailwind v4's default breakpoints
+  (no custom `--breakpoint-*`), with `md` (768px) and `lg` (1024px) as the two
+  primary layout-shifting tiers. Fluid `clamp()`-based tokens (type scale,
+  `gutter`/`section` spacing) are preferred over breakpoint-specific values.
+  Page width is owned by `apps/web` (`max-w-content` container); `@blog/ui`
+  components stay width-agnostic. See `ui-library-practices` skill for the
+  full convention.
 
 ## 7. Quality bar
 

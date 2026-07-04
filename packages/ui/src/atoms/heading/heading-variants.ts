@@ -10,7 +10,7 @@ export const headingVariants = tv({
       [Size.MD]: 'text-2xl',
       [Size.LG]: 'text-3xl',
       [Size.XL]: 'text-4xl',
-      [Size.XXL]: 'text-5xl',
+      [Size.XXL]: 'text-display',
     },
   },
 });

@@ -59,7 +59,7 @@ describe(`<${Heading.name}/>`, () => {
     render(<Heading level={1}>Default</Heading>);
     expect(
       screen.getByRole('heading', { level: 1, name: 'Default' }).className,
-    ).toContain('text-5xl');
+    ).toContain('text-display');
   });
 
   it('applies default size for level 4', () => {

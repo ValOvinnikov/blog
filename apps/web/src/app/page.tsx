@@ -1,7 +1,9 @@
+import { Container } from './components/container';
+
 export default function HomePage() {
   return (
-    <main>
+    <Container as="main" className="py-section">
       <h1>Blog</h1>
-    </main>
+    </Container>
   );
 }
