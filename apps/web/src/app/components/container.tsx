@@ -1,17 +1,24 @@
-import type { HTMLAttributes } from 'react';
+import type { ComponentPropsWithoutRef, ElementType } from 'react';
 
 import { containerVariants } from './container-variants';
 
-export interface IContainerProps extends HTMLAttributes<HTMLDivElement> {
-  as?: 'div' | 'main' | 'section' | 'header' | 'footer';
-}
+type TContainerOwnProps = {
+  className?: string;
+};
 
-export function Container({
-  as: Component = 'div',
+export type TContainerProps<C extends ElementType = 'div'> =
+  TContainerOwnProps & {
+    as?: C;
+  } & Omit<ComponentPropsWithoutRef<C>, keyof TContainerOwnProps | 'as'>;
+
+export const Container = <C extends ElementType = 'div'>({
+  as,
   className,
   ...rest
-}: IContainerProps) {
+}: TContainerProps<C>) => {
+  const Component = (as ?? 'div') as ElementType;
+
   return (
     <Component className={containerVariants({ class: className })} {...rest} />
   );
-}
+};

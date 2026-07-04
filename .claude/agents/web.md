@@ -28,6 +28,21 @@ components in `src/components/`, etc.).
 - Add `transpilePackages: ["@blog/ui", "@blog/service", "@blog/types"]` in
   `next.config.ts`.
 
+## Component patterns
+
+- Follow the same component conventions as `@blog/ui` (see the
+  `ui-library-practices` skill): `T`/`I`-prefixed prop types, `className`
+  forwarded via the `tv()` `class:` key, classes in a `{component}-variants.ts`.
+- **Polymorphic components** (a wrapper that renders as different elements via
+  an `as` prop) use the generic pattern documented in `ui-library-practices`
+  ("The `as` prop — two levels"). `apps/web/src/app/components/container.tsx`
+  is the reference: generic `C extends ElementType = 'div'`, props inferred with
+  `ComponentPropsWithoutRef<C>`, own props stripped with `Omit<…, keyof … | 'as'>`,
+  one `as ElementType` cast at the render site. Use `ComponentPropsWithoutRef`
+  for server-safe wrappers; only reach for `ComponentPropsWithRef<C>` in a
+  client component that genuinely needs a forwarded ref. Prefer a plain union
+  `as` (Level 1) when you don't need element-specific prop inference.
+
 ## Routes (App Router)
 
 - `/` home — featured + latest posts via `getPosts`.
