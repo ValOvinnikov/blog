@@ -10,13 +10,13 @@ export interface IFooterProps
   navLinks?: { href: string; label: string }[];
 }
 
-export function Footer({
+export const Footer = ({
   title,
   navLinks,
   className,
   dataTestId,
   ...rest
-}: IFooterProps) {
+}: IFooterProps) => {
   const { root, nav, copyright } = footerVariants();
   const year = new Date().getFullYear();
 
@@ -41,4 +41,4 @@ export function Footer({
       </p>
     </footer>
   );
-}
+};
