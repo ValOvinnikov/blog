@@ -46,6 +46,14 @@
   --radius: 6px;
   --radius-lg: 10px;
 
+  /* layout — container widths (→ max-w-content, max-w-measure) */
+  --container-content: 72rem;
+  --container-measure: 68ch;
+
+  /* layout — fluid spacing (→ px-gutter, gap-gutter, py-section, gap-section) */
+  --spacing-gutter: clamp(1rem, 5vw, 2.5rem);
+  --spacing-section: clamp(3rem, 8vw, 6rem);
+
   /* fluid type scale */
   --text-xs: 0.78rem;
   --text-xs--line-height: 1.4;
@@ -67,6 +75,9 @@
 
   --text-3xl: clamp(2.1rem, 1.6rem + 2.2vw, 3rem);
   --text-3xl--line-height: 1.1;
+
+  --text-4xl: clamp(2.35rem, 1.8rem + 2.75vw, 3.4rem);
+  --text-4xl--line-height: 1.08;
 
   --text-display: clamp(2.6rem, 1.8rem + 3.6vw, 4.6rem);
   --text-display--line-height: 1.05;

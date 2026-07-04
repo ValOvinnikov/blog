@@ -4,13 +4,15 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./react": "./src/react/polymorphic.ts"
   },
   "scripts": {
     "type-check": "tsc --noEmit",
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@types/react": "^19.0.0",
     "prettier": "^3.4.0",
     "typescript": "^5.7.0"
   }
