@@ -91,6 +91,104 @@ src/atoms/theme-toggle/
 - Prefer composition (`children`, slots) over boolean prop explosions.
 - Server-component-safe by default. **No `"use client"` allowed** — see Purity rules.
 
+## The `as` prop — two levels
+
+A component that can render as different elements uses an `as` prop. Pick the
+**minimum** level that fits — don't reach for generics when a union works.
+
+### Level 1 — constrained union (default choice)
+
+When the element only swaps its **tag** and every variant shares the same prop
+surface (e.g. an anchor-like nav link, or a heading that swaps `h1`–`h4`), a
+plain union is simplest and safest:
+
+```tsx
+type TLinkAs = 'a' | ComponentType<AnchorHTMLAttributes<HTMLAnchorElement>>;
+
+export interface INavLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+  as?: TLinkAs;
+}
+```
+
+The props are fixed to one element's shape; the consumer just supplies a
+drop-in replacement (e.g. next-intl's `Link`). No element-specific prop
+inference — and that's the point. Use this unless you actually need Level 2.
+
+### Level 2 — fully polymorphic (element-specific prop inference)
+
+When the component is a generic wrapper that should accept **any** element and
+expose _that element's_ props (`href` only when `as="a"`, `disabled` only when
+`as="button"`), use the shared `TPolymorphicProps<C, OwnProps>` generic from
+`@blog/config/react` — don't re-derive the mechanism per component. `Container`
+in `apps/web` is the reference consumer:
+
+```tsx
+// packages/config/src/react/polymorphic.ts (already built — import, don't rewrite)
+export type TPolymorphicProps<
+  C extends ElementType,
+  OwnProps = object,
+> = OwnProps & {
+  as?: C;
+} & Omit<ComponentPropsWithoutRef<C>, keyof OwnProps | 'as'>;
+```
+
+```tsx
+// apps/web/src/app/components/container.tsx
+import type { TPolymorphicProps } from '@blog/config/react';
+import type { ElementType } from 'react';
+
+import { containerVariants } from './container-variants';
+
+type TContainerOwnProps = { className?: string };
+
+export type TContainerProps<C extends ElementType = 'div'> = TPolymorphicProps<
+  C,
+  TContainerOwnProps
+>;
+
+export const Container = <C extends ElementType = 'div'>({
+  as,
+  className,
+  ...rest
+}: TContainerProps<C>) => {
+  const Component = (as ?? 'div') as ElementType;
+  return (
+    <Component className={containerVariants({ class: className })} {...rest} />
+  );
+};
+```
+
+(Generic arrow components are fine in `.tsx` — the `extends` constraint on the
+type parameter disambiguates it from a JSX tag, so no `<C,>` trailing comma is
+needed.)
+
+Why each piece matters:
+
+- **`C extends ElementType = 'div'`** — `C` is inferred from `as`; the default
+  makes `<Container />` a `div` with no ceremony.
+- **`ComponentPropsWithoutRef<C>`** (inside `TPolymorphicProps`) — the
+  inference engine. `as="a"` makes `href` valid; `as="button"` makes `disabled`
+  valid instead.
+- **`Omit<…, keyof OwnProps | 'as'>`** — strips the element's own `className`/
+  `as` so the component's own prop typing wins and there's no key collision.
+  Add more own props to `TContainerOwnProps` and they're excluded automatically.
+- **`ComponentPropsWithoutRef`, not `WithRef`** — `TPolymorphicProps` is
+  deliberately built on `WithoutRef` for server-component-safe wrappers (refs
+  don't cross the RSC boundary). If a client component genuinely needs a ref,
+  don't reuse `TPolymorphicProps` — build a local variant with
+  `ComponentPropsWithRef<C>`; React 19's ref-as-prop forwards it through
+  `...rest` with no `forwardRef` wrapper.
+- **`as ElementType` cast** — the one unavoidable seam at the consumer's render
+  site (not inside the shared type): TS can't prove a generic-typed value is
+  safe to spread arbitrary props onto. One narrow cast per consumer is the
+  standard escape hatch.
+- **Why `@blog/config/react`, not the package root** — `@blog/config`'s root
+  barrel (`@blog/config`) is framework-agnostic and consumed by `@blog/service`,
+  which must never import React. `TPolymorphicProps` lives behind a dedicated
+  `./react` subpath export so it's opt-in and doesn't leak `@types/react` into
+  `service`'s type graph. Always import it as `@blog/config/react`, never
+  re-export it from the root.
+
 ## Styling
 
 - **All Tailwind classes live in a `{component-name}-variants.ts` file.**
@@ -154,6 +252,35 @@ src/atoms/theme-toggle/
   `font-display`, `font-body`, `font-mono`). No hard-coded hex values.
 - Dark mode is handled by token values switching under `.dark` — no manual
   `dark:` utilities needed for colour tokens.
+
+## Responsive design
+
+- **Mobile-first.** Author base (unprefixed) classes for mobile; layer up with
+  `md:` then `lg:`. Never author desktop-first and scale down.
+- **Two primary breakpoints only.** Use Tailwind's default `md` (768px, tablet)
+  and `lg` (1024px, desktop) as the layout-shifting tiers — e.g. `grid-cols-1
+md:grid-cols-2 lg:grid-cols-3`, `hidden md:flex`. Reserve `sm`/`xl`/`2xl` for
+  genuine exceptions; don't reach for every tier out of habit.
+- **No custom breakpoints.** Tailwind v4 defaults (`sm` 640, `md` 768, `lg`
+  1024, `xl` 1280, `2xl` 1536) are the project standard — do not define
+  `--breakpoint-*` overrides.
+- **Prefer fluid tokens over breakpoint-specific values** wherever a smooth
+  scale suffices. The type scale (`text-xl` through `text-display` in
+  `configs/tailwind/theme.css`) is already `clamp()`-based and needs no
+  responsive prefix. Layout spacing uses the same approach: `gap-gutter`,
+  `px-gutter`, `py-section`, `gap-section` (all fluid via `clamp()`) instead of
+  hand-picking per-breakpoint spacing values.
+- **Page width belongs to `apps/web`, not `@blog/ui`.** Components stay
+  width-agnostic (`w-full`); the consuming app applies `max-w-content` /
+  `max-w-measure` containers.
+- Responsive classes follow the same rule as all Tailwind classes: they live
+  in the `*-variants.ts` file via `tv`, grouped by concern — never inline in
+  JSX. Example (PostGrid-style responsive grid):
+  ```ts
+  export const postGridVariants = tv({
+    base: ['grid grid-cols-1 gap-gutter', 'md:grid-cols-2', 'lg:grid-cols-3'],
+  });
+  ```
 
 ## Icons
 
@@ -237,7 +364,7 @@ All four must pass. Fix failures before reporting back. **Format runs first** �
 
 - [ ] **Ran `pnpm --filter @blog/ui format`** on all created and edited files.
 - [ ] No `service`/`sanity`/`fetch` imports. No `"use client"` directive.
-- [ ] Named function export (`export function MyComponent`); no helper components in the same file.
+- [ ] Arrow-function component (`export const MyComponent = (...) => ...`); no helper components in the same file.
 - [ ] Props interface extends `IWithDataTestId` from `@blog/config`; `dataTestId`
       wired to the root interactive element's `data-testid`.
 - [ ] Props typed (`I`-prefix interface or `T`-prefix type); `className` forwarded via `class:` key in `tv()` call.
@@ -247,3 +374,4 @@ All four must pass. Fix failures before reporting back. **Format runs first** �
 - [ ] `describe(Component.name, ...)` and `beforeEach` for shared setup.
 - [ ] Uses token utilities; dark mode intact.
 - [ ] Exported from the barrel (`index.ts` → `atoms/index.ts` → `src/index.ts`). The component `index.ts` exports **only the component and its props interface** — never the variants file. Variants are an implementation detail.
+- [ ] If the component has more than one layout arrangement (grid, stacking nav, columns), it is mobile-first with `md:`/`lg:` only — no custom breakpoints, no page-width `max-w-*` baked into the component.
