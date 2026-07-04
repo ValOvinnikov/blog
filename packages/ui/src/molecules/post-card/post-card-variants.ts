@@ -9,6 +9,10 @@ export const postCardVariants = tv({
     ],
     image: ['w-full aspect-video object-cover', 'bg-surface-2'],
     content: ['flex flex-col flex-1', 'px-5 py-4 gap-3'],
+    titleLink: [
+      'focus:outline-none',
+      'focus-visible:ring-2 focus-visible:ring-accent rounded',
+    ],
     title: [
       'font-display font-bold leading-tight tracking-tight',
       'text-fg hover:text-accent transition-colors',

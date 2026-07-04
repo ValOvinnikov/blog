@@ -18,7 +18,7 @@ export interface IPostCardProps
   authorAvatarSrc?: string;
 }
 
-export function PostCard({
+export const PostCard = ({
   title,
   excerpt,
   href,
@@ -30,11 +30,12 @@ export function PostCard({
   className,
   dataTestId,
   ...rest
-}: IPostCardProps) {
+}: IPostCardProps) => {
   const {
     root,
     image,
     content,
+    titleLink,
     title: titleSlot,
     excerpt: excerptSlot,
     meta,
@@ -60,10 +61,7 @@ export function PostCard({
       )}
 
       <div className={content()}>
-        <a
-          href={href}
-          className="focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
-        >
+        <a href={href} className={titleLink()}>
           <Heading level={2} size={Size.SM} className={titleSlot()}>
             {title}
           </Heading>
@@ -98,4 +96,4 @@ export function PostCard({
       </div>
     </div>
   );
-}
+};
