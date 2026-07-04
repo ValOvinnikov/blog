@@ -18,14 +18,14 @@ export interface IHeaderProps
   mobileTrigger?: ReactNode;
 }
 
-export function Header({
+export const Header = ({
   title,
   navLinks,
   mobileTrigger,
   className,
   dataTestId,
   ...rest
-}: IHeaderProps) {
+}: IHeaderProps) => {
   const {
     root,
     brand,
@@ -58,4 +58,4 @@ export function Header({
       </div>
     </header>
   );
-}
+};
