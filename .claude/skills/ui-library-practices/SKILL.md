@@ -118,20 +118,33 @@ inference — and that's the point. Use this unless you actually need Level 2.
 
 When the component is a generic wrapper that should accept **any** element and
 expose _that element's_ props (`href` only when `as="a"`, `disabled` only when
-`as="button"`), use the generic pattern. `Container` in `apps/web` is the
-reference implementation:
+`as="button"`), use the shared `TPolymorphicProps<C, OwnProps>` generic from
+`@blog/config/react` — don't re-derive the mechanism per component. `Container`
+in `apps/web` is the reference consumer:
 
 ```tsx
-import type { ComponentPropsWithoutRef, ElementType } from 'react';
+// packages/config/src/react/polymorphic.ts (already built — import, don't rewrite)
+export type TPolymorphicProps<
+  C extends ElementType,
+  OwnProps = object,
+> = OwnProps & {
+  as?: C;
+} & Omit<ComponentPropsWithoutRef<C>, keyof OwnProps | 'as'>;
+```
 
-type TContainerOwnProps = {
-  className?: string;
-};
+```tsx
+// apps/web/src/app/components/container.tsx
+import type { TPolymorphicProps } from '@blog/config/react';
+import type { ElementType } from 'react';
 
-export type TContainerProps<C extends ElementType = 'div'> =
-  TContainerOwnProps & {
-    as?: C;
-  } & Omit<ComponentPropsWithoutRef<C>, keyof TContainerOwnProps | 'as'>;
+import { containerVariants } from './container-variants';
+
+type TContainerOwnProps = { className?: string };
+
+export type TContainerProps<C extends ElementType = 'div'> = TPolymorphicProps<
+  C,
+  TContainerOwnProps
+>;
 
 export const Container = <C extends ElementType = 'div'>({
   as,
@@ -153,18 +166,28 @@ Why each piece matters:
 
 - **`C extends ElementType = 'div'`** — `C` is inferred from `as`; the default
   makes `<Container />` a `div` with no ceremony.
-- **`ComponentPropsWithoutRef<C>`** — the inference engine. `as="a"` makes
-  `href` valid; `as="button"` makes `disabled` valid instead.
-- **`Omit<…, keyof TContainerOwnProps | 'as'>`** — strips the element's own
-  `className`/`as` so _our_ prop typing wins and there's no key collision. Add
-  more own props later and they're excluded automatically.
-- **`ComponentPropsWithoutRef`, not `WithRef`** — deliberate for
-  server-component-safe wrappers (refs don't cross the RSC boundary). If a
-  client component needs a ref, switch to `ComponentPropsWithRef<C>`; React 19's
-  ref-as-prop forwards it through `...rest` with no `forwardRef` wrapper.
-- **`as ElementType` cast** — the one unavoidable seam: TS can't prove a
-  generic-typed value is safe to spread arbitrary props onto. One narrow cast at
-  the assignment site is the standard escape hatch.
+- **`ComponentPropsWithoutRef<C>`** (inside `TPolymorphicProps`) — the
+  inference engine. `as="a"` makes `href` valid; `as="button"` makes `disabled`
+  valid instead.
+- **`Omit<…, keyof OwnProps | 'as'>`** — strips the element's own `className`/
+  `as` so the component's own prop typing wins and there's no key collision.
+  Add more own props to `TContainerOwnProps` and they're excluded automatically.
+- **`ComponentPropsWithoutRef`, not `WithRef`** — `TPolymorphicProps` is
+  deliberately built on `WithoutRef` for server-component-safe wrappers (refs
+  don't cross the RSC boundary). If a client component genuinely needs a ref,
+  don't reuse `TPolymorphicProps` — build a local variant with
+  `ComponentPropsWithRef<C>`; React 19's ref-as-prop forwards it through
+  `...rest` with no `forwardRef` wrapper.
+- **`as ElementType` cast** — the one unavoidable seam at the consumer's render
+  site (not inside the shared type): TS can't prove a generic-typed value is
+  safe to spread arbitrary props onto. One narrow cast per consumer is the
+  standard escape hatch.
+- **Why `@blog/config/react`, not the package root** — `@blog/config`'s root
+  barrel (`@blog/config`) is framework-agnostic and consumed by `@blog/service`,
+  which must never import React. `TPolymorphicProps` lives behind a dedicated
+  `./react` subpath export so it's opt-in and doesn't leak `@types/react` into
+  `service`'s type graph. Always import it as `@blog/config/react`, never
+  re-export it from the root.
 
 ## Styling
 

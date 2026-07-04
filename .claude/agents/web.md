@@ -34,14 +34,17 @@ components in `src/components/`, etc.).
   `ui-library-practices` skill): `T`/`I`-prefixed prop types, `className`
   forwarded via the `tv()` `class:` key, classes in a `{component}-variants.ts`.
 - **Polymorphic components** (a wrapper that renders as different elements via
-  an `as` prop) use the generic pattern documented in `ui-library-practices`
-  ("The `as` prop — two levels"). `apps/web/src/app/components/container.tsx`
-  is the reference: generic `C extends ElementType = 'div'`, props inferred with
-  `ComponentPropsWithoutRef<C>`, own props stripped with `Omit<…, keyof … | 'as'>`,
-  one `as ElementType` cast at the render site. Use `ComponentPropsWithoutRef`
-  for server-safe wrappers; only reach for `ComponentPropsWithRef<C>` in a
-  client component that genuinely needs a forwarded ref. Prefer a plain union
-  `as` (Level 1) when you don't need element-specific prop inference.
+  an `as` prop) use the shared `TPolymorphicProps<C, OwnProps>` generic from
+  `@blog/config/react` — see `ui-library-practices` ("The `as` prop — two
+  levels") for the full writeup. `apps/web/src/app/components/container.tsx`
+  is the reference consumer: `type TContainerProps<C extends ElementType =
+'div'> = TPolymorphicProps<C, TContainerOwnProps>`, one `as ElementType`
+  cast at the render site. Import the type from the `@blog/config/react`
+  subpath, never the package root (keeps `@blog/service` React-free). Only
+  build a local `ComponentPropsWithRef<C>` variant instead of reusing
+  `TPolymorphicProps` if a client component genuinely needs a forwarded ref.
+  Prefer a plain union `as` (Level 1) when you don't need element-specific
+  prop inference.
 
 ## Routes (App Router)
 
