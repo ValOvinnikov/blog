@@ -1,91 +1,114 @@
 import type { IWithDataTestId } from '@blog/config';
-import type { HTMLAttributes } from 'react';
+import type { TPolymorphicProps } from '@blog/config/react';
+import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
+import { Fragment } from 'react';
 
 import { Button } from '../../atoms/button';
 import { Heading } from '../../atoms/heading';
 import { Tag } from '../../atoms/tag';
+import {
+  mapCompoundSlots,
+  type TCompoundChildren,
+  type TCompoundComponent,
+} from '../../lib/compound';
 import { heroVariants } from './hero-variants';
 
+const s = heroVariants();
+
+export const HeroMedia = ({
+  className,
+  ...rest
+}: ComponentPropsWithoutRef<'div'>) => (
+  <div className={s.image({ class: className })} {...rest} />
+);
+
+type THeroCtaOwnProps = {
+  className?: string;
+  children?: ReactNode;
+};
+
+export const HeroCta = <C extends ElementType = 'a'>({
+  as,
+  className,
+  children,
+  ...rest
+}: TPolymorphicProps<C, THeroCtaOwnProps>) => {
+  const Component = (as ?? 'a') as ElementType;
+  return (
+    <Component className={s.cta({ class: className })} {...rest}>
+      <Button>{children}</Button>
+    </Component>
+  );
+};
+
+const HeroParts = {
+  Media: HeroMedia,
+  Cta: HeroCta,
+} satisfies Record<string, ElementType>;
+
 export interface IHeroProps
-  extends HTMLAttributes<HTMLElement>, IWithDataTestId {
+  extends
+    Omit<ComponentPropsWithoutRef<'section'>, 'children'>,
+    IWithDataTestId {
   title: string;
   excerpt?: string;
-  href: string;
-  ctaLabel?: string;
   tags?: string[];
-  coverImage?: { src: string; alt: string };
   publishedAt?: string;
+  children?: TCompoundChildren<typeof HeroParts>;
 }
 
-export const Hero = ({
+const HeroRoot = ({
   title,
   excerpt,
-  href,
-  ctaLabel = 'Read more',
   tags,
-  coverImage,
   publishedAt,
+  children,
   className,
   dataTestId,
   ...rest
 }: IHeroProps) => {
-  const {
-    root,
-    image: imageSlot,
-    content: contentSlot,
-    meta: metaSlot,
-    title: titleSlot,
-    excerpt: excerptSlot,
-    tags: tagsSlot,
-    cta: ctaSlot,
-  } = heroVariants();
+  const { slots, unmatched } = mapCompoundSlots(children, HeroParts);
+  const formattedDate = publishedAt
+    ? new Date(publishedAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : undefined;
 
   return (
     <section
       aria-label="Featured post"
-      className={root({ class: className })}
+      className={s.root({ class: className })}
       data-testid={dataTestId}
       {...rest}
     >
-      {coverImage && (
-        <img
-          className={imageSlot()}
-          src={coverImage.src}
-          alt={coverImage.alt}
-        />
-      )}
-
-      <div className={contentSlot()}>
-        {publishedAt && (
-          <time dateTime={publishedAt} className={metaSlot()}>
-            {new Date(publishedAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
+      {slots.Media}
+      <div className={s.content()}>
+        {publishedAt && formattedDate && (
+          <time dateTime={publishedAt} className={s.meta()}>
+            {formattedDate}
           </time>
         )}
-
-        <div className={titleSlot()}>
+        <div className={s.title()}>
           <Heading level={1}>{title}</Heading>
         </div>
-
-        {excerpt && <p className={excerptSlot()}>{excerpt}</p>}
-
+        {excerpt && <p className={s.excerpt()}>{excerpt}</p>}
         {tags && tags.length > 0 && (
-          <div className={tagsSlot()}>
+          <div className={s.tags()}>
             {tags.map((tag) => (
               <Tag key={tag}>{tag}</Tag>
             ))}
           </div>
         )}
-
-        <div className={ctaSlot()}>
-          <a href={href}>
-            <Button>{ctaLabel}</Button>
-          </a>
-        </div>
+        {slots.Cta}
+        {unmatched.map((node, i) => (
+          <Fragment key={i}>{node}</Fragment>
+        ))}
       </div>
     </section>
   );
 };
+
+export const Hero: TCompoundComponent<typeof HeroRoot, typeof HeroParts> =
+  Object.assign(HeroRoot, HeroParts);

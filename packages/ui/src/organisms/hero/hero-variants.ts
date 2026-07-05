@@ -7,7 +7,7 @@ export const heroVariants = tv({
       'rounded-lg overflow-hidden',
       'bg-surface border border-border',
     ],
-    image: ['w-full aspect-video', 'object-cover'],
+    image: ['relative w-full aspect-video overflow-hidden'],
     content: ['flex flex-col gap-4', 'p-6 md:p-8'],
     meta: ['font-sans text-sm', 'text-text-muted'],
     title: [],
