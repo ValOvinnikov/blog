@@ -51,11 +51,18 @@ src/atoms/theme-toggle/
   theme-toggle.stories.tsx   # Storybook stories
   index.ts                   # named barrel — component + props only, never variants
   components/                # sub-components used only by this component
-    some-child.tsx
+    child-name/              # every child gets its own sub-folder
+      child-name.tsx
+      child-name-variants.ts # child's own tv() — never imports parent's variants
 ```
 
 - **One component per file.** Sub-components that are not exported from the
   barrel belong in a `components/` sub-folder — never inline in the parent file.
+- **Every child has its own variants file.** A child component must never import
+  the parent's `*-variants.ts`. Extract the relevant slot classes into the
+  child's own `child-name-variants.ts` alongside its `.tsx` file.
+- **Every child lives in its own sub-folder** inside `components/` (since it
+  always has at least two files: the component and its variants).
 
 ## Component conventions
 
@@ -238,26 +245,63 @@ component.
 
 ### Authoring a compound component
 
+Sub-components live in `components/{child-name}/` and each owns its variants.
 One `Parts` map drives everything — the `children` type, the resolver call,
 and the assembled export:
 
+```
+header/
+  components/
+    brand/
+      header-brand.tsx
+      header-brand-variants.ts   ← child's own tv(), no parent import
+    nav/
+      header-nav.tsx
+      header-nav-variants.ts
+  header-variants.ts             ← root element only
+  header.tsx                     ← root + assembly, no inline child defs
+```
+
+```ts
+// components/brand/header-brand-variants.ts
+export const headerBrandVariants = tv({
+  base: [
+    'font-sans font-semibold text-lg',
+    'text-fg',
+    'transition-colors hover:text-accent',
+    'mr-8',
+  ],
+});
+```
+
 ```tsx
+// components/brand/header-brand.tsx
+import { headerBrandVariants } from './header-brand-variants';
 export const HeaderBrand = ({
   className,
   ...rest
 }: ComponentPropsWithoutRef<'span'>) => (
-  <span className={s.brand({ class: className })} {...rest} />
+  <span className={headerBrandVariants({ class: className })} {...rest} />
 );
-export const HeaderNav = ({
-  className,
-  ...rest
-}: ComponentPropsWithoutRef<'nav'>) => (
-  <nav
-    aria-label="Site navigation"
-    className={s.nav({ class: className })}
-    {...rest}
-  />
-);
+```
+
+```ts
+// header-variants.ts — root only
+export const headerVariants = tv({
+  base: [
+    'flex items-center justify-between',
+    'px-gutter py-3',
+    'bg-bg border-b border-border',
+    'sticky top-0 z-10',
+  ],
+});
+```
+
+```tsx
+// header.tsx — root + assembly only, no inline sub-component definitions
+import { HeaderBrand } from './components/brand/header-brand';
+import { HeaderNav } from './components/nav/header-nav';
+import { headerVariants } from './header-variants';
 
 const HeaderParts = {
   Brand: HeaderBrand,
@@ -280,7 +324,7 @@ const HeaderRoot = ({
   const { slots, unmatched } = mapCompoundSlots(children, HeaderParts);
   return (
     <header
-      className={s.root({ class: className })}
+      className={headerVariants({ class: className })}
       data-testid={dataTestId}
       {...rest}
     >
@@ -556,7 +600,7 @@ All four must pass. Fix failures before reporting back. **Format runs first** �
 
 - [ ] **Ran `pnpm --filter @blog/ui format`** on all created and edited files.
 - [ ] No `service`/`sanity`/`fetch` imports. No `"use client"` directive.
-- [ ] Arrow-function component (`export const MyComponent = (...) => ...`); no helper components in the same file.
+- [ ] Arrow-function component (`export const MyComponent = (...) => ...`); no sub-components defined inline — each lives in `components/{child-name}/` with its own `{child-name}-variants.ts`. Child variants never import the parent's variants file.
 - [ ] Props interface extends `IWithDataTestId` from `@blog/config`; `dataTestId`
       wired to the root interactive element's `data-testid`.
 - [ ] Props typed (`I`-prefix interface or `T`-prefix type); `className` forwarded via `class:` key in `tv()` call.

@@ -1,9 +1,7 @@
 import type { IWithDataTestId } from '@blog/config';
-import type { TPolymorphicProps } from '@blog/config/react';
-import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ElementType } from 'react';
 import { Fragment } from 'react';
 
-import { buttonVariants } from '../../atoms/button/button-variants';
 import { Heading } from '../../atoms/heading';
 import { Tag } from '../../atoms/tag';
 import {
@@ -11,38 +9,11 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '../../lib/compound';
+import { HeroCta } from './components/cta/hero-cta';
+import { HeroMedia } from './components/media/hero-media';
 import { heroVariants } from './hero-variants';
 
 const s = heroVariants();
-
-export const HeroMedia = ({
-  className,
-  ...rest
-}: ComponentPropsWithoutRef<'div'>) => (
-  <div className={s.image({ class: className })} {...rest} />
-);
-
-type THeroCtaOwnProps = {
-  className?: string;
-  children?: ReactNode;
-};
-
-export const HeroCta = <C extends ElementType = 'a'>({
-  as,
-  className,
-  children,
-  ...rest
-}: TPolymorphicProps<C, THeroCtaOwnProps>) => {
-  const Component = (as ?? 'a') as ElementType;
-  return (
-    <Component
-      className={buttonVariants({ class: s.cta({ class: className }) })}
-      {...rest}
-    >
-      {children}
-    </Component>
-  );
-};
 
 const HeroParts = {
   Media: HeroMedia,

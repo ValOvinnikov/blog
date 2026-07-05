@@ -1,47 +1,19 @@
 import { type IWithDataTestId, Size } from '@blog/config';
-import type { TPolymorphicProps } from '@blog/config/react';
-import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ElementType } from 'react';
 import { Fragment } from 'react';
 
 import { Avatar } from '../../atoms/avatar';
-import { Heading } from '../../atoms/heading';
 import { Tag } from '../../atoms/tag';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
 } from '../../lib/compound';
+import { PostCardMedia } from './components/media/post-card-media';
+import { PostCardTitle } from './components/title/post-card-title';
 import { postCardVariants } from './post-card-variants';
 
 const s = postCardVariants();
-
-export const PostCardMedia = ({
-  className,
-  ...rest
-}: ComponentPropsWithoutRef<'div'>) => (
-  <div className={s.image({ class: className })} {...rest} />
-);
-
-type TPostCardTitleOwnProps = {
-  className?: string;
-  children?: ReactNode;
-};
-
-export const PostCardTitle = <C extends ElementType = 'a'>({
-  as,
-  className,
-  children,
-  ...rest
-}: TPolymorphicProps<C, TPostCardTitleOwnProps>) => {
-  const Component = (as ?? 'a') as ElementType;
-  return (
-    <Component className={s.titleLink({ class: className })} {...rest}>
-      <Heading level={2} size={Size.SM} className={s.title()}>
-        {children}
-      </Heading>
-    </Component>
-  );
-};
 
 const PostCardParts = {
   Media: PostCardMedia,

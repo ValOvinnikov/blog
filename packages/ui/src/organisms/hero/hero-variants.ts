@@ -7,7 +7,6 @@ export const heroVariants = tv({
       'rounded-lg overflow-hidden',
       'bg-surface border border-border',
     ],
-    image: ['relative w-full aspect-video overflow-hidden'],
     content: ['flex flex-col gap-4', 'p-6 md:p-8'],
     meta: ['font-sans text-sm', 'text-text-muted'],
     title: [],
@@ -17,6 +16,5 @@ export const heroVariants = tv({
       'max-w-prose',
     ],
     tags: ['flex flex-wrap gap-2'],
-    cta: ['mt-2'],
   },
 });

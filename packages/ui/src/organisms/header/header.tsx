@@ -7,34 +7,10 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '../../lib/compound';
+import { HeaderActions } from './components/actions/header-actions';
+import { HeaderBrand } from './components/brand/header-brand';
+import { HeaderNav } from './components/nav/header-nav';
 import { headerVariants } from './header-variants';
-
-const s = headerVariants();
-
-export const HeaderBrand = ({
-  className,
-  ...rest
-}: ComponentPropsWithoutRef<'span'>) => (
-  <span className={s.brand({ class: className })} {...rest} />
-);
-
-export const HeaderNav = ({
-  className,
-  ...rest
-}: ComponentPropsWithoutRef<'nav'>) => (
-  <nav
-    aria-label="Site navigation"
-    className={s.nav({ class: className })}
-    {...rest}
-  />
-);
-
-export const HeaderActions = ({
-  className,
-  ...rest
-}: ComponentPropsWithoutRef<'div'>) => (
-  <div className={s.actions({ class: className })} {...rest} />
-);
 
 const HeaderParts = {
   Brand: HeaderBrand,
@@ -58,7 +34,7 @@ const HeaderRoot = ({
   const { slots, unmatched } = mapCompoundSlots(children, HeaderParts);
   return (
     <header
-      className={s.root({ class: className })}
+      className={headerVariants({ class: className })}
       data-testid={dataTestId}
       {...rest}
     >
