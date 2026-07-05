@@ -1,58 +1,79 @@
 import { render, screen } from '@testing-library/react';
 
+import { NavLink } from '../../atoms/nav-link';
 import { Footer } from './footer';
 
-const defaultNavLinks = [
-  { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' },
-];
-
 describe(`<${Footer.name}/>`, () => {
-  it('renders the title in the copyright line', () => {
-    render(<Footer title="My Blog" />);
-    expect(screen.getByText(/My Blog/)).toBeVisible();
+  it('renders Footer.Copyright with the current year and title', () => {
+    render(
+      <Footer>
+        <Footer.Copyright title="My Blog" />
+      </Footer>,
+    );
+    const year = new Date().getFullYear();
+    expect(screen.getByText(`© ${year} My Blog`)).toBeVisible();
   });
 
-  it('renders nav links when provided', () => {
-    render(<Footer title="My Blog" navLinks={defaultNavLinks} />);
+  it('renders Footer.Nav content', () => {
+    render(
+      <Footer>
+        <Footer.Nav>
+          <NavLink href="/about">About</NavLink>
+          <NavLink href="/contact">Contact</NavLink>
+        </Footer.Nav>
+      </Footer>,
+    );
     expect(screen.getByRole('link', { name: 'About' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'Contact' })).toBeVisible();
   });
 
-  it('renders correct hrefs on nav links', () => {
-    render(<Footer title="My Blog" navLinks={defaultNavLinks} />);
+  it('preserves hrefs on nav links', () => {
+    render(
+      <Footer>
+        <Footer.Nav>
+          <NavLink href="/about">About</NavLink>
+        </Footer.Nav>
+      </Footer>,
+    );
     expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute(
       'href',
       '/about',
     );
-    expect(screen.getByRole('link', { name: 'Contact' })).toHaveAttribute(
-      'href',
-      '/contact',
+  });
+
+  it('does not render a nav element when Footer.Nav is omitted', () => {
+    render(
+      <Footer>
+        <Footer.Copyright title="My Blog" />
+      </Footer>,
     );
-  });
-
-  it('does not render a nav element when navLinks is omitted', () => {
-    render(<Footer title="My Blog" />);
     expect(
       screen.queryByRole('navigation', { name: 'Footer navigation' }),
     ).not.toBeInTheDocument();
   });
 
-  it('does not render a nav element when navLinks is an empty array', () => {
-    render(<Footer title="My Blog" navLinks={[]} />);
-    expect(
-      screen.queryByRole('navigation', { name: 'Footer navigation' }),
-    ).not.toBeInTheDocument();
+  it('renders unmatched children without dropping them', () => {
+    render(
+      <Footer>
+        <Footer.Copyright title="My Blog" />
+        <span>stray content</span>
+      </Footer>,
+    );
+    expect(screen.getByText('stray content')).toBeVisible();
+  });
+
+  it('renders as a <footer> landmark', () => {
+    render(<Footer />);
+    expect(screen.getByRole('contentinfo')).toBeVisible();
   });
 
   it('forwards className to the root element', () => {
-    render(<Footer title="My Blog" className="custom-class" />);
-    const footer = screen.getByRole('contentinfo');
-    expect(footer.className).toContain('custom-class');
+    render(<Footer className="custom-class" />);
+    expect(screen.getByRole('contentinfo').className).toContain('custom-class');
   });
 
   it('forwards data-testid to the root element', () => {
-    render(<Footer title="My Blog" dataTestId="site-footer" />);
+    render(<Footer dataTestId="site-footer" />);
     expect(screen.getByTestId('site-footer')).toBeVisible();
   });
 });

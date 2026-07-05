@@ -1,44 +1,77 @@
 import type { IWithDataTestId } from '@blog/config';
-import type { HTMLAttributes } from 'react';
+import type { ComponentPropsWithoutRef, ElementType } from 'react';
+import { Fragment } from 'react';
 
-import { NavLink } from '../../atoms/nav-link';
+import {
+  mapCompoundSlots,
+  type TCompoundChildren,
+  type TCompoundComponent,
+} from '../../lib/compound';
 import { footerVariants } from './footer-variants';
 
-export interface IFooterProps
-  extends Omit<HTMLAttributes<HTMLElement>, 'children'>, IWithDataTestId {
+const s = footerVariants();
+
+export interface IFooterCopyrightProps extends Omit<
+  ComponentPropsWithoutRef<'p'>,
+  'children'
+> {
   title: string;
-  navLinks?: { href: string; label: string }[];
 }
 
-export const Footer = ({
+export const FooterCopyright = ({
   title,
-  navLinks,
+  className,
+  ...rest
+}: IFooterCopyrightProps) => (
+  <p className={s.copyright({ class: className })} {...rest}>
+    &copy; {new Date().getFullYear()} {title}
+  </p>
+);
+
+export const FooterNav = ({
+  className,
+  ...rest
+}: ComponentPropsWithoutRef<'nav'>) => (
+  <nav
+    aria-label="Footer navigation"
+    className={s.nav({ class: className })}
+    {...rest}
+  />
+);
+
+const FooterParts = {
+  Nav: FooterNav,
+  Copyright: FooterCopyright,
+} satisfies Record<string, ElementType>;
+
+export interface IFooterProps
+  extends
+    Omit<ComponentPropsWithoutRef<'footer'>, 'children'>,
+    IWithDataTestId {
+  children?: TCompoundChildren<typeof FooterParts>;
+}
+
+const FooterRoot = ({
+  children,
   className,
   dataTestId,
   ...rest
 }: IFooterProps) => {
-  const { root, nav, copyright } = footerVariants();
-  const year = new Date().getFullYear();
-
+  const { slots, unmatched } = mapCompoundSlots(children, FooterParts);
   return (
     <footer
-      className={root({ class: className })}
+      className={s.root({ class: className })}
       data-testid={dataTestId}
       {...rest}
     >
-      {navLinks && navLinks.length > 0 && (
-        <nav className={nav()} aria-label="Footer navigation">
-          {navLinks.map((link) => (
-            <NavLink key={link.href} href={link.href}>
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
-      )}
-
-      <p className={copyright()}>
-        &copy; {year} {title}
-      </p>
+      {slots.Nav}
+      {slots.Copyright}
+      {unmatched.map((node, i) => (
+        <Fragment key={i}>{node}</Fragment>
+      ))}
     </footer>
   );
 };
+
+export const Footer: TCompoundComponent<typeof FooterRoot, typeof FooterParts> =
+  Object.assign(FooterRoot, FooterParts);
