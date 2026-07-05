@@ -18,7 +18,7 @@ const defaultSizes: Record<1 | 2 | 3 | 4, TSize> = {
   4: Size.MD,
 };
 
-export function Heading({ level, size, className, ...rest }: THeadingProps) {
+export const Heading = ({ level, size, className, ...rest }: THeadingProps) => {
   const Tag = `h${level}` as const;
   return (
     <Tag
@@ -29,4 +29,4 @@ export function Heading({ level, size, className, ...rest }: THeadingProps) {
       {...rest}
     />
   );
-}
+};

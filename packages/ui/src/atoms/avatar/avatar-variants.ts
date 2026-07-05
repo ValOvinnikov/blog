@@ -23,3 +23,7 @@ export const avatarVariants = tv({
 export const avatarImageVariants = tv({
   base: ['h-full w-full object-cover'],
 });
+
+export const avatarNameVariants = tv({
+  base: ['sr-only'],
+});
