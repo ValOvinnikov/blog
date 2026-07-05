@@ -51,11 +51,77 @@ src/atoms/theme-toggle/
   theme-toggle.stories.tsx   # Storybook stories
   index.ts                   # named barrel — component + props only, never variants
   components/                # sub-components used only by this component
-    some-child.tsx
+    child-name/              # every child gets its own sub-folder
+      child-name.tsx
+      child-name-variants.ts # child's own tv() — never imports parent's variants
 ```
 
 - **One component per file.** Sub-components that are not exported from the
   barrel belong in a `components/` sub-folder — never inline in the parent file.
+- **Every child has its own variants file.** A child component must never import
+  the parent's `*-variants.ts`. Extract the relevant slot classes into the
+  child's own `child-name-variants.ts` alongside its `.tsx` file.
+- **Every child lives in its own sub-folder** inside `components/` (since it
+  always has at least two files: the component and its variants).
+- **Use absolute package paths for cross-folder imports** — `@blog/ui/atoms/heading`,
+  `@blog/ui/lib/compound`, never `../../atoms/heading` or `../../lib/compound`.
+  The `@blog/ui/*` alias is configured in `tsconfig.json` (paths), `vitest.config.ts`
+  (resolve.alias), and `.storybook/main.ts` (viteFinal alias). Same-folder imports
+  (`./header-variants`, `./components/brand/header-brand`) remain relative.
+
+## Accessibility rules (non-negotiable)
+
+- **Never hardcode strings in UI components.** Any text that conveys meaning or
+  identity — `aria-label`, landmark names, button labels — must be a prop. The
+  component has no knowledge of the page context it's placed in.
+
+  ```tsx
+  // ✅ correct — consumer supplies the label
+  interface IHeaderNavProps extends ComponentPropsWithoutRef<'nav'> {
+    ariaLabel?: string;
+  }
+  export const HeaderNav = ({ ariaLabel, ...rest }: IHeaderNavProps) => (
+    <nav aria-label={ariaLabel} {...rest} />
+  );
+
+  // ❌ wrong — component decides its own label
+  export const HeaderNav = ({ ...rest }) => (
+    <nav aria-label="Site navigation" {...rest} />
+  );
+  ```
+
+  The camelCase `ariaLabel` prop is the project convention for the mapped
+  `aria-label` attribute — prefer it over passing `aria-label` directly to keep
+  component APIs consistent.
+
+- **Never format dates inside a UI component.** Date display is locale-dependent
+  and the UI layer has no access to the user's locale. Pass two separate props:
+  `publishedAt?: string` (ISO 8601, used only for `<time dateTime>`) and
+  `formattedDate?: string` (human-readable string pre-formatted in `apps/web`
+  using `Intl.DateTimeFormat` or Next.js `formatDate` utilities). The `<time>`
+  element only renders when **both** are present:
+
+  ```tsx
+  // IHeroProps / IPostCardProps
+  publishedAt?: string;   // → <time dateTime={publishedAt}>
+  formattedDate?: string; // → visible text inside <time>
+
+  // render:
+  {publishedAt && formattedDate && (
+    <time dateTime={publishedAt}>{formattedDate}</time>
+  )}
+  ```
+
+  In `apps/web`, format via `new Intl.DateTimeFormat(locale, { ... }).format(date)`
+  (or equivalent Next.js/i18n helper) before passing to the component.
+
+- **Card/post title slots must render a heading element.** `PostCard.Title` is an
+  `<h2>` wrapper (not `<div>`) so the card title participates in the document
+  outline. The consumer passes the link as `children`:
+  ```html
+  <h2><a href="/post">Post title</a></h2>
+  ```
+  This is the correct semantic pattern for a linked heading in a card component.
 
 ## Component conventions
 
@@ -232,32 +298,74 @@ and client components.
   `mapCompoundSlots`'s `unmatched` output is the runtime backstop for
   exactly that gap.
 
-Import both from `../../lib/compound` (relative to a component under
-`atoms/`/`molecules/`/`organisms/`) — never re-derive this mechanism per
+Import both from `@blog/ui/lib/compound` — never re-derive this mechanism per
 component.
 
 ### Authoring a compound component
 
+Sub-components live in `components/{child-name}/` and each owns its variants.
 One `Parts` map drives everything — the `children` type, the resolver call,
 and the assembled export:
 
+```
+header/
+  components/
+    brand/
+      header-brand.tsx
+      header-brand-variants.ts   ← child's own tv(), no parent import
+    nav/
+      header-nav.tsx
+      header-nav-variants.ts
+  header-variants.ts             ← root element only
+  header.tsx                     ← root + assembly, no inline child defs
+```
+
+```ts
+// components/brand/header-brand-variants.ts
+export const headerBrandVariants = tv({
+  base: [
+    'font-sans font-semibold text-lg',
+    'text-fg',
+    'transition-colors hover:text-accent',
+    'mr-8',
+  ],
+});
+```
+
 ```tsx
+// components/brand/header-brand.tsx
+import { headerBrandVariants } from './header-brand-variants';
 export const HeaderBrand = ({
   className,
   ...rest
 }: ComponentPropsWithoutRef<'span'>) => (
-  <span className={s.brand({ class: className })} {...rest} />
+  <span className={headerBrandVariants({ class: className })} {...rest} />
 );
-export const HeaderNav = ({
-  className,
-  ...rest
-}: ComponentPropsWithoutRef<'nav'>) => (
-  <nav
-    aria-label="Site navigation"
-    className={s.nav({ class: className })}
-    {...rest}
-  />
-);
+```
+
+```ts
+// header-variants.ts — root only
+export const headerVariants = tv({
+  base: [
+    'flex items-center justify-between',
+    'px-gutter py-3',
+    'bg-bg border-b border-border',
+    'sticky top-0 z-10',
+  ],
+});
+```
+
+```tsx
+// header.tsx — root + assembly only, no inline sub-component definitions
+import {
+  mapCompoundSlots,
+  type TCompoundChildren,
+  type TCompoundComponent,
+} from '@blog/ui/lib/compound';
+
+import { HeaderBrand } from './components/brand/header-brand';
+import { HeaderNav } from './components/nav/header-nav';
+import { headerVariants } from './header-variants';
 
 const HeaderParts = {
   Brand: HeaderBrand,
@@ -280,7 +388,7 @@ const HeaderRoot = ({
   const { slots, unmatched } = mapCompoundSlots(children, HeaderParts);
   return (
     <header
-      className={s.root({ class: className })}
+      className={headerVariants({ class: className })}
       data-testid={dataTestId}
       {...rest}
     >
@@ -305,29 +413,41 @@ export const Header: TCompoundComponent<typeof HeaderRoot, typeof HeaderParts> =
   (resolve → render slots → `Object.assign`) is expected to repeat per
   component — that repetition is the deliberate trade-off for not having a
   factory, not a DRY violation to fix.
-- **A slot that must wrap component-owned content in a link** (e.g. a card's
-  title, or a CTA button) combines the compound pattern with the
-  polymorphic pattern from the previous section — the slot itself is
-  `TPolymorphicProps`-based:
+- **Slots are generic positioning containers — never force element types or
+  borrow styles from other atoms.** A slot like `Hero.Cta` or `PostCard.Title`
+  must be a plain wrapper with only its own layout/spacing styles. The consumer
+  decides what goes inside (`<Button>`, `<a>`, a router `Link`, etc.) and
+  supplies that element's own styling. Never import another atom's variants
+  (e.g. `buttonVariants`) inside a slot — that would couple the slot to a
+  specific visual treatment. The slot's `tv()` holds only positioning/layout
+  classes (`mt-2`, `text-fg hover:text-accent`); everything else belongs to
+  the consumer's child element.
   ```tsx
-  export const PostCardTitle = <C extends ElementType = 'a'>({
-    as,
+  // ✅ correct — generic wrapper, consumer owns the element and its style
+  export const HeroCta = ({
     className,
-    children,
     ...rest
-  }: TPolymorphicProps<C, { className?: string; children?: ReactNode }>) => {
+  }: ComponentPropsWithoutRef<'div'>) => (
+    <div className={heroCtaVariants({ class: className })} {...rest} />
+  );
+
+  // consumer:
+  <Hero.Cta>
+    <Button as="a" href="/post">Read more</Button>
+  </Hero.Cta>
+
+  // ❌ wrong — slot steals buttonVariants, forcing button styling on any child
+  export const HeroCta = <C extends ElementType = 'a'>({
+    as, className, children, ...rest
+  }: TPolymorphicProps<C, ...>) => {
     const Component = (as ?? 'a') as ElementType;
     return (
-      <Component className={s.titleLink({ class: className })} {...rest}>
-        <Heading level={2} size={Size.SM} className={s.title()}>
-          {children}
-        </Heading>
+      <Component className={buttonVariants({ class: heroCtaVariants({ class: className }) })} {...rest}>
+        {children}
       </Component>
     );
   };
   ```
-  This is how `apps/web` passes `as={Link}` (next-intl) or a Sanity-aware
-  image through a slot without `@blog/ui` ever importing either.
 - **Barrel exports stay unchanged by compound-ness**: `index.ts` exports only
   the assembled compound (`Header`) and its root props type (`IHeaderProps`)
   — never the sub-components (`HeaderBrand`, `HeaderNav`) or their prop types
@@ -556,7 +676,7 @@ All four must pass. Fix failures before reporting back. **Format runs first** �
 
 - [ ] **Ran `pnpm --filter @blog/ui format`** on all created and edited files.
 - [ ] No `service`/`sanity`/`fetch` imports. No `"use client"` directive.
-- [ ] Arrow-function component (`export const MyComponent = (...) => ...`); no helper components in the same file.
+- [ ] Arrow-function component (`export const MyComponent = (...) => ...`); no sub-components defined inline — each lives in `components/{child-name}/` with its own `{child-name}-variants.ts`. Child variants never import the parent's variants file.
 - [ ] Props interface extends `IWithDataTestId` from `@blog/config`; `dataTestId`
       wired to the root interactive element's `data-testid`.
 - [ ] Props typed (`I`-prefix interface or `T`-prefix type); `className` forwarded via `class:` key in `tv()` call.

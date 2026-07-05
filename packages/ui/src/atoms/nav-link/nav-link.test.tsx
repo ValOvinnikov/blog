@@ -16,21 +16,21 @@ describe(`<${NavLink.name}/>`, () => {
     );
   });
 
-  it('applies active variant class when isActive={true}', () => {
+  it('active variant applies accent color', () => {
     render(
       <NavLink href="/blog" isActive>
         Blog
       </NavLink>,
     );
     expect(screen.getByRole('link', { name: 'Blog' }).className).toContain(
-      'font-medium',
+      'text-accent',
     );
   });
 
-  it('applies inactive variant class by default', () => {
+  it('inactive variant applies subtle color by default', () => {
     render(<NavLink href="/blog">Blog</NavLink>);
     expect(screen.getByRole('link', { name: 'Blog' }).className).toContain(
-      'text-text-muted',
+      'text-text-subtle',
     );
   });
 

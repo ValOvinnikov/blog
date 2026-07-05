@@ -2,21 +2,16 @@ import { tv } from 'tailwind-variants';
 
 export const heroVariants = tv({
   slots: {
-    root: [
-      'flex flex-col',
-      'rounded-lg overflow-hidden',
-      'bg-surface border border-border',
+    root: ['py-6 md:py-10'],
+    content: ['flex flex-col gap-4'],
+    eyebrow: [
+      'font-mono text-xs font-medium',
+      'tracking-[.14em] uppercase',
+      'text-accent',
     ],
-    image: ['relative w-full aspect-video overflow-hidden'],
-    content: ['flex flex-col gap-4', 'p-6 md:p-8'],
-    meta: ['font-sans text-sm', 'text-text-muted'],
+    meta: ['font-mono text-xs', 'text-text-subtle'],
     title: [],
-    excerpt: [
-      'font-sans text-base leading-relaxed',
-      'text-text-muted',
-      'max-w-prose',
-    ],
-    tags: ['flex flex-wrap gap-2'],
-    cta: ['mt-2'],
+    excerpt: ['text-base leading-[1.6]', 'text-text-muted', 'max-w-[52ch]'],
+    tags: ['flex flex-wrap gap-2', 'mt-2'],
   },
 });

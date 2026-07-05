@@ -1,23 +1,20 @@
-import { Size } from '@blog/config';
 import { tv } from 'tailwind-variants';
 
 export const tagVariants = tv({
   base: [
-    'inline-flex items-center rounded',
-    'font-sans font-medium whitespace-nowrap',
+    'inline-flex items-center',
+    'rounded-sm',
+    'font-mono text-xs font-medium',
+    'tracking-[.06em] uppercase whitespace-nowrap',
+    'px-2 py-0.5',
   ],
   variants: {
     variant: {
-      default: 'bg-surface-2 text-text-muted',
-      accent: 'bg-accent text-bg',
-    },
-    size: {
-      [Size.SM]: 'px-2 py-0.5 text-xs',
-      [Size.MD]: 'px-2.5 py-1 text-sm',
+      default: 'text-text-subtle border border-border',
+      accent: 'bg-accent-muted text-accent',
     },
   },
   defaultVariants: {
     variant: 'default',
-    size: Size.MD,
   },
 });

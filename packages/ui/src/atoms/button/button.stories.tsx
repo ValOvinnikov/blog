@@ -12,26 +12,26 @@ export default meta;
 
 type TStory = StoryObj<typeof Button>;
 
-export const Default: TStory = {
-  args: { children: 'Button', variant: 'primary', size: Size.MD },
-};
-
-export const Secondary: TStory = {
-  args: { children: 'Button', variant: 'secondary' },
+export const Primary: TStory = {
+  args: { children: 'Publish', variant: 'primary', size: Size.MD },
 };
 
 export const Ghost: TStory = {
-  args: { children: 'Button', variant: 'ghost' },
+  args: { children: 'Cancel', variant: 'ghost' },
+};
+
+export const Link: TStory = {
+  args: { children: 'Read more', variant: 'link' },
 };
 
 export const Small: TStory = {
-  args: { children: 'Button', size: Size.SM },
+  args: { children: 'Tag', size: Size.SM },
 };
 
 export const Large: TStory = {
-  args: { children: 'Button', size: Size.LG },
+  args: { children: 'Get started', size: Size.LG },
 };
 
 export const Disabled: TStory = {
-  args: { children: 'Button', disabled: true },
+  args: { children: 'Disabled', disabled: true },
 };

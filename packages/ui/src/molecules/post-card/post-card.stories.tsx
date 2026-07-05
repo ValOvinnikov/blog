@@ -19,6 +19,7 @@ export const Full: TStory = {
     excerpt:
       'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS, tailwind-variants, and Atomic Design principles.',
     publishedAt: '2024-03-10T09:00:00Z',
+    formattedDate: 'March 10, 2024',
     tags: ['design-system', 'tailwind', 'react'],
     authorName: 'Jane Doe',
     authorAvatarSrc: 'https://i.pravatar.cc/150?img=1',
@@ -31,8 +32,10 @@ export const Full: TStory = {
           alt="Abstract design elements on a dark background"
         />
       </PostCard.Media>
-      <PostCard.Title href="/posts/building-a-design-system">
-        Building a Design System from Scratch
+      <PostCard.Title>
+        <a href="/posts/building-a-design-system">
+          Building a Design System from Scratch
+        </a>
       </PostCard.Title>
     </PostCard>
   ),
@@ -41,7 +44,9 @@ export const Full: TStory = {
 export const Minimal: TStory = {
   render: () => (
     <PostCard>
-      <PostCard.Title href="/posts/minimal">A Minimal Post</PostCard.Title>
+      <PostCard.Title>
+        <a href="/posts/minimal">A Minimal Post</a>
+      </PostCard.Title>
     </PostCard>
   ),
 };
@@ -52,11 +57,12 @@ export const WithTags: TStory = {
       'A collection of practical TypeScript patterns that will level up your code.',
     tags: ['typescript', 'javascript', 'tips'],
     publishedAt: '2024-06-01T00:00:00Z',
+    formattedDate: 'June 1, 2024',
   },
   render: (args) => (
     <PostCard {...args}>
-      <PostCard.Title href="/posts/typescript-tips">
-        TypeScript Tips for 2024
+      <PostCard.Title>
+        <a href="/posts/typescript-tips">TypeScript Tips for 2024</a>
       </PostCard.Title>
     </PostCard>
   ),

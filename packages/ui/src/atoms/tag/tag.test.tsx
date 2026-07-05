@@ -1,4 +1,3 @@
-import { Size } from '@blog/config';
 import { render, screen } from '@testing-library/react';
 
 import { Tag } from './tag';
@@ -14,13 +13,13 @@ describe(`<${Tag.name}/>`, () => {
     expect(screen.getByText('Label').className).toContain('mt-4');
   });
 
-  it('accent variant applies accent background class', () => {
-    render(<Tag variant="accent">Label</Tag>);
-    expect(screen.getByText('Label').className).toContain('bg-accent');
+  it('default variant has a border', () => {
+    render(<Tag>Label</Tag>);
+    expect(screen.getByText('Label').className).toContain('border');
   });
 
-  it('sm size applies text-xs class', () => {
-    render(<Tag size={Size.SM}>Label</Tag>);
-    expect(screen.getByText('Label').className).toContain('text-xs');
+  it('accent variant applies accent-muted background', () => {
+    render(<Tag variant="accent">Label</Tag>);
+    expect(screen.getByText('Label').className).toContain('bg-accent-muted');
   });
 });

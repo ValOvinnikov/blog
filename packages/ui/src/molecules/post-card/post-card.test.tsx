@@ -3,45 +3,19 @@ import { render, screen } from '@testing-library/react';
 import { PostCard } from './post-card';
 
 describe(`<${PostCard.name}/>`, () => {
-  it('renders PostCard.Title content as a heading', () => {
+  it('renders PostCard.Title as an h2 heading', () => {
     render(
       <PostCard>
-        <PostCard.Title href="/posts/hello-world">Hello World</PostCard.Title>
+        <PostCard.Title>
+          <a href="/posts/hello-world">Hello World</a>
+        </PostCard.Title>
       </PostCard>,
     );
-    expect(screen.getByRole('heading', { name: 'Hello World' })).toBeVisible();
-  });
-
-  it('wraps PostCard.Title in a link with the correct href by default', () => {
-    render(
-      <PostCard>
-        <PostCard.Title href="/posts/hello-world">Hello World</PostCard.Title>
-      </PostCard>,
-    );
+    expect(screen.getByRole('heading', { level: 2 })).toBeVisible();
     expect(screen.getByRole('link')).toHaveAttribute(
       'href',
       '/posts/hello-world',
     );
-  });
-
-  it('renders PostCard.Title as a custom element when `as` is provided', () => {
-    const CustomLink = ({
-      href,
-      children,
-      ...rest
-    }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
-      <a href={href} data-custom="true" {...rest}>
-        {children}
-      </a>
-    );
-    render(
-      <PostCard>
-        <PostCard.Title as={CustomLink} href="/posts/custom">
-          Custom
-        </PostCard.Title>
-      </PostCard>,
-    );
-    expect(screen.getByRole('link')).toHaveAttribute('data-custom', 'true');
   });
 
   it('renders PostCard.Media content', () => {
@@ -58,7 +32,9 @@ describe(`<${PostCard.name}/>`, () => {
   it('does not render media when PostCard.Media is omitted', () => {
     render(
       <PostCard>
-        <PostCard.Title href="/posts/hello-world">Hello World</PostCard.Title>
+        <PostCard.Title>
+          <a href="/posts/hello-world">Hello World</a>
+        </PostCard.Title>
       </PostCard>,
     );
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
@@ -98,16 +74,22 @@ describe(`<${PostCard.name}/>`, () => {
     expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
   });
 
-  it('renders a time element with the correct dateTime attribute', () => {
+  it('renders a time element with the correct dateTime and display text', () => {
     const iso = '2024-01-15T00:00:00Z';
-    render(<PostCard publishedAt={iso} />);
+    render(<PostCard publishedAt={iso} formattedDate="January 15, 2024" />);
     const timeEl = screen.getByRole('time');
     expect(timeEl).toBeVisible();
     expect(timeEl).toHaveAttribute('dateTime', iso);
+    expect(timeEl).toHaveTextContent('January 15, 2024');
   });
 
   it('does not render time element when publishedAt is omitted', () => {
     render(<PostCard />);
+    expect(screen.queryByRole('time')).not.toBeInTheDocument();
+  });
+
+  it('does not render time element when formattedDate is omitted', () => {
+    render(<PostCard publishedAt="2024-01-15T00:00:00Z" />);
     expect(screen.queryByRole('time')).not.toBeInTheDocument();
   });
 

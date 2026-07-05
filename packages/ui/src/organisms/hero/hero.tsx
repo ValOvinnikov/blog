@@ -1,48 +1,17 @@
 import type { IWithDataTestId } from '@blog/config';
-import type { TPolymorphicProps } from '@blog/config/react';
-import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
-import { Fragment } from 'react';
-
-import { buttonVariants } from '../../atoms/button/button-variants';
-import { Heading } from '../../atoms/heading';
-import { Tag } from '../../atoms/tag';
+import { Heading } from '@blog/ui/atoms/heading';
+import { Tag } from '@blog/ui/atoms/tag';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '../../lib/compound';
+} from '@blog/ui/lib/compound';
+import type { ComponentPropsWithoutRef, ElementType } from 'react';
+import { Fragment } from 'react';
+
+import { HeroCta } from './components/cta/hero-cta';
+import { HeroMedia } from './components/media/hero-media';
 import { heroVariants } from './hero-variants';
-
-const s = heroVariants();
-
-export const HeroMedia = ({
-  className,
-  ...rest
-}: ComponentPropsWithoutRef<'div'>) => (
-  <div className={s.image({ class: className })} {...rest} />
-);
-
-type THeroCtaOwnProps = {
-  className?: string;
-  children?: ReactNode;
-};
-
-export const HeroCta = <C extends ElementType = 'a'>({
-  as,
-  className,
-  children,
-  ...rest
-}: TPolymorphicProps<C, THeroCtaOwnProps>) => {
-  const Component = (as ?? 'a') as ElementType;
-  return (
-    <Component
-      className={buttonVariants({ class: s.cta({ class: className }) })}
-      {...rest}
-    >
-      {children}
-    </Component>
-  );
-};
 
 const HeroParts = {
   Media: HeroMedia,
@@ -54,40 +23,42 @@ export interface IHeroProps
     Omit<ComponentPropsWithoutRef<'section'>, 'children'>,
     IWithDataTestId {
   title: string;
+  eyebrow?: string;
   excerpt?: string;
   tags?: string[];
   publishedAt?: string;
+  formattedDate?: string;
   children?: TCompoundChildren<typeof HeroParts>;
+  ariaLabel?: string;
 }
 
 const HeroRoot = ({
   title,
+  eyebrow,
   excerpt,
   tags,
   publishedAt,
+  formattedDate,
   children,
   className,
   dataTestId,
+  ariaLabel,
   ...rest
 }: IHeroProps) => {
+  const s = heroVariants();
+
   const { slots, unmatched } = mapCompoundSlots(children, HeroParts);
-  const formattedDate = publishedAt
-    ? new Date(publishedAt).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : undefined;
 
   return (
     <section
-      aria-label="Featured post"
+      aria-label={ariaLabel}
       className={s.root({ class: className })}
       data-testid={dataTestId}
       {...rest}
     >
       {slots.Media}
       <div className={s.content()}>
+        {eyebrow && <p className={s.eyebrow()}>{eyebrow}</p>}
         {publishedAt && formattedDate && (
           <time dateTime={publishedAt} className={s.meta()}>
             {formattedDate}
