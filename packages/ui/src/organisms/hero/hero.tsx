@@ -3,7 +3,7 @@ import type { TPolymorphicProps } from '@blog/config/react';
 import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
 import { Fragment } from 'react';
 
-import { Button } from '../../atoms/button';
+import { buttonVariants } from '../../atoms/button/button-variants';
 import { Heading } from '../../atoms/heading';
 import { Tag } from '../../atoms/tag';
 import {
@@ -35,8 +35,11 @@ export const HeroCta = <C extends ElementType = 'a'>({
 }: TPolymorphicProps<C, THeroCtaOwnProps>) => {
   const Component = (as ?? 'a') as ElementType;
   return (
-    <Component className={s.cta({ class: className })} {...rest}>
-      <Button>{children}</Button>
+    <Component
+      className={buttonVariants({ class: s.cta({ class: className }) })}
+      {...rest}
+    >
+      {children}
     </Component>
   );
 };
