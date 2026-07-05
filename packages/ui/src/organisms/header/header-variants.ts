@@ -4,7 +4,7 @@ export const headerVariants = tv({
   slots: {
     root: [
       'flex items-center justify-between',
-      'px-6 py-3',
+      'px-gutter py-3',
       'bg-bg border-b border-border',
       'sticky top-0 z-10',
     ],
@@ -16,6 +16,5 @@ export const headerVariants = tv({
     ],
     nav: ['hidden items-center gap-gutter', 'md:flex'],
     actions: ['flex items-center gap-2'],
-    mobileTrigger: ['md:hidden'],
   },
 });
