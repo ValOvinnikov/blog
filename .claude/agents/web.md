@@ -45,6 +45,39 @@ components in `src/components/`, etc.).
   `TPolymorphicProps` if a client component genuinely needs a forwarded ref.
   Prefer a plain union `as` (Level 1) when you don't need element-specific
   prop inference.
+- **Consuming `@blog/ui` compound components** (`Header`, `Footer`, `Hero`,
+  `PostCard`) — see `ui-library-practices` ("Compound components") for the
+  full mechanism. From here, it's just composition: render the named slots
+  as children, and pass framework-coupled pieces (`next-intl`'s `Link`, a
+  Sanity-aware image component) directly into them — `@blog/ui` never
+  imports either.
+  ```tsx
+  import { Link } from '@/i18n/navigation'; // next-intl
+
+  <Header>
+    <Header.Brand>My Blog</Header.Brand>
+    <Header.Nav>
+      <NavLink as={Link} href="/" isActive={pathname === '/'}>Home</NavLink>
+      <NavLink as={Link} href="/blog">Blog</NavLink>
+    </Header.Nav>
+    <Header.Actions>
+      <MobileNavTrigger />
+      <ThemeToggle />
+    </Header.Actions>
+  </Header>
+
+  <PostCard excerpt={post.excerpt} tags={post.tags}>
+    <PostCard.Media>
+      <SanityImage image={post.coverImage} alt={post.title} />
+    </PostCard.Media>
+    <PostCard.Title as={Link} href={`/blog/${post.slug}`}>
+      {post.title}
+    </PostCard.Title>
+  </PostCard>
+  ```
+  Never deep-import a compound's sub-components (`import { HeaderBrand }
+from '@blog/ui'` doesn't exist) — always reach them through dot-notation
+  on the assembled export (`Header.Brand`).
 
 ## Routes (App Router)
 
