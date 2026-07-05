@@ -30,7 +30,7 @@ const TestHarness = ({ children }: { children: ReactNode }) => {
   );
 };
 
-describe(mapCompoundSlots, () => {
+describe('mapCompoundSlots', () => {
   it('matches a single known slot', () => {
     render(
       <TestHarness>
