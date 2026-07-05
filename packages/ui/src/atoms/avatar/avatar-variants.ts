@@ -5,7 +5,7 @@ export const avatarVariants = tv({
   base: [
     'rounded-full overflow-hidden inline-flex items-center justify-center',
     'bg-surface-2 text-text-muted',
-    'font-sans font-medium',
+    'font-display font-medium',
     'select-none shrink-0',
   ],
   variants: {

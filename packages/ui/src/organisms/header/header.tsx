@@ -1,12 +1,12 @@
 import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef, ElementType } from 'react';
-import { Fragment } from 'react';
-
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '../../lib/compound';
+} from '@blog/ui/lib/compound';
+import type { ComponentPropsWithoutRef, ElementType } from 'react';
+import { Fragment } from 'react';
+
 import { HeaderActions } from './components/actions/header-actions';
 import { HeaderBrand } from './components/brand/header-brand';
 import { HeaderNav } from './components/nav/header-nav';
@@ -39,8 +39,12 @@ const HeaderRoot = ({
       {...rest}
     >
       {slots.Brand}
-      {slots.Nav}
-      {slots.Actions}
+      {(slots.Nav || slots.Actions) && (
+        <div className="flex items-center gap-4">
+          {slots.Nav}
+          {slots.Actions}
+        </div>
+      )}
       {unmatched.map((node, i) => (
         <Fragment key={i}>{node}</Fragment>
       ))}

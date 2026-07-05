@@ -6,11 +6,8 @@ import { tagVariants } from './tag-variants';
 export type TTagProps = HTMLAttributes<HTMLSpanElement> &
   VariantProps<typeof tagVariants>;
 
-export const Tag = ({ className, variant, size, ...rest }: TTagProps) => {
+export const Tag = ({ className, variant, ...rest }: TTagProps) => {
   return (
-    <span
-      className={tagVariants({ variant, size, class: className })}
-      {...rest}
-    />
+    <span className={tagVariants({ variant, class: className })} {...rest} />
   );
 };

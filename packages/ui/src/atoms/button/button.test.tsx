@@ -21,27 +21,29 @@ describe(`<${Button.name}/>`, () => {
     );
   });
 
-  it('renders secondary variant', () => {
-    render(<Button variant="secondary">Secondary</Button>);
-    const btn = screen.getByRole('button', { name: 'Secondary' });
-    expect(btn.className).toContain('border-border');
-  });
-
-  it('renders ghost variant', () => {
+  it('renders ghost variant with strong border', () => {
     render(<Button variant="ghost">Ghost</Button>);
     const btn = screen.getByRole('button', { name: 'Ghost' });
-    expect(btn.className).toContain('hover:bg-border');
+    expect(btn.className).toContain('border-border-strong');
+  });
+
+  it('renders link variant with underline', () => {
+    render(<Button variant="link">Link</Button>);
+    const btn = screen.getByRole('button', { name: 'Link' });
+    expect(btn.className).toContain('underline');
   });
 
   it('renders sm size', () => {
     render(<Button size={Size.SM}>Small</Button>);
-    const btn = screen.getByRole('button', { name: 'Small' });
-    expect(btn.className).toContain('h-8');
+    expect(screen.getByRole('button', { name: 'Small' }).className).toContain(
+      'h-8',
+    );
   });
 
   it('renders lg size', () => {
     render(<Button size={Size.LG}>Large</Button>);
-    const btn = screen.getByRole('button', { name: 'Large' });
-    expect(btn.className).toContain('h-12');
+    expect(screen.getByRole('button', { name: 'Large' }).className).toContain(
+      'h-11',
+    );
   });
 });

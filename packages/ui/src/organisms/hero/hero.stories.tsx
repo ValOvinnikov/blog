@@ -7,11 +7,14 @@ const meta: Meta<typeof Hero> = {
   component: Hero,
   tags: ['autodocs'],
   args: {
+    eyebrow: 'Architecture',
     title: 'Building a Design System from Scratch',
     excerpt:
       'A deep dive into Atomic Design principles, Tailwind CSS v4, and class-variance-authority — all working together in a portable component library.',
     tags: ['Design System', 'Tailwind', 'React'],
     publishedAt: '2024-06-01T00:00:00Z',
+    formattedDate: 'June 1, 2024',
+    ariaLabel: 'Featured post',
   },
 };
 export default meta;
@@ -27,7 +30,33 @@ export const Full: TStory = {
           alt="Code editor showing component code"
         />
       </Hero.Media>
-      <Hero.Cta href="/posts/design-system">Read more</Hero.Cta>
+      <Hero.Cta>
+        <a href="/posts/design-system">Read more</a>
+      </Hero.Cta>
+    </Hero>
+  ),
+};
+
+export const Minimal: TStory = {
+  args: {
+    eyebrow: 'Senior frontend engineer',
+    title: 'Notes on shipping frontend at scale',
+    excerpt:
+      'Architecture, performance, and design systems — from fintech and retail. Written, not generated.',
+    tags: undefined,
+    publishedAt: undefined,
+    formattedDate: undefined,
+  },
+  render: (args) => <Hero {...args} />,
+};
+
+export const WithoutEyebrow: TStory = {
+  args: { eyebrow: undefined },
+  render: (args) => (
+    <Hero {...args}>
+      <Hero.Cta>
+        <a href="/posts/design-system">Read more</a>
+      </Hero.Cta>
     </Hero>
   ),
 };
@@ -35,15 +64,15 @@ export const Full: TStory = {
 export const WithoutImage: TStory = {
   render: (args) => (
     <Hero {...args}>
-      <Hero.Cta href="/posts/design-system">Read more</Hero.Cta>
+      <Hero.Cta>
+        <a href="/posts/design-system">Read more</a>
+      </Hero.Cta>
     </Hero>
   ),
 };
 
 export const WithoutTags: TStory = {
-  args: {
-    tags: undefined,
-  },
+  args: { tags: undefined },
   render: (args) => (
     <Hero {...args}>
       <Hero.Media>
@@ -52,7 +81,9 @@ export const WithoutTags: TStory = {
           alt="Code editor showing component code"
         />
       </Hero.Media>
-      <Hero.Cta href="/posts/design-system">Read more</Hero.Cta>
+      <Hero.Cta>
+        <a href="/posts/design-system">Read more</a>
+      </Hero.Cta>
     </Hero>
   ),
 };

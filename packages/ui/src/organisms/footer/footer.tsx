@@ -1,12 +1,12 @@
 import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef, ElementType } from 'react';
-import { Fragment } from 'react';
-
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '../../lib/compound';
+} from '@blog/ui/lib/compound';
+import type { ComponentPropsWithoutRef, ElementType } from 'react';
+import { Fragment } from 'react';
+
 import { FooterCopyright } from './components/copyright/footer-copyright';
 import { FooterNav } from './components/nav/footer-nav';
 import { footerVariants } from './footer-variants';
@@ -36,8 +36,8 @@ const FooterRoot = ({
       data-testid={dataTestId}
       {...rest}
     >
-      {slots.Nav}
       {slots.Copyright}
+      {slots.Nav}
       {unmatched.map((node, i) => (
         <Fragment key={i}>{node}</Fragment>
       ))}

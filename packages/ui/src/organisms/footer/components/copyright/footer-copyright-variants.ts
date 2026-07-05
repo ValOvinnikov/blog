@@ -1,5 +1,5 @@
 import { tv } from 'tailwind-variants';
 
 export const footerCopyrightVariants = tv({
-  base: ['font-sans text-sm', 'text-text-muted'],
+  base: ['font-mono text-xs text-text-subtle'],
 });

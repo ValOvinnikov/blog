@@ -2,8 +2,9 @@ import { tv } from 'tailwind-variants';
 
 export const footerVariants = tv({
   base: [
-    'flex flex-col items-center gap-gutter',
-    'px-gutter py-6',
-    'bg-bg border-t border-border',
+    'flex items-center justify-between',
+    'px-gutter pt-4',
+    'border-t border-border',
+    'font-mono text-xs text-text-subtle',
   ],
 });

@@ -2,12 +2,17 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 import { footerNavVariants } from './footer-nav-variants';
 
+interface IFooterNavProps extends ComponentPropsWithoutRef<'nav'> {
+  ariaLabel?: string;
+}
+
 export const FooterNav = ({
   className,
+  ariaLabel,
   ...rest
-}: ComponentPropsWithoutRef<'nav'>) => (
+}: IFooterNavProps) => (
   <nav
-    aria-label="Footer navigation"
+    aria-label={ariaLabel}
     className={footerNavVariants({ class: className })}
     {...rest}
   />

@@ -46,45 +46,19 @@ describe(`<${Hero.name}/>`, () => {
     expect(screen.queryByText('Design')).not.toBeInTheDocument();
   });
 
-  it('renders Hero.Cta with the correct href', () => {
+  it('renders Hero.Cta children', () => {
     render(
       <Hero title="Building a Design System">
-        <Hero.Cta href="/posts/design-system">Read more</Hero.Cta>
+        <Hero.Cta>
+          <a href="/posts/design-system">Read more</a>
+        </Hero.Cta>
       </Hero>,
     );
     expect(screen.getByRole('link')).toHaveAttribute(
       'href',
       '/posts/design-system',
     );
-  });
-
-  it('renders Hero.Cta children as the label', () => {
-    render(
-      <Hero title="Building a Design System">
-        <Hero.Cta href="/posts/design-system">View post</Hero.Cta>
-      </Hero>,
-    );
-    expect(screen.getByText('View post')).toBeVisible();
-  });
-
-  it('renders Hero.Cta as a custom element when `as` is provided', () => {
-    const CustomLink = ({
-      href,
-      children,
-      ...rest
-    }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
-      <a href={href} data-custom="true" {...rest}>
-        {children}
-      </a>
-    );
-    render(
-      <Hero title="Building a Design System">
-        <Hero.Cta as={CustomLink} href="/posts/design-system">
-          Read more
-        </Hero.Cta>
-      </Hero>,
-    );
-    expect(screen.getByRole('link')).toHaveAttribute('data-custom', 'true');
+    expect(screen.getByText('Read more')).toBeVisible();
   });
 
   it('does not render a CTA when Hero.Cta is omitted', () => {
@@ -109,7 +83,13 @@ describe(`<${Hero.name}/>`, () => {
   });
 
   it('forwards className to the root element', () => {
-    render(<Hero title="Building a Design System" className="custom-hero" />);
+    render(
+      <Hero
+        title="Building a Design System"
+        className="custom-hero"
+        ariaLabel="Featured post"
+      />,
+    );
     expect(
       screen.getByRole('region', { name: 'Featured post' }).className,
     ).toContain('custom-hero');

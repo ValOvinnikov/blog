@@ -2,9 +2,9 @@ import { tv } from 'tailwind-variants';
 
 export const headerBrandVariants = tv({
   base: [
-    'font-sans font-semibold text-lg',
-    'text-fg',
+    'font-display font-medium text-lg',
+    'tracking-[-0.01em]',
+    'text-text',
     'transition-colors hover:text-accent',
-    'mr-8',
   ],
 });

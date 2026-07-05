@@ -1,29 +1,10 @@
-import { Size } from '@blog/config';
-import type { TPolymorphicProps } from '@blog/config/react';
-import type { ElementType, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 
-import { Heading } from '../../../../atoms/heading';
 import { postCardTitleVariants } from './post-card-title-variants';
 
-const s = postCardTitleVariants();
-
-type TPostCardTitleOwnProps = {
-  className?: string;
-  children?: ReactNode;
-};
-
-export const PostCardTitle = <C extends ElementType = 'a'>({
-  as,
+export const PostCardTitle = ({
   className,
-  children,
   ...rest
-}: TPolymorphicProps<C, TPostCardTitleOwnProps>) => {
-  const Component = (as ?? 'a') as ElementType;
-  return (
-    <Component className={s.link({ class: className })} {...rest}>
-      <Heading level={2} size={Size.SM} className={s.title()}>
-        {children}
-      </Heading>
-    </Component>
-  );
-};
+}: ComponentPropsWithoutRef<'h2'>) => (
+  <h2 className={postCardTitleVariants({ class: className })} {...rest} />
+);

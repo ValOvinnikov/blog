@@ -1,14 +1,14 @@
 import { type IWithDataTestId, Size } from '@blog/config';
-import type { ComponentPropsWithoutRef, ElementType } from 'react';
-import { Fragment } from 'react';
-
-import { Avatar } from '../../atoms/avatar';
-import { Tag } from '../../atoms/tag';
+import { Avatar } from '@blog/ui/atoms/avatar';
+import { Tag } from '@blog/ui/atoms/tag';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '../../lib/compound';
+} from '@blog/ui/lib/compound';
+import type { ComponentPropsWithoutRef, ElementType } from 'react';
+import { Fragment } from 'react';
+
 import { PostCardMedia } from './components/media/post-card-media';
 import { PostCardTitle } from './components/title/post-card-title';
 import { postCardVariants } from './post-card-variants';
@@ -27,6 +27,7 @@ export interface IPostCardProps
   excerpt?: string;
   tags?: string[];
   publishedAt?: string;
+  formattedDate?: string;
   authorName?: string;
   authorAvatarSrc?: string;
   children?: TCompoundChildren<typeof PostCardParts>;
@@ -36,6 +37,7 @@ const PostCardRoot = ({
   excerpt,
   tags,
   publishedAt,
+  formattedDate,
   authorName,
   authorAvatarSrc,
   children,
@@ -44,13 +46,6 @@ const PostCardRoot = ({
   ...rest
 }: IPostCardProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, PostCardParts);
-  const formattedDate = publishedAt
-    ? new Date(publishedAt).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : undefined;
 
   return (
     <article
