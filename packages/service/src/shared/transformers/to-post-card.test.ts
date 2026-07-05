@@ -6,7 +6,7 @@ import { toPostCard } from './to-post-card';
 
 vi.mock('#/sanity/image', () => ({
   urlForImage: vi.fn(
-    () => 'https://cdn.sanity.io/images/proj/dataset/img-800x600.jpg'
+    () => 'https://cdn.sanity.io/images/proj/dataset/img-800x600.jpg',
   ),
 }));
 

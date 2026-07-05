@@ -24,7 +24,7 @@ describe('getSiteSettings', () => {
       makeRawSiteSettings({
         title: 'Awesome Blog',
         description: 'Great content',
-      })
+      }),
     );
 
     const result = await getSiteSettings();

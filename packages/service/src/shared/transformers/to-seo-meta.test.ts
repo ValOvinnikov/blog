@@ -7,7 +7,7 @@ import { toSeoMeta } from './to-seo-meta';
 
 vi.mock('#/sanity/image', () => ({
   urlForImage: vi.fn(
-    () => 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg'
+    () => 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
   ),
 }));
 
@@ -40,7 +40,7 @@ describe('toSeoMeta', () => {
         ogTitle: null,
         ogDescription: null,
         ogImage: null,
-      })
+      }),
     );
 
     expect(result.metaDescription).toBeUndefined();

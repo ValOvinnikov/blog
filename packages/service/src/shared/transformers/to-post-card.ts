@@ -32,7 +32,7 @@ export type TPostCard = {
 };
 
 function toPostCardAuthor(
-  raw: NonNullable<TRawPostCard['author']>
+  raw: NonNullable<TRawPostCard['author']>,
 ): TPostCardAuthor {
   return {
     id: raw._id,
@@ -43,7 +43,7 @@ function toPostCardAuthor(
 }
 
 function toPostCardCategory(
-  raw: NonNullable<TRawPostCard['categories']>[number]
+  raw: NonNullable<TRawPostCard['categories']>[number],
 ): TPostCardCategory {
   return {
     id: raw._id,

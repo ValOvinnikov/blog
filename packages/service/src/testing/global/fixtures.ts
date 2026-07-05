@@ -2,7 +2,7 @@ import type { TRawSiteSettings } from '#/features/global/site-settings/adaptor/t
 import { makeRawImage } from '#/testing/shared/fixtures';
 
 export function makeRawSiteSettings(
-  overrides: Partial<TRawSiteSettings> = {}
+  overrides: Partial<TRawSiteSettings> = {},
 ): TRawSiteSettings {
   return {
     title: 'My Blog',

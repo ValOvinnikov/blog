@@ -21,7 +21,7 @@ describe('getAuthor', () => {
 
   it('maps the raw author into a domain detail object', async () => {
     mockRun.mockResolvedValue(
-      makeRawAuthor({ _id: 'author-abc', name: 'John Smith' })
+      makeRawAuthor({ _id: 'author-abc', name: 'John Smith' }),
     );
 
     const result = await getAuthor('john-smith');
@@ -39,7 +39,7 @@ describe('getAuthor', () => {
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({ parameters: { slug: 'my-author' } })
+      expect.objectContaining({ parameters: { slug: 'my-author' } }),
     );
   });
 });

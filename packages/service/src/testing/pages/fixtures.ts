@@ -3,7 +3,7 @@ import type { TRawPostCard } from '#/shared/transformers/to-post-card';
 import { makeRawImage } from '#/testing/shared/fixtures';
 
 export function makeRawPostCard(
-  overrides: Partial<TRawPostCard> = {}
+  overrides: Partial<TRawPostCard> = {},
 ): TRawPostCard {
   return {
     _id: 'post-1',
@@ -33,7 +33,7 @@ export function makeRawPostCard(
 }
 
 export function makeRawPostDetail(
-  overrides: Partial<TRawPostDetail> = {}
+  overrides: Partial<TRawPostDetail> = {},
 ): TRawPostDetail {
   return {
     _id: 'post-1',

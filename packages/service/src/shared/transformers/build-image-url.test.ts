@@ -6,7 +6,7 @@ import { buildImageUrl } from './build-image-url';
 
 vi.mock('#/sanity/image', () => ({
   urlForImage: vi.fn(
-    () => 'https://cdn.sanity.io/images/proj/dataset/abc123-800x600.jpg'
+    () => 'https://cdn.sanity.io/images/proj/dataset/abc123-800x600.jpg',
   ),
 }));
 
@@ -27,7 +27,7 @@ describe('buildImageUrl', () => {
         alt: 'x',
         hotspot: null,
         crop: null,
-      })
+      }),
     ).toBeUndefined();
   });
 

@@ -6,7 +6,7 @@ import type { categoriesQuery } from './query';
 import type { TCategoriesList } from './types';
 
 export function toCategories(
-  raw: InferResultType<typeof categoriesQuery>
+  raw: InferResultType<typeof categoriesQuery>,
 ): TCategoriesList {
   return raw.map(toCategory);
 }
