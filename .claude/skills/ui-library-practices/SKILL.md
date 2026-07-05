@@ -328,6 +328,22 @@ md:grid-cols-2 lg:grid-cols-3`, `hidden md:flex`. Reserve `sm`/`xl`/`2xl` for
   ```tsx
   describe(`<${ThemeToggle.name}/> — with props`, () => { ... })
   ```
+- **Testing a plain function/utility (not a component)** — e.g. `lib/compound.tsx`'s
+  `mapCompoundSlots` — use a plain string literal naming the function. Never
+  pass the bare function reference, and never reach for `.name` here either
+  (the `.name` pattern above exists specifically to auto-sync a JSX label with
+  component renames; a utility's describe title doesn't need that):
+  ```ts
+  // ✅ correct
+  describe('mapCompoundSlots', () => { ... })
+
+  // ❌ wrong — bare function reference, not a string
+  describe(mapCompoundSlots, () => { ... })
+
+  // ❌ wrong — .name property access; unnecessary indirection for a
+  // non-component function, just write the name directly
+  describe(mapCompoundSlots.name, () => { ... })
+  ```
 - **Put the default render in `beforeEach`** when all (or most) tests share
   the same setup. For tests that need specific props, put them in a separate
   `describe` block with their own render (Testing Library auto-cleans up

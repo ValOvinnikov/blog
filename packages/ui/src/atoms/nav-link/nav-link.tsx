@@ -9,16 +9,16 @@ export interface INavLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   as?: TLinkAs;
 }
 
-export function NavLink({
+export const NavLink = ({
   isActive = false,
   className,
   as: Component = 'a',
   ...rest
-}: INavLinkProps) {
+}: INavLinkProps) => {
   return (
     <Component
       className={navLinkVariants({ isActive, class: className })}
       {...rest}
     />
   );
-}
+};
