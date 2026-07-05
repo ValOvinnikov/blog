@@ -16,35 +16,48 @@ type TStory = StoryObj<typeof PostCard>;
 
 export const Full: TStory = {
   args: {
-    title: 'Building a Design System from Scratch',
-    href: '/posts/building-a-design-system',
     excerpt:
       'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS, tailwind-variants, and Atomic Design principles.',
     publishedAt: '2024-03-10T09:00:00Z',
     tags: ['design-system', 'tailwind', 'react'],
-    coverImage: {
-      src: 'https://picsum.photos/seed/designsystem/800/450',
-      alt: 'Abstract design elements on a dark background',
-    },
     authorName: 'Jane Doe',
     authorAvatarSrc: 'https://i.pravatar.cc/150?img=1',
   },
+  render: (args) => (
+    <PostCard {...args}>
+      <PostCard.Media>
+        <img
+          src="https://picsum.photos/seed/designsystem/800/450"
+          alt="Abstract design elements on a dark background"
+        />
+      </PostCard.Media>
+      <PostCard.Title href="/posts/building-a-design-system">
+        Building a Design System from Scratch
+      </PostCard.Title>
+    </PostCard>
+  ),
 };
 
 export const Minimal: TStory = {
-  args: {
-    title: 'A Minimal Post',
-    href: '/posts/minimal',
-  },
+  render: () => (
+    <PostCard>
+      <PostCard.Title href="/posts/minimal">A Minimal Post</PostCard.Title>
+    </PostCard>
+  ),
 };
 
 export const WithTags: TStory = {
   args: {
-    title: 'TypeScript Tips for 2024',
-    href: '/posts/typescript-tips',
     excerpt:
       'A collection of practical TypeScript patterns that will level up your code.',
     tags: ['typescript', 'javascript', 'tips'],
     publishedAt: '2024-06-01T00:00:00Z',
   },
+  render: (args) => (
+    <PostCard {...args}>
+      <PostCard.Title href="/posts/typescript-tips">
+        TypeScript Tips for 2024
+      </PostCard.Title>
+    </PostCard>
+  ),
 };

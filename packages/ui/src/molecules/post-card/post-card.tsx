@@ -1,47 +1,77 @@
 import { type IWithDataTestId, Size } from '@blog/config';
-import type { HTMLAttributes } from 'react';
+import type { TPolymorphicProps } from '@blog/config/react';
+import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
+import { Fragment } from 'react';
 
 import { Avatar } from '../../atoms/avatar';
 import { Heading } from '../../atoms/heading';
 import { Tag } from '../../atoms/tag';
+import {
+  mapCompoundSlots,
+  type TCompoundChildren,
+  type TCompoundComponent,
+} from '../../lib/compound';
 import { postCardVariants } from './post-card-variants';
 
+const s = postCardVariants();
+
+export const PostCardMedia = ({
+  className,
+  ...rest
+}: ComponentPropsWithoutRef<'div'>) => (
+  <div className={s.image({ class: className })} {...rest} />
+);
+
+type TPostCardTitleOwnProps = {
+  className?: string;
+  children?: ReactNode;
+};
+
+export const PostCardTitle = <C extends ElementType = 'a'>({
+  as,
+  className,
+  children,
+  ...rest
+}: TPolymorphicProps<C, TPostCardTitleOwnProps>) => {
+  const Component = (as ?? 'a') as ElementType;
+  return (
+    <Component className={s.titleLink({ class: className })} {...rest}>
+      <Heading level={2} size={Size.SM} className={s.title()}>
+        {children}
+      </Heading>
+    </Component>
+  );
+};
+
+const PostCardParts = {
+  Media: PostCardMedia,
+  Title: PostCardTitle,
+} satisfies Record<string, ElementType>;
+
 export interface IPostCardProps
-  extends HTMLAttributes<HTMLDivElement>, IWithDataTestId {
-  title: string;
+  extends
+    Omit<ComponentPropsWithoutRef<'article'>, 'children'>,
+    IWithDataTestId {
   excerpt?: string;
-  href: string;
-  publishedAt?: string;
   tags?: string[];
-  coverImage?: { src: string; alt: string };
+  publishedAt?: string;
   authorName?: string;
   authorAvatarSrc?: string;
+  children?: TCompoundChildren<typeof PostCardParts>;
 }
 
-export const PostCard = ({
-  title,
+const PostCardRoot = ({
   excerpt,
-  href,
-  publishedAt,
   tags,
-  coverImage,
+  publishedAt,
   authorName,
   authorAvatarSrc,
+  children,
   className,
   dataTestId,
   ...rest
 }: IPostCardProps) => {
-  const {
-    root,
-    image,
-    content,
-    titleLink,
-    title: titleSlot,
-    excerpt: excerptSlot,
-    meta,
-    tags: tagsSlot,
-  } = postCardVariants();
-
+  const { slots, unmatched } = mapCompoundSlots(children, PostCardParts);
   const formattedDate = publishedAt
     ? new Date(publishedAt).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -51,34 +81,27 @@ export const PostCard = ({
     : undefined;
 
   return (
-    <div
-      className={root({ class: className })}
+    <article
+      className={s.root({ class: className })}
       data-testid={dataTestId}
       {...rest}
     >
-      {coverImage && (
-        <img src={coverImage.src} alt={coverImage.alt} className={image()} />
-      )}
-
-      <div className={content()}>
-        <a href={href} className={titleLink()}>
-          <Heading level={2} size={Size.SM} className={titleSlot()}>
-            {title}
-          </Heading>
-        </a>
-
+      {slots.Media}
+      <div className={s.content()}>
+        {slots.Title}
+        {unmatched.map((node, i) => (
+          <Fragment key={i}>{node}</Fragment>
+        ))}
         {tags && tags.length > 0 && (
-          <div className={tagsSlot()}>
+          <div className={s.tags()}>
             {tags.map((tag) => (
               <Tag key={tag}>{tag}</Tag>
             ))}
           </div>
         )}
-
-        {excerpt && <p className={excerptSlot()}>{excerpt}</p>}
-
+        {excerpt && <p className={s.excerpt()}>{excerpt}</p>}
         {(publishedAt || authorName) && (
-          <div className={meta()}>
+          <div className={s.meta()}>
             {authorName && (
               <Avatar
                 name={authorName}
@@ -94,6 +117,11 @@ export const PostCard = ({
           </div>
         )}
       </div>
-    </div>
+    </article>
   );
 };
+
+export const PostCard: TCompoundComponent<
+  typeof PostCardRoot,
+  typeof PostCardParts
+> = Object.assign(PostCardRoot, PostCardParts);

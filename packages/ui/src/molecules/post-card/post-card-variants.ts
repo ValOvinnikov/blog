@@ -7,7 +7,7 @@ export const postCardVariants = tv({
       'bg-bg border border-border',
       'transition-shadow hover:shadow-md',
     ],
-    image: ['w-full aspect-video object-cover', 'bg-surface-2'],
+    image: ['relative w-full aspect-video overflow-hidden', 'bg-surface-2'],
     content: ['flex flex-col flex-1', 'px-5 py-4 gap-3'],
     titleLink: [
       'focus:outline-none',
