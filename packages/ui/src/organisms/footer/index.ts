@@ -1,2 +1,2 @@
-export type { IFooterCopyrightProps, IFooterProps } from './footer';
+export type { IFooterProps } from './footer';
 export { Footer } from './footer';

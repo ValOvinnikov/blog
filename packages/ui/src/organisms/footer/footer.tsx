@@ -11,7 +11,7 @@ import { footerVariants } from './footer-variants';
 
 const s = footerVariants();
 
-export interface IFooterCopyrightProps extends Omit<
+interface IFooterCopyrightProps extends Omit<
   ComponentPropsWithoutRef<'p'>,
   'children'
 > {
