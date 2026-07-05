@@ -23,7 +23,7 @@ describe('getCategoryPage', () => {
   it('maps the category and its posts into a page object', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawCategory({ _id: 'cat-abc', title: 'Design' })
+        makeRawCategory({ _id: 'cat-abc', title: 'Design' }),
       )
       .mockResolvedValueOnce([
         makeRawPostCard(),

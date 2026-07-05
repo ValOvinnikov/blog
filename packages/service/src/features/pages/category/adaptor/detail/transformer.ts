@@ -14,7 +14,7 @@ type TRawPosts = InferResultType<typeof categoryPagePostsQuery>;
 
 export function toCategoryPage(
   rawCategory: TRawCategory,
-  rawPosts: TRawPosts
+  rawPosts: TRawPosts,
 ): TCategoryPage {
   return {
     category: toCategory(rawCategory),

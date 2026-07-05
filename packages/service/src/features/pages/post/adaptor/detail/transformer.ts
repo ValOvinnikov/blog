@@ -13,7 +13,7 @@ export type TRawPostDetail = NonNullable<
 >;
 
 function toPostDetailAuthor(
-  raw: NonNullable<TRawPostDetail['author']>
+  raw: NonNullable<TRawPostDetail['author']>,
 ): TPostDetailAuthor {
   return {
     id: raw._id,

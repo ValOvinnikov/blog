@@ -21,7 +21,7 @@ describe('getPost', () => {
 
   it('maps the raw post into a domain detail object', async () => {
     mockRun.mockResolvedValue(
-      makeRawPostDetail({ _id: 'post-abc', title: 'Test Post' })
+      makeRawPostDetail({ _id: 'post-abc', title: 'Test Post' }),
     );
 
     const result = await getPost('test-post');
@@ -39,7 +39,7 @@ describe('getPost', () => {
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({ parameters: { slug: 'my-slug' } })
+      expect.objectContaining({ parameters: { slug: 'my-slug' } }),
     );
   });
 });

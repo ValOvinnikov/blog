@@ -19,7 +19,7 @@ type TNextFetchOptions = {
 
 export const runQuery = makeSafeQueryRunner<TNextFetchOptions>(
   (query, { parameters, next }) =>
-    client.fetch(query, parameters ?? {}, next ? { next } : undefined)
+    client.fetch(query, parameters ?? {}, next ? { next } : undefined),
 );
 
 export const isr = (tag: string): TNextFetchOptions => ({

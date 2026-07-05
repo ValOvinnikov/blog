@@ -6,7 +6,7 @@ import { toCategoryPage } from './transformer';
 import type { TCategoryPage } from './types';
 
 export async function getCategoryPage(
-  slug: string
+  slug: string,
 ): Promise<TCategoryPage | null> {
   const [rawCategory, rawPosts] = await Promise.all([
     runQuery(categoryPageCategoryQuery, {

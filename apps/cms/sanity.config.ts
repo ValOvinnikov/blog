@@ -26,11 +26,11 @@ export default defineConfig({
               .child(
                 S.document()
                   .schemaType('siteSettings')
-                  .documentId('siteSettings')
+                  .documentId('siteSettings'),
               ),
             S.divider(),
             ...S.documentTypeListItems().filter(
-              (item) => !SINGLETON_TYPES.has(item.getId() ?? '')
+              (item) => !SINGLETON_TYPES.has(item.getId() ?? ''),
             ),
           ]),
     }),

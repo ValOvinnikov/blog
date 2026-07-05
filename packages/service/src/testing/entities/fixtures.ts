@@ -3,7 +3,7 @@ import type { TRawCategory } from '#/shared/transformers/to-category';
 import { makeRawImage } from '#/testing/shared/fixtures';
 
 export function makeRawCategory(
-  overrides: Partial<TRawCategory> = {}
+  overrides: Partial<TRawCategory> = {},
 ): TRawCategory {
   return {
     _id: 'cat-1',
