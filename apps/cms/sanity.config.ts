@@ -20,6 +20,10 @@ export default defineConfig({
         S.list()
           .title('Content')
           .items([
+            ...S.documentTypeListItems().filter(
+              (item) => !SINGLETON_TYPES.has(item.getId() ?? ''),
+            ),
+            S.divider(),
             S.listItem()
               .title('Site Settings')
               .id('siteSettings')
@@ -28,10 +32,6 @@ export default defineConfig({
                   .schemaType('siteSettings')
                   .documentId('siteSettings'),
               ),
-            S.divider(),
-            ...S.documentTypeListItems().filter(
-              (item) => !SINGLETON_TYPES.has(item.getId() ?? ''),
-            ),
           ]),
     }),
     visionTool(),

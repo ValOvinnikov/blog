@@ -21,14 +21,19 @@ architecture is the deliverable, so boundary violations are blocking, not nits.
 - `apps/web` is the only place `ui` and `service` meet: Server Components fetch
   via `service`, pass typed props to `ui`. No GROQ or raw Sanity client in `web`.
 - Dependency graph stays acyclic: `web → ui/service/types`, `service → types`,
-  `ui → types`, `cms → types (via typegen)`.
+  `ui → config`, `cms → types (via typegen)`.
 
 ## 2. Type safety (blocking)
 
 - No `any`; `unknown` is narrowed. `strict` + `noUncheckedIndexedAccess` honoured.
-- Content shapes come from `@blog/types` (generated). No hand-redeclared shapes.
+- `@blog/service` uses generated types from `sanity.types.ts` — no hand-redeclared
+  content shapes. `@blog/ui` defines its own prop types; it does not import from
+  `@blog/service` or depend on service view-models.
 - If schemas changed, `sanity.types.ts` was regenerated (`pnpm typegen`) and
   committed, and downstream `service` types updated.
+- Every field the CMS schema marks `.required()` has `.notNull()` in the
+  corresponding `service` groqd projection. Optional fields use plain
+  `sub.field()` with no fallback sentinel.
 
 ## 3. Rendering & data
 
@@ -49,14 +54,18 @@ architecture is the deliverable, so boundary violations are blocking, not nits.
 - New `ui` class names are reachable by the web app's `@source` glob.
 - No raw Tailwind class strings inline in JSX — in `@blog/ui` **and**
   `apps/web` alike. Classes live in a co-located `{component}-variants.ts`
-  via `tv()`. Exception: `next/font` variable class names in `layout.tsx`.
+  via `tv()` from `tailwind-variants`. No standalone `clsx` or `tailwind-merge`
+  usage. Exception: `next/font` variable class names in `layout.tsx`.
 - Responsive classes are mobile-first, using only `md:`/`lg:` as the primary
   tiers (no custom `--breakpoint-*`).
 
-## 6. Tests
+## 6. Tests & stories
 
-- New/changed `ui` components and `service` functions have co-located tests.
-- Bug fixes include a regression test. `pnpm test` green.
+- New/changed `ui` components have a co-located `*.test.tsx` and a Storybook
+  story (follow `ui-storybook` skill). Both are required, not optional.
+- New/changed `service` functions have a co-located `*.test.ts`.
+- Bug fixes include a regression test that failed before the fix.
+- `pnpm test` green.
 
 ## 7. Hygiene
 

@@ -190,6 +190,9 @@ importers:
       '@blog/config':
         specifier: workspace:*
         version: link:../config
+      '@blog/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@sanity/image-url':
         specifier: ^1.1.0
         version: 1.2.0
@@ -285,6 +288,18 @@ importers:
       vitest:
         specifier: ^3.0.0
         version: 3.2.6(@types/node@20.19.43)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0)
+
+  packages/utils:
+    devDependencies:
+      prettier:
+        specifier: ^3.4.0
+        version: 3.9.4
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.6(@types/node@20.19.43)(jiti@2.7.0)(jsdom@26.1.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0)
 
 packages:
 

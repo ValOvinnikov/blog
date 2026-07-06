@@ -23,6 +23,21 @@ components in `src/components/`, etc.).
 - Render UI **only** through `@blog/ui` components. Keep presentation out of
   routes; keep data logic out of components. Server Components fetch, then pass
   plain typed props into `ui`.
+- **Always check `result.ok` after every service call** — service functions
+  return `AsyncResult<T>` via `safeAsync`. Never access `result.data` without
+  first checking `result.ok`. Decide what to do on failure at this layer:
+  - Critical data (page content, post detail): `if (!result.ok) notFound()` or
+    `if (!result.ok) return` (render nothing).
+  - Optional/global data (site settings in layout): log the error and apply
+    fallbacks — or return early if a fallback is not possible.
+  ```ts
+  const result = await service.global.siteSettings.v1.getSiteSettings();
+  if (!result.ok) {
+    console.error('Failed to load site settings:', result.error);
+    return;
+  }
+  const { title, navigation } = result.data;
+  ```
 - `"use client"` only where interaction truly requires it (theme toggle, share
   buttons, mobile nav). Default to Server Components.
 - Add `transpilePackages: ["@blog/ui", "@blog/service", "@blog/types"]` in
@@ -37,9 +52,9 @@ components in `src/components/`, etc.).
   an `as` prop) use the shared `TPolymorphicProps<C, OwnProps>` generic from
   `@blog/config/react` — see `ui-library-practices` ("The `as` prop — two
   levels") for the full writeup. `apps/web/src/app/components/container.tsx`
-  is the reference consumer: `type TContainerProps<C extends ElementType =
-'div'> = TPolymorphicProps<C, TContainerOwnProps>`, one `as ElementType`
-  cast at the render site. Import the type from the `@blog/config/react`
+  is the reference consumer (`src/components/container/container.tsx`):
+  `type TContainerProps<C extends ElementType = 'div'> = TPolymorphicProps<C, TContainerOwnProps>`,
+  one `as ElementType` cast at the render site. Import the type from `@blog/config/react`
   subpath, never the package root (keeps `@blog/service` React-free). Only
   build a local `ComponentPropsWithRef<C>` variant instead of reusing
   `TPolymorphicProps` if a client component genuinely needs a forwarded ref.
@@ -47,37 +62,10 @@ components in `src/components/`, etc.).
   prop inference.
 - **Consuming `@blog/ui` compound components** (`Header`, `Footer`, `Hero`,
   `PostCard`) — see `ui-library-practices` ("Compound components") for the
-  full mechanism. From here, it's just composition: render the named slots
-  as children, and pass framework-coupled pieces (`next-intl`'s `Link`, a
-  Sanity-aware image component) directly into them — `@blog/ui` never
-  imports either.
-  ```tsx
-  import { Link } from '@/i18n/navigation'; // next-intl
-
-  <Header>
-    <Header.Brand>My Blog</Header.Brand>
-    <Header.Nav>
-      <NavLink as={Link} href="/" isActive={pathname === '/'}>Home</NavLink>
-      <NavLink as={Link} href="/blog">Blog</NavLink>
-    </Header.Nav>
-    <Header.Actions>
-      <MobileNavTrigger />
-      <ThemeToggle />
-    </Header.Actions>
-  </Header>
-
-  <PostCard excerpt={post.excerpt} tags={post.tags}>
-    <PostCard.Media>
-      <SanityImage image={post.coverImage} alt={post.title} />
-    </PostCard.Media>
-    <PostCard.Title as={Link} href={`/blog/${post.slug}`}>
-      {post.title}
-    </PostCard.Title>
-  </PostCard>
-  ```
-  Never deep-import a compound's sub-components (`import { HeaderBrand }
-from '@blog/ui'` doesn't exist) — always reach them through dot-notation
-  on the assembled export (`Header.Brand`).
+  full mechanism. From here it's just composition: render named slots as children,
+  pass framework-coupled pieces (`Link` from `next/link`, `SanityImage`)
+  directly into them. Never deep-import sub-components — always use dot-notation
+  on the assembled export (`Header.Brand`, `PostCard.Title`).
 
 ## Routes (App Router)
 

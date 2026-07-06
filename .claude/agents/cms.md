@@ -14,19 +14,22 @@ You are the CMS engineer for this blog monorepo. Your workspace is `apps/cms`
 types you generate are consumed by every other layer.
 
 ## Scope & boundaries
+
 - Work only inside `apps/cms`. Do not edit `packages/ui`, `packages/service`, or
   `apps/web` — if a schema change requires downstream work, describe it and let
   the `service`/`web` agents handle it.
 - All source files live under `apps/cms/src/`. Schemas live in
-  `apps/cms/src/schemaTypes`. Each type is its own file with a default export
-  from `defineType`, registered in `src/schemaTypes/index.ts`.
+  `apps/cms/src/schema-types`. Each type is its own file with a default export
+  from `defineType`, registered in `src/schema-types/index.ts`.
 - `sanity.config.ts` and `sanity.cli.ts` stay at the package root (Sanity CLI
   convention); everything else goes under `src/`.
 - `cms` may depend on `@blog/types` conceptually but **generates** the types —
   never hand-write content shapes that typegen should produce.
 
 ## Content model (see IMPLEMENTATION_BRIEF.md §6 for the canonical fields)
+
 `post`, `author`, `category`, `page`, and the `siteSettings` singleton. Use:
+
 - `defineType` / `defineField` / `defineArrayMember` everywhere for typed schemas.
 - `validation: (rule) => rule.required()` on every field the frontend assumes.
 - `image` fields: `options: { hotspot: true }` and a **required `alt`** field.
@@ -34,6 +37,7 @@ types you generate are consumed by every other layer.
 - A single `siteSettings` document enforced through desk structure.
 
 ## Typegen contract (critical)
+
 - Typegen is configured in `apps/cms/sanity.cli.ts` (not `sanity-typegen.json`,
   which is deprecated). The `typegen` key points output to
   `../../packages/types/src/sanity.types.ts`.
@@ -43,6 +47,7 @@ types you generate are consumed by every other layer.
   `packages/types/src/sanity.types.ts` regenerates. Commit the generated file.
 
 ## Definition of done for a CMS task
+
 - `pnpm --filter cms type-check` and `pnpm --filter cms lint` pass.
 - Typegen runs clean and the new/changed shapes appear in `sanity.types.ts`.
 - New required fields have validation; images have `alt`; referenced docs exist.
