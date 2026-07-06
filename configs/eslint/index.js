@@ -65,6 +65,20 @@ export default [
         'error',
         { 'src/**/': 'KEBAB_CASE' },
       ],
+      // 'import/order': [
+      //   'error',
+      //   {
+      //     'newlines-between': 'always',
+      //     groups: [
+      //       'builtin',
+      //       'external',
+      //       'internal',
+      //       'parent',
+      //       'sibling',
+      //       'index',
+      //     ],
+      //   },
+      // ],
     },
   },
   prettier,
