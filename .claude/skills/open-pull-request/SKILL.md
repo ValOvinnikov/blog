@@ -68,8 +68,14 @@ Work through these gates in order. **Stop at each gate and wait for the user.**
 ### Gate 1 — Do the work
 
 - Follow `develop-feature` for implementation and per-layer delegation.
-- Run quality gates: `pnpm type-check && pnpm lint && pnpm test`.
-- Report results. Do not proceed past Gate 1 if any gate is red.
+- Run the verify step from `develop-feature` § 5 — single-package, CMS-only,
+  or multi-layer sequence depending on what changed. Do not use the simplified
+  `pnpm type-check && pnpm lint && pnpm test` shortcut — it misses typegen and
+  the web build where required.
+- Run `code-review-practices` over `git diff`. Fix any blocking issues (layer
+  boundaries, type safety, missing `.notNull()`, `next/link` usage) before
+  proceeding. Do not move to Gate 2 with known violations.
+- Report results. Do not proceed past Gate 1 if any check is red.
 
 ### Gate 2 — Ask to commit
 
@@ -139,12 +145,15 @@ Do not manually set Done.
 
 ```
 ## Summary
-- <what changed, per layer>
+- <what changed, listed per layer: cms / service / ui / web>
 
 ## Test plan
+- [ ] pnpm typegen (if schema changed)
 - [ ] pnpm type-check
 - [ ] pnpm lint
 - [ ] pnpm test
+- [ ] pnpm --filter web build (if web was touched)
+- [ ] Storybook stories present (if ui components were added or changed)
 
 Closes #<n>
 ```

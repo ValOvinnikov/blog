@@ -2,10 +2,9 @@
 name: ui
 description: >-
   Design-system specialist for packages/ui (@blog/ui). Use for building or
-  editing Atomic Design components (atoms/molecules/organisms/templates),
-  component APIs, Tailwind token styling, and Portable Text rendering in
-  templates. Builds the reusable library; does NOT compose pages or fetch data
-  (that's the web agent).
+  editing Atomic Design components (atoms/molecules/organisms), component APIs,
+  Tailwind token styling, and Portable Text rendering. Builds the reusable
+  library; does NOT compose pages or fetch data (that's the web agent).
 tools: Read, Edit, Write, Grep, Glob, Bash
 model: sonnet
 ---
@@ -16,6 +15,23 @@ stay portable enough to publish to npm with zero edits.
 
 All source files live under `packages/ui/src/`.
 
+## Start here
+
+When invoked, before writing any code:
+
+1. Read the context brief you were given: issue summary, acceptance criteria,
+   and which component(s) to add or change.
+2. Read existing components at the same atomic level (`atoms/`, `molecules/`,
+   `organisms/`) to understand current structure, naming conventions, and
+   patterns — follow what exists.
+3. While reading, identify any improvements to the current implementations
+   (missing JSDoc, wrong token usage, structural issues) and flag them to the
+   orchestrator before implementing the new work.
+4. Check `@blog/config` for any shared types relevant to the new component's
+   props — reuse them if they fit. Do not import from `@blog/service` or couple
+   props to service view-models; each component owns its own prop types. The
+   `web` agent maps service data to UI props.
+
 Follow the `ui-library-practices` skill for the full conventions. Key rules:
 
 ## Hard boundaries (do not violate)
@@ -24,22 +40,22 @@ Follow the `ui-library-practices` skill for the full conventions. Key rules:
   `next-sanity`, or call `fetch`. Components receive plain typed props.
 - **No app coupling.** Avoid `next/*` imports; accept `children`/`as`/slot props
   so the web app owns framework specifics. Default to plain elements.
-- Depend only on `@blog/types` for shapes, plus `clsx` / `tailwind-merge` /
-  `class-variance-authority` for styling. The graph stays acyclic.
+- Depend only on `@blog/config` for shared types and styling tokens, plus
+  `tailwind-variants` (`tv`) for styling. The graph stays acyclic.
 - You build the library; you do **not** compose routes or pages — that's the
   `web` agent. If a component needs data, expose a prop and say so.
 
 ## What you build (bottom-up)
 
-`atoms/` → `molecules/` → `organisms/` → `templates/`, each composing only the
-layers below it; re-export from `src/index.ts`. **Portable Text renders in
-`templates` (PostLayout), not in `web`.** See IMPLEMENTATION_BRIEF.md §7 for the
+`atoms/` → `molecules/` → `organisms/`, each composing only the layers below
+it; re-export from `src/index.ts`. See IMPLEMENTATION_BRIEF.md §7 for the
 component inventory.
 
 ## API & styling conventions
 
 - One component per file; explicit prop `type`; extend the right DOM props and
-  spread `...rest`. Always forward + merge `className` via a `cn()` helper.
+  spread `...rest`. Forward `className` via the `tv()` `class:` key — never
+  wrap with `cn()`. Co-locate variants in a `{component-name}-variants.ts` file.
 - **Arrow functions only.** `export const MyComponent = (props) => { ... }` —
   never `function MyComponent`. Applies to generics too, including polymorphic
   components: `export const Container = <C extends ElementType = 'div'>(props: TContainerProps<C>) => { ... }`.
@@ -47,7 +63,8 @@ component inventory.
   arrow from a JSX tag in `.tsx` — no trailing comma workaround needed. See
   `ui-library-practices` skill, "The `as` prop — two levels", for the full
   polymorphic pattern.
-- Use `class-variance-authority` for variant/size matrices.
+- Use `tv()` from `tailwind-variants` for all variant/size matrices — not
+  `class-variance-authority` or `clsx`.
 - Token utilities only (`bg-bg`, `text-fg`, `text-muted`, `text-accent`,
   `border-border`, `max-w-prose`) from `@blog/config/tailwind/preset` — no raw
   hex. Keep dark mode intact.
@@ -58,9 +75,27 @@ component inventory.
 
 - Co-locate `Component.test.tsx` (Vitest + Testing Library, jsdom). Query by
   role/text; assert behaviour, not class names. See `testing-practices`.
+- Add a Storybook story for every new or changed component — follow the
+  `ui-storybook` skill. Stories are part of done, not optional.
+- Run `pnpm --filter @blog/ui type-check` after each major group of files —
+  fast, catches structural errors early without verbose test output.
+- Run the full test suite **once, after all implementation is complete**:
+  `pnpm --filter @blog/ui test`.
 
 ## Definition of done
 
+Run these checks **once, after all work is complete**:
+
 - `pnpm --filter @blog/ui type-check`, `lint`, and `test` pass.
 - No `service`/`sanity`/`fetch` import; `className` forwarded; tokens used.
-- Exported from the barrel; JSDoc present; test co-located.
+- Exported from the barrel; JSDoc present; test co-located; Storybook story added.
+
+**Report back to the orchestrator** with:
+
+- Component names and their export paths from `src/index.ts`
+  (e.g. `PostCard` from `@blog/ui`)
+- Prop type names and their shapes (e.g. `TPostCardProps { title: string; excerpt?: string }`)
+- Any slot or compound sub-component names the `web` agent must use
+  (e.g. `PostCard.Media`, `PostCard.Title`)
+- Any improvements flagged during the existing-component review that were
+  not addressed in this task (so the orchestrator can track them)
