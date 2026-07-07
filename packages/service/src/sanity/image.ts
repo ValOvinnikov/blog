@@ -1,10 +1,17 @@
 import imageUrlBuilder from '@sanity/image-url';
 import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
 
-import { client } from './client';
+import { getClient } from './client';
 
-const builder = imageUrlBuilder(client);
+type TImageUrlBuilder = ReturnType<typeof imageUrlBuilder>;
+
+let builder: TImageUrlBuilder | undefined;
+
+function getImageUrlBuilder(): TImageUrlBuilder {
+  builder ??= imageUrlBuilder(getClient());
+  return builder;
+}
 
 export function urlForImage(source: SanityImageSource): string {
-  return builder.image(source).auto('format').url();
+  return getImageUrlBuilder().image(source).auto('format').url();
 }

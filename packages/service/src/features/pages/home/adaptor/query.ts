@@ -3,5 +3,5 @@ import { postCardFragment } from '#/shared/fragments/post';
 
 export const homePageQuery = q.star
   .filterByType('post')
-  .order('publishedAt desc')
+  // .order('publishedAt desc')
   .project(postCardFragment);

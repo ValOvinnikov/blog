@@ -1,11 +1,18 @@
+import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { Hero, PostCard, PostGrid } from '@blog/ui';
 import type { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { setRequestLocale } from 'next-intl/server';
 
 import { Container } from '@/components/container/container';
-import { cardSlots } from '@/utils/card-slots';
 import { formatDate } from '@/utils/format-date';
-import { heroSlots } from '@/utils/hero-slots';
+
+type TProps = {
+  params: Promise<ILocalizedParams>;
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const result = await service.global.siteSettings.v1.getSiteSettings();
@@ -28,14 +35,24 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function HomePage() {
-  const { featuredPosts, recentPosts } =
-    await service.pages.home.v1.getHomePage();
+export default async function HomePage({ params }: TProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const result = await service.pages.home.v1.getHomePage();
+
+  if (!result.ok) {
+    console.error(`Error to fetch home page: ${result.error}`);
+    notFound();
+  }
+
+  console.info(result.data);
+  const { featuredPosts, recentPosts } = result.data;
 
   const featuredPost = featuredPosts[0];
 
   return (
-    <Container as="main" className="py-section">
+    <Container as="main">
       {featuredPost && (
         <Hero
           eyebrow={featuredPost.categories[0]?.title}
@@ -43,10 +60,23 @@ export default async function HomePage() {
           excerpt={featuredPost.excerpt}
           tags={featuredPost.categories.map((category) => category.title)}
           publishedAt={featuredPost.publishedAt}
-          formattedDate={formatDate(featuredPost.publishedAt)}
+          formattedDate={formatDate(featuredPost.publishedAt, locale)}
           ariaLabel="Featured post"
         >
-          {heroSlots(featuredPost)}
+          <Hero.Media key="media">
+            {featuredPost.mainImageUrl && (
+              <Image
+                src={featuredPost.mainImageUrl}
+                alt={featuredPost.mainImageAlt}
+                fill
+                className="object-cover"
+                priority
+              />
+            )}
+          </Hero.Media>
+          <Hero.Cta key="cta">
+            <Link href={`/blog/${featuredPost.slug}`}>Read more</Link>
+          </Hero.Cta>
         </Hero>
       )}
 
@@ -58,11 +88,23 @@ export default async function HomePage() {
               excerpt={post.excerpt}
               tags={post.categories.map((category) => category.title)}
               publishedAt={post.publishedAt}
-              formattedDate={formatDate(post.publishedAt)}
+              formattedDate={formatDate(post.publishedAt, locale)}
               authorName={post.author?.name}
               authorAvatarSrc={post.author?.imageUrl}
             >
-              {cardSlots(post)}
+              <PostCard.Media key="media">
+                {post.mainImageUrl && (
+                  <Image
+                    src={post.mainImageUrl}
+                    alt={post.mainImageAlt}
+                    fill
+                    className="object-cover"
+                  />
+                )}
+              </PostCard.Media>
+              <PostCard.Title key="title">
+                <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+              </PostCard.Title>
             </PostCard>
           ))}
         </PostGrid>
