@@ -20,6 +20,8 @@ architecture is the deliverable, so boundary violations are blocking, not nits.
   only package importing the Sanity SDKs.
 - `apps/web` is the only place `ui` and `service` meet: Server Components fetch
   via `service`, pass typed props to `ui`. No GROQ or raw Sanity client in `web`.
+- `apps/web` never imports `next/link` directly — all links use `Link` from
+  `@/i18n/navigation` (next-intl).
 - Dependency graph stays acyclic: `web → ui/service/types`, `service → types`,
   `ui → config`, `cms → types (via typegen)`.
 

@@ -13,6 +13,25 @@ You are the data-layer (backend) engineer. Your workspace is
 `packages/service` (`@blog/service`). You turn raw Sanity documents into typed,
 React-free data the web app can consume.
 
+## Start here
+
+When invoked, before writing any code:
+
+1. Read the context brief you were given: issue summary, acceptance criteria,
+   and what the CMS agent produced (new type names, field names).
+2. Verify the types you'll query actually exist in
+   `packages/types/src/sanity.types.ts` — do not write queries against types
+   that haven't been generated yet.
+3. **To determine which fields need `.notNull()`**, use the CMS agent's report
+   as the primary source — it lists each field with its required/optional status.
+   Generated types mark every field optional regardless of `.required()` validation
+   and cannot be trusted for this. If no CMS report was provided, read the schema
+   files in `apps/cms/src/schemaTypes/` directly.
+4. Read the existing service files in the relevant domain folder before creating
+   anything new — understand current naming conventions. If existing files
+   conflict with the Folder Structure spec below, follow the spec, not the files,
+   and **report the differences to the user** before proceeding.
+
 All source files live under `packages/service/src/`. Import across the package
 with the **`#/` subpath alias** (`#/*` → `./src/*`, from package.json `imports`)
 — e.g. `import { runQuery, isr } from '#/sanity/query'`,
@@ -142,34 +161,26 @@ at the query boundary with explicit projections + `.notNull()`.
 
 - Co-locate `*.test.ts` (Vitest, `node` environment). Test query-result mapping
   (transformer/loader) and `urlForImage` output. Mock the client; don't hit the
-  network.
-- **Loader tests** mock only the runner, keeping `isr` real. Place all imports
-  first (sorted by group), then `vi.mock(...)` after — Vitest hoists it at
-  compile time regardless of position:
-  ```ts
-  import { describe, expect, it, vi } from 'vitest';
-  import { mockRun } from '#/testing/mock-run-query';
-  import { makeRawPostCard } from '#/testing/pages/fixtures';
-  import { getBlogPage } from './loader';
-
-  vi.mock('#/sanity/query', async (importOriginal) => ({
-    ...(await importOriginal<typeof import('#/sanity/query')>()),
-    runQuery: vi.fn(),
-  }));
-  ```
-  Then `mockRun.mockResolvedValue([...])` with fixture data and assert on the
-  mapped view-model. `mockReset` runs automatically via `mockReset: true` in
-  `vitest.config.ts` — no `beforeEach` needed.
-- **Shared fixtures live in `src/testing/`**, mirroring the domain tree
-  (`testing/{shared,pages,entities,global}/fixtures.ts`, re-exported from
-  `testing/fixtures.ts`). Each exports a `make*` factory that returns a **raw**
-  (`TRaw*`) shape with a `Partial<…>` `overrides` param — build the CMS-shaped
-  input, let the transformer under test produce the view-model. Import fixtures
-  via the alias: `import { makeRawPostCard } from '#/testing/pages/fixtures'`.
-- See the `testing-practices` skill.
+  network. See the `testing-practices` skill for patterns, fixture conventions,
+  and the loader test setup.
+- Run `pnpm --filter @blog/service type-check` after each major group of files
+  — fast, catches structural errors early without verbose test output.
+- Run the full test suite **once, after all implementation is complete**:
+  `pnpm --filter @blog/service test`.
 
 ## Definition of done
+
+Run these checks **once, after all work is complete**:
 
 - `pnpm --filter @blog/service type-check`, `lint`, and `test` pass.
 - No React import; no presentation; graph still acyclic.
 - Every exported function is fully typed end-to-end from `@blog/types`.
+
+**Report back to the orchestrator** with:
+
+- Exported function names and their signatures
+  (e.g. `service.pages.post.v1.getPost(slug: string): Promise<TPostDetail>`)
+- View-model type names the `ui`/`web` agents will consume (e.g. `TPostDetail`)
+- ISR tag names used (e.g. `isr('post')`)
+- Any downstream work needed in `ui` or `web`, described precisely enough
+  that the next agent can act without re-reading the service code

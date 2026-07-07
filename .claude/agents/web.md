@@ -16,6 +16,30 @@ into routes — you are the _only_ place `@blog/ui` and `@blog/service` meet.
 All source files live under `apps/web/src/` (App Router routes in `src/app/`,
 components in `src/components/`, etc.).
 
+## Start here
+
+When invoked, before writing any code:
+
+1. Read the context brief you were given: issue summary and acceptance criteria.
+2. If a **service agent report** was provided, note the exported function
+   signatures and view-model types you will call. If not, read the existing
+   service exports in `packages/service/src/index.ts` to find the functions
+   to reuse.
+3. If a **UI agent report** was provided, note the component names, prop shapes,
+   and compound sub-component names you will compose. If not, check existing
+   `@blog/ui` exports in `packages/ui/src/index.ts` to identify reusable
+   components — do not build reusable design-system components here; ask the
+   `ui` agent for those.
+4. Service functions return the correct shape — pass props through directly when
+   they match. Only transform when needed (e.g. formatting a date string before
+   passing it to a UI component).
+5. If a component is framework-coupled (e.g. a `SanityImage` wrapper, a
+   `next-intl` Link consumer, a theme toggle), build it here in `src/components/`.
+   Pure, reusable design-system components belong in `@blog/ui` — ask the `ui`
+   agent for those.
+6. Read existing routes in `src/app/` before creating new ones — follow
+   current structure and naming conventions.
+
 ## Composition rules (do not violate)
 
 - Fetch data **only** through `@blog/service` functions. Never import `sanity` /
@@ -40,8 +64,30 @@ components in `src/components/`, etc.).
   ```
 - `"use client"` only where interaction truly requires it (theme toggle, share
   buttons, mobile nav). Default to Server Components.
+- **Never use `next/link` directly.** Always import `Link` from
+  `@/i18n/navigation` (next-intl). This applies everywhere — routes, layouts,
+  components, and Server Components alike.
 - Add `transpilePackages: ["@blog/ui", "@blog/service", "@blog/types"]` in
   `next.config.ts`.
+
+## File organisation (do not violate)
+
+- **Pages and layouts must be clean.** No inline component definitions and no
+  helper functions inside `page.tsx` or `layout.tsx` files. Extract everything.
+- **Components** live in `src/components/`. Each component gets its own folder
+  named after it, containing the component file and a co-located test file:
+  ```
+  src/components/hero-section/
+    hero-section.tsx
+    hero-section.test.tsx
+  ```
+- **Helper functions** (slot builders, data transformers, formatters) live in
+  `src/utils/`. One file per function or closely related group, named after its
+  purpose: `format-date.ts`, `hero-slots.ts`, `card-slots.ts`.
+- **Font configuration** lives in `src/config/fonts.ts` — define and export all
+  `next/font` objects there. `layout.tsx` imports them and applies only the CSS
+  variable class names to `<html>` (the one permitted inline exception). No font
+  definitions inside layout files.
 
 ## Component patterns
 
@@ -62,8 +108,8 @@ components in `src/components/`, etc.).
   prop inference.
 - **Consuming `@blog/ui` compound components** (`Header`, `Footer`, `Hero`,
   `PostCard`) — see `ui-library-practices` ("Compound components") for the
-  full mechanism. From here it's just composition: render named slots as children,
-  pass framework-coupled pieces (`Link` from `next/link`, `SanityImage`)
+  full pattern. From here it's just composition: render named slots as children,
+  pass framework-coupled pieces (`Link` from `@/i18n/navigation`, `SanityImage`)
   directly into them. Never deep-import sub-components — always use dot-notation
   on the assembled export (`Header.Brand`, `PostCard.Title`).
 
@@ -124,9 +170,23 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
 
 - Component/route tests with Vitest + Testing Library (jsdom). Mock `service`
   functions; assert that fetched data renders. See the `testing-practices` skill.
+- Run `pnpm --filter web type-check` after each major group of files — it's
+  fast and catches structural errors early without burning tokens on test output.
+- Run the full test suite **once, after all implementation is complete**:
+  `pnpm --filter web test`.
 
 ## Definition of done
 
+Run these checks **once, after all work is complete**:
+
 - `pnpm --filter web type-check`, `lint`, `test`, and `build` pass.
-- No direct Sanity import; no GROQ; no inline presentation that belongs in `ui`.
+- No direct Sanity import; no GROQ; no `next/link` import; no inline
+  presentation that belongs in `ui`.
 - Routes have metadata; feeds present; ISR/revalidation wired.
+
+**Report back to the orchestrator** with:
+
+- Routes created or changed (e.g. `/blog/[slug]` page added)
+- Metadata wired (title, description, OG, canonical)
+- Any ISR tags consumed from the service layer
+- Any framework-coupled components added to `src/components/`

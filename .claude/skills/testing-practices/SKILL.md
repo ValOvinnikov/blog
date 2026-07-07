@@ -14,12 +14,25 @@ components, **jsdom** for the DOM environment. Shared config lives in
 `@blog/config/vitest/preset`.
 
 ## Where tests live
-- **Co-located** next to the source: `Button.tsx` → `Button.test.tsx`,
-  `queries.ts` → `queries.test.ts`. No separate `__tests__` tree.
+
+- **Co-located** next to the source file, named `{filename}.test.ts(x)`:
+  `Button.tsx` → `Button.test.tsx`, `transformer.ts` → `transformer.test.ts`.
+- Service fixtures live in `packages/service/src/testing/`, mirroring the
+  domain tree. Each exports a `make*` factory returning a raw (`TRaw*`) shape
+  with a `Partial<…>` overrides param. Import via the `#/` alias:
+  `import { makeRawPostCard } from '#/testing/pages/fixtures'`.
 - Run from root: `pnpm test` (all), or `pnpm --filter @blog/ui test`.
   Watch mode: `pnpm test:watch`.
 
+## When to run tests
+
+- Run `pnpm --filter <pkg> type-check` after each major group of files — fast,
+  catches structural errors early without verbose test output.
+- Run the full test suite **once, after all implementation is complete**:
+  `pnpm --filter <pkg> test`.
+
 ## Per-package setup
+
 - **ui / web** (`jsdom`): a `vitest.config.ts` merges the preset and sets
   `environment: "jsdom"` + `setupFiles: ["./vitest.setup.ts"]`, where the setup
   file does `import "@testing-library/jest-dom/vitest";`.
@@ -27,14 +40,18 @@ components, **jsdom** for the DOM environment. Shared config lives in
 
 ```ts
 // vitest.config.ts (ui / web)
-import preset from "@blog/config/vitest/preset";
-import { defineConfig, mergeConfig } from "vitest/config";
-export default mergeConfig(preset, defineConfig({
-  test: { environment: "jsdom", setupFiles: ["./vitest.setup.ts"] },
-}));
+import preset from '@blog/config/vitest/preset';
+import { defineConfig, mergeConfig } from 'vitest/config';
+export default mergeConfig(
+  preset,
+  defineConfig({
+    test: { environment: 'jsdom', setupFiles: ['./vitest.setup.ts'] },
+  }),
+);
 ```
 
 ## What to test (and what not to)
+
 - **`@blog/ui`** — behaviour and contract, not markup snapshots. Query by role/
   text (`getByRole("button", { name: ... })`), assert rendered props, variants,
   and interactions via `@testing-library/user-event`. Avoid testing class names.
@@ -46,6 +63,7 @@ export default mergeConfig(preset, defineConfig({
   logic down into `ui`/`service` where it's cheaper to test.
 
 ## Conventions
+
 - Arrange–Act–Assert; one behaviour per `it`. Descriptive names:
   `it("renders the post title and author")`.
 - Prefer real user-facing queries (`getByRole`, `getByText`) over `data-testid`.
@@ -53,7 +71,15 @@ export default mergeConfig(preset, defineConfig({
 - Deterministic: no real dates/network/random. Inject or freeze.
 - A bug fix gets a regression test that fails before the fix.
 
+## What not to test
+
+- **Never test CSS class names** — assert behaviour and output, not styling.
+- **No snapshot tests** — they couple tests to markup and break on unrelated changes.
+- **No implementation details** — test what a component does, not how it does it.
+- **No network calls** — always mock the Sanity client and `service` functions.
+
 ## Checklist
+
 - [ ] Test co-located and named `*.test.ts(x)`.
 - [ ] Right environment (jsdom for components, node for service).
 - [ ] Boundaries mocked; no network, no real time.
