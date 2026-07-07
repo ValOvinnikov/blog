@@ -1,9 +1,9 @@
 /*
- * @blog/config — Tailwind v4 theme wiring.
+ * @blog/tailwind-config — Tailwind v4 theme wiring.
  *
  * Import order in apps/web/app/globals.css:
  *   @import "tailwindcss";
- *   @import "@blog/config/tailwind/theme.css";   <- this file
+ *   @import "@blog/tailwind-config/theme.css";   <- this file
  *   @import "@blog/ui/styles/tokens.css";        <- token values (:root / .dark)
  *   @source "../../../packages/ui/src/**\/*.{ts,tsx}";
  *

@@ -19,14 +19,14 @@ The blog publishes long-form articles with rich text, code blocks, author byline
 
 ## 2. Workspaces
 
-| Workspace | Path | Package name | Responsibility |
-|---|---|---|---|
-| cms | `apps/cms` | `cms` | Sanity Studio: schema definitions, content modelling, editorial UI, typegen source |
-| web | `apps/web` | `web` | Next.js frontend: routes, SEO, composition of ui + service |
-| service | `packages/service` | `@blog/service` | Data access: Sanity client, GROQ queries, typed fetch functions |
-| ui | `packages/ui` | `@blog/ui` | Atomic Design component library: pure, presentational, prop-driven |
-| types | `packages/types` | `@blog/types` | Generated Sanity types + shared content shapes |
-| config | `packages/config` | `@blog/config` | Shared tsconfig, Tailwind preset, eslint config, Vitest preset |
+| Workspace | Path               | Package name    | Responsibility                                                                     |
+| --------- | ------------------ | --------------- | ---------------------------------------------------------------------------------- |
+| cms       | `apps/cms`         | `cms`           | Sanity Studio: schema definitions, content modelling, editorial UI, typegen source |
+| web       | `apps/web`         | `web`           | Next.js frontend: routes, SEO, composition of ui + service                         |
+| service   | `packages/service` | `@blog/service` | Data access: Sanity client, GROQ queries, typed fetch functions                    |
+| ui        | `packages/ui`      | `@blog/ui`      | Atomic Design component library: pure, presentational, prop-driven                 |
+| types     | `packages/types`   | `@blog/types`   | Generated Sanity types + shared content shapes                                     |
+| config    | `packages/config`  | `@blog/config`  | Shared tsconfig, Tailwind preset, eslint config, Vitest preset                     |
 
 ---
 
@@ -58,7 +58,10 @@ Run these in sequence. Reconcile any version mismatch toward the latest stable.
 3. **cms (Sanity v4):** scaffold with `pnpm create sanity@latest` (TypeScript, the existing project ID/dataset). Place it under `apps/cms`. Define the schemas in §6. Requires **Node 20.19+**.
 4. **typegen → types:** create `apps/cms/sanity-typegen.json` so generated output lands in the shared types package:
    ```json
-   { "path": "./schemaTypes/**/*.{ts,tsx}", "generates": "../../packages/types/src/sanity.types.ts" }
+   {
+     "path": "./schemaTypes/**/*.{ts,tsx}",
+     "generates": "../../packages/types/src/sanity.types.ts"
+   }
    ```
    Run `pnpm --filter cms typegen`. Re-export from `packages/types/src/index.ts`.
 5. **service:** configure the Sanity client (`next-sanity`), write GROQ queries, and expose typed functions: `getPosts()`, `getPost(slug)`, `getPostsByCategory(slug)`, `getCategories()`, `getAuthor(slug)`, `getPage(slug)`, `getSiteSettings()`. Import result types from `@blog/types`.
@@ -71,15 +74,18 @@ Run these in sequence. Reconcile any version mismatch toward the latest stable.
 ## 5. Cross-cutting requirements
 
 **Tailwind v4 across packages.** The `ui` package's class names live outside the web app and will be purged unless scanned. In the web app's global stylesheet:
+
 ```css
-@import "tailwindcss";
+@import 'tailwindcss';
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 ```
-Both `ui` and `web` must consume the same tokens from `@blog/config/tailwind/preset`.
+
+Both `ui` and `web` must consume the same tokens from `@blog/tailwind-config/theme.css`.
 
 **Type sync.** Generated Sanity types are only as fresh as the last typegen run. `turbo.json` already declares `build.dependsOn: ["typegen"]` — keep it that way so types regenerate before builds.
 
 **Environment variables** (see `.env.example` files):
+
 ```
 NEXT_PUBLIC_SANITY_PROJECT_ID=
 NEXT_PUBLIC_SANITY_DATASET=production
@@ -97,6 +103,7 @@ SANITY_REVALIDATE_SECRET=    # on-demand ISR webhook
 ## 6. Content model (Sanity schemas in `apps/cms/schemaTypes`)
 
 **`post`**
+
 - `title` (string, required)
 - `slug` (slug, source: title, required)
 - `excerpt` (text, required) — summary for cards, meta description, RSS
@@ -129,16 +136,17 @@ templates/  PageLayout, PostLayout (renders Portable Text body), HomeLayout
 styles/     tokens.css
 index.ts    barrel export
 ```
+
 Rules: components are typed and prop-driven; no data fetching, no Sanity imports. Document each with JSDoc (makes adding Storybook trivial later). Render Portable Text in `templates`, not `web`. Co-locate unit tests (`Button.test.tsx`) next to components. See the `ui-library-practices` skill.
 
 ---
 
 ## 8. Deployment
 
-| Workspace | Target | Command / setup |
-|---|---|---|
-| web | Vercel (Hobby, free, personal use) | Import repo → set **Root Directory = `apps/web`**. Vercel auto-detects Turborepo and builds `types`/`service`/`ui` first. Add env vars. |
-| cms | Sanity-hosted (free) | `pnpm --filter cms deploy` → served at `your-project.sanity.studio` |
+| Workspace | Target                             | Command / setup                                                                                                                         |
+| --------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| web       | Vercel (Hobby, free, personal use) | Import repo → set **Root Directory = `apps/web`**. Vercel auto-detects Turborepo and builds `types`/`service`/`ui` first. Add env vars. |
+| cms       | Sanity-hosted (free)               | `pnpm --filter cms deploy` → served at `your-project.sanity.studio`                                                                     |
 
 Custom domain on Vercel is the only cost (~£10/yr at the registrar). Hobby has hard caps and no overage billing; blog traffic stays well within them.
 
