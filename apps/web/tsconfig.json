@@ -7,7 +7,9 @@
     "noEmit": true,
     "moduleResolution": "Bundler",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@blog/ui/*": ["../../packages/ui/src/*"],
+      "#/*": ["../../packages/service/src/*"]
     },
     "plugins": [
       {

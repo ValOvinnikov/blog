@@ -47,6 +47,21 @@ When invoked, before writing any code:
 - Render UI **only** through `@blog/ui` components. Keep presentation out of
   routes; keep data logic out of components. Server Components fetch, then pass
   plain typed props into `ui`.
+- **Always check `result.ok` after every service call** — service functions
+  return `AsyncResult<T>` via `safeAsync`. Never access `result.data` without
+  first checking `result.ok`. Decide what to do on failure at this layer:
+  - Critical data (page content, post detail): `if (!result.ok) notFound()` or
+    `if (!result.ok) return` (render nothing).
+  - Optional/global data (site settings in layout): log the error and apply
+    fallbacks — or return early if a fallback is not possible.
+  ```ts
+  const result = await service.global.siteSettings.v1.getSiteSettings();
+  if (!result.ok) {
+    console.error('Failed to load site settings:', result.error);
+    return;
+  }
+  const { title, navigation } = result.data;
+  ```
 - `"use client"` only where interaction truly requires it (theme toggle, share
   buttons, mobile nav). Default to Server Components.
 - **Never use `next/link` directly.** Always import `Link` from
@@ -83,9 +98,9 @@ When invoked, before writing any code:
   an `as` prop) use the shared `TPolymorphicProps<C, OwnProps>` generic from
   `@blog/config/react` — see `ui-library-practices` ("The `as` prop — two
   levels") for the full writeup. `apps/web/src/app/components/container.tsx`
-  is the reference consumer: `type TContainerProps<C extends ElementType =
-'div'> = TPolymorphicProps<C, TContainerOwnProps>`, one `as ElementType`
-  cast at the render site. Import the type from the `@blog/config/react`
+  is the reference consumer (`src/components/container/container.tsx`):
+  `type TContainerProps<C extends ElementType = 'div'> = TPolymorphicProps<C, TContainerOwnProps>`,
+  one `as ElementType` cast at the render site. Import the type from `@blog/config/react`
   subpath, never the package root (keeps `@blog/service` React-free). Only
   build a local `ComponentPropsWithRef<C>` variant instead of reusing
   `TPolymorphicProps` if a client component genuinely needs a forwarded ref.
@@ -127,6 +142,23 @@ variants.ts` using `tailwind-variants` (`tv`), classes grouped by concern in
   `py-section`, etc.) — no hard-coded hex or arbitrary spacing values.
 - Responsive classes follow the `ui-library-practices` convention: mobile-
   first, `md:`/`lg:` as the two primary tiers, no custom breakpoints.
+
+## Locale (next-intl)
+
+All routes live under `src/app/[locale]/`. The middleware (`src/middleware.ts`)
+uses `localePrefix: 'never'` so the browser URL never shows the locale segment.
+Supported locales and the default are declared in `src/i18n/routing.ts`.
+
+- **Never hardcode a locale string.** In Server Components, read locale from
+  `params`: `const { locale } = await params`. Call `setRequestLocale(locale)`
+  at the top of every layout and page that receives params — required for static
+  rendering.
+- **`generateStaticParams`** must be exported from `[locale]/layout.tsx`:
+  `return routing.locales.map((locale) => ({ locale }))`.
+- Thread `locale` down to any formatting helpers (`formatDate`, `Intl.*`).
+- **ESLint exception**: `src/app/` is excluded from the `check-file`
+  folder-naming rule (see `apps/web/eslint.config.js`) because Next.js uses
+  `[dynamic]` and `(group)` folder conventions there.
 
 ## SEO / feeds / a11y
 

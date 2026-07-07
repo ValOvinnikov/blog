@@ -78,6 +78,12 @@ relative paths only within a single slice (`./query`, `./types`).
     named slice folders (`detail/`, `params/`). **One query per file** — a slice
     that composes two queries has two files (e.g. category `detail/` has
     `category.query.ts` + `posts.query.ts`).
+    **Loader return type is always `Promise<TViewModel>` — never nullable.**
+    Do not add null checks, `| null` return types, or try/catch in loaders.
+    If a document is missing, groqd throws (e.g. `ValidationErrors`) — let it
+    propagate. `safeAsync` in `application/service.ts` catches all throws and
+    converts them to `{ ok: false, error }`. The web layer is responsible for
+    deciding what to do (`notFound()`, fallback UI, or early return).
   - **`application/service.ts`** — a `createXService()` **factory** returning the
     versioned facade `{ v1: { …actions } }`. Version is an object key, never in
     the import path. `src/index.ts` calls each factory (`createPostService()`, …)

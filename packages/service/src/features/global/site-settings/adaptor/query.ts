@@ -13,9 +13,16 @@ export const siteSettingsQuery = q.star
     ogImage: sub.field('ogImage').project(imageWithAltFragment).notNull(),
     ogTitle: sub.field('ogTitle'),
     ogDescription: sub.field('ogDescription'),
-    navigation: sub.field('navigation[]').project((s) => ({
-      label: s.field('label').notNull(),
-      href: s.field('href').notNull(),
-    })),
-    socialLinks: sub.field('socialLinks[]').project(socialLinkFragment),
-  }));
+    navigation: sub
+      .field('navigation[]')
+      .project((s) => ({
+        label: s.field('label').notNull(),
+        href: s.field('href').notNull(),
+      }))
+      .nullable(true),
+    socialLinks: sub
+      .field('socialLinks[]')
+      .project(socialLinkFragment)
+      .nullable(true),
+  }))
+  .notNull();

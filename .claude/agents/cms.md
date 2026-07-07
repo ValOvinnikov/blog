@@ -34,8 +34,8 @@ When invoked, before writing any code:
   `apps/web` — if a schema change requires downstream work, describe it and let
   the `service`/`web` agents handle it.
 - All source files live under `apps/cms/src/`. Schemas live in
-  `apps/cms/src/schemaTypes`. Each type is its own file with a default export
-  from `defineType`, registered in `src/schemaTypes/index.ts`.
+  `apps/cms/src/schema-types`. Each type is its own file with a default export
+  from `defineType`, registered in `src/schema-types/index.ts`.
 - `sanity.config.ts` and `sanity.cli.ts` stay at the package root (Sanity CLI
   convention); everything else goes under `src/`.
 - `cms` may depend on `@blog/types` conceptually but **generates** the types —

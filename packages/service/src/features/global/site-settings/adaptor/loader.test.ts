@@ -11,12 +11,10 @@ vi.mock('#/sanity/query', async (importOriginal) => ({
 }));
 
 describe('getSiteSettings', () => {
-  it('returns null when site settings are not configured', async () => {
+  it('throws when site settings document does not exist', async () => {
     mockRun.mockResolvedValue(null);
 
-    const result = await getSiteSettings();
-
-    expect(result).toBeNull();
+    await expect(getSiteSettings()).rejects.toThrow();
   });
 
   it('maps raw site settings into a domain object', async () => {
@@ -29,10 +27,9 @@ describe('getSiteSettings', () => {
 
     const result = await getSiteSettings();
 
-    expect(result).not.toBeNull();
-    expect(result?.title).toBe('Awesome Blog');
-    expect(result?.description).toBe('Great content');
-    expect(result?.navigation).toEqual([]);
-    expect(result?.socialLinks).toEqual([]);
+    expect(result.title).toBe('Awesome Blog');
+    expect(result.description).toBe('Great content');
+    expect(result.navigation).toEqual([]);
+    expect(result.socialLinks).toEqual([]);
   });
 });
