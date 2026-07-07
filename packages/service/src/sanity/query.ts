@@ -4,7 +4,7 @@ import type {
 } from '@blog/config';
 import { createGroqBuilder, makeSafeQueryRunner } from 'groqd';
 
-import { client } from './client';
+import { getClient } from './client';
 
 type TSchemaConfig = {
   schemaTypes: AllSanitySchemaTypes;
@@ -19,7 +19,7 @@ type TNextFetchOptions = {
 
 export const runQuery = makeSafeQueryRunner<TNextFetchOptions>(
   (query, { parameters, next }) =>
-    client.fetch(query, parameters ?? {}, next ? { next } : undefined),
+    getClient().fetch(query, parameters ?? {}, next ? { next } : undefined),
 );
 
 export const isr = (tag: string): TNextFetchOptions => ({
