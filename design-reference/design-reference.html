@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Console — Design Reference (Direction A)</title>
+    <title>Console — Full Atomic Design Reference</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -21,9 +21,11 @@
         --chrome-ink: #1c2024;
         --chrome-muted: #6b7078;
       }
+
       * {
         box-sizing: border-box;
       }
+
       body {
         margin: 0;
         background: var(--chrome-bg);
@@ -31,37 +33,42 @@
         font-family: var(--font-disp);
         -webkit-font-smoothing: antialiased;
       }
+
       .wrap {
-        max-width: 1120px;
+        max-width: 1180px;
         margin: 0 auto;
         padding: 40px 24px 80px;
       }
-      .doc-head {
-        margin-bottom: 8px;
-      }
+
       .doc-head h1 {
         font-size: 34px;
         font-weight: 500;
         letter-spacing: -0.02em;
         margin: 0;
       }
+
+      .doc-head .meta,
+      .doc-head .note {
+        color: var(--chrome-muted);
+      }
+
       .doc-head .meta {
         font-family: var(--font-mono);
         font-size: 12px;
-        color: var(--chrome-muted);
         margin-top: 6px;
       }
-      .doc-head .use {
-        font-family: var(--font-disp);
+
+      .doc-head .note {
         font-size: 13px;
-        color: var(--chrome-muted);
-        max-width: 70ch;
-        margin-top: 14px;
-        line-height: 1.6;
+        line-height: 1.65;
+        max-width: 78ch;
+        margin: 14px 0 0;
       }
+
       .sec {
         margin-top: 52px;
       }
+
       .sec-title {
         font-family: var(--font-mono);
         font-size: 12px;
@@ -72,19 +79,30 @@
         padding-bottom: 10px;
         margin-bottom: 22px;
       }
-      .cap {
+
+      .cap,
+      .frame-label {
         font-family: var(--font-mono);
         font-size: 11px;
         color: var(--chrome-muted);
         margin: 0 0 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
       }
+
       .grid2 {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
         gap: 22px;
       }
 
-      /* ---- theme token scopes ---- */
+      .grid3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 18px;
+      }
+
+      /* ---- semantic theme tokens ---- */
       .t-light {
         color-scheme: light;
         --bg: oklch(0.99 0.002 250);
@@ -101,6 +119,7 @@
         --accent-muted: oklch(0.95 0.03 250);
         --accent-contrast: oklch(0.99 0 0);
       }
+
       .t-dark {
         color-scheme: dark;
         --bg: oklch(0.17 0.006 250);
@@ -118,21 +137,603 @@
         --accent-contrast: oklch(0.16 0.006 250);
       }
 
-      /* ---- color swatches ---- */
+      /* ---- preview shell ---- */
+      .frame {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-read);
+      }
+
+      .bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--surface-2);
+        border-bottom: 1px solid var(--border);
+        padding: 9px 12px;
+      }
+
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+
+      .dots i {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--border-strong);
+        display: block;
+      }
+
+      .url {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--subtle);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .page {
+        padding: 22px 24px 26px;
+      }
+
+      .page-narrow {
+        max-width: 760px;
+      }
+
+      /* ================= ATOMS ================= */
+      .a-logo {
+        font-family: var(--font-disp);
+        font-size: 19px;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        color: var(--text);
+      }
+
+      .a-logo em {
+        font-family: var(--font-mono);
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        color: var(--accent);
+      }
+
+      .a-navlink {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--subtle);
+        text-decoration: none;
+      }
+
+      .a-iconbutton {
+        width: 22px;
+        height: 22px;
+        display: inline-grid;
+        place-items: center;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--muted);
+        padding: 0;
+      }
+
+      .a-iconbutton svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .a-eyebrow {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .a-heading-hero,
+      .a-heading-post,
+      .a-card-title {
+        font-family: var(--font-disp);
+        font-weight: 500;
+        color: var(--text);
+      }
+
+      .a-heading-hero {
+        font-size: clamp(2rem, 1.4rem + 2vw, 3rem);
+        line-height: 1.05;
+        letter-spacing: -0.025em;
+        margin: 10px 0 12px;
+        max-width: 16ch;
+      }
+
+      .a-heading-post {
+        font-size: clamp(1.9rem, 1.45rem + 1.5vw, 2.45rem);
+        line-height: 1.07;
+        letter-spacing: -0.02em;
+        margin: 12px 0 0;
+        max-width: 18ch;
+      }
+
+      .a-body {
+        font-size: 15px;
+        line-height: 1.72;
+        color: var(--text);
+        margin: 0;
+      }
+
+      .a-body-muted {
+        color: var(--muted);
+      }
+
+      .a-prose-link {
+        color: var(--accent);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        text-decoration-color: var(--border-strong);
+      }
+
+      .a-inline-code {
+        font-family: var(--font-mono);
+        font-size: 0.9em;
+        background: var(--surface-2);
+        border-radius: 3px;
+        padding: 1px 5px;
+      }
+
+      .a-tag {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--subtle);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 3px 8px;
+      }
+
+      .a-tag-active {
+        background: var(--accent-muted);
+        color: var(--accent);
+        border-color: transparent;
+      }
+
+      .a-button {
+        font-family: var(--font-disp);
+        font-weight: 500;
+        font-size: 14px;
+        border-radius: 3px;
+        padding: 8px 16px;
+        cursor: default;
+        border: 1px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 36px;
+      }
+
+      .a-button-primary {
+        background: var(--accent);
+        color: var(--accent-contrast);
+      }
+
+      .a-button-ghost {
+        background: transparent;
+        color: var(--text);
+        border-color: var(--border-strong);
+      }
+
+      .a-button-link {
+        background: transparent;
+        color: var(--accent);
+        padding-inline: 4px;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .a-media {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background:
+          radial-gradient(
+            circle at 18% 18%,
+            var(--accent-muted),
+            transparent 32%
+          ),
+          linear-gradient(135deg, var(--surface-2), var(--bg-subtle));
+        isolation: isolate;
+      }
+
+      .a-media::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(var(--border) 1px, transparent 1px),
+          linear-gradient(90deg, var(--border) 1px, transparent 1px);
+        background-size: 22px 22px;
+        opacity: 0.42;
+        z-index: -1;
+      }
+
+      .a-media::after {
+        content: attr(data-label);
+        position: absolute;
+        left: 12px;
+        bottom: 10px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--accent);
+        background: color-mix(in oklch, var(--surface) 86%, transparent);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 4px 7px;
+      }
+
+      .a-media img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .a-caption {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--subtle);
+        line-height: 1.5;
+        margin-top: 8px;
+      }
+
+      .a-sep {
+        color: var(--border-strong);
+        margin: 0 7px;
+      }
+
+      /* ================= MOLECULES ================= */
+      .m-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .m-nav {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 0;
+      }
+
+      .m-post-meta {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--subtle);
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        padding: 9px 0;
+      }
+
+      .m-post-meta a,
+      .m-card-meta .category {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      .m-tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 20px 0 0;
+      }
+
+      .m-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+
+      .m-post-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 14px 16px;
+        transition:
+          transform 200ms cubic-bezier(0.2, 0, 0, 1),
+          border-color 200ms cubic-bezier(0.2, 0, 0, 1);
+      }
+
+      .m-post-card.is-hovered {
+        border-color: var(--border-strong);
+        transform: translateY(-2px);
+      }
+
+      .m-card-meta {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--subtle);
+        margin-bottom: 6px;
+      }
+
+      .a-card-title {
+        font-size: 16px;
+        letter-spacing: -0.01em;
+        margin: 0 0 5px;
+        line-height: 1.2;
+      }
+
+      .m-card-desc {
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--muted);
+        margin: 0;
+      }
+
+      .m-code {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        margin: 18px 0;
+        overflow: hidden;
+      }
+
+      .m-code-label {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--subtle);
+        padding: 7px 12px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .m-code pre {
+        margin: 0;
+        padding: 12px 14px;
+        font-family: var(--font-mono);
+        font-size: 12.5px;
+        line-height: 1.65;
+        color: var(--text);
+        overflow-x: auto;
+      }
+
+      .m-code .comment {
+        color: var(--subtle);
+      }
+      .m-code .keyword {
+        color: var(--accent);
+      }
+
+      .m-quote {
+        margin: 18px 0;
+        padding: 2px 0 2px 16px;
+        border-left: 2px solid var(--accent-muted);
+        font-family: var(--font-read);
+        font-style: italic;
+        font-size: 15px;
+        color: var(--muted);
+      }
+
+      .m-image-caption {
+        margin-bottom: 18px;
+      }
+
+      /* ================= ORGANISMS ================= */
+      .o-home-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: clamp(1.25rem, 4vw, 2rem);
+        padding: 26px 0 8px;
+        align-items: center;
+      }
+
+      .o-home-hero.has-media {
+        grid-template-columns: minmax(0, 1.15fr) minmax(180px, 0.85fr);
+      }
+
+      .o-home-hero .hero-copy {
+        min-width: 0;
+      }
+
+      .o-home-hero .hero-sub {
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--muted);
+        max-width: 52ch;
+        margin: 0;
+      }
+
+      .o-home-hero .hero-media {
+        aspect-ratio: 4 / 3;
+        min-height: 170px;
+      }
+
+      .o-latest {
+        margin-top: 22px;
+      }
+
+      .o-latest-title,
+      .component-label {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--subtle);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin: 0 0 12px;
+      }
+
+      .o-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 14px;
+      }
+
+      .o-article-header {
+        padding-top: 24px;
+      }
+
+      .o-article-header .m-post-meta {
+        margin: 16px 0 18px;
+      }
+
+      .o-article-header .post-lead {
+        max-width: 68ch;
+      }
+
+      .o-post-cover {
+        margin: 18px 0 20px;
+      }
+
+      .o-post-cover .a-media {
+        aspect-ratio: 16 / 9;
+        min-height: 210px;
+      }
+
+      .o-article-body {
+        max-width: 68ch;
+      }
+
+      .o-footer {
+        margin-top: 22px;
+        padding-top: 14px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--subtle);
+      }
+
+      /* component catalogue */
+      .catalog-card {
+        background: var(--chrome-card);
+        border: 1px solid var(--chrome-line);
+        border-radius: 12px;
+        padding: 18px 18px 20px;
+      }
+
+      .catalog-card h3 {
+        margin: 0 0 6px;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+      }
+
+      .catalog-card p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--chrome-muted);
+      }
+
+      .catalog-card code {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--chrome-ink);
+      }
+
+      .component-demo {
+        margin-top: 12px;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text);
+        padding: 16px;
+        font-family: var(--font-read);
+      }
+
+      .component-demo .o-home-hero {
+        padding-block: 0;
+      }
+
+      .component-demo .o-home-hero.has-media {
+        grid-template-columns: 1fr 120px;
+      }
+
+      .component-demo .a-heading-hero {
+        font-size: 24px;
+      }
+
+      .component-demo .hero-media {
+        min-height: 100px;
+      }
+
+      @media (max-width: 720px) {
+        .page {
+          padding: 20px 18px 24px;
+        }
+
+        .m-header {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .m-nav {
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .o-home-hero.has-media {
+          grid-template-columns: 1fr;
+        }
+
+        .o-home-hero .hero-media {
+          order: -1;
+          aspect-ratio: 16 / 9;
+        }
+
+        .o-footer {
+          flex-direction: column;
+        }
+      }
+
+      /* ================= FULL REFERENCE EXTENSIONS ================= */
+      .toc {
+        margin-top: 22px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .toc a {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--chrome-muted);
+        text-decoration: none;
+        border: 1px solid var(--chrome-line);
+        background: var(--chrome-card);
+        border-radius: 999px;
+        padding: 7px 10px;
+      }
+
       .swatches {
         background: var(--chrome-card);
         border: 1px solid var(--chrome-line);
         border-radius: 12px;
         overflow: hidden;
       }
+
       .sw-head,
       .sw-row {
         display: grid;
-        grid-template-columns: 1.4fr 0.9fr 64px 64px;
+        grid-template-columns: 1.2fr 1.4fr 76px 76px;
         align-items: center;
         gap: 12px;
         padding: 9px 16px;
       }
+
       .sw-head {
         font-family: var(--font-mono);
         font-size: 11px;
@@ -141,34 +742,44 @@
         color: var(--chrome-muted);
         border-bottom: 1px solid var(--chrome-line);
       }
+
       .sw-row {
         border-top: 1px solid var(--chrome-line);
       }
       .sw-row:first-of-type {
         border-top: 0;
       }
+
       .sw-name {
         font-family: var(--font-mono);
         font-size: 12px;
         color: var(--chrome-ink);
       }
+
       .sw-role {
         font-size: 12px;
         color: var(--chrome-muted);
       }
+
       .chip {
         height: 34px;
         border-radius: 6px;
         border: 1px solid rgba(0, 0, 0, 0.08);
       }
 
-      /* ---- type specimens ---- */
-      .type-card {
+      .type-card,
+      .token-card,
+      .component-row,
+      .module-card {
         background: var(--chrome-card);
         border: 1px solid var(--chrome-line);
         border-radius: 12px;
+      }
+
+      .type-card {
         padding: 24px 26px;
       }
+
       .spec-row {
         padding: 14px 0;
         border-top: 1px solid var(--chrome-line);
@@ -176,52 +787,62 @@
       .spec-row:first-child {
         border-top: 0;
       }
-      .spec-row .tk {
+
+      .spec-row .tk,
+      .token-card .tk,
+      .component-row .tk {
         font-family: var(--font-mono);
         font-size: 11px;
         color: var(--chrome-muted);
         display: block;
         margin-bottom: 6px;
       }
+
       .sp-display {
         font-family: var(--font-disp);
         font-weight: 500;
-        font-size: clamp(2.6rem, 1.8rem+3.6vw, 4.6rem);
+        font-size: clamp(2.6rem, 1.8rem + 3.6vw, 4.6rem);
         line-height: 1.05;
         letter-spacing: -0.02em;
       }
+
       .sp-3xl {
         font-family: var(--font-disp);
         font-weight: 500;
-        font-size: clamp(2.1rem, 1.6rem+2.2vw, 3rem);
+        font-size: clamp(2.1rem, 1.6rem + 2.2vw, 3rem);
         line-height: 1.1;
         letter-spacing: -0.02em;
       }
+
       .sp-2xl {
         font-family: var(--font-disp);
         font-weight: 500;
-        font-size: clamp(1.7rem, 1.35rem+1.4vw, 2.2rem);
+        font-size: clamp(1.7rem, 1.35rem + 1.4vw, 2.2rem);
         line-height: 1.2;
         letter-spacing: -0.02em;
       }
+
       .sp-xl {
         font-family: var(--font-disp);
         font-weight: 500;
-        font-size: clamp(1.35rem, 1.15rem+0.7vw, 1.6rem);
+        font-size: clamp(1.35rem, 1.15rem + 0.7vw, 1.6rem);
         line-height: 1.35;
       }
+
       .sp-body {
         font-family: var(--font-read);
         font-size: 1.0625rem;
         line-height: 1.7;
         max-width: 60ch;
       }
+
       .sp-sm {
         font-family: var(--font-read);
         font-size: 0.875rem;
         line-height: 1.5;
         color: #555;
       }
+
       .sp-mono {
         font-family: var(--font-mono);
         font-size: 0.78rem;
@@ -229,32 +850,16 @@
         text-transform: uppercase;
       }
 
-      /* ---- tokens (radius/motion) ---- */
-      .tok-card {
-        background: var(--chrome-card);
-        border: 1px solid var(--chrome-line);
-        border-radius: 12px;
-        padding: 22px 24px;
+      .token-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
       }
-      .radii {
-        display: flex;
-        gap: 20px;
-        align-items: flex-end;
-        margin-top: 6px;
+
+      .token-card {
+        padding: 18px 20px;
       }
-      .radii .r {
-        text-align: center;
-        font-family: var(--font-mono);
-        font-size: 11px;
-        color: var(--chrome-muted);
-      }
-      .radii .box {
-        width: 64px;
-        height: 48px;
-        background: #dfe6f4;
-        border: 1px solid #b9c6e6;
-        margin-bottom: 8px;
-      }
+
       .kv {
         font-family: var(--font-mono);
         font-size: 12px;
@@ -265,331 +870,214 @@
         color: var(--chrome-muted);
       }
 
-      /* ================= website mock components ================= */
-      .frame {
-        border-radius: 12px;
+      .radii {
+        display: flex;
+        gap: 20px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+
+      .radii .r {
+        text-align: center;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--chrome-muted);
+      }
+
+      .radii .box {
+        width: 64px;
+        height: 48px;
+        background: #dfe6f4;
+        border: 1px solid #b9c6e6;
+        margin-bottom: 8px;
+      }
+
+      .component-list {
+        display: grid;
+        gap: 16px;
+      }
+
+      .component-row {
+        display: grid;
+        grid-template-columns: minmax(220px, 0.85fr) minmax(0, 1.65fr);
+        gap: 18px;
+        padding: 18px;
+        align-items: stretch;
+      }
+
+      .component-info h3 {
+        margin: 0 0 6px;
+        font-size: 17px;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+      }
+
+      .component-info p,
+      .component-info li {
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--chrome-muted);
+      }
+
+      .component-info p {
+        margin: 0 0 8px;
+      }
+      .component-info ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+      }
+
+      .component-info code,
+      .module-card code,
+      .note-card code {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--chrome-ink);
+      }
+
+      .component-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .preview-panel {
+        border-radius: 10px;
         overflow: hidden;
         border: 1px solid var(--border);
         background: var(--bg);
         color: var(--text);
+        padding: 16px;
         font-family: var(--font-read);
+        min-width: 0;
       }
-      .fl {
+
+      .preview-title {
         font-family: var(--font-mono);
-        font-size: 11px;
-        color: var(--chrome-muted);
-        margin: 0 0 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-      }
-      .bar {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        background: var(--surface-2);
-        border-bottom: 1px solid var(--border);
-        padding: 9px 12px;
-      }
-      .dots {
-        display: flex;
-        gap: 6px;
-      }
-      .dots i {
-        width: 9px;
-        height: 9px;
-        border-radius: 50%;
-        background: var(--border-strong);
-        display: block;
-      }
-      .url {
-        font-family: var(--font-mono);
-        font-size: 12px;
-        color: var(--subtle);
-      }
-      .site {
-        padding: 22px 24px 26px;
-      }
-      .shead {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-bottom: 16px;
-        border-bottom: 1px solid var(--border);
-      }
-      .brand {
-        font-family: var(--font-disp);
-        font-size: 19px;
-        font-weight: 500;
-        letter-spacing: -0.01em;
-        color: var(--text);
-      }
-      .brand em {
-        font-family: var(--font-mono);
-        font-style: normal;
-        font-weight: 400;
-        font-size: 14px;
-        color: var(--accent);
-      }
-      .nav {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-      }
-      .nav a {
-        font-family: var(--font-mono);
-        font-size: 12px;
-        color: var(--subtle);
-        text-decoration: none;
-      }
-      .nav .ic {
-        width: 18px;
-        height: 18px;
-        color: var(--muted);
-      }
-      .eyebrow {
-        font-family: var(--font-mono);
-        font-size: 11px;
-        font-weight: 500;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--accent);
-      }
-      .h1 {
-        font-family: var(--font-disp);
-        font-weight: 500;
-        font-size: 30px;
-        line-height: 1.07;
-        letter-spacing: -0.02em;
-        color: var(--text);
-        margin: 12px 0 0;
-      }
-      .spec {
-        font-family: var(--font-mono);
-        font-size: 12px;
-        color: var(--subtle);
-        border-top: 1px solid var(--border);
-        border-bottom: 1px solid var(--border);
-        padding: 9px 0;
-        margin: 16px 0 20px;
-      }
-      .spec .sep {
-        color: var(--border-strong);
-        margin: 0 7px;
-      }
-      .spec a {
-        color: var(--accent);
-        text-decoration: none;
-      }
-      .lead {
-        font-size: 15px;
-        line-height: 1.72;
-        color: var(--text);
-        max-width: 60ch;
-        margin: 0 0 14px;
-      }
-      .lead a {
-        color: var(--accent);
-        text-decoration: underline;
-        text-underline-offset: 2px;
-        text-decoration-color: var(--border-strong);
-      }
-      .icode {
-        font-family: var(--font-mono);
-        font-size: 0.9em;
-        background: var(--surface-2);
-        border-radius: 3px;
-        padding: 1px 5px;
-      }
-      .code {
-        background: var(--surface-2);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        margin: 18px 0;
-        overflow: hidden;
-      }
-      .code .clab {
-        font-family: var(--font-mono);
-        font-size: 11px;
-        color: var(--subtle);
-        padding: 7px 12px;
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        justify-content: space-between;
-      }
-      .code pre {
-        margin: 0;
-        padding: 12px 14px;
-        font-family: var(--font-mono);
-        font-size: 12.5px;
-        line-height: 1.65;
-        color: var(--text);
-        overflow-x: auto;
-      }
-      .code .cm {
-        color: var(--subtle);
-      }
-      .code .kw {
-        color: var(--accent);
-      }
-      blockquote {
-        margin: 18px 0;
-        padding: 2px 0 2px 16px;
-        border-left: 2px solid var(--accent-muted);
-        font-family: var(--font-read);
-        font-style: italic;
-        font-size: 15px;
-        color: var(--muted);
-      }
-      .tags {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin: 20px 0 0;
-      }
-      .tag {
-        font-family: var(--font-mono);
-        font-size: 11px;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: var(--subtle);
-        border: 1px solid var(--border);
-        border-radius: 3px;
-        padding: 3px 8px;
-      }
-      .tag.on {
-        background: var(--accent-muted);
-        color: var(--accent);
-        border-color: transparent;
-      }
-      /* buttons */
-      .btns {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        flex-wrap: wrap;
-        margin-top: 4px;
-      }
-      .btn {
-        font-family: var(--font-disp);
-        font-weight: 500;
-        font-size: 14px;
-        border-radius: 3px;
-        padding: 8px 16px;
-        cursor: default;
-        border: 1px solid transparent;
-      }
-      .btn.primary {
-        background: var(--accent);
-        color: var(--accent-contrast);
-      }
-      .btn.ghost {
-        background: transparent;
-        color: var(--text);
-        border-color: var(--border-strong);
-      }
-      .btn.link {
-        background: transparent;
-        color: var(--accent);
-        padding: 8px 4px;
-        text-decoration: underline;
-        text-underline-offset: 3px;
-      }
-      /* cards */
-      .cardgrid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 14px;
-        margin-top: 16px;
-      }
-      .card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        padding: 14px 16px;
-      }
-      .card .cmeta {
-        font-family: var(--font-mono);
-        font-size: 11px;
-        color: var(--subtle);
-        margin-bottom: 6px;
-      }
-      .card .cmeta .sep {
-        color: var(--border-strong);
-        margin: 0 6px;
-      }
-      .card .cec {
-        color: var(--accent);
-      }
-      .card .ct {
-        font-family: var(--font-disp);
-        font-weight: 500;
-        font-size: 16px;
-        letter-spacing: -0.01em;
-        color: var(--text);
-        margin: 0 0 5px;
-        line-height: 1.2;
-      }
-      .card .cx {
-        font-size: 13px;
-        line-height: 1.55;
-        color: var(--muted);
-        margin: 0;
-      }
-      .cardgrid.demo .card:nth-child(2) {
-        border-color: var(--border-strong);
-        transform: translateY(-2px);
-      }
-      .comp-block {
-        padding: 18px 0;
-        border-top: 1px solid var(--border);
-      }
-      .comp-block:first-child {
-        border-top: 0;
-        padding-top: 0;
-      }
-      .comp-lab {
-        font-family: var(--font-mono);
-        font-size: 11px;
+        font-size: 10px;
         color: var(--subtle);
         text-transform: uppercase;
         letter-spacing: 0.08em;
         margin: 0 0 12px;
       }
-      /* home hero */
-      .hero {
-        padding: 26px 0 8px;
+
+      .preview-panel.compact .a-heading-hero {
+        font-size: 25px;
       }
-      .hero .htitle {
-        font-family: var(--font-disp);
-        font-weight: 500;
-        font-size: 38px;
-        line-height: 1.05;
-        letter-spacing: -0.025em;
-        color: var(--text);
-        margin: 10px 0 12px;
-        max-width: 16ch;
+      .preview-panel.compact .a-heading-post {
+        font-size: 24px;
       }
-      .hero .hsub {
-        font-size: 16px;
-        line-height: 1.6;
-        color: var(--muted);
-        max-width: 52ch;
-        margin: 0;
+      .preview-panel.compact .o-home-hero {
+        padding-block: 0;
       }
-      .foot {
-        margin-top: 22px;
-        padding-top: 14px;
-        border-top: 1px solid var(--border);
+      .preview-panel.compact .o-home-hero.has-media {
+        grid-template-columns: minmax(0, 1fr) 130px;
+      }
+      .preview-panel.compact .hero-media {
+        min-height: 100px;
+      }
+      .preview-panel.compact .o-card-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+      .preview-panel.compact .o-post-cover .a-media {
+        min-height: 145px;
+      }
+      .preview-panel.compact .m-header {
+        padding-bottom: 12px;
+      }
+
+      .component-demo-row {
         display: flex;
-        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .module-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+
+      .module-card {
+        padding: 18px;
+      }
+      .module-card h3 {
+        margin: 0 0 8px;
+        font-size: 17px;
+        font-weight: 500;
+      }
+      .module-card p {
+        margin: 0;
+        color: var(--chrome-muted);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .note-card {
+        background: var(--chrome-card);
+        border: 1px solid var(--chrome-line);
+        border-radius: 12px;
+        padding: 18px 20px;
+        font-size: 13px;
+        line-height: 1.65;
+        color: var(--chrome-muted);
+      }
+
+      .component-divider {
+        margin: 34px 0 16px;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--chrome-muted);
+      }
+
+      .mini-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        background: var(--chrome-card);
+        border: 1px solid var(--chrome-line);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .mini-table th,
+      .mini-table td {
+        text-align: left;
+        border-bottom: 1px solid var(--chrome-line);
+        padding: 10px 12px;
+        vertical-align: top;
+      }
+
+      .mini-table th {
         font-family: var(--font-mono);
         font-size: 11px;
-        color: var(--subtle);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--chrome-muted);
+        font-weight: 500;
       }
-      @media (max-width: 520px) {
+
+      .mini-table td {
+        color: var(--chrome-muted);
+      }
+      .mini-table tr:last-child td {
+        border-bottom: 0;
+      }
+
+      @media (max-width: 820px) {
+        .component-row {
+          grid-template-columns: 1fr;
+        }
+        .component-preview-grid {
+          grid-template-columns: 1fr;
+        }
         .sw-head,
         .sw-row {
-          grid-template-columns: 1fr 52px 52px;
+          grid-template-columns: 1fr 76px 76px;
         }
         .sw-role {
           display: none;
@@ -599,22 +1087,27 @@
   </head>
   <body>
     <div class="wrap">
-      <div class="doc-head">
+      <header class="doc-head">
         <h1>Console</h1>
         <div class="meta">
-          design reference · direction A — azure · serif · v1
+          full design reference · direction A — azure · serif · v3
         </div>
-        <p class="use">
-          A visual reference for implementing the blog UI. Every colour, size,
-          and component here maps 1:1 to the tokens in <b>tokens.css</b> /
-          <b>theme.css</b>. Screens are shown in both themes. Hand screenshots
-          of individual frames to the implementing agent, or import this file
-          into Figma with an HTML-to-Figma plugin for editable frames.
+        <p class="note">
+          A complete implementation reference for the blog UI. It includes
+          foundations, full Home/Post page mocks in light and dark modes,
+          optional image states, and a full atomic component catalogue with HTML
+          previews. Templates own page placement; components own only their
+          internal styling.
         </p>
-      </div>
+        <nav class="toc" aria-label="Reference sections">
+          <a href="#foundations">Foundations</a><a href="#pages">Pages</a
+          ><a href="#atoms">Atoms</a><a href="#molecules">Molecules</a
+          ><a href="#organisms">Organisms</a><a href="#templates">Templates</a
+          ><a href="#next-map">Next.js map</a>
+        </nav>
+      </header>
 
-      <!-- ============ FOUNDATIONS: COLOUR ============ -->
-      <section class="sec">
+      <section class="sec" id="foundations">
         <div class="sec-title">Foundations · colour tokens</div>
         <div class="swatches">
           <div class="sw-head">
@@ -629,6 +1122,15 @@
               class="chip"
               style="background: oklch(0.17 0.006 250)"
             ></span>
+          </div>
+          <div class="sw-row">
+            <span class="sw-name">bg-subtle</span
+            ><span class="sw-role">secondary page field</span
+            ><span
+              class="chip"
+              style="background: oklch(0.965 0.003 250)"
+            ></span
+            ><span class="chip" style="background: oklch(0.2 0.006 250)"></span>
           </div>
           <div class="sw-row">
             <span class="sw-name">surface</span
@@ -673,8 +1175,8 @@
             ></span>
           </div>
           <div class="sw-row">
-            <span class="sw-name">text-muted</span
-            ><span class="sw-role">secondary</span
+            <span class="sw-name">muted</span
+            ><span class="sw-role">secondary body text</span
             ><span class="chip" style="background: oklch(0.46 0.01 250)"></span
             ><span
               class="chip"
@@ -682,8 +1184,8 @@
             ></span>
           </div>
           <div class="sw-row">
-            <span class="sw-name">text-subtle</span
-            ><span class="sw-role">metadata</span
+            <span class="sw-name">subtle</span
+            ><span class="sw-role">metadata / low emphasis</span
             ><span class="chip" style="background: oklch(0.6 0.008 250)"></span
             ><span
               class="chip"
@@ -695,6 +1197,12 @@
             ><span class="sw-role">links / interactive</span
             ><span class="chip" style="background: oklch(0.58 0.17 250)"></span
             ><span class="chip" style="background: oklch(0.7 0.16 250)"></span>
+          </div>
+          <div class="sw-row">
+            <span class="sw-name">accent-hover</span
+            ><span class="sw-role">interactive hover</span
+            ><span class="chip" style="background: oklch(0.52 0.17 250)"></span
+            ><span class="chip" style="background: oklch(0.76 0.16 250)"></span>
           </div>
           <div class="sw-row">
             <span class="sw-name">accent-muted</span
@@ -714,11 +1222,10 @@
         </div>
       </section>
 
-      <!-- ============ FOUNDATIONS: TYPE ============ -->
       <section class="sec">
         <div class="sec-title">Foundations · typography</div>
         <p class="cap">
-          display + ui: Space Grotesk · long-form: Newsreader · chrome + code:
+          display + UI: Space Grotesk · long-form: Newsreader · chrome + code:
           JetBrains Mono
         </p>
         <div class="type-card">
@@ -741,14 +1248,11 @@
             <div class="sp-xl">Shared singletons</div>
           </div>
           <div class="spec-row">
-            <span class="tk"
-              >text-base · Newsreader · body prose (68ch measure)</span
-            >
+            <span class="tk">text-base · Newsreader · body prose</span>
             <div class="sp-body">
               Runtime composition changes the economics of a large frontend.
               Each remote ships on its own cadence and the shell resolves them
-              at load — the trade you accept is a versioning contract at the
-              boundary.
+              at load.
             </div>
           </div>
           <div class="spec-row">
@@ -764,12 +1268,11 @@
         </div>
       </section>
 
-      <!-- ============ FOUNDATIONS: SHAPE + MOTION ============ -->
       <section class="sec">
         <div class="sec-title">Foundations · shape, layout, motion</div>
-        <div class="grid2">
-          <div class="tok-card">
-            <p class="cap">radius — restrained; borders over shadows</p>
+        <div class="token-grid">
+          <div class="token-card">
+            <span class="tk">radius — restrained; borders over shadows</span>
             <div class="radii">
               <div class="r">
                 <div class="box" style="border-radius: 3px"></div>
@@ -785,201 +1288,640 @@
               </div>
             </div>
           </div>
-          <div class="tok-card">
-            <p class="cap">layout + motion</p>
+          <div class="token-card">
+            <span class="tk">layout</span>
             <div class="kv">
-              <span>measure</span> 68ch<br />
-              <span>gutter</span> clamp(1rem, 5vw, 2.5rem)<br />
-              <span>section-gap</span> clamp(3rem, 8vw, 6rem)<br />
-              <span>ease</span> cubic-bezier(.2,0,0,1)<br />
-              <span>dur</span> fast 120ms · base 200ms · slow 360ms
+              <span>measure</span> 68ch<br /><span>page max</span> 1120px /
+              1180px reference<br /><span>gutter</span> clamp(1rem, 5vw,
+              2.5rem)<br /><span>section-gap</span> clamp(3rem, 8vw, 6rem)
+            </div>
+          </div>
+          <div class="token-card">
+            <span class="tk">motion</span>
+            <div class="kv">
+              <span>ease</span> cubic-bezier(.2,0,0,1)<br /><span
+                >dur-fast</span
+              >
+              120ms<br /><span>dur-base</span> 200ms<br /><span>dur-slow</span>
+              360ms
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ============ COMPONENTS ============ -->
-      <section class="sec">
-        <div class="sec-title">Components</div>
-        <div class="grid2">
-          <!-- light components -->
-          <div>
-            <p class="fl">Light</p>
-            <div class="frame t-light">
-              <div class="site">
-                <div class="comp-block">
-                  <p class="comp-lab">buttons — primary / ghost / link</p>
-                  <div class="btns">
-                    <span class="btn primary">Read post</span
-                    ><span class="btn ghost">Subscribe</span
-                    ><span class="btn link">View all</span>
-                  </div>
-                </div>
-                <div class="comp-block">
-                  <p class="comp-lab">tags &amp; category pill (active)</p>
-                  <div class="tags">
-                    <span class="tag">react</span
-                    ><span class="tag">typescript</span
-                    ><span class="tag on">architecture</span>
-                  </div>
-                </div>
-                <div class="comp-block">
-                  <p class="comp-lab">spec line — signature</p>
-                  <div class="spec" style="margin: 0">
-                    2026-06-28<span class="sep">·</span>9 min read<span
-                      class="sep"
-                      >·</span
-                    >2,140 words<span class="sep">·</span><a>ARCHITECTURE</a>
-                  </div>
-                </div>
-                <div class="comp-block">
-                  <p class="comp-lab">prose — link, inline code, quote</p>
-                  <p class="lead" style="margin: 0 0 8px">
-                    Resolve remotes with a <a>versioning contract</a> and keep
-                    <span class="icode">react</span> a singleton.
-                  </p>
-                  <blockquote style="margin: 0">
-                    If it isn't typed, it isn't a contract.
-                  </blockquote>
-                </div>
-                <div class="comp-block">
-                  <p class="comp-lab">code block — dual-theme (Shiki)</p>
-                  <div class="code" style="margin: 0">
-                    <div class="clab">
-                      <span>next.config.ts</span><span>copy</span>
-                    </div>
-                    <pre><span class="cm">// one React on the page</span>
-shared: { react: { singleton: <span class="kw">true</span> } }</pre>
-                  </div>
-                </div>
-                <div class="comp-block">
-                  <p class="comp-lab">post card — default &amp; hover</p>
-                  <div class="cardgrid demo">
-                    <div class="card">
-                      <div class="cmeta">
-                        2026-05-12<span class="sep">·</span>6 min<span
-                          class="sep"
-                          >·</span
-                        ><span class="cec">PERFORMANCE</span>
-                      </div>
-                      <p class="ct">Cutting hydration cost</p>
-                      <p class="cx">Where the boundary pays off.</p>
-                    </div>
-                    <div class="card">
-                      <div class="cmeta">
-                        2026-04-02<span class="sep">·</span>8 min<span
-                          class="sep"
-                          >·</span
-                        ><span class="cec">DESIGN SYSTEMS</span>
-                      </div>
-                      <p class="ct">Tokens that survive refactors</p>
-                      <p class="cx">Semantic naming, one source.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- dark components -->
-          <div>
-            <p class="fl">Dark</p>
-            <div class="frame t-dark">
-              <div class="site">
-                <div class="comp-block">
-                  <p class="comp-lab">buttons — primary / ghost / link</p>
-                  <div class="btns">
-                    <span class="btn primary">Read post</span
-                    ><span class="btn ghost">Subscribe</span
-                    ><span class="btn link">View all</span>
-                  </div>
-                </div>
-                <div class="comp-block">
-                  <p class="comp-lab">tags &amp; category pill (active)</p>
-                  <div class="tags">
-                    <span class="tag">react</span
-                    ><span class="tag">typescript</span
-                    ><span class="tag on">architecture</span>
-                  </div>
-                </div>
-                <div class="comp-block">
-                  <p class="comp-lab">spec line — signature</p>
-                  <div class="spec" style="margin: 0">
-                    2026-06-28<span class="sep">·</span>9 min read<span
-                      class="sep"
-                      >·</span
-                    >2,140 words<span class="sep">·</span><a>ARCHITECTURE</a>
-                  </div>
-                </div>
-                <div class="comp-block">
-                  <p class="comp-lab">prose — link, inline code, quote</p>
-                  <p class="lead" style="margin: 0 0 8px">
-                    Resolve remotes with a <a>versioning contract</a> and keep
-                    <span class="icode">react</span> a singleton.
-                  </p>
-                  <blockquote style="margin: 0">
-                    If it isn't typed, it isn't a contract.
-                  </blockquote>
-                </div>
-                <div class="comp-block">
-                  <p class="comp-lab">code block — dual-theme (Shiki)</p>
-                  <div class="code" style="margin: 0">
-                    <div class="clab">
-                      <span>next.config.ts</span><span>copy</span>
-                    </div>
-                    <pre><span class="cm">// one React on the page</span>
-shared: { react: { singleton: <span class="kw">true</span> } }</pre>
-                  </div>
-                </div>
-                <div class="comp-block">
-                  <p class="comp-lab">post card — default &amp; hover</p>
-                  <div class="cardgrid demo">
-                    <div class="card">
-                      <div class="cmeta">
-                        2026-05-12<span class="sep">·</span>6 min<span
-                          class="sep"
-                          >·</span
-                        ><span class="cec">PERFORMANCE</span>
-                      </div>
-                      <p class="ct">Cutting hydration cost</p>
-                      <p class="cx">Where the boundary pays off.</p>
-                    </div>
-                    <div class="card">
-                      <div class="cmeta">
-                        2026-04-02<span class="sep">·</span>8 min<span
-                          class="sep"
-                          >·</span
-                        ><span class="cec">DESIGN SYSTEMS</span>
-                      </div>
-                      <p class="ct">Tokens that survive refactors</p>
-                      <p class="cx">Semantic naming, one source.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============ SCREEN: HOME ============ -->
-      <section class="sec">
-        <div class="sec-title">Screen · home</div>
+      <section class="sec" id="pages">
+        <div class="sec-title">Pages · full mocks</div>
+        <p class="cap">
+          Home and Post detail shown with optional images. Remove media blocks
+          and <code>has-media</code> when no image is provided.
+        </p>
         <div class="grid2">
           <div>
-            <p class="fl">Light</p>
+            <p class="frame-label">Light · HomePageTemplate</p>
             <div class="frame t-light">
               <div class="bar">
                 <span class="dots"><i></i><i></i><i></i></span
                 ><span class="url">val.dev</span>
               </div>
-              <div class="site">
-                <div class="shead">
-                  <span class="brand">val<em>.dev</em></span>
-                  <nav class="nav">
-                    <a>writing</a><a>projects</a><a>about</a
-                    ><svg
-                      class="ic"
+              <div class="page">
+                <header class="m-header">
+                  <span class="a-logo">val<em>.dev</em></span>
+                  <nav class="m-nav" aria-label="Primary">
+                    <a class="a-navlink">writing</a
+                    ><a class="a-navlink">projects</a
+                    ><a class="a-navlink">about</a
+                    ><button
+                      class="a-iconbutton"
+                      aria-label="Switch to dark mode"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                      >
+                        <path
+                          d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                        />
+                      </svg>
+                    </button>
+                  </nav>
+                </header>
+                <main>
+                  <section
+                    class="o-home-hero has-media"
+                    aria-labelledby="home-hero-preview-title"
+                  >
+                    <div class="hero-copy">
+                      <div class="a-eyebrow">Senior frontend engineer</div>
+                      <h2 id="home-hero-preview-title" class="a-heading-hero">
+                        Notes on shipping frontend at scale
+                      </h2>
+                      <p class="hero-sub">
+                        Architecture, performance, and design systems — from
+                        fintech and retail.
+                      </p>
+                      <div class="m-actions">
+                        <span class="a-button a-button-primary"
+                          >Read latest</span
+                        ><span class="a-button a-button-link"
+                          >View all posts</span
+                        >
+                      </div>
+                    </div>
+                    <figure style="margin: 0">
+                      <div
+                        class="a-media hero-media"
+                        data-label="optional hero image"
+                      ></div>
+                    </figure>
+                  </section>
+                  <section
+                    class="o-latest"
+                    aria-labelledby="latest-module-title"
+                  >
+                    <p id="latest-module-title" class="o-latest-title">
+                      Latest
+                    </p>
+                    <div class="o-card-grid">
+                      <article class="m-post-card">
+                        <div class="m-card-meta">
+                          2026-06-28<span class="a-sep">·</span>9 min<span
+                            class="a-sep"
+                            >·</span
+                          ><span class="category">ARCHITECTURE</span>
+                        </div>
+                        <h4 class="a-card-title">
+                          Micro-frontends with Module Federation
+                        </h4>
+                        <p class="m-card-desc">
+                          Runtime composition and its contracts.
+                        </p>
+                      </article>
+                      <article class="m-post-card is-hovered">
+                        <div class="m-card-meta">
+                          2026-04-02<span class="a-sep">·</span>8 min<span
+                            class="a-sep"
+                            >·</span
+                          ><span class="category">DESIGN</span>
+                        </div>
+                        <h4 class="a-card-title">
+                          Tokens that survive refactors
+                        </h4>
+                        <p class="m-card-desc">Semantic naming, one source.</p>
+                      </article>
+                      <article class="m-post-card">
+                        <div class="m-card-meta">
+                          2026-05-12<span class="a-sep">·</span>6 min<span
+                            class="a-sep"
+                            >·</span
+                          ><span class="category">PERFORMANCE</span>
+                        </div>
+                        <h4 class="a-card-title">Cutting hydration cost</h4>
+                        <p class="m-card-desc">Where the boundary pays off.</p>
+                      </article>
+                    </div>
+                  </section>
+                </main>
+                <footer class="o-footer">
+                  <span>© 2026 val.dev</span
+                  ><span>rss · github · linkedin</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="frame-label">Dark · HomePageTemplate</p>
+            <div class="frame t-dark">
+              <div class="bar">
+                <span class="dots"><i></i><i></i><i></i></span
+                ><span class="url">val.dev</span>
+              </div>
+              <div class="page">
+                <header class="m-header">
+                  <span class="a-logo">val<em>.dev</em></span>
+                  <nav class="m-nav" aria-label="Primary">
+                    <a class="a-navlink">writing</a
+                    ><a class="a-navlink">projects</a
+                    ><a class="a-navlink">about</a
+                    ><button
+                      class="a-iconbutton"
+                      aria-label="Switch to light mode"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                      >
+                        <circle cx="12" cy="12" r="4" />
+                        <path
+                          d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
+                        />
+                      </svg>
+                    </button>
+                  </nav>
+                </header>
+                <main>
+                  <section
+                    class="o-home-hero has-media"
+                    aria-labelledby="home-hero-preview-title"
+                  >
+                    <div class="hero-copy">
+                      <div class="a-eyebrow">Senior frontend engineer</div>
+                      <h2 id="home-hero-preview-title" class="a-heading-hero">
+                        Notes on shipping frontend at scale
+                      </h2>
+                      <p class="hero-sub">
+                        Architecture, performance, and design systems — from
+                        fintech and retail.
+                      </p>
+                      <div class="m-actions">
+                        <span class="a-button a-button-primary"
+                          >Read latest</span
+                        ><span class="a-button a-button-link"
+                          >View all posts</span
+                        >
+                      </div>
+                    </div>
+                    <figure style="margin: 0">
+                      <div
+                        class="a-media hero-media"
+                        data-label="optional hero image"
+                      ></div>
+                    </figure>
+                  </section>
+                  <section
+                    class="o-latest"
+                    aria-labelledby="latest-module-title"
+                  >
+                    <p id="latest-module-title" class="o-latest-title">
+                      Latest
+                    </p>
+                    <div class="o-card-grid">
+                      <article class="m-post-card">
+                        <div class="m-card-meta">
+                          2026-06-28<span class="a-sep">·</span>9 min<span
+                            class="a-sep"
+                            >·</span
+                          ><span class="category">ARCHITECTURE</span>
+                        </div>
+                        <h4 class="a-card-title">
+                          Micro-frontends with Module Federation
+                        </h4>
+                        <p class="m-card-desc">
+                          Runtime composition and its contracts.
+                        </p>
+                      </article>
+                      <article class="m-post-card is-hovered">
+                        <div class="m-card-meta">
+                          2026-04-02<span class="a-sep">·</span>8 min<span
+                            class="a-sep"
+                            >·</span
+                          ><span class="category">DESIGN</span>
+                        </div>
+                        <h4 class="a-card-title">
+                          Tokens that survive refactors
+                        </h4>
+                        <p class="m-card-desc">Semantic naming, one source.</p>
+                      </article>
+                      <article class="m-post-card">
+                        <div class="m-card-meta">
+                          2026-05-12<span class="a-sep">·</span>6 min<span
+                            class="a-sep"
+                            >·</span
+                          ><span class="category">PERFORMANCE</span>
+                        </div>
+                        <h4 class="a-card-title">Cutting hydration cost</h4>
+                        <p class="m-card-desc">Where the boundary pays off.</p>
+                      </article>
+                    </div>
+                  </section>
+                </main>
+                <footer class="o-footer">
+                  <span>© 2026 val.dev</span
+                  ><span>rss · github · linkedin</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-title">Pages · post detail</div>
+        <div class="grid2">
+          <div>
+            <p class="frame-label">Light · PostPageTemplate</p>
+            <div class="frame t-light">
+              <div class="bar">
+                <span class="dots"><i></i><i></i><i></i></span
+                ><span class="url"
+                  >val.dev/writing/module-federation-at-scale</span
+                >
+              </div>
+              <div class="page page-narrow">
+                <header class="m-header">
+                  <span class="a-logo">val<em>.dev</em></span>
+                  <nav class="m-nav" aria-label="Primary">
+                    <a class="a-navlink">writing</a
+                    ><a class="a-navlink">projects</a
+                    ><a class="a-navlink">about</a
+                    ><button
+                      class="a-iconbutton"
+                      aria-label="Switch to dark mode"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                      >
+                        <path
+                          d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                        />
+                      </svg>
+                    </button>
+                  </nav>
+                </header>
+                <main>
+                  <article>
+                    <header class="o-article-header">
+                      <div class="a-eyebrow">Architecture</div>
+                      <h1 class="a-heading-post">
+                        Scaling micro-frontends with Module Federation
+                      </h1>
+                      <div class="m-post-meta">
+                        2026-06-28<span class="a-sep">·</span>9 min read<span
+                          class="a-sep"
+                          >·</span
+                        >2,140 words<span class="a-sep">·</span
+                        ><a>ARCHITECTURE</a>
+                      </div>
+                      <p class="a-body post-lead">
+                        Runtime composition changes the economics of a large
+                        frontend. Each remote ships on its own cadence.
+                      </p>
+                      <figure class="o-post-cover">
+                        <div
+                          class="a-media"
+                          data-label="optional post cover"
+                        ></div>
+                        <figcaption class="a-caption">
+                          Optional cover image. Hide the figure when there is no
+                          image.
+                        </figcaption>
+                      </figure>
+                    </header>
+                    <div class="o-article-body">
+                      <p class="a-body">
+                        The trade you accept is a
+                        <a class="a-prose-link">versioning contract</a> at the
+                        boundary. Keep
+                        <span class="a-inline-code">react</span> a singleton and
+                        type every exposed surface.
+                      </p>
+                      <div class="m-code">
+                        <div class="m-code-label">
+                          <span>next.config.ts</span><span>copy</span>
+                        </div>
+                        <pre><span class="comment">// one React on the page</span>
+shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
+                      </div>
+                      <blockquote class="m-quote">
+                        Treat every remote's exposed surface as a public API. If
+                        it isn't typed, it isn't a contract.
+                      </blockquote>
+                      <div class="m-tags">
+                        <span class="a-tag">react</span
+                        ><span class="a-tag">module-federation</span
+                        ><span class="a-tag a-tag-active">performance</span>
+                      </div>
+                    </div>
+                  </article>
+                </main>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="frame-label">Dark · PostPageTemplate</p>
+            <div class="frame t-dark">
+              <div class="bar">
+                <span class="dots"><i></i><i></i><i></i></span
+                ><span class="url"
+                  >val.dev/writing/module-federation-at-scale</span
+                >
+              </div>
+              <div class="page page-narrow">
+                <header class="m-header">
+                  <span class="a-logo">val<em>.dev</em></span>
+                  <nav class="m-nav" aria-label="Primary">
+                    <a class="a-navlink">writing</a
+                    ><a class="a-navlink">projects</a
+                    ><a class="a-navlink">about</a
+                    ><button
+                      class="a-iconbutton"
+                      aria-label="Switch to light mode"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                      >
+                        <circle cx="12" cy="12" r="4" />
+                        <path
+                          d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
+                        />
+                      </svg>
+                    </button>
+                  </nav>
+                </header>
+                <main>
+                  <article>
+                    <header class="o-article-header">
+                      <div class="a-eyebrow">Architecture</div>
+                      <h1 class="a-heading-post">
+                        Scaling micro-frontends with Module Federation
+                      </h1>
+                      <div class="m-post-meta">
+                        2026-06-28<span class="a-sep">·</span>9 min read<span
+                          class="a-sep"
+                          >·</span
+                        >2,140 words<span class="a-sep">·</span
+                        ><a>ARCHITECTURE</a>
+                      </div>
+                      <p class="a-body post-lead">
+                        Runtime composition changes the economics of a large
+                        frontend. Each remote ships on its own cadence.
+                      </p>
+                      <figure class="o-post-cover">
+                        <div
+                          class="a-media"
+                          data-label="optional post cover"
+                        ></div>
+                        <figcaption class="a-caption">
+                          Optional cover image. Hide the figure when there is no
+                          image.
+                        </figcaption>
+                      </figure>
+                    </header>
+                    <div class="o-article-body">
+                      <p class="a-body">
+                        The trade you accept is a
+                        <a class="a-prose-link">versioning contract</a> at the
+                        boundary. Keep
+                        <span class="a-inline-code">react</span> a singleton and
+                        type every exposed surface.
+                      </p>
+                      <div class="m-code">
+                        <div class="m-code-label">
+                          <span>next.config.ts</span><span>copy</span>
+                        </div>
+                        <pre><span class="comment">// one React on the page</span>
+shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
+                      </div>
+                      <blockquote class="m-quote">
+                        Treat every remote's exposed surface as a public API. If
+                        it isn't typed, it isn't a contract.
+                      </blockquote>
+                      <div class="m-tags">
+                        <span class="a-tag">react</span
+                        ><span class="a-tag">module-federation</span
+                        ><span class="a-tag a-tag-active">performance</span>
+                      </div>
+                    </div>
+                  </article>
+                </main>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-title">Optional image states</div>
+        <div class="grid2">
+          <div>
+            <p class="frame-label">Home hero · with image</p>
+            <div class="preview-panel t-light compact">
+              <section
+                class="o-home-hero has-media"
+                aria-labelledby="home-hero-preview-title"
+              >
+                <div class="hero-copy">
+                  <div class="a-eyebrow">Senior frontend engineer</div>
+                  <h2 id="home-hero-preview-title" class="a-heading-hero">
+                    Notes on shipping frontend at scale
+                  </h2>
+                  <p class="hero-sub">
+                    Architecture, performance, and design systems — from fintech
+                    and retail.
+                  </p>
+                  <div class="m-actions">
+                    <span class="a-button a-button-primary">Read latest</span
+                    ><span class="a-button a-button-link">View all posts</span>
+                  </div>
+                </div>
+                <figure style="margin: 0">
+                  <div
+                    class="a-media hero-media"
+                    data-label="optional hero image"
+                  ></div>
+                </figure>
+              </section>
+            </div>
+          </div>
+          <div>
+            <p class="frame-label">Home hero · without image</p>
+            <div class="preview-panel t-light compact">
+              <section
+                class="o-home-hero"
+                aria-labelledby="home-hero-no-image-title"
+              >
+                <div class="hero-copy">
+                  <div class="a-eyebrow">Senior frontend engineer</div>
+                  <h2 id="home-hero-no-image-title" class="a-heading-hero">
+                    Notes on shipping frontend at scale
+                  </h2>
+                  <p class="hero-sub">
+                    No media column is reserved when the image is missing.
+                  </p>
+                  <div class="m-actions">
+                    <span class="a-button a-button-primary">Read latest</span
+                    ><span class="a-button a-button-link">View all posts</span>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+          <div>
+            <p class="frame-label">Post header · with cover image</p>
+            <div class="preview-panel t-dark compact">
+              <header class="o-article-header">
+                <div class="a-eyebrow">Architecture</div>
+                <h1 class="a-heading-post">
+                  Scaling micro-frontends with Module Federation
+                </h1>
+                <div class="m-post-meta">
+                  2026-06-28<span class="a-sep">·</span>9 min read<span
+                    class="a-sep"
+                    >·</span
+                  >2,140 words<span class="a-sep">·</span><a>ARCHITECTURE</a>
+                </div>
+                <p class="a-body post-lead">
+                  Runtime composition changes the economics of a large frontend.
+                  Each remote ships on its own cadence.
+                </p>
+                <figure class="o-post-cover">
+                  <div class="a-media" data-label="optional post cover"></div>
+                  <figcaption class="a-caption">
+                    Optional cover image. Hide the figure when there is no
+                    image.
+                  </figcaption>
+                </figure>
+              </header>
+            </div>
+          </div>
+          <div>
+            <p class="frame-label">Post header · without cover image</p>
+            <div class="preview-panel t-dark compact">
+              <header class="o-article-header">
+                <div class="a-eyebrow">Architecture</div>
+                <h1 class="a-heading-post">
+                  Scaling micro-frontends with Module Federation
+                </h1>
+                <div class="m-post-meta">
+                  2026-06-28<span class="a-sep">·</span>9 min read<span
+                    class="a-sep"
+                    >·</span
+                  >2,140 words<span class="a-sep">·</span><a>ARCHITECTURE</a>
+                </div>
+                <p class="a-body post-lead">
+                  When no cover exists, remove the whole figure and the text
+                  rhythm remains unchanged.
+                </p>
+              </header>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="atoms">
+        <div class="sec-title">Atomic components · atoms</div>
+        <p class="cap">
+          Smallest styled primitives used by the Home and Post pages.
+        </p>
+        <div class="component-list">
+          <article class="component-row" id="logo">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>Logo</h3>
+              <p>
+                Brand wordmark used in the site header. Accent part uses the
+                mono face.
+              </p>
+              <p>
+                <code><Logo /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <span class="a-logo">val<em>.dev</em></span>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <span class="a-logo">val<em>.dev</em></span>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="navlink">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>NavLink</h3>
+              <p>
+                Small mono navigation link. The page/header decides active state
+                if needed.
+              </p>
+              <p>
+                <code><NavLink href="/writing">writing</NavLink></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="component-demo-row">
+                  <a class="a-navlink">writing</a
+                  ><a class="a-navlink">projects</a
+                  ><a class="a-navlink">about</a>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="component-demo-row">
+                  <a class="a-navlink">writing</a
+                  ><a class="a-navlink">projects</a
+                  ><a class="a-navlink">about</a>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="iconbutton---themetoggleicon">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>IconButton / ThemeToggleIcon</h3>
+              <p>Unfilled icon button for theme switching in the header.</p>
+              <p>
+                <code><IconButton aria-label="Switch theme" /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="component-demo-row">
+                  <button class="a-iconbutton">
+                    <svg
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -988,68 +1930,9 @@ shared: { react: { singleton: <span class="kw">true</span> } }</pre>
                       <path
                         d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
                       />
-                    </svg>
-                  </nav>
-                </div>
-                <div class="hero">
-                  <div class="eyebrow">Senior frontend engineer</div>
-                  <h2 class="htitle">Notes on shipping frontend at scale</h2>
-                  <p class="hsub">
-                    Architecture, performance, and design systems — from fintech
-                    and retail. Written, not generated.
-                  </p>
-                </div>
-                <p class="comp-lab" style="margin: 22px 0 0">Latest</p>
-                <div class="cardgrid">
-                  <div class="card">
-                    <div class="cmeta">
-                      2026-06-28<span class="sep">·</span>9 min<span class="sep"
-                        >·</span
-                      ><span class="cec">ARCHITECTURE</span>
-                    </div>
-                    <p class="ct">Micro-frontends with Module Federation</p>
-                    <p class="cx">Runtime composition and its contracts.</p>
-                  </div>
-                  <div class="card">
-                    <div class="cmeta">
-                      2026-05-12<span class="sep">·</span>6 min<span class="sep"
-                        >·</span
-                      ><span class="cec">PERFORMANCE</span>
-                    </div>
-                    <p class="ct">Cutting hydration cost in Next 15</p>
-                    <p class="cx">Where the boundary pays off.</p>
-                  </div>
-                  <div class="card">
-                    <div class="cmeta">
-                      2026-04-02<span class="sep">·</span>8 min<span class="sep"
-                        >·</span
-                      ><span class="cec">DESIGN</span>
-                    </div>
-                    <p class="ct">Tokens that survive refactors</p>
-                    <p class="cx">One source, semantic names.</p>
-                  </div>
-                </div>
-                <div class="foot">
-                  <span>© 2026 val.dev</span
-                  ><span>rss · github · linkedin</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <p class="fl">Dark</p>
-            <div class="frame t-dark">
-              <div class="bar">
-                <span class="dots"><i></i><i></i><i></i></span
-                ><span class="url">val.dev</span>
-              </div>
-              <div class="site">
-                <div class="shead">
-                  <span class="brand">val<em>.dev</em></span>
-                  <nav class="nav">
-                    <a>writing</a><a>projects</a><a>about</a
-                    ><svg
-                      class="ic"
+                    </svg></button
+                  ><button class="a-iconbutton">
+                    <svg
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -1060,76 +1943,14 @@ shared: { react: { singleton: <span class="kw">true</span> } }</pre>
                         d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
                       />
                     </svg>
-                  </nav>
-                </div>
-                <div class="hero">
-                  <div class="eyebrow">Senior frontend engineer</div>
-                  <h2 class="htitle">Notes on shipping frontend at scale</h2>
-                  <p class="hsub">
-                    Architecture, performance, and design systems — from fintech
-                    and retail. Written, not generated.
-                  </p>
-                </div>
-                <p class="comp-lab" style="margin: 22px 0 0">Latest</p>
-                <div class="cardgrid">
-                  <div class="card">
-                    <div class="cmeta">
-                      2026-06-28<span class="sep">·</span>9 min<span class="sep"
-                        >·</span
-                      ><span class="cec">ARCHITECTURE</span>
-                    </div>
-                    <p class="ct">Micro-frontends with Module Federation</p>
-                    <p class="cx">Runtime composition and its contracts.</p>
-                  </div>
-                  <div class="card">
-                    <div class="cmeta">
-                      2026-05-12<span class="sep">·</span>6 min<span class="sep"
-                        >·</span
-                      ><span class="cec">PERFORMANCE</span>
-                    </div>
-                    <p class="ct">Cutting hydration cost in Next 15</p>
-                    <p class="cx">Where the boundary pays off.</p>
-                  </div>
-                  <div class="card">
-                    <div class="cmeta">
-                      2026-04-02<span class="sep">·</span>8 min<span class="sep"
-                        >·</span
-                      ><span class="cec">DESIGN</span>
-                    </div>
-                    <p class="ct">Tokens that survive refactors</p>
-                    <p class="cx">One source, semantic names.</p>
-                  </div>
-                </div>
-                <div class="foot">
-                  <span>© 2026 val.dev</span
-                  ><span>rss · github · linkedin</span>
+                  </button>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============ SCREEN: POST ============ -->
-      <section class="sec">
-        <div class="sec-title">Screen · post</div>
-        <div class="grid2">
-          <div>
-            <p class="fl">Light</p>
-            <div class="frame t-light">
-              <div class="bar">
-                <span class="dots"><i></i><i></i><i></i></span
-                ><span class="url"
-                  >val.dev/writing/module-federation-at-scale</span
-                >
-              </div>
-              <div class="site">
-                <div class="shead">
-                  <span class="brand">val<em>.dev</em></span>
-                  <nav class="nav">
-                    <a>writing</a><a>projects</a><a>about</a
-                    ><svg
-                      class="ic"
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="component-demo-row">
+                  <button class="a-iconbutton">
+                    <svg
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -1138,66 +1959,9 @@ shared: { react: { singleton: <span class="kw">true</span> } }</pre>
                       <path
                         d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
                       />
-                    </svg>
-                  </nav>
-                </div>
-                <div class="eyebrow" style="margin-top: 24px">Architecture</div>
-                <h1 class="h1">
-                  Scaling micro-frontends with Module Federation
-                </h1>
-                <div class="spec">
-                  2026-06-28<span class="sep">·</span>9 min read<span
-                    class="sep"
-                    >·</span
-                  >2,140 words<span class="sep">·</span><a>ARCHITECTURE</a>
-                </div>
-                <p class="lead">
-                  Runtime composition changes the economics of a large frontend.
-                  Instead of one deploy pipeline gating every team, each remote
-                  ships on its own cadence and the shell resolves them at load.
-                  The trade you accept is a <a>versioning contract</a> at the
-                  boundary — and that contract is where most of the real work
-                  lives.
-                </p>
-                <div class="code">
-                  <div class="clab">
-                    <span>next.config.ts</span><span>copy</span>
-                  </div>
-                  <pre><span class="cm">// shared singletons keep one React on the page</span>
-<span class="kw">new</span> ModuleFederationPlugin({
-  name: <span class="kw">"shell"</span>,
-  remotes: { checkout: <span class="kw">"checkout@/mf.js"</span> },
-  shared: { react: { singleton: <span class="kw">true</span> } }
-})</pre>
-                </div>
-                <blockquote>
-                  Treat every remote's exposed surface as a public API. If it
-                  isn't typed, it isn't a contract.
-                </blockquote>
-                <div class="tags">
-                  <span class="tag">react</span
-                  ><span class="tag">module-federation</span
-                  ><span class="tag">performance</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <p class="fl">Dark</p>
-            <div class="frame t-dark">
-              <div class="bar">
-                <span class="dots"><i></i><i></i><i></i></span
-                ><span class="url"
-                  >val.dev/writing/module-federation-at-scale</span
-                >
-              </div>
-              <div class="site">
-                <div class="shead">
-                  <span class="brand">val<em>.dev</em></span>
-                  <nav class="nav">
-                    <a>writing</a><a>projects</a><a>about</a
-                    ><svg
-                      class="ic"
+                    </svg></button
+                  ><button class="a-iconbutton">
+                    <svg
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -1208,49 +1972,1589 @@ shared: { react: { singleton: <span class="kw">true</span> } }</pre>
                         d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
                       />
                     </svg>
-                  </nav>
-                </div>
-                <div class="eyebrow" style="margin-top: 24px">Architecture</div>
-                <h1 class="h1">
-                  Scaling micro-frontends with Module Federation
-                </h1>
-                <div class="spec">
-                  2026-06-28<span class="sep">·</span>9 min read<span
-                    class="sep"
-                    >·</span
-                  >2,140 words<span class="sep">·</span><a>ARCHITECTURE</a>
-                </div>
-                <p class="lead">
-                  Runtime composition changes the economics of a large frontend.
-                  Instead of one deploy pipeline gating every team, each remote
-                  ships on its own cadence and the shell resolves them at load.
-                  The trade you accept is a <a>versioning contract</a> at the
-                  boundary — and that contract is where most of the real work
-                  lives.
-                </p>
-                <div class="code">
-                  <div class="clab">
-                    <span>next.config.ts</span><span>copy</span>
-                  </div>
-                  <pre><span class="cm">// shared singletons keep one React on the page</span>
-<span class="kw">new</span> ModuleFederationPlugin({
-  name: <span class="kw">"shell"</span>,
-  remotes: { checkout: <span class="kw">"checkout@/mf.js"</span> },
-  shared: { react: { singleton: <span class="kw">true</span> } }
-})</pre>
-                </div>
-                <blockquote>
-                  Treat every remote's exposed surface as a public API. If it
-                  isn't typed, it isn't a contract.
-                </blockquote>
-                <div class="tags">
-                  <span class="tag">react</span
-                  ><span class="tag">module-federation</span
-                  ><span class="tag">performance</span>
+                  </button>
                 </div>
               </div>
             </div>
+          </article>
+          <article class="component-row" id="eyebrow">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>Eyebrow</h3>
+              <p>Uppercase mono label for hero role and article category.</p>
+              <p>
+                <code><Eyebrow>Architecture</Eyebrow></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="a-eyebrow">Architecture</div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="a-eyebrow">Architecture</div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="heading">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>Heading</h3>
+              <p>
+                Display headings for hero, post title, and card title. Use
+                variant prop rather than separate CSS per component.
+              </p>
+              <p>
+                <code><Heading variant="hero|post|card" /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div>
+                  <h2 class="a-heading-hero">
+                    Notes on shipping frontend at scale
+                  </h2>
+                  <h3 class="a-heading-post">Scaling micro-frontends</h3>
+                  <h4 class="a-card-title">Tokens that survive refactors</h4>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div>
+                  <h2 class="a-heading-hero">
+                    Notes on shipping frontend at scale
+                  </h2>
+                  <h3 class="a-heading-post">Scaling micro-frontends</h3>
+                  <h4 class="a-card-title">Tokens that survive refactors</h4>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="bodytext---mutedtext">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>BodyText / MutedText</h3>
+              <p>
+                Long-form serif text. Muted variant is used for hero subtitles
+                and card descriptions.
+              </p>
+              <p>
+                <code><Text tone="default|muted" /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div>
+                  <p class="a-body">
+                    Runtime composition changes the economics of a large
+                    frontend.
+                  </p>
+                  <p class="a-body a-body-muted" style="margin-top: 8px">
+                    Architecture, performance, and design systems.
+                  </p>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div>
+                  <p class="a-body">
+                    Runtime composition changes the economics of a large
+                    frontend.
+                  </p>
+                  <p class="a-body a-body-muted" style="margin-top: 8px">
+                    Architecture, performance, and design systems.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="button">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>Button</h3>
+              <p>
+                Three variants used by the hero/actions: primary, ghost, and
+                link.
+              </p>
+              <p>
+                <code><button variant="primary|ghost|link" /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="component-demo-row">
+                  <span class="a-button a-button-primary">Read post</span
+                  ><span class="a-button a-button-ghost">Subscribe</span
+                  ><span class="a-button a-button-link">View all</span>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="component-demo-row">
+                  <span class="a-button a-button-primary">Read post</span
+                  ><span class="a-button a-button-ghost">Subscribe</span
+                  ><span class="a-button a-button-link">View all</span>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="tag">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>Tag</h3>
+              <p>
+                Small mono pill for post tags. Active/tinted variant is useful
+                for selected categories.
+              </p>
+              <p>
+                <code><Tag active>react</Tag></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="component-demo-row">
+                  <span class="a-tag">react</span
+                  ><span class="a-tag">typescript</span
+                  ><span class="a-tag a-tag-active">architecture</span>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="component-demo-row">
+                  <span class="a-tag">react</span
+                  ><span class="a-tag">typescript</span
+                  ><span class="a-tag a-tag-active">architecture</span>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="proselink-+-inlinecode">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>ProseLink + InlineCode</h3>
+              <p>Inline rich-text atoms used inside the article body.</p>
+              <p>
+                <code><ProseLink /> <InlineCode /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <p class="a-body">
+                  Use a <a class="a-prose-link">versioning contract</a> and keep
+                  <span class="a-inline-code">react</span> a singleton.
+                </p>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <p class="a-body">
+                  Use a <a class="a-prose-link">versioning contract</a> and keep
+                  <span class="a-inline-code">react</span> a singleton.
+                </p>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="mediaframe">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>MediaFrame</h3>
+              <p>
+                Reusable visual container for optional hero images and post
+                covers. In production this wraps Next Image.
+              </p>
+              <p>
+                <code><MediaFrame ratio="4/3|16/9" /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div
+                  class="a-media"
+                  data-label="media frame"
+                  style="aspect-ratio: 16/9; min-height: 130px"
+                ></div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div
+                  class="a-media"
+                  data-label="media frame"
+                  style="aspect-ratio: 16/9; min-height: 130px"
+                ></div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="caption">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>Caption</h3>
+              <p>Mono caption used below optional article images.</p>
+              <p>
+                <code><caption /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <figure style="margin: 0">
+                  <div
+                    class="a-media"
+                    data-label="image"
+                    style="aspect-ratio: 16/9; min-height: 120px"
+                  ></div>
+                  <figcaption class="a-caption">
+                    Optional cover image. Hide the figure when missing.
+                  </figcaption>
+                </figure>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <figure style="margin: 0">
+                  <div
+                    class="a-media"
+                    data-label="image"
+                    style="aspect-ratio: 16/9; min-height: 120px"
+                  ></div>
+                  <figcaption class="a-caption">
+                    Optional cover image. Hide the figure when missing.
+                  </figcaption>
+                </figure>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="separator">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>Separator</h3>
+              <p>Visual separator used inside metadata rows.</p>
+              <p>
+                <code><Separator /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <p class="m-card-meta">
+                  2026-06-28<span class="a-sep">·</span>9 min<span class="a-sep"
+                    >·</span
+                  ><span class="category">ARCHITECTURE</span>
+                </p>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <p class="m-card-meta">
+                  2026-06-28<span class="a-sep">·</span>9 min<span class="a-sep"
+                    >·</span
+                  ><span class="category">ARCHITECTURE</span>
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="sec" id="molecules">
+        <div class="sec-title">Atomic components · molecules</div>
+        <p class="cap">
+          Reusable compositions of atoms. Molecules do not own route-level
+          margins.
+        </p>
+        <div class="component-list">
+          <article class="component-row" id="primarynavigation">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>PrimaryNavigation</h3>
+              <p>
+                Composes NavLink atoms and the theme icon button. It does not
+                own the outer header border.
+              </p>
+              <p>
+                <code><PrimaryNavigation /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <nav class="m-nav" aria-label="Primary">
+                  <a class="a-navlink">writing</a
+                  ><a class="a-navlink">projects</a
+                  ><a class="a-navlink">about</a
+                  ><button class="a-iconbutton">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                    >
+                      <path
+                        d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                      />
+                    </svg>
+                  </button>
+                </nav>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <nav class="m-nav" aria-label="Primary">
+                  <a class="a-navlink">writing</a
+                  ><a class="a-navlink">projects</a
+                  ><a class="a-navlink">about</a
+                  ><button class="a-iconbutton">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                    >
+                      <circle cx="12" cy="12" r="4" />
+                      <path
+                        d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
+                      />
+                    </svg>
+                  </button>
+                </nav>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="siteheader">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>SiteHeader</h3>
+              <p>
+                Header row used by both Home and Post pages. Owns its internal
+                border and alignment only.
+              </p>
+              <p>
+                <code><SiteHeader /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <header class="m-header">
+                  <span class="a-logo">val<em>.dev</em></span>
+                  <nav class="m-nav" aria-label="Primary">
+                    <a class="a-navlink">writing</a
+                    ><a class="a-navlink">projects</a
+                    ><a class="a-navlink">about</a
+                    ><button
+                      class="a-iconbutton"
+                      aria-label="Switch to dark mode"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                      >
+                        <path
+                          d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                        />
+                      </svg>
+                    </button>
+                  </nav>
+                </header>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <header class="m-header">
+                  <span class="a-logo">val<em>.dev</em></span>
+                  <nav class="m-nav" aria-label="Primary">
+                    <a class="a-navlink">writing</a
+                    ><a class="a-navlink">projects</a
+                    ><a class="a-navlink">about</a
+                    ><button
+                      class="a-iconbutton"
+                      aria-label="Switch to light mode"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                      >
+                        <circle cx="12" cy="12" r="4" />
+                        <path
+                          d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
+                        />
+                      </svg>
+                    </button>
+                  </nav>
+                </header>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="postmeta">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>PostMeta</h3>
+              <p>
+                Article metadata line: date, reading time, words, and category
+                link.
+              </p>
+              <p>
+                <code><PostMeta date readTime words category /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="m-post-meta">
+                  2026-06-28<span class="a-sep">·</span>9 min read<span
+                    class="a-sep"
+                    >·</span
+                  >2,140 words<span class="a-sep">·</span><a>ARCHITECTURE</a>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="m-post-meta">
+                  2026-06-28<span class="a-sep">·</span>9 min read<span
+                    class="a-sep"
+                    >·</span
+                  >2,140 words<span class="a-sep">·</span><a>ARCHITECTURE</a>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="cardmeta">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>CardMeta</h3>
+              <p>
+                Compact metadata line for post cards. It shares atoms with
+                PostMeta but has smaller sizing.
+              </p>
+              <p>
+                <code><CardMeta /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="m-card-meta">
+                  2026-04-02<span class="a-sep">·</span>8 min<span class="a-sep"
+                    >·</span
+                  ><span class="category">DESIGN</span>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="m-card-meta">
+                  2026-04-02<span class="a-sep">·</span>8 min<span class="a-sep"
+                    >·</span
+                  ><span class="category">DESIGN</span>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="postcard">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>PostCard</h3>
+              <p>
+                Card preview used in LatestPosts. Hover state raises by 2px and
+                strengthens border.
+              </p>
+              <p>
+                <code><PostCard post /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="component-demo-row" style="align-items: stretch">
+                  <div style="flex: 1; min-width: 180px">
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-06-28<span class="a-sep">·</span>9 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">ARCHITECTURE</span>
+                      </div>
+                      <h4 class="a-card-title">
+                        Micro-frontends with Module Federation
+                      </h4>
+                      <p class="m-card-desc">
+                        Runtime composition and its contracts.
+                      </p>
+                    </article>
+                  </div>
+                  <div style="flex: 1; min-width: 180px">
+                    <article class="m-post-card is-hovered">
+                      <div class="m-card-meta">
+                        2026-04-02<span class="a-sep">·</span>8 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">DESIGN</span>
+                      </div>
+                      <h4 class="a-card-title">
+                        Tokens that survive refactors
+                      </h4>
+                      <p class="m-card-desc">Semantic naming, one source.</p>
+                    </article>
+                  </div>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="component-demo-row" style="align-items: stretch">
+                  <div style="flex: 1; min-width: 180px">
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-06-28<span class="a-sep">·</span>9 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">ARCHITECTURE</span>
+                      </div>
+                      <h4 class="a-card-title">
+                        Micro-frontends with Module Federation
+                      </h4>
+                      <p class="m-card-desc">
+                        Runtime composition and its contracts.
+                      </p>
+                    </article>
+                  </div>
+                  <div style="flex: 1; min-width: 180px">
+                    <article class="m-post-card is-hovered">
+                      <div class="m-card-meta">
+                        2026-04-02<span class="a-sep">·</span>8 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">DESIGN</span>
+                      </div>
+                      <h4 class="a-card-title">
+                        Tokens that survive refactors
+                      </h4>
+                      <p class="m-card-desc">Semantic naming, one source.</p>
+                    </article>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="taglist">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>TagList</h3>
+              <p>Wraps Tag atoms with consistent gap and wrapping.</p>
+              <p>
+                <code><TagList tags /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="m-tags">
+                  <span class="a-tag">react</span
+                  ><span class="a-tag">module-federation</span
+                  ><span class="a-tag a-tag-active">performance</span>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="m-tags">
+                  <span class="a-tag">react</span
+                  ><span class="a-tag">module-federation</span
+                  ><span class="a-tag a-tag-active">performance</span>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="actionlist">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>ActionList</h3>
+              <p>
+                Button group used in the home hero. The molecule owns only
+                inline gap and wrapping.
+              </p>
+              <p>
+                <code><ActionList /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="m-actions" style="margin-top: 0">
+                  <span class="a-button a-button-primary">Read latest</span
+                  ><span class="a-button a-button-link">View all posts</span>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="m-actions" style="margin-top: 0">
+                  <span class="a-button a-button-primary">Read latest</span
+                  ><span class="a-button a-button-link">View all posts</span>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="codeblock">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>CodeBlock</h3>
+              <p>
+                Code container with filename/copy label and Shiki-compatible
+                token colours.
+              </p>
+              <p>
+                <code><CodeBlock filename code /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="m-code">
+                  <div class="m-code-label">
+                    <span>next.config.ts</span><span>copy</span>
+                  </div>
+                  <pre><span class="comment">// one React on the page</span>
+shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="m-code">
+                  <div class="m-code-label">
+                    <span>next.config.ts</span><span>copy</span>
+                  </div>
+                  <pre><span class="comment">// one React on the page</span>
+shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="quoteblock">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>QuoteBlock</h3>
+              <p>Article quote/callout with accent-muted rule.</p>
+              <p>
+                <code><QuoteBlock /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <blockquote class="m-quote" style="margin: 0">
+                  If it isn't typed, it isn't a contract.
+                </blockquote>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <blockquote class="m-quote" style="margin: 0">
+                  If it isn't typed, it isn't a contract.
+                </blockquote>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="imagewithcaption">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>ImageWithCaption</h3>
+              <p>
+                Optional article media composed from MediaFrame + Caption. Hide
+                the whole molecule when absent.
+              </p>
+              <p>
+                <code><ImageWithCaption image caption /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <figure class="o-post-cover" style="margin: 0">
+                  <div class="a-media" data-label="optional image"></div>
+                  <figcaption class="a-caption">
+                    Hide this whole figure if there is no image.
+                  </figcaption>
+                </figure>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <figure class="o-post-cover" style="margin: 0">
+                  <div class="a-media" data-label="optional image"></div>
+                  <figcaption class="a-caption">
+                    Hide this whole figure if there is no image.
+                  </figcaption>
+                </figure>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="sec" id="organisms">
+        <div class="sec-title">Atomic components · organisms</div>
+        <p class="cap">
+          Larger page sections composed from atoms and molecules.
+        </p>
+        <div class="component-list">
+          <article class="component-row" id="homehero">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>HomeHero</h3>
+              <p>
+                Hero copy with optional media. With image it becomes two
+                columns; without image it collapses to one column.
+              </p>
+              <p>
+                <code><HomeHero image? /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <section
+                  class="o-home-hero has-media"
+                  aria-labelledby="home-hero-preview-title"
+                >
+                  <div class="hero-copy">
+                    <div class="a-eyebrow">Senior frontend engineer</div>
+                    <h2 id="home-hero-preview-title" class="a-heading-hero">
+                      Notes on shipping frontend at scale
+                    </h2>
+                    <p class="hero-sub">
+                      Architecture, performance, and design systems — from
+                      fintech and retail.
+                    </p>
+                    <div class="m-actions">
+                      <span class="a-button a-button-primary">Read latest</span
+                      ><span class="a-button a-button-link"
+                        >View all posts</span
+                      >
+                    </div>
+                  </div>
+                  <figure style="margin: 0">
+                    <div
+                      class="a-media hero-media"
+                      data-label="optional hero image"
+                    ></div>
+                  </figure>
+                </section>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <section
+                  class="o-home-hero"
+                  aria-labelledby="home-hero-no-image-title"
+                >
+                  <div class="hero-copy">
+                    <div class="a-eyebrow">Senior frontend engineer</div>
+                    <h2 id="home-hero-no-image-title" class="a-heading-hero">
+                      Notes on shipping frontend at scale
+                    </h2>
+                    <p class="hero-sub">
+                      No media column is reserved when the image is missing.
+                    </p>
+                    <div class="m-actions">
+                      <span class="a-button a-button-primary">Read latest</span
+                      ><span class="a-button a-button-link"
+                        >View all posts</span
+                      >
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="latestposts">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>LatestPosts</h3>
+              <p>Section title and responsive grid of PostCard molecules.</p>
+              <p>
+                <code><LatestPosts posts /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <section class="o-latest" aria-labelledby="latest-module-title">
+                  <p id="latest-module-title" class="o-latest-title">Latest</p>
+                  <div class="o-card-grid">
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-06-28<span class="a-sep">·</span>9 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">ARCHITECTURE</span>
+                      </div>
+                      <h4 class="a-card-title">
+                        Micro-frontends with Module Federation
+                      </h4>
+                      <p class="m-card-desc">
+                        Runtime composition and its contracts.
+                      </p>
+                    </article>
+                    <article class="m-post-card is-hovered">
+                      <div class="m-card-meta">
+                        2026-04-02<span class="a-sep">·</span>8 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">DESIGN</span>
+                      </div>
+                      <h4 class="a-card-title">
+                        Tokens that survive refactors
+                      </h4>
+                      <p class="m-card-desc">Semantic naming, one source.</p>
+                    </article>
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-05-12<span class="a-sep">·</span>6 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">PERFORMANCE</span>
+                      </div>
+                      <h4 class="a-card-title">Cutting hydration cost</h4>
+                      <p class="m-card-desc">Where the boundary pays off.</p>
+                    </article>
+                  </div>
+                </section>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <section class="o-latest" aria-labelledby="latest-module-title">
+                  <p id="latest-module-title" class="o-latest-title">Latest</p>
+                  <div class="o-card-grid">
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-06-28<span class="a-sep">·</span>9 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">ARCHITECTURE</span>
+                      </div>
+                      <h4 class="a-card-title">
+                        Micro-frontends with Module Federation
+                      </h4>
+                      <p class="m-card-desc">
+                        Runtime composition and its contracts.
+                      </p>
+                    </article>
+                    <article class="m-post-card is-hovered">
+                      <div class="m-card-meta">
+                        2026-04-02<span class="a-sep">·</span>8 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">DESIGN</span>
+                      </div>
+                      <h4 class="a-card-title">
+                        Tokens that survive refactors
+                      </h4>
+                      <p class="m-card-desc">Semantic naming, one source.</p>
+                    </article>
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-05-12<span class="a-sep">·</span>6 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">PERFORMANCE</span>
+                      </div>
+                      <h4 class="a-card-title">Cutting hydration cost</h4>
+                      <p class="m-card-desc">Where the boundary pays off.</p>
+                    </article>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="articleheader">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>ArticleHeader</h3>
+              <p>
+                Post category, title, meta, lead paragraph, and optional cover
+                image.
+              </p>
+              <p>
+                <code><ArticleHeader coverImage? /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <header class="o-article-header">
+                  <div class="a-eyebrow">Architecture</div>
+                  <h1 class="a-heading-post">
+                    Scaling micro-frontends with Module Federation
+                  </h1>
+                  <div class="m-post-meta">
+                    2026-06-28<span class="a-sep">·</span>9 min read<span
+                      class="a-sep"
+                      >·</span
+                    >2,140 words<span class="a-sep">·</span><a>ARCHITECTURE</a>
+                  </div>
+                  <p class="a-body post-lead">
+                    Runtime composition changes the economics of a large
+                    frontend. Each remote ships on its own cadence.
+                  </p>
+                  <figure class="o-post-cover">
+                    <div class="a-media" data-label="optional post cover"></div>
+                    <figcaption class="a-caption">
+                      Optional cover image. Hide the figure when there is no
+                      image.
+                    </figcaption>
+                  </figure>
+                </header>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <header class="o-article-header">
+                  <div class="a-eyebrow">Architecture</div>
+                  <h1 class="a-heading-post">
+                    Scaling micro-frontends with Module Federation
+                  </h1>
+                  <div class="m-post-meta">
+                    2026-06-28<span class="a-sep">·</span>9 min read<span
+                      class="a-sep"
+                      >·</span
+                    >2,140 words<span class="a-sep">·</span><a>ARCHITECTURE</a>
+                  </div>
+                  <p class="a-body post-lead">
+                    Runtime composition changes the economics of a large
+                    frontend. Each remote ships on its own cadence.
+                  </p>
+                  <figure class="o-post-cover">
+                    <div class="a-media" data-label="optional post cover"></div>
+                    <figcaption class="a-caption">
+                      Optional cover image. Hide the figure when there is no
+                      image.
+                    </figcaption>
+                  </figure>
+                </header>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="articlebody">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>ArticleBody</h3>
+              <p>
+                Renders prose content modules used by the post page: paragraphs,
+                links, inline code, code block, quote, and tags.
+              </p>
+              <p>
+                <code><ArticleBody blocks /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="o-article-body">
+                  <p class="a-body">
+                    The trade you accept is a
+                    <a class="a-prose-link">versioning contract</a> at the
+                    boundary. Keep <span class="a-inline-code">react</span> a
+                    singleton and type every exposed surface.
+                  </p>
+                  <div class="m-code">
+                    <div class="m-code-label">
+                      <span>next.config.ts</span><span>copy</span>
+                    </div>
+                    <pre><span class="comment">// one React on the page</span>
+shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
+                  </div>
+                  <blockquote class="m-quote">
+                    Treat every remote's exposed surface as a public API. If it
+                    isn't typed, it isn't a contract.
+                  </blockquote>
+                  <div class="m-tags">
+                    <span class="a-tag">react</span
+                    ><span class="a-tag">module-federation</span
+                    ><span class="a-tag a-tag-active">performance</span>
+                  </div>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="o-article-body">
+                  <p class="a-body">
+                    The trade you accept is a
+                    <a class="a-prose-link">versioning contract</a> at the
+                    boundary. Keep <span class="a-inline-code">react</span> a
+                    singleton and type every exposed surface.
+                  </p>
+                  <div class="m-code">
+                    <div class="m-code-label">
+                      <span>next.config.ts</span><span>copy</span>
+                    </div>
+                    <pre><span class="comment">// one React on the page</span>
+shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
+                  </div>
+                  <blockquote class="m-quote">
+                    Treat every remote's exposed surface as a public API. If it
+                    isn't typed, it isn't a contract.
+                  </blockquote>
+                  <div class="m-tags">
+                    <span class="a-tag">react</span
+                    ><span class="a-tag">module-federation</span
+                    ><span class="a-tag a-tag-active">performance</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="sitefooter">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>SiteFooter</h3>
+              <p>Small mono footer used on the Home page template.</p>
+              <p>
+                <code><SiteFooter /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <footer class="o-footer">
+                  <span>© 2026 val.dev</span
+                  ><span>rss · github · linkedin</span>
+                </footer>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <footer class="o-footer">
+                  <span>© 2026 val.dev</span
+                  ><span>rss · github · linkedin</span>
+                </footer>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="sec" id="templates">
+        <div class="sec-title">Atomic components · templates</div>
+        <p class="cap">
+          Route-level placement only. Templates decide section order, reading
+          width, and optional media presence.
+        </p>
+        <div class="component-list">
+          <article class="component-row" id="homepagetemplate">
+            <div class="component-info">
+              <span class="tk">Template</span>
+              <h3>HomePageTemplate</h3>
+              <p>
+                Places header, HomeHero, LatestPosts, and footer. Owns
+                page-level padding and ordering.
+              </p>
+              <p>
+                <code><HomePageTemplate /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="bar">
+                  <span class="dots"><i></i><i></i><i></i></span
+                  ><span class="url">val.dev</span>
+                </div>
+                <div class="page">
+                  <header class="m-header">
+                    <span class="a-logo">val<em>.dev</em></span>
+                    <nav class="m-nav" aria-label="Primary">
+                      <a class="a-navlink">writing</a
+                      ><a class="a-navlink">projects</a
+                      ><a class="a-navlink">about</a
+                      ><button
+                        class="a-iconbutton"
+                        aria-label="Switch to dark mode"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.6"
+                        >
+                          <path
+                            d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                          />
+                        </svg>
+                      </button>
+                    </nav>
+                  </header>
+                  <main>
+                    <section
+                      class="o-home-hero has-media"
+                      aria-labelledby="home-hero-preview-title"
+                    >
+                      <div class="hero-copy">
+                        <div class="a-eyebrow">Senior frontend engineer</div>
+                        <h2 id="home-hero-preview-title" class="a-heading-hero">
+                          Notes on shipping frontend at scale
+                        </h2>
+                        <p class="hero-sub">
+                          Architecture, performance, and design systems — from
+                          fintech and retail.
+                        </p>
+                        <div class="m-actions">
+                          <span class="a-button a-button-primary"
+                            >Read latest</span
+                          ><span class="a-button a-button-link"
+                            >View all posts</span
+                          >
+                        </div>
+                      </div>
+                      <figure style="margin: 0">
+                        <div
+                          class="a-media hero-media"
+                          data-label="optional hero image"
+                        ></div>
+                      </figure>
+                    </section>
+                    <section
+                      class="o-latest"
+                      aria-labelledby="latest-module-title"
+                    >
+                      <p id="latest-module-title" class="o-latest-title">
+                        Latest
+                      </p>
+                      <div class="o-card-grid">
+                        <article class="m-post-card">
+                          <div class="m-card-meta">
+                            2026-06-28<span class="a-sep">·</span>9 min<span
+                              class="a-sep"
+                              >·</span
+                            ><span class="category">ARCHITECTURE</span>
+                          </div>
+                          <h4 class="a-card-title">
+                            Micro-frontends with Module Federation
+                          </h4>
+                          <p class="m-card-desc">
+                            Runtime composition and its contracts.
+                          </p>
+                        </article>
+                        <article class="m-post-card is-hovered">
+                          <div class="m-card-meta">
+                            2026-04-02<span class="a-sep">·</span>8 min<span
+                              class="a-sep"
+                              >·</span
+                            ><span class="category">DESIGN</span>
+                          </div>
+                          <h4 class="a-card-title">
+                            Tokens that survive refactors
+                          </h4>
+                          <p class="m-card-desc">
+                            Semantic naming, one source.
+                          </p>
+                        </article>
+                        <article class="m-post-card">
+                          <div class="m-card-meta">
+                            2026-05-12<span class="a-sep">·</span>6 min<span
+                              class="a-sep"
+                              >·</span
+                            ><span class="category">PERFORMANCE</span>
+                          </div>
+                          <h4 class="a-card-title">Cutting hydration cost</h4>
+                          <p class="m-card-desc">
+                            Where the boundary pays off.
+                          </p>
+                        </article>
+                      </div>
+                    </section>
+                  </main>
+                  <footer class="o-footer">
+                    <span>© 2026 val.dev</span
+                    ><span>rss · github · linkedin</span>
+                  </footer>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="bar">
+                  <span class="dots"><i></i><i></i><i></i></span
+                  ><span class="url">val.dev</span>
+                </div>
+                <div class="page">
+                  <header class="m-header">
+                    <span class="a-logo">val<em>.dev</em></span>
+                    <nav class="m-nav" aria-label="Primary">
+                      <a class="a-navlink">writing</a
+                      ><a class="a-navlink">projects</a
+                      ><a class="a-navlink">about</a
+                      ><button
+                        class="a-iconbutton"
+                        aria-label="Switch to light mode"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.6"
+                        >
+                          <circle cx="12" cy="12" r="4" />
+                          <path
+                            d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
+                          />
+                        </svg>
+                      </button>
+                    </nav>
+                  </header>
+                  <main>
+                    <section
+                      class="o-home-hero"
+                      aria-labelledby="home-hero-no-image-title"
+                    >
+                      <div class="hero-copy">
+                        <div class="a-eyebrow">Senior frontend engineer</div>
+                        <h2
+                          id="home-hero-no-image-title"
+                          class="a-heading-hero"
+                        >
+                          Notes on shipping frontend at scale
+                        </h2>
+                        <p class="hero-sub">
+                          No media column is reserved when the image is missing.
+                        </p>
+                        <div class="m-actions">
+                          <span class="a-button a-button-primary"
+                            >Read latest</span
+                          ><span class="a-button a-button-link"
+                            >View all posts</span
+                          >
+                        </div>
+                      </div>
+                    </section>
+                    <section
+                      class="o-latest"
+                      aria-labelledby="latest-module-title"
+                    >
+                      <p id="latest-module-title" class="o-latest-title">
+                        Latest
+                      </p>
+                      <div class="o-card-grid">
+                        <article class="m-post-card">
+                          <div class="m-card-meta">
+                            2026-06-28<span class="a-sep">·</span>9 min<span
+                              class="a-sep"
+                              >·</span
+                            ><span class="category">ARCHITECTURE</span>
+                          </div>
+                          <h4 class="a-card-title">
+                            Micro-frontends with Module Federation
+                          </h4>
+                          <p class="m-card-desc">
+                            Runtime composition and its contracts.
+                          </p>
+                        </article>
+                        <article class="m-post-card is-hovered">
+                          <div class="m-card-meta">
+                            2026-04-02<span class="a-sep">·</span>8 min<span
+                              class="a-sep"
+                              >·</span
+                            ><span class="category">DESIGN</span>
+                          </div>
+                          <h4 class="a-card-title">
+                            Tokens that survive refactors
+                          </h4>
+                          <p class="m-card-desc">
+                            Semantic naming, one source.
+                          </p>
+                        </article>
+                        <article class="m-post-card">
+                          <div class="m-card-meta">
+                            2026-05-12<span class="a-sep">·</span>6 min<span
+                              class="a-sep"
+                              >·</span
+                            ><span class="category">PERFORMANCE</span>
+                          </div>
+                          <h4 class="a-card-title">Cutting hydration cost</h4>
+                          <p class="m-card-desc">
+                            Where the boundary pays off.
+                          </p>
+                        </article>
+                      </div>
+                    </section>
+                  </main>
+                  <footer class="o-footer">
+                    <span>© 2026 val.dev</span
+                    ><span>rss · github · linkedin</span>
+                  </footer>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="postpagetemplate">
+            <div class="component-info">
+              <span class="tk">Template</span>
+              <h3>PostPageTemplate</h3>
+              <p>
+                Places header and article content inside a narrower reading
+                column. Owns route-level width.
+              </p>
+              <p>
+                <code><PostPageTemplate /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="bar">
+                  <span class="dots"><i></i><i></i><i></i></span
+                  ><span class="url">val.dev/writing/post</span>
+                </div>
+                <div class="page page-narrow">
+                  <header class="m-header">
+                    <span class="a-logo">val<em>.dev</em></span>
+                    <nav class="m-nav" aria-label="Primary">
+                      <a class="a-navlink">writing</a
+                      ><a class="a-navlink">projects</a
+                      ><a class="a-navlink">about</a
+                      ><button
+                        class="a-iconbutton"
+                        aria-label="Switch to dark mode"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.6"
+                        >
+                          <path
+                            d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                          />
+                        </svg>
+                      </button>
+                    </nav>
+                  </header>
+                  <main>
+                    <article>
+                      <header class="o-article-header">
+                        <div class="a-eyebrow">Architecture</div>
+                        <h1 class="a-heading-post">
+                          Scaling micro-frontends with Module Federation
+                        </h1>
+                        <div class="m-post-meta">
+                          2026-06-28<span class="a-sep">·</span>9 min read<span
+                            class="a-sep"
+                            >·</span
+                          >2,140 words<span class="a-sep">·</span
+                          ><a>ARCHITECTURE</a>
+                        </div>
+                        <p class="a-body post-lead">
+                          Runtime composition changes the economics of a large
+                          frontend. Each remote ships on its own cadence.
+                        </p>
+                        <figure class="o-post-cover">
+                          <div
+                            class="a-media"
+                            data-label="optional post cover"
+                          ></div>
+                          <figcaption class="a-caption">
+                            Optional cover image. Hide the figure when there is
+                            no image.
+                          </figcaption>
+                        </figure>
+                      </header>
+                      <div class="o-article-body">
+                        <p class="a-body">
+                          The trade you accept is a
+                          <a class="a-prose-link">versioning contract</a> at the
+                          boundary. Keep
+                          <span class="a-inline-code">react</span> a singleton
+                          and type every exposed surface.
+                        </p>
+                        <div class="m-code">
+                          <div class="m-code-label">
+                            <span>next.config.ts</span><span>copy</span>
+                          </div>
+                          <pre><span class="comment">// one React on the page</span>
+shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
+                        </div>
+                        <blockquote class="m-quote">
+                          Treat every remote's exposed surface as a public API.
+                          If it isn't typed, it isn't a contract.
+                        </blockquote>
+                        <div class="m-tags">
+                          <span class="a-tag">react</span
+                          ><span class="a-tag">module-federation</span
+                          ><span class="a-tag a-tag-active">performance</span>
+                        </div>
+                      </div>
+                    </article>
+                  </main>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="bar">
+                  <span class="dots"><i></i><i></i><i></i></span
+                  ><span class="url">val.dev/writing/post</span>
+                </div>
+                <div class="page page-narrow">
+                  <header class="m-header">
+                    <span class="a-logo">val<em>.dev</em></span>
+                    <nav class="m-nav" aria-label="Primary">
+                      <a class="a-navlink">writing</a
+                      ><a class="a-navlink">projects</a
+                      ><a class="a-navlink">about</a
+                      ><button
+                        class="a-iconbutton"
+                        aria-label="Switch to light mode"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="1.6"
+                        >
+                          <circle cx="12" cy="12" r="4" />
+                          <path
+                            d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
+                          />
+                        </svg>
+                      </button>
+                    </nav>
+                  </header>
+                  <main>
+                    <article>
+                      <header class="o-article-header">
+                        <div class="a-eyebrow">Architecture</div>
+                        <h1 class="a-heading-post">
+                          Scaling micro-frontends with Module Federation
+                        </h1>
+                        <div class="m-post-meta">
+                          2026-06-28<span class="a-sep">·</span>9 min read<span
+                            class="a-sep"
+                            >·</span
+                          >2,140 words<span class="a-sep">·</span
+                          ><a>ARCHITECTURE</a>
+                        </div>
+                        <p class="a-body post-lead">
+                          Runtime composition changes the economics of a large
+                          frontend. Each remote ships on its own cadence.
+                        </p>
+                        <figure class="o-post-cover">
+                          <div
+                            class="a-media"
+                            data-label="optional post cover"
+                          ></div>
+                          <figcaption class="a-caption">
+                            Optional cover image. Hide the figure when there is
+                            no image.
+                          </figcaption>
+                        </figure>
+                      </header>
+                      <div class="o-article-body">
+                        <p class="a-body">
+                          The trade you accept is a
+                          <a class="a-prose-link">versioning contract</a> at the
+                          boundary. Keep
+                          <span class="a-inline-code">react</span> a singleton
+                          and type every exposed surface.
+                        </p>
+                        <div class="m-code">
+                          <div class="m-code-label">
+                            <span>next.config.ts</span><span>copy</span>
+                          </div>
+                          <pre><span class="comment">// one React on the page</span>
+shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
+                        </div>
+                        <blockquote class="m-quote">
+                          Treat every remote's exposed surface as a public API.
+                          If it isn't typed, it isn't a contract.
+                        </blockquote>
+                        <div class="m-tags">
+                          <span class="a-tag">react</span
+                          ><span class="a-tag">module-federation</span
+                          ><span class="a-tag a-tag-active">performance</span>
+                        </div>
+                      </div>
+                    </article>
+                  </main>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="sec" id="next-map">
+        <div class="sec-title">Next.js implementation map</div>
+        <div class="module-grid">
+          <div class="module-card">
+            <h3>Atoms</h3>
+            <p>
+              <code>components/atoms/logo.tsx</code>, <code>nav-link.tsx</code>,
+              <code>icon-button.tsx</code>, <code>eyebrow.tsx</code>,
+              <code>heading.tsx</code>, <code>text.tsx</code>,
+              <code>button.tsx</code>, <code>tag.tsx</code>,
+              <code>media-frame.tsx</code>, <code>caption.tsx</code>,
+              <code>inline-code.tsx</code>, <code>prose-link.tsx</code>,
+              <code>separator.tsx</code>.
+            </p>
           </div>
+          <div class="module-card">
+            <h3>Molecules</h3>
+            <p>
+              <code>components/molecules/primary-navigation.tsx</code>,
+              <code>site-header.tsx</code>, <code>post-meta.tsx</code>,
+              <code>card-meta.tsx</code>, <code>post-card.tsx</code>,
+              <code>tag-list.tsx</code>, <code>action-list.tsx</code>,
+              <code>code-block.tsx</code>, <code>quote-block.tsx</code>,
+              <code>image-with-caption.tsx</code>.
+            </p>
+          </div>
+          <div class="module-card">
+            <h3>Organisms</h3>
+            <p>
+              <code>components/organisms/home-hero.tsx</code>,
+              <code>latest-posts.tsx</code>, <code>article-header.tsx</code>,
+              <code>article-body.tsx</code>, <code>site-footer.tsx</code>.
+            </p>
+          </div>
+          <div class="module-card">
+            <h3>Templates / routes</h3>
+            <p>
+              <code>components/templates/home-page-template.tsx</code>,
+              <code>post-page-template.tsx</code>. Route files pass data and
+              choose whether optional image props exist.
+            </p>
+          </div>
+        </div>
+        <div class="sec" style="margin-top: 22px">
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Route</th>
+                <th>Template placement</th>
+                <th>Optional image rule</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>app/page.tsx</code></td>
+                <td>
+                  <code>SiteHeader → HomeHero → LatestPosts → SiteFooter</code>
+                </td>
+                <td>
+                  Pass <code>heroImage</code> only when available.
+                  <code>HomeHero</code> adds <code>has-media</code> internally.
+                </td>
+              </tr>
+              <tr>
+                <td><code>app/writing/[slug]/page.tsx</code></td>
+                <td><code>SiteHeader → ArticleHeader → ArticleBody</code></td>
+                <td>
+                  Pass <code>coverImage</code> only when available.
+                  <code>ArticleHeader</code> removes the figure when missing.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note-card" style="margin-top: 18px">
+          Implementation rule: atoms/molecules should not add route margins like
+          <code>mt-section</code> or page max-widths. Use templates and page
+          files for placement. Organisms may own internal section layout, but
+          not overall page sequence.
         </div>
       </section>
     </div>
