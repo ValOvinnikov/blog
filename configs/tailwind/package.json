@@ -1,0 +1,13 @@
+{
+  "name": "@blog/tailwind-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./theme.css": "./theme.css",
+    "./preset": "./preset.ts"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.0.0"
+  }
+}
