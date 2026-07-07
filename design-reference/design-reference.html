@@ -1,374 +1,1258 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Console — Design Reference (Direction A)</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-<style>
-  :root{
-    --font-disp:'Space Grotesk',system-ui,sans-serif;
-    --font-read:'Newsreader',Georgia,serif;
-    --font-mono:'JetBrains Mono',ui-monospace,monospace;
-    --chrome-bg:#f4f5f7; --chrome-card:#ffffff; --chrome-line:#e4e6ea;
-    --chrome-ink:#1c2024; --chrome-muted:#6b7078;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--chrome-bg);color:var(--chrome-ink);
-    font-family:var(--font-disp);-webkit-font-smoothing:antialiased}
-  .wrap{max-width:1120px;margin:0 auto;padding:40px 24px 80px}
-  .doc-head{margin-bottom:8px}
-  .doc-head h1{font-size:34px;font-weight:500;letter-spacing:-.02em;margin:0}
-  .doc-head .meta{font-family:var(--font-mono);font-size:12px;color:var(--chrome-muted);margin-top:6px}
-  .doc-head .use{font-family:var(--font-disp);font-size:13px;color:var(--chrome-muted);max-width:70ch;margin-top:14px;line-height:1.6}
-  .sec{margin-top:52px}
-  .sec-title{font-family:var(--font-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
-    color:var(--chrome-muted);border-bottom:1px solid var(--chrome-line);padding-bottom:10px;margin-bottom:22px}
-  .cap{font-family:var(--font-mono);font-size:11px;color:var(--chrome-muted);margin:0 0 10px}
-  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Console — Design Reference (Direction A)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --font-disp: 'Space Grotesk', system-ui, sans-serif;
+        --font-read: 'Newsreader', Georgia, serif;
+        --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+        --chrome-bg: #f4f5f7;
+        --chrome-card: #ffffff;
+        --chrome-line: #e4e6ea;
+        --chrome-ink: #1c2024;
+        --chrome-muted: #6b7078;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--chrome-bg);
+        color: var(--chrome-ink);
+        font-family: var(--font-disp);
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 40px 24px 80px;
+      }
+      .doc-head {
+        margin-bottom: 8px;
+      }
+      .doc-head h1 {
+        font-size: 34px;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+      .doc-head .meta {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--chrome-muted);
+        margin-top: 6px;
+      }
+      .doc-head .use {
+        font-family: var(--font-disp);
+        font-size: 13px;
+        color: var(--chrome-muted);
+        max-width: 70ch;
+        margin-top: 14px;
+        line-height: 1.6;
+      }
+      .sec {
+        margin-top: 52px;
+      }
+      .sec-title {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--chrome-muted);
+        border-bottom: 1px solid var(--chrome-line);
+        padding-bottom: 10px;
+        margin-bottom: 22px;
+      }
+      .cap {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--chrome-muted);
+        margin: 0 0 10px;
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 22px;
+      }
 
-  /* ---- theme token scopes ---- */
-  .t-light{color-scheme:light;
-    --bg:oklch(.99 .002 250);--bg-subtle:oklch(.965 .003 250);--surface:oklch(1 0 0);--surface-2:oklch(.975 .003 250);
-    --border:oklch(.9 .004 250);--border-strong:oklch(.8 .006 250);
-    --text:oklch(.2 .01 250);--muted:oklch(.46 .01 250);--subtle:oklch(.6 .008 250);
-    --accent:oklch(.58 .17 250);--accent-hover:oklch(.52 .17 250);--accent-muted:oklch(.95 .03 250);--accent-contrast:oklch(.99 0 0)}
-  .t-dark{color-scheme:dark;
-    --bg:oklch(.17 .006 250);--bg-subtle:oklch(.2 .006 250);--surface:oklch(.21 .007 250);--surface-2:oklch(.24 .008 250);
-    --border:oklch(.3 .008 250);--border-strong:oklch(.42 .01 250);
-    --text:oklch(.95 .004 250);--muted:oklch(.72 .008 250);--subtle:oklch(.56 .008 250);
-    --accent:oklch(.7 .16 250);--accent-hover:oklch(.76 .16 250);--accent-muted:oklch(.3 .06 250);--accent-contrast:oklch(.16 .006 250)}
+      /* ---- theme token scopes ---- */
+      .t-light {
+        color-scheme: light;
+        --bg: oklch(0.99 0.002 250);
+        --bg-subtle: oklch(0.965 0.003 250);
+        --surface: oklch(1 0 0);
+        --surface-2: oklch(0.975 0.003 250);
+        --border: oklch(0.9 0.004 250);
+        --border-strong: oklch(0.8 0.006 250);
+        --text: oklch(0.2 0.01 250);
+        --muted: oklch(0.46 0.01 250);
+        --subtle: oklch(0.6 0.008 250);
+        --accent: oklch(0.58 0.17 250);
+        --accent-hover: oklch(0.52 0.17 250);
+        --accent-muted: oklch(0.95 0.03 250);
+        --accent-contrast: oklch(0.99 0 0);
+      }
+      .t-dark {
+        color-scheme: dark;
+        --bg: oklch(0.17 0.006 250);
+        --bg-subtle: oklch(0.2 0.006 250);
+        --surface: oklch(0.21 0.007 250);
+        --surface-2: oklch(0.24 0.008 250);
+        --border: oklch(0.3 0.008 250);
+        --border-strong: oklch(0.42 0.01 250);
+        --text: oklch(0.95 0.004 250);
+        --muted: oklch(0.72 0.008 250);
+        --subtle: oklch(0.56 0.008 250);
+        --accent: oklch(0.7 0.16 250);
+        --accent-hover: oklch(0.76 0.16 250);
+        --accent-muted: oklch(0.3 0.06 250);
+        --accent-contrast: oklch(0.16 0.006 250);
+      }
 
-  /* ---- color swatches ---- */
-  .swatches{background:var(--chrome-card);border:1px solid var(--chrome-line);border-radius:12px;overflow:hidden}
-  .sw-head,.sw-row{display:grid;grid-template-columns:1.4fr .9fr 64px 64px;align-items:center;gap:12px;padding:9px 16px}
-  .sw-head{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--chrome-muted);border-bottom:1px solid var(--chrome-line)}
-  .sw-row{border-top:1px solid var(--chrome-line)}
-  .sw-row:first-of-type{border-top:0}
-  .sw-name{font-family:var(--font-mono);font-size:12px;color:var(--chrome-ink)}
-  .sw-role{font-size:12px;color:var(--chrome-muted)}
-  .chip{height:34px;border-radius:6px;border:1px solid rgba(0,0,0,.08)}
+      /* ---- color swatches ---- */
+      .swatches {
+        background: var(--chrome-card);
+        border: 1px solid var(--chrome-line);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .sw-head,
+      .sw-row {
+        display: grid;
+        grid-template-columns: 1.4fr 0.9fr 64px 64px;
+        align-items: center;
+        gap: 12px;
+        padding: 9px 16px;
+      }
+      .sw-head {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--chrome-muted);
+        border-bottom: 1px solid var(--chrome-line);
+      }
+      .sw-row {
+        border-top: 1px solid var(--chrome-line);
+      }
+      .sw-row:first-of-type {
+        border-top: 0;
+      }
+      .sw-name {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--chrome-ink);
+      }
+      .sw-role {
+        font-size: 12px;
+        color: var(--chrome-muted);
+      }
+      .chip {
+        height: 34px;
+        border-radius: 6px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
 
-  /* ---- type specimens ---- */
-  .type-card{background:var(--chrome-card);border:1px solid var(--chrome-line);border-radius:12px;padding:24px 26px}
-  .spec-row{padding:14px 0;border-top:1px solid var(--chrome-line)}
-  .spec-row:first-child{border-top:0}
-  .spec-row .tk{font-family:var(--font-mono);font-size:11px;color:var(--chrome-muted);display:block;margin-bottom:6px}
-  .sp-display{font-family:var(--font-disp);font-weight:500;font-size:clamp(2.6rem,1.8rem+3.6vw,4.6rem);line-height:1.05;letter-spacing:-.02em}
-  .sp-3xl{font-family:var(--font-disp);font-weight:500;font-size:clamp(2.1rem,1.6rem+2.2vw,3rem);line-height:1.1;letter-spacing:-.02em}
-  .sp-2xl{font-family:var(--font-disp);font-weight:500;font-size:clamp(1.7rem,1.35rem+1.4vw,2.2rem);line-height:1.2;letter-spacing:-.02em}
-  .sp-xl{font-family:var(--font-disp);font-weight:500;font-size:clamp(1.35rem,1.15rem+.7vw,1.6rem);line-height:1.35}
-  .sp-body{font-family:var(--font-read);font-size:1.0625rem;line-height:1.7;max-width:60ch}
-  .sp-sm{font-family:var(--font-read);font-size:.875rem;line-height:1.5;color:#555}
-  .sp-mono{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase}
+      /* ---- type specimens ---- */
+      .type-card {
+        background: var(--chrome-card);
+        border: 1px solid var(--chrome-line);
+        border-radius: 12px;
+        padding: 24px 26px;
+      }
+      .spec-row {
+        padding: 14px 0;
+        border-top: 1px solid var(--chrome-line);
+      }
+      .spec-row:first-child {
+        border-top: 0;
+      }
+      .spec-row .tk {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--chrome-muted);
+        display: block;
+        margin-bottom: 6px;
+      }
+      .sp-display {
+        font-family: var(--font-disp);
+        font-weight: 500;
+        font-size: clamp(2.6rem, 1.8rem+3.6vw, 4.6rem);
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+      }
+      .sp-3xl {
+        font-family: var(--font-disp);
+        font-weight: 500;
+        font-size: clamp(2.1rem, 1.6rem+2.2vw, 3rem);
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+      .sp-2xl {
+        font-family: var(--font-disp);
+        font-weight: 500;
+        font-size: clamp(1.7rem, 1.35rem+1.4vw, 2.2rem);
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+      }
+      .sp-xl {
+        font-family: var(--font-disp);
+        font-weight: 500;
+        font-size: clamp(1.35rem, 1.15rem+0.7vw, 1.6rem);
+        line-height: 1.35;
+      }
+      .sp-body {
+        font-family: var(--font-read);
+        font-size: 1.0625rem;
+        line-height: 1.7;
+        max-width: 60ch;
+      }
+      .sp-sm {
+        font-family: var(--font-read);
+        font-size: 0.875rem;
+        line-height: 1.5;
+        color: #555;
+      }
+      .sp-mono {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
 
-  /* ---- tokens (radius/motion) ---- */
-  .tok-card{background:var(--chrome-card);border:1px solid var(--chrome-line);border-radius:12px;padding:22px 24px}
-  .radii{display:flex;gap:20px;align-items:flex-end;margin-top:6px}
-  .radii .r{text-align:center;font-family:var(--font-mono);font-size:11px;color:var(--chrome-muted)}
-  .radii .box{width:64px;height:48px;background:#dfe6f4;border:1px solid #b9c6e6;margin-bottom:8px}
-  .kv{font-family:var(--font-mono);font-size:12px;color:var(--chrome-ink);line-height:1.9}
-  .kv span{color:var(--chrome-muted)}
+      /* ---- tokens (radius/motion) ---- */
+      .tok-card {
+        background: var(--chrome-card);
+        border: 1px solid var(--chrome-line);
+        border-radius: 12px;
+        padding: 22px 24px;
+      }
+      .radii {
+        display: flex;
+        gap: 20px;
+        align-items: flex-end;
+        margin-top: 6px;
+      }
+      .radii .r {
+        text-align: center;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--chrome-muted);
+      }
+      .radii .box {
+        width: 64px;
+        height: 48px;
+        background: #dfe6f4;
+        border: 1px solid #b9c6e6;
+        margin-bottom: 8px;
+      }
+      .kv {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--chrome-ink);
+        line-height: 1.9;
+      }
+      .kv span {
+        color: var(--chrome-muted);
+      }
 
-  /* ================= website mock components ================= */
-  .frame{border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font-read)}
-  .fl{font-family:var(--font-mono);font-size:11px;color:var(--chrome-muted);margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em}
-  .bar{display:flex;align-items:center;gap:10px;background:var(--surface-2);border-bottom:1px solid var(--border);padding:9px 12px}
-  .dots{display:flex;gap:6px}.dots i{width:9px;height:9px;border-radius:50%;background:var(--border-strong);display:block}
-  .url{font-family:var(--font-mono);font-size:12px;color:var(--subtle)}
-  .site{padding:22px 24px 26px}
-  .shead{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid var(--border)}
-  .brand{font-family:var(--font-disp);font-size:19px;font-weight:500;letter-spacing:-.01em;color:var(--text)}
-  .brand em{font-family:var(--font-mono);font-style:normal;font-weight:400;font-size:14px;color:var(--accent)}
-  .nav{display:flex;align-items:center;gap:16px}
-  .nav a{font-family:var(--font-mono);font-size:12px;color:var(--subtle);text-decoration:none}
-  .nav .ic{width:18px;height:18px;color:var(--muted)}
-  .eyebrow{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
-  .h1{font-family:var(--font-disp);font-weight:500;font-size:30px;line-height:1.07;letter-spacing:-.02em;color:var(--text);margin:12px 0 0}
-  .spec{font-family:var(--font-mono);font-size:12px;color:var(--subtle);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:9px 0;margin:16px 0 20px}
-  .spec .sep{color:var(--border-strong);margin:0 7px}
-  .spec a{color:var(--accent);text-decoration:none}
-  .lead{font-size:15px;line-height:1.72;color:var(--text);max-width:60ch;margin:0 0 14px}
-  .lead a{color:var(--accent);text-decoration:underline;text-underline-offset:2px;text-decoration-color:var(--border-strong)}
-  .icode{font-family:var(--font-mono);font-size:.9em;background:var(--surface-2);border-radius:3px;padding:1px 5px}
-  .code{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;margin:18px 0;overflow:hidden}
-  .code .clab{font-family:var(--font-mono);font-size:11px;color:var(--subtle);padding:7px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
-  .code pre{margin:0;padding:12px 14px;font-family:var(--font-mono);font-size:12.5px;line-height:1.65;color:var(--text);overflow-x:auto}
-  .code .cm{color:var(--subtle)}.code .kw{color:var(--accent)}
-  blockquote{margin:18px 0;padding:2px 0 2px 16px;border-left:2px solid var(--accent-muted);font-family:var(--font-read);font-style:italic;font-size:15px;color:var(--muted)}
-  .tags{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 0}
-  .tag{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--subtle);border:1px solid var(--border);border-radius:3px;padding:3px 8px}
-  .tag.on{background:var(--accent-muted);color:var(--accent);border-color:transparent}
-  /* buttons */
-  .btns{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:4px}
-  .btn{font-family:var(--font-disp);font-weight:500;font-size:14px;border-radius:3px;padding:8px 16px;cursor:default;border:1px solid transparent}
-  .btn.primary{background:var(--accent);color:var(--accent-contrast)}
-  .btn.ghost{background:transparent;color:var(--text);border-color:var(--border-strong)}
-  .btn.link{background:transparent;color:var(--accent);padding:8px 4px;text-decoration:underline;text-underline-offset:3px}
-  /* cards */
-  .cardgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:16px}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px 16px}
-  .card .cmeta{font-family:var(--font-mono);font-size:11px;color:var(--subtle);margin-bottom:6px}
-  .card .cmeta .sep{color:var(--border-strong);margin:0 6px}
-  .card .cec{color:var(--accent)}
-  .card .ct{font-family:var(--font-disp);font-weight:500;font-size:16px;letter-spacing:-.01em;color:var(--text);margin:0 0 5px;line-height:1.2}
-  .card .cx{font-size:13px;line-height:1.55;color:var(--muted);margin:0}
-  .cardgrid.demo .card:nth-child(2){border-color:var(--border-strong);transform:translateY(-2px)}
-  .comp-block{padding:18px 0;border-top:1px solid var(--border)}
-  .comp-block:first-child{border-top:0;padding-top:0}
-  .comp-lab{font-family:var(--font-mono);font-size:11px;color:var(--subtle);text-transform:uppercase;letter-spacing:.08em;margin:0 0 12px}
-  /* home hero */
-  .hero{padding:26px 0 8px}
-  .hero .htitle{font-family:var(--font-disp);font-weight:500;font-size:38px;line-height:1.05;letter-spacing:-.025em;color:var(--text);margin:10px 0 12px;max-width:16ch}
-  .hero .hsub{font-size:16px;line-height:1.6;color:var(--muted);max-width:52ch;margin:0}
-  .foot{margin-top:22px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:var(--subtle)}
-  @media (max-width:520px){.sw-head,.sw-row{grid-template-columns:1fr 52px 52px}.sw-role{display:none}}
-</style>
-</head>
-<body>
-<div class="wrap">
-
-  <div class="doc-head">
-    <h1>Console</h1>
-    <div class="meta">design reference · direction A — azure · serif · v1</div>
-    <p class="use">A visual reference for implementing the blog UI. Every colour, size, and component here maps 1:1 to the tokens in <b>tokens.css</b> / <b>theme.css</b>. Screens are shown in both themes. Hand screenshots of individual frames to the implementing agent, or import this file into Figma with an HTML-to-Figma plugin for editable frames.</p>
-  </div>
-
-  <!-- ============ FOUNDATIONS: COLOUR ============ -->
-  <section class="sec">
-    <div class="sec-title">Foundations · colour tokens</div>
-    <div class="swatches">
-      <div class="sw-head"><span>token</span><span>role</span><span>light</span><span>dark</span></div>
-      <div class="sw-row"><span class="sw-name">bg</span><span class="sw-role">page background</span><span class="chip" style="background:oklch(.99 .002 250)"></span><span class="chip" style="background:oklch(.17 .006 250)"></span></div>
-      <div class="sw-row"><span class="sw-name">surface</span><span class="sw-role">cards</span><span class="chip" style="background:oklch(1 0 0)"></span><span class="chip" style="background:oklch(.21 .007 250)"></span></div>
-      <div class="sw-row"><span class="sw-name">surface-2</span><span class="sw-role">nested / code</span><span class="chip" style="background:oklch(.975 .003 250)"></span><span class="chip" style="background:oklch(.24 .008 250)"></span></div>
-      <div class="sw-row"><span class="sw-name">border</span><span class="sw-role">hairline</span><span class="chip" style="background:oklch(.9 .004 250)"></span><span class="chip" style="background:oklch(.3 .008 250)"></span></div>
-      <div class="sw-row"><span class="sw-name">border-strong</span><span class="sw-role">emphasis / hover</span><span class="chip" style="background:oklch(.8 .006 250)"></span><span class="chip" style="background:oklch(.42 .01 250)"></span></div>
-      <div class="sw-row"><span class="sw-name">text</span><span class="sw-role">primary ink</span><span class="chip" style="background:oklch(.2 .01 250)"></span><span class="chip" style="background:oklch(.95 .004 250)"></span></div>
-      <div class="sw-row"><span class="sw-name">text-muted</span><span class="sw-role">secondary</span><span class="chip" style="background:oklch(.46 .01 250)"></span><span class="chip" style="background:oklch(.72 .008 250)"></span></div>
-      <div class="sw-row"><span class="sw-name">text-subtle</span><span class="sw-role">metadata</span><span class="chip" style="background:oklch(.6 .008 250)"></span><span class="chip" style="background:oklch(.56 .008 250)"></span></div>
-      <div class="sw-row"><span class="sw-name">accent</span><span class="sw-role">links / interactive</span><span class="chip" style="background:oklch(.58 .17 250)"></span><span class="chip" style="background:oklch(.7 .16 250)"></span></div>
-      <div class="sw-row"><span class="sw-name">accent-muted</span><span class="sw-role">tint / selection</span><span class="chip" style="background:oklch(.95 .03 250)"></span><span class="chip" style="background:oklch(.3 .06 250)"></span></div>
-      <div class="sw-row"><span class="sw-name">accent-contrast</span><span class="sw-role">text on accent</span><span class="chip" style="background:oklch(.99 0 0)"></span><span class="chip" style="background:oklch(.16 .006 250)"></span></div>
-    </div>
-  </section>
-
-  <!-- ============ FOUNDATIONS: TYPE ============ -->
-  <section class="sec">
-    <div class="sec-title">Foundations · typography</div>
-    <p class="cap">display + ui: Space Grotesk · long-form: Newsreader · chrome + code: JetBrains Mono</p>
-    <div class="type-card">
-      <div class="spec-row"><span class="tk">text-display · Space Grotesk 500 · clamp(2.6→4.6rem)</span><div class="sp-display">Console</div></div>
-      <div class="spec-row"><span class="tk">text-3xl · post title</span><div class="sp-3xl">Scaling micro-frontends</div></div>
-      <div class="spec-row"><span class="tk">text-2xl · section heading</span><div class="sp-2xl">The versioning contract</div></div>
-      <div class="spec-row"><span class="tk">text-xl · subsection</span><div class="sp-xl">Shared singletons</div></div>
-      <div class="spec-row"><span class="tk">text-base · Newsreader · body prose (68ch measure)</span><div class="sp-body">Runtime composition changes the economics of a large frontend. Each remote ships on its own cadence and the shell resolves them at load — the trade you accept is a versioning contract at the boundary.</div></div>
-      <div class="spec-row"><span class="tk">text-sm · caption</span><div class="sp-sm">Measured on a real retail funnel, cold cache, p75.</div></div>
-      <div class="spec-row"><span class="tk">text-xs · JetBrains Mono · eyebrow / label</span><div class="sp-mono">Architecture · 9 min read</div></div>
-    </div>
-  </section>
-
-  <!-- ============ FOUNDATIONS: SHAPE + MOTION ============ -->
-  <section class="sec">
-    <div class="sec-title">Foundations · shape, layout, motion</div>
-    <div class="grid2">
-      <div class="tok-card">
-        <p class="cap">radius — restrained; borders over shadows</p>
-        <div class="radii">
-          <div class="r"><div class="box" style="border-radius:3px"></div>radius-sm · 3px</div>
-          <div class="r"><div class="box" style="border-radius:6px"></div>radius · 6px</div>
-          <div class="r"><div class="box" style="border-radius:10px"></div>radius-lg · 10px</div>
+      /* ================= website mock components ================= */
+      .frame {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font-read);
+      }
+      .fl {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--chrome-muted);
+        margin: 0 0 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--surface-2);
+        border-bottom: 1px solid var(--border);
+        padding: 9px 12px;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--border-strong);
+        display: block;
+      }
+      .url {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--subtle);
+      }
+      .site {
+        padding: 22px 24px 26px;
+      }
+      .shead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+      }
+      .brand {
+        font-family: var(--font-disp);
+        font-size: 19px;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        color: var(--text);
+      }
+      .brand em {
+        font-family: var(--font-mono);
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        color: var(--accent);
+      }
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .nav a {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--subtle);
+        text-decoration: none;
+      }
+      .nav .ic {
+        width: 18px;
+        height: 18px;
+        color: var(--muted);
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      .h1 {
+        font-family: var(--font-disp);
+        font-weight: 500;
+        font-size: 30px;
+        line-height: 1.07;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        margin: 12px 0 0;
+      }
+      .spec {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--subtle);
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        padding: 9px 0;
+        margin: 16px 0 20px;
+      }
+      .spec .sep {
+        color: var(--border-strong);
+        margin: 0 7px;
+      }
+      .spec a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .lead {
+        font-size: 15px;
+        line-height: 1.72;
+        color: var(--text);
+        max-width: 60ch;
+        margin: 0 0 14px;
+      }
+      .lead a {
+        color: var(--accent);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        text-decoration-color: var(--border-strong);
+      }
+      .icode {
+        font-family: var(--font-mono);
+        font-size: 0.9em;
+        background: var(--surface-2);
+        border-radius: 3px;
+        padding: 1px 5px;
+      }
+      .code {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        margin: 18px 0;
+        overflow: hidden;
+      }
+      .code .clab {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--subtle);
+        padding: 7px 12px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+      }
+      .code pre {
+        margin: 0;
+        padding: 12px 14px;
+        font-family: var(--font-mono);
+        font-size: 12.5px;
+        line-height: 1.65;
+        color: var(--text);
+        overflow-x: auto;
+      }
+      .code .cm {
+        color: var(--subtle);
+      }
+      .code .kw {
+        color: var(--accent);
+      }
+      blockquote {
+        margin: 18px 0;
+        padding: 2px 0 2px 16px;
+        border-left: 2px solid var(--accent-muted);
+        font-family: var(--font-read);
+        font-style: italic;
+        font-size: 15px;
+        color: var(--muted);
+      }
+      .tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 20px 0 0;
+      }
+      .tag {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--subtle);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 3px 8px;
+      }
+      .tag.on {
+        background: var(--accent-muted);
+        color: var(--accent);
+        border-color: transparent;
+      }
+      /* buttons */
+      .btns {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 4px;
+      }
+      .btn {
+        font-family: var(--font-disp);
+        font-weight: 500;
+        font-size: 14px;
+        border-radius: 3px;
+        padding: 8px 16px;
+        cursor: default;
+        border: 1px solid transparent;
+      }
+      .btn.primary {
+        background: var(--accent);
+        color: var(--accent-contrast);
+      }
+      .btn.ghost {
+        background: transparent;
+        color: var(--text);
+        border-color: var(--border-strong);
+      }
+      .btn.link {
+        background: transparent;
+        color: var(--accent);
+        padding: 8px 4px;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      /* cards */
+      .cardgrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 14px;
+        margin-top: 16px;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 14px 16px;
+      }
+      .card .cmeta {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--subtle);
+        margin-bottom: 6px;
+      }
+      .card .cmeta .sep {
+        color: var(--border-strong);
+        margin: 0 6px;
+      }
+      .card .cec {
+        color: var(--accent);
+      }
+      .card .ct {
+        font-family: var(--font-disp);
+        font-weight: 500;
+        font-size: 16px;
+        letter-spacing: -0.01em;
+        color: var(--text);
+        margin: 0 0 5px;
+        line-height: 1.2;
+      }
+      .card .cx {
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--muted);
+        margin: 0;
+      }
+      .cardgrid.demo .card:nth-child(2) {
+        border-color: var(--border-strong);
+        transform: translateY(-2px);
+      }
+      .comp-block {
+        padding: 18px 0;
+        border-top: 1px solid var(--border);
+      }
+      .comp-block:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+      .comp-lab {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--subtle);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin: 0 0 12px;
+      }
+      /* home hero */
+      .hero {
+        padding: 26px 0 8px;
+      }
+      .hero .htitle {
+        font-family: var(--font-disp);
+        font-weight: 500;
+        font-size: 38px;
+        line-height: 1.05;
+        letter-spacing: -0.025em;
+        color: var(--text);
+        margin: 10px 0 12px;
+        max-width: 16ch;
+      }
+      .hero .hsub {
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--muted);
+        max-width: 52ch;
+        margin: 0;
+      }
+      .foot {
+        margin-top: 22px;
+        padding-top: 14px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--subtle);
+      }
+      @media (max-width: 520px) {
+        .sw-head,
+        .sw-row {
+          grid-template-columns: 1fr 52px 52px;
+        }
+        .sw-role {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="doc-head">
+        <h1>Console</h1>
+        <div class="meta">
+          design reference · direction A — azure · serif · v1
         </div>
+        <p class="use">
+          A visual reference for implementing the blog UI. Every colour, size,
+          and component here maps 1:1 to the tokens in <b>tokens.css</b> /
+          <b>theme.css</b>. Screens are shown in both themes. Hand screenshots
+          of individual frames to the implementing agent, or import this file
+          into Figma with an HTML-to-Figma plugin for editable frames.
+        </p>
       </div>
-      <div class="tok-card">
-        <p class="cap">layout + motion</p>
-        <div class="kv">
-          <span>measure</span> 68ch<br>
-          <span>gutter</span> clamp(1rem, 5vw, 2.5rem)<br>
-          <span>section-gap</span> clamp(3rem, 8vw, 6rem)<br>
-          <span>ease</span> cubic-bezier(.2,0,0,1)<br>
-          <span>dur</span> fast 120ms · base 200ms · slow 360ms
+
+      <!-- ============ FOUNDATIONS: COLOUR ============ -->
+      <section class="sec">
+        <div class="sec-title">Foundations · colour tokens</div>
+        <div class="swatches">
+          <div class="sw-head">
+            <span>token</span><span>role</span><span>light</span
+            ><span>dark</span>
+          </div>
+          <div class="sw-row">
+            <span class="sw-name">bg</span
+            ><span class="sw-role">page background</span
+            ><span class="chip" style="background: oklch(0.99 0.002 250)"></span
+            ><span
+              class="chip"
+              style="background: oklch(0.17 0.006 250)"
+            ></span>
+          </div>
+          <div class="sw-row">
+            <span class="sw-name">surface</span
+            ><span class="sw-role">cards</span
+            ><span class="chip" style="background: oklch(1 0 0)"></span
+            ><span
+              class="chip"
+              style="background: oklch(0.21 0.007 250)"
+            ></span>
+          </div>
+          <div class="sw-row">
+            <span class="sw-name">surface-2</span
+            ><span class="sw-role">nested / code</span
+            ><span
+              class="chip"
+              style="background: oklch(0.975 0.003 250)"
+            ></span
+            ><span
+              class="chip"
+              style="background: oklch(0.24 0.008 250)"
+            ></span>
+          </div>
+          <div class="sw-row">
+            <span class="sw-name">border</span
+            ><span class="sw-role">hairline</span
+            ><span class="chip" style="background: oklch(0.9 0.004 250)"></span
+            ><span class="chip" style="background: oklch(0.3 0.008 250)"></span>
+          </div>
+          <div class="sw-row">
+            <span class="sw-name">border-strong</span
+            ><span class="sw-role">emphasis / hover</span
+            ><span class="chip" style="background: oklch(0.8 0.006 250)"></span
+            ><span class="chip" style="background: oklch(0.42 0.01 250)"></span>
+          </div>
+          <div class="sw-row">
+            <span class="sw-name">text</span
+            ><span class="sw-role">primary ink</span
+            ><span class="chip" style="background: oklch(0.2 0.01 250)"></span
+            ><span
+              class="chip"
+              style="background: oklch(0.95 0.004 250)"
+            ></span>
+          </div>
+          <div class="sw-row">
+            <span class="sw-name">text-muted</span
+            ><span class="sw-role">secondary</span
+            ><span class="chip" style="background: oklch(0.46 0.01 250)"></span
+            ><span
+              class="chip"
+              style="background: oklch(0.72 0.008 250)"
+            ></span>
+          </div>
+          <div class="sw-row">
+            <span class="sw-name">text-subtle</span
+            ><span class="sw-role">metadata</span
+            ><span class="chip" style="background: oklch(0.6 0.008 250)"></span
+            ><span
+              class="chip"
+              style="background: oklch(0.56 0.008 250)"
+            ></span>
+          </div>
+          <div class="sw-row">
+            <span class="sw-name">accent</span
+            ><span class="sw-role">links / interactive</span
+            ><span class="chip" style="background: oklch(0.58 0.17 250)"></span
+            ><span class="chip" style="background: oklch(0.7 0.16 250)"></span>
+          </div>
+          <div class="sw-row">
+            <span class="sw-name">accent-muted</span
+            ><span class="sw-role">tint / selection</span
+            ><span class="chip" style="background: oklch(0.95 0.03 250)"></span
+            ><span class="chip" style="background: oklch(0.3 0.06 250)"></span>
+          </div>
+          <div class="sw-row">
+            <span class="sw-name">accent-contrast</span
+            ><span class="sw-role">text on accent</span
+            ><span class="chip" style="background: oklch(0.99 0 0)"></span
+            ><span
+              class="chip"
+              style="background: oklch(0.16 0.006 250)"
+            ></span>
+          </div>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <!-- ============ COMPONENTS ============ -->
-  <section class="sec">
-    <div class="sec-title">Components</div>
-    <div class="grid2">
+      <!-- ============ FOUNDATIONS: TYPE ============ -->
+      <section class="sec">
+        <div class="sec-title">Foundations · typography</div>
+        <p class="cap">
+          display + ui: Space Grotesk · long-form: Newsreader · chrome + code:
+          JetBrains Mono
+        </p>
+        <div class="type-card">
+          <div class="spec-row">
+            <span class="tk"
+              >text-display · Space Grotesk 500 · clamp(2.6→4.6rem)</span
+            >
+            <div class="sp-display">Console</div>
+          </div>
+          <div class="spec-row">
+            <span class="tk">text-3xl · post title</span>
+            <div class="sp-3xl">Scaling micro-frontends</div>
+          </div>
+          <div class="spec-row">
+            <span class="tk">text-2xl · section heading</span>
+            <div class="sp-2xl">The versioning contract</div>
+          </div>
+          <div class="spec-row">
+            <span class="tk">text-xl · subsection</span>
+            <div class="sp-xl">Shared singletons</div>
+          </div>
+          <div class="spec-row">
+            <span class="tk"
+              >text-base · Newsreader · body prose (68ch measure)</span
+            >
+            <div class="sp-body">
+              Runtime composition changes the economics of a large frontend.
+              Each remote ships on its own cadence and the shell resolves them
+              at load — the trade you accept is a versioning contract at the
+              boundary.
+            </div>
+          </div>
+          <div class="spec-row">
+            <span class="tk">text-sm · caption</span>
+            <div class="sp-sm">
+              Measured on a real retail funnel, cold cache, p75.
+            </div>
+          </div>
+          <div class="spec-row">
+            <span class="tk">text-xs · JetBrains Mono · eyebrow / label</span>
+            <div class="sp-mono">Architecture · 9 min read</div>
+          </div>
+        </div>
+      </section>
 
-      <!-- light components -->
-      <div>
-        <p class="fl">Light</p>
-        <div class="frame t-light">
-          <div class="site">
-            <div class="comp-block">
-              <p class="comp-lab">buttons — primary / ghost / link</p>
-              <div class="btns"><span class="btn primary">Read post</span><span class="btn ghost">Subscribe</span><span class="btn link">View all</span></div>
+      <!-- ============ FOUNDATIONS: SHAPE + MOTION ============ -->
+      <section class="sec">
+        <div class="sec-title">Foundations · shape, layout, motion</div>
+        <div class="grid2">
+          <div class="tok-card">
+            <p class="cap">radius — restrained; borders over shadows</p>
+            <div class="radii">
+              <div class="r">
+                <div class="box" style="border-radius: 3px"></div>
+                radius-sm · 3px
+              </div>
+              <div class="r">
+                <div class="box" style="border-radius: 6px"></div>
+                radius · 6px
+              </div>
+              <div class="r">
+                <div class="box" style="border-radius: 10px"></div>
+                radius-lg · 10px
+              </div>
             </div>
-            <div class="comp-block">
-              <p class="comp-lab">tags &amp; category pill (active)</p>
-              <div class="tags"><span class="tag">react</span><span class="tag">typescript</span><span class="tag on">architecture</span></div>
+          </div>
+          <div class="tok-card">
+            <p class="cap">layout + motion</p>
+            <div class="kv">
+              <span>measure</span> 68ch<br />
+              <span>gutter</span> clamp(1rem, 5vw, 2.5rem)<br />
+              <span>section-gap</span> clamp(3rem, 8vw, 6rem)<br />
+              <span>ease</span> cubic-bezier(.2,0,0,1)<br />
+              <span>dur</span> fast 120ms · base 200ms · slow 360ms
             </div>
-            <div class="comp-block">
-              <p class="comp-lab">spec line — signature</p>
-              <div class="spec" style="margin:0">2026-06-28<span class="sep">·</span>9 min read<span class="sep">·</span>2,140 words<span class="sep">·</span><a>ARCHITECTURE</a></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ COMPONENTS ============ -->
+      <section class="sec">
+        <div class="sec-title">Components</div>
+        <div class="grid2">
+          <!-- light components -->
+          <div>
+            <p class="fl">Light</p>
+            <div class="frame t-light">
+              <div class="site">
+                <div class="comp-block">
+                  <p class="comp-lab">buttons — primary / ghost / link</p>
+                  <div class="btns">
+                    <span class="btn primary">Read post</span
+                    ><span class="btn ghost">Subscribe</span
+                    ><span class="btn link">View all</span>
+                  </div>
+                </div>
+                <div class="comp-block">
+                  <p class="comp-lab">tags &amp; category pill (active)</p>
+                  <div class="tags">
+                    <span class="tag">react</span
+                    ><span class="tag">typescript</span
+                    ><span class="tag on">architecture</span>
+                  </div>
+                </div>
+                <div class="comp-block">
+                  <p class="comp-lab">spec line — signature</p>
+                  <div class="spec" style="margin: 0">
+                    2026-06-28<span class="sep">·</span>9 min read<span
+                      class="sep"
+                      >·</span
+                    >2,140 words<span class="sep">·</span><a>ARCHITECTURE</a>
+                  </div>
+                </div>
+                <div class="comp-block">
+                  <p class="comp-lab">prose — link, inline code, quote</p>
+                  <p class="lead" style="margin: 0 0 8px">
+                    Resolve remotes with a <a>versioning contract</a> and keep
+                    <span class="icode">react</span> a singleton.
+                  </p>
+                  <blockquote style="margin: 0">
+                    If it isn't typed, it isn't a contract.
+                  </blockquote>
+                </div>
+                <div class="comp-block">
+                  <p class="comp-lab">code block — dual-theme (Shiki)</p>
+                  <div class="code" style="margin: 0">
+                    <div class="clab">
+                      <span>next.config.ts</span><span>copy</span>
+                    </div>
+                    <pre><span class="cm">// one React on the page</span>
+shared: { react: { singleton: <span class="kw">true</span> } }</pre>
+                  </div>
+                </div>
+                <div class="comp-block">
+                  <p class="comp-lab">post card — default &amp; hover</p>
+                  <div class="cardgrid demo">
+                    <div class="card">
+                      <div class="cmeta">
+                        2026-05-12<span class="sep">·</span>6 min<span
+                          class="sep"
+                          >·</span
+                        ><span class="cec">PERFORMANCE</span>
+                      </div>
+                      <p class="ct">Cutting hydration cost</p>
+                      <p class="cx">Where the boundary pays off.</p>
+                    </div>
+                    <div class="card">
+                      <div class="cmeta">
+                        2026-04-02<span class="sep">·</span>8 min<span
+                          class="sep"
+                          >·</span
+                        ><span class="cec">DESIGN SYSTEMS</span>
+                      </div>
+                      <p class="ct">Tokens that survive refactors</p>
+                      <p class="cx">Semantic naming, one source.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="comp-block">
-              <p class="comp-lab">prose — link, inline code, quote</p>
-              <p class="lead" style="margin:0 0 8px">Resolve remotes with a <a>versioning contract</a> and keep <span class="icode">react</span> a singleton.</p>
-              <blockquote style="margin:0">If it isn't typed, it isn't a contract.</blockquote>
-            </div>
-            <div class="comp-block">
-              <p class="comp-lab">code block — dual-theme (Shiki)</p>
-              <div class="code" style="margin:0"><div class="clab"><span>next.config.ts</span><span>copy</span></div><pre><span class="cm">// one React on the page</span>
-shared: { react: { singleton: <span class="kw">true</span> } }</pre></div>
-            </div>
-            <div class="comp-block">
-              <p class="comp-lab">post card — default &amp; hover</p>
-              <div class="cardgrid demo">
-                <div class="card"><div class="cmeta">2026-05-12<span class="sep">·</span>6 min<span class="sep">·</span><span class="cec">PERFORMANCE</span></div><p class="ct">Cutting hydration cost</p><p class="cx">Where the boundary pays off.</p></div>
-                <div class="card"><div class="cmeta">2026-04-02<span class="sep">·</span>8 min<span class="sep">·</span><span class="cec">DESIGN SYSTEMS</span></div><p class="ct">Tokens that survive refactors</p><p class="cx">Semantic naming, one source.</p></div>
+          </div>
+
+          <!-- dark components -->
+          <div>
+            <p class="fl">Dark</p>
+            <div class="frame t-dark">
+              <div class="site">
+                <div class="comp-block">
+                  <p class="comp-lab">buttons — primary / ghost / link</p>
+                  <div class="btns">
+                    <span class="btn primary">Read post</span
+                    ><span class="btn ghost">Subscribe</span
+                    ><span class="btn link">View all</span>
+                  </div>
+                </div>
+                <div class="comp-block">
+                  <p class="comp-lab">tags &amp; category pill (active)</p>
+                  <div class="tags">
+                    <span class="tag">react</span
+                    ><span class="tag">typescript</span
+                    ><span class="tag on">architecture</span>
+                  </div>
+                </div>
+                <div class="comp-block">
+                  <p class="comp-lab">spec line — signature</p>
+                  <div class="spec" style="margin: 0">
+                    2026-06-28<span class="sep">·</span>9 min read<span
+                      class="sep"
+                      >·</span
+                    >2,140 words<span class="sep">·</span><a>ARCHITECTURE</a>
+                  </div>
+                </div>
+                <div class="comp-block">
+                  <p class="comp-lab">prose — link, inline code, quote</p>
+                  <p class="lead" style="margin: 0 0 8px">
+                    Resolve remotes with a <a>versioning contract</a> and keep
+                    <span class="icode">react</span> a singleton.
+                  </p>
+                  <blockquote style="margin: 0">
+                    If it isn't typed, it isn't a contract.
+                  </blockquote>
+                </div>
+                <div class="comp-block">
+                  <p class="comp-lab">code block — dual-theme (Shiki)</p>
+                  <div class="code" style="margin: 0">
+                    <div class="clab">
+                      <span>next.config.ts</span><span>copy</span>
+                    </div>
+                    <pre><span class="cm">// one React on the page</span>
+shared: { react: { singleton: <span class="kw">true</span> } }</pre>
+                  </div>
+                </div>
+                <div class="comp-block">
+                  <p class="comp-lab">post card — default &amp; hover</p>
+                  <div class="cardgrid demo">
+                    <div class="card">
+                      <div class="cmeta">
+                        2026-05-12<span class="sep">·</span>6 min<span
+                          class="sep"
+                          >·</span
+                        ><span class="cec">PERFORMANCE</span>
+                      </div>
+                      <p class="ct">Cutting hydration cost</p>
+                      <p class="cx">Where the boundary pays off.</p>
+                    </div>
+                    <div class="card">
+                      <div class="cmeta">
+                        2026-04-02<span class="sep">·</span>8 min<span
+                          class="sep"
+                          >·</span
+                        ><span class="cec">DESIGN SYSTEMS</span>
+                      </div>
+                      <p class="ct">Tokens that survive refactors</p>
+                      <p class="cx">Semantic naming, one source.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- dark components -->
-      <div>
-        <p class="fl">Dark</p>
-        <div class="frame t-dark">
-          <div class="site">
-            <div class="comp-block">
-              <p class="comp-lab">buttons — primary / ghost / link</p>
-              <div class="btns"><span class="btn primary">Read post</span><span class="btn ghost">Subscribe</span><span class="btn link">View all</span></div>
+      <!-- ============ SCREEN: HOME ============ -->
+      <section class="sec">
+        <div class="sec-title">Screen · home</div>
+        <div class="grid2">
+          <div>
+            <p class="fl">Light</p>
+            <div class="frame t-light">
+              <div class="bar">
+                <span class="dots"><i></i><i></i><i></i></span
+                ><span class="url">val.dev</span>
+              </div>
+              <div class="site">
+                <div class="shead">
+                  <span class="brand">val<em>.dev</em></span>
+                  <nav class="nav">
+                    <a>writing</a><a>projects</a><a>about</a
+                    ><svg
+                      class="ic"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                    >
+                      <path
+                        d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                      />
+                    </svg>
+                  </nav>
+                </div>
+                <div class="hero">
+                  <div class="eyebrow">Senior frontend engineer</div>
+                  <h2 class="htitle">Notes on shipping frontend at scale</h2>
+                  <p class="hsub">
+                    Architecture, performance, and design systems — from fintech
+                    and retail. Written, not generated.
+                  </p>
+                </div>
+                <p class="comp-lab" style="margin: 22px 0 0">Latest</p>
+                <div class="cardgrid">
+                  <div class="card">
+                    <div class="cmeta">
+                      2026-06-28<span class="sep">·</span>9 min<span class="sep"
+                        >·</span
+                      ><span class="cec">ARCHITECTURE</span>
+                    </div>
+                    <p class="ct">Micro-frontends with Module Federation</p>
+                    <p class="cx">Runtime composition and its contracts.</p>
+                  </div>
+                  <div class="card">
+                    <div class="cmeta">
+                      2026-05-12<span class="sep">·</span>6 min<span class="sep"
+                        >·</span
+                      ><span class="cec">PERFORMANCE</span>
+                    </div>
+                    <p class="ct">Cutting hydration cost in Next 15</p>
+                    <p class="cx">Where the boundary pays off.</p>
+                  </div>
+                  <div class="card">
+                    <div class="cmeta">
+                      2026-04-02<span class="sep">·</span>8 min<span class="sep"
+                        >·</span
+                      ><span class="cec">DESIGN</span>
+                    </div>
+                    <p class="ct">Tokens that survive refactors</p>
+                    <p class="cx">One source, semantic names.</p>
+                  </div>
+                </div>
+                <div class="foot">
+                  <span>© 2026 val.dev</span
+                  ><span>rss · github · linkedin</span>
+                </div>
+              </div>
             </div>
-            <div class="comp-block">
-              <p class="comp-lab">tags &amp; category pill (active)</p>
-              <div class="tags"><span class="tag">react</span><span class="tag">typescript</span><span class="tag on">architecture</span></div>
-            </div>
-            <div class="comp-block">
-              <p class="comp-lab">spec line — signature</p>
-              <div class="spec" style="margin:0">2026-06-28<span class="sep">·</span>9 min read<span class="sep">·</span>2,140 words<span class="sep">·</span><a>ARCHITECTURE</a></div>
-            </div>
-            <div class="comp-block">
-              <p class="comp-lab">prose — link, inline code, quote</p>
-              <p class="lead" style="margin:0 0 8px">Resolve remotes with a <a>versioning contract</a> and keep <span class="icode">react</span> a singleton.</p>
-              <blockquote style="margin:0">If it isn't typed, it isn't a contract.</blockquote>
-            </div>
-            <div class="comp-block">
-              <p class="comp-lab">code block — dual-theme (Shiki)</p>
-              <div class="code" style="margin:0"><div class="clab"><span>next.config.ts</span><span>copy</span></div><pre><span class="cm">// one React on the page</span>
-shared: { react: { singleton: <span class="kw">true</span> } }</pre></div>
-            </div>
-            <div class="comp-block">
-              <p class="comp-lab">post card — default &amp; hover</p>
-              <div class="cardgrid demo">
-                <div class="card"><div class="cmeta">2026-05-12<span class="sep">·</span>6 min<span class="sep">·</span><span class="cec">PERFORMANCE</span></div><p class="ct">Cutting hydration cost</p><p class="cx">Where the boundary pays off.</p></div>
-                <div class="card"><div class="cmeta">2026-04-02<span class="sep">·</span>8 min<span class="sep">·</span><span class="cec">DESIGN SYSTEMS</span></div><p class="ct">Tokens that survive refactors</p><p class="cx">Semantic naming, one source.</p></div>
+          </div>
+          <div>
+            <p class="fl">Dark</p>
+            <div class="frame t-dark">
+              <div class="bar">
+                <span class="dots"><i></i><i></i><i></i></span
+                ><span class="url">val.dev</span>
+              </div>
+              <div class="site">
+                <div class="shead">
+                  <span class="brand">val<em>.dev</em></span>
+                  <nav class="nav">
+                    <a>writing</a><a>projects</a><a>about</a
+                    ><svg
+                      class="ic"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                    >
+                      <circle cx="12" cy="12" r="4" />
+                      <path
+                        d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
+                      />
+                    </svg>
+                  </nav>
+                </div>
+                <div class="hero">
+                  <div class="eyebrow">Senior frontend engineer</div>
+                  <h2 class="htitle">Notes on shipping frontend at scale</h2>
+                  <p class="hsub">
+                    Architecture, performance, and design systems — from fintech
+                    and retail. Written, not generated.
+                  </p>
+                </div>
+                <p class="comp-lab" style="margin: 22px 0 0">Latest</p>
+                <div class="cardgrid">
+                  <div class="card">
+                    <div class="cmeta">
+                      2026-06-28<span class="sep">·</span>9 min<span class="sep"
+                        >·</span
+                      ><span class="cec">ARCHITECTURE</span>
+                    </div>
+                    <p class="ct">Micro-frontends with Module Federation</p>
+                    <p class="cx">Runtime composition and its contracts.</p>
+                  </div>
+                  <div class="card">
+                    <div class="cmeta">
+                      2026-05-12<span class="sep">·</span>6 min<span class="sep"
+                        >·</span
+                      ><span class="cec">PERFORMANCE</span>
+                    </div>
+                    <p class="ct">Cutting hydration cost in Next 15</p>
+                    <p class="cx">Where the boundary pays off.</p>
+                  </div>
+                  <div class="card">
+                    <div class="cmeta">
+                      2026-04-02<span class="sep">·</span>8 min<span class="sep"
+                        >·</span
+                      ><span class="cec">DESIGN</span>
+                    </div>
+                    <p class="ct">Tokens that survive refactors</p>
+                    <p class="cx">One source, semantic names.</p>
+                  </div>
+                </div>
+                <div class="foot">
+                  <span>© 2026 val.dev</span
+                  ><span>rss · github · linkedin</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-    </div>
-  </section>
-
-  <!-- ============ SCREEN: HOME ============ -->
-  <section class="sec">
-    <div class="sec-title">Screen · home</div>
-    <div class="grid2">
-      <div>
-        <p class="fl">Light</p>
-        <div class="frame t-light">
-          <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">val.dev</span></div>
-          <div class="site">
-            <div class="shead"><span class="brand">val<em>.dev</em></span><nav class="nav"><a>writing</a><a>projects</a><a>about</a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></nav></div>
-            <div class="hero"><div class="eyebrow">Senior frontend engineer</div><h2 class="htitle">Notes on shipping frontend at scale</h2><p class="hsub">Architecture, performance, and design systems — from fintech and retail. Written, not generated.</p></div>
-            <p class="comp-lab" style="margin:22px 0 0">Latest</p>
-            <div class="cardgrid">
-              <div class="card"><div class="cmeta">2026-06-28<span class="sep">·</span>9 min<span class="sep">·</span><span class="cec">ARCHITECTURE</span></div><p class="ct">Micro-frontends with Module Federation</p><p class="cx">Runtime composition and its contracts.</p></div>
-              <div class="card"><div class="cmeta">2026-05-12<span class="sep">·</span>6 min<span class="sep">·</span><span class="cec">PERFORMANCE</span></div><p class="ct">Cutting hydration cost in Next 15</p><p class="cx">Where the boundary pays off.</p></div>
-              <div class="card"><div class="cmeta">2026-04-02<span class="sep">·</span>8 min<span class="sep">·</span><span class="cec">DESIGN</span></div><p class="ct">Tokens that survive refactors</p><p class="cx">One source, semantic names.</p></div>
-            </div>
-            <div class="foot"><span>© 2026 val.dev</span><span>rss · github · linkedin</span></div>
-          </div>
-        </div>
-      </div>
-      <div>
-        <p class="fl">Dark</p>
-        <div class="frame t-dark">
-          <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">val.dev</span></div>
-          <div class="site">
-            <div class="shead"><span class="brand">val<em>.dev</em></span><nav class="nav"><a>writing</a><a>projects</a><a>about</a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></svg></nav></div>
-            <div class="hero"><div class="eyebrow">Senior frontend engineer</div><h2 class="htitle">Notes on shipping frontend at scale</h2><p class="hsub">Architecture, performance, and design systems — from fintech and retail. Written, not generated.</p></div>
-            <p class="comp-lab" style="margin:22px 0 0">Latest</p>
-            <div class="cardgrid">
-              <div class="card"><div class="cmeta">2026-06-28<span class="sep">·</span>9 min<span class="sep">·</span><span class="cec">ARCHITECTURE</span></div><p class="ct">Micro-frontends with Module Federation</p><p class="cx">Runtime composition and its contracts.</p></div>
-              <div class="card"><div class="cmeta">2026-05-12<span class="sep">·</span>6 min<span class="sep">·</span><span class="cec">PERFORMANCE</span></div><p class="ct">Cutting hydration cost in Next 15</p><p class="cx">Where the boundary pays off.</p></div>
-              <div class="card"><div class="cmeta">2026-04-02<span class="sep">·</span>8 min<span class="sep">·</span><span class="cec">DESIGN</span></div><p class="ct">Tokens that survive refactors</p><p class="cx">One source, semantic names.</p></div>
-            </div>
-            <div class="foot"><span>© 2026 val.dev</span><span>rss · github · linkedin</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SCREEN: POST ============ -->
-  <section class="sec">
-    <div class="sec-title">Screen · post</div>
-    <div class="grid2">
-      <div>
-        <p class="fl">Light</p>
-        <div class="frame t-light">
-          <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">val.dev/writing/module-federation-at-scale</span></div>
-          <div class="site">
-            <div class="shead"><span class="brand">val<em>.dev</em></span><nav class="nav"><a>writing</a><a>projects</a><a>about</a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></nav></div>
-            <div class="eyebrow" style="margin-top:24px">Architecture</div>
-            <h1 class="h1">Scaling micro-frontends with Module Federation</h1>
-            <div class="spec">2026-06-28<span class="sep">·</span>9 min read<span class="sep">·</span>2,140 words<span class="sep">·</span><a>ARCHITECTURE</a></div>
-            <p class="lead">Runtime composition changes the economics of a large frontend. Instead of one deploy pipeline gating every team, each remote ships on its own cadence and the shell resolves them at load. The trade you accept is a <a>versioning contract</a> at the boundary — and that contract is where most of the real work lives.</p>
-            <div class="code"><div class="clab"><span>next.config.ts</span><span>copy</span></div><pre><span class="cm">// shared singletons keep one React on the page</span>
+      <!-- ============ SCREEN: POST ============ -->
+      <section class="sec">
+        <div class="sec-title">Screen · post</div>
+        <div class="grid2">
+          <div>
+            <p class="fl">Light</p>
+            <div class="frame t-light">
+              <div class="bar">
+                <span class="dots"><i></i><i></i><i></i></span
+                ><span class="url"
+                  >val.dev/writing/module-federation-at-scale</span
+                >
+              </div>
+              <div class="site">
+                <div class="shead">
+                  <span class="brand">val<em>.dev</em></span>
+                  <nav class="nav">
+                    <a>writing</a><a>projects</a><a>about</a
+                    ><svg
+                      class="ic"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                    >
+                      <path
+                        d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                      />
+                    </svg>
+                  </nav>
+                </div>
+                <div class="eyebrow" style="margin-top: 24px">Architecture</div>
+                <h1 class="h1">
+                  Scaling micro-frontends with Module Federation
+                </h1>
+                <div class="spec">
+                  2026-06-28<span class="sep">·</span>9 min read<span
+                    class="sep"
+                    >·</span
+                  >2,140 words<span class="sep">·</span><a>ARCHITECTURE</a>
+                </div>
+                <p class="lead">
+                  Runtime composition changes the economics of a large frontend.
+                  Instead of one deploy pipeline gating every team, each remote
+                  ships on its own cadence and the shell resolves them at load.
+                  The trade you accept is a <a>versioning contract</a> at the
+                  boundary — and that contract is where most of the real work
+                  lives.
+                </p>
+                <div class="code">
+                  <div class="clab">
+                    <span>next.config.ts</span><span>copy</span>
+                  </div>
+                  <pre><span class="cm">// shared singletons keep one React on the page</span>
 <span class="kw">new</span> ModuleFederationPlugin({
   name: <span class="kw">"shell"</span>,
   remotes: { checkout: <span class="kw">"checkout@/mf.js"</span> },
   shared: { react: { singleton: <span class="kw">true</span> } }
-})</pre></div>
-            <blockquote>Treat every remote's exposed surface as a public API. If it isn't typed, it isn't a contract.</blockquote>
-            <div class="tags"><span class="tag">react</span><span class="tag">module-federation</span><span class="tag">performance</span></div>
+})</pre>
+                </div>
+                <blockquote>
+                  Treat every remote's exposed surface as a public API. If it
+                  isn't typed, it isn't a contract.
+                </blockquote>
+                <div class="tags">
+                  <span class="tag">react</span
+                  ><span class="tag">module-federation</span
+                  ><span class="tag">performance</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div>
-        <p class="fl">Dark</p>
-        <div class="frame t-dark">
-          <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">val.dev/writing/module-federation-at-scale</span></div>
-          <div class="site">
-            <div class="shead"><span class="brand">val<em>.dev</em></span><nav class="nav"><a>writing</a><a>projects</a><a>about</a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></svg></nav></div>
-            <div class="eyebrow" style="margin-top:24px">Architecture</div>
-            <h1 class="h1">Scaling micro-frontends with Module Federation</h1>
-            <div class="spec">2026-06-28<span class="sep">·</span>9 min read<span class="sep">·</span>2,140 words<span class="sep">·</span><a>ARCHITECTURE</a></div>
-            <p class="lead">Runtime composition changes the economics of a large frontend. Instead of one deploy pipeline gating every team, each remote ships on its own cadence and the shell resolves them at load. The trade you accept is a <a>versioning contract</a> at the boundary — and that contract is where most of the real work lives.</p>
-            <div class="code"><div class="clab"><span>next.config.ts</span><span>copy</span></div><pre><span class="cm">// shared singletons keep one React on the page</span>
+          <div>
+            <p class="fl">Dark</p>
+            <div class="frame t-dark">
+              <div class="bar">
+                <span class="dots"><i></i><i></i><i></i></span
+                ><span class="url"
+                  >val.dev/writing/module-federation-at-scale</span
+                >
+              </div>
+              <div class="site">
+                <div class="shead">
+                  <span class="brand">val<em>.dev</em></span>
+                  <nav class="nav">
+                    <a>writing</a><a>projects</a><a>about</a
+                    ><svg
+                      class="ic"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                    >
+                      <circle cx="12" cy="12" r="4" />
+                      <path
+                        d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
+                      />
+                    </svg>
+                  </nav>
+                </div>
+                <div class="eyebrow" style="margin-top: 24px">Architecture</div>
+                <h1 class="h1">
+                  Scaling micro-frontends with Module Federation
+                </h1>
+                <div class="spec">
+                  2026-06-28<span class="sep">·</span>9 min read<span
+                    class="sep"
+                    >·</span
+                  >2,140 words<span class="sep">·</span><a>ARCHITECTURE</a>
+                </div>
+                <p class="lead">
+                  Runtime composition changes the economics of a large frontend.
+                  Instead of one deploy pipeline gating every team, each remote
+                  ships on its own cadence and the shell resolves them at load.
+                  The trade you accept is a <a>versioning contract</a> at the
+                  boundary — and that contract is where most of the real work
+                  lives.
+                </p>
+                <div class="code">
+                  <div class="clab">
+                    <span>next.config.ts</span><span>copy</span>
+                  </div>
+                  <pre><span class="cm">// shared singletons keep one React on the page</span>
 <span class="kw">new</span> ModuleFederationPlugin({
   name: <span class="kw">"shell"</span>,
   remotes: { checkout: <span class="kw">"checkout@/mf.js"</span> },
   shared: { react: { singleton: <span class="kw">true</span> } }
-})</pre></div>
-            <blockquote>Treat every remote's exposed surface as a public API. If it isn't typed, it isn't a contract.</blockquote>
-            <div class="tags"><span class="tag">react</span><span class="tag">module-federation</span><span class="tag">performance</span></div>
+})</pre>
+                </div>
+                <blockquote>
+                  Treat every remote's exposed surface as a public API. If it
+                  isn't typed, it isn't a contract.
+                </blockquote>
+                <div class="tags">
+                  <span class="tag">react</span
+                  ><span class="tag">module-federation</span
+                  ><span class="tag">performance</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
-  </section>
-
-</div>
-</body>
+  </body>
 </html>

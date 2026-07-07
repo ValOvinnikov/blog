@@ -106,7 +106,7 @@ that first needs them (see the execution model above). **There is no template la
 — page composition is owned by the Next.js App Router, and `PortableTextRenderer` lives in `apps/web`
 (the template issues #57–59 were closed for this reason; see SPEC).
 
-- [x] `styles/tokens.css` consuming `@blog/config/tailwind/preset` (colours, spacing, type scale, contrast-safe).
+- [x] `styles/tokens.css` consuming `@blog/tailwind-config/theme.css` (colours, spacing, type scale, contrast-safe).
 - [x] Shared `Size` constant + `TValueOf`/`TSize` types in `@blog/config` (no repeated size string literals).
 - [ ] Foundation atoms:
   - [x] `Button`

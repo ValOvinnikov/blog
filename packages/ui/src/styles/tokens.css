@@ -4,7 +4,7 @@
  * Colour tokens flip between light (:root) and dark (.dark). They are consumed
  * as semantic Tailwind utilities (bg-bg, text-text-muted, border-border,
  * bg-accent, ...) via the @theme inline mapping in
- * @blog/config/tailwind/theme.css.
+ * @blog/tailwind-config/theme.css.
  *
  * Authored in OKLCH and tuned for WCAG AA in both themes. If you change a
  * value, re-verify contrast — pay particular attention to accent-coloured link
@@ -37,7 +37,7 @@
   --ring: var(--accent);
 
   /* layout tokens (--container-content/measure, --spacing-gutter/section) live
-     in configs/tailwind/theme.css @theme so they generate utilities. */
+     in @blog/tailwind-config/theme.css @theme so they generate utilities. */
 
   /* motion */
   --ease: cubic-bezier(0.2, 0, 0, 1);
