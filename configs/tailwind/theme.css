@@ -1,23 +1,17 @@
+@import 'tailwindcss';
+
 /*
- * @blog/tailwind-config — Tailwind v4 theme wiring.
+ * @blog/tailwind-config — shared Tailwind v4 theme entry.
  *
- * Import order in apps/web/app/globals.css:
- *   @import "tailwindcss";
- *   @import "@blog/tailwind-config/theme.css";   <- this file
- *   @import "@blog/ui/styles/tokens.css";        <- token values (:root / .dark)
- *   @source "../../../packages/ui/src/**\/*.{ts,tsx}";
- *
- * Colours are mapped with `@theme inline` so generated utilities reference
- * runtime CSS variables — that is what lets the `.dark` class swap the whole
- * palette live. Static design values (radius, type scale) go in a plain
- * `@theme` block.
+ * This is the only source of Tailwind theme tokens and global base styling.
+ * Apps/packages should import this file, then add only local source-scanning
+ * directives such as `@source` when they need Tailwind to scan another package.
  */
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  /* colour → utilities: bg-bg, bg-surface, text-text, text-text-muted,
-     border-border, bg-accent, text-accent, text-accent-contrast, ... */
+  /* Semantic colour utilities: bg-bg, text-text-muted, border-border, ... */
   --color-bg: var(--bg);
   --color-bg-subtle: var(--bg-subtle);
   --color-surface: var(--surface);
@@ -27,34 +21,54 @@
   --color-text: var(--text);
   --color-text-muted: var(--text-muted);
   --color-text-subtle: var(--text-subtle);
+  --color-muted: var(--text-muted);
+  --color-subtle: var(--text-subtle);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-muted: var(--accent-muted);
   --color-accent-contrast: var(--accent-contrast);
 
-  /* font utilities: font-display, font-body, font-mono.
-     The referenced variables are provided by next/font in the web app's root
-     layout and fall back to system stacks if not loaded. */
-  --font-display: var(--font-display);
-  --font-body: var(--font-body);
-  --font-mono: var(--font-mono);
+  /* Next.js supplies these variables via next/font in apps/web. */
+  --font-display: var(
+    --font-display-family,
+    'Space Grotesk',
+    system-ui,
+    sans-serif
+  );
+  --font-body: var(--font-body-family, 'Newsreader', Georgia, serif);
+  --font-read: var(--font-body-family, 'Newsreader', Georgia, serif);
+  --font-mono: var(
+    --font-mono-family,
+    'JetBrains Mono',
+    ui-monospace,
+    monospace
+  );
 }
 
 @theme {
-  /* shape */
+  /* Shape */
   --radius-sm: 3px;
   --radius: 6px;
+  --radius-md: 6px;
   --radius-lg: 10px;
+  --radius-xl: 12px;
 
-  /* layout — container widths (→ max-w-content, max-w-measure) */
+  /* Layout */
   --container-content: 72rem;
+  --container-page: 70rem;
+  --container-post: 47.5rem;
   --container-measure: 68ch;
+  --container-copy: 60ch;
 
-  /* layout — fluid spacing (→ px-gutter, gap-gutter, py-section, gap-section) */
   --spacing-gutter: clamp(1rem, 5vw, 2.5rem);
   --spacing-section: clamp(3rem, 8vw, 6rem);
+  --spacing-page-y: clamp(1.5rem, 4vw, 2.5rem);
+  --spacing-site-x: 1.5rem;
+  --spacing-site-y: 1.375rem;
+  --spacing-card-x: 1rem;
+  --spacing-card-y: 0.875rem;
 
-  /* fluid type scale */
+  /* Type scale */
   --text-xs: 0.78rem;
   --text-xs--line-height: 1.4;
 
@@ -82,4 +96,186 @@
   --text-display: clamp(2.6rem, 1.8rem + 3.6vw, 4.6rem);
   --text-display--line-height: 1.05;
   --text-display--letter-spacing: -0.02em;
+
+  --text-title-3xl: clamp(2.1rem, 1.6rem + 2.2vw, 3rem);
+  --text-title-3xl--line-height: 1.1;
+  --text-title-3xl--letter-spacing: -0.02em;
+
+  --text-title-2xl: clamp(1.7rem, 1.35rem + 1.4vw, 2.2rem);
+  --text-title-2xl--line-height: 1.2;
+  --text-title-2xl--letter-spacing: -0.02em;
+
+  --text-title-xl: clamp(1.35rem, 1.15rem + 0.7vw, 1.6rem);
+  --text-title-xl--line-height: 1.35;
+
+  --text-hero: clamp(2rem, 1.4rem + 2vw, 3rem);
+  --text-hero--line-height: 1.05;
+  --text-hero--letter-spacing: -0.025em;
+
+  --text-post-title: clamp(1.9rem, 1.45rem + 1.5vw, 2.45rem);
+  --text-post-title--line-height: 1.07;
+  --text-post-title--letter-spacing: -0.02em;
+
+  --text-prose: 1.0625rem;
+  --text-prose--line-height: 1.7;
+
+  --text-lead: 0.9375rem;
+  --text-lead--line-height: 1.72;
+
+  --text-caption: 0.875rem;
+  --text-caption--line-height: 1.5;
+
+  --text-copy: 0.875rem;
+  --text-copy--line-height: 1.45;
+
+  --text-card-title: 1rem;
+  --text-card-title--line-height: 1.2;
+  --text-card-title--letter-spacing: -0.01em;
+
+  --text-card-copy: 0.8125rem;
+  --text-card-copy--line-height: 1.55;
+
+  --text-meta: 0.75rem;
+  --text-meta--line-height: 1.5;
+
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1.4;
+
+  --text-code: 0.78125rem;
+  --text-code--line-height: 1.65;
+
+  /* Tracking */
+  --tracking-tight-display: -0.02em;
+  --tracking-tight-hero: -0.025em;
+  --tracking-tight-card: -0.01em;
+  --tracking-label: 0.08em;
+  --tracking-eyebrow: 0.14em;
+  --tracking-section: 0.16em;
+
+  /* Motion */
+  --ease-console: cubic-bezier(0.2, 0, 0, 1);
+}
+
+:root {
+  color-scheme: light;
+
+  --bg: oklch(0.99 0.002 250);
+  --bg-subtle: oklch(0.965 0.003 250);
+  --surface: oklch(1 0 0);
+  --surface-2: oklch(0.975 0.003 250);
+  --border: oklch(0.9 0.004 250);
+  --border-strong: oklch(0.8 0.006 250);
+  --text: oklch(0.2 0.01 250);
+  --text-muted: oklch(0.46 0.01 250);
+  --text-subtle: oklch(0.6 0.008 250);
+  --accent: oklch(0.58 0.17 250);
+  --accent-hover: oklch(0.52 0.17 250);
+  --accent-muted: oklch(0.95 0.03 250);
+  --accent-contrast: oklch(0.99 0 0);
+  --ring: var(--accent);
+
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 360ms;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg: oklch(0.17 0.006 250);
+  --bg-subtle: oklch(0.2 0.006 250);
+  --surface: oklch(0.21 0.007 250);
+  --surface-2: oklch(0.24 0.008 250);
+  --border: oklch(0.3 0.008 250);
+  --border-strong: oklch(0.42 0.01 250);
+  --text: oklch(0.95 0.004 250);
+  --text-muted: oklch(0.72 0.008 250);
+  --text-subtle: oklch(0.56 0.008 250);
+  --accent: oklch(0.7 0.16 250);
+  --accent-hover: oklch(0.76 0.16 250);
+  --accent-muted: oklch(0.3 0.06 250);
+  --accent-contrast: oklch(0.16 0.006 250);
+  --ring: var(--accent);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body-family, 'Newsreader', Georgia, serif);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(
+      --font-display-family,
+      'Space Grotesk',
+      system-ui,
+      sans-serif
+    );
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background: var(--accent-muted);
+    color: var(--accent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@utility duration-fast {
+  transition-duration: var(--duration-fast);
+}
+
+@utility duration-base {
+  transition-duration: var(--duration-base);
+}
+
+@utility duration-slow {
+  transition-duration: var(--duration-slow);
+}
+
+@utility max-w-page {
+  max-width: var(--container-page);
+}
+
+@utility max-w-post {
+  max-width: var(--container-post);
+}
+
+@utility max-w-measure {
+  max-width: var(--container-measure);
+}
+
+@utility max-w-copy {
+  max-width: var(--container-copy);
 }
