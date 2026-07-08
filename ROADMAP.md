@@ -273,6 +273,7 @@ New data domain. Sanity stays the read path; relational engagement data lives in
 - [ ] **Newsletter** (Resend + `subscribers` table — reuses Phase 5 infra).
 - [ ] **Lighthouse CI + visual regression** (Playwright/Chromatic) in CI.
 - [ ] **Bookmarks/likes** tied to the same auth.
+- [ ] **Dedicated typegen script** — replace the inline `sanity schema extract --path ... && sanity typegen generate` command in `apps/cms/package.json` with a proper standalone script (e.g. `scripts/typegen.sh` or a turbo-friendly split into `typegen:extract` + `typegen:generate`).
 
 **Acceptance gate (per feature)**
 

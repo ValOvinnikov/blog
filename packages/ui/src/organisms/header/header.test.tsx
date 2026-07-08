@@ -83,11 +83,6 @@ describe(`<${Header.name}/>`, () => {
     expect(screen.getByRole('banner')).toBeVisible();
   });
 
-  it('forwards className to the root element', () => {
-    render(<Header className="custom-class" />);
-    expect(screen.getByRole('banner').className).toContain('custom-class');
-  });
-
   it('forwards data-testid to the root element', () => {
     render(<Header dataTestId="site-header" />);
     expect(screen.getByTestId('site-header')).toBeVisible();

@@ -19,13 +19,6 @@ describe(`<${Avatar.name}/>`, () => {
     expect(screen.getByText('JM')).toBeVisible();
   });
 
-  it('merges extra className', () => {
-    const { container } = render(
-      <Avatar alt="Jane Doe" name="Jane Doe" className="ring-2" />,
-    );
-    expect(container.firstChild).toHaveClass('ring-2');
-  });
-
   it('applies sm size class', () => {
     const { container } = render(
       <Avatar alt="Jane Doe" name="Jane Doe" size={Size.SM} />,

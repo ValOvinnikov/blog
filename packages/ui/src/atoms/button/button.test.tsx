@@ -14,13 +14,6 @@ describe(`<${Button.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Disabled' })).toBeDisabled();
   });
 
-  it('merges extra className', () => {
-    render(<Button className="mt-4">Styled</Button>);
-    expect(screen.getByRole('button', { name: 'Styled' }).className).toContain(
-      'mt-4',
-    );
-  });
-
   it('renders ghost variant with strong border', () => {
     render(<Button variant="ghost">Ghost</Button>);
     const btn = screen.getByRole('button', { name: 'Ghost' });

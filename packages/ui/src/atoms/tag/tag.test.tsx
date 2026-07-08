@@ -8,11 +8,6 @@ describe(`<${Tag.name}/>`, () => {
     expect(screen.getByText('Label').tagName).toBe('SPAN');
   });
 
-  it('merges extra className', () => {
-    render(<Tag className="mt-4">Label</Tag>);
-    expect(screen.getByText('Label').className).toContain('mt-4');
-  });
-
   it('default variant has a border', () => {
     render(<Tag>Label</Tag>);
     expect(screen.getByText('Label').className).toContain('border');

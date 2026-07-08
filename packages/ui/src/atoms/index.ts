@@ -3,6 +3,7 @@ export * from './button';
 export * from './caption';
 export * from './eyebrow';
 export * from './heading';
+export * from './icon-button';
 export * from './logo';
 export * from './media-frame';
 export * from './meta-separator';

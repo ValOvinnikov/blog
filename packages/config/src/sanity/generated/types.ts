@@ -14,7 +14,7 @@
 
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
-// Source: schema.json
+// Source: ../../packages/config/src/sanity/generated/schema.json
 export type Seo = {
   _type: 'seo';
   metaTitle?: string;

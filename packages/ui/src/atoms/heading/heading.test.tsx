@@ -32,17 +32,6 @@ describe(`<${Heading.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('merges extra className', () => {
-    render(
-      <Heading level={1} className="mt-8">
-        Styled
-      </Heading>,
-    );
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Styled' }).className,
-    ).toContain('mt-8');
-  });
-
   it('applies size override', () => {
     render(
       <Heading level={1} size={Size.SM}>

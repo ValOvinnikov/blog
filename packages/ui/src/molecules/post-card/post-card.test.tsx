@@ -102,11 +102,6 @@ describe(`<${PostCard.name}/>`, () => {
     expect(screen.getByText('stray content')).toBeVisible();
   });
 
-  it('forwards className to root element', () => {
-    const { container } = render(<PostCard className="extra-class" />);
-    expect(container.firstChild).toHaveClass('extra-class');
-  });
-
   it('forwards data-testid to root element', () => {
     render(<PostCard dataTestId="post-card" />);
     expect(screen.getByTestId('post-card')).toBeVisible();

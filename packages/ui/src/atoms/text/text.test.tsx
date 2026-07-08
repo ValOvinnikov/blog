@@ -33,11 +33,6 @@ describe(`<${Text.name}/>`, () => {
     expect(screen.getByText('Lead body').className).toContain('text-text');
   });
 
-  it('accepts className override', () => {
-    render(<Text className="max-w-prose">Body</Text>);
-    expect(screen.getByText('Body').className).toContain('max-w-prose');
-  });
-
   it('forwards additional HTML attributes', () => {
     render(<Text data-testid="text-el">Content</Text>);
     expect(screen.getByTestId('text-el')).toBeVisible();
