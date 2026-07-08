@@ -83,8 +83,8 @@ export default async function HomePage({ params }: TProps) {
       <Hero
         eyebrow={hero.eyebrow}
         title={hero.title}
+        titleId="home-hero-title"
         excerpt={hero.subtitle}
-        ariaLabel="Featured post"
       >
         {(hero.primaryAction || hero.secondaryAction) && (
           <Hero.Cta>

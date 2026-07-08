@@ -86,6 +86,20 @@ describe(mapCompoundSlots, () => {
     ).toHaveTextContent('second');
   });
 
+  it('matches slots wrapped in a single Fragment', () => {
+    render(
+      <TestHarness>
+        <>
+          <Alpha>one</Alpha>
+          <Beta>two</Beta>
+        </>
+      </TestHarness>,
+    );
+    expect(screen.getByTestId('alpha')).toHaveTextContent('one');
+    expect(screen.getByTestId('beta')).toHaveTextContent('two');
+    expect(screen.queryAllByTestId('unmatched-item')).toHaveLength(0);
+  });
+
   it('ignores false/null/undefined children without adding them to unmatched', () => {
     render(
       <TestHarness>

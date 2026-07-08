@@ -6,11 +6,11 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/compound';
+import { CardMeta } from '@blog/ui/molecules/card-meta';
 import type { ComponentPropsWithoutRef, ElementType } from 'react';
 import { Fragment } from 'react';
 
 import { PostCardMedia } from './components/media/post-card-media';
-import { PostCardMeta } from './components/meta/post-card-meta';
 import { PostCardTitle } from './components/title/post-card-title';
 import { postCardVariants } from './post-card-variants';
 
@@ -18,7 +18,7 @@ const s = postCardVariants();
 
 const PostCardParts = {
   Media: PostCardMedia,
-  Meta: PostCardMeta,
+  Meta: CardMeta,
   Title: PostCardTitle,
 } satisfies Record<string, ElementType>;
 
