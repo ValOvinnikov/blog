@@ -6,6 +6,7 @@
     "allowJs": true,
     "noEmit": true,
     "moduleResolution": "Bundler",
+    "types": ["vitest/globals"],
     "paths": {
       "@/*": ["./src/*"],
       "@blog/ui/*": ["../../packages/ui/src/*"],
@@ -24,7 +25,9 @@
     ".next/types/**/*.ts",
     ".storybook/**/*.ts",
     ".storybook/**/*.tsx",
-    "index.css.d.ts"
+    "index.css.d.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts"
   ],
   "exclude": ["node_modules"]
 }

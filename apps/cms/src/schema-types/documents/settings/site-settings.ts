@@ -38,6 +38,22 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'brandPrefix',
+      title: 'Brand Prefix',
+      type: 'string',
+      description:
+        'Primary brand text shown in the site header logo, e.g. "val".',
+      validation: (rule) => rule.required().max(30),
+    }),
+    defineField({
+      name: 'brandSuffix',
+      title: 'Brand Suffix',
+      type: 'string',
+      description:
+        'Accent suffix shown after the brand prefix in the site header logo, e.g. ".dev".',
+      validation: (rule) => rule.max(30),
+    }),
+    defineField({
       name: 'ogImage',
       title: 'Default OG Image',
       type: 'imageWithAlt',

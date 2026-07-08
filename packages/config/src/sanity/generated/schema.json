@@ -652,6 +652,20 @@
         },
         "optional": true
       },
+      "brandPrefix": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "brandSuffix": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "ogImage": {
         "type": "objectAttribute",
         "value": {

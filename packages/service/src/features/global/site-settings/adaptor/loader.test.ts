@@ -22,6 +22,8 @@ describe('getSiteSettings', () => {
       makeRawSiteSettings({
         title: 'Awesome Blog',
         description: 'Great content',
+        brandPrefix: 'val',
+        brandSuffix: '.dev',
       }),
     );
 
@@ -29,6 +31,8 @@ describe('getSiteSettings', () => {
 
     expect(result.title).toBe('Awesome Blog');
     expect(result.description).toBe('Great content');
+    expect(result.brandPrefix).toBe('val');
+    expect(result.brandSuffix).toBe('.dev');
     expect(result.navigation).toEqual([]);
     expect(result.socialLinks).toEqual([]);
   });

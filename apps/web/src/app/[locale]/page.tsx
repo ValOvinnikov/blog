@@ -1,20 +1,13 @@
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import {
-  ContentSection,
-  Hero,
-  LinkButton,
-  NavLink,
-  PostCard,
-  PostGrid,
-} from '@blog/ui';
+import { Hero, LinkButton, PostsSection } from '@blog/ui';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 
-import { Container } from '@/components/container/container';
+import { HomePageTemplate } from '@/components/home-page-template/home-page-template';
 import { formatDate } from '@/utils/format-date';
 
 type TProps = {
@@ -77,71 +70,66 @@ export default async function HomePage({ params }: TProps) {
   }
 
   const { hero, latestPosts, latestPostsTitle } = result.data;
-  console.info(latestPosts);
+
+  const posts = latestPosts.map((post) => ({
+    id: post.id,
+    href: `/blog/${post.slug}`,
+    title: post.title,
+    excerpt: post.excerpt,
+    publishedAt: post.publishedAt,
+    formattedDate: formatDate(post.publishedAt, locale),
+    categories: post.categories,
+  }));
+
   return (
-    <Container as="main" className="py-page-y">
-      <Hero
-        eyebrow={hero.eyebrow}
-        title={hero.title}
-        titleId="home-hero-title"
-        excerpt={hero.subtitle}
-      >
-        {(hero.primaryAction || hero.secondaryAction) && (
-          <Hero.Cta>
-            {hero.primaryAction && (
-              <LinkButton as={Link} href={hero.primaryAction.href}>
-                {hero.primaryAction.label}
-              </LinkButton>
-            )}
-            {hero.secondaryAction && (
-              <LinkButton
-                as={Link}
-                href={hero.secondaryAction.href}
-                variant="link"
-              >
-                {hero.secondaryAction.label}
-              </LinkButton>
-            )}
-          </Hero.Cta>
-        )}
+    <HomePageTemplate
+      hero={
+        <Hero
+          eyebrow={hero.eyebrow}
+          title={hero.title}
+          titleId="home-hero-title"
+          excerpt={hero.subtitle}
+        >
+          {(hero.primaryAction || hero.secondaryAction) && (
+            <Hero.Cta>
+              {hero.primaryAction && (
+                <LinkButton as={Link} href={hero.primaryAction.href}>
+                  {hero.primaryAction.label}
+                </LinkButton>
+              )}
+              {hero.secondaryAction && (
+                <LinkButton
+                  as={Link}
+                  href={hero.secondaryAction.href}
+                  variant="link"
+                >
+                  {hero.secondaryAction.label}
+                </LinkButton>
+              )}
+            </Hero.Cta>
+          )}
 
-        {hero.image && (
-          <Hero.Media key="media">
-            <Image
-              src={hero.image.src}
-              alt={hero.image.alt}
-              fill
-              className="object-cover"
-              priority
-            />
-          </Hero.Media>
-        )}
-      </Hero>
-
-      {latestPosts.length > 0 && (
-        <ContentSection title={latestPostsTitle} titleId="latest-posts-title">
-          <PostGrid>
-            {latestPosts.map((post) => (
-              <PostCard
-                key={post.id}
-                excerpt={post.excerpt}
-                tags={post.categories.map((category) => category.title)}
-              >
-                <PostCard.Title key="title">
-                  <NavLink as={Link} href={`/blog/${post.slug}`}>
-                    {post.title}
-                  </NavLink>
-                </PostCard.Title>
-                <PostCard.Footer
-                  key="footer"
-                  publishedAt={post.publishedAt}
-                  formattedDate={formatDate(post.publishedAt, locale)}
-                />
-              </PostCard>
-            ))}
-          </PostGrid>
-        </ContentSection>
-      )}
-    </Container>
+          {hero.image && (
+            <Hero.Media key="media">
+              <Image
+                src={hero.image.src}
+                alt={hero.image.alt}
+                fill
+                className="object-cover"
+                priority
+              />
+            </Hero.Media>
+          )}
+        </Hero>
+      }
+      latestPosts={
+        <PostsSection
+          posts={posts}
+          title={latestPostsTitle}
+          titleId="latest-posts-title"
+          linkAs={Link}
+        />
+      }
+    />
   );
 }

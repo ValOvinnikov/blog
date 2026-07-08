@@ -108,6 +108,8 @@ export type SiteSettings = {
   description?: string;
   tagline?: string;
   logo?: ImageWithAlt;
+  brandPrefix?: string;
+  brandSuffix?: string;
   ogImage?: ImageWithAlt;
   ogTitle?: string;
   ogDescription?: string;

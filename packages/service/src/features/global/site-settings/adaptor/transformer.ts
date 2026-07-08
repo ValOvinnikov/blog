@@ -15,6 +15,8 @@ export function toSiteSettings(raw: TRawSiteSettings): TSiteSettings {
     title: raw.title,
     description: raw.description,
     tagline: raw.tagline ?? undefined,
+    brandPrefix: raw.brandPrefix,
+    brandSuffix: raw.brandSuffix ?? undefined,
     logoUrl: buildImageUrl(raw.logo),
     ogImageUrl: buildImageUrl(raw.ogImage),
     ogTitle: raw.ogTitle ?? undefined,
