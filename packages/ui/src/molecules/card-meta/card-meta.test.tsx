@@ -5,7 +5,7 @@ import { CardMeta } from './card-meta';
 
 faker.seed(123);
 
-const dateIso = faker.date.past().toISOString();
+const dateValue = faker.date.past().toISOString();
 const dateLabel = faker.date.past().toLocaleDateString('en-GB', {
   year: 'numeric',
   month: 'long',
@@ -17,18 +17,22 @@ const category = faker.lorem.word();
 describe(`<${CardMeta.name}/>`, () => {
   it('renders time element with correct dateTime attribute', () => {
     render(
-      <CardMeta dateIso={dateIso} dateLabel={dateLabel} category={category} />,
+      <CardMeta
+        dateValue={dateValue}
+        dateLabel={dateLabel}
+        category={category}
+      />,
     );
     const timeEl = screen.getByRole('time');
     expect(timeEl).toBeVisible();
-    expect(timeEl).toHaveAttribute('dateTime', dateIso);
+    expect(timeEl).toHaveAttribute('dateTime', dateValue);
     expect(timeEl).toHaveTextContent(dateLabel);
   });
 
   it('renders readingTime text when provided', () => {
     render(
       <CardMeta
-        dateIso={dateIso}
+        dateValue={dateValue}
         dateLabel={dateLabel}
         readingTime={readingTime}
         category={category}
@@ -39,7 +43,11 @@ describe(`<${CardMeta.name}/>`, () => {
 
   it('omits readingTime segment and its separator when not provided — only one aria-hidden separator', () => {
     const { container } = render(
-      <CardMeta dateIso={dateIso} dateLabel={dateLabel} category={category} />,
+      <CardMeta
+        dateValue={dateValue}
+        dateLabel={dateLabel}
+        category={category}
+      />,
     );
     const separators = container.querySelectorAll('[aria-hidden="true"]');
     expect(separators).toHaveLength(1);
@@ -48,7 +56,7 @@ describe(`<${CardMeta.name}/>`, () => {
   it('renders two separators when readingTime is provided', () => {
     const { container } = render(
       <CardMeta
-        dateIso={dateIso}
+        dateValue={dateValue}
         dateLabel={dateLabel}
         readingTime={readingTime}
         category={category}
@@ -60,14 +68,22 @@ describe(`<${CardMeta.name}/>`, () => {
 
   it('renders category in uppercase', () => {
     render(
-      <CardMeta dateIso={dateIso} dateLabel={dateLabel} category={category} />,
+      <CardMeta
+        dateValue={dateValue}
+        dateLabel={dateLabel}
+        category={category}
+      />,
     );
     expect(screen.getByText(category.toUpperCase())).toBeVisible();
   });
 
   it('category element has text-accent class', () => {
     render(
-      <CardMeta dateIso={dateIso} dateLabel={dateLabel} category={category} />,
+      <CardMeta
+        dateValue={dateValue}
+        dateLabel={dateLabel}
+        category={category}
+      />,
     );
     const categoryEl = screen.getByText(category.toUpperCase());
     expect(categoryEl).toHaveClass('text-accent');
@@ -76,7 +92,7 @@ describe(`<${CardMeta.name}/>`, () => {
   it('forwards dataTestId to root element', () => {
     render(
       <CardMeta
-        dateIso={dateIso}
+        dateValue={dateValue}
         dateLabel={dateLabel}
         category={category}
         dataTestId="card-meta"

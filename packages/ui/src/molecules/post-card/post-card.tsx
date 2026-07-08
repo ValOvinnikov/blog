@@ -1,5 +1,4 @@
-import { type IWithDataTestId, Size } from '@blog/config';
-import { Avatar } from '@blog/ui/atoms/avatar';
+import { type IWithDataTestId } from '@blog/config';
 import { Tag } from '@blog/ui/atoms/tag';
 import {
   mapCompoundSlots,
@@ -10,6 +9,7 @@ import { CardMeta } from '@blog/ui/molecules/card-meta';
 import type { ComponentPropsWithoutRef, ElementType } from 'react';
 import { Fragment } from 'react';
 
+import { PostCardFooter } from './components/footer/post-card-footer';
 import { PostCardMedia } from './components/media/post-card-media';
 import { PostCardTitle } from './components/title/post-card-title';
 import { postCardVariants } from './post-card-variants';
@@ -20,6 +20,7 @@ const PostCardParts = {
   Media: PostCardMedia,
   Meta: CardMeta,
   Title: PostCardTitle,
+  Footer: PostCardFooter,
 } satisfies Record<string, ElementType>;
 
 export interface IPostCardProps
@@ -28,20 +29,12 @@ export interface IPostCardProps
     IWithDataTestId {
   excerpt?: string;
   tags?: string[];
-  publishedAt?: string;
-  formattedDate?: string;
-  authorName?: string;
-  authorAvatarSrc?: string;
   children?: TCompoundChildren<typeof PostCardParts>;
 }
 
 const PostCardRoot = ({
   excerpt,
   tags,
-  publishedAt,
-  formattedDate,
-  authorName,
-  authorAvatarSrc,
   children,
   className,
   dataTestId,
@@ -70,22 +63,7 @@ const PostCardRoot = ({
           </div>
         )}
         {excerpt && <p className={s.excerpt()}>{excerpt}</p>}
-        {(publishedAt || authorName) && (
-          <div className={s.meta()}>
-            {authorName && (
-              <Avatar
-                name={authorName}
-                alt={authorName}
-                src={authorAvatarSrc}
-                size={Size.SM}
-              />
-            )}
-            {authorName && <span>{authorName}</span>}
-            {publishedAt && formattedDate && (
-              <time dateTime={publishedAt}>{formattedDate}</time>
-            )}
-          </div>
-        )}
+        {slots.Footer}
       </div>
     </article>
   );

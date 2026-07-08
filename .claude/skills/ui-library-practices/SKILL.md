@@ -299,6 +299,40 @@ Why each piece matters:
   `service`'s type graph. Always import it as `@blog/config/react`, never
   re-export it from the root.
 
+### Any anchor a component builds itself — never a hardcoded `<a>`
+
+This applies even when the anchor isn't the component's own root — e.g. an
+**organism that constructs a link to pass into another component's slot**
+(`PostsSection` building the `<a href={post.href}>` it hands to
+`PostCard.Title`). The organism is still rendering an anchor, so it still
+needs a `linkAs`/`as` prop (Level 1, `TAnchorElementType` from
+`@blog/config/react` — reuse it, don't redeclare the union per component) that
+defaults to `'a'`. A bare `<a>` baked into an organism is exactly as wrong as
+one baked into an atom; "it's just wrapping a slot's children" is not an
+exemption.
+
+```tsx
+// ❌ wrong — organism hardcodes the anchor; apps/web can never swap in next/link
+<PostCard.Title>
+  <a href={post.href} className="before:absolute before:inset-0">
+    {post.title}
+  </a>
+</PostCard.Title>;
+
+// ✅ correct — polymorphic, defaults to 'a', styling lives in the variants file
+const Link = (linkAs ?? 'a') as ElementType;
+<PostCard.Title>
+  <Link href={post.href} className={s.titleLink()}>
+    {post.title}
+  </Link>
+</PostCard.Title>;
+```
+
+Note `className={s.titleLink()}` above, not an inline string — the "no inline
+Tailwind classes" rule (see Styling section) applies to every element,
+including one-off classes like a full-card overlay (`before:absolute
+before:inset-0`). Give it its own named slot in `{component}-variants.ts`.
+
 ## Compound components
 
 Use this when a component owns **more than one** framework-coupled seam —

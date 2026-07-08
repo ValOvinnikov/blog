@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 import { CardMeta } from './card-meta';
 
-const dateIso = faker.date.past().toISOString();
-const dateLabel = new Date(dateIso).toLocaleDateString('en-GB', {
+const dateValue = faker.date.past().toISOString();
+const dateLabel = new Date(dateValue).toLocaleDateString('en-GB', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
@@ -16,7 +16,7 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
   args: {
-    dateIso,
+    dateValue,
     dateLabel,
     category: faker.lorem.word(),
   },

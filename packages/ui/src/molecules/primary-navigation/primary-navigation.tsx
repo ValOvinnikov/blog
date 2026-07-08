@@ -1,19 +1,11 @@
 import type { IWithDataTestId } from '@blog/config';
+import type { TAnchorElementType } from '@blog/config/react';
 import { NavLink } from '@blog/ui/atoms/nav-link';
-import type { ComponentType, HTMLAttributes, ReactNode } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 
 import { primaryNavigationVariants } from './primary-navigation-variants';
 
-/**
- * Restricts `linkAs` to the intrinsic `<a>` tag or a custom component whose
- * props accept a string `href` and `children` (e.g. next/link's `Link`,
- * next-intl's `Link`) — anything else is rejected at the type level. A plain
- * `ElementType<{ href: string }>` is too loose here: TS's `extends` check
- * allows any intrinsic element to structurally match an object type that
- * only adds properties, so it would silently accept `div`, `span`, etc.
- */
-export type TAnchorElementType =
-  'a' | ComponentType<{ href: string; children?: ReactNode }>;
+export type { TAnchorElementType };
 
 export interface INavItem {
   href: string;

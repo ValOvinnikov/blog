@@ -4,3 +4,9 @@ export * from './header';
 export * from './hero';
 export type { IPostGridProps } from './post-grid';
 export { PostGrid } from './post-grid';
+export type {
+  IPostCardCategoryData,
+  IPostCardData,
+  IPostsSectionProps,
+} from './posts-section';
+export { PostsSection } from './posts-section';
