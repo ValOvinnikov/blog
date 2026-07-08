@@ -571,6 +571,29 @@ in consumer-controlled markup.
   export const headerVariants = tv({ ... });
   ```
   The grouping is self-evident from the classes themselves — **no comments of any kind** in variants files or stories files unless the reason is genuinely non-obvious (e.g. a browser workaround or a z-index constraint that would surprise a reader). Story names and export identifiers are self-documenting; JSDoc blocks above story exports are forbidden.
+- **In `slots`-based `tv()` calls, every slot value is always an array of strings — never a bare string** — even a single-class slot, and even when the slot is overridden inside `variants`/`compoundVariants`. This keeps every slot assignment visually consistent and diff-friendly regardless of how many classes it currently holds:
+  ```ts
+  // ✅ correct — slot values are always arrays, including variant overrides
+  export const heroVariants = tv({
+    slots: {
+      root: ['grid grid-cols-1 items-center'],
+      excerpt: ['m-0 max-w-[52ch]'],
+    },
+    variants: {
+      hasMedia: {
+        true: { root: ['lg:grid-cols-[minmax(0,1.15fr)_minmax(180px,0.85fr)]'] },
+      },
+    },
+  });
+
+  // ❌ wrong — bare string breaks consistency with the slots block above it
+  variants: {
+    hasMedia: {
+      true: { root: 'lg:grid-cols-[minmax(0,1.15fr)_minmax(180px,0.85fr)]' },
+    },
+  },
+  ```
+  This rule applies to slot-based components only. Non-slot `base`/`variants` `tv()` calls (a single-element component with no named slots) may use bare strings for variant entries, matching existing atoms like `button-variants.ts` and `tag-variants.ts`.
 - Every named element in the component (including inner spans or wrappers)
   gets its own named export in the variants file:
   ```ts

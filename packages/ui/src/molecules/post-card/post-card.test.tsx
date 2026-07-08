@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { PostCard } from './post-card';
 
 describe(`<${PostCard.name}/>`, () => {
-  it('renders PostCard.Title as an h2 heading', () => {
+  it('renders PostCard.Title as an h3 heading', () => {
     render(
       <PostCard>
         <PostCard.Title>
@@ -11,7 +11,7 @@ describe(`<${PostCard.name}/>`, () => {
         </PostCard.Title>
       </PostCard>,
     );
-    expect(screen.getByRole('heading', { level: 2 })).toBeVisible();
+    expect(screen.getByRole('heading', { level: 3 })).toBeVisible();
     expect(screen.getByRole('link')).toHaveAttribute(
       'href',
       '/posts/hello-world',
@@ -105,9 +105,11 @@ describe(`<${PostCard.name}/>`, () => {
   it('renders PostCard.Meta content', () => {
     render(
       <PostCard>
-        <PostCard.Meta>
-          <span>Jan 1, 2024</span>
-        </PostCard.Meta>
+        <PostCard.Meta
+          dateIso="2024-01-01"
+          dateLabel="Jan 1, 2024"
+          category="design"
+        />
       </PostCard>,
     );
     expect(screen.getByText('Jan 1, 2024')).toBeVisible();

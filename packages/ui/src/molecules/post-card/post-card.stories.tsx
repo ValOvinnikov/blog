@@ -23,6 +23,12 @@ const meta = {
             alt="Abstract design elements on a dark background"
           />
         </PostCard.Media>
+        <PostCard.Meta
+          dateIso="2024-03-10"
+          dateLabel="March 10, 2024"
+          readingTime="9 min"
+          category="design-system"
+        />
         <PostCard.Title>
           <a href="/posts/building-a-design-system">
             Building a Design System from Scratch

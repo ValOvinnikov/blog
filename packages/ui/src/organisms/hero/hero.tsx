@@ -1,6 +1,8 @@
 import type { IWithDataTestId } from '@blog/config';
+import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
 import { Tag } from '@blog/ui/atoms/tag';
+import { Text } from '@blog/ui/atoms/text';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
@@ -56,16 +58,22 @@ const HeroRoot = ({
       {...rest}
     >
       <div className={s.content()}>
-        {eyebrow && <p className={s.eyebrow()}>{eyebrow}</p>}
+        {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
         {publishedAt && formattedDate && (
           <time dateTime={publishedAt} className={s.meta()}>
             {formattedDate}
           </time>
         )}
         <div className={s.title()}>
-          <Heading level={1}>{title}</Heading>
+          <Heading level={1} visual="hero">
+            {title}
+          </Heading>
         </div>
-        {excerpt && <p className={s.excerpt()}>{excerpt}</p>}
+        {excerpt && (
+          <Text variant="hero" className={s.excerpt()}>
+            {excerpt}
+          </Text>
+        )}
         {tags && tags.length > 0 && (
           <div className={s.tags()}>
             {tags.map((tag) => (
