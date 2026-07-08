@@ -6,4 +6,5 @@ export * from './logo';
 export * from './meta-separator';
 export * from './nav-link';
 export * from './tag';
+export * from './text';
 export * from './theme-toggle';

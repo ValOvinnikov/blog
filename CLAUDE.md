@@ -81,8 +81,9 @@ Every issue follows this exact order. **Stop and wait for explicit user approval
 3. Do the work + run quality gates
 4. **Ask to commit** — present "commit now" vs "review first"; wait for answer
 5. **Ask to push** — separate question, after commit; wait for answer
-6. **Ask to open PR** — separate question, after push; wait for answer
-7. Set issue → Code Review on the board immediately after PR is created
+6. **Ask to open PR** — separate question, after push; wait for answer.
+   Once approved: run `gh pr create`, then **immediately** set the issue → Code Review
+   on the board — do not report the PR URL until the board update is done.
 
 **Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work only — never the commit, push, or PR.** Those three gates always require fresh, explicit confirmation.
 

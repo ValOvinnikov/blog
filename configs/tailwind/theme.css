@@ -159,6 +159,13 @@
 :root {
   color-scheme: light;
 
+  /* Font-family fallbacks. next/font in apps/web injects class-scoped overrides
+     that take precedence. These ensure font utilities resolve in any other
+     context (Storybook, tests, standalone consumers). */
+  --font-display-family: 'Space Grotesk', system-ui, sans-serif;
+  --font-body-family: 'Newsreader', Georgia, serif;
+  --font-mono-family: 'JetBrains Mono', ui-monospace, monospace;
+
   --bg: oklch(0.99 0.002 250);
   --bg-subtle: oklch(0.965 0.003 250);
   --surface: oklch(1 0 0);
