@@ -29,14 +29,14 @@ describe(`<${Button.name}/>`, () => {
   it('renders sm size', () => {
     render(<Button size={Size.SM}>Small</Button>);
     expect(screen.getByRole('button', { name: 'Small' }).className).toContain(
-      'h-8',
+      'px-3',
     );
   });
 
   it('renders lg size', () => {
     render(<Button size={Size.LG}>Large</Button>);
     expect(screen.getByRole('button', { name: 'Large' }).className).toContain(
-      'h-11',
+      'px-5',
     );
   });
 });
