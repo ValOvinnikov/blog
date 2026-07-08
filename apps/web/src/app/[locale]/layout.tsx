@@ -2,13 +2,14 @@ import '../../../index.css';
 
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { Footer, Header, NavLink, ThemeToggle } from '@blog/ui';
+import { Footer, Header, NavLink } from '@blog/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { hasLocale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 
+import { ThemeToggleButton } from '@/components/theme-toggle-button/theme-toggle-button';
 import { jetbrainsMono, newsreader, spaceGrotesk } from '@/config/fonts';
 import { routing } from '@/i18n/routing';
 
@@ -84,7 +85,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
             ))}
           </Header.Nav>
           <Header.Actions>
-            <ThemeToggle />
+            <ThemeToggleButton />
           </Header.Actions>
         </Header>
         {children}

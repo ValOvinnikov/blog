@@ -20,7 +20,7 @@ const meta = {
           <NavLink href="/about">About</NavLink>
         </Header.Nav>
         <Header.Actions>
-          <ThemeToggle />
+          <ThemeToggle isDark={false} onToggle={() => {}} />
         </Header.Actions>
       </>
     ),
@@ -48,7 +48,7 @@ export const WithMobileTrigger: TStory = {
         </Header.Nav>
         <Header.Actions>
           <button aria-label="Open menu">☰</button>
-          <ThemeToggle />
+          <ThemeToggle isDark={false} onToggle={() => {}} />
         </Header.Actions>
       </>
     ),

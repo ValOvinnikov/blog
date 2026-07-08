@@ -1,61 +1,81 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
 
 import { ThemeToggle } from './theme-toggle';
 
 describe(`<${ThemeToggle.name}/>`, () => {
-  beforeEach(() => {
-    document.documentElement.classList.remove('dark');
-    render(<ThemeToggle />);
-  });
-
   it('renders a button', () => {
+    render(<ThemeToggle isDark={false} onToggle={vi.fn()} />);
     expect(screen.getByRole('button')).toBeVisible();
   });
 
-  it('shows "Switch to dark theme" label in light mode', () => {
+  it('shows "Switch to dark theme" label when isDark is false', () => {
+    render(<ThemeToggle isDark={false} onToggle={vi.fn()} />);
     expect(screen.getByRole('button')).toHaveAccessibleName(
       'Switch to dark theme',
     );
   });
 
-  it('toggles aria-label after click', async () => {
-    const button = screen.getByRole('button');
-    await userEvent.click(button);
-    expect(button).toHaveAccessibleName('Switch to light theme');
+  it('shows "Switch to light theme" label when isDark is true', () => {
+    render(<ThemeToggle isDark={true} onToggle={vi.fn()} />);
+    expect(screen.getByRole('button')).toHaveAccessibleName(
+      'Switch to light theme',
+    );
   });
 
-  it('adds .dark to <html> when toggled to dark', async () => {
+  it('calls onToggle when clicked', async () => {
+    const onToggle = vi.fn();
+    render(<ThemeToggle isDark={false} onToggle={onToggle} />);
     await userEvent.click(screen.getByRole('button'));
-    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(onToggle).toHaveBeenCalledTimes(1);
   });
 
-  it('removes .dark from <html> when toggled back to light', async () => {
+  it('reflects the accessible name after re-rendering with a new isDark value', () => {
+    const { rerender } = render(
+      <ThemeToggle isDark={false} onToggle={vi.fn()} />,
+    );
+    expect(screen.getByRole('button')).toHaveAccessibleName(
+      'Switch to dark theme',
+    );
+
+    rerender(<ThemeToggle isDark={true} onToggle={vi.fn()} />);
+    expect(screen.getByRole('button')).toHaveAccessibleName(
+      'Switch to light theme',
+    );
+  });
+
+  it('renders the placeholder and no icon when mounted is false', () => {
+    render(<ThemeToggle isDark={false} onToggle={vi.fn()} mounted={false} />);
     const button = screen.getByRole('button');
-    await userEvent.click(button);
-    await userEvent.click(button);
-    expect(document.documentElement.classList.contains('dark')).toBe(false);
+    expect(button.querySelector('svg')).not.toBeInTheDocument();
+    expect(
+      button.querySelector('span[aria-hidden="true"]'),
+    ).toBeInTheDocument();
   });
 
-  it('persists choice to localStorage', async () => {
-    await userEvent.click(screen.getByRole('button'));
-    expect(localStorage.getItem('theme')).toBe('dark');
+  it('renders the icon when mounted is true', () => {
+    render(<ThemeToggle isDark={false} onToggle={vi.fn()} mounted={true} />);
+    expect(screen.getByRole('button').querySelector('svg')).toBeInTheDocument();
   });
 });
 
-describe(`<${ThemeToggle.name}/> — with props`, () => {
-  beforeEach(() => {
-    document.documentElement.classList.remove('dark');
-  });
-
+describe(`<${ThemeToggle.name}/> — with custom labels`, () => {
   it('uses custom darkLabel', () => {
-    render(<ThemeToggle darkLabel="Тёмная тема" />);
+    render(
+      <ThemeToggle isDark={false} onToggle={vi.fn()} darkLabel="Тёмная тема" />,
+    );
     expect(screen.getByRole('button')).toHaveAccessibleName('Тёмная тема');
   });
 
-  it('uses custom lightLabel after toggling to dark', async () => {
-    render(<ThemeToggle lightLabel="Светлая тема" />);
-    await userEvent.click(screen.getByRole('button'));
+  it('uses custom lightLabel when isDark is true', () => {
+    render(
+      <ThemeToggle
+        isDark={true}
+        onToggle={vi.fn()}
+        lightLabel="Светлая тема"
+      />,
+    );
     expect(screen.getByRole('button')).toHaveAccessibleName('Светлая тема');
   });
 });
