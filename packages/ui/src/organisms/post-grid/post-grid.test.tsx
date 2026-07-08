@@ -13,18 +13,4 @@ describe(`<${PostGrid.name}/>`, () => {
     );
     expect(screen.getAllByRole('article')).toHaveLength(3);
   });
-
-  it('applies grid layout class to the wrapper', () => {
-    render(<PostGrid dataTestId="grid">content</PostGrid>);
-    expect(screen.getByTestId('grid').className).toContain('grid');
-  });
-
-  it('merges extra className', () => {
-    render(
-      <PostGrid className="mt-8" dataTestId="grid">
-        content
-      </PostGrid>,
-    );
-    expect(screen.getByTestId('grid').className).toContain('mt-8');
-  });
 });

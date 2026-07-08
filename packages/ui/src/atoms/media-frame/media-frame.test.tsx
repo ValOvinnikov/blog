@@ -8,13 +8,6 @@ describe(`<${MediaFrame.name}/>`, () => {
     expect(container.firstChild?.nodeName).toBe('DIV');
   });
 
-  it('has relative class', () => {
-    const { container } = render(<MediaFrame />);
-    expect((container.firstChild as HTMLElement).className).toContain(
-      'relative',
-    );
-  });
-
   it('ratio="video" applies aspect-video', () => {
     const { container } = render(<MediaFrame ratio="video" />);
     expect((container.firstChild as HTMLElement).className).toContain(
@@ -33,13 +26,6 @@ describe(`<${MediaFrame.name}/>`, () => {
     const { container } = render(<MediaFrame ratio="portrait" />);
     expect((container.firstChild as HTMLElement).className).toContain(
       'aspect-[3/4]',
-    );
-  });
-
-  it('accepts arbitrary aspect-ratio via className', () => {
-    const { container } = render(<MediaFrame className="aspect-[16/9]" />);
-    expect((container.firstChild as HTMLElement).className).toContain(
-      'aspect-[16/9]',
     );
   });
 

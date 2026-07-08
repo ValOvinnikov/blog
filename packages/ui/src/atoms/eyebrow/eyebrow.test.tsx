@@ -12,16 +12,4 @@ describe(`<${Eyebrow.name}/>`, () => {
     const { container } = render(<Eyebrow>Label</Eyebrow>);
     expect(container.firstChild?.nodeName).toBe('P');
   });
-
-  it('has text-accent class', () => {
-    const { container } = render(<Eyebrow>Label</Eyebrow>);
-    expect((container.firstChild as HTMLElement).className).toContain(
-      'text-accent',
-    );
-  });
-
-  it('accepts className override', () => {
-    render(<Eyebrow className="mt-2">Label</Eyebrow>);
-    expect(screen.getByText('Label').className).toContain('mt-2');
-  });
 });

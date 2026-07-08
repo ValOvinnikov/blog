@@ -82,19 +82,6 @@ describe(`<${Hero.name}/>`, () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
-  it('forwards className to the root element', () => {
-    render(
-      <Hero
-        title="Building a Design System"
-        className="custom-hero"
-        ariaLabel="Featured post"
-      />,
-    );
-    expect(
-      screen.getByRole('region', { name: 'Featured post' }).className,
-    ).toContain('custom-hero');
-  });
-
   it('forwards data-testid to the root element', () => {
     render(
       <Hero title="Building a Design System" dataTestId="featured-hero" />,

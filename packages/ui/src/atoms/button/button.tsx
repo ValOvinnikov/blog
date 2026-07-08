@@ -9,9 +9,9 @@ export type TButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
 export const Button = ({ className, variant, size, ...rest }: TButtonProps) => {
   return (
     <button
+      {...rest}
       type="button"
       className={buttonVariants({ variant, size, class: className })}
-      {...rest}
     />
   );
 };

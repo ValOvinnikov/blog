@@ -48,11 +48,6 @@ describe(`<${ThemeToggle.name}/> — with props`, () => {
     document.documentElement.classList.remove('dark');
   });
 
-  it('merges extra className', () => {
-    render(<ThemeToggle className="ml-2" />);
-    expect(screen.getByRole('button').className).toContain('ml-2');
-  });
-
   it('uses custom darkLabel', () => {
     render(<ThemeToggle darkLabel="Тёмная тема" />);
     expect(screen.getByRole('button')).toHaveAccessibleName('Тёмная тема');

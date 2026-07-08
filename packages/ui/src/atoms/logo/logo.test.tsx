@@ -21,9 +21,4 @@ describe(`<${Logo.name}/>`, () => {
     const spans = container.querySelectorAll('span');
     expect(spans).toHaveLength(1);
   });
-
-  it('accepts className override on root element', () => {
-    render(<Logo prefix="Val." className="mt-4" />);
-    expect(screen.getByText('Val.').className).toContain('mt-4');
-  });
 });

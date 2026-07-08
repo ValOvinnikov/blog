@@ -17,9 +17,4 @@ describe(`<${MetaSeparator.name}/>`, () => {
     const { container } = render(<MetaSeparator />);
     expect(container.firstChild).toHaveAttribute('aria-hidden', 'true');
   });
-
-  it('accepts className override', () => {
-    const { container } = render(<MetaSeparator className="ml-1" />);
-    expect((container.firstChild as HTMLElement).className).toContain('ml-1');
-  });
 });

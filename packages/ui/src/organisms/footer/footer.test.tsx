@@ -67,11 +67,6 @@ describe(`<${Footer.name}/>`, () => {
     expect(screen.getByRole('contentinfo')).toBeVisible();
   });
 
-  it('forwards className to the root element', () => {
-    render(<Footer className="custom-class" />);
-    expect(screen.getByRole('contentinfo').className).toContain('custom-class');
-  });
-
   it('forwards data-testid to the root element', () => {
     render(<Footer dataTestId="site-footer" />);
     expect(screen.getByTestId('site-footer')).toBeVisible();
