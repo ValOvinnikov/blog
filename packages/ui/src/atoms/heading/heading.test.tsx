@@ -57,4 +57,29 @@ describe(`<${Heading.name}/>`, () => {
       screen.getByRole('heading', { level: 4, name: 'Default' }).className,
     ).toContain('text-2xl');
   });
+
+  it('applies visual variant hero', () => {
+    render(
+      <Heading level={1} visual="hero">
+        Hero
+      </Heading>,
+    );
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Hero' }).className,
+    ).toContain('text-hero');
+  });
+
+  it('visual variant skips default size class', () => {
+    render(
+      <Heading level={1} visual="card">
+        Card
+      </Heading>,
+    );
+    const cls = screen.getByRole('heading', {
+      level: 1,
+      name: 'Card',
+    }).className;
+    expect(cls).toContain('text-card-title');
+    expect(cls).not.toContain('text-display');
+  });
 });

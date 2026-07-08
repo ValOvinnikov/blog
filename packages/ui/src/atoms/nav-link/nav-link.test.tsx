@@ -31,7 +31,7 @@ describe(`<${NavLink.name}/>`, () => {
   it('inactive variant applies subtle color by default', () => {
     render(<NavLink href="/blog">Blog</NavLink>);
     expect(screen.getByRole('link', { name: 'Blog' }).className).toContain(
-      'text-text-subtle',
+      'text-subtle',
     );
   });
 

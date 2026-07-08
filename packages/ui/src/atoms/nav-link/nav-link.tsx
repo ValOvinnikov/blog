@@ -1,3 +1,4 @@
+import type { IWithDataTestId } from '@blog/config';
 import type { TPolymorphicProps } from '@blog/config/react';
 import type { ElementType } from 'react';
 
@@ -6,7 +7,7 @@ import { navLinkVariants } from './nav-link-variants';
 type TNavLinkOwnProps = {
   className?: string;
   isActive?: boolean;
-};
+} & IWithDataTestId;
 
 export type TNavLinkProps<C extends ElementType = 'a'> = TPolymorphicProps<
   C,
@@ -16,6 +17,7 @@ export type TNavLinkProps<C extends ElementType = 'a'> = TPolymorphicProps<
 export const NavLink = <C extends ElementType = 'a'>({
   isActive = false,
   className,
+  dataTestId,
   as,
   ...rest
 }: TNavLinkProps<C>) => {
@@ -24,6 +26,7 @@ export const NavLink = <C extends ElementType = 'a'>({
   return (
     <Component
       className={navLinkVariants({ isActive, class: className })}
+      data-testid={dataTestId}
       {...rest}
     />
   );

@@ -31,3 +31,19 @@ export const H4: TStory = {
 export const WithSizeOverride: TStory = {
   args: { level: 2, size: Size.XS, children: 'H2 with xs size override' },
 };
+
+export const VisualHero: TStory = {
+  args: { level: 1, visual: 'hero', children: 'Hero Heading' },
+};
+
+export const VisualPost: TStory = {
+  args: { level: 1, visual: 'post', children: 'Post Title Heading' },
+};
+
+export const VisualCard: TStory = {
+  args: { level: 2, visual: 'card', children: 'Card Title Heading' },
+};
+
+export const VisualSection: TStory = {
+  args: { level: 2, visual: 'section', children: 'Section Heading' },
+};
