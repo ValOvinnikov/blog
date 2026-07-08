@@ -25,17 +25,18 @@ export interface IHeroProps
     Omit<ComponentPropsWithoutRef<'section'>, 'children'>,
     IWithDataTestId {
   title: string;
+  titleId: string;
   eyebrow?: string;
   excerpt?: string;
   tags?: string[];
   publishedAt?: string;
   formattedDate?: string;
   children?: TCompoundChildren<typeof HeroParts>;
-  ariaLabel?: string;
 }
 
 const HeroRoot = ({
   title,
+  titleId,
   eyebrow,
   excerpt,
   tags,
@@ -44,7 +45,6 @@ const HeroRoot = ({
   children,
   className,
   dataTestId,
-  ariaLabel,
   ...rest
 }: IHeroProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeroParts);
@@ -52,41 +52,46 @@ const HeroRoot = ({
 
   return (
     <section
-      aria-label={ariaLabel}
+      aria-labelledby={titleId}
       className={s.root({ class: className })}
       data-testid={dataTestId}
       {...rest}
     >
       <div className={s.content()}>
-        {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-        {publishedAt && formattedDate && (
-          <time dateTime={publishedAt} className={s.meta()}>
-            {formattedDate}
-          </time>
-        )}
-        <div className={s.title()}>
-          <Heading level={1} visual="hero">
-            {title}
-          </Heading>
-        </div>
-        {excerpt && (
-          <Text variant="hero" className={s.excerpt()}>
-            {excerpt}
-          </Text>
-        )}
-        {tags && tags.length > 0 && (
-          <div className={s.tags()}>
-            {tags.map((tag) => (
-              <Tag key={tag}>{tag}</Tag>
-            ))}
+        <div className={s.grid()}>
+          <div className={s.copy()}>
+            {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+            {publishedAt && formattedDate && (
+              <time dateTime={publishedAt} className={s.meta()}>
+                {formattedDate}
+              </time>
+            )}
+            <div className={s.title()}>
+              <Heading id={titleId} level={1} visual="hero">
+                {title}
+              </Heading>
+            </div>
+            {excerpt && (
+              <Text variant="hero" className={s.excerpt()}>
+                {excerpt}
+              </Text>
+            )}
+            {tags && tags.length > 0 && (
+              <div className={s.tags()}>
+                {tags.map((tag) => (
+                  <Tag key={tag}>{tag}</Tag>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+          {slots.Media}
+        </div>
+
         {slots.Cta}
         {unmatched.map((node, i) => (
           <Fragment key={i}>{node}</Fragment>
         ))}
       </div>
-      {slots.Media}
     </section>
   );
 };

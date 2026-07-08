@@ -14,7 +14,7 @@ const meta = {
     tags: ['Design System', 'Tailwind', 'React'],
     publishedAt: '2024-06-01T00:00:00Z',
     formattedDate: 'June 1, 2024',
-    ariaLabel: 'Featured post',
+    titleId: 'hero-title',
     children: (
       <>
         <Hero.Media>

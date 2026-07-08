@@ -2,6 +2,7 @@ import {
   Children,
   type ComponentProps,
   type ElementType,
+  Fragment,
   isValidElement,
   type ReactElement,
   type ReactNode,
@@ -13,6 +14,25 @@ interface ICompoundSlots<M extends TComponentMap> {
   slots: { [K in keyof M]?: ReactElement };
   unmatched: ReactNode[];
 }
+
+/**
+ * `Children.forEach` treats a `<>...</>` Fragment as one opaque child instead
+ * of descending into it — common when a compound root's `children` is built
+ * as a single JSX expression (e.g. Storybook `args`). Recursing here lets
+ * `mapCompoundSlots` match slots the same way regardless of Fragment wrapping.
+ */
+const flattenFragments = (children: ReactNode): ReactNode[] => {
+  const flat: ReactNode[] = [];
+  Children.forEach(children, (child) => {
+    if (isValidElement(child) && child.type === Fragment) {
+      const fragmentProps = child.props as { children?: ReactNode };
+      flat.push(...flattenFragments(fragmentProps.children));
+    } else {
+      flat.push(child);
+    }
+  });
+  return flat;
+};
 
 /**
  * Resolves a compound root's `children` against a map of known slot
@@ -29,7 +49,7 @@ export const mapCompoundSlots = <M extends TComponentMap>(
   const slots: ICompoundSlots<M>['slots'] = {};
   const unmatched: ReactNode[] = [];
 
-  Children.forEach(children, (child) => {
+  flattenFragments(children).forEach((child) => {
     if (!isValidElement(child)) {
       if (child != null && child !== false) unmatched.push(child);
       return;
