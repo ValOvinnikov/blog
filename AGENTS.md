@@ -1,5 +1,7 @@
 # AGENTS.md
 
+<!-- Mirror of CLAUDE.md — only difference is the agent directory path in "Use the scoped agents" (line 36: .Codex/agents/ vs .claude/agents/). Keep in sync when rules change. -->
+
 Guidance for working in this repo. See `SPEC.md` (architecture) and
 `IMPLEMENTATION_BRIEF.md` (build steps) for detail.
 
