@@ -65,11 +65,22 @@ component inventory.
   polymorphic pattern.
 - Use `tv()` from `tailwind-variants` for all variant/size matrices — not
   `class-variance-authority` or `clsx`.
+- **`base` is always an array**, never a single string. Group by concern —
+  one string per logical group (layout, typography, color, interaction, state):
+  ```ts
+  base: [
+    'inline-flex items-center justify-center', // layout
+    'font-mono text-label font-medium uppercase tracking-eyebrow', // typography
+    'text-accent', // color
+  ];
+  ```
+  No inline comments on each group — the classes are self-evident.
 - Token utilities only (`bg-bg`, `text-fg`, `text-muted`, `text-accent`,
   `border-border`, `max-w-prose`) from `@blog/config/tailwind/preset` — no raw
   hex. Keep dark mode intact.
 - Server-component-safe by default; `"use client"` only for interactivity.
-- JSDoc every exported component.
+- JSDoc on exported components when the purpose isn't obvious from the name;
+  skip JSDoc on type/interface/prop declarations unless a constraint is non-obvious.
 
 ## Testing
 
