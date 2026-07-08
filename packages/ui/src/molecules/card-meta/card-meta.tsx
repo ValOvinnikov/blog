@@ -5,7 +5,7 @@ import { cardMetaVariants } from './card-meta-variants';
 
 export interface ICardMetaProps extends IWithDataTestId {
   /** ISO-8601 date string placed in `<time dateTime>`. */
-  dateIso: string;
+  dateValue: string;
   /** Human-readable date string, pre-formatted by the web layer. */
   dateLabel: string;
   /** Optional reading time (e.g. "9 min"). Omitting hides the segment and its separator. */
@@ -22,7 +22,7 @@ const s = cardMetaVariants();
  * Renders: date [· readingTime] · CATEGORY
  */
 export const CardMeta = ({
-  dateIso,
+  dateValue,
   dateLabel,
   readingTime,
   category,
@@ -30,7 +30,7 @@ export const CardMeta = ({
   dataTestId,
 }: ICardMetaProps) => (
   <div className={s.root({ class: className })} data-testid={dataTestId}>
-    <time dateTime={dateIso}>{dateLabel}</time>
+    <time dateTime={dateValue}>{dateLabel}</time>
     {readingTime && (
       <>
         <MetaSeparator />

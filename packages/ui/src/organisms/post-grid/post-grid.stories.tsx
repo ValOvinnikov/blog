@@ -42,13 +42,28 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
   args: {
-    children: posts.map(({ href, title, ...rest }) => (
-      <PostCard key={href} {...rest}>
-        <PostCard.Title>
-          <a href={href}>{title}</a>
-        </PostCard.Title>
-      </PostCard>
-    )),
+    children: posts.map(
+      ({
+        href,
+        title,
+        excerpt,
+        tags,
+        publishedAt,
+        formattedDate,
+        authorName,
+      }) => (
+        <PostCard key={href} excerpt={excerpt} tags={tags}>
+          <PostCard.Title>
+            <a href={href}>{title}</a>
+          </PostCard.Title>
+          <PostCard.Footer
+            publishedAt={publishedAt}
+            formattedDate={formattedDate}
+            authorName={authorName}
+          />
+        </PostCard>
+      ),
+    ),
   },
 } satisfies Meta<typeof PostGrid>;
 
@@ -59,12 +74,29 @@ export const Default: TStory = {};
 
 export const TwoColumn: TStory = {
   args: {
-    children: posts.slice(0, 2).map(({ href, title, ...rest }) => (
-      <PostCard key={href} {...rest}>
-        <PostCard.Title>
-          <a href={href}>{title}</a>
-        </PostCard.Title>
-      </PostCard>
-    )),
+    children: posts
+      .slice(0, 2)
+      .map(
+        ({
+          href,
+          title,
+          excerpt,
+          tags,
+          publishedAt,
+          formattedDate,
+          authorName,
+        }) => (
+          <PostCard key={href} excerpt={excerpt} tags={tags}>
+            <PostCard.Title>
+              <a href={href}>{title}</a>
+            </PostCard.Title>
+            <PostCard.Footer
+              publishedAt={publishedAt}
+              formattedDate={formattedDate}
+              authorName={authorName}
+            />
+          </PostCard>
+        ),
+      ),
   },
 };

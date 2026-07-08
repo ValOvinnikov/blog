@@ -61,8 +61,12 @@ describe(`<${PostCard.name}/>`, () => {
     expect(container.querySelectorAll('span[class]').length).toBe(0);
   });
 
-  it('renders author name when provided', () => {
-    render(<PostCard authorName="Jane Doe" />);
+  it('renders author name when provided via PostCard.Footer', () => {
+    render(
+      <PostCard>
+        <PostCard.Footer authorName="Jane Doe" />
+      </PostCard>,
+    );
     const visibleName = screen
       .getAllByText('Jane Doe')
       .find((el) => !el.classList.contains('sr-only'));
@@ -76,7 +80,11 @@ describe(`<${PostCard.name}/>`, () => {
 
   it('renders a time element with the correct dateTime and display text', () => {
     const iso = '2024-01-15T00:00:00Z';
-    render(<PostCard publishedAt={iso} formattedDate="January 15, 2024" />);
+    render(
+      <PostCard>
+        <PostCard.Footer publishedAt={iso} formattedDate="January 15, 2024" />
+      </PostCard>,
+    );
     const timeEl = screen.getByRole('time');
     expect(timeEl).toBeVisible();
     expect(timeEl).toHaveAttribute('dateTime', iso);
@@ -84,12 +92,20 @@ describe(`<${PostCard.name}/>`, () => {
   });
 
   it('does not render time element when publishedAt is omitted', () => {
-    render(<PostCard />);
+    render(
+      <PostCard>
+        <PostCard.Footer formattedDate="January 15, 2024" />
+      </PostCard>,
+    );
     expect(screen.queryByRole('time')).not.toBeInTheDocument();
   });
 
   it('does not render time element when formattedDate is omitted', () => {
-    render(<PostCard publishedAt="2024-01-15T00:00:00Z" />);
+    render(
+      <PostCard>
+        <PostCard.Footer publishedAt="2024-01-15T00:00:00Z" />
+      </PostCard>,
+    );
     expect(screen.queryByRole('time')).not.toBeInTheDocument();
   });
 
@@ -106,7 +122,7 @@ describe(`<${PostCard.name}/>`, () => {
     render(
       <PostCard>
         <PostCard.Meta
-          dateIso="2024-01-01"
+          dateValue="2024-01-01"
           dateLabel="Jan 1, 2024"
           category="design"
         />

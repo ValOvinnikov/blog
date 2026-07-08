@@ -13,14 +13,14 @@ const meta = {
     titleId: 'latest-posts',
     children: (
       <PostGrid>
-        <PostCard
-          excerpt="A compact post card inside a reusable labeled section."
-          publishedAt="2024-06-01T00:00:00Z"
-          formattedDate="June 1, 2024"
-        >
+        <PostCard excerpt="A compact post card inside a reusable labeled section.">
           <PostCard.Title>
             <a href="/posts/design-system">Building a Design System</a>
           </PostCard.Title>
+          <PostCard.Footer
+            publishedAt="2024-06-01T00:00:00Z"
+            formattedDate="June 1, 2024"
+          />
         </PostCard>
       </PostGrid>
     ),

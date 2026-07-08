@@ -125,8 +125,6 @@ export default async function HomePage({ params }: TProps) {
               <PostCard
                 key={post.id}
                 excerpt={post.excerpt}
-                publishedAt={post.publishedAt}
-                formattedDate={formatDate(post.publishedAt, locale)}
                 tags={post.categories.map((category) => category.title)}
               >
                 <PostCard.Title key="title">
@@ -134,6 +132,11 @@ export default async function HomePage({ params }: TProps) {
                     {post.title}
                   </NavLink>
                 </PostCard.Title>
+                <PostCard.Footer
+                  key="footer"
+                  publishedAt={post.publishedAt}
+                  formattedDate={formatDate(post.publishedAt, locale)}
+                />
               </PostCard>
             ))}
           </PostGrid>
