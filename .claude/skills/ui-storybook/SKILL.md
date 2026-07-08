@@ -34,15 +34,16 @@ The glob `../src/**/*.stories.@(ts|tsx)` picks them up automatically.
 Always use [Component Story Format 3](https://storybook.js.org/docs/writing-stories).
 
 ```tsx
-import type { Meta, StoryObj } from "@storybook/react";
-import { Button } from "./Button";
+import type { Meta, StoryObj } from '@storybook/react';
+import { Button } from './Button';
 
 const meta = {
-  title: "Atoms/Button",        // Atomic Design path
+  title: 'Atoms/Button', // Atomic Design path
   component: Button,
-  tags: ["autodocs"],            // generates the docs page
-  args: {                        // shared defaults across stories
-    children: "Click me",
+  tags: ['autodocs'], // generates the docs page
+  args: {
+    // shared defaults across stories
+    children: 'Click me',
   },
 } satisfies Meta<typeof Button>;
 
@@ -50,11 +51,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
-  args: { variant: "primary" },
+  args: { variant: 'primary' },
 };
 
 export const Secondary: Story = {
-  args: { variant: "secondary" },
+  args: { variant: 'secondary' },
 };
 ```
 
@@ -65,12 +66,92 @@ Match Atomic Design tiers: `"Atoms/Button"`, `"Molecules/PostCard"`,
 
 ## Args and controls
 
-- Define **all required props** as `args` on `meta` so Storybook generates
-  controls and a docs page automatically.
+- **All required props belong in `meta.args`**, not in individual stories. If
+  a prop appears in every story with the same value, it belongs in meta.
+  Individual stories only override what genuinely differs from those defaults.
+- Optional props that serve as a useful base (e.g. `className`, `size`) should
+  also go in `meta.args` when they're shared across stories.
 - For union types (variants, sizes) Storybook infers controls from TypeScript.
   Annotate with `argTypes` only when the inferred control is wrong.
 - Never pass live data or async functions as args — all props must be static
   and serialisable.
+
+```tsx
+// ✅ correct — shared props in meta, stories only override what changes
+const meta = {
+  component: Avatar,
+  args: { name: 'Jane Doe', alt: 'Jane Doe', size: Size.MD }, // required props here
+} satisfies Meta<typeof Avatar>;
+
+export const WithImage: TStory = { args: { src: '...' } }; // just the diff
+export const Small: TStory = { args: { size: Size.SM } };
+
+// ❌ wrong — required props repeated in every story
+export const WithImage: TStory = {
+  args: { name: 'Jane Doe', alt: 'Jane Doe', src: '...' },
+};
+export const Small: TStory = {
+  args: { name: 'Jane Doe', alt: 'Jane Doe', size: Size.SM },
+};
+```
+
+## `render` — prefer args; use render only when args can't express it
+
+Pass JSX children directly as `children` in `args`. Storybook renders JSX args
+correctly, and this keeps stories as plain objects with no boilerplate.
+
+```tsx
+// ✅ correct — children in args, no render
+const FillImage = () => (
+  <img
+    src="..."
+    style={{
+      position: 'absolute',
+      inset: 0,
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover',
+    }}
+  />
+);
+
+const meta = {
+  component: ImageWithCaption,
+  tags: ['autodocs'],
+  args: {
+    caption: 'A scenic mountain view',
+    className: 'aspect-video w-[480px]',
+    children: <FillImage />, // JSX element as arg
+  },
+} satisfies Meta<typeof ImageWithCaption>;
+
+export const WithCaption: TStory = {};
+export const WithoutCaption: TStory = { args: { caption: undefined } };
+
+// ❌ wrong — render used just to provide children that could be args
+export const WithCaption: TStory = {
+  args: { caption: 'A scenic mountain view' },
+  render: (args) => (
+    <ImageWithCaption {...args}>
+      <FillImage />
+    </ImageWithCaption>
+  ),
+};
+```
+
+The same rule applies to compound-slot children (`PostCard.Media`, `Hero.Cta`,
+`Footer.Nav`, etc.) — pass them as `children: <Slot>...</Slot>` in args and
+override per story when the composition changes.
+
+**Define any JSX helpers (like `FillImage`) before the `meta` const**, since
+`const` is not hoisted and the JSX evaluates at module initialisation time.
+
+Use `render` when args genuinely can't express the story's structure:
+
+- The story needs a stateful wrapper (e.g. controlled input demo)
+- The component must sit inside a specific DOM context (`<form>`, `<table>`)
+- Multiple component instances are composed side by side
+- A per-story context provider that doesn't belong in a global decorator
 
 ## Testing strategy
 
@@ -95,8 +176,8 @@ For complex components, add a `Component.mdx` file alongside stories to write
 long-form docs:
 
 ```mdx
-import { Canvas, Controls, Meta } from "@storybook/blocks";
-import * as ButtonStories from "./Button.stories";
+import { Canvas, Controls, Meta } from '@storybook/blocks';
+import * as ButtonStories from './Button.stories';
 
 <Meta of={ButtonStories} />
 

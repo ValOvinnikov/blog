@@ -8,19 +8,18 @@ const meta = {
   title: 'Molecules/ActionList',
   component: ActionList,
   tags: ['autodocs'],
-  parameters: {
-    layout: 'padded',
+  parameters: { layout: 'padded' },
+  args: {
+    children: (
+      <>
+        <NavLink href="/blog">{faker.lorem.words(2)}</NavLink>
+        <NavLink href="/about">{faker.lorem.words(2)}</NavLink>
+      </>
+    ),
   },
 } satisfies Meta<typeof ActionList>;
 
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-export const Default: TStory = {
-  render: () => (
-    <ActionList>
-      <NavLink href="/blog">{faker.lorem.words(2)}</NavLink>
-      <NavLink href="/about">{faker.lorem.words(2)}</NavLink>
-    </ActionList>
-  ),
-};
+export const Default: TStory = {};

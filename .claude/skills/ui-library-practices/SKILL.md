@@ -197,6 +197,7 @@ Import shared constants and types from `@blog/config` — never re-declare them 
   );
   ```
 - Always forward `className`; pass it as `class: className` in the `tv()` call — `tailwind-variants` handles merging internally. Never use `cn()` for this.
+- **Optional vs required props must match the render logic.** If a prop is only rendered conditionally (`{caption && <Caption>...}`), type it as `caption?: string` — not `caption: string`. A required prop the component ignores when falsy is a type lie; make it optional so callers never have to pass an empty string.
 - Prefer composition (`children`, slots) over boolean prop explosions.
 - Server-component-safe by default. **No `"use client"` allowed** — see Purity rules.
 
