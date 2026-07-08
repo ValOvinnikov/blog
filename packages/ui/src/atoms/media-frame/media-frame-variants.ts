@@ -1,0 +1,15 @@
+import { tv } from 'tailwind-variants';
+
+export const mediaFrameVariants = tv({
+  base: [
+    'relative isolate overflow-hidden',
+    'rounded-lg border border-border bg-surface-2',
+  ],
+  variants: {
+    ratio: {
+      video: ['aspect-video'],
+      square: ['aspect-square'],
+      portrait: ['aspect-[3/4]'],
+    },
+  },
+});
