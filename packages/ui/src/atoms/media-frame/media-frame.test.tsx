@@ -15,10 +15,31 @@ describe(`<${MediaFrame.name}/>`, () => {
     );
   });
 
-  it('accepts className override', () => {
-    const { container } = render(<MediaFrame className="aspect-video" />);
+  it('ratio="video" applies aspect-video', () => {
+    const { container } = render(<MediaFrame ratio="video" />);
     expect((container.firstChild as HTMLElement).className).toContain(
       'aspect-video',
+    );
+  });
+
+  it('ratio="square" applies aspect-square', () => {
+    const { container } = render(<MediaFrame ratio="square" />);
+    expect((container.firstChild as HTMLElement).className).toContain(
+      'aspect-square',
+    );
+  });
+
+  it('ratio="portrait" applies aspect-[3/4]', () => {
+    const { container } = render(<MediaFrame ratio="portrait" />);
+    expect((container.firstChild as HTMLElement).className).toContain(
+      'aspect-[3/4]',
+    );
+  });
+
+  it('accepts arbitrary aspect-ratio via className', () => {
+    const { container } = render(<MediaFrame className="aspect-[16/9]" />);
+    expect((container.firstChild as HTMLElement).className).toContain(
+      'aspect-[16/9]',
     );
   });
 

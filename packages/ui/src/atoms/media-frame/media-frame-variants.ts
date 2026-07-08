@@ -5,4 +5,11 @@ export const mediaFrameVariants = tv({
     'relative isolate overflow-hidden',
     'rounded-lg border border-border bg-surface-2',
   ],
+  variants: {
+    ratio: {
+      video: ['aspect-video'],
+      square: ['aspect-square'],
+      portrait: ['aspect-[3/4]'],
+    },
+  },
 });

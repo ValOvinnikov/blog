@@ -86,6 +86,10 @@ component inventory.
 
 - Co-locate `Component.test.tsx` (Vitest + Testing Library, jsdom). Query by
   role/text; assert behaviour, not class names. See `testing-practices`.
+- Use `@faker-js/faker` for realistic mock data in tests and stories — never
+  hardcode `"Title"` or `"Lorem ipsum"` when a faker call gives better coverage.
+  Seed tests for determinism: `faker.seed(123)` at the top of each test file.
+  Stories may use faker unseeded (they are not diffed in CI).
 - Add a Storybook story for every new or changed component — follow the
   `ui-storybook` skill. Stories are part of done, not optional.
 - Run `pnpm --filter @blog/ui type-check` after each major group of files —
