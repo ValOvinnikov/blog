@@ -9,9 +9,6 @@ export interface ILogoProps extends HTMLAttributes<HTMLSpanElement> {
 
 /**
  * Logo atom — renders a brand mark with an optional monospace accent suffix.
- *
- * @example
- * <Logo prefix="Val." suffix="dev" />
  */
 export const Logo = ({ prefix, suffix, className, ...rest }: ILogoProps) => {
   const { root, suffix: suffixSlot } = logoVariants();
