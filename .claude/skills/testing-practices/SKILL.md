@@ -66,7 +66,11 @@ export default mergeConfig(
 
 - Arrange–Act–Assert; one behaviour per `it`. Descriptive names:
   `it("renders the post title and author")`.
-- Prefer real user-facing queries (`getByRole`, `getByText`) over `data-testid`.
+- Prefer semantic queries (`getByRole`, `getByText`, `getByLabelText`) over
+  `getByTestId`. Use `getByTestId` when a semantic query would be ambiguous —
+  this is common in molecule and organism integration tests where the same role
+  appears multiple times (e.g. multiple `<img>` or `<button>` elements).
+  `IWithDataTestId` is on every `@blog/ui` component for exactly this purpose.
 - Use `vi.fn()` / `vi.mock()` for boundaries (the Sanity client, `service`).
 - Deterministic: no real dates/network/random. Inject or freeze.
 - A bug fix gets a regression test that fails before the fix.
