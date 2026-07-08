@@ -1,3 +1,6 @@
 import basePrettierConfig from '../../configs/prettier/index.js';
 
-export default { ...basePrettierConfig };
+export default {
+  ...basePrettierConfig,
+  plugins: ['prettier-plugin-tailwindcss'],
+};

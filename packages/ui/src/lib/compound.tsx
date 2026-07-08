@@ -56,5 +56,8 @@ type TSlotElement<Parts extends Record<string, ElementType>> = {
 }[keyof Parts];
 
 /** Strictly types a compound root's `children` to its own known slots. */
+type TMaybeSlotElement<Parts extends Record<string, ElementType>> =
+  TSlotElement<Parts> | false | null | undefined;
+
 export type TCompoundChildren<Parts extends Record<string, ElementType>> =
-  TSlotElement<Parts> | TSlotElement<Parts>[] | false | null | undefined;
+  TMaybeSlotElement<Parts> | TMaybeSlotElement<Parts>[];

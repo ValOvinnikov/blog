@@ -6,7 +6,7 @@ export const buttonVariants = tv({
     'inline-flex items-center justify-center',
     'rounded-sm',
     'font-display font-medium',
-    'transition-colors duration-[var(--dur-fast)]',
+    'transition-colors duration-fast ease-console',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
     'disabled:pointer-events-none disabled:opacity-50',
   ],

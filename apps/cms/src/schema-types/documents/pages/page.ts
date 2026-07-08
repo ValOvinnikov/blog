@@ -1,11 +1,11 @@
-import { DocumentIcon } from '@sanity/icons';
+import { FileText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 export default defineType({
   name: 'page',
   title: 'Page',
   type: 'document',
-  icon: DocumentIcon,
+  icon: FileText,
   fields: [
     defineField({
       name: 'title',

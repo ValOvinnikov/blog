@@ -40,7 +40,7 @@ const HeaderRoot = ({
     >
       {slots.Brand}
       {(slots.Nav || slots.Actions) && (
-        <div className="flex items-center gap-4">
+        <div className="flex min-w-0 flex-wrap items-center gap-4">
           {slots.Nav}
           {slots.Actions}
         </div>

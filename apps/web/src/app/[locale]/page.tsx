@@ -1,6 +1,13 @@
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { Hero, PostCard, PostGrid } from '@blog/ui';
+import {
+  ContentSection,
+  Hero,
+  LinkButton,
+  NavLink,
+  PostCard,
+  PostGrid,
+} from '@blog/ui';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -15,21 +22,44 @@ type TProps = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const result = await service.global.siteSettings.v1.getSiteSettings();
-  const settings = result.ok ? result.data : null;
-  const title = settings?.ogTitle ?? settings?.title ?? 'Blog';
-  const description = settings?.ogDescription ?? settings?.description ?? '';
-  const images = settings?.ogImageUrl ? [{ url: settings.ogImageUrl }] : [];
+  const [homeResult, settingsResult] = await Promise.all([
+    service.pages.home.v1.getHomePage(),
+    service.global.siteSettings.v1.getSiteSettings(),
+  ]);
+
+  const home = homeResult.ok ? homeResult.data : null;
+  const settings = settingsResult.ok ? settingsResult.data : null;
+  const title =
+    home?.seo?.metaTitle ??
+    home?.seo?.ogTitle ??
+    settings?.ogTitle ??
+    settings?.title ??
+    'Blog';
+  const description =
+    home?.seo?.metaDescription ??
+    home?.seo?.ogDescription ??
+    settings?.ogDescription ??
+    settings?.description ??
+    '';
+  const ogTitle = home?.seo?.ogTitle ?? title;
+  const ogDescription = home?.seo?.ogDescription ?? description;
+  const imageUrl = home?.seo?.ogImageUrl ?? settings?.ogImageUrl;
+  const images = imageUrl ? [{ url: imageUrl }] : [];
 
   return {
     title,
     description,
     alternates: { canonical: '/' },
-    openGraph: { title, description, images, type: 'website' },
+    openGraph: {
+      title: ogTitle,
+      description: ogDescription,
+      images,
+      type: 'website',
+    },
     twitter: {
       card: 'summary_large_image',
-      title,
-      description,
+      title: ogTitle,
+      description: ogDescription,
       images: images.map((image) => image.url),
     },
   };
@@ -46,68 +76,68 @@ export default async function HomePage({ params }: TProps) {
     notFound();
   }
 
-  console.info(result.data);
-  const { featuredPosts, recentPosts } = result.data;
-
-  const featuredPost = featuredPosts[0];
-
+  const { hero, latestPosts, latestPostsTitle } = result.data;
+  console.info(latestPosts);
   return (
-    <Container as="main">
-      {featuredPost && (
-        <Hero
-          eyebrow={featuredPost.categories[0]?.title}
-          title={featuredPost.title}
-          excerpt={featuredPost.excerpt}
-          tags={featuredPost.categories.map((category) => category.title)}
-          publishedAt={featuredPost.publishedAt}
-          formattedDate={formatDate(featuredPost.publishedAt, locale)}
-          ariaLabel="Featured post"
-        >
-          <Hero.Media key="media">
-            {featuredPost.mainImageUrl && (
-              <Image
-                src={featuredPost.mainImageUrl}
-                alt={featuredPost.mainImageAlt}
-                fill
-                className="object-cover"
-                priority
-              />
+    <Container as="main" className="py-page-y">
+      <Hero
+        eyebrow={hero.eyebrow}
+        title={hero.title}
+        excerpt={hero.subtitle}
+        ariaLabel="Featured post"
+      >
+        {(hero.primaryAction || hero.secondaryAction) && (
+          <Hero.Cta>
+            {hero.primaryAction && (
+              <LinkButton as={Link} href={hero.primaryAction.href}>
+                {hero.primaryAction.label}
+              </LinkButton>
             )}
-          </Hero.Media>
-          <Hero.Cta key="cta">
-            <Link href={`/blog/${featuredPost.slug}`}>Read more</Link>
+            {hero.secondaryAction && (
+              <LinkButton
+                as={Link}
+                href={hero.secondaryAction.href}
+                variant="link"
+              >
+                {hero.secondaryAction.label}
+              </LinkButton>
+            )}
           </Hero.Cta>
-        </Hero>
-      )}
+        )}
 
-      {recentPosts.length > 0 && (
-        <PostGrid>
-          {recentPosts.map((post) => (
-            <PostCard
-              key={post.id}
-              excerpt={post.excerpt}
-              tags={post.categories.map((category) => category.title)}
-              publishedAt={post.publishedAt}
-              formattedDate={formatDate(post.publishedAt, locale)}
-              authorName={post.author?.name}
-              authorAvatarSrc={post.author?.imageUrl}
-            >
-              <PostCard.Media key="media">
-                {post.mainImageUrl && (
-                  <Image
-                    src={post.mainImageUrl}
-                    alt={post.mainImageAlt}
-                    fill
-                    className="object-cover"
-                  />
-                )}
-              </PostCard.Media>
-              <PostCard.Title key="title">
-                <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-              </PostCard.Title>
-            </PostCard>
-          ))}
-        </PostGrid>
+        {hero.image && (
+          <Hero.Media key="media">
+            <Image
+              src={hero.image.src}
+              alt={hero.image.alt}
+              fill
+              className="object-cover"
+              priority
+            />
+          </Hero.Media>
+        )}
+      </Hero>
+
+      {latestPosts.length > 0 && (
+        <ContentSection title={latestPostsTitle} titleId="latest-posts-title">
+          <PostGrid>
+            {latestPosts.map((post) => (
+              <PostCard
+                key={post.id}
+                excerpt={post.excerpt}
+                publishedAt={post.publishedAt}
+                formattedDate={formatDate(post.publishedAt, locale)}
+                tags={post.categories.map((category) => category.title)}
+              >
+                <PostCard.Title key="title">
+                  <NavLink as={Link} href={`/blog/${post.slug}`}>
+                    {post.title}
+                  </NavLink>
+                </PostCard.Title>
+              </PostCard>
+            ))}
+          </PostGrid>
+        </ContentSection>
       )}
     </Container>
   );

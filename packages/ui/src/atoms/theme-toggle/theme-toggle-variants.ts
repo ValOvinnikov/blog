@@ -5,7 +5,7 @@ export const themeToggleVariants = tv({
     'inline-flex h-9 w-9 items-center justify-center',
     'rounded-sm',
     'text-text-muted',
-    'transition-colors duration-[var(--dur-fast)]',
+    'transition-colors duration-fast ease-console',
     'hover:bg-surface-2 hover:text-text',
   ],
 });

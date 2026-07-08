@@ -119,6 +119,69 @@ export type SiteSettings = {
   >;
 };
 
+export type HomePage = {
+  _id: string;
+  _type: 'homePage';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  featuredPost?: {
+    _ref: string;
+    _type: 'reference';
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: 'post';
+  };
+  heroEyebrowMode?: 'postCategory' | 'custom';
+  heroEyebrow?: string;
+  heroTitleMode?: 'postTitle' | 'custom';
+  heroTitle?: string;
+  heroSubtitleMode?: 'postExcerpt' | 'custom';
+  heroSubtitle?: string;
+  heroImageMode?: 'postImage' | 'custom' | 'none';
+  heroImage?: ImageWithAlt;
+  primaryActionLabel?: string;
+  secondaryAction?: {
+    _ref: string;
+    _type: 'reference';
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: 'link';
+  };
+  latestPostsTitle?: string;
+  latestPostsLimit?: number;
+  seo?: Seo;
+};
+
+export type Link = {
+  _id: string;
+  _type: 'link';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  label?: string;
+  linkType?: 'internal' | 'external';
+  internalReference?:
+    | {
+        _ref: string;
+        _type: 'reference';
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: 'post';
+      }
+    | {
+        _ref: string;
+        _type: 'reference';
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: 'category';
+      }
+    | {
+        _ref: string;
+        _type: 'reference';
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: 'page';
+      };
+  url?: string;
+};
+
 export type Page = {
   _id: string;
   _type: 'page';
@@ -323,6 +386,8 @@ export type AllSanitySchemaTypes =
   | PortableText
   | ImageWithAlt
   | SiteSettings
+  | HomePage
+  | Link
   | Page
   | Slug
   | Category
