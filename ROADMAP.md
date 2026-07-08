@@ -148,9 +148,17 @@ only what's new. Deploy happens once, at the end (3e).
 
 ### 3a — Home page (`/`)
 
-- [ ] `ui` components (build only if missing): `NavLink` (atom), `Header` (organism, nav + `ThemeToggle`), `Footer` (organism), `PostCard` (molecule), `PostGrid` (organism), `Hero` (organism).
-- [ ] `web`: `app/page.tsx` — featured + latest, fetched via `service`, composed from the above.
-- [ ] Per-route `generateMetadata` (canonical, OG, Twitter).
+Home is a dedicated vertical slice. See `docs/home-page-rollout.md` for the
+source-of-truth content model and rollout contract. It uses a `homePage`
+singleton in Sanity, not the generic `page` document. The generic `page`
+document and `page.template` rendering remain Phase 4/page-builder work.
+
+- [ ] `cms`: add `homePage` singleton; organize Studio into Pages, Blog, and Settings groups.
+- [ ] `typegen`: regenerate Sanity types after the singleton is registered.
+- [ ] `service`: fetch Home singleton, resolve/fallback featured post, map hero override modes, and return latest posts ordered by `publishedAt desc`.
+- [ ] `ui`: align existing `Hero`, `PostCard`, `PostGrid`, `Header`, and `Footer` components to the Home design reference only where needed.
+- [ ] `web`: localized Home route renders CMS-authored hero + latest posts via `service`; no GROQ/Sanity client in `web`.
+- [ ] Per-route `generateMetadata` (canonical, OG, Twitter) from Home SEO with site settings fallback.
 
 ### 3b — Blog list (`/blog`)
 

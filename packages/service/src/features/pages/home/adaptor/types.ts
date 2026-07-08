@@ -1,6 +1,28 @@
 import type { TPostCard } from '#/shared/transformers/to-post-card';
+import type { TSeoMeta } from '#/shared/transformers/to-seo-meta';
+
+export type THomeHeroImage = {
+  src: string;
+  alt: string;
+};
+
+export type THomeHeroAction = {
+  label: string;
+  href: string;
+};
+
+export type THomeHero = {
+  eyebrow: string | undefined;
+  title: string;
+  subtitle: string | undefined;
+  image: THomeHeroImage | undefined;
+  primaryAction: THomeHeroAction | undefined;
+  secondaryAction: THomeHeroAction | undefined;
+};
 
 export type THomePage = {
-  featuredPosts: TPostCard[];
-  recentPosts: TPostCard[];
+  hero: THomeHero;
+  latestPostsTitle: string;
+  latestPosts: TPostCard[];
+  seo: TSeoMeta | undefined;
 };

@@ -3,9 +3,12 @@ import { tv } from 'tailwind-variants';
 export const postCardVariants = tv({
   slots: {
     root: [
-      'flex flex-col h-full overflow-hidden rounded',
+      'relative flex h-full flex-col overflow-hidden rounded-md',
       'bg-surface border border-border',
-      'transition-colors hover:border-border-strong',
+      'transition-[transform,border-color] duration-base ease-console',
+      'hover:-translate-y-0.5 hover:border-border-strong',
+      'focus-within:-translate-y-0.5 focus-within:border-border-strong',
+      'motion-reduce:transition-none motion-reduce:transform-none',
     ],
     content: ['flex flex-col flex-1', 'px-4 py-4 gap-2'],
     excerpt: ['text-sm leading-[1.55]', 'text-text-muted line-clamp-3'],

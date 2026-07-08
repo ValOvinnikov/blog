@@ -1,4 +1,4 @@
 @import '@blog/tailwind-config/theme.css';
 
 /* Tell Tailwind to scan ui package source for class names */
-@source "../../../../packages/ui/src/**/*.{ts,tsx}";
+@source '../../packages/ui/src/**/*.{ts,tsx}';

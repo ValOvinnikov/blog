@@ -45,9 +45,8 @@ const HeroRoot = ({
   ariaLabel,
   ...rest
 }: IHeroProps) => {
-  const s = heroVariants();
-
   const { slots, unmatched } = mapCompoundSlots(children, HeroParts);
+  const s = heroVariants({ hasMedia: Boolean(slots.Media) });
 
   return (
     <section
@@ -56,7 +55,6 @@ const HeroRoot = ({
       data-testid={dataTestId}
       {...rest}
     >
-      {slots.Media}
       <div className={s.content()}>
         {eyebrow && <p className={s.eyebrow()}>{eyebrow}</p>}
         {publishedAt && formattedDate && (
@@ -80,6 +78,7 @@ const HeroRoot = ({
           <Fragment key={i}>{node}</Fragment>
         ))}
       </div>
+      {slots.Media}
     </section>
   );
 };

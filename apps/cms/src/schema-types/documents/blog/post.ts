@@ -1,11 +1,11 @@
-import { ComposeIcon } from '@sanity/icons';
+import { Newspaper } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export default defineType({
   name: 'post',
   title: 'Post',
   type: 'document',
-  icon: ComposeIcon,
+  icon: Newspaper,
   fields: [
     defineField({
       name: 'title',

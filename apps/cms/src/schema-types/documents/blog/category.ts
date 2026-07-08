@@ -1,11 +1,11 @@
-import { TagIcon } from '@sanity/icons';
+import { Tags } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 export default defineType({
   name: 'category',
   title: 'Category',
   type: 'document',
-  icon: TagIcon,
+  icon: Tags,
   fields: [
     defineField({
       name: 'title',

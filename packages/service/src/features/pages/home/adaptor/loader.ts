@@ -1,10 +1,14 @@
 import { isr, runQuery } from '#/sanity/query';
 
-import { homePageQuery } from './query';
+import { homePagePostsQuery, homePageQuery } from './query';
 import { toHomePage } from './transformer';
 import type { THomePage } from './types';
 
 export async function getHomePage(): Promise<THomePage> {
-  const raw = await runQuery(homePageQuery, isr('posts'));
-  return toHomePage(raw);
+  const [rawHome, rawPosts] = await Promise.all([
+    runQuery(homePageQuery, isr('homePage')),
+    runQuery(homePagePostsQuery, isr('posts')),
+  ]);
+
+  return toHomePage(rawHome, rawPosts);
 }

@@ -1,5 +1,7 @@
 # AGENTS.md
 
+<!-- Mirror of CLAUDE.md — only difference is the agent directory path in "Use the scoped agents" (line 36: .Codex/agents/ vs .claude/agents/). Keep in sync when rules change. -->
+
 Guidance for working in this repo. See `SPEC.md` (architecture) and
 `IMPLEMENTATION_BRIEF.md` (build steps) for detail.
 
@@ -36,6 +38,13 @@ Delegate layer work to the matching subagent in `.Codex/agents/`, in dependency
 order (`cms → service → ui → web`):
 `cms` (schemas/typegen), `service` (data layer), `ui` (design system),
 `web` (frontend/SEO + composition).
+
+**Orchestrator must not write layer files before delegating.** Do not create
+stub or partial files in a layer owned by a subagent — the subagent owns file
+creation end-to-end and applies the layer's skill conventions from the start.
+Handing a subagent pre-written stubs bypasses those conventions and breaks the
+delegation model. If you need to communicate structure, describe it in the
+prompt — do not write it to disk first.
 
 ## Use the skills
 

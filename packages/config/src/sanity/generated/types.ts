@@ -12,6 +12,8 @@
  * ---------------------------------------------------------------------------------
  */
 
+export declare const internalGroqTypeReferenceTo: unique symbol;
+
 // Source: schema.json
 export type Seo = {
   _type: 'seo';
@@ -80,14 +82,16 @@ export type PortableText = Array<
     } & Code)
 >;
 
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+};
+
 export type ImageWithAlt = {
   _type: 'imageWithAlt';
-  asset?: {
-    _ref: string;
-    _type: 'reference';
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
-  };
+  asset?: SanityImageAssetReference;
   media?: unknown;
   hotspot?: SanityImageHotspot;
   crop?: SanityImageCrop;
@@ -119,6 +123,69 @@ export type SiteSettings = {
   >;
 };
 
+export type PostReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'post';
+};
+
+export type LinkReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'link';
+};
+
+export type HomePage = {
+  _id: string;
+  _type: 'homePage';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  featuredPost?: PostReference;
+  heroEyebrowMode?: 'postCategory' | 'custom';
+  heroEyebrow?: string;
+  heroTitleMode?: 'postTitle' | 'custom';
+  heroTitle?: string;
+  heroSubtitleMode?: 'postExcerpt' | 'custom';
+  heroSubtitle?: string;
+  heroImageMode?: 'postImage' | 'custom' | 'none';
+  heroImage?: ImageWithAlt;
+  primaryActionLabel?: string;
+  secondaryAction?: LinkReference;
+  latestPostsTitle?: string;
+  latestPostsLimit?: number;
+  seo?: Seo;
+};
+
+export type CategoryReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'category';
+};
+
+export type PageReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page';
+};
+
+export type Link = {
+  _id: string;
+  _type: 'link';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  label?: string;
+  linkType?: 'internal' | 'external';
+  internalReference?: PostReference | CategoryReference | PageReference;
+  url?: string;
+};
+
 export type Page = {
   _id: string;
   _type: 'page';
@@ -147,6 +214,13 @@ export type Category = {
   description?: string;
 };
 
+export type AuthorReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'author';
+};
+
 export type Post = {
   _id: string;
   _type: 'post';
@@ -157,19 +231,12 @@ export type Post = {
   slug?: Slug;
   excerpt?: string;
   mainImage?: ImageWithAlt;
-  author?: {
-    _ref: string;
-    _type: 'reference';
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: 'author';
-  };
-  categories?: Array<{
-    _ref: string;
-    _type: 'reference';
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: 'category';
-  }>;
+  author?: AuthorReference;
+  categories?: Array<
+    {
+      _key: string;
+    } & CategoryReference
+  >;
   tags?: Array<string>;
   publishedAt?: string;
   body?: PortableText;
@@ -252,6 +319,7 @@ export type SanityImageMetadata = {
   palette?: SanityImagePalette;
   lqip?: string;
   blurHash?: string;
+  thumbHash?: string;
   hasAlpha?: boolean;
   isOpaque?: boolean;
 };
@@ -321,11 +389,19 @@ export type AllSanitySchemaTypes =
   | SocialLink
   | BlockText
   | PortableText
+  | SanityImageAssetReference
   | ImageWithAlt
   | SiteSettings
+  | PostReference
+  | LinkReference
+  | HomePage
+  | CategoryReference
+  | PageReference
+  | Link
   | Page
   | Slug
   | Category
+  | AuthorReference
   | Post
   | Author
   | SanityImageCrop
@@ -339,4 +415,3 @@ export type AllSanitySchemaTypes =
   | SanityAssetSourceData
   | SanityImageAsset
   | Geopoint;
-export declare const internalGroqTypeReferenceTo: unique symbol;

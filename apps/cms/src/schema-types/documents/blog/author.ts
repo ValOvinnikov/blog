@@ -1,11 +1,11 @@
-import { UserIcon } from '@sanity/icons';
+import { UserRound } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export default defineType({
   name: 'author',
   title: 'Author',
   type: 'document',
-  icon: UserIcon,
+  icon: UserRound,
   fields: [
     defineField({
       name: 'name',

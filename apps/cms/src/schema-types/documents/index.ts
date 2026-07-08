@@ -1,7 +1,17 @@
-import author from './author';
-import category from './category';
-import page from './page';
-import post from './post';
-import siteSettings from './site-settings';
+import author from './blog/author';
+import category from './blog/category';
+import post from './blog/post';
+import homePage from './pages/home-page';
+import page from './pages/page';
+import link from './settings/link';
+import siteSettings from './settings/site-settings';
 
-export const documents = [post, author, category, page, siteSettings];
+export const documents = [
+  post,
+  author,
+  category,
+  page,
+  link,
+  homePage,
+  siteSettings,
+];

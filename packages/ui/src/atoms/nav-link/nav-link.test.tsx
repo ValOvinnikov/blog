@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import type { AnchorHTMLAttributes } from 'react';
 
 import { NavLink } from './nav-link';
 
@@ -39,7 +40,7 @@ describe(`<${NavLink.name}/>`, () => {
       href,
       children,
       ...props
-    }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
       <a href={href} data-custom="true" {...props}>
         {children}
       </a>

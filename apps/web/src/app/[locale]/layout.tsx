@@ -1,4 +1,4 @@
-import '../globals.css';
+import '../../../index.css';
 
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
