@@ -7,6 +7,7 @@ export default defineCliConfig({
   },
   typegen: {
     path: './src/**/*.{ts,tsx}',
+    schema: '../../packages/config/src/sanity/generated/schema.json',
     generates: '../../packages/config/src/sanity/generated/types.ts',
     overloadClientMethods: true,
   },

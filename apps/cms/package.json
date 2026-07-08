@@ -5,7 +5,7 @@
     "dev": "sanity dev",
     "build": "sanity build",
     "deploy": "sanity deploy",
-    "typegen": "sanity schema extract && sanity typegen generate",
+    "typegen": "sanity schema extract --path ../../packages/config/src/sanity/generated/schema.json && sanity typegen generate",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "format": "prettier --write ."

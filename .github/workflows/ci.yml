@@ -102,10 +102,32 @@ jobs:
       - name: Test
         run: pnpm test
 
+  typegen:
+    name: Typegen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typegen
+        working-directory: apps/cms
+        run: pnpm exec sanity typegen generate
+
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [type-check, lint, test]
+    needs: [type-check, lint, test, typegen]
     steps:
       - uses: actions/checkout@v7
 
