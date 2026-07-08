@@ -2,19 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 import { MediaFrame } from './media-frame';
 
-const meta = {
-  title: 'Atoms/MediaFrame',
-  component: MediaFrame,
-  tags: ['autodocs'],
-} satisfies Meta<typeof MediaFrame>;
-
-export default meta;
-type TStory = StoryObj<typeof meta>;
-
-/** Simulates a Next.js `<Image fill />` child using a plain img tag. */
-const FillImage = ({ seed = 'media' }: { seed?: string }) => (
+const FillImage = () => (
   <img
-    src={`https://picsum.photos/seed/${seed}/800/600`}
+    src="https://picsum.photos/seed/media/800/600"
     alt="placeholder"
     style={{
       position: 'absolute',
@@ -26,34 +16,30 @@ const FillImage = ({ seed = 'media' }: { seed?: string }) => (
   />
 );
 
-export const Video: TStory = {
-  render: () => (
-    <MediaFrame ratio="video" className="w-96">
-      <FillImage seed="video" />
-    </MediaFrame>
-  ),
-};
+const meta = {
+  title: 'Atoms/MediaFrame',
+  component: MediaFrame,
+  tags: ['autodocs'],
+  args: {
+    ratio: 'video',
+    className: 'w-96',
+    children: <FillImage />,
+  },
+} satisfies Meta<typeof MediaFrame>;
+
+export default meta;
+type TStory = StoryObj<typeof meta>;
+
+export const Video: TStory = {};
 
 export const Square: TStory = {
-  render: () => (
-    <MediaFrame ratio="square" className="w-48">
-      <FillImage seed="square" />
-    </MediaFrame>
-  ),
+  args: { ratio: 'square', className: 'w-48' },
 };
 
 export const Portrait: TStory = {
-  render: () => (
-    <MediaFrame ratio="portrait" className="w-48">
-      <FillImage seed="portrait" />
-    </MediaFrame>
-  ),
+  args: { ratio: 'portrait', className: 'w-48' },
 };
 
 export const CustomRatio: TStory = {
-  render: () => (
-    <MediaFrame className="aspect-[16/9] w-96">
-      <FillImage seed="custom" />
-    </MediaFrame>
-  ),
+  args: { ratio: undefined, className: 'aspect-[16/9] w-96' },
 };

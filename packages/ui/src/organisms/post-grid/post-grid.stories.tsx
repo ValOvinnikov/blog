@@ -3,16 +3,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { PostCard } from '../../molecules/post-card';
 import { PostGrid } from './post-grid';
 
-const meta: Meta<typeof PostGrid> = {
-  title: 'Organisms/PostGrid',
-  component: PostGrid,
-  tags: ['autodocs'],
-  parameters: { layout: 'padded' },
-};
-export default meta;
-
-type TStory = StoryObj<typeof PostGrid>;
-
 const posts = [
   {
     href: '/posts/building-a-design-system',
@@ -46,30 +36,35 @@ const posts = [
   },
 ];
 
-export const Default: TStory = {
-  render: () => (
-    <PostGrid>
-      {posts.map(({ href, title, ...rest }) => (
-        <PostCard key={href} {...rest}>
-          <PostCard.Title>
-            <a href={href}>{title}</a>
-          </PostCard.Title>
-        </PostCard>
-      ))}
-    </PostGrid>
-  ),
-};
+const meta = {
+  title: 'Organisms/PostGrid',
+  component: PostGrid,
+  tags: ['autodocs'],
+  parameters: { layout: 'padded' },
+  args: {
+    children: posts.map(({ href, title, ...rest }) => (
+      <PostCard key={href} {...rest}>
+        <PostCard.Title>
+          <a href={href}>{title}</a>
+        </PostCard.Title>
+      </PostCard>
+    )),
+  },
+} satisfies Meta<typeof PostGrid>;
+
+export default meta;
+type TStory = StoryObj<typeof meta>;
+
+export const Default: TStory = {};
 
 export const TwoColumn: TStory = {
-  render: () => (
-    <PostGrid>
-      {posts.slice(0, 2).map(({ href, title, ...rest }) => (
-        <PostCard key={href} {...rest}>
-          <PostCard.Title>
-            <a href={href}>{title}</a>
-          </PostCard.Title>
-        </PostCard>
-      ))}
-    </PostGrid>
-  ),
+  args: {
+    children: posts.slice(0, 2).map(({ href, title, ...rest }) => (
+      <PostCard key={href} {...rest}>
+        <PostCard.Title>
+          <a href={href}>{title}</a>
+        </PostCard.Title>
+      </PostCard>
+    )),
+  },
 };

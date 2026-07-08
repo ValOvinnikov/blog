@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 import { Hero } from './hero';
 
-const meta: Meta<typeof Hero> = {
+const meta = {
   title: 'Organisms/Hero',
   component: Hero,
   tags: ['autodocs'],
@@ -15,27 +15,26 @@ const meta: Meta<typeof Hero> = {
     publishedAt: '2024-06-01T00:00:00Z',
     formattedDate: 'June 1, 2024',
     ariaLabel: 'Featured post',
+    children: (
+      <>
+        <Hero.Media>
+          <img
+            src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=675&fit=crop"
+            alt="Code editor showing component code"
+          />
+        </Hero.Media>
+        <Hero.Cta>
+          <a href="/posts/design-system">Read more</a>
+        </Hero.Cta>
+      </>
+    ),
   },
-};
+} satisfies Meta<typeof Hero>;
+
 export default meta;
+type TStory = StoryObj<typeof meta>;
 
-type TStory = StoryObj<typeof Hero>;
-
-export const Full: TStory = {
-  render: (args) => (
-    <Hero {...args}>
-      <Hero.Media>
-        <img
-          src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=675&fit=crop"
-          alt="Code editor showing component code"
-        />
-      </Hero.Media>
-      <Hero.Cta>
-        <a href="/posts/design-system">Read more</a>
-      </Hero.Cta>
-    </Hero>
-  ),
-};
+export const Full: TStory = {};
 
 export const Minimal: TStory = {
   args: {
@@ -46,44 +45,31 @@ export const Minimal: TStory = {
     tags: undefined,
     publishedAt: undefined,
     formattedDate: undefined,
+    children: undefined,
   },
-  render: (args) => <Hero {...args} />,
 };
 
 export const WithoutEyebrow: TStory = {
-  args: { eyebrow: undefined },
-  render: (args) => (
-    <Hero {...args}>
+  args: {
+    eyebrow: undefined,
+    children: (
       <Hero.Cta>
         <a href="/posts/design-system">Read more</a>
       </Hero.Cta>
-    </Hero>
-  ),
+    ),
+  },
 };
 
 export const WithoutImage: TStory = {
-  render: (args) => (
-    <Hero {...args}>
+  args: {
+    children: (
       <Hero.Cta>
         <a href="/posts/design-system">Read more</a>
       </Hero.Cta>
-    </Hero>
-  ),
+    ),
+  },
 };
 
 export const WithoutTags: TStory = {
   args: { tags: undefined },
-  render: (args) => (
-    <Hero {...args}>
-      <Hero.Media>
-        <img
-          src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=675&fit=crop"
-          alt="Code editor showing component code"
-        />
-      </Hero.Media>
-      <Hero.Cta>
-        <a href="/posts/design-system">Read more</a>
-      </Hero.Cta>
-    </Hero>
-  ),
 };

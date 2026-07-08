@@ -3,44 +3,30 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 import { Avatar } from './avatar';
 
-const meta: Meta<typeof Avatar> = {
+const meta = {
   title: 'Atoms/Avatar',
   component: Avatar,
   tags: ['autodocs'],
-};
-export default meta;
+  args: {
+    name: 'Jane Doe',
+    alt: 'Jane Doe',
+    size: Size.MD,
+  },
+} satisfies Meta<typeof Avatar>;
 
-type TStory = StoryObj<typeof Avatar>;
+export default meta;
+type TStory = StoryObj<typeof meta>;
 
 export const WithImage: TStory = {
-  args: {
-    src: 'https://i.pravatar.cc/150?img=1',
-    alt: 'Jane Doe',
-    name: 'Jane Doe',
-    size: Size.MD,
-  },
+  args: { src: 'https://i.pravatar.cc/150?img=1' },
 };
 
-export const Initials: TStory = {
-  args: {
-    alt: 'Jane Doe',
-    name: 'Jane Doe',
-    size: Size.MD,
-  },
-};
+export const Initials: TStory = {};
 
 export const Small: TStory = {
-  args: {
-    alt: 'Jane Doe',
-    name: 'Jane Doe',
-    size: Size.SM,
-  },
+  args: { size: Size.SM },
 };
 
 export const Large: TStory = {
-  args: {
-    alt: 'Jane Doe',
-    name: 'Jane Doe',
-    size: Size.LG,
-  },
+  args: { size: Size.LG },
 };

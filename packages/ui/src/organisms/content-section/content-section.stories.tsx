@@ -4,22 +4,14 @@ import { PostCard } from '../../molecules/post-card';
 import { PostGrid } from '../post-grid';
 import { ContentSection } from './content-section';
 
-const meta: Meta<typeof ContentSection> = {
+const meta = {
   title: 'Organisms/ContentSection',
   component: ContentSection,
   tags: ['autodocs'],
   args: {
     title: 'Latest',
     titleId: 'latest-posts',
-  },
-};
-export default meta;
-
-type TStory = StoryObj<typeof ContentSection>;
-
-export const WithPostGrid: TStory = {
-  render: (args) => (
-    <ContentSection {...args}>
+    children: (
       <PostGrid>
         <PostCard
           excerpt="A compact post card inside a reusable labeled section."
@@ -31,6 +23,11 @@ export const WithPostGrid: TStory = {
           </PostCard.Title>
         </PostCard>
       </PostGrid>
-    </ContentSection>
-  ),
-};
+    ),
+  },
+} satisfies Meta<typeof ContentSection>;
+
+export default meta;
+type TStory = StoryObj<typeof meta>;
+
+export const WithPostGrid: TStory = {};
