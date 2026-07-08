@@ -10,6 +10,7 @@ import type { ComponentPropsWithoutRef, ElementType } from 'react';
 import { Fragment } from 'react';
 
 import { PostCardMedia } from './components/media/post-card-media';
+import { PostCardMeta } from './components/meta/post-card-meta';
 import { PostCardTitle } from './components/title/post-card-title';
 import { postCardVariants } from './post-card-variants';
 
@@ -17,6 +18,7 @@ const s = postCardVariants();
 
 const PostCardParts = {
   Media: PostCardMedia,
+  Meta: PostCardMeta,
   Title: PostCardTitle,
 } satisfies Record<string, ElementType>;
 
@@ -55,6 +57,7 @@ const PostCardRoot = ({
     >
       {slots.Media}
       <div className={s.content()}>
+        {slots.Meta}
         {slots.Title}
         {unmatched.map((node, i) => (
           <Fragment key={i}>{node}</Fragment>

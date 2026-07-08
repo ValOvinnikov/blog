@@ -102,6 +102,17 @@ describe(`<${PostCard.name}/>`, () => {
     expect(screen.getByText('stray content')).toBeVisible();
   });
 
+  it('renders PostCard.Meta content', () => {
+    render(
+      <PostCard>
+        <PostCard.Meta>
+          <span>Jan 1, 2024</span>
+        </PostCard.Meta>
+      </PostCard>,
+    );
+    expect(screen.getByText('Jan 1, 2024')).toBeVisible();
+  });
+
   it('forwards data-testid to root element', () => {
     render(<PostCard dataTestId="post-card" />);
     expect(screen.getByTestId('post-card')).toBeVisible();
