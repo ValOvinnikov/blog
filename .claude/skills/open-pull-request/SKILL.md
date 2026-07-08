@@ -32,11 +32,29 @@ Work through these gates in order. **Stop at each gate and wait for the user.**
 
 ### Gate 0 — Pull the issue and set In Progress
 
-1. Find the GitHub Project item for the issue:
+1. **Look up the project item ID in memory first.**
+   Read `memory/reference_project_item_ids.md` (in the project memory directory).
+   If the issue number is in the table, use that ID — skip the API query entirely.
+
+   If it is **not** in the table, fetch it:
+
    ```
    gh api graphql -f query='{ user(login:"ValOvinnikov") { projectV2(number:2) {
-     items(first:50) { nodes { id content { ... on Issue { number } } } } } } }'
+     items(first:100) { nodes { id content { ... on Issue { number } } } } } } }'
    ```
+
+   **Immediately after fetching**, append a new row to
+   `memory/reference_project_item_ids.md` using the Edit tool:
+
+   ```
+   | #<n>  | PVTI_…      |
+   ```
+
+   Do this before setting In Progress — if you skip it, Gate 5 will need
+   another API call to find the same ID.
+
+   Keep the item ID in context — it is reused at Gate 5 without another lookup.
+
 2. Set status → **In Progress** (`47fc9ee4`) for the issue being worked on:
    ```
    gh api graphql -f query='mutation {
@@ -56,8 +74,8 @@ Work through these gates in order. **Stop at each gate and wait for the user.**
      issue(number:<n>) { parent { number } } } }'
    ```
 
-   If a parent exists and is not already In Progress, set it to In Progress using
-   the same mutation with the parent's project item ID.
+   If a parent exists and is not already In Progress, look up its item ID the
+   same way (memory first, then API) and set it to In Progress.
 
 4. Checkout a new branch from up-to-date `main`:
    ```
