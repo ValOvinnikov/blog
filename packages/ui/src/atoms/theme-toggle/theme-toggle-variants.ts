@@ -2,11 +2,13 @@ import { tv } from 'tailwind-variants';
 
 export const themeToggleVariants = tv({
   base: [
-    'inline-flex h-9 w-9 items-center justify-center',
+    'inline-flex size-[22px] items-center justify-center',
     'rounded-sm',
-    'text-text-muted',
+    'text-muted',
     'transition-colors duration-fast ease-console',
-    'hover:bg-surface-2 hover:text-text',
+    'hover:text-text',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+    'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
   ],
 });
 

@@ -1,8 +1,5 @@
-'use client';
-
 import type { IWithDataTestId } from '@blog/config';
 import { Moon, Sun } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
 import {
   themeTogglePlaceholderVariants,
@@ -11,51 +8,35 @@ import {
 
 export interface IThemeToggleProps extends IWithDataTestId {
   className?: string;
+  isDark: boolean;
+  onToggle: () => void;
+  mounted?: boolean;
   lightLabel?: string;
   darkLabel?: string;
 }
 
-type TTheme = 'light' | 'dark';
-
-const readTheme = (): TTheme => {
-  if (typeof document === 'undefined') return 'light';
-  return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-};
-
+/**
+ * A pure, controlled theme-switch button. The consumer owns the actual theme
+ * state (e.g. reading/writing `document.documentElement` and `localStorage`
+ * in `apps/web`) and passes it down via `isDark`/`onToggle`. Renders a
+ * placeholder while `mounted` is `false` to avoid a hydration-mismatch flash
+ * before the consumer knows the real theme.
+ */
 export const ThemeToggle = ({
   className,
   dataTestId,
+  isDark,
+  onToggle,
+  mounted = true,
   lightLabel = 'Switch to light theme',
   darkLabel = 'Switch to dark theme',
 }: IThemeToggleProps) => {
-  const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState<TTheme>('light');
-
-  useEffect(() => {
-    setTheme(readTheme());
-    setMounted(true);
-  }, []);
-
-  const toggle = () => {
-    const next: TTheme = theme === 'dark' ? 'light' : 'dark';
-    const root = document.documentElement;
-    root.classList.toggle('dark', next === 'dark');
-    root.style.colorScheme = next;
-    try {
-      localStorage.setItem('theme', next);
-    } catch {
-      // localStorage can throw in private mode; the class change still applies
-    }
-    setTheme(next);
-  };
-
-  const isDark = theme === 'dark';
   const label = isDark ? lightLabel : darkLabel;
 
   return (
     <button
       type="button"
-      onClick={toggle}
+      onClick={onToggle}
       aria-label={label}
       title={label}
       data-testid={dataTestId}
