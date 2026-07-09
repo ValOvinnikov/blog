@@ -71,8 +71,40 @@ Match Atomic Design tiers: `"Atoms/Button"`, `"Molecules/PostCard"`,
   Individual stories only override what genuinely differs from those defaults.
 - Optional props that serve as a useful base (e.g. `className`, `size`) should
   also go in `meta.args` when they're shared across stories.
-- For union types (variants, sizes) Storybook infers controls from TypeScript.
-  Annotate with `argTypes` only when the inferred control is wrong.
+- **For `tailwind-variants` (`tv()`) props (`variant`, `size`, etc.), always
+  wire an explicit `select` control via `objectKeys` — don't rely on
+  Storybook's TypeScript-inferred control.** Inference reads the prop type,
+  not the component's actual variant config, so it silently drifts out of
+  sync (wrong/missing options) whenever the `*-variants.ts` file changes.
+  `tv()` exposes its config on `.variants` at runtime, so `objectKeys` (from
+  `@blog/config`) gives you the real, always-current option list:
+
+  ```tsx
+  import { objectKeys } from '@blog/config';
+
+  import { Button } from './button';
+  import { buttonVariants } from './button-variants';
+
+  const meta = {
+    title: 'Atoms/Button',
+    component: Button,
+    tags: ['autodocs'],
+    argTypes: {
+      variant: {
+        control: 'select',
+        options: objectKeys(buttonVariants.variants.variant),
+      },
+      size: {
+        control: 'select',
+        options: objectKeys(buttonVariants.variants.size),
+      },
+    },
+  } satisfies Meta<typeof Button>;
+  ```
+
+  For other union-typed props with no `tv()` variant behind them, Storybook's
+  inferred control is fine — only override with `argTypes` when it's wrong.
+
 - Never pass live data or async functions as args — all props must be static
   and serialisable.
 
@@ -166,9 +198,13 @@ Tokens load via `tokens.css` imported in `.storybook/preview.ts` — no extra
 setup needed. Use the same token utilities in stories that you use in components
 (`bg-bg`, `text-fg`, etc.).
 
-To preview dark mode, add the `backgrounds` parameter or use the toolbar toggle
-(addon-essentials includes it). The tokens switch automatically via
-`prefers-color-scheme`.
+Dark mode is class-based (`.dark` on `<html>`), not `prefers-color-scheme`. A
+**Light/Dark toolbar toggle** is wired via `@storybook/addon-themes`'
+`withThemeByClassName` in `.storybook/preview.ts`, which toggles `.dark` on
+the preview `<html>` exactly like `apps/web` does — no per-story setup
+needed. `.storybook/preview.css` re-asserts the themed canvas background at
+higher specificity so the whole preview (not just component colors) follows
+the toggle.
 
 ## MDX documentation pages
 
@@ -203,5 +239,8 @@ Stories in `@blog/ui` must obey the same boundary rules as the components:
 - [ ] `title` follows the `"Tier/ComponentName"` pattern.
 - [ ] `tags: ["autodocs"]` present on `meta`.
 - [ ] All required props covered by `args`.
+- [ ] Any `tv()`-backed prop (`variant`, `size`, …) has an `argTypes` `select`
+      control sourced via `objectKeys(<x>Variants.variants.<group>)`, not
+      left to TypeScript inference.
 - [ ] No `service`/`sanity`/`next` imports in the story file.
 - [ ] `pnpm --filter @blog/ui storybook:build` exits cleanly (no TS errors).
