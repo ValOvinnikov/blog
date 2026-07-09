@@ -1,0 +1,15 @@
+/*
+ * Storybook renders stories in an iframe whose <body> (`.sb-show-main`) picks up
+ * a background from Storybook's own base styles, which overrides the themed
+ * `html/body { background: var(--bg) }` that theme.css declares inside
+ * `@layer base` (layered rules lose to unlayered ones).
+ *
+ * Re-assert the themed background/foreground at higher specificity (a class
+ * beats the bare `body` element selector) and unlayered, so the whole canvas
+ * follows the toolbar light/dark toggle — `withThemeByClassName` toggles the
+ * `.dark` class on <html>, which flips `--bg` / `--text`.
+ */
+body.sb-show-main {
+  background: var(--bg);
+  color: var(--text);
+}
