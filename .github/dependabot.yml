@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # JS/TS deps across the whole pnpm workspace (root + all packages/apps)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      eslint:
+        patterns: ["eslint*", "@eslint/*", "typescript-eslint"]
+      vitest:
+        patterns: ["vitest*", "@vitejs/*"]
+    open-pull-requests-limit: 5
+    labels: ["tooling"]
+
+  # GitHub Actions themselves — auto-bumps pinned SHAs from #156
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels: ["tooling"]
