@@ -1,20 +1,21 @@
-import react from '@vitejs/plugin-react';
+import preset from '@blog/vitest-config/preset';
 import path from 'path';
-import { defineConfig } from 'vitest/config';
+import { defineConfig, mergeConfig } from 'vitest/config';
 
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: [
-      {
-        find: /^@blog\/ui\/(.+)/,
-        replacement: `${path.resolve(__dirname, 'src')}/$1`,
-      },
-    ],
-  },
-  test: {
-    environment: 'jsdom',
-    globals: true,
-    setupFiles: ['./src/test-setup.ts'],
-  },
-});
+export default mergeConfig(
+  preset,
+  defineConfig({
+    resolve: {
+      alias: [
+        {
+          find: /^@blog\/ui\/(.+)/,
+          replacement: `${path.resolve(__dirname, 'src')}/$1`,
+        },
+      ],
+    },
+    test: {
+      environment: 'jsdom',
+      setupFiles: ['./src/test-setup.ts'],
+    },
+  }),
+);
