@@ -1,13 +1,13 @@
 name: CI
 
 on:
+  # No `paths-ignore` here on purpose. Build/Lint/Test/Type-check/Typegen are
+  # *required* status checks in the branch ruleset. A workflow skipped by path
+  # filtering leaves its required checks "Pending" forever, which blocks any PR
+  # that only touches the ignored paths (e.g. a `.claude/**` or docs-only PR)
+  # from ever merging. Running CI on every PR is cheap and avoids that deadlock.
   pull_request:
     branches: [main]
-    paths-ignore:
-      - "**.md"
-      - "docs/**"
-      - ".claude/**"
-      - ".superpowers/**"
 
 permissions:
   contents: read
