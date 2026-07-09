@@ -1,5 +1,5 @@
 import { Size } from '@blog/config';
-import { tv } from 'tailwind-variants';
+import { tv } from '@blog/ui/lib/tv';
 
 export const headingVariants = tv({
   base: ['font-display font-medium text-text'],
