@@ -1,3 +1,3 @@
-import basePrettierConfig from '../../configs/prettier/index.js';
+import basePrettierConfig from '@blog/prettier-config';
 
 export default { ...basePrettierConfig };
