@@ -1,7 +1,8 @@
-import { Size } from '@blog/config';
+import { objectKeys, Size } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Avatar } from './avatar';
+import { avatarVariants } from './avatar-variants';
 
 const meta = {
   title: 'Atoms/Avatar',
@@ -11,6 +12,12 @@ const meta = {
     name: 'Jane Doe',
     alt: 'Jane Doe',
     size: Size.MD,
+  },
+  argTypes: {
+    size: {
+      control: 'select',
+      options: objectKeys(avatarVariants.variants.size),
+    },
   },
 } satisfies Meta<typeof Avatar>;
 

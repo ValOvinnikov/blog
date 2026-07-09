@@ -1,11 +1,19 @@
+import { objectKeys } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Text } from './text';
+import { textVariants } from './text-variants';
 
 const meta: Meta<typeof Text> = {
   title: 'Atoms/Text',
   component: Text,
   tags: ['autodocs'],
+  argTypes: {
+    variant: {
+      control: 'select',
+      options: objectKeys(textVariants.variants.variant),
+    },
+  },
 };
 export default meta;
 
