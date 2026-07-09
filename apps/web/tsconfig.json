@@ -25,9 +25,7 @@
     ".next/types/**/*.ts",
     ".storybook/**/*.ts",
     ".storybook/**/*.tsx",
-    "index.css.d.ts",
-    "vitest.config.ts",
-    "vitest.setup.ts"
+    "index.css.d.ts"
   ],
   "exclude": ["node_modules"]
 }
