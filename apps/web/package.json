@@ -28,6 +28,7 @@
     "tailwind-variants": "^3.2.2"
   },
   "devDependencies": {
+    "@blog/tsconfig": "workspace:*",
     "@storybook/addon-essentials": "^8.6.14",
     "@storybook/nextjs": "^8.6.14",
     "@storybook/react": "^8.6.14",
