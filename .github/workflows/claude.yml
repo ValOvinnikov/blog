@@ -29,8 +29,8 @@ jobs:
       )
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      pull-requests: read
+      contents: write # lets Claude push branches so it can open PRs
+      pull-requests: write # lets Claude open/update PRs
       issues: read
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
@@ -58,6 +58,11 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
+          # Reuse the repo's own tool allowlist (pnpm scripts, git read/commit,
+          # etc.) so cloud runs don't need per-command approval for things
+          # already vetted for local sessions.
+          settings: .claude/settings.json
+
           # This is an optional setting that allows Claude to read CI results on PRs
           additional_permissions: |
             actions: read
@@ -65,15 +70,15 @@ jobs:
           # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
           # prompt: 'Update the pull request description to include a summary of changes.'
 
-          # Optional: Add claude_args to customize behavior and configuration
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://code.claude.com/docs/en/cli-reference for available options
-          # claude_args: '--allowed-tools Bash(gh pr *)'
-
           # Trigger-phrase model routing: "@claude-opus" runs Opus 4.8;
           # plain "@claude" (the default) runs Sonnet 5. "@claude-opus"
           # already contains the "@claude" substring, so the job's `if:`
           # trigger above fires for both without any change.
+          #
+          # git push / gh pr create are allowed here (cloud-only), not in the
+          # shared .claude/settings.json — that file also governs interactive
+          # local sessions, which should keep asking before every push/PR.
           claude_args: |
             --model ${{ (contains(github.event.comment.body, '@claude-opus') || contains(github.event.review.body, '@claude-opus') || contains(github.event.issue.body, '@claude-opus') || contains(github.event.issue.title, '@claude-opus')) && 'claude-opus-4-8' || 'claude-sonnet-5' }}
+            --allowedTools "Bash(git push:*),Bash(gh pr create:*),Bash(gh pr edit:*)"
 
