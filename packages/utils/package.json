@@ -14,8 +14,10 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
+    "@blog/eslint-config": "workspace:*",
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
+    "eslint": "^10.6.0",
     "prettier": "^3.9.4",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"

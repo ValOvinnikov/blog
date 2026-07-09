@@ -1,3 +1,3 @@
-import config from '../../configs/eslint/index.js';
+import config from '@blog/eslint-config/ui';
 
 export default [...config];

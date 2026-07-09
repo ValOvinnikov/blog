@@ -28,6 +28,7 @@
     "tailwind-variants": "^3.2.2"
   },
   "devDependencies": {
+    "@blog/eslint-config": "workspace:*",
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
     "@storybook/addon-essentials": "^8.6.14",
@@ -40,7 +41,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^4.3.0",
-    "eslint": "^9.17.0",
+    "eslint": "^10.6.0",
     "jsdom": "^25.0.0",
     "prettier": "^3.9.4",
     "prettier-plugin-tailwindcss": "^0.8.0",
