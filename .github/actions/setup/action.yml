@@ -1,0 +1,35 @@
+name: Setup pnpm/node/turbo-cache
+description: Install pnpm and Node, restore the turbo cache, and install dependencies
+
+inputs:
+  pnpm-version:
+    description: pnpm version to install
+    required: true
+  node-version:
+    description: Node.js version to install
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v6
+      with:
+        version: ${{ inputs.pnpm-version }}
+
+    - uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'pnpm'
+
+    - name: Cache turbo
+      uses: actions/cache@v6
+      with:
+        path: .turbo
+        key: turbo-${{ runner.os }}-${{ hashFiles('turbo.json') }}-${{ github.sha }}
+        restore-keys: |
+          turbo-${{ runner.os }}-${{ hashFiles('turbo.json') }}-
+          turbo-${{ runner.os }}-
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+      shell: bash

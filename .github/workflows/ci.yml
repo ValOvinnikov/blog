@@ -18,26 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+      - uses: ./.github/actions/setup
         with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - uses: actions/setup-node@v6
-        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Cache turbo
-        uses: actions/cache@v6
-        with:
-          path: .turbo
-          key: turbo-${{ runner.os }}-${{ hashFiles('turbo.json') }}-${{ github.sha }}
-          restore-keys: |
-            turbo-${{ runner.os }}-${{ hashFiles('turbo.json') }}-
-            turbo-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Type-check
         run: pnpm type-check
@@ -48,26 +32,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+      - uses: ./.github/actions/setup
         with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - uses: actions/setup-node@v6
-        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Cache turbo
-        uses: actions/cache@v6
-        with:
-          path: .turbo
-          key: turbo-${{ runner.os }}-${{ hashFiles('turbo.json') }}-${{ github.sha }}
-          restore-keys: |
-            turbo-${{ runner.os }}-${{ hashFiles('turbo.json') }}-
-            turbo-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Lint
         run: pnpm lint
@@ -78,26 +46,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+      - uses: ./.github/actions/setup
         with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - uses: actions/setup-node@v6
-        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Cache turbo
-        uses: actions/cache@v6
-        with:
-          path: .turbo
-          key: turbo-${{ runner.os }}-${{ hashFiles('turbo.json') }}-${{ github.sha }}
-          restore-keys: |
-            turbo-${{ runner.os }}-${{ hashFiles('turbo.json') }}-
-            turbo-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Test
         run: pnpm test
@@ -108,17 +60,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+      - uses: ./.github/actions/setup
         with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - uses: actions/setup-node@v6
-        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Typegen
         working-directory: apps/cms
@@ -131,26 +76,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+      - uses: ./.github/actions/setup
         with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - uses: actions/setup-node@v6
-        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Cache turbo
-        uses: actions/cache@v6
-        with:
-          path: .turbo
-          key: turbo-${{ runner.os }}-${{ hashFiles('turbo.json') }}-${{ github.sha }}
-          restore-keys: |
-            turbo-${{ runner.os }}-${{ hashFiles('turbo.json') }}-
-            turbo-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Build
         run: pnpm build
