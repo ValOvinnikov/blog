@@ -9,6 +9,8 @@ export type TSiteSettings = {
   title: string;
   description: string;
   tagline: string | undefined;
+  brandPrefix: string;
+  brandSuffix: string | undefined;
   logoUrl: string | undefined;
   ogImageUrl: string | undefined;
   ogTitle: string | undefined;

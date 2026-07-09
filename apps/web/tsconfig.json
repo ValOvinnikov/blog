@@ -6,6 +6,7 @@
     "allowJs": true,
     "noEmit": true,
     "moduleResolution": "Bundler",
+    "types": ["vitest/globals"],
     "paths": {
       "@/*": ["./src/*"],
       "@blog/ui/*": ["../../packages/ui/src/*"],

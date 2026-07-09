@@ -2,7 +2,7 @@ import '../../../index.css';
 
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { Footer, Header, NavLink } from '@blog/ui';
+import { Footer, Header, Logo, NavLink, PrimaryNavigation } from '@blog/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -57,7 +57,8 @@ export default async function LocaleLayout({ children, params }: TProps) {
     notFound();
   }
 
-  const { title, navigation, socialLinks } = result.data;
+  const { title, navigation, socialLinks, brandPrefix, brandSuffix } =
+    result.data;
 
   return (
     <html
@@ -75,18 +76,18 @@ export default async function LocaleLayout({ children, params }: TProps) {
       <body>
         <Header>
           <Header.Brand>
-            <Link href="/">{title}</Link>
+            <Link href="/" aria-label="Home">
+              <Logo prefix={brandPrefix} suffix={brandSuffix} />
+            </Link>
           </Header.Brand>
-          <Header.Nav>
-            {navigation.map((item) => (
-              <NavLink key={item.href} href={item.href}>
-                {item.label}
-              </NavLink>
-            ))}
-          </Header.Nav>
-          <Header.Actions>
-            <ThemeToggleButton />
-          </Header.Actions>
+          <PrimaryNavigation
+            links={navigation.map((item) => ({
+              href: item.href,
+              label: item.label,
+            }))}
+            actions={<ThemeToggleButton />}
+            linkAs={Link}
+          />
         </Header>
         {children}
         <Footer>

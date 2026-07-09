@@ -9,6 +9,8 @@ export const siteSettingsQuery = q.star
     title: sub.field('title').notNull(),
     description: sub.field('description').notNull(),
     tagline: sub.field('tagline'),
+    brandPrefix: sub.field('brandPrefix').notNull(),
+    brandSuffix: sub.field('brandSuffix'),
     logo: sub.field('logo').project(imageWithAltFragment).notNull(),
     ogImage: sub.field('ogImage').project(imageWithAltFragment).notNull(),
     ogTitle: sub.field('ogTitle'),

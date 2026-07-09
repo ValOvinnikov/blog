@@ -8,6 +8,8 @@ export function makeRawSiteSettings(
     title: 'My Blog',
     description: 'A blog about things',
     tagline: null,
+    brandPrefix: 'val',
+    brandSuffix: null,
     logo: makeRawImage('Logo'),
     ogImage: makeRawImage('OG image'),
     ogTitle: null,
