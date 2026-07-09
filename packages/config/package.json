@@ -8,13 +8,16 @@
     "./react": "./src/react/polymorphic.ts"
   },
   "scripts": {
+    "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@blog/eslint-config": "workspace:*",
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
     "@types/react": "^19.0.0",
+    "eslint": "^10.6.0",
     "prettier": "^3.9.4",
     "typescript": "^5.7.0"
   }

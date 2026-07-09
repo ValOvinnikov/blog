@@ -22,9 +22,11 @@
     "styled-components": "^6.1.0"
   },
   "devDependencies": {
+    "@blog/eslint-config": "workspace:*",
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
     "@sanity/cli": "^4.0.0",
+    "eslint": "^10.6.0",
     "prettier": "^3.9.4",
     "typescript": "^5.7.0"
   }
