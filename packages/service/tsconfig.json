@@ -3,6 +3,11 @@
   "extends": "@blog/tsconfig/base.json",
   "compilerOptions": {
     "noEmit": true,
+    // Declare ambient globals explicitly so type resolution does not depend on
+    // pnpm's hoisting layout: "node" for `process.env`, "vitest/globals" for the
+    // `globals: true` test config. Without this, a dependency bump that reshuffles
+    // node_modules can drop @types/node discovery and break `tsc`.
+    "types": ["node", "vitest/globals"],
     "paths": {
       "#/*": ["./src/*"]
     }
