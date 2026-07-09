@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@blog/prettier-config": "workspace:*",
+    "@blog/tsconfig": "workspace:*",
     "@types/node": "^20",
     "prettier": "^3.9.4",
     "typescript": "^5.7.0",

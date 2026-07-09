@@ -18,8 +18,13 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "**/*.{ts,tsx}": ["eslint --fix", "prettier --write"],
-    "**/*.{js,json,md,css}": ["prettier --write"]
+    "**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.{js,json,md,css}": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
     "@blog/prettier-config": "workspace:*",
