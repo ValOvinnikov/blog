@@ -10,7 +10,7 @@ import { defineConfig } from 'vitest/config';
  * `environment: "node"`.
  *
  *   // packages/ui/vitest.config.ts
- *   import preset from "@blog/config/vitest/preset";
+ *   import preset from "@blog/vitest-config/preset";
  *   import { mergeConfig, defineConfig } from "vitest/config";
  *   export default mergeConfig(preset, defineConfig({
  *     test: { environment: "jsdom", setupFiles: ["./vitest.setup.ts"] },

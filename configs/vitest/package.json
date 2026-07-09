@@ -1,18 +1,20 @@
 {
-  "name": "@blog/tailwind-config",
+  "name": "@blog/vitest-config",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "exports": {
-    "./theme.css": "./theme.css",
     "./preset": "./preset.ts"
   },
   "scripts": {
     "lint": "eslint ."
   },
+  "dependencies": {
+    "@vitejs/plugin-react": "^6.0.3",
+    "vitest": "^4.1.10"
+  },
   "devDependencies": {
     "@blog/eslint-config": "workspace:*",
-    "eslint": "^10.6.0",
-    "tailwindcss": "^4.0.0"
+    "eslint": "^10.6.0"
   }
 }
