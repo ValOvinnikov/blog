@@ -28,7 +28,7 @@
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
     "@blog/vitest-config": "workspace:*",
-    "@types/node": "^20",
+    "@types/node": "^26",
     "eslint": "^10.6.0",
     "prettier": "^3.9.4",
     "typescript": "^6.0.3",
