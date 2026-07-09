@@ -12,9 +12,10 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
     "@types/react": "^19.0.0",
-    "prettier": "^3.4.0",
+    "prettier": "^3.9.4",
     "typescript": "^5.7.0"
   }
 }

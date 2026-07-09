@@ -18,9 +18,16 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "**/*.{ts,tsx,js,json,md,css}": "prettier --check"
+    "**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.{js,json,md,css}": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
+    "@blog/prettier-config": "workspace:*",
     "@eslint/js": "^9.17.0",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
@@ -32,7 +39,7 @@
     "globals": "^15.14.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
-    "prettier": "^3.4.0",
+    "prettier": "^3.9.4",
     "turbo": "^2.5.0",
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.18.0"

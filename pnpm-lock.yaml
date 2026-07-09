@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@blog/prettier-config':
+        specifier: workspace:*
+        version: link:configs/prettier
       '@eslint/js':
         specifier: ^9.17.0
         version: 9.39.4
@@ -42,7 +45,7 @@ importers:
         specifier: ^17.0.8
         version: 17.0.8
       prettier:
-        specifier: ^3.4.0
+        specifier: ^3.9.4
         version: 3.9.4
       turbo:
         specifier: ^2.5.0
@@ -81,6 +84,9 @@ importers:
         specifier: ^6.1.0
         version: 6.4.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
     devDependencies:
+      '@blog/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
       '@blog/tsconfig':
         specifier: workspace:*
         version: link:../../configs/tsconfig
@@ -88,7 +94,7 @@ importers:
         specifier: ^4.0.0
         version: 4.22.0(@types/node@20.19.43)(lightningcss@1.32.0)(react@19.2.7)(terser@5.48.0)(tsx@4.23.0)(typescript@5.9.3)(yaml@2.9.0)
       prettier:
-        specifier: ^3.4.0
+        specifier: ^3.9.4
         version: 3.9.4
       typescript:
         specifier: ^5.7.0
@@ -127,6 +133,9 @@ importers:
         specifier: ^3.2.2
         version: 3.2.2(tailwind-merge@3.6.0)(tailwindcss@4.3.2)
     devDependencies:
+      '@blog/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
       '@blog/tsconfig':
         specifier: workspace:*
         version: link:../../configs/tsconfig
@@ -167,7 +176,7 @@ importers:
         specifier: ^25.0.0
         version: 25.0.1
       prettier:
-        specifier: ^3.4.0
+        specifier: ^3.9.4
         version: 3.9.4
       prettier-plugin-tailwindcss:
         specifier: ^0.8.0
@@ -185,6 +194,12 @@ importers:
         specifier: ^3.0.0
         version: 3.2.6(@types/node@20.19.43)(jiti@2.7.0)(jsdom@25.0.1)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.23.0)(yaml@2.9.0)
 
+  configs/prettier:
+    devDependencies:
+      prettier:
+        specifier: ^3.9.4
+        version: 3.9.4
+
   configs/tailwind:
     devDependencies:
       tailwindcss:
@@ -195,6 +210,9 @@ importers:
 
   packages/config:
     devDependencies:
+      '@blog/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
       '@blog/tsconfig':
         specifier: workspace:*
         version: link:../../configs/tsconfig
@@ -202,7 +220,7 @@ importers:
         specifier: ^19.0.0
         version: 19.2.17
       prettier:
-        specifier: ^3.4.0
+        specifier: ^3.9.4
         version: 3.9.4
       typescript:
         specifier: ^5.7.0
@@ -226,6 +244,9 @@ importers:
         specifier: ^9.8.0
         version: 9.12.3(cty4735wzzmpranwzsvtden7za)
     devDependencies:
+      '@blog/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
       '@blog/tsconfig':
         specifier: workspace:*
         version: link:../../configs/tsconfig
@@ -233,7 +254,7 @@ importers:
         specifier: ^20
         version: 20.19.43
       prettier:
-        specifier: ^3.4.0
+        specifier: ^3.9.4
         version: 3.9.4
       typescript:
         specifier: ^5.7.0
@@ -260,6 +281,9 @@ importers:
         specifier: ^3.2.2
         version: 3.2.2(tailwind-merge@3.6.0)(tailwindcss@4.3.2)
     devDependencies:
+      '@blog/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
       '@blog/tsconfig':
         specifier: workspace:*
         version: link:../../configs/tsconfig
@@ -300,7 +324,7 @@ importers:
         specifier: ^25.0.0
         version: 25.0.1
       prettier:
-        specifier: ^3.4.0
+        specifier: ^3.9.4
         version: 3.9.4
       react:
         specifier: ^19.0.0
@@ -323,11 +347,14 @@ importers:
 
   packages/utils:
     devDependencies:
+      '@blog/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
       '@blog/tsconfig':
         specifier: workspace:*
         version: link:../../configs/tsconfig
       prettier:
-        specifier: ^3.4.0
+        specifier: ^3.9.4
         version: 3.9.4
       typescript:
         specifier: ^5.7.0
