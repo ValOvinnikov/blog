@@ -118,6 +118,8 @@
         --accent-hover: oklch(0.52 0.17 250);
         --accent-muted: oklch(0.95 0.03 250);
         --accent-contrast: oklch(0.99 0 0);
+        --accent-solid: oklch(0.55 0.17 250);
+        --accent-solid-hover: oklch(0.49 0.17 250);
       }
 
       .t-dark {
@@ -134,7 +136,9 @@
         --accent: oklch(0.7 0.16 250);
         --accent-hover: oklch(0.76 0.16 250);
         --accent-muted: oklch(0.3 0.06 250);
-        --accent-contrast: oklch(0.16 0.006 250);
+        --accent-contrast: oklch(0.99 0 0);
+        --accent-solid: oklch(0.53 0.16 250);
+        --accent-solid-hover: oklch(0.47 0.16 250);
       }
 
       /* ---- preview shell ---- */
@@ -317,8 +321,11 @@
       }
 
       .a-button-primary {
-        background: var(--accent);
+        background: var(--accent-solid);
         color: var(--accent-contrast);
+      }
+      .a-button-primary:hover {
+        background: var(--accent-solid-hover);
       }
 
       .a-button-ghost {
@@ -1211,13 +1218,16 @@
             ><span class="chip" style="background: oklch(0.3 0.06 250)"></span>
           </div>
           <div class="sw-row">
+            <span class="sw-name">accent-solid</span
+            ><span class="sw-role">filled surface (button bg)</span
+            ><span class="chip" style="background: oklch(0.55 0.17 250)"></span
+            ><span class="chip" style="background: oklch(0.53 0.16 250)"></span>
+          </div>
+          <div class="sw-row">
             <span class="sw-name">accent-contrast</span
-            ><span class="sw-role">text on accent</span
+            ><span class="sw-role">text on accent-solid</span
             ><span class="chip" style="background: oklch(0.99 0 0)"></span
-            ><span
-              class="chip"
-              style="background: oklch(0.16 0.006 250)"
-            ></span>
+            ><span class="chip" style="background: oklch(0.99 0 0)"></span>
           </div>
         </div>
       </section>
