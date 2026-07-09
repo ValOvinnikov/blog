@@ -1,12 +1,23 @@
-import { Size } from '@blog/config';
+import { objectKeys, Size } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Button } from './button';
+import { buttonVariants } from './button-variants';
 
 const meta: Meta<typeof Button> = {
   title: 'Atoms/Button',
   component: Button,
   tags: ['autodocs'],
+  argTypes: {
+    variant: {
+      control: 'select',
+      options: objectKeys(buttonVariants.variants.variant),
+    },
+    size: {
+      control: 'select',
+      options: objectKeys(buttonVariants.variants.size),
+    },
+  },
 };
 export default meta;
 
