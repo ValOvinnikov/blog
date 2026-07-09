@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
+import { NavLink } from '../../atoms/nav-link';
+
 import { Hero } from './hero';
 
 const meta = {
@@ -24,7 +26,7 @@ const meta = {
           />
         </Hero.Media>
         <Hero.Cta>
-          <a href="/posts/design-system">Read more</a>
+          <NavLink href="/posts/design-system">Read more</NavLink>
         </Hero.Cta>
       </>
     ),
@@ -54,7 +56,7 @@ export const WithoutEyebrow: TStory = {
     eyebrow: undefined,
     children: (
       <Hero.Cta>
-        <a href="/posts/design-system">Read more</a>
+        <NavLink href="/posts/design-system">Read more</NavLink>
       </Hero.Cta>
     ),
   },
@@ -64,7 +66,7 @@ export const WithoutImage: TStory = {
   args: {
     children: (
       <Hero.Cta>
-        <a href="/posts/design-system">Read more</a>
+        <NavLink href="/posts/design-system">Read more</NavLink>
       </Hero.Cta>
     ),
   },
