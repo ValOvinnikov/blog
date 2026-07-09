@@ -22,6 +22,10 @@
       "Bash(git log:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
+      "Bash(gh project item-add:*)",
+      "Bash(gh project item-edit:*)",
+      "Bash(gh project item-list:*)",
+      "Bash(gh project field-list:*)",
       "Read",
       "Edit",
       "Write"
