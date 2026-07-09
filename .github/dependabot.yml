@@ -9,8 +9,21 @@ updates:
     groups:
       eslint:
         patterns: ["eslint*", "@eslint/*", "typescript-eslint"]
+      storybook:
+        patterns: ["storybook", "@storybook/*"]
       vitest:
         patterns: ["vitest*", "@vitejs/*"]
+    ignore:
+      # Storybook 8 -> 10 is a coordinated migration (all @storybook/* + the
+      # storybook core + eslint-plugin-storybook + .storybook config move
+      # together), not a routine dev-dep bump. Hold majors until we do it
+      # deliberately; minors/patches within the current major still flow.
+      - dependency-name: "storybook"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@storybook/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint-plugin-storybook"
+        update-types: ["version-update:semver-major"]
     open-pull-requests-limit: 5
     labels: ["tooling"]
 
