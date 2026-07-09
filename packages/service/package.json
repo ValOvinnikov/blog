@@ -27,6 +27,7 @@
     "@blog/eslint-config": "workspace:*",
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
+    "@blog/vitest-config": "workspace:*",
     "@types/node": "^20",
     "eslint": "^10.6.0",
     "prettier": "^3.9.4",
