@@ -1,5 +1,4 @@
-import imageUrlBuilder from '@sanity/image-url';
-import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
+import imageUrlBuilder, { type SanityImageSource } from '@sanity/image-url';
 
 import { getClient } from './client';
 

@@ -36,8 +36,8 @@ importers:
         specifier: ^5.1.0
         version: 5.2.1(m3umd4c4ykbzktd5qafhqb7o3e)
       '@sanity/image-url':
-        specifier: ^1.1.0
-        version: 1.2.0
+        specifier: ^2.1.1
+        version: 2.1.1
       '@sanity/vision':
         specifier: ^6.4.0
         version: 6.4.0(m3umd4c4ykbzktd5qafhqb7o3e)
@@ -285,8 +285,8 @@ importers:
         specifier: workspace:*
         version: link:../utils
       '@sanity/image-url':
-        specifier: ^1.1.0
-        version: 1.2.0
+        specifier: ^2.1.1
+        version: 2.1.1
       groqd:
         specifier: ^1.7.1
         version: 1.7.1
@@ -3321,10 +3321,6 @@ packages:
   '@sanity/id-utils@1.0.0':
     resolution: {integrity: sha512-2sb7tbdMDuUuVyocJPKG0gZBiOML/ovCe+mJiLrv1j69ODOfa2LfUjDVR+dRw/A/+XuxoJSSP8ebG7NiwTOgIA==}
     engines: {node: '>=18'}
-
-  '@sanity/image-url@1.2.0':
-    resolution: {integrity: sha512-pYRhti+lDi22it+npWXkEGuYyzbXJLF+d0TYLiyWbKu46JHhYhTDKkp6zmGu4YKF5cXUjT6pnUjFsaf2vlB9nQ==}
-    engines: {node: '>=10.0.0'}
 
   '@sanity/image-url@2.1.1':
     resolution: {integrity: sha512-qVXsF1teWR6FO3ZFAz46HDcRU+E6EQkpyncPnkGOzeJ1PgnaOiWMVbiSrZtX10s3txzzu/tAjKwbxbGHfDWgGw==}
@@ -12602,8 +12598,6 @@ snapshots:
       '@sanity/uuid': 3.0.3
       lodash: 4.18.1
       ts-brand: 0.2.0
-
-  '@sanity/image-url@1.2.0': {}
 
   '@sanity/image-url@2.1.1':
     dependencies:
