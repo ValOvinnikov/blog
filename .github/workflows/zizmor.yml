@@ -1,0 +1,37 @@
+name: Zizmor
+
+on:
+  # No path filter on purpose — same reasoning as ci.yml: a workflow skipped
+  # by path filtering leaves any required status check "Pending" forever.
+  # Auditing every PR is cheap (zizmor finishes in seconds).
+  pull_request:
+    branches: [main]
+
+env:
+  ZIZMOR_VERSION: 1.26.1
+
+permissions:
+  contents: read
+
+jobs:
+  zizmor:
+    name: Zizmor
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+
+      - name: Run zizmor
+        # --format=github emits ::error:: annotations inline on the PR diff.
+        # Unlike --format=sarif, this keeps zizmor's own exit code (11-14 on
+        # findings) as the job's exit code, so the job actually fails on new
+        # findings instead of always reporting green. Accepted findings are
+        # triaged via .github/zizmor.yml, not by switching to SARIF.
+        run: uvx "zizmor@${ZIZMOR_VERSION}" --format=github .github/workflows/ .github/actions/
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

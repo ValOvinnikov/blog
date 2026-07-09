@@ -39,6 +39,12 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           fetch-depth: 1
+          # Safe even though this job pushes branches: claude-code-action
+          # configures its own git auth (embeds a fresh token in the remote
+          # URL / a credential helper) and explicitly strips the credential
+          # actions/checkout would otherwise persist. See
+          # https://github.com/anthropics/claude-code-action/blob/main/src/github/operations/git-config.ts
+          persist-credentials: false
 
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
         with:
