@@ -24,6 +24,10 @@ apps/cms/schema.json
 # Build / type info
 *.tsbuildinfo
 *.tsbuildinfo.*
+.eslintcache
+
+# Storybook
+storybook-static/
 
 # Tests / coverage
 coverage/
