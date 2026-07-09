@@ -157,9 +157,9 @@
   --accent: 0.7 0.16 250;
   --accent-hover: 0.76 0.16 250;
   --accent-muted: 0.3 0.06 250;
-  --accent-contrast: 0.99 0 0;
-  --accent-solid: 0.53 0.16 250;
-  --accent-solid-hover: 0.47 0.16 250;
+  --accent-contrast: 0.16 0.006 250;
+  --accent-solid: 0.7 0.16 250;
+  --accent-solid-hover: 0.76 0.16 250;
 }
 
 @layer base {
