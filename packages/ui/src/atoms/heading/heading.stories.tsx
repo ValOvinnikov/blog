@@ -1,12 +1,23 @@
-import { Size } from '@blog/config';
+import { objectKeys, Size } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Heading } from './heading';
+import { headingVariants } from './heading-variants';
 
 const meta: Meta<typeof Heading> = {
   title: 'Atoms/Heading',
   component: Heading,
   tags: ['autodocs'],
+  argTypes: {
+    visual: {
+      control: 'select',
+      options: objectKeys(headingVariants.variants.visual),
+    },
+    size: {
+      control: 'select',
+      options: objectKeys(headingVariants.variants.size),
+    },
+  },
 };
 export default meta;
 

@@ -1,6 +1,8 @@
+import { objectKeys } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { MediaFrame } from './media-frame';
+import { mediaFrameVariants } from './media-frame-variants';
 
 const FillImage = () => (
   <img
@@ -24,6 +26,12 @@ const meta = {
     ratio: 'video',
     className: 'w-96',
     children: <FillImage />,
+  },
+  argTypes: {
+    ratio: {
+      control: 'select',
+      options: objectKeys(mediaFrameVariants.variants.ratio),
+    },
   },
 } satisfies Meta<typeof MediaFrame>;
 

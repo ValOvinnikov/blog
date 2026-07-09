@@ -7,6 +7,11 @@ const meta: Meta<typeof NavLink> = {
   component: NavLink,
   tags: ['autodocs'],
   args: { href: '#', children: 'Link' },
+  argTypes: {
+    isActive: {
+      control: 'boolean',
+    },
+  },
 };
 export default meta;
 
