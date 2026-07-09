@@ -1,14 +1,11 @@
 import path from 'node:path';
 
-import { FlatCompat } from '@eslint/eslintrc';
+import nextPlugin from '@next/eslint-plugin-next';
 import checkFile from 'eslint-plugin-check-file';
 
 import react from './react.js';
 import storybook from './storybook.js';
 
-const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname,
-});
 const packageJsonPath = path.resolve(
   import.meta.dirname,
   '../../apps/web/package.json',
@@ -17,7 +14,7 @@ const packageJsonPath = path.resolve(
 /** @type {import("eslint").Linter.Config[]} */
 export default [
   ...react,
-  ...compat.config({ extends: ['plugin:@next/next/recommended'] }),
+  nextPlugin.configs.recommended,
   ...storybook(packageJsonPath),
   {
     // Next.js App Router uses bracket and paren folder conventions ([locale],
