@@ -38,7 +38,13 @@ jobs:
           plugin_marketplaces: 'https://github.com/anthropics/claude-code.git'
           plugins: 'code-review@claude-code-plugins'
           prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
-          allowed_bots: '*'
+          # allowed_bots intentionally omitted: the action's default is to
+          # trust no bots at all, which is correct here — nothing in this
+          # review flow needs bot interaction. '*' (the prior setting)
+          # widened trust to any bot's comments/events as agent input, and
+          # the action's own docs flag it as risky ("prefer an explicit list
+          # over '*'", "allowed bots are not checked for repository
+          # permissions").
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
 
