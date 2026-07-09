@@ -7,7 +7,12 @@
     "./theme.css": "./theme.css",
     "./preset": "./preset.ts"
   },
+  "scripts": {
+    "lint": "eslint ."
+  },
   "devDependencies": {
+    "@blog/eslint-config": "workspace:*",
+    "eslint": "^10.6.0",
     "tailwindcss": "^4.0.0"
   }
 }
