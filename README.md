@@ -1,5 +1,7 @@
 # Blog
 
+[![CI](https://github.com/ValOvinnikov/blog/actions/workflows/ci.yml/badge.svg)](https://github.com/ValOvinnikov/blog/actions/workflows/ci.yml)
+
 A CMS-driven blog built as a **Turborepo + pnpm monorepo** with strict
 separation of concerns: a headless Sanity Studio for authoring, a Next.js 15
 frontend for reading, a portable design system, and a typed data layer — with
@@ -60,29 +62,29 @@ cp apps/cms/.env.example apps/cms/.env.local
 
 Environment variables (see `.env.example`):
 
-| Variable | Purpose |
-|---|---|
-| `NEXT_PUBLIC_SANITY_PROJECT_ID` | Sanity project id |
-| `NEXT_PUBLIC_SANITY_DATASET` | usually `production` |
-| `NEXT_PUBLIC_SITE_URL` | canonical origin for SEO / sitemap / RSS |
-| `SANITY_API_READ_TOKEN` | drafts / preview only |
-| `SANITY_REVALIDATE_SECRET` | on-demand ISR webhook secret |
+| Variable                        | Purpose                                  |
+| ------------------------------- | ---------------------------------------- |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | Sanity project id                        |
+| `NEXT_PUBLIC_SANITY_DATASET`    | usually `production`                     |
+| `NEXT_PUBLIC_SITE_URL`          | canonical origin for SEO / sitemap / RSS |
+| `SANITY_API_READ_TOKEN`         | drafts / preview only                    |
+| `SANITY_REVALIDATE_SECRET`      | on-demand ISR webhook secret             |
 
 Add `http://localhost:3000` (and your deployed origin) to the project's CORS
 origins at [manage.sanity.io](https://manage.sanity.io).
 
 ## Scripts (run from the repo root)
 
-| Command | What it does |
-|---|---|
-| `pnpm dev` | Run all workspaces in dev (Next.js + Sanity Studio) |
-| `pnpm build` | Build everything (`typegen` runs first) |
-| `pnpm test` | Run Vitest across packages |
-| `pnpm test:watch` | Vitest in watch mode |
-| `pnpm type-check` | `tsc --noEmit` across the graph |
-| `pnpm lint` | ESLint across packages |
-| `pnpm typegen` | Regenerate Sanity types into `@blog/types` |
-| `pnpm format` | Prettier write |
+| Command           | What it does                                        |
+| ----------------- | --------------------------------------------------- |
+| `pnpm dev`        | Run all workspaces in dev (Next.js + Sanity Studio) |
+| `pnpm build`      | Build everything (`typegen` runs first)             |
+| `pnpm test`       | Run Vitest across packages                          |
+| `pnpm test:watch` | Vitest in watch mode                                |
+| `pnpm type-check` | `tsc --noEmit` across the graph                     |
+| `pnpm lint`       | ESLint across packages                              |
+| `pnpm typegen`    | Regenerate Sanity types into `@blog/types`          |
+| `pnpm format`     | Prettier write                                      |
 
 Scope to one workspace with `pnpm --filter <name>`, e.g.
 `pnpm --filter web dev` or `pnpm --filter @blog/ui test`.
@@ -127,10 +129,10 @@ contracts:
 
 ## Deployment
 
-| Workspace | Target | Setup |
-|---|---|---|
-| `web` | Vercel (Hobby) | Import repo → **Root Directory = `apps/web`**; add env vars. Vercel builds `types`/`service`/`ui` first automatically. |
-| `cms` | Sanity-hosted | `pnpm --filter cms deploy` → served at `your-project.sanity.studio`. |
+| Workspace | Target         | Setup                                                                                                                  |
+| --------- | -------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `web`     | Vercel (Hobby) | Import repo → **Root Directory = `apps/web`**; add env vars. Vercel builds `types`/`service`/`ui` first automatically. |
+| `cms`     | Sanity-hosted  | `pnpm --filter cms deploy` → served at `your-project.sanity.studio`.                                                   |
 
 ## License
 
