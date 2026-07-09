@@ -14,7 +14,7 @@ export const buttonVariants = tv({
   variants: {
     variant: {
       primary:
-        'border-transparent bg-accent text-accent-contrast hover:bg-accent-hover',
+        'border-transparent bg-accent-solid text-accent-contrast hover:bg-accent-solid-hover',
       ghost:
         'border-border-strong bg-transparent text-text hover:border-accent hover:text-accent',
       link: 'border-transparent bg-transparent px-1 text-accent underline underline-offset-[3px] hover:text-accent-hover',
