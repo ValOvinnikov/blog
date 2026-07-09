@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 
 import { NavLink } from '../../atoms/nav-link';
+
 import { Footer } from './footer';
 
 describe(`<${Footer.name}/>`, () => {

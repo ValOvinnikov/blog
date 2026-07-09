@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 
 import { NavLink } from '../../atoms/nav-link';
+
 import { Header } from './header';
 
 describe(`<${Header.name}/>`, () => {

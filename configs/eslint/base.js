@@ -1,7 +1,6 @@
 import js from '@eslint/js';
 import checkFile from 'eslint-plugin-check-file';
 import importX from 'eslint-plugin-import-x';
-import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import prettier from 'eslint-config-prettier/flat';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -24,7 +23,6 @@ export default [
       globals: { ...globals.browser, ...globals.node },
     },
     plugins: {
-      'simple-import-sort': simpleImportSort,
       'import-x': importX,
     },
     rules: {
@@ -38,10 +36,30 @@ export default [
         { selector: 'typeAlias', format: ['PascalCase'], prefix: ['T'] },
         { selector: 'interface', format: ['PascalCase'], prefix: ['I'] },
       ],
-      'simple-import-sort/imports': 'error',
-      'simple-import-sort/exports': 'error',
       'import-x/first': 'error',
       'import-x/no-duplicates': 'error',
+      'import-x/order': [
+        'error',
+        {
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+          ],
+          // `#/*` (service) and `@/*` (web) are this package's own subpath
+          // import aliases — without this, import-x can't tell they're
+          // "internal" and falls back to sorting them after every named group.
+          pathGroups: [
+            { pattern: '#/**', group: 'internal' },
+            { pattern: '@/**', group: 'internal' },
+          ],
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc', caseInsensitive: true },
+        },
+      ],
     },
   },
   {
