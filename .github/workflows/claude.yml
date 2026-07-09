@@ -48,3 +48,10 @@ jobs:
           # or https://code.claude.com/docs/en/cli-reference for available options
           # claude_args: '--allowed-tools Bash(gh pr *)'
 
+          # Trigger-phrase model routing: "@claude-opus" runs Opus 4.8;
+          # plain "@claude" (the default) runs Sonnet 5. "@claude-opus"
+          # already contains the "@claude" substring, so the job's `if:`
+          # trigger above fires for both without any change.
+          claude_args: |
+            --model ${{ (contains(github.event.comment.body, '@claude-opus') || contains(github.event.review.body, '@claude-opus') || contains(github.event.issue.body, '@claude-opus') || contains(github.event.issue.title, '@claude-opus')) && 'claude-opus-4-8' || 'claude-sonnet-5' }}
+
