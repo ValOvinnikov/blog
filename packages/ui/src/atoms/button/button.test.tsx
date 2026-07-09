@@ -14,6 +14,13 @@ describe(`<${Button.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Disabled' })).toBeDisabled();
   });
 
+  it('keeps the primary text color alongside the size (regression: tailwind-merge must not strip text-accent-contrast)', () => {
+    render(<Button variant="primary">Publish</Button>);
+    const btn = screen.getByRole('button', { name: 'Publish' });
+    expect(btn.className).toContain('text-accent-contrast');
+    expect(btn.className).toContain('text-copy');
+  });
+
   it('renders ghost variant with strong border', () => {
     render(<Button variant="ghost">Ghost</Button>);
     const btn = screen.getByRole('button', { name: 'Ghost' });
