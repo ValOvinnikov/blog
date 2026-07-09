@@ -19,13 +19,21 @@ jobs:
     # Restrict to the repo owner only — this repo is public, and without an
     # actor check any commenter could trigger a real agent run against
     # github.actor's credentials/quota.
+    #
+    # The actor check alone only gates *who triggers* a run, not *whose
+    # content the agent reads as context*. Since this job has contents:write +
+    # pull-requests:write, an untrusted user could plant an adversarial
+    # issue/PR body that the agent later ingests when the owner @claude's that
+    # thread. Each branch below additionally requires the underlying
+    # issue/PR to be owner-authored (github.event.issue.user.login /
+    # github.event.pull_request.user.login), closing that vector.
     if: |
       github.actor == 'ValOvinnikov' &&
       (
-        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-        (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-        (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-        (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && github.event.issue.user.login == 'ValOvinnikov') ||
+        (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude') && github.event.pull_request.user.login == 'ValOvinnikov') ||
+        (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude') && github.event.pull_request.user.login == 'ValOvinnikov') ||
+        (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')) && github.event.issue.user.login == 'ValOvinnikov')
       )
     runs-on: ubuntu-latest
     permissions:
