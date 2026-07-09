@@ -28,6 +28,7 @@ jobs:
         (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
       )
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write # lets Claude push branches so it can open PRs
       pull-requests: write # lets Claude open/update PRs
