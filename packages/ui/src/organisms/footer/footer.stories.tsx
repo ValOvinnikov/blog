@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { NavLink } from '../../atoms/nav-link';
+
 import { Footer } from './footer';
 
 const meta = {
