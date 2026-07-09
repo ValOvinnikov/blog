@@ -1,6 +1,7 @@
 {
   "name": "cms",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "sanity dev",
     "build": "sanity build",
