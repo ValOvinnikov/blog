@@ -14,6 +14,9 @@ export const ThemeToggleButton = () => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Reads DOM state set by a pre-hydration inline script to avoid an SSR/client
+    // mismatch; there is no external-store subscription to move this into.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsDark(document.documentElement.classList.contains('dark'));
     setMounted(true);
   }, []);

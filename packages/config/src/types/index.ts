@@ -1,4 +1,4 @@
-import { TLocaleIsoCode } from '../constants';
+import type { TLocaleIsoCode } from '../constants';
 
 export interface IWithDataTestId {
   dataTestId?: string;
