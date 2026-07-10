@@ -15,6 +15,14 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../../packages/config/src/sanity/generated/schema.json
+export type Brand = {
+  _type: 'brand';
+  name?: string;
+  prefix?: string;
+  suffix?: string;
+  logo?: ImageWithAlt;
+};
+
 export type Seo = {
   _type: 'seo';
   metaTitle?: string;
@@ -103,29 +111,42 @@ export type ImageWithAlt = {
   alt?: string;
 };
 
+export type Settings_footer = {
+  _id: string;
+  _type: 'settings_footer';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  social?: Array<
+    {
+      _key: string;
+    } & SocialLink
+  >;
+};
+
+export type Settings_navigation = {
+  _id: string;
+  _type: 'settings_navigation';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  items?: Array<
+    {
+      _key: string;
+    } & NavItem
+  >;
+};
+
 export type SiteSettings = {
   _id: string;
   _type: 'siteSettings';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  title?: string;
+  brand?: Brand;
   description?: string;
   tagline?: string;
-  logo?: ImageWithAlt;
-  brandPrefix?: string;
-  brandSuffix?: string;
   defaultSeo?: OpenGraph;
-  navigation?: Array<
-    {
-      _key: string;
-    } & NavItem
-  >;
-  socialLinks?: Array<
-    {
-      _key: string;
-    } & SocialLink
-  >;
 };
 
 export type PostReference = {
@@ -389,6 +410,7 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | Brand
   | Seo
   | OpenGraph
   | NavItem
@@ -397,6 +419,8 @@ export type AllSanitySchemaTypes =
   | PortableText
   | SanityImageAssetReference
   | ImageWithAlt
+  | Settings_footer
+  | Settings_navigation
   | SiteSettings
   | PostReference
   | LinkReference

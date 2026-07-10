@@ -5,7 +5,9 @@ import {
   FileText,
   House,
   Link2,
+  Menu,
   Newspaper,
+  PanelBottom,
   Settings,
   Tags,
   UserRound,
@@ -87,6 +89,24 @@ export default defineConfig({
                         S.document()
                           .schemaType('siteSettings')
                           .documentId('siteSettings'),
+                      ),
+                    S.listItem()
+                      .title('Navigation')
+                      .id('settings_navigation')
+                      .icon(Menu)
+                      .child(
+                        S.document()
+                          .schemaType('settings_navigation')
+                          .documentId('settings_navigation'),
+                      ),
+                    S.listItem()
+                      .title('Footer')
+                      .id('settings_footer')
+                      .icon(PanelBottom)
+                      .child(
+                        S.document()
+                          .schemaType('settings_footer')
+                          .documentId('settings_footer'),
                       ),
                   ]),
               ),
