@@ -33,5 +33,12 @@ export default defineType({
         'Page content — supports rich text, images, and code blocks.',
       validation: (rule) => rule.required(),
     }),
+    defineField({
+      name: 'seo',
+      title: 'SEO',
+      type: 'seo',
+      description:
+        'Override meta title, description, and OG image for search engines.',
+    }),
   ],
 });

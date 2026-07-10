@@ -197,6 +197,7 @@ export type Page = {
   title?: string;
   slug?: Slug;
   body?: PortableText;
+  seo?: Seo;
 };
 
 export type Slug = {
