@@ -17,6 +17,12 @@ export default mergeConfig(
     test: {
       environment: 'jsdom',
       setupFiles: ['./src/test-setup.ts'],
+      css: {
+        // `?raw` CSS imports (e.g. the design-token gallery's theme.css?raw)
+        // must bypass Vitest's default CSS stubbing so the raw source text
+        // is preserved; every other .css import stays stubbed for speed.
+        include: [/\?raw/],
+      },
     },
   }),
 );
