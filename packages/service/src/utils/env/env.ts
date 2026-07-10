@@ -7,14 +7,14 @@ import { z } from 'zod';
 export const env = createEnv({
   server: {
     NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().min(1),
-    NEXT_PUBLIC_SANITY_DATASET: z.string().min(1).default('production'),
+    // Required, no default: every environment (.env.example included) sets the
+    // dataset explicitly. A silent 'production' fallback would let a
+    // misconfigured preview/dev quietly read production content.
+    NEXT_PUBLIC_SANITY_DATASET: z.string().min(1),
     SANITY_API_READ_TOKEN: z.string().min(1).optional(),
   },
-  shared: {
-    NODE_ENV: z
-      .enum(['development', 'production', 'test'])
-      .default('development'),
-  },
+  // NODE_ENV is intentionally not validated here: it's a runtime-guaranteed
+  // system var (Node/Next/Vitest always set it). client.ts reads it directly.
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,
   skipValidation: !!process.env['SKIP_ENV_VALIDATION'],

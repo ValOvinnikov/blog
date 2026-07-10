@@ -4,7 +4,6 @@ const ENV_KEYS = [
   'NEXT_PUBLIC_SANITY_PROJECT_ID',
   'NEXT_PUBLIC_SANITY_DATASET',
   'SANITY_API_READ_TOKEN',
-  'NODE_ENV',
   'SKIP_ENV_VALIDATION',
 ] as const;
 
@@ -40,14 +39,12 @@ describe('env', () => {
     process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
     process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
     process.env['SANITY_API_READ_TOKEN'] = 'secret-token';
-    process.env['NODE_ENV'] = 'production';
 
     const { env } = await importEnv();
 
     expect(env.NEXT_PUBLIC_SANITY_PROJECT_ID).toBe('abc123');
     expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe('staging');
     expect(env.SANITY_API_READ_TOKEN).toBe('secret-token');
-    expect(env.NODE_ENV).toBe('production');
   });
 
   it('throws when NEXT_PUBLIC_SANITY_PROJECT_ID is missing', async () => {
@@ -58,14 +55,12 @@ describe('env', () => {
     await expect(importEnv()).rejects.toThrow();
   });
 
-  it('falls back to "production" when NEXT_PUBLIC_SANITY_DATASET is empty', async () => {
+  it('throws when NEXT_PUBLIC_SANITY_DATASET is empty (no default)', async () => {
     delete process.env['SKIP_ENV_VALIDATION'];
     process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
     process.env['NEXT_PUBLIC_SANITY_DATASET'] = '';
 
-    const { env } = await importEnv();
-
-    expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe('production');
+    await expect(importEnv()).rejects.toThrow();
   });
 
   it('leaves SANITY_API_READ_TOKEN undefined when absent', async () => {

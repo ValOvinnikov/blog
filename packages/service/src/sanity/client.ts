@@ -1,6 +1,6 @@
 import { createClient } from 'next-sanity';
 
-import { env } from '../env';
+import { env } from '#/utils/env/env';
 
 type TSanityClient = ReturnType<typeof createClient>;
 
@@ -13,7 +13,7 @@ export function getClient(): TSanityClient {
     projectId: env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     dataset: env.NEXT_PUBLIC_SANITY_DATASET,
     apiVersion: '2024-01-01',
-    useCdn: env.NODE_ENV === 'production',
+    useCdn: process.env['NODE_ENV'] === 'production',
     token: env.SANITY_API_READ_TOKEN,
   });
 
