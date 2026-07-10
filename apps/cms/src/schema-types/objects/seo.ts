@@ -4,6 +4,7 @@ export default defineType({
   name: 'seo',
   title: 'SEO',
   type: 'object',
+  options: { collapsible: true, collapsed: true },
   fields: [
     defineField({
       name: 'metaTitle',
@@ -22,27 +23,10 @@ export default defineType({
       validation: (rule) => rule.max(160),
     }),
     defineField({
-      name: 'ogTitle',
-      title: 'OG Title',
-      type: 'string',
-      description:
-        'Title shown when shared on social media. Defaults to meta title if empty.',
-      validation: (rule) => rule.max(70),
-    }),
-    defineField({
-      name: 'ogDescription',
-      title: 'OG Description',
-      type: 'text',
-      description:
-        'Description shown when shared on social media. Defaults to meta description if empty.',
-      validation: (rule) => rule.max(200),
-    }),
-    defineField({
-      name: 'ogImage',
-      title: 'OG Image',
-      type: 'imageWithAlt',
-      description:
-        'Image shown when shared on social media. Recommended size: 1200×630 px.',
+      name: 'openGraph',
+      title: 'Open Graph',
+      type: 'openGraph',
+      description: 'Social-sharing overrides (title, description, image).',
     }),
   ],
 });

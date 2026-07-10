@@ -26,6 +26,30 @@
           },
           "optional": true
         },
+        "openGraph": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "openGraph"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "openGraph",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "openGraph"
+          }
+        },
         "ogTitle": {
           "type": "objectAttribute",
           "value": {
@@ -666,25 +690,11 @@
         },
         "optional": true
       },
-      "ogImage": {
+      "defaultSeo": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "imageWithAlt"
-        },
-        "optional": true
-      },
-      "ogTitle": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "ogDescription": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
+          "name": "openGraph"
         },
         "optional": true
       },
@@ -1411,16 +1421,6 @@
               "type": "inline",
               "name": "category.reference"
             }
-          }
-        },
-        "optional": true
-      },
-      "tags": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "array",
-          "of": {
-            "type": "string"
           }
         },
         "optional": true

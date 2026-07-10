@@ -19,6 +19,11 @@ export type Seo = {
   _type: 'seo';
   metaTitle?: string;
   metaDescription?: string;
+  openGraph?: OpenGraph;
+};
+
+export type OpenGraph = {
+  _type: 'openGraph';
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: ImageWithAlt;
@@ -110,9 +115,7 @@ export type SiteSettings = {
   logo?: ImageWithAlt;
   brandPrefix?: string;
   brandSuffix?: string;
-  ogImage?: ImageWithAlt;
-  ogTitle?: string;
-  ogDescription?: string;
+  defaultSeo?: OpenGraph;
   navigation?: Array<
     {
       _key: string;
@@ -240,7 +243,6 @@ export type Post = {
       _key: string;
     } & CategoryReference
   >;
-  tags?: Array<string>;
   publishedAt?: string;
   body?: PortableText;
   featured?: boolean;
@@ -388,6 +390,7 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | Seo
+  | OpenGraph
   | NavItem
   | SocialLink
   | BlockText
