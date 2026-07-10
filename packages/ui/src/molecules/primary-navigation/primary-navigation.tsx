@@ -11,6 +11,7 @@ export interface INavItem {
   href: string;
   label: string;
   isActive?: boolean;
+  target?: '_blank';
 }
 
 export interface IPrimaryNavigationProps
@@ -42,8 +43,14 @@ export const PrimaryNavigation = ({
     data-testid={dataTestId}
     {...rest}
   >
-    {links.map(({ href, label, isActive }) => (
-      <NavLink key={href} as={linkAs} href={href} isActive={isActive}>
+    {links.map(({ href, label, isActive, target }) => (
+      <NavLink
+        key={href}
+        as={linkAs}
+        href={href}
+        isActive={isActive}
+        target={target}
+      >
         {label}
       </NavLink>
     ))}

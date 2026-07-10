@@ -27,3 +27,17 @@ export const WithActions: TStory = {
     actions: <button type="button">Toggle theme</button>,
   },
 };
+
+export const WithExternalLink: TStory = {
+  args: {
+    links: [
+      { href: '/blog', label: 'Blog', isActive: true },
+      { href: '/about', label: 'About' },
+      {
+        href: faker.internet.url(),
+        label: 'Docs',
+        target: '_blank',
+      },
+    ],
+  },
+};
