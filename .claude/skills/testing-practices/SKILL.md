@@ -66,6 +66,25 @@ export default mergeConfig(
 
 - Arrange–Act–Assert; one behaviour per `it`. Descriptive names:
   `it("renders the post title and author")`.
+- **When a suite targets a single exported symbol (function/component), pass the
+  symbol itself to `describe`, not a string.** Vitest derives the suite name from
+  the reference's `.name`, so the label can never drift from the code: rename the
+  symbol and the suite name follows, and deleting it is a compile error instead of
+  a stale string. Use a string only when no single symbol names the suite.
+
+  ```ts
+  import { objectKeys } from './objects';
+
+  describe(objectKeys, () => {
+    // ✅ suite name tracks the symbol
+    it("returns the object's keys", () => {
+      /* … */
+    });
+  });
+
+  // ❌ describe('objectKeys', () => { … })  — string drifts on rename
+  ```
+
 - Prefer semantic queries (`getByRole`, `getByText`, `getByLabelText`) over
   `getByTestId`. Use `getByTestId` when a semantic query would be ambiguous —
   this is common in molecule and organism integration tests where the same role

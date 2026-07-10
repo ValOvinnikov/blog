@@ -1,4 +1,5 @@
-import { objectKeys, Size } from '@blog/config';
+import { Size } from '@blog/config';
+import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Button } from './button';

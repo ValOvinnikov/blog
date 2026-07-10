@@ -336,6 +336,9 @@ importers:
       '@blog/tailwind-config':
         specifier: workspace:*
         version: link:../../configs/tailwind
+      '@blog/utils':
+        specifier: workspace:*
+        version: link:../utils
       lucide-react:
         specifier: ^1.24.0
         version: 1.24.0(react@19.2.7)
