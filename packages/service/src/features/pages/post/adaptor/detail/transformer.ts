@@ -2,6 +2,7 @@ import type { InferResultType } from 'groqd';
 
 import { buildImageUrl } from '#/shared/transformers/build-image-url';
 import { toCategory } from '#/shared/transformers/to-category';
+import { toSanityImage } from '#/shared/transformers/to-sanity-image';
 import { toSeoMeta } from '#/shared/transformers/to-seo-meta';
 import { toSocialLink } from '#/shared/transformers/to-social-link';
 
@@ -35,6 +36,7 @@ export function toPostDetail(raw: TRawPostDetail): TPostDetail {
     publishedAt: raw.publishedAt,
     mainImageUrl: buildImageUrl(raw.mainImage),
     mainImageAlt: raw.mainImage.alt,
+    mainImageSanity: toSanityImage(raw.mainImageAsset),
     featured: raw.featured ?? false,
     body: raw.body,
     seo: raw.seo ? toSeoMeta(raw.seo) : undefined,
