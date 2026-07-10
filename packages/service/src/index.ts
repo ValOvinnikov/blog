@@ -2,6 +2,8 @@
 
 import { createAuthorService } from './features/entities/author';
 import { createCategoriesService } from './features/entities/categories';
+import { createFooterService } from './features/global/footer';
+import { createNavigationService } from './features/global/navigation';
 import { createSiteSettingsService } from './features/global/site-settings';
 import { createBlogService } from './features/pages/blog';
 import { createCategoryService } from './features/pages/category';
@@ -21,12 +23,16 @@ export const service = {
   },
   global: {
     siteSettings: createSiteSettingsService(),
+    navigation: createNavigationService(),
+    footer: createFooterService(),
   },
 };
 
 export type { TAuthorDetail } from './features/entities/author';
 export type { TCategoriesList } from './features/entities/categories';
-export type { TNavItem, TSiteSettings } from './features/global/site-settings';
+export type { TFooter } from './features/global/footer';
+export type { TNavigation, TNavItem } from './features/global/navigation';
+export type { TBrand, TSiteSettings } from './features/global/site-settings';
 export type { TBlogPage } from './features/pages/blog';
 export type { TCategoryPage } from './features/pages/category';
 export type { THomePage } from './features/pages/home';

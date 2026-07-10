@@ -1,19 +1,24 @@
 import { Settings } from 'lucide-react';
-import { defineArrayMember, defineField, defineType } from 'sanity';
+import { defineField, defineType } from 'sanity';
 
 export default defineType({
   name: 'siteSettings',
   title: 'Site Settings',
   type: 'document',
   icon: Settings,
+  preview: {
+    select: { title: 'brand.name' },
+    prepare: ({ title }) => ({
+      title: title ?? 'Site Settings',
+      subtitle: 'Site settings',
+    }),
+  },
   fields: [
     defineField({
-      name: 'title',
-      title: 'Site Title',
-      type: 'string',
-      description:
-        'Used in the browser tab, RSS feed, and as the default SEO title prefix.',
-      validation: (rule) => rule.required().max(60),
+      name: 'brand',
+      title: 'Brand',
+      type: 'brand',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'description',
@@ -30,30 +35,6 @@ export default defineType({
       validation: (rule) => rule.max(120),
     }),
     defineField({
-      name: 'logo',
-      title: 'Logo',
-      type: 'imageWithAlt',
-      description:
-        'Site logo shown in the header. SVG or high-res PNG recommended.',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'brandPrefix',
-      title: 'Brand Prefix',
-      type: 'string',
-      description:
-        'Primary brand text shown in the site header logo, e.g. "val".',
-      validation: (rule) => rule.required().max(30),
-    }),
-    defineField({
-      name: 'brandSuffix',
-      title: 'Brand Suffix',
-      type: 'string',
-      description:
-        'Accent suffix shown after the brand prefix in the site header logo, e.g. ".dev".',
-      validation: (rule) => rule.max(30),
-    }),
-    defineField({
       name: 'defaultSeo',
       title: 'Default Social Sharing',
       type: 'openGraph',
@@ -65,20 +46,6 @@ export default defineType({
           .custom((value: { ogImage?: unknown } | undefined) =>
             value?.ogImage ? true : 'A default OG image is required.',
           ),
-    }),
-    defineField({
-      name: 'navigation',
-      title: 'Navigation',
-      type: 'array',
-      description: 'Top-level nav links rendered in the site header.',
-      of: [defineArrayMember({ type: 'navItem' })],
-    }),
-    defineField({
-      name: 'socialLinks',
-      title: 'Social Links',
-      type: 'array',
-      description: 'Social profile links shown in the site footer.',
-      of: [defineArrayMember({ type: 'socialLink' })],
     }),
   ],
 });

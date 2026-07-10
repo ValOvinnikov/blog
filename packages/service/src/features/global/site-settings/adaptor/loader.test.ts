@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { makeRawSiteSettings } from '#/testing/global/fixtures';
 import { mockRun } from '#/testing/mock-run-query';
+import { makeRawImage } from '#/testing/shared/fixtures';
 
 import { getSiteSettings } from './loader';
 
@@ -20,20 +21,21 @@ describe('getSiteSettings', () => {
   it('maps raw site settings into a domain object', async () => {
     mockRun.mockResolvedValue(
       makeRawSiteSettings({
-        title: 'Awesome Blog',
         description: 'Great content',
-        brandPrefix: 'val',
-        brandSuffix: '.dev',
+        brand: {
+          name: 'Awesome Blog',
+          prefix: 'val',
+          suffix: '.dev',
+          logo: makeRawImage('Logo'),
+        },
       }),
     );
 
     const result = await getSiteSettings();
 
-    expect(result.title).toBe('Awesome Blog');
     expect(result.description).toBe('Great content');
-    expect(result.brandPrefix).toBe('val');
-    expect(result.brandSuffix).toBe('.dev');
-    expect(result.navigation).toEqual([]);
-    expect(result.socialLinks).toEqual([]);
+    expect(result.brand.name).toBe('Awesome Blog');
+    expect(result.brand.prefix).toBe('val');
+    expect(result.brand.suffix).toBe('.dev');
   });
 });
