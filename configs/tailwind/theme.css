@@ -28,8 +28,9 @@
   --color-accent-muted: var(--accent-muted);
   --color-accent-contrast: var(--accent-contrast);
   /* Filled accent surface (e.g. primary button). Kept distinct from --accent
-     so the bright dark-mode accent can stay vivid for links/rings/tags while a
-     filled surface stays dark enough for white --accent-contrast text. */
+     so each mode can tune the fill independently: light mode uses a darker
+     fill with white --accent-contrast text, dark mode uses a vivid fill
+     matching --accent with near-black --accent-contrast text. */
   --color-accent-solid: var(--accent-solid);
   --color-accent-solid-hover: var(--accent-solid-hover);
 
@@ -209,13 +210,13 @@
   --accent: oklch(0.7 0.16 250);
   --accent-hover: oklch(0.76 0.16 250);
   --accent-muted: oklch(0.3 0.06 250);
-  /* White (not near-black): the primary button now sits on --accent-solid, a
-     darker filled surface, so white label text is legible AND consistent with
-     light mode. The bright --accent above stays for links/rings/tags. */
-  --accent-contrast: oklch(0.99 0 0);
-  /* Filled-surface accent — darker than --accent so white text hits ~5.1:1. */
-  --accent-solid: oklch(0.53 0.16 250);
-  --accent-solid-hover: oklch(0.47 0.16 250);
+  /* Near-black (not white): the dark-mode primary button is now a bright,
+     vivid accent fill (matching --accent) with near-black label text, which
+     reads as the intended "bright accent button" look and hits ~7.3:1 (AAA). */
+  --accent-contrast: oklch(0.16 0.006 250);
+  /* Filled-surface accent — vivid, matches --accent so near-black text hits ~7.3:1 (AAA). */
+  --accent-solid: oklch(0.7 0.16 250);
+  --accent-solid-hover: oklch(0.76 0.16 250);
   --ring: var(--accent);
 }
 
