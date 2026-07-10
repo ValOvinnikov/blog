@@ -34,6 +34,22 @@ describe(parseThemeTokens, () => {
     expect(accentSolid?.name).toBe('accent-solid');
   });
 
+  it('captures the declared value', () => {
+    const tokens = parseThemeTokens(SAMPLE);
+    expect(tokens.find((t) => t.cssVar === '--color-bg')?.value).toBe(
+      'var(--bg)',
+    );
+    expect(tokens.find((t) => t.cssVar === '--radius-sm')?.value).toBe('3px');
+  });
+
+  it('only reads @theme blocks, not the raw :root palette', () => {
+    const withRoot = `${SAMPLE}\n:root { --text: oklch(0.2 0 0); --muted: oklch(0.5 0 0); }`;
+    const tokens = parseThemeTokens(withRoot);
+    // `--text` / `--muted` from :root must not appear as typography tokens.
+    expect(tokens.find((t) => t.cssVar === '--text')).toBeUndefined();
+    expect(tokens.find((t) => t.cssVar === '--muted')).toBeUndefined();
+  });
+
   it('reads an @role comment when present', () => {
     const tokens = parseThemeTokens(SAMPLE);
     const bg = tokens.find((t) => t.cssVar === '--color-bg');

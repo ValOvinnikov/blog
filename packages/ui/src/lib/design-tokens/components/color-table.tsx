@@ -27,10 +27,10 @@ export const ColorTable = ({ tokens }: TColorTableProps) => (
           <td className="py-3 font-mono text-label">{token.name}</td>
           <td className="py-3 text-text-muted">{token.role}</td>
           <td className="py-3">
-            <TokenChip cssVar={token.cssVar} scheme="light" />
+            <TokenChip value={token.value} scheme="light" />
           </td>
           <td className="py-3">
-            <TokenChip cssVar={token.cssVar} scheme="dark" />
+            <TokenChip value={token.value} scheme="dark" />
           </td>
         </tr>
       ))}

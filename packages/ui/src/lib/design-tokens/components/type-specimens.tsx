@@ -7,24 +7,27 @@ export type TTypeSpecimensProps = {
   fontOnly?: boolean;
 };
 
+const SAMPLE = 'The quick brown fox jumps over the lazy dog';
+
 /**
- * Renders one specimen line per typography or font token, styled with the
- * token's own `var()` value so the gallery always reflects the live theme.
+ * One specimen row per typography or font token, styled with the token's own
+ * declared value. Rows are divided by a hairline so each specimen is clearly
+ * separated (mirrors the colour table's row rhythm).
  */
 export const TypeSpecimens = ({ tokens, fontOnly }: TTypeSpecimensProps) => (
-  <div className="space-y-6">
+  <div className="divide-y divide-border">
     {tokens.map((token) => {
       const style: CSSProperties = fontOnly
-        ? { fontFamily: `var(${token.cssVar})` }
-        : { fontSize: `var(${token.cssVar})` };
+        ? { fontFamily: token.value }
+        : { fontSize: token.value };
       const descriptor = fontOnly ? `font-${token.name}` : `text-${token.name}`;
 
       return (
-        <div key={token.cssVar}>
-          <p className="mb-1 font-mono text-label text-text-subtle uppercase">
+        <div key={token.cssVar} className="py-5">
+          <p className="mb-2 font-mono text-label text-text-subtle uppercase">
             {descriptor}
           </p>
-          <p style={style}>The quick brown fox jumps over the lazy dog</p>
+          <p style={style}>{SAMPLE}</p>
         </div>
       );
     })}

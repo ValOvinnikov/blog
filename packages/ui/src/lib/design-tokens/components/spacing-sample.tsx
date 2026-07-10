@@ -13,13 +13,16 @@ export const SpacingSample = ({ tokens }: TSpacingSampleProps) => (
   <div className="space-y-3">
     {tokens.map((token) => (
       <div key={token.cssVar} className="flex items-center gap-4">
-        <span className="w-32 shrink-0 font-mono text-label text-text-subtle">
+        <span className="w-28 shrink-0 font-mono text-label text-text-subtle">
           {token.name}
         </span>
         <span
-          className="h-4 rounded-sm bg-accent"
-          style={{ width: `var(${token.cssVar})` }}
+          className="h-4 shrink-0 rounded-sm bg-accent"
+          style={{ width: token.value }}
         />
+        <span className="font-mono text-label text-text-muted">
+          {token.value}
+        </span>
       </div>
     ))}
   </div>

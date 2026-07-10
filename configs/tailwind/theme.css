@@ -193,6 +193,8 @@
   --accent-solid-hover: oklch(0.49 0.17 250);
   --ring: var(--accent);
 
+  /* Durations live here (not @theme) so the @layer base transition utilities'
+     var() references are never tree-shaken out of the runtime CSS. */
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --duration-slow: 360ms;
