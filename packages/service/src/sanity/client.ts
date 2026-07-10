@@ -1,3 +1,7 @@
+// Fails the build if this module is ever pulled into a client bundle — the
+// Sanity client reads SANITY_API_READ_TOKEN and must stay server-only.
+import 'server-only';
+
 import { createClient } from 'next-sanity';
 
 import { env } from '#/utils/env/env';
@@ -15,6 +19,8 @@ export function getClient(): TSanityClient {
     apiVersion: '2024-01-01',
     useCdn: process.env['NODE_ENV'] === 'production',
     token: env.SANITY_API_READ_TOKEN,
+    // Explicit (already the default): never serve draft content to the public.
+    perspective: 'published',
   });
 
   return client;
