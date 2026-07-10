@@ -6,6 +6,7 @@ export default defineType({
   title: 'Navigation',
   type: 'document',
   icon: Menu,
+  preview: { prepare: () => ({ title: 'Navigation' }) },
   fields: [
     defineField({
       name: 'items',

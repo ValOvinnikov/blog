@@ -6,6 +6,7 @@ export default defineType({
   title: 'Footer',
   type: 'document',
   icon: PanelBottom,
+  preview: { prepare: () => ({ title: 'Footer' }) },
   fields: [
     defineField({
       name: 'social',
