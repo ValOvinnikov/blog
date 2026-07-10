@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import type { ReactElement } from 'react';
 
 import { ColorTable } from './components/color-table';
 import { KvList } from './components/kv-list';
 import { ShapeSample } from './components/shape-sample';
+import { SpacingSample } from './components/spacing-sample';
 import { TokenSection } from './components/token-section';
 import { TypeSpecimens } from './components/type-specimens';
+import type { TToken } from './parse-theme-tokens';
 import { tokensByCategory } from './token-registry';
 
 const meta = {
@@ -15,52 +18,57 @@ export default meta;
 
 type TStory = StoryObj<typeof meta>;
 
+/** Render a titled section, or nothing when the category has no tokens. */
+const section = (
+  title: string,
+  tokens: TToken[],
+  render: (tokens: TToken[]) => ReactElement,
+): ReactElement =>
+  tokens.length === 0 ? (
+    <></>
+  ) : (
+    <TokenSection title={title}>{render(tokens)}</TokenSection>
+  );
+
 export const Colour: TStory = {
-  render: () => (
-    <TokenSection title="Colour">
-      <ColorTable tokens={tokensByCategory.color} />
-    </TokenSection>
-  ),
+  render: () =>
+    section('Colour', tokensByCategory.color, (t) => <ColorTable tokens={t} />),
 };
 
 export const Typography: TStory = {
-  render: () => (
-    <TokenSection title="Typography">
-      <TypeSpecimens tokens={tokensByCategory.typography} />
-    </TokenSection>
-  ),
+  render: () =>
+    section('Typography', tokensByCategory.typography, (t) => (
+      <TypeSpecimens tokens={t} />
+    )),
 };
 
 export const Fonts: TStory = {
-  render: () => (
-    <TokenSection title="Fonts">
-      <TypeSpecimens tokens={tokensByCategory.font} fontOnly />
-    </TokenSection>
-  ),
+  render: () =>
+    section('Fonts', tokensByCategory.font, (t) => (
+      <TypeSpecimens tokens={t} fontOnly />
+    )),
 };
 
 export const Radius: TStory = {
-  render: () => (
-    <TokenSection title="Radius">
-      <ShapeSample tokens={tokensByCategory.radius} />
-    </TokenSection>
-  ),
+  render: () =>
+    section('Radius', tokensByCategory.radius, (t) => (
+      <ShapeSample tokens={t} />
+    )),
 };
 
 export const Spacing: TStory = {
-  render: () => (
-    <TokenSection title="Spacing">
-      <KvList tokens={tokensByCategory.spacing} />
-    </TokenSection>
-  ),
+  render: () =>
+    section('Spacing', tokensByCategory.spacing, (t) => (
+      <SpacingSample tokens={t} />
+    )),
+};
+
+export const Layout: TStory = {
+  render: () =>
+    section('Layout', tokensByCategory.layout, (t) => <KvList tokens={t} />),
 };
 
 export const Motion: TStory = {
-  render: () => (
-    <TokenSection title="Motion">
-      <KvList
-        tokens={[...tokensByCategory.layout, ...tokensByCategory.motion]}
-      />
-    </TokenSection>
-  ),
+  render: () =>
+    section('Motion', tokensByCategory.motion, (t) => <KvList tokens={t} />),
 };
