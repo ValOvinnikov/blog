@@ -63,14 +63,6 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'tags',
-      title: 'Tags',
-      type: 'array',
-      description: 'Freeform tags for additional discovery.',
-      of: [defineArrayMember({ type: 'string' })],
-      options: { layout: 'tags' },
-    }),
-    defineField({
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',

@@ -54,28 +54,17 @@ export default defineType({
       validation: (rule) => rule.max(30),
     }),
     defineField({
-      name: 'ogImage',
-      title: 'Default OG Image',
-      type: 'imageWithAlt',
+      name: 'defaultSeo',
+      title: 'Default Social Sharing',
+      type: 'openGraph',
       description:
-        'Fallback social-share image used when a post or page has no own OG image.',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'ogTitle',
-      title: 'Default OG Title',
-      type: 'string',
-      description:
-        'Fallback social-share title. Defaults to site title if empty.',
-      validation: (rule) => rule.max(70),
-    }),
-    defineField({
-      name: 'ogDescription',
-      title: 'Default OG Description',
-      type: 'text',
-      description:
-        'Fallback social-share description. Defaults to site description if empty.',
-      validation: (rule) => rule.max(200),
+        'Fallback title/description/image used when a page has no own OG values.',
+      validation: (rule) =>
+        rule
+          .required()
+          .custom((value: { ogImage?: unknown } | undefined) =>
+            value?.ogImage ? true : 'A default OG image is required.',
+          ),
     }),
     defineField({
       name: 'navigation',

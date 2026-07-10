@@ -17,8 +17,8 @@ export function toSeoMeta(raw: TRawSeo): TSeoMeta {
   return {
     metaTitle: raw.metaTitle,
     metaDescription: raw.metaDescription ?? undefined,
-    ogTitle: raw.ogTitle ?? undefined,
-    ogDescription: raw.ogDescription ?? undefined,
-    ogImageUrl: buildImageUrl(raw.ogImage),
+    ogTitle: raw.openGraph?.ogTitle ?? undefined,
+    ogDescription: raw.openGraph?.ogDescription ?? undefined,
+    ogImageUrl: buildImageUrl(raw.openGraph?.ogImage),
   };
 }

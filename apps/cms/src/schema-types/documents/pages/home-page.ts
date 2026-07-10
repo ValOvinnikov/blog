@@ -39,11 +39,6 @@ export default defineType({
       title: 'Latest Posts',
       options: { collapsible: true, collapsed: false },
     },
-    {
-      name: 'seo',
-      title: 'SEO',
-      options: { collapsible: true, collapsed: true },
-    },
   ],
   initialValue: {
     title: 'Home Page',
@@ -243,7 +238,6 @@ export default defineType({
       type: 'seo',
       description:
         'Override Home page meta title, description, and social sharing image.',
-      fieldset: 'seo',
     }),
   ],
 });
