@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { mockRun } from '#/testing/mock-run-query';
 import { makeRawPostCard } from '#/testing/pages/fixtures';
+import { makeRawSanityImage } from '#/testing/shared/fixtures';
 
 import { getHomePage } from './loader';
 
@@ -24,6 +25,7 @@ describe('getHomePage', () => {
         heroSubtitle: null,
         heroImageMode: 'postImage',
         heroImage: null,
+        heroImageAsset: null,
         primaryActionLabel: 'Start reading',
         secondaryAction: {
           label: 'Browse all',
@@ -81,6 +83,7 @@ describe('getHomePage', () => {
         heroSubtitle: 'Custom home subtitle.',
         heroImageMode: 'custom',
         heroImage: makeRawPostCard().mainImage,
+        heroImageAsset: makeRawSanityImage(),
         primaryActionLabel: null,
         secondaryAction: null,
         latestPostsTitle: 'Recent writing',
@@ -99,6 +102,14 @@ describe('getHomePage', () => {
     expect(page.hero.subtitle).toBe('Custom home subtitle.');
     expect(page.hero.image?.src).toContain('cdn.sanity.io');
     expect(page.hero.image?.alt).toBe('Alt text');
+    expect(page.hero.sanityImage).toEqual({
+      assetId: 'image-abc123-800x600-jpg',
+      alt: 'Alt text',
+      hotspot: undefined,
+      crop: undefined,
+      lqip: 'data:image/png;base64,abc123',
+      dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
+    });
     expect(page.latestPostsTitle).toBe('Recent writing');
     expect(page.latestPosts).toHaveLength(1);
   });

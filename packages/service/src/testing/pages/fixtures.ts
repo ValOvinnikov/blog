@@ -1,6 +1,6 @@
 import type { TRawPostDetail } from '#/features/pages/post/adaptor/detail/transformer';
 import type { TRawPostCard } from '#/shared/transformers/to-post-card';
-import { makeRawImage } from '#/testing/shared/fixtures';
+import { makeRawImage, makeRawSanityImage } from '#/testing/shared/fixtures';
 
 export function makeRawPostCard(
   overrides: Partial<TRawPostCard> = {},
@@ -12,6 +12,7 @@ export function makeRawPostCard(
     excerpt: 'A sufficiently long excerpt for the card.',
     publishedAt: '2026-01-15T00:00:00Z',
     mainImage: makeRawImage(),
+    mainImageAsset: makeRawSanityImage(),
     featured: false,
     author: {
       _id: 'author-1',
@@ -42,6 +43,7 @@ export function makeRawPostDetail(
     excerpt: 'A sufficiently long excerpt for the card.',
     publishedAt: '2026-01-15T00:00:00Z',
     mainImage: makeRawImage(),
+    mainImageAsset: makeRawSanityImage(),
     featured: false,
     body: [],
     seo: null,

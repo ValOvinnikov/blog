@@ -3,6 +3,7 @@ import type { InferResultType } from 'groqd';
 import { buildImageUrl } from '#/shared/transformers/build-image-url';
 import { toLink } from '#/shared/transformers/to-link';
 import { toPostCard } from '#/shared/transformers/to-post-card';
+import { toSanityImage } from '#/shared/transformers/to-sanity-image';
 import { toSeoMeta } from '#/shared/transformers/to-seo-meta';
 
 import type { homePagePostsQuery, homePageQuery } from './query';
@@ -53,6 +54,13 @@ export function toHomePage(
         ? { src: heroImageUrl, alt: heroPost.mainImageAlt }
         : undefined;
 
+  const heroSanityImage =
+    rawHome?.heroImageMode === 'custom'
+      ? toSanityImage(rawHome.heroImageAsset)
+      : rawHome?.heroImageMode === 'none'
+        ? undefined
+        : heroPost?.mainImageSanity;
+
   const latestPostsLimit =
     rawHome?.latestPostsLimit ?? DEFAULT_LATEST_POSTS_LIMIT;
 
@@ -80,6 +88,7 @@ export function toHomePage(
         heroPost?.excerpt,
       ),
       image: heroImage,
+      sanityImage: heroSanityImage,
       primaryAction: heroPost
         ? {
             label: rawHome?.primaryActionLabel ?? DEFAULT_PRIMARY_ACTION_LABEL,

@@ -33,6 +33,7 @@ export type { THomePage } from './features/pages/home';
 export type { TPostDetail, TPostDetailAuthor } from './features/pages/post';
 export { urlForImage } from './sanity/image';
 export type { TCategory } from './shared/transformers/to-category';
+export type { TSanityImage } from './shared/transformers/to-sanity-image';
 export type {
   TPostCard,
   TPostCardAuthor,

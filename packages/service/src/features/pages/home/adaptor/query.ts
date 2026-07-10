@@ -1,5 +1,8 @@
 import { q } from '#/sanity/query';
-import { imageWithAltFragment } from '#/shared/fragments/image';
+import {
+  imageWithAltFragment,
+  sanityImageFragment,
+} from '#/shared/fragments/image';
 import { linkFragment } from '#/shared/fragments/link';
 import { postCardFragment } from '#/shared/fragments/post';
 import { seoFragment } from '#/shared/fragments/seo';
@@ -24,6 +27,10 @@ export const homePageQuery = q.star
     heroImage: sub
       .field('heroImage')
       .project(imageWithAltFragment)
+      .nullable(true),
+    heroImageAsset: sub
+      .field('heroImage')
+      .project(sanityImageFragment)
       .nullable(true),
     primaryActionLabel: sub.field('primaryActionLabel').nullable(true),
     secondaryAction: sub
