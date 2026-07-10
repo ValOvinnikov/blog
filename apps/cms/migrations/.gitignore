@@ -1,0 +1,5 @@
+# Dataset export backups (see README.md). These are large tarballs that may
+# contain real content — never commit them.
+backups/*
+!backups/.gitkeep
+*.tar.gz
