@@ -25,7 +25,7 @@
     "@blog/eslint-config": "workspace:*",
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
-    "@sanity/cli": "^4.0.0",
+    "@sanity/cli": "^7.7.1",
     "eslint": "^10.6.0",
     "prettier": "^3.9.4",
     "typescript": "^6.0.3"
