@@ -117,6 +117,9 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.7(react@19.2.7)
+      sanity-image:
+        specifier: ^1.1.0
+        version: 1.1.0(react@19.2.7)
       tailwind-variants:
         specifier: ^3.2.2
         version: 3.2.2(tailwind-merge@3.6.0)(tailwindcss@4.3.2)
@@ -2988,6 +2991,9 @@ packages:
     resolution: {integrity: sha512-BfzEnDJOt9T8M989/lA37EcJgat01wLRnoi5dQf3QzOH7jzpqTAzdDbVfRljVr5r+jzKqpbHeyOfAaXxAd0PAA==}
     cpu: [x64]
     os: [win32]
+
+  '@sanity-image/url-builder@1.1.0':
+    resolution: {integrity: sha512-ApAlwhF/cLxGY+VJKmYI8krLPySZuxRe4OiT95vJGCBra1cIvSZgkosKzpu/sBVRVujt8Jq0yF0pTko94H7iQQ==}
 
   '@sanity-labs/design-tokens@0.0.2-alpha.4':
     resolution: {integrity: sha512-+i7GXix4Akt34VDWgSM1Lpq8Hxf8SH8022uNsDRXSNuAqQMjKVGWLItAyc2TyfWVwWZLhsCF3lj5tdW7cecDxQ==}
@@ -7763,6 +7769,12 @@ packages:
   safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
 
+  sanity-image@1.1.0:
+    resolution: {integrity: sha512-hdhZmN9fT2qNa8DVXjwRdilCtbzL1BhF9tZDB7rzaAMVDZxwV/shNApySZXks9sTlQgnfazArCATCjckwSH7GA==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+
   sanity@6.4.0:
     resolution: {integrity: sha512-GLLFtHWhLWBW+mgu2XlCs7YQSQWCY6cAFhLZIyDO81p89CgFlTXjGpQGc+2QGUPq5jG4eWG1C+U1p+2GcTaaKA==}
     engines: {node: '>=22.12'}
@@ -11397,6 +11409,8 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.62.2':
     optional: true
+
+  '@sanity-image/url-builder@1.1.0': {}
 
   '@sanity-labs/design-tokens@0.0.2-alpha.4': {}
 
@@ -17253,6 +17267,11 @@ snapshots:
       is-regex: 1.2.1
 
   safer-buffer@2.1.2: {}
+
+  sanity-image@1.1.0(react@19.2.7):
+    dependencies:
+      '@sanity-image/url-builder': 1.1.0
+      react: 19.2.7
 
   sanity@6.4.0(@babel/core@7.29.7)(@babel/plugin-transform-runtime@7.29.7(@babel/core@7.29.7))(@babel/runtime@7.29.7)(@emotion/is-prop-valid@1.4.0)(@noble/hashes@2.2.0)(@oclif/core@4.11.14)(@rolldown/plugin-babel@0.2.3(@babel/core@7.29.7)(@babel/plugin-transform-runtime@7.29.7(@babel/core@7.29.7))(@babel/runtime@7.29.7)(rolldown@1.1.5)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.23.0)(yaml@2.9.0)))(@sanity/cli-core@2.2.1(@noble/hashes@2.2.0)(@types/node@26.1.1)(esbuild@0.28.1)(terser@5.48.0)(yaml@2.9.0))(@types/node@26.1.1)(@types/react@19.2.17)(esbuild@0.28.1)(jiti@2.7.0)(prismjs@1.30.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(rolldown@1.1.5)(styled-components@6.4.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(terser@5.48.0)(typescript@6.0.3):
     dependencies:

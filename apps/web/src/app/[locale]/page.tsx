@@ -2,12 +2,12 @@ import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { Hero, LinkButton, PostsSection } from '@blog/ui';
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 
 import { HomePageTemplate } from '@/components/home-page-template/home-page-template';
+import { SanityImage } from '@/components/sanity-image/sanity-image';
 import { formatDate } from '@/utils/format-date';
 
 type TProps = {
@@ -109,14 +109,14 @@ export default async function HomePage({ params }: TProps) {
             </Hero.Cta>
           )}
 
-          {hero.image && (
+          {hero.sanityImage && (
             <Hero.Media key="media">
-              <Image
-                src={hero.image.src}
-                alt={hero.image.alt}
-                fill
-                className="object-cover"
-                priority
+              <SanityImage
+                image={hero.sanityImage}
+                width={1200}
+                height={900}
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="size-full object-cover"
               />
             </Hero.Media>
           )}
