@@ -115,8 +115,6 @@ export default async function HomePage({ params }: TProps) {
                 image={hero.sanityImage}
                 width={1200}
                 height={900}
-                mode="cover"
-                loading="eager"
                 sizes="(min-width: 1024px) 50vw, 100vw"
                 className="size-full object-cover"
               />

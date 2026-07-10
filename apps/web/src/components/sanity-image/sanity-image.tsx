@@ -1,3 +1,7 @@
+'use client';
+
+// `sanity-image` uses `useState` internally (LQIP blur-up), so this bridge
+// must be a Client Component boundary when rendered from Server Components.
 import type { ISanityImage } from '@blog/config';
 import { SanityImage as SanityImageBase } from 'sanity-image';
 
@@ -27,9 +31,9 @@ export const SanityImage = ({
   image,
   width,
   height,
-  mode,
+  mode = 'cover',
   sizes,
-  loading,
+  loading = 'eager',
   className,
   alt,
 }: ISanityImageProps) => (
