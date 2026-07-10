@@ -23,7 +23,7 @@ export const TypeSpecimens = ({ tokens, fontOnly }: TTypeSpecimensProps) => (
       const descriptor = fontOnly ? `font-${token.name}` : `text-${token.name}`;
 
       return (
-        <div key={token.cssVar} className="py-5">
+        <div key={token.cssVar} className="py-5 first:pt-0">
           <p className="mb-2 font-mono text-label text-text-subtle uppercase">
             {descriptor}
           </p>
