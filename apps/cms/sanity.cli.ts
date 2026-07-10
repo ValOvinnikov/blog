@@ -3,7 +3,9 @@ import { defineCliConfig } from 'sanity/cli';
 export default defineCliConfig({
   api: {
     projectId: 'ccs8c2no',
-    dataset: 'production',
+    // Dataset is env-driven so CLI commands (dev, migrations, exports) can target
+    // e.g. a `development` dataset. Defaults to `production`.
+    dataset: process.env.SANITY_STUDIO_DATASET ?? 'production',
   },
   typegen: {
     path: './src/**/*.{ts,tsx}',

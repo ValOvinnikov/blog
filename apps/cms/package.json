@@ -11,9 +11,12 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "migrate:list": "sanity migrations list",
-    "migrate:dry": "sanity migrations run",
-    "migrate:run": "sanity migrations run --no-dry-run",
-    "dataset:export": "sanity datasets export production"
+    "migrate:new": "node scripts/migrate.mjs new",
+    "migrate:track": "node scripts/migrate.mjs track",
+    "migrate:current": "node scripts/migrate.mjs current",
+    "migrate:dry": "node scripts/migrate.mjs dry",
+    "migrate:run": "node scripts/migrate.mjs run",
+    "dataset:export": "node scripts/migrate.mjs export"
   },
   "dependencies": {
     "@sanity/code-input": "^5.1.0",

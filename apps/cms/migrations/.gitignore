@@ -3,3 +3,6 @@
 backups/*
 !backups/.gitkeep
 *.tar.gz
+
+# Local "current migration" pointer used by scripts/migrate.mjs (per-developer).
+.current
