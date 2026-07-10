@@ -21,7 +21,15 @@ export default mergeConfig(
       },
     },
     resolve: {
-      alias: [{ find: /^#\//, replacement: `${src}/` }],
+      alias: [
+        { find: /^#\//, replacement: `${src}/` },
+        // `import 'server-only'` throws outside a react-server bundle; stub it
+        // to a no-op for the node test env (the real guard still runs in build).
+        {
+          find: /^server-only$/,
+          replacement: `${src}/testing/server-only-stub.ts`,
+        },
+      ],
     },
   }),
 );

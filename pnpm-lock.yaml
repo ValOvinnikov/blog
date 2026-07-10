@@ -302,6 +302,9 @@ importers:
       next-sanity:
         specifier: ^13.1.1
         version: 13.1.1(@emotion/is-prop-valid@1.4.0)(@sanity/client@7.23.0)(@sanity/types@6.4.0(@types/react@19.2.17))(next@16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-dom@19.2.7(react@19.2.7))(react-is@19.2.7)(react@19.2.7)(sanity@6.4.0(@emotion/is-prop-valid@1.4.0)(@noble/hashes@2.2.0)(@oclif/core@4.11.14)(@sanity/cli-core@2.2.1(@noble/hashes@2.2.0)(@types/node@26.1.1)(esbuild@0.28.1)(terser@5.48.0)(yaml@2.9.0))(@types/node@26.1.1)(@types/react@19.2.17)(esbuild@0.28.1)(jiti@2.7.0)(prismjs@1.30.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(styled-components@6.4.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(terser@5.48.0)(typescript@6.0.3))(styled-components@6.4.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@6.0.3)
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
       zod:
         specifier: ^3.25.76
         version: 3.25.76
@@ -7800,6 +7803,9 @@ packages:
     resolution: {integrity: sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==}
     engines: {node: '>=10'}
     hasBin: true
+
+  server-only@0.0.1:
+    resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
 
   set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
@@ -17549,6 +17555,8 @@ snapshots:
   semver@6.3.1: {}
 
   semver@7.8.5: {}
+
+  server-only@0.0.1: {}
 
   set-function-length@1.2.2:
     dependencies:
