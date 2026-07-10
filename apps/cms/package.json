@@ -9,7 +9,11 @@
     "typegen": "sanity schema extract --path ../../packages/config/src/sanity/generated/schema.json && sanity typegen generate",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "migrate:list": "sanity migrations list",
+    "migrate:dry": "sanity migrations run",
+    "migrate:run": "sanity migrations run --no-dry-run",
+    "dataset:export": "sanity datasets export production"
   },
   "dependencies": {
     "@sanity/code-input": "^5.1.0",
