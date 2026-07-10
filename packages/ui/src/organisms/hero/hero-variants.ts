@@ -1,4 +1,4 @@
-import { tv } from '@blog/ui/lib/tv';
+import { tv } from '@blog/ui/lib/styling';
 
 export const heroVariants = tv({
   slots: {

@@ -4,7 +4,7 @@ import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '@blog/ui/lib/compound';
+} from '@blog/ui/lib/react';
 import { CardMeta } from '@blog/ui/molecules/card-meta';
 import type { ComponentPropsWithoutRef, ElementType } from 'react';
 import { Fragment } from 'react';
