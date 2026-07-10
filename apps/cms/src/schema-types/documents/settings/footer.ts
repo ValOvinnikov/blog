@@ -13,7 +13,7 @@ export default defineType({
       title: 'Social Links',
       type: 'array',
       description: 'Social profile links shown in the site footer.',
-      of: [defineArrayMember({ type: 'socialLink' })],
+      of: [defineArrayMember({ type: 'link' })],
     }),
   ],
 });

@@ -37,10 +37,45 @@ export type OpenGraph = {
   ogImage?: ImageWithAlt;
 };
 
-export type NavItem = {
-  _type: 'navItem';
+export type PostReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'post';
+};
+
+export type CategoryReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'category';
+};
+
+export type PageReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page';
+};
+
+export type Link = {
+  _type: 'link';
   label?: string;
-  href?: string;
+  linkType?: 'internal' | 'external';
+  internalReference?: PostReference | CategoryReference | PageReference;
+  url?: string;
+  openInNewTab?: boolean;
+  platform?:
+    | 'x'
+    | 'github'
+    | 'linkedin'
+    | 'youtube'
+    | 'instagram'
+    | 'mastodon'
+    | 'bluesky'
+    | 'facebook'
+    | 'threads'
+    | 'rss';
 };
 
 export type SocialLink = {
@@ -120,7 +155,7 @@ export type Settings_footer = {
   social?: Array<
     {
       _key: string;
-    } & SocialLink
+    } & Link
   >;
 };
 
@@ -133,7 +168,7 @@ export type Settings_navigation = {
   items?: Array<
     {
       _key: string;
-    } & NavItem
+    } & Link
   >;
 };
 
@@ -147,20 +182,6 @@ export type SiteSettings = {
   description?: string;
   tagline?: string;
   defaultSeo?: OpenGraph;
-};
-
-export type PostReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'post';
-};
-
-export type LinkReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'link';
 };
 
 export type HomePage = {
@@ -180,36 +201,10 @@ export type HomePage = {
   heroImageMode?: 'postImage' | 'custom' | 'none';
   heroImage?: ImageWithAlt;
   primaryActionLabel?: string;
-  secondaryAction?: LinkReference;
+  secondaryAction?: Link;
   latestPostsTitle?: string;
   latestPostsLimit?: number;
   seo?: Seo;
-};
-
-export type CategoryReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'category';
-};
-
-export type PageReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page';
-};
-
-export type Link = {
-  _id: string;
-  _type: 'link';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  label?: string;
-  linkType?: 'internal' | 'external';
-  internalReference?: PostReference | CategoryReference | PageReference;
-  url?: string;
 };
 
 export type Page = {
@@ -413,7 +408,10 @@ export type AllSanitySchemaTypes =
   | Brand
   | Seo
   | OpenGraph
-  | NavItem
+  | PostReference
+  | CategoryReference
+  | PageReference
+  | Link
   | SocialLink
   | BlockText
   | PortableText
@@ -422,12 +420,7 @@ export type AllSanitySchemaTypes =
   | Settings_footer
   | Settings_navigation
   | SiteSettings
-  | PostReference
-  | LinkReference
   | HomePage
-  | CategoryReference
-  | PageReference
-  | Link
   | Page
   | Slug
   | Category

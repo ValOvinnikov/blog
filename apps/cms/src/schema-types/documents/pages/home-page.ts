@@ -213,10 +213,9 @@ export default defineType({
     defineField({
       name: 'secondaryAction',
       title: 'Secondary Action',
-      type: 'reference',
+      type: 'link',
       description: 'Optional secondary CTA shown next to the primary action.',
       fieldset: 'hero',
-      to: [{ type: 'link' }],
     }),
     defineField({
       name: 'latestPostsTitle',

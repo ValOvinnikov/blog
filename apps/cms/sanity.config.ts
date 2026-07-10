@@ -4,7 +4,6 @@ import {
   Files,
   FileText,
   House,
-  Link2,
   Menu,
   Newspaper,
   PanelBottom,
@@ -80,7 +79,6 @@ export default defineConfig({
                 S.list()
                   .title('Settings')
                   .items([
-                    S.documentTypeListItem('link').title('Links').icon(Link2),
                     S.listItem()
                       .title('Site Settings')
                       .id('siteSettings')

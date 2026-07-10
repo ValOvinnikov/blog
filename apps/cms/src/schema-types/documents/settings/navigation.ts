@@ -13,7 +13,7 @@ export default defineType({
       title: 'Header Links',
       type: 'array',
       description: 'Top-level nav links rendered in the site header.',
-      of: [defineArrayMember({ type: 'navItem' })],
+      of: [defineArrayMember({ type: 'link' })],
     }),
   ],
 });
