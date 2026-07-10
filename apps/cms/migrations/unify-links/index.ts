@@ -5,10 +5,10 @@
  *
  * Transforms:
  *   - `settings_navigation.items`: each `navItem { label, href }` becomes
- *     `link { _type: 'link', label, linkType: 'external', url: href }`.
+ *     `link { _type: 'link', label, linkType: 'EXTERNAL', url: href }`.
  *   - `settings_footer.social`: each `socialLink { platform, url }` becomes
- *     `link { _type: 'link', label: platform, linkType: 'external', url,
- *     platform: <normalized> }`, where the normalized platform lowercases the
+ *     `link { _type: 'link', label: platform, linkType: 'EXTERNAL', url,
+ *     platform: <normalized> }`, where the normalized platform UPPERCASES the
  *     old free-text value and keeps it only if it matches a known
  *     `SOCIAL_PLATFORMS` value (otherwise `platform` is left unset).
  *   - `author.socialLinks` is intentionally UNTOUCHED — `socialLink` stays a
