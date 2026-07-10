@@ -11,6 +11,7 @@ import { setRequestLocale } from 'next-intl/server';
 
 import { ThemeToggleButton } from '@/components/theme-toggle-button/theme-toggle-button';
 import { jetbrainsMono, newsreader, spaceGrotesk } from '@/config/fonts';
+import { themeBootstrapScript } from '@/config/theme-script';
 import { routing } from '@/i18n/routing';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -69,7 +70,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var s=localStorage.getItem('theme'),d=window.matchMedia('(prefers-color-scheme:dark)').matches;if(s==='dark'||(s===null&&d)){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark'}}catch(e){}})()`,
+            __html: themeBootstrapScript,
           }}
         />
       </head>
