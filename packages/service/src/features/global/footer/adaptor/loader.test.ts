@@ -31,11 +31,11 @@ describe('getFooter', () => {
         social: [
           {
             label: 'GitHub',
-            linkType: 'external',
+            linkType: 'EXTERNAL',
             url: 'https://github.com/val',
             internalReference: null,
             openInNewTab: null,
-            platform: 'github',
+            platform: 'GITHUB',
           },
         ],
       }),
@@ -48,7 +48,7 @@ describe('getFooter', () => {
         label: 'GitHub',
         href: 'https://github.com/val',
         target: undefined,
-        platform: 'github',
+        platform: 'GITHUB',
       },
     ]);
   });

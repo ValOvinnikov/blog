@@ -1,7 +1,6 @@
+import { SOCIAL_PLATFORMS, TLINK_TYPE } from '@blog/config/constants';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
-
-import { SOCIAL_PLATFORMS } from '../constants/social-platforms';
 
 type TLinkParent = {
   linkType?: string;
@@ -16,7 +15,7 @@ export default defineType({
   type: 'object',
   icon: Link2,
   initialValue: {
-    linkType: 'internal',
+    linkType: TLINK_TYPE.INTERNAL,
     openInNewTab: false,
   },
   fields: [
@@ -34,8 +33,8 @@ export default defineType({
       options: {
         layout: 'radio',
         list: [
-          { title: 'Internal document', value: 'internal' },
-          { title: 'URL or path', value: 'external' },
+          { title: 'Internal document', value: TLINK_TYPE.INTERNAL },
+          { title: 'URL or path', value: TLINK_TYPE.EXTERNAL },
         ],
       },
       validation: (rule) => rule.required(),
@@ -45,10 +44,10 @@ export default defineType({
       title: 'Internal Document',
       type: 'reference',
       to: [{ type: 'post' }, { type: 'category' }, { type: 'page' }],
-      hidden: ({ parent }) => !isLinkType(parent, 'internal'),
+      hidden: ({ parent }) => !isLinkType(parent, TLINK_TYPE.INTERNAL),
       validation: (rule) =>
         rule.custom((value, context) => {
-          if (isLinkType(context.parent, 'internal') && !value) {
+          if (isLinkType(context.parent, TLINK_TYPE.INTERNAL) && !value) {
             return 'Choose a document for an internal link.';
           }
 
@@ -61,10 +60,10 @@ export default defineType({
       type: 'string',
       description:
         'Use a relative path such as /blog or a full URL such as https://example.com.',
-      hidden: ({ parent }) => !isLinkType(parent, 'external'),
+      hidden: ({ parent }) => !isLinkType(parent, TLINK_TYPE.EXTERNAL),
       validation: (rule) =>
         rule.custom((value, context) => {
-          if (!isLinkType(context.parent, 'external')) {
+          if (!isLinkType(context.parent, TLINK_TYPE.EXTERNAL)) {
             return true;
           }
 
@@ -85,7 +84,7 @@ export default defineType({
       type: 'boolean',
       description: 'Only applies to external URLs or paths.',
       initialValue: false,
-      hidden: ({ parent }) => !isLinkType(parent, 'external'),
+      hidden: ({ parent }) => !isLinkType(parent, TLINK_TYPE.EXTERNAL),
     }),
     defineField({
       name: 'platform',
@@ -93,7 +92,10 @@ export default defineType({
       type: 'string',
       description: 'Optional social platform, used for icon selection.',
       options: {
-        list: [...SOCIAL_PLATFORMS],
+        list: Object.values(SOCIAL_PLATFORMS).map((value) => ({
+          title: value,
+          value,
+        })),
       },
     }),
   ],
@@ -108,7 +110,7 @@ export default defineType({
       return {
         title: title as string | undefined,
         subtitle:
-          linkType === 'internal'
+          linkType === TLINK_TYPE.INTERNAL
             ? `Internal: ${String(internalTitle ?? 'not selected')}`
             : String(url ?? 'URL not set'),
       };

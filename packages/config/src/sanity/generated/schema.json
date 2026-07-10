@@ -237,11 +237,11 @@
             "of": [
               {
                 "type": "string",
-                "value": "internal"
+                "value": "INTERNAL"
               },
               {
                 "type": "string",
-                "value": "external"
+                "value": "EXTERNAL"
               }
             ]
           },
@@ -289,43 +289,43 @@
             "of": [
               {
                 "type": "string",
-                "value": "x"
+                "value": "X"
               },
               {
                 "type": "string",
-                "value": "github"
+                "value": "GITHUB"
               },
               {
                 "type": "string",
-                "value": "linkedin"
+                "value": "LINKEDIN"
               },
               {
                 "type": "string",
-                "value": "youtube"
+                "value": "YOUTUBE"
               },
               {
                 "type": "string",
-                "value": "instagram"
+                "value": "INSTAGRAM"
               },
               {
                 "type": "string",
-                "value": "mastodon"
+                "value": "MASTODON"
               },
               {
                 "type": "string",
-                "value": "bluesky"
+                "value": "BLUESKY"
               },
               {
                 "type": "string",
-                "value": "facebook"
+                "value": "FACEBOOK"
               },
               {
                 "type": "string",
-                "value": "threads"
+                "value": "THREADS"
               },
               {
                 "type": "string",
-                "value": "rss"
+                "value": "RSS"
               }
             ]
           },

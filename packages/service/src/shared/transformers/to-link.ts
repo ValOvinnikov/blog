@@ -1,4 +1,4 @@
-import type { ILink } from '@blog/config';
+import { TLINK_TYPE, type ILink } from '@blog/config';
 import type { InferFragmentType } from 'groqd';
 
 import type { linkFragment } from '#/shared/fragments/link';
@@ -24,7 +24,7 @@ export function toLink(raw: TRawLink | null | undefined): ILink | undefined {
   if (!raw) return undefined;
 
   const href =
-    raw.linkType === 'internal' && raw.internalReference
+    raw.linkType === TLINK_TYPE.INTERNAL && raw.internalReference
       ? toInternalHref(raw.internalReference)
       : raw.url;
 
@@ -34,7 +34,9 @@ export function toLink(raw: TRawLink | null | undefined): ILink | undefined {
     label: raw.label,
     href,
     target:
-      raw.linkType === 'external' && raw.openInNewTab ? '_blank' : undefined,
+      raw.linkType === TLINK_TYPE.EXTERNAL && raw.openInNewTab
+        ? '_blank'
+        : undefined,
     platform: raw.platform ?? undefined,
   };
 }

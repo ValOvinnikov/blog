@@ -31,7 +31,7 @@ describe('getNavigation', () => {
         items: [
           {
             label: 'Blog',
-            linkType: 'external',
+            linkType: 'EXTERNAL',
             url: '/blog',
             internalReference: null,
             openInNewTab: null,

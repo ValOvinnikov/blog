@@ -6,14 +6,12 @@ type TSmartLinkProps = {
   target?: '_blank';
 } & Omit<ComponentPropsWithoutRef<'a'>, 'href' | 'target' | 'rel'>;
 
-const isAbsolute = (href: string) => /^https?:\/\//.test(href);
-
 /**
- * SmartLink — picks the right anchor for a given `href`: the app router's
- * `Link` for internal paths (client-side navigation), or a plain `<a>` for
- * absolute URLs (external links), deriving `rel` from `target`. Works both as
- * a direct link and as the `as`/`linkAs` polymorphic target for `@blog/ui`
- * components (`NavLink`, `LinkButton`, `PrimaryNavigation`).
+ * SmartLink — the app's link with `rel` derived from `target`. Renders
+ * `next/link` (which handles both internal client-side navigation and external
+ * URLs), adding `rel="noopener noreferrer"` only when `target="_blank"`. Works
+ * both as a direct link and as the `as`/`linkAs` polymorphic target for
+ * `@blog/ui` components (`NavLink`, `LinkButton`, `PrimaryNavigation`).
  *
  * @example
  * <LinkButton as={SmartLink} href={action.href} target={action.target}>
@@ -28,16 +26,8 @@ export function SmartLink({
 }: TSmartLinkProps) {
   const rel = target === '_blank' ? 'noopener noreferrer' : undefined;
 
-  if (isAbsolute(href)) {
-    return (
-      <a href={href} target={target} rel={rel} {...rest}>
-        {children}
-      </a>
-    );
-  }
-
   return (
-    <Link href={href} {...rest}>
+    <Link href={href} target={target} rel={rel} {...rest}>
       {children}
     </Link>
   );

@@ -13,7 +13,7 @@ describe('SmartLink', () => {
     expect(link).not.toHaveAttribute('rel');
   });
 
-  it('renders a plain anchor with target and rel for an absolute href', () => {
+  it('adds target and rel for an external href opening in a new tab', () => {
     render(
       <SmartLink href="https://example.com" target="_blank">
         Visit site

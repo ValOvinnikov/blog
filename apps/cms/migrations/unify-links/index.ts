@@ -37,9 +37,12 @@
  *   4. Only then: pnpm --filter cms migrate:run -- unify-links
  *      (human-gated — an agent must not run this step)
  */
+import {
+  SOCIAL_PLATFORMS,
+  TLINK_TYPE,
+  type TLinkType,
+} from '@blog/config/constants';
 import { at, defineMigration, set, unset } from 'sanity/migrate';
-
-import { SOCIAL_PLATFORMS } from '../../src/schema-types/constants/social-platforms';
 
 type TKeyed<T> = T & { _key: string };
 
@@ -61,23 +64,22 @@ type TLinkObject = {
   _type: 'link';
   _key?: string;
   label?: string;
-  linkType?: 'internal' | 'external';
+  linkType?: TLinkType;
   internalReference?: unknown;
   url?: string;
   openInNewTab?: boolean;
   platform?: string;
 };
 
-const SOCIAL_PLATFORM_VALUES: readonly string[] = SOCIAL_PLATFORMS.map(
-  (p) => p.value,
-);
+const SOCIAL_PLATFORM_VALUES: readonly string[] =
+  Object.values(SOCIAL_PLATFORMS);
 
-/** Lowercases free-text platform names and keeps only known values. */
+/** Uppercases free-text platform names and keeps only known values. */
 const normalizePlatform = (
   platform: string | undefined,
 ): string | undefined => {
   if (!platform) return undefined;
-  const normalized = platform.trim().toLowerCase();
+  const normalized = platform.trim().toUpperCase();
   return SOCIAL_PLATFORM_VALUES.includes(normalized) ? normalized : undefined;
 };
 
@@ -85,7 +87,7 @@ const navItemToLink = (item: TKeyed<TNavItem>): TKeyed<TLinkObject> => ({
   _key: item._key,
   _type: 'link',
   label: item.label,
-  linkType: 'external',
+  linkType: TLINK_TYPE.EXTERNAL,
   url: item.href,
 });
 
@@ -93,7 +95,7 @@ const socialLinkToLink = (item: TKeyed<TSocialLink>): TKeyed<TLinkObject> => ({
   _key: item._key,
   _type: 'link',
   label: item.platform,
-  linkType: 'external',
+  linkType: TLINK_TYPE.EXTERNAL,
   url: item.url,
   platform: normalizePlatform(item.platform),
 });
@@ -107,7 +109,8 @@ const isReference = (value: unknown): value is TLinkReference =>
 const legacyLinkDocToInlineLink = (doc: TLegacyLinkDocument): TLinkObject => ({
   _type: 'link',
   label: doc.label,
-  linkType: doc.linkType === 'internal' ? 'internal' : 'external',
+  linkType:
+    doc.linkType === 'internal' ? TLINK_TYPE.INTERNAL : TLINK_TYPE.EXTERNAL,
   internalReference: doc.internalReference,
   url: doc.url,
 });

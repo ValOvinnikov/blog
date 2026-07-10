@@ -61,21 +61,21 @@ export type PageReference = {
 export type Link = {
   _type: 'link';
   label?: string;
-  linkType?: 'internal' | 'external';
+  linkType?: 'INTERNAL' | 'EXTERNAL';
   internalReference?: PostReference | CategoryReference | PageReference;
   url?: string;
   openInNewTab?: boolean;
   platform?:
-    | 'x'
-    | 'github'
-    | 'linkedin'
-    | 'youtube'
-    | 'instagram'
-    | 'mastodon'
-    | 'bluesky'
-    | 'facebook'
-    | 'threads'
-    | 'rss';
+    | 'X'
+    | 'GITHUB'
+    | 'LINKEDIN'
+    | 'YOUTUBE'
+    | 'INSTAGRAM'
+    | 'MASTODON'
+    | 'BLUESKY'
+    | 'FACEBOOK'
+    | 'THREADS'
+    | 'RSS';
 };
 
 export type SocialLink = {
