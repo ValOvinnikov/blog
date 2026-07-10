@@ -23,6 +23,18 @@ const preview: Preview = {
       },
     },
     layout: 'centered',
+    options: {
+      storySort: {
+        order: [
+          'Design Tokens',
+          'Atoms',
+          'Molecules',
+          'Organisms',
+          'Templates',
+          '*',
+        ],
+      },
+    },
   },
 };
 export default preview;

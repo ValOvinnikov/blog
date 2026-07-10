@@ -12,27 +12,30 @@
 
 @theme inline {
   /* Semantic colour utilities: bg-bg, text-text-muted, border-border, ... */
-  --color-bg: var(--bg);
-  --color-bg-subtle: var(--bg-subtle);
-  --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
-  --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
-  --color-text: var(--text);
-  --color-text-muted: var(--text-muted);
-  --color-text-subtle: var(--text-subtle);
-  --color-muted: var(--text-muted);
-  --color-subtle: var(--text-subtle);
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-muted: var(--accent-muted);
-  --color-accent-contrast: var(--accent-contrast);
+  --color-bg: var(--bg); /* @role page background */
+  --color-bg-subtle: var(--bg-subtle); /* @role secondary page field */
+  --color-surface: var(--surface); /* @role cards */
+  --color-surface-2: var(--surface-2); /* @role nested / code */
+  --color-border: var(--border); /* @role hairline */
+  --color-border-strong: var(--border-strong); /* @role emphasis / hover */
+  --color-text: var(--text); /* @role primary ink */
+  --color-text-muted: var(--text-muted); /* @role secondary body text */
+  --color-text-subtle: var(--text-subtle); /* @role metadata / low emphasis */
+  --color-muted: var(--text-muted); /* @role secondary body text (alias) */
+  --color-subtle: var(--text-subtle); /* @role metadata (alias) */
+  --color-accent: var(--accent); /* @role links / interactive */
+  --color-accent-hover: var(--accent-hover); /* @role interactive hover */
+  --color-accent-muted: var(--accent-muted); /* @role tint / selection */
+  /* prettier-ignore */
+  --color-accent-contrast: var(--accent-contrast); /* @role text on accent-solid */
   /* Filled accent surface (e.g. primary button). Kept distinct from --accent
      so each mode can tune the fill independently: light mode uses a darker
      fill with white --accent-contrast text, dark mode uses a vivid fill
      matching --accent with near-black --accent-contrast text. */
-  --color-accent-solid: var(--accent-solid);
-  --color-accent-solid-hover: var(--accent-solid-hover);
+  /* prettier-ignore */
+  --color-accent-solid: var(--accent-solid); /* @role filled surface (button bg) */
+  /* prettier-ignore */
+  --color-accent-solid-hover: var(--accent-solid-hover); /* @role filled surface hover */
 
   /* Next.js supplies these variables via next/font in apps/web. */
   --font-display: var(
@@ -190,6 +193,8 @@
   --accent-solid-hover: oklch(0.49 0.17 250);
   --ring: var(--accent);
 
+  /* Durations live here (not @theme) so the @layer base transition utilities'
+     var() references are never tree-shaken out of the runtime CSS. */
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --duration-slow: 360ms;

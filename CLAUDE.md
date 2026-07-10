@@ -67,6 +67,12 @@ prompt — do not write it to disk first.
   `sanity.cli.ts`, `next.config.ts`, `vitest.config.ts`, etc.) stay at the
   package root.
 - TypeScript `strict`; no `any`. Server Components by default.
+- `'use client'` never in `@blog/ui` (it stays pure and prop-driven). In
+  `apps/web` it IS the right tool — add it at the _leaf boundary_ that
+  genuinely needs the client: React hooks (`useState`/`useEffect`), browser
+  APIs, event handlers, or wrapping a third-party component that uses hooks
+  internally (e.g. the `sanity-image` wrapper). Keep it as low in the tree as
+  possible, not on whole pages.
 - Co-locate `*.test.ts(x)`; `pnpm test` must pass.
 - After a schema change: `pnpm typegen`, then commit `sanity.types.ts`.
 - Verify with `pnpm type-check`, `pnpm lint`, `pnpm test`, `pnpm build` from root.

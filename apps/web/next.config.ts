@@ -1,23 +1,25 @@
-import { createHash } from 'node:crypto';
-
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
-import { themeBootstrapScript } from './src/config/theme-script';
-
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
-// Allow-lists the inline dark-mode bootstrap script (see
-// `src/app/[locale]/layout.tsx`) in the CSP `script-src` below. The app is
-// statically generated / ISR, so a per-request nonce would force dynamic
-// rendering — a hash of the (stable, constant) script text works instead
-// and requires no request-time computation.
-const themeScriptHash = `'sha256-${createHash('sha256').update(themeBootstrapScript).digest('base64')}'`;
+const isDev = process.env.NODE_ENV !== 'production';
+
+// Next.js App Router injects its own inline scripts on every page — the
+// `self.__next_f.push(...)` RSC/hydration payload (and our inline dark-mode
+// bootstrap). Their content is per-render, so it can't be hashed, and a
+// per-request nonce would force dynamic rendering (we're static/ISR). So
+// `script-src` allows 'unsafe-inline' (a hash/nonce would make the browser
+// *ignore* it), plus 'unsafe-eval' in dev for Turbopack/HMR. Same-origin-only
+// external scripts still apply, and every other directive stays strict.
+const scriptSrc = isDev
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+  : "script-src 'self' 'unsafe-inline'";
 
 const contentSecurityPolicy = [
   "default-src 'self'",
   "img-src 'self' https://cdn.sanity.io data:",
-  `script-src 'self' ${themeScriptHash}`,
+  scriptSrc,
   // 'unsafe-inline' is required because Next.js and Tailwind inject inline
   // <style> tags at runtime (e.g. Next's style-loader output, CSS-in-JS
   // from streamed RSC payloads); there is no static, hashable set of style
