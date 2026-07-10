@@ -22,12 +22,12 @@ export async function generateMetadata(): Promise<Metadata> {
     return {};
   }
 
-  const { title, description } = result.data;
+  const { brand, description } = result.data;
 
   return {
     title: {
-      default: title,
-      template: `%s | ${title}`,
+      default: brand.name,
+      template: `%s | ${brand.name}`,
     },
     description,
   };
@@ -51,15 +51,20 @@ export default async function LocaleLayout({ children, params }: TProps) {
 
   setRequestLocale(locale);
 
-  const result = await service.global.siteSettings.v1.getSiteSettings();
+  const [settingsResult, navResult, footerResult] = await Promise.all([
+    service.global.siteSettings.v1.getSiteSettings(),
+    service.global.navigation.v1.getNavigation(),
+    service.global.footer.v1.getFooter(),
+  ]);
 
-  if (!result.ok) {
-    console.error(`Error to fetch site settings: ${result.error}`);
+  if (!settingsResult.ok) {
+    console.error(`Error to fetch site settings: ${settingsResult.error}`);
     notFound();
   }
 
-  const { title, navigation, socialLinks, brandPrefix, brandSuffix } =
-    result.data;
+  const { brand } = settingsResult.data;
+  const navItems = navResult.ok ? navResult.data.items : [];
+  const social = footerResult.ok ? footerResult.data.social : [];
 
   return (
     <html
@@ -78,11 +83,11 @@ export default async function LocaleLayout({ children, params }: TProps) {
         <Header>
           <Header.Brand>
             <Link href="/" aria-label="Home">
-              <Logo prefix={brandPrefix} suffix={brandSuffix} />
+              <Logo prefix={brand.prefix} suffix={brand.suffix} />
             </Link>
           </Header.Brand>
           <PrimaryNavigation
-            links={navigation.map((item) => ({
+            links={navItems.map((item) => ({
               href: item.href,
               label: item.label,
             }))}
@@ -92,9 +97,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
         </Header>
         {children}
         <Footer>
-          <Footer.Copyright title={title} />
+          <Footer.Copyright title={brand.name} />
           <Footer.Nav>
-            {socialLinks.map((link) => (
+            {social.map((link) => (
               <NavLink key={link.url} href={link.url}>
                 {link.platform}
               </NavLink>

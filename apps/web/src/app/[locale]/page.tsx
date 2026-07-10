@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
     home?.seo?.metaTitle ??
     home?.seo?.ogTitle ??
     settings?.ogTitle ??
-    settings?.title ??
+    settings?.brand.name ??
     'Blog';
   const description =
     home?.seo?.metaDescription ??
