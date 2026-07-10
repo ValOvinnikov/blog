@@ -21,7 +21,7 @@
     "@blog/utils": "workspace:*",
     "@sanity/image-url": "^2.1.1",
     "groqd": "^1.7.1",
-    "next-sanity": "^9.8.0"
+    "next-sanity": "^13.1.1"
   },
   "devDependencies": {
     "@blog/eslint-config": "workspace:*",
