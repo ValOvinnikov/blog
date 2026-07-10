@@ -77,10 +77,10 @@ Match Atomic Design tiers: `"Atoms/Button"`, `"Molecules/PostCard"`,
   not the component's actual variant config, so it silently drifts out of
   sync (wrong/missing options) whenever the `*-variants.ts` file changes.
   `tv()` exposes its config on `.variants` at runtime, so `objectKeys` (from
-  `@blog/config`) gives you the real, always-current option list:
+  `@blog/utils`) gives you the real, always-current option list:
 
   ```tsx
-  import { objectKeys } from '@blog/config';
+  import { objectKeys } from '@blog/utils';
 
   import { Button } from './button';
   import { buttonVariants } from './button-variants';

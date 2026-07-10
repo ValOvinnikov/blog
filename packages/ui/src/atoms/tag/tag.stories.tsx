@@ -1,4 +1,4 @@
-import { objectKeys } from '@blog/config';
+import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Tag } from './tag';
