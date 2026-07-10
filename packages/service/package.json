@@ -21,7 +21,7 @@
     "@blog/utils": "workspace:*",
     "@sanity/image-url": "^2.1.1",
     "groqd": "^1.7.1",
-    "next-sanity": "^9.8.0"
+    "next-sanity": "^13.1.1"
   },
   "devDependencies": {
     "@blog/eslint-config": "workspace:*",
@@ -30,7 +30,7 @@
     "@blog/vitest-config": "workspace:*",
     "@types/node": "^26",
     "eslint": "^10.6.0",
-    "prettier": "^3.9.4",
+    "prettier": "^3.9.5",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   }
