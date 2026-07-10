@@ -24,6 +24,11 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "eslint-plugin-storybook"
         update-types: ["version-update:semver-major"]
+      # elliptic <=6.6.1 has an open advisory with NO patched release, so
+      # Dependabot's security updater can never resolve it and errors on every
+      # run. It's a deep transitive (build-tooling) dep; ignore it until an
+      # upstream fix ships. Tracked in the transitive-overrides work (#220).
+      - dependency-name: "elliptic"
     open-pull-requests-limit: 5
     labels: ["tooling"]
 
