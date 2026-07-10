@@ -16,7 +16,6 @@
     "migrate:current": "node scripts/migrate.mjs current",
     "migrate:dry": "node scripts/migrate.mjs dry",
     "migrate:run": "node scripts/migrate.mjs run",
-    "migrate:inline-hero": "sanity exec scripts/inline-hero-secondary-action.mjs --with-user-token",
     "dataset:export": "node scripts/migrate.mjs export"
   },
   "dependencies": {

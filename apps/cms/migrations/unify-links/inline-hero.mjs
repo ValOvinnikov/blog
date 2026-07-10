@@ -1,8 +1,7 @@
 /**
  * Inline `homePage.secondaryAction` — convert the legacy reference to a `link`
  * document into an inline `link` object. Run AFTER the `unify-links` migration.
- *
- *   pnpm --filter cms migrate:inline-hero
+ * One-off, co-located with the migration it belongs to.
  *
  * This does what the migration cannot: dereference the referenced document. It
  * uses the Sanity CLI's real client (`getCliClient`), not the migration
@@ -10,7 +9,7 @@
  * MUTATES the dataset — human-gated. Targets the `SANITY_STUDIO_DATASET` dataset
  * (default `production`) via `sanity.cli.ts`. Run with the sanity CLI:
  *
- *   sanity exec scripts/inline-hero-secondary-action.mjs --with-user-token
+ *   pnpm --filter cms exec sanity exec migrations/unify-links/inline-hero.mjs --with-user-token
  */
 import { getCliClient } from 'sanity/cli';
 

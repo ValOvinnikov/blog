@@ -18,16 +18,16 @@
  * become an inline `link` object, but a migration cannot dereference another
  * document here: `@sanity/migrate`'s `context.client` is a Proxy that throws
  * with the installed `@sanity/client` (private-field access). So the hero action
- * is inlined by a separate script that uses a real client — run it AFTER this
- * migration:
- *   pnpm --filter cms migrate:inline-hero
- * (see ../../scripts/inline-hero-secondary-action.mjs).
+ * is inlined by the co-located `inline-hero.mjs` script (a real client), run
+ * AFTER this migration:
+ *   pnpm --filter cms exec sanity exec migrations/unify-links/inline-hero.mjs --with-user-token
  *
  * Workflow (see ../README.md for full guardrails):
  *   1. pnpm --filter cms dataset:export
- *   2. pnpm --filter cms migrate:dry            (tracked; inspect the diff)
- *   3. pnpm --filter cms migrate:run            (human-gated)
- *   4. pnpm --filter cms migrate:inline-hero    (hero action; human-gated)
+ *   2. pnpm --filter cms migrate:dry   (tracked; inspect the diff)
+ *   3. pnpm --filter cms migrate:run   (human-gated)
+ *   4. inline the hero action (human-gated):
+ *      pnpm --filter cms exec sanity exec migrations/unify-links/inline-hero.mjs --with-user-token
  */
 import {
   SOCIAL_PLATFORMS,
