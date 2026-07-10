@@ -35,6 +35,12 @@ approval. Never bundle them. See `open-pull-request` skill for the full sequence
 - If the task touches a library API, CLI command, or config format you are not
   certain of, run the `use-context7` skill **before** writing the plan — fetch
   the relevant docs now, not mid-implementation.
+- **Migration check (schema changes).** If the work alters an _existing_ content
+  shape — renaming/removing/moving a field, renaming a `_type`, restructuring a
+  document — existing `production` documents will be orphaned unless migrated.
+  Decide now whether a data migration is required. If yes, it is part of the plan
+  (see step 2); if the change is purely additive/optional, note explicitly that
+  no migration is needed. Purely new types/fields need none.
 - Surface unknowns early; ask the user only if a decision is genuinely theirs.
 - **Follow Gate 0 in `open-pull-request`** — pull the issue from the board,
   set status → In Progress, checkout a new branch from `main`. For multi-layer
@@ -51,6 +57,13 @@ approval. Never bundle them. See `open-pull-request` skill for the full sequence
 - Explicitly mark which layers are **unaffected** — those agents are skipped
   entirely. Do not invoke an agent whose layer has no changes.
 - Note which step each subagent owns.
+- **If the investigation flagged a migration**, the plan must include it as an
+  explicit step — which documents/fields change, the `sanity/migrate` transform,
+  and the dry-run → backup → human-gated run sequence — and **prompt the user
+  with that migration plan** before implementing (the live-data change is theirs
+  to approve, like a deploy). Follow `apps/cms/migrations/README.md`. Sequence it
+  right after the schema+typegen step and before the `service` layer consumes the
+  new shape.
 
 ## 3. Implement — delegate to the scoped subagent for each layer
 

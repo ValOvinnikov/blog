@@ -75,6 +75,16 @@ prompt — do not write it to disk first.
   possible, not on whole pages.
 - Co-locate `*.test.ts(x)`; `pnpm test` must pass.
 - After a schema change: `pnpm typegen`, then commit `sanity.types.ts`.
+- **Check for migrations.** Content is live in the `production` dataset, so any
+  change that alters an _existing_ shape — renaming/removing/moving a field,
+  renaming a `_type`, restructuring a document — orphans data unless existing
+  documents are migrated. Before implementing, decide: does this need a data
+  migration? If yes, **surface a migration plan and prompt the user** (which
+  documents/fields change, the `sanity/migrate` transform, dry-run → backup →
+  human-gated run) — do not just change the schema. Additive, optional-only
+  changes need no migration; say so explicitly. Use the tooling and workflow in
+  `apps/cms/migrations/` (`README.md` + `migrate:dry`/`migrate:run`/`dataset:export`).
+  Migrations against `production` are human-gated like `sanity deploy`.
 - Verify with `pnpm type-check`, `pnpm lint`, `pnpm test`, `pnpm build` from root.
 - Conventional commits, one concern per PR.
 
