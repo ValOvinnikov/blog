@@ -31,7 +31,7 @@ export const service = {
 export type { TAuthorDetail } from './features/entities/author';
 export type { TCategoriesList } from './features/entities/categories';
 export type { TFooter } from './features/global/footer';
-export type { TNavigation, TNavItem } from './features/global/navigation';
+export type { TNavigation } from './features/global/navigation';
 export type { TBrand, TSiteSettings } from './features/global/site-settings';
 export type { TBlogPage } from './features/pages/blog';
 export type { TCategoryPage } from './features/pages/category';

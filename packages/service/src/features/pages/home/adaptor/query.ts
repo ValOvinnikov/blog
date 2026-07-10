@@ -35,7 +35,6 @@ export const homePageQuery = q.star
     primaryActionLabel: sub.field('primaryActionLabel').nullable(true),
     secondaryAction: sub
       .field('secondaryAction')
-      .deref()
       .project(linkFragment)
       .nullable(true),
     latestPostsTitle: sub.field('latestPostsTitle').notNull(),

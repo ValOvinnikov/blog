@@ -1,4 +1,4 @@
-import type { ISanityImage } from '@blog/config';
+import type { ILink, ISanityImage } from '@blog/config';
 
 import type { TPostCard } from '#/shared/transformers/to-post-card';
 import type { TSeoMeta } from '#/shared/transformers/to-seo-meta';
@@ -8,10 +8,8 @@ export type THomeHeroImage = {
   alt: string;
 };
 
-export type THomeHeroAction = {
-  label: string;
-  href: string;
-};
+/** Hero actions are the shared link view-model (carries target for new-tab). */
+export type THomeHeroAction = ILink;
 
 export type THomeHero = {
   eyebrow: string | undefined;

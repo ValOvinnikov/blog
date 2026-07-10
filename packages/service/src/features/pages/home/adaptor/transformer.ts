@@ -93,6 +93,8 @@ export function toHomePage(
         ? {
             label: rawHome?.primaryActionLabel ?? DEFAULT_PRIMARY_ACTION_LABEL,
             href: `/blog/${heroPost.slug}`,
+            target: undefined,
+            platform: undefined,
           }
         : undefined,
       secondaryAction: toLink(rawHome?.secondaryAction),

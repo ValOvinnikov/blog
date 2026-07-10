@@ -1,13 +1,9 @@
+import type { ILink } from '@blog/config';
 import type { InferFragmentType } from 'groqd';
 
 import type { linkFragment } from '#/shared/fragments/link';
 
 export type TRawLink = InferFragmentType<typeof linkFragment>;
-
-export type TLink = {
-  label: string;
-  href: string;
-};
 
 function toInternalHref(raw: NonNullable<TRawLink['internalReference']>) {
   if (!raw.slug) return undefined;
@@ -24,7 +20,7 @@ function toInternalHref(raw: NonNullable<TRawLink['internalReference']>) {
   }
 }
 
-export function toLink(raw: TRawLink | null | undefined): TLink | undefined {
+export function toLink(raw: TRawLink | null | undefined): ILink | undefined {
   if (!raw) return undefined;
 
   const href =
@@ -37,5 +33,8 @@ export function toLink(raw: TRawLink | null | undefined): TLink | undefined {
   return {
     label: raw.label,
     href,
+    target:
+      raw.linkType === 'external' && raw.openInNewTab ? '_blank' : undefined,
+    platform: raw.platform ?? undefined,
   };
 }
