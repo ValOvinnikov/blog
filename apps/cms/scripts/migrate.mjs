@@ -117,12 +117,15 @@ switch (command) {
   case 'new': {
     if (!name) fail('Usage: migrate new <name>');
     const indexFile = join(migrationsDir, name, 'index.ts');
-    if (existsSync(indexFile)) {
-      console.log(`Migration "${name}" already exists — tracking it.`);
-    } else {
-      mkdirSync(join(migrationsDir, name), { recursive: true });
-      writeFileSync(indexFile, template(name));
+    mkdirSync(join(migrationsDir, name), { recursive: true });
+    try {
+      // `wx` creates the file atomically and fails with EEXIST if it already
+      // exists — avoids a check-then-write (TOCTOU) race.
+      writeFileSync(indexFile, template(name), { flag: 'wx' });
       console.log(`Created migration: ${name}`);
+    } catch (error) {
+      if (error.code !== 'EEXIST') throw error;
+      console.log(`Migration "${name}" already exists — tracking it.`);
     }
     track(name);
     break;
