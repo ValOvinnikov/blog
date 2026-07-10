@@ -35,9 +35,11 @@ API shape from `sanity/migrate` applied to a document-type field rename.
 
 ## Workflow
 
-1. **Scaffold.** Run `sanity migrations create` from `apps/cms` (interactive —
-   it will prompt for a title and migration type) or copy an existing folder
-   under `migrations/` and rename it.
+1. **Scaffold + track.** `pnpm --filter cms migrate:new <slug>` creates
+   `<slug>/index.ts` from a template and records it as the _current_ migration
+   (in the gitignored `migrations/.current`), so the following steps don't need
+   the id. If `<slug>` already exists it just tracks it. (You can also
+   `migrate:track <slug>` an existing one, or omit the name to track the newest.)
 2. **Author the transform** in `<slug>/index.ts` using `defineMigration` from
    `sanity/migrate`. Prefer the `migrate.document` / `migrate.node` /
    `migrate.string` etc. node-visitor handlers for straightforward field
@@ -46,14 +48,14 @@ API shape from `sanity/migrate` applied to a document-type field rename.
 3. **Back up the dataset before any destructive run** (see Guardrails below):
 
    ```sh
-   pnpm --filter cms dataset:export -- production migrations/backups/production-<date>.tar.gz
+   pnpm --filter cms dataset:export -- migrations/backups/production-<date>.tar.gz
    ```
 
-4. **Dry-run first.** Dry-run is the default for `sanity migrations run`, so
-   this never touches the dataset:
+4. **Dry-run first.** Uses the tracked migration (no id needed); dry-run never
+   touches the dataset:
 
    ```sh
-   pnpm --filter cms migrate:dry -- <slug>
+   pnpm --filter cms migrate:dry
    ```
 
    Inspect the printed diff carefully — check the exact documents and fields
@@ -63,10 +65,13 @@ API shape from `sanity/migrate` applied to a document-type field rename.
    backup exists:
 
    ```sh
-   pnpm --filter cms migrate:run -- <slug>
+   pnpm --filter cms migrate:run          # prompts for confirmation
    ```
 
-   This passes `--no-dry-run` and will mutate the dataset.
+   This passes `--no-dry-run` and will mutate the dataset. In a
+   **non-interactive/deploy** context add `--yes` (or set `CI=true`) to skip the
+   prompt: `pnpm --filter cms migrate:run --yes`. Pass an explicit `<slug>` to
+   any of these to override the tracked migration.
 
 6. **Regenerate types if the schema also changed:**
 
@@ -100,29 +105,30 @@ API shape from `sanity/migrate` applied to a document-type field rename.
 
 ## Commands reference
 
-All commands below are run from `apps/cms` (or via `pnpm --filter cms <script>`
-from the repo root). They use the Sanity CLI's plural `migrations` /
-`datasets` topics.
+Run from the repo root via `pnpm --filter cms <script>`. `migrate:*` and
+`dataset:export` are backed by `scripts/migrate.mjs`, which resolves the target
+migration (explicit name → tracked `.current` → newest) and the target dataset.
+
+**Dataset selection.** The dataset comes from `SANITY_STUDIO_DATASET` (default
+`production`) — `sanity.cli.ts` reads the same var, so `sanity dev` and the CLI
+agree. Target another dataset by exporting it:
 
 ```sh
-# List available migrations
-pnpm --filter cms migrate:list
-# -> sanity migrations list
-
-# Dry-run a migration (default; never mutates data)
-pnpm --filter cms migrate:dry -- <slug>
-# -> sanity migrations run <slug>
-
-# Run a migration for real — human-gated, always back up first
-pnpm --filter cms migrate:run -- <slug>
-# -> sanity migrations run <slug> --no-dry-run
-
-# Export a dataset backup before a destructive run
-pnpm --filter cms dataset:export -- <destination>
-# -> sanity datasets export production <destination>
+SANITY_STUDIO_DATASET=development pnpm --filter cms migrate:dry
 ```
 
-Useful extra flags on `sanity migrations run`: `--project <id>` /
-`--dataset <name>` to target a non-default dataset, `--confirm` /
-`--no-confirm` to control the interactive confirmation prompt before a
-non-dry run.
+The resolved dataset is printed before every dry-run / run / export.
+
+```sh
+pnpm --filter cms migrate:list            # list all migrations
+pnpm --filter cms migrate:new <slug>      # scaffold (or reuse) + track
+pnpm --filter cms migrate:track [slug]    # track an existing one (default: newest)
+pnpm --filter cms migrate:current         # print the tracked migration
+pnpm --filter cms migrate:dry [slug]      # dry-run the tracked/named migration
+pnpm --filter cms migrate:run [slug]      # apply it (prompts; --yes to skip)
+pnpm --filter cms dataset:export [dest]   # backup (default dest: backups/<dataset>-<ts>.tar.gz)
+```
+
+For CI/deploy, `migrate:run --yes` (or `CI=true`) runs non-interactively. To
+target a non-default dataset ad-hoc without env, pass an explicit `--dataset`
+through to the underlying `sanity migrations run`.
