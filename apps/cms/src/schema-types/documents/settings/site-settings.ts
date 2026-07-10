@@ -6,6 +6,13 @@ export default defineType({
   title: 'Site Settings',
   type: 'document',
   icon: Settings,
+  preview: {
+    select: { title: 'brand.name' },
+    prepare: ({ title }) => ({
+      title: title ?? 'Site Settings',
+      subtitle: 'Site settings',
+    }),
+  },
   fields: [
     defineField({
       name: 'brand',
