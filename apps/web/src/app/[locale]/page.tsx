@@ -8,6 +8,7 @@ import { setRequestLocale } from 'next-intl/server';
 
 import { HomePageTemplate } from '@/components/home-page-template/home-page-template';
 import { SanityImage } from '@/components/sanity-image/sanity-image';
+import { SmartLink } from '@/components/smart-link/smart-link';
 import { formatDate } from '@/utils/format-date';
 
 type TProps = {
@@ -93,14 +94,19 @@ export default async function HomePage({ params }: TProps) {
           {(hero.primaryAction || hero.secondaryAction) && (
             <Hero.Cta>
               {hero.primaryAction && (
-                <LinkButton as={Link} href={hero.primaryAction.href}>
+                <LinkButton
+                  as={SmartLink}
+                  href={hero.primaryAction.href}
+                  target={hero.primaryAction.target}
+                >
                   {hero.primaryAction.label}
                 </LinkButton>
               )}
               {hero.secondaryAction && (
                 <LinkButton
-                  as={Link}
+                  as={SmartLink}
                   href={hero.secondaryAction.href}
+                  target={hero.secondaryAction.target}
                   variant="link"
                 >
                   {hero.secondaryAction.label}

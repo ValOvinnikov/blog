@@ -1,7 +1,7 @@
 import blockText from './block-text';
 import brand from './brand';
 import imageWithAlt from './image-with-alt';
-import navItem from './nav-item';
+import link from './link';
 import openGraph from './open-graph';
 import portableText from './portable-text';
 import seo from './seo';
@@ -12,7 +12,7 @@ export const objects = [
   portableText,
   blockText,
   socialLink,
-  navItem,
+  link,
   openGraph,
   seo,
   brand,

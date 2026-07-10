@@ -28,14 +28,28 @@ describe('getFooter', () => {
   it('maps raw social links into a domain object', async () => {
     mockRun.mockResolvedValue(
       makeRawFooter({
-        social: [{ platform: 'github', url: 'https://github.com/val' }],
+        social: [
+          {
+            label: 'GitHub',
+            linkType: 'EXTERNAL',
+            url: 'https://github.com/val',
+            internalReference: null,
+            openInNewTab: null,
+            platform: 'GITHUB',
+          },
+        ],
       }),
     );
 
     const result = await getFooter();
 
     expect(result.social).toEqual([
-      { platform: 'github', url: 'https://github.com/val' },
+      {
+        label: 'GitHub',
+        href: 'https://github.com/val',
+        target: undefined,
+        platform: 'GITHUB',
+      },
     ]);
   });
 });

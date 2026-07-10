@@ -1,8 +1,5 @@
-export type TNavItem = {
-  label: string;
-  href: string;
-};
+import type { ILink } from '@blog/config';
 
 export type TNavigation = {
-  items: TNavItem[];
+  items: ILink[];
 };

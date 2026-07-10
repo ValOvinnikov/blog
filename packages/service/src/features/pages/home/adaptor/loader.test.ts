@@ -29,7 +29,7 @@ describe('getHomePage', () => {
         primaryActionLabel: 'Start reading',
         secondaryAction: {
           label: 'Browse all',
-          linkType: 'external',
+          linkType: 'EXTERNAL',
           url: '/blog',
           internalReference: null,
         },

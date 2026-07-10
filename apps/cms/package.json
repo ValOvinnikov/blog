@@ -19,6 +19,7 @@
     "dataset:export": "node scripts/migrate.mjs export"
   },
   "dependencies": {
+    "@blog/config": "workspace:*",
     "@sanity/code-input": "^5.1.0",
     "@sanity/image-url": "^2.1.1",
     "@sanity/vision": "^6.4.0",

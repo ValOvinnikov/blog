@@ -9,6 +9,7 @@ import { notFound } from 'next/navigation';
 import { hasLocale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 
+import { SmartLink } from '@/components/smart-link/smart-link';
 import { ThemeToggleButton } from '@/components/theme-toggle-button/theme-toggle-button';
 import { jetbrainsMono, newsreader, spaceGrotesk } from '@/config/fonts';
 import { themeBootstrapScript } from '@/config/theme-script';
@@ -90,9 +91,10 @@ export default async function LocaleLayout({ children, params }: TProps) {
             links={navItems.map((item) => ({
               href: item.href,
               label: item.label,
+              target: item.target,
             }))}
             actions={<ThemeToggleButton />}
-            linkAs={Link}
+            linkAs={SmartLink}
           />
         </Header>
         {children}
@@ -100,8 +102,13 @@ export default async function LocaleLayout({ children, params }: TProps) {
           <Footer.Copyright title={brand.name} />
           <Footer.Nav>
             {social.map((link) => (
-              <NavLink key={link.url} href={link.url}>
-                {link.platform}
+              <NavLink
+                key={link.href}
+                as={SmartLink}
+                href={link.href}
+                target={link.target}
+              >
+                {link.label}
               </NavLink>
             ))}
           </Footer.Nav>

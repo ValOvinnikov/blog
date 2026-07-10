@@ -38,6 +38,9 @@ importers:
 
   apps/cms:
     dependencies:
+      '@blog/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@sanity/code-input':
         specifier: ^5.1.0
         version: 5.2.1(4pkl6jq2l3n5fg3lq3l5ouutem)

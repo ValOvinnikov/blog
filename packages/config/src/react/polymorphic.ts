@@ -38,4 +38,9 @@ export type TPolymorphicProps<
  * and let `apps/web` pass its router's `Link` for client-side navigation.
  */
 export type TAnchorElementType =
-  'a' | ComponentType<{ href: string; children?: ReactNode }>;
+  | 'a'
+  | ComponentType<{
+      href: string;
+      children?: ReactNode;
+      target?: '_blank';
+    }>;

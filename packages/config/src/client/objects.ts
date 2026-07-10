@@ -1,3 +1,5 @@
+import type { TSocialPlatform } from '../constants/link';
+
 export interface ISanityImageHotspot {
   x: number;
   y: number;
@@ -25,4 +27,13 @@ export interface ISanityImage {
   crop: ISanityImageCrop | undefined;
   lqip: string | undefined;
   dimensions: ISanityImageDimensions | undefined;
+}
+
+export interface ILink {
+  label: string;
+  href: string;
+  /** '_blank' for external links opting into a new tab, else undefined. */
+  target: '_blank' | undefined;
+  /** Social platform key (set on footer social links). */
+  platform: TSocialPlatform | undefined;
 }

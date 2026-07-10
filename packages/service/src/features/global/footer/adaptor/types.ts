@@ -1,5 +1,5 @@
-import type { TSocialLink } from '#/shared/transformers/to-social-link';
+import type { ILink } from '@blog/config';
 
 export type TFooter = {
-  social: TSocialLink[];
+  social: ILink[];
 };

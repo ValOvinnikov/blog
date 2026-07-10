@@ -28,12 +28,23 @@ describe('getNavigation', () => {
   it('maps raw navigation items into a domain object', async () => {
     mockRun.mockResolvedValue(
       makeRawNavigation({
-        items: [{ label: 'Blog', href: '/blog' }],
+        items: [
+          {
+            label: 'Blog',
+            linkType: 'EXTERNAL',
+            url: '/blog',
+            internalReference: null,
+            openInNewTab: null,
+            platform: null,
+          },
+        ],
       }),
     );
 
     const result = await getNavigation();
 
-    expect(result.items).toEqual([{ label: 'Blog', href: '/blog' }]);
+    expect(result.items).toEqual([
+      { label: 'Blog', href: '/blog', target: undefined, platform: undefined },
+    ]);
   });
 });

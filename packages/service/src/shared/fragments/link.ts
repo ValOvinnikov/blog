@@ -11,4 +11,6 @@ export const linkFragment = q.fragmentForType<'link'>().project((sub) => ({
       _type: true,
       slug: ref.field('slug.current'),
     })),
+  openInNewTab: sub.field('openInNewTab'),
+  platform: sub.field('platform'),
 }));

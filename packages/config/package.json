@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./react": "./src/react/polymorphic.ts"
+    "./react": "./src/react/polymorphic.ts",
+    "./constants": "./src/constants/index.ts"
   },
   "scripts": {
     "lint": "eslint .",
