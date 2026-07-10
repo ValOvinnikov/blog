@@ -1,41 +1,18 @@
+import type {
+  ISanityImage,
+  ISanityImageCrop,
+  ISanityImageDimensions,
+  ISanityImageHotspot,
+} from '@blog/config';
 import type { InferFragmentType } from 'groqd';
 
 import type { sanityImageFragment } from '#/shared/fragments/image';
 
 export type TRawSanityImage = InferFragmentType<typeof sanityImageFragment>;
 
-export type TSanityImageHotspot = {
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-};
-
-export type TSanityImageCrop = {
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-};
-
-export type TSanityImageDimensions = {
-  width: number;
-  height: number;
-  aspectRatio: number;
-};
-
-export type TSanityImage = {
-  assetId: string;
-  alt: string;
-  hotspot: TSanityImageHotspot | undefined;
-  crop: TSanityImageCrop | undefined;
-  lqip: string | undefined;
-  dimensions: TSanityImageDimensions | undefined;
-};
-
 function toHotspot(
   raw: TRawSanityImage['hotspot'],
-): TSanityImageHotspot | undefined {
+): ISanityImageHotspot | undefined {
   if (
     !raw ||
     raw.x == null ||
@@ -49,7 +26,7 @@ function toHotspot(
   return { x: raw.x, y: raw.y, height: raw.height, width: raw.width };
 }
 
-function toCrop(raw: TRawSanityImage['crop']): TSanityImageCrop | undefined {
+function toCrop(raw: TRawSanityImage['crop']): ISanityImageCrop | undefined {
   if (
     !raw ||
     raw.top == null ||
@@ -65,7 +42,7 @@ function toCrop(raw: TRawSanityImage['crop']): TSanityImageCrop | undefined {
 
 function toDimensions(
   raw: TRawSanityImage['asset']['metadata'],
-): TSanityImageDimensions | undefined {
+): ISanityImageDimensions | undefined {
   const dimensions = raw?.dimensions;
   if (
     !dimensions ||
@@ -85,7 +62,7 @@ function toDimensions(
 
 export function toSanityImage(
   raw: TRawSanityImage | null | undefined,
-): TSanityImage | undefined {
+): ISanityImage | undefined {
   if (!raw?.asset) return undefined;
 
   return {

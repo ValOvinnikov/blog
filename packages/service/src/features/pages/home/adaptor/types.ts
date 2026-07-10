@@ -1,5 +1,6 @@
+import type { ISanityImage } from '@blog/config';
+
 import type { TPostCard } from '#/shared/transformers/to-post-card';
-import type { TSanityImage } from '#/shared/transformers/to-sanity-image';
 import type { TSeoMeta } from '#/shared/transformers/to-seo-meta';
 
 export type THomeHeroImage = {
@@ -17,7 +18,7 @@ export type THomeHero = {
   title: string;
   subtitle: string | undefined;
   image: THomeHeroImage | undefined;
-  sanityImage: TSanityImage | undefined;
+  sanityImage: ISanityImage | undefined;
   primaryAction: THomeHeroAction | undefined;
   secondaryAction: THomeHeroAction | undefined;
 };

@@ -1,11 +1,9 @@
+import type { ISanityImage } from '@blog/config';
 import type { InferFragmentType } from 'groqd';
 
 import type { postCardFragment } from '#/shared/fragments/post';
 import { buildImageUrl } from '#/shared/transformers/build-image-url';
-import {
-  toSanityImage,
-  type TSanityImage,
-} from '#/shared/transformers/to-sanity-image';
+import { toSanityImage } from '#/shared/transformers/to-sanity-image';
 
 export type TRawPostCard = InferFragmentType<typeof postCardFragment>;
 
@@ -30,7 +28,7 @@ export type TPostCard = {
   publishedAt: string;
   mainImageUrl: string | undefined;
   mainImageAlt: string;
-  mainImageSanity: TSanityImage | undefined;
+  mainImageSanity: ISanityImage | undefined;
   featured: boolean;
   author: TPostCardAuthor | undefined;
   categories: TPostCardCategory[];
