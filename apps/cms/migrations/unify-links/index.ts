@@ -1,9 +1,9 @@
 /**
  * Unify `navItem` / `socialLink` / the old `link` document into the single
- * `link` object (schema change: Phase 4, Task 1 — link unification). Run
- * AFTER the schema change + `pnpm typegen`.
+ * `link` object (Phase 4 — link unification). Run AFTER the schema change +
+ * `pnpm typegen`.
  *
- * Transforms:
+ * Transforms (per-document, no cross-document dereference):
  *   - `settings_navigation.items`: each `navItem { label, href }` becomes
  *     `link { _type: 'link', label, linkType: 'EXTERNAL', url: href }`.
  *   - `settings_footer.social`: each `socialLink { platform, url }` becomes
@@ -12,62 +12,41 @@
  *     old free-text value and keeps it only if it matches a known
  *     `SOCIAL_PLATFORMS` value (otherwise `platform` is left unset).
  *   - `author.socialLinks` is intentionally UNTOUCHED — `socialLink` stays a
- *     live schema type for that field (see schema-types/objects/social-link.ts),
- *     out of scope for this migration.
+ *     live schema type for that field, out of scope for this migration.
  *
- * `homePage.secondaryAction` — approach taken:
- *   Before the schema change, `secondaryAction` was a `reference` to a `link`
- *   **document**. A plain `document()` node-visitor cannot dereference another
- *   document on its own, but `MigrationContext` (passed to every node-visitor,
- *   see `@sanity/migrate` `types.ts`) exposes `context.client`, a real
- *   `@sanity/client` instance (restricted to `fetch` / `getDocument` /
- *   `getDocuments` / `clone` / `config` / `withConfig`) backed by the live
- *   dataset — not just the migration's own filtered/exported document set.
- *   Node-visitor handlers may also be `async` and return a `Promise` of
- *   mutations. So this migration dereferences `secondaryAction._ref` via
- *   `context.client.getDocument(ref)` and `set()`s an inline `link` object
- *   built from the fetched document's fields, then lets the reference itself
- *   be overwritten by the patch. There is a single `homePage` singleton, so
- *   this is a single, bounded dereference per run.
+ * `homePage.secondaryAction` (a reference to a legacy `link` document) must
+ * become an inline `link` object, but a migration cannot dereference another
+ * document here: `@sanity/migrate`'s `context.client` is a Proxy that throws
+ * with the installed `@sanity/client` (private-field access). So the hero action
+ * is inlined by a separate script that uses a real client — run it AFTER this
+ * migration:
+ *   pnpm --filter cms migrate:inline-hero
+ * (see ../../scripts/inline-hero-secondary-action.mjs).
  *
  * Workflow (see ../README.md for full guardrails):
- *   1. pnpm --filter cms dataset:export -- migrations/backups/production-pre-unify-links.tar.gz
- *   2. pnpm --filter cms migrate:dry -- unify-links
- *   3. Inspect the dry-run diff carefully.
- *   4. Only then: pnpm --filter cms migrate:run -- unify-links
- *      (human-gated — an agent must not run this step)
+ *   1. pnpm --filter cms dataset:export
+ *   2. pnpm --filter cms migrate:dry            (tracked; inspect the diff)
+ *   3. pnpm --filter cms migrate:run            (human-gated)
+ *   4. pnpm --filter cms migrate:inline-hero    (hero action; human-gated)
  */
 import {
   SOCIAL_PLATFORMS,
   TLINK_TYPE,
   type TLinkType,
 } from '@blog/config/constants';
-import { at, defineMigration, set, unset } from 'sanity/migrate';
+import { at, defineMigration, set } from 'sanity/migrate';
 
 type TKeyed<T> = T & { _key: string };
 
 type TNavItem = { label?: string; href?: string };
 type TSocialLink = { platform?: string; url?: string };
 
-type TLinkReference = { _type: 'reference'; _ref: string; _weak?: boolean };
-
-type TLegacyLinkDocument = {
-  _id: string;
-  _type: 'link';
-  label?: string;
-  linkType?: string;
-  internalReference?: unknown;
-  url?: string;
-};
-
 type TLinkObject = {
   _type: 'link';
   _key?: string;
   label?: string;
   linkType?: TLinkType;
-  internalReference?: unknown;
   url?: string;
-  openInNewTab?: boolean;
   platform?: string;
 };
 
@@ -100,27 +79,12 @@ const socialLinkToLink = (item: TKeyed<TSocialLink>): TKeyed<TLinkObject> => ({
   platform: normalizePlatform(item.platform),
 });
 
-const isReference = (value: unknown): value is TLinkReference =>
-  typeof value === 'object' &&
-  value !== null &&
-  (value as { _type?: unknown })._type === 'reference' &&
-  typeof (value as { _ref?: unknown })._ref === 'string';
-
-const legacyLinkDocToInlineLink = (doc: TLegacyLinkDocument): TLinkObject => ({
-  _type: 'link',
-  label: doc.label,
-  linkType:
-    doc.linkType === 'internal' ? TLINK_TYPE.INTERNAL : TLINK_TYPE.EXTERNAL,
-  internalReference: doc.internalReference,
-  url: doc.url,
-});
-
 export default defineMigration({
-  title: 'Unify navItem/socialLink/link document into shared link object',
-  documentTypes: ['settings_navigation', 'settings_footer', 'homePage'],
+  title: 'Unify navItem/socialLink into the shared link object',
+  documentTypes: ['settings_navigation', 'settings_footer'],
 
   migrate: {
-    document(doc, context) {
+    document(doc) {
       if (doc._type === 'settings_navigation') {
         const items = (doc as { items?: TKeyed<TNavItem>[] }).items;
         if (!items) return undefined;
@@ -133,30 +97,6 @@ export default defineMigration({
         if (!social) return undefined;
 
         return [at('social', set(social.map(socialLinkToLink)))];
-      }
-
-      if (doc._type === 'homePage') {
-        const secondaryAction = (doc as { secondaryAction?: unknown })
-          .secondaryAction;
-
-        if (!isReference(secondaryAction)) {
-          // Already unset, or already migrated to an inline link object.
-          return undefined;
-        }
-
-        return context.client
-          .getDocument<TLegacyLinkDocument>(secondaryAction._ref)
-          .then((linkDoc) => {
-            if (!linkDoc) {
-              // Dangling reference — clear the field rather than leave a
-              // broken reference behind.
-              return [at('secondaryAction', unset())];
-            }
-
-            return [
-              at('secondaryAction', set(legacyLinkDocToInlineLink(linkDoc))),
-            ];
-          });
       }
 
       return undefined;
