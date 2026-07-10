@@ -18,9 +18,9 @@ export function toSiteSettings(raw: TRawSiteSettings): TSiteSettings {
     brandPrefix: raw.brandPrefix,
     brandSuffix: raw.brandSuffix ?? undefined,
     logoUrl: buildImageUrl(raw.logo),
-    ogImageUrl: buildImageUrl(raw.ogImage),
-    ogTitle: raw.ogTitle ?? undefined,
-    ogDescription: raw.ogDescription ?? undefined,
+    ogImageUrl: buildImageUrl(raw.defaultSeo.ogImage),
+    ogTitle: raw.defaultSeo.ogTitle ?? undefined,
+    ogDescription: raw.defaultSeo.ogDescription ?? undefined,
     navigation: raw.navigation ?? [],
     socialLinks: (raw.socialLinks ?? []).map(toSocialLink),
   };

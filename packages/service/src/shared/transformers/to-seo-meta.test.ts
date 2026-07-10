@@ -15,9 +15,11 @@ function makeRawSeo(overrides: Partial<TRawSeo> = {}): TRawSeo {
   return {
     metaTitle: 'Page Title',
     metaDescription: 'A description',
-    ogTitle: 'OG Title',
-    ogDescription: 'OG description',
-    ogImage: makeRawImage('OG image'),
+    openGraph: {
+      ogTitle: 'OG Title',
+      ogDescription: 'OG description',
+      ogImage: makeRawImage('OG image'),
+    },
     ...overrides,
   };
 }
@@ -37,9 +39,7 @@ describe('toSeoMeta', () => {
     const result = toSeoMeta(
       makeRawSeo({
         metaDescription: null,
-        ogTitle: null,
-        ogDescription: null,
-        ogImage: null,
+        openGraph: null,
       }),
     );
 

@@ -1,5 +1,6 @@
 import { q } from '#/sanity/query';
 import { imageWithAltFragment } from '#/shared/fragments/image';
+import { openGraphFragment } from '#/shared/fragments/open-graph';
 import { socialLinkFragment } from '#/shared/fragments/social-link';
 
 export const siteSettingsQuery = q.star
@@ -12,9 +13,7 @@ export const siteSettingsQuery = q.star
     brandPrefix: sub.field('brandPrefix').notNull(),
     brandSuffix: sub.field('brandSuffix'),
     logo: sub.field('logo').project(imageWithAltFragment).notNull(),
-    ogImage: sub.field('ogImage').project(imageWithAltFragment).notNull(),
-    ogTitle: sub.field('ogTitle'),
-    ogDescription: sub.field('ogDescription'),
+    defaultSeo: sub.field('defaultSeo').project(openGraphFragment).notNull(),
     navigation: sub
       .field('navigation[]')
       .project((s) => ({
