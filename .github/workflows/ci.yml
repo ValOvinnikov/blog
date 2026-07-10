@@ -103,3 +103,10 @@ jobs:
 
       - name: Build
         run: pnpm build
+        # @blog/service validates its env at import time (Zod via
+        # @t3-oss/env-core). CI has no Sanity env vars, so skip validation
+        # here — the build doesn't fetch, and real validation still runs at
+        # deploy time on Vercel where the vars are set. Pages tolerate a
+        # missing client (service fetchers return an `ok: false` Result).
+        env:
+          SKIP_ENV_VALIDATION: 'true'

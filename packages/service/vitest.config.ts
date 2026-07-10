@@ -15,6 +15,9 @@ export default mergeConfig(
       env: {
         NEXT_PUBLIC_SANITY_PROJECT_ID: 'test-project',
         NEXT_PUBLIC_SANITY_DATASET: 'test',
+        // `env.ts` validates at import time; tests that delete env vars mid-run
+        // (e.g. client.test.ts) rely on importing modules without throwing.
+        SKIP_ENV_VALIDATION: 'true',
       },
     },
     resolve: {
