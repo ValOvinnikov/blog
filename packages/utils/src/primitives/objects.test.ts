@@ -2,7 +2,7 @@ import { describe, expect, expectTypeOf, it } from 'vitest';
 
 import { objectKeys } from './objects';
 
-describe('objectKeys', () => {
+describe(objectKeys, () => {
   it("returns the object's keys", () => {
     expect(objectKeys({ a: 1, b: 2, c: 3 })).toEqual(['a', 'b', 'c']);
   });
