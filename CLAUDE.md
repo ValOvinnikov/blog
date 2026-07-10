@@ -67,6 +67,11 @@ prompt — do not write it to disk first.
   `sanity.cli.ts`, `next.config.ts`, `vitest.config.ts`, etc.) stay at the
   package root.
 - TypeScript `strict`; no `any`. Server Components by default.
+- **Key/value-pair consts are always both UPPERCASE** (key === uppercase value),
+  `as const`, and live in `@blog/config` (`constants/`). e.g.
+  `export const TLINK_TYPE = { INTERNAL: 'INTERNAL', EXTERNAL: 'EXTERNAL' } as const;`
+  The uppercase value is the stored/serialized value, so schema `options.list`
+  and migrations use it too; derive unions with `(typeof C)[keyof typeof C]`.
 - `'use client'` never in `@blog/ui` (it stays pure and prop-driven). In
   `apps/web` it IS the right tool — add it at the _leaf boundary_ that
   genuinely needs the client: React hooks (`useState`/`useEffect`), browser
