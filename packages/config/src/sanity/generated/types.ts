@@ -15,6 +15,50 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../../packages/config/src/sanity/generated/schema.json
+export type Module_cta = {
+  _type: 'module_cta';
+  heading?: string;
+  body?: BlockText;
+  actions?: Array<
+    {
+      _key: string;
+    } & Link
+  >;
+};
+
+export type Module_content = {
+  _type: 'module_content';
+  body?: PortableText;
+};
+
+export type Module_postList = {
+  _type: 'module_postList';
+  title?: string;
+  limit?: number;
+};
+
+export type PostReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'post';
+};
+
+export type Module_hero = {
+  _type: 'module_hero';
+  featuredPost?: PostReference;
+  heroEyebrowMode?: 'postCategory' | 'custom';
+  heroEyebrow?: string;
+  heroTitleMode?: 'postTitle' | 'custom';
+  heroTitle?: string;
+  heroSubtitleMode?: 'postExcerpt' | 'custom';
+  heroSubtitle?: string;
+  heroImageMode?: 'postImage' | 'custom' | 'none';
+  heroImage?: ImageWithAlt;
+  primaryActionLabel?: string;
+  secondaryAction?: Link;
+};
+
 export type Brand = {
   _type: 'brand';
   name?: string;
@@ -35,13 +79,6 @@ export type OpenGraph = {
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: ImageWithAlt;
-};
-
-export type PostReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'post';
 };
 
 export type CategoryReference = {
@@ -191,19 +228,17 @@ export type HomePage = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  featuredPost?: PostReference;
-  heroEyebrowMode?: 'postCategory' | 'custom';
-  heroEyebrow?: string;
-  heroTitleMode?: 'postTitle' | 'custom';
-  heroTitle?: string;
-  heroSubtitleMode?: 'postExcerpt' | 'custom';
-  heroSubtitle?: string;
-  heroImageMode?: 'postImage' | 'custom' | 'none';
-  heroImage?: ImageWithAlt;
-  primaryActionLabel?: string;
-  secondaryAction?: Link;
-  latestPostsTitle?: string;
-  latestPostsLimit?: number;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_hero)
+    | ({
+        _key: string;
+      } & Module_postList)
+    | ({
+        _key: string;
+      } & Module_cta)
+  >;
   seo?: Seo;
 };
 
@@ -215,7 +250,14 @@ export type Page = {
   _rev: string;
   title?: string;
   slug?: Slug;
-  body?: PortableText;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_content)
+    | ({
+        _key: string;
+      } & Module_cta)
+  >;
   seo?: Seo;
 };
 
@@ -405,10 +447,14 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | Module_cta
+  | Module_content
+  | Module_postList
+  | PostReference
+  | Module_hero
   | Brand
   | Seo
   | OpenGraph
-  | PostReference
   | CategoryReference
   | PageReference
   | Link

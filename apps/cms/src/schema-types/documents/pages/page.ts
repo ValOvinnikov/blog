@@ -1,5 +1,5 @@
 import { FileText } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export default defineType({
   name: 'page',
@@ -26,12 +26,14 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'body',
-      title: 'Body',
-      type: 'portableText',
-      description:
-        'Page content — supports rich text, images, and code blocks.',
-      validation: (rule) => rule.required(),
+      name: 'modules',
+      title: 'Modules',
+      type: 'array',
+      description: 'Ordered content blocks that build the page.',
+      of: [
+        defineArrayMember({ type: 'module_content' }),
+        defineArrayMember({ type: 'module_cta' }),
+      ],
     }),
     defineField({
       name: 'seo',
