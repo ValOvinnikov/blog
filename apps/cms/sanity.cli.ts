@@ -1,11 +1,19 @@
 import { defineCliConfig } from 'sanity/cli';
 
+import { requireEnv } from './sanity-env';
+
 export default defineCliConfig({
   api: {
-    projectId: process.env.SANITY_STUDIO_PROJECT_ID ?? 'ccs8c2no',
-    // Dataset is env-driven so CLI commands (dev, migrations, exports) can target
-    // e.g. a `development` dataset. Defaults to `production`.
-    dataset: process.env.SANITY_STUDIO_DATASET ?? 'production',
+    // Env-driven (no hardcoded ids in this public repo). CLI commands (dev,
+    // migrations, exports) target whatever SANITY_STUDIO_* points at.
+    projectId: requireEnv(
+      'SANITY_STUDIO_PROJECT_ID',
+      process.env.SANITY_STUDIO_PROJECT_ID,
+    ),
+    dataset: requireEnv(
+      'SANITY_STUDIO_DATASET',
+      process.env.SANITY_STUDIO_DATASET,
+    ),
   },
   typegen: {
     path: './src/**/*.{ts,tsx}',

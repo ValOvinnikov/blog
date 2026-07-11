@@ -15,6 +15,15 @@ permissions:
 env:
   PNPM_VERSION: 9.15.0
   NODE_VERSION: '22'
+  # The Sanity project/dataset are not hardcoded in the repo — the Studio/CLI
+  # config reads them from SANITY_STUDIO_*. Jobs that load that config (typegen,
+  # build, migrations) need them present, so source them from repo-level
+  # Variables (Settings → Secrets and variables → Actions → Variables):
+  #   SANITY_STUDIO_PROJECT_ID, SANITY_STUDIO_DATASET.
+  # The migrations dry-run connects to the real dataset, so these must be the
+  # production values (project id is public, so a Variable — not a Secret — is fine).
+  SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
+  SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
 
 jobs:
   type-check:
