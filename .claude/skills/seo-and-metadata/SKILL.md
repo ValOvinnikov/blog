@@ -14,6 +14,7 @@ Target Lighthouse SEO ≥ 95. Metadata is composed from `siteSettings`
 Canonical origin comes from `NEXT_PUBLIC_SITE_URL`.
 
 ## Per-route metadata
+
 - Every route exports `generateMetadata` (dynamic) or a static `metadata`.
 - Resolve title as `post.seo?.metaTitle ?? post.title`, description as
   `post.seo?.metaDescription ?? post.excerpt`. Fall back to `siteSettings`.
@@ -32,17 +33,32 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   if (!post) return {};
   const title = post.seo?.metaTitle ?? post.title;
   const description = post.seo?.metaDescription ?? post.excerpt;
-  const ogImage = urlForImage(post.seo?.ogImage ?? post.mainImage)?.width(1200).height(630).url();
+  const ogImage = urlForImage(post.seo?.ogImage ?? post.mainImage)
+    ?.width(1200)
+    .height(630)
+    .url();
   return {
-    title, description,
+    title,
+    description,
     alternates: { canonical: `/blog/${post.slug}` },
-    openGraph: { type: "article", title, description, images: ogImage ? [ogImage] : [] },
-    twitter: { card: "summary_large_image", title, description, images: ogImage ? [ogImage] : [] },
+    openGraph: {
+      type: 'article',
+      title,
+      description,
+      images: ogImage ? [ogImage] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ogImage ? [ogImage] : [],
+    },
   };
 }
 ```
 
 ## Structured data (JSON-LD)
+
 - Post pages embed a `BlogPosting`/`Article` script: `headline`, `datePublished`
   (`post.publishedAt`), `author` (`{ "@type": "Person", name }`), `image`,
   `description`. Render via `<script type="application/ld+json">` with
@@ -50,6 +66,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 - Generate `dangerouslySetInnerHTML` only for the serialized JSON-LD object.
 
 ## Feeds (all under `apps/web/app`)
+
 - `sitemap.ts` — `MetadataRoute.Sitemap`: home, all post slugs (with
   `lastModified`), categories, pages. Driven by `service` data.
 - `robots.ts` — `MetadataRoute.Robots`: allow all, point `sitemap` at
@@ -58,11 +75,13 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   built from `getPosts()` (title, link, `pubDate`, description from `excerpt`).
 
 ## Rules
+
 - Fetch all SEO inputs through `@blog/service` — no Sanity client in `web`.
 - Keep titles ≤ ~60 chars, descriptions ≤ ~155; truncate `excerpt` if needed.
 - Re-check `sitemap`/RSS after adding any publicly listed content type.
 
 ## Checklist
+
 - [ ] Route has `generateMetadata` with title, description, canonical, OG, Twitter.
 - [ ] `metadataBase` set; OG image absolute and 1200×630.
 - [ ] Posts emit valid `BlogPosting` JSON-LD.

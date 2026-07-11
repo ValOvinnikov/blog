@@ -53,14 +53,18 @@
 - **Acceptance:** `turbo.json` outputs match reality; `.nvmrc` present;
   `pnpm build` from root still green.
 
-### M0.4 · `docs: close the spec-drift ticket (#13)`
+### M0.4 · `docs: keep #13 parked (db layer) — not spec drift`
 
 - **Labels:** `documentation`
-- **Body:** The SPEC rewrite (this PR) resolves the drift #13 tracks: dead
-  `@blog/types`, missing `utils`, stale content model, missing
-  migrations/CI/delivery sections, archived brief. Verify #13's checklist
-  against the new `SPEC.md` and close it, noting anything still outstanding.
-- **Acceptance:** #13 closed with a comment linking the SPEC-rewrite PR.
+- **Body:** Correction to an earlier assumption: #13 is **not** a general
+  spec-drift ticket (that drift was fixed by the SPEC rewrite PR). It tracks
+  the deliberately deferred **`db` layer** (Drizzle/Neon engagement layer):
+  SPEC/CLAUDE amendments, a `db` subagent, and the `drizzle-kit` allowlist
+  entry, all to be done **when that phase begins, not before**. Action: leave
+  #13 open, add a comment noting the SPEC rewrite landed and its checklist is
+  still valid for the future db work.
+- **Acceptance:** #13 remains open with the clarifying comment; no db docs
+  added prematurely.
 
 ---
 
