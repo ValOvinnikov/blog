@@ -61,6 +61,13 @@ export default mergeConfig(
 - **`web`** — route/page components with `service` functions mocked; assert that
   the data renders and metadata is produced. Keep these light; prefer pushing
   logic down into `ui`/`service` where it's cheaper to test.
+- **`apps/cms/migrations/*`** — a migration's `document()` handler is a pure
+  function (doc → mutations), so test it directly. Cover **transform correctness**
+  (a legacy doc maps to the expected module/field shape) and **idempotency**
+  (running it against an already-migrated doc returns `undefined`/no-op — never
+  re-transforms or overwrites data). Extract the transform into a small helper if
+  that makes it easier to assert. (An idempotency test would have caught the
+  Phase 5 modules-overwrite bug.)
 
 ## Conventions
 
@@ -101,9 +108,20 @@ export default mergeConfig(
 - **No implementation details** — test what a component does, not how it does it.
 - **No network calls** — always mock the Sanity client and `service` functions.
 
+## Coverage strategy
+
+Think pyramid: **many** fast, focused unit tests (`ui`/`service`/migrations),
+**few** heavier route/integration tests. Spend coverage on what matters —
+**business-critical paths, edge cases (empty/null/limits), error & empty
+handling, and data integrity/idempotency**. **Skip** trivial getters, framework
+code, and one-off scripts. When adding a feature, do a quick **gap scan**: does
+each new critical path _and_ each error/empty branch have a test? Note gaps
+rather than leaving them silent.
+
 ## Checklist
 
 - [ ] Test co-located and named `*.test.ts(x)`.
+- [ ] Migrations: transform-correctness + idempotency tested.
 - [ ] Right environment (jsdom for components, node for service).
 - [ ] Boundaries mocked; no network, no real time.
 - [ ] Queried by role/text; asserts behaviour, not implementation detail.
