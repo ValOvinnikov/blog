@@ -20,8 +20,11 @@ export default defineConfig({
   name: 'default',
   title: 'Blog',
 
-  projectId: 'ccs8c2no',
-  dataset: 'production',
+  // Env-driven so the Studio can point at a dev project/dataset. Sanity exposes
+  // SANITY_STUDIO_* to the studio bundle (set them in apps/cms/.env). Defaults
+  // to production so nothing breaks if they're unset.
+  projectId: process.env.SANITY_STUDIO_PROJECT_ID ?? 'ccs8c2no',
+  dataset: process.env.SANITY_STUDIO_DATASET ?? 'production',
 
   plugins: [
     structureTool({
