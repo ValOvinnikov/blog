@@ -1,5 +1,11 @@
 # AI Implementation Brief — Blog Monorepo
 
+> **⚠️ ARCHIVED (2026-07-12).** This was the one-shot bootstrap playbook for the
+> initial build, which is complete. It is kept as historical context only and is
+> **no longer maintained** — versions, paths, and the content model below have
+> drifted from reality. The single durable reference is [`SPEC.md`](./SPEC.md);
+> when the two disagree, `SPEC.md` wins. Do not extend this file.
+
 > **For the AI agent reading this:** This is your implementation spec. Build the project described below. Follow the dependency rules and bootstrap order exactly. Where a step says "install latest", run the official scaffolder rather than hard-coding versions — the `package.json` files in this repo are a structural skeleton, and version numbers in them should be reconciled to the latest stable on install. Ask the user for the Sanity project ID and dataset before wiring the data layer. Work top-to-bottom; do not skip the acceptance checks.
 >
 > **Working in this repo?** Read [`SPEC.md`](./SPEC.md) for the durable product + architecture reference, and use the scoped subagents in `.claude/agents/` (`cms`, `service`, `ui`, `web`) plus the skills in `.claude/skills/` (`develop-feature`, `add-content-type`, `ui-library-practices`, `testing-practices`, `seo-and-metadata`, `code-review-practices`).

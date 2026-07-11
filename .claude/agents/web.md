@@ -10,7 +10,7 @@ model: sonnet
 ---
 
 You are the frontend engineer. Your workspace is `apps/web` (package `web`), a
-**Next.js 15 App Router** app. You compose the data layer and the design system
+**Next.js 16 App Router** app. You compose the data layer and the design system
 into routes — you are the _only_ place `@blog/ui` and `@blog/service` meet.
 
 All source files live under `apps/web/src/` (App Router routes in `src/app/`,
@@ -67,8 +67,8 @@ When invoked, before writing any code:
 - **Never use `next/link` directly.** Always import `Link` from
   `@/i18n/navigation` (next-intl). This applies everywhere — routes, layouts,
   components, and Server Components alike.
-- Add `transpilePackages: ["@blog/ui", "@blog/service", "@blog/types"]` in
-  `next.config.ts`.
+- `transpilePackages: ['@blog/ui', '@blog/service', '@blog/config']` is set in
+  `next.config.ts` — keep it in sync if a new workspace package is consumed.
 
 ## File organisation (do not violate)
 
@@ -97,8 +97,8 @@ When invoked, before writing any code:
 - **Polymorphic components** (a wrapper that renders as different elements via
   an `as` prop) use the shared `TPolymorphicProps<C, OwnProps>` generic from
   `@blog/config/react` — see `ui-library-practices` ("The `as` prop — two
-  levels") for the full writeup. `apps/web/src/app/components/container.tsx`
-  is the reference consumer (`src/components/container/container.tsx`):
+  levels") for the full writeup. The reference consumer is
+  `apps/web/src/components/container/container.tsx`:
   `type TContainerProps<C extends ElementType = 'div'> = TPolymorphicProps<C, TContainerOwnProps>`,
   one `as ElementType` cast at the render site. Import the type from `@blog/config/react`
   subpath, never the package root (keeps `@blog/service` React-free). Only
@@ -115,12 +115,19 @@ When invoked, before writing any code:
 
 ## Routes (App Router)
 
-- `/` home — featured + latest posts via `getPosts`.
-- `/blog/[slug]` — `getPost`; `generateStaticParams`; render body through
-  `@blog/ui`'s `PostLayout` (Portable Text incl. code blocks). Add JSON-LD
-  `BlogPosting` and `generateMetadata`.
-- `/category/[slug]` — `getPostsByCategory`.
-- `/[slug]` — standalone `page` documents via `getPage`.
+All data comes through the versioned service facade
+(`service.pages.post.v1.getPost(slug)` — see `packages/service/src/index.ts`
+for the live surface). Route inventory (built + planned; see SPEC.md §1):
+
+- `/` home — built; hero + latest posts via `service.pages.home.v1`.
+- `/blog` — post list + pagination via `service.pages.blog.v1`.
+- `/blog/[slug]` — `service.pages.post.v1.getPost`; `generateStaticParams`
+  from the params slice; body rendered through the **web-owned**
+  `PortableTextRenderer` (maps Portable Text blocks to `@blog/ui` components,
+  incl. code blocks). Add JSON-LD `BlogPosting` and `generateMetadata`.
+- `/category/[slug]` — `service.pages.category.v1`.
+- `/[slug]` — standalone `page` documents (modules[] page-builder once #250
+  lands).
 - `app/api/revalidate/route.ts` — verify `SANITY_REVALIDATE_SECRET`, call
   `revalidateTag`/`revalidatePath`.
 
