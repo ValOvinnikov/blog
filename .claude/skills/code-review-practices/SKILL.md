@@ -76,8 +76,26 @@ architecture is the deliverable, so boundary violations are blocking, not nits.
 
 ## How to run a review here
 
+Run **both passes** over `git diff` before opening a PR:
+
 1. `git diff` the branch; map each changed file to its layer.
-2. Walk sections 1–7; flag boundary/type issues first (blocking) then quality.
-3. For deeper automated passes, the built-in `/code-review` skill complements
-   this checklist — this one encodes _our_ boundaries; that one finds general
-   correctness bugs.
+2. **Contract pass (this checklist).** Walk sections 1–7; flag boundary/type
+   issues first (blocking) then quality. This encodes _our_ architecture — a
+   generic reviewer can't know it.
+3. **General pass.** Also review for general correctness, security, performance,
+   and maintainability — the dimensions a contract check won't catch:
+   - **Security:** injection/XSS/SSRF, auth/authz, secrets, unsafe deserialization.
+   - **Performance:** N+1 queries, O(n²) in hot paths, unbounded loops/queries,
+     resource leaks.
+   - **Correctness:** edge cases (empty/null/overflow), race conditions, error
+     handling/propagation, off-by-one, **migration idempotency** (a re-run must
+     not overwrite/lose data).
+   - **Maintainability:** naming, single responsibility, duplication, test coverage.
+
+   Use the built-in `/code-review` skill for this pass (or apply the dimensions
+   above directly). Both passes are required — the contract pass finds boundary
+   violations; the general pass finds the bugs.
+
+4. On PRs, the `claude-code-review` CI workflow (`.github/workflows/`) also runs
+   the general `/code-review` automatically — but don't rely on it in place of
+   the pre-PR self-review.
