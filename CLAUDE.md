@@ -51,6 +51,7 @@ prompt — do not write it to disk first.
 
 - `develop-feature` at the start of any non-trivial task (lifecycle + delegation).
 - `add-content-type` when a change spans more than one workspace.
+- `cms-schema-practices` when touching `apps/cms` schemas or migrations.
 - `ui-library-practices` when touching `packages/ui`.
 - `ui-storybook` when adding or editing stories in `packages/ui`.
 - `web-storybook` when adding or editing stories in `apps/web`.

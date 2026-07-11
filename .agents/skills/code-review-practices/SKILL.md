@@ -41,6 +41,18 @@ env vars, or the content model, `SPEC.md` must be updated in the same PR.
 - Every field the CMS schema marks `.required()` has `.notNull()` in the
   corresponding `service` groqd projection. Optional fields use plain
   `sub.field()` with no fallback sentinel.
+- **CMS schema/migration diffs** hold the `cms-schema-practices` bar:
+  - No stored-value or `_type` literal repeated across files — constants from
+    `@blog/config` (renaming a stored value must be a one-file change).
+  - Repeated field patterns (e.g. mode+custom pairs) extracted into a schema
+    helper, not copy-pasted.
+  - Restructures keep **validation parity**: constraints that existed on the
+    old shape exist on the new one (container-level `rule.custom()`/`min` for
+    moved required fields, cardinality rules once arrays allow duplicates) —
+    or the PR explicitly states which constraint was dropped and why.
+  - Migrations: target-state idempotency guard on **every** document-type
+    branch, one source of truth for moved-field lists, and a co-located test
+    (transform + re-run no-op).
 
 ## 3. Rendering & data
 
@@ -81,8 +93,26 @@ env vars, or the content model, `SPEC.md` must be updated in the same PR.
 
 ## How to run a review here
 
+Run **both passes** over `git diff` before opening a PR:
+
 1. `git diff` the branch; map each changed file to its layer.
-2. Walk sections 1–7; flag boundary/type issues first (blocking) then quality.
-3. For deeper automated passes, the built-in `/code-review` skill complements
-   this checklist — this one encodes _our_ boundaries; that one finds general
-   correctness bugs.
+2. **Contract pass (this checklist).** Walk sections 1–7; flag boundary/type
+   issues first (blocking) then quality. This encodes _our_ architecture — a
+   generic reviewer can't know it.
+3. **General pass.** Also review for general correctness, security, performance,
+   and maintainability — the dimensions a contract check won't catch:
+   - **Security:** injection/XSS/SSRF, auth/authz, secrets, unsafe deserialization.
+   - **Performance:** N+1 queries, O(n²) in hot paths, unbounded loops/queries,
+     resource leaks.
+   - **Correctness:** edge cases (empty/null/overflow), race conditions, error
+     handling/propagation, off-by-one, **migration idempotency** (a re-run must
+     not overwrite/lose data).
+   - **Maintainability:** naming, single responsibility, duplication, test coverage.
+
+   Use the built-in `/code-review` skill for this pass (or apply the dimensions
+   above directly). Both passes are required — the contract pass finds boundary
+   violations; the general pass finds the bugs.
+
+4. On PRs, the `claude-code-review` CI workflow (`.github/workflows/`) also runs
+   the general `/code-review` automatically — but don't rely on it in place of
+   the pre-PR self-review.

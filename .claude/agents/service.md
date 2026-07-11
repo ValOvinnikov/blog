@@ -153,6 +153,20 @@ at the query boundary with explicit projections + `.notNull()`.
   arrays. Callers in `apps/web` own missing-value handling (`notFound()`,
   conditional render, fallback UI).
 
+## Code quality bar
+
+- **Discriminators come from constants.** When matching stored values or
+  `_type` names (`module_hero`, `LINK_TYPE.INTERNAL`), use the const from
+  `@blog/config` — never a raw string literal repeated across query,
+  transformer, and test.
+- **Array-of-modules semantics are explicit.** When the schema allows multiple
+  entries of a type and you pick one (`.find(...)`), state the rule (first
+  wins) in a comment and confirm the schema enforces the cardinality you
+  assume — if it doesn't, report the gap instead of silently ignoring editor
+  input.
+- **Extract at the second repetition.** A projection/transform pattern used
+  twice becomes a fragment or shared transformer; never copy-paste a third.
+
 ## Comments
 
 - Write a comment only when it explains something the code cannot — a groqd

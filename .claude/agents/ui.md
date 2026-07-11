@@ -82,6 +82,10 @@ archived brief.
 - Server-component-safe by default; `"use client"` only for interactivity.
 - JSDoc on exported components when the purpose isn't obvious from the name;
   skip JSDoc on type/interface/prop declarations unless a constraint is non-obvious.
+- **Extract at the second repetition.** A prop shape, variant matrix, or slot
+  pattern used by two components becomes a shared type/helper/sub-component —
+  never copy-paste a third instance. Discriminator/enum prop values come from
+  `@blog/config` constants, not repeated string literals.
 
 ## Testing
 
