@@ -14,17 +14,23 @@ import {
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 
+import { requireEnv } from './sanity-env';
 import { schemaTypes } from './src/schema-types';
 
 export default defineConfig({
   name: 'default',
   title: 'Blog',
 
-  // Env-driven so the Studio can point at a dev project/dataset. Sanity exposes
-  // SANITY_STUDIO_* to the studio bundle (set them in apps/cms/.env). Defaults
-  // to production so nothing breaks if they're unset.
-  projectId: process.env.SANITY_STUDIO_PROJECT_ID ?? 'ccs8c2no',
-  dataset: process.env.SANITY_STUDIO_DATASET ?? 'production',
+  // Env-driven (no hardcoded ids in this public repo). Sanity only exposes
+  // SANITY_STUDIO_* to the Studio bundle — set them in apps/cms/.env locally.
+  projectId: requireEnv(
+    'SANITY_STUDIO_PROJECT_ID',
+    process.env.SANITY_STUDIO_PROJECT_ID,
+  ),
+  dataset: requireEnv(
+    'SANITY_STUDIO_DATASET',
+    process.env.SANITY_STUDIO_DATASET,
+  ),
 
   plugins: [
     structureTool({
