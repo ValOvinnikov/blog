@@ -84,6 +84,10 @@ When invoked, before writing any code:
 - **Helper functions** (slot builders, data transformers, formatters) live in
   `src/utils/`. One file per function or closely related group, named after its
   purpose: `format-date.ts`, `hero-slots.ts`, `card-slots.ts`.
+- **Extract at the second repetition.** A slot-builder or composition pattern
+  used by two routes becomes a `src/utils/` helper — never copy-paste a third.
+  Discriminators (`_type` names, stored enum values) come from `@blog/config`
+  constants, not repeated string literals.
 - **Font configuration** lives in `src/config/fonts.ts` — define and export all
   `next/font` objects there. `layout.tsx` imports them and applies only the CSS
   variable class names to `<html>` (the one permitted inline exception). No font

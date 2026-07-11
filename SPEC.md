@@ -269,7 +269,8 @@ inside the layer contracts:
   before delegating.
 - **Skills** (`.claude/skills/`): `develop-feature` (lifecycle + delegation —
   the entry point for any non-trivial task), `add-content-type` (cross-layer
-  recipe), `ui-library-practices`, `ui-storybook`, `web-storybook`,
+  recipe), `cms-schema-practices` (schema + migration quality bar),
+  `ui-library-practices`, `ui-storybook`, `web-storybook`,
   `testing-practices`, `seo-and-metadata`, `code-review-practices`,
   `open-pull-request`, `use-context7` (live version-matched docs).
 - `.agents/skills/` mirrors `.claude/skills/` for other harnesses — keep them

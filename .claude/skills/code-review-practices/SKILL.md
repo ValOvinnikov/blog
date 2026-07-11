@@ -41,6 +41,18 @@ env vars, or the content model, `SPEC.md` must be updated in the same PR.
 - Every field the CMS schema marks `.required()` has `.notNull()` in the
   corresponding `service` groqd projection. Optional fields use plain
   `sub.field()` with no fallback sentinel.
+- **CMS schema/migration diffs** hold the `cms-schema-practices` bar:
+  - No stored-value or `_type` literal repeated across files — constants from
+    `@blog/config` (renaming a stored value must be a one-file change).
+  - Repeated field patterns (e.g. mode+custom pairs) extracted into a schema
+    helper, not copy-pasted.
+  - Restructures keep **validation parity**: constraints that existed on the
+    old shape exist on the new one (container-level `rule.custom()`/`min` for
+    moved required fields, cardinality rules once arrays allow duplicates) —
+    or the PR explicitly states which constraint was dropped and why.
+  - Migrations: target-state idempotency guard on **every** document-type
+    branch, one source of truth for moved-field lists, and a co-located test
+    (transform + re-run no-op).
 
 ## 3. Rendering & data
 

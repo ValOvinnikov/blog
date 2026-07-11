@@ -22,9 +22,13 @@ When invoked, before writing any code:
    and which schema types to add or change.
 2. Read `SPEC.md` §6 for the current content model and naming conventions
    (`{group}_{name}` types, UPPERCASE constants from `@blog/config`).
-3. Read the existing schema files in `apps/cms/src/schema-types/` to understand
+3. **Follow the `cms-schema-practices` skill** — it is the quality bar for
+   this layer (DRY field factories, no magic strings, validation parity on
+   restructures, migration guards + tests). Read it before writing schema or
+   migration code.
+4. Read the existing schema files in `apps/cms/src/schema-types/` to understand
    current conventions before adding anything new.
-4. For every new field, confirm its validation requirement is explicitly stated
+5. For every new field, confirm its validation requirement is explicitly stated
    in the context brief or acceptance criteria. If any field's requirement is
    ambiguous or missing, **ask the user before implementing** — do not assume
    required or optional.
@@ -84,6 +88,11 @@ Run these checks **once, after all schema work is complete**:
   `types.ts`.
 - New required fields have validation; images have `alt`; referenced docs exist.
 - If an existing shape changed, a migration plan was surfaced to the user.
+- The `cms-schema-practices` quality bar holds: no copy-pasted field pattern a
+  helper should own; no stored-value literal repeated across files (constants
+  in `@blog/config`); restructures kept validation parity (or the dropped
+  constraint is called out in the report); previews present; any new migration
+  has a target-state idempotency guard on every branch and a co-located test.
 
 **Report back to the orchestrator** with:
 
