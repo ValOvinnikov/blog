@@ -33,57 +33,65 @@ export function toHomePage(
   rawHome: TRawHomePage,
   rawPosts: TRawHomePagePosts,
 ): THomePage {
+  const heroModule = rawHome?.modules?.find(
+    (module) => module._type === 'module_hero',
+  );
+  const postListModule = rawHome?.modules?.find(
+    (module) => module._type === 'module_postList',
+  );
+
   const posts = rawPosts.map(toPostCard);
-  const configuredFeaturedPost = rawHome?.featuredPost
-    ? toPostCard(rawHome.featuredPost)
+  const configuredFeaturedPost = heroModule?.featuredPost
+    ? toPostCard(heroModule.featuredPost)
     : undefined;
   const heroPost =
     configuredFeaturedPost ?? posts.find((post) => post.featured);
 
   const heroImageUrl =
-    rawHome?.heroImageMode === 'custom'
-      ? buildImageUrl(rawHome.heroImage)
-      : rawHome?.heroImageMode === 'none'
+    heroModule?.heroImageMode === 'custom'
+      ? buildImageUrl(heroModule.heroImage)
+      : heroModule?.heroImageMode === 'none'
         ? undefined
         : heroPost?.mainImageUrl;
 
   const heroImage =
-    heroImageUrl && rawHome?.heroImageMode === 'custom' && rawHome.heroImage
-      ? { src: heroImageUrl, alt: rawHome.heroImage.alt }
+    heroImageUrl &&
+    heroModule?.heroImageMode === 'custom' &&
+    heroModule.heroImage
+      ? { src: heroImageUrl, alt: heroModule.heroImage.alt }
       : heroImageUrl && heroPost
         ? { src: heroImageUrl, alt: heroPost.mainImageAlt }
         : undefined;
 
   const heroSanityImage =
-    rawHome?.heroImageMode === 'custom'
-      ? toSanityImage(rawHome.heroImageAsset)
-      : rawHome?.heroImageMode === 'none'
+    heroModule?.heroImageMode === 'custom'
+      ? toSanityImage(heroModule.heroImageAsset)
+      : heroModule?.heroImageMode === 'none'
         ? undefined
         : heroPost?.mainImageSanity;
 
-  const latestPostsLimit =
-    rawHome?.latestPostsLimit ?? DEFAULT_LATEST_POSTS_LIMIT;
+  const latestPostsLimit = postListModule?.limit ?? DEFAULT_LATEST_POSTS_LIMIT;
 
   return {
     hero: {
       eyebrow: getCustomOrFallback(
-        rawHome?.heroEyebrowMode,
-        rawHome?.heroEyebrow,
+        heroModule?.heroEyebrowMode,
+        heroModule?.heroEyebrow,
         'custom',
         heroPost?.categories[0]?.title,
       ),
       title:
         getCustomOrFallback(
-          rawHome?.heroTitleMode,
-          rawHome?.heroTitle,
+          heroModule?.heroTitleMode,
+          heroModule?.heroTitle,
           'custom',
           heroPost?.title,
         ) ??
         rawHome?.title ??
         'Home',
       subtitle: getCustomOrFallback(
-        rawHome?.heroSubtitleMode,
-        rawHome?.heroSubtitle,
+        heroModule?.heroSubtitleMode,
+        heroModule?.heroSubtitle,
         'custom',
         heroPost?.excerpt,
       ),
@@ -91,15 +99,16 @@ export function toHomePage(
       sanityImage: heroSanityImage,
       primaryAction: heroPost
         ? {
-            label: rawHome?.primaryActionLabel ?? DEFAULT_PRIMARY_ACTION_LABEL,
+            label:
+              heroModule?.primaryActionLabel ?? DEFAULT_PRIMARY_ACTION_LABEL,
             href: `/blog/${heroPost.slug}`,
             target: undefined,
             platform: undefined,
           }
         : undefined,
-      secondaryAction: toLink(rawHome?.secondaryAction),
+      secondaryAction: toLink(heroModule?.secondaryAction),
     },
-    latestPostsTitle: rawHome?.latestPostsTitle ?? DEFAULT_LATEST_POSTS_TITLE,
+    latestPostsTitle: postListModule?.title ?? DEFAULT_LATEST_POSTS_TITLE,
     latestPosts: posts
       .filter((post) => post.id !== heroPost?.id)
       .slice(0, latestPostsLimit),
