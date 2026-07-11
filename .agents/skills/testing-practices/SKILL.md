@@ -15,10 +15,21 @@ components, **jsdom** for the DOM environment. Shared config lives in
 
 ## Where tests live
 
-- **Co-located** next to the source: `Button.tsx` → `Button.test.tsx`,
-  `queries.ts` → `queries.test.ts`. No separate `__tests__` tree.
+- **Co-located** next to the source file, named `{filename}.test.ts(x)`:
+  `Button.tsx` → `Button.test.tsx`, `transformer.ts` → `transformer.test.ts`.
+- Service fixtures live in `packages/service/src/testing/`, mirroring the
+  domain tree. Each exports a `make*` factory returning a raw (`TRaw*`) shape
+  with a `Partial<…>` overrides param. Import via the `#/` alias:
+  `import { makeRawPostCard } from '#/testing/pages/fixtures'`.
 - Run from root: `pnpm test` (all), or `pnpm --filter @blog/ui test`.
   Watch mode: `pnpm test:watch`.
+
+## When to run tests
+
+- Run `pnpm --filter <pkg> type-check` after each major group of files — fast,
+  catches structural errors early without verbose test output.
+- Run the full test suite **once, after all implementation is complete**:
+  `pnpm --filter <pkg> test`.
 
 ## Per-package setup
 
@@ -55,10 +66,40 @@ export default mergeConfig(
 
 - Arrange–Act–Assert; one behaviour per `it`. Descriptive names:
   `it("renders the post title and author")`.
-- Prefer real user-facing queries (`getByRole`, `getByText`) over `data-testid`.
+- **When a suite targets a single exported symbol (function/component), pass the
+  symbol itself to `describe`, not a string.** Vitest derives the suite name from
+  the reference's `.name`, so the label can never drift from the code: rename the
+  symbol and the suite name follows, and deleting it is a compile error instead of
+  a stale string. Use a string only when no single symbol names the suite.
+
+  ```ts
+  import { objectKeys } from './objects';
+
+  describe(objectKeys, () => {
+    // ✅ suite name tracks the symbol
+    it("returns the object's keys", () => {
+      /* … */
+    });
+  });
+
+  // ❌ describe('objectKeys', () => { … })  — string drifts on rename
+  ```
+
+- Prefer semantic queries (`getByRole`, `getByText`, `getByLabelText`) over
+  `getByTestId`. Use `getByTestId` when a semantic query would be ambiguous —
+  this is common in molecule and organism integration tests where the same role
+  appears multiple times (e.g. multiple `<img>` or `<button>` elements).
+  `IWithDataTestId` is on every `@blog/ui` component for exactly this purpose.
 - Use `vi.fn()` / `vi.mock()` for boundaries (the Sanity client, `service`).
 - Deterministic: no real dates/network/random. Inject or freeze.
 - A bug fix gets a regression test that fails before the fix.
+
+## What not to test
+
+- **Never test CSS class names** — assert behaviour and output, not styling.
+- **No snapshot tests** — they couple tests to markup and break on unrelated changes.
+- **No implementation details** — test what a component does, not how it does it.
+- **No network calls** — always mock the Sanity client and `service` functions.
 
 ## Checklist
 

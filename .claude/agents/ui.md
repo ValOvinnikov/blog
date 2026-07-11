@@ -48,8 +48,9 @@ Follow the `ui-library-practices` skill for the full conventions. Key rules:
 ## What you build (bottom-up)
 
 `atoms/` → `molecules/` → `organisms/`, each composing only the layers below
-it; re-export from `src/index.ts`. See IMPLEMENTATION_BRIEF.md §7 for the
-component inventory.
+it; re-export from `src/index.ts`. The barrel (`packages/ui/src/index.ts`) and
+the existing folder tree are the component inventory — read them, not the
+archived brief.
 
 ## API & styling conventions
 

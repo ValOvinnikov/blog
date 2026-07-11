@@ -150,14 +150,17 @@ production code — never import fixtures from outside Storybook.
 
 ```ts
 // storybook/fixtures/post.ts
-import type { Post } from '@blog/types';
-export const mockPost: Post = {
-  _id: 'mock-1',
+import type { TPostDetail } from '@blog/service';
+export const mockPost: TPostDetail = {
   title: 'Hello World',
-  slug: { current: 'hello-world' },
-  // ...
+  slug: 'hello-world',
+  // ...view-model fields, not raw Sanity document fields
 };
 ```
+
+Fixtures mock the **service view-models** (`TPostDetail`, `THomePage`, … from
+`@blog/service`) — the shapes pages actually receive — not raw Sanity
+documents.
 
 ## Tailwind in apps/web stories
 

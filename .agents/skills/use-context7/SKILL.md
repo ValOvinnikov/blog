@@ -4,7 +4,7 @@ description: >-
   How and when to pull live library documentation via the context7 MCP server.
   Use before implementing anything that depends on a specific library version,
   CLI flag, configuration format, or API shape — especially for packages that
-  evolve quickly (Sanity v4, Next.js 15, Tailwind v4, Vitest). Apply whenever
+  evolve quickly (Sanity v6, Next.js 16, Tailwind v4, Vitest). Apply whenever
   you are about to guess at an API rather than verify it.
 ---
 
@@ -26,8 +26,8 @@ Use context7 whenever you would otherwise be guessing:
   (`sanity.cli.ts` typegen block, `next.config.ts` options, Tailwind v4
   `@import`/`@source` directives, Vitest config shape).
 - A library API whose call signature, generic constraints, or import path may
-  have shifted (`defineType`/`defineField`/`defineArrayMember` in Sanity v4,
-  `defineQuery` in `next-sanity`, `client.fetch` options).
+  have shifted (`defineType`/`defineField`/`defineArrayMember` in Sanity v6,
+  groqd builder methods, `client.fetch` options).
 - A deprecation notice you hit mid-task — look up the replacement immediately
   rather than working around the old API.
 - Any "latest" install: verify the scaffold commands and default choices before
@@ -40,13 +40,13 @@ Skip context7 for:
 - Refactoring existing, already-working code.
 - General programming logic (algorithms, data transformation, TypeScript
   narrowing patterns).
-- Business rules that live in `SPEC.md` / `IMPLEMENTATION_BRIEF.md` — those are
-  the canonical source, not external docs.
+- Business rules that live in `SPEC.md` — that is the canonical source, not
+  external docs.
 
 ## The two-step pattern
 
 1. **Resolve** — call context7 with the library name to get its versioned library
-   ID. Be specific: `"sanity v4"` is better than `"sanity"`.
+   ID. Be specific: `"sanity v6"` is better than `"sanity"`.
 
 2. **Fetch** — call context7 with the resolved ID and a focused topic string
    (e.g. `"typegen configuration sanity.cli.ts"`, `"defineArrayMember image
@@ -60,10 +60,10 @@ different API area.
 
 | Library                  | Use context7 when…                                                                     |
 | ------------------------ | -------------------------------------------------------------------------------------- |
-| `sanity` v4              | `defineType`/`defineField` options, desk structure, typegen workflow, `schema extract` |
+| `sanity` v6              | `defineType`/`defineField` options, desk structure, typegen workflow, `schema extract` |
 | `@sanity/code-input`     | Plugin registration, `code` array member usage                                         |
 | `next-sanity`            | `defineQuery`, `createClient`, `useLiveMode`, `SanityImage`                            |
-| `next` v15               | `generateMetadata`, `generateStaticParams`, App Router conventions, `revalidatePath`   |
+| `next` v16               | `generateMetadata`, `generateStaticParams`, App Router conventions, `revalidatePath`   |
 | `tailwindcss` v4         | `@import`/`@source` directives, preset/plugin API, config format changes               |
 | `vitest`                 | Config keys, `mergeConfig`, environment options                                        |
 | `@testing-library/react` | Query priority, async utilities, `userEvent` v14 API                                   |

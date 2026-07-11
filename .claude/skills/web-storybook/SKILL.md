@@ -26,10 +26,10 @@ navigation stubs automatically.
 `apps/web` stories are for **compositions** — components that wire `@blog/ui`
 to real page structure. Two categories:
 
-| Type | Examples | Note |
-|---|---|---|
-| **Client components** | theme toggle, mobile nav, share buttons | Straightforward; no RSC setup needed |
-| **Server components / page layouts** | `PostPage`, `HomeLayout`, `CategoryPage` | Require service mocks (see below) |
+| Type                                 | Examples                                 | Note                                 |
+| ------------------------------------ | ---------------------------------------- | ------------------------------------ |
+| **Client components**                | theme toggle, mobile nav, share buttons  | Straightforward; no RSC setup needed |
+| **Server components / page layouts** | `PostPage`, `HomeLayout`, `CategoryPage` | Require service mocks (see below)    |
 
 Pure design-system components belong in `@blog/ui` stories, not here. If you
 find yourself storying a `Button` in `apps/web`, move it to `packages/ui`.
@@ -44,6 +44,7 @@ components/**/*.stories.@(ts|tsx)
 ```
 
 Example:
+
 ```
 app/blog/[slug]/
   page.tsx
@@ -53,14 +54,14 @@ app/blog/[slug]/
 ## Story format (CSF 3)
 
 ```tsx
-import type { Meta, StoryObj } from "@storybook/react";
-import { PostPage } from "./PostPage";
-import { mockPost } from "@/storybook/fixtures/post";
+import type { Meta, StoryObj } from '@storybook/react';
+import { PostPage } from './PostPage';
+import { mockPost } from '@/storybook/fixtures/post';
 
 const meta = {
-  title: "Pages/PostPage",
+  title: 'Pages/PostPage',
   component: PostPage,
-  tags: ["autodocs"],
+  tags: ['autodocs'],
   args: { post: mockPost },
 } satisfies Meta<typeof PostPage>;
 
@@ -115,7 +116,7 @@ export const getPost = async () => mockPost;
 config.resolve = config.resolve ?? {};
 config.resolve.alias = {
   ...config.resolve.alias,
-  "@blog/service": path.resolve(__dirname, "mocks/service.ts"),
+  '@blog/service': path.resolve(__dirname, 'mocks/service.ts'),
 };
 ```
 
@@ -136,7 +137,7 @@ new components to avoid the coupling.
 export const WithActiveNav: Story = {
   parameters: {
     nextjs: {
-      navigation: { pathname: "/blog/my-post" },
+      navigation: { pathname: '/blog/my-post' },
     },
   },
 };
@@ -149,14 +150,17 @@ production code — never import fixtures from outside Storybook.
 
 ```ts
 // storybook/fixtures/post.ts
-import type { Post } from "@blog/types";
-export const mockPost: Post = {
-  _id: "mock-1",
-  title: "Hello World",
-  slug: { current: "hello-world" },
-  // ...
+import type { TPostDetail } from '@blog/service';
+export const mockPost: TPostDetail = {
+  title: 'Hello World',
+  slug: 'hello-world',
+  // ...view-model fields, not raw Sanity document fields
 };
 ```
+
+Fixtures mock the **service view-models** (`TPostDetail`, `THomePage`, … from
+`@blog/service`) — the shapes pages actually receive — not raw Sanity
+documents.
 
 ## Tailwind in apps/web stories
 
@@ -165,7 +169,7 @@ CSS through the Next.js PostCSS pipeline. If the global stylesheet is
 `app/globals.css`, import it in `.storybook/preview.ts`:
 
 ```ts
-import "../app/globals.css";
+import '../app/globals.css';
 ```
 
 This ensures `@import "tailwindcss"` and the `@source` directive for
@@ -179,7 +183,7 @@ Use page-level paths: `"Pages/PostPage"`, `"Pages/HomePage"`,
 ## Checklist before finishing
 
 - [ ] Component accepts data as props (Approach A) rather than fetching
-  internally, where possible.
+      internally, where possible.
 - [ ] All required props provided via `args`; no live Sanity calls.
 - [ ] `nextjs.navigation.pathname` set if component checks active route.
 - [ ] Fixtures live in `storybook/fixtures/`; not imported outside Storybook.

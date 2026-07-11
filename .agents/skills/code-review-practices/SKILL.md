@@ -9,8 +9,11 @@ description: >-
 
 # Code review practices
 
-Review against the contracts in `SPEC.md` and `IMPLEMENTATION_BRIEF.md`. The
+Review against the contracts in `SPEC.md` (the single durable reference). The
 architecture is the deliverable, so boundary violations are blocking, not nits.
+
+**Spec sync (blocking):** if the diff changes architecture, layer contracts,
+env vars, or the content model, `SPEC.md` must be updated in the same PR.
 
 ## 1. Layer boundaries (blocking)
 
@@ -20,17 +23,21 @@ architecture is the deliverable, so boundary violations are blocking, not nits.
   only package importing the Sanity SDKs.
 - `apps/web` is the only place `ui` and `service` meet: Server Components fetch
   via `service`, pass typed props to `ui`. No GROQ or raw Sanity client in `web`.
-- Dependency graph stays acyclic: `web → ui/service/types`, `service → types`,
-  `ui → config`, `cms → types (via typegen)`.
+- `apps/web` never imports `next/link` directly — all links use `Link` from
+  `@/i18n/navigation` (next-intl).
+- Dependency graph stays acyclic: `web → ui/service/config/utils`,
+  `service → config/utils`, `ui → config`, `cms → config (types via typegen)`.
 
 ## 2. Type safety (blocking)
 
 - No `any`; `unknown` is narrowed. `strict` + `noUncheckedIndexedAccess` honoured.
-- `@blog/service` uses generated types from `sanity.types.ts` — no hand-redeclared
-  content shapes. `@blog/ui` defines its own prop types; it does not import from
+- `@blog/service` uses the generated types in
+  `packages/config/src/sanity/generated/types.ts` — no hand-redeclared content
+  shapes. `@blog/ui` defines its own prop types; it does not import from
   `@blog/service` or depend on service view-models.
-- If schemas changed, `sanity.types.ts` was regenerated (`pnpm typegen`) and
-  committed, and downstream `service` types updated.
+- If schemas changed, the generated types were regenerated (`pnpm typegen`) and
+  committed, downstream `service` types updated, and — for existing-shape
+  changes — a content migration is present or explicitly ruled out.
 - Every field the CMS schema marks `.required()` has `.notNull()` in the
   corresponding `service` groqd projection. Optional fields use plain
   `sub.field()` with no fallback sentinel.
