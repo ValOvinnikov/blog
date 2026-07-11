@@ -110,7 +110,8 @@ agent rules and skill.
 
 **CMS-only task (schema changed)**:
 
-1. `pnpm typegen` — regenerates `sanity.types.ts` from the updated schema.
+1. `pnpm typegen` — regenerates the types in
+   `packages/config/src/sanity/generated/` from the updated schema.
 2. `pnpm --filter cms type-check` and `pnpm --filter cms lint` — verify the
    studio itself is clean.
 
@@ -119,9 +120,11 @@ agent rules and skill.
 **Multi-layer task** (more than one package touched, or schema change with downstream effects):
 Run in this exact order from the repo root — each step feeds the next:
 
-1. `pnpm typegen` — regenerates `sanity.types.ts` from the current schema.
-   (`sanity schema extract` overwrites the intermediate `schema.json`, so no
-   manual clean is needed first.)
+1. `pnpm typegen` — regenerates the types in
+   `packages/config/src/sanity/generated/` from the current schema.
+   (`sanity schema extract` overwrites `schema.json` in place, so no manual
+   clean is needed first. Typegen can be non-deterministic — re-run until the
+   diff is minimal.)
 2. `pnpm type-check` — checks all packages against the freshly generated types.
 3. `pnpm lint` — runs across all packages.
 4. `pnpm test` — runs all test suites. Per-package checks already ran during
@@ -155,5 +158,6 @@ re-run from that step — do not proceed with any red check.
 
 - Respect every layer boundary (`SPEC.md`). A cross-layer feature that leaks a
   boundary is wrong even if it "works".
-- Regenerate + commit `sanity.types.ts` after schema changes.
+- Regenerate + commit the generated types in
+  `packages/config/src/sanity/generated/` after schema changes.
 - Don't read or commit `.env*`.

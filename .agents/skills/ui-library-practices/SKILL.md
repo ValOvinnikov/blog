@@ -123,6 +123,50 @@ src/atoms/theme-toggle/
   ```
   This is the correct semantic pattern for a linked heading in a card component.
 
+## Using `@blog/config`
+
+Import shared constants and types from `@blog/config` — never re-declare them or replace them with bare string literals.
+
+- **`Size` constant for all size variant keys.** Use `[Size.SM]`, `[Size.MD]`, etc. as computed property keys in `tv()` variant maps, in `defaultVariants`, and in component logic (e.g. `defaultSizes` lookup maps). Never write `'sm'`, `'md'`, `'lg'` etc. as plain strings:
+
+  ```ts
+  // ✅ correct
+  import { Size } from '@blog/config';
+  export const buttonVariants = tv({
+    variants: {
+      size: {
+        [Size.SM]: 'px-3 py-1.5 text-sm',
+        [Size.MD]: 'px-4 py-2 text-copy',
+        [Size.LG]: 'px-5 py-2.5 text-base',
+      },
+    },
+    defaultVariants: { size: Size.MD },
+  });
+
+  // ❌ wrong — plain strings bypass the single source of truth
+  size: { sm: '...', md: '...', lg: '...' }
+  defaultVariants: { size: 'md' }
+  ```
+
+- **`IWithDataTestId`, `TPolymorphicProps`, and other shared types** come from `@blog/config` or `@blog/config/react` (see the `as` prop section below). Never re-declare them locally.
+
+- **Heading tag literals over template expressions.** When a component derives an HTML tag from a numeric prop (e.g. `level: 1 | 2 | 3 | 4` → `h1`–`h4`), use an explicit lookup map with a typed union — not a template literal with `as const`:
+
+  ```tsx
+  // ✅ correct — self-documenting type, no type-assertion noise
+  type THeadingTag = 'h1' | 'h2' | 'h3' | 'h4';
+  const headingTags: Record<1 | 2 | 3 | 4, THeadingTag> = {
+    1: 'h1',
+    2: 'h2',
+    3: 'h3',
+    4: 'h4',
+  };
+  const Tag = headingTags[level];
+
+  // ❌ wrong — opaque cast, type not visible to readers
+  const Tag = `h${level}` as const;
+  ```
+
 ## Component conventions
 
 - **Arrow functions only.** Use `export const MyComponent = (props) => { ... }`.
@@ -131,8 +175,8 @@ src/atoms/theme-toggle/
   never inline. Extend the right DOM props
   (`React.ComponentPropsWithoutRef<"button">`) and spread `...rest` so
   consumers can pass `aria-*`, `id`, etc.
-- **Every interactive component prop interface must extend `IWithDataTestId`**
-  from `@blog/config`. Wire `dataTestId` to the root interactive element's
+- **Every component prop interface must extend `IWithDataTestId`**
+  from `@blog/config`. Wire `dataTestId` to the root element's
   `data-testid` attribute:
   ```tsx
   import type { IWithDataTestId } from '@blog/config';
@@ -152,8 +196,8 @@ src/atoms/theme-toggle/
     </button>
   );
   ```
-- Always forward `className`; merge with the `cn()` helper (`clsx` +
-  `tailwind-merge`) so consumers can safely override tokens.
+- Always forward `className`; pass it as `class: className` in the `tv()` call — `tailwind-variants` handles merging internally. Never use `cn()` for this.
+- **Optional vs required props must match the render logic.** If a prop is only rendered conditionally (`{caption && <Caption>...}`), type it as `caption?: string` — not `caption: string`. A required prop the component ignores when falsy is a type lie; make it optional so callers never have to pass an empty string.
 - Prefer composition (`children`, slots) over boolean prop explosions.
 - Server-component-safe by default. **No `"use client"` allowed** — see Purity rules.
 
@@ -254,6 +298,40 @@ Why each piece matters:
   `./react` subpath export so it's opt-in and doesn't leak `@types/react` into
   `service`'s type graph. Always import it as `@blog/config/react`, never
   re-export it from the root.
+
+### Any anchor a component builds itself — never a hardcoded `<a>`
+
+This applies even when the anchor isn't the component's own root — e.g. an
+**organism that constructs a link to pass into another component's slot**
+(`PostsSection` building the `<a href={post.href}>` it hands to
+`PostCard.Title`). The organism is still rendering an anchor, so it still
+needs a `linkAs`/`as` prop (Level 1, `TAnchorElementType` from
+`@blog/config/react` — reuse it, don't redeclare the union per component) that
+defaults to `'a'`. A bare `<a>` baked into an organism is exactly as wrong as
+one baked into an atom; "it's just wrapping a slot's children" is not an
+exemption.
+
+```tsx
+// ❌ wrong — organism hardcodes the anchor; apps/web can never swap in next/link
+<PostCard.Title>
+  <a href={post.href} className="before:absolute before:inset-0">
+    {post.title}
+  </a>
+</PostCard.Title>;
+
+// ✅ correct — polymorphic, defaults to 'a', styling lives in the variants file
+const Link = (linkAs ?? 'a') as ElementType;
+<PostCard.Title>
+  <Link href={post.href} className={s.titleLink()}>
+    {post.title}
+  </Link>
+</PostCard.Title>;
+```
+
+Note `className={s.titleLink()}` above, not an inline string — the "no inline
+Tailwind classes" rule (see Styling section) applies to every element,
+including one-off classes like a full-card overlay (`before:absolute
+before:inset-0`). Give it its own named slot in `{component}-variants.ts`.
 
 ## Compound components
 
@@ -527,6 +605,29 @@ in consumer-controlled markup.
   export const headerVariants = tv({ ... });
   ```
   The grouping is self-evident from the classes themselves — **no comments of any kind** in variants files or stories files unless the reason is genuinely non-obvious (e.g. a browser workaround or a z-index constraint that would surprise a reader). Story names and export identifiers are self-documenting; JSDoc blocks above story exports are forbidden.
+- **In `slots`-based `tv()` calls, every slot value is always an array of strings — never a bare string** — even a single-class slot, and even when the slot is overridden inside `variants`/`compoundVariants`. This keeps every slot assignment visually consistent and diff-friendly regardless of how many classes it currently holds:
+  ```ts
+  // ✅ correct — slot values are always arrays, including variant overrides
+  export const heroVariants = tv({
+    slots: {
+      root: ['grid grid-cols-1 items-center'],
+      excerpt: ['m-0 max-w-[52ch]'],
+    },
+    variants: {
+      hasMedia: {
+        true: { root: ['lg:grid-cols-[minmax(0,1.15fr)_minmax(180px,0.85fr)]'] },
+      },
+    },
+  });
+
+  // ❌ wrong — bare string breaks consistency with the slots block above it
+  variants: {
+    hasMedia: {
+      true: { root: 'lg:grid-cols-[minmax(0,1.15fr)_minmax(180px,0.85fr)]' },
+    },
+  },
+  ```
+  This rule applies to slot-based components only. Non-slot `base`/`variants` `tv()` calls (a single-element component with no named slots) may use bare strings for variant entries, matching existing atoms like `button-variants.ts` and `tag-variants.ts`.
 - Every named element in the component (including inner spans or wrappers)
   gets its own named export in the variants file:
   ```ts
@@ -659,6 +760,13 @@ md:grid-cols-2 lg:grid-cols-3`, `hidden md:flex`. Reserve `sm`/`xl`/`2xl` for
 - **Do not write a dedicated test for `dataTestId`.** If a test uses
   `screen.getByTestId(...)` and the attribute is missing, the test fails on its
   own — an explicit assertion adds no value.
+- **Prefer semantic queries; fall back to `getByTestId` when queries would be
+  ambiguous.** Default to `getByRole`, `getByLabelText`, `getByText` — they
+  verify semantics and accessibility. Use `getByTestId` when a molecule or
+  organism renders multiple elements of the same role and a semantic query
+  can't unambiguously target the right one (e.g. two buttons in a `CardMeta`,
+  a heading inside a `PostCard` alongside a nav heading). This is valid in
+  both atom unit tests and molecule/organism integration tests in Vitest.
 - See `testing-practices` for the full testing guide.
 
 ## Quality gates (run in this order before finishing)
@@ -678,7 +786,7 @@ All four must pass. Fix failures before reporting back. **Format runs first** �
 - [ ] No `service`/`sanity`/`fetch` imports. No `"use client"` directive.
 - [ ] Arrow-function component (`export const MyComponent = (...) => ...`); no sub-components defined inline — each lives in `components/{child-name}/` with its own `{child-name}-variants.ts`. Child variants never import the parent's variants file.
 - [ ] Props interface extends `IWithDataTestId` from `@blog/config`; `dataTestId`
-      wired to the root interactive element's `data-testid`.
+      wired to the root element's `data-testid`.
 - [ ] Props typed (`I`-prefix interface or `T`-prefix type); `className` forwarded via `class:` key in `tv()` call.
 - [ ] All Tailwind classes in `{component}-variants.ts`; none inline in JSX on any element. Classes grouped by concern in `base` arrays inside `tv`. No `cn()` wrapping the `tv` call.
 - [ ] Stories file `{component}.stories.tsx` created alongside the component.

@@ -20,13 +20,13 @@ When invoked, before writing any code:
 1. Read the context brief you were given: issue summary, acceptance criteria,
    and what the CMS agent produced (new type names, field names).
 2. Verify the types you'll query actually exist in
-   `packages/types/src/sanity.types.ts` — do not write queries against types
-   that haven't been generated yet.
+   `packages/config/src/sanity/generated/types.ts` — do not write queries
+   against types that haven't been generated yet.
 3. **To determine which fields need `.notNull()`**, use the CMS agent's report
    as the primary source — it lists each field with its required/optional status.
    Generated types mark every field optional regardless of `.required()` validation
    and cannot be trusted for this. If no CMS report was provided, read the schema
-   files in `apps/cms/src/schemaTypes/` directly.
+   files in `apps/cms/src/schema-types/` directly.
 4. Read the existing service files in the relevant domain folder before creating
    anything new — understand current naming conventions. If existing files
    conflict with the Folder Structure spec below, follow the spec, not the files,
@@ -44,9 +44,11 @@ relative paths only within a single slice (`./query`, `./types`).
 - **Only** `@blog/service` imports `sanity` / `next-sanity` / `@sanity/image-url`.
   No other package may. If `web` or `ui` needs data, it goes through a function
   you export here.
-- Depend only on `@blog/types` (and the Sanity SDKs). Import result types from
-  `@blog/types` — do not redeclare content shapes.
-- The dependency graph stays acyclic: `service → types`, nothing more.
+- Depend only on `@blog/config`, `@blog/utils`, and the Sanity SDKs. Generated
+  content types come from `@blog/config` — do not redeclare content shapes.
+  Import from the package root or plain subpaths, never `@blog/config/react`
+  (that subpath exists precisely to keep React out of this package).
+- The dependency graph stays acyclic: `service → config, utils`, nothing more.
 
 ## What you build
 
@@ -139,9 +141,9 @@ at the query boundary with explicit projections + `.notNull()`.
 
 ## Transformer rules
 
-- Return types come from `@blog/types` (or `InferResultType`/`InferFragmentType`
-  off the query). No `any`; narrow `unknown`. Return domain-shaped data, never a
-  raw `SanityDocument`.
+- Return types come from the generated types in `@blog/config` (or
+  `InferResultType`/`InferFragmentType` off the query). No `any`; narrow
+  `unknown`. Return domain-shaped data, never a raw `SanityDocument`.
 - **Required fields need no fallback** — after `.notNull()` they're already
   non-null, so assign directly: `title: raw.title`.
 - **Never fake absent values.** For optional fields use `raw.field ?? undefined`
@@ -174,7 +176,8 @@ Run these checks **once, after all work is complete**:
 
 - `pnpm --filter @blog/service type-check`, `lint`, and `test` pass.
 - No React import; no presentation; graph still acyclic.
-- Every exported function is fully typed end-to-end from `@blog/types`.
+- Every exported function is fully typed end-to-end from the generated types
+  in `@blog/config`.
 
 **Report back to the orchestrator** with:
 

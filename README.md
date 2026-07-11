@@ -3,21 +3,23 @@
 [![CI](https://github.com/ValOvinnikov/blog/actions/workflows/ci.yml/badge.svg)](https://github.com/ValOvinnikov/blog/actions/workflows/ci.yml)
 
 A CMS-driven blog built as a **Turborepo + pnpm monorepo** with strict
-separation of concerns: a headless Sanity Studio for authoring, a Next.js 15
+separation of concerns: a headless Sanity Studio for authoring, a Next.js
 frontend for reading, a portable design system, and a typed data layer — with
 end-to-end TypeScript type safety from schema to screen.
 
-> **Specs:** [`IMPLEMENTATION_BRIEF.md`](./IMPLEMENTATION_BRIEF.md) is the ordered
-> build playbook; [`SPEC.md`](./SPEC.md) is the durable product + architecture
-> reference. Read the brief to build, the spec to understand.
+> **Docs:** [`SPEC.md`](./SPEC.md) is the durable product + architecture
+> reference — start there. [`docs/BACKLOG.md`](./docs/BACKLOG.md) is the
+> ticket-ready roadmap. [`IMPLEMENTATION_BRIEF.md`](./IMPLEMENTATION_BRIEF.md)
+> is the archived bootstrap playbook (historical only).
 
 ## Stack
 
-- **Next.js 15** (App Router, React Server Components, TS strict) — `apps/web`
-- **Sanity v4** Studio (headless CMS, typegen source) — `apps/cms`
-- **Tailwind CSS v4** with shared design tokens
+- **Next.js 16** (App Router, React Server Components, TS strict) + **React 19** — `apps/web`
+- **Sanity Studio v6** (headless CMS, typegen source) — `apps/cms`
+- **Tailwind CSS v4** with shared design tokens + `tailwind-variants`
+- **next-intl** i18n (locale-prefix-free URLs)
 - **Atomic Design** component library — `packages/ui`
-- **Vitest + Testing Library** for unit tests
+- **Vitest + Testing Library** for unit tests; **Storybook** in `ui` and `web`
 - **Turborepo + pnpm** workspaces, **TypeScript** everywhere
 
 ## Monorepo layout
@@ -27,20 +29,22 @@ apps/
   cms        Sanity Studio: schemas, editorial UI, typegen source   (cms)
   web        Next.js frontend: routes, SEO, composition             (web)
 packages/
-  service    Data access: Sanity client, GROQ, typed fetchers       (@blog/service)
+  service    Data access: Sanity client, groqd queries, transformers (@blog/service)
   ui         Atomic Design component library (pure, prop-driven)     (@blog/ui)
-  types      Generated Sanity types + shared shapes                 (@blog/types)
-  config     Shared tsconfig / Tailwind preset / eslint / vitest     (@blog/config)
+  config     Constants, generated Sanity types, shared TS types      (@blog/config)
+  utils      Framework-free helpers (async, primitives)              (@blog/utils)
+configs/
+  eslint / prettier / tailwind / tsconfig / vitest presets           (@blog/*-config)
 ```
 
 ### Dependency rules (enforced, acyclic)
 
 ```
-web → ui, service, types
-service → types          (no React, ever)
-ui → types               (no Sanity, no data fetching — stays publishable)
-cms → types              (generates them via typegen)
-config → consumed by all
+web → ui, service, config, utils
+service → config, utils   (no React, ever)
+ui → config               (no Sanity, no data fetching — stays publishable)
+cms → config              (generates the types typegen ships into config)
+configs/* → consumed by all
 ```
 
 `web` is the **only** place `ui` and `service` meet: Server Components fetch
@@ -83,7 +87,7 @@ origins at [manage.sanity.io](https://manage.sanity.io).
 | `pnpm test:watch` | Vitest in watch mode                                |
 | `pnpm type-check` | `tsc --noEmit` across the graph                     |
 | `pnpm lint`       | ESLint across packages                              |
-| `pnpm typegen`    | Regenerate Sanity types into `@blog/types`          |
+| `pnpm typegen`    | Regenerate Sanity types into `@blog/config`         |
 | `pnpm format`     | Prettier write                                      |
 
 Scope to one workspace with `pnpm --filter <name>`, e.g.
@@ -91,15 +95,19 @@ Scope to one workspace with `pnpm --filter <name>`, e.g.
 
 ## Content model
 
-Defined as Sanity schemas in `apps/cms/schemaTypes` (full field list in the
-brief §6): `post`, `author`, `category`, `page`, and a `siteSettings` singleton.
-Schema changes regenerate `packages/types/src/sanity.types.ts` via `pnpm typegen`
-— commit the generated file.
+Defined as Sanity schemas in `apps/cms/src/schema-types/` (current model in
+`SPEC.md` §6): `post`, `author`, `category`, `page`, the `homePage` /
+`siteSettings` / `settings_navigation` / `settings_footer` singletons, and
+shared objects (unified `link`, `seo`/`openGraph`, `imageWithAlt`, `brand`).
+Schema changes regenerate `packages/config/src/sanity/generated/types.ts` via
+`pnpm typegen` — commit the generated files. Changes to _existing_ shapes need
+a content migration (`apps/cms/migrations/README.md`) — production runs are
+human-gated.
 
 ## Type flow
 
 ```
-Sanity schema (cms) ──typegen──► @blog/types ──► @blog/service ──► web ──props──► @blog/ui
+Sanity schema (cms) ──typegen──► @blog/config ──► @blog/service ──► web ──props──► @blog/ui
 ```
 
 One source of truth: a schema change surfaces as a TypeScript error anywhere a
@@ -120,9 +128,12 @@ contracts:
   - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit); start here for non-trivial work.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
   - `ui-library-practices` — building pure, prop-driven design-system components.
+  - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.
   - `testing-practices` — Vitest + Testing Library conventions.
   - `seo-and-metadata` — per-route metadata, JSON-LD, sitemap/robots/RSS.
   - `code-review-practices` — boundary/type/SEO/test checklist before a PR.
+  - `open-pull-request` — branch → work → PR with human-gated push/PR steps.
+  - `use-context7` — fetch live, version-matched library docs before guessing.
 - **Settings** (`.claude/settings.json`) — permission allowlist for the standard
   pnpm/turbo/sanity/git commands; deploy and `.env` reads are gated.
 - **`CLAUDE.md`** — repo-wide guidance loaded into every session.
