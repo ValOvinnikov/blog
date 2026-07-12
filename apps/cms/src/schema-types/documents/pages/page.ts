@@ -1,3 +1,4 @@
+import { MODULE_TYPE } from '@blog/config/constants';
 import { FileText } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -31,8 +32,8 @@ export default defineType({
       type: 'array',
       description: 'Ordered content blocks that build the page.',
       of: [
-        defineArrayMember({ type: 'module_content' }),
-        defineArrayMember({ type: 'module_cta' }),
+        defineArrayMember({ type: MODULE_TYPE.CONTENT }),
+        defineArrayMember({ type: MODULE_TYPE.CTA }),
       ],
     }),
     defineField({

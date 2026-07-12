@@ -1,3 +1,4 @@
+import { HERO_FIELD_MODE, MODULE_TYPE } from '@blog/config';
 import type { InferResultType } from 'groqd';
 
 import { buildImageUrl } from '#/shared/transformers/build-image-url';
@@ -34,10 +35,10 @@ export function toHomePage(
   rawPosts: TRawHomePagePosts,
 ): THomePage {
   const heroModule = rawHome?.modules?.find(
-    (module) => module._type === 'module_hero',
+    (module) => module._type === MODULE_TYPE.HERO,
   );
   const postListModule = rawHome?.modules?.find(
-    (module) => module._type === 'module_postList',
+    (module) => module._type === MODULE_TYPE.POST_LIST,
   );
 
   const posts = rawPosts.map(toPostCard);
@@ -48,15 +49,15 @@ export function toHomePage(
     configuredFeaturedPost ?? posts.find((post) => post.featured);
 
   const heroImageUrl =
-    heroModule?.heroImageMode === 'custom'
+    heroModule?.heroImageMode === HERO_FIELD_MODE.CUSTOM
       ? buildImageUrl(heroModule.heroImage)
-      : heroModule?.heroImageMode === 'none'
+      : heroModule?.heroImageMode === HERO_FIELD_MODE.NONE
         ? undefined
         : heroPost?.mainImageUrl;
 
   const heroImage =
     heroImageUrl &&
-    heroModule?.heroImageMode === 'custom' &&
+    heroModule?.heroImageMode === HERO_FIELD_MODE.CUSTOM &&
     heroModule.heroImage
       ? { src: heroImageUrl, alt: heroModule.heroImage.alt }
       : heroImageUrl && heroPost
@@ -64,9 +65,9 @@ export function toHomePage(
         : undefined;
 
   const heroSanityImage =
-    heroModule?.heroImageMode === 'custom'
+    heroModule?.heroImageMode === HERO_FIELD_MODE.CUSTOM
       ? toSanityImage(heroModule.heroImageAsset)
-      : heroModule?.heroImageMode === 'none'
+      : heroModule?.heroImageMode === HERO_FIELD_MODE.NONE
         ? undefined
         : heroPost?.mainImageSanity;
 
@@ -77,14 +78,14 @@ export function toHomePage(
       eyebrow: getCustomOrFallback(
         heroModule?.heroEyebrowMode,
         heroModule?.heroEyebrow,
-        'custom',
+        HERO_FIELD_MODE.CUSTOM,
         heroPost?.categories[0]?.title,
       ),
       title:
         getCustomOrFallback(
           heroModule?.heroTitleMode,
           heroModule?.heroTitle,
-          'custom',
+          HERO_FIELD_MODE.CUSTOM,
           heroPost?.title,
         ) ??
         rawHome?.title ??
@@ -92,7 +93,7 @@ export function toHomePage(
       subtitle: getCustomOrFallback(
         heroModule?.heroSubtitleMode,
         heroModule?.heroSubtitle,
-        'custom',
+        HERO_FIELD_MODE.CUSTOM,
         heroPost?.excerpt,
       ),
       image: heroImage,

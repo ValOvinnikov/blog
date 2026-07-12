@@ -1,3 +1,4 @@
+import { HERO_FIELD_MODE, MODULE_TYPE } from '@blog/config/constants';
 import { House } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -21,16 +22,16 @@ export default defineType({
     title: 'Home Page',
     modules: [
       {
-        _type: 'module_hero',
+        _type: MODULE_TYPE.HERO,
         _key: 'hero',
-        heroEyebrowMode: 'postCategory',
-        heroTitleMode: 'postTitle',
-        heroSubtitleMode: 'postExcerpt',
-        heroImageMode: 'postImage',
+        heroEyebrowMode: HERO_FIELD_MODE.POST_CATEGORY,
+        heroTitleMode: HERO_FIELD_MODE.POST_TITLE,
+        heroSubtitleMode: HERO_FIELD_MODE.POST_EXCERPT,
+        heroImageMode: HERO_FIELD_MODE.POST_IMAGE,
         primaryActionLabel: 'Read more',
       },
       {
-        _type: 'module_postList',
+        _type: MODULE_TYPE.POST_LIST,
         _key: 'postList',
         title: 'Latest',
         limit: 6,
@@ -51,10 +52,26 @@ export default defineType({
       type: 'array',
       description: 'Ordered content blocks that build the Home page.',
       of: [
-        defineArrayMember({ type: 'module_hero' }),
-        defineArrayMember({ type: 'module_postList' }),
-        defineArrayMember({ type: 'module_cta' }),
+        defineArrayMember({ type: MODULE_TYPE.HERO }),
+        defineArrayMember({ type: MODULE_TYPE.POST_LIST }),
+        defineArrayMember({ type: MODULE_TYPE.CTA }),
       ],
+      validation: (rule) =>
+        rule.custom((modules) => {
+          const list = (modules as { _type?: string }[] | undefined) ?? [];
+          const heroCount = list.filter(
+            (module) => module._type === MODULE_TYPE.HERO,
+          ).length;
+          const postListCount = list.filter(
+            (module) => module._type === MODULE_TYPE.POST_LIST,
+          ).length;
+
+          if (heroCount !== 1 || postListCount !== 1) {
+            return 'The Home page must contain exactly one Hero module and exactly one Post List module.';
+          }
+
+          return true;
+        }),
     }),
     defineField({
       name: 'seo',

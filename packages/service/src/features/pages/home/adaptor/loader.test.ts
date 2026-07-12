@@ -1,3 +1,4 @@
+import { HERO_FIELD_MODE, MODULE_TYPE } from '@blog/config';
 import { describe, expect, it, vi } from 'vitest';
 
 import { mockRun } from '#/testing/mock-run-query';
@@ -19,15 +20,15 @@ describe('getHomePage', () => {
         modules: [
           {
             _key: 'hero',
-            _type: 'module_hero',
+            _type: MODULE_TYPE.HERO,
             featuredPost: makeRawPostCard({ _id: 'featured-ref' }),
-            heroEyebrowMode: 'postCategory',
+            heroEyebrowMode: HERO_FIELD_MODE.POST_CATEGORY,
             heroEyebrow: null,
-            heroTitleMode: 'postTitle',
+            heroTitleMode: HERO_FIELD_MODE.POST_TITLE,
             heroTitle: null,
-            heroSubtitleMode: 'postExcerpt',
+            heroSubtitleMode: HERO_FIELD_MODE.POST_EXCERPT,
             heroSubtitle: null,
-            heroImageMode: 'postImage',
+            heroImageMode: HERO_FIELD_MODE.POST_IMAGE,
             heroImage: null,
             heroImageAsset: null,
             primaryActionLabel: 'Start reading',
@@ -40,7 +41,7 @@ describe('getHomePage', () => {
           },
           {
             _key: 'postList',
-            _type: 'module_postList',
+            _type: MODULE_TYPE.POST_LIST,
             title: 'Latest',
             limit: 2,
           },
@@ -87,15 +88,15 @@ describe('getHomePage', () => {
         modules: [
           {
             _key: 'hero',
-            _type: 'module_hero',
+            _type: MODULE_TYPE.HERO,
             featuredPost: null,
-            heroEyebrowMode: 'custom',
+            heroEyebrowMode: HERO_FIELD_MODE.CUSTOM,
             heroEyebrow: 'Field notes',
-            heroTitleMode: 'custom',
+            heroTitleMode: HERO_FIELD_MODE.CUSTOM,
             heroTitle: 'Custom home title',
-            heroSubtitleMode: 'custom',
+            heroSubtitleMode: HERO_FIELD_MODE.CUSTOM,
             heroSubtitle: 'Custom home subtitle.',
-            heroImageMode: 'custom',
+            heroImageMode: HERO_FIELD_MODE.CUSTOM,
             heroImage: makeRawPostCard().mainImage,
             heroImageAsset: makeRawSanityImage(),
             primaryActionLabel: null,
@@ -103,7 +104,7 @@ describe('getHomePage', () => {
           },
           {
             _key: 'postList',
-            _type: 'module_postList',
+            _type: MODULE_TYPE.POST_LIST,
             title: 'Recent writing',
             limit: 1,
           },

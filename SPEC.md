@@ -116,8 +116,9 @@ apps/web Server Component  ──plain typed props──►  @blog/ui
 ## 6. Content model
 
 Source of truth: `apps/cms/src/schema-types/` (documents grouped `blog/`,
-`pages/`, `settings/`; shared `objects/`; `modules/` reserved for the
-page-builder). Naming convention `{group}_{name}` is being applied
+`pages/`, `settings/`; shared `objects/`; `modules/` holds the page-builder
+blocks — `module_hero`, `module_postList`, `module_content`, `module_cta`).
+Naming convention `{group}_{name}` is being applied
 incrementally (#251): `settings_navigation` and `settings_footer` are done;
 `siteSettings` and `homePage` still carry legacy names.
 
@@ -128,10 +129,11 @@ incrementally (#251): `settings_navigation` and `settings_footer` are done;
   featured, seo.
 - `author` — name, slug, image, bio, role, socialLinks (unified `link`-based).
 - `category` — title, slug, description.
-- `page` — title, slug, body, seo. Will move to a `modules[]` page-builder
-  (#250); `modules/index.ts` is currently an empty placeholder.
-- `homePage` (singleton) — hero (eyebrow/title/subtitle/image each with
-  auto/manual mode + featuredPost ref), latestPosts settings, seo.
+- `page` — title, slug, `modules[]` (`module_content`, `module_cta`), seo.
+- `homePage` (singleton) — `modules[]` (`rule.custom` requires exactly one
+  `module_hero` + exactly one `module_postList`; `module_cta` also allowed),
+  seo. `module_hero` carries the eyebrow/title/subtitle/image mode+custom
+  pairs + featuredPost ref; `module_postList` the latest-posts title/limit.
 - `siteSettings` (singleton) — brand (`brand` object: name/prefix/suffix/logo),
   description, tagline, defaultSeo.
 - `settings_navigation` (singleton) — items (links).
@@ -141,6 +143,12 @@ incrementally (#251): `settings_navigation` and `settings_footer` are done;
 `socialLink`, `brand`, `imageWithAlt` (required alt), `seo` + `openGraph`,
 `blockText` / `portableText`.
 
+**Modules** (page-builder blocks used in `modules[]`) — `module_hero`,
+`module_postList`, `module_content`, `module_cta`. `_type` names come from
+`MODULE_TYPE` in `@blog/config`. `module_hero`'s repeated mode/custom field
+pairs are built by the `defineModeFieldPair` schema helper
+(`apps/cms/src/schema-types/helpers/`).
+
 **Conventions**
 
 - `defineType`/`defineField`/`defineArrayMember` everywhere; validation
@@ -148,7 +156,10 @@ incrementally (#251): `settings_navigation` and `settings_footer` are done;
   `hotspot: true` + required alt.
 - Enum-ish stored values come from `@blog/config` constants — **both key and
   value UPPERCASE** (`LINK_TYPE.INTERNAL === 'INTERNAL'`), `as const`; schema
-  `options.list` and migrations use the same constant.
+  `options.list` and migrations use the same constant. Exceptions: `_type`-name
+  consts (`MODULE_TYPE`) keep the real lowercase type names as values, and
+  legacy lowercase mode values (`HERO_FIELD_MODE`, e.g. `'postCategory'`) are
+  centralized as-is until an uppercasing migration runs (Phase B follow-up).
 - Singletons enforced through desk structure.
 
 ## 7. Environment & configuration

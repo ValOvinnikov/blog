@@ -1,3 +1,5 @@
+import { MODULE_TYPE } from '@blog/config';
+
 import { q } from '#/sanity/query';
 import {
   imageWithAltFragment,
@@ -15,7 +17,7 @@ export const homePageQuery = q.star
     modules: sub.field('modules[]').project((module) => ({
       _key: true,
       ...module.conditionalByType({
-        module_hero: (hero) => ({
+        [MODULE_TYPE.HERO]: (hero) => ({
           featuredPost: hero
             .field('featuredPost')
             .deref()
@@ -42,7 +44,7 @@ export const homePageQuery = q.star
             .project(linkFragment)
             .nullable(true),
         }),
-        module_postList: (postList) => ({
+        [MODULE_TYPE.POST_LIST]: (postList) => ({
           title: postList.field('title').notNull(),
           limit: postList.field('limit').notNull(),
         }),
