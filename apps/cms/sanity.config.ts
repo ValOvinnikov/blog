@@ -95,7 +95,8 @@ export default defineConfig({
                       .child(
                         S.document()
                           .schemaType('siteSettings')
-                          .documentId('siteSettings'),
+                          .documentId('siteSettings')
+                          .title('Site Settings'),
                       ),
                     S.listItem()
                       .title('Navigation')
@@ -104,7 +105,8 @@ export default defineConfig({
                       .child(
                         S.document()
                           .schemaType('settings_navigation')
-                          .documentId('settings_navigation'),
+                          .documentId('settings_navigation')
+                          .title('Navigation'),
                       ),
                     S.listItem()
                       .title('Footer')
@@ -113,7 +115,8 @@ export default defineConfig({
                       .child(
                         S.document()
                           .schemaType('settings_footer')
-                          .documentId('settings_footer'),
+                          .documentId('settings_footer')
+                          .title('Footer'),
                       ),
                   ]),
               ),
