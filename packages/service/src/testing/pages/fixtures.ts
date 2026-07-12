@@ -1,3 +1,7 @@
+import { MODULE_TYPE } from '@blog/config';
+
+import type { TRawGenericPage } from '#/features/pages/generic/adaptor/transformer';
+import type { TRawHomePage } from '#/features/pages/home/adaptor/transformer';
 import type { TRawPostDetail } from '#/features/pages/post/adaptor/detail/transformer';
 import type { TRawPostCard } from '#/shared/transformers/to-post-card';
 import { makeRawImage, makeRawSanityImage } from '#/testing/shared/fixtures';
@@ -64,6 +68,36 @@ export function makeRawPostDetail(
         description: 'Engineering posts',
       },
     ],
+    ...overrides,
+  };
+}
+
+export function makeRawHomePage(
+  overrides: Partial<TRawHomePage> = {},
+): TRawHomePage {
+  return {
+    title: 'Home Page',
+    hero: { key: 'hero-ref', id: 'hero-1', type: MODULE_TYPE.HERO },
+    modules: [
+      { key: 'module-1', id: 'post-list-1', type: MODULE_TYPE.POST_LIST },
+      { key: 'module-2', id: 'cta-1', type: MODULE_TYPE.CTA },
+    ],
+    seo: null,
+    ...overrides,
+  };
+}
+
+export function makeRawGenericPage(
+  overrides: Partial<TRawGenericPage> = {},
+): TRawGenericPage {
+  return {
+    title: 'About',
+    slug: 'about',
+    modules: [
+      { key: 'module-1', id: 'content-1', type: MODULE_TYPE.CONTENT },
+      { key: 'module-2', id: 'cta-1', type: MODULE_TYPE.CTA },
+    ],
+    seo: null,
     ...overrides,
   };
 }

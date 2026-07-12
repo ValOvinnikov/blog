@@ -1,4 +1,6 @@
+export * from './content-module';
 export * from './content-section';
+export * from './cta-module';
 export * from './footer';
 export * from './header';
 export * from './hero';

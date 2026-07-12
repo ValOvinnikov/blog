@@ -13,7 +13,7 @@ function toInternalHref(raw: NonNullable<TRawLink['internalReference']>) {
       return `/blog/${raw.slug}`;
     case 'category':
       return `/category/${raw.slug}`;
-    case 'page':
+    case 'page_generic':
       return `/${raw.slug}`;
     default:
       return undefined;
