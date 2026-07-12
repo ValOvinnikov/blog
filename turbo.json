@@ -31,7 +31,11 @@
     },
     "typegen": {
       "cache": false,
-      "outputs": ["src/sanity.types.ts"]
+      "env": ["SANITY_STUDIO_PROJECT_ID", "SANITY_STUDIO_DATASET"],
+      "outputs": [
+        "../../packages/config/src/sanity/generated/schema.json",
+        "../../packages/config/src/sanity/generated/types.ts"
+      ]
     },
     "format": {
       "cache": false

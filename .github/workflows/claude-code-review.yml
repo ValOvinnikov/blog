@@ -3,12 +3,25 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened, synchronize, ready_for_review, reopened]
-    # Optional: Only run on specific file changes
-    # paths:
-    #   - "src/**/*.ts"
-    #   - "src/**/*.tsx"
-    #   - "src/**/*.js"
-    #   - "src/**/*.jsx"
+    # Only review PRs that touch code or workflows. Path filtering is safe
+    # HERE (unlike ci.yml) because claude-review is not a required status
+    # check — a skipped run can't block a merge. Docs-only PRs skip the
+    # ~3-minute AI review and its usage cost.
+    paths:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - '**/*.js'
+      - '**/*.mjs'
+      - '**/*.jsx'
+      - '**/*.css'
+      - '**/*.json'
+      - '.github/workflows/**'
+
+# A synchronize event supersedes the in-flight review of the same PR —
+# cancel it rather than paying for two.
+concurrency:
+  group: claude-review-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   claude-review:
