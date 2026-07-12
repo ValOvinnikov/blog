@@ -105,6 +105,9 @@ importers:
       '@portabletext/react':
         specifier: ^3.2.0
         version: 3.2.4(react@19.2.7)
+      '@sanity/webhook':
+        specifier: ^4.0.4
+        version: 4.0.4
       '@t3-oss/env-nextjs':
         specifier: ^0.13.11
         version: 0.13.11(typescript@6.0.3)(valibot@1.4.2(typescript@6.0.3))(zod@3.25.76)
