@@ -7,12 +7,14 @@ import { createNavigationService } from './features/global/navigation';
 import { createSiteSettingsService } from './features/global/site-settings';
 import { createBlogService } from './features/pages/blog';
 import { createCategoryService } from './features/pages/category';
+import { createGenericPageService } from './features/pages/generic';
 import { createHomeService } from './features/pages/home';
 import { createPostService } from './features/pages/post';
 
 export const service = {
   pages: {
     home: createHomeService(),
+    generic: createGenericPageService(),
     blog: createBlogService(),
     post: createPostService(),
     category: createCategoryService(),
@@ -35,10 +37,12 @@ export type { TNavigation } from './features/global/navigation';
 export type { TBrand, TSiteSettings } from './features/global/site-settings';
 export type { TBlogPage } from './features/pages/blog';
 export type { TCategoryPage } from './features/pages/category';
+export type { TGenericPage } from './features/pages/generic';
 export type { THomePage } from './features/pages/home';
 export type { TPostDetail, TPostDetailAuthor } from './features/pages/post';
 export { urlForImage } from './sanity/image';
 export type { TCategory } from './shared/transformers/to-category';
+export type { TModuleRef } from './shared/transformers/to-module-ref';
 export type {
   TPostCard,
   TPostCardAuthor,
