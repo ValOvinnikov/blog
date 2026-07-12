@@ -11,6 +11,15 @@ description: >-
 The delivery loop for this repo. `develop-feature` says how to _build_ a change;
 this skill says how to _ship it for review_.
 
+## Scope: prefer per-layer PRs
+
+Split a multi-layer feature into separate PRs per layer (`cms → service → ui →
+web`, dependency order) — smaller diffs review faster. **Split only when each
+layer's PR merges to `main` green on its own** (typically additive changes).
+Keep it a single PR when a partial merge breaks the build — e.g. renaming a
+shared `_type`/generated type that downstream references reds `type-check` until
+all layers land. One concern per PR still holds either way.
+
 ## ABSOLUTE RULES — never violate
 
 - **Never push without explicit user approval for that specific push.**

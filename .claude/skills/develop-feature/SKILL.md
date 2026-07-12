@@ -24,6 +24,12 @@ approval. Never bundle them. See `open-pull-request` skill for the full sequence
 - Trivial / single-file / one layer → just do it (still test + review).
 - Spans multiple layers → use the `add-content-type` recipe and delegate per
   layer as below.
+- **Prefer one PR per layer** (`cms → service → ui → web`, dependency order) so
+  each review stays small — **but split only when each layer merges to `main`
+  green on its own** (typically additive changes). Keep a single PR when a
+  partial merge would break the build: e.g. renaming a shared `_type` or
+  generated type that downstream consumes reds `type-check` until every layer
+  lands. Split only if possible.
 
 ## 1. Investigate + set status (main session)
 
