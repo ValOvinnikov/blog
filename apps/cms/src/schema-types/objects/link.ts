@@ -43,7 +43,7 @@ export default defineType({
       name: 'internalReference',
       title: 'Internal Document',
       type: 'reference',
-      to: [{ type: 'post' }, { type: 'category' }, { type: 'page' }],
+      to: [{ type: 'post' }, { type: 'category' }, { type: 'page_generic' }],
       hidden: ({ parent }) => !isLinkType(parent, TLINK_TYPE.INTERNAL),
       validation: (rule) =>
         rule.custom((value, context) => {

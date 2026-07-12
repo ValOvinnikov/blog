@@ -1,19 +1,17 @@
+import { MODULE_TYPE } from '@blog/config/constants';
 import { FileText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
-export default defineType({
-  name: 'page',
+import { defineModulesField } from '../../helpers/define-modules-field';
+import { titleField } from '../../helpers/title-field';
+
+export const genericSchema = defineType({
+  name: 'page_generic',
   title: 'Page',
   type: 'document',
   icon: FileText,
   fields: [
-    defineField({
-      name: 'title',
-      title: 'Title',
-      type: 'string',
-      description: 'Page headline shown in the browser tab and as the H1.',
-      validation: (rule) => rule.required().max(120),
-    }),
+    titleField({ max: 120, description: 'Page headline / H1' }),
     defineField({
       name: 'slug',
       title: 'Slug',
@@ -25,13 +23,8 @@ export default defineType({
       },
       validation: (rule) => rule.required(),
     }),
-    defineField({
-      name: 'body',
-      title: 'Body',
-      type: 'portableText',
-      description:
-        'Page content — supports rich text, images, and code blocks.',
-      validation: (rule) => rule.required(),
+    defineModulesField({
+      allow: [MODULE_TYPE.CONTENT, MODULE_TYPE.CTA],
     }),
     defineField({
       name: 'seo',
@@ -41,4 +34,9 @@ export default defineType({
         'Override meta title, description, and OG image for search engines.',
     }),
   ],
+  preview: {
+    select: {
+      title: 'title',
+    },
+  },
 });
