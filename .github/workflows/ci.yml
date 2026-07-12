@@ -101,6 +101,21 @@ jobs:
         working-directory: apps/cms
         run: pnpm exec sanity typegen generate
 
+  skills-sync:
+    name: Skills sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # `.claude/skills/` is canonical; `.agents/skills/` mirrors it for other
+    # harnesses (see CLAUDE.md). The two copies have drifted silently before, so
+    # fail CI when they diverge — editing one without the other is caught here.
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - name: Verify .claude/skills and .agents/skills are identical
+        run: diff -rq .claude/skills .agents/skills
+
   migrations:
     name: Migrations
     runs-on: ubuntu-latest
