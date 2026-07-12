@@ -18,7 +18,7 @@ export const heroSchema = defineType({
       type: 'reference',
       description:
         'Post featured in this hero. If empty, the newest post marked Featured is used.',
-      to: [{ type: 'post' }],
+      to: [{ type: 'blog_post' }],
       validation: (rule) =>
         rule
           .custom((value) =>

@@ -1,4 +1,4 @@
-import type { BlockText, PortableText } from '@blog/config';
+import type { BlockText, RichText } from '@blog/config';
 
 import type { TCategory } from '#/shared/transformers/to-category';
 import type { TPostCard } from '#/shared/transformers/to-post-card';
@@ -16,7 +16,7 @@ export type TPostDetailAuthor = {
 };
 
 export type TPostDetail = Omit<TPostCard, 'author' | 'categories'> & {
-  body: PortableText;
+  body: RichText;
   seo: TSeoMeta | undefined;
   author: TPostDetailAuthor | undefined;
   categories: TCategory[];

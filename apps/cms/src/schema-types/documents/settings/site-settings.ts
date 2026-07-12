@@ -4,7 +4,7 @@ import { defineField, defineType } from 'sanity';
 import { titleField } from '../../helpers/title-field';
 
 export const siteSchema = defineType({
-  name: 'siteSettings',
+  name: 'settings_site',
   title: 'Site Settings',
   type: 'document',
   icon: Settings,

@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-export default defineType({
+export const socialLinkSchema = defineType({
   name: 'socialLink',
   title: 'Social Link',
   type: 'object',

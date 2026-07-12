@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-export default defineType({
+export const seoSchema = defineType({
   name: 'seo',
   title: 'SEO',
   type: 'object',

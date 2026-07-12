@@ -3,7 +3,7 @@ import { imageWithAltFragment } from '#/shared/fragments/image';
 import { openGraphFragment } from '#/shared/fragments/open-graph';
 
 export const siteSettingsQuery = q.star
-  .filterByType('siteSettings')
+  .filterByType('settings_site')
   .slice(0)
   .project((sub) => ({
     brand: sub

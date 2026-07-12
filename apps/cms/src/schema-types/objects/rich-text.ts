@@ -1,8 +1,8 @@
 import { defineArrayMember, defineType } from 'sanity';
 
-export default defineType({
-  name: 'portableText',
-  title: 'Portable Text',
+export const richTextSchema = defineType({
+  name: 'richText',
+  title: 'Rich Text',
   type: 'array',
   of: [
     defineArrayMember({ type: 'block' }),

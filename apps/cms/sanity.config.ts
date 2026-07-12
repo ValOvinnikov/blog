@@ -95,13 +95,13 @@ export default defineConfig({
                 S.list()
                   .title('Blog')
                   .items([
-                    S.documentTypeListItem('post')
+                    S.documentTypeListItem('blog_post')
                       .title('Posts')
                       .icon(Newspaper),
-                    S.documentTypeListItem('category')
+                    S.documentTypeListItem('blog_category')
                       .title('Categories')
                       .icon(Tags),
-                    S.documentTypeListItem('author')
+                    S.documentTypeListItem('blog_author')
                       .title('Authors')
                       .icon(UserRound),
                   ]),
@@ -117,12 +117,12 @@ export default defineConfig({
                   .items([
                     S.listItem()
                       .title('Site Settings')
-                      .id('siteSettings')
+                      .id('settings_site')
                       .icon(Settings)
                       .child(
                         S.document()
-                          .schemaType('siteSettings')
-                          .documentId('siteSettings'),
+                          .schemaType('settings_site')
+                          .documentId('settings_site'),
                       ),
                     S.listItem()
                       .title('Navigation')

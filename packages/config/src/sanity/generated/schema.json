@@ -67,7 +67,7 @@
   },
   {
     "type": "type",
-    "name": "post.reference",
+    "name": "blog_post.reference",
     "value": {
       "type": "object",
       "attributes": {
@@ -92,12 +92,12 @@
           "optional": true
         }
       },
-      "dereferencesTo": "post"
+      "dereferencesTo": "blog_post"
     }
   },
   {
     "type": "type",
-    "name": "category.reference",
+    "name": "blog_category.reference",
     "value": {
       "type": "object",
       "attributes": {
@@ -122,7 +122,7 @@
           "optional": true
         }
       },
-      "dereferencesTo": "category"
+      "dereferencesTo": "blog_category"
     }
   },
   {
@@ -199,11 +199,11 @@
             "of": [
               {
                 "type": "inline",
-                "name": "post.reference"
+                "name": "blog_post.reference"
               },
               {
                 "type": "inline",
-                "name": "category.reference"
+                "name": "blog_category.reference"
               },
               {
                 "type": "inline",
@@ -325,14 +325,14 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "portableText"
+          "name": "richText"
         },
         "optional": true
       }
     }
   },
   {
-    "name": "portableText",
+    "name": "richText",
     "type": "type",
     "value": {
       "type": "array",
@@ -1143,7 +1143,7 @@
     }
   },
   {
-    "name": "siteSettings",
+    "name": "settings_site",
     "type": "document",
     "attributes": {
       "_id": {
@@ -1156,7 +1156,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "string",
-          "value": "siteSettings"
+          "value": "settings_site"
         }
       },
       "_createdAt": {
@@ -1454,7 +1454,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "post.reference"
+          "name": "blog_post.reference"
         },
         "optional": true
       },
@@ -1739,7 +1739,7 @@
     }
   },
   {
-    "name": "category",
+    "name": "blog_category",
     "type": "document",
     "attributes": {
       "_id": {
@@ -1752,7 +1752,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "string",
-          "value": "category"
+          "value": "blog_category"
         }
       },
       "_createdAt": {
@@ -1799,7 +1799,7 @@
   },
   {
     "type": "type",
-    "name": "author.reference",
+    "name": "blog_author.reference",
     "value": {
       "type": "object",
       "attributes": {
@@ -1824,11 +1824,11 @@
           "optional": true
         }
       },
-      "dereferencesTo": "author"
+      "dereferencesTo": "blog_author"
     }
   },
   {
-    "name": "post",
+    "name": "blog_post",
     "type": "document",
     "attributes": {
       "_id": {
@@ -1841,7 +1841,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "string",
-          "value": "post"
+          "value": "blog_post"
         }
       },
       "_createdAt": {
@@ -1896,7 +1896,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "author.reference"
+          "name": "blog_author.reference"
         },
         "optional": true
       },
@@ -1916,7 +1916,7 @@
             },
             "rest": {
               "type": "inline",
-              "name": "category.reference"
+              "name": "blog_category.reference"
             }
           }
         },
@@ -1933,7 +1933,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "portableText"
+          "name": "richText"
         },
         "optional": true
       },
@@ -1955,7 +1955,7 @@
     }
   },
   {
-    "name": "author",
+    "name": "blog_author",
     "type": "document",
     "attributes": {
       "_id": {
@@ -1968,7 +1968,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "string",
-          "value": "author"
+          "value": "blog_author"
         }
       },
       "_createdAt": {

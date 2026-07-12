@@ -1,4 +1,4 @@
-import type { PortableText as TPortableText } from '@blog/config';
+import type { RichText as TPortableText } from '@blog/config';
 import { PortableText } from '@portabletext/react';
 
 export interface IPortableTextRendererProps {

@@ -1,19 +1,19 @@
-import blockText from './block-text';
-import brand from './brand';
-import imageWithAlt from './image-with-alt';
-import link from './link';
-import openGraph from './open-graph';
-import portableText from './portable-text';
-import seo from './seo';
-import socialLink from './social-link';
+import { blockTextSchema } from './block-text';
+import { brandSchema } from './brand';
+import { imageWithAltSchema } from './image-with-alt';
+import { linkSchema } from './link';
+import { openGraphSchema } from './open-graph';
+import { richTextSchema } from './rich-text';
+import { seoSchema } from './seo';
+import { socialLinkSchema } from './social-link';
 
 export const objects = [
-  imageWithAlt,
-  portableText,
-  blockText,
-  socialLink,
-  link,
-  openGraph,
-  seo,
-  brand,
+  imageWithAltSchema,
+  richTextSchema,
+  blockTextSchema,
+  socialLinkSchema,
+  linkSchema,
+  openGraphSchema,
+  seoSchema,
+  brandSchema,
 ];
