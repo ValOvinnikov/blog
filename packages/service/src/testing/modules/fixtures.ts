@@ -1,5 +1,6 @@
 import { HERO_FIELD_MODE } from '@blog/config';
 
+import type { TRawContentModule } from '#/features/modules/content/adaptor/transformer';
 import type { TRawHeroModule } from '#/features/modules/hero/adaptor/transformer';
 import type { TRawPostListModule } from '#/features/modules/post-list/adaptor/transformer';
 
@@ -29,6 +30,23 @@ export function makeRawPostListModule(
   return {
     title: 'Latest',
     limit: 6,
+    ...overrides,
+  };
+}
+
+export function makeRawContentModule(
+  overrides: Partial<TRawContentModule> = {},
+): TRawContentModule {
+  return {
+    title: 'About us',
+    body: [
+      {
+        _type: 'block',
+        _key: 'block-1',
+        style: 'normal',
+        children: [{ _type: 'span', _key: 'span-1', text: 'Hello.' }],
+      },
+    ],
     ...overrides,
   };
 }
