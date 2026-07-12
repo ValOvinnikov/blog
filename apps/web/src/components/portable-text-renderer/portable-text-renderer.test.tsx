@@ -1,10 +1,10 @@
-import type { PortableText } from '@blog/config';
+import type { RichText } from '@blog/config';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { PortableTextRenderer } from './portable-text-renderer';
 
-const value: PortableText = [
+const value: RichText = [
   {
     _type: 'block',
     _key: 'block-1',
