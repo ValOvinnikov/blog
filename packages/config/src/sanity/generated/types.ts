@@ -15,26 +15,16 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../../packages/config/src/sanity/generated/schema.json
-export type Brand = {
-  _type: 'brand';
-  name?: string;
-  prefix?: string;
-  suffix?: string;
-  logo?: ImageWithAlt;
-};
-
-export type Seo = {
-  _type: 'seo';
-  metaTitle?: string;
-  metaDescription?: string;
-  openGraph?: OpenGraph;
-};
-
-export type OpenGraph = {
-  _type: 'openGraph';
-  ogTitle?: string;
-  ogDescription?: string;
-  ogImage?: ImageWithAlt;
+export type Module_cta = {
+  _id: string;
+  _type: 'module_cta';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  heading?: string;
+  text?: string;
+  action?: Link;
 };
 
 export type PostReference = {
@@ -51,18 +41,18 @@ export type CategoryReference = {
   [internalGroqTypeReferenceTo]?: 'category';
 };
 
-export type PageReference = {
+export type Page_genericReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page';
+  [internalGroqTypeReferenceTo]?: 'page_generic';
 };
 
 export type Link = {
   _type: 'link';
   label?: string;
   linkType?: 'INTERNAL' | 'EXTERNAL';
-  internalReference?: PostReference | CategoryReference | PageReference;
+  internalReference?: PostReference | CategoryReference | Page_genericReference;
   url?: string;
   openInNewTab?: boolean;
   platform?:
@@ -78,30 +68,15 @@ export type Link = {
     | 'RSS';
 };
 
-export type SocialLink = {
-  _type: 'socialLink';
-  platform?: string;
-  url?: string;
+export type Module_content = {
+  _id: string;
+  _type: 'module_content';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  body?: PortableText;
 };
-
-export type BlockText = Array<{
-  children?: Array<{
-    marks?: Array<string>;
-    text?: string;
-    _type: 'span';
-    _key: string;
-  }>;
-  style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote';
-  listItem?: 'bullet' | 'number';
-  markDefs?: Array<{
-    href?: string;
-    _type: 'link';
-    _key: string;
-  }>;
-  level?: number;
-  _type: 'block';
-  _key: string;
-}>;
 
 export type PortableText = Array<
   | {
@@ -130,6 +105,63 @@ export type PortableText = Array<
     } & Code)
 >;
 
+export type Module_postList = {
+  _id: string;
+  _type: 'module_postList';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  limit?: number;
+};
+
+export type Brand = {
+  _type: 'brand';
+  name?: string;
+  prefix?: string;
+  suffix?: string;
+  logo?: ImageWithAlt;
+};
+
+export type Seo = {
+  _type: 'seo';
+  metaTitle?: string;
+  metaDescription?: string;
+  openGraph?: OpenGraph;
+};
+
+export type OpenGraph = {
+  _type: 'openGraph';
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: ImageWithAlt;
+};
+
+export type SocialLink = {
+  _type: 'socialLink';
+  platform?: string;
+  url?: string;
+};
+
+export type BlockText = Array<{
+  children?: Array<{
+    marks?: Array<string>;
+    text?: string;
+    _type: 'span';
+    _key: string;
+  }>;
+  style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote';
+  listItem?: 'bullet' | 'number';
+  markDefs?: Array<{
+    href?: string;
+    _type: 'link';
+    _key: string;
+  }>;
+  level?: number;
+  _type: 'block';
+  _key: string;
+}>;
+
 export type SanityImageAssetReference = {
   _ref: string;
   _type: 'reference';
@@ -152,6 +184,7 @@ export type Settings_footer = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  title?: string;
   social?: Array<
     {
       _key: string;
@@ -165,6 +198,7 @@ export type Settings_navigation = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  title?: string;
   items?: Array<
     {
       _key: string;
@@ -178,44 +212,96 @@ export type SiteSettings = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  title?: string;
   brand?: Brand;
   description?: string;
   tagline?: string;
   defaultSeo?: OpenGraph;
 };
 
-export type HomePage = {
+export type Module_heroReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_hero';
+};
+
+export type Module_postListReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_postList';
+};
+
+export type Module_ctaReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_cta';
+};
+
+export type Page_home = {
   _id: string;
-  _type: 'homePage';
+  _type: 'page_home';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  hero?: Module_heroReference;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_postListReference)
+    | ({
+        _key: string;
+      } & Module_ctaReference)
+  >;
+  seo?: Seo;
+};
+
+export type Module_hero = {
+  _id: string;
+  _type: 'module_hero';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   title?: string;
   featuredPost?: PostReference;
-  heroEyebrowMode?: 'postCategory' | 'custom';
+  heroEyebrowMode?: 'POST_CATEGORY' | 'CUSTOM';
   heroEyebrow?: string;
-  heroTitleMode?: 'postTitle' | 'custom';
+  heroTitleMode?: 'POST_TITLE' | 'CUSTOM';
   heroTitle?: string;
-  heroSubtitleMode?: 'postExcerpt' | 'custom';
+  heroSubtitleMode?: 'POST_EXCERPT' | 'CUSTOM';
   heroSubtitle?: string;
-  heroImageMode?: 'postImage' | 'custom' | 'none';
+  heroImageMode?: 'POST_IMAGE' | 'CUSTOM' | 'NONE';
   heroImage?: ImageWithAlt;
   primaryActionLabel?: string;
   secondaryAction?: Link;
-  latestPostsTitle?: string;
-  latestPostsLimit?: number;
-  seo?: Seo;
 };
 
-export type Page = {
+export type Module_contentReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_content';
+};
+
+export type Page_generic = {
   _id: string;
-  _type: 'page';
+  _type: 'page_generic';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   title?: string;
   slug?: Slug;
-  body?: PortableText;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_contentReference)
+    | ({
+        _key: string;
+      } & Module_ctaReference)
+  >;
   seo?: Seo;
 };
 
@@ -405,23 +491,31 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | Module_cta
+  | PostReference
+  | CategoryReference
+  | Page_genericReference
+  | Link
+  | Module_content
+  | PortableText
+  | Module_postList
   | Brand
   | Seo
   | OpenGraph
-  | PostReference
-  | CategoryReference
-  | PageReference
-  | Link
   | SocialLink
   | BlockText
-  | PortableText
   | SanityImageAssetReference
   | ImageWithAlt
   | Settings_footer
   | Settings_navigation
   | SiteSettings
-  | HomePage
-  | Page
+  | Module_heroReference
+  | Module_postListReference
+  | Module_ctaReference
+  | Page_home
+  | Module_hero
+  | Module_contentReference
+  | Page_generic
   | Slug
   | Category
   | AuthorReference

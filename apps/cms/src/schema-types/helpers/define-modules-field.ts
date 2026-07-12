@@ -20,6 +20,6 @@ export const defineModulesField = ({
     type: 'array',
     description: description ?? 'Ordered content modules that build this page.',
     of: allow.map((type) =>
-      defineArrayMember({ type: 'reference', to: [{ type }] }),
+      defineArrayMember({ name: type, type: 'reference', to: [{ type }] }),
     ),
   });
