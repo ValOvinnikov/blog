@@ -10,7 +10,6 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
-    "test": "vitest run --passWithNoTests",
     "migrate:list": "sanity migrations list",
     "migrate:new": "node scripts/migrate.mjs new",
     "migrate:track": "node scripts/migrate.mjs track",
@@ -34,11 +33,9 @@
     "@blog/eslint-config": "workspace:*",
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
-    "@blog/vitest-config": "workspace:*",
     "@sanity/cli": "^7.7.1",
     "eslint": "^10.6.0",
     "prettier": "^3.9.5",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.10"
+    "typescript": "^6.0.3"
   }
 }
