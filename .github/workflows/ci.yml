@@ -12,6 +12,12 @@ on:
 permissions:
   contents: read
 
+# A force-push/synchronize supersedes the running suite for the same ref —
+# cancel it instead of paying for two full parallel runs.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   PNPM_VERSION: 9.15.0
   NODE_VERSION: '22'
