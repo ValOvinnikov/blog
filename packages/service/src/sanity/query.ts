@@ -22,6 +22,6 @@ export const runQuery = makeSafeQueryRunner<TNextFetchOptions>(
     getClient().fetch(query, parameters ?? {}, next ? { next } : undefined),
 );
 
-export const isr = (tag: string): TNextFetchOptions => ({
-  next: { revalidate: 3600, tags: [tag] },
+export const isr = (tag: string | string[]): TNextFetchOptions => ({
+  next: { revalidate: 3600, tags: Array.isArray(tag) ? tag : [tag] },
 });
