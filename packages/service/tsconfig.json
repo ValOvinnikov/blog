@@ -9,7 +9,8 @@
     // node_modules can drop @types/node discovery and break `tsc`.
     "types": ["node", "vitest/globals"],
     "paths": {
-      "#/*": ["./src/*"]
+      "@blog/service/*": ["./src/*"],
+      "@blog/config/*": ["../../packages/config/src/*"]
     }
   },
   "include": ["src"]

@@ -2,6 +2,10 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@blog/tsconfig/base.json",
   "compilerOptions": {
+    "paths": {
+      "@cms/*": ["./src/*"],
+      "@blog/config/*": ["../../packages/config/src/*"]
+    },
     "lib": ["dom", "dom.iterable", "esnext"],
     "noEmit": true,
     "tsBuildInfoFile": "tsconfig.tsbuildinfo"

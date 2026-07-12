@@ -4,7 +4,8 @@
   "compilerOptions": {
     "types": ["vitest/globals"],
     "paths": {
-      "@blog/ui/*": ["./src/*"]
+      "@blog/ui/*": ["./src/*"],
+      "@blog/config/*": ["../../packages/config/src/*"]
     }
   },
   "include": ["src", ".storybook"]

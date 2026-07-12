@@ -8,9 +8,10 @@
     "moduleResolution": "Bundler",
     "types": ["vitest/globals"],
     "paths": {
-      "@/*": ["./src/*"],
+      "@web/*": ["./src/*"],
       "@blog/ui/*": ["../../packages/ui/src/*"],
-      "#/*": ["../../packages/service/src/*"]
+      "@blog/service/*": ["../../packages/service/src/*"],
+      "@blog/config/*": ["../../packages/config/src/*"]
     },
     "plugins": [
       {
