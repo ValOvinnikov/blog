@@ -1,3 +1,4 @@
+export * from './content-module';
 export * from './content-section';
 export * from './footer';
 export * from './header';
