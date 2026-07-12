@@ -1,13 +1,16 @@
 import { PanelBottom } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
-export default defineType({
+import { titleField } from '../../helpers/title-field';
+
+export const footerSchema = defineType({
   name: 'settings_footer',
   title: 'Footer',
   type: 'document',
   icon: PanelBottom,
-  preview: { prepare: () => ({ title: 'Footer' }) },
+  preview: { select: { title: 'title' } },
   fields: [
+    titleField({ initialValue: 'Footer', readOnly: true }),
     defineField({
       name: 'social',
       title: 'Social Links',

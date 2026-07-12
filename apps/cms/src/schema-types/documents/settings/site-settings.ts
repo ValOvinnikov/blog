@@ -1,19 +1,22 @@
 import { Settings } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
-export default defineType({
+import { titleField } from '../../helpers/title-field';
+
+export const siteSchema = defineType({
   name: 'siteSettings',
   title: 'Site Settings',
   type: 'document',
   icon: Settings,
   preview: {
-    select: { title: 'brand.name' },
+    select: { title: 'title' },
     prepare: ({ title }) => ({
       title: title ?? 'Site Settings',
       subtitle: 'Site settings',
     }),
   },
   fields: [
+    titleField({ initialValue: 'Site Settings', readOnly: true }),
     defineField({
       name: 'brand',
       title: 'Brand',

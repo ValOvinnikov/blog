@@ -1,13 +1,16 @@
 import { Menu } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
-export default defineType({
+import { titleField } from '../../helpers/title-field';
+
+export const navigationSchema = defineType({
   name: 'settings_navigation',
   title: 'Navigation',
   type: 'document',
   icon: Menu,
-  preview: { prepare: () => ({ title: 'Navigation' }) },
+  preview: { select: { title: 'title' } },
   fields: [
+    titleField({ initialValue: 'Navigation', readOnly: true }),
     defineField({
       name: 'items',
       title: 'Header Links',
