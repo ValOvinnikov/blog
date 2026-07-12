@@ -13,16 +13,16 @@ readers browse a fast, statically-rendered Next.js site. Content is fully typed
 end-to-end — a schema change in the CMS surfaces as a TypeScript error in the
 frontend if a consumer is out of date.
 
-**Primary surfaces** (status as of 2026-07-11):
+**Primary surfaces** (status as of 2026-07-12):
 
-| Surface  | Route              | Status                          |
-| -------- | ------------------ | ------------------------------- |
-| Home     | `/`                | ✅ Built (hero + latest posts)  |
-| Post     | `/blog/[slug]`     | 🔲 Phase 3 (#76/#90)            |
-| Blog     | `/blog`            | 🔲 Phase 3 (#75)                |
-| Category | `/category/[slug]` | 🔲 Phase 3 (#77/#91)            |
-| Page     | `/[slug]`          | 🔲 Planned (modules[] via #250) |
-| Feeds    | sitemap/robots/RSS | 🔲 Phase 3 (#92)                |
+| Surface  | Route              | Status                                                                                                                               |
+| -------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Home     | `/`                | ✅ Built — modules-as-documents (hero + `modules[]`)                                                                                 |
+| Post     | `/blog/[slug]`     | 🔲 Phase 3 (#76/#90)                                                                                                                 |
+| Blog     | `/blog`            | 🔲 Phase 3 (#75)                                                                                                                     |
+| Category | `/category/[slug]` | 🔲 Phase 3 (#77/#91)                                                                                                                 |
+| Page     | `/[slug]`          | 🔲 Planned — `service.pages.generic.v1.getPage` exists; route deferred until a slugs-listing loader lands for `generateStaticParams` |
+| Feeds    | sitemap/robots/RSS | 🔲 Phase 3 (#92)                                                                                                                     |
 
 The site is **not yet deployed** — see `docs/BACKLOG.md` (deploy milestone) for
 the phased rollout plan.
@@ -93,9 +93,14 @@ Sanity Studio (apps/cms)
       ▼
 packages/config/src/sanity/generated/{schema.json,types.ts}   (committed)
       ▼
-@blog/service  ──runQuery + groqd──►  typed view-models (TPostDetail, …)
+@blog/service
+  ├─ service.pages.<page>   ──thin query──►  { title, hero?, modules[]: TModuleRef, seo }
+  └─ service.modules.<type> ──runQuery + groqd, keyed by module id──►  typed module view-model
       ▼
-apps/web Server Component  ──plain typed props──►  @blog/ui
+apps/web
+  ├─ page.tsx           fetches service.pages.<page>, checks result.ok
+  ├─ ModuleRenderer      maps each TModuleRef → MODULE_MAP[type]({ id, locale })
+  └─ per-module component  fetches service.modules.<type>, maps view-model ──plain typed props──►  @blog/ui organism
 ```
 
 - Typegen config lives in `apps/cms/sanity.cli.ts`; the script is
@@ -112,30 +117,106 @@ apps/web Server Component  ──plain typed props──►  @blog/ui
   `AsyncResult<T>` (`{ ok: false, error }`). **Web must check `result.ok`
   before touching `result.data`** and owns the failure decision (`notFound()`,
   fallback, or early return).
+- **Page queries are thin.** `page_home`/`page_generic` project only page
+  fields plus lightweight module descriptors (`TModuleRef = { key, type, id }`,
+  from `to-module-ref.ts`) — no module internals, no `conditionalByType`. Each
+  module type owns its own fetcher (`service.modules.<type>.v1.get<Type>(id)`)
+  under `packages/service/src/features/modules/<type>/`, with its own GROQ,
+  transformer, and `T | undefined` view-model (`THeroModule`,
+  `TPostListModule`, `TContentModule`, `TCtaModule`). `module_postList` fetches
+  its own posts (the newest `limit`); `module_hero` resolves its own
+  custom-vs-fallback fields (see §6).
+- **Web renders modules generically.** `apps/web/src/modules/module-map.ts`
+  registers `MODULE_MAP: Record<TModuleType, (props) => ReactNode>` — typed
+  exhaustively over `TModuleType`/`MODULE_TYPE` (`@blog/config`) so omitting a
+  module type from the map is a compile error. `module-renderer.tsx`'s
+  `ModuleRenderer` walks a page's `modules: TModuleRef[]`, resolves each entry
+  through `MODULE_MAP`, and renders the result keyed by the module's stable
+  `_key`; an unrecognized type renders nothing and logs a warning rather than
+  failing the page. Each per-module component
+  (`apps/web/src/modules/<type>/<type>-module.tsx`) is an async Server
+  Component that calls its `service.modules.<type>` fetcher, checks
+  `result.ok`, and maps the view-model onto the matching pure `@blog/ui`
+  organism — this is the only place that module's service and ui meet. The
+  home route additionally renders a dedicated `HeroModule` for `page_home`'s
+  required `hero` reference (kept separate from `modules[]`).
 
 ## 6. Content model
 
 Source of truth: `apps/cms/src/schema-types/` (documents grouped `blog/`,
-`pages/`, `settings/`; shared `objects/`; `modules/` reserved for the
-page-builder). Naming convention `{group}_{name}` is being applied
-incrementally (#251): `settings_navigation` and `settings_footer` are done;
-`siteSettings` and `homePage` still carry legacy names.
+`pages/`, `settings/`; shared `objects/`; `modules/` — standalone,
+cross-referenceable page-builder documents, not embedded objects). Naming
+convention `{group}_{name}` is being applied incrementally (#251):
+`settings_navigation`, `settings_footer`, `page_home`, `page_generic`, and
+every `module_*` document are done; `siteSettings` still carries a legacy
+name.
 
-**Documents**
+**Modules are documents, not embedded objects** — pages reference them by
+`_ref`, so a module is independently listable, previewable, and reusable
+across pages (Studio's built-in **Incoming references** view shows which
+pages use a given module before it's edited or deleted). `MODULE_TYPE`
+(`packages/config/src/constants/module.ts`) is the single source of truth for
+the module type registry; every layer (cms schema list, `service.modules`
+namespace, web `MODULE_MAP`) derives from it, so omitting a type from one is a
+compile error or an obvious gap, not a silent drift.
+
+**Module documents** (`apps/cms/src/schema-types/modules/`)
+
+- `module_hero` (`heroSchema`) — internal `title`, `featuredPost` (ref to
+  `post`, warning-only — falls back to the newest featured post), four
+  mode/custom field pairs (`heroEyebrow`, `heroTitle`, `heroSubtitle`,
+  `heroImage`) built via the `defineModeFieldPair` helper and driven by the
+  UPPERCASE `HERO_FIELD_MODE` const (`CUSTOM`/`NONE`/`POST_CATEGORY`/
+  `POST_TITLE`/`POST_EXCERPT`/`POST_IMAGE`), `primaryActionLabel`,
+  `secondaryAction` (`link`).
+- `module_postList` (`postListSchema`) — internal `title` (display heading),
+  `limit` (posts to fetch, 1–12).
+- `module_content` (`contentSchema`) — internal `title`, `body` (portable
+  text).
+- `module_cta` (`ctaSchema`) — internal `title`, `heading`, `text`, `action`
+  (`link`, required).
+
+Every module document gets a required internal `title` via the reusable
+`titleField` helper (§ below) so it's listable/previewable in Studio
+independent of its display fields.
+
+**Page documents reference modules**
+
+- `page_home` (`homeSchema`, singleton) — `title`, `hero` (single **required**
+  reference to a `module_hero`, kept separate from the module list — it always
+  renders first), `modules` (array of references via `defineModulesField({
+allow: [MODULE_TYPE.POST_LIST, MODULE_TYPE.CTA] })`), `seo`.
+- `page_generic` (`genericSchema`) — `title`, `slug` (source: title),
+  `modules` (array of references via `defineModulesField({ allow:
+[MODULE_TYPE.CONTENT, MODULE_TYPE.CTA] })`), `seo`.
+
+`defineModulesField({ allow, description? })`
+(`schema-types/helpers/define-modules-field.ts`) builds the `modules` array
+field's `of` from the allowed `TModuleType[]`, one strong `reference` array
+member per allowed type — the single place that field shape is defined,
+replacing a hand-duplicated block per page document.
+
+**Other documents**
 
 - `post` — title, slug, excerpt, mainImage (`imageWithAlt`), author (ref),
   categories (refs), publishedAt, body (portable text incl. code blocks),
   featured, seo.
 - `author` — name, slug, image, bio, role, socialLinks (unified `link`-based).
 - `category` — title, slug, description.
-- `page` — title, slug, body, seo. Will move to a `modules[]` page-builder
-  (#250); `modules/index.ts` is currently an empty placeholder.
-- `homePage` (singleton) — hero (eyebrow/title/subtitle/image each with
-  auto/manual mode + featuredPost ref), latestPosts settings, seo.
-- `siteSettings` (singleton) — brand (`brand` object: name/prefix/suffix/logo),
-  description, tagline, defaultSeo.
-- `settings_navigation` (singleton) — items (links).
-- `settings_footer` (singleton) — social links.
+- `siteSettings` (singleton) — `titleField` (read-only, fixed value), brand
+  (`brand` object: name/prefix/suffix/logo), description, tagline, defaultSeo.
+- `settings_navigation` (singleton) — `titleField` (read-only, fixed value),
+  items (links).
+- `settings_footer` (singleton) — `titleField` (read-only, fixed value),
+  social links.
+
+**Reusable `titleField` helper** (`schema-types/helpers/title-field.ts`) —
+`titleField({ initialValue?, readOnly?, description?, max? })` returns a
+required `defineField({ name: 'title', type: 'string', … })`. Singletons pass
+a fixed `initialValue` + `readOnly: true` (this — not `preview.prepare` or the
+desk `S.document().title()`, which only labels the list item — is what fixes
+the document form showing "Untitled"). Content/module documents pass `max`
+for an editable headline.
 
 **Objects** — `link` (unified internal/external, `LINK_TYPE` const),
 `socialLink`, `brand`, `imageWithAlt` (required alt), `seo` + `openGraph`,
@@ -145,11 +226,17 @@ incrementally (#251): `settings_navigation` and `settings_footer` are done;
 
 - `defineType`/`defineField`/`defineArrayMember` everywhere; validation
   `rule.required()` on every field the frontend assumes; images get
-  `hotspot: true` + required alt.
+  `hotspot: true` + required alt. Every schema definition is a **named
+  export** (`{localName}Schema`) — never `export default defineType`.
 - Enum-ish stored values come from `@blog/config` constants — **both key and
-  value UPPERCASE** (`LINK_TYPE.INTERNAL === 'INTERNAL'`), `as const`; schema
-  `options.list` and migrations use the same constant.
-- Singletons enforced through desk structure.
+  value UPPERCASE** (`LINK_TYPE.INTERNAL === 'INTERNAL'`,
+  `HERO_FIELD_MODE.CUSTOM === 'CUSTOM'`), `as const`; schema `options.list` and
+  migrations use the same constant.
+- Singletons enforced through desk structure; Studio also groups a top-level
+  **Modules** section with one browsable list per module type (Heroes, Post
+  Lists, Content, CTAs).
+- No migration was needed for the modules-as-documents redesign — datasets
+  were recreated clean before this model shipped.
 
 ## 7. Environment & configuration
 
