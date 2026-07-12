@@ -98,6 +98,12 @@ prompt — do not write it to disk first.
   Migrations against `production` are human-gated like `sanity deploy`.
 - Verify with `pnpm type-check`, `pnpm lint`, `pnpm test`, `pnpm build` from root.
 - Conventional commits, one concern per PR.
+- **Prefer per-layer PRs.** Split a multi-layer feature into separate PRs per
+  layer (`cms → service → ui → web`, dependency order) so each review stays small
+  and focused. **Split only when each layer's PR merges to `main` green on its
+  own** (typically additive changes). Keep it a single PR when a partial merge
+  would break the build — e.g. renaming a shared `_type` or generated type that
+  downstream consumes reds `type-check` until every layer lands.
 - **Spec sync:** any PR that changes architecture, layer contracts, env vars,
   or the content model updates `SPEC.md` in the same PR.
 - `.claude/skills/` is canonical; `.agents/skills/` mirrors it for other
