@@ -1,15 +1,12 @@
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { Hero, LinkButton, PostsSection } from '@blog/ui';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 
 import { HomePageTemplate } from '@/components/home-page-template/home-page-template';
-import { SanityImage } from '@/components/sanity-image/sanity-image';
-import { SmartLink } from '@/components/smart-link/smart-link';
-import { formatDate } from '@/utils/format-date';
+import { HeroModule } from '@/modules/hero/hero-module';
+import { ModuleRenderer } from '@/modules/module-renderer';
 
 type TProps = {
   params: Promise<ILocalizedParams>;
@@ -70,72 +67,12 @@ export default async function HomePage({ params }: TProps) {
     notFound();
   }
 
-  const { hero, latestPosts, latestPostsTitle } = result.data;
-
-  const posts = latestPosts.map((post) => ({
-    id: post.id,
-    href: `/blog/${post.slug}`,
-    title: post.title,
-    excerpt: post.excerpt,
-    publishedAt: post.publishedAt,
-    formattedDate: formatDate(post.publishedAt, locale),
-    categories: post.categories,
-  }));
+  const { hero, modules } = result.data;
 
   return (
     <HomePageTemplate
-      hero={
-        <Hero
-          eyebrow={hero.eyebrow}
-          title={hero.title}
-          titleId="home-hero-title"
-          excerpt={hero.subtitle}
-        >
-          {(hero.primaryAction || hero.secondaryAction) && (
-            <Hero.Cta>
-              {hero.primaryAction && (
-                <LinkButton
-                  as={SmartLink}
-                  href={hero.primaryAction.href}
-                  target={hero.primaryAction.target}
-                >
-                  {hero.primaryAction.label}
-                </LinkButton>
-              )}
-              {hero.secondaryAction && (
-                <LinkButton
-                  as={SmartLink}
-                  href={hero.secondaryAction.href}
-                  target={hero.secondaryAction.target}
-                  variant="link"
-                >
-                  {hero.secondaryAction.label}
-                </LinkButton>
-              )}
-            </Hero.Cta>
-          )}
-
-          {hero.sanityImage && (
-            <Hero.Media key="media">
-              <SanityImage
-                image={hero.sanityImage}
-                width={1200}
-                height={900}
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                className="size-full object-cover"
-              />
-            </Hero.Media>
-          )}
-        </Hero>
-      }
-      latestPosts={
-        <PostsSection
-          posts={posts}
-          title={latestPostsTitle}
-          titleId="latest-posts-title"
-          linkAs={Link}
-        />
-      }
+      hero={<HeroModule id={hero.id} locale={locale} />}
+      modules={<ModuleRenderer modules={modules} locale={locale} />}
     />
   );
 }
