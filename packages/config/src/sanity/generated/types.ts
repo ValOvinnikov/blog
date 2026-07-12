@@ -27,18 +27,18 @@ export type Module_cta = {
   action?: Link;
 };
 
-export type PostReference = {
+export type Blog_postReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'post';
+  [internalGroqTypeReferenceTo]?: 'blog_post';
 };
 
-export type CategoryReference = {
+export type Blog_categoryReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'category';
+  [internalGroqTypeReferenceTo]?: 'blog_category';
 };
 
 export type Page_genericReference = {
@@ -52,7 +52,8 @@ export type Link = {
   _type: 'link';
   label?: string;
   linkType?: 'INTERNAL' | 'EXTERNAL';
-  internalReference?: PostReference | CategoryReference | Page_genericReference;
+  internalReference?:
+    Blog_postReference | Blog_categoryReference | Page_genericReference;
   url?: string;
   openInNewTab?: boolean;
   platform?:
@@ -75,10 +76,10 @@ export type Module_content = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  body?: PortableText;
+  body?: RichText;
 };
 
-export type PortableText = Array<
+export type RichText = Array<
   | {
       children?: Array<{
         marks?: Array<string>;
@@ -206,9 +207,9 @@ export type Settings_navigation = {
   >;
 };
 
-export type SiteSettings = {
+export type Settings_site = {
   _id: string;
-  _type: 'siteSettings';
+  _type: 'settings_site';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -266,7 +267,7 @@ export type Module_hero = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  featuredPost?: PostReference;
+  featuredPost?: Blog_postReference;
   heroEyebrowMode?: 'POST_CATEGORY' | 'CUSTOM';
   heroEyebrow?: string;
   heroTitleMode?: 'POST_TITLE' | 'CUSTOM';
@@ -311,9 +312,9 @@ export type Slug = {
   source?: string;
 };
 
-export type Category = {
+export type Blog_category = {
   _id: string;
-  _type: 'category';
+  _type: 'blog_category';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -322,16 +323,16 @@ export type Category = {
   description?: string;
 };
 
-export type AuthorReference = {
+export type Blog_authorReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'author';
+  [internalGroqTypeReferenceTo]?: 'blog_author';
 };
 
-export type Post = {
+export type Blog_post = {
   _id: string;
-  _type: 'post';
+  _type: 'blog_post';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -339,21 +340,21 @@ export type Post = {
   slug?: Slug;
   excerpt?: string;
   mainImage?: ImageWithAlt;
-  author?: AuthorReference;
+  author?: Blog_authorReference;
   categories?: Array<
     {
       _key: string;
-    } & CategoryReference
+    } & Blog_categoryReference
   >;
   publishedAt?: string;
-  body?: PortableText;
+  body?: RichText;
   featured?: boolean;
   seo?: Seo;
 };
 
-export type Author = {
+export type Blog_author = {
   _id: string;
-  _type: 'author';
+  _type: 'blog_author';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -492,12 +493,12 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | Module_cta
-  | PostReference
-  | CategoryReference
+  | Blog_postReference
+  | Blog_categoryReference
   | Page_genericReference
   | Link
   | Module_content
-  | PortableText
+  | RichText
   | Module_postList
   | Brand
   | Seo
@@ -508,7 +509,7 @@ export type AllSanitySchemaTypes =
   | ImageWithAlt
   | Settings_footer
   | Settings_navigation
-  | SiteSettings
+  | Settings_site
   | Module_heroReference
   | Module_postListReference
   | Module_ctaReference
@@ -517,10 +518,10 @@ export type AllSanitySchemaTypes =
   | Module_contentReference
   | Page_generic
   | Slug
-  | Category
-  | AuthorReference
-  | Post
-  | Author
+  | Blog_category
+  | Blog_authorReference
+  | Blog_post
+  | Blog_author
   | SanityImageCrop
   | SanityImageHotspot
   | Code
