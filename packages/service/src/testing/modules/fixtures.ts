@@ -1,6 +1,7 @@
 import { HERO_FIELD_MODE } from '@blog/config';
 
 import type { TRawHeroModule } from '#/features/modules/hero/adaptor/transformer';
+import type { TRawPostListModule } from '#/features/modules/post-list/adaptor/transformer';
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
@@ -18,6 +19,16 @@ export function makeRawHeroModule(
     heroImageAsset: null,
     primaryActionLabel: null,
     secondaryAction: null,
+    ...overrides,
+  };
+}
+
+export function makeRawPostListModule(
+  overrides: Partial<TRawPostListModule> = {},
+): TRawPostListModule {
+  return {
+    title: 'Latest',
+    limit: 6,
     ...overrides,
   };
 }
