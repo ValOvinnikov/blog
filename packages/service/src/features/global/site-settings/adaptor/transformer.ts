@@ -1,6 +1,5 @@
+import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import type { InferResultType } from 'groqd';
-
-import { buildImageUrl } from '#/shared/transformers/build-image-url';
 
 import type { siteSettingsQuery } from './query';
 import type { TSiteSettings } from './types';

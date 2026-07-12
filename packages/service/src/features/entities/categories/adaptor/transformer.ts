@@ -1,6 +1,5 @@
+import { toCategory } from '@blog/service/shared/transformers/to-category';
 import type { InferResultType } from 'groqd';
-
-import { toCategory } from '#/shared/transformers/to-category';
 
 import type { categoriesQuery } from './query';
 import type { TCategoriesList } from './types';

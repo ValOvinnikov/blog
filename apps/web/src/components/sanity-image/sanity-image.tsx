@@ -3,9 +3,8 @@
 // `sanity-image` uses `useState` internally (LQIP blur-up), so this bridge
 // must be a Client Component boundary when rendered from Server Components.
 import type { ISanityImage } from '@blog/config';
+import { env } from '@web/utils/env/env';
 import { SanityImage as SanityImageBase } from 'sanity-image';
-
-import { env } from '@/utils/env/env';
 
 export interface ISanityImageProps {
   image: ISanityImage;

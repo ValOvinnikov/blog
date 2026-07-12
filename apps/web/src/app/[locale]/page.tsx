@@ -1,12 +1,11 @@
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
+import { HomePageTemplate } from '@web/components/home-page-template/home-page-template';
+import { HeroModule } from '@web/modules/hero/hero-module';
+import { ModuleRenderer } from '@web/modules/module-renderer';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
-
-import { HomePageTemplate } from '@/components/home-page-template/home-page-template';
-import { HeroModule } from '@/modules/hero/hero-module';
-import { ModuleRenderer } from '@/modules/module-renderer';
 
 type TProps = {
   params: Promise<ILocalizedParams>;

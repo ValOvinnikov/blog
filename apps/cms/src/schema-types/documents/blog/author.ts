@@ -1,9 +1,8 @@
+import { blockTextSchema } from '@cms/schema-types/objects/block-text';
+import { imageWithAltSchema } from '@cms/schema-types/objects/image-with-alt';
+import { socialLinkSchema } from '@cms/schema-types/objects/social-link';
 import { UserRound } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
-
-import { blockTextSchema } from '../../objects/block-text';
-import { imageWithAltSchema } from '../../objects/image-with-alt';
-import { socialLinkSchema } from '../../objects/social-link';
 
 export const authorSchema = defineType({
   name: 'blog_author',

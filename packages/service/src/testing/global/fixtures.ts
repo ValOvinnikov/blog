@@ -1,7 +1,7 @@
-import type { TRawFooter } from '#/features/global/footer/adaptor/transformer';
-import type { TRawNavigation } from '#/features/global/navigation/adaptor/transformer';
-import type { TRawSiteSettings } from '#/features/global/site-settings/adaptor/transformer';
-import { makeRawImage } from '#/testing/shared/fixtures';
+import type { TRawFooter } from '@blog/service/features/global/footer/adaptor/transformer';
+import type { TRawNavigation } from '@blog/service/features/global/navigation/adaptor/transformer';
+import type { TRawSiteSettings } from '@blog/service/features/global/site-settings/adaptor/transformer';
+import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 
 export function makeRawSiteSettings(
   overrides: Partial<TRawSiteSettings> = {},

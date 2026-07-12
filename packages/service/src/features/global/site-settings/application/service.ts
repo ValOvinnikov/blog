@@ -1,6 +1,5 @@
+import { getSiteSettings } from '@blog/service/features/global/site-settings/adaptor/loader';
 import { safeAsync } from '@blog/utils';
-
-import { getSiteSettings } from '../adaptor/loader';
 
 export function createSiteSettingsService() {
   return {

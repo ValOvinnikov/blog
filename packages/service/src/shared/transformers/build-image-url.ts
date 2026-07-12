@@ -1,8 +1,7 @@
+import { urlForImage } from '@blog/service/sanity/image';
+import type { imageWithAltFragment } from '@blog/service/shared/fragments/image';
 import type { SanityImageSource } from '@sanity/image-url';
 import type { InferFragmentType } from 'groqd';
-
-import { urlForImage } from '#/sanity/image';
-import type { imageWithAltFragment } from '#/shared/fragments/image';
 
 type TRawImage = InferFragmentType<typeof imageWithAltFragment>;
 

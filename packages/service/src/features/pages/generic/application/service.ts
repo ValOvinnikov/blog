@@ -1,6 +1,5 @@
+import { getPage } from '@blog/service/features/pages/generic/adaptor/loader';
 import { safeAsync } from '@blog/utils';
-
-import { getPage } from '../adaptor/loader';
 
 export function createGenericPageService() {
   return {

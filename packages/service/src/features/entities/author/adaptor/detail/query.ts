@@ -1,5 +1,5 @@
-import { q } from '#/sanity/query';
-import { authorDetailFragment } from '#/shared/fragments/author';
+import { q } from '@blog/service/sanity/query';
+import { authorDetailFragment } from '@blog/service/shared/fragments/author';
 
 export const authorQuery = q
   .parameters<{ slug: string }>()

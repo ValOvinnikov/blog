@@ -1,6 +1,5 @@
+import { getFooter } from '@blog/service/features/global/footer/adaptor/loader';
 import { safeAsync } from '@blog/utils';
-
-import { getFooter } from '../adaptor/loader';
 
 export function createFooterService() {
   return {

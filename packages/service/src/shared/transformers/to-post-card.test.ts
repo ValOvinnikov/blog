@@ -1,10 +1,9 @@
+import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import { describe, expect, it, vi } from 'vitest';
-
-import { makeRawPostCard } from '#/testing/pages/fixtures';
 
 import { toPostCard } from './to-post-card';
 
-vi.mock('#/sanity/image', () => ({
+vi.mock('@blog/service/sanity/image', () => ({
   urlForImage: vi.fn(
     () => 'https://cdn.sanity.io/images/proj/dataset/img-800x600.jpg',
   ),

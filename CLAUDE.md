@@ -70,6 +70,19 @@ prompt — do not write it to disk first.
   Exceptions: root-level config files required by their tool (`sanity.config.ts`,
   `sanity.cli.ts`, `next.config.ts`, `vitest.config.ts`, etc.) stay at the
   package root.
+- **Absolute imports via per-workspace aliases.** Internal imports use the
+  workspace's **own name** as the alias — `@blog/{pkg}/*` for packages
+  (`@blog/config`, `@blog/service`, `@blog/ui`), `@{app}/*` for apps
+  (`@web/*`, `@cms/*`). Same-directory `./` stays relative; **never**
+  parent-traversal `../`, and **never** a shared `#/`/`@/` (a shared prefix
+  hijacks a dependency's identically-named alias across packages, and breaks
+  the Turbopack build / cross-package type-check). Each workspace's
+  `tsconfig.json` `paths` **and** `vitest.config.ts` alias declare its own
+  alias **plus each dependency's** alias (e.g. `web` maps `@web`, `@blog/ui`,
+  `@blog/service`, `@blog/config`). **When a workspace starts consuming a new
+  package, add that dependency's alias to the consumer's `tsconfig` + `vitest`**
+  — otherwise type-check/test/build fail. Unique per-workspace prefixes resolve
+  cleanly in tsc (`Bundler`), Next/Turbopack, Sanity's esbuild extract, and vitest.
 - TypeScript `strict`; no `any`. Server Components by default.
 - **Key/value-pair consts are always both UPPERCASE** (key === uppercase value),
   `as const`, and live in `@blog/config` (`constants/`). e.g.

@@ -1,11 +1,10 @@
 import { HERO_FIELD_MODE } from '@blog/config/constants';
+import { postSchema } from '@cms/schema-types/documents/blog/post';
+import { defineModeFieldPair } from '@cms/schema-types/helpers/define-mode-field-pair';
+import { titleField } from '@cms/schema-types/helpers/title-field';
+import { linkSchema } from '@cms/schema-types/objects/link';
 import { Sparkles } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
-
-import { postSchema } from '../documents/blog/post';
-import { defineModeFieldPair } from '../helpers/define-mode-field-pair';
-import { titleField } from '../helpers/title-field';
-import { linkSchema } from '../objects/link';
 
 export const heroSchema = defineType({
   name: 'module_hero',

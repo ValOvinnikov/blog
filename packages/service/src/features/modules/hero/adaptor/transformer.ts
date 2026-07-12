@@ -1,10 +1,9 @@
 import { HERO_FIELD_MODE } from '@blog/config';
+import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
+import { toLink } from '@blog/service/shared/transformers/to-link';
+import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
+import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { InferResultType } from 'groqd';
-
-import { buildImageUrl } from '#/shared/transformers/build-image-url';
-import { toLink } from '#/shared/transformers/to-link';
-import { toPostCard } from '#/shared/transformers/to-post-card';
-import { toSanityImage } from '#/shared/transformers/to-sanity-image';
 
 import type { heroFallbackFeaturedPostQuery } from './featured-post.query';
 import type { heroModuleQuery } from './query';

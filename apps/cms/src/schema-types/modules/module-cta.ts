@@ -1,8 +1,7 @@
+import { titleField } from '@cms/schema-types/helpers/title-field';
+import { linkSchema } from '@cms/schema-types/objects/link';
 import { Megaphone } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
-
-import { titleField } from '../helpers/title-field';
-import { linkSchema } from '../objects/link';
 
 export const ctaSchema = defineType({
   name: 'module_cta',

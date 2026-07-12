@@ -1,10 +1,10 @@
-import { q } from '#/sanity/query';
+import { q } from '@blog/service/sanity/query';
 import {
   imageWithAltFragment,
   sanityImageFragment,
-} from '#/shared/fragments/image';
-import { linkFragment } from '#/shared/fragments/link';
-import { postCardFragment } from '#/shared/fragments/post';
+} from '@blog/service/shared/fragments/image';
+import { linkFragment } from '@blog/service/shared/fragments/link';
+import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 export const heroModuleQuery = q
   .parameters<{ id: string }>()

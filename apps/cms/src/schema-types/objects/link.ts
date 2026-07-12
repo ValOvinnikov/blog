@@ -1,9 +1,8 @@
 import { SOCIAL_PLATFORMS, TLINK_TYPE } from '@blog/config/constants';
+import { categorySchema } from '@cms/schema-types/documents/blog/category';
+import { postSchema } from '@cms/schema-types/documents/blog/post';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
-
-import { categorySchema } from '../documents/blog/category';
-import { postSchema } from '../documents/blog/post';
 
 type TLinkParent = {
   linkType?: string;

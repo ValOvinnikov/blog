@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '../constants';
+import type { TLocaleIsoCode } from '@blog/config/constants';
 
 export interface IWithDataTestId {
   dataTestId?: string;

@@ -1,7 +1,6 @@
+import { toModuleRef } from '@blog/service/shared/transformers/to-module-ref';
+import { toSeoMeta } from '@blog/service/shared/transformers/to-seo-meta';
 import type { InferResultType } from 'groqd';
-
-import { toModuleRef } from '#/shared/transformers/to-module-ref';
-import { toSeoMeta } from '#/shared/transformers/to-seo-meta';
 
 import type { homePageQuery } from './query';
 import type { THomePage } from './types';

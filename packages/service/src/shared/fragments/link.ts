@@ -1,4 +1,4 @@
-import { q } from '#/sanity/query';
+import { q } from '@blog/service/sanity/query';
 
 export const linkFragment = q.fragmentForType<'link'>().project((sub) => ({
   label: sub.field('label').notNull(),

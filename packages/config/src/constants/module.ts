@@ -1,5 +1,5 @@
-import type { AllSanitySchemaTypes } from '../sanity/generated/types';
-import type { TValueOf } from '../utils';
+import type { AllSanitySchemaTypes } from '@blog/config/sanity/generated/types';
+import type { TValueOf } from '@blog/config/utils';
 
 /**
  * Union of every module document `_type`, derived from the generated Sanity

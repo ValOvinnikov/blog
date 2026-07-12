@@ -1,6 +1,5 @@
+import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { InferResultType } from 'groqd';
-
-import { toPostCard } from '#/shared/transformers/to-post-card';
 
 import type { postListModulePostsQuery } from './posts.query';
 import type { postListModuleQuery } from './query';

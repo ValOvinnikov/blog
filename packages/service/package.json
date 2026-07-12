@@ -6,9 +6,6 @@
   "exports": {
     ".": "./src/index.ts"
   },
-  "imports": {
-    "#/*": "./src/*"
-  },
   "scripts": {
     "lint": "eslint .",
     "type-check": "tsc --noEmit",

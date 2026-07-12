@@ -4,9 +4,8 @@ import type {
   ISanityImageDimensions,
   ISanityImageHotspot,
 } from '@blog/config';
+import type { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import type { InferFragmentType } from 'groqd';
-
-import type { sanityImageFragment } from '#/shared/fragments/image';
 
 export type TRawSanityImage = InferFragmentType<typeof sanityImageFragment>;
 

@@ -1,6 +1,5 @@
+import { getContent } from '@blog/service/features/modules/content/adaptor/loader';
 import { safeAsync } from '@blog/utils';
-
-import { getContent } from '../adaptor/loader';
 
 export function createContentModuleService() {
   return {

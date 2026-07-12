@@ -1,7 +1,6 @@
 import { TLINK_TYPE, type ILink } from '@blog/config';
+import type { linkFragment } from '@blog/service/shared/fragments/link';
 import type { InferFragmentType } from 'groqd';
-
-import type { linkFragment } from '#/shared/fragments/link';
 
 export type TRawLink = InferFragmentType<typeof linkFragment>;
 

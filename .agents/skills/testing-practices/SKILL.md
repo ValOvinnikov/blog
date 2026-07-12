@@ -19,8 +19,8 @@ components, **jsdom** for the DOM environment. Shared config lives in
   `Button.tsx` → `Button.test.tsx`, `transformer.ts` → `transformer.test.ts`.
 - Service fixtures live in `packages/service/src/testing/`, mirroring the
   domain tree. Each exports a `make*` factory returning a raw (`TRaw*`) shape
-  with a `Partial<…>` overrides param. Import via the `#/` alias:
-  `import { makeRawPostCard } from '#/testing/pages/fixtures'`.
+  with a `Partial<…>` overrides param. Import via the workspace alias:
+  `import { makeRawPostCard } from '@blog/service/testing/pages/fixtures'`.
 - Run from root: `pnpm test` (all), or `pnpm --filter @blog/ui test`.
   Watch mode: `pnpm test:watch`.
 
@@ -37,6 +37,13 @@ components, **jsdom** for the DOM environment. Shared config lives in
   `environment: "jsdom"` + `setupFiles: ["./vitest.setup.ts"]`, where the setup
   file does `import "@testing-library/jest-dom/vitest";`.
 - **service** (`node`): merge the preset with `environment: "node"`. No DOM.
+- **Import aliases in tests.** Each `vitest.config.ts` `resolve.alias` must map
+  the workspace's own alias **and every dependency's** alias (e.g. service's
+  vitest maps `@blog/service/*` → its `src` and `@blog/config/*` → config's
+  `src`). Vitest doesn't read `tsconfig` `paths`, so a missing dependency alias
+  makes cross-package imports — and `vi.mock` of an aliased module — fail. Add a
+  new dependency's alias here whenever a package starts importing it in tests.
+  See CLAUDE.md → Conventions (per-workspace aliases).
 
 ```ts
 // vitest.config.ts (ui / web)

@@ -1,6 +1,5 @@
+import type { categoryFragment } from '@blog/service/shared/fragments/category';
 import type { InferFragmentType } from 'groqd';
-
-import type { categoryFragment } from '#/shared/fragments/category';
 
 export type TRawCategory = InferFragmentType<typeof categoryFragment>;
 

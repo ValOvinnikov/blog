@@ -1,5 +1,5 @@
-import { q } from '#/sanity/query';
-import { categoryFragment } from '#/shared/fragments/category';
+import { q } from '@blog/service/sanity/query';
+import { categoryFragment } from '@blog/service/shared/fragments/category';
 
 export const categoryPageCategoryQuery = q
   .parameters<{ slug: string }>()

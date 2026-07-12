@@ -1,13 +1,12 @@
+import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
+import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 import { describe, expect, it, vi } from 'vitest';
-
-import { makeRawSiteSettings } from '#/testing/global/fixtures';
-import { mockRun } from '#/testing/mock-run-query';
-import { makeRawImage } from '#/testing/shared/fixtures';
 
 import { getSiteSettings } from './loader';
 
-vi.mock('#/sanity/query', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('#/sanity/query')>()),
+vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
 

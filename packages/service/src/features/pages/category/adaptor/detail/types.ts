@@ -1,5 +1,5 @@
-import type { TCategory } from '#/shared/transformers/to-category';
-import type { TPostCard } from '#/shared/transformers/to-post-card';
+import type { TCategory } from '@blog/service/shared/transformers/to-category';
+import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 
 export type TCategoryPage = {
   category: TCategory;

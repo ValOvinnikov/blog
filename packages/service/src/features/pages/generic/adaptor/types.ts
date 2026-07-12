@@ -1,5 +1,5 @@
-import type { TModuleRef } from '#/shared/transformers/to-module-ref';
-import type { TSeoMeta } from '#/shared/transformers/to-seo-meta';
+import type { TModuleRef } from '@blog/service/shared/transformers/to-module-ref';
+import type { TSeoMeta } from '@blog/service/shared/transformers/to-seo-meta';
 
 export type TGenericPage = {
   title: string;

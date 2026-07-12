@@ -1,6 +1,5 @@
 import type { BlockText } from '@blog/config';
-
-import type { TSocialLink } from '#/shared/transformers/to-social-link';
+import type { TSocialLink } from '@blog/service/shared/transformers/to-social-link';
 
 export type TAuthorDetail = {
   id: string;

@@ -1,4 +1,4 @@
-import type { TValueOf } from '../utils';
+import type { TValueOf } from '@blog/config/utils';
 
 export const Size = {
   XS: 'XS',

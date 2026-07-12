@@ -1,4 +1,4 @@
-import { isr, runQuery } from '#/sanity/query';
+import { isr, runQuery } from '@blog/service/sanity/query';
 
 import { postParamsQuery } from './query';
 

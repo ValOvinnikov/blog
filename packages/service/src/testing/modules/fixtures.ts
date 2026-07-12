@@ -1,9 +1,8 @@
 import { HERO_FIELD_MODE, TLINK_TYPE } from '@blog/config';
-
-import type { TRawContentModule } from '#/features/modules/content/adaptor/transformer';
-import type { TRawCtaModule } from '#/features/modules/cta/adaptor/transformer';
-import type { TRawHeroModule } from '#/features/modules/hero/adaptor/transformer';
-import type { TRawPostListModule } from '#/features/modules/post-list/adaptor/transformer';
+import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
+import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
+import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
+import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},

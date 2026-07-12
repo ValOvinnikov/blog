@@ -1,3 +1,3 @@
-import type { TCategory } from '#/shared/transformers/to-category';
+import type { TCategory } from '@blog/service/shared/transformers/to-category';
 
 export type TCategoriesList = TCategory[];
