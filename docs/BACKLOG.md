@@ -12,6 +12,54 @@
 > (existing #85–94) → M2 (hardening) → M3 (differentiators)**. Deployment
 > deliberately precedes Phase 3 — every later feature needs a live URL and env
 > plumbing to be testable.
+>
+> **Status 2026-07-12:** M0/M1 tickets are filed and on the board (numbers
+> annotated per ticket below). GitHub milestones mirror these sections
+> (M0 — Housekeeping, M1 — Deployment, Phase 3 — Blog core, M2 — Hardening,
+> CMS restructure P4–P6; legacy Phase 0–2 milestones closed). **M0.3 (#270)
+> is In Progress — the starting point.**
+
+## Roadmap
+
+```mermaid
+flowchart LR
+  subgraph DONE["✅ Done · Phases 0–2"]
+    F[Foundation · Content core<br/>Design system · Home page]
+  end
+  subgraph INFLIGHT["🔧 In flight"]
+    PR262["PR #262 modules P5<br/>fix per review, merge"]
+    P6["#251 group_name naming P6"]
+  end
+  subgraph M0["M0 Housekeeping"]
+    M03["#270 turbo outputs + .nvmrc ◀ NOW"]
+    M02["#267 skills-drift CI guard"]
+    M01["#269 board reconciliation"]
+  end
+  subgraph M1["M1 Deployment"]
+    M11["#271 D0 accounts/tokens"]
+    M12["#272 D1 Studio + CORS closes #9"]
+    M13["#273 D2 web on Vercel"]
+    M14["#274 D3 revalidation closes #93"]
+    M16["#261 D5 migration automation"]
+  end
+  subgraph P3["Phase 3 Blog core"]
+    P3a["#75–#94, #123<br/>blog/post/category routes,<br/>feeds, JSON-LD, UI · seed #12"]
+  end
+  subgraph M2["M2 Hardening"]
+    M21["#275 D4 launch hardening"]
+    M22["draft preview · Storybook CI<br/>Lighthouse · #264 migration tests"]
+  end
+  subgraph M3["M3 Differentiators"]
+    M33["Reading depth ◀ SPEC'D + PLANNED<br/>specs + plans 2026-07-12"]
+    M31["agent-native MCP · semantic search<br/>publish-time AI · voice assistant"]
+  end
+  DONE --> INFLIGHT --> M0 --> M1 --> P3 --> M2 --> M3
+  M14 -.->|webhook plumbing| M33
+  P3a -.->|post route 76/90| M33
+```
+
+Parked outside the flow: #13 (db layer — deferred until the engagement phase
+begins).
 
 ---
 
@@ -19,6 +67,7 @@
 
 ### M0.1 · `chore(board): reconcile Phase-3 umbrella issues with granular issues`
 
+- **Filed:** #269
 - **Labels:** `tooling`
 - **Body:** #75–#78 (page-level umbrellas) overlap #85–#94 (granular
   per-component issues) — e.g. #78 duplicates #92 + #93 almost entirely, #76
@@ -32,6 +81,7 @@
 
 ### M0.2 · `chore(repo): single canonical skills dir + guard against drift`
 
+- **Filed:** #267
 - **Labels:** `tooling`
 - **Body:** `.claude/skills/` and `.agents/skills/` are duplicated and have
   drifted before (now re-synced; `.claude/skills/` is canonical, per
@@ -43,6 +93,7 @@
 
 ### M0.3 · `chore(turbo): fix stale typegen outputs + add .nvmrc`
 
+- **Filed:** #270 (In Progress — current work item)
 - **Labels:** `tooling`, `layer:config`
 - **Body:** `turbo.json`'s `typegen` task declares
   `outputs: ["src/sanity.types.ts"]`, but typegen writes
@@ -55,6 +106,7 @@
 
 ### M0.4 · `docs: keep #13 parked (db layer) — not spec drift`
 
+- **Filed:** ✅ done — clarifying comment posted on #13 (2026-07-12); no new issue needed
 - **Labels:** `documentation`
 - **Body:** Correction to an earlier assumption: #13 is **not** a general
   spec-drift ticket (that drift was fixed by the SPEC rewrite PR). It tracks
@@ -72,6 +124,7 @@
 
 ### M1.1 · `chore(deploy): D0 — accounts, tokens, domains`
 
+- **Filed:** #271
 - **Depends on:** nothing (human-driven; agent prepares the checklist)
 - **Body:** Prereqs for first deploy. Confirm Vercel account + GitHub repo
   connection. In manage.sanity.io: confirm `production` dataset; mint a
@@ -82,6 +135,7 @@
 
 ### M1.2 · `chore(deploy): D1 — deploy Sanity Studio + CORS (closes #9)`
 
+- **Filed:** #272
 - **Depends on:** M1.1
 - **Body:** From `apps/cms` with `SANITY_STUDIO_PROJECT_ID`/`_DATASET` set:
   `pnpm deploy` (human runs it — agents never deploy). Then add CORS origins
@@ -92,6 +146,7 @@
 
 ### M1.3 · `chore(deploy): D2 — web app on Vercel`
 
+- **Filed:** #273
 - **Depends on:** M1.1
 - **Body:** New Vercel project: Root Directory `apps/web` (include files
   outside root), Node 22, env vars for Production + Preview
@@ -107,6 +162,7 @@ link` for remote caching.
 
 ### M1.4 · `feat(web): D3 — ISR revalidation webhook (closes #93)`
 
+- **Filed:** #274
 - **Labels:** also `layer:web`
 - **Depends on:** M1.3
 - **Body:** `app/api/revalidate/route.ts` verifying
@@ -119,6 +175,7 @@ link` for remote caching.
 
 ### M1.5 · `chore(deploy): D4 — launch hardening`
 
+- **Filed:** #275
 - **Depends on:** M1.4 + Phase-3 routes (#85–94)
 - **Body:** Flip `NEXT_PUBLIC_SITE_URL` to the final domain; verify
   sitemap/robots/RSS (#92) and JSON-LD (#94) against the live URL; OG-image
@@ -130,6 +187,7 @@ link` for remote caching.
 
 ### M1.6 · `chore(cms): D5 — automated migration deploys (extends #261)`
 
+- **Filed:** ✅ #261 (pre-existing) — dependency comment posted 2026-07-12
 - **Depends on:** M1.3 (Vercel auto-deploys now exist)
 - **Body:** Implement the design in
   `docs/superpowers/specs/2026-07-10-migration-deployment-automation-design.md`:
@@ -204,7 +262,12 @@ scope the idea, not the design.
 - **Acceptance:** publishing a post populates summary/takeaways fields within
   a minute; human can edit/reject them; no AI calls on the reader hot path.
 
-### M3.3 · `feat: choose-your-depth reading`
+### M3.3 · `feat: choose-your-depth reading` — **SPEC'D + PLANNED** (flagship)
+
+> Design: `docs/superpowers/specs/2026-07-12-reading-depth-design.md` ·
+> Plan: `docs/superpowers/plans/2026-07-12-reading-depth-plan.md`.
+> File the implementation issue from the spec when its prerequisites clear
+> (post route #76/#90; pipeline additionally #273/#274).
 
 - **Labels:** `layer:cms`, `layer:service`, `layer:ui`, `layer:web`
 - **Depends on:** #250 (modules[] page-builder), M3.2 (generated summaries)
