@@ -137,7 +137,11 @@ jobs:
           SANITY_AUTH_TOKEN: ${{ env.SANITY_READ_TOKEN }}
         run: |
           set -euo pipefail
+          shopt -s nullglob
           for dir in migrations/*/; do
+            # Only dirs holding a migration — skips backups/ and any non-migration
+            # folder, and is a no-op when there are zero migrations.
+            [ -f "${dir}index.ts" ] || continue
             id="$(basename "${dir}")"
             echo "::group::dry-run ${id}"
             # Dry mode is the default — computes the diff, never writes.

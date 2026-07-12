@@ -28,10 +28,11 @@ apps/cms/migrations/
   README.md          # this file
 ```
 
-`rename-author-role-to-job-title/index.ts` in this directory is an
-**illustrative template**, not a real migration — read its header comment
-before copying it. It shows the `defineMigration` / `at` / `set` / `unset`
-API shape from `sanity/migrate` applied to a document-type field rename.
+This directory currently holds **no migrations** — the datasets were recreated
+clean, so the previously-applied transforms were removed. The tooling stays.
+`migrate:new` scaffolds a new `<slug>/index.ts` from a built-in template (see
+the `template()` in `scripts/migrate.mjs`), which shows the `defineMigration` /
+`at` / `set` / `unset` API shape from `sanity/migrate`.
 
 ## Workflow
 
