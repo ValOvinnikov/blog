@@ -1,6 +1,7 @@
-import { HERO_FIELD_MODE } from '@blog/config';
+import { HERO_FIELD_MODE, TLINK_TYPE } from '@blog/config';
 
 import type { TRawContentModule } from '#/features/modules/content/adaptor/transformer';
+import type { TRawCtaModule } from '#/features/modules/cta/adaptor/transformer';
 import type { TRawHeroModule } from '#/features/modules/hero/adaptor/transformer';
 import type { TRawPostListModule } from '#/features/modules/post-list/adaptor/transformer';
 
@@ -47,6 +48,24 @@ export function makeRawContentModule(
         children: [{ _type: 'span', _key: 'span-1', text: 'Hello.' }],
       },
     ],
+    ...overrides,
+  };
+}
+
+export function makeRawCtaModule(
+  overrides: Partial<TRawCtaModule> = {},
+): TRawCtaModule {
+  return {
+    heading: 'Subscribe to the newsletter',
+    text: 'Get new posts in your inbox.',
+    action: {
+      label: 'Subscribe',
+      linkType: TLINK_TYPE.EXTERNAL,
+      url: '/newsletter',
+      internalReference: null,
+      openInNewTab: null,
+      platform: null,
+    },
     ...overrides,
   };
 }
