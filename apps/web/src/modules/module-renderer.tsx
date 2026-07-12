@@ -1,0 +1,44 @@
+import type { TModuleRef } from '@blog/service';
+import { Fragment, type ReactNode } from 'react';
+
+import { MODULE_MAP } from './module-map';
+
+export interface IModuleRendererProps {
+  modules: TModuleRef[];
+  locale: string;
+}
+
+/**
+ * ModuleRenderer — maps each thin `TModuleRef` (from a page's `modules[]`)
+ * to its registered per-module Server Component and renders it, keyed by
+ * the module's stable `_key`. Unknown module types render nothing and log a
+ * warning rather than failing the whole page.
+ */
+export async function ModuleRenderer({
+  modules,
+  locale,
+}: IModuleRendererProps): Promise<ReactNode> {
+  const rendered = await Promise.all(
+    modules.map(async (module) => {
+      const Component = MODULE_MAP[module.type];
+
+      if (!Component) {
+        console.warn(`ModuleRenderer: unknown module type "${module.type}"`);
+        return null;
+      }
+
+      return {
+        key: module.key,
+        node: await Component({ id: module.id, locale }),
+      };
+    }),
+  );
+
+  return (
+    <>
+      {rendered.map((entry) =>
+        entry ? <Fragment key={entry.key}>{entry.node}</Fragment> : null,
+      )}
+    </>
+  );
+}
