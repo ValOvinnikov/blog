@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-export default defineType({
+export const brandSchema = defineType({
   name: 'brand',
   title: 'Brand',
   type: 'object',

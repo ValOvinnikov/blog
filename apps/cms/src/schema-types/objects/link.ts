@@ -9,7 +9,7 @@ type TLinkParent = {
 const isLinkType = (parent: unknown, linkType: string) =>
   (parent as TLinkParent | undefined)?.linkType === linkType;
 
-export default defineType({
+export const linkSchema = defineType({
   name: 'link',
   title: 'Link',
   type: 'object',
@@ -43,7 +43,11 @@ export default defineType({
       name: 'internalReference',
       title: 'Internal Document',
       type: 'reference',
-      to: [{ type: 'post' }, { type: 'category' }, { type: 'page_generic' }],
+      to: [
+        { type: 'blog_post' },
+        { type: 'blog_category' },
+        { type: 'page_generic' },
+      ],
       hidden: ({ parent }) => !isLinkType(parent, TLINK_TYPE.INTERNAL),
       validation: (rule) =>
         rule.custom((value, context) => {

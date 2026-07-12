@@ -1,8 +1,8 @@
 import { Tags } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
-export default defineType({
-  name: 'category',
+export const categorySchema = defineType({
+  name: 'blog_category',
   title: 'Category',
   type: 'document',
   icon: Tags,

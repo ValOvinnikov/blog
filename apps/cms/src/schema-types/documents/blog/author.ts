@@ -1,8 +1,8 @@
 import { UserRound } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
-export default defineType({
-  name: 'author',
+export const authorSchema = defineType({
+  name: 'blog_author',
   title: 'Author',
   type: 'document',
   icon: UserRound,

@@ -1,8 +1,8 @@
 import { Newspaper } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
-export default defineType({
-  name: 'post',
+export const postSchema = defineType({
+  name: 'blog_post',
   title: 'Post',
   type: 'document',
   icon: Newspaper,
@@ -46,7 +46,7 @@ export default defineType({
       title: 'Author',
       type: 'reference',
       description: 'The person who wrote this post.',
-      to: [{ type: 'author' }],
+      to: [{ type: 'blog_author' }],
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -57,7 +57,7 @@ export default defineType({
       of: [
         defineArrayMember({
           type: 'reference',
-          to: [{ type: 'category' }],
+          to: [{ type: 'blog_category' }],
         }),
       ],
       validation: (rule) => rule.required(),
@@ -72,7 +72,7 @@ export default defineType({
     defineField({
       name: 'body',
       title: 'Body',
-      type: 'portableText',
+      type: 'richText',
       description:
         'Full post content — supports rich text, images, and code blocks.',
       validation: (rule) => rule.required(),

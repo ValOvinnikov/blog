@@ -14,7 +14,7 @@ export const contentSchema = defineType({
     defineField({
       name: 'body',
       title: 'Body',
-      type: 'portableText',
+      type: 'richText',
       description:
         'Page content — supports rich text, images, and code blocks.',
       validation: (rule) => rule.required(),

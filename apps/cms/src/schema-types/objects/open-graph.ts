@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-export default defineType({
+export const openGraphSchema = defineType({
   name: 'openGraph',
   title: 'Open Graph',
   type: 'object',
