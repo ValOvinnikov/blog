@@ -1,2 +1,6 @@
-// Phase 4: page-builder module types (page_hero, page_cta, etc.) will be added here.
-export const modules: never[] = [];
+import { contentSchema } from './module-content';
+import { ctaSchema } from './module-cta';
+import { heroSchema } from './module-hero';
+import { postListSchema } from './module-post-list';
+
+export const modules = [heroSchema, postListSchema, contentSchema, ctaSchema];
