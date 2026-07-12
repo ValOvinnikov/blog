@@ -1,5 +1,7 @@
 import { defineField, defineType } from 'sanity';
 
+import { imageWithAltSchema } from './image-with-alt';
+
 export const brandSchema = defineType({
   name: 'brand',
   title: 'Brand',
@@ -31,7 +33,7 @@ export const brandSchema = defineType({
     defineField({
       name: 'logo',
       title: 'Logo',
-      type: 'imageWithAlt',
+      type: imageWithAltSchema.name,
       description: 'Site logo. SVG or high-res PNG recommended.',
       validation: (rule) => rule.required(),
     }),

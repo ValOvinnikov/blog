@@ -1,5 +1,7 @@
 import { defineField, defineType } from 'sanity';
 
+import { openGraphSchema } from './open-graph';
+
 export const seoSchema = defineType({
   name: 'seo',
   title: 'SEO',
@@ -25,7 +27,7 @@ export const seoSchema = defineType({
     defineField({
       name: 'openGraph',
       title: 'Open Graph',
-      type: 'openGraph',
+      type: openGraphSchema.name,
       description: 'Social-sharing overrides (title, description, image).',
     }),
   ],

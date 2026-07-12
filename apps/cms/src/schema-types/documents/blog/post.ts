@@ -1,6 +1,13 @@
 import { Newspaper } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
+import { imageWithAltSchema } from '../../objects/image-with-alt';
+import { richTextSchema } from '../../objects/rich-text';
+import { seoSchema } from '../../objects/seo';
+
+import { authorSchema } from './author';
+import { categorySchema } from './category';
+
 export const postSchema = defineType({
   name: 'blog_post',
   title: 'Post',
@@ -36,7 +43,7 @@ export const postSchema = defineType({
     defineField({
       name: 'mainImage',
       title: 'Main Image',
-      type: 'imageWithAlt',
+      type: imageWithAltSchema.name,
       description:
         'Hero image shown at the top of the post and in social shares.',
       validation: (rule) => rule.required(),
@@ -46,7 +53,7 @@ export const postSchema = defineType({
       title: 'Author',
       type: 'reference',
       description: 'The person who wrote this post.',
-      to: [{ type: 'blog_author' }],
+      to: [{ type: authorSchema.name }],
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -57,7 +64,7 @@ export const postSchema = defineType({
       of: [
         defineArrayMember({
           type: 'reference',
-          to: [{ type: 'blog_category' }],
+          to: [{ type: categorySchema.name }],
         }),
       ],
       validation: (rule) => rule.required(),
@@ -72,7 +79,7 @@ export const postSchema = defineType({
     defineField({
       name: 'body',
       title: 'Body',
-      type: 'richText',
+      type: richTextSchema.name,
       description:
         'Full post content — supports rich text, images, and code blocks.',
       validation: (rule) => rule.required(),
@@ -86,7 +93,7 @@ export const postSchema = defineType({
     defineField({
       name: 'seo',
       title: 'SEO',
-      type: 'seo',
+      type: seoSchema.name,
       description:
         'Override meta title, description, and OG image for search engines.',
     }),

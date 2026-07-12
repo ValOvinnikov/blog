@@ -1,4 +1,3 @@
-import { MODULE_TYPE } from '@blog/config/constants';
 import { codeInput } from '@sanity/code-input';
 import { visionTool } from '@sanity/vision';
 import {
@@ -21,6 +20,18 @@ import { structureTool } from 'sanity/structure';
 
 import { requireEnv } from './sanity-env';
 import { schemaTypes } from './src/schema-types';
+import { authorSchema } from './src/schema-types/documents/blog/author';
+import { categorySchema } from './src/schema-types/documents/blog/category';
+import { postSchema } from './src/schema-types/documents/blog/post';
+import { homePageSchema } from './src/schema-types/documents/pages/home-page';
+import { genericSchema } from './src/schema-types/documents/pages/page';
+import { footerSchema } from './src/schema-types/documents/settings/footer';
+import { navigationSchema } from './src/schema-types/documents/settings/navigation';
+import { siteSchema } from './src/schema-types/documents/settings/site-settings';
+import { contentSchema } from './src/schema-types/modules/module-content';
+import { ctaSchema } from './src/schema-types/modules/module-cta';
+import { heroSchema } from './src/schema-types/modules/module-hero';
+import { postListSchema } from './src/schema-types/modules/module-post-list';
 
 export default defineConfig({
   name: 'default',
@@ -53,14 +64,14 @@ export default defineConfig({
                   .items([
                     S.listItem()
                       .title('Home Page')
-                      .id('page_home')
+                      .id(homePageSchema.name)
                       .icon(House)
                       .child(
                         S.document()
-                          .schemaType('page_home')
-                          .documentId('page_home'),
+                          .schemaType(homePageSchema.name)
+                          .documentId(homePageSchema.name),
                       ),
-                    S.documentTypeListItem('page_generic')
+                    S.documentTypeListItem(genericSchema.name)
                       .title('Generic Pages')
                       .icon(FileText),
                   ]),
@@ -73,16 +84,16 @@ export default defineConfig({
                 S.list()
                   .title('Modules')
                   .items([
-                    S.documentTypeListItem(MODULE_TYPE.HERO)
+                    S.documentTypeListItem(heroSchema.name)
                       .title('Heroes')
                       .icon(Sparkles),
-                    S.documentTypeListItem(MODULE_TYPE.POST_LIST)
+                    S.documentTypeListItem(postListSchema.name)
                       .title('Post Lists')
                       .icon(List),
-                    S.documentTypeListItem(MODULE_TYPE.CONTENT)
+                    S.documentTypeListItem(contentSchema.name)
                       .title('Content')
                       .icon(FileText),
-                    S.documentTypeListItem(MODULE_TYPE.CTA)
+                    S.documentTypeListItem(ctaSchema.name)
                       .title('CTAs')
                       .icon(Megaphone),
                   ]),
@@ -95,13 +106,13 @@ export default defineConfig({
                 S.list()
                   .title('Blog')
                   .items([
-                    S.documentTypeListItem('blog_post')
+                    S.documentTypeListItem(postSchema.name)
                       .title('Posts')
                       .icon(Newspaper),
-                    S.documentTypeListItem('blog_category')
+                    S.documentTypeListItem(categorySchema.name)
                       .title('Categories')
                       .icon(Tags),
-                    S.documentTypeListItem('blog_author')
+                    S.documentTypeListItem(authorSchema.name)
                       .title('Authors')
                       .icon(UserRound),
                   ]),
@@ -117,30 +128,30 @@ export default defineConfig({
                   .items([
                     S.listItem()
                       .title('Site Settings')
-                      .id('settings_site')
+                      .id(siteSchema.name)
                       .icon(Settings)
                       .child(
                         S.document()
-                          .schemaType('settings_site')
-                          .documentId('settings_site'),
+                          .schemaType(siteSchema.name)
+                          .documentId(siteSchema.name),
                       ),
                     S.listItem()
                       .title('Navigation')
-                      .id('settings_navigation')
+                      .id(navigationSchema.name)
                       .icon(Menu)
                       .child(
                         S.document()
-                          .schemaType('settings_navigation')
-                          .documentId('settings_navigation'),
+                          .schemaType(navigationSchema.name)
+                          .documentId(navigationSchema.name),
                       ),
                     S.listItem()
                       .title('Footer')
-                      .id('settings_footer')
+                      .id(footerSchema.name)
                       .icon(PanelBottom)
                       .child(
                         S.document()
-                          .schemaType('settings_footer')
-                          .documentId('settings_footer'),
+                          .schemaType(footerSchema.name)
+                          .documentId(footerSchema.name),
                       ),
                   ]),
               ),

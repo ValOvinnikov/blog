@@ -2,6 +2,7 @@ import { Menu } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
 import { titleField } from '../../helpers/title-field';
+import { linkSchema } from '../../objects/link';
 
 export const navigationSchema = defineType({
   name: 'settings_navigation',
@@ -16,7 +17,7 @@ export const navigationSchema = defineType({
       title: 'Header Links',
       type: 'array',
       description: 'Top-level nav links rendered in the site header.',
-      of: [defineArrayMember({ type: 'link' })],
+      of: [defineArrayMember({ type: linkSchema.name })],
     }),
   ],
 });

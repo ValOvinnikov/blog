@@ -1,6 +1,10 @@
 import { UserRound } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
+import { blockTextSchema } from '../../objects/block-text';
+import { imageWithAltSchema } from '../../objects/image-with-alt';
+import { socialLinkSchema } from '../../objects/social-link';
+
 export const authorSchema = defineType({
   name: 'blog_author',
   title: 'Author',
@@ -29,14 +33,14 @@ export const authorSchema = defineType({
     defineField({
       name: 'image',
       title: 'Image',
-      type: 'imageWithAlt',
+      type: imageWithAltSchema.name,
       description: 'Avatar shown on posts and the author profile page.',
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'bio',
       title: 'Bio',
-      type: 'blockText',
+      type: blockTextSchema.name,
       description: 'Short biography displayed on the author page.',
     }),
     defineField({
@@ -52,7 +56,7 @@ export const authorSchema = defineType({
       title: 'Social Links',
       type: 'array',
       description: 'Links to social profiles shown on the author page.',
-      of: [defineArrayMember({ type: 'socialLink' })],
+      of: [defineArrayMember({ type: socialLinkSchema.name })],
     }),
   ],
   preview: {

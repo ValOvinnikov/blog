@@ -2,6 +2,8 @@ import { Settings } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 import { titleField } from '../../helpers/title-field';
+import { brandSchema } from '../../objects/brand';
+import { openGraphSchema } from '../../objects/open-graph';
 
 export const siteSchema = defineType({
   name: 'settings_site',
@@ -20,7 +22,7 @@ export const siteSchema = defineType({
     defineField({
       name: 'brand',
       title: 'Brand',
-      type: 'brand',
+      type: brandSchema.name,
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -40,7 +42,7 @@ export const siteSchema = defineType({
     defineField({
       name: 'defaultSeo',
       title: 'Default Social Sharing',
-      type: 'openGraph',
+      type: openGraphSchema.name,
       description:
         'Fallback title/description/image used when a page has no own OG values.',
       validation: (rule) =>

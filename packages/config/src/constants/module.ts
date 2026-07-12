@@ -1,13 +1,15 @@
+import type { AllSanitySchemaTypes } from '../sanity/generated/types';
 import type { TValueOf } from '../utils';
 
-export const MODULE_TYPE = {
-  HERO: 'module_hero',
-  POST_LIST: 'module_postList',
-  CONTENT: 'module_content',
-  CTA: 'module_cta',
-} as const;
-
-export type TModuleType = TValueOf<typeof MODULE_TYPE>;
+/**
+ * Union of every module document `_type`, derived from the generated Sanity
+ * types rather than hand-maintained — the schema's own `name:` field is the
+ * single source of truth for these values (see `apps/cms/src/schema-types/modules`).
+ */
+export type TModuleType = Extract<
+  AllSanitySchemaTypes,
+  { _type: `module_${string}` }
+>['_type'];
 
 /**
  * Source-mode values for the hero module's mode/custom field pairs
