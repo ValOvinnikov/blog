@@ -1,11 +1,10 @@
-import { MODULE_TYPE } from '@blog/config/constants';
 import { List } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 import { titleField } from '../helpers/title-field';
 
 export const postListSchema = defineType({
-  name: MODULE_TYPE.POST_LIST,
+  name: 'module_postList',
   title: 'Post List',
   type: 'document',
   icon: List,

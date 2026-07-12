@@ -2,6 +2,9 @@ import { SOCIAL_PLATFORMS, TLINK_TYPE } from '@blog/config/constants';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
+import { categorySchema } from '../documents/blog/category';
+import { postSchema } from '../documents/blog/post';
+
 type TLinkParent = {
   linkType?: string;
 };
@@ -44,8 +47,13 @@ export const linkSchema = defineType({
       title: 'Internal Document',
       type: 'reference',
       to: [
-        { type: 'blog_post' },
-        { type: 'blog_category' },
+        { type: postSchema.name },
+        { type: categorySchema.name },
+        // Not `genericSchema.name`: importing documents/pages/page.ts here
+        // would close a real circular import (page.ts -> module-cta.ts ->
+        // this file, since the CTA module has a `link` field). page_generic
+        // is genericSchema's own `name:` literal — see cms-schema-practices
+        // on schema's-own-name literals being the source of truth.
         { type: 'page_generic' },
       ],
       hidden: ({ parent }) => !isLinkType(parent, TLINK_TYPE.INTERNAL),

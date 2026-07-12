@@ -1,12 +1,14 @@
-import { HERO_FIELD_MODE, MODULE_TYPE } from '@blog/config/constants';
+import { HERO_FIELD_MODE } from '@blog/config/constants';
 import { Sparkles } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
+import { postSchema } from '../documents/blog/post';
 import { defineModeFieldPair } from '../helpers/define-mode-field-pair';
 import { titleField } from '../helpers/title-field';
+import { linkSchema } from '../objects/link';
 
 export const heroSchema = defineType({
-  name: MODULE_TYPE.HERO,
+  name: 'module_hero',
   title: 'Hero',
   type: 'document',
   icon: Sparkles,
@@ -18,7 +20,7 @@ export const heroSchema = defineType({
       type: 'reference',
       description:
         'Post featured in this hero. If empty, the newest post marked Featured is used.',
-      to: [{ type: 'blog_post' }],
+      to: [{ type: postSchema.name }],
       validation: (rule) =>
         rule
           .custom((value) =>
@@ -83,7 +85,7 @@ export const heroSchema = defineType({
     defineField({
       name: 'secondaryAction',
       title: 'Secondary Action',
-      type: 'link',
+      type: linkSchema.name,
       description: 'Optional secondary CTA shown next to the primary action.',
     }),
   ],

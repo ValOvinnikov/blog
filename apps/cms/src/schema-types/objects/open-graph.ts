@@ -1,5 +1,7 @@
 import { defineField, defineType } from 'sanity';
 
+import { imageWithAltSchema } from './image-with-alt';
+
 export const openGraphSchema = defineType({
   name: 'openGraph',
   title: 'Open Graph',
@@ -24,7 +26,7 @@ export const openGraphSchema = defineType({
     defineField({
       name: 'ogImage',
       title: 'OG Image',
-      type: 'imageWithAlt',
+      type: imageWithAltSchema.name,
       description:
         'Image shown when shared on social media. Recommended size: 1200×630 px.',
     }),

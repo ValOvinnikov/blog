@@ -1,11 +1,11 @@
-import { MODULE_TYPE } from '@blog/config/constants';
 import { Megaphone } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 import { titleField } from '../helpers/title-field';
+import { linkSchema } from '../objects/link';
 
 export const ctaSchema = defineType({
-  name: MODULE_TYPE.CTA,
+  name: 'module_cta',
   title: 'Call to Action',
   type: 'document',
   icon: Megaphone,
@@ -25,7 +25,7 @@ export const ctaSchema = defineType({
     defineField({
       name: 'action',
       title: 'Action',
-      type: 'link',
+      type: linkSchema.name,
       validation: (rule) => rule.required(),
     }),
   ],

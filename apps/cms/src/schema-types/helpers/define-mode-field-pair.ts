@@ -1,6 +1,8 @@
 import { HERO_FIELD_MODE, type THeroFieldMode } from '@blog/config/constants';
 import { defineField } from 'sanity';
 
+import { imageWithAltSchema } from '../objects/image-with-alt';
+
 /** Parent shape shared by any object using mode/custom field pairs (e.g. `module_hero`). */
 export type TModeFieldPairParent = Record<string, THeroFieldMode | undefined>;
 
@@ -57,7 +59,7 @@ export const defineModeFieldPair = ({
         ? defineField({
             name,
             title: `Custom ${title}`,
-            type: 'imageWithAlt',
+            type: imageWithAltSchema.name,
             hidden,
             validation: (rule) => rule.custom(requiredWhenCustom),
           })

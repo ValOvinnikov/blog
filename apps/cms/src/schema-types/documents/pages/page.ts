@@ -1,9 +1,11 @@
-import { MODULE_TYPE } from '@blog/config/constants';
 import { FileText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 import { defineModulesField } from '../../helpers/define-modules-field';
 import { titleField } from '../../helpers/title-field';
+import { contentSchema } from '../../modules/module-content';
+import { ctaSchema } from '../../modules/module-cta';
+import { seoSchema } from '../../objects/seo';
 
 export const genericSchema = defineType({
   name: 'page_generic',
@@ -24,12 +26,12 @@ export const genericSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     defineModulesField({
-      allow: [MODULE_TYPE.CONTENT, MODULE_TYPE.CTA],
+      allow: [contentSchema.name, ctaSchema.name],
     }),
     defineField({
       name: 'seo',
       title: 'SEO',
-      type: 'seo',
+      type: seoSchema.name,
       description:
         'Override meta title, description, and OG image for search engines.',
     }),

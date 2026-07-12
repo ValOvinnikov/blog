@@ -1,9 +1,12 @@
-import { MODULE_TYPE } from '@blog/config/constants';
 import { House } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 import { defineModulesField } from '../../helpers/define-modules-field';
 import { titleField } from '../../helpers/title-field';
+import { ctaSchema } from '../../modules/module-cta';
+import { heroSchema } from '../../modules/module-hero';
+import { postListSchema } from '../../modules/module-post-list';
+import { seoSchema } from '../../objects/seo';
 
 export const homePageSchema = defineType({
   name: 'page_home',
@@ -28,16 +31,16 @@ export const homePageSchema = defineType({
       title: 'Hero',
       type: 'reference',
       description: 'The hero module rendered at the top of the home page.',
-      to: [{ type: MODULE_TYPE.HERO }],
+      to: [{ type: heroSchema.name }],
       validation: (rule) => rule.required(),
     }),
     defineModulesField({
-      allow: [MODULE_TYPE.POST_LIST, MODULE_TYPE.CTA],
+      allow: [postListSchema.name, ctaSchema.name],
     }),
     defineField({
       name: 'seo',
       title: 'SEO',
-      type: 'seo',
+      type: seoSchema.name,
       description:
         'Override Home page meta title, description, and social sharing image.',
     }),
