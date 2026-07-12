@@ -10,7 +10,7 @@ export const footerSchema = defineType({
   icon: PanelBottom,
   preview: { select: { title: 'title' } },
   fields: [
-    titleField({ initialValue: 'Footer', readOnly: true }),
+    titleField(),
     defineField({
       name: 'social',
       title: 'Social Links',

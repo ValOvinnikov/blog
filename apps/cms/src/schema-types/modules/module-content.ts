@@ -10,7 +10,7 @@ export const contentSchema = defineType({
   type: 'document',
   icon: FileText,
   fields: [
-    titleField({ max: 120 }),
+    titleField(),
     defineField({
       name: 'body',
       title: 'Body',

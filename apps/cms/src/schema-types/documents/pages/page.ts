@@ -11,7 +11,7 @@ export const genericSchema = defineType({
   type: 'document',
   icon: FileText,
   fields: [
-    titleField({ max: 120, description: 'Page headline / H1' }),
+    titleField({ description: 'Page headline / H1' }),
     defineField({
       name: 'slug',
       title: 'Slug',

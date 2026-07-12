@@ -8,15 +8,16 @@ import type { TPostListModule } from './types';
 
 export type TRawPostListModule = InferResultType<typeof postListModuleQuery>;
 export type TRawPostListModulePosts = InferResultType<
-  typeof postListModulePostsQuery
+  ReturnType<typeof postListModulePostsQuery>
 >;
 
 export function toPostListModule(
   raw: TRawPostListModule,
   rawPosts: TRawPostListModulePosts,
 ): TPostListModule {
+  // The posts query already applied `limit` in GROQ, so no JS slice here.
   return {
     title: raw.title,
-    posts: rawPosts.slice(0, raw.limit).map(toPostCard),
+    posts: rawPosts.map(toPostCard),
   };
 }

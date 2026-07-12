@@ -16,7 +16,7 @@ export const siteSchema = defineType({
     }),
   },
   fields: [
-    titleField({ initialValue: 'Site Settings', readOnly: true }),
+    titleField(),
     defineField({
       name: 'brand',
       title: 'Brand',

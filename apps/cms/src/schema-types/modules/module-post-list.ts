@@ -10,7 +10,7 @@ export const postListSchema = defineType({
   type: 'document',
   icon: List,
   fields: [
-    titleField({ max: 120, description: 'Display heading for this list.' }),
+    titleField({ description: 'Display heading for this list.' }),
     defineField({
       name: 'limit',
       title: 'Limit',

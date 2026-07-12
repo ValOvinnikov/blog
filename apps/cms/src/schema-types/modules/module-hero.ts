@@ -11,7 +11,7 @@ export const heroSchema = defineType({
   type: 'document',
   icon: Sparkles,
   fields: [
-    titleField({ max: 120 }),
+    titleField(),
     defineField({
       name: 'featuredPost',
       title: 'Featured Post',

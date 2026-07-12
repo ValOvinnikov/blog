@@ -1,7 +1,7 @@
 import author from './blog/author';
 import category from './blog/category';
 import post from './blog/post';
-import { homeSchema } from './pages/home-page';
+import { homePageSchema } from './pages/home-page';
 import { genericSchema } from './pages/page';
 import { footerSchema } from './settings/footer';
 import { navigationSchema } from './settings/navigation';
@@ -12,7 +12,7 @@ export const documents = [
   author,
   category,
   genericSchema,
-  homeSchema,
+  homePageSchema,
   siteSchema,
   navigationSchema,
   footerSchema,

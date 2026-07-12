@@ -1,4 +1,8 @@
-import { defineField } from 'sanity';
+import { defineField, type StringDefinition, type StringRule } from 'sanity';
+
+type TTitleFieldOptions = Partial<
+  Pick<StringDefinition, 'description' | 'initialValue' | 'readOnly'>
+>;
 
 /**
  * Reusable internal `title` field shared by every document type. Singletons
@@ -6,19 +10,12 @@ import { defineField } from 'sanity';
  * resolves to a real value instead of "Untitled"; content documents pass
  * `max` for an editable headline length cap.
  */
-export const titleField = (options?: {
-  initialValue?: string;
-  readOnly?: boolean;
-  description?: string;
-  max?: number;
-}) =>
+export const titleField = (options: TTitleFieldOptions = {}) =>
   defineField({
     name: 'title',
     title: 'Title',
     type: 'string',
-    description: options?.description,
-    initialValue: options?.initialValue,
-    readOnly: options?.readOnly ?? false,
-    validation: (rule) =>
-      options?.max ? rule.required().max(options.max) : rule.required(),
+    description: 'The main title / headline for this document.',
+    validation: (rule: StringRule) => rule.required(),
+    ...options,
   });

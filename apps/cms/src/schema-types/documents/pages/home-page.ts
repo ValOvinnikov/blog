@@ -5,7 +5,7 @@ import { defineField, defineType } from 'sanity';
 import { defineModulesField } from '../../helpers/define-modules-field';
 import { titleField } from '../../helpers/title-field';
 
-export const homeSchema = defineType({
+export const homePageSchema = defineType({
   name: 'page_home',
   title: 'Home Page',
   type: 'document',
@@ -22,7 +22,7 @@ export const homeSchema = defineType({
     },
   },
   fields: [
-    titleField({ initialValue: 'Home Page', readOnly: true }),
+    titleField(),
     defineField({
       name: 'hero',
       title: 'Hero',

@@ -10,7 +10,7 @@ export const ctaSchema = defineType({
   type: 'document',
   icon: Megaphone,
   fields: [
-    titleField({ max: 120 }),
+    titleField(),
     defineField({
       name: 'heading',
       title: 'Heading',

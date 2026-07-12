@@ -10,7 +10,7 @@ export const navigationSchema = defineType({
   icon: Menu,
   preview: { select: { title: 'title' } },
   fields: [
-    titleField({ initialValue: 'Navigation', readOnly: true }),
+    titleField(),
     defineField({
       name: 'items',
       title: 'Header Links',
