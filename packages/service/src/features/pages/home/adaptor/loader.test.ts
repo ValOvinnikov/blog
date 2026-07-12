@@ -1,4 +1,3 @@
-import { MODULE_TYPE } from '@blog/config';
 import { describe, expect, it, vi } from 'vitest';
 
 import { mockRun } from '#/testing/mock-run-query';
@@ -21,11 +20,11 @@ describe('getHomePage', () => {
     expect(page.hero).toEqual({
       key: 'hero-ref',
       id: 'hero-1',
-      type: MODULE_TYPE.HERO,
+      type: 'module_hero',
     });
     expect(page.modules).toEqual([
-      { key: 'module-1', id: 'post-list-1', type: MODULE_TYPE.POST_LIST },
-      { key: 'module-2', id: 'cta-1', type: MODULE_TYPE.CTA },
+      { key: 'module-1', id: 'post-list-1', type: 'module_postList' },
+      { key: 'module-2', id: 'cta-1', type: 'module_cta' },
     ]);
     expect(page.seo).toBeUndefined();
   });

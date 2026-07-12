@@ -1,4 +1,3 @@
-import { MODULE_TYPE } from '@blog/config';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -6,10 +5,10 @@ import { ModuleRenderer } from './module-renderer';
 
 vi.mock('./module-map', () => ({
   MODULE_MAP: {
-    [MODULE_TYPE.HERO]: undefined,
-    [MODULE_TYPE.POST_LIST]: undefined,
-    [MODULE_TYPE.CONTENT]: undefined,
-    [MODULE_TYPE.CTA]: ({ id }: { id: string; locale: string }) => (
+    module_hero: undefined,
+    module_postList: undefined,
+    module_content: undefined,
+    module_cta: ({ id }: { id: string; locale: string }) => (
       <div data-testid="stub-cta">{id}</div>
     ),
   },
@@ -18,7 +17,7 @@ vi.mock('./module-map', () => ({
 describe('ModuleRenderer', () => {
   it('renders the mapped component for a known module type with its id', async () => {
     const ui = await ModuleRenderer({
-      modules: [{ key: 'cta-1', type: MODULE_TYPE.CTA, id: 'cta-doc-id' }],
+      modules: [{ key: 'cta-1', type: 'module_cta', id: 'cta-doc-id' }],
       locale: 'en',
     });
 

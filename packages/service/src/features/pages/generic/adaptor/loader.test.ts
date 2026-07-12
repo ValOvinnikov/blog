@@ -1,4 +1,3 @@
-import { MODULE_TYPE } from '@blog/config';
 import { describe, expect, it, vi } from 'vitest';
 
 import { mockRun } from '#/testing/mock-run-query';
@@ -20,8 +19,8 @@ describe('getPage', () => {
     expect(page.title).toBe('About');
     expect(page.slug).toBe('about');
     expect(page.modules).toEqual([
-      { key: 'module-1', id: 'content-1', type: MODULE_TYPE.CONTENT },
-      { key: 'module-2', id: 'cta-1', type: MODULE_TYPE.CTA },
+      { key: 'module-1', id: 'content-1', type: 'module_content' },
+      { key: 'module-2', id: 'cta-1', type: 'module_cta' },
     ]);
     expect(page.seo).toBeUndefined();
   });
