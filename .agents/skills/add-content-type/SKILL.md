@@ -53,6 +53,11 @@ Build in dependency order. Never skip a layer; never reverse the arrows.
   versioned facade (`service.<domain>.<feature>.v1.*`).
 - Return types derive from the generated types in `@blog/config` (or
   `InferResultType`/`InferFragmentType`); no `any`. **No React import.**
+- **Imports use the workspace alias** (`@blog/service/*` here, `@web/*` in web,
+  `@cms/*` in cms, …), never parent-traversal `../` — see CLAUDE.md →
+  Conventions. If a layer starts importing a package it didn't before, add that
+  dependency's alias to the consumer's `tsconfig` `paths` **and**
+  `vitest.config.ts` alias, or type-check/test/build will fail.
 - ISR via `runQuery(query, { parameters, ...isr('tag') })`.
 - Add a co-located `*.test.ts` (node env) mocking the client.
 
