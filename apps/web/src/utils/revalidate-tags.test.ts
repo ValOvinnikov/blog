@@ -22,9 +22,9 @@ describe('getRevalidateTagsForType', () => {
     expect(getRevalidateTagsForType('nope', 'x')).toEqual([]);
   });
 
-  // Security: the type comes from the webhook body. A Map lookup must not fall
-  // through to Object.prototype for keys like these (CodeQL
-  // js/unvalidated-dynamic-method-call).
+  // Security: the type comes from the webhook body. The `switch` must return no
+  // tags for these prototype/method names — never dispatch to an inherited
+  // function (CodeQL js/unvalidated-dynamic-method-call).
   it.each(['constructor', 'toString', '__proto__', 'hasOwnProperty'])(
     'returns no tags (and does not throw) for the prototype key %s',
     (type) => {

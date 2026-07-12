@@ -1,41 +1,49 @@
 /**
- * Maps a Sanity document `_type` to the ISR tags that must be revalidated
- * when a document of that type is published/unpublished.
+ * Resolves the ISR tags affected by a change to a Sanity document of the given
+ * `_type`, for the revalidation webhook. Unknown types resolve to an empty list.
  *
- * Backed by a `Map` (not a plain object) so a user-controlled `_type` from the
- * webhook body can only ever match an explicitly-registered entry — an object
- * lookup would fall through to `Object.prototype` for keys like `constructor`
- * or `toString` and dispatch to an unexpected function.
+ * A `switch` (rather than a lookup table of functions) is deliberate: the
+ * `type` comes from the webhook body, so selecting **and invoking** a function
+ * by that value is a user-controlled dynamic dispatch (CodeQL
+ * `js/unvalidated-dynamic-method-call`). Static `case` branches have no such
+ * dispatch.
  *
- * The tag strings here are the exact literals passed to `isr(...)` in
- * `@blog/service` loaders — they predate a `{group}_{name}` rename of
- * document `_type`s, so a handful of tags don't match their document's
- * current `_type` (e.g. the `page_home` document invalidates the `homePage`
- * tag). Keep this table in sync with `packages/service/src` if either side changes.
- */
-const REVALIDATE_TAGS_BY_TYPE = new Map<string, (id: string) => string[]>([
-  ['blog_post', () => ['post', 'posts', 'homePage']],
-  ['blog_author', () => ['author', 'posts']],
-  ['blog_category', () => ['category', 'categories', 'posts']],
-  ['settings_site', () => ['site-settings']],
-  ['settings_navigation', () => ['navigation']],
-  ['settings_footer', () => ['footer']],
-  ['page_home', () => ['homePage']],
-  ['page_generic', () => ['page_generic']],
-  ['module_hero', (id) => ['modules:hero', `module:${id}`]],
-  ['module_postList', (id) => ['modules:postList', `module:${id}`]],
-  ['module_content', (id) => ['modules:content', `module:${id}`]],
-  ['module_cta', (id) => ['modules:cta', `module:${id}`]],
-]);
-
-/**
- * Resolves the ISR tags affected by a change to a document of the given
- * `_type`. Unknown types resolve to an empty list.
+ * The tag strings are the exact literals passed to `isr(...)` in `@blog/service`
+ * loaders — they predate a `{group}_{name}` rename of document `_type`s, so a
+ * few tags don't match their document's current `_type` (e.g. the `page_home`
+ * document invalidates the `homePage` tag). Keep in sync with
+ * `packages/service/src` if either side changes.
  *
  * @example
  * getRevalidateTagsForType('blog_post', 'post-123') // ['post', 'posts', 'homePage']
  */
 export function getRevalidateTagsForType(type: string, id: string): string[] {
-  const resolveTags = REVALIDATE_TAGS_BY_TYPE.get(type);
-  return resolveTags ? resolveTags(id) : [];
+  switch (type) {
+    case 'blog_post':
+      return ['post', 'posts', 'homePage'];
+    case 'blog_author':
+      return ['author', 'posts'];
+    case 'blog_category':
+      return ['category', 'categories', 'posts'];
+    case 'settings_site':
+      return ['site-settings'];
+    case 'settings_navigation':
+      return ['navigation'];
+    case 'settings_footer':
+      return ['footer'];
+    case 'page_home':
+      return ['homePage'];
+    case 'page_generic':
+      return ['page_generic'];
+    case 'module_hero':
+      return ['modules:hero', `module:${id}`];
+    case 'module_postList':
+      return ['modules:postList', `module:${id}`];
+    case 'module_content':
+      return ['modules:content', `module:${id}`];
+    case 'module_cta':
+      return ['modules:cta', `module:${id}`];
+    default:
+      return [];
+  }
 }
