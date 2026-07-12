@@ -1,4 +1,4 @@
-import { q } from '#/sanity/query';
+import { q } from '@blog/service/sanity/query';
 
 export const categoryFragment = q
   .fragmentForType<'blog_category'>()

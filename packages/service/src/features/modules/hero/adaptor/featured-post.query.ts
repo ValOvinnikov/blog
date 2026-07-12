@@ -1,5 +1,5 @@
-import { q } from '#/sanity/query';
-import { postCardFragment } from '#/shared/fragments/post';
+import { q } from '@blog/service/sanity/query';
+import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 // Fallback when the hero module has no `featuredPost` configured: newest
 // post marked `featured`.

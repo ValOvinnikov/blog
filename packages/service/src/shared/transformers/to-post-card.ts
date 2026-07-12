@@ -1,9 +1,8 @@
 import type { ISanityImage } from '@blog/config';
+import type { postCardFragment } from '@blog/service/shared/fragments/post';
+import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
+import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { InferFragmentType } from 'groqd';
-
-import type { postCardFragment } from '#/shared/fragments/post';
-import { buildImageUrl } from '#/shared/transformers/build-image-url';
-import { toSanityImage } from '#/shared/transformers/to-sanity-image';
 
 export type TRawPostCard = InferFragmentType<typeof postCardFragment>;
 

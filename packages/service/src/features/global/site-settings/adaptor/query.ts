@@ -1,6 +1,6 @@
-import { q } from '#/sanity/query';
-import { imageWithAltFragment } from '#/shared/fragments/image';
-import { openGraphFragment } from '#/shared/fragments/open-graph';
+import { q } from '@blog/service/sanity/query';
+import { imageWithAltFragment } from '@blog/service/shared/fragments/image';
+import { openGraphFragment } from '@blog/service/shared/fragments/open-graph';
 
 export const siteSettingsQuery = q.star
   .filterByType('settings_site')

@@ -1,4 +1,4 @@
-import { isr, runQuery } from '#/sanity/query';
+import { isr, runQuery } from '@blog/service/sanity/query';
 
 import { heroFallbackFeaturedPostQuery } from './featured-post.query';
 import { heroModuleQuery } from './query';

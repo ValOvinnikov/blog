@@ -1,7 +1,6 @@
+import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
+import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import { describe, expect, it } from 'vitest';
-
-import { makeRawPostListModule } from '#/testing/modules/fixtures';
-import { makeRawPostCard } from '#/testing/pages/fixtures';
 
 import { toPostListModule } from './transformer';
 

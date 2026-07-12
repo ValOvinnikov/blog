@@ -1,7 +1,6 @@
 import type { TModuleType } from '@blog/config';
-
-import { q } from '#/sanity/query';
-import { seoFragment } from '#/shared/fragments/seo';
+import { q } from '@blog/service/sanity/query';
+import { seoFragment } from '@blog/service/shared/fragments/seo';
 
 // groqd's typed `.deref()` doesn't support light-dereferencing a reference
 // down to just `_id`/`_type` inside a nested `.project()` callback; `q.raw`

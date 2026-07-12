@@ -1,6 +1,5 @@
+import { toLink } from '@blog/service/shared/transformers/to-link';
 import type { InferResultType } from 'groqd';
-
-import { toLink } from '#/shared/transformers/to-link';
 
 import type { ctaModuleQuery } from './query';
 import type { TCtaModule } from './types';

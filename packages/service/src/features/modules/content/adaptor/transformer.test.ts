@@ -1,6 +1,5 @@
+import { makeRawContentModule } from '@blog/service/testing/modules/fixtures';
 import { describe, expect, it } from 'vitest';
-
-import { makeRawContentModule } from '#/testing/modules/fixtures';
 
 import { toContentModule } from './transformer';
 

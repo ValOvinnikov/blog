@@ -1,10 +1,9 @@
+import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
+import { toCategory } from '@blog/service/shared/transformers/to-category';
+import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
+import { toSeoMeta } from '@blog/service/shared/transformers/to-seo-meta';
+import { toSocialLink } from '@blog/service/shared/transformers/to-social-link';
 import type { InferResultType } from 'groqd';
-
-import { buildImageUrl } from '#/shared/transformers/build-image-url';
-import { toCategory } from '#/shared/transformers/to-category';
-import { toSanityImage } from '#/shared/transformers/to-sanity-image';
-import { toSeoMeta } from '#/shared/transformers/to-seo-meta';
-import { toSocialLink } from '#/shared/transformers/to-social-link';
 
 import type { postDetailQuery } from './query';
 import type { TPostDetail, TPostDetailAuthor } from './types';

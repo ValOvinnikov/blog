@@ -1,8 +1,7 @@
+import { titleField } from '@cms/schema-types/helpers/title-field';
+import { richTextSchema } from '@cms/schema-types/objects/rich-text';
 import { FileText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
-
-import { titleField } from '../helpers/title-field';
-import { richTextSchema } from '../objects/rich-text';
 
 export const contentSchema = defineType({
   name: 'module_content',

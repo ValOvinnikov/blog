@@ -1,8 +1,7 @@
+import { titleField } from '@cms/schema-types/helpers/title-field';
+import { linkSchema } from '@cms/schema-types/objects/link';
 import { Menu } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
-
-import { titleField } from '../../helpers/title-field';
-import { linkSchema } from '../../objects/link';
 
 export const navigationSchema = defineType({
   name: 'settings_navigation',

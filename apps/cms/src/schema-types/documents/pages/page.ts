@@ -1,11 +1,10 @@
+import { defineModulesField } from '@cms/schema-types/helpers/define-modules-field';
+import { titleField } from '@cms/schema-types/helpers/title-field';
+import { contentSchema } from '@cms/schema-types/modules/module-content';
+import { ctaSchema } from '@cms/schema-types/modules/module-cta';
+import { seoSchema } from '@cms/schema-types/objects/seo';
 import { FileText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
-
-import { defineModulesField } from '../../helpers/define-modules-field';
-import { titleField } from '../../helpers/title-field';
-import { contentSchema } from '../../modules/module-content';
-import { ctaSchema } from '../../modules/module-cta';
-import { seoSchema } from '../../objects/seo';
 
 export const genericSchema = defineType({
   name: 'page_generic',

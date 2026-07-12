@@ -1,12 +1,11 @@
+import { defineModulesField } from '@cms/schema-types/helpers/define-modules-field';
+import { titleField } from '@cms/schema-types/helpers/title-field';
+import { ctaSchema } from '@cms/schema-types/modules/module-cta';
+import { heroSchema } from '@cms/schema-types/modules/module-hero';
+import { postListSchema } from '@cms/schema-types/modules/module-post-list';
+import { seoSchema } from '@cms/schema-types/objects/seo';
 import { House } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
-
-import { defineModulesField } from '../../helpers/define-modules-field';
-import { titleField } from '../../helpers/title-field';
-import { ctaSchema } from '../../modules/module-cta';
-import { heroSchema } from '../../modules/module-hero';
-import { postListSchema } from '../../modules/module-post-list';
-import { seoSchema } from '../../objects/seo';
 
 export const homePageSchema = defineType({
   name: 'page_home',

@@ -1,10 +1,9 @@
+import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 import { describe, expect, it, vi } from 'vitest';
-
-import { makeRawImage } from '#/testing/shared/fixtures';
 
 import { buildImageUrl } from './build-image-url';
 
-vi.mock('#/sanity/image', () => ({
+vi.mock('@blog/service/sanity/image', () => ({
   urlForImage: vi.fn(
     () => 'https://cdn.sanity.io/images/proj/dataset/abc123-800x600.jpg',
   ),
@@ -38,7 +37,7 @@ describe('buildImageUrl', () => {
   });
 
   it('returns undefined when urlForImage throws', async () => {
-    const { urlForImage } = await import('#/sanity/image');
+    const { urlForImage } = await import('@blog/service/sanity/image');
     vi.mocked(urlForImage).mockImplementationOnce(() => {
       throw new Error('builder error');
     });

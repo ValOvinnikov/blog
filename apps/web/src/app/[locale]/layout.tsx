@@ -3,17 +3,16 @@ import '../../../index.css';
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { Footer, Header, Logo, NavLink, PrimaryNavigation } from '@blog/ui';
+import { SmartLink } from '@web/components/smart-link/smart-link';
+import { ThemeToggleButton } from '@web/components/theme-toggle-button/theme-toggle-button';
+import { jetbrainsMono, newsreader, spaceGrotesk } from '@web/config/fonts';
+import { themeBootstrapScript } from '@web/config/theme-script';
+import { routing } from '@web/i18n/routing';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { hasLocale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
-
-import { SmartLink } from '@/components/smart-link/smart-link';
-import { ThemeToggleButton } from '@/components/theme-toggle-button/theme-toggle-button';
-import { jetbrainsMono, newsreader, spaceGrotesk } from '@/config/fonts';
-import { themeBootstrapScript } from '@/config/theme-script';
-import { routing } from '@/i18n/routing';
 
 export async function generateMetadata(): Promise<Metadata> {
   const result = await service.global.siteSettings.v1.getSiteSettings();

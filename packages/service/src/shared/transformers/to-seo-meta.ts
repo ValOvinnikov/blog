@@ -1,7 +1,6 @@
+import type { seoFragment } from '@blog/service/shared/fragments/seo';
+import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import type { InferFragmentType } from 'groqd';
-
-import type { seoFragment } from '#/shared/fragments/seo';
-import { buildImageUrl } from '#/shared/transformers/build-image-url';
 
 export type TRawSeo = InferFragmentType<typeof seoFragment>;
 

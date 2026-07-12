@@ -1,6 +1,5 @@
+import { getCta } from '@blog/service/features/modules/cta/adaptor/loader';
 import { safeAsync } from '@blog/utils';
-
-import { getCta } from '../adaptor/loader';
 
 export function createCtaModuleService() {
   return {

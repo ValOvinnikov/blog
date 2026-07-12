@@ -1,6 +1,5 @@
+import { getHomePage } from '@blog/service/features/pages/home/adaptor/loader';
 import { safeAsync } from '@blog/utils';
-
-import { getHomePage } from '../adaptor/loader';
 
 export function createHomeService() {
   return {

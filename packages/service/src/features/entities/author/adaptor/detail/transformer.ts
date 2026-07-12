@@ -1,7 +1,6 @@
+import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
+import { toSocialLink } from '@blog/service/shared/transformers/to-social-link';
 import type { InferResultType } from 'groqd';
-
-import { buildImageUrl } from '#/shared/transformers/build-image-url';
-import { toSocialLink } from '#/shared/transformers/to-social-link';
 
 import type { authorQuery } from './query';
 import type { TAuthorDetail } from './types';

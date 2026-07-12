@@ -2,9 +2,8 @@
 // Sanity client reads SANITY_API_READ_TOKEN and must stay server-only.
 import 'server-only';
 
+import { env } from '@blog/service/utils/env/env';
 import { createClient } from 'next-sanity';
-
-import { env } from '#/utils/env/env';
 
 type TSanityClient = ReturnType<typeof createClient>;
 

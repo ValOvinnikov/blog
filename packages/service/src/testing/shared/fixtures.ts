@@ -1,5 +1,5 @@
-import type { TRawPostCard } from '#/shared/transformers/to-post-card';
-import type { TRawSanityImage } from '#/shared/transformers/to-sanity-image';
+import type { TRawPostCard } from '@blog/service/shared/transformers/to-post-card';
+import type { TRawSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 
 type TRawImage = TRawPostCard['mainImage'];
 

@@ -1,13 +1,12 @@
+import { makeRawCategory } from '@blog/service/testing/entities/fixtures';
+import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import { describe, expect, it, vi } from 'vitest';
-
-import { makeRawCategory } from '#/testing/entities/fixtures';
-import { mockRun } from '#/testing/mock-run-query';
-import { makeRawPostCard } from '#/testing/pages/fixtures';
 
 import { getCategoryPage } from './loader';
 
-vi.mock('#/sanity/query', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('#/sanity/query')>()),
+vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
 

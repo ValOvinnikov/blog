@@ -1,4 +1,4 @@
-import { getBlogPage } from '../adaptor/loader';
+import { getBlogPage } from '@blog/service/features/pages/blog/adaptor/loader';
 
 export function createBlogService() {
   return {

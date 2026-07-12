@@ -1,9 +1,8 @@
+import { imageWithAltSchema } from '@cms/schema-types/objects/image-with-alt';
+import { richTextSchema } from '@cms/schema-types/objects/rich-text';
+import { seoSchema } from '@cms/schema-types/objects/seo';
 import { Newspaper } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
-
-import { imageWithAltSchema } from '../../objects/image-with-alt';
-import { richTextSchema } from '../../objects/rich-text';
-import { seoSchema } from '../../objects/seo';
 
 import { authorSchema } from './author';
 import { categorySchema } from './category';

@@ -1,8 +1,11 @@
-import type { TRawGenericPage } from '#/features/pages/generic/adaptor/transformer';
-import type { TRawHomePage } from '#/features/pages/home/adaptor/transformer';
-import type { TRawPostDetail } from '#/features/pages/post/adaptor/detail/transformer';
-import type { TRawPostCard } from '#/shared/transformers/to-post-card';
-import { makeRawImage, makeRawSanityImage } from '#/testing/shared/fixtures';
+import type { TRawGenericPage } from '@blog/service/features/pages/generic/adaptor/transformer';
+import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
+import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail/transformer';
+import type { TRawPostCard } from '@blog/service/shared/transformers/to-post-card';
+import {
+  makeRawImage,
+  makeRawSanityImage,
+} from '@blog/service/testing/shared/fixtures';
 
 export function makeRawPostCard(
   overrides: Partial<TRawPostCard> = {},

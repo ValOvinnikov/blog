@@ -1,3 +1,16 @@
+import { schemaTypes } from '@cms/schema-types';
+import { authorSchema } from '@cms/schema-types/documents/blog/author';
+import { categorySchema } from '@cms/schema-types/documents/blog/category';
+import { postSchema } from '@cms/schema-types/documents/blog/post';
+import { homePageSchema } from '@cms/schema-types/documents/pages/home-page';
+import { genericSchema } from '@cms/schema-types/documents/pages/page';
+import { footerSchema } from '@cms/schema-types/documents/settings/footer';
+import { navigationSchema } from '@cms/schema-types/documents/settings/navigation';
+import { siteSchema } from '@cms/schema-types/documents/settings/site-settings';
+import { contentSchema } from '@cms/schema-types/modules/module-content';
+import { ctaSchema } from '@cms/schema-types/modules/module-cta';
+import { heroSchema } from '@cms/schema-types/modules/module-hero';
+import { postListSchema } from '@cms/schema-types/modules/module-post-list';
 import { codeInput } from '@sanity/code-input';
 import { visionTool } from '@sanity/vision';
 import {
@@ -19,19 +32,6 @@ import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 
 import { requireEnv } from './sanity-env';
-import { schemaTypes } from './src/schema-types';
-import { authorSchema } from './src/schema-types/documents/blog/author';
-import { categorySchema } from './src/schema-types/documents/blog/category';
-import { postSchema } from './src/schema-types/documents/blog/post';
-import { homePageSchema } from './src/schema-types/documents/pages/home-page';
-import { genericSchema } from './src/schema-types/documents/pages/page';
-import { footerSchema } from './src/schema-types/documents/settings/footer';
-import { navigationSchema } from './src/schema-types/documents/settings/navigation';
-import { siteSchema } from './src/schema-types/documents/settings/site-settings';
-import { contentSchema } from './src/schema-types/modules/module-content';
-import { ctaSchema } from './src/schema-types/modules/module-cta';
-import { heroSchema } from './src/schema-types/modules/module-hero';
-import { postListSchema } from './src/schema-types/modules/module-post-list';
 
 export default defineConfig({
   name: 'default',

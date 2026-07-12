@@ -1,6 +1,5 @@
+import { toLink } from '@blog/service/shared/transformers/to-link';
 import type { InferResultType } from 'groqd';
-
-import { toLink } from '#/shared/transformers/to-link';
 
 import type { navigationQuery } from './query';
 import type { TNavigation } from './types';

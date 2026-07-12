@@ -1,7 +1,6 @@
 import { HERO_FIELD_MODE, type THeroFieldMode } from '@blog/config/constants';
+import { imageWithAltSchema } from '@cms/schema-types/objects/image-with-alt';
 import { defineField } from 'sanity';
-
-import { imageWithAltSchema } from '../objects/image-with-alt';
 
 /** Parent shape shared by any object using mode/custom field pairs (e.g. `module_hero`). */
 export type TModeFieldPairParent = Record<string, THeroFieldMode | undefined>;

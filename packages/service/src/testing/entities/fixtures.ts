@@ -1,6 +1,6 @@
-import type { TRawAuthor } from '#/features/entities/author/adaptor/detail/transformer';
-import type { TRawCategory } from '#/shared/transformers/to-category';
-import { makeRawImage } from '#/testing/shared/fixtures';
+import type { TRawAuthor } from '@blog/service/features/entities/author/adaptor/detail/transformer';
+import type { TRawCategory } from '@blog/service/shared/transformers/to-category';
+import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 
 export function makeRawCategory(
   overrides: Partial<TRawCategory> = {},

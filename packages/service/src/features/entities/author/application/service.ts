@@ -1,5 +1,5 @@
-import { getAuthor } from '../adaptor/detail/loader';
-import { getAuthorParams } from '../adaptor/params/loader';
+import { getAuthor } from '@blog/service/features/entities/author/adaptor/detail/loader';
+import { getAuthorParams } from '@blog/service/features/entities/author/adaptor/params/loader';
 
 export function createAuthorService() {
   return {

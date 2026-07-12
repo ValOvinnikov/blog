@@ -1,4 +1,4 @@
-import { getCategories } from '../adaptor/loader';
+import { getCategories } from '@blog/service/features/entities/categories/adaptor/loader';
 
 export function createCategoriesService() {
   return {

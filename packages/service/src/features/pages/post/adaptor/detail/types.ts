@@ -1,9 +1,8 @@
 import type { BlockText, RichText } from '@blog/config';
-
-import type { TCategory } from '#/shared/transformers/to-category';
-import type { TPostCard } from '#/shared/transformers/to-post-card';
-import type { TSeoMeta } from '#/shared/transformers/to-seo-meta';
-import type { TSocialLink } from '#/shared/transformers/to-social-link';
+import type { TCategory } from '@blog/service/shared/transformers/to-category';
+import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
+import type { TSeoMeta } from '@blog/service/shared/transformers/to-seo-meta';
+import type { TSocialLink } from '@blog/service/shared/transformers/to-social-link';
 
 export type TPostDetailAuthor = {
   id: string;

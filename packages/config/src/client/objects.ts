@@ -1,4 +1,4 @@
-import type { TSocialPlatform } from '../constants/link';
+import type { TSocialPlatform } from '@blog/config/constants/link';
 
 export interface ISanityImageHotspot {
   x: number;

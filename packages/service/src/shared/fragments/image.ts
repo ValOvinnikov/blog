@@ -1,4 +1,4 @@
-import { q } from '#/sanity/query';
+import { q } from '@blog/service/sanity/query';
 
 // `alt` is our field (required); the rest are Sanity's built-in image fields.
 export const imageWithAltFragment = q

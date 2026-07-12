@@ -1,8 +1,7 @@
 import { service } from '@blog/service';
 import { PostsSection } from '@blog/ui';
-
-import { Link } from '@/i18n/navigation';
-import { formatDate } from '@/utils/format-date';
+import { Link } from '@web/i18n/navigation';
+import { formatDate } from '@web/utils/format-date';
 
 export interface IPostListModuleProps {
   id: string;

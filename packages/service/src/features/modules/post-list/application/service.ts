@@ -1,6 +1,5 @@
+import { getPostList } from '@blog/service/features/modules/post-list/adaptor/loader';
 import { safeAsync } from '@blog/utils';
-
-import { getPostList } from '../adaptor/loader';
 
 export function createPostListModuleService() {
   return {

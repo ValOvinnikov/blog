@@ -1,9 +1,8 @@
 import { HERO_FIELD_MODE } from '@blog/config';
+import { makeRawHeroModule } from '@blog/service/testing/modules/fixtures';
+import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
 import { describe, expect, it } from 'vitest';
-
-import { makeRawHeroModule } from '#/testing/modules/fixtures';
-import { makeRawPostCard } from '#/testing/pages/fixtures';
-import { makeRawSanityImage } from '#/testing/shared/fixtures';
 
 import { toHeroModule } from './transformer';
 

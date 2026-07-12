@@ -1,7 +1,6 @@
+import { toCategory } from '@blog/service/shared/transformers/to-category';
+import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { InferResultType } from 'groqd';
-
-import { toCategory } from '#/shared/transformers/to-category';
-import { toPostCard } from '#/shared/transformers/to-post-card';
 
 import type { categoryPageCategoryQuery } from './category.query';
 import type { categoryPagePostsQuery } from './posts.query';

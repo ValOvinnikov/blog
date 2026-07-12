@@ -1,6 +1,5 @@
+import { getHero } from '@blog/service/features/modules/hero/adaptor/loader';
 import { safeAsync } from '@blog/utils';
-
-import { getHero } from '../adaptor/loader';
 
 export function createHeroModuleService() {
   return {

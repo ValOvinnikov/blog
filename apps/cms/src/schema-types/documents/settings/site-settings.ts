@@ -1,9 +1,8 @@
+import { titleField } from '@cms/schema-types/helpers/title-field';
+import { brandSchema } from '@cms/schema-types/objects/brand';
+import { openGraphSchema } from '@cms/schema-types/objects/open-graph';
 import { Settings } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
-
-import { titleField } from '../../helpers/title-field';
-import { brandSchema } from '../../objects/brand';
-import { openGraphSchema } from '../../objects/open-graph';
 
 export const siteSchema = defineType({
   name: 'settings_site',

@@ -1,11 +1,10 @@
+import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 import { describe, expect, it, vi } from 'vitest';
-
-import { makeRawImage } from '#/testing/shared/fixtures';
 
 import type { TRawSeo } from './to-seo-meta';
 import { toSeoMeta } from './to-seo-meta';
 
-vi.mock('#/sanity/image', () => ({
+vi.mock('@blog/service/sanity/image', () => ({
   urlForImage: vi.fn(
     () => 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
   ),

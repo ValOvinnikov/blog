@@ -1,6 +1,5 @@
+import { getNavigation } from '@blog/service/features/global/navigation/adaptor/loader';
 import { safeAsync } from '@blog/utils';
-
-import { getNavigation } from '../adaptor/loader';
 
 export function createNavigationService() {
   return {

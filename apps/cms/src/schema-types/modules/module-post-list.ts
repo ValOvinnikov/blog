@@ -1,7 +1,6 @@
+import { titleField } from '@cms/schema-types/helpers/title-field';
 import { List } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
-
-import { titleField } from '../helpers/title-field';
 
 export const postListSchema = defineType({
   name: 'module_postList',

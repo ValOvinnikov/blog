@@ -1,8 +1,7 @@
 import { service } from '@blog/service';
 import { Hero, LinkButton } from '@blog/ui';
-
-import { SanityImage } from '@/components/sanity-image/sanity-image';
-import { SmartLink } from '@/components/smart-link/smart-link';
+import { SanityImage } from '@web/components/sanity-image/sanity-image';
+import { SmartLink } from '@web/components/smart-link/smart-link';
 
 export interface IHeroModuleProps {
   id: string;
