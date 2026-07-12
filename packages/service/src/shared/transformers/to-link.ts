@@ -9,9 +9,9 @@ function toInternalHref(raw: NonNullable<TRawLink['internalReference']>) {
   if (!raw.slug) return undefined;
 
   switch (raw._type) {
-    case 'post':
+    case 'blog_post':
       return `/blog/${raw.slug}`;
-    case 'category':
+    case 'blog_category':
       return `/category/${raw.slug}`;
     case 'page_generic':
       return `/${raw.slug}`;

@@ -4,7 +4,7 @@ import { imageWithAltFragment } from './image';
 import { socialLinkFragment } from './social-link';
 
 export const authorCardFragment = q
-  .fragmentForType<'author'>()
+  .fragmentForType<'blog_author'>()
   .project((sub) => ({
     _id: true,
     name: sub.field('name').notNull(),
@@ -14,7 +14,7 @@ export const authorCardFragment = q
   }));
 
 export const authorDetailFragment = q
-  .fragmentForType<'author'>()
+  .fragmentForType<'blog_author'>()
   .project((sub) => ({
     _id: true,
     name: sub.field('name').notNull(),

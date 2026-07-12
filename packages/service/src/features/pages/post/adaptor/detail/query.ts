@@ -3,7 +3,7 @@ import { postDetailFragment } from '#/shared/fragments/post';
 
 export const postDetailQuery = q
   .parameters<{ slug: string }>()
-  .star.filterByType('post')
+  .star.filterByType('blog_post')
   .filterRaw('slug.current == $slug')
   .slice(0)
   .project(postDetailFragment);

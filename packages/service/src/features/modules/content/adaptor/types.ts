@@ -1,6 +1,6 @@
-import type { PortableText } from '@blog/config';
+import type { RichText } from '@blog/config';
 
 export type TContentModule = {
   title: string;
-  body: PortableText;
+  body: RichText;
 };

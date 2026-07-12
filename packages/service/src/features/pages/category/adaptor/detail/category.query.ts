@@ -3,7 +3,7 @@ import { categoryFragment } from '#/shared/fragments/category';
 
 export const categoryPageCategoryQuery = q
   .parameters<{ slug: string }>()
-  .star.filterByType('category')
+  .star.filterByType('blog_category')
   .filterRaw('slug.current == $slug')
   .slice(0)
   .project(categoryFragment);
