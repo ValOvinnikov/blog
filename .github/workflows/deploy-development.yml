@@ -96,6 +96,13 @@ jobs:
         with:
           persist-credentials: false
 
+      # pnpm + node on PATH so `vercel build` can install the workspace deps
+      # (Vercel detects pnpm-lock.yaml and shells out to `pnpm`).
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
       # Deploys `blog-dev` via the Vercel CLI (its Git auto-deploy is disabled).
       # For `blog-dev`, Vercel "production" = main, so --prod targets its main
       # URL. No-op (green) until the development environment's VERCEL_* secrets
