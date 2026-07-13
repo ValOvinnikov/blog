@@ -60,7 +60,7 @@ export default async function HomePage({ params }: TProps) {
   setRequestLocale(locale);
 
   const result = await service.pages.home.v1.getHomePage();
-
+  console.log('Home page result:', result);
   if (!result.ok) {
     console.error(`Error to fetch home page: ${result.error}`);
     notFound();
