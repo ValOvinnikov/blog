@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@blog/config": "workspace:*",
-    "@sanity/code-input": "^5.1.0",
+    "@sanity/code-input": "^7.2.6",
     "@sanity/image-url": "^2.1.1",
     "@sanity/vision": "^6.4.0",
     "lucide-react": "^1.24.0",
@@ -34,7 +34,7 @@
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
     "@sanity/cli": "^7.7.1",
-    "eslint": "^10.6.0",
+    "eslint": "^10.7.0",
     "prettier": "^3.9.5",
     "typescript": "^6.0.3"
   }
