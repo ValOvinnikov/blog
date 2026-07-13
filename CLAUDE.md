@@ -141,7 +141,8 @@ Every issue follows this exact order. **Stop and wait for explicit user approval
 
 Deploys are automated by the pipeline (see `docs/DEPLOY.md`, `SPEC.md` §13):
 merge to `main` → **development**; push a `vX.Y.Z` git tag → **production**
-(gated by a CI `verify` job). Both the Studio and web app deploy per trigger.
+(gated by a CI `verify` job). Dev deploys only the app(s) whose turbo graph the
+merge touched (`turbo-ignore`); a production tag always deploys both.
 The one-time environment setup (datasets, tokens, Vercel projects, GitHub
 secrets, webhooks, CORS) is human-gated console work in `docs/DEPLOY.md`.
 Cutting a release is `git tag vX.Y.Z && git push origin vX.Y.Z` — a
