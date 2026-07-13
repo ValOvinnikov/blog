@@ -378,9 +378,12 @@ and release runbook live in `docs/DEPLOY.md`; this is the shape.
   (type-check/lint/test/build) that the deploy jobs `needs`, so a deploy happens
   only after checks pass on the exact commit:
   `.github/workflows/deploy-development.yml` (on merge to `main` → dev Studio +
-  dev web) and `.github/workflows/deploy-production.yml` (on a `v*` tag → prod
-  Studio + prod web). Deploy steps are guarded on their secret being present, so
-  the workflows no-op green until the one-time console setup (`docs/DEPLOY.md`).
+  dev web, each deployed only when its turbo graph is affected by the merge, via
+  `turbo-ignore`; `workflow_dispatch` forces both) and
+  `.github/workflows/deploy-production.yml` (on a `v*` tag → prod Studio + prod
+  web, always both — a tag is a deliberate full release). Deploy steps are
+  guarded on their secret being present, so the workflows no-op green until the
+  one-time console setup (`docs/DEPLOY.md`).
 - Historical phased rollout tickets (D0–D5) live in `docs/BACKLOG.md`.
 
 ## 14. Tooling: agents & skills
