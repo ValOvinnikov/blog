@@ -32,18 +32,23 @@ Architecture rationale lives in `SPEC.md` §13 and
 
 ## Values scratchpad
 
-Fill these as you go — later steps reuse them.
+Each row is **one value you collect once**, then paste under the **real env-var
+key(s)** shown. Some values are stored under more than one key (e.g. the Sanity
+project id is `NEXT_PUBLIC_SANITY_PROJECT_ID` on Vercel but
+`SANITY_STUDIO_PROJECT_ID` for the Studio/CLI) — that's expected, not a mistake.
+The short `<PLACEHOLDER>` names below are used only within this doc to refer back
+to a collected value.
 
-```
-PROJECT_ID            = ____________   (Sanity → API → Project ID; public)
-READ_TOKEN            = ____________   (Sanity Viewer token; secret)
-DEPLOY_TOKEN          = ____________   (Sanity Deploy/write token; secret)
-DEV_REVALIDATE_SECRET = ____________   (openssl rand -hex 32; secret)
-PRD_REVALIDATE_SECRET = ____________   (openssl rand -hex 32; secret)
-VERCEL_TOKEN          = ____________   (Vercel account token; secret)
-VERCEL_ORG_ID         = ____________   (from `vercel link` on blog-prod)
-VERCEL_PROJECT_ID     = ____________   (from `vercel link` on blog-prod; blog-prod)
-```
+| Placeholder               | Value to collect                       | Stored under env key(s)                                                                     |
+| ------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `<PROJECT_ID>`            | Sanity → API → Project ID (public)     | `NEXT_PUBLIC_SANITY_PROJECT_ID` (Vercel) · `SANITY_STUDIO_PROJECT_ID` (GH Variable + local) |
+| `<READ_TOKEN>`            | Sanity **Viewer** token (secret)       | `SANITY_API_READ_TOKEN` (Vercel + GH secret)                                                |
+| `<DEPLOY_TOKEN>`          | Sanity **Deploy/write** token (secret) | `SANITY_DEPLOY_TOKEN` (GH secret) → CLI reads it as `SANITY_AUTH_TOKEN`                     |
+| `<DEV_REVALIDATE_SECRET>` | `openssl rand -hex 32` (secret)        | `SANITY_REVALIDATE_SECRET` on `blog-dev` + the dev webhook                                  |
+| `<PRD_REVALIDATE_SECRET>` | `openssl rand -hex 32` (secret)        | `SANITY_REVALIDATE_SECRET` on `blog-prod` + the prod webhook                                |
+| `<VERCEL_TOKEN>`          | Vercel account token (secret)          | `VERCEL_TOKEN` (GH secret)                                                                  |
+| `<VERCEL_ORG_ID>`         | from `vercel link` on `blog-prod`      | `VERCEL_ORG_ID` (GH secret)                                                                 |
+| `<VERCEL_PROJECT_ID>`     | from `vercel link` on `blog-prod`      | `VERCEL_PROJECT_ID` (GH secret)                                                             |
 
 ---
 
