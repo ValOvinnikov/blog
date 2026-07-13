@@ -1,31 +1,56 @@
 name: Deploy Development
 
-# Dev web deploys via Vercel's native Git integration on `main` (project
-# `blog-dev`). This workflow only deploys the dev Studio. Path-filtered because
-# it is NOT a required status check (safe to skip), unlike ci.yml.
+# Both the dev Studio and the dev web app deploy from here, on merge to `main`,
+# and ONLY after the `verify` gate (type-check/lint/test/build on the merged
+# commit) passes. Vercel's native Git integration for `blog-dev` is disabled
+# (Ignored Build Step = `exit 0`) so nothing deploys pre-merge or ungated —
+# every dev deploy goes through this workflow. Mirrors deploy-production.yml.
 on:
   push:
     branches: [main]
-    paths:
-      - 'apps/cms/**'
-      - 'packages/config/**'
-      - '.github/workflows/deploy-development.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: deploy-dev-studio
-  cancel-in-progress: true
+  group: deploy-dev
+  cancel-in-progress: false
 
 env:
   PNPM_VERSION: 9.15.0
   NODE_VERSION: '22'
+  VERCEL_CLI_VERSION: 48.0.0
 
 jobs:
+  # Gate: re-run the full suite on the exact merged commit before any deploy.
+  # Deploy jobs `needs: verify`, so a dev deploy only happens after checks pass.
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Type-check
+        run: pnpm type-check
+      - name: Lint
+        run: pnpm lint
+      - name: Test
+        run: pnpm test
+      - name: Build
+        run: pnpm build
+        env:
+          SKIP_ENV_VALIDATION: 'true'
+
   deploy-studio:
     name: Deploy dev Studio
+    needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: development
@@ -50,3 +75,30 @@ jobs:
         if: ${{ env.SANITY_AUTH_TOKEN != '' }}
         working-directory: apps/cms
         run: pnpm exec sanity deploy
+
+  deploy-web:
+    name: Deploy dev web
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: development
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      # Deploys `blog-dev` via the Vercel CLI (its Git auto-deploy is disabled).
+      # For `blog-dev`, Vercel "production" = main, so --prod targets its main
+      # URL. No-op (green) until the development environment's VERCEL_* secrets
+      # exist.
+      - name: Deploy to Vercel (blog-dev)
+        if: ${{ env.VERCEL_TOKEN != '' }}
+        run: |
+          set -euo pipefail
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --prebuilt --prod --token="$VERCEL_TOKEN"
