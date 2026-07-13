@@ -1,31 +1,120 @@
 name: Deploy Development
 
-# Dev web deploys via Vercel's native Git integration on `main` (project
-# `blog-dev`). This workflow only deploys the dev Studio. Path-filtered because
-# it is NOT a required status check (safe to skip), unlike ci.yml.
+# The dev Studio and dev web app deploy from here on merge to `main` — but only
+# the app(s) whose turbo graph the merge actually touched (see the `changes`
+# job), and ONLY after the `verify` gate (type-check/lint/test/build on the
+# merged commit) passes. Vercel's native Git integration for `blog-dev` is
+# disabled (Ignored Build Step = `exit 0`) so nothing deploys pre-merge or
+# ungated — every dev deploy goes through this workflow. Mirrors
+# deploy-production.yml, which deploys both apps unconditionally (a tag is a
+# deliberate full release).
 on:
   push:
     branches: [main]
-    paths:
-      - 'apps/cms/**'
-      - 'packages/config/**'
-      - '.github/workflows/deploy-development.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
+# Only the latest merge matters for dev — a newer push supersedes any queued or
+# in-flight dev deploy (Vercel/Sanity deploys are atomic, so cancelling is safe).
+# Production keeps cancel-in-progress: false.
 concurrency:
-  group: deploy-dev-studio
+  group: deploy-dev
   cancel-in-progress: true
 
 env:
   PNPM_VERSION: 9.15.0
   NODE_VERSION: '22'
+  VERCEL_CLI_VERSION: 48.0.0
+  # Keep in lockstep with the `turbo` devDependency version.
+  TURBO_IGNORE_VERSION: 2.10.4
+  # `sanity build` (run by the verify job's `pnpm build`) loads sanity.cli.ts,
+  # which requires these. Sourced from repo Variables like ci.yml; the
+  # deploy-studio job overrides them with its environment-scoped values.
+  SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
+  SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
+  # Vercel Remote Cache — lets verify replay task artifacts already built by PR
+  # CI instead of rebuilding. No-op until TURBO_TOKEN/TURBO_TEAM are configured.
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
+  # Graph-aware change detection: turbo-ignore exits 0 when the package and its
+  # workspace dependencies are untouched between HEAD^1 (main before this merge)
+  # and HEAD, 1 when a redeploy is needed. A `packages/config` change therefore
+  # redeploys both apps; a docs-only merge deploys neither. workflow_dispatch
+  # bypasses the gates below, so a manual run always deploys everything.
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      cms: ${{ steps.cms.outputs.changed }}
+      web: ${{ steps.web.outputs.changed }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+
+      - name: Is cms affected?
+        id: cms
+        run: |
+          set -uo pipefail
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" cms --fallback=HEAD^1; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Is web affected?
+        id: web
+        run: |
+          set -uo pipefail
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" web --fallback=HEAD^1; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  # Gate: re-run the full suite on the exact merged commit before any deploy.
+  # Deploy jobs `needs: verify`, so a dev deploy only happens after checks pass.
+  # Skipped entirely (along with both deploys) when neither app is affected.
+  verify:
+    name: Verify
+    needs: changes
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.cms == 'true' ||
+      needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Type-check
+        run: pnpm type-check
+      - name: Lint
+        run: pnpm lint
+      - name: Test
+        run: pnpm test
+      - name: Build
+        run: pnpm build
+        env:
+          SKIP_ENV_VALIDATION: 'true'
+
   deploy-studio:
     name: Deploy dev Studio
+    needs: [changes, verify]
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.cms == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: development
@@ -50,3 +139,48 @@ jobs:
         if: ${{ env.SANITY_AUTH_TOKEN != '' }}
         working-directory: apps/cms
         run: pnpm exec sanity deploy
+
+  deploy-web:
+    name: Deploy dev web
+    needs: [changes, verify]
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: development
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      # Org/project ids are not sensitive — they live as environment-scoped
+      # Variables (not Secrets) so they stay inspectable in run logs.
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      # pnpm + node on PATH so `vercel build` can install the workspace deps
+      # (Vercel detects pnpm-lock.yaml and shells out to `pnpm`).
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Deploys `blog-dev` via the Vercel CLI (its Git auto-deploy is disabled).
+      # For `blog-dev`, Vercel "production" = main, so --prod targets its main
+      # URL. No-op (green) until the development environment's VERCEL_* secrets
+      # exist.
+      - name: Deploy to Vercel (blog-dev)
+        if: ${{ env.VERCEL_TOKEN != '' }}
+        run: |
+          set -euo pipefail
+          # Without both ids the CLI silently auto-links to whatever project
+          # matches the directory name — fail loudly instead.
+          : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the development environment}"
+          : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID Variable on the development environment}"
+          # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
+          # green; the package is cached after the first resolution.
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --prebuilt --prod --token="$VERCEL_TOKEN"
