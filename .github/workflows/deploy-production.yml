@@ -16,6 +16,11 @@ env:
   PNPM_VERSION: 9.15.0
   NODE_VERSION: '22'
   VERCEL_CLI_VERSION: 48.0.0
+  # `sanity build` (run by the verify job's `pnpm build`) loads sanity.cli.ts,
+  # which requires these. Sourced from repo Variables like ci.yml; the
+  # deploy-studio job overrides them with its environment-scoped values.
+  SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
+  SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
 
 jobs:
   # A tag can point at ANY commit with no PR gate, so re-run the full suite on
