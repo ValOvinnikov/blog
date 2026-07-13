@@ -251,7 +251,8 @@ for an editable headline.
 | `SANITY_STUDIO_DATASET`                    | cms Studio + CLI | required                                                            |
 | `SANITY_STUDIO_HOSTNAME`                   | cms CLI (deploy) | deploy target `<host>.sanity.studio`; CI-only                       |
 | `SANITY_DEPLOY_TOKEN`                      | CI (deploy)      | write/Deploy token; **project-scoped** → set per GitHub Environment |
-| `VERCEL_TOKEN` / `_ORG_ID` / `_PROJECT_ID` | CI (deploy)      | `blog-prod` deploy via Vercel CLI on tags                           |
+| `VERCEL_TOKEN` / `_ORG_ID` / `_PROJECT_ID` | CI (deploy)      | Vercel CLI deploys; token is a Secret, ids are Variables            |
+| `TURBO_TOKEN` / `TURBO_TEAM`               | CI (all)         | optional Vercel Remote Cache; no-op until configured                |
 | `SKIP_ENV_VALIDATION`                      | CI builds only   | bypasses Zod env validation where no vars exist                     |
 
 - Env access is **always** through the validated entry points
