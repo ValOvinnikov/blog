@@ -11,8 +11,13 @@ export const genericSchema = defineType({
   title: 'Page',
   type: 'document',
   icon: FileText,
+  preview: {
+    select: {
+      title: 'title',
+    },
+  },
   fields: [
-    titleField({ description: 'Page headline / H1' }),
+    titleField(),
     defineField({
       name: 'slug',
       title: 'Slug',
@@ -35,9 +40,4 @@ export const genericSchema = defineType({
         'Override meta title, description, and OG image for search engines.',
     }),
   ],
-  preview: {
-    select: {
-      title: 'title',
-    },
-  },
 });
