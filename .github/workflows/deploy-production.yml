@@ -86,6 +86,12 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
+      # pnpm + node on PATH so `vercel build` can install the workspace deps
+      # (Vercel detects pnpm-lock.yaml and shells out to `pnpm`).
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
       # Vercel CLI runs its own `next build` with the project's Production env
       # vars pulled from Vercel (root directory apps/web is stored on the
       # project, so build resolves the monorepo workspaces correctly).
