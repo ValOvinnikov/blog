@@ -11,44 +11,56 @@ Both the Sanity **Studio** and the Next.js **web app** deploy on each trigger.
 Architecture rationale lives in `SPEC.md` §13 and
 `docs/superpowers/specs/2026-07-13-multi-env-release-pipeline-design.md`.
 
+> **Each environment is a separate Sanity project** (one per environment) — not
+> one project with two datasets. Project ids stay **env-driven and are never
+> committed** (this repo hardcodes no Sanity ids — see `<DEV_PROJECT_ID>` /
+> `<PRD_PROJECT_ID>` below). Because Sanity **tokens are project-scoped**, dev and
+> prod each need their own read + deploy tokens, wired as **environment-scoped**
+> GitHub secrets/variables (the `development` / `production` GitHub Environments),
+> not repo-level. `blog-dev` and `blog-prod` likewise point
+> `NEXT_PUBLIC_SANITY_PROJECT_ID` at different project ids.
+
 ---
 
 ## Environment matrix
 
-| Concern              | Development                           | Production                        |
-| -------------------- | ------------------------------------- | --------------------------------- |
-| Sanity dataset       | `development`                         | `production`                      |
-| Studio hostname      | `valovinnikov-blog-dev.sanity.studio` | `valovinnikov-blog.sanity.studio` |
-| Vercel project       | `blog-dev`                            | `blog-prod`                       |
-| Web URL (initial)    | `blog-dev.vercel.app`                 | `blog.vercel.app`                 |
-| Deploy trigger       | push/merge to `main`                  | push git tag `v*`                 |
-| Web deploy           | Vercel native Git integration         | Vercel CLI (GitHub Actions)       |
-| Studio deploy        | GitHub Actions                        | GitHub Actions                    |
-| Revalidation webhook | dev → dev site                        | prod → prod site                  |
+| Concern              | Development                           | Production                         |
+| -------------------- | ------------------------------------- | ---------------------------------- |
+| Sanity project       | separate dev project (id via env)     | separate prod project (id via env) |
+| Sanity dataset       | `development`                         | `production`                       |
+| Studio hostname      | `valovinnikov-blog-dev.sanity.studio` | `valovinnikov-blog.sanity.studio`  |
+| Vercel project       | `blog-dev`                            | `blog-prod`                        |
+| Web URL (initial)    | `<DEV_WEB_URL>`                       | `<PRD_WEB_URL>`                    |
+| Deploy trigger       | push/merge to `main`                  | push git tag `v*`                  |
+| Web deploy           | Vercel native Git integration         | Vercel CLI (GitHub Actions)        |
+| Studio deploy        | GitHub Actions                        | GitHub Actions                     |
+| Revalidation webhook | dev → dev site                        | prod → prod site                   |
 
-> Custom domains are deferred (#275); `*.vercel.app` URLs until then.
+> `<DEV_WEB_URL>` / `<PRD_WEB_URL>` are each project's `*.vercel.app` URL — either
+> the auto-assigned one (e.g. `blog-web-<random>.vercel.app`) or a stable alias you
+> add in Vercel → Settings → Domains. Use the same value in `NEXT_PUBLIC_SITE_URL`,
+> the CORS origin, and the webhook URL. Custom domains are deferred (#275).
 
 ---
 
 ## Values scratchpad
 
-Each row is **one value you collect once**, then paste under the **real env-var
-key(s)** shown. Some values are stored under more than one key (e.g. the Sanity
-project id is `NEXT_PUBLIC_SANITY_PROJECT_ID` on Vercel but
-`SANITY_STUDIO_PROJECT_ID` for the Studio/CLI) — that's expected, not a mistake.
-The short `<PLACEHOLDER>` names below are used only within this doc to refer back
-to a collected value.
+Collect these **per environment** — dev and prod are separate Sanity projects, so
+the project id and all tokens differ. The `<PLACEHOLDER>` names are used only
+within this doc; the real values live in GitHub / Vercel / local `.env` and are
+**never committed** (project ids included).
 
-| Placeholder               | Value to collect                       | Stored under env key(s)                                                                     |
-| ------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `<PROJECT_ID>`            | Sanity → API → Project ID (public)     | `NEXT_PUBLIC_SANITY_PROJECT_ID` (Vercel) · `SANITY_STUDIO_PROJECT_ID` (GH Variable + local) |
-| `<READ_TOKEN>`            | Sanity **Viewer** token (secret)       | `SANITY_API_READ_TOKEN` (Vercel + GH secret)                                                |
-| `<DEPLOY_TOKEN>`          | Sanity **Deploy/write** token (secret) | `SANITY_DEPLOY_TOKEN` (GH secret) → CLI reads it as `SANITY_AUTH_TOKEN`                     |
-| `<DEV_REVALIDATE_SECRET>` | `openssl rand -hex 32` (secret)        | `SANITY_REVALIDATE_SECRET` on `blog-dev` + the dev webhook                                  |
-| `<PRD_REVALIDATE_SECRET>` | `openssl rand -hex 32` (secret)        | `SANITY_REVALIDATE_SECRET` on `blog-prod` + the prod webhook                                |
-| `<VERCEL_TOKEN>`          | Vercel account token (secret)          | `VERCEL_TOKEN` (GH secret)                                                                  |
-| `<VERCEL_ORG_ID>`         | from `vercel link` on `blog-prod`      | `VERCEL_ORG_ID` (GH secret)                                                                 |
-| `<VERCEL_PROJECT_ID>`     | from `vercel link` on `blog-prod`      | `VERCEL_PROJECT_ID` (GH secret)                                                             |
+| What                                       | Development               | Production                |
+| ------------------------------------------ | ------------------------- | ------------------------- |
+| Sanity project id (public)                 | `<DEV_PROJECT_ID>`        | `<PRD_PROJECT_ID>`        |
+| Sanity dataset                             | `development`             | `production`              |
+| Sanity **Viewer** token                    | `<DEV_READ_TOKEN>`        | `<PRD_READ_TOKEN>`        |
+| Sanity **Deploy** token                    | `<DEV_DEPLOY_TOKEN>`      | `<PRD_DEPLOY_TOKEN>`      |
+| Revalidate secret (`openssl rand -hex 32`) | `<DEV_REVALIDATE_SECRET>` | `<PRD_REVALIDATE_SECRET>` |
+
+Vercel (needed for the **prod** deploy only — dev web uses native Git
+integration): `<VERCEL_TOKEN>` (account token), plus `<VERCEL_ORG_ID>` and
+`<VERCEL_PROJECT_ID>` for `blog-prod` from `vercel link`.
 
 ---
 
@@ -57,14 +69,17 @@ to a collected value.
 The workflows are written to **no-op green until their secrets exist**, so the
 code can merge first; the pipeline activates once the steps below are done.
 
-### 1. Sanity — datasets & tokens · https://manage.sanity.io
+### 1. Sanity — projects, datasets & tokens · https://manage.sanity.io
 
-- [ ] **Datasets:** confirm `production` exists; **create `development`**
-      (visibility public is fine — mirrors production).
-- [ ] **API → Project ID:** copy → `PROJECT_ID`.
-- [ ] **API → Tokens → Add API token:**
-  - [ ] `web-read` — permission **Viewer** → `READ_TOKEN`.
-  - [ ] `ci-deploy` — permission **Deploy Studio** (write) → `DEPLOY_TOKEN`.
+Do this in **each** project (dev and prod are separate projects; tokens are
+project-scoped, so mint them **inside** the matching project):
+
+- [ ] **Dataset:** dev project → `development`; prod project → `production`
+      (visibility public is fine).
+- [ ] **API → Project ID:** copy → `<DEV_PROJECT_ID>` / `<PRD_PROJECT_ID>`.
+- [ ] **API → Tokens → Add API token** (per project):
+  - [ ] `web-read` — permission **Viewer** → `<DEV_READ_TOKEN>` / `<PRD_READ_TOKEN>`.
+  - [ ] `ci-deploy` — permission **Deploy Studio** (write) → `<DEV_DEPLOY_TOKEN>` / `<PRD_DEPLOY_TOKEN>`.
         (Distinct from the read token; `sanity deploy` needs write.)
 
 ### 2. Secrets to generate locally
@@ -93,66 +108,79 @@ outside of the root directory"_; **Node.js 22.x**.
 
 #### Vercel env vars — set on **each** project (Production + Preview scopes)
 
-Same five keys per project; only the dataset / URL / secret differ:
+Same five keys per project; each project points at its **own** Sanity project,
+so the id / dataset / URL / tokens all differ:
 
-| Key                             | `blog-dev` value              | `blog-prod` value         |
-| ------------------------------- | ----------------------------- | ------------------------- |
-| `NEXT_PUBLIC_SANITY_PROJECT_ID` | `<PROJECT_ID>`                | `<PROJECT_ID>`            |
-| `NEXT_PUBLIC_SANITY_DATASET`    | `development`                 | `production`              |
-| `NEXT_PUBLIC_SITE_URL`          | `https://blog-dev.vercel.app` | `https://blog.vercel.app` |
-| `SANITY_API_READ_TOKEN`         | `<READ_TOKEN>`                | `<READ_TOKEN>`            |
-| `SANITY_REVALIDATE_SECRET`      | `<DEV_REVALIDATE_SECRET>`     | `<PRD_REVALIDATE_SECRET>` |
+| Key                             | `blog-dev` value          | `blog-prod` value         |
+| ------------------------------- | ------------------------- | ------------------------- |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | `<DEV_PROJECT_ID>`        | `<PRD_PROJECT_ID>`        |
+| `NEXT_PUBLIC_SANITY_DATASET`    | `development`             | `production`              |
+| `NEXT_PUBLIC_SITE_URL`          | `https://<DEV_WEB_URL>`   | `https://<PRD_WEB_URL>`   |
+| `SANITY_API_READ_TOKEN`         | `<DEV_READ_TOKEN>`        | `<PRD_READ_TOKEN>`        |
+| `SANITY_REVALIDATE_SECRET`      | `<DEV_REVALIDATE_SECRET>` | `<PRD_REVALIDATE_SECRET>` |
 
-> `SANITY_API_READ_TOKEN` is server-only (never exposed to the browser). One
-> project-scoped Viewer token reads both datasets, so the same value is fine.
+> `SANITY_API_READ_TOKEN` is server-only (never exposed to the browser). Each
+> project uses the Viewer token minted in its own Sanity project.
 
-### 4. GitHub Actions — repo secrets & variables
+### 4. GitHub Actions — environment-scoped variables & secrets
 
-Settings → Secrets and variables → Actions.
+The deploy jobs run in the `development` / `production` **GitHub Environments**,
+so set these per environment (Settings → Environments → `<env>`) — that's how each
+job resolves its own project's id + token:
 
-- [ ] **Variable** `SANITY_STUDIO_PROJECT_ID` = `<PROJECT_ID>` (public id → a
-      Variable, not a Secret; the CI/typegen jobs already read it).
-- [ ] **Secret** `SANITY_DEPLOY_TOKEN` = `<DEPLOY_TOKEN>`.
-- [ ] **Secret** `VERCEL_TOKEN` = `<VERCEL_TOKEN>`.
-- [ ] **Secret** `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`.
-- [ ] **Secret** `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (blog-prod).
-- [ ] (Optional) GitHub **Environments** `development` / `production` — add a
-      required reviewer on `production` for an extra manual gate before prod
+**`development` environment**
+
+- [ ] Variable `SANITY_STUDIO_PROJECT_ID` = `<DEV_PROJECT_ID>`
+- [ ] Secret `SANITY_DEPLOY_TOKEN` = `<DEV_DEPLOY_TOKEN>`
+
+**`production` environment**
+
+- [ ] Variable `SANITY_STUDIO_PROJECT_ID` = `<PRD_PROJECT_ID>`
+- [ ] Secret `SANITY_DEPLOY_TOKEN` = `<PRD_DEPLOY_TOKEN>`
+- [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
+- [ ] Secret `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
+- [ ] Secret `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (blog-prod)
+- [ ] (Optional) require a reviewer on `production` for a manual gate before prod
       deploys run.
+
+> Repo-level `SANITY_STUDIO_PROJECT_ID` / `SANITY_STUDIO_DATASET` remain the
+> fallback for `ci.yml` (which sets no environment) — point them at whichever
+> project CI's typegen/migration checks should target.
 
 ### 5. Sanity — revalidation webhooks · API → Webhooks → Create webhook
 
 Create **two** (the route `/api/revalidate` already exists):
 
-| Field       | dev webhook                                  | prod webhook                             |
-| ----------- | -------------------------------------------- | ---------------------------------------- |
-| Name        | `revalidate dev`                             | `revalidate prod`                        |
-| URL         | `https://blog-dev.vercel.app/api/revalidate` | `https://blog.vercel.app/api/revalidate` |
-| Dataset     | `development`                                | `production`                             |
-| Trigger     | Create · Update · Delete                     | Create · Update · Delete                 |
-| HTTP method | `POST`                                       | `POST`                                   |
-| API version | `v2021-03-25` (or later)                     | `v2021-03-25` (or later)                 |
-| Projection  | `{_type, _id, "slug": slug.current}`         | `{_type, _id, "slug": slug.current}`     |
-| Secret      | `<DEV_REVALIDATE_SECRET>`                    | `<PRD_REVALIDATE_SECRET>`                |
+| Field       | dev webhook                            | prod webhook                           |
+| ----------- | -------------------------------------- | -------------------------------------- |
+| Name        | `revalidate dev`                       | `revalidate prod`                      |
+| URL         | `https://<DEV_WEB_URL>/api/revalidate` | `https://<PRD_WEB_URL>/api/revalidate` |
+| Dataset     | `development`                          | `production`                           |
+| Trigger     | Create · Update · Delete               | Create · Update · Delete               |
+| HTTP method | `POST`                                 | `POST`                                 |
+| API version | `v2021-03-25` (or later)               | `v2021-03-25` (or later)               |
+| Projection  | `{_type, _id, "slug": slug.current}`   | `{_type, _id, "slug": slug.current}`   |
+| Secret      | `<DEV_REVALIDATE_SECRET>`              | `<PRD_REVALIDATE_SECRET>`              |
 
 ### 6. Sanity — CORS origins · API → CORS origins
 
 - [ ] `http://localhost:3333` — credentials **on** (local Studio).
 - [ ] `https://valovinnikov-blog-dev.sanity.studio` — credentials **on**.
 - [ ] `https://valovinnikov-blog.sanity.studio` — credentials **on**.
-- [ ] `https://blog-dev.vercel.app` — credentials **off** (token reads).
-- [ ] `https://blog.vercel.app` — credentials **off**.
+- [ ] `https://<DEV_WEB_URL>` — credentials **off** (token reads).
+- [ ] `https://<PRD_WEB_URL>` — credentials **off**.
 
 ### 7. Local dev configuration
 
-- [ ] `apps/cms/.env` (gitignored): `SANITY_STUDIO_PROJECT_ID=<PROJECT_ID>`,
+Local dev points at the **dev** project (`<DEV_PROJECT_ID>`):
+
+- [ ] `apps/cms/.env` (gitignored): `SANITY_STUDIO_PROJECT_ID=<DEV_PROJECT_ID>`,
       `SANITY_STUDIO_DATASET=development`.
-- [ ] `apps/web/.env.local` (gitignored): `NEXT_PUBLIC_SANITY_PROJECT_ID`,
+- [ ] `apps/web/.env.local` (gitignored): `NEXT_PUBLIC_SANITY_PROJECT_ID=<DEV_PROJECT_ID>`,
       `NEXT_PUBLIC_SANITY_DATASET=development`, and optionally
       `NEXT_PUBLIC_SITE_URL=http://localhost:3000`.
-- [ ] (Optional) seed `development` from production:
-      `pnpm --filter cms dataset:export` then import into `development`, or
-      author fresh dev content. `development` is empty until seeded.
+- [ ] (Optional) seed the dev `development` dataset — author fresh content in the
+      dev Studio, or export/import from another dataset. It's empty until seeded.
 
 ---
 

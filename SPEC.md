@@ -240,19 +240,19 @@ for an editable headline.
 
 ## 7. Environment & configuration
 
-| Variable                                   | Consumer         | Notes                                            |
-| ------------------------------------------ | ---------------- | ------------------------------------------------ |
-| `NEXT_PUBLIC_SANITY_PROJECT_ID`            | web + service    | required; validated by Zod at import             |
-| `NEXT_PUBLIC_SANITY_DATASET`               | web + service    | required                                         |
-| `NEXT_PUBLIC_SITE_URL`                     | web (SEO)        | optional until launch; canonical/OG/feeds        |
-| `SANITY_API_READ_TOKEN`                    | service (server) | optional; private reads / future draft mode      |
-| `SANITY_REVALIDATE_SECRET`                 | web (server)     | optional until the #93 revalidation route exists |
-| `SANITY_STUDIO_PROJECT_ID`                 | cms Studio + CLI | required; no hardcoded ids in the repo           |
-| `SANITY_STUDIO_DATASET`                    | cms Studio + CLI | required                                         |
-| `SANITY_STUDIO_HOSTNAME`                   | cms CLI (deploy) | deploy target `<host>.sanity.studio`; CI-only    |
-| `SANITY_DEPLOY_TOKEN`                      | CI (deploy)      | write/Deploy-scoped token for `sanity deploy`    |
-| `VERCEL_TOKEN` / `_ORG_ID` / `_PROJECT_ID` | CI (deploy)      | `blog-prod` deploy via Vercel CLI on tags        |
-| `SKIP_ENV_VALIDATION`                      | CI builds only   | bypasses Zod env validation where no vars exist  |
+| Variable                                   | Consumer         | Notes                                                               |
+| ------------------------------------------ | ---------------- | ------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID`            | web + service    | required; validated by Zod at import                                |
+| `NEXT_PUBLIC_SANITY_DATASET`               | web + service    | required                                                            |
+| `NEXT_PUBLIC_SITE_URL`                     | web (SEO)        | optional until launch; canonical/OG/feeds                           |
+| `SANITY_API_READ_TOKEN`                    | service (server) | optional; private reads / future draft mode                         |
+| `SANITY_REVALIDATE_SECRET`                 | web (server)     | optional until the #93 revalidation route exists                    |
+| `SANITY_STUDIO_PROJECT_ID`                 | cms Studio + CLI | required; **per environment** (env-driven; no ids in repo)          |
+| `SANITY_STUDIO_DATASET`                    | cms Studio + CLI | required                                                            |
+| `SANITY_STUDIO_HOSTNAME`                   | cms CLI (deploy) | deploy target `<host>.sanity.studio`; CI-only                       |
+| `SANITY_DEPLOY_TOKEN`                      | CI (deploy)      | write/Deploy token; **project-scoped** → set per GitHub Environment |
+| `VERCEL_TOKEN` / `_ORG_ID` / `_PROJECT_ID` | CI (deploy)      | `blog-prod` deploy via Vercel CLI on tags                           |
+| `SKIP_ENV_VALIDATION`                      | CI builds only   | bypasses Zod env validation where no vars exist                     |
 
 - Env access is **always** through the validated entry points
   (`apps/web/src/utils/env/env.ts` via `@t3-oss/env-nextjs`, service's env via
@@ -344,15 +344,16 @@ the gate sequence (also in `CLAUDE.md` — the operational source of truth):
 Two long-lived environments, deployed by trigger. The full click-by-click setup
 and release runbook live in `docs/DEPLOY.md`; this is the shape.
 
-| Concern                 | Development                           | Production                        |
-| ----------------------- | ------------------------------------- | --------------------------------- |
-| Sanity dataset          | `development`                         | `production`                      |
-| Studio hostname         | `valovinnikov-blog-dev.sanity.studio` | `valovinnikov-blog.sanity.studio` |
-| Vercel project          | `blog-dev`                            | `blog-prod`                       |
-| Deploy trigger          | push/merge to `main`                  | push git tag `v*`                 |
-| Web deploy mechanism    | Vercel native Git integration         | Vercel CLI in GitHub Actions      |
-| Studio deploy mechanism | GitHub Actions (`sanity deploy`)      | GitHub Actions (`sanity deploy`)  |
-| Revalidation webhook    | dev webhook → dev site                | prod webhook → prod site          |
+| Concern                 | Development                           | Production                         |
+| ----------------------- | ------------------------------------- | ---------------------------------- |
+| Sanity project          | separate dev project (id via env)     | separate prod project (id via env) |
+| Sanity dataset          | `development`                         | `production`                       |
+| Studio hostname         | `valovinnikov-blog-dev.sanity.studio` | `valovinnikov-blog.sanity.studio`  |
+| Vercel project          | `blog-dev`                            | `blog-prod`                        |
+| Deploy trigger          | push/merge to `main`                  | push git tag `v*`                  |
+| Web deploy mechanism    | Vercel native Git integration         | Vercel CLI in GitHub Actions       |
+| Studio deploy mechanism | GitHub Actions (`sanity deploy`)      | GitHub Actions (`sanity deploy`)   |
+| Revalidation webhook    | dev webhook → dev site                | prod webhook → prod site           |
 
 - `main` is a continuous **staging line** (auto-deploys to development, which is
   also the local-dev dataset); a **`vMAJOR.MINOR.PATCH` git tag** promotes that
@@ -362,6 +363,12 @@ and release runbook live in `docs/DEPLOY.md`; this is the shape.
 - The Sanity CLI is env-driven on **both** dataset (`SANITY_STUDIO_DATASET`) and
   hostname (`SANITY_STUDIO_HOSTNAME`), so one `sanity.cli.ts` deploys either
   Studio (`apps/cms/sanity.cli.ts`).
+- **Each environment is a separate Sanity project** (not one project with two
+  datasets); each has its own project id, kept **env-driven and never committed**
+  (this repo hardcodes no Sanity ids). Because Sanity tokens are
+  **project-scoped**, dev and prod each need their own deploy + read tokens,
+  wired as **environment-scoped** GitHub secrets/variables (the `development` and
+  `production` GitHub Environments) so each deploy job resolves its own project.
 - Two Vercel projects give full isolation. `blog-dev` auto-deploys `main` and
   serves PR previews; `blog-prod` has its Ignored Build Step set to always-skip
   and is deployed **only** by the tag workflow via the Vercel CLI — so a `main`
