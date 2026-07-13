@@ -30,6 +30,11 @@ env:
   # production values (project id is public, so a Variable — not a Secret — is fine).
   SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
   SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
+  # Vercel Remote Cache for turbo tasks — shares artifacts across PR CI, the
+  # deploy verify jobs, and local dev. No-op until TURBO_TOKEN (repo Secret) and
+  # TURBO_TEAM (repo Variable) exist; turbo then falls back to the local cache.
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
   type-check:

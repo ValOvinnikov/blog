@@ -21,6 +21,10 @@ env:
   # deploy-studio job overrides them with its environment-scoped values.
   SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
   SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
+  # Vercel Remote Cache — lets verify replay task artifacts already built by PR
+  # CI instead of rebuilding. No-op until TURBO_TOKEN/TURBO_TEAM are configured.
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
 jobs:
   # A tag can point at ANY commit with no PR gate, so re-run the full suite on
@@ -80,8 +84,10 @@ jobs:
     environment: production
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      # Org/project ids are not sensitive — they live as environment-scoped
+      # Variables (not Secrets) so they stay inspectable in run logs.
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
@@ -99,6 +105,12 @@ jobs:
         if: ${{ env.VERCEL_TOKEN != '' }}
         run: |
           set -euo pipefail
+          # Without both ids the CLI silently auto-links to whatever project
+          # matches the directory name — fail loudly instead.
+          : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the production environment}"
+          : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID Variable on the production environment}"
+          # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
+          # green; the package is cached after the first resolution.
           npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
           npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
           npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --prebuilt --prod --token="$VERCEL_TOKEN"

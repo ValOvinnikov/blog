@@ -142,22 +142,35 @@ job resolves its own project's id + token:
 - [ ] Variable `SANITY_STUDIO_PROJECT_ID` = `<DEV_PROJECT_ID>`
 - [ ] Secret `SANITY_DEPLOY_TOKEN` = `<DEV_DEPLOY_TOKEN>`
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
-- [ ] Secret `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
-- [ ] Secret `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-dev**)
+- [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
+- [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-dev**)
 
 **`production` environment**
 
 - [ ] Variable `SANITY_STUDIO_PROJECT_ID` = `<PRD_PROJECT_ID>`
 - [ ] Secret `SANITY_DEPLOY_TOKEN` = `<PRD_DEPLOY_TOKEN>`
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
-- [ ] Secret `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
-- [ ] Secret `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-prod**)
+- [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
+- [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-prod**)
 - [ ] (Optional) require a reviewer on `production` for a manual gate before prod
       deploys run.
 
 > Repo-level `SANITY_STUDIO_PROJECT_ID` / `SANITY_STUDIO_DATASET` remain the
 > fallback for `ci.yml` (which sets no environment) — point them at whichever
 > project CI's typegen/migration checks should target.
+
+**Repo level (Settings → Secrets and variables → Actions) — Turborepo Remote Cache**
+
+Optional but recommended: shares turbo task artifacts across PR CI, the deploy
+verify jobs, and local dev, so unchanged tasks replay instead of rebuilding.
+Run `npx turbo login && npx turbo link` once locally (or mint a token in the
+Vercel dashboard → Account/Team Settings → Tokens), then:
+
+- [ ] Secret `TURBO_TOKEN` = `<VERCEL_ACCESS_TOKEN>`
+- [ ] Variable `TURBO_TEAM` = `<VERCEL_TEAM_SLUG>`
+
+Until both exist the workflows fall back to the local `.turbo` cache — nothing
+breaks.
 
 ### 5. Sanity — revalidation webhooks · API → Webhooks → Create webhook
 
