@@ -240,16 +240,19 @@ for an editable headline.
 
 ## 7. Environment & configuration
 
-| Variable                        | Consumer         | Notes                                            |
-| ------------------------------- | ---------------- | ------------------------------------------------ |
-| `NEXT_PUBLIC_SANITY_PROJECT_ID` | web + service    | required; validated by Zod at import             |
-| `NEXT_PUBLIC_SANITY_DATASET`    | web + service    | required                                         |
-| `NEXT_PUBLIC_SITE_URL`          | web (SEO)        | optional until launch; canonical/OG/feeds        |
-| `SANITY_API_READ_TOKEN`         | service (server) | optional; private reads / future draft mode      |
-| `SANITY_REVALIDATE_SECRET`      | web (server)     | optional until the #93 revalidation route exists |
-| `SANITY_STUDIO_PROJECT_ID`      | cms Studio + CLI | required; no hardcoded ids in the repo           |
-| `SANITY_STUDIO_DATASET`         | cms Studio + CLI | required                                         |
-| `SKIP_ENV_VALIDATION`           | CI builds only   | bypasses Zod env validation where no vars exist  |
+| Variable                                   | Consumer         | Notes                                            |
+| ------------------------------------------ | ---------------- | ------------------------------------------------ |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID`            | web + service    | required; validated by Zod at import             |
+| `NEXT_PUBLIC_SANITY_DATASET`               | web + service    | required                                         |
+| `NEXT_PUBLIC_SITE_URL`                     | web (SEO)        | optional until launch; canonical/OG/feeds        |
+| `SANITY_API_READ_TOKEN`                    | service (server) | optional; private reads / future draft mode      |
+| `SANITY_REVALIDATE_SECRET`                 | web (server)     | optional until the #93 revalidation route exists |
+| `SANITY_STUDIO_PROJECT_ID`                 | cms Studio + CLI | required; no hardcoded ids in the repo           |
+| `SANITY_STUDIO_DATASET`                    | cms Studio + CLI | required                                         |
+| `SANITY_STUDIO_HOSTNAME`                   | cms CLI (deploy) | deploy target `<host>.sanity.studio`; CI-only    |
+| `SANITY_DEPLOY_TOKEN`                      | CI (deploy)      | write/Deploy-scoped token for `sanity deploy`    |
+| `VERCEL_TOKEN` / `_ORG_ID` / `_PROJECT_ID` | CI (deploy)      | `blog-prod` deploy via Vercel CLI on tags        |
+| `SKIP_ENV_VALIDATION`                      | CI builds only   | bypasses Zod env validation where no vars exist  |
 
 - Env access is **always** through the validated entry points
   (`apps/web/src/utils/env/env.ts` via `@t3-oss/env-nextjs`, service's env via
@@ -336,14 +339,39 @@ the gate sequence (also in `CLAUDE.md` — the operational source of truth):
 4. `sanity deploy`, Vercel deploys, and `production` migrations are
    **human-gated** — agents never run them.
 
-## 13. Deployment topology (planned)
+## 13. Deployment topology
 
-Not yet deployed. Target: Sanity-hosted Studio (`sanity deploy`) + web app on
-Vercel (root dir `apps/web`, turbo-ignore build filter, env vars from §7,
-`npx turbo-ignore web` as the Ignored Build Step). Phased plan with tickets
-lives in `docs/BACKLOG.md` (D0–D5): accounts/tokens → Studio + CORS → Vercel
-web → content + revalidation webhook → launch hardening (feeds, JSON-LD,
-smoke tests) → operational automation (migration ledger, remote caching).
+Two long-lived environments, deployed by trigger. The full click-by-click setup
+and release runbook live in `docs/DEPLOY.md`; this is the shape.
+
+| Concern                 | Development                           | Production                        |
+| ----------------------- | ------------------------------------- | --------------------------------- |
+| Sanity dataset          | `development`                         | `production`                      |
+| Studio hostname         | `valovinnikov-blog-dev.sanity.studio` | `valovinnikov-blog.sanity.studio` |
+| Vercel project          | `blog-dev`                            | `blog-prod`                       |
+| Deploy trigger          | push/merge to `main`                  | push git tag `v*`                 |
+| Web deploy mechanism    | Vercel native Git integration         | Vercel CLI in GitHub Actions      |
+| Studio deploy mechanism | GitHub Actions (`sanity deploy`)      | GitHub Actions (`sanity deploy`)  |
+| Revalidation webhook    | dev webhook → dev site                | prod webhook → prod site          |
+
+- `main` is a continuous **staging line** (auto-deploys to development, which is
+  also the local-dev dataset); a **`vMAJOR.MINOR.PATCH` git tag** promotes that
+  exact commit to production. The tag is the sole source of truth for the version
+  (`package.json` version is not synced). Content is never versioned — it flows
+  Studio → revalidation webhook independently of releases.
+- The Sanity CLI is env-driven on **both** dataset (`SANITY_STUDIO_DATASET`) and
+  hostname (`SANITY_STUDIO_HOSTNAME`), so one `sanity.cli.ts` deploys either
+  Studio (`apps/cms/sanity.cli.ts`).
+- Two Vercel projects give full isolation. `blog-dev` auto-deploys `main` and
+  serves PR previews; `blog-prod` has its Ignored Build Step set to always-skip
+  and is deployed **only** by the tag workflow via the Vercel CLI — so a `main`
+  push can never reach production.
+- Workflows: `.github/workflows/deploy-development.yml` (dev Studio on `main`)
+  and `.github/workflows/deploy-production.yml` (a `verify` gate re-running
+  type-check/lint/test/build on the tagged commit, then prod Studio + prod web).
+  Deploy steps are guarded on their secret being present, so the workflows no-op
+  green until the one-time console setup (`docs/DEPLOY.md`) is done.
+- Historical phased rollout tickets (D0–D5) live in `docs/BACKLOG.md`.
 
 ## 14. Tooling: agents & skills
 

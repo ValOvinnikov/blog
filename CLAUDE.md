@@ -137,9 +137,20 @@ Every issue follows this exact order. **Stop and wait for explicit user approval
 
 **Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work only — never the commit, push, or PR.** Those three gates always require fresh, explicit confirmation.
 
+## Deployment
+
+Deploys are automated by the pipeline (see `docs/DEPLOY.md`, `SPEC.md` §13):
+merge to `main` → **development**; push a `vX.Y.Z` git tag → **production**
+(gated by a CI `verify` job). Both the Studio and web app deploy per trigger.
+The one-time environment setup (datasets, tokens, Vercel projects, GitHub
+secrets, webhooks, CORS) is human-gated console work in `docs/DEPLOY.md`.
+Cutting a release is `git tag vX.Y.Z && git push origin vX.Y.Z` — a
+push, so it stays under the push gate.
+
 ## Don't
 
-- Run `sanity deploy` / Vercel deploys (human-gated).
+- Run `sanity deploy` / Vercel deploys by hand (the pipeline owns them;
+  console setup is human-gated).
 - Read or commit `.env*` files.
 - Add a cross-layer import that creates a cycle.
 - Commit, push, or open a PR without explicit approval for that specific action.
