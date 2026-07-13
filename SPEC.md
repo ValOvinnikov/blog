@@ -351,7 +351,7 @@ and release runbook live in `docs/DEPLOY.md`; this is the shape.
 | Studio hostname         | `valovinnikov-blog-dev.sanity.studio` | `valovinnikov-blog.sanity.studio`  |
 | Vercel project          | `blog-dev`                            | `blog-prod`                        |
 | Deploy trigger          | push/merge to `main`                  | push git tag `v*`                  |
-| Web deploy mechanism    | Vercel native Git integration         | Vercel CLI in GitHub Actions       |
+| Web deploy mechanism    | Vercel CLI in GitHub Actions          | Vercel CLI in GitHub Actions       |
 | Studio deploy mechanism | GitHub Actions (`sanity deploy`)      | GitHub Actions (`sanity deploy`)   |
 | Revalidation webhook    | dev webhook → dev site                | prod webhook → prod site           |
 
@@ -369,15 +369,17 @@ and release runbook live in `docs/DEPLOY.md`; this is the shape.
   **project-scoped**, dev and prod each need their own deploy + read tokens,
   wired as **environment-scoped** GitHub secrets/variables (the `development` and
   `production` GitHub Environments) so each deploy job resolves its own project.
-- Two Vercel projects give full isolation. `blog-dev` auto-deploys `main` and
-  serves PR previews; `blog-prod` has its Ignored Build Step set to always-skip
-  and is deployed **only** by the tag workflow via the Vercel CLI — so a `main`
-  push can never reach production.
-- Workflows: `.github/workflows/deploy-development.yml` (dev Studio on `main`)
-  and `.github/workflows/deploy-production.yml` (a `verify` gate re-running
-  type-check/lint/test/build on the tagged commit, then prod Studio + prod web).
-  Deploy steps are guarded on their secret being present, so the workflows no-op
-  green until the one-time console setup (`docs/DEPLOY.md`) is done.
+- Two Vercel projects give full isolation. **Both** have Vercel's Git auto-deploy
+  disabled (Ignored Build Step `exit 0`) and are deployed **only** via the Vercel
+  CLI from GitHub Actions — so nothing deploys pre-merge, there are **no PR
+  preview deploys**, and a `main` push can never reach production.
+- **Deploys are CI-gated.** Each workflow runs a `verify` job
+  (type-check/lint/test/build) that the deploy jobs `needs`, so a deploy happens
+  only after checks pass on the exact commit:
+  `.github/workflows/deploy-development.yml` (on merge to `main` → dev Studio +
+  dev web) and `.github/workflows/deploy-production.yml` (on a `v*` tag → prod
+  Studio + prod web). Deploy steps are guarded on their secret being present, so
+  the workflows no-op green until the one-time console setup (`docs/DEPLOY.md`).
 - Historical phased rollout tickets (D0–D5) live in `docs/BACKLOG.md`.
 
 ## 14. Tooling: agents & skills

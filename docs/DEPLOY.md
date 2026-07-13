@@ -24,17 +24,18 @@ Architecture rationale lives in `SPEC.md` §13 and
 
 ## Environment matrix
 
-| Concern              | Development                           | Production                         |
-| -------------------- | ------------------------------------- | ---------------------------------- |
-| Sanity project       | separate dev project (id via env)     | separate prod project (id via env) |
-| Sanity dataset       | `development`                         | `production`                       |
-| Studio hostname      | `valovinnikov-blog-dev.sanity.studio` | `valovinnikov-blog.sanity.studio`  |
-| Vercel project       | `blog-dev`                            | `blog-prod`                        |
-| Web URL (initial)    | `<DEV_WEB_URL>`                       | `<PRD_WEB_URL>`                    |
-| Deploy trigger       | push/merge to `main`                  | push git tag `v*`                  |
-| Web deploy           | Vercel native Git integration         | Vercel CLI (GitHub Actions)        |
-| Studio deploy        | GitHub Actions                        | GitHub Actions                     |
-| Revalidation webhook | dev → dev site                        | prod → prod site                   |
+| Concern               | Development                           | Production                         |
+| --------------------- | ------------------------------------- | ---------------------------------- |
+| Sanity project        | separate dev project (id via env)     | separate prod project (id via env) |
+| Sanity dataset        | `development`                         | `production`                       |
+| Studio hostname       | `valovinnikov-blog-dev.sanity.studio` | `valovinnikov-blog.sanity.studio`  |
+| Vercel project        | `blog-dev`                            | `blog-prod`                        |
+| Web URL (initial)     | `<DEV_WEB_URL>`                       | `<PRD_WEB_URL>`                    |
+| Deploy trigger        | push/merge to `main`                  | push git tag `v*`                  |
+| Web deploy            | Vercel CLI (GitHub Actions)           | Vercel CLI (GitHub Actions)        |
+| Studio deploy         | GitHub Actions                        | GitHub Actions                     |
+| CI gate before deploy | `verify` job on `main`                | `verify` job on the `v*` tag       |
+| Revalidation webhook  | dev → dev site                        | prod → prod site                   |
 
 > `<DEV_WEB_URL>` / `<PRD_WEB_URL>` are each project's `*.vercel.app` URL — either
 > the auto-assigned one (e.g. `blog-web-<random>.vercel.app`) or a stable alias you
@@ -58,9 +59,10 @@ within this doc; the real values live in GitHub / Vercel / local `.env` and are
 | Sanity **Deploy** token                    | `<DEV_DEPLOY_TOKEN>`      | `<PRD_DEPLOY_TOKEN>`      |
 | Revalidate secret (`openssl rand -hex 32`) | `<DEV_REVALIDATE_SECRET>` | `<PRD_REVALIDATE_SECRET>` |
 
-Vercel (needed for the **prod** deploy only — dev web uses native Git
-integration): `<VERCEL_TOKEN>` (account token), plus `<VERCEL_ORG_ID>` and
-`<VERCEL_PROJECT_ID>` for `blog-prod` from `vercel link`.
+Vercel (needed for **both** dev and prod web deploys — both go through the Vercel
+CLI in CI): `<VERCEL_TOKEN>` (account token) and `<VERCEL_ORG_ID>` are shared;
+`<VERCEL_PROJECT_ID>` is **per project** (`blog-dev` vs `blog-prod`, from
+`vercel link`).
 
 ---
 
@@ -95,10 +97,17 @@ For **each** project (`blog-dev`, `blog-prod`): Add New → Project → import
 `ValOvinnikov/blog`; **Root Directory `apps/web`** + tick _"Include files
 outside of the root directory"_; **Node.js 22.x**.
 
+Both projects have Vercel's Git auto-deploy **disabled** — every deploy goes
+through a CI-gated GitHub Actions job (no pre-merge/preview deploys, nothing
+deploys before checks pass):
+
 - [ ] **`blog-dev`**
-  - [ ] Settings → Git → **Production Branch = `main`** (auto-deploys `main`,
-        serves PR previews).
-  - [ ] Ignored Build Step → `npx turbo-ignore web`.
+  - [ ] Settings → Git → **Ignored Build Step → `exit 0`** (skip all Git-triggered
+        builds — no auto-deploy, no PR previews; the `Deploy Development` workflow
+        deploys it via the CLI on merge to `main`, after its `verify` gate).
+  - [ ] From repo root: `npx vercel link` → select `blog-dev`. Read the ids from
+        `.vercel/project.json` → `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
+        (Then delete the local `.vercel/` dir — it's gitignored scratch.)
 - [ ] **`blog-prod`**
   - [ ] Settings → Git → **Ignored Build Step → `exit 0`** (always skip — Git
         never deploys prod; only the tag workflow does).
@@ -132,6 +141,9 @@ job resolves its own project's id + token:
 
 - [ ] Variable `SANITY_STUDIO_PROJECT_ID` = `<DEV_PROJECT_ID>`
 - [ ] Secret `SANITY_DEPLOY_TOKEN` = `<DEV_DEPLOY_TOKEN>`
+- [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
+- [ ] Secret `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
+- [ ] Secret `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-dev**)
 
 **`production` environment**
 
@@ -139,7 +151,7 @@ job resolves its own project's id + token:
 - [ ] Secret `SANITY_DEPLOY_TOKEN` = `<PRD_DEPLOY_TOKEN>`
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Secret `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
-- [ ] Secret `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (blog-prod)
+- [ ] Secret `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-prod**)
 - [ ] (Optional) require a reviewer on `production` for a manual gate before prod
       deploys run.
 
@@ -188,11 +200,18 @@ Local dev points at the **dev** project (`<DEV_PROJECT_ID>`):
 
 ### Development — on merge to `main`
 
-1. **Web:** `blog-dev`'s Vercel Git integration auto-builds `main` against the
-   `development` dataset. PRs get preview deployments automatically.
-2. **Studio:** `.github/workflows/deploy-development.yml` runs (when `apps/cms/**`
-   or `packages/config/**` changed) and deploys
-   `valovinnikov-blog-dev.sanity.studio`.
+`.github/workflows/deploy-development.yml` (Vercel's Git auto-deploy for
+`blog-dev` is disabled, so this is the **only** path — nothing deploys pre-merge
+or before checks):
+
+1. **`verify` gate** re-runs `type-check` / `lint` / `test` / `build` on the
+   merged commit. Both deploy jobs `needs: verify`.
+2. **`deploy-studio`** → `valovinnikov-blog-dev.sanity.studio` (development
+   dataset).
+3. **`deploy-web`** → `blog-dev` via the Vercel CLI
+   (`vercel pull → build --prod → deploy --prebuilt --prod`).
+
+There are **no PR preview deployments** — deploys happen only on merge to `main`.
 
 ### Production — on a `vX.Y.Z` tag
 
@@ -227,7 +246,7 @@ commit or redeploy a prior Vercel build.
 
 - [ ] Home page renders (hero + latest posts) with `cdn.sanity.io` images.
 - [ ] Response headers include the CSP / security headers (`next.config.ts`).
-- [ ] Opening a PR triggers a `blog-dev` **Preview** build; a docs-only push is
-      skipped by `turbo-ignore`.
+- [ ] A merge to `main` runs `Deploy Development` → `verify` passes → Studio + web
+      deploy (no deploy runs before `verify` is green, and PRs never deploy).
 - [ ] Publishing in the Studio updates the corresponding site within seconds
       (webhook). Dev publishes hit the dev site; prod publishes hit prod.
