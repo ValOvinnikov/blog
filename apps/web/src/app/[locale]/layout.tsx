@@ -83,7 +83,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
         <Header>
           <Header.Brand>
             <Link href="/" aria-label="Home">
-              <Logo prefix={brand.prefix} suffix={brand.suffix} />
+              <Logo prefix={brand.name} suffix={brand.prefix} />
             </Link>
           </Header.Brand>
           <PrimaryNavigation
