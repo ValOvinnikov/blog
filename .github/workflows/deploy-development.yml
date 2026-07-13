@@ -1,0 +1,52 @@
+name: Deploy Development
+
+# Dev web deploys via Vercel's native Git integration on `main` (project
+# `blog-dev`). This workflow only deploys the dev Studio. Path-filtered because
+# it is NOT a required status check (safe to skip), unlike ci.yml.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/cms/**'
+      - 'packages/config/**'
+      - '.github/workflows/deploy-development.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-dev-studio
+  cancel-in-progress: true
+
+env:
+  PNPM_VERSION: 9.15.0
+  NODE_VERSION: '22'
+
+jobs:
+  deploy-studio:
+    name: Deploy dev Studio
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: development
+    env:
+      SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
+      SANITY_STUDIO_DATASET: development
+      SANITY_STUDIO_HOSTNAME: valovinnikov-blog-dev
+      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_DEPLOY_TOKEN }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # No-op (green) until SANITY_DEPLOY_TOKEN is configured, so this is safe
+      # to merge before the one-time human setup exists.
+      - name: Deploy Studio
+        if: ${{ env.SANITY_AUTH_TOKEN != '' }}
+        working-directory: apps/cms
+        run: pnpm exec sanity deploy

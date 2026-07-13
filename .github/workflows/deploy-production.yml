@@ -1,0 +1,93 @@
+name: Deploy Production
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+# Never cancel an in-flight production deploy.
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 9.15.0
+  NODE_VERSION: '22'
+  VERCEL_CLI_VERSION: 48.0.0
+
+jobs:
+  # A tag can point at ANY commit with no PR gate, so re-run the full suite on
+  # the exact tagged commit before anything is promoted to production.
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Type-check
+        run: pnpm type-check
+      - name: Lint
+        run: pnpm lint
+      - name: Test
+        run: pnpm test
+      - name: Build
+        run: pnpm build
+        env:
+          SKIP_ENV_VALIDATION: 'true'
+
+  deploy-studio:
+    name: Deploy prod Studio
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    env:
+      SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
+      SANITY_STUDIO_DATASET: production
+      SANITY_STUDIO_HOSTNAME: valovinnikov-blog
+      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_DEPLOY_TOKEN }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Deploy Studio
+        if: ${{ env.SANITY_AUTH_TOKEN != '' }}
+        working-directory: apps/cms
+        run: pnpm exec sanity deploy
+
+  deploy-web:
+    name: Deploy prod web
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+      # Vercel CLI runs its own `next build` with the project's Production env
+      # vars pulled from Vercel (root directory apps/web is stored on the
+      # project, so build resolves the monorepo workspaces correctly).
+      - name: Deploy to Vercel (production)
+        if: ${{ env.VERCEL_TOKEN != '' }}
+        run: |
+          set -euo pipefail
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --prebuilt --prod --token="$VERCEL_TOKEN"
