@@ -1,7 +1,7 @@
 import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import { env } from '@web/utils/env/env';
 import { getRevalidateTagsForType } from '@web/utils/revalidate-tags';
-import { revalidateTag } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 // `revalidateTag` requires the Node.js runtime (it isn't supported on Edge).
@@ -79,5 +79,20 @@ export async function POST(request: Request): Promise<NextResponse> {
     revalidateTag(tag, { expire: 0 });
   }
 
-  return NextResponse.json({ revalidated, type, id }, { status: 200 });
+  // Tag expiry alone has not been invalidating prerendered route entries on
+  // Vercel (#318) — pages kept serving stale content indefinitely. Purging
+  // the root layout's path invalidates every page; publishes are infrequent
+  // on a blog, so the whole-site blast radius is acceptable. Verified against
+  // next@16.2.10 internals: every rendered route carries the implicit
+  // `_N_T_/layout` tag, which `revalidatePath('/', 'layout')` expires — so
+  // this covers the locale-prefixed prerenders (`/EN`) too.
+  const pathPurged = revalidated.length > 0;
+  if (pathPurged) {
+    revalidatePath('/', 'layout');
+  }
+
+  return NextResponse.json(
+    { revalidated, pathPurged, type, id },
+    { status: 200 },
+  );
 }

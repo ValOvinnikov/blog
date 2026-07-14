@@ -4,8 +4,9 @@ const { isValidSignatureMock } = vi.hoisted(() => ({
   isValidSignatureMock: vi.fn(),
 }));
 
-const { revalidateTagMock } = vi.hoisted(() => ({
+const { revalidateTagMock, revalidatePathMock } = vi.hoisted(() => ({
   revalidateTagMock: vi.fn(),
+  revalidatePathMock: vi.fn(),
 }));
 
 vi.mock('@sanity/webhook', () => ({
@@ -15,6 +16,7 @@ vi.mock('@sanity/webhook', () => ({
 
 vi.mock('next/cache', () => ({
   revalidateTag: revalidateTagMock,
+  revalidatePath: revalidatePathMock,
 }));
 
 vi.mock('@web/utils/env/env', () => ({
@@ -37,6 +39,7 @@ describe('POST /api/revalidate', () => {
   beforeEach(() => {
     isValidSignatureMock.mockReset();
     revalidateTagMock.mockReset();
+    revalidatePathMock.mockReset();
   });
 
   afterEach(() => {
@@ -57,6 +60,7 @@ describe('POST /api/revalidate', () => {
     expect(response.status).toBe(200);
     expect(json).toEqual({
       revalidated: ['post', 'posts', 'homePage'],
+      pathPurged: true,
       type: 'blog_post',
       id: 'post-1',
     });
@@ -64,6 +68,8 @@ describe('POST /api/revalidate', () => {
     expect(revalidateTagMock).toHaveBeenCalledWith('posts', { expire: 0 });
     expect(revalidateTagMock).toHaveBeenCalledWith('homePage', { expire: 0 });
     expect(revalidateTagMock).toHaveBeenCalledTimes(3);
+    expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
+    expect(revalidatePathMock).toHaveBeenCalledTimes(1);
   });
 
   it('returns 401 and revalidates nothing for an invalid signature', async () => {
@@ -106,10 +112,12 @@ describe('POST /api/revalidate', () => {
     expect(response.status).toBe(200);
     expect(json).toEqual({
       revalidated: [],
+      pathPurged: false,
       type: 'something_unknown',
       id: 'doc-1',
     });
     expect(revalidateTagMock).not.toHaveBeenCalled();
+    expect(revalidatePathMock).not.toHaveBeenCalled();
   });
 
   it('returns 400 for a malformed request body', async () => {
