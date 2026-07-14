@@ -394,7 +394,9 @@ inside the layer contracts:
 - **Subagents** (`.claude/agents/`): `cms`, `service`, `ui`, `web` — each
   scoped to one workspace, delegated in dependency order
   (`cms → service → ui → web`). The orchestrator never writes layer files
-  before delegating.
+  before delegating. Plus `reviewer` — a read-only pre-commit reviewer
+  dispatched over the full diff before the commit gate; it must return
+  `APPROVE` before the orchestrator may ask to commit.
 - **Skills** (`.claude/skills/`): `develop-feature` (lifecycle + delegation —
   the entry point for any non-trivial task), `add-content-type` (cross-layer
   recipe), `cms-schema-practices` (schema + migration quality bar),

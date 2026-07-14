@@ -15,6 +15,44 @@ architecture is the deliverable, so boundary violations are blocking, not nits.
 **Spec sync (blocking):** if the diff changes architecture, layer contracts,
 env vars, or the content model, `SPEC.md` must be updated in the same PR.
 
+## 0. Mechanical pass (blocking — run the commands, don't eyeball)
+
+Checklist prose gets skimmed; commands don't miss. Run each of these over the
+**full diff** (`git diff main...HEAD`, plus `git diff` if the tree is dirty)
+and treat every hit as a blocking finding unless explicitly allowed:
+
+```bash
+BASE=main
+D() { git diff "$BASE"...HEAD; git diff; }
+
+# Debug artifacts — console.log/info/debug/trace never land
+# (console.warn/error are allowed in apps/web server code)
+D | grep -nE '^\+.*console\.(log|info|debug|trace)'
+D | grep -nE '^\+.*\bdebugger\b'
+
+# Focused/skipped tests
+D | grep -nE '^\+.*\.(only|skip)\('
+
+# New suppressions need a stated justification
+D | grep -nE '^\+.*(eslint-disable|@ts-ignore|@ts-expect-error|@ts-nocheck)'
+
+# Leftovers and conflict markers
+D | grep -nE '^\+.*(TODO|FIXME|XXX|HACK)'
+D | grep -nE '^(<<<<<<<|>>>>>>>)'
+
+# Secrets / env files
+D | grep -nE '^\+.*(_TOKEN|_SECRET|API_KEY)\s*[:=]'
+git diff "$BASE"...HEAD --name-only | grep -E '^\.env'
+```
+
+Also scan the diff by eye for commented-out code blocks — grep can't catch
+those reliably. ESLint's `no-console` (in `configs/eslint/base.js`) backs this
+up at lint time; the grep pass exists so review catches what config misses.
+
+Expected false positives: a diff that edits this skill (or other docs quoting
+these patterns) will hit its own example strings. Hits inside documentation
+code fences are not findings — report only hits in real code.
+
 ## 1. Layer boundaries (blocking)
 
 - `@blog/ui` imports **no** `service`, `sanity`, `next-sanity`, or `fetch`. Pure
@@ -93,14 +131,22 @@ env vars, or the content model, `SPEC.md` must be updated in the same PR.
 
 ## How to run a review here
 
-Run **both passes** over `git diff` before opening a PR:
+**Pre-commit reviews are delegated to the `reviewer` subagent**
+(`.claude/agents/reviewer.md`) — a fresh context has no author bias and no
+memory of "why the code is fine". The orchestrator dispatches it after the
+verify gates pass and before asking to commit; it runs the passes below and
+reports a verdict with blocking/non-blocking findings. If you are reviewing
+manually (e.g. someone else's PR, or the subagent is unavailable), run the
+same passes yourself.
 
-1. `git diff` the branch; map each changed file to its layer.
-2. **Contract pass (this checklist).** Walk sections 1–7; flag boundary/type
-   issues first (blocking) then quality. This encodes _our_ architecture — a
-   generic reviewer can't know it.
-3. **General pass.** Also review for general correctness, security, performance,
-   and maintainability — the dimensions a contract check won't catch:
+The review runs **three passes** over the diff, in order — a hit in an early
+pass does not skip the later ones:
+
+1. **Mechanical pass (section 0).** Run the commands; every hit is blocking.
+2. **Contract pass (sections 1–7).** Map each changed file to its layer, walk
+   the checklist; flag boundary/type issues first (blocking) then quality.
+   This encodes _our_ architecture — a generic reviewer can't know it.
+3. **General pass.** The dimensions a contract check won't catch:
    - **Security:** injection/XSS/SSRF, auth/authz, secrets, unsafe deserialization.
    - **Performance:** N+1 queries, O(n²) in hot paths, unbounded loops/queries,
      resource leaks.
@@ -109,10 +155,6 @@ Run **both passes** over `git diff` before opening a PR:
      not overwrite/lose data).
    - **Maintainability:** naming, single responsibility, duplication, test coverage.
 
-   Use the built-in `/code-review` skill for this pass (or apply the dimensions
-   above directly). Both passes are required — the contract pass finds boundary
-   violations; the general pass finds the bugs.
-
-4. On PRs, the `claude-code-review` CI workflow (`.github/workflows/`) also runs
-   the general `/code-review` automatically — but don't rely on it in place of
-   the pre-PR self-review.
+On PRs, the `claude-code-review` CI workflow (`.github/workflows/`) also runs
+the general `/code-review` automatically — but don't rely on it in place of
+the pre-commit review: CI reviews after the push, this review gates the commit.

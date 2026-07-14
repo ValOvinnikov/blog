@@ -124,6 +124,8 @@ contracts:
   - `service` — Sanity client, GROQ, typed fetchers (no React).
   - `ui` — building the pure, publishable `@blog/ui` design system.
   - `web` — App Router routes, SEO, composition of `ui` + `service`.
+  - `reviewer` — read-only pre-commit review of the full diff; gates the
+    commit ask on an `APPROVE` verdict.
 - **Skills** (`.claude/skills/`):
   - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit); start here for non-trivial work.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
