@@ -1,15 +1,15 @@
-import type { TModuleRef } from '@blog/service';
+import type { TModule } from '@blog/service';
 import { Fragment, type ReactNode } from 'react';
 
 import { MODULE_MAP } from './module-map';
 
 export interface IModuleRendererProps {
-  modules: TModuleRef[];
+  modules: TModule[];
   locale: string;
 }
 
 /**
- * ModuleRenderer — maps each thin `TModuleRef` (from a page's `modules[]`)
+ * ModuleRenderer — maps each thin `TModule` (from a page's `modules[]`)
  * to its registered per-module Server Component and renders it, keyed by
  * the module's `_id` (a page can't reference the same module twice — enforced
  * by a CMS uniqueness rule). Unknown module types render nothing and log a

@@ -1,9 +1,9 @@
-import type { TModuleRef } from '@blog/service/shared/transformers/to-module-ref';
+import type { TModule } from '@blog/service/shared/transformers/to-module';
 import type { TSeoMeta } from '@blog/service/shared/transformers/to-seo-meta';
 
 export type THomePage = {
   title: string;
-  hero: TModuleRef;
-  modules: TModuleRef[];
+  hero: TModule;
+  modules: TModule[];
   seo: TSeoMeta | undefined;
 };

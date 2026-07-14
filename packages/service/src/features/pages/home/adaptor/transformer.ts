@@ -1,4 +1,4 @@
-import { toModuleRef } from '@blog/service/shared/transformers/to-module-ref';
+import { toModule } from '@blog/service/shared/transformers/to-module';
 import { toSeoMeta } from '@blog/service/shared/transformers/to-seo-meta';
 import type { InferResultType } from 'groqd';
 
@@ -10,8 +10,8 @@ export type TRawHomePage = InferResultType<typeof homePageQuery>;
 export function toHomePage(raw: TRawHomePage): THomePage {
   return {
     title: raw.title,
-    hero: toModuleRef(raw.hero),
-    modules: (raw.modules ?? []).map(toModuleRef),
+    hero: toModule(raw.hero),
+    modules: (raw.modules ?? []).map(toModule),
     seo: raw.seo ? toSeoMeta(raw.seo) : undefined,
   };
 }

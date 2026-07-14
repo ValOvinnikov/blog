@@ -56,7 +56,7 @@ export type { THomePage } from './features/pages/home';
 export type { TPostDetail, TPostDetailAuthor } from './features/pages/post';
 export { urlForImage } from './sanity/image';
 export type { TCategory } from './shared/transformers/to-category';
-export type { TModuleRef } from './shared/transformers/to-module-ref';
+export type { TModule } from './shared/transformers/to-module';
 export type {
   TPostCard,
   TPostCardAuthor,

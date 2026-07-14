@@ -2,14 +2,14 @@ import type { TModuleType } from '@blog/config';
 import type { moduleFragment } from '@blog/service/shared/fragments/module';
 import type { InferFragmentType } from 'groqd';
 
-export type TRawModuleRef = InferFragmentType<typeof moduleFragment>;
+export type TRawModule = InferFragmentType<typeof moduleFragment>;
 
-export type TModuleRef = {
+export type TModule = {
   id: string;
   type: TModuleType;
 };
 
-export function toModuleRef(raw: TRawModuleRef): TModuleRef {
+export function toModule(raw: TRawModule): TModule {
   return {
     id: raw._id,
     type: raw._type,
