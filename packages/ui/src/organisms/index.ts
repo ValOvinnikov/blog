@@ -4,6 +4,8 @@ export * from './cta-module';
 export * from './footer';
 export * from './header';
 export * from './hero';
+export type { IPaginationProps } from './pagination';
+export { Pagination } from './pagination';
 export type { IPostGridProps } from './post-grid';
 export { PostGrid } from './post-grid';
 export type {
