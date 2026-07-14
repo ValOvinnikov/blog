@@ -1,5 +1,5 @@
+import { makeRawPostCard } from '@blog/service/testing/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import { describe, expect, it, vi } from 'vitest';
 
 import { getBlogPage } from './loader';
@@ -10,23 +10,40 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 }));
 
 describe('getBlogPage', () => {
-  it('maps every post into a card', async () => {
-    mockRun.mockResolvedValue([
+  it('returns the page window with page math for a full corpus', async () => {
+    // First runQuery call = window, second = count (Promise.all order).
+    mockRun.mockResolvedValueOnce([
       makeRawPostCard({ _id: 'a' }),
       makeRawPostCard({ _id: 'b' }),
     ]);
+    mockRun.mockResolvedValueOnce(20);
 
-    const page = await getBlogPage();
+    const result = await getBlogPage({ page: 2, pageSize: 9 });
 
-    expect(page.posts.map((p) => p.id)).toEqual(['a', 'b']);
-    expect(page.posts[0]?.title).toBe('Hello World');
+    expect(result.posts.map((p) => p.id)).toEqual(['a', 'b']);
+    expect(result.currentPage).toBe(2);
+    expect(result.total).toBe(20);
+    expect(result.totalPages).toBe(3); // ceil(20 / 9)
   });
 
-  it('returns an empty list when there are no posts', async () => {
-    mockRun.mockResolvedValue([]);
+  it('defaults to page 1 and POSTS_PER_PAGE', async () => {
+    mockRun.mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
+    mockRun.mockResolvedValueOnce(1);
 
-    const page = await getBlogPage();
+    const result = await getBlogPage();
 
-    expect(page.posts).toEqual([]);
+    expect(result.currentPage).toBe(1);
+    expect(result.totalPages).toBe(1);
+  });
+
+  it('returns totalPages 1 for an empty corpus', async () => {
+    mockRun.mockResolvedValueOnce([]);
+    mockRun.mockResolvedValueOnce(0);
+
+    const result = await getBlogPage({ page: 1 });
+
+    expect(result.posts).toEqual([]);
+    expect(result.total).toBe(0);
+    expect(result.totalPages).toBe(1); // Math.max(1, ceil(0/9))
   });
 });
