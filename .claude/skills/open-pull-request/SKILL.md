@@ -28,6 +28,9 @@ all layers land. One concern per PR still holds either way.
   Ask separately, after the push is confirmed.
 - **Never commit without explicit user approval.**
   After finishing work, ask the user: commit now or wait for review?
+- **Never ask to commit (Gate 2) before the `reviewer` subagent has returned
+  `APPROVE` on the final diff.** New changes after an APPROVE invalidate it —
+  re-review before asking again.
 - **Never merge.** Merging is the human's call only.
 - **Never deploy.** `sanity deploy` and Vercel deploys are human-run only.
 - **Never set `--assignee` or `--reviewer` on the PR.** The repo owner cannot
@@ -99,10 +102,13 @@ Work through these gates in order. **Stop at each gate and wait for the user.**
   or multi-layer sequence depending on what changed. Do not use the simplified
   `pnpm type-check && pnpm lint && pnpm test` shortcut — it misses typegen and
   the web build where required.
-- Run `code-review-practices` over `git diff`. Fix any blocking issues (layer
-  boundaries, type safety, missing `.notNull()`, `next/link` usage) before
-  proceeding. Do not move to Gate 2 with known violations.
-- Report results. Do not proceed past Gate 1 if any check is red.
+- Dispatch the **`reviewer` subagent** (`.claude/agents/reviewer.md`) over the
+  final diff — it applies `code-review-practices` (mechanical scan + contract
+  pass + general pass). Fix any blocking findings, re-verify, and re-dispatch
+  until it returns `APPROVE`. Do not move to Gate 2 without an `APPROVE` on
+  the diff as it stands.
+- Report results, including the review verdict. Do not proceed past Gate 1 if
+  any check is red.
 
 ### Gate 2 — Ask to commit
 

@@ -57,7 +57,8 @@ prompt — do not write it to disk first.
 - `web-storybook` when adding or editing stories in `apps/web`.
 - `testing-practices` when adding/updating tests.
 - `seo-and-metadata` when changing routes, metadata, or feeds.
-- `code-review-practices` before opening a PR.
+- `code-review-practices` before every commit — applied by the `reviewer`
+  subagent at gate step 4 (see the delivery gate sequence below).
 - `open-pull-request` when shipping an issue: branch → work → PR → assign (push is human-gated).
 - `use-context7` before implementing against any library API you are not certain
   of — resolves live, version-matched docs via the context7 MCP server. Use
@@ -129,9 +130,13 @@ Every issue follows this exact order. **Stop and wait for explicit user approval
 1. Set issue → In Progress on the board
 2. Checkout branch from `main`
 3. Do the work + run quality gates
-4. **Ask to commit** — present "commit now" vs "review first"; wait for answer
-5. **Ask to push** — separate question, after commit; wait for answer
-6. **Ask to open PR** — separate question, after push; wait for answer.
+4. **Dispatch the `reviewer` subagent** (`.claude/agents/reviewer.md`) over the
+   full diff — fix blocking findings and re-dispatch until it returns
+   `APPROVE`. Never ask to commit without an `APPROVE` on the diff as it
+   stands; new changes invalidate a prior `APPROVE`.
+5. **Ask to commit** — present "commit now" vs "review first"; wait for answer
+6. **Ask to push** — separate question, after commit; wait for answer
+7. **Ask to open PR** — separate question, after push; wait for answer.
    Once approved: run `gh pr create`, then **immediately** set the issue → Code Review
    on the board — do not report the PR URL until the board update is done.
 

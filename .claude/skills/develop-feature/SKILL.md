@@ -142,10 +142,18 @@ Run in this exact order from the repo root — each step feeds the next:
 All checks must pass before moving to self-review. Fix the failing layer and
 re-run from that step — do not proceed with any red check.
 
-## 6. Self-review
+## 6. Review (blocking — Gate 2 must not be offered until this passes)
 
-- Run the `code-review-practices` skill over `git diff`. Fix boundary/type
-  issues (blocking) before anything else.
+- Dispatch the **`reviewer` subagent** (`.claude/agents/reviewer.md`) over the
+  full diff (`main...HEAD` + working tree). It applies `code-review-practices`
+  — mechanical scan, contract pass, general pass — with fresh eyes and reports
+  a verdict.
+- Fix every **blocking** finding (delegating to the owning layer agent where
+  appropriate), re-run the affected verify checks from step 5, then re-dispatch
+  the reviewer until it returns `APPROVE`.
+- Only after `APPROVE` may you proceed to step 7 and ask to commit. A review
+  that never ran is a blocking finding in itself — "the diff is small" or
+  "checks are green" does not substitute for the review.
 
 ## 7. Hand off to the gate sequence
 

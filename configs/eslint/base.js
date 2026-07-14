@@ -26,6 +26,7 @@ export default [
       'import-x': importX,
     },
     rules: {
+      'no-console': ['error', { allow: ['warn', 'error'] }],
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/consistent-type-imports': [
         'warn',
