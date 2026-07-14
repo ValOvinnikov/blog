@@ -25,4 +25,23 @@ describe('Sanity client module loading', () => {
 
     await expect(import('./image')).resolves.toHaveProperty('urlForImage');
   });
+
+  it('creates the client with the Sanity CDN disabled', async () => {
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
+    vi.resetModules();
+
+    const createClientMock = vi.fn().mockReturnValue({});
+    vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
+
+    const { getClient } = await import('./client');
+    getClient();
+
+    // Next's tagged data cache is the sole caching layer — a CDN read after a
+    // tag purge can re-cache stale content (#316).
+    expect(createClientMock).toHaveBeenCalledWith(
+      expect.objectContaining({ useCdn: false }),
+    );
+
+    vi.doUnmock('next-sanity');
+  });
 });

@@ -60,9 +60,9 @@ describe('POST /api/revalidate', () => {
       type: 'blog_post',
       id: 'post-1',
     });
-    expect(revalidateTagMock).toHaveBeenCalledWith('post', 'max');
-    expect(revalidateTagMock).toHaveBeenCalledWith('posts', 'max');
-    expect(revalidateTagMock).toHaveBeenCalledWith('homePage', 'max');
+    expect(revalidateTagMock).toHaveBeenCalledWith('post', { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith('posts', { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith('homePage', { expire: 0 });
     expect(revalidateTagMock).toHaveBeenCalledTimes(3);
   });
 

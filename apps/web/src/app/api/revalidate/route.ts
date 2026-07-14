@@ -72,9 +72,11 @@ export async function POST(request: Request): Promise<NextResponse> {
   const revalidated = getRevalidateTagsForType(type, id);
 
   for (const tag of revalidated) {
-    // 'max' fully purges the tag on demand (Next 16 requires an explicit
-    // profile) rather than applying a bounded expiry window.
-    revalidateTag(tag, 'max');
+    // `{ expire: 0 }` forces immediate expiration — the next request blocks
+    // and renders fresh. The profile shorthand ('max' etc.) is a *stale
+    // window*: it keeps serving old content while revalidating in the
+    // background, which for a publish webhook means updates never appear.
+    revalidateTag(tag, { expire: 0 });
   }
 
   return NextResponse.json({ revalidated, type, id }, { status: 200 });

@@ -290,8 +290,13 @@ changing a schema does **not** change existing documents.
 - **Default:** static generation; `generateStaticParams` for dynamic routes
   (service exposes `params` slices returning `{ slug }[]`).
 - **Revalidation:** time-based via `isr('tag')` in service queries; on-demand
-  via `app/api/revalidate` (#93, secret-verified, `revalidateTag`) from a
-  Sanity publish webhook.
+  via `app/api/revalidate` (#93, secret-verified,
+  `revalidateTag(tag, { expire: 0 })` — immediate expiry, not a stale-while-
+  revalidate profile) from a Sanity publish webhook.
+- **Sanity CDN is deliberately bypassed** (`useCdn: false` in the service
+  client): Next's tagged data cache is the sole caching layer. Reading through
+  the CDN lets a just-purged tag refetch a still-stale CDN response and
+  re-cache it — do not flip it back on as a perf optimisation (#316).
 - **Preview/drafts:** Next.js Draft Mode + Sanity Presentation — planned
   post-deployment (see backlog), enabled by `SANITY_API_READ_TOKEN`.
 - **i18n:** all routes under `src/app/[locale]/`; next-intl middleware with

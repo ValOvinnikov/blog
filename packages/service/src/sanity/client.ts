@@ -16,7 +16,11 @@ export function getClient(): TSanityClient {
     projectId: env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     dataset: env.NEXT_PUBLIC_SANITY_DATASET,
     apiVersion: '2024-01-01',
-    useCdn: process.env['NODE_ENV'] === 'production',
+    // Next's tagged data cache is the caching layer (webhook-driven
+    // revalidation). Reading through Sanity's CDN on top of it lets a
+    // just-purged tag refetch a still-stale CDN response and re-cache it
+    // for up to an hour — origin reads stay rare because ISR absorbs them.
+    useCdn: false,
     token: env.SANITY_API_READ_TOKEN,
     // Explicit (already the default): never serve draft content to the public.
     perspective: 'published',
