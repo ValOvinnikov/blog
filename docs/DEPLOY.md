@@ -7,7 +7,9 @@ How this blog deploys, and the one-time setup that makes the pipeline live.
 - **Push a `vX.Y.Z` git tag** → **production** environment (`production`
   dataset).
 
-Both the Sanity **Studio** and the Next.js **web app** deploy on each trigger.
+On a `main` merge, the Sanity **Studio** and the Next.js **web app** each deploy
+only when the merge touches their turbo graph (`turbo-ignore`; a manual
+`workflow_dispatch` run deploys both). A production tag always deploys both.
 Architecture rationale lives in `SPEC.md` §13 and
 `docs/superpowers/specs/2026-07-13-multi-env-release-pipeline-design.md`.
 
@@ -217,11 +219,14 @@ Local dev points at the **dev** project (`<DEV_PROJECT_ID>`):
 `blog-dev` is disabled, so this is the **only** path — nothing deploys pre-merge
 or before checks):
 
-1. **`verify` gate** re-runs `type-check` / `lint` / `test` / `build` on the
+1. **`changes` gate** runs `turbo-ignore` per app — a deploy job only runs when
+   the merge affects that app's turbo graph (`workflow_dispatch` forces both;
+   a no-op merge skips everything, including `verify`).
+2. **`verify` gate** re-runs `type-check` / `lint` / `test` / `build` on the
    merged commit. Both deploy jobs `needs: verify`.
-2. **`deploy-studio`** → `valovinnikov-blog-dev.sanity.studio` (development
+3. **`deploy-studio`** → `valovinnikov-blog-dev.sanity.studio` (development
    dataset).
-3. **`deploy-web`** → `blog-dev` via the Vercel CLI
+4. **`deploy-web`** → `blog-dev` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
 
 There are **no PR preview deployments** — deploys happen only on merge to `main`.
