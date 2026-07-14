@@ -1,4 +1,4 @@
-import { TLINK_TYPE, type ILink } from '@blog/config';
+import { routes, TLINK_TYPE, type ILink } from '@blog/config';
 import type { linkFragment } from '@blog/service/shared/fragments/link';
 import type { InferFragmentType } from 'groqd';
 
@@ -14,9 +14,9 @@ const INTERNAL_HREF_BUILDERS: Record<
   TInternalReference['_type'],
   (slug: string) => string
 > = {
-  blog_post: (slug) => `/blog/${slug}`,
-  blog_category: (slug) => `/category/${slug}`,
-  page_generic: (slug) => `/${slug}`,
+  blog_post: routes.post,
+  blog_category: routes.category,
+  page_generic: routes.genericPage,
 };
 
 function toInternalHref(raw: TInternalReference): string | undefined {

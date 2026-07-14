@@ -1,4 +1,4 @@
-import { HERO_FIELD_MODE } from '@blog/config';
+import { HERO_FIELD_MODE, routes } from '@blog/config';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { toLink } from '@blog/service/shared/transformers/to-link';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
@@ -82,7 +82,7 @@ export function toHeroModule(
     primaryAction: heroPost
       ? {
           label: raw.primaryActionLabel ?? DEFAULT_PRIMARY_ACTION_LABEL,
-          href: `/blog/${heroPost.slug}`,
+          href: routes.post(heroPost.slug),
           target: undefined,
           platform: undefined,
         }
