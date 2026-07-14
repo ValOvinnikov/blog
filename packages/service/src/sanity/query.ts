@@ -13,6 +13,9 @@ type TSchemaConfig = {
 
 export const q = createGroqBuilder<TSchemaConfig>();
 
+/** Shared `.parameters<T>()` shape for the slug-lookup queries (post, category, author, generic page). */
+export type TSlugParams = { slug: string };
+
 type TNextFetchOptions = {
   next?: { revalidate?: number | false; tags?: string[] };
 };

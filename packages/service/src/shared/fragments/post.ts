@@ -18,9 +18,13 @@ export const postCardFragment = q
       .field('mainImage')
       .project(sanityImageFragment)
       .notNull(),
-    featured: sub.field('featured'),
+    featured: sub.field('featured').nullable(true),
     author: sub.field('author').deref().project(authorCardFragment).notNull(),
-    categories: sub.field('categories[]').deref().project(categoryFragment),
+    categories: sub
+      .field('categories[]')
+      .deref()
+      .project(categoryFragment)
+      .notNull(),
   }));
 
 export const postDetailFragment = q
@@ -36,9 +40,13 @@ export const postDetailFragment = q
       .field('mainImage')
       .project(sanityImageFragment)
       .notNull(),
-    featured: sub.field('featured'),
+    featured: sub.field('featured').nullable(true),
     body: sub.field('body[]').notNull(),
-    seo: sub.field('seo').project(seoFragment),
+    seo: sub.field('seo').project(seoFragment).nullable(true),
     author: sub.field('author').deref().project(authorDetailFragment).notNull(),
-    categories: sub.field('categories[]').deref().project(categoryFragment),
+    categories: sub
+      .field('categories[]')
+      .deref()
+      .project(categoryFragment)
+      .notNull(),
   }));

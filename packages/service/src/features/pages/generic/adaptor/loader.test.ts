@@ -18,8 +18,8 @@ describe('getPage', () => {
     expect(page.title).toBe('About');
     expect(page.slug).toBe('about');
     expect(page.modules).toEqual([
-      { key: 'module-1', id: 'content-1', type: 'module_content' },
-      { key: 'module-2', id: 'cta-1', type: 'module_cta' },
+      { id: 'content-1', type: 'module_content' },
+      { id: 'cta-1', type: 'module_cta' },
     ]);
     expect(page.seo).toBeUndefined();
   });

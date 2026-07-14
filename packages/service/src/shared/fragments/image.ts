@@ -24,14 +24,20 @@ export const sanityImageFragment = q
       .deref()
       .project((assetSub) => ({
         _id: true,
-        metadata: assetSub.field('metadata').project((metaSub) => ({
-          lqip: metaSub.field('lqip'),
-          dimensions: metaSub.field('dimensions').project((dimSub) => ({
-            width: dimSub.field('width'),
-            height: dimSub.field('height'),
-            aspectRatio: dimSub.field('aspectRatio'),
-          })),
-        })),
+        metadata: assetSub
+          .field('metadata')
+          .project((metaSub) => ({
+            lqip: metaSub.field('lqip').nullable(true),
+            dimensions: metaSub
+              .field('dimensions')
+              .project((dimSub) => ({
+                width: dimSub.field('width').nullable(true),
+                height: dimSub.field('height').nullable(true),
+                aspectRatio: dimSub.field('aspectRatio').nullable(true),
+              }))
+              .nullable(true),
+          }))
+          .nullable(true),
       }))
       .notNull(),
   }));

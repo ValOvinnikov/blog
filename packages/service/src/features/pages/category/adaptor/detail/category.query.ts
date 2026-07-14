@@ -1,9 +1,9 @@
-import { q } from '@blog/service/sanity/query';
+import { q, type TSlugParams } from '@blog/service/sanity/query';
 import { categoryFragment } from '@blog/service/shared/fragments/category';
 
 export const categoryPageCategoryQuery = q
-  .parameters<{ slug: string }>()
+  .parameters<TSlugParams>()
   .star.filterByType('blog_category')
-  .filterRaw('slug.current == $slug')
+  .filterBy('slug.current == $slug')
   .slice(0)
   .project(categoryFragment);

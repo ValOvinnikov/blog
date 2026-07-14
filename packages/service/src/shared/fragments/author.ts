@@ -10,7 +10,7 @@ export const authorCardFragment = q
     name: sub.field('name').notNull(),
     slug: sub.field('slug.current').notNull(),
     image: sub.field('image').project(imageWithAltFragment).notNull(),
-    role: sub.field('role'),
+    role: sub.field('role').nullable(true),
   }));
 
 export const authorDetailFragment = q
@@ -20,7 +20,10 @@ export const authorDetailFragment = q
     name: sub.field('name').notNull(),
     slug: sub.field('slug.current').notNull(),
     image: sub.field('image').project(imageWithAltFragment).notNull(),
-    role: sub.field('role'),
-    bio: sub.field('bio[]'),
-    socialLinks: sub.field('socialLinks[]').project(socialLinkFragment),
+    role: sub.field('role').nullable(true),
+    bio: sub.field('bio[]').nullable(true),
+    socialLinks: sub
+      .field('socialLinks[]')
+      .project(socialLinkFragment)
+      .nullable(true),
   }));

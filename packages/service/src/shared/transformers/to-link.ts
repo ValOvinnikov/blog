@@ -4,19 +4,32 @@ import type { InferFragmentType } from 'groqd';
 
 export type TRawLink = InferFragmentType<typeof linkFragment>;
 
-function toInternalHref(raw: NonNullable<TRawLink['internalReference']>) {
+type TInternalReference = NonNullable<TRawLink['internalReference']>;
+
+// Keyed by the generated document `_type` union rather than a hand-typed
+// switch: renaming/removing one of these types in the schema (link.ts's
+// `to: [...]`) fails this object literal at compile time instead of leaving
+// a silently-dead case branch.
+const INTERNAL_HREF_BUILDERS: Record<
+  TInternalReference['_type'],
+  (slug: string) => string
+> = {
+  blog_post: (slug) => `/blog/${slug}`,
+  blog_category: (slug) => `/category/${slug}`,
+  page_generic: (slug) => `/${slug}`,
+};
+
+function toInternalHref(raw: TInternalReference): string | undefined {
   if (!raw.slug) return undefined;
 
-  switch (raw._type) {
-    case 'blog_post':
-      return `/blog/${raw.slug}`;
-    case 'blog_category':
-      return `/category/${raw.slug}`;
-    case 'page_generic':
-      return `/${raw.slug}`;
-    default:
-      return undefined;
-  }
+  // `_type` is typed as the reference union, but it comes from Sanity at
+  // runtime and could fall outside it (unexpected reference target / schema
+  // drift) — return undefined rather than crash, mirroring the old switch's
+  // `default`. The Record stays exhaustive so adding a schema type is a
+  // compile error here.
+  const build: ((slug: string) => string) | undefined =
+    INTERNAL_HREF_BUILDERS[raw._type];
+  return build?.(raw.slug);
 }
 
 export function toLink(raw: TRawLink | null | undefined): ILink | undefined {

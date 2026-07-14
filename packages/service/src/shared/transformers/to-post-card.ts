@@ -45,7 +45,7 @@ function toPostCardAuthor(
 }
 
 function toPostCardCategory(
-  raw: NonNullable<TRawPostCard['categories']>[number],
+  raw: TRawPostCard['categories'][number],
 ): TPostCardCategory {
   return {
     id: raw._id,
@@ -66,6 +66,6 @@ export function toPostCard(raw: TRawPostCard): TPostCard {
     mainImageSanity: toSanityImage(raw.mainImageAsset),
     featured: raw.featured ?? false,
     author: raw.author ? toPostCardAuthor(raw.author) : undefined,
-    categories: (raw.categories ?? []).map(toPostCardCategory),
+    categories: raw.categories.map(toPostCardCategory),
   };
 }

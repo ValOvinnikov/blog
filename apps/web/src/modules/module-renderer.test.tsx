@@ -17,7 +17,7 @@ vi.mock('./module-map', () => ({
 describe('ModuleRenderer', () => {
   it('renders the mapped component for a known module type with its id', async () => {
     const ui = await ModuleRenderer({
-      modules: [{ key: 'cta-1', type: 'module_cta', id: 'cta-doc-id' }],
+      modules: [{ type: 'module_cta', id: 'cta-doc-id' }],
       locale: 'en',
     });
 
@@ -31,7 +31,7 @@ describe('ModuleRenderer', () => {
 
     const ui = await ModuleRenderer({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      modules: [{ key: 'x', type: 'module_unknown' as any, id: 'x-id' }],
+      modules: [{ type: 'module_unknown' as any, id: 'x-id' }],
       locale: 'en',
     });
 

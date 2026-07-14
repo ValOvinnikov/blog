@@ -76,9 +76,13 @@ code fences are not findings — report only hits in real code.
 - If schemas changed, the generated types were regenerated (`pnpm typegen`) and
   committed, downstream `service` types updated, and — for existing-shape
   changes — a content migration is present or explicitly ruled out.
-- Every field the CMS schema marks `.required()` has `.notNull()` in the
-  corresponding `service` groqd projection. Optional fields use plain
-  `sub.field()` with no fallback sentinel.
+- **Every** groqd field's nullability is explicit — each `sub.field(...)` ends
+  in `.notNull()` or `.nullable(true)`; no implicit/plain projected field. A
+  schema-`.required()` field gets `.notNull()`; an optional one gets
+  `.nullable(true)`. An unmarked projected/reference field silently requires
+  non-null and throws at `.parse()` on null data → 404. Flag any
+  `sub.field(...)` not terminated by `.notNull()`/`.nullable()`, and any
+  `.notNull()` on a schema-optional field that should fall back rather than 404.
 - **CMS schema/migration diffs** hold the `cms-schema-practices` bar:
   - No stored-value or `_type` literal repeated across files — constants from
     `@blog/config` (renaming a stored value must be a one-file change).

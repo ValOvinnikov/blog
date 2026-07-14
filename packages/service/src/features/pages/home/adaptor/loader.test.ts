@@ -17,13 +17,12 @@ describe('getHomePage', () => {
 
     expect(page.title).toBe('Home Page');
     expect(page.hero).toEqual({
-      key: 'hero-ref',
       id: 'hero-1',
       type: 'module_hero',
     });
     expect(page.modules).toEqual([
-      { key: 'module-1', id: 'post-list-1', type: 'module_postList' },
-      { key: 'module-2', id: 'cta-1', type: 'module_cta' },
+      { id: 'post-list-1', type: 'module_postList' },
+      { id: 'cta-1', type: 'module_cta' },
     ]);
     expect(page.seo).toBeUndefined();
   });
