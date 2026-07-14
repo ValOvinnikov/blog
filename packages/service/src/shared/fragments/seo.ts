@@ -4,6 +4,6 @@ import { openGraphFragment } from './open-graph';
 
 export const seoFragment = q.fragmentForType<'seo'>().project((sub) => ({
   metaTitle: sub.field('metaTitle').notNull(),
-  metaDescription: sub.field('metaDescription'),
+  metaDescription: sub.field('metaDescription').nullable(true),
   openGraph: sub.field('openGraph').project(openGraphFragment).nullable(true),
 }));
