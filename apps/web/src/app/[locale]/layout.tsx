@@ -11,7 +11,7 @@ import { routing } from '@web/i18n/routing';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { hasLocale } from 'next-intl';
+import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -80,38 +80,47 @@ export default async function LocaleLayout({ children, params }: TProps) {
         />
       </head>
       <body>
-        <Header>
-          <Header.Brand>
-            <Link href="/" aria-label="Home">
-              <Logo prefix={brand.name} suffix={brand.prefix} />
-            </Link>
-          </Header.Brand>
-          <PrimaryNavigation
-            links={navItems.map((item) => ({
-              href: item.href,
-              label: item.label,
-              target: item.target,
-            }))}
-            actions={<ThemeToggleButton />}
-            linkAs={SmartLink}
-          />
-        </Header>
-        {children}
-        <Footer>
-          <Footer.Copyright title={brand.name} />
-          <Footer.Nav>
-            {social.map((link) => (
-              <NavLink
-                key={link.href}
-                as={SmartLink}
-                href={link.href}
-                target={link.target}
-              >
-                {link.label}
-              </NavLink>
-            ))}
-          </Footer.Nav>
-        </Footer>
+        {/* `locale` is passed explicitly (not inherited) so the page stays
+            statically rendered; `messages={null}` — this app localizes routing
+            only, it ships no translation messages. Client components that read
+            the locale (next-intl navigation `Link` in the post-list module)
+            need this provider or they throw "No intl context found". */}
+        {/* TODO: revisit this config (pass real messages, re-check static
+            rendering) when translation messages are introduced.*/}
+        <NextIntlClientProvider locale={locale} messages={null}>
+          <Header>
+            <Header.Brand>
+              <Link href="/" aria-label="Home">
+                <Logo prefix={brand.prefix} suffix={brand.suffix} />
+              </Link>
+            </Header.Brand>
+            <PrimaryNavigation
+              links={navItems.map((item) => ({
+                href: item.href,
+                label: item.label,
+                target: item.target,
+              }))}
+              actions={<ThemeToggleButton />}
+              linkAs={SmartLink}
+            />
+          </Header>
+          {children}
+          <Footer>
+            <Footer.Copyright title={brand.name} />
+            <Footer.Nav>
+              {social.map((link) => (
+                <NavLink
+                  key={link.href}
+                  as={SmartLink}
+                  href={link.href}
+                  target={link.target}
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+            </Footer.Nav>
+          </Footer>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

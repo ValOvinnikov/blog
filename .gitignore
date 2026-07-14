@@ -55,3 +55,7 @@ Thumbs.db
 # Claude Code — share project config, ignore local overrides
 .claude/settings.local.json
 .claude/worktrees/
+
+# Vercel CLI link scratch (env files are handled at the top of this file —
+# a plain `.env*` here would override the `!.env.example` exceptions)
+.vercel
