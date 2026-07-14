@@ -19,10 +19,17 @@ const INTERNAL_HREF_BUILDERS: Record<
   page_generic: (slug) => `/${slug}`,
 };
 
-function toInternalHref(raw: TInternalReference) {
+function toInternalHref(raw: TInternalReference): string | undefined {
   if (!raw.slug) return undefined;
 
-  return INTERNAL_HREF_BUILDERS[raw._type](raw.slug);
+  // `_type` is typed as the reference union, but it comes from Sanity at
+  // runtime and could fall outside it (unexpected reference target / schema
+  // drift) — return undefined rather than crash, mirroring the old switch's
+  // `default`. The Record stays exhaustive so adding a schema type is a
+  // compile error here.
+  const build: ((slug: string) => string) | undefined =
+    INTERNAL_HREF_BUILDERS[raw._type];
+  return build?.(raw.slug);
 }
 
 export function toLink(raw: TRawLink | null | undefined): ILink | undefined {
