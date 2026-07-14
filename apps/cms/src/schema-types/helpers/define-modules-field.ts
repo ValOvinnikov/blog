@@ -26,4 +26,10 @@ export const defineModulesField = ({
     of: allow.map((type) =>
       defineArrayMember({ name: type, type: 'reference', to: [{ type }] }),
     ),
+    // `unique()` compares array items by `_ref` for reference-typed array
+    // members, so this rejects the same module document being referenced
+    // twice in one page. That guarantee is what makes a module's `_id` safe
+    // to use as a React key downstream in the web app.
+    validation: (rule) =>
+      rule.unique().error('Each module can only be referenced once per page.'),
   });

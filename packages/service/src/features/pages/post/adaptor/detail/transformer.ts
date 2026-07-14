@@ -40,6 +40,6 @@ export function toPostDetail(raw: TRawPostDetail): TPostDetail {
     body: raw.body,
     seo: raw.seo ? toSeoMeta(raw.seo) : undefined,
     author: raw.author ? toPostDetailAuthor(raw.author) : undefined,
-    categories: (raw.categories ?? []).map(toCategory),
+    categories: raw.categories.map(toCategory),
   };
 }

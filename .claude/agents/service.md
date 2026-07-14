@@ -114,16 +114,28 @@ relative paths only within a single slice (`./query`, `./types`).
 
 Typegen marks **every** field optional regardless of schema `.required()` rules
 (validation is runtime, not reflected in types). We restore the schema contract
-at the query boundary with explicit projections + `.notNull()`.
+at the query boundary with explicit projections and **explicit nullability on
+every field** (`.notNull()` or `.nullable(true)`).
 
 - **Explicitly project every field we defined** with `sub.field('name')` — never
   the `true` shorthand. `true` is allowed **only** for Sanity's built-in/system
   fields (`_id`, `_type`, `asset`, `hotspot`, `crop`, `_createdAt`, …), which we
   don't own and whose nullability we don't control.
-- **`.notNull()` for schema-required fields; plain `sub.field()` for optional
-  ones.** `.notNull()` both narrows the type (removes `null`) and adds a runtime
-  check that throws if the CMS ever violates the contract — fail loud at the data
-  boundary rather than leak `null` into the UI.
+- **Every field's nullability is explicit — terminate every `sub.field(...)`
+  in `.notNull()` or `.nullable(true)`. Never leave a projected field implicit.**
+  `.notNull()` for schema-required fields (narrows the type _and_ adds a runtime
+  check that throws if the CMS violates the contract — fail loud at the data
+  boundary rather than leak `null` into the UI); `.nullable(true)` for optional
+  ones. There is no "plain `sub.field()`" middle ground: on a `.project()`/
+  `.deref()`/reference field, an unmarked field silently requires **non-null**
+  and throws at `.parse()` on real null data → the page 404s (this is exactly
+  the `ogImage` bug). Grep check: every `sub.field(...)` line ends in
+  `.notNull()`/`.nullable()`.
+- **`.notNull()` on a schema-_optional_ field is a deliberate "404 if absent"
+  assertion — use it only when that's truly intended.** Typegen marks the field
+  optional; asserting `.notNull()` means absent content fails the query and
+  `notFound()`s the page. For SEO/display fields (e.g. `metaTitle`) prefer a
+  fallback in the transformer/consumer over a 404.
 - **`.notNull()` must be LAST in a chain** — it returns a non-chainable builder.
   Correct: `sub.field('image').project(imageFragment).notNull()` and
   `sub.field('author').deref().project(authorFragment).notNull()`. You cannot

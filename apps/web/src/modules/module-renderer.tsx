@@ -11,7 +11,8 @@ export interface IModuleRendererProps {
 /**
  * ModuleRenderer — maps each thin `TModuleRef` (from a page's `modules[]`)
  * to its registered per-module Server Component and renders it, keyed by
- * the module's stable `_key`. Unknown module types render nothing and log a
+ * the module's `_id` (a page can't reference the same module twice — enforced
+ * by a CMS uniqueness rule). Unknown module types render nothing and log a
  * warning rather than failing the whole page.
  */
 export async function ModuleRenderer({
@@ -28,7 +29,7 @@ export async function ModuleRenderer({
       }
 
       return {
-        key: module.key,
+        key: module.id,
         node: await Component({ id: module.id, locale }),
       };
     }),

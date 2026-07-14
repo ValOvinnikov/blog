@@ -11,12 +11,12 @@ export const siteSettingsQuery = q.star
       .project((b) => ({
         name: b.field('name').notNull(),
         prefix: b.field('prefix').notNull(),
-        suffix: b.field('suffix'),
+        suffix: b.field('suffix').nullable(true),
         logo: b.field('logo').project(imageWithAltFragment).notNull(),
       }))
       .notNull(),
     description: sub.field('description').notNull(),
-    tagline: sub.field('tagline'),
+    tagline: sub.field('tagline').nullable(true),
     defaultSeo: sub.field('defaultSeo').project(openGraphFragment).notNull(),
   }))
   .notNull();

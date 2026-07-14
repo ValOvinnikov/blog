@@ -78,10 +78,10 @@ export function makeRawHomePage(
 ): TRawHomePage {
   return {
     title: 'Home Page',
-    hero: { key: 'hero-ref', id: 'hero-1', type: 'module_hero' },
+    hero: { _id: 'hero-1', _type: 'module_hero' },
     modules: [
-      { key: 'module-1', id: 'post-list-1', type: 'module_postList' },
-      { key: 'module-2', id: 'cta-1', type: 'module_cta' },
+      { _id: 'post-list-1', _type: 'module_postList' },
+      { _id: 'cta-1', _type: 'module_cta' },
     ],
     seo: null,
     ...overrides,
@@ -95,8 +95,8 @@ export function makeRawGenericPage(
     title: 'About',
     slug: 'about',
     modules: [
-      { key: 'module-1', id: 'content-1', type: 'module_content' },
-      { key: 'module-2', id: 'cta-1', type: 'module_cta' },
+      { _id: 'content-1', _type: 'module_content' },
+      { _id: 'cta-1', _type: 'module_cta' },
     ],
     seo: null,
     ...overrides,

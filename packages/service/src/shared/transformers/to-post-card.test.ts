@@ -50,14 +50,6 @@ describe('toPostCard', () => {
     expect(toPostCard(raw).author).toBeUndefined();
   });
 
-  it('returns empty categories array when categories is absent at runtime', () => {
-    const raw = {
-      ...makeRawPostCard(),
-      categories: null,
-    } as unknown as Parameters<typeof toPostCard>[0];
-    expect(toPostCard(raw).categories).toEqual([]);
-  });
-
   it('defaults featured to false when null', () => {
     const result = toPostCard(makeRawPostCard({ featured: null }));
     expect(result.featured).toBe(false);

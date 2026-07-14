@@ -4,19 +4,25 @@ import type { InferFragmentType } from 'groqd';
 
 export type TRawLink = InferFragmentType<typeof linkFragment>;
 
-function toInternalHref(raw: NonNullable<TRawLink['internalReference']>) {
+type TInternalReference = NonNullable<TRawLink['internalReference']>;
+
+// Keyed by the generated document `_type` union rather than a hand-typed
+// switch: renaming/removing one of these types in the schema (link.ts's
+// `to: [...]`) fails this object literal at compile time instead of leaving
+// a silently-dead case branch.
+const INTERNAL_HREF_BUILDERS: Record<
+  TInternalReference['_type'],
+  (slug: string) => string
+> = {
+  blog_post: (slug) => `/blog/${slug}`,
+  blog_category: (slug) => `/category/${slug}`,
+  page_generic: (slug) => `/${slug}`,
+};
+
+function toInternalHref(raw: TInternalReference) {
   if (!raw.slug) return undefined;
 
-  switch (raw._type) {
-    case 'blog_post':
-      return `/blog/${raw.slug}`;
-    case 'blog_category':
-      return `/category/${raw.slug}`;
-    case 'page_generic':
-      return `/${raw.slug}`;
-    default:
-      return undefined;
-  }
+  return INTERNAL_HREF_BUILDERS[raw._type](raw.slug);
 }
 
 export function toLink(raw: TRawLink | null | undefined): ILink | undefined {
