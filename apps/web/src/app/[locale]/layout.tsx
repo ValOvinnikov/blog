@@ -95,11 +95,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
               </Link>
             </Header.Brand>
             <PrimaryNavigation
-              links={navItems.map((item) => ({
-                href: item.href,
-                label: item.label,
-                target: item.target,
-              }))}
+              links={navItems}
               actions={<ThemeToggleButton />}
               linkAs={SmartLink}
             />
