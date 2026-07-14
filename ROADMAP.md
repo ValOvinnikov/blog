@@ -160,10 +160,18 @@ document and `page.template` rendering remain Phase 4/page-builder work.
 - [ ] `web`: localized Home route renders CMS-authored hero + latest posts via `service`; no GROQ/Sanity client in `web`.
 - [ ] Per-route `generateMetadata` (canonical, OG, Twitter) from Home SEO with site settings fallback.
 
-### 3b — Blog list (`/blog`)
+### 3b — Blog list (`/blog` + `/blog/page/N`)
 
-- [ ] `ui`: `Pagination` (organism). Reuse `PostGrid` + `PostCard`.
-- [ ] `web`: `app/blog/page.tsx` — paginated list; `generateMetadata`.
+> Spec'd + planned 2026-07-14 — see
+> `docs/superpowers/specs/2026-07-14-blog-list-pagination-design.md` and its
+> plan. Ships as **four per-layer PRs** (config → service → ui → web),
+> issues #75/#85. Establishes the site-wide routing conventions (route-builder
+> in `@blog/config`, `/x/page/N` pagination) — see SPEC §1.
+
+- [~] `config`: `routes` URL builder (single source of URL truth) + `POSTS_PER_PAGE`.
+- [ ] `service`: paginated blog query (window + count) + `safeAsync` wrap; adopt `routes` in href-emitting transformers.
+- [ ] `ui`: `Pagination` (organism, #85 — route-agnostic `createHref` + `linkAs`). Reuse `PostsSection`.
+- [ ] `web`: `app/[locale]/blog/page.tsx` + `blog/page/[page]/page.tsx`; self-canonical `generateMetadata`; `/blog/page/1` → 308 to `/blog`; out-of-range → 404.
 
 ### 3c — Post detail (`/blog/[slug]`)
 
@@ -172,9 +180,13 @@ document and `page.template` rendering remain Phase 4/page-builder work.
 
 ### 3d — Category (`/category/[slug]`)
 
-- [ ] Reuse `PostGrid` + `PostCard` + `Pagination` (expect zero new components).
-- [ ] `web`: `app/category/[slug]/page.tsx` — filtered; `generateStaticParams`; `generateMetadata`.
-- [ ] `/[slug]` placeholder route reserved for Phase 4.
+- [ ] Reuse `PostsSection` + `Pagination` (expect zero new components); adopt the `/category/[slug]/page/N` pagination convention (#91 — see the note posted there).
+- [ ] `web`: `app/[locale]/category/[slug]/page.tsx` — filtered; `generateStaticParams`; `generateMetadata`.
+- [ ] `/[slug]` placeholder route reserved for Phase 4 (#285) — slug space guarded by `RESERVED_SLUGS` (#328).
+
+### 3f — Author page (`/author/[slug]`) — #327
+
+- [ ] `web`: author profile (bio, avatar, socials) + their posts via the already-built `service.entities.author` loaders; `routes.author(slug)`; after #76 so bylines have a link target.
 
 ### 3e — Ship (SEO surface + ISR + deploy)
 

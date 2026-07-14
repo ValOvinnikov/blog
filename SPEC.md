@@ -13,19 +13,35 @@ readers browse a fast, statically-rendered Next.js site. Content is fully typed
 end-to-end — a schema change in the CMS surfaces as a TypeScript error in the
 frontend if a consumer is out of date.
 
-**Primary surfaces** (status as of 2026-07-12):
+**Primary surfaces** (status as of 2026-07-14):
 
-| Surface  | Route              | Status                                                                                                                               |
-| -------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Home     | `/`                | ✅ Built — modules-as-documents (hero + `modules[]`)                                                                                 |
-| Post     | `/blog/[slug]`     | 🔲 Phase 3 (#76/#90)                                                                                                                 |
-| Blog     | `/blog`            | 🔲 Phase 3 (#75)                                                                                                                     |
-| Category | `/category/[slug]` | 🔲 Phase 3 (#77/#91)                                                                                                                 |
-| Page     | `/[slug]`          | 🔲 Planned — `service.pages.generic.v1.getPage` exists; route deferred until a slugs-listing loader lands for `generateStaticParams` |
-| Feeds    | sitemap/robots/RSS | 🔲 Phase 3 (#92)                                                                                                                     |
+| Surface  | Route                            | Status                                                                                                      |
+| -------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Home     | `/`                              | ✅ Built — modules-as-documents (hero + `modules[]`)                                                        |
+| Blog     | `/blog` + `/blog/page/N`         | 🔲 In flight — #75/#85, spec'd + planned (paginated index)                                                  |
+| Post     | `/blog/[slug]`                   | 🔲 Phase 3 (#76/#90)                                                                                        |
+| Category | `/category/[slug]` (+ `/page/N`) | 🔲 Phase 3 (#91 — adopts the pagination convention)                                                         |
+| Author   | `/author/[slug]`                 | 🔲 Planned — #327 (service loaders already built)                                                           |
+| Page     | `/[slug]`                        | 🔲 Planned — #285; `service.pages.generic.v1.getPage` exists; slug space guarded by `RESERVED_SLUGS` (#328) |
+| Feeds    | sitemap/robots/RSS               | 🔲 Phase 3 (#92)                                                                                            |
 
-The site is **not yet deployed** — see `docs/BACKLOG.md` (deploy milestone) for
-the phased rollout plan.
+**Routing conventions** (decided 2026-07-14 — full rationale in
+`docs/superpowers/specs/2026-07-14-blog-list-pagination-design.md`):
+
+- **One route-builder** — `routes` in `@blog/config` is the single source of
+  URL truth (`routes.post(slug)`, `routes.blogIndex(page?)`, …). No inline
+  path templates in `service` or `web`; the sitemap and JSON-LD consume it too.
+- **Pagination** — path-based, `/x/page/N` (static `page/` segment; singular).
+  Page 1 lives only at the base URL; `/x/page/1` → `permanentRedirect` (308).
+  Every page self-canonicalizes (never canonical-to-page-1); no
+  `rel=next/prev`; non-canonical or out-of-range page params → hard 404.
+- **Slug-space safety** — Next resolves static › dynamic › catch-all, so
+  section segments (`blog`, `category`, `author`) always beat the root generic
+  `/[slug]`; `RESERVED_SLUGS` (#328) stops editors creating pages those
+  segments would shadow. No catch-all routes for fixed-shape paths.
+
+Both environments are **live** (§13): merging to `main` deploys development;
+a `vX.Y.Z` tag promotes to production.
 
 ## 2. Architecture principles
 
@@ -73,14 +89,14 @@ configs/
   eslint, prettier, tailwind, tsconfig, vitest                        (@blog/*-config)
 ```
 
-| Layer           | Imports                          | Exposes                                                                                                                                                    | Must never                                                        |
-| --------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `@blog/config`  | —                                | Constants (UPPERCASE key/value pairs), generated Sanity types + extracted schema, shared TS types, `/react` subpath for polymorphic prop helpers           | contain app logic; force React on non-React consumers (subpath!)  |
-| `@blog/utils`   | —                                | Pure helpers (`safeAsync`, primitives)                                                                                                                     | depend on any sibling                                             |
-| `@blog/service` | `config`, `utils`, Sanity SDKs   | The versioned `service` facade (`service.pages.post.v1.getPost(slug)` …), view-model types (`TPostDetail`, `THomePage`, …), `urlForImage`                  | import React or `@blog/ui`; return raw Sanity docs; fake defaults |
-| `@blog/ui`      | `config` (types + tokens)        | Atomic-design components up to organisms (pure, prop-driven, polymorphic `as`/`linkAs` slots). No template layer — page composition belongs in `web`.      | import `service`/`sanity`/`fetch`; use `'use client'`             |
-| `web` (app)     | `ui`, `service`, `config`, utils | Routes, metadata, feeds, i18n, page composition; owns `PortableTextRenderer` and all framework-coupled wrappers (`SanityImage`, `SmartLink`, theme toggle) | write GROQ; import Sanity SDKs; put data logic in components      |
-| `cms` (app)     | `config` (constants)             | Schema types (source of truth), desk structure, content migrations                                                                                         | hand-write shapes typegen should produce                          |
+| Layer           | Imports                          | Exposes                                                                                                                                                                                                 | Must never                                                        |
+| --------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `@blog/config`  | —                                | Constants (UPPERCASE key/value pairs), the `routes` URL builder (single source of URL truth), generated Sanity types + extracted schema, shared TS types, `/react` subpath for polymorphic prop helpers | contain app logic; force React on non-React consumers (subpath!)  |
+| `@blog/utils`   | —                                | Pure helpers (`safeAsync`, primitives)                                                                                                                                                                  | depend on any sibling                                             |
+| `@blog/service` | `config`, `utils`, Sanity SDKs   | The versioned `service` facade (`service.pages.post.v1.getPost(slug)` …), view-model types (`TPostDetail`, `THomePage`, …), `urlForImage`                                                               | import React or `@blog/ui`; return raw Sanity docs; fake defaults |
+| `@blog/ui`      | `config` (types + tokens)        | Atomic-design components up to organisms (pure, prop-driven, polymorphic `as`/`linkAs` slots). No template layer — page composition belongs in `web`.                                                   | import `service`/`sanity`/`fetch`; use `'use client'`             |
+| `web` (app)     | `ui`, `service`, `config`, utils | Routes, metadata, feeds, i18n, page composition; owns `PortableTextRenderer` and all framework-coupled wrappers (`SanityImage`, `SmartLink`, theme toggle)                                              | write GROQ; import Sanity SDKs; put data logic in components      |
+| `cms` (app)     | `config` (constants)             | Schema types (source of truth), desk structure, content migrations                                                                                                                                      | hand-write shapes typegen should produce                          |
 
 The graph is acyclic. `apps/web` is the only place `ui` and `service` meet.
 
@@ -312,6 +328,8 @@ changing a schema does **not** change existing documents.
 
 - Per-route `generateMetadata` (title, description, canonical, Open Graph,
   Twitter card) using `NEXT_PUBLIC_SITE_URL`.
+- Paginated lists: every page **self-canonical** (never canonical-to-page-1),
+  no `rel=next/prev`, out-of-range → hard 404 (§1 routing conventions).
 - JSON-LD `Article`/`BlogPosting` on post pages (#94).
 - `sitemap.ts`, `robots.ts`, RSS route (#92).
 - Security headers shipped from `next.config.ts`: strict CSP (documented
