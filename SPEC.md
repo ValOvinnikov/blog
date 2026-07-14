@@ -292,7 +292,10 @@ changing a schema does **not** change existing documents.
 - **Revalidation:** time-based via `isr('tag')` in service queries; on-demand
   via `app/api/revalidate` (#93, secret-verified,
   `revalidateTag(tag, { expire: 0 })` — immediate expiry, not a stale-while-
-  revalidate profile) from a Sanity publish webhook.
+  revalidate profile) from a Sanity publish webhook. Tag expiry alone does not
+  invalidate prerendered route entries on Vercel (#318), so the route also
+  calls `revalidatePath('/', 'layout')` when a registered type matched —
+  purging every page per publish (acceptable blast radius for a blog).
 - **Sanity CDN is deliberately bypassed** (`useCdn: false` in the service
   client): Next's tagged data cache is the sole caching layer. Reading through
   the CDN lets a just-purged tag refetch a still-stale CDN response and
