@@ -1,3 +1,4 @@
+import { toTotalPages } from '@blog/service/features/pages/blog/adaptor/pagination';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { InferResultType } from 'groqd';
 
@@ -16,7 +17,7 @@ export function toIndexPage(
   return {
     posts: raw.posts.map(toPostCard),
     currentPage,
-    totalPages: Math.max(1, Math.ceil(raw.total / pageSize)),
+    totalPages: toTotalPages(raw.total, pageSize),
     total: raw.total,
   };
 }
