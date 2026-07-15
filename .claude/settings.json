@@ -47,5 +47,8 @@
       "Bash(pnpm --filter cms deploy:*)",
       "Bash(npx sanity deploy:*)"
     ]
+  },
+  "worktree": {
+    "baseRef": "head"
   }
 }
