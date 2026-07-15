@@ -1,6 +1,5 @@
 import { q } from '@blog/service/sanity/query';
 import { imageWithAltFragment } from '@blog/service/shared/fragments/image';
-import { openGraphFragment } from '@blog/service/shared/fragments/open-graph';
 
 export const siteSettingsQuery = q.star
   .filterByType('settings_site')
@@ -17,6 +16,9 @@ export const siteSettingsQuery = q.star
       .notNull(),
     description: sub.field('description').notNull(),
     tagline: sub.field('tagline').nullable(true),
-    defaultSeo: sub.field('defaultSeo').project(openGraphFragment).notNull(),
+    defaultOgImage: sub
+      .field('defaultOgImage')
+      .project(imageWithAltFragment)
+      .notNull(),
   }))
   .notNull();

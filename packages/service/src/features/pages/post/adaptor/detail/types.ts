@@ -1,7 +1,6 @@
 import type { BlockText, RichText } from '@blog/config';
 import type { TCategory } from '@blog/service/shared/transformers/to-category';
 import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
-import type { TSeoMeta } from '@blog/service/shared/transformers/to-seo-meta';
 import type { TSocialLink } from '@blog/service/shared/transformers/to-social-link';
 
 export type TPostDetailAuthor = {
@@ -14,9 +13,20 @@ export type TPostDetailAuthor = {
   socialLinks: TSocialLink[];
 };
 
+// Unresolved authored SEO overrides, unlike home/blog's `resolveSeo`-backed
+// `TSeoResolved` — post detail's fallback ladder (content title/excerpt/
+// heroImage) lands with the `/blog/{slug}` route in a follow-up (#355).
+export type TPostSeo = {
+  metaTitle: string | undefined;
+  metaDescription: string | undefined;
+  ogTitle: string | undefined;
+  ogDescription: string | undefined;
+  ogImageUrl: string | undefined;
+};
+
 export type TPostDetail = Omit<TPostCard, 'author' | 'categories'> & {
   body: RichText;
-  seo: TSeoMeta | undefined;
+  seo: TPostSeo | undefined;
   author: TPostDetailAuthor | undefined;
   categories: TCategory[];
 };

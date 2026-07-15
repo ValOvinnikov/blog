@@ -15,11 +15,7 @@ export function makeRawSiteSettings(
     },
     description: 'A blog about things',
     tagline: null,
-    defaultSeo: {
-      ogTitle: null,
-      ogDescription: null,
-      ogImage: makeRawImage('OG image'),
-    },
+    defaultOgImage: makeRawImage('Default OG image'),
     ...overrides,
   };
 }

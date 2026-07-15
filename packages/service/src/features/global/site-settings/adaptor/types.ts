@@ -9,7 +9,5 @@ export type TSiteSettings = {
   brand: TBrand;
   description: string;
   tagline: string | undefined;
-  ogImageUrl: string | undefined;
-  ogTitle: string | undefined;
-  ogDescription: string | undefined;
+  defaultOgImageUrl: string | undefined;
 };

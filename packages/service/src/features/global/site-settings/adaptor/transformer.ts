@@ -18,8 +18,6 @@ export function toSiteSettings(raw: TRawSiteSettings): TSiteSettings {
     },
     description: raw.description,
     tagline: raw.tagline ?? undefined,
-    ogImageUrl: buildImageUrl(raw.defaultSeo.ogImage),
-    ogTitle: raw.defaultSeo.ogTitle ?? undefined,
-    ogDescription: raw.defaultSeo.ogDescription ?? undefined,
+    defaultOgImageUrl: buildImageUrl(raw.defaultOgImage),
   };
 }
