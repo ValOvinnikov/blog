@@ -13,22 +13,23 @@ export const seoSchema = defineType({
       title: 'Meta Title',
       type: 'string',
       description:
-        'Overrides the page title in search results. Keep under 60 characters.',
-      validation: (rule) => rule.required().max(60),
+        'Overrides the page title in search results. Leave empty to use the page content. Keep under 60 characters.',
+      validation: (rule) => rule.max(60),
     }),
     defineField({
       name: 'metaDescription',
       title: 'Meta Description',
       type: 'text',
       description:
-        'Summary shown in search results. Keep between 120–160 characters.',
+        'Overrides the summary shown in search results. Leave empty to use the page content. Keep between 120–160 characters.',
       validation: (rule) => rule.max(160),
     }),
     defineField({
       name: 'openGraph',
       title: 'Open Graph',
       type: openGraphSchema.name,
-      description: 'Social-sharing overrides (title, description, image).',
+      description:
+        'Overrides the social-sharing title, description, and image. Leave empty to use the page content.',
     }),
   ],
 });
