@@ -5,10 +5,12 @@ type TTitleFieldOptions = Partial<
 >;
 
 /**
- * Reusable internal `title` field shared by every document type. Singletons
- * pass a fixed `initialValue` + `readOnly: true` so the Studio form heading
- * resolves to a real value instead of "Untitled"; content documents pass
- * `max` for an editable headline length cap.
+ * Reusable internal `title` field shared by every document type. Keep it
+ * bare for singletons: a fixed `initialValue` + `readOnly: true` does NOT
+ * fix the Studio "Untitled" heading — `initialValue` doesn't fire for a
+ * singleton opened by `documentId`, and `readOnly` then leaves the field
+ * permanently empty (stuck at "Untitled"). Singletons resolve their Studio
+ * label via `preview.prepare` instead.
  */
 export const titleField = (options: TTitleFieldOptions = {}) =>
   defineField({
