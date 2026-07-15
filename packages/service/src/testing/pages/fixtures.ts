@@ -1,4 +1,4 @@
-import type { TRawBlogIndexSettings } from '@blog/service/features/pages/blog/adaptor/settings/transformer';
+import type { TRawBlogPage } from '@blog/service/features/pages/blog/adaptor/index-page/transformer';
 import type { TRawGenericPage } from '@blog/service/features/pages/generic/adaptor/transformer';
 import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
 import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail/transformer';
@@ -89,9 +89,9 @@ export function makeRawHomePage(
   };
 }
 
-export function makeRawBlogIndexSettings(
-  overrides: Partial<NonNullable<TRawBlogIndexSettings>> = {},
-): NonNullable<TRawBlogIndexSettings> {
+export function makeRawBlogPage(
+  overrides: Partial<NonNullable<TRawBlogPage>> = {},
+): NonNullable<TRawBlogPage> {
   return {
     heading: 'The Blog',
     supportingText: 'Notes on building things.',

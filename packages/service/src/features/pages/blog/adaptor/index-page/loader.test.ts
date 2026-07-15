@@ -1,6 +1,6 @@
 import { makeRawPostCard } from '@blog/service/testing/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawBlogIndexSettings } from '@blog/service/testing/pages/fixtures';
+import { makeRawBlogPage } from '@blog/service/testing/pages/fixtures';
 import { describe, expect, it, vi } from 'vitest';
 
 import { getIndexPage } from './loader';
@@ -13,7 +13,7 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 describe('getIndexPage', () => {
   it('returns the page window with page math for a full corpus', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawBlogIndexSettings({ itemsPerPage: 9 }))
+      .mockResolvedValueOnce(makeRawBlogPage({ itemsPerPage: 9 }))
       .mockResolvedValueOnce({
         posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'b' })],
         total: 20,
@@ -27,10 +27,10 @@ describe('getIndexPage', () => {
     expect(result.totalPages).toBe(3); // ceil(20 / 9)
   });
 
-  it('takes heading/supportingText/seo from settings and defaults to page 1', async () => {
+  it('takes heading/supportingText/seo from the page_blog singleton and defaults to page 1', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawBlogIndexSettings({
+        makeRawBlogPage({
           heading: 'Latest posts',
           supportingText: 'Fresh from the team.',
         }),
