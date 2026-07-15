@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+# Seed local env files into new git worktrees.
+#
+# Linked worktrees (`git worktree add`, e.g. the isolated worktrees the agent
+# harness creates) do not inherit git-ignored files, so `.env.local` is absent
+# there and env-dependent builds/tests can't run. `post-checkout` fires on
+# `git worktree add`, so copy the local env files from the primary worktree.
+# No-op in the primary checkout and whenever a file already exists (idempotent);
+# values never enter git.
+
+git_dir="$(git rev-parse --git-dir)"
+common_dir="$(git rev-parse --git-common-dir)"
+[ "$git_dir" = "$common_dir" ] && exit 0 # primary checkout: nothing to seed
+
+main="$(git worktree list --porcelain | awk '/^worktree /{print $2; exit}')"
+[ -z "$main" ] && exit 0
+
+dest_top="$(git rev-parse --show-toplevel)"
+[ "$main" = "$dest_top" ] && exit 0
+
+( cd "$main" && find . \
+	-type d \( -name node_modules -o -path './.git' -o -path './.claude/worktrees' \) -prune -o \
+	-type f \( -name '.env.local' -o -name '.env.*.local' \) -print ) |
+	while IFS= read -r rel; do
+		rel="${rel#./}"
+		src="$main/$rel"
+		dest="$dest_top/$rel"
+		if [ -f "$src" ] && [ ! -e "$dest" ]; then
+			mkdir -p "$(dirname "$dest")"
+			cp "$src" "$dest"
+			echo "husky/post-checkout: seeded $rel"
+		fi
+	done
+
+exit 0
