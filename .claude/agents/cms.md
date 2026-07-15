@@ -3,8 +3,9 @@ name: cms
 description: >-
   Sanity Studio (apps/cms) specialist. Use for content modelling — schema
   definitions, document/object types, validation, desk structure, the
-  singleton settings documents, and typegen. Owns the source of truth for
-  content shapes that flow into the generated types in @blog/config.
+  singleton settings documents, the page-builder module documents (module_*),
+  and typegen. Owns the source of truth for content shapes that flow into the
+  generated types in @blog/config.
 tools: Read, Edit, Write, Grep, Glob, Bash
 model: sonnet
 isolation: worktree
@@ -23,10 +24,11 @@ When invoked, before writing any code:
    and which schema types to add or change.
 2. Read `SPEC.md` §6 for the current content model and naming conventions
    (`{group}_{name}` types, UPPERCASE constants from `@blog/config`).
-3. **Follow the `cms-schema-practices` skill** — it is the quality bar for
-   this layer (DRY field factories, no magic strings, validation parity on
-   restructures, migration guards + tests). Read it before writing schema or
-   migration code.
+3. **Follow the `cms-schema-practices` skill** — read
+   `.claude/skills/cms-schema-practices/SKILL.md` (you have no Skill tool;
+   use Read). It is the quality bar for this layer (DRY field factories, no
+   magic strings, validation parity on restructures, migration guards +
+   tests). Read it before writing schema or migration code.
 4. Read the existing schema files in `apps/cms/src/schema-types/` to understand
    current conventions before adding anything new.
 5. For every new field, confirm its validation requirement is explicitly stated
@@ -40,8 +42,9 @@ When invoked, before writing any code:
   `apps/web` — if a schema change requires downstream work, describe it and let
   the `service`/`web` agents handle it.
 - All source files live under `apps/cms/src/`. Schemas live in
-  `apps/cms/src/schema-types`. Each type is its own file with a default export
-  from `defineType`, registered in `src/schema-types/index.ts`.
+  `apps/cms/src/schema-types`. Each type is its own file with a **named
+  `{localName}Schema` export** from `defineType` (`postSchema`, `heroSchema`)
+  — never `export default` — registered in `src/schema-types/index.ts`.
 - `sanity.config.ts` and `sanity.cli.ts` stay at the package root (Sanity CLI
   convention); everything else goes under `src/`.
 - `cms` **generates** the content types (typegen ships them into
@@ -55,15 +58,18 @@ When invoked, before writing any code:
 
 ## Content model (see SPEC.md §6 for the current model)
 
-Documents: `post`, `author`, `category`, `page`, plus the `homePage`,
-`siteSettings`, `settings_navigation`, and `settings_footer` singletons.
-Shared objects: unified `link`, `socialLink`, `brand`, `imageWithAlt`,
-`seo`/`openGraph`, `blockText`/`portableText`. Use:
+Type names follow `{group}_{name}`. Documents: `blog_post`, `blog_author`,
+`blog_category`; page documents `page_home`, `page_blog`, `page_generic`;
+singletons `settings_site`, `settings_navigation`, `settings_footer`; and the
+reusable module documents `module_hero`, `module_postList`, `module_content`,
+`module_cta`. Shared objects: unified `link`, `socialLink`, `brand`,
+`imageWithAlt`, `seo`/`openGraph`, `blockText`/`richText`. Use:
 
 - `defineType` / `defineField` / `defineArrayMember` everywhere for typed schemas.
 - `validation: (rule) => rule.required()` on every field the frontend assumes.
 - `image` fields: `options: { hotspot: true }` and a **required `alt`** field.
-- Portable Text `body`: block + image + `code` (via `@sanity/code-input`).
+- Rich text (`richText`): block + `imageWithAlt` + `code` (via
+  `@sanity/code-input`).
 - Singleton documents enforced through desk structure.
 
 ## Typegen contract (critical)
@@ -98,7 +104,7 @@ Run these checks **once, after all schema work is complete**:
 **Report back to the orchestrator** with:
 
 - The exact names of new/changed types as they appear in the generated
-  `types.ts` (e.g. `Post`, `Author`, `SiteSettings`)
+  `types.ts` (e.g. `Blog_post`, `Blog_author`, `Settings_site`)
 - A field-by-field breakdown for every new/changed type — field name, its type,
   and whether it is **required** (has `.required()` validation in the schema) or
   **optional**. This is the source of truth for `.notNull()` decisions in the

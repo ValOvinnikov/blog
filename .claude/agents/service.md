@@ -34,9 +34,9 @@ When invoked, before writing any code:
    and **report the differences to the user** before proceeding.
 
 All source files live under `packages/service/src/`. Import across the package
-with the **`#/` subpath alias** (`#/*` → `./src/*`, from package.json `imports`)
-— e.g. `import { runQuery, isr } from '#/sanity/query'`,
-`import type { TPostCard } from '#/shared/transformers/to-post-card'`. Use
+with the workspace's **own-name alias** (`@blog/service/*` → `./src/*`, from
+tsconfig `paths`) — e.g. `import { q } from '@blog/service/sanity/query'`,
+`import { toLink } from '@blog/service/shared/transformers/to-link'`. Use
 relative paths only within a single slice (`./query`, `./types`).
 
 ## Hard boundaries (do not violate)
@@ -64,10 +64,12 @@ relative paths only within a single slice (`./query`, `./types`).
 
 ## Folder structure
 
-- **Domains** group features in `features/`: `pages/*` (route data: home, blog,
-  post, category), `entities/*` (content entities: author, categories),
-  `global/*` (global settings: site-settings). The root `service` object mirrors
-  these domains → `{ pages, entities, global }`.
+- **Domains** group features in `features/`: `pages/*` (route data: home,
+  generic, blog, post, category), `modules/*` (page-builder module data: hero,
+  post-list, content, cta), `entities/*` (content entities: author,
+  categories), `global/*` (global settings: site-settings, navigation, footer).
+  The root `service` object mirrors these domains →
+  `{ pages, modules, entities, global }`.
 - **Each feature = `adaptor/` + `application/` + `index.ts`:**
   - **`adaptor/`** — the Sanity-coupled implementation, one slice per action.
     A slice is `query.ts` · `transformer.ts` · `types.ts` · `loader.ts`. **The
@@ -92,8 +94,8 @@ relative paths only within a single slice (`./query`, `./types`).
     blog route is an _index_ page (a post list) with no `blogPage` CMS document,
     so its loader is `getIndexPage`, not `getBlogPage`. **One query per file** —
     a slice composing two queries has two files (e.g. category `detail/` has
-    `category.query.ts` + `posts.query.ts`). _(Existing `category`/`author`
-    still use the older `detail/`+`params/` names pending a retrofit.)_
+    `category.query.ts` + `posts.query.ts`). _(Existing `post`/`category`/
+    `author` still use the older `detail/`+`params/` names pending a retrofit.)_
     **Loader return type is always `Promise<TViewModel>` — never nullable.**
     Do not add null checks, `| null` return types, or try/catch in loaders.
     If a document is missing, groqd throws (e.g. `ValidationErrors`) — let it
@@ -162,7 +164,7 @@ every field** (`.notNull()` or `.nullable(true)`).
 - **Slug → project `sub.field('slug.current').notNull()`** so the result is a
   plain `string`, not the `{ current?: string }` Slug object. No `?.current`
   dance in the transformer afterwards.
-- **Block content** (`blockText` / `portableText`) rejects the bare field name in
+- **Block content** (`blockText` / `richText`) rejects the bare field name in
   `.field()`. Use the array form: `sub.field('body[]')` (add `.notNull()` if
   required). Same array form for object arrays you want to re-project:
   `sub.field('socialLinks[]').project((s) => ({ … }))`.
@@ -205,8 +207,9 @@ every field** (`.notNull()` or `.nullable(true)`).
 
 - Co-locate `*.test.ts` (Vitest, `node` environment). Test query-result mapping
   (transformer/loader) and `urlForImage` output. Mock the client; don't hit the
-  network. See the `testing-practices` skill for patterns, fixture conventions,
-  and the loader test setup.
+  network. See the `testing-practices` skill
+  (`.claude/skills/testing-practices/SKILL.md` — read it with Read; you have
+  no Skill tool) for patterns, fixture conventions, and the loader test setup.
 - Run `pnpm --filter @blog/service type-check` after each major group of files
   — fast, catches structural errors early without verbose test output.
 - Run the full test suite **once, after all implementation is complete**:
