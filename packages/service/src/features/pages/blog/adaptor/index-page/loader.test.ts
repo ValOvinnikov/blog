@@ -33,6 +33,11 @@ describe('getIndexPage', () => {
         makeRawBlogPage({
           heading: 'Latest posts',
           supportingText: 'Fresh from the team.',
+          seo: {
+            metaTitle: 'Latest posts — Blog',
+            metaDescription: 'Fresh from the team.',
+            openGraph: null,
+          },
         }),
       )
       .mockResolvedValueOnce({
@@ -46,19 +51,12 @@ describe('getIndexPage', () => {
     expect(result.totalPages).toBe(1);
     expect(result.heading).toBe('Latest posts');
     expect(result.supportingText).toBe('Fresh from the team.');
-  });
-
-  it('falls back to "Blog" heading and POSTS_PER_PAGE when page_blog is unauthored', async () => {
-    mockRun
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({ posts: [], total: 0 });
-
-    const result = await getIndexPage({ page: 1 });
-
-    expect(result.heading).toBe('Blog');
-    expect(result.supportingText).toBeUndefined();
-    expect(result.posts).toEqual([]);
-    expect(result.total).toBe(0);
-    expect(result.totalPages).toBe(1); // Math.max(1, ceil(0/9))
+    expect(result.seo).toEqual({
+      metaTitle: 'Latest posts — Blog',
+      metaDescription: 'Fresh from the team.',
+      ogTitle: undefined,
+      ogDescription: undefined,
+      ogImageUrl: undefined,
+    });
   });
 });

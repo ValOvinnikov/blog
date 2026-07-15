@@ -5,7 +5,7 @@ export const indexPageParamsQuery = q.star
   .slice(0)
   .project((page) => ({
     blogPosts: q.project((sub) => ({
-      total: sub.count(q.star.filterByType('blog_post')),
+      total: sub.count(q.star.filterByType('blog_post')).notNull(true),
     })),
     itemsPerPage: page.field('itemsPerPage').notNull(),
   }))

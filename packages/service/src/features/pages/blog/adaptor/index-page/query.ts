@@ -4,9 +4,6 @@ import { seoFragment } from '@blog/service/shared/fragments/seo';
 
 const blogPosts = q.star.filterByType('blog_post');
 
-// `page_blog` is a singleton and may be unauthored — `.nullable(true)` at the
-// end (rather than `.notNull()`, as page_home uses) lets the loader fall back
-// instead of throwing.
 export const blogPageQuery = q.star
   .filterByType('page_blog')
   .slice(0)
@@ -16,13 +13,16 @@ export const blogPageQuery = q.star
     itemsPerPage: sub.field('itemsPerPage').notNull(),
     seo: sub.field('seo').project(seoFragment).nullable(true),
   }))
-  .nullable(true);
+  .notNull();
 
 export const buildIndexPageQuery = (start: number, end: number) =>
-  q.project((sub) => ({
-    posts: blogPosts
-      .order('publishedAt desc')
-      .slice(start, end)
-      .project(postCardFragment),
-    total: sub.count(blogPosts),
-  }));
+  q
+    .project((sub) => ({
+      posts: blogPosts
+        .order('publishedAt desc')
+        .slice(start, end)
+        .project(postCardFragment)
+        .notNull(true),
+      total: sub.count(blogPosts).notNull(true),
+    }))
+    .notNull(true);

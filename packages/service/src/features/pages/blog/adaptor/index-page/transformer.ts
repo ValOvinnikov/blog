@@ -11,8 +11,6 @@ export type TRawBlogIndexPosts = InferResultType<
   ReturnType<typeof buildIndexPageQuery>
 >;
 
-const FALLBACK_HEADING = 'Blog';
-
 export function toIndexPage(
   rawPage: TRawBlogPage,
   rawPosts: TRawBlogIndexPosts,
@@ -20,9 +18,9 @@ export function toIndexPage(
   pageSize: number,
 ): TBlogIndexPage {
   return {
-    heading: rawPage?.heading ?? FALLBACK_HEADING,
-    supportingText: rawPage?.supportingText ?? undefined,
-    seo: rawPage?.seo ? toSeoMeta(rawPage.seo) : undefined,
+    heading: rawPage.heading,
+    supportingText: rawPage.supportingText ?? undefined,
+    seo: rawPage.seo ? toSeoMeta(rawPage.seo) : undefined,
     posts: rawPosts.posts.map(toPostCard),
     currentPage,
     totalPages: toTotalPages(rawPosts.total, pageSize),

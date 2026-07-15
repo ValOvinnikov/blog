@@ -1,4 +1,3 @@
-import { POSTS_PER_PAGE } from '@blog/service/features/pages/blog/adaptor/pagination';
 import { isr, runQuery } from '@blog/service/sanity/query';
 
 import { blogPageQuery, buildIndexPageQuery } from './query';
@@ -16,7 +15,7 @@ export async function getIndexPage({
   // must be resolved before the posts query's slice bounds can be built —
   // the two fetches can't run in parallel.
   const rawPage = await runQuery(blogPageQuery, isr('page_blog'));
-  const pageSize = rawPage?.itemsPerPage ?? POSTS_PER_PAGE;
+  const pageSize = rawPage.itemsPerPage;
   const start = (page - 1) * pageSize;
   const rawPosts = await runQuery(
     buildIndexPageQuery(start, start + pageSize),
