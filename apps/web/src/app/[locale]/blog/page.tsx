@@ -1,6 +1,6 @@
 import type { ILocalizedParams } from '@blog/config';
-import { buildBlogListMetadata } from '@web/components/blog-list-page/blog-list-metadata';
 import { BlogListPage } from '@web/components/blog-list-page/blog-list-page';
+import { buildBlogListMetadata } from '@web/metadata/blog-list-metadata';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 

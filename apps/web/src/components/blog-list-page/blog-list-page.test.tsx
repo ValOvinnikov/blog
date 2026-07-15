@@ -87,11 +87,23 @@ describe('BlogListPage', () => {
   it('renders the posts for a page within range', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
-      data: { posts: [post], currentPage: 1, totalPages: 3, total: 20 },
+      data: {
+        heading: 'Blog',
+        supportingText: 'Essays and notes.',
+        posts: [post],
+        currentPage: 1,
+        totalPages: 3,
+        total: 20,
+      },
     });
 
     const ui = await BlogListPage({ page: 1, locale: 'en' });
     render(<>{ui}</>);
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Blog' }),
+    ).toBeVisible();
+    expect(screen.getByText('Essays and notes.')).toBeVisible();
 
     const link = screen.getByRole('link', { name: 'My Post Title' });
     expect(link).toBeVisible();

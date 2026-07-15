@@ -23,6 +23,7 @@ const REVALIDATE_TAGS = {
   settings_navigation: ['navigation'],
   settings_footer: ['footer'],
   page_home: ['homePage'],
+  page_blog: ['page_blog'],
   page_generic: ['page_generic'],
   module_hero: ['modules:hero'],
   module_postList: ['modules:postList'],
