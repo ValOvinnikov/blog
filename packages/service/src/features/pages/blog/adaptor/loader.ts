@@ -1,6 +1,6 @@
 import { isr, runQuery } from '@blog/service/sanity/query';
 
-import { buildBlogPageQuery } from './query';
+import { blogPageCountQuery, buildBlogPageQuery } from './query';
 import { toBlogPage } from './transformer';
 import type { TBlogPage } from './types';
 
@@ -21,4 +21,11 @@ export async function getBlogPage({
     isr('posts'),
   );
   return toBlogPage(raw, page, pageSize);
+}
+
+export async function getBlogPageCount(
+  pageSize = POSTS_PER_PAGE,
+): Promise<number> {
+  const total = await runQuery(blogPageCountQuery, isr('posts'));
+  return Math.max(1, Math.ceil(total / pageSize));
 }

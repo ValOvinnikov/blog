@@ -2,7 +2,7 @@ import { makeRawPostCard } from '@blog/service/testing/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { describe, expect, it, vi } from 'vitest';
 
-import { getBlogPage } from './loader';
+import { getBlogPage, getBlogPageCount } from './loader';
 
 vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
@@ -44,5 +44,23 @@ describe('getBlogPage', () => {
     expect(result.posts).toEqual([]);
     expect(result.total).toBe(0);
     expect(result.totalPages).toBe(1); // Math.max(1, ceil(0/9))
+  });
+});
+
+describe('getBlogPageCount', () => {
+  it('returns total page count for a full corpus', async () => {
+    mockRun.mockResolvedValue(20);
+
+    const result = await getBlogPageCount();
+
+    expect(result).toBe(3); // ceil(20 / 9)
+  });
+
+  it('returns 1 for an empty corpus', async () => {
+    mockRun.mockResolvedValue(0);
+
+    const result = await getBlogPageCount();
+
+    expect(result).toBe(1); // Math.max(1, ceil(0/9))
   });
 });

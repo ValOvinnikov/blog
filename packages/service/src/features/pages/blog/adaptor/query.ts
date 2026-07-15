@@ -11,3 +11,6 @@ export const buildBlogPageQuery = (start: number, end: number) =>
       .project(postCardFragment),
     total: sub.count(blogPosts),
   }));
+
+/** Count-only query for `generateStaticParams` — no post projection or derefs. */
+export const blogPageCountQuery = q.count(blogPosts);
