@@ -119,7 +119,7 @@ export const linkSchema = defineType({
     },
     prepare({ title, linkType, url, internalTitle }) {
       return {
-        title: title as string | undefined,
+        title: title ?? 'Unknown',
         subtitle:
           linkType === TLINK_TYPE.INTERNAL
             ? `Internal: ${String(internalTitle ?? 'not selected')}`

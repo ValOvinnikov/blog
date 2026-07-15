@@ -95,7 +95,7 @@ export const heroSchema = defineType({
     },
     prepare({ title, subtitle }) {
       return {
-        title: (title as string | undefined) ?? 'Hero',
+        title: title ?? 'Unknown',
         subtitle: subtitle
           ? `Featured: ${String(subtitle)}`
           : 'Uses newest featured post',

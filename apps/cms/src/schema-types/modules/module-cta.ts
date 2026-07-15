@@ -35,8 +35,8 @@ export const ctaSchema = defineType({
     },
     prepare({ title, subtitle }) {
       return {
-        title: (title as string | undefined) ?? 'Call to Action',
-        subtitle: subtitle as string | undefined,
+        title: title ?? 'Unknown',
+        subtitle,
       };
     },
   },

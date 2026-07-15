@@ -2,6 +2,7 @@ import { schemaTypes } from '@cms/schema-types';
 import { authorSchema } from '@cms/schema-types/documents/blog/author';
 import { categorySchema } from '@cms/schema-types/documents/blog/category';
 import { postSchema } from '@cms/schema-types/documents/blog/post';
+import { blogPageSchema } from '@cms/schema-types/documents/pages/blog-page';
 import { homePageSchema } from '@cms/schema-types/documents/pages/home-page';
 import { genericSchema } from '@cms/schema-types/documents/pages/page';
 import { footerSchema } from '@cms/schema-types/documents/settings/footer';
@@ -70,6 +71,15 @@ export default defineConfig({
                         S.document()
                           .schemaType(homePageSchema.name)
                           .documentId(homePageSchema.name),
+                      ),
+                    S.listItem()
+                      .title('Blog Page')
+                      .id(blogPageSchema.name)
+                      .icon(Newspaper)
+                      .child(
+                        S.document()
+                          .schemaType(blogPageSchema.name)
+                          .documentId(blogPageSchema.name),
                       ),
                     S.documentTypeListItem(genericSchema.name)
                       .title('Generic Pages')

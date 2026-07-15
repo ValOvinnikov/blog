@@ -105,7 +105,7 @@ export const postSchema = defineType({
     },
     prepare({ title, author, media }) {
       return {
-        title: title as string | undefined,
+        title: title ?? 'Unknown',
         subtitle: author ? `by ${String(author)}` : '',
         media,
       };
