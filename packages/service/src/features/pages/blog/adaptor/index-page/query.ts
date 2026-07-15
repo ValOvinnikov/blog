@@ -3,7 +3,7 @@ import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 const blogPosts = q.star.filterByType('blog_post');
 
-export const buildBlogPageQuery = (start: number, end: number) =>
+export const buildIndexPageQuery = (start: number, end: number) =>
   q.project((sub) => ({
     posts: blogPosts
       .order('publishedAt desc')

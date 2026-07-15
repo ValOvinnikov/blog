@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { BlogListPage } from './blog-list-page';
 
-const { getBlogPageMock } = vi.hoisted(() => ({
-  getBlogPageMock: vi.fn(),
+const { getIndexPageMock } = vi.hoisted(() => ({
+  getIndexPageMock: vi.fn(),
 }));
 
 const { notFoundMock } = vi.hoisted(() => ({
@@ -16,7 +16,7 @@ const { notFoundMock } = vi.hoisted(() => ({
 vi.mock('@blog/service', () => ({
   service: {
     pages: {
-      blog: { v1: { getBlogPage: getBlogPageMock } },
+      blog: { v1: { getIndexPage: getIndexPageMock } },
     },
   },
 }));
@@ -51,12 +51,12 @@ const post = {
 
 describe('BlogListPage', () => {
   beforeEach(() => {
-    getBlogPageMock.mockReset();
+    getIndexPageMock.mockReset();
     notFoundMock.mockClear();
   });
 
   it('calls notFound() when the requested page is beyond totalPages', async () => {
-    getBlogPageMock.mockResolvedValue({
+    getIndexPageMock.mockResolvedValue({
       ok: true,
       data: { posts: [post], currentPage: 5, totalPages: 1, total: 1 },
     });
@@ -70,7 +70,10 @@ describe('BlogListPage', () => {
 
   it('calls notFound() when the fetch fails', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getBlogPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+    getIndexPageMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
 
     await expect(BlogListPage({ page: 1, locale: 'en' })).rejects.toThrow(
       'NEXT_NOT_FOUND',
@@ -82,7 +85,7 @@ describe('BlogListPage', () => {
   });
 
   it('renders the posts for a page within range', async () => {
-    getBlogPageMock.mockResolvedValue({
+    getIndexPageMock.mockResolvedValue({
       ok: true,
       data: { posts: [post], currentPage: 1, totalPages: 3, total: 20 },
     });

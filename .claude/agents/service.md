@@ -70,17 +70,30 @@ relative paths only within a single slice (`./query`, `./types`).
   these domains → `{ pages, entities, global }`.
 - **Each feature = `adaptor/` + `application/` + `index.ts`:**
   - **`adaptor/`** — the Sanity-coupled implementation, one slice per action.
-    A slice is `query.ts` · `transformer.ts` · `types.ts` · `loader.ts` (params
-    slices have just `query.ts` + `loader.ts`, no transform). `types.ts` holds
-    the **view-model** type (`TBlogPage`, `TPostDetail`, …); the transformer
+    A slice is `query.ts` · `transformer.ts` · `types.ts` · `loader.ts`. **The
+    loader is always thin** (`runQuery` → transformer → view-model), so any
+    shaping logic lives in `transformer.ts`, never inline in the loader. A
+    params slice whose query already projects its final shape (e.g. category
+    slug params, `*[…]{ 'slug': slug.current }`) needs no transformer; one that
+    **computes** its shape (e.g. the blog index's page params, derived from a
+    `count`) gets a `transformer.ts` like any other slice. `types.ts` holds
+    the **view-model** type (`TPostDetail`, `THomePage`, …); the transformer
     exports the **raw** input type it maps from
     (`export type TRawPostDetail = NonNullable<InferResultType<typeof query>>`),
     which is what fixtures build. `loader.ts` is the thin orchestrator:
     `runQuery(query, isr('tag'))` → transformer → typed view-model. Single-action
-    features keep the four files flat in `adaptor/`; multi-action features use
-    named slice folders (`detail/`, `params/`). **One query per file** — a slice
-    that composes two queries has two files (e.g. category `detail/` has
-    `category.query.ts` + `posts.query.ts`).
+    features keep the four files flat in `adaptor/`; **the moment a feature
+    gains a second action, move every action into its own named slice folder —
+    never leave two actions flattened together in `adaptor/`.** Name slices by
+    page **role**, generically (not by entity): `index-page/` for a list/index
+    route's data, `detail-page/` for a single-entity route's data, plus
+    `index-page-params/` / `detail-page-params/` for each route's
+    `generateStaticParams` source. Prefer these to entity-suffixed names — the
+    blog route is an _index_ page (a post list) with no `blogPage` CMS document,
+    so its loader is `getIndexPage`, not `getBlogPage`. **One query per file** —
+    a slice composing two queries has two files (e.g. category `detail/` has
+    `category.query.ts` + `posts.query.ts`). _(Existing `category`/`author`
+    still use the older `detail/`+`params/` names pending a retrofit.)_
     **Loader return type is always `Promise<TViewModel>` — never nullable.**
     Do not add null checks, `| null` return types, or try/catch in loaders.
     If a document is missing, groqd throws (e.g. `ValidationErrors`) — let it
@@ -95,8 +108,10 @@ relative paths only within a single slice (`./query`, `./types`).
     as a function.
   - **`index.ts`** — `export { createXService } from './application/service'` +
     the public view-model type(s) from the slice's `adaptor/**/types.ts`.
-- **Params loaders** (dynamic routes only: post, category, author) return
-  `{ slug: string }[]` for Next's `generateStaticParams` — a `params/` slice.
+- **Params slices** produce the `generateStaticParams` source directly, so the
+  web route only spreads `result.data`: slug routes
+  (`detail-page-params/` — post, category, author) return `{ slug: string }[]`;
+  the paginated index (`index-page-params/` — blog) returns `{ page: string }[]`.
 - **`shared/`** holds cross-feature building blocks:
   `fragments/` (groqd projections — **multiple fragments per file is fine when
   they belong to one domain**, e.g. `post.ts` holds the post-card + post-detail

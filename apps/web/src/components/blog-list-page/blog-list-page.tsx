@@ -18,7 +18,7 @@ export interface IBlogListPageProps {
  * service and renders it through the pure ui organisms.
  */
 export async function BlogListPage({ page, locale }: IBlogListPageProps) {
-  const result = await service.pages.blog.v1.getBlogPage({ page });
+  const result = await service.pages.blog.v1.getIndexPage({ page });
 
   if (!result.ok) {
     console.error(`Error to fetch blog page: ${result.error}`);

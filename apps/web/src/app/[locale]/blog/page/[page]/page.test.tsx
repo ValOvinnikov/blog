@@ -14,8 +14,8 @@ const { notFoundMock } = vi.hoisted(() => ({
   }),
 }));
 
-const { getBlogPageMock } = vi.hoisted(() => ({
-  getBlogPageMock: vi.fn(),
+const { getIndexPageMock } = vi.hoisted(() => ({
+  getIndexPageMock: vi.fn(),
 }));
 
 // Isolates the redirect/404 branch — neither tested path (page 1 redirect,
@@ -23,7 +23,7 @@ const { getBlogPageMock } = vi.hoisted(() => ({
 vi.mock('@blog/service', () => ({
   service: {
     pages: {
-      blog: { v1: { getBlogPage: getBlogPageMock } },
+      blog: { v1: { getIndexPage: getIndexPageMock } },
     },
   },
 }));
