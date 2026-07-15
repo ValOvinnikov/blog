@@ -1,5 +1,5 @@
-import { toTotalPages } from '@blog/service/features/pages/blog/adaptor/pagination';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
+import { toTotalPages } from '@blog/utils';
 import type { InferResultType } from 'groqd';
 
 import type { buildIndexPageQuery } from './query';
