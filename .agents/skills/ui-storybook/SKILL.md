@@ -2,7 +2,7 @@
 name: ui-storybook
 description: >-
   How to write, run, and maintain Storybook stories in @blog/ui (packages/ui).
-  Use when adding stories for atoms, molecules, organisms, or templates, or when
+  Use when adding stories for atoms, molecules, or organisms, or when
   configuring the Storybook instance in packages/ui. Complements
   ui-library-practices and testing-practices.
 ---
@@ -21,11 +21,14 @@ pnpm --filter @blog/ui storybook:build  # static build
 Co-locate stories next to the component:
 
 ```
-src/atoms/Button/
-  Button.tsx
-  Button.test.tsx
-  Button.stories.tsx   ← here
+src/atoms/button/
+  button.tsx
+  button.test.tsx
+  button.stories.tsx   ← here
 ```
+
+(Kebab-case files/folders, same as every other file in `@blog/ui` — see
+`ui-library-practices`.)
 
 The glob `../src/**/*.stories.@(ts|tsx)` picks them up automatically.
 
@@ -35,7 +38,7 @@ Always use [Component Story Format 3](https://storybook.js.org/docs/writing-stor
 
 ```tsx
 import type { Meta, StoryObj } from '@storybook/react';
-import { Button } from './Button';
+import { Button } from './button';
 
 const meta = {
   title: 'Atoms/Button', // Atomic Design path
@@ -62,7 +65,9 @@ export const Secondary: Story = {
 ## Naming convention for `title`
 
 Match Atomic Design tiers: `"Atoms/Button"`, `"Molecules/PostCard"`,
-`"Organisms/Header"`, `"Templates/PageLayout"`. This keeps the sidebar tidy.
+`"Organisms/Header"`. This keeps the sidebar tidy. There is no Templates tier —
+`@blog/ui` stops at organisms (see `ui-library-practices`); page-level
+compositions are storied in `apps/web` (`web-storybook`).
 
 ## Args and controls
 
@@ -208,12 +213,12 @@ the toggle.
 
 ## MDX documentation pages
 
-For complex components, add a `Component.mdx` file alongside stories to write
+For complex components, add a `{component}.mdx` file alongside stories to write
 long-form docs:
 
 ```mdx
 import { Canvas, Controls, Meta } from '@storybook/blocks';
-import * as ButtonStories from './Button.stories';
+import * as ButtonStories from './button.stories';
 
 <Meta of={ButtonStories} />
 

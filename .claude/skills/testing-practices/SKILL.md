@@ -68,23 +68,27 @@ export default mergeConfig(
 - **`web`** — route/page components with `service` functions mocked; assert that
   the data renders and metadata is produced. Keep these light; prefer pushing
   logic down into `ui`/`service` where it's cheaper to test.
-- **`apps/cms/migrations/*`** — a migration's `document()` handler is a pure
+- **`apps/cms/migrations/*`** (when one is authored — the directory currently
+  holds only the tooling) — a migration's `document()` handler is a pure
   function (doc → mutations), so test it directly. Cover **transform correctness**
   (a legacy doc maps to the expected module/field shape) and **idempotency**
   (running it against an already-migrated doc returns `undefined`/no-op — never
   re-transforms or overwrites data). Extract the transform into a small helper if
-  that makes it easier to assert. (An idempotency test would have caught the
-  Phase 5 modules-overwrite bug.)
+  that makes it easier to assert.
 
 ## Conventions
 
 - Arrange–Act–Assert; one behaviour per `it`. Descriptive names:
   `it("renders the post title and author")`.
-- **When a suite targets a single exported symbol (function/component), pass the
-  symbol itself to `describe`, not a string.** Vitest derives the suite name from
-  the reference's `.name`, so the label can never drift from the code: rename the
-  symbol and the suite name follows, and deleting it is a compile error instead of
-  a stale string. Use a string only when no single symbol names the suite.
+- **When a suite targets a single exported function, pass the symbol itself to
+  `describe`, not a string.** Vitest derives the suite name from the
+  reference's `.name`, so the label can never drift from the code: rename the
+  symbol and the suite name follows, and deleting it is a compile error instead
+  of a stale string. Use a string only when no single symbol names the suite.
+  **Components are the exception** — they use the JSX-style template literal
+  ``describe(`<${Component.name}/>`, …)`` (see `ui-library-practices`).
+  Existing string titles migrate opportunistically when a test is touched; no
+  mass rename.
 
   ```ts
   import { objectKeys } from './objects';

@@ -39,24 +39,27 @@ find yourself storying a `Button` in `apps/web`, move it to `packages/ui`.
 Co-locate stories next to the component. The globs in `main.ts` cover:
 
 ```
-app/**/*.stories.@(ts|tsx)
-components/**/*.stories.@(ts|tsx)
+src/app/**/*.stories.@(ts|tsx)
+src/components/**/*.stories.@(ts|tsx)
 ```
 
 Example:
 
 ```
-app/blog/[slug]/
+src/app/[locale]/blog/[slug]/
   page.tsx
   page.stories.tsx   ← here
 ```
+
+(Kebab-case files, `src/`-rooted paths — same conventions as the rest of
+`apps/web`.)
 
 ## Story format (CSF 3)
 
 ```tsx
 import type { Meta, StoryObj } from '@storybook/react';
-import { PostPage } from './PostPage';
-import { mockPost } from '@/storybook/fixtures/post';
+import { PostPage } from './post-page';
+import { mockPost } from '@web/storybook/fixtures/post';
 
 const meta = {
   title: 'Pages/PostPage',
@@ -87,13 +90,15 @@ Extract the data-fetching into the route `page.tsx` and accept data as props
 in the component:
 
 ```tsx
-// PostPage.tsx (pure, accepts typed props)
-export function PostPage({ post }: { post: Post }) { ... }
+// post-page.tsx (pure, accepts typed props)
+export function PostPage({ post }: { post: TPostDetail }) { ... }
 
-// app/blog/[slug]/page.tsx (fetches + passes props)
-export default async function Page({ params }) {
-  const post = await getPost(params.slug);
-  return <PostPage post={post} />;
+// src/app/[locale]/blog/[slug]/page.tsx (fetches + passes props)
+export default async function Page({ params }: TProps) {
+  const { slug } = await params;
+  const result = await service.pages.post.v1.getPostBySlug(slug);
+  if (!result.ok) notFound();
+  return <PostPage post={result.data} />;
 }
 ```
 
@@ -145,11 +150,11 @@ export const WithActiveNav: Story = {
 
 ## Fixtures
 
-Keep shared mock data in `apps/web/storybook/fixtures/`. These are not
+Keep shared mock data in `apps/web/src/storybook/fixtures/`. These are not
 production code — never import fixtures from outside Storybook.
 
 ```ts
-// storybook/fixtures/post.ts
+// src/storybook/fixtures/post.ts
 import type { TPostDetail } from '@blog/service';
 export const mockPost: TPostDetail = {
   title: 'Hello World',
@@ -165,11 +170,12 @@ documents.
 ## Tailwind in apps/web stories
 
 The `@storybook/nextjs` framework picks up `next.config.ts` and processes
-CSS through the Next.js PostCSS pipeline. If the global stylesheet is
-`app/globals.css`, import it in `.storybook/preview.ts`:
+CSS through the Next.js PostCSS pipeline. The global stylesheet is
+`src/index.css` (the one `src/app/[locale]/layout.tsx` imports) — import it in
+`.storybook/preview.ts`:
 
 ```ts
-import '../app/globals.css';
+import '../src/index.css';
 ```
 
 This ensures `@import "tailwindcss"` and the `@source` directive for
@@ -186,5 +192,5 @@ Use page-level paths: `"Pages/PostPage"`, `"Pages/HomePage"`,
       internally, where possible.
 - [ ] All required props provided via `args`; no live Sanity calls.
 - [ ] `nextjs.navigation.pathname` set if component checks active route.
-- [ ] Fixtures live in `storybook/fixtures/`; not imported outside Storybook.
+- [ ] Fixtures live in `src/storybook/fixtures/`; not imported outside Storybook.
 - [ ] `pnpm --filter web storybook:build` exits cleanly (no TS errors).

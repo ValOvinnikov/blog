@@ -112,6 +112,11 @@ the constraints must move with them or be consciously re-decided:
   helper type or a "Post featured in the **Home** hero" description.
 - Follow `{group}_{name}` for new types; each type in its own file; register
   in the group index.
+- **Schema defs are named exports** — `export const {localName}Schema =
+defineType(...)` (`heroSchema`, `postSchema`, `siteSchema`), never
+  `export default defineType`. Registration indexes and cross-references
+  import the named symbol (`to: [{ type: heroSchema.name }]`), so a rename is
+  compiler-checked instead of a stringly-typed hunt.
 
 ### Previews
 
@@ -133,8 +138,7 @@ the constraints must move with them or be consciously re-decided:
   how fields get orphaned.
 - **Every migration ships a co-located test** (`*.test.ts`): the transform on
   a representative fixture, and a re-run on already-migrated input proving
-  it's a no-op (idempotency). See `testing-practices`; #264 tracks the
-  backfill for older migrations.
+  it's a no-op (idempotency). See `testing-practices`.
 - **Header comment = operator manual:** what it transforms, the
   export → dry → inspect → human-gated run workflow, and the deploy-ordering
   constraint (migrate production **before** deploying code that expects the
