@@ -7,6 +7,7 @@ description: >-
   ui and service meet.
 tools: Read, Edit, Write, Grep, Glob, Bash
 model: sonnet
+isolation: worktree
 ---
 
 You are the frontend engineer. Your workspace is `apps/web` (package `web`), a

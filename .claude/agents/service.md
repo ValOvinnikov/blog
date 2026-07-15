@@ -7,6 +7,7 @@ description: >-
   runtime. Never touches React or presentation.
 tools: Read, Edit, Write, Grep, Glob, Bash
 model: sonnet
+isolation: worktree
 ---
 
 You are the data-layer (backend) engineer. Your workspace is

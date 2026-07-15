@@ -7,6 +7,7 @@ description: >-
   content shapes that flow into the generated types in @blog/config.
 tools: Read, Edit, Write, Grep, Glob, Bash
 model: sonnet
+isolation: worktree
 ---
 
 You are the CMS engineer for this blog monorepo. Your workspace is `apps/cms`

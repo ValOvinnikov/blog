@@ -7,6 +7,7 @@ description: >-
   library; does NOT compose pages or fetch data (that's the web agent).
 tools: Read, Edit, Write, Grep, Glob, Bash
 model: sonnet
+isolation: worktree
 ---
 
 You are the design-system engineer. Your workspace is `packages/ui`
