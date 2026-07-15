@@ -1,23 +1,29 @@
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
+import { toSeoMeta } from '@blog/service/shared/transformers/to-seo-meta';
 import { toTotalPages } from '@blog/utils';
 import type { InferResultType } from 'groqd';
 
-import type { buildIndexPageQuery } from './query';
+import type { blogPageQuery, buildIndexPageQuery } from './query';
 import type { TBlogIndexPage } from './types';
 
-export type TRawBlogIndexPage = InferResultType<
+export type TRawBlogPage = InferResultType<typeof blogPageQuery>;
+export type TRawBlogIndexPosts = InferResultType<
   ReturnType<typeof buildIndexPageQuery>
 >;
 
 export function toIndexPage(
-  raw: TRawBlogIndexPage,
+  rawPage: TRawBlogPage,
+  rawPosts: TRawBlogIndexPosts,
   currentPage: number,
   pageSize: number,
 ): TBlogIndexPage {
   return {
-    posts: raw.posts.map(toPostCard),
+    heading: rawPage.heading,
+    supportingText: rawPage.supportingText ?? undefined,
+    seo: rawPage.seo ? toSeoMeta(rawPage.seo) : undefined,
+    posts: rawPosts.posts.map(toPostCard),
     currentPage,
-    totalPages: toTotalPages(raw.total, pageSize),
-    total: raw.total,
+    totalPages: toTotalPages(rawPosts.total, pageSize),
+    total: rawPosts.total,
   };
 }

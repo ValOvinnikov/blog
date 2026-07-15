@@ -48,12 +48,22 @@ export type Page_genericReference = {
   [internalGroqTypeReferenceTo]?: 'page_generic';
 };
 
+export type Page_blogReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_blog';
+};
+
 export type Link = {
   _type: 'link';
   label?: string;
   linkType?: 'INTERNAL' | 'EXTERNAL';
   internalReference?:
-    Blog_postReference | Blog_categoryReference | Page_genericReference;
+    | Blog_postReference
+    | Blog_categoryReference
+    | Page_genericReference
+    | Page_blogReference;
   url?: string;
   openInNewTab?: boolean;
   platform?:
@@ -509,6 +519,7 @@ export type AllSanitySchemaTypes =
   | Blog_postReference
   | Blog_categoryReference
   | Page_genericReference
+  | Page_blogReference
   | Link
   | Module_content
   | RichText

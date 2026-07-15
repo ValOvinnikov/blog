@@ -1,4 +1,12 @@
 import { q } from '@blog/service/sanity/query';
 
-/** Count-only query for `generateStaticParams` — no post projection or derefs. */
-export const indexPageCountQuery = q.count(q.star.filterByType('blog_post'));
+export const indexPageParamsQuery = q.star
+  .filterByType('page_blog')
+  .slice(0)
+  .project((page) => ({
+    blogPosts: q.project((sub) => ({
+      total: sub.count(q.star.filterByType('blog_post')).notNull(true),
+    })),
+    itemsPerPage: page.field('itemsPerPage').notNull(),
+  }))
+  .notNull();

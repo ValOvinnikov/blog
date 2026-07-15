@@ -1,12 +1,9 @@
-import { POSTS_PER_PAGE } from '@blog/service/features/pages/blog/adaptor/pagination';
 import { isr, runQuery } from '@blog/service/sanity/query';
 
-import { indexPageCountQuery } from './query';
+import { indexPageParamsQuery } from './query';
 import { toIndexPageParams } from './transformer';
 
-export async function getIndexPageParams(
-  pageSize = POSTS_PER_PAGE,
-): Promise<{ page: string }[]> {
-  const total = await runQuery(indexPageCountQuery, isr('posts'));
-  return toIndexPageParams(total, pageSize);
+export async function getIndexPageParams(): Promise<{ page: string }[]> {
+  const raw = await runQuery(indexPageParamsQuery, isr(['posts', 'page_blog']));
+  return toIndexPageParams(raw);
 }
