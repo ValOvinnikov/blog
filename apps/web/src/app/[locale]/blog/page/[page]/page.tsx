@@ -16,15 +16,13 @@ type TProps = {
 // (dynamicParams defaults to true); correctness rides on the explicit
 // range check in BlogListPage, not on this list.
 export async function generateStaticParams() {
-  const result = await service.pages.blog.v1.getBlogPageCount();
+  const result = await service.pages.blog.v1.getIndexPageParams();
   if (!result.ok) {
-    console.error(`Error to fetch blog page count: ${result.error}`);
+    console.error(`Error to fetch blog page params: ${result.error}`);
     return [];
   }
 
-  return Array.from({ length: Math.max(0, result.data - 1) }, (_, i) => ({
-    page: String(i + 2),
-  }));
+  return result.data;
 }
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
