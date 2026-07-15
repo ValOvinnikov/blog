@@ -24,7 +24,7 @@ export const homePageSchema = defineType({
     },
   },
   fields: [
-    titleField(),
+    titleField({ initialValue: 'Home Page', readOnly: true }),
     defineField({
       name: 'hero',
       title: 'Hero',

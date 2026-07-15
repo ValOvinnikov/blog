@@ -220,6 +220,19 @@ export type Settings_site = {
   defaultSeo?: OpenGraph;
 };
 
+export type Page_blog = {
+  _id: string;
+  _type: 'page_blog';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  heading?: string;
+  supportingText?: string;
+  itemsPerPage?: number;
+  seo?: Seo;
+};
+
 export type Module_heroReference = {
   _ref: string;
   _type: 'reference';
@@ -510,6 +523,7 @@ export type AllSanitySchemaTypes =
   | Settings_footer
   | Settings_navigation
   | Settings_site
+  | Page_blog
   | Module_heroReference
   | Module_postListReference
   | Module_ctaReference
