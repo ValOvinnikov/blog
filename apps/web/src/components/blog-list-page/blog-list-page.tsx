@@ -1,4 +1,4 @@
-import { routes } from '@blog/config';
+import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { Pagination, PostsSection } from '@blog/ui';
 import { BlogPageTemplate } from '@web/components/blog-page-template/blog-page-template';
@@ -6,18 +6,14 @@ import { Link } from '@web/i18n/navigation';
 import { formatDate } from '@web/utils/format-date';
 import { notFound } from 'next/navigation';
 
-export interface IBlogListPageProps {
-  /** 1-based, already validated as a canonical positive integer. */
-  page: number;
-  locale: string;
-}
+type TBlogListPageProps = ILocalizedParams & { page: number };
 
 /**
  * BlogListPage — shared composition for `/blog` (page 1) and
  * `/blog/page/[page]` (pages ≥ 2): fetches one page window via the blog
  * service and renders it through the pure ui organisms.
  */
-export async function BlogListPage({ page, locale }: IBlogListPageProps) {
+export async function BlogListPage({ page, locale }: TBlogListPageProps) {
   const result = await service.pages.blog.v1.getIndexPage({ page });
 
   if (!result.ok) {
@@ -25,7 +21,8 @@ export async function BlogListPage({ page, locale }: IBlogListPageProps) {
     notFound();
   }
 
-  const { posts, currentPage, totalPages } = result.data;
+  const { heading, supportingText, posts, currentPage, totalPages } =
+    result.data;
 
   // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
   // soft-404 or a redirect to the last page (spec SEO rules).
@@ -45,7 +42,8 @@ export async function BlogListPage({ page, locale }: IBlogListPageProps) {
 
   return (
     <BlogPageTemplate
-      heading="Blog"
+      heading={heading}
+      supportingText={supportingText}
       posts={
         <PostsSection
           posts={items}

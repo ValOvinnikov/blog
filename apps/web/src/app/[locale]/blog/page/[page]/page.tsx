@@ -1,8 +1,8 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { buildBlogListMetadata } from '@web/components/blog-list-page/blog-list-metadata';
 import { BlogListPage } from '@web/components/blog-list-page/blog-list-page';
 import { permanentRedirect } from '@web/i18n/navigation';
+import { buildBlogListMetadata } from '@web/metadata/blog-list-metadata';
 import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';

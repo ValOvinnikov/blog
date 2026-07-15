@@ -31,4 +31,31 @@ describe(`<${BlogPageTemplate.name}/>`, () => {
 
     expect(screen.getByTestId('posts-slot')).toBeInTheDocument();
   });
+
+  it('renders supportingText under the h1 when passed', () => {
+    render(
+      <BlogPageTemplate
+        heading="Blog"
+        supportingText="Essays and notes on building this site."
+        posts={<div data-testid="posts-slot" />}
+      />,
+    );
+
+    expect(
+      screen.getByText('Essays and notes on building this site.'),
+    ).toBeVisible();
+  });
+
+  it('omits supportingText when not passed', () => {
+    render(
+      <BlogPageTemplate
+        heading="Blog"
+        posts={<div data-testid="posts-slot" />}
+      />,
+    );
+
+    expect(
+      screen.queryByText('Essays and notes on building this site.'),
+    ).not.toBeInTheDocument();
+  });
 });

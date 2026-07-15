@@ -11,6 +11,12 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
+  it('maps the blog-index singleton to its ISR tag', () => {
+    expect(getRevalidateTagsForType('page_blog', 'page_blog')).toEqual([
+      'page_blog',
+    ]);
+  });
+
   it('includes the per-document tag for module types', () => {
     expect(getRevalidateTagsForType('module_hero', 'hero-1')).toEqual([
       'modules:hero',
