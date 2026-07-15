@@ -61,8 +61,12 @@ code fences are not findings — report only hits in real code.
   only package importing the Sanity SDKs.
 - `apps/web` is the only place `ui` and `service` meet: Server Components fetch
   via `service`, pass typed props to `ui`. No GROQ or raw Sanity client in `web`.
-- `apps/web` never imports `next/link` directly — all links use `Link` from
-  `@/i18n/navigation` (next-intl).
+- Links in `apps/web` go through the app's wrappers: `SmartLink`
+  (`@web/components/smart-link` — wraps `next/link`, derives `rel` from
+  `target`, and is the polymorphic `as`/`linkAs` target for `@blog/ui`
+  components) or the locale-aware `Link` from `@web/i18n/navigation`
+  (next-intl) where the route is locale-prefixed. Don't add new raw
+  `next/link` imports outside those wrappers.
 - Dependency graph stays acyclic: `web → ui/service/config/utils`,
   `service → config/utils`, `ui → config`, `cms → config (types via typegen)`.
 

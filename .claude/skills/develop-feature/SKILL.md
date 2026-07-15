@@ -77,12 +77,12 @@ Hand each layer's work to its agent (use the Agent tool, or state which agent
 owns it). Do them in dependency order; later steps depend on earlier output.
 **Skip any agent whose layer has no changes** — don't invoke it at all.
 
-| Layer / work                   | Agent     | Skill it should apply                       |
-| ------------------------------ | --------- | ------------------------------------------- |
-| Sanity schema + `pnpm typegen` | `cms`     | —                                           |
-| GROQ + typed fetcher           | `service` | `add-content-type`, `testing-practices`     |
-| Components                     | `ui`      | `ui-library-practices`, `testing-practices` |
-| Routes / metadata / feeds      | `web`     | `seo-and-metadata`, `testing-practices`     |
+| Layer / work                   | Agent     | Skill it should apply                                       |
+| ------------------------------ | --------- | ----------------------------------------------------------- |
+| Sanity schema + `pnpm typegen` | `cms`     | `cms-schema-practices`                                      |
+| GROQ + typed fetcher           | `service` | `add-content-type`, `testing-practices`                     |
+| Components                     | `ui`      | `ui-library-practices`, `ui-storybook`, `testing-practices` |
+| Routes / metadata / feeds      | `web`     | `seo-and-metadata`, `web-storybook`, `testing-practices`    |
 
 All subagents use **Sonnet** (set in each agent's definition file — do not
 override with a different model unless the user explicitly asks).

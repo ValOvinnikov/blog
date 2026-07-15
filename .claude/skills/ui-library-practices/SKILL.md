@@ -710,19 +710,19 @@ md:grid-cols-2 lg:grid-cols-3`, `hidden md:flex`. Reserve `sm`/`xl`/`2xl` for
   describe(`<${ThemeToggle.name}/> — with props`, () => { ... })
   ```
 - **Testing a plain function/utility (not a component)** — e.g. `lib/compound.tsx`'s
-  `mapCompoundSlots` — use a plain string literal naming the function. Never
-  pass the bare function reference, and never reach for `.name` here either
-  (the `.name` pattern above exists specifically to auto-sync a JSX label with
-  component renames; a utility's describe title doesn't need that):
+  `mapCompoundSlots` — pass the symbol itself. Vitest derives the suite title
+  from the reference's `.name`, so a rename tracks automatically and deleting
+  the function is a compile error instead of a stale string (see
+  `testing-practices`). The JSX-style `<${Name}/>` template is only for
+  components:
   ```ts
-  // ✅ correct
-  describe('mapCompoundSlots', () => { ... })
-
-  // ❌ wrong — bare function reference, not a string
+  // ✅ correct — symbol reference, rename-safe
   describe(mapCompoundSlots, () => { ... })
 
-  // ❌ wrong — .name property access; unnecessary indirection for a
-  // non-component function, just write the name directly
+  // ❌ wrong — string drifts when the function is renamed
+  describe('mapCompoundSlots', () => { ... })
+
+  // ❌ wrong — .name property access; the reference alone already does this
   describe(mapCompoundSlots.name, () => { ... })
   ```
 - **Put the default render in `beforeEach`** when all (or most) tests share

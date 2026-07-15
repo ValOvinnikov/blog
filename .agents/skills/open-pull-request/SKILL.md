@@ -90,10 +90,18 @@ Work through these gates in order. **Stop at each gate and wait for the user.**
    same way (memory first, then API) and set it to In Progress.
 
 4. Checkout a new branch from up-to-date `main`:
+
    ```
    git switch main && git pull --ff-only
    git switch -c issue/<n>-<short-slug>
    ```
+
+   **Exception — worktree-isolating subagents.** When the implementation will
+   be delegated to subagents that run in their own git worktrees
+   (`develop-feature` multi-layer flow), keep `main` checked out here instead
+   of switching: the feature branch is created inside the agent's worktree,
+   and you land it from the agent's commit during verification. Switching the
+   main checkout too creates two competing copies of the branch.
 
 ### Gate 1 — Do the work
 
