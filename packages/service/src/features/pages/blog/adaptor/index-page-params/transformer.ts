@@ -1,4 +1,3 @@
-import { POSTS_PER_PAGE } from '@blog/service/features/pages/blog/adaptor/pagination';
 import { toTotalPages } from '@blog/utils';
 import type { InferResultType } from 'groqd';
 
@@ -10,8 +9,7 @@ export type TRawIndexPageParams = InferResultType<typeof indexPageParamsQuery>;
 export function toIndexPageParams(
   raw: TRawIndexPageParams,
 ): { page: string }[] {
-  const pageSize = raw.itemsPerPage ?? POSTS_PER_PAGE;
-  const totalPages = toTotalPages(raw.total, pageSize);
+  const totalPages = toTotalPages(raw.blogPosts.total, raw.itemsPerPage);
   return Array.from({ length: Math.max(0, totalPages - 1) }, (_, i) => ({
     page: String(i + 2),
   }));

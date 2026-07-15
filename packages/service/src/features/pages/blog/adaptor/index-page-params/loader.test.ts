@@ -10,7 +10,10 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 
 describe('getIndexPageParams', () => {
   it('returns pages 2..totalPages for a full corpus', async () => {
-    mockRun.mockResolvedValueOnce({ total: 20, itemsPerPage: 9 });
+    mockRun.mockResolvedValueOnce({
+      blogPosts: { total: 20 },
+      itemsPerPage: 9,
+    });
 
     const params = await getIndexPageParams();
 
@@ -18,18 +21,10 @@ describe('getIndexPageParams', () => {
   });
 
   it('returns an empty array when there is only one page', async () => {
-    mockRun.mockResolvedValueOnce({ total: 0, itemsPerPage: 9 });
+    mockRun.mockResolvedValueOnce({ blogPosts: { total: 0 }, itemsPerPage: 9 });
 
     const params = await getIndexPageParams();
 
     expect(params).toEqual([]);
-  });
-
-  it('falls back to POSTS_PER_PAGE when itemsPerPage is absent', async () => {
-    mockRun.mockResolvedValueOnce({ total: 20, itemsPerPage: null });
-
-    const params = await getIndexPageParams();
-
-    expect(params).toEqual([{ page: '2' }, { page: '3' }]); // ceil(20 / 9)
   });
 });
