@@ -244,7 +244,7 @@ for an editable headline.
 
 **Objects** — `link` (unified internal/external, `LINK_TYPE` const),
 `socialLink`, `brand`, `imageWithAlt` (required alt), `seo` + `openGraph`,
-`blockText` / `portableText`.
+`blockText` / `richText`.
 
 **Conventions**
 
@@ -330,7 +330,8 @@ changing a schema does **not** change existing documents.
   `localePrefix: 'never'` (URLs never show the locale). Locales come from
   `LOCALE_ISO_CODES` in `@blog/config` (currently `en`). Never hardcode a
   locale; `setRequestLocale(locale)` at the top of every layout/page. Links go
-  through `@/i18n/navigation` (`SmartLink`) — never `next/link` directly.
+  through `SmartLink` (`@web/components/smart-link`) or the locale-aware
+  `Link` from `@web/i18n/navigation` — never `next/link` directly.
 
 ## 10. SEO & accessibility
 

@@ -65,8 +65,11 @@ When invoked, before writing any code:
   ```
 - `"use client"` only where interaction truly requires it (theme toggle, share
   buttons, mobile nav). Default to Server Components.
-- **Never use `next/link` directly.** Always import `Link` from
-  `@web/i18n/navigation` (next-intl). This applies everywhere — routes, layouts,
+- **Never use `next/link` directly.** Links go through the app's two wrappers:
+  `SmartLink` (`@web/components/smart-link` — wraps `next/link`, derives `rel`
+  from `target`, and is the polymorphic `as`/`linkAs` target for `@blog/ui`
+  components) or the locale-aware `Link` from `@web/i18n/navigation` (next-intl)
+  where the route is locale-prefixed. This applies everywhere — routes, layouts,
   components, and Server Components alike.
 - `transpilePackages: ['@blog/ui', '@blog/service', '@blog/config']` is set in
   `next.config.ts` — keep it in sync if a new workspace package is consumed.
@@ -123,9 +126,10 @@ When invoked, before writing any code:
 - **Consuming `@blog/ui` compound components** (`Header`, `Footer`, `Hero`,
   `PostCard`) — see `ui-library-practices` ("Compound components") for the
   full pattern. From here it's just composition: render named slots as children,
-  pass framework-coupled pieces (`Link` from `@web/i18n/navigation`, `SanityImage`)
-  directly into them. Never deep-import sub-components — always use dot-notation
-  on the assembled export (`Header.Brand`, `PostCard.Title`).
+  pass framework-coupled pieces directly into them (`SmartLink`, the
+  locale-aware `Link` from `@web/i18n/navigation`, `SanityImage`). Never
+  deep-import sub-components — always use dot-notation on the assembled
+  export (`Header.Brand`, `PostCard.Title`).
 
 ## Routes (App Router)
 
@@ -213,8 +217,8 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
 Run these checks **once, after all work is complete**:
 
 - `pnpm --filter web type-check`, `lint`, `test`, and `build` pass.
-- No direct Sanity import; no GROQ; no `next/link` import; no inline
-  presentation that belongs in `ui`.
+- No direct Sanity import; no GROQ; no raw `next/link` import outside the
+  `SmartLink` wrapper; no inline presentation that belongs in `ui`.
 - Routes have metadata; feeds present; ISR/revalidation wired.
 
 **Report back to the orchestrator** with:
