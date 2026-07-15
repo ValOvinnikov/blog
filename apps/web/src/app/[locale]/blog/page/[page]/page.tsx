@@ -44,7 +44,9 @@ export default async function BlogListNumberedPage({ params }: TProps) {
   const page = parsePageParam(rawPage);
 
   // Non-canonical / non-numeric → hard 404 (never a soft-404).
-  if (page === null) notFound();
+  if (page === null) {
+    notFound();
+  }
 
   // Page 1 has exactly one URL: /blog. 308 — SEO-equivalent to a 301.
   if (page === 1) {

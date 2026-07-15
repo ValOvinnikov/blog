@@ -29,7 +29,9 @@ export async function BlogListPage({ page, locale }: IBlogListPageProps) {
 
   // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
   // soft-404 or a redirect to the last page (spec SEO rules).
-  if (page > totalPages) notFound();
+  if (page > totalPages) {
+    notFound();
+  }
 
   const items = posts.map((post) => ({
     id: post.id,
