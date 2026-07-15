@@ -226,6 +226,29 @@ link` for remote caching.
   category page; budgets at ≥ 95 per SPEC §10. Non-required initially.
 - **Acceptance:** report posted per PR; regression below budget flags.
 
+### M2.4 · `perf(service): audit all GROQ queries for round-trips + projection efficiency`
+
+- **Labels:** `layer:service`, `enhancement`
+- **Depends on:** Phase 3 routes landed (the audit is most useful once every
+  query slice exists) — soft dependency, can start earlier.
+- **Body:** As the per-feature `adaptor/**/query.ts` slices have accumulated,
+  no pass has looked at them holistically for efficiency. The blog-index work
+  surfaced concrete patterns worth a systematic sweep: sequential fetches that
+  could be a single round-trip (or genuinely can't — e.g. the `index-page`
+  read-then-slice on `page_blog.itemsPerPage`, which is inherent and should be
+  left as-is), over-fetching (projecting fields the transformer never reads),
+  correct `.notNull()`/`.nullable(true)` on every branch, and consistent
+  ISR/`isr(...)` cache tags. Review **every** query slice under
+  `packages/service/src/features/**/adaptor/**/query.ts` (plus shared
+  fragments in `shared/fragments/`) against: (1) round-trips — can independent
+  reads combine, and are sequential reads truly dependent; (2) projection
+  scope — drop unused fields, prefer fragments; (3) nullability correctness;
+  (4) slice/pagination bounds; (5) ISR tag correctness. Apply the clear wins in
+  the same PR; split anything large into its own follow-up ticket.
+- **Acceptance:** every query slice reviewed with findings noted; unambiguous
+  optimisations applied; larger refactors ticketed; `pnpm --filter @blog/service
+test` + `type-check` green; no behavioural regressions.
+
 ---
 
 ## M3 — Differentiator features (label: `enhancement`)
