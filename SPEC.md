@@ -18,7 +18,7 @@ frontend if a consumer is out of date.
 | Surface  | Route                            | Status                                                                                                      |
 | -------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | Home     | `/`                              | ✅ Built — modules-as-documents (hero + `modules[]`)                                                        |
-| Blog     | `/blog` + `/blog/page/N`         | 🔲 In flight — #75/#85, spec'd + planned (paginated index)                                                  |
+| Blog     | `/blog` + `/blog/page/N`         | ✅ Built — paginated index (#75)                                                                            |
 | Post     | `/blog/[slug]`                   | 🔲 Phase 3 (#76/#90)                                                                                        |
 | Category | `/category/[slug]` (+ `/page/N`) | 🔲 Phase 3 (#91 — adopts the pagination convention)                                                         |
 | Author   | `/author/[slug]`                 | 🔲 Planned — #327 (service loaders already built)                                                           |

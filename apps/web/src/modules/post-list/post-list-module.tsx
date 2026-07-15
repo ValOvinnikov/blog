@@ -1,3 +1,4 @@
+import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { PostsSection } from '@blog/ui';
 import { Link } from '@web/i18n/navigation';
@@ -21,7 +22,7 @@ export async function PostListModule({ id, locale }: IPostListModuleProps) {
 
   const items = posts.map((post) => ({
     id: post.id,
-    href: `/blog/${post.slug}`,
+    href: routes.post(post.slug),
     title: post.title,
     excerpt: post.excerpt,
     publishedAt: post.publishedAt,
