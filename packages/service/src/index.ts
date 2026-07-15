@@ -49,7 +49,11 @@ export type { TContentModule } from './features/modules/content';
 export type { TCtaModule } from './features/modules/cta';
 export type { THeroModule } from './features/modules/hero';
 export type { TPostListModule } from './features/modules/post-list';
-export type { TBlogIndexPage, TGetIndexPageArgs } from './features/pages/blog';
+export type {
+  TBlogIndexPage,
+  TBlogIndexSettings,
+  TGetIndexPageArgs,
+} from './features/pages/blog';
 export type { TCategoryPage } from './features/pages/category';
 export type { TGenericPage } from './features/pages/generic';
 export type { THomePage } from './features/pages/home';

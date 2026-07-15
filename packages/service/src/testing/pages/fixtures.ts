@@ -1,3 +1,4 @@
+import type { TRawBlogIndexSettings } from '@blog/service/features/pages/blog/adaptor/settings/transformer';
 import type { TRawGenericPage } from '@blog/service/features/pages/generic/adaptor/transformer';
 import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
 import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail/transformer';
@@ -83,6 +84,18 @@ export function makeRawHomePage(
       { _id: 'post-list-1', _type: 'module_postList' },
       { _id: 'cta-1', _type: 'module_cta' },
     ],
+    seo: null,
+    ...overrides,
+  };
+}
+
+export function makeRawBlogIndexSettings(
+  overrides: Partial<NonNullable<TRawBlogIndexSettings>> = {},
+): NonNullable<TRawBlogIndexSettings> {
+  return {
+    heading: 'The Blog',
+    supportingText: 'Notes on building things.',
+    itemsPerPage: 9,
     seo: null,
     ...overrides,
   };
