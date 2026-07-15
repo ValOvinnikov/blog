@@ -65,7 +65,7 @@ export const Pagination = ({
       )}
       <ul role="list" className={s.list()}>
         {pages.map((page) => (
-          <li key={page} className={s.item()}>
+          <li key={page}>
             <Component
               href={createHref(page)}
               aria-current={page === currentPage ? 'page' : undefined}

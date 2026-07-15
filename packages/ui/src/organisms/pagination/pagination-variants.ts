@@ -4,7 +4,6 @@ export const paginationVariants = tv({
   slots: {
     root: 'mt-8 flex items-center justify-center gap-2',
     list: 'm-0 flex list-none items-center gap-1 p-0',
-    item: '',
     link: [
       'inline-flex h-9 min-w-9 items-center justify-center rounded-md px-2',
       'font-mono text-label',
