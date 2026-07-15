@@ -33,7 +33,9 @@ When invoked, before writing any code:
    props to service view-models; each component owns its own prop types. The
    `web` agent maps service data to UI props.
 
-Follow the `ui-library-practices` skill for the full conventions. Key rules:
+Follow the `ui-library-practices` skill for the full conventions — read
+`.claude/skills/ui-library-practices/SKILL.md` (you have no Skill tool; use
+Read). Key rules:
 
 ## Hard boundaries (do not violate)
 
@@ -91,13 +93,15 @@ archived brief.
 ## Testing
 
 - Co-locate `Component.test.tsx` (Vitest + Testing Library, jsdom). Query by
-  role/text; assert behaviour, not class names. See `testing-practices`.
+  role/text; assert behaviour, not class names. See the `testing-practices`
+  skill (`.claude/skills/testing-practices/SKILL.md`).
 - Use `@faker-js/faker` for realistic mock data in tests and stories — never
   hardcode `"Title"` or `"Lorem ipsum"` when a faker call gives better coverage.
   Seed tests for determinism: `faker.seed(123)` at the top of each test file.
   Stories may use faker unseeded (they are not diffed in CI).
 - Add a Storybook story for every new or changed component — follow the
-  `ui-storybook` skill. Stories are part of done, not optional.
+  `ui-storybook` skill (`.claude/skills/ui-storybook/SKILL.md`). Stories are
+  part of done, not optional.
 - Run `pnpm --filter @blog/ui type-check` after each major group of files —
   fast, catches structural errors early without verbose test output.
 - Run the full test suite **once, after all implementation is complete**:

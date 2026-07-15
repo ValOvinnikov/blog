@@ -66,7 +66,7 @@ When invoked, before writing any code:
 - `"use client"` only where interaction truly requires it (theme toggle, share
   buttons, mobile nav). Default to Server Components.
 - **Never use `next/link` directly.** Always import `Link` from
-  `@/i18n/navigation` (next-intl). This applies everywhere — routes, layouts,
+  `@web/i18n/navigation` (next-intl). This applies everywhere — routes, layouts,
   components, and Server Components alike.
 - `transpilePackages: ['@blog/ui', '@blog/service', '@blog/config']` is set in
   `next.config.ts` — keep it in sync if a new workspace package is consumed.
@@ -82,6 +82,14 @@ When invoked, before writing any code:
     hero-section.tsx
     hero-section.test.tsx
   ```
+- **Module renderers** live in `src/modules/` — the web-side counterparts of
+  the CMS `module_*` documents: `module-map.ts` (discriminator → component
+  map), `module-renderer.tsx`, and one folder per module (`hero/`,
+  `post-list/`, `content/`, `cta/`). A new CMS module type gets its renderer
+  folder here plus an entry in the map — it is not a `src/components/`
+  component.
+- **Metadata builders** live in `src/metadata/` (e.g. `blog-list-metadata/`)
+  — shared `generateMetadata` helpers, one folder per builder, co-located test.
 - **Helper functions** (slot builders, data transformers, formatters) live in
   `src/utils/`. One file per function or closely related group, named after its
   purpose: `format-date.ts`, `hero-slots.ts`, `card-slots.ts`.
@@ -97,7 +105,8 @@ When invoked, before writing any code:
 ## Component patterns
 
 - Follow the same component conventions as `@blog/ui` (see the
-  `ui-library-practices` skill): `T`/`I`-prefixed prop types, `className`
+  `ui-library-practices` skill — `.claude/skills/ui-library-practices/SKILL.md`,
+  read it with Read; you have no Skill tool): `T`/`I`-prefixed prop types, `className`
   forwarded via the `tv()` `class:` key, classes in a `{component}-variants.ts`.
 - **Polymorphic components** (a wrapper that renders as different elements via
   an `as` prop) use the shared `TPolymorphicProps<C, OwnProps>` generic from
@@ -114,7 +123,7 @@ When invoked, before writing any code:
 - **Consuming `@blog/ui` compound components** (`Header`, `Footer`, `Hero`,
   `PostCard`) — see `ui-library-practices` ("Compound components") for the
   full pattern. From here it's just composition: render named slots as children,
-  pass framework-coupled pieces (`Link` from `@/i18n/navigation`, `SanityImage`)
+  pass framework-coupled pieces (`Link` from `@web/i18n/navigation`, `SanityImage`)
   directly into them. Never deep-import sub-components — always use dot-notation
   on the assembled export (`Header.Brand`, `PostCard.Title`).
 
@@ -124,15 +133,17 @@ All data comes through the versioned service facade
 (`service.pages.post.v1.getPost(slug)` — see `packages/service/src/index.ts`
 for the live surface). Route inventory (built + planned; see SPEC.md §1):
 
-- `/` home — built; hero + latest posts via `service.pages.home.v1`.
-- `/blog` — post list + pagination via `service.pages.blog.v1`.
+- `/` home — built; hero + page-builder modules via `service.pages.home.v1`,
+  rendered through `src/modules/` (`HeroModule` + `ModuleRenderer`).
+- `/blog` — built; post list via `service.pages.blog.v1`, pagination at
+  `/blog/page/[page]`.
 - `/blog/[slug]` — `service.pages.post.v1.getPost`; `generateStaticParams`
   from the params slice; body rendered through the **web-owned**
   `PortableTextRenderer` (maps Portable Text blocks to `@blog/ui` components,
   incl. code blocks). Add JSON-LD `BlogPosting` and `generateMetadata`.
 - `/category/[slug]` — `service.pages.category.v1`.
-- `/[slug]` — standalone `page` documents (modules[] page-builder once #250
-  lands).
+- `/[slug]` — standalone `page_generic` documents; the modules[] page-builder
+  data layer is live (`service.pages.generic.v1`, `service.modules.*`).
 - `app/api/revalidate/route.ts` — verify `SANITY_REVALIDATE_SECRET`, call
   `revalidateTag`/`revalidatePath`.
 
@@ -174,6 +185,10 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
 
 ## SEO / feeds / a11y
 
+- **Follow the `seo-and-metadata` skill**
+  (`.claude/skills/seo-and-metadata/SKILL.md`) whenever you add or change a
+  route, metadata, structured data, or a feed — it defines the resolved-SEO
+  contract, JSON-LD shapes, and feed conventions this section only summarizes.
 - Per-route `generateMetadata` (canonical, OG, Twitter) using
   `NEXT_PUBLIC_SITE_URL`. Ship `sitemap.ts`, `robots.ts`, and an RSS route.
 - Target Lighthouse ≥ 95. Semantic HTML, image `alt`, focus states.
@@ -181,7 +196,13 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
 ## Testing
 
 - Component/route tests with Vitest + Testing Library (jsdom). Mock `service`
-  functions; assert that fetched data renders. See the `testing-practices` skill.
+  functions; assert that fetched data renders. See the `testing-practices`
+  skill (`.claude/skills/testing-practices/SKILL.md`).
+- Storybook is configured in `apps/web` (`.storybook/main.ts` scans
+  `src/app/**` and `src/components/**`). When adding or changing a client
+  component or page composition, follow the `web-storybook` skill
+  (`.claude/skills/web-storybook/SKILL.md`) — it covers RSC caveats and
+  service-layer mocking.
 - Run `pnpm --filter web type-check` after each major group of files — it's
   fast and catches structural errors early without burning tokens on test output.
 - Run the full test suite **once, after all implementation is complete**:
