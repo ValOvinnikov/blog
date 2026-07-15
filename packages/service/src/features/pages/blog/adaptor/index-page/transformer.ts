@@ -1,16 +1,18 @@
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { InferResultType } from 'groqd';
 
-import type { buildBlogPageQuery } from './query';
-import type { TBlogPage } from './types';
+import type { buildIndexPageQuery } from './query';
+import type { TBlogIndexPage } from './types';
 
-type TRawBlogPage = InferResultType<ReturnType<typeof buildBlogPageQuery>>;
+export type TRawBlogIndexPage = InferResultType<
+  ReturnType<typeof buildIndexPageQuery>
+>;
 
-export function toBlogPage(
-  raw: TRawBlogPage,
+export function toIndexPage(
+  raw: TRawBlogIndexPage,
   currentPage: number,
   pageSize: number,
-): TBlogPage {
+): TBlogIndexPage {
   return {
     posts: raw.posts.map(toPostCard),
     currentPage,

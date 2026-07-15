@@ -2,21 +2,21 @@ import { makeRawPostCard } from '@blog/service/testing/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { describe, expect, it, vi } from 'vitest';
 
-import { getBlogPage, getBlogPageCount } from './loader';
+import { getIndexPage } from './loader';
 
 vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
 
-describe('getBlogPage', () => {
+describe('getIndexPage', () => {
   it('returns the page window with page math for a full corpus', async () => {
     mockRun.mockResolvedValue({
       posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'b' })],
       total: 20,
     });
 
-    const result = await getBlogPage({ page: 2, pageSize: 9 });
+    const result = await getIndexPage({ page: 2, pageSize: 9 });
 
     expect(result.posts.map((p) => p.id)).toEqual(['a', 'b']);
     expect(result.currentPage).toBe(2);
@@ -30,7 +30,7 @@ describe('getBlogPage', () => {
       total: 1,
     });
 
-    const result = await getBlogPage();
+    const result = await getIndexPage();
 
     expect(result.currentPage).toBe(1);
     expect(result.totalPages).toBe(1);
@@ -39,28 +39,10 @@ describe('getBlogPage', () => {
   it('returns totalPages 1 for an empty corpus', async () => {
     mockRun.mockResolvedValue({ posts: [], total: 0 });
 
-    const result = await getBlogPage({ page: 1 });
+    const result = await getIndexPage({ page: 1 });
 
     expect(result.posts).toEqual([]);
     expect(result.total).toBe(0);
     expect(result.totalPages).toBe(1); // Math.max(1, ceil(0/9))
-  });
-});
-
-describe('getBlogPageCount', () => {
-  it('returns total page count for a full corpus', async () => {
-    mockRun.mockResolvedValue(20);
-
-    const result = await getBlogPageCount();
-
-    expect(result).toBe(3); // ceil(20 / 9)
-  });
-
-  it('returns 1 for an empty corpus', async () => {
-    mockRun.mockResolvedValue(0);
-
-    const result = await getBlogPageCount();
-
-    expect(result).toBe(1); // Math.max(1, ceil(0/9))
   });
 });

@@ -1,3 +1,3 @@
-export type { TGetBlogPageArgs } from './adaptor/loader';
-export type { TBlogPage } from './adaptor/types';
+export type { TGetIndexPageArgs } from './adaptor/index-page/loader';
+export type { TBlogIndexPage } from './adaptor/index-page/types';
 export { createBlogService } from './application/service';
