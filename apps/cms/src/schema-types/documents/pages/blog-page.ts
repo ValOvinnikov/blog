@@ -20,7 +20,7 @@ export const blogPageSchema = defineType({
     },
   },
   fields: [
-    titleField({ initialValue: 'Blog Page', readOnly: true }),
+    titleField(),
     defineField({
       name: 'heading',
       title: 'Heading',
