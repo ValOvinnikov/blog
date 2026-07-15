@@ -12,10 +12,12 @@ export const blogPageSchema = defineType({
     select: {
       title: 'title',
     },
-    prepare: () => ({
-      title: 'Blog Page',
-      subtitle: 'Blog singleton',
-    }),
+    prepare({ title }) {
+      return {
+        title: (title as string | undefined) ?? 'Blog Page',
+        subtitle: 'Blog singleton',
+      };
+    },
   },
   fields: [
     titleField({ initialValue: 'Blog Page', readOnly: true }),

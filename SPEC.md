@@ -198,13 +198,18 @@ independent of its display fields.
 
 **Page documents reference modules**
 
-- `page_home` (`homeSchema`, singleton) — `title`, `hero` (single **required**
-  reference to a `module_hero`, kept separate from the module list — it always
-  renders first), `modules` (array of references via `defineModulesField({
-allow: [MODULE_TYPE.POST_LIST, MODULE_TYPE.CTA] })`), `seo`.
+- `page_home` (`homeSchema`, singleton) — `titleField` (read-only, fixed
+  value), `hero` (single **required** reference to a `module_hero`, kept
+  separate from the module list — it always renders first), `modules` (array of
+  references via `defineModulesField({ allow: [MODULE_TYPE.POST_LIST,
+MODULE_TYPE.CTA] })`), `seo`.
 - `page_generic` (`genericSchema`) — `title`, `slug` (source: title),
   `modules` (array of references via `defineModulesField({ allow:
 [MODULE_TYPE.CONTENT, MODULE_TYPE.CTA] })`), `seo`.
+- `page_blog` (`blogPageSchema`, singleton) — the `/blog` index page config; a
+  non-module singleton: `titleField` (read-only, fixed value), `heading` (the
+  page `<h1>`), `supportingText` (optional line under it), `itemsPerPage`
+  (number, 1–24, drives the pagination window size), `seo`.
 
 `defineModulesField({ allow, description? })`
 (`schema-types/helpers/define-modules-field.ts`) builds the `modules` array
