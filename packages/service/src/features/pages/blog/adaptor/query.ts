@@ -1,11 +1,13 @@
 import { q } from '@blog/service/sanity/query';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
-const blogPosts = q.star.filterByType('blog_post').order('publishedAt desc');
+const blogPosts = q.star.filterByType('blog_post');
 
-// groqd's `.slice` takes literal indices (GROQ has no $param slices), so the
-// window query is a builder, not a module-level const.
-export const buildBlogListQuery = (start: number, end: number) =>
-  blogPosts.slice(start, end).project(postCardFragment);
-
-export const blogPostsCountQuery = q.count(blogPosts);
+export const buildBlogPageQuery = (start: number, end: number) =>
+  q.project((sub) => ({
+    posts: blogPosts
+      .order('publishedAt desc')
+      .slice(start, end)
+      .project(postCardFragment),
+    total: sub.count(blogPosts),
+  }));

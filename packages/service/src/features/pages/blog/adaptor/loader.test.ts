@@ -11,12 +11,10 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 
 describe('getBlogPage', () => {
   it('returns the page window with page math for a full corpus', async () => {
-    // First runQuery call = window, second = count (Promise.all order).
-    mockRun.mockResolvedValueOnce([
-      makeRawPostCard({ _id: 'a' }),
-      makeRawPostCard({ _id: 'b' }),
-    ]);
-    mockRun.mockResolvedValueOnce(20);
+    mockRun.mockResolvedValue({
+      posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'b' })],
+      total: 20,
+    });
 
     const result = await getBlogPage({ page: 2, pageSize: 9 });
 
@@ -27,8 +25,10 @@ describe('getBlogPage', () => {
   });
 
   it('defaults to page 1 and POSTS_PER_PAGE', async () => {
-    mockRun.mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
-    mockRun.mockResolvedValueOnce(1);
+    mockRun.mockResolvedValue({
+      posts: [makeRawPostCard({ _id: 'a' })],
+      total: 1,
+    });
 
     const result = await getBlogPage();
 
@@ -37,8 +37,7 @@ describe('getBlogPage', () => {
   });
 
   it('returns totalPages 1 for an empty corpus', async () => {
-    mockRun.mockResolvedValueOnce([]);
-    mockRun.mockResolvedValueOnce(0);
+    mockRun.mockResolvedValue({ posts: [], total: 0 });
 
     const result = await getBlogPage({ page: 1 });
 
