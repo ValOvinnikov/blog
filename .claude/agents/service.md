@@ -70,8 +70,13 @@ relative paths only within a single slice (`./query`, `./types`).
   these domains → `{ pages, entities, global }`.
 - **Each feature = `adaptor/` + `application/` + `index.ts`:**
   - **`adaptor/`** — the Sanity-coupled implementation, one slice per action.
-    A slice is `query.ts` · `transformer.ts` · `types.ts` · `loader.ts` (params
-    slices have just `query.ts` + `loader.ts`, no transform). `types.ts` holds
+    A slice is `query.ts` · `transformer.ts` · `types.ts` · `loader.ts`. **The
+    loader is always thin** (`runQuery` → transformer → view-model), so any
+    shaping logic lives in `transformer.ts`, never inline in the loader. A
+    params slice whose query already projects its final shape (e.g. category
+    slug params, `*[…]{ 'slug': slug.current }`) needs no transformer; one that
+    **computes** its shape (e.g. the blog index's page params, derived from a
+    `count`) gets a `transformer.ts` like any other slice. `types.ts` holds
     the **view-model** type (`TPostDetail`, `THomePage`, …); the transformer
     exports the **raw** input type it maps from
     (`export type TRawPostDetail = NonNullable<InferResultType<typeof query>>`),
