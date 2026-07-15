@@ -54,6 +54,9 @@ export const linkSchema = defineType({
         // is genericSchema's own `name:` literal — see cms-schema-practices
         // on schema's-own-name literals being the source of truth.
         { type: 'page_generic' },
+        // page_blog (the blog index singleton) is likewise referenced by its
+        // own `name:` literal — a "Blog" nav item points here.
+        { type: 'page_blog' },
       ],
       hidden: ({ parent }) => !isLinkType(parent, TLINK_TYPE.INTERNAL),
       validation: (rule) =>

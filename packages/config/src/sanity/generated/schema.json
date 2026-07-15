@@ -156,6 +156,36 @@
     }
   },
   {
+    "type": "type",
+    "name": "page_blog.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "page_blog"
+    }
+  },
+  {
     "name": "link",
     "type": "type",
     "value": {
@@ -208,6 +238,10 @@
               {
                 "type": "inline",
                 "name": "page_generic.reference"
+              },
+              {
+                "type": "inline",
+                "name": "page_blog.reference"
               }
             ]
           },
