@@ -18,7 +18,7 @@ export const homePageSchema = defineType({
     },
     prepare({ title }) {
       return {
-        title: (title as string | undefined) ?? 'Home Page',
+        title: title ?? 'Unknown',
         subtitle: 'Home singleton',
       };
     },

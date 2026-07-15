@@ -24,7 +24,7 @@ export const postListSchema = defineType({
     },
     prepare({ title, limit }) {
       return {
-        title: (title as string | undefined) ?? 'Post List',
+        title: title ?? 'Unknown',
         subtitle: limit ? `Limit: ${String(limit)}` : undefined,
       };
     },

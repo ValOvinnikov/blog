@@ -14,7 +14,7 @@ export const blogPageSchema = defineType({
     },
     prepare({ title }) {
       return {
-        title: (title as string | undefined) ?? 'Blog Page',
+        title: title ?? 'Unknown',
         subtitle: 'Blog singleton',
       };
     },

@@ -25,7 +25,7 @@ export const contentSchema = defineType({
     },
     prepare({ title }) {
       return {
-        title: (title as string | undefined) ?? 'Content',
+        title: title ?? 'Unknown',
       };
     },
   },

@@ -12,7 +12,7 @@ export const siteSchema = defineType({
   preview: {
     select: { title: 'title' },
     prepare: ({ title }) => ({
-      title: title ?? 'Site Settings',
+      title: title ?? 'Unknown',
       subtitle: 'Site settings',
     }),
   },

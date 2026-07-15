@@ -199,7 +199,8 @@ independent of its display fields.
 **Page documents reference modules**
 
 - `page_home` (`homeSchema`, singleton) — `titleField` (internal Studio label;
-  `preview.prepare` falls back to "Home Page"), `hero` (single **required**
+  `preview.prepare` falls back to the generic "Unknown" when unset), `hero`
+  (single **required**
   reference to a `module_hero`, kept
   separate from the module list — it always renders first), `modules` (array of
   references via `defineModulesField({ allow: [MODULE_TYPE.POST_LIST,
@@ -209,7 +210,7 @@ MODULE_TYPE.CTA] })`), `seo`.
 [MODULE_TYPE.CONTENT, MODULE_TYPE.CTA] })`), `seo`.
 - `page_blog` (`blogPageSchema`, singleton) — the `/blog` index page config; a
   non-module singleton: `titleField` (internal Studio label; `preview.prepare`
-  falls back to "Blog Page"), `heading` (the
+  falls back to the generic "Unknown" when unset), `heading` (the
   page `<h1>`), `supportingText` (optional line under it), `itemsPerPage`
   (number, 1–24, drives the pagination window size), `seo`.
 
