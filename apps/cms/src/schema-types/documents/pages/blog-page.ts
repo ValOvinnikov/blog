@@ -25,7 +25,7 @@ export const blogPageSchema = defineType({
       name: 'heading',
       title: 'Heading',
       type: 'string',
-      description: 'The page <h1>.',
+      description: 'The main heading shown at the top of the page.',
       validation: (rule) => rule.required(),
     }),
     defineField({
