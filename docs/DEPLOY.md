@@ -59,6 +59,7 @@ within this doc; the real values live in GitHub / Vercel / local `.env` and are
 | Sanity dataset                             | `development`             | `production`              |
 | Sanity **Viewer** token                    | `<DEV_READ_TOKEN>`        | `<PRD_READ_TOKEN>`        |
 | Sanity **Deploy** token                    | `<DEV_DEPLOY_TOKEN>`      | `<PRD_DEPLOY_TOKEN>`      |
+| Sanity **Migrate** token (Editor)          | `<DEV_MIGRATE_TOKEN>`     | `<PRD_MIGRATE_TOKEN>`     |
 | Revalidate secret (`openssl rand -hex 32`) | `<DEV_REVALIDATE_SECRET>` | `<PRD_REVALIDATE_SECRET>` |
 
 Vercel (needed for **both** dev and prod web deploys — both go through the Vercel
@@ -85,6 +86,10 @@ project-scoped, so mint them **inside** the matching project):
   - [ ] `web-read` — permission **Viewer** → `<DEV_READ_TOKEN>` / `<PRD_READ_TOKEN>`.
   - [ ] `ci-deploy` — permission **Deploy Studio** (write) → `<DEV_DEPLOY_TOKEN>` / `<PRD_DEPLOY_TOKEN>`.
         (Distinct from the read token; `sanity deploy` needs write.)
+  - [ ] `ci-migrate` — permission **Editor** → `<DEV_MIGRATE_TOKEN>` / `<PRD_MIGRATE_TOKEN>`.
+        (Content migrations mutate documents; the Deploy-Studio token can't —
+        a real `migrate:deploy` run gets "permission update required". Kept
+        separate from `ci-deploy` for least privilege.)
 
 ### 2. Secrets to generate locally
 
@@ -143,6 +148,7 @@ job resolves its own project's id + token:
 
 - [ ] Variable `SANITY_STUDIO_PROJECT_ID` = `<DEV_PROJECT_ID>`
 - [ ] Secret `SANITY_DEPLOY_TOKEN` = `<DEV_DEPLOY_TOKEN>`
+- [ ] Secret `SANITY_MIGRATE_TOKEN` = `<DEV_MIGRATE_TOKEN>` (Editor — the migrate job)
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-dev**)
@@ -151,6 +157,7 @@ job resolves its own project's id + token:
 
 - [ ] Variable `SANITY_STUDIO_PROJECT_ID` = `<PRD_PROJECT_ID>`
 - [ ] Secret `SANITY_DEPLOY_TOKEN` = `<PRD_DEPLOY_TOKEN>`
+- [ ] Secret `SANITY_MIGRATE_TOKEN` = `<PRD_MIGRATE_TOKEN>` (Editor — the migrate job)
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-prod**)
