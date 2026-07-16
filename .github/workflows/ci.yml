@@ -102,9 +102,30 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Typegen
-        working-directory: apps/cms
-        run: pnpm exec sanity typegen generate
+      # Drift guard: regenerate schema.json + types.ts from the current
+      # schemas and require the committed output to match — a schema change
+      # merged without `pnpm typegen` ships stale (but self-consistent) types
+      # that type-check alone can't catch. Typegen is non-deterministic (see
+      # CLAUDE.md), so a mismatch gets up to 3 regeneration attempts before it
+      # counts as drift. Read-only: nothing is committed from CI.
+      - name: Typegen (verify committed output is current)
+        run: |
+          set -euo pipefail
+          generated=packages/config/src/sanity/generated
+          for attempt in 1 2 3; do
+            (cd apps/cms && pnpm typegen)
+            if [ -z "$(git status --porcelain -- "$generated")" ]; then
+              echo "Committed typegen output is current (attempt ${attempt})."
+              exit 0
+            fi
+            echo "Attempt ${attempt}: regenerated output differs from committed output."
+          done
+          echo '::group::typegen drift (regenerated vs committed)'
+          git status --porcelain -- "$generated"
+          git --no-pager diff --color=never -- "$generated"
+          echo '::endgroup::'
+          echo "::error::Committed generated types in ${generated} are stale. Run 'pnpm typegen' locally and commit the regenerated files."
+          exit 1
 
   skills-sync:
     name: Skills sync
