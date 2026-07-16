@@ -163,7 +163,46 @@ re-run from that step — do not proceed with any red check.
   - Gate 4: ask to create the PR (separate, explicit approval)
   - Gate 5: set status → Code Review immediately after PR is created
 
-## 8. Deploy — human-gated, never automatic
+## 8. Remove the subagent worktrees you created
+
+Once the PR is open, each subagent's worktree has served its purpose — its
+commits are landed on the `feat/` branch and pushed. Remove it: nothing else
+will. The harness only auto-sweeps worktrees that have **no uncommitted
+changes, no untracked files, and no unpushed commits** — and a
+`worktree-agent-*` branch is never pushed under its own name, so these
+accumulate forever otherwise (~1.1 GB each; 26 once piled up). A subagent
+cannot do this itself — it cannot remove the worktree it is standing in.
+
+For each worktree created for this task:
+
+```bash
+branch=$(git -C <worktree> branch --show-current)
+git -C <worktree> status --porcelain              # must be EMPTY
+git cherry origin/<feat-branch> "$branch"         # must print no '+' lines
+git worktree remove <worktree>                    # never --force
+```
+
+- **Both checks must pass**, and only then remove.
+- **Compare against the pushed `feat/` branch — NOT `origin/main`.** At this
+  point the PR is open but unmerged, so the agent's commits are on `feat/…`,
+  not yet on `main`; checking `origin/main` reports every commit as unmerged
+  and you would never clean anything up. Using `origin/<feat-branch>` also
+  proves the work reached the remote, which is what makes deleting the local
+  worktree safe.
+- **Use `git cherry`, not `git rev-list --count`.** rev-list counts SHAs, so a
+  squash- or rebase-merged branch still looks "ahead" and you would keep a
+  worktree whose work is fully landed.
+- Uncommitted changes exist nowhere else and are unrecoverable — if `status` is
+  dirty, leave the worktree and tell the user what is in it.
+- Removal keeps the branch — committed work stays recoverable, which is what
+  makes this safe.
+- Deletion is slow (~1.1 GB of `node_modules` each). Remove them one at a time
+  with a generous timeout; an interrupted removal leaves a half-deleted
+  worktree that then needs `--force`.
+- If a worktree still exists after its PR merged, the same checks work against
+  `origin/main`.
+
+## 9. Deploy — human-gated, never automatic
 
 - `sanity deploy` (cms) and Vercel deploys are **manual, human-run** steps. Do
   not run them. At most, remind the user of the commands (README → Deployment).

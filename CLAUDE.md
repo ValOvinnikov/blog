@@ -149,6 +149,10 @@ Every issue follows this exact order. **Stop and wait for explicit user approval
 7. **Ask to open PR** — separate question, after push; wait for answer.
    Once approved: run `gh pr create`, then **immediately** set the issue → Code Review
    on the board — do not report the PR URL until the board update is done.
+8. **Remove the subagent worktrees you created** (no gate — just do it). Nothing
+   else will: the harness never auto-sweeps them because `worktree-agent-*`
+   branches are never pushed, and they cost ~1.1 GB each. See `develop-feature`
+   step 8 for the safety checks — never delete uncommitted work.
 
 **Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work only — never the commit, push, or PR.** Those three gates always require fresh, explicit confirmation.
 

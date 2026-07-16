@@ -132,7 +132,7 @@ contracts:
     `no-restricted-imports` violations — back to the agent in the same turn.
     Report-only (never `--fix`); the commit-time gates stay authoritative.
 - **Skills** (`.claude/skills/`):
-  - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit); start here for non-trivial work.
+  - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
   - `cms-schema-practices` — Sanity schema quality bar + content-migration workflow.
   - `ui-library-practices` — building pure, prop-driven design-system components.
