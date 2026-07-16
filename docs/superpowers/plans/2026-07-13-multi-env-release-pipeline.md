@@ -1,5 +1,13 @@
 # Multi-environment Release Pipeline Implementation Plan
 
+> **Status: implemented & archived (2026-07).** This is a point-in-time planning
+> snapshot; the embedded workflow YAML below is an early draft and has since
+> diverged from what shipped (the dev pipeline gained `changes`/`verify`/`migrate`
+> jobs, per-job concurrency, and CLI-based web deploys). The **authoritative**
+> sources are the live workflow files (`.github/workflows/deploy-development.yml`,
+> `deploy-production.yml`), `SPEC.md` §13, and `docs/DEPLOY.md`. Do not treat the
+> code blocks here as current — read them as historical intent only.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Automate environment-specific deploys — `main` → development, `v*` tag → production — for both the Sanity Studio and the Next.js web app.

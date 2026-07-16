@@ -16,12 +16,19 @@ on:
 permissions:
   contents: read
 
-# Only the latest merge matters for dev — a newer push supersedes any queued or
-# in-flight dev deploy (Vercel/Sanity deploys are atomic, so cancelling is safe).
-# Production keeps cancel-in-progress: false.
-concurrency:
-  group: deploy-dev
-  cancel-in-progress: true
+# Concurrency is scoped PER JOB, not workflow-wide, so the `migrate` job can be
+# exempted from cancellation (#409). A workflow-level `cancel-in-progress: true`
+# cancels the *entire* run — including a `migrate:deploy` that is mutating the
+# dataset mid-transaction — when the next merge lands. Instead:
+#   • changes / verify / deploy-* keep `cancel-in-progress: true` (their own
+#     groups) — a newer merge still supersedes an in-flight build/deploy, so
+#     "latest merge wins" is preserved for the cancel-safe jobs. Each job needs
+#     a distinct group; jobs sharing one group would cancel each other in-run.
+#   • migrate uses `cancel-in-progress: false` — a newer merge QUEUES behind a
+#     running migration instead of interrupting it. GitHub keeps at most one
+#     pending run per group (newer supersedes older pending), so rapid merges
+#     collapse to "finish the current migration, then run the latest".
+# Production keeps a workflow-level `cancel-in-progress: false` (never cancels).
 
 env:
   PNPM_VERSION: 9.15.0
@@ -49,6 +56,9 @@ jobs:
     name: Detect changes
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    concurrency:
+      group: deploy-dev-changes
+      cancel-in-progress: true
     outputs:
       cms: ${{ steps.cms.outputs.changed }}
       web: ${{ steps.web.outputs.changed }}
@@ -90,6 +100,9 @@ jobs:
       needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    concurrency:
+      group: deploy-dev-verify
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -125,6 +138,12 @@ jobs:
       needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # The one job that must never be cancelled mid-run (#409): a dataset mutation
+    # interrupted mid-transaction can leave a migration half-applied. `false`
+    # queues a newer merge behind the running migration instead of cancelling it.
+    concurrency:
+      group: deploy-dev-migrate
+      cancel-in-progress: false
     environment: development
     env:
       SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
@@ -155,6 +174,9 @@ jobs:
       needs.changes.outputs.cms == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    concurrency:
+      group: deploy-dev-studio
+      cancel-in-progress: true
     environment: development
     env:
       SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
@@ -186,6 +208,9 @@ jobs:
       needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    concurrency:
+      group: deploy-dev-web
+      cancel-in-progress: true
     environment: development
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}

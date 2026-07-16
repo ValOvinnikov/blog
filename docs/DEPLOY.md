@@ -245,6 +245,20 @@ migrate]`. No artifact backup here — dev is the disposable staging line (and
 5. **`deploy-web`** → `blog-dev` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
 
+Concurrency is scoped **per job**, not workflow-wide. `changes` / `verify` /
+`deploy-*` each keep `cancel-in-progress: true`, so a newer merge still
+supersedes an in-flight build/deploy — "latest merge wins" still holds. (The
+supersede is slightly lazier than the old workflow-level cancel: a per-job
+group cancels an older run's `deploy-web`/`deploy-studio` only once the newer
+run's _same_ job is ready to start — i.e. after the newer run clears its own
+`changes` → `verify` → `migrate` chain — so an old deploy can finish before
+being superseded rather than being cut off the instant a new run starts.) The
+`migrate` job is the exception — its group uses `cancel-in-progress: false`
+(#409), so a newer merge **queues behind** a running migration instead of
+interrupting a dataset mutation mid-transaction. GitHub keeps at most one
+pending run per group, so a burst of merges collapses to "finish the current
+migration, then run the latest".
+
 There are **no PR preview deployments** — deploys happen only on merge to `main`.
 
 ### Production — on a `vX.Y.Z` tag
