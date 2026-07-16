@@ -1,4 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
+
 export type TBrand = {
   name: string;
   prefix: string;
