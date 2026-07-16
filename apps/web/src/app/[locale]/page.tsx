@@ -1,6 +1,7 @@
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { HomePageTemplate } from '@web/components/home-page-template/home-page-template';
+import { toMetadata } from '@web/metadata/to-metadata';
 import { HeroModule } from '@web/modules/hero/hero-module';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import type { Metadata } from 'next';
@@ -12,47 +13,18 @@ type TProps = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const [homeResult, settingsResult] = await Promise.all([
-    service.pages.home.v1.getHomePage(),
-    service.global.siteSettings.v1.getSiteSettings(),
-  ]);
+  const result = await service.pages.home.v1.getHomePage();
 
-  const home = homeResult.ok ? homeResult.data : null;
-  const settings = settingsResult.ok ? settingsResult.data : null;
-  const title =
-    home?.seo?.metaTitle ??
-    home?.seo?.ogTitle ??
-    settings?.ogTitle ??
-    settings?.brand.name ??
-    'Blog';
-  const description =
-    home?.seo?.metaDescription ??
-    home?.seo?.ogDescription ??
-    settings?.ogDescription ??
-    settings?.description ??
-    '';
-  const ogTitle = home?.seo?.ogTitle ?? title;
-  const ogDescription = home?.seo?.ogDescription ?? description;
-  const imageUrl = home?.seo?.ogImageUrl ?? settings?.ogImageUrl;
-  const images = imageUrl ? [{ url: imageUrl }] : [];
+  if (!result.ok) {
+    console.error(`Error to fetch home page metadata: ${result.error}`);
+    return {};
+  }
 
-  return {
-    title,
-    description,
-    alternates: { canonical: '/' },
-    openGraph: {
-      title: ogTitle,
-      description: ogDescription,
-      images,
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: ogTitle,
-      description: ogDescription,
-      images: images.map((image) => image.url),
-    },
-  };
+  return toMetadata(result.data.seo, {
+    canonical: '/',
+    ogType: 'website',
+    titleAbsolute: true,
+  });
 }
 
 export default async function HomePage({ params }: TProps) {

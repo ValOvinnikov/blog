@@ -10,6 +10,12 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
+vi.mock('@blog/service/sanity/image', () => ({
+  urlForImage: vi.fn(
+    () => 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
+  ),
+}));
+
 describe('getSiteSettings', () => {
   it('throws when site settings document does not exist', async () => {
     mockRun.mockResolvedValue(null);
@@ -36,5 +42,13 @@ describe('getSiteSettings', () => {
     expect(result.brand.name).toBe('Awesome Blog');
     expect(result.brand.prefix).toBe('val');
     expect(result.brand.suffix).toBe('.dev');
+  });
+
+  it('maps the default OG image to a URL', async () => {
+    mockRun.mockResolvedValue(makeRawSiteSettings());
+
+    const result = await getSiteSettings();
+
+    expect(result.defaultOgImageUrl).toContain('sanity.io');
   });
 });

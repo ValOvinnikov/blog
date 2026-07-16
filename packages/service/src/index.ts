@@ -62,5 +62,5 @@ export type {
   TPostCardAuthor,
   TPostCardCategory,
 } from './shared/transformers/to-post-card';
-export type { TSeoMeta } from './shared/transformers/to-seo-meta';
+export type { TSeoResolved } from './shared/transformers/resolve-seo';
 export type { TSocialLink } from './shared/transformers/to-social-link';

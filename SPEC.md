@@ -228,7 +228,8 @@ replacing a hand-duplicated block per page document.
 - `author` — name, slug, image, bio, role, socialLinks (unified `link`-based).
 - `category` — title, slug, description.
 - `siteSettings` (singleton) — `titleField` (read-only, fixed value), brand
-  (`brand` object: name/prefix/suffix/logo), description, tagline, defaultSeo.
+  (`brand` object: name/prefix/suffix/logo), description, tagline,
+  `defaultOgImage` (`imageWithAlt`, required — the last-resort social image).
 - `settings_navigation` (singleton) — `titleField` (read-only, fixed value),
   items (links).
 - `settings_footer` (singleton) — `titleField` (read-only, fixed value),
@@ -243,7 +244,8 @@ the document form showing "Untitled"). Content/module documents pass `max`
 for an editable headline.
 
 **Objects** — `link` (unified internal/external, `LINK_TYPE` const),
-`socialLink`, `brand`, `imageWithAlt` (required alt), `seo` + `openGraph`,
+`socialLink`, `brand`, `imageWithAlt` (required alt), `seo` (all-optional
+override bag) + `openGraph`,
 `blockText` / `richText`.
 
 **Conventions**
@@ -337,6 +339,17 @@ changing a schema does **not** change existing documents.
 
 - Per-route `generateMetadata` (title, description, canonical, Open Graph,
   Twitter card) using `NEXT_PUBLIC_SITE_URL`.
+- **SEO fallback resolution lives in `service`**, not the routes: a single
+  `resolveSeo` transformer applies the ladder **authored `seo` →
+  content-derived → site defaults** once per field, returning a fully-resolved
+  `TSeoResolved`. `web` maps it to `Metadata` with one shared `toMetadata`
+  helper — no `??` fallback chains in route files. Page loaders
+  (`getHomePage`, `getIndexPage`) fetch site settings internally (Next dedupes)
+  and return `seo: TSeoResolved`. The home title is emitted **absolute** (it is
+  the brand) so the layout `%s | Brand` template does not double-append; site
+  settings contribute only `description` + `defaultOgImage` as the final rung.
+  If no image resolves at any rung, `ogImageUrl` is absent and the route omits
+  `og:image` / the twitter image rather than emitting an empty tag.
 - Paginated lists: every page **self-canonical** (never canonical-to-page-1),
   no `rel=next/prev`, out-of-range → hard 404 (§1 routing conventions).
 - JSON-LD `Article`/`BlogPosting` on post pages (#94).

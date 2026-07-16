@@ -1,6 +1,6 @@
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { brandSchema } from '@cms/schema-types/objects/brand';
-import { openGraphSchema } from '@cms/schema-types/objects/open-graph';
+import { imageWithAltSchema } from '@cms/schema-types/objects/image-with-alt';
 import { Settings } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -39,17 +39,12 @@ export const siteSchema = defineType({
       validation: (rule) => rule.max(120),
     }),
     defineField({
-      name: 'defaultSeo',
-      title: 'Default Social Sharing',
-      type: openGraphSchema.name,
+      name: 'defaultOgImage',
+      title: 'Default OG Image',
+      type: imageWithAltSchema.name,
       description:
-        'Fallback title/description/image used when a page has no own OG values.',
-      validation: (rule) =>
-        rule
-          .required()
-          .custom((value: { ogImage?: unknown } | undefined) =>
-            value?.ogImage ? true : 'A default OG image is required.',
-          ),
+        'Fallback social-sharing image used when a page has no own OG image.',
+      validation: (rule) => rule.required(),
     }),
   ],
 });

@@ -1,6 +1,6 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
-import type { TBlogIndexPage, TSiteSettings } from '@blog/service';
+import { toMetadata } from '@web/metadata/to-metadata';
 import type { Metadata } from 'next';
 
 /**
@@ -11,56 +11,26 @@ import type { Metadata } from 'next';
  * fetch per request, so this adds no extra round-trip.
  */
 export async function buildBlogListMetadata(page: number): Promise<Metadata> {
-  const [indexPageResult, settingsResult] = await Promise.all([
-    service.pages.blog.v1.getIndexPage({ page }),
-    service.global.siteSettings.v1.getSiteSettings(),
-  ]);
+  const result = await service.pages.blog.v1.getIndexPage({ page });
 
-  let indexPage: TBlogIndexPage | null = null;
-  if (indexPageResult.ok) {
-    indexPage = indexPageResult.data;
+  if (!result.ok) {
+    console.error(`Error to fetch blog index page metadata: ${result.error}`);
+    return {};
   }
 
-  let settings: TSiteSettings | null = null;
-  if (settingsResult.ok) {
-    settings = settingsResult.data;
-  }
-
-  const base =
-    indexPage?.seo?.metaTitle ??
-    indexPage?.seo?.ogTitle ??
-    indexPage?.heading ??
-    settings?.ogTitle ??
-    settings?.brand.name ??
-    'Blog';
+  const { seo } = result.data;
   // "– Page N" stays a hardcoded suffix until translation messages land (#321).
-  const title = page === 1 ? base : `${base} – Page ${page}`;
-  const description =
-    indexPage?.seo?.metaDescription ??
-    indexPage?.seo?.ogDescription ??
-    settings?.ogDescription ??
-    settings?.description ??
-    '';
-  const ogTitle = indexPage?.seo?.ogTitle ?? title;
-  const ogDescription = indexPage?.seo?.ogDescription ?? description;
-  const imageUrl = indexPage?.seo?.ogImageUrl ?? settings?.ogImageUrl;
-  const images = imageUrl ? [{ url: imageUrl }] : [];
+  const resolvedSeo =
+    page === 1
+      ? seo
+      : {
+          ...seo,
+          title: `${seo.title} – Page ${page}`,
+          ogTitle: `${seo.ogTitle} – Page ${page}`,
+        };
 
-  return {
-    title,
-    description,
-    alternates: { canonical: routes.blogIndex(page) },
-    openGraph: {
-      title: ogTitle,
-      description: ogDescription,
-      images,
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: ogTitle,
-      description: ogDescription,
-      images: images.map((image) => image.url),
-    },
-  };
+  return toMetadata(resolvedSeo, {
+    canonical: routes.blogIndex(page),
+    ogType: 'website',
+  });
 }

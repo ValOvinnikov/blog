@@ -227,7 +227,7 @@ export type Settings_site = {
   brand?: Brand;
   description?: string;
   tagline?: string;
-  defaultSeo?: OpenGraph;
+  defaultOgImage?: ImageWithAlt;
 };
 
 export type Page_blog = {

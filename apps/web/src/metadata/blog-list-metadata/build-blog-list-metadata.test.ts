@@ -1,10 +1,10 @@
+import type { TSeoResolved } from '@blog/service';
 import { describe, expect, it, vi } from 'vitest';
 
 import { buildBlogListMetadata } from './build-blog-list-metadata';
 
-const { getIndexPageMock, getSiteSettingsMock } = vi.hoisted(() => ({
+const { getIndexPageMock } = vi.hoisted(() => ({
   getIndexPageMock: vi.fn(),
-  getSiteSettingsMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -12,34 +12,29 @@ vi.mock('@blog/service', () => ({
     pages: {
       blog: { v1: { getIndexPage: getIndexPageMock } },
     },
-    global: {
-      siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } },
-    },
   },
 }));
 
+const seo: TSeoResolved = {
+  title: 'The Blog',
+  description: 'All the posts.',
+  ogTitle: 'The Blog OG',
+  ogDescription: 'All the posts OG.',
+  ogImageUrl: 'https://cdn.example.com/blog-og.jpg',
+};
+
 describe('buildBlogListMetadata', () => {
-  it('builds page-1 metadata from page_blog SEO, self-canonical to /blog', async () => {
+  it('builds page-1 metadata from the resolved seo, self-canonical to /blog', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
         heading: 'Blog',
-        seo: {
-          metaTitle: 'The Blog',
-          metaDescription: 'All the posts.',
-          ogTitle: 'The Blog OG',
-          ogDescription: 'All the posts OG.',
-          ogImageUrl: 'https://cdn.example.com/blog-og.jpg',
-        },
+        seo,
         posts: [],
         currentPage: 1,
         totalPages: 3,
         total: 20,
       },
-    });
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { description: 'A great blog.' },
     });
 
     const metadata = await buildBlogListMetadata(1);
@@ -54,86 +49,36 @@ describe('buildBlogListMetadata', () => {
     ]);
   });
 
-  it('builds page-N metadata, self-canonical to /blog/page/N — never /blog', async () => {
+  it('builds page-N metadata with a "– Page N" suffix, self-canonical to /blog/page/N — never /blog', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
         heading: 'Blog',
-        seo: { metaTitle: 'The Blog' },
+        seo,
         posts: [],
         currentPage: 2,
         totalPages: 3,
         total: 20,
       },
     });
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { description: 'A great blog.' },
-    });
 
     const metadata = await buildBlogListMetadata(2);
 
     expect(metadata.title).toBe('The Blog – Page 2');
+    expect(metadata.openGraph?.title).toBe('The Blog OG – Page 2');
+    expect(metadata.twitter?.title).toBe('The Blog OG – Page 2');
     expect(metadata.alternates?.canonical).toBe('/blog/page/2');
     expect(metadata.alternates?.canonical).not.toBe('/blog');
   });
 
-  it('falls back to site settings ogTitle when page_blog is unavailable', async () => {
+  it('returns empty metadata when the index page fetch fails', async () => {
     getIndexPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ogTitle: 'Site OG Title',
-        ogDescription: 'Site OG description.',
-        description: 'A great blog.',
-        ogImageUrl: 'https://cdn.example.com/site-og.jpg',
-      },
-    });
-
-    const metadata = await buildBlogListMetadata(1);
-
-    expect(metadata.title).toBe('Site OG Title');
-    expect(metadata.description).toBe('Site OG description.');
-  });
-
-  it('falls back to the page_blog heading when no SEO is authored', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        heading: 'Blog',
-        posts: [],
-        currentPage: 1,
-        totalPages: 3,
-        total: 20,
-      },
-    });
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { description: 'A great blog.' },
-    });
-
-    const metadata = await buildBlogListMetadata(1);
-
-    expect(metadata.title).toBe('Blog');
-    expect(metadata.description).toBe('A great blog.');
-  });
-
-  it('falls back to the literal "Blog" when neither page_blog nor site settings is available', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    getSiteSettingsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
 
     const metadata = await buildBlogListMetadata(1);
 
-    expect(metadata.title).toBe('Blog');
-    expect(metadata.description).toBe('');
+    expect(metadata).toEqual({});
   });
 });

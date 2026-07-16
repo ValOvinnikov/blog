@@ -1240,11 +1240,11 @@
         },
         "optional": true
       },
-      "defaultSeo": {
+      "defaultOgImage": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "openGraph"
+          "name": "imageWithAlt"
         },
         "optional": true
       }
