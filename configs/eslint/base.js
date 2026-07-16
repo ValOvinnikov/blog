@@ -51,13 +51,6 @@ export default [
             'sibling',
             'index',
           ],
-          // `#/*` (service) and `@/*` (web) are this package's own subpath
-          // import aliases — without this, import-x can't tell they're
-          // "internal" and falls back to sorting them after every named group.
-          pathGroups: [
-            { pattern: '#/**', group: 'internal' },
-            { pattern: '@/**', group: 'internal' },
-          ],
           'newlines-between': 'always',
           alphabetize: { order: 'asc', caseInsensitive: true },
         },
