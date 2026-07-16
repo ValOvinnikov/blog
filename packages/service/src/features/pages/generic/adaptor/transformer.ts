@@ -7,7 +7,7 @@ import type { TGenericPage, TGenericPageSeo } from './types';
 
 export type TRawGenericPage = InferResultType<typeof genericPageQuery>;
 
-// TODO: replace with resolveSeo once the generic page route adopts the
+// TODO(#370): replace with resolveSeo once the generic page route adopts the
 // authored → content-derived → site-defaults ladder (out of scope for #355).
 function toGenericPageSeo(
   raw: NonNullable<TRawGenericPage['seo']>,
