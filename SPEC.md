@@ -425,6 +425,12 @@ and release runbook live in `docs/DEPLOY.md`; this is the shape.
   exact commit to production. The tag is the sole source of truth for the version
   (`package.json` version is not synced). Content is never versioned — it flows
   Studio → revalidation webhook independently of releases.
+- **Content migrations run inside the prod deploy, gated and ordered.** The prod
+  tag workflow is `verify → migrate → { deploy-studio, deploy-web }`: the
+  `migrate` job applies only un-applied migrations (`migrate:deploy`, tracked in
+  a per-dataset `migrationState` ledger) behind the `production` approval gate
+  and after a dataset-export backup, so readers never receive new code ahead of
+  the migrated data. Runbook in `docs/DEPLOY.md`.
 - The Sanity CLI is env-driven on **both** dataset (`SANITY_STUDIO_DATASET`) and
   hostname (`SANITY_STUDIO_HOSTNAME`), so one `sanity.cli.ts` deploys either
   Studio (`apps/cms/sanity.cli.ts`).

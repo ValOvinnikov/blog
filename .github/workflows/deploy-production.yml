@@ -52,9 +52,56 @@ jobs:
         env:
           SKIP_ENV_VALIDATION: 'true'
 
+  # Apply any un-applied content migrations to production BEFORE new code is
+  # served. `environment: production` gates this on the required reviewer (the
+  # human check), and every step is guarded on the deploy token so the whole job
+  # is a no-op until SANITY_DEPLOY_TOKEN is configured — safe to land ahead of
+  # the console setup.
+  migrate:
+    name: Migrate prod content
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    env:
+      SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
+      SANITY_STUDIO_DATASET: production
+      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_DEPLOY_TOKEN }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      # A backup on the ephemeral runner is not a backup — export the dataset and
+      # upload it as an artifact BEFORE any mutation, so a bad migration is
+      # recoverable.
+      - name: Back up production dataset
+        if: ${{ env.SANITY_AUTH_TOKEN != '' }}
+        working-directory: apps/cms
+        run: pnpm dataset:export "${RUNNER_TEMP}/prod-${GITHUB_REF_NAME}.tar.gz"
+      - name: Upload backup artifact
+        if: ${{ env.SANITY_AUTH_TOKEN != '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sanity-prod-backup-${{ github.ref_name }}
+          path: ${{ runner.temp }}/prod-${{ github.ref_name }}.tar.gz
+          retention-days: 30
+          if-no-files-found: error
+      # Runs only un-applied migrations (dry -> run -> record in the
+      # migrationState ledger), idempotent — a second run is a no-op. CI sets
+      # CI=true which (with --yes) skips the interactive confirm; the approval
+      # gate above is the real human check.
+      - name: Apply pending migrations
+        if: ${{ env.SANITY_AUTH_TOKEN != '' }}
+        working-directory: apps/cms
+        run: pnpm migrate:deploy --yes
+
   deploy-studio:
     name: Deploy prod Studio
-    needs: verify
+    needs: [verify, migrate]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: production
@@ -78,7 +125,7 @@ jobs:
 
   deploy-web:
     name: Deploy prod web
-    needs: verify
+    needs: [verify, migrate]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
