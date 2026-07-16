@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import type { categoryFragment } from '@blog/service/shared/fragments/category';
 import type { InferFragmentType } from 'groqd';
 
@@ -7,7 +8,7 @@ export type TCategory = {
   id: string;
   title: string;
   slug: string;
-  description: string | undefined;
+  description: TMaybeUndefined<string>;
 };
 
 export function toCategory(raw: TRawCategory): TCategory {

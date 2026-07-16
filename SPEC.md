@@ -126,8 +126,10 @@ apps/web
 - Generated types mark **every** field optional (validation is runtime-only).
   The service layer restores the contract at the query boundary: explicit
   `sub.field()` projections, `.notNull()` (always last in the chain) for
-  schema-required fields, `T | undefined` (never `| null`) in view-models, and
-  **no faked defaults** — absence handling belongs to `apps/web`.
+  schema-required fields, `T | undefined` (never `| null`) in view-models —
+  spelled `TMaybeUndefined<T>` (the `@blog/config` alias) for a value that may
+  be absent, distinct from property optionality (`field?:`) — and **no faked
+  defaults**: absence handling belongs to `apps/web`.
 - Service loaders return `Promise<TViewModel>` and throw on missing data;
   `safeAsync` in each feature's `application/service.ts` converts throws into
   `AsyncResult<T>` (`{ ok: false, error }`). **Web must check `result.ok`

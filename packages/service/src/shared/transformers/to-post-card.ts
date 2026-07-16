@@ -1,4 +1,4 @@
-import type { ISanityImage } from '@blog/config';
+import type { ISanityImage, TMaybeUndefined } from '@blog/config';
 import type { postCardFragment } from '@blog/service/shared/fragments/post';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
@@ -10,7 +10,7 @@ export type TPostCardAuthor = {
   id: string;
   name: string;
   slug: string;
-  imageUrl: string | undefined;
+  imageUrl: TMaybeUndefined<string>;
 };
 
 export type TPostCardCategory = {
@@ -25,11 +25,11 @@ export type TPostCard = {
   slug: string;
   excerpt: string;
   publishedAt: string;
-  heroImageUrl: string | undefined;
-  heroImageAlt: string | undefined;
-  heroImageSanity: ISanityImage | undefined;
+  heroImageUrl: TMaybeUndefined<string>;
+  heroImageAlt: TMaybeUndefined<string>;
+  heroImageSanity: TMaybeUndefined<ISanityImage>;
   featured: boolean;
-  author: TPostCardAuthor | undefined;
+  author: TMaybeUndefined<TPostCardAuthor>;
   categories: TPostCardCategory[];
 };
 
