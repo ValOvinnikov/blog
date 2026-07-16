@@ -40,8 +40,8 @@ export const postSchema = defineType({
       validation: (rule) => rule.required().min(50).max(300),
     }),
     defineField({
-      name: 'mainImage',
-      title: 'Main Image',
+      name: 'heroImage',
+      title: 'Hero Image',
       type: imageWithAltSchema.name,
       description:
         'Optional hero image shown at the top of the post and in social shares.',
@@ -100,7 +100,7 @@ export const postSchema = defineType({
     select: {
       title: 'title',
       author: 'author.name',
-      media: 'mainImage',
+      media: 'heroImage',
     },
     prepare({ title, author, media }) {
       return {
