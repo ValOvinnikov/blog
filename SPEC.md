@@ -264,20 +264,21 @@ for an editable headline.
 
 ## 7. Environment & configuration
 
-| Variable                                   | Consumer         | Notes                                                               |
-| ------------------------------------------ | ---------------- | ------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SANITY_PROJECT_ID`            | web + service    | required; validated by Zod at import                                |
-| `NEXT_PUBLIC_SANITY_DATASET`               | web + service    | required                                                            |
-| `NEXT_PUBLIC_SITE_URL`                     | web (SEO)        | optional until launch; canonical/OG/feeds                           |
-| `SANITY_API_READ_TOKEN`                    | service (server) | optional; private reads / future draft mode                         |
-| `SANITY_REVALIDATE_SECRET`                 | web (server)     | optional until the #93 revalidation route exists                    |
-| `SANITY_STUDIO_PROJECT_ID`                 | cms Studio + CLI | required; **per environment** (env-driven; no ids in repo)          |
-| `SANITY_STUDIO_DATASET`                    | cms Studio + CLI | required                                                            |
-| `SANITY_STUDIO_HOSTNAME`                   | cms CLI (deploy) | deploy target `<host>.sanity.studio`; CI-only                       |
-| `SANITY_DEPLOY_TOKEN`                      | CI (deploy)      | write/Deploy token; **project-scoped** → set per GitHub Environment |
-| `VERCEL_TOKEN` / `_ORG_ID` / `_PROJECT_ID` | CI (deploy)      | Vercel CLI deploys; token is a Secret, ids are Variables            |
-| `TURBO_TOKEN` / `TURBO_TEAM`               | CI (all)         | optional Vercel Remote Cache; no-op until configured                |
-| `SKIP_ENV_VALIDATION`                      | CI builds only   | bypasses Zod env validation where no vars exist                     |
+| Variable                                   | Consumer                                | Notes                                                                                                                                                  |
+| ------------------------------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID`            | web + service                           | required; validated by Zod at import                                                                                                                   |
+| `NEXT_PUBLIC_SANITY_DATASET`               | web + service                           | required                                                                                                                                               |
+| `NEXT_PUBLIC_SITE_URL`                     | web (SEO)                               | optional until launch; canonical/OG/feeds                                                                                                              |
+| `SANITY_API_READ_TOKEN`                    | service (server)                        | optional; private reads / future draft mode                                                                                                            |
+| `SANITY_REVALIDATE_SECRET`                 | web (server)                            | optional until the #93 revalidation route exists                                                                                                       |
+| `SANITY_STUDIO_PROJECT_ID`                 | cms Studio + CLI                        | required; **per environment** (env-driven; no ids in repo)                                                                                             |
+| `SANITY_STUDIO_DATASET`                    | cms Studio + CLI                        | required                                                                                                                                               |
+| `SANITY_STUDIO_HOSTNAME`                   | cms CLI (deploy)                        | deploy target `<host>.sanity.studio`; CI-only                                                                                                          |
+| `SANITY_DEPLOY_TOKEN`                      | CI (deploy)                             | write/Deploy token; **project-scoped** → set per GitHub Environment                                                                                    |
+| `SANITY_AUTH_TOKEN`                        | cms `migrate:deploy`/`migrate:backfill` | write token for the `migrationState` ledger client (`@sanity/client`); the standard Sanity CLI auth var — falls back to `SANITY_DEPLOY_TOKEN` if unset |
+| `VERCEL_TOKEN` / `_ORG_ID` / `_PROJECT_ID` | CI (deploy)                             | Vercel CLI deploys; token is a Secret, ids are Variables                                                                                               |
+| `TURBO_TOKEN` / `TURBO_TEAM`               | CI (all)                                | optional Vercel Remote Cache; no-op until configured                                                                                                   |
+| `SKIP_ENV_VALIDATION`                      | CI builds only                          | bypasses Zod env validation where no vars exist                                                                                                        |
 
 - Env access is **always** through the validated entry points
   (`apps/web/src/utils/env/env.ts` via `@t3-oss/env-nextjs`, service's env via
@@ -298,16 +299,30 @@ changing a schema does **not** change existing documents.
   this before implementing, and surface the plan to the user. Additive,
   optional-only changes need none (say so explicitly).
 - Tooling lives in `apps/cms/migrations/` (`README.md`) with helper scripts:
-  `migrate:new` / `migrate:dry` / `migrate:run` / `dataset:export`.
+  `migrate:new` (folders are now UTC-timestamped, `YYYYMMDDTHHmm-<slug>`, for
+  deterministic run order) / `migrate:dry` / `migrate:run` / `dataset:export`.
 - Workflow: **dry-run → dataset export (backup) → human-gated run**. Running
   against `production` is human-gated, like deploys. Migrations must be
   idempotent.
+- **`migrate:deploy`** runs only the migrations not yet recorded in a
+  per-dataset `migrationState` ledger document (`_id: 'migrationState'`, a
+  system doc — not a Studio schema type, never part of typegen), in order:
+  dry-run → run (`--no-dry-run --no-confirm`) → append `{id, runAt, sha}` to
+  the ledger, stopping on first failure. A second run with nothing new is a
+  no-op. `migrate:backfill` records the currently-pending folder migrations as
+  applied **without** running them (one-time, per dataset, for migrations that
+  predate the ledger). Both need a write token (`SANITY_AUTH_TOKEN` /
+  `SANITY_DEPLOY_TOKEN`) and remain **manual, local-only commands today** — no
+  CI workflow invokes them yet.
 - CI (`Migrations` job) validates every migration loads and — with a read
   token — dry-runs each one read-only. It never mutates data.
-- Future: automated post-merge migration deploys with an applied-migrations
-  ledger — designed in
+- Future: a gated post-merge workflow that runs `migrate:deploy` against
+  `production` automatically (write token, durable backup, release ordering
+  vs. the Vercel web deploy) — designed in
   `docs/superpowers/specs/2026-07-10-migration-deployment-automation-design.md`
-  (#261), deferred until after first deployment.
+  (#261, rollout steps 4–5); steps 1–3 (timestamped ids, the ledger,
+  `migrate:deploy`/`migrate:backfill`) are implemented and usable locally
+  today, e.g. `SANITY_STUDIO_DATASET=development pnpm --filter cms migrate:deploy`.
 
 ## 9. Rendering, caching & i18n
 
