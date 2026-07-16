@@ -26,10 +26,14 @@ export async function HeroModule({ id }: IHeroModuleProps) {
     secondaryAction,
   } = result.data;
 
+  // No title resolved from CMS config or fallback featured post — never
+  // render a Hero with an empty top-level <h1>.
+  if (!title) return null;
+
   return (
     <Hero
       eyebrow={eyebrow}
-      title={title ?? ''}
+      title={title}
       titleId="home-hero-title"
       excerpt={subtitle}
     >
