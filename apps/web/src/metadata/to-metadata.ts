@@ -20,6 +20,9 @@ export function toMetadata(
   opts: TToMetadataOptions,
 ): Metadata {
   const { canonical, ogType, titleAbsolute } = opts;
+  // `ogImageUrl` can be absent (see `TSeoResolved`) — omit the image entirely
+  // rather than emit an `og:image`/twitter image with no URL.
+  const images = seo.ogImageUrl ? [{ url: seo.ogImageUrl }] : [];
 
   return {
     title: titleAbsolute ? { absolute: seo.title } : seo.title,
@@ -28,14 +31,14 @@ export function toMetadata(
     openGraph: {
       title: seo.ogTitle,
       description: seo.ogDescription,
-      images: [{ url: seo.ogImageUrl }],
+      images,
       type: ogType,
     },
     twitter: {
       card: 'summary_large_image',
       title: seo.ogTitle,
       description: seo.ogDescription,
-      images: [seo.ogImageUrl],
+      images: images.map((image) => image.url),
     },
   };
 }

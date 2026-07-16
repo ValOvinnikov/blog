@@ -65,6 +65,16 @@ describe('toMetadata', () => {
     ]);
   });
 
+  it('omits images when ogImageUrl is absent', () => {
+    const metadata = toMetadata(
+      { ...seo, ogImageUrl: undefined },
+      { canonical: '/', ogType: 'website' },
+    );
+
+    expect(metadata.openGraph?.images).toEqual([]);
+    expect(metadata.twitter?.images).toEqual([]);
+  });
+
   it('maps twitter card, title, description, and images', () => {
     const metadata = toMetadata(seo, { canonical: '/blog', ogType: 'website' });
 

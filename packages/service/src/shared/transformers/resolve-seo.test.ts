@@ -59,6 +59,16 @@ describe(resolveSeo, () => {
     expect(result.ogImageUrl).toBe(settings.defaultOgImageUrl);
   });
 
+  it('yields an undefined ogImageUrl when no image resolves at any rung', () => {
+    const result = resolveSeo(
+      makeAuthoredSeo({ openGraph: null }),
+      { title: 'Content title' },
+      { description: 'Settings description', defaultOgImageUrl: undefined },
+    );
+
+    expect(result.ogImageUrl).toBeUndefined();
+  });
+
   it('defaults ogTitle/ogDescription to the resolved title/description, not the raw authored openGraph', () => {
     const result = resolveSeo(
       makeAuthoredSeo({

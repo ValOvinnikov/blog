@@ -9,7 +9,11 @@ export type TSeoResolved = {
   description: string;
   ogTitle: string;
   ogDescription: string;
-  ogImageUrl: string;
+  // Optional: bottoms out at the site-settings default OG image, but
+  // `buildImageUrl` can legitimately yield `undefined` (missing asset /
+  // url builder throws), so consumers must degrade gracefully (omit the
+  // image) rather than emit `og:image` with no URL.
+  ogImageUrl: string | undefined;
 };
 
 type TSeoContentDefaults = {
@@ -20,7 +24,7 @@ type TSeoContentDefaults = {
 
 type TSeoSettingsDefaults = {
   description: string;
-  defaultOgImageUrl: string;
+  defaultOgImageUrl: string | undefined;
 };
 
 /**

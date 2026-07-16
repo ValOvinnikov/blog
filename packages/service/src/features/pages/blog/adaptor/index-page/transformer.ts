@@ -27,10 +27,7 @@ export function toIndexPage(
       { title: rawPage.heading },
       {
         description: settings.description,
-        // defaultOgImage is CMS-required (schema validation), but buildImageUrl's
-        // signature can't express that non-nullability — the asset is always
-        // present in practice.
-        defaultOgImageUrl: settings.defaultOgImageUrl as string,
+        defaultOgImageUrl: settings.defaultOgImageUrl,
       },
     ),
     posts: rawPosts.posts.map(toPostCard),
