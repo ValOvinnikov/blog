@@ -2,8 +2,8 @@
 
 Guidance for working in this repo. See `SPEC.md` (architecture — the single
 durable reference) and `docs/BACKLOG.md` (ticket-ready roadmap).
-`IMPLEMENTATION_BRIEF.md` is archived history; when it disagrees with
-`SPEC.md`, the spec wins.
+`docs/archive/IMPLEMENTATION_BRIEF.md` is frozen history — do not read it for
+current behaviour, and when it disagrees with `SPEC.md`, the spec wins.
 
 ## What this is
 
