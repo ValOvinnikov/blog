@@ -31,6 +31,18 @@ describe('getPost', () => {
     expect(result?.slug).toBe('hello-world');
   });
 
+  it('maps a post with no mainImage to undefined image fields', async () => {
+    mockRun.mockResolvedValue(
+      makeRawPostDetail({ mainImage: null, mainImageAsset: null }),
+    );
+
+    const result = await getPost('hello-world');
+
+    expect(result?.mainImageUrl).toBeUndefined();
+    expect(result?.mainImageAlt).toBeUndefined();
+    expect(result?.mainImageSanity).toBeUndefined();
+  });
+
   it('passes the slug as a query parameter', async () => {
     mockRun.mockResolvedValue(null);
 

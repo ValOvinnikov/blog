@@ -26,7 +26,7 @@ export type TPostCard = {
   excerpt: string;
   publishedAt: string;
   mainImageUrl: string | undefined;
-  mainImageAlt: string;
+  mainImageAlt: string | undefined;
   mainImageSanity: ISanityImage | undefined;
   featured: boolean;
   author: TPostCardAuthor | undefined;
@@ -62,7 +62,7 @@ export function toPostCard(raw: TRawPostCard): TPostCard {
     excerpt: raw.excerpt,
     publishedAt: raw.publishedAt,
     mainImageUrl: buildImageUrl(raw.mainImage),
-    mainImageAlt: raw.mainImage.alt,
+    mainImageAlt: raw.mainImage?.alt,
     mainImageSanity: toSanityImage(raw.mainImageAsset),
     featured: raw.featured ?? false,
     author: raw.author ? toPostCardAuthor(raw.author) : undefined,

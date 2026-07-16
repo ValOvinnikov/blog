@@ -77,6 +77,21 @@ describe('toHeroModule', () => {
     expect(hero.sanityImage).toBeUndefined();
   });
 
+  it('degrades gracefully when the featured post has no image', () => {
+    const raw = makeRawHeroModule({
+      featuredPost: makeRawPostCard({
+        mainImage: null,
+        mainImageAsset: null,
+      }),
+    });
+
+    const hero = toHeroModule(raw, null);
+
+    expect(hero.title).toBe('Hello World');
+    expect(hero.image).toBeUndefined();
+    expect(hero.sanityImage).toBeUndefined();
+  });
+
   it('has no primary action and undefined title/subtitle when there is no post at all', () => {
     const raw = makeRawHeroModule({ featuredPost: null });
 

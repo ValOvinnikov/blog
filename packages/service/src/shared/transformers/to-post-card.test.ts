@@ -54,4 +54,14 @@ describe('toPostCard', () => {
     const result = toPostCard(makeRawPostCard({ featured: null }));
     expect(result.featured).toBe(false);
   });
+
+  it('returns undefined image fields when mainImage is absent', () => {
+    const result = toPostCard(
+      makeRawPostCard({ mainImage: null, mainImageAsset: null }),
+    );
+
+    expect(result.mainImageUrl).toBeUndefined();
+    expect(result.mainImageAlt).toBeUndefined();
+    expect(result.mainImageSanity).toBeUndefined();
+  });
 });

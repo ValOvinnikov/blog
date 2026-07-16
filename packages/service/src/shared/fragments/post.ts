@@ -13,11 +13,14 @@ export const postCardFragment = q
     slug: sub.field('slug.current').notNull(),
     excerpt: sub.field('excerpt').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
-    mainImage: sub.field('mainImage').project(imageWithAltFragment).notNull(),
+    mainImage: sub
+      .field('mainImage')
+      .project(imageWithAltFragment)
+      .nullable(true),
     mainImageAsset: sub
       .field('mainImage')
       .project(sanityImageFragment)
-      .notNull(),
+      .nullable(true),
     featured: sub.field('featured').nullable(true),
     author: sub.field('author').deref().project(authorCardFragment).notNull(),
     categories: sub
@@ -35,11 +38,14 @@ export const postDetailFragment = q
     slug: sub.field('slug.current').notNull(),
     excerpt: sub.field('excerpt').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
-    mainImage: sub.field('mainImage').project(imageWithAltFragment).notNull(),
+    mainImage: sub
+      .field('mainImage')
+      .project(imageWithAltFragment)
+      .nullable(true),
     mainImageAsset: sub
       .field('mainImage')
       .project(sanityImageFragment)
-      .notNull(),
+      .nullable(true),
     featured: sub.field('featured').nullable(true),
     body: sub.field('body[]').notNull(),
     seo: sub.field('seo').project(seoFragment).nullable(true),

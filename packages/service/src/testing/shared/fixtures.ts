@@ -1,7 +1,8 @@
-import type { TRawPostCard } from '@blog/service/shared/transformers/to-post-card';
+import type { imageWithAltFragment } from '@blog/service/shared/fragments/image';
 import type { TRawSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
+import type { InferFragmentType } from 'groqd';
 
-type TRawImage = TRawPostCard['mainImage'];
+type TRawImage = InferFragmentType<typeof imageWithAltFragment>;
 
 export function makeRawImage(alt = 'Alt text'): TRawImage {
   return {

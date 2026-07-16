@@ -34,7 +34,7 @@ export function toPostDetail(raw: TRawPostDetail): TPostDetail {
     excerpt: raw.excerpt,
     publishedAt: raw.publishedAt,
     mainImageUrl: buildImageUrl(raw.mainImage),
-    mainImageAlt: raw.mainImage.alt,
+    mainImageAlt: raw.mainImage?.alt,
     mainImageSanity: toSanityImage(raw.mainImageAsset),
     featured: raw.featured ?? false,
     body: raw.body,
