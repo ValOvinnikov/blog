@@ -44,8 +44,7 @@ export const postSchema = defineType({
       title: 'Main Image',
       type: imageWithAltSchema.name,
       description:
-        'Hero image shown at the top of the post and in social shares.',
-      validation: (rule) => rule.required(),
+        'Optional hero image shown at the top of the post and in social shares.',
     }),
     defineField({
       name: 'author',
