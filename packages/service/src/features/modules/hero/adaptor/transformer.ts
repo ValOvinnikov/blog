@@ -50,7 +50,7 @@ export function toHeroModule(
   const image =
     imageUrl && raw.heroImageMode === HERO_FIELD_MODE.CUSTOM && raw.heroImage
       ? { src: imageUrl, alt: raw.heroImage.alt }
-      : imageUrl && heroPost
+      : imageUrl && heroPost?.mainImageAlt
         ? { src: imageUrl, alt: heroPost.mainImageAlt }
         : undefined;
 
