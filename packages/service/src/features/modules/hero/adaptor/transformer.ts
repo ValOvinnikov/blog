@@ -45,13 +45,13 @@ export function toHeroModule(
       ? buildImageUrl(raw.heroImage)
       : raw.heroImageMode === HERO_FIELD_MODE.NONE
         ? undefined
-        : heroPost?.mainImageUrl;
+        : heroPost?.heroImageUrl;
 
   const image =
     imageUrl && raw.heroImageMode === HERO_FIELD_MODE.CUSTOM && raw.heroImage
       ? { src: imageUrl, alt: raw.heroImage.alt }
-      : imageUrl && heroPost?.mainImageAlt
-        ? { src: imageUrl, alt: heroPost.mainImageAlt }
+      : imageUrl && heroPost?.heroImageAlt
+        ? { src: imageUrl, alt: heroPost.heroImageAlt }
         : undefined;
 
   const sanityImage =
@@ -59,7 +59,7 @@ export function toHeroModule(
       ? toSanityImage(raw.heroImageAsset)
       : raw.heroImageMode === HERO_FIELD_MODE.NONE
         ? undefined
-        : heroPost?.mainImageSanity;
+        : heroPost?.heroImageSanity;
 
   return {
     eyebrow: getCustomOrFallback(

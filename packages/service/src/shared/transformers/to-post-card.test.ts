@@ -18,8 +18,8 @@ describe('toPostCard', () => {
     expect(result.slug).toBe('hello-world');
     expect(result.excerpt).toBe('A sufficiently long excerpt for the card.');
     expect(result.publishedAt).toBe('2026-01-15T00:00:00Z');
-    expect(result.mainImageUrl).toContain('sanity.io');
-    expect(result.mainImageAlt).toBe('Alt text');
+    expect(result.heroImageUrl).toContain('sanity.io');
+    expect(result.heroImageAlt).toBe('Alt text');
     expect(result.featured).toBe(false);
   });
 
@@ -55,13 +55,13 @@ describe('toPostCard', () => {
     expect(result.featured).toBe(false);
   });
 
-  it('returns undefined image fields when mainImage is absent', () => {
+  it('returns undefined image fields when heroImage is absent', () => {
     const result = toPostCard(
-      makeRawPostCard({ mainImage: null, mainImageAsset: null }),
+      makeRawPostCard({ heroImage: null, heroImageAsset: null }),
     );
 
-    expect(result.mainImageUrl).toBeUndefined();
-    expect(result.mainImageAlt).toBeUndefined();
-    expect(result.mainImageSanity).toBeUndefined();
+    expect(result.heroImageUrl).toBeUndefined();
+    expect(result.heroImageAlt).toBeUndefined();
+    expect(result.heroImageSanity).toBeUndefined();
   });
 });

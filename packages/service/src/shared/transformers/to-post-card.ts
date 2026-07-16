@@ -25,9 +25,9 @@ export type TPostCard = {
   slug: string;
   excerpt: string;
   publishedAt: string;
-  mainImageUrl: string | undefined;
-  mainImageAlt: string | undefined;
-  mainImageSanity: ISanityImage | undefined;
+  heroImageUrl: string | undefined;
+  heroImageAlt: string | undefined;
+  heroImageSanity: ISanityImage | undefined;
   featured: boolean;
   author: TPostCardAuthor | undefined;
   categories: TPostCardCategory[];
@@ -61,9 +61,9 @@ export function toPostCard(raw: TRawPostCard): TPostCard {
     slug: raw.slug,
     excerpt: raw.excerpt,
     publishedAt: raw.publishedAt,
-    mainImageUrl: buildImageUrl(raw.mainImage),
-    mainImageAlt: raw.mainImage?.alt,
-    mainImageSanity: toSanityImage(raw.mainImageAsset),
+    heroImageUrl: buildImageUrl(raw.heroImage),
+    heroImageAlt: raw.heroImage?.alt,
+    heroImageSanity: toSanityImage(raw.heroImageAsset),
     featured: raw.featured ?? false,
     author: raw.author ? toPostCardAuthor(raw.author) : undefined,
     categories: raw.categories.map(toPostCardCategory),

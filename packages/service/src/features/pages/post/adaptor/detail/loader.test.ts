@@ -31,16 +31,16 @@ describe('getPost', () => {
     expect(result?.slug).toBe('hello-world');
   });
 
-  it('maps a post with no mainImage to undefined image fields', async () => {
+  it('maps a post with no heroImage to undefined image fields', async () => {
     mockRun.mockResolvedValue(
-      makeRawPostDetail({ mainImage: null, mainImageAsset: null }),
+      makeRawPostDetail({ heroImage: null, heroImageAsset: null }),
     );
 
     const result = await getPost('hello-world');
 
-    expect(result?.mainImageUrl).toBeUndefined();
-    expect(result?.mainImageAlt).toBeUndefined();
-    expect(result?.mainImageSanity).toBeUndefined();
+    expect(result?.heroImageUrl).toBeUndefined();
+    expect(result?.heroImageAlt).toBeUndefined();
+    expect(result?.heroImageSanity).toBeUndefined();
   });
 
   it('passes the slug as a query parameter', async () => {

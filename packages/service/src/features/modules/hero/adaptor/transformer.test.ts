@@ -43,7 +43,7 @@ describe('toHeroModule', () => {
       heroSubtitleMode: HERO_FIELD_MODE.CUSTOM,
       heroSubtitle: 'Custom home subtitle.',
       heroImageMode: HERO_FIELD_MODE.CUSTOM,
-      heroImage: makeRawPostCard().mainImage,
+      heroImage: makeRawPostCard().heroImage,
       heroImageAsset: makeRawSanityImage(),
     });
 
@@ -80,8 +80,8 @@ describe('toHeroModule', () => {
   it('degrades gracefully when the featured post has no image', () => {
     const raw = makeRawHeroModule({
       featuredPost: makeRawPostCard({
-        mainImage: null,
-        mainImageAsset: null,
+        heroImage: null,
+        heroImageAsset: null,
       }),
     });
 
