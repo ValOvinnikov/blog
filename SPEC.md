@@ -222,7 +222,7 @@ replacing a hand-duplicated block per page document.
 
 **Other documents**
 
-- `post` — title, slug, excerpt, mainImage (`imageWithAlt`, **optional** — a
+- `post` — title, slug, excerpt, heroImage (`imageWithAlt`, **optional** — a
   post without one renders imageless rather than 404ing), author (ref),
   categories (refs), publishedAt, body (portable text incl. code blocks),
   featured, seo.
