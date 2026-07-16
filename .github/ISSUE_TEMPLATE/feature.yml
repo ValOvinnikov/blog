@@ -1,0 +1,71 @@
+name: Feature / change
+description: >-
+  A task for a human or agent to execute — defined by task, constraints, and
+  verifiable success criteria.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: task
+    attributes:
+      label: Task
+      description: What should exist or behave differently once this is done, and why.
+      placeholder: One or two sentences. Outcome, not implementation steps.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: layers
+    attributes:
+      label: Layers touched
+      description: >-
+        Which workspaces change (drives delegation order cms → service → ui →
+        web and the per-layer PR split).
+      options:
+        - label: cms (apps/cms — schemas, desk, migrations)
+        - label: service (packages/service — GROQ, fetchers)
+        - label: ui (packages/ui — design system)
+        - label: web (apps/web — routes, SEO, composition)
+        - label: config (packages/config, packages/utils, configs/*)
+        - label: tooling (CI, hooks, agents, skills, repo config)
+
+  - type: dropdown
+    id: migration
+    attributes:
+      label: Data migration needed?
+      description: >-
+        Content is live in the production dataset — any change to an existing
+        shape (rename/remove/move a field, rename a _type, restructure a
+        document) orphans data unless migrated.
+      options:
+        - 'No — additive/optional only'
+        - 'Yes — existing shape changes (migration plan required)'
+        - 'Unsure — decide during investigation'
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints
+      description: >-
+        Boundaries the implementation must respect — layer contracts, naming,
+        what must NOT change, dependencies on other issues.
+      placeholder: |
+        - ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: success-criteria
+    attributes:
+      label: Success criteria
+      description: >-
+        Verifiable outcomes — each one should be checkable by a test, a
+        command, or a reproducible manual step. The PR must map changes to
+        these.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+        - [ ] pnpm type-check / lint / test / build stay green
+    validations:
+      required: true

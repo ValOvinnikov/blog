@@ -1,0 +1,42 @@
+name: Bug
+description: Something behaves differently from what the code or spec promises.
+labels: [bug]
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Smallest sequence of steps that shows the problem.
+      placeholder: |
+        1. ...
+        2. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+      description: Include exact error output / screenshots where relevant.
+    validations:
+      required: true
+
+  - type: textarea
+    id: success-criteria
+    attributes:
+      label: Success criteria
+      description: >-
+        What "fixed" means, verifiably — usually the reproduction passing plus
+        a regression test.
+      placeholder: |
+        - [ ] Reproduction above behaves as expected
+        - [ ] Regression test covers it
+    validations:
+      required: true
