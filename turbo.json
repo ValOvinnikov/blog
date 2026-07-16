@@ -3,6 +3,12 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/configs/tsconfig/*.json",
+        "$TURBO_ROOT$/configs/tailwind/*.ts",
+        "$TURBO_ROOT$/configs/tailwind/*.css"
+      ],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "env": [
         "NODE_ENV",
@@ -18,12 +24,16 @@
       "cache": false,
       "persistent": true
     },
-    "lint": {},
+    "lint": {
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/configs/eslint/*.js"]
+    },
     "type-check": {
-      "dependsOn": ["^type-check"]
+      "dependsOn": ["^type-check"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/configs/tsconfig/*.json"]
     },
     "test": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/configs/vitest/*.ts"]
     },
     "test:watch": {
       "cache": false,
@@ -45,6 +55,12 @@
       "persistent": true
     },
     "storybook:build": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/configs/tsconfig/*.json",
+        "$TURBO_ROOT$/configs/tailwind/*.ts",
+        "$TURBO_ROOT$/configs/tailwind/*.css"
+      ],
       "outputs": ["storybook-static/**"]
     }
   }

@@ -292,6 +292,24 @@ override bag) + `openGraph`,
   declared in `turbo.json` (`env`/`passThroughEnv`) or turbo strips it.
   `pnpm --filter` bypasses turbo and can mask a missing declaration — verify
   with `pnpm build` from root.
+- **Shared config presets bust their consumers' cache.** Each cached task
+  declares the `configs/*` presets it reads via `inputs` using the
+  `$TURBO_ROOT$` microsyntax (repo-root-relative, cross-package): `lint` ←
+  `configs/eslint`, `type-check` ← `configs/tsconfig`, `test` ← `configs/vitest`,
+  `build`/`storybook:build` ← `configs/tsconfig` + `configs/tailwind`. Without
+  this, editing a preset (e.g. `configs/eslint/base.js`) left `lint` a
+  `FULL TURBO` cache hit against stale rules. The tasks that actually needed the
+  fix are `lint` and `storybook:build` — the two with **no** `dependsOn: ["^…"]`,
+  so their hash is their own files only. `type-check`/`test`/`build` carry a
+  `dependsOn: ["^…"]` edge and, because every workspace lists the `configs/*`
+  packages as `devDependencies`, already invalidate on any preset edit through
+  Turbo's dependency closure; their explicit `inputs` pin the contract precisely
+  rather than fixing a live bug, and are preferred over a blunt
+  `globalDependencies: ["configs/**"]` (which over-invalidates across task types).
+  Globs stay single-level and extension-scoped (`*.js`/`*.json`/`*.ts`/`*.css`)
+  so `node_modules`/`.turbo` logs never leak into a task hash — note
+  `configs/tsconfig/*.json` also matches that package's own `package.json`, which
+  is intentional and conservative (#403).
 - Never read or commit `.env*` files.
 
 ## 8. Migrations & live data (core contract)
