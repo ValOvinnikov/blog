@@ -81,15 +81,11 @@ begins).
 
 ### M0.2 · `chore(repo): single canonical skills dir + guard against drift`
 
-- **Filed:** #267
-- **Labels:** `tooling`
-- **Body:** `.claude/skills/` and `.agents/skills/` are duplicated and have
-  drifted before (now re-synced; `.claude/skills/` is canonical, per
-  `CLAUDE.md`). Add a CI step (in `ci.yml`) that fails when
-  `diff -rq .claude/skills .agents/skills` is non-empty, or replace
-  `.agents/skills` with symlinks if the consuming tool supports them.
-- **Acceptance:** CI fails on divergence; `CLAUDE.md` documents the canonical
-  copy (already done); a divergence introduced on a test branch is caught.
+- **Filed:** #267 — ✅ done (CI drift guard), then **obsolete** via #383: the
+  repo is Claude-only, so `.agents/skills/`, `AGENTS.md`, `.codex/` and the
+  `skills-sync` CI job were removed entirely. `.claude/skills/` is now the
+  single home for skills — there is nothing left to keep in sync. Kept here as
+  a record of the decision.
 
 ### M0.3 · `chore(turbo): fix stale typegen outputs + add .nvmrc`
 

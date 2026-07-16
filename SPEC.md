@@ -473,8 +473,6 @@ inside the layer contracts:
   `ui-library-practices`, `ui-storybook`, `web-storybook`,
   `testing-practices`, `seo-and-metadata`, `code-review-practices`,
   `open-pull-request`, `use-context7` (live version-matched docs).
-- `.agents/skills/` mirrors `.claude/skills/` for other harnesses — keep them
-  in sync (canonical copy: `.claude/skills/`).
 - **Settings** (`.claude/settings.json`): permission allowlist for the
   project's standard commands (deploys and `.env` reads denied), hook wiring,
   and plugin provisioning (`extraKnownMarketplaces` + `enabledPlugins`) so a

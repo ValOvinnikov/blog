@@ -130,8 +130,7 @@ prompt — do not write it to disk first.
   changes a workflow updates that section in the same PR. Likewise a PR that
   changes agent tooling (`.claude/` hooks/agents/skills/settings) updates
   §"Working with Claude Code".
-- `.claude/skills/` is canonical; `.agents/skills/` mirrors it for other
-  harnesses — when you edit a skill, apply the same change to both copies.
+- `.claude/skills/` is the single home for skills — edit one copy, no mirror.
 
 ## Delivery gate sequence (mandatory — never skip or bundle)
 
