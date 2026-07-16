@@ -125,6 +125,11 @@ prompt — do not write it to disk first.
   downstream consumes reds `type-check` until every layer lands.
 - **Spec sync:** any PR that changes architecture, layer contracts, env vars,
   or the content model updates `SPEC.md` in the same PR.
+- **README sync:** `README.md` §"CI & automation" documents every workflow in
+  `.github/workflows/` and the required status checks — a PR that adds or
+  changes a workflow updates that section in the same PR. Likewise a PR that
+  changes agent tooling (`.claude/` hooks/agents/skills/settings) updates
+  §"Working with Claude Code".
 - `.claude/skills/` is canonical; `.agents/skills/` mirrors it for other
   harnesses — when you edit a skill, apply the same change to both copies.
 

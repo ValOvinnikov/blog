@@ -126,9 +126,15 @@ contracts:
   - `web` — App Router routes, SEO, composition of `ui` + `service`.
   - `reviewer` — read-only pre-commit review of the full diff; gates the
     commit ask on an `APPROVE` verdict.
+- **Hooks** (`.claude/hooks/`, wired in `.claude/settings.json`):
+  - `post-edit-lint.sh` — `PostToolUse` hook that lints every agent-edited
+    `.ts`/`.tsx` file and feeds errors — including layer-boundary
+    `no-restricted-imports` violations — back to the agent in the same turn.
+    Report-only (never `--fix`); the commit-time gates stay authoritative.
 - **Skills** (`.claude/skills/`):
   - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit); start here for non-trivial work.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
+  - `cms-schema-practices` — Sanity schema quality bar + content-migration workflow.
   - `ui-library-practices` — building pure, prop-driven design-system components.
   - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.
   - `testing-practices` — Vitest + Testing Library conventions.
@@ -137,15 +143,34 @@ contracts:
   - `open-pull-request` — branch → work → PR with human-gated push/PR steps.
   - `use-context7` — fetch live, version-matched library docs before guessing.
 - **Settings** (`.claude/settings.json`) — permission allowlist for the standard
-  pnpm/turbo/sanity/git commands; deploy and `.env` reads are gated.
+  pnpm/turbo/sanity/git/gh commands and hook wiring; deploys and `.env` reads
+  are denied.
 - **`CLAUDE.md`** — repo-wide guidance loaded into every session.
 
-## Deployment
+## CI & automation
 
-| Workspace | Target         | Setup                                                                                                                  |
-| --------- | -------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `web`     | Vercel (Hobby) | Import repo → **Root Directory = `apps/web`**; add env vars. Vercel builds `types`/`service`/`ui` first automatically. |
-| `cms`     | Sanity-hosted  | `pnpm --filter cms deploy` → served at `your-project.sanity.studio`.                                                   |
+All automation lives in `.github/workflows/` (shared pnpm/Node setup in
+`.github/actions/setup`; Dependabot bumps npm + GitHub Actions weekly).
+
+| Workflow                                          | Trigger                                                 | What it does                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **CI** (`ci.yml`)                                 | every PR to `main`                                      | The quality gates: **Type-check**, **Lint**, **Test**, **Typegen** (regenerates schema + types and fails if the committed output in `packages/config/src/sanity/generated/` is stale), **Skills sync** (`.claude/skills` ↔ `.agents/skills` mirror), **Migrations** (loads every migration + read-only dry-run against the dataset), **Build**. |
+| **Dependency Review**                             | every PR to `main`                                      | Blocks dependency changes with known vulnerabilities (`fail-on-severity: high`; no license policy configured).                                                                                                                                                                                                                                  |
+| **Zizmor** (`zizmor.yml`)                         | every PR to `main`                                      | Static security analysis of the workflow files themselves.                                                                                                                                                                                                                                                                                      |
+| **Claude Code Review** (`claude-code-review.yml`) | PR opened/updated (code paths, owner PRs only)          | Automated AI review posted on the PR; advisory, not a required check.                                                                                                                                                                                                                                                                           |
+| **Claude Code** (`claude.yml`)                    | `@claude` mentions (owner-only, owner-authored threads) | Interactive agent runs on issues/PRs.                                                                                                                                                                                                                                                                                                           |
+| **Deploy Development** (`deploy-development.yml`) | push to `main` (+ manual dispatch)                      | `turbo-ignore` change detection → verify (type-check/lint/test/build) → auto-apply pending content migrations to the dev dataset → deploy only the affected app(s) to the dev environment.                                                                                                                                                      |
+| **Deploy Production** (`deploy-production.yml`)   | `vX.Y.Z` tag push                                       | Verify → back up the production dataset (artifact) → gated prod content migration → deploy Studio + web to production. Cutting a release = pushing a tag, so it stays under the human push gate.                                                                                                                                                |
+
+**Required status checks on `main`:** Type-check, Lint, Test, Typegen, Build,
+Migrations, Dependency Review. Everything else is advisory. CI runs on every
+PR without path filters on purpose — a path-skipped workflow leaves its
+required checks pending forever (see the comment in `ci.yml`).
+
+One-time environment setup (datasets, tokens, Vercel projects, secrets,
+webhooks, CORS) is human-gated console work — see [`docs/DEPLOY.md`](./docs/DEPLOY.md)
+and `SPEC.md` §13. Manual `sanity deploy` / Vercel deploys are never run by
+hand (agent permissions deny them; the pipeline owns deploys).
 
 ## License
 
