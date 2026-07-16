@@ -13,12 +13,12 @@ export const postCardFragment = q
     slug: sub.field('slug.current').notNull(),
     excerpt: sub.field('excerpt').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
-    mainImage: sub
-      .field('mainImage')
+    heroImage: sub
+      .field('heroImage')
       .project(imageWithAltFragment)
       .nullable(true),
-    mainImageAsset: sub
-      .field('mainImage')
+    heroImageAsset: sub
+      .field('heroImage')
       .project(sanityImageFragment)
       .nullable(true),
     featured: sub.field('featured').nullable(true),
@@ -38,12 +38,12 @@ export const postDetailFragment = q
     slug: sub.field('slug.current').notNull(),
     excerpt: sub.field('excerpt').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
-    mainImage: sub
-      .field('mainImage')
+    heroImage: sub
+      .field('heroImage')
       .project(imageWithAltFragment)
       .nullable(true),
-    mainImageAsset: sub
-      .field('mainImage')
+    heroImageAsset: sub
+      .field('heroImage')
       .project(sanityImageFragment)
       .nullable(true),
     featured: sub.field('featured').nullable(true),

@@ -1991,7 +1991,7 @@
         },
         "optional": true
       },
-      "mainImage": {
+      "heroImage": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",

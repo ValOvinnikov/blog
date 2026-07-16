@@ -362,7 +362,7 @@ export type Blog_post = {
   title?: string;
   slug?: Slug;
   excerpt?: string;
-  mainImage?: ImageWithAlt;
+  heroImage?: ImageWithAlt;
   author?: Blog_authorReference;
   categories?: Array<
     {
