@@ -129,7 +129,11 @@ jobs:
     env:
       SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
       SANITY_STUDIO_DATASET: development
-      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_DEPLOY_TOKEN }}
+      # Content mutations need an Editor (write) token; the deploy token only has
+      # Deploy-Studio permission and gets "permission update required" on a real
+      # migration run. Least-privilege: a dedicated migrate token, separate from
+      # deploy-studio's deploy-only token.
+      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_MIGRATE_TOKEN }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
