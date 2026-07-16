@@ -126,6 +126,10 @@ contracts:
   - `web` — App Router routes, SEO, composition of `ui` + `service`.
   - `reviewer` — read-only pre-commit review of the full diff; gates the
     commit ask on an `APPROVE` verdict.
+  - `explore` — read-only discovery scout (Haiku). Answers "where is X / how
+    does Y work" sweeps in a cheap, disposable context and returns conclusions
+    with `file:line` pointers instead of file dumps, so the orchestrator's
+    window isn't spent rediscovering the codebase.
 - **Hooks** (`.claude/hooks/`, wired in `.claude/settings.json`):
   - `post-edit-lint.sh` — `PostToolUse` hook that lints every agent-edited
     `.ts`/`.tsx` file and feeds errors — including layer-boundary
