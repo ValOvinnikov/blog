@@ -223,10 +223,19 @@ or before checks):
    the merge affects that app's turbo graph (`workflow_dispatch` forces both;
    a no-op merge skips everything, including `verify`).
 2. **`verify` gate** re-runs `type-check` / `lint` / `test` / `build` on the
-   merged commit. Both deploy jobs `needs: verify`.
-3. **`deploy-studio`** → `valovinnikov-blog-dev.sanity.studio` (development
+   merged commit.
+3. **`migrate`** (`environment: development`) applies any un-applied migrations
+   to the **development** dataset via `migrate:deploy` (a no-op when none are
+   pending), so dev's data never lags its code — the #355 failure mode. It runs
+   on the same condition as `verify` (so it's never skipped out from under a
+   deploy that depends on it); both deploy jobs `needs: [changes, verify,
+migrate]`. No artifact backup here — dev is the disposable staging line (and
+   is refreshed from prod by #363); the job is guarded on `SANITY_DEPLOY_TOKEN`,
+   so it's inert until that secret exists. **No approval gate on dev** (unlike
+   prod) — dev auto-migrates.
+4. **`deploy-studio`** → `valovinnikov-blog-dev.sanity.studio` (development
    dataset).
-4. **`deploy-web`** → `blog-dev` via the Vercel CLI
+5. **`deploy-web`** → `blog-dev` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
 
 There are **no PR preview deployments** — deploys happen only on merge to `main`.
