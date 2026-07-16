@@ -11,8 +11,8 @@ export type TRawPostDetail = NonNullable<
   InferResultType<typeof postDetailQuery>
 >;
 
-// TODO: replace with resolveSeo (content title/excerpt/heroImage ladder) once
-// the /blog/{slug} route lands (#355 follow-up).
+// TODO(#371): replace with resolveSeo (content title/excerpt/heroImage ladder)
+// once the /blog/{slug} route lands (#355 follow-up).
 function toPostSeo(raw: NonNullable<TRawPostDetail['seo']>): TPostSeo {
   return {
     metaTitle: raw.metaTitle ?? undefined,
