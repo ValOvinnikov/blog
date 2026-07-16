@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import type { seoFragment } from '@blog/service/shared/fragments/seo';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import type { InferFragmentType } from 'groqd';
@@ -13,7 +14,7 @@ export type TSeoResolved = {
   // `buildImageUrl` can legitimately yield `undefined` (missing asset /
   // url builder throws), so consumers must degrade gracefully (omit the
   // image) rather than emit `og:image` with no URL.
-  ogImageUrl: string | undefined;
+  ogImageUrl: TMaybeUndefined<string>;
 };
 
 type TSeoContentDefaults = {
@@ -24,7 +25,7 @@ type TSeoContentDefaults = {
 
 type TSeoSettingsDefaults = {
   description: string;
-  defaultOgImageUrl: string | undefined;
+  defaultOgImageUrl: TMaybeUndefined<string>;
 };
 
 /**

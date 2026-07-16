@@ -1,7 +1,7 @@
-import type { ILink } from '@blog/config';
+import type { ILink, TMaybeUndefined } from '@blog/config';
 
 export type TCtaModule = {
   heading: string;
-  text: string | undefined;
-  action: ILink | undefined;
+  text: TMaybeUndefined<string>;
+  action: TMaybeUndefined<ILink>;
 };

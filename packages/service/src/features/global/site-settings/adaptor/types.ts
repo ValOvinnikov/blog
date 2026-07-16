@@ -1,13 +1,15 @@
+import type { TMaybeUndefined } from '@blog/config';
+
 export type TBrand = {
   name: string;
   prefix: string;
-  suffix: string | undefined;
-  logoUrl: string | undefined;
+  suffix: TMaybeUndefined<string>;
+  logoUrl: TMaybeUndefined<string>;
 };
 
 export type TSiteSettings = {
   brand: TBrand;
   description: string;
-  tagline: string | undefined;
-  defaultOgImageUrl: string | undefined;
+  tagline: TMaybeUndefined<string>;
+  defaultOgImageUrl: TMaybeUndefined<string>;
 };

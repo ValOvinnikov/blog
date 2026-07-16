@@ -1,4 +1,4 @@
-import type { BlockText, RichText } from '@blog/config';
+import type { BlockText, RichText, TMaybeUndefined } from '@blog/config';
 import type { TCategory } from '@blog/service/shared/transformers/to-category';
 import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { TSocialLink } from '@blog/service/shared/transformers/to-social-link';
@@ -7,9 +7,9 @@ export type TPostDetailAuthor = {
   id: string;
   name: string;
   slug: string;
-  imageUrl: string | undefined;
-  role: string | undefined;
-  bio: BlockText | undefined;
+  imageUrl: TMaybeUndefined<string>;
+  role: TMaybeUndefined<string>;
+  bio: TMaybeUndefined<BlockText>;
   socialLinks: TSocialLink[];
 };
 
@@ -17,16 +17,16 @@ export type TPostDetailAuthor = {
 // `TSeoResolved` — post detail's fallback ladder (content title/excerpt/
 // heroImage) lands with the `/blog/{slug}` route in a follow-up (#355).
 export type TPostSeo = {
-  metaTitle: string | undefined;
-  metaDescription: string | undefined;
-  ogTitle: string | undefined;
-  ogDescription: string | undefined;
-  ogImageUrl: string | undefined;
+  metaTitle: TMaybeUndefined<string>;
+  metaDescription: TMaybeUndefined<string>;
+  ogTitle: TMaybeUndefined<string>;
+  ogDescription: TMaybeUndefined<string>;
+  ogImageUrl: TMaybeUndefined<string>;
 };
 
 export type TPostDetail = Omit<TPostCard, 'author' | 'categories'> & {
   body: RichText;
-  seo: TPostSeo | undefined;
-  author: TPostDetailAuthor | undefined;
+  seo: TMaybeUndefined<TPostSeo>;
+  author: TMaybeUndefined<TPostDetailAuthor>;
   categories: TCategory[];
 };
