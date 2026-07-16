@@ -236,11 +236,22 @@ There are **no PR preview deployments** — deploys happen only on merge to `mai
 `.github/workflows/deploy-production.yml`:
 
 1. **`verify` gate** re-runs `type-check` / `lint` / `test` / `build` on the
-   tagged commit. Both deploy jobs `needs: verify`, so a red commit can never be
-   promoted — even if you tag the wrong SHA.
-2. **`deploy-studio`** → `valovinnikov-blog.sanity.studio` (production dataset).
-3. **`deploy-web`** → `blog-prod` via the Vercel CLI
+   tagged commit, so a red commit can never be promoted — even if you tag the
+   wrong SHA.
+2. **`migrate`** (`environment: production`, `needs: verify`) — exports a backup
+   of the production dataset (uploaded as a 30-day artifact) **before** any
+   mutation, then runs `migrate:deploy --yes` to apply only the un-applied
+   content migrations (dry → run → record in the `migrationState` ledger,
+   idempotent). The `production` environment's required reviewer is the human
+   approval gate. Every step is guarded on `SANITY_DEPLOY_TOKEN`, so the job is a
+   **no-op until that secret is configured** — safe to ship ahead of setup.
+3. **`deploy-studio`** → `valovinnikov-blog.sanity.studio` (production dataset).
+4. **`deploy-web`** → `blog-prod` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
+
+Both deploy jobs `needs: [verify, migrate]`, so **new code is never served
+before pending migrations run**; a failed or reviewer-rejected `migrate` skips
+both deploys, leaving the old code serving the old (un-migrated) data.
 
 ---
 
