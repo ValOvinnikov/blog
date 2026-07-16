@@ -109,9 +109,43 @@ jobs:
         env:
           SKIP_ENV_VALIDATION: 'true'
 
+  # Apply content migrations to the dev dataset BEFORE dev serves new code, so a
+  # schema+migration merge can't leave dev's data behind its code (the #355
+  # failure mode). No artifact backup here — dev is the disposable staging line
+  # (also refreshed from prod by #363); prod keeps the backup + approval gate.
+  # `if:` matches `verify` so migrate is never skipped out from under a deploy
+  # that `needs` it; migrate:deploy is a no-op when nothing is pending, and every
+  # step is guarded on the token so the job is inert until it's configured.
+  migrate:
+    name: Migrate dev content
+    needs: [changes, verify]
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.cms == 'true' ||
+      needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: development
+    env:
+      SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
+      SANITY_STUDIO_DATASET: development
+      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_DEPLOY_TOKEN }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Apply pending migrations
+        if: ${{ env.SANITY_AUTH_TOKEN != '' }}
+        working-directory: apps/cms
+        run: pnpm migrate:deploy --yes
+
   deploy-studio:
     name: Deploy dev Studio
-    needs: [changes, verify]
+    needs: [changes, verify, migrate]
     if: >-
       github.event_name == 'workflow_dispatch' ||
       needs.changes.outputs.cms == 'true'
@@ -142,7 +176,7 @@ jobs:
 
   deploy-web:
     name: Deploy dev web
-    needs: [changes, verify]
+    needs: [changes, verify, migrate]
     if: >-
       github.event_name == 'workflow_dispatch' ||
       needs.changes.outputs.web == 'true'
