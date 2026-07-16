@@ -1,0 +1,43 @@
+name: Actionlint
+
+on:
+  # No path filter on purpose — same reasoning as ci.yml / zizmor.yml: a
+  # workflow skipped by path filtering leaves any required status check
+  # "Pending" forever. Linting every PR is cheap (actionlint finishes in
+  # seconds), and catches workflow syntax/expression/`needs` errors that zizmor
+  # (security posture) does not.
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  ACTIONLINT_VERSION: 1.7.12
+  # sha256 of actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz — the pin.
+  # From the release's checksums.txt; bump both together on upgrade.
+  ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+
+jobs:
+  actionlint:
+    name: Actionlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Run actionlint
+        # Download the official release binary and verify its checksum (the pin)
+        # before executing — no third-party action, no `curl | bash`. shellcheck
+        # is preinstalled on ubuntu-latest, so `run:` blocks are shell-linted too.
+        run: |
+          set -euo pipefail
+          tarball="actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          curl --silent --show-error --location --fail \
+            --output "${tarball}" \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/${tarball}"
+          echo "${ACTIONLINT_SHA256}  ${tarball}" | sha256sum --check --strict -
+          tar --extract --gzip --file "${tarball}" actionlint
+          ./actionlint -color
