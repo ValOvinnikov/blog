@@ -476,7 +476,9 @@ inside the layer contracts:
 - `.agents/skills/` mirrors `.claude/skills/` for other harnesses — keep them
   in sync (canonical copy: `.claude/skills/`).
 - **Settings** (`.claude/settings.json`): permission allowlist for the
-  project's standard commands.
+  project's standard commands (deploys and `.env` reads denied), hook wiring,
+  and plugin provisioning (`extraKnownMarketplaces` + `enabledPlugins`) so a
+  fresh clone resolves the plugins the repo's guidance depends on.
 
 ## 15. Out of scope (for now)
 

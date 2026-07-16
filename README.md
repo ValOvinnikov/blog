@@ -144,7 +144,10 @@ contracts:
   - `use-context7` — fetch live, version-matched library docs before guessing.
 - **Settings** (`.claude/settings.json`) — permission allowlist for the standard
   pnpm/turbo/sanity/git/gh commands and hook wiring; deploys and `.env` reads
-  are denied.
+  are denied. It also provisions the plugins the repo's own guidance depends on
+  (currently **context7**, required by the `use-context7` skill) via
+  `extraKnownMarketplaces` + `enabledPlugins`, so a fresh clone resolves them
+  without per-person setup. Opt out locally in `.claude/settings.local.json`.
 - **`CLAUDE.md`** — repo-wide guidance loaded into every session.
 
 ## CI & automation
