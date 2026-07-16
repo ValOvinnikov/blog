@@ -100,6 +100,13 @@ prompt — do not write it to disk first.
 - After a schema change: `pnpm typegen`, then commit the regenerated files in
   `packages/config/src/sanity/generated/`. Typegen can be non-deterministic —
   re-run until the diff is minimal.
+- **Never hand-edit the generated types.** `packages/config/src/sanity/generated/`
+  is deny-listed for Edit/MultiEdit/Write in `.claude/settings.json`, so an
+  attempt is blocked outright ("denied by your permission settings"). That is
+  not an obstacle to route around — a shell write (`echo >`, `sed -i`) is not
+  blocked, but it is still wrong: a hand-edit is silently undone by the next
+  `pnpm typegen` and caught by CI's typegen drift guard. If a generated type is
+  wrong, the **schema** in `apps/cms` is wrong — fix it there and regenerate.
 - **Check for migrations.** Content is live in the `production` dataset, so any
   change that alters an _existing_ shape — renaming/removing/moving a field,
   renaming a `_type`, restructuring a document — orphans data unless existing
