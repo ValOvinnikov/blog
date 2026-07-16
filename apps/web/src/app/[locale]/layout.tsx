@@ -9,7 +9,6 @@ import { jetbrainsMono, newsreader, spaceGrotesk } from '@web/config/fonts';
 import { themeBootstrapScript } from '@web/config/theme-script';
 import { routing } from '@web/i18n/routing';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
@@ -90,9 +89,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
         <NextIntlClientProvider locale={locale} messages={null}>
           <Header>
             <Header.Brand>
-              <Link href="/" aria-label="Home">
+              <SmartLink href="/" aria-label="Home">
                 <Logo prefix={brand.prefix} suffix={brand.suffix} />
-              </Link>
+              </SmartLink>
             </Header.Brand>
             <PrimaryNavigation
               links={navItems}
