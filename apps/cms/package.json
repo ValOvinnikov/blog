@@ -9,6 +9,8 @@
     "typegen": "sanity schema extract --path ../../packages/config/src/sanity/generated/schema.json && sanity typegen generate",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
     "format": "prettier --write .",
     "migrate:list": "sanity migrations list",
     "migrate:new": "node scripts/migrate.mjs new",
@@ -16,6 +18,8 @@
     "migrate:current": "node scripts/migrate.mjs current",
     "migrate:dry": "node scripts/migrate.mjs dry",
     "migrate:run": "node scripts/migrate.mjs run",
+    "migrate:deploy": "node scripts/migrate.mjs deploy",
+    "migrate:backfill": "node scripts/migrate.mjs deploy --backfill",
     "dataset:export": "node scripts/migrate.mjs export"
   },
   "dependencies": {
@@ -33,9 +37,12 @@
     "@blog/eslint-config": "workspace:*",
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
+    "@blog/vitest-config": "workspace:*",
     "@sanity/cli": "^7.7.1",
+    "@sanity/client": "^7.23.0",
     "eslint": "^10.7.0",
     "prettier": "^3.9.5",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
   }
 }
