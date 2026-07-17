@@ -118,11 +118,14 @@ prompt — do not write it to disk first.
   `apps/cms/migrations/` (`README.md` + `migrate:dry`/`migrate:run`/`dataset:export`).
   Migrations against `production` are human-gated like `sanity deploy`.
 - Verify with `pnpm type-check`, `pnpm lint`, `pnpm test`, `pnpm build` from root.
-- **Edit-time lint feedback:** a checked-in `PostToolUse` hook
-  (`.claude/hooks/post-edit-lint.sh`, wired in `.claude/settings.json`) lints
-  every edited/written `.ts`/`.tsx` file and feeds errors — including
-  layer-boundary violations — straight back to the agent in the same turn.
-  Report-only (never `--fix`); commit-time gates stay authoritative.
+- **Edit-time format + lint feedback:** checked-in `PostToolUse` hooks
+  (`.claude/hooks/post-edit-prettier.sh` then `.claude/hooks/post-edit-lint.sh`,
+  chained as one command in `.claude/settings.json` since matching hooks
+  otherwise run in parallel) format every edited/written file with Prettier,
+  then lint every `.ts`/`.tsx` file on the formatted content and feed errors —
+  including layer-boundary violations — straight back to the agent in the
+  same turn. Prettier is silent and always exits 0 (formatting, not review);
+  lint stays report-only (never `--fix`); commit-time gates stay authoritative.
 - Conventional commits, one concern per PR.
 - **Prefer per-layer PRs.** Split a multi-layer feature into separate PRs per
   layer (`cms → service → ui → web`, dependency order) so each review stays small
