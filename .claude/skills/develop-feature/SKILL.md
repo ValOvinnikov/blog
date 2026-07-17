@@ -154,12 +154,21 @@ re-run from that step — do not proceed with any red check.
   full diff (`main...HEAD` + working tree). It applies `code-review-practices`
   — mechanical scan, contract pass, general pass — with fresh eyes and reports
   a verdict.
-- Fix every **blocking** finding (delegating to the owning layer agent where
-  appropriate), re-run the affected verify checks from step 5, then re-dispatch
-  the reviewer until it returns `APPROVE`.
-- Only after `APPROVE` may you proceed to step 7 and ask to commit. A review
-  that never ran is a blocking finding in itself — "the diff is small" or
-  "checks are green" does not substitute for the review.
+- **If the diff touches `apps/web` routes, metadata, structured data, or
+  feeds** (any of: `generateMetadata`, JSON-LD, `sitemap.ts`, `robots.ts`,
+  `rss.xml/route.ts`, or a new/changed route under `apps/web/src/app`), also
+  dispatch the **`seo-auditor` subagent** (`.claude/agents/seo-auditor.md`)
+  over the same diff, alongside `reviewer` — not instead of it. It applies
+  the `seo-and-metadata` skill as an audit checklist and reports a verdict in
+  the same `APPROVE` / blocking / non-blocking / not-checked format.
+- Fix every **blocking** finding from either subagent (delegating to the
+  owning layer agent where appropriate), re-run the affected verify checks
+  from step 5, then re-dispatch whichever subagent found the issue until it
+  returns `APPROVE`.
+- Only after `APPROVE` from `reviewer` (and from `seo-auditor` when
+  dispatched) may you proceed to step 7 and ask to commit. A review that
+  never ran is a blocking finding in itself — "the diff is small" or "checks
+  are green" does not substitute for the review.
 
 ## 7. Hand off to the gate sequence
 
