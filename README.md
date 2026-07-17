@@ -131,6 +131,13 @@ contracts:
     does Y work" sweeps in a cheap, disposable context and returns conclusions
     with `file:line` pointers instead of file dumps, so the orchestrator's
     window isn't spent rediscovering the codebase.
+  - `board-keeper` — reconciles the Blog Build project board against repo
+    reality (open PR → issue in Code Review, in-flight branch → In Progress,
+    merged PR → issue Done). Re-queries every status write it makes to catch
+    `gh project item-edit`'s known silent-failure mode, and reports
+    destructive-looking moves (e.g. reopening a wrongly-closed issue) for the
+    orchestrator instead of applying them. Dispatched after every PR
+    open/merge, and on demand.
 
   `reviewer` and `explore` are read-only by **enforcement**, not just prose
   (#425): both run under `permissionMode: dontAsk`, so any Bash call the
