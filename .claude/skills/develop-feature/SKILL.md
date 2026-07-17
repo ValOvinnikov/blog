@@ -154,12 +154,22 @@ re-run from that step — do not proceed with any red check.
   full diff (`main...HEAD` + working tree). It applies `code-review-practices`
   — mechanical scan, contract pass, general pass — with fresh eyes and reports
   a verdict.
+- **If the diff touches `packages/ui` or `apps/web` components**, also dispatch
+  the **`a11y-reviewer` subagent** (`.claude/agents/a11y-reviewer.md`) over the
+  same diff — it checks the `ui-library-practices` accessibility rules
+  (`ariaLabel` prop convention, no in-component date formatting, real heading
+  tags, polymorphic `linkAs`, `alt` text, `focus-visible`, icon labelling) that
+  `reviewer`'s general pass does not specifically enumerate. Skip it entirely
+  for diffs with no `ui`/`web` files.
 - Fix every **blocking** finding (delegating to the owning layer agent where
   appropriate), re-run the affected verify checks from step 5, then re-dispatch
-  the reviewer until it returns `APPROVE`.
-- Only after `APPROVE` may you proceed to step 7 and ask to commit. A review
-  that never ran is a blocking finding in itself — "the diff is small" or
-  "checks are green" does not substitute for the review.
+  the reviewer(s) until every dispatched reviewer returns its pass verdict
+  (`APPROVE` / `PASS`).
+- Only after every dispatched reviewer's pass verdict (`APPROVE` / `PASS`) may
+  you proceed to step 7 and ask to commit — a `PASS` from `a11y-reviewer` does
+  not excuse a `NEEDS FIXES` from `reviewer`, or vice versa. A review that
+  never ran is a blocking finding in itself — "the diff is small" or "checks
+  are green" does not substitute for the review.
 
 ## 7. Hand off to the gate sequence
 

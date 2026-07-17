@@ -127,15 +127,19 @@ contracts:
   - `web` — App Router routes, SEO, composition of `ui` + `service`.
   - `reviewer` — read-only pre-commit review of the full diff; gates the
     commit ask on an `APPROVE` verdict.
+  - `a11y-reviewer` — read-only accessibility audit of `packages/ui`/`apps/web`
+    diffs against `ui-library-practices`' non-negotiable rules; dispatched
+    alongside `reviewer` whenever a diff touches those layers.
   - `explore` — read-only discovery scout (Haiku). Answers "where is X / how
     does Y work" sweeps in a cheap, disposable context and returns conclusions
     with `file:line` pointers instead of file dumps, so the orchestrator's
     window isn't spent rediscovering the codebase.
 
-  `reviewer` and `explore` are read-only by **enforcement**, not just prose
-  (#425): both run under `permissionMode: dontAsk`, so any Bash call the
-  permission engine would prompt for (redirects, `sed -i`, `tee`, unrecognized
-  binaries) is auto-denied, and a per-agent `PreToolUse` guard
+  `reviewer`, `a11y-reviewer`, and `explore` are read-only by **enforcement**,
+  not just prose (#425): all three run under `permissionMode: dontAsk`, so any
+  Bash call the permission engine would prompt for (redirects, `sed -i`,
+  `tee`, unrecognized binaries) is auto-denied, and a per-agent `PreToolUse`
+  guard
   (`read-only-agent-guard.sh`) denies the write-shaped commands the project
   allow-list would otherwise admit (`git commit` — including with leading
   global flags like `git -C dir commit`, `mkdir`, `cp`, `pnpm typegen`,
