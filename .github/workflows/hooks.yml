@@ -44,3 +44,13 @@ jobs:
         # false-positive failure mode that got that attempt discarded — see
         # the test file's own header.
         run: sh .claude/hooks/gate-bypass-guard.test.sh
+
+      - name: pre-bash-worktree-install-guard.sh deny/allow matrix
+        # #459: pins the regex tokenizer's intended behavior (mutating pnpm
+        # subcommands, flag-tolerant forms, compound-command segments) plus
+        # the negative cases — see the test file's own header.
+        run: sh .claude/hooks/pre-bash-worktree-install-guard.test.sh
+
+      - name: test-writer-scope-guard.sh deny/allow matrix
+        # #459: pins the *.test.ts(x)-only suffix check.
+        run: bash .claude/hooks/test-writer-scope-guard.test.sh
