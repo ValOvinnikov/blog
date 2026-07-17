@@ -154,11 +154,20 @@ contracts:
   its false-positive cost.
 
 - **Hooks** (`.claude/hooks/`):
-  - `post-edit-lint.sh` — `PostToolUse` hook (wired in `.claude/settings.json`)
-    that lints every agent-edited `.ts`/`.tsx` file and feeds errors —
-    including layer-boundary `no-restricted-imports` violations — back to the
-    agent in the same turn. Report-only (never `--fix`); the commit-time gates
-    stay authoritative.
+  - `post-edit-prettier.sh` → `post-edit-lint.sh` — `PostToolUse` hooks (wired
+    in `.claude/settings.json` as a single chained command,
+    `post-edit-prettier.sh && post-edit-lint.sh`) so every agent-edited/written
+    file is Prettier-formatted, then linted on the formatted content, in the
+    same turn. They're chained rather than two entries under the same
+    matcher because Claude Code runs all hooks matching an event in
+    parallel — two array entries would race and ESLint could see pre-format
+    content. `post-edit-prettier.sh` always exits 0 and gives no agent
+    feedback (formatting, not review); unsupported/missing files and
+    `.prettierignore`'d paths are silent no-ops via Prettier itself.
+    `post-edit-lint.sh` lints every agent-edited `.ts`/`.tsx` file and feeds
+    errors — including layer-boundary `no-restricted-imports` violations —
+    back to the agent. Report-only (never `--fix`); the commit-time gates
+    (lint-staged) stay authoritative.
   - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`
     and `explore` agent frontmatter, so it fires only for them) backing the
     read-only enforcement described above. Its deny list mirrors the
