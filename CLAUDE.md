@@ -171,6 +171,17 @@ Every issue follows this exact order. **Stop and wait for explicit user approval
 
 **Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work only — never the commit, push, or PR.** Those three gates always require fresh, explicit confirmation.
 
+**Board reconciliation (not a gate — no approval needed).** After step 7 opens
+a PR, and again after any PR merges, dispatch the `board-keeper` subagent
+(`.claude/agents/board-keeper.md`). Board mutations have silently failed
+before — it re-queries every status write it makes to confirm it actually
+stuck, and sweeps the whole board for drift (not just the issue you were
+working), not only the status you just set. It never edits code and only
+applies safe, forward-only status corrections; anything that looks
+destructive (e.g. reopening a wrongly-closed issue) comes back in its report
+for you to act on. Also dispatch it on demand whenever asked to "reconcile
+the board."
+
 ## Deployment
 
 Deploys are automated by the pipeline (see `docs/DEPLOY.md`, `SPEC.md` §13):
