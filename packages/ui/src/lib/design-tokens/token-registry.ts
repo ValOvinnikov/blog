@@ -6,16 +6,6 @@ import {
   type TToken,
 } from './parse-theme-tokens';
 
-export const SECTION_ORDER: readonly TCategory[] = [
-  'color',
-  'typography',
-  'font',
-  'radius',
-  'spacing',
-  'layout',
-  'motion',
-] as const;
-
 /**
  * Every design token from `@blog/tailwind-config`'s `theme.css`, grouped by
  * category. Auto-discovered at build time, so renaming or adding a token

@@ -1,6 +1,6 @@
 import type { ILink, ISanityImage, TMaybeUndefined } from '@blog/config';
 
-export type THeroModuleImage = {
+type THeroModuleImage = {
   src: string;
   alt: string;
 };
