@@ -121,6 +121,9 @@ contracts:
 
 - **Scoped subagents** (`.claude/agents/`) — one per layer, primed with that
   layer's rules:
+  - `config` — `packages/config`, `packages/utils`, `configs/*`: UPPERCASE
+    constants, the `routes` URL builder, shared config packages, cross-workspace
+    alias wiring, guards `src/sanity/generated/` (typegen-only).
   - `cms` — Sanity schemas, content modelling, typegen.
   - `service` — Sanity client, GROQ, typed fetchers (no React).
   - `ui` — building the pure, publishable `@blog/ui` design system.
