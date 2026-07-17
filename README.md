@@ -121,6 +121,9 @@ contracts:
 
 - **Scoped subagents** (`.claude/agents/`) — one per layer, primed with that
   layer's rules:
+  - `config` — `packages/config`, `packages/utils`, `configs/*`: UPPERCASE
+    constants, the `routes` URL builder, shared config packages, cross-workspace
+    alias wiring, guards `src/sanity/generated/` (typegen-only).
   - `cms` — Sanity schemas, content modelling, typegen.
   - `service` — Sanity client, GROQ, typed fetchers (no React).
   - `ui` — building the pure, publishable `@blog/ui` design system.
@@ -137,6 +140,13 @@ contracts:
     `seo-and-metadata` skill as a checklist (`generateMetadata` completeness,
     JSON-LD validity, sitemap/robots/RSS coherence) and reports a verdict in
     the same `APPROVE` / blocking / non-blocking / not-checked format.
+  - `board-keeper` — reconciles the Blog Build project board against repo
+    reality (open PR → issue in Code Review, in-flight branch → In Progress,
+    merged PR → issue Done). Re-queries every status write it makes to catch
+    `gh project item-edit`'s known silent-failure mode, and reports
+    destructive-looking moves (e.g. reopening a wrongly-closed issue) for the
+    orchestrator instead of applying them. Dispatched after every PR
+    open/merge, and on demand.
 
   `reviewer`, `explore`, and `seo-auditor` are read-only by **enforcement**,
   not just prose (#425): all three run under `permissionMode: dontAsk`, so
@@ -157,11 +167,20 @@ contracts:
   was rejected as not worth its false-positive cost.
 
 - **Hooks** (`.claude/hooks/`):
-  - `post-edit-lint.sh` — `PostToolUse` hook (wired in `.claude/settings.json`)
-    that lints every agent-edited `.ts`/`.tsx` file and feeds errors —
-    including layer-boundary `no-restricted-imports` violations — back to the
-    agent in the same turn. Report-only (never `--fix`); the commit-time gates
-    stay authoritative.
+  - `post-edit-prettier.sh` → `post-edit-lint.sh` — `PostToolUse` hooks (wired
+    in `.claude/settings.json` as a single chained command,
+    `post-edit-prettier.sh && post-edit-lint.sh`) so every agent-edited/written
+    file is Prettier-formatted, then linted on the formatted content, in the
+    same turn. They're chained rather than two entries under the same
+    matcher because Claude Code runs all hooks matching an event in
+    parallel — two array entries would race and ESLint could see pre-format
+    content. `post-edit-prettier.sh` always exits 0 and gives no agent
+    feedback (formatting, not review); unsupported/missing files and
+    `.prettierignore`'d paths are silent no-ops via Prettier itself.
+    `post-edit-lint.sh` lints every agent-edited `.ts`/`.tsx` file and feeds
+    errors — including layer-boundary `no-restricted-imports` violations —
+    back to the agent. Report-only (never `--fix`); the commit-time gates
+    (lint-staged) stay authoritative.
   - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`,
     `explore`, and `seo-auditor` agent frontmatter, so it fires only for them)
     backing the read-only enforcement described above. Its deny list mirrors the

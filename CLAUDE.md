@@ -36,9 +36,12 @@ automatic pipeline; this skill is how the right ones get used in the right order
 ## Use the scoped agents
 
 Delegate layer work to the matching subagent in `.claude/agents/`, in dependency
-order (`cms → service → ui → web`):
-`cms` (schemas/typegen), `service` (data layer), `ui` (design system),
-`web` (frontend/SEO + composition).
+order (`config → cms → service → ui → web` when config changes are involved,
+otherwise `cms → service → ui → web`):
+`config` (`packages/config`, `packages/utils`, `configs/*` — constants, route
+helpers, shared config packages, alias wiring, guards typegen output), `cms`
+(schemas/typegen), `service` (data layer), `ui` (design system), `web`
+(frontend/SEO + composition).
 
 **Orchestrator must not write layer files before delegating.** Do not create
 stub or partial files in a layer owned by a subagent — the subagent owns file
@@ -118,18 +121,22 @@ prompt — do not write it to disk first.
   `apps/cms/migrations/` (`README.md` + `migrate:dry`/`migrate:run`/`dataset:export`).
   Migrations against `production` are human-gated like `sanity deploy`.
 - Verify with `pnpm type-check`, `pnpm lint`, `pnpm test`, `pnpm build` from root.
-- **Edit-time lint feedback:** a checked-in `PostToolUse` hook
-  (`.claude/hooks/post-edit-lint.sh`, wired in `.claude/settings.json`) lints
-  every edited/written `.ts`/`.tsx` file and feeds errors — including
-  layer-boundary violations — straight back to the agent in the same turn.
-  Report-only (never `--fix`); commit-time gates stay authoritative.
+- **Edit-time format + lint feedback:** checked-in `PostToolUse` hooks
+  (`.claude/hooks/post-edit-prettier.sh` then `.claude/hooks/post-edit-lint.sh`,
+  chained as one command in `.claude/settings.json` since matching hooks
+  otherwise run in parallel) format every edited/written file with Prettier,
+  then lint every `.ts`/`.tsx` file on the formatted content and feed errors —
+  including layer-boundary violations — straight back to the agent in the
+  same turn. Prettier is silent and always exits 0 (formatting, not review);
+  lint stays report-only (never `--fix`); commit-time gates stay authoritative.
 - Conventional commits, one concern per PR.
 - **Prefer per-layer PRs.** Split a multi-layer feature into separate PRs per
-  layer (`cms → service → ui → web`, dependency order) so each review stays small
-  and focused. **Split only when each layer's PR merges to `main` green on its
-  own** (typically additive changes). Keep it a single PR when a partial merge
-  would break the build — e.g. renaming a shared `_type` or generated type that
-  downstream consumes reds `type-check` until every layer lands.
+  layer (`config → cms → service → ui → web` when config changes are involved,
+  otherwise `cms → service → ui → web`; dependency order) so each review stays
+  small and focused. **Split only when each layer's PR merges to `main` green
+  on its own** (typically additive changes). Keep it a single PR when a partial
+  merge would break the build — e.g. renaming a shared `_type` or generated
+  type that downstream consumes reds `type-check` until every layer lands.
 - **Spec sync:** any PR that changes architecture, layer contracts, env vars,
   or the content model updates `SPEC.md` in the same PR.
 - **README sync:** `README.md` §"CI & automation" documents every workflow in
@@ -161,6 +168,17 @@ Every issue follows this exact order. **Stop and wait for explicit user approval
    step 8 for the safety checks — never delete uncommitted work.
 
 **Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work only — never the commit, push, or PR.** Those three gates always require fresh, explicit confirmation.
+
+**Board reconciliation (not a gate — no approval needed).** After step 7 opens
+a PR, and again after any PR merges, dispatch the `board-keeper` subagent
+(`.claude/agents/board-keeper.md`). Board mutations have silently failed
+before — it re-queries every status write it makes to confirm it actually
+stuck, and sweeps the whole board for drift (not just the issue you were
+working), not only the status you just set. It never edits code and only
+applies safe, forward-only status corrections; anything that looks
+destructive (e.g. reopening a wrongly-closed issue) comes back in its report
+for you to act on. Also dispatch it on demand whenever asked to "reconcile
+the board."
 
 ## Deployment
 
