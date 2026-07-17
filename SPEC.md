@@ -285,6 +285,7 @@ override bag) + `openGraph`,
 | `VERCEL_TOKEN` / `_ORG_ID` / `_PROJECT_ID` | CI (deploy)                             | Vercel CLI deploys; token is a Secret, ids are Variables                                                                                               |
 | `TURBO_TOKEN` / `TURBO_TEAM`               | CI (all)                                | optional Vercel Remote Cache; no-op until configured                                                                                                   |
 | `SKIP_ENV_VALIDATION`                      | CI builds only                          | bypasses Zod env validation where no vars exist                                                                                                        |
+| `LIGHTHOUSE_URLS`                          | CI (`lighthouse.yml`)                   | Variable; one full preview URL per line (`/` + one post page); no-op until #275 lands a preview-URL mechanism (see `.lighthouse/README.md`)            |
 
 - Env access is **always** through the validated entry points
   (`apps/web/src/utils/env/env.ts` via `@t3-oss/env-nextjs`, service's env via
@@ -411,9 +412,12 @@ changing a schema does **not** change existing documents.
 - CI (required checks on PRs to `main`): Type-check, Lint, Test, Typegen,
   Migrations (load + read-only dry-run), Build, dependency-review — plus
   advisory jobs: knip (unused files/exports/dependencies), actionlint + zizmor
-  (workflow lint + security), Dependabot, and Claude code review. knip starts
-  non-required and is promoted to a required check once it has held zero false
-  positives across two weeks of PRs (human-gated ruleset change).
+  (workflow lint + security), Dependabot, Claude code review, and Lighthouse CI
+  (`lighthouse.yml`, #399 — budget assertions against `.lighthouse/budgets.json`
+  for `/` and one post page; no-op until the `LIGHTHOUSE_URLS` Variable is set,
+  which depends on #275's preview-URL mechanism). knip starts non-required and
+  is promoted to a required check once it has held zero false positives across
+  two weeks of PRs (human-gated ruleset change).
 - Hooks: husky + lint-staged (eslint --fix + prettier on staged files).
 - Conventional commits; one concern per PR.
 
