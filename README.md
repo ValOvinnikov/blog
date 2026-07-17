@@ -305,16 +305,29 @@ contracts:
   - `code-review-practices` — boundary/type/SEO/test checklist before a PR.
   - `open-pull-request` — branch → work → PR with human-gated push/PR steps.
   - `use-context7` — fetch live, version-matched library docs before guessing.
+  - Plugin skills (provisioned via `.claude/settings.json`, see below):
+    `superpowers:systematic-debugging`, `superpowers:test-driven-development`,
+    `superpowers:verification-before-completion`, `superpowers:writing-skills`,
+    `superpowers:brainstorming` and `superpowers:using-git-worktrees` (invoked
+    by `develop-feature`), `vercel:nextjs`, `vercel:next-cache-components`,
+    `vercel:deployments-cicd`, `frontend-design:frontend-design`.
 - **Settings** (`.claude/settings.json`) — permission allowlist for the standard
   pnpm/turbo/sanity/git/gh commands and hook wiring; deploys and hand-edits to
   the generated Sanity types (`packages/config/src/sanity/generated/`, regenerate
   via `pnpm typegen`) are denied, as are reads/writes of real env files
   (`.env`, `.env.local`, `.env.*.local`) — the tracked `.env.example` templates
   stay readable and editable so agents can maintain them. It also provisions
-  the plugins the repo's own guidance depends on
-  (currently **context7**, required by the `use-context7` skill) via
-  `extraKnownMarketplaces` + `enabledPlugins`, so a fresh clone resolves them
-  without per-person setup. Opt out locally in `.claude/settings.local.json`.
+  the plugins the repo's own guidance depends on via `extraKnownMarketplaces` +
+  `enabledPlugins`, so a fresh clone resolves them without per-person setup:
+  **context7** (required by the `use-context7` skill), **superpowers**
+  (required by `develop-feature` and the plugin skills above), **vercel**,
+  and **frontend-design** — all four from the single `claude-plugins-official`
+  marketplace. Because the `vercel` plugin bundles a `/deploy` command and
+  `deployment-expert` subagent that can trigger a real deploy, the deny list
+  also blocks the underlying `vercel --prod` / `vercel deploy --prod` /
+  `vercel promote` / `vercel rollback` commands and the `deploy_to_vercel`
+  MCP tool, so enabling the plugin can't bypass this repo's human-gated
+  deploy policy. Opt out locally in `.claude/settings.local.json`.
 - **`CLAUDE.md`** — repo-wide guidance loaded into every session.
 
 ## CI & automation
