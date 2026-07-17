@@ -3,7 +3,12 @@
   // Design specs, an HTML mockup and a reference ThemeToggle — material for
   // humans, in no workspace, never built or imported. Not source, so nothing
   // here can be "unused".
-  "ignore": ["design-reference/**"],
+  //
+  // .claude/hooks/*.js: invoked as a subprocess by its paired *.sh wrapper
+  // (e.g. gate-bypass-guard.sh execs gate-bypass-guard.js), never imported
+  // from TS/JS source — invisible to knip's import graph the same way the
+  // *.sh hooks already are (knip doesn't scan shell files at all).
+  "ignore": ["design-reference/**", ".claude/hooks/*.js"],
   "workspaces": {
     "apps/cms": {
       // Each migration's default export is loaded by the Sanity CLI
