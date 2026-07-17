@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# PreToolUse guard for the read-only subagents (reviewer, explore) — issue #425.
+# PreToolUse guard for Bash-mutation denial — issue #425, reused by #396.
 #
 # Wired in each agent's frontmatter, so it fires ONLY for that agent's Bash
-# calls; layer agents (cms/service/ui/web) never see it. It works together
-# with `permissionMode: dontAsk` in the same frontmatter:
+# calls. It works together with `permissionMode: dontAsk` in the same
+# frontmatter:
 #
 #   - dontAsk makes the harness's own permission engine fail CLOSED: any Bash
 #     call it would prompt for (redirects, sed -i, tee, unrecognized binaries,
@@ -19,7 +19,17 @@
 # analysis of shell commands cannot be made sound and its false positives on
 # honest commands cost more than they protect. Keep this list a mirror of the
 # write-shaped permissions.allow entries — update it when that list changes.
+#
+# Originally written for the fully-read-only `reviewer`/`explore` agents
+# (#425); `test-writer` (#396) reuses it verbatim for the same reason — it
+# has no legitimate need for any command on the deny list either, even though
+# it isn't read-only overall (it writes `*.test.ts(x)` via Edit/Write, gated
+# separately by `test-writer-scope-guard.sh`). Each caller sets `GUARD_LABEL`
+# in its hook command to keep the deny message accurate; it defaults to the
+# original #425 framing so reviewer/explore need no changes.
 set -u
+
+GUARD_LABEL="${GUARD_LABEL:-You are a read-only agent (#425)}"
 
 input=$(cat)
 
@@ -134,15 +144,15 @@ while IFS= read -r segment; do
   [ -z "$segment" ] && continue
 
   if git_subcommand_denied "$segment"; then
-    deny "You are a read-only agent (#425): this git command mutates the working tree, repo, or board state. Report the change you wanted to make instead of applying it; for searching, prefer the Grep/Read tools."
+    deny "$GUARD_LABEL: this git command mutates the working tree, repo, or board state. Report the change you wanted to make instead of applying it; for searching, prefer the Grep/Read tools."
   fi
   if pnpm_exec_denied "$segment"; then
-    deny "You are a read-only agent (#425): 'pnpm exec'/'--filter ... exec' runs an arbitrary command and can mutate the tree. Report the change you wanted to make instead of applying it."
+    deny "$GUARD_LABEL: 'pnpm exec'/'--filter ... exec' runs an arbitrary command and can mutate the tree. Report the change you wanted to make instead of applying it."
   fi
   for prefix in "${DENY_PREFIXES[@]}"; do
     case "$segment" in
     "$prefix" | "$prefix"[[:space:]]*)
-      deny "You are a read-only agent (#425): '$prefix' mutates the working tree, repo, or board state. Report the change you wanted to make instead of applying it; for searching, prefer the Grep/Read tools."
+      deny "$GUARD_LABEL: '$prefix' mutates the working tree, repo, or board state. Report the change you wanted to make instead of applying it; for searching, prefer the Grep/Read tools."
       ;;
     esac
   done

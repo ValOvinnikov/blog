@@ -112,8 +112,17 @@ agent rules and skill.
 
 ## 4. Test
 
-- Follow the `testing-practices` skill. Tests run once per layer when
-  implementation is complete — not after each file.
+- Dispatch the **`test-writer` subagent** (`.claude/agents/test-writer.md`)
+  once the layer agents have finished implementing. Give it the same
+  context-handoff package as step 3 (issue summary, acceptance criteria) plus
+  a diff summary and the new exports/components/types each layer agent
+  produced — it starts cold like any subagent. It applies `testing-practices`
+  per layer and is scoped to `*.test.ts(x)` files only, enforced by a
+  `PreToolUse` guard (#396): a test that can't pass without a product-code
+  change comes back as a finding for you to route to the owning layer agent,
+  never a fix `test-writer` makes itself.
+- Tests run once per layer when implementation is complete — not after each
+  file.
 - New routes/metadata: sanity-check `sitemap`/RSS.
 
 ## 5. Verify
