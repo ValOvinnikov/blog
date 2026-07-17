@@ -1,9 +1,31 @@
+import { realpathSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const isDev = process.env.NODE_ENV !== 'production';
+
+// Agent worktrees symlink their root node_modules to the primary checkout's
+// copy (.husky/post-checkout), and Turbopack refuses to resolve through
+// symlinks that leave its project root. Anchor the root at the checkout that
+// physically hosts the dependencies: in a shared-deps worktree that is the
+// primary checkout (which also contains the worktree, under
+// .claude/worktrees/); everywhere else realpath is the workspace root itself,
+// i.e. the exact value Turbopack would infer on its own.
+//
+// `../..` assumes apps/web's current depth (repo root/apps/web) — revisit if
+// this app ever moves.
+const workspaceRoot = resolve(process.cwd(), '../..');
+const turbopackRoot = (() => {
+  try {
+    return dirname(realpathSync(join(workspaceRoot, 'node_modules')));
+  } catch {
+    return workspaceRoot; // no node_modules yet — nothing to resolve through
+  }
+})();
 
 // Next.js App Router injects its own inline scripts on every page — the
 // `self.__next_f.push(...)` RSC/hydration payload (and our inline dark-mode
@@ -61,6 +83,7 @@ const securityHeaders = [
 ];
 
 const config: NextConfig = {
+  turbopack: { root: turbopackRoot },
   transpilePackages: ['@blog/ui', '@blog/service', '@blog/config'],
   images: {
     remotePatterns: [

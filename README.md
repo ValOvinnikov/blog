@@ -121,6 +121,9 @@ contracts:
 
 - **Scoped subagents** (`.claude/agents/`) — one per layer, primed with that
   layer's rules:
+  - `config` — `packages/config`, `packages/utils`, `configs/*`: UPPERCASE
+    constants, the `routes` URL builder, shared config packages, cross-workspace
+    alias wiring, guards `src/sanity/generated/` (typegen-only).
   - `cms` — Sanity schemas, content modelling, typegen.
   - `service` — Sanity client, GROQ, typed fetchers (no React).
   - `ui` — building the pure, publishable `@blog/ui` design system.
@@ -131,6 +134,13 @@ contracts:
     does Y work" sweeps in a cheap, disposable context and returns conclusions
     with `file:line` pointers instead of file dumps, so the orchestrator's
     window isn't spent rediscovering the codebase.
+  - `board-keeper` — reconciles the Blog Build project board against repo
+    reality (open PR → issue in Code Review, in-flight branch → In Progress,
+    merged PR → issue Done). Re-queries every status write it makes to catch
+    `gh project item-edit`'s known silent-failure mode, and reports
+    destructive-looking moves (e.g. reopening a wrongly-closed issue) for the
+    orchestrator instead of applying them. Dispatched after every PR
+    open/merge, and on demand.
 
   `reviewer` and `explore` are read-only by **enforcement**, not just prose
   (#425): both run under `permissionMode: dontAsk`, so any Bash call the
@@ -151,11 +161,23 @@ contracts:
   its false-positive cost.
 
 - **Hooks** (`.claude/hooks/`):
-  - `post-edit-lint.sh` — `PostToolUse` hook (wired in `.claude/settings.json`)
-    that lints every agent-edited `.ts`/`.tsx` file and feeds errors —
-    including layer-boundary `no-restricted-imports` violations — back to the
-    agent in the same turn. Report-only (never `--fix`); the commit-time gates
-    stay authoritative.
+  - `post-edit-prettier.sh` → `post-edit-lint.sh` — `PostToolUse` hooks (wired
+    in `.claude/settings.json` as a single chained command,
+    `post-edit-prettier.sh && post-edit-lint.sh`) so every agent-edited/written
+    file is Prettier-formatted, then linted on the formatted content, in the
+    same turn. They're chained rather than two entries under the same
+    matcher because Claude Code runs all hooks matching an event in
+    parallel — two array entries would race and ESLint could see pre-format
+    content. `post-edit-prettier.sh` always exits 0 and gives no agent
+    feedback (formatting, not review); unsupported/missing files and
+    `.prettierignore`'d paths are silent no-ops via Prettier itself.
+    `post-edit-lint.sh` lints every agent-edited `.ts`/`.tsx` file and feeds
+    errors — including layer-boundary `no-restricted-imports` violations —
+    back to the agent. Report-only (never `--fix`); the commit-time gates
+    (lint-staged) stay authoritative.
+  - `pre-bash-worktree-install-guard.sh` — `PreToolUse` hook that blocks
+    dependency-mutating pnpm commands inside a shared-deps agent worktree
+    (see below) before pnpm can write anything.
   - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`
     and `explore` agent frontmatter, so it fires only for them) backing the
     read-only enforcement described above. Its deny list mirrors the
@@ -163,6 +185,39 @@ contracts:
     in sync. `read-only-agent-guard.test.sh` pins the deny/allow matrix
     (including the bypasses found across #425's review rounds); run it
     directly or via CI (**Hooks**, below).
+- **Shared `node_modules` in agent worktrees** — a full `pnpm install` per
+  isolated worktree duplicated ~1.1 GB and minutes of setup each time, so
+  `.husky/post-checkout` seeds every new linked worktree instead (issue #410):
+  - the root `node_modules` becomes a **symlink** to the primary checkout's
+    copy — that directory holds pnpm's content-addressed `.pnpm` store, i.e.
+    every external package;
+  - each workspace `node_modules` is a tiny **copy of pnpm's symlink farm**
+    (`cp -RP`). pnpm's links are relative, so `@blog/*` resolve to the
+    _worktree's own source_ while external packages resolve through the root
+    symlink into the primary checkout's store. A fresh worktree costs ~80 MB
+    (source + farms) instead of ~1.2 GB, and removal is fast.
+  - `apps/web/next.config.ts` anchors `turbopack.root` at the checkout that
+    physically hosts the dependencies (via `realpath` of `node_modules`) —
+    Turbopack otherwise refuses to resolve through a symlink that leaves its
+    project root. In the primary checkout and on Vercel this resolves to the
+    workspace root, exactly what Turbopack infers anyway.
+  - **Installing inside a shared worktree is unsupported** — pnpm follows the
+    root symlink, so `pnpm install`/`add`/... would prune and rewrite the
+    _primary checkout's_ dependencies. Three layers prevent it: the
+    `PreToolUse` hook blocks agent-issued pnpm mutations up front, the root
+    `preinstall` script (`scripts/guard-worktree-install.mjs`) aborts any
+    install that slips through before pnpm links anything, and pnpm itself
+    prompts before reusing a virtual store created at another path. On a
+    branch that must change dependencies, give the worktree a private tree:
+    `rm node_modules` (removes only the symlink) then `pnpm install`.
+  - Why not the harness's `worktree.symlinkDirectories` setting: it can only
+    symlink whole directories, which works for the root but would point the
+    workspace-level `node_modules` at the primary checkout — and their
+    `@blog/*` links would then resolve to the _primary checkout's source_,
+    silently building stale code. The `post-checkout` hook produces the
+    farm copies the pnpm layout needs, covers manually created worktrees
+    too, and keeps a single mechanism in charge.
+
 - **Skills** (`.claude/skills/`):
   - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
