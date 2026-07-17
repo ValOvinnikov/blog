@@ -148,10 +148,12 @@ contracts:
   - `open-pull-request` — branch → work → PR with human-gated push/PR steps.
   - `use-context7` — fetch live, version-matched library docs before guessing.
 - **Settings** (`.claude/settings.json`) — permission allowlist for the standard
-  pnpm/turbo/sanity/git/gh commands and hook wiring; deploys, `.env` reads, and
-  hand-edits to the generated Sanity types
-  (`packages/config/src/sanity/generated/`, regenerate via `pnpm typegen`) are
-  denied. It also provisions the plugins the repo's own guidance depends on
+  pnpm/turbo/sanity/git/gh commands and hook wiring; deploys and hand-edits to
+  the generated Sanity types (`packages/config/src/sanity/generated/`, regenerate
+  via `pnpm typegen`) are denied, as are reads/writes of real env files
+  (`.env`, `.env.local`, `.env.*.local`) — the tracked `.env.example` templates
+  stay readable and editable so agents can maintain them. It also provisions
+  the plugins the repo's own guidance depends on
   (currently **context7**, required by the `use-context7` skill) via
   `extraKnownMarketplaces` + `enabledPlugins`, so a fresh clone resolves them
   without per-person setup. Opt out locally in `.claude/settings.local.json`.
