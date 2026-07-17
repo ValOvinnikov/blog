@@ -1,12 +1,28 @@
 #!/usr/bin/env sh
-# Seed local env files into new git worktrees.
+# Seed new git worktrees: local env files + shared dependencies.
 #
 # Linked worktrees (`git worktree add`, e.g. the isolated worktrees the agent
-# harness creates) do not inherit git-ignored files, so `.env.local` is absent
-# there and env-dependent builds/tests can't run. `post-checkout` fires on
-# `git worktree add`, so copy the local env files from the primary worktree.
-# No-op in the primary checkout and whenever a file already exists (idempotent);
-# values never enter git.
+# harness creates) do not inherit git-ignored files, so `.env.local` and
+# `node_modules` are absent there. `post-checkout` fires on `git worktree add`:
+#
+# 1. Env files — copy `.env.local` / `.env.*.local` from the primary worktree
+#    (values never enter git).
+# 2. Dependencies — instead of a ~1.1 GB, minutes-long `pnpm install` per
+#    worktree, share the primary checkout's:
+#      - root `node_modules` -> symlink to the primary checkout's. It holds
+#        the content-addressed `.pnpm` store, i.e. all external packages.
+#      - each workspace `node_modules` -> tiny copy of pnpm's symlink farm
+#        (`cp -RP`, links copied as links). pnpm's links are relative, so
+#        `@blog/*` resolve to THIS worktree's source while external deps
+#        resolve through the root symlink into the primary checkout's store.
+#    Running `pnpm install`/`add` inside such a worktree would write through
+#    the symlink and mutate the primary checkout — guarded by the pnpm
+#    `preinstall` script and the PreToolUse hook; see README
+#    § "Working with Claude Code" (incl. the escape hatch for branches that
+#    change dependencies).
+#
+# No-op in the primary checkout and whenever the target already exists
+# (idempotent).
 
 git_dir="$(git rev-parse --git-dir)"
 common_dir="$(git rev-parse --git-common-dir)"
@@ -31,5 +47,21 @@ dest_top="$(git rev-parse --show-toplevel)"
 			echo "husky/post-checkout: seeded $rel"
 		fi
 	done
+
+if [ -d "$main/node_modules" ] && [ ! -e "$dest_top/node_modules" ]; then
+	ln -s "$main/node_modules" "$dest_top/node_modules"
+	echo "husky/post-checkout: linked node_modules -> $main/node_modules"
+	( cd "$main" && find . \
+		\( -path './.git' -o -path './.claude/worktrees' -o -path './node_modules' \) -prune -o \
+		-type d -name node_modules -print -prune ) |
+		while IFS= read -r rel; do
+			rel="${rel#./}"
+			dest="$dest_top/$rel"
+			if [ -d "$dest_top/$(dirname "$rel")" ] && [ ! -e "$dest" ]; then
+				cp -RP "$main/$rel" "$dest"
+				echo "husky/post-checkout: seeded $rel (symlink farm)"
+			fi
+		done
+fi
 
 exit 0

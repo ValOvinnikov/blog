@@ -167,12 +167,21 @@ re-run from that step — do not proceed with any red check.
   full diff (`main...HEAD` + working tree). It applies `code-review-practices`
   — mechanical scan, contract pass, general pass — with fresh eyes and reports
   a verdict.
-- Fix every **blocking** finding (delegating to the owning layer agent where
-  appropriate), re-run the affected verify checks from step 5, then re-dispatch
-  the reviewer until it returns `APPROVE`.
-- Only after `APPROVE` may you proceed to step 7 and ask to commit. A review
-  that never ran is a blocking finding in itself — "the diff is small" or
-  "checks are green" does not substitute for the review.
+- **If the diff touches `apps/web` routes, metadata, structured data, or
+  feeds** (any of: `generateMetadata`, JSON-LD, `sitemap.ts`, `robots.ts`,
+  `rss.xml/route.ts`, or a new/changed route under `apps/web/src/app`), also
+  dispatch the **`seo-auditor` subagent** (`.claude/agents/seo-auditor.md`)
+  over the same diff, alongside `reviewer` — not instead of it. It applies
+  the `seo-and-metadata` skill as an audit checklist and reports a verdict in
+  the same `APPROVE` / blocking / non-blocking / not-checked format.
+- Fix every **blocking** finding from either subagent (delegating to the
+  owning layer agent where appropriate), re-run the affected verify checks
+  from step 5, then re-dispatch whichever subagent found the issue until it
+  returns `APPROVE`.
+- Only after `APPROVE` from `reviewer` (and from `seo-auditor` when
+  dispatched) may you proceed to step 7 and ask to commit. A review that
+  never ran is a blocking finding in itself — "the diff is small" or "checks
+  are green" does not substitute for the review.
 
 ## 7. Hand off to the gate sequence
 
@@ -181,6 +190,12 @@ re-run from that step — do not proceed with any red check.
   - Gate 3: ask to push (separate, explicit approval)
   - Gate 4: ask to create the PR (separate, explicit approval)
   - Gate 5: set status → Code Review immediately after PR is created
+- **Then dispatch `board-keeper`** (`.claude/agents/board-keeper.md`) — no
+  approval needed, it's not a gate. It re-queries the status write Gate 5 just
+  made to confirm it actually stuck (`gh project item-edit` has silently
+  failed before) and sweeps the rest of the board for unrelated drift while
+  it's there. Dispatch it again after this PR merges, and any time you're
+  asked to "reconcile the board."
 
 ## 8. Remove the subagent worktrees you created
 
@@ -189,8 +204,11 @@ commits are landed on the `feat/` branch and pushed. Remove it: nothing else
 will. The harness only auto-sweeps worktrees that have **no uncommitted
 changes, no untracked files, and no unpushed commits** — and a
 `worktree-agent-*` branch is never pushed under its own name, so these
-accumulate forever otherwise (~1.1 GB each; 26 once piled up). A subagent
-cannot do this itself — it cannot remove the worktree it is standing in.
+accumulate forever otherwise (26 once piled up). Worktrees created since
+issue #410 share the main checkout's `node_modules` (~80 MB each instead of
+~1.2 GB — see README §"Working with Claude Code"), but they still clutter
+`git worktree list` and hold branches. A subagent cannot do this itself — it
+cannot remove the worktree it is standing in.
 
 For each worktree created for this task:
 
@@ -215,9 +233,11 @@ git worktree remove <worktree>                    # never --force
   dirty, leave the worktree and tell the user what is in it.
 - Removal keeps the branch — committed work stays recoverable, which is what
   makes this safe.
-- Deletion is slow (~1.1 GB of `node_modules` each). Remove them one at a time
-  with a generous timeout; an interrupted removal leaves a half-deleted
-  worktree that then needs `--force`.
+- Worktrees created before the shared-`node_modules` change (issue #410) hold
+  a private ~1.1 GB `node_modules`, so their deletion is slow — remove them
+  one at a time with a generous timeout; an interrupted removal leaves a
+  half-deleted worktree that then needs `--force`. Shared-deps worktrees
+  (root `node_modules` is a symlink) remove in seconds.
 - If a worktree still exists after its PR merged, the same checks work against
   `origin/main`.
 

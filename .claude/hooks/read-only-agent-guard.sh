@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# PreToolUse guard for Bash-mutation denial — issue #425, reused by #396.
+# PreToolUse guard for the read-only subagents (reviewer, explore,
+# seo-auditor) — issue #425 — reused for Bash-mutation denial by test-writer
+# (#396), which isn't fully read-only.
 #
 # Wired in each agent's frontmatter, so it fires ONLY for that agent's Bash
 # calls. It works together with `permissionMode: dontAsk` in the same
@@ -20,13 +22,12 @@
 # honest commands cost more than they protect. Keep this list a mirror of the
 # write-shaped permissions.allow entries — update it when that list changes.
 #
-# Originally written for the fully-read-only `reviewer`/`explore` agents
-# (#425); `test-writer` (#396) reuses it verbatim for the same reason — it
-# has no legitimate need for any command on the deny list either, even though
-# it isn't read-only overall (it writes `*.test.ts(x)` via Edit/Write, gated
-# separately by `test-writer-scope-guard.sh`). Each caller sets `GUARD_LABEL`
-# in its hook command to keep the deny message accurate; it defaults to the
-# original #425 framing so reviewer/explore need no changes.
+# `test-writer` has no legitimate need for any command on the deny list
+# either, even though it isn't read-only overall (it writes `*.test.ts(x)`
+# via Edit/Write, gated separately by `test-writer-scope-guard.sh`). Each
+# caller sets `GUARD_LABEL` in its hook command to keep the deny message
+# accurate; it defaults to the original #425 framing, so reviewer/explore/
+# seo-auditor (which don't set it) need no changes.
 set -u
 
 GUARD_LABEL="${GUARD_LABEL:-You are a read-only agent (#425)}"
