@@ -191,7 +191,10 @@ function check(seg) {
       return 'A leading + in a push refspec is a force push.';
     }
   }
-  if (sub === 'config' && args.some((a) => a.toLowerCase() === 'core.hookspath')) {
+  if (
+    sub === 'config' &&
+    args.some((a) => a.toLowerCase() === 'core.hookspath')
+  ) {
     return 'Changing core.hooksPath disables the husky gates.';
   }
   return null;

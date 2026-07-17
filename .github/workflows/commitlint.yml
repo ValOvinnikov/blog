@@ -1,0 +1,58 @@
+name: Commitlint
+
+on:
+  # No path filter on purpose — same reasoning as ci.yml / actionlint.yml: a
+  # workflow skipped by path filtering leaves any required status check
+  # "Pending" forever, and every PR carries commits that need checking
+  # regardless of what files changed.
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# A force-push/synchronize supersedes the running job for the same ref.
+concurrency:
+  group: commitlint-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PNPM_VERSION: 9.15.0
+  NODE_VERSION: '22'
+
+jobs:
+  commitlint:
+    name: Commitlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          # Full history so `--from`/`--to` below can walk the whole PR
+          # commit range, not just the merge tip actions/checkout fetches by
+          # default (fetch-depth: 1).
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Backstop for the commit-msg hook (.husky/commit-msg): lints every
+      # commit in the PR's range against the same commitlint.config.mjs, so a
+      # commit that slipped past the local hook (different clone, `--no-verify`,
+      # a GitHub web UI edit) still gets caught before merge. Merge commits
+      # ("Merge pull request #…", "Merge remote-tracking branch … into …") are
+      # skipped by commitlint.config.mjs's explicit `ignores` plus commitlint's
+      # built-in defaultIgnores. Dependabot's commit messages (`chore(deps): …`)
+      # are NOT separately exempted — they pass because they're already
+      # Conventional Commits-shaped in this repo's history; a future Dependabot
+      # message that isn't would fail this check like any other commit. Same
+      # config the hook enforces, so there's nothing to drift.
+      - name: Commitlint (PR commit range)
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: pnpm exec commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose

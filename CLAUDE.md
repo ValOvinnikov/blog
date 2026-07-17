@@ -129,7 +129,16 @@ prompt — do not write it to disk first.
   including layer-boundary violations — straight back to the agent in the
   same turn. Prettier is silent and always exits 0 (formatting, not review);
   lint stays report-only (never `--fix`); commit-time gates stay authoritative.
-- Conventional commits, one concern per PR.
+- **Conventional commits, one concern per PR — mechanically enforced.**
+  `.husky/commit-msg` runs commitlint (`commitlint.config.mjs`) on every
+  local commit; the **Commitlint** CI workflow (`commitlint.yml`) re-checks
+  the full PR commit range as a backstop. Allowed types: config-conventional's
+  defaults (`build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`,
+  `revert`, `style`, `test`) plus this repo's own `tooling`; scope is
+  free-form (component/area name) but must be lower-case. Merge commits
+  (local or `Merge pull request #…`) are explicitly skipped; Dependabot's
+  `chore(deps): …` messages are not separately exempted — they pass because
+  they're already conventional.
 - **Prefer per-layer PRs.** Split a multi-layer feature into separate PRs per
   layer (`config → cms → service → ui → web` when config changes are involved,
   otherwise `cms → service → ui → web`; dependency order) so each review stays
