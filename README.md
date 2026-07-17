@@ -328,6 +328,16 @@ contracts:
   `vercel promote` / `vercel rollback` commands and the `deploy_to_vercel`
   MCP tool, so enabling the plugin can't bypass this repo's human-gated
   deploy policy. Opt out locally in `.claude/settings.local.json`.
+- **Scheduled cloud routines** — a Claude Code "routine" (`/schedule`, backed
+  by the `RemoteTrigger` API — cloud infrastructure, not a local cron job)
+  runs daily and posts a summary of what merged in the last 24 hours, plus a
+  retrospective code-review pass on any code-touching PR. It is read-only end
+  to end (no `gh pr comment`, no file writes, no git commits) — the summary is
+  delivered only via the routine's own push/email notification. See
+  `docs/routines/release-notes-drafter.md` for the full prompt, current
+  enabled/disabled status, and incident history; that file is a
+  version-controlled reference copy, so editing it has no effect on the live
+  routine — update both places if the prompt changes.
 - **`CLAUDE.md`** — repo-wide guidance loaded into every session.
 
 ## CI & automation
