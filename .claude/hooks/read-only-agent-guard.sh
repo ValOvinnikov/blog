@@ -64,15 +64,29 @@ DENY_PREFIXES=(
 # "a and dir" as two tokens (that specific gap let `git -C "<space-path>"
 # commit` slip past an earlier version of this script; see #425 review
 # history). `xargs -n1` is a quoting-aware tokenizer already available on the
-# host with no new dependency; unbalanced quotes make it fail with no output,
-# in which case fall back to naive splitting rather than silently allowing.
+# host with no new dependency; an unbalanced quote makes it fail, in which
+# case fall back to naive splitting rather than silently allowing.
+#
+# The fallback triggers on xargs's own exit status, not on whether TOKENS
+# ended up empty: `xargs -n1` can print some tokens before it hits the
+# unbalanced quote and errors, e.g. `git -C "unterminated commit` emits
+# "git"/"-C" and only then fails — an empty-TOKENS check would miss that and
+# use the truncated, subcommand-dropping result instead of falling back.
+#
 # Portable to bash 3.2 (macOS system bash) — no mapfile/readarray.
 tokenize() {
   TOKENS=()
-  local tok
-  while IFS= read -r tok; do
-    TOKENS+=("$tok")
-  done < <(printf '%s' "$1" | xargs -n1 2>/dev/null)
+  local tok output status
+  output=$(printf '%s' "$1" | xargs -n1 2>/dev/null)
+  status=$?
+  # The `-n "$output"` guard matters: a here-string on an empty variable
+  # (`<<<""`) still feeds `read` one empty line, which would otherwise seed
+  # TOKENS with a single "" element instead of leaving it truly empty.
+  if [ "$status" -eq 0 ] && [ -n "$output" ]; then
+    while IFS= read -r tok; do
+      TOKENS+=("$tok")
+    done <<<"$output"
+  fi
   if [ "${#TOKENS[@]}" -eq 0 ] && [ -n "$1" ]; then
     # shellcheck disable=SC2206
     TOKENS=($1)

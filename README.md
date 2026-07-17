@@ -188,7 +188,9 @@ contracts:
     `explore`, and `seo-auditor` agent frontmatter, so it fires only for them)
     backing the read-only enforcement described above. Its deny list mirrors the
     write-shaped entries in `settings.json` `permissions.allow` — keep the two
-    in sync.
+    in sync. `read-only-agent-guard.test.sh` pins the deny/allow matrix
+    (including the bypasses found across #425's review rounds); run it
+    directly or via CI (**Hooks**, below).
 - **Shared `node_modules` in agent worktrees** — a full `pnpm install` per
   isolated worktree duplicated ~1.1 GB and minutes of setup each time, so
   `.husky/post-checkout` seeds every new linked worktree instead (issue #410):
@@ -221,6 +223,7 @@ contracts:
     silently building stale code. The `post-checkout` hook produces the
     farm copies the pnpm layout needs, covers manually created worktrees
     too, and keeps a single mechanism in charge.
+
 - **Skills** (`.claude/skills/`):
   - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
@@ -256,6 +259,7 @@ All automation lives in `.github/workflows/` (shared pnpm/Node setup in
 | **Zizmor** (`zizmor.yml`)                         | every PR to `main`                                      | Static security analysis of the workflow files themselves.                                                                                                                                                                                                                               |
 | **Actionlint** (`actionlint.yml`)                 | every PR to `main`                                      | Validates the workflow files' syntax, `${{ }}` expressions and `needs` graph, and shellchecks their `run:` blocks — the correctness half that Zizmor's security analysis does not cover. Runs the official binary, pinned by version + sha256 (no third-party action, no curl-to-shell). |
 | **Knip** (`knip.yml`)                             | every PR to `main`                                      | Reports unused files, exports, and dependencies (config in `knip.json`); read-only, fails on any finding or a stale ignore rule. Advisory for now — promoted to a required check after two weeks of zero false positives (human-gated ruleset change).                                   |
+| **Hooks** (`hooks.yml`)                           | every PR to `main`                                      | Shellchecks `.claude/hooks/*.sh` (outside actionlint's `run:`-block-only coverage) and runs `read-only-agent-guard.test.sh`'s deny/allow matrix against `read-only-agent-guard.sh`.                                                                                                      |
 | **Test Presence** (`test-presence.yml`)           | every PR to `main` (incl. label add/remove)             | Advisory nudge: fails when source under `packages/*/src` or `apps/web/src` changes without touching any `*.test.ts(x)` file. Ignores stories, configs, `*.d.ts`, generated types, deletions, and `apps/cms`. Waive with the `no-tests-needed` label; never a required check.             |
 | **Claude Code Review** (`claude-code-review.yml`) | PR opened/updated (code paths, owner PRs only)          | Automated AI review posted on the PR; advisory, not a required check.                                                                                                                                                                                                                    |
 | **Claude Code** (`claude.yml`)                    | `@claude` mentions (owner-only, owner-authored threads) | Interactive agent runs on issues/PRs.                                                                                                                                                                                                                                                    |
