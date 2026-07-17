@@ -3,11 +3,11 @@ name: Deploy Development
 # The dev Studio and dev web app deploy from here on merge to `main` — but only
 # the app(s) whose turbo graph the merge actually touched (see the `changes`
 # job), and ONLY after the `verify` gate (type-check/lint/test/build on the
-# merged commit) passes. Vercel's native Git integration for `blog-dev` is
-# disabled (Ignored Build Step = `exit 0`) so nothing deploys pre-merge or
-# ungated — every dev deploy goes through this workflow. Mirrors
-# deploy-production.yml, which deploys both apps unconditionally (a tag is a
-# deliberate full release).
+# merged commit) passes. Vercel's native Git integration is disabled for both
+# projects declaratively via apps/web/vercel.json's git.deploymentEnabled:
+# false (#445) so nothing deploys pre-merge or ungated — every dev deploy goes
+# through this workflow. Mirrors deploy-production.yml, which deploys both
+# apps unconditionally (a tag is a deliberate full release).
 on:
   push:
     branches: [main]

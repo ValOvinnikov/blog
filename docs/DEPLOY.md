@@ -106,18 +106,20 @@ outside of the root directory"_; **Node.js 22.x**.
 
 Both projects have Vercel's Git auto-deploy **disabled** — every deploy goes
 through a CI-gated GitHub Actions job (no pre-merge/preview deploys, nothing
-deploys before checks pass):
+deploys before checks pass). This is set **once, in code**, via
+`apps/web/vercel.json`'s `git.deploymentEnabled: false` — since both
+projects' Root Directory is `apps/web`, the committed file governs auto-deploy
+for both projects identically, and can't silently drift the way a
+per-project console toggle (the old "Ignored Build Step" setting) could — a
+missed one-time click on `blog-prod` once meant it deployed on every branch
+push, uncontrolled, until #445 replaced it with this file. Nothing to set per
+project in the dashboard for this anymore; only project linking remains:
 
 - [ ] **`blog-dev`**
-  - [ ] Settings → Git → **Ignored Build Step → `exit 0`** (skip all Git-triggered
-        builds — no auto-deploy, no PR previews; the `Deploy Development` workflow
-        deploys it via the CLI on merge to `main`, after its `verify` gate).
   - [ ] From repo root: `npx vercel link` → select `blog-dev`. Read the ids from
         `.vercel/project.json` → `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
         (Then delete the local `.vercel/` dir — it's gitignored scratch.)
 - [ ] **`blog-prod`**
-  - [ ] Settings → Git → **Ignored Build Step → `exit 0`** (always skip — Git
-        never deploys prod; only the tag workflow does).
   - [ ] From repo root: `npx vercel link` → select `blog-prod`. Read the ids
         from `.vercel/project.json` → `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
         (Then delete the local `.vercel/` dir — it's gitignored scratch.)
