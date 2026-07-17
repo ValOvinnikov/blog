@@ -167,19 +167,31 @@ re-run from that step — do not proceed with any red check.
   full diff (`main...HEAD` + working tree). It applies `code-review-practices`
   — mechanical scan, contract pass, general pass — with fresh eyes and reports
   a verdict.
+- **If the diff touches `packages/ui` or `apps/web` components**, also dispatch
+  the **`a11y-reviewer` subagent** (`.claude/agents/a11y-reviewer.md`) over the
+  same diff — it checks the `ui-library-practices` accessibility rules
+  (`ariaLabel` prop convention, no in-component date formatting, real heading
+  tags, polymorphic `linkAs`, `alt` text, `focus-visible`, icon labelling) that
+  `reviewer`'s general pass does not specifically enumerate. Skip it entirely
+  for diffs with no `ui`/`web` files.
 - **If the diff touches `apps/web` routes, metadata, structured data, or
   feeds** (any of: `generateMetadata`, JSON-LD, `sitemap.ts`, `robots.ts`,
   `rss.xml/route.ts`, or a new/changed route under `apps/web/src/app`), also
   dispatch the **`seo-auditor` subagent** (`.claude/agents/seo-auditor.md`)
   over the same diff, alongside `reviewer` — not instead of it. It applies
   the `seo-and-metadata` skill as an audit checklist and reports a verdict in
-  the same `APPROVE` / blocking / non-blocking / not-checked format.
-- Fix every **blocking** finding from either subagent (delegating to the
-  owning layer agent where appropriate), re-run the affected verify checks
-  from step 5, then re-dispatch whichever subagent found the issue until it
-  returns `APPROVE`.
-- Only after `APPROVE` from `reviewer` (and from `seo-auditor` when
-  dispatched) may you proceed to step 7 and ask to commit. A review that
+  the same `APPROVE` / blocking / non-blocking / not-checked format. A single
+  `apps/web` diff can trigger both `a11y-reviewer` and `seo-auditor` at once —
+  dispatch whichever of the two conditions match; they check different things
+  and neither substitutes for the other.
+- Fix every **blocking** finding from any dispatched reviewer (delegating to
+  the owning layer agent where appropriate), re-run the affected verify checks
+  from step 5, then re-dispatch whichever subagent found the issue until every
+  dispatched reviewer returns its pass verdict (`APPROVE` / `PASS`).
+- Only after every dispatched reviewer's pass verdict (`APPROVE` / `PASS`) may
+  you proceed to step 7 and ask to commit — a pass from `a11y-reviewer` or
+  `seo-auditor` does not excuse a `NEEDS FIXES`/blocking result from any other
+  dispatched reviewer, or vice versa. A review that
   never ran is a blocking finding in itself — "the diff is small" or "checks
   are green" does not substitute for the review.
 

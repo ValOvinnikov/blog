@@ -130,6 +130,9 @@ contracts:
   - `web` — App Router routes, SEO, composition of `ui` + `service`.
   - `reviewer` — read-only pre-commit review of the full diff; gates the
     commit ask on an `APPROVE` verdict.
+  - `a11y-reviewer` — read-only accessibility audit of `packages/ui`/`apps/web`
+    diffs against `ui-library-practices`' non-negotiable rules; dispatched
+    alongside `reviewer` whenever a diff touches those layers.
   - `explore` — read-only discovery scout (Haiku). Answers "where is X / how
     does Y work" sweeps in a cheap, disposable context and returns conclusions
     with `file:line` pointers instead of file dumps, so the orchestrator's
@@ -160,7 +163,25 @@ contracts:
     orchestrator instead of applying them. Dispatched after every PR
     open/merge, and on demand.
 
-  `reviewer`, `explore`, and `seo-auditor` are read-only by **enforcement**, not just prose (#425); `test-writer` reuses the same `Bash` guard although it isn't fully read-only (#396). All four run under `permissionMode: dontAsk`, so any Bash call the permission engine would prompt for (redirects, `sed -i`, `tee`, unrecognized binaries) is auto-denied, and a per-agent `PreToolUse` guard (`read-only-agent-guard.sh`) denies the write-shaped commands the project allow-list would otherwise admit (`git commit` — including with leading global flags like `git -C dir commit`, `mkdir`, `cp`, `pnpm typegen`, `pnpm exec`/`pnpm --filter ... exec`, …). Residual, accepted: commands that execute package scripts the allow-list doesn't flag as write-shaped (`pnpm test`, `pnpm dev`, `turbo run`) can still write, and the guard's quote-naive segment splitting can false-positive on search patterns containing e.g. `&& mkdir ` — denials tell the agent to fall back to Grep/Read. This is a guardrail against honest confusion, not a security boundary — it doesn't chase further obfuscation (case-insensitive filesystem tricks, path-qualified binaries, wrapper commands); see #397 for why full adversarial-proof text-level enforcement was rejected as not worth its false-positive cost.
+  `reviewer`, `a11y-reviewer`, `seo-auditor`, and `explore` are read-only by
+  **enforcement**, not just prose (#425); `test-writer` reuses the same `Bash`
+  guard although it isn't fully read-only (#396). All five run under
+  `permissionMode: dontAsk`, so any Bash call the permission engine would
+  prompt for (redirects, `sed -i`, `tee`, unrecognized binaries) is
+  auto-denied, and a per-agent `PreToolUse` guard (`read-only-agent-guard.sh`)
+  denies the write-shaped commands the project allow-list would otherwise
+  admit (`git commit` — including with leading global flags like
+  `git -C dir commit`, `mkdir`, `cp`, `pnpm typegen`, `pnpm exec`/
+  `pnpm --filter ... exec`, …). Residual, accepted: commands that execute
+  package scripts the allow-list doesn't flag as write-shaped (`pnpm test`,
+  `pnpm dev`, `turbo run`) can still write, and the guard's quote-naive
+  segment splitting can false-positive on search patterns containing e.g.
+  `&& mkdir ` — denials tell the agent to fall back to Grep/Read. This is a
+  guardrail against honest confusion, not a security boundary — it doesn't
+  chase further obfuscation (case-insensitive filesystem tricks,
+  path-qualified binaries, wrapper commands); see #397 for why full
+  adversarial-proof text-level enforcement was rejected as not worth its
+  false-positive cost.
 
 - **Hooks** (`.claude/hooks/`):
   - `post-edit-prettier.sh` → `post-edit-lint.sh` — `PostToolUse` hooks (wired
@@ -181,9 +202,10 @@ contracts:
     dependency-mutating pnpm commands inside a shared-deps agent worktree
     (see below) before pnpm can write anything.
   - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`,
-    `explore`, `seo-auditor`, and `test-writer` agent frontmatter —
-    `test-writer` sets a `GUARD_LABEL` env var on its hook command so the
-    deny message names it correctly rather than calling it "read-only")
+    `a11y-reviewer`, `explore`, `seo-auditor`, and `test-writer` agent
+    frontmatter — `test-writer` sets a `GUARD_LABEL` env var on its hook
+    command so the deny message names it correctly rather than calling it
+    "read-only")
     backing the enforcement described above. Its deny list mirrors the
     write-shaped entries in `settings.json` `permissions.allow` — keep the
     two in sync. `read-only-agent-guard.test.sh` pins the deny/allow matrix
