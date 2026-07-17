@@ -39,8 +39,9 @@ docs/        BACKLOG.md (roadmap), DEPLOY.md
 SPEC.md      architecture — the durable reference
 ```
 
-Dependency order is `cms → service → ui → web`; the graph is acyclic. Source
-lives under `src/` in every workspace. Tests are co-located as `*.test.ts(x)`.
+Dependency order is `config → cms → service → ui → web`; the graph is
+acyclic. Source lives under `src/` in every workspace. Tests are co-located
+as `*.test.ts(x)`.
 
 Useful starting points, in rough order of cheapness:
 

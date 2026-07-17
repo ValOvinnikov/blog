@@ -485,10 +485,10 @@ and release runbook live in `docs/DEPLOY.md`; this is the shape.
 The repo ships Claude Code configuration so contributors (human or AI) stay
 inside the layer contracts:
 
-- **Subagents** (`.claude/agents/`): `cms`, `service`, `ui`, `web` — each
-  scoped to one workspace, delegated in dependency order
-  (`cms → service → ui → web`). The orchestrator never writes layer files
-  before delegating. Plus `reviewer` — a read-only pre-commit reviewer
+- **Subagents** (`.claude/agents/`): `config`, `cms`, `service`, `ui`, `web` —
+  each scoped to one workspace, delegated in dependency order
+  (`config → cms → service → ui → web`). The orchestrator never writes layer
+  files before delegating. Plus `reviewer` — a read-only pre-commit reviewer
   dispatched over the full diff before the commit gate; it must return
   `APPROVE` before the orchestrator may ask to commit — and `explore`, a
   read-only Haiku discovery scout that answers broad "where / how / whether"
