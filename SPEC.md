@@ -489,19 +489,23 @@ and release runbook live in `docs/DEPLOY.md`; this is the shape.
 The repo ships Claude Code configuration so contributors (human or AI) stay
 inside the layer contracts:
 
-- **Subagents** (`.claude/agents/`): `cms`, `service`, `ui`, `web` — each
-  scoped to one workspace, delegated in dependency order
-  (`cms → service → ui → web`). The orchestrator never writes layer files
-  before delegating. Plus three read-only subagents: `reviewer`, a
-  pre-commit reviewer dispatched over the full diff before the commit gate
-  (must return `APPROVE` before the orchestrator may ask to commit);
-  `explore`, a Haiku discovery scout that answers broad "where / how /
-  whether" questions in a disposable context and returns conclusions with
+- **Subagents** (`.claude/agents/`): `config`, `cms`, `service`, `ui`, `web` —
+  each scoped to one workspace, delegated in dependency order
+  (`config → cms → service → ui → web`). The orchestrator never writes layer
+  files before delegating. Plus read-only reviewers, each gating the commit
+  ask the same way `reviewer` does when dispatched: `reviewer` (pre-commit
+  review of the full diff — must return `APPROVE` before the orchestrator may
+  ask to commit), `a11y-reviewer` (accessibility audit of
+  `packages/ui`/`apps/web` diffs against `ui-library-practices`'
+  non-negotiable rules), and `seo-auditor` (SEO/metadata audit whenever a
+  diff touches `apps/web` routes, metadata, structured data, or feeds,
+  applying the `seo-and-metadata` skill as its checklist). `explore` is a
+  separate, non-gating Haiku discovery scout that answers broad "where / how
+  / whether" questions in a disposable context and returns conclusions with
   `file:line` pointers, keeping that reading out of the orchestrator's
-  window; and `seo-auditor`, dispatched alongside `reviewer` (never instead
-  of it) whenever a diff touches `apps/web` routes, metadata, structured
-  data, or feeds, applying the `seo-and-metadata` skill as its checklist and
-  gating the commit ask the same way `reviewer` does.
+  window. `test-writer` adds/extends co-located `*.test.ts(x)` coverage after
+  the layer agents finish, scoped to test files by enforcement. `board-keeper`
+  reconciles the project board against repo reality after every PR open/merge.
 - **Skills** (`.claude/skills/`): `develop-feature` (lifecycle + delegation —
   the entry point for any non-trivial task), `add-content-type` (cross-layer
   recipe), `cms-schema-practices` (schema + migration quality bar),
