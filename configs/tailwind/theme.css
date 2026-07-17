@@ -198,6 +198,20 @@
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --duration-slow: 360ms;
+
+  /* ── valstack logo ───────────────────────────────────────── */
+  /* A · Console (azure tonal steps, front = lightest) */
+  --logo-1: oklch(0.52 0.17 250);
+  --logo-2: oklch(0.63 0.16 250);
+  --logo-3: oklch(0.73 0.13 250);
+  /* B · Indigo (alternate) */
+  --logo-alt-1: oklch(0.47 0.24 274); /* ≈ #3D3AE0 */
+  --logo-alt-2: oklch(0.58 0.21 274); /* ≈ #6E6BF0 */
+  --logo-alt-3: oklch(0.72 0.14 274); /* ≈ #A6A4F7 */
+  /* Amber, darkened beyond the source spec's L 0.62 (measured ~3.67:1 against
+     --bg, AA-large only) to clear 4.5:1 AA for normal text against both --bg
+     (~5.1:1) and --bg-subtle (~4.7:1, TerminalLogo's chip background). */
+  --logo-alt-accent: oklch(0.54 0.15 65);
 }
 
 .dark {
@@ -223,6 +237,15 @@
   --accent-solid: oklch(0.7 0.16 250);
   --accent-solid-hover: oklch(0.76 0.16 250);
   --ring: var(--accent);
+
+  /* ── valstack logo ───────────────────────────────────────── */
+  --logo-1: oklch(0.58 0.17 250);
+  --logo-2: oklch(0.68 0.16 250);
+  --logo-3: oklch(0.8 0.14 250);
+  --logo-alt-1: oklch(0.52 0.24 274);
+  --logo-alt-2: oklch(0.64 0.2 274);
+  --logo-alt-3: oklch(0.78 0.13 274);
+  --logo-alt-accent: oklch(0.8 0.15 80); /* bright amber ≈ #FFB020 */
 }
 
 @layer base {
@@ -305,4 +328,12 @@
 
 @utility max-w-copy {
   max-width: var(--container-copy);
+}
+
+/* Terminal-logo cursor blink (valstack `TerminalLogo`); not a token, just a
+   plain keyframe consumed via an arbitrary-value animate utility. */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
 }
