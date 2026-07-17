@@ -186,7 +186,9 @@ contracts:
     deny message names it correctly rather than calling it "read-only")
     backing the enforcement described above. Its deny list mirrors the
     write-shaped entries in `settings.json` `permissions.allow` — keep the
-    two in sync.
+    two in sync. `read-only-agent-guard.test.sh` pins the deny/allow matrix
+    (including the bypasses found across #425's review rounds); run it
+    directly or via CI (**Hooks**, below).
   - `test-writer-scope-guard.sh` — `PreToolUse` hook (wired in the
     `test-writer` agent frontmatter) that denies any `Edit`/`Write` whose
     target isn't `*.test.ts`/`*.test.tsx`, backing the test-file-only scoping
@@ -259,6 +261,7 @@ All automation lives in `.github/workflows/` (shared pnpm/Node setup in
 | **Zizmor** (`zizmor.yml`)                         | every PR to `main`                                      | Static security analysis of the workflow files themselves.                                                                                                                                                                                                                               |
 | **Actionlint** (`actionlint.yml`)                 | every PR to `main`                                      | Validates the workflow files' syntax, `${{ }}` expressions and `needs` graph, and shellchecks their `run:` blocks — the correctness half that Zizmor's security analysis does not cover. Runs the official binary, pinned by version + sha256 (no third-party action, no curl-to-shell). |
 | **Knip** (`knip.yml`)                             | every PR to `main`                                      | Reports unused files, exports, and dependencies (config in `knip.json`); read-only, fails on any finding or a stale ignore rule. Advisory for now — promoted to a required check after two weeks of zero false positives (human-gated ruleset change).                                   |
+| **Hooks** (`hooks.yml`)                           | every PR to `main`                                      | Shellchecks `.claude/hooks/*.sh` (outside actionlint's `run:`-block-only coverage) and runs `read-only-agent-guard.test.sh`'s deny/allow matrix against `read-only-agent-guard.sh`.                                                                                                      |
 | **Test Presence** (`test-presence.yml`)           | every PR to `main` (incl. label add/remove)             | Advisory nudge: fails when source under `packages/*/src` or `apps/web/src` changes without touching any `*.test.ts(x)` file. Ignores stories, configs, `*.d.ts`, generated types, deletions, and `apps/cms`. Waive with the `no-tests-needed` label; never a required check.             |
 | **Claude Code Review** (`claude-code-review.yml`) | PR opened/updated (code paths, owner PRs only)          | Automated AI review posted on the PR; advisory, not a required check.                                                                                                                                                                                                                    |
 | **Claude Code** (`claude.yml`)                    | `@claude` mentions (owner-only, owner-authored threads) | Interactive agent runs on issues/PRs.                                                                                                                                                                                                                                                    |
