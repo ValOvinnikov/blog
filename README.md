@@ -201,6 +201,29 @@ contracts:
   - `pre-bash-worktree-install-guard.sh` — `PreToolUse` hook that blocks
     dependency-mutating pnpm commands inside a shared-deps agent worktree
     (see below) before pnpm can write anything.
+  - `gate-bypass-guard.sh` — `PreToolUse` hook, wired **globally** in
+    `.claude/settings.json` (every agent's `Bash` calls, not one agent's —
+    bypass commands could come from any context, including the
+    orchestrator). Blocks the plain, unobfuscated forms of `git` commands
+    that skip the husky gates or rewrite pushed history: a literal
+    `--no-verify`/`-n` on `commit`/`push`/`merge`, a literal
+    `--force`/`-f`/`--force-with-lease`/`+refspec` on `push`, and
+    `core.hooksPath` on `git config`. A quote-aware tokenizer (not a regex
+    over the raw string) keeps a quoted commit message — including this
+    repo's own multi-line `-m "$(cat <<'EOF' ... EOF)"` convention — as one
+    value token that can never be misread as a flag; that distinction is
+    what a discarded, more ambitious first attempt at this hook (#397) got
+    wrong before it was fixed. That attempt chased ~15 real bypasses across
+    five review rounds and was discarded anyway, because its false-positive
+    rate on honest commands (it blocked its own commit message for merely
+    mentioning `--no-verify`) cost more than the shortcuts it prevented. This
+    version deliberately does not chase further obfuscation — env var
+    indirection, shell recursion, case-insensitive filesystems,
+    path-qualified binaries, wrapper commands, clustered short flags,
+    quote-splitting, backslash-newline continuations — same posture as
+    `read-only-agent-guard.sh` below. `gate-bypass-guard.test.sh` pins the
+    deny/allow matrix, reusing the discarded attempt's proven
+    legitimate-command bank; run it directly or via CI (**Hooks**, below).
   - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`,
     `a11y-reviewer`, `explore`, `seo-auditor`, and `test-writer` agent
     frontmatter — `test-writer` sets a `GUARD_LABEL` env var on its hook
@@ -306,7 +329,7 @@ All automation lives in `.github/workflows/` (shared pnpm/Node setup in
 | **Zizmor** (`zizmor.yml`)                         | every PR to `main`                                      | Static security analysis of the workflow files themselves.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | **Actionlint** (`actionlint.yml`)                 | every PR to `main`                                      | Validates the workflow files' syntax, `${{ }}` expressions and `needs` graph, and shellchecks their `run:` blocks — the correctness half that Zizmor's security analysis does not cover. Runs the official binary, pinned by version + sha256 (no third-party action, no curl-to-shell).                                                                                                                                                                                                                                                   |
 | **Knip** (`knip.yml`)                             | every PR to `main`                                      | Reports unused files, exports, and dependencies (config in `knip.json`); read-only, fails on any finding or a stale ignore rule. Advisory for now — promoted to a required check after two weeks of zero false positives (human-gated ruleset change).                                                                                                                                                                                                                                                                                     |
-| **Hooks** (`hooks.yml`)                           | every PR to `main`                                      | Shellchecks `.claude/hooks/*.sh` (outside actionlint's `run:`-block-only coverage) and runs `read-only-agent-guard.test.sh`'s deny/allow matrix against `read-only-agent-guard.sh`.                                                                                                                                                                                                                                                                                                                                                        |
+| **Hooks** (`hooks.yml`)                           | every PR to `main`                                      | Shellchecks `.claude/hooks/*.sh` (outside actionlint's `run:`-block-only coverage) and runs `read-only-agent-guard.test.sh`'s and `gate-bypass-guard.test.sh`'s deny/allow matrices against their respective guards.                                                                                                                                                                                                                                                                                                                       |
 | **Test Presence** (`test-presence.yml`)           | every PR to `main` (incl. label add/remove)             | Advisory nudge: fails when source under `packages/*/src` or `apps/web/src` changes without touching any `*.test.ts(x)` file. Ignores stories, configs, `*.d.ts`, generated types, deletions, and `apps/cms`. Waive with the `no-tests-needed` label; never a required check.                                                                                                                                                                                                                                                               |
 | **Claude Code Review** (`claude-code-review.yml`) | PR opened/updated (code paths, owner PRs only)          | Automated AI review posted on the PR; advisory, not a required check.                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | **Claude Code** (`claude.yml`)                    | `@claude` mentions (owner-only, owner-authored threads) | Interactive agent runs on issues/PRs.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |

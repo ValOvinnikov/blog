@@ -37,3 +37,10 @@ jobs:
         # Pins the cases hand-tested across #425's review rounds (see the test
         # file's own header) so a future edit can't silently reopen a bypass.
         run: bash .claude/hooks/read-only-agent-guard.test.sh
+
+      - name: gate-bypass-guard.sh deny/allow matrix
+        # Reuses the discarded first attempt's (#397, commit ecc1092) proven
+        # ALLOW bank so a future edit can't silently reintroduce the
+        # false-positive failure mode that got that attempt discarded — see
+        # the test file's own header.
+        run: sh .claude/hooks/gate-bypass-guard.test.sh
