@@ -1,0 +1,54 @@
+name: Lighthouse CI
+
+# Advisory Lighthouse CI budget assertions (#399) against a preview URL for
+# `/` and one post page, on every PR. Thresholds live in
+# .lighthouse/budgets.json (documented in .lighthouse/README.md).
+#
+# No-op (green) until the repo Variable LIGHTHOUSE_URLS is set — this repo
+# currently has NO PR preview deploys for web by design: Vercel's native Git
+# auto-deploy is disabled (apps/web/vercel.json, git.deploymentEnabled: false,
+# #445/#446; see SPEC.md §13), so there is no automatic per-PR URL to point
+# this at. LIGHTHOUSE_URLS activates once #275 resolves how a preview/smoke
+# URL is produced — see .lighthouse/README.md "Activation status" for the
+# exact value to set. Mirrors the guarded-step pattern in
+# deploy-development.yml (steps check `env.SOME_TOKEN != ''` and no-op green
+# until configured) so this is safe to merge ahead of #275.
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# A force-push/synchronize supersedes the running job for the same ref.
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    name: Lighthouse CI budgets
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # One full URL per line — the preview/smoke URL for `/` and one post
+      # page. A repo Variable (not a Secret): preview URLs aren't sensitive
+      # and this keeps the value inspectable in run logs.
+      LIGHTHOUSE_URLS: ${{ vars.LIGHTHOUSE_URLS }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      # Non-required/advisory (per #399's constraints) — promoting this to a
+      # required check is a separate, human-gated branch-ruleset decision.
+      # Guarded on LIGHTHOUSE_URLS so the job is inert (green) until #275
+      # exists; see the workflow header comment above.
+      - name: Run Lighthouse CI budgets
+        if: ${{ env.LIGHTHOUSE_URLS != '' }}
+        uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # 12.6.2
+        with:
+          urls: ${{ env.LIGHTHOUSE_URLS }}
+          configPath: .lighthouse/budgets.json
+          uploadArtifacts: true
+          artifactName: lighthouse-results
