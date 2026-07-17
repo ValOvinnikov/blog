@@ -131,11 +131,36 @@ contracts:
     does Y work" sweeps in a cheap, disposable context and returns conclusions
     with `file:line` pointers instead of file dumps, so the orchestrator's
     window isn't spent rediscovering the codebase.
-- **Hooks** (`.claude/hooks/`, wired in `.claude/settings.json`):
-  - `post-edit-lint.sh` — `PostToolUse` hook that lints every agent-edited
-    `.ts`/`.tsx` file and feeds errors — including layer-boundary
-    `no-restricted-imports` violations — back to the agent in the same turn.
-    Report-only (never `--fix`); the commit-time gates stay authoritative.
+
+  `reviewer` and `explore` are read-only by **enforcement**, not just prose
+  (#425): both run under `permissionMode: dontAsk`, so any Bash call the
+  permission engine would prompt for (redirects, `sed -i`, `tee`, unrecognized
+  binaries) is auto-denied, and a per-agent `PreToolUse` guard
+  (`read-only-agent-guard.sh`) denies the write-shaped commands the project
+  allow-list would otherwise admit (`git commit` — including with leading
+  global flags like `git -C dir commit`, `mkdir`, `cp`, `pnpm typegen`,
+  `pnpm exec`/`pnpm --filter ... exec`, …). Residual, accepted: commands that
+  execute package scripts the allow-list doesn't flag as write-shaped
+  (`pnpm test`, `pnpm dev`, `turbo run`) can still write, and the guard's
+  quote-naive segment splitting can false-positive on search patterns
+  containing e.g. `&& mkdir ` — denials tell the agent to fall back to
+  Grep/Read. This is a guardrail against honest confusion, not a security
+  boundary — it doesn't chase further obfuscation (case-insensitive
+  filesystem tricks, path-qualified binaries, wrapper commands); see #397 for
+  why full adversarial-proof text-level enforcement was rejected as not worth
+  its false-positive cost.
+
+- **Hooks** (`.claude/hooks/`):
+  - `post-edit-lint.sh` — `PostToolUse` hook (wired in `.claude/settings.json`)
+    that lints every agent-edited `.ts`/`.tsx` file and feeds errors —
+    including layer-boundary `no-restricted-imports` violations — back to the
+    agent in the same turn. Report-only (never `--fix`); the commit-time gates
+    stay authoritative.
+  - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`
+    and `explore` agent frontmatter, so it fires only for them) backing the
+    read-only enforcement described above. Its deny list mirrors the
+    write-shaped entries in `settings.json` `permissions.allow` — keep the two
+    in sync.
 - **Skills** (`.claude/skills/`):
   - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
