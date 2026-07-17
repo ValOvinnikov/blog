@@ -24,12 +24,13 @@ approval. Never bundle them. See `open-pull-request` skill for the full sequence
 - Trivial / single-file / one layer → just do it (still test + review).
 - Spans multiple layers → use the `add-content-type` recipe and delegate per
   layer as below.
-- **Prefer one PR per layer** (`cms → service → ui → web`, dependency order) so
-  each review stays small — **but split only when each layer merges to `main`
-  green on its own** (typically additive changes). Keep a single PR when a
-  partial merge would break the build: e.g. renaming a shared `_type` or
-  generated type that downstream consumes reds `type-check` until every layer
-  lands. Split only if possible.
+- **Prefer one PR per layer** (`config → cms → service → ui → web` when config
+  changes are involved, otherwise `cms → service → ui → web`; dependency
+  order) so each review stays small — **but split only when each layer merges
+  to `main` green on its own** (typically additive changes). Keep a single PR
+  when a partial merge would break the build: e.g. renaming a shared `_type`
+  or generated type that downstream consumes reds `type-check` until every
+  layer lands. Split only if possible.
 
 ## 1. Investigate + set status (main session)
 
@@ -37,7 +38,8 @@ approval. Never bundle them. See `open-pull-request` skill for the full sequence
   and acceptance criteria — don't rely solely on what the user said in the prompt.
 - Restate the task and acceptance criteria. Read `SPEC.md` for the contracts.
 - Locate the affected files/layers (Grep/Glob/Read). Identify which workspaces
-  change: `cms`, `service`, `ui`, `web`.
+  change: `config` (`packages/config`, `packages/utils`, `configs/*`), `cms`,
+  `service`, `ui`, `web`.
 - **If locating them means a broad sweep** — "where does X live", "how does Y
   work", "is there already a Z" — dispatch the **`explore` subagent**
   (`.claude/agents/explore.md`) instead of reading around yourself. It answers
@@ -65,7 +67,8 @@ approval. Never bundle them. See `open-pull-request` skill for the full sequence
   `superpowers:brainstorming` **before** writing the plan — explore intent,
   constraints, and design decisions first.
 - Write the change as ordered steps **in dependency order**:
-  `cms → types(typegen) → service → ui → web`. Never reverse it.
+  `config → cms → types(typegen) → service → ui → web` (drop `config` if it
+  has no changes). Never reverse it.
 - Explicitly mark which layers are **unaffected** — those agents are skipped
   entirely. Do not invoke an agent whose layer has no changes.
 - Note which step each subagent owns.
@@ -83,12 +86,13 @@ Hand each layer's work to its agent (use the Agent tool, or state which agent
 owns it). Do them in dependency order; later steps depend on earlier output.
 **Skip any agent whose layer has no changes** — don't invoke it at all.
 
-| Layer / work                   | Agent     | Skill it should apply                                       |
-| ------------------------------ | --------- | ----------------------------------------------------------- |
-| Sanity schema + `pnpm typegen` | `cms`     | `cms-schema-practices`                                      |
-| GROQ + typed fetcher           | `service` | `add-content-type`, `testing-practices`                     |
-| Components                     | `ui`      | `ui-library-practices`, `ui-storybook`, `testing-practices` |
-| Routes / metadata / feeds      | `web`     | `seo-and-metadata`, `web-storybook`, `testing-practices`    |
+| Layer / work                                                 | Agent     | Skill it should apply                                       |
+| ------------------------------------------------------------ | --------- | ----------------------------------------------------------- |
+| Constants, `routes`, shared types, `configs/*`, alias wiring | `config`  | —                                                           |
+| Sanity schema + `pnpm typegen`                               | `cms`     | `cms-schema-practices`                                      |
+| GROQ + typed fetcher                                         | `service` | `add-content-type`, `testing-practices`                     |
+| Components                                                   | `ui`      | `ui-library-practices`, `ui-storybook`, `testing-practices` |
+| Routes / metadata / feeds                                    | `web`     | `seo-and-metadata`, `web-storybook`, `testing-practices`    |
 
 All subagents use **Sonnet** (set in each agent's definition file — do not
 override with a different model unless the user explicitly asks).
@@ -108,8 +112,17 @@ agent rules and skill.
 
 ## 4. Test
 
-- Follow the `testing-practices` skill. Tests run once per layer when
-  implementation is complete — not after each file.
+- Dispatch the **`test-writer` subagent** (`.claude/agents/test-writer.md`)
+  once the layer agents have finished implementing. Give it the same
+  context-handoff package as step 3 (issue summary, acceptance criteria) plus
+  a diff summary and the new exports/components/types each layer agent
+  produced — it starts cold like any subagent. It applies `testing-practices`
+  per layer and is scoped to `*.test.ts(x)` files only, enforced by a
+  `PreToolUse` guard (#396): a test that can't pass without a product-code
+  change comes back as a finding for you to route to the owning layer agent,
+  never a fix `test-writer` makes itself.
+- Tests run once per layer when implementation is complete — not after each
+  file.
 - New routes/metadata: sanity-check `sitemap`/RSS.
 
 ## 5. Verify
@@ -161,13 +174,24 @@ re-run from that step — do not proceed with any red check.
   tags, polymorphic `linkAs`, `alt` text, `focus-visible`, icon labelling) that
   `reviewer`'s general pass does not specifically enumerate. Skip it entirely
   for diffs with no `ui`/`web` files.
-- Fix every **blocking** finding (delegating to the owning layer agent where
-  appropriate), re-run the affected verify checks from step 5, then re-dispatch
-  the reviewer(s) until every dispatched reviewer returns its pass verdict
-  (`APPROVE` / `PASS`).
+- **If the diff touches `apps/web` routes, metadata, structured data, or
+  feeds** (any of: `generateMetadata`, JSON-LD, `sitemap.ts`, `robots.ts`,
+  `rss.xml/route.ts`, or a new/changed route under `apps/web/src/app`), also
+  dispatch the **`seo-auditor` subagent** (`.claude/agents/seo-auditor.md`)
+  over the same diff, alongside `reviewer` — not instead of it. It applies
+  the `seo-and-metadata` skill as an audit checklist and reports a verdict in
+  the same `APPROVE` / blocking / non-blocking / not-checked format. A single
+  `apps/web` diff can trigger both `a11y-reviewer` and `seo-auditor` at once —
+  dispatch whichever of the two conditions match; they check different things
+  and neither substitutes for the other.
+- Fix every **blocking** finding from any dispatched reviewer (delegating to
+  the owning layer agent where appropriate), re-run the affected verify checks
+  from step 5, then re-dispatch whichever subagent found the issue until every
+  dispatched reviewer returns its pass verdict (`APPROVE` / `PASS`).
 - Only after every dispatched reviewer's pass verdict (`APPROVE` / `PASS`) may
-  you proceed to step 7 and ask to commit — a `PASS` from `a11y-reviewer` does
-  not excuse a `NEEDS FIXES` from `reviewer`, or vice versa. A review that
+  you proceed to step 7 and ask to commit — a pass from `a11y-reviewer` or
+  `seo-auditor` does not excuse a `NEEDS FIXES`/blocking result from any other
+  dispatched reviewer, or vice versa. A review that
   never ran is a blocking finding in itself — "the diff is small" or "checks
   are green" does not substitute for the review.
 
@@ -178,6 +202,12 @@ re-run from that step — do not proceed with any red check.
   - Gate 3: ask to push (separate, explicit approval)
   - Gate 4: ask to create the PR (separate, explicit approval)
   - Gate 5: set status → Code Review immediately after PR is created
+- **Then dispatch `board-keeper`** (`.claude/agents/board-keeper.md`) — no
+  approval needed, it's not a gate. It re-queries the status write Gate 5 just
+  made to confirm it actually stuck (`gh project item-edit` has silently
+  failed before) and sweeps the rest of the board for unrelated drift while
+  it's there. Dispatch it again after this PR merges, and any time you're
+  asked to "reconcile the board."
 
 ## 8. Remove the subagent worktrees you created
 
@@ -186,8 +216,11 @@ commits are landed on the `feat/` branch and pushed. Remove it: nothing else
 will. The harness only auto-sweeps worktrees that have **no uncommitted
 changes, no untracked files, and no unpushed commits** — and a
 `worktree-agent-*` branch is never pushed under its own name, so these
-accumulate forever otherwise (~1.1 GB each; 26 once piled up). A subagent
-cannot do this itself — it cannot remove the worktree it is standing in.
+accumulate forever otherwise (26 once piled up). Worktrees created since
+issue #410 share the main checkout's `node_modules` (~80 MB each instead of
+~1.2 GB — see README §"Working with Claude Code"), but they still clutter
+`git worktree list` and hold branches. A subagent cannot do this itself — it
+cannot remove the worktree it is standing in.
 
 For each worktree created for this task:
 
@@ -212,9 +245,11 @@ git worktree remove <worktree>                    # never --force
   dirty, leave the worktree and tell the user what is in it.
 - Removal keeps the branch — committed work stays recoverable, which is what
   makes this safe.
-- Deletion is slow (~1.1 GB of `node_modules` each). Remove them one at a time
-  with a generous timeout; an interrupted removal leaves a half-deleted
-  worktree that then needs `--force`.
+- Worktrees created before the shared-`node_modules` change (issue #410) hold
+  a private ~1.1 GB `node_modules`, so their deletion is slow — remove them
+  one at a time with a generous timeout; an interrupted removal leaves a
+  half-deleted worktree that then needs `--force`. Shared-deps worktrees
+  (root `node_modules` is a symlink) remove in seconds.
 - If a worktree still exists after its PR merged, the same checks work against
   `origin/main`.
 

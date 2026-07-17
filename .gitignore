@@ -1,5 +1,9 @@
 # Dependencies
-node_modules/
+# no trailing slash: in shared-deps agent worktrees the root node_modules is
+# a symlink (.husky/post-checkout), and `node_modules/` matches only real
+# directories — the symlink would show up as untracked and block
+# `git worktree remove`.
+node_modules
 .pnpm-store/
 
 # Environment — never commit secrets. Templates (*.env.example) are kept.

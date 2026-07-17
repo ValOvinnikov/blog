@@ -13,6 +13,16 @@ Stack: **Vitest** as the runner, **@testing-library/react** + **jest-dom** for
 components, **jsdom** for the DOM environment. Shared config lives in
 `@blog/config/vitest/preset`.
 
+**Two-tier, by design.** Each layer agent (`cms`/`service`/`ui`/`web`) still
+writes tests for what it implements — that responsibility isn't removed. The
+`test-writer` subagent (`.claude/agents/test-writer.md`) runs afterward as a
+dedicated, fresh-context pass over the same diff, per `develop-feature` step
+4: it catches gaps a layer agent's attention thins out on by the end of its
+own run, and is the one that owns raising coverage if thresholds land later
+(#396). Overlap where a layer agent already wrote thorough coverage is
+expected and fine — `test-writer` adds only what's missing, it doesn't
+duplicate or rewrite adequate existing tests.
+
 ## Where tests live
 
 - **Co-located** next to the source file, named `{filename}.test.ts(x)`:

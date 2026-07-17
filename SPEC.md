@@ -488,12 +488,16 @@ inside the layer contracts:
 - **Subagents** (`.claude/agents/`): `cms`, `service`, `ui`, `web` — each
   scoped to one workspace, delegated in dependency order
   (`cms → service → ui → web`). The orchestrator never writes layer files
-  before delegating. Plus `reviewer` — a read-only pre-commit reviewer
-  dispatched over the full diff before the commit gate; it must return
-  `APPROVE` before the orchestrator may ask to commit — and `explore`, a
-  read-only Haiku discovery scout that answers broad "where / how / whether"
-  questions in a disposable context and returns conclusions with `file:line`
-  pointers, keeping that reading out of the orchestrator's window.
+  before delegating. Plus three read-only subagents: `reviewer`, a
+  pre-commit reviewer dispatched over the full diff before the commit gate
+  (must return `APPROVE` before the orchestrator may ask to commit);
+  `explore`, a Haiku discovery scout that answers broad "where / how /
+  whether" questions in a disposable context and returns conclusions with
+  `file:line` pointers, keeping that reading out of the orchestrator's
+  window; and `seo-auditor`, dispatched alongside `reviewer` (never instead
+  of it) whenever a diff touches `apps/web` routes, metadata, structured
+  data, or feeds, applying the `seo-and-metadata` skill as its checklist and
+  gating the commit ask the same way `reviewer` does.
 - **Skills** (`.claude/skills/`): `develop-feature` (lifecycle + delegation —
   the entry point for any non-trivial task), `add-content-type` (cross-layer
   recipe), `cms-schema-practices` (schema + migration quality bar),

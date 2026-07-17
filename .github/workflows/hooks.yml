@@ -1,0 +1,39 @@
+name: Hooks
+
+on:
+  # No path filter on purpose — same reasoning as ci.yml / actionlint.yml: a
+  # workflow skipped by path filtering leaves any required status check
+  # "Pending" forever. Shellchecking and testing a handful of scripts is cheap
+  # regardless of what the PR touches.
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hooks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hooks:
+    name: Shellcheck + guard tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Shellcheck .claude/hooks
+        # shellcheck is preinstalled on ubuntu-latest (same fact actionlint.yml
+        # relies on for workflow run: blocks) — these standalone scripts aren't
+        # inside any run: block, so actionlint's shellcheck pass never reaches
+        # them.
+        run: shellcheck .claude/hooks/*.sh
+
+      - name: read-only-agent-guard.sh deny/allow matrix
+        # Pins the cases hand-tested across #425's review rounds (see the test
+        # file's own header) so a future edit can't silently reopen a bypass.
+        run: bash .claude/hooks/read-only-agent-guard.test.sh
