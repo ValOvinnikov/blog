@@ -135,6 +135,41 @@ contracts:
     `.ts`/`.tsx` file and feeds errors — including layer-boundary
     `no-restricted-imports` violations — back to the agent in the same turn.
     Report-only (never `--fix`); the commit-time gates stay authoritative.
+  - `pre-bash-worktree-install-guard.sh` — `PreToolUse` hook that blocks
+    dependency-mutating pnpm commands inside a shared-deps agent worktree
+    (see below) before pnpm can write anything.
+- **Shared `node_modules` in agent worktrees** — a full `pnpm install` per
+  isolated worktree duplicated ~1.1 GB and minutes of setup each time, so
+  `.husky/post-checkout` seeds every new linked worktree instead (issue #410):
+  - the root `node_modules` becomes a **symlink** to the primary checkout's
+    copy — that directory holds pnpm's content-addressed `.pnpm` store, i.e.
+    every external package;
+  - each workspace `node_modules` is a tiny **copy of pnpm's symlink farm**
+    (`cp -RP`). pnpm's links are relative, so `@blog/*` resolve to the
+    _worktree's own source_ while external packages resolve through the root
+    symlink into the primary checkout's store. A fresh worktree costs ~80 MB
+    (source + farms) instead of ~1.2 GB, and removal is fast.
+  - `apps/web/next.config.ts` anchors `turbopack.root` at the checkout that
+    physically hosts the dependencies (via `realpath` of `node_modules`) —
+    Turbopack otherwise refuses to resolve through a symlink that leaves its
+    project root. In the primary checkout and on Vercel this resolves to the
+    workspace root, exactly what Turbopack infers anyway.
+  - **Installing inside a shared worktree is unsupported** — pnpm follows the
+    root symlink, so `pnpm install`/`add`/... would prune and rewrite the
+    _primary checkout's_ dependencies. Three layers prevent it: the
+    `PreToolUse` hook blocks agent-issued pnpm mutations up front, the root
+    `preinstall` script (`scripts/guard-worktree-install.mjs`) aborts any
+    install that slips through before pnpm links anything, and pnpm itself
+    prompts before reusing a virtual store created at another path. On a
+    branch that must change dependencies, give the worktree a private tree:
+    `rm node_modules` (removes only the symlink) then `pnpm install`.
+  - Why not the harness's `worktree.symlinkDirectories` setting: it can only
+    symlink whole directories, which works for the root but would point the
+    workspace-level `node_modules` at the primary checkout — and their
+    `@blog/*` links would then resolve to the _primary checkout's source_,
+    silently building stale code. The `post-checkout` hook produces the
+    farm copies the pnpm layout needs, covers manually created worktrees
+    too, and keeps a single mechanism in charge.
 - **Skills** (`.claude/skills/`):
   - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).

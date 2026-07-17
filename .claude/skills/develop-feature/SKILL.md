@@ -176,8 +176,11 @@ commits are landed on the `feat/` branch and pushed. Remove it: nothing else
 will. The harness only auto-sweeps worktrees that have **no uncommitted
 changes, no untracked files, and no unpushed commits** — and a
 `worktree-agent-*` branch is never pushed under its own name, so these
-accumulate forever otherwise (~1.1 GB each; 26 once piled up). A subagent
-cannot do this itself — it cannot remove the worktree it is standing in.
+accumulate forever otherwise (26 once piled up). Worktrees created since
+issue #410 share the main checkout's `node_modules` (~80 MB each instead of
+~1.2 GB — see README §"Working with Claude Code"), but they still clutter
+`git worktree list` and hold branches. A subagent cannot do this itself — it
+cannot remove the worktree it is standing in.
 
 For each worktree created for this task:
 
@@ -202,9 +205,11 @@ git worktree remove <worktree>                    # never --force
   dirty, leave the worktree and tell the user what is in it.
 - Removal keeps the branch — committed work stays recoverable, which is what
   makes this safe.
-- Deletion is slow (~1.1 GB of `node_modules` each). Remove them one at a time
-  with a generous timeout; an interrupted removal leaves a half-deleted
-  worktree that then needs `--force`.
+- Worktrees created before the shared-`node_modules` change (issue #410) hold
+  a private ~1.1 GB `node_modules`, so their deletion is slow — remove them
+  one at a time with a generous timeout; an interrupted removal leaves a
+  half-deleted worktree that then needs `--force`. Shared-deps worktrees
+  (root `node_modules` is a symlink) remove in seconds.
 - If a worktree still exists after its PR merged, the same checks work against
   `origin/main`.
 
