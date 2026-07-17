@@ -37,15 +37,17 @@ approval. Never bundle them. See `open-pull-request` skill for the full sequence
 - **Fetch the GitHub issue** with `gh issue view <number>` to get the full body
   and acceptance criteria — don't rely solely on what the user said in the prompt.
 - Restate the task and acceptance criteria. Read `SPEC.md` for the contracts.
-- Locate the affected files/layers (Grep/Glob/Read). Identify which workspaces
-  change: `config` (`packages/config`, `packages/utils`, `configs/*`), `cms`,
+- Locate the affected files/layers. Identify which workspaces change:
+  `config` (`packages/config`, `packages/utils`, `configs/*`), `cms`,
   `service`, `ui`, `web`.
 - **If locating them means a broad sweep** — "where does X live", "how does Y
   work", "is there already a Z" — dispatch the **`explore` subagent**
   (`.claude/agents/explore.md`) instead of reading around yourself. It answers
   from a cheap, disposable Haiku context and returns conclusions plus
   `file:line` pointers, so the rediscovery never enters this session's window.
-  Read directly when you already know the file.
+  **Grep/Glob-driven discovery belongs to `explore`, not the orchestrator —**
+  only `Read` a file directly here once you already know it's the one you need
+  (e.g. `explore` pointed at it, or the issue/prior step named it).
 - If the task touches a library API, CLI command, or config format you are not
   certain of, run the `use-context7` skill **before** writing the plan — fetch
   the relevant docs now, not mid-implementation.
