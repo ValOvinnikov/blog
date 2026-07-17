@@ -36,9 +36,12 @@ automatic pipeline; this skill is how the right ones get used in the right order
 ## Use the scoped agents
 
 Delegate layer work to the matching subagent in `.claude/agents/`, in dependency
-order (`cms → service → ui → web`):
-`cms` (schemas/typegen), `service` (data layer), `ui` (design system),
-`web` (frontend/SEO + composition).
+order (`config → cms → service → ui → web` when config changes are involved,
+otherwise `cms → service → ui → web`):
+`config` (`packages/config`, `packages/utils`, `configs/*` — constants, route
+helpers, shared config packages, alias wiring, guards typegen output), `cms`
+(schemas/typegen), `service` (data layer), `ui` (design system), `web`
+(frontend/SEO + composition).
 
 **Orchestrator must not write layer files before delegating.** Do not create
 stub or partial files in a layer owned by a subagent — the subagent owns file
@@ -125,11 +128,12 @@ prompt — do not write it to disk first.
   Report-only (never `--fix`); commit-time gates stay authoritative.
 - Conventional commits, one concern per PR.
 - **Prefer per-layer PRs.** Split a multi-layer feature into separate PRs per
-  layer (`cms → service → ui → web`, dependency order) so each review stays small
-  and focused. **Split only when each layer's PR merges to `main` green on its
-  own** (typically additive changes). Keep it a single PR when a partial merge
-  would break the build — e.g. renaming a shared `_type` or generated type that
-  downstream consumes reds `type-check` until every layer lands.
+  layer (`config → cms → service → ui → web` when config changes are involved,
+  otherwise `cms → service → ui → web`; dependency order) so each review stays
+  small and focused. **Split only when each layer's PR merges to `main` green
+  on its own** (typically additive changes). Keep it a single PR when a partial
+  merge would break the build — e.g. renaming a shared `_type` or generated
+  type that downstream consumes reds `type-check` until every layer lands.
 - **Spec sync:** any PR that changes architecture, layer contracts, env vars,
   or the content model updates `SPEC.md` in the same PR.
 - **README sync:** `README.md` §"CI & automation" documents every workflow in
