@@ -9,7 +9,8 @@ end-to-end TypeScript type safety from schema to screen.
 
 > **Docs:** [`SPEC.md`](./SPEC.md) is the durable product + architecture
 > reference — start there. [`docs/BACKLOG.md`](./docs/BACKLOG.md) is the
-> ticket-ready roadmap. [`IMPLEMENTATION_BRIEF.md`](./IMPLEMENTATION_BRIEF.md)
+> ticket-ready roadmap.
+> [`docs/archive/IMPLEMENTATION_BRIEF.md`](./docs/archive/IMPLEMENTATION_BRIEF.md)
 > is the archived bootstrap playbook (historical only).
 
 ## Stack
@@ -130,14 +131,39 @@ contracts:
     does Y work" sweeps in a cheap, disposable context and returns conclusions
     with `file:line` pointers instead of file dumps, so the orchestrator's
     window isn't spent rediscovering the codebase.
-- **Hooks** (`.claude/hooks/`, wired in `.claude/settings.json`):
-  - `post-edit-lint.sh` — `PostToolUse` hook that lints every agent-edited
-    `.ts`/`.tsx` file and feeds errors — including layer-boundary
-    `no-restricted-imports` violations — back to the agent in the same turn.
-    Report-only (never `--fix`); the commit-time gates stay authoritative.
+
+  `reviewer` and `explore` are read-only by **enforcement**, not just prose
+  (#425): both run under `permissionMode: dontAsk`, so any Bash call the
+  permission engine would prompt for (redirects, `sed -i`, `tee`, unrecognized
+  binaries) is auto-denied, and a per-agent `PreToolUse` guard
+  (`read-only-agent-guard.sh`) denies the write-shaped commands the project
+  allow-list would otherwise admit (`git commit` — including with leading
+  global flags like `git -C dir commit`, `mkdir`, `cp`, `pnpm typegen`,
+  `pnpm exec`/`pnpm --filter ... exec`, …). Residual, accepted: commands that
+  execute package scripts the allow-list doesn't flag as write-shaped
+  (`pnpm test`, `pnpm dev`, `turbo run`) can still write, and the guard's
+  quote-naive segment splitting can false-positive on search patterns
+  containing e.g. `&& mkdir ` — denials tell the agent to fall back to
+  Grep/Read. This is a guardrail against honest confusion, not a security
+  boundary — it doesn't chase further obfuscation (case-insensitive
+  filesystem tricks, path-qualified binaries, wrapper commands); see #397 for
+  why full adversarial-proof text-level enforcement was rejected as not worth
+  its false-positive cost.
+
+- **Hooks** (`.claude/hooks/`):
+  - `post-edit-lint.sh` — `PostToolUse` hook (wired in `.claude/settings.json`)
+    that lints every agent-edited `.ts`/`.tsx` file and feeds errors —
+    including layer-boundary `no-restricted-imports` violations — back to the
+    agent in the same turn. Report-only (never `--fix`); the commit-time gates
+    stay authoritative.
   - `pre-bash-worktree-install-guard.sh` — `PreToolUse` hook that blocks
     dependency-mutating pnpm commands inside a shared-deps agent worktree
     (see below) before pnpm can write anything.
+  - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`
+    and `explore` agent frontmatter, so it fires only for them) backing the
+    read-only enforcement described above. Its deny list mirrors the
+    write-shaped entries in `settings.json` `permissions.allow` — keep the two
+    in sync.
 - **Shared `node_modules` in agent worktrees** — a full `pnpm install` per
   isolated worktree duplicated ~1.1 GB and minutes of setup each time, so
   `.husky/post-checkout` seeds every new linked worktree instead (issue #410):
@@ -182,10 +208,12 @@ contracts:
   - `open-pull-request` — branch → work → PR with human-gated push/PR steps.
   - `use-context7` — fetch live, version-matched library docs before guessing.
 - **Settings** (`.claude/settings.json`) — permission allowlist for the standard
-  pnpm/turbo/sanity/git/gh commands and hook wiring; deploys, `.env` reads, and
-  hand-edits to the generated Sanity types
-  (`packages/config/src/sanity/generated/`, regenerate via `pnpm typegen`) are
-  denied. It also provisions the plugins the repo's own guidance depends on
+  pnpm/turbo/sanity/git/gh commands and hook wiring; deploys and hand-edits to
+  the generated Sanity types (`packages/config/src/sanity/generated/`, regenerate
+  via `pnpm typegen`) are denied, as are reads/writes of real env files
+  (`.env`, `.env.local`, `.env.*.local`) — the tracked `.env.example` templates
+  stay readable and editable so agents can maintain them. It also provisions
+  the plugins the repo's own guidance depends on
   (currently **context7**, required by the `use-context7` skill) via
   `extraKnownMarketplaces` + `enabledPlugins`, so a fresh clone resolves them
   without per-person setup. Opt out locally in `.claude/settings.local.json`.
@@ -196,20 +224,29 @@ contracts:
 All automation lives in `.github/workflows/` (shared pnpm/Node setup in
 `.github/actions/setup`; Dependabot bumps npm + GitHub Actions weekly).
 
-| Workflow                                          | Trigger                                                 | What it does                                                                                                                                                                                                                                                                      |
-| ------------------------------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **CI** (`ci.yml`)                                 | every PR to `main`                                      | The quality gates: **Type-check**, **Lint**, **Test**, **Typegen** (regenerates schema + types and fails if the committed output in `packages/config/src/sanity/generated/` is stale), **Migrations** (loads every migration + read-only dry-run against the dataset), **Build**. |
-| **Dependency Review**                             | every PR to `main`                                      | Blocks dependency changes with known vulnerabilities (`fail-on-severity: high`; no license policy configured).                                                                                                                                                                    |
-| **Zizmor** (`zizmor.yml`)                         | every PR to `main`                                      | Static security analysis of the workflow files themselves.                                                                                                                                                                                                                        |
-| **Claude Code Review** (`claude-code-review.yml`) | PR opened/updated (code paths, owner PRs only)          | Automated AI review posted on the PR; advisory, not a required check.                                                                                                                                                                                                             |
-| **Claude Code** (`claude.yml`)                    | `@claude` mentions (owner-only, owner-authored threads) | Interactive agent runs on issues/PRs.                                                                                                                                                                                                                                             |
-| **Deploy Development** (`deploy-development.yml`) | push to `main` (+ manual dispatch)                      | `turbo-ignore` change detection → verify (type-check/lint/test/build) → auto-apply pending content migrations to the dev dataset → deploy only the affected app(s) to the dev environment.                                                                                        |
-| **Deploy Production** (`deploy-production.yml`)   | `vX.Y.Z` tag push                                       | Verify → back up the production dataset (artifact) → gated prod content migration → deploy Studio + web to production. Cutting a release = pushing a tag, so it stays under the human push gate.                                                                                  |
+| Workflow                                          | Trigger                                                 | What it does                                                                                                                                                                                                                                                                             |
+| ------------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **CI** (`ci.yml`)                                 | every PR to `main`                                      | The quality gates: **Type-check**, **Lint**, **Test**, **Typegen** (regenerates schema + types and fails if the committed output in `packages/config/src/sanity/generated/` is stale), **Migrations** (loads every migration + read-only dry-run against the dataset), **Build**.        |
+| **Dependency Review**                             | every PR to `main`                                      | Blocks dependency changes with known vulnerabilities (`fail-on-severity: high`; no license policy configured).                                                                                                                                                                           |
+| **Zizmor** (`zizmor.yml`)                         | every PR to `main`                                      | Static security analysis of the workflow files themselves.                                                                                                                                                                                                                               |
+| **Actionlint** (`actionlint.yml`)                 | every PR to `main`                                      | Validates the workflow files' syntax, `${{ }}` expressions and `needs` graph, and shellchecks their `run:` blocks — the correctness half that Zizmor's security analysis does not cover. Runs the official binary, pinned by version + sha256 (no third-party action, no curl-to-shell). |
+| **Knip** (`knip.yml`)                             | every PR to `main`                                      | Reports unused files, exports, and dependencies (config in `knip.json`); read-only, fails on any finding or a stale ignore rule. Advisory for now — promoted to a required check after two weeks of zero false positives (human-gated ruleset change).                                   |
+| **Test Presence** (`test-presence.yml`)           | every PR to `main` (incl. label add/remove)             | Advisory nudge: fails when source under `packages/*/src` or `apps/web/src` changes without touching any `*.test.ts(x)` file. Ignores stories, configs, `*.d.ts`, generated types, deletions, and `apps/cms`. Waive with the `no-tests-needed` label; never a required check.             |
+| **Claude Code Review** (`claude-code-review.yml`) | PR opened/updated (code paths, owner PRs only)          | Automated AI review posted on the PR; advisory, not a required check.                                                                                                                                                                                                                    |
+| **Claude Code** (`claude.yml`)                    | `@claude` mentions (owner-only, owner-authored threads) | Interactive agent runs on issues/PRs.                                                                                                                                                                                                                                                    |
+| **Deploy Development** (`deploy-development.yml`) | push to `main` (+ manual dispatch)                      | `turbo-ignore` change detection → verify (type-check/lint/test/build) → auto-apply pending content migrations to the dev dataset → deploy only the affected app(s) to the dev environment.                                                                                               |
+| **Deploy Production** (`deploy-production.yml`)   | `vX.Y.Z` tag push                                       | Verify → back up the production dataset (artifact) → gated prod content migration → deploy Studio + web to production. Cutting a release = pushing a tag, so it stays under the human push gate.                                                                                         |
 
 **Required status checks on `main`:** Type-check, Lint, Test, Typegen, Build,
 Migrations, Dependency Review. Everything else is advisory. CI runs on every
 PR without path filters on purpose — a path-skipped workflow leaves its
 required checks pending forever (see the comment in `ci.yml`).
+
+**Test Presence stays advisory by design.** Refactors, type-only changes, and
+pure re-exports legitimately carry no test delta, so the job nudges rather than
+blocks — don't add it to the required checks. When a change genuinely needs no
+test, apply the `no-tests-needed` label: the override then lives on the PR where
+reviewers can see it, instead of in a bypassed check.
 
 One-time environment setup (datasets, tokens, Vercel projects, secrets,
 webhooks, CORS) is human-gated console work — see [`docs/DEPLOY.md`](./docs/DEPLOY.md)

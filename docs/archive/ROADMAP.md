@@ -1,21 +1,20 @@
-# ROADMAP — Phased Build Plan
+# ROADMAP — Phased Build Plan (archived)
 
-> **For the AI agent:** This is the execution plan. Work **one phase at a time, top to bottom**. Do not start a phase until the previous phase's **Acceptance gate** is fully checked. Tick each `- [ ]` to `- [x]` as you complete it and **commit the roadmap change in the same PR** as the work it tracks. If a task can't pass its gate, stop and report rather than proceeding.
+> **Frozen history — archived 2026-07-17.** This was the original phased build
+> plan that bootstrapped the project. It is **not** current process and is **no
+> longer maintained**. The live roadmap is [`docs/BACKLOG.md`](../BACKLOG.md)
+> and the Blog Build project board; architecture lives in
+> [`SPEC.md`](../../SPEC.md). Where this file disagrees with `SPEC.md`, the spec
+> wins. It is kept only as a record of the original phase plan and what it
+> tracked — do not use it to decide what to work on or how.
 >
-> **Companion docs:** [`SPEC.md`](./SPEC.md) is the durable _why_ + layer contracts; [`IMPLEMENTATION_BRIEF.md`](./IMPLEMENTATION_BRIEF.md) is the bootstrap detail. This file is the _when_ and the progress ledger. Where they conflict, SPEC wins on architecture, this file wins on ordering.
->
-> **Ownership:** each phase names the scoped subagent in `.claude/agents/` that should drive it (`cms`, `service`, `ui`, `web`) plus the relevant skill in `.claude/skills/`.
+> **Companion history:** [`IMPLEMENTATION_BRIEF.md`](./IMPLEMENTATION_BRIEF.md)
+> is the archived bootstrap detail.
 
----
-
-## How to track progress
-
-This file **is** the tracker. The plan and its status live together so there is a single source of truth, reviewable in git history.
-
-- Status legend: `- [ ]` not started · `- [~]` in progress · `- [x]` done · `- [!]` blocked (add a one-line note).
-- One concern per commit/PR (matches SPEC §7). When a PR closes a task, flip its box in the same diff.
-- A phase is "done" only when every box under its **Acceptance gate** is `- [x]`.
-- Optional automation layer (MCP) is described in [Appendix C](#appendix-c--recommended-mcp-servers). If the GitHub MCP is connected, mirror each unchecked task as an Issue and each phase as a milestone; this markdown remains the source of truth.
+**Reading the ledger below:** `- [ ]` not started · `- [~]` in progress ·
+`- [x]` done · `- [!]` blocked. These boxes captured the project's early state
+while this plan was active and were not kept current — treat them as historical,
+not as today's status.
 
 ---
 

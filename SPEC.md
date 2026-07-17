@@ -3,8 +3,9 @@
 > **The single durable reference for this project.** Any PR that changes
 > architecture, contracts, env vars, or the content model must update this file
 > in the same PR (the `code-review-practices` skill enforces this).
-> `IMPLEMENTATION_BRIEF.md` is the archived bootstrap playbook — historical
-> context only; when it disagrees with this document, this document wins.
+> `docs/archive/IMPLEMENTATION_BRIEF.md` is the archived bootstrap playbook —
+> historical context only; when it disagrees with this document, this document
+> wins.
 
 ## 1. Product summary
 
@@ -408,8 +409,11 @@ changing a schema does **not** change existing documents.
 - Storybook stories are part of done for every new/changed `ui` component
   (`ui-storybook` skill) and for `web` compositions (`web-storybook` skill).
 - CI (required checks on PRs to `main`): Type-check, Lint, Test, Typegen,
-  Migrations (load + read-only dry-run), Build — plus zizmor (workflow
-  security), dependency-review, Dependabot, and Claude code review.
+  Migrations (load + read-only dry-run), Build, dependency-review — plus
+  advisory jobs: knip (unused files/exports/dependencies), actionlint + zizmor
+  (workflow lint + security), Dependabot, and Claude code review. knip starts
+  non-required and is promoted to a required check once it has held zero false
+  positives across two weeks of PRs (human-gated ruleset change).
 - Hooks: husky + lint-staged (eslint --fix + prettier on staged files).
 - Conventional commits; one concern per PR.
 
@@ -514,4 +518,4 @@ be layered on without violating the contracts above.
   same PR.
 - The content model section (§6) describes the _current_ schema — update it
   when #250/#251 land.
-- `IMPLEMENTATION_BRIEF.md` is frozen history; do not extend it.
+- `docs/archive/IMPLEMENTATION_BRIEF.md` is frozen history; do not extend it.

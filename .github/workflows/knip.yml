@@ -1,0 +1,51 @@
+name: Knip
+
+on:
+  # No path filter — same reasoning as ci.yml / actionlint.yml. Dead code is
+  # almost never created by editing the file that dies: deleting the last
+  # import of a module is what orphans it, so filtering on the orphan's own
+  # path would miss exactly the change that caused it. Keeping every PR in
+  # scope also means no rework when this is promoted to a required check,
+  # where a path-skipped run would sit "Pending" forever.
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# A force-push/synchronize supersedes the running job for the same ref.
+concurrency:
+  group: knip-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PNPM_VERSION: 9.15.0
+  NODE_VERSION: '22'
+
+jobs:
+  knip:
+    name: Knip
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Read-only: reports unused files/exports/dependencies and exits non-zero
+      # on any finding. Never `--fix` — deleting code is a human decision.
+      #
+      # `--treat-config-hints-as-errors` keeps knip.json itself honest: an
+      # ignore or entry that has become unnecessary (because the code it
+      # covered was fixed or deleted) fails the job instead of silently
+      # rotting into a rule that hides real findings later.
+      #
+      # The github-actions reporter annotates the offending lines in the PR's
+      # Files-changed view; the plain summary still prints to the job log.
+      - name: Knip
+        run: pnpm knip --reporter github-actions --treat-config-hints-as-errors
