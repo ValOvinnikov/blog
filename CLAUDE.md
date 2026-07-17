@@ -189,8 +189,9 @@ Every issue follows this exact order. **Stop and wait for explicit user approval
 7. **Ask to open PR** — separate question, after push; wait for answer.
    Once approved: run `gh pr create`, then **immediately** set the issue → Code Review
    on the board — do not report the PR URL until the board update is done.
-   Then watch CI to completion and fix any failure it surfaces (`open-pull-request`
-   Gate 5a) — a fix push still needs its own fresh push-approval ask, same as any push.
+   Then dispatch `ci-watcher` (background) to watch CI to completion, and
+   diagnose and fix any failure it reports (`open-pull-request` Gate 5a) — a
+   fix push still needs its own fresh push-approval ask, same as any push.
 8. **Remove the subagent worktrees you created** (no gate — just do it). Nothing
    else will: the harness never auto-sweeps them because `worktree-agent-*`
    branches are never pushed. Worktrees share the main checkout's

@@ -162,13 +162,24 @@ contracts:
     destructive-looking moves (e.g. reopening a wrongly-closed issue) for the
     orchestrator instead of applying them. Dispatched after every PR
     open/merge, and on demand.
+  - `ci-watcher` — read-only, Haiku-model watcher for a single PR's CI
+    checks (#464). Dispatched in the background right after `open-pull-request`
+    Gate 5, with the PR's actual number (never the issue number or a bare
+    branch) so it needs no worktree/branch context of its own. Runs
+    `gh pr checks <n> --watch` to a terminal state and reports pass/fail —
+    on failure, the check name, run/job URL, and a raw `--log-failed`
+    excerpt, handed back as data with no root-cause diagnosis or fix
+    suggestion. That replaces running `--watch` synchronously in the
+    orchestrator's own turn, which measured ~3,000–3,500 tokens of polling
+    output landing permanently in its context (paid again every turn until
+    compaction) and blocked the session for the minutes CI took.
 
-  `reviewer`, `a11y-reviewer`, `seo-auditor`, and `explore` are read-only by
-  **enforcement**, not just prose (#425); `test-writer` reuses the same `Bash`
-  guard although it isn't fully read-only (#396). All five run under
-  `permissionMode: dontAsk`, so any Bash call the permission engine would
-  prompt for (redirects, `sed -i`, `tee`, unrecognized binaries) is
-  auto-denied, and a per-agent `PreToolUse` guard (`read-only-agent-guard.sh`)
+  `reviewer`, `a11y-reviewer`, `seo-auditor`, `explore`, and `ci-watcher` are
+  read-only by **enforcement**, not just prose (#425, #464); `test-writer`
+  reuses the same `Bash` guard although it isn't fully read-only (#396). All
+  six run under `permissionMode: dontAsk`, so any Bash call the permission
+  engine would prompt for (redirects, `sed -i`, `tee`, unrecognized binaries)
+  is auto-denied, and a per-agent `PreToolUse` guard (`read-only-agent-guard.sh`)
   denies the write-shaped commands the project allow-list would otherwise
   admit (`git commit` — including with leading global flags like
   `git -C dir commit`, `mkdir`, `cp`, `pnpm typegen`, `pnpm exec`/
@@ -225,8 +236,8 @@ contracts:
     deny/allow matrix, reusing the discarded attempt's proven
     legitimate-command bank; run it directly or via CI (**Hooks**, below).
   - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`,
-    `a11y-reviewer`, `explore`, `seo-auditor`, and `test-writer` agent
-    frontmatter — `test-writer` sets a `GUARD_LABEL` env var on its hook
+    `a11y-reviewer`, `explore`, `seo-auditor`, `ci-watcher`, and `test-writer`
+    agent frontmatter — `test-writer` sets a `GUARD_LABEL` env var on its hook
     command so the deny message names it correctly rather than calling it
     "read-only")
     backing the enforcement described above. Its deny list mirrors the
