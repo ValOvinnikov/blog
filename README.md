@@ -247,6 +247,29 @@ contracts:
     silently building stale code. The `post-checkout` hook produces the
     farm copies the pnpm layout needs, covers manually created worktrees
     too, and keeps a single mechanism in charge.
+- **Env files in agent worktrees** (issue #404) — the same
+  `.husky/post-checkout` hook copies `.env.local`/`.env.*.local` from the
+  primary checkout into every new linked worktree, so `pnpm build` works
+  there without an agent ever touching a real env file directly (the deny
+  rules in `.claude/settings.json` block `Bash(cp *.env*)`/`Bash(mv *.env*)`
+  and Read/Edit/Write on `.env.local` — the hook runs as a git subprocess,
+  invisible to and unaffected by that permission layer). Verified end-to-end:
+  a fresh worktree gets seeded and `pnpm --filter web build` passes green
+  inside it, deny rules active throughout.
+  - **Edge case:** a worktree created before husky's hooks are wired up
+    (i.e. before `pnpm install` has ever run once in the primary checkout —
+    `prepare: husky` in the root `package.json` is what wires them) is
+    created **unseeded**, and an agent cannot self-heal — the deny rules
+    block a manual `cp`/`mv` with no prompt. The resulting build failure is
+    an ordinary missing-env-var error from Next.js/Sanity (a structured
+    `@t3-oss/env-nextjs` "Invalid environment variables" message naming the
+    missing key), not a mystery stack trace; if you hit one in a worktree,
+    first check whether `apps/web/.env.local` exists there at all. Fix is
+    human-only: run `pnpm install` once in the primary checkout (wires the
+    hooks), then either re-create the worktree, or — since hooks are shared
+    across worktrees via the common `.git` dir — trigger a re-seed in the
+    existing one with any `git checkout` (the hook skips already-present
+    files, so it only fills the gaps).
 
 - **Skills** (`.claude/skills/`):
   - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work.
