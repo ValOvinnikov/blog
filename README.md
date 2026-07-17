@@ -202,9 +202,10 @@ contracts:
     dependency-mutating pnpm commands inside a shared-deps agent worktree
     (see below) before pnpm can write anything.
   - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`,
-    `explore`, `seo-auditor`, and `test-writer` agent frontmatter —
-    `test-writer` sets a `GUARD_LABEL` env var on its hook command so the
-    deny message names it correctly rather than calling it "read-only")
+    `a11y-reviewer`, `explore`, `seo-auditor`, and `test-writer` agent
+    frontmatter — `test-writer` sets a `GUARD_LABEL` env var on its hook
+    command so the deny message names it correctly rather than calling it
+    "read-only")
     backing the enforcement described above. Its deny list mirrors the
     write-shaped entries in `settings.json` `permissions.allow` — keep the
     two in sync. `read-only-agent-guard.test.sh` pins the deny/allow matrix
