@@ -72,7 +72,12 @@
       "Bash(printenv:*)",
       "Bash(env)",
       "Bash(pnpm --filter cms deploy:*)",
-      "Bash(npx sanity deploy:*)"
+      "Bash(npx sanity deploy:*)",
+      "Bash(vercel --prod:*)",
+      "Bash(vercel deploy --prod:*)",
+      "Bash(vercel promote:*)",
+      "Bash(vercel rollback:*)",
+      "mcp__plugin_vercel_vercel__deploy_to_vercel"
     ]
   },
   "extraKnownMarketplaces": {
@@ -84,7 +89,10 @@
     }
   },
   "enabledPlugins": {
-    "context7@claude-plugins-official": true
+    "context7@claude-plugins-official": true,
+    "vercel@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
   },
   "worktree": {
     "baseRef": "head"

@@ -67,6 +67,24 @@ prompt — do not write it to disk first.
   of — resolves live, version-matched docs via the context7 MCP server. Use
   whenever you hit a deprecation, an unfamiliar config format, or a CLI flag you
   would otherwise guess at.
+- `superpowers:systematic-debugging` on any bug or failing test, before
+  proposing a fix.
+- `superpowers:test-driven-development` when implementing any feature or
+  bugfix, before writing implementation code — pairs with this repo's own
+  `testing-practices` for what a good test looks like here.
+- `superpowers:verification-before-completion` before any "done"/"fixed"/
+  "passing" claim — run the verification commands and confirm their output
+  first.
+- `superpowers:writing-skills` when creating or editing anything under
+  `.claude/skills/`.
+- `vercel:nextjs` for App Router / Server Components / Next.js API work in
+  `apps/web`.
+- `vercel:next-cache-components` for caching, ISR, or Partial Prerendering
+  work in `apps/web`.
+- `vercel:deployments-cicd` when changing the deploy pipeline or
+  `.github/workflows/` CI config.
+- `frontend-design:frontend-design` for visual design work in `packages/ui`
+  or `apps/web`.
 
 ## Conventions
 
@@ -205,7 +223,13 @@ push, so it stays under the push gate.
 ## Don't
 
 - Run `sanity deploy` / Vercel deploys by hand (the pipeline owns them;
-  console setup is human-gated).
+  console setup is human-gated) — this includes the `vercel` plugin's
+  `/deploy` command, `deployment-expert` subagent, and `deploy_to_vercel`
+  MCP tool; `.claude/settings.json` denies the underlying `vercel --prod` /
+  `vercel deploy --prod` / `vercel promote` / `vercel rollback` commands and
+  the MCP tool as a backstop, but treat `vercel:deployments-cicd` and the
+  plugin's commands as read-only reasoning aids, never a way to trigger a
+  deploy.
 - Read or commit `.env*` files.
 - Add a cross-layer import that creates a cycle.
 - Commit, push, or open a PR without explicit approval for that specific action.
