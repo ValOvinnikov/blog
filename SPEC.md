@@ -465,9 +465,13 @@ and release runbook live in `docs/DEPLOY.md`; this is the shape.
   wired as **environment-scoped** GitHub secrets/variables (the `development` and
   `production` GitHub Environments) so each deploy job resolves its own project.
 - Two Vercel projects give full isolation. **Both** have Vercel's Git auto-deploy
-  disabled (Ignored Build Step `exit 0`) and are deployed **only** via the Vercel
-  CLI from GitHub Actions — so nothing deploys pre-merge, there are **no PR
-  preview deploys**, and a `main` push can never reach production.
+  disabled — declaratively, via `apps/web/vercel.json`'s
+  `git.deploymentEnabled: false` (#445; both projects share Root Directory
+  `apps/web`, so one committed file governs both, unlike the previous
+  per-project console "Ignored Build Step" setting it replaced) — and are
+  deployed **only** via the Vercel CLI from GitHub Actions — so nothing
+  deploys pre-merge, there are **no PR preview deploys**, and a `main` push
+  can never reach production.
 - **Deploys are CI-gated.** Each workflow runs a `verify` job
   (type-check/lint/test/build) that the deploy jobs `needs`, so a deploy happens
   only after checks pass on the exact commit:
