@@ -492,16 +492,16 @@ inside the layer contracts:
 - **Subagents** (`.claude/agents/`): `config`, `cms`, `service`, `ui`, `web` —
   each scoped to one workspace, delegated in dependency order
   (`config → cms → service → ui → web`). The orchestrator never writes layer
-  files before delegating. Plus read-only subagents dispatched alongside the
-  layer work, all gating the commit ask the same way `reviewer` does when
-  dispatched: `reviewer` (pre-commit review of the full diff — must return
-  `APPROVE` before the orchestrator may ask to commit), `a11y-reviewer`
-  (accessibility audit of `packages/ui`/`apps/web` diffs against
-  `ui-library-practices`' non-negotiable rules), `seo-auditor` (SEO/metadata
-  audit whenever a diff touches `apps/web` routes, metadata, structured data,
-  or feeds, applying the `seo-and-metadata` skill as its checklist), and
-  `explore`, a Haiku discovery scout that answers broad "where / how /
-  whether" questions in a disposable context and returns conclusions with
+  files before delegating. Plus read-only reviewers, each gating the commit
+  ask the same way `reviewer` does when dispatched: `reviewer` (pre-commit
+  review of the full diff — must return `APPROVE` before the orchestrator may
+  ask to commit), `a11y-reviewer` (accessibility audit of
+  `packages/ui`/`apps/web` diffs against `ui-library-practices`'
+  non-negotiable rules), and `seo-auditor` (SEO/metadata audit whenever a
+  diff touches `apps/web` routes, metadata, structured data, or feeds,
+  applying the `seo-and-metadata` skill as its checklist). `explore` is a
+  separate, non-gating Haiku discovery scout that answers broad "where / how
+  / whether" questions in a disposable context and returns conclusions with
   `file:line` pointers, keeping that reading out of the orchestrator's
   window. `test-writer` adds/extends co-located `*.test.ts(x)` coverage after
   the layer agents finish, scoped to test files by enforcement. `board-keeper`
