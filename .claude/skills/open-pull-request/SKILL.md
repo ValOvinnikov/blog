@@ -179,61 +179,56 @@ after Gate 5) — but the pipeline it drives when a check fails still passes
 through the normal push-approval gate (Gate 3) every single time, fresh, no
 exceptions.
 
-1. **Watch the checks:**
-
-   ```
-   gh pr checks --watch
-   ```
-
-   Run this with **no argument.** Per `gh pr checks --help`: "Without an
-   argument, the pull request that belongs to the current branch is
-   selected" — exactly right here, since you're still on the branch Gate 4
-   just created the PR from. Do **not** pass the issue number `<n>`: issues
+1. **Extract the PR number and dispatch `ci-watcher`** (primary mechanism,
+   #464). `gh pr create`'s stdout (Gate 4) already printed the PR URL, e.g.
+   `https://github.com/ValOvinnikov/blog/pull/478` — take the trailing
+   number. Dispatch the **`ci-watcher` subagent**
+   (`.claude/agents/ci-watcher.md`) via the Agent tool with
+   `run_in_background: true`, passing that number explicitly: "watch PR #478
+   to completion." **Never pass the branch or the issue number** — issues
    and PRs share one counter, so the PR opened for issue #`<n>` is almost
-   never numbered `<n>` itself — passing it would watch the wrong PR (or one
-   that doesn't exist).
+   never numbered `<n>` itself; passing it would watch the wrong PR (or one
+   that doesn't exist) — this is the exact bug the reviewer caught during
+   #461's first pass.
 
-   This blocks synchronously until every check reaches a terminal state
+   `ci-watcher` runs `gh pr checks <n> --watch` on your behalf and blocks
+   _its own_ turn until every check reaches a terminal state
    (success/failure/skipped) — typically a few minutes for this repo's
-   workflows. Treat that wait as normal foreground work, not something to
-   background or schedule around: `--watch` returns on its own once CI
-   settles, so there's no separate polling loop to build.
+   workflows. Because it's dispatched in the background, your own turn is
+   not blocked: continue other queued work (or respond to the user) until
+   notified. This is the reason the watch loop is delegated at all — run
+   inline, `--watch`'s polling refreshes land permanently in your own
+   context (measured at ~3,000–3,500 tokens for one real PR), paid again on
+   every subsequent turn until compaction; delegated, that cost is paid in
+   `ci-watcher`'s own disposable context instead.
 
-   **Fallback** if `--watch` isn't available (old `gh` version) or the
-   session genuinely can't stay attached that long: run one non-blocking
-   check instead (same no-argument form) —
+   **Fallback** if dispatching a subagent isn't viable (background dispatch
+   unsupported in the current environment, or another reason a subagent
+   genuinely can't be used here) — fall back to watching directly, same as
+   before #464: run one non-blocking check yourself, with the explicit PR
+   number, never `--watch` synchronously —
 
    ```
-   gh pr checks
+   gh pr checks <n>
    ```
 
    — report the result honestly, including "pending" if checks haven't
    finished, and tell the user a manual re-check may be needed later (e.g.
-   "run `gh pr checks` again in a few minutes"). Never let CI status go
+   "run `gh pr checks <n>` again in a few minutes"). Never let CI status go
    unreported because the session moved on; a silent "I'll assume it's
    fine" is exactly the gap this gate closes.
 
-2. **All green:** report that explicitly alongside the PR URL. Nothing
-   further to do — Gate 6 governs from here.
+2. **`ci-watcher` reports all green:** report that explicitly alongside the
+   PR URL. Nothing further to do — Gate 6 governs from here.
 
-3. **Any check fails — required or not.** A check outside the required list
-   (see the companion issue #462, which promotes some of these to required)
-   is not exempt: "not required to merge" is not "safe to ignore." For each
-   failing check:
+3. **`ci-watcher` reports a failure — required or not.** A check outside the
+   required list (see the companion issue #462, which promotes some of these
+   to required) is not exempt: "not required to merge" is not "safe to
+   ignore." `ci-watcher`'s report hands you the failing check name(s), the
+   run/job URL, and a raw `--log-failed` excerpt as data — it does not
+   diagnose or suggest a fix; that stays your job:
 
-   - List the checks to find the failing job/workflow name (no argument,
-     same current-branch PR as above):
-     ```
-     gh pr checks
-     ```
-   - Find the run and pull its failing job's log:
-     ```
-     gh run list --branch <branch> --limit 5
-     gh run view <run-id> --log-failed
-     ```
-     (or, for one job's raw log directly:
-     `gh api repos/ValOvinnikov/blog/actions/jobs/<job-id>/logs`).
-   - Read the log and name the precise cause — compiler/lint error with
+   - Read the excerpt and name the precise cause — compiler/lint error with
      file:line, the specific failing test name and assertion, a typegen
      drift diff, etc. "CI failed" is not a diagnosis; report what actually
      broke.
@@ -247,7 +242,8 @@ exceptions.
    - **Ask to push again — a fresh, explicit approval, exactly like Gate 3.**
      A push made to fix CI is still a push. The approval for the original
      push does not cover it; ask every time, same branch or not.
-   - Once pushed, go back to step 1 and re-watch.
+   - Once pushed, re-dispatch `ci-watcher` on the same PR number (or repeat
+     step 1's fallback) and go back to step 2.
 
 4. **Stop and ask the human** instead of guessing when a failure isn't
    safely automatable — a genuine design/behavior question the fix would
