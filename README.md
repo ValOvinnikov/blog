@@ -134,6 +134,12 @@ contracts:
     does Y work" sweeps in a cheap, disposable context and returns conclusions
     with `file:line` pointers instead of file dumps, so the orchestrator's
     window isn't spent rediscovering the codebase.
+  - `seo-auditor` — read-only SEO/metadata audit of the full diff, dispatched
+    alongside `reviewer` (never instead of it) whenever a change touches
+    `apps/web` routes, metadata, structured data, or feeds. Applies the
+    `seo-and-metadata` skill as a checklist (`generateMetadata` completeness,
+    JSON-LD validity, sitemap/robots/RSS coherence) and reports a verdict in
+    the same `APPROVE` / blocking / non-blocking / not-checked format.
   - `board-keeper` — reconciles the Blog Build project board against repo
     reality (open PR → issue in Code Review, in-flight branch → In Progress,
     merged PR → issue Done). Re-queries every status write it makes to catch
@@ -142,23 +148,23 @@ contracts:
     orchestrator instead of applying them. Dispatched after every PR
     open/merge, and on demand.
 
-  `reviewer` and `explore` are read-only by **enforcement**, not just prose
-  (#425): both run under `permissionMode: dontAsk`, so any Bash call the
-  permission engine would prompt for (redirects, `sed -i`, `tee`, unrecognized
-  binaries) is auto-denied, and a per-agent `PreToolUse` guard
-  (`read-only-agent-guard.sh`) denies the write-shaped commands the project
-  allow-list would otherwise admit (`git commit` — including with leading
-  global flags like `git -C dir commit`, `mkdir`, `cp`, `pnpm typegen`,
-  `pnpm exec`/`pnpm --filter ... exec`, …). Residual, accepted: commands that
-  execute package scripts the allow-list doesn't flag as write-shaped
-  (`pnpm test`, `pnpm dev`, `turbo run`) can still write, and the guard's
-  quote-naive segment splitting can false-positive on search patterns
-  containing e.g. `&& mkdir ` — denials tell the agent to fall back to
-  Grep/Read. This is a guardrail against honest confusion, not a security
-  boundary — it doesn't chase further obfuscation (case-insensitive
-  filesystem tricks, path-qualified binaries, wrapper commands); see #397 for
-  why full adversarial-proof text-level enforcement was rejected as not worth
-  its false-positive cost.
+  `reviewer`, `explore`, and `seo-auditor` are read-only by **enforcement**,
+  not just prose (#425): all three run under `permissionMode: dontAsk`, so
+  any Bash call the permission engine would prompt for (redirects, `sed -i`,
+  `tee`, unrecognized binaries) is auto-denied, and a per-agent `PreToolUse`
+  guard (`read-only-agent-guard.sh`) denies the write-shaped commands the
+  project allow-list would otherwise admit (`git commit` — including with
+  leading global flags like `git -C dir commit`, `mkdir`, `cp`,
+  `pnpm typegen`, `pnpm exec`/`pnpm --filter ... exec`, …). Residual,
+  accepted: commands that execute package scripts the allow-list doesn't
+  flag as write-shaped (`pnpm test`, `pnpm dev`, `turbo run`) can still
+  write, and the guard's quote-naive segment splitting can false-positive on
+  search patterns containing e.g. `&& mkdir ` — denials tell the agent to
+  fall back to Grep/Read. This is a guardrail against honest confusion, not
+  a security boundary — it doesn't chase further obfuscation
+  (case-insensitive filesystem tricks, path-qualified binaries, wrapper
+  commands); see #397 for why full adversarial-proof text-level enforcement
+  was rejected as not worth its false-positive cost.
 
 - **Hooks** (`.claude/hooks/`):
   - `post-edit-prettier.sh` → `post-edit-lint.sh` — `PostToolUse` hooks (wired
@@ -178,9 +184,9 @@ contracts:
   - `pre-bash-worktree-install-guard.sh` — `PreToolUse` hook that blocks
     dependency-mutating pnpm commands inside a shared-deps agent worktree
     (see below) before pnpm can write anything.
-  - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`
-    and `explore` agent frontmatter, so it fires only for them) backing the
-    read-only enforcement described above. Its deny list mirrors the
+  - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`,
+    `explore`, and `seo-auditor` agent frontmatter, so it fires only for them)
+    backing the read-only enforcement described above. Its deny list mirrors the
     write-shaped entries in `settings.json` `permissions.allow` — keep the two
     in sync. `read-only-agent-guard.test.sh` pins the deny/allow matrix
     (including the bypasses found across #425's review rounds); run it

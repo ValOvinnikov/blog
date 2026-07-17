@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse guard for the read-only subagents (reviewer, explore) — issue #425.
+# PreToolUse guard for the read-only subagents (reviewer, explore, seo-auditor) — issue #425.
 #
 # Wired in each agent's frontmatter, so it fires ONLY for that agent's Bash
 # calls; layer agents (cms/service/ui/web) never see it. It works together
