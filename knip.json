@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/knip@6.27.0/schema.json",
+  // Design specs, an HTML mockup and a reference ThemeToggle — material for
+  // humans, in no workspace, never built or imported. Not source, so nothing
+  // here can be "unused".
+  "ignore": ["design-reference/**"],
+  "workspaces": {
+    "apps/cms": {
+      // Each migration's default export is loaded by the Sanity CLI
+      // (`sanity migrations run`), never imported from source. Listing them as
+      // entries — rather than ignoring them — keeps their own imports analysed.
+      // This replaces the default `{index,cli,main}` entry patterns, which match
+      // nothing here; the Sanity plugin still contributes sanity.{config,cli}.ts.
+      "entry": ["migrations/*/index.ts"]
+    },
+    "packages/service": {
+      // Reachable only through a string in vitest.config.ts's `resolve.alias`,
+      // which knip cannot follow. src/index.ts needs no entry of its own — it is
+      // already detected from package.json `exports`.
+      "entry": ["src/testing/server-only-stub.ts"]
+    }
+  }
+}

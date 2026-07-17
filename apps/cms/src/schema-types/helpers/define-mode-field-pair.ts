@@ -5,11 +5,8 @@ import { defineField } from 'sanity';
 /** Parent shape shared by any object using mode/custom field pairs (e.g. `module_hero`). */
 export type TModeFieldPairParent = Record<string, THeroFieldMode | undefined>;
 
-export const isMode = (
-  parent: unknown,
-  key: string,
-  mode: THeroFieldMode,
-): boolean => (parent as TModeFieldPairParent | undefined)?.[key] === mode;
+const isMode = (parent: unknown, key: string, mode: THeroFieldMode): boolean =>
+  (parent as TModeFieldPairParent | undefined)?.[key] === mode;
 
 type TModeFieldPair = {
   /** Base field name — the mode field is `${name}Mode`. */

@@ -26,5 +26,3 @@ export function makeRawAuthor(overrides: Partial<TRawAuthor> = {}): TRawAuthor {
     ...overrides,
   };
 }
-
-export { makeRawImage };
