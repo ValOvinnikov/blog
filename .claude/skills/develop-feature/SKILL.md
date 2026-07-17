@@ -199,11 +199,14 @@ re-run from that step — do not proceed with any red check.
 
 ## 7. Hand off to the gate sequence
 
-- Follow Gates 2–5 in `open-pull-request` exactly:
+- Follow Gates 2–5a in `open-pull-request` exactly:
   - Gate 2: ask to commit (or wait for review)
   - Gate 3: ask to push (separate, explicit approval)
   - Gate 4: ask to create the PR (separate, explicit approval)
   - Gate 5: set status → Code Review immediately after PR is created
+  - Gate 5a: watch CI to completion and fix any failure it surfaces — see
+    `open-pull-request` for the full mechanics (any resulting push still
+    needs its own fresh Gate 3 approval)
 - **Then dispatch `board-keeper`** (`.claude/agents/board-keeper.md`) — no
   approval needed, it's not a gate. It re-queries the status write Gate 5 just
   made to confirm it actually stuck (`gh project item-edit` has silently
