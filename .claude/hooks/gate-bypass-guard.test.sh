@@ -52,6 +52,10 @@ block 'git push --force-with-lease=main:abc123 origin main'
 block 'git push origin +main'
 block 'git config core.hooksPath /dev/null'
 block 'git config --global core.hooksPath /dev/null'
+# The bare no-value form is technically a read in real git, but this guard
+# deliberately does not special-case it (see gate-bypass-guard.js's comment
+# on CONFIG_READ_FLAGS) — pinned here so a future edit can't silently flip it.
+block 'git config core.hooksPath'
 # git config keys are case-insensitive, so this is still a plain, literal form.
 block 'git config CORE.HOOKSPATH /dev/null'
 # A chained command is still a plain, single-line form.
@@ -71,6 +75,32 @@ block 'git --exec-path /foo commit --no-verify'
 # all, and this case falls out of that for free.
 block 'git status
 git push --force origin main'
+# Unquoted $(...) / backtick command substitution is a value, not a
+# statement separator — reviewer-found gap (#454): without this, the
+# substitution fractured a single git invocation into a trailing segment
+# that no longer started with `git` and the --no-verify slipped through.
+# shellcheck disable=SC2016 # the $(...) / backtick must reach the guard unexpanded
+block 'git commit -m $(echo hi) --no-verify'
+# shellcheck disable=SC2016
+block 'git commit -m `echo hi` --no-verify'
+# A `)` or `(` inside a quoted string WITHIN the $(...) must not corrupt the
+# paren-depth count — reviewer-found gap: a naive counter closed the
+# substitution one char early on the quoted `)`, and the stray `"` that
+# followed was misread as a new unterminated double-quote region that
+# swallowed the real trailing --no-verify into a value token (real bash
+# parses all three of these as plain, unrelated args reaching git).
+# shellcheck disable=SC2016
+block 'git commit -m $(echo "abc)") --no-verify'
+# shellcheck disable=SC2016
+block 'git commit -m $(echo '"'"'bad)'"'"') --no-verify'
+# shellcheck disable=SC2016
+block 'git commit -m $(echo "(") --no-verify'
+# A backtick substitution NESTED inside $(...) must be consumed as its own
+# atomic span too, so a paren inside it can't corrupt the outer depth count
+# — reviewer-found gap (#454 round 2): a bare `)` inside backticks was
+# previously counted toward the $(...) depth and closed it early.
+# shellcheck disable=SC2016
+block 'git commit -m $(echo `echo )`) --no-verify'
 
 # --- must ALLOW: the repo's own workflow (from ecc1092's ALLOW bank) --------
 allow 'git commit -q -m "chore: x"'
@@ -94,6 +124,11 @@ allow 'git status'
 allow 'git config user.name "Val"'
 allow 'pnpm build'
 allow 'echo hello'
+# --get*-style reads of core.hooksPath are harmless — reviewer-found false
+# positive (#454): these were blocked identically to a real write.
+allow 'git config --get core.hooksPath'
+allow 'git config --get-all core.hooksPath'
+allow 'git config --get-regexp core.hooksPath'
 
 # --- must ALLOW: lookalikes that are NOT bypasses (from ecc1092) -----------
 # -n is --dry-run for push, --no-stat for merge, --dry-run for clean; only
@@ -138,6 +173,20 @@ allow 'GIT push --force origin main'                  # case-insensitive filesys
 allow '/usr/bin/git push --force origin main'         # path-qualified binary
 allow 'sudo git push --force origin main'             # wrapper command
 allow 'bash -c "git push --force"'                    # shell recursion
+# A backslash-escaped quote inside $(...), used to hide a flag, is the same
+# quote-splitting trick as `--no-ver"ify"` above — the plain top-level form
+# of this trick already isn't chased; this is that same gap, not a new one.
+# shellcheck disable=SC2016
+allow 'git commit -m $(echo \"abc\)\") --no-verify'  # quote-split flag, nested in $(...)
+# $'...' (ANSI-C quoting) isn't recognized as its own quote form — the
+# tokenizer treats it as plain '...' with no backslash-escape awareness, so
+# \' inside it isn't seen as an escaped close — #454 round 3, found by direct
+# adversarial testing, not chased further per the same "stop here" call as
+# the two gaps above.
+# shellcheck disable=SC2016,SC1003 # the \' is literal test payload, not an escape attempt
+allow 'git commit -m $'"'"'x\'"'"'y'"'"' --no-verify' # ANSI-C quoting, top level
+# shellcheck disable=SC2016,SC1003
+allow 'git commit -m $(echo $'"'"'x\'"'"'y'"'"') --no-verify' # ANSI-C quoting, nested in $(...)
 
 if [ "$fails" -eq 0 ]; then
 	echo "gate-bypass-guard: all cases pass"
