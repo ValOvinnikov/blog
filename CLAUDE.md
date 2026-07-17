@@ -121,11 +121,14 @@ prompt — do not write it to disk first.
   `apps/cms/migrations/` (`README.md` + `migrate:dry`/`migrate:run`/`dataset:export`).
   Migrations against `production` are human-gated like `sanity deploy`.
 - Verify with `pnpm type-check`, `pnpm lint`, `pnpm test`, `pnpm build` from root.
-- **Edit-time lint feedback:** a checked-in `PostToolUse` hook
-  (`.claude/hooks/post-edit-lint.sh`, wired in `.claude/settings.json`) lints
-  every edited/written `.ts`/`.tsx` file and feeds errors — including
-  layer-boundary violations — straight back to the agent in the same turn.
-  Report-only (never `--fix`); commit-time gates stay authoritative.
+- **Edit-time format + lint feedback:** checked-in `PostToolUse` hooks
+  (`.claude/hooks/post-edit-prettier.sh` then `.claude/hooks/post-edit-lint.sh`,
+  chained as one command in `.claude/settings.json` since matching hooks
+  otherwise run in parallel) format every edited/written file with Prettier,
+  then lint every `.ts`/`.tsx` file on the formatted content and feed errors —
+  including layer-boundary violations — straight back to the agent in the
+  same turn. Prettier is silent and always exits 0 (formatting, not review);
+  lint stays report-only (never `--fix`); commit-time gates stay authoritative.
 - Conventional commits, one concern per PR.
 - **Prefer per-layer PRs.** Split a multi-layer feature into separate PRs per
   layer (`config → cms → service → ui → web` when config changes are involved,
@@ -161,10 +164,23 @@ Every issue follows this exact order. **Stop and wait for explicit user approval
    on the board — do not report the PR URL until the board update is done.
 8. **Remove the subagent worktrees you created** (no gate — just do it). Nothing
    else will: the harness never auto-sweeps them because `worktree-agent-*`
-   branches are never pushed, and they cost ~1.1 GB each. See `develop-feature`
-   step 8 for the safety checks — never delete uncommitted work.
+   branches are never pushed. Worktrees share the main checkout's
+   `node_modules` (README §"Working with Claude Code"), but they still pile
+   up. See `develop-feature` step 8 for the safety checks — never delete
+   uncommitted work.
 
 **Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work only — never the commit, push, or PR.** Those three gates always require fresh, explicit confirmation.
+
+**Board reconciliation (not a gate — no approval needed).** After step 7 opens
+a PR, and again after any PR merges, dispatch the `board-keeper` subagent
+(`.claude/agents/board-keeper.md`). Board mutations have silently failed
+before — it re-queries every status write it makes to confirm it actually
+stuck, and sweeps the whole board for drift (not just the issue you were
+working), not only the status you just set. It never edits code and only
+applies safe, forward-only status corrections; anything that looks
+destructive (e.g. reopening a wrongly-closed issue) comes back in its report
+for you to act on. Also dispatch it on demand whenever asked to "reconcile
+the board."
 
 ## Deployment
 

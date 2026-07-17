@@ -465,9 +465,13 @@ and release runbook live in `docs/DEPLOY.md`; this is the shape.
   wired as **environment-scoped** GitHub secrets/variables (the `development` and
   `production` GitHub Environments) so each deploy job resolves its own project.
 - Two Vercel projects give full isolation. **Both** have Vercel's Git auto-deploy
-  disabled (Ignored Build Step `exit 0`) and are deployed **only** via the Vercel
-  CLI from GitHub Actions — so nothing deploys pre-merge, there are **no PR
-  preview deploys**, and a `main` push can never reach production.
+  disabled — declaratively, via `apps/web/vercel.json`'s
+  `git.deploymentEnabled: false` (#445; both projects share Root Directory
+  `apps/web`, so one committed file governs both, unlike the previous
+  per-project console "Ignored Build Step" setting it replaced) — and are
+  deployed **only** via the Vercel CLI from GitHub Actions — so nothing
+  deploys pre-merge, there are **no PR preview deploys**, and a `main` push
+  can never reach production.
 - **Deploys are CI-gated.** Each workflow runs a `verify` job
   (type-check/lint/test/build) that the deploy jobs `needs`, so a deploy happens
   only after checks pass on the exact commit:
@@ -488,12 +492,20 @@ inside the layer contracts:
 - **Subagents** (`.claude/agents/`): `config`, `cms`, `service`, `ui`, `web` —
   each scoped to one workspace, delegated in dependency order
   (`config → cms → service → ui → web`). The orchestrator never writes layer
-  files before delegating. Plus `reviewer` — a read-only pre-commit reviewer
-  dispatched over the full diff before the commit gate; it must return
-  `APPROVE` before the orchestrator may ask to commit — and `explore`, a
-  read-only Haiku discovery scout that answers broad "where / how / whether"
-  questions in a disposable context and returns conclusions with `file:line`
-  pointers, keeping that reading out of the orchestrator's window.
+  files before delegating. Plus read-only subagents dispatched alongside the
+  layer work, all gating the commit ask the same way `reviewer` does when
+  dispatched: `reviewer` (pre-commit review of the full diff — must return
+  `APPROVE` before the orchestrator may ask to commit), `a11y-reviewer`
+  (accessibility audit of `packages/ui`/`apps/web` diffs against
+  `ui-library-practices`' non-negotiable rules), `seo-auditor` (SEO/metadata
+  audit whenever a diff touches `apps/web` routes, metadata, structured data,
+  or feeds, applying the `seo-and-metadata` skill as its checklist), and
+  `explore`, a Haiku discovery scout that answers broad "where / how /
+  whether" questions in a disposable context and returns conclusions with
+  `file:line` pointers, keeping that reading out of the orchestrator's
+  window. `test-writer` adds/extends co-located `*.test.ts(x)` coverage after
+  the layer agents finish, scoped to test files by enforcement. `board-keeper`
+  reconciles the project board against repo reality after every PR open/merge.
 - **Skills** (`.claude/skills/`): `develop-feature` (lifecycle + delegation —
   the entry point for any non-trivial task), `add-content-type` (cross-layer
   recipe), `cms-schema-practices` (schema + migration quality bar),
