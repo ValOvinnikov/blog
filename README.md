@@ -134,6 +134,18 @@ contracts:
     does Y work" sweeps in a cheap, disposable context and returns conclusions
     with `file:line` pointers instead of file dumps, so the orchestrator's
     window isn't spent rediscovering the codebase.
+  - `test-writer` — adds/extends co-located `*.test.ts(x)` coverage after the
+    layer agents finish implementing, so test quality doesn't depend on each
+    layer agent's leftover attention at the end of its run. Scoped to test
+    files by **enforcement** (#396) on both tool surfaces it has: a
+    `PreToolUse` guard (`test-writer-scope-guard.sh`) denies any `Edit`/
+    `Write` outside `*.test.ts(x)`, and `permissionMode: dontAsk` +
+    `read-only-agent-guard.sh` (reused as-is from `reviewer`/`explore` below)
+    denies the same write-shaped `Bash` commands — closing the `mv`/`cp`
+    bypass that would otherwise move or overwrite a file outside the
+    Edit/Write check entirely. A needed product-code change comes back as a
+    finding for the orchestrator to route, never a fix this agent makes
+    itself.
   - `seo-auditor` — read-only SEO/metadata audit of the full diff, dispatched
     alongside `reviewer` (never instead of it) whenever a change touches
     `apps/web` routes, metadata, structured data, or feeds. Applies the
@@ -148,23 +160,7 @@ contracts:
     orchestrator instead of applying them. Dispatched after every PR
     open/merge, and on demand.
 
-  `reviewer`, `explore`, and `seo-auditor` are read-only by **enforcement**,
-  not just prose (#425): all three run under `permissionMode: dontAsk`, so
-  any Bash call the permission engine would prompt for (redirects, `sed -i`,
-  `tee`, unrecognized binaries) is auto-denied, and a per-agent `PreToolUse`
-  guard (`read-only-agent-guard.sh`) denies the write-shaped commands the
-  project allow-list would otherwise admit (`git commit` — including with
-  leading global flags like `git -C dir commit`, `mkdir`, `cp`,
-  `pnpm typegen`, `pnpm exec`/`pnpm --filter ... exec`, …). Residual,
-  accepted: commands that execute package scripts the allow-list doesn't
-  flag as write-shaped (`pnpm test`, `pnpm dev`, `turbo run`) can still
-  write, and the guard's quote-naive segment splitting can false-positive on
-  search patterns containing e.g. `&& mkdir ` — denials tell the agent to
-  fall back to Grep/Read. This is a guardrail against honest confusion, not
-  a security boundary — it doesn't chase further obfuscation
-  (case-insensitive filesystem tricks, path-qualified binaries, wrapper
-  commands); see #397 for why full adversarial-proof text-level enforcement
-  was rejected as not worth its false-positive cost.
+  `reviewer`, `explore`, and `seo-auditor` are read-only by **enforcement**, not just prose (#425); `test-writer` reuses the same `Bash` guard although it isn't fully read-only (#396). All four run under `permissionMode: dontAsk`, so any Bash call the permission engine would prompt for (redirects, `sed -i`, `tee`, unrecognized binaries) is auto-denied, and a per-agent `PreToolUse` guard (`read-only-agent-guard.sh`) denies the write-shaped commands the project allow-list would otherwise admit (`git commit` — including with leading global flags like `git -C dir commit`, `mkdir`, `cp`, `pnpm typegen`, `pnpm exec`/`pnpm --filter ... exec`, …). Residual, accepted: commands that execute package scripts the allow-list doesn't flag as write-shaped (`pnpm test`, `pnpm dev`, `turbo run`) can still write, and the guard's quote-naive segment splitting can false-positive on search patterns containing e.g. `&& mkdir ` — denials tell the agent to fall back to Grep/Read. This is a guardrail against honest confusion, not a security boundary — it doesn't chase further obfuscation (case-insensitive filesystem tricks, path-qualified binaries, wrapper commands); see #397 for why full adversarial-proof text-level enforcement was rejected as not worth its false-positive cost.
 
 - **Hooks** (`.claude/hooks/`):
   - `post-edit-prettier.sh` → `post-edit-lint.sh` — `PostToolUse` hooks (wired
@@ -185,12 +181,18 @@ contracts:
     dependency-mutating pnpm commands inside a shared-deps agent worktree
     (see below) before pnpm can write anything.
   - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`,
-    `explore`, and `seo-auditor` agent frontmatter, so it fires only for them)
-    backing the read-only enforcement described above. Its deny list mirrors the
-    write-shaped entries in `settings.json` `permissions.allow` — keep the two
-    in sync. `read-only-agent-guard.test.sh` pins the deny/allow matrix
+    `explore`, `seo-auditor`, and `test-writer` agent frontmatter —
+    `test-writer` sets a `GUARD_LABEL` env var on its hook command so the
+    deny message names it correctly rather than calling it "read-only")
+    backing the enforcement described above. Its deny list mirrors the
+    write-shaped entries in `settings.json` `permissions.allow` — keep the
+    two in sync. `read-only-agent-guard.test.sh` pins the deny/allow matrix
     (including the bypasses found across #425's review rounds); run it
     directly or via CI (**Hooks**, below).
+  - `test-writer-scope-guard.sh` — `PreToolUse` hook (wired in the
+    `test-writer` agent frontmatter) that denies any `Edit`/`Write` whose
+    target isn't `*.test.ts`/`*.test.tsx`, backing the test-file-only scoping
+    described above.
 - **Shared `node_modules` in agent worktrees** — a full `pnpm install` per
   isolated worktree duplicated ~1.1 GB and minutes of setup each time, so
   `.husky/post-checkout` seeds every new linked worktree instead (issue #410):
