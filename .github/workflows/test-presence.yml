@@ -1,0 +1,137 @@
+name: Test Presence
+
+on:
+  # No path filter on purpose — same reasoning as ci.yml / actionlint.yml: a
+  # path-skipped workflow reports "Pending" forever if it is ever promoted to a
+  # required check. The job is cheap (one git diff, no install), and it needs
+  # the whole diff anyway — "source changed but no test changed" is a property
+  # of the PR as a whole, not of any one path.
+  #
+  # `labeled`/`unlabeled` are included so toggling the override label
+  # re-evaluates the check immediately, instead of needing an empty push.
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-presence-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Applying this label to a PR turns the check green. The override is a label
+  # rather than a magic commit-message token so it stays visible and auditable
+  # on the PR itself.
+  OVERRIDE_LABEL: no-tests-needed
+
+jobs:
+  test-presence:
+    name: Test presence
+    # ADVISORY — deliberately NOT a required status check in the branch ruleset.
+    # Refactors, type-only changes, and pure re-exports legitimately carry no
+    # test delta, so this job nudges; it must never be the only thing standing
+    # between a correct PR and merge.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          # The comparison is against the merge base, which a shallow clone
+          # cannot resolve.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check that source changes touch tests
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+
+          # Three-dot: `A...B` diffs from the merge base of A and B to B, so
+          # commits that landed on the base branch after this PR branched are
+          # never mistaken for changes made by this PR.
+          range="origin/${BASE_REF}...HEAD"
+
+          # Resolve the base explicitly. Without this, an unresolvable ref would
+          # only surface as an empty `git diff` swallowed by the `|| true` on the
+          # filters below — i.e. the check would report green having compared
+          # nothing. Fail loudly instead.
+          if ! git rev-parse --verify --quiet "origin/${BASE_REF}" > /dev/null; then
+            echo "::error::Cannot resolve origin/${BASE_REF} — the base branch is needed to compute the merge base."
+            exit 1
+          fi
+
+          # Collect the changed-file list first, so a git failure aborts the
+          # step (set -e) rather than being masked by the `|| true` on the greps
+          # below. --diff-filter=ACMR excludes deletions (no D): removing a
+          # source file needs no new test, and deleting a test is not evidence
+          # that the changed source is covered — so a delete counts as neither.
+          changed=$(git diff --name-only --diff-filter=ACMR "${range}")
+
+          # Source = code whose behaviour a test could plausibly cover.
+          # Excluded, and why:
+          #   *.test.*    — the tests themselves
+          #   *.stories.* — Storybook fixtures, exercised by the stories build
+          #   *.config.*  — configuration, not behaviour
+          #   *.d.ts      — type declarations, no runtime to test
+          #   generated/  — typegen output, guarded by CI's typegen drift job
+          #   apps/cms    — Studio schema config, covered by the typegen and
+          #                 migrations jobs instead (never matched below)
+          source_changed=$(
+            printf '%s\n' "${changed}" \
+              | grep -E '^(packages/[^/]+|apps/web)/src/.+\.tsx?$' \
+              | grep -vE '\.(test|stories|config)\.tsx?$' \
+              | grep -vE '\.d\.ts$' \
+              | grep -vE '^packages/config/src/sanity/generated/' \
+              || true
+          )
+
+          if [ -z "${source_changed}" ]; then
+            echo "No source changes under packages/*/src or apps/web/src — nothing to check."
+            echo 'No source changes needing tests.' >> "${GITHUB_STEP_SUMMARY}"
+            exit 0
+          fi
+
+          tests_changed=$(
+            printf '%s\n' "${changed}" | grep -E '\.test\.tsx?$' || true
+          )
+
+          if [ -n "${tests_changed}" ]; then
+            echo "Source and tests both changed."
+            echo 'Test presence: source changed and tests were touched.' >> "${GITHUB_STEP_SUMMARY}"
+            exit 0
+          fi
+
+          # Read the label off the event payload with jq (--arg, so the label
+          # name is data and never interpolated into the script).
+          if jq --exit-status --arg label "${OVERRIDE_LABEL}" \
+               'any(.pull_request.labels[]?; .name == $label)' \
+               "${GITHUB_EVENT_PATH}" > /dev/null; then
+            echo "::notice::Source changed without a test change, waived by the '${OVERRIDE_LABEL}' label."
+            {
+              echo '### Test presence: waived'
+              echo
+              echo "Source changed with no test change, waived by the \`${OVERRIDE_LABEL}\` label."
+            } >> "${GITHUB_STEP_SUMMARY}"
+            exit 0
+          fi
+
+          echo '::group::source files changed without a test change'
+          printf '%s\n' "${source_changed}"
+          echo '::endgroup::'
+          echo "::error::Source changed but no *.test.ts(x) file was touched. Add or update a test, or apply the '${OVERRIDE_LABEL}' label if no test delta is warranted."
+          {
+            echo '### Test presence: no test change found'
+            echo
+            echo 'These source files changed, but no test file was touched:'
+            echo
+            printf '%s\n' "${source_changed}" | sed 's/^/- /'
+            echo
+            echo "Add or update a \`*.test.ts(x)\` file, or apply the \`${OVERRIDE_LABEL}\` label if this change genuinely needs no test delta."
+            echo
+            echo '_This check is advisory — it never blocks merge on its own._'
+          } >> "${GITHUB_STEP_SUMMARY}"
+          exit 1

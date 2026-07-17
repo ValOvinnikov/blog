@@ -169,6 +169,7 @@ All automation lives in `.github/workflows/` (shared pnpm/Node setup in
 | **Zizmor** (`zizmor.yml`)                         | every PR to `main`                                      | Static security analysis of the workflow files themselves.                                                                                                                                                                                                                               |
 | **Actionlint** (`actionlint.yml`)                 | every PR to `main`                                      | Validates the workflow files' syntax, `${{ }}` expressions and `needs` graph, and shellchecks their `run:` blocks — the correctness half that Zizmor's security analysis does not cover. Runs the official binary, pinned by version + sha256 (no third-party action, no curl-to-shell). |
 | **Knip** (`knip.yml`)                             | every PR to `main`                                      | Reports unused files, exports, and dependencies (config in `knip.json`); read-only, fails on any finding or a stale ignore rule. Advisory for now — promoted to a required check after two weeks of zero false positives (human-gated ruleset change).                                   |
+| **Test Presence** (`test-presence.yml`)           | every PR to `main` (incl. label add/remove)             | Advisory nudge: fails when source under `packages/*/src` or `apps/web/src` changes without touching any `*.test.ts(x)` file. Ignores stories, configs, `*.d.ts`, generated types, deletions, and `apps/cms`. Waive with the `no-tests-needed` label; never a required check.             |
 | **Claude Code Review** (`claude-code-review.yml`) | PR opened/updated (code paths, owner PRs only)          | Automated AI review posted on the PR; advisory, not a required check.                                                                                                                                                                                                                    |
 | **Claude Code** (`claude.yml`)                    | `@claude` mentions (owner-only, owner-authored threads) | Interactive agent runs on issues/PRs.                                                                                                                                                                                                                                                    |
 | **Deploy Development** (`deploy-development.yml`) | push to `main` (+ manual dispatch)                      | `turbo-ignore` change detection → verify (type-check/lint/test/build) → auto-apply pending content migrations to the dev dataset → deploy only the affected app(s) to the dev environment.                                                                                               |
@@ -178,6 +179,12 @@ All automation lives in `.github/workflows/` (shared pnpm/Node setup in
 Migrations, Dependency Review. Everything else is advisory. CI runs on every
 PR without path filters on purpose — a path-skipped workflow leaves its
 required checks pending forever (see the comment in `ci.yml`).
+
+**Test Presence stays advisory by design.** Refactors, type-only changes, and
+pure re-exports legitimately carry no test delta, so the job nudges rather than
+blocks — don't add it to the required checks. When a change genuinely needs no
+test, apply the `no-tests-needed` label: the override then lives on the PR where
+reviewers can see it, instead of in a bypassed check.
 
 One-time environment setup (datasets, tokens, Vercel projects, secrets,
 webhooks, CORS) is human-gated console work — see [`docs/DEPLOY.md`](./docs/DEPLOY.md)
