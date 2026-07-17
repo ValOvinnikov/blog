@@ -3,8 +3,9 @@
 > **The single durable reference for this project.** Any PR that changes
 > architecture, contracts, env vars, or the content model must update this file
 > in the same PR (the `code-review-practices` skill enforces this).
-> `IMPLEMENTATION_BRIEF.md` is the archived bootstrap playbook — historical
-> context only; when it disagrees with this document, this document wins.
+> `docs/archive/IMPLEMENTATION_BRIEF.md` is the archived bootstrap playbook —
+> historical context only; when it disagrees with this document, this document
+> wins.
 
 ## 1. Product summary
 
@@ -517,4 +518,4 @@ be layered on without violating the contracts above.
   same PR.
 - The content model section (§6) describes the _current_ schema — update it
   when #250/#251 land.
-- `IMPLEMENTATION_BRIEF.md` is frozen history; do not extend it.
+- `docs/archive/IMPLEMENTATION_BRIEF.md` is frozen history; do not extend it.

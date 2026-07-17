@@ -2,7 +2,7 @@
 
 > **For the AI agent:** This is the execution plan. Work **one phase at a time, top to bottom**. Do not start a phase until the previous phase's **Acceptance gate** is fully checked. Tick each `- [ ]` to `- [x]` as you complete it and **commit the roadmap change in the same PR** as the work it tracks. If a task can't pass its gate, stop and report rather than proceeding.
 >
-> **Companion docs:** [`SPEC.md`](./SPEC.md) is the durable _why_ + layer contracts; [`IMPLEMENTATION_BRIEF.md`](./IMPLEMENTATION_BRIEF.md) is the bootstrap detail. This file is the _when_ and the progress ledger. Where they conflict, SPEC wins on architecture, this file wins on ordering.
+> **Companion docs:** [`SPEC.md`](./SPEC.md) is the durable _why_ + layer contracts; [`docs/archive/IMPLEMENTATION_BRIEF.md`](./docs/archive/IMPLEMENTATION_BRIEF.md) is the archived bootstrap detail. This file is the _when_ and the progress ledger. Where they conflict, SPEC wins on architecture, this file wins on ordering.
 >
 > **Ownership:** each phase names the scoped subagent in `.claude/agents/` that should drive it (`cms`, `service`, `ui`, `web`) plus the relevant skill in `.claude/skills/`.
 
