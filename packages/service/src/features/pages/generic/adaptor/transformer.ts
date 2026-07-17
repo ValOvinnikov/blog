@@ -1,31 +1,31 @@
-import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
+import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
+import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toModule } from '@blog/service/shared/transformers/to-module';
 import type { InferResultType } from 'groqd';
 
 import type { genericPageQuery } from './query';
-import type { TGenericPage, TGenericPageSeo } from './types';
+import type { TGenericPage } from './types';
 
 export type TRawGenericPage = InferResultType<typeof genericPageQuery>;
 
-// TODO(#370): replace with resolveSeo once the generic page route adopts the
-// authored → content-derived → site-defaults ladder (out of scope for #355).
-function toGenericPageSeo(
-  raw: NonNullable<TRawGenericPage['seo']>,
-): TGenericPageSeo {
-  return {
-    metaTitle: raw.metaTitle ?? undefined,
-    metaDescription: raw.metaDescription ?? undefined,
-    ogTitle: raw.openGraph?.ogTitle ?? undefined,
-    ogDescription: raw.openGraph?.ogDescription ?? undefined,
-    ogImageUrl: buildImageUrl(raw.openGraph?.ogImage),
-  };
-}
-
-export function toGenericPage(raw: TRawGenericPage): TGenericPage {
+export function toGenericPage(
+  raw: TRawGenericPage,
+  settings: TSiteSettings,
+): TGenericPage {
   return {
     title: raw.title,
     slug: raw.slug,
     modules: (raw.modules ?? []).map(toModule),
-    seo: raw.seo ? toGenericPageSeo(raw.seo) : undefined,
+    // The page_generic schema has no excerpt/summary or image field, so the
+    // content-derived tier only supplies a title; description/image fall
+    // through to the site defaults.
+    seo: resolveSeo(
+      raw.seo ?? undefined,
+      { title: raw.title },
+      {
+        description: settings.description,
+        defaultOgImageUrl: settings.defaultOgImageUrl,
+      },
+    ),
   };
 }

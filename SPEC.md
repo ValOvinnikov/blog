@@ -381,8 +381,8 @@ changing a schema does **not** change existing documents.
   content-derived → site defaults** once per field, returning a fully-resolved
   `TSeoResolved`. `web` maps it to `Metadata` with one shared `toMetadata`
   helper — no `??` fallback chains in route files. Page loaders
-  (`getHomePage`, `getIndexPage`) fetch site settings internally (Next dedupes)
-  and return `seo: TSeoResolved`. The home title is emitted **absolute** (it is
+  (`getHomePage`, `getIndexPage`, `getPage` for the generic page — #370) fetch
+  site settings internally (Next dedupes) and return `seo: TSeoResolved`. The home title is emitted **absolute** (it is
   the brand) so the layout `%s | Brand` template does not double-append; site
   settings contribute only `description` + `defaultOgImage` as the final rung.
   If no image resolves at any rung, `ogImageUrl` is absent and the route omits
