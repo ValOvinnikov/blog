@@ -172,6 +172,12 @@ re-run from that step — do not proceed with any red check.
   - Gate 3: ask to push (separate, explicit approval)
   - Gate 4: ask to create the PR (separate, explicit approval)
   - Gate 5: set status → Code Review immediately after PR is created
+- **Then dispatch `board-keeper`** (`.claude/agents/board-keeper.md`) — no
+  approval needed, it's not a gate. It re-queries the status write Gate 5 just
+  made to confirm it actually stuck (`gh project item-edit` has silently
+  failed before) and sweeps the rest of the board for unrelated drift while
+  it's there. Dispatch it again after this PR merges, and any time you're
+  asked to "reconcile the board."
 
 ## 8. Remove the subagent worktrees you created
 
