@@ -171,11 +171,14 @@ contracts:
     the same `APPROVE` / blocking / non-blocking / not-checked format.
   - `board-keeper` — reconciles the Blog Build project board against repo
     reality (open PR → issue in Code Review, in-flight branch → In Progress,
-    merged PR → issue Done). Re-queries every status write it makes to catch
-    `gh project item-edit`'s known silent-failure mode, and reports
-    destructive-looking moves (e.g. reopening a wrongly-closed issue) for the
-    orchestrator instead of applying them. Dispatched after every PR
-    open/merge, and on demand.
+    merged PR → issue Done, a completed parent issue whose sub-issues all
+    trace to merged PRs → Done, every open issue/PR carries at least one
+    label). Re-queries every status write it makes to catch `gh project
+item-edit`'s known silent-failure mode, and reports destructive-looking
+    moves (e.g. reopening a wrongly-closed issue) for the orchestrator
+    instead of applying them. Dispatched after every PR open/merge, right
+    after a new issue is filed (confirms it landed on the board with a
+    status and label), and on demand.
   - `ci-watcher` — read-only, Haiku-model watcher for a single PR's CI
     checks (#464). Dispatched in the background right after `open-pull-request`
     Gate 5, with the PR's actual number (never the issue number or a bare

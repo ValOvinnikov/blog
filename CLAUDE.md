@@ -215,8 +215,12 @@ stuck, and sweeps the whole board for drift (not just the issue you were
 working), not only the status you just set. It never edits code and only
 applies safe, forward-only status corrections; anything that looks
 destructive (e.g. reopening a wrongly-closed issue) comes back in its report
-for you to act on. Also dispatch it on demand whenever asked to "reconcile
-the board."
+for you to act on. Also dispatch it **right after filing any new issue**
+(`gh issue create`) — pass the issue number and, if you already know it, the
+label it should carry; `board-keeper` confirms the issue actually landed on
+the board with the right status and a label, catching issues that would
+otherwise sit off-board or unlabeled until the next full sweep. And dispatch
+it on demand whenever asked to "reconcile the board."
 
 ## Deployment
 
