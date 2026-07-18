@@ -123,8 +123,15 @@ Work through these gates in order. **Stop at each gate and wait for the user.**
 
    ```
    git switch main && git pull --ff-only
-   git switch -c issue/<n>-<short-slug>
+   git switch -c <type>/<n>-<short-slug>
    ```
+
+   `<type>` is a conventional-commit type matching the work (`feat`, `fix`,
+   `tooling`, `docs`, `chore`, etc. — see `CLAUDE.md`'s commitlint list);
+   `<n>` is the issue number. This is the convention every recent branch
+   actually uses — the older `issue/<n>-*` form (issues #3–122) is legacy
+   only, not the current standard (`board-keeper`'s branch-detection check
+   matches both).
 
    **Exception — worktree-isolating subagents.** When the implementation will
    be delegated to subagents that run in their own git worktrees
@@ -160,7 +167,7 @@ Wait for the user's answer. Do not commit until they say to.
 
 After the commit is made, ask:
 
-> "Changes committed. Ready to push branch `issue/<n>-<short-slug>` to origin — shall I go ahead?"
+> "Changes committed. Ready to push branch `<type>/<n>-<short-slug>` to origin — shall I go ahead?"
 
 Wait for explicit approval. Do not push until the user confirms.
 

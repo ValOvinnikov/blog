@@ -94,7 +94,7 @@ Skip this step entirely for any other trigger.
 gh pr list --state open   --json number,title,headRefName,body,url,labels
 gh pr list --state merged --limit 50 --json number,title,headRefName,body,mergedAt,url
 gh issue list --state open --json number,title,url,labels
-git ls-remote --heads origin 'issue/*'
+git ls-remote --heads origin | grep -oE '[a-zA-Z]+/[0-9]+-[^[:space:]]+$'
 ```
 
 The `labels` field on the two open-item queries feeds Step 3a's hygiene
@@ -108,9 +108,14 @@ body. A PR titled or bodied `part of #<n>` with no `Closes` keyword does
 **not** close its issue on merge — treat its issue as still open regardless of
 the PR's merge state.
 
-`git ls-remote --heads origin 'issue/*'` gives you in-flight branches by the
-`issue/<n>-<slug>` naming convention (`open-pull-request` Gate 0) — an issue
-with a remote branch and no open PR yet is mid-work.
+The branch list gives you in-flight work by this repo's `<type>/<n>-<slug>`
+naming convention (`open-pull-request` Gate 0 — `type` is a
+conventional-commit type like `feat`/`fix`/`tooling`/`docs`/`chore`, `<n>` is
+the issue number). Extract the number after the slash from each match (e.g.
+`feat/469-brand-logo-ui` → `469`) — an issue with a matching branch and no
+open PR yet is mid-work. The same grep also still matches the legacy
+`issue/<n>-*` form used by old branches (issues #3–122), so nothing
+previously covered is lost.
 
 **A remote branch is a positive signal only, never a negative one.** Work in
 progress in another session's local checkout, or in a subagent worktree that
@@ -128,7 +133,7 @@ X" is not evidence of "not X":
 | -------------------------------------------------------------------------------------------------------------------------- | --------------------- |
 | Merged PR with `Closes #n` for this issue, issue is closed                                                                 | Done                  |
 | Open PR with `Closes #n` for this issue (issue still open)                                                                 | Code Review           |
-| Remote branch `issue/<n>-*` exists, no open PR yet, issue open                                                             | In Progress           |
+| Remote branch `<type>/<n>-*` (or legacy `issue/<n>-*`) exists, no open PR yet, issue open                                  | In Progress           |
 | Issue closed with **no** merged `Closes #n` PR (manually closed, or closed as a side effect of a partial/stacked PR merge) | **flag, don't infer** |
 
 If none of these signals apply to an issue (no branch, no PR either way),
