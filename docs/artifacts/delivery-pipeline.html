@@ -413,62 +413,6 @@
     line-height: 1.4;
   }
 
-  /* ---- roster ---- */
-  .roster {
-    margin-top: 56px;
-  }
-  .roster h2 {
-    font-size: 19px;
-    font-weight: 650;
-    letter-spacing: -0.005em;
-    margin: 0 0 6px;
-    text-wrap: balance;
-  }
-  .roster-dek {
-    color: var(--ink-muted);
-    font-size: 13.5px;
-    max-width: 62ch;
-    margin: 0 0 26px;
-  }
-  .roster-group {
-    display: grid;
-    grid-template-columns: 96px 1fr;
-    gap: 18px;
-    padding: 16px 0;
-  }
-  .roster-group + .roster-group {
-    border-top: 1px solid var(--line);
-  }
-  .roster-group-label {
-    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-    font-size: 10.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    color: var(--ink-faint);
-    padding-top: 3px;
-  }
-  .roster-entries {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .roster-entry {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-  .roster-entry p {
-    margin: 0;
-    font-size: 13.5px;
-    color: var(--ink-muted);
-    max-width: 58ch;
-  }
-  .roster-entry .scope {
-    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-    font-size: 11.5px;
-    color: var(--ink-faint);
-  }
-
   footer {
     margin-top: 36px;
     font-size: 12.5px;
@@ -539,10 +483,9 @@
     </p>
     <h1>From picking a ticket to a merged PR</h1>
     <p class="dek">
-      Nine stages, three actors doing the work — the orchestrating session,
-      scoped subagents on their own models, and plain mechanical commands — plus
-      four moments that stop and wait for you. Everything else runs without
-      asking.
+      Every agent that can touch a ticket, placed where it actually acts — the
+      orchestrating session, ten scoped subagents on their own models, and four
+      moments that stop and wait for you. Everything else runs without asking.
     </p>
     <div class="legend">
       <span class="legend-item"
@@ -564,7 +507,8 @@
       <div class="card">
         <div class="badges">
           <span class="badge"
-            >orchestrator <span class="model">· Sonnet&nbsp;5</span></span
+            >orchestrator
+            <span class="model">· Sonnet&nbsp;5 / Opus</span></span
           >
         </div>
         <p>
@@ -572,6 +516,16 @@
           In&nbsp;Progress, checks out a fresh branch from
           <code class="mono">origin/main</code>.
         </p>
+        <ul class="substeps">
+          <li>
+            <span class="who">discovery</span
+            ><span class="what"
+              ><strong>explore</strong> · Haiku&nbsp;4.5, on demand — a cheap
+              disposable sweep for "where does X live" questions, dispatched
+              only if the ticket needs one before planning</span
+            >
+          </li>
+        </ul>
         <div class="interaction">
           <span class="label">You</span
           ><span class="val"
@@ -588,6 +542,13 @@
         <span class="stage-title">Build, test, review — on a loop</span>
       </div>
       <div class="card">
+        <div class="badges">
+          <span class="badge"
+            >orchestrator
+            <span class="model">· Sonnet&nbsp;5 / Opus</span></span
+          >
+        </div>
+        <p>Dispatches each step below in order and relays findings back.</p>
         <ul class="substeps">
           <li>
             <span class="who">implement</span
@@ -607,20 +568,38 @@
           <li>
             <span class="who">verify</span
             ><span class="what"
-              ><strong>type-check · lint · test · build</strong> — plain
-              commands, no model</span
+              ><strong>verify-runner</strong> · Haiku&nbsp;4.5 — runs
+              type-check/lint/test/build, reports pass/fail only, dispatched
+              synchronously since Gate&nbsp;1 can't proceed without the
+              result</span
             >
           </li>
           <li>
             <span class="who">review</span
             ><span class="what"
-              ><strong>reviewer</strong> (+ a11y / SEO auditors when relevant) ·
-              Sonnet&nbsp;5</span
+              ><strong>reviewer</strong> · Sonnet&nbsp;5 — full diff, every
+              issue</span
+            >
+          </li>
+          <li>
+            <span class="who">review — a11y</span
+            ><span class="what"
+              ><strong>a11y-reviewer</strong> · Sonnet&nbsp;5, only when the
+              diff touches <code class="mono">packages/ui</code> or
+              <code class="mono">apps/web</code></span
+            >
+          </li>
+          <li>
+            <span class="who">review — SEO</span
+            ><span class="what"
+              ><strong>seo-auditor</strong> · Sonnet&nbsp;5, only when the diff
+              touches routes/metadata/feeds</span
             >
           </li>
         </ul>
         <div class="loop-note">
-          ↻ blocking findings send it back to implement — repeats until reviewer
+          ↻ any blocking finding from verify-runner or a dispatched reviewer
+          sends it back to implement — repeats until every dispatched reviewer
           says APPROVE
         </div>
         <div class="interaction">
@@ -637,7 +616,13 @@
         <span class="stage-title">Commit?</span>
       </div>
       <div class="card">
-        <div class="badges"><span class="badge you">you decide</span></div>
+        <div class="badges">
+          <span class="badge you">you decide</span>
+          <span class="badge"
+            >orchestrator
+            <span class="model">runs it after your yes</span></span
+          >
+        </div>
         <p>
           Only asked once reviewer has approved the diff as it stands. A single
           new change after approval voids it — re-review before asking again.
@@ -656,7 +641,13 @@
         <span class="stage-title">Push?</span>
       </div>
       <div class="card">
-        <div class="badges"><span class="badge you">you decide</span></div>
+        <div class="badges">
+          <span class="badge you">you decide</span>
+          <span class="badge"
+            >orchestrator
+            <span class="model">runs it after your yes</span></span
+          >
+        </div>
         <p>
           A separate ask from the commit above. Approving a push once never
           covers the next one — including a fix-push made later at Gate&nbsp;5a.
@@ -675,7 +666,12 @@
         <span class="stage-title">Open the PR?</span>
       </div>
       <div class="card">
-        <div class="badges"><span class="badge you">you decide</span></div>
+        <div class="badges">
+          <span class="badge you">you decide</span>
+          <span class="badge"
+            >orchestrator <span class="model">opens it + sets board</span></span
+          >
+        </div>
         <p>
           After push is confirmed. Once approved, the PR is opened and the board
           moves to Code&nbsp;Review immediately after.
@@ -698,6 +694,9 @@
           <span class="badge"
             >ci-watcher <span class="model">· Haiku&nbsp;4.5</span></span
           >
+          <span class="badge"
+            >orchestrator <span class="model">diagnoses on failure</span></span
+          >
         </div>
         <p>
           Dispatched in the background with the PR's number, so the polling
@@ -707,7 +706,8 @@
         <div class="fail-branch">
           <strong>If a check fails</strong> — required or not — it hands back
           the check name, run URL, and log excerpt. Orchestrator diagnoses,
-          delegates the fix, then Gate&nbsp;3 fires again for the fix-push.
+          delegates the fix to the owning layer subagent, then Gate&nbsp;3 fires
+          again for the fix-push.
         </div>
         <div class="interaction">
           <span class="label">You</span
@@ -751,12 +751,17 @@
           <span class="badge"
             >board-keeper <span class="model">· Sonnet&nbsp;5</span></span
           >
+          <span class="badge"
+            >orchestrator <span class="model">removes the worktree</span></span
+          >
         </div>
         <p>
           <code class="mono">Closes&nbsp;#n</code> in the PR body closes the
           issue on merge; the board moves to Done via GitHub's own automation.
           board-keeper re-queries the write to confirm it actually stuck, and
-          sweeps the rest of the board for drift while it's there.
+          sweeps the rest of the board for drift while it's there. Orchestrator
+          removes the subagent worktree once the safety checks pass — no gate,
+          just housekeeping.
         </p>
         <div class="interaction">
           <span class="label">You</span><span class="val">nothing</span>
@@ -764,171 +769,6 @@
       </div>
     </div>
   </div>
-
-  <section class="roster">
-    <h2>The full roster, by scope</h2>
-    <p class="roster-dek">
-      Every subagent that can appear in a run, grouped by what it's responsible
-      for — not every stage above uses all of them.
-    </p>
-
-    <div class="roster-group">
-      <div class="roster-group-label">layer</div>
-      <div class="roster-entries">
-        <div class="roster-entry">
-          <span class="badges"
-            ><span class="badge"
-              >layer subagent(s) — config / cms / service / ui / web
-              <span class="model">· Sonnet&nbsp;5</span></span
-            ></span
-          >
-          <p class="scope">
-            packages/config · apps/cms · packages/service · packages/ui ·
-            apps/web
-          </p>
-          <p>
-            Each owns exactly one workspace, in its own isolated worktree.
-            Dependency order runs
-            <code class="mono">config → cms → service → ui → web</code> — only
-            the layers a change actually touches get dispatched.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="roster-group">
-      <div class="roster-group-label">review</div>
-      <div class="roster-entries">
-        <div class="roster-entry">
-          <span class="badges"
-            ><span class="badge"
-              >reviewer <span class="model">· Sonnet&nbsp;5</span></span
-            ></span
-          >
-          <p class="scope">full diff, every issue</p>
-          <p>
-            Fresh eyes on the whole change — mechanical scan, layer-contract
-            pass, general review. Gate&nbsp;1 doesn't complete without an
-            APPROVE from this one.
-          </p>
-        </div>
-        <div class="roster-entry">
-          <span class="badges"
-            ><span class="badge"
-              >a11y-reviewer <span class="model">· Sonnet&nbsp;5</span></span
-            ></span
-          >
-          <p class="scope">packages/ui · apps/web only</p>
-          <p>
-            Accessibility-specific pass — <code class="mono">ariaLabel</code>
-            conventions, real heading tags, focus-visible, alt text. Only
-            dispatched when the diff touches UI or web presentation.
-          </p>
-        </div>
-        <div class="roster-entry">
-          <span class="badges"
-            ><span class="badge"
-              >seo-auditor <span class="model">· Sonnet&nbsp;5</span></span
-            ></span
-          >
-          <p class="scope">apps/web only</p>
-          <p>
-            Metadata, structured data, sitemap/robots/RSS — dispatched only when
-            a diff touches routes, metadata, or feeds.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="roster-group">
-      <div class="roster-group-label">quality</div>
-      <div class="roster-entries">
-        <div class="roster-entry">
-          <span class="badges"
-            ><span class="badge"
-              >test-writer <span class="model">· Sonnet&nbsp;5</span></span
-            ></span
-          >
-          <p class="scope">
-            <code class="mono">*.test.ts(x)</code> only, every layer
-          </p>
-          <p>
-            Adds or extends test coverage after the layer agents finish.
-            Scope-guarded — a fix it needs to make outside a test file comes
-            back as a finding, never an edit it makes itself.
-          </p>
-        </div>
-        <div class="roster-entry">
-          <span class="badges"
-            ><span class="badge"
-              >verify-runner <span class="model">· Haiku&nbsp;4.5</span></span
-            ></span
-          >
-          <p class="scope">Gate&nbsp;1, before reviewer runs</p>
-          <p>
-            Runs the integration pass — type-check, lint, test, build — and
-            reports pass/fail only. Dispatched synchronously (Gate&nbsp;1 can't
-            proceed without the result), so the bulky
-            <span class="mono">turbo</span> output lands in its own context, not
-            the orchestrator's.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="roster-group">
-      <div class="roster-group-label">ops</div>
-      <div class="roster-entries">
-        <div class="roster-entry">
-          <span class="badges"
-            ><span class="badge"
-              >ci-watcher <span class="model">· Haiku&nbsp;4.5</span></span
-            ></span
-          >
-          <p class="scope">Gate&nbsp;5a, after the PR opens</p>
-          <p>
-            Polls the PR's checks to a terminal state in the background and
-            reports pass/fail — same cost-isolation reasoning as verify-runner,
-            just later in the pipeline and non-blocking since other work can
-            continue while it waits.
-          </p>
-        </div>
-        <div class="roster-entry">
-          <span class="badges"
-            ><span class="badge"
-              >board-keeper <span class="model">· Sonnet&nbsp;5</span></span
-            ></span
-          >
-          <p class="scope">the whole board, not just the current issue</p>
-          <p>
-            Reconciles board status against repo reality after every PR
-            open/merge — re-queries its own writes to confirm they stuck, and
-            surfaces anything destructive-looking (like a wrongly-closed issue)
-            instead of touching it.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="roster-group">
-      <div class="roster-group-label">discovery</div>
-      <div class="roster-entries">
-        <div class="roster-entry">
-          <span class="badges"
-            ><span class="badge"
-              >explore <span class="model">· Haiku&nbsp;4.5</span></span
-            ></span
-          >
-          <p class="scope">on demand, before planning</p>
-          <p>
-            A cheap, disposable sweep for "where does X live" / "is there
-            already a Y" questions — burns a Haiku context so that rediscovery
-            never has to enter the orchestrator's own.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <div class="summary">
     <div class="stat you">
@@ -940,8 +780,8 @@
     <div class="stat auto">
       <div class="n">13</div>
       <div class="lbl">
-        agents in the full roster — 5 layer + 8 cross-cutting — each in its own
-        context
+        distinct agents across the flow above — 5 layer + 8 named cross-cutting
+        roles, each in its own context
       </div>
     </div>
     <div class="stat">
