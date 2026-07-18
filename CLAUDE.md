@@ -164,6 +164,12 @@ prompt — do not write it to disk first.
   on its own** (typically additive changes). Keep it a single PR when a partial
   merge would break the build — e.g. renaming a shared `_type` or generated
   type that downstream consumes reds `type-check` until every layer lands.
+  **Only the completing PR includes `Closes #<n>`** — earlier layer PRs
+  reference the issue without an adjacent closing keyword (GitHub auto-closes
+  on the literal substring regardless of tense). See `open-pull-request`'s
+  "Scope: prefer per-layer PRs" and "PR body template" sections for the exact
+  wording rule and the board-Status gotcha if an issue is auto-closed
+  prematurely.
 - **Spec sync:** any PR that changes architecture, layer contracts, env vars,
   or the content model updates `SPEC.md` in the same PR.
 - **README sync:** `README.md` §"CI & automation" documents every workflow in

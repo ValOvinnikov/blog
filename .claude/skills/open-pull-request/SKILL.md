@@ -22,6 +22,32 @@ Keep it a single PR when a partial merge breaks the build — e.g. renaming a
 shared `_type`/generated type that downstream references reds `type-check` until
 all layers land. One concern per PR still holds either way.
 
+**Only the completing PR includes `Closes #<n>`.** In a per-layer split, every
+earlier layer's PR body must reference the tracked issue without an adjacent
+closing keyword — see the "PR body template" section below for the exact
+wording rule and an example.
+
+**Auto-close-keyword gotcha — GitHub's substring match ignores tense.**
+GitHub auto-closes an issue whenever `close(s)?|fix(es)?|resolve(s)? #N`
+appears _anywhere_ in the PR body, even inside prose describing a _future_
+action, not just a directive line. A partial-implementation PR that says
+"...confirm this live, then **close #399**" gets `#399` auto-closed on merge
+regardless — the keyword and number are adjacent, so GitHub's regex fires. If
+a PR body must explain that it does **not** close its tracked issue, never
+let a closing keyword sit directly next to the issue reference anywhere in
+the body: rephrase with intervening words so the two aren't adjacent — e.g.
+"revisit and close issue #399 later" breaks the adjacency; "then close #399"
+does not.
+
+**If this bites anyway: reopening an issue does not revert board Status.**
+This happened for real with #399 — merging a PR whose body had an adjacent
+"close #399" auto-closed it, the board's "Pull request merged" workflow set
+Status to Done, the issue was manually reopened, but Status stayed on Done.
+~2 hours later the board's "Auto-close issue" workflow (fires on Status →
+Done) closed #399 again, with no PR/commit reference at all. If a similar
+incident recurs, check the board Status field alongside open/closed
+state — reopening only fixes one of the two.
+
 ## ABSOLUTE RULES — never violate
 
 - **Never push without explicit user approval for that specific push.**
@@ -285,3 +311,19 @@ Do not manually set Done.
 
 Closes #<n>
 ```
+
+**`Closes #<n>` is conditional — only the PR that completes the tracked
+issue includes it.** In a per-layer split (see "Scope: prefer per-layer PRs"
+above), every layer's PR merging first with `Closes #<n>` in its body would
+auto-close the issue prematurely, before later layers land. Earlier layer
+PRs reference the issue without a closing keyword instead:
+
+```
+Part of #<n>
+```
+
+or a plain mention with intervening words (e.g. "see #<n> for the full
+scope") — never a bare `#<n>` immediately after `close`/`closes`/`fix`/
+`fixes`/`resolve`/`resolves`, per the auto-close-keyword gotcha above. Only
+the final layer's PR — the one that actually finishes the issue — carries
+`Closes #<n>`.
