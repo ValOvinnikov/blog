@@ -92,15 +92,36 @@ Skip this step entirely for any other trigger.
 
 ```
 gh pr list --state open   --json number,title,headRefName,body,url,labels
-gh pr list --state merged --limit 50 --json number,title,headRefName,body,mergedAt,url
-gh issue list --state open --json number,title,url,labels
+gh issue list --state open --limit 200 --json number,title,url,labels
 git ls-remote --heads origin | grep -oE '[a-zA-Z]+/[0-9]+-[^[:space:]]+$'
 ```
 
 The `labels` field on the two open-item queries feeds Step 3a's hygiene
 check below — no separate query needed.
 
-For each PR, resolve the issue it closes: prefer the project item's
+**`--limit 200` on `gh issue list` is a verified-sufficient number for this
+repo's current issue count (37 open), not an assumed-safe constant** — the
+unset default (30) already dropped a real open issue, #76, in a past sweep.
+Re-check the real count against `gh issue list --state open --limit 200
+--json number | jq length` if this guidance is ever revisited and it's
+close to 200.
+
+**Don't fetch a bulk merged-PR list at all** — this repo has 250+ merged
+PRs and growing, so any fixed `--limit` on that query silently truncates
+again eventually, no matter how high it's set. For merged-PR evidence,
+query the specific issue instead:
+
+```
+gh issue view <n> --json state,closedAt,closedByPullRequestsReferences
+```
+
+`closedByPullRequestsReferences` is GitHub's own structured "which PR(s)
+closed this issue via a `Closes`/`Fixes`/`Resolves` keyword" field — correct
+regardless of how large the merged-PR history grows, and more reliable than
+text-matching a PR body. Use it per-issue wherever Step 3 or Step 3b need to
+confirm an issue's closure, instead of scanning a bulk list.
+
+For each **open** PR, resolve the issue it closes: prefer the project item's
 `linked pull requests` field; if a PR doesn't show up there (the Development
 panel link can be missing even when the body says so), fall back to parsing
 `Closes #<n>` / `closes #<n>` / `Fixes #<n>` (case-insensitive) out of the PR
@@ -141,6 +162,11 @@ you have no positive evidence about its status — **don't infer "Todo" and
 don't report drift**, regardless of what the board currently says. A board
 status of In Progress or Code Review with no matching branch/PR is common and
 expected (unpushed local work) — leave it alone, it is not drift.
+
+The "Merged PR with `Closes #n`" row is checked per-issue via
+`closedByPullRequestsReferences` (Step 2), not by scanning a bulk merged-PR
+list — only run it for issues that are closed on the board or flagged by a
+targeted trigger, not every issue on the board every sweep.
 
 Compare expected vs. the board's actual `status` for every issue where a
 signal fired. Anything that matches is not drift — don't report it, you'd
@@ -185,10 +211,9 @@ report it like the `completed < total` case below instead of guessing.
   This is a _stronger_ signal of a wrongly-closed issue, not a weaker one —
   report it in Step 5 like any other flagged item, and say explicitly how
   many sub-issues remain open.
-- **`completed == total`** — cross-check each sub-issue number against Step
-  2's merged-PR list using the same `Closes #<n>` / `closes #<n>` /
-  `Fixes #<n>` parsing you already apply there. If **every** sub-issue closed
-  via a merged PR carrying that keyword for its own number, the parent's
+- **`completed == total`** — cross-check each sub-issue via
+  `gh issue view <n> --json closedByPullRequestsReferences` (Step 2). If
+  **every** sub-issue has at least one PR in that field, the parent's
   closure is fully evidenced: this is a new **safe, forward-only transition**
   to Done — apply and re-verify exactly like any Step 4 write.
 - If even one sub-issue's closure can't be explained by a merged `Closes`
