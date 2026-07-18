@@ -2,11 +2,13 @@
 
 > **How to use this file.** Each entry below is a ready-to-file GitHub issue:
 > title (conventional-commit style), labels, dependencies, and a body with
-> context + acceptance criteria. An agent filing these should create them with
-> `gh issue create`, add them to the **Blog Build** project board, and apply
-> the milestone/label noted per section. File in the listed order — later
-> tickets depend on earlier ones. Existing open issues are referenced by
-> number; do not duplicate them.
+> context + acceptance criteria. An agent filing these should dispatch the
+> `board-keeper` subagent to create each one (`"create issue: title=...,
+body=..., labels=..."` — never `gh issue create` directly, see `CLAUDE.md`),
+> which creates it, adds it to the **Blog Build** project board, and applies
+> the milestone/label noted per section as one verified operation. File in the
+> listed order — later tickets depend on earlier ones. Existing open issues
+> are referenced by number; do not duplicate them.
 >
 > Sequencing: **M0 (housekeeping) → M1 (deployment) → Phase 3 routes
 > (existing #85–94) → M2 (hardening) → M3 (differentiators)**. Deployment

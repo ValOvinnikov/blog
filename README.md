@@ -169,16 +169,24 @@ contracts:
     `seo-and-metadata` skill as a checklist (`generateMetadata` completeness,
     JSON-LD validity, sitemap/robots/RSS coherence) and reports a verdict in
     the same `APPROVE` / blocking / non-blocking / not-checked format.
-  - `board-keeper` — reconciles the Blog Build project board against repo
-    reality (open PR → issue in Code Review, in-flight branch → In Progress,
-    merged PR → issue Done, a completed parent issue whose sub-issues all
-    trace to merged PRs → Done, every open issue/PR carries at least one
-    label). Re-queries every status write it makes to catch `gh project
-item-edit`'s known silent-failure mode, and reports destructive-looking
-    moves (e.g. reopening a wrongly-closed issue) for the orchestrator
-    instead of applying them. Dispatched after every PR open/merge, right
-    after a new issue is filed (confirms it landed on the board with a
-    status and label), and on demand.
+  - `board-keeper` — creates new issues and reconciles the Blog Build
+    project board against repo reality (open PR → issue in Code Review,
+    in-flight branch → In Progress, merged PR → issue Done, a completed
+    parent issue whose sub-issues all trace to merged PRs → Done, every
+    open issue/PR carries at least one label). Issue creation is a single
+    choke point — the orchestrator never calls `gh issue create` directly;
+    it dispatches `board-keeper` with a fully-specified title/body/labels
+    (and a parent issue number if it's a sub-issue), which creates the
+    issue, places it on the board, and confirms status/labels/parent-link
+    as one verified operation, so creation and placement can never be
+    decoupled into a forgettable second step. Re-queries every status write
+    it makes to catch `gh project item-edit`'s known silent-failure mode,
+    checks the active `gh` token carries the `project` scope before writing
+    anything (board writes fail outright without it — not part of GitHub's
+    default OAuth scopes), and reports destructive-looking moves (e.g.
+    reopening a wrongly-closed issue) for the orchestrator instead of
+    applying them. Dispatched to create any new issue, after every PR
+    open/merge, and on demand.
   - `ci-watcher` — read-only, Haiku-model watcher for a single PR's CI
     checks (#464). Dispatched in the background right after `open-pull-request`
     Gate 5, with the PR's actual number (never the issue number or a bare
