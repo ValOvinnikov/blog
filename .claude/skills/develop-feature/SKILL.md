@@ -40,14 +40,25 @@ approval. Never bundle them. See `open-pull-request` skill for the full sequence
 - Locate the affected files/layers. Identify which workspaces change:
   `config` (`packages/config`, `packages/utils`, `configs/*`), `cms`,
   `service`, `ui`, `web`.
-- **If locating them means a broad sweep** — "where does X live", "how does Y
-  work", "is there already a Z" — dispatch the **`explore` subagent**
-  (`.claude/agents/explore.md`) instead of reading around yourself. It answers
+- **`explore` vs. inline `Bash`/`Read` — decide by whether the target path is
+  already known, not by query count.** Dispatch the **`explore` subagent**
+  (`.claude/agents/explore.md`) whenever you're searching for something
+  ("where does X live", "how does Y work", "is there already a Z", "what else
+  references this") — even a single `grep` across a package is unbounded
+  discovery if you don't already know which file has the answer. It answers
   from a cheap, disposable Haiku context and returns conclusions plus
   `file:line` pointers, so the rediscovery never enters this session's window.
-  **Grep/Glob-driven discovery belongs to `explore`, not the orchestrator —**
-  only `Read` a file directly here once you already know it's the one you need
-  (e.g. `explore` pointed at it, or the issue/prior step named it).
+  Read or grep inline only to verify a specific, already-named file (named by
+  the user, the issue body, a prior `explore` dispatch, or this step's own
+  prior output).
+  **"I already have context from a prior session" is not an exemption** —
+  cached memory can be stale (`feedback_memory_staleness_check.md`) and
+  doesn't change whether what you're about to run is a _verification_ of a
+  known file or a _search_ for an unknown one. If you catch yourself
+  justifying an inline `grep`/`find`/`Read` as "narrow" because you already
+  suspect where the answer is, that suspicion is exactly the hypothesis
+  `explore` should confirm — dispatch it, feeding it your suspected path(s)
+  as a starting hypothesis rather than checking them yourself.
 - If the task touches a library API, CLI command, or config format you are not
   certain of, run the `use-context7` skill **before** writing the plan — fetch
   the relevant docs now, not mid-implementation.
