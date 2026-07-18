@@ -671,11 +671,31 @@
           <span class="badge"
             >orchestrator <span class="model">opens it + sets board</span></span
           >
+          <span class="badge"
+            >board-keeper <span class="model">· Sonnet&nbsp;5</span></span
+          >
         </div>
         <p>
           After push is confirmed. Once approved, the PR is opened and the board
-          moves to Code&nbsp;Review immediately after.
+          moves to Code&nbsp;Review immediately after — then board-keeper is
+          dispatched to re-query that write and confirm it actually stuck (<code
+            class="mono"
+            >gh project item-edit</code
+          >
+          has silently failed before), sweeping the rest of the board for
+          unrelated drift while it's there: flags any open issue/PR missing a
+          label, and safely promotes to Done any closed parent issue whose
+          sub-issues all trace to their own merged PRs.
         </p>
+        <div class="fail-branch">
+          <strong>A third trigger, off this ticket's rail</strong> —
+          board-keeper also fires the instant any new issue is filed (<code
+            class="mono"
+            >gh issue create</code
+          >), wherever that happens mid-flow. It confirms the issue landed on
+          the board with a status and a label instead of waiting for the next
+          full sweep to notice.
+        </div>
         <div class="interaction">
           <span class="label">You</span
           ><span class="val">explicit yes, every single time</span>
@@ -749,7 +769,8 @@
       <div class="card">
         <div class="badges">
           <span class="badge"
-            >board-keeper <span class="model">· Sonnet&nbsp;5</span></span
+            >board-keeper
+            <span class="model">· Sonnet&nbsp;5, 2nd time</span></span
           >
           <span class="badge"
             >orchestrator <span class="model">removes the worktree</span></span
@@ -758,10 +779,10 @@
         <p>
           <code class="mono">Closes&nbsp;#n</code> in the PR body closes the
           issue on merge; the board moves to Done via GitHub's own automation.
-          board-keeper re-queries the write to confirm it actually stuck, and
-          sweeps the rest of the board for drift while it's there. Orchestrator
-          removes the subagent worktree once the safety checks pass — no gate,
-          just housekeeping.
+          board-keeper's second dispatch for this ticket (the first was
+          Gate&nbsp;4) confirms that transition stuck and sweeps for drift once
+          more. Orchestrator removes the subagent worktree once the safety
+          checks pass — no gate, just housekeeping.
         </p>
         <div class="interaction">
           <span class="label">You</span><span class="val">nothing</span>
