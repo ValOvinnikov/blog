@@ -559,6 +559,15 @@
             >
           </li>
           <li>
+            <span class="who">self-check</span
+            ><span class="what"
+              >each layer subagent, per its own "Definition of done" — e.g.
+              <code class="mono">pnpm --filter @blog/service type-check</code
+              >/<code class="mono">lint</code>/<code class="mono">test</code>,
+              scoped to just the package it touched, before handing back</span
+            >
+          </li>
+          <li>
             <span class="who">write tests</span
             ><span class="what"
               ><strong>test-writer</strong> · Sonnet&nbsp;5, scoped to
@@ -566,12 +575,24 @@
             >
           </li>
           <li>
-            <span class="who">verify</span
+            <span class="who">integration verify</span
             ><span class="what"
-              ><strong>verify-runner</strong> · Haiku&nbsp;4.5 — runs
+              ><strong>verify-runner</strong> · Haiku&nbsp;4.5 — the
+              orchestrator's own broader, multi-package pass across
               type-check/lint/test/build, reports pass/fail only, dispatched
               synchronously since Gate&nbsp;1 can't proceed without the
               result</span
+            >
+          </li>
+          <li>
+            <span class="who">git hooks</span
+            ><span class="what"
+              >husky <code class="mono">pre-commit</code>/<code
+                class="mono"
+                >pre-push</code
+              >
+              — a redundant automatic pass invoked by git itself at
+              commit/push time, not by any agent</span
             >
           </li>
           <li>
