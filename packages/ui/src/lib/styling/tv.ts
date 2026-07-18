@@ -16,6 +16,18 @@ import { createTV } from 'tailwind-variants';
  * Keep this list in sync with the semantic `--text-*` sizes in
  * `@blog/tailwind-config`'s `theme.css`. The standard scale
  * (xs/sm/base/lg/xl/2xl/3xl/4xl) is already known to tailwind-merge.
+ *
+ * The custom `font-<family>` utilities (`font-display`, `font-body`,
+ * `font-read`, `font-mono`, defined as `--font-*` theme tokens in
+ * `theme.css`) are registered here too, for the same reason as the
+ * font-size list above. Note: as of `tailwind-merge@3.6.0`, its default
+ * `font-family` classGroup already has a permissive catch-all
+ * (`isAnyNonArbitrary`) that happens to resolve conflicts between these
+ * correctly without explicit registration — verified directly against a
+ * stock `extendTailwindMerge({})`. Registering them explicitly is still
+ * worthwhile as documented intent (matching the font-size precedent) and a
+ * guard against that upstream catch-all narrowing in a future version, not
+ * because it fixes an observed break in the currently pinned version.
  */
 export const tv = createTV({
   twMergeConfig: {
@@ -40,6 +52,11 @@ export const tv = createTV({
               'label',
               'code',
             ],
+          },
+        ],
+        'font-family': [
+          {
+            font: ['display', 'body', 'read', 'mono'],
           },
         ],
       },
