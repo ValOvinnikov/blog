@@ -1,0 +1,801 @@
+<title>The delivery pipeline — gates, agents, models</title>
+<style>
+  :root {
+    --bg: oklch(0.975 0.006 250);
+    --surface: oklch(0.945 0.011 252);
+    --surface-2: oklch(0.915 0.014 252);
+    --line: oklch(0.82 0.016 252);
+    --ink: oklch(0.24 0.025 252);
+    --ink-muted: oklch(0.48 0.02 252);
+    --ink-faint: oklch(0.62 0.016 252);
+    --auto: oklch(0.52 0.098 199);
+    --auto-soft: oklch(0.52 0.098 199 / 0.12);
+    --gate: oklch(0.58 0.16 55);
+    --gate-soft: oklch(0.58 0.16 55 / 0.14);
+    --gate-ink: oklch(0.32 0.1 55);
+    --shadow:
+      0 1px 2px oklch(0.24 0.025 252 / 0.06),
+      0 8px 24px oklch(0.24 0.025 252 / 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: oklch(0.16 0.017 254);
+      --surface: oklch(0.208 0.02 253);
+      --surface-2: oklch(0.255 0.022 253);
+      --line: oklch(0.34 0.022 253);
+      --ink: oklch(0.93 0.008 250);
+      --ink-muted: oklch(0.7 0.018 250);
+      --ink-faint: oklch(0.52 0.018 250);
+      --auto: oklch(0.76 0.12 199);
+      --auto-soft: oklch(0.76 0.12 199 / 0.14);
+      --gate: oklch(0.78 0.15 60);
+      --gate-soft: oklch(0.78 0.15 60 / 0.16);
+      --gate-ink: oklch(0.88 0.1 60);
+      --shadow: 0 1px 2px oklch(0 0 0 / 0.3), 0 12px 28px oklch(0 0 0 / 0.35);
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: oklch(0.16 0.017 254);
+    --surface: oklch(0.208 0.02 253);
+    --surface-2: oklch(0.255 0.022 253);
+    --line: oklch(0.34 0.022 253);
+    --ink: oklch(0.93 0.008 250);
+    --ink-muted: oklch(0.7 0.018 250);
+    --ink-faint: oklch(0.52 0.018 250);
+    --auto: oklch(0.76 0.12 199);
+    --auto-soft: oklch(0.76 0.12 199 / 0.14);
+    --gate: oklch(0.78 0.15 60);
+    --gate-soft: oklch(0.78 0.15 60 / 0.16);
+    --gate-ink: oklch(0.88 0.1 60);
+    --shadow: 0 1px 2px oklch(0 0 0 / 0.3), 0 12px 28px oklch(0 0 0 / 0.35);
+  }
+  :root[data-theme='light'] {
+    --bg: oklch(0.975 0.006 250);
+    --surface: oklch(0.945 0.011 252);
+    --surface-2: oklch(0.915 0.014 252);
+    --line: oklch(0.82 0.016 252);
+    --ink: oklch(0.24 0.025 252);
+    --ink-muted: oklch(0.48 0.02 252);
+    --ink-faint: oklch(0.62 0.016 252);
+    --auto: oklch(0.52 0.098 199);
+    --auto-soft: oklch(0.52 0.098 199 / 0.12);
+    --gate: oklch(0.58 0.16 55);
+    --gate-soft: oklch(0.58 0.16 55 / 0.14);
+    --gate-ink: oklch(0.32 0.1 55);
+    --shadow:
+      0 1px 2px oklch(0.24 0.025 252 / 0.06),
+      0 8px 24px oklch(0.24 0.025 252 / 0.06);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  html,
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  body {
+    font-family:
+      ui-sans-serif,
+      -apple-system,
+      'Segoe UI',
+      'Helvetica Neue',
+      Arial,
+      sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding: 56px 20px 96px;
+  }
+  .mono {
+    font-family:
+      ui-monospace, 'SF Mono', 'Berkeley Mono', Menlo, Consolas,
+      'Liberation Mono', monospace;
+  }
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  /* ---- header ---- */
+  header {
+    margin-bottom: 40px;
+  }
+  .eyebrow {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 10px;
+  }
+  h1 {
+    font-size: clamp(26px, 4vw, 32px);
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+    text-wrap: balance;
+    max-width: 18ch;
+  }
+  .dek {
+    color: var(--ink-muted);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  /* ---- legend ---- */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 7px 12px 7px 10px;
+    font-size: 13px;
+    color: var(--ink-muted);
+  }
+  .swatch {
+    width: 11px;
+    height: 11px;
+    flex: none;
+  }
+  .swatch.auto {
+    border-radius: 50%;
+    background: var(--auto);
+  }
+  .swatch.gate {
+    background: var(--gate);
+    transform: rotate(45deg);
+    border-radius: 2px;
+  }
+
+  /* ---- rail ---- */
+  .rail {
+    position: relative;
+    margin-top: 44px;
+    padding-left: 34px;
+  }
+  .rail::before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: linear-gradient(
+      to bottom,
+      var(--line),
+      var(--line) 92%,
+      transparent
+    );
+  }
+
+  .stage {
+    position: relative;
+    padding-bottom: 30px;
+  }
+  .stage:last-child {
+    padding-bottom: 0;
+  }
+
+  .marker {
+    position: absolute;
+    left: -34px;
+    top: 3px;
+    width: 20px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+  }
+  .marker::after {
+    content: '';
+    display: block;
+  }
+  .stage.auto .marker::after {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2.5px solid var(--auto);
+  }
+  .stage.gate .marker::after {
+    width: 13px;
+    height: 13px;
+    background: var(--gate);
+    transform: rotate(45deg);
+    border-radius: 2px;
+    box-shadow: 0 0 0 3px var(--gate-soft);
+  }
+  .stage.human .marker::after {
+    width: 13px;
+    height: 13px;
+    background: var(--gate);
+    transform: rotate(45deg);
+    border-radius: 2px;
+    box-shadow: 0 0 0 3px var(--gate-soft);
+  }
+
+  .stage-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .gate-tag {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .stage-title {
+    font-size: 16.5px;
+    font-weight: 650;
+    letter-spacing: -0.005em;
+  }
+  .stage.human .stage-title {
+    color: var(--gate-ink);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .stage.human .card {
+    background: var(--gate-soft);
+    border-color: color-mix(in oklch, var(--gate) 45%, var(--line));
+  }
+
+  .card p {
+    margin: 0 0 10px;
+    color: var(--ink-muted);
+    font-size: 14px;
+    max-width: 60ch;
+  }
+  .card p:last-child {
+    margin-bottom: 0;
+  }
+
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 12px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: var(--auto-soft);
+    color: var(--ink);
+    border: 1px solid color-mix(in oklch, var(--auto) 35%, var(--line));
+  }
+  .badge .model {
+    color: var(--ink-faint);
+  }
+  .badge.you {
+    background: var(--gate-soft);
+    border-color: color-mix(in oklch, var(--gate) 45%, var(--line));
+    color: var(--gate-ink);
+    font-weight: 650;
+  }
+  .badge.mech {
+    background: var(--surface-2);
+    color: var(--ink-muted);
+    border-color: var(--line);
+  }
+
+  .substeps {
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px dashed var(--line);
+    padding-top: 10px;
+  }
+  .substeps li {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    font-size: 13.5px;
+    color: var(--ink-muted);
+    padding: 4px 0;
+  }
+  .substeps li + li {
+    border-top: 1px solid color-mix(in oklch, var(--line) 60%, transparent);
+  }
+  .substeps .who {
+    flex: none;
+    width: 15ch;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+  .substeps .what strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .loop-note {
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: var(--auto);
+    display: flex;
+    gap: 6px;
+    align-items: baseline;
+  }
+
+  .interaction {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    font-size: 13px;
+    padding-top: 10px;
+    margin-top: 4px;
+    border-top: 1px solid color-mix(in oklch, var(--line) 70%, transparent);
+  }
+  .stage.human .interaction {
+    border-top-color: color-mix(in oklch, var(--gate) 30%, transparent);
+  }
+  .interaction .label {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+  }
+  .interaction .val {
+    color: var(--ink-muted);
+  }
+  .stage.human .interaction .val {
+    color: var(--gate-ink);
+    font-weight: 600;
+  }
+
+  .fail-branch {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    font-size: 13px;
+    color: var(--ink-muted);
+    border-left: 3px solid var(--auto);
+  }
+  .fail-branch strong {
+    color: var(--ink);
+  }
+
+  /* ---- summary strip ---- */
+  .summary {
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 16px 14px;
+    box-shadow: var(--shadow);
+  }
+  .stat .n {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 26px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 650;
+    line-height: 1;
+  }
+  .stat.you .n {
+    color: var(--gate-ink);
+  }
+  .stat.auto .n {
+    color: var(--auto);
+  }
+  .stat .lbl {
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: var(--ink-muted);
+    line-height: 1.4;
+  }
+
+  footer {
+    margin-top: 36px;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+  }
+
+  @media (max-width: 560px) {
+    .summary {
+      grid-template-columns: 1fr;
+    }
+    .substeps li {
+      flex-direction: column;
+      gap: 2px;
+    }
+    .substeps .who {
+      width: auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .stage {
+      animation: rise 0.5s ease backwards;
+    }
+    .stage:nth-child(1) {
+      animation-delay: 0.02s;
+    }
+    .stage:nth-child(2) {
+      animation-delay: 0.05s;
+    }
+    .stage:nth-child(3) {
+      animation-delay: 0.08s;
+    }
+    .stage:nth-child(4) {
+      animation-delay: 0.11s;
+    }
+    .stage:nth-child(5) {
+      animation-delay: 0.14s;
+    }
+    .stage:nth-child(6) {
+      animation-delay: 0.17s;
+    }
+    .stage:nth-child(7) {
+      animation-delay: 0.2s;
+    }
+    .stage:nth-child(8) {
+      animation-delay: 0.23s;
+    }
+    .stage:nth-child(9) {
+      animation-delay: 0.26s;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<div class="page">
+  <header>
+    <p class="eyebrow">
+      gate sequence · this repo's Claude Code delivery pipeline
+    </p>
+    <h1>From picking a ticket to a merged PR</h1>
+    <p class="dek">
+      Every agent that can touch a ticket, placed where it actually acts — the
+      orchestrating session, ten scoped subagents on their own models, and four
+      moments that stop and wait for you. Everything else runs without asking.
+    </p>
+    <div class="legend">
+      <span class="legend-item"
+        ><span class="swatch auto"></span>runs on its own</span
+      >
+      <span class="legend-item"
+        ><span class="swatch gate"></span>stops and waits for you</span
+      >
+    </div>
+  </header>
+
+  <div class="rail">
+    <div class="stage auto">
+      <div class="marker"></div>
+      <div class="stage-head">
+        <span class="gate-tag">GATE&nbsp;0</span>
+        <span class="stage-title">Pick the ticket, branch</span>
+      </div>
+      <div class="card">
+        <div class="badges">
+          <span class="badge"
+            >orchestrator
+            <span class="model">· Sonnet&nbsp;5 / Opus</span></span
+          >
+        </div>
+        <p>
+          Reads the issue and its acceptance criteria, moves the board card to
+          In&nbsp;Progress, checks out a fresh branch from
+          <code class="mono">origin/main</code>.
+        </p>
+        <ul class="substeps">
+          <li>
+            <span class="who">discovery</span
+            ><span class="what"
+              ><strong>explore</strong> · Haiku&nbsp;4.5, on demand — a cheap
+              disposable sweep for "where does X live" questions, dispatched
+              only if the ticket needs one before planning</span
+            >
+          </li>
+        </ul>
+        <div class="interaction">
+          <span class="label">You</span
+          ><span class="val"
+            >point at which ticket — nothing else needed here</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="stage auto">
+      <div class="marker"></div>
+      <div class="stage-head">
+        <span class="gate-tag">GATE&nbsp;1</span>
+        <span class="stage-title">Build, test, review — on a loop</span>
+      </div>
+      <div class="card">
+        <div class="badges">
+          <span class="badge"
+            >orchestrator
+            <span class="model">· Sonnet&nbsp;5 / Opus</span></span
+          >
+        </div>
+        <p>Dispatches each step below in order and relays findings back.</p>
+        <ul class="substeps">
+          <li>
+            <span class="who">implement</span
+            ><span class="what"
+              >layer subagent(s) —
+              <strong>config / cms / service / ui / web</strong>, each
+              Sonnet&nbsp;5 in its own worktree</span
+            >
+          </li>
+          <li>
+            <span class="who">write tests</span
+            ><span class="what"
+              ><strong>test-writer</strong> · Sonnet&nbsp;5, scoped to
+              <code class="mono">*.test.ts(x)</code> only</span
+            >
+          </li>
+          <li>
+            <span class="who">verify</span
+            ><span class="what"
+              ><strong>verify-runner</strong> · Haiku&nbsp;4.5 — runs
+              type-check/lint/test/build, reports pass/fail only, dispatched
+              synchronously since Gate&nbsp;1 can't proceed without the
+              result</span
+            >
+          </li>
+          <li>
+            <span class="who">review</span
+            ><span class="what"
+              ><strong>reviewer</strong> · Sonnet&nbsp;5 — full diff, every
+              issue</span
+            >
+          </li>
+          <li>
+            <span class="who">review — a11y</span
+            ><span class="what"
+              ><strong>a11y-reviewer</strong> · Sonnet&nbsp;5, only when the
+              diff touches <code class="mono">packages/ui</code> or
+              <code class="mono">apps/web</code></span
+            >
+          </li>
+          <li>
+            <span class="who">review — SEO</span
+            ><span class="what"
+              ><strong>seo-auditor</strong> · Sonnet&nbsp;5, only when the diff
+              touches routes/metadata/feeds</span
+            >
+          </li>
+        </ul>
+        <div class="loop-note">
+          ↻ any blocking finding from verify-runner or a dispatched reviewer
+          sends it back to implement — repeats until every dispatched reviewer
+          says APPROVE
+        </div>
+        <div class="interaction">
+          <span class="label">You</span
+          ><span class="val">nothing — the whole loop runs unattended</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage human">
+      <div class="marker"></div>
+      <div class="stage-head">
+        <span class="gate-tag">GATE&nbsp;2</span>
+        <span class="stage-title">Commit?</span>
+      </div>
+      <div class="card">
+        <div class="badges">
+          <span class="badge you">you decide</span>
+          <span class="badge"
+            >orchestrator
+            <span class="model">runs it after your yes</span></span
+          >
+        </div>
+        <p>
+          Only asked once reviewer has approved the diff as it stands. A single
+          new change after approval voids it — re-review before asking again.
+        </p>
+        <div class="interaction">
+          <span class="label">You</span
+          ><span class="val">explicit yes, every single time</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage human">
+      <div class="marker"></div>
+      <div class="stage-head">
+        <span class="gate-tag">GATE&nbsp;3</span>
+        <span class="stage-title">Push?</span>
+      </div>
+      <div class="card">
+        <div class="badges">
+          <span class="badge you">you decide</span>
+          <span class="badge"
+            >orchestrator
+            <span class="model">runs it after your yes</span></span
+          >
+        </div>
+        <p>
+          A separate ask from the commit above. Approving a push once never
+          covers the next one — including a fix-push made later at Gate&nbsp;5a.
+        </p>
+        <div class="interaction">
+          <span class="label">You</span
+          ><span class="val">explicit yes, every single time</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage human">
+      <div class="marker"></div>
+      <div class="stage-head">
+        <span class="gate-tag">GATE&nbsp;4</span>
+        <span class="stage-title">Open the PR?</span>
+      </div>
+      <div class="card">
+        <div class="badges">
+          <span class="badge you">you decide</span>
+          <span class="badge"
+            >orchestrator <span class="model">opens it + sets board</span></span
+          >
+        </div>
+        <p>
+          After push is confirmed. Once approved, the PR is opened and the board
+          moves to Code&nbsp;Review immediately after.
+        </p>
+        <div class="interaction">
+          <span class="label">You</span
+          ><span class="val">explicit yes, every single time</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage auto">
+      <div class="marker"></div>
+      <div class="stage-head">
+        <span class="gate-tag">GATE&nbsp;5a</span>
+        <span class="stage-title">Watch CI to completion</span>
+      </div>
+      <div class="card">
+        <div class="badges">
+          <span class="badge"
+            >ci-watcher <span class="model">· Haiku&nbsp;4.5</span></span
+          >
+          <span class="badge"
+            >orchestrator <span class="model">diagnoses on failure</span></span
+          >
+        </div>
+        <p>
+          Dispatched in the background with the PR's number, so the polling
+          noise lands in its own disposable context instead of the
+          orchestrator's — and the session isn't blocked while checks run.
+        </p>
+        <div class="fail-branch">
+          <strong>If a check fails</strong> — required or not — it hands back
+          the check name, run URL, and log excerpt. Orchestrator diagnoses,
+          delegates the fix to the owning layer subagent, then Gate&nbsp;3 fires
+          again for the fix-push.
+        </div>
+        <div class="interaction">
+          <span class="label">You</span
+          ><span class="val"
+            >nothing on green; one more push-approval if something failed</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="stage human">
+      <div class="marker"></div>
+      <div class="stage-head">
+        <span class="gate-tag">—</span>
+        <span class="stage-title">Merge</span>
+      </div>
+      <div class="card">
+        <div class="badges"><span class="badge you">you only</span></div>
+        <p>
+          Never automated, under any circumstance — no gate exists for it
+          because the orchestrator is never the one to click it. This is
+          entirely yours, in GitHub.
+        </p>
+        <div class="interaction">
+          <span class="label">You</span
+          ><span class="val"
+            >the click itself — not an approval, an action</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="stage auto">
+      <div class="marker"></div>
+      <div class="stage-head">
+        <span class="gate-tag">GATE&nbsp;6</span>
+        <span class="stage-title">Done</span>
+      </div>
+      <div class="card">
+        <div class="badges">
+          <span class="badge"
+            >board-keeper <span class="model">· Sonnet&nbsp;5</span></span
+          >
+          <span class="badge"
+            >orchestrator <span class="model">removes the worktree</span></span
+          >
+        </div>
+        <p>
+          <code class="mono">Closes&nbsp;#n</code> in the PR body closes the
+          issue on merge; the board moves to Done via GitHub's own automation.
+          board-keeper re-queries the write to confirm it actually stuck, and
+          sweeps the rest of the board for drift while it's there. Orchestrator
+          removes the subagent worktree once the safety checks pass — no gate,
+          just housekeeping.
+        </p>
+        <div class="interaction">
+          <span class="label">You</span><span class="val">nothing</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="stat you">
+      <div class="n">4 / 9</div>
+      <div class="lbl">
+        stages that stop and wait on you — three approvals, one action
+      </div>
+    </div>
+    <div class="stat auto">
+      <div class="n">13</div>
+      <div class="lbl">
+        distinct agents across the flow above — 5 layer + 8 named cross-cutting
+        roles, each in its own context
+      </div>
+    </div>
+    <div class="stat">
+      <div class="n">2</div>
+      <div class="lbl">
+        models in play — Sonnet&nbsp;5 for anything needing judgment,
+        Haiku&nbsp;4.5 for the mechanical, no-diagnosis jobs
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Gate numbers match this repo's own
+    <span class="mono">open-pull-request</span> skill exactly — nothing here is
+    renumbered for the diagram.
+  </footer>
+</div>
