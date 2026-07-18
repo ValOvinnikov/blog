@@ -129,39 +129,66 @@ agent rules and skill.
 
 ## 5. Verify
 
+Dispatch the **`verify-runner` subagent** (`.claude/agents/verify-runner.md`)
+to run the integration verify pass instead of running it inline yourself —
+`turbo run type-check`/`lint`/`test`/`build` output across up to 11 packages
+is purely mechanical (a compiler/test runner either succeeds or fails; no
+interpretation is needed to know which), so it belongs in the subagent's
+disposable Haiku context, not this session's. **Dispatch it synchronously
+(`run_in_background: false`), not in the background** — verify is a blocking
+prerequisite before `reviewer` can run in step 6, so there is no other queued
+work to do while waiting on it (unlike `ci-watcher`, which does have other
+work to fill the wait). Give it the exact ordered command sequence for the
+scenario at hand; it does not decide or guess scope.
+
+**`pnpm typegen` never goes to `verify-runner`.** It mutates
+`packages/config/src/sanity/generated/` in place — that is a write, not a
+read-only verify step, and `verify-runner`'s `read-only-agent-guard.sh` hook
+denies it same as it would for `reviewer`/`explore`/`ci-watcher`. Whenever a
+scenario below calls for typegen, run it yourself, inline, in this session
+_before_ dispatching `verify-runner` for the remaining checks.
+
 **Single-package task, no schema change** (e.g. service query added, ui component added):
 
-- Run per-package checks only: `pnpm --filter <pkg> type-check`,
-  `pnpm --filter <pkg> lint`, `pnpm --filter <pkg> test`.
+- Dispatch `verify-runner` with: `pnpm --filter <pkg> type-check`,
+  `pnpm --filter <pkg> lint`, `pnpm --filter <pkg> test` (stop-on-first-failure).
 - All three must pass before moving to self-review.
 
 **CMS-only task (schema changed)**:
 
-1. `pnpm typegen` — regenerates the types in
-   `packages/config/src/sanity/generated/` from the updated schema.
-2. `pnpm --filter cms type-check` and `pnpm --filter cms lint` — verify the
-   studio itself is clean.
+1. Run `pnpm typegen` yourself, inline — regenerates the types in
+   `packages/config/src/sanity/generated/` from the updated schema. Typegen
+   can be non-deterministic — re-run until the diff is minimal.
+2. Dispatch `verify-runner` with: `pnpm --filter cms type-check`,
+   `pnpm --filter cms lint` (stop-on-first-failure) — verify the studio
+   itself is clean.
 
 - No web build needed; downstream packages are unchanged.
 
 **Multi-layer task** (more than one package touched, or schema change with downstream effects):
-Run in this exact order from the repo root — each step feeds the next:
+Each step feeds the next:
 
-1. `pnpm typegen` — regenerates the types in
+1. Run `pnpm typegen` yourself, inline — regenerates the types in
    `packages/config/src/sanity/generated/` from the current schema.
    (`sanity schema extract` overwrites `schema.json` in place, so no manual
    clean is needed first. Typegen can be non-deterministic — re-run until the
    diff is minimal.)
-2. `pnpm type-check` — checks all packages against the freshly generated types.
-3. `pnpm lint` — runs across all packages.
-4. `pnpm test` — runs all test suites. Per-package checks already ran during
-   implementation; this is the integration pass.
-5. `pnpm --filter web build` — Next.js build catches RSC errors, missing env
-   vars, and bundle issues that type-check alone won't surface. Only `web`
-   needs this; `cms`, `service`, and `ui` have no build script.
+2. Dispatch `verify-runner` with this exact sequence, in order,
+   stop-on-first-failure:
+   - `pnpm type-check` — checks all packages against the freshly generated types.
+   - `pnpm lint` — runs across all packages.
+   - `pnpm test` — runs all test suites. Per-package checks already ran during
+     implementation; this is the integration pass.
+   - `pnpm --filter web build` — Next.js build catches RSC errors, missing env
+     vars, and bundle issues that type-check alone won't surface. Only `web`
+     needs this; `cms`, `service`, and `ui` have no build script.
 
-All checks must pass before moving to self-review. Fix the failing layer and
-re-run from that step — do not proceed with any red check.
+All checks must pass before moving to self-review. If `verify-runner` reports
+a failure, diagnose it yourself (or delegate the fix to the owning layer's
+subagent) — `verify-runner` only reports which command failed and the
+trimmed output, it never diagnoses or fixes. Fix the failing layer, then
+re-dispatch `verify-runner` from the failed step — do not proceed with any
+red check.
 
 ## 6. Review (blocking — Gate 2 must not be offered until this passes)
 

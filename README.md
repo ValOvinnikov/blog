@@ -128,6 +128,20 @@ contracts:
   - `service` — Sanity client, GROQ, typed fetchers (no React).
   - `ui` — building the pure, publishable `@blog/ui` design system.
   - `web` — App Router routes, SEO, composition of `ui` + `service`.
+  - `verify-runner` — read-only, Haiku-model runner for the integration
+    verify pass (`develop-feature` §5: `type-check`/`lint`/`test`/`build`,
+    the exact scenario-specific sequence it's given). Dispatched
+    **synchronously** (not background — verify blocks `reviewer`, so there's
+    no other work to queue while waiting) right before step 6's review. Runs
+    each command in order, stops at the first failure, and reports which
+    command failed plus trimmed output — no root-cause diagnosis or fix
+    suggestion. Never given `pnpm typegen`: that mutates generated files,
+    which its read-only guard denies, so typegen still runs inline in the
+    orchestrator's own session first. That replaces running the verify
+    commands directly in the orchestrator's own turn, which put
+    `turbo run type-check`/`lint`/`test`/`build` output across up to 11
+    packages permanently into its context for a purely mechanical pass/fail
+    job.
   - `reviewer` — read-only pre-commit review of the full diff; gates the
     commit ask on an `APPROVE` verdict.
   - `a11y-reviewer` — read-only accessibility audit of `packages/ui`/`apps/web`
@@ -174,12 +188,13 @@ contracts:
     output landing permanently in its context (paid again every turn until
     compaction) and blocked the session for the minutes CI took.
 
-  `reviewer`, `a11y-reviewer`, `seo-auditor`, `explore`, and `ci-watcher` are
-  read-only by **enforcement**, not just prose (#425, #464); `test-writer`
-  reuses the same `Bash` guard although it isn't fully read-only (#396). All
-  six run under `permissionMode: dontAsk`, so any Bash call the permission
-  engine would prompt for (redirects, `sed -i`, `tee`, unrecognized binaries)
-  is auto-denied, and a per-agent `PreToolUse` guard (`read-only-agent-guard.sh`)
+  `reviewer`, `a11y-reviewer`, `seo-auditor`, `explore`, `ci-watcher`, and
+  `verify-runner` are read-only by **enforcement**, not just prose (#425,
+  #464, #466); `test-writer` reuses the same `Bash` guard although it isn't
+  fully read-only (#396). All seven run under `permissionMode: dontAsk`, so
+  any Bash call the permission engine would prompt for (redirects, `sed -i`,
+  `tee`, unrecognized binaries) is auto-denied, and a per-agent `PreToolUse`
+  guard (`read-only-agent-guard.sh`)
   denies the write-shaped commands the project allow-list would otherwise
   admit (`git commit` — including with leading global flags like
   `git -C dir commit`, `mkdir`, `cp`, `pnpm typegen`, `pnpm exec`/
@@ -236,10 +251,10 @@ contracts:
     deny/allow matrix, reusing the discarded attempt's proven
     legitimate-command bank; run it directly or via CI (**Hooks**, below).
   - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`,
-    `a11y-reviewer`, `explore`, `seo-auditor`, `ci-watcher`, and `test-writer`
-    agent frontmatter — `test-writer` sets a `GUARD_LABEL` env var on its hook
-    command so the deny message names it correctly rather than calling it
-    "read-only")
+    `a11y-reviewer`, `explore`, `seo-auditor`, `ci-watcher`, `verify-runner`,
+    and `test-writer` agent frontmatter — `test-writer` sets a `GUARD_LABEL`
+    env var on its hook command so the deny message names it correctly
+    rather than calling it "read-only")
     backing the enforcement described above. Its deny list mirrors the
     write-shaped entries in `settings.json` `permissions.allow` — keep the
     two in sync. `read-only-agent-guard.test.sh` pins the deny/allow matrix
