@@ -215,12 +215,21 @@ stuck, and sweeps the whole board for drift (not just the issue you were
 working), not only the status you just set. It never edits code and only
 applies safe, forward-only status corrections; anything that looks
 destructive (e.g. reopening a wrongly-closed issue) comes back in its report
-for you to act on. Also dispatch it **right after filing any new issue**
-(`gh issue create`) — pass the issue number and, if you already know it, the
-label it should carry; `board-keeper` confirms the issue actually landed on
-the board with the right status and a label, catching issues that would
-otherwise sit off-board or unlabeled until the next full sweep. And dispatch
-it on demand whenever asked to "reconcile the board."
+for you to act on. And dispatch it on demand whenever asked to "reconcile
+the board."
+
+**Never call `gh issue create` directly — creating an issue always goes
+through `board-keeper`.** Dispatch it with `"create issue: title=..., body=...,
+labels=...(, parent=#<n>)"`; it creates the issue, places it on the board,
+confirms status and labels, links it to a parent if given, and only then
+reports the issue number back — creation and placement happen as one
+verified operation instead of two steps where the second could be skipped.
+Before dispatching, gather every required field — **title** (conventional-
+commit style), **body** (context + acceptance criteria), **at least one
+label**, and a **parent issue number** if this is a sub-issue of an existing
+tracking issue — asking the human for anything missing rather than guessing;
+`board-keeper` has no interactive-prompt tool, so this gathering only happens
+here, before dispatch, never inside it.
 
 ## Deployment
 
