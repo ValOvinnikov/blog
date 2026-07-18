@@ -25,7 +25,6 @@ export function makeRawPostCard(
       name: 'Jane Doe',
       slug: 'jane-doe',
       image: makeRawImage('Jane avatar'),
-      role: 'Writer',
     },
     categories: [
       {
