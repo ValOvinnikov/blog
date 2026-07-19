@@ -1,6 +1,7 @@
 export * from './action-list';
 export * from './brand-lockup';
 export * from './card-meta';
+export * from './command-link';
 export * from './image-with-caption';
 export * from './link-button';
 export * from './post-card';
