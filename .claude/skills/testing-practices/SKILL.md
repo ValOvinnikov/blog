@@ -118,6 +118,31 @@ export default mergeConfig(
   this is common in molecule and organism integration tests where the same role
   appears multiple times (e.g. multiple `<img>` or `<button>` elements).
   `IWithDataTestId` is on every `@blog/ui` component for exactly this purpose.
+- **Never drop to a raw DOM query** (`container.querySelector`/`querySelectorAll`,
+  `document.querySelector`, or any other direct DOM API) in place of a
+  Testing Library query. If no semantic query reaches an element — typically a
+  purely decorative, empty, roleless element like a blinking-cursor span —
+  add a **fixed, hardcoded `data-testid`** directly on that element in the
+  component and query it with `getByTestId`/`queryByTestId`:
+
+  ```tsx
+  // ✅ correct — element has no role/text, so it gets its own fixed test id
+  <span className={cursor()} aria-hidden="true" data-testid="cursor" />;
+
+  // test:
+  expect(screen.getByTestId('cursor')).toHaveAttribute('aria-hidden', 'true');
+
+  // ❌ wrong — raw DOM query as an escape hatch
+  expect(container.querySelector('[aria-hidden="true"]:empty')).toBeTruthy();
+  ```
+
+  This hardcoded `data-testid` is a **different concept** from the
+  `IWithDataTestId`/`dataTestId` prop above — that one is consumer-supplied,
+  for the component's own root element; this one is a fixed literal on an
+  internal sub-element with no other query path. Both are legitimate; don't
+  conflate them. Existing raw-DOM-query usage migrates opportunistically when
+  a test is touched; no mass rewrite.
+
 - Use `vi.fn()` / `vi.mock()` for boundaries (the Sanity client, `service`).
 - Deterministic: no real dates/network/random. Inject or freeze.
 - A bug fix gets a regression test that fails before the fix.
