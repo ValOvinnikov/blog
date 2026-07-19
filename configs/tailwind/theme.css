@@ -184,11 +184,17 @@
   --text: oklch(0.2 0.01 250);
   --text-muted: oklch(0.46 0.01 250);
   --text-subtle: oklch(0.6 0.008 250);
-  --accent: oklch(0.58 0.17 250);
-  --accent-hover: oklch(0.52 0.17 250);
+  /* --accent's L was lowered from 0.58 (independently re-derived: old value
+     measured 4.15:1 vs --bg / 3.86:1 vs --bg-subtle, both under the 4.5:1 AA
+     minimum for normal text). At L=0.53 it measures ~5.07:1 / ~4.72:1.
+     --accent-hover keeps the original -0.06 delta below --accent. */
+  --accent: oklch(0.53 0.17 250);
+  --accent-hover: oklch(0.47 0.17 250);
   --accent-muted: oklch(0.95 0.03 250);
   --accent-contrast: oklch(0.99 0 0);
-  /* Filled-surface accent — white text hits WCAG AA (~4.7:1) at this lightness. */
+  /* Filled-surface accent — white text hits WCAG AA (~4.7:1) at this lightness.
+     Independent of --accent by design (see comment above `--color-accent-solid`
+     in the @theme inline block); unaffected by --accent's contrast fix. */
   --accent-solid: oklch(0.55 0.17 250);
   --accent-solid-hover: oklch(0.49 0.17 250);
   --ring: var(--accent);
