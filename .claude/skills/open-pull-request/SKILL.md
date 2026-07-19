@@ -27,26 +27,46 @@ earlier layer's PR body must reference the tracked issue without an adjacent
 closing keyword — see the "PR body template" section below for the exact
 wording rule and an example.
 
-**Auto-close-keyword gotcha — GitHub's substring match ignores tense.**
-GitHub auto-closes an issue whenever `close(s)?|fix(es)?|resolve(s)? #N`
-appears _anywhere_ in the PR body, even inside prose describing a _future_
-action, not just a directive line. A partial-implementation PR that says
-"...confirm this live, then **close #399**" gets `#399` auto-closed on merge
-regardless — the keyword and number are adjacent, so GitHub's regex fires. If
-a PR body must explain that it does **not** close its tracked issue, never
-let a closing keyword sit directly next to the issue reference anywhere in
-the body: rephrase with intervening words so the two aren't adjacent — e.g.
-"revisit and close issue #399 later" breaks the adjacency; "then close #399"
-does not.
+**Auto-close-keyword gotcha — GitHub's substring match ignores tense, and it
+scans commit messages too, not just PR bodies.** GitHub auto-closes an issue
+whenever `close(s)?|fix(es)?|resolve(s)? #N` appears _anywhere_ in the PR
+body, even inside prose describing a _future_ action, not just a directive
+line. A partial-implementation PR that says "...confirm this live, then
+close #N" gets that issue auto-closed on merge regardless — the keyword and
+number are adjacent, so GitHub's regex fires. If a PR body must explain that
+it does **not** close its tracked issue, never let a closing keyword sit
+directly next to the issue reference anywhere in the body: rephrase with
+intervening words so the two aren't adjacent — e.g. "revisit and close issue
+#N later" breaks the adjacency; "then close #N" does not.
+
+**This applies equally to the squash-merge commit message** — a separate
+surface GitHub also scans, which can diverge from the reviewed PR body at
+merge time (GitHub composes the squash message from the PR title + body by
+default, but it can be hand-edited at merge time, and a direct `git commit`
+message on a squashed branch can differ entirely from what was in the PR
+body). Confirmed for real: a PR whose _body_ correctly avoided the adjacent
+form still triggered a real auto-close on issue #399 a third time (2026-07)
+because its **commit message** quoted the original incident narrative in a
+form that put a closing keyword directly next to that real issue number,
+which GitHub's scanner parsed the same way it parses PR bodies. When writing
+about this gotcha itself — in a PR body, an issue, docs, _or_ a commit
+message — never let a closing keyword land directly next to a **real** issue
+number, including when illustrating the pattern: use a placeholder like
+`#N` for examples (as this section does throughout), and wherever a genuine
+historical reference to a real issue number is unavoidable, always keep an
+intervening word between the keyword and the number.
 
 **If this bites anyway: reopening an issue does not revert board Status.**
-This happened for real with #399 — merging a PR whose body had an adjacent
-"close #399" auto-closed it, the board's "Pull request merged" workflow set
-Status to Done, the issue was manually reopened, but Status stayed on Done.
-~2 hours later the board's "Auto-close issue" workflow (fires on Status →
-Done) closed #399 again, with no PR/commit reference at all. If a similar
+This happened for real with issue #399 — merging a PR whose body put a
+closing keyword directly next to that issue's number auto-closed it, the
+board's "Pull request merged" workflow set Status to Done, the issue was
+manually reopened, but Status stayed on Done. ~2 hours later the board's
+"Auto-close issue" workflow (fires on Status → Done) closed it again, with
+no PR/commit reference at all. A **third** auto-close later came from a
+squash-merge commit message (see above), not a PR body at all. If a similar
 incident recurs, check the board Status field alongside open/closed
-state — reopening only fixes one of the two.
+state — reopening only fixes one of the two — and check both the PR body
+and its actual merge commit message, not just the former.
 
 ## ABSOLUTE RULES — never violate
 
