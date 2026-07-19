@@ -24,6 +24,15 @@ approval. Never bundle them. See `open-pull-request` skill for the full sequence
 - Trivial / single-file / one layer → just do it (still test + review).
 - Spans multiple layers → use the `add-content-type` recipe and delegate per
   layer as below.
+- **Filing a new issue for a feature that spans 2+ layers → file an epic
+  (parent) plus one sub-issue per layer, never a single flat issue.** This is
+  step 0's own "prefer one PR per layer" rule one level earlier: ticket
+  structure informs PR structure. See `CLAUDE.md`'s "Never call
+  `gh issue create` directly" section for the exact dispatch mechanics
+  (batch-create the epic first, then each sub-issue with `parent=<epic-number>`, one
+  `board-keeper` dispatch). Working an _existing_ issue that already spans
+  layers doesn't retroactively need this — it only applies when you're the one
+  filing the ticket.
 - **Prefer one PR per layer** (`config → cms → service → ui → web` when config
   changes are involved, otherwise `cms → service → ui → web`; dependency
   order) so each review stays small — **but split only when each layer merges
