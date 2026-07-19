@@ -2,7 +2,9 @@ import '../../../index.css';
 
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { Footer, Header, Logo, NavLink, PrimaryNavigation } from '@blog/ui';
+import { Footer, Header, NavLink, PrimaryNavigation } from '@blog/ui';
+import { BrandChipLink } from '@web/components/brand-chip-link/brand-chip-link';
+import { BrandLockupLink } from '@web/components/brand-lockup-link/brand-lockup-link';
 import { SmartLink } from '@web/components/smart-link/smart-link';
 import { ThemeToggleButton } from '@web/components/theme-toggle-button/theme-toggle-button';
 import { jetbrainsMono, newsreader, spaceGrotesk } from '@web/config/fonts';
@@ -89,9 +91,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
         <NextIntlClientProvider locale={locale} messages={null}>
           <Header>
             <Header.Brand>
-              <SmartLink href="/" aria-label="Home">
-                <Logo prefix={brand.prefix} suffix={brand.suffix} />
-              </SmartLink>
+              <BrandLockupLink brand={brand} />
             </Header.Brand>
             <PrimaryNavigation
               links={navItems}
@@ -101,6 +101,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
           </Header>
           {children}
           <Footer>
+            <BrandChipLink brand={brand} />
             <Footer.Copyright title={brand.name} />
             <Footer.Nav>
               {social.map((link) => (
