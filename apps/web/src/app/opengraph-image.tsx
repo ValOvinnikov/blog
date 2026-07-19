@@ -1,7 +1,7 @@
-import { service } from '@blog/service';
 import {
   buildDefaultSocialImage,
   contentType,
+  resolveDefaultSocialImageProps,
   size,
 } from '@web/metadata/default-social-image/default-social-image';
 
@@ -11,21 +11,11 @@ export { contentType, size };
 /**
  * Site-wide default Open Graph image (Console brand variant). Applies
  * wherever a route's resolved `seo.ogImageUrl` is absent (see `toMetadata`)
- * — this is the ultimate fallback, so it fetches `siteSettings` itself
- * rather than accepting props (this file has no access to a parent layout's
- * data) and degrades to a brand-mark-only image if that fetch fails.
+ * — this is the ultimate fallback, so it resolves its own props rather than
+ * accepting them (this file has no access to a parent layout's data).
  */
 export default async function Image() {
-  const result = await service.global.siteSettings.v1.getSiteSettings();
+  const props = await resolveDefaultSocialImageProps('opengraph-image');
 
-  if (!result.ok) {
-    console.error(
-      `Error fetching site settings for opengraph-image: ${result.error}`,
-    );
-    return buildDefaultSocialImage({});
-  }
-
-  const { brand, tagline } = result.data;
-
-  return buildDefaultSocialImage({ brandName: brand.name, tagline });
+  return buildDefaultSocialImage(props);
 }

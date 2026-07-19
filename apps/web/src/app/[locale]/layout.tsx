@@ -10,6 +10,7 @@ import { ThemeToggleButton } from '@web/components/theme-toggle-button/theme-tog
 import { jetbrainsMono, newsreader, spaceGrotesk } from '@web/config/fonts';
 import { themeBootstrapScript } from '@web/config/theme-script';
 import { routing } from '@web/i18n/routing';
+import { env } from '@web/utils/env/env';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
@@ -18,14 +19,23 @@ import { setRequestLocale } from 'next-intl/server';
 export async function generateMetadata(): Promise<Metadata> {
   const result = await service.global.siteSettings.v1.getSiteSettings();
 
+  // Every route's own `openGraph`/`twitter` replaces (not merges with) this
+  // root segment's — `metadataBase` is the one field that still inherits
+  // down (see `toMetadata`), which is what lets a leaf's relative fallback
+  // image path resolve to an absolute URL.
+  const metadataBase = env.NEXT_PUBLIC_SITE_URL
+    ? new URL(env.NEXT_PUBLIC_SITE_URL)
+    : undefined;
+
   if (!result.ok) {
     console.error(`Error to fetch site settings: ${result.error}`);
-    return {};
+    return { metadataBase };
   }
 
   const { brand, description } = result.data;
 
   return {
+    metadataBase,
     title: {
       default: brand.name,
       template: `%s | ${brand.name}`,

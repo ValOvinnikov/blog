@@ -1,22 +1,13 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { getSiteSettingsMock } = vi.hoisted(() => ({
-  getSiteSettingsMock: vi.fn(),
-}));
-
-const { buildDefaultSocialImageMock } = vi.hoisted(() => ({
-  buildDefaultSocialImageMock: vi.fn(),
-}));
-
-vi.mock('@blog/service', () => ({
-  service: {
-    global: {
-      siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } },
-    },
-  },
-}));
+const { resolveDefaultSocialImagePropsMock, buildDefaultSocialImageMock } =
+  vi.hoisted(() => ({
+    resolveDefaultSocialImagePropsMock: vi.fn(),
+    buildDefaultSocialImageMock: vi.fn(),
+  }));
 
 vi.mock('@web/metadata/default-social-image/default-social-image', () => ({
+  resolveDefaultSocialImageProps: resolveDefaultSocialImagePropsMock,
   buildDefaultSocialImage: buildDefaultSocialImageMock,
   contentType: 'image/png',
   size: { width: 1200, height: 630 },
@@ -24,43 +15,25 @@ vi.mock('@web/metadata/default-social-image/default-social-image', () => ({
 
 describe('opengraph-image', () => {
   beforeEach(() => {
-    getSiteSettingsMock.mockReset();
+    resolveDefaultSocialImagePropsMock.mockReset();
     buildDefaultSocialImageMock.mockReset();
   });
 
-  afterEach(() => {
-    vi.resetModules();
-  });
-
-  it('renders the brand name and tagline from site settings', async () => {
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brand: { name: 'Test Brand', prefix: 'test', suffix: 'brand' },
-        tagline: 'Building things',
-      },
+  it('resolves props for this route and renders the image from them', async () => {
+    resolveDefaultSocialImagePropsMock.mockResolvedValue({
+      brandName: 'Test Brand',
+      tagline: 'Building things',
     });
     const { default: Image } = await import('./opengraph-image');
 
     await Image();
 
+    expect(resolveDefaultSocialImagePropsMock).toHaveBeenCalledWith(
+      'opengraph-image',
+    );
     expect(buildDefaultSocialImageMock).toHaveBeenCalledWith({
       brandName: 'Test Brand',
       tagline: 'Building things',
     });
-  });
-
-  it('falls back to the brand-mark-only image when site settings fail to load', async () => {
-    getSiteSettingsMock.mockResolvedValue({ ok: false, error: 'boom' });
-    const consoleErrorSpy = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
-    const { default: Image } = await import('./opengraph-image');
-
-    await Image();
-
-    expect(buildDefaultSocialImageMock).toHaveBeenCalledWith({});
-    expect(consoleErrorSpy).toHaveBeenCalled();
-    consoleErrorSpy.mockRestore();
   });
 });
