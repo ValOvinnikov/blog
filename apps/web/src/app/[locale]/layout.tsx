@@ -1,5 +1,3 @@
-import '../../../index.css';
-
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { Footer, Header, NavLink, PrimaryNavigation } from '@blog/ui';
@@ -7,8 +5,6 @@ import { BrandChipLink } from '@web/components/brand-chip-link/brand-chip-link';
 import { BrandLockupLink } from '@web/components/brand-lockup-link/brand-lockup-link';
 import { SmartLink } from '@web/components/smart-link/smart-link';
 import { ThemeToggleButton } from '@web/components/theme-toggle-button/theme-toggle-button';
-import { jetbrainsMono, newsreader, spaceGrotesk } from '@web/config/fonts';
-import { themeBootstrapScript } from '@web/config/theme-script';
 import { routing } from '@web/i18n/routing';
 import { env } from '@web/utils/env/env';
 import type { Metadata } from 'next';
@@ -78,56 +74,42 @@ export default async function LocaleLayout({ children, params }: TProps) {
   const social = footerResult.ok ? footerResult.data.social : [];
 
   return (
-    <html
-      lang={locale}
-      className={`${spaceGrotesk.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}
-      suppressHydrationWarning
-    >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: themeBootstrapScript,
-          }}
+    // `locale` is passed explicitly (not inherited) so the page stays
+    // statically rendered; `messages={null}` — this app localizes routing
+    // only, it ships no translation messages. Client components that read
+    // the locale (next-intl navigation `Link` in the post-list module)
+    // need this provider or they throw "No intl context found".
+
+    // TODO: revisit this config (pass real messages, re-check static
+    // rendering) when translation messages are introduced.
+    <NextIntlClientProvider locale={locale} messages={null}>
+      <Header>
+        <Header.Brand>
+          <BrandLockupLink brand={brand} />
+        </Header.Brand>
+        <PrimaryNavigation
+          links={navItems}
+          actions={<ThemeToggleButton />}
+          linkAs={SmartLink}
         />
-      </head>
-      <body>
-        {/* `locale` is passed explicitly (not inherited) so the page stays
-            statically rendered; `messages={null}` — this app localizes routing
-            only, it ships no translation messages. Client components that read
-            the locale (next-intl navigation `Link` in the post-list module)
-            need this provider or they throw "No intl context found". */}
-        {/* TODO: revisit this config (pass real messages, re-check static
-            rendering) when translation messages are introduced.*/}
-        <NextIntlClientProvider locale={locale} messages={null}>
-          <Header>
-            <Header.Brand>
-              <BrandLockupLink brand={brand} />
-            </Header.Brand>
-            <PrimaryNavigation
-              links={navItems}
-              actions={<ThemeToggleButton />}
-              linkAs={SmartLink}
-            />
-          </Header>
-          {children}
-          <Footer>
-            <BrandChipLink brand={brand} />
-            <Footer.Copyright title={brand.name} />
-            <Footer.Nav>
-              {social.map((link) => (
-                <NavLink
-                  key={link.href}
-                  as={SmartLink}
-                  href={link.href}
-                  target={link.target}
-                >
-                  {link.label}
-                </NavLink>
-              ))}
-            </Footer.Nav>
-          </Footer>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+      </Header>
+      {children}
+      <Footer>
+        <BrandChipLink brand={brand} />
+        <Footer.Copyright title={brand.name} />
+        <Footer.Nav>
+          {social.map((link) => (
+            <NavLink
+              key={link.href}
+              as={SmartLink}
+              href={link.href}
+              target={link.target}
+            >
+              {link.label}
+            </NavLink>
+          ))}
+        </Footer.Nav>
+      </Footer>
+    </NextIntlClientProvider>
   );
 }
