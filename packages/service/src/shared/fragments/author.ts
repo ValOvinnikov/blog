@@ -10,7 +10,6 @@ export const authorCardFragment = q
     name: sub.field('name').notNull(),
     slug: sub.field('slug.current').notNull(),
     image: sub.field('image').project(imageWithAltFragment).notNull(),
-    role: sub.field('role').nullable(true),
   }));
 
 export const authorDetailFragment = q
