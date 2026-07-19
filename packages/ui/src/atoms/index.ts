@@ -1,4 +1,5 @@
 export * from './avatar';
+export * from './brand-mark';
 export * from './button';
 export * from './caption';
 export * from './eyebrow';

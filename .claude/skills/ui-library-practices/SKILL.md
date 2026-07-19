@@ -183,19 +183,36 @@ Import shared constants and types from `@blog/config` — never re-declare them 
   import { type VariantProps } from 'tailwind-variants';
   import { myComponentVariants } from './my-component-variants';
 
-  export interface IMyComponentProps extends IWithDataTestId {
+  export interface IMyComponentProps
+    extends IWithDataTestId, VariantProps<typeof myComponentVariants> {
     className?: string;
   }
 
-  export const MyComponent = ({ className, dataTestId }: IMyComponentProps) => (
+  export const MyComponent = ({
+    size,
+    className,
+    dataTestId,
+  }: IMyComponentProps) => (
     <button
       data-testid={dataTestId}
-      className={myComponentVariants({ class: className })}
+      className={myComponentVariants({ size, class: className })}
     >
       ...
     </button>
   );
   ```
+  **If a `tv()` variants file defines a `variants` key, it exports its own
+  derived type — `export type T{X}Variants = VariantProps<typeof
+xVariants>;` in the `*-variants.ts` file itself — and the component's
+  corresponding prop(s) are typed from that export (`size?:
+T{X}Variants['size']`, or `extends T{X}Variants` when every variant key
+  becomes a direct prop). Never derive `VariantProps<typeof xVariants>`
+  inline in the component file, and never hand-write a duplicate union (e.g.
+  `size?: 'sm' | 'md' | 'lg'`) — both drift out of sync with the variants
+  file; co-locating the derived type with the variants it comes from gives
+  every consumer (including a sibling component composing this one) one
+  canonical import instead of re-deriving it. See `brand-mark-variants.ts`
+  for the reference pattern.**
 - Always forward `className`; pass it as `class: className` in the `tv()` call — `tailwind-variants` handles merging internally. Never use `cn()` for this.
 - **Optional vs required props must match the render logic.** If a prop is only rendered conditionally (`{caption && <Caption>...}`), type it as `caption?: string` — not `caption: string`. A required prop the component ignores when falsy is a type lie; make it optional so callers never have to pass an empty string.
 - Prefer composition (`children`, slots) over boolean prop explosions.
@@ -556,6 +573,29 @@ in consumer-controlled markup.
 - Use `tailwind-variants` (`tv`) in the variants file for all base styles,
   variants, and sizes. Even components with no variants still define a `tv`.
   `tv` handles `tailwind-merge` internally — do **not** wrap the call with `cn()`.
+- **A component with multiple visual slots uses exactly one `tv({ slots: {...}
+})` call in its `*-variants.ts` file — never multiple separate `tv()`
+  exports.** Every named element (root plus each inner span/wrapper) becomes a
+  key in the single `slots` object; the component destructures the slot
+  functions it needs from that one call. This applies whenever a component has
+  more than one styled element, not just compound components — see
+  `logo-variants.ts`, `card-meta-variants.ts`, and `post-card-variants.ts`:
+  ```ts
+  // ✅ correct — one tv({ slots }) call
+  export const myComponentVariants = tv({
+    slots: {
+      root: ['flex items-center gap-2'],
+      label: ['font-medium'],
+      icon: ['text-accent'],
+    },
+  });
+  // component: const { root, label, icon } = myComponentVariants();
+
+  // ❌ wrong — one tv() export per element
+  export const myComponentRootVariants = tv({ base: [...] });
+  export const myComponentLabelVariants = tv({ base: [...] });
+  export const myComponentIconVariants = tv({ base: [...] });
+  ```
 - **Group classes by concern inside the `base` array** — one string per concern,
   not one long unreadable string:
   ```ts
@@ -634,10 +674,14 @@ in consumer-controlled markup.
   export const themeToggleVariants = tv({ base: [...] });
   export const themeTogglePlaceholderVariants = tv({ base: ['block h-[18px] w-[18px]'] });
   ```
-- In the component, pass `class: className` into the `tv` call — no `cn()` import needed:
+- In the component, pass `class: className` into the `tv` call — no `cn()` import needed. The `variant`/`size` args passed in must be typed via `VariantProps<typeof myComponentVariants>` on the prop type, not hand-written unions:
   ```tsx
   import { type VariantProps } from 'tailwind-variants';
   import { myComponentVariants } from './my-component-variants';
+
+  export type TMyComponentProps = VariantProps<typeof myComponentVariants> & {
+    className?: string;
+  };
 
   className={myComponentVariants({ variant, size, class: className })}
   ```
