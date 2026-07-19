@@ -234,6 +234,15 @@ tracking issue — asking the human for anything missing rather than guessing;
 `board-keeper` has no interactive-prompt tool, so this gathering only happens
 here, before dispatch, never inside it.
 
+**A feature spanning 2+ layers always gets an epic (parent) issue plus one
+sub-issue per layer — never a single flat issue covering multiple layers.**
+This mirrors "prefer per-layer PRs" one level earlier: ticket structure
+informs PR structure, not the other way around. Gather every sub-issue's
+title/body/labels up front, same as any other creation, then dispatch
+`board-keeper` once with the whole set — it creates the epic first, then
+each sub-issue with `parent=<epic-number>`, using its existing batch-dispatch
+support (one Step 1 pull covers the whole batch, not one per issue).
+
 ## Deployment
 
 Deploys are automated by the pipeline (see `docs/DEPLOY.md`, `SPEC.md` §13):

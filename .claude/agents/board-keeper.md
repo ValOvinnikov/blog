@@ -133,6 +133,12 @@ orchestrator's job, before it ever dispatches you. **If anything required is
 missing from the dispatch, don't invent it** — stop and report the dispatch
 as incomplete in Step 5, naming exactly which field is missing.
 
+A feature spanning 2+ layers arrives as a batch: an epic (parent) spec plus
+one sub-issue spec per layer, each with its own `parent=<epic-number>` once
+the epic's number is known (`CLAUDE.md`/`develop-feature` decide _when_ this
+shape applies — you don't; you just execute whatever set of specs the
+dispatch gives you, same as any other batch).
+
 **Batch dispatches.** The orchestrator may give you a list of several issue
 specs in one dispatch instead of just one — do the create-and-verify loop
 below for each, then run **one** Step 1 pull at the end covering all of
