@@ -98,12 +98,20 @@ table is stale and needs a follow-up edit here.
 ## Input you receive
 
 The orchestrator tells you why you're running: `"create issue: title=...,
-body=..., labels=...(, parent=#<n>)"` (see Step 0), `"after PR #<n>"`,
-`"after merge of #<n>"`, `"after filing issue #<n>"`, or a full "reconcile
-the board" sweep with no specific issue. Except for a pure creation
-dispatch (Step 0 hands off into the rest of the sweep anyway, so this still
-holds), do the full cross-reference regardless — a targeted trigger just
-tells you where drift is likeliest, not where to stop looking.
+body=..., labels=...(, parent=#<n>)"` — or a **list** of those for a batch
+of issues in one dispatch (see Step 0), `"after PR #<n>"`, `"after merge of
+#<n>"`, `"after filing issue #<n>"`, or a full "reconcile the board" sweep
+with no specific issue. For every trigger **except a pure creation
+dispatch**, do the full cross-reference regardless — a targeted trigger
+just tells you where drift is likeliest, not where to stop looking.
+
+**A pure creation dispatch is a different, cheaper operation — it does
+NOT cascade into the full sweep by default.** Creating an issue and
+reconciling the whole board are unrelated in cost and in what they check;
+bundling them meant every single ticket filed paid for a ~110-item sweep it
+didn't need. Stop after Step 0's own placement check unless the dispatch
+_also_ explicitly asks for a sweep (e.g. `"create issue: ...; also
+reconcile the board"`) — only then continue into Step 2 onward.
 
 **`"after filing issue #<n>"` may include a label.** The orchestrator knows
 what it just filed and may tell you which label(s) belong on it (e.g. "after
@@ -125,6 +133,15 @@ orchestrator's job, before it ever dispatches you. **If anything required is
 missing from the dispatch, don't invent it** — stop and report the dispatch
 as incomplete in Step 5, naming exactly which field is missing.
 
+**Batch dispatches.** The orchestrator may give you a list of several issue
+specs in one dispatch instead of just one — do the create-and-verify loop
+below for each, then run **one** Step 1 pull at the end covering all of
+them, not one per issue. That's the whole point of batching: N issues cost
+one dispatch's fixed overhead plus N cheap `gh issue create` calls, not N
+full dispatches.
+
+For each issue spec:
+
 1. Create the issue. The body arrives as inline text in your dispatch, not a
    file — pass it via a heredoc, not `--body-file` (no file exists to point
    at). If a `parent` was given, link it in the same call via `--parent`
@@ -143,14 +160,21 @@ as incomplete in Step 5, naming exactly which field is missing.
    flag silently worked, same re-verify-every-write discipline as any other
    fix here — by re-querying the parent's `subIssuesSummary` (same shape as
    Step 3b) and confirming the new number appears among its `subIssues`.
-3. Treat the new issue number exactly as if the orchestrator had dispatched
-   you with `"after filing issue #<n>"` (plus the labels you were given) —
-   run **Step 1** through **Step 1b** against it, no special-cased duplicate
-   logic. Then continue to Step 2 onward as usual; creating an issue doesn't
-   exempt this dispatch from the rest of the sweep.
-4. Report the created issue's number, URL, confirmed board status,
-   confirmed labels, and (if applicable) confirmed parent link in Step 5,
-   in addition to the normal drift table.
+
+Once every issue in the dispatch is created:
+
+3. Run **Step 1** once (covers all of them in a single pull), then apply
+   Step 1b's placement/status/label checks to each new issue number — same
+   logic as `"after filing issue #<n>"`, just batched. **Stop there.** Do
+   NOT continue into Step 2 onward — a creation dispatch is not a full
+   sweep (see "Input you receive" above) unless the orchestrator explicitly
+   also asked for one in the same dispatch.
+4. Report each created issue's number, URL, confirmed board status,
+   confirmed labels, and (if applicable) confirmed parent link in Step 5.
+   If the full sweep was not run (the normal case), say so explicitly in
+   Step 5 rather than presenting an empty drift table as if a sweep
+   happened — an empty table means "checked, nothing found," not "didn't
+   check."
 
 ## Step 1 — pull board state
 
@@ -380,8 +404,11 @@ decide whether to retry again or escalate.
 Structure your response exactly like this:
 
 1. **Drift found** — table: `Issue # | Board status | Expected status | Evidence (PR/branch)`.
-   Empty table (state so explicitly) if none found — that's a good outcome,
-   not a failure to report something.
+   Empty table (state so explicitly) if the sweep ran and found nothing —
+   that's a good outcome, not a failure to report something. If this was a
+   pure creation dispatch and Step 0 stopped before Step 2 (no sweep opt-in
+   requested), say that plainly instead — "sweep not run this dispatch" is a
+   different, equally valid outcome, not the same as "swept, found nothing."
 2. **Fixes applied** — one line per fix: `Issue #n: <old> → <new>, verified via re-query`.
    Include failed writes here too, marked clearly as failed, not silently
    dropped.
