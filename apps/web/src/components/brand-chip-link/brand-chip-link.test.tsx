@@ -9,6 +9,7 @@ const brand: TBrand = {
   prefix: 'test',
   suffix: 'brand',
   logoUrl: undefined,
+  specLine: undefined,
 };
 
 describe(`<${BrandChipLink.name}/>`, () => {
