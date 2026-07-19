@@ -7,7 +7,7 @@ const s = notFoundPageVariants();
 
 /**
  * NotFoundPage — the terminal-styled 404 body content. Rendered from the
- * root `global-not-found.tsx`, which sits outside the `[locale]` route tree (this
+ * root `not-found.tsx`, which sits outside the `[locale]` route tree (this
  * app's `Header`/`Footer` chrome lives in `[locale]/layout.tsx`), so this
  * stays a self-contained, centered composition: no site chrome, just the
  * `TerminalChip` molecule, a short explanation, and a link home.
