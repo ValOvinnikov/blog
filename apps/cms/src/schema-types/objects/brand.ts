@@ -37,5 +37,13 @@ export const brandSchema = defineType({
       description: 'Site logo. SVG or high-res PNG recommended.',
       validation: (rule) => rule.required(),
     }),
+    defineField({
+      name: 'specLine',
+      title: 'Spec Line',
+      type: 'string',
+      description:
+        'Optional monospace line shown below the logo — system-status/build-tag style text, editor\'s choice, e.g. "build 2026.07 · online".',
+      validation: (rule) => rule.max(60),
+    }),
   ],
 });

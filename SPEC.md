@@ -232,7 +232,7 @@ replacing a hand-duplicated block per page document.
 - `author` — name, slug, image, bio, role, socialLinks (unified `link`-based).
 - `category` — title, slug, description.
 - `siteSettings` (singleton) — `titleField` (read-only, fixed value), brand
-  (`brand` object: name/prefix/suffix/logo), description, tagline,
+  (`brand` object: name/prefix/suffix/logo/specLine), description, tagline,
   `defaultOgImage` (`imageWithAlt`, required — the last-resort social image).
 - `settings_navigation` (singleton) — `titleField` (read-only, fixed value),
   items (links).

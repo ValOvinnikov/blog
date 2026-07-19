@@ -132,6 +132,7 @@ export type Brand = {
   prefix?: string;
   suffix?: string;
   logo?: ImageWithAlt;
+  specLine?: string;
 };
 
 export type Seo = {
