@@ -41,10 +41,9 @@ describe(`<${CommandLink.name}/>`, () => {
   });
 
   it('marks the prompt and arrow as decorative', () => {
-    const { container } = render(
-      <CommandLink href="/" command="cd ~" ariaLabel="Return home" />,
-    );
-    expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(2);
+    render(<CommandLink href="/" command="cd ~" ariaLabel="Return home" />);
+    expect(screen.getByText('$')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByText('→')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('marks the cursor as decorative when shown', () => {
@@ -56,11 +55,16 @@ describe(`<${CommandLink.name}/>`, () => {
         showCursor
       />,
     );
-    expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(3);
+    // The cursor is an empty, roleless span — no semantic query reaches it,
+    // so a scoped container query is the documented Testing Library
+    // escape hatch, disambiguated from the prompt/arrow via `:empty`.
+    expect(
+      container.querySelector('[aria-hidden="true"]:empty'),
+    ).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('omits the arrow when showArrow is false', () => {
-    const { container } = render(
+    render(
       <CommandLink
         href="/"
         command="cd ~"
@@ -68,7 +72,7 @@ describe(`<${CommandLink.name}/>`, () => {
         showArrow={false}
       />,
     );
-    expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(1);
+    expect(screen.queryByText('→')).not.toBeInTheDocument();
   });
 
   it('renders with a custom component when the as prop is provided', () => {
