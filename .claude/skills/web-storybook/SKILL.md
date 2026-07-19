@@ -193,4 +193,9 @@ Use page-level paths: `"Pages/PostPage"`, `"Pages/HomePage"`,
 - [ ] All required props provided via `args`; no live Sanity calls.
 - [ ] `nextjs.navigation.pathname` set if component checks active route.
 - [ ] Fixtures live in `src/storybook/fixtures/`; not imported outside Storybook.
-- [ ] `pnpm --filter web storybook:build` exits cleanly (no TS errors).
+- [ ] Story compiles clean — `.storybook` and `src/**/*.tsx` (including
+      `.stories.tsx`) are covered by `apps/web/tsconfig.json`'s `include`, so
+      `pnpm --filter web type-check` already catches TS errors here; no
+      separate `storybook:build` needed. Verify the story renders correctly
+      in the running dev server (`pnpm --filter web storybook`) — that's the
+      check for actual Storybook/Vite runtime issues type-check can't see.

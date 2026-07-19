@@ -138,7 +138,10 @@ prompt — do not write it to disk first.
   changes need no migration; say so explicitly. Use the tooling and workflow in
   `apps/cms/migrations/` (`README.md` + `migrate:dry`/`migrate:run`/`dataset:export`).
   Migrations against `production` are human-gated like `sanity deploy`.
-- Verify with `pnpm type-check`, `pnpm lint`, `pnpm test`, `pnpm build` from root.
+- Verify with `pnpm type-check`, `pnpm lint`, `pnpm test` from root. `pnpm build`
+  is not part of the local loop — CI's `ci.yml` `build` job gates every PR;
+  only reproduce it locally when diagnosing an actual CI build failure
+  (`open-pull-request` Gate 5a).
 - **Edit-time format + lint feedback:** checked-in `PostToolUse` hooks
   (`.claude/hooks/post-edit-prettier.sh` then `.claude/hooks/post-edit-lint.sh`,
   chained as one command in `.claude/settings.json` since matching hooks

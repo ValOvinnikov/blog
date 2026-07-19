@@ -140,16 +140,17 @@ When invoked, before writing any code:
 - Co-locate `*.test.ts` (Vitest, `node` environment via `configs/vitest/preset.ts`).
   Test `routes.ts` builders and any pure helper in `packages/utils`. Presets
   under `configs/*` are not code — no tests, just correctness by consumption
-  (every workspace's own `type-check`/`lint`/`test`/`build` exercises them).
+  (every workspace's own `type-check`/`lint`/`test`, plus CI's `build` job,
+  exercises them).
 - Run `pnpm --filter @blog/config type-check` / `pnpm --filter @blog/utils type-check`
   after each major group of files.
 - Run the full test suite **once, after all implementation is complete**:
   `pnpm --filter @blog/config test` and `pnpm --filter @blog/utils test`.
 - **A change to `configs/*` has no test suite of its own** — its correctness
-  is proven by running `pnpm type-check`, `pnpm lint`, `pnpm test`, and
-  `pnpm --filter web build` from the repo root once every consuming workspace
-  has picked it up. Say so explicitly in your report so the orchestrator runs
-  the full multi-layer verify pass, not just this package's checks.
+  is proven by running `pnpm type-check`, `pnpm lint`, and `pnpm test` from
+  the repo root once every consuming workspace has picked it up (CI's `build`
+  job covers the rest). Say so explicitly in your report so the orchestrator
+  runs the full multi-layer verify pass, not just this package's checks.
 
 ## Definition of done
 

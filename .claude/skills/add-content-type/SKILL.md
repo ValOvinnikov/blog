@@ -89,7 +89,8 @@ Build in dependency order. Never skip a layer; never reverse the arrows.
 ## Step 6 — Verify
 
 - `pnpm typegen` (clean), then from root: `pnpm type-check`, `pnpm lint`,
-  `pnpm test`, `pnpm build`. All green.
+  `pnpm test`. All green. `pnpm build` is CI-only (`ci.yml`), not part of
+  local verify.
 - Run the `code-review-practices` skill over the diff before opening the PR.
 
 ## Boundary checklist (the whole point)

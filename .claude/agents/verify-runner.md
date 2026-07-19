@@ -1,8 +1,9 @@
 ---
 name: verify-runner
 description: >-
-  Runs the integration verify pass (type-check/lint/test/build, per the exact
-  scenario command sequence it's given) and reports pass/fail — never
+  Runs the integration verify pass (type-check/lint/test, per the exact
+  scenario command sequence it's given — build is CI-only, not part of the
+  routine sequence) and reports pass/fail — never
   diagnoses or fixes. Use in `develop-feature` §5, as a blocking prerequisite
   before the `reviewer` subagent can run. Dispatched **synchronously**
   (`run_in_background: false`), not background: the orchestrator cannot
@@ -74,7 +75,7 @@ stop rather than improvising a substitute.
 Report back to the orchestrator with exactly this structure:
 
 **All pass:** one line naming which checks ran and passed, e.g.
-`type-check, lint, test, build: all passed.`
+`type-check, lint, test: all passed.`
 
 **Any failure:**
 

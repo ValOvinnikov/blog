@@ -135,7 +135,10 @@ code fences are not findings — report only hits in real code.
 ## 7. Hygiene
 
 - Conventional commit, one concern per PR. No stray `console.log`, no committed
-  secrets/`.env`. `pnpm type-check`, `lint`, `test`, `build` pass from root.
+  secrets/`.env`. `type-check`/`lint`/`test` are confirmed by `verify-runner`
+  before this review is dispatched — reviewer trusts that result rather than
+  re-running the suite. `build` is CI-only (`ci.yml`'s `build` job gates every
+  PR); it is not part of the local/review loop.
 
 ## How to run a review here
 

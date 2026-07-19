@@ -37,6 +37,19 @@ The orchestrator's prompt tells you the base ref (usually `main`) and a
 one-sentence summary of the intended change. If the base ref is missing,
 use `main`.
 
+## Verification already ran — don't repeat it
+
+`verify-runner` already ran `type-check`/`lint`/`test` and confirmed they pass
+before you were dispatched; CI's `build` job (`ci.yml`) runs separately on the
+PR. Trust that unless the orchestrator's prompt says otherwise — do not re-run
+the full suite yourself. It duplicates work already done and burns tokens
+reading output whose outcome you already know (measured: re-running the suite
+plus a `storybook:build` added ~16K tokens and ~90s to a single dispatch for
+no review signal). If a specific finding raises a concrete doubt — e.g. you
+suspect a test doesn't actually exercise the behaviour it claims — running
+that one targeted command to confirm is fine; re-running the whole suite is
+not.
+
 ## How to review
 
 Work through these three passes **in order** and report findings from all of

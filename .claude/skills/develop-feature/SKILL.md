@@ -142,7 +142,7 @@ agent rules and skill.
 
 Dispatch the **`verify-runner` subagent** (`.claude/agents/verify-runner.md`)
 to run the integration verify pass instead of running it inline yourself —
-`turbo run type-check`/`lint`/`test`/`build` output across up to 11 packages
+`turbo run type-check`/`lint`/`test` output across up to 11 packages
 is purely mechanical (a compiler/test runner either succeeds or fails; no
 interpretation is needed to know which), so it belongs in the subagent's
 disposable Haiku context, not this session's. **Dispatch it synchronously
@@ -190,9 +190,14 @@ Each step feeds the next:
    - `pnpm lint` — runs across all packages.
    - `pnpm test` — runs all test suites. Per-package checks already ran during
      implementation; this is the integration pass.
-   - `pnpm --filter web build` — Next.js build catches RSC errors, missing env
-     vars, and bundle issues that type-check alone won't surface. Only `web`
-     needs this; `cms`, `service`, and `ui` have no build script.
+
+**No local `build` step.** CI's `ci.yml` runs a dedicated `build` job (Next.js
+build + Sanity Studio build) gating every PR — a local re-run duplicates it.
+Measured cost of adding it to the local loop: +~65% tokens and +~4.6× wall
+time on a `verify-runner` dispatch, for a check CI already gates on. If you
+need to reproduce an actual CI build failure, run the specific failing
+command locally then (`open-pull-request` Gate 5a) — that's targeted
+diagnosis, not a routine step.
 
 All checks must pass before moving to self-review. If `verify-runner` reports
 a failure, diagnose it yourself (or delegate the fix to the owning layer's
