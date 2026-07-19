@@ -51,6 +51,32 @@ exact fix command to the orchestrator in Step 5 and stop — a reconciliation
 attempted on a scope-broken token produces incomplete, misleading results,
 not a partial success.
 
+## Scratch files — namespace them, never a fixed path
+
+If any step in this file has you stage intermediate `gh`/`git`/`jq` output to
+a file for a later step to read (rather than holding it in your own
+context), **never write to a fixed, guessable path** like `/tmp/board.json`
+or `/tmp/board_summary.tsv`. This repo's multi-worktree, multi-session
+workflow means other concurrent sessions can be writing to the exact same
+predictable filename at the same time — this has already caused two silent
+corruptions in real dispatches (a file overwritten mid-run by an unrelated
+session, and a `jq 'length'` count that changed between two reads of the
+"same" file with no command of the dispatching agent's own touching it).
+Neither incident errored — both were caught only because the resulting count
+was internally inconsistent with an earlier read, which is not guaranteed
+for every check you might do.
+
+Use a namespaced temp directory instead:
+
+```
+scratch=$(mktemp -d)
+# ... write/read files under "$scratch/" instead of a bare /tmp/<name> path
+```
+
+This applies to every step in this file, not just one — don't assume a
+scratch file is safe just because a particular step doesn't currently
+mention writing one.
+
 ## Board IDs (hardcoded — this is the documented source, don't re-derive)
 
 | Key             | Value                            |
