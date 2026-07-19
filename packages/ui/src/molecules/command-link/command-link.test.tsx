@@ -47,7 +47,7 @@ describe(`<${CommandLink.name}/>`, () => {
   });
 
   it('marks the cursor as decorative when shown', () => {
-    const { container } = render(
+    render(
       <CommandLink
         href="/"
         command="cd ~"
@@ -55,12 +55,7 @@ describe(`<${CommandLink.name}/>`, () => {
         showCursor
       />,
     );
-    // The cursor is an empty, roleless span — no semantic query reaches it,
-    // so a scoped container query is the documented Testing Library
-    // escape hatch, disambiguated from the prompt/arrow via `:empty`.
-    expect(
-      container.querySelector('[aria-hidden="true"]:empty'),
-    ).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByTestId('cursor')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('omits the arrow when showArrow is false', () => {

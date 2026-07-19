@@ -62,7 +62,9 @@ export const CommandLink = <C extends ElementType = 'a'>({
           →
         </span>
       )}
-      {showCursor && <span className={cursor()} aria-hidden="true" />}
+      {showCursor && (
+        <span className={cursor()} aria-hidden="true" data-testid="cursor" />
+      )}
     </Component>
   );
 };
