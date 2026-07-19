@@ -35,6 +35,30 @@ const preview: Preview = {
         ],
       },
     },
+    // Custom viewport presets matching this repo's Tailwind breakpoints
+    // (`sm` 640px, `md` 768px — Tailwind v4 defaults, unmodified by
+    // `configs/tailwind/preset.ts`), available from the toolbar for any
+    // story. Don't redefine viewports or override them per-story — see the
+    // `ui-storybook` skill.
+    viewport: {
+      viewports: {
+        phone: {
+          name: 'Phone (<640px)',
+          styles: { width: '375px', height: '667px' },
+          type: 'mobile',
+        },
+        tablet: {
+          name: 'Tablet (640-768px)',
+          styles: { width: '700px', height: '1024px' },
+          type: 'tablet',
+        },
+        desktop: {
+          name: 'Desktop (≥768px)',
+          styles: { width: '1024px', height: '768px' },
+          type: 'desktop',
+        },
+      },
+    },
   },
 };
 export default preview;

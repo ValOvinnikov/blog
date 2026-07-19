@@ -1,5 +1,6 @@
-import type { IWithDataTestId, Size } from '@blog/config';
+import type { IWithDataTestId } from '@blog/config';
 import type { SVGProps } from 'react';
+import type { VariantProps } from 'tailwind-variants';
 
 import { brandMarkVariants } from './brand-mark-variants';
 
@@ -7,7 +8,7 @@ export interface IBrandMarkProps
   extends
     Omit<SVGProps<SVGSVGElement>, 'className' | 'title'>,
     IWithDataTestId {
-  size?: typeof Size.SM | typeof Size.MD | typeof Size.LG;
+  size?: VariantProps<typeof brandMarkVariants>['size'];
   /** Accessible title for standalone use. Omit to keep the mark decorative. */
   title?: string;
   className?: string;

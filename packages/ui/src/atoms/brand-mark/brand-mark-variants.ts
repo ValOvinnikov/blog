@@ -5,9 +5,9 @@ export const brandMarkVariants = tv({
   base: ['inline-block shrink-0'],
   variants: {
     size: {
-      [Size.SM]: 'size-5',
-      [Size.MD]: 'size-7',
-      [Size.LG]: 'size-9',
+      [Size.SM]: ['size-5'],
+      [Size.MD]: ['size-7'],
+      [Size.LG]: ['size-9'],
     },
   },
   defaultVariants: {

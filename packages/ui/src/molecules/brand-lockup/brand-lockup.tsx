@@ -1,5 +1,5 @@
-import type { IWithDataTestId, Size } from '@blog/config';
-import { BrandMark } from '@blog/ui/atoms/brand-mark';
+import type { IWithDataTestId } from '@blog/config';
+import { BrandMark, type IBrandMarkProps } from '@blog/ui/atoms/brand-mark';
 import { Logo } from '@blog/ui/atoms/logo';
 import type { ComponentPropsWithoutRef } from 'react';
 
@@ -9,7 +9,7 @@ export interface IBrandLockupProps
   extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
   prefix: string;
   suffix?: string;
-  size?: typeof Size.SM | typeof Size.MD | typeof Size.LG;
+  size?: IBrandMarkProps['size'];
   specLine?: string;
 }
 

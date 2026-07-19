@@ -211,6 +211,17 @@ needed. `.storybook/preview.css` re-asserts the themed canvas background at
 higher specificity so the whole preview (not just component colors) follows
 the toggle.
 
+## Viewport testing
+
+Global responsive breakpoint presets (phone/tablet/desktop, matching this
+repo's real Tailwind breakpoints) live in `.storybook/preview.ts`'s
+`parameters.viewport` config, wired via `@storybook/addon-viewport` (bundled
+in `@storybook/addon-essentials`). The toolbar viewport picker uses these
+presets for **every** story automatically — **never redefine a custom
+viewport object or add a per-story `parameters.viewport` override in an
+individual story file.** Anyone can switch viewports interactively from the
+toolbar; a story doesn't need a dedicated export per breakpoint.
+
 ## MDX documentation pages
 
 For complex components, add a `{component}.mdx` file alongside stories to write
