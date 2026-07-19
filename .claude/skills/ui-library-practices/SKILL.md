@@ -201,11 +201,18 @@ Import shared constants and types from `@blog/config` — never re-declare them 
     </button>
   );
   ```
-  **If a `tv()` variants file defines a `variants` key, the component's
-  corresponding prop type must be derived from `VariantProps<typeof
-xVariants>` — never hand-written as a duplicate union (e.g. `size?: 'sm' |
-'md' | 'lg'`) that can silently drift out of sync with the variants file.
-  See `button.tsx`/`tag.tsx` for the reference pattern.**
+  **If a `tv()` variants file defines a `variants` key, it exports its own
+  derived type — `export type T{X}Variants = VariantProps<typeof
+xVariants>;` in the `*-variants.ts` file itself — and the component's
+  corresponding prop(s) are typed from that export (`size?:
+T{X}Variants['size']`, or `extends T{X}Variants` when every variant key
+  becomes a direct prop). Never derive `VariantProps<typeof xVariants>`
+  inline in the component file, and never hand-write a duplicate union (e.g.
+  `size?: 'sm' | 'md' | 'lg'`) — both drift out of sync with the variants
+  file; co-locating the derived type with the variants it comes from gives
+  every consumer (including a sibling component composing this one) one
+  canonical import instead of re-deriving it. See `brand-mark-variants.ts`
+  for the reference pattern.**
 - Always forward `className`; pass it as `class: className` in the `tv()` call — `tailwind-variants` handles merging internally. Never use `cn()` for this.
 - **Optional vs required props must match the render logic.** If a prop is only rendered conditionally (`{caption && <Caption>...}`), type it as `caption?: string` — not `caption: string`. A required prop the component ignores when falsy is a type lie; make it optional so callers never have to pass an empty string.
 - Prefer composition (`children`, slots) over boolean prop explosions.

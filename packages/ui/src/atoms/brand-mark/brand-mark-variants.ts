@@ -1,5 +1,6 @@
 import { Size } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const brandMarkVariants = tv({
   base: ['inline-block shrink-0'],
@@ -14,3 +15,5 @@ export const brandMarkVariants = tv({
     size: Size.MD,
   },
 });
+
+export type TBrandMarkVariants = VariantProps<typeof brandMarkVariants>;
