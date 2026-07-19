@@ -24,11 +24,9 @@ const meta = {
   title: 'Molecules/BrandLockup',
   component: BrandLockup,
   tags: ['autodocs'],
-  argTypes: {
-    variant: {
-      control: 'select',
-      options: ['console', 'indigo'],
-    },
+  args: {
+    prefix: 'brand',
+    suffix: 'io',
   },
 } satisfies Meta<typeof BrandLockup>;
 
@@ -38,25 +36,25 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const WithSpecLine: TStory = {
-  args: { showSpec: true, specLine: 'v1.0.0 · build/local' },
+  args: { specLine: 'v1.0.0 · build/local' },
 };
 
 export const PhoneMarkOnly: TStory = {
-  args: { showSpec: true, specLine: 'v1.0.0 · build/local' },
+  args: { specLine: 'v1.0.0 · build/local' },
   parameters: {
     viewport: { viewports: RESPONSIVE_VIEWPORTS, defaultViewport: 'phone' },
   },
 };
 
 export const TabletWithWordmark: TStory = {
-  args: { showSpec: true, specLine: 'v1.0.0 · build/local' },
+  args: { specLine: 'v1.0.0 · build/local' },
   parameters: {
     viewport: { viewports: RESPONSIVE_VIEWPORTS, defaultViewport: 'tablet' },
   },
 };
 
 export const DesktopWithSpecLine: TStory = {
-  args: { showSpec: true, specLine: 'v1.0.0 · build/local' },
+  args: { specLine: 'v1.0.0 · build/local' },
   parameters: {
     viewport: { viewports: RESPONSIVE_VIEWPORTS, defaultViewport: 'desktop' },
   },

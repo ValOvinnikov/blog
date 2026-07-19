@@ -17,23 +17,13 @@ const meta = {
       control: 'select',
       options: objectKeys(brandMarkVariants.variants.size),
     },
-    variant: {
-      control: 'select',
-      options: ['console', 'indigo'],
-    },
   },
 } satisfies Meta<typeof BrandMark>;
 
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-export const Console: TStory = {
-  args: { variant: 'console' },
-};
-
-export const Indigo: TStory = {
-  args: { variant: 'indigo' },
-};
+export const Default: TStory = {};
 
 export const Small: TStory = {
   args: { size: Size.SM },

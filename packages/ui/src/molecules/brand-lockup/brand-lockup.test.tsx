@@ -6,37 +6,31 @@ import { BrandLockup } from './brand-lockup';
 faker.seed(123);
 
 describe(`<${BrandLockup.name}/>`, () => {
-  it('renders the mark and the fixed wordmark', () => {
-    const { container } = render(<BrandLockup />);
+  it('renders the mark and the wordmark from prefix/suffix', () => {
+    const prefix = faker.word.noun();
+    const suffix = faker.word.noun();
+    const { container } = render(
+      <BrandLockup prefix={prefix} suffix={suffix} />,
+    );
     expect(container.querySelectorAll('polygon')).toHaveLength(3);
-    expect(screen.getByText('BRAND')).toBeVisible();
+    expect(screen.getByText(prefix)).toBeVisible();
+    expect(screen.getByText(suffix)).toBeVisible();
   });
 
   it('renders the mark decoratively — no accessible role or name', () => {
-    render(<BrandLockup />);
+    render(<BrandLockup prefix={faker.word.noun()} />);
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('does not render a spec line by default', () => {
     const specLine = faker.hacker.phrase();
-    render(<BrandLockup specLine={specLine} />);
+    render(<BrandLockup prefix={faker.word.noun()} />);
     expect(screen.queryByText(specLine)).not.toBeInTheDocument();
   });
 
-  it('does not render a spec line when showSpec is set without specLine text', () => {
-    const { container } = render(<BrandLockup showSpec />);
-    expect(container.textContent).toBe('BRAND');
-  });
-
-  it('renders the spec line when showSpec and specLine are both set', () => {
+  it('renders the spec line when specLine is set', () => {
     const specLine = faker.hacker.phrase();
-    render(<BrandLockup showSpec specLine={specLine} />);
+    render(<BrandLockup prefix={faker.word.noun()} specLine={specLine} />);
     expect(screen.getByText(specLine)).toBeVisible();
-  });
-
-  it('forwards the indigo variant to the mark', () => {
-    const { container } = render(<BrandLockup variant="indigo" />);
-    const firstPolygon = container.querySelector('polygon');
-    expect(firstPolygon).toHaveStyle({ fill: 'var(--logo-alt-1)' });
   });
 });

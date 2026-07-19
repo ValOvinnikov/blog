@@ -556,6 +556,29 @@ in consumer-controlled markup.
 - Use `tailwind-variants` (`tv`) in the variants file for all base styles,
   variants, and sizes. Even components with no variants still define a `tv`.
   `tv` handles `tailwind-merge` internally — do **not** wrap the call with `cn()`.
+- **A component with multiple visual slots uses exactly one `tv({ slots: {...}
+})` call in its `*-variants.ts` file — never multiple separate `tv()`
+  exports.** Every named element (root plus each inner span/wrapper) becomes a
+  key in the single `slots` object; the component destructures the slot
+  functions it needs from that one call. This applies whenever a component has
+  more than one styled element, not just compound components — see
+  `logo-variants.ts`, `card-meta-variants.ts`, and `post-card-variants.ts`:
+  ```ts
+  // ✅ correct — one tv({ slots }) call
+  export const myComponentVariants = tv({
+    slots: {
+      root: ['flex items-center gap-2'],
+      label: ['font-medium'],
+      icon: ['text-accent'],
+    },
+  });
+  // component: const { root, label, icon } = myComponentVariants();
+
+  // ❌ wrong — one tv() export per element
+  export const myComponentRootVariants = tv({ base: [...] });
+  export const myComponentLabelVariants = tv({ base: [...] });
+  export const myComponentIconVariants = tv({ base: [...] });
+  ```
 - **Group classes by concern inside the `base` array** — one string per concern,
   not one long unreadable string:
   ```ts
