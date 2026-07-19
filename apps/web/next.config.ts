@@ -85,6 +85,14 @@ const securityHeaders = [
 const config: NextConfig = {
   turbopack: { root: turbopackRoot },
   transpilePackages: ['@blog/ui', '@blog/service', '@blog/config'],
+  // `src/app/[locale]/layout.tsx` is a top-level dynamic segment, so there is
+  // no single `app/layout.tsx` to compose a global 404 from. `global-not-
+  // found.js` (`src/app/global-not-found.tsx`) is Next's documented answer
+  // to that exact topology — it bypasses normal layout composition and
+  // renders a fully self-contained document instead.
+  experimental: {
+    globalNotFound: true,
+  },
   images: {
     remotePatterns: [
       {

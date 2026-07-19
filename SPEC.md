@@ -372,6 +372,14 @@ changing a schema does **not** change existing documents.
   locale; `setRequestLocale(locale)` at the top of every layout/page. Links go
   through `SmartLink` (`@web/components/smart-link`) or the locale-aware
   `Link` from `@web/i18n/navigation` — never `next/link` directly.
+- **Global 404 exception:** the one file deliberately outside `[locale]/`.
+  Because `[locale]/layout.tsx` is a top-level dynamic segment, there is no
+  `app/layout.tsx` for a plain root `not-found.tsx` to compose into for
+  genuinely unmatched URLs. `src/app/global-not-found.tsx` opts into Next's
+  `global-not-found.js` convention (`experimental.globalNotFound: true` in
+  `next.config.ts`) instead — a fully self-contained document (own
+  `<html>`/`<body>`, own global stylesheet + font imports) with no
+  `Header`/`Footer` chrome (#491).
 
 ## 10. SEO & accessibility
 
