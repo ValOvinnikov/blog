@@ -31,6 +31,7 @@ describe('getSiteSettings', () => {
           name: 'Awesome Blog',
           prefix: 'val',
           suffix: '.dev',
+          specLine: 'A blog about building things',
           logo: makeRawImage('Logo'),
         },
       }),
@@ -42,6 +43,25 @@ describe('getSiteSettings', () => {
     expect(result.brand.name).toBe('Awesome Blog');
     expect(result.brand.prefix).toBe('val');
     expect(result.brand.suffix).toBe('.dev');
+    expect(result.brand.specLine).toBe('A blog about building things');
+  });
+
+  it('maps a missing spec line to undefined', async () => {
+    mockRun.mockResolvedValue(
+      makeRawSiteSettings({
+        brand: {
+          name: 'Awesome Blog',
+          prefix: 'val',
+          suffix: '.dev',
+          specLine: null,
+          logo: makeRawImage('Logo'),
+        },
+      }),
+    );
+
+    const result = await getSiteSettings();
+
+    expect(result.brand.specLine).toBeUndefined();
   });
 
   it('maps the default OG image to a URL', async () => {

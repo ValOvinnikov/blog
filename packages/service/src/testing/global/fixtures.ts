@@ -11,6 +11,7 @@ export function makeRawSiteSettings(
       name: 'My Blog',
       prefix: 'val',
       suffix: null,
+      specLine: null,
       logo: makeRawImage('Logo'),
     },
     description: 'A blog about things',
