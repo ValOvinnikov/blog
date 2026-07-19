@@ -216,7 +216,8 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
 
 Run these checks **once, after all work is complete**:
 
-- `pnpm --filter web type-check`, `lint`, `test`, and `build` pass.
+- `pnpm --filter web type-check`, `lint`, and `test` pass. `build` runs in CI
+  (`ci.yml`) and is not part of local verify.
 - No direct Sanity import; no GROQ; no raw `next/link` import outside the
   `SmartLink` wrapper; no inline presentation that belongs in `ui`.
 - Routes have metadata; feeds present; ISR/revalidation wired.

@@ -129,21 +129,25 @@ contracts:
   - `ui` — building the pure, publishable `@blog/ui` design system.
   - `web` — App Router routes, SEO, composition of `ui` + `service`.
   - `verify-runner` — read-only, Haiku-model runner for the integration
-    verify pass (`develop-feature` §5: `type-check`/`lint`/`test`/`build`,
-    the exact scenario-specific sequence it's given). Dispatched
-    **synchronously** (not background — verify blocks `reviewer`, so there's
-    no other work to queue while waiting) right before step 6's review. Runs
-    each command in order, stops at the first failure, and reports which
-    command failed plus trimmed output — no root-cause diagnosis or fix
-    suggestion. Never given `pnpm typegen`: that mutates generated files,
-    which its read-only guard denies, so typegen still runs inline in the
-    orchestrator's own session first. That replaces running the verify
-    commands directly in the orchestrator's own turn, which put
-    `turbo run type-check`/`lint`/`test`/`build` output across up to 11
-    packages permanently into its context for a purely mechanical pass/fail
-    job.
+    verify pass (`develop-feature` §5: `type-check`/`lint`/`test`,
+    the exact scenario-specific sequence it's given). `build` is not part of
+    the routine sequence — CI's `ci.yml` `build` job gates every PR, so a
+    local re-run would just duplicate it; `verify-runner` still runs `build`
+    on request when reproducing an actual CI build failure
+    (`open-pull-request` Gate 5a). Dispatched **synchronously** (not
+    background — verify blocks `reviewer`, so there's no other work to queue
+    while waiting) right before step 6's review. Runs each command in order,
+    stops at the first failure, and reports which command failed plus
+    trimmed output — no root-cause diagnosis or fix suggestion. Never given
+    `pnpm typegen`: that mutates generated files, which its read-only guard
+    denies, so typegen still runs inline in the orchestrator's own session
+    first. That replaces running the verify commands directly in the
+    orchestrator's own turn, which put `turbo run type-check`/`lint`/`test`
+    output across up to 11 packages permanently into its context for a
+    purely mechanical pass/fail job.
   - `reviewer` — read-only pre-commit review of the full diff; gates the
-    commit ask on an `APPROVE` verdict.
+    commit ask on an `APPROVE` verdict. Trusts `verify-runner`'s already-passed
+    `type-check`/`lint`/`test` result rather than re-running it.
   - `a11y-reviewer` — read-only accessibility audit of `packages/ui`/`apps/web`
     diffs against `ui-library-practices`' non-negotiable rules; dispatched
     alongside `reviewer` whenever a diff touches those layers.

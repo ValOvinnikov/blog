@@ -333,7 +333,6 @@ Do not manually set Done.
 - [ ] pnpm type-check
 - [ ] pnpm lint
 - [ ] pnpm test
-- [ ] pnpm --filter web build (if web was touched)
 - [ ] Storybook stories present (if ui components were added or changed)
 
 Closes #<n>

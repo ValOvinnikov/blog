@@ -259,4 +259,9 @@ Stories in `@blog/ui` must obey the same boundary rules as the components:
       control sourced via `objectKeys(<x>Variants.variants.<group>)`, not
       left to TypeScript inference.
 - [ ] No `service`/`sanity`/`next` imports in the story file.
-- [ ] `pnpm --filter @blog/ui storybook:build` exits cleanly (no TS errors).
+- [ ] Story compiles clean — `.storybook` and `.stories.tsx` are covered by
+      `packages/ui/tsconfig.json`'s `include`, so `pnpm --filter @blog/ui
+  type-check` already catches TS errors here; no separate
+      `storybook:build` needed. Verify the story renders correctly in the
+      running dev server (`pnpm --filter @blog/ui storybook`) — that's the
+      check for actual Storybook/Vite runtime issues type-check can't see.
