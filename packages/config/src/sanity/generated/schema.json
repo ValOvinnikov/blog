@@ -671,6 +671,13 @@
             "name": "imageWithAlt"
           },
           "optional": true
+        },
+        "specLine": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
         }
       }
     }
