@@ -1,5 +1,14 @@
 # Blog
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/brand/mark-dark.svg">
+  <img src="docs/brand/mark-light.svg" width="72" alt="Brand mark">
+</picture>
+
+```
+> brand: command not found
+```
+
 [![CI](https://github.com/ValOvinnikov/blog/actions/workflows/ci.yml/badge.svg)](https://github.com/ValOvinnikov/blog/actions/workflows/ci.yml)
 
 A CMS-driven blog built as a **Turborepo + pnpm monorepo** with strict
