@@ -150,22 +150,32 @@ export const WithActiveNav: Story = {
 
 ## Fixtures
 
-Keep shared mock data in `apps/web/src/storybook/fixtures/`. These are not
-production code — never import fixtures from outside Storybook.
+Two separate fixture locations — don't conflate them:
 
-```ts
-// src/storybook/fixtures/post.ts
-import type { TPostDetail } from '@blog/service';
-export const mockPost: TPostDetail = {
-  title: 'Hello World',
-  slug: 'hello-world',
-  // ...view-model fields, not raw Sanity document fields
-};
-```
+- `apps/web/src/storybook/fixtures/` — Storybook-only. Mocks the **service
+  view-models** (`TPostDetail`, `THomePage`, … from `@blog/service`), the
+  shapes pages actually receive, not raw Sanity documents. Never import these
+  from a test file.
 
-Fixtures mock the **service view-models** (`TPostDetail`, `THomePage`, … from
-`@blog/service`) — the shapes pages actually receive — not raw Sanity
-documents.
+  ```ts
+  // src/storybook/fixtures/post.ts
+  import type { TPostDetail } from '@blog/service';
+  export const mockPost: TPostDetail = {
+    title: 'Hello World',
+    slug: 'hello-world',
+    // ...view-model fields, not raw Sanity document fields
+  };
+  ```
+
+- `apps/web/src/testing/` — fixtures shared between a component's
+  `.stories.tsx` **and** its `.test.tsx` (e.g. raw Portable Text / schema-shaped
+  data a lower-level component renders directly, not a page-level
+  view-model). Mirrors the component tree; see `testing-practices` → "Where
+  tests live" for the convention and import path
+  (`@web/testing/<component>/fixtures`).
+
+If a story's data is also something a test needs, it belongs in
+`src/testing/`, not `src/storybook/fixtures/`.
 
 ## Tailwind in apps/web stories
 
