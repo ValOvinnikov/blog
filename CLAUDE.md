@@ -51,13 +51,12 @@ delegation model. If you need to communicate structure, describe it in the
 prompt — do not write it to disk first.
 
 **Dispatch subagents in the background by default.** Every Agent-tool
-dispatch defaults to `run_in_background: true`. Synchronous dispatch
-(`run_in_background: false`) requires a stated reason — a concrete next step
-that genuinely cannot proceed without this specific result — not habit.
-Measured across a real session: 48 synchronous `board-keeper` dispatches
-averaged 112s each with the orchestrator fully blocked for all of it, most
-of which had no ordering requirement forcing that wait. Three known,
-already-established exceptions:
+dispatch defaults to `run_in_background: true`. "The next step depends on
+this result" does **not** justify `run_in_background: false` — background
+dispatch preserves ordering too (the orchestrator resumes on notification,
+then runs the dependent step); foreground only costs the ability to respond
+to the user while it runs. Only the three exceptions below stay synchronous,
+each for its own stated reason:
 
 - `verify-runner` before `reviewer` (`develop-feature` skill §5, and
   `verify-runner.md`'s own frontmatter) — reviewer genuinely cannot run
@@ -69,6 +68,9 @@ already-established exceptions:
 - Gate 7 below: `gh pr create`, then set the board status — the PR URL isn't
   reported until that board write is confirmed, so that one board-keeper
   dispatch stays synchronous.
+
+This list is exhaustive — every other dispatch (layer agents, `reviewer`,
+`a11y-reviewer`, `seo-auditor`, `ci-watcher`, ...) runs in the background.
 
 ## Use the skills
 
