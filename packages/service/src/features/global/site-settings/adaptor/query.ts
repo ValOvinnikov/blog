@@ -11,7 +11,13 @@ export const siteSettingsQuery = q.star
         name: b.field('name').notNull(),
         prefix: b.field('prefix').notNull(),
         suffix: b.field('suffix').nullable(true),
-        specLine: b.field('specLine').nullable(true),
+        specLine: b
+          .field('specLine')
+          .project((sl) => ({
+            items: sl.field('items[]').nullable(true),
+            separator: sl.field('separator').notNull(),
+          }))
+          .nullable(true),
         logo: b.field('logo').project(imageWithAltFragment).notNull(),
         variant: b.field('variant').notNull(),
       }))

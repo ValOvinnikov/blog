@@ -675,7 +675,8 @@
         "specLine": {
           "type": "objectAttribute",
           "value": {
-            "type": "string"
+            "type": "inline",
+            "name": "specLine"
           },
           "optional": true
         },
@@ -691,6 +692,57 @@
               {
                 "type": "string",
                 "value": "INDIGO"
+              }
+            ]
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "specLine",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "specLine"
+          }
+        },
+        "items": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "array",
+            "of": {
+              "type": "string"
+            }
+          },
+          "optional": true
+        },
+        "separator": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "DOT"
+              },
+              {
+                "type": "string",
+                "value": "PIPE"
+              },
+              {
+                "type": "string",
+                "value": "BULLET"
+              },
+              {
+                "type": "string",
+                "value": "SLASH"
               }
             ]
           },

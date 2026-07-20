@@ -3,6 +3,7 @@ import { toTitleCase } from '@blog/utils';
 import { defineField, defineType } from 'sanity';
 
 import { imageWithAltSchema } from './image-with-alt';
+import { specLineSchema } from './spec-line';
 
 export const brandSchema = defineType({
   name: 'brand',
@@ -42,10 +43,9 @@ export const brandSchema = defineType({
     defineField({
       name: 'specLine',
       title: 'Spec Line',
-      type: 'string',
+      type: specLineSchema.name,
       description:
-        'Optional monospace line shown below the logo — system-status/build-tag style text, editor\'s choice, e.g. "build 2026.07 · online".',
-      validation: (rule) => rule.max(60),
+        'Optional monospace line shown below the logo — system-status/build-tag style text, e.g. "build 2026.07 · online".',
     }),
     defineField({
       name: 'variant',
