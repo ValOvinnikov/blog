@@ -1,3 +1,4 @@
+import { BRAND_VARIANTS } from '@blog/config';
 import type { TRawFooter } from '@blog/service/features/global/footer/adaptor/transformer';
 import type { TRawNavigation } from '@blog/service/features/global/navigation/adaptor/transformer';
 import type { TRawSiteSettings } from '@blog/service/features/global/site-settings/adaptor/transformer';
@@ -13,6 +14,7 @@ export function makeRawSiteSettings(
       suffix: null,
       specLine: null,
       logo: makeRawImage('Logo'),
+      variant: BRAND_VARIANTS.CONSOLE,
     },
     description: 'A blog about things',
     tagline: null,

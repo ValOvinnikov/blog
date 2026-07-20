@@ -1,3 +1,4 @@
+import { BRAND_VARIANTS } from '@blog/config';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
@@ -33,6 +34,7 @@ describe('getSiteSettings', () => {
           suffix: '.dev',
           specLine: 'A blog about building things',
           logo: makeRawImage('Logo'),
+          variant: BRAND_VARIANTS.CONSOLE,
         },
       }),
     );
@@ -44,6 +46,26 @@ describe('getSiteSettings', () => {
     expect(result.brand.prefix).toBe('val');
     expect(result.brand.suffix).toBe('.dev');
     expect(result.brand.specLine).toBe('A blog about building things');
+    expect(result.brand.variant).toBe(BRAND_VARIANTS.CONSOLE);
+  });
+
+  it('maps a non-default brand variant', async () => {
+    mockRun.mockResolvedValue(
+      makeRawSiteSettings({
+        brand: {
+          name: 'Awesome Blog',
+          prefix: 'val',
+          suffix: '.dev',
+          specLine: 'A blog about building things',
+          logo: makeRawImage('Logo'),
+          variant: BRAND_VARIANTS.INDIGO,
+        },
+      }),
+    );
+
+    const result = await getSiteSettings();
+
+    expect(result.brand.variant).toBe(BRAND_VARIANTS.INDIGO);
   });
 
   it('maps a missing spec line to undefined', async () => {
@@ -55,6 +77,7 @@ describe('getSiteSettings', () => {
           suffix: '.dev',
           specLine: null,
           logo: makeRawImage('Logo'),
+          variant: BRAND_VARIANTS.CONSOLE,
         },
       }),
     );

@@ -13,6 +13,7 @@ export const siteSettingsQuery = q.star
         suffix: b.field('suffix').nullable(true),
         specLine: b.field('specLine').nullable(true),
         logo: b.field('logo').project(imageWithAltFragment).notNull(),
+        variant: b.field('variant').notNull(),
       }))
       .notNull(),
     description: sub.field('description').notNull(),
