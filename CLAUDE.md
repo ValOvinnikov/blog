@@ -64,7 +64,10 @@ each for its own stated reason:
 - Gate 0 (`open-pull-request` skill): `board-keeper` with the
   `"starting work on #<n>"` trigger — the branch checkout right after it
   depends on the issue (and, if any, its parent) actually being set to In
-  Progress first.
+  Progress first. **Starting parallel work on several sibling sub-issues at
+  once (e.g. dispatching multiple layer subagents in the same turn) is one
+  batched dispatch — `"starting work on #86, #87, #88, #89"` — never one
+  `board-keeper` dispatch per issue** (`board-keeper.md`'s Step 1d).
 - Gate 7 below: `gh pr create`, then set the board status — the PR URL isn't
   reported until that board write is confirmed, so that one board-keeper
   dispatch stays synchronous.

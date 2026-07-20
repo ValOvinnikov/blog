@@ -103,7 +103,10 @@ Work through these gates in order. **Stop at each gate and wait for the user.**
    re-verify, and — if the issue has a parent — checks the parent's board
    status too and promotes it to In Progress if it's still Todo/blank, also
    re-verified. See `board-keeper.md`'s `"starting work on #<n>"` trigger for
-   the exact steps.
+   the exact steps. **Starting several sibling sub-issues in parallel (e.g.
+   about to dispatch multiple layer subagents in the same turn) is one
+   batched dispatch listing every issue number, not one `board-keeper`
+   dispatch per issue** — e.g. `"starting work on #86, #87, #88, #89"`.
 
    This single dispatch replaces two `gh api graphql` calls this step used to
    run inline (added in commit `be0c1fc`, then regressed once in practice

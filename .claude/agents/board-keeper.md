@@ -102,9 +102,11 @@ table is stale and needs a follow-up edit here.
 
 The orchestrator tells you why you're running: `"create issue: title=...,
 body=..., labels=...(, parent=#<n>)"` — or a **list** of those for a batch
-of issues in one dispatch (see Step 0), `"starting work on #<n>"` (Gate 0 —
-see Step 1d), `"after PR #<n>"`, `"after merge of #<n>"`, `"after filing
-issue #<n>"`, or a full "reconcile the board" sweep with no specific issue.
+of issues in one dispatch (see Step 0), `"starting work on #<n>"` — or a
+**list** of issue numbers in one dispatch when starting parallel work on
+several sibling sub-issues at once (Gate 0 — see Step 1d), `"after PR #<n>"`,
+`"after merge of #<n>"`, `"after filing issue #<n>"`, or a full "reconcile
+the board" sweep with no specific issue.
 
 **Every targeted trigger — creation, `"starting work on #<n>"`, `"after PR
 #<n>"`, `"after merge of #<n>"`, `"after filing issue #<n>"` — is a cheap,
@@ -289,6 +291,20 @@ orchestrating session jumps straight from a cached
 `memory/reference_project_item_ids.md` lookup to the status mutation without
 walking the rest of Gate 0). Doing both writes here instead makes them one
 discoverable dispatch instead of a paragraph to remember.
+
+**Batch dispatches.** When the orchestrator is about to start parallel work on
+several sibling sub-issues at once (e.g. dispatching multiple layer subagents
+for independent sub-issues under one epic in the same turn), it gives you all
+of their numbers in one dispatch — `"starting work on #86, #87, #88, #89"` —
+instead of one dispatch per issue. Run steps 1-4 below for each issue in the
+list (they usually share the same parent, so its board-status check in step 4
+only needs to run once — do it on the first issue that has one, then skip it
+for the rest unless a later issue in the batch names a different parent), then
+do **one** Step 5 report covering the whole batch. Same rationale as Step 0's
+batching: N issues cost one dispatch's fixed overhead plus N cheap status
+checks, not N full dispatches — four issues starting together as four separate
+synchronous dispatches was the exact inefficiency this batch form exists to
+avoid.
 
 1. Look up issue `#<n>`'s project item ID — memory first
    (`memory/reference_project_item_ids.md`), then the Step 1 query if it
