@@ -3,17 +3,15 @@ import { tv } from '@blog/ui/lib/styling';
 export const commandLinkVariants = tv({
   slots: {
     root: [
-      'group inline-flex items-center gap-1.5 no-underline',
+      'group inline-flex items-center gap-1.5',
+      'border-b border-accent pb-[3px]',
       'font-mono text-copy',
       'transition-colors duration-base ease-console',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
     ],
     prompt: ['select-none text-subtle'],
-    command: [
-      'text-accent underline underline-offset-[3px] decoration-1',
-      'group-hover:text-accent-hover group-hover:decoration-accent',
-    ],
+    command: ['text-accent', 'group-hover:text-accent-hover'],
     arrow: [
       'text-accent opacity-60',
       'transition-transform duration-base ease-console',
