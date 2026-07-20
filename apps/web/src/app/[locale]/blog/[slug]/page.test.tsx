@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import BlogPostPage, { generateMetadata, generateStaticParams } from './page';
+import BlogPostSlugPage, {
+  generateMetadata,
+  generateStaticParams,
+} from './page';
 
 const { getPostParamsMock } = vi.hoisted(() => ({
   getPostParamsMock: vi.fn(),
@@ -22,9 +25,9 @@ vi.mock('@web/metadata/post-metadata', () => ({
   buildPostMetadata: vi.fn().mockResolvedValue({ title: 'Hello World' }),
 }));
 
-vi.mock('@web/components/post-detail-page/post-detail-page', () => ({
-  PostDetailPage: ({ slug, locale }: { slug: string; locale: string }) => (
-    <div data-testid="post-detail-page">
+vi.mock('@web/components/pages/blog-post-page', () => ({
+  BlogPostPage: ({ slug, locale }: { slug: string; locale: string }) => (
+    <div data-testid="blog-post-page">
       {slug}-{locale}
     </div>
   ),
@@ -65,9 +68,9 @@ describe('generateMetadata', () => {
   });
 });
 
-describe('BlogPostPage', () => {
-  it('renders PostDetailPage with the resolved locale and slug', async () => {
-    const ui = await BlogPostPage({
+describe('BlogPostSlugPage', () => {
+  it('renders BlogPostPage with the resolved locale and slug', async () => {
+    const ui = await BlogPostSlugPage({
       params: Promise.resolve({ locale: 'EN', slug: 'hello-world' }),
     });
 

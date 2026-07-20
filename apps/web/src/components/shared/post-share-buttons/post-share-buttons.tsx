@@ -2,7 +2,7 @@
 
 import type { IShareLinkItem } from '@blog/ui';
 import { ShareButtons } from '@blog/ui';
-import { SmartLink } from '@web/components/smart-link/smart-link';
+import { SmartLink } from '@web/components/shared/smart-link';
 
 type TPostShareButtonsProps = {
   links: IShareLinkItem[];

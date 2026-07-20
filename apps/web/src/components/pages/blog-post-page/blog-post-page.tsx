@@ -1,10 +1,10 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { AuthorByline, Heading, PostMeta, TagList } from '@blog/ui';
-import { JsonLd } from '@web/components/json-ld/json-ld';
-import { PortableTextRenderer } from '@web/components/portable-text-renderer/portable-text-renderer';
-import { PostShareButtons } from '@web/components/post-share-buttons/post-share-buttons';
-import { SanityImage } from '@web/components/sanity-image/sanity-image';
+import { JsonLd } from '@web/components/shared/json-ld';
+import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
+import { PostShareButtons } from '@web/components/shared/post-share-buttons';
+import { SanityImage } from '@web/components/shared/sanity-image';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
 import { buildShareLinks } from '@web/utils/build-share-links';
@@ -13,20 +13,20 @@ import { formatDate } from '@web/utils/format-date';
 import { ExternalLink } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
-import { postDetailPageVariants } from './post-detail-page-variants';
+import { blogPostPageVariants } from './blog-post-page-variants';
 
-type TPostDetailPageProps = ILocalizedParams & { slug: string };
+type TBlogPostPageProps = ILocalizedParams & { slug: string };
 
-const s = postDetailPageVariants();
+const s = blogPostPageVariants();
 
 /**
- * PostDetailPage — `/blog/{slug}` composition: fetches the post via
+ * BlogPostPage — `/blog/{slug}` composition: fetches the post via
  * `service.pages.post.v1.getPost`, then composes `PostMeta`, `AuthorByline`,
  * `PortableTextRenderer`, and `PostShareButtons` around the fetched view
  * model, plus a `BlogPosting` JSON-LD tag. `Header`/`Footer` stay owned by
  * `[locale]/layout.tsx`.
  */
-export async function PostDetailPage({ slug, locale }: TPostDetailPageProps) {
+export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
   const post = await service.pages.post.v1.getPost(slug);
 
   if (!post) {

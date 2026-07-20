@@ -1,6 +1,6 @@
 import { service } from '@blog/service';
 import { ContentModule as ContentModuleUi } from '@blog/ui';
-import { PortableTextRenderer } from '@web/components/portable-text-renderer/portable-text-renderer';
+import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 
 export interface IContentModuleProps {
   id: string;

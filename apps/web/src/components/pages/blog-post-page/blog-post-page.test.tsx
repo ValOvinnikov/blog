@@ -1,8 +1,8 @@
-import type { TPostDetail } from '@blog/service';
 import { render, screen } from '@testing-library/react';
+import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { PostDetailPage } from './post-detail-page';
+import { BlogPostPage } from './blog-post-page';
 
 const { getPostMock } = vi.hoisted(() => ({
   getPostMock: vi.fn(),
@@ -30,7 +30,7 @@ vi.mock('@web/utils/env/env', () => ({
   env: { NEXT_PUBLIC_SITE_URL: 'https://example.com' },
 }));
 
-vi.mock('@web/components/smart-link/smart-link', () => ({
+vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
     href,
     children,
@@ -45,52 +45,7 @@ vi.mock('@web/components/smart-link/smart-link', () => ({
   ),
 }));
 
-const post: TPostDetail = {
-  id: 'post-1',
-  title: 'Hello World',
-  slug: 'hello-world',
-  excerpt: 'A sufficiently long excerpt for the card.',
-  publishedAt: '2026-01-15T00:00:00Z',
-  heroImageUrl: 'https://cdn.example.com/hero.jpg',
-  heroImageAlt: 'A hero image',
-  heroImageSanity: undefined,
-  featured: false,
-  body: [
-    {
-      _type: 'block',
-      _key: 'b1',
-      style: 'normal',
-      children: [{ _type: 'span', _key: 's1', text: 'Body text.' }],
-    },
-  ],
-  seo: undefined,
-  author: {
-    id: 'author-1',
-    name: 'Jane Doe',
-    slug: 'jane-doe',
-    imageUrl: 'https://cdn.example.com/jane.jpg',
-    role: 'Writer',
-    bio: [
-      {
-        _type: 'block',
-        _key: 'bio1',
-        style: 'normal',
-        children: [{ _type: 'span', _key: 'bio1s', text: 'A short bio.' }],
-      },
-    ],
-    socialLinks: [],
-  },
-  categories: [
-    {
-      id: 'cat-1',
-      title: 'Engineering',
-      slug: 'engineering',
-      description: undefined,
-    },
-  ],
-};
-
-describe(`<${PostDetailPage.name}/>`, () => {
+describe(`<${BlogPostPage.name}/>`, () => {
   beforeEach(() => {
     getPostMock.mockReset();
     notFoundMock.mockClear();
@@ -100,16 +55,16 @@ describe(`<${PostDetailPage.name}/>`, () => {
     getPostMock.mockResolvedValue(null);
 
     await expect(
-      PostDetailPage({ slug: 'missing', locale: 'EN' }),
+      BlogPostPage({ slug: 'missing', locale: 'EN' }),
     ).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(notFoundMock).toHaveBeenCalledTimes(1);
   });
 
   it('renders the post title, meta, body, categories, share links, and author byline', async () => {
-    getPostMock.mockResolvedValue(post);
+    getPostMock.mockResolvedValue(mockPostDetail);
 
-    const ui = await PostDetailPage({ slug: 'hello-world', locale: 'EN' });
+    const ui = await BlogPostPage({ slug: 'hello-world', locale: 'EN' });
     render(<>{ui}</>);
 
     expect(
@@ -126,9 +81,9 @@ describe(`<${PostDetailPage.name}/>`, () => {
   });
 
   it('renders the JSON-LD BlogPosting schema script', async () => {
-    getPostMock.mockResolvedValue(post);
+    getPostMock.mockResolvedValue(mockPostDetail);
 
-    const ui = await PostDetailPage({ slug: 'hello-world', locale: 'EN' });
+    const ui = await BlogPostPage({ slug: 'hello-world', locale: 'EN' });
     const { container } = render(<>{ui}</>);
 
     const script = container.querySelector(
@@ -139,9 +94,9 @@ describe(`<${PostDetailPage.name}/>`, () => {
   });
 
   it('omits PostMeta and AuthorByline when the post has no author', async () => {
-    getPostMock.mockResolvedValue({ ...post, author: undefined });
+    getPostMock.mockResolvedValue({ ...mockPostDetail, author: undefined });
 
-    const ui = await PostDetailPage({ slug: 'hello-world', locale: 'EN' });
+    const ui = await BlogPostPage({ slug: 'hello-world', locale: 'EN' });
     render(<>{ui}</>);
 
     expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();

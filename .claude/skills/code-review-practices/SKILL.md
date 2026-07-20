@@ -121,6 +121,11 @@ code fences are not findings — report only hits in real code.
   `apps/web` alike. Classes live in a co-located `{component}-variants.ts`
   via `tv()` from `tailwind-variants`. No standalone `clsx` or `tailwind-merge`
   usage. Exception: `next/font` variable class names in `layout.tsx`.
+- In `slots`-based `tv()` calls, every slot value is always an array of
+  strings — never a bare string — even a single-class slot. Applies in
+  `@blog/ui` (see `ui-library-practices`) and `apps/web` alike, since it's a
+  `tailwind-variants` styling convention, not something scoped to one layer.
+  `hero: ['mb-8 aspect-video ...']`, not `hero: 'mb-8 aspect-video ...'`.
 - Responsive classes are mobile-first, using only `md:`/`lg:` as the primary
   tiers (no custom `--breakpoint-*`).
 

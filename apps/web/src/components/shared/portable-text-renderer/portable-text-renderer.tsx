@@ -5,7 +5,7 @@ import {
   type PortableTextComponents,
   type PortableTextMarkComponentProps,
 } from '@portabletext/react';
-import { SmartLink } from '@web/components/smart-link/smart-link';
+import { SmartLink } from '@web/components/shared/smart-link';
 
 import { CodeBlock } from './code-block';
 import { portableTextRendererVariants } from './portable-text-renderer-variants';

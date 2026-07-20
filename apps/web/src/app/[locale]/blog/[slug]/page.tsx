@@ -1,6 +1,6 @@
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { PostDetailPage } from '@web/components/post-detail-page/post-detail-page';
+import { BlogPostPage } from '@web/components/pages/blog-post-page';
 import { routing } from '@web/i18n/routing';
 import { buildPostMetadata } from '@web/metadata/post-metadata';
 import type { Metadata } from 'next';
@@ -31,9 +31,9 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
   return buildPostMetadata(slug);
 }
 
-export default async function BlogPostPage({ params }: TProps) {
+export default async function BlogPostSlugPage({ params }: TProps) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  return <PostDetailPage slug={slug} locale={locale} />;
+  return <BlogPostPage slug={slug} locale={locale} />;
 }

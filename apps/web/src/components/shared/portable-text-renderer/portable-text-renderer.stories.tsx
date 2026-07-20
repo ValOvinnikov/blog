@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { richTextDemo } from '@web/testing/portable-text-renderer/fixtures';
+import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixtures';
 
 import { PortableTextRenderer } from './portable-text-renderer';
 
