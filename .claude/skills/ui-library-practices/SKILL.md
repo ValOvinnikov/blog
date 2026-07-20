@@ -668,6 +668,7 @@ in consumer-controlled markup.
   },
   ```
   This rule applies to slot-based components only. Non-slot `base`/`variants` `tv()` calls (a single-element component with no named slots) may use bare strings for variant entries, matching existing atoms like `button-variants.ts` and `tag-variants.ts`.
+  **Not ESLint-enforced, by design:** no installed plugin (`eslint-plugin-tailwindcss` and similar only check class-name ordering/validity, not string-vs-array shape) covers this, and a custom rule would need to parse each `tv()` call, detect whether it has a `slots` key, and only then flag bare-string slot/variant-override values — a project-specific AST rule for a convention affecting a small, slow-growing set of files. The `reviewer` subagent's `code-review-practices` pass and this skill's own examples already catch it reliably at PR time. Revisit if violations keep recurring.
 - Every named element in the component (including inner spans or wrappers)
   gets its own named export in the variants file:
   ```ts
