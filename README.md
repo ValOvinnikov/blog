@@ -186,8 +186,13 @@ contracts:
     project board against repo reality (open PR → issue in Code Review,
     in-flight branch → In Progress, merged PR → issue Done, a completed
     parent issue whose sub-issues all trace to merged PRs → Done, every
-    open issue/PR carries at least one label). Issue creation is a single
-    choke point — the orchestrator never calls `gh issue create` directly;
+    open issue/PR carries at least one label). Also propagates parent/epic
+    status both ways: a parent still `Todo` moves to In Progress the moment
+    any of its sub-issues does, and a parent whose sub-issues are all
+    complete but is still open gets flagged (not auto-closed — closing an
+    issue stays a judgment call) rather than sitting unnoticed. Issue
+    creation is a single choke point — the orchestrator never calls
+    `gh issue create` directly;
     it dispatches `board-keeper` with a fully-specified title/body/labels
     (and a parent issue number if it's a sub-issue), which creates the
     issue, places it on the board, and confirms status/labels/parent-link
