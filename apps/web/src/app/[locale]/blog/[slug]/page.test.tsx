@@ -45,6 +45,14 @@ describe('generateStaticParams', () => {
       { locale: 'EN', slug: 'b' },
     ]);
   });
+
+  it('returns an empty array when getPostParams rejects', async () => {
+    getPostParamsMock.mockRejectedValue(new Error('projectId missing'));
+
+    const params = await generateStaticParams();
+
+    expect(params).toEqual([]);
+  });
 });
 
 describe('generateMetadata', () => {

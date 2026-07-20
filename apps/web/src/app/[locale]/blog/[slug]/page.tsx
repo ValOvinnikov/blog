@@ -10,12 +10,20 @@ type TProps = {
   params: Promise<ILocalizedParams & { slug: string }>;
 };
 
+// Posts beyond the build-time list still render on demand via ISR
+// (dynamicParams defaults to true); correctness rides on getPost's own
+// notFound() handling, not on this list.
 export async function generateStaticParams() {
-  const params = await service.pages.post.v1.getPostParams();
+  try {
+    const params = await service.pages.post.v1.getPostParams();
 
-  return routing.locales.flatMap((locale) =>
-    params.map(({ slug }) => ({ locale, slug })),
-  );
+    return routing.locales.flatMap((locale) =>
+      params.map(({ slug }) => ({ locale, slug })),
+    );
+  } catch (error) {
+    console.error('Error to fetch post params:', error);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
