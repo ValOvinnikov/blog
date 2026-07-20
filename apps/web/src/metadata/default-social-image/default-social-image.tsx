@@ -11,7 +11,7 @@ export const contentType = 'image/png';
 // Indigo-variant OG image, out of scope for #490). The dark palette is used
 // regardless of the visitor's system theme: this is a single static asset
 // shared by every share surface, so it can't itself respond to
-// `prefers-color-scheme` the way `icon.svg` does.
+// `prefers-color-scheme` the way the favicon route (`icon.tsx`) does.
 const COLORS = {
   bg: '#0d1012',
   logo1: '#007cd9',
