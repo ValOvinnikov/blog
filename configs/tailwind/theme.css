@@ -217,6 +217,19 @@
   --logo-alt-accent: oklch(0.54 0.15 65);
 }
 
+/* Brand-indigo variant (#512): swaps --accent/--accent-hover/--logo-1/2/3 to
+   the Indigo values computed and WCAG-verified in #494/#515. --accent-hover
+   has no --logo-alt-* counterpart, so it's derived here with the same -0.06
+   lightness delta the Console --accent-hover already uses (verified AA: light
+   6.57:1 vs --bg / 6.11:1 vs --bg-subtle). */
+.brand-indigo {
+  --accent: var(--logo-alt-accent);
+  --accent-hover: oklch(0.48 0.15 65);
+  --logo-1: var(--logo-alt-1);
+  --logo-2: var(--logo-alt-2);
+  --logo-3: var(--logo-alt-3);
+}
+
 .dark {
   color-scheme: dark;
 
@@ -249,6 +262,18 @@
   --logo-alt-2: oklch(0.64 0.2 274);
   --logo-alt-3: oklch(0.78 0.13 274);
   --logo-alt-accent: oklch(0.8 0.15 80);
+}
+
+/* Dark-mode brand-indigo variant (#512): same swap as `.brand-indigo` above,
+   but using the dark `--logo-alt-*` values and the dark accent-hover delta
+   (+0.06, matching Console's dark --accent-hover convention). Verified AA:
+   10.08:1 / 9.54:1 (--accent) and 12.14:1 / 11.49:1 (--accent-hover). */
+.dark.brand-indigo {
+  --accent: var(--logo-alt-accent);
+  --accent-hover: oklch(0.86 0.15 80);
+  --logo-1: var(--logo-alt-1);
+  --logo-2: var(--logo-alt-2);
+  --logo-3: var(--logo-alt-3);
 }
 
 @layer base {
