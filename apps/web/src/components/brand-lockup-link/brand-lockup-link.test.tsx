@@ -21,4 +21,12 @@ describe(`<${BrandLockupLink.name}/>`, () => {
     expect(screen.getByText(brand.prefix)).toBeVisible();
     expect(screen.getByText(brand.suffix as string)).toBeVisible();
   });
+
+  it('passes the spec line through to the brand lockup when set', () => {
+    render(
+      <BrandLockupLink brand={{ ...brand, specLine: 'Est. 2026 · Berlin' }} />,
+    );
+
+    expect(screen.getByText('Est. 2026 · Berlin')).toBeVisible();
+  });
 });
