@@ -1,3 +1,4 @@
+import { BRAND_VARIANTS } from '@blog/config';
 import type { TBrand } from '@blog/service';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
@@ -10,6 +11,7 @@ const brand: TBrand = {
   suffix: 'brand',
   logoUrl: undefined,
   specLine: undefined,
+  variant: BRAND_VARIANTS.CONSOLE,
 };
 
 describe(`<${BrandLockupLink.name}/>`, () => {

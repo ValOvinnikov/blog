@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TBrandVariants, TMaybeUndefined } from '@blog/config';
 
 export type TBrand = {
   name: string;
@@ -6,6 +6,7 @@ export type TBrand = {
   suffix: TMaybeUndefined<string>;
   specLine: TMaybeUndefined<string>;
   logoUrl: TMaybeUndefined<string>;
+  variant: TBrandVariants;
 };
 
 export type TSiteSettings = {
