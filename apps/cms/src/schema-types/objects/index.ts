@@ -6,6 +6,7 @@ import { openGraphSchema } from './open-graph';
 import { richTextSchema } from './rich-text';
 import { seoSchema } from './seo';
 import { socialLinkSchema } from './social-link';
+import { specLineSchema } from './spec-line';
 
 export const objects = [
   imageWithAltSchema,
@@ -15,5 +16,6 @@ export const objects = [
   linkSchema,
   openGraphSchema,
   seoSchema,
+  specLineSchema,
   brandSchema,
 ];

@@ -232,7 +232,10 @@ replacing a hand-duplicated block per page document.
 - `author` — name, slug, image, bio, role, socialLinks (unified `link`-based).
 - `category` — title, slug, description.
 - `siteSettings` (singleton) — `titleField` (read-only, fixed value), brand
-  (`brand` object: name/prefix/suffix/logo/specLine/variant), description,
+  (`brand` object: name/prefix/suffix/logo/specLine/variant — `specLine` is
+  a `specLine` object, `{ items: string[] (max 4, each max 15 chars),
+separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
+  service layer can join it with a chosen separator glyph), description,
   tagline, `defaultOgImage` (`imageWithAlt`, required — the last-resort
   social image).
 - `settings_navigation` (singleton) — `titleField` (read-only, fixed value),
@@ -249,7 +252,9 @@ the document form showing "Untitled"). Content/module documents pass `max`
 for an editable headline.
 
 **Objects** — `link` (unified internal/external, `LINK_TYPE` const),
-`socialLink`, `brand`, `imageWithAlt` (required alt), `seo` (all-optional
+`socialLink`, `brand`, `specLine` (structured spec-line: `items` + a
+`SPEC_LINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt),
+`seo` (all-optional
 override bag) + `openGraph`,
 `blockText` / `richText`.
 

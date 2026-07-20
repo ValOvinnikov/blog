@@ -132,8 +132,14 @@ export type Brand = {
   prefix?: string;
   suffix?: string;
   logo?: ImageWithAlt;
-  specLine?: string;
+  specLine?: SpecLine;
   variant?: 'CONSOLE' | 'INDIGO';
+};
+
+export type SpecLine = {
+  _type: 'specLine';
+  items?: Array<string>;
+  separator?: 'DOT' | 'PIPE' | 'BULLET' | 'SLASH';
 };
 
 export type Seo = {
@@ -527,6 +533,7 @@ export type AllSanitySchemaTypes =
   | RichText
   | Module_postList
   | Brand
+  | SpecLine
   | Seo
   | OpenGraph
   | SocialLink

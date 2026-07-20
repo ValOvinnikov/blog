@@ -1,4 +1,8 @@
-import { BRAND_VARIANTS } from '@blog/config';
+import {
+  BRAND_VARIANTS,
+  SPEC_LINE_SEPARATOR_CHARS,
+  SPEC_LINE_SEPARATORS,
+} from '@blog/config';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
@@ -32,7 +36,10 @@ describe('getSiteSettings', () => {
           name: 'Awesome Blog',
           prefix: 'val',
           suffix: '.dev',
-          specLine: 'A blog about building things',
+          specLine: {
+            items: ['build 2026.07', 'online'],
+            separator: SPEC_LINE_SEPARATORS.DOT,
+          },
           logo: makeRawImage('Logo'),
           variant: BRAND_VARIANTS.CONSOLE,
         },
@@ -45,7 +52,9 @@ describe('getSiteSettings', () => {
     expect(result.brand.name).toBe('Awesome Blog');
     expect(result.brand.prefix).toBe('val');
     expect(result.brand.suffix).toBe('.dev');
-    expect(result.brand.specLine).toBe('A blog about building things');
+    expect(result.brand.specLine).toBe(
+      `build 2026.07 ${SPEC_LINE_SEPARATOR_CHARS.DOT} online`,
+    );
     expect(result.brand.variant).toBe(BRAND_VARIANTS.CONSOLE);
   });
 
@@ -56,7 +65,7 @@ describe('getSiteSettings', () => {
           name: 'Awesome Blog',
           prefix: 'val',
           suffix: '.dev',
-          specLine: 'A blog about building things',
+          specLine: null,
           logo: makeRawImage('Logo'),
           variant: BRAND_VARIANTS.INDIGO,
         },
@@ -76,6 +85,116 @@ describe('getSiteSettings', () => {
           prefix: 'val',
           suffix: '.dev',
           specLine: null,
+          logo: makeRawImage('Logo'),
+          variant: BRAND_VARIANTS.CONSOLE,
+        },
+      }),
+    );
+
+    const result = await getSiteSettings();
+
+    expect(result.brand.specLine).toBeUndefined();
+  });
+
+  it('joins multiple spec-line items with the mapped separator', async () => {
+    mockRun.mockResolvedValue(
+      makeRawSiteSettings({
+        brand: {
+          name: 'Awesome Blog',
+          prefix: 'val',
+          suffix: '.dev',
+          specLine: {
+            items: ['build 2026.07', 'online'],
+            separator: SPEC_LINE_SEPARATORS.PIPE,
+          },
+          logo: makeRawImage('Logo'),
+          variant: BRAND_VARIANTS.CONSOLE,
+        },
+      }),
+    );
+
+    const result = await getSiteSettings();
+
+    expect(result.brand.specLine).toBe(
+      `build 2026.07 ${SPEC_LINE_SEPARATOR_CHARS.PIPE} online`,
+    );
+  });
+
+  it('joins spec-line items with the Bullet separator', async () => {
+    mockRun.mockResolvedValue(
+      makeRawSiteSettings({
+        brand: {
+          name: 'Awesome Blog',
+          prefix: 'val',
+          suffix: '.dev',
+          specLine: {
+            items: ['build 2026.07', 'online'],
+            separator: SPEC_LINE_SEPARATORS.BULLET,
+          },
+          logo: makeRawImage('Logo'),
+          variant: BRAND_VARIANTS.CONSOLE,
+        },
+      }),
+    );
+
+    const result = await getSiteSettings();
+
+    expect(result.brand.specLine).toBe(
+      `build 2026.07 ${SPEC_LINE_SEPARATOR_CHARS.BULLET} online`,
+    );
+  });
+
+  it('joins spec-line items with the Slash separator', async () => {
+    mockRun.mockResolvedValue(
+      makeRawSiteSettings({
+        brand: {
+          name: 'Awesome Blog',
+          prefix: 'val',
+          suffix: '.dev',
+          specLine: {
+            items: ['build 2026.07', 'online'],
+            separator: SPEC_LINE_SEPARATORS.SLASH,
+          },
+          logo: makeRawImage('Logo'),
+          variant: BRAND_VARIANTS.CONSOLE,
+        },
+      }),
+    );
+
+    const result = await getSiteSettings();
+
+    expect(result.brand.specLine).toBe(
+      `build 2026.07 ${SPEC_LINE_SEPARATOR_CHARS.SLASH} online`,
+    );
+  });
+
+  it('joins a single spec-line item with no separator character', async () => {
+    mockRun.mockResolvedValue(
+      makeRawSiteSettings({
+        brand: {
+          name: 'Awesome Blog',
+          prefix: 'val',
+          suffix: '.dev',
+          specLine: { items: ['online'], separator: SPEC_LINE_SEPARATORS.DOT },
+          logo: makeRawImage('Logo'),
+          variant: BRAND_VARIANTS.CONSOLE,
+        },
+      }),
+    );
+
+    const result = await getSiteSettings();
+
+    expect(result.brand.specLine).toBe('online');
+  });
+
+  it('maps an empty spec-line items list to undefined', async () => {
+    mockRun.mockResolvedValue(
+      makeRawSiteSettings({
+        brand: {
+          name: 'Awesome Blog',
+          prefix: 'val',
+          suffix: '.dev',
+          specLine: { items: [], separator: SPEC_LINE_SEPARATORS.DOT },
           logo: makeRawImage('Logo'),
           variant: BRAND_VARIANTS.CONSOLE,
         },
