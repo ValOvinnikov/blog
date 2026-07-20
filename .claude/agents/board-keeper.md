@@ -6,7 +6,8 @@ description: >-
   the Blog Build project board (project #2) against repo reality — every
   open PR's issue sits in Code Review, in-flight branches sit In Progress,
   merged-PR issues are closed/Done, a completed parent issue whose
-  sub-issues all trace to merged PRs is Done, nothing is stuck in a stale
+  sub-issues all trace to merged PRs is Done, a parent still Todo moves to
+  In Progress the moment any sub-issue starts, nothing is stuck in a stale
   column, and every open issue/PR carries at least one label. Use to create
   any new issue (never call `gh issue create` directly from the
   orchestrator), after every PR open/merge, and on demand ("reconcile the
@@ -235,10 +236,42 @@ Skip this step entirely for any other trigger.
    close the issue yet). If it doesn't match, set it the same way Step 4
    applies and re-verifies a write, then re-query to confirm.
 2. If the orchestrator mentions a parent tracking issue, pull its
-   `subIssuesSummary` and report the `completed`/`total` counts in Step 5 —
-   informational only, not itself a write. A parent that's now eligible for
-   Done because all its sub-issues completed is Step 3b's territory; only
-   surface the numbers here, don't apply that fix in this lightweight step.
+   `subIssuesSummary` (same query as Step 3b) and act on what it shows. If
+   the parent doesn't appear in the Step 1 board query at all, add it the
+   same way Step 1b adds a missing freshly-filed issue
+   (`gh project item-add`), then continue. **These conditions aren't
+   mutually exclusive — check each independently, don't stop at the first
+   match** (e.g. a parent that's both still `Todo` and `completed == total`
+   needs the promotion applied _and_ the completion flagged, not just one):
+   - **Parent still `Todo`/blank on the board** — this sub-issue starting
+     work is evidence the epic itself is now in progress. Move the parent
+     to In Progress too, the same way Step 4 applies and re-verifies any
+     other safe forward-only transition (Todo/blank → In Progress is
+     already on that allow-list; this just also applies it to the parent,
+     not only the issue directly being worked).
+   - **`completed == total` but the parent's `state` is still `OPEN`** —
+     don't close it and don't set its board status to Done yourself;
+     closing an issue is a judgment call this skill treats cautiously
+     everywhere else (same category as a reopen candidate). Report it in
+     Step 5 as a needs-orchestrator item: "all N sub-issues of #X are
+     complete, consider closing the parent."
+   - **`completed == total` and the parent is already `CLOSED`** — this is
+     Step 3b's fully-evidenced safe-Done-transition case, and it stays
+     Step 3b's territory: don't apply it here. Verifying every sub-issue's
+     `closedByPullRequestsReferences` (up to 50) is exactly the kind of
+     per-issue API cost this lightweight step exists to avoid — leave it
+     for a full sweep to pick up, same as before this ticket.
+   - **Parent `state: CLOSED`, `completed < total`** — the parent closed
+     while children are still open, exactly the "part of #n"-without-`Closes`
+     auto-close accident this file's "Not safe" list already warns about.
+     This is a _stronger_ signal of a wrongly-closed issue, not a weaker
+     one, and costs nothing extra to flag here since `state`/`completed`/
+     `total` are already in hand from the query this step just ran — report
+     it in Step 5 like any other flagged item, same wording as Step 3b, and
+     say explicitly how many sub-issues remain open.
+   - Otherwise (partial completion, parent still correctly `OPEN` and
+     already In Progress/Code Review) — nothing to do, no need to report
+     the numbers just to report them.
 3. **Stop here.** Do NOT continue into Step 2 onward — this is a targeted
    check, not a full sweep, unless the dispatch explicitly also asked for
    one (see "Input you receive" above).
@@ -345,12 +378,38 @@ orchestrator explicitly told you which one during a Step 1b dispatch.
 
 ## Step 3b — parent/sub-issue completion
 
-Refines Step 3's "Issue closed with no merged `Closes #n` PR → flag, don't
-infer" row for the specific case of a parent issue with GitHub-native
-sub-issues. A parent never has its own `Closes #n` PR — only its children
-do — so a legitimately completed parent would otherwise always land in that
-flagged row and need manual confirmation every time. Run this check before
-reporting any such item as a plain flagged drift:
+Two triggers, both resolved with the same query:
+
+1. Refines Step 3's "Issue closed with no merged `Closes #n` PR → flag,
+   don't infer" row for the specific case of a parent issue with
+   GitHub-native sub-issues. A parent never has its own `Closes #n` PR —
+   only its children do — so a legitimately completed parent would
+   otherwise always land in that flagged row and need manual confirmation
+   every time. Run this check before reporting any such item as a plain
+   flagged drift.
+2. Applies to every **open** issue encountered during a full sweep that has
+   sub-issues, whether or not Step 3 flagged it — an open parent whose
+   sub-issues are all done doesn't trigger the closed-issue check at all
+   and would otherwise go unnoticed indefinitely (this happened twice in
+   one session, #469 and #527, both caught only by chance).
+
+Don't identify candidate parents with a per-issue call each (that's the
+O(n) cost this skill exists to avoid on a full sweep) — batch it into one
+query against every open issue, then only fetch `subIssues(first: 50)` for
+the ones that come back with `total > 0`:
+
+```
+gh api graphql -f query='{ repository(owner:"ValOvinnikov", name:"blog") {
+  issues(states: OPEN, first: 100) { nodes {
+    number state subIssuesSummary { total completed }
+  } } } }'
+```
+
+`first: 100` is verified-sufficient for this repo's current open-issue count
+(37), same caveat as Step 2's `--limit 200` on `gh issue list` — re-check
+the real count if it's ever close to 100 and add pagination if so.
+
+Then for each hit, resolve its sub-issue list:
 
 ```
 gh api graphql -f query='{ repository(owner:"ValOvinnikov", name:"blog") {
@@ -364,16 +423,39 @@ gh api graphql -f query='{ repository(owner:"ValOvinnikov", name:"blog") {
 number of `nodes` returned, don't treat the visible subset as complete;
 report it like the `completed < total` case below instead of guessing.
 
+`total: 0` is checked first and is unambiguous on its own (`completed == 0`
+too, so it's vacuously covered by later bullets but never reached — apply it
+before anything else below). Past that, the `CLOSED`/`OPEN` bullets are
+mutually exclusive by `state`. The board-status bullet below them is
+independent of all of those and can co-occur with the `OPEN`,
+`completed == total` bullet — check it separately, don't stop at the first
+match.
+
 - **`total: 0`** — not a sub-issue case. Report exactly as Step 3 describes.
-- **`completed < total`** — the parent closed while children are still open.
-  This is a _stronger_ signal of a wrongly-closed issue, not a weaker one —
-  report it in Step 5 like any other flagged item, and say explicitly how
-  many sub-issues remain open.
-- **`completed == total`** — cross-check each sub-issue via
-  `gh issue view <n> --json closedByPullRequestsReferences` (Step 2). If
-  **every** sub-issue has at least one PR in that field, the parent's
-  closure is fully evidenced: this is a new **safe, forward-only transition**
-  to Done — apply and re-verify exactly like any Step 4 write.
+- **Parent `state: CLOSED`, `completed < total`** — the parent closed while
+  children are still open. This is a _stronger_ signal of a wrongly-closed
+  issue, not a weaker one — report it in Step 5 like any other flagged
+  item, and say explicitly how many sub-issues remain open.
+- **Parent `state: CLOSED`, `completed == total`** — cross-check each
+  sub-issue via `gh issue view <n> --json closedByPullRequestsReferences`
+  (Step 2). If **every** sub-issue has at least one PR in that field, the
+  parent's closure is fully evidenced: this is a new **safe, forward-only
+  transition** to Done — apply and re-verify exactly like any Step 4 write.
+- **Parent `state: OPEN`, `completed == total`** — every sub-issue is done
+  but nobody has closed the parent yet (trigger 2 above — this fires
+  regardless of whether Step 3 flagged anything, since an open issue with
+  no `Closes` PR of its own is never flagged by that check in the first
+  place). Don't close it and don't set its board status to Done yourself —
+  report it in Step 5 as a needs-orchestrator item: "all N sub-issues of
+  #X are complete, consider closing the parent."
+- **Parent board status `Todo`/blank, any sub-issue's board status is In
+  Progress, Code Review, or Done** — work has started on the epic even
+  though its own board status never moved. (A sub-issue that's itself
+  blank/Todo isn't evidence of anything — that's Step 1b's data-quality gap,
+  not active work.) Move the parent to In Progress, same safe forward-only
+  transition Step 1c applies when a targeted dispatch surfaces this; a full
+  sweep should catch it too for any parent the orchestrator didn't happen
+  to mention on the way in.
 - If even one sub-issue's closure can't be explained by a merged `Closes`
   PR (manually closed, no PR, or still open despite `state: CLOSED` on a
   stale query), don't infer safety from the rest — report the parent as
@@ -449,9 +531,11 @@ Structure your response exactly like this:
 3. **Needs orchestrator** — the backward moves, reopen candidates, and
    conflicts from Step 4; any zero-label items from Step 3a (issue/PR #,
    title, suggested label if one is reasonably obvious from the title —
-   otherwise say so); any Step 3b parent/sub-issue case that wasn't safely
-   promoted (sub-issues still open, or one closed without a merged `Closes`
-   PR — name which one broke the chain); a missing `project` auth scope
+   otherwise say so); any Step 3b/1c parent/sub-issue case that wasn't
+   safely promoted — sub-issues still open, one closed without a merged
+   `Closes` PR (name which one broke the chain), **or an `OPEN` parent whose
+   sub-issues are all complete** ("all N sub-issues of #X are complete,
+   consider closing the parent"); a missing `project` auth scope
    (Prerequisite check) — report the exact fix command and stop, don't
    attempt anything else this dispatch; and an incomplete Step 0 dispatch
    (missing title/body/label/parent) — name exactly which field was
