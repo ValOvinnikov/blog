@@ -90,9 +90,13 @@ When invoked, before writing any code:
 
   **In both subtrees**, each component still gets its own folder named after
   it, containing the component file, a co-located test file, and an
-  `index.ts` barrel re-exporting its public API (the component plus any
-  exported prop type — never internal implementation pieces like a
-  `*-variants.ts` or a sub-component only that folder uses):
+  `index.ts` barrel re-exporting the component — never internal
+  implementation pieces like a `*-variants.ts` or a sub-component only that
+  folder uses. **Only re-export the prop type too if something outside the
+  folder actually imports it by name** — `knip`'s CI check fails the build
+  on an export nothing consumes, so a barrel that re-exports an unused prop
+  type reds CI; add the type export later, the moment a second file needs
+  it:
 
   ```
   src/components/pages/blog-post-page/
