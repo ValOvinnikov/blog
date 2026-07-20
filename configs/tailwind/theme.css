@@ -221,10 +221,22 @@
    the Indigo values computed and WCAG-verified in #494/#515. --accent-hover
    has no --logo-alt-* counterpart, so it's derived here with the same -0.06
    lightness delta the Console --accent-hover already uses (verified AA: light
-   6.57:1 vs --bg / 6.11:1 vs --bg-subtle). */
+   6.57:1 vs --bg / 6.11:1 vs --bg-subtle).
+   #563: --accent-solid/--accent-solid-hover/--accent-muted were missing here,
+   so the primary Button (bg-accent-solid) silently stayed Console blue under
+   this variant. Reuses --logo-alt-accent (no new colors) for --accent-solid,
+   matching Console's own --accent-solid ≈ --accent pattern above. Verified
+   (OKLCH → sRGB → WCAG contrast, independently recomputed): fill #a85700 vs
+   the existing white --accent-contrast = 5.09:1 (AA pass); hover fill #944500
+   vs white = 6.57:1 (AA pass). --accent-muted mirrors --accent-muted's own
+   light-mode shape (L 0.95, C 0.03) at this hue for the indigo ::selection
+   tint; selection text (--accent) against it measures 4.51:1 (AA pass). */
 .indigo {
   --accent: var(--logo-alt-accent);
   --accent-hover: oklch(0.48 0.15 65);
+  --accent-solid: var(--logo-alt-accent);
+  --accent-solid-hover: oklch(0.48 0.15 65);
+  --accent-muted: oklch(0.95 0.03 65);
   --logo-1: var(--logo-alt-1);
   --logo-2: var(--logo-alt-2);
   --logo-3: var(--logo-alt-3);
@@ -267,10 +279,21 @@
 /* Dark-mode indigo variant (#512): same swap as `.indigo` above,
    but using the dark `--logo-alt-*` values and the dark accent-hover delta
    (+0.06, matching Console's dark --accent-hover convention). Verified AA:
-   10.08:1 / 9.54:1 (--accent) and 12.14:1 / 11.49:1 (--accent-hover). */
+   10.08:1 / 9.54:1 (--accent) and 12.14:1 / 11.49:1 (--accent-hover).
+   #563: --accent-solid/--accent-solid-hover/--accent-muted were missing here
+   too — same bug as the light `.indigo` block above. Reuses the dark
+   --logo-alt-accent for --accent-solid, matching Console's dark
+   --accent-solid ≈ --accent pattern. Verified (independently recomputed):
+   fill #f0b135 vs the existing near-black --accent-contrast = 10.23:1 (AAA
+   pass); hover fill #ffc54d vs near-black = 12.32:1 (AAA pass). --accent-muted
+   mirrors --accent-muted's own dark-mode shape (L 0.3, C 0.06) at this hue;
+   selection text (--accent) against it measures 7.24:1 (AAA pass). */
 .dark.indigo {
   --accent: var(--logo-alt-accent);
   --accent-hover: oklch(0.86 0.15 80);
+  --accent-solid: var(--logo-alt-accent);
+  --accent-solid-hover: oklch(0.86 0.15 80);
+  --accent-muted: oklch(0.3 0.06 80);
   --logo-1: var(--logo-alt-1);
   --logo-2: var(--logo-alt-2);
   --logo-3: var(--logo-alt-3);
