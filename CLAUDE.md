@@ -50,6 +50,22 @@ Handing a subagent pre-written stubs bypasses those conventions and breaks the
 delegation model. If you need to communicate structure, describe it in the
 prompt — do not write it to disk first.
 
+**Dispatch subagents in the background by default.** Every Agent-tool
+dispatch defaults to `run_in_background: true`. Synchronous dispatch
+(`run_in_background: false`) requires a stated reason — a concrete next step
+that genuinely cannot proceed without this specific result — not habit.
+Measured across a real session: 48 synchronous `board-keeper` dispatches
+averaged 112s each with the orchestrator fully blocked for all of it, most
+of which had no ordering requirement forcing that wait. Two known,
+already-established exceptions:
+
+- `verify-runner` before `reviewer` (`develop-feature` skill §5, and
+  `verify-runner.md`'s own frontmatter) — reviewer genuinely cannot run
+  before verify's pass/fail is known.
+- Gate 7 below: `gh pr create`, then set the board status — the PR URL isn't
+  reported until that board write is confirmed, so that one board-keeper
+  dispatch stays synchronous.
+
 ## Use the skills
 
 - `develop-feature` at the start of any non-trivial task (lifecycle + delegation).
@@ -212,14 +228,19 @@ Every issue follows this exact order. **Stop and wait for explicit user approval
 
 **Board reconciliation (not a gate — no approval needed).** After step 7 opens
 a PR, and again after any PR merges, dispatch the `board-keeper` subagent
-(`.claude/agents/board-keeper.md`). Board mutations have silently failed
+(`.claude/agents/board-keeper.md`) with a targeted trigger (`"after PR
+#<n>"` / `"after merge of #<n>"`). Board mutations have silently failed
 before — it re-queries every status write it makes to confirm it actually
-stuck, and sweeps the whole board for drift (not just the issue you were
-working), not only the status you just set. It never edits code and only
+stuck. This targeted dispatch does **not** sweep the rest of the board by
+default (routine PR/merge events are cheap, single-issue checks now,
+per `board-keeper.md`'s own "Input you receive" section) — append "...also
+reconcile the board" when you have a specific reason to check further, or
+dispatch it bare with no issue number for a full sweep on demand (e.g.
+whenever asked to "reconcile the board", at the start of a session, or
+before answering a project-status question). It never edits code and only
 applies safe, forward-only status corrections; anything that looks
 destructive (e.g. reopening a wrongly-closed issue) comes back in its report
-for you to act on. And dispatch it on demand whenever asked to "reconcile
-the board."
+for you to act on.
 
 **Never call `gh issue create` directly — creating an issue always goes
 through `board-keeper`.** Dispatch it with `"create issue: title=..., body=...,

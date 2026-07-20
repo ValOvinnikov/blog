@@ -101,17 +101,22 @@ The orchestrator tells you why you're running: `"create issue: title=...,
 body=..., labels=...(, parent=#<n>)"` — or a **list** of those for a batch
 of issues in one dispatch (see Step 0), `"after PR #<n>"`, `"after merge of
 #<n>"`, `"after filing issue #<n>"`, or a full "reconcile the board" sweep
-with no specific issue. For every trigger **except a pure creation
-dispatch**, do the full cross-reference regardless — a targeted trigger
-just tells you where drift is likeliest, not where to stop looking.
+with no specific issue.
 
-**A pure creation dispatch is a different, cheaper operation — it does
-NOT cascade into the full sweep by default.** Creating an issue and
-reconciling the whole board are unrelated in cost and in what they check;
-bundling them meant every single ticket filed paid for a ~110-item sweep it
-didn't need. Stop after Step 0's own placement check unless the dispatch
-_also_ explicitly asks for a sweep (e.g. `"create issue: ...; also
-reconcile the board"`) — only then continue into Step 2 onward.
+**Every targeted trigger — creation, `"after PR #<n>"`, `"after merge of
+#<n>"`, `"after filing issue #<n>"` — is a cheap, single-issue operation by
+default. None of them cascade into the full board sweep (Step 2 onward)
+unless the dispatch explicitly also asks for one**, e.g. `"after merge of
+#<n>; also reconcile the board"` (same opt-in pattern as Step 0's `"create
+issue: ...; also reconcile the board"`). Only a bare "reconcile the board"
+dispatch with no specific issue runs the full sweep unconditionally — that's
+its entire purpose. Measured across a real session: a targeted check runs
+15-100s; a full sweep runs 100-450s (avg 112s across 48 dispatches, worst
+case 433s for one). Running a ~125-item sweep after every routine PR/merge
+event costs far more than the drift it catches beyond the one issue already
+being handled — reconciling the whole board and confirming one status write
+are unrelated in cost and in what they check; bundling them by default meant
+every routine event paid for a sweep it usually didn't need.
 
 **`"after filing issue #<n>"` may include a label.** The orchestrator knows
 what it just filed and may tell you which label(s) belong on it (e.g. "after
@@ -215,6 +220,28 @@ Skip this step entirely for any other trigger.
    re-verify. If no label was given and none exists, don't guess — report it
    in Step 5 as a needs-orchestrator item; picking the right `layer:*` vs.
    `tooling` vs. `bug` label is a judgment call, not a mechanical fix.
+4. **Stop here.** Do NOT continue into Step 2 onward — this is a targeted
+   check, not a full sweep, unless the dispatch explicitly also asked for
+   one (see "Input you receive" above).
+
+## Step 1c — targeted status check ("after PR #<n>" or "after merge of #<n>")
+
+Skip this step entirely for any other trigger.
+
+1. Confirm issue `#<n>`'s board status matches what the orchestrator told you
+   to expect (Code Review after a PR opens, Done after it merges — the
+   orchestrator states which, since it already knows whether the merged PR
+   carried a `Closes` keyword or is a per-layer partial PR that shouldn't
+   close the issue yet). If it doesn't match, set it the same way Step 4
+   applies and re-verifies a write, then re-query to confirm.
+2. If the orchestrator mentions a parent tracking issue, pull its
+   `subIssuesSummary` and report the `completed`/`total` counts in Step 5 —
+   informational only, not itself a write. A parent that's now eligible for
+   Done because all its sub-issues completed is Step 3b's territory; only
+   surface the numbers here, don't apply that fix in this lightweight step.
+3. **Stop here.** Do NOT continue into Step 2 onward — this is a targeted
+   check, not a full sweep, unless the dispatch explicitly also asked for
+   one (see "Input you receive" above).
 
 ## Step 2 — pull repo-side truth
 
@@ -412,8 +439,9 @@ Structure your response exactly like this:
 1. **Drift found** — table: `Issue # | Board status | Expected status | Evidence (PR/branch)`.
    Empty table (state so explicitly) if the sweep ran and found nothing —
    that's a good outcome, not a failure to report something. If this was a
-   pure creation dispatch and Step 0 stopped before Step 2 (no sweep opt-in
-   requested), say that plainly instead — "sweep not run this dispatch" is a
+   targeted trigger (creation, `"after PR #<n>"`, `"after merge of #<n>"`,
+   `"after filing issue #<n>"`) and no sweep opt-in was requested, say that
+   plainly instead — "sweep not run this dispatch, targeted check only" is a
    different, equally valid outcome, not the same as "swept, found nothing."
 2. **Fixes applied** — one line per fix: `Issue #n: <old> → <new>, verified via re-query`.
    Include failed writes here too, marked clearly as failed, not silently

@@ -260,12 +260,16 @@ red check.
     then diagnose and fix any failure it reports — see `open-pull-request`
     for the full mechanics (any resulting push still needs its own fresh
     Gate 3 approval)
-- **Then dispatch `board-keeper`** (`.claude/agents/board-keeper.md`) — no
-  approval needed, it's not a gate. It re-queries the status write Gate 5 just
-  made to confirm it actually stuck (`gh project item-edit` has silently
-  failed before) and sweeps the rest of the board for unrelated drift while
-  it's there. Dispatch it again after this PR merges, and any time you're
-  asked to "reconcile the board."
+- **Then dispatch `board-keeper`** (`.claude/agents/board-keeper.md`) with a
+  targeted `"after PR #<n>"` trigger — no approval needed, it's not a gate.
+  It re-queries the status write Gate 5 just made to confirm it actually
+  stuck (`gh project item-edit` has silently failed before). This is a cheap,
+  single-issue check by default now — it does not sweep the rest of the
+  board unless you append "...also reconcile the board" or dispatch it bare
+  for a full sweep. Dispatch it again (targeted `"after merge of #<n>"`)
+  after this PR merges, and run a full sweep any time you're asked to
+  "reconcile the board" or a targeted check surfaces something that looks
+  broader than the one issue.
 
 ## 8. Remove the subagent worktrees you created
 

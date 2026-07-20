@@ -587,12 +587,11 @@
           <li>
             <span class="who">git hooks</span
             ><span class="what"
-              >husky <code class="mono">pre-commit</code>/<code
-                class="mono"
+              >husky <code class="mono">pre-commit</code>/<code class="mono"
                 >pre-push</code
               >
-              — a redundant automatic pass invoked by git itself at
-              commit/push time, not by any agent</span
+              — a redundant automatic pass invoked by git itself at commit/push
+              time, not by any agent</span
             >
           </li>
           <li>
@@ -699,14 +698,17 @@
         <p>
           After push is confirmed. Once approved, the PR is opened and the board
           moves to Code&nbsp;Review immediately after — then board-keeper is
-          dispatched to re-query that write and confirm it actually stuck (<code
-            class="mono"
+          dispatched with a targeted
+          <code class="mono">"after PR #&lt;n&gt;"</code> trigger to re-query
+          that write and confirm it actually stuck (<code class="mono"
             >gh project item-edit</code
           >
-          has silently failed before), sweeping the rest of the board for
-          unrelated drift while it's there: flags any open issue/PR missing a
+          has silently failed before). This is a cheap, single-issue check by
+          default — it does not sweep the rest of the board unless explicitly
+          asked to (append "...also reconcile the board", or dispatch it bare
+          for an unconditional full sweep: flags any open issue/PR missing a
           label, and safely promotes to Done any closed parent issue whose
-          sub-issues all trace to their own merged PRs.
+          sub-issues all trace to their own merged PRs).
         </p>
         <div class="fail-branch">
           <strong>A third trigger, off this ticket's rail</strong> —
@@ -801,9 +803,12 @@
           <code class="mono">Closes&nbsp;#n</code> in the PR body closes the
           issue on merge; the board moves to Done via GitHub's own automation.
           board-keeper's second dispatch for this ticket (the first was
-          Gate&nbsp;4) confirms that transition stuck and sweeps for drift once
-          more. Orchestrator removes the subagent worktree once the safety
-          checks pass — no gate, just housekeeping.
+          Gate&nbsp;4), with a targeted
+          <code class="mono">"after merge of #&lt;n&gt;"</code> trigger,
+          confirms that transition stuck — again a cheap single-issue check, not
+          a full sweep, unless explicitly asked for one. Orchestrator removes
+          the subagent worktree once the safety checks pass — no gate, just
+          housekeeping.
         </p>
         <div class="interaction">
           <span class="label">You</span><span class="val">nothing</span>

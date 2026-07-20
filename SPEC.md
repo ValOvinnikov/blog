@@ -519,7 +519,8 @@ inside the layer contracts:
   `file:line` pointers, keeping that reading out of the orchestrator's
   window. `test-writer` adds/extends co-located `*.test.ts(x)` coverage after
   the layer agents finish, scoped to test files by enforcement. `board-keeper`
-  reconciles the project board against repo reality after every PR open/merge.
+  confirms one status write per PR open/merge (targeted, not a full sweep by
+  default) and reconciles the whole board on demand or when opted in.
 - **Skills** (`.claude/skills/`): `develop-feature` (lifecycle + delegation —
   the entry point for any non-trivial task), `add-content-type` (cross-layer
   recipe), `cms-schema-practices` (schema + migration quality bar),
