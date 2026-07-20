@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@blog/config": "workspace:*",
-    "@sanity/code-input": "^7.2.6",
+    "@sanity/code-input": "^7.2.10",
     "@sanity/vision": "^6.4.0",
     "lucide-react": "^1.24.0",
     "react": "^19.0.0",
