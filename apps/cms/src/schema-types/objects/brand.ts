@@ -1,3 +1,4 @@
+import { BRAND_VARIANTS } from '@blog/config/constants';
 import { defineField, defineType } from 'sanity';
 
 import { imageWithAltSchema } from './image-with-alt';
@@ -44,6 +45,22 @@ export const brandSchema = defineType({
       description:
         'Optional monospace line shown below the logo — system-status/build-tag style text, editor\'s choice, e.g. "build 2026.07 · online".',
       validation: (rule) => rule.max(60),
+    }),
+    defineField({
+      name: 'variant',
+      title: 'Brand Variant',
+      type: 'string',
+      description:
+        'Switches the site-wide accent color and logo palette between Console and Indigo.',
+      options: {
+        layout: 'radio',
+        list: [
+          { title: 'Console', value: BRAND_VARIANTS.CONSOLE },
+          { title: 'Indigo', value: BRAND_VARIANTS.INDIGO },
+        ],
+      },
+      initialValue: BRAND_VARIANTS.CONSOLE,
+      validation: (rule) => rule.required(),
     }),
   ],
 });

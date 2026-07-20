@@ -678,6 +678,23 @@
             "type": "string"
           },
           "optional": true
+        },
+        "variant": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "CONSOLE"
+              },
+              {
+                "type": "string",
+                "value": "INDIGO"
+              }
+            ]
+          },
+          "optional": true
         }
       }
     }

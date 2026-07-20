@@ -133,6 +133,7 @@ export type Brand = {
   suffix?: string;
   logo?: ImageWithAlt;
   specLine?: string;
+  variant?: 'CONSOLE' | 'INDIGO';
 };
 
 export type Seo = {
