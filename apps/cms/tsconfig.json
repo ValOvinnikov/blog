@@ -4,7 +4,8 @@
   "compilerOptions": {
     "paths": {
       "@cms/*": ["./src/*"],
-      "@blog/config/*": ["../../packages/config/src/*"]
+      "@blog/config/*": ["../../packages/config/src/*"],
+      "@blog/utils/*": ["../../packages/utils/src/*"]
     },
     "lib": ["dom", "dom.iterable", "esnext"],
     "noEmit": true,

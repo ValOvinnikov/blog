@@ -1,4 +1,5 @@
 import { BRAND_VARIANTS } from '@blog/config/constants';
+import { toTitleCase } from '@blog/utils';
 import { defineField, defineType } from 'sanity';
 
 import { imageWithAltSchema } from './image-with-alt';
@@ -53,11 +54,11 @@ export const brandSchema = defineType({
       description:
         'Switches the site-wide accent color and logo palette between Console and Indigo.',
       options: {
-        layout: 'radio',
-        list: [
-          { title: 'Console', value: BRAND_VARIANTS.CONSOLE },
-          { title: 'Indigo', value: BRAND_VARIANTS.INDIGO },
-        ],
+        layout: 'dropdown',
+        list: Object.values(BRAND_VARIANTS).map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
       },
       initialValue: BRAND_VARIANTS.CONSOLE,
       validation: (rule) => rule.required(),

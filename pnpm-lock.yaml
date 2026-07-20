@@ -51,6 +51,9 @@ importers:
       '@blog/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@blog/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       '@sanity/code-input':
         specifier: ^7.2.10
         version: 7.2.10(5fvrpezx6zr36pkrsfhszeu7gy)
