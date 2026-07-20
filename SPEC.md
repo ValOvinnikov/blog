@@ -97,7 +97,7 @@ configs/
 | `@blog/service` | `config`, `utils`, Sanity SDKs   | The versioned `service` facade (`service.pages.post.v1.getPost(slug)` …), view-model types (`TPostDetail`, `THomePage`, …), `urlForImage`                                                               | import React or `@blog/ui`; return raw Sanity docs; fake defaults |
 | `@blog/ui`      | `config` (types + tokens)        | Atomic-design components up to organisms (pure, prop-driven, polymorphic `as`/`linkAs` slots). No template layer — page composition belongs in `web`.                                                   | import `service`/`sanity`/`fetch`; use `'use client'`             |
 | `web` (app)     | `ui`, `service`, `config`, utils | Routes, metadata, feeds, i18n, page composition; owns `PortableTextRenderer` and all framework-coupled wrappers (`SanityImage`, `SmartLink`, theme toggle)                                              | write GROQ; import Sanity SDKs; put data logic in components      |
-| `cms` (app)     | `config` (constants)             | Schema types (source of truth), desk structure, content migrations                                                                                                                                      | hand-write shapes typegen should produce                          |
+| `cms` (app)     | `config` (constants), `utils`    | Schema types (source of truth), desk structure, content migrations                                                                                                                                      | hand-write shapes typegen should produce                          |
 
 The graph is acyclic. `apps/web` is the only place `ui` and `service` meet.
 
@@ -232,8 +232,9 @@ replacing a hand-duplicated block per page document.
 - `author` — name, slug, image, bio, role, socialLinks (unified `link`-based).
 - `category` — title, slug, description.
 - `siteSettings` (singleton) — `titleField` (read-only, fixed value), brand
-  (`brand` object: name/prefix/suffix/logo/specLine), description, tagline,
-  `defaultOgImage` (`imageWithAlt`, required — the last-resort social image).
+  (`brand` object: name/prefix/suffix/logo/specLine/variant), description,
+  tagline, `defaultOgImage` (`imageWithAlt`, required — the last-resort
+  social image).
 - `settings_navigation` (singleton) — `titleField` (read-only, fixed value),
   items (links).
 - `settings_footer` (singleton) — `titleField` (read-only, fixed value),
