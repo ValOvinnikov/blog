@@ -94,52 +94,30 @@ Work through these gates in order. **Stop at each gate and wait for the user.**
 
 ### Gate 0 — Pull the issue and set In Progress
 
-1. **Look up the project item ID in memory first.**
-   Read `memory/reference_project_item_ids.md` (in the project memory directory).
-   If the issue number is in the table, use that ID — skip the API query entirely.
+1. Dispatch **`board-keeper`** **synchronously** (this blocks the branch
+   checkout below, so it's a documented exception to the background-by-default
+   rule alongside `verify-runner` and Gate 7 — see `CLAUDE.md`'s
+   "Dispatch subagents in the background by default" section) with the
+   trigger `"starting work on #<n>"`. In one dispatch it: looks up the item ID
+   (memory first, then the API), sets the issue's status → In Progress with
+   re-verify, and — if the issue has a parent — checks the parent's board
+   status too and promotes it to In Progress if it's still Todo/blank, also
+   re-verified. See `board-keeper.md`'s `"starting work on #<n>"` trigger for
+   the exact steps.
 
-   If it is **not** in the table, fetch it:
+   This single dispatch replaces two `gh api graphql` calls this step used to
+   run inline (added in commit `be0c1fc`, then regressed once in practice
+   when an orchestrating session jumped straight from a cached
+   `reference_project_item_ids.md` lookup to the status mutation without
+   walking the rest of Gate 0 — inline prose is easy to skip; a named
+   subagent dispatch is not).
 
-   ```
-   gh api graphql -f query='{ user(login:"ValOvinnikov") { projectV2(number:2) {
-     items(first:100) { nodes { id content { ... on Issue { number } } } } } } }'
-   ```
+   If the report includes a newly discovered item ID (for the issue or its
+   parent), append it to `memory/reference_project_item_ids.md` using the
+   Edit tool — keep it in context, it's reused at Gate 5 without another
+   lookup.
 
-   **Immediately after fetching**, append a new row to
-   `memory/reference_project_item_ids.md` using the Edit tool:
-
-   ```
-   | #<n>  | PVTI_…      |
-   ```
-
-   Do this before setting In Progress — if you skip it, Gate 5 will need
-   another API call to find the same ID.
-
-   Keep the item ID in context — it is reused at Gate 5 without another lookup.
-
-2. Set status → **In Progress** (`47fc9ee4`) for the issue being worked on:
-   ```
-   gh api graphql -f query='mutation {
-     updateProjectV2ItemFieldValue(input:{
-       projectId:"PVT_kwHOAIMQW84BcK3T"
-       itemId:"<ITEM_ID>"
-       fieldId:"PVTSSF_lAHOAIMQW84BcK3TzhW1nPs"
-       value:{singleSelectOptionId:"47fc9ee4"}
-     }) { projectV2Item { id } }
-   }'
-   ```
-3. **If the issue is a sub-issue, also set its parent to In Progress.**
-   Check whether the issue has a parent:
-
-   ```
-   gh api graphql -f query='{ repository(owner:"ValOvinnikov", name:"blog") {
-     issue(number:<n>) { parent { number } } } }'
-   ```
-
-   If a parent exists and is not already In Progress, look up its item ID the
-   same way (memory first, then API) and set it to In Progress.
-
-4. Checkout a new branch from up-to-date `main`:
+2. Checkout a new branch from up-to-date `main`:
 
    ```
    git switch main && git pull --ff-only

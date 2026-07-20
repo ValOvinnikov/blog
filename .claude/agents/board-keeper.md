@@ -10,8 +10,10 @@ description: >-
   In Progress the moment any sub-issue starts, nothing is stuck in a stale
   column, and every open issue/PR carries at least one label. Use to create
   any new issue (never call `gh issue create` directly from the
-  orchestrator), after every PR open/merge, and on demand ("reconcile the
-  board"). Applies only safe, re-verified fixes and leads its report with a
+  orchestrator), when starting work on an issue (Gate 0 — sets it to In
+  Progress and promotes a Todo/blank parent in the same dispatch), after
+  every PR open/merge, and on demand ("reconcile the board"). Applies only
+  safe, re-verified fixes and leads its report with a
   drift table; destructive-looking moves (e.g. reopening a wrongly-closed
   issue) are listed for the orchestrator instead of being done blindly.
 tools: Read, Bash
@@ -100,13 +102,13 @@ table is stale and needs a follow-up edit here.
 
 The orchestrator tells you why you're running: `"create issue: title=...,
 body=..., labels=...(, parent=#<n>)"` — or a **list** of those for a batch
-of issues in one dispatch (see Step 0), `"after PR #<n>"`, `"after merge of
-#<n>"`, `"after filing issue #<n>"`, or a full "reconcile the board" sweep
-with no specific issue.
+of issues in one dispatch (see Step 0), `"starting work on #<n>"` (Gate 0 —
+see Step 1d), `"after PR #<n>"`, `"after merge of #<n>"`, `"after filing
+issue #<n>"`, or a full "reconcile the board" sweep with no specific issue.
 
-**Every targeted trigger — creation, `"after PR #<n>"`, `"after merge of
-#<n>"`, `"after filing issue #<n>"` — is a cheap, single-issue operation by
-default. None of them cascade into the full board sweep (Step 2 onward)
+**Every targeted trigger — creation, `"starting work on #<n>"`, `"after PR
+#<n>"`, `"after merge of #<n>"`, `"after filing issue #<n>"` — is a cheap,
+single-issue operation by default. None of them cascade into the full board sweep (Step 2 onward)
 unless the dispatch explicitly also asks for one**, e.g. `"after merge of
 #<n>; also reconcile the board"` (same opt-in pattern as Step 0's `"create
 issue: ...; also reconcile the board"`). Only a bare "reconcile the board"
@@ -275,6 +277,45 @@ Skip this step entirely for any other trigger.
 3. **Stop here.** Do NOT continue into Step 2 onward — this is a targeted
    check, not a full sweep, unless the dispatch explicitly also asked for
    one (see "Input you receive" above).
+
+## Step 1d — starting work on an issue ("starting work on #<n>")
+
+Skip this step entirely for any other trigger.
+
+Replaces the two manual `gh api graphql` calls `open-pull-request/SKILL.md`'s
+Gate 0 used to run inline (commit `be0c1fc` added the parent-check there; it
+later regressed once in practice because inline prose is easy to skip when an
+orchestrating session jumps straight from a cached
+`memory/reference_project_item_ids.md` lookup to the status mutation without
+walking the rest of Gate 0). Doing both writes here instead makes them one
+discoverable dispatch instead of a paragraph to remember.
+
+1. Look up issue `#<n>`'s project item ID — memory first
+   (`memory/reference_project_item_ids.md`), then the Step 1 query if it
+   isn't cached. Report any newly discovered ID in Step 5 like any other
+   trigger.
+2. Check its current board status first. If it's Todo or blank, set it → In
+   Progress the same way Step 4 applies and re-verifies any other write. If
+   it's already In Progress (this trigger re-run, or the orchestrator started
+   it another way), there's nothing to write — confirm and move on. If it's
+   already **further along** (Code Review, Done — e.g. a mis-triggered
+   re-run on an issue whose work already shipped), leave it alone: that's a
+   backward move, which Step 4's own classification below never allows.
+3. Check whether it has a parent:
+   ```
+   gh api graphql -f query='{ repository(owner:"ValOvinnikov", name:"blog") {
+     issue(number:<n>) { parent { number } } } }'
+   ```
+   If `parent` is `null`, stop here — nothing more to do.
+4. If a parent exists, look up its item ID (memory first, then API) and check
+   its current board status. If it's Todo or blank, promote it to In Progress
+   the same way Step 4 applies and re-verifies any other safe forward-only
+   transition (the same case Step 1c's first bullet already covers for the
+   after-PR/after-merge triggers — this is that identical logic, just fired
+   earlier, at start-of-work). If it's already In Progress or further along,
+   leave it alone — that's not a backward move to correct.
+5. **Stop here.** Do NOT continue into Step 2 onward — this is a targeted
+   check, not a full sweep, unless the dispatch explicitly also asked for one.
 
 ## Step 2 — pull repo-side truth
 

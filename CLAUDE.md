@@ -56,12 +56,16 @@ dispatch defaults to `run_in_background: true`. Synchronous dispatch
 that genuinely cannot proceed without this specific result — not habit.
 Measured across a real session: 48 synchronous `board-keeper` dispatches
 averaged 112s each with the orchestrator fully blocked for all of it, most
-of which had no ordering requirement forcing that wait. Two known,
+of which had no ordering requirement forcing that wait. Three known,
 already-established exceptions:
 
 - `verify-runner` before `reviewer` (`develop-feature` skill §5, and
   `verify-runner.md`'s own frontmatter) — reviewer genuinely cannot run
   before verify's pass/fail is known.
+- Gate 0 (`open-pull-request` skill): `board-keeper` with the
+  `"starting work on #<n>"` trigger — the branch checkout right after it
+  depends on the issue (and, if any, its parent) actually being set to In
+  Progress first.
 - Gate 7 below: `gh pr create`, then set the board status — the PR URL isn't
   reported until that board write is confirmed, so that one board-keeper
   dispatch stays synchronous.
