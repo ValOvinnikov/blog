@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest';
 
 import { CodeBlock } from './code-block';
 
-describe('CodeBlock', () => {
+describe(`<${CodeBlock.name}/>`, () => {
   it('renders the code content', () => {
-    const { container } = render(
-      <CodeBlock code="const x = 1;" language="typescript" />,
-    );
+    render(<CodeBlock code="const x = 1;" language="typescript" />);
 
-    expect(container.querySelector('pre')?.textContent).toBe('1const x = 1;');
+    expect(screen.getByTestId('code-content').textContent).toBe(
+      '1const x = 1;',
+    );
   });
 
   it('renders the filename as a caption when provided', () => {
@@ -25,11 +25,9 @@ describe('CodeBlock', () => {
   });
 
   it('omits the filename caption when not provided', () => {
-    const { container } = render(
-      <CodeBlock code="const x = 1;" language="typescript" />,
-    );
+    render(<CodeBlock code="const x = 1;" language="typescript" />);
 
-    expect(container.querySelector('figcaption')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('filename-caption')).not.toBeInTheDocument();
   });
 
   it('renders without a language, falling back to plain text', () => {
@@ -39,7 +37,7 @@ describe('CodeBlock', () => {
   });
 
   it('marks the requested line as highlighted', () => {
-    const { container } = render(
+    render(
       <CodeBlock
         code={'const a = 1;\nconst b = 2;'}
         language="typescript"
@@ -47,7 +45,7 @@ describe('CodeBlock', () => {
       />,
     );
 
-    const lines = container.querySelectorAll('pre > code > span');
+    const lines = screen.getAllByTestId('code-line');
     expect(lines).toHaveLength(2);
     expect(lines[0]).not.toHaveClass('bg-accent-muted');
     expect(lines[1]).toHaveClass('bg-accent-muted');

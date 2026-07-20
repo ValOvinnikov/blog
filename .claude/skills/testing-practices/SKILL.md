@@ -31,6 +31,20 @@ duplicate or rewrite adequate existing tests.
   domain tree. Each exports a `make*` factory returning a raw (`TRaw*`) shape
   with a `Partial<…>` overrides param. Import via the workspace alias:
   `import { makeRawPostCard } from '@blog/service/testing/pages/fixtures'`.
+- **`web` (and `ui`) follow the same `testing/` pattern** for fixtures shared
+  by more than one file — typically a component's `.test.tsx` **and** its
+  `.stories.tsx`. Mirror the component tree under `src/testing/`:
+  `src/components/portable-text-renderer/` → `src/testing/portable-text-renderer/fixtures.ts`.
+  Export small builder functions (not one giant literal) plus any ready-made
+  sample data the stories need, and import via the workspace alias —
+  `import { richTextBlock } from '@web/testing/portable-text-renderer/fixtures'`
+  — never a relative `./` path once the fixture is shared. A fixture used by
+  only one test file with no story to share it stays inline in that test file;
+  promote it to `src/testing/` the moment a second file (usually the sibling
+  story) needs the same data. This is distinct from `src/storybook/fixtures/`
+  (`web-storybook`) — that directory is Storybook-only view-model mocks
+  (`TPostDetail`, `THomePage`, …) never imported from a test; `src/testing/`
+  fixtures are shared by both.
 - Run from root: `pnpm test` (all), or `pnpm --filter @blog/ui test`.
   Watch mode: `pnpm test:watch`.
 

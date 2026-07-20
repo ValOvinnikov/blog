@@ -27,19 +27,23 @@ export const CodeBlock = ({
   return (
     <figure className={s.root()}>
       {filename ? (
-        <figcaption className={s.filename()}>{filename}</figcaption>
+        <figcaption className={s.filename()} data-testid="filename-caption">
+          {filename}
+        </figcaption>
       ) : null}
       <SyntaxHighlighter
         language={language ?? 'text'}
         style={oneDark}
         showLineNumbers
         wrapLines
-        lineProps={(lineNumber) =>
-          highlightedLines?.includes(lineNumber)
+        lineProps={(lineNumber) => ({
+          'data-testid': 'code-line',
+          ...(highlightedLines?.includes(lineNumber)
             ? { className: s.highlightedLine() }
-            : {}
-        }
+            : {}),
+        })}
         className={s.pre()}
+        data-testid="code-content"
       >
         {code}
       </SyntaxHighlighter>

@@ -197,6 +197,19 @@ Use Vitest + Testing Library (`Component.test.tsx`) for all behaviour tests —
 same `userEvent` / `expect` API but faster and CI-friendly. See
 `testing-practices`.
 
+## Fixtures
+
+A component's `.stories.tsx` args and its `.test.tsx` render props both need
+sample data — don't duplicate a hand-written literal in both files. Follow
+the same `src/testing/` pattern as `apps/web` (`web-storybook`,
+`testing-practices` → "Where tests live"): mirror the component tree under
+`packages/ui/src/testing/`, e.g. `src/organisms/post-card/` →
+`src/testing/post-card/fixtures.ts`, and import via the workspace alias —
+`import { mockPostCard } from '@blog/ui/testing/post-card/fixtures'` — never
+a relative path once the fixture is shared. A one-off literal used by only a
+single file stays inline; promote it to `src/testing/` the moment a second
+file (typically the story) needs the same shape.
+
 ## Tailwind tokens in stories
 
 Tokens load via `tokens.css` imported in `.storybook/preview.ts` — no extra
@@ -260,8 +273,8 @@ Stories in `@blog/ui` must obey the same boundary rules as the components:
       left to TypeScript inference.
 - [ ] No `service`/`sanity`/`next` imports in the story file.
 - [ ] Story compiles clean — `.storybook` and `.stories.tsx` are covered by
-      `packages/ui/tsconfig.json`'s `include`, so `pnpm --filter @blog/ui
-  type-check` already catches TS errors here; no separate
-      `storybook:build` needed. Verify the story renders correctly in the
-      running dev server (`pnpm --filter @blog/ui storybook`) — that's the
-      check for actual Storybook/Vite runtime issues type-check can't see.
+      `packages/ui/tsconfig.json`'s `include`, so
+      `pnpm --filter @blog/ui type-check` already catches TS errors here; no
+      separate `storybook:build` needed. Verify the story renders correctly
+      in the running dev server (`pnpm --filter @blog/ui storybook`) — that's
+      the check for actual Storybook/Vite runtime issues type-check can't see.
