@@ -1,16 +1,70 @@
-import type { RichText as TPortableText } from '@blog/config';
-import { PortableText } from '@portabletext/react';
+import type { Code, RichText as TPortableText } from '@blog/config';
+import { Heading, Prose } from '@blog/ui';
+import {
+  PortableText,
+  type PortableTextComponents,
+  type PortableTextMarkComponentProps,
+} from '@portabletext/react';
+import { SmartLink } from '@web/components/smart-link/smart-link';
+
+import { CodeBlock } from './code-block';
+import { portableTextRendererVariants } from './portable-text-renderer-variants';
 
 export interface IPortableTextRendererProps {
   value: TPortableText;
 }
 
+interface ILinkAnnotation {
+  _type: 'link';
+  href?: string;
+}
+
+const s = portableTextRendererVariants();
+
+const components: PortableTextComponents = {
+  block: {
+    normal: ({ children }) => <p>{children}</p>,
+    h1: ({ children }) => <Heading level={1}>{children}</Heading>,
+    h2: ({ children }) => <Heading level={2}>{children}</Heading>,
+    h3: ({ children }) => <Heading level={3}>{children}</Heading>,
+    h4: ({ children }) => <Heading level={4}>{children}</Heading>,
+  },
+  marks: {
+    code: ({ children }: PortableTextMarkComponentProps) => (
+      <code className={s.inlineCode()}>{children}</code>
+    ),
+    link: ({
+      children,
+      value,
+    }: PortableTextMarkComponentProps<ILinkAnnotation>) =>
+      value?.href ? (
+        <SmartLink href={value.href}>{children}</SmartLink>
+      ) : (
+        <>{children}</>
+      ),
+  },
+  types: {
+    code: ({ value }: { value: Code }) => (
+      <CodeBlock
+        code={value.code ?? ''}
+        language={value.language}
+        filename={value.filename}
+        highlightedLines={value.highlightedLines}
+      />
+    ),
+  },
+};
+
 /**
  * PortableTextRenderer — web-owned bridge from a Sanity Portable Text field
- * (the service layer's `PortableText` view-model type) to rendered markup,
- * via `@portabletext/react`. Maps blocks to semantic HTML using the
- * library's sensible defaults; custom block types (e.g. code blocks) get
- * their own `components` override here as they're introduced.
+ * (the service layer's `RichText` view-model type) to rendered markup, via
+ * `@portabletext/react`. Maps block styles and marks to `@blog/ui` atoms
+ * (`Prose`, `Heading`) and custom types (a `code` block) to a syntax-
+ * highlighted `CodeBlock` — the one place this bridges Sanity content and
+ * `@blog/ui` presentation, keeping `@blog/ui` itself Sanity-free. `Prose`
+ * wraps the whole rendered output once (it's width-agnostic typography, not
+ * a per-block wrapper) so sibling paragraphs/headings/code blocks are direct
+ * children sharing one spacing rhythm.
  *
  * @example
  * <ContentModule title={title}>
@@ -18,5 +72,7 @@ export interface IPortableTextRendererProps {
  * </ContentModule>
  */
 export const PortableTextRenderer = ({ value }: IPortableTextRendererProps) => (
-  <PortableText value={value} />
+  <Prose className={s.root()}>
+    <PortableText value={value} components={components} />
+  </Prose>
 );
