@@ -1,4 +1,4 @@
-import { Heading, LinkButton, Text, TerminalChip } from '@blog/ui';
+import { CommandLink, Heading, Text, TerminalChip } from '@blog/ui';
 import { SmartLink } from '@web/components/smart-link/smart-link';
 
 import { notFoundPageVariants } from './not-found-page-variants';
@@ -25,8 +25,11 @@ export const NotFoundPage = () => (
     <Text className={s.copy()}>
       That route doesn&apos;t resolve to anything here.
     </Text>
-    <LinkButton as={SmartLink} href="/">
-      Return home
-    </LinkButton>
+    <CommandLink
+      as={SmartLink}
+      href="/"
+      command="cd ~"
+      ariaLabel="Return home"
+    />
   </main>
 );
