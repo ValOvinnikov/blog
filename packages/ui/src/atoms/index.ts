@@ -9,6 +9,7 @@ export * from './logo';
 export * from './media-frame';
 export * from './meta-separator';
 export * from './nav-link';
+export * from './prose';
 export * from './tag';
 export * from './terminal-typing';
 export * from './text';
