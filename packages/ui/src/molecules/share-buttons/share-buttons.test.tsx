@@ -1,3 +1,4 @@
+import type { IShareLinkItem } from '@blog/ui/molecules/share-link';
 import { faker } from '@faker-js/faker';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -7,76 +8,35 @@ import { ShareButtons } from './share-buttons';
 
 faker.seed(123);
 
+const buildLinks = (): IShareLinkItem[] => [
+  { href: faker.internet.url(), label: 'Share on X' },
+  { href: faker.internet.url(), label: 'Share on LinkedIn' },
+];
+
 describe(`<${ShareButtons.name}/>`, () => {
-  it('renders a share link to X, as a plain <a> by default, built from the url and title', () => {
-    const url = faker.internet.url();
-    const title = faker.lorem.sentence();
-    render(<ShareButtons url={url} title={title} />);
+  it('renders a link for each entry in links, as plain <a>s by default', () => {
+    const links = buildLinks();
+    render(<ShareButtons links={links} />);
 
-    const link = screen.getByRole('link', { name: /share on x/i });
-    expect(link.tagName).toBe('A');
-    const href = new URL(link.getAttribute('href') ?? '');
-    expect(`${href.origin}${href.pathname}`).toBe(
-      'https://twitter.com/intent/tweet',
-    );
-    expect(href.searchParams.get('url')).toBe(url);
-    expect(href.searchParams.get('text')).toBe(title);
-    expect(link).toHaveAttribute('target', '_blank');
-    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    links.forEach(({ href, label }) => {
+      const link = screen.getByRole('link', { name: label });
+      expect(link.tagName).toBe('A');
+      expect(link).toHaveAttribute('href', href);
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    });
   });
 
-  it('renders a share link to LinkedIn, as a plain <a> by default, built from the url', () => {
-    const url = faker.internet.url();
-    const title = faker.lorem.sentence();
-    render(<ShareButtons url={url} title={title} />);
-
-    const link = screen.getByRole('link', { name: /share on linkedin/i });
-    expect(link.tagName).toBe('A');
-    const href = new URL(link.getAttribute('href') ?? '');
-    expect(`${href.origin}${href.pathname}`).toBe(
-      'https://www.linkedin.com/sharing/share-offsite/',
-    );
-    expect(href.searchParams.get('url')).toBe(url);
-    expect(link).toHaveAttribute('target', '_blank');
-    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-  });
-
-  it('renders the default English labels when no label props are given', () => {
-    render(
-      <ShareButtons
-        url={faker.internet.url()}
-        title={faker.lorem.sentence()}
-      />,
-    );
-
-    expect(screen.getByRole('link', { name: 'Share on X' })).toBeVisible();
-    expect(
-      screen.getByRole('link', { name: 'Share on LinkedIn' }),
-    ).toBeVisible();
+  it('renders the copy-link button with the default label', () => {
+    render(<ShareButtons links={buildLinks()} />);
     expect(screen.getByRole('button', { name: 'Copy link' })).toBeVisible();
   });
 
-  it('renders custom labels when xLabel, linkedInLabel, and copyLabel are provided', () => {
-    render(
-      <ShareButtons
-        url={faker.internet.url()}
-        title={faker.lorem.sentence()}
-        xLabel="Partager sur X"
-        linkedInLabel="Partager sur LinkedIn"
-        copyLabel="Copier le lien"
-      />,
-    );
-
-    expect(screen.getByRole('link', { name: 'Partager sur X' })).toBeVisible();
-    expect(
-      screen.getByRole('link', { name: 'Partager sur LinkedIn' }),
-    ).toBeVisible();
+  it('renders a custom copyLabel when provided', () => {
+    render(<ShareButtons links={buildLinks()} copyLabel="Copier le lien" />);
     expect(
       screen.getByRole('button', { name: 'Copier le lien' }),
     ).toBeVisible();
-    expect(
-      screen.queryByRole('link', { name: 'Share on X' }),
-    ).not.toBeInTheDocument();
   });
 
   it('renders share links via linkAs when provided', () => {
@@ -92,60 +52,35 @@ describe(`<${ShareButtons.name}/>`, () => {
       </a>
     );
 
-    render(
-      <ShareButtons
-        url={faker.internet.url()}
-        title={faker.lorem.sentence()}
-        linkAs={CustomLink}
-      />,
-    );
+    render(<ShareButtons links={buildLinks()} linkAs={CustomLink} />);
 
-    // X + LinkedIn share links
     expect(screen.getAllByTestId('custom-link')).toHaveLength(2);
   });
 
   it('calls onCopy when the copy button is clicked', async () => {
     const onCopy = vi.fn();
-    render(
-      <ShareButtons
-        url={faker.internet.url()}
-        title={faker.lorem.sentence()}
-        onCopy={onCopy}
-      />,
-    );
+    render(<ShareButtons links={buildLinks()} onCopy={onCopy} />);
 
     await userEvent.click(screen.getByRole('button', { name: /copy link/i }));
     expect(onCopy).toHaveBeenCalledOnce();
   });
 
   it('does not throw when onCopy is omitted and the copy button is clicked', async () => {
-    render(
-      <ShareButtons
-        url={faker.internet.url()}
-        title={faker.lorem.sentence()}
-      />,
-    );
+    render(<ShareButtons links={buildLinks()} />);
 
     await userEvent.click(screen.getByRole('button', { name: /copy link/i }));
     expect(screen.getByRole('button', { name: /copy link/i })).toBeVisible();
   });
 
   it('forwards data-testid', () => {
-    render(
-      <ShareButtons
-        url={faker.internet.url()}
-        title={faker.lorem.sentence()}
-        dataTestId="share-buttons"
-      />,
-    );
+    render(<ShareButtons links={buildLinks()} dataTestId="share-buttons" />);
     expect(screen.getByTestId('share-buttons')).toBeVisible();
   });
 
   it('merges extra className', () => {
     render(
       <ShareButtons
-        url={faker.internet.url()}
-        title={faker.lorem.sentence()}
+        links={buildLinks()}
         className="mt-4"
         dataTestId="share-buttons"
       />,
