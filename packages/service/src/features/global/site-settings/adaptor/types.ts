@@ -4,6 +4,7 @@ export type TBrand = {
   name: string;
   prefix: string;
   suffix: TMaybeUndefined<string>;
+  specLine: TMaybeUndefined<string>;
   logoUrl: TMaybeUndefined<string>;
 };
 
