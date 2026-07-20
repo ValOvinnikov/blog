@@ -2,7 +2,7 @@ import { BRAND_VARIANTS, type TBrandVariants } from '@blog/config';
 
 const BRAND_VARIANT_CLASS_NAMES: Record<TBrandVariants, string | undefined> = {
   [BRAND_VARIANTS.CONSOLE]: undefined,
-  [BRAND_VARIANTS.INDIGO]: 'brand-indigo',
+  [BRAND_VARIANTS.INDIGO]: BRAND_VARIANTS.INDIGO.toLowerCase(),
 };
 
 /**
@@ -15,7 +15,7 @@ const BRAND_VARIANT_CLASS_NAMES: Record<TBrandVariants, string | undefined> = {
  * brand variant means adding one entry to the map, not a new branch.
  *
  * @example
- * buildRootHtmlClassName('font-a font-b', BRAND_VARIANTS.INDIGO) // 'font-a font-b brand-indigo'
+ * buildRootHtmlClassName('font-a font-b', BRAND_VARIANTS.INDIGO) // 'font-a font-b indigo'
  * buildRootHtmlClassName('font-a font-b', undefined) // 'font-a font-b'
  */
 export function buildRootHtmlClassName(

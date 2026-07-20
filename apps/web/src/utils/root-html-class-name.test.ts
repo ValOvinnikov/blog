@@ -16,9 +16,9 @@ describe('buildRootHtmlClassName', () => {
     expect(buildRootHtmlClassName(BASE_CLASS_NAME)).toBe(BASE_CLASS_NAME);
   });
 
-  it('appends brand-indigo for the Indigo variant', () => {
+  it('appends indigo for the Indigo variant', () => {
     expect(buildRootHtmlClassName(BASE_CLASS_NAME, BRAND_VARIANTS.INDIGO)).toBe(
-      `${BASE_CLASS_NAME} brand-indigo`,
+      `${BASE_CLASS_NAME} indigo`,
     );
   });
 });
