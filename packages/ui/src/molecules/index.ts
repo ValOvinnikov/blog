@@ -9,5 +9,6 @@ export * from './post-card';
 export * from './post-meta';
 export * from './primary-navigation';
 export * from './share-buttons';
+export * from './share-link';
 export * from './tag-list';
 export * from './terminal-chip';
