@@ -203,13 +203,16 @@ contracts:
     anything (board writes fail outright without it — not part of GitHub's
     default OAuth scopes), and reports destructive-looking moves (e.g.
     reopening a wrongly-closed issue) for the orchestrator instead of
-    applying them. Dispatched to create any new issue, after every PR
-    open/merge, and on demand. Targeted triggers — creation, after-PR,
-    after-merge, after-filing — are cheap, single-issue checks by default
-    and do not cascade into a full board sweep — append "...also reconcile
-    the board" to opt in, or dispatch it bare with no issue number for an
-    unconditional full sweep. Measured: a targeted check runs 15-100s, a
-    full sweep 100-450s.
+    applying them. Dispatched to create any new issue, when starting work on
+    an issue (`open-pull-request` Gate 0 — sets the issue itself to In
+    Progress and promotes a Todo/blank parent in the same dispatch,
+    synchronously, since branch checkout depends on the result), after every
+    PR open/merge, and on demand. Targeted triggers — creation, start-of-work,
+    after-PR, after-merge, after-filing — are cheap, single-issue checks by
+    default and do not cascade into a full board sweep — append "...also
+    reconcile the board" to opt in, or dispatch it bare with no issue number
+    for an unconditional full sweep. Measured: a targeted check runs 15-100s,
+    a full sweep 100-450s.
   - `ci-watcher` — read-only, Haiku-model watcher for a single PR's CI
     checks (#464). Dispatched in the background right after `open-pull-request`
     Gate 5, with the PR's actual number (never the issue number or a bare
