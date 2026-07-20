@@ -15,6 +15,15 @@ describe(`<${Logo.name}/>`, () => {
     expect(suffixEl.className).toContain('text-accent');
   });
 
+  it('renders suffix with the same font-weight as the prefix', () => {
+    render(<Logo prefix="Val." suffix="dev" />);
+    const prefixEl = screen.getByText('Val.');
+    const suffixEl = screen.getByText('dev');
+    expect(suffixEl.className).toContain('font-medium');
+    expect(prefixEl.className).toContain('font-medium');
+    expect(suffixEl.className).not.toContain('font-normal');
+  });
+
   it('renders without suffix span when suffix is omitted', () => {
     const { container } = render(<Logo prefix="Val." />);
     // root span only; no nested span for suffix

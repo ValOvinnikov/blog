@@ -7,6 +7,6 @@ export const logoVariants = tv({
       'font-display text-[19px] font-medium tracking-[-0.01em]',
       'text-text',
     ],
-    suffix: ['font-mono text-sm font-normal', 'text-accent'],
+    suffix: ['font-mono text-sm font-medium', 'text-accent'],
   },
 });
