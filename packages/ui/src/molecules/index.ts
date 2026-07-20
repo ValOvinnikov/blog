@@ -6,5 +6,6 @@ export * from './image-with-caption';
 export * from './link-button';
 export * from './post-card';
 export * from './primary-navigation';
+export * from './share-buttons';
 export * from './tag-list';
 export * from './terminal-chip';
