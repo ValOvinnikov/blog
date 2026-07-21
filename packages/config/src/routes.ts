@@ -9,7 +9,9 @@ export const routes = {
   /** Page 1 lives at /blog only; pages ≥ 2 under the static `page/` segment. */
   blogIndex: (page = 1) => (page === 1 ? '/blog' : `/blog/page/${page}`),
   post: (slug: string) => `/blog/${slug}`,
-  category: (slug: string) => `/category/${slug}`,
+  /** Page 1 lives at /category/{slug} only; pages ≥ 2 under the static `page/` segment. */
+  category: (slug: string, page = 1) =>
+    page === 1 ? `/category/${slug}` : `/category/${slug}/page/${page}`,
   author: (slug: string) => `/author/${slug}`,
   genericPage: (slug: string) => `/${slug}`,
 } as const;

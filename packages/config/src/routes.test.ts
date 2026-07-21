@@ -23,4 +23,14 @@ describe('routes', () => {
     expect(routes.author('jane-doe')).toBe('/author/jane-doe');
     expect(routes.genericPage('about')).toBe('/about');
   });
+
+  it('builds page 1 of a category without a page segment', () => {
+    expect(routes.category('design')).toBe('/category/design');
+    expect(routes.category('design', 1)).toBe('/category/design');
+  });
+
+  it('builds page N of a category under /category/{slug}/page/', () => {
+    expect(routes.category('design', 2)).toBe('/category/design/page/2');
+    expect(routes.category('design', 10)).toBe('/category/design/page/10');
+  });
 });
