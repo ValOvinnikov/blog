@@ -1,11 +1,10 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { AuthorByline, Heading, PostMeta, TagList } from '@blog/ui';
+import { Heading, PostMeta, TagList } from '@blog/ui';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 import { PostShareButtons } from '@web/components/shared/post-share-buttons';
 import { SanityImage } from '@web/components/shared/sanity-image';
-import { blockTextToPlain } from '@web/utils/block-text-to-plain';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
 import { buildShareLinks } from '@web/utils/build-share-links';
 import { env } from '@web/utils/env/env';
@@ -21,7 +20,7 @@ const s = blogPostPageVariants();
 
 /**
  * BlogPostPage — `/blog/{slug}` composition: fetches the post via
- * `service.pages.post.v1.getPost`, then composes `PostMeta`, `AuthorByline`,
+ * `service.pages.post.v1.getPost`, then composes `PostMeta`,
  * `PortableTextRenderer`, and `PostShareButtons` around the fetched view
  * model, plus a `BlogPosting` JSON-LD tag. `Header`/`Footer` stay owned by
  * `[locale]/layout.tsx`.
@@ -87,16 +86,6 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
       <div className={s.share()}>
         <PostShareButtons links={shareLinks} url={url} />
       </div>
-
-      {/* TODO: Check design-reference.html for existing design, if no, remove it */}
-      {post.author && (
-        <AuthorByline
-          className={s.byline()}
-          name={post.author.name}
-          bio={blockTextToPlain(post.author.bio)}
-          avatarUrl={post.author.imageUrl}
-        />
-      )}
     </main>
   );
 }
