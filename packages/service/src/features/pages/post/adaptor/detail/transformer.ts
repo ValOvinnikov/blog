@@ -1,27 +1,17 @@
+import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
+import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toCategory } from '@blog/service/shared/transformers/to-category';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toSocialLink } from '@blog/service/shared/transformers/to-social-link';
 import type { InferResultType } from 'groqd';
 
 import type { postDetailQuery } from './query';
-import type { TPostDetail, TPostDetailAuthor, TPostSeo } from './types';
+import type { TPostDetail, TPostDetailAuthor } from './types';
 
 export type TRawPostDetail = NonNullable<
   InferResultType<typeof postDetailQuery>
 >;
-
-// TODO(#371): replace with resolveSeo (content title/excerpt/heroImage ladder)
-// once the /blog/{slug} route lands (#355 follow-up).
-function toPostSeo(raw: NonNullable<TRawPostDetail['seo']>): TPostSeo {
-  return {
-    metaTitle: raw.metaTitle ?? undefined,
-    metaDescription: raw.metaDescription ?? undefined,
-    ogTitle: raw.openGraph?.ogTitle ?? undefined,
-    ogDescription: raw.openGraph?.ogDescription ?? undefined,
-    ogImageUrl: buildImageUrl(raw.openGraph?.ogImage),
-  };
-}
 
 function toPostDetailAuthor(
   raw: NonNullable<TRawPostDetail['author']>,
@@ -37,19 +27,31 @@ function toPostDetailAuthor(
   };
 }
 
-export function toPostDetail(raw: TRawPostDetail): TPostDetail {
+export function toPostDetail(
+  raw: TRawPostDetail,
+  settings: TSiteSettings,
+): TPostDetail {
+  const heroImageUrl = buildImageUrl(raw.heroImage);
+
   return {
     id: raw._id,
     title: raw.title,
     slug: raw.slug,
     excerpt: raw.excerpt,
     publishedAt: raw.publishedAt,
-    heroImageUrl: buildImageUrl(raw.heroImage),
+    heroImageUrl,
     heroImageAlt: raw.heroImage?.alt,
     heroImageSanity: toSanityImage(raw.heroImageAsset),
     featured: raw.featured ?? false,
     body: raw.body,
-    seo: raw.seo ? toPostSeo(raw.seo) : undefined,
+    seo: resolveSeo(
+      raw.seo ?? undefined,
+      { title: raw.title, description: raw.excerpt, imageUrl: heroImageUrl },
+      {
+        description: settings.description,
+        defaultOgImageUrl: settings.defaultOgImageUrl,
+      },
+    ),
     author: raw.author ? toPostDetailAuthor(raw.author) : undefined,
     categories: raw.categories.map(toCategory),
   };
