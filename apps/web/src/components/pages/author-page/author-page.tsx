@@ -22,20 +22,19 @@ const s = authorPageVariants();
 
 /**
  * AuthorPage — `/author/[slug]` composition: fetches the author and their
- * posts in parallel (`service.entities.author.v1.getAuthor` and
- * `getAuthorPosts`), then renders their profile (role, name/bio/avatar via
- * `AuthorByline`, social links via `ShareLink`/`ActionList`), followed by
- * their (unpaginated) post list via `PostsSection`.
+ * posts together via `service.entities.author.v1.getAuthorPage`, then
+ * renders their profile (role, name/bio/avatar via `AuthorByline`, social
+ * links via `ShareLink`/`ActionList`), followed by their (unpaginated) post
+ * list via `PostsSection`.
  */
 export async function AuthorPage({ slug, locale }: TAuthorPageProps) {
-  const [author, posts] = await Promise.all([
-    service.entities.author.v1.getAuthor(slug),
-    service.entities.author.v1.getAuthorPosts(slug),
-  ]);
+  const result = await service.entities.author.v1.getAuthorPage(slug);
 
-  if (!author) {
+  if (!result) {
     notFound();
   }
+
+  const { author, posts } = result;
 
   const items = posts.map((post) => ({
     id: post.id,
