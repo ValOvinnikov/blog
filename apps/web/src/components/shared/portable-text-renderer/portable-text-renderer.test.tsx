@@ -4,7 +4,7 @@ import {
   richTextBlock,
   richTextSpan,
   type TRichTextBlock,
-} from '@web/testing/portable-text-renderer/fixtures';
+} from '@web/testing/shared/portable-text-renderer/fixtures';
 import { describe, expect, it } from 'vitest';
 
 import { PortableTextRenderer } from './portable-text-renderer';

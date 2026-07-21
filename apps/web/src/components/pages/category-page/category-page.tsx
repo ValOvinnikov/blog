@@ -1,7 +1,7 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { PostsSection } from '@blog/ui';
-import { BlogPageTemplate } from '@web/components/blog-page-template/blog-page-template';
+import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
 import { Link } from '@web/i18n/navigation';
 import { formatDate } from '@web/utils/format-date';
 import { notFound } from 'next/navigation';

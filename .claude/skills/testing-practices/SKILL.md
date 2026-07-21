@@ -33,11 +33,15 @@ duplicate or rewrite adequate existing tests.
   `import { makeRawPostCard } from '@blog/service/testing/pages/fixtures'`.
 - **`web` (and `ui`) follow the same `testing/` pattern** for fixtures shared
   by more than one file — typically a component's `.test.tsx` **and** its
-  `.stories.tsx`. Mirror the component tree under `src/testing/`:
-  `src/components/portable-text-renderer/` → `src/testing/portable-text-renderer/fixtures.ts`.
-  Export small builder functions (not one giant literal) plus any ready-made
-  sample data the stories need, and import via the workspace alias —
-  `import { richTextBlock } from '@web/testing/portable-text-renderer/fixtures'`
+  `.stories.tsx`. Mirror the component tree under `src/testing/`, including
+  the `pages/`/`shared/` split (see the `web` agent's "File organisation"):
+  `src/components/shared/portable-text-renderer/` →
+  `src/testing/shared/portable-text-renderer/fixtures.ts`;
+  `src/components/pages/blog-post-page/` →
+  `src/testing/pages/blog-post-page/fixtures.ts`. Export small builder
+  functions (not one giant literal) plus any ready-made sample data the
+  stories need, and import via the workspace alias —
+  `import { richTextBlock } from '@web/testing/shared/portable-text-renderer/fixtures'`
   — never a relative `./` path once the fixture is shared. A fixture used by
   only one test file with no story to share it stays inline in that test file;
   promote it to `src/testing/` the moment a second file (usually the sibling

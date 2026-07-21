@@ -1,6 +1,6 @@
 import type { TBrand } from '@blog/service';
 import { BrandLockup } from '@blog/ui';
-import { SmartLink } from '@web/components/smart-link/smart-link';
+import { SmartLink } from '@web/components/shared/smart-link';
 
 export interface IBrandLockupLinkProps {
   brand: TBrand;

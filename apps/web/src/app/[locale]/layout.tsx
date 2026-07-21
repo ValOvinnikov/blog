@@ -1,9 +1,9 @@
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { Footer, Header, NavLink, PrimaryNavigation } from '@blog/ui';
-import { BrandLockupLink } from '@web/components/brand-lockup-link/brand-lockup-link';
-import { SmartLink } from '@web/components/smart-link/smart-link';
-import { ThemeToggleButton } from '@web/components/theme-toggle-button/theme-toggle-button';
+import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
+import { SmartLink } from '@web/components/shared/smart-link';
+import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { routing } from '@web/i18n/routing';
 import { env } from '@web/utils/env/env';
 import type { Metadata } from 'next';

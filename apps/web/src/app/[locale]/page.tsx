@@ -1,6 +1,6 @@
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { HomePageTemplate } from '@web/components/home-page-template/home-page-template';
+import { HomePageTemplate } from '@web/components/pages/home-page-template';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { HeroModule } from '@web/modules/hero/hero-module';
 import { ModuleRenderer } from '@web/modules/module-renderer';

@@ -1,5 +1,5 @@
 import { CommandLink, Heading, Text, TerminalChip } from '@blog/ui';
-import { SmartLink } from '@web/components/smart-link/smart-link';
+import { SmartLink } from '@web/components/shared/smart-link';
 
 import { notFoundPageVariants } from './not-found-page-variants';
 

@@ -78,13 +78,38 @@ When invoked, before writing any code:
 
 - **Pages and layouts must be clean.** No inline component definitions and no
   helper functions inside `page.tsx` or `layout.tsx` files. Extract everything.
-- **Components** live in `src/components/`. Each component gets its own folder
-  named after it, containing the component file and a co-located test file:
+- **Components** live in `src/components/`, split into two subtrees:
+  - `src/components/pages/` — page-level compositions: the one component a
+    route's `page.tsx` (or `not-found.tsx`) renders to produce the whole
+    page (fetch + compose), plus any `*-template` shell it delegates to.
+    Named after the page it composes, e.g. `blog-post-page/`,
+    `home-page-template/`.
+  - `src/components/shared/` — everything else: reusable pieces consumed by
+    more than one place, or generic framework-coupled wrappers
+    (`sanity-image/`, `smart-link/`, `json-ld/`, `theme-toggle-button/`).
+
+  **In both subtrees**, each component still gets its own folder named after
+  it, containing the component file, a co-located test file, and an
+  `index.ts` barrel re-exporting the component — never internal
+  implementation pieces like a `*-variants.ts` or a sub-component only that
+  folder uses. **Only re-export the prop type too if something outside the
+  folder actually imports it by name** — `knip`'s CI check fails the build
+  on an export nothing consumes, so a barrel that re-exports an unused prop
+  type reds CI; add the type export later, the moment a second file needs
+  it:
+
   ```
-  src/components/hero-section/
-    hero-section.tsx
-    hero-section.test.tsx
+  src/components/pages/blog-post-page/
+    blog-post-page.tsx
+    blog-post-page-variants.ts
+    blog-post-page.test.tsx
+    index.ts               # export { BlogPostPage } from './blog-post-page';
   ```
+
+  Consumers import the folder, not the file:
+  `import { BlogPostPage } from '@web/components/pages/blog-post-page'`,
+  never `.../blog-post-page/blog-post-page`.
+
 - **Module renderers** live in `src/modules/` — the web-side counterparts of
   the CMS `module_*` documents: `module-map.ts` (discriminator → component
   map), `module-renderer.tsx`, and one folder per module (`hero/`,

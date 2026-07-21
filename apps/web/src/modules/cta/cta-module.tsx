@@ -1,6 +1,6 @@
 import { service } from '@blog/service';
 import { CtaModule as CtaModuleUi } from '@blog/ui';
-import { SmartLink } from '@web/components/smart-link/smart-link';
+import { SmartLink } from '@web/components/shared/smart-link';
 
 export interface ICtaModuleProps {
   id: string;
