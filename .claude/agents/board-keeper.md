@@ -176,6 +176,15 @@ For each issue spec:
    flag silently worked, same re-verify-every-write discipline as any other
    fix here — by re-querying the parent's `subIssuesSummary` (same shape as
    Step 3b) and confirming the new number appears among its `subIssues`.
+3. **If a `parent` was given and it carries a milestone, the new sub-issue
+   must carry the same one** — `gh issue create` never inherits a parent's
+   milestone on its own, and this has silently drifted before (a whole batch
+   of sub-issues shipped with no milestone while their epic had one). Check
+   with `gh issue view <parent> --json milestone`; if it's non-null, apply
+   the same title to the new issue with
+   `gh issue edit <new-number> --milestone "<title>"` and verify via
+   `gh issue view <new-number> --json milestone`. If the parent has no
+   milestone, leave the new issue's milestone unset too — don't invent one.
 
 Once every issue in the dispatch is created:
 
