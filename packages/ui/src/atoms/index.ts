@@ -10,6 +10,7 @@ export * from './media-frame';
 export * from './meta-separator';
 export * from './nav-link';
 export * from './prose';
+export * from './quote-block';
 export * from './tag';
 export * from './terminal-typing';
 export * from './text';
