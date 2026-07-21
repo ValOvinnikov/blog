@@ -11,12 +11,22 @@ type TRawCategory = NonNullable<
 >;
 type TRawPosts = InferResultType<typeof categoryPagePostsQuery>;
 
+export type TCategoryPagePagination = {
+  currentPage: number;
+  totalPages: number;
+  total: number;
+};
+
 export function toCategoryPage(
   rawCategory: TRawCategory,
   rawPosts: TRawPosts,
+  pagination?: TCategoryPagePagination,
 ): TCategoryPage {
   return {
     category: toCategory(rawCategory),
     posts: rawPosts.map(toPostCard),
+    currentPage: pagination?.currentPage,
+    totalPages: pagination?.totalPages,
+    total: pagination?.total,
   };
 }
