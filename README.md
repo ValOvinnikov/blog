@@ -380,17 +380,23 @@ contracts:
   via `pnpm typegen`) are denied, as are reads/writes of real env files
   (`.env`, `.env.local`, `.env.*.local`) — the tracked `.env.example` templates
   stay readable and editable so agents can maintain them. It also provisions
-  the plugins the repo's own guidance depends on via `extraKnownMarketplaces` +
-  `enabledPlugins`, so a fresh clone resolves them without per-person setup:
-  **context7** (required by the `use-context7` skill), **superpowers**
-  (required by `develop-feature` and the plugin skills above), **vercel**,
-  and **frontend-design** — all four from the single `claude-plugins-official`
-  marketplace. Because the `vercel` plugin bundles a `/deploy` command and
-  `deployment-expert` subagent that can trigger a real deploy, the deny list
-  also blocks the underlying `vercel --prod` / `vercel deploy --prod` /
-  `vercel promote` / `vercel rollback` commands and the `deploy_to_vercel`
-  MCP tool, so enabling the plugin can't bypass this repo's human-gated
-  deploy policy. Opt out locally in `.claude/settings.local.json`.
+  plugins via `extraKnownMarketplaces` + `enabledPlugins`, so a fresh clone
+  resolves them without per-person setup: **context7** (required by the
+  `use-context7` skill), **superpowers** (required by `develop-feature` and
+  the plugin skills above), **frontend-design**, **typescript-lsp**,
+  **vercel**, **code-simplifier**, **claude-md-management**, **skill-creator**,
+  **code-review**, **feature-dev**, **security-guidance**,
+  **claude-code-setup**, **playwright**, and **sanity** — all from the single
+  `claude-plugins-official` marketplace. Because the `vercel` plugin bundles a
+  `/deploy` command and `deployment-expert` subagent that can trigger a real
+  deploy, the deny list also blocks the underlying `vercel --prod` /
+  `vercel deploy --prod` / `vercel promote` / `vercel rollback` commands and
+  the `deploy_to_vercel` MCP tool, so enabling the plugin can't bypass this
+  repo's human-gated deploy policy. Opt out locally in
+  `.claude/settings.local.json`.
+- **`.mcp.json`** (project root) — declares the `github` MCP server (Copilot's
+  hosted `https://api.githubcopilot.com/mcp/insiders` endpoint) so it's
+  available to every contributor without per-person setup.
 - **Scheduled cloud routines** — a Claude Code "routine" (`/schedule`, backed
   by the `RemoteTrigger` API — cloud infrastructure, not a local cron job)
   runs daily and posts a summary of what merged in the last 24 hours, plus a
