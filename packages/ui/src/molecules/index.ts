@@ -5,6 +5,7 @@ export * from './card-meta';
 export * from './command-link';
 export * from './image-with-caption';
 export * from './link-button';
+export * from './popover-menu';
 export * from './post-card';
 export * from './post-meta';
 export * from './primary-navigation';

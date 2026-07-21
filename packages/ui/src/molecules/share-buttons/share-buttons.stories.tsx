@@ -10,20 +10,20 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
   args: {
+    triggerAriaLabel: 'Share this post',
+    panelAriaLabel: 'Share this post',
+    open: true,
+    onOpenChange: () => {},
     links: [
       {
         href: faker.internet.url(),
         label: 'Share on X',
-        icon: (
-          <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />
-        ),
+        icon: <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />,
       },
       {
         href: faker.internet.url(),
         label: 'Share on LinkedIn',
-        icon: (
-          <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />
-        ),
+        icon: <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />,
       },
     ],
   },
@@ -32,7 +32,15 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-export const Default: TStory = {};
+export const Open: TStory = {};
+
+export const Closed: TStory = {
+  args: { open: false },
+};
+
+export const Copied: TStory = {
+  args: { isCopied: true },
+};
 
 export const LocalizedLabels: TStory = {
   args: {
@@ -40,16 +48,12 @@ export const LocalizedLabels: TStory = {
       {
         href: faker.internet.url(),
         label: 'Partager sur X',
-        icon: (
-          <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />
-        ),
+        icon: <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />,
       },
       {
         href: faker.internet.url(),
         label: 'Partager sur LinkedIn',
-        icon: (
-          <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />
-        ),
+        icon: <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />,
       },
     ],
     copyLabel: 'Copier le lien',

@@ -37,3 +37,18 @@ export const WithoutReadingTime: TStory = {};
 export const WithoutAvatar: TStory = {
   args: { author: { name: faker.person.fullName() } },
 };
+
+export const WithShareTrigger: TStory = {
+  args: {
+    share: {
+      links: [
+        { href: faker.internet.url(), label: 'Share on X' },
+        { href: faker.internet.url(), label: 'Share on LinkedIn' },
+      ],
+      open: true,
+      onOpenChange: () => {},
+      triggerAriaLabel: 'Share this post',
+      panelAriaLabel: 'Share this post',
+    },
+  },
+};

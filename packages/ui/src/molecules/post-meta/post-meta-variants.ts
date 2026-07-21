@@ -8,5 +8,6 @@ export const postMetaVariants = tv({
     ],
     author: ['flex items-center gap-2'],
     authorName: ['text-text font-medium'],
+    share: ['ml-auto'],
   },
 });

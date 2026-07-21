@@ -90,4 +90,36 @@ describe(`<${PostMeta.name}/>`, () => {
     );
     expect(screen.getByTestId('post-meta')).toBeVisible();
   });
+
+  it('omits the share trigger when share is not provided', () => {
+    render(
+      <PostMeta
+        author={author}
+        publishedAt={publishedAt}
+        formattedDate={formattedDate}
+      />,
+    );
+    expect(
+      screen.queryByRole('button', { name: /share/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders a share trigger when share is provided', () => {
+    render(
+      <PostMeta
+        author={author}
+        publishedAt={publishedAt}
+        formattedDate={formattedDate}
+        share={{
+          links: [{ href: 'https://example.com', label: 'Share on X' }],
+          open: false,
+          onOpenChange: () => {},
+          triggerAriaLabel: 'Share this post',
+        }}
+      />,
+    );
+    expect(
+      screen.getByRole('button', { name: 'Share this post' }),
+    ).toBeVisible();
+  });
 });

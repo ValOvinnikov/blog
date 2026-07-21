@@ -2,6 +2,8 @@ import type { IWithDataTestId } from '@blog/config';
 import { Size } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { MetaSeparator } from '@blog/ui/atoms/meta-separator';
+import type { IShareButtonsProps } from '@blog/ui/molecules/share-buttons';
+import { ShareButtons } from '@blog/ui/molecules/share-buttons';
 
 import { postMetaVariants } from './post-meta-variants';
 
@@ -15,6 +17,8 @@ export interface IPostMetaProps extends IWithDataTestId {
   /** Human-readable date string, pre-formatted in the web layer. */
   formattedDate: string;
   readingTimeMinutes?: number;
+  /** Renders a share trigger + popover inline, right-aligned in the strip — omit to render `PostMeta` without a share action. `open`/`onOpenChange`/`isCopied`/`onCopyClick` remain fully controlled by whatever the web layer passes through here. */
+  share?: IShareButtonsProps;
   className?: string;
 }
 
@@ -29,6 +33,7 @@ export const PostMeta = ({
   publishedAt,
   formattedDate,
   readingTimeMinutes,
+  share,
   className,
   dataTestId,
 }: IPostMetaProps) => (
@@ -49,6 +54,12 @@ export const PostMeta = ({
         <MetaSeparator />
         <span>{readingTimeMinutes} min read</span>
       </>
+    )}
+    {share && (
+      <ShareButtons
+        {...share}
+        className={s.share({ class: share.className })}
+      />
     )}
   </div>
 );
