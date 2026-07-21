@@ -5,7 +5,7 @@ import type { HTMLAttributes } from 'react';
 
 import { tagListVariants } from './tag-list-variants';
 
-export interface ITagListItem {
+interface ITagListItem {
   label: string;
   href?: string;
 }
