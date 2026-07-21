@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AuthorPage } from './author-page';
 
-const { getAuthorMock } = vi.hoisted(() => ({
-  getAuthorMock: vi.fn(),
+const { getAuthorPageMock } = vi.hoisted(() => ({
+  getAuthorPageMock: vi.fn(),
 }));
 
 const { notFoundMock } = vi.hoisted(() => ({
@@ -16,13 +16,30 @@ const { notFoundMock } = vi.hoisted(() => ({
 vi.mock('@blog/service', () => ({
   service: {
     entities: {
-      author: { v1: { getAuthor: getAuthorMock } },
+      author: {
+        v1: { getAuthorPage: getAuthorPageMock },
+      },
     },
   },
 }));
 
 vi.mock('next/navigation', () => ({
   notFound: notFoundMock,
+}));
+
+vi.mock('@web/i18n/navigation', () => ({
+  Link: ({
+    href,
+    children,
+    ...rest
+  }: {
+    href: string;
+    children: React.ReactNode;
+  }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
 }));
 
 const author = {
@@ -46,16 +63,25 @@ const author = {
   ],
 };
 
+const post = {
+  id: 'post-1',
+  title: 'My Post Title',
+  slug: 'my-post-slug',
+  excerpt: 'An excerpt.',
+  publishedAt: '2026-01-01T00:00:00.000Z',
+  categories: [{ id: 'cat-1', title: 'News', slug: 'news' }],
+};
+
 describe('AuthorPage', () => {
   beforeEach(() => {
-    getAuthorMock.mockReset();
+    getAuthorPageMock.mockReset();
     notFoundMock.mockClear();
   });
 
   it('calls notFound() when the author does not exist', async () => {
-    getAuthorMock.mockResolvedValue(null);
+    getAuthorPageMock.mockResolvedValue(null);
 
-    await expect(AuthorPage({ slug: 'missing' })).rejects.toThrow(
+    await expect(AuthorPage({ slug: 'missing', locale: 'en' })).rejects.toThrow(
       'NEXT_NOT_FOUND',
     );
 
@@ -63,9 +89,9 @@ describe('AuthorPage', () => {
   });
 
   it('renders the author role, name, bio, and social links', async () => {
-    getAuthorMock.mockResolvedValue(author);
+    getAuthorPageMock.mockResolvedValue({ author, posts: [] });
 
-    const ui = await AuthorPage({ slug: 'jane-doe' });
+    const ui = await AuthorPage({ slug: 'jane-doe', locale: 'en' });
     render(<>{ui}</>);
 
     expect(screen.getByText('Senior Engineer')).toBeVisible();
@@ -82,16 +108,37 @@ describe('AuthorPage', () => {
   });
 
   it('renders without a role and without social links when none are authored', async () => {
-    getAuthorMock.mockResolvedValue({
-      ...author,
-      role: undefined,
-      socialLinks: [],
+    getAuthorPageMock.mockResolvedValue({
+      author: { ...author, role: undefined, socialLinks: [] },
+      posts: [],
     });
 
-    const ui = await AuthorPage({ slug: 'jane-doe' });
+    const ui = await AuthorPage({ slug: 'jane-doe', locale: 'en' });
     render(<>{ui}</>);
 
     expect(screen.queryByText('Senior Engineer')).not.toBeInTheDocument();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('renders the author posts via PostsSection', async () => {
+    getAuthorPageMock.mockResolvedValue({ author, posts: [post] });
+
+    const ui = await AuthorPage({ slug: 'jane-doe', locale: 'en' });
+    render(<>{ui}</>);
+
+    const link = screen.getByRole('link', { name: 'My Post Title' });
+    expect(link).toBeVisible();
+    expect(link).toHaveAttribute('href', '/blog/my-post-slug');
+  });
+
+  it('renders no posts section when the author has no posts', async () => {
+    getAuthorPageMock.mockResolvedValue({ author, posts: [] });
+
+    const ui = await AuthorPage({ slug: 'jane-doe', locale: 'en' });
+    render(<>{ui}</>);
+
+    expect(
+      screen.queryByRole('link', { name: 'My Post Title' }),
+    ).not.toBeInTheDocument();
   });
 });
