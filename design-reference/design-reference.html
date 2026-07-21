@@ -635,6 +635,65 @@
         margin-bottom: 18px;
       }
 
+      .m-author-byline {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .a-avatar {
+        width: 56px;
+        height: 56px;
+        flex-shrink: 0;
+        border-radius: 9999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--surface-2);
+        color: var(--muted);
+        font-family: var(--font-disp);
+        font-weight: 500;
+        font-size: 16px;
+      }
+
+      .m-author-byline .a-author-body {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .a-author-name {
+        font-family: var(--font-disp);
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+        color: var(--text);
+        margin: 0;
+      }
+
+      .a-author-bio {
+        margin-top: 4px;
+      }
+
+      .a-button-sm {
+        padding: 6px 12px;
+        font-size: 13px;
+      }
+
+      .m-share-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .a-share-icon {
+        width: 16px;
+        height: 16px;
+        margin-right: 6px;
+      }
+
       /* ================= ORGANISMS ================= */
       .o-home-hero {
         display: grid;
@@ -3070,6 +3129,274 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
                   <span>cd ~</span>
                   <span class="a-cmd-arrow" aria-hidden="true">→</span>
                 </a>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="authorbyline">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>AuthorByline</h3>
+              <p>
+                Expanded author card shown below a post body: an
+                <code>Avatar</code> atom (<code>size="lg"</code>), the author's
+                name as a level-3 <code>Heading</code>, and an optional bio
+                rendered through the <code>Text</code> atom
+                (<code>variant="muted"</code>).
+              </p>
+              <p>
+                <code
+                  ><AuthorByline
+                    name="Ava Ito"
+                    bio="Writes about systems."
+                    avatarUrl?
+                /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="m-author-byline">
+                  <span class="a-avatar" aria-hidden="true">AI</span>
+                  <div class="a-author-body">
+                    <h3 class="a-author-name">Ava Ito</h3>
+                    <p class="a-body a-body-muted a-author-bio">
+                      Writes about systems that survive contact with production.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="m-author-byline">
+                  <span class="a-avatar" aria-hidden="true">AI</span>
+                  <div class="a-author-body">
+                    <h3 class="a-author-name">Ava Ito</h3>
+                    <p class="a-body a-body-muted a-author-bio">
+                      Writes about systems that survive contact with production.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="linkbutton">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>LinkButton</h3>
+              <p>
+                Polymorphic wrapper around the <code>Button</code> atom's own
+                <code>buttonVariants</code> — same <code>variant</code>/
+                <code>size</code> matrix (<code>primary|ghost|link</code> ×
+                <code>sm|md|lg</code>), but renders as an
+                <code>&lt;a&gt;</code> by default. Pass <code>as</code> to
+                render through the app router's <code>Link</code> instead; all
+                other props (e.g. <code>href</code>, <code>target</code>) spread
+                onto the rendered element.
+              </p>
+              <p>
+                <code
+                  ><LinkButton href="/writing" variant="ghost" size="sm" as?
+                /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="component-demo-row">
+                  <a class="a-button a-button-primary" href="#">Read post</a
+                  ><a class="a-button a-button-ghost a-button-sm" href="#"
+                    >Subscribe</a
+                  >
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="component-demo-row">
+                  <a class="a-button a-button-primary" href="#">Read post</a
+                  ><a class="a-button a-button-ghost a-button-sm" href="#"
+                    >Subscribe</a
+                  >
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="sharelink">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>ShareLink</h3>
+              <p>
+                A single external share action rendered through
+                <code>LinkButton</code> (<code>variant="ghost"</code>,
+                <code>size="sm"</code>), with <code>target="_blank"</code> and
+                <code>rel="noopener noreferrer"</code> baked in since every
+                share link opens the target platform in a new tab. Never builds
+                its own <code>href</code> — the finished share URL is passed in
+                as plain data.
+              </p>
+              <p>
+                <code><ShareLink href label icon? as? /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <a
+                  class="a-button a-button-ghost a-button-sm"
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <svg
+                    class="a-share-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    aria-hidden="true"
+                  >
+                    <path d="M7 17 17 7" />
+                    <path d="M8 7h9v9" />
+                  </svg>
+                  Share on X
+                </a>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <a
+                  class="a-button a-button-ghost a-button-sm"
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <svg
+                    class="a-share-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    aria-hidden="true"
+                  >
+                    <path d="M7 17 17 7" />
+                    <path d="M8 7h9v9" />
+                  </svg>
+                  Share on X
+                </a>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="sharebuttons">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>ShareButtons</h3>
+              <p>
+                Renders a list of pre-built share links (each via
+                <code>ShareLink</code>) plus a copy-link <code>Button</code>.
+                <code>@blog/ui</code> only renders the <code>links</code> it's
+                given — building the platform-specific share URLs (X, LinkedIn,
+                …) is <code>apps/web</code>'s job — and never touches
+                <code>window</code>/clipboard directly; copying is delegated
+                entirely to the <code>onCopy</code> callback.
+              </p>
+              <p>
+                <code
+                  ><ShareButtons links onCopy? linkAs? copyLabel="Copy link"
+                /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="m-share-buttons">
+                  <a class="a-button a-button-ghost a-button-sm" href="#">
+                    <svg
+                      class="a-share-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      aria-hidden="true"
+                    >
+                      <path d="M7 17 17 7" />
+                      <path d="M8 7h9v9" />
+                    </svg>
+                    Share on X
+                  </a>
+                  <a class="a-button a-button-ghost a-button-sm" href="#">
+                    <svg
+                      class="a-share-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      aria-hidden="true"
+                    >
+                      <path d="M7 17 17 7" />
+                      <path d="M8 7h9v9" />
+                    </svg>
+                    Share on LinkedIn
+                  </a>
+                  <span class="a-button a-button-ghost a-button-sm">
+                    <svg
+                      class="a-share-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      aria-hidden="true"
+                    >
+                      <path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" />
+                      <path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" />
+                    </svg>
+                    Copy link
+                  </span>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="m-share-buttons">
+                  <a class="a-button a-button-ghost a-button-sm" href="#">
+                    <svg
+                      class="a-share-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      aria-hidden="true"
+                    >
+                      <path d="M7 17 17 7" />
+                      <path d="M8 7h9v9" />
+                    </svg>
+                    Share on X
+                  </a>
+                  <a class="a-button a-button-ghost a-button-sm" href="#">
+                    <svg
+                      class="a-share-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      aria-hidden="true"
+                    >
+                      <path d="M7 17 17 7" />
+                      <path d="M8 7h9v9" />
+                    </svg>
+                    Share on LinkedIn
+                  </a>
+                  <span class="a-button a-button-ghost a-button-sm">
+                    <svg
+                      class="a-share-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      aria-hidden="true"
+                    >
+                      <path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" />
+                      <path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" />
+                    </svg>
+                    Copy link
+                  </span>
+                </div>
               </div>
             </div>
           </article>
