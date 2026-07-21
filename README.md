@@ -395,8 +395,12 @@ contracts:
   repo's human-gated deploy policy. Opt out locally in
   `.claude/settings.local.json`.
 - **`.mcp.json`** (project root) — declares the `github` MCP server (Copilot's
-  hosted `https://api.githubcopilot.com/mcp/insiders` endpoint) so it's
-  available to every contributor without per-person setup.
+  hosted `https://api.githubcopilot.com/mcp` endpoint), authenticated with a
+  static `Authorization: Bearer ${GITHUB_PAT}` header rather than OAuth —
+  GitHub's auth server doesn't support the dynamic client registration
+  Claude Code's automatic MCP login needs. Each contributor exports their own
+  `GITHUB_PAT` (a GitHub personal access token) in their shell profile; never
+  put the token value in this repo.
 - **Scheduled cloud routines** — a Claude Code "routine" (`/schedule`, backed
   by the `RemoteTrigger` API — cloud infrastructure, not a local cron job)
   runs daily and posts a summary of what merged in the last 24 hours, plus a
