@@ -12,4 +12,9 @@ describe('createAuthorService', () => {
     const svc = createAuthorService();
     expect(typeof svc.v1.getAuthorParams).toBe('function');
   });
+
+  it('exposes v1.getAuthorPosts as a function', () => {
+    const svc = createAuthorService();
+    expect(typeof svc.v1.getAuthorPosts).toBe('function');
+  });
 });
