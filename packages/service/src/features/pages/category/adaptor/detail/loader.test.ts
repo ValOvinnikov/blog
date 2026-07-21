@@ -44,4 +44,46 @@ describe('getCategoryPage', () => {
 
     expect(result?.posts).toEqual([]);
   });
+
+  it('leaves pagination fields undefined when called without a page', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawCategory())
+      .mockResolvedValueOnce([makeRawPostCard()]);
+
+    const result = await getCategoryPage('engineering');
+
+    expect(result?.currentPage).toBeUndefined();
+    expect(result?.totalPages).toBeUndefined();
+    expect(result?.total).toBeUndefined();
+  });
+
+  it('returns the sliced page window with pagination metadata when a page is given', async () => {
+    mockRun.mockResolvedValueOnce(makeRawCategory()).mockResolvedValueOnce({
+      posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'b' })],
+      total: 20,
+    });
+
+    const result = await getCategoryPage('engineering', {
+      page: 2,
+      itemsPerPage: 5,
+    });
+
+    expect(result?.posts.map((p) => p.id)).toEqual(['a', 'b']);
+    expect(result?.currentPage).toBe(2);
+    expect(result?.total).toBe(20);
+    expect(result?.totalPages).toBe(4);
+  });
+
+  it('returns null for a paginated request when the category is not found', async () => {
+    mockRun
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ posts: [], total: 0 });
+
+    const result = await getCategoryPage('missing', {
+      page: 2,
+      itemsPerPage: 9,
+    });
+
+    expect(result).toBeNull();
+  });
 });
