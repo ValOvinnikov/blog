@@ -120,6 +120,9 @@
         --accent-contrast: oklch(0.99 0 0);
         --accent-solid: oklch(0.55 0.17 250);
         --accent-solid-hover: oklch(0.49 0.17 250);
+        --logo-1: oklch(0.52 0.17 250);
+        --logo-2: oklch(0.63 0.16 250);
+        --logo-3: oklch(0.73 0.13 250);
       }
 
       .t-dark {
@@ -139,6 +142,9 @@
         --accent-contrast: oklch(0.16 0.006 250);
         --accent-solid: oklch(0.7 0.16 250);
         --accent-solid-hover: oklch(0.76 0.16 250);
+        --logo-1: oklch(0.58 0.17 250);
+        --logo-2: oklch(0.68 0.16 250);
+        --logo-3: oklch(0.8 0.14 250);
       }
 
       /* ---- preview shell ---- */
@@ -340,6 +346,100 @@
         padding-inline: 4px;
         text-decoration: underline;
         text-underline-offset: 3px;
+      }
+
+      /* ---- terminal-branding system (BrandMark/BrandLockup/
+         TerminalTyping/TerminalChip/CommandLink) ---- */
+      @keyframes blink {
+        0%,
+        49% {
+          opacity: 1;
+        }
+        50%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .a-brand-mark {
+        display: inline-block;
+        flex-shrink: 0;
+      }
+
+      .a-brand-lockup {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .a-brand-lockup .a-brand-wordmark {
+        display: block;
+        font-family: var(--font-disp);
+        font-weight: 500;
+        color: var(--text);
+      }
+
+      .a-brand-lockup .a-brand-spec {
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--subtle);
+      }
+
+      .a-term-cursor {
+        display: inline-block;
+        width: 0.5ch;
+        height: 1em;
+        vertical-align: text-bottom;
+        background: var(--accent);
+        animation: blink 1s steps(1) infinite;
+      }
+
+      .a-terminal-type {
+        display: inline-flex;
+        align-items: baseline;
+        font-family: var(--font-mono);
+        font-weight: 500;
+        font-size: 28px;
+        letter-spacing: -0.01em;
+        color: var(--text);
+      }
+
+      .a-terminal-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid var(--border-strong);
+        border-radius: 3px;
+        padding: 4px 10px;
+        background: var(--surface);
+        font-family: var(--font-mono);
+        font-size: 12px;
+      }
+      .a-terminal-chip .a-term-prompt {
+        color: var(--accent);
+      }
+      .a-terminal-chip .a-term-text {
+        color: var(--text);
+      }
+
+      .a-command-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-bottom: 1px solid var(--accent);
+        padding-bottom: 3px;
+        font-family: var(--font-mono);
+        font-size: 14px;
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .a-command-link .a-term-prompt {
+        color: var(--subtle);
+      }
+      .a-command-link .a-cmd-arrow {
+        color: var(--accent);
+        opacity: 0.6;
       }
 
       .a-media {
@@ -2295,6 +2395,102 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               </div>
             </div>
           </article>
+          <article class="component-row" id="brandmark">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>BrandMark</h3>
+              <p>
+                The brand mark: three stacked polygon layers coloured from the
+                <code>--logo-1/2/3</code> tokens via inline
+                <code>style</code> (not mirrored into Tailwind utilities).
+                Decorative by default (no accessible name); pass a
+                <code>title</code> when used standalone rather than nested in a
+                labelled composition.
+              </p>
+              <p>
+                <code><BrandMark size="sm|md|lg" /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <svg
+                  class="a-brand-mark"
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  aria-hidden="true"
+                >
+                  <polygon
+                    points="12,3 22,7 12,11 2,7"
+                    style="fill: var(--logo-1)"
+                  />
+                  <polygon
+                    points="12,8 22,12 12,16 2,12"
+                    style="fill: var(--logo-2)"
+                  />
+                  <polygon
+                    points="12,13 22,17 12,21 2,17"
+                    style="fill: var(--logo-3)"
+                  />
+                </svg>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <svg
+                  class="a-brand-mark"
+                  viewBox="0 0 24 24"
+                  width="28"
+                  height="28"
+                  aria-hidden="true"
+                >
+                  <polygon
+                    points="12,3 22,7 12,11 2,7"
+                    style="fill: var(--logo-1)"
+                  />
+                  <polygon
+                    points="12,8 22,12 12,16 2,12"
+                    style="fill: var(--logo-2)"
+                  />
+                  <polygon
+                    points="12,13 22,17 12,21 2,17"
+                    style="fill: var(--logo-3)"
+                  />
+                </svg>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="terminaltyping">
+            <div class="component-info">
+              <span class="tk">Atom</span>
+              <h3>TerminalTyping</h3>
+              <p>
+                Monospace, terminal-styled wordmark for a hero-intro flourish.
+                Only ever renders the final typed-out state (full text plus an
+                optional CSS-only blinking cursor) — a client wrapper in
+                <code>apps/web</code> drives the progressive
+                character-by-character reveal on top of this static building
+                block, respecting <code>prefers-reduced-motion</code>.
+              </p>
+              <p>
+                <code><TerminalTyping text="..." showCursor /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <span class="a-terminal-type"
+                  >notes --watch<span class="a-term-cursor"></span
+                ></span>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <span class="a-terminal-type"
+                  >notes --watch<span class="a-term-cursor"></span
+                ></span>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -2724,6 +2920,156 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
                     Hide this whole figure if there is no image.
                   </figcaption>
                 </figure>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="brandlockup">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>BrandLockup</h3>
+              <p>
+                <code>BrandMark</code> plus the wordmark (via the
+                <code>Logo</code> atom), with an optional monospace spec line.
+                Mark-only below the <code>sm</code> breakpoint (&lt;640px); the
+                wordmark becomes visible at <code>sm</code> (stays present for
+                assistive tech below that via <code>sr-only</code>), the spec
+                line reveals at <code>md</code> (≥768px) only when supplied.
+              </p>
+              <p>
+                <code
+                  ><BrandLockup prefix="notes" suffix="cli" specLine="v1.0.0"
+                /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="a-brand-lockup">
+                  <svg
+                    class="a-brand-mark"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    aria-hidden="true"
+                  >
+                    <polygon
+                      points="12,3 22,7 12,11 2,7"
+                      style="fill: var(--logo-1)"
+                    />
+                    <polygon
+                      points="12,8 22,12 12,16 2,12"
+                      style="fill: var(--logo-2)"
+                    />
+                    <polygon
+                      points="12,13 22,17 12,21 2,17"
+                      style="fill: var(--logo-3)"
+                    />
+                  </svg>
+                  <span>
+                    <span class="a-brand-wordmark">notes.cli</span>
+                    <span class="a-brand-spec">v1.0.0</span>
+                  </span>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="a-brand-lockup">
+                  <svg
+                    class="a-brand-mark"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    aria-hidden="true"
+                  >
+                    <polygon
+                      points="12,3 22,7 12,11 2,7"
+                      style="fill: var(--logo-1)"
+                    />
+                    <polygon
+                      points="12,8 22,12 12,16 2,12"
+                      style="fill: var(--logo-2)"
+                    />
+                    <polygon
+                      points="12,13 22,17 12,21 2,17"
+                      style="fill: var(--logo-3)"
+                    />
+                  </svg>
+                  <span>
+                    <span class="a-brand-wordmark">notes.cli</span>
+                    <span class="a-brand-spec">v1.0.0</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="terminalchip">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>TerminalChip</h3>
+              <p>
+                Monospace, terminal-prompt-styled chip for the wordmark, with an
+                optional blinking cursor. The blink animation is CSS-only
+                (shared <code>blink</code> keyframe) and already respects
+                <code>prefers-reduced-motion</code> via the global rule in
+                <code>configs/tailwind/theme.css</code>.
+              </p>
+              <p>
+                <code><TerminalChip prefix="notes" suffix=".cli" /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <span class="a-terminal-chip">
+                  <span class="a-term-prompt" aria-hidden="true">&gt;</span>
+                  <span class="a-term-text">notes.cli</span>
+                  <span class="a-term-cursor"></span>
+                </span>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <span class="a-terminal-chip">
+                  <span class="a-term-prompt" aria-hidden="true">&gt;</span>
+                  <span class="a-term-text">notes.cli</span>
+                  <span class="a-term-cursor"></span>
+                </span>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="commandlink">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>CommandLink</h3>
+              <p>
+                Monospace, terminal-prompt-styled navigation link (<code
+                  >$ cd ~ →</code
+                >). Shares the terminal aesthetic (and the CSS-only blink
+                cursor) with <code>TerminalChip</code>, but is interactive and
+                polymorphic. Prompt/arrow/cursor are decorative
+                (<code>aria-hidden</code>); <code>ariaLabel</code>
+                supplies the real accessible name since the visible command
+                reads as jargon aloud.
+              </p>
+              <p>
+                <code><CommandLink command="cd ~" ariaLabel="Go home" /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <a class="a-command-link" href="#" aria-label="Go home">
+                  <span class="a-term-prompt" aria-hidden="true">$</span>
+                  <span>cd ~</span>
+                  <span class="a-cmd-arrow" aria-hidden="true">→</span>
+                </a>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <a class="a-command-link" href="#" aria-label="Go home">
+                  <span class="a-term-prompt" aria-hidden="true">$</span>
+                  <span>cd ~</span>
+                  <span class="a-cmd-arrow" aria-hidden="true">→</span>
+                </a>
               </div>
             </div>
           </article>
