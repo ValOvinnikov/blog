@@ -364,12 +364,11 @@ avoid.
    already **further along** (Code Review, Done — e.g. a mis-triggered
    re-run on an issue whose work already shipped), leave it alone: that's a
    backward move, which Step 4's own classification below never allows.
-3. Check whether it has a parent:
-   ```
-   gh api graphql -f query='{ repository(owner:"ValOvinnikov", name:"blog") {
-     issue(number:<n>) { parent { number } } } }'
-   ```
-   If `parent` is `null`, stop here — nothing more to do.
+3. Check whether it has a parent via `mcp__github__issue_read`
+   (`method: get_parent`, `owner: ValOvinnikov`, `repo: blog`,
+   `issue_number: <n>`) — per the "Tool preference" section above, this
+   replaces the old `gh api graphql` parent query. If it returns no parent,
+   stop here — nothing more to do.
 4. If a parent exists, look up its item ID (memory first, then API) and check
    its current board status. If it's Todo or blank, promote it to In Progress
    the same way Step 4 applies and re-verifies any other safe forward-only
@@ -513,15 +512,12 @@ gh api graphql -f query='{ repository(owner:"ValOvinnikov", name:"blog") {
 (37), same caveat as Step 2's `--limit 200` on `gh issue list` — re-check
 the real count if it's ever close to 100 and add pagination if so.
 
-Then for each hit, resolve its sub-issue list:
-
-```
-gh api graphql -f query='{ repository(owner:"ValOvinnikov", name:"blog") {
-  issue(number:<n>) {
-    subIssuesSummary { total completed }
-    subIssues(first: 50) { nodes { number state } }
-  } } }'
-```
+Then for each hit, resolve its sub-issue list via `mcp__github__issue_read`
+(`method: get_sub_issues`, `issue_number: <n>`, paginate with `page`/`perPage`
+if `total` exceeds one page) — per the "Tool preference" section above, this
+replaces the old per-issue `gh api graphql` query and its hardcoded
+`first: 50`. Pair it with `method: get` (or the summary already on hand from
+the bulk scan above) for `total`/`completed` counts.
 
 `subIssues(first: 50)` is unpaginated beyond 50 — if `total` exceeds the
 number of `nodes` returned, don't treat the visible subset as complete;
