@@ -15,7 +15,7 @@ describe('getCategoryPaginationParams', () => {
       .mockResolvedValueOnce({ posts: [], total: 20 })
       .mockResolvedValueOnce({ posts: [], total: 9 });
 
-    const params = await getCategoryPaginationParams();
+    const params = await getCategoryPaginationParams(9);
 
     expect(params).toEqual([
       { slug: 'engineering', page: '2' },
@@ -26,7 +26,7 @@ describe('getCategoryPaginationParams', () => {
   it('returns an empty array when there are no categories', async () => {
     mockRun.mockResolvedValueOnce([]);
 
-    const params = await getCategoryPaginationParams();
+    const params = await getCategoryPaginationParams(9);
 
     expect(params).toEqual([]);
   });
@@ -36,7 +36,7 @@ describe('getCategoryPaginationParams', () => {
       .mockResolvedValueOnce([{ slug: 'engineering' }])
       .mockResolvedValueOnce({ posts: [], total: 0 });
 
-    const params = await getCategoryPaginationParams();
+    const params = await getCategoryPaginationParams(9);
 
     expect(params).toEqual([]);
   });

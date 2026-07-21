@@ -63,12 +63,15 @@ describe('getCategoryPage', () => {
       total: 20,
     });
 
-    const result = await getCategoryPage('engineering', { page: 2 });
+    const result = await getCategoryPage('engineering', {
+      page: 2,
+      itemsPerPage: 5,
+    });
 
     expect(result?.posts.map((p) => p.id)).toEqual(['a', 'b']);
     expect(result?.currentPage).toBe(2);
     expect(result?.total).toBe(20);
-    expect(result?.totalPages).toBe(3); // ceil(20 / 9)
+    expect(result?.totalPages).toBe(4);
   });
 
   it('returns null for a paginated request when the category is not found', async () => {
@@ -76,7 +79,10 @@ describe('getCategoryPage', () => {
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce({ posts: [], total: 0 });
 
-    const result = await getCategoryPage('missing', { page: 2 });
+    const result = await getCategoryPage('missing', {
+      page: 2,
+      itemsPerPage: 9,
+    });
 
     expect(result).toBeNull();
   });
