@@ -3082,16 +3082,36 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
           Larger page sections composed from atoms and molecules.
         </p>
         <div class="component-list">
-          <article class="component-row" id="homehero">
+          <article class="component-row" id="hero">
             <div class="component-info">
               <span class="tk">Organism</span>
-              <h3>HomeHero</h3>
+              <h3>Hero</h3>
               <p>
-                Hero copy with optional media. With image it becomes two
-                columns; without image it collapses to one column.
+                Generalized hero shared across home, post, and page-builder —
+                not a home-only persona statement. Renders an optional
+                <code>eyebrow</code>, an optional <code>publishedAt</code>/<code
+                  >formattedDate</code
+                >
+                byline, the required <code>title</code>, an optional
+                <code>excerpt</code>, and optional <code>tags</code>. Media and
+                calls-to-action are compound slots (<code>Hero.Media</code>,
+                <code>Hero.Cta</code>) rather than a single
+                <code>image</code> prop — with a <code>Hero.Media</code> slot
+                present it becomes two columns; without one it collapses to one
+                column.
               </p>
               <p>
-                <code><HomeHero image? /></code>
+                <code
+                  ><Hero
+                    title
+                    titleId
+                    eyebrow?
+                    excerpt?
+                    tags?
+                    publishedAt?
+                    formattedDate?
+                    ><Hero.Media /><Hero.Cta /></Hero
+                ></code>
               </p>
             </div>
             <div class="component-preview-grid">
