@@ -8,7 +8,7 @@ description: >-
   minutes CI takes, and doesn't pay the polling output's token cost turn after
   turn. Always pass the actual PR number (from `gh pr create`'s stdout), never
   the issue number or a bare branch reference.
-tools: Bash
+tools: Bash, mcp__github__pull_request_read
 model: haiku
 permissionMode: dontAsk
 hooks:
@@ -29,9 +29,22 @@ Read-only is enforced, not just asked (#425, reused here per #464): you run
 under `permissionMode: dontAsk` (any Bash call the permission layer would
 prompt for is auto-denied) plus a PreToolUse guard
 (`.claude/hooks/read-only-agent-guard.sh`) that denies write-shaped commands.
-You have no Edit/Write tools and only `Bash` — use it exclusively for `gh`
-read commands. If a legitimate read-only command is denied, that is a signal
-you're reaching for the wrong command, not something to route around.
+You have no Edit/Write tools; `Bash` is exclusively for `gh` read commands. If
+a legitimate read-only command is denied, that is a signal you're reaching for
+the wrong command, not something to route around. The PreToolUse guard only
+matches `Bash` — `mcp__github__pull_request_read` isn't covered by it, but
+needs no covering: every one of its methods is a read, so it carries the same
+read-only guarantee without the hook.
+
+## Tool preference — MCP `github` server vs. `gh` CLI
+
+Prefer `mcp__github__pull_request_read` (`get_status` / `get_check_runs`)
+over `gh pr checks <n>` for the one-off "confirm which check failed" lookup
+in step 3 below — structured output, no JSON-parsing risk. But the MCP
+server has no `--watch` equivalent (no long-poll-to-completion tool) and no
+Actions-run-log tool, so the two commands that actually carry this agent's
+core job stay on `gh`/Bash: the initial blocking watch (step 1) and pulling
+a failing job's log (step 3's `gh run list` / `gh run view --log-failed`).
 
 ## Input you receive
 
@@ -62,10 +75,10 @@ share one counter and are not interchangeable).
 
 3. **Any check fails — required or not.** "Not required to merge" is not
    "safe to ignore." For each failing check:
-   - List checks to confirm the failing job/workflow name:
-     ```
-     gh pr checks <n>
-     ```
+   - Confirm the failing job/workflow name via
+     `mcp__github__pull_request_read` (`method: get_check_runs`,
+     `owner: ValOvinnikov`, `repo: blog`, `pullNumber: <n>`) — falls back to
+     `gh pr checks <n>` only if the MCP call errors.
    - Find the run and pull its failing job's log:
      ```
      gh run list --branch <branch> --limit 5

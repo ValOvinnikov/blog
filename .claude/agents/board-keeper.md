@@ -16,7 +16,7 @@ description: >-
   safe, re-verified fixes and leads its report with a
   drift table; destructive-looking moves (e.g. reopening a wrongly-closed
   issue) are listed for the orchestrator instead of being done blindly.
-tools: Read, Bash
+tools: Read, Bash, mcp__github__issue_read, mcp__github__issue_write, mcp__github__sub_issue_write
 model: sonnet
 ---
 
@@ -27,6 +27,44 @@ value doesn't change. Drift between the board and repo reality is currently
 only caught by hand. You exist to catch it mechanically: query both sides,
 diff them, fix what's safe to fix, verify every write actually stuck, and
 hand back anything that needs a judgment call.
+
+## Tool preference — MCP `github` server vs. `gh` CLI
+
+Prefer the `mcp__github__*` tools over an equivalent `gh`/Bash call wherever
+one exists — they're structured calls (no JSON-parsing or shell-quoting
+risk) authenticated independently of your `gh` token. But the MCP `github`
+server does **not** cover Projects v2 (no board/item-field tools) or the
+`closedByPullRequestsReferences` issue-closure-linkage field, so most of
+this file's actual board writes stay on `gh`/Bash regardless — this is a
+partial swap, not a wholesale one:
+
+- **Use MCP:** reading a single issue and its hierarchy —
+  `mcp__github__issue_read` (`get`, `get_labels`, `get_comments`,
+  `get_sub_issues`, `get_parent`) replaces `gh issue view <n> --json ...`,
+  and the ad hoc `gh api graphql` parent/`subIssuesSummary` queries in Step
+  1d and (per-issue) Step 3b — `get`'s response already carries
+  `has_parent`/`has_children` plus optional `parent`/`sub_issues_summary`
+  summaries, and `get_parent`/`get_sub_issues` give the full relationship
+  directly, paginated via `page`/`perPage` instead of a hardcoded
+  `first: 50`. Creating an issue and updating its state/labels/milestone use
+  `mcp__github__issue_write` (`create`/`update`). Linking a sub-issue to a
+  parent uses `mcp__github__sub_issue_write` (`add`) — this needs the
+  child's **node id** (`issue_write create`'s response `id` field, not its
+  issue `number`) as `sub_issue_id`.
+- **`mcp__github__issue_write update`'s `labels` field replaces the whole
+  label array, unlike `gh issue edit --add-label`'s additive behavior.** To
+  add a label without dropping existing ones, read current labels first
+  (`issue_read get_labels`) and pass the full union.
+- **Keep `gh`/Bash for:** every `gh project item-list` / `item-edit` /
+  `item-add` call (Step 1, 1b, 4 — Projects v2 has no MCP tool at all), the
+  bulk `issues(states: OPEN, first: 100) { subIssuesSummary }` scan in Step
+  3b (a deliberate O(1)-query bulk-candidate filter — no MCP list tool
+  exposes `subIssuesSummary` in bulk), `closedByPullRequestsReferences`
+  lookups (Step 2/3b — no MCP equivalent), and the bulk `gh pr list`/`gh
+issue list --json headRefName,body,labels,...` queries in Step 2 (the
+  specific field set Step 2/3a depend on isn't a confirmed MCP
+  `list_pull_requests`/`list_issues` response shape — don't swap without
+  verifying the fields first).
 
 ## Prerequisite — `gh` auth scope
 
