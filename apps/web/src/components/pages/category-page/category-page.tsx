@@ -1,27 +1,40 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { PostsSection } from '@blog/ui';
+import { Pagination, PostsSection } from '@blog/ui';
 import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
 import { Link } from '@web/i18n/navigation';
+import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
 import { formatDate } from '@web/utils/format-date';
 import { notFound } from 'next/navigation';
 
-type TCategoryPageProps = ILocalizedParams & { slug: string };
+type TCategoryPageProps = ILocalizedParams & { slug: string; page?: number };
 
 /**
- * CategoryPage — `/category/[slug]` composition: fetches a single
- * unpaginated window of posts for the category and renders them through the
- * same pure ui organisms as `BlogListPage`. Pagination is out of scope here
- * (tracked separately as #588/#589).
+ * CategoryPage — shared composition for `/category/[slug]` (page 1,
+ * unpaginated — `page` omitted) and `/category/[slug]/page/[page]` (pages
+ * ≥ 2, `page` provided): fetches posts for the category and renders them
+ * through the same pure ui organisms as `BlogListPage`.
  */
-export async function CategoryPage({ slug, locale }: TCategoryPageProps) {
-  const page = await service.pages.category.v1.getCategoryPage(slug);
+export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
+  const result =
+    page === undefined
+      ? await service.pages.category.v1.getCategoryPage(slug)
+      : await service.pages.category.v1.getCategoryPage(slug, {
+          page,
+          itemsPerPage: CATEGORY_ITEMS_PER_PAGE,
+        });
 
-  if (!page) {
+  if (!result) {
     notFound();
   }
 
-  const { category, posts } = page;
+  const { category, posts, currentPage, totalPages } = result;
+
+  // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
+  // soft-404 or a redirect to the last page (spec SEO rules).
+  if (page !== undefined && totalPages !== undefined && page > totalPages) {
+    notFound();
+  }
 
   const items = posts.map((post) => ({
     id: post.id,
@@ -44,6 +57,19 @@ export async function CategoryPage({ slug, locale }: TCategoryPageProps) {
           titleId="category-posts-title"
           linkAs={Link}
         />
+      }
+      pagination={
+        currentPage !== undefined && totalPages !== undefined ? (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            createHref={(pageNumber) => routes.category(slug, pageNumber)}
+            ariaLabel="Category pages"
+            previousLabel="Previous"
+            nextLabel="Next"
+            linkAs={Link}
+          />
+        ) : undefined
       }
     />
   );

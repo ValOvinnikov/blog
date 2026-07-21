@@ -54,4 +54,27 @@ describe('buildCategoryMetadata', () => {
 
     expect(metadata).toEqual({});
   });
+
+  it('builds page-N metadata with a "– Page N" suffix, self-canonical to /category/[slug]/page/N — never /category/[slug]', async () => {
+    getCategoryPageMock.mockResolvedValue({ category, posts: [] });
+
+    const metadata = await buildCategoryMetadata('engineering', 2);
+
+    expect(metadata.title).toBe('Engineering – Page 2');
+    expect(metadata.openGraph?.title).toBe('Engineering – Page 2');
+    expect(metadata.alternates?.canonical).toBe('/category/engineering/page/2');
+    expect(metadata.alternates?.canonical).not.toBe('/category/engineering');
+    expect(getCategoryPageMock).toHaveBeenCalledWith('engineering', {
+      page: 2,
+      itemsPerPage: 9,
+    });
+  });
+
+  it('returns empty metadata for page N when the category does not exist', async () => {
+    getCategoryPageMock.mockResolvedValue(null);
+
+    const metadata = await buildCategoryMetadata('missing', 2);
+
+    expect(metadata).toEqual({});
+  });
 });

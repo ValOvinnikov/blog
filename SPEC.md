@@ -21,7 +21,7 @@ frontend if a consumer is out of date.
 | Home     | `/`                              | ✅ Built — modules-as-documents (hero + `modules[]`)                                                        |
 | Blog     | `/blog` + `/blog/page/N`         | ✅ Built — paginated index (#75)                                                                            |
 | Post     | `/blog/[slug]`                   | ✅ Built — post detail page + JSON-LD (#76)                                                                 |
-| Category | `/category/[slug]` (+ `/page/N`) | 🔲 Phase 3 (#91 — adopts the pagination convention)                                                         |
+| Category | `/category/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589)                                                   |
 | Author   | `/author/[slug]`                 | 🔲 Planned — #327 (service loaders already built)                                                           |
 | Page     | `/[slug]`                        | 🔲 Planned — #285; `service.pages.generic.v1.getPage` exists; slug space guarded by `RESERVED_SLUGS` (#328) |
 | Feeds    | sitemap/robots/RSS               | 🔲 Phase 3 (#92)                                                                                            |
