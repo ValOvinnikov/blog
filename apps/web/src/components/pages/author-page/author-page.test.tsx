@@ -120,7 +120,7 @@ describe('AuthorPage', () => {
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it("renders the author's posts via PostsSection", async () => {
+  it('renders the author posts via PostsSection', async () => {
     getAuthorPageMock.mockResolvedValue({ author, posts: [post] });
 
     const ui = await AuthorPage({ slug: 'jane-doe', locale: 'en' });
