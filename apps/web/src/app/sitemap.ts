@@ -33,11 +33,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [];
   }
 
-  const [posts, categories, blogParamsResult] = await Promise.all([
-    service.pages.post.v1.getPostParams(),
-    service.pages.category.v1.getCategoryParams(),
-    service.pages.blog.v1.getIndexPageParams(),
-  ]);
+  const [posts, categories, blogParamsResult, genericPageSlugsResult] =
+    await Promise.all([
+      service.pages.post.v1.getPostParams(),
+      service.pages.category.v1.getCategoryParams(),
+      service.pages.blog.v1.getIndexPageParams(),
+      service.pages.generic.v1.getPageSlugs(),
+    ]);
 
   if (!blogParamsResult.ok) {
     console.error(
@@ -48,11 +50,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ? blogParamsResult.data.map(({ page }) => Number(page))
     : [];
 
+  if (!genericPageSlugsResult.ok) {
+    console.error(
+      `Error fetching generic page slugs for sitemap: ${genericPageSlugsResult.error}`,
+    );
+  }
+  const genericPageSlugs = genericPageSlugsResult.ok
+    ? genericPageSlugsResult.data
+    : [];
+
   return [
     toEntry(routes.home(), siteUrl),
     toEntry(routes.blogIndex(), siteUrl),
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
     ...posts.map(({ slug }) => toEntry(routes.post(slug), siteUrl)),
     ...categories.map(({ slug }) => toEntry(routes.category(slug), siteUrl)),
+    ...genericPageSlugs.map(({ slug }) =>
+      toEntry(routes.genericPage(slug), siteUrl),
+    ),
   ];
 }
