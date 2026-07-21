@@ -14,17 +14,20 @@ readers browse a fast, statically-rendered Next.js site. Content is fully typed
 end-to-end — a schema change in the CMS surfaces as a TypeScript error in the
 frontend if a consumer is out of date.
 
-**Primary surfaces** (status as of 2026-07-14):
+**Primary surfaces** (status as of 2026-07-21):
 
-| Surface  | Route                            | Status                                                                                                      |
-| -------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Home     | `/`                              | ✅ Built — modules-as-documents (hero + `modules[]`)                                                        |
-| Blog     | `/blog` + `/blog/page/N`         | ✅ Built — paginated index (#75)                                                                            |
-| Post     | `/blog/[slug]`                   | ✅ Built — post detail page + JSON-LD (#76)                                                                 |
-| Category | `/category/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589)                                                   |
-| Author   | `/author/[slug]`                 | 🔲 Planned — #327 (service loaders already built)                                                           |
-| Page     | `/[slug]`                        | 🔲 Planned — #285; `service.pages.generic.v1.getPage` exists; slug space guarded by `RESERVED_SLUGS` (#328) |
-| Feeds    | sitemap/robots/RSS               | 🔲 Phase 3 (#92)                                                                                            |
+| Surface  | Route                            | Status                                                                              |
+| -------- | -------------------------------- | ----------------------------------------------------------------------------------- |
+| Home     | `/`                              | ✅ Built — modules-as-documents (hero + `modules[]`)                                |
+| Blog     | `/blog` + `/blog/page/N`         | ✅ Built — paginated index (#75)                                                    |
+| Post     | `/blog/[slug]`                   | ✅ Built — post detail page + JSON-LD (#76)                                         |
+| Category | `/category/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589)                           |
+| Author   | `/author/[slug]`                 | ✅ Built — profile + posts by author (#327/#593-595)                                |
+| Page     | `/[slug]`                        | ✅ Built — generic page route (#285), slug space guarded by `RESERVED_SLUGS` (#328) |
+| Feeds    | sitemap/robots/RSS               | ✅ Built — Phase 3 (#92), generic pages listed in the sitemap (#285)                |
+
+Phase 3 (Blog core) is fully closed as of 2026-07-21 — every primary surface
+above is built and merged.
 
 **Routing conventions** (decided 2026-07-14 — full rationale in
 `docs/superpowers/specs/2026-07-14-blog-list-pagination-design.md`):
