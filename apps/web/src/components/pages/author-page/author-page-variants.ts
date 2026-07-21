@@ -6,5 +6,6 @@ export const authorPageVariants = tv({
     eyebrow: ['mb-2'],
     byline: ['mx-auto max-w-measure'],
     socialLinks: ['mx-auto mt-8 max-w-measure'],
+    posts: ['mt-16'],
   },
 });

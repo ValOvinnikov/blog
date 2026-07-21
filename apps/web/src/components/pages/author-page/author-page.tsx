@@ -1,28 +1,51 @@
+import type { ILocalizedParams } from '@blog/config';
+import { routes } from '@blog/config';
 import { service } from '@blog/service';
-import { ActionList, AuthorByline, Eyebrow, ShareLink } from '@blog/ui';
+import {
+  ActionList,
+  AuthorByline,
+  Eyebrow,
+  PostsSection,
+  ShareLink,
+} from '@blog/ui';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { Link } from '@web/i18n/navigation';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
+import { formatDate } from '@web/utils/format-date';
 import { notFound } from 'next/navigation';
 
 import { authorPageVariants } from './author-page-variants';
 
-type TAuthorPageProps = { slug: string };
+type TAuthorPageProps = ILocalizedParams & { slug: string };
 
 const s = authorPageVariants();
 
 /**
- * AuthorPage — `/author/[slug]` composition: fetches the author via
- * `service.entities.author.v1.getAuthor`, then renders their profile
- * (role, name/bio/avatar via `AuthorByline`, and social links via
- * `ShareLink`/`ActionList`). Scoped to profile only — the author's post list
- * is a separate tracked follow-up (#593/#594/#595).
+ * AuthorPage — `/author/[slug]` composition: fetches the author and their
+ * posts in parallel (`service.entities.author.v1.getAuthor` and
+ * `getAuthorPosts`), then renders their profile (role, name/bio/avatar via
+ * `AuthorByline`, social links via `ShareLink`/`ActionList`), followed by
+ * their (unpaginated) post list via `PostsSection`.
  */
-export async function AuthorPage({ slug }: TAuthorPageProps) {
-  const author = await service.entities.author.v1.getAuthor(slug);
+export async function AuthorPage({ slug, locale }: TAuthorPageProps) {
+  const [author, posts] = await Promise.all([
+    service.entities.author.v1.getAuthor(slug),
+    service.entities.author.v1.getAuthorPosts(slug),
+  ]);
 
   if (!author) {
     notFound();
   }
+
+  const items = posts.map((post) => ({
+    id: post.id,
+    href: routes.post(post.slug),
+    title: post.title,
+    excerpt: post.excerpt,
+    publishedAt: post.publishedAt,
+    formattedDate: formatDate(post.publishedAt, locale),
+    categories: post.categories,
+  }));
 
   return (
     <main className={s.root()}>
@@ -47,6 +70,14 @@ export async function AuthorPage({ slug }: TAuthorPageProps) {
           ))}
         </ActionList>
       )}
+
+      <PostsSection
+        className={s.posts()}
+        posts={items}
+        title={`Posts by ${author.name}`}
+        titleId="author-posts-title"
+        linkAs={Link}
+      />
     </main>
   );
 }
