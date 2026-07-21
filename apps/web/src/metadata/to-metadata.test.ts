@@ -97,6 +97,35 @@ describe('toMetadata', () => {
       'https://cdn.example.com/blog-og.jpg',
     ]);
   });
+
+  it('adds openGraph.publishedTime and authors for article type when provided', () => {
+    const metadata = toMetadata(seo, {
+      canonical: '/blog/my-post',
+      ogType: 'article',
+      article: {
+        publishedTime: '2026-01-15T00:00:00Z',
+        authors: ['Jane Doe'],
+      },
+    });
+
+    expect(
+      (metadata.openGraph as { publishedTime?: string })?.publishedTime,
+    ).toBe('2026-01-15T00:00:00Z');
+    expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
+      'Jane Doe',
+    ]);
+  });
+
+  it('omits openGraph.publishedTime and authors when article option is not passed', () => {
+    const metadata = toMetadata(seo, { canonical: '/blog', ogType: 'website' });
+
+    expect(
+      (metadata.openGraph as { publishedTime?: string })?.publishedTime,
+    ).toBeUndefined();
+    expect(
+      (metadata.openGraph as { authors?: string[] })?.authors,
+    ).toBeUndefined();
+  });
 });
 
 describe('toMetadata output resolved by Next itself (regression for #490)', () => {

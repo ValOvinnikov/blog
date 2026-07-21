@@ -26,7 +26,13 @@ const basePost: TPostDetail = {
   heroImageSanity: undefined,
   featured: false,
   body: [],
-  seo: undefined,
+  seo: {
+    title: 'Hello World',
+    description: 'A sufficiently long excerpt for the card.',
+    ogTitle: 'Hello World OG',
+    ogDescription: 'A sufficiently long excerpt for the card OG.',
+    ogImageUrl: 'https://cdn.example.com/hero.jpg',
+  },
   author: undefined,
   categories: [],
 };
@@ -40,7 +46,7 @@ describe('buildPostMetadata', () => {
     expect(metadata).toEqual({});
   });
 
-  it('falls back to post title/excerpt/heroImage when seo is not authored', async () => {
+  it('passes the already-resolved seo through to toMetadata', async () => {
     getPostMock.mockResolvedValue(basePost);
 
     const metadata = await buildPostMetadata('hello-world');
@@ -50,37 +56,53 @@ describe('buildPostMetadata', () => {
       'A sufficiently long excerpt for the card.',
     );
     expect(metadata.alternates?.canonical).toBe('/blog/hello-world');
-    expect(metadata.openGraph?.title).toBe('Hello World');
+    expect(metadata.openGraph?.title).toBe('Hello World OG');
     expect(metadata.openGraph?.description).toBe(
-      'A sufficiently long excerpt for the card.',
+      'A sufficiently long excerpt for the card OG.',
     );
     expect(metadata.openGraph?.images).toEqual([
       { url: 'https://cdn.example.com/hero.jpg' },
     ]);
   });
 
-  it('prefers authored seo overrides field-by-field', async () => {
+  it('sets openGraph.publishedTime from post.publishedAt', async () => {
+    getPostMock.mockResolvedValue(basePost);
+
+    const metadata = await buildPostMetadata('hello-world');
+
+    expect(
+      (metadata.openGraph as { publishedTime?: string })?.publishedTime,
+    ).toBe('2026-01-15T00:00:00Z');
+  });
+
+  it('sets openGraph.authors from post.author.name when present', async () => {
     getPostMock.mockResolvedValue({
       ...basePost,
-      seo: {
-        metaTitle: 'Authored Title',
-        metaDescription: 'Authored description.',
-        ogTitle: 'Authored OG Title',
-        ogDescription: undefined,
-        ogImageUrl: 'https://cdn.example.com/og.jpg',
+      author: {
+        id: 'author-1',
+        name: 'Jane Doe',
+        slug: 'jane-doe',
+        imageUrl: undefined,
+        role: undefined,
+        bio: undefined,
+        socialLinks: [],
       },
     });
 
     const metadata = await buildPostMetadata('hello-world');
 
-    expect(metadata.title).toBe('Authored Title');
-    expect(metadata.description).toBe('Authored description.');
-    expect(metadata.openGraph?.title).toBe('Authored OG Title');
-    // Falls back to the resolved description (own metaDescription), not the
-    // post excerpt, when only ogDescription is missing.
-    expect(metadata.openGraph?.description).toBe('Authored description.');
-    expect(metadata.openGraph?.images).toEqual([
-      { url: 'https://cdn.example.com/og.jpg' },
+    expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
+      'Jane Doe',
     ]);
+  });
+
+  it('omits openGraph.authors when the post has no resolved author', async () => {
+    getPostMock.mockResolvedValue(basePost);
+
+    const metadata = await buildPostMetadata('hello-world');
+
+    expect(
+      (metadata.openGraph as { authors?: string[] })?.authors,
+    ).toBeUndefined();
   });
 });

@@ -14,7 +14,13 @@ const post: TPostDetail = {
   heroImageSanity: undefined,
   featured: false,
   body: [],
-  seo: undefined,
+  seo: {
+    title: 'Hello World',
+    description: 'A sufficiently long excerpt for the post.',
+    ogTitle: 'Hello World',
+    ogDescription: 'A sufficiently long excerpt for the post.',
+    ogImageUrl: 'https://cdn.example.com/hero.jpg',
+  },
   author: {
     id: 'author-1',
     name: 'Jane Doe',
