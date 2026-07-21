@@ -1,5 +1,5 @@
 import type { Code, RichText as TPortableText } from '@blog/config';
-import { Heading, Prose } from '@blog/ui';
+import { Heading, Prose, ProseLink } from '@blog/ui';
 import {
   PortableText,
   type PortableTextComponents,
@@ -38,7 +38,9 @@ const components: PortableTextComponents = {
       value,
     }: PortableTextMarkComponentProps<ILinkAnnotation>) =>
       value?.href ? (
-        <SmartLink href={value.href}>{children}</SmartLink>
+        <ProseLink as={SmartLink} href={value.href}>
+          {children}
+        </ProseLink>
       ) : (
         <>{children}</>
       ),
