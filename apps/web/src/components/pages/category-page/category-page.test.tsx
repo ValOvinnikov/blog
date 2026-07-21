@@ -109,4 +109,71 @@ describe('CategoryPage', () => {
     ).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
+
+  it('calls the paginated getCategoryPage with the fixed itemsPerPage when a page is given', async () => {
+    getCategoryPageMock.mockResolvedValue({
+      category: {
+        id: 'cat-1',
+        title: 'News',
+        slug: 'news',
+        description: 'The latest updates.',
+      },
+      posts: [post],
+      currentPage: 2,
+      totalPages: 3,
+      total: 20,
+    });
+
+    await CategoryPage({ slug: 'news', locale: 'en', page: 2 });
+
+    expect(getCategoryPageMock).toHaveBeenCalledWith('news', {
+      page: 2,
+      itemsPerPage: 9,
+    });
+  });
+
+  it('renders pagination wired to routes.category(slug, page) when a page is given', async () => {
+    getCategoryPageMock.mockResolvedValue({
+      category: {
+        id: 'cat-1',
+        title: 'News',
+        slug: 'news',
+        description: 'The latest updates.',
+      },
+      posts: [post],
+      currentPage: 2,
+      totalPages: 3,
+      total: 20,
+    });
+
+    const ui = await CategoryPage({ slug: 'news', locale: 'en', page: 2 });
+    render(<>{ui}</>);
+
+    expect(
+      screen.getByRole('navigation', { name: 'Category pages' }),
+    ).toBeVisible();
+    const nextLink = screen.getByRole('link', { name: 'Next' });
+    expect(nextLink).toHaveAttribute('href', '/category/news/page/3');
+  });
+
+  it('calls notFound() when the requested page is beyond totalPages', async () => {
+    getCategoryPageMock.mockResolvedValue({
+      category: {
+        id: 'cat-1',
+        title: 'News',
+        slug: 'news',
+        description: 'The latest updates.',
+      },
+      posts: [],
+      currentPage: 5,
+      totalPages: 1,
+      total: 1,
+    });
+
+    await expect(
+      CategoryPage({ slug: 'news', locale: 'en', page: 5 }),
+    ).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(notFoundMock).toHaveBeenCalledTimes(1);
+  });
 });
