@@ -722,6 +722,93 @@
         color: var(--subtle);
       }
 
+      /* ---- page-builder organisms (ContentModule/ContentSection/
+         CtaModule/Pagination) ---- */
+      .o-content-module {
+        margin-top: 22px;
+      }
+
+      .o-content-module-title {
+        margin: 0 0 12px;
+        font-size: 19px;
+        font-weight: 500;
+        line-height: 1.3;
+      }
+
+      .o-content-module-body {
+        max-width: 68ch;
+      }
+
+      .o-content-section {
+        margin-top: 22px;
+      }
+
+      .o-cta-module {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-top: 22px;
+        padding: 24px 20px;
+        background: var(--bg-subtle);
+      }
+
+      .o-cta-module-heading {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 500;
+        line-height: 1.3;
+      }
+
+      .o-cta-module-text {
+        margin: 0;
+        max-width: 68ch;
+        color: var(--subtle);
+      }
+
+      .o-cta-module-action {
+        margin-top: 8px;
+      }
+
+      .o-pagination {
+        margin-top: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .o-pagination ul {
+        margin: 0;
+        display: flex;
+        list-style: none;
+        align-items: center;
+        gap: 4px;
+        padding: 0;
+      }
+
+      .o-pagination a {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        display: inline-flex;
+        min-width: 36px;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        padding: 0 8px;
+        color: var(--subtle);
+        text-decoration: none;
+      }
+
+      .o-pagination a:hover {
+        color: var(--text);
+      }
+
+      .o-pagination a[aria-current='page'] {
+        color: var(--accent);
+      }
+
       /* component catalogue */
       .catalog-card {
         background: var(--chrome-card);
@@ -3409,6 +3496,273 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
                   <span>© 2026 val.dev</span
                   ><span>rss · github · linkedin</span>
                 </footer>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="contentmodule">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>ContentModule</h3>
+              <p>
+                Page-builder organism for a single Portable Text content block
+                behind an optional heading. The web layer renders the Portable
+                Text tree and passes it in as <code>children</code>; the heading
+                itself carries no typographic token classes today (browser
+                default), unlike the labeled sections below.
+              </p>
+              <p>
+                <code><ContentModule title? titleId? children /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <section
+                  class="o-content-module"
+                  aria-labelledby="content-module-title-light"
+                >
+                  <h2
+                    id="content-module-title-light"
+                    class="o-content-module-title"
+                  >
+                    About this project
+                  </h2>
+                  <div class="o-content-module-body">
+                    <p class="a-body">
+                      Building a design system from scratch means establishing
+                      tokens, atoms, molecules, and organisms that scale across
+                      a growing product surface.
+                    </p>
+                  </div>
+                </section>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <section
+                  class="o-content-module"
+                  aria-labelledby="content-module-title-dark"
+                >
+                  <h2
+                    id="content-module-title-dark"
+                    class="o-content-module-title"
+                  >
+                    About this project
+                  </h2>
+                  <div class="o-content-module-body">
+                    <p class="a-body">
+                      Building a design system from scratch means establishing
+                      tokens, atoms, molecules, and organisms that scale across
+                      a growing product surface.
+                    </p>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="contentsection">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>ContentSection</h3>
+              <p>
+                Generic labeled wrapper for page-builder sections — a mono-label
+                heading plus arbitrary <code>children</code>
+                (e.g. a PostGrid of PostCards, as shown here). Distinct from
+                PostsSection: it owns no post-specific data shape, just the
+                label + slot composition.
+              </p>
+              <p>
+                <code><ContentSection title titleId children /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <section
+                  class="o-content-section"
+                  aria-labelledby="content-section-title-light"
+                >
+                  <p id="content-section-title-light" class="o-latest-title">
+                    Related posts
+                  </p>
+                  <div class="o-card-grid">
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-03-11<span class="a-sep">·</span>7 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">DESIGN</span>
+                      </div>
+                      <h4 class="a-card-title">
+                        Tokens that survive refactors
+                      </h4>
+                      <p class="m-card-desc">
+                        Semantic naming, one source of truth.
+                      </p>
+                    </article>
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-01-22<span class="a-sep">·</span>5 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">ENGINEERING</span>
+                      </div>
+                      <h4 class="a-card-title">A compact post card</h4>
+                      <p class="m-card-desc">
+                        Reusable inside any labeled section.
+                      </p>
+                    </article>
+                  </div>
+                </section>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <section
+                  class="o-content-section"
+                  aria-labelledby="content-section-title-dark"
+                >
+                  <p id="content-section-title-dark" class="o-latest-title">
+                    Related posts
+                  </p>
+                  <div class="o-card-grid">
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-03-11<span class="a-sep">·</span>7 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">DESIGN</span>
+                      </div>
+                      <h4 class="a-card-title">
+                        Tokens that survive refactors
+                      </h4>
+                      <p class="m-card-desc">
+                        Semantic naming, one source of truth.
+                      </p>
+                    </article>
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-01-22<span class="a-sep">·</span>5 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">ENGINEERING</span>
+                      </div>
+                      <h4 class="a-card-title">A compact post card</h4>
+                      <p class="m-card-desc">
+                        Reusable inside any labeled section.
+                      </p>
+                    </article>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="ctamodule">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>CtaModule</h3>
+              <p>
+                Heading, optional supporting text, and an action slot on a
+                subtle background — the newsletter-signup / call-to-action
+                page-builder block. <code>action</code> is a fully rendered
+                link/button passed in by the web layer; this component never
+                builds the anchor itself.
+              </p>
+              <p>
+                <code><CtaModule heading headingId? text? action /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <section
+                  class="o-cta-module"
+                  aria-labelledby="cta-module-heading-light"
+                >
+                  <h2
+                    id="cta-module-heading-light"
+                    class="o-cta-module-heading"
+                  >
+                    Never miss a post
+                  </h2>
+                  <p class="o-cta-module-text">
+                    Subscribe to get new articles on design systems and
+                    engineering delivered straight to your inbox.
+                  </p>
+                  <div class="o-cta-module-action">
+                    <a class="a-button a-button-primary">Subscribe now</a>
+                  </div>
+                </section>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <section
+                  class="o-cta-module"
+                  aria-labelledby="cta-module-heading-dark"
+                >
+                  <h2 id="cta-module-heading-dark" class="o-cta-module-heading">
+                    Never miss a post
+                  </h2>
+                  <p class="o-cta-module-text">
+                    Subscribe to get new articles on design systems and
+                    engineering delivered straight to your inbox.
+                  </p>
+                  <div class="o-cta-module-action">
+                    <a class="a-button a-button-primary">Subscribe now</a>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="pagination">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>Pagination</h3>
+              <p>
+                Prev/next + numbered links for paginated listings (blog index,
+                category pages). Route-agnostic (<code>createHref</code>) and
+                polymorphic (<code>linkAs</code>); renders nothing when there is
+                a single page.
+              </p>
+              <p>
+                <code
+                  ><Pagination
+                    currentPage
+                    totalPages
+                    createHref
+                    ariaLabel
+                    previousLabel
+                    nextLabel
+                    linkAs?
+                /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <nav class="o-pagination" aria-label="Blog pages">
+                  <a>Previous</a>
+                  <ul role="list">
+                    <li><a href="#">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#" aria-current="page">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">5</a></li>
+                  </ul>
+                  <a>Next</a>
+                </nav>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <nav class="o-pagination" aria-label="Blog pages">
+                  <a>Previous</a>
+                  <ul role="list">
+                    <li><a href="#">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#" aria-current="page">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">5</a></li>
+                  </ul>
+                  <a>Next</a>
+                </nav>
               </div>
             </div>
           </article>
