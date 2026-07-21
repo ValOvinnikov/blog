@@ -5,6 +5,10 @@ type TToMetadataOptions = {
   canonical: string;
   ogType: 'website' | 'article';
   titleAbsolute?: boolean;
+  article?: {
+    publishedTime?: string;
+    authors?: string[];
+  };
 };
 
 // Route-relative fallbacks to the file-convention-derived default images
@@ -35,7 +39,7 @@ export function toMetadata(
   seo: TSeoResolved,
   opts: TToMetadataOptions,
 ): Metadata {
-  const { canonical, ogType, titleAbsolute } = opts;
+  const { canonical, ogType, titleAbsolute, article } = opts;
   const ogImages = seo.ogImageUrl
     ? [{ url: seo.ogImageUrl }]
     : [{ url: FALLBACK_OG_IMAGE_PATH }];
@@ -52,6 +56,8 @@ export function toMetadata(
       description: seo.ogDescription,
       images: ogImages,
       type: ogType,
+      ...(article?.publishedTime && { publishedTime: article.publishedTime }),
+      ...(article?.authors && { authors: article.authors }),
     },
     twitter: {
       card: 'summary_large_image',

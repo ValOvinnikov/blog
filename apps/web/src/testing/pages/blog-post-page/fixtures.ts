@@ -18,7 +18,13 @@ export const mockPostDetail: TPostDetail = {
       children: [{ _type: 'span', _key: 's1', text: 'Body text.' }],
     },
   ],
-  seo: undefined,
+  seo: {
+    title: 'Hello World',
+    description: 'A sufficiently long excerpt for the card.',
+    ogTitle: 'Hello World',
+    ogDescription: 'A sufficiently long excerpt for the card.',
+    ogImageUrl: 'https://cdn.example.com/hero.jpg',
+  },
   author: {
     id: 'author-1',
     name: 'Jane Doe',
