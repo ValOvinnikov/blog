@@ -40,7 +40,7 @@ export const service = {
   },
 };
 
-export type { TAuthorDetail } from './features/entities/author';
+export type { TAuthorDetail, TAuthorPage } from './features/entities/author';
 export type { TCategoriesList } from './features/entities/categories';
 export type { TFooter } from './features/global/footer';
 export type { TNavigation } from './features/global/navigation';
