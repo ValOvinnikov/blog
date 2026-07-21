@@ -10,7 +10,7 @@ import {
 import { toCategoryPage } from './transformer';
 import type { TCategoryPage } from './types';
 
-export type TGetCategoryPageArgs = {
+type TGetCategoryPageArgs = {
   page?: number;
 };
 
