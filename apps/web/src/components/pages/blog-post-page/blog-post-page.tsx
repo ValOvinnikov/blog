@@ -5,6 +5,7 @@ import { JsonLd } from '@web/components/shared/json-ld';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 import { PostShareButtons } from '@web/components/shared/post-share-buttons';
 import { SanityImage } from '@web/components/shared/sanity-image';
+import { SmartLink } from '@web/components/shared/smart-link';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
 import { buildShareLinks } from '@web/utils/build-share-links';
@@ -66,7 +67,11 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
 
       {post.categories.length > 0 && (
         <TagList
-          tags={post.categories.map((category) => category.title)}
+          tags={post.categories.map((category) => ({
+            label: category.title,
+            href: routes.category(category.slug),
+          }))}
+          linkAs={SmartLink}
           className={s.tags()}
         />
       )}

@@ -71,7 +71,10 @@ describe(`<${BlogPostPage.name}/>`, () => {
       screen.getByRole('heading', { level: 1, name: 'Hello World' }),
     ).toBeVisible();
     expect(screen.getByText('Body text.')).toBeVisible();
-    expect(screen.getByText('Engineering')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
+      'href',
+      '/category/engineering',
+    );
     expect(screen.getAllByText('Jane Doe').length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText('A short bio.')).toBeVisible();
     expect(screen.getByRole('link', { name: /Share on X/ })).toBeVisible();
