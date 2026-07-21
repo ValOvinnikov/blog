@@ -1227,7 +1227,10 @@
             <span class="sw-name">accent-contrast</span
             ><span class="sw-role">text on accent-solid</span
             ><span class="chip" style="background: oklch(0.99 0 0)"></span
-            ><span class="chip" style="background: oklch(0.16 0.006 250)"></span>
+            ><span
+              class="chip"
+              style="background: oklch(0.16 0.006 250)"
+            ></span>
           </div>
         </div>
       </section>
@@ -2042,16 +2045,42 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               </div>
             </div>
           </article>
-          <article class="component-row" id="bodytext---mutedtext">
+          <article class="component-row" id="text">
             <div class="component-info">
               <span class="tk">Atom</span>
-              <h3>BodyText / MutedText</h3>
+              <h3>Text</h3>
               <p>
-                Long-form serif text. Muted variant is used for hero subtitles
-                and card descriptions.
+                Serif body copy atom. Ships 4 variants — a superset of the
+                default/muted tones shown below, each pairing a font-size token
+                with a color and line-height:
               </p>
+              <ul>
+                <li>
+                  <code>lead</code> (default) —
+                  <code>text-lead</code> (0.9375rem) /
+                  <code>leading-[1.72]</code> / <code>text-text</code>. Standard
+                  long-form body copy.
+                </li>
+                <li>
+                  <code>muted</code> — same size/line-height as
+                  <code>lead</code>, <code>text-muted</code> color. The
+                  de-emphasized tone (bios, secondary copy).
+                </li>
+                <li>
+                  <code>hero</code> — <code>text-base</code> (1.0625rem) /
+                  <code>leading-[1.6]</code> / <code>text-muted</code>. Used for
+                  hero subtitles.
+                </li>
+                <li>
+                  <code>card</code> — <code>text-card-copy</code> (0.8125rem) /
+                  <code>leading-[1.55]</code> / <code>text-muted</code>. Sized
+                  for card descriptions; not yet wired into
+                  <code>PostCard</code>, which renders its own excerpt markup
+                  instead.
+                </li>
+              </ul>
               <p>
-                <code><Text tone="default|muted" /></code>
+                <code><Text variant="lead|muted|hero|card" /></code>
               </p>
             </div>
             <div class="component-preview-grid">
