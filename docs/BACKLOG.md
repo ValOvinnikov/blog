@@ -15,11 +15,11 @@ body=..., labels=..."` — never `gh issue create` directly, see `CLAUDE.md`),
 > deliberately precedes Phase 3 — every later feature needs a live URL and env
 > plumbing to be testable.
 >
-> **Status 2026-07-12:** M0/M1 tickets are filed and on the board (numbers
-> annotated per ticket below). GitHub milestones mirror these sections
-> (M0 — Housekeeping, M1 — Deployment, Phase 3 — Blog core, M2 — Hardening,
-> CMS restructure P4–P6; legacy Phase 0–2 milestones closed). **M0.3 (#270)
-> is In Progress — the starting point.**
+> **Status 2026-07-21:** M0 and M1 are fully closed, and **Phase 3 (Blog
+> core) is closed** — every ticket in #75–94, #123, plus the later-filed
+> #327 (author route), #328 (`RESERVED_SLUGS` guard), and #285 (generic page
+> route) is done and merged. **M2 (Hardening) is next — #275 (D4 launch
+> hardening) is the open starting point.**
 
 ## Roadmap
 
@@ -28,34 +28,30 @@ flowchart LR
   subgraph DONE["✅ Done · Phases 0–2"]
     F[Foundation · Content core<br/>Design system · Home page]
   end
-  subgraph INFLIGHT["🔧 In flight"]
-    PR262["PR #262 modules P5<br/>fix per review, merge"]
-    P6["#251 group_name naming P6"]
-  end
-  subgraph M0["M0 Housekeeping"]
-    M03["#270 turbo outputs + .nvmrc ◀ NOW"]
+  subgraph M0["✅ M0 Housekeeping"]
+    M03["#270 turbo outputs + .nvmrc"]
     M02["#267 skills-drift CI guard"]
     M01["#269 board reconciliation"]
   end
-  subgraph M1["M1 Deployment"]
+  subgraph M1["✅ M1 Deployment"]
     M11["#271 D0 accounts/tokens"]
     M12["#272 D1 Studio + CORS closes #9"]
     M13["#273 D2 web on Vercel"]
     M14["#274 D3 revalidation closes #93"]
     M16["#261 D5 migration automation"]
   end
-  subgraph P3["Phase 3 Blog core"]
-    P3a["#75–#94, #123<br/>blog/post/category routes,<br/>feeds, JSON-LD, UI · seed #12"]
+  subgraph P3["✅ Phase 3 Blog core"]
+    P3a["#75–#94, #123, #285, #327, #328<br/>blog/post/category/author/generic-page<br/>routes, feeds, JSON-LD, UI"]
   end
-  subgraph M2["M2 Hardening"]
-    M21["#275 D4 launch hardening"]
+  subgraph M2["🔧 M2 Hardening ◀ NOW"]
+    M21["#275 D4 launch hardening ◀ NOW"]
     M22["draft preview · Storybook CI<br/>Lighthouse · #264 migration tests"]
   end
   subgraph M3["M3 Differentiators"]
     M33["Reading depth ◀ SPEC'D + PLANNED<br/>specs + plans 2026-07-12"]
     M31["agent-native MCP · semantic search<br/>publish-time AI · voice assistant"]
   end
-  DONE --> INFLIGHT --> M0 --> M1 --> P3 --> M2 --> M3
+  DONE --> M0 --> M1 --> P3 --> M2 --> M3
   M14 -.->|webhook plumbing| M33
   P3a -.->|post route 76/90| M33
 ```
@@ -65,11 +61,11 @@ begins).
 
 ---
 
-## M0 — Housekeeping & board reconciliation
+## M0 — Housekeeping & board reconciliation — ✅ closed
 
 ### M0.1 · `chore(board): reconcile Phase-3 umbrella issues with granular issues`
 
-- **Filed:** #269
+- **Filed:** #269 — ✅ closed
 - **Labels:** `tooling`
 - **Body:** #75–#78 (page-level umbrellas) overlap #85–#94 (granular
   per-component issues) — e.g. #78 duplicates #92 + #93 almost entirely, #76
@@ -91,7 +87,7 @@ begins).
 
 ### M0.3 · `chore(turbo): fix stale typegen outputs + add .nvmrc`
 
-- **Filed:** #270 (In Progress — current work item)
+- **Filed:** #270 — ✅ closed
 - **Labels:** `tooling`, `layer:config`
 - **Body:** `turbo.json`'s `typegen` task declares
   `outputs: ["src/sanity.types.ts"]`, but typegen writes
@@ -118,11 +114,11 @@ begins).
 
 ---
 
-## M1 — Deployment milestone (label: `deploy`, all `tooling`)
+## M1 — Deployment milestone (label: `deploy`, all `tooling`) — ✅ closed
 
 ### M1.1 · `chore(deploy): D0 — accounts, tokens, domains`
 
-- **Filed:** #271
+- **Filed:** #271 — ✅ closed
 - **Depends on:** nothing (human-driven; agent prepares the checklist)
 - **Body:** Prereqs for first deploy. Confirm Vercel account + GitHub repo
   connection. In manage.sanity.io: confirm `production` dataset; mint a
@@ -133,7 +129,7 @@ begins).
 
 ### M1.2 · `chore(deploy): D1 — deploy Sanity Studio + CORS (closes #9)`
 
-- **Filed:** #272
+- **Filed:** #272 — ✅ closed
 - **Depends on:** M1.1
 - **Body:** From `apps/cms` with `SANITY_STUDIO_PROJECT_ID`/`_DATASET` set:
   `pnpm deploy` (human runs it — agents never deploy). Then add CORS origins
@@ -144,7 +140,7 @@ begins).
 
 ### M1.3 · `chore(deploy): D2 — web app on Vercel`
 
-- **Filed:** #273
+- **Filed:** #273 — ✅ closed
 - **Depends on:** M1.1
 - **Body:** New Vercel project: Root Directory `apps/web` (include files
   outside root), Node 22, env vars for Production + Preview
@@ -160,7 +156,7 @@ link` for remote caching.
 
 ### M1.4 · `feat(web): D3 — ISR revalidation webhook (closes #93)`
 
-- **Filed:** #274
+- **Filed:** #274 — ✅ closed
 - **Labels:** also `layer:web`
 - **Depends on:** M1.3
 - **Body:** `app/api/revalidate/route.ts` verifying
