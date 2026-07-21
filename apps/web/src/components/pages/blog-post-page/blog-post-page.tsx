@@ -1,6 +1,6 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { AuthorByline, Heading, PostMeta, TagList } from '@blog/ui';
+import { AuthorByline, Heading, TagList } from '@blog/ui';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 import { PostShareButtons } from '@web/components/shared/post-share-buttons';
@@ -21,10 +21,10 @@ const s = blogPostPageVariants();
 
 /**
  * BlogPostPage — `/blog/{slug}` composition: fetches the post via
- * `service.pages.post.v1.getPost`, then composes `PostMeta`, `AuthorByline`,
- * `PortableTextRenderer`, and `PostShareButtons` around the fetched view
- * model, plus a `BlogPosting` JSON-LD tag. `Header`/`Footer` stay owned by
- * `[locale]/layout.tsx`.
+ * `service.pages.post.v1.getPost`, then composes `PostShareButtons` (which
+ * renders `PostMeta` with its `share` slot wired), `AuthorByline`, and
+ * `PortableTextRenderer` around the fetched view model, plus a `BlogPosting`
+ * JSON-LD tag. `Header`/`Footer` stay owned by `[locale]/layout.tsx`.
  */
 export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
   const post = await service.pages.post.v1.getPost(slug);
@@ -72,20 +72,19 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
       )}
 
       {post.author && (
-        <PostMeta
+        <PostShareButtons
           className={s.meta()}
           author={{ name: post.author.name, avatarUrl: post.author.imageUrl }}
           publishedAt={post.publishedAt}
           formattedDate={formatDate(post.publishedAt, locale)}
+          links={shareLinks}
+          url={url}
+          triggerAriaLabel={`Share "${post.title}"`}
         />
       )}
 
       <div className={s.body()}>
         <PortableTextRenderer value={post.body} />
-      </div>
-
-      <div className={s.share()}>
-        <PostShareButtons links={shareLinks} url={url} />
       </div>
 
       {/* TODO: Check design-reference.html for existing design, if no, remove it */}

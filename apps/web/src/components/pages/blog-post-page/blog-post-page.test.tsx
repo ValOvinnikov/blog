@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -74,9 +75,11 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(screen.getByText('Engineering')).toBeVisible();
     expect(screen.getAllByText('Jane Doe').length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText('A short bio.')).toBeVisible();
-    expect(screen.getByRole('link', { name: /Share on X/ })).toBeVisible();
+
+    await userEvent.click(screen.getByRole('button', { name: /Share/ }));
+    expect(screen.getByRole('menuitem', { name: /Share on X/ })).toBeVisible();
     expect(
-      screen.getByRole('link', { name: /Share on LinkedIn/ }),
+      screen.getByRole('menuitem', { name: /Share on LinkedIn/ }),
     ).toBeVisible();
   });
 
