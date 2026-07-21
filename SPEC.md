@@ -401,12 +401,17 @@ changing a schema does **not** change existing documents.
   content-derived → site defaults** once per field, returning a fully-resolved
   `TSeoResolved`. `web` maps it to `Metadata` with one shared `toMetadata`
   helper — no `??` fallback chains in route files. Page loaders
-  (`getHomePage`, `getIndexPage`, `getPage` for the generic page — #370) fetch
-  site settings internally (Next dedupes) and return `seo: TSeoResolved`. The home title is emitted **absolute** (it is
-  the brand) so the layout `%s | Brand` template does not double-append; site
-  settings contribute only `description` + `defaultOgImage` as the final rung.
-  If no image resolves at any rung, `ogImageUrl` is absent and the route omits
-  `og:image` / the twitter image rather than emitting an empty tag.
+  (`getHomePage`, `getIndexPage`, `getPage` for the generic page — #370,
+  `getPost` for the post detail page — #371) fetch site settings internally
+  (Next dedupes) and return `seo: TSeoResolved`. The home title is emitted
+  **absolute** (it is the brand) so the layout `%s | Brand` template does not
+  double-append; site settings contribute only `description` +
+  `defaultOgImage` as the final rung. If no image resolves at any rung,
+  `ogImageUrl` is absent and the route omits `og:image` / the twitter image
+  rather than emitting an empty tag. Post detail's `toMetadata` call also
+  passes `article.publishedTime`/`article.authors` (from the post
+  view-model) — an opt-in extension to `toMetadata`'s options, only emitted
+  for `ogType: 'article'` callers.
 - Paginated lists: every page **self-canonical** (never canonical-to-page-1),
   no `rel=next/prev`, out-of-range → hard 404 (§1 routing conventions).
 - JSON-LD `Article`/`BlogPosting` on post pages (#94).
