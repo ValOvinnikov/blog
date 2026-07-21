@@ -3925,7 +3925,7 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               <tr>
                 <td><code>app/page.tsx</code></td>
                 <td>
-                  <code>SiteHeader → HomeHero → LatestPosts → SiteFooter</code>
+                  <code>Header → HomeHero → LatestPosts → SiteFooter</code>
                 </td>
                 <td>
                   Pass <code>heroImage</code> only when available.
@@ -3934,7 +3934,7 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               </tr>
               <tr>
                 <td><code>app/writing/[slug]/page.tsx</code></td>
-                <td><code>SiteHeader → ArticleHeader → ArticleBody</code></td>
+                <td><code>Header → ArticleHeader → ArticleBody</code></td>
                 <td>
                   Pass <code>coverImage</code> only when available.
                   <code>ArticleHeader</code> removes the figure when missing.
