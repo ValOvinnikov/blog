@@ -75,6 +75,25 @@ each for its own stated reason:
 This list is exhaustive — every other dispatch (layer agents, `reviewer`,
 `a11y-reviewer`, `seo-auditor`, `ci-watcher`, ...) runs in the background.
 
+**Known failure mode — read this before typing `run_in_background: false`
+on a `reviewer`/`ci-watcher`/`board-keeper` call that isn't one of the three
+exceptions above.** The rationalization is always the same shape: "I can't
+commit/report/move on until I know whether this passed, so I'll just wait
+for it synchronously." That reasoning is explicitly rejected two paragraphs
+up ("The next step depends on this result" does **not** justify
+`run_in_background: false`) — but it's easy to type the override anyway
+because it _feels_ like a real blocker in the moment, not a rationalization.
+It isn't: background dispatch means the harness resumes you on completion
+and you do the dependent step then — the ordering is identical either way.
+The only thing foreground costs you is the ability to answer the user while
+it runs, which is exactly the failure this note exists to prevent (a
+synchronous `reviewer` dispatch left no way to respond to a live user
+message until it returned, blocking a real conversation for no ordering
+benefit). Before setting `run_in_background: false` on anything, name which
+of the three exceptions above applies. If none does, the answer is `true`,
+full stop — do not reopen the "but I need the result" argument, it was
+already settled.
+
 ## Use the skills
 
 - `develop-feature` at the start of any non-trivial task (lifecycle + delegation).
