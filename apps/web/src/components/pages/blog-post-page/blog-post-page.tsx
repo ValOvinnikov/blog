@@ -60,7 +60,7 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
         </div>
       )}
 
-      <Heading level={1} className={s.heading()}>
+      <Heading level={1} visual="post" className={s.heading()}>
         {post.title}
       </Heading>
 
@@ -88,6 +88,7 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
         <PostShareButtons links={shareLinks} url={url} />
       </div>
 
+      {/* TODO: Check design-reference.html for existing design, if no, remove it */}
       {post.author && (
         <AuthorByline
           className={s.byline()}
