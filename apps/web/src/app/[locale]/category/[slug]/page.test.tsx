@@ -14,7 +14,7 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/components/category-page/category-page', () => ({
+vi.mock('@web/components/pages/category-page', () => ({
   CategoryPage: () => null,
 }));
 

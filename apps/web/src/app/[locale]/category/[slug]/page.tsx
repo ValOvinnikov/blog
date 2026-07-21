@@ -1,6 +1,6 @@
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { CategoryPage } from '@web/components/category-page/category-page';
+import { CategoryPage } from '@web/components/pages/category-page';
 import { buildCategoryMetadata } from '@web/metadata/category-metadata';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
