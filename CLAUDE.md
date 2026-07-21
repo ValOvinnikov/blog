@@ -75,13 +75,27 @@ each for its own stated reason:
 This list is exhaustive — every other dispatch (layer agents, `reviewer`,
 `a11y-reviewer`, `seo-auditor`, `ci-watcher`, ...) runs in the background.
 
+**How completion is detected — no polling, no synchronous wait.** The
+orchestrator never needs to block on a background dispatch to learn its
+result, and must never invent one (sleeping, re-dispatching the same check
+in a loop, or repeatedly reading the agent's output file) to simulate a
+foreground wait. The harness delivers a `task-notification` automatically
+the moment a background agent finishes — that notification, not a manual
+check, is the signal to read the result and run the dependent step. Until it
+arrives, the orchestrator stays fully responsive: keep answering the user,
+keep dispatching other independent work, keep doing anything else that
+doesn't depend on the pending result. A background dispatch is "fire, stay
+unblocked, act on notification" — never "fire, then find some other way to
+wait."
+
 **Known failure mode — read this before typing `run_in_background: false`
 on a `reviewer`/`ci-watcher`/`board-keeper` call that isn't one of the three
 exceptions above.** The rationalization is always the same shape: "I can't
 commit/report/move on until I know whether this passed, so I'll just wait
-for it synchronously." That reasoning is explicitly rejected two paragraphs
-up ("The next step depends on this result" does **not** justify
-`run_in_background: false`) — but it's easy to type the override anyway
+for it synchronously." That reasoning is explicitly rejected in the
+"Dispatch subagents in the background by default" paragraph above ("The next
+step depends on this result" does **not** justify `run_in_background:
+false`) — but it's easy to type the override anyway
 because it _feels_ like a real blocker in the moment, not a rationalization.
 It isn't: background dispatch means the harness resumes you on completion
 and you do the dependent step then — the ordering is identical either way.
