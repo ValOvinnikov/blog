@@ -1,10 +1,8 @@
 import type { IWithDataTestId } from '@blog/config';
+import { IconButton } from '@blog/ui/atoms/icon-button';
 import { Moon, Sun } from 'lucide-react';
 
-import {
-  themeTogglePlaceholderVariants,
-  themeToggleVariants,
-} from './theme-toggle-variants';
+import { themeTogglePlaceholderVariants } from './theme-toggle-variants';
 
 export interface IThemeToggleProps extends IWithDataTestId {
   className?: string;
@@ -34,13 +32,12 @@ export const ThemeToggle = ({
   const label = isDark ? lightLabel : darkLabel;
 
   return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-label={label}
+    <IconButton
+      ariaLabel={label}
       title={label}
-      data-testid={dataTestId}
-      className={themeToggleVariants({ class: className })}
+      onClick={onToggle}
+      dataTestId={dataTestId}
+      className={className}
     >
       {mounted ? (
         isDark ? (
@@ -51,6 +48,6 @@ export const ThemeToggle = ({
       ) : (
         <span className={themeTogglePlaceholderVariants()} aria-hidden="true" />
       )}
-    </button>
+    </IconButton>
   );
 };
