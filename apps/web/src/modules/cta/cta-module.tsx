@@ -1,5 +1,5 @@
 import { service } from '@blog/service';
-import { CtaModule as CtaModuleUi } from '@blog/ui';
+import { CtaModule as CtaModuleUi } from '@blog/ui/organisms';
 import { SmartLink } from '@web/components/shared/smart-link';
 
 export interface ICtaModuleProps {
