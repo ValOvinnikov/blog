@@ -23,6 +23,18 @@
       // which knip cannot follow. src/index.ts needs no entry of its own — it is
       // already detected from package.json `exports`.
       "entry": ["src/testing/server-only-stub.ts"]
+    },
+    "packages/ui": {
+      // The component-test render wrapper (customRender + RTL re-exports) is a
+      // testing entry point, consumed by *.test.tsx across the package (adoption
+      // lands in #666), not from source. Mark it an entry so its exports aren't
+      // reported unused; package.json `exports` still covers src/index.ts.
+      "entry": ["src/testing/custom-render.tsx"]
+    },
+    "apps/web": {
+      // Same as packages/ui — the test render wrapper is a testing entry point.
+      // The Next.js plugin still contributes the app-router entries.
+      "entry": ["src/testing/custom-render.tsx"]
     }
   }
 }
