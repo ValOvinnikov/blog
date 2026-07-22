@@ -48,6 +48,10 @@ export const Portrait: TStory = {
   args: { ratio: 'portrait', className: 'w-48' },
 };
 
+export const Classic: TStory = {
+  args: { ratio: 'classic', className: 'w-96' },
+};
+
 export const CustomRatio: TStory = {
   args: { ratio: undefined, className: 'aspect-[16/9] w-96' },
 };
