@@ -138,8 +138,8 @@ When invoked, before writing any code:
   forwarded via the `tv()` `class:` key, classes in a `{component}-variants.ts`.
 - **Polymorphic components** (a wrapper that renders as different elements via
   an `as` prop) use the shared `TPolymorphicProps<C, OwnProps>` generic from
-  `@blog/config/react` — see `ui-library-practices` ("The `as` prop — two
-  levels") for the full writeup. The reference consumer is
+  `@blog/config/react` — see `ui-library-practices` ("Polymorphism — the `as`
+  prop", full derivation in `polymorphic-and-as.md`) for the writeup. The reference consumer is
   `apps/web/src/components/container/container.tsx`:
   `type TContainerProps<C extends ElementType = 'div'> = TPolymorphicProps<C, TContainerOwnProps>`,
   one `as ElementType` cast at the render site. Import the type from `@blog/config/react`
@@ -149,12 +149,20 @@ When invoked, before writing any code:
   Prefer a plain union `as` (Level 1) when you don't need element-specific
   prop inference.
 - **Consuming `@blog/ui` compound components** (`Header`, `Footer`, `Hero`,
-  `PostCard`) — see `ui-library-practices` ("Compound components") for the
-  full pattern. From here it's just composition: render named slots as children,
+  `PostCard`) — see `ui-library-practices` ("Compound components" →
+  `compound-components.md`) for the full pattern. From here it's just composition: render named slots as children,
   pass framework-coupled pieces directly into them (`SmartLink`, the
   locale-aware `Link` from `@web/i18n/navigation`, `SanityImage`). Never
   deep-import sub-components — always use dot-notation on the assembled
   export (`Header.Brand`, `PostCard.Title`).
+- **Interactive components** (popover, dropdown, menu, disclosure, tabs,
+  clipboard, focus trap, outside-click / Escape) — follow the
+  `web-component-practices` skill
+  (`.claude/skills/web-component-practices/SKILL.md`, read with Read): compose
+  a pure `@blog/ui` component via a `ReactNode` slot — **never wrap it and
+  re-forward its props** — and put all browser-API behaviour (event listeners,
+  focus management, clipboard) in ref-based hooks, never inline
+  `document.getElementById`/`addEventListener` in the component body.
 
 ## Routes (App Router)
 
