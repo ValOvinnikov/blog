@@ -114,22 +114,14 @@ compositions are storied in `apps/web` (`web-storybook`).
   and serialisable.
 
 ```tsx
-// ✅ correct — shared props in meta, stories only override what changes
+// ✅ shared/required props in meta; each story overrides only the diff
 const meta = {
   component: Avatar,
-  args: { name: 'Jane Doe', alt: 'Jane Doe', size: Size.MD }, // required props here
+  args: { name: 'Jane Doe', alt: 'Jane Doe', size: Size.MD },
 } satisfies Meta<typeof Avatar>;
-
-export const WithImage: TStory = { args: { src: '...' } }; // just the diff
+export const WithImage: TStory = { args: { src: '...' } };
 export const Small: TStory = { args: { size: Size.SM } };
-
-// ❌ wrong — required props repeated in every story
-export const WithImage: TStory = {
-  args: { name: 'Jane Doe', alt: 'Jane Doe', src: '...' },
-};
-export const Small: TStory = {
-  args: { name: 'Jane Doe', alt: 'Jane Doe', size: Size.SM },
-};
+// ❌ repeating name/alt in every story's args
 ```
 
 ## `render` — prefer args; use render only when args can't express it
@@ -165,15 +157,7 @@ const meta = {
 export const WithCaption: TStory = {};
 export const WithoutCaption: TStory = { args: { caption: undefined } };
 
-// ❌ wrong — render used just to provide children that could be args
-export const WithCaption: TStory = {
-  args: { caption: 'A scenic mountain view' },
-  render: (args) => (
-    <ImageWithCaption {...args}>
-      <FillImage />
-    </ImageWithCaption>
-  ),
-};
+// ❌ wrong — a `render` used only to pass children that could have been an arg
 ```
 
 The same rule applies to compound-slot children (`PostCard.Media`, `Hero.Cta`,
@@ -185,10 +169,20 @@ override per story when the composition changes.
 
 Use `render` when args genuinely can't express the story's structure:
 
-- The story needs a stateful wrapper (e.g. controlled input demo)
+- The story needs a stateful wrapper (a controlled input, or a controlled/
+  headless component whose visible state is prop-driven — see below)
 - The component must sit inside a specific DOM context (`<form>`, `<table>`)
 - Multiple component instances are composed side by side
 - A per-story context provider that doesn't belong in a global decorator
+
+**A controlled/headless component needs a visible, interactive story — not a
+static `open`.** When a component's visible state is entirely prop-driven
+(`open`, `isCopied`) and its surface is absolutely positioned (a popover panel,
+a dropdown, a menu), an `args: { open: true }` story renders it clipped, empty,
+or overlapping — effectively invisible in the canvas. Give it a `render` story
+with a stateful wrapper that toggles the state through the real trigger, plus a
+decorator that gives the positioned surface room (padding / `min-height`). A
+story where the open state can't be seen and exercised is a broken story.
 
 ## Testing strategy
 

@@ -114,6 +114,9 @@ already settled.
 - `add-content-type` when a change spans more than one workspace.
 - `cms-schema-practices` when touching `apps/cms` schemas or migrations.
 - `ui-library-practices` when touching `packages/ui`.
+- `web-component-practices` when building or editing an interactive component in
+  `apps/web` (popover/menu/disclosure/clipboard/focus) or composing `@blog/ui`
+  with client state.
 - `ui-storybook` when adding or editing stories in `packages/ui`.
 - `web-storybook` when adding or editing stories in `apps/web`.
 - `testing-practices` when adding/updating tests.
