@@ -362,6 +362,7 @@ contracts:
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
   - `cms-schema-practices` — Sanity schema quality bar + content-migration workflow.
   - `ui-library-practices` — building pure, prop-driven design-system components.
+  - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks).
   - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.
   - `testing-practices` — Vitest + Testing Library conventions.
   - `seo-and-metadata` — per-route metadata, JSON-LD, sitemap/robots/RSS.

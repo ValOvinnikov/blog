@@ -31,24 +31,16 @@ duplicate or rewrite adequate existing tests.
   domain tree. Each exports a `make*` factory returning a raw (`TRaw*`) shape
   with a `Partial<…>` overrides param. Import via the workspace alias:
   `import { makeRawPostCard } from '@blog/service/testing/pages/fixtures'`.
-- **`web` (and `ui`) follow the same `testing/` pattern** for fixtures shared
-  by more than one file — typically a component's `.test.tsx` **and** its
-  `.stories.tsx`. Mirror the component tree under `src/testing/`, including
-  the `pages/`/`shared/` split (see the `web` agent's "File organisation"):
-  `src/components/shared/portable-text-renderer/` →
-  `src/testing/shared/portable-text-renderer/fixtures.ts`;
-  `src/components/pages/blog-post-page/` →
-  `src/testing/pages/blog-post-page/fixtures.ts`. Export small builder
-  functions (not one giant literal) plus any ready-made sample data the
-  stories need, and import via the workspace alias —
-  `import { richTextBlock } from '@web/testing/shared/portable-text-renderer/fixtures'`
-  — never a relative `./` path once the fixture is shared. A fixture used by
-  only one test file with no story to share it stays inline in that test file;
-  promote it to `src/testing/` the moment a second file (usually the sibling
-  story) needs the same data. This is distinct from `src/storybook/fixtures/`
-  (`web-storybook`) — that directory is Storybook-only view-model mocks
-  (`TPostDetail`, `THomePage`, …) never imported from a test; `src/testing/`
-  fixtures are shared by both.
+- **`web` and `ui` follow the same `src/testing/` pattern** for fixtures shared
+  by more than one file (a component's `.test.tsx` **and** its `.stories.tsx`).
+  Mirror the component tree, keeping the `pages/`/`shared/` split
+  (`src/components/pages/blog-post-page/` →
+  `src/testing/pages/blog-post-page/fixtures.ts`); export small builder
+  functions, import via the workspace alias (`@web/testing/…`), never a
+  relative path once shared. A fixture used by one test file with no story
+  stays inline; promote it the moment a second file (usually the sibling story)
+  needs it. Distinct from `src/storybook/fixtures/` (`web-storybook`) —
+  Storybook-only view-model mocks (`TPostDetail`, …) never imported by a test.
 - Run from root: `pnpm test` (all), or `pnpm --filter @blog/ui test`.
   Watch mode: `pnpm test:watch`.
 
@@ -114,9 +106,8 @@ export default mergeConfig(
   symbol and the suite name follows, and deleting it is a compile error instead
   of a stale string. Use a string only when no single symbol names the suite.
   **Components are the exception** — they use the JSX-style template literal
-  ``describe(`<${Component.name}/>`, …)`` (see `ui-library-practices`).
-  Existing string titles migrate opportunistically when a test is touched; no
-  mass rename.
+  ``describe(`<${Component.name}/>`, …)``. Existing string titles migrate
+  opportunistically when a test is touched; no mass rename.
 
   ```ts
   import { objectKeys } from './objects';
@@ -154,13 +145,19 @@ export default mergeConfig(
   expect(container.querySelector('[aria-hidden="true"]:empty')).toBeTruthy();
   ```
 
-  This hardcoded `data-testid` is a **different concept** from the
-  `IWithDataTestId`/`dataTestId` prop above — that one is consumer-supplied,
-  for the component's own root element; this one is a fixed literal on an
-  internal sub-element with no other query path. Both are legitimate; don't
-  conflate them. Existing raw-DOM-query usage migrates opportunistically when
-  a test is touched; no mass rewrite.
+  (This fixed `data-testid` differs from the consumer-supplied
+  `IWithDataTestId`/`dataTestId` prop — that one is for the component's own
+  root; this is a literal on a roleless internal element. Existing raw-DOM
+  queries migrate opportunistically when a test is touched; no mass rewrite.)
 
+- **`.toBeVisible()` for positive render assertions**, not
+  `.toBeInTheDocument()` — the latter is valid only with `.not`, to assert
+  absence.
+- **No dedicated `dataTestId` test** — a test that queries by a missing test id
+  already fails; an explicit assertion adds nothing.
+- Put the default render in `beforeEach` when tests share setup; per-prop cases
+  go in their own `describe` with their own render (Testing Library auto-cleans
+  between tests).
 - Use `vi.fn()` / `vi.mock()` for boundaries (the Sanity client, `service`).
 - Deterministic: no real dates/network/random. Inject or freeze.
 - A bug fix gets a regression test that fails before the fix.
@@ -171,6 +168,11 @@ export default mergeConfig(
 - **No snapshot tests** — they couple tests to markup and break on unrelated changes.
 - **No implementation details** — test what a component does, not how it does it.
 - **No network calls** — always mock the Sanity client and `service` functions.
+- **Never mock a sibling `@blog/ui` component** to make a `web` test pass. If a
+  test has to `vi.mock('@blog/ui')` and reimplement a fake `PostMeta`/panel,
+  that's a composition smell — the web component is wrapping the pure one
+  instead of being passed into its slot. Fix the structure
+  (`web-component-practices`) and test the real composed tree.
 
 ## Coverage strategy
 

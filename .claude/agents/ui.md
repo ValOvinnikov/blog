@@ -65,8 +65,8 @@ archived brief.
   components: `export const Container = <C extends ElementType = 'div'>(props: TContainerProps<C>) => { ... }`.
   The `extends` constraint on the type parameter disambiguates the generic
   arrow from a JSX tag in `.tsx` — no trailing comma workaround needed. See
-  `ui-library-practices` skill, "The `as` prop — two levels", for the full
-  polymorphic pattern.
+  `ui-library-practices` skill, "Polymorphism — the `as` prop" (deep dive in
+  `polymorphic-and-as.md`), for the full polymorphic pattern.
 - Use `tv()` from `tailwind-variants` for all variant/size matrices — not
   `class-variance-authority` or `clsx`.
 - **`base` is always an array**, never a single string. Group by concern —
