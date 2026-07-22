@@ -36,6 +36,18 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     });
   });
 
+  it('renders a blockquote-style block as a blockquote', () => {
+    const value: RichText = [
+      richTextBlock('blockquote', [richTextSpan('A quote')]),
+    ];
+
+    render(<PortableTextRenderer value={value} />);
+
+    expect(
+      screen.getByText('A quote', { selector: 'blockquote' }),
+    ).toBeVisible();
+  });
+
   it('renders the strong mark as bold text', () => {
     const value: RichText = [
       richTextBlock('normal', [richTextSpan('bold text', ['strong'])]),
