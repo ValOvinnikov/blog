@@ -2774,6 +2774,20 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               <p>
                 <code><CodeBlock filename code /></code>
               </p>
+              <p>
+                <em
+                  >Implementation note: despite the "Molecule" label above,
+                  <code>CodeBlock</code> deliberately lives in
+                  <code>apps/web</code> at
+                  <code
+                    >apps/web/src/components/shared/portable-text-renderer/code-block.tsx</code
+                  >, not as a <code>@blog/ui</code> molecule. It wraps
+                  <code>react-syntax-highlighter</code>, a third-party rendering
+                  dependency that <code>@blog/ui</code> must stay free of per
+                  this repo's layer contracts. The styling and behaviour shown
+                  here still apply; only the package location differs.</em
+                >
+              </p>
             </div>
             <div class="component-preview-grid">
               <div class="preview-panel t-light compact">
