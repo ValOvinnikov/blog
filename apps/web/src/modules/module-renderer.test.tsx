@@ -5,7 +5,6 @@ import { ModuleRenderer } from './module-renderer';
 
 vi.mock('./module-map', () => ({
   MODULE_MAP: {
-    module_hero: undefined,
     module_postList: undefined,
     module_content: undefined,
     module_cta: ({ id }: { id: string; locale: string }) => (
