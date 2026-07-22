@@ -20,9 +20,8 @@ export interface IShareLinkProps extends IShareLinkItem, IWithDataTestId {
  * ShareLink molecule — a single external share action (e.g. "Share on X"),
  * rendered through `LinkButton` with `target="_blank"` and
  * `rel="noopener noreferrer"` baked in, since every share link opens the
- * target platform in a new tab. `ShareButtons` maps its `links` prop through
- * this component instead of duplicating the same `LinkButton` wiring per
- * platform. It never builds the `href` itself — `apps/web` constructs the
+ * target platform in a new tab. Used by the author page for a person's social
+ * links. It never builds the `href` itself — `apps/web` constructs the
  * platform-specific share URL and passes it in as plain data.
  */
 export const ShareLink = ({

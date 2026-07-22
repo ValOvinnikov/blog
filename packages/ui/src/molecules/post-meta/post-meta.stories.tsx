@@ -18,7 +18,7 @@ const meta = {
   args: {
     author: {
       name: faker.person.fullName(),
-      avatarUrl: faker.image.avatarGitHub(),
+      imageUrl: faker.image.avatarGitHub(),
     },
     publishedAt,
     formattedDate,
@@ -36,4 +36,10 @@ export const WithoutReadingTime: TStory = {};
 
 export const WithoutAvatar: TStory = {
   args: { author: { name: faker.person.fullName() } },
+};
+
+export const WithShareSlot: TStory = {
+  args: {
+    share: <button type="button">Share</button>,
+  },
 };

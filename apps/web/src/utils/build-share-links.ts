@@ -1,19 +1,20 @@
 import type { IShareLinkItem } from '@blog/ui';
 
 /**
- * Builds the `IShareLinkItem[]` for a post's share actions — `@blog/ui`'s
- * `ShareButtons` only renders whatever `links` it's given, so this is where
- * the platform-specific share URLs (X, LinkedIn) get constructed.
+ * Builds the `IShareLinkItem[]` for a post's share actions — `PostShare`
+ * (`apps/web/src/components/shared/post-share`) maps each entry to a
+ * `PopoverMenu.Item as={SmartLink}`, so this is where the platform-specific
+ * share URLs (X, LinkedIn) get constructed.
  *
  * Icons are left undefined here rather than attached in this function: they
  * are `ReactNode`s, and this stays a plain, framework-free `.ts` util so it
- * can be unit-tested without a DOM/React renderer — the future consumer that
- * composes `<ShareButtons />` (post detail page, #76) attaches an icon per
- * item alongside its own JSX.
+ * can be unit-tested without a DOM/React renderer — the web layer
+ * (`blog-post-page`) attaches an icon per item alongside its own JSX before
+ * passing `links` into `PostShare`.
  *
  * @example
  * const links = buildShareLinks({ url: 'https://example.com/post', title: 'My post' });
- * return <ShareButtons links={links} />;
+ * return <PostShare url={url} title={title} links={links} />;
  */
 export function buildShareLinks({
   url,
