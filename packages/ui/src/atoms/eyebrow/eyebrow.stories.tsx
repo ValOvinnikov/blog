@@ -18,3 +18,7 @@ export const Default: TStory = {
 export const CategoryLabel: TStory = {
   args: { children: 'Engineering' },
 };
+
+export const AsCategoryLink: TStory = {
+  args: { children: 'Engineering', href: '/category/engineering' },
+};

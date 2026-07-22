@@ -1,3 +1,4 @@
+export * from './article';
 export * from './content-module';
 export * from './content-section';
 export * from './cta-module';
