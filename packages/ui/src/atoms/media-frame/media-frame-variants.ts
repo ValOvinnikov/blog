@@ -10,6 +10,7 @@ export const mediaFrameVariants = tv({
       video: ['aspect-video'],
       square: ['aspect-square'],
       portrait: ['aspect-[3/4]'],
+      classic: ['aspect-[4/3]'],
     },
   },
 });
