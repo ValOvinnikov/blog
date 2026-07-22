@@ -1,8 +1,7 @@
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { TRawSeo } from './resolve-seo';
-import { resolveSeo } from './resolve-seo';
+import { type TRawSeo, resolveSeo } from './resolve-seo';
 
 vi.mock('@blog/service/sanity/image', () => ({
   urlForImage: vi.fn(

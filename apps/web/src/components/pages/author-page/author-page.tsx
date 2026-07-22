@@ -1,5 +1,4 @@
-import type { ILocalizedParams } from '@blog/config';
-import { routes } from '@blog/config';
+import { type ILocalizedParams, routes } from '@blog/config';
 import { service } from '@blog/service';
 import {
   ActionList,

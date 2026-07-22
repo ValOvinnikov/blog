@@ -76,11 +76,11 @@ and its actual merge commit message, not just the former.
   a CI failure found at Gate 5a: ask fresh, every time.
 - **Never create a PR without explicit user approval.**
   Ask separately, after the push is confirmed.
-- **Never commit without explicit user approval.**
-  After finishing work, ask the user: commit now or wait for review?
-- **Never ask to commit (Gate 2) before the `reviewer` subagent has returned
+- **Committing needs no approval — commit the reviewed work freely.**
+  Committing is local and reversible; the human gates are push and PR.
+- **Never push (Gate 3) before the `reviewer` subagent has returned
   `APPROVE` on the final diff.** New changes after an APPROVE invalidate it —
-  re-review before asking again.
+  re-review before pushing again.
 - **Never merge.** Merging is the human's call only.
 - **Never deploy.** `sanity deploy` and Vercel deploys are human-run only.
 - **Never set `--assignee` or `--reviewer` on the PR.** The repo owner cannot
@@ -90,7 +90,7 @@ and its actual merge commit message, not just the former.
 
 ## The strict gate sequence
 
-Work through these gates in order. **Stop at each gate and wait for the user.**
+Work through these gates in order. **Committing is free; stop at the push and PR gates and wait for the user.**
 
 ### Gate 0 — Pull the issue and set In Progress
 
@@ -156,13 +156,11 @@ Work through these gates in order. **Stop at each gate and wait for the user.**
 - Report results, including the review verdict. Do not proceed past Gate 1 if
   any check is red.
 
-### Gate 2 — Ask to commit
+### Gate 2 — Commit the reviewed work
 
-Present the user with two explicit options:
-
-> "Work is complete and all gates pass. Would you like me to **commit now**, or do you want to **review the changes first** before I commit?"
-
-Wait for the user's answer. Do not commit until they say to.
+Once the `reviewer` has returned `APPROVE` on the final diff, commit — **no
+approval needed**. Committing is local and reversible; the gates that need the
+human are push and PR (below). Then proceed to Gate 3.
 
 ### Gate 3 — Ask to push
 
@@ -272,7 +270,7 @@ exceptions.
    - Re-run the specific local verify step from `develop-feature` §5 that
      matches the failing check (e.g. `pnpm --filter web build` for a build
      check, `pnpm test` for a test job) rather than the whole suite blindly.
-   - Commit the fix — Gate 2 still applies, ask before committing.
+   - Commit the fix — no approval needed (committing is free).
    - **Ask to push again — a fresh, explicit approval, exactly like Gate 3.**
      A push made to fix CI is still a push. The approval for the original
      push does not cover it; ask every time, same branch or not.

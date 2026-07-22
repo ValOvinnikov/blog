@@ -4,8 +4,11 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
-import type { ComponentPropsWithoutRef, ElementType } from 'react';
-import { Fragment } from 'react';
+import {
+  type ComponentPropsWithoutRef,
+  type ElementType,
+  Fragment,
+} from 'react';
 
 import { HeaderActions } from './components/actions/header-actions';
 import { HeaderBrand } from './components/brand/header-brand';

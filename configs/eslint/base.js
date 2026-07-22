@@ -39,7 +39,7 @@ export default [
         { selector: 'interface', format: ['PascalCase'], prefix: ['I'] },
       ],
       'import-x/first': 'error',
-      'import-x/no-duplicates': 'error',
+      'import-x/no-duplicates': ['error', { 'prefer-inline': true }],
       'import-x/order': [
         'error',
         {

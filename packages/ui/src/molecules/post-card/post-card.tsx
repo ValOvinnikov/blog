@@ -6,8 +6,11 @@ import {
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
 import { CardMeta } from '@blog/ui/molecules/card-meta';
-import type { ComponentPropsWithoutRef, ElementType } from 'react';
-import { Fragment } from 'react';
+import {
+  type ComponentPropsWithoutRef,
+  type ElementType,
+  Fragment,
+} from 'react';
 
 import { PostCardFooter } from './components/footer/post-card-footer';
 import { PostCardMedia } from './components/media/post-card-media';
