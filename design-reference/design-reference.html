@@ -3517,16 +3517,42 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               </div>
             </div>
           </article>
-          <article class="component-row" id="homehero">
+          <article class="component-row" id="hero">
             <div class="component-info">
               <span class="tk">Organism</span>
-              <h3>HomeHero</h3>
+              <h3>Hero</h3>
               <p>
-                Hero copy with optional media. With image it becomes two
-                columns; without image it collapses to one column.
+                Generalized component contract — not a home-only persona
+                statement. Renders an optional <code>eyebrow</code>, an optional
+                <code>publishedAt</code>/<code>formattedDate</code> byline, the
+                required <code>title</code>, an optional <code>excerpt</code>,
+                and optional <code>tags</code>, so it covers post-shaped fields
+                alongside the home page's copy. Media and calls-to-action are
+                compound slots (<code>Hero.Media</code>, <code>Hero.Cta</code>)
+                rather than a single <code>image</code> prop — with a
+                <code>Hero.Media</code> slot present it becomes two columns;
+                without one it collapses to one column.
               </p>
               <p>
-                <code><HomeHero image? /></code>
+                <strong>Current usage is home-only</strong>, despite the
+                generalized contract: the home route composes
+                <code>HeroModule</code> directly as a dedicated
+                <code>hero</code> prop on <code>HomePageTemplate</code>, not
+                through the generic page-builder <code>modules[]</code> →
+                <code>ModuleRenderer</code> pipeline — the CMS schema doesn't
+                allow a <code>module_hero</code> entry in any page's
+                <code>modules[]</code> array (generic pages allow only
+                content/cta; the home page allows only postList/cta), and
+                <code>MODULE_MAP</code> excludes <code>module_hero</code> for
+                that reason. Post-detail and other page-builder pages don't
+                render <code>Hero</code> today.
+              </p>
+              <p>
+                <code
+                  >&lt;Hero title titleId eyebrow? excerpt? tags? publishedAt?
+                  formattedDate?&gt; &lt;Hero.Media /&gt;&lt;Hero.Cta /&gt;
+                  &lt;/Hero&gt;</code
+                >
               </p>
             </div>
             <div class="component-preview-grid">
