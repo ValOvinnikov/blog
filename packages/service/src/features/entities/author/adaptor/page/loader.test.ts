@@ -1,4 +1,4 @@
-import { toAuthorDetail } from '@blog/service/features/entities/author/adaptor/detail/transformer';
+import { toAuthorDetail } from '@blog/service/features/entities/author/adaptor/detail-page/transformer';
 import { toAuthorPosts } from '@blog/service/features/entities/author/adaptor/posts/transformer';
 import { makeRawAuthor } from '@blog/service/testing/entities/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
@@ -6,15 +6,18 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { getAuthorPage } from './loader';
 
-vi.mock('@blog/service/features/entities/author/adaptor/detail/loader', () => ({
-  getAuthor: vi.fn(),
-}));
+vi.mock(
+  '@blog/service/features/entities/author/adaptor/detail-page/loader',
+  () => ({
+    getAuthor: vi.fn(),
+  }),
+);
 vi.mock('@blog/service/features/entities/author/adaptor/posts/loader', () => ({
   getAuthorPosts: vi.fn(),
 }));
 
 const { getAuthor } =
-  await import('@blog/service/features/entities/author/adaptor/detail/loader');
+  await import('@blog/service/features/entities/author/adaptor/detail-page/loader');
 const { getAuthorPosts } =
   await import('@blog/service/features/entities/author/adaptor/posts/loader');
 

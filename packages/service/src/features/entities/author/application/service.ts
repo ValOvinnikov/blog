@@ -1,6 +1,6 @@
-import { getAuthor } from '@blog/service/features/entities/author/adaptor/detail/loader';
+import { getAuthor } from '@blog/service/features/entities/author/adaptor/detail-page/loader';
+import { getAuthorParams } from '@blog/service/features/entities/author/adaptor/detail-page-params/loader';
 import { getAuthorPage } from '@blog/service/features/entities/author/adaptor/page/loader';
-import { getAuthorParams } from '@blog/service/features/entities/author/adaptor/params/loader';
 import { getAuthorPosts } from '@blog/service/features/entities/author/adaptor/posts/loader';
 
 export function createAuthorService() {
