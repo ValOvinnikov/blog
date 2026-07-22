@@ -11,6 +11,7 @@ export * from './media-frame';
 export * from './meta-separator';
 export * from './nav-link';
 export * from './prose';
+export * from './prose-link';
 export * from './tag';
 export * from './terminal-typing';
 export * from './text';
