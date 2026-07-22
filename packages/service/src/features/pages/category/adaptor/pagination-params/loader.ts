@@ -1,5 +1,5 @@
-import { buildCategoryPostsPageQuery } from '@blog/service/features/pages/category/adaptor/detail/posts.query';
-import { categoryParamsQuery } from '@blog/service/features/pages/category/adaptor/params/query';
+import { buildCategoryPostsPageQuery } from '@blog/service/features/pages/category/adaptor/detail-page/posts.query';
+import { categoryParamsQuery } from '@blog/service/features/pages/category/adaptor/detail-page-params/query';
 import { isr, runQuery } from '@blog/service/sanity/query';
 
 import { toCategoryPaginationParams } from './transformer';
