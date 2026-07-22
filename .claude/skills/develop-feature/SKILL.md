@@ -16,8 +16,9 @@ part_. Run it at the start of any non-trivial task.
 
 ## IMPORTANT: every issue follows the strict gate sequence in `open-pull-request`
 
-Commit → push → PR are three separate gates, each requiring explicit user
-approval. Never bundle them. See `open-pull-request` skill for the full sequence.
+Committing is free (no approval needed); push and PR are two separate gates,
+each requiring explicit user approval. Never bundle them. See
+`open-pull-request` skill for the full sequence.
 
 ## 0. Decide the shape
 
@@ -243,7 +244,7 @@ red check.
   from step 5, then re-dispatch whichever subagent found the issue until every
   dispatched reviewer returns its pass verdict (`APPROVE` / `PASS`).
 - Only after every dispatched reviewer's pass verdict (`APPROVE` / `PASS`) may
-  you proceed to step 7 and ask to commit — a pass from `a11y-reviewer` or
+  you proceed to step 7 and commit the reviewed work + ask to push — a pass from `a11y-reviewer` or
   `seo-auditor` does not excuse a `NEEDS FIXES`/blocking result from any other
   dispatched reviewer, or vice versa. A review that
   never ran is a blocking finding in itself — "the diff is small" or "checks
@@ -252,7 +253,7 @@ red check.
 ## 7. Hand off to the gate sequence
 
 - Follow Gates 2–5a in `open-pull-request` exactly:
-  - Gate 2: ask to commit (or wait for review)
+  - Gate 2: commit the reviewed work (no approval needed)
   - Gate 3: ask to push (separate, explicit approval)
   - Gate 4: ask to create the PR (separate, explicit approval)
   - Gate 5: set status → Code Review immediately after PR is created
