@@ -1348,13 +1348,15 @@
           A complete implementation reference for the blog UI. It includes
           foundations, full Home/Post page mocks in light and dark modes,
           optional image states, and a full atomic component catalogue with HTML
-          previews. Templates own page placement; components own only their
-          internal styling.
+          previews. Page compositions (built in <code>apps/web</code>, not
+          <code>@blog/ui</code>) own page placement; <code>@blog/ui</code>
+          components own only their internal styling.
         </p>
         <nav class="toc" aria-label="Reference sections">
           <a href="#foundations">Foundations</a><a href="#pages">Pages</a
           ><a href="#atoms">Atoms</a><a href="#molecules">Molecules</a
-          ><a href="#organisms">Organisms</a><a href="#templates">Templates</a
+          ><a href="#organisms">Organisms</a
+          ><a href="#templates">Page compositions</a
           ><a href="#next-map">Next.js map</a>
         </nav>
       </header>
@@ -4144,19 +4146,25 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
       </section>
 
       <section class="sec" id="templates">
-        <div class="sec-title">Atomic components · templates</div>
+        <div class="sec-title">Page compositions · apps/web</div>
         <p class="cap">
-          Route-level placement only. Templates decide section order, reading
-          width, and optional media presence.
+          These are <code>apps/web</code> page compositions, not
+          <code>@blog/ui</code> components — <code>@blog/ui</code> stops at
+          organisms and never gains a template layer. Route-level placement
+          only: these compositions decide section order, reading width, and
+          optional media presence by arranging <code>@blog/ui</code> atoms,
+          molecules, and organisms.
         </p>
         <div class="component-list">
           <article class="component-row" id="homepagetemplate">
             <div class="component-info">
-              <span class="tk">Template</span>
+              <span class="tk">apps/web</span>
               <h3>HomePageTemplate</h3>
               <p>
                 Places header, HomeHero, LatestPosts, and footer. Owns
-                page-level padding and ordering.
+                page-level padding and ordering. Lives in <code>apps/web</code>
+                — it composes <code>@blog/ui</code> organisms, it is not part
+                of <code>@blog/ui</code>.
               </p>
               <p>
                 <code><HomePageTemplate /></code>
@@ -4396,11 +4404,13 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
           </article>
           <article class="component-row" id="postpagetemplate">
             <div class="component-info">
-              <span class="tk">Template</span>
+              <span class="tk">apps/web</span>
               <h3>PostPageTemplate</h3>
               <p>
                 Places header and article content inside a narrower reading
-                column. Owns route-level width.
+                column. Owns route-level width. Lives in <code>apps/web</code>
+                — it composes <code>@blog/ui</code> organisms, it is not part
+                of <code>@blog/ui</code>.
               </p>
               <p>
                 <code><PostPageTemplate /></code>
@@ -4591,6 +4601,11 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
 
       <section class="sec" id="next-map">
         <div class="sec-title">Next.js implementation map</div>
+        <p class="cap">
+          Atoms, molecules, and organisms map to <code>@blog/ui</code>.
+          Templates / routes map to <code>apps/web</code> page compositions —
+          <code>@blog/ui</code> has no template layer.
+        </p>
         <div class="module-grid">
           <div class="module-card">
             <h3>Atoms</h3>
