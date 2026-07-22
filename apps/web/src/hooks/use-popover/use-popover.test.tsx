@@ -114,4 +114,71 @@ describe(usePopover, () => {
 
     expect(document.activeElement).toBe(first);
   });
+
+  it('moves focus to the next item on ArrowDown, wrapping from the last back to the first', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    await user.click(getTrigger());
+
+    const first = screen.getByRole('button', { name: 'first' });
+    const last = screen.getByRole('button', { name: 'second' });
+
+    fireEvent.keyDown(document, { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(last);
+
+    fireEvent.keyDown(document, { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(first);
+  });
+
+  it('moves focus to the previous item on ArrowUp, wrapping from the first to the last', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    await user.click(getTrigger());
+
+    const last = screen.getByRole('button', { name: 'second' });
+
+    fireEvent.keyDown(document, { key: 'ArrowUp' });
+
+    expect(document.activeElement).toBe(last);
+  });
+
+  it('moves focus to the previous item on ArrowUp when not on the first item', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    await user.click(getTrigger());
+
+    const first = screen.getByRole('button', { name: 'first' });
+    const last = screen.getByRole('button', { name: 'second' });
+    last.focus();
+
+    fireEvent.keyDown(document, { key: 'ArrowUp' });
+
+    expect(document.activeElement).toBe(first);
+  });
+
+  it('focuses the first item on Home', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    await user.click(getTrigger());
+
+    const first = screen.getByRole('button', { name: 'first' });
+    const last = screen.getByRole('button', { name: 'second' });
+    last.focus();
+
+    fireEvent.keyDown(document, { key: 'Home' });
+
+    expect(document.activeElement).toBe(first);
+  });
+
+  it('focuses the last item on End', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    await user.click(getTrigger());
+
+    const last = screen.getByRole('button', { name: 'second' });
+
+    fireEvent.keyDown(document, { key: 'End' });
+
+    expect(document.activeElement).toBe(last);
+  });
 });
