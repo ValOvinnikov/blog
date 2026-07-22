@@ -7,7 +7,7 @@ faker.seed(123);
 
 const author = {
   name: faker.person.fullName(),
-  avatarUrl: faker.image.avatarGitHub(),
+  imageUrl: faker.image.avatarGitHub(),
 };
 const publishedAt = faker.date.past().toISOString();
 const formattedDate = faker.date.past().toLocaleDateString('en-GB', {
@@ -67,7 +67,7 @@ describe(`<${PostMeta.name}/>`, () => {
     expect(screen.queryByText(/min read/)).not.toBeInTheDocument();
   });
 
-  it('falls back to initials when avatarUrl is not provided', () => {
+  it('falls back to initials when imageUrl is not provided', () => {
     render(
       <PostMeta
         author={{ name: author.name }}
@@ -104,22 +104,15 @@ describe(`<${PostMeta.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders a share trigger when share is provided', () => {
+  it('renders the share slot when share is provided', () => {
     render(
       <PostMeta
         author={author}
         publishedAt={publishedAt}
         formattedDate={formattedDate}
-        share={{
-          links: [{ href: 'https://example.com', label: 'Share on X' }],
-          open: false,
-          onOpenChange: () => {},
-          triggerAriaLabel: 'Share this post',
-        }}
+        share={<button>share</button>}
       />,
     );
-    expect(
-      screen.getByRole('button', { name: 'Share this post' }),
-    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'share' })).toBeVisible();
   });
 });

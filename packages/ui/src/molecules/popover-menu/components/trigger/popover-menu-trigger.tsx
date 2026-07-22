@@ -11,7 +11,7 @@ export interface IPopoverMenuTriggerProps
   /** `id` of the `PopoverMenu.Panel` this trigger controls — wired to `aria-controls`. */
   panelId: string;
   /** Forwarded to the underlying `<button>` so the caller can manage focus (e.g. return focus here when the panel closes). */
-  triggerRef?: Ref<HTMLButtonElement>;
+  ref?: Ref<HTMLButtonElement>;
 }
 
 /**
@@ -23,7 +23,7 @@ export const PopoverMenuTrigger = ({
   ariaLabel,
   open,
   panelId,
-  triggerRef,
+  ref,
   className,
   children,
   dataTestId,
@@ -31,7 +31,7 @@ export const PopoverMenuTrigger = ({
 }: IPopoverMenuTriggerProps) => (
   <button
     {...rest}
-    ref={triggerRef}
+    ref={ref}
     type="button"
     aria-haspopup="menu"
     aria-expanded={open}

@@ -1,5 +1,5 @@
 import type { IWithDataTestId } from '@blog/config';
-import type { HTMLAttributes } from 'react';
+import type { HTMLAttributes, Ref } from 'react';
 
 import { popoverMenuPanelVariants } from './popover-menu-panel-variants';
 
@@ -10,6 +10,8 @@ export interface IPopoverMenuPanelProps
   /** Whether the panel is visible — fully controlled by the caller. */
   open: boolean;
   ariaLabel?: string;
+  /** Forwarded to the underlying panel `<div>` so the caller can manage focus-trap/outside-click detection against the real node. */
+  ref?: Ref<HTMLDivElement>;
 }
 
 /**
@@ -22,6 +24,7 @@ export const PopoverMenuPanel = ({
   id,
   open,
   ariaLabel,
+  ref,
   className,
   children,
   dataTestId,
@@ -29,6 +32,7 @@ export const PopoverMenuPanel = ({
 }: IPopoverMenuPanelProps) => (
   <div
     {...rest}
+    ref={ref}
     id={id}
     role="menu"
     aria-label={ariaLabel}

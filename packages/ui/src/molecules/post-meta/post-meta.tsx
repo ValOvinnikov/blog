@@ -2,23 +2,22 @@ import type { IWithDataTestId } from '@blog/config';
 import { Size } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { MetaSeparator } from '@blog/ui/atoms/meta-separator';
-import type { IShareButtonsProps } from '@blog/ui/molecules/share-buttons';
-import { ShareButtons } from '@blog/ui/molecules/share-buttons';
+import type { ReactNode } from 'react';
 
 import { postMetaVariants } from './post-meta-variants';
 
 export interface IPostMetaProps extends IWithDataTestId {
   author: {
     name: string;
-    avatarUrl?: string;
+    imageUrl?: string;
   };
   /** ISO 8601 date string, used only for `<time dateTime>`. */
   publishedAt: string;
   /** Human-readable date string, pre-formatted in the web layer. */
   formattedDate: string;
   readingTimeMinutes?: number;
-  /** Renders a share trigger + popover inline, right-aligned in the strip — omit to render `PostMeta` without a share action. `open`/`onOpenChange`/`isCopied`/`onCopyClick` remain fully controlled by whatever the web layer passes through here. */
-  share?: IShareButtonsProps;
+  /** Opaque share widget, right-aligned in the strip — omit to render `PostMeta` without a share action. `PostMeta` knows nothing about its contents or state; the interactive widget is built in `apps/web` and passed in. */
+  share?: ReactNode;
   className?: string;
 }
 
@@ -42,7 +41,7 @@ export const PostMeta = ({
       <Avatar
         name={author.name}
         alt={author.name}
-        src={author.avatarUrl}
+        src={author.imageUrl}
         size={Size.SM}
       />
       <span className={s.authorName()}>{author.name}</span>
@@ -55,11 +54,6 @@ export const PostMeta = ({
         <span>{readingTimeMinutes} min read</span>
       </>
     )}
-    {share && (
-      <ShareButtons
-        {...share}
-        className={s.share({ class: share.className })}
-      />
-    )}
+    {share && <span className={s.share()}>{share}</span>}
   </div>
 );

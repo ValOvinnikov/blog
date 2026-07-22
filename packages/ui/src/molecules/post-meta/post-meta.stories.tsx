@@ -18,7 +18,7 @@ const meta = {
   args: {
     author: {
       name: faker.person.fullName(),
-      avatarUrl: faker.image.avatarGitHub(),
+      imageUrl: faker.image.avatarGitHub(),
     },
     publishedAt,
     formattedDate,
@@ -38,17 +38,8 @@ export const WithoutAvatar: TStory = {
   args: { author: { name: faker.person.fullName() } },
 };
 
-export const WithShareTrigger: TStory = {
+export const WithShareSlot: TStory = {
   args: {
-    share: {
-      links: [
-        { href: faker.internet.url(), label: 'Share on X' },
-        { href: faker.internet.url(), label: 'Share on LinkedIn' },
-      ],
-      open: true,
-      onOpenChange: () => {},
-      triggerAriaLabel: 'Share this post',
-      panelAriaLabel: 'Share this post',
-    },
+    share: <button type="button">Share</button>,
   },
 };
