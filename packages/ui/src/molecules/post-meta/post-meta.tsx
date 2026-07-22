@@ -1,5 +1,4 @@
-import type { IWithDataTestId } from '@blog/config';
-import { Size } from '@blog/config';
+import { type IWithDataTestId, Size } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { MetaSeparator } from '@blog/ui/atoms/meta-separator';
 import type { ReactNode } from 'react';

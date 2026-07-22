@@ -8,8 +8,11 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
-import type { ComponentPropsWithoutRef, ElementType } from 'react';
-import { Fragment } from 'react';
+import {
+  type ComponentPropsWithoutRef,
+  type ElementType,
+  Fragment,
+} from 'react';
 
 import { HeroCta } from './components/cta/hero-cta';
 import { HeroMedia } from './components/media/hero-media';

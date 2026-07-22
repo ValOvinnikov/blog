@@ -4,8 +4,11 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
-import type { ComponentPropsWithoutRef, ElementType } from 'react';
-import { Fragment } from 'react';
+import {
+  type ComponentPropsWithoutRef,
+  type ElementType,
+  Fragment,
+} from 'react';
 
 import { FooterCopyright } from './components/copyright/footer-copyright';
 import { FooterNav } from './components/nav/footer-nav';

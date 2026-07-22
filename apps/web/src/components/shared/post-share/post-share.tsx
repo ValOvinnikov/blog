@@ -1,7 +1,6 @@
 'use client';
 
-import type { IShareLinkItem } from '@blog/ui';
-import { PopoverMenu } from '@blog/ui';
+import { type IShareLinkItem, PopoverMenu } from '@blog/ui';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useCopyToClipboard } from '@web/hooks/use-copy-to-clipboard';
 import { usePopover } from '@web/hooks/use-popover';

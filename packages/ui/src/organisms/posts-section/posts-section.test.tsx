@@ -2,8 +2,7 @@ import { faker } from '@faker-js/faker';
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
-import type { IPostCardData } from './posts-section';
-import { PostsSection } from './posts-section';
+import { type IPostCardData, PostsSection } from './posts-section';
 
 faker.seed(123);
 
