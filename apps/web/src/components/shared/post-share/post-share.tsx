@@ -8,6 +8,8 @@ import { usePopover } from '@web/hooks/use-popover';
 import { Check, Copy, Share2 } from 'lucide-react';
 import { useId } from 'react';
 
+import { postShareLiveRegionVariants } from './post-share-variants';
+
 export type TPostShareProps = {
   url: string;
   title: string;
@@ -74,6 +76,13 @@ export function PostShare({ url, title, links, className }: TPostShareProps) {
           </PopoverMenu.Item>
         ))}
       </PopoverMenu.Panel>
+      <span
+        role="status"
+        aria-live="polite"
+        className={postShareLiveRegionVariants()}
+      >
+        {isCopied ? 'Link copied' : ''}
+      </span>
     </PopoverMenu>
   );
 }

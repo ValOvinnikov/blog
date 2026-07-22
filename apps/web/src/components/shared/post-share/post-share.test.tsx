@@ -71,6 +71,17 @@ describe(`<${PostShare.name}/>`, () => {
     );
   });
 
+  it('announces a successful copy via an aria-live status region', async () => {
+    vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
+
+    expect(screen.getByRole('status')).toHaveTextContent('');
+
+    await userEvent.setup().click(getTrigger());
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Copy link' }));
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Link copied');
+  });
+
   it('renders one share link per entry in `links`, opening in a new tab', async () => {
     await userEvent.setup().click(getTrigger());
 
