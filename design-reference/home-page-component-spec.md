@@ -738,6 +738,16 @@ export function PostCard({ href, title, description, meta }: PostCardProps) {
 }
 ```
 
+> **Decision record (2026-07-21, issue #624, epic #612):** the reference
+> `PostCard` above is text-only — no thumbnail. The actual `@blog/ui`
+> `PostCard` (`packages/ui/src/molecules/post-card/`) is a compound
+> component that includes a `PostCard.Media` slot for an optional
+> thumbnail. This is intentional, not drift to reconcile: it matches
+> issue #74's acceptance criteria, which predates and supersedes this
+> design reference's text-only mock for `PostCard`. Do not "fix" `PostCard`
+> back to thumbnail-less to match this reference — the reference is stale
+> on this point; `@blog/ui`'s compound `Media` slot is the source of truth.
+
 ---
 
 ### 2.6 `MediaFrame`
