@@ -83,6 +83,14 @@ export const postSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'closingNote',
+      title: 'Closing Note',
+      type: 'text',
+      description:
+        'Optional plain-text note rendered at the end of the post body — e.g. a sign-off or short closing remark.',
+      validation: (rule) => rule.max(300),
+    }),
+    defineField({
       name: 'featured',
       title: 'Featured',
       type: 'boolean',

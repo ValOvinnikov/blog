@@ -379,6 +379,7 @@ export type Blog_post = {
   >;
   publishedAt?: string;
   body?: RichText;
+  closingNote?: string;
   featured?: boolean;
   seo?: Seo;
 };
