@@ -241,10 +241,13 @@ replacing a hand-duplicated block per page document.
 
 - `post` — title, slug, excerpt, heroImage (`imageWithAlt`, **optional** — a
   post without one renders imageless rather than 404ing), author (ref),
-  categories (refs), publishedAt, body (portable text incl. code blocks),
+  categories (refs → `category`, 1–4, first is primary), tags (refs → `tag`,
+  optional, max 6), publishedAt, body (portable text incl. code blocks),
   featured, seo.
 - `author` — name, slug, image, bio, role, socialLinks (unified `link`-based).
 - `category` — title, slug, description.
+- `tag` — title, slug, description, seo (topic taxonomy for posts; drives the
+  `/tag` archives + related-posts, alongside the section-level `category`).
 - `siteSettings` (singleton) — `titleField` (read-only, fixed value), brand
   (`brand` object: name/prefix/suffix/logo/specLine/variant — `specLine` is
   a `specLine` object, `{ items: string[] (max 4, each max 15 chars),
