@@ -43,12 +43,45 @@ helpers, shared config packages, alias wiring, guards typegen output), `cms`
 (schemas/typegen), `service` (data layer), `ui` (design system), `web`
 (frontend/SEO + composition).
 
-**Orchestrator must not write layer files before delegating.** Do not create
-stub or partial files in a layer owned by a subagent — the subagent owns file
-creation end-to-end and applies the layer's skill conventions from the start.
-Handing a subagent pre-written stubs bypasses those conventions and breaks the
-delegation model. If you need to communicate structure, describe it in the
-prompt — do not write it to disk first.
+**Delegating in-scope work to its sub-agent is REQUIRED, not optional — for the
+whole lifecycle, not just the first draft.** Every file that lives in a
+sub-agent's domain (`config`/`cms`/`service`/`ui`/`web` per the map above) is
+written, changed, fixed, renamed, and reworked **by that sub-agent** — the
+initial implementation, every review-remediation, every follow-up tweak, every
+"it's one line" edit. The orchestrator _orchestrates_; it does not hand-author
+or hand-patch a layer's files because doing it itself feels faster. Handing a
+sub-agent pre-written stubs, or editing its files after it hands them back, both
+bypass the layer's skill conventions and break the delegation model. Describe
+structure in the prompt; never write it to disk first.
+
+**What the orchestrator does with its own hands is exactly the work that falls
+OUTSIDE every sub-agent's scope:**
+
+- Governance/process docs it owns: `CLAUDE.md`, `.claude/**` (agents, skills,
+  hooks, settings), `SPEC.md`, `README.md`, `docs/**` (specs/plans).
+- The mechanical **scratchpad → branch assembly** of a sub-agent's _own_
+  exported output — a file copy, not authoring (see the worktree-teardown
+  handoff). Reconciling a trivial transfer conflict is fine; rewriting the
+  content is not — that goes back to the sub-agent.
+- `pnpm typegen` (it mutates generated files; `develop-feature` §5).
+- Orchestration itself: git, `gh`, the board (via `board-keeper`), dispatching
+  agents, and running the delivery gates.
+
+Everything else — a groqd tweak, a variant class, a schema field, a route, a
+`*.test.ts(x)` edit, a two-line rename fix — is a **dispatch** (a fresh Agent,
+or `SendMessage` to continue the owning agent with its context intact), never a
+direct orchestrator edit.
+
+**Known failure mode — the "I'll just fix this one small thing myself" trap.**
+When a review turns up a blocking finding in a layer file, or a rename / knip /
+lint nit needs a two-line change, patching it inline _feels_ faster than
+re-dispatching the owning agent. That feeling is the rationalization this rule
+exists to stop: a two-line orchestrator edit to a `config`/`cms`/`service`/`ui`/
+`web` file is still the orchestrator doing a sub-agent's job. Route the fix to
+the owning agent (dispatch, or `SendMessage` it), let it re-export, then
+re-verify and re-review. "Small", "mechanical", "the agent already did the hard
+part", and "it's a fix, not new code" are **not** exemptions — the only
+orchestrator-hand edits are the out-of-scope list above.
 
 **Dispatch subagents in the background by default.** Every Agent-tool
 dispatch defaults to `run_in_background: true`. "The next step depends on
