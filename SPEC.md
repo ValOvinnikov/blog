@@ -242,7 +242,8 @@ replacing a hand-duplicated block per page document.
 - `post` — title, slug, excerpt, heroImage (`imageWithAlt`, **optional** — a
   post without one renders imageless rather than 404ing), author (ref),
   categories (refs), publishedAt, body (portable text incl. code blocks),
-  featured, seo.
+  closingNote (plain text, optional, max 300 chars — rendered at the end of
+  the post body), featured, seo.
 - `author` — name, slug, image, bio, role, socialLinks (unified `link`-based).
 - `category` — title, slug, description.
 - `siteSettings` (singleton) — `titleField` (read-only, fixed value), brand
