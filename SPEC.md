@@ -149,19 +149,28 @@ apps/web
   its own posts (the newest `limit`); `module_hero` resolves its own
   custom-vs-fallback fields (see §6).
 - **Web renders modules generically.** `apps/web/src/modules/module-map.ts`
-  registers `MODULE_MAP: Record<TModuleType, (props) => ReactNode>` — typed
-  exhaustively over `TModuleType`/`MODULE_TYPE` (`@blog/config`) so omitting a
-  module type from the map is a compile error. `module-renderer.tsx`'s
-  `ModuleRenderer` walks a page's `modules: TModuleRef[]`, resolves each entry
-  through `MODULE_MAP`, and renders the result keyed by the module's stable
-  `_key`; an unrecognized type renders nothing and logs a warning rather than
-  failing the page. Each per-module component
+  registers `MODULE_MAP: Record<Exclude<TModuleType, 'module_hero'>, (props) =>
+ReactNode>` — typed exhaustively over every module type in
+  `TModuleType`/`MODULE_TYPE` (`@blog/config`) **except** `module_hero`, so
+  omitting any other module type from the map is a compile error.
+  `module_hero` is deliberately excluded: the CMS schema never allows a
+  `module_hero` entry inside any page's `modules[]` array (`page_generic`
+  allows only `content`/`cta`; `page_home` allows only `postList`/`cta`), so
+  it can never reach `ModuleRenderer` — see the home-route note below.
+  `module-renderer.tsx`'s `ModuleRenderer` walks a page's
+  `modules: TModuleRef[]`, resolves each entry through `MODULE_MAP` (cast to
+  `keyof typeof MODULE_MAP`, since the raw `TModuleType` still includes
+  `module_hero`), and renders the result keyed by the module's stable `_key`;
+  an unrecognized type — including a `module_hero` if the schema constraint
+  were ever loosened — renders nothing and logs a warning rather than failing
+  the page. Each per-module component
   (`apps/web/src/modules/<type>/<type>-module.tsx`) is an async Server
   Component that calls its `service.modules.<type>` fetcher, checks
   `result.ok`, and maps the view-model onto the matching pure `@blog/ui`
   organism — this is the only place that module's service and ui meet. The
-  home route additionally renders a dedicated `HeroModule` for `page_home`'s
-  required `hero` reference (kept separate from `modules[]`).
+  home route instead renders `HeroModule` directly, as a dedicated `hero` prop
+  on `HomePageTemplate`, for `page_home`'s required `hero` reference (kept
+  separate from `modules[]` and from `MODULE_MAP`/`ModuleRenderer` entirely).
 
 ## 6. Content model
 
@@ -180,7 +189,9 @@ pages use a given module before it's edited or deleted). `MODULE_TYPE`
 (`packages/config/src/constants/module.ts`) is the single source of truth for
 the module type registry; every layer (cms schema list, `service.modules`
 namespace, web `MODULE_MAP`) derives from it, so omitting a type from one is a
-compile error or an obvious gap, not a silent drift.
+compile error or an obvious gap, not a silent drift — `MODULE_MAP`'s one
+intentional exception is `module_hero` (see §5), excluded because it's
+schema-forbidden from ever appearing in a `modules[]` array.
 
 **Module documents** (`apps/cms/src/schema-types/modules/`)
 

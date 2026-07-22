@@ -9,6 +9,5 @@ export const blogPostPageVariants = tv({
     tags: ['mb-4'],
     meta: ['mb-8'],
     body: ['mx-auto max-w-measure'],
-    byline: ['mx-auto mt-12 max-w-measure'],
   },
 });

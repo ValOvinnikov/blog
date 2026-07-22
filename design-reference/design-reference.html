@@ -635,6 +635,65 @@
         margin-bottom: 18px;
       }
 
+      .m-author-byline {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .a-avatar {
+        width: 56px;
+        height: 56px;
+        flex-shrink: 0;
+        border-radius: 9999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--surface-2);
+        color: var(--muted);
+        font-family: var(--font-disp);
+        font-weight: 500;
+        font-size: 16px;
+      }
+
+      .m-author-byline .a-author-body {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .a-author-name {
+        font-family: var(--font-disp);
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+        color: var(--text);
+        margin: 0;
+      }
+
+      .a-author-bio {
+        margin-top: 4px;
+      }
+
+      .a-button-sm {
+        padding: 6px 12px;
+        font-size: 13px;
+      }
+
+      .m-share-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .a-share-icon {
+        width: 16px;
+        height: 16px;
+        margin-right: 6px;
+      }
+
       /* ================= ORGANISMS ================= */
       .o-home-hero {
         display: grid;
@@ -720,6 +779,92 @@
         font-family: var(--font-mono);
         font-size: 11px;
         color: var(--subtle);
+      }
+
+      /* ---- page-builder organisms (ContentModule/ContentSection/
+         CtaModule/Pagination) ---- */
+      .o-content-module {
+        margin-top: 22px;
+      }
+
+      .o-content-module-title {
+        /* No typographic token classes in the real component (`m-0 mb-3`
+           only) — deliberately left at browser default here to match. */
+        margin: 0 0 12px;
+      }
+
+      .o-content-module-body {
+        max-width: 68ch;
+      }
+
+      .o-content-section {
+        margin-top: 22px;
+      }
+
+      .o-cta-module {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-top: 22px;
+        padding: 24px 20px;
+        background: var(--bg-subtle);
+      }
+
+      .o-cta-module-heading {
+        /* No typographic token classes in the real component (`m-0` only)
+           — deliberately left at browser default here to match, same as
+           ContentModule's heading above. */
+        margin: 0;
+      }
+
+      .o-cta-module-text {
+        margin: 0;
+        max-width: 68ch;
+        color: var(--subtle);
+      }
+
+      .o-cta-module-action {
+        margin-top: 8px;
+      }
+
+      .o-pagination {
+        margin-top: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .o-pagination ul {
+        margin: 0;
+        display: flex;
+        list-style: none;
+        align-items: center;
+        gap: 4px;
+        padding: 0;
+      }
+
+      .o-pagination a {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        display: inline-flex;
+        min-width: 36px;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        padding: 0 8px;
+        color: var(--subtle);
+        text-decoration: none;
+      }
+
+      .o-pagination a:hover {
+        color: var(--text);
+      }
+
+      .o-pagination a[aria-current='page'] {
+        color: var(--accent);
       }
 
       /* component catalogue */
@@ -2557,74 +2702,6 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               </div>
             </div>
           </article>
-          <article class="component-row" id="siteheader">
-            <div class="component-info">
-              <span class="tk">Molecule</span>
-              <h3>SiteHeader</h3>
-              <p>
-                Header row used by both Home and Post pages. Owns its internal
-                border and alignment only.
-              </p>
-              <p>
-                <code><SiteHeader /></code>
-              </p>
-            </div>
-            <div class="component-preview-grid">
-              <div class="preview-panel t-light compact">
-                <p class="preview-title">Light preview</p>
-                <header class="m-header">
-                  <span class="a-logo">val<em>.dev</em></span>
-                  <nav class="m-nav" aria-label="Primary">
-                    <a class="a-navlink">writing</a
-                    ><a class="a-navlink">projects</a
-                    ><a class="a-navlink">about</a
-                    ><button
-                      class="a-iconbutton"
-                      aria-label="Switch to dark mode"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.6"
-                      >
-                        <path
-                          d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
-                        />
-                      </svg>
-                    </button>
-                  </nav>
-                </header>
-              </div>
-              <div class="preview-panel t-dark compact">
-                <p class="preview-title">Dark preview</p>
-                <header class="m-header">
-                  <span class="a-logo">val<em>.dev</em></span>
-                  <nav class="m-nav" aria-label="Primary">
-                    <a class="a-navlink">writing</a
-                    ><a class="a-navlink">projects</a
-                    ><a class="a-navlink">about</a
-                    ><button
-                      class="a-iconbutton"
-                      aria-label="Switch to light mode"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.6"
-                      >
-                        <circle cx="12" cy="12" r="4" />
-                        <path
-                          d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
-                        />
-                      </svg>
-                    </button>
-                  </nav>
-                </header>
-              </div>
-            </div>
-          </article>
           <article class="component-row" id="postmeta">
             <div class="component-info">
               <span class="tk">Molecule</span>
@@ -2841,6 +2918,20 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               </p>
               <p>
                 <code><CodeBlock filename code /></code>
+              </p>
+              <p>
+                <em
+                  >Implementation note: despite the "Molecule" label above,
+                  <code>CodeBlock</code> deliberately lives in
+                  <code>apps/web</code> at
+                  <code
+                    >apps/web/src/components/shared/portable-text-renderer/code-block.tsx</code
+                  >, not as a <code>@blog/ui</code> molecule. It wraps
+                  <code>react-syntax-highlighter</code>, a third-party rendering
+                  dependency that <code>@blog/ui</code> must stay free of per
+                  this repo's layer contracts. The styling and behaviour shown
+                  here still apply; only the package location differs.</em
+                >
               </p>
             </div>
             <div class="component-preview-grid">
@@ -3073,6 +3164,274 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               </div>
             </div>
           </article>
+          <article class="component-row" id="authorbyline">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>AuthorByline</h3>
+              <p>
+                Expanded author card shown below a post body: an
+                <code>Avatar</code> atom (<code>size="lg"</code>), the author's
+                name as a level-3 <code>Heading</code>, and an optional bio
+                rendered through the <code>Text</code> atom
+                (<code>variant="muted"</code>).
+              </p>
+              <p>
+                <code
+                  ><AuthorByline
+                    name="Ava Ito"
+                    bio="Writes about systems."
+                    avatarUrl?
+                /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="m-author-byline">
+                  <span class="a-avatar" aria-hidden="true">AI</span>
+                  <div class="a-author-body">
+                    <h3 class="a-author-name">Ava Ito</h3>
+                    <p class="a-body a-body-muted a-author-bio">
+                      Writes about systems that survive contact with production.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="m-author-byline">
+                  <span class="a-avatar" aria-hidden="true">AI</span>
+                  <div class="a-author-body">
+                    <h3 class="a-author-name">Ava Ito</h3>
+                    <p class="a-body a-body-muted a-author-bio">
+                      Writes about systems that survive contact with production.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="linkbutton">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>LinkButton</h3>
+              <p>
+                Polymorphic wrapper around the <code>Button</code> atom's own
+                <code>buttonVariants</code> — same <code>variant</code>/
+                <code>size</code> matrix (<code>primary|ghost|link</code> ×
+                <code>sm|md|lg</code>), but renders as an
+                <code>&lt;a&gt;</code> by default. Pass <code>as</code> to
+                render through the app router's <code>Link</code> instead; all
+                other props (e.g. <code>href</code>, <code>target</code>) spread
+                onto the rendered element.
+              </p>
+              <p>
+                <code
+                  ><LinkButton href="/writing" variant="ghost" size="sm" as?
+                /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="component-demo-row">
+                  <a class="a-button a-button-primary" href="#">Read post</a
+                  ><a class="a-button a-button-ghost a-button-sm" href="#"
+                    >Subscribe</a
+                  >
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="component-demo-row">
+                  <a class="a-button a-button-primary" href="#">Read post</a
+                  ><a class="a-button a-button-ghost a-button-sm" href="#"
+                    >Subscribe</a
+                  >
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="sharelink">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>ShareLink</h3>
+              <p>
+                A single external share action rendered through
+                <code>LinkButton</code> (<code>variant="ghost"</code>,
+                <code>size="sm"</code>), with <code>target="_blank"</code> and
+                <code>rel="noopener noreferrer"</code> baked in since every
+                share link opens the target platform in a new tab. Never builds
+                its own <code>href</code> — the finished share URL is passed in
+                as plain data.
+              </p>
+              <p>
+                <code><ShareLink href label icon? as? /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <a
+                  class="a-button a-button-ghost a-button-sm"
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <svg
+                    class="a-share-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    aria-hidden="true"
+                  >
+                    <path d="M7 17 17 7" />
+                    <path d="M8 7h9v9" />
+                  </svg>
+                  Share on X
+                </a>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <a
+                  class="a-button a-button-ghost a-button-sm"
+                  href="#"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <svg
+                    class="a-share-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                    aria-hidden="true"
+                  >
+                    <path d="M7 17 17 7" />
+                    <path d="M8 7h9v9" />
+                  </svg>
+                  Share on X
+                </a>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="sharebuttons">
+            <div class="component-info">
+              <span class="tk">Molecule</span>
+              <h3>ShareButtons</h3>
+              <p>
+                Renders a list of pre-built share links (each via
+                <code>ShareLink</code>) plus a copy-link <code>Button</code>.
+                <code>@blog/ui</code> only renders the <code>links</code> it's
+                given — building the platform-specific share URLs (X, LinkedIn,
+                …) is <code>apps/web</code>'s job — and never touches
+                <code>window</code>/clipboard directly; copying is delegated
+                entirely to the <code>onCopy</code> callback.
+              </p>
+              <p>
+                <code
+                  ><ShareButtons links onCopy? linkAs? copyLabel="Copy link"
+                /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <div class="m-share-buttons">
+                  <a class="a-button a-button-ghost a-button-sm" href="#">
+                    <svg
+                      class="a-share-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      aria-hidden="true"
+                    >
+                      <path d="M7 17 17 7" />
+                      <path d="M8 7h9v9" />
+                    </svg>
+                    Share on X
+                  </a>
+                  <a class="a-button a-button-ghost a-button-sm" href="#">
+                    <svg
+                      class="a-share-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      aria-hidden="true"
+                    >
+                      <path d="M7 17 17 7" />
+                      <path d="M8 7h9v9" />
+                    </svg>
+                    Share on LinkedIn
+                  </a>
+                  <span class="a-button a-button-ghost a-button-sm">
+                    <svg
+                      class="a-share-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      aria-hidden="true"
+                    >
+                      <path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" />
+                      <path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" />
+                    </svg>
+                    Copy link
+                  </span>
+                </div>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <div class="m-share-buttons">
+                  <a class="a-button a-button-ghost a-button-sm" href="#">
+                    <svg
+                      class="a-share-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      aria-hidden="true"
+                    >
+                      <path d="M7 17 17 7" />
+                      <path d="M8 7h9v9" />
+                    </svg>
+                    Share on X
+                  </a>
+                  <a class="a-button a-button-ghost a-button-sm" href="#">
+                    <svg
+                      class="a-share-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      aria-hidden="true"
+                    >
+                      <path d="M7 17 17 7" />
+                      <path d="M8 7h9v9" />
+                    </svg>
+                    Share on LinkedIn
+                  </a>
+                  <span class="a-button a-button-ghost a-button-sm">
+                    <svg
+                      class="a-share-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      aria-hidden="true"
+                    >
+                      <path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" />
+                      <path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" />
+                    </svg>
+                    Copy link
+                  </span>
+                </div>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -3082,16 +3441,118 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
           Larger page sections composed from atoms and molecules.
         </p>
         <div class="component-list">
-          <article class="component-row" id="homehero">
+          <article class="component-row" id="siteheader">
             <div class="component-info">
               <span class="tk">Organism</span>
-              <h3>HomeHero</h3>
+              <h3>Header</h3>
               <p>
-                Hero copy with optional media. With image it becomes two
-                columns; without image it collapses to one column.
+                Compound header shell with named
+                <code>Brand</code>, <code>Nav</code>, and
+                <code>Actions</code> slots for page-builder recomposition. Owns
+                its internal border, alignment, and slot layout only.
               </p>
               <p>
-                <code><HomeHero image? /></code>
+                <code
+                  >&lt;Header&gt; &lt;Header.Brand&gt;My
+                  Blog&lt;/Header.Brand&gt;
+                  &lt;Header.Nav&gt;...&lt;/Header.Nav&gt;
+                  &lt;Header.Actions&gt;...&lt;/Header.Actions&gt;
+                  &lt;/Header&gt;</code
+                >
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <header class="m-header">
+                  <span class="a-logo">val<em>.dev</em></span>
+                  <nav class="m-nav" aria-label="Primary">
+                    <a class="a-navlink">writing</a
+                    ><a class="a-navlink">projects</a
+                    ><a class="a-navlink">about</a
+                    ><button
+                      class="a-iconbutton"
+                      aria-label="Switch to dark mode"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                      >
+                        <path
+                          d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                        />
+                      </svg>
+                    </button>
+                  </nav>
+                </header>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <header class="m-header">
+                  <span class="a-logo">val<em>.dev</em></span>
+                  <nav class="m-nav" aria-label="Primary">
+                    <a class="a-navlink">writing</a
+                    ><a class="a-navlink">projects</a
+                    ><a class="a-navlink">about</a
+                    ><button
+                      class="a-iconbutton"
+                      aria-label="Switch to light mode"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                      >
+                        <circle cx="12" cy="12" r="4" />
+                        <path
+                          d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"
+                        />
+                      </svg>
+                    </button>
+                  </nav>
+                </header>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="hero">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>Hero</h3>
+              <p>
+                Generalized component contract — not a home-only persona
+                statement. Renders an optional <code>eyebrow</code>, an optional
+                <code>publishedAt</code>/<code>formattedDate</code> byline, the
+                required <code>title</code>, an optional <code>excerpt</code>,
+                and optional <code>tags</code>, so it covers post-shaped fields
+                alongside the home page's copy. Media and calls-to-action are
+                compound slots (<code>Hero.Media</code>, <code>Hero.Cta</code>)
+                rather than a single <code>image</code> prop — with a
+                <code>Hero.Media</code> slot present it becomes two columns;
+                without one it collapses to one column.
+              </p>
+              <p>
+                <strong>Current usage is home-only</strong>, despite the
+                generalized contract: the home route composes
+                <code>HeroModule</code> directly as a dedicated
+                <code>hero</code> prop on <code>HomePageTemplate</code>, not
+                through the generic page-builder <code>modules[]</code> →
+                <code>ModuleRenderer</code> pipeline — the CMS schema doesn't
+                allow a <code>module_hero</code> entry in any page's
+                <code>modules[]</code> array (generic pages allow only
+                content/cta; the home page allows only postList/cta), and
+                <code>MODULE_MAP</code> excludes <code>module_hero</code> for
+                that reason. Post-detail and other page-builder pages don't
+                render <code>Hero</code> today.
+              </p>
+              <p>
+                <code
+                  >&lt;Hero title titleId eyebrow? excerpt? tags? publishedAt?
+                  formattedDate?&gt; &lt;Hero.Media /&gt;&lt;Hero.Cta /&gt;
+                  &lt;/Hero&gt;</code
+                >
               </p>
             </div>
             <div class="component-preview-grid">
@@ -3409,6 +3870,273 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
                   <span>© 2026 val.dev</span
                   ><span>rss · github · linkedin</span>
                 </footer>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="contentmodule">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>ContentModule</h3>
+              <p>
+                Page-builder organism for a single Portable Text content block
+                behind an optional heading. The web layer renders the Portable
+                Text tree and passes it in as <code>children</code>; the heading
+                itself carries no typographic token classes today (browser
+                default), unlike the labeled sections below.
+              </p>
+              <p>
+                <code><ContentModule title? titleId? children /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <section
+                  class="o-content-module"
+                  aria-labelledby="content-module-title-light"
+                >
+                  <h2
+                    id="content-module-title-light"
+                    class="o-content-module-title"
+                  >
+                    About this project
+                  </h2>
+                  <div class="o-content-module-body">
+                    <p class="a-body">
+                      Building a design system from scratch means establishing
+                      tokens, atoms, molecules, and organisms that scale across
+                      a growing product surface.
+                    </p>
+                  </div>
+                </section>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <section
+                  class="o-content-module"
+                  aria-labelledby="content-module-title-dark"
+                >
+                  <h2
+                    id="content-module-title-dark"
+                    class="o-content-module-title"
+                  >
+                    About this project
+                  </h2>
+                  <div class="o-content-module-body">
+                    <p class="a-body">
+                      Building a design system from scratch means establishing
+                      tokens, atoms, molecules, and organisms that scale across
+                      a growing product surface.
+                    </p>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="contentsection">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>ContentSection</h3>
+              <p>
+                Generic labeled wrapper for page-builder sections — a mono-label
+                heading plus arbitrary <code>children</code>
+                (e.g. a PostGrid of PostCards, as shown here). Distinct from
+                PostsSection: it owns no post-specific data shape, just the
+                label + slot composition.
+              </p>
+              <p>
+                <code><ContentSection title titleId children /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <section
+                  class="o-content-section"
+                  aria-labelledby="content-section-title-light"
+                >
+                  <p id="content-section-title-light" class="o-latest-title">
+                    Related posts
+                  </p>
+                  <div class="o-card-grid">
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-03-11<span class="a-sep">·</span>7 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">DESIGN</span>
+                      </div>
+                      <h4 class="a-card-title">
+                        Tokens that survive refactors
+                      </h4>
+                      <p class="m-card-desc">
+                        Semantic naming, one source of truth.
+                      </p>
+                    </article>
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-01-22<span class="a-sep">·</span>5 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">ENGINEERING</span>
+                      </div>
+                      <h4 class="a-card-title">A compact post card</h4>
+                      <p class="m-card-desc">
+                        Reusable inside any labeled section.
+                      </p>
+                    </article>
+                  </div>
+                </section>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <section
+                  class="o-content-section"
+                  aria-labelledby="content-section-title-dark"
+                >
+                  <p id="content-section-title-dark" class="o-latest-title">
+                    Related posts
+                  </p>
+                  <div class="o-card-grid">
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-03-11<span class="a-sep">·</span>7 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">DESIGN</span>
+                      </div>
+                      <h4 class="a-card-title">
+                        Tokens that survive refactors
+                      </h4>
+                      <p class="m-card-desc">
+                        Semantic naming, one source of truth.
+                      </p>
+                    </article>
+                    <article class="m-post-card">
+                      <div class="m-card-meta">
+                        2026-01-22<span class="a-sep">·</span>5 min<span
+                          class="a-sep"
+                          >·</span
+                        ><span class="category">ENGINEERING</span>
+                      </div>
+                      <h4 class="a-card-title">A compact post card</h4>
+                      <p class="m-card-desc">
+                        Reusable inside any labeled section.
+                      </p>
+                    </article>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="ctamodule">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>CtaModule</h3>
+              <p>
+                Heading, optional supporting text, and an action slot on a
+                subtle background — the newsletter-signup / call-to-action
+                page-builder block. <code>action</code> is a fully rendered
+                link/button passed in by the web layer; this component never
+                builds the anchor itself.
+              </p>
+              <p>
+                <code><CtaModule heading headingId? text? action /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <section
+                  class="o-cta-module"
+                  aria-labelledby="cta-module-heading-light"
+                >
+                  <h2
+                    id="cta-module-heading-light"
+                    class="o-cta-module-heading"
+                  >
+                    Never miss a post
+                  </h2>
+                  <p class="o-cta-module-text">
+                    Subscribe to get new articles on design systems and
+                    engineering delivered straight to your inbox.
+                  </p>
+                  <div class="o-cta-module-action">
+                    <a class="a-button a-button-primary">Subscribe now</a>
+                  </div>
+                </section>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <section
+                  class="o-cta-module"
+                  aria-labelledby="cta-module-heading-dark"
+                >
+                  <h2 id="cta-module-heading-dark" class="o-cta-module-heading">
+                    Never miss a post
+                  </h2>
+                  <p class="o-cta-module-text">
+                    Subscribe to get new articles on design systems and
+                    engineering delivered straight to your inbox.
+                  </p>
+                  <div class="o-cta-module-action">
+                    <a class="a-button a-button-primary">Subscribe now</a>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </article>
+          <article class="component-row" id="pagination">
+            <div class="component-info">
+              <span class="tk">Organism</span>
+              <h3>Pagination</h3>
+              <p>
+                Prev/next + numbered links for paginated listings (blog index,
+                category pages). Route-agnostic (<code>createHref</code>) and
+                polymorphic (<code>linkAs</code>); renders nothing when there is
+                a single page.
+              </p>
+              <p>
+                <code
+                  ><Pagination
+                    currentPage
+                    totalPages
+                    createHref
+                    ariaLabel
+                    previousLabel
+                    nextLabel
+                    linkAs?
+                /></code>
+              </p>
+            </div>
+            <div class="component-preview-grid">
+              <div class="preview-panel t-light compact">
+                <p class="preview-title">Light preview</p>
+                <nav class="o-pagination" aria-label="Blog pages">
+                  <a href="#">Previous</a>
+                  <ul role="list">
+                    <li><a href="#">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#" aria-current="page">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">5</a></li>
+                  </ul>
+                  <a href="#">Next</a>
+                </nav>
+              </div>
+              <div class="preview-panel t-dark compact">
+                <p class="preview-title">Dark preview</p>
+                <nav class="o-pagination" aria-label="Blog pages">
+                  <a href="#">Previous</a>
+                  <ul role="list">
+                    <li><a href="#">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#" aria-current="page">3</a></li>
+                    <li><a href="#">4</a></li>
+                    <li><a href="#">5</a></li>
+                  </ul>
+                  <a href="#">Next</a>
+                </nav>
               </div>
             </div>
           </article>
@@ -3917,7 +4645,7 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               <tr>
                 <td><code>app/page.tsx</code></td>
                 <td>
-                  <code>SiteHeader → HomeHero → LatestPosts → SiteFooter</code>
+                  <code>Header → HomeHero → LatestPosts → SiteFooter</code>
                 </td>
                 <td>
                   Pass <code>heroImage</code> only when available.
@@ -3926,7 +4654,7 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               </tr>
               <tr>
                 <td><code>app/writing/[slug]/page.tsx</code></td>
-                <td><code>SiteHeader → ArticleHeader → ArticleBody</code></td>
+                <td><code>Header → ArticleHeader → ArticleBody</code></td>
                 <td>
                   Pass <code>coverImage</code> only when available.
                   <code>ArticleHeader</code> removes the figure when missing.

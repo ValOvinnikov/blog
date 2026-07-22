@@ -32,3 +32,11 @@ export const ManyTags: TStory = {
     tags: faker.helpers.multiple(() => faker.lorem.word(), { count: 12 }),
   },
 };
+
+export const Linked: TStory = {
+  args: {
+    tags: faker.helpers
+      .multiple(() => faker.lorem.word(), { count: 5 })
+      .map((label) => ({ label, href: `/category/${label}` })),
+  },
+};

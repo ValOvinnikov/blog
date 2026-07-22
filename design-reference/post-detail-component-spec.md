@@ -309,6 +309,16 @@ export function PostMeta({
 
 Path: `src/components/molecules/CodeBlock.tsx`
 
+> **Implementation note:** despite the path above, `CodeBlock` deliberately
+> lives in `apps/web` at
+> `apps/web/src/components/shared/portable-text-renderer/code-block.tsx`, not
+> as a `@blog/ui` molecule. It wraps `react-syntax-highlighter`, a
+> third-party rendering dependency that `@blog/ui` must stay free of per this
+> repo's layer contracts (`@blog/ui` is pure/prop-driven with no
+> fetch/Sanity/third-party-rendering deps). The styling and behaviour
+> described below still apply; only the package location differs from what's
+> shown here.
+
 Purpose: Code sample block in article body.
 
 Tailwind classes:

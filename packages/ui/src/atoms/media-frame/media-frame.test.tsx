@@ -29,6 +29,13 @@ describe(`<${MediaFrame.name}/>`, () => {
     );
   });
 
+  it('ratio="classic" applies aspect-[4/3]', () => {
+    const { container } = render(<MediaFrame ratio="classic" />);
+    expect((container.firstChild as HTMLElement).className).toContain(
+      'aspect-[4/3]',
+    );
+  });
+
   it('forwards HTML attributes', () => {
     const { container } = render(<MediaFrame data-testid="frame" />);
     expect(container.firstChild).toHaveAttribute('data-testid', 'frame');

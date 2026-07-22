@@ -62,7 +62,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(notFoundMock).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the post title, meta, body, categories, share links, and author byline', async () => {
+  it('renders the post title, meta, body, categories, and share links', async () => {
     getPostMock.mockResolvedValue(mockPostDetail);
 
     const ui = await BlogPostPage({ slug: 'hello-world', locale: 'EN' });
@@ -72,9 +72,11 @@ describe(`<${BlogPostPage.name}/>`, () => {
       screen.getByRole('heading', { level: 1, name: 'Hello World' }),
     ).toBeVisible();
     expect(screen.getByText('Body text.')).toBeVisible();
-    expect(screen.getByText('Engineering')).toBeVisible();
-    expect(screen.getAllByText('Jane Doe').length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByText('A short bio.')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
+      'href',
+      '/category/engineering',
+    );
+    expect(screen.getByText('Jane Doe')).toBeVisible();
 
     await userEvent.click(screen.getByRole('button', { name: /Share/ }));
     expect(screen.getByRole('menuitem', { name: /Share on X/ })).toBeVisible();
@@ -96,7 +98,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(script?.textContent).toContain('"@type":"BlogPosting"');
   });
 
-  it('omits PostMeta and AuthorByline when the post has no author', async () => {
+  it('omits PostMeta when the post has no author', async () => {
     getPostMock.mockResolvedValue({ ...mockPostDetail, author: undefined });
 
     const ui = await BlogPostPage({ slug: 'hello-world', locale: 'EN' });

@@ -1,5 +1,5 @@
 import type { Code, RichText as TPortableText } from '@blog/config';
-import { Heading, Prose } from '@blog/ui';
+import { Heading, InlineCode, Prose, ProseLink, QuoteBlock } from '@blog/ui';
 import {
   PortableText,
   type PortableTextComponents,
@@ -28,17 +28,20 @@ const components: PortableTextComponents = {
     h2: ({ children }) => <Heading level={2}>{children}</Heading>,
     h3: ({ children }) => <Heading level={3}>{children}</Heading>,
     h4: ({ children }) => <Heading level={4}>{children}</Heading>,
+    blockquote: ({ children }) => <QuoteBlock>{children}</QuoteBlock>,
   },
   marks: {
     code: ({ children }: PortableTextMarkComponentProps) => (
-      <code className={s.inlineCode()}>{children}</code>
+      <InlineCode>{children}</InlineCode>
     ),
     link: ({
       children,
       value,
     }: PortableTextMarkComponentProps<ILinkAnnotation>) =>
       value?.href ? (
-        <SmartLink href={value.href}>{children}</SmartLink>
+        <ProseLink as={SmartLink} href={value.href}>
+          {children}
+        </ProseLink>
       ) : (
         <>{children}</>
       ),
