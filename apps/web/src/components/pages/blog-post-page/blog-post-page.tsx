@@ -1,9 +1,9 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { Heading, TagList } from '@blog/ui';
+import { Heading, PostMeta, TagList } from '@blog/ui';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
-import { PostShareButtons } from '@web/components/shared/post-share-buttons';
+import { PostShare } from '@web/components/shared/post-share';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
@@ -21,10 +21,10 @@ const s = blogPostPageVariants();
 
 /**
  * BlogPostPage — `/blog/{slug}` composition: fetches the post via
- * `service.pages.post.v1.getPost`, then composes `PostShareButtons` (which
- * renders `PostMeta` with its `share` slot wired) and `PortableTextRenderer`
- * around the fetched view model, plus a `BlogPosting` JSON-LD tag.
- * `Header`/`Footer` stay owned by `[locale]/layout.tsx`.
+ * `service.pages.post.v1.getPost`, then composes `PostMeta` (with `PostShare`
+ * passed into its `share` slot) and `PortableTextRenderer` around the
+ * fetched view model, plus a `BlogPosting` JSON-LD tag. `Header`/`Footer`
+ * stay owned by `[locale]/layout.tsx`.
  */
 export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
   const post = await service.pages.post.v1.getPost(slug);
@@ -76,14 +76,12 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
       )}
 
       {post.author && (
-        <PostShareButtons
+        <PostMeta
           className={s.meta()}
-          author={{ name: post.author.name, avatarUrl: post.author.imageUrl }}
+          author={post.author}
           publishedAt={post.publishedAt}
           formattedDate={formatDate(post.publishedAt, locale)}
-          links={shareLinks}
-          url={url}
-          triggerAriaLabel={`Share "${post.title}"`}
+          share={<PostShare url={url} title={post.title} links={shareLinks} />}
         />
       )}
 
