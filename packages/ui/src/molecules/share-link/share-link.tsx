@@ -1,5 +1,4 @@
-import type { IWithDataTestId } from '@blog/config';
-import { Size } from '@blog/config';
+import { type IWithDataTestId, Size } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { LinkButton } from '@blog/ui/molecules/link-button';
 import type { ElementType, ReactNode } from 'react';
