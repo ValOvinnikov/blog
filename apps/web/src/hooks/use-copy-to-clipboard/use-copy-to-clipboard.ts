@@ -8,7 +8,7 @@ const DEFAULT_RESET_DELAY_MS = 2000;
  * useCopyToClipboard — writes text to `navigator.clipboard` and exposes a
  * `isCopied` flag that auto-resets after `resetMs`.
  */
-export function useCopyToClipboard(resetMs = DEFAULT_RESET_DELAY_MS) {
+export const useCopyToClipboard = (resetMs = DEFAULT_RESET_DELAY_MS) => {
   const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
@@ -27,4 +27,4 @@ export function useCopyToClipboard(resetMs = DEFAULT_RESET_DELAY_MS) {
   };
 
   return { isCopied, copy };
-}
+};

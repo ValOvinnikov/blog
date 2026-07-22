@@ -3,11 +3,10 @@
 import type { IShareLinkItem } from '@blog/ui';
 import { PopoverMenu } from '@blog/ui';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { useCopyToClipboard } from '@web/hooks/use-copy-to-clipboard';
+import { usePopover } from '@web/hooks/use-popover';
 import { Check, Copy, Share2 } from 'lucide-react';
 import { useId } from 'react';
-
-import { useCopyToClipboard } from './use-copy-to-clipboard';
-import { usePopover } from './use-popover';
 
 export type TPostShareProps = {
   url: string;

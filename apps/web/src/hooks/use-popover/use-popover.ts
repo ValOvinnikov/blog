@@ -14,7 +14,7 @@ const FOCUSABLE_SELECTOR =
  * The caller wires `triggerRef` onto `PopoverMenu.Trigger`'s `ref` and
  * `panelRef` onto `PopoverMenu.Panel`'s `ref`.
  */
-export function usePopover() {
+export const usePopover = () => {
   const [open, setOpenState] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -96,4 +96,4 @@ export function usePopover() {
   }, [open]);
 
   return { open, toggle, triggerRef, panelRef };
-}
+};
