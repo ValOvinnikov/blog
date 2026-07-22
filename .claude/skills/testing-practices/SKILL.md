@@ -155,9 +155,47 @@ export default mergeConfig(
   absence.
 - **No dedicated `dataTestId` test** — a test that queries by a missing test id
   already fails; an explicit assertion adds nothing.
-- Put the default render in `beforeEach` when tests share setup; per-prop cases
-  go in their own `describe` with their own render (Testing Library auto-cleans
-  between tests).
+- **Hoist a shared render into `beforeEach` — never call a render helper at the
+  top of every `it`.** When the tests in a suite all render the same thing, put
+  that render in `beforeEach` and reach the result through `screen`. A
+  `renderComponent()` (or `setup()`) helper invoked as the first line of every
+  test is the exact repetition `beforeEach` exists to remove — the presence of
+  that repeated call is the smell, not the helper.
+
+  ```tsx
+  // ✅ rendered once, in beforeEach; tests just query `screen`
+  describe(`<${PostShare.name}/>`, () => {
+    beforeEach(() => {
+      render(<PostShare {...defaultProps} />);
+    });
+
+    it('is closed by default', () => {
+      expect(screen.getByRole('button')).toHaveAttribute(
+        'aria-expanded',
+        'false',
+      );
+    });
+  });
+
+  // ❌ the same render copied into every test
+  const renderComponent = () => render(<PostShare {...defaultProps} />);
+  it('is closed by default', () => {
+    renderComponent();
+    /* … */
+  });
+  it('opens on click', () => {
+    renderComponent();
+    /* … */
+  });
+  ```
+
+  A test that genuinely needs a **different** render (extra surrounding DOM,
+  different props) goes in its own `describe` with its own render, so the shared
+  `beforeEach` doesn't double-render it. Prefer driving a variation through the
+  shared render where you can — e.g. an "outside click" closes on
+  `fireEvent.mouseDown(document.body)` without a bespoke wrapper. (Testing
+  Library auto-cleans between tests.)
+
 - Use `vi.fn()` / `vi.mock()` for boundaries (the Sanity client, `service`).
 - Deterministic: no real dates/network/random. Inject or freeze.
 - A bug fix gets a regression test that fails before the fix.
