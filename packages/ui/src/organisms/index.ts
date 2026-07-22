@@ -1,3 +1,5 @@
+export * from './article-body';
+export * from './article-header';
 export * from './content-module';
 export * from './content-section';
 export * from './cta-module';
