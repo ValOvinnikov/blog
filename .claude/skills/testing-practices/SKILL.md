@@ -155,6 +155,33 @@ export default mergeConfig(
   absence.
 - **No dedicated `dataTestId` test** — a test that queries by a missing test id
   already fails; an explicit assertion adds nothing.
+- **Render component tests with `customRender` from the package's
+  `testing/custom-render` wrapper, not with `render` from `@testing-library/react`
+  directly.** Each workspace exposes a `customRender` that wraps RTL's render
+  with that package's providers and re-exports the full RTL surface, so tests
+  get a consistent, provider-complete render (plus `screen`/`fireEvent`/etc.)
+  from one module:
+  - `@blog/ui/testing/custom-render` — `@blog/ui` is pure/prop-driven, so its wrapper
+    mounts no providers today; it exists to centralise the RTL import and give a
+    single home for a provider if a component ever needs one.
+  - `@web/testing/custom-render` — mounts `NextIntlClientProvider` (matching
+    `[locale]/layout.tsx`) so components using next-intl navigation/hooks render
+    without per-test provider setup.
+
+  Migration is a drop-in: import `customRender` (and `screen`/etc.) from the
+  wrapper and call `customRender(<Component … />)` in place of `render(…)`;
+  queries are unchanged.
+
+  ```tsx
+  // ✅ component tests render via the package wrapper's customRender
+  import { customRender, screen } from '@blog/ui/testing/custom-render'; // or '@web/testing/custom-render'
+
+  customRender(<Component {...props} />);
+
+  // ❌ not RTL's render directly
+  import { render, screen } from '@testing-library/react';
+  ```
+
 - **Hoist a shared render into `beforeEach` — never call a render helper at the
   top of every `it`.** When the tests in a suite all render the same thing, put
   that render in `beforeEach` and reach the result through `screen`. A
