@@ -26,3 +26,12 @@ export const Default: TStory = {
 export const Accent: TStory = {
   args: { children: 'architecture', variant: 'accent' },
 };
+
+export const AsLink: TStory = {
+  args: {
+    children: 'architecture',
+    variant: 'accent',
+    as: 'a',
+    href: '/category/architecture',
+  },
+};

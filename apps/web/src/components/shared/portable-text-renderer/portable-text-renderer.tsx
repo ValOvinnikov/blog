@@ -1,5 +1,5 @@
 import type { Code, RichText as TPortableText } from '@blog/config';
-import { Heading, Prose, QuoteBlock } from '@blog/ui';
+import { Heading, InlineCode, Prose, ProseLink, QuoteBlock } from '@blog/ui';
 import {
   PortableText,
   type PortableTextComponents,
@@ -32,14 +32,16 @@ const components: PortableTextComponents = {
   },
   marks: {
     code: ({ children }: PortableTextMarkComponentProps) => (
-      <code className={s.inlineCode()}>{children}</code>
+      <InlineCode>{children}</InlineCode>
     ),
     link: ({
       children,
       value,
     }: PortableTextMarkComponentProps<ILinkAnnotation>) =>
       value?.href ? (
-        <SmartLink href={value.href}>{children}</SmartLink>
+        <ProseLink as={SmartLink} href={value.href}>
+          {children}
+        </ProseLink>
       ) : (
         <>{children}</>
       ),
