@@ -1,6 +1,6 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { Heading, PostMeta, TagList } from '@blog/ui';
+import { ArticleBody, ArticleHeader } from '@blog/ui';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 import { PostShare } from '@web/components/shared/post-share';
@@ -21,10 +21,11 @@ const s = blogPostPageVariants();
 
 /**
  * BlogPostPage — `/blog/{slug}` composition: fetches the post via
- * `service.pages.post.v1.getPost`, then composes `PostMeta` (with `PostShare`
- * passed into its `share` slot) and `PortableTextRenderer` around the
- * fetched view model, plus a `BlogPosting` JSON-LD tag. `Header`/`Footer`
- * stay owned by `[locale]/layout.tsx`.
+ * `service.pages.post.v1.getPost`, then composes `ArticleHeader` (category
+ * eyebrow links, title, `PostMeta` with `PostShare` in its share slot, lead,
+ * cover image) and `ArticleBody` (rendered `PortableTextRenderer` body)
+ * around the fetched view model, plus a `BlogPosting` JSON-LD tag.
+ * `Header`/`Footer` stay owned by `[locale]/layout.tsx`.
  */
 export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
   const post = await service.pages.post.v1.getPost(slug);
@@ -47,47 +48,48 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
     <main className={s.root()}>
       {schema && <JsonLd schema={schema} />}
 
-      {post.heroImageSanity && (
-        <div className={s.hero()}>
-          <SanityImage
-            image={post.heroImageSanity}
-            width={1200}
-            height={675}
-            sizes="(min-width: 1024px) 800px, 100vw"
-            className={s.heroImage()}
-            alt={post.heroImageAlt}
-          />
-        </div>
-      )}
-
-      <Heading level={1} visual="post" className={s.heading()}>
-        {post.title}
-      </Heading>
-
-      {post.categories.length > 0 && (
-        <TagList
-          tags={post.categories.map((category) => ({
+      <article>
+        <ArticleHeader
+          categories={post.categories.map((category) => ({
             label: category.title,
             href: routes.category(category.slug),
           }))}
           linkAs={SmartLink}
-          className={s.tags()}
+          title={post.title}
+          lead={post.excerpt}
+          meta={
+            post.author
+              ? {
+                  author: post.author,
+                  publishedAt: post.publishedAt,
+                  formattedDate: formatDate(post.publishedAt, locale),
+                  share: (
+                    <PostShare
+                      url={url}
+                      title={post.title}
+                      links={shareLinks}
+                    />
+                  ),
+                }
+              : undefined
+          }
+          coverMedia={
+            post.heroImageSanity ? (
+              <SanityImage
+                image={post.heroImageSanity}
+                width={1200}
+                height={675}
+                sizes="(min-width: 1024px) 800px, 100vw"
+                alt={post.heroImageAlt}
+              />
+            ) : undefined
+          }
         />
-      )}
 
-      {post.author && (
-        <PostMeta
-          className={s.meta()}
-          author={post.author}
-          publishedAt={post.publishedAt}
-          formattedDate={formatDate(post.publishedAt, locale)}
-          share={<PostShare url={url} title={post.title} links={shareLinks} />}
-        />
-      )}
-
-      <div className={s.body()}>
-        <PortableTextRenderer value={post.body} />
-      </div>
+        <ArticleBody className={s.body()}>
+          <PortableTextRenderer value={post.body} />
+        </ArticleBody>
+      </article>
     </main>
   );
 }

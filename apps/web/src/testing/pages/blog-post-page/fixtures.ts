@@ -8,7 +8,14 @@ export const mockPostDetail: TPostDetail = {
   publishedAt: '2026-01-15T00:00:00Z',
   heroImageUrl: 'https://cdn.example.com/hero.jpg',
   heroImageAlt: 'A hero image',
-  heroImageSanity: undefined,
+  heroImageSanity: {
+    assetId: 'image-abc123-1200x675-jpg',
+    alt: 'A hero image',
+    hotspot: undefined,
+    crop: undefined,
+    lqip: undefined,
+    dimensions: { width: 1200, height: 675, aspectRatio: 1200 / 675 },
+  },
   featured: false,
   body: [
     {

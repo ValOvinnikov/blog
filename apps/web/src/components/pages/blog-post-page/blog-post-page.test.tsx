@@ -28,7 +28,11 @@ vi.mock('next/navigation', () => ({
 }));
 
 vi.mock('@web/utils/env/env', () => ({
-  env: { NEXT_PUBLIC_SITE_URL: 'https://example.com' },
+  env: {
+    NEXT_PUBLIC_SITE_URL: 'https://example.com',
+    NEXT_PUBLIC_SANITY_PROJECT_ID: 'test-project',
+    NEXT_PUBLIC_SANITY_DATASET: 'test-dataset',
+  },
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -62,21 +66,26 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(notFoundMock).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the post title, meta, body, categories, and share links', async () => {
+  it('renders the article landmark with title, eyebrow category link, meta, and body', async () => {
     getPostMock.mockResolvedValue(mockPostDetail);
 
     const ui = await BlogPostPage({ slug: 'hello-world', locale: 'EN' });
     render(<>{ui}</>);
 
+    expect(screen.getByRole('article')).toBeVisible();
     expect(
       screen.getByRole('heading', { level: 1, name: 'Hello World' }),
     ).toBeVisible();
-    expect(screen.getByText('Body text.')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
-      'href',
-      '/category/engineering',
+
+    const categoryLinks = screen.getAllByRole('link', { name: 'Engineering' });
+    expect(categoryLinks).toHaveLength(mockPostDetail.categories.length);
+    categoryLinks.forEach((link) =>
+      expect(link).toHaveAttribute('href', '/category/engineering'),
     );
+
     expect(screen.getByText('Jane Doe')).toBeVisible();
+    expect(screen.getByAltText('A hero image')).toBeVisible();
+    expect(screen.getByText('Body text.')).toBeVisible();
 
     await userEvent.click(screen.getByRole('button', { name: /Share/ }));
     expect(screen.getByRole('menuitem', { name: /Share on X/ })).toBeVisible();
