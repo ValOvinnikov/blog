@@ -9,6 +9,7 @@ import { Fragment } from 'react';
 
 import { PopoverMenuItem } from './components/item/popover-menu-item';
 import { PopoverMenuPanel } from './components/panel/popover-menu-panel';
+import { PopoverMenuSeparator } from './components/separator/popover-menu-separator';
 import { PopoverMenuTrigger } from './components/trigger/popover-menu-trigger';
 import { popoverMenuVariants } from './popover-menu-variants';
 
@@ -20,6 +21,7 @@ const PopoverMenuSlotParts = {
 const PopoverMenuParts = {
   ...PopoverMenuSlotParts,
   Item: PopoverMenuItem,
+  Separator: PopoverMenuSeparator,
 } satisfies Record<string, ElementType>;
 
 export interface IPopoverMenuProps
@@ -29,7 +31,8 @@ export interface IPopoverMenuProps
 
 /**
  * PopoverMenu — positioned trigger + non-modal menu panel primitive
- * (`PopoverMenu.Trigger`, `PopoverMenu.Panel`, `PopoverMenu.Item`). Pure
+ * (`PopoverMenu.Trigger`, `PopoverMenu.Panel`, `PopoverMenu.Item`,
+ * `PopoverMenu.Separator`). Pure
  * structure/ARIA/styling: open/closed state, focus trap, and Escape/
  * outside-click dismissal are the caller's responsibility, since `@blog/ui`
  * never carries client-side state or a `"use client"` directive. `apps/web`

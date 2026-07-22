@@ -54,6 +54,6 @@ export const PostMeta = ({
         <span>{readingTimeMinutes} min read</span>
       </>
     )}
-    {share && <span className={s.share()}>{share}</span>}
+    {share && <div className={s.share()}>{share}</div>}
   </div>
 );

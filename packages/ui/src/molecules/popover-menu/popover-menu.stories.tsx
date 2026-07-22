@@ -40,6 +40,7 @@ const InteractiveDemo = () => {
         >
           Copy link
         </PopoverMenu.Item>
+        <PopoverMenu.Separator />
         <PopoverMenu.Item as="a" href="https://example.com">
           Share on X
         </PopoverMenu.Item>
@@ -72,6 +73,7 @@ export const Copied: TStory = {
           >
             Copied
           </PopoverMenu.Item>
+          <PopoverMenu.Separator />
           <PopoverMenu.Item as="a" href="https://example.com">
             Share on X
           </PopoverMenu.Item>

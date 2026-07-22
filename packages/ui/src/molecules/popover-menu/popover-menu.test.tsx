@@ -89,6 +89,25 @@ describe(`<${PopoverMenu.name}/>`, () => {
     expect(onClick).toHaveBeenCalledOnce();
   });
 
+  it('renders a Separator between Items with role="separator"', () => {
+    render(
+      <PopoverMenu>
+        <PopoverMenu.Trigger ariaLabel="Open menu" open panelId="p1">
+          Trigger
+        </PopoverMenu.Trigger>
+        <PopoverMenu.Panel id="p1" open>
+          <PopoverMenu.Item>Copy link</PopoverMenu.Item>
+          <PopoverMenu.Separator />
+          <PopoverMenu.Item as="a" href="https://example.com">
+            Share on X
+          </PopoverMenu.Item>
+        </PopoverMenu.Panel>
+      </PopoverMenu>,
+    );
+
+    expect(screen.getByRole('separator')).toBeVisible();
+  });
+
   it('forwards data-testid', () => {
     render(
       <PopoverMenu dataTestId="popover-menu">
