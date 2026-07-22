@@ -245,17 +245,18 @@ already settled.
 
 ## Delivery gate sequence (mandatory — never skip or bundle)
 
-Every issue follows this exact order. **Stop and wait for explicit user approval at each gate.**
+Every issue follows this exact order. **Committing is free (no approval needed); stop and wait for explicit user approval at the push and PR gates.**
 
 1. Set issue → In Progress on the board
 2. Checkout branch from `main`
 3. Do the work + run quality gates
 4. **Dispatch the `reviewer` subagent** (`.claude/agents/reviewer.md`) over the
    full diff — fix blocking findings and re-dispatch until it returns
-   `APPROVE`. Never ask to commit without an `APPROVE` on the diff as it
+   `APPROVE`. Never **push** without an `APPROVE` on the diff as it
    stands; new changes invalidate a prior `APPROVE`.
-5. **Ask to commit** — present "commit now" vs "review first"; wait for answer
-6. **Ask to push** — separate question, after commit; wait for answer
+5. **Commit** the reviewed work — no approval needed; committing is free (local
+   and reversible). Don't push it yet.
+6. **Ask to push** — explicit approval required; separate question; wait for answer
 7. **Ask to open PR** — separate question, after push; wait for answer.
    Once approved: run `gh pr create`, then **immediately** set the issue → Code Review
    on the board — do not report the PR URL until the board update is done.
@@ -269,7 +270,7 @@ Every issue follows this exact order. **Stop and wait for explicit user approval
    up. See `develop-feature` step 8 for the safety checks — never delete
    uncommitted work.
 
-**Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work only — never the commit, push, or PR.** Those three gates always require fresh, explicit confirmation.
+**Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work and commits — never the push or PR.** Those two gates always require fresh, explicit confirmation.
 
 **Board reconciliation (not a gate — no approval needed).** After step 7 opens
 a PR, and again after any PR merges, dispatch the `board-keeper` subagent
@@ -332,4 +333,5 @@ push, so it stays under the push gate.
   deploy.
 - Read or commit `.env*` files.
 - Add a cross-layer import that creates a cycle.
-- Commit, push, or open a PR without explicit approval for that specific action.
+- Push or open a PR without explicit approval for that specific action.
+  (Committing needs no approval — commit freely as work reaches a coherent state.)
