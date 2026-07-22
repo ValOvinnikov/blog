@@ -1,5 +1,4 @@
 import { tv } from '@blog/ui/lib/styling';
-import type { VariantProps } from 'tailwind-variants';
 
 export const eyebrowVariants = tv({
   base: [
@@ -17,5 +16,3 @@ export const eyebrowVariants = tv({
     },
   },
 });
-
-export type TEyebrowVariants = VariantProps<typeof eyebrowVariants>;
