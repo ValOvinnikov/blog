@@ -24,6 +24,7 @@ frontend if a consumer is out of date.
 | Category | `/category/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589)                                                      |
 | Tag      | `/tag/[slug]` (+ `/page/N`)      | ✅ Built — unpaginated + paginated tag archives, shared-tag related posts, per-tag RSS (#674)                  |
 | Author   | `/author/[slug]`                 | ✅ Built — profile + posts by author (#327/#593-595)                                                           |
+| Topics   | `/topics`                        | ✅ Built — hub listing every category with post counts, links to archives (#750/#751/#752)                     |
 | Page     | `/[slug]`                        | ✅ Built — generic page route (#285), slug space guarded by `RESERVED_SLUGS` (#328)                            |
 | Feeds    | sitemap/robots/RSS               | ✅ Built — Phase 3 (#92), generic pages listed in the sitemap (#285); tag archives + per-tag RSS added in #674 |
 
@@ -46,7 +47,8 @@ built in that phase is merged. Post taxonomy (category `max: 4` cap + the
   generic `/[slug]`; `RESERVED_SLUGS` (#328) stops editors creating pages those
   segments would shadow. No catch-all routes for fixed-shape paths. `tag` is in
   `RESERVED_SLUGS` (#674) so `/tag/[slug]` can never be shadowed by a generic
-  page slugged `tag`.
+  page slugged `tag`; `topics` is in `RESERVED_SLUGS` (#752) so `/topics` can
+  never be shadowed by a generic page slugged `topics`.
 - **Tag axis** (#674) — `/tag/[slug]` (+ `/page/N`) mirrors the category
   route's pagination/canonical/404 rules exactly (`routes.tag(slug, page?)`).
   Post detail (`/blog/[slug]`) renders the post's tags as `Article.Footer`
