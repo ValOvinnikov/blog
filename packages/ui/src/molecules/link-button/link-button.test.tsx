@@ -1,11 +1,20 @@
-import { render, screen } from '@testing-library/react';
+import {
+  customRender,
+  renderElement,
+  screen,
+} from '@blog/ui/testing/custom-render';
 import type { AnchorHTMLAttributes } from 'react';
 
 import { LinkButton } from './link-button';
 
+const setup = customRender(LinkButton, {
+  href: '/blog',
+  children: 'Read more',
+});
+
 describe(`<${LinkButton.name}/>`, () => {
   it('renders an anchor by default', () => {
-    render(<LinkButton href="/blog">Read more</LinkButton>);
+    setup();
 
     expect(screen.getByRole('link', { name: 'Read more' })).toHaveAttribute(
       'href',
@@ -21,7 +30,7 @@ describe(`<${LinkButton.name}/>`, () => {
       <a data-custom-link="true" href={href} {...rest} />
     );
 
-    render(
+    renderElement(
       <LinkButton as={CustomLink} href="/about">
         About
       </LinkButton>,
@@ -34,11 +43,7 @@ describe(`<${LinkButton.name}/>`, () => {
   });
 
   it('forwards data-testid', () => {
-    render(
-      <LinkButton href="/blog" dataTestId="blog-link">
-        Blog
-      </LinkButton>,
-    );
+    setup({ dataTestId: 'blog-link', children: 'Blog' });
 
     expect(screen.getByTestId('blog-link')).toBeVisible();
   });

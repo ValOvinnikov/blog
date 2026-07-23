@@ -1,7 +1,8 @@
-import { render } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { customRender } from '@web/testing/custom-render';
 
 import { JsonLd } from './json-ld';
+
+const setup = customRender(JsonLd, { schema: {} });
 
 describe(`<${JsonLd.name}/>`, () => {
   it('renders a script tag of type application/ld+json with the serialized schema', () => {
@@ -11,7 +12,7 @@ describe(`<${JsonLd.name}/>`, () => {
       headline: 'Hello world',
     };
 
-    const { container } = render(<JsonLd schema={schema} />);
+    const { container } = setup({ schema });
 
     const script = container.querySelector('script');
     expect(script).toHaveAttribute('type', 'application/ld+json');
@@ -21,7 +22,7 @@ describe(`<${JsonLd.name}/>`, () => {
   it('escapes </script> sequences in string fields to prevent premature tag closure', () => {
     const schema = { description: '</script><script>alert(1)</script>' };
 
-    const { container } = render(<JsonLd schema={schema} />);
+    const { container } = setup({ schema });
 
     const script = container.querySelector('script');
     expect(script?.innerHTML).not.toContain('</script>');
@@ -31,7 +32,7 @@ describe(`<${JsonLd.name}/>`, () => {
   it('escapes a bare ampersand', () => {
     const schema = { description: 'Tom & Jerry' };
 
-    const { container } = render(<JsonLd schema={schema} />);
+    const { container } = setup({ schema });
 
     const script = container.querySelector('script');
     expect(script?.innerHTML).toBe('{"description":"Tom \\u0026 Jerry"}');

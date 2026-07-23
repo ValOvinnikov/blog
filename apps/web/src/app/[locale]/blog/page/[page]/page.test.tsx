@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { customRenderAsync } from '@web/testing/custom-render';
 
 import BlogListNumberedPage from './page';
 
@@ -52,6 +52,10 @@ vi.mock('next-intl/server', () => ({
   setRequestLocale: vi.fn(),
 }));
 
+const setup = customRenderAsync(BlogListNumberedPage, {
+  params: Promise.resolve({ locale: 'EN', page: '1' }),
+});
+
 describe('BlogListNumberedPage', () => {
   beforeEach(() => {
     permanentRedirectMock.mockClear();
@@ -59,11 +63,7 @@ describe('BlogListNumberedPage', () => {
   });
 
   it('redirects /blog/page/1 to /blog (canonical page 1 has one URL)', async () => {
-    await expect(
-      BlogListNumberedPage({
-        params: Promise.resolve({ locale: 'EN', page: '1' }),
-      }),
-    ).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(permanentRedirectMock).toHaveBeenCalledWith({
       href: '/blog',
@@ -75,9 +75,7 @@ describe('BlogListNumberedPage', () => {
     'hard-404s a non-canonical page param (%s)',
     async (raw) => {
       await expect(
-        BlogListNumberedPage({
-          params: Promise.resolve({ locale: 'EN', page: raw }),
-        }),
+        setup({ params: Promise.resolve({ locale: 'EN', page: raw }) }),
       ).rejects.toThrow('NEXT_NOT_FOUND');
 
       expect(notFoundMock).toHaveBeenCalled();

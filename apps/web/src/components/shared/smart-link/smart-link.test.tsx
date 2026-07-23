@@ -1,11 +1,15 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { customRender, screen } from '@web/testing/custom-render';
 
 import { SmartLink } from './smart-link';
 
+const setup = customRender(SmartLink, {
+  href: '/blog/hello-world',
+  children: 'Read post',
+});
+
 describe('SmartLink', () => {
   it('renders the router Link for an internal href, without target or rel', () => {
-    render(<SmartLink href="/blog/hello-world">Read post</SmartLink>);
+    setup();
 
     const link = screen.getByRole('link', { name: 'Read post' });
     expect(link).toHaveAttribute('href', '/blog/hello-world');
@@ -14,11 +18,11 @@ describe('SmartLink', () => {
   });
 
   it('adds target and rel for an external href opening in a new tab', () => {
-    render(
-      <SmartLink href="https://example.com" target="_blank">
-        Visit site
-      </SmartLink>,
-    );
+    setup({
+      href: 'https://example.com',
+      target: '_blank',
+      children: 'Visit site',
+    });
 
     const link = screen.getByRole('link', { name: 'Visit site' });
     expect(link.tagName).toBe('A');

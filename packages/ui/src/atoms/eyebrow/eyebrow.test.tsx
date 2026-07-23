@@ -1,21 +1,25 @@
-import { render, screen } from '@testing-library/react';
+import { customRender, screen } from '@blog/ui/testing/custom-render';
 import type { ReactNode } from 'react';
 
 import { Eyebrow } from './eyebrow';
 
+const setup = customRender(Eyebrow, {
+  children: 'Featured Post',
+});
+
 describe(`<${Eyebrow.name}/>`, () => {
   it('renders children', () => {
-    render(<Eyebrow>Featured Post</Eyebrow>);
+    setup();
     expect(screen.getByText('Featured Post')).toBeVisible();
   });
 
   it('renders as a <p> element', () => {
-    const { container } = render(<Eyebrow>Label</Eyebrow>);
+    const { container } = setup({ children: 'Label' });
     expect(container.firstChild?.nodeName).toBe('P');
   });
 
   it('renders as a link when href is provided', () => {
-    render(<Eyebrow href="/category/engineering">Engineering</Eyebrow>);
+    setup({ href: '/category/engineering', children: 'Engineering' });
     expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
       'href',
       '/category/engineering',
@@ -34,11 +38,11 @@ describe(`<${Eyebrow.name}/>`, () => {
         {children}
       </a>
     );
-    render(
-      <Eyebrow href="/category/engineering" linkAs={CustomLink}>
-        Engineering
-      </Eyebrow>,
-    );
+    setup({
+      href: '/category/engineering',
+      linkAs: CustomLink,
+      children: 'Engineering',
+    });
     expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
       'data-custom',
       'true',
@@ -46,7 +50,7 @@ describe(`<${Eyebrow.name}/>`, () => {
   });
 
   it('forwards dataTestId to the root element', () => {
-    render(<Eyebrow dataTestId="eyebrow">Featured Post</Eyebrow>);
+    setup({ dataTestId: 'eyebrow' });
     expect(screen.getByTestId('eyebrow')).toBeVisible();
   });
 });

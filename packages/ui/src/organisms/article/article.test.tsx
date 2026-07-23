@@ -1,5 +1,5 @@
+import { renderElement, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import { render, screen } from '@testing-library/react';
 
 import { Article } from './article';
 
@@ -17,7 +17,7 @@ const meta = {
 
 describe(`<${Article.name}/>`, () => {
   it('renders as an <article> landmark wrapping Header and Body', () => {
-    render(
+    renderElement(
       <Article>
         <Article.Header title="Building a Design System" meta={meta} />
         <Article.Body>
@@ -36,7 +36,7 @@ describe(`<${Article.name}/>`, () => {
   });
 
   it('renders a single category as a link to its route', () => {
-    render(
+    renderElement(
       <Article>
         <Article.Header
           title="Building a Design System"
@@ -55,7 +55,7 @@ describe(`<${Article.name}/>`, () => {
   });
 
   it('renders multiple categories as separate links', () => {
-    render(
+    renderElement(
       <Article>
         <Article.Header
           title="Building a Design System"
@@ -80,7 +80,7 @@ describe(`<${Article.name}/>`, () => {
   });
 
   it('does not render any category links when categories is omitted', () => {
-    render(
+    renderElement(
       <Article>
         <Article.Header title="Building a Design System" meta={meta} />
         <Article.Body>
@@ -92,7 +92,7 @@ describe(`<${Article.name}/>`, () => {
   });
 
   it('does not render any category links when categories is an empty array', () => {
-    render(
+    renderElement(
       <Article>
         <Article.Header
           title="Building a Design System"
@@ -108,7 +108,7 @@ describe(`<${Article.name}/>`, () => {
   });
 
   it('renders the lead paragraph when provided', () => {
-    render(
+    renderElement(
       <Article>
         <Article.Header
           title="Building a Design System"
@@ -126,7 +126,7 @@ describe(`<${Article.name}/>`, () => {
   });
 
   it('does not render a lead paragraph when omitted', () => {
-    render(
+    renderElement(
       <Article>
         <Article.Header title="Building a Design System" meta={meta} />
         <Article.Body>
@@ -140,7 +140,7 @@ describe(`<${Article.name}/>`, () => {
   });
 
   it('does not render a PostMeta strip when meta is omitted', () => {
-    render(
+    renderElement(
       <Article>
         <Article.Header title="Building a Design System" />
         <Article.Body>
@@ -153,7 +153,7 @@ describe(`<${Article.name}/>`, () => {
   });
 
   it('renders coverMedia content when provided', () => {
-    render(
+    renderElement(
       <Article>
         <Article.Header
           title="Building a Design System"
@@ -169,7 +169,7 @@ describe(`<${Article.name}/>`, () => {
   });
 
   it('does not render a coverMedia wrapper when omitted', () => {
-    render(
+    renderElement(
       <Article>
         <Article.Header title="Building a Design System" meta={meta} />
         <Article.Body>
@@ -181,7 +181,7 @@ describe(`<${Article.name}/>`, () => {
   });
 
   it('renders Article.Body children', () => {
-    render(
+    renderElement(
       <Article>
         <Article.Header title="Building a Design System" meta={meta} />
         <Article.Body>
@@ -193,7 +193,7 @@ describe(`<${Article.name}/>`, () => {
   });
 
   it('forwards dataTestId to the root element', () => {
-    render(
+    renderElement(
       <Article dataTestId="article">
         <Article.Header title="Building a Design System" meta={meta} />
         <Article.Body>

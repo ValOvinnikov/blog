@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { customRenderAsync } from '@web/testing/custom-render';
 
 import CategoryNumberedPage, {
   generateMetadata,
@@ -138,6 +138,14 @@ describe('CategoryNumberedPage generateMetadata', () => {
   });
 });
 
+const setup = customRenderAsync(CategoryNumberedPage, {
+  params: Promise.resolve({
+    locale: 'EN',
+    slug: 'engineering',
+    page: '1',
+  }),
+});
+
 describe('CategoryNumberedPage', () => {
   beforeEach(() => {
     permanentRedirectMock.mockClear();
@@ -145,15 +153,7 @@ describe('CategoryNumberedPage', () => {
   });
 
   it('redirects /category/[slug]/page/1 to /category/[slug] (canonical page 1 has one URL)', async () => {
-    await expect(
-      CategoryNumberedPage({
-        params: Promise.resolve({
-          locale: 'EN',
-          slug: 'engineering',
-          page: '1',
-        }),
-      }),
-    ).rejects.toThrow('NEXT_REDIRECT');
+    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(permanentRedirectMock).toHaveBeenCalledWith({
       href: '/category/engineering',
@@ -165,7 +165,7 @@ describe('CategoryNumberedPage', () => {
     'hard-404s a non-canonical page param (%s)',
     async (raw) => {
       await expect(
-        CategoryNumberedPage({
+        setup({
           params: Promise.resolve({
             locale: 'EN',
             slug: 'engineering',

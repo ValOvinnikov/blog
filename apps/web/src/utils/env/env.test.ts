@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+export {};
 
 const ENV_KEYS = [
   'SANITY_REVALIDATE_SECRET',

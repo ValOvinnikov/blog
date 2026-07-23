@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+export {};
 
 const {
   getPostParamsMock,

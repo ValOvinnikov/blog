@@ -1,5 +1,4 @@
 import { BRAND_VARIANTS } from '@blog/config';
-import { describe, expect, it } from 'vitest';
 
 import { buildRootHtmlClassName } from './root-html-class-name';
 

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+export {};
 
 const { resolveDefaultSocialImagePropsMock, buildDefaultSocialImageMock } =
   vi.hoisted(() => ({

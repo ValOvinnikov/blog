@@ -1,14 +1,24 @@
+import {
+  customRender,
+  renderElement,
+  screen,
+} from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import { render, screen } from '@testing-library/react';
 import type { AnchorHTMLAttributes } from 'react';
 
 import { CommandLink } from './command-link';
 
 faker.seed(123);
 
+const setup = customRender(CommandLink, {
+  href: '/',
+  command: 'cd ~',
+  ariaLabel: 'Return home',
+});
+
 describe(`<${CommandLink.name}/>`, () => {
   it('renders an anchor with the given href', () => {
-    render(<CommandLink href="/" command="cd ~" ariaLabel="Return home" />);
+    setup();
     expect(screen.getByRole('link', { name: 'Return home' })).toHaveAttribute(
       'href',
       '/',
@@ -17,7 +27,7 @@ describe(`<${CommandLink.name}/>`, () => {
 
   it('uses ariaLabel as the accessible name, not the visible command', () => {
     const command = faker.hacker.phrase();
-    render(<CommandLink href="/" command={command} ariaLabel="Return home" />);
+    setup({ command });
     expect(screen.getByRole('link', { name: 'Return home' })).toBeVisible();
     expect(
       screen.queryByRole('link', { name: command }),
@@ -26,14 +36,7 @@ describe(`<${CommandLink.name}/>`, () => {
   });
 
   it('ignores a raw aria-label prop in favor of ariaLabel', () => {
-    render(
-      <CommandLink
-        href="/"
-        command="cd ~"
-        ariaLabel="Return home"
-        aria-label="Wrong label"
-      />,
-    );
+    setup({ 'aria-label': 'Wrong label' });
     expect(screen.getByRole('link', { name: 'Return home' })).toBeVisible();
     expect(
       screen.queryByRole('link', { name: 'Wrong label' }),
@@ -41,32 +44,18 @@ describe(`<${CommandLink.name}/>`, () => {
   });
 
   it('marks the prompt and arrow as decorative', () => {
-    render(<CommandLink href="/" command="cd ~" ariaLabel="Return home" />);
+    setup();
     expect(screen.getByText('$')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByText('→')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('marks the cursor as decorative when shown', () => {
-    render(
-      <CommandLink
-        href="/"
-        command="cd ~"
-        ariaLabel="Return home"
-        showCursor
-      />,
-    );
+    setup({ showCursor: true });
     expect(screen.getByTestId('cursor')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('omits the arrow when showArrow is false', () => {
-    render(
-      <CommandLink
-        href="/"
-        command="cd ~"
-        ariaLabel="Return home"
-        showArrow={false}
-      />,
-    );
+    setup({ showArrow: false });
     expect(screen.queryByText('→')).not.toBeInTheDocument();
   });
 
@@ -81,7 +70,7 @@ describe(`<${CommandLink.name}/>`, () => {
       </a>
     );
 
-    render(
+    renderElement(
       <CommandLink
         as={CustomLink}
         href="/about"
@@ -96,26 +85,12 @@ describe(`<${CommandLink.name}/>`, () => {
   });
 
   it('forwards data-testid', () => {
-    render(
-      <CommandLink
-        href="/"
-        command="cd ~"
-        ariaLabel="Return home"
-        dataTestId="command-link"
-      />,
-    );
+    setup({ dataTestId: 'command-link' });
     expect(screen.getByTestId('command-link')).toBeVisible();
   });
 
   it('merges extra className', () => {
-    render(
-      <CommandLink
-        href="/"
-        command="cd ~"
-        ariaLabel="Return home"
-        className="ml-2"
-      />,
-    );
+    setup({ className: 'ml-2' });
     expect(
       screen.getByRole('link', { name: 'Return home' }).className,
     ).toContain('ml-2');

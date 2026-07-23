@@ -1,5 +1,4 @@
-import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { GenericPage } from './generic-page';
 
@@ -31,6 +30,11 @@ vi.mock('@web/modules/module-renderer', () => ({
   ),
 }));
 
+const setup = customRenderAsync(GenericPage, {
+  slug: 'about-us',
+  locale: 'EN',
+});
+
 describe(`<${GenericPage.name}/>`, () => {
   beforeEach(() => {
     getPageMock.mockReset();
@@ -40,9 +44,7 @@ describe(`<${GenericPage.name}/>`, () => {
   it('calls notFound() when the page does not exist', async () => {
     getPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
 
-    await expect(
-      GenericPage({ slug: 'missing', locale: 'EN' }),
-    ).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(notFoundMock).toHaveBeenCalledTimes(1);
   });
@@ -64,8 +66,7 @@ describe(`<${GenericPage.name}/>`, () => {
       },
     });
 
-    const ui = await GenericPage({ slug: 'about-us', locale: 'EN' });
-    render(<>{ui}</>);
+    await setup();
 
     expect(screen.getByTestId('module-renderer')).toHaveTextContent(
       '1 modules',

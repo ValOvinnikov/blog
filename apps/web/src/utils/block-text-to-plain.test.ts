@@ -1,5 +1,4 @@
 import type { BlockText } from '@blog/config';
-import { describe, expect, it } from 'vitest';
 
 import { blockTextToPlain } from './block-text-to-plain';
 

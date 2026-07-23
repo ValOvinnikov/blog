@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { customRender, screen, within } from '@blog/ui/testing/custom-render';
 import type { ReactNode } from 'react';
 
 import { Pagination } from './pagination';
@@ -6,16 +6,18 @@ import { Pagination } from './pagination';
 const createHref = (page: number) =>
   page === 1 ? '/blog' : `/blog/page/${page}`;
 
-const baseProps = {
+const setup = customRender(Pagination, {
   createHref,
   ariaLabel: 'Blog pages',
   previousLabel: 'Previous',
   nextLabel: 'Next',
-};
+  currentPage: 2,
+  totalPages: 3,
+});
 
 describe(`<${Pagination.name}/>`, () => {
   it('renders a labeled nav with a link per page and correct hrefs', () => {
-    render(<Pagination {...baseProps} currentPage={2} totalPages={3} />);
+    setup();
 
     expect(
       screen.getByRole('navigation', { name: 'Blog pages' }),
@@ -35,14 +37,14 @@ describe(`<${Pagination.name}/>`, () => {
   });
 
   it('exposes the page list with an explicit list role', () => {
-    render(<Pagination {...baseProps} currentPage={2} totalPages={3} />);
+    setup();
 
     const nav = screen.getByRole('navigation', { name: 'Blog pages' });
     expect(within(nav).getByRole('list')).toBeVisible();
   });
 
   it('marks the current page with aria-current', () => {
-    render(<Pagination {...baseProps} currentPage={2} totalPages={3} />);
+    setup();
 
     expect(screen.getByRole('link', { name: '2' })).toHaveAttribute(
       'aria-current',
@@ -54,9 +56,7 @@ describe(`<${Pagination.name}/>`, () => {
   });
 
   it('hides previous on the first page and next on the last page', () => {
-    const { rerender } = render(
-      <Pagination {...baseProps} currentPage={1} totalPages={3} />,
-    );
+    const { rerender } = setup({ currentPage: 1 });
     expect(
       screen.queryByRole('link', { name: 'Previous' }),
     ).not.toBeInTheDocument();
@@ -65,7 +65,16 @@ describe(`<${Pagination.name}/>`, () => {
       '/blog/page/2',
     );
 
-    rerender(<Pagination {...baseProps} currentPage={3} totalPages={3} />);
+    rerender(
+      <Pagination
+        createHref={createHref}
+        ariaLabel="Blog pages"
+        previousLabel="Previous"
+        nextLabel="Next"
+        currentPage={3}
+        totalPages={3}
+      />,
+    );
     expect(screen.getByRole('link', { name: 'Previous' })).toHaveAttribute(
       'href',
       '/blog/page/2',
@@ -76,9 +85,7 @@ describe(`<${Pagination.name}/>`, () => {
   });
 
   it('renders nothing when there is a single page', () => {
-    const { container } = render(
-      <Pagination {...baseProps} currentPage={1} totalPages={1} />,
-    );
+    const { container } = setup({ currentPage: 1, totalPages: 1 });
     expect(container).toBeEmptyDOMElement();
   });
 
@@ -95,28 +102,14 @@ describe(`<${Pagination.name}/>`, () => {
       </a>
     );
 
-    render(
-      <Pagination
-        {...baseProps}
-        currentPage={2}
-        totalPages={3}
-        linkAs={CustomLink}
-      />,
-    );
+    setup({ linkAs: CustomLink });
 
     // 3 page links + prev + next
     expect(screen.getAllByTestId('custom-link')).toHaveLength(5);
   });
 
   it('forwards data-testid', () => {
-    render(
-      <Pagination
-        {...baseProps}
-        currentPage={1}
-        totalPages={2}
-        dataTestId="blog-pagination"
-      />,
-    );
+    setup({ currentPage: 1, totalPages: 2, dataTestId: 'blog-pagination' });
     expect(screen.getByTestId('blog-pagination')).toBeVisible();
   });
 });

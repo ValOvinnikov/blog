@@ -9,7 +9,6 @@ import {
   resolveOpenGraph,
   resolveTwitter,
 } from 'next/dist/lib/metadata/resolvers/resolve-opengraph';
-import { describe, expect, it } from 'vitest';
 
 import { toMetadata } from './to-metadata';
 

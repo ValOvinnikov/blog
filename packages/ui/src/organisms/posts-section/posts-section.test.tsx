@@ -1,5 +1,5 @@
+import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 import { type IPostCardData, PostsSection } from './posts-section';
@@ -18,19 +18,21 @@ const makePost = (): IPostCardData => ({
 
 const posts = faker.helpers.multiple(makePost, { count: 3 });
 
+const setup = customRender(PostsSection, {
+  title: 'Latest',
+  titleId: 'latest-posts',
+  posts,
+});
+
 describe(`<${PostsSection.name}/>`, () => {
   it('labels the section with its title', () => {
-    render(
-      <PostsSection title="Latest" titleId="latest-posts" posts={posts} />,
-    );
+    setup();
 
     expect(screen.getByRole('region', { name: 'Latest' })).toBeVisible();
   });
 
   it('renders a PostCard for each post', () => {
-    render(
-      <PostsSection title="Latest" titleId="latest-posts" posts={posts} />,
-    );
+    setup();
 
     for (const post of posts) {
       expect(
@@ -44,22 +46,13 @@ describe(`<${PostsSection.name}/>`, () => {
   });
 
   it('returns null when posts is empty', () => {
-    const { container } = render(
-      <PostsSection title="Latest" titleId="latest-posts" posts={[]} />,
-    );
+    const { container } = setup({ posts: [] });
 
     expect(container).toBeEmptyDOMElement();
   });
 
   it('forwards data-testid', () => {
-    render(
-      <PostsSection
-        title="Latest"
-        titleId="latest-posts"
-        posts={posts}
-        dataTestId="latest-posts-section"
-      />,
-    );
+    setup({ dataTestId: 'latest-posts-section' });
 
     expect(screen.getByTestId('latest-posts-section')).toBeVisible();
   });
@@ -77,14 +70,7 @@ describe(`<${PostsSection.name}/>`, () => {
       </a>
     );
 
-    render(
-      <PostsSection
-        title="Latest"
-        titleId="latest-posts"
-        posts={posts}
-        linkAs={CustomLink}
-      />,
-    );
+    setup({ linkAs: CustomLink });
 
     expect(screen.getAllByTestId('custom-link')).toHaveLength(posts.length);
   });
