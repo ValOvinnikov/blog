@@ -29,11 +29,14 @@ const tag = {
 describe('buildTagMetadata', () => {
   it('builds metadata from the tag resolved seo, self-canonical to /tag/[slug]', async () => {
     getTagPageMock.mockResolvedValue({
-      tag,
-      posts: [],
-      currentPage: 1,
-      totalPages: 1,
-      total: 0,
+      ok: true,
+      data: {
+        tag,
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
+      },
     });
 
     const metadata = await buildTagMetadata('typescript');
@@ -50,20 +53,34 @@ describe('buildTagMetadata', () => {
   });
 
   it('returns empty metadata when the tag does not exist', async () => {
-    getTagPageMock.mockResolvedValue(null);
+    getTagPageMock.mockResolvedValue({ ok: true, data: null });
 
     const metadata = await buildTagMetadata('missing');
 
     expect(metadata).toEqual({});
   });
 
+  it('returns empty metadata when the tag fetch fails', async () => {
+    getTagPageMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+
+    const metadata = await buildTagMetadata('typescript');
+
+    expect(metadata).toEqual({});
+  });
+
   it('builds page-N metadata with a "– Page N" suffix, self-canonical to /tag/[slug]/page/N — never /tag/[slug]', async () => {
     getTagPageMock.mockResolvedValue({
-      tag,
-      posts: [],
-      currentPage: 2,
-      totalPages: 3,
-      total: 20,
+      ok: true,
+      data: {
+        tag,
+        posts: [],
+        currentPage: 2,
+        totalPages: 3,
+        total: 20,
+      },
     });
 
     const metadata = await buildTagMetadata('typescript', 2);
@@ -79,7 +96,7 @@ describe('buildTagMetadata', () => {
   });
 
   it('returns empty metadata for page N when the tag does not exist', async () => {
-    getTagPageMock.mockResolvedValue(null);
+    getTagPageMock.mockResolvedValue({ ok: true, data: null });
 
     const metadata = await buildTagMetadata('missing', 2);
 

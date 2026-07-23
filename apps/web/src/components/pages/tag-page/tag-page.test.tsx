@@ -58,26 +58,43 @@ describe('TagPage', () => {
   });
 
   it('calls notFound() when the tag does not exist', async () => {
-    getTagPageMock.mockResolvedValue(null);
+    getTagPageMock.mockResolvedValue({ ok: true, data: null });
 
     await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
+  it('calls notFound() when the fetch fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getTagPageMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+
+    errorSpy.mockRestore();
+  });
+
   it('renders the tag heading, description, and posts', async () => {
     getTagPageMock.mockResolvedValue({
-      tag: {
-        id: 'tag-1',
-        title: 'TypeScript',
-        slug: 'typescript',
-        description: 'The latest TypeScript posts.',
-        seo,
+      ok: true,
+      data: {
+        tag: {
+          id: 'tag-1',
+          title: 'TypeScript',
+          slug: 'typescript',
+          description: 'The latest TypeScript posts.',
+          seo,
+        },
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
       },
-      posts: [post],
-      currentPage: 1,
-      totalPages: 1,
-      total: 1,
     });
 
     await setup();
@@ -95,17 +112,20 @@ describe('TagPage', () => {
 
   it('renders the tag heading with no posts section when the tag has no posts', async () => {
     getTagPageMock.mockResolvedValue({
-      tag: {
-        id: 'tag-1',
-        title: 'TypeScript',
-        slug: 'typescript',
-        description: 'The latest TypeScript posts.',
-        seo,
+      ok: true,
+      data: {
+        tag: {
+          id: 'tag-1',
+          title: 'TypeScript',
+          slug: 'typescript',
+          description: 'The latest TypeScript posts.',
+          seo,
+        },
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
       },
-      posts: [],
-      currentPage: 1,
-      totalPages: 1,
-      total: 0,
     });
 
     await setup();
@@ -118,17 +138,20 @@ describe('TagPage', () => {
 
   it('calls getTagPage with the fixed itemsPerPage, page undefined, on page 1', async () => {
     getTagPageMock.mockResolvedValue({
-      tag: {
-        id: 'tag-1',
-        title: 'TypeScript',
-        slug: 'typescript',
-        description: 'The latest TypeScript posts.',
-        seo,
+      ok: true,
+      data: {
+        tag: {
+          id: 'tag-1',
+          title: 'TypeScript',
+          slug: 'typescript',
+          description: 'The latest TypeScript posts.',
+          seo,
+        },
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
       },
-      posts: [post],
-      currentPage: 1,
-      totalPages: 1,
-      total: 1,
     });
 
     await setup();
@@ -141,17 +164,20 @@ describe('TagPage', () => {
 
   it('calls the paginated getTagPage with the fixed itemsPerPage when a page is given', async () => {
     getTagPageMock.mockResolvedValue({
-      tag: {
-        id: 'tag-1',
-        title: 'TypeScript',
-        slug: 'typescript',
-        description: 'The latest TypeScript posts.',
-        seo,
+      ok: true,
+      data: {
+        tag: {
+          id: 'tag-1',
+          title: 'TypeScript',
+          slug: 'typescript',
+          description: 'The latest TypeScript posts.',
+          seo,
+        },
+        posts: [post],
+        currentPage: 2,
+        totalPages: 3,
+        total: 20,
       },
-      posts: [post],
-      currentPage: 2,
-      totalPages: 3,
-      total: 20,
     });
 
     await setup({ page: 2 });
@@ -164,17 +190,20 @@ describe('TagPage', () => {
 
   it('renders pagination on page 1 when there is more than one page', async () => {
     getTagPageMock.mockResolvedValue({
-      tag: {
-        id: 'tag-1',
-        title: 'TypeScript',
-        slug: 'typescript',
-        description: 'The latest TypeScript posts.',
-        seo,
+      ok: true,
+      data: {
+        tag: {
+          id: 'tag-1',
+          title: 'TypeScript',
+          slug: 'typescript',
+          description: 'The latest TypeScript posts.',
+          seo,
+        },
+        posts: [post],
+        currentPage: 1,
+        totalPages: 3,
+        total: 20,
       },
-      posts: [post],
-      currentPage: 1,
-      totalPages: 3,
-      total: 20,
     });
 
     await setup();
@@ -184,17 +213,20 @@ describe('TagPage', () => {
 
   it('renders pagination wired to routes.tag(slug, page) when a page is given', async () => {
     getTagPageMock.mockResolvedValue({
-      tag: {
-        id: 'tag-1',
-        title: 'TypeScript',
-        slug: 'typescript',
-        description: 'The latest TypeScript posts.',
-        seo,
+      ok: true,
+      data: {
+        tag: {
+          id: 'tag-1',
+          title: 'TypeScript',
+          slug: 'typescript',
+          description: 'The latest TypeScript posts.',
+          seo,
+        },
+        posts: [post],
+        currentPage: 2,
+        totalPages: 3,
+        total: 20,
       },
-      posts: [post],
-      currentPage: 2,
-      totalPages: 3,
-      total: 20,
     });
 
     await setup({ page: 2 });
@@ -206,17 +238,20 @@ describe('TagPage', () => {
 
   it('calls notFound() when the requested page is beyond totalPages', async () => {
     getTagPageMock.mockResolvedValue({
-      tag: {
-        id: 'tag-1',
-        title: 'TypeScript',
-        slug: 'typescript',
-        description: 'The latest TypeScript posts.',
-        seo,
+      ok: true,
+      data: {
+        tag: {
+          id: 'tag-1',
+          title: 'TypeScript',
+          slug: 'typescript',
+          description: 'The latest TypeScript posts.',
+          seo,
+        },
+        posts: [],
+        currentPage: 5,
+        totalPages: 1,
+        total: 1,
       },
-      posts: [],
-      currentPage: 5,
-      totalPages: 1,
-      total: 1,
     });
 
     await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');

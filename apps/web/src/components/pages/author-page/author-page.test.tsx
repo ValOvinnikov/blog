@@ -70,20 +70,37 @@ describe('AuthorPage', () => {
   });
 
   it('calls notFound() when the author does not exist', async () => {
-    getAuthorPageMock.mockResolvedValue(null);
+    getAuthorPageMock.mockResolvedValue({ ok: true, data: null });
 
     await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
+  it('calls notFound() when the fetch fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getAuthorPageMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+
+    errorSpy.mockRestore();
+  });
+
   it('renders the author role, name, bio, and social links', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author,
-      posts: [],
-      currentPage: 1,
-      totalPages: 1,
-      total: 0,
+      ok: true,
+      data: {
+        author,
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
+      },
     });
 
     await setup();
@@ -107,11 +124,14 @@ describe('AuthorPage', () => {
 
   it('renders without a role and without social links when none are authored', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author: { ...author, role: undefined, socialLinks: [] },
-      posts: [],
-      currentPage: 1,
-      totalPages: 1,
-      total: 0,
+      ok: true,
+      data: {
+        author: { ...author, role: undefined, socialLinks: [] },
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
+      },
     });
 
     await setup();
@@ -122,11 +142,14 @@ describe('AuthorPage', () => {
 
   it('renders the author posts via PostsSection', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author,
-      posts: [post],
-      currentPage: 1,
-      totalPages: 1,
-      total: 1,
+      ok: true,
+      data: {
+        author,
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
     });
 
     await setup();
@@ -138,11 +161,14 @@ describe('AuthorPage', () => {
 
   it('renders no posts section when the author has no posts', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author,
-      posts: [],
-      currentPage: 1,
-      totalPages: 1,
-      total: 0,
+      ok: true,
+      data: {
+        author,
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
+      },
     });
 
     await setup();
@@ -154,11 +180,14 @@ describe('AuthorPage', () => {
 
   it('calls getAuthorPage with the fixed itemsPerPage, page undefined, on page 1', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author,
-      posts: [post],
-      currentPage: 1,
-      totalPages: 1,
-      total: 1,
+      ok: true,
+      data: {
+        author,
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
     });
 
     await setup();
@@ -171,11 +200,14 @@ describe('AuthorPage', () => {
 
   it('calls the paginated getAuthorPage with the fixed itemsPerPage when a page is given', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author,
-      posts: [post],
-      currentPage: 2,
-      totalPages: 3,
-      total: 20,
+      ok: true,
+      data: {
+        author,
+        posts: [post],
+        currentPage: 2,
+        totalPages: 3,
+        total: 20,
+      },
     });
 
     await setup({ page: 2 });
@@ -188,11 +220,14 @@ describe('AuthorPage', () => {
 
   it('renders pagination on page 1 when there is more than one page', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author,
-      posts: [post],
-      currentPage: 1,
-      totalPages: 3,
-      total: 20,
+      ok: true,
+      data: {
+        author,
+        posts: [post],
+        currentPage: 1,
+        totalPages: 3,
+        total: 20,
+      },
     });
 
     await setup();
@@ -204,11 +239,14 @@ describe('AuthorPage', () => {
 
   it('renders pagination wired to routes.author(slug, page) when a page is given', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author,
-      posts: [post],
-      currentPage: 2,
-      totalPages: 3,
-      total: 20,
+      ok: true,
+      data: {
+        author,
+        posts: [post],
+        currentPage: 2,
+        totalPages: 3,
+        total: 20,
+      },
     });
 
     await setup({ page: 2 });
@@ -222,11 +260,14 @@ describe('AuthorPage', () => {
 
   it('calls notFound() when the requested page is beyond totalPages', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author,
-      posts: [],
-      currentPage: 5,
-      totalPages: 1,
-      total: 1,
+      ok: true,
+      data: {
+        author,
+        posts: [],
+        currentPage: 5,
+        totalPages: 1,
+        total: 1,
+      },
     });
 
     await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');

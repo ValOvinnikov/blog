@@ -39,23 +39,26 @@ describe('GET /tag/[slug]/rss.xml', () => {
 
   it('returns a valid RSS 2.0 feed scoped to the tag with the correct content type', async () => {
     getTagPageMock.mockResolvedValue({
-      tag: {
-        id: 'tag-1',
-        title: 'TypeScript',
-        slug: 'typescript',
-        description: 'The latest TypeScript posts.',
-        seo: {
+      ok: true,
+      data: {
+        tag: {
+          id: 'tag-1',
           title: 'TypeScript',
+          slug: 'typescript',
           description: 'The latest TypeScript posts.',
-          ogTitle: 'TypeScript',
-          ogDescription: 'The latest TypeScript posts.',
-          ogImageUrl: undefined,
+          seo: {
+            title: 'TypeScript',
+            description: 'The latest TypeScript posts.',
+            ogTitle: 'TypeScript',
+            ogDescription: 'The latest TypeScript posts.',
+            ogImageUrl: undefined,
+          },
         },
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
       },
-      posts: [post],
-      currentPage: 1,
-      totalPages: 1,
-      total: 1,
     });
     const { GET } = await import('./route');
 
@@ -88,23 +91,26 @@ describe('GET /tag/[slug]/rss.xml', () => {
 
   it('falls back to the tag title as the channel description when none is authored', async () => {
     getTagPageMock.mockResolvedValue({
-      tag: {
-        id: 'tag-1',
-        title: 'TypeScript',
-        slug: 'typescript',
-        description: undefined,
-        seo: {
+      ok: true,
+      data: {
+        tag: {
+          id: 'tag-1',
           title: 'TypeScript',
-          description: 'TypeScript',
-          ogTitle: 'TypeScript',
-          ogDescription: 'TypeScript',
-          ogImageUrl: undefined,
+          slug: 'typescript',
+          description: undefined,
+          seo: {
+            title: 'TypeScript',
+            description: 'TypeScript',
+            ogTitle: 'TypeScript',
+            ogDescription: 'TypeScript',
+            ogImageUrl: undefined,
+          },
         },
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
       },
-      posts: [],
-      currentPage: 1,
-      totalPages: 1,
-      total: 0,
     });
     const { GET } = await import('./route');
 
@@ -134,19 +140,25 @@ describe('GET /tag/[slug]/rss.xml', () => {
     getTagPageMock.mockImplementation(({ page }: { page: number }) => {
       if (page === 1) {
         return Promise.resolve({
-          tag,
-          posts: [post],
-          currentPage: 1,
-          totalPages: 2,
-          total: 2,
+          ok: true,
+          data: {
+            tag,
+            posts: [post],
+            currentPage: 1,
+            totalPages: 2,
+            total: 2,
+          },
         });
       }
       return Promise.resolve({
-        tag,
-        posts: [{ ...post, slug: 'second-post', title: 'Second post' }],
-        currentPage: 2,
-        totalPages: 2,
-        total: 2,
+        ok: true,
+        data: {
+          tag,
+          posts: [{ ...post, slug: 'second-post', title: 'Second post' }],
+          currentPage: 2,
+          totalPages: 2,
+          total: 2,
+        },
       });
     });
     const { GET } = await import('./route');
@@ -160,7 +172,7 @@ describe('GET /tag/[slug]/rss.xml', () => {
   });
 
   it('calls notFound() when the tag does not exist', async () => {
-    getTagPageMock.mockResolvedValue(null);
+    getTagPageMock.mockResolvedValue({ ok: true, data: null });
     const { GET } = await import('./route');
 
     await expect(
@@ -168,5 +180,19 @@ describe('GET /tag/[slug]/rss.xml', () => {
     ).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls notFound() when the tag fetch fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getTagPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+    const { GET } = await import('./route');
+
+    await expect(
+      GET(new Request('https://example.com'), { params }),
+    ).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+
+    errorSpy.mockRestore();
   });
 });

@@ -22,11 +22,14 @@ const category = {
 describe('buildCategoryMetadata', () => {
   it('builds metadata from the category title/description, self-canonical to /category/[slug]', async () => {
     getCategoryPageMock.mockResolvedValue({
-      category,
-      posts: [],
-      currentPage: 1,
-      totalPages: 1,
-      total: 0,
+      ok: true,
+      data: {
+        category,
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
+      },
     });
 
     const metadata = await buildCategoryMetadata('engineering');
@@ -46,11 +49,14 @@ describe('buildCategoryMetadata', () => {
 
   it('falls back to the category title as description when none is authored', async () => {
     getCategoryPageMock.mockResolvedValue({
-      category: { ...category, description: undefined },
-      posts: [],
-      currentPage: 1,
-      totalPages: 1,
-      total: 0,
+      ok: true,
+      data: {
+        category: { ...category, description: undefined },
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
+      },
     });
 
     const metadata = await buildCategoryMetadata('engineering');
@@ -59,20 +65,34 @@ describe('buildCategoryMetadata', () => {
   });
 
   it('returns empty metadata when the category does not exist', async () => {
-    getCategoryPageMock.mockResolvedValue(null);
+    getCategoryPageMock.mockResolvedValue({ ok: true, data: null });
 
     const metadata = await buildCategoryMetadata('missing');
 
     expect(metadata).toEqual({});
   });
 
+  it('returns empty metadata when the category fetch fails', async () => {
+    getCategoryPageMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+
+    const metadata = await buildCategoryMetadata('engineering');
+
+    expect(metadata).toEqual({});
+  });
+
   it('builds page-N metadata with a "– Page N" suffix, self-canonical to /category/[slug]/page/N — never /category/[slug]', async () => {
     getCategoryPageMock.mockResolvedValue({
-      category,
-      posts: [],
-      currentPage: 2,
-      totalPages: 3,
-      total: 20,
+      ok: true,
+      data: {
+        category,
+        posts: [],
+        currentPage: 2,
+        totalPages: 3,
+        total: 20,
+      },
     });
 
     const metadata = await buildCategoryMetadata('engineering', 2);
@@ -88,7 +108,7 @@ describe('buildCategoryMetadata', () => {
   });
 
   it('returns empty metadata for page N when the category does not exist', async () => {
-    getCategoryPageMock.mockResolvedValue(null);
+    getCategoryPageMock.mockResolvedValue({ ok: true, data: null });
 
     const metadata = await buildCategoryMetadata('missing', 2);
 

@@ -99,23 +99,26 @@ describe('TagNumberedPage generateMetadata', () => {
 
   it('builds metadata for page 2', async () => {
     getTagPageMock.mockResolvedValue({
-      tag: {
-        id: 'tag-1',
-        title: 'TypeScript',
-        slug: 'typescript',
-        description: 'Posts about TypeScript.',
-        seo: {
+      ok: true,
+      data: {
+        tag: {
+          id: 'tag-1',
           title: 'TypeScript',
+          slug: 'typescript',
           description: 'Posts about TypeScript.',
-          ogTitle: 'TypeScript',
-          ogDescription: 'Posts about TypeScript.',
-          ogImageUrl: undefined,
+          seo: {
+            title: 'TypeScript',
+            description: 'Posts about TypeScript.',
+            ogTitle: 'TypeScript',
+            ogDescription: 'Posts about TypeScript.',
+            ogImageUrl: undefined,
+          },
         },
+        posts: [],
+        currentPage: 2,
+        totalPages: 3,
+        total: 20,
       },
-      posts: [],
-      currentPage: 2,
-      totalPages: 3,
-      total: 20,
     });
 
     const metadata = await generateMetadata({

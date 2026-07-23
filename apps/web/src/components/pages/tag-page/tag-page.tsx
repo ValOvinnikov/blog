@@ -22,11 +22,15 @@ export async function TagPage({ slug, locale, page }: TTagPageProps) {
     itemsPerPage: TAG_ITEMS_PER_PAGE,
   });
 
-  if (!result) {
+  if (!result.ok) {
+    console.error(`Error to fetch tag page: ${result.error}`);
+    notFound();
+  }
+  if (result.data === null) {
     notFound();
   }
 
-  const { tag, posts, currentPage, totalPages } = result;
+  const { tag, posts, currentPage, totalPages } = result.data;
 
   // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
   // soft-404 or a redirect to the last page (spec SEO rules).
