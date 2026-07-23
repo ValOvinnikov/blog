@@ -40,6 +40,21 @@ describe(`<${NavLink.name}/>`, () => {
     );
   });
 
+  it('sets aria-current="page" when active', () => {
+    setup({ href: '/blog', isActive: true, children: 'Blog' });
+    expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
+  it('omits aria-current when inactive', () => {
+    setup({ href: '/blog', children: 'Blog' });
+    expect(screen.getByRole('link', { name: 'Blog' })).not.toHaveAttribute(
+      'aria-current',
+    );
+  });
+
   it('renders with a custom component when `as` prop is provided', () => {
     const CustomLink = ({
       href,

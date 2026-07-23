@@ -26,6 +26,7 @@ export const NavLink = <C extends ElementType = 'a'>({
   return (
     <Component
       className={navLinkVariants({ isActive, class: className })}
+      aria-current={isActive ? 'page' : undefined}
       data-testid={dataTestId}
       {...rest}
     />
