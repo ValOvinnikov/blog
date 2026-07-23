@@ -1,8 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import {
-  imageWithAltFragment,
-  sanityImageFragment,
-} from '@blog/service/shared/fragments/image';
+import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { linkFragment } from '@blog/service/shared/fragments/link';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
@@ -24,10 +21,6 @@ export const heroModuleQuery = q
     heroSubtitleMode: sub.field('heroSubtitleMode').notNull(),
     heroSubtitle: sub.field('heroSubtitle').nullable(true),
     heroImageMode: sub.field('heroImageMode').notNull(),
-    heroImage: sub
-      .field('heroImage')
-      .project(imageWithAltFragment)
-      .nullable(true),
     heroImageAsset: sub
       .field('heroImage')
       .project(sanityImageFragment)

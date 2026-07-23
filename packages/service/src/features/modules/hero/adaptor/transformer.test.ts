@@ -42,7 +42,6 @@ describe('toHeroModule', () => {
       heroSubtitleMode: HERO_FIELD_MODE.CUSTOM,
       heroSubtitle: 'Custom home subtitle.',
       heroImageMode: HERO_FIELD_MODE.CUSTOM,
-      heroImage: makeRawPostCard().heroImage,
       heroImageAsset: makeRawSanityImage(),
     });
 
