@@ -15,10 +15,11 @@ describe('routes', () => {
     expect(routes.blogIndex(10)).toBe('/blog/page/10');
   });
 
-  it('builds post, category, author, and generic-page paths', () => {
+  it('builds post, category, author, topics, and generic-page paths', () => {
     expect(routes.post('my-post')).toBe('/blog/my-post');
     expect(routes.category('design')).toBe('/category/design');
     expect(routes.author('jane-doe')).toBe('/author/jane-doe');
+    expect(routes.topics()).toBe('/topics');
     expect(routes.genericPage('about')).toBe('/about');
   });
 

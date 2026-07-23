@@ -16,5 +16,6 @@ export const routes = {
   tag: (slug: string, page = 1) =>
     page === 1 ? `/tag/${slug}` : `/tag/${slug}/page/${page}`,
   author: (slug: string) => `/author/${slug}`,
+  topics: () => '/topics',
   genericPage: (slug: string) => `/${slug}`,
 } as const;
