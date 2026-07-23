@@ -1,15 +1,10 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { notFound } from 'next/navigation';
 
 import { CategoryPage } from './category-page';
 
 const { getCategoryPageMock } = vi.hoisted(() => ({
   getCategoryPageMock: vi.fn(),
-}));
-
-const { notFoundMock } = vi.hoisted(() => ({
-  notFoundMock: vi.fn(() => {
-    throw new Error('NEXT_NOT_FOUND');
-  }),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -18,10 +13,6 @@ vi.mock('@blog/service', () => ({
       category: { v1: { getCategoryPage: getCategoryPageMock } },
     },
   },
-}));
-
-vi.mock('next/navigation', () => ({
-  notFound: notFoundMock,
 }));
 
 vi.mock('@web/i18n/navigation', () => ({
@@ -56,7 +47,6 @@ const setup = customRenderAsync(CategoryPage, {
 describe('CategoryPage', () => {
   beforeEach(() => {
     getCategoryPageMock.mockReset();
-    notFoundMock.mockClear();
   });
 
   it('calls notFound() when the category does not exist', async () => {
@@ -64,7 +54,7 @@ describe('CategoryPage', () => {
 
     await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(notFoundMock).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
   it('renders the category heading, description, and posts', async () => {
@@ -88,7 +78,7 @@ describe('CategoryPage', () => {
     const link = screen.getByRole('link', { name: 'My Post Title' });
     expect(link).toBeVisible();
     expect(link).toHaveAttribute('href', '/blog/my-post-slug');
-    expect(notFoundMock).not.toHaveBeenCalled();
+    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
   it('renders the category heading with no posts section when the category has no posts', async () => {
@@ -171,6 +161,6 @@ describe('CategoryPage', () => {
 
     await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(notFoundMock).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 });

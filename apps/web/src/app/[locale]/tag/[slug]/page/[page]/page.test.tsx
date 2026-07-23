@@ -1,4 +1,5 @@
 import { customRenderAsync } from '@web/testing/custom-render';
+import { notFound } from 'next/navigation';
 
 import TagNumberedPage, {
   generateMetadata,
@@ -8,12 +9,6 @@ import TagNumberedPage, {
 const { permanentRedirectMock } = vi.hoisted(() => ({
   permanentRedirectMock: vi.fn(() => {
     throw new Error('NEXT_REDIRECT');
-  }),
-}));
-
-const { notFoundMock } = vi.hoisted(() => ({
-  notFoundMock: vi.fn(() => {
-    throw new Error('NEXT_NOT_FOUND');
   }),
 }));
 
@@ -51,14 +46,6 @@ vi.mock('@web/i18n/navigation', () => ({
       {children}
     </a>
   ),
-}));
-
-vi.mock('next/navigation', () => ({
-  notFound: notFoundMock,
-}));
-
-vi.mock('next-intl/server', () => ({
-  setRequestLocale: vi.fn(),
 }));
 
 describe('TagNumberedPage generateStaticParams', () => {
@@ -154,7 +141,6 @@ const setup = customRenderAsync(TagNumberedPage, {
 describe('TagNumberedPage', () => {
   beforeEach(() => {
     permanentRedirectMock.mockClear();
-    notFoundMock.mockClear();
   });
 
   it('redirects /tag/[slug]/page/1 to /tag/[slug] (canonical page 1 has one URL)', async () => {
@@ -179,7 +165,7 @@ describe('TagNumberedPage', () => {
         }),
       ).rejects.toThrow('NEXT_NOT_FOUND');
 
-      expect(notFoundMock).toHaveBeenCalled();
+      expect(vi.mocked(notFound)).toHaveBeenCalled();
     },
   );
 });

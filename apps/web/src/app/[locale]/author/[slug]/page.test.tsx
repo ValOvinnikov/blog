@@ -20,10 +20,6 @@ vi.mock('@web/metadata/author-metadata', () => ({
   buildAuthorMetadata: vi.fn().mockResolvedValue({}),
 }));
 
-vi.mock('next-intl/server', () => ({
-  setRequestLocale: vi.fn(),
-}));
-
 describe('AuthorDetailPage generateStaticParams', () => {
   it('returns the author slugs on success', async () => {
     getAuthorParamsMock.mockResolvedValue([
