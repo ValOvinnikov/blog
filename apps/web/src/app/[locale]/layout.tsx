@@ -13,6 +13,8 @@ import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 
+import { localeLayoutVariants } from './layout-variants';
+
 export async function generateMetadata(): Promise<Metadata> {
   const result = await service.global.siteSettings.v1.getSiteSettings();
 
@@ -73,6 +75,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
   const { brand } = settingsResult.data;
   const navItems = navResult.ok ? navResult.data.items : [];
   const social = footerResult.ok ? footerResult.data.social : [];
+  const s = localeLayoutVariants();
 
   return (
     // `locale` is passed explicitly (not inherited) so the page stays
@@ -84,28 +87,34 @@ export default async function LocaleLayout({ children, params }: TProps) {
     // TODO: revisit this config (pass real messages, re-check static
     // rendering) when translation messages are introduced.
     <NextIntlClientProvider locale={locale} messages={null}>
-      <Header>
-        <Header.Brand>
-          <BrandLockupLink brand={brand} />
-        </Header.Brand>
-        <SiteNavigation links={navItems} actions={<ThemeToggleButton />} />
-      </Header>
-      {children}
-      <Footer>
-        <Footer.Copyright title={brand.name} />
-        <Footer.Nav>
-          {social.map((link) => (
-            <NavLink
-              key={link.href}
-              as={SmartLink}
-              href={link.href}
-              target={link.target}
-            >
-              {link.label}
-            </NavLink>
-          ))}
-        </Footer.Nav>
-      </Footer>
+      {/* `root` is the sticky-footer shell: `min-h-dvh flex-col` so short
+          pages still fill the viewport, `content` is `flex-1` so it grows to
+          push `Footer` to the bottom on short pages and yields naturally
+          (no overlap) once page content exceeds the viewport. */}
+      <div className={s.root()}>
+        <Header>
+          <Header.Brand>
+            <BrandLockupLink brand={brand} />
+          </Header.Brand>
+          <SiteNavigation links={navItems} actions={<ThemeToggleButton />} />
+        </Header>
+        <div className={s.content()}>{children}</div>
+        <Footer>
+          <Footer.Copyright title={brand.name} />
+          <Footer.Nav>
+            {social.map((link) => (
+              <NavLink
+                key={link.href}
+                as={SmartLink}
+                href={link.href}
+                target={link.target}
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </Footer.Nav>
+        </Footer>
+      </div>
     </NextIntlClientProvider>
   );
 }
