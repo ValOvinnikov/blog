@@ -6,9 +6,20 @@ import { postCardFragment } from '@blog/service/shared/fragments/post';
 // reference — no `in`-operator needed. `filterBy`'s strong typing only covers
 // paths on the raw (undereferenced) document shape, so a dereferenced path
 // like `author->slug.current` still goes through `filterRaw`.
-export const authorPostsQuery = q
+const authorPosts = q
   .parameters<TSlugParams>()
   .star.filterByType('blog_post')
-  .filterRaw('author->slug.current == $slug')
-  .order('publishedAt desc')
-  .project(postCardFragment);
+  .filterRaw('author->slug.current == $slug');
+
+export const buildAuthorPostsPageQuery = (start: number, end: number) =>
+  q
+    .parameters<TSlugParams>()
+    .project((sub) => ({
+      posts: authorPosts
+        .order('publishedAt desc')
+        .slice(start, end)
+        .project(postCardFragment)
+        .notNull(true),
+      total: sub.count(authorPosts).notNull(true),
+    }))
+    .notNull(true);

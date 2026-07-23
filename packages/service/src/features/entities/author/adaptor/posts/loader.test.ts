@@ -10,34 +10,68 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 
 describe('getAuthorPosts', () => {
   it('maps the raw posts into post cards, preserving query order', async () => {
-    mockRun.mockResolvedValueOnce([
-      makeRawPostCard({ _id: 'post-1', title: 'Newest' }),
-      makeRawPostCard({ _id: 'post-2', title: 'Oldest' }),
-    ]);
+    mockRun.mockResolvedValueOnce({
+      posts: [
+        makeRawPostCard({ _id: 'post-1', title: 'Newest' }),
+        makeRawPostCard({ _id: 'post-2', title: 'Oldest' }),
+      ],
+      total: 2,
+    });
 
-    const result = await getAuthorPosts('jane-doe');
+    const result = await getAuthorPosts('jane-doe', { itemsPerPage: 9 });
 
-    expect(result).toHaveLength(2);
-    expect(result.map((post) => post.id)).toEqual(['post-1', 'post-2']);
-    expect(result[0]?.title).toBe('Newest');
+    expect(result.posts).toHaveLength(2);
+    expect(result.posts.map((post) => post.id)).toEqual(['post-1', 'post-2']);
+    expect(result.posts[0]?.title).toBe('Newest');
+    expect(result.total).toBe(2);
   });
 
-  it('returns an empty array when the author has no posts', async () => {
-    mockRun.mockResolvedValueOnce([]);
+  it('returns an empty posts array when the author has no posts', async () => {
+    mockRun.mockResolvedValueOnce({ posts: [], total: 0 });
 
-    const result = await getAuthorPosts('no-posts-author');
+    const result = await getAuthorPosts('no-posts-author', {
+      itemsPerPage: 9,
+    });
 
-    expect(result).toEqual([]);
+    expect(result.posts).toEqual([]);
+    expect(result.total).toBe(0);
   });
 
   it('passes the slug as a query parameter', async () => {
-    mockRun.mockResolvedValueOnce([]);
+    mockRun.mockResolvedValueOnce({ posts: [], total: 0 });
 
-    await getAuthorPosts('jane-doe');
+    await getAuthorPosts('jane-doe', { itemsPerPage: 9 });
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ parameters: { slug: 'jane-doe' } }),
     );
+  });
+
+  it('defaults to page 1 when no page is given', async () => {
+    mockRun.mockResolvedValueOnce({
+      posts: [makeRawPostCard()],
+      total: 20,
+    });
+
+    const result = await getAuthorPosts('jane-doe', { itemsPerPage: 9 });
+
+    expect(result.posts).toHaveLength(1);
+    expect(result.total).toBe(20);
+  });
+
+  it('windows the query using the given page and itemsPerPage', async () => {
+    mockRun.mockResolvedValueOnce({
+      posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'b' })],
+      total: 20,
+    });
+
+    const result = await getAuthorPosts('jane-doe', {
+      page: 2,
+      itemsPerPage: 5,
+    });
+
+    expect(result.posts.map((post) => post.id)).toEqual(['a', 'b']);
+    expect(result.total).toBe(20);
   });
 });
