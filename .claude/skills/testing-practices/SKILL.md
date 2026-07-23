@@ -32,15 +32,32 @@ duplicate or rewrite adequate existing tests.
   with a `Partial<…>` overrides param. Import via the workspace alias:
   `import { makeRawPostCard } from '@blog/service/testing/pages/fixtures'`.
 - **`web` and `ui` follow the same `src/testing/` pattern** for fixtures shared
-  by more than one file (a component's `.test.tsx` **and** its `.stories.tsx`).
-  Mirror the component tree, keeping the `pages/`/`shared/` split
-  (`src/components/pages/blog-post-page/` →
+  by more than one file (a component's `.test.tsx` **and** its `.stories.tsx`,
+  or two unrelated test files that both need the same domain shape — e.g. an
+  SEO object or a tag/author/post mock consumed by a page test and a metadata
+  builder test). Mirror the component tree, keeping the `pages/`/`shared/`
+  split (`src/components/pages/blog-post-page/` →
   `src/testing/pages/blog-post-page/fixtures.ts`); export small builder
   functions, import via the workspace alias (`@web/testing/…`), never a
-  relative path once shared. A fixture used by one test file with no story
-  stays inline; promote it the moment a second file (usually the sibling story)
-  needs it. Distinct from `src/storybook/fixtures/` (`web-storybook`) —
-  Storybook-only view-model mocks (`TPostDetail`, …) never imported by a test.
+  relative path once shared. A fixture used by exactly one test file stays
+  inline; promote it the moment a second file needs the same shape — not
+  necessarily the sibling story, any second consumer counts. Distinct from
+  `src/storybook/fixtures/` (`web-storybook`) — Storybook-only view-model
+  mocks (`TPostDetail`, …) never imported by a test.
+- **Check `testing/` for an existing builder before writing a mock literal —
+  REQUIRED, not a preference.** Before hand-rolling an object shaped like a
+  known domain entity (SEO, tag, author, post/post-card, category, …) inside a
+  `*.test.ts(x)` file, grep `packages/service/src/testing/` (service tests) or
+  `apps/web/src/testing/`/`packages/ui/src/testing/` (web/ui tests) for a
+  builder that already covers it (`makeRaw*` in service, `make*` in web/ui) —
+  reuse it with `overrides` rather than duplicating the shape inline, even if
+  the existing builder lives in a directory the new test wouldn't otherwise
+  touch. If no builder exists yet and the shape is a generic domain entity
+  (not something specific to the one component/route under test), **add the
+  builder to `testing/` in the same PR** rather than inlining it "for now" —
+  the promotion trigger above (second consumer) exists precisely so this
+  doesn't need a separate follow-up PR once a second file predictably needs
+  the same shape.
 - Run from root: `pnpm test` (all), or `pnpm --filter @blog/ui test`.
   Watch mode: `pnpm test:watch`.
 
