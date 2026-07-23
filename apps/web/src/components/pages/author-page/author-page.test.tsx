@@ -84,9 +84,13 @@ describe('AuthorPage', () => {
 
     expect(screen.getByText('Senior Engineer')).toBeVisible();
     expect(
-      screen.getByRole('heading', { level: 3, name: 'Jane Doe' }),
+      screen.getByRole('heading', { level: 1, name: 'Jane Doe' }),
     ).toBeVisible();
     expect(screen.getByText('Builds things.')).toBeVisible();
+    expect(screen.getByRole('img', { name: 'Jane Doe' })).toHaveAttribute(
+      'src',
+      'https://cdn.example.com/jane.jpg',
+    );
 
     const xLink = screen.getByRole('link', { name: 'X' });
     expect(xLink).toHaveAttribute('href', 'https://x.com/janedoe');

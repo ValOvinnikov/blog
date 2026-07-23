@@ -1,8 +1,9 @@
-import { type ILocalizedParams, routes } from '@blog/config';
+import { Size, type ILocalizedParams, routes } from '@blog/config';
 import { service } from '@blog/service';
-import { Eyebrow } from '@blog/ui/atoms';
-import { ActionList, AuthorByline, ShareLink } from '@blog/ui/molecules';
+import { Avatar, Eyebrow } from '@blog/ui/atoms';
+import { ActionList, ShareLink } from '@blog/ui/molecules';
 import { PostsSection } from '@blog/ui/organisms';
+import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { Link } from '@web/i18n/navigation';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
@@ -18,9 +19,11 @@ const s = authorPageVariants();
 /**
  * AuthorPage — `/author/[slug]` composition: fetches the author and their
  * posts together via `service.entities.author.v1.getAuthorPage`, then
- * renders their profile (role, name/bio/avatar via `AuthorByline`, social
- * links via `ShareLink`/`ActionList`), followed by their (unpaginated) post
- * list via `PostsSection`.
+ * composes the shared `BlogPageTemplate` archive shell with the author's
+ * name as the page `<h1>`, their role/avatar in `introHeader`, bio as
+ * `supportingText`, social links via `ShareLink`/`ActionList`, and their
+ * (unpaginated) post list via `PostsSection`. Pagination is deferred — see
+ * #744.
  */
 export async function AuthorPage({ slug, locale }: TAuthorPageProps) {
   const result = await service.entities.author.v1.getAuthorPage(slug);
@@ -42,36 +45,42 @@ export async function AuthorPage({ slug, locale }: TAuthorPageProps) {
   }));
 
   return (
-    <main className={s.root()}>
-      {author.role && <Eyebrow className={s.eyebrow()}>{author.role}</Eyebrow>}
-
-      <AuthorByline
-        className={s.byline()}
-        name={author.name}
-        bio={blockTextToPlain(author.bio)}
-        avatarUrl={author.imageUrl}
-      />
-
-      {author.socialLinks.length > 0 && (
-        <ActionList className={s.socialLinks()}>
-          {author.socialLinks.map((link) => (
-            <ShareLink
-              key={link.url}
-              href={link.url}
-              label={link.platform}
-              as={SmartLink}
-            />
-          ))}
-        </ActionList>
-      )}
-
-      <PostsSection
-        className={s.posts()}
-        posts={items}
-        title={`Posts by ${author.name}`}
-        titleId="author-posts-title"
-        linkAs={Link}
-      />
-    </main>
+    <BlogPageTemplate
+      heading={author.name}
+      introHeader={
+        <div className={s.introHeader()}>
+          {author.role && <Eyebrow>{author.role}</Eyebrow>}
+          <Avatar
+            name={author.name}
+            alt={author.name}
+            src={author.imageUrl}
+            size={Size.LG}
+          />
+        </div>
+      }
+      supportingText={blockTextToPlain(author.bio)}
+      socialLinks={
+        author.socialLinks.length > 0 ? (
+          <ActionList className={s.socialLinks()}>
+            {author.socialLinks.map((link) => (
+              <ShareLink
+                key={link.url}
+                href={link.url}
+                label={link.platform}
+                as={SmartLink}
+              />
+            ))}
+          </ActionList>
+        ) : undefined
+      }
+      posts={
+        <PostsSection
+          posts={items}
+          title={`Posts by ${author.name}`}
+          titleId="author-posts-title"
+          linkAs={Link}
+        />
+      }
+    />
   );
 }
