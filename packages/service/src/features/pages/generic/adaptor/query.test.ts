@@ -1,5 +1,4 @@
 import { makeRawGenericPage } from '@blog/service/testing/pages/fixtures';
-import { describe, expect, it } from 'vitest';
 
 import { genericPageQuery } from './query';
 

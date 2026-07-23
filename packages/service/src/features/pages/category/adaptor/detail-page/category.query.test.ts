@@ -1,5 +1,4 @@
 import { makeRawCategory } from '@blog/service/testing/entities/fixtures';
-import { describe, expect, it } from 'vitest';
 
 import { categoryPageCategoryQuery } from './category.query';
 

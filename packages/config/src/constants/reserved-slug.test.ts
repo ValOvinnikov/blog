@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { RESERVED_SLUGS } from './reserved-slug';
 
 // Coverage asserting `apps/web`'s actual static routes stay a subset of this

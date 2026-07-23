@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { service } from './index';
 
 describe('service.modules', () => {

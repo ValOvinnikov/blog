@@ -1,7 +1,6 @@
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawGenericPage } from '@blog/service/testing/pages/fixtures';
-import { describe, expect, it, vi } from 'vitest';
 
 import { getPage } from './loader';
 
@@ -52,7 +51,11 @@ describe('getPage', () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawGenericPage({
-          seo: { metaTitle: 'About Us', metaDescription: null, openGraph: null },
+          seo: {
+            metaTitle: 'About Us',
+            metaDescription: null,
+            openGraph: null,
+          },
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());

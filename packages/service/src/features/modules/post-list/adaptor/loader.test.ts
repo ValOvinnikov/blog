@@ -1,7 +1,6 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { describe, expect, it, vi } from 'vitest';
 
 import { getPostList } from './loader';
 import * as postsQuery from './posts.query';

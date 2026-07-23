@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { createAuthorService } from './service';
 
 describe('createAuthorService', () => {

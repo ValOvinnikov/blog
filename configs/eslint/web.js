@@ -3,6 +3,7 @@ import path from 'node:path';
 import nextPlugin from '@next/eslint-plugin-next';
 import checkFile from 'eslint-plugin-check-file';
 
+import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
 import react from './react.js';
 import storybook from './storybook.js';
 
@@ -35,6 +36,7 @@ export default [
       'no-restricted-imports': [
         'error',
         {
+          paths: [noVitestGlobalsImportPath],
           patterns: [
             {
               group: [

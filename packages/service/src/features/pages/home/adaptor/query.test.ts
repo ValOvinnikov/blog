@@ -1,5 +1,4 @@
 import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
-import { describe, expect, it } from 'vitest';
 
 import { homePageQuery } from './query';
 

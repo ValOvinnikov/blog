@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { toTotalPages } from './to-total-pages';
 
 describe('toTotalPages', () => {

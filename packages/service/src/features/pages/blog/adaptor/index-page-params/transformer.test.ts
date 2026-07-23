@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { toIndexPageParams } from './transformer';
 
 describe('toIndexPageParams', () => {

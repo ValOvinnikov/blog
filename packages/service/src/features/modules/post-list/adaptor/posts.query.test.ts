@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { postListModulePostsQuery } from './posts.query';
 
 describe('postListModulePostsQuery', () => {

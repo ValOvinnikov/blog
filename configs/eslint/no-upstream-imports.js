@@ -1,3 +1,5 @@
+import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
+
 /** @type {import("eslint").Linter.Config[]} */
 export default [
   {
@@ -6,6 +8,7 @@ export default [
       'no-restricted-imports': [
         'error',
         {
+          paths: [noVitestGlobalsImportPath],
           patterns: [
             {
               group: [

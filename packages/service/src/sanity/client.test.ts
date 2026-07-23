@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+export {};
 
 describe('Sanity client module loading', () => {
   const originalProjectId = process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];

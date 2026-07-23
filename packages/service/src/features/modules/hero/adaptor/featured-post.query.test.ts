@@ -1,5 +1,4 @@
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { describe, expect, it } from 'vitest';
 
 import { heroFallbackFeaturedPostQuery } from './featured-post.query';
 

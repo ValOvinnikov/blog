@@ -1,6 +1,5 @@
 import { makeRawCategory } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { describe, expect, it, vi } from 'vitest';
 
 import { getCategories } from './loader';
 

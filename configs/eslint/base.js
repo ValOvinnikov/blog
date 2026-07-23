@@ -5,6 +5,8 @@ import prettier from 'eslint-config-prettier/flat';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
+
 /** @type {import("eslint").Linter.Config[]} */
 export default [
   {
@@ -28,6 +30,10 @@ export default [
     rules: {
       curly: ['error', 'all'],
       'no-console': ['error', { allow: ['warn', 'error'] }],
+      'no-restricted-imports': [
+        'error',
+        { paths: [noVitestGlobalsImportPath] },
+      ],
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/consistent-type-imports': [
         'warn',
