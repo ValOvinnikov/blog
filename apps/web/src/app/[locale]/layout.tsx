@@ -1,6 +1,8 @@
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { Footer, Header, NavLink, PrimaryNavigation } from '@blog/ui';
+import { NavLink } from '@blog/ui/atoms';
+import { PrimaryNavigation } from '@blog/ui/molecules';
+import { Footer, Header } from '@blog/ui/organisms';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';

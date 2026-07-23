@@ -1,12 +1,8 @@
 import { type ILocalizedParams, routes } from '@blog/config';
 import { service } from '@blog/service';
-import {
-  ActionList,
-  AuthorByline,
-  Eyebrow,
-  PostsSection,
-  ShareLink,
-} from '@blog/ui';
+import { Eyebrow } from '@blog/ui/atoms';
+import { ActionList, AuthorByline, ShareLink } from '@blog/ui/molecules';
+import { PostsSection } from '@blog/ui/organisms';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { Link } from '@web/i18n/navigation';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
