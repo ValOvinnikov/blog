@@ -58,6 +58,9 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Hello World' }),
     ).toBeVisible();
+    expect(
+      screen.getByText('A sufficiently long excerpt for the card.'),
+    ).toBeVisible();
     expect(screen.getByText('Body text.')).toBeVisible();
     expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
       'href',

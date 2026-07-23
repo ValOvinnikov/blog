@@ -36,15 +36,26 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
     notFound();
   }
 
+  const {
+    title,
+    excerpt,
+    categories,
+    tags,
+    body,
+    relatedPosts,
+    heroImageSanity,
+    heroImageAlt,
+    publishedAt,
+    author,
+  } = post;
+
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
   const url = `${siteUrl}${routes.post(slug)}`;
   const schema = buildBlogPostingSchema(post, siteUrl);
-  const shareLinks = buildShareLinks({ url, title: post.title }).map(
-    (link) => ({
-      ...link,
-      icon: <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />,
-    }),
-  );
+  const shareLinks = buildShareLinks({ url, title }).map((link) => ({
+    ...link,
+    icon: <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />,
+  }));
 
   return (
     <main className={s.root()}>
@@ -52,28 +63,27 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
 
       <Article>
         <Article.Header
-          categories={post.categories.map((category) => ({
+          categories={categories.map((category) => ({
             label: category.title,
             href: routes.category(category.slug),
           }))}
           linkAs={SmartLink}
-          title={post.title}
+          title={title}
+          lead={excerpt}
           meta={{
-            author: post.author,
-            publishedAt: post.publishedAt,
-            formattedDate: formatDate(post.publishedAt, locale),
-            share: (
-              <PostShare url={url} title={post.title} links={shareLinks} />
-            ),
+            author,
+            publishedAt,
+            formattedDate: formatDate(publishedAt, locale),
+            share: <PostShare url={url} title={title} links={shareLinks} />,
           }}
           coverMedia={
-            post.heroImageSanity ? (
+            heroImageSanity ? (
               <SanityImage
-                image={post.heroImageSanity}
+                image={heroImageSanity}
                 width={1200}
                 height={675}
                 sizes="(min-width: 1024px) 800px, 100vw"
-                alt={post.heroImageAlt}
+                alt={heroImageAlt}
                 className={s.coverImage()}
               />
             ) : undefined
@@ -81,11 +91,11 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
         />
 
         <Article.Body className={s.body()}>
-          <PortableTextRenderer value={post.body} />
+          <PortableTextRenderer value={body} />
         </Article.Body>
 
         <Article.Footer
-          tags={post.tags.map((tag) => ({
+          tags={tags.map((tag) => ({
             label: tag.title,
             href: routes.tag(tag.slug),
           }))}
@@ -93,9 +103,9 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
         />
       </Article>
 
-      {post.relatedPosts.length > 0 && (
+      {relatedPosts.length > 0 && (
         <PostsSection
-          posts={post.relatedPosts.map((relatedPost) => ({
+          posts={relatedPosts.map((relatedPost) => ({
             id: relatedPost.id,
             href: routes.post(relatedPost.slug),
             title: relatedPost.title,
