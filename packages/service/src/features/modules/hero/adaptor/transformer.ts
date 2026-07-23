@@ -1,5 +1,4 @@
 import { HERO_FIELD_MODE, routes } from '@blog/config';
-import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { toLink } from '@blog/service/shared/transformers/to-link';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
@@ -40,20 +39,6 @@ export function toHeroModule(
     : undefined;
   const heroPost = configuredFeaturedPost ?? fallbackPost;
 
-  const imageUrl =
-    raw.heroImageMode === HERO_FIELD_MODE.CUSTOM
-      ? buildImageUrl(raw.heroImage)
-      : raw.heroImageMode === HERO_FIELD_MODE.NONE
-        ? undefined
-        : heroPost?.heroImageUrl;
-
-  const image =
-    imageUrl && raw.heroImageMode === HERO_FIELD_MODE.CUSTOM && raw.heroImage
-      ? { src: imageUrl, alt: raw.heroImage.alt }
-      : imageUrl && heroPost?.heroImageAlt
-        ? { src: imageUrl, alt: heroPost.heroImageAlt }
-        : undefined;
-
   const sanityImage =
     raw.heroImageMode === HERO_FIELD_MODE.CUSTOM
       ? toSanityImage(raw.heroImageAsset)
@@ -77,7 +62,6 @@ export function toHeroModule(
       raw.heroSubtitle,
       heroPost?.excerpt,
     ),
-    image,
     sanityImage,
     primaryAction: heroPost
       ? {

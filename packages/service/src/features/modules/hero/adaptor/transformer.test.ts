@@ -32,7 +32,7 @@ describe('toHeroModule', () => {
     expect(hero.primaryAction?.href).toBe('/blog/hello-world');
   });
 
-  it('uses custom copy and custom image when configured', () => {
+  it('uses custom copy and custom sanity image when configured', () => {
     const raw = makeRawHeroModule({
       featuredPost: null,
       heroEyebrowMode: HERO_FIELD_MODE.CUSTOM,
@@ -51,8 +51,6 @@ describe('toHeroModule', () => {
     expect(hero.eyebrow).toBe('Field notes');
     expect(hero.title).toBe('Custom home title');
     expect(hero.subtitle).toBe('Custom home subtitle.');
-    expect(hero.image?.src).toContain('cdn.sanity.io');
-    expect(hero.image?.alt).toBe('Alt text');
     expect(hero.sanityImage).toEqual({
       assetId: 'image-abc123-800x600-jpg',
       alt: 'Alt text',
@@ -72,7 +70,6 @@ describe('toHeroModule', () => {
 
     const hero = toHeroModule(raw, fallbackPost);
 
-    expect(hero.image).toBeUndefined();
     expect(hero.sanityImage).toBeUndefined();
   });
 
@@ -87,7 +84,6 @@ describe('toHeroModule', () => {
     const hero = toHeroModule(raw, null);
 
     expect(hero.title).toBe('Hello World');
-    expect(hero.image).toBeUndefined();
     expect(hero.sanityImage).toBeUndefined();
   });
 
