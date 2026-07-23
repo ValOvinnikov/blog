@@ -1,15 +1,10 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { notFound } from 'next/navigation';
 
 import { AuthorPage } from './author-page';
 
 const { getAuthorPageMock } = vi.hoisted(() => ({
   getAuthorPageMock: vi.fn(),
-}));
-
-const { notFoundMock } = vi.hoisted(() => ({
-  notFoundMock: vi.fn(() => {
-    throw new Error('NEXT_NOT_FOUND');
-  }),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -20,10 +15,6 @@ vi.mock('@blog/service', () => ({
       },
     },
   },
-}));
-
-vi.mock('next/navigation', () => ({
-  notFound: notFoundMock,
 }));
 
 vi.mock('@web/i18n/navigation', () => ({
@@ -76,7 +67,6 @@ const setup = customRenderAsync(AuthorPage, { slug: 'jane-doe', locale: 'en' });
 describe('AuthorPage', () => {
   beforeEach(() => {
     getAuthorPageMock.mockReset();
-    notFoundMock.mockClear();
   });
 
   it('calls notFound() when the author does not exist', async () => {
@@ -84,7 +74,7 @@ describe('AuthorPage', () => {
 
     await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(notFoundMock).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
   it('renders the author role, name, bio, and social links', async () => {
@@ -102,7 +92,7 @@ describe('AuthorPage', () => {
     expect(xLink).toHaveAttribute('href', 'https://x.com/janedoe');
     const githubLink = screen.getByRole('link', { name: 'GitHub' });
     expect(githubLink).toHaveAttribute('href', 'https://github.com/janedoe');
-    expect(notFoundMock).not.toHaveBeenCalled();
+    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
   it('renders without a role and without social links when none are authored', async () => {

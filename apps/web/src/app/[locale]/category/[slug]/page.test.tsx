@@ -20,10 +20,6 @@ vi.mock('@web/metadata/category-metadata', () => ({
   buildCategoryMetadata: vi.fn().mockResolvedValue({}),
 }));
 
-vi.mock('next-intl/server', () => ({
-  setRequestLocale: vi.fn(),
-}));
-
 describe('CategoryDetailPage generateStaticParams', () => {
   it('returns the category slugs on success', async () => {
     getCategoryParamsMock.mockResolvedValue([

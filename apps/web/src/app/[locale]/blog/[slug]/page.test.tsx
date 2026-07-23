@@ -31,10 +31,6 @@ vi.mock('@web/components/pages/blog-post-page', () => ({
   ),
 }));
 
-vi.mock('next-intl/server', () => ({
-  setRequestLocale: vi.fn(),
-}));
-
 describe('generateStaticParams', () => {
   it('builds one entry per locale x slug combination', async () => {
     getPostParamsMock.mockResolvedValue([{ slug: 'a' }, { slug: 'b' }]);

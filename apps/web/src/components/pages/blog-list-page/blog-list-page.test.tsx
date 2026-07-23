@@ -1,15 +1,10 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { notFound } from 'next/navigation';
 
 import { BlogListPage } from './blog-list-page';
 
 const { getIndexPageMock } = vi.hoisted(() => ({
   getIndexPageMock: vi.fn(),
-}));
-
-const { notFoundMock } = vi.hoisted(() => ({
-  notFoundMock: vi.fn(() => {
-    throw new Error('NEXT_NOT_FOUND');
-  }),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -18,10 +13,6 @@ vi.mock('@blog/service', () => ({
       blog: { v1: { getIndexPage: getIndexPageMock } },
     },
   },
-}));
-
-vi.mock('next/navigation', () => ({
-  notFound: notFoundMock,
 }));
 
 vi.mock('@web/i18n/navigation', () => ({
@@ -53,7 +44,6 @@ const setup = customRenderAsync(BlogListPage, { page: 1, locale: 'en' });
 describe('BlogListPage', () => {
   beforeEach(() => {
     getIndexPageMock.mockReset();
-    notFoundMock.mockClear();
   });
 
   it('calls notFound() when the requested page is beyond totalPages', async () => {
@@ -64,7 +54,7 @@ describe('BlogListPage', () => {
 
     await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(notFoundMock).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
   it('calls notFound() when the fetch fails', async () => {
@@ -76,7 +66,7 @@ describe('BlogListPage', () => {
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(notFoundMock).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
 
     errorSpy.mockRestore();
   });
@@ -104,6 +94,6 @@ describe('BlogListPage', () => {
     const link = screen.getByRole('link', { name: 'My Post Title' });
     expect(link).toBeVisible();
     expect(link).toHaveAttribute('href', '/blog/my-post-slug');
-    expect(notFoundMock).not.toHaveBeenCalled();
+    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 });

@@ -1,15 +1,10 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { notFound } from 'next/navigation';
 
 import { GenericPage } from './generic-page';
 
 const { getPageMock } = vi.hoisted(() => ({
   getPageMock: vi.fn(),
-}));
-
-const { notFoundMock } = vi.hoisted(() => ({
-  notFoundMock: vi.fn(() => {
-    throw new Error('NEXT_NOT_FOUND');
-  }),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -18,10 +13,6 @@ vi.mock('@blog/service', () => ({
       generic: { v1: { getPage: getPageMock } },
     },
   },
-}));
-
-vi.mock('next/navigation', () => ({
-  notFound: notFoundMock,
 }));
 
 vi.mock('@web/modules/module-renderer', () => ({
@@ -38,7 +29,6 @@ const setup = customRenderAsync(GenericPage, {
 describe(`<${GenericPage.name}/>`, () => {
   beforeEach(() => {
     getPageMock.mockReset();
-    notFoundMock.mockClear();
   });
 
   it('calls notFound() when the page does not exist', async () => {
@@ -46,7 +36,7 @@ describe(`<${GenericPage.name}/>`, () => {
 
     await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(notFoundMock).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
   it('renders the ModuleRenderer with the fetched modules', async () => {

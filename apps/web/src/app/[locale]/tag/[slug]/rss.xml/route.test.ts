@@ -1,27 +1,13 @@
-export {};
+import { notFound } from 'next/navigation';
 
 const { getTagPageMock } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
-}));
-
-const { notFoundMock } = vi.hoisted(() => ({
-  notFoundMock: vi.fn(() => {
-    throw new Error('NEXT_NOT_FOUND');
-  }),
 }));
 
 vi.mock('@blog/service', () => ({
   service: {
     pages: { tag: { v1: { getTagPage: getTagPageMock } } },
   },
-}));
-
-vi.mock('next/navigation', () => ({
-  notFound: notFoundMock,
-}));
-
-vi.mock('@web/utils/env/env', () => ({
-  env: { NEXT_PUBLIC_SITE_URL: 'https://example.com' },
 }));
 
 const post = {
@@ -44,7 +30,6 @@ describe('GET /tag/[slug]/rss.xml', () => {
   afterEach(() => {
     vi.resetModules();
     getTagPageMock.mockReset();
-    notFoundMock.mockClear();
   });
 
   it('returns a valid RSS 2.0 feed scoped to the tag with the correct content type', async () => {
@@ -125,6 +110,6 @@ describe('GET /tag/[slug]/rss.xml', () => {
       GET(new Request('https://example.com'), { params }),
     ).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(notFoundMock).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,16 +1,11 @@
 import { customRenderAsync } from '@web/testing/custom-render';
+import { notFound } from 'next/navigation';
 
 import BlogListNumberedPage from './page';
 
 const { permanentRedirectMock } = vi.hoisted(() => ({
   permanentRedirectMock: vi.fn(() => {
     throw new Error('NEXT_REDIRECT');
-  }),
-}));
-
-const { notFoundMock } = vi.hoisted(() => ({
-  notFoundMock: vi.fn(() => {
-    throw new Error('NEXT_NOT_FOUND');
   }),
 }));
 
@@ -44,14 +39,6 @@ vi.mock('@web/i18n/navigation', () => ({
   ),
 }));
 
-vi.mock('next/navigation', () => ({
-  notFound: notFoundMock,
-}));
-
-vi.mock('next-intl/server', () => ({
-  setRequestLocale: vi.fn(),
-}));
-
 const setup = customRenderAsync(BlogListNumberedPage, {
   params: Promise.resolve({ locale: 'EN', page: '1' }),
 });
@@ -59,7 +46,6 @@ const setup = customRenderAsync(BlogListNumberedPage, {
 describe('BlogListNumberedPage', () => {
   beforeEach(() => {
     permanentRedirectMock.mockClear();
-    notFoundMock.mockClear();
   });
 
   it('redirects /blog/page/1 to /blog (canonical page 1 has one URL)', async () => {
@@ -78,7 +64,7 @@ describe('BlogListNumberedPage', () => {
         setup({ params: Promise.resolve({ locale: 'EN', page: raw }) }),
       ).rejects.toThrow('NEXT_NOT_FOUND');
 
-      expect(notFoundMock).toHaveBeenCalled();
+      expect(vi.mocked(notFound)).toHaveBeenCalled();
     },
   );
 });

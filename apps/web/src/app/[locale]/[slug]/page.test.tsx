@@ -27,10 +27,6 @@ vi.mock('@web/components/pages/generic-page', () => ({
   ),
 }));
 
-vi.mock('next-intl/server', () => ({
-  setRequestLocale: vi.fn(),
-}));
-
 describe('generateStaticParams', () => {
   it('returns the generic page slugs on success', async () => {
     getPageSlugsMock.mockResolvedValue({

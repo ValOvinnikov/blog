@@ -12,10 +12,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/utils/env/env', () => ({
-  env: { NEXT_PUBLIC_SITE_URL: 'https://example.com' },
-}));
-
 const post = {
   id: 'post-1',
   title: 'Hello & Welcome',

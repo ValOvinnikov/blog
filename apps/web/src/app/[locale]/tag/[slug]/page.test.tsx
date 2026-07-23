@@ -20,10 +20,6 @@ vi.mock('@web/metadata/tag-metadata', () => ({
   buildTagMetadata: vi.fn().mockResolvedValue({}),
 }));
 
-vi.mock('next-intl/server', () => ({
-  setRequestLocale: vi.fn(),
-}));
-
 describe('TagDetailPage generateStaticParams', () => {
   it('returns the tag slugs on success', async () => {
     getTagParamsMock.mockResolvedValue([
