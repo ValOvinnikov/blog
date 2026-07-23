@@ -1,6 +1,6 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { Article } from '@blog/ui/organisms';
+import { Article, PostsSection } from '@blog/ui/organisms';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 import { PostShare } from '@web/components/shared/post-share';
@@ -24,8 +24,10 @@ const s = blogPostPageVariants();
  * `service.pages.post.v1.getPost`, then composes it through the `Article`
  * compound (`Article.Header` for category eyebrow links, title, `PostMeta`
  * with `PostShare` in its share slot, and cover image; `Article.Body` for
- * the rendered `PortableTextRenderer` body), plus a `BlogPosting` JSON-LD
- * tag. `Header`/`Footer` stay owned by `[locale]/layout.tsx`.
+ * the rendered `PortableTextRenderer` body; `Article.Footer` for the tag
+ * chip list), plus a `BlogPosting` JSON-LD tag and, when the post has any,
+ * a "Related posts" `PostsSection` after the article. `Header`/`Footer`
+ * (site chrome) stay owned by `[locale]/layout.tsx`.
  */
 export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
   const post = await service.pages.post.v1.getPost(slug);
@@ -89,7 +91,32 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
         <Article.Body className={s.body()}>
           <PortableTextRenderer value={post.body} />
         </Article.Body>
+
+        <Article.Footer
+          tags={post.tags.map((tag) => ({
+            label: tag.title,
+            href: routes.tag(tag.slug),
+          }))}
+          linkAs={SmartLink}
+        />
       </Article>
+
+      {post.relatedPosts.length > 0 && (
+        <PostsSection
+          posts={post.relatedPosts.map((relatedPost) => ({
+            id: relatedPost.id,
+            href: routes.post(relatedPost.slug),
+            title: relatedPost.title,
+            excerpt: relatedPost.excerpt,
+            publishedAt: relatedPost.publishedAt,
+            formattedDate: formatDate(relatedPost.publishedAt, locale),
+            categories: relatedPost.categories,
+          }))}
+          title="Related posts"
+          titleId="related-posts-title"
+          linkAs={SmartLink}
+        />
+      )}
     </main>
   );
 }

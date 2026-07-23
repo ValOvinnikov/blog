@@ -105,4 +105,70 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
   });
+
+  it('renders the post tags as links to routes.tag(slug)', async () => {
+    getPostMock.mockResolvedValue({
+      ...mockPostDetail,
+      tags: [
+        { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
+        { id: 'tag-2', title: 'React', slug: 'react' },
+      ],
+    });
+
+    await setup();
+
+    expect(screen.getByRole('link', { name: 'TypeScript' })).toHaveAttribute(
+      'href',
+      '/tag/typescript',
+    );
+    expect(screen.getByRole('link', { name: 'React' })).toHaveAttribute(
+      'href',
+      '/tag/react',
+    );
+  });
+
+  it('renders no tag chips when the post has no tags', async () => {
+    getPostMock.mockResolvedValue({ ...mockPostDetail, tags: [] });
+
+    await setup();
+
+    expect(
+      screen.queryByRole('link', { name: 'TypeScript' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders a "Related posts" section when relatedPosts is non-empty', async () => {
+    getPostMock.mockResolvedValue({
+      ...mockPostDetail,
+      relatedPosts: [
+        {
+          id: 'related-1',
+          title: 'A Related Post',
+          slug: 'a-related-post',
+          excerpt: 'A related excerpt.',
+          publishedAt: '2026-01-10T00:00:00.000Z',
+          heroImageUrl: undefined,
+          heroImageAlt: undefined,
+          heroImageSanity: undefined,
+          featured: false,
+          author: undefined,
+          categories: [],
+        },
+      ],
+    });
+
+    await setup();
+
+    expect(screen.getByText('Related posts')).toBeVisible();
+    const link = screen.getByRole('link', { name: 'A Related Post' });
+    expect(link).toHaveAttribute('href', '/blog/a-related-post');
+  });
+
+  it('omits the "Related posts" section when relatedPosts is empty', async () => {
+    getPostMock.mockResolvedValue({ ...mockPostDetail, relatedPosts: [] });
+
+    await setup();
+
+    expect(screen.queryByText('Related posts')).not.toBeInTheDocument();
+  });
 });

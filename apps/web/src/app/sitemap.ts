@@ -17,10 +17,11 @@ function toEntry(path: string, siteUrl: string): MetadataRoute.Sitemap[number] {
 
 /**
  * Site-wide sitemap: home, blog index + every numbered page, every published
- * post and category. Every entry carries a `languages` alternate for each
- * configured locale — a no-op today (`localePrefix: 'never'` means every
- * locale resolves to the same unprefixed path) but keeps this future-proof
- * if locale-prefixed routing is ever introduced.
+ * post, category, and tag archive. Every entry carries a `languages`
+ * alternate for each configured locale — a no-op today
+ * (`localePrefix: 'never'` means every locale resolves to the same
+ * unprefixed path) but keeps this future-proof if locale-prefixed routing is
+ * ever introduced.
  *
  * Returns an empty sitemap (logged) when `NEXT_PUBLIC_SITE_URL` is unset —
  * every URL in a sitemap must be absolute, so there is no meaningful
@@ -33,10 +34,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [];
   }
 
-  const [posts, categories, blogParamsResult, genericPageSlugsResult] =
+  const [posts, categories, tags, blogParamsResult, genericPageSlugsResult] =
     await Promise.all([
       service.pages.post.v1.getPostParams(),
       service.pages.category.v1.getCategoryParams(),
+      service.pages.tag.v1.getTagParams(),
       service.pages.blog.v1.getIndexPageParams(),
       service.pages.generic.v1.getPageSlugs(),
     ]);
@@ -65,6 +67,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
     ...posts.map(({ slug }) => toEntry(routes.post(slug), siteUrl)),
     ...categories.map(({ slug }) => toEntry(routes.category(slug), siteUrl)),
+    ...tags.map(({ slug }) => toEntry(routes.tag(slug), siteUrl)),
     ...genericPageSlugs.map(({ slug }) =>
       toEntry(routes.genericPage(slug), siteUrl),
     ),

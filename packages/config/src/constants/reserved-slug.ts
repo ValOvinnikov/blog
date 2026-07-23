@@ -9,6 +9,7 @@
 export const RESERVED_SLUGS = [
   'blog',
   'category',
+  'tag',
   'author',
   'api',
   'page',
