@@ -18,16 +18,6 @@ const post = {
   slug: 'hello-welcome',
   excerpt: 'A <first> post.',
   publishedAt: '2026-01-15T00:00:00Z',
-  heroImageUrl: undefined,
-  heroImageAlt: undefined,
-  heroImageSanity: undefined,
-  featured: false,
-  author: {
-    id: 'author-1',
-    name: 'Jane Doe',
-    slug: 'jane-doe',
-    imageUrl: undefined,
-  },
   categories: [],
 };
 
