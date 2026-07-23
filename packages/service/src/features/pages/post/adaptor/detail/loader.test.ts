@@ -1,6 +1,11 @@
+import { getRelatedPosts } from '@blog/service/features/pages/post/adaptor/related/loader';
+import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawPostDetail } from '@blog/service/testing/pages/fixtures';
+import {
+  makeRawPostCard,
+  makeRawPostDetail,
+} from '@blog/service/testing/pages/fixtures';
 import { describe, expect, it, vi } from 'vitest';
 
 import { getPost } from './loader';
@@ -15,6 +20,12 @@ vi.mock('@blog/service/sanity/image', () => ({
     () => 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
   ),
 }));
+
+vi.mock('@blog/service/features/pages/post/adaptor/related/loader', () => ({
+  getRelatedPosts: vi.fn().mockResolvedValue([]),
+}));
+
+const mockGetRelatedPosts = vi.mocked(getRelatedPosts);
 
 describe('getPost', () => {
   it('returns null when the post is not found', async () => {
@@ -121,5 +132,71 @@ describe('getPost', () => {
     const result = await getPost('hello-world');
 
     expect(result?.seo.ogImageUrl).toBeUndefined();
+  });
+
+  it('maps tags from raw input', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostDetail({
+          tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world');
+
+    expect(result?.tags).toEqual([
+      { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
+    ]);
+  });
+
+  it('maps an absent tags field to an empty array', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostDetail({ tags: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world');
+
+    expect(result?.tags).toEqual([]);
+  });
+
+  it('exposes relatedPosts from getRelatedPosts', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostDetail({ _id: 'post-abc' }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+    mockGetRelatedPosts.mockResolvedValueOnce([
+      toPostCard(makeRawPostCard({ _id: 'related-1' })),
+    ]);
+
+    const result = await getPost('hello-world');
+
+    expect(result?.relatedPosts.map((post) => post.id)).toEqual(['related-1']);
+  });
+
+  it('calls getRelatedPosts with the post id, tag ids, and primary category id', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostDetail({
+          _id: 'post-abc',
+          tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
+          categories: [
+            {
+              _id: 'cat-1',
+              title: 'Engineering',
+              slug: 'engineering',
+              description: null,
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    await getPost('hello-world');
+
+    expect(mockGetRelatedPosts).toHaveBeenCalledWith(
+      'post-abc',
+      ['tag-1'],
+      'cat-1',
+    );
   });
 });

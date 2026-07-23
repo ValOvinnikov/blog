@@ -14,6 +14,7 @@ import { createCategoryService } from './features/pages/category';
 import { createGenericPageService } from './features/pages/generic';
 import { createHomeService } from './features/pages/home';
 import { createPostService } from './features/pages/post';
+import { createTagService } from './features/pages/tag';
 
 export const service = {
   pages: {
@@ -22,6 +23,7 @@ export const service = {
     blog: createBlogService(),
     post: createPostService(),
     category: createCategoryService(),
+    tag: createTagService(),
   },
   modules: {
     hero: createHeroModuleService(),
@@ -54,6 +56,7 @@ export type { TCategoryPage } from './features/pages/category';
 export type { TGenericPage } from './features/pages/generic';
 export type { THomePage } from './features/pages/home';
 export type { TPostDetail, TPostDetailAuthor } from './features/pages/post';
+export type { TTagPage } from './features/pages/tag';
 export { urlForImage } from './sanity/image';
 export type { TCategory } from './shared/transformers/to-category';
 export type { TModule } from './shared/transformers/to-module';
@@ -64,3 +67,4 @@ export type {
 } from './shared/transformers/to-post-card';
 export type { TSeoResolved } from './shared/transformers/resolve-seo';
 export type { TSocialLink } from './shared/transformers/to-social-link';
+export type { TTag } from './shared/transformers/to-tag';

@@ -4,6 +4,7 @@ import { authorCardFragment, authorDetailFragment } from './author';
 import { categoryFragment } from './category';
 import { imageWithAltFragment, sanityImageFragment } from './image';
 import { seoFragment } from './seo';
+import { tagFragment } from './tag';
 
 export const postCardFragment = q
   .fragmentForType<'blog_post'>()
@@ -55,4 +56,5 @@ export const postDetailFragment = q
       .deref()
       .project(categoryFragment)
       .notNull(),
+    tags: sub.field('tags[]').deref().project(tagFragment).nullable(true),
   }));

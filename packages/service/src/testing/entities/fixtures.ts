@@ -1,5 +1,6 @@
 import type { TRawAuthor } from '@blog/service/features/entities/author/adaptor/detail-page/transformer';
 import type { TRawCategory } from '@blog/service/shared/transformers/to-category';
+import type { TRawTag } from '@blog/service/shared/transformers/to-tag';
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 
 export function makeRawCategory(
@@ -10,6 +11,15 @@ export function makeRawCategory(
     title: 'Engineering',
     slug: 'engineering',
     description: 'Engineering posts',
+    ...overrides,
+  };
+}
+
+export function makeRawTag(overrides: Partial<TRawTag> = {}): TRawTag {
+  return {
+    _id: 'tag-1',
+    title: 'TypeScript',
+    slug: 'typescript',
     ...overrides,
   };
 }
