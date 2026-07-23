@@ -155,6 +155,31 @@ export const WithoutMeta: TStory = {
   },
 };
 
+export const WithFooterTags: TStory = {
+  args: {
+    children: (
+      <>
+        <Article.Header
+          categories={[{ label: 'Engineering', href: '/category/engineering' }]}
+          title={faker.lorem.sentence({ min: 4, max: 8 })}
+          lead={faker.lorem.paragraph()}
+          meta={{
+            author: { name: faker.person.fullName() },
+            publishedAt,
+            formattedDate,
+          }}
+        />
+        <Article.Body>{bodyParagraphs}</Article.Body>
+        <Article.Footer
+          tags={faker.helpers
+            .multiple(() => faker.lorem.word(), { count: 4 })
+            .map((label) => ({ label, href: `/tag/${label}` }))}
+        />
+      </>
+    ),
+  },
+};
+
 export const WithShareSlot: TStory = {
   args: {
     children: (
