@@ -40,6 +40,13 @@ describe(`<${CtaModule.name}/>`, () => {
     );
   });
 
+  it('omits the action wrapper when action is not provided', () => {
+    const { container } = setup({ action: undefined });
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(container.querySelector('section > div')).not.toBeInTheDocument();
+  });
+
   it('labels the section via the heading when headingId is provided', () => {
     const heading = faker.lorem.sentence(4);
     const { container } = setup({ heading, headingId: 'cta-heading' });
