@@ -22,4 +22,5 @@ export type TPostDetail = Omit<TPostCard, 'author' | 'categories'> & {
   categories: TCategory[];
   tags: TTag[];
   relatedPosts: TPostCard[];
+  readingTimeMinutes: number;
 };

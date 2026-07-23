@@ -3,6 +3,7 @@ import {
   toPostCardCategory,
   type TPostCardCategory,
 } from '@blog/service/shared/transformers/to-post-card';
+import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawArchivePostCard = InferFragmentType<
@@ -16,6 +17,7 @@ export type TArchivePostCard = {
   excerpt: string;
   publishedAt: string;
   categories: TPostCardCategory[];
+  readingTimeMinutes: number;
 };
 
 export function toArchivePostCard(raw: TRawArchivePostCard): TArchivePostCard {
@@ -26,5 +28,6 @@ export function toArchivePostCard(raw: TRawArchivePostCard): TArchivePostCard {
     excerpt: raw.excerpt,
     publishedAt: raw.publishedAt,
     categories: raw.categories.map(toPostCardCategory),
+    readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };
 }

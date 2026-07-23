@@ -28,4 +28,18 @@ describe(toArchivePostCard, () => {
     expect(result).not.toHaveProperty('featured');
     expect(result).not.toHaveProperty('author');
   });
+
+  it('computes readingTimeMinutes from the server-computed word count', () => {
+    const result = toArchivePostCard(
+      makeRawArchivePostCard({ wordCount: 401 }),
+    );
+
+    expect(result.readingTimeMinutes).toBe(3);
+  });
+
+  it('rounds a wordless post up to a 1-minute read', () => {
+    const result = toArchivePostCard(makeRawArchivePostCard({ wordCount: 0 }));
+
+    expect(result.readingTimeMinutes).toBe(1);
+  });
 });

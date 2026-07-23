@@ -190,6 +190,26 @@ describe('getPost', () => {
     expect(result?.tags).toEqual([]);
   });
 
+  it('computes readingTimeMinutes from the server-computed word count', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostDetail({ wordCount: 401 }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world');
+
+    expect(result?.readingTimeMinutes).toBe(3);
+  });
+
+  it('rounds a wordless post up to a 1-minute read', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostDetail({ wordCount: 0 }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world');
+
+    expect(result?.readingTimeMinutes).toBe(1);
+  });
+
   it('exposes relatedPosts from getRelatedPosts', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawPostDetail({ _id: 'post-abc' }))
