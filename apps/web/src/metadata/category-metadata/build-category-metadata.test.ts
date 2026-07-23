@@ -21,7 +21,13 @@ const category = {
 
 describe('buildCategoryMetadata', () => {
   it('builds metadata from the category title/description, self-canonical to /category/[slug]', async () => {
-    getCategoryPageMock.mockResolvedValue({ category, posts: [] });
+    getCategoryPageMock.mockResolvedValue({
+      category,
+      posts: [],
+      currentPage: 1,
+      totalPages: 1,
+      total: 0,
+    });
 
     const metadata = await buildCategoryMetadata('engineering');
 
@@ -32,12 +38,19 @@ describe('buildCategoryMetadata', () => {
     expect(metadata.openGraph?.description).toBe(
       'Posts about building things.',
     );
+    expect(getCategoryPageMock).toHaveBeenCalledWith('engineering', {
+      page: undefined,
+      itemsPerPage: 9,
+    });
   });
 
   it('falls back to the category title as description when none is authored', async () => {
     getCategoryPageMock.mockResolvedValue({
       category: { ...category, description: undefined },
       posts: [],
+      currentPage: 1,
+      totalPages: 1,
+      total: 0,
     });
 
     const metadata = await buildCategoryMetadata('engineering');
@@ -54,7 +67,13 @@ describe('buildCategoryMetadata', () => {
   });
 
   it('builds page-N metadata with a "– Page N" suffix, self-canonical to /category/[slug]/page/N — never /category/[slug]', async () => {
-    getCategoryPageMock.mockResolvedValue({ category, posts: [] });
+    getCategoryPageMock.mockResolvedValue({
+      category,
+      posts: [],
+      currentPage: 2,
+      totalPages: 3,
+      total: 20,
+    });
 
     const metadata = await buildCategoryMetadata('engineering', 2);
 

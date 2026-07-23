@@ -53,6 +53,9 @@ describe('GET /tag/[slug]/rss.xml', () => {
         },
       },
       posts: [post],
+      currentPage: 1,
+      totalPages: 1,
+      total: 1,
     });
     const { GET } = await import('./route');
 
@@ -77,6 +80,10 @@ describe('GET /tag/[slug]/rss.xml', () => {
     expect(doc.querySelector('item > link')?.textContent).toBe(
       'https://example.com/blog/hello-welcome',
     );
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
+      page: 1,
+      itemsPerPage: 9,
+    });
   });
 
   it('falls back to the tag title as the channel description when none is authored', async () => {
@@ -95,6 +102,9 @@ describe('GET /tag/[slug]/rss.xml', () => {
         },
       },
       posts: [],
+      currentPage: 1,
+      totalPages: 1,
+      total: 0,
     });
     const { GET } = await import('./route');
 
@@ -105,6 +115,48 @@ describe('GET /tag/[slug]/rss.xml', () => {
     expect(doc.querySelector('channel > description')?.textContent).toBe(
       'TypeScript',
     );
+  });
+
+  it('aggregates posts across every windowed tag page', async () => {
+    const tag = {
+      id: 'tag-1',
+      title: 'TypeScript',
+      slug: 'typescript',
+      description: 'The latest TypeScript posts.',
+      seo: {
+        title: 'TypeScript',
+        description: 'The latest TypeScript posts.',
+        ogTitle: 'TypeScript',
+        ogDescription: 'The latest TypeScript posts.',
+        ogImageUrl: undefined,
+      },
+    };
+    getTagPageMock.mockImplementation(({ page }: { page: number }) => {
+      if (page === 1) {
+        return Promise.resolve({
+          tag,
+          posts: [post],
+          currentPage: 1,
+          totalPages: 2,
+          total: 2,
+        });
+      }
+      return Promise.resolve({
+        tag,
+        posts: [{ ...post, slug: 'second-post', title: 'Second post' }],
+        currentPage: 2,
+        totalPages: 2,
+        total: 2,
+      });
+    });
+    const { GET } = await import('./route');
+
+    const response = await GET(new Request('https://example.com'), { params });
+    const xml = await response.text();
+    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+
+    expect(doc.querySelectorAll('item')).toHaveLength(2);
+    expect(getTagPageMock).toHaveBeenCalledTimes(2);
   });
 
   it('calls notFound() when the tag does not exist', async () => {

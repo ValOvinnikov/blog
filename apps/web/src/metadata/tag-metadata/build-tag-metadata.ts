@@ -5,7 +5,7 @@ import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import type { Metadata } from 'next';
 
 /**
- * Metadata for a `/tag/[slug]` page (unpaginated, `pageNumber` omitted) or a
+ * Metadata for a `/tag/[slug]` page (page 1, `pageNumber` omitted) or a
  * `/tag/[slug]/page/[page]` page (`pageNumber` ≥ 2). Unlike `TCategory`,
  * `TTagPageTag.seo` is already a fully-resolved `TSeoResolved` (authored →
  * content → site defaults), so this maps it straight through `toMetadata`,
@@ -20,13 +20,10 @@ export async function buildTagMetadata(
   slug: string,
   pageNumber?: number,
 ): Promise<Metadata> {
-  const result =
-    pageNumber === undefined
-      ? await service.pages.tag.v1.getTagPage(slug)
-      : await service.pages.tag.v1.getTagPage(slug, {
-          page: pageNumber,
-          itemsPerPage: TAG_ITEMS_PER_PAGE,
-        });
+  const result = await service.pages.tag.v1.getTagPage(slug, {
+    page: pageNumber,
+    itemsPerPage: TAG_ITEMS_PER_PAGE,
+  });
 
   if (!result) {
     return {};

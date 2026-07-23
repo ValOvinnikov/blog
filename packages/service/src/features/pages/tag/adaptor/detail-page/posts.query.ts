@@ -9,10 +9,6 @@ const tagPosts = q
   .star.filterByType('blog_post')
   .filterRaw('$slug in tags[]->slug.current');
 
-export const tagPagePostsQuery = tagPosts
-  .order('publishedAt desc')
-  .project(postCardFragment);
-
 export const buildTagPostsPageQuery = (start: number, end: number) =>
   q
     .parameters<TSlugParams>()

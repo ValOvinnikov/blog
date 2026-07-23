@@ -11,9 +11,11 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 
 describe('getCategoryPage', () => {
   it('returns null when the category is not found', async () => {
-    mockRun.mockResolvedValueOnce(null).mockResolvedValueOnce([]);
+    mockRun
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ posts: [], total: 0 });
 
-    const result = await getCategoryPage('missing');
+    const result = await getCategoryPage('missing', { itemsPerPage: 9 });
 
     expect(result).toBeNull();
   });
@@ -23,12 +25,12 @@ describe('getCategoryPage', () => {
       .mockResolvedValueOnce(
         makeRawCategory({ _id: 'cat-abc', title: 'Design' }),
       )
-      .mockResolvedValueOnce([
-        makeRawPostCard(),
-        makeRawPostCard({ _id: 'post-2' }),
-      ]);
+      .mockResolvedValueOnce({
+        posts: [makeRawPostCard(), makeRawPostCard({ _id: 'post-2' })],
+        total: 2,
+      });
 
-    const result = await getCategoryPage('design');
+    const result = await getCategoryPage('design', { itemsPerPage: 9 });
 
     expect(result).not.toBeNull();
     expect(result?.category.id).toBe('cat-abc');
@@ -37,23 +39,25 @@ describe('getCategoryPage', () => {
   });
 
   it('returns an empty posts list when no posts belong to the category', async () => {
-    mockRun.mockResolvedValueOnce(makeRawCategory()).mockResolvedValueOnce([]);
+    mockRun
+      .mockResolvedValueOnce(makeRawCategory())
+      .mockResolvedValueOnce({ posts: [], total: 0 });
 
-    const result = await getCategoryPage('engineering');
+    const result = await getCategoryPage('engineering', { itemsPerPage: 9 });
 
     expect(result?.posts).toEqual([]);
   });
 
-  it('leaves pagination fields undefined when called without a page', async () => {
+  it('defaults to page 1 and returns pagination metadata when called without a page', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawCategory())
-      .mockResolvedValueOnce([makeRawPostCard()]);
+      .mockResolvedValueOnce({ posts: [makeRawPostCard()], total: 1 });
 
-    const result = await getCategoryPage('engineering');
+    const result = await getCategoryPage('engineering', { itemsPerPage: 9 });
 
-    expect(result?.currentPage).toBeUndefined();
-    expect(result?.totalPages).toBeUndefined();
-    expect(result?.total).toBeUndefined();
+    expect(result?.currentPage).toBe(1);
+    expect(result?.totalPages).toBe(1);
+    expect(result?.total).toBe(1);
   });
 
   it('returns the sliced page window with pagination metadata when a page is given', async () => {

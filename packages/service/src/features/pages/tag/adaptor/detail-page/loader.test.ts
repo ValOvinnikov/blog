@@ -16,10 +16,10 @@ describe('getTagPage', () => {
   it('returns null when the tag is not found', async () => {
     mockRun
       .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce({ posts: [], total: 0 })
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getTagPage('missing');
+    const result = await getTagPage('missing', { itemsPerPage: 9 });
 
     expect(result).toBeNull();
   });
@@ -29,13 +29,13 @@ describe('getTagPage', () => {
       .mockResolvedValueOnce(
         makeRawTagPageTag({ _id: 'tag-abc', title: 'React' }),
       )
-      .mockResolvedValueOnce([
-        makeRawPostCard(),
-        makeRawPostCard({ _id: 'post-2' }),
-      ])
+      .mockResolvedValueOnce({
+        posts: [makeRawPostCard(), makeRawPostCard({ _id: 'post-2' })],
+        total: 2,
+      })
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getTagPage('react');
+    const result = await getTagPage('react', { itemsPerPage: 9 });
 
     expect(result).not.toBeNull();
     expect(result?.tag.id).toBe('tag-abc');
@@ -46,25 +46,25 @@ describe('getTagPage', () => {
   it('returns an empty posts list when no posts belong to the tag', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawTagPageTag())
-      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce({ posts: [], total: 0 })
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getTagPage('typescript');
+    const result = await getTagPage('typescript', { itemsPerPage: 9 });
 
     expect(result?.posts).toEqual([]);
   });
 
-  it('leaves pagination fields undefined when called without a page', async () => {
+  it('defaults to page 1 and returns pagination metadata when called without a page', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawTagPageTag())
-      .mockResolvedValueOnce([makeRawPostCard()])
+      .mockResolvedValueOnce({ posts: [makeRawPostCard()], total: 1 })
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getTagPage('typescript');
+    const result = await getTagPage('typescript', { itemsPerPage: 9 });
 
-    expect(result?.currentPage).toBeUndefined();
-    expect(result?.totalPages).toBeUndefined();
-    expect(result?.total).toBeUndefined();
+    expect(result?.currentPage).toBe(1);
+    expect(result?.totalPages).toBe(1);
+    expect(result?.total).toBe(1);
   });
 
   it('returns the sliced page window with pagination metadata when a page is given', async () => {
@@ -114,10 +114,10 @@ describe('getTagPage', () => {
           },
         }),
       )
-      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce({ posts: [], total: 0 })
       .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getTagPage('typescript');
+    const result = await getTagPage('typescript', { itemsPerPage: 9 });
 
     expect(result?.tag.description).toBe('Posts about TypeScript.');
     expect(result?.tag.seo.title).toBe('Authored Title');
@@ -133,12 +133,12 @@ describe('getTagPage', () => {
           seo: null,
         }),
       )
-      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce({ posts: [], total: 0 })
       .mockResolvedValueOnce(
         makeRawSiteSettings({ description: 'Site default description' }),
       );
 
-    const result = await getTagPage('rust');
+    const result = await getTagPage('rust', { itemsPerPage: 9 });
 
     expect(result).not.toBeNull();
     expect(result?.tag.description).toBeUndefined();
