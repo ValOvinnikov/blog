@@ -31,38 +31,38 @@ vi.mock('@web/components/pages/blog-post-page', () => ({
   ),
 }));
 
-describe('generateStaticParams', () => {
-  it('builds one entry per locale x slug combination', async () => {
-    getPostParamsMock.mockResolvedValue([{ slug: 'a' }, { slug: 'b' }]);
+describe('BlogPostSlugPage', () => {
+  describe('generateStaticParams', () => {
+    it('builds one entry per locale x slug combination', async () => {
+      getPostParamsMock.mockResolvedValue([{ slug: 'a' }, { slug: 'b' }]);
 
-    const params = await generateStaticParams();
+      const params = await generateStaticParams();
 
-    expect(params).toEqual([
-      { locale: 'EN', slug: 'a' },
-      { locale: 'EN', slug: 'b' },
-    ]);
-  });
-
-  it('returns an empty array when getPostParams rejects', async () => {
-    getPostParamsMock.mockRejectedValue(new Error('projectId missing'));
-
-    const params = await generateStaticParams();
-
-    expect(params).toEqual([]);
-  });
-});
-
-describe('generateMetadata', () => {
-  it('delegates to buildPostMetadata with the resolved slug', async () => {
-    const metadata = await generateMetadata({
-      params: Promise.resolve({ locale: 'EN', slug: 'hello-world' }),
+      expect(params).toEqual([
+        { locale: 'EN', slug: 'a' },
+        { locale: 'EN', slug: 'b' },
+      ]);
     });
 
-    expect(metadata).toEqual({ title: 'Hello World' });
-  });
-});
+    it('returns an empty array when getPostParams rejects', async () => {
+      getPostParamsMock.mockRejectedValue(new Error('projectId missing'));
 
-describe('BlogPostSlugPage', () => {
+      const params = await generateStaticParams();
+
+      expect(params).toEqual([]);
+    });
+  });
+
+  describe('generateMetadata', () => {
+    it('delegates to buildPostMetadata with the resolved slug', async () => {
+      const metadata = await generateMetadata({
+        params: Promise.resolve({ locale: 'EN', slug: 'hello-world' }),
+      });
+
+      expect(metadata).toEqual({ title: 'Hello World' });
+    });
+  });
+
   it('renders BlogPostPage with the resolved locale and slug', async () => {
     const ui = await BlogPostSlugPage({
       params: Promise.resolve({ locale: 'EN', slug: 'hello-world' }),

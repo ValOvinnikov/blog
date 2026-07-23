@@ -48,87 +48,6 @@ vi.mock('@web/i18n/navigation', () => ({
   ),
 }));
 
-describe('AuthorNumberedPage generateStaticParams', () => {
-  it('returns the author pagination params on success', async () => {
-    getAuthorPaginationParamsMock.mockResolvedValue([
-      { slug: 'jane-doe', page: '2' },
-      { slug: 'john-smith', page: '2' },
-    ]);
-
-    const params = await generateStaticParams();
-
-    expect(params).toEqual([
-      { slug: 'jane-doe', page: '2' },
-      { slug: 'john-smith', page: '2' },
-    ]);
-    expect(getAuthorPaginationParamsMock).toHaveBeenCalledWith(9);
-  });
-
-  it('returns an empty array when the fetch rejects', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getAuthorPaginationParamsMock.mockRejectedValue(new Error('boom'));
-
-    const params = await generateStaticParams();
-
-    expect(params).toEqual([]);
-    errorSpy.mockRestore();
-  });
-});
-
-describe('AuthorNumberedPage generateMetadata', () => {
-  it('returns empty metadata for page 1', async () => {
-    const metadata = await generateMetadata({
-      params: Promise.resolve({ locale: 'EN', slug: 'jane-doe', page: '1' }),
-    });
-
-    expect(metadata).toEqual({});
-    expect(getAuthorPageMock).not.toHaveBeenCalled();
-  });
-
-  it('returns empty metadata for a non-canonical page param', async () => {
-    const metadata = await generateMetadata({
-      params: Promise.resolve({
-        locale: 'EN',
-        slug: 'jane-doe',
-        page: 'abc',
-      }),
-    });
-
-    expect(metadata).toEqual({});
-  });
-
-  it('builds metadata for page 2', async () => {
-    getAuthorPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        author: {
-          id: 'author-1',
-          name: 'Jane Doe',
-          slug: 'jane-doe',
-          role: 'Senior Engineer',
-          imageUrl: undefined,
-          bio: undefined,
-          socialLinks: [],
-        },
-        posts: [],
-        currentPage: 2,
-        totalPages: 3,
-        total: 20,
-      },
-    });
-
-    const metadata = await generateMetadata({
-      params: Promise.resolve({ locale: 'EN', slug: 'jane-doe', page: '2' }),
-    });
-
-    expect(metadata.title).toBe('Jane Doe — Senior Engineer – Page 2');
-    expect(getAuthorPageMock).toHaveBeenCalledWith('jane-doe', {
-      page: 2,
-      itemsPerPage: 9,
-    });
-  });
-});
-
 const setup = customRenderAsync(AuthorNumberedPage, {
   params: Promise.resolve({
     locale: 'EN',
@@ -140,6 +59,87 @@ const setup = customRenderAsync(AuthorNumberedPage, {
 describe('AuthorNumberedPage', () => {
   beforeEach(() => {
     permanentRedirectMock.mockClear();
+  });
+
+  describe('generateStaticParams', () => {
+    it('returns the author pagination params on success', async () => {
+      getAuthorPaginationParamsMock.mockResolvedValue([
+        { slug: 'jane-doe', page: '2' },
+        { slug: 'john-smith', page: '2' },
+      ]);
+
+      const params = await generateStaticParams();
+
+      expect(params).toEqual([
+        { slug: 'jane-doe', page: '2' },
+        { slug: 'john-smith', page: '2' },
+      ]);
+      expect(getAuthorPaginationParamsMock).toHaveBeenCalledWith(9);
+    });
+
+    it('returns an empty array when the fetch rejects', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      getAuthorPaginationParamsMock.mockRejectedValue(new Error('boom'));
+
+      const params = await generateStaticParams();
+
+      expect(params).toEqual([]);
+      errorSpy.mockRestore();
+    });
+  });
+
+  describe('generateMetadata', () => {
+    it('returns empty metadata for page 1', async () => {
+      const metadata = await generateMetadata({
+        params: Promise.resolve({ locale: 'EN', slug: 'jane-doe', page: '1' }),
+      });
+
+      expect(metadata).toEqual({});
+      expect(getAuthorPageMock).not.toHaveBeenCalled();
+    });
+
+    it('returns empty metadata for a non-canonical page param', async () => {
+      const metadata = await generateMetadata({
+        params: Promise.resolve({
+          locale: 'EN',
+          slug: 'jane-doe',
+          page: 'abc',
+        }),
+      });
+
+      expect(metadata).toEqual({});
+    });
+
+    it('builds metadata for page 2', async () => {
+      getAuthorPageMock.mockResolvedValue({
+        ok: true,
+        data: {
+          author: {
+            id: 'author-1',
+            name: 'Jane Doe',
+            slug: 'jane-doe',
+            role: 'Senior Engineer',
+            imageUrl: undefined,
+            bio: undefined,
+            socialLinks: [],
+          },
+          posts: [],
+          currentPage: 2,
+          totalPages: 3,
+          total: 20,
+        },
+      });
+
+      const metadata = await generateMetadata({
+        params: Promise.resolve({ locale: 'EN', slug: 'jane-doe', page: '2' }),
+      });
+
+      expect(metadata.title).toBe('Jane Doe — Senior Engineer – Page 2');
+      expect(getAuthorPageMock).toHaveBeenCalledWith('jane-doe', {
+        page: 2,
+        itemsPerPage: 9,
+      });
+    });
   });
 
   it('redirects /author/[slug]/page/1 to /author/[slug] (canonical page 1 has one URL)', async () => {

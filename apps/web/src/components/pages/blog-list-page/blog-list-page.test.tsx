@@ -48,7 +48,7 @@ const post = makePostCard({
 
 const setup = customRenderAsync(BlogListPage, { page: 1, locale: 'en' });
 
-describe('BlogListPage', () => {
+describe(`<${BlogListPage.name}/>`, () => {
   beforeEach(() => {
     getIndexPageMock.mockReset();
     getCategoriesMock.mockReset();

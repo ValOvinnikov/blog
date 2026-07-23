@@ -50,84 +50,6 @@ vi.mock('@web/i18n/navigation', () => ({
   ),
 }));
 
-describe('CategoryNumberedPage generateStaticParams', () => {
-  it('returns the category pagination params on success', async () => {
-    getCategoryPaginationParamsMock.mockResolvedValue([
-      { slug: 'engineering', page: '2' },
-      { slug: 'design', page: '2' },
-    ]);
-
-    const params = await generateStaticParams();
-
-    expect(params).toEqual([
-      { slug: 'engineering', page: '2' },
-      { slug: 'design', page: '2' },
-    ]);
-    expect(getCategoryPaginationParamsMock).toHaveBeenCalledWith(9);
-  });
-
-  it('returns an empty array when the fetch rejects', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getCategoryPaginationParamsMock.mockRejectedValue(new Error('boom'));
-
-    const params = await generateStaticParams();
-
-    expect(params).toEqual([]);
-    errorSpy.mockRestore();
-  });
-});
-
-describe('CategoryNumberedPage generateMetadata', () => {
-  it('returns empty metadata for page 1', async () => {
-    const metadata = await generateMetadata({
-      params: Promise.resolve({ locale: 'EN', slug: 'engineering', page: '1' }),
-    });
-
-    expect(metadata).toEqual({});
-    expect(getCategoryPageMock).not.toHaveBeenCalled();
-  });
-
-  it('returns empty metadata for a non-canonical page param', async () => {
-    const metadata = await generateMetadata({
-      params: Promise.resolve({
-        locale: 'EN',
-        slug: 'engineering',
-        page: 'abc',
-      }),
-    });
-
-    expect(metadata).toEqual({});
-  });
-
-  it('builds metadata for page 2', async () => {
-    getCategoryPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        category: {
-          id: 'cat-1',
-          title: 'Engineering',
-          slug: 'engineering',
-          description: 'Posts about building things.',
-        },
-        posts: [],
-        currentPage: 2,
-        totalPages: 3,
-        total: 20,
-      },
-    });
-
-    const metadata = await generateMetadata({
-      params: Promise.resolve({ locale: 'EN', slug: 'engineering', page: '2' }),
-    });
-
-    expect(metadata.title).toBe('Engineering – Page 2');
-    expect(getCategoryPageMock).toHaveBeenCalledWith('engineering', {
-      page: 2,
-      itemsPerPage: 9,
-    });
-  });
-});
-
 const setup = customRenderAsync(CategoryNumberedPage, {
   params: Promise.resolve({
     locale: 'EN',
@@ -139,6 +61,92 @@ const setup = customRenderAsync(CategoryNumberedPage, {
 describe('CategoryNumberedPage', () => {
   beforeEach(() => {
     permanentRedirectMock.mockClear();
+  });
+
+  describe('generateStaticParams', () => {
+    it('returns the category pagination params on success', async () => {
+      getCategoryPaginationParamsMock.mockResolvedValue([
+        { slug: 'engineering', page: '2' },
+        { slug: 'design', page: '2' },
+      ]);
+
+      const params = await generateStaticParams();
+
+      expect(params).toEqual([
+        { slug: 'engineering', page: '2' },
+        { slug: 'design', page: '2' },
+      ]);
+      expect(getCategoryPaginationParamsMock).toHaveBeenCalledWith(9);
+    });
+
+    it('returns an empty array when the fetch rejects', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      getCategoryPaginationParamsMock.mockRejectedValue(new Error('boom'));
+
+      const params = await generateStaticParams();
+
+      expect(params).toEqual([]);
+      errorSpy.mockRestore();
+    });
+  });
+
+  describe('generateMetadata', () => {
+    it('returns empty metadata for page 1', async () => {
+      const metadata = await generateMetadata({
+        params: Promise.resolve({
+          locale: 'EN',
+          slug: 'engineering',
+          page: '1',
+        }),
+      });
+
+      expect(metadata).toEqual({});
+      expect(getCategoryPageMock).not.toHaveBeenCalled();
+    });
+
+    it('returns empty metadata for a non-canonical page param', async () => {
+      const metadata = await generateMetadata({
+        params: Promise.resolve({
+          locale: 'EN',
+          slug: 'engineering',
+          page: 'abc',
+        }),
+      });
+
+      expect(metadata).toEqual({});
+    });
+
+    it('builds metadata for page 2', async () => {
+      getCategoryPageMock.mockResolvedValue({
+        ok: true,
+        data: {
+          category: {
+            id: 'cat-1',
+            title: 'Engineering',
+            slug: 'engineering',
+            description: 'Posts about building things.',
+          },
+          posts: [],
+          currentPage: 2,
+          totalPages: 3,
+          total: 20,
+        },
+      });
+
+      const metadata = await generateMetadata({
+        params: Promise.resolve({
+          locale: 'EN',
+          slug: 'engineering',
+          page: '2',
+        }),
+      });
+
+      expect(metadata.title).toBe('Engineering – Page 2');
+      expect(getCategoryPageMock).toHaveBeenCalledWith('engineering', {
+        page: 2,
+        itemsPerPage: 9,
+      });
+    });
   });
 
   it('redirects /category/[slug]/page/1 to /category/[slug] (canonical page 1 has one URL)', async () => {

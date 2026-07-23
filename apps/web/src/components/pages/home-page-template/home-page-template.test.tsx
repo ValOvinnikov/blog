@@ -7,7 +7,7 @@ const setup = customRender(HomePageTemplate, {
   modules: <div>Modules content</div>,
 });
 
-describe('HomePageTemplate', () => {
+describe(`<${HomePageTemplate.name}/>`, () => {
   beforeEach(() => {
     setup();
   });

@@ -58,7 +58,7 @@ const setup = customRenderAsync(TagPage, {
   locale: 'en',
 });
 
-describe('TagPage', () => {
+describe(`<${TagPage.name}/>`, () => {
   beforeEach(() => {
     getTagPageMock.mockReset();
   });
