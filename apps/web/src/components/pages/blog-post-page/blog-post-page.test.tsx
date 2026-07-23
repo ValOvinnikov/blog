@@ -62,11 +62,13 @@ describe(`<${BlogPostPage.name}/>`, () => {
       screen.getByText('A sufficiently long excerpt for the card.'),
     ).toBeVisible();
     expect(screen.getByText('Body text.')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
-      'href',
-      '/category/engineering',
-    );
     expect(screen.getByText('Jane Doe')).toBeVisible();
+
+    const categoryLinks = screen.getAllByRole('link', { name: 'Engineering' });
+    expect(categoryLinks).toHaveLength(2);
+    categoryLinks.forEach((link) =>
+      expect(link).toHaveAttribute('href', '/category/engineering'),
+    );
 
     await userEvent.click(screen.getByRole('button', { name: /Share/ }));
     expect(screen.getByRole('menuitem', { name: /Share on X/ })).toBeVisible();

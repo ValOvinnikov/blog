@@ -9,6 +9,13 @@ export const postMetaVariants = tv({
     ],
     author: ['flex items-center gap-2'],
     authorName: ['text-text font-medium'],
+    category: [
+      'uppercase no-underline transition-colors duration-base ease-console',
+      'text-accent',
+      'hover:text-accent-hover',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+    ],
     share: ['ml-auto'],
   },
 });
