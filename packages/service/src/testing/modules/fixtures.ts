@@ -16,7 +16,6 @@ export function makeRawHeroModule(
     heroSubtitleMode: HERO_FIELD_MODE.POST_EXCERPT,
     heroSubtitle: null,
     heroImageMode: HERO_FIELD_MODE.POST_IMAGE,
-    heroImage: null,
     heroImageAsset: null,
     primaryActionLabel: null,
     secondaryAction: null,
