@@ -110,7 +110,7 @@ describe('TagPage', () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders the tag heading with no posts section when the tag has no posts', async () => {
+  it('renders the empty-state message when the tag has no posts', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -133,6 +133,13 @@ describe('TagPage', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'TypeScript' }),
     ).toBeVisible();
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'Posts tagged TypeScript',
+      }),
+    ).toBeVisible();
+    expect(screen.getByText('No posts tagged TypeScript yet.')).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 

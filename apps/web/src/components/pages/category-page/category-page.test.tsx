@@ -110,7 +110,7 @@ describe('CategoryPage', () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders the category heading with no posts section when the category has no posts', async () => {
+  it('renders the empty-state message when the category has no posts', async () => {
     getCategoryPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -132,6 +132,10 @@ describe('CategoryPage', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'News' }),
     ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Posts in News' }),
+    ).toBeVisible();
+    expect(screen.getByText('No posts in News yet.')).toBeVisible();
     expect(
       screen.queryByRole('link', { name: 'My Post Title' }),
     ).not.toBeInTheDocument();

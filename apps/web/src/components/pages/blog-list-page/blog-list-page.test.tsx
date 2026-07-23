@@ -105,6 +105,30 @@ describe('BlogListPage', () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
+  it('renders the empty-state message when there are no posts', async () => {
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Blog',
+        supportingText: 'Essays and notes.',
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'All posts' }),
+    ).toBeVisible();
+    expect(screen.getByText('No posts yet.')).toBeVisible();
+    expect(
+      screen.queryByRole('link', { name: 'My Post Title' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('renders the category chip row', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,

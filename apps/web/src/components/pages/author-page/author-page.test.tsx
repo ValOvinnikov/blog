@@ -159,7 +159,7 @@ describe('AuthorPage', () => {
     expect(link).toHaveAttribute('href', '/blog/my-post-slug');
   });
 
-  it('renders no posts section when the author has no posts', async () => {
+  it('renders the empty-state message when the author has no posts', async () => {
     getAuthorPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -173,6 +173,12 @@ describe('AuthorPage', () => {
 
     await setup();
 
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Posts by Jane Doe' }),
+    ).toBeVisible();
+    expect(
+      screen.getByText("Jane Doe hasn't published any posts yet."),
+    ).toBeVisible();
     expect(
       screen.queryByRole('link', { name: 'My Post Title' }),
     ).not.toBeInTheDocument();

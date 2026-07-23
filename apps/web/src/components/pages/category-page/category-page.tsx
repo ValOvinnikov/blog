@@ -66,6 +66,7 @@ export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
           title={`Posts in ${category.title}`}
           titleId="category-posts-title"
           linkAs={Link}
+          emptyMessage={`No posts in ${category.title} yet.`}
         />
       }
       pagination={
