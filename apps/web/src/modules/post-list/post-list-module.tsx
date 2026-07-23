@@ -1,6 +1,6 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
-import { PostsSection } from '@blog/ui';
+import { PostsSection } from '@blog/ui/organisms';
 import { Link } from '@web/i18n/navigation';
 import { formatDate } from '@web/utils/format-date';
 

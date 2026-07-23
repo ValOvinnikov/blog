@@ -1,4 +1,5 @@
-import { CommandLink, Heading, Text, TerminalChip } from '@blog/ui';
+import { Heading, Text } from '@blog/ui/atoms';
+import { CommandLink, TerminalChip } from '@blog/ui/molecules';
 import { SmartLink } from '@web/components/shared/smart-link';
 
 import { notFoundPageVariants } from './not-found-page-variants';

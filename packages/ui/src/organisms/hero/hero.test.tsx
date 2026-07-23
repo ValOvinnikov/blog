@@ -1,55 +1,52 @@
-import { render, screen } from '@testing-library/react';
+import {
+  customRender,
+  renderElement,
+  screen,
+} from '@blog/ui/testing/custom-render';
 
 import { Hero } from './hero';
 
+const setup = customRender(Hero, {
+  title: 'Building a Design System',
+  titleId: 'hero-title',
+});
+
 describe(`<${Hero.name}/>`, () => {
   it('renders the title', () => {
-    render(<Hero title="Building a Design System" titleId="hero-title" />);
+    setup();
     expect(
       screen.getByRole('heading', { name: 'Building a Design System' }),
     ).toBeVisible();
   });
 
   it('renders the excerpt when provided', () => {
-    render(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        excerpt="A walkthrough of Atomic Design with Tailwind."
-      />,
-    );
+    setup({ excerpt: 'A walkthrough of Atomic Design with Tailwind.' });
     expect(
       screen.getByText('A walkthrough of Atomic Design with Tailwind.'),
     ).toBeVisible();
   });
 
   it('does not render an excerpt element when excerpt is omitted', () => {
-    render(<Hero title="Building a Design System" titleId="hero-title" />);
+    setup();
     expect(
       screen.queryByText('A walkthrough of Atomic Design with Tailwind.'),
     ).not.toBeInTheDocument();
   });
 
   it('renders all provided tags', () => {
-    render(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        tags={['Design', 'Tailwind', 'React']}
-      />,
-    );
+    setup({ tags: ['Design', 'Tailwind', 'React'] });
     expect(screen.getByText('Design')).toBeVisible();
     expect(screen.getByText('Tailwind')).toBeVisible();
     expect(screen.getByText('React')).toBeVisible();
   });
 
   it('does not render the tags container when tags is omitted', () => {
-    render(<Hero title="Building a Design System" titleId="hero-title" />);
+    setup();
     expect(screen.queryByText('Design')).not.toBeInTheDocument();
   });
 
   it('renders Hero.Cta children', () => {
-    render(
+    renderElement(
       <Hero title="Building a Design System" titleId="hero-title">
         <Hero.Cta>
           <a href="/posts/design-system">Read more</a>
@@ -64,12 +61,12 @@ describe(`<${Hero.name}/>`, () => {
   });
 
   it('does not render a CTA when Hero.Cta is omitted', () => {
-    render(<Hero title="Building a Design System" titleId="hero-title" />);
+    setup();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('renders Hero.Media content', () => {
-    render(
+    renderElement(
       <Hero title="Building a Design System" titleId="hero-title">
         <Hero.Media>
           <img src="/img/hero.jpg" alt="Hero cover photo" />
@@ -80,14 +77,12 @@ describe(`<${Hero.name}/>`, () => {
   });
 
   it('does not render media when Hero.Media is omitted', () => {
-    render(<Hero title="Building a Design System" titleId="hero-title" />);
+    setup();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('labels the section via the title heading, not a redundant string', () => {
-    const { container } = render(
-      <Hero title="Building a Design System" titleId="hero-title" />,
-    );
+    const { container } = setup();
     const section = container.querySelector('section');
     expect(section).toHaveAttribute('aria-labelledby', 'hero-title');
     expect(
@@ -96,13 +91,7 @@ describe(`<${Hero.name}/>`, () => {
   });
 
   it('forwards data-testid to the root element', () => {
-    render(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        dataTestId="featured-hero"
-      />,
-    );
+    setup({ dataTestId: 'featured-hero' });
     expect(screen.getByTestId('featured-hero')).toBeVisible();
   });
 });

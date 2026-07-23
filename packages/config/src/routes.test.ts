@@ -33,4 +33,14 @@ describe('routes', () => {
     expect(routes.category('design', 2)).toBe('/category/design/page/2');
     expect(routes.category('design', 10)).toBe('/category/design/page/10');
   });
+
+  it('builds page 1 of a tag without a page segment', () => {
+    expect(routes.tag('typescript')).toBe('/tag/typescript');
+    expect(routes.tag('typescript', 1)).toBe('/tag/typescript');
+  });
+
+  it('builds page N of a tag under /tag/{slug}/page/', () => {
+    expect(routes.tag('typescript', 2)).toBe('/tag/typescript/page/2');
+    expect(routes.tag('typescript', 10)).toBe('/tag/typescript/page/10');
+  });
 });

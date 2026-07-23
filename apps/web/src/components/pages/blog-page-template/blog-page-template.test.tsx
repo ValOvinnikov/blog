@@ -1,17 +1,15 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { customRender, screen } from '@web/testing/custom-render';
 
 import { BlogPageTemplate } from './blog-page-template';
 
+const setup = customRender(BlogPageTemplate, {
+  heading: 'Blog',
+  posts: <div data-testid="posts-slot" />,
+});
+
 describe(`<${BlogPageTemplate.name}/>`, () => {
   it('renders the heading as the page h1 with posts and pagination slots', () => {
-    render(
-      <BlogPageTemplate
-        heading="Blog"
-        posts={<div data-testid="posts-slot" />}
-        pagination={<div data-testid="pagination-slot" />}
-      />,
-    );
+    setup({ pagination: <div data-testid="pagination-slot" /> });
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'Blog' }),
@@ -22,24 +20,15 @@ describe(`<${BlogPageTemplate.name}/>`, () => {
   });
 
   it('renders without a pagination slot', () => {
-    render(
-      <BlogPageTemplate
-        heading="Blog"
-        posts={<div data-testid="posts-slot" />}
-      />,
-    );
+    setup();
 
     expect(screen.getByTestId('posts-slot')).toBeInTheDocument();
   });
 
   it('renders supportingText under the h1 when passed', () => {
-    render(
-      <BlogPageTemplate
-        heading="Blog"
-        supportingText="Essays and notes on building this site."
-        posts={<div data-testid="posts-slot" />}
-      />,
-    );
+    setup({
+      supportingText: 'Essays and notes on building this site.',
+    });
 
     expect(
       screen.getByText('Essays and notes on building this site.'),
@@ -47,12 +36,7 @@ describe(`<${BlogPageTemplate.name}/>`, () => {
   });
 
   it('omits supportingText when not passed', () => {
-    render(
-      <BlogPageTemplate
-        heading="Blog"
-        posts={<div data-testid="posts-slot" />}
-      />,
-    );
+    setup();
 
     expect(
       screen.queryByText('Essays and notes on building this site.'),

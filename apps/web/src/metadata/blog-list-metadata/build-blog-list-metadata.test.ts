@@ -1,5 +1,4 @@
 import type { TSeoResolved } from '@blog/service';
-import { describe, expect, it, vi } from 'vitest';
 
 import { buildBlogListMetadata } from './build-blog-list-metadata';
 

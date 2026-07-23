@@ -1,5 +1,4 @@
 import { BRAND_VARIANTS } from '@blog/config';
-import { describe, expect, it } from 'vitest';
 
 import { buildBrandIconSvg } from './brand-icon-svg';
 

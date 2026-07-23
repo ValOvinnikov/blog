@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { renderElement, screen } from '@blog/ui/testing/custom-render';
 
 import { NavLink } from '../../atoms/nav-link';
 
@@ -6,7 +6,7 @@ import { Footer } from './footer';
 
 describe(`<${Footer.name}/>`, () => {
   it('renders Footer.Copyright with the current year and title', () => {
-    render(
+    renderElement(
       <Footer>
         <Footer.Copyright title="My Blog" />
       </Footer>,
@@ -16,7 +16,7 @@ describe(`<${Footer.name}/>`, () => {
   });
 
   it('renders Footer.Nav content', () => {
-    render(
+    renderElement(
       <Footer>
         <Footer.Nav>
           <NavLink href="/about">About</NavLink>
@@ -29,7 +29,7 @@ describe(`<${Footer.name}/>`, () => {
   });
 
   it('preserves hrefs on nav links', () => {
-    render(
+    renderElement(
       <Footer>
         <Footer.Nav>
           <NavLink href="/about">About</NavLink>
@@ -43,7 +43,7 @@ describe(`<${Footer.name}/>`, () => {
   });
 
   it('does not render a nav element when Footer.Nav is omitted', () => {
-    render(
+    renderElement(
       <Footer>
         <Footer.Copyright title="My Blog" />
       </Footer>,
@@ -54,7 +54,7 @@ describe(`<${Footer.name}/>`, () => {
   });
 
   it('renders unmatched children without dropping them', () => {
-    render(
+    renderElement(
       <Footer>
         <Footer.Copyright title="My Blog" />
         <span>stray content</span>
@@ -64,12 +64,12 @@ describe(`<${Footer.name}/>`, () => {
   });
 
   it('renders as a <footer> landmark', () => {
-    render(<Footer />);
+    renderElement(<Footer />);
     expect(screen.getByRole('contentinfo')).toBeVisible();
   });
 
   it('forwards data-testid to the root element', () => {
-    render(<Footer dataTestId="site-footer" />);
+    renderElement(<Footer dataTestId="site-footer" />);
     expect(screen.getByTestId('site-footer')).toBeVisible();
   });
 });

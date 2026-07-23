@@ -1,11 +1,11 @@
-import { render, screen } from '@testing-library/react';
+import { renderElement, screen } from '@blog/ui/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { PopoverMenu } from './popover-menu';
 
 describe(`<${PopoverMenu.name}/>`, () => {
   it('renders a trigger with the correct menu-button ARIA attributes', () => {
-    render(
+    renderElement(
       <PopoverMenu>
         <PopoverMenu.Trigger ariaLabel="Open menu" open={false} panelId="p1">
           Trigger
@@ -23,7 +23,7 @@ describe(`<${PopoverMenu.name}/>`, () => {
   });
 
   it('hides the panel when open is false and shows it when open is true', () => {
-    const { rerender } = render(
+    const { rerender } = renderElement(
       <PopoverMenu>
         <PopoverMenu.Trigger ariaLabel="Open menu" open={false} panelId="p1">
           Trigger
@@ -51,7 +51,7 @@ describe(`<${PopoverMenu.name}/>`, () => {
   });
 
   it('renders each Item with role="menuitem"', () => {
-    render(
+    renderElement(
       <PopoverMenu>
         <PopoverMenu.Trigger ariaLabel="Open menu" open panelId="p1">
           Trigger
@@ -74,7 +74,7 @@ describe(`<${PopoverMenu.name}/>`, () => {
 
   it('calls onClick when a button Item is clicked', async () => {
     const onClick = vi.fn();
-    render(
+    renderElement(
       <PopoverMenu>
         <PopoverMenu.Trigger ariaLabel="Open menu" open panelId="p1">
           Trigger
@@ -90,7 +90,7 @@ describe(`<${PopoverMenu.name}/>`, () => {
   });
 
   it('renders a Separator between Items with role="separator"', () => {
-    render(
+    renderElement(
       <PopoverMenu>
         <PopoverMenu.Trigger ariaLabel="Open menu" open panelId="p1">
           Trigger
@@ -109,7 +109,7 @@ describe(`<${PopoverMenu.name}/>`, () => {
   });
 
   it('forwards data-testid', () => {
-    render(
+    renderElement(
       <PopoverMenu dataTestId="popover-menu">
         <PopoverMenu.Trigger ariaLabel="Open menu" open panelId="p1">
           Trigger
@@ -124,7 +124,7 @@ describe(`<${PopoverMenu.name}/>`, () => {
   });
 
   it('merges extra className', () => {
-    render(
+    renderElement(
       <PopoverMenu className="mt-4" dataTestId="popover-menu">
         <PopoverMenu.Trigger ariaLabel="Open menu" open panelId="p1">
           Trigger

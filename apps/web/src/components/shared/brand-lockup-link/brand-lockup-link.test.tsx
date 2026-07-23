@@ -1,7 +1,6 @@
 import { BRAND_VARIANTS } from '@blog/config';
 import type { TBrand } from '@blog/service';
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { customRender, screen } from '@web/testing/custom-render';
 
 import { BrandLockupLink } from './brand-lockup-link';
 
@@ -14,9 +13,11 @@ const brand: TBrand = {
   variant: BRAND_VARIANTS.CONSOLE,
 };
 
+const setup = customRender(BrandLockupLink, { brand });
+
 describe(`<${BrandLockupLink.name}/>`, () => {
   it('renders a link home labelled "Home" wrapping the brand lockup', () => {
-    render(<BrandLockupLink brand={brand} />);
+    setup();
 
     const link = screen.getByRole('link', { name: 'Home' });
     expect(link).toHaveAttribute('href', '/');
@@ -25,9 +26,7 @@ describe(`<${BrandLockupLink.name}/>`, () => {
   });
 
   it('passes the spec line through to the brand lockup when set', () => {
-    render(
-      <BrandLockupLink brand={{ ...brand, specLine: 'Est. 2026 · Berlin' }} />,
-    );
+    setup({ brand: { ...brand, specLine: 'Est. 2026 · Berlin' } });
 
     expect(screen.getByText('Est. 2026 · Berlin')).toBeVisible();
   });

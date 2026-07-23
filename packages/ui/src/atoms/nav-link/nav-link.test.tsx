@@ -1,16 +1,25 @@
-import { render, screen } from '@testing-library/react';
+import {
+  customRender,
+  renderElement,
+  screen,
+} from '@blog/ui/testing/custom-render';
 import type { AnchorHTMLAttributes } from 'react';
 
 import { NavLink } from './nav-link';
 
+const setup = customRender(NavLink, {
+  href: '/',
+  children: 'Home',
+});
+
 describe(`<${NavLink.name}/>`, () => {
   it('renders children', () => {
-    render(<NavLink href="/">Home</NavLink>);
+    setup();
     expect(screen.getByRole('link', { name: 'Home' })).toBeVisible();
   });
 
   it('has correct href when passed', () => {
-    render(<NavLink href="/about">About</NavLink>);
+    setup({ href: '/about', children: 'About' });
     expect(screen.getByRole('link', { name: 'About' })).toHaveAttribute(
       'href',
       '/about',
@@ -18,18 +27,14 @@ describe(`<${NavLink.name}/>`, () => {
   });
 
   it('active variant applies accent color', () => {
-    render(
-      <NavLink href="/blog" isActive>
-        Blog
-      </NavLink>,
-    );
+    setup({ href: '/blog', isActive: true, children: 'Blog' });
     expect(screen.getByRole('link', { name: 'Blog' }).className).toContain(
       'text-accent',
     );
   });
 
   it('inactive variant applies subtle color by default', () => {
-    render(<NavLink href="/blog">Blog</NavLink>);
+    setup({ href: '/blog', children: 'Blog' });
     expect(screen.getByRole('link', { name: 'Blog' }).className).toContain(
       'text-subtle',
     );
@@ -45,7 +50,7 @@ describe(`<${NavLink.name}/>`, () => {
         {children}
       </a>
     );
-    render(
+    renderElement(
       <NavLink as={CustomLink} href="/custom">
         Custom
       </NavLink>,

@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { buildRssFeed, type TRssItem } from './build-rss-feed';
 
 const channel = {

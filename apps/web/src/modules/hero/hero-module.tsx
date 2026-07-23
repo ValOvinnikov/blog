@@ -1,5 +1,6 @@
 import { service } from '@blog/service';
-import { Hero, LinkButton } from '@blog/ui';
+import { LinkButton } from '@blog/ui/molecules';
+import { Hero } from '@blog/ui/organisms';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 

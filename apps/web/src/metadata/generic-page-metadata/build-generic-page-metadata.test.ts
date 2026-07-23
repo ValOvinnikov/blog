@@ -1,5 +1,4 @@
 import type { TSeoResolved } from '@blog/service';
-import { describe, expect, it, vi } from 'vitest';
 
 import { buildGenericPageMetadata } from './build-generic-page-metadata';
 

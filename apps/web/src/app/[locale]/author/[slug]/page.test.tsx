@@ -1,5 +1,3 @@
-import { describe, expect, it, vi } from 'vitest';
-
 import { generateStaticParams } from './page';
 
 const { getAuthorParamsMock } = vi.hoisted(() => ({

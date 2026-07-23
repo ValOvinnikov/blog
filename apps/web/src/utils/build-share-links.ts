@@ -1,4 +1,4 @@
-import type { IShareLinkItem } from '@blog/ui';
+import type { IShareLinkItem } from '@blog/ui/molecules';
 
 /**
  * Builds the `IShareLinkItem[]` for a post's share actions — `PostShare`

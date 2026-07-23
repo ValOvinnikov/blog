@@ -1,5 +1,5 @@
+import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 
 import { PrimaryNavigation } from './primary-navigation';
@@ -14,28 +14,30 @@ const links = faker.helpers.multiple(
   { count: 3 },
 );
 
+const setup = customRender(PrimaryNavigation, {
+  links,
+});
+
 describe(`<${PrimaryNavigation.name}/>`, () => {
   it('renders all nav links', () => {
-    render(<PrimaryNavigation links={links} />);
+    setup();
     for (const link of links) {
       expect(screen.getByRole('link', { name: link.label })).toBeVisible();
     }
   });
 
   it('renders as a nav landmark', () => {
-    render(<PrimaryNavigation links={links} />);
+    setup();
     expect(screen.getByRole('navigation')).toBeVisible();
   });
 
   it('renders the actions slot when provided', () => {
-    render(
-      <PrimaryNavigation links={links} actions={<button>Toggle</button>} />,
-    );
+    setup({ actions: <button>Toggle</button> });
     expect(screen.getByRole('button', { name: 'Toggle' })).toBeVisible();
   });
 
   it('renders without actions when omitted', () => {
-    render(<PrimaryNavigation links={links} />);
+    setup();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
@@ -43,14 +45,12 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
     const externalHref = faker.internet.url();
     const externalLabel = faker.lorem.words(2);
 
-    render(
-      <PrimaryNavigation
-        links={[
-          ...links,
-          { href: externalHref, label: externalLabel, target: '_blank' },
-        ]}
-      />,
-    );
+    setup({
+      links: [
+        ...links,
+        { href: externalHref, label: externalLabel, target: '_blank' },
+      ],
+    });
 
     expect(screen.getByRole('link', { name: externalLabel })).toHaveAttribute(
       'target',
@@ -76,7 +76,7 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       </a>
     );
 
-    render(<PrimaryNavigation links={links} linkAs={CustomLink} />);
+    setup({ linkAs: CustomLink });
     expect(screen.getAllByTestId('custom-link')).toHaveLength(links.length);
   });
 });

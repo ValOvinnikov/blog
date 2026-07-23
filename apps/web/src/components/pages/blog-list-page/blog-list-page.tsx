@@ -1,6 +1,6 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { Pagination, PostsSection } from '@blog/ui';
+import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
 import { Link } from '@web/i18n/navigation';
 import { formatDate } from '@web/utils/format-date';

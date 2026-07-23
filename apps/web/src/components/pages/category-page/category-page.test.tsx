@@ -1,5 +1,4 @@
-import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { CategoryPage } from './category-page';
 
@@ -49,6 +48,11 @@ const post = {
   categories: [{ id: 'cat-1', title: 'News', slug: 'news' }],
 };
 
+const setup = customRenderAsync(CategoryPage, {
+  slug: 'news',
+  locale: 'en',
+});
+
 describe('CategoryPage', () => {
   beforeEach(() => {
     getCategoryPageMock.mockReset();
@@ -58,9 +62,7 @@ describe('CategoryPage', () => {
   it('calls notFound() when the category does not exist', async () => {
     getCategoryPageMock.mockResolvedValue(null);
 
-    await expect(
-      CategoryPage({ slug: 'missing', locale: 'en' }),
-    ).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(notFoundMock).toHaveBeenCalledTimes(1);
   });
@@ -76,8 +78,7 @@ describe('CategoryPage', () => {
       posts: [post],
     });
 
-    const ui = await CategoryPage({ slug: 'news', locale: 'en' });
-    render(<>{ui}</>);
+    await setup();
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'News' }),
@@ -101,8 +102,7 @@ describe('CategoryPage', () => {
       posts: [],
     });
 
-    const ui = await CategoryPage({ slug: 'news', locale: 'en' });
-    render(<>{ui}</>);
+    await setup();
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'News' }),
@@ -124,7 +124,7 @@ describe('CategoryPage', () => {
       total: 20,
     });
 
-    await CategoryPage({ slug: 'news', locale: 'en', page: 2 });
+    await setup({ page: 2 });
 
     expect(getCategoryPageMock).toHaveBeenCalledWith('news', {
       page: 2,
@@ -146,8 +146,7 @@ describe('CategoryPage', () => {
       total: 20,
     });
 
-    const ui = await CategoryPage({ slug: 'news', locale: 'en', page: 2 });
-    render(<>{ui}</>);
+    await setup({ page: 2 });
 
     expect(
       screen.getByRole('navigation', { name: 'Category pages' }),
@@ -170,9 +169,7 @@ describe('CategoryPage', () => {
       total: 1,
     });
 
-    await expect(
-      CategoryPage({ slug: 'news', locale: 'en', page: 5 }),
-    ).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(notFoundMock).toHaveBeenCalledTimes(1);
   });
