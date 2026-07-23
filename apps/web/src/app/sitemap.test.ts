@@ -7,6 +7,7 @@ const {
   getTagParamsMock,
   getTagPaginationParamsMock,
   getAuthorParamsMock,
+  getAuthorPaginationParamsMock,
   getIndexPageParamsMock,
   getPageSlugsMock,
 } = vi.hoisted(() => ({
@@ -16,6 +17,7 @@ const {
   getTagParamsMock: vi.fn(),
   getTagPaginationParamsMock: vi.fn(),
   getAuthorParamsMock: vi.fn(),
+  getAuthorPaginationParamsMock: vi.fn(),
   getIndexPageParamsMock: vi.fn(),
   getPageSlugsMock: vi.fn(),
 }));
@@ -40,7 +42,12 @@ vi.mock('@blog/service', () => ({
       generic: { v1: { getPageSlugs: getPageSlugsMock } },
     },
     entities: {
-      author: { v1: { getAuthorParams: getAuthorParamsMock } },
+      author: {
+        v1: {
+          getAuthorParams: getAuthorParamsMock,
+          getAuthorPaginationParams: getAuthorPaginationParamsMock,
+        },
+      },
     },
   },
 }));
@@ -57,6 +64,7 @@ function mockAllEmpty() {
   getTagParamsMock.mockResolvedValue([]);
   getTagPaginationParamsMock.mockResolvedValue([]);
   getAuthorParamsMock.mockResolvedValue([]);
+  getAuthorPaginationParamsMock.mockResolvedValue([]);
   getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
   getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
 }
@@ -70,6 +78,7 @@ describe('sitemap', () => {
     getTagParamsMock.mockReset();
     getTagPaginationParamsMock.mockReset();
     getAuthorParamsMock.mockReset();
+    getAuthorPaginationParamsMock.mockReset();
     getIndexPageParamsMock.mockReset();
     getPageSlugsMock.mockReset();
   });
@@ -109,7 +118,7 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/about');
   });
 
-  it('includes numbered category and tag pagination pages', async () => {
+  it('includes numbered category, tag and author pagination pages', async () => {
     mockAllEmpty();
     getCategoryPaginationParamsMock.mockResolvedValue([
       { slug: 'news', page: '2' },
@@ -117,6 +126,9 @@ describe('sitemap', () => {
     getTagPaginationParamsMock.mockResolvedValue([
       { slug: 'typescript', page: '2' },
       { slug: 'typescript', page: '3' },
+    ]);
+    getAuthorPaginationParamsMock.mockResolvedValue([
+      { slug: 'jane-doe', page: '2' },
     ]);
     const sitemap = (await import('./sitemap')).default;
 
@@ -126,6 +138,7 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/category/news/page/2');
     expect(urls).toContain('https://example.com/tag/typescript/page/2');
     expect(urls).toContain('https://example.com/tag/typescript/page/3');
+    expect(urls).toContain('https://example.com/author/jane-doe/page/2');
   });
 
   it('omits category pagination pages when the fetch throws', async () => {
@@ -161,6 +174,18 @@ describe('sitemap', () => {
     const urls = entries.map((entry) => entry.url);
 
     expect(urls).not.toContain('https://example.com/author/jane-doe');
+    expect(urls).toContain('https://example.com/');
+  });
+
+  it('omits author pagination pages when the fetch throws', async () => {
+    mockAllEmpty();
+    getAuthorPaginationParamsMock.mockRejectedValue(new Error('boom'));
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+    const urls = entries.map((entry) => entry.url);
+
+    expect(urls).not.toContain('https://example.com/author/jane-doe/page/2');
     expect(urls).toContain('https://example.com/');
   });
 

@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { routing } from '@web/i18n/routing';
+import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
 import { env } from '@web/utils/env/env';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
@@ -95,11 +96,24 @@ async function getTagPaginationParamsSafe() {
   }
 }
 
+async function getAuthorPaginationParamsSafe() {
+  try {
+    return await service.entities.author.v1.getAuthorPaginationParams(
+      AUTHOR_ITEMS_PER_PAGE,
+    );
+  } catch (error) {
+    console.error(
+      `Error fetching author pagination params for sitemap: ${error}`,
+    );
+    return [];
+  }
+}
+
 /**
  * Site-wide sitemap: home, blog index + every numbered page, the `/topics`
  * hub, every published post, category, tag, and author archive (plus their
- * numbered pages 2..N for category/tag — see the pagination helpers above),
- * and every generic page. Every entry carries a `languages` alternate for
+ * numbered pages 2..N for category/tag/author — see the pagination helpers
+ * above), and every generic page. Every entry carries a `languages` alternate for
  * each configured locale — a no-op today
  * (`localePrefix: 'never'` means every locale resolves to the same
  * unprefixed path) but keeps this future-proof if locale-prefixed routing is
@@ -132,6 +146,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     authors,
     categoryPages,
     tagPages,
+    authorPages,
     blogParamsResult,
     genericPageSlugsResult,
   ] = await Promise.all([
@@ -141,6 +156,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getAuthorParamsSafe(),
     getCategoryPaginationParamsSafe(),
     getTagPaginationParamsSafe(),
+    getAuthorPaginationParamsSafe(),
     service.pages.blog.v1.getIndexPageParams(),
     service.pages.generic.v1.getPageSlugs(),
   ]);
@@ -178,6 +194,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       toEntry(routes.tag(slug, Number(page)), siteUrl),
     ),
     ...authors.map(({ slug }) => toEntry(routes.author(slug), siteUrl)),
+    ...authorPages.map(({ slug, page }) =>
+      toEntry(routes.author(slug, Number(page)), siteUrl),
+    ),
     ...genericPageSlugs.map(({ slug }) =>
       toEntry(routes.genericPage(slug), siteUrl),
     ),
