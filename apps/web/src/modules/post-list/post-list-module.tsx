@@ -34,7 +34,7 @@ export async function PostListModule({ id, locale }: IPostListModuleProps) {
     <PostsSection
       posts={items}
       title={title}
-      titleId="latest-posts-title"
+      titleId={`latest-posts-${id}`}
       linkAs={Link}
     />
   );

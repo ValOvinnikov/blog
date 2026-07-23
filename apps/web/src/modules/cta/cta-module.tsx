@@ -22,7 +22,7 @@ export async function CtaModule({ id }: ICtaModuleProps) {
   return (
     <CtaModuleUi
       heading={heading}
-      headingId="cta-module-heading"
+      headingId={`cta-${id}`}
       text={text}
       action={
         action ? (
