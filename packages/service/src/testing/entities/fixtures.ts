@@ -1,4 +1,5 @@
 import type { TRawAuthor } from '@blog/service/features/entities/author/adaptor/detail-page/transformer';
+import type { TRawCategoryWithPostCount } from '@blog/service/features/entities/categories/adaptor/transformer';
 import type { TRawCategory } from '@blog/service/shared/transformers/to-category';
 import type { TRawTag } from '@blog/service/shared/transformers/to-tag';
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
@@ -11,6 +12,16 @@ export function makeRawCategory(
     title: 'Engineering',
     slug: 'engineering',
     description: 'Engineering posts',
+    ...overrides,
+  };
+}
+
+export function makeRawCategoryWithPostCount(
+  overrides: Partial<TRawCategoryWithPostCount> = {},
+): TRawCategoryWithPostCount {
+  return {
+    ...makeRawCategory(),
+    postCount: 0,
     ...overrides,
   };
 }
