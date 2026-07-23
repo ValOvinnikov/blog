@@ -49,79 +49,6 @@ vi.mock('@web/i18n/navigation', () => ({
   ),
 }));
 
-describe('TagNumberedPage generateStaticParams', () => {
-  it('returns the tag pagination params on success', async () => {
-    getTagPaginationParamsMock.mockResolvedValue([
-      { slug: 'typescript', page: '2' },
-      { slug: 'react', page: '2' },
-    ]);
-
-    const params = await generateStaticParams();
-
-    expect(params).toEqual([
-      { slug: 'typescript', page: '2' },
-      { slug: 'react', page: '2' },
-    ]);
-    expect(getTagPaginationParamsMock).toHaveBeenCalledWith(9);
-  });
-
-  it('returns an empty array when the fetch rejects', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getTagPaginationParamsMock.mockRejectedValue(new Error('boom'));
-
-    const params = await generateStaticParams();
-
-    expect(params).toEqual([]);
-    errorSpy.mockRestore();
-  });
-});
-
-describe('TagNumberedPage generateMetadata', () => {
-  it('returns empty metadata for page 1', async () => {
-    const metadata = await generateMetadata({
-      params: Promise.resolve({ locale: 'EN', slug: 'typescript', page: '1' }),
-    });
-
-    expect(metadata).toEqual({});
-    expect(getTagPageMock).not.toHaveBeenCalled();
-  });
-
-  it('returns empty metadata for a non-canonical page param', async () => {
-    const metadata = await generateMetadata({
-      params: Promise.resolve({
-        locale: 'EN',
-        slug: 'typescript',
-        page: 'abc',
-      }),
-    });
-
-    expect(metadata).toEqual({});
-  });
-
-  it('builds metadata for page 2', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        tag: makeTag(),
-        posts: [],
-        currentPage: 2,
-        totalPages: 3,
-        total: 20,
-      },
-    });
-
-    const metadata = await generateMetadata({
-      params: Promise.resolve({ locale: 'EN', slug: 'typescript', page: '2' }),
-    });
-
-    expect(metadata.title).toBe('TypeScript – Page 2');
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
-      page: 2,
-      itemsPerPage: 9,
-    });
-  });
-});
-
 const setup = customRenderAsync(TagNumberedPage, {
   params: Promise.resolve({
     locale: 'EN',
@@ -133,6 +60,87 @@ const setup = customRenderAsync(TagNumberedPage, {
 describe('TagNumberedPage', () => {
   beforeEach(() => {
     permanentRedirectMock.mockClear();
+  });
+
+  describe('generateStaticParams', () => {
+    it('returns the tag pagination params on success', async () => {
+      getTagPaginationParamsMock.mockResolvedValue([
+        { slug: 'typescript', page: '2' },
+        { slug: 'react', page: '2' },
+      ]);
+
+      const params = await generateStaticParams();
+
+      expect(params).toEqual([
+        { slug: 'typescript', page: '2' },
+        { slug: 'react', page: '2' },
+      ]);
+      expect(getTagPaginationParamsMock).toHaveBeenCalledWith(9);
+    });
+
+    it('returns an empty array when the fetch rejects', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      getTagPaginationParamsMock.mockRejectedValue(new Error('boom'));
+
+      const params = await generateStaticParams();
+
+      expect(params).toEqual([]);
+      errorSpy.mockRestore();
+    });
+  });
+
+  describe('generateMetadata', () => {
+    it('returns empty metadata for page 1', async () => {
+      const metadata = await generateMetadata({
+        params: Promise.resolve({
+          locale: 'EN',
+          slug: 'typescript',
+          page: '1',
+        }),
+      });
+
+      expect(metadata).toEqual({});
+      expect(getTagPageMock).not.toHaveBeenCalled();
+    });
+
+    it('returns empty metadata for a non-canonical page param', async () => {
+      const metadata = await generateMetadata({
+        params: Promise.resolve({
+          locale: 'EN',
+          slug: 'typescript',
+          page: 'abc',
+        }),
+      });
+
+      expect(metadata).toEqual({});
+    });
+
+    it('builds metadata for page 2', async () => {
+      getTagPageMock.mockResolvedValue({
+        ok: true,
+        data: {
+          tag: makeTag(),
+          posts: [],
+          currentPage: 2,
+          totalPages: 3,
+          total: 20,
+        },
+      });
+
+      const metadata = await generateMetadata({
+        params: Promise.resolve({
+          locale: 'EN',
+          slug: 'typescript',
+          page: '2',
+        }),
+      });
+
+      expect(metadata.title).toBe('TypeScript – Page 2');
+      expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
+        page: 2,
+        itemsPerPage: 9,
+      });
+    });
   });
 
   it('redirects /tag/[slug]/page/1 to /tag/[slug] (canonical page 1 has one URL)', async () => {

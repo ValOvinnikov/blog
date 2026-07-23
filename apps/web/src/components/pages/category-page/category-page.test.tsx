@@ -60,7 +60,7 @@ const setup = customRenderAsync(CategoryPage, {
   locale: 'en',
 });
 
-describe('CategoryPage', () => {
+describe(`<${CategoryPage.name}/>`, () => {
   beforeEach(() => {
     getCategoryPageMock.mockReset();
     getCategoriesMock.mockReset();

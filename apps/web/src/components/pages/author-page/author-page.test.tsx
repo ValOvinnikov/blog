@@ -53,7 +53,7 @@ const post = makePostCard({
 
 const setup = customRenderAsync(AuthorPage, { slug: 'jane-doe', locale: 'en' });
 
-describe('AuthorPage', () => {
+describe(`<${AuthorPage.name}/>`, () => {
   beforeEach(() => {
     getAuthorPageMock.mockReset();
   });
