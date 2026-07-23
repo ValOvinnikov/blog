@@ -65,16 +65,62 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(screen.getByText('Jane Doe')).toBeVisible();
 
     const categoryLinks = screen.getAllByRole('link', { name: 'Engineering' });
-    expect(categoryLinks).toHaveLength(2);
-    categoryLinks.forEach((link) =>
-      expect(link).toHaveAttribute('href', '/category/engineering'),
-    );
+    expect(categoryLinks).toHaveLength(1);
+    expect(categoryLinks[0]).toHaveAttribute('href', '/category/engineering');
 
     await userEvent.click(screen.getByRole('button', { name: /Share/ }));
     expect(screen.getByRole('menuitem', { name: /Share on X/ })).toBeVisible();
     expect(
       screen.getByRole('menuitem', { name: /Share on LinkedIn/ }),
     ).toBeVisible();
+  });
+
+  it('renders the sole category as the eyebrow only, with no meta strip category link', async () => {
+    getPostMock.mockResolvedValue(mockPostDetail);
+
+    await setup();
+
+    expect(screen.getAllByRole('link', { name: 'Engineering' })).toHaveLength(
+      1,
+    );
+  });
+
+  it('splits multiple categories: the primary as the eyebrow, the rest in the meta strip', async () => {
+    getPostMock.mockResolvedValue({
+      ...mockPostDetail,
+      categories: [
+        {
+          id: 'cat-1',
+          title: 'Engineering',
+          slug: 'engineering',
+          description: undefined,
+        },
+        {
+          id: 'cat-2',
+          title: 'Design',
+          slug: 'design',
+          description: undefined,
+        },
+        {
+          id: 'cat-3',
+          title: 'Product',
+          slug: 'product',
+          description: undefined,
+        },
+      ],
+    });
+
+    await setup();
+
+    const primaryLinks = screen.getAllByRole('link', { name: 'Engineering' });
+    expect(primaryLinks).toHaveLength(1);
+    expect(primaryLinks[0]).toHaveAttribute('href', '/category/engineering');
+
+    const designLink = screen.getByRole('link', { name: 'Design' });
+    expect(designLink).toHaveAttribute('href', '/category/design');
+
+    const productLink = screen.getByRole('link', { name: 'Product' });
+    expect(productLink).toHaveAttribute('href', '/category/product');
   });
 
   it('renders the JSON-LD BlogPosting schema script', async () => {
