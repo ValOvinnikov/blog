@@ -75,6 +75,9 @@ describe('TagPage', () => {
         seo,
       },
       posts: [post],
+      currentPage: 1,
+      totalPages: 1,
+      total: 1,
     });
 
     await setup();
@@ -100,6 +103,9 @@ describe('TagPage', () => {
         seo,
       },
       posts: [],
+      currentPage: 1,
+      totalPages: 1,
+      total: 0,
     });
 
     await setup();
@@ -108,6 +114,29 @@ describe('TagPage', () => {
       screen.getByRole('heading', { level: 1, name: 'TypeScript' }),
     ).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('calls getTagPage with the fixed itemsPerPage, page undefined, on page 1', async () => {
+    getTagPageMock.mockResolvedValue({
+      tag: {
+        id: 'tag-1',
+        title: 'TypeScript',
+        slug: 'typescript',
+        description: 'The latest TypeScript posts.',
+        seo,
+      },
+      posts: [post],
+      currentPage: 1,
+      totalPages: 1,
+      total: 1,
+    });
+
+    await setup();
+
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
+      page: undefined,
+      itemsPerPage: 9,
+    });
   });
 
   it('calls the paginated getTagPage with the fixed itemsPerPage when a page is given', async () => {
@@ -131,6 +160,26 @@ describe('TagPage', () => {
       page: 2,
       itemsPerPage: 9,
     });
+  });
+
+  it('renders pagination on page 1 when there is more than one page', async () => {
+    getTagPageMock.mockResolvedValue({
+      tag: {
+        id: 'tag-1',
+        title: 'TypeScript',
+        slug: 'typescript',
+        description: 'The latest TypeScript posts.',
+        seo,
+      },
+      posts: [post],
+      currentPage: 1,
+      totalPages: 3,
+      total: 20,
+    });
+
+    await setup();
+
+    expect(screen.getByRole('navigation', { name: 'Tag pages' })).toBeVisible();
   });
 
   it('renders pagination wired to routes.tag(slug, page) when a page is given', async () => {

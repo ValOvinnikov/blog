@@ -10,19 +10,17 @@ import { notFound } from 'next/navigation';
 type TCategoryPageProps = ILocalizedParams & { slug: string; page?: number };
 
 /**
- * CategoryPage — shared composition for `/category/[slug]` (page 1,
- * unpaginated — `page` omitted) and `/category/[slug]/page/[page]` (pages
- * ≥ 2, `page` provided): fetches posts for the category and renders them
- * through the same pure ui organisms as `BlogListPage`.
+ * CategoryPage — shared composition for `/category/[slug]` (page 1, `page`
+ * omitted) and `/category/[slug]/page/[page]` (pages ≥ 2, `page` provided):
+ * fetches posts for the category and renders them through the same pure ui
+ * organisms as `BlogListPage`. `getCategoryPage` always windows — page 1
+ * gets the same pagination metadata as any other page.
  */
 export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
-  const result =
-    page === undefined
-      ? await service.pages.category.v1.getCategoryPage(slug)
-      : await service.pages.category.v1.getCategoryPage(slug, {
-          page,
-          itemsPerPage: CATEGORY_ITEMS_PER_PAGE,
-        });
+  const result = await service.pages.category.v1.getCategoryPage(slug, {
+    page,
+    itemsPerPage: CATEGORY_ITEMS_PER_PAGE,
+  });
 
   if (!result) {
     notFound();
@@ -32,7 +30,7 @@ export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
 
   // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
   // soft-404 or a redirect to the last page (spec SEO rules).
-  if (page !== undefined && totalPages !== undefined && page > totalPages) {
+  if (page !== undefined && page > totalPages) {
     notFound();
   }
 
@@ -59,17 +57,15 @@ export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
         />
       }
       pagination={
-        currentPage !== undefined && totalPages !== undefined ? (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            createHref={(pageNumber) => routes.category(slug, pageNumber)}
-            ariaLabel="Category pages"
-            previousLabel="Previous"
-            nextLabel="Next"
-            linkAs={Link}
-          />
-        ) : undefined
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          createHref={(pageNumber) => routes.category(slug, pageNumber)}
+          ariaLabel="Category pages"
+          previousLabel="Previous"
+          nextLabel="Next"
+          linkAs={Link}
+        />
       }
     />
   );

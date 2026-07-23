@@ -66,6 +66,9 @@ describe('CategoryPage', () => {
         description: 'The latest updates.',
       },
       posts: [post],
+      currentPage: 1,
+      totalPages: 1,
+      total: 1,
     });
 
     await setup();
@@ -90,6 +93,9 @@ describe('CategoryPage', () => {
         description: 'The latest updates.',
       },
       posts: [],
+      currentPage: 1,
+      totalPages: 1,
+      total: 0,
     });
 
     await setup();
@@ -98,6 +104,28 @@ describe('CategoryPage', () => {
       screen.getByRole('heading', { level: 1, name: 'News' }),
     ).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('calls getCategoryPage with the fixed itemsPerPage, page undefined, on page 1', async () => {
+    getCategoryPageMock.mockResolvedValue({
+      category: {
+        id: 'cat-1',
+        title: 'News',
+        slug: 'news',
+        description: 'The latest updates.',
+      },
+      posts: [post],
+      currentPage: 1,
+      totalPages: 1,
+      total: 1,
+    });
+
+    await setup();
+
+    expect(getCategoryPageMock).toHaveBeenCalledWith('news', {
+      page: undefined,
+      itemsPerPage: 9,
+    });
   });
 
   it('calls the paginated getCategoryPage with the fixed itemsPerPage when a page is given', async () => {
@@ -120,6 +148,27 @@ describe('CategoryPage', () => {
       page: 2,
       itemsPerPage: 9,
     });
+  });
+
+  it('renders pagination on page 1 when there is more than one page', async () => {
+    getCategoryPageMock.mockResolvedValue({
+      category: {
+        id: 'cat-1',
+        title: 'News',
+        slug: 'news',
+        description: 'The latest updates.',
+      },
+      posts: [post],
+      currentPage: 1,
+      totalPages: 3,
+      total: 20,
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('navigation', { name: 'Category pages' }),
+    ).toBeVisible();
   });
 
   it('renders pagination wired to routes.category(slug, page) when a page is given', async () => {

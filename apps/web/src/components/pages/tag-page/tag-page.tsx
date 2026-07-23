@@ -10,19 +10,17 @@ import { notFound } from 'next/navigation';
 type TTagPageProps = ILocalizedParams & { slug: string; page?: number };
 
 /**
- * TagPage — shared composition for `/tag/[slug]` (page 1, unpaginated —
- * `page` omitted) and `/tag/[slug]/page/[page]` (pages ≥ 2, `page`
- * provided): fetches posts for the tag and renders them through the same
- * pure ui organisms as `CategoryPage`.
+ * TagPage — shared composition for `/tag/[slug]` (page 1, `page` omitted)
+ * and `/tag/[slug]/page/[page]` (pages ≥ 2, `page` provided): fetches posts
+ * for the tag and renders them through the same pure ui organisms as
+ * `CategoryPage`. `getTagPage` always windows — page 1 gets the same
+ * pagination metadata as any other page.
  */
 export async function TagPage({ slug, locale, page }: TTagPageProps) {
-  const result =
-    page === undefined
-      ? await service.pages.tag.v1.getTagPage(slug)
-      : await service.pages.tag.v1.getTagPage(slug, {
-          page,
-          itemsPerPage: TAG_ITEMS_PER_PAGE,
-        });
+  const result = await service.pages.tag.v1.getTagPage(slug, {
+    page,
+    itemsPerPage: TAG_ITEMS_PER_PAGE,
+  });
 
   if (!result) {
     notFound();
@@ -32,7 +30,7 @@ export async function TagPage({ slug, locale, page }: TTagPageProps) {
 
   // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
   // soft-404 or a redirect to the last page (spec SEO rules).
-  if (page !== undefined && totalPages !== undefined && page > totalPages) {
+  if (page !== undefined && page > totalPages) {
     notFound();
   }
 
@@ -59,17 +57,15 @@ export async function TagPage({ slug, locale, page }: TTagPageProps) {
         />
       }
       pagination={
-        currentPage !== undefined && totalPages !== undefined ? (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            createHref={(pageNumber) => routes.tag(slug, pageNumber)}
-            ariaLabel="Tag pages"
-            previousLabel="Previous"
-            nextLabel="Next"
-            linkAs={Link}
-          />
-        ) : undefined
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          createHref={(pageNumber) => routes.tag(slug, pageNumber)}
+          ariaLabel="Tag pages"
+          previousLabel="Previous"
+          nextLabel="Next"
+          linkAs={Link}
+        />
       }
     />
   );

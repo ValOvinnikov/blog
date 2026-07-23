@@ -28,7 +28,13 @@ const tag = {
 
 describe('buildTagMetadata', () => {
   it('builds metadata from the tag resolved seo, self-canonical to /tag/[slug]', async () => {
-    getTagPageMock.mockResolvedValue({ tag, posts: [] });
+    getTagPageMock.mockResolvedValue({
+      tag,
+      posts: [],
+      currentPage: 1,
+      totalPages: 1,
+      total: 0,
+    });
 
     const metadata = await buildTagMetadata('typescript');
 
@@ -37,6 +43,10 @@ describe('buildTagMetadata', () => {
     expect(metadata.alternates?.canonical).toBe('/tag/typescript');
     expect(metadata.openGraph?.title).toBe('TypeScript');
     expect(metadata.openGraph?.description).toBe('Posts about TypeScript.');
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
+      page: undefined,
+      itemsPerPage: 9,
+    });
   });
 
   it('returns empty metadata when the tag does not exist', async () => {
@@ -48,7 +58,13 @@ describe('buildTagMetadata', () => {
   });
 
   it('builds page-N metadata with a "– Page N" suffix, self-canonical to /tag/[slug]/page/N — never /tag/[slug]', async () => {
-    getTagPageMock.mockResolvedValue({ tag, posts: [] });
+    getTagPageMock.mockResolvedValue({
+      tag,
+      posts: [],
+      currentPage: 2,
+      totalPages: 3,
+      total: 20,
+    });
 
     const metadata = await buildTagMetadata('typescript', 2);
 
