@@ -32,6 +32,5 @@ export async function getAuthorPage(
     posts,
     currentPage: page,
     totalPages: toTotalPages(total, itemsPerPage),
-    total,
   };
 }

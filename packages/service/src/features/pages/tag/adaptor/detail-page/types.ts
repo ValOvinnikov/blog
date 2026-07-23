@@ -1,6 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config';
 import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo';
-import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
+import type { TArchivePostCard } from '@blog/service/shared/transformers/to-archive-post-card';
 
 // The tag page's own richer tag shape — `description`/`seo` on top of the
 // minimal `{id,title,slug}` chip shape `TTag` provides for the post-detail
@@ -15,8 +15,7 @@ export type TTagPageTag = {
 
 export type TTagPage = {
   tag: TTagPageTag;
-  posts: TPostCard[];
+  posts: TArchivePostCard[];
   currentPage: number;
   totalPages: number;
-  total: number;
 };

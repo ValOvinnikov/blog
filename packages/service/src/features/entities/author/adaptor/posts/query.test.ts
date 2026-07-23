@@ -1,13 +1,10 @@
 import { makeRawCategory } from '@blog/service/testing/entities/fixtures';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawArchivePostCard } from '@blog/service/testing/pages/fixtures';
 
 import { buildAuthorPostsPageQuery } from './query';
 
 function makeSparseRawPostCard() {
-  return makeRawPostCard({
-    heroImage: null,
-    heroImageAsset: null,
-    featured: null,
+  return makeRawArchivePostCard({
     categories: [makeRawCategory({ description: null })],
   });
 }

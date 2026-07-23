@@ -1,5 +1,5 @@
 import { q, type TSlugParams } from '@blog/service/sanity/query';
-import { postCardFragment } from '@blog/service/shared/fragments/post';
+import { archivePostCardFragment } from '@blog/service/shared/fragments/archive-post-card';
 
 // `filterBy`'s strong typing only covers simple equality/comparison
 // expressions; the `in` operator across a dereferenced array isn't
@@ -16,7 +16,7 @@ export const buildTagPostsPageQuery = (start: number, end: number) =>
       posts: tagPosts
         .order('publishedAt desc')
         .slice(start, end)
-        .project(postCardFragment)
+        .project(archivePostCardFragment)
         .notNull(true),
       total: sub.count(tagPosts).notNull(true),
     }))

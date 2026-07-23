@@ -1,5 +1,5 @@
+import { toArchivePostCard } from '@blog/service/shared/transformers/to-archive-post-card';
 import { toCategory } from '@blog/service/shared/transformers/to-category';
-import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { InferResultType } from 'groqd';
 
 import type { categoryPageCategoryQuery } from './category.query';
@@ -16,7 +16,6 @@ type TRawPosts = InferResultType<
 export type TCategoryPagePagination = {
   currentPage: number;
   totalPages: number;
-  total: number;
 };
 
 export function toCategoryPage(
@@ -26,9 +25,8 @@ export function toCategoryPage(
 ): TCategoryPage {
   return {
     category: toCategory(rawCategory),
-    posts: rawPosts.map(toPostCard),
+    posts: rawPosts.map(toArchivePostCard),
     currentPage: pagination.currentPage,
     totalPages: pagination.totalPages,
-    total: pagination.total,
   };
 }

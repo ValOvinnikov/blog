@@ -1,7 +1,9 @@
-import { makeRawPostCard } from '@blog/service/testing/fixtures';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawBlogPage } from '@blog/service/testing/pages/fixtures';
+import {
+  makeRawArchivePostCard,
+  makeRawBlogPage,
+} from '@blog/service/testing/pages/fixtures';
 
 import { getIndexPage } from './loader';
 
@@ -22,7 +24,10 @@ describe('getIndexPage', () => {
       .mockResolvedValueOnce(makeRawBlogPage({ itemsPerPage: 9 }))
       .mockResolvedValueOnce(makeRawSiteSettings())
       .mockResolvedValueOnce({
-        posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'b' })],
+        posts: [
+          makeRawArchivePostCard({ _id: 'a' }),
+          makeRawArchivePostCard({ _id: 'b' }),
+        ],
         total: 20,
       });
 
@@ -30,7 +35,6 @@ describe('getIndexPage', () => {
 
     expect(result.posts.map((p) => p.id)).toEqual(['a', 'b']);
     expect(result.currentPage).toBe(2);
-    expect(result.total).toBe(20);
     expect(result.totalPages).toBe(3); // ceil(20 / 9)
   });
 
@@ -49,7 +53,7 @@ describe('getIndexPage', () => {
       )
       .mockResolvedValueOnce(makeRawSiteSettings())
       .mockResolvedValueOnce({
-        posts: [makeRawPostCard({ _id: 'a' })],
+        posts: [makeRawArchivePostCard({ _id: 'a' })],
         total: 1,
       });
 

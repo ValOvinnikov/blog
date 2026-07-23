@@ -1,5 +1,5 @@
 import { q, type TSlugParams } from '@blog/service/sanity/query';
-import { postCardFragment } from '@blog/service/shared/fragments/post';
+import { archivePostCardFragment } from '@blog/service/shared/fragments/archive-post-card';
 
 // `author` is a single dereferenced reference (unlike the array-of-references
 // `categories`), so the filter is a direct equality check through the
@@ -18,7 +18,7 @@ export const buildAuthorPostsPageQuery = (start: number, end: number) =>
       posts: authorPosts
         .order('publishedAt desc')
         .slice(start, end)
-        .project(postCardFragment)
+        .project(archivePostCardFragment)
         .notNull(true),
       total: sub.count(authorPosts).notNull(true),
     }))

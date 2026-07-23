@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { postCardFragment } from '@blog/service/shared/fragments/post';
+import { archivePostCardFragment } from '@blog/service/shared/fragments/archive-post-card';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
 
 const blogPosts = q.star.filterByType('blog_post');
@@ -21,7 +21,7 @@ export const buildIndexPageQuery = (start: number, end: number) =>
       posts: blogPosts
         .order('publishedAt desc')
         .slice(start, end)
-        .project(postCardFragment)
+        .project(archivePostCardFragment)
         .notNull(true),
       total: sub.count(blogPosts).notNull(true),
     }))

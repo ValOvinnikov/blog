@@ -1,5 +1,5 @@
 import { routes } from '@blog/config';
-import { service, type TPostCard, type TTagPage } from '@blog/service';
+import { service, type TArchivePostCard, type TTagPage } from '@blog/service';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
 import { env } from '@web/utils/env/env';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
@@ -9,7 +9,7 @@ type TProps = {
   params: Promise<{ slug: string }>;
 };
 
-function toRssItem(post: TPostCard, siteUrl: string): TRssItem {
+function toRssItem(post: TArchivePostCard, siteUrl: string): TRssItem {
   return {
     title: post.title,
     link: `${siteUrl}${routes.post(post.slug)}`,

@@ -38,6 +38,5 @@ export async function getCategoryPage(
   return toCategoryPage(rawCategory, rawPosts.posts, {
     currentPage: page,
     totalPages: toTotalPages(rawPosts.total, itemsPerPage),
-    total: rawPosts.total,
   });
 }

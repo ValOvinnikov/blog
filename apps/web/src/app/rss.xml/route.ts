@@ -1,12 +1,12 @@
 import { routes } from '@blog/config';
-import { service, type TPostCard } from '@blog/service';
+import { service, type TArchivePostCard } from '@blog/service';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
 import { env } from '@web/utils/env/env';
 
 const FALLBACK_TITLE = 'Blog';
 const FALLBACK_DESCRIPTION = 'Latest posts';
 
-function toRssItem(post: TPostCard, siteUrl: string): TRssItem {
+function toRssItem(post: TArchivePostCard, siteUrl: string): TRssItem {
   return {
     title: post.title,
     link: `${siteUrl}${routes.post(post.slug)}`,
@@ -15,7 +15,7 @@ function toRssItem(post: TPostCard, siteUrl: string): TRssItem {
   };
 }
 
-async function getAllPublishedPosts(): Promise<TPostCard[]> {
+async function getAllPublishedPosts(): Promise<TArchivePostCard[]> {
   const firstPageResult = await service.pages.blog.v1.getIndexPage({ page: 1 });
   if (!firstPageResult.ok) {
     console.error(

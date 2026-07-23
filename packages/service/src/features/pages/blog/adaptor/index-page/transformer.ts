@@ -1,6 +1,6 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
-import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
+import { toArchivePostCard } from '@blog/service/shared/transformers/to-archive-post-card';
 import { toTotalPages } from '@blog/utils';
 import type { InferResultType } from 'groqd';
 
@@ -30,9 +30,8 @@ export function toIndexPage(
         defaultOgImageUrl: settings.defaultOgImageUrl,
       },
     ),
-    posts: rawPosts.posts.map(toPostCard),
+    posts: rawPosts.posts.map(toArchivePostCard),
     currentPage,
     totalPages: toTotalPages(rawPosts.total, pageSize),
-    total: rawPosts.total,
   };
 }

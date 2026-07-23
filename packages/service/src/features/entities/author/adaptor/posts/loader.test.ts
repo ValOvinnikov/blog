@@ -1,5 +1,5 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawArchivePostCard } from '@blog/service/testing/pages/fixtures';
 
 import { getAuthorPosts } from './loader';
 
@@ -12,8 +12,8 @@ describe('getAuthorPosts', () => {
   it('maps the raw posts into post cards, preserving query order', async () => {
     mockRun.mockResolvedValueOnce({
       posts: [
-        makeRawPostCard({ _id: 'post-1', title: 'Newest' }),
-        makeRawPostCard({ _id: 'post-2', title: 'Oldest' }),
+        makeRawArchivePostCard({ _id: 'post-1', title: 'Newest' }),
+        makeRawArchivePostCard({ _id: 'post-2', title: 'Oldest' }),
       ],
       total: 2,
     });
@@ -50,7 +50,7 @@ describe('getAuthorPosts', () => {
 
   it('defaults to page 1 when no page is given', async () => {
     mockRun.mockResolvedValueOnce({
-      posts: [makeRawPostCard()],
+      posts: [makeRawArchivePostCard()],
       total: 20,
     });
 
@@ -62,7 +62,10 @@ describe('getAuthorPosts', () => {
 
   it('windows the query using the given page and itemsPerPage', async () => {
     mockRun.mockResolvedValueOnce({
-      posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'b' })],
+      posts: [
+        makeRawArchivePostCard({ _id: 'a' }),
+        makeRawArchivePostCard({ _id: 'b' }),
+      ],
       total: 20,
     });
 
