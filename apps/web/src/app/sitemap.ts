@@ -7,12 +7,12 @@ import { env } from '@web/utils/env/env';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import type { MetadataRoute } from 'next';
 
-// `getPostParams()`/`getCategoryParams()`/`getTagParams()`/`getAuthorParams()`/
-// `getPageSlugs()` all currently project only `{ slug }` (or `{ slug, page }`
-// for the pagination variants) — no query in web's reach exposes a
-// `publishedAt`/`_updatedAt` field cheaply today, so `lastModified` stays
-// unset for every entry below until a service-layer change adds one (see the
-// module doc comment for the flagged follow-up).
+// `getPostParams()` now projects `{ slug, publishedAt }`, so post entries set
+// `lastModified` below. `getCategoryParams()`/`getTagParams()`/
+// `getAuthorParams()`/`getPageSlugs()` (and the pagination variants) still
+// project only `{ slug }` (or `{ slug, page }`) — no query in web's reach
+// exposes a `publishedAt`/`_updatedAt` field for those yet, so `lastModified`
+// stays unset for them until a service-layer change adds one.
 function toEntry(
   path: string,
   siteUrl: string,
@@ -123,14 +123,12 @@ async function getAuthorPaginationParamsSafe() {
  * every URL in a sitemap must be absolute, so there is no meaningful
  * relative fallback (mirrors `buildBlogPostingSchema`'s same judgment call).
  *
- * `lastModified` follow-up (#780): every params query above projects only
- * slug/page — none carries a `publishedAt`/`_updatedAt` field, so no entry
- * sets `lastModified` yet. Wiring it in (posts at minimum) needs a
- * service-layer change — e.g. adding `publishedAt` to
- * `getPostParams()`'s projection in
- * `packages/service/src/features/pages/post/adaptor/params/{query,loader}.ts`
- * — which is out of `web`'s scope; `toEntry()` already accepts an optional
- * `lastModified` param so wiring it in later is a one-line change per entry.
+ * `lastModified` (#780): post entries set it from `getPostParams()`'s
+ * `publishedAt` field. Category/tag/author/generic-page params queries still
+ * project only slug/page — none carries a `publishedAt`/`_updatedAt` field
+ * yet, so those entries leave `lastModified` unset until a service-layer
+ * change adds one; `toEntry()` already accepts an optional `lastModified`
+ * param so wiring it in later is a one-line change per entry.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = env.NEXT_PUBLIC_SITE_URL;
@@ -184,7 +182,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     toEntry(routes.blogIndex(), siteUrl),
     toEntry(routes.topics(), siteUrl),
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
-    ...posts.map(({ slug }) => toEntry(routes.post(slug), siteUrl)),
+    ...posts.map(({ slug, publishedAt }) =>
+      toEntry(routes.post(slug), siteUrl, publishedAt),
+    ),
     ...categories.map(({ slug }) => toEntry(routes.category(slug), siteUrl)),
     ...categoryPages.map(({ slug, page }) =>
       toEntry(routes.category(slug, Number(page)), siteUrl),

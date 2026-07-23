@@ -86,8 +86,8 @@ describe('sitemap', () => {
   it('includes home, blog index, topics hub, post, category, tag, author, blog page and generic page entries', async () => {
     mockAllEmpty();
     getPostParamsMock.mockResolvedValue([
-      { slug: 'first-post' },
-      { slug: 'second-post' },
+      { slug: 'first-post', publishedAt: '2026-01-01T00:00:00.000Z' },
+      { slug: 'second-post', publishedAt: '2026-01-02T00:00:00.000Z' },
     ]);
     getCategoryParamsMock.mockResolvedValue([{ slug: 'news' }]);
     getTagParamsMock.mockResolvedValue([{ slug: 'typescript' }]);
@@ -189,16 +189,24 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/');
   });
 
-  it('does not set lastModified on any entry today', async () => {
+  it('sets lastModified on post entries from publishedAt, but not on entries without a date source', async () => {
     mockAllEmpty();
-    getPostParamsMock.mockResolvedValue([{ slug: 'first-post' }]);
+    getPostParamsMock.mockResolvedValue([
+      { slug: 'first-post', publishedAt: '2026-01-01T00:00:00.000Z' },
+    ]);
+    getCategoryParamsMock.mockResolvedValue([{ slug: 'news' }]);
     const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
+    const postEntry = entries.find(
+      (entry) => entry.url === 'https://example.com/blog/first-post',
+    );
+    const categoryEntry = entries.find(
+      (entry) => entry.url === 'https://example.com/category/news',
+    );
 
-    for (const entry of entries) {
-      expect(entry.lastModified).toBeUndefined();
-    }
+    expect(postEntry?.lastModified).toBe('2026-01-01T00:00:00.000Z');
+    expect(categoryEntry?.lastModified).toBeUndefined();
   });
 
   it('carries a languages alternate for each configured locale', async () => {
