@@ -53,9 +53,9 @@ export const PostsSection = ({
       className={s.root({ class: className })}
       data-testid={dataTestId}
     >
-      <p id={titleId} className={s.label()}>
+      <h2 id={titleId} className={s.label()}>
         {title}
-      </p>
+      </h2>
       <div className={s.grid()}>
         {posts.map((post) => (
           <PostCard key={post.id} excerpt={post.excerpt}>
