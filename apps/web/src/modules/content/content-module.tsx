@@ -1,5 +1,5 @@
 import { service } from '@blog/service';
-import { ContentModule as ContentModuleUi } from '@blog/ui';
+import { ContentModule as ContentModuleUi } from '@blog/ui/organisms';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 
 export interface IContentModuleProps {

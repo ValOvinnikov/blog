@@ -343,6 +343,18 @@ export type Slug = {
   source?: string;
 };
 
+export type Blog_tag = {
+  _id: string;
+  _type: 'blog_tag';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  description?: string;
+  seo?: Seo;
+};
+
 export type Blog_category = {
   _id: string;
   _type: 'blog_category';
@@ -361,6 +373,13 @@ export type Blog_authorReference = {
   [internalGroqTypeReferenceTo]?: 'blog_author';
 };
 
+export type Blog_tagReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'blog_tag';
+};
+
 export type Blog_post = {
   _id: string;
   _type: 'blog_post';
@@ -376,6 +395,11 @@ export type Blog_post = {
     {
       _key: string;
     } & Blog_categoryReference
+  >;
+  tags?: Array<
+    {
+      _key: string;
+    } & Blog_tagReference
   >;
   publishedAt?: string;
   body?: RichText;
@@ -552,8 +576,10 @@ export type AllSanitySchemaTypes =
   | Module_contentReference
   | Page_generic
   | Slug
+  | Blog_tag
   | Blog_category
   | Blog_authorReference
+  | Blog_tagReference
   | Blog_post
   | Blog_author
   | SanityImageCrop

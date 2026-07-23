@@ -2,6 +2,7 @@ import { schemaTypes } from '@cms/schema-types';
 import { authorSchema } from '@cms/schema-types/documents/blog/author';
 import { categorySchema } from '@cms/schema-types/documents/blog/category';
 import { postSchema } from '@cms/schema-types/documents/blog/post';
+import { tagSchema } from '@cms/schema-types/documents/blog/tag';
 import { blogPageSchema } from '@cms/schema-types/documents/pages/blog-page';
 import { homePageSchema } from '@cms/schema-types/documents/pages/home-page';
 import { genericSchema } from '@cms/schema-types/documents/pages/page';
@@ -26,6 +27,7 @@ import {
   PanelBottom,
   Settings,
   Sparkles,
+  Tag,
   Tags,
   UserRound,
 } from 'lucide-react';
@@ -122,6 +124,9 @@ export default defineConfig({
                     S.documentTypeListItem(categorySchema.name)
                       .title('Categories')
                       .icon(Tags),
+                    S.documentTypeListItem(tagSchema.name)
+                      .title('Tags')
+                      .icon(Tag),
                     S.documentTypeListItem(authorSchema.name)
                       .title('Authors')
                       .icon(UserRound),
