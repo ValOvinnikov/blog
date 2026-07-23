@@ -1,9 +1,9 @@
 import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { NavLink } from '@blog/ui/atoms';
-import { PrimaryNavigation } from '@blog/ui/molecules';
 import { Footer, Header } from '@blog/ui/organisms';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
+import { SiteNavigation } from '@web/components/shared/site-navigation';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { routing } from '@web/i18n/routing';
@@ -88,11 +88,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
         <Header.Brand>
           <BrandLockupLink brand={brand} />
         </Header.Brand>
-        <PrimaryNavigation
-          links={navItems}
-          actions={<ThemeToggleButton />}
-          linkAs={SmartLink}
-        />
+        <SiteNavigation links={navItems} actions={<ThemeToggleButton />} />
       </Header>
       {children}
       <Footer>
