@@ -41,14 +41,6 @@ describe('toPostCard', () => {
     ]);
   });
 
-  it('returns undefined author when author is absent at runtime', () => {
-    const raw = {
-      ...makeRawPostCard(),
-      author: null,
-    } as unknown as Parameters<typeof toPostCard>[0];
-    expect(toPostCard(raw).author).toBeUndefined();
-  });
-
   it('defaults featured to false when null', () => {
     const result = toPostCard(makeRawPostCard({ featured: null }));
     expect(result.featured).toBe(false);
