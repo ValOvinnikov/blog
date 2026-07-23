@@ -1,6 +1,5 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { describe, expect, it, vi } from 'vitest';
 
 import { getAuthorPosts } from './loader';
 

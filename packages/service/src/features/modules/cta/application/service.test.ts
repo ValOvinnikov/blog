@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { createCtaModuleService } from './service';
 
 describe('createCtaModuleService', () => {

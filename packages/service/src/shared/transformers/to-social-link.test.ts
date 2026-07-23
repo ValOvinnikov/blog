@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { toSocialLink } from './to-social-link';
 
 describe('toSocialLink', () => {

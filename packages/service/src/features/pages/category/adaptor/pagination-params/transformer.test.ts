@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { toCategoryPaginationParams } from './transformer';
 
 describe('toCategoryPaginationParams', () => {

@@ -6,7 +6,6 @@ import {
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
-import { describe, expect, it, vi } from 'vitest';
 
 import { getSiteSettings } from './loader';
 

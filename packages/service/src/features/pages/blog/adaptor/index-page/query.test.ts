@@ -3,7 +3,6 @@ import {
   makeRawBlogPage,
   makeRawPostCard,
 } from '@blog/service/testing/pages/fixtures';
-import { describe, expect, it } from 'vitest';
 
 import { blogPageQuery, buildIndexPageQuery } from './query';
 

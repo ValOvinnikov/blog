@@ -1,5 +1,4 @@
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { describe, expect, it, vi } from 'vitest';
 
 import { toPostCard } from './to-post-card';
 

@@ -6,7 +6,6 @@ import {
   makeRawPostCard,
   makeRawPostDetail,
 } from '@blog/service/testing/pages/fixtures';
-import { describe, expect, it, vi } from 'vitest';
 
 import { getPost } from './loader';
 

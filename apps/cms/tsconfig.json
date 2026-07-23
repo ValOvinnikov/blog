@@ -9,7 +9,11 @@
     },
     "lib": ["dom", "dom.iterable", "esnext"],
     "noEmit": true,
-    "tsBuildInfoFile": "tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "tsconfig.tsbuildinfo",
+    // Declare the vitest globals ambient types explicitly — test files rely on
+    // `globals: true` (configs/vitest/preset.ts) and no longer import
+    // describe/it/expect from 'vitest' directly.
+    "types": ["vitest/globals"]
   },
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules", "dist", ".sanity"]

@@ -1,5 +1,4 @@
 import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
-import { describe, expect, it } from 'vitest';
 
 import { toSanityImage } from './to-sanity-image';
 

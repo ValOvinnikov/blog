@@ -1,7 +1,6 @@
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
-import { describe, expect, it, vi } from 'vitest';
 
 import { getHomePage } from './loader';
 

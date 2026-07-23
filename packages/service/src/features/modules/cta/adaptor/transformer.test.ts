@@ -1,5 +1,4 @@
 import { makeRawCtaModule } from '@blog/service/testing/modules/fixtures';
-import { describe, expect, it } from 'vitest';
 
 import { toCtaModule } from './transformer';
 

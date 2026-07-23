@@ -1,5 +1,4 @@
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
-import { describe, expect, it, vi } from 'vitest';
 
 import { buildImageUrl } from './build-image-url';
 

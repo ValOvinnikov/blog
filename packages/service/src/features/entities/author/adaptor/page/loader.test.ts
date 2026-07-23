@@ -2,7 +2,6 @@ import { toAuthorDetail } from '@blog/service/features/entities/author/adaptor/d
 import { toAuthorPosts } from '@blog/service/features/entities/author/adaptor/posts/transformer';
 import { makeRawAuthor } from '@blog/service/testing/entities/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
-import { describe, expect, it, vi } from 'vitest';
 
 import { getAuthorPage } from './loader';
 

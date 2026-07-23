@@ -1,6 +1,5 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawCtaModule } from '@blog/service/testing/modules/fixtures';
-import { describe, expect, it, vi } from 'vitest';
 
 import { getCta } from './loader';
 

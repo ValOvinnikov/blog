@@ -3,7 +3,6 @@ import {
   makeRawCategory,
 } from '@blog/service/testing/entities/fixtures';
 import { makeRawPostDetail } from '@blog/service/testing/pages/fixtures';
-import { describe, expect, it } from 'vitest';
 
 import { postDetailQuery } from './query';
 

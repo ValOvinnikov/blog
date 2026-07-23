@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { safeAsync } from './safe-async';
 
 describe('safeAsync', () => {

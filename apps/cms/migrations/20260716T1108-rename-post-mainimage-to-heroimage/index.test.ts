@@ -1,5 +1,4 @@
 import { at, set, unset } from 'sanity/migrate';
-import { describe, expect, it } from 'vitest';
 
 import { renamePostMainImageToHeroImage } from './index';
 
