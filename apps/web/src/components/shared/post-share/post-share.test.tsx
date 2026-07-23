@@ -1,6 +1,10 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  customRender,
+  fireEvent,
+  screen,
+  waitFor,
+} from '@web/testing/custom-render';
 
 import { PostShare } from './post-share';
 
@@ -15,6 +19,12 @@ const links = [
   },
 ];
 
+const setup = customRender(PostShare, {
+  url: 'https://example.com/blog/hello',
+  title: 'Hello World',
+  links,
+});
+
 const getTrigger = () =>
   screen.getByRole('button', { name: 'Share "Hello World"' });
 
@@ -23,13 +33,7 @@ const getTrigger = () =>
 // composes `PopoverMenu` (labels, the copy action, and the per-link items).
 describe(`<${PostShare.name}/>`, () => {
   beforeEach(() => {
-    render(
-      <PostShare
-        url="https://example.com/blog/hello"
-        title="Hello World"
-        links={links}
-      />,
-    );
+    setup();
   });
 
   it('labels the trigger with the post title and renders it closed', () => {

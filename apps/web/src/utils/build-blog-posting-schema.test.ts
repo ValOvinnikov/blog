@@ -1,5 +1,4 @@
 import type { TPostDetail } from '@blog/service';
-import { describe, expect, it } from 'vitest';
 
 import { buildBlogPostingSchema } from './build-blog-posting-schema';
 

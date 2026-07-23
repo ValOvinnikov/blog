@@ -1,6 +1,5 @@
 import type { ISanityImage } from '@blog/config';
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { customRender, screen } from '@web/testing/custom-render';
 
 import { SanityImage } from './sanity-image';
 
@@ -13,9 +12,15 @@ const image: ISanityImage = {
   dimensions: { width: 800, height: 600, aspectRatio: 800 / 600 },
 };
 
+const setup = customRender(SanityImage, {
+  image,
+  width: 960,
+  height: 720,
+});
+
 describe('SanityImage', () => {
   it('renders an img pointing at the Sanity CDN with a srcset', () => {
-    render(<SanityImage image={image} width={960} height={720} />);
+    setup();
 
     const img = screen.getByRole('img', { name: image.alt });
     expect(img).toHaveAttribute(
@@ -26,31 +31,24 @@ describe('SanityImage', () => {
   });
 
   it('falls back to the image alt text when no override is provided', () => {
-    render(<SanityImage image={image} width={960} height={720} />);
+    setup();
 
     expect(screen.getByAltText(image.alt)).toBeVisible();
   });
 
   it('uses the provided alt override instead of the image alt', () => {
-    render(
-      <SanityImage image={image} width={960} height={720} alt="Custom alt" />,
-    );
+    setup({ alt: 'Custom alt' });
 
     expect(screen.getByAltText('Custom alt')).toBeVisible();
     expect(screen.queryByAltText(image.alt)).not.toBeInTheDocument();
   });
 
   it('forwards className, sizes and loading to the rendered element', () => {
-    render(
-      <SanityImage
-        image={image}
-        width={960}
-        height={720}
-        className="rounded-lg"
-        sizes="(min-width: 1024px) 50vw, 100vw"
-        loading="eager"
-      />,
-    );
+    setup({
+      className: 'rounded-lg',
+      sizes: '(min-width: 1024px) 50vw, 100vw',
+      loading: 'eager',
+    });
 
     const img = screen.getByRole('img', { name: image.alt });
     expect(img).toHaveClass('rounded-lg');

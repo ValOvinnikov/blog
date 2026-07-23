@@ -155,47 +155,56 @@ export default mergeConfig(
   absence.
 - **No dedicated `dataTestId` test** — a test that queries by a missing test id
   already fails; an explicit assertion adds nothing.
-- **Render component tests with `customRender` from the package's
-  `testing/custom-render` wrapper, not with `render` from `@testing-library/react`
-  directly.** Each workspace exposes a `customRender` that wraps RTL's render
-  with that package's providers and re-exports the full RTL surface, so tests
-  get a consistent, provider-complete render (plus `screen`/`fireEvent`/etc.)
-  from one module:
-  - `@blog/ui/testing/custom-render` — `@blog/ui` is pure/prop-driven, so its wrapper
-    mounts no providers today; it exists to centralise the RTL import and give a
-    single home for a provider if a component ever needs one.
-  - `@web/testing/custom-render` — mounts `NextIntlClientProvider` (matching
-    `[locale]/layout.tsx`) so components using next-intl navigation/hooks render
-    without per-test provider setup.
+- **Render component tests through the `customRender` factory from the package's
+  `testing/custom-render` wrapper — never `render` from `@testing-library/react`
+  directly.** `customRender(Component, defaultProps)` binds a component to its
+  default props and returns a provider-wrapped `setup(overrides?)` renderer; the
+  wrapper also re-exports the full RTL surface (`screen`/`fireEvent`/…) so a test
+  imports everything from one module. Props are inferred from the component (via
+  `NoInfer`) — no type argument at the call site.
+  - `@blog/ui/testing/custom-render` — `customRender` + `renderElement`; the
+    provider wrapper is a passthrough (`@blog/ui` is pure/prop-driven).
+  - `@web/testing/custom-render` — `customRender`, `customRenderAsync`, and
+    `renderElement`; mounts `NextIntlClientProvider` (matching `[locale]/layout.tsx`).
 
-  Migration is a drop-in: import `customRender` (and `screen`/etc.) from the
-  wrapper and call `customRender(<Component … />)` in place of `render(…)`;
-  queries are unchanged.
+  Define `setup` once per file, then:
+  - **Sync component + props** → `const setup = customRender(Component, {…});`
+  - **Async server/page component** (called as `await Page({…})`) →
+    `const setup = customRenderAsync(Page, {…});` and `await setup(…)` (also
+    supports `await expect(setup({…})).rejects.toThrow(…)` for pages that throw).
+  - **Ad-hoc JSX / not one component+props** (compound children, polymorphic `as`
+    overrides, a pre-built element) → `renderElement(<…>)`.
 
   ```tsx
-  // ✅ component tests render via the package wrapper's customRender
-  import { customRender, screen } from '@blog/ui/testing/custom-render'; // or '@web/testing/custom-render'
+  import { customRender, screen } from '@blog/ui/testing/custom-render';
 
-  customRender(<Component {...props} />);
+  const setup = customRender(PostMeta, { author, publishedAt, formattedDate });
 
-  // ❌ not RTL's render directly
-  import { render, screen } from '@testing-library/react';
+  it('shows reading time when provided', () => {
+    setup({ readingTimeMinutes: 5 }); // override one prop; defaults kept
+    expect(screen.getByText('5 min read')).toBeVisible();
+  });
+
+  // ❌ never RTL's render directly: import { render } from '@testing-library/react';
   ```
 
-- **Hoist a shared render into `beforeEach` — never call a render helper at the
-  top of every `it`.** When the tests in a suite all render the same thing, put
-  that render in `beforeEach` and reach the result through `screen`. A
-  `renderComponent()` (or `setup()`) helper invoked as the first line of every
-  test is the exact repetition `beforeEach` exists to remove — the presence of
-  that repeated call is the smell, not the helper.
+- **`beforeEach(setup)` for uniform suites; inline `setup({…})` when props vary.**
+  If every `it` in a suite renders the **same** props, call `setup()` in
+  `beforeEach` and query `screen`. If tests need **different** props, call
+  `setup({ overrides })` inline in each `it` — that is the factory's purpose, not
+  the repeated-`renderComponent()` smell. Don't pair a `beforeEach(setup)` default
+  with an inline override in the same `describe` (it double-renders); a genuinely
+  different render goes in its own `describe`. (Testing Library auto-cleans
+  between tests; drive small variations through the shared render where you can —
+  e.g. an outside click via `fireEvent.mouseDown(document.body)`.)
 
   ```tsx
-  // ✅ rendered once, in beforeEach; tests just query `screen`
+  // ✅ uniform props → beforeEach
+  const setup = customRender(PostShare, defaultProps);
   describe(`<${PostShare.name}/>`, () => {
     beforeEach(() => {
-      render(<PostShare {...defaultProps} />);
+      setup();
     });
-
     it('is closed by default', () => {
       expect(screen.getByRole('button')).toHaveAttribute(
         'aria-expanded',
@@ -204,24 +213,16 @@ export default mergeConfig(
     });
   });
 
-  // ❌ the same render copied into every test
-  const renderComponent = () => render(<PostShare {...defaultProps} />);
-  it('is closed by default', () => {
-    renderComponent();
-    /* … */
-  });
-  it('opens on click', () => {
-    renderComponent();
-    /* … */
+  // ✅ varying props → inline setup({…}) per it (no beforeEach)
+  const setup = customRender(Eyebrow, { children: 'Featured Post' });
+  it('renders as a link when href is set', () => {
+    setup({ href: '/category/x', children: 'X' });
+    expect(screen.getByRole('link', { name: 'X' })).toHaveAttribute(
+      'href',
+      '/category/x',
+    );
   });
   ```
-
-  A test that genuinely needs a **different** render (extra surrounding DOM,
-  different props) goes in its own `describe` with its own render, so the shared
-  `beforeEach` doesn't double-render it. Prefer driving a variation through the
-  shared render where you can — e.g. an "outside click" closes on
-  `fireEvent.mouseDown(document.body)` without a bespoke wrapper. (Testing
-  Library auto-cleans between tests.)
 
 - Use `vi.fn()` / `vi.mock()` for boundaries (the Sanity client, `service`).
 - Deterministic: no real dates/network/random. Inject or freeze.

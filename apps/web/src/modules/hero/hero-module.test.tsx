@@ -1,5 +1,4 @@
-import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { HeroModule } from './hero-module';
 
@@ -15,6 +14,8 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
+const setup = customRenderAsync(HeroModule, { id: 'hero-1', locale: 'en' });
+
 describe(HeroModule, () => {
   beforeEach(() => {
     getHeroMock.mockReset();
@@ -23,8 +24,7 @@ describe(HeroModule, () => {
   it('renders no top-level heading when the fetch fails', async () => {
     getHeroMock.mockResolvedValue({ ok: false, error: new Error('boom') });
 
-    const ui = await HeroModule({ id: 'hero-1', locale: 'en' });
-    const { container } = render(<>{ui}</>);
+    const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
   });
@@ -43,8 +43,7 @@ describe(HeroModule, () => {
       },
     });
 
-    const ui = await HeroModule({ id: 'hero-1', locale: 'en' });
-    const { container } = render(<>{ui}</>);
+    const { container } = await setup();
 
     expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
     expect(container).toBeEmptyDOMElement();
@@ -64,8 +63,7 @@ describe(HeroModule, () => {
       },
     });
 
-    const ui = await HeroModule({ id: 'hero-1', locale: 'en' });
-    render(<>{ui}</>);
+    await setup();
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'Welcome to the blog' }),

@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { getRevalidateTagsForType } from './revalidate-tags';
 
 describe('getRevalidateTagsForType', () => {

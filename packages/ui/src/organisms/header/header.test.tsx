@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { renderElement, screen } from '@blog/ui/testing/custom-render';
 
 import { NavLink } from '../../atoms/nav-link';
 
@@ -6,7 +6,7 @@ import { Header } from './header';
 
 describe(`<${Header.name}/>`, () => {
   it('renders Header.Brand content', () => {
-    render(
+    renderElement(
       <Header>
         <Header.Brand>My Blog</Header.Brand>
       </Header>,
@@ -15,7 +15,7 @@ describe(`<${Header.name}/>`, () => {
   });
 
   it('renders Header.Nav content', () => {
-    render(
+    renderElement(
       <Header>
         <Header.Nav>
           <NavLink href="/">Home</NavLink>
@@ -28,7 +28,7 @@ describe(`<${Header.name}/>`, () => {
   });
 
   it('preserves hrefs on nav links', () => {
-    render(
+    renderElement(
       <Header>
         <Header.Nav>
           <NavLink href="/blog">Blog</NavLink>
@@ -42,7 +42,7 @@ describe(`<${Header.name}/>`, () => {
   });
 
   it('renders Header.Actions content', () => {
-    render(
+    renderElement(
       <Header>
         <Header.Actions>
           <button>Menu</button>
@@ -53,7 +53,7 @@ describe(`<${Header.name}/>`, () => {
   });
 
   it('renders all three slots together in order', () => {
-    render(
+    renderElement(
       <Header>
         <Header.Brand>My Blog</Header.Brand>
         <Header.Nav>
@@ -70,7 +70,7 @@ describe(`<${Header.name}/>`, () => {
   });
 
   it('renders unmatched children without dropping them', () => {
-    render(
+    renderElement(
       <Header>
         <Header.Brand>My Blog</Header.Brand>
         <span>stray content</span>
@@ -80,12 +80,12 @@ describe(`<${Header.name}/>`, () => {
   });
 
   it('renders as a <header> landmark', () => {
-    render(<Header />);
+    renderElement(<Header />);
     expect(screen.getByRole('banner')).toBeVisible();
   });
 
   it('forwards data-testid to the root element', () => {
-    render(<Header dataTestId="site-header" />);
+    renderElement(<Header dataTestId="site-header" />);
     expect(screen.getByTestId('site-header')).toBeVisible();
   });
 });

@@ -1,5 +1,5 @@
+import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import { render, screen } from '@testing-library/react';
 
 import { ActionList } from './action-list';
 
@@ -7,31 +7,23 @@ faker.seed(123);
 
 const label = faker.lorem.words(2);
 
+const setup = customRender(ActionList, {
+  children: <button>{label}</button>,
+});
+
 describe(`<${ActionList.name}/>`, () => {
   it('renders children', () => {
-    render(
-      <ActionList>
-        <button>{label}</button>
-      </ActionList>,
-    );
+    setup();
     expect(screen.getByRole('button', { name: label })).toBeVisible();
   });
 
   it('accepts className override', () => {
-    const { container } = render(
-      <ActionList className="custom-class">
-        <button>{label}</button>
-      </ActionList>,
-    );
+    const { container } = setup({ className: 'custom-class' });
     expect(container.firstChild).toHaveClass('custom-class');
   });
 
   it('forwards dataTestId', () => {
-    render(
-      <ActionList dataTestId="action-list">
-        <button>{label}</button>
-      </ActionList>,
-    );
+    setup({ dataTestId: 'action-list' });
     expect(screen.getByTestId('action-list')).toBeVisible();
   });
 });

@@ -1,13 +1,16 @@
 import type { RichText } from '@blog/config';
-import { render, screen } from '@testing-library/react';
+import { customRender, screen } from '@web/testing/custom-render';
 import {
   richTextBlock,
   richTextSpan,
   type TRichTextBlock,
 } from '@web/testing/shared/portable-text-renderer/fixtures';
-import { describe, expect, it } from 'vitest';
 
 import { PortableTextRenderer } from './portable-text-renderer';
+
+const setup = customRender(PortableTextRenderer, {
+  value: [],
+});
 
 describe(`<${PortableTextRenderer.name}/>`, () => {
   it('renders a normal-style block as a paragraph', () => {
@@ -15,7 +18,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       richTextBlock('normal', [richTextSpan('Hello world')]),
     ];
 
-    render(<PortableTextRenderer value={value} />);
+    setup({ value });
 
     expect(screen.getByText('Hello world', { selector: 'p' })).toBeVisible();
   });
@@ -28,7 +31,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
         ]),
       ];
 
-      render(<PortableTextRenderer value={value} />);
+      setup({ value });
 
       expect(
         screen.getByRole('heading', { level, name: `Heading ${level}` }),
@@ -41,7 +44,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       richTextBlock('blockquote', [richTextSpan('A quote')]),
     ];
 
-    render(<PortableTextRenderer value={value} />);
+    setup({ value });
 
     expect(
       screen.getByText('A quote', { selector: 'blockquote' }),
@@ -53,7 +56,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       richTextBlock('normal', [richTextSpan('bold text', ['strong'])]),
     ];
 
-    render(<PortableTextRenderer value={value} />);
+    setup({ value });
 
     expect(screen.getByText('bold text').tagName).toBe('STRONG');
   });
@@ -63,7 +66,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       richTextBlock('normal', [richTextSpan('italic text', ['em'])]),
     ];
 
-    render(<PortableTextRenderer value={value} />);
+    setup({ value });
 
     expect(screen.getByText('italic text').tagName).toBe('EM');
   });
@@ -73,7 +76,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       richTextBlock('normal', [richTextSpan('const x = 1', ['code'])]),
     ];
 
-    render(<PortableTextRenderer value={value} />);
+    setup({ value });
 
     expect(screen.getByText('const x = 1').tagName).toBe('CODE');
   });
@@ -87,7 +90,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       ),
     ];
 
-    render(<PortableTextRenderer value={value} />);
+    setup({ value });
 
     const link = screen.getByRole('link', { name: 'a link' });
     expect(link).toHaveAttribute('href', 'https://example.com');
@@ -102,7 +105,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       ),
     ];
 
-    render(<PortableTextRenderer value={value} />);
+    setup({ value });
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
     expect(screen.getByText('incomplete link')).toBeVisible();
@@ -115,7 +118,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       richTextBlock('normal', [richTextSpan('Second paragraph')]),
     ];
 
-    const { container } = render(<PortableTextRenderer value={value} />);
+    const { container } = setup({ value });
 
     const root = container.firstElementChild;
 
@@ -143,7 +146,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       },
     ];
 
-    render(<PortableTextRenderer value={value} />);
+    setup({ value });
 
     expect(screen.getByText('example.ts')).toBeVisible();
     expect(screen.getByTestId('code-content').textContent).toContain(

@@ -1,26 +1,32 @@
-import { render, screen } from '@testing-library/react';
+import {
+  customRender,
+  renderElement,
+  screen,
+} from '@blog/ui/testing/custom-render';
 import type { AnchorHTMLAttributes } from 'react';
 
 import { Tag } from './tag';
 
+const setup = customRender(Tag, { children: 'Label' });
+
 describe(`<${Tag.name}/>`, () => {
   it('renders a span element', () => {
-    render(<Tag>Label</Tag>);
+    setup();
     expect(screen.getByText('Label').tagName).toBe('SPAN');
   });
 
   it('default variant has a border', () => {
-    render(<Tag>Label</Tag>);
+    setup();
     expect(screen.getByText('Label').className).toContain('border');
   });
 
   it('accent variant applies accent-muted background', () => {
-    render(<Tag variant="accent">Label</Tag>);
+    setup({ variant: 'accent' });
     expect(screen.getByText('Label').className).toContain('bg-accent-muted');
   });
 
   it('renders as an anchor when `as` is set to "a"', () => {
-    render(
+    renderElement(
       <Tag as="a" href="/category/architecture">
         Architecture
       </Tag>,
@@ -41,7 +47,7 @@ describe(`<${Tag.name}/>`, () => {
         {children}
       </a>
     );
-    render(
+    renderElement(
       <Tag as={CustomLink} href="/custom">
         Custom
       </Tag>,

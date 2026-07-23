@@ -1,10 +1,10 @@
-import { render, screen } from '@testing-library/react';
+import { renderElement, screen } from '@blog/ui/testing/custom-render';
 
 import { PostCard } from './post-card';
 
 describe(`<${PostCard.name}/>`, () => {
   it('renders PostCard.Title as an h3 heading', () => {
-    render(
+    renderElement(
       <PostCard>
         <PostCard.Title>
           <a href="/posts/hello-world">Hello World</a>
@@ -19,7 +19,7 @@ describe(`<${PostCard.name}/>`, () => {
   });
 
   it('renders PostCard.Media content', () => {
-    render(
+    renderElement(
       <PostCard>
         <PostCard.Media>
           <img src="/cover.jpg" alt="Cover photo" />
@@ -30,7 +30,7 @@ describe(`<${PostCard.name}/>`, () => {
   });
 
   it('does not render media when PostCard.Media is omitted', () => {
-    render(
+    renderElement(
       <PostCard>
         <PostCard.Title>
           <a href="/posts/hello-world">Hello World</a>
@@ -41,28 +41,28 @@ describe(`<${PostCard.name}/>`, () => {
   });
 
   it('renders excerpt when provided', () => {
-    render(<PostCard excerpt="A short summary." />);
+    renderElement(<PostCard excerpt="A short summary." />);
     expect(screen.getByText('A short summary.')).toBeVisible();
   });
 
   it('does not render excerpt element when omitted', () => {
-    render(<PostCard />);
+    renderElement(<PostCard />);
     expect(screen.queryByText(/summary/i)).not.toBeInTheDocument();
   });
 
   it('renders all provided tags', () => {
-    render(<PostCard tags={['react', 'typescript']} />);
+    renderElement(<PostCard tags={['react', 'typescript']} />);
     expect(screen.getByText('react')).toBeVisible();
     expect(screen.getByText('typescript')).toBeVisible();
   });
 
   it('does not render tags area when tags is empty', () => {
-    const { container } = render(<PostCard tags={[]} />);
+    const { container } = renderElement(<PostCard tags={[]} />);
     expect(container.querySelectorAll('span[class]').length).toBe(0);
   });
 
   it('renders author name when provided via PostCard.Footer', () => {
-    render(
+    renderElement(
       <PostCard>
         <PostCard.Footer authorName="Jane Doe" />
       </PostCard>,
@@ -74,13 +74,13 @@ describe(`<${PostCard.name}/>`, () => {
   });
 
   it('does not render author section when authorName is omitted', () => {
-    render(<PostCard />);
+    renderElement(<PostCard />);
     expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
   });
 
   it('renders a time element with the correct dateTime and display text', () => {
     const iso = '2024-01-15T00:00:00Z';
-    render(
+    renderElement(
       <PostCard>
         <PostCard.Footer publishedAt={iso} formattedDate="January 15, 2024" />
       </PostCard>,
@@ -92,7 +92,7 @@ describe(`<${PostCard.name}/>`, () => {
   });
 
   it('does not render time element when publishedAt is omitted', () => {
-    render(
+    renderElement(
       <PostCard>
         <PostCard.Footer formattedDate="January 15, 2024" />
       </PostCard>,
@@ -101,7 +101,7 @@ describe(`<${PostCard.name}/>`, () => {
   });
 
   it('does not render time element when formattedDate is omitted', () => {
-    render(
+    renderElement(
       <PostCard>
         <PostCard.Footer publishedAt="2024-01-15T00:00:00Z" />
       </PostCard>,
@@ -110,7 +110,7 @@ describe(`<${PostCard.name}/>`, () => {
   });
 
   it('renders unmatched children without dropping them', () => {
-    render(
+    renderElement(
       <PostCard>
         <span>stray content</span>
       </PostCard>,
@@ -119,7 +119,7 @@ describe(`<${PostCard.name}/>`, () => {
   });
 
   it('renders PostCard.Meta content', () => {
-    render(
+    renderElement(
       <PostCard>
         <PostCard.Meta
           dateValue="2024-01-01"
@@ -132,7 +132,7 @@ describe(`<${PostCard.name}/>`, () => {
   });
 
   it('forwards data-testid to root element', () => {
-    render(<PostCard dataTestId="post-card" />);
+    renderElement(<PostCard dataTestId="post-card" />);
     expect(screen.getByTestId('post-card')).toBeVisible();
   });
 });

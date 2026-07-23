@@ -1,5 +1,4 @@
 import { BRAND_VARIANTS } from '@blog/config';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { getSiteSettingsMock } = vi.hoisted(() => ({
   getSiteSettingsMock: vi.fn(),

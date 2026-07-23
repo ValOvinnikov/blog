@@ -1,15 +1,24 @@
+import {
+  customRender,
+  renderElement,
+  screen,
+} from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import { render, screen } from '@testing-library/react';
 import type { AnchorHTMLAttributes } from 'react';
 
 import { ProseLink } from './prose-link';
 
 faker.seed(123);
 
+const setup = customRender(ProseLink, {
+  href: '/about',
+  children: 'About',
+});
+
 describe(`<${ProseLink.name}/>`, () => {
   it('renders an anchor with the given href and children', () => {
     const label = faker.lorem.words(3);
-    render(<ProseLink href="/about">{label}</ProseLink>);
+    setup({ children: label });
     expect(screen.getByRole('link', { name: label })).toHaveAttribute(
       'href',
       '/about',
@@ -17,14 +26,14 @@ describe(`<${ProseLink.name}/>`, () => {
   });
 
   it('applies the accent/underline treatment', () => {
-    render(<ProseLink href="/about">About</ProseLink>);
+    setup();
     expect(screen.getByRole('link', { name: 'About' }).className).toContain(
       'text-accent',
     );
   });
 
   it('does not set an explicit font-size class, inheriting the surrounding text', () => {
-    render(<ProseLink href="/about">About</ProseLink>);
+    setup();
     expect(screen.getByRole('link', { name: 'About' }).className).not.toMatch(
       /text-(xs|sm|base|lg|xl|copy|meta|label)\b/,
     );
@@ -41,7 +50,7 @@ describe(`<${ProseLink.name}/>`, () => {
       </a>
     );
 
-    render(
+    renderElement(
       <ProseLink as={CustomLink} href="/about">
         About
       </ProseLink>,
@@ -53,20 +62,12 @@ describe(`<${ProseLink.name}/>`, () => {
   });
 
   it('forwards data-testid', () => {
-    render(
-      <ProseLink href="/about" dataTestId="prose-link">
-        About
-      </ProseLink>,
-    );
+    setup({ dataTestId: 'prose-link' });
     expect(screen.getByTestId('prose-link')).toBeVisible();
   });
 
   it('merges extra className', () => {
-    render(
-      <ProseLink href="/about" className="ml-2">
-        About
-      </ProseLink>,
-    );
+    setup({ className: 'ml-2' });
     expect(screen.getByRole('link', { name: 'About' }).className).toContain(
       'ml-2',
     );

@@ -1,5 +1,4 @@
-import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { BlogListPage } from './blog-list-page';
 
@@ -49,6 +48,8 @@ const post = {
   categories: [{ id: 'cat-1', title: 'News', slug: 'news' }],
 };
 
+const setup = customRenderAsync(BlogListPage, { page: 1, locale: 'en' });
+
 describe('BlogListPage', () => {
   beforeEach(() => {
     getIndexPageMock.mockReset();
@@ -61,9 +62,7 @@ describe('BlogListPage', () => {
       data: { posts: [post], currentPage: 5, totalPages: 1, total: 1 },
     });
 
-    await expect(BlogListPage({ page: 5, locale: 'en' })).rejects.toThrow(
-      'NEXT_NOT_FOUND',
-    );
+    await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(notFoundMock).toHaveBeenCalledTimes(1);
   });
@@ -75,9 +74,7 @@ describe('BlogListPage', () => {
       error: new Error('boom'),
     });
 
-    await expect(BlogListPage({ page: 1, locale: 'en' })).rejects.toThrow(
-      'NEXT_NOT_FOUND',
-    );
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(notFoundMock).toHaveBeenCalledTimes(1);
 
@@ -97,8 +94,7 @@ describe('BlogListPage', () => {
       },
     });
 
-    const ui = await BlogListPage({ page: 1, locale: 'en' });
-    render(<>{ui}</>);
+    await setup();
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'Blog' }),

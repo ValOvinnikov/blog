@@ -1,5 +1,4 @@
-import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { AuthorPage } from './author-page';
 
@@ -72,6 +71,8 @@ const post = {
   categories: [{ id: 'cat-1', title: 'News', slug: 'news' }],
 };
 
+const setup = customRenderAsync(AuthorPage, { slug: 'jane-doe', locale: 'en' });
+
 describe('AuthorPage', () => {
   beforeEach(() => {
     getAuthorPageMock.mockReset();
@@ -81,9 +82,7 @@ describe('AuthorPage', () => {
   it('calls notFound() when the author does not exist', async () => {
     getAuthorPageMock.mockResolvedValue(null);
 
-    await expect(AuthorPage({ slug: 'missing', locale: 'en' })).rejects.toThrow(
-      'NEXT_NOT_FOUND',
-    );
+    await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(notFoundMock).toHaveBeenCalledTimes(1);
   });
@@ -91,8 +90,7 @@ describe('AuthorPage', () => {
   it('renders the author role, name, bio, and social links', async () => {
     getAuthorPageMock.mockResolvedValue({ author, posts: [] });
 
-    const ui = await AuthorPage({ slug: 'jane-doe', locale: 'en' });
-    render(<>{ui}</>);
+    await setup();
 
     expect(screen.getByText('Senior Engineer')).toBeVisible();
     expect(
@@ -113,8 +111,7 @@ describe('AuthorPage', () => {
       posts: [],
     });
 
-    const ui = await AuthorPage({ slug: 'jane-doe', locale: 'en' });
-    render(<>{ui}</>);
+    await setup();
 
     expect(screen.queryByText('Senior Engineer')).not.toBeInTheDocument();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
@@ -123,8 +120,7 @@ describe('AuthorPage', () => {
   it('renders the author posts via PostsSection', async () => {
     getAuthorPageMock.mockResolvedValue({ author, posts: [post] });
 
-    const ui = await AuthorPage({ slug: 'jane-doe', locale: 'en' });
-    render(<>{ui}</>);
+    await setup();
 
     const link = screen.getByRole('link', { name: 'My Post Title' });
     expect(link).toBeVisible();
@@ -134,8 +130,7 @@ describe('AuthorPage', () => {
   it('renders no posts section when the author has no posts', async () => {
     getAuthorPageMock.mockResolvedValue({ author, posts: [] });
 
-    const ui = await AuthorPage({ slug: 'jane-doe', locale: 'en' });
-    render(<>{ui}</>);
+    await setup();
 
     expect(
       screen.queryByRole('link', { name: 'My Post Title' }),

@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest';
-
 import { escapeXml } from './escape-xml';
 
 describe(escapeXml, () => {

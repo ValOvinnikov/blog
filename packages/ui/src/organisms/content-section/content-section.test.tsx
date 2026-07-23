@@ -1,14 +1,16 @@
-import { render, screen } from '@testing-library/react';
+import { customRender, screen } from '@blog/ui/testing/custom-render';
 
 import { ContentSection } from './content-section';
 
+const setup = customRender(ContentSection, {
+  title: 'Latest',
+  titleId: 'latest-posts',
+  children: <p>Posts</p>,
+});
+
 describe(`<${ContentSection.name}/>`, () => {
   it('labels the section with its heading', () => {
-    render(
-      <ContentSection title="Latest" titleId="latest-posts">
-        <p>Posts</p>
-      </ContentSection>,
-    );
+    setup();
 
     expect(screen.getByRole('region', { name: 'Latest' })).toBeVisible();
     expect(
@@ -17,11 +19,7 @@ describe(`<${ContentSection.name}/>`, () => {
   });
 
   it('forwards data-testid', () => {
-    render(
-      <ContentSection title="Latest" titleId="latest-posts" dataTestId="latest">
-        <p>Posts</p>
-      </ContentSection>,
-    );
+    setup({ dataTestId: 'latest' });
 
     expect(screen.getByTestId('latest')).toBeVisible();
   });

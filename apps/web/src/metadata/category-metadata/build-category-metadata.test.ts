@@ -1,5 +1,3 @@
-import { describe, expect, it, vi } from 'vitest';
-
 import { buildCategoryMetadata } from './build-category-metadata';
 
 const { getCategoryPageMock } = vi.hoisted(() => ({

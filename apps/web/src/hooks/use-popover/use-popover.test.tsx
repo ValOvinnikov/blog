@@ -1,6 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { customRender, fireEvent, screen } from '@web/testing/custom-render';
 
 import { usePopover } from './use-popover';
 
@@ -30,12 +29,16 @@ const Harness = () => {
   );
 };
 
+const setup = customRender(Harness, {});
+
 const getTrigger = () => screen.getByRole('button', { name: 'trigger' });
 
 describe(usePopover, () => {
-  it('starts closed, with the panel contents unreachable', () => {
-    render(<Harness />);
+  beforeEach(() => {
+    setup();
+  });
 
+  it('starts closed, with the panel contents unreachable', () => {
     expect(getTrigger()).toHaveAttribute('aria-expanded', 'false');
     expect(
       screen.queryByRole('button', { name: 'first' }),
@@ -44,7 +47,6 @@ describe(usePopover, () => {
 
   it('opens on toggle and moves focus to the first focusable item in the panel', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
 
     await user.click(getTrigger());
 
@@ -56,7 +58,6 @@ describe(usePopover, () => {
 
   it('closes on a second toggle and returns focus to the trigger', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
     const trigger = getTrigger();
 
     await user.click(trigger);
@@ -68,7 +69,6 @@ describe(usePopover, () => {
 
   it('closes on Escape and returns focus to the trigger', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
     const trigger = getTrigger();
     await user.click(trigger);
 
@@ -80,7 +80,6 @@ describe(usePopover, () => {
 
   it('closes on an outside pointer-down and returns focus to the trigger', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
     const trigger = getTrigger();
     await user.click(trigger);
 
@@ -92,7 +91,6 @@ describe(usePopover, () => {
 
   it('stays open on a pointer-down inside the panel', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
     const trigger = getTrigger();
     await user.click(trigger);
 
@@ -103,7 +101,6 @@ describe(usePopover, () => {
 
   it('traps Tab, wrapping focus from the last item back to the first', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
     await user.click(getTrigger());
 
     const first = screen.getByRole('button', { name: 'first' });
@@ -117,7 +114,6 @@ describe(usePopover, () => {
 
   it('moves focus to the next item on ArrowDown, wrapping from the last back to the first', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
     await user.click(getTrigger());
 
     const first = screen.getByRole('button', { name: 'first' });
@@ -132,7 +128,6 @@ describe(usePopover, () => {
 
   it('moves focus to the previous item on ArrowUp, wrapping from the first to the last', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
     await user.click(getTrigger());
 
     const last = screen.getByRole('button', { name: 'second' });
@@ -144,7 +139,6 @@ describe(usePopover, () => {
 
   it('moves focus to the previous item on ArrowUp when not on the first item', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
     await user.click(getTrigger());
 
     const first = screen.getByRole('button', { name: 'first' });
@@ -158,7 +152,6 @@ describe(usePopover, () => {
 
   it('focuses the first item on Home', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
     await user.click(getTrigger());
 
     const first = screen.getByRole('button', { name: 'first' });
@@ -172,7 +165,6 @@ describe(usePopover, () => {
 
   it('focuses the last item on End', async () => {
     const user = userEvent.setup();
-    render(<Harness />);
     await user.click(getTrigger());
 
     const last = screen.getByRole('button', { name: 'second' });

@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { renderElement, screen, within } from '@blog/ui/testing/custom-render';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import { mapCompoundSlots } from './compound';
@@ -32,7 +32,7 @@ const TestHarness = ({ children }: { children: ReactNode }) => {
 
 describe(mapCompoundSlots, () => {
   it('matches a single known slot', () => {
-    render(
+    renderElement(
       <TestHarness>
         <Alpha>one</Alpha>
       </TestHarness>,
@@ -42,7 +42,7 @@ describe(mapCompoundSlots, () => {
   });
 
   it('matches multiple different known slots', () => {
-    render(
+    renderElement(
       <TestHarness>
         <Alpha>one</Alpha>
         <Beta>two</Beta>
@@ -54,7 +54,7 @@ describe(mapCompoundSlots, () => {
 
   it('routes an unknown component to unmatched', () => {
     const Unknown = () => <span>unknown</span>;
-    render(
+    renderElement(
       <TestHarness>
         <Alpha>one</Alpha>
         <Unknown />
@@ -65,12 +65,12 @@ describe(mapCompoundSlots, () => {
   });
 
   it('routes stray text children to unmatched', () => {
-    render(<TestHarness>stray text</TestHarness>);
+    renderElement(<TestHarness>stray text</TestHarness>);
     expect(screen.getByText('stray text')).toBeVisible();
   });
 
   it('routes a duplicate slot (second occurrence) to unmatched', () => {
-    render(
+    renderElement(
       <TestHarness>
         <Alpha>first</Alpha>
         <Alpha>second</Alpha>
@@ -87,7 +87,7 @@ describe(mapCompoundSlots, () => {
   });
 
   it('matches slots wrapped in a single Fragment', () => {
-    render(
+    renderElement(
       <TestHarness>
         <>
           <Alpha>one</Alpha>
@@ -101,7 +101,7 @@ describe(mapCompoundSlots, () => {
   });
 
   it('ignores false/null/undefined children without adding them to unmatched', () => {
-    render(
+    renderElement(
       <TestHarness>
         <Alpha>one</Alpha>
         {false}

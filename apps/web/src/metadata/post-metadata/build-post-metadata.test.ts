@@ -1,5 +1,4 @@
 import type { TPostDetail } from '@blog/service';
-import { describe, expect, it, vi } from 'vitest';
 
 import { buildPostMetadata } from './build-post-metadata';
 
