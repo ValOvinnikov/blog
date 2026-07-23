@@ -32,7 +32,15 @@ const basePost: TPostDetail = {
     ogDescription: 'A sufficiently long excerpt for the card OG.',
     ogImageUrl: 'https://cdn.example.com/hero.jpg',
   },
-  author: undefined,
+  author: {
+    id: 'author-1',
+    name: 'Jane Doe',
+    slug: 'jane-doe',
+    imageUrl: undefined,
+    role: undefined,
+    bio: undefined,
+    socialLinks: [],
+  },
   categories: [],
   tags: [],
   relatedPosts: [],
@@ -76,34 +84,13 @@ describe('buildPostMetadata', () => {
     ).toBe('2026-01-15T00:00:00Z');
   });
 
-  it('sets openGraph.authors from post.author.name when present', async () => {
-    getPostMock.mockResolvedValue({
-      ...basePost,
-      author: {
-        id: 'author-1',
-        name: 'Jane Doe',
-        slug: 'jane-doe',
-        imageUrl: undefined,
-        role: undefined,
-        bio: undefined,
-        socialLinks: [],
-      },
-    });
+  it('sets openGraph.authors from post.author.name', async () => {
+    getPostMock.mockResolvedValue(basePost);
 
     const metadata = await buildPostMetadata('hello-world');
 
     expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
       'Jane Doe',
     ]);
-  });
-
-  it('omits openGraph.authors when the post has no resolved author', async () => {
-    getPostMock.mockResolvedValue(basePost);
-
-    const metadata = await buildPostMetadata('hello-world');
-
-    expect(
-      (metadata.openGraph as { authors?: string[] })?.authors,
-    ).toBeUndefined();
   });
 });

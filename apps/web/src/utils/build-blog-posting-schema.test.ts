@@ -61,15 +61,6 @@ describe(buildBlogPostingSchema, () => {
     expect(schema?.image).toBeUndefined();
   });
 
-  it('omits author when the post has no resolved author', () => {
-    const schema = buildBlogPostingSchema(
-      { ...post, author: undefined },
-      'https://example.com',
-    );
-
-    expect(schema?.author).toBeUndefined();
-  });
-
   it('builds an absolute url from siteUrl and the post slug', () => {
     const schema = buildBlogPostingSchema(
       { ...post, slug: 'another-post' },

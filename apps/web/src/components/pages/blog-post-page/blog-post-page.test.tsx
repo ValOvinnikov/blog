@@ -84,14 +84,6 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(script?.textContent).toContain('"@type":"BlogPosting"');
   });
 
-  it('omits PostMeta when the post has no author', async () => {
-    getPostMock.mockResolvedValue({ ...mockPostDetail, author: undefined });
-
-    await setup();
-
-    expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
-  });
-
   it('renders the post tags as links to routes.tag(slug)', async () => {
     getPostMock.mockResolvedValue({
       ...mockPostDetail,

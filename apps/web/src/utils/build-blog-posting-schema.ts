@@ -9,7 +9,7 @@ export type TBlogPostingSchema = {
   image: string | undefined;
   datePublished: string;
   dateModified: string;
-  author: { '@type': 'Person'; name: string } | undefined;
+  author: { '@type': 'Person'; name: string };
   url: string;
   keywords: string | undefined;
 };
@@ -51,9 +51,7 @@ export function buildBlogPostingSchema(
     image: post.heroImageUrl,
     datePublished: post.publishedAt,
     dateModified: post.publishedAt,
-    author: post.author
-      ? { '@type': 'Person', name: post.author.name }
-      : undefined,
+    author: { '@type': 'Person', name: post.author.name },
     url: `${siteUrl}${routes.post(post.slug)}`,
     keywords:
       post.tags.length > 0
