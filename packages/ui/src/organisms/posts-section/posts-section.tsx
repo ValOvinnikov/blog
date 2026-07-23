@@ -26,6 +26,8 @@ export interface IPostsSectionProps extends IWithDataTestId {
   className?: string;
   /** Component each card's title link renders as — defaults to a plain `<a>`. Pass the app router's Link to get client-side navigation. */
   linkAs?: TAnchorElementType;
+  /** Message rendered under the heading when `posts` is empty. Omit to keep the section rendering nothing (existing behavior). */
+  emptyMessage?: string;
 }
 
 const s = postsSectionVariants();
@@ -43,8 +45,10 @@ export const PostsSection = ({
   className,
   dataTestId,
   linkAs,
+  emptyMessage,
 }: IPostsSectionProps) => {
-  if (posts.length === 0) return null;
+  const isEmpty = posts.length === 0;
+  if (isEmpty && !emptyMessage) return null;
   const Component = (linkAs ?? 'a') as ElementType;
 
   return (
@@ -56,22 +60,26 @@ export const PostsSection = ({
       <h2 id={titleId} className={s.label()}>
         {title}
       </h2>
-      <div className={s.grid()}>
-        {posts.map((post) => (
-          <PostCard key={post.id} excerpt={post.excerpt}>
-            <PostCard.Meta
-              dateValue={post.publishedAt}
-              dateLabel={post.formattedDate}
-              category={post.categories[0]?.title ?? ''}
-            />
-            <PostCard.Title>
-              <Component href={post.href} className={s.titleLink()}>
-                {post.title}
-              </Component>
-            </PostCard.Title>
-          </PostCard>
-        ))}
-      </div>
+      {isEmpty ? (
+        <p className={s.emptyMessage()}>{emptyMessage}</p>
+      ) : (
+        <div className={s.grid()}>
+          {posts.map((post) => (
+            <PostCard key={post.id} excerpt={post.excerpt}>
+              <PostCard.Meta
+                dateValue={post.publishedAt}
+                dateLabel={post.formattedDate}
+                category={post.categories[0]?.title ?? ''}
+              />
+              <PostCard.Title>
+                <Component href={post.href} className={s.titleLink()}>
+                  {post.title}
+                </Component>
+              </PostCard.Title>
+            </PostCard>
+          ))}
+        </div>
+      )}
     </section>
   );
 };
