@@ -78,7 +78,7 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
           title={title}
           lead={excerpt}
           meta={{
-            author,
+            author: { ...author, href: routes.author(author.slug) },
             publishedAt,
             formattedDate: formatDate(publishedAt, locale),
             categories: categories.slice(1).map((category) => ({

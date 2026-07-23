@@ -75,6 +75,17 @@ describe(`<${BlogPostPage.name}/>`, () => {
     ).toBeVisible();
   });
 
+  it('links the author name to routes.author(slug)', async () => {
+    getPostMock.mockResolvedValue(mockPostDetail);
+
+    await setup();
+
+    expect(screen.getByRole('link', { name: 'Jane Doe' })).toHaveAttribute(
+      'href',
+      '/author/jane-doe',
+    );
+  });
+
   it('renders the sole category as the eyebrow only, with no meta strip category link', async () => {
     getPostMock.mockResolvedValue(mockPostDetail);
 
