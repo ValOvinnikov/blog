@@ -21,7 +21,7 @@ export async function ContentModule({ id }: IContentModuleProps) {
   const { title, body } = result.data;
 
   return (
-    <ContentModuleUi title={title}>
+    <ContentModuleUi title={title} titleId={`content-${id}`}>
       <PortableTextRenderer value={body} />
     </ContentModuleUi>
   );
