@@ -6,7 +6,7 @@ import { tagVariants } from './tag-variants';
 
 type TTagOwnProps = {
   className?: string;
-} & VariantProps<typeof tagVariants>;
+} & Omit<VariantProps<typeof tagVariants>, 'interactive'>;
 
 export type TTagProps<C extends ElementType = 'span'> = TPolymorphicProps<
   C,
@@ -27,7 +27,11 @@ export const Tag = <C extends ElementType = 'span'>({
 
   return (
     <Component
-      className={tagVariants({ variant, class: className })}
+      className={tagVariants({
+        variant,
+        interactive: Boolean(as),
+        class: className,
+      })}
       {...rest}
     />
   );
