@@ -34,6 +34,8 @@ const basePost: TPostDetail = {
   },
   author: undefined,
   categories: [],
+  tags: [],
+  relatedPosts: [],
 };
 
 describe('buildPostMetadata', () => {

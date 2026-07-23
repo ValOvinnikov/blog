@@ -3,6 +3,7 @@ import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo
 import type { TCategory } from '@blog/service/shared/transformers/to-category';
 import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { TSocialLink } from '@blog/service/shared/transformers/to-social-link';
+import type { TTag } from '@blog/service/shared/transformers/to-tag';
 
 export type TPostDetailAuthor = {
   id: string;
@@ -19,4 +20,6 @@ export type TPostDetail = Omit<TPostCard, 'author' | 'categories'> & {
   seo: TSeoResolved;
   author: TMaybeUndefined<TPostDetailAuthor>;
   categories: TCategory[];
+  tags: TTag[];
+  relatedPosts: TPostCard[];
 };

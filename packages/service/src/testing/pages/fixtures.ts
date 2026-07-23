@@ -2,6 +2,7 @@ import type { TRawBlogPage } from '@blog/service/features/pages/blog/adaptor/ind
 import type { TRawGenericPage } from '@blog/service/features/pages/generic/adaptor/transformer';
 import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
 import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail/transformer';
+import type { TRawTagPageTag } from '@blog/service/features/pages/tag/adaptor/detail-page/transformer';
 import type { TRawPostCard } from '@blog/service/shared/transformers/to-post-card';
 import {
   makeRawImage,
@@ -69,6 +70,7 @@ export function makeRawPostDetail(
         description: 'Engineering posts',
       },
     ],
+    tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
     ...overrides,
   };
 }
@@ -95,6 +97,19 @@ export function makeRawBlogPage(
     heading: 'The Blog',
     supportingText: 'Notes on building things.',
     itemsPerPage: 9,
+    seo: null,
+    ...overrides,
+  };
+}
+
+export function makeRawTagPageTag(
+  overrides: Partial<TRawTagPageTag> = {},
+): TRawTagPageTag {
+  return {
+    _id: 'tag-1',
+    title: 'TypeScript',
+    slug: 'typescript',
+    description: 'Posts about TypeScript.',
     seo: null,
     ...overrides,
   };

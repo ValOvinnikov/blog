@@ -2,8 +2,10 @@ import type { TSiteSettings } from '@blog/service/features/global/site-settings/
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toCategory } from '@blog/service/shared/transformers/to-category';
+import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toSocialLink } from '@blog/service/shared/transformers/to-social-link';
+import { toTag } from '@blog/service/shared/transformers/to-tag';
 import type { InferResultType } from 'groqd';
 
 import type { postDetailQuery } from './query';
@@ -30,6 +32,7 @@ function toPostDetailAuthor(
 export function toPostDetail(
   raw: TRawPostDetail,
   settings: TSiteSettings,
+  relatedPosts: TPostCard[],
 ): TPostDetail {
   const heroImageUrl = buildImageUrl(raw.heroImage);
 
@@ -54,5 +57,7 @@ export function toPostDetail(
     ),
     author: raw.author ? toPostDetailAuthor(raw.author) : undefined,
     categories: raw.categories.map(toCategory),
+    tags: (raw.tags ?? []).map(toTag),
+    relatedPosts,
   };
 }
