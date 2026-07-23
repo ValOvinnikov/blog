@@ -16,9 +16,10 @@ function toEntry(path: string, siteUrl: string): MetadataRoute.Sitemap[number] {
 }
 
 /**
- * Site-wide sitemap: home, blog index + every numbered page, every published
- * post, category, and tag archive. Every entry carries a `languages`
- * alternate for each configured locale — a no-op today
+ * Site-wide sitemap: home, blog index + every numbered page, the `/topics`
+ * hub, every published post, category, and tag archive, and every generic
+ * page. Every entry carries a `languages` alternate for each configured
+ * locale — a no-op today
  * (`localePrefix: 'never'` means every locale resolves to the same
  * unprefixed path) but keeps this future-proof if locale-prefixed routing is
  * ever introduced.
@@ -64,6 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     toEntry(routes.home(), siteUrl),
     toEntry(routes.blogIndex(), siteUrl),
+    toEntry(routes.topics(), siteUrl),
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
     ...posts.map(({ slug }) => toEntry(routes.post(slug), siteUrl)),
     ...categories.map(({ slug }) => toEntry(routes.category(slug), siteUrl)),

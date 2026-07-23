@@ -40,7 +40,7 @@ describe('sitemap', () => {
     getPageSlugsMock.mockReset();
   });
 
-  it('includes home, blog index, post, category, tag, blog page and generic page entries', async () => {
+  it('includes home, blog index, topics hub, post, category, tag, blog page and generic page entries', async () => {
     getPostParamsMock.mockResolvedValue([
       { slug: 'first-post' },
       { slug: 'second-post' },
@@ -62,6 +62,7 @@ describe('sitemap', () => {
 
     expect(urls).toContain('https://example.com/');
     expect(urls).toContain('https://example.com/blog');
+    expect(urls).toContain('https://example.com/topics');
     expect(urls).toContain('https://example.com/blog/page/2');
     expect(urls).toContain('https://example.com/blog/page/3');
     expect(urls).toContain('https://example.com/blog/first-post');
