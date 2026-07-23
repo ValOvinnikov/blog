@@ -1,2 +1,2 @@
-export type { TCategoriesList } from './adaptor/types';
+export type { TCategoriesList, TCategoryWithPostCount } from './adaptor/types';
 export { createCategoriesService } from './application/service';

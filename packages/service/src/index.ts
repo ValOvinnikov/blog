@@ -43,7 +43,10 @@ export const service = {
 };
 
 export type { TAuthorDetail, TAuthorPage } from './features/entities/author';
-export type { TCategoriesList } from './features/entities/categories';
+export type {
+  TCategoriesList,
+  TCategoryWithPostCount,
+} from './features/entities/categories';
 export type { TFooter } from './features/global/footer';
 export type { TNavigation } from './features/global/navigation';
 export type { TBrand, TSiteSettings } from './features/global/site-settings';
