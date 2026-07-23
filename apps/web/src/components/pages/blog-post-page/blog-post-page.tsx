@@ -64,10 +64,16 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
 
       <Article>
         <Article.Header
-          categories={categories.map((category) => ({
-            label: category.title,
-            href: routes.category(category.slug),
-          }))}
+          categories={
+            primaryCategory
+              ? [
+                  {
+                    label: primaryCategory.title,
+                    href: routes.category(primaryCategory.slug),
+                  },
+                ]
+              : []
+          }
           linkAs={SmartLink}
           title={title}
           lead={excerpt}
@@ -75,12 +81,10 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
             author,
             publishedAt,
             formattedDate: formatDate(publishedAt, locale),
-            category: primaryCategory
-              ? {
-                  label: primaryCategory.title,
-                  href: routes.category(primaryCategory.slug),
-                }
-              : undefined,
+            categories: categories.slice(1).map((category) => ({
+              label: category.title,
+              href: routes.category(category.slug),
+            })),
             linkAs: SmartLink,
             share: <PostShare url={url} title={title} links={shareLinks} />,
           }}
