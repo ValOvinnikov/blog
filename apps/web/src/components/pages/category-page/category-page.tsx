@@ -2,9 +2,11 @@ import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
+import { CategoryChipList } from '@web/components/shared/category-chip-list';
 import { Link } from '@web/i18n/navigation';
 import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
 import { formatDate } from '@web/utils/format-date';
+import { getCategoriesSafely } from '@web/utils/get-categories-safely';
 import { notFound } from 'next/navigation';
 
 type TCategoryPageProps = ILocalizedParams & { slug: string; page?: number };
@@ -17,10 +19,13 @@ type TCategoryPageProps = ILocalizedParams & { slug: string; page?: number };
  * gets the same pagination metadata as any other page.
  */
 export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
-  const result = await service.pages.category.v1.getCategoryPage(slug, {
-    page,
-    itemsPerPage: CATEGORY_ITEMS_PER_PAGE,
-  });
+  const [result, categories] = await Promise.all([
+    service.pages.category.v1.getCategoryPage(slug, {
+      page,
+      itemsPerPage: CATEGORY_ITEMS_PER_PAGE,
+    }),
+    getCategoriesSafely(),
+  ]);
 
   if (!result) {
     notFound();
@@ -48,6 +53,9 @@ export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
     <BlogPageTemplate
       heading={category.title}
       supportingText={category.description}
+      categoryChips={
+        <CategoryChipList categories={categories} activeSlug={slug} />
+      }
       posts={
         <PostsSection
           posts={items}
