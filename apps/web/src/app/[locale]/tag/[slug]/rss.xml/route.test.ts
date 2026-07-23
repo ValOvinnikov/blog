@@ -1,3 +1,6 @@
+import { makePostCard } from '@web/testing/shared/post/fixtures';
+import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { makeTag } from '@web/testing/shared/tag/fixtures';
 import { notFound } from 'next/navigation';
 
 const { getTagPageMock } = vi.hoisted(() => ({
@@ -10,14 +13,12 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-const post = {
-  id: 'post-1',
+const post = makePostCard({
   title: 'Hello & Welcome',
   slug: 'hello-welcome',
   excerpt: 'A <first> post.',
   publishedAt: '2026-01-15T00:00:00Z',
-  categories: [],
-};
+});
 
 const params = Promise.resolve({ slug: 'typescript' });
 
@@ -31,19 +32,15 @@ describe('GET /tag/[slug]/rss.xml', () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
+        tag: makeTag({
           description: 'The latest TypeScript posts.',
-          seo: {
+          seo: makeSeo({
             title: 'TypeScript',
             description: 'The latest TypeScript posts.',
             ogTitle: 'TypeScript',
             ogDescription: 'The latest TypeScript posts.',
-            ogImageUrl: undefined,
-          },
-        },
+          }),
+        }),
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -83,19 +80,15 @@ describe('GET /tag/[slug]/rss.xml', () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
+        tag: makeTag({
           description: undefined,
-          seo: {
+          seo: makeSeo({
             title: 'TypeScript',
             description: 'TypeScript',
             ogTitle: 'TypeScript',
             ogDescription: 'TypeScript',
-            ogImageUrl: undefined,
-          },
-        },
+          }),
+        }),
         posts: [],
         currentPage: 1,
         totalPages: 1,
@@ -114,19 +107,15 @@ describe('GET /tag/[slug]/rss.xml', () => {
   });
 
   it('aggregates posts across every windowed tag page', async () => {
-    const tag = {
-      id: 'tag-1',
-      title: 'TypeScript',
-      slug: 'typescript',
+    const tag = makeTag({
       description: 'The latest TypeScript posts.',
-      seo: {
+      seo: makeSeo({
         title: 'TypeScript',
         description: 'The latest TypeScript posts.',
         ogTitle: 'TypeScript',
         ogDescription: 'The latest TypeScript posts.',
-        ogImageUrl: undefined,
-      },
-    };
+      }),
+    });
     getTagPageMock.mockImplementation(({ page }: { page: number }) => {
       if (page === 1) {
         return Promise.resolve({

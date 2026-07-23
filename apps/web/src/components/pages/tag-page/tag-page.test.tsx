@@ -1,4 +1,10 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import {
+  makePostCard,
+  makePostCardCategory,
+} from '@web/testing/shared/post/fixtures';
+import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { makeTag } from '@web/testing/shared/tag/fixtures';
 import { notFound } from 'next/navigation';
 
 import { TagPage } from './tag-page';
@@ -30,22 +36,22 @@ vi.mock('@web/i18n/navigation', () => ({
   ),
 }));
 
-const seo = {
-  title: 'TypeScript',
+const tag = makeTag({
   description: 'The latest TypeScript posts.',
-  ogTitle: 'TypeScript',
-  ogDescription: 'The latest TypeScript posts.',
-  ogImageUrl: undefined,
-};
+  seo: makeSeo({
+    title: 'TypeScript',
+    description: 'The latest TypeScript posts.',
+    ogTitle: 'TypeScript',
+    ogDescription: 'The latest TypeScript posts.',
+  }),
+});
 
-const post = {
-  id: 'post-1',
+const post = makePostCard({
   title: 'My Post Title',
   slug: 'my-post-slug',
-  excerpt: 'An excerpt.',
   publishedAt: '2026-01-01T00:00:00.000Z',
-  categories: [{ id: 'cat-1', title: 'News', slug: 'news' }],
-};
+  categories: [makePostCardCategory()],
+});
 
 const setup = customRenderAsync(TagPage, {
   slug: 'typescript',
@@ -83,13 +89,7 @@ describe('TagPage', () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'The latest TypeScript posts.',
-          seo,
-        },
+        tag,
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -110,17 +110,11 @@ describe('TagPage', () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders the tag heading with no posts section when the tag has no posts', async () => {
+  it('renders the empty-state message when the tag has no posts', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'The latest TypeScript posts.',
-          seo,
-        },
+        tag,
         posts: [],
         currentPage: 1,
         totalPages: 1,
@@ -133,6 +127,13 @@ describe('TagPage', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'TypeScript' }),
     ).toBeVisible();
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'Posts tagged TypeScript',
+      }),
+    ).toBeVisible();
+    expect(screen.getByText('No posts tagged TypeScript yet.')).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
@@ -140,13 +141,7 @@ describe('TagPage', () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'The latest TypeScript posts.',
-          seo,
-        },
+        tag,
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -166,13 +161,7 @@ describe('TagPage', () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'The latest TypeScript posts.',
-          seo,
-        },
+        tag,
         posts: [post],
         currentPage: 2,
         totalPages: 3,
@@ -192,13 +181,7 @@ describe('TagPage', () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'The latest TypeScript posts.',
-          seo,
-        },
+        tag,
         posts: [post],
         currentPage: 1,
         totalPages: 3,
@@ -215,13 +198,7 @@ describe('TagPage', () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'The latest TypeScript posts.',
-          seo,
-        },
+        tag,
         posts: [post],
         currentPage: 2,
         totalPages: 3,
@@ -240,13 +217,7 @@ describe('TagPage', () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'The latest TypeScript posts.',
-          seo,
-        },
+        tag,
         posts: [],
         currentPage: 5,
         totalPages: 1,

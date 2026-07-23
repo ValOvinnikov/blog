@@ -53,10 +53,22 @@ describe(`<${PostsSection.name}/>`, () => {
     }
   });
 
-  it('returns null when posts is empty', () => {
+  it('returns null when posts is empty and no emptyMessage is provided', () => {
     const { container } = setup({ posts: [] });
 
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('renders the heading and the empty message when posts is empty and emptyMessage is provided', () => {
+    const emptyMessage = faker.lorem.sentence();
+
+    setup({ posts: [], emptyMessage });
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Latest' }),
+    ).toBeVisible();
+    expect(screen.getByText(emptyMessage)).toBeVisible();
+    expect(screen.queryAllByRole('link')).toHaveLength(0);
   });
 
   it('forwards data-testid', () => {

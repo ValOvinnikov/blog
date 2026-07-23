@@ -1,4 +1,9 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeAuthor } from '@web/testing/shared/author/fixtures';
+import {
+  makePostCard,
+  makePostCardCategory,
+} from '@web/testing/shared/post/fixtures';
 import { notFound } from 'next/navigation';
 
 import { AuthorPage } from './author-page';
@@ -32,35 +37,19 @@ vi.mock('@web/i18n/navigation', () => ({
   ),
 }));
 
-const author = {
-  id: 'author-1',
-  name: 'Jane Doe',
-  slug: 'jane-doe',
-  role: 'Senior Engineer',
-  imageUrl: 'https://cdn.example.com/jane.jpg',
-  bio: [
-    {
-      _type: 'block' as const,
-      _key: 'b1',
-      children: [
-        { _type: 'span' as const, _key: 's1', text: 'Builds things.' },
-      ],
-    },
-  ],
+const author = makeAuthor({
   socialLinks: [
     { platform: 'X', url: 'https://x.com/janedoe' },
     { platform: 'GitHub', url: 'https://github.com/janedoe' },
   ],
-};
+});
 
-const post = {
-  id: 'post-1',
+const post = makePostCard({
   title: 'My Post Title',
   slug: 'my-post-slug',
-  excerpt: 'An excerpt.',
   publishedAt: '2026-01-01T00:00:00.000Z',
-  categories: [{ id: 'cat-1', title: 'News', slug: 'news' }],
-};
+  categories: [makePostCardCategory()],
+});
 
 const setup = customRenderAsync(AuthorPage, { slug: 'jane-doe', locale: 'en' });
 
@@ -159,7 +148,7 @@ describe('AuthorPage', () => {
     expect(link).toHaveAttribute('href', '/blog/my-post-slug');
   });
 
-  it('renders no posts section when the author has no posts', async () => {
+  it('renders the empty-state message when the author has no posts', async () => {
     getAuthorPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -173,6 +162,12 @@ describe('AuthorPage', () => {
 
     await setup();
 
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Posts by Jane Doe' }),
+    ).toBeVisible();
+    expect(
+      screen.getByText("Jane Doe hasn't published any posts yet."),
+    ).toBeVisible();
     expect(
       screen.queryByRole('link', { name: 'My Post Title' }),
     ).not.toBeInTheDocument();

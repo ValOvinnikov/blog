@@ -1,4 +1,4 @@
-import type { TSeoResolved } from '@blog/service';
+import { makeSeo } from '@web/testing/shared/seo/fixtures';
 
 import { buildGenericPageMetadata } from './build-generic-page-metadata';
 
@@ -14,13 +14,13 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-const seo: TSeoResolved = {
+const seo = makeSeo({
   title: 'About Us',
   description: 'Who we are.',
   ogTitle: 'About Us OG',
   ogDescription: 'Who we are OG.',
   ogImageUrl: 'https://cdn.example.com/about-og.jpg',
-};
+});
 
 describe('buildGenericPageMetadata', () => {
   it('maps the resolved seo straight through toMetadata, self-canonical to /[slug]', async () => {

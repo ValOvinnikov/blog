@@ -1,4 +1,4 @@
-export {};
+import { makePostCard } from '@web/testing/shared/post/fixtures';
 
 const { getIndexPageMock, getSiteSettingsMock } = vi.hoisted(() => ({
   getIndexPageMock: vi.fn(),
@@ -12,14 +12,12 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-const post = {
-  id: 'post-1',
+const post = makePostCard({
   title: 'Hello & Welcome',
   slug: 'hello-welcome',
   excerpt: 'A <first> post.',
   publishedAt: '2026-01-15T00:00:00Z',
-  categories: [],
-};
+});
 
 describe('GET /rss.xml', () => {
   afterEach(() => {
