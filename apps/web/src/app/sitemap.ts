@@ -1,12 +1,25 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { routing } from '@web/i18n/routing';
+import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
 import { env } from '@web/utils/env/env';
+import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import type { MetadataRoute } from 'next';
 
-function toEntry(path: string, siteUrl: string): MetadataRoute.Sitemap[number] {
+// `getPostParams()`/`getCategoryParams()`/`getTagParams()`/`getAuthorParams()`/
+// `getPageSlugs()` all currently project only `{ slug }` (or `{ slug, page }`
+// for the pagination variants) — no query in web's reach exposes a
+// `publishedAt`/`_updatedAt` field cheaply today, so `lastModified` stays
+// unset for every entry below until a service-layer change adds one (see the
+// module doc comment for the flagged follow-up).
+function toEntry(
+  path: string,
+  siteUrl: string,
+  lastModified?: Date | string,
+): MetadataRoute.Sitemap[number] {
   return {
     url: `${siteUrl}${path}`,
+    ...(lastModified ? { lastModified } : {}),
     alternates: {
       languages: Object.fromEntries(
         routing.locales.map((locale) => [locale, `${siteUrl}${path}`]),
@@ -42,11 +55,52 @@ async function getTagParamsSafe() {
   }
 }
 
+async function getAuthorParamsSafe() {
+  try {
+    return await service.entities.author.v1.getAuthorParams();
+  } catch (error) {
+    console.error(`Error fetching author params for sitemap: ${error}`);
+    return [];
+  }
+}
+
+// Pages 2..N of a category/tag archive are near-duplicate slices of the same
+// post list (same title/description pattern, decreasing content density) —
+// included anyway, for consistency with the numbered `/blog/page/N` entries
+// already listed below, rather than treating paginated archives as
+// crawlable-but-not-advertised. `itemsPerPage` must match the value each
+// numbered-page route's own `generateStaticParams` uses, or the two disagree
+// on how many pages exist.
+async function getCategoryPaginationParamsSafe() {
+  try {
+    return await service.pages.category.v1.getCategoryPaginationParams(
+      CATEGORY_ITEMS_PER_PAGE,
+    );
+  } catch (error) {
+    console.error(
+      `Error fetching category pagination params for sitemap: ${error}`,
+    );
+    return [];
+  }
+}
+
+async function getTagPaginationParamsSafe() {
+  try {
+    return await service.pages.tag.v1.getTagPaginationParams(
+      TAG_ITEMS_PER_PAGE,
+    );
+  } catch (error) {
+    console.error(`Error fetching tag pagination params for sitemap: ${error}`);
+    return [];
+  }
+}
+
 /**
  * Site-wide sitemap: home, blog index + every numbered page, the `/topics`
- * hub, every published post, category, and tag archive, and every generic
- * page. Every entry carries a `languages` alternate for each configured
- * locale — a no-op today
+ * hub, every published post, category, tag, and author archive (plus their
+ * numbered pages 2..N for category/tag — see the pagination helpers above),
+ * and every generic page. Every entry carries a `languages` alternate for
+ * each configured locale — a no-op today
  * (`localePrefix: 'never'` means every locale resolves to the same
  * unprefixed path) but keeps this future-proof if locale-prefixed routing is
  * ever introduced.
@@ -54,6 +108,15 @@ async function getTagParamsSafe() {
  * Returns an empty sitemap (logged) when `NEXT_PUBLIC_SITE_URL` is unset —
  * every URL in a sitemap must be absolute, so there is no meaningful
  * relative fallback (mirrors `buildBlogPostingSchema`'s same judgment call).
+ *
+ * `lastModified` follow-up (#780): every params query above projects only
+ * slug/page — none carries a `publishedAt`/`_updatedAt` field, so no entry
+ * sets `lastModified` yet. Wiring it in (posts at minimum) needs a
+ * service-layer change — e.g. adding `publishedAt` to
+ * `getPostParams()`'s projection in
+ * `packages/service/src/features/pages/post/adaptor/params/{query,loader}.ts`
+ * — which is out of `web`'s scope; `toEntry()` already accepts an optional
+ * `lastModified` param so wiring it in later is a one-line change per entry.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = env.NEXT_PUBLIC_SITE_URL;
@@ -62,14 +125,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [];
   }
 
-  const [posts, categories, tags, blogParamsResult, genericPageSlugsResult] =
-    await Promise.all([
-      getPostParamsSafe(),
-      getCategoryParamsSafe(),
-      getTagParamsSafe(),
-      service.pages.blog.v1.getIndexPageParams(),
-      service.pages.generic.v1.getPageSlugs(),
-    ]);
+  const [
+    posts,
+    categories,
+    tags,
+    authors,
+    categoryPages,
+    tagPages,
+    blogParamsResult,
+    genericPageSlugsResult,
+  ] = await Promise.all([
+    getPostParamsSafe(),
+    getCategoryParamsSafe(),
+    getTagParamsSafe(),
+    getAuthorParamsSafe(),
+    getCategoryPaginationParamsSafe(),
+    getTagPaginationParamsSafe(),
+    service.pages.blog.v1.getIndexPageParams(),
+    service.pages.generic.v1.getPageSlugs(),
+  ]);
 
   if (!blogParamsResult.ok) {
     console.error(
@@ -96,7 +170,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
     ...posts.map(({ slug }) => toEntry(routes.post(slug), siteUrl)),
     ...categories.map(({ slug }) => toEntry(routes.category(slug), siteUrl)),
+    ...categoryPages.map(({ slug, page }) =>
+      toEntry(routes.category(slug, Number(page)), siteUrl),
+    ),
     ...tags.map(({ slug }) => toEntry(routes.tag(slug), siteUrl)),
+    ...tagPages.map(({ slug, page }) =>
+      toEntry(routes.tag(slug, Number(page)), siteUrl),
+    ),
+    ...authors.map(({ slug }) => toEntry(routes.author(slug), siteUrl)),
     ...genericPageSlugs.map(({ slug }) =>
       toEntry(routes.genericPage(slug), siteUrl),
     ),
