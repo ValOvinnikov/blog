@@ -12,6 +12,9 @@ export const routes = {
   /** Page 1 lives at /category/{slug} only; pages ≥ 2 under the static `page/` segment. */
   category: (slug: string, page = 1) =>
     page === 1 ? `/category/${slug}` : `/category/${slug}/page/${page}`,
+  /** Page 1 lives at /tag/{slug} only; pages ≥ 2 under the static `page/` segment. */
+  tag: (slug: string, page = 1) =>
+    page === 1 ? `/tag/${slug}` : `/tag/${slug}/page/${page}`,
   author: (slug: string) => `/author/${slug}`,
   genericPage: (slug: string) => `/${slug}`,
 } as const;

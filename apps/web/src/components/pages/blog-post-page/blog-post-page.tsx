@@ -1,6 +1,6 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { Article } from '@blog/ui';
+import { Article } from '@blog/ui/organisms';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 import { PostShare } from '@web/components/shared/post-share';

@@ -1,5 +1,11 @@
 import type { Code, RichText as TPortableText } from '@blog/config';
-import { Heading, InlineCode, Prose, ProseLink, QuoteBlock } from '@blog/ui';
+import {
+  Heading,
+  InlineCode,
+  Prose,
+  ProseLink,
+  QuoteBlock,
+} from '@blog/ui/atoms';
 import {
   PortableText,
   type PortableTextComponents,

@@ -1,6 +1,6 @@
 'use client';
 
-import { ThemeToggle } from '@blog/ui';
+import { ThemeToggle } from '@blog/ui/atoms';
 import { useEffect, useState } from 'react';
 
 /**

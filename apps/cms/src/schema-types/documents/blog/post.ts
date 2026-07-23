@@ -6,6 +6,7 @@ import { defineArrayMember, defineField, defineType } from 'sanity';
 
 import { authorSchema } from './author';
 import { categorySchema } from './category';
+import { tagSchema } from './tag';
 
 export const postSchema = defineType({
   name: 'blog_post',
@@ -65,7 +66,21 @@ export const postSchema = defineType({
           to: [{ type: categorySchema.name }],
         }),
       ],
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().max(4),
+    }),
+    defineField({
+      name: 'tags',
+      title: 'Tags',
+      type: 'array',
+      description:
+        'Topics for discovery — power /tag pages, related posts, and the article footer chips.',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{ type: tagSchema.name }],
+        }),
+      ],
+      validation: (rule) => rule.max(6),
     }),
     defineField({
       name: 'publishedAt',

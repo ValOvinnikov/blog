@@ -1,6 +1,7 @@
 import { authorSchema } from './blog/author';
 import { categorySchema } from './blog/category';
 import { postSchema } from './blog/post';
+import { tagSchema } from './blog/tag';
 import { blogPageSchema } from './pages/blog-page';
 import { homePageSchema } from './pages/home-page';
 import { genericSchema } from './pages/page';
@@ -12,6 +13,7 @@ export const documents = [
   postSchema,
   authorSchema,
   categorySchema,
+  tagSchema,
   genericSchema,
   homePageSchema,
   blogPageSchema,
