@@ -183,7 +183,7 @@ describe('sitemap', () => {
     const [homeEntry] = await sitemap();
 
     expect(homeEntry?.alternates?.languages).toEqual({
-      EN: 'https://example.com/',
+      en: 'https://example.com/',
     });
   });
 
