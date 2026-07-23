@@ -1,4 +1,5 @@
 import type { TPostDetail } from '@blog/service';
+import { makeSeo } from '@web/testing/shared/seo/fixtures';
 
 import { buildPostMetadata } from './build-post-metadata';
 
@@ -25,13 +26,13 @@ const basePost: TPostDetail = {
   heroImageSanity: undefined,
   featured: false,
   body: [],
-  seo: {
+  seo: makeSeo({
     title: 'Hello World',
     description: 'A sufficiently long excerpt for the card.',
     ogTitle: 'Hello World OG',
     ogDescription: 'A sufficiently long excerpt for the card OG.',
     ogImageUrl: 'https://cdn.example.com/hero.jpg',
-  },
+  }),
   author: {
     id: 'author-1',
     name: 'Jane Doe',

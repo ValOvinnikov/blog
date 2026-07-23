@@ -1,4 +1,9 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeCategoryWithPostCount } from '@web/testing/shared/category/fixtures';
+import {
+  makePostCard,
+  makePostCardCategory,
+} from '@web/testing/shared/post/fixtures';
 import { notFound } from 'next/navigation';
 
 import { BlogListPage } from './blog-list-page';
@@ -34,14 +39,12 @@ vi.mock('@web/i18n/navigation', () => ({
   ),
 }));
 
-const post = {
-  id: 'post-1',
+const post = makePostCard({
   title: 'My Post Title',
   slug: 'my-post-slug',
-  excerpt: 'An excerpt.',
   publishedAt: '2026-01-01T00:00:00.000Z',
-  categories: [{ id: 'cat-1', title: 'News', slug: 'news' }],
-};
+  categories: [makePostCardCategory()],
+});
 
 const setup = customRenderAsync(BlogListPage, { page: 1, locale: 'en' });
 
@@ -50,7 +53,7 @@ describe('BlogListPage', () => {
     getIndexPageMock.mockReset();
     getCategoriesMock.mockReset();
     getCategoriesMock.mockResolvedValue([
-      { id: 'cat-1', title: 'News', slug: 'news', postCount: 1 },
+      makeCategoryWithPostCount({ title: 'News', slug: 'news', postCount: 1 }),
     ]);
   });
 

@@ -1,4 +1,4 @@
-import type { TSeoResolved } from '@blog/service';
+import { makeSeo } from '@web/testing/shared/seo/fixtures';
 
 import { buildBlogListMetadata } from './build-blog-list-metadata';
 
@@ -14,13 +14,13 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-const seo: TSeoResolved = {
+const seo = makeSeo({
   title: 'The Blog',
   description: 'All the posts.',
   ogTitle: 'The Blog OG',
   ogDescription: 'All the posts OG.',
   ogImageUrl: 'https://cdn.example.com/blog-og.jpg',
-};
+});
 
 describe('buildBlogListMetadata', () => {
   it('builds page-1 metadata from the resolved seo, self-canonical to /blog', async () => {

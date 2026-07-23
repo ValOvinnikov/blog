@@ -1,3 +1,6 @@
+import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { makeTag } from '@web/testing/shared/tag/fixtures';
+
 import { buildTagMetadata } from './build-tag-metadata';
 
 const { getTagPageMock } = vi.hoisted(() => ({
@@ -12,19 +15,15 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-const tag = {
-  id: 'tag-1',
-  title: 'TypeScript',
-  slug: 'typescript',
-  description: 'Posts about TypeScript.',
-  seo: {
+const tag = makeTag({
+  seo: makeSeo({
     title: 'TypeScript',
     description: 'Posts about TypeScript.',
     ogTitle: 'TypeScript',
     ogDescription: 'Posts about TypeScript.',
     ogImageUrl: 'https://cdn.example.com/og.jpg',
-  },
-};
+  }),
+});
 
 describe('buildTagMetadata', () => {
   it('builds metadata from the tag resolved seo, self-canonical to /tag/[slug]', async () => {

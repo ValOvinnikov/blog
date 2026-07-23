@@ -1,3 +1,5 @@
+import { makeAuthor } from '@web/testing/shared/author/fixtures';
+
 import { buildAuthorMetadata } from './build-author-metadata';
 
 const { getAuthorPageMock } = vi.hoisted(() => ({
@@ -12,23 +14,7 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-const author = {
-  id: 'author-1',
-  name: 'Jane Doe',
-  slug: 'jane-doe',
-  role: 'Senior Engineer',
-  imageUrl: 'https://cdn.example.com/jane.jpg',
-  bio: [
-    {
-      _type: 'block' as const,
-      _key: 'b1',
-      children: [
-        { _type: 'span' as const, _key: 's1', text: 'Builds things.' },
-      ],
-    },
-  ],
-  socialLinks: [],
-};
+const author = makeAuthor();
 
 describe('buildAuthorMetadata', () => {
   it('builds metadata from the author name/role/bio, self-canonical to /author/[slug]', async () => {

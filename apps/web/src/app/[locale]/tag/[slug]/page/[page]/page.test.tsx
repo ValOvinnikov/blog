@@ -1,4 +1,5 @@
 import { customRenderAsync } from '@web/testing/custom-render';
+import { makeTag } from '@web/testing/shared/tag/fixtures';
 import { notFound } from 'next/navigation';
 
 import TagNumberedPage, {
@@ -101,19 +102,7 @@ describe('TagNumberedPage generateMetadata', () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'Posts about TypeScript.',
-          seo: {
-            title: 'TypeScript',
-            description: 'Posts about TypeScript.',
-            ogTitle: 'TypeScript',
-            ogDescription: 'Posts about TypeScript.',
-            ogImageUrl: undefined,
-          },
-        },
+        tag: makeTag(),
         posts: [],
         currentPage: 2,
         totalPages: 3,

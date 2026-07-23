@@ -1,4 +1,5 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makePostCard } from '@web/testing/shared/post/fixtures';
 
 import { PostListModule } from './post-list-module';
 
@@ -29,24 +30,12 @@ vi.mock('@web/i18n/navigation', () => ({
   ),
 }));
 
-const post = {
-  id: 'post-1',
+const post = makePostCard({
   title: 'First post',
   slug: 'first-post',
   excerpt: 'An excerpt',
   publishedAt: '2026-01-01T00:00:00.000Z',
-  heroImageUrl: undefined,
-  heroImageAlt: undefined,
-  heroImageSanity: undefined,
-  featured: false,
-  author: {
-    id: 'author-1',
-    name: 'Jane Doe',
-    slug: 'jane-doe',
-    imageUrl: undefined,
-  },
-  categories: [],
-};
+});
 
 const setup = customRenderAsync(PostListModule, {
   id: 'post-list-1',

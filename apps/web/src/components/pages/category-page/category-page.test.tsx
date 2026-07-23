@@ -1,4 +1,12 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import {
+  makeCategory,
+  makeCategoryWithPostCount,
+} from '@web/testing/shared/category/fixtures';
+import {
+  makePostCard,
+  makePostCardCategory,
+} from '@web/testing/shared/post/fixtures';
 import { notFound } from 'next/navigation';
 
 import { CategoryPage } from './category-page';
@@ -34,14 +42,18 @@ vi.mock('@web/i18n/navigation', () => ({
   ),
 }));
 
-const post = {
-  id: 'post-1',
+const post = makePostCard({
   title: 'My Post Title',
   slug: 'my-post-slug',
-  excerpt: 'An excerpt.',
   publishedAt: '2026-01-01T00:00:00.000Z',
-  categories: [{ id: 'cat-1', title: 'News', slug: 'news' }],
-};
+  categories: [makePostCardCategory()],
+});
+
+const category = makeCategory({
+  title: 'News',
+  slug: 'news',
+  description: 'The latest updates.',
+});
 
 const setup = customRenderAsync(CategoryPage, {
   slug: 'news',
@@ -53,8 +65,13 @@ describe('CategoryPage', () => {
     getCategoryPageMock.mockReset();
     getCategoriesMock.mockReset();
     getCategoriesMock.mockResolvedValue([
-      { id: 'cat-1', title: 'News', slug: 'news', postCount: 1 },
-      { id: 'cat-2', title: 'Design', slug: 'design', postCount: 2 },
+      makeCategoryWithPostCount({ title: 'News', slug: 'news', postCount: 1 }),
+      makeCategoryWithPostCount({
+        id: 'cat-2',
+        title: 'Design',
+        slug: 'design',
+        postCount: 2,
+      }),
     ]);
   });
 
@@ -84,12 +101,7 @@ describe('CategoryPage', () => {
     getCategoryPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category: {
-          id: 'cat-1',
-          title: 'News',
-          slug: 'news',
-          description: 'The latest updates.',
-        },
+        category,
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -114,12 +126,7 @@ describe('CategoryPage', () => {
     getCategoryPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category: {
-          id: 'cat-1',
-          title: 'News',
-          slug: 'news',
-          description: 'The latest updates.',
-        },
+        category,
         posts: [],
         currentPage: 1,
         totalPages: 1,
@@ -141,12 +148,7 @@ describe('CategoryPage', () => {
     getCategoryPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category: {
-          id: 'cat-1',
-          title: 'News',
-          slug: 'news',
-          description: 'The latest updates.',
-        },
+        category,
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -175,12 +177,7 @@ describe('CategoryPage', () => {
     getCategoryPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category: {
-          id: 'cat-1',
-          title: 'News',
-          slug: 'news',
-          description: 'The latest updates.',
-        },
+        category,
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -200,12 +197,7 @@ describe('CategoryPage', () => {
     getCategoryPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category: {
-          id: 'cat-1',
-          title: 'News',
-          slug: 'news',
-          description: 'The latest updates.',
-        },
+        category,
         posts: [post],
         currentPage: 2,
         totalPages: 3,
@@ -225,12 +217,7 @@ describe('CategoryPage', () => {
     getCategoryPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category: {
-          id: 'cat-1',
-          title: 'News',
-          slug: 'news',
-          description: 'The latest updates.',
-        },
+        category,
         posts: [post],
         currentPage: 1,
         totalPages: 3,
@@ -249,12 +236,7 @@ describe('CategoryPage', () => {
     getCategoryPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category: {
-          id: 'cat-1',
-          title: 'News',
-          slug: 'news',
-          description: 'The latest updates.',
-        },
+        category,
         posts: [post],
         currentPage: 2,
         totalPages: 3,
@@ -275,12 +257,7 @@ describe('CategoryPage', () => {
     getCategoryPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category: {
-          id: 'cat-1',
-          title: 'News',
-          slug: 'news',
-          description: 'The latest updates.',
-        },
+        category,
         posts: [],
         currentPage: 5,
         totalPages: 1,

@@ -1,4 +1,5 @@
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { notFound } from 'next/navigation';
 
 import { GenericPage } from './generic-page';
@@ -46,13 +47,12 @@ describe(`<${GenericPage.name}/>`, () => {
         title: 'About Us',
         slug: 'about-us',
         modules: [{ id: 'module-1', type: 'module_content' }],
-        seo: {
+        seo: makeSeo({
           title: 'About Us',
           description: 'Who we are.',
           ogTitle: 'About Us',
           ogDescription: 'Who we are.',
-          ogImageUrl: undefined,
-        },
+        }),
       },
     });
 

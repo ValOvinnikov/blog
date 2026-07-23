@@ -1,3 +1,5 @@
+import { makeCategory } from '@web/testing/shared/category/fixtures';
+
 import { buildCategoryMetadata } from './build-category-metadata';
 
 const { getCategoryPageMock } = vi.hoisted(() => ({
@@ -12,12 +14,7 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-const category = {
-  id: 'cat-1',
-  title: 'Engineering',
-  slug: 'engineering',
-  description: 'Posts about building things.',
-};
+const category = makeCategory();
 
 describe('buildCategoryMetadata', () => {
   it('builds metadata from the category title/description, self-canonical to /category/[slug]', async () => {
