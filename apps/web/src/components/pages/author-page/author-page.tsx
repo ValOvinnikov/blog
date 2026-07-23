@@ -95,6 +95,7 @@ export async function AuthorPage({ slug, locale, page }: TAuthorPageProps) {
           title={`Posts by ${author.name}`}
           titleId="author-posts-title"
           linkAs={Link}
+          emptyMessage={`${author.name} hasn't published any posts yet.`}
         />
       }
       pagination={

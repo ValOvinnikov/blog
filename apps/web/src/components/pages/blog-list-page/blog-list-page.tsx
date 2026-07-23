@@ -56,6 +56,7 @@ export async function BlogListPage({ page, locale }: TBlogListPageProps) {
           title="All posts"
           titleId="blog-posts-title"
           linkAs={Link}
+          emptyMessage="No posts yet."
         />
       }
       pagination={

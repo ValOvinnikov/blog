@@ -58,6 +58,7 @@ export async function TagPage({ slug, locale, page }: TTagPageProps) {
           title={`Posts tagged ${tag.title}`}
           titleId="tag-posts-title"
           linkAs={Link}
+          emptyMessage={`No posts tagged ${tag.title} yet.`}
         />
       }
       pagination={

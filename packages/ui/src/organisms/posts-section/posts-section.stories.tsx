@@ -63,3 +63,10 @@ export const Empty: TStory = {
     posts: [],
   },
 };
+
+export const EmptyWithMessage: TStory = {
+  args: {
+    posts: [],
+    emptyMessage: 'No posts in this category yet — check back soon.',
+  },
+};
