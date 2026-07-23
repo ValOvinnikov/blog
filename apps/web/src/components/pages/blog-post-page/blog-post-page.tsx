@@ -58,22 +58,14 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
           }))}
           linkAs={SmartLink}
           title={post.title}
-          meta={
-            post.author
-              ? {
-                  author: post.author,
-                  publishedAt: post.publishedAt,
-                  formattedDate: formatDate(post.publishedAt, locale),
-                  share: (
-                    <PostShare
-                      url={url}
-                      title={post.title}
-                      links={shareLinks}
-                    />
-                  ),
-                }
-              : undefined
-          }
+          meta={{
+            author: post.author,
+            publishedAt: post.publishedAt,
+            formattedDate: formatDate(post.publishedAt, locale),
+            share: (
+              <PostShare url={url} title={post.title} links={shareLinks} />
+            ),
+          }}
           coverMedia={
             post.heroImageSanity ? (
               <SanityImage

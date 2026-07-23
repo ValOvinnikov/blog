@@ -18,7 +18,7 @@ export async function buildPostMetadata(slug: string): Promise<Metadata> {
     ogType: 'article',
     article: {
       publishedTime: post.publishedAt,
-      authors: post.author?.name ? [post.author.name] : undefined,
+      authors: [post.author.name],
     },
   });
 }

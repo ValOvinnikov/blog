@@ -18,7 +18,7 @@ export type TPostDetailAuthor = {
 export type TPostDetail = Omit<TPostCard, 'author' | 'categories'> & {
   body: RichText;
   seo: TSeoResolved;
-  author: TMaybeUndefined<TPostDetailAuthor>;
+  author: TPostDetailAuthor;
   categories: TCategory[];
   tags: TTag[];
   relatedPosts: TPostCard[];
