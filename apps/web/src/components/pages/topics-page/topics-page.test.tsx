@@ -107,4 +107,18 @@ describe(`<${TopicsPage.name}/>`, () => {
     expect(screen.getByText('No topics yet.')).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
+
+  it('renders the empty state instead of crashing when the fetch throws', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getCategoriesMock.mockRejectedValue(
+      new Error('Configuration must contain `projectId`'),
+    );
+
+    await setup();
+
+    expect(screen.getByText('No topics yet.')).toBeVisible();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+
+    errorSpy.mockRestore();
+  });
 });

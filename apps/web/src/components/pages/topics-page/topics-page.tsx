@@ -1,7 +1,7 @@
 import { routes } from '@blog/config';
-import { service } from '@blog/service';
 import { Heading, Text } from '@blog/ui/atoms';
 import { Link } from '@web/i18n/navigation';
+import { getCategoriesSafely } from '@web/utils/get-categories-safely';
 
 import { topicsPageVariants } from './topics-page-variants';
 
@@ -9,19 +9,21 @@ const s = topicsPageVariants();
 
 /**
  * TopicsPage — `/topics` composition: fetches every category (with its
- * published-post count) via `service.entities.categories.v1.getCategories`
- * and renders each as a card linking to its `/category/[slug]` archive.
- * This is a category *index*, not a post archive, so it uses its own
- * lightweight shell rather than forcing category cards through
- * `BlogPageTemplate`'s `posts` slot, which is built specifically for post
- * grids (blog index, category, tag, author archives).
+ * published-post count) via `getCategoriesSafely` and renders each as a
+ * card linking to its `/category/[slug]` archive. This is a category
+ * *index*, not a post archive, so it uses its own lightweight shell rather
+ * than forcing category cards through `BlogPageTemplate`'s `posts` slot,
+ * which is built specifically for post grids (blog index, category, tag,
+ * author archives).
  *
- * `getCategories` is not `AsyncResult`-wrapped — an unexpected failure
- * propagates as a thrown error to the nearest error boundary, same as any
- * other uncaught Server Component error.
+ * `getCategories` is not `AsyncResult`-wrapped, so an uncaught failure
+ * would otherwise propagate straight through a Server Component render and
+ * crash the whole page (or, at build time, the whole static export) —
+ * hence the `getCategoriesSafely` wrapper, which falls back to an empty
+ * list.
  */
 export async function TopicsPage() {
-  const categories = await service.entities.categories.v1.getCategories();
+  const categories = await getCategoriesSafely();
 
   return (
     <main className={s.root()}>
