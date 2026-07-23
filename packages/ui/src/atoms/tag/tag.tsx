@@ -27,7 +27,11 @@ export const Tag = <C extends ElementType = 'span'>({
 
   return (
     <Component
-      className={tagVariants({ variant, class: className })}
+      className={tagVariants({
+        variant,
+        interactive: Boolean(as),
+        class: className,
+      })}
       {...rest}
     />
   );

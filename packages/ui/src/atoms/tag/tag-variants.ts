@@ -15,8 +15,24 @@ export const tagVariants = tv({
       default: 'text-text-subtle border border-border',
       accent: 'bg-accent-muted text-accent',
     },
+    interactive: {
+      true: 'transition-colors duration-base ease-console',
+    },
   },
+  compoundVariants: [
+    {
+      variant: 'default',
+      interactive: true,
+      class: 'hover:border-accent hover:text-accent',
+    },
+    {
+      variant: 'accent',
+      interactive: true,
+      class: 'hover:text-accent-hover',
+    },
+  ],
   defaultVariants: {
     variant: 'default',
+    interactive: false,
   },
 });
