@@ -29,13 +29,11 @@ export type TPostCard = {
   heroImageAlt: TMaybeUndefined<string>;
   heroImageSanity: TMaybeUndefined<ISanityImage>;
   featured: boolean;
-  author: TMaybeUndefined<TPostCardAuthor>;
+  author: TPostCardAuthor;
   categories: TPostCardCategory[];
 };
 
-function toPostCardAuthor(
-  raw: NonNullable<TRawPostCard['author']>,
-): TPostCardAuthor {
+function toPostCardAuthor(raw: TRawPostCard['author']): TPostCardAuthor {
   return {
     id: raw._id,
     name: raw.name,
@@ -65,7 +63,7 @@ export function toPostCard(raw: TRawPostCard): TPostCard {
     heroImageAlt: raw.heroImage?.alt,
     heroImageSanity: toSanityImage(raw.heroImageAsset),
     featured: raw.featured ?? false,
-    author: raw.author ? toPostCardAuthor(raw.author) : undefined,
+    author: toPostCardAuthor(raw.author),
     categories: raw.categories.map(toPostCardCategory),
   };
 }
