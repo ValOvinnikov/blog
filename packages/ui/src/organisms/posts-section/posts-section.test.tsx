@@ -77,6 +77,27 @@ describe(`<${PostsSection.name}/>`, () => {
     expect(screen.getByTestId('latest-posts-section')).toBeVisible();
   });
 
+  it('renders readingTime when provided on a post', () => {
+    const readingTime = `${faker.number.int({ min: 3, max: 15 })} min`;
+    const postsWithReadingTime = posts.map((post, index) =>
+      index === 0 ? { ...post, readingTime } : post,
+    );
+
+    setup({ posts: postsWithReadingTime });
+
+    expect(screen.getByText(readingTime)).toBeVisible();
+  });
+
+  it('renders fine without readingTime on a post', () => {
+    setup();
+
+    for (const post of posts) {
+      expect(
+        screen.getByRole('heading', { level: 3, name: post.title }),
+      ).toBeVisible();
+    }
+  });
+
   it('renders each title link via linkAs when provided', () => {
     const CustomLink = ({
       href,

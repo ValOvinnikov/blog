@@ -16,6 +16,7 @@ export interface IPostCardData {
   excerpt?: string;
   publishedAt: string;
   formattedDate: string;
+  readingTime?: string;
   categories: IPostCardCategoryData[];
 }
 
@@ -69,6 +70,7 @@ export const PostsSection = ({
               <PostCard.Meta
                 dateValue={post.publishedAt}
                 dateLabel={post.formattedDate}
+                readingTime={post.readingTime}
                 category={post.categories[0]?.title ?? ''}
               />
               <PostCard.Title>

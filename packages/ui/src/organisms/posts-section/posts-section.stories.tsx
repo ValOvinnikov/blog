@@ -11,6 +11,7 @@ const posts = [
       'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS.',
     publishedAt: '2024-06-01T00:00:00Z',
     formattedDate: 'June 1, 2024',
+    readingTime: '9 min',
     categories: [{ title: 'design-system' }],
   },
   {
@@ -21,6 +22,7 @@ const posts = [
       'A collection of practical TypeScript patterns that will level up your code.',
     publishedAt: '2024-05-15T00:00:00Z',
     formattedDate: 'May 15, 2024',
+    readingTime: '5 min',
     categories: [{ title: 'typescript' }],
   },
   {
