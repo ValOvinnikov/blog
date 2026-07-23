@@ -48,6 +48,7 @@ describe(buildBlogPostingSchema, () => {
       dateModified: '2026-01-15T00:00:00Z',
       author: { '@type': 'Person', name: 'Jane Doe' },
       url: 'https://example.com/blog/hello-world',
+      keywords: undefined,
     });
   });
 
@@ -82,5 +83,26 @@ describe(buildBlogPostingSchema, () => {
     const schema = buildBlogPostingSchema(post, '');
 
     expect(schema).toBeUndefined();
+  });
+
+  it('builds comma-separated keywords from the post tags', () => {
+    const schema = buildBlogPostingSchema(
+      {
+        ...post,
+        tags: [
+          { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
+          { id: 'tag-2', title: 'React', slug: 'react' },
+        ],
+      },
+      'https://example.com',
+    );
+
+    expect(schema?.keywords).toBe('TypeScript, React');
+  });
+
+  it('omits keywords when the post has no tags', () => {
+    const schema = buildBlogPostingSchema(post, 'https://example.com');
+
+    expect(schema?.keywords).toBeUndefined();
   });
 });

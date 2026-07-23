@@ -3,11 +3,13 @@ export {};
 const {
   getPostParamsMock,
   getCategoryParamsMock,
+  getTagParamsMock,
   getIndexPageParamsMock,
   getPageSlugsMock,
 } = vi.hoisted(() => ({
   getPostParamsMock: vi.fn(),
   getCategoryParamsMock: vi.fn(),
+  getTagParamsMock: vi.fn(),
   getIndexPageParamsMock: vi.fn(),
   getPageSlugsMock: vi.fn(),
 }));
@@ -17,6 +19,7 @@ vi.mock('@blog/service', () => ({
     pages: {
       post: { v1: { getPostParams: getPostParamsMock } },
       category: { v1: { getCategoryParams: getCategoryParamsMock } },
+      tag: { v1: { getTagParams: getTagParamsMock } },
       blog: { v1: { getIndexPageParams: getIndexPageParamsMock } },
       generic: { v1: { getPageSlugs: getPageSlugsMock } },
     },
@@ -32,16 +35,18 @@ describe('sitemap', () => {
     vi.resetModules();
     getPostParamsMock.mockReset();
     getCategoryParamsMock.mockReset();
+    getTagParamsMock.mockReset();
     getIndexPageParamsMock.mockReset();
     getPageSlugsMock.mockReset();
   });
 
-  it('includes home, blog index, post, category, blog page and generic page entries', async () => {
+  it('includes home, blog index, post, category, tag, blog page and generic page entries', async () => {
     getPostParamsMock.mockResolvedValue([
       { slug: 'first-post' },
       { slug: 'second-post' },
     ]);
     getCategoryParamsMock.mockResolvedValue([{ slug: 'news' }]);
+    getTagParamsMock.mockResolvedValue([{ slug: 'typescript' }]);
     getIndexPageParamsMock.mockResolvedValue({
       ok: true,
       data: [{ page: '2' }, { page: '3' }],
@@ -62,12 +67,14 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/blog/first-post');
     expect(urls).toContain('https://example.com/blog/second-post');
     expect(urls).toContain('https://example.com/category/news');
+    expect(urls).toContain('https://example.com/tag/typescript');
     expect(urls).toContain('https://example.com/about');
   });
 
   it('carries a languages alternate for each configured locale', async () => {
     getPostParamsMock.mockResolvedValue([]);
     getCategoryParamsMock.mockResolvedValue([]);
+    getTagParamsMock.mockResolvedValue([]);
     getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
     getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
     const sitemap = (await import('./sitemap')).default;
@@ -82,6 +89,7 @@ describe('sitemap', () => {
   it('omits numbered blog pages when the params fetch fails', async () => {
     getPostParamsMock.mockResolvedValue([]);
     getCategoryParamsMock.mockResolvedValue([]);
+    getTagParamsMock.mockResolvedValue([]);
     getIndexPageParamsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
@@ -100,6 +108,7 @@ describe('sitemap', () => {
   it('omits generic pages when the slugs fetch fails', async () => {
     getPostParamsMock.mockResolvedValue([]);
     getCategoryParamsMock.mockResolvedValue([]);
+    getTagParamsMock.mockResolvedValue([]);
     getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
     getPageSlugsMock.mockResolvedValue({
       ok: false,

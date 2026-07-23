@@ -11,6 +11,7 @@ export type TBlogPostingSchema = {
   dateModified: string;
   author: { '@type': 'Person'; name: string } | undefined;
   url: string;
+  keywords: string | undefined;
 };
 
 /**
@@ -20,6 +21,9 @@ export type TBlogPostingSchema = {
  * `dateModified` falls back to `publishedAt`: `TPostDetail` doesn't carry a
  * separate last-modified timestamp yet, so this is the best available value
  * until the service layer exposes one.
+ *
+ * `keywords` is a comma-separated join of the post's tag titles, `undefined`
+ * when the post has none — schema.org's `keywords` accepts free-form `Text`.
  *
  * Returns `undefined` when `siteUrl` is empty, mirroring how
  * `[locale]/layout.tsx` treats a missing `NEXT_PUBLIC_SITE_URL` as "no
@@ -51,5 +55,9 @@ export function buildBlogPostingSchema(
       ? { '@type': 'Person', name: post.author.name }
       : undefined,
     url: `${siteUrl}${routes.post(post.slug)}`,
+    keywords:
+      post.tags.length > 0
+        ? post.tags.map((tag) => tag.title).join(', ')
+        : undefined,
   };
 }

@@ -14,20 +14,22 @@ readers browse a fast, statically-rendered Next.js site. Content is fully typed
 end-to-end — a schema change in the CMS surfaces as a TypeScript error in the
 frontend if a consumer is out of date.
 
-**Primary surfaces** (status as of 2026-07-21):
+**Primary surfaces** (status as of 2026-07-23):
 
-| Surface  | Route                            | Status                                                                              |
-| -------- | -------------------------------- | ----------------------------------------------------------------------------------- |
-| Home     | `/`                              | ✅ Built — modules-as-documents (hero + `modules[]`)                                |
-| Blog     | `/blog` + `/blog/page/N`         | ✅ Built — paginated index (#75)                                                    |
-| Post     | `/blog/[slug]`                   | ✅ Built — post detail page + JSON-LD (#76)                                         |
-| Category | `/category/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589)                           |
-| Author   | `/author/[slug]`                 | ✅ Built — profile + posts by author (#327/#593-595)                                |
-| Page     | `/[slug]`                        | ✅ Built — generic page route (#285), slug space guarded by `RESERVED_SLUGS` (#328) |
-| Feeds    | sitemap/robots/RSS               | ✅ Built — Phase 3 (#92), generic pages listed in the sitemap (#285)                |
+| Surface  | Route                            | Status                                                                                                         |
+| -------- | -------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Home     | `/`                              | ✅ Built — modules-as-documents (hero + `modules[]`)                                                           |
+| Blog     | `/blog` + `/blog/page/N`         | ✅ Built — paginated index (#75)                                                                               |
+| Post     | `/blog/[slug]`                   | ✅ Built — post detail page + JSON-LD (#76)                                                                    |
+| Category | `/category/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589)                                                      |
+| Tag      | `/tag/[slug]` (+ `/page/N`)      | ✅ Built — unpaginated + paginated tag archives, shared-tag related posts, per-tag RSS (#674)                  |
+| Author   | `/author/[slug]`                 | ✅ Built — profile + posts by author (#327/#593-595)                                                           |
+| Page     | `/[slug]`                        | ✅ Built — generic page route (#285), slug space guarded by `RESERVED_SLUGS` (#328)                            |
+| Feeds    | sitemap/robots/RSS               | ✅ Built — Phase 3 (#92), generic pages listed in the sitemap (#285); tag archives + per-tag RSS added in #674 |
 
 Phase 3 (Blog core) is fully closed as of 2026-07-21 — every primary surface
-above is built and merged.
+built in that phase is merged. Post taxonomy (category `max: 4` cap + the
+`/tag/*` axis above) shipped as milestone M3 (#674) on 2026-07-23.
 
 **Routing conventions** (decided 2026-07-14 — full rationale in
 `docs/superpowers/specs/2026-07-14-blog-list-pagination-design.md`):
@@ -40,9 +42,18 @@ above is built and merged.
   Every page self-canonicalizes (never canonical-to-page-1); no
   `rel=next/prev`; non-canonical or out-of-range page params → hard 404.
 - **Slug-space safety** — Next resolves static › dynamic › catch-all, so
-  section segments (`blog`, `category`, `author`) always beat the root generic
-  `/[slug]`; `RESERVED_SLUGS` (#328) stops editors creating pages those
-  segments would shadow. No catch-all routes for fixed-shape paths.
+  section segments (`blog`, `category`, `tag`, `author`) always beat the root
+  generic `/[slug]`; `RESERVED_SLUGS` (#328) stops editors creating pages those
+  segments would shadow. No catch-all routes for fixed-shape paths. `tag` is in
+  `RESERVED_SLUGS` (#674) so `/tag/[slug]` can never be shadowed by a generic
+  page slugged `tag`.
+- **Tag axis** (#674) — `/tag/[slug]` (+ `/page/N`) mirrors the category
+  route's pagination/canonical/404 rules exactly (`routes.tag(slug, page?)`).
+  Post detail (`/blog/[slug]`) renders the post's tags as `Article.Footer`
+  chips linking to `routes.tag`, plus a shared-tag-ranked "Related posts"
+  section (up to 3, category-fallback when fewer than 3 share a tag). Every
+  tag also gets its own RSS feed at `/tag/[slug]/rss.xml`, and every tag
+  archive URL is listed in the sitemap.
 
 Both environments are **live** (§13): merging to `main` deploys development;
 a `vX.Y.Z` tag promotes to production.

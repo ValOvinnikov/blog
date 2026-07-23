@@ -16,6 +16,7 @@ describe('RESERVED_SLUGS', () => {
   it('contains every top-level static segment claimed by apps/web', () => {
     expect(RESERVED_SLUGS).toContain('blog');
     expect(RESERVED_SLUGS).toContain('category');
+    expect(RESERVED_SLUGS).toContain('tag');
     expect(RESERVED_SLUGS).toContain('author');
     expect(RESERVED_SLUGS).toContain('api');
     expect(RESERVED_SLUGS).toContain('page');
