@@ -3,14 +3,18 @@ import { notFound } from 'next/navigation';
 
 import { BlogListPage } from './blog-list-page';
 
-const { getIndexPageMock } = vi.hoisted(() => ({
+const { getIndexPageMock, getCategoriesMock } = vi.hoisted(() => ({
   getIndexPageMock: vi.fn(),
+  getCategoriesMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
   service: {
     pages: {
       blog: { v1: { getIndexPage: getIndexPageMock } },
+    },
+    entities: {
+      categories: { v1: { getCategories: getCategoriesMock } },
     },
   },
 }));
@@ -44,6 +48,10 @@ const setup = customRenderAsync(BlogListPage, { page: 1, locale: 'en' });
 describe('BlogListPage', () => {
   beforeEach(() => {
     getIndexPageMock.mockReset();
+    getCategoriesMock.mockReset();
+    getCategoriesMock.mockResolvedValue([
+      { id: 'cat-1', title: 'News', slug: 'news', postCount: 1 },
+    ]);
   });
 
   it('calls notFound() when the requested page is beyond totalPages', async () => {
@@ -95,5 +103,33 @@ describe('BlogListPage', () => {
     expect(link).toBeVisible();
     expect(link).toHaveAttribute('href', '/blog/my-post-slug');
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+  });
+
+  it('renders the category chip row', async () => {
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Blog',
+        supportingText: 'Essays and notes.',
+        posts: [post],
+        currentPage: 1,
+        totalPages: 3,
+        total: 20,
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('navigation', { name: 'Categories' }),
+    ).toBeVisible();
+    expect(screen.getByRole('link', { name: 'All' })).toHaveAttribute(
+      'href',
+      '/blog',
+    );
+    expect(screen.getByRole('link', { name: 'News' })).toHaveAttribute(
+      'href',
+      '/category/news',
+    );
   });
 });

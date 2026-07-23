@@ -6,6 +6,7 @@ export const blogPageTemplateVariants = tv({
     introHeader: ['mb-6'],
     heading: 'mb-6',
     supportingText: 'text-muted mb-6',
+    categoryChips: ['mb-8'],
     socialLinks: ['mb-10'],
   },
 });
