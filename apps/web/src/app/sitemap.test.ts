@@ -124,6 +124,52 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/');
   });
 
+  it('omits posts when the post params fetch throws', async () => {
+    getPostParamsMock.mockRejectedValue(new Error('boom'));
+    getCategoryParamsMock.mockResolvedValue([]);
+    getTagParamsMock.mockResolvedValue([]);
+    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+    const urls = entries.map((entry) => entry.url);
+
+    expect(urls).not.toContain('https://example.com/blog/first-post');
+    expect(urls).toContain('https://example.com/');
+    expect(urls).toContain('https://example.com/blog');
+  });
+
+  it('omits categories when the category params fetch throws', async () => {
+    getPostParamsMock.mockResolvedValue([]);
+    getCategoryParamsMock.mockRejectedValue(new Error('boom'));
+    getTagParamsMock.mockResolvedValue([]);
+    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+    const urls = entries.map((entry) => entry.url);
+
+    expect(urls).not.toContain('https://example.com/category/news');
+    expect(urls).toContain('https://example.com/');
+  });
+
+  it('omits tags when the tag params fetch throws', async () => {
+    getPostParamsMock.mockResolvedValue([]);
+    getCategoryParamsMock.mockResolvedValue([]);
+    getTagParamsMock.mockRejectedValue(new Error('boom'));
+    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+    const urls = entries.map((entry) => entry.url);
+
+    expect(urls).not.toContain('https://example.com/tag/typescript');
+    expect(urls).toContain('https://example.com/');
+  });
+
   it('returns an empty sitemap when NEXT_PUBLIC_SITE_URL is unset', async () => {
     vi.doMock('@web/utils/env/env', () => ({ env: {} }));
     const sitemap = (await import('./sitemap')).default;

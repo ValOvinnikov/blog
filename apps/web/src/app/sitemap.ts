@@ -15,6 +15,33 @@ function toEntry(path: string, siteUrl: string): MetadataRoute.Sitemap[number] {
   };
 }
 
+async function getPostParamsSafe() {
+  try {
+    return await service.pages.post.v1.getPostParams();
+  } catch (error) {
+    console.error(`Error fetching post params for sitemap: ${error}`);
+    return [];
+  }
+}
+
+async function getCategoryParamsSafe() {
+  try {
+    return await service.pages.category.v1.getCategoryParams();
+  } catch (error) {
+    console.error(`Error fetching category params for sitemap: ${error}`);
+    return [];
+  }
+}
+
+async function getTagParamsSafe() {
+  try {
+    return await service.pages.tag.v1.getTagParams();
+  } catch (error) {
+    console.error(`Error fetching tag params for sitemap: ${error}`);
+    return [];
+  }
+}
+
 /**
  * Site-wide sitemap: home, blog index + every numbered page, the `/topics`
  * hub, every published post, category, and tag archive, and every generic
@@ -37,9 +64,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const [posts, categories, tags, blogParamsResult, genericPageSlugsResult] =
     await Promise.all([
-      service.pages.post.v1.getPostParams(),
-      service.pages.category.v1.getCategoryParams(),
-      service.pages.tag.v1.getTagParams(),
+      getPostParamsSafe(),
+      getCategoryParamsSafe(),
+      getTagParamsSafe(),
       service.pages.blog.v1.getIndexPageParams(),
       service.pages.generic.v1.getPageSlugs(),
     ]);
