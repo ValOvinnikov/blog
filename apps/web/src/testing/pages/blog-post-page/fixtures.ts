@@ -49,4 +49,6 @@ export const mockPostDetail: TPostDetail = {
       description: undefined,
     },
   ],
+  tags: [],
+  relatedPosts: [],
 };

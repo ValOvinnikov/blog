@@ -30,6 +30,8 @@ const post: TPostDetail = {
     socialLinks: [],
   },
   categories: [],
+  tags: [],
+  relatedPosts: [],
 };
 
 describe(buildBlogPostingSchema, () => {
