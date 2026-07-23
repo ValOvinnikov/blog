@@ -2,14 +2,14 @@ import type { BlockText } from '@blog/config';
 
 /**
  * Flattens a `BlockText` (simple Portable Text blocks — author bio, no
- * custom types) to a plain string, joining blocks with a space. `@blog/ui`'s
- * `AuthorByline` renders a plain-text `bio` snippet rather than rich markup,
- * so this is the one place that concatenation happens rather than rendering
- * through `PortableTextRenderer`.
+ * custom types) to a plain string, joining blocks with a space. Author bio
+ * is rendered as a plain-text snippet (e.g. `BlogPageTemplate`'s
+ * `supportingText`) rather than rich markup, so this is the one place that
+ * concatenation happens rather than rendering through `PortableTextRenderer`.
  *
  * @example
- * const bio = blockTextToPlain(post.author?.bio);
- * return <AuthorByline name={author.name} bio={bio} />;
+ * const bio = blockTextToPlain(author.bio);
+ * return <BlogPageTemplate heading={author.name} supportingText={bio} posts={posts} />;
  */
 export function blockTextToPlain(
   blocks: BlockText | undefined,

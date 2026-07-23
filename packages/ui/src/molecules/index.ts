@@ -1,5 +1,4 @@
 export * from './action-list';
-export * from './author-byline';
 export * from './brand-lockup';
 export * from './card-meta';
 export * from './command-link';
