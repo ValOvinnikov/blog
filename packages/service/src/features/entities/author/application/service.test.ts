@@ -20,4 +20,9 @@ describe('createAuthorService', () => {
     const svc = createAuthorService();
     expect(typeof svc.v1.getAuthorPosts).toBe('function');
   });
+
+  it('exposes v1.getAuthorPaginationParams as a function', () => {
+    const svc = createAuthorService();
+    expect(typeof svc.v1.getAuthorPaginationParams).toBe('function');
+  });
 });

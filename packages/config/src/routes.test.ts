@@ -41,4 +41,14 @@ describe('routes', () => {
     expect(routes.tag('typescript', 2)).toBe('/tag/typescript/page/2');
     expect(routes.tag('typescript', 10)).toBe('/tag/typescript/page/10');
   });
+
+  it('builds page 1 of an author archive without a page segment', () => {
+    expect(routes.author('jane-doe')).toBe('/author/jane-doe');
+    expect(routes.author('jane-doe', 1)).toBe('/author/jane-doe');
+  });
+
+  it('builds page N of an author archive under /author/{slug}/page/', () => {
+    expect(routes.author('jane-doe', 2)).toBe('/author/jane-doe/page/2');
+    expect(routes.author('jane-doe', 10)).toBe('/author/jane-doe/page/10');
+  });
 });

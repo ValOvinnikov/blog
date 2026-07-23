@@ -23,7 +23,7 @@ frontend if a consumer is out of date.
 | Post     | `/blog/[slug]`                   | ✅ Built — post detail page + JSON-LD (#76)                                                                    |
 | Category | `/category/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589)                                                      |
 | Tag      | `/tag/[slug]` (+ `/page/N`)      | ✅ Built — unpaginated + paginated tag archives, shared-tag related posts, per-tag RSS (#674)                  |
-| Author   | `/author/[slug]`                 | ✅ Built — profile + posts by author (#327/#593-595)                                                           |
+| Author   | `/author/[slug]` (+ `/page/N`)   | ✅ Built — profile + posts by author, paginated (#327/#593-595/#744)                                           |
 | Page     | `/[slug]`                        | ✅ Built — generic page route (#285), slug space guarded by `RESERVED_SLUGS` (#328)                            |
 | Feeds    | sitemap/robots/RSS               | ✅ Built — Phase 3 (#92), generic pages listed in the sitemap (#285); tag archives + per-tag RSS added in #674 |
 
