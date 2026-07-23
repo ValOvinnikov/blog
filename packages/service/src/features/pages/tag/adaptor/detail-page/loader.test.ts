@@ -1,7 +1,7 @@
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
-  makeRawPostCard,
+  makeRawArchivePostCard,
   makeRawTagPageTag,
 } from '@blog/service/testing/pages/fixtures';
 
@@ -30,7 +30,10 @@ describe('getTagPage', () => {
         makeRawTagPageTag({ _id: 'tag-abc', title: 'React' }),
       )
       .mockResolvedValueOnce({
-        posts: [makeRawPostCard(), makeRawPostCard({ _id: 'post-2' })],
+        posts: [
+          makeRawArchivePostCard(),
+          makeRawArchivePostCard({ _id: 'post-2' }),
+        ],
         total: 2,
       })
       .mockResolvedValueOnce(makeRawSiteSettings());
@@ -57,21 +60,26 @@ describe('getTagPage', () => {
   it('defaults to page 1 and returns pagination metadata when called without a page', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawTagPageTag())
-      .mockResolvedValueOnce({ posts: [makeRawPostCard()], total: 1 })
+      .mockResolvedValueOnce({
+        posts: [makeRawArchivePostCard()],
+        total: 1,
+      })
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getTagPage('typescript', { itemsPerPage: 9 });
 
     expect(result?.currentPage).toBe(1);
     expect(result?.totalPages).toBe(1);
-    expect(result?.total).toBe(1);
   });
 
   it('returns the sliced page window with pagination metadata when a page is given', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawTagPageTag())
       .mockResolvedValueOnce({
-        posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'b' })],
+        posts: [
+          makeRawArchivePostCard({ _id: 'a' }),
+          makeRawArchivePostCard({ _id: 'b' }),
+        ],
         total: 20,
       })
       .mockResolvedValueOnce(makeRawSiteSettings());
@@ -83,7 +91,6 @@ describe('getTagPage', () => {
 
     expect(result?.posts.map((p) => p.id)).toEqual(['a', 'b']);
     expect(result?.currentPage).toBe(2);
-    expect(result?.total).toBe(20);
     expect(result?.totalPages).toBe(4);
   });
 

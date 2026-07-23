@@ -40,6 +40,5 @@ export async function getTagPage(
   return toTagPage(rawTag, rawPosts.posts, settings, {
     currentPage: page,
     totalPages: toTotalPages(rawPosts.total, itemsPerPage),
-    total: rawPosts.total,
   });
 }

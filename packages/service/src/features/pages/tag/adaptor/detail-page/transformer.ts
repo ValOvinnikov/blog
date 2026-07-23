@@ -1,6 +1,6 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
-import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
+import { toArchivePostCard } from '@blog/service/shared/transformers/to-archive-post-card';
 import type { InferResultType } from 'groqd';
 
 import type { buildTagPostsPageQuery } from './posts.query';
@@ -17,7 +17,6 @@ type TRawPosts = InferResultType<
 export type TTagPagePagination = {
   currentPage: number;
   totalPages: number;
-  total: number;
 };
 
 function toTagPageTag(
@@ -53,9 +52,8 @@ export function toTagPage(
 ): TTagPage {
   return {
     tag: toTagPageTag(rawTag, settings),
-    posts: rawPosts.map(toPostCard),
+    posts: rawPosts.map(toArchivePostCard),
     currentPage: pagination.currentPage,
     totalPages: pagination.totalPages,
-    total: pagination.total,
   };
 }

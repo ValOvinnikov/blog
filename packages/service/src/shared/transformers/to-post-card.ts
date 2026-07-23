@@ -42,7 +42,7 @@ function toPostCardAuthor(raw: TRawPostCard['author']): TPostCardAuthor {
   };
 }
 
-function toPostCardCategory(
+export function toPostCardCategory(
   raw: TRawPostCard['categories'][number],
 ): TPostCardCategory {
   return {

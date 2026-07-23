@@ -1,6 +1,6 @@
 import { makeRawCategory } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawArchivePostCard } from '@blog/service/testing/pages/fixtures';
 
 import { getCategoryPage } from './loader';
 
@@ -26,7 +26,10 @@ describe('getCategoryPage', () => {
         makeRawCategory({ _id: 'cat-abc', title: 'Design' }),
       )
       .mockResolvedValueOnce({
-        posts: [makeRawPostCard(), makeRawPostCard({ _id: 'post-2' })],
+        posts: [
+          makeRawArchivePostCard(),
+          makeRawArchivePostCard({ _id: 'post-2' }),
+        ],
         total: 2,
       });
 
@@ -51,18 +54,20 @@ describe('getCategoryPage', () => {
   it('defaults to page 1 and returns pagination metadata when called without a page', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawCategory())
-      .mockResolvedValueOnce({ posts: [makeRawPostCard()], total: 1 });
+      .mockResolvedValueOnce({ posts: [makeRawArchivePostCard()], total: 1 });
 
     const result = await getCategoryPage('engineering', { itemsPerPage: 9 });
 
     expect(result?.currentPage).toBe(1);
     expect(result?.totalPages).toBe(1);
-    expect(result?.total).toBe(1);
   });
 
   it('returns the sliced page window with pagination metadata when a page is given', async () => {
     mockRun.mockResolvedValueOnce(makeRawCategory()).mockResolvedValueOnce({
-      posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'b' })],
+      posts: [
+        makeRawArchivePostCard({ _id: 'a' }),
+        makeRawArchivePostCard({ _id: 'b' }),
+      ],
       total: 20,
     });
 
@@ -73,7 +78,6 @@ describe('getCategoryPage', () => {
 
     expect(result?.posts.map((p) => p.id)).toEqual(['a', 'b']);
     expect(result?.currentPage).toBe(2);
-    expect(result?.total).toBe(20);
     expect(result?.totalPages).toBe(4);
   });
 

@@ -1,7 +1,7 @@
 import { makeRawCategory } from '@blog/service/testing/entities/fixtures';
 import {
+  makeRawArchivePostCard,
   makeRawBlogPage,
-  makeRawPostCard,
 } from '@blog/service/testing/pages/fixtures';
 
 import { blogPageQuery, buildIndexPageQuery } from './query';
@@ -18,10 +18,7 @@ describe('buildIndexPageQuery', () => {
   it('parses posts whose optional card fields are all absent', () => {
     const raw = {
       posts: [
-        makeRawPostCard({
-          heroImage: null,
-          heroImageAsset: null,
-          featured: null,
+        makeRawArchivePostCard({
           categories: [makeRawCategory({ description: null })],
         }),
       ],
