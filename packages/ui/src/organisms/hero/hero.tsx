@@ -31,8 +31,25 @@ export interface IHeroProps
   titleId: string;
   eyebrow?: string;
   excerpt?: string;
+  /**
+   * Post tags, rendered as a `Tag` list beneath the excerpt. The Home hero
+   * doesn't pass this — it's a reuse slot for post-style hero contexts
+   * (e.g. a Post Detail hero) that want tags surfaced in the hero itself.
+   * Intentionally optional, not dead code.
+   */
   tags?: string[];
+  /**
+   * ISO 8601 publish date, rendered as the `<time dateTime>` meta line
+   * alongside `formattedDate` (both must be present for the line to
+   * render). The Home hero doesn't pass this — it's a reuse slot for
+   * post-style hero contexts. Intentionally optional, not dead code.
+   */
   publishedAt?: string;
+  /**
+   * Pre-formatted display string for `publishedAt` — `@blog/ui` never
+   * formats dates itself, the caller supplies the formatted text. See
+   * `publishedAt`.
+   */
   formattedDate?: string;
   children?: TCompoundChildren<typeof HeroParts>;
 }
@@ -62,8 +79,13 @@ const HeroRoot = ({
     >
       <div className={s.content()}>
         <div className={s.grid()}>
-          <div className={s.copy()}>
+          <div className={s.copy()} data-testid="hero-copy">
             {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+            {/*
+              Meta (date) slot: not used by the Home hero — reserved for
+              post-style hero reuse (see `publishedAt`/`formattedDate` JSDoc
+              on `IHeroProps`).
+            */}
             {publishedAt && formattedDate && (
               <time dateTime={publishedAt} className={s.meta()}>
                 {formattedDate}
@@ -79,6 +101,10 @@ const HeroRoot = ({
                 {excerpt}
               </Text>
             )}
+            {/*
+              Tags slot: not used by the Home hero — reserved for
+              post-style hero reuse (see `tags` JSDoc on `IHeroProps`).
+            */}
             {tags && tags.length > 0 && (
               <div className={s.tags()}>
                 {tags.map((tag) => (
@@ -86,11 +112,11 @@ const HeroRoot = ({
                 ))}
               </div>
             )}
+            {slots.Cta}
           </div>
           {slots.Media}
         </div>
 
-        {slots.Cta}
         {unmatched.map((node, i) => (
           <Fragment key={i}>{node}</Fragment>
         ))}

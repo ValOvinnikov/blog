@@ -60,6 +60,21 @@ describe(`<${Hero.name}/>`, () => {
     expect(screen.getByText('Read more')).toBeVisible();
   });
 
+  it('nests the CTA inside the copy column, alongside the heading', () => {
+    renderElement(
+      <Hero title="Building a Design System" titleId="hero-title">
+        <Hero.Cta>
+          <a href="/posts/design-system">Read more</a>
+        </Hero.Cta>
+      </Hero>,
+    );
+    const copyColumn = screen.getByTestId('hero-copy');
+    expect(copyColumn).toContainElement(
+      screen.getByRole('heading', { name: 'Building a Design System' }),
+    );
+    expect(copyColumn).toContainElement(screen.getByRole('link'));
+  });
+
   it('does not render a CTA when Hero.Cta is omitted', () => {
     setup();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
