@@ -44,11 +44,17 @@ export const WithShareSlot: TStory = {
   },
 };
 
-export const WithCategory: TStory = {
+export const WithCategories: TStory = {
   args: {
-    category: {
-      label: faker.commerce.department(),
-      href: `/categories/${faker.lorem.slug()}`,
-    },
+    categories: [
+      {
+        label: faker.commerce.department(),
+        href: `/categories/${faker.lorem.slug()}`,
+      },
+      {
+        label: faker.commerce.department(),
+        href: `/categories/${faker.lorem.slug()}`,
+      },
+    ],
   },
 };

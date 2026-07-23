@@ -72,26 +72,48 @@ describe(`<${PostMeta.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'share' })).toBeVisible();
   });
 
-  it('omits the category link when category is not provided', () => {
+  it('omits category links when categories is not provided', () => {
     setup();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('renders the category as a link to its href when provided', () => {
-    const category = {
-      label: faker.commerce.department(),
-      href: `/categories/${faker.lorem.slug()}`,
-    };
-    setup({ category });
-    const link = screen.getByRole('link', { name: category.label });
-    expect(link).toHaveAttribute('href', category.href);
+  it('omits category links when categories is an empty array', () => {
+    setup({ categories: [] });
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('renders the category as the linkAs component when provided', () => {
-    const category = {
-      label: faker.commerce.department(),
-      href: `/categories/${faker.lorem.slug()}`,
-    };
+  it('renders each category as a link to its href when provided', () => {
+    const categories = [
+      {
+        label: faker.commerce.department(),
+        href: `/categories/${faker.lorem.slug()}`,
+      },
+      {
+        label: faker.commerce.department(),
+        href: `/categories/${faker.lorem.slug()}`,
+      },
+    ];
+    setup({ categories });
+    const links = screen.getAllByRole('link');
+    expect(links).toHaveLength(categories.length);
+    categories.forEach((category) => {
+      expect(
+        screen.getByRole('link', { name: category.label }),
+      ).toHaveAttribute('href', category.href);
+    });
+  });
+
+  it('renders each category as the linkAs component when provided', () => {
+    const categories = [
+      {
+        label: faker.commerce.department(),
+        href: `/categories/${faker.lorem.slug()}`,
+      },
+      {
+        label: faker.commerce.department(),
+        href: `/categories/${faker.lorem.slug()}`,
+      },
+    ];
     const CustomLink = ({
       href,
       children,
@@ -103,8 +125,10 @@ describe(`<${PostMeta.name}/>`, () => {
         {children}
       </a>
     );
-    setup({ category, linkAs: CustomLink });
-    const link = screen.getByRole('link', { name: category.label });
-    expect(link).toHaveAttribute('data-custom-link', 'true');
+    setup({ categories, linkAs: CustomLink });
+    categories.forEach((category) => {
+      const link = screen.getByRole('link', { name: category.label });
+      expect(link).toHaveAttribute('data-custom-link', 'true');
+    });
   });
 });
