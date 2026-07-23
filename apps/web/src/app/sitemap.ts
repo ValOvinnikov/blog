@@ -15,10 +15,38 @@ function toEntry(path: string, siteUrl: string): MetadataRoute.Sitemap[number] {
   };
 }
 
+async function getPostParamsSafe() {
+  try {
+    return await service.pages.post.v1.getPostParams();
+  } catch (error) {
+    console.error(`Error fetching post params for sitemap: ${error}`);
+    return [];
+  }
+}
+
+async function getCategoryParamsSafe() {
+  try {
+    return await service.pages.category.v1.getCategoryParams();
+  } catch (error) {
+    console.error(`Error fetching category params for sitemap: ${error}`);
+    return [];
+  }
+}
+
+async function getTagParamsSafe() {
+  try {
+    return await service.pages.tag.v1.getTagParams();
+  } catch (error) {
+    console.error(`Error fetching tag params for sitemap: ${error}`);
+    return [];
+  }
+}
+
 /**
- * Site-wide sitemap: home, blog index + every numbered page, every published
- * post, category, and tag archive. Every entry carries a `languages`
- * alternate for each configured locale — a no-op today
+ * Site-wide sitemap: home, blog index + every numbered page, the `/topics`
+ * hub, every published post, category, and tag archive, and every generic
+ * page. Every entry carries a `languages` alternate for each configured
+ * locale — a no-op today
  * (`localePrefix: 'never'` means every locale resolves to the same
  * unprefixed path) but keeps this future-proof if locale-prefixed routing is
  * ever introduced.
@@ -36,9 +64,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const [posts, categories, tags, blogParamsResult, genericPageSlugsResult] =
     await Promise.all([
-      service.pages.post.v1.getPostParams(),
-      service.pages.category.v1.getCategoryParams(),
-      service.pages.tag.v1.getTagParams(),
+      getPostParamsSafe(),
+      getCategoryParamsSafe(),
+      getTagParamsSafe(),
       service.pages.blog.v1.getIndexPageParams(),
       service.pages.generic.v1.getPageSlugs(),
     ]);
@@ -64,6 +92,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     toEntry(routes.home(), siteUrl),
     toEntry(routes.blogIndex(), siteUrl),
+    toEntry(routes.topics(), siteUrl),
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
     ...posts.map(({ slug }) => toEntry(routes.post(slug), siteUrl)),
     ...categories.map(({ slug }) => toEntry(routes.category(slug), siteUrl)),

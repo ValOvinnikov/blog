@@ -40,7 +40,7 @@ describe('sitemap', () => {
     getPageSlugsMock.mockReset();
   });
 
-  it('includes home, blog index, post, category, tag, blog page and generic page entries', async () => {
+  it('includes home, blog index, topics hub, post, category, tag, blog page and generic page entries', async () => {
     getPostParamsMock.mockResolvedValue([
       { slug: 'first-post' },
       { slug: 'second-post' },
@@ -62,6 +62,7 @@ describe('sitemap', () => {
 
     expect(urls).toContain('https://example.com/');
     expect(urls).toContain('https://example.com/blog');
+    expect(urls).toContain('https://example.com/topics');
     expect(urls).toContain('https://example.com/blog/page/2');
     expect(urls).toContain('https://example.com/blog/page/3');
     expect(urls).toContain('https://example.com/blog/first-post');
@@ -120,6 +121,52 @@ describe('sitemap', () => {
     const urls = entries.map((entry) => entry.url);
 
     expect(urls).not.toContain('https://example.com/about');
+    expect(urls).toContain('https://example.com/');
+  });
+
+  it('omits posts when the post params fetch throws', async () => {
+    getPostParamsMock.mockRejectedValue(new Error('boom'));
+    getCategoryParamsMock.mockResolvedValue([]);
+    getTagParamsMock.mockResolvedValue([]);
+    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+    const urls = entries.map((entry) => entry.url);
+
+    expect(urls).not.toContain('https://example.com/blog/first-post');
+    expect(urls).toContain('https://example.com/');
+    expect(urls).toContain('https://example.com/blog');
+  });
+
+  it('omits categories when the category params fetch throws', async () => {
+    getPostParamsMock.mockResolvedValue([]);
+    getCategoryParamsMock.mockRejectedValue(new Error('boom'));
+    getTagParamsMock.mockResolvedValue([]);
+    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+    const urls = entries.map((entry) => entry.url);
+
+    expect(urls).not.toContain('https://example.com/category/news');
+    expect(urls).toContain('https://example.com/');
+  });
+
+  it('omits tags when the tag params fetch throws', async () => {
+    getPostParamsMock.mockResolvedValue([]);
+    getCategoryParamsMock.mockResolvedValue([]);
+    getTagParamsMock.mockRejectedValue(new Error('boom'));
+    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+    const urls = entries.map((entry) => entry.url);
+
+    expect(urls).not.toContain('https://example.com/tag/typescript');
     expect(urls).toContain('https://example.com/');
   });
 

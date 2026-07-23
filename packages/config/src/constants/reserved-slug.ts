@@ -13,6 +13,7 @@ export const RESERVED_SLUGS = [
   'author',
   'api',
   'page',
+  'topics',
 ] as const;
 
 export type TReservedSlug = (typeof RESERVED_SLUGS)[number];
