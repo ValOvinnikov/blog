@@ -56,6 +56,7 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
     ...link,
     icon: <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />,
   }));
+  const primaryCategory = categories[0];
 
   return (
     <main className={s.root()}>
@@ -74,6 +75,13 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
             author,
             publishedAt,
             formattedDate: formatDate(publishedAt, locale),
+            category: primaryCategory
+              ? {
+                  label: primaryCategory.title,
+                  href: routes.category(primaryCategory.slug),
+                }
+              : undefined,
+            linkAs: SmartLink,
             share: <PostShare url={url} title={title} links={shareLinks} />,
           }}
           coverMedia={
