@@ -25,11 +25,15 @@ export async function buildTagMetadata(
     itemsPerPage: TAG_ITEMS_PER_PAGE,
   });
 
-  if (!result) {
+  if (!result.ok) {
+    console.error(`Error to fetch tag page metadata: ${result.error}`);
+    return {};
+  }
+  if (result.data === null) {
     return {};
   }
 
-  const { seo } = result.tag;
+  const { seo } = result.data.tag;
   // "– Page N" stays a hardcoded suffix until translation messages land
   // (#321), matching `buildCategoryMetadata`.
   const title =

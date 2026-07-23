@@ -101,16 +101,19 @@ describe('CategoryNumberedPage generateMetadata', () => {
 
   it('builds metadata for page 2', async () => {
     getCategoryPageMock.mockResolvedValue({
-      category: {
-        id: 'cat-1',
-        title: 'Engineering',
-        slug: 'engineering',
-        description: 'Posts about building things.',
+      ok: true,
+      data: {
+        category: {
+          id: 'cat-1',
+          title: 'Engineering',
+          slug: 'engineering',
+          description: 'Posts about building things.',
+        },
+        posts: [],
+        currentPage: 2,
+        totalPages: 3,
+        total: 20,
       },
-      posts: [],
-      currentPage: 2,
-      totalPages: 3,
-      total: 20,
     });
 
     const metadata = await generateMetadata({

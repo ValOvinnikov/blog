@@ -27,11 +27,15 @@ export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
     getCategoriesSafely(),
   ]);
 
-  if (!result) {
+  if (!result.ok) {
+    console.error(`Error to fetch category page: ${result.error}`);
+    notFound();
+  }
+  if (result.data === null) {
     notFound();
   }
 
-  const { category, posts, currentPage, totalPages } = result;
+  const { category, posts, currentPage, totalPages } = result.data;
 
   // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
   // soft-404 or a redirect to the last page (spec SEO rules).

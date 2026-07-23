@@ -33,11 +33,14 @@ const author = {
 describe('buildAuthorMetadata', () => {
   it('builds metadata from the author name/role/bio, self-canonical to /author/[slug]', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author,
-      posts: [],
-      currentPage: 1,
-      totalPages: 1,
-      total: 0,
+      ok: true,
+      data: {
+        author,
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
+      },
     });
 
     const metadata = await buildAuthorMetadata('jane-doe');
@@ -55,11 +58,14 @@ describe('buildAuthorMetadata', () => {
 
   it('falls back to the plain name when no role is authored', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author: { ...author, role: undefined },
-      posts: [],
-      currentPage: 1,
-      totalPages: 1,
-      total: 0,
+      ok: true,
+      data: {
+        author: { ...author, role: undefined },
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
+      },
     });
 
     const metadata = await buildAuthorMetadata('jane-doe');
@@ -69,11 +75,14 @@ describe('buildAuthorMetadata', () => {
 
   it('falls back to the title as description when no bio is authored', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author: { ...author, bio: undefined },
-      posts: [],
-      currentPage: 1,
-      totalPages: 1,
-      total: 0,
+      ok: true,
+      data: {
+        author: { ...author, bio: undefined },
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
+      },
     });
 
     const metadata = await buildAuthorMetadata('jane-doe');
@@ -82,20 +91,34 @@ describe('buildAuthorMetadata', () => {
   });
 
   it('returns empty metadata when the author does not exist', async () => {
-    getAuthorPageMock.mockResolvedValue(null);
+    getAuthorPageMock.mockResolvedValue({ ok: true, data: null });
 
     const metadata = await buildAuthorMetadata('missing');
 
     expect(metadata).toEqual({});
   });
 
+  it('returns empty metadata when the author fetch fails', async () => {
+    getAuthorPageMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+
+    const metadata = await buildAuthorMetadata('jane-doe');
+
+    expect(metadata).toEqual({});
+  });
+
   it('builds page-N metadata with a "– Page N" suffix, self-canonical to /author/[slug]/page/N — never /author/[slug]', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author,
-      posts: [],
-      currentPage: 2,
-      totalPages: 3,
-      total: 20,
+      ok: true,
+      data: {
+        author,
+        posts: [],
+        currentPage: 2,
+        totalPages: 3,
+        total: 20,
+      },
     });
 
     const metadata = await buildAuthorMetadata('jane-doe', 2);
@@ -113,7 +136,7 @@ describe('buildAuthorMetadata', () => {
   });
 
   it('returns empty metadata for page N when the author does not exist', async () => {
-    getAuthorPageMock.mockResolvedValue(null);
+    getAuthorPageMock.mockResolvedValue({ ok: true, data: null });
 
     const metadata = await buildAuthorMetadata('missing', 2);
 

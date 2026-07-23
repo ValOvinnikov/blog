@@ -25,11 +25,15 @@ export async function buildAuthorMetadata(
     itemsPerPage: AUTHOR_ITEMS_PER_PAGE,
   });
 
-  if (!result) {
+  if (!result.ok) {
+    console.error(`Error to fetch author page metadata: ${result.error}`);
+    return {};
+  }
+  if (result.data === null) {
     return {};
   }
 
-  const { author } = result;
+  const { author } = result.data;
   const baseTitle = author.role
     ? `${author.name} — ${author.role}`
     : author.name;

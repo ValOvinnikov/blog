@@ -99,19 +99,22 @@ describe('AuthorNumberedPage generateMetadata', () => {
 
   it('builds metadata for page 2', async () => {
     getAuthorPageMock.mockResolvedValue({
-      author: {
-        id: 'author-1',
-        name: 'Jane Doe',
-        slug: 'jane-doe',
-        role: 'Senior Engineer',
-        imageUrl: undefined,
-        bio: undefined,
-        socialLinks: [],
+      ok: true,
+      data: {
+        author: {
+          id: 'author-1',
+          name: 'Jane Doe',
+          slug: 'jane-doe',
+          role: 'Senior Engineer',
+          imageUrl: undefined,
+          bio: undefined,
+          socialLinks: [],
+        },
+        posts: [],
+        currentPage: 2,
+        totalPages: 3,
+        total: 20,
       },
-      posts: [],
-      currentPage: 2,
-      totalPages: 3,
-      total: 20,
     });
 
     const metadata = await generateMetadata({

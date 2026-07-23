@@ -34,11 +34,15 @@ export async function AuthorPage({ slug, locale, page }: TAuthorPageProps) {
     itemsPerPage: AUTHOR_ITEMS_PER_PAGE,
   });
 
-  if (!result) {
+  if (!result.ok) {
+    console.error(`Error to fetch author page: ${result.error}`);
+    notFound();
+  }
+  if (result.data === null) {
     notFound();
   }
 
-  const { author, posts, currentPage, totalPages } = result;
+  const { author, posts, currentPage, totalPages } = result.data;
 
   // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
   // soft-404 or a redirect to the last page (spec SEO rules).

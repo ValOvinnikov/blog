@@ -24,11 +24,15 @@ export async function buildCategoryMetadata(
     itemsPerPage: CATEGORY_ITEMS_PER_PAGE,
   });
 
-  if (!result) {
+  if (!result.ok) {
+    console.error(`Error to fetch category page metadata: ${result.error}`);
+    return {};
+  }
+  if (result.data === null) {
     return {};
   }
 
-  const { category } = result;
+  const { category } = result.data;
   const description = category.description ?? category.title;
   // "– Page N" stays a hardcoded suffix until translation messages land
   // (#321), matching `buildBlogListMetadata`.

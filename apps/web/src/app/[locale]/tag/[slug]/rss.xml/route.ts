@@ -1,5 +1,5 @@
 import { routes } from '@blog/config';
-import { service, type TPostCard } from '@blog/service';
+import { service, type TPostCard, type TTagPage } from '@blog/service';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
 import { env } from '@web/utils/env/env';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
@@ -8,10 +8,6 @@ import { notFound } from 'next/navigation';
 type TProps = {
   params: Promise<{ slug: string }>;
 };
-
-type TTagPageResult = NonNullable<
-  Awaited<ReturnType<typeof service.pages.tag.v1.getTagPage>>
->;
 
 function toRssItem(post: TPostCard, siteUrl: string): TRssItem {
   return {
@@ -28,17 +24,21 @@ function toRssItem(post: TPostCard, siteUrl: string): TRssItem {
  * fetches page 1 for the tag itself + pagination metadata, then fetches the
  * remaining pages in parallel and concatenates, mirroring the site-wide
  * `getAllPublishedPosts` in `app/rss.xml/route.ts`. Returns `null` when the
- * tag itself doesn't exist.
+ * tag itself doesn't exist or the fetch fails.
  */
-async function getAllTagPosts(slug: string): Promise<TTagPageResult | null> {
+async function getAllTagPosts(slug: string): Promise<TTagPage | null> {
   const firstPage = await service.pages.tag.v1.getTagPage(slug, {
     page: 1,
     itemsPerPage: TAG_ITEMS_PER_PAGE,
   });
-  if (!firstPage) return null;
+  if (!firstPage.ok) {
+    console.error(`Error fetching tag page for RSS feed: ${firstPage.error}`);
+    return null;
+  }
+  if (firstPage.data === null) return null;
 
-  const { totalPages } = firstPage;
-  if (totalPages <= 1) return firstPage;
+  const { totalPages } = firstPage.data;
+  if (totalPages <= 1) return firstPage.data;
 
   const restPageNumbers = Array.from(
     { length: totalPages - 1 },
@@ -53,9 +53,15 @@ async function getAllTagPosts(slug: string): Promise<TTagPageResult | null> {
     ),
   );
 
-  const restPosts = restPages.flatMap((page) => page?.posts ?? []);
+  const restPosts = restPages.flatMap((page) => {
+    if (!page.ok) {
+      console.error(`Error fetching tag page for RSS feed: ${page.error}`);
+      return [];
+    }
+    return page.data?.posts ?? [];
+  });
 
-  return { ...firstPage, posts: [...firstPage.posts, ...restPosts] };
+  return { ...firstPage.data, posts: [...firstPage.data.posts, ...restPosts] };
 }
 
 /**
