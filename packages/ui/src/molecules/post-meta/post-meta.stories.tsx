@@ -43,3 +43,12 @@ export const WithShareSlot: TStory = {
     share: <button type="button">Share</button>,
   },
 };
+
+export const WithCategory: TStory = {
+  args: {
+    category: {
+      label: faker.commerce.department(),
+      href: `/categories/${faker.lorem.slug()}`,
+    },
+  },
+};

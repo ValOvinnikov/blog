@@ -1,5 +1,6 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import type { ReactNode } from 'react';
 
 import { PostMeta } from './post-meta';
 
@@ -69,5 +70,41 @@ describe(`<${PostMeta.name}/>`, () => {
   it('renders the share slot when share is provided', () => {
     setup({ share: <button>share</button> });
     expect(screen.getByRole('button', { name: 'share' })).toBeVisible();
+  });
+
+  it('omits the category link when category is not provided', () => {
+    setup();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('renders the category as a link to its href when provided', () => {
+    const category = {
+      label: faker.commerce.department(),
+      href: `/categories/${faker.lorem.slug()}`,
+    };
+    setup({ category });
+    const link = screen.getByRole('link', { name: category.label });
+    expect(link).toHaveAttribute('href', category.href);
+  });
+
+  it('renders the category as the linkAs component when provided', () => {
+    const category = {
+      label: faker.commerce.department(),
+      href: `/categories/${faker.lorem.slug()}`,
+    };
+    const CustomLink = ({
+      href,
+      children,
+    }: {
+      href: string;
+      children?: ReactNode;
+    }) => (
+      <a href={href} data-custom-link="true">
+        {children}
+      </a>
+    );
+    setup({ category, linkAs: CustomLink });
+    const link = screen.getByRole('link', { name: category.label });
+    expect(link).toHaveAttribute('data-custom-link', 'true');
   });
 });
