@@ -4,14 +4,13 @@ import {
 } from '@blog/service/shared/transformers/to-post-card';
 import type { InferResultType } from 'groqd';
 
+import { RELATED_POSTS_LIMIT } from './constants';
 import type { relatedByCategoryQuery, relatedByTagsQuery } from './query';
 
 export type TRawRelatedByTags = InferResultType<typeof relatedByTagsQuery>;
 export type TRawRelatedByCategory = InferResultType<
   typeof relatedByCategoryQuery
 >;
-
-const RELATED_POSTS_LIMIT = 3;
 
 /**
  * Ranks the shared-tag candidate pool by exact shared-tag count desc,
