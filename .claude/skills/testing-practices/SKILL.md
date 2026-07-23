@@ -81,7 +81,8 @@ export default mergeConfig(
 
 - **`@blog/ui`** — behaviour and contract, not markup snapshots. Query by role/
   text (`getByRole("button", { name: ... })`), assert rendered props, variants,
-  and interactions via `@testing-library/user-event`. Avoid testing class names.
+  and interactions via `@testing-library/user-event`. Never assert
+  always-present styling classes (see "What not to test").
 - **`@blog/service`** — pure logic: GROQ result → domain mapping, `urlForImage`
   output, error/empty handling. **Mock the Sanity client** (`vi.mock`); never
   hit the network. No `revalidate` timing tests.
@@ -226,11 +227,22 @@ export default mergeConfig(
 
 - Use `vi.fn()` / `vi.mock()` for boundaries (the Sanity client, `service`).
 - Deterministic: no real dates/network/random. Inject or freeze.
-- A bug fix gets a regression test that fails before the fix.
+- A bug fix gets a regression test that fails before the fix — **unless** it's
+  a pure styling fix (borders/spacing/tokens) with no behavioural surface, which
+  gets the `no-tests-needed` label instead of a class assertion.
 
 ## What not to test
 
-- **Never test CSS class names** — assert behaviour and output, not styling.
+- **Never assert always-present styling classes — REQUIRED, not a preference.**
+  Do not use `toHaveClass` (or match on `className`) for a class that is
+  **always** on the element (borders, spacing, colours, a fixed `mt-*`/`px-*`,
+  a token swap). Assert a class **only** when it appears **conditionally** —
+  it toggles with a prop/variant/state (`active`, `error`, a `size`/`hasX`
+  variant) and that toggle is the behaviour under test. A change that only
+  adds/adjusts always-on styling has **no** behavioural surface, so it gets
+  **no** unit test — ship it with the `no-tests-needed` label instead of
+  inventing a class assertion. Assert behaviour and rendered output, never
+  static styling.
 - **No snapshot tests** — they couple tests to markup and break on unrelated changes.
 - **No implementation details** — test what a component does, not how it does it.
 - **No network calls** — always mock the Sanity client and `service` functions.
