@@ -6,7 +6,7 @@ import { tagVariants } from './tag-variants';
 
 type TTagOwnProps = {
   className?: string;
-} & VariantProps<typeof tagVariants>;
+} & Omit<VariantProps<typeof tagVariants>, 'interactive'>;
 
 export type TTagProps<C extends ElementType = 'span'> = TPolymorphicProps<
   C,
