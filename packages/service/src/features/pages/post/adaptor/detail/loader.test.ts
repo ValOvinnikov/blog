@@ -6,6 +6,7 @@ import {
   makeRawPostCard,
   makeRawPostDetail,
 } from '@blog/service/testing/pages/fixtures';
+import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 
 import { getPost } from './loader';
 
@@ -50,6 +51,36 @@ describe('getPost', () => {
     expect(result?.id).toBe('post-abc');
     expect(result?.title).toBe('Test Post');
     expect(result?.slug).toBe('hello-world');
+  });
+
+  it('maps the required author onto the post detail', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostDetail({
+          author: {
+            _id: 'author-9',
+            name: 'Jane Doe',
+            slug: 'jane-doe',
+            image: makeRawImage('Jane avatar'),
+            role: 'Editor',
+            bio: null,
+            socialLinks: null,
+          },
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world');
+
+    expect(result?.author).toEqual({
+      id: 'author-9',
+      name: 'Jane Doe',
+      slug: 'jane-doe',
+      imageUrl: 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
+      role: 'Editor',
+      bio: undefined,
+      socialLinks: [],
+    });
   });
 
   it('maps a post with no heroImage to undefined image fields', async () => {

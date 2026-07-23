@@ -15,9 +15,7 @@ export type TRawPostDetail = NonNullable<
   InferResultType<typeof postDetailQuery>
 >;
 
-function toPostDetailAuthor(
-  raw: NonNullable<TRawPostDetail['author']>,
-): TPostDetailAuthor {
+function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
   return {
     id: raw._id,
     name: raw.name,
@@ -55,7 +53,7 @@ export function toPostDetail(
         defaultOgImageUrl: settings.defaultOgImageUrl,
       },
     ),
-    author: raw.author ? toPostDetailAuthor(raw.author) : undefined,
+    author: toPostDetailAuthor(raw.author),
     categories: raw.categories.map(toCategory),
     tags: (raw.tags ?? []).map(toTag),
     relatedPosts,
