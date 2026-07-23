@@ -39,7 +39,12 @@ const post = {
   heroImageAlt: undefined,
   heroImageSanity: undefined,
   featured: false,
-  author: undefined,
+  author: {
+    id: 'author-1',
+    name: 'Jane Doe',
+    slug: 'jane-doe',
+    imageUrl: undefined,
+  },
   categories: [],
 };
 
