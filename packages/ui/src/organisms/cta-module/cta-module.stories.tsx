@@ -25,3 +25,9 @@ export const WithoutText: TStory = {
     text: undefined,
   },
 };
+
+export const WithoutAction: TStory = {
+  args: {
+    action: undefined,
+  },
+};

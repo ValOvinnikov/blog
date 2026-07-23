@@ -10,13 +10,14 @@ export interface ICtaModuleProps
   heading: string;
   headingId?: string;
   text?: string;
-  action: ReactNode;
+  action?: ReactNode;
 }
 
 /**
  * CtaModule — page-builder organism rendering a heading, optional supporting
- * text, and an action slot. `action` is a fully rendered link/button passed
- * in by the web layer — this component never builds the anchor itself.
+ * text, and an optional action slot. `action` is a fully rendered link/button
+ * passed in by the web layer — this component never builds the anchor itself.
+ * The action wrapper is omitted entirely when `action` is absent.
  */
 export const CtaModule = ({
   heading,
@@ -40,7 +41,7 @@ export const CtaModule = ({
         {heading}
       </h2>
       {text && <p className={s.text()}>{text}</p>}
-      <div className={s.action()}>{action}</div>
+      {action && <div className={s.action()}>{action}</div>}
     </section>
   );
 };
