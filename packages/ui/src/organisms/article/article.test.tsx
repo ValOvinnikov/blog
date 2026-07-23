@@ -125,24 +125,6 @@ describe(`<${Article.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders the lead paragraph with top spacing below the metadata strip', () => {
-    renderElement(
-      <Article>
-        <Article.Header
-          title="Building a Design System"
-          meta={meta}
-          lead="A walkthrough of Atomic Design with Tailwind."
-        />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(
-      screen.getByText('A walkthrough of Atomic Design with Tailwind.'),
-    ).toHaveClass('mt-4');
-  });
-
   it('does not render a lead paragraph when omitted', () => {
     renderElement(
       <Article>

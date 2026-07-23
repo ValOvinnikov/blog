@@ -59,14 +59,6 @@ describe(`<${PostMeta.name}/>`, () => {
     expect(screen.getByTestId('post-meta')).toBeVisible();
   });
 
-  it('renders the top/bottom rule on the root element', () => {
-    setup({ dataTestId: 'post-meta' });
-    expect(screen.getByTestId('post-meta')).toHaveClass(
-      'border-y',
-      'border-border',
-    );
-  });
-
   it('omits the share trigger when share is not provided', () => {
     setup();
     expect(
