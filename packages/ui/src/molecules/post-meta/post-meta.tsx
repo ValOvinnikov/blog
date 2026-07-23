@@ -10,6 +10,8 @@ export interface IPostMetaProps extends IWithDataTestId {
   author: {
     name: string;
     imageUrl?: string;
+    /** Link target for the author name — omit to render plain text. `PostMeta` never imports routes; the href is built and passed in by `apps/web`. */
+    href?: string;
   };
   /** ISO 8601 date string, used only for `<time dateTime>`. */
   publishedAt: string;
@@ -45,7 +47,7 @@ export const PostMeta = ({
   className,
   dataTestId,
 }: IPostMetaProps) => {
-  const CategoryLink = (linkAs ?? 'a') as ElementType;
+  const LinkComponent = (linkAs ?? 'a') as ElementType;
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
@@ -56,7 +58,13 @@ export const PostMeta = ({
           src={author.imageUrl}
           size={Size.SM}
         />
-        <span className={s.authorName()}>{author.name}</span>
+        {author.href ? (
+          <LinkComponent href={author.href} className={s.authorName()}>
+            {author.name}
+          </LinkComponent>
+        ) : (
+          <span className={s.authorName()}>{author.name}</span>
+        )}
       </span>
       <MetaSeparator />
       <time dateTime={publishedAt}>{formattedDate}</time>
@@ -72,9 +80,9 @@ export const PostMeta = ({
           {categories.map((category, index) => (
             <Fragment key={category.href}>
               {index > 0 && <MetaSeparator />}
-              <CategoryLink href={category.href} className={s.category()}>
+              <LinkComponent href={category.href} className={s.category()}>
                 {category.label}
-              </CategoryLink>
+              </LinkComponent>
             </Fragment>
           ))}
         </>

@@ -131,4 +131,41 @@ describe(`<${PostMeta.name}/>`, () => {
       expect(link).toHaveAttribute('data-custom-link', 'true');
     });
   });
+
+  it('renders the author name as plain text when href is not provided', () => {
+    setup();
+    expect(
+      screen.queryByRole('link', { name: author.name }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the author name as a link to its href when provided', () => {
+    const authorHref = `/authors/${faker.lorem.slug()}`;
+    setup({ author: { ...author, href: authorHref } });
+    expect(screen.getByRole('link', { name: author.name })).toHaveAttribute(
+      'href',
+      authorHref,
+    );
+  });
+
+  it('renders the author link as the linkAs component when provided', () => {
+    const authorHref = `/authors/${faker.lorem.slug()}`;
+    const CustomLink = ({
+      href,
+      children,
+    }: {
+      href: string;
+      children?: ReactNode;
+    }) => (
+      <a href={href} data-custom-link="true">
+        {children}
+      </a>
+    );
+    setup({
+      author: { ...author, href: authorHref },
+      linkAs: CustomLink,
+    });
+    const link = screen.getByRole('link', { name: author.name });
+    expect(link).toHaveAttribute('data-custom-link', 'true');
+  });
 });

@@ -58,3 +58,13 @@ export const WithCategories: TStory = {
     ],
   },
 };
+
+export const WithLinkedAuthor: TStory = {
+  args: {
+    author: {
+      name: faker.person.fullName(),
+      imageUrl: faker.image.avatarGitHub(),
+      href: `/authors/${faker.lorem.slug()}`,
+    },
+  },
+};
