@@ -3,13 +3,15 @@ import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { InferResultType } from 'groqd';
 
 import type { categoryPageCategoryQuery } from './category.query';
-import type { categoryPagePostsQuery } from './posts.query';
+import type { buildCategoryPostsPageQuery } from './posts.query';
 import type { TCategoryPage } from './types';
 
 type TRawCategory = NonNullable<
   InferResultType<typeof categoryPageCategoryQuery>
 >;
-type TRawPosts = InferResultType<typeof categoryPagePostsQuery>;
+type TRawPosts = InferResultType<
+  ReturnType<typeof buildCategoryPostsPageQuery>
+>['posts'];
 
 export type TCategoryPagePagination = {
   currentPage: number;
@@ -20,13 +22,13 @@ export type TCategoryPagePagination = {
 export function toCategoryPage(
   rawCategory: TRawCategory,
   rawPosts: TRawPosts,
-  pagination?: TCategoryPagePagination,
+  pagination: TCategoryPagePagination,
 ): TCategoryPage {
   return {
     category: toCategory(rawCategory),
     posts: rawPosts.map(toPostCard),
-    currentPage: pagination?.currentPage,
-    totalPages: pagination?.totalPages,
-    total: pagination?.total,
+    currentPage: pagination.currentPage,
+    totalPages: pagination.totalPages,
+    total: pagination.total,
   };
 }

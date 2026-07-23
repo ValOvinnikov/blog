@@ -2,44 +2,28 @@ import { getSiteSettings } from '@blog/service/features/global/site-settings/ada
 import { isr, runQuery } from '@blog/service/sanity/query';
 import { toTotalPages } from '@blog/utils';
 
-import { buildTagPostsPageQuery, tagPagePostsQuery } from './posts.query';
+import { buildTagPostsPageQuery } from './posts.query';
 import { tagPageTagQuery } from './tag.query';
 import { toTagPage } from './transformer';
 import type { TTagPage } from './types';
 
-type TGetTagPageArgs =
-  | { page?: undefined; itemsPerPage?: undefined }
-  | { page: number; itemsPerPage: number };
+type TGetTagPageArgs = {
+  page?: number;
+  itemsPerPage: number;
+};
 
 /**
- * `page` is left undefined for an unpaginated call site, which fetches
- * every post for the tag in one unsliced query. Passing a `page` opts into
- * the sliced, paginated query — tags have no CMS-authored page-size field
- * like `page_blog.itemsPerPage`, so `itemsPerPage` is required alongside
- * `page`; the caller (the `/tag/[slug]/page/[page]` route) decides the
- * value. Populates `currentPage`/`totalPages`/`total` on the returned
- * view-model.
+ * Always windows, mirroring the blog index (`getIndexPage`) — `page`
+ * defaults to 1 so the unnumbered `/tag/[slug]` route gets the same
+ * sliced-query + pagination-metadata shape as `/tag/[slug]/page/[page]`
+ * (pages ≥ 2). Tags have no CMS-authored page-size field like
+ * `page_blog.itemsPerPage`, so `itemsPerPage` is always required — the
+ * caller (`TAG_ITEMS_PER_PAGE` on the web side) decides the value.
  */
 export async function getTagPage(
   slug: string,
-  { page, itemsPerPage }: TGetTagPageArgs = {},
+  { page = 1, itemsPerPage }: TGetTagPageArgs,
 ): Promise<TTagPage | null> {
-  if (page === undefined) {
-    const [rawTag, rawPosts, settings] = await Promise.all([
-      runQuery(tagPageTagQuery, {
-        parameters: { slug },
-        ...isr('tag'),
-      }),
-      runQuery(tagPagePostsQuery, {
-        parameters: { slug },
-        ...isr('posts'),
-      }),
-      getSiteSettings(),
-    ]);
-    if (!rawTag) return null;
-    return toTagPage(rawTag, rawPosts, settings);
-  }
-
   const start = (page - 1) * itemsPerPage;
   const [rawTag, rawPosts, settings] = await Promise.all([
     runQuery(tagPageTagQuery, {

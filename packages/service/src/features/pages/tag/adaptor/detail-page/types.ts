@@ -16,10 +16,7 @@ export type TTagPageTag = {
 export type TTagPage = {
   tag: TTagPageTag;
   posts: TPostCard[];
-  // Present only when `getTagPage` was called with a `page` — the
-  // unpaginated call site gets the full, unsliced post list and no
-  // pagination metadata.
-  currentPage?: number;
-  totalPages?: number;
-  total?: number;
+  currentPage: number;
+  totalPages: number;
+  total: number;
 };

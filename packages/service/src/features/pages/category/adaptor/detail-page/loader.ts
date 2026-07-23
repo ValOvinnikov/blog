@@ -2,45 +2,27 @@ import { isr, runQuery } from '@blog/service/sanity/query';
 import { toTotalPages } from '@blog/utils';
 
 import { categoryPageCategoryQuery } from './category.query';
-import {
-  buildCategoryPostsPageQuery,
-  categoryPagePostsQuery,
-} from './posts.query';
+import { buildCategoryPostsPageQuery } from './posts.query';
 import { toCategoryPage } from './transformer';
 import type { TCategoryPage } from './types';
 
-type TGetCategoryPageArgs =
-  | { page?: undefined; itemsPerPage?: undefined }
-  | { page: number; itemsPerPage: number };
+type TGetCategoryPageArgs = {
+  page?: number;
+  itemsPerPage: number;
+};
 
 /**
- * `page` is left undefined by #91's original unpaginated call site, which
- * fetches every post for the category in one unsliced query. Passing a
- * `page` opts into the sliced, paginated query — categories have no
- * CMS-authored page-size field like `page_blog.itemsPerPage`, so
- * `itemsPerPage` is required alongside `page`; the caller (the eventual
- * `/category/[slug]/page/[page]` route, #589) decides the value. Populates
- * `currentPage`/`totalPages`/`total` on the returned view-model.
+ * Always windows, mirroring the blog index (`getIndexPage`) — `page`
+ * defaults to 1 so the unnumbered `/category/[slug]` route gets the same
+ * sliced-query + pagination-metadata shape as `/category/[slug]/page/[page]`
+ * (pages ≥ 2). Categories have no CMS-authored page-size field like
+ * `page_blog.itemsPerPage`, so `itemsPerPage` is always required — the
+ * caller (`CATEGORY_ITEMS_PER_PAGE` on the web side) decides the value.
  */
 export async function getCategoryPage(
   slug: string,
-  { page, itemsPerPage }: TGetCategoryPageArgs = {},
+  { page = 1, itemsPerPage }: TGetCategoryPageArgs,
 ): Promise<TCategoryPage | null> {
-  if (page === undefined) {
-    const [rawCategory, rawPosts] = await Promise.all([
-      runQuery(categoryPageCategoryQuery, {
-        parameters: { slug },
-        ...isr('category'),
-      }),
-      runQuery(categoryPagePostsQuery, {
-        parameters: { slug },
-        ...isr('posts'),
-      }),
-    ]);
-    if (!rawCategory) return null;
-    return toCategoryPage(rawCategory, rawPosts);
-  }
-
   const start = (page - 1) * itemsPerPage;
   const [rawCategory, rawPosts] = await Promise.all([
     runQuery(categoryPageCategoryQuery, {

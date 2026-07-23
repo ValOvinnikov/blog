@@ -3,14 +3,16 @@ import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { InferResultType } from 'groqd';
 
-import type { tagPagePostsQuery } from './posts.query';
+import type { buildTagPostsPageQuery } from './posts.query';
 import type { tagPageTagQuery } from './tag.query';
 import type { TTagPage, TTagPageTag } from './types';
 
 export type TRawTagPageTag = NonNullable<
   InferResultType<typeof tagPageTagQuery>
 >;
-type TRawPosts = InferResultType<typeof tagPagePostsQuery>;
+type TRawPosts = InferResultType<
+  ReturnType<typeof buildTagPostsPageQuery>
+>['posts'];
 
 export type TTagPagePagination = {
   currentPage: number;
@@ -47,13 +49,13 @@ export function toTagPage(
   rawTag: TRawTagPageTag,
   rawPosts: TRawPosts,
   settings: TSiteSettings,
-  pagination?: TTagPagePagination,
+  pagination: TTagPagePagination,
 ): TTagPage {
   return {
     tag: toTagPageTag(rawTag, settings),
     posts: rawPosts.map(toPostCard),
-    currentPage: pagination?.currentPage,
-    totalPages: pagination?.totalPages,
-    total: pagination?.total,
+    currentPage: pagination.currentPage,
+    totalPages: pagination.totalPages,
+    total: pagination.total,
   };
 }
