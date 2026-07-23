@@ -31,6 +31,14 @@ describe(`<${PostsSection.name}/>`, () => {
     expect(screen.getByRole('region', { name: 'Latest' })).toBeVisible();
   });
 
+  it('renders the section title as a heading', () => {
+    setup();
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Latest' }),
+    ).toBeVisible();
+  });
+
   it('renders a PostCard for each post', () => {
     setup();
 
