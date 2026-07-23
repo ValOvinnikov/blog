@@ -11,11 +11,13 @@ import {
 } from 'react';
 
 import { ArticleBody } from './components/body/article-body';
+import { ArticleFooter } from './components/footer/article-footer';
 import { ArticleHeader } from './components/header/article-header';
 
 const ArticleParts = {
   Header: ArticleHeader,
   Body: ArticleBody,
+  Footer: ArticleFooter,
 } satisfies Record<string, ElementType>;
 
 export interface IArticleProps
@@ -36,6 +38,7 @@ const ArticleRoot = ({
     <article className={className} data-testid={dataTestId} {...rest}>
       {slots.Header}
       {slots.Body}
+      {slots.Footer}
       {unmatched.map((node, i) => (
         <Fragment key={i}>{node}</Fragment>
       ))}

@@ -192,6 +192,44 @@ describe(`<${Article.name}/>`, () => {
     expect(screen.getByRole('article')).toBeVisible();
   });
 
+  it('renders Article.Footer tags as links to their routes', () => {
+    renderElement(
+      <Article>
+        <Article.Header title="Building a Design System" meta={meta} />
+        <Article.Body>
+          <p>Post body content.</p>
+        </Article.Body>
+        <Article.Footer
+          tags={[
+            { label: 'TypeScript', href: '/tag/typescript' },
+            { label: 'Testing', href: '/tag/testing' },
+          ]}
+        />
+      </Article>,
+    );
+    expect(screen.getByRole('link', { name: 'TypeScript' })).toHaveAttribute(
+      'href',
+      '/tag/typescript',
+    );
+    expect(screen.getByRole('link', { name: 'Testing' })).toHaveAttribute(
+      'href',
+      '/tag/testing',
+    );
+  });
+
+  it('does not render an Article.Footer when tags is empty', () => {
+    renderElement(
+      <Article>
+        <Article.Header title="Building a Design System" meta={meta} />
+        <Article.Body>
+          <p>Post body content.</p>
+        </Article.Body>
+        <Article.Footer tags={[]} />
+      </Article>,
+    );
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
   it('forwards dataTestId to the root element', () => {
     renderElement(
       <Article dataTestId="article">
