@@ -68,7 +68,11 @@ export const ArticleHeader = ({
       <Heading level={1} visual="post" className={s.title()}>
         {title}
       </Heading>
-      {meta && <PostMeta {...meta} />}
+      {meta && (
+        <div className={s.meta()}>
+          <PostMeta {...meta} />
+        </div>
+      )}
       {lead && (
         <Text variant="lead" className={s.lead()}>
           {lead}
