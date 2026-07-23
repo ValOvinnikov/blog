@@ -32,6 +32,7 @@ const post: TPostDetail = {
   categories: [],
   tags: [],
   relatedPosts: [],
+  readingTimeMinutes: 4,
 };
 
 describe(buildBlogPostingSchema, () => {

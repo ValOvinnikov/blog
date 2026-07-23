@@ -42,6 +42,7 @@ export async function BlogListPage({ page, locale }: TBlogListPageProps) {
     excerpt: post.excerpt,
     publishedAt: post.publishedAt,
     formattedDate: formatDate(post.publishedAt, locale),
+    readingTime: `${post.readingTimeMinutes} min`,
     categories: post.categories,
   }));
 
