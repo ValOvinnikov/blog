@@ -4,10 +4,20 @@ import {
 } from '@blog/service/shared/transformers/to-post-card';
 import type { InferResultType } from 'groqd';
 
-import type { authorPostsQuery } from './query';
+import type { buildAuthorPostsPageQuery } from './query';
 
-type TRawAuthorPosts = InferResultType<typeof authorPostsQuery>;
+type TRawAuthorPosts = InferResultType<
+  ReturnType<typeof buildAuthorPostsPageQuery>
+>['posts'];
 
-export function toAuthorPosts(raw: TRawAuthorPosts): TPostCard[] {
-  return raw.map(toPostCard);
+export type TAuthorPosts = {
+  posts: TPostCard[];
+  total: number;
+};
+
+export function toAuthorPosts(
+  rawPosts: TRawAuthorPosts,
+  total: number,
+): TAuthorPosts {
+  return { posts: rawPosts.map(toPostCard), total };
 }

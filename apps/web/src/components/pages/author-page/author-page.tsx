@@ -2,37 +2,49 @@ import { Size, type ILocalizedParams, routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Avatar, Eyebrow } from '@blog/ui/atoms';
 import { ActionList, ShareLink } from '@blog/ui/molecules';
-import { PostsSection } from '@blog/ui/organisms';
+import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { Link } from '@web/i18n/navigation';
+import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
 import { formatDate } from '@web/utils/format-date';
 import { notFound } from 'next/navigation';
 
 import { authorPageVariants } from './author-page-variants';
 
-type TAuthorPageProps = ILocalizedParams & { slug: string };
+type TAuthorPageProps = ILocalizedParams & { slug: string; page?: number };
 
 const s = authorPageVariants();
 
 /**
- * AuthorPage — `/author/[slug]` composition: fetches the author and their
- * posts together via `service.entities.author.v1.getAuthorPage`, then
- * composes the shared `BlogPageTemplate` archive shell with the author's
- * name as the page `<h1>`, their role/avatar in `introHeader`, bio as
- * `supportingText`, social links via `ShareLink`/`ActionList`, and their
- * (unpaginated) post list via `PostsSection`. Pagination is deferred — see
- * #744.
+ * AuthorPage — shared composition for `/author/[slug]` (page 1, `page`
+ * omitted) and `/author/[slug]/page/[page]` (pages ≥ 2, `page` provided):
+ * fetches the author and their posts together via
+ * `service.entities.author.v1.getAuthorPage`, then composes the shared
+ * `BlogPageTemplate` archive shell with the author's name as the page
+ * `<h1>`, their role/avatar in `introHeader`, bio as `supportingText`,
+ * social links via `ShareLink`/`ActionList`, and their post list via
+ * `PostsSection`. `getAuthorPage` always windows — page 1 gets the same
+ * pagination metadata as any other page.
  */
-export async function AuthorPage({ slug, locale }: TAuthorPageProps) {
-  const result = await service.entities.author.v1.getAuthorPage(slug);
+export async function AuthorPage({ slug, locale, page }: TAuthorPageProps) {
+  const result = await service.entities.author.v1.getAuthorPage(slug, {
+    page,
+    itemsPerPage: AUTHOR_ITEMS_PER_PAGE,
+  });
 
   if (!result) {
     notFound();
   }
 
-  const { author, posts } = result;
+  const { author, posts, currentPage, totalPages } = result;
+
+  // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
+  // soft-404 or a redirect to the last page (spec SEO rules).
+  if (page !== undefined && page > totalPages) {
+    notFound();
+  }
 
   const items = posts.map((post) => ({
     id: post.id,
@@ -78,6 +90,17 @@ export async function AuthorPage({ slug, locale }: TAuthorPageProps) {
           posts={items}
           title={`Posts by ${author.name}`}
           titleId="author-posts-title"
+          linkAs={Link}
+        />
+      }
+      pagination={
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          createHref={(pageNumber) => routes.author(slug, pageNumber)}
+          ariaLabel="Author pages"
+          previousLabel="Previous"
+          nextLabel="Next"
           linkAs={Link}
         />
       }

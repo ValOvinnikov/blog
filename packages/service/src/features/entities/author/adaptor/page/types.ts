@@ -4,4 +4,7 @@ import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 export type TAuthorPage = {
   author: TAuthorDetail;
   posts: TPostCard[];
+  currentPage: number;
+  totalPages: number;
+  total: number;
 };

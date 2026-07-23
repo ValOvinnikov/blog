@@ -1,13 +1,13 @@
 import { buildAuthorMetadata } from './build-author-metadata';
 
-const { getAuthorMock } = vi.hoisted(() => ({
-  getAuthorMock: vi.fn(),
+const { getAuthorPageMock } = vi.hoisted(() => ({
+  getAuthorPageMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
   service: {
     entities: {
-      author: { v1: { getAuthor: getAuthorMock } },
+      author: { v1: { getAuthorPage: getAuthorPageMock } },
     },
   },
 }));
@@ -32,7 +32,13 @@ const author = {
 
 describe('buildAuthorMetadata', () => {
   it('builds metadata from the author name/role/bio, self-canonical to /author/[slug]', async () => {
-    getAuthorMock.mockResolvedValue(author);
+    getAuthorPageMock.mockResolvedValue({
+      author,
+      posts: [],
+      currentPage: 1,
+      totalPages: 1,
+      total: 0,
+    });
 
     const metadata = await buildAuthorMetadata('jane-doe');
 
@@ -41,10 +47,20 @@ describe('buildAuthorMetadata', () => {
     expect(metadata.alternates?.canonical).toBe('/author/jane-doe');
     expect(metadata.openGraph?.title).toBe('Jane Doe — Senior Engineer');
     expect(metadata.openGraph?.description).toBe('Builds things.');
+    expect(getAuthorPageMock).toHaveBeenCalledWith('jane-doe', {
+      page: undefined,
+      itemsPerPage: 9,
+    });
   });
 
   it('falls back to the plain name when no role is authored', async () => {
-    getAuthorMock.mockResolvedValue({ ...author, role: undefined });
+    getAuthorPageMock.mockResolvedValue({
+      author: { ...author, role: undefined },
+      posts: [],
+      currentPage: 1,
+      totalPages: 1,
+      total: 0,
+    });
 
     const metadata = await buildAuthorMetadata('jane-doe');
 
@@ -52,7 +68,13 @@ describe('buildAuthorMetadata', () => {
   });
 
   it('falls back to the title as description when no bio is authored', async () => {
-    getAuthorMock.mockResolvedValue({ ...author, bio: undefined });
+    getAuthorPageMock.mockResolvedValue({
+      author: { ...author, bio: undefined },
+      posts: [],
+      currentPage: 1,
+      totalPages: 1,
+      total: 0,
+    });
 
     const metadata = await buildAuthorMetadata('jane-doe');
 
@@ -60,9 +82,40 @@ describe('buildAuthorMetadata', () => {
   });
 
   it('returns empty metadata when the author does not exist', async () => {
-    getAuthorMock.mockResolvedValue(null);
+    getAuthorPageMock.mockResolvedValue(null);
 
     const metadata = await buildAuthorMetadata('missing');
+
+    expect(metadata).toEqual({});
+  });
+
+  it('builds page-N metadata with a "– Page N" suffix, self-canonical to /author/[slug]/page/N — never /author/[slug]', async () => {
+    getAuthorPageMock.mockResolvedValue({
+      author,
+      posts: [],
+      currentPage: 2,
+      totalPages: 3,
+      total: 20,
+    });
+
+    const metadata = await buildAuthorMetadata('jane-doe', 2);
+
+    expect(metadata.title).toBe('Jane Doe — Senior Engineer – Page 2');
+    expect(metadata.openGraph?.title).toBe(
+      'Jane Doe — Senior Engineer – Page 2',
+    );
+    expect(metadata.alternates?.canonical).toBe('/author/jane-doe/page/2');
+    expect(metadata.alternates?.canonical).not.toBe('/author/jane-doe');
+    expect(getAuthorPageMock).toHaveBeenCalledWith('jane-doe', {
+      page: 2,
+      itemsPerPage: 9,
+    });
+  });
+
+  it('returns empty metadata for page N when the author does not exist', async () => {
+    getAuthorPageMock.mockResolvedValue(null);
+
+    const metadata = await buildAuthorMetadata('missing', 2);
 
     expect(metadata).toEqual({});
   });
