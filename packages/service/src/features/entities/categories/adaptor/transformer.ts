@@ -8,7 +8,7 @@ export type TRawCategoryWithPostCount = InferResultType<
   typeof categoriesQuery
 >[number];
 
-export function toCategoryWithPostCount(
+function toCategoryWithPostCount(
   raw: TRawCategoryWithPostCount,
 ): TCategoryWithPostCount {
   return {
