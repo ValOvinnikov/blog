@@ -4,4 +4,5 @@ export const postParamsQuery = q.star
   .filterByType('blog_post')
   .project((sub) => ({
     slug: sub.field('slug.current').notNull(),
+    publishedAt: sub.field('publishedAt').notNull(),
   }));
