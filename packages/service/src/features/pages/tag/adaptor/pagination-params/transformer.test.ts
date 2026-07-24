@@ -5,8 +5,8 @@ describe('toTagPaginationParams', () => {
     expect(
       toTagPaginationParams(
         [
-          { slug: 'typescript', total: 20 },
-          { slug: 'react', total: 9 },
+          { slug: 'typescript', postCount: 20 },
+          { slug: 'react', postCount: 9 },
         ],
         9,
       ),
@@ -17,12 +17,14 @@ describe('toTagPaginationParams', () => {
   });
 
   it('contributes no entries for a tag with zero posts', () => {
-    expect(toTagPaginationParams([{ slug: 'empty', total: 0 }], 9)).toEqual([]);
+    expect(toTagPaginationParams([{ slug: 'empty', postCount: 0 }], 9)).toEqual(
+      [],
+    );
   });
 
   it('contributes no entries for a tag that fits on one page', () => {
     expect(
-      toTagPaginationParams([{ slug: 'typescript', total: 5 }], 9),
+      toTagPaginationParams([{ slug: 'typescript', postCount: 5 }], 9),
     ).toEqual([]);
   });
 

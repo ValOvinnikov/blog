@@ -5,8 +5,8 @@ describe('toCategoryPaginationParams', () => {
     expect(
       toCategoryPaginationParams(
         [
-          { slug: 'engineering', total: 20 },
-          { slug: 'design', total: 9 },
+          { slug: 'engineering', postCount: 20 },
+          { slug: 'design', postCount: 9 },
         ],
         9,
       ),
@@ -18,13 +18,13 @@ describe('toCategoryPaginationParams', () => {
 
   it('contributes no entries for a category with zero posts', () => {
     expect(
-      toCategoryPaginationParams([{ slug: 'empty', total: 0 }], 9),
+      toCategoryPaginationParams([{ slug: 'empty', postCount: 0 }], 9),
     ).toEqual([]);
   });
 
   it('contributes no entries for a category that fits on one page', () => {
     expect(
-      toCategoryPaginationParams([{ slug: 'engineering', total: 5 }], 9),
+      toCategoryPaginationParams([{ slug: 'engineering', postCount: 5 }], 9),
     ).toEqual([]);
   });
 
