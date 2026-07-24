@@ -56,17 +56,12 @@ export const postSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'categories',
-      title: 'Categories',
-      type: 'array',
-      description: 'Topic categories used for filtering and navigation.',
-      of: [
-        defineArrayMember({
-          type: 'reference',
-          to: [{ type: categorySchema.name }],
-        }),
-      ],
-      validation: (rule) => rule.required().max(4),
+      name: 'category',
+      title: 'Category',
+      type: 'reference',
+      description: "The post's primary topic classification.",
+      to: [{ type: categorySchema.name }],
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'tags',
