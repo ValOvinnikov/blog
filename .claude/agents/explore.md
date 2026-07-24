@@ -81,22 +81,22 @@ pointers for every claim. Structure:
 
 This is what good looks like — copy this shape exactly:
 
-> **No author route exists.** The service layer exposes author data but
-> nothing consumes it.
+> **No per-author RSS feed exists.** Tags have one; authors don't, though the
+> underlying data fetch already supports it.
 >
-> - `apps/web/src/app/[locale]/` — routes are `blog/` and `blog/page/[page]`
->   only; no `author/` directory. (A directory needs no line number.)
-> - `packages/service/src/index.ts:33` — exposed as `service.entities.author`.
-> - `packages/service/src/features/entities/author/application/service.ts:12` —
->   `v1.getAuthor(slug)` and `v1.getAuthorParams()`.
-> - `packages/service/src/features/entities/author/adaptor/detail/types.ts:8` —
->   the `TAuthorDetail` shape lives here.
+> - `apps/web/src/app/[locale]/tag/[slug]/rss.xml/route.ts` — the existing
+>   per-tag RSS route to mirror.
+> - `apps/web/src/app/[locale]/author/[slug]/` — no `rss.xml/` subdirectory.
+> - `packages/service/src/features/pages/author/adaptor/detail-page/loader.ts` —
+>   `getAuthorPage` already fetches the author's posts, so a feed route
+>   wouldn't need a new service call.
 >
-> Caveat: grepped `apps/web` for `entities.author` and found no importers.
+> Caveat: didn't check whether `routes.ts` reserves an `authorRss` helper.
 
-Note what that does **not** do: it never names `TAuthorDetail`'s fields — it
-says where the shape lives and stops. If the orchestrator needs the fields it
-will read those two lines itself, which is cheaper than you retyping them.
+Note what that does **not** do: it never lists `getAuthorPage`'s return
+fields — it says where the shape lives and stops. If the orchestrator needs
+the fields it will read those two lines itself, which is cheaper than you
+retyping them.
 
 Rules — these are the job, not style preferences:
 
