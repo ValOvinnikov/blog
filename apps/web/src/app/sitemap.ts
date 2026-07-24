@@ -23,7 +23,10 @@ function toEntry(
     ...(lastModified ? { lastModified } : {}),
     alternates: {
       languages: Object.fromEntries(
-        routing.locales.map((locale) => [locale, `${siteUrl}${path}`]),
+        routing.locales.map((locale) => [
+          locale.toLowerCase(),
+          `${siteUrl}${path}`,
+        ]),
       ),
     },
   };
