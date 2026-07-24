@@ -50,7 +50,7 @@ export const relatedByTagsQuery = q
 export const relatedByCategoryQuery = q
   .parameters<TRelatedByCategoryParams>()
   .star.filterByType('blog_post')
-  .filterRaw('_id != $currentId && $categoryId in categories[]->_id')
+  .filterRaw('_id != $currentId && category._ref == $categoryId')
   .order('publishedAt desc')
   .slice(0, RELATED_POSTS_CATEGORY_CANDIDATE_LIMIT)
   .project(postCardFragment);

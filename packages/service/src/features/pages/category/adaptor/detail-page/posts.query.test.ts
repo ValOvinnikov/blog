@@ -5,7 +5,7 @@ import { buildCategoryPostsPageQuery } from './posts.query';
 
 function makeSparseRawPostCard() {
   return makeRawArchivePostCard({
-    categories: [makeRawCategory({ description: null })],
+    category: makeRawCategory({ description: null }),
   });
 }
 
