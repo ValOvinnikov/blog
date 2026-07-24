@@ -1,5 +1,7 @@
 # CMS Schema & Studio Restructure — Implementation Plan
 
+> **Archived — implemented.** See SPEC.md §6. Content model for current behavior.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Restructure the CMS schema and Studio per the merged #242 spec —

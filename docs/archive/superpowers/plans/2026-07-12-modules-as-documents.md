@@ -1,5 +1,7 @@
 # Modules-as-Documents Implementation Plan
 
+> **Archived — implemented.** See SPEC.md §6. Content model for current behavior.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Delegate each layer to its scoped agent (`cms → service → ui → web`) per CLAUDE.md.
 
 **Goal:** Rework the page-builder so modules are standalone reusable Sanity documents that pages reference, fetched per-module and rendered generically by type on the web layer.

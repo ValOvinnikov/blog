@@ -1,5 +1,7 @@
 # CMS Schema & Studio Restructure — Design
 
+> **Archived — implemented.** See SPEC.md §6. Content model for current behavior.
+
 **Issue:** #242 — `refactor(cms): revisit + reorganise schema structure and Studio`
 **Depends on:** #241 (content-migration tooling — merged/in review) — every `_type`
 rename or field move below ships with a migration authored via that tooling.

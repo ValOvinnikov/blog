@@ -1,5 +1,7 @@
 # Structured spec line (items + separator)
 
+> **Archived — implemented.** See SPEC.md §6. Content model for current behavior.
+
 **Date:** 2026-07-20
 **Issue:** not yet filed — spans config + cms + service, needs an epic + 3
 sub-issues per this repo's ticket-structure convention (filed after this

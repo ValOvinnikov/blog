@@ -1,5 +1,7 @@
 # Home Page Component Alignment Plan
 
+> **Archived — implemented.** See SPEC.md §1. Product summary (Home surface) for current behavior.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Align every UI component used by the Home page with the Console design spec (`design-reference/home-page-component-spec.md`) and `design-reference/design-reference.html` — adding missing atoms/molecules/organisms, fixing token/variant gaps, refactoring ThemeToggle to be pure, and updating the web layer to compose everything correctly. Post Detail components are identified but deferred.

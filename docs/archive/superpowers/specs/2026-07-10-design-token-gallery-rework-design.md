@@ -1,5 +1,7 @@
 # Design: auto-parsed Storybook design-token gallery (rework of #210)
 
+> **Archived — implemented.** See SPEC.md §packages/ui/src/lib/design-tokens (no dedicated SPEC.md section — internal design-system tooling) for current behavior.
+
 Date: 2026-07-10
 Status: Approved (design), pending implementation plan
 Supersedes the flat gallery currently on PR #215 (updates the same branch).

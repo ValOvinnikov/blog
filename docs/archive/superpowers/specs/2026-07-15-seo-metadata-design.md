@@ -1,5 +1,7 @@
 # SEO / metadata end-to-end design (#355)
 
+> **Archived — implemented.** See SPEC.md §10. SEO & accessibility for current behavior.
+
 **Date:** 2026-07-15
 **Issue:** [#355 — SEO/metadata: revisit end-to-end flow (CMS → service → web)](https://github.com/ValOvinnikov/blog/issues/355)
 **Status:** Approved design, pending implementation plan

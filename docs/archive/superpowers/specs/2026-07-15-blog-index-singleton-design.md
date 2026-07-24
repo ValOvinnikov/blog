@@ -1,5 +1,7 @@
 # Blog index page singleton (`page_blog`) — design
 
+> **Archived — implemented.** See SPEC.md §6. Content model for current behavior.
+
 - **Issue:** #341 · **Milestone:** Phase 3 — Blog core
 - **Date:** 2026-07-15
 - **Layers:** `cms → service → web` (dependency order). Additive → **no migration**.

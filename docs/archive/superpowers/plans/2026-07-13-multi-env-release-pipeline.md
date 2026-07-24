@@ -1,5 +1,7 @@
 # Multi-environment Release Pipeline Implementation Plan
 
+> **Archived — implemented.** See SPEC.md §13. Deployment topology for current behavior.
+
 > **Status: implemented & archived (2026-07).** This is a point-in-time planning
 > snapshot; the embedded workflow YAML below is an early draft and has since
 > diverged from what shipped (the dev pipeline gained `changes`/`verify`/`migrate`

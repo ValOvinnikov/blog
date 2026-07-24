@@ -1,5 +1,8 @@
 # Home Page Rollout
 
+> **Archived — implemented.** See SPEC.md §1 Product summary (Home surface)
+> for current behavior.
+
 This document is the durable reference for rolling out the Home page only. It
 keeps the Home slice separate from the later blog list, post detail, category,
 feeds, deployment, and Phase 4 page-builder work.

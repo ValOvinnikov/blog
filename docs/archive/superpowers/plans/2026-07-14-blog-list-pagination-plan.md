@@ -1,5 +1,7 @@
 # Blog List Pagination Implementation Plan
 
+> **Archived — implemented.** See SPEC.md §1. Product summary (Blog surface) for current behavior.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
 > **Repo-specific execution model:** this repo delegates layer work to the
