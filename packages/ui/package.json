@@ -55,6 +55,6 @@
     "storybook": "^8.6.18",
     "tailwindcss": "^4.3.3",
     "typescript": "catalog:",
-    "vitest": "^4.1.10"
+    "vitest": "catalog:"
   }
 }
