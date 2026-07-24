@@ -72,66 +72,6 @@ describe(`<${PostMeta.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'share' })).toBeVisible();
   });
 
-  it('omits category links when categories is not provided', () => {
-    setup();
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
-  });
-
-  it('omits category links when categories is an empty array', () => {
-    setup({ categories: [] });
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
-  });
-
-  it('renders each category as a link to its href when provided', () => {
-    const categories = [
-      {
-        label: faker.commerce.department(),
-        href: `/categories/${faker.lorem.slug()}`,
-      },
-      {
-        label: faker.commerce.department(),
-        href: `/categories/${faker.lorem.slug()}`,
-      },
-    ];
-    setup({ categories });
-    const links = screen.getAllByRole('link');
-    expect(links).toHaveLength(categories.length);
-    categories.forEach((category) => {
-      expect(
-        screen.getByRole('link', { name: category.label }),
-      ).toHaveAttribute('href', category.href);
-    });
-  });
-
-  it('renders each category as the linkAs component when provided', () => {
-    const categories = [
-      {
-        label: faker.commerce.department(),
-        href: `/categories/${faker.lorem.slug()}`,
-      },
-      {
-        label: faker.commerce.department(),
-        href: `/categories/${faker.lorem.slug()}`,
-      },
-    ];
-    const CustomLink = ({
-      href,
-      children,
-    }: {
-      href: string;
-      children?: ReactNode;
-    }) => (
-      <a href={href} data-custom-link="true">
-        {children}
-      </a>
-    );
-    setup({ categories, linkAs: CustomLink });
-    categories.forEach((category) => {
-      const link = screen.getByRole('link', { name: category.label });
-      expect(link).toHaveAttribute('data-custom-link', 'true');
-    });
-  });
-
   it('renders the author name as plain text when href is not provided', () => {
     setup();
     expect(

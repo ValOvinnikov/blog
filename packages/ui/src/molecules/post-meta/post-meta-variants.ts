@@ -15,13 +15,6 @@ export const postMetaVariants = tv({
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
     ],
-    category: [
-      'uppercase no-underline transition-colors duration-base ease-console',
-      'text-accent',
-      'hover:text-accent-hover',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
-    ],
     share: ['ml-auto'],
   },
 });

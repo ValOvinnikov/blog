@@ -24,7 +24,7 @@ const meta = {
     children: (
       <>
         <Article.Header
-          categories={[{ label: 'Engineering', href: '/category/engineering' }]}
+          category={{ label: 'Engineering', href: '/category/engineering' }}
           title={faker.lorem.sentence({ min: 4, max: 8 })}
           lead={faker.lorem.paragraph()}
           meta={{
@@ -53,7 +53,7 @@ export const WithCoverMedia: TStory = {
     children: (
       <>
         <Article.Header
-          categories={[{ label: 'Engineering', href: '/category/engineering' }]}
+          category={{ label: 'Engineering', href: '/category/engineering' }}
           title={faker.lorem.sentence({ min: 4, max: 8 })}
           lead={faker.lorem.paragraph()}
           meta={{
@@ -78,35 +78,11 @@ export const WithCoverMedia: TStory = {
   },
 };
 
-export const WithoutCategories: TStory = {
+export const WithoutCategory: TStory = {
   args: {
     children: (
       <>
         <Article.Header
-          title={faker.lorem.sentence({ min: 4, max: 8 })}
-          lead={faker.lorem.paragraph()}
-          meta={{
-            author: { name: faker.person.fullName() },
-            publishedAt,
-            formattedDate,
-          }}
-        />
-        <Article.Body>{bodyParagraphs}</Article.Body>
-      </>
-    ),
-  },
-};
-
-export const WithMultipleCategories: TStory = {
-  args: {
-    children: (
-      <>
-        <Article.Header
-          categories={[
-            { label: 'Engineering', href: '/category/engineering' },
-            { label: 'Design Systems', href: '/category/design-systems' },
-            { label: 'Tooling', href: '/category/tooling' },
-          ]}
           title={faker.lorem.sentence({ min: 4, max: 8 })}
           lead={faker.lorem.paragraph()}
           meta={{
@@ -126,7 +102,7 @@ export const WithoutLead: TStory = {
     children: (
       <>
         <Article.Header
-          categories={[{ label: 'Engineering', href: '/category/engineering' }]}
+          category={{ label: 'Engineering', href: '/category/engineering' }}
           title={faker.lorem.sentence({ min: 4, max: 8 })}
           meta={{
             author: { name: faker.person.fullName() },
@@ -145,7 +121,7 @@ export const WithoutMeta: TStory = {
     children: (
       <>
         <Article.Header
-          categories={[{ label: 'Engineering', href: '/category/engineering' }]}
+          category={{ label: 'Engineering', href: '/category/engineering' }}
           title={faker.lorem.sentence({ min: 4, max: 8 })}
           lead={faker.lorem.paragraph()}
         />
@@ -160,7 +136,7 @@ export const WithFooterTags: TStory = {
     children: (
       <>
         <Article.Header
-          categories={[{ label: 'Engineering', href: '/category/engineering' }]}
+          category={{ label: 'Engineering', href: '/category/engineering' }}
           title={faker.lorem.sentence({ min: 4, max: 8 })}
           lead={faker.lorem.paragraph()}
           meta={{
@@ -185,7 +161,7 @@ export const WithShareSlot: TStory = {
     children: (
       <>
         <Article.Header
-          categories={[{ label: 'Engineering', href: '/category/engineering' }]}
+          category={{ label: 'Engineering', href: '/category/engineering' }}
           title={faker.lorem.sentence({ min: 4, max: 8 })}
           lead={faker.lorem.paragraph()}
           meta={{

@@ -35,13 +35,13 @@ describe(`<${Article.name}/>`, () => {
     expect(screen.getByText('Post body content.')).toBeVisible();
   });
 
-  it('renders a single category as a link to its route', () => {
+  it('renders the category as an eyebrow link to its route', () => {
     renderElement(
       <Article>
         <Article.Header
           title="Building a Design System"
           meta={meta}
-          categories={[{ label: 'Engineering', href: '/category/engineering' }]}
+          category={{ label: 'Engineering', href: '/category/engineering' }}
         />
         <Article.Body>
           <p>Post body content.</p>
@@ -54,51 +54,10 @@ describe(`<${Article.name}/>`, () => {
     );
   });
 
-  it('renders multiple categories as separate links', () => {
-    renderElement(
-      <Article>
-        <Article.Header
-          title="Building a Design System"
-          meta={meta}
-          categories={[
-            { label: 'Engineering', href: '/category/engineering' },
-            { label: 'Design Systems', href: '/category/design-systems' },
-          ]}
-        />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
-      'href',
-      '/category/engineering',
-    );
-    expect(
-      screen.getByRole('link', { name: 'Design Systems' }),
-    ).toHaveAttribute('href', '/category/design-systems');
-  });
-
-  it('does not render any category links when categories is omitted', () => {
+  it('does not render a category link when category is omitted', () => {
     renderElement(
       <Article>
         <Article.Header title="Building a Design System" meta={meta} />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
-  });
-
-  it('does not render any category links when categories is an empty array', () => {
-    renderElement(
-      <Article>
-        <Article.Header
-          title="Building a Design System"
-          meta={meta}
-          categories={[]}
-        />
         <Article.Body>
           <p>Post body content.</p>
         </Article.Body>

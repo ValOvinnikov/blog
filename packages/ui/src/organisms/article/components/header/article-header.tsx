@@ -3,10 +3,9 @@ import type { TAnchorElementType } from '@blog/config/react';
 import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
 import { MediaFrame } from '@blog/ui/atoms/media-frame';
-import { MetaSeparator } from '@blog/ui/atoms/meta-separator';
 import { Text } from '@blog/ui/atoms/text';
 import { PostMeta, type IPostMetaProps } from '@blog/ui/molecules/post-meta';
-import { type ComponentPropsWithoutRef, type ReactNode, Fragment } from 'react';
+import { type ComponentPropsWithoutRef, type ReactNode } from 'react';
 
 import { articleHeaderVariants } from './article-header-variants';
 
@@ -17,9 +16,9 @@ export interface IArticleHeaderCategory {
 
 export interface IArticleHeaderProps
   extends Omit<ComponentPropsWithoutRef<'header'>, 'title'>, IWithDataTestId {
-  /** Post categories, rendered as inline eyebrow links separated by a middot. Omit or pass an empty array to render no eyebrow. */
-  categories?: IArticleHeaderCategory[];
-  /** Component the category links render as — pass the app router's Link for client-side navigation. */
+  /** Post's category, rendered as an eyebrow link above the title. Omit to render no eyebrow. */
+  category?: IArticleHeaderCategory;
+  /** Component the category link renders as — pass the app router's Link for client-side navigation. */
   linkAs?: TAnchorElementType;
   title: string;
   /** Lead paragraph rendered below the metadata strip. Omit to render no lead. */
@@ -31,11 +30,11 @@ export interface IArticleHeaderProps
 }
 
 /**
- * Article.Header — post detail heading area: category eyebrow links, title,
+ * Article.Header — post detail heading area: category eyebrow, title,
  * metadata strip, lead paragraph, and an optional cover media slot.
  */
 export const ArticleHeader = ({
-  categories,
+  category,
   linkAs,
   title,
   lead,
@@ -53,16 +52,11 @@ export const ArticleHeader = ({
       data-testid={dataTestId}
       {...rest}
     >
-      {categories && categories.length > 0 && (
+      {category && (
         <div className={s.categories()}>
-          {categories.map((category, index) => (
-            <Fragment key={category.href}>
-              {index > 0 && <MetaSeparator />}
-              <Eyebrow href={category.href} linkAs={linkAs}>
-                {category.label}
-              </Eyebrow>
-            </Fragment>
-          ))}
+          <Eyebrow href={category.href} linkAs={linkAs}>
+            {category.label}
+          </Eyebrow>
         </div>
       )}
       <Heading level={1} visual="post" className={s.title()}>

@@ -13,7 +13,7 @@ const makePost = (): IPostCardData => ({
   excerpt: faker.lorem.paragraph(),
   publishedAt: faker.date.past().toISOString(),
   formattedDate: faker.date.past().toLocaleDateString(),
-  categories: [{ title: faker.lorem.word() }],
+  category: { title: faker.lorem.word() },
 });
 
 const posts = faker.helpers.multiple(makePost, { count: 3 });

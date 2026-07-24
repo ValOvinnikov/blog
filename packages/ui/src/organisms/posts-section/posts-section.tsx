@@ -17,7 +17,7 @@ export interface IPostCardData {
   publishedAt: string;
   formattedDate: string;
   readingTime?: string;
-  categories: IPostCardCategoryData[];
+  category: IPostCardCategoryData;
 }
 
 export interface IPostsSectionProps extends IWithDataTestId {
@@ -71,7 +71,7 @@ export const PostsSection = ({
                 dateValue={post.publishedAt}
                 dateLabel={post.formattedDate}
                 readingTime={post.readingTime}
-                category={post.categories[0]?.title ?? ''}
+                category={post.category.title}
               />
               <PostCard.Title>
                 <Component href={post.href} className={s.titleLink()}>
