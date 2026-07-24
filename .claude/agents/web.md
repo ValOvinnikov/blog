@@ -120,7 +120,7 @@ When invoked, before writing any code:
   — shared `generateMetadata` helpers, one folder per builder, co-located test.
 - **Helper functions** (slot builders, data transformers, formatters) live in
   `src/utils/`. One file per function or closely related group, named after its
-  purpose: `format-date.ts`, `hero-slots.ts`, `card-slots.ts`.
+  purpose: `to-post-list-items.ts`, `hero-slots.ts`, `card-slots.ts`.
 - **Extract at the second repetition.** A slot-builder or composition pattern
   used by two routes becomes a `src/utils/` helper — never copy-paste a third.
   Discriminators (`_type` names, stored enum values) come from `@blog/config`
