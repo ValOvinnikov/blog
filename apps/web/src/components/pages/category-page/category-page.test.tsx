@@ -255,6 +255,8 @@ describe(`<${CategoryPage.name}/>`, () => {
     ).toBeVisible();
     const nextLink = screen.getByRole('link', { name: 'Next' });
     expect(nextLink).toHaveAttribute('href', '/category/news/page/3');
+    const previousLink = screen.getByRole('link', { name: 'Previous' });
+    expect(previousLink).toHaveAttribute('href', '/category/news');
   });
 
   it('calls notFound() when the requested page is beyond totalPages', async () => {

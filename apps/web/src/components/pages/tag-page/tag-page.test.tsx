@@ -211,6 +211,8 @@ describe(`<${TagPage.name}/>`, () => {
     expect(screen.getByRole('navigation', { name: 'Tag pages' })).toBeVisible();
     const nextLink = screen.getByRole('link', { name: 'Next' });
     expect(nextLink).toHaveAttribute('href', '/tag/typescript/page/3');
+    const previousLink = screen.getByRole('link', { name: 'Previous' });
+    expect(previousLink).toHaveAttribute('href', '/tag/typescript');
   });
 
   it('calls notFound() when the requested page is beyond totalPages', async () => {

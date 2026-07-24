@@ -10,6 +10,7 @@ import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 import { authorPageVariants } from './author-page-variants';
 
@@ -29,10 +30,13 @@ const s = authorPageVariants();
  * pagination metadata as any other page.
  */
 export async function AuthorPage({ slug, locale, page }: TAuthorPageProps) {
-  const result = await service.entities.author.v1.getAuthorPage(slug, {
-    page,
-    itemsPerPage: AUTHOR_ITEMS_PER_PAGE,
-  });
+  const [result, t] = await Promise.all([
+    service.entities.author.v1.getAuthorPage(slug, {
+      page,
+      itemsPerPage: AUTHOR_ITEMS_PER_PAGE,
+    }),
+    getTranslations('pagination'),
+  ]);
 
   if (!result.ok) {
     console.error(`Error to fetch author page: ${result.error}`);
@@ -95,9 +99,9 @@ export async function AuthorPage({ slug, locale, page }: TAuthorPageProps) {
           currentPage={currentPage}
           totalPages={totalPages}
           createHref={(pageNumber) => routes.author(slug, pageNumber)}
-          ariaLabel="Author pages"
-          previousLabel="Previous"
-          nextLabel="Next"
+          ariaLabel={t('ariaLabel', { pageType: 'Author' })}
+          previousLabel={t('previous')}
+          nextLabel={t('next')}
           linkAs={Link}
         />
       }
