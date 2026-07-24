@@ -8,7 +8,7 @@ const { getAuthorPageMock } = vi.hoisted(() => ({
 
 vi.mock('@blog/service', () => ({
   service: {
-    entities: {
+    pages: {
       author: { v1: { getAuthorPage: getAuthorPageMock } },
     },
   },

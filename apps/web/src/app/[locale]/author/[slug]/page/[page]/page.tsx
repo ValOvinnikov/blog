@@ -20,7 +20,7 @@ type TProps = {
 // `AuthorPage`, not on this list.
 export async function generateStaticParams() {
   try {
-    return await service.entities.author.v1.getAuthorPaginationParams(
+    return await service.pages.author.v1.getAuthorPaginationParams(
       AUTHOR_ITEMS_PER_PAGE,
     );
   } catch (error) {

@@ -40,8 +40,6 @@ vi.mock('@blog/service', () => ({
       },
       blog: { v1: { getIndexPageParams: getIndexPageParamsMock } },
       generic: { v1: { getPageSlugs: getPageSlugsMock } },
-    },
-    entities: {
       author: {
         v1: {
           getAuthorParams: getAuthorParamsMock,

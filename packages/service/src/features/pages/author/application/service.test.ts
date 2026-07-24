@@ -1,18 +1,13 @@
-import { getAuthorPage } from '@blog/service/features/entities/author/adaptor/page/loader';
-import type { TAuthorPage } from '@blog/service/features/entities/author/adaptor/page/types';
+import { getAuthorPage } from '@blog/service/features/pages/author/adaptor/detail-page/loader';
+import type { TAuthorPage } from '@blog/service/features/pages/author/adaptor/detail-page/types';
 
 import { createAuthorService } from './service';
 
-vi.mock('@blog/service/features/entities/author/adaptor/page/loader');
+vi.mock('@blog/service/features/pages/author/adaptor/detail-page/loader');
 
 const mockGetAuthorPage = vi.mocked(getAuthorPage);
 
 describe('createAuthorService', () => {
-  it('exposes v1.getAuthor as a function', () => {
-    const svc = createAuthorService();
-    expect(typeof svc.v1.getAuthor).toBe('function');
-  });
-
   it('exposes v1.getAuthorPage as a function', () => {
     const svc = createAuthorService();
     expect(typeof svc.v1.getAuthorPage).toBe('function');
@@ -21,11 +16,6 @@ describe('createAuthorService', () => {
   it('exposes v1.getAuthorParams as a function', () => {
     const svc = createAuthorService();
     expect(typeof svc.v1.getAuthorParams).toBe('function');
-  });
-
-  it('exposes v1.getAuthorPosts as a function', () => {
-    const svc = createAuthorService();
-    expect(typeof svc.v1.getAuthorPosts).toBe('function');
   });
 
   it('exposes v1.getAuthorPaginationParams as a function', () => {

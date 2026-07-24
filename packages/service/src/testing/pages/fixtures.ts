@@ -1,7 +1,7 @@
 import type { TRawBlogPage } from '@blog/service/features/pages/blog/adaptor/index-page/transformer';
-import type { TRawGenericPage } from '@blog/service/features/pages/generic/adaptor/transformer';
+import type { TRawGenericPage } from '@blog/service/features/pages/generic/adaptor/detail-page/transformer';
 import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
-import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail/transformer';
+import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
 import type { TRawTagPageTag } from '@blog/service/features/pages/tag/adaptor/detail-page/transformer';
 import type { TRawArchivePostCard } from '@blog/service/shared/transformers/to-archive-post-card';
 import type { TRawPostCard } from '@blog/service/shared/transformers/to-post-card';
