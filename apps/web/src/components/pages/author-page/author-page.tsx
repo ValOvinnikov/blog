@@ -29,7 +29,7 @@ const s = authorPageVariants();
  * `PostsSection`. `getAuthorPage` always windows — page 1 gets the same
  * pagination metadata as any other page.
  */
-export async function AuthorPage({ slug, locale, page }: TAuthorPageProps) {
+export async function AuthorPage({ slug, page }: TAuthorPageProps) {
   const [result, t] = await Promise.all([
     service.entities.author.v1.getAuthorPage(slug, {
       page,
@@ -54,7 +54,7 @@ export async function AuthorPage({ slug, locale, page }: TAuthorPageProps) {
     notFound();
   }
 
-  const items = toPostListItems(posts, locale);
+  const items = await toPostListItems(posts);
 
   return (
     <BlogPageTemplate

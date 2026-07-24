@@ -19,7 +19,7 @@ type TCategoryPageProps = ILocalizedParams & { slug: string; page?: number };
  * organisms as `BlogListPage`. `getCategoryPage` always windows — page 1
  * gets the same pagination metadata as any other page.
  */
-export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
+export async function CategoryPage({ slug, page }: TCategoryPageProps) {
   const [result, categories, t] = await Promise.all([
     service.pages.category.v1.getCategoryPage(slug, {
       page,
@@ -45,7 +45,7 @@ export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
     notFound();
   }
 
-  const items = toPostListItems(posts, locale);
+  const items = await toPostListItems(posts);
 
   return (
     <BlogPageTemplate

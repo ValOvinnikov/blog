@@ -9,10 +9,10 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
 import { buildShareLinks } from '@web/utils/build-share-links';
 import { env } from '@web/utils/env/env';
-import { formatDate } from '@web/utils/format-date';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { ExternalLink } from 'lucide-react';
 import { notFound } from 'next/navigation';
+import { getFormatter } from 'next-intl/server';
 
 import { blogPostPageVariants } from './blog-post-page-variants';
 
@@ -30,7 +30,7 @@ const s = blogPostPageVariants();
  * a "Related posts" `PostsSection` after the article. `Header`/`Footer`
  * (site chrome) stay owned by `[locale]/layout.tsx`.
  */
-export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
+export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   const post = await service.pages.post.v1.getPost(slug);
 
   if (!post) {
@@ -59,7 +59,8 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
     icon: <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />,
   }));
   const primaryCategory = categories[0];
-  const relatedPostItems = toPostListItems(relatedPosts, locale);
+  const format = await getFormatter();
+  const relatedPostItems = await toPostListItems(relatedPosts);
 
   return (
     <main className={s.root()}>
@@ -83,7 +84,11 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
           meta={{
             author: { ...author, href: routes.author(author.slug) },
             publishedAt,
-            formattedDate: formatDate(publishedAt, locale),
+            formattedDate: format.dateTime(new Date(publishedAt), {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            }),
             readingTimeMinutes,
             categories: categories.slice(1).map((category) => ({
               label: category.title,

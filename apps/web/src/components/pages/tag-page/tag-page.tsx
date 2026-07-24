@@ -17,7 +17,7 @@ type TTagPageProps = ILocalizedParams & { slug: string; page?: number };
  * `CategoryPage`. `getTagPage` always windows — page 1 gets the same
  * pagination metadata as any other page.
  */
-export async function TagPage({ slug, locale, page }: TTagPageProps) {
+export async function TagPage({ slug, page }: TTagPageProps) {
   const [result, t] = await Promise.all([
     service.pages.tag.v1.getTagPage(slug, {
       page,
@@ -42,7 +42,7 @@ export async function TagPage({ slug, locale, page }: TTagPageProps) {
     notFound();
   }
 
-  const items = toPostListItems(posts, locale);
+  const items = await toPostListItems(posts);
 
   return (
     <BlogPageTemplate

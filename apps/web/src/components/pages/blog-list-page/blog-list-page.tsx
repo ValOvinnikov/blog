@@ -16,7 +16,7 @@ type TBlogListPageProps = ILocalizedParams & { page: number };
  * `/blog/page/[page]` (pages ≥ 2): fetches one page window via the blog
  * service and renders it through the pure ui organisms.
  */
-export async function BlogListPage({ page, locale }: TBlogListPageProps) {
+export async function BlogListPage({ page }: TBlogListPageProps) {
   const [result, categories, t] = await Promise.all([
     service.pages.blog.v1.getIndexPage({ page }),
     getCategoriesSafely(),
@@ -37,7 +37,7 @@ export async function BlogListPage({ page, locale }: TBlogListPageProps) {
     notFound();
   }
 
-  const items = toPostListItems(posts, locale);
+  const items = await toPostListItems(posts);
 
   return (
     <BlogPageTemplate

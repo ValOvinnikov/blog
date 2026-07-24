@@ -83,6 +83,14 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(screen.getByText('4 min read')).toBeVisible();
   });
 
+  it('renders the published date formatted via next-intl (year/month/day)', async () => {
+    getPostMock.mockResolvedValue(mockPostDetail);
+
+    await setup();
+
+    expect(screen.getByText('January 15, 2026')).toBeVisible();
+  });
+
   it('links the author name to routes.author(slug)', async () => {
     getPostMock.mockResolvedValue(mockPostDetail);
 

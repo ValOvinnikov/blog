@@ -56,6 +56,10 @@ const interpolate = (template: string, values?: TTranslationValues): string =>
 // stand-in that resolves real strings from `i18n/messages/en.json` (so a
 // test catches a missing/renamed key) and performs `{param}` interpolation —
 // component tests then assert on the actual rendered copy instead of a fake.
+// `getFormatter` is stubbed the same way for `dateTime`: it delegates to the
+// real `Intl.DateTimeFormat` (via `toLocaleDateString`) under the `en` locale
+// that `i18n/messages/en.json` represents, so tests assert the real rendered
+// date string instead of a fake.
 vi.mock('next-intl/server', () => ({
   setRequestLocale: vi.fn(),
   getTranslations: vi.fn(async (arg?: TGetTranslationsArg) => {
@@ -70,6 +74,10 @@ vi.mock('next-intl/server', () => ({
       return interpolate(template, values);
     };
   }),
+  getFormatter: vi.fn(async () => ({
+    dateTime: (date: Date, options?: Intl.DateTimeFormatOptions) =>
+      date.toLocaleDateString('en', options),
+  })),
 }));
 
 // `next/navigation`'s `notFound()` must keep throwing so components short-

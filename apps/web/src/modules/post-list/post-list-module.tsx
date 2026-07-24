@@ -12,14 +12,14 @@ export interface IPostListModuleProps {
  * PostListModule — fetches `module_postList` data and renders it through the
  * `PostsSection` organism. The only place this module's service and ui meet.
  */
-export async function PostListModule({ id, locale }: IPostListModuleProps) {
+export async function PostListModule({ id }: IPostListModuleProps) {
   const result = await service.modules.postList.v1.getPostList(id);
 
   if (!result.ok) return null;
 
   const { title, posts } = result.data;
 
-  const items = toPostListItems(posts, locale);
+  const items = await toPostListItems(posts);
 
   return (
     <PostsSection
