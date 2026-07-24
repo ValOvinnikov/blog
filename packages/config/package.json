@@ -22,7 +22,7 @@
     "@blog/vitest-config": "workspace:*",
     "@types/react": "^19.0.0",
     "eslint": "catalog:",
-    "prettier": "^3.9.5",
+    "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
