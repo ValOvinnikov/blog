@@ -45,6 +45,7 @@ const basePost: TPostDetail = {
   categories: [],
   tags: [],
   relatedPosts: [],
+  readingTimeMinutes: 4,
 };
 
 describe('buildPostMetadata', () => {

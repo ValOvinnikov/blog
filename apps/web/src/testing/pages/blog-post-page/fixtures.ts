@@ -51,4 +51,5 @@ export const mockPostDetail: TPostDetail = {
   ],
   tags: [],
   relatedPosts: [],
+  readingTimeMinutes: 4,
 };

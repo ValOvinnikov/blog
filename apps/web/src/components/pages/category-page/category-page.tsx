@@ -50,6 +50,7 @@ export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
     excerpt: post.excerpt,
     publishedAt: post.publishedAt,
     formattedDate: formatDate(post.publishedAt, locale),
+    readingTime: `${post.readingTimeMinutes} min`,
     categories: post.categories,
   }));
 

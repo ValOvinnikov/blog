@@ -6,6 +6,7 @@ import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toSocialLink } from '@blog/service/shared/transformers/to-social-link';
 import { toTag } from '@blog/service/shared/transformers/to-tag';
+import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferResultType } from 'groqd';
 
 import type { postDetailQuery } from './query';
@@ -57,5 +58,6 @@ export function toPostDetail(
     categories: raw.categories.map(toCategory),
     tags: (raw.tags ?? []).map(toTag),
     relatedPosts,
+    readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };
 }

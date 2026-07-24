@@ -75,6 +75,14 @@ describe(`<${BlogPostPage.name}/>`, () => {
     ).toBeVisible();
   });
 
+  it('renders the reading time in the post meta strip', async () => {
+    getPostMock.mockResolvedValue(mockPostDetail);
+
+    await setup();
+
+    expect(screen.getByText('4 min read')).toBeVisible();
+  });
+
   it('links the author name to routes.author(slug)', async () => {
     getPostMock.mockResolvedValue(mockPostDetail);
 

@@ -59,6 +59,7 @@ export function makeRawArchivePostCard(
         description: 'Engineering posts',
       },
     ],
+    wordCount: 400,
     ...overrides,
   };
 }
@@ -95,6 +96,7 @@ export function makeRawPostDetail(
       },
     ],
     tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
+    wordCount: 400,
     ...overrides,
   };
 }

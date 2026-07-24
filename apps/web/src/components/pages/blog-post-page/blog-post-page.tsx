@@ -47,6 +47,7 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
     heroImageAlt,
     publishedAt,
     author,
+    readingTimeMinutes,
   } = post;
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
@@ -81,6 +82,7 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
             author: { ...author, href: routes.author(author.slug) },
             publishedAt,
             formattedDate: formatDate(publishedAt, locale),
+            readingTimeMinutes,
             categories: categories.slice(1).map((category) => ({
               label: category.title,
               href: routes.category(category.slug),
