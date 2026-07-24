@@ -24,8 +24,9 @@ has been updated to describe the final shape:
   implemented, per project decision).
 - `2026-07-12-reading-depth-design.md` / `2026-07-12-reading-depth-plan.md` —
   approved design, not yet implemented.
-- `2026-07-24-single-category-per-post-design.md` /
-  `2026-07-24-single-category-per-post.md` — epic #809, in progress.
+
+(This list reflects what's active as of this PR — check the directory listing
+for anything landed since.)
 
 ## Archived design docs (shipped — historical only)
 

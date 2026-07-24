@@ -27,9 +27,9 @@ type TSeoResolved = {
 };
 ```
 
-> Contract defined in `docs/superpowers/specs/2026-07-15-seo-metadata-design.md`
-> (#355). Until that refactor lands, home/blog routes still show the legacy
-> hand-rolled pattern — do not copy it into new code.
+> Contract defined in
+> `docs/archive/superpowers/specs/2026-07-15-seo-metadata-design.md` (#355,
+> shipped — current shape documented in `SPEC.md` §10).
 
 ## Per-route metadata
 

@@ -35,7 +35,7 @@ category cap was narrowed to a single required reference in #809 on
 2026-07-24 (see §6 Content model).
 
 **Routing conventions** (decided 2026-07-14 — full rationale in
-`docs/superpowers/specs/2026-07-14-blog-list-pagination-design.md`):
+`docs/archive/superpowers/specs/2026-07-14-blog-list-pagination-design.md`):
 
 - **One route-builder** — `routes` in `@blog/config` is the single source of
   URL truth (`routes.post(slug)`, `routes.blogIndex(page?)`, …). No inline
