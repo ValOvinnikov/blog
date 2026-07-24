@@ -1,4 +1,4 @@
-import { routes, type ILocalizedParams } from '@blog/config';
+import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
@@ -9,14 +9,14 @@ import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
-type TBlogListPageProps = ILocalizedParams & { page: number };
+type TBlogListPageProps = { page: number };
 
 /**
  * BlogListPage — shared composition for `/blog` (page 1) and
  * `/blog/page/[page]` (pages ≥ 2): fetches one page window via the blog
  * service and renders it through the pure ui organisms.
  */
-export async function BlogListPage({ page, locale }: TBlogListPageProps) {
+export async function BlogListPage({ page }: TBlogListPageProps) {
   const [result, categories, t] = await Promise.all([
     service.pages.blog.v1.getIndexPage({ page }),
     getCategoriesSafely(),
@@ -37,7 +37,7 @@ export async function BlogListPage({ page, locale }: TBlogListPageProps) {
     notFound();
   }
 
-  const items = toPostListItems(posts, locale);
+  const items = await toPostListItems(posts);
 
   return (
     <BlogPageTemplate

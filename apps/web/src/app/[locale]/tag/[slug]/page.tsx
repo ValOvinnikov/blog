@@ -30,5 +30,5 @@ export default async function TagDetailPage({ params }: TProps) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  return <TagPage slug={slug} locale={locale} />;
+  return <TagPage slug={slug} />;
 }

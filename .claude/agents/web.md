@@ -120,7 +120,7 @@ When invoked, before writing any code:
   — shared `generateMetadata` helpers, one folder per builder, co-located test.
 - **Helper functions** (slot builders, data transformers, formatters) live in
   `src/utils/`. One file per function or closely related group, named after its
-  purpose: `format-date.ts`, `hero-slots.ts`, `card-slots.ts`.
+  purpose: `to-post-list-items.ts`, `hero-slots.ts`, `card-slots.ts`.
 - **Extract at the second repetition.** A slot-builder or composition pattern
   used by two routes becomes a `src/utils/` helper — never copy-paste a third.
   Discriminators (`_type` names, stored enum values) come from `@blog/config`
@@ -215,7 +215,10 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
   rendering.
 - **`generateStaticParams`** must be exported from `[locale]/layout.tsx`:
   `return routing.locales.map((locale) => ({ locale }))`.
-- Thread `locale` down to any formatting helpers (`formatDate`, `Intl.*`).
+- Date/number formatting uses next-intl's `useFormatter`/`getFormatter`
+  (`format.dateTime(...)`), which reads locale automatically from the
+  per-request config set up in `i18n/request.ts` — no `locale` argument needs
+  threading down to formatting call sites.
 - **ESLint exception**: `src/app/` is excluded from the `check-file`
   folder-naming rule (see `apps/web/eslint.config.js`) because Next.js uses
   `[dynamic]` and `(group)` folder conventions there.

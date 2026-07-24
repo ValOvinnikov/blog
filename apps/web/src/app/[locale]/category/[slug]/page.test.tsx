@@ -16,10 +16,8 @@ vi.mock('@blog/service', () => ({
 }));
 
 vi.mock('@web/components/pages/category-page', () => ({
-  CategoryPage: ({ slug, locale }: { slug: string; locale: string }) => (
-    <div data-testid="category-page">
-      {slug}-{locale}
-    </div>
+  CategoryPage: ({ slug }: { slug: string }) => (
+    <div data-testid="category-page">{slug}</div>
   ),
 }));
 
@@ -61,12 +59,11 @@ describe('CategoryDetailPage', () => {
     });
   });
 
-  it('renders CategoryPage with the resolved locale and slug', async () => {
+  it('renders CategoryPage with the resolved slug', async () => {
     const ui = await CategoryDetailPage({
       params: Promise.resolve({ locale: 'EN', slug: 'engineering' }),
     });
 
     expect(ui.props.slug).toBe('engineering');
-    expect(ui.props.locale).toBe('EN');
   });
 });

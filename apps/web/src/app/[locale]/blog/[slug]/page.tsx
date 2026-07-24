@@ -35,5 +35,5 @@ export default async function BlogPostSlugPage({ params }: TProps) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  return <BlogPostPage slug={slug} locale={locale} />;
+  return <BlogPostPage slug={slug} />;
 }

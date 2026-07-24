@@ -1,4 +1,4 @@
-import { Size, type ILocalizedParams, routes } from '@blog/config';
+import { Size, routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Avatar, Eyebrow } from '@blog/ui/atoms';
 import { ActionList, ShareLink } from '@blog/ui/molecules';
@@ -14,7 +14,7 @@ import { getTranslations } from 'next-intl/server';
 
 import { authorPageVariants } from './author-page-variants';
 
-type TAuthorPageProps = ILocalizedParams & { slug: string; page?: number };
+type TAuthorPageProps = { slug: string; page?: number };
 
 const s = authorPageVariants();
 
@@ -29,7 +29,7 @@ const s = authorPageVariants();
  * `PostsSection`. `getAuthorPage` always windows — page 1 gets the same
  * pagination metadata as any other page.
  */
-export async function AuthorPage({ slug, locale, page }: TAuthorPageProps) {
+export async function AuthorPage({ slug, page }: TAuthorPageProps) {
   const [result, t] = await Promise.all([
     service.entities.author.v1.getAuthorPage(slug, {
       page,
@@ -54,7 +54,7 @@ export async function AuthorPage({ slug, locale, page }: TAuthorPageProps) {
     notFound();
   }
 
-  const items = toPostListItems(posts, locale);
+  const items = await toPostListItems(posts);
 
   return (
     <BlogPageTemplate

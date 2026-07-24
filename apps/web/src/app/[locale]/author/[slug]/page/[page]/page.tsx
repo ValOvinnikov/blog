@@ -52,5 +52,5 @@ export default async function AuthorNumberedPage({ params }: TProps) {
     permanentRedirect({ href: routes.author(slug, 1), locale });
   }
 
-  return <AuthorPage slug={slug} page={page} locale={locale} />;
+  return <AuthorPage slug={slug} page={page} />;
 }

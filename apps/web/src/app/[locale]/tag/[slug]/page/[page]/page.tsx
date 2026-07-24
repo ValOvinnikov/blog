@@ -52,5 +52,5 @@ export default async function TagNumberedPage({ params }: TProps) {
     permanentRedirect({ href: routes.tag(slug, 1), locale });
   }
 
-  return <TagPage slug={slug} page={page} locale={locale} />;
+  return <TagPage slug={slug} page={page} />;
 }
