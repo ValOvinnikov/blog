@@ -11,7 +11,12 @@ import { env } from '@web/utils/env/env';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
+import {
+  getMessages,
+  getNow,
+  getTimeZone,
+  setRequestLocale,
+} from 'next-intl/server';
 
 import { localeLayoutVariants } from './layout-variants';
 
@@ -61,11 +66,15 @@ export default async function LocaleLayout({ children, params }: TProps) {
 
   setRequestLocale(locale);
 
-  const [settingsResult, navResult, footerResult] = await Promise.all([
-    service.global.siteSettings.v1.getSiteSettings(),
-    service.global.navigation.v1.getNavigation(),
-    service.global.footer.v1.getFooter(),
-  ]);
+  const [settingsResult, navResult, footerResult, messages, now, timeZone] =
+    await Promise.all([
+      service.global.siteSettings.v1.getSiteSettings(),
+      service.global.navigation.v1.getNavigation(),
+      service.global.footer.v1.getFooter(),
+      getMessages(),
+      getNow(),
+      getTimeZone(),
+    ]);
 
   if (!settingsResult.ok) {
     console.error(`Error to fetch site settings: ${settingsResult.error}`);
@@ -78,15 +87,21 @@ export default async function LocaleLayout({ children, params }: TProps) {
   const s = localeLayoutVariants();
 
   return (
-    // `locale` is passed explicitly (not inherited) so the page stays
-    // statically rendered; `messages={null}` — this app localizes routing
-    // only, it ships no translation messages. Client components that read
-    // the locale (next-intl navigation `Link` in the post-list module)
-    // need this provider or they throw "No intl context found".
-
-    // TODO: revisit this config (pass real messages, re-check static
-    // rendering) when translation messages are introduced.
-    <NextIntlClientProvider locale={locale} messages={null}>
+    // `locale`, `now`, and `timeZone` are passed explicitly (not inherited)
+    // so the page stays statically rendered — `setRequestLocale` above
+    // already resolves them from the static param rather than a dynamic
+    // API, but passing them here skips the provider's own implicit
+    // resolution. `messages` comes from `getMessages()`, which reads the
+    // per-locale `messages/*.json` file wired in `i18n/request.ts`. Client
+    // components that read the locale (next-intl navigation `Link` in the
+    // post-list module) need this provider or they throw "No intl context
+    // found".
+    <NextIntlClientProvider
+      locale={locale}
+      messages={messages}
+      now={now}
+      timeZone={timeZone}
+    >
       {/* `root` is the sticky-footer shell: `min-h-dvh flex-col` so short
           pages still fill the viewport, `content` is `flex-1` so it grows to
           push `Footer` to the bottom on short pages and yields naturally
