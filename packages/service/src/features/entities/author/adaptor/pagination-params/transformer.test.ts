@@ -5,8 +5,8 @@ describe('toAuthorPaginationParams', () => {
     expect(
       toAuthorPaginationParams(
         [
-          { slug: 'jane-doe', total: 20 },
-          { slug: 'john-smith', total: 9 },
+          { slug: 'jane-doe', postCount: 20 },
+          { slug: 'john-smith', postCount: 9 },
         ],
         9,
       ),
@@ -18,13 +18,13 @@ describe('toAuthorPaginationParams', () => {
 
   it('contributes no entries for an author with zero posts', () => {
     expect(
-      toAuthorPaginationParams([{ slug: 'empty-author', total: 0 }], 9),
+      toAuthorPaginationParams([{ slug: 'empty-author', postCount: 0 }], 9),
     ).toEqual([]);
   });
 
   it('contributes no entries for an author that fits on one page', () => {
     expect(
-      toAuthorPaginationParams([{ slug: 'jane-doe', total: 5 }], 9),
+      toAuthorPaginationParams([{ slug: 'jane-doe', postCount: 5 }], 9),
     ).toEqual([]);
   });
 

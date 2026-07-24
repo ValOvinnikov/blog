@@ -9,10 +9,10 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 
 describe('getCategoryPaginationParams', () => {
   it('returns { slug, page } entries for pages 2..N per category', async () => {
-    mockRun
-      .mockResolvedValueOnce([{ slug: 'engineering' }, { slug: 'design' }])
-      .mockResolvedValueOnce({ posts: [], total: 20 })
-      .mockResolvedValueOnce({ posts: [], total: 9 });
+    mockRun.mockResolvedValueOnce([
+      { slug: 'engineering', postCount: 20 },
+      { slug: 'design', postCount: 9 },
+    ]);
 
     const params = await getCategoryPaginationParams(9);
 
@@ -31,9 +31,7 @@ describe('getCategoryPaginationParams', () => {
   });
 
   it('returns an empty array when every category fits on one page', async () => {
-    mockRun
-      .mockResolvedValueOnce([{ slug: 'engineering' }])
-      .mockResolvedValueOnce({ posts: [], total: 0 });
+    mockRun.mockResolvedValueOnce([{ slug: 'engineering', postCount: 0 }]);
 
     const params = await getCategoryPaginationParams(9);
 

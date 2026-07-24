@@ -9,10 +9,10 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 
 describe('getTagPaginationParams', () => {
   it('returns { slug, page } entries for pages 2..N per tag', async () => {
-    mockRun
-      .mockResolvedValueOnce([{ slug: 'typescript' }, { slug: 'react' }])
-      .mockResolvedValueOnce({ posts: [], total: 20 })
-      .mockResolvedValueOnce({ posts: [], total: 9 });
+    mockRun.mockResolvedValueOnce([
+      { slug: 'typescript', postCount: 20 },
+      { slug: 'react', postCount: 9 },
+    ]);
 
     const params = await getTagPaginationParams(9);
 
@@ -31,9 +31,7 @@ describe('getTagPaginationParams', () => {
   });
 
   it('returns an empty array when every tag fits on one page', async () => {
-    mockRun
-      .mockResolvedValueOnce([{ slug: 'typescript' }])
-      .mockResolvedValueOnce({ posts: [], total: 0 });
+    mockRun.mockResolvedValueOnce([{ slug: 'typescript', postCount: 0 }]);
 
     const params = await getTagPaginationParams(9);
 
