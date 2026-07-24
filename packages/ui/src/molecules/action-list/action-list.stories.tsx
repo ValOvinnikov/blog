@@ -1,6 +1,6 @@
 import { NavLink } from '@blog/ui/atoms/nav-link/nav-link';
 import { faker } from '@faker-js/faker';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { ActionList } from './action-list';
 

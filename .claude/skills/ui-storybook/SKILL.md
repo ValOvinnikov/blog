@@ -9,7 +9,17 @@ description: >-
 
 # Storybook in `@blog/ui`
 
-Storybook v8 with `@storybook/react-vite`. Runs on port **6006**.
+Storybook v10 with `@storybook/react-vite`. Runs on port **6006**.
+
+Storybook 10 folded most of `@storybook/addon-essentials`' functionality
+(controls, interactions, actions, viewport) into core — no addon needed for
+any of those. The one piece that didn't move to core is docs:
+`@storybook/addon-docs` is an explicit `addons` entry in `.storybook/main.ts`,
+required for the `tags: ['autodocs']` convention below to work.
+`@storybook/addon-themes` stays, for the light/dark toolbar toggle.
+`Meta`/`StoryObj`/`Preview`/`ReactRenderer` types come from
+`@storybook/react-vite` (the framework package), not `@storybook/react` —
+Storybook 10 moved to framework-based type imports.
 
 ```
 pnpm --filter @blog/ui storybook        # dev server
@@ -37,7 +47,7 @@ The glob `../src/**/*.stories.@(ts|tsx)` picks them up automatically.
 Always use [Component Story Format 3](https://storybook.js.org/docs/writing-stories).
 
 ```tsx
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button } from './button';
 
 const meta = {
@@ -222,12 +232,12 @@ the toggle.
 
 Global responsive breakpoint presets (phone/tablet/desktop, matching this
 repo's real Tailwind breakpoints) live in `.storybook/preview.ts`'s
-`parameters.viewport` config, wired via `@storybook/addon-viewport` (bundled
-in `@storybook/addon-essentials`). The toolbar viewport picker uses these
-presets for **every** story automatically — **never redefine a custom
-viewport object or add a per-story `parameters.viewport` override in an
-individual story file.** Anyone can switch viewports interactively from the
-toolbar; a story doesn't need a dedicated export per breakpoint.
+`parameters.viewport` config — viewport is a core Storybook 10 feature, no
+addon install needed. The toolbar viewport picker uses these presets for
+**every** story automatically — **never redefine a custom viewport object or
+add a per-story `parameters.viewport` override in an individual story file.**
+Anyone can switch viewports interactively from the toolbar; a story doesn't
+need a dedicated export per breakpoint.
 
 ## MDX documentation pages
 
@@ -235,7 +245,7 @@ For complex components, add a `{component}.mdx` file alongside stories to write
 long-form docs:
 
 ```mdx
-import { Canvas, Controls, Meta } from '@storybook/blocks';
+import { Canvas, Controls, Meta } from '@storybook/addon-docs/blocks';
 import * as ButtonStories from './button.stories';
 
 <Meta of={ButtonStories} />

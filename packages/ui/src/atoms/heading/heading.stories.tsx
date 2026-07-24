@@ -1,6 +1,6 @@
 import { Size } from '@blog/config';
 import { objectKeys } from '@blog/utils';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Heading } from './heading';
 import { headingVariants } from './heading-variants';

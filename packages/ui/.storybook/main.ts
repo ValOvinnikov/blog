@@ -1,11 +1,15 @@
-import path from 'path';
+import { fileURLToPath } from 'node:url';
 
 import type { StorybookConfig } from '@storybook/react-vite';
 import tailwindcss from '@tailwindcss/vite';
 
+// main.ts is loaded as ESM (no __dirname/require), so resolve the src path
+// via import.meta.url — see the ui-storybook skill.
+const srcDir = fileURLToPath(new URL('../src', import.meta.url));
+
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(ts|tsx)', '../src/**/*.mdx'],
-  addons: ['@storybook/addon-essentials', '@storybook/addon-themes'],
+  addons: ['@storybook/addon-docs', '@storybook/addon-themes'],
   framework: { name: '@storybook/react-vite', options: {} },
   viteFinal: async (config) => {
     config.plugins = config.plugins ?? [];
@@ -20,7 +24,7 @@ const config: StorybookConfig = {
       ...(Array.isArray(config.resolve.alias) ? config.resolve.alias : []),
       {
         find: /^@blog\/ui\/(.+)/,
-        replacement: `${path.resolve(__dirname, '../src')}/$1`,
+        replacement: `${srcDir}/$1`,
       },
     ];
     return config;

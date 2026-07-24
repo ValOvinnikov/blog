@@ -1,6 +1,6 @@
 import { Size } from '@blog/config';
 import { objectKeys } from '@blog/utils';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { BrandMark } from './brand-mark';
 import { brandMarkVariants } from './brand-mark-variants';
