@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@blog/eslint-config": "workspace:*",
-    "eslint": "^10.7.0",
+    "eslint": "catalog:",
     "tailwindcss": "^4.3.3"
   }
 }
