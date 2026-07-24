@@ -80,6 +80,31 @@ vi.mock('next-intl/server', () => ({
   })),
 }));
 
+// `next/font/google`'s loader functions (`Space_Grotesk`, `Newsreader`,
+// `JetBrains_Mono` — see `@web/config/fonts`) rely on a Next.js build-time
+// transform that doesn't exist under Vitest, so calling them directly throws
+// ("... is not a function"). Stubbed globally, not just in the root layout's
+// test, because `fonts.ts` is evaluated at module load time by anything that
+// imports the root `app/layout.tsx` (directly or transitively) — same
+// reasoning as the `next-intl/server`/`next/navigation` mocks above. The stub
+// returns the shape consumers read: a `className` string plus a `variable`
+// string derived from the `variable` option, since `RootLayout` reads
+// `.variable` off every font export to build the root `<html>` className.
+vi.mock('next/font/google', () => {
+  const createFontMock =
+    (fontName: string) =>
+    ({ variable }: { variable?: string } = {}) => ({
+      className: `mock-${fontName}-className`,
+      variable: variable ?? `mock-${fontName}-variable`,
+    });
+
+  return {
+    Space_Grotesk: createFontMock('space-grotesk'),
+    Newsreader: createFontMock('newsreader'),
+    JetBrains_Mono: createFontMock('jetbrains-mono'),
+  };
+});
+
 // `next/navigation`'s `notFound()` must keep throwing so components short-
 // circuit exactly as it does at runtime (Next renders the not-found boundary
 // via a thrown NEXT_NOT_FOUND digest). Tests that assert on it import the
