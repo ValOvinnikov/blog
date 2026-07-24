@@ -355,17 +355,6 @@ export type Blog_tag = {
   seo?: Seo;
 };
 
-export type Blog_category = {
-  _id: string;
-  _type: 'blog_category';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  description?: string;
-};
-
 export type Blog_authorReference = {
   _ref: string;
   _type: 'reference';
@@ -391,11 +380,7 @@ export type Blog_post = {
   excerpt?: string;
   heroImage?: ImageWithAlt;
   author?: Blog_authorReference;
-  categories?: Array<
-    {
-      _key: string;
-    } & Blog_categoryReference
-  >;
+  category?: Blog_categoryReference;
   tags?: Array<
     {
       _key: string;
@@ -405,6 +390,17 @@ export type Blog_post = {
   body?: RichText;
   featured?: boolean;
   seo?: Seo;
+};
+
+export type Blog_category = {
+  _id: string;
+  _type: 'blog_category';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  description?: string;
 };
 
 export type Blog_author = {
@@ -577,10 +573,10 @@ export type AllSanitySchemaTypes =
   | Page_generic
   | Slug
   | Blog_tag
-  | Blog_category
   | Blog_authorReference
   | Blog_tagReference
   | Blog_post
+  | Blog_category
   | Blog_author
   | SanityImageCrop
   | SanityImageHotspot
