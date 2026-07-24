@@ -34,9 +34,19 @@ const turbopackRoot = (() => {
 // `script-src` allows 'unsafe-inline' (a hash/nonce would make the browser
 // *ignore* it), plus 'unsafe-eval' in dev for Turbopack/HMR. Same-origin-only
 // external scripts still apply, and every other directive stays strict.
+//
+// `va.vercel-scripts.com` is Vercel Speed Insights' script host. On an actual
+// Vercel deployment the `<SpeedInsights />` component loads its script from a
+// same-origin path (`/_vercel/speed-insights/script.js`, proxied by the
+// platform), which `'self'` already covers — but in local dev (no proxy) it
+// falls back to the real `va.vercel-scripts.com` debug script, so both
+// `script-src` and `connect-src` (for the beacon it posts back) need the
+// explicit allowance to keep dev usable without weakening prod.
+const VERCEL_SPEED_INSIGHTS_ORIGIN = 'https://va.vercel-scripts.com';
+
 const scriptSrc = isDev
-  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-  : "script-src 'self' 'unsafe-inline'";
+  ? `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${VERCEL_SPEED_INSIGHTS_ORIGIN}`
+  : `script-src 'self' 'unsafe-inline' ${VERCEL_SPEED_INSIGHTS_ORIGIN}`;
 
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -48,7 +58,7 @@ const contentSecurityPolicy = [
   // content to allow-list instead.
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self'",
-  "connect-src 'self' https://cdn.sanity.io",
+  `connect-src 'self' https://cdn.sanity.io ${VERCEL_SPEED_INSIGHTS_ORIGIN}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
