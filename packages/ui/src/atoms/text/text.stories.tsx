@@ -1,5 +1,5 @@
 import { objectKeys } from '@blog/utils';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Text } from './text';
 import { textVariants } from './text-variants';

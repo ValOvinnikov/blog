@@ -1,7 +1,7 @@
 import { Size } from '@blog/config';
 import { objectKeys } from '@blog/utils';
 import { faker } from '@faker-js/faker';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Prose } from './prose';
 import { proseVariants } from './prose-variants';

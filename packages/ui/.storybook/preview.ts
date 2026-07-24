@@ -2,7 +2,7 @@ import '../index.css';
 import './preview.css';
 
 import { withThemeByClassName } from '@storybook/addon-themes';
-import type { Preview, ReactRenderer } from '@storybook/react';
+import type { Preview, ReactRenderer } from '@storybook/react-vite';
 
 const preview: Preview = {
   // Toolbar theme switcher: toggles the `.dark` class on the preview <html>,

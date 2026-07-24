@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { PostCard } from '../../molecules/post-card';
 import { PostGrid } from '../post-grid';
