@@ -26,6 +26,7 @@ export const postCardFragment = q
     featured: sub.field('featured').nullable(true),
     author: sub.field('author').deref().project(authorCardFragment).notNull(),
     category: sub.field('category').deref().project(categoryFragment).notNull(),
+    wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));
 
 export const postDetailFragment = q

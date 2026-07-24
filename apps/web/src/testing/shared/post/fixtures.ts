@@ -25,6 +25,7 @@ export function makePostCard(overrides: Partial<TPostCard> = {}): TPostCard {
     featured: false,
     author: makePostCardAuthor(),
     category: makePostCardCategory(),
+    readingTimeMinutes: 2,
     ...overrides,
   };
 }

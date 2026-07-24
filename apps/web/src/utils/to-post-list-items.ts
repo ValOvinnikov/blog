@@ -6,9 +6,7 @@ import { getFormatter } from 'next-intl/server';
 /**
  * Structural source shape accepted by `toPostListItems` — satisfied by both
  * `TPostCard` (post detail's related posts, the post-list module) and the
- * leaner `TArchivePostCard` (blog/category/tag/author archive pages), which
- * additionally carries `readingTimeMinutes`. Declaring it optional here lets
- * either post-card type flow through the same mapper without a union.
+ * leaner `TArchivePostCard` (blog/category/tag/author archive pages).
  */
 type TPostListItemSource = {
   id: string;
@@ -17,7 +15,7 @@ type TPostListItemSource = {
   excerpt: string;
   publishedAt: string;
   category: TPostCardCategory;
-  readingTimeMinutes?: number;
+  readingTimeMinutes: number;
 };
 
 /**
@@ -46,10 +44,7 @@ export const toPostListItems = async (
       month: 'long',
       day: 'numeric',
     }),
-    readingTime:
-      post.readingTimeMinutes === undefined
-        ? undefined
-        : `${post.readingTimeMinutes} min`,
+    readingTime: `${post.readingTimeMinutes} min`,
     category: post.category,
   }));
 };
