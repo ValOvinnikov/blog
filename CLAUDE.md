@@ -211,6 +211,15 @@ already settled.
   APIs, event handlers, or wrapping a third-party component that uses hooks
   internally (e.g. the `sanity-image` wrapper). Keep it as low in the tree as
   possible, not on whole pages.
+- **Destructure the fetched view-model once, right after the null/`notFound`
+  guard.** A page/route component that fetches a `service` result destructures
+  it into local bindings immediately after the guard (`const { title, posts,
+currentPage, totalPages } = result.data;`), then reads those bindings for
+  the rest of the function — never repeats `result.data.x`/`post.x` inline at
+  each use site once the guard has already proven the shape is non-null. This
+  keeps the "we know it's safe past this point" fact visible at one place
+  instead of re-deriving it (or re-typing the same access path) at every
+  usage.
 - Co-locate `*.test.ts(x)`; `pnpm test` must pass.
 - After a schema change: `pnpm typegen`, then commit the regenerated files in
   `packages/config/src/sanity/generated/`. Typegen can be non-deterministic —
