@@ -21,7 +21,7 @@
     "@blog/tsconfig": "workspace:*",
     "@blog/vitest-config": "workspace:*",
     "@types/react": "^19.0.0",
-    "eslint": "^10.7.0",
+    "eslint": "catalog:",
     "prettier": "^3.9.5",
     "typescript": "catalog:",
     "vitest": "^4.1.10"

@@ -25,9 +25,9 @@
     "typescript-eslint": "^8.64.0"
   },
   "devDependencies": {
-    "eslint": "^10.7.0"
+    "eslint": "catalog:"
   },
   "peerDependencies": {
-    "eslint": "^10.0.0"
+    "eslint": "catalog:"
   }
 }
