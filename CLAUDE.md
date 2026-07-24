@@ -211,14 +211,19 @@ already settled.
   APIs, event handlers, or wrapping a third-party component that uses hooks
   internally (e.g. the `sanity-image` wrapper). Keep it as low in the tree as
   possible, not on whole pages.
-- **Destructure the fetched view-model once, right after the null/`notFound`
-  guard.** A page/route component that fetches a `service` result destructures
-  it into local bindings immediately after the guard (`const { title, posts,
-currentPage, totalPages } = result.data;`), then reads those bindings for
-  the rest of the function — never repeats `result.data.x`/`post.x` inline at
-  each use site once the guard has already proven the shape is non-null. This
-  keeps the "we know it's safe past this point" fact visible at one place
-  instead of re-deriving it (or re-typing the same access path) at every
+- **Destructure a value into local bindings once, right after the point that
+  settles its shape — then use those bindings, not repeated inline access.**
+  General practice, not just page components: whenever a function reads more
+  than one field of an object more than once — a fetched `service` result past
+  its null/`notFound` guard, a props object, a parsed config — destructure it
+  once near the top of the scope where the shape is settled, then reference
+  the local bindings for the rest of the function. Never repeat
+  `result.data.x`/`post.x`/`props.x` inline at each use site once the shape is
+  already known. Canonical case: a page/route component destructures its
+  fetched result right after the guard (`const { title, posts, currentPage,
+totalPages } = result.data;`) — but the same rule applies anywhere a shape
+  is read repeatedly. This keeps "we've already established this" visible in
+  one place instead of re-deriving or re-typing the same access path at every
   usage.
 - Co-locate `*.test.ts(x)`; `pnpm test` must pass.
 - After a schema change: `pnpm typegen`, then commit the regenerated files in
