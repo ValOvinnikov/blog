@@ -540,6 +540,14 @@ and release runbook live in `docs/DEPLOY.md`; this is the shape.
   guarded on their secret being present, so the workflows no-op green until the
   one-time console setup (`docs/DEPLOY.md`).
 - Historical phased rollout tickets (D0–D5) live in `docs/BACKLOG.md`.
+- **Development dataset refresh** (#363): `development` can be manually
+  replaced with a fresh copy of `production` (published-only, cross-project
+  export→import) via `refresh-dev-dataset.yml`, a `workflow_dispatch`-only
+  workflow — never automatic, never part of a deploy. Run only after that
+  release's production migrations complete (`docs/DEPLOY.md`'s "Refreshing
+  development from production"); the script's safety guard hardcodes the
+  target dataset, so a misconfigured environment fails loudly rather than
+  reversing direction.
 
 ## 14. Tooling: agents & skills
 

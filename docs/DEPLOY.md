@@ -170,6 +170,21 @@ job resolves its own project's id + token:
 > fallback for `ci.yml` (which sets no environment) — point them at whichever
 > project CI's typegen/migration checks should target.
 
+**`dataset-refresh` environment** — a dedicated GitHub Environment (separate
+from `development`/`production`) for `refresh-dev-dataset.yml`
+(`workflow_dispatch` only, #363): this single job needs **both** projects'
+credentials at once, which a `development`- or `production`-scoped job can't
+provide.
+
+- [ ] Variable `SANITY_PROD_PROJECT_ID` = `<PRD_PROJECT_ID>` (export source)
+- [ ] Secret `SANITY_PROD_EXPORT_TOKEN` = `<PRD_EXPORT_TOKEN>` (Viewer — export
+      only, never a deploy/migrate token)
+- [ ] Variable `SANITY_DEV_PROJECT_ID` = `<DEV_PROJECT_ID>` (import target)
+- [ ] Secret `SANITY_DEV_IMPORT_TOKEN` = `<DEV_IMPORT_TOKEN>` (**Administrator**
+      — deleting and recreating a dataset needs more than Editor)
+- [ ] (Recommended) require a reviewer on `dataset-refresh` — an extra human
+      gate before the job deletes and replaces the `development` dataset.
+
 **Repo level (Settings → Secrets and variables → Actions) — Turborepo Remote Cache**
 
 Optional but recommended: shares turbo task artifacts across PR CI, the deploy
@@ -238,8 +253,9 @@ or before checks):
    pending), so dev's data never lags its code — the #355 failure mode. It runs
    on the same condition as `verify` (so it's never skipped out from under a
    deploy that depends on it); both deploy jobs `needs: [changes, verify,
-migrate]`. No artifact backup here — dev is the disposable staging line (and
-   is refreshed from prod by #363); the job is guarded on `SANITY_DEPLOY_TOKEN`,
+migrate]`. No artifact backup here — dev is the disposable staging line
+   (see "Refreshing development from production" below for the manual
+   post-migration refresh); the job is guarded on `SANITY_DEPLOY_TOKEN`,
    so it's inert until that secret exists. **No approval gate on dev** (unlike
    prod) — dev auto-migrates.
 4. **`deploy-studio`** → `valovinnikov-blog-dev.sanity.studio` (development
@@ -284,6 +300,29 @@ There are **no PR preview deployments** — deploys happen only on merge to `mai
 Both deploy jobs `needs: [verify, migrate]`, so **new code is never served
 before pending migrations run**; a failed or reviewer-rejected `migrate` skips
 both deploys, leaving the old code serving the old (un-migrated) data.
+
+### Refreshing development from production (manual, post-migration)
+
+The `development` dataset drifts from real content over time. `.github/workflows/refresh-dev-dataset.yml`
+(`workflow_dispatch` only — never automatic, never part of a deploy) replaces
+`development` with a fresh copy of `production`, cross-project (dev and prod
+are separate Sanity projects, so this is an export→import, not
+`sanity dataset copy`). Published documents only — drafts are excluded.
+Assets are included; since the target dataset is deleted and recreated each
+run, there's no cross-run asset accumulation.
+
+**Run this only after that release's production migrations have completed**
+(step 2 above) — refreshing from a not-yet-migrated `production` would copy
+pre-migration shapes that no longer match the deployed schema:
+
+1. Confirm the `production` deploy's `migrate` job finished (Actions tab).
+2. Actions → **Refresh Dev Dataset** → **Run workflow** (`main`).
+3. The job exports `production` (published-only), deletes and recreates
+   `development`, then imports — direction is hardcoded in
+   `apps/cms/scripts/refresh-dev-dataset-lib.mjs`'s safety guard, so a
+   misconfigured environment fails loudly rather than silently reversing.
+
+See `apps/cms/migrations/README.md` for the underlying script details.
 
 ---
 
