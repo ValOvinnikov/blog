@@ -16,7 +16,7 @@ export type TArchivePostCard = {
   slug: string;
   excerpt: string;
   publishedAt: string;
-  categories: TPostCardCategory[];
+  category: TPostCardCategory;
   readingTimeMinutes: number;
 };
 
@@ -27,7 +27,7 @@ export function toArchivePostCard(raw: TRawArchivePostCard): TArchivePostCard {
     slug: raw.slug,
     excerpt: raw.excerpt,
     publishedAt: raw.publishedAt,
-    categories: raw.categories.map(toPostCardCategory),
+    category: toPostCardCategory(raw.category),
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };
 }

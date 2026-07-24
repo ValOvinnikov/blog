@@ -223,20 +223,18 @@ describe('getPost', () => {
     expect(result?.relatedPosts.map((post) => post.id)).toEqual(['related-1']);
   });
 
-  it('calls getRelatedPosts with the post id, tag ids, and primary category id', async () => {
+  it('calls getRelatedPosts with the post id, tag ids, and category id', async () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostDetail({
           _id: 'post-abc',
           tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
-          categories: [
-            {
-              _id: 'cat-1',
-              title: 'Engineering',
-              slug: 'engineering',
-              description: null,
-            },
-          ],
+          category: {
+            _id: 'cat-1',
+            title: 'Engineering',
+            slug: 'engineering',
+            description: null,
+          },
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());

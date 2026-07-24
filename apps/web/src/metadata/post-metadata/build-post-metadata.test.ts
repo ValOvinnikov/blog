@@ -42,7 +42,12 @@ const basePost: TPostDetail = {
     bio: undefined,
     socialLinks: [],
   },
-  categories: [],
+  category: {
+    id: 'cat-1',
+    title: 'News',
+    slug: 'news',
+    description: undefined,
+  },
   tags: [],
   relatedPosts: [],
   readingTimeMinutes: 4,

@@ -44,21 +44,6 @@ export const WithShareSlot: TStory = {
   },
 };
 
-export const WithCategories: TStory = {
-  args: {
-    categories: [
-      {
-        label: faker.commerce.department(),
-        href: `/categories/${faker.lorem.slug()}`,
-      },
-      {
-        label: faker.commerce.department(),
-        href: `/categories/${faker.lorem.slug()}`,
-      },
-    ],
-  },
-};
-
 export const WithLinkedAuthor: TStory = {
   args: {
     author: {

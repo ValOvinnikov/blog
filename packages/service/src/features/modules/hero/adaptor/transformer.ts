@@ -50,7 +50,7 @@ export function toHeroModule(
     eyebrow: getCustomOrFallback(
       raw.heroEyebrowMode,
       raw.heroEyebrow,
-      heroPost?.categories[0]?.title,
+      heroPost?.category?.title,
     ),
     title: getCustomOrFallback(
       raw.heroTitleMode,

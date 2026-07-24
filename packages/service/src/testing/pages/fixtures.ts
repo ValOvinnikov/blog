@@ -28,14 +28,12 @@ export function makeRawPostCard(
       slug: 'jane-doe',
       image: makeRawImage('Jane avatar'),
     },
-    categories: [
-      {
-        _id: 'cat-1',
-        title: 'Engineering',
-        slug: 'engineering',
-        description: 'Engineering posts',
-      },
-    ],
+    category: {
+      _id: 'cat-1',
+      title: 'Engineering',
+      slug: 'engineering',
+      description: 'Engineering posts',
+    },
     ...overrides,
   };
 }
@@ -51,14 +49,12 @@ export function makeRawArchivePostCard(
     slug: 'hello-world',
     excerpt: 'A sufficiently long excerpt for the card.',
     publishedAt: '2026-01-15T00:00:00Z',
-    categories: [
-      {
-        _id: 'cat-1',
-        title: 'Engineering',
-        slug: 'engineering',
-        description: 'Engineering posts',
-      },
-    ],
+    category: {
+      _id: 'cat-1',
+      title: 'Engineering',
+      slug: 'engineering',
+      description: 'Engineering posts',
+    },
     wordCount: 400,
     ...overrides,
   };
@@ -87,14 +83,12 @@ export function makeRawPostDetail(
       bio: null,
       socialLinks: null,
     },
-    categories: [
-      {
-        _id: 'cat-1',
-        title: 'Engineering',
-        slug: 'engineering',
-        description: 'Engineering posts',
-      },
-    ],
+    category: {
+      _id: 'cat-1',
+      title: 'Engineering',
+      slug: 'engineering',
+      description: 'Engineering posts',
+    },
     tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
     wordCount: 400,
     ...overrides,

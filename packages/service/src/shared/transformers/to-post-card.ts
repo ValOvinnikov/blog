@@ -30,7 +30,7 @@ export type TPostCard = {
   heroImageSanity: TMaybeUndefined<ISanityImage>;
   featured: boolean;
   author: TPostCardAuthor;
-  categories: TPostCardCategory[];
+  category: TPostCardCategory;
 };
 
 function toPostCardAuthor(raw: TRawPostCard['author']): TPostCardAuthor {
@@ -43,7 +43,7 @@ function toPostCardAuthor(raw: TRawPostCard['author']): TPostCardAuthor {
 }
 
 export function toPostCardCategory(
-  raw: TRawPostCard['categories'][number],
+  raw: TRawPostCard['category'],
 ): TPostCardCategory {
   return {
     id: raw._id,
@@ -64,6 +64,6 @@ export function toPostCard(raw: TRawPostCard): TPostCard {
     heroImageSanity: toSanityImage(raw.heroImageAsset),
     featured: raw.featured ?? false,
     author: toPostCardAuthor(raw.author),
-    categories: raw.categories.map(toPostCardCategory),
+    category: toPostCardCategory(raw.category),
   };
 }

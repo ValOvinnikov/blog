@@ -7,8 +7,7 @@ import { toRelatedPosts } from './transformer';
 /**
  * Up to 3 other published posts, ranked by shared-tag count desc then
  * `publishedAt` desc, backfilled from recent posts in the current post's
- * primary category (`categories[0]`) when fewer than 3 tag-ranked
- * candidates qualify.
+ * category when fewer than 3 tag-ranked candidates qualify.
  */
 export async function getRelatedPosts(
   currentId: string,

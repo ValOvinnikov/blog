@@ -25,11 +25,7 @@ export const postCardFragment = q
       .nullable(true),
     featured: sub.field('featured').nullable(true),
     author: sub.field('author').deref().project(authorCardFragment).notNull(),
-    categories: sub
-      .field('categories[]')
-      .deref()
-      .project(categoryFragment)
-      .notNull(),
+    category: sub.field('category').deref().project(categoryFragment).notNull(),
   }));
 
 export const postDetailFragment = q
@@ -52,11 +48,7 @@ export const postDetailFragment = q
     body: sub.field('body[]').notNull(),
     seo: sub.field('seo').project(seoFragment).nullable(true),
     author: sub.field('author').deref().project(authorDetailFragment).notNull(),
-    categories: sub
-      .field('categories[]')
-      .deref()
-      .project(categoryFragment)
-      .notNull(),
+    category: sub.field('category').deref().project(categoryFragment).notNull(),
     tags: sub.field('tags[]').deref().project(tagFragment).nullable(true),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));

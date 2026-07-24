@@ -55,7 +55,7 @@ export function toPostDetail(
       },
     ),
     author: toPostDetailAuthor(raw.author),
-    categories: raw.categories.map(toCategory),
+    category: toCategory(raw.category),
     tags: (raw.tags ?? []).map(toTag),
     relatedPosts,
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),

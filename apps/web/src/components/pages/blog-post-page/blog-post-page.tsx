@@ -40,7 +40,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   const {
     title,
     excerpt,
-    categories,
+    category,
     tags,
     body,
     relatedPosts,
@@ -58,7 +58,6 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
     ...link,
     icon: <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />,
   }));
-  const primaryCategory = categories[0];
   const [format, relatedPostItems] = await Promise.all([
     getFormatter(),
     toPostListItems(relatedPosts),
@@ -70,16 +69,10 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
 
       <Article>
         <Article.Header
-          categories={
-            primaryCategory
-              ? [
-                  {
-                    label: primaryCategory.title,
-                    href: routes.category(primaryCategory.slug),
-                  },
-                ]
-              : []
-          }
+          category={{
+            label: category.title,
+            href: routes.category(category.slug),
+          }}
           linkAs={SmartLink}
           title={title}
           lead={excerpt}
@@ -92,10 +85,6 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
               day: 'numeric',
             }),
             readingTimeMinutes,
-            categories: categories.slice(1).map((category) => ({
-              label: category.title,
-              href: routes.category(category.slug),
-            })),
             linkAs: SmartLink,
             share: <PostShare url={url} title={title} links={shareLinks} />,
           }}

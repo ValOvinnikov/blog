@@ -33,12 +33,14 @@ describe('toPostCard', () => {
     });
   });
 
-  it('maps categories array', () => {
+  it('maps the category', () => {
     const result = toPostCard(makeRawPostCard());
 
-    expect(result.categories).toEqual([
-      { id: 'cat-1', title: 'Engineering', slug: 'engineering' },
-    ]);
+    expect(result.category).toEqual({
+      id: 'cat-1',
+      title: 'Engineering',
+      slug: 'engineering',
+    });
   });
 
   it('defaults featured to false when null', () => {

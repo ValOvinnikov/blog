@@ -12,7 +12,7 @@ const posts = [
     publishedAt: '2024-06-01T00:00:00Z',
     formattedDate: 'June 1, 2024',
     readingTime: '9 min',
-    categories: [{ title: 'design-system' }],
+    category: { title: 'design-system' },
   },
   {
     id: '2',
@@ -23,7 +23,7 @@ const posts = [
     publishedAt: '2024-05-15T00:00:00Z',
     formattedDate: 'May 15, 2024',
     readingTime: '5 min',
-    categories: [{ title: 'typescript' }],
+    category: { title: 'typescript' },
   },
   {
     id: '3',
@@ -33,7 +33,7 @@ const posts = [
       'How to apply Atomic Design principles to a real-world component library.',
     publishedAt: '2024-04-20T00:00:00Z',
     formattedDate: 'April 20, 2024',
-    categories: [{ title: 'atomic-design' }],
+    category: { title: 'atomic-design' },
   },
 ];
 

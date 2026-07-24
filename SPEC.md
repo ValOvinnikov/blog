@@ -30,7 +30,9 @@ frontend if a consumer is out of date.
 
 Phase 3 (Blog core) is fully closed as of 2026-07-21 — every primary surface
 built in that phase is merged. Post taxonomy (category `max: 4` cap + the
-`/tag/*` axis above) shipped as milestone M3 (#674) on 2026-07-23.
+`/tag/*` axis above) shipped as milestone M3 (#674) on 2026-07-23; the
+category cap was narrowed to a single required reference in #809 on
+2026-07-24 (see §6 Content model).
 
 **Routing conventions** (decided 2026-07-14 — full rationale in
 `docs/superpowers/specs/2026-07-14-blog-list-pagination-design.md`):
@@ -254,9 +256,9 @@ replacing a hand-duplicated block per page document.
 
 - `post` — title, slug, excerpt, heroImage (`imageWithAlt`, **optional** — a
   post without one renders imageless rather than 404ing), author (ref),
-  categories (refs → `category`, 1–4, first is primary), tags (refs → `tag`,
-  optional, max 6), publishedAt, body (portable text incl. code blocks),
-  featured, seo.
+  category (ref → `category`, required — the post's single primary
+  classification), tags (refs → `tag`, optional, max 6), publishedAt, body
+  (portable text incl. code blocks), featured, seo.
 - `author` — name, slug, image, bio, role, socialLinks (unified `link`-based).
 - `category` — title, slug, description.
 - `tag` — title, slug, description, seo (topic taxonomy for posts; drives the

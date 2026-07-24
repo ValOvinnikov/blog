@@ -13,12 +13,14 @@ describe(toArchivePostCard, () => {
     expect(result.publishedAt).toBe('2026-01-15T00:00:00Z');
   });
 
-  it('maps categories array', () => {
+  it('maps the category', () => {
     const result = toArchivePostCard(makeRawArchivePostCard());
 
-    expect(result.categories).toEqual([
-      { id: 'cat-1', title: 'Engineering', slug: 'engineering' },
-    ]);
+    expect(result.category).toEqual({
+      id: 'cat-1',
+      title: 'Engineering',
+      slug: 'engineering',
+    });
   });
 
   it('does not include hero image, featured, or author fields', () => {

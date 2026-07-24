@@ -15,11 +15,11 @@ export type TPostDetailAuthor = {
   socialLinks: TSocialLink[];
 };
 
-export type TPostDetail = Omit<TPostCard, 'author' | 'categories'> & {
+export type TPostDetail = Omit<TPostCard, 'author' | 'category'> & {
   body: RichText;
   seo: TSeoResolved;
   author: TPostDetailAuthor;
-  categories: TCategory[];
+  category: TCategory;
   tags: TTag[];
   relatedPosts: TPostCard[];
   readingTimeMinutes: number;

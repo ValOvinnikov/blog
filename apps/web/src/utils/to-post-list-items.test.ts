@@ -15,7 +15,7 @@ describe('toPostListItems', () => {
       title: 'Hello World',
       excerpt: 'An excerpt.',
       publishedAt: '2026-01-15T00:00:00.000Z',
-      categories: [category],
+      category,
     });
 
     const [item] = await toPostListItems([post]);
@@ -28,7 +28,7 @@ describe('toPostListItems', () => {
       publishedAt: '2026-01-15T00:00:00.000Z',
       formattedDate: 'January 15, 2026',
       readingTime: undefined,
-      categories: [category],
+      category,
     });
   });
 

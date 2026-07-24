@@ -19,7 +19,7 @@ describe('buildIndexPageQuery', () => {
     const raw = {
       posts: [
         makeRawArchivePostCard({
-          categories: [makeRawCategory({ description: null })],
+          category: makeRawCategory({ description: null }),
         }),
       ],
       total: 1,

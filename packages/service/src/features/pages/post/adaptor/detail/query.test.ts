@@ -14,7 +14,7 @@ describe('postDetailQuery', () => {
       featured: null,
       seo: null,
       author: makeRawAuthor({ role: null }),
-      categories: [makeRawCategory({ description: null })],
+      category: makeRawCategory({ description: null }),
     });
 
     expect(() => postDetailQuery.parse(raw)).not.toThrow();
