@@ -49,7 +49,7 @@
     "@types/react-dom": "^19",
     "eslint": "catalog:",
     "jsdom": "^29.1.1",
-    "prettier": "^3.9.5",
+    "prettier": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "storybook": "^8.6.18",

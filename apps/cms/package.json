@@ -41,7 +41,7 @@
     "@sanity/cli": "^7.7.1",
     "@sanity/client": "^7.23.0",
     "eslint": "catalog:",
-    "prettier": "^3.9.5",
+    "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
