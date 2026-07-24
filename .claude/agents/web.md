@@ -215,7 +215,10 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
   rendering.
 - **`generateStaticParams`** must be exported from `[locale]/layout.tsx`:
   `return routing.locales.map((locale) => ({ locale }))`.
-- Thread `locale` down to any formatting helpers (`formatDate`, `Intl.*`).
+- Date/number formatting uses next-intl's `useFormatter`/`getFormatter`
+  (`format.dateTime(...)`), which reads locale automatically from the
+  per-request config set up in `i18n/request.ts` — no `locale` argument needs
+  threading down to formatting call sites.
 - **ESLint exception**: `src/app/` is excluded from the `check-file`
   folder-naming rule (see `apps/web/eslint.config.js`) because Next.js uses
   `[dynamic]` and `(group)` folder conventions there.
