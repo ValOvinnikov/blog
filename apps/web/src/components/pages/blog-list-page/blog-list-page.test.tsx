@@ -132,6 +132,30 @@ describe(`<${BlogListPage.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
+  it('renders pagination with the translated aria-label, previous, and next labels', async () => {
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Blog',
+        supportingText: 'Essays and notes.',
+        posts: [post],
+        currentPage: 2,
+        totalPages: 3,
+        total: 20,
+      },
+    });
+
+    await setup({ page: 2 });
+
+    expect(
+      screen.getByRole('navigation', { name: 'Blog pages' }),
+    ).toBeVisible();
+    const nextLink = screen.getByRole('link', { name: 'Next' });
+    expect(nextLink).toHaveAttribute('href', '/blog/page/3');
+    const previousLink = screen.getByRole('link', { name: 'Previous' });
+    expect(previousLink).toHaveAttribute('href', '/blog');
+  });
+
   it('renders the category chip row', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,

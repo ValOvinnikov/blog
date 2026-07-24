@@ -251,6 +251,8 @@ describe(`<${AuthorPage.name}/>`, () => {
     ).toBeVisible();
     const nextLink = screen.getByRole('link', { name: 'Next' });
     expect(nextLink).toHaveAttribute('href', '/author/jane-doe/page/3');
+    const previousLink = screen.getByRole('link', { name: 'Previous' });
+    expect(previousLink).toHaveAttribute('href', '/author/jane-doe');
   });
 
   it('calls notFound() when the requested page is beyond totalPages', async () => {

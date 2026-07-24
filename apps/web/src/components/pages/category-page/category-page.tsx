@@ -8,6 +8,7 @@ import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
 import { getCategoriesSafely } from '@web/utils/get-categories-safely';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 type TCategoryPageProps = ILocalizedParams & { slug: string; page?: number };
 
@@ -19,12 +20,13 @@ type TCategoryPageProps = ILocalizedParams & { slug: string; page?: number };
  * gets the same pagination metadata as any other page.
  */
 export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
-  const [result, categories] = await Promise.all([
+  const [result, categories, t] = await Promise.all([
     service.pages.category.v1.getCategoryPage(slug, {
       page,
       itemsPerPage: CATEGORY_ITEMS_PER_PAGE,
     }),
     getCategoriesSafely(),
+    getTranslations('pagination'),
   ]);
 
   if (!result.ok) {
@@ -66,9 +68,9 @@ export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
           currentPage={currentPage}
           totalPages={totalPages}
           createHref={(pageNumber) => routes.category(slug, pageNumber)}
-          ariaLabel="Category pages"
-          previousLabel="Previous"
-          nextLabel="Next"
+          ariaLabel={t('ariaLabel', { pageType: 'Category' })}
+          previousLabel={t('previous')}
+          nextLabel={t('next')}
           linkAs={Link}
         />
       }

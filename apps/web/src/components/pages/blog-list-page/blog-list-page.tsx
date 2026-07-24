@@ -7,6 +7,7 @@ import { Link } from '@web/i18n/navigation';
 import { getCategoriesSafely } from '@web/utils/get-categories-safely';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 type TBlogListPageProps = ILocalizedParams & { page: number };
 
@@ -16,9 +17,10 @@ type TBlogListPageProps = ILocalizedParams & { page: number };
  * service and renders it through the pure ui organisms.
  */
 export async function BlogListPage({ page, locale }: TBlogListPageProps) {
-  const [result, categories] = await Promise.all([
+  const [result, categories, t] = await Promise.all([
     service.pages.blog.v1.getIndexPage({ page }),
     getCategoriesSafely(),
+    getTranslations('pagination'),
   ]);
 
   if (!result.ok) {
@@ -56,9 +58,9 @@ export async function BlogListPage({ page, locale }: TBlogListPageProps) {
           currentPage={currentPage}
           totalPages={totalPages}
           createHref={routes.blogIndex}
-          ariaLabel="Blog pages"
-          previousLabel="Previous"
-          nextLabel="Next"
+          ariaLabel={t('ariaLabel', { pageType: 'Blog' })}
+          previousLabel={t('previous')}
+          nextLabel={t('next')}
           linkAs={Link}
         />
       }

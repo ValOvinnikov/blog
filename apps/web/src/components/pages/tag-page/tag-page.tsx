@@ -6,6 +6,7 @@ import { Link } from '@web/i18n/navigation';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 type TTagPageProps = ILocalizedParams & { slug: string; page?: number };
 
@@ -17,10 +18,13 @@ type TTagPageProps = ILocalizedParams & { slug: string; page?: number };
  * pagination metadata as any other page.
  */
 export async function TagPage({ slug, locale, page }: TTagPageProps) {
-  const result = await service.pages.tag.v1.getTagPage(slug, {
-    page,
-    itemsPerPage: TAG_ITEMS_PER_PAGE,
-  });
+  const [result, t] = await Promise.all([
+    service.pages.tag.v1.getTagPage(slug, {
+      page,
+      itemsPerPage: TAG_ITEMS_PER_PAGE,
+    }),
+    getTranslations('pagination'),
+  ]);
 
   if (!result.ok) {
     console.error(`Error to fetch tag page: ${result.error}`);
@@ -58,9 +62,9 @@ export async function TagPage({ slug, locale, page }: TTagPageProps) {
           currentPage={currentPage}
           totalPages={totalPages}
           createHref={(pageNumber) => routes.tag(slug, pageNumber)}
-          ariaLabel="Tag pages"
-          previousLabel="Previous"
-          nextLabel="Next"
+          ariaLabel={t('ariaLabel', { pageType: 'Tag' })}
+          previousLabel={t('previous')}
+          nextLabel={t('next')}
           linkAs={Link}
         />
       }
