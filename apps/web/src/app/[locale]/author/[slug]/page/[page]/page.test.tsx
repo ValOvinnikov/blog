@@ -21,7 +21,7 @@ const { getAuthorPageMock, getAuthorPaginationParamsMock } = vi.hoisted(() => ({
 // paths should ever reach the real service/fetch chain.
 vi.mock('@blog/service', () => ({
   service: {
-    entities: {
+    pages: {
       author: {
         v1: {
           getAuthorPage: getAuthorPageMock,

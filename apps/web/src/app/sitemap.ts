@@ -61,7 +61,7 @@ async function getTagParamsSafe() {
 
 async function getAuthorParamsSafe() {
   try {
-    return await service.entities.author.v1.getAuthorParams();
+    return await service.pages.author.v1.getAuthorParams();
   } catch (error) {
     console.error(`Error fetching author params for sitemap: ${error}`);
     return [];
@@ -101,7 +101,7 @@ async function getTagPaginationParamsSafe() {
 
 async function getAuthorPaginationParamsSafe() {
   try {
-    return await service.entities.author.v1.getAuthorPaginationParams(
+    return await service.pages.author.v1.getAuthorPaginationParams(
       AUTHOR_ITEMS_PER_PAGE,
     );
   } catch (error) {

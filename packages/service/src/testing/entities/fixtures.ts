@@ -1,5 +1,5 @@
-import type { TRawAuthor } from '@blog/service/features/entities/author/adaptor/detail-page/transformer';
 import type { TRawCategoryWithPostCount } from '@blog/service/features/entities/categories/adaptor/transformer';
+import type { TRawAuthor } from '@blog/service/features/pages/author/adaptor/detail-page/transformer';
 import type { TRawCategory } from '@blog/service/shared/transformers/to-category';
 import type { TRawTag } from '@blog/service/shared/transformers/to-tag';
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';

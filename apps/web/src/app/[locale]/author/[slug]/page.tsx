@@ -14,7 +14,7 @@ type TProps = {
 // stays default `true`, so a missed build-time slug still renders on demand.
 export async function generateStaticParams() {
   try {
-    return await service.entities.author.v1.getAuthorParams();
+    return await service.pages.author.v1.getAuthorParams();
   } catch (error) {
     console.error(`Error to fetch author params: ${error}`);
     return [];

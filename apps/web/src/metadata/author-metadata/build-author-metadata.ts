@@ -20,7 +20,7 @@ export async function buildAuthorMetadata(
   slug: string,
   pageNumber?: number,
 ): Promise<Metadata> {
-  const result = await service.entities.author.v1.getAuthorPage(slug, {
+  const result = await service.pages.author.v1.getAuthorPage(slug, {
     page: pageNumber,
     itemsPerPage: AUTHOR_ITEMS_PER_PAGE,
   });

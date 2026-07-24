@@ -1,5 +1,5 @@
-import { getPage } from '@blog/service/features/pages/generic/adaptor/loader';
-import { getPageSlugs } from '@blog/service/features/pages/generic/adaptor/params/loader';
+import { getPage } from '@blog/service/features/pages/generic/adaptor/detail-page/loader';
+import { getPageSlugs } from '@blog/service/features/pages/generic/adaptor/detail-page-params/loader';
 import { safeAsync } from '@blog/utils';
 
 export function createGenericPageService() {

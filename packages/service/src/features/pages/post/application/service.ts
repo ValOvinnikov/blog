@@ -1,5 +1,5 @@
-import { getPost } from '@blog/service/features/pages/post/adaptor/detail/loader';
-import { getPostParams } from '@blog/service/features/pages/post/adaptor/params/loader';
+import { getPost } from '@blog/service/features/pages/post/adaptor/detail-page/loader';
+import { getPostParams } from '@blog/service/features/pages/post/adaptor/detail-page-params/loader';
 
 export function createPostService() {
   return {

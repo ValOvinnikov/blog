@@ -22,7 +22,7 @@ const s = authorPageVariants();
  * AuthorPage — shared composition for `/author/[slug]` (page 1, `page`
  * omitted) and `/author/[slug]/page/[page]` (pages ≥ 2, `page` provided):
  * fetches the author and their posts together via
- * `service.entities.author.v1.getAuthorPage`, then composes the shared
+ * `service.pages.author.v1.getAuthorPage`, then composes the shared
  * `BlogPageTemplate` archive shell with the author's name as the page
  * `<h1>`, their role/avatar in `introHeader`, bio as `supportingText`,
  * social links via `ShareLink`/`ActionList`, and their post list via
@@ -31,7 +31,7 @@ const s = authorPageVariants();
  */
 export async function AuthorPage({ slug, page }: TAuthorPageProps) {
   const [result, t] = await Promise.all([
-    service.entities.author.v1.getAuthorPage(slug, {
+    service.pages.author.v1.getAuthorPage(slug, {
       page,
       itemsPerPage: AUTHOR_ITEMS_PER_PAGE,
     }),
