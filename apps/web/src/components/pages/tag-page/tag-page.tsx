@@ -3,8 +3,8 @@ import { service } from '@blog/service';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
 import { Link } from '@web/i18n/navigation';
-import { formatDate } from '@web/utils/format-date';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
+import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 
 type TTagPageProps = ILocalizedParams & { slug: string; page?: number };
@@ -38,16 +38,7 @@ export async function TagPage({ slug, locale, page }: TTagPageProps) {
     notFound();
   }
 
-  const items = posts.map((post) => ({
-    id: post.id,
-    href: routes.post(post.slug),
-    title: post.title,
-    excerpt: post.excerpt,
-    publishedAt: post.publishedAt,
-    formattedDate: formatDate(post.publishedAt, locale),
-    readingTime: `${post.readingTimeMinutes} min`,
-    categories: post.categories,
-  }));
+  const items = toPostListItems(posts, locale);
 
   return (
     <BlogPageTemplate

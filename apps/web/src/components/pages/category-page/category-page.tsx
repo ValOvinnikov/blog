@@ -5,8 +5,8 @@ import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
 import { CategoryChipList } from '@web/components/shared/category-chip-list';
 import { Link } from '@web/i18n/navigation';
 import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
-import { formatDate } from '@web/utils/format-date';
 import { getCategoriesSafely } from '@web/utils/get-categories-safely';
+import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 
 type TCategoryPageProps = ILocalizedParams & { slug: string; page?: number };
@@ -43,16 +43,7 @@ export async function CategoryPage({ slug, locale, page }: TCategoryPageProps) {
     notFound();
   }
 
-  const items = posts.map((post) => ({
-    id: post.id,
-    href: routes.post(post.slug),
-    title: post.title,
-    excerpt: post.excerpt,
-    publishedAt: post.publishedAt,
-    formattedDate: formatDate(post.publishedAt, locale),
-    readingTime: `${post.readingTimeMinutes} min`,
-    categories: post.categories,
-  }));
+  const items = toPostListItems(posts, locale);
 
   return (
     <BlogPageTemplate
