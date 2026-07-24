@@ -11,7 +11,7 @@ On a `main` merge, the Sanity **Studio** and the Next.js **web app** each deploy
 only when the merge touches their turbo graph (`turbo-ignore`; a manual
 `workflow_dispatch` run deploys both). A production tag always deploys both.
 Architecture rationale lives in `SPEC.md` §13 and
-`docs/superpowers/specs/2026-07-13-multi-env-release-pipeline-design.md`.
+`docs/archive/superpowers/specs/2026-07-13-multi-env-release-pipeline-design.md`.
 
 > **Each environment is a separate Sanity project** (one per environment) — not
 > one project with two datasets. Project ids stay **env-driven and are never

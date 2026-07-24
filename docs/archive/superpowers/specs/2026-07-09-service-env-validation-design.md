@@ -1,5 +1,7 @@
 # Design: Zod environment-variable validation for `@blog/service`
 
+> **Archived — implemented.** See SPEC.md §7. Environment & configuration for current behavior.
+
 Date: 2026-07-09
 Status: Approved (design), pending implementation plan
 

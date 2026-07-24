@@ -1,8 +1,10 @@
 # Phase 4 — Unify links into a single `link` object — Plan
 
+> **Archived — implemented.** See SPEC.md §6. Content model for current behavior.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:subagent-driven-development. Steps use `- [ ]`.
 > Part of #242 · sub-issue **#249** · master plan
-> `docs/superpowers/plans/2026-07-10-cms-schema-restructure-plan.md`.
+> `docs/archive/superpowers/plans/2026-07-10-cms-schema-restructure-plan.md`.
 
 **Goal:** Replace the `link` **document**, `navItem`, and `socialLink` with one
 shared `link` **object** used everywhere (header nav, footer social, hero

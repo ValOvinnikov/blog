@@ -1,5 +1,7 @@
 # Post taxonomy — dedicated category + tags system
 
+> **Archived — implemented.** See SPEC.md §6. Content model for current behavior.
+
 - **Status:** Design (approved in brainstorm; pending spec review)
 - **Date:** 2026-07-22
 - **Epic:** #674

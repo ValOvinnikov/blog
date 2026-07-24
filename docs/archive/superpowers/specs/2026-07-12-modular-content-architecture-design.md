@@ -1,5 +1,7 @@
 # Modular content architecture — modules as documents
 
+> **Archived — implemented.** See SPEC.md §6. Content model for current behavior.
+
 **Status:** design approved (brainstorm), pending spec review
 **Date:** 2026-07-12
 **Closes:** #242 (supersedes the embedded-object modules built in PR #262, now closed)

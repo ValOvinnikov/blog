@@ -1,5 +1,7 @@
 # Blog List Pagination Implementation Plan
 
+> **Archived — implemented.** See SPEC.md §1. Product summary (Blog surface) for current behavior.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
 > **Repo-specific execution model:** this repo delegates layer work to the
@@ -9,7 +11,7 @@
 > sequence: root verify → `reviewer` subagent `APPROVE` → **human-approved**
 > commit → push → PR → board update. Never bundle gates.
 
-**Spec:** `docs/superpowers/specs/2026-07-14-blog-list-pagination-design.md` (committed on `feat/config-route-builder`).
+**Spec:** `docs/archive/superpowers/specs/2026-07-14-blog-list-pagination-design.md` (committed on `feat/config-route-builder`).
 **Issues:** #75 (`/blog` route), #85 (Pagination organism).
 
 **Goal:** Ship the paginated `/blog` index (`/blog`, `/blog/page/N`) plus the site-wide route-builder it rides on.
@@ -123,7 +125,7 @@ Expected: FAIL — cannot resolve `./routes`.
  * Single source of truth for app URL construction. Consumed by `service`
  * (href-emitting transformers) and `web` (routes, pagination `createHref`,
  * sitemap, JSON-LD) — never build these paths inline elsewhere.
- * Spec: docs/superpowers/specs/2026-07-14-blog-list-pagination-design.md.
+ * Spec: docs/archive/superpowers/specs/2026-07-14-blog-list-pagination-design.md.
  */
 export const routes = {
   home: () => '/',

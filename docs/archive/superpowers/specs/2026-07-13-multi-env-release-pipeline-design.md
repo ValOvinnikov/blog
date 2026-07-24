@@ -1,5 +1,7 @@
 # Multi-environment release pipeline — design
 
+> **Archived — implemented.** See SPEC.md §13. Deployment topology for current behavior.
+
 **Date:** 2026-07-13
 **Status:** Draft (awaiting review)
 **Scope:** Deployment/CI infrastructure for `apps/cms` (Studio) and `apps/web`

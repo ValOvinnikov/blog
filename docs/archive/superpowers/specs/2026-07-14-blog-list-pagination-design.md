@@ -1,5 +1,7 @@
 # Blog list page with pagination — design
 
+> **Archived — implemented.** See SPEC.md §1. Product summary (Blog surface) for current behavior.
+
 - **Issues:** #75 (P3b: `/blog` route + Pagination), #85 (P3b: Pagination organism)
 - **Date:** 2026-07-14
 - **Layers:** `config → service → ui → web` (dependency order). No schema change → **no migration**.

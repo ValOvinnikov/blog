@@ -1,5 +1,7 @@
 # Multi-environment Release Pipeline Implementation Plan
 
+> **Archived — implemented.** See SPEC.md §13. Deployment topology for current behavior.
+
 > **Status: implemented & archived (2026-07).** This is a point-in-time planning
 > snapshot; the embedded workflow YAML below is an early draft and has since
 > diverged from what shipped (the dev pipeline gained `changes`/`verify`/`migrate`
@@ -16,7 +18,7 @@
 
 **Tech Stack:** GitHub Actions, Sanity CLI v6 (`sanity deploy`), Vercel CLI, pnpm 9.15.0 / Node 22, existing `.github/actions/setup` composite, zizmor (workflow audit).
 
-**Spec:** `docs/superpowers/specs/2026-07-13-multi-env-release-pipeline-design.md`
+**Spec:** `docs/archive/superpowers/specs/2026-07-13-multi-env-release-pipeline-design.md`
 
 ## Global Constraints
 

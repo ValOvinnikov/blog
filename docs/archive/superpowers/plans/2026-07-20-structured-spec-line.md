@@ -1,5 +1,7 @@
 # Structured Spec Line Implementation Plan
 
+> **Archived — implemented.** See SPEC.md §6. Content model for current behavior.
+
 > **For agentic workers:** Execution in this repo follows its own
 > `develop-feature`/`open-pull-request` skills (config/cms/service subagent
 > dispatch, `verify-runner`, `reviewer`, gated commit/push/PR) — **not**

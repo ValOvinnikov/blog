@@ -147,8 +147,8 @@ only what's new. Deploy happens once, at the end (3e).
 
 ### 3a — Home page (`/`)
 
-Home is a dedicated vertical slice. See `docs/home-page-rollout.md` for the
-source-of-truth content model and rollout contract. It uses a `homePage`
+Home is a dedicated vertical slice. See `docs/archive/home-page-rollout.md`
+for the source-of-truth content model and rollout contract. It uses a `homePage`
 singleton in Sanity, not the generic `page` document. The generic `page`
 document and `page.template` rendering remain Phase 4/page-builder work.
 
@@ -162,8 +162,8 @@ document and `page.template` rendering remain Phase 4/page-builder work.
 ### 3b — Blog list (`/blog` + `/blog/page/N`)
 
 > Spec'd + planned 2026-07-14 — see
-> `docs/superpowers/specs/2026-07-14-blog-list-pagination-design.md` and its
-> plan. Ships as **four per-layer PRs** (config → service → ui → web),
+> `docs/archive/superpowers/specs/2026-07-14-blog-list-pagination-design.md`
+> and its plan. Ships as **four per-layer PRs** (config → service → ui → web),
 > issues #75/#85. Establishes the site-wide routing conventions (route-builder
 > in `@blog/config`, `/x/page/N` pagination) — see SPEC §1.
 

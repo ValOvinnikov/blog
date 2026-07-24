@@ -283,6 +283,18 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   prematurely.
 - **Spec sync:** any PR that changes architecture, layer contracts, env vars,
   or the content model updates `SPEC.md` in the same PR.
+- **Design-doc retention:** a `docs/superpowers/specs/*`/`plans/*` doc is
+  "done" once its PR(s) merged **and** `SPEC.md` reflects the final shape —
+  archive it in the same PR that does that `SPEC.md` sync. Move both the spec
+  and its paired plan (if one exists) to `docs/archive/superpowers/{specs,plans}/`
+  (mirrors the existing `docs/archive/` bucket), keeping the filename, and add
+  a one-line banner right after the title:
+  `> **Archived — implemented.** See SPEC.md §N for current behavior.` (or a
+  file/path pointer if no `SPEC.md` section covers it, e.g. internal tooling).
+  Archived, never deleted — the doc still carries the "why" (alternatives
+  considered, tradeoffs) that `SPEC.md` doesn't restate. See `docs/README.md`
+  for the full index and the retroactive sweep this rule was introduced with
+  (#637).
 - **README sync:** `README.md` §"CI & automation" documents every workflow in
   `.github/workflows/` and the required status checks — a PR that adds or
   changes a workflow updates that section in the same PR. Likewise a PR that

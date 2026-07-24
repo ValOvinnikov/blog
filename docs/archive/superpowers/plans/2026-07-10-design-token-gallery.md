@@ -1,5 +1,9 @@
 # Design-Token Gallery Rework Implementation Plan
 
+> **Archived — implemented.** See `packages/ui/src/lib/design-tokens/` for
+> current behavior (no dedicated `SPEC.md` section — internal design-system
+> tooling).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the hand-maintained `@blog/ui` design-token gallery with one that auto-discovers every Tailwind token from `configs/tailwind/theme.css`, so renaming a token never requires editing the gallery.

@@ -1,5 +1,7 @@
 # Post Taxonomy (Category + Tags) Implementation Plan
 
+> **Archived — implemented.** See SPEC.md §6. Content model for current behavior.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. In THIS repo each Task is one per-layer **sub-issue of epic #674**, delegated to the matching scoped subagent (`config`/`cms`/`service`/`ui`/`web`) per `develop-feature`, and shipped as its own per-layer PR under milestone **M3 — Post taxonomy**.
 
 **Goal:** Split the post's overloaded `categories` array into a bounded **category** axis (section) and a new **tags** axis (topics) backed by a `blog_tag` reference document, with full tag discovery — `/tag/*` archives, shared-tag ranked related-posts, per-tag RSS, sitemap, and JSON-LD keywords.
