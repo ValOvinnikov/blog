@@ -1,0 +1,62 @@
+name: Refresh Dev Dataset
+
+# Manually replaces the `development` Sanity dataset with a fresh copy of
+# `production` (published documents only) — dev and prod are separate Sanity
+# PROJECTS (docs/DEPLOY.md), so this is a cross-project export + import, not
+# `sanity dataset copy` (same-project only, doesn't apply here).
+#
+# Run this ONLY after confirming that release's production migrations have
+# already finished (never in parallel with or before them) — see
+# apps/cms/migrations/README.md and docs/DEPLOY.md for the full release
+# sequence. `workflow_dispatch` is the ONLY trigger; this must never fire
+# automatically (no `push`/`schedule`).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Never let a second refresh run concurrently with (or cancel) one already in
+# progress — the job deletes and recreates the target dataset mid-run.
+concurrency:
+  group: refresh-dev-dataset
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 9.15.0
+  NODE_VERSION: '22'
+
+jobs:
+  refresh:
+    name: Refresh development from production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Dedicated environment (distinct from `development`/`production`) that
+    # holds BOTH projects' credentials at once, since this one job reads from
+    # prod and writes to dev in the same run — unlike the single-project
+    # deploy/migrate jobs, which each need only their own environment's
+    # secrets. Add a required reviewer on this environment (Settings →
+    # Environments → dataset-refresh) for a human approval gate before the
+    # job runs, given it deletes the dev dataset.
+    environment: dataset-refresh
+    env:
+      SANITY_PROD_PROJECT_ID: ${{ vars.SANITY_PROD_PROJECT_ID }}
+      SANITY_PROD_EXPORT_TOKEN: ${{ secrets.SANITY_PROD_EXPORT_TOKEN }}
+      SANITY_DEV_PROJECT_ID: ${{ vars.SANITY_DEV_PROJECT_ID }}
+      SANITY_DEV_IMPORT_TOKEN: ${{ secrets.SANITY_DEV_IMPORT_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      # This is a deliberate, manually-triggered action — unlike the
+      # auto-triggered deploy workflows, it should NOT no-op green when a
+      # secret is missing. The script's own guard fails loudly (and safely,
+      # before any network call) if anything required is missing or the
+      # source/target direction isn't exactly production -> development.
+      - name: Refresh development dataset from production
+        working-directory: apps/cms
+        run: pnpm dataset:refresh-dev
