@@ -20,6 +20,12 @@ describe('toPostCard', () => {
     expect(result.heroImageUrl).toContain('sanity.io');
     expect(result.heroImageAlt).toBe('Alt text');
     expect(result.featured).toBe(false);
+    expect(result.readingTimeMinutes).toBe(2);
+  });
+
+  it('computes reading time from the word count', () => {
+    const result = toPostCard(makeRawPostCard({ wordCount: 600 }));
+    expect(result.readingTimeMinutes).toBe(3);
   });
 
   it('maps the author sub-object', () => {

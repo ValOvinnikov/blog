@@ -34,6 +34,7 @@ export function makeRawPostCard(
       slug: 'engineering',
       description: 'Engineering posts',
     },
+    wordCount: 400,
     ...overrides,
   };
 }

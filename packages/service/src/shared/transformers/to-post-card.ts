@@ -2,6 +2,7 @@ import type { ISanityImage, TMaybeUndefined } from '@blog/config';
 import type { postCardFragment } from '@blog/service/shared/fragments/post';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
+import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawPostCard = InferFragmentType<typeof postCardFragment>;
@@ -31,6 +32,7 @@ export type TPostCard = {
   featured: boolean;
   author: TPostCardAuthor;
   category: TPostCardCategory;
+  readingTimeMinutes: number;
 };
 
 function toPostCardAuthor(raw: TRawPostCard['author']): TPostCardAuthor {
@@ -65,5 +67,6 @@ export function toPostCard(raw: TRawPostCard): TPostCard {
     featured: raw.featured ?? false,
     author: toPostCardAuthor(raw.author),
     category: toPostCardCategory(raw.category),
+    readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };
 }
