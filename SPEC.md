@@ -323,7 +323,8 @@ override bag) + `openGraph`,
 | `VERCEL_TOKEN` / `_ORG_ID` / `_PROJECT_ID` | CI (deploy)                             | Vercel CLI deploys; token is a Secret, ids are Variables                                                                                               |
 | `TURBO_TOKEN` / `TURBO_TEAM`               | CI (all)                                | optional Vercel Remote Cache; no-op until configured                                                                                                   |
 | `SKIP_ENV_VALIDATION`                      | CI builds only                          | bypasses Zod env validation where no vars exist                                                                                                        |
-| `LIGHTHOUSE_URLS`                          | CI (`lighthouse.yml`)                   | Variable; one full preview URL per line (`/` + one post page); no-op until #275 lands a preview-URL mechanism (see `.lighthouse/README.md`)            |
+| `LIGHTHOUSE_URLS`                          | CI (`lighthouse.yml`)                   | Variable; one full preview URL per line (`/` + one post page); no-op until a preview-URL mechanism lands (see `.lighthouse/README.md`)                 |
+| `SMOKE_URL`                                | CI (`playwright-smoke.yml`)             | Variable; one already-deployed origin the Playwright smoke suite (`apps/web/e2e/`) runs against; no-op until set, same mechanism as `LIGHTHOUSE_URLS`  |
 
 - Env access is **always** through the validated entry points
   (`apps/web/src/utils/env/env.ts` via `@t3-oss/env-nextjs`, service's env via
@@ -465,12 +466,15 @@ changing a schema does **not** change existing documents.
 - CI (required checks on PRs to `main`): Type-check, Lint, Test, Typegen,
   Migrations (load + read-only dry-run), Build, dependency-review — plus
   advisory jobs: knip (unused files/exports/dependencies), actionlint + zizmor
-  (workflow lint + security), Dependabot, Claude code review, and Lighthouse CI
+  (workflow lint + security), Dependabot, Claude code review, Lighthouse CI
   (`lighthouse.yml`, #399 — budget assertions against `.lighthouse/budgets.json`
-  for `/` and one post page; no-op until the `LIGHTHOUSE_URLS` Variable is set,
-  which depends on #275's preview-URL mechanism). knip starts non-required and
-  is promoted to a required check once it has held zero false positives across
-  two weeks of PRs (human-gated ruleset change).
+  for `/` and one post page; no-op until the `LIGHTHOUSE_URLS` Variable is set),
+  and Playwright smoke (`playwright-smoke.yml`, #275 — home + one post page
+  render 200 with zero console errors, against `SMOKE_URL`; no-op until that
+  Variable is set, same reason as Lighthouse — no PR preview deploys yet).
+  knip starts non-required and is promoted to a required check once it has
+  held zero false positives across two weeks of PRs (human-gated ruleset
+  change).
 - Hooks: husky + lint-staged (eslint --fix + prettier on staged files).
 - Conventional commits; one concern per PR.
 
