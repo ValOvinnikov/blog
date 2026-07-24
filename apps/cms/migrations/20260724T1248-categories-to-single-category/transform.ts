@@ -11,7 +11,7 @@ export type TLegacyPostDoc = { categories?: TLegacyCategoryRef[] };
 /**
  * Pure transform: picks the first entry of the legacy `categories` array as
  * the new single `category` reference value. Exported so it's unit-testable
- * (#264) without a live dataset connection.
+ * without a live dataset connection — see `./transform.test.ts`.
  */
 export function categoriesToSingleCategory(
   doc: TLegacyPostDoc,
