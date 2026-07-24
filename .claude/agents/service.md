@@ -59,14 +59,14 @@ relative paths only within a single slice (`./query`, `./types`).
 - `urlForImage` (`sanity/image.ts`) on `@sanity/image-url`.
 - The `service` facade — the only public surface (`src/index.ts`), grouped by
   domain and version: `service.pages.post.v1.getPost(slug)`,
-  `service.entities.author.v1.getAuthorParams()`.
+  `service.pages.author.v1.getAuthorParams()`.
 - ISR via `runQuery(query, { parameters, ...isr('tag') })`.
 
 ## Folder structure
 
 - **Domains** group features in `features/`: `pages/*` (route data: home,
-  generic, blog, post, category), `modules/*` (page-builder module data: hero,
-  post-list, content, cta), `entities/*` (content entities: author,
+  generic, blog, post, category, tag, author), `modules/*` (page-builder
+  module data: hero, post-list, content, cta), `entities/*` (content entities:
   categories), `global/*` (global settings: site-settings, navigation, footer).
   The root `service` object mirrors these domains →
   `{ pages, modules, entities, global }`.
@@ -93,9 +93,8 @@ relative paths only within a single slice (`./query`, `./types`).
     `generateStaticParams` source. Prefer these to entity-suffixed names — the
     blog route is an _index_ page (a post list) with no `blogPage` CMS document,
     so its loader is `getIndexPage`, not `getBlogPage`. **One query per file** —
-    a slice composing two queries has two files (e.g. category `detail/` has
-    `category.query.ts` + `posts.query.ts`). _(Existing `post`/`category`/
-    `author` still use the older `detail/`+`params/` names pending a retrofit.)_
+    a slice composing two queries has two files (e.g. category `detail-page/`
+    has `category.query.ts` + `posts.query.ts`).
     **Loader return type is always `Promise<TViewModel>` — never nullable.**
     Do not add null checks, `| null` return types, or try/catch in loaders.
     If a document is missing, groqd throws (e.g. `ValidationErrors`) — let it
