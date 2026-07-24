@@ -16,10 +16,8 @@ vi.mock('@blog/service', () => ({
 }));
 
 vi.mock('@web/components/pages/author-page', () => ({
-  AuthorPage: ({ slug, locale }: { slug: string; locale: string }) => (
-    <div data-testid="author-page">
-      {slug}-{locale}
-    </div>
+  AuthorPage: ({ slug }: { slug: string }) => (
+    <div data-testid="author-page">{slug}</div>
   ),
 }));
 
@@ -61,12 +59,11 @@ describe('AuthorDetailPage', () => {
     });
   });
 
-  it('renders AuthorPage with the resolved locale and slug', async () => {
+  it('renders AuthorPage with the resolved slug', async () => {
     const ui = await AuthorDetailPage({
       params: Promise.resolve({ locale: 'EN', slug: 'jane-doe' }),
     });
 
     expect(ui.props.slug).toBe('jane-doe');
-    expect(ui.props.locale).toBe('EN');
   });
 });

@@ -1,4 +1,4 @@
-import { routes, type ILocalizedParams } from '@blog/config';
+import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
@@ -10,7 +10,7 @@ import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
-type TCategoryPageProps = ILocalizedParams & { slug: string; page?: number };
+type TCategoryPageProps = { slug: string; page?: number };
 
 /**
  * CategoryPage — shared composition for `/category/[slug]` (page 1, `page`

@@ -1,4 +1,4 @@
-import { routes, type ILocalizedParams } from '@blog/config';
+import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
@@ -8,7 +8,7 @@ import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
-type TTagPageProps = ILocalizedParams & { slug: string; page?: number };
+type TTagPageProps = { slug: string; page?: number };
 
 /**
  * TagPage — shared composition for `/tag/[slug]` (page 1, `page` omitted)

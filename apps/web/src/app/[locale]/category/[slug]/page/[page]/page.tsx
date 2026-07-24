@@ -52,5 +52,5 @@ export default async function CategoryNumberedPage({ params }: TProps) {
     permanentRedirect({ href: routes.category(slug, 1), locale });
   }
 
-  return <CategoryPage slug={slug} page={page} locale={locale} />;
+  return <CategoryPage slug={slug} page={page} />;
 }

@@ -24,10 +24,8 @@ vi.mock('@web/metadata/post-metadata', () => ({
 }));
 
 vi.mock('@web/components/pages/blog-post-page', () => ({
-  BlogPostPage: ({ slug, locale }: { slug: string; locale: string }) => (
-    <div data-testid="blog-post-page">
-      {slug}-{locale}
-    </div>
+  BlogPostPage: ({ slug }: { slug: string }) => (
+    <div data-testid="blog-post-page">{slug}</div>
   ),
 }));
 
@@ -63,12 +61,11 @@ describe('BlogPostSlugPage', () => {
     });
   });
 
-  it('renders BlogPostPage with the resolved locale and slug', async () => {
+  it('renders BlogPostPage with the resolved slug', async () => {
     const ui = await BlogPostSlugPage({
       params: Promise.resolve({ locale: 'EN', slug: 'hello-world' }),
     });
 
     expect(ui.props.slug).toBe('hello-world');
-    expect(ui.props.locale).toBe('EN');
   });
 });

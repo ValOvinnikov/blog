@@ -57,7 +57,6 @@ const category = makeCategory({
 
 const setup = customRenderAsync(CategoryPage, {
   slug: 'news',
-  locale: 'en',
 });
 
 describe(`<${CategoryPage.name}/>`, () => {

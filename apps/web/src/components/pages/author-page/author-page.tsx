@@ -1,4 +1,4 @@
-import { Size, type ILocalizedParams, routes } from '@blog/config';
+import { Size, routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Avatar, Eyebrow } from '@blog/ui/atoms';
 import { ActionList, ShareLink } from '@blog/ui/molecules';
@@ -14,7 +14,7 @@ import { getTranslations } from 'next-intl/server';
 
 import { authorPageVariants } from './author-page-variants';
 
-type TAuthorPageProps = ILocalizedParams & { slug: string; page?: number };
+type TAuthorPageProps = { slug: string; page?: number };
 
 const s = authorPageVariants();
 

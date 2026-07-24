@@ -55,7 +55,6 @@ const post = makePostCard({
 
 const setup = customRenderAsync(TagPage, {
   slug: 'typescript',
-  locale: 'en',
 });
 
 describe(`<${TagPage.name}/>`, () => {

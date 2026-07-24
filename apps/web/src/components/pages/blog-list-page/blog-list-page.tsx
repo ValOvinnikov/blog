@@ -1,4 +1,4 @@
-import { routes, type ILocalizedParams } from '@blog/config';
+import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
@@ -9,7 +9,7 @@ import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
-type TBlogListPageProps = ILocalizedParams & { page: number };
+type TBlogListPageProps = { page: number };
 
 /**
  * BlogListPage — shared composition for `/blog` (page 1) and

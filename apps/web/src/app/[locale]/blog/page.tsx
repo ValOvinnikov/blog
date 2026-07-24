@@ -16,5 +16,5 @@ export default async function BlogIndexPage({ params }: TProps) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <BlogListPage page={1} locale={locale} />;
+  return <BlogListPage page={1} />;
 }

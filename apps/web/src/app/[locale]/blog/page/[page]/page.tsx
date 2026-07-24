@@ -48,5 +48,5 @@ export default async function BlogListNumberedPage({ params }: TProps) {
     permanentRedirect({ href: routes.blogIndex(1), locale });
   }
 
-  return <BlogListPage page={page} locale={locale} />;
+  return <BlogListPage page={page} />;
 }

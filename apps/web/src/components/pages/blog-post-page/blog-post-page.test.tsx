@@ -34,7 +34,6 @@ vi.mock('@web/components/shared/smart-link', () => ({
 
 const setup = customRenderAsync(BlogPostPage, {
   slug: 'hello-world',
-  locale: 'EN',
 });
 
 describe(`<${BlogPostPage.name}/>`, () => {

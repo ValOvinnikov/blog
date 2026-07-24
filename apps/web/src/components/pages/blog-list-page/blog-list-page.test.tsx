@@ -46,7 +46,7 @@ const post = makePostCard({
   categories: [makePostCardCategory()],
 });
 
-const setup = customRenderAsync(BlogListPage, { page: 1, locale: 'en' });
+const setup = customRenderAsync(BlogListPage, { page: 1 });
 
 describe(`<${BlogListPage.name}/>`, () => {
   beforeEach(() => {

@@ -13,10 +13,8 @@ vi.mock('@blog/service', () => ({
 }));
 
 vi.mock('@web/components/pages/tag-page', () => ({
-  TagPage: ({ slug, locale }: { slug: string; locale: string }) => (
-    <div data-testid="tag-page">
-      {slug}-{locale}
-    </div>
+  TagPage: ({ slug }: { slug: string }) => (
+    <div data-testid="tag-page">{slug}</div>
   ),
 }));
 
@@ -58,12 +56,11 @@ describe('TagDetailPage', () => {
     });
   });
 
-  it('renders TagPage with the resolved locale and slug', async () => {
+  it('renders TagPage with the resolved slug', async () => {
     const ui = await TagDetailPage({
       params: Promise.resolve({ locale: 'EN', slug: 'typescript' }),
     });
 
     expect(ui.props.slug).toBe('typescript');
-    expect(ui.props.locale).toBe('EN');
   });
 });

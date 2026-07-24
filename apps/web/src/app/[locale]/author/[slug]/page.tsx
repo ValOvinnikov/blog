@@ -30,5 +30,5 @@ export default async function AuthorDetailPage({ params }: TProps) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  return <AuthorPage slug={slug} locale={locale} />;
+  return <AuthorPage slug={slug} />;
 }

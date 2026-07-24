@@ -1,4 +1,4 @@
-import { routes, type ILocalizedParams } from '@blog/config';
+import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Article, PostsSection } from '@blog/ui/organisms';
 import { JsonLd } from '@web/components/shared/json-ld';
@@ -16,7 +16,7 @@ import { getFormatter } from 'next-intl/server';
 
 import { blogPostPageVariants } from './blog-post-page-variants';
 
-type TBlogPostPageProps = ILocalizedParams & { slug: string };
+type TBlogPostPageProps = { slug: string };
 
 const s = blogPostPageVariants();
 
@@ -59,8 +59,10 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
     icon: <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />,
   }));
   const primaryCategory = categories[0];
-  const format = await getFormatter();
-  const relatedPostItems = await toPostListItems(relatedPosts);
+  const [format, relatedPostItems] = await Promise.all([
+    getFormatter(),
+    toPostListItems(relatedPosts),
+  ]);
 
   return (
     <main className={s.root()}>

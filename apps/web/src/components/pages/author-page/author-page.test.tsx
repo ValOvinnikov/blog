@@ -51,7 +51,7 @@ const post = makePostCard({
   categories: [makePostCardCategory()],
 });
 
-const setup = customRenderAsync(AuthorPage, { slug: 'jane-doe', locale: 'en' });
+const setup = customRenderAsync(AuthorPage, { slug: 'jane-doe' });
 
 describe(`<${AuthorPage.name}/>`, () => {
   beforeEach(() => {
