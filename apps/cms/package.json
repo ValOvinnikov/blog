@@ -20,7 +20,8 @@
     "migrate:run": "node scripts/migrate.mjs run",
     "migrate:deploy": "node scripts/migrate.mjs deploy",
     "migrate:backfill": "node scripts/migrate.mjs deploy --backfill",
-    "dataset:export": "node scripts/migrate.mjs export"
+    "dataset:export": "node scripts/migrate.mjs export",
+    "dataset:refresh-dev": "node scripts/refresh-dev-dataset.mjs"
   },
   "dependencies": {
     "@blog/config": "workspace:*",

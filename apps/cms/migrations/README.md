@@ -194,3 +194,20 @@ For CI/deploy, `migrate:run --yes` (or `CI=true`) runs non-interactively — sam
 for `migrate:deploy --yes` / `migrate:backfill --yes`. To
 target a non-default dataset ad-hoc without env, pass an explicit `--dataset`
 through to the underlying `sanity migrations run`.
+
+## Refreshing `development` from `production` (not a migration)
+
+`pnpm --filter cms dataset:refresh-dev` (`scripts/refresh-dev-dataset.mjs`) is
+a **different** tool from everything above — it doesn't transform documents in
+place, it wholesale **replaces** the `development` dataset with a fresh
+`--no-drafts` (published-only) export of `production`, including assets. Dev
+and prod are separate Sanity **projects** (see `docs/DEPLOY.md`), so this is a
+cross-project export/import, not `sanity dataset copy` (same-project only).
+
+Run it manually, via the `Refresh Dev Dataset` GitHub Actions workflow
+(`workflow_dispatch` only — never automatic), and only **after** confirming
+that release's production migrations have already finished. The script's
+`assertSafeDatasetRefresh` guard (`scripts/refresh-dev-dataset-lib.mjs`)
+refuses to run unless the target is exactly `development` and the source/
+target project ids are both present and different — it fails loudly before
+any network call rather than risk writing into production.
