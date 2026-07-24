@@ -1,5 +1,5 @@
 /** A `blog_post.categories[]` array item as it existed before #811. */
-export type TLegacyCategoryRef = {
+type TLegacyCategoryRef = {
   _ref: string;
   _type: string;
   _key: string;
