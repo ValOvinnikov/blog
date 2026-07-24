@@ -125,7 +125,7 @@ Expected: FAIL — cannot resolve `./routes`.
  * Single source of truth for app URL construction. Consumed by `service`
  * (href-emitting transformers) and `web` (routes, pagination `createHref`,
  * sitemap, JSON-LD) — never build these paths inline elsewhere.
- * Spec: docs/superpowers/specs/2026-07-14-blog-list-pagination-design.md.
+ * Spec: docs/archive/superpowers/specs/2026-07-14-blog-list-pagination-design.md.
  */
 export const routes = {
   home: () => '/',
