@@ -152,4 +152,21 @@ describe('getTagPage', () => {
     expect(result?.tag.seo.title).toBe('Rust');
     expect(result?.tag.seo.description).toBe('Site default description');
   });
+
+  it('tags the posts query with category alongside posts', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawTagPageTag())
+      .mockResolvedValueOnce({ posts: [], total: 0 })
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    await getTagPage('typescript', { itemsPerPage: 9 });
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({
+        next: { revalidate: 3600, tags: ['posts', 'category'] },
+      }),
+    );
+  });
 });

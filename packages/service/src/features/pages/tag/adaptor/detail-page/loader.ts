@@ -30,9 +30,11 @@ export async function getTagPage(
       parameters: { slug },
       ...isr('tag'),
     }),
+    // `archivePostCardFragment` derefs `category` — that tag must ride
+    // alongside `posts` (tag-scope contract, `sanity/query.ts`).
     runQuery(buildTagPostsPageQuery(start, start + itemsPerPage), {
       parameters: { slug },
-      ...isr('posts'),
+      ...isr(['posts', 'category']),
     }),
     getSiteSettings(),
   ]);

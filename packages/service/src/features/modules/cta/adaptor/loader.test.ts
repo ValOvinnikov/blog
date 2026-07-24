@@ -23,4 +23,27 @@ describe('getCta', () => {
 
     await expect(getCta('missing')).rejects.toThrow();
   });
+
+  it('tags the query with every type its action can reference internally', async () => {
+    mockRun.mockResolvedValueOnce(makeRawCtaModule());
+
+    await getCta('cta-1');
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        next: {
+          revalidate: 3600,
+          tags: [
+            'modules:cta',
+            'module:cta-1',
+            'post',
+            'category',
+            'page_generic',
+            'page_blog',
+          ],
+        },
+      }),
+    );
+  });
 });

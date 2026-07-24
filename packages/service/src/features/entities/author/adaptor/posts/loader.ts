@@ -18,11 +18,13 @@ export async function getAuthorPosts(
   { page = 1, itemsPerPage }: TGetAuthorPostsArgs,
 ): Promise<TAuthorPosts> {
   const start = (page - 1) * itemsPerPage;
+  // `archivePostCardFragment` derefs `category` — that tag must ride
+  // alongside `posts` (tag-scope contract, `sanity/query.ts`).
   const raw = await runQuery(
     buildAuthorPostsPageQuery(start, start + itemsPerPage),
     {
       parameters: { slug },
-      ...isr('posts'),
+      ...isr(['posts', 'category']),
     },
   );
   return toAuthorPosts(raw.posts, raw.total);

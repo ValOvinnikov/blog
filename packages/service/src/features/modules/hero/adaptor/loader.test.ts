@@ -30,4 +30,42 @@ describe('getHero', () => {
 
     await expect(getHero('missing')).rejects.toThrow();
   });
+
+  it('tags both queries with every document type their fragments dereference', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawHeroModule())
+      .mockResolvedValueOnce(null);
+
+    await getHero('hero-1');
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({
+        next: {
+          revalidate: 3600,
+          tags: [
+            'modules:hero',
+            'module:hero-1',
+            'posts',
+            'author',
+            'category',
+            'post',
+            'page_generic',
+            'page_blog',
+          ],
+        },
+      }),
+    );
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({
+        next: {
+          revalidate: 3600,
+          tags: ['posts', 'author', 'category'],
+        },
+      }),
+    );
+  });
 });
