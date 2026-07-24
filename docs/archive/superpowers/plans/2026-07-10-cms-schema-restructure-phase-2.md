@@ -4,7 +4,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax.
 > Part of #242 · sub-issue **#247** · follows the master plan
-> `docs/superpowers/plans/2026-07-10-cms-schema-restructure-plan.md`.
+> `docs/archive/superpowers/plans/2026-07-10-cms-schema-restructure-plan.md`.
 
 **Goal:** Replace the flat `ogTitle`/`ogDescription`/`ogImage` fields on `seo`
 and `siteSettings` with a shared `openGraph` object, make `seo` a

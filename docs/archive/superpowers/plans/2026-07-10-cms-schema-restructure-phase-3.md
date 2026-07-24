@@ -4,7 +4,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:subagent-driven-development. Steps use `- [ ]`.
 > Part of #242 · sub-issue **#248** · master plan
-> `docs/superpowers/plans/2026-07-10-cms-schema-restructure-plan.md`.
+> `docs/archive/superpowers/plans/2026-07-10-cms-schema-restructure-plan.md`.
 
 **Goal:** Break the `siteSettings` god-object apart: introduce a `brand` object
 (single source for header wordmark + footer name), and extract `navigation` and

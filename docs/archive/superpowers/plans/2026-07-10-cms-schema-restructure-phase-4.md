@@ -4,7 +4,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:subagent-driven-development. Steps use `- [ ]`.
 > Part of #242 · sub-issue **#249** · master plan
-> `docs/superpowers/plans/2026-07-10-cms-schema-restructure-plan.md`.
+> `docs/archive/superpowers/plans/2026-07-10-cms-schema-restructure-plan.md`.
 
 **Goal:** Replace the `link` **document**, `navItem`, and `socialLink` with one
 shared `link` **object** used everywhere (header nav, footer social, hero

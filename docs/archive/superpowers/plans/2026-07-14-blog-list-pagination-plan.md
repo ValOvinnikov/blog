@@ -11,7 +11,7 @@
 > sequence: root verify → `reviewer` subagent `APPROVE` → **human-approved**
 > commit → push → PR → board update. Never bundle gates.
 
-**Spec:** `docs/superpowers/specs/2026-07-14-blog-list-pagination-design.md` (committed on `feat/config-route-builder`).
+**Spec:** `docs/archive/superpowers/specs/2026-07-14-blog-list-pagination-design.md` (committed on `feat/config-route-builder`).
 **Issues:** #75 (`/blog` route), #85 (Pagination organism).
 
 **Goal:** Ship the paginated `/blog` index (`/blog`, `/blog/page/N`) plus the site-wide route-builder it rides on.

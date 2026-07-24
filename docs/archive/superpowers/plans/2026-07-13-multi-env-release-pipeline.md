@@ -18,7 +18,7 @@
 
 **Tech Stack:** GitHub Actions, Sanity CLI v6 (`sanity deploy`), Vercel CLI, pnpm 9.15.0 / Node 22, existing `.github/actions/setup` composite, zizmor (workflow audit).
 
-**Spec:** `docs/superpowers/specs/2026-07-13-multi-env-release-pipeline-design.md`
+**Spec:** `docs/archive/superpowers/specs/2026-07-13-multi-env-release-pipeline-design.md`
 
 ## Global Constraints
 

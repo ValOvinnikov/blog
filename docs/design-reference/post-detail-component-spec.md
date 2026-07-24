@@ -2,7 +2,7 @@
 
 Status: deferred. This file is retained as design reference only and must not be
 pulled into the Home page rollout. The Home-only plan lives in
-`docs/home-page-rollout.md`.
+`docs/archive/home-page-rollout.md`.
 
 Source design: Console direction A — azure serif. This file assumes the Home page component library has already been implemented. Reuse shared components from the Home page implementation instead of duplicating them.
 
