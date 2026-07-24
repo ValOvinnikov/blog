@@ -18,15 +18,8 @@ What lives where, and which docs are live vs. historical. See `CLAUDE.md`'s
 `docs/superpowers/specs/*` and `docs/superpowers/plans/*` — produced by the
 `superpowers:brainstorming`/`writing-plans` skills while a feature is being
 designed/built. A doc stays here until its work has shipped **and** `SPEC.md`
-has been updated to describe the final shape:
-
-- `2026-07-10-migration-deployment-automation-design.md` — deferred (not yet
-  implemented, per project decision).
-- `2026-07-12-reading-depth-design.md` / `2026-07-12-reading-depth-plan.md` —
-  approved design, not yet implemented.
-
-(This list reflects what's active as of this PR — check the directory listing
-for anything landed since.)
+has been updated to describe the final shape — see the directory listing for
+what's currently active.
 
 ## Archived design docs (shipped — historical only)
 
