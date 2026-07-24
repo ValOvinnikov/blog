@@ -14,6 +14,7 @@ export default [
       'dist/**',
       '.next/**',
       'node_modules/**',
+      'storybook-static/**',
       '**/sanity/generated/types.ts',
     ],
   },
