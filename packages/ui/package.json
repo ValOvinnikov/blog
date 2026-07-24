@@ -28,8 +28,8 @@
     "tailwind-variants": "^3.2.2"
   },
   "peerDependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@blog/eslint-config": "workspace:*",
@@ -50,8 +50,8 @@
     "eslint": "catalog:",
     "jsdom": "^29.1.1",
     "prettier": "^3.9.5",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "storybook": "^8.6.18",
     "tailwindcss": "^4.3.3",
     "typescript": "catalog:",
