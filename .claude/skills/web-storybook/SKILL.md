@@ -10,7 +10,10 @@ description: >-
 
 # Storybook in `apps/web`
 
-Storybook v8 with `@storybook/nextjs`. Runs on port **6007**.
+Storybook v10 with `@storybook/nextjs-vite` (Vite-based — `@storybook/nextjs`'s
+webpack preset requires `next/config`, which Next.js 16 removed entirely; see
+[storybookjs/storybook#29421](https://github.com/storybookjs/storybook/issues/29421)).
+Runs on port **6007**.
 
 ```
 pnpm --filter web storybook        # dev server
@@ -18,8 +21,16 @@ pnpm --filter web storybook:build  # static build
 ```
 
 RSC experimental mode is enabled (`features.experimentalRSC: true` in
-`.storybook/main.ts`). `@storybook/nextjs` handles Next.js Image, Link, and
-navigation stubs automatically.
+`.storybook/main.ts`). `@storybook/nextjs-vite` handles Next.js Image, Link,
+and navigation stubs automatically. `Meta`/`StoryObj`/`Preview` types come
+from `@storybook/nextjs-vite` (the framework package), not `@storybook/react`
+— Storybook 10 moved to framework-based type imports.
+
+Storybook 10 folded `@storybook/addon-essentials` into core (viewport,
+controls, interactions, actions ship for free — no addon needed). The one
+piece that didn't move to core is docs: `@storybook/addon-docs` is an
+explicit `addons` entry in `.storybook/main.ts`, required for the
+`tags: ['autodocs']` convention below to work.
 
 ## What to story in `apps/web`
 
@@ -57,7 +68,7 @@ src/app/[locale]/blog/[slug]/
 ## Story format (CSF 3)
 
 ```tsx
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { PostPage } from './post-page';
 import { mockPost } from '@web/storybook/fixtures/post';
 
@@ -117,11 +128,22 @@ export const getPost = async () => mockPost;
 ```
 
 ```ts
-// .storybook/main.ts viteFinal (if mocking is needed)
-config.resolve = config.resolve ?? {};
-config.resolve.alias = {
-  ...config.resolve.alias,
-  '@blog/service': path.resolve(__dirname, 'mocks/service.ts'),
+// .storybook/main.ts — main.ts is loaded as ESM (no __dirname/require), so
+// resolve the mock path via import.meta.url
+import { fileURLToPath } from 'node:url';
+
+const config: StorybookConfig = {
+  // ...
+  async viteFinal(viteConfig) {
+    viteConfig.resolve ??= {};
+    viteConfig.resolve.alias = {
+      ...viteConfig.resolve.alias,
+      '@blog/service': fileURLToPath(
+        new URL('./mocks/service.ts', import.meta.url),
+      ),
+    };
+    return viteConfig;
+  },
 };
 ```
 
@@ -136,7 +158,7 @@ new components to avoid the coupling.
 - `"use client"` components story identically to any React component — no
   special setup needed.
 - Next.js navigation (`useRouter`, `usePathname`) is automatically stubbed
-  by `@storybook/nextjs`. Control it via `parameters.nextjs.navigation`.
+  by `@storybook/nextjs-vite`. Control it via `parameters.nextjs.navigation`.
 
 ```tsx
 export const WithActiveNav: Story = {
@@ -179,16 +201,18 @@ If a story's data is also something a test needs, it belongs in
 
 ## Tailwind in apps/web stories
 
-The `@storybook/nextjs` framework picks up `next.config.ts` and processes
-CSS through the Next.js PostCSS pipeline. The global stylesheet is
-`src/index.css` (the one `src/app/[locale]/layout.tsx` imports) — import it in
-`.storybook/preview.ts`:
+The `@storybook/nextjs-vite` framework picks up `next.config.ts` and, being
+Vite-based, resolves CSS through Vite's built-in PostCSS pipeline — it
+auto-detects `postcss.config.mjs` at the app root, so the existing
+`@tailwindcss/postcss` plugin config keeps working unchanged. The global
+stylesheet is `apps/web/index.css` (the one `src/app/[locale]/layout.tsx`
+imports) — import it in `.storybook/preview.ts`:
 
 ```ts
-import '../src/index.css';
+import '../index.css';
 ```
 
-This ensures `@import "tailwindcss"` and the `@source` directive for
+This ensures `@import` of the shared theme and the `@source` directive for
 `packages/ui` are active in Storybook.
 
 ## Naming convention
