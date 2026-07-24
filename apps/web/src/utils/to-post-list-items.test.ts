@@ -16,6 +16,7 @@ describe('toPostListItems', () => {
       excerpt: 'An excerpt.',
       publishedAt: '2026-01-15T00:00:00.000Z',
       category,
+      readingTimeMinutes: 2,
     });
 
     const [item] = await toPostListItems([post]);
@@ -27,7 +28,7 @@ describe('toPostListItems', () => {
       excerpt: 'An excerpt.',
       publishedAt: '2026-01-15T00:00:00.000Z',
       formattedDate: 'January 15, 2026',
-      readingTime: undefined,
+      readingTime: '2 min',
       category,
     });
   });
@@ -61,20 +62,12 @@ describe('toPostListItems', () => {
     });
   });
 
-  it('derives readingTime from readingTimeMinutes when present (archive post cards)', async () => {
-    const post = { ...makePostCard(), readingTimeMinutes: 5 };
+  it('derives readingTime from readingTimeMinutes', async () => {
+    const post = makePostCard({ readingTimeMinutes: 5 });
 
     const [item] = await toPostListItems([post]);
 
     expect(item?.readingTime).toBe('5 min');
-  });
-
-  it('omits readingTime when the source has no readingTimeMinutes', async () => {
-    const post = makePostCard();
-
-    const [item] = await toPostListItems([post]);
-
-    expect(item?.readingTime).toBeUndefined();
   });
 
   it('maps an empty list to an empty list', async () => {
