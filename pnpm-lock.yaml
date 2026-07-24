@@ -9,6 +9,12 @@ catalogs:
     eslint:
       specifier: ^10.7.0
       version: 10.7.0
+    react:
+      specifier: ^19.0.0
+      version: 19.2.7
+    react-dom:
+      specifier: ^19.0.0
+      version: 19.2.7
     typescript:
       specifier: ^6.0.3
       version: 6.0.3
@@ -76,10 +82,10 @@ importers:
         specifier: ^1.24.0
         version: 1.24.0(react@19.2.7)
       react:
-        specifier: ^19.0.0
+        specifier: 'catalog:'
         version: 19.2.7
       react-dom:
-        specifier: ^19.0.0
+        specifier: 'catalog:'
         version: 19.2.7(react@19.2.7)
       sanity:
         specifier: ^6.6.0
@@ -152,10 +158,10 @@ importers:
         specifier: ^4.13.2
         version: 4.13.2(next@16.2.11(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(typescript@6.0.3)
       react:
-        specifier: ^19.0.0
+        specifier: 'catalog:'
         version: 19.2.7
       react-dom:
-        specifier: ^19.0.0
+        specifier: 'catalog:'
         version: 19.2.7(react@19.2.7)
       react-syntax-highlighter:
         specifier: ^15.6.6
@@ -270,7 +276,7 @@ importers:
         specifier: ^17.7.0
         version: 17.7.0
       react:
-        specifier: ^19.0.0
+        specifier: 'catalog:'
         version: 19.2.7
       typescript-eslint:
         specifier: ^8.64.0
@@ -477,10 +483,10 @@ importers:
         specifier: ^3.9.5
         version: 3.9.5
       react:
-        specifier: ^19.0.0
+        specifier: 'catalog:'
         version: 19.2.7
       react-dom:
-        specifier: ^19.0.0
+        specifier: 'catalog:'
         version: 19.2.7(react@19.2.7)
       storybook:
         specifier: ^8.6.18

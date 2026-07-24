@@ -133,6 +133,11 @@ matching hardcoded version with `"catalog:"` in each consuming
 `package.json`, then run `pnpm install` and confirm the lockfile diff only
 changes `specifier` fields (not resolved `version` fields) — a version bump
 belongs in its own change, not bundled with a catalog migration.
+The `catalog:` protocol resolves identically in a `dependencies`,
+`devDependencies`, or `peerDependencies` block — `react`/`react-dom` (in
+`dependencies` for `apps/cms`/`apps/web`, `peerDependencies` for
+`packages/ui`) confirmed this alongside the earlier `devDependencies`-only
+migrations.
 
 ## Content model
 
