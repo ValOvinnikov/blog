@@ -26,6 +26,8 @@
     ".next/types/**/*.ts",
     ".storybook/**/*.ts",
     ".storybook/**/*.tsx",
+    "e2e/**/*.ts",
+    "playwright.config.ts",
     "index.css.d.ts"
   ],
   "exclude": ["node_modules"]

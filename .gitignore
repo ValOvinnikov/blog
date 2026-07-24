@@ -37,6 +37,11 @@ storybook-static/
 coverage/
 .vitest/
 
+# Playwright (apps/web)
+apps/web/playwright-report/
+apps/web/test-results/
+apps/web/blob-report/
+
 # Deployment
 .vercel/
 
