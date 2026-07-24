@@ -1,8 +1,7 @@
-import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { PostsSection } from '@blog/ui/organisms';
 import { Link } from '@web/i18n/navigation';
-import { formatDate } from '@web/utils/format-date';
+import { toPostListItems } from '@web/utils/to-post-list-items';
 
 export interface IPostListModuleProps {
   id: string;
@@ -20,15 +19,7 @@ export async function PostListModule({ id, locale }: IPostListModuleProps) {
 
   const { title, posts } = result.data;
 
-  const items = posts.map((post) => ({
-    id: post.id,
-    href: routes.post(post.slug),
-    title: post.title,
-    excerpt: post.excerpt,
-    publishedAt: post.publishedAt,
-    formattedDate: formatDate(post.publishedAt, locale),
-    categories: post.categories,
-  }));
+  const items = toPostListItems(posts, locale);
 
   return (
     <PostsSection

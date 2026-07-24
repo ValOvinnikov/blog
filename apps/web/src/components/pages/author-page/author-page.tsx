@@ -8,7 +8,7 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { Link } from '@web/i18n/navigation';
 import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
-import { formatDate } from '@web/utils/format-date';
+import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 
 import { authorPageVariants } from './author-page-variants';
@@ -50,16 +50,7 @@ export async function AuthorPage({ slug, locale, page }: TAuthorPageProps) {
     notFound();
   }
 
-  const items = posts.map((post) => ({
-    id: post.id,
-    href: routes.post(post.slug),
-    title: post.title,
-    excerpt: post.excerpt,
-    publishedAt: post.publishedAt,
-    formattedDate: formatDate(post.publishedAt, locale),
-    readingTime: `${post.readingTimeMinutes} min`,
-    categories: post.categories,
-  }));
+  const items = toPostListItems(posts, locale);
 
   return (
     <BlogPageTemplate

@@ -4,8 +4,8 @@ import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
 import { CategoryChipList } from '@web/components/shared/category-chip-list';
 import { Link } from '@web/i18n/navigation';
-import { formatDate } from '@web/utils/format-date';
 import { getCategoriesSafely } from '@web/utils/get-categories-safely';
+import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 
 type TBlogListPageProps = ILocalizedParams & { page: number };
@@ -35,16 +35,7 @@ export async function BlogListPage({ page, locale }: TBlogListPageProps) {
     notFound();
   }
 
-  const items = posts.map((post) => ({
-    id: post.id,
-    href: routes.post(post.slug),
-    title: post.title,
-    excerpt: post.excerpt,
-    publishedAt: post.publishedAt,
-    formattedDate: formatDate(post.publishedAt, locale),
-    readingTime: `${post.readingTimeMinutes} min`,
-    categories: post.categories,
-  }));
+  const items = toPostListItems(posts, locale);
 
   return (
     <BlogPageTemplate

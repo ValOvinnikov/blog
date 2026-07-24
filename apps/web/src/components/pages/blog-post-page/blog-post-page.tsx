@@ -10,6 +10,7 @@ import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
 import { buildShareLinks } from '@web/utils/build-share-links';
 import { env } from '@web/utils/env/env';
 import { formatDate } from '@web/utils/format-date';
+import { toPostListItems } from '@web/utils/to-post-list-items';
 import { ExternalLink } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
@@ -58,6 +59,7 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
     icon: <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />,
   }));
   const primaryCategory = categories[0];
+  const relatedPostItems = toPostListItems(relatedPosts, locale);
 
   return (
     <main className={s.root()}>
@@ -117,17 +119,9 @@ export async function BlogPostPage({ slug, locale }: TBlogPostPageProps) {
         />
       </Article>
 
-      {relatedPosts.length > 0 && (
+      {relatedPostItems.length > 0 && (
         <PostsSection
-          posts={relatedPosts.map((relatedPost) => ({
-            id: relatedPost.id,
-            href: routes.post(relatedPost.slug),
-            title: relatedPost.title,
-            excerpt: relatedPost.excerpt,
-            publishedAt: relatedPost.publishedAt,
-            formattedDate: formatDate(relatedPost.publishedAt, locale),
-            categories: relatedPost.categories,
-          }))}
+          posts={relatedPostItems}
           title="Related posts"
           titleId="related-posts-title"
           linkAs={SmartLink}
