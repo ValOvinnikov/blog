@@ -24,7 +24,7 @@ export function makePostCard(overrides: Partial<TPostCard> = {}): TPostCard {
     heroImageSanity: undefined,
     featured: false,
     author: makePostCardAuthor(),
-    categories: [],
+    category: makePostCardCategory(),
     ...overrides,
   };
 }

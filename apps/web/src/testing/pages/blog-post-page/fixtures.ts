@@ -41,14 +41,12 @@ export const mockPostDetail: TPostDetail = {
     ],
     socialLinks: [],
   },
-  categories: [
-    {
-      id: 'cat-1',
-      title: 'Engineering',
-      slug: 'engineering',
-      description: undefined,
-    },
-  ],
+  category: {
+    id: 'cat-1',
+    title: 'Engineering',
+    slug: 'engineering',
+    description: undefined,
+  },
   tags: [],
   relatedPosts: [],
   readingTimeMinutes: 4,

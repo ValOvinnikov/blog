@@ -16,7 +16,7 @@ type TPostListItemSource = {
   title: string;
   excerpt: string;
   publishedAt: string;
-  categories: TPostCardCategory[];
+  category: TPostCardCategory;
   readingTimeMinutes?: number;
 };
 
@@ -50,6 +50,6 @@ export const toPostListItems = async (
       post.readingTimeMinutes === undefined
         ? undefined
         : `${post.readingTimeMinutes} min`,
-    categories: post.categories,
+    category: post.category,
   }));
 };

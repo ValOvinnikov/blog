@@ -49,7 +49,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the post title, meta, body, categories, and share links', async () => {
+  it('renders the post title, meta, body, category, and share links', async () => {
     getPostMock.mockResolvedValue(mockPostDetail);
 
     await setup();
@@ -101,52 +101,14 @@ describe(`<${BlogPostPage.name}/>`, () => {
     );
   });
 
-  it('renders the sole category as the eyebrow only, with no meta strip category link', async () => {
+  it('renders the category eyebrow link', async () => {
     getPostMock.mockResolvedValue(mockPostDetail);
 
     await setup();
 
-    expect(screen.getAllByRole('link', { name: 'Engineering' })).toHaveLength(
-      1,
-    );
-  });
-
-  it('splits multiple categories: the primary as the eyebrow, the rest in the meta strip', async () => {
-    getPostMock.mockResolvedValue({
-      ...mockPostDetail,
-      categories: [
-        {
-          id: 'cat-1',
-          title: 'Engineering',
-          slug: 'engineering',
-          description: undefined,
-        },
-        {
-          id: 'cat-2',
-          title: 'Design',
-          slug: 'design',
-          description: undefined,
-        },
-        {
-          id: 'cat-3',
-          title: 'Product',
-          slug: 'product',
-          description: undefined,
-        },
-      ],
-    });
-
-    await setup();
-
-    const primaryLinks = screen.getAllByRole('link', { name: 'Engineering' });
-    expect(primaryLinks).toHaveLength(1);
-    expect(primaryLinks[0]).toHaveAttribute('href', '/category/engineering');
-
-    const designLink = screen.getByRole('link', { name: 'Design' });
-    expect(designLink).toHaveAttribute('href', '/category/design');
-
-    const productLink = screen.getByRole('link', { name: 'Product' });
-    expect(productLink).toHaveAttribute('href', '/category/product');
+    const categoryLinks = screen.getAllByRole('link', { name: 'Engineering' });
+    expect(categoryLinks).toHaveLength(1);
+    expect(categoryLinks[0]).toHaveAttribute('href', '/category/engineering');
   });
 
   it('renders the JSON-LD BlogPosting schema script', async () => {
@@ -212,7 +174,11 @@ describe(`<${BlogPostPage.name}/>`, () => {
             slug: 'jane-doe',
             imageUrl: undefined,
           },
-          categories: [],
+          category: {
+            id: 'cat-1',
+            title: 'Engineering',
+            slug: 'engineering',
+          },
         },
       ],
     });

@@ -50,7 +50,7 @@ const post = makePostCard({
   title: 'My Post Title',
   slug: 'my-post-slug',
   publishedAt: '2026-01-01T00:00:00.000Z',
-  categories: [makePostCardCategory()],
+  category: makePostCardCategory(),
 });
 
 const setup = customRenderAsync(TagPage, {
