@@ -68,4 +68,16 @@ describe(getRelatedPosts, () => {
 
     expect(result).toEqual([]);
   });
+
+  it('tags both queries with author/category alongside posts', async () => {
+    mockRun.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
+
+    await getRelatedPosts('current-id', ['tag-a'], 'cat-1');
+
+    const expectedTags = expect.objectContaining({
+      next: { revalidate: 3600, tags: ['posts', 'author', 'category'] },
+    });
+    expect(mockRun).toHaveBeenNthCalledWith(1, expect.anything(), expectedTags);
+    expect(mockRun).toHaveBeenNthCalledWith(2, expect.anything(), expectedTags);
+  });
 });

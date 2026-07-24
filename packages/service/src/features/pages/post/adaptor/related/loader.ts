@@ -14,17 +14,20 @@ export async function getRelatedPosts(
   tagIds: string[],
   categoryId: string | undefined,
 ): Promise<TPostCard[]> {
+  // Both queries project `postCardFragment`, which derefs `author`/
+  // `category` — both tags must ride alongside `posts` (tag-scope
+  // contract, `sanity/query.ts`).
   const [byTags, byCategory] = await Promise.all([
     tagIds.length > 0
       ? runQuery(relatedByTagsQuery, {
           parameters: { currentId, tagIds },
-          ...isr('posts'),
+          ...isr(['posts', 'author', 'category']),
         })
       : Promise.resolve([]),
     categoryId
       ? runQuery(relatedByCategoryQuery, {
           parameters: { currentId, categoryId },
-          ...isr('posts'),
+          ...isr(['posts', 'author', 'category']),
         })
       : Promise.resolve([]),
   ]);

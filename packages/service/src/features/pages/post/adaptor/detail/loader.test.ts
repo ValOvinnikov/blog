@@ -110,6 +110,24 @@ describe('getPost', () => {
     );
   });
 
+  it('tags the query with author/category alongside post', async () => {
+    mockRun
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    await getPost('my-slug');
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        next: {
+          revalidate: 3600,
+          tags: ['post', 'author', 'category'],
+        },
+      }),
+    );
+  });
+
   it('lets authored seo override the resolved defaults', async () => {
     mockRun
       .mockResolvedValueOnce(

@@ -50,4 +50,17 @@ describe('getFooter', () => {
       },
     ]);
   });
+
+  it('tags the query with every type its social links can reference internally', async () => {
+    mockRun.mockResolvedValue(makeRawFooter());
+
+    await getFooter();
+
+    expect(mockRun).toHaveBeenCalledWith(expect.anything(), {
+      next: {
+        revalidate: 3600,
+        tags: ['footer', 'post', 'category', 'page_generic', 'page_blog'],
+      },
+    });
+  });
 });

@@ -95,4 +95,17 @@ describe('getIndexPage', () => {
       ogImageUrl: expect.stringContaining('sanity.io'),
     });
   });
+
+  it('tags the posts query with category alongside posts', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawBlogPage())
+      .mockResolvedValueOnce(makeRawSiteSettings())
+      .mockResolvedValueOnce({ posts: [], total: 0 });
+
+    await getIndexPage();
+
+    expect(mockRun).toHaveBeenNthCalledWith(3, expect.anything(), {
+      next: { revalidate: 3600, tags: ['posts', 'category'] },
+    });
+  });
 });

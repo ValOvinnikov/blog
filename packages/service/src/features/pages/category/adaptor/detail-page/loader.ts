@@ -29,9 +29,11 @@ export async function getCategoryPage(
       parameters: { slug },
       ...isr('category'),
     }),
+    // `archivePostCardFragment` derefs `category` — that tag must ride
+    // alongside `posts` (tag-scope contract, `sanity/query.ts`).
     runQuery(buildCategoryPostsPageQuery(start, start + itemsPerPage), {
       parameters: { slug },
-      ...isr('posts'),
+      ...isr(['posts', 'category']),
     }),
   ]);
   if (!rawCategory) return null;

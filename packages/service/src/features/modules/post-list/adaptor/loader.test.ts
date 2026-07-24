@@ -32,4 +32,16 @@ describe('getPostList', () => {
 
     await expect(getPostList('missing')).rejects.toThrow();
   });
+
+  it('tags the posts query with author/category alongside posts', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostListModule({ limit: 3 }))
+      .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
+
+    await getPostList('post-list-1');
+
+    expect(mockRun).toHaveBeenNthCalledWith(2, expect.anything(), {
+      next: { revalidate: 3600, tags: ['posts', 'author', 'category'] },
+    });
+  });
 });

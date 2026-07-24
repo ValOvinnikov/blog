@@ -13,9 +13,11 @@ export async function getPostList(id: string): Promise<TPostListModule> {
     ...isr(['modules:postList', `module:${id}`]),
   });
 
+  // `postCardFragment` derefs `author`/`category` — both tags must ride
+  // alongside `posts` (tag-scope contract, `sanity/query.ts`).
   const rawPosts = await runQuery(
     postListModulePostsQuery(raw.limit),
-    isr('posts'),
+    isr(['posts', 'author', 'category']),
   );
 
   return toPostListModule(raw, rawPosts);

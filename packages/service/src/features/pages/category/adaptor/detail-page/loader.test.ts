@@ -93,4 +93,20 @@ describe('getCategoryPage', () => {
 
     expect(result).toBeNull();
   });
+
+  it('tags the posts query with category alongside posts', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawCategory())
+      .mockResolvedValueOnce({ posts: [], total: 0 });
+
+    await getCategoryPage('engineering', { itemsPerPage: 9 });
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({
+        next: { revalidate: 3600, tags: ['posts', 'category'] },
+      }),
+    );
+  });
 });

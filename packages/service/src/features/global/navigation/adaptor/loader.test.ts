@@ -45,4 +45,17 @@ describe('getNavigation', () => {
       { label: 'Blog', href: '/blog', target: undefined, platform: undefined },
     ]);
   });
+
+  it('tags the query with every type its items can reference internally', async () => {
+    mockRun.mockResolvedValue(makeRawNavigation());
+
+    await getNavigation();
+
+    expect(mockRun).toHaveBeenCalledWith(expect.anything(), {
+      next: {
+        revalidate: 3600,
+        tags: ['navigation', 'post', 'category', 'page_generic', 'page_blog'],
+      },
+    });
+  });
 });

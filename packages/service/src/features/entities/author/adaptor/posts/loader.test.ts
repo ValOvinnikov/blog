@@ -48,6 +48,19 @@ describe('getAuthorPosts', () => {
     );
   });
 
+  it('tags the query with category alongside posts', async () => {
+    mockRun.mockResolvedValueOnce({ posts: [], total: 0 });
+
+    await getAuthorPosts('jane-doe', { itemsPerPage: 9 });
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        next: { revalidate: 3600, tags: ['posts', 'category'] },
+      }),
+    );
+  });
+
   it('defaults to page 1 when no page is given', async () => {
     mockRun.mockResolvedValueOnce({
       posts: [makeRawArchivePostCard()],
