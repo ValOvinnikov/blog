@@ -64,10 +64,22 @@ export async function HeroModule({ id }: IHeroModuleProps) {
 
       {sanityImage && (
         <Hero.Media key="media">
+          {/*
+            SanityImage's `sanity-image` package bakes a hotspot-aware crop
+            into the source URL at this exact width/height — it isn't just a
+            CSS `object-fit` concern, the source is pre-cropped to this ratio
+            before any responsive CSS ever runs. Hero.Media (`heroMediaVariants`)
+            is responsive — `aspect-video` (16:9, `MediaFrame`'s default) below
+            the `lg` breakpoint, `lg:aspect-[4/3]` at `lg` and up — but this
+            component only accepts one non-responsive ratio. 1200x675 (16:9)
+            degrades gracefully at both breakpoints (verified visually); 1200x900
+            (4:3) visibly crops the image at the top on tablet/below-`lg`
+            viewports, where the container itself is 16:9.
+          */}
           <SanityImage
             image={sanityImage}
             width={1200}
-            height={900}
+            height={675}
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="size-full object-cover"
           />
