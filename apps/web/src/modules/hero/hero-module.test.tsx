@@ -1,6 +1,16 @@
+import type { ISanityImage } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { HeroModule } from './hero-module';
+
+const sanityImage: ISanityImage = {
+  assetId: 'image-abc123-1600x1200-jpg',
+  alt: 'A scenic mountain range',
+  hotspot: { x: 0.5, y: 0.5, width: 1, height: 1 },
+  crop: undefined,
+  lqip: undefined,
+  dimensions: { width: 1600, height: 1200, aspectRatio: 1600 / 1200 },
+};
 
 const { getHeroMock } = vi.hoisted(() => ({
   getHeroMock: vi.fn(),
@@ -66,5 +76,27 @@ describe(HeroModule, () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Welcome to the blog' }),
     ).toBeVisible();
+  });
+
+  it('renders the hero image cropped to a 16:9 (675) height, not 4:3 (900)', async () => {
+    getHeroMock.mockResolvedValue({
+      ok: true,
+      data: {
+        eyebrow: undefined,
+        title: 'Welcome to the blog',
+        subtitle: undefined,
+        sanityImage,
+        primaryAction: undefined,
+        secondaryAction: undefined,
+      },
+    });
+
+    await setup();
+
+    const img = screen.getByRole('img', { name: sanityImage.alt });
+
+    expect(img).toHaveAttribute('height', '675');
+    expect(img.getAttribute('src')).toContain('h=675');
+    expect(img.getAttribute('src')).not.toContain('h=900');
   });
 });
