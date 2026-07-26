@@ -24,7 +24,6 @@ const meta = {
     children: (
       <>
         <Article.Header
-          category={{ label: 'Engineering', href: '/category/engineering' }}
           title={faker.lorem.sentence({ min: 4, max: 8 })}
           lead={faker.lorem.paragraph()}
           meta={{
@@ -53,7 +52,6 @@ export const WithCoverMedia: TStory = {
     children: (
       <>
         <Article.Header
-          category={{ label: 'Engineering', href: '/category/engineering' }}
           title={faker.lorem.sentence({ min: 4, max: 8 })}
           lead={faker.lorem.paragraph()}
           meta={{
@@ -78,31 +76,11 @@ export const WithCoverMedia: TStory = {
   },
 };
 
-export const WithoutCategory: TStory = {
-  args: {
-    children: (
-      <>
-        <Article.Header
-          title={faker.lorem.sentence({ min: 4, max: 8 })}
-          lead={faker.lorem.paragraph()}
-          meta={{
-            author: { name: faker.person.fullName() },
-            publishedAt,
-            formattedDate,
-          }}
-        />
-        <Article.Body>{bodyParagraphs}</Article.Body>
-      </>
-    ),
-  },
-};
-
 export const WithoutLead: TStory = {
   args: {
     children: (
       <>
         <Article.Header
-          category={{ label: 'Engineering', href: '/category/engineering' }}
           title={faker.lorem.sentence({ min: 4, max: 8 })}
           meta={{
             author: { name: faker.person.fullName() },
@@ -121,7 +99,6 @@ export const WithoutMeta: TStory = {
     children: (
       <>
         <Article.Header
-          category={{ label: 'Engineering', href: '/category/engineering' }}
           title={faker.lorem.sentence({ min: 4, max: 8 })}
           lead={faker.lorem.paragraph()}
         />
@@ -136,7 +113,6 @@ export const WithFooterTags: TStory = {
     children: (
       <>
         <Article.Header
-          category={{ label: 'Engineering', href: '/category/engineering' }}
           title={faker.lorem.sentence({ min: 4, max: 8 })}
           lead={faker.lorem.paragraph()}
           meta={{
@@ -161,7 +137,6 @@ export const WithShareSlot: TStory = {
     children: (
       <>
         <Article.Header
-          category={{ label: 'Engineering', href: '/category/engineering' }}
           title={faker.lorem.sentence({ min: 4, max: 8 })}
           lead={faker.lorem.paragraph()}
           meta={{

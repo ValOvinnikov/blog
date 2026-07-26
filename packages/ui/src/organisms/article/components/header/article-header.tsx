@@ -1,6 +1,4 @@
 import type { IWithDataTestId } from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
 import { MediaFrame } from '@blog/ui/atoms/media-frame';
 import { Text } from '@blog/ui/atoms/text';
@@ -9,17 +7,8 @@ import { type ComponentPropsWithoutRef, type ReactNode } from 'react';
 
 import { articleHeaderVariants } from './article-header-variants';
 
-export interface IArticleHeaderCategory {
-  label: string;
-  href: string;
-}
-
 export interface IArticleHeaderProps
   extends Omit<ComponentPropsWithoutRef<'header'>, 'title'>, IWithDataTestId {
-  /** Post's category, rendered as an eyebrow link above the title. Omit to render no eyebrow. */
-  category?: IArticleHeaderCategory;
-  /** Component the category link renders as — pass the app router's Link for client-side navigation. */
-  linkAs?: TAnchorElementType;
   title: string;
   /** Lead paragraph rendered below the metadata strip. Omit to render no lead. */
   lead?: string;
@@ -30,12 +19,11 @@ export interface IArticleHeaderProps
 }
 
 /**
- * Article.Header — post detail heading area: category eyebrow, title,
- * metadata strip, lead paragraph, and an optional cover media slot.
+ * Article.Header — post detail heading area: title, metadata strip, lead
+ * paragraph, and an optional cover media slot. Category navigation lives in
+ * the page-composed `Breadcrumbs` trail, not here.
  */
 export const ArticleHeader = ({
-  category,
-  linkAs,
   title,
   lead,
   meta,
@@ -52,13 +40,6 @@ export const ArticleHeader = ({
       data-testid={dataTestId}
       {...rest}
     >
-      {category && (
-        <div className={s.categories()}>
-          <Eyebrow href={category.href} linkAs={linkAs}>
-            {category.label}
-          </Eyebrow>
-        </div>
-      )}
       <Heading level={1} visual="post" className={s.title()}>
         {title}
       </Heading>
