@@ -1,5 +1,6 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
+import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Article, PostsSection } from '@blog/ui/organisms';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
@@ -7,12 +8,13 @@ import { PostShare } from '@web/components/shared/post-share';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
+import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { buildShareLinks } from '@web/utils/build-share-links';
 import { env } from '@web/utils/env/env';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { ExternalLink } from 'lucide-react';
 import { notFound } from 'next/navigation';
-import { getFormatter } from 'next-intl/server';
+import { getFormatter, getTranslations } from 'next-intl/server';
 
 import { blogPostPageVariants } from './blog-post-page-variants';
 
@@ -22,13 +24,14 @@ const s = blogPostPageVariants();
 
 /**
  * BlogPostPage — `/blog/{slug}` composition: fetches the post via
- * `service.pages.post.v1.getPost`, then composes it through the `Article`
- * compound (`Article.Header` for category eyebrow links, title, `PostMeta`
- * with `PostShare` in its share slot, and cover image; `Article.Body` for
- * the rendered `PortableTextRenderer` body; `Article.Footer` for the tag
- * chip list), plus a `BlogPosting` JSON-LD tag and, when the post has any,
- * a "Related posts" `PostsSection` after the article. `Header`/`Footer`
- * (site chrome) stay owned by `[locale]/layout.tsx`.
+ * `service.pages.post.v1.getPost`, then renders a `Home › Category › Post`
+ * `Breadcrumbs` trail (plus its `BreadcrumbList` JSON-LD) as page chrome
+ * above the `Article` compound (`Article.Header` for title, `PostMeta` with
+ * `PostShare` in its share slot, and cover image; `Article.Body` for the
+ * rendered `PortableTextRenderer` body; `Article.Footer` for the tag chip
+ * list), plus a `BlogPosting` JSON-LD tag and, when the post has any, a
+ * "Related posts" `PostsSection` after the article. `Header`/`Footer` (site
+ * chrome) stay owned by `[locale]/layout.tsx`.
  */
 export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   const post = await service.pages.post.v1.getPost(slug);
@@ -58,22 +61,32 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
     ...link,
     icon: <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />,
   }));
-  const [format, relatedPostItems] = await Promise.all([
+  const [format, t, relatedPostItems] = await Promise.all([
     getFormatter(),
+    getTranslations('breadcrumbs'),
     toPostListItems(relatedPosts),
   ]);
+
+  const trail: IBreadcrumbItem[] = [
+    { label: t('home'), href: routes.home() },
+    { label: category.title, href: routes.category(category.slug) },
+    { label: title, href: routes.post(slug) },
+  ];
+  const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
 
   return (
     <main className={s.root()}>
       {schema && <JsonLd schema={schema} />}
+      {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
+
+      <Breadcrumbs
+        items={trail}
+        ariaLabel={t('ariaLabel')}
+        linkAs={SmartLink}
+      />
 
       <Article>
         <Article.Header
-          category={{
-            label: category.title,
-            href: routes.category(category.slug),
-          }}
-          linkAs={SmartLink}
           title={title}
           lead={excerpt}
           meta={{

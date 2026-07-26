@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event';
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
 import { notFound } from 'next/navigation';
 
@@ -49,7 +49,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the post title, meta, body, category, and share links', async () => {
+  it('renders the post title, meta, body, and share links', async () => {
     getPostMock.mockResolvedValue(mockPostDetail);
 
     await setup();
@@ -62,10 +62,6 @@ describe(`<${BlogPostPage.name}/>`, () => {
     ).toBeVisible();
     expect(screen.getByText('Body text.')).toBeVisible();
     expect(screen.getByText('Jane Doe')).toBeVisible();
-
-    const categoryLinks = screen.getAllByRole('link', { name: 'Engineering' });
-    expect(categoryLinks).toHaveLength(1);
-    expect(categoryLinks[0]).toHaveAttribute('href', '/category/engineering');
 
     await userEvent.click(screen.getByRole('button', { name: /Share/ }));
     expect(screen.getByRole('menuitem', { name: /Share on X/ })).toBeVisible();
@@ -101,14 +97,31 @@ describe(`<${BlogPostPage.name}/>`, () => {
     );
   });
 
-  it('renders the category eyebrow link', async () => {
+  it('renders the Home › Category › Post breadcrumbs trail', async () => {
+    getPostMock.mockResolvedValue(mockPostDetail);
+
+    await setup();
+
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+
+    const homeLink = within(nav).getByRole('link', { name: 'Home' });
+    expect(homeLink).toHaveAttribute('href', '/');
+
+    const categoryLink = within(nav).getByRole('link', { name: 'Engineering' });
+    expect(categoryLink).toHaveAttribute('href', '/category/engineering');
+
+    const current = within(nav).getByText('Hello World');
+    expect(current).toHaveAttribute('aria-current', 'page');
+    expect(current.tagName).not.toBe('A');
+  });
+
+  it('renders no category eyebrow outside the breadcrumbs trail', async () => {
     getPostMock.mockResolvedValue(mockPostDetail);
 
     await setup();
 
     const categoryLinks = screen.getAllByRole('link', { name: 'Engineering' });
     expect(categoryLinks).toHaveLength(1);
-    expect(categoryLinks[0]).toHaveAttribute('href', '/category/engineering');
   });
 
   it('renders the JSON-LD BlogPosting schema script', async () => {
@@ -121,6 +134,23 @@ describe(`<${BlogPostPage.name}/>`, () => {
     );
     expect(script).not.toBeNull();
     expect(script?.textContent).toContain('"@type":"BlogPosting"');
+  });
+
+  it('renders the JSON-LD BreadcrumbList schema script', async () => {
+    getPostMock.mockResolvedValue(mockPostDetail);
+
+    const { container } = await setup();
+
+    const scripts = container.querySelectorAll(
+      'script[type="application/ld+json"]',
+    );
+    const breadcrumbScript = Array.from(scripts).find((script) =>
+      script.textContent?.includes('"@type":"BreadcrumbList"'),
+    );
+    expect(breadcrumbScript).toBeDefined();
+    expect(breadcrumbScript?.textContent).toContain(
+      '"item":"https://example.com/category/engineering"',
+    );
   });
 
   it('renders the post tags as links to routes.tag(slug)', async () => {

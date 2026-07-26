@@ -445,6 +445,12 @@ changing a schema does **not** change existing documents.
 - Paginated lists: every page **self-canonical** (never canonical-to-page-1),
   no `rel=next/prev`, out-of-range → hard 404 (§1 routing conventions).
 - JSON-LD `Article`/`BlogPosting` on post pages (#94).
+- **Breadcrumbs & structured data (#815):** post pages (`/blog/{slug}`) render
+  a `Home › Category › Post` `Breadcrumbs` trail (`@blog/ui` molecule) as page
+  chrome — composed as a sibling above the `Article` content organism, never
+  nested inside it — alongside a `BreadcrumbList` JSON-LD schema
+  (`buildBreadcrumbListSchema`) built from the same trail, sitting next to the
+  existing `BlogPosting` JSON-LD.
 - `sitemap.ts`, `robots.ts`, RSS route (#92).
 - **Per-environment indexing (#841):** gated by `NEXT_PUBLIC_SANITY_DATASET`
   (via the shared `isProductionEnvironment()` helper) — only the real

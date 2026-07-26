@@ -35,26 +35,7 @@ describe(`<${Article.name}/>`, () => {
     expect(screen.getByText('Post body content.')).toBeVisible();
   });
 
-  it('renders the category as an eyebrow link to its route', () => {
-    renderElement(
-      <Article>
-        <Article.Header
-          title="Building a Design System"
-          meta={meta}
-          category={{ label: 'Engineering', href: '/category/engineering' }}
-        />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
-      'href',
-      '/category/engineering',
-    );
-  });
-
-  it('does not render a category link when category is omitted', () => {
+  it('renders no category eyebrow — breadcrumbs own category navigation', () => {
     renderElement(
       <Article>
         <Article.Header title="Building a Design System" meta={meta} />
