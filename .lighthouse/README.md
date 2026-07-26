@@ -71,3 +71,29 @@ advisory (non-required, per #399) for exactly that reason.
 If `LIGHTHOUSE_URLS` is ever cleared, the Lighthouse step no-ops green (see
 the guarded-step pattern in `deploy-development.yml`) rather than failing —
 so accidentally unsetting the Variable doesn't red the job, just silences it.
+
+## `ci.collect.numberOfRuns: 3` — averaging out single-run noise (#846)
+
+Once Lighthouse pointed at production (#826), the home page's Performance
+score was still red — but investigating it (#846) found **no reproducible,
+home-specific code defect**. A real Chrome DevTools CPU profile (captured via
+Playwright + the CDP `Tracing` domain, unthrottled) showed home and the post
+page cost virtually **identical** real JS execution during load (~126ms vs
+~123ms of attributed script time, spread thin across the Next.js/React
+runtime chunks — no single dominant blocking function on either page).
+
+That real-hardware parity doesn't match the ~10x gap Lighthouse's _simulated_
+mobile + 4x-CPU-throttle model reported (home TBT 2,310ms vs post 210ms in one
+CI run) — and the action was running with the default `numberOfRuns: 1` (no
+`treosh/lighthouse-ci-action`/`@lhci/cli` docs recommend `numberOfRuns` ≥ 3;
+Total Blocking Time is explicitly one of the noisiest Lighthouse metrics under
+simulated throttling, and a single un-averaged run has no way to distinguish a
+real regression from a one-off noisy sample. `numberOfRuns: 3` makes Lighthouse
+CI take the **median** run per URL, which is the standard mitigation.
+
+This doesn't claim the site is fully optimized — home's LCP (~3.7s) and TBT
+under throttling are still budget-adjacent and worth watching — but it does
+mean **the specific "home is 4x worse than post" finding was single-run
+noise, not a code defect**, so no speculative app-code change was made chasing
+it. If a _median-of-3_ run still shows home meaningfully worse than post after
+this change, that would be real signal worth a fresh investigation.
