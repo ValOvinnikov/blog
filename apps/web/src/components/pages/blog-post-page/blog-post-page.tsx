@@ -77,7 +77,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   return (
     <main className={s.root()}>
       {schema && <JsonLd schema={schema} />}
-      <JsonLd schema={breadcrumbListSchema} />
+      {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
 
       <Breadcrumbs
         items={trail}

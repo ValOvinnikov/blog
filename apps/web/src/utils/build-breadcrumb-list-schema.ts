@@ -20,14 +20,24 @@ export type TBreadcrumbListSchema = {
  * absolute URL (`siteUrl` + the item's relative `href`) since schema.org
  * requires `ListItem.item` to be absolute.
  *
+ * Returns `undefined` when `siteUrl` is empty, mirroring how
+ * `[locale]/layout.tsx` treats a missing `NEXT_PUBLIC_SITE_URL` as "no
+ * `metadataBase`" rather than defaulting to `''` — schema.org's
+ * `ListItem.item` must be absolute, so silently concatenating an empty
+ * `siteUrl` with each item's relative `href` would produce invalid
+ * (relative) `item` URLs and fail structured-data validation. Callers skip
+ * rendering `<JsonLd>` entirely when this returns `undefined`.
+ *
  * @example
  * const schema = buildBreadcrumbListSchema(trail, env.NEXT_PUBLIC_SITE_URL ?? '');
- * return <JsonLd schema={schema} />;
+ * return schema ? <JsonLd schema={schema} /> : null;
  */
 export function buildBreadcrumbListSchema(
   items: IBreadcrumbItem[],
   siteUrl: string,
-): TBreadcrumbListSchema {
+): TBreadcrumbListSchema | undefined {
+  if (!siteUrl) return undefined;
+
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
