@@ -446,6 +446,16 @@ changing a schema does **not** change existing documents.
   no `rel=next/prev`, out-of-range → hard 404 (§1 routing conventions).
 - JSON-LD `Article`/`BlogPosting` on post pages (#94).
 - `sitemap.ts`, `robots.ts`, RSS route (#92).
+- **Per-environment indexing (#841):** gated by `NEXT_PUBLIC_SANITY_DATASET`
+  (via the shared `isProductionEnvironment()` helper) — only the real
+  `production` dataset is indexable. Every other environment (e.g.
+  `development`, which can serve content byte-identical to production after a
+  dataset refresh) gets a page-level `<meta name="robots" content="noindex,
+nofollow">` from the root layout on every route, while `robots.ts` keeps
+  crawling allowed (so that noindex is actually seen) but omits the sitemap.
+  The blanket meta tag, not `robots.txt`, is the authoritative de-indexing
+  lever — a `Disallow: /` would stop crawlers from ever fetching the page to
+  see its `noindex`.
 - Security headers shipped from `next.config.ts`: strict CSP (documented
   inline), HSTS, `X-Frame-Options: DENY`, referrer + permissions policies.
 - Semantic HTML; card titles are heading tags; no hardcoded `aria-label`s in

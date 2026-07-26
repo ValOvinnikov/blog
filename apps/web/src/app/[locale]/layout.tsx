@@ -8,6 +8,7 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { routing } from '@web/i18n/routing';
 import { env } from '@web/utils/env/env';
+import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
@@ -31,9 +32,21 @@ export async function generateMetadata(): Promise<Metadata> {
     ? new URL(env.NEXT_PUBLIC_SITE_URL)
     : undefined;
 
+  // Only the real production environment is indexable — see
+  // `isProductionEnvironment` and `robots.ts` for the full reasoning. This
+  // page-level meta tag is the primary de-indexing lever (unlike a robots.txt
+  // disallow, it survives a crawl and gets honored by the crawler), so it's
+  // applied here at the root layout, ahead of the `!result.ok` guard, so it
+  // still lands even when site settings fail to load. Spread conditionally
+  // rather than assigning `robots: undefined` on production, keeping the key
+  // absent (not just falsy) when indexing is allowed.
+  const robotsMetadata = isProductionEnvironment()
+    ? {}
+    : { robots: { index: false, follow: false } };
+
   if (!result.ok) {
     console.error(`Error to fetch site settings: ${result.error}`);
-    return { metadataBase };
+    return { metadataBase, ...robotsMetadata };
   }
 
   const { brand, description } = result.data;
@@ -45,6 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${brand.name}`,
     },
     description,
+    ...robotsMetadata,
   };
 }
 

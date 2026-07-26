@@ -10,6 +10,7 @@ const {
   getNowMock,
   getTimeZoneMock,
   setRequestLocaleMock,
+  isProductionEnvironmentMock,
 } = vi.hoisted(() => ({
   getSiteSettingsMock: vi.fn(),
   getNavigationMock: vi.fn(),
@@ -18,6 +19,11 @@ const {
   getNowMock: vi.fn(),
   getTimeZoneMock: vi.fn(),
   setRequestLocaleMock: vi.fn(),
+  isProductionEnvironmentMock: vi.fn(),
+}));
+
+vi.mock('@web/utils/is-production-environment', () => ({
+  isProductionEnvironment: isProductionEnvironmentMock,
 }));
 
 vi.mock('@blog/service', () => ({
@@ -57,6 +63,7 @@ describe('LocaleLayout', () => {
     getMessagesMock.mockResolvedValue(messages);
     getNowMock.mockResolvedValue(now);
     getTimeZoneMock.mockResolvedValue('UTC');
+    isProductionEnvironmentMock.mockReturnValue(true);
   });
 
   describe('generateStaticParams', () => {
@@ -84,6 +91,33 @@ describe('LocaleLayout', () => {
       const metadata = await generateMetadata();
 
       expect(metadata).not.toHaveProperty('title');
+      errorSpy.mockRestore();
+    });
+
+    it('omits robots restrictions in production (indexable)', async () => {
+      isProductionEnvironmentMock.mockReturnValue(true);
+
+      const metadata = await generateMetadata();
+
+      expect(metadata).not.toHaveProperty('robots');
+    });
+
+    it('adds noindex, nofollow robots metadata outside production', async () => {
+      isProductionEnvironmentMock.mockReturnValue(false);
+
+      const metadata = await generateMetadata();
+
+      expect(metadata.robots).toEqual({ index: false, follow: false });
+    });
+
+    it('still applies noindex, nofollow outside production when site settings fail', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      isProductionEnvironmentMock.mockReturnValue(false);
+      getSiteSettingsMock.mockResolvedValue({ ok: false, error: 'boom' });
+
+      const metadata = await generateMetadata();
+
+      expect(metadata.robots).toEqual({ index: false, follow: false });
       errorSpy.mockRestore();
     });
   });
