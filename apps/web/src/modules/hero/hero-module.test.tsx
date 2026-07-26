@@ -99,4 +99,29 @@ describe(HeroModule, () => {
     expect(img.getAttribute('src')).toContain('h=675');
     expect(img.getAttribute('src')).not.toContain('h=900');
   });
+
+  it('gives the default "Read more" CTA a descriptive accessible name', async () => {
+    getHeroMock.mockResolvedValue({
+      ok: true,
+      data: {
+        eyebrow: undefined,
+        title: 'Welcome to the blog',
+        subtitle: undefined,
+        sanityImage: undefined,
+        primaryAction: {
+          label: 'Read more',
+          href: '/blog/welcome-to-the-blog',
+          target: undefined,
+          ariaLabel: 'Read more: Welcome to the blog',
+        },
+        secondaryAction: undefined,
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('link', { name: 'Read more: Welcome to the blog' }),
+    ).toBeVisible();
+  });
 });

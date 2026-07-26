@@ -15,6 +15,7 @@ describe('toCtaModule', () => {
       href: '/newsletter',
       target: undefined,
       platform: undefined,
+      ariaLabel: undefined,
     });
   });
 

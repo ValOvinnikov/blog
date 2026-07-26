@@ -39,13 +39,26 @@ vi.mock('@blog/ui/molecules', () => ({
 }));
 
 const links = [
-  { label: 'Home', href: '/', target: undefined, platform: undefined },
-  { label: 'Blog', href: '/blog', target: undefined, platform: undefined },
+  {
+    label: 'Home',
+    href: '/',
+    target: undefined,
+    platform: undefined,
+    ariaLabel: undefined,
+  },
+  {
+    label: 'Blog',
+    href: '/blog',
+    target: undefined,
+    platform: undefined,
+    ariaLabel: undefined,
+  },
   {
     label: 'About',
     href: '/about',
     target: undefined,
     platform: undefined,
+    ariaLabel: undefined,
   },
 ];
 
