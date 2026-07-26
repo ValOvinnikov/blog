@@ -41,28 +41,30 @@ regressions); lowering it loosens the budget. There's no separate schema
 migration or regeneration step — the file is read directly by the workflow
 on the next run.
 
-## Activation status (blocked on #275)
+## Activation status — active, targets production (#826)
 
-This job is wired but **inert today**: `.github/workflows/lighthouse.yml`'s
-Lighthouse step only runs when the repo Variable `LIGHTHOUSE_URLS` is set (one
-full URL per line — the preview/smoke URL for `/` and one post page). This
-repo currently has **no PR preview deploys for web** by design (Vercel's
-native Git auto-deploy is disabled — `apps/web/vercel.json`,
-`git.deploymentEnabled: false`, #445/#446; see `SPEC.md` §13) — deploys only
-happen via the gated `deploy-development`/`deploy-production` workflows, never
-pre-merge. There is nothing to point `LIGHTHOUSE_URLS` at until
-[#275](https://github.com/ValOvinnikov/blog/issues/275) resolves how a
-preview/smoke URL is produced per PR. Until then the job's Lighthouse step is
-skipped and the job reports green (no-op), matching this repo's convention for
-"activates once configured" (see the guarded deploy steps in
-`deploy-development.yml`).
+This job is **active**: the repo Variable `LIGHTHOUSE_URLS` (Settings →
+Secrets and variables → Actions → Variables) is set to two **production**
+URLs — `https://valstack.dev/` and one live post page.
 
-Once #275 lands a preview-URL mechanism, set `LIGHTHOUSE_URLS` (Settings →
-Secrets and variables → Actions → Variables) to the two URLs, e.g.:
+It was first activated (#399) pointed at the `development` deployment, since
+this repo has **no PR preview deploys for web** by design (Vercel's native Git
+auto-deploy is disabled — `apps/web/vercel.json`,
+`git.deploymentEnabled: false`, #445/#446; see `SPEC.md` §13) and
+[#275](https://github.com/ValOvinnikov/blog/issues/275) (a preview/smoke-URL
+mechanism) hasn't landed. That first run (#826) found real budget failures
+and traced them to the target itself, not the site: `development` can serve
+content byte-identical to production after a dataset refresh, yet is
+deliberately `noindex, nofollow` (#841) — which permanently fails the SEO
+category's crawlability audit — and separately carries cold-start /
+unwarmed-ISR performance noise unrelated to any PR's actual changes.
 
-```
-https://<preview-host>/
-https://<preview-host>/posts/<some-slug>
-```
+**Production is the correct stable target** — it's the only environment where
+the budgets measure real, indexable behavior. The accepted trade-off: this job
+checks production's current health on every PR, not the PR's own diff, until
+#275 lands a true per-PR preview. It stays advisory (non-required, per #399)
+for exactly that reason.
 
-No other change is needed — the workflow and budgets are already in place.
+If `LIGHTHOUSE_URLS` is ever cleared, the Lighthouse step no-ops green (see
+the guarded-step pattern in `deploy-development.yml`) rather than failing —
+so accidentally unsetting the Variable doesn't red the job, just silences it.
