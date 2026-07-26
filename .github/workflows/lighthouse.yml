@@ -1,18 +1,29 @@
 name: Lighthouse CI
 
-# Advisory Lighthouse CI budget assertions (#399) against a preview URL for
-# `/` and one post page, on every PR. Thresholds live in
+# Advisory Lighthouse CI budget assertions (#399) against a stable, known URL
+# for `/` and one post page, on every PR. Thresholds live in
 # .lighthouse/budgets.json (documented in .lighthouse/README.md).
 #
-# No-op (green) until the repo Variable LIGHTHOUSE_URLS is set — this repo
-# currently has NO PR preview deploys for web by design: Vercel's native Git
-# auto-deploy is disabled (apps/web/vercel.json, git.deploymentEnabled: false,
-# #445/#446; see SPEC.md §13), so there is no automatic per-PR URL to point
-# this at. LIGHTHOUSE_URLS activates once #275 resolves how a preview/smoke
-# URL is produced — see .lighthouse/README.md "Activation status" for the
-# exact value to set. Mirrors the guarded-step pattern in
-# deploy-development.yml (steps check `env.SOME_TOKEN != ''` and no-op green
-# until configured) so this is safe to merge ahead of #275.
+# LIGHTHOUSE_URLS points at PRODUCTION (https://valstack.dev), not a per-PR
+# preview: this repo has no PR preview deploys for web by design (Vercel's
+# native Git auto-deploy is disabled — apps/web/vercel.json,
+# git.deploymentEnabled: false, #445/#446; see SPEC.md §13), and no per-PR
+# preview/smoke-URL mechanism is currently tracked (#275 closed without
+# delivering one — see .lighthouse/README.md). The `development`
+# deployment was tried first (#399) but is unsuitable as a Lighthouse target:
+# it can serve content byte-identical to production after a dataset refresh
+# yet is deliberately `noindex, nofollow` (#841), which permanently fails the
+# SEO category's crawlability audit — plus dev carries cold-start/unwarmed-ISR
+# performance noise unrelated to any PR's changes (#826). Production is the
+# only environment where the budgets reflect real, indexable behavior. This
+# means the job checks production's current health on every PR rather than
+# the PR's own diff — an accepted limitation until a true per-PR preview
+# target exists (none is currently tracked); it's still a useful early-warning
+# budget, and stays advisory (non-required) per #399.
+#
+# No-op (green) if the repo Variable LIGHTHOUSE_URLS is ever unset — mirrors
+# the guarded-step pattern in deploy-development.yml (steps check
+# `env.SOME_TOKEN != ''` and no-op green until configured).
 on:
   pull_request:
     branches: [main]
@@ -31,9 +42,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      # One full URL per line — the preview/smoke URL for `/` and one post
-      # page. A repo Variable (not a Secret): preview URLs aren't sensitive
-      # and this keeps the value inspectable in run logs.
+      # One full URL per line — production's `/` and one post page (see the
+      # workflow header comment for why production, not dev or a preview). A
+      # repo Variable (not a Secret): production URLs aren't sensitive and
+      # this keeps the value inspectable in run logs.
       LIGHTHOUSE_URLS: ${{ vars.LIGHTHOUSE_URLS }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -42,8 +54,8 @@ jobs:
 
       # Non-required/advisory (per #399's constraints) — promoting this to a
       # required check is a separate, human-gated branch-ruleset decision.
-      # Guarded on LIGHTHOUSE_URLS so the job is inert (green) until #275
-      # exists; see the workflow header comment above.
+      # Guarded on LIGHTHOUSE_URLS so the job is inert (green) if the Variable
+      # is ever unset; see the workflow header comment above.
       - name: Run Lighthouse CI budgets
         if: ${{ env.LIGHTHOUSE_URLS != '' }}
         uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # 12.6.2
