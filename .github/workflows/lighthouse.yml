@@ -40,7 +40,9 @@ jobs:
   lighthouse:
     name: Lighthouse CI budgets
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # numberOfRuns: 3 (.lighthouse/budgets.json) roughly triples this job's
+    # Lighthouse passes (2 URLs × 3 runs) — bumped from 10 to keep headroom.
+    timeout-minutes: 15
     env:
       # One full URL per line — production's `/` and one post page (see the
       # workflow header comment for why production, not dev or a preview). A

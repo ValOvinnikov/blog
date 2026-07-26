@@ -85,11 +85,12 @@ runtime chunks — no single dominant blocking function on either page).
 That real-hardware parity doesn't match the ~10x gap Lighthouse's _simulated_
 mobile + 4x-CPU-throttle model reported (home TBT 2,310ms vs post 210ms in one
 CI run) — and the action was running with the default `numberOfRuns: 1` (no
-`treosh/lighthouse-ci-action`/`@lhci/cli` docs recommend `numberOfRuns` ≥ 3;
-Total Blocking Time is explicitly one of the noisiest Lighthouse metrics under
-simulated throttling, and a single un-averaged run has no way to distinguish a
-real regression from a one-off noisy sample. `numberOfRuns: 3` makes Lighthouse
-CI take the **median** run per URL, which is the standard mitigation.
+averaging). Both `treosh/lighthouse-ci-action` and `@lhci/cli`'s own docs
+recommend `numberOfRuns` ≥ 3 for exactly this reason: Total Blocking Time is
+one of the noisiest Lighthouse metrics under simulated throttling, and a
+single un-averaged run has no way to distinguish a real regression from a
+one-off noisy sample. `numberOfRuns: 3` makes Lighthouse CI take the
+**median** run per URL, which is the standard mitigation.
 
 This doesn't claim the site is fully optimized — home's LCP (~3.7s) and TBT
 under throttling are still budget-adjacent and worth watching — but it does
