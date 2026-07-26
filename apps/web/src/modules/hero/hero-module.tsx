@@ -45,6 +45,7 @@ export async function HeroModule({ id }: IHeroModuleProps) {
               as={SmartLink}
               href={primaryAction.href}
               target={primaryAction.target}
+              aria-label={primaryAction.ariaLabel}
             >
               {primaryAction.label}
             </LinkButton>
@@ -55,6 +56,7 @@ export async function HeroModule({ id }: IHeroModuleProps) {
               href={secondaryAction.href}
               target={secondaryAction.target}
               variant="link"
+              aria-label={secondaryAction.ariaLabel}
             >
               {secondaryAction.label}
             </LinkButton>
