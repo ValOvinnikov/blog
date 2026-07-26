@@ -7,8 +7,9 @@ name: Lighthouse CI
 # LIGHTHOUSE_URLS points at PRODUCTION (https://valstack.dev), not a per-PR
 # preview: this repo has no PR preview deploys for web by design (Vercel's
 # native Git auto-deploy is disabled — apps/web/vercel.json,
-# git.deploymentEnabled: false, #445/#446; see SPEC.md §13), and #275 (a
-# preview/smoke-URL mechanism) remains unresolved. The `development`
+# git.deploymentEnabled: false, #445/#446; see SPEC.md §13), and no per-PR
+# preview/smoke-URL mechanism is currently tracked (#275 closed without
+# delivering one — see .lighthouse/README.md). The `development`
 # deployment was tried first (#399) but is unsuitable as a Lighthouse target:
 # it can serve content byte-identical to production after a dataset refresh
 # yet is deliberately `noindex, nofollow` (#841), which permanently fails the
@@ -16,9 +17,9 @@ name: Lighthouse CI
 # performance noise unrelated to any PR's changes (#826). Production is the
 # only environment where the budgets reflect real, indexable behavior. This
 # means the job checks production's current health on every PR rather than
-# the PR's own diff — an accepted limitation until #275 lands a true preview
-# target; it's still a useful early-warning budget, and stays advisory
-# (non-required) per #399.
+# the PR's own diff — an accepted limitation until a true per-PR preview
+# target exists (none is currently tracked); it's still a useful early-warning
+# budget, and stays advisory (non-required) per #399.
 #
 # No-op (green) if the repo Variable LIGHTHOUSE_URLS is ever unset — mirrors
 # the guarded-step pattern in deploy-development.yml (steps check

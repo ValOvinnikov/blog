@@ -47,13 +47,15 @@ This job is **active**: the repo Variable `LIGHTHOUSE_URLS` (Settings →
 Secrets and variables → Actions → Variables) is set to two **production**
 URLs — `https://valstack.dev/` and one live post page.
 
-It was first activated (#399) pointed at the `development` deployment, since
+It was first activated (#399), pointed at the `development` deployment, since
 this repo has **no PR preview deploys for web** by design (Vercel's native Git
 auto-deploy is disabled — `apps/web/vercel.json`,
-`git.deploymentEnabled: false`, #445/#446; see `SPEC.md` §13) and
-[#275](https://github.com/ValOvinnikov/blog/issues/275) (a preview/smoke-URL
-mechanism) hasn't landed. That first run (#826) found real budget failures
-and traced them to the target itself, not the site: `development` can serve
+`git.deploymentEnabled: false`, #445/#446; see `SPEC.md` §13) and no per-PR
+preview/smoke-URL mechanism is currently tracked — [#275](https://github.com/ValOvinnikov/blog/issues/275),
+which this pointed at originally, closed (via #822) without delivering one; it
+only added the still-guarded-and-inert `SMOKE_URL` Playwright job. That first
+Lighthouse run against `development` (#826) found real budget failures and
+traced them to the target itself, not the site: `development` can serve
 content byte-identical to production after a dataset refresh, yet is
 deliberately `noindex, nofollow` (#841) — which permanently fails the SEO
 category's crawlability audit — and separately carries cold-start /
@@ -61,9 +63,9 @@ unwarmed-ISR performance noise unrelated to any PR's actual changes.
 
 **Production is the correct stable target** — it's the only environment where
 the budgets measure real, indexable behavior. The accepted trade-off: this job
-checks production's current health on every PR, not the PR's own diff, until
-#275 lands a true per-PR preview. It stays advisory (non-required, per #399)
-for exactly that reason.
+checks production's current health on every PR, not the PR's own diff, until a
+true per-PR preview target exists (none is currently tracked). It stays
+advisory (non-required, per #399) for exactly that reason.
 
 If `LIGHTHOUSE_URLS` is ever cleared, the Lighthouse step no-ops green (see
 the guarded-step pattern in `deploy-development.yml`) rather than failing —
