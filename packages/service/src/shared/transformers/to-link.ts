@@ -51,9 +51,6 @@ export function toLink(raw: TRawLink | null | undefined): ILink | undefined {
         ? '_blank'
         : undefined,
     platform: raw.platform ?? undefined,
-    // The `link` object has no aria-label-ish field in the schema; nothing
-    // to source this from yet. A future enhancement could add an optional
-    // "accessible name" field to the link schema for CTAs using generic copy.
-    ariaLabel: undefined,
+    ariaLabel: raw.accessibleLabel ?? undefined,
   };
 }

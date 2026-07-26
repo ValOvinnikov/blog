@@ -10,6 +10,7 @@ function makeRawLink(overrides: Partial<TRawLink> = {}): TRawLink {
     internalReference: null,
     openInNewTab: null,
     platform: null,
+    accessibleLabel: null,
     ...overrides,
   };
 }
@@ -30,6 +31,20 @@ describe('toLink', () => {
       platform: undefined,
       ariaLabel: undefined,
     });
+  });
+
+  it('threads accessibleLabel through to ariaLabel when present', () => {
+    const result = toLink(
+      makeRawLink({ accessibleLabel: 'Read the full announcement' }),
+    );
+
+    expect(result?.ariaLabel).toBe('Read the full announcement');
+  });
+
+  it('leaves ariaLabel undefined when accessibleLabel is absent', () => {
+    const result = toLink(makeRawLink({ accessibleLabel: null }));
+
+    expect(result?.ariaLabel).toBeUndefined();
   });
 
   it('opens external links in a new tab when flagged', () => {
