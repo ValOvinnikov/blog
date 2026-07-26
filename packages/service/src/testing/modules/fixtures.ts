@@ -63,6 +63,7 @@ export function makeRawCtaModule(
       internalReference: null,
       openInNewTab: null,
       platform: null,
+      accessibleLabel: null,
     },
     ...overrides,
   };

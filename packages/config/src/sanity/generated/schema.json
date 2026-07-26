@@ -205,6 +205,13 @@
           },
           "optional": true
         },
+        "accessibleLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
         "linkType": {
           "type": "objectAttribute",
           "value": {

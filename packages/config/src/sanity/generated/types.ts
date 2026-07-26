@@ -58,6 +58,7 @@ export type Page_blogReference = {
 export type Link = {
   _type: 'link';
   label?: string;
+  accessibleLabel?: string;
   linkType?: 'INTERNAL' | 'EXTERNAL';
   internalReference?:
     | Blog_postReference

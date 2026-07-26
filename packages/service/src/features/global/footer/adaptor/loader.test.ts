@@ -34,6 +34,7 @@ describe('getFooter', () => {
             internalReference: null,
             openInNewTab: null,
             platform: 'GITHUB',
+            accessibleLabel: null,
           },
         ],
       }),

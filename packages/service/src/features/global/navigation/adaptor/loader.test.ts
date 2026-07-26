@@ -34,6 +34,7 @@ describe('getNavigation', () => {
             internalReference: null,
             openInNewTab: null,
             platform: null,
+            accessibleLabel: null,
           },
         ],
       }),
