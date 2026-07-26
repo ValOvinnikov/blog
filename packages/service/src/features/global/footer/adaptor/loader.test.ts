@@ -47,6 +47,7 @@ describe('getFooter', () => {
         href: 'https://github.com/val',
         target: undefined,
         platform: 'GITHUB',
+        ariaLabel: undefined,
       },
     ]);
   });

@@ -28,6 +28,7 @@ describe('toLink', () => {
       href: 'https://example.com',
       target: undefined,
       platform: undefined,
+      ariaLabel: undefined,
     });
   });
 

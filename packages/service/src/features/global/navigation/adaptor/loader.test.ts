@@ -42,7 +42,13 @@ describe('getNavigation', () => {
     const result = await getNavigation();
 
     expect(result.items).toEqual([
-      { label: 'Blog', href: '/blog', target: undefined, platform: undefined },
+      {
+        label: 'Blog',
+        href: '/blog',
+        target: undefined,
+        platform: undefined,
+        ariaLabel: undefined,
+      },
     ]);
   });
 

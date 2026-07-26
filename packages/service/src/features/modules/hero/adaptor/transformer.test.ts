@@ -19,6 +19,24 @@ describe('toHeroModule', () => {
       href: '/blog/hello-world',
       target: undefined,
       platform: undefined,
+      ariaLabel: 'Read more: Hello World',
+    });
+  });
+
+  it('trusts an editor-authored primary action label and omits ariaLabel', () => {
+    const raw = makeRawHeroModule({
+      featuredPost: makeRawPostCard({ _id: 'featured-ref' }),
+      primaryActionLabel: 'Discover the story',
+    });
+
+    const hero = toHeroModule(raw, null);
+
+    expect(hero.primaryAction).toEqual({
+      label: 'Discover the story',
+      href: '/blog/hello-world',
+      target: undefined,
+      platform: undefined,
+      ariaLabel: undefined,
     });
   });
 
@@ -30,6 +48,7 @@ describe('toHeroModule', () => {
 
     expect(hero.title).toBe('Hello World');
     expect(hero.primaryAction?.href).toBe('/blog/hello-world');
+    expect(hero.primaryAction?.ariaLabel).toBe('Read more: Hello World');
   });
 
   it('uses custom copy and custom sanity image when configured', () => {
