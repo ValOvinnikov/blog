@@ -1,5 +1,6 @@
 export * from './action-list';
 export * from './brand-lockup';
+export * from './breadcrumbs';
 export * from './card-meta';
 export * from './command-link';
 export * from './image-with-caption';
