@@ -10,4 +10,8 @@ describe('categoriesQuery', () => {
 
     expect(() => categoriesQuery.parse(raw)).not.toThrow();
   });
+
+  it('excludes future-dated posts from the post count', () => {
+    expect(categoriesQuery.query).toContain('publishedAt <= now()');
+  });
 });

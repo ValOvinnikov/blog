@@ -1,8 +1,11 @@
 import { q } from '@blog/service/sanity/query';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 import { archivePostCardFragment } from '@blog/service/shared/fragments/archive-post-card';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
 
-const blogPosts = q.star.filterByType('blog_post');
+const blogPosts = q.star
+  .filterByType('blog_post')
+  .filterRaw(PUBLISHED_POST_FILTER);
 
 export const blogPageQuery = q.star
   .filterByType('page_blog')

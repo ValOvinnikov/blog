@@ -16,4 +16,10 @@ describe('heroFallbackFeaturedPostQuery', () => {
       title: rawPost.title,
     });
   });
+
+  it('excludes posts whose publishedAt is in the future', () => {
+    expect(heroFallbackFeaturedPostQuery.query).toContain(
+      'publishedAt <= now()',
+    );
+  });
 });

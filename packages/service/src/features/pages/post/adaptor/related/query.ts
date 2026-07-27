@@ -1,4 +1,5 @@
 import { q } from '@blog/service/sanity/query';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 import {
@@ -35,6 +36,7 @@ export const relatedByTagsQuery = q
   .parameters<TRelatedByTagsParams>()
   .star.filterByType('blog_post')
   .filterRaw('_id != $currentId && count((tags[]->_id)[@ in $tagIds]) > 0')
+  .filterRaw(PUBLISHED_POST_FILTER)
   .order('publishedAt desc')
   .slice(0, RELATED_POSTS_TAG_CANDIDATE_LIMIT)
   .project((sub) => ({
@@ -51,6 +53,7 @@ export const relatedByCategoryQuery = q
   .parameters<TRelatedByCategoryParams>()
   .star.filterByType('blog_post')
   .filterRaw('_id != $currentId && category._ref == $categoryId')
+  .filterRaw(PUBLISHED_POST_FILTER)
   .order('publishedAt desc')
   .slice(0, RELATED_POSTS_CATEGORY_CANDIDATE_LIMIT)
   .project(postCardFragment);

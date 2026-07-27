@@ -27,4 +27,8 @@ describe('buildIndexPageQuery', () => {
 
     expect(() => buildIndexPageQuery(0, 9).parse(raw)).not.toThrow();
   });
+
+  it('excludes posts whose publishedAt is in the future', () => {
+    expect(buildIndexPageQuery(0, 9).query).toContain('publishedAt <= now()');
+  });
 });

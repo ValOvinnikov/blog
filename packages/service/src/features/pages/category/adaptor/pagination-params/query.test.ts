@@ -12,4 +12,10 @@ describe('categoryPaginationParamsQuery', () => {
 
     expect(() => categoryPaginationParamsQuery.parse(raw)).not.toThrow();
   });
+
+  it('excludes future-dated posts from the post count', () => {
+    expect(categoryPaginationParamsQuery.query).toContain(
+      'publishedAt <= now()',
+    );
+  });
 });

@@ -1,7 +1,7 @@
 import { makeRawCategory } from '@blog/service/testing/entities/fixtures';
 import { makeRawArchivePostCard } from '@blog/service/testing/pages/fixtures';
 
-import { buildAuthorPostsPageQuery } from './posts.query';
+import { buildTagPostsPageQuery } from './posts.query';
 
 function makeSparseRawPostCard() {
   return makeRawArchivePostCard({
@@ -9,15 +9,15 @@ function makeSparseRawPostCard() {
   });
 }
 
-describe('buildAuthorPostsPageQuery', () => {
+describe('buildTagPostsPageQuery', () => {
   it('parses posts whose optional card fields are all absent', () => {
     const raw = { posts: [makeSparseRawPostCard()], total: 1 };
 
-    expect(() => buildAuthorPostsPageQuery(0, 9).parse(raw)).not.toThrow();
+    expect(() => buildTagPostsPageQuery(0, 9).parse(raw)).not.toThrow();
   });
 
   it('excludes posts whose publishedAt is in the future', () => {
-    expect(buildAuthorPostsPageQuery(0, 9).query).toContain(
+    expect(buildTagPostsPageQuery(0, 9).query).toContain(
       'publishedAt <= now()',
     );
   });

@@ -15,4 +15,10 @@ describe('buildCategoryPostsPageQuery', () => {
 
     expect(() => buildCategoryPostsPageQuery(0, 9).parse(raw)).not.toThrow();
   });
+
+  it('excludes posts whose publishedAt is in the future', () => {
+    expect(buildCategoryPostsPageQuery(0, 9).query).toContain(
+      'publishedAt <= now()',
+    );
+  });
 });
