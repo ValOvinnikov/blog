@@ -28,6 +28,23 @@ const headingTags: Record<1 | 2 | 3 | 4, THeadingTag> = {
   4: 'h4',
 };
 
+/**
+ * Semantic heading (`level` picks the rendered `h1`–`h4` tag) with an
+ * independent `visual` treatment. `visual` always wins over `size` — pass it
+ * whenever the heading's rendered size should be driven by *where* it sits
+ * on the page rather than its outline depth.
+ *
+ * For in-article/body content (e.g. a `PortableTextRenderer` in `apps/web`
+ * mapping Portable Text `h2`/`h3`/`h4` blocks), pair `level` with the
+ * matching `prose-h2`/`prose-h3`/`prose-h4` visual so body subheadings read
+ * as clearly subordinate to the page's own `post`-visual title, however deep
+ * the block sits in the document outline:
+ *
+ * @example
+ * <Heading level={2} visual="prose-h2">{block.text}</Heading>
+ * <Heading level={3} visual="prose-h3">{block.text}</Heading>
+ * <Heading level={4} visual="prose-h4">{block.text}</Heading>
+ */
 export const Heading = ({
   level,
   visual,

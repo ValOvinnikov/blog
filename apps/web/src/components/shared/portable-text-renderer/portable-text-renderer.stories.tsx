@@ -15,8 +15,11 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 /**
- * Multiple sibling block types back to back (heading, paragraphs, marks, a
- * code block) — the layout regression this covers is missing vertical
- * spacing between them, which would render as one unbroken block of text.
+ * Multiple sibling block types back to back (headings at every level,
+ * paragraphs, marks, a code block) — the layout regression this covers is
+ * missing vertical spacing between them, which would render as one unbroken
+ * block of text. Also demonstrates the `prose-h2`/`prose-h3`/`prose-h4`
+ * visual step-down: each heading level reads clearly smaller than the one
+ * above it, and all sit below the page's own title size.
  */
 export const Content: TStory = {};

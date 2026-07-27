@@ -50,6 +50,16 @@ export const richTextDemo: RichText = [
     richTextSpan('inline code', ['code']),
     richTextSpan(' marks.'),
   ]),
+  richTextBlock('h3', [richTextSpan('A subsection heading')]),
+  richTextBlock('normal', [
+    richTextSpan('A paragraph nested under the subsection heading.'),
+  ]),
+  richTextBlock('h4', [richTextSpan('A nested subsection heading')]),
+  richTextBlock('normal', [
+    richTextSpan(
+      'A paragraph nested under the deepest heading level, demonstrating the step-down sizing from h2 through h4.',
+    ),
+  ]),
   richTextBlock(
     'normal',
     [

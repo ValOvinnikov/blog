@@ -30,10 +30,33 @@ const s = portableTextRendererVariants();
 const components: PortableTextComponents = {
   block: {
     normal: ({ children }) => <p>{children}</p>,
-    h1: ({ children }) => <Heading level={1}>{children}</Heading>,
-    h2: ({ children }) => <Heading level={2}>{children}</Heading>,
-    h3: ({ children }) => <Heading level={3}>{children}</Heading>,
-    h4: ({ children }) => <Heading level={4}>{children}</Heading>,
+    // Defensive: Studio's block-toolbar no longer offers 'h1' as a style, but
+    // the schema doesn't reject a document written with one via another path
+    // (API, import script, legacy content) — omitting this key entirely would
+    // let `@portabletext/react` fall back to its own bare, unstyled `<h1>`
+    // default, producing a second competing top-level heading on the page.
+    // Downgrade to the same treatment as h2 so it can never outrank the real
+    // page title.
+    h1: ({ children }) => (
+      <Heading level={2} visual="prose-h2">
+        {children}
+      </Heading>
+    ),
+    h2: ({ children }) => (
+      <Heading level={2} visual="prose-h2">
+        {children}
+      </Heading>
+    ),
+    h3: ({ children }) => (
+      <Heading level={3} visual="prose-h3">
+        {children}
+      </Heading>
+    ),
+    h4: ({ children }) => (
+      <Heading level={4} visual="prose-h4">
+        {children}
+      </Heading>
+    ),
     blockquote: ({ children }) => <QuoteBlock>{children}</QuoteBlock>,
   },
   marks: {
