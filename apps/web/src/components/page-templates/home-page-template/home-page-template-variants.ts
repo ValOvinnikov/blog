@@ -1,5 +1,8 @@
 import { tv } from 'tailwind-variants';
 
 export const homePageTemplateVariants = tv({
-  base: ['bg-bg mx-auto w-full', 'max-w-page px-gutter py-page-y'],
+  slots: {
+    root: ['bg-bg w-full'],
+    modules: ['mx-auto w-full', 'max-w-page px-gutter py-page-y'],
+  },
 });

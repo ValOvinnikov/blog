@@ -2,8 +2,12 @@ import { tv } from '@blog/ui/lib/styling';
 
 export const heroVariants = tv({
   slots: {
-    root: ['bg-bg-subtle border-b border-border', 'py-[26px] pb-8'],
-    content: ['flex flex-col'],
+    root: ['w-full', 'bg-bg-subtle border-b border-border'],
+    content: [
+      'flex flex-col',
+      'mx-auto w-full max-w-page px-gutter',
+      'py-[26px] pb-8',
+    ],
     grid: ['grid grid-cols-1 items-stretch gap-[clamp(1.25rem,4vw,2rem)]'],
     copy: ['flex h-full flex-col', 'min-w-0'],
     meta: ['mt-2 font-mono text-meta text-subtle'],

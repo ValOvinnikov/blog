@@ -22,4 +22,11 @@ describe(`<${HomePageTemplate.name}/>`, () => {
     expect(main).toContainElement(screen.getByText('Hero content'));
     expect(main).toContainElement(screen.getByText('Modules content'));
   });
+
+  it('renders hero as a direct child of main, unwrapped by the modules container', () => {
+    const main = screen.getByRole('main');
+    const hero = screen.getByText('Hero content');
+
+    expect(hero.parentElement).toBe(main);
+  });
 });
