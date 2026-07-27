@@ -66,14 +66,15 @@ export async function CategoryPage({ slug, page }: TCategoryPageProps) {
     <>
       {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
 
-      <Breadcrumbs
-        items={trail}
-        ariaLabel={breadcrumbsT('ariaLabel')}
-        linkAs={SmartLink}
-      />
-
       <BlogPageTemplate
         heading={category.title}
+        breadcrumbs={
+          <Breadcrumbs
+            items={trail}
+            ariaLabel={breadcrumbsT('ariaLabel')}
+            linkAs={SmartLink}
+          />
+        }
         supportingText={category.description}
         categoryChips={
           <CategoryChipList categories={categories} activeSlug={slug} />
