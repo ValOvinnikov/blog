@@ -109,4 +109,13 @@ describe(`<${Hero.name}/>`, () => {
     setup({ dataTestId: 'featured-hero' });
     expect(screen.getByTestId('featured-hero')).toBeVisible();
   });
+
+  it('gives the root section a subtle background and bottom divider', () => {
+    const { container } = setup();
+    const section = container.querySelector('section');
+    expect(section?.className).toContain('bg-bg-subtle');
+    expect(section?.className).toContain('border-b');
+    expect(section?.className).toContain('border-border');
+    expect(section?.className).toContain('pb-8');
+  });
 });
