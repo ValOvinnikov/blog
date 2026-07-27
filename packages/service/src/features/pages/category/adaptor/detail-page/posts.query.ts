@@ -1,4 +1,5 @@
 import { q, type TSlugParams } from '@blog/service/sanity/query';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 import { archivePostCardFragment } from '@blog/service/shared/fragments/archive-post-card';
 
 // `category` is a single dereferenced reference (like `author`), so this is
@@ -9,7 +10,8 @@ import { archivePostCardFragment } from '@blog/service/shared/fragments/archive-
 const categoryPosts = q
   .parameters<TSlugParams>()
   .star.filterByType('blog_post')
-  .filterRaw('category->slug.current == $slug');
+  .filterRaw('category->slug.current == $slug')
+  .filterRaw(PUBLISHED_POST_FILTER);
 
 export const buildCategoryPostsPageQuery = (start: number, end: number) =>
   q

@@ -1,4 +1,5 @@
 import { q } from '@blog/service/sanity/query';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 
 // `references()` matches a tag reference anywhere in the document, including
 // inside the `tags[]` array, so this correlates each tag's own post count via
@@ -10,6 +11,11 @@ export const tagPaginationParamsQuery = q.star
   .project((sub) => ({
     slug: sub.field('slug.current').notNull(),
     postCount: sub
-      .count(sub.star.filterByType('blog_post').filterRaw('references(^._id)'))
+      .count(
+        sub.star
+          .filterByType('blog_post')
+          .filterRaw('references(^._id)')
+          .filterRaw(PUBLISHED_POST_FILTER),
+      )
       .notNull(true),
   }));

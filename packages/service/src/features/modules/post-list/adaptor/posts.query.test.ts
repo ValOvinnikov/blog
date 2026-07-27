@@ -13,4 +13,8 @@ describe('postListModulePostsQuery', () => {
       'order(publishedAt desc)',
     );
   });
+
+  it('excludes posts whose publishedAt is in the future', () => {
+    expect(postListModulePostsQuery(3).query).toContain('publishedAt <= now()');
+  });
 });

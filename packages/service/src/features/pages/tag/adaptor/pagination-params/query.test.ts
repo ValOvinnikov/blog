@@ -12,4 +12,8 @@ describe('tagPaginationParamsQuery', () => {
 
     expect(() => tagPaginationParamsQuery.parse(raw)).not.toThrow();
   });
+
+  it('excludes future-dated posts from the post count', () => {
+    expect(tagPaginationParamsQuery.query).toContain('publishedAt <= now()');
+  });
 });

@@ -19,4 +19,8 @@ describe('postDetailQuery', () => {
 
     expect(() => postDetailQuery.parse(raw)).not.toThrow();
   });
+
+  it('excludes posts whose publishedAt is in the future, hard-404ing direct access', () => {
+    expect(postDetailQuery.query).toContain('publishedAt <= now()');
+  });
 });
