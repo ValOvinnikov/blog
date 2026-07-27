@@ -2,3 +2,56 @@
 
 /* Tell Tailwind to scan ui package source for class names */
 @source '../../packages/ui/src/**/*.{ts,tsx}';
+
+/*
+ * Syntax-highlighting token colors for the Portable Text code block
+ * (`src/components/shared/portable-text-renderer/code-block-syntax-theme.ts`).
+ * Kept web-local rather than in `@blog/tailwind-config/theme.css` since
+ * `react-syntax-highlighter` is a web-only dependency with no consumer
+ * outside `apps/web` (#862). The code block's own background reuses the
+ * existing `--surface-2` token (already documented as the "nested / code"
+ * role in `theme.css`); these are additive foreground colors for Prism's
+ * token classes. Every value below was verified via an OKLCH -> linear-sRGB
+ * WCAG contrast calculation against both `--surface-2` values — all clear
+ * the 4.5:1 AA threshold for normal text (comment tokens reuse `--text-muted`,
+ * matching the existing filename-caption contrast on the same surface;
+ * every other token measures 5.5:1-8:1).
+ */
+:root {
+  /* --code-fg/--code-comment reference --text/--text-muted rather than
+     duplicating their raw color values. This still needs its own
+     `--code-fg`/`--code-comment` declaration inside the `.dark` block below
+     (not just `--text`/`--text-muted`'s override), because `.dark` isn't
+     guaranteed to sit on the same element as `:root` here — per
+     `@custom-variant dark (&:where(.dark, .dark *));` in
+     `@blog/tailwind-config/theme.css`, `.dark` can be toggled on an
+     ancestor element instead (this PR's own `code-block.stories.tsx` `Dark`
+     story does exactly that, nesting `.dark` on a wrapper `<div>` around
+     the code block). When `.dark` lands on an ancestor, an element inside
+     it still inherits `--text`/`--text-muted` from whichever rule actually
+     declares them on an element in its own ancestor chain; if `--code-fg`
+     were declared only once, indirectly, in `:root`, it would keep
+     resolving to `:root`'s light-mode `--text` even inside a nested
+     `.dark`. Redeclaring `--code-fg`/`--code-comment` directly inside
+     `.dark` ensures `.dark`'s own value wins regardless of where `.dark`
+     sits relative to `:root` in the DOM. */
+  --code-fg: var(--text);
+  --code-comment: var(--text-muted);
+  --code-keyword: oklch(0.5 0.19 310);
+  --code-property: oklch(0.5 0.19 15);
+  --code-string: oklch(0.45 0.14 145);
+  --code-variable: oklch(0.5 0.17 250);
+  --code-constant: oklch(0.48 0.14 55);
+  --code-url: oklch(0.48 0.11 200);
+}
+
+.dark {
+  --code-fg: var(--text);
+  --code-comment: var(--text-muted);
+  --code-keyword: oklch(0.78 0.14 310);
+  --code-property: oklch(0.75 0.13 15);
+  --code-string: oklch(0.75 0.12 145);
+  --code-variable: oklch(0.75 0.13 250);
+  --code-constant: oklch(0.78 0.11 55);
+  --code-url: oklch(0.75 0.09 200);
+}

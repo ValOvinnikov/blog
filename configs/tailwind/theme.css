@@ -6,6 +6,14 @@
  * This is the only source of Tailwind theme tokens and global base styling.
  * Apps/packages should import this file, then add only local source-scanning
  * directives such as `@source` when they need Tailwind to scan another package.
+ *
+ * Narrow exception: a consuming app MAY declare its own workspace-scoped
+ * `:root`/`.dark` custom properties when the tokens are specific to a
+ * dependency with no cross-workspace consumer — e.g. `apps/web/index.css`'s
+ * `--code-*` tokens for `react-syntax-highlighter` (#862), a web-only
+ * dependency `packages/ui` and `apps/cms` never touch. This is the rare
+ * carve-out, not the default — tokens shared by more than one workspace
+ * still belong here.
  */
 
 @custom-variant dark (&:where(.dark, .dark *));
