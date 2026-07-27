@@ -23,8 +23,29 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     expect(screen.getByText('Hello world', { selector: 'p' })).toBeVisible();
   });
 
-  ([1, 2, 3, 4] as const).forEach((level) => {
-    it(`renders an h${level}-style block as a level ${level} heading`, () => {
+  it('renders an h1-style block downgraded to a level 2 heading with the prose-h2 visual, never a bare h1', () => {
+    const value: RichText = [
+      // The generated `style` union no longer includes 'h1' (Studio can't
+      // author one anymore), but the renderer still defends against a
+      // legacy/malformed one reaching this component via another write path.
+      richTextBlock('h1' as TRichTextBlock['style'], [
+        richTextSpan('Heading 1'),
+      ]),
+    ];
+
+    setup({ value });
+
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Heading 1',
+    });
+    expect(heading).toBeVisible();
+    expect(heading.className).toContain('text-prose-h2');
+    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
+  });
+
+  ([2, 3, 4] as const).forEach((level) => {
+    it(`renders an h${level}-style block as a level ${level} heading with the matching prose-h${level} visual`, () => {
       const value: RichText = [
         richTextBlock(`h${level}` as TRichTextBlock['style'], [
           richTextSpan(`Heading ${level}`),
@@ -33,9 +54,12 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
 
       setup({ value });
 
-      expect(
-        screen.getByRole('heading', { level, name: `Heading ${level}` }),
-      ).toBeVisible();
+      const heading = screen.getByRole('heading', {
+        level,
+        name: `Heading ${level}`,
+      });
+      expect(heading).toBeVisible();
+      expect(heading.className).toContain(`text-prose-h${level}`);
     });
   });
 

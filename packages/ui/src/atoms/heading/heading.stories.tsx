@@ -59,3 +59,40 @@ export const VisualCard: TStory = {
 export const VisualSection: TStory = {
   args: { level: 2, visual: 'section', children: 'Section Heading' },
 };
+
+export const VisualProseH2: TStory = {
+  args: { level: 2, visual: 'prose-h2', children: 'Prose H2 Heading' },
+};
+
+export const VisualProseH3: TStory = {
+  args: { level: 3, visual: 'prose-h3', children: 'Prose H3 Heading' },
+};
+
+export const VisualProseH4: TStory = {
+  args: { level: 4, visual: 'prose-h4', children: 'Prose H4 Heading' },
+};
+
+/**
+ * The `post` visual (the page's real title, e.g. `PostPage`'s h1) must
+ * always read as the largest heading on the page. `prose-h2`/`prose-h3`/
+ * `prose-h4` are sized for subheadings *within* the body copy — this story
+ * puts them side by side so the size relationship stays visually checkable.
+ */
+export const InArticleHierarchy: TStory = {
+  render: () => (
+    <div className="flex max-w-prose flex-col gap-4">
+      <Heading level={1} visual="post">
+        The Post Title (h1, visual=&quot;post&quot;)
+      </Heading>
+      <Heading level={2} visual="prose-h2">
+        A Body Subsection (h2, visual=&quot;prose-h2&quot;)
+      </Heading>
+      <Heading level={3} visual="prose-h3">
+        A Nested Subsection (h3, visual=&quot;prose-h3&quot;)
+      </Heading>
+      <Heading level={4} visual="prose-h4">
+        A Deeper Subsection (h4, visual=&quot;prose-h4&quot;)
+      </Heading>
+    </div>
+  ),
+};
