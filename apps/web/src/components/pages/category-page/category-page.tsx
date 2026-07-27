@@ -1,7 +1,7 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
-import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
+import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { CategoryChipList } from '@web/components/shared/category-chip-list';
 import { Link } from '@web/i18n/navigation';
 import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
