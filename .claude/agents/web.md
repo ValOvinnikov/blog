@@ -78,18 +78,25 @@ When invoked, before writing any code:
 
 - **Pages and layouts must be clean.** No inline component definitions and no
   helper functions inside `page.tsx` or `layout.tsx` files. Extract everything.
-- **Components** live in `src/components/`, split into two subtrees:
+- **Components** live in `src/components/`, split into three subtrees:
   - `src/components/pages/` — page-level compositions: the one component a
-    route's `page.tsx` (or `not-found.tsx`) renders to produce the whole
-    page (fetch + compose), plus any `*-template` shell it delegates to.
-    Named after the page it composes, e.g. `blog-post-page/`,
-    `home-page-template/`.
+    route's `page.tsx` (or `not-found.tsx`) renders directly to produce the
+    whole page (fetch + compose). Named after the page it composes, e.g.
+    `blog-post-page/`, `category-page/`.
+  - `src/components/page-templates/` — pure render shells with no data
+    fetching, consumed by one or more `pages/` components (or, for the home
+    route, by `page.tsx` directly) to render shared layout. Named with a
+    `*-template` suffix, e.g. `blog-page-template/` (the shared archive shell
+    consumed by `blog-list-page`, `category-page`, `tag-page`, `author-page`),
+    `home-page-template/`. A component belongs here only if something
+    delegates rendering to it — a page with no shared shell has no
+    `*-template` counterpart, and that's fine.
   - `src/components/shared/` — everything else: reusable pieces consumed by
     more than one place, or generic framework-coupled wrappers
     (`sanity-image/`, `smart-link/`, `json-ld/`, `theme-toggle-button/`).
 
-  **In both subtrees**, each component still gets its own folder named after
-  it, containing the component file, a co-located test file, and an
+  **In all three subtrees**, each component still gets its own folder named
+  after it, containing the component file, a co-located test file, and an
   `index.ts` barrel re-exporting the component — never internal
   implementation pieces like a `*-variants.ts` or a sub-component only that
   folder uses. **Only re-export the prop type too if something outside the

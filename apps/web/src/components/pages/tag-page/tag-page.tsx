@@ -1,7 +1,7 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
-import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
+import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { Link } from '@web/i18n/navigation';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import { toPostListItems } from '@web/utils/to-post-list-items';

@@ -3,7 +3,7 @@ import { service } from '@blog/service';
 import { Avatar, Eyebrow } from '@blog/ui/atoms';
 import { ActionList, ShareLink } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
-import { BlogPageTemplate } from '@web/components/pages/blog-page-template';
+import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { Link } from '@web/i18n/navigation';
 import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
