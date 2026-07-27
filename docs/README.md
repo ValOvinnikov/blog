@@ -19,15 +19,22 @@ What lives where, and which docs are live vs. historical. See `CLAUDE.md`'s
 `superpowers:brainstorming`/`writing-plans` skills while a feature is being
 designed/built. A doc stays here until its work has shipped **and** `SPEC.md`
 has been updated to describe the final shape — see the directory listing for
-what's currently active.
+what's currently active. Once both are true, the doc is **deleted** in the
+same PR that syncs `SPEC.md` (`CLAUDE.md`'s "Design-doc retention" rule) —
+`SPEC.md` is the durable record; the design doc doesn't stick around as a
+second copy that can drift from it.
 
-## Archived design docs (shipped — historical only)
+## Archived design docs (frozen history — pre-2026-07-27 only)
 
 `docs/archive/` — same idea as `IMPLEMENTATION_BRIEF.md`/`ROADMAP.md` already
 here: done, historical, kept for the "why" (alternatives considered,
 tradeoffs) that `SPEC.md` doesn't restate. Each carries a banner pointing at
-the `SPEC.md` section that now describes the shipped behavior. Do not extend
-these — if something here disagrees with `SPEC.md`, `SPEC.md` wins.
+the `SPEC.md` section that now describes the shipped behavior. **This bucket
+is closed — no new entries.** Design-doc retention changed 2026-07-27 from
+archive-on-ship to delete-on-ship (`CLAUDE.md`'s "Design-doc retention"
+rule); everything below predates that change and is kept as-is, but a doc
+finishing today is deleted, not moved here. If something here disagrees with
+`SPEC.md`, `SPEC.md` wins.
 
 - `IMPLEMENTATION_BRIEF.md`, `ROADMAP.md` — frozen bootstrap-era history.
 - `home-page-rollout.md` — Home surface rollout, shipped.
