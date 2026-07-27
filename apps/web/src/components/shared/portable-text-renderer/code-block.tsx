@@ -1,6 +1,6 @@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
+import { codeBlockSyntaxTheme } from './code-block-syntax-theme';
 import { codeBlockVariants } from './code-block-variants';
 
 export interface ICodeBlockProps {
@@ -33,7 +33,7 @@ export const CodeBlock = ({
       ) : null}
       <SyntaxHighlighter
         language={language ?? 'text'}
-        style={oneDark}
+        style={codeBlockSyntaxTheme}
         showLineNumbers
         wrapLines
         lineProps={(lineNumber) => ({
