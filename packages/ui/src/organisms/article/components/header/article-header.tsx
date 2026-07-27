@@ -35,11 +35,7 @@ export const ArticleHeader = ({
   const s = articleHeaderVariants();
 
   return (
-    <header
-      className={s.root({ class: className })}
-      data-testid={dataTestId}
-      {...rest}
-    >
+    <header className={className} data-testid={dataTestId} {...rest}>
       <Heading level={1} visual="post" className={s.title()}>
         {title}
       </Heading>
