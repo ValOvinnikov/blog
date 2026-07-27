@@ -72,3 +72,7 @@ Thumbs.db
 # Vercel CLI link scratch (env files are handled at the top of this file —
 # a plain `.env*` here would override the `!.env.example` exceptions)
 .vercel
+
+# Blog post content-authoring scratch (drafts, generator scripts, NDJSON
+# import files) — working files for populating Sanity, never committed
+/content
