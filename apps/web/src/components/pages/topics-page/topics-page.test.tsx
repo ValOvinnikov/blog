@@ -37,7 +37,7 @@ describe(`<${TopicsPage.name}/>`, () => {
   });
 
   it('renders the page heading', async () => {
-    getCategoriesMock.mockResolvedValue([]);
+    getCategoriesMock.mockResolvedValue({ ok: true, data: [] });
 
     await setup();
 
@@ -47,15 +47,18 @@ describe(`<${TopicsPage.name}/>`, () => {
   });
 
   it('renders a card per category, linking to its category archive', async () => {
-    getCategoriesMock.mockResolvedValue([
-      {
-        id: 'cat-1',
-        title: 'Engineering',
-        slug: 'engineering',
-        description: 'Posts about building things.',
-        postCount: 5,
-      },
-    ]);
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: [
+        {
+          id: 'cat-1',
+          title: 'Engineering',
+          slug: 'engineering',
+          description: 'Posts about building things.',
+          postCount: 5,
+        },
+      ],
+    });
 
     await setup();
 
@@ -66,15 +69,18 @@ describe(`<${TopicsPage.name}/>`, () => {
   });
 
   it('omits the description when the category has none', async () => {
-    getCategoriesMock.mockResolvedValue([
-      {
-        id: 'cat-1',
-        title: 'Engineering',
-        slug: 'engineering',
-        description: undefined,
-        postCount: 5,
-      },
-    ]);
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: [
+        {
+          id: 'cat-1',
+          title: 'Engineering',
+          slug: 'engineering',
+          description: undefined,
+          postCount: 5,
+        },
+      ],
+    });
 
     await setup();
 
@@ -84,15 +90,18 @@ describe(`<${TopicsPage.name}/>`, () => {
   });
 
   it('renders singular "1 post" for a category with exactly one post', async () => {
-    getCategoriesMock.mockResolvedValue([
-      {
-        id: 'cat-1',
-        title: 'Engineering',
-        slug: 'engineering',
-        description: undefined,
-        postCount: 1,
-      },
-    ]);
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: [
+        {
+          id: 'cat-1',
+          title: 'Engineering',
+          slug: 'engineering',
+          description: undefined,
+          postCount: 1,
+        },
+      ],
+    });
 
     await setup();
 
@@ -100,7 +109,7 @@ describe(`<${TopicsPage.name}/>`, () => {
   });
 
   it('renders an empty-state message when there are no categories', async () => {
-    getCategoriesMock.mockResolvedValue([]);
+    getCategoriesMock.mockResolvedValue({ ok: true, data: [] });
 
     await setup();
 
@@ -108,11 +117,12 @@ describe(`<${TopicsPage.name}/>`, () => {
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('renders the empty state instead of crashing when the fetch throws', async () => {
+  it('renders the empty state instead of crashing when the fetch resolves to a failure result', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getCategoriesMock.mockRejectedValue(
-      new Error('Configuration must contain `projectId`'),
-    );
+    getCategoriesMock.mockResolvedValue({
+      ok: false,
+      error: new Error('Configuration must contain `projectId`'),
+    });
 
     await setup();
 

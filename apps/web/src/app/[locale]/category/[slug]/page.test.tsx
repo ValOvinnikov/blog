@@ -28,19 +28,22 @@ vi.mock('@web/metadata/category-metadata', () => ({
 describe('CategoryDetailPage', () => {
   describe('generateStaticParams', () => {
     it('returns the category slugs on success', async () => {
-      getCategoryParamsMock.mockResolvedValue([
-        { slug: 'engineering' },
-        { slug: 'design' },
-      ]);
+      getCategoryParamsMock.mockResolvedValue({
+        ok: true,
+        data: [{ slug: 'engineering' }, { slug: 'design' }],
+      });
 
       const params = await generateStaticParams();
 
       expect(params).toEqual([{ slug: 'engineering' }, { slug: 'design' }]);
     });
 
-    it('returns an empty array when the fetch rejects', async () => {
+    it('returns an empty array when the fetch resolves to a failure result', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      getCategoryParamsMock.mockRejectedValue(new Error('boom'));
+      getCategoryParamsMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
 
       const params = await generateStaticParams();
 

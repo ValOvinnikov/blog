@@ -52,9 +52,16 @@ describe(`<${BlogListPage.name}/>`, () => {
   beforeEach(() => {
     getIndexPageMock.mockReset();
     getCategoriesMock.mockReset();
-    getCategoriesMock.mockResolvedValue([
-      makeCategoryWithPostCount({ title: 'News', slug: 'news', postCount: 1 }),
-    ]);
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: [
+        makeCategoryWithPostCount({
+          title: 'News',
+          slug: 'news',
+          postCount: 1,
+        }),
+      ],
+    });
   });
 
   it('calls notFound() when the requested page is beyond totalPages', async () => {

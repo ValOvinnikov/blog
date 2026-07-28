@@ -28,19 +28,22 @@ vi.mock('@web/metadata/author-metadata', () => ({
 describe('AuthorDetailPage', () => {
   describe('generateStaticParams', () => {
     it('returns the author slugs on success', async () => {
-      getAuthorParamsMock.mockResolvedValue([
-        { slug: 'jane-doe' },
-        { slug: 'john-smith' },
-      ]);
+      getAuthorParamsMock.mockResolvedValue({
+        ok: true,
+        data: [{ slug: 'jane-doe' }, { slug: 'john-smith' }],
+      });
 
       const params = await generateStaticParams();
 
       expect(params).toEqual([{ slug: 'jane-doe' }, { slug: 'john-smith' }]);
     });
 
-    it('returns an empty array when the fetch rejects', async () => {
+    it('returns an empty array when the fetch resolves to a failure result', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      getAuthorParamsMock.mockRejectedValue(new Error('boom'));
+      getAuthorParamsMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
 
       const params = await generateStaticParams();
 

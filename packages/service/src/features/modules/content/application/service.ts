@@ -3,6 +3,6 @@ import { safeAsync } from '@blog/utils';
 
 export function createContentModuleService() {
   return {
-    v1: { getContent: (id: string) => safeAsync(getContent(id)) },
+    v1: { getContent: safeAsync((id: string) => getContent(id)) },
   };
 }

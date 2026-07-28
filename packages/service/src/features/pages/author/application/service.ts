@@ -11,10 +11,13 @@ export function createAuthorService() {
       // Loader still returns `TAuthorPage | null` for "author not found";
       // safeAsync only wraps arbitrary query failures, so callers check
       // `.ok` first, then `.data !== null` (see #713).
-      getAuthorPage: (slug: string, args: TGetAuthorPageArgs) =>
-        safeAsync(getAuthorPage(slug, args)),
-      getAuthorParams,
-      getAuthorPaginationParams,
+      getAuthorPage: safeAsync((slug: string, args: TGetAuthorPageArgs) =>
+        getAuthorPage(slug, args),
+      ),
+      getAuthorParams: safeAsync(() => getAuthorParams()),
+      getAuthorPaginationParams: safeAsync((itemsPerPage: number) =>
+        getAuthorPaginationParams(itemsPerPage),
+      ),
     },
   };
 }

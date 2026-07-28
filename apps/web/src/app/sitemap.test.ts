@@ -56,13 +56,13 @@ vi.mock('@web/utils/env/env', () => ({
 
 /** Resolves every params mock to an empty result; tests override as needed. */
 function mockAllEmpty() {
-  getPostParamsMock.mockResolvedValue([]);
-  getCategoryParamsMock.mockResolvedValue([]);
-  getCategoryPaginationParamsMock.mockResolvedValue([]);
-  getTagParamsMock.mockResolvedValue([]);
-  getTagPaginationParamsMock.mockResolvedValue([]);
-  getAuthorParamsMock.mockResolvedValue([]);
-  getAuthorPaginationParamsMock.mockResolvedValue([]);
+  getPostParamsMock.mockResolvedValue({ ok: true, data: [] });
+  getCategoryParamsMock.mockResolvedValue({ ok: true, data: [] });
+  getCategoryPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+  getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
+  getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+  getAuthorParamsMock.mockResolvedValue({ ok: true, data: [] });
+  getAuthorPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
   getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
   getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
 }
@@ -83,13 +83,25 @@ describe('sitemap', () => {
 
   it('includes home, blog index, topics hub, post, category, tag, author, blog page and generic page entries', async () => {
     mockAllEmpty();
-    getPostParamsMock.mockResolvedValue([
-      { slug: 'first-post', publishedAt: '2026-01-01T00:00:00.000Z' },
-      { slug: 'second-post', publishedAt: '2026-01-02T00:00:00.000Z' },
-    ]);
-    getCategoryParamsMock.mockResolvedValue([{ slug: 'news' }]);
-    getTagParamsMock.mockResolvedValue([{ slug: 'typescript' }]);
-    getAuthorParamsMock.mockResolvedValue([{ slug: 'jane-doe' }]);
+    getPostParamsMock.mockResolvedValue({
+      ok: true,
+      data: [
+        { slug: 'first-post', publishedAt: '2026-01-01T00:00:00.000Z' },
+        { slug: 'second-post', publishedAt: '2026-01-02T00:00:00.000Z' },
+      ],
+    });
+    getCategoryParamsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'news' }],
+    });
+    getTagParamsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'typescript' }],
+    });
+    getAuthorParamsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'jane-doe' }],
+    });
     getIndexPageParamsMock.mockResolvedValue({
       ok: true,
       data: [{ page: '2' }, { page: '3' }],
@@ -118,16 +130,21 @@ describe('sitemap', () => {
 
   it('includes numbered category, tag and author pagination pages', async () => {
     mockAllEmpty();
-    getCategoryPaginationParamsMock.mockResolvedValue([
-      { slug: 'news', page: '2' },
-    ]);
-    getTagPaginationParamsMock.mockResolvedValue([
-      { slug: 'typescript', page: '2' },
-      { slug: 'typescript', page: '3' },
-    ]);
-    getAuthorPaginationParamsMock.mockResolvedValue([
-      { slug: 'jane-doe', page: '2' },
-    ]);
+    getCategoryPaginationParamsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'news', page: '2' }],
+    });
+    getTagPaginationParamsMock.mockResolvedValue({
+      ok: true,
+      data: [
+        { slug: 'typescript', page: '2' },
+        { slug: 'typescript', page: '3' },
+      ],
+    });
+    getAuthorPaginationParamsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'jane-doe', page: '2' }],
+    });
     const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
@@ -139,9 +156,12 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/author/jane-doe/page/2');
   });
 
-  it('omits category pagination pages when the fetch throws', async () => {
+  it('omits category pagination pages when the fetch resolves to a failure result', async () => {
     mockAllEmpty();
-    getCategoryPaginationParamsMock.mockRejectedValue(new Error('boom'));
+    getCategoryPaginationParamsMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
     const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
@@ -151,9 +171,12 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/');
   });
 
-  it('omits tag pagination pages when the fetch throws', async () => {
+  it('omits tag pagination pages when the fetch resolves to a failure result', async () => {
     mockAllEmpty();
-    getTagPaginationParamsMock.mockRejectedValue(new Error('boom'));
+    getTagPaginationParamsMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
     const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
@@ -163,9 +186,12 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/');
   });
 
-  it('omits authors when the author params fetch throws', async () => {
+  it('omits authors when the author params fetch resolves to a failure result', async () => {
     mockAllEmpty();
-    getAuthorParamsMock.mockRejectedValue(new Error('boom'));
+    getAuthorParamsMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
     const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
@@ -175,9 +201,12 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/');
   });
 
-  it('omits author pagination pages when the fetch throws', async () => {
+  it('omits author pagination pages when the fetch resolves to a failure result', async () => {
     mockAllEmpty();
-    getAuthorPaginationParamsMock.mockRejectedValue(new Error('boom'));
+    getAuthorPaginationParamsMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
     const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
@@ -189,10 +218,14 @@ describe('sitemap', () => {
 
   it('sets lastModified on post entries from publishedAt, but not on entries without a date source', async () => {
     mockAllEmpty();
-    getPostParamsMock.mockResolvedValue([
-      { slug: 'first-post', publishedAt: '2026-01-01T00:00:00.000Z' },
-    ]);
-    getCategoryParamsMock.mockResolvedValue([{ slug: 'news' }]);
+    getPostParamsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'first-post', publishedAt: '2026-01-01T00:00:00.000Z' }],
+    });
+    getCategoryParamsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'news' }],
+    });
     const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
@@ -249,9 +282,12 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/');
   });
 
-  it('omits posts when the post params fetch throws', async () => {
+  it('omits posts when the post params fetch resolves to a failure result', async () => {
     mockAllEmpty();
-    getPostParamsMock.mockRejectedValue(new Error('boom'));
+    getPostParamsMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
     const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
@@ -262,9 +298,12 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/blog');
   });
 
-  it('omits categories when the category params fetch throws', async () => {
+  it('omits categories when the category params fetch resolves to a failure result', async () => {
     mockAllEmpty();
-    getCategoryParamsMock.mockRejectedValue(new Error('boom'));
+    getCategoryParamsMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
     const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
@@ -274,9 +313,12 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/');
   });
 
-  it('omits tags when the tag params fetch throws', async () => {
+  it('omits tags when the tag params fetch resolves to a failure result', async () => {
     mockAllEmpty();
-    getTagParamsMock.mockRejectedValue(new Error('boom'));
+    getTagParamsMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
     const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();

@@ -13,12 +13,14 @@ type TProps = {
 // uncaught throw here would crash the entire `next build`. `dynamicParams`
 // stays default `true`, so a missed build-time slug still renders on demand.
 export async function generateStaticParams() {
-  try {
-    return await service.pages.author.v1.getAuthorParams();
-  } catch (error) {
-    console.error(`Error to fetch author params: ${error}`);
+  const result = await service.pages.author.v1.getAuthorParams();
+
+  if (!result.ok) {
+    console.error(`Error to fetch author params: ${result.error}`);
     return [];
   }
+
+  return result.data;
 }
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {

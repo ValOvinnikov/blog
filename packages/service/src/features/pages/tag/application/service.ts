@@ -11,10 +11,13 @@ export function createTagService() {
       // Loader still returns `TTagPage | null` for "tag not found";
       // safeAsync only wraps arbitrary query failures, so callers check
       // `.ok` first, then `.data !== null` (see #713).
-      getTagPage: (slug: string, args: TGetTagPageArgs) =>
-        safeAsync(getTagPage(slug, args)),
-      getTagParams,
-      getTagPaginationParams,
+      getTagPage: safeAsync((slug: string, args: TGetTagPageArgs) =>
+        getTagPage(slug, args),
+      ),
+      getTagParams: safeAsync(() => getTagParams()),
+      getTagPaginationParams: safeAsync((itemsPerPage: number) =>
+        getTagPaginationParams(itemsPerPage),
+      ),
     },
   };
 }

@@ -64,10 +64,13 @@ describe('TagNumberedPage', () => {
 
   describe('generateStaticParams', () => {
     it('returns the tag pagination params on success', async () => {
-      getTagPaginationParamsMock.mockResolvedValue([
-        { slug: 'typescript', page: '2' },
-        { slug: 'react', page: '2' },
-      ]);
+      getTagPaginationParamsMock.mockResolvedValue({
+        ok: true,
+        data: [
+          { slug: 'typescript', page: '2' },
+          { slug: 'react', page: '2' },
+        ],
+      });
 
       const params = await generateStaticParams();
 
@@ -78,9 +81,12 @@ describe('TagNumberedPage', () => {
       expect(getTagPaginationParamsMock).toHaveBeenCalledWith(9);
     });
 
-    it('returns an empty array when the fetch rejects', async () => {
+    it('returns an empty array when the fetch resolves to a failure result', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      getTagPaginationParamsMock.mockRejectedValue(new Error('boom'));
+      getTagPaginationParamsMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
 
       const params = await generateStaticParams();
 

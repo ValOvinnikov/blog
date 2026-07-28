@@ -19,14 +19,15 @@ type TProps = {
 // on demand via ISR — correctness rides on the explicit range check in
 // `TagPage`, not on this list.
 export async function generateStaticParams() {
-  try {
-    return await service.pages.tag.v1.getTagPaginationParams(
-      TAG_ITEMS_PER_PAGE,
-    );
-  } catch (error) {
-    console.error(`Error to fetch tag pagination params: ${error}`);
+  const result =
+    await service.pages.tag.v1.getTagPaginationParams(TAG_ITEMS_PER_PAGE);
+
+  if (!result.ok) {
+    console.error(`Error to fetch tag pagination params: ${result.error}`);
     return [];
   }
+
+  return result.data;
 }
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {

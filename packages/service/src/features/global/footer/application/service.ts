@@ -4,7 +4,7 @@ import { safeAsync } from '@blog/utils';
 export function createFooterService() {
   return {
     v1: {
-      getFooter: () => safeAsync(getFooter()),
+      getFooter: safeAsync(() => getFooter()),
     },
   };
 }

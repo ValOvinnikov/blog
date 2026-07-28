@@ -78,15 +78,22 @@ describe(`<${CategoryPage.name}/>`, () => {
   beforeEach(() => {
     getCategoryPageMock.mockReset();
     getCategoriesMock.mockReset();
-    getCategoriesMock.mockResolvedValue([
-      makeCategoryWithPostCount({ title: 'News', slug: 'news', postCount: 1 }),
-      makeCategoryWithPostCount({
-        id: 'cat-2',
-        title: 'Design',
-        slug: 'design',
-        postCount: 2,
-      }),
-    ]);
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: [
+        makeCategoryWithPostCount({
+          title: 'News',
+          slug: 'news',
+          postCount: 1,
+        }),
+        makeCategoryWithPostCount({
+          id: 'cat-2',
+          title: 'Design',
+          slug: 'design',
+          postCount: 2,
+        }),
+      ],
+    });
   });
 
   it('calls notFound() when the category does not exist', async () => {

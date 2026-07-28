@@ -27,25 +27,56 @@ vi.mock('@web/components/pages/blog-post-page', () => ({
 
 describe('BlogPostSlugPage', () => {
   describe('generateStaticParams', () => {
+    const originalSkipEnvValidation = process.env.SKIP_ENV_VALIDATION;
+
+    afterEach(() => {
+      process.env.SKIP_ENV_VALIDATION = originalSkipEnvValidation;
+    });
+
     it('returns the bare slug for each post, letting Next combine it with the locale segment', async () => {
-      getPostParamsMock.mockResolvedValue([
-        { slug: 'a', publishedAt: '2026-01-01' },
-        { slug: 'b', publishedAt: '2026-01-02' },
-      ]);
+      getPostParamsMock.mockResolvedValue({
+        ok: true,
+        data: [
+          { slug: 'a', publishedAt: '2026-01-01' },
+          { slug: 'b', publishedAt: '2026-01-02' },
+        ],
+      });
 
       const params = await generateStaticParams();
 
       expect(params).toEqual([{ slug: 'a' }, { slug: 'b' }]);
     });
 
-    it('returns an empty array when getPostParams rejects', async () => {
+    it('returns an empty array when getPostParams resolves to a failure result, regardless of SKIP_ENV_VALIDATION', async () => {
+      delete process.env.SKIP_ENV_VALIDATION;
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      getPostParamsMock.mockRejectedValue(new Error('projectId missing'));
+      getPostParamsMock.mockResolvedValue({
+        ok: false,
+        error: new Error('projectId missing'),
+      });
 
       const params = await generateStaticParams();
 
       expect(params).toEqual([]);
       errorSpy.mockRestore();
+    });
+
+    it('throws when getPostParams resolves to zero posts and SKIP_ENV_VALIDATION is unset', async () => {
+      delete process.env.SKIP_ENV_VALIDATION;
+      getPostParamsMock.mockResolvedValue({ ok: true, data: [] });
+
+      await expect(generateStaticParams()).rejects.toThrow(
+        /generateStaticParams for blog\/\[slug\] returned zero posts/,
+      );
+    });
+
+    it('returns an empty array when getPostParams resolves to zero posts and SKIP_ENV_VALIDATION is set', async () => {
+      process.env.SKIP_ENV_VALIDATION = 'true';
+      getPostParamsMock.mockResolvedValue({ ok: true, data: [] });
+
+      const params = await generateStaticParams();
+
+      expect(params).toEqual([]);
     });
   });
 

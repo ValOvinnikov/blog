@@ -21,18 +21,20 @@ describe('getCategoriesSafely', () => {
         postCount: 3,
       },
     ];
-    vi.mocked(service.entities.categories.v1.getCategories).mockResolvedValue(
-      categories,
-    );
+    vi.mocked(service.entities.categories.v1.getCategories).mockResolvedValue({
+      ok: true,
+      data: categories,
+    });
 
     await expect(getCategoriesSafely()).resolves.toEqual(categories);
   });
 
-  it('falls back to an empty list and logs when the fetch throws', async () => {
+  it('falls back to an empty list and logs when the fetch resolves to a failure result', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.mocked(service.entities.categories.v1.getCategories).mockRejectedValue(
-      new Error('boom'),
-    );
+    vi.mocked(service.entities.categories.v1.getCategories).mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
 
     await expect(getCategoriesSafely()).resolves.toEqual([]);
     expect(errorSpy).toHaveBeenCalledWith(

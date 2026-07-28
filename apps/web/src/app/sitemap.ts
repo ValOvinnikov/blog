@@ -32,92 +32,18 @@ function toEntry(
   };
 }
 
-async function getPostParamsSafe() {
-  try {
-    return await service.pages.post.v1.getPostParams();
-  } catch (error) {
-    console.error(`Error fetching post params for sitemap: ${error}`);
-    return [];
-  }
-}
-
-async function getCategoryParamsSafe() {
-  try {
-    return await service.pages.category.v1.getCategoryParams();
-  } catch (error) {
-    console.error(`Error fetching category params for sitemap: ${error}`);
-    return [];
-  }
-}
-
-async function getTagParamsSafe() {
-  try {
-    return await service.pages.tag.v1.getTagParams();
-  } catch (error) {
-    console.error(`Error fetching tag params for sitemap: ${error}`);
-    return [];
-  }
-}
-
-async function getAuthorParamsSafe() {
-  try {
-    return await service.pages.author.v1.getAuthorParams();
-  } catch (error) {
-    console.error(`Error fetching author params for sitemap: ${error}`);
-    return [];
-  }
-}
-
-// Pages 2..N of a category/tag archive are near-duplicate slices of the same
-// post list (same title/description pattern, decreasing content density) —
-// included anyway, for consistency with the numbered `/blog/page/N` entries
-// already listed below, rather than treating paginated archives as
-// crawlable-but-not-advertised. `itemsPerPage` must match the value each
-// numbered-page route's own `generateStaticParams` uses, or the two disagree
-// on how many pages exist.
-async function getCategoryPaginationParamsSafe() {
-  try {
-    return await service.pages.category.v1.getCategoryPaginationParams(
-      CATEGORY_ITEMS_PER_PAGE,
-    );
-  } catch (error) {
-    console.error(
-      `Error fetching category pagination params for sitemap: ${error}`,
-    );
-    return [];
-  }
-}
-
-async function getTagPaginationParamsSafe() {
-  try {
-    return await service.pages.tag.v1.getTagPaginationParams(
-      TAG_ITEMS_PER_PAGE,
-    );
-  } catch (error) {
-    console.error(`Error fetching tag pagination params for sitemap: ${error}`);
-    return [];
-  }
-}
-
-async function getAuthorPaginationParamsSafe() {
-  try {
-    return await service.pages.author.v1.getAuthorPaginationParams(
-      AUTHOR_ITEMS_PER_PAGE,
-    );
-  } catch (error) {
-    console.error(
-      `Error fetching author pagination params for sitemap: ${error}`,
-    );
-    return [];
-  }
-}
-
 /**
  * Site-wide sitemap: home, blog index + every numbered page, the `/topics`
  * hub, every published post, category, tag, and author archive (plus their
- * numbered pages 2..N for category/tag/author — see the pagination helpers
- * above), and every generic page. Every entry carries a `languages` alternate for
- * each configured locale — a no-op today
+ * numbered pages 2..N for category/tag/author — pages 2..N of a
+ * category/tag/author archive are near-duplicate slices of the same post
+ * list (same title/description pattern, decreasing content density),
+ * included anyway for consistency with the numbered `/blog/page/N` entries
+ * already listed below, rather than treating paginated archives as
+ * crawlable-but-not-advertised; `itemsPerPage` below must match the value
+ * each numbered-page route's own `generateStaticParams` uses, or the two
+ * disagree on how many pages exist), and every generic page. Every entry
+ * carries a `languages` alternate for each configured locale — a no-op today
  * (`localePrefix: 'never'` means every locale resolves to the same
  * unprefixed path) but keeps this future-proof if locale-prefixed routing is
  * ever introduced.
@@ -141,26 +67,83 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const [
-    posts,
-    categories,
-    tags,
-    authors,
-    categoryPages,
-    tagPages,
-    authorPages,
+    postParamsResult,
+    categoryParamsResult,
+    tagParamsResult,
+    authorParamsResult,
+    categoryPaginationParamsResult,
+    tagPaginationParamsResult,
+    authorPaginationParamsResult,
     blogParamsResult,
     genericPageSlugsResult,
   ] = await Promise.all([
-    getPostParamsSafe(),
-    getCategoryParamsSafe(),
-    getTagParamsSafe(),
-    getAuthorParamsSafe(),
-    getCategoryPaginationParamsSafe(),
-    getTagPaginationParamsSafe(),
-    getAuthorPaginationParamsSafe(),
+    service.pages.post.v1.getPostParams(),
+    service.pages.category.v1.getCategoryParams(),
+    service.pages.tag.v1.getTagParams(),
+    service.pages.author.v1.getAuthorParams(),
+    service.pages.category.v1.getCategoryPaginationParams(
+      CATEGORY_ITEMS_PER_PAGE,
+    ),
+    service.pages.tag.v1.getTagPaginationParams(TAG_ITEMS_PER_PAGE),
+    service.pages.author.v1.getAuthorPaginationParams(AUTHOR_ITEMS_PER_PAGE),
     service.pages.blog.v1.getIndexPageParams(),
     service.pages.generic.v1.getPageSlugs(),
   ]);
+
+  if (!postParamsResult.ok) {
+    console.error(
+      `Error fetching post params for sitemap: ${postParamsResult.error}`,
+    );
+  }
+  const posts = postParamsResult.ok ? postParamsResult.data : [];
+
+  if (!categoryParamsResult.ok) {
+    console.error(
+      `Error fetching category params for sitemap: ${categoryParamsResult.error}`,
+    );
+  }
+  const categories = categoryParamsResult.ok ? categoryParamsResult.data : [];
+
+  if (!tagParamsResult.ok) {
+    console.error(
+      `Error fetching tag params for sitemap: ${tagParamsResult.error}`,
+    );
+  }
+  const tags = tagParamsResult.ok ? tagParamsResult.data : [];
+
+  if (!authorParamsResult.ok) {
+    console.error(
+      `Error fetching author params for sitemap: ${authorParamsResult.error}`,
+    );
+  }
+  const authors = authorParamsResult.ok ? authorParamsResult.data : [];
+
+  if (!categoryPaginationParamsResult.ok) {
+    console.error(
+      `Error fetching category pagination params for sitemap: ${categoryPaginationParamsResult.error}`,
+    );
+  }
+  const categoryPages = categoryPaginationParamsResult.ok
+    ? categoryPaginationParamsResult.data
+    : [];
+
+  if (!tagPaginationParamsResult.ok) {
+    console.error(
+      `Error fetching tag pagination params for sitemap: ${tagPaginationParamsResult.error}`,
+    );
+  }
+  const tagPages = tagPaginationParamsResult.ok
+    ? tagPaginationParamsResult.data
+    : [];
+
+  if (!authorPaginationParamsResult.ok) {
+    console.error(
+      `Error fetching author pagination params for sitemap: ${authorPaginationParamsResult.error}`,
+    );
+  }
+  const authorPages = authorPaginationParamsResult.ok
+    ? authorPaginationParamsResult.data
+    : [];
 
   if (!blogParamsResult.ok) {
     console.error(

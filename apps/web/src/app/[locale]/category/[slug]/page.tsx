@@ -13,12 +13,14 @@ type TProps = {
 // uncaught throw here would crash the entire `next build`. `dynamicParams`
 // stays default `true`, so a missed build-time slug still renders on demand.
 export async function generateStaticParams() {
-  try {
-    return await service.pages.category.v1.getCategoryParams();
-  } catch (error) {
-    console.error(`Error to fetch category params: ${error}`);
+  const result = await service.pages.category.v1.getCategoryParams();
+
+  if (!result.ok) {
+    console.error(`Error to fetch category params: ${result.error}`);
     return [];
   }
+
+  return result.data;
 }
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
