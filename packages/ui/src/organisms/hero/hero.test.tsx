@@ -110,12 +110,12 @@ describe(`<${Hero.name}/>`, () => {
     expect(screen.getByTestId('featured-hero')).toBeVisible();
   });
 
-  it('gives the root section a full-bleed subtle background and bottom divider', () => {
+  it('gives the root section a full-bleed branded background and strong bottom divider', () => {
     const { container } = setup();
     const section = container.querySelector('section');
-    expect(section?.className).toContain('bg-bg-subtle');
+    expect(section?.className).toContain('bg-accent-muted');
     expect(section?.className).toContain('border-b');
-    expect(section?.className).toContain('border-border');
+    expect(section?.className).toContain('border-border-strong');
     expect(section?.className).toContain('w-full');
   });
 

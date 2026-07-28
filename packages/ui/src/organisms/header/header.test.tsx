@@ -88,4 +88,13 @@ describe(`<${Header.name}/>`, () => {
     renderElement(<Header dataTestId="site-header" />);
     expect(screen.getByTestId('site-header')).toBeVisible();
   });
+
+  it('keeps the current plain page background above tinted hero sections', () => {
+    renderElement(<Header dataTestId="site-header" />);
+    const header = screen.getByTestId('site-header');
+    expect(header.className).toContain('bg-bg');
+    expect(header.className).toContain('border-b');
+    expect(header.className).toContain('border-border');
+    expect(header.className).not.toContain('bg-accent-muted');
+  });
 });

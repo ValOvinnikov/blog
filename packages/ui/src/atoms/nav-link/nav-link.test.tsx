@@ -33,10 +33,10 @@ describe(`<${NavLink.name}/>`, () => {
     );
   });
 
-  it('inactive variant applies subtle color by default', () => {
+  it('inactive variant uses muted text for AA contrast on tinted chrome', () => {
     setup({ href: '/blog', children: 'Blog' });
     expect(screen.getByRole('link', { name: 'Blog' }).className).toContain(
-      'text-subtle',
+      'text-muted',
     );
   });
 

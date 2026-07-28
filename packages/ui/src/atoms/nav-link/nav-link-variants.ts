@@ -12,7 +12,7 @@ export const navLinkVariants = tv({
   variants: {
     isActive: {
       true: 'text-accent',
-      false: 'text-subtle',
+      false: 'text-muted',
     },
   },
   defaultVariants: { isActive: false },
