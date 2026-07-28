@@ -98,3 +98,51 @@ mean **the specific "home is 4x worse than post" finding was single-run
 noise, not a code defect**, so no speculative app-code change was made chasing
 it. If a _median-of-3_ run still shows home meaningfully worse than post after
 this change, that would be real signal worth a fresh investigation.
+
+## Chronic-looking failures traced to two separate causes, not one (#865)
+
+Two unrelated PRs (#860, #864) failed identically on performance/SEO, which
+looked like a single chronic regression. Pulling the actual `lighthouse-results`
+artifacts (`gh run download <run-id> -n lighthouse-results`) for the specific
+failing audits — not just the aggregate category score — found **two
+independent, already-resolved-or-inherent issues**, plus a third, unrelated,
+much more serious bug discovered along the way:
+
+- **SEO `link-text` failure (homepage only, every run in the window
+  checked)**: the Hero's default CTA rendered with visible text "Read more"
+  and no accessible name, which Lighthouse's `link-text` audit fails outright
+  (score 0, binary). This was already fixed in `apps/service`'s
+  `toHeroModule` transformer (PR #848, merged before the failing runs) — it
+  computes a descriptive `ariaLabel` (`"Read more: <post title>"`) whenever
+  the CTA uses the generic fallback label. The runs that still failed were
+  hitting a not-yet-revalidated cached homepage; a fresh fetch confirms the
+  live CTA now carries the `aria-label`. No further code change needed.
+- **Performance `largest-contentful-paint` hovering at 0.88–0.89 (just under
+  the 0.9 budget), both pages**: `mainthread-work-breakdown`,
+  `bootup-time`, and `total-byte-weight` all scored a clean `1` — there is no
+  JS-bloat or main-thread smoking gun. This is the same simulated-throttle
+  sensitivity already documented above (#846): one run in the same window
+  scored 0.90/0.91 with no code change in between. Treated as inherent
+  measurement noise at this budget line, not a regression to chase.
+- **Unrelated, more serious finding: every `/blog/[slug]` request for a
+  non-existent post returned a live production `500`, not a `404`** — this is
+  what caused the _later_ Lighthouse runs (after ~2026-07-27T15:24Z) to fail
+  collection outright (`ERRORED_DOCUMENT_REQUEST`, `Status code: 500`)
+  instead of just scoring low. Response headers on the 500
+  (`x-matched-path: /500`, `age` in the tens of thousands of seconds,
+  `last-modified` pinned to the last build) showed Vercel serving one frozen
+  static `/500` fallback for **every** miss under that route — confirmed with
+  a random, guaranteed-never-requested slug returning the identical stale
+  response. This wasn't an `apps/web` code bug (the `notFound()` guard in
+  `blog-post-page.tsx` is correct, and every other detail route —
+  `category/[slug]`, `tag/[slug]`, `author/[slug]` — 404s correctly); it was
+  a stuck build/deploy artifact. A fresh production deploy (`v0.1.12`) was
+  cut to clear it — confirm `/blog/<nonexistent-slug>` returns a clean `404`
+  after that deploy finishes, and if the same route wedges into serving a
+  frozen `/500` again after a future deploy, that needs its own dedicated
+  Vercel-side investigation (this doc is not the place to track that).
+
+`LIGHTHOUSE_URLS`'s post-page target was also updated from
+`/blog/rebuilding-my-blog-on-a-headless-cms` (deleted) to
+`/blog/rendering-portable-text-nextjs` (live) — the dead URL was the direct
+cause of every Lighthouse collection failure after the post was removed.

@@ -15,10 +15,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/i18n/routing', () => ({
-  routing: { locales: ['EN'] },
-}));
-
 vi.mock('@web/metadata/post-metadata', () => ({
   buildPostMetadata: vi.fn().mockResolvedValue({ title: 'Hello World' }),
 }));
@@ -31,23 +27,25 @@ vi.mock('@web/components/pages/blog-post-page', () => ({
 
 describe('BlogPostSlugPage', () => {
   describe('generateStaticParams', () => {
-    it('builds one entry per locale x slug combination', async () => {
-      getPostParamsMock.mockResolvedValue([{ slug: 'a' }, { slug: 'b' }]);
+    it('returns the bare slug for each post, letting Next combine it with the locale segment', async () => {
+      getPostParamsMock.mockResolvedValue([
+        { slug: 'a', publishedAt: '2026-01-01' },
+        { slug: 'b', publishedAt: '2026-01-02' },
+      ]);
 
       const params = await generateStaticParams();
 
-      expect(params).toEqual([
-        { locale: 'EN', slug: 'a' },
-        { locale: 'EN', slug: 'b' },
-      ]);
+      expect(params).toEqual([{ slug: 'a' }, { slug: 'b' }]);
     });
 
     it('returns an empty array when getPostParams rejects', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       getPostParamsMock.mockRejectedValue(new Error('projectId missing'));
 
       const params = await generateStaticParams();
 
       expect(params).toEqual([]);
+      errorSpy.mockRestore();
     });
   });
 
