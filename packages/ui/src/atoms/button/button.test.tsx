@@ -19,7 +19,9 @@ describe(`<${Button.name}/>`, () => {
   it('keeps the primary text color alongside the size (regression: tailwind-merge must not strip text-accent-contrast)', () => {
     setup({ variant: 'primary', children: 'Publish' });
     const btn = screen.getByRole('button', { name: 'Publish' });
+    expect(btn.className).toContain('bg-accent-solid');
     expect(btn.className).toContain('text-accent-contrast');
+    expect(btn.className).toContain('hover:bg-accent-solid-hover');
     expect(btn.className).toContain('text-copy');
   });
 
