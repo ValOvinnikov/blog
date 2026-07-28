@@ -11,7 +11,7 @@ export const postCardVariants = tv({
       'motion-reduce:transition-none motion-reduce:transform-none',
     ],
     content: ['flex flex-col flex-1', 'px-card-x py-card-y gap-2'],
-    excerpt: ['text-sm leading-[1.55]', 'text-muted line-clamp-3'],
+    excerpt: ['text-prose leading-[1.55]', 'text-muted line-clamp-3'],
     tags: ['flex flex-wrap gap-1.5 mt-1'],
   },
 });
