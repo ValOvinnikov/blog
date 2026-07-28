@@ -42,15 +42,25 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('calls notFound() when the post does not exist', async () => {
-    getPostMock.mockResolvedValue(null);
+    getPostMock.mockResolvedValue({ ok: true, data: null });
 
     await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
+  it('calls notFound() when the fetch fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getPostMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    errorSpy.mockRestore();
+  });
+
   it('renders the post title, meta, body, and share links', async () => {
-    getPostMock.mockResolvedValue(mockPostDetail);
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     await setup();
 
@@ -71,7 +81,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('renders the reading time in the post meta strip', async () => {
-    getPostMock.mockResolvedValue(mockPostDetail);
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     await setup();
 
@@ -79,7 +89,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('renders the published date formatted via next-intl (year/month/day)', async () => {
-    getPostMock.mockResolvedValue(mockPostDetail);
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     await setup();
 
@@ -87,7 +97,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('links the author name to routes.author(slug)', async () => {
-    getPostMock.mockResolvedValue(mockPostDetail);
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     await setup();
 
@@ -98,7 +108,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('renders the Home › Category › Post breadcrumbs trail', async () => {
-    getPostMock.mockResolvedValue(mockPostDetail);
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     await setup();
 
@@ -116,7 +126,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('renders no category eyebrow outside the breadcrumbs trail', async () => {
-    getPostMock.mockResolvedValue(mockPostDetail);
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     await setup();
 
@@ -125,7 +135,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('renders the JSON-LD BlogPosting schema script', async () => {
-    getPostMock.mockResolvedValue(mockPostDetail);
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     const { container } = await setup();
 
@@ -137,7 +147,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    getPostMock.mockResolvedValue(mockPostDetail);
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     const { container } = await setup();
 
@@ -155,11 +165,14 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
   it('renders the post tags as links to routes.tag(slug)', async () => {
     getPostMock.mockResolvedValue({
-      ...mockPostDetail,
-      tags: [
-        { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
-        { id: 'tag-2', title: 'React', slug: 'react' },
-      ],
+      ok: true,
+      data: {
+        ...mockPostDetail,
+        tags: [
+          { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
+          { id: 'tag-2', title: 'React', slug: 'react' },
+        ],
+      },
     });
 
     await setup();
@@ -175,7 +188,10 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('renders no tag chips when the post has no tags', async () => {
-    getPostMock.mockResolvedValue({ ...mockPostDetail, tags: [] });
+    getPostMock.mockResolvedValue({
+      ok: true,
+      data: { ...mockPostDetail, tags: [] },
+    });
 
     await setup();
 
@@ -186,31 +202,34 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
   it('renders a "Related posts" section when relatedPosts is non-empty', async () => {
     getPostMock.mockResolvedValue({
-      ...mockPostDetail,
-      relatedPosts: [
-        {
-          id: 'related-1',
-          title: 'A Related Post',
-          slug: 'a-related-post',
-          excerpt: 'A related excerpt.',
-          publishedAt: '2026-01-10T00:00:00.000Z',
-          heroImageUrl: undefined,
-          heroImageAlt: undefined,
-          heroImageSanity: undefined,
-          featured: false,
-          author: {
-            id: 'author-1',
-            name: 'Jane Doe',
-            slug: 'jane-doe',
-            imageUrl: undefined,
+      ok: true,
+      data: {
+        ...mockPostDetail,
+        relatedPosts: [
+          {
+            id: 'related-1',
+            title: 'A Related Post',
+            slug: 'a-related-post',
+            excerpt: 'A related excerpt.',
+            publishedAt: '2026-01-10T00:00:00.000Z',
+            heroImageUrl: undefined,
+            heroImageAlt: undefined,
+            heroImageSanity: undefined,
+            featured: false,
+            author: {
+              id: 'author-1',
+              name: 'Jane Doe',
+              slug: 'jane-doe',
+              imageUrl: undefined,
+            },
+            category: {
+              id: 'cat-1',
+              title: 'Engineering',
+              slug: 'engineering',
+            },
           },
-          category: {
-            id: 'cat-1',
-            title: 'Engineering',
-            slug: 'engineering',
-          },
-        },
-      ],
+        ],
+      },
     });
 
     await setup();
@@ -221,7 +240,10 @@ describe(`<${BlogPostPage.name}/>`, () => {
   });
 
   it('omits the "Related posts" section when relatedPosts is empty', async () => {
-    getPostMock.mockResolvedValue({ ...mockPostDetail, relatedPosts: [] });
+    getPostMock.mockResolvedValue({
+      ok: true,
+      data: { ...mockPostDetail, relatedPosts: [] },
+    });
 
     await setup();
 

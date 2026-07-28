@@ -25,19 +25,22 @@ vi.mock('@web/metadata/tag-metadata', () => ({
 describe('TagDetailPage', () => {
   describe('generateStaticParams', () => {
     it('returns the tag slugs on success', async () => {
-      getTagParamsMock.mockResolvedValue([
-        { slug: 'typescript' },
-        { slug: 'react' },
-      ]);
+      getTagParamsMock.mockResolvedValue({
+        ok: true,
+        data: [{ slug: 'typescript' }, { slug: 'react' }],
+      });
 
       const params = await generateStaticParams();
 
       expect(params).toEqual([{ slug: 'typescript' }, { slug: 'react' }]);
     });
 
-    it('returns an empty array when the fetch rejects', async () => {
+    it('returns an empty array when the fetch resolves to a failure result', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      getTagParamsMock.mockRejectedValue(new Error('boom'));
+      getTagParamsMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
 
       const params = await generateStaticParams();
 

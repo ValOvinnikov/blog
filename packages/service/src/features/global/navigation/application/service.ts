@@ -4,7 +4,7 @@ import { safeAsync } from '@blog/utils';
 export function createNavigationService() {
   return {
     v1: {
-      getNavigation: () => safeAsync(getNavigation()),
+      getNavigation: safeAsync(() => getNavigation()),
     },
   };
 }

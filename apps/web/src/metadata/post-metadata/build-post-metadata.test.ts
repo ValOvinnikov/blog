@@ -55,15 +55,25 @@ const basePost: TPostDetail = {
 
 describe('buildPostMetadata', () => {
   it('returns empty metadata when the post does not exist', async () => {
-    getPostMock.mockResolvedValue(null);
+    getPostMock.mockResolvedValue({ ok: true, data: null });
 
     const metadata = await buildPostMetadata('missing');
 
     expect(metadata).toEqual({});
   });
 
+  it('returns empty metadata when the post fetch fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getPostMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+
+    const metadata = await buildPostMetadata('hello-world');
+
+    expect(metadata).toEqual({});
+    errorSpy.mockRestore();
+  });
+
   it('passes the already-resolved seo through to toMetadata', async () => {
-    getPostMock.mockResolvedValue(basePost);
+    getPostMock.mockResolvedValue({ ok: true, data: basePost });
 
     const metadata = await buildPostMetadata('hello-world');
 
@@ -82,7 +92,7 @@ describe('buildPostMetadata', () => {
   });
 
   it('sets openGraph.publishedTime from post.publishedAt', async () => {
-    getPostMock.mockResolvedValue(basePost);
+    getPostMock.mockResolvedValue({ ok: true, data: basePost });
 
     const metadata = await buildPostMetadata('hello-world');
 
@@ -92,7 +102,7 @@ describe('buildPostMetadata', () => {
   });
 
   it('sets openGraph.authors from post.author.name', async () => {
-    getPostMock.mockResolvedValue(basePost);
+    getPostMock.mockResolvedValue({ ok: true, data: basePost });
 
     const metadata = await buildPostMetadata('hello-world');
 

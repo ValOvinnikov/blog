@@ -34,12 +34,17 @@ const s = blogPostPageVariants();
  * chrome) stay owned by `[locale]/layout.tsx`.
  */
 export async function BlogPostPage({ slug }: TBlogPostPageProps) {
-  const post = await service.pages.post.v1.getPost(slug);
+  const result = await service.pages.post.v1.getPost(slug);
 
-  if (!post) {
+  if (!result.ok) {
+    console.error(`Error to fetch post: ${result.error}`);
+    notFound();
+  }
+  if (result.data === null) {
     notFound();
   }
 
+  const post = result.data;
   const {
     title,
     excerpt,

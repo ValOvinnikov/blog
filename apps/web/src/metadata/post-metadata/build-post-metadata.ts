@@ -9,16 +9,24 @@ import type { Metadata } from 'next';
  * doesn't exist; the route itself calls `notFound()` for the actual 404.
  */
 export async function buildPostMetadata(slug: string): Promise<Metadata> {
-  const post = await service.pages.post.v1.getPost(slug);
+  const result = await service.pages.post.v1.getPost(slug);
 
-  if (!post) return {};
+  if (!result.ok) {
+    console.error(`Error to fetch post metadata: ${result.error}`);
+    return {};
+  }
+  if (result.data === null) {
+    return {};
+  }
 
-  return toMetadata(post.seo, {
+  const { seo, publishedAt, author } = result.data;
+
+  return toMetadata(seo, {
     canonical: routes.post(slug),
     ogType: 'article',
     article: {
-      publishedTime: post.publishedAt,
-      authors: [post.author.name],
+      publishedTime: publishedAt,
+      authors: [author.name],
     },
   });
 }

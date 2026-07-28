@@ -3,6 +3,6 @@ import { safeAsync } from '@blog/utils';
 
 export function createHeroModuleService() {
   return {
-    v1: { getHero: (id: string) => safeAsync(getHero(id)) },
+    v1: { getHero: safeAsync((id: string) => getHero(id)) },
   };
 }

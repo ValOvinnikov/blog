@@ -308,23 +308,23 @@ override bag) + `openGraph`,
 
 ## 7. Environment & configuration
 
-| Variable                                   | Consumer                                | Notes                                                                                                                                                  |
-| ------------------------------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `NEXT_PUBLIC_SANITY_PROJECT_ID`            | web + service                           | required; validated by Zod at import                                                                                                                   |
-| `NEXT_PUBLIC_SANITY_DATASET`               | web + service                           | required                                                                                                                                               |
-| `NEXT_PUBLIC_SITE_URL`                     | web (SEO)                               | optional until launch; canonical/OG/feeds                                                                                                              |
-| `SANITY_API_READ_TOKEN`                    | service (server)                        | optional; private reads / future draft mode                                                                                                            |
-| `SANITY_REVALIDATE_SECRET`                 | web (server)                            | optional until the #93 revalidation route exists                                                                                                       |
-| `SANITY_STUDIO_PROJECT_ID`                 | cms Studio + CLI                        | required; **per environment** (env-driven; no ids in repo)                                                                                             |
-| `SANITY_STUDIO_DATASET`                    | cms Studio + CLI                        | required                                                                                                                                               |
-| `SANITY_STUDIO_HOSTNAME`                   | cms CLI (deploy)                        | deploy target `<host>.sanity.studio`; CI-only                                                                                                          |
-| `SANITY_DEPLOY_TOKEN`                      | CI (deploy)                             | write/Deploy token; **project-scoped** → set per GitHub Environment                                                                                    |
-| `SANITY_AUTH_TOKEN`                        | cms `migrate:deploy`/`migrate:backfill` | write token for the `migrationState` ledger client (`@sanity/client`); the standard Sanity CLI auth var — falls back to `SANITY_DEPLOY_TOKEN` if unset |
-| `VERCEL_TOKEN` / `_ORG_ID` / `_PROJECT_ID` | CI (deploy)                             | Vercel CLI deploys; token is a Secret, ids are Variables                                                                                               |
-| `TURBO_TOKEN` / `TURBO_TEAM`               | CI (all)                                | optional Vercel Remote Cache; no-op until configured                                                                                                   |
-| `SKIP_ENV_VALIDATION`                      | CI builds only                          | bypasses Zod env validation where no vars exist                                                                                                        |
-| `LIGHTHOUSE_URLS`                          | CI (`lighthouse.yml`)                   | Variable; one full preview URL per line (`/` + one post page); no-op until a preview-URL mechanism lands (see `.lighthouse/README.md`)                 |
-| `SMOKE_URL`                                | CI (`playwright-smoke.yml`)             | Variable; one already-deployed origin the Playwright smoke suite (`apps/web/e2e/`) runs against; no-op until set, same mechanism as `LIGHTHOUSE_URLS`  |
+| Variable                                   | Consumer                                           | Notes                                                                                                                                                  |
+| ------------------------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID`            | web + service                                      | required; validated by Zod at import                                                                                                                   |
+| `NEXT_PUBLIC_SANITY_DATASET`               | web + service                                      | required                                                                                                                                               |
+| `NEXT_PUBLIC_SITE_URL`                     | web (SEO)                                          | optional until launch; canonical/OG/feeds                                                                                                              |
+| `SANITY_API_READ_TOKEN`                    | service (server)                                   | optional; private reads / future draft mode                                                                                                            |
+| `SANITY_REVALIDATE_SECRET`                 | web (server)                                       | optional until the #93 revalidation route exists                                                                                                       |
+| `SANITY_STUDIO_PROJECT_ID`                 | cms Studio + CLI                                   | required; **per environment** (env-driven; no ids in repo)                                                                                             |
+| `SANITY_STUDIO_DATASET`                    | cms Studio + CLI                                   | required                                                                                                                                               |
+| `SANITY_STUDIO_HOSTNAME`                   | cms CLI (deploy)                                   | deploy target `<host>.sanity.studio`; CI-only                                                                                                          |
+| `SANITY_DEPLOY_TOKEN`                      | CI (deploy)                                        | write/Deploy token; **project-scoped** → set per GitHub Environment                                                                                    |
+| `SANITY_AUTH_TOKEN`                        | cms `migrate:deploy`/`migrate:backfill`            | write token for the `migrationState` ledger client (`@sanity/client`); the standard Sanity CLI auth var — falls back to `SANITY_DEPLOY_TOKEN` if unset |
+| `VERCEL_TOKEN` / `_ORG_ID` / `_PROJECT_ID` | CI (deploy)                                        | Vercel CLI deploys; token is a Secret, ids are Variables                                                                                               |
+| `TURBO_TOKEN` / `TURBO_TEAM`               | CI (all)                                           | optional Vercel Remote Cache; no-op until configured                                                                                                   |
+| `SKIP_ENV_VALIDATION`                      | CI builds + `blog/[slug]`'s `generateStaticParams` | bypasses Zod env validation where no vars exist; also the escape hatch for a build that legitimately has no Sanity access (#889) — see §9              |
+| `LIGHTHOUSE_URLS`                          | CI (`lighthouse.yml`)                              | Variable; one full preview URL per line (`/` + one post page); no-op until a preview-URL mechanism lands (see `.lighthouse/README.md`)                 |
+| `SMOKE_URL`                                | CI (`playwright-smoke.yml`)                        | Variable; one already-deployed origin the Playwright smoke suite (`apps/web/e2e/`) runs against; no-op until set, same mechanism as `LIGHTHOUSE_URLS`  |
 
 - Env access is **always** through the validated entry points
   (`apps/web/src/utils/env/env.ts` via `@t3-oss/env-nextjs`, service's env via
@@ -392,6 +392,18 @@ changing a schema does **not** change existing documents.
 
 - **Default:** static generation; `generateStaticParams` for dynamic routes
   (service exposes `params` slices returning `{ slug }[]`).
+- **Build-time zero-results guard (`SKIP_ENV_VALIDATION`, #889):**
+  `blog/[slug]`'s `generateStaticParams` throws — failing the build — if its
+  params query resolves successfully but to zero posts, unless
+  `SKIP_ENV_VALIDATION` is set. A real build with valid Sanity access
+  resolving to zero posts is not a legitimate "no content yet" state for this
+  app (posts exist in production); it previously meant a build-scoped Sanity
+  token wasn't actually reaching the build step (e.g. a Vercel "Sensitive"
+  env var, redacted during `vercel build` but injected at runtime), silently
+  shipping a route with zero prebuilt paths. `SKIP_ENV_VALIDATION` is the same
+  flag CI's credential-less builds already set (§7's env table) — it doubles
+  as the intentional escape hatch for a build that genuinely has no Sanity
+  access.
 - **Revalidation:** time-based via `isr('tag')` in service queries; on-demand
   via `app/api/revalidate` (#93, secret-verified,
   `revalidateTag(tag, { expire: 0 })` — immediate expiry, not a stale-while-

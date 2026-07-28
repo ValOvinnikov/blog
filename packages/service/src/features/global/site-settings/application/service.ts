@@ -4,7 +4,7 @@ import { safeAsync } from '@blog/utils';
 export function createSiteSettingsService() {
   return {
     v1: {
-      getSiteSettings: () => safeAsync(getSiteSettings()),
+      getSiteSettings: safeAsync(() => getSiteSettings()),
     },
   };
 }

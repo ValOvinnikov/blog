@@ -3,6 +3,6 @@ import { safeAsync } from '@blog/utils';
 
 export function createHomeService() {
   return {
-    v1: { getHomePage: () => safeAsync(getHomePage()) },
+    v1: { getHomePage: safeAsync(() => getHomePage()) },
   };
 }

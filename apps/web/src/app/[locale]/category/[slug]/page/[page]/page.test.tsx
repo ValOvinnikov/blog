@@ -65,10 +65,13 @@ describe('CategoryNumberedPage', () => {
 
   describe('generateStaticParams', () => {
     it('returns the category pagination params on success', async () => {
-      getCategoryPaginationParamsMock.mockResolvedValue([
-        { slug: 'engineering', page: '2' },
-        { slug: 'design', page: '2' },
-      ]);
+      getCategoryPaginationParamsMock.mockResolvedValue({
+        ok: true,
+        data: [
+          { slug: 'engineering', page: '2' },
+          { slug: 'design', page: '2' },
+        ],
+      });
 
       const params = await generateStaticParams();
 
@@ -79,9 +82,12 @@ describe('CategoryNumberedPage', () => {
       expect(getCategoryPaginationParamsMock).toHaveBeenCalledWith(9);
     });
 
-    it('returns an empty array when the fetch rejects', async () => {
+    it('returns an empty array when the fetch resolves to a failure result', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      getCategoryPaginationParamsMock.mockRejectedValue(new Error('boom'));
+      getCategoryPaginationParamsMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
 
       const params = await generateStaticParams();
 

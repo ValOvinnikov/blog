@@ -3,6 +3,6 @@ import { safeAsync } from '@blog/utils';
 
 export function createCtaModuleService() {
   return {
-    v1: { getCta: (id: string) => safeAsync(getCta(id)) },
+    v1: { getCta: safeAsync((id: string) => getCta(id)) },
   };
 }

@@ -11,10 +11,13 @@ export function createCategoryService() {
       // Loader still returns `TCategoryPage | null` for "category not
       // found"; safeAsync only wraps arbitrary query failures, so callers
       // check `.ok` first, then `.data !== null` (see #713).
-      getCategoryPage: (slug: string, args: TGetCategoryPageArgs) =>
-        safeAsync(getCategoryPage(slug, args)),
-      getCategoryParams,
-      getCategoryPaginationParams,
+      getCategoryPage: safeAsync((slug: string, args: TGetCategoryPageArgs) =>
+        getCategoryPage(slug, args),
+      ),
+      getCategoryParams: safeAsync(() => getCategoryParams()),
+      getCategoryPaginationParams: safeAsync((itemsPerPage: number) =>
+        getCategoryPaginationParams(itemsPerPage),
+      ),
     },
   };
 }

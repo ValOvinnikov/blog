@@ -5,8 +5,8 @@ import { safeAsync } from '@blog/utils';
 export function createGenericPageService() {
   return {
     v1: {
-      getPage: (slug: string) => safeAsync(getPage(slug)),
-      getPageSlugs: () => safeAsync(getPageSlugs()),
+      getPage: safeAsync((slug: string) => getPage(slug)),
+      getPageSlugs: safeAsync(() => getPageSlugs()),
     },
   };
 }

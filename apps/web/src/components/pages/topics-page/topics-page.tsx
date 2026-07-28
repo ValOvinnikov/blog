@@ -16,11 +16,10 @@ const s = topicsPageVariants();
  * which is built specifically for post grids (blog index, category, tag,
  * author archives).
  *
- * `getCategories` is not `AsyncResult`-wrapped, so an uncaught failure
- * would otherwise propagate straight through a Server Component render and
- * crash the whole page (or, at build time, the whole static export) —
- * hence the `getCategoriesSafely` wrapper, which falls back to an empty
- * list.
+ * `getCategoriesSafely` unwraps `getCategories`'s `AsyncResult`, falling
+ * back to an empty list on failure — this is a category index, not
+ * critical page content, so a fetch failure here must never crash the
+ * whole page (or, at build time, the whole static export).
  */
 export async function TopicsPage() {
   const categories = await getCategoriesSafely();

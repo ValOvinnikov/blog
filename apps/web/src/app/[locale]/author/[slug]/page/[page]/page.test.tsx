@@ -63,10 +63,13 @@ describe('AuthorNumberedPage', () => {
 
   describe('generateStaticParams', () => {
     it('returns the author pagination params on success', async () => {
-      getAuthorPaginationParamsMock.mockResolvedValue([
-        { slug: 'jane-doe', page: '2' },
-        { slug: 'john-smith', page: '2' },
-      ]);
+      getAuthorPaginationParamsMock.mockResolvedValue({
+        ok: true,
+        data: [
+          { slug: 'jane-doe', page: '2' },
+          { slug: 'john-smith', page: '2' },
+        ],
+      });
 
       const params = await generateStaticParams();
 
@@ -77,9 +80,12 @@ describe('AuthorNumberedPage', () => {
       expect(getAuthorPaginationParamsMock).toHaveBeenCalledWith(9);
     });
 
-    it('returns an empty array when the fetch rejects', async () => {
+    it('returns an empty array when the fetch resolves to a failure result', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      getAuthorPaginationParamsMock.mockRejectedValue(new Error('boom'));
+      getAuthorPaginationParamsMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
 
       const params = await generateStaticParams();
 
