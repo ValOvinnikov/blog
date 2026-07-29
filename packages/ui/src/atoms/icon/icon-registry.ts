@@ -15,6 +15,8 @@ import FacebookComponent from '@blog/ui/assets/icons/facebook.svg';
 import FacebookUrl from '@blog/ui/assets/icons/facebook.svg?url';
 import GitHubComponent from '@blog/ui/assets/icons/github.svg';
 import GitHubUrl from '@blog/ui/assets/icons/github.svg?url';
+import HouseComponent from '@blog/ui/assets/icons/house.svg';
+import HouseUrl from '@blog/ui/assets/icons/house.svg?url';
 import LinkedInComponent from '@blog/ui/assets/icons/linkedin.svg';
 import LinkedInUrl from '@blog/ui/assets/icons/linkedin.svg?url';
 import MenuRowsComponent from '@blog/ui/assets/icons/menu-rows.svg';
@@ -59,6 +61,7 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.CLOSE]: { component: CloseComponent, url: CloseUrl },
   [ICONS.X]: { component: XComponent, url: XUrl },
   [ICONS.GITHUB]: { component: GitHubComponent, url: GitHubUrl },
+  [ICONS.HOUSE]: { component: HouseComponent, url: HouseUrl },
   [ICONS.LINKEDIN]: { component: LinkedInComponent, url: LinkedInUrl },
   [ICONS.FACEBOOK]: { component: FacebookComponent, url: FacebookUrl },
   [ICONS.RSS]: { component: RssComponent, url: RssUrl },

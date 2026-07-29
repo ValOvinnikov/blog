@@ -36,6 +36,31 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     }
   });
 
+  it('renders the first item as a link with a decorative House icon, keeping the label as its accessible name', () => {
+    setup();
+    const homeLink = screen.getByRole('link', { name: firstItem.label });
+    const icon = homeLink.querySelector('svg');
+    const labelText = screen.getByText(firstItem.label);
+
+    expect(icon).toHaveAttribute('aria-hidden', 'true');
+    expect(labelText).toHaveClass('sr-only');
+  });
+
+  it('sets a title attribute on the first item for sighted hover users', () => {
+    setup();
+    expect(screen.getByRole('link', { name: firstItem.label })).toHaveAttribute(
+      'title',
+      firstItem.label,
+    );
+  });
+
+  it('sets a title attribute on the first item even when it is also the current page', () => {
+    const { container } = setup({ items: [firstItem] });
+    const current = container.querySelector('[aria-current="page"]');
+
+    expect(current).toHaveAttribute('title', firstItem.label);
+  });
+
   it('renders the last item as text with aria-current="page", not a link', () => {
     setup();
     const current = screen.getByText(lastItem.label);

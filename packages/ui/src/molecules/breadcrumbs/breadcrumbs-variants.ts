@@ -21,5 +21,6 @@ export const breadcrumbsVariants = tv({
       'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
     ],
     current: ['text-text'],
+    homeLabel: ['sr-only'],
   },
 });

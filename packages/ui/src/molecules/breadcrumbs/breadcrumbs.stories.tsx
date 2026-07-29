@@ -16,6 +16,10 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
+// The first trail item always renders a decorative House icon in place of
+// its visible label — the label stays as visually-hidden text, so its
+// `label` value (e.g. "Home") only affects the accessible name, not what's
+// shown on screen.
 export const Default: TStory = {
   args: {
     items: [
