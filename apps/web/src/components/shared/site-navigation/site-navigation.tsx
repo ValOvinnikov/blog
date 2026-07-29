@@ -3,8 +3,11 @@
 import type { ILink } from '@blog/config';
 import { PrimaryNavigation } from '@blog/ui/molecules';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { useMobileNavToggle } from '@web/hooks/use-mobile-nav-toggle';
 import { usePathname } from '@web/i18n/navigation';
-import type { ReactNode } from 'react';
+import { useEffect, useId, type ReactNode } from 'react';
+
+import { siteNavigationVariants } from './site-navigation-variants';
 
 type TSiteNavigationProps = {
   links: ILink[];
@@ -21,13 +24,23 @@ const isNavItemActive = (pathname: string, href: string): boolean => {
 
 /**
  * SiteNavigation — client wrapper around `PrimaryNavigation` that marks the
- * item matching the current route as active. Reads the locale-aware
- * pathname (stripped of any locale prefix) via `usePathname` from
- * `@web/i18n/navigation` so it lines up with the plain `href`s served by the
- * navigation service.
+ * item matching the current route as active, and wires up the mobile
+ * hamburger toggle. Open/closed state, focus management, and Escape/
+ * outside-click dismissal live in `useMobileNavToggle` — this component only
+ * supplies the real accessible name and closes the panel whenever the route
+ * changes (so a nav link click never leaves it open on the next page).
  */
 export const SiteNavigation = ({ links, actions }: TSiteNavigationProps) => {
   const pathname = usePathname();
+  const panelId = useId();
+  const { open, toggle, close, containerRef } = useMobileNavToggle(panelId);
+
+  useEffect(() => {
+    if (!open) return;
+
+    close();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- close only when the route actually changes, not whenever `open`/`close` are redefined
+  }, [pathname]);
 
   const items = links.map((link) => ({
     ...link,
@@ -35,6 +48,18 @@ export const SiteNavigation = ({ links, actions }: TSiteNavigationProps) => {
   }));
 
   return (
-    <PrimaryNavigation links={items} actions={actions} linkAs={SmartLink} />
+    <div ref={containerRef} className={siteNavigationVariants()}>
+      <PrimaryNavigation
+        links={items}
+        actions={actions}
+        linkAs={SmartLink}
+        mobileToggle={{
+          open,
+          onToggle: toggle,
+          ariaLabel: 'Toggle navigation menu',
+          panelId,
+        }}
+      />
+    </div>
   );
 };
