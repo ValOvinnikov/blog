@@ -16,6 +16,20 @@ describe(`<${Button.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Disabled' })).toBeDisabled();
   });
 
+  it('shows a pointer cursor on hover', () => {
+    setup();
+    expect(
+      screen.getByRole('button', { name: 'Click me' }).className,
+    ).toContain('cursor-pointer');
+  });
+
+  it('disables pointer events (and thus the pointer cursor) when disabled', () => {
+    setup({ disabled: true, children: 'Disabled' });
+    expect(
+      screen.getByRole('button', { name: 'Disabled' }).className,
+    ).toContain('disabled:pointer-events-none');
+  });
+
   it('keeps the primary text color alongside the size (regression: tailwind-merge must not strip text-accent-contrast)', () => {
     setup({ variant: 'primary', children: 'Publish' });
     const btn = screen.getByRole('button', { name: 'Publish' });

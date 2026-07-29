@@ -25,3 +25,7 @@ export const WithMoonIcon: TStory = {
     children: <Icon name={ICONS.MOON} size={Size.SM} />,
   },
 };
+
+export const Disabled: TStory = {
+  args: { disabled: true },
+};
