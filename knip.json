@@ -31,7 +31,13 @@
       // Next.js plugin still contributes the app-router entries.
       // (packages/ui needs no such entry: its `./*` package.json export makes
       // the wrapper reachable as public API, so knip already sees it as used.)
-      "entry": ["src/testing/custom-render.tsx"]
+      "entry": ["src/testing/custom-render.tsx"],
+      // Referenced only as a Turbopack loader string (next.config.ts
+      // `turbopack.rules['*.svg'].loaders: ['@svgr/webpack']`) — knip's
+      // import graph can't see a bare string naming a package. Strict pnpm
+      // (no hoisting) still requires it as a real apps/web devDependency so
+      // Turbopack can resolve it.
+      "ignoreDependencies": ["@svgr/webpack"]
     }
   }
 }

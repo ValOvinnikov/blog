@@ -93,9 +93,39 @@ const securityHeaders = [
 ];
 
 const config: NextConfig = {
-  turbopack: { root: turbopackRoot },
+  turbopack: {
+    root: turbopackRoot,
+    rules: {
+      // @blog/ui's icon assets (packages/ui/src/assets/icons) ship from
+      // source (transpilePackages below), so Turbopack sees their raw .svg
+      // imports directly:
+      //   import Sun from '.../sun.svg'        -> SVGR React component
+      //   import SunUrl from '.../sun.svg?url' -> emitted asset URL
+      // The two rules are disjoint on the `?url` query so exactly one
+      // applies per import. Mirrors the Vitest/Storybook (vite-plugin-svgr)
+      // config in packages/ui.
+      '*.svg': [
+        {
+          condition: { query: /^\?url$/ },
+          type: 'asset',
+        },
+        {
+          condition: { not: { query: /^\?url$/ } },
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      ],
+    },
+  },
   transpilePackages: ['@blog/ui', '@blog/service', '@blog/config'],
   images: {
+    // This app never uses Next's static-image-import feature (all imagery
+    // is remote Sanity CDN URLs via SanityImage) — disabling it removes
+    // Next's own ambient `declare module '*.svg' { const content: any }`
+    // shim (next/image-types/global.d.ts), which would otherwise conflict
+    // with @blog/ui's typed SVGR declarations (svg.d.ts) for any .svg
+    // import transitively type-checked through @blog/ui's source.
+    disableStaticImages: true,
     remotePatterns: [
       {
         protocol: 'https',

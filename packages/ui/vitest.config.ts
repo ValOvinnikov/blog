@@ -1,11 +1,17 @@
 import path from 'path';
 
 import preset from '@blog/vitest-config/preset';
+import svgr from 'vite-plugin-svgr';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
 export default mergeConfig(
   preset,
   defineConfig({
+    // Bare `.svg` imports resolve to an SVGR React component; the `?url`
+    // variant isn't matched by this filter, so it falls through to Vite's
+    // built-in asset-URL handling untouched. Mirrors the Storybook
+    // (.storybook/main.ts) and Turbopack (apps/web/next.config.ts) config.
+    plugins: [svgr({ include: '**/*.svg' })],
     resolve: {
       alias: [
         {
