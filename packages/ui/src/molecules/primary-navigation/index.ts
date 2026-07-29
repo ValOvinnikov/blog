@@ -1,5 +1,6 @@
 export type {
   INavItem,
+  IPrimaryNavigationMobileToggleProps,
   IPrimaryNavigationProps,
   TAnchorElementType,
 } from './primary-navigation';
