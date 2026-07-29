@@ -45,9 +45,11 @@ export async function HeroModule({ id }: IHeroModuleProps) {
               as={SmartLink}
               href={primaryAction.href}
               target={primaryAction.target}
-              aria-label={primaryAction.ariaLabel}
             >
               {primaryAction.label}
+              {primaryAction.hiddenLabelSuffix && (
+                <span className="sr-only">{`: ${primaryAction.hiddenLabelSuffix}`}</span>
+              )}
             </LinkButton>
           )}
           {secondaryAction && (
