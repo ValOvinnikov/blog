@@ -1,5 +1,6 @@
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { customRender, screen, within } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 
 import { PrimaryNavigation } from './primary-navigation';
@@ -78,5 +79,88 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
 
     setup({ linkAs: CustomLink });
     expect(screen.getAllByTestId('custom-link')).toHaveLength(links.length);
+  });
+
+  it('renders no mobile panel when mobileToggle is omitted', () => {
+    setup();
+    expect(
+      screen.queryByTestId('primary-navigation-mobile-panel'),
+    ).not.toBeInTheDocument();
+  });
+
+  describe('mobileToggle', () => {
+    const ariaLabel = 'Toggle navigation menu';
+    const panelId = 'primary-navigation-panel';
+
+    it('renders the toggle button with the given ariaLabel', () => {
+      setup({
+        mobileToggle: {
+          open: false,
+          onToggle: () => {},
+          ariaLabel,
+          panelId,
+        },
+      });
+
+      expect(screen.getByRole('button', { name: ariaLabel })).toBeVisible();
+    });
+
+    it('reflects open as aria-expanded and links the toggle to the panel via aria-controls/id', () => {
+      setup({
+        mobileToggle: {
+          open: true,
+          onToggle: () => {},
+          ariaLabel,
+          panelId,
+        },
+      });
+
+      const toggle = screen.getByRole('button', { name: ariaLabel });
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      expect(toggle).toHaveAttribute('aria-controls', panelId);
+      expect(
+        screen.getByTestId('primary-navigation-mobile-panel'),
+      ).toHaveAttribute('id', panelId);
+    });
+
+    it('hides the panel when open is false and shows it when open is true', () => {
+      const { rerender } = setup({
+        mobileToggle: {
+          open: false,
+          onToggle: () => {},
+          ariaLabel,
+          panelId,
+        },
+      });
+
+      expect(
+        screen.getByTestId('primary-navigation-mobile-panel'),
+      ).not.toBeVisible();
+
+      rerender(
+        <PrimaryNavigation
+          links={links}
+          mobileToggle={{ open: true, onToggle: () => {}, ariaLabel, panelId }}
+        />,
+      );
+
+      const panel = screen.getByTestId('primary-navigation-mobile-panel');
+      expect(panel).toBeVisible();
+      for (const link of links) {
+        expect(
+          within(panel).getByRole('link', { name: link.label }),
+        ).toBeVisible();
+      }
+    });
+
+    it('calls onToggle when the toggle button is clicked', async () => {
+      const onToggle = vi.fn();
+      setup({
+        mobileToggle: { open: false, onToggle, ariaLabel, panelId },
+      });
+
+      await userEvent.click(screen.getByRole('button', { name: ariaLabel }));
+      expect(onToggle).toHaveBeenCalledOnce();
+    });
   });
 });

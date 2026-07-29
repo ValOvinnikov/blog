@@ -239,6 +239,21 @@ add a per-story `parameters.viewport` override in an individual story file.**
 Anyone can switch viewports interactively from the toolbar; a story doesn't
 need a dedicated export per breakpoint.
 
+**Narrow exception — a component whose behavior forks on a real (non-container)
+media-query breakpoint.** Most components don't care which viewport preset is
+active, so the rule above holds. But if a component's own rendering only
+changes below/above a real CSS `md:`/`sm:`-style breakpoint (not a container
+query), a story demonstrating that state renders identically to `Default` at
+Storybook's normal wide canvas — silently showing nothing without a manual
+toolbar switch. In that specific case, pin `globals: { viewport: '<preset>' }`
+(the CSF3 per-story globals override, not `parameters.viewport` — that field
+no longer even has a `defaultViewport` key in Storybook 10) on that story,
+reusing an existing named preset from `preview.ts` rather than inventing new
+dimensions, and leave a one-line comment explaining why. First precedent:
+`PrimaryNavigation`'s `MobileClosed`/`MobileOpen`/`MobileInteractive` stories
+(`packages/ui/src/molecules/primary-navigation/primary-navigation.stories.tsx`),
+whose `mobileToggle` prop collapses the nav behind a real `md:` variant.
+
 ## MDX documentation pages
 
 For complex components, add a `{component}.mdx` file alongside stories to write
