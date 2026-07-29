@@ -9,6 +9,7 @@ import {
 } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
+import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
@@ -36,8 +37,8 @@ const s = authorPageVariants();
  * social links via `ShareLink`/`ActionList`, and their post list via
  * `PostsSection`. `getAuthorPage` always windows — page 1 gets the same
  * pagination metadata as any other page. Renders a `Home › Author: {name}`
- * `Breadcrumbs` trail (plus its `BreadcrumbList` JSON-LD) as page chrome
- * above the archive content.
+ * `Breadcrumbs` trail (plus its `BreadcrumbList` JSON-LD) inside a
+ * `BreadcrumbBar` sibling before `<main>`.
  */
 export async function AuthorPage({ slug, page }: TAuthorPageProps) {
   const [result, t, breadcrumbsT] = await Promise.all([
@@ -81,15 +82,16 @@ export async function AuthorPage({ slug, page }: TAuthorPageProps) {
     <>
       {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
 
+      <BreadcrumbBar>
+        <Breadcrumbs
+          items={trail}
+          ariaLabel={breadcrumbsT('ariaLabel')}
+          linkAs={SmartLink}
+        />
+      </BreadcrumbBar>
+
       <BlogPageTemplate
         heading={author.name}
-        breadcrumbs={
-          <Breadcrumbs
-            items={trail}
-            ariaLabel={breadcrumbsT('ariaLabel')}
-            linkAs={SmartLink}
-          />
-        }
         introHeader={
           <div className={s.introHeader()}>
             {author.role && <Eyebrow>{author.role}</Eyebrow>}

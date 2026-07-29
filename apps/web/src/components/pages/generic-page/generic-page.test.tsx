@@ -106,6 +106,33 @@ describe(`<${GenericPage.name}/>`, () => {
     expect(current.tagName).not.toBe('A');
   });
 
+  it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
+    getPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        title: 'About Us',
+        slug: 'about-us',
+        modules: [],
+        seo: makeSeo({
+          title: 'About Us',
+          description: 'Who we are.',
+          ogTitle: 'About Us',
+          ogDescription: 'Who we are.',
+        }),
+      },
+    });
+
+    await setup();
+
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    const main = screen.getByRole('main');
+
+    expect(main.contains(nav)).toBe(false);
+    expect(
+      nav.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
     getPageMock.mockResolvedValue({
       ok: true,

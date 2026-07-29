@@ -321,6 +321,29 @@ describe(`<${AuthorPage.name}/>`, () => {
     expect(current.tagName).not.toBe('A');
   });
 
+  it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
+    getAuthorPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        author,
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    await setup();
+
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    const main = screen.getByRole('main');
+
+    expect(main.contains(nav)).toBe(false);
+    expect(
+      nav.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
     getAuthorPageMock.mockResolvedValue({
       ok: true,

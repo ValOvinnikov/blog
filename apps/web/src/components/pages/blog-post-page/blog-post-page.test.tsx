@@ -127,6 +127,20 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(current.tagName).not.toBe('A');
   });
 
+  it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+
+    await setup();
+
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    const main = screen.getByRole('main');
+
+    expect(main.contains(nav)).toBe(false);
+    expect(
+      nav.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it('renders no category eyebrow outside the breadcrumbs trail', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 

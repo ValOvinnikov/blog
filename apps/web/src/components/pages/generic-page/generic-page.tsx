@@ -1,6 +1,7 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
+import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { ModuleRenderer } from '@web/modules/module-renderer';
@@ -17,9 +18,9 @@ type TGenericPageProps = ILocalizedParams & { slug: string };
  * GenericPage — `/{slug}` composition for standalone `page_generic`
  * documents: fetches the page via `service.pages.generic.v1.getPage`,
  * renders a `Home › {title}` `Breadcrumbs` trail (plus its `BreadcrumbList`
- * JSON-LD) above the content, then renders its `modules[]` through the
- * shared `ModuleRenderer` inside the common page shell. `Header`/`Footer`
- * stay owned by `[locale]/layout.tsx`.
+ * JSON-LD) inside a `BreadcrumbBar` sibling before `<main>`, then renders
+ * its `modules[]` through the shared `ModuleRenderer` inside the common page
+ * shell. `Header`/`Footer` stay owned by `[locale]/layout.tsx`.
  */
 export async function GenericPage({ slug, locale }: TGenericPageProps) {
   const [result, breadcrumbsT] = await Promise.all([
@@ -44,12 +45,15 @@ export async function GenericPage({ slug, locale }: TGenericPageProps) {
     <>
       {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
 
-      <main className={genericPageVariants()}>
+      <BreadcrumbBar>
         <Breadcrumbs
           items={trail}
           ariaLabel={breadcrumbsT('ariaLabel')}
           linkAs={SmartLink}
         />
+      </BreadcrumbBar>
+
+      <main className={genericPageVariants()}>
         <ModuleRenderer modules={modules} locale={locale} />
       </main>
     </>

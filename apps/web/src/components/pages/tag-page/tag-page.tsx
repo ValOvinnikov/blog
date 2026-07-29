@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
+import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
@@ -18,10 +19,10 @@ type TTagPageProps = { slug: string; page?: number };
  * TagPage — shared composition for `/tag/[slug]` (page 1, `page` omitted)
  * and `/tag/[slug]/page/[page]` (pages ≥ 2, `page` provided): fetches posts
  * for the tag, renders a `Home › Tag: {name}` `Breadcrumbs` trail (plus its
- * `BreadcrumbList` JSON-LD) as page chrome above the archive content, then
- * renders the posts through the same pure ui organisms as `CategoryPage`.
- * `getTagPage` always windows — page 1 gets the same pagination metadata as
- * any other page.
+ * `BreadcrumbList` JSON-LD) inside a `BreadcrumbBar` sibling before `<main>`,
+ * then renders the posts through the same pure ui organisms as
+ * `CategoryPage`. `getTagPage` always windows — page 1 gets the same
+ * pagination metadata as any other page.
  */
 export async function TagPage({ slug, page }: TTagPageProps) {
   const [result, t, breadcrumbsT] = await Promise.all([
@@ -62,15 +63,16 @@ export async function TagPage({ slug, page }: TTagPageProps) {
     <>
       {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
 
+      <BreadcrumbBar>
+        <Breadcrumbs
+          items={trail}
+          ariaLabel={breadcrumbsT('ariaLabel')}
+          linkAs={SmartLink}
+        />
+      </BreadcrumbBar>
+
       <BlogPageTemplate
         heading={tag.title}
-        breadcrumbs={
-          <Breadcrumbs
-            items={trail}
-            ariaLabel={breadcrumbsT('ariaLabel')}
-            linkAs={SmartLink}
-          />
-        }
         supportingText={tag.description}
         posts={
           <PostsSection

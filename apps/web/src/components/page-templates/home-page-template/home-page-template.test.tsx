@@ -29,4 +29,10 @@ describe(`<${HomePageTemplate.name}/>`, () => {
 
     expect(hero.parentElement).toBe(main);
   });
+
+  it('renders no breadcrumb navigation — home has no BreadcrumbBar', () => {
+    expect(
+      screen.queryByRole('navigation', { name: 'Breadcrumb' }),
+    ).not.toBeInTheDocument();
+  });
 });
