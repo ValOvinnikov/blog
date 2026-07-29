@@ -6,8 +6,9 @@
   },
   "breadcrumbs": {
     "home": "Home",
+    "ariaLabel": "Breadcrumb",
+    "authorPrefix": "Author: {name}",
     "topics": "Topics",
-    "blog": "Blog",
-    "ariaLabel": "Breadcrumb"
+    "blog": "Blog"
   }
 }

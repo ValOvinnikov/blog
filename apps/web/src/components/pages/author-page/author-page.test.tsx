@@ -1,4 +1,4 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { makeAuthor } from '@web/testing/shared/author/fixtures';
 import {
   makePostCard,
@@ -24,6 +24,21 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/i18n/navigation', () => ({
   Link: ({
+    href,
+    children,
+    ...rest
+  }: {
+    href: string;
+    children: React.ReactNode;
+  }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
+}));
+
+vi.mock('@web/components/shared/smart-link', () => ({
+  SmartLink: ({
     href,
     children,
     ...rest
@@ -270,5 +285,55 @@ describe(`<${AuthorPage.name}/>`, () => {
     await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders the Home › Author: {name} breadcrumbs trail', async () => {
+    getAuthorPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        author,
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    await setup();
+
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+
+    const homeLink = within(nav).getByRole('link', { name: 'Home' });
+    expect(homeLink).toHaveAttribute('href', '/');
+
+    const current = within(nav).getByText('Author: Jane Doe');
+    expect(current).toHaveAttribute('aria-current', 'page');
+    expect(current.tagName).not.toBe('A');
+  });
+
+  it('renders the JSON-LD BreadcrumbList schema script', async () => {
+    getAuthorPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        author,
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    const { container } = await setup();
+
+    const scripts = container.querySelectorAll(
+      'script[type="application/ld+json"]',
+    );
+    const breadcrumbScript = Array.from(scripts).find((script) =>
+      script.textContent?.includes('"@type":"BreadcrumbList"'),
+    );
+    expect(breadcrumbScript).toBeDefined();
+    expect(breadcrumbScript?.textContent).toContain(
+      '"item":"https://example.com/author/jane-doe"',
+    );
   });
 });

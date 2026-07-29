@@ -1,13 +1,21 @@
 import { Size, routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Avatar, Eyebrow } from '@blog/ui/atoms';
-import { ActionList, ShareLink } from '@blog/ui/molecules';
+import {
+  ActionList,
+  Breadcrumbs,
+  ShareLink,
+  type IBreadcrumbItem,
+} from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
+import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { Link } from '@web/i18n/navigation';
 import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
+import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
+import { env } from '@web/utils/env/env';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -27,15 +35,18 @@ const s = authorPageVariants();
  * `<h1>`, their role/avatar in `introHeader`, bio as `supportingText`,
  * social links via `ShareLink`/`ActionList`, and their post list via
  * `PostsSection`. `getAuthorPage` always windows — page 1 gets the same
- * pagination metadata as any other page.
+ * pagination metadata as any other page. Renders a `Home › Author: {name}`
+ * `Breadcrumbs` trail (plus its `BreadcrumbList` JSON-LD) as page chrome
+ * above the archive content.
  */
 export async function AuthorPage({ slug, page }: TAuthorPageProps) {
-  const [result, t] = await Promise.all([
+  const [result, t, breadcrumbsT] = await Promise.all([
     service.pages.author.v1.getAuthorPage(slug, {
       page,
       itemsPerPage: AUTHOR_ITEMS_PER_PAGE,
     }),
     getTranslations('pagination'),
+    getTranslations('breadcrumbs'),
   ]);
 
   if (!result.ok) {
@@ -56,55 +67,76 @@ export async function AuthorPage({ slug, page }: TAuthorPageProps) {
 
   const items = await toPostListItems(posts);
 
+  const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
+  const trail: IBreadcrumbItem[] = [
+    { label: breadcrumbsT('home'), href: routes.home() },
+    {
+      label: breadcrumbsT('authorPrefix', { name: author.name }),
+      href: routes.author(slug),
+    },
+  ];
+  const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
+
   return (
-    <BlogPageTemplate
-      heading={author.name}
-      introHeader={
-        <div className={s.introHeader()}>
-          {author.role && <Eyebrow>{author.role}</Eyebrow>}
-          <Avatar
-            name={author.name}
-            alt={author.name}
-            src={author.imageUrl}
-            size={Size.LG}
+    <>
+      {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
+
+      <BlogPageTemplate
+        heading={author.name}
+        breadcrumbs={
+          <Breadcrumbs
+            items={trail}
+            ariaLabel={breadcrumbsT('ariaLabel')}
+            linkAs={SmartLink}
           />
-        </div>
-      }
-      supportingText={blockTextToPlain(author.bio)}
-      socialLinks={
-        author.socialLinks.length > 0 ? (
-          <ActionList className={s.socialLinks()}>
-            {author.socialLinks.map((link) => (
-              <ShareLink
-                key={link.url}
-                href={link.url}
-                label={link.platform}
-                as={SmartLink}
-              />
-            ))}
-          </ActionList>
-        ) : undefined
-      }
-      posts={
-        <PostsSection
-          posts={items}
-          title={`Posts by ${author.name}`}
-          titleId="author-posts-title"
-          linkAs={Link}
-          emptyMessage={`${author.name} hasn't published any posts yet.`}
-        />
-      }
-      pagination={
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          createHref={(pageNumber) => routes.author(slug, pageNumber)}
-          ariaLabel={t('ariaLabel', { pageType: 'Author' })}
-          previousLabel={t('previous')}
-          nextLabel={t('next')}
-          linkAs={Link}
-        />
-      }
-    />
+        }
+        introHeader={
+          <div className={s.introHeader()}>
+            {author.role && <Eyebrow>{author.role}</Eyebrow>}
+            <Avatar
+              name={author.name}
+              alt={author.name}
+              src={author.imageUrl}
+              size={Size.LG}
+            />
+          </div>
+        }
+        supportingText={blockTextToPlain(author.bio)}
+        socialLinks={
+          author.socialLinks.length > 0 ? (
+            <ActionList className={s.socialLinks()}>
+              {author.socialLinks.map((link) => (
+                <ShareLink
+                  key={link.url}
+                  href={link.url}
+                  label={link.platform}
+                  as={SmartLink}
+                />
+              ))}
+            </ActionList>
+          ) : undefined
+        }
+        posts={
+          <PostsSection
+            posts={items}
+            title={`Posts by ${author.name}`}
+            titleId="author-posts-title"
+            linkAs={Link}
+            emptyMessage={`${author.name} hasn't published any posts yet.`}
+          />
+        }
+        pagination={
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            createHref={(pageNumber) => routes.author(slug, pageNumber)}
+            ariaLabel={t('ariaLabel', { pageType: 'Author' })}
+            previousLabel={t('previous')}
+            nextLabel={t('next')}
+            linkAs={Link}
+          />
+        }
+      />
+    </>
   );
 }
