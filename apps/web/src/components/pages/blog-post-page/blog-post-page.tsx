@@ -28,12 +28,12 @@ const s = blogPostPageVariants();
  * `service.pages.post.v1.getPost`, then renders a `Home › Category › Post`
  * `Breadcrumbs` trail (plus its `BreadcrumbList` JSON-LD) inside a
  * `BreadcrumbBar` sibling before `<main>`, followed by `<main>` holding the
- * `Article` compound (`Article.Header` for title, `PostMeta` with
- * `PostShare` in its share slot, and cover image; `Article.Body` for the
- * rendered `PortableTextRenderer` body; `Article.Footer` for the tag chip
- * list), plus a `BlogPosting` JSON-LD tag and, when the post has any, a
- * "Related posts" `PostsSection` after the article. `Header`/`Footer` (site
- * chrome) stay owned by `[locale]/layout.tsx`.
+ * `Article` compound (`Article.Header` at `max-w-page` for the category
+ * eyebrow, title, `PostMeta` with `PostShare` in its share slot, lead, and
+ * cover image; `Article.Body`/`Article.Footer` narrowed back to `max-w-post`
+ * for the reading measure), plus a `BlogPosting` JSON-LD tag and, when the
+ * post has any, a tinted "Related reading" `PostsSection` band after the
+ * article. `Header`/`Footer` (site chrome) stay owned by `[locale]/layout.tsx`.
  */
 export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   const result = await service.pages.post.v1.getPost(slug);
@@ -97,7 +97,13 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
       <main className={s.root()}>
         <Article>
           <Article.Header
+            className={s.hero()}
             title={title}
+            category={{
+              label: category.title,
+              href: routes.category(category.slug),
+              linkAs: SmartLink,
+            }}
             lead={excerpt}
             meta={{
               author: { ...author, href: routes.author(author.slug) },
@@ -130,6 +136,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
           </Article.Body>
 
           <Article.Footer
+            className={s.footer()}
             tags={tags.map((tag) => ({
               label: tag.title,
               href: routes.tag(tag.slug),
@@ -141,9 +148,10 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
         {relatedPostItems.length > 0 && (
           <PostsSection
             posts={relatedPostItems}
-            title="Related posts"
+            title="Related reading"
             titleId="related-posts-title"
             linkAs={SmartLink}
+            tinted
           />
         )}
       </main>

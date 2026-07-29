@@ -1,6 +1,12 @@
+import type { RichText } from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
+import {
+  richTextBlock,
+  richTextSpan,
+  type TRichTextBlock,
+} from '@web/testing/shared/portable-text-renderer/fixtures';
 import { notFound } from 'next/navigation';
 
 import { BlogPostPage } from './blog-post-page';
@@ -141,13 +147,36 @@ describe(`<${BlogPostPage.name}/>`, () => {
     ).toBeTruthy();
   });
 
-  it('renders no category eyebrow outside the breadcrumbs trail', async () => {
+  it('renders the category eyebrow linked to the category archive page, in addition to the breadcrumbs trail', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     await setup();
 
     const categoryLinks = screen.getAllByRole('link', { name: 'Engineering' });
-    expect(categoryLinks).toHaveLength(1);
+    expect(categoryLinks).toHaveLength(2);
+    categoryLinks.forEach((link) => {
+      expect(link).toHaveAttribute('href', '/category/engineering');
+    });
+  });
+
+  it('renders exactly one <h1> on the page (the post title), even when the body authors an h1-style block', async () => {
+    const body: RichText = [
+      // The generated `style` union no longer includes 'h1' (Studio can't
+      // author one anymore), but the renderer still defends against a
+      // legacy/malformed one reaching this component via another write path.
+      richTextBlock('h1' as TRichTextBlock['style'], [
+        richTextSpan('An authored h1.'),
+      ]),
+      ...mockPostDetail.body,
+    ];
+    getPostMock.mockResolvedValue({
+      ok: true,
+      data: { ...mockPostDetail, body },
+    });
+
+    await setup();
+
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
   it('renders the JSON-LD BlogPosting schema script', async () => {
@@ -216,7 +245,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders a "Related posts" section when relatedPosts is non-empty', async () => {
+  it('renders a "Related reading" section when relatedPosts is non-empty, even when a related post is in a different category (tag-matched, not category-scoped)', async () => {
     getPostMock.mockResolvedValue({
       ok: true,
       data: {
@@ -239,9 +268,9 @@ describe(`<${BlogPostPage.name}/>`, () => {
               imageUrl: undefined,
             },
             category: {
-              id: 'cat-1',
-              title: 'Engineering',
-              slug: 'engineering',
+              id: 'cat-2',
+              title: 'Design',
+              slug: 'design',
             },
           },
         ],
@@ -250,12 +279,12 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('Related posts')).toBeVisible();
+    expect(screen.getByText('Related reading')).toBeVisible();
     const link = screen.getByRole('link', { name: 'A Related Post' });
     expect(link).toHaveAttribute('href', '/blog/a-related-post');
   });
 
-  it('omits the "Related posts" section when relatedPosts is empty', async () => {
+  it('omits the "Related reading" section when relatedPosts is empty', async () => {
     getPostMock.mockResolvedValue({
       ok: true,
       data: { ...mockPostDetail, relatedPosts: [] },
@@ -263,6 +292,6 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.queryByText('Related posts')).not.toBeInTheDocument();
+    expect(screen.queryByText('Related reading')).not.toBeInTheDocument();
   });
 });

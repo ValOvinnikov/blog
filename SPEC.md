@@ -54,10 +54,19 @@ category cap was narrowed to a single required reference in #809 on
 - **Tag axis** (#674) — `/tag/[slug]` (+ `/page/N`) mirrors the category
   route's pagination/canonical/404 rules exactly (`routes.tag(slug, page?)`).
   Post detail (`/blog/[slug]`) renders the post's tags as `Article.Footer`
-  chips linking to `routes.tag`, plus a shared-tag-ranked "Related posts"
-  section (up to 3, category-fallback when fewer than 3 share a tag). Every
-  tag also gets its own RSS feed at `/tag/[slug]/rss.xml`, and every tag
-  archive URL is listed in the sitemap.
+  chips linking to `routes.tag`, plus a shared-tag-ranked "Related reading"
+  section (up to 3, category-fallback when fewer than 3 share a tag) — the
+  heading stays category-neutral since the tag-based match isn't
+  category-scoped. Every tag also gets its own RSS feed at
+  `/tag/[slug]/rss.xml`, and every tag archive URL is listed in the sitemap.
+- **Post-detail layout (#902):** `/blog/[slug]`'s `<main>` splits into
+  per-region widths instead of one uniform clamp — the hero region
+  (`Article.Header`: category eyebrow linking to `routes.category`, capped
+  h1 title, meta strip, cover image) spans `max-w-page` (1120px); the article
+  body stays `max-w-post` (760px / 68ch measure, unchanged). The "Related
+  reading" section renders in a full-bleed `--bg-subtle` tinted band (inner
+  `max-w-page`), visually separated from the article; the hero stays on the
+  page's normal `--bg` (not tinted).
 
 Both environments are **live** (§13): merging to `main` deploys development;
 a `vX.Y.Z` tag promotes to production.
