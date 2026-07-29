@@ -2,6 +2,7 @@ import '../../index.css';
 
 import { LOCALE_ISO_CODES, type TBrandVariants } from '@blog/config';
 import { service } from '@blog/service';
+import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { jetbrainsMono, newsreader, spaceGrotesk } from '@web/config/fonts';
 import { themeBootstrapScript } from '@web/config/theme-script';
@@ -56,10 +57,12 @@ export default async function RootLayout({ children }: TProps) {
       </head>
       <body>
         {children}
-        {/* Client component (uses hooks internally) mounted at the leaf —
-            collects real-user Core Web Vitals. Zero-config: it no-ops in
-            development and auto-detects the Vercel deployment in production. */}
+        {/* Client components (use hooks internally) mounted at the leaf —
+            collect real-user Core Web Vitals and pageview analytics.
+            Zero-config: both no-op in development and auto-detect the
+            Vercel deployment in production. */}
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
