@@ -1,6 +1,6 @@
 import { Size, routes } from '@blog/config';
 import { service } from '@blog/service';
-import { Avatar, Eyebrow } from '@blog/ui/atoms';
+import { Avatar, Eyebrow, Icon } from '@blog/ui/atoms';
 import {
   ActionList,
   Breadcrumbs,
@@ -16,6 +16,7 @@ import { blockTextToPlain } from '@web/utils/block-text-to-plain';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { toPostListItems } from '@web/utils/to-post-list-items';
+import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
@@ -104,14 +105,23 @@ export async function AuthorPage({ slug, page }: TAuthorPageProps) {
         socialLinks={
           author.socialLinks.length > 0 ? (
             <ActionList className={s.socialLinks()}>
-              {author.socialLinks.map((link) => (
-                <ShareLink
-                  key={link.url}
-                  href={link.url}
-                  label={link.platform}
-                  as={SmartLink}
-                />
-              ))}
+              {author.socialLinks.map((link) => {
+                const iconName = toSocialIconName(link.platform);
+
+                return (
+                  <ShareLink
+                    key={link.url}
+                    href={link.url}
+                    label={link.platform}
+                    icon={
+                      iconName ? (
+                        <Icon name={iconName} size={Size.SM} />
+                      ) : undefined
+                    }
+                    as={SmartLink}
+                  />
+                );
+              })}
             </ActionList>
           ) : undefined
         }
