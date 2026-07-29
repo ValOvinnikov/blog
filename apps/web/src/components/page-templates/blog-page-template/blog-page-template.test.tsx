@@ -58,20 +58,6 @@ describe(`<${BlogPageTemplate.name}/>`, () => {
     expect(screen.queryByTestId('intro-header-slot')).not.toBeInTheDocument();
   });
 
-  it('renders breadcrumbs as the first child of main when passed', () => {
-    setup({ breadcrumbs: <div data-testid="breadcrumbs-slot" /> });
-
-    const main = screen.getByRole('main');
-    expect(screen.getByTestId('breadcrumbs-slot')).toBeInTheDocument();
-    expect(main.firstElementChild).toBe(screen.getByTestId('breadcrumbs-slot'));
-  });
-
-  it('omits breadcrumbs when not passed', () => {
-    setup();
-
-    expect(screen.queryByTestId('breadcrumbs-slot')).not.toBeInTheDocument();
-  });
-
   it('renders categoryChips after supportingText and before posts when passed', () => {
     setup({ categoryChips: <div data-testid="category-chips-slot" /> });
 

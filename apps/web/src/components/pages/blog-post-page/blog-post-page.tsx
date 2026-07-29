@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Article, PostsSection } from '@blog/ui/organisms';
+import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 import { PostShare } from '@web/components/shared/post-share';
@@ -25,8 +26,9 @@ const s = blogPostPageVariants();
 /**
  * BlogPostPage — `/blog/{slug}` composition: fetches the post via
  * `service.pages.post.v1.getPost`, then renders a `Home › Category › Post`
- * `Breadcrumbs` trail (plus its `BreadcrumbList` JSON-LD) as page chrome
- * above the `Article` compound (`Article.Header` for title, `PostMeta` with
+ * `Breadcrumbs` trail (plus its `BreadcrumbList` JSON-LD) inside a
+ * `BreadcrumbBar` sibling before `<main>`, followed by `<main>` holding the
+ * `Article` compound (`Article.Header` for title, `PostMeta` with
  * `PostShare` in its share slot, and cover image; `Article.Body` for the
  * rendered `PortableTextRenderer` body; `Article.Footer` for the tag chip
  * list), plus a `BlogPosting` JSON-LD tag and, when the post has any, a
@@ -80,67 +82,71 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
 
   return (
-    <main className={s.root()}>
+    <>
       {schema && <JsonLd schema={schema} />}
       {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
 
-      <Breadcrumbs
-        items={trail}
-        ariaLabel={t('ariaLabel')}
-        linkAs={SmartLink}
-      />
-
-      <Article>
-        <Article.Header
-          title={title}
-          lead={excerpt}
-          meta={{
-            author: { ...author, href: routes.author(author.slug) },
-            publishedAt,
-            formattedDate: format.dateTime(new Date(publishedAt), {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            }),
-            readingTimeMinutes,
-            linkAs: SmartLink,
-            share: <PostShare url={url} title={title} links={shareLinks} />,
-          }}
-          coverMedia={
-            heroImageSanity ? (
-              <SanityImage
-                image={heroImageSanity}
-                width={1200}
-                height={675}
-                sizes="(min-width: 1024px) 800px, 100vw"
-                alt={heroImageAlt}
-                className={s.coverImage()}
-              />
-            ) : undefined
-          }
-        />
-
-        <Article.Body className={s.body()}>
-          <PortableTextRenderer value={body} />
-        </Article.Body>
-
-        <Article.Footer
-          tags={tags.map((tag) => ({
-            label: tag.title,
-            href: routes.tag(tag.slug),
-          }))}
+      <BreadcrumbBar>
+        <Breadcrumbs
+          items={trail}
+          ariaLabel={t('ariaLabel')}
           linkAs={SmartLink}
         />
-      </Article>
+      </BreadcrumbBar>
 
-      {relatedPostItems.length > 0 && (
-        <PostsSection
-          posts={relatedPostItems}
-          title="Related posts"
-          titleId="related-posts-title"
-          linkAs={SmartLink}
-        />
-      )}
-    </main>
+      <main className={s.root()}>
+        <Article>
+          <Article.Header
+            title={title}
+            lead={excerpt}
+            meta={{
+              author: { ...author, href: routes.author(author.slug) },
+              publishedAt,
+              formattedDate: format.dateTime(new Date(publishedAt), {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              }),
+              readingTimeMinutes,
+              linkAs: SmartLink,
+              share: <PostShare url={url} title={title} links={shareLinks} />,
+            }}
+            coverMedia={
+              heroImageSanity ? (
+                <SanityImage
+                  image={heroImageSanity}
+                  width={1200}
+                  height={675}
+                  sizes="(min-width: 1024px) 800px, 100vw"
+                  alt={heroImageAlt}
+                  className={s.coverImage()}
+                />
+              ) : undefined
+            }
+          />
+
+          <Article.Body className={s.body()}>
+            <PortableTextRenderer value={body} />
+          </Article.Body>
+
+          <Article.Footer
+            tags={tags.map((tag) => ({
+              label: tag.title,
+              href: routes.tag(tag.slug),
+            }))}
+            linkAs={SmartLink}
+          />
+        </Article>
+
+        {relatedPostItems.length > 0 && (
+          <PostsSection
+            posts={relatedPostItems}
+            title="Related posts"
+            titleId="related-posts-title"
+            linkAs={SmartLink}
+          />
+        )}
+      </main>
+    </>
   );
 }

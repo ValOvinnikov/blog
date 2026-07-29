@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
+import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { CategoryChipList } from '@web/components/shared/category-chip-list';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -19,8 +20,8 @@ type TBlogListPageProps = { page: number };
  * BlogListPage — shared composition for `/blog` (page 1) and
  * `/blog/page/[page]` (pages ≥ 2): fetches one page window via the blog
  * service, renders a `Home › Blog` `Breadcrumbs` trail (plus its
- * `BreadcrumbList` JSON-LD) as page chrome above the archive content, then
- * renders it through the pure ui organisms.
+ * `BreadcrumbList` JSON-LD) inside a `BreadcrumbBar` sibling before `<main>`,
+ * then renders the archive content through the pure ui organisms.
  */
 export async function BlogListPage({ page }: TBlogListPageProps) {
   const [result, categories, t, breadcrumbsT] = await Promise.all([
@@ -57,15 +58,16 @@ export async function BlogListPage({ page }: TBlogListPageProps) {
     <>
       {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
 
+      <BreadcrumbBar>
+        <Breadcrumbs
+          items={trail}
+          ariaLabel={breadcrumbsT('ariaLabel')}
+          linkAs={SmartLink}
+        />
+      </BreadcrumbBar>
+
       <BlogPageTemplate
         heading={heading}
-        breadcrumbs={
-          <Breadcrumbs
-            items={trail}
-            ariaLabel={breadcrumbsT('ariaLabel')}
-            linkAs={SmartLink}
-          />
-        }
         supportingText={supportingText}
         categoryChips={<CategoryChipList categories={categories} />}
         posts={

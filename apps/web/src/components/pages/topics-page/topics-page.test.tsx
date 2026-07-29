@@ -149,6 +149,20 @@ describe(`<${TopicsPage.name}/>`, () => {
     expect(current.tagName).not.toBe('A');
   });
 
+  it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
+    getCategoriesMock.mockResolvedValue({ ok: true, data: [] });
+
+    await setup();
+
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    const main = screen.getByRole('main');
+
+    expect(main.contains(nav)).toBe(false);
+    expect(
+      nav.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
     getCategoriesMock.mockResolvedValue({ ok: true, data: [] });
 

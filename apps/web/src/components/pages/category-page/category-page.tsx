@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
+import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { CategoryChipList } from '@web/components/shared/category-chip-list';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -20,8 +21,8 @@ type TCategoryPageProps = { slug: string; page?: number };
  * CategoryPage — shared composition for `/category/[slug]` (page 1, `page`
  * omitted) and `/category/[slug]/page/[page]` (pages ≥ 2, `page` provided):
  * fetches posts for the category, renders a `Home › Category` `Breadcrumbs`
- * trail (plus its `BreadcrumbList` JSON-LD) as page chrome above the
- * archive content, then renders the posts through the same pure ui
+ * trail (plus its `BreadcrumbList` JSON-LD) inside a `BreadcrumbBar` sibling
+ * before `<main>`, then renders the posts through the same pure ui
  * organisms as `BlogListPage`. `getCategoryPage` always windows — page 1
  * gets the same pagination metadata as any other page.
  */
@@ -65,15 +66,16 @@ export async function CategoryPage({ slug, page }: TCategoryPageProps) {
     <>
       {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
 
+      <BreadcrumbBar>
+        <Breadcrumbs
+          items={trail}
+          ariaLabel={breadcrumbsT('ariaLabel')}
+          linkAs={SmartLink}
+        />
+      </BreadcrumbBar>
+
       <BlogPageTemplate
         heading={category.title}
-        breadcrumbs={
-          <Breadcrumbs
-            items={trail}
-            ariaLabel={breadcrumbsT('ariaLabel')}
-            linkAs={SmartLink}
-          />
-        }
         supportingText={category.description}
         categoryChips={
           <CategoryChipList categories={categories} activeSlug={slug} />

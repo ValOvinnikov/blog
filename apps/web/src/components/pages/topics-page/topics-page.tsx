@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { Heading, Text } from '@blog/ui/atoms';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
+import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
@@ -20,7 +21,7 @@ const s = topicsPageVariants();
  * than forcing category cards through `BlogPageTemplate`'s `posts` slot,
  * which is built specifically for post grids (blog index, category, tag,
  * author archives). Renders a `Home › Topics` `Breadcrumbs` trail (plus its
- * `BreadcrumbList` JSON-LD) above the heading.
+ * `BreadcrumbList` JSON-LD) inside a `BreadcrumbBar` sibling before `<main>`.
  *
  * `getCategoriesSafely` unwraps `getCategories`'s `AsyncResult`, falling
  * back to an empty list on failure — this is a category index, not
@@ -41,45 +42,49 @@ export async function TopicsPage() {
   const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
 
   return (
-    <main className={s.root()}>
+    <>
       {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
 
-      <Breadcrumbs
-        items={trail}
-        ariaLabel={breadcrumbsT('ariaLabel')}
-        linkAs={SmartLink}
-      />
+      <BreadcrumbBar>
+        <Breadcrumbs
+          items={trail}
+          ariaLabel={breadcrumbsT('ariaLabel')}
+          linkAs={SmartLink}
+        />
+      </BreadcrumbBar>
 
-      <Heading level={1} className={s.heading()}>
-        Topics
-      </Heading>
-      <Text className={s.intro()}>Browse every post by topic.</Text>
-      {categories.length === 0 ? (
-        <Text className={s.empty()}>No topics yet.</Text>
-      ) : (
-        <ul className={s.list()}>
-          {categories.map((category) => (
-            <li key={category.id} className={s.card()}>
-              <Heading level={2} visual="card">
-                <SmartLink
-                  href={routes.category(category.slug)}
-                  className={s.cardLink()}
-                >
-                  {category.title}
-                </SmartLink>
-              </Heading>
-              {category.description ? (
-                <Text variant="card">{category.description}</Text>
-              ) : null}
-              <Text variant="card">
-                {category.postCount === 1
-                  ? '1 post'
-                  : `${category.postCount} posts`}
-              </Text>
-            </li>
-          ))}
-        </ul>
-      )}
-    </main>
+      <main className={s.root()}>
+        <Heading level={1} className={s.heading()}>
+          Topics
+        </Heading>
+        <Text className={s.intro()}>Browse every post by topic.</Text>
+        {categories.length === 0 ? (
+          <Text className={s.empty()}>No topics yet.</Text>
+        ) : (
+          <ul className={s.list()}>
+            {categories.map((category) => (
+              <li key={category.id} className={s.card()}>
+                <Heading level={2} visual="card">
+                  <SmartLink
+                    href={routes.category(category.slug)}
+                    className={s.cardLink()}
+                  >
+                    {category.title}
+                  </SmartLink>
+                </Heading>
+                {category.description ? (
+                  <Text variant="card">{category.description}</Text>
+                ) : null}
+                <Text variant="card">
+                  {category.postCount === 1
+                    ? '1 post'
+                    : `${category.postCount} posts`}
+                </Text>
+              </li>
+            ))}
+          </ul>
+        )}
+      </main>
+    </>
   );
 }
