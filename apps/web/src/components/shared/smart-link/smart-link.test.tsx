@@ -8,7 +8,7 @@ const setup = customRender(SmartLink, {
 });
 
 describe('SmartLink', () => {
-  it('renders the router Link for an internal href, without target or rel', () => {
+  it('renders the locale-aware router Link for an internal href, without target or rel', () => {
     setup();
 
     const link = screen.getByRole('link', { name: 'Read post' });
@@ -17,7 +17,7 @@ describe('SmartLink', () => {
     expect(link).not.toHaveAttribute('rel');
   });
 
-  it('adds target and rel for an external href opening in a new tab', () => {
+  it('renders an absolute external href through the locale-aware Link, adding rel for a new tab', () => {
     setup({
       href: 'https://example.com',
       target: '_blank',
@@ -27,6 +27,20 @@ describe('SmartLink', () => {
     const link = screen.getByRole('link', { name: 'Visit site' });
     expect(link.tagName).toBe('A');
     expect(link).toHaveAttribute('href', 'https://example.com');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('renders a protocol-relative href through plain next/link, adding rel for a new tab', () => {
+    setup({
+      href: '//cdn.example.com/asset',
+      target: '_blank',
+      children: 'Open asset',
+    });
+
+    const link = screen.getByRole('link', { name: 'Open asset' });
+    expect(link.tagName).toBe('A');
+    expect(link).toHaveAttribute('href', '//cdn.example.com/asset');
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });

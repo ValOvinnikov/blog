@@ -3,7 +3,6 @@ import { Heading, Text } from '@blog/ui/atoms';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { Link } from '@web/i18n/navigation';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { getCategoriesSafely } from '@web/utils/get-categories-safely';
@@ -62,12 +61,12 @@ export async function TopicsPage() {
           {categories.map((category) => (
             <li key={category.id} className={s.card()}>
               <Heading level={2} visual="card">
-                <Link
+                <SmartLink
                   href={routes.category(category.slug)}
                   className={s.cardLink()}
                 >
                   {category.title}
-                </Link>
+                </SmartLink>
               </Heading>
               {category.description ? (
                 <Text variant="card">{category.description}</Text>

@@ -11,7 +11,6 @@ import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { Link } from '@web/i18n/navigation';
 import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
@@ -121,7 +120,7 @@ export async function AuthorPage({ slug, page }: TAuthorPageProps) {
             posts={items}
             title={`Posts by ${author.name}`}
             titleId="author-posts-title"
-            linkAs={Link}
+            linkAs={SmartLink}
             emptyMessage={`${author.name} hasn't published any posts yet.`}
           />
         }
@@ -133,7 +132,7 @@ export async function AuthorPage({ slug, page }: TAuthorPageProps) {
             ariaLabel={t('ariaLabel', { pageType: 'Author' })}
             previousLabel={t('previous')}
             nextLabel={t('next')}
-            linkAs={Link}
+            linkAs={SmartLink}
           />
         }
       />

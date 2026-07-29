@@ -6,7 +6,6 @@ import { BlogPageTemplate } from '@web/components/page-templates/blog-page-templ
 import { CategoryChipList } from '@web/components/shared/category-chip-list';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { Link } from '@web/i18n/navigation';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
 import { env } from '@web/utils/env/env';
@@ -84,7 +83,7 @@ export async function CategoryPage({ slug, page }: TCategoryPageProps) {
             posts={items}
             title={`Posts in ${category.title}`}
             titleId="category-posts-title"
-            linkAs={Link}
+            linkAs={SmartLink}
             emptyMessage={`No posts in ${category.title} yet.`}
           />
         }
@@ -96,7 +95,7 @@ export async function CategoryPage({ slug, page }: TCategoryPageProps) {
             ariaLabel={t('ariaLabel', { pageType: 'Category' })}
             previousLabel={t('previous')}
             nextLabel={t('next')}
-            linkAs={Link}
+            linkAs={SmartLink}
           />
         }
       />

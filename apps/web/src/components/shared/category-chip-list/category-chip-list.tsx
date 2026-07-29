@@ -1,7 +1,7 @@
 import { routes } from '@blog/config';
 import type { TCategoriesList } from '@blog/service';
 import { Tag } from '@blog/ui/atoms/tag';
-import { Link } from '@web/i18n/navigation';
+import { SmartLink } from '@web/components/shared/smart-link';
 
 import { categoryChipListVariants } from './category-chip-list-variants';
 
@@ -20,8 +20,7 @@ export interface ICategoryChipListProps {
  * an "All" chip back to the unfiltered blog index. Renders on `/blog` (no
  * `activeSlug`, "All" highlighted) and on `/category/[slug]` archives
  * (`activeSlug` highlights the matching category chip instead). Every link
- * is a real `<a>` via the locale-aware `Link` — SEO navigation, not a
- * client-side filter.
+ * is a real `<a>` via `SmartLink` — SEO navigation, not a client-side filter.
  *
  * @example
  * <CategoryChipList categories={categories} activeSlug={category.slug} />
@@ -37,7 +36,7 @@ export const CategoryChipList = ({
   return (
     <nav aria-label="Categories" className={categoryChipListVariants()}>
       <Tag
-        as={Link}
+        as={SmartLink}
         href={routes.blogIndex()}
         variant={isAllActive ? 'accent' : 'default'}
         aria-current={isAllActive ? 'page' : undefined}
@@ -50,7 +49,7 @@ export const CategoryChipList = ({
         return (
           <Tag
             key={category.id}
-            as={Link}
+            as={SmartLink}
             href={routes.category(category.slug)}
             variant={isActive ? 'accent' : 'default'}
             aria-current={isActive ? 'page' : undefined}

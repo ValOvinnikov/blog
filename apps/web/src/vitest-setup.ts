@@ -111,10 +111,34 @@ vi.mock('next/font/google', () => {
 // binding directly: `import { notFound } from 'next/navigation';` then
 // `expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1)`. Cleared before each
 // test so call counts never leak across `it`s.
+//
+// `usePathname`/`useRouter`/`redirect`/`permanentRedirect` are stubbed here
+// too — not because any test asserts on them directly (tests that care mock
+// the higher-level `@web/i18n/navigation` module instead, which never
+// reaches this one), but because `SmartLink` renders next-intl's `Link`,
+// whose internals (`createSharedNavigationFns`, `BaseLink`) read these
+// bindings off `next/navigation` unconditionally while wiring up navigation,
+// even when a test never calls them. `redirect`/`permanentRedirect` mirror
+// `notFound`'s throw-to-short-circuit behavior for the same reason.
 vi.mock('next/navigation', () => ({
   notFound: vi.fn(() => {
     throw new Error('NEXT_NOT_FOUND');
   }),
+  redirect: vi.fn(() => {
+    throw new Error('NEXT_REDIRECT');
+  }),
+  permanentRedirect: vi.fn(() => {
+    throw new Error('NEXT_REDIRECT');
+  }),
+  usePathname: vi.fn(() => '/'),
+  useRouter: vi.fn(() => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+  })),
 }));
 
 beforeEach(() => {

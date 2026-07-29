@@ -1,6 +1,6 @@
 import { service } from '@blog/service';
 import { PostsSection } from '@blog/ui/organisms';
-import { Link } from '@web/i18n/navigation';
+import { SmartLink } from '@web/components/shared/smart-link';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 
 export interface IPostListModuleProps {
@@ -26,7 +26,7 @@ export async function PostListModule({ id }: IPostListModuleProps) {
       posts={items}
       title={title}
       titleId={`latest-posts-${id}`}
-      linkAs={Link}
+      linkAs={SmartLink}
     />
   );
 }

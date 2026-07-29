@@ -29,6 +29,16 @@ export default mergeConfig(
     test: {
       environment: 'jsdom',
       setupFiles: ['./src/vitest-setup.ts'],
+      // `SmartLink` renders next-intl's `Link`, whose client `createNavigation`
+      // ships pre-built ESM (`import ... from 'next/navigation'` with no
+      // extension) — Node's own ESM resolver can't load that extensionless
+      // subpath when Vitest externalizes the dependency. Inlining it forces
+      // Vite's bundler-style resolver (which does resolve it) instead.
+      server: {
+        deps: {
+          inline: ['next-intl'],
+        },
+      },
     },
   }),
 );

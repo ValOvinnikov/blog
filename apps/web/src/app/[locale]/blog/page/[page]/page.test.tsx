@@ -25,18 +25,6 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/i18n/navigation', () => ({
   permanentRedirect: permanentRedirectMock,
-  Link: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
 }));
 
 const setup = customRenderAsync(BlogListNumberedPage, {
