@@ -5,7 +5,6 @@ import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { Link } from '@web/i18n/navigation';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
@@ -78,7 +77,7 @@ export async function TagPage({ slug, page }: TTagPageProps) {
             posts={items}
             title={`Posts tagged ${tag.title}`}
             titleId="tag-posts-title"
-            linkAs={Link}
+            linkAs={SmartLink}
             emptyMessage={`No posts tagged ${tag.title} yet.`}
           />
         }
@@ -90,7 +89,7 @@ export async function TagPage({ slug, page }: TTagPageProps) {
             ariaLabel={t('ariaLabel', { pageType: 'Tag' })}
             previousLabel={t('previous')}
             nextLabel={t('next')}
-            linkAs={Link}
+            linkAs={SmartLink}
           />
         }
       />

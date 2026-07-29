@@ -6,7 +6,6 @@ import { BlogPageTemplate } from '@web/components/page-templates/blog-page-templ
 import { CategoryChipList } from '@web/components/shared/category-chip-list';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { Link } from '@web/i18n/navigation';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { getCategoriesSafely } from '@web/utils/get-categories-safely';
@@ -74,7 +73,7 @@ export async function BlogListPage({ page }: TBlogListPageProps) {
             posts={items}
             title="All posts"
             titleId="blog-posts-title"
-            linkAs={Link}
+            linkAs={SmartLink}
             emptyMessage="No posts yet."
           />
         }
@@ -86,7 +85,7 @@ export async function BlogListPage({ page }: TBlogListPageProps) {
             ariaLabel={t('ariaLabel', { pageType: 'Blog' })}
             previousLabel={t('previous')}
             nextLabel={t('next')}
-            linkAs={Link}
+            linkAs={SmartLink}
           />
         }
       />

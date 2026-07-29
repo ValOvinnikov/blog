@@ -27,21 +27,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/i18n/navigation', () => ({
-  Link: ({
-    href,
-    children,
-    ...rest
-  }: {
-    href: string;
-    children: React.ReactNode;
-  }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
-
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
     href,

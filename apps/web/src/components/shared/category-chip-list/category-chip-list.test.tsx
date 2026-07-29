@@ -2,8 +2,8 @@ import { customRender, screen } from '@web/testing/custom-render';
 
 import { CategoryChipList } from './category-chip-list';
 
-vi.mock('@web/i18n/navigation', () => ({
-  Link: ({
+vi.mock('@web/components/shared/smart-link', () => ({
+  SmartLink: ({
     href,
     children,
     ...rest

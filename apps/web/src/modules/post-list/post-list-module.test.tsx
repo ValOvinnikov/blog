@@ -15,8 +15,8 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/i18n/navigation', () => ({
-  Link: ({
+vi.mock('@web/components/shared/smart-link', () => ({
+  SmartLink: ({
     href,
     children,
     ...rest
