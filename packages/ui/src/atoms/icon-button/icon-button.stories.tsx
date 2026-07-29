@@ -1,5 +1,6 @@
+import { ICONS } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Moon, Sun } from 'lucide-react';
 
 import { IconButton } from './icon-button';
 
@@ -9,7 +10,9 @@ const meta = {
   tags: ['autodocs'],
   args: {
     ariaLabel: 'Action',
-    children: <Sun size={16} strokeWidth={1.6} aria-hidden="true" />,
+    children: (
+      <Icon name={ICONS.SUN} size={16} strokeWidth={1.6} aria-hidden="true" />
+    ),
   },
 } satisfies Meta<typeof IconButton>;
 
@@ -21,6 +24,8 @@ export const Default: TStory = {};
 export const WithMoonIcon: TStory = {
   args: {
     ariaLabel: 'Switch to dark theme',
-    children: <Moon size={16} strokeWidth={1.6} aria-hidden="true" />,
+    children: (
+      <Icon name={ICONS.MOON} size={16} strokeWidth={1.6} aria-hidden="true" />
+    ),
   },
 };
