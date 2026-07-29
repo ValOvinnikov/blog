@@ -1,5 +1,6 @@
-import type { IWithDataTestId } from '@blog/config';
+import { ICONS, type IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
+import { Icon } from '@blog/ui/atoms/icon';
 import { type ElementType } from 'react';
 
 import { breadcrumbsVariants } from './breadcrumbs-variants';
@@ -25,9 +26,16 @@ const s = breadcrumbsVariants();
  * Breadcrumbs — page-chrome navigation trail (e.g. `Home › Category ›
  * Post title`). Every item except the last renders as a link; the last item
  * is the current page, rendered as plain text with `aria-current="page"`.
- * Separators are decorative CSS `::before` pseudo-elements, kept out of the
- * a11y tree. Pure and independent of page content — render it as a sibling
- * above the content organism, never nested inside one.
+ * The first item renders a decorative House icon in place of its visible
+ * label text — the label itself stays in the DOM as visually-hidden text so
+ * the item keeps a real accessible name for assistive tech, and is also set
+ * as a `title` attribute so sighted mouse users get a hover tooltip (same
+ * convention as other icon-only interactive elements in this library, e.g.
+ * `ThemeToggle`). This `title` is applied on whichever element the first
+ * item renders as, so a single-item trail (first item also current) is
+ * covered too. Separators are decorative CSS `::before` pseudo-elements,
+ * kept out of the a11y tree. Pure and independent of page content — render
+ * it as a sibling above the content organism, never nested inside one.
  */
 export const Breadcrumbs = ({
   items,
@@ -48,16 +56,27 @@ export const Breadcrumbs = ({
       <ol className={s.list()}>
         {items.map(({ label, href }, index) => {
           const isCurrent = index === lastIndex;
+          const isFirst = index === 0;
+          const content = isFirst ? (
+            <>
+              <Icon name={ICONS.HOUSE} />
+              <span className={s.homeLabel()}>{label}</span>
+            </>
+          ) : (
+            label
+          );
+
+          const title = isFirst ? label : undefined;
 
           return (
             <li key={href} className={s.item()}>
               {isCurrent ? (
-                <span className={s.current()} aria-current="page">
-                  {label}
+                <span className={s.current()} aria-current="page" title={title}>
+                  {content}
                 </span>
               ) : (
-                <LinkComponent href={href} className={s.link()}>
-                  {label}
+                <LinkComponent href={href} className={s.link()} title={title}>
+                  {content}
                 </LinkComponent>
               )}
             </li>
