@@ -63,7 +63,8 @@ category cap was narrowed to a single required reference in #809 on
   per-region widths instead of one uniform clamp — the hero region
   (`Article.Header`: category eyebrow linking to `routes.category`, capped
   h1 title, meta strip, cover image) spans `max-w-page` (1120px); the article
-  body stays `max-w-post` (760px / 68ch measure, unchanged). The "Related
+  body is capped at `max-w-measure` (68ch, tightened from the earlier
+  `max-w-post`/760px for reading comfort — #932). The "Related
   reading" section renders in a full-bleed `--bg-subtle` tinted band (inner
   `max-w-page`), visually separated from the article; the hero stays on the
   page's normal `--bg` (not tinted).
