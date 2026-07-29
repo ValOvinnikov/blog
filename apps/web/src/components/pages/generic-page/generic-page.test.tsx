@@ -1,4 +1,4 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { notFound } from 'next/navigation';
 
@@ -19,6 +19,21 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/modules/module-renderer', () => ({
   ModuleRenderer: ({ modules }: { modules: { id: string }[] }) => (
     <div data-testid="module-renderer">{modules.length} modules</div>
+  ),
+}));
+
+vi.mock('@web/components/shared/smart-link', () => ({
+  SmartLink: ({
+    href,
+    children,
+    ...rest
+  }: {
+    href: string;
+    children: React.ReactNode;
+  }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
   ),
 }));
 
@@ -60,6 +75,64 @@ describe(`<${GenericPage.name}/>`, () => {
 
     expect(screen.getByTestId('module-renderer')).toHaveTextContent(
       '1 modules',
+    );
+  });
+
+  it('renders the Home › {title} breadcrumbs trail', async () => {
+    getPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        title: 'About Us',
+        slug: 'about-us',
+        modules: [],
+        seo: makeSeo({
+          title: 'About Us',
+          description: 'Who we are.',
+          ogTitle: 'About Us',
+          ogDescription: 'Who we are.',
+        }),
+      },
+    });
+
+    await setup();
+
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+
+    const homeLink = within(nav).getByRole('link', { name: 'Home' });
+    expect(homeLink).toHaveAttribute('href', '/');
+
+    const current = within(nav).getByText('About Us');
+    expect(current).toHaveAttribute('aria-current', 'page');
+    expect(current.tagName).not.toBe('A');
+  });
+
+  it('renders the JSON-LD BreadcrumbList schema script', async () => {
+    getPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        title: 'About Us',
+        slug: 'about-us',
+        modules: [],
+        seo: makeSeo({
+          title: 'About Us',
+          description: 'Who we are.',
+          ogTitle: 'About Us',
+          ogDescription: 'Who we are.',
+        }),
+      },
+    });
+
+    const { container } = await setup();
+
+    const scripts = container.querySelectorAll(
+      'script[type="application/ld+json"]',
+    );
+    const breadcrumbScript = Array.from(scripts).find((script) =>
+      script.textContent?.includes('"@type":"BreadcrumbList"'),
+    );
+    expect(breadcrumbScript).toBeDefined();
+    expect(breadcrumbScript?.textContent).toContain(
+      '"item":"https://example.com/about-us"',
     );
   });
 });
