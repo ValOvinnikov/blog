@@ -15,6 +15,14 @@ describe('svg import tooling', () => {
     expect(screen.getByTestId('sun-icon')).toBeInTheDocument();
   });
 
+  it('keeps the source viewBox on the compiled SVG so CSS-driven resizing (Icon.tsx) rescales correctly', () => {
+    render(<SunIcon data-testid="sun-icon" />);
+
+    expect(screen.getByTestId('sun-icon').getAttribute('viewBox')).toBe(
+      '0 0 24 24',
+    );
+  });
+
   it('resolves a `.svg?url` import to a non-empty asset URL string', () => {
     expect(typeof sunIconUrl).toBe('string');
     expect(sunIconUrl.length).toBeGreaterThan(0);
