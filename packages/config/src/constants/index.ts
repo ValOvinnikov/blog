@@ -1,4 +1,5 @@
 export * from './brand';
+export * from './icon';
 export * from './language';
 export * from './link';
 export * from './module';
