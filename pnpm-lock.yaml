@@ -163,9 +163,6 @@ importers:
       '@vercel/speed-insights':
         specifier: ^2.0.0
         version: 2.0.0(next@16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
-      lucide-react:
-        specifier: ^1.24.0
-        version: 1.24.0(react@19.2.7)
       next:
         specifier: ^16.2.11
         version: 16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
