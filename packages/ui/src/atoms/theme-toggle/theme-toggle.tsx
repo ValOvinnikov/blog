@@ -1,4 +1,4 @@
-import { ICONS, type IWithDataTestId } from '@blog/config';
+import { ICONS, Size, type IWithDataTestId } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { IconButton } from '@blog/ui/atoms/icon-button';
 
@@ -41,19 +41,9 @@ export const ThemeToggle = ({
     >
       {mounted ? (
         isDark ? (
-          <Icon
-            name={ICONS.SUN}
-            size={18}
-            strokeWidth={1.6}
-            aria-hidden="true"
-          />
+          <Icon name={ICONS.SUN} size={Size.MD} />
         ) : (
-          <Icon
-            name={ICONS.MOON}
-            size={18}
-            strokeWidth={1.6}
-            aria-hidden="true"
-          />
+          <Icon name={ICONS.MOON} size={Size.MD} />
         )
       ) : (
         <span className={themeTogglePlaceholderVariants()} aria-hidden="true" />

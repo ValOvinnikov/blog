@@ -1,4 +1,4 @@
-import { ICONS } from '@blog/config';
+import { ICONS, Size } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
@@ -33,23 +33,11 @@ const InteractiveDemo = () => {
         panelId="popover-menu-panel"
         onClick={() => setOpen((current) => !current)}
       >
-        <Icon
-          name={ICONS.SHARE}
-          size={16}
-          strokeWidth={1.6}
-          aria-hidden="true"
-        />
+        <Icon name={ICONS.SHARE} size={Size.SM} />
       </PopoverMenu.Trigger>
       <PopoverMenu.Panel id="popover-menu-panel" open={open} ariaLabel="Menu">
         <PopoverMenu.Item
-          icon={
-            <Icon
-              name={ICONS.EXTERNAL_LINK}
-              size={16}
-              strokeWidth={1.6}
-              aria-hidden="true"
-            />
-          }
+          icon={<Icon name={ICONS.EXTERNAL_LINK} size={Size.SM} />}
         >
           Copy link
         </PopoverMenu.Item>
@@ -78,24 +66,10 @@ export const Copied: TStory = {
           open
           panelId="popover-menu-panel"
         >
-          <Icon
-            name={ICONS.SHARE}
-            size={16}
-            strokeWidth={1.6}
-            aria-hidden="true"
-          />
+          <Icon name={ICONS.SHARE} size={Size.SM} />
         </PopoverMenu.Trigger>
         <PopoverMenu.Panel id="popover-menu-panel" open ariaLabel="Menu">
-          <PopoverMenu.Item
-            icon={
-              <Icon
-                name={ICONS.CHECK}
-                size={16}
-                strokeWidth={1.6}
-                aria-hidden="true"
-              />
-            }
-          >
+          <PopoverMenu.Item icon={<Icon name={ICONS.CHECK} size={Size.SM} />}>
             Copied
           </PopoverMenu.Item>
           <PopoverMenu.Separator />
@@ -120,12 +94,7 @@ export const Closed: TStory = {
           open={false}
           panelId="popover-menu-panel"
         >
-          <Icon
-            name={ICONS.SHARE}
-            size={16}
-            strokeWidth={1.6}
-            aria-hidden="true"
-          />
+          <Icon name={ICONS.SHARE} size={Size.SM} />
         </PopoverMenu.Trigger>
         <PopoverMenu.Panel
           id="popover-menu-panel"
@@ -133,14 +102,7 @@ export const Closed: TStory = {
           ariaLabel="Menu"
         >
           <PopoverMenu.Item
-            icon={
-              <Icon
-                name={ICONS.EXTERNAL_LINK}
-                size={16}
-                strokeWidth={1.6}
-                aria-hidden="true"
-              />
-            }
+            icon={<Icon name={ICONS.EXTERNAL_LINK} size={Size.SM} />}
           >
             Copy link
           </PopoverMenu.Item>

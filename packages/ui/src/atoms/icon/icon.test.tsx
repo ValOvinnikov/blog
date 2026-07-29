@@ -1,4 +1,4 @@
-import { ICONS, type TIconName } from '@blog/config';
+import { ICONS, Size, type TIconName } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 
 import { Icon } from './icon';
@@ -19,24 +19,22 @@ describe(`<${Icon.name}/>`, () => {
     ).toHaveLength(0);
   });
 
-  it('defaults to a 24x24 size', () => {
+  it('defaults to the MD size', () => {
     setup({ dataTestId: 'icon' });
 
-    expect(screen.getByTestId('icon')).toHaveAttribute('width', '24');
-    expect(screen.getByTestId('icon')).toHaveAttribute('height', '24');
+    expect(screen.getByTestId('icon')).toHaveClass('size-4.5');
   });
 
-  it('forwards size as width and height', () => {
-    setup({ size: 32, dataTestId: 'icon' });
+  it('applies the sm size class', () => {
+    setup({ size: Size.SM, dataTestId: 'icon' });
 
-    expect(screen.getByTestId('icon')).toHaveAttribute('width', '32');
-    expect(screen.getByTestId('icon')).toHaveAttribute('height', '32');
+    expect(screen.getByTestId('icon')).toHaveClass('size-4');
   });
 
-  it('forwards strokeWidth', () => {
-    setup({ strokeWidth: 2.5, dataTestId: 'icon' });
+  it('applies the lg size class', () => {
+    setup({ size: Size.LG, dataTestId: 'icon' });
 
-    expect(screen.getByTestId('icon')).toHaveAttribute('stroke-width', '2.5');
+    expect(screen.getByTestId('icon')).toHaveClass('size-6');
   });
 
   it('forwards a custom className', () => {
@@ -45,10 +43,34 @@ describe(`<${Icon.name}/>`, () => {
     expect(screen.getByTestId('icon')).toHaveClass('text-accent');
   });
 
-  it('forwards aria-hidden and other svg attributes', () => {
-    setup({ 'aria-hidden': true, dataTestId: 'icon' });
+  it('renders a baked-in stroke-width per icon with no strokeWidth prop', () => {
+    setup({ dataTestId: 'icon' });
+
+    expect(screen.getByTestId('icon')).toHaveAttribute('stroke-width', '1.6');
+  });
+
+  it('defaults to aria-hidden when no aria-label is given', () => {
+    setup({ dataTestId: 'icon' });
 
     expect(screen.getByTestId('icon')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('does not default aria-hidden when an aria-label is given', () => {
+    setup({ 'aria-label': 'Share this post', dataTestId: 'icon' });
+
+    const icon = screen.getByTestId('icon');
+    expect(icon).toHaveAccessibleName('Share this post');
+    expect(icon).not.toHaveAttribute('aria-hidden');
+  });
+
+  it('lets an explicit aria-hidden override the default even with an aria-label', () => {
+    setup({
+      'aria-label': 'Share this post',
+      'aria-hidden': false,
+      dataTestId: 'icon',
+    });
+
+    expect(screen.getByTestId('icon')).toHaveAttribute('aria-hidden', 'false');
   });
 });
 

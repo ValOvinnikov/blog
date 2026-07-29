@@ -439,9 +439,6 @@ importers:
       '@blog/utils':
         specifier: workspace:*
         version: link:../utils
-      lucide-react:
-        specifier: ^1.24.0
-        version: 1.24.0(react@19.2.7)
       tailwind-merge:
         specifier: ^3.6.0
         version: 3.6.0

@@ -1,8 +1,9 @@
-import { ICONS } from '@blog/config';
+import { ICONS, Size } from '@blog/config';
 import { objectKeys, toTitleCase } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Icon } from './icon';
+import { iconVariants } from './icon-variants';
 
 const iconNames = objectKeys(ICONS);
 
@@ -13,7 +14,7 @@ const IconGallery = () => (
         key={name}
         className="flex flex-col items-center gap-2 rounded-md border border-border p-4 text-center"
       >
-        <Icon name={name} size={28} aria-hidden="true" />
+        <Icon name={name} size={Size.LG} />
         <span className="font-mono text-label text-text-muted">
           {toTitleCase(name)}
         </span>
@@ -29,6 +30,12 @@ const meta = {
   args: {
     name: ICONS.SUN,
   },
+  argTypes: {
+    size: {
+      control: 'select',
+      options: objectKeys(iconVariants.variants.size),
+    },
+  },
 } satisfies Meta<typeof Icon>;
 
 export default meta;
@@ -36,12 +43,20 @@ type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
 
+export const Small: TStory = {
+  args: { size: Size.SM },
+};
+
 export const Large: TStory = {
-  args: { size: 40 },
+  args: { size: Size.LG },
 };
 
 export const CustomColor: TStory = {
   args: { name: ICONS.SHARE, className: 'text-accent' },
+};
+
+export const WithAccessibleLabel: TStory = {
+  args: { name: ICONS.SHARE, 'aria-label': 'Share this post' },
 };
 
 export const Gallery: TStory = {
