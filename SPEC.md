@@ -465,7 +465,10 @@ changing a schema does **not** change existing documents.
   `Home › Category › Post`, sitting next to the existing `BlogPosting`
   JSON-LD. Category archives (`/category/{slug}`, #836) render
   `Home › {Category}`; tag archives (`/tag/{slug}`, #837) render
-  `Home › Tag: {Tag}`.
+  `Home › Tag: {Tag}`. Author archives (`/author/{slug}`, #838) render
+  `Home › Author: {Name}`; generic pages (`/{slug}`, #839) render
+  `Home › {Page title}`; the topics index (`/topics`, #840) renders
+  `Home › Topics` and the blog index (`/blog`, #840) renders `Home › Blog`.
 - `sitemap.ts`, `robots.ts`, RSS route (#92).
 - **Per-environment indexing (#841):** gated by `NEXT_PUBLIC_SANITY_DATASET`
   (via the shared `isProductionEnvironment()` helper) — only the real
