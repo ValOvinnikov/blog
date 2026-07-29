@@ -20,3 +20,8 @@ export const Default: TStory = {};
 export const WithSpecLine: TStory = {
   args: { specLine: 'v1.0.0 · build/local' },
 };
+
+// Narrow-viewport exception (`ui-storybook` skill) — same as `PrimaryNavigation`'s mobile stories.
+export const NarrowViewport: TStory = {
+  globals: { viewport: 'phone' },
+};

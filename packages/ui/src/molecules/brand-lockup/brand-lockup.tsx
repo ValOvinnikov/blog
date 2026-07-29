@@ -15,10 +15,11 @@ export interface IBrandLockupProps
 
 /**
  * BrandLockup molecule — the brand mark plus the wordmark (via the `Logo`
- * atom), with an optional monospace spec line. Mark-only below the `sm`
- * breakpoint (<640px); the wordmark becomes visible at `sm` (≥640px, it
- * stays present for assistive tech below that via `sr-only`) and the spec
- * line reveals at `md` (≥768px), only when `specLine` is supplied.
+ * atom), with an optional monospace spec line. The wordmark (prefix+suffix)
+ * is visible at every viewport width, scaled down below the `sm` breakpoint
+ * (<640px) so it doesn't crowd narrow headers, then growing to its full size
+ * at `sm` (≥640px). The spec line reveals at `md` (≥768px), only when
+ * `specLine` is supplied.
  */
 export const BrandLockup = ({
   prefix,

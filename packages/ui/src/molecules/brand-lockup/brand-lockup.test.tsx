@@ -19,6 +19,12 @@ describe(`<${BrandLockup.name}/>`, () => {
     expect(screen.getByText(suffix)).toBeVisible();
   });
 
+  it('renders the wordmark visibly rather than screen-reader-only', () => {
+    const prefix = faker.word.noun();
+    setup({ prefix });
+    expect(screen.getByText(prefix)).not.toHaveClass('sr-only');
+  });
+
   it('renders the mark decoratively — no accessible role or name', () => {
     setup();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
