@@ -1,5 +1,6 @@
-import { routes } from '@blog/config';
+import { ICONS, Size, routes } from '@blog/config';
 import { service } from '@blog/service';
+import { Icon } from '@blog/ui/atoms';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Article, PostsSection } from '@blog/ui/organisms';
 import { JsonLd } from '@web/components/shared/json-ld';
@@ -12,7 +13,6 @@ import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-sche
 import { buildShareLinks } from '@web/utils/build-share-links';
 import { env } from '@web/utils/env/env';
 import { toPostListItems } from '@web/utils/to-post-list-items';
-import { ExternalLink } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
@@ -64,7 +64,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   const schema = buildBlogPostingSchema(post, siteUrl);
   const shareLinks = buildShareLinks({ url, title }).map((link) => ({
     ...link,
-    icon: <ExternalLink size={16} strokeWidth={1.6} aria-hidden="true" />,
+    icon: <Icon name={ICONS.EXTERNAL_LINK} size={Size.SM} />,
   }));
   const [format, t, relatedPostItems] = await Promise.all([
     getFormatter(),

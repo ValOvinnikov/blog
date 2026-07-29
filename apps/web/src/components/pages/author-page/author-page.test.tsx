@@ -106,9 +106,34 @@ describe(`<${AuthorPage.name}/>`, () => {
 
     const xLink = screen.getByRole('link', { name: 'X' });
     expect(xLink).toHaveAttribute('href', 'https://x.com/janedoe');
+    expect(xLink.querySelector('svg')).toBeInTheDocument();
     const githubLink = screen.getByRole('link', { name: 'GitHub' });
     expect(githubLink).toHaveAttribute('href', 'https://github.com/janedoe');
+    expect(githubLink.querySelector('svg')).toBeInTheDocument();
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+  });
+
+  it('renders no icon for a platform outside the current icon set', async () => {
+    getAuthorPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        author: {
+          ...author,
+          socialLinks: [
+            { platform: 'Mastodon', url: 'https://mastodon.social/@janedoe' },
+          ],
+        },
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
+      },
+    });
+
+    await setup();
+
+    const mastodonLink = screen.getByRole('link', { name: 'Mastodon' });
+    expect(mastodonLink.querySelector('svg')).not.toBeInTheDocument();
   });
 
   it('renders without a role and without social links when none are authored', async () => {

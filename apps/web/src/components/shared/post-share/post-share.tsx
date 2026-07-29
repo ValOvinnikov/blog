@@ -1,10 +1,11 @@
 'use client';
 
+import { ICONS, Size } from '@blog/config';
+import { Icon } from '@blog/ui/atoms';
 import { type IShareLinkItem, PopoverMenu } from '@blog/ui/molecules';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useCopyToClipboard } from '@web/hooks/use-copy-to-clipboard';
 import { usePopover } from '@web/hooks/use-popover';
-import { Check, Copy, Share2 } from 'lucide-react';
 import { useId } from 'react';
 
 import { postShareLiveRegionVariants } from './post-share-variants';
@@ -42,7 +43,7 @@ export function PostShare({ url, title, links, className }: TPostShareProps) {
         panelId={panelId}
         onClick={toggle}
       >
-        <Share2 size={16} strokeWidth={1.6} aria-hidden="true" />
+        <Icon name={ICONS.SHARE} size={Size.SM} />
       </PopoverMenu.Trigger>
       <PopoverMenu.Panel
         ref={panelRef}
@@ -53,9 +54,9 @@ export function PostShare({ url, title, links, className }: TPostShareProps) {
         <PopoverMenu.Item
           icon={
             isCopied ? (
-              <Check size={16} strokeWidth={1.6} aria-hidden="true" />
+              <Icon name={ICONS.CHECK} size={Size.SM} />
             ) : (
-              <Copy size={16} strokeWidth={1.6} aria-hidden="true" />
+              <Icon name={ICONS.COPY} size={Size.SM} />
             )
           }
           onClick={() => copy(url)}

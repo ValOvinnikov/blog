@@ -37,7 +37,10 @@ describe(`<${PostShare.name}/>`, () => {
   });
 
   it('labels the trigger with the post title and renders it closed', () => {
-    expect(getTrigger()).toHaveAttribute('aria-expanded', 'false');
+    const trigger = getTrigger();
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(trigger.querySelector('svg')).toBeInTheDocument();
   });
 
   it('opens the panel on trigger click and closes it again on a second click', async () => {
@@ -61,9 +64,9 @@ describe(`<${PostShare.name}/>`, () => {
     fireEvent.click(screen.getByRole('menuitem', { name: 'Copy link' }));
 
     expect(writeText).toHaveBeenCalledWith('https://example.com/blog/hello');
-    expect(
-      await screen.findByRole('menuitem', { name: 'Copied' }),
-    ).toBeVisible();
+    const copiedItem = await screen.findByRole('menuitem', { name: 'Copied' });
+    expect(copiedItem).toBeVisible();
+    expect(copiedItem.querySelector('svg')).toBeInTheDocument();
 
     await waitFor(
       () => {

@@ -74,7 +74,9 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(screen.getByText('Jane Doe')).toBeVisible();
 
     await userEvent.click(screen.getByRole('button', { name: /Share/ }));
-    expect(screen.getByRole('menuitem', { name: /Share on X/ })).toBeVisible();
+    const xShareLink = screen.getByRole('menuitem', { name: /Share on X/ });
+    expect(xShareLink).toBeVisible();
+    expect(xShareLink.querySelector('svg')).toBeInTheDocument();
     expect(
       screen.getByRole('menuitem', { name: /Share on LinkedIn/ }),
     ).toBeVisible();

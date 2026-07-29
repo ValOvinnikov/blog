@@ -65,7 +65,8 @@ ship raw TypeScript (Just-in-Time pattern) and are transpiled by the web app via
 ### SVG icon imports
 
 `@blog/ui` ships its icon set as raw SVGs under `packages/ui/src/assets/icons/`
-(source: `docs/design-reference/icons/`). SVGR turns a bare `.svg` import into
+(the design-reference copy that seeded these has been removed — this is the
+sole source now). SVGR turns a bare `.svg` import into
 a typed React component; the `?url` suffix bypasses SVGR and resolves to the
 emitted asset's URL instead — same two-shape convention everywhere it's
 configured:
