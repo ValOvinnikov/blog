@@ -35,7 +35,7 @@ describe(`<${Article.name}/>`, () => {
     expect(screen.getByText('Post body content.')).toBeVisible();
   });
 
-  it('renders no category eyebrow — breadcrumbs own category navigation', () => {
+  it('renders no category eyebrow when category is omitted', () => {
     renderElement(
       <Article>
         <Article.Header title="Building a Design System" meta={meta} />
@@ -45,6 +45,63 @@ describe(`<${Article.name}/>`, () => {
       </Article>,
     );
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('renders the category eyebrow as non-heading text when no href is given', () => {
+    renderElement(
+      <Article>
+        <Article.Header
+          title="Building a Design System"
+          category={{ label: 'Engineering' }}
+          meta={meta}
+        />
+        <Article.Body>
+          <p>Post body content.</p>
+        </Article.Body>
+      </Article>,
+    );
+    expect(screen.getByText('Engineering')).toBeVisible();
+    expect(
+      screen.queryByRole('link', { name: 'Engineering' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'Engineering' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the category eyebrow as a link when href is given', () => {
+    renderElement(
+      <Article>
+        <Article.Header
+          title="Building a Design System"
+          category={{ label: 'Engineering', href: '/category/engineering' }}
+          meta={meta}
+        />
+        <Article.Body>
+          <p>Post body content.</p>
+        </Article.Body>
+      </Article>,
+    );
+    expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
+      'href',
+      '/category/engineering',
+    );
+  });
+
+  it('renders exactly one h1 — the post title — when a category eyebrow is present', () => {
+    renderElement(
+      <Article>
+        <Article.Header
+          title="Building a Design System"
+          category={{ label: 'Engineering', href: '/category/engineering' }}
+          meta={meta}
+        />
+        <Article.Body>
+          <p>Post body content.</p>
+        </Article.Body>
+      </Article>,
+    );
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
   it('renders the lead paragraph when provided', () => {
@@ -106,6 +163,24 @@ describe(`<${Article.name}/>`, () => {
       </Article>,
     );
     expect(screen.getByAltText('Post cover')).toBeVisible();
+  });
+
+  it('caps the coverMedia wrapper at the wide page width', () => {
+    renderElement(
+      <Article>
+        <Article.Header
+          title="Building a Design System"
+          meta={meta}
+          coverMedia={<img src="/cover.jpg" alt="Post cover" />}
+        />
+        <Article.Body>
+          <p>Post body content.</p>
+        </Article.Body>
+      </Article>,
+    );
+    expect(
+      screen.getByAltText('Post cover').parentElement?.className,
+    ).toContain('max-w-page');
   });
 
   it('does not render a coverMedia wrapper when omitted', () => {

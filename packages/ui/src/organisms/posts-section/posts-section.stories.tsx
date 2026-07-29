@@ -72,3 +72,12 @@ export const EmptyWithMessage: TStory = {
     emptyMessage: 'No posts in this category yet — check back soon.',
   },
 };
+
+export const TintedBand: TStory = {
+  args: {
+    title: 'Related reading',
+    titleId: 'related-posts-title',
+    tinted: true,
+  },
+  parameters: { layout: 'fullscreen' },
+};

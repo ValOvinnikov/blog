@@ -25,6 +25,7 @@ const meta = {
       <>
         <Article.Header
           title={faker.lorem.sentence({ min: 4, max: 8 })}
+          category={{ label: 'Engineering', href: '/category/engineering' }}
           lead={faker.lorem.paragraph()}
           meta={{
             author: {
@@ -53,6 +54,7 @@ export const WithCoverMedia: TStory = {
       <>
         <Article.Header
           title={faker.lorem.sentence({ min: 4, max: 8 })}
+          category={{ label: 'Engineering', href: '/category/engineering' }}
           lead={faker.lorem.paragraph()}
           meta={{
             author: {
@@ -69,6 +71,45 @@ export const WithCoverMedia: TStory = {
               alt="Code editor showing component code"
             />
           }
+        />
+        <Article.Body>{bodyParagraphs}</Article.Body>
+      </>
+    ),
+  },
+};
+
+export const WithUnlinkedCategory: TStory = {
+  args: {
+    children: (
+      <>
+        <Article.Header
+          title={faker.lorem.sentence({ min: 4, max: 8 })}
+          category={{ label: 'Engineering' }}
+          lead={faker.lorem.paragraph()}
+          meta={{
+            author: { name: faker.person.fullName() },
+            publishedAt,
+            formattedDate,
+          }}
+        />
+        <Article.Body>{bodyParagraphs}</Article.Body>
+      </>
+    ),
+  },
+};
+
+export const WithoutCategory: TStory = {
+  args: {
+    children: (
+      <>
+        <Article.Header
+          title={faker.lorem.sentence({ min: 4, max: 8 })}
+          lead={faker.lorem.paragraph()}
+          meta={{
+            author: { name: faker.person.fullName() },
+            publishedAt,
+            formattedDate,
+          }}
         />
         <Article.Body>{bodyParagraphs}</Article.Body>
       </>

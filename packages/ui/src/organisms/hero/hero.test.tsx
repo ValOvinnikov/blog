@@ -33,18 +33,6 @@ describe(`<${Hero.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders all provided tags', () => {
-    setup({ tags: ['Design', 'Tailwind', 'React'] });
-    expect(screen.getByText('Design')).toBeVisible();
-    expect(screen.getByText('Tailwind')).toBeVisible();
-    expect(screen.getByText('React')).toBeVisible();
-  });
-
-  it('does not render the tags container when tags is omitted', () => {
-    setup();
-    expect(screen.queryByText('Design')).not.toBeInTheDocument();
-  });
-
   it('renders Hero.Cta children', () => {
     renderElement(
       <Hero title="Building a Design System" titleId="hero-title">

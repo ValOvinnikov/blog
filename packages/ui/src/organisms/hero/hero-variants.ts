@@ -10,10 +10,8 @@ export const heroVariants = tv({
     ],
     grid: ['grid grid-cols-1 items-stretch gap-[clamp(1.25rem,4vw,2rem)]'],
     copy: ['flex h-full flex-col', 'min-w-0'],
-    meta: ['mt-2 font-mono text-meta text-subtle'],
     title: ['mt-2.5 mb-3'],
     excerpt: ['m-0', 'max-w-[52ch]'],
-    tags: ['flex flex-wrap gap-2', 'my-4'],
   },
   variants: {
     hasMedia: {

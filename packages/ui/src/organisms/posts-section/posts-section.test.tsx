@@ -17,6 +17,10 @@ const makePost = (): IPostCardData => ({
 });
 
 const posts = faker.helpers.multiple(makePost, { count: 3 });
+const [firstPost] = posts;
+if (!firstPost) {
+  throw new Error('expected `makePost` to produce at least one post');
+}
 
 const setup = customRender(PostsSection, {
   title: 'Latest',
@@ -114,5 +118,41 @@ describe(`<${PostsSection.name}/>`, () => {
     setup({ linkAs: CustomLink });
 
     expect(screen.getAllByTestId('custom-link')).toHaveLength(posts.length);
+  });
+
+  it('renders as an inline section by default (not full-bleed)', () => {
+    const { container } = setup();
+
+    const section = container.querySelector('section');
+    expect(section?.className).not.toContain('w-full');
+    expect(section?.className).not.toContain('bg-bg-subtle');
+  });
+
+  it('renders a full-bleed tinted band when tinted is true', () => {
+    const { container } = setup({ tinted: true });
+
+    const section = container.querySelector('section');
+    expect(section?.className).toContain('w-full');
+    expect(section?.className).toContain('bg-bg-subtle');
+  });
+
+  it('keeps the heading and grid inside an inner max-w-page wrapper when tinted', () => {
+    setup({ tinted: true });
+
+    const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
+    const inner = heading.parentElement;
+    expect(inner?.className).toContain('max-w-page');
+    expect(inner).toContainElement(
+      screen.getByRole('heading', { level: 3, name: firstPost.title }),
+    );
+  });
+
+  it('keeps the h2 heading markup and aria wiring unchanged when tinted', () => {
+    setup({ tinted: true });
+
+    expect(screen.getByRole('region', { name: 'Latest' })).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Latest' }),
+    ).toBeVisible();
   });
 });

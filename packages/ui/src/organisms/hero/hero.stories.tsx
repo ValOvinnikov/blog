@@ -13,9 +13,6 @@ const meta = {
     title: 'Building a Design System from Scratch',
     excerpt:
       'A deep dive into Atomic Design principles, Tailwind CSS v4, and class-variance-authority — all working together in a portable component library.',
-    tags: ['Design System', 'Tailwind', 'React'],
-    publishedAt: '2024-06-01T00:00:00Z',
-    formattedDate: 'June 1, 2024',
     titleId: 'hero-title',
     children: (
       <>
@@ -44,9 +41,6 @@ export const Minimal: TStory = {
     title: 'Notes on shipping frontend at scale',
     excerpt:
       'Architecture, performance, and design systems — from fintech and retail. Written, not generated.',
-    tags: undefined,
-    publishedAt: undefined,
-    formattedDate: undefined,
     children: undefined,
   },
 };
@@ -70,8 +64,4 @@ export const WithoutImage: TStory = {
       </Hero.Cta>
     ),
   },
-};
-
-export const WithoutTags: TStory = {
-  args: { tags: undefined },
 };

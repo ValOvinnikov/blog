@@ -29,9 +29,14 @@ export interface IPostsSectionProps extends IWithDataTestId {
   linkAs?: TAnchorElementType;
   /** Message rendered under the heading when `posts` is empty. Omit to keep the section rendering nothing (existing behavior). */
   emptyMessage?: string;
+  /**
+   * Render as a full-bleed `--bg-subtle` band: the heading and grid sit
+   * inside an inner `max-w-page` container while the section itself spans
+   * full width. Omit (or pass `false`) for the existing inline behavior,
+   * sized by the parent. Heading markup/`aria` wiring is unchanged either way.
+   */
+  tinted?: boolean;
 }
-
-const s = postsSectionVariants();
 
 /**
  * PostsSection — labeled section rendering a set of posts in a responsive
@@ -47,17 +52,15 @@ export const PostsSection = ({
   dataTestId,
   linkAs,
   emptyMessage,
+  tinted,
 }: IPostsSectionProps) => {
   const isEmpty = posts.length === 0;
   if (isEmpty && !emptyMessage) return null;
   const Component = (linkAs ?? 'a') as ElementType;
+  const s = postsSectionVariants({ tinted });
 
-  return (
-    <section
-      aria-labelledby={titleId}
-      className={s.root({ class: className })}
-      data-testid={dataTestId}
-    >
+  const content = (
+    <>
       <h2 id={titleId} className={s.label()}>
         {title}
       </h2>
@@ -82,6 +85,16 @@ export const PostsSection = ({
           ))}
         </div>
       )}
+    </>
+  );
+
+  return (
+    <section
+      aria-labelledby={titleId}
+      className={s.root({ class: className })}
+      data-testid={dataTestId}
+    >
+      {tinted ? <div className={s.inner()}>{content}</div> : content}
     </section>
   );
 };
