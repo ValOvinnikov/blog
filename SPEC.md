@@ -420,9 +420,15 @@ changing a schema does **not** change existing documents.
 - **i18n:** all routes under `src/app/[locale]/`; next-intl middleware with
   `localePrefix: 'never'` (URLs never show the locale). Locales come from
   `LOCALE_ISO_CODES` in `@blog/config` (currently `en`). Never hardcode a
-  locale; `setRequestLocale(locale)` at the top of every layout/page. Links go
-  through `SmartLink` (`@web/components/smart-link`) or the locale-aware
-  `Link` from `@web/i18n/navigation` — never `next/link` directly.
+  locale; `setRequestLocale(locale)` at the top of every layout/page. All
+  in-app links go through the single `SmartLink`
+  (`@web/components/shared/smart-link`), which is itself locale-aware — it
+  renders next-intl's `Link` internally, falling back to `next/link` only for
+  protocol-relative (`//host`) hrefs, and applies `rel="noopener noreferrer"`
+  on `target="_blank"`. Never use `next/link` or the i18n `Link` directly at a
+  call site. `@web/i18n/navigation` remains the source of the non-link
+  navigation helpers (`permanentRedirect`, `usePathname`) and of the `Link`
+  that `SmartLink` wraps internally.
 - **Root layout:** `src/app/layout.tsx` is a real root layout — it owns the
   document shell (`<html>`/`<head>`/`<body>`, global stylesheet, fonts, the
   dark-mode bootstrap script) with a fixed `lang` (`LOCALE_ISO_CODES.EN`; this

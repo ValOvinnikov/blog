@@ -65,12 +65,14 @@ When invoked, before writing any code:
   ```
 - `"use client"` only where interaction truly requires it (theme toggle, share
   buttons, mobile nav). Default to Server Components.
-- **Never use `next/link` directly.** Links go through the app's two wrappers:
-  `SmartLink` (`@web/components/smart-link` — wraps `next/link`, derives `rel`
-  from `target`, and is the polymorphic `as`/`linkAs` target for `@blog/ui`
-  components) or the locale-aware `Link` from `@web/i18n/navigation` (next-intl)
-  where the route is locale-prefixed. This applies everywhere — routes, layouts,
-  components, and Server Components alike.
+- **Never use `next/link` or the i18n `Link` directly.** All links go through the
+  single `SmartLink` (`@web/components/shared/smart-link`): it is locale-aware
+  (renders next-intl's `Link` internally, falling back to `next/link` only for
+  protocol-relative hrefs), derives `rel` from `target`, and is the polymorphic
+  `as`/`linkAs` target for `@blog/ui` components. `@web/i18n/navigation` still
+  provides `permanentRedirect`/`usePathname`, but never import its `Link` at a
+  call site. This applies everywhere — routes, layouts, components, and Server
+  Components alike.
 - `transpilePackages: ['@blog/ui', '@blog/service', '@blog/config']` is set in
   `next.config.ts` — keep it in sync if a new workspace package is consumed.
 
@@ -158,9 +160,8 @@ When invoked, before writing any code:
 - **Consuming `@blog/ui` compound components** (`Header`, `Footer`, `Hero`,
   `PostCard`) — see `ui-library-practices` ("Compound components" →
   `compound-components.md`) for the full pattern. From here it's just composition: render named slots as children,
-  pass framework-coupled pieces directly into them (`SmartLink`, the
-  locale-aware `Link` from `@web/i18n/navigation`, `SanityImage`). Never
-  deep-import sub-components — always use dot-notation on the assembled
+  pass framework-coupled pieces directly into them (`SmartLink`,
+  `SanityImage`). Never deep-import sub-components — always use dot-notation on the assembled
   export (`Header.Brand`, `PostCard.Title`).
 - **Interactive components** (popover, dropdown, menu, disclosure, tabs,
   clipboard, focus trap, outside-click / Escape) — follow the
