@@ -464,10 +464,13 @@ changing a schema does **not** change existing documents.
   no `rel=next/prev`, out-of-range → hard 404 (§1 routing conventions).
 - JSON-LD `Article`/`BlogPosting` on post pages (#94).
 - **Breadcrumbs & structured data (#835):** every content route renders a
-  `Breadcrumbs` trail (`@blog/ui` molecule) as page chrome — composed as a
-  sibling above the page's content organism, never nested inside it —
-  alongside a `BreadcrumbList` JSON-LD schema (`buildBreadcrumbListSchema`)
-  built from the same trail. Post pages (`/blog/{slug}`, #815) render
+  `Breadcrumbs` trail (`@blog/ui` molecule) as page chrome, wrapped in a
+  web-level `BreadcrumbBar` (#903) rendered as a true DOM sibling of
+  `<main>` — immediately after `<Header>`, before `<main>`, never nested
+  inside it — aligned to `max-w-page` (1120px) on every page regardless of
+  that page's own content width. The home page renders no bar. This is
+  paired with a `BreadcrumbList` JSON-LD schema (`buildBreadcrumbListSchema`)
+  built from the same trail, still co-located per page. Post pages (`/blog/{slug}`, #815) render
   `Home › Category › Post`, sitting next to the existing `BlogPosting`
   JSON-LD. Category archives (`/category/{slug}`, #836) render
   `Home › {Category}`; tag archives (`/tag/{slug}`, #837) render
