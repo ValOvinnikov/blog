@@ -4,6 +4,7 @@ export * from './button';
 export * from './caption';
 export * from './eyebrow';
 export * from './heading';
+export * from './icon';
 export * from './icon-button';
 export * from './inline-code';
 export * from './logo';

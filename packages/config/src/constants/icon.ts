@@ -1,0 +1,21 @@
+import type { TValueOf } from '@blog/config/utils';
+
+export const ICONS = {
+  SUN: 'SUN',
+  MOON: 'MOON',
+  SHARE: 'SHARE',
+  COPY: 'COPY',
+  CHECK: 'CHECK',
+  CHECK_SHEET: 'CHECK_SHEET',
+  EXTERNAL_LINK: 'EXTERNAL_LINK',
+  MENU: 'MENU',
+  MENU_ROWS: 'MENU_ROWS',
+  CLOSE: 'CLOSE',
+  X: 'X',
+  GITHUB: 'GITHUB',
+  LINKEDIN: 'LINKEDIN',
+  FACEBOOK: 'FACEBOOK',
+  RSS: 'RSS',
+} as const;
+
+export type TIconName = TValueOf<typeof ICONS>;

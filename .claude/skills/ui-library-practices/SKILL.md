@@ -284,8 +284,10 @@ slot/media rules → **`compound-components.md`**.
 
 ## Icons
 
-- **Use `lucide-react` for all icons.** No inline SVG.
-- Pass `size` and `strokeWidth` props: `<Sun size={18} strokeWidth={1.6} aria-hidden="true" />`.
+- **Use the `<Icon name={ICONS.X}>` atom** (`@blog/ui/atoms/icon`) for all icons.
+  `ICONS`/`TIconName` come from `@blog/config`; each maps to a bespoke local SVG
+  through the icon registry. No `lucide-react`, no ad-hoc inline SVG in components.
+- Pass `size` and `strokeWidth` props: `<Icon name={ICONS.SUN} size={18} strokeWidth={1.6} aria-hidden="true" />`.
 - Icon-only interactive elements must have `aria-label` and `title`.
 
 ## Tests
@@ -323,7 +325,7 @@ issues and ensures every committed file is consistently formatted.
 - [ ] Interactive/foreign content hosted via a `ReactNode` slot, not a forwarded
       controlled-props bag. Data props shaped to accept the view-model directly.
 - [ ] Stories file created alongside the component.
-- [ ] Icons from `lucide-react`; no inline SVG.
+- [ ] Icons via `<Icon name={ICONS.X}>` (`@blog/ui/atoms/icon`); no `lucide-react`, no ad-hoc inline SVG.
 - [ ] `describe(Component.name, ...)` and `beforeEach` for shared setup.
 - [ ] Uses token utilities; dark mode intact.
 - [ ] Exported from the barrel (`index.ts` → `atoms/index.ts` → `src/index.ts`);

@@ -1,6 +1,6 @@
-import type { IWithDataTestId } from '@blog/config';
+import { ICONS, Size, type IWithDataTestId } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
 import { IconButton } from '@blog/ui/atoms/icon-button';
-import { Moon, Sun } from 'lucide-react';
 
 import { themeTogglePlaceholderVariants } from './theme-toggle-variants';
 
@@ -41,9 +41,9 @@ export const ThemeToggle = ({
     >
       {mounted ? (
         isDark ? (
-          <Sun size={18} strokeWidth={1.6} aria-hidden="true" />
+          <Icon name={ICONS.SUN} size={Size.MD} />
         ) : (
-          <Moon size={18} strokeWidth={1.6} aria-hidden="true" />
+          <Icon name={ICONS.MOON} size={Size.MD} />
         )
       ) : (
         <span className={themeTogglePlaceholderVariants()} aria-hidden="true" />
