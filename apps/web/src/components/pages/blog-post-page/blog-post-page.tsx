@@ -32,9 +32,8 @@ const s = blogPostPageVariants();
  * eyebrow, title, `PostMeta` with `PostShare` in its share slot, lead, and
  * cover image; `Article.Body`/`Article.Footer` narrowed back to `max-w-post`
  * for the reading measure), plus a `BlogPosting` JSON-LD tag and, when the
- * post has any, a tinted "More from {category}" `PostsSection` band after
- * the article. `Header`/`Footer` (site chrome) stay owned by
- * `[locale]/layout.tsx`.
+ * post has any, a tinted "Related reading" `PostsSection` band after the
+ * article. `Header`/`Footer` (site chrome) stay owned by `[locale]/layout.tsx`.
  */
 export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   const result = await service.pages.post.v1.getPost(slug);
@@ -149,7 +148,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
         {relatedPostItems.length > 0 && (
           <PostsSection
             posts={relatedPostItems}
-            title={`More from ${category.title}`}
+            title="Related reading"
             titleId="related-posts-title"
             linkAs={SmartLink}
             tinted

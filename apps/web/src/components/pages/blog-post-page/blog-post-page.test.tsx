@@ -245,7 +245,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders a "More from {category}" section when relatedPosts is non-empty', async () => {
+  it('renders a "Related reading" section when relatedPosts is non-empty, even when a related post is in a different category (tag-matched, not category-scoped)', async () => {
     getPostMock.mockResolvedValue({
       ok: true,
       data: {
@@ -268,9 +268,9 @@ describe(`<${BlogPostPage.name}/>`, () => {
               imageUrl: undefined,
             },
             category: {
-              id: 'cat-1',
-              title: 'Engineering',
-              slug: 'engineering',
+              id: 'cat-2',
+              title: 'Design',
+              slug: 'design',
             },
           },
         ],
@@ -279,12 +279,12 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('More from Engineering')).toBeVisible();
+    expect(screen.getByText('Related reading')).toBeVisible();
     const link = screen.getByRole('link', { name: 'A Related Post' });
     expect(link).toHaveAttribute('href', '/blog/a-related-post');
   });
 
-  it('omits the "More from {category}" section when relatedPosts is empty', async () => {
+  it('omits the "Related reading" section when relatedPosts is empty', async () => {
     getPostMock.mockResolvedValue({
       ok: true,
       data: { ...mockPostDetail, relatedPosts: [] },
@@ -292,6 +292,6 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.queryByText('More from Engineering')).not.toBeInTheDocument();
+    expect(screen.queryByText('Related reading')).not.toBeInTheDocument();
   });
 });
