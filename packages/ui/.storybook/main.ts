@@ -2,6 +2,7 @@ import { fileURLToPath } from 'node:url';
 
 import type { StorybookConfig } from '@storybook/react-vite';
 import tailwindcss from '@tailwindcss/vite';
+import svgr from 'vite-plugin-svgr';
 
 // main.ts is loaded as ESM (no __dirname/require), so resolve the src path
 // via import.meta.url — see the ui-storybook skill.
@@ -14,6 +15,11 @@ const config: StorybookConfig = {
   viteFinal: async (config) => {
     config.plugins = config.plugins ?? [];
     config.plugins.push(tailwindcss());
+    // Bare `.svg` imports resolve to an SVGR React component; the `?url`
+    // variant isn't matched by this filter, so it falls through to Vite's
+    // built-in asset-URL handling untouched. Mirrors the Vitest
+    // (vitest.config.ts) and Turbopack (apps/web/next.config.ts) config.
+    config.plugins.push(svgr({ include: '**/*.svg' }));
     config.esbuild = {
       ...config.esbuild,
       jsx: 'automatic',

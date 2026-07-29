@@ -93,7 +93,30 @@ const securityHeaders = [
 ];
 
 const config: NextConfig = {
-  turbopack: { root: turbopackRoot },
+  turbopack: {
+    root: turbopackRoot,
+    rules: {
+      // @blog/ui's icon assets (packages/ui/src/assets/icons) ship from
+      // source (transpilePackages below), so Turbopack sees their raw .svg
+      // imports directly:
+      //   import Sun from '.../sun.svg'        -> SVGR React component
+      //   import SunUrl from '.../sun.svg?url' -> emitted asset URL
+      // The two rules are disjoint on the `?url` query so exactly one
+      // applies per import. Mirrors the Vitest/Storybook (vite-plugin-svgr)
+      // config in packages/ui.
+      '*.svg': [
+        {
+          condition: { query: /url/ },
+          type: 'asset',
+        },
+        {
+          condition: { not: { query: /url/ } },
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      ],
+    },
+  },
   transpilePackages: ['@blog/ui', '@blog/service', '@blog/config'],
   images: {
     remotePatterns: [

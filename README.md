@@ -62,6 +62,29 @@ data through `service` and pass plain typed props into `ui`. Internal packages
 ship raw TypeScript (Just-in-Time pattern) and are transpiled by the web app via
 `transpilePackages`.
 
+### SVG icon imports
+
+`@blog/ui` ships its icon set as raw SVGs under `packages/ui/src/assets/icons/`
+(source: `docs/design-reference/icons/`). SVGR turns a bare `.svg` import into
+a typed React component; the `?url` suffix bypasses SVGR and resolves to the
+emitted asset's URL instead — same two-shape convention everywhere it's
+configured:
+
+- **Next.js/Turbopack** (`apps/web/next.config.ts`) — `turbopack.rules` with
+  `@svgr/webpack`, split by a `condition.query` match on `?url`. `@blog/ui`
+  ships from source (`transpilePackages`), so Turbopack sees these imports
+  directly wherever `@blog/ui` is consumed.
+- **Storybook** (`packages/ui/.storybook/main.ts`, `apps/web/.storybook/main.ts`)
+  and **Vitest** (`packages/ui/vitest.config.ts`, `apps/web/vitest.config.ts`)
+  — both Vite-based, so `vite-plugin-svgr` (`include: '**/*.svg'`) handles the
+  component case; the `?url` case needs no extra config since it's Vite's own
+  built-in asset-URL handling.
+
+Ambient module types (`declare module '*.svg'` / `'*.svg?url'`) live in
+`packages/ui/src/assets/icons/svg.d.ts` — only `@blog/ui` needs them, since it's
+the only workspace that imports raw SVGs; `apps/web` only ever consumes
+`@blog/ui`'s already-typed components.
+
 ## Getting started
 
 Requires **Node 20.19+** and **pnpm 9+**.
