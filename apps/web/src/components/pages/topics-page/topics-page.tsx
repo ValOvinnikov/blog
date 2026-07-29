@@ -1,7 +1,13 @@
 import { routes } from '@blog/config';
 import { Heading, Text } from '@blog/ui/atoms';
+import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
+import { JsonLd } from '@web/components/shared/json-ld';
+import { SmartLink } from '@web/components/shared/smart-link';
 import { Link } from '@web/i18n/navigation';
+import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
+import { env } from '@web/utils/env/env';
 import { getCategoriesSafely } from '@web/utils/get-categories-safely';
+import { getTranslations } from 'next-intl/server';
 
 import { topicsPageVariants } from './topics-page-variants';
 
@@ -14,7 +20,8 @@ const s = topicsPageVariants();
  * *index*, not a post archive, so it uses its own lightweight shell rather
  * than forcing category cards through `BlogPageTemplate`'s `posts` slot,
  * which is built specifically for post grids (blog index, category, tag,
- * author archives).
+ * author archives). Renders a `Home › Topics` `Breadcrumbs` trail (plus its
+ * `BreadcrumbList` JSON-LD) above the heading.
  *
  * `getCategoriesSafely` unwraps `getCategories`'s `AsyncResult`, falling
  * back to an empty list on failure — this is a category index, not
@@ -22,10 +29,28 @@ const s = topicsPageVariants();
  * whole page (or, at build time, the whole static export).
  */
 export async function TopicsPage() {
-  const categories = await getCategoriesSafely();
+  const [categories, breadcrumbsT] = await Promise.all([
+    getCategoriesSafely(),
+    getTranslations('breadcrumbs'),
+  ]);
+
+  const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
+  const trail: IBreadcrumbItem[] = [
+    { label: breadcrumbsT('home'), href: routes.home() },
+    { label: breadcrumbsT('topics'), href: routes.topics() },
+  ];
+  const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
 
   return (
     <main className={s.root()}>
+      {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
+
+      <Breadcrumbs
+        items={trail}
+        ariaLabel={breadcrumbsT('ariaLabel')}
+        linkAs={SmartLink}
+      />
+
       <Heading level={1} className={s.heading()}>
         Topics
       </Heading>

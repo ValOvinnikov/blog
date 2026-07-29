@@ -1,4 +1,4 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 
 import { TopicsPage } from './topics-page';
 
@@ -16,6 +16,21 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/i18n/navigation', () => ({
   Link: ({
+    href,
+    children,
+    ...rest
+  }: {
+    href: string;
+    children: React.ReactNode;
+  }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
+}));
+
+vi.mock('@web/components/shared/smart-link', () => ({
+  SmartLink: ({
     href,
     children,
     ...rest
@@ -114,7 +129,8 @@ describe(`<${TopicsPage.name}/>`, () => {
     await setup();
 
     expect(screen.getByText('No topics yet.')).toBeVisible();
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    // Only the breadcrumb "Home" link renders — no category cards.
+    expect(screen.getAllByRole('link')).toHaveLength(1);
   });
 
   it('renders the empty state instead of crashing when the fetch resolves to a failure result', async () => {
@@ -127,8 +143,41 @@ describe(`<${TopicsPage.name}/>`, () => {
     await setup();
 
     expect(screen.getByText('No topics yet.')).toBeVisible();
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    // Only the breadcrumb "Home" link renders — no category cards.
+    expect(screen.getAllByRole('link')).toHaveLength(1);
 
     errorSpy.mockRestore();
+  });
+
+  it('renders the Home › Topics breadcrumbs trail', async () => {
+    getCategoriesMock.mockResolvedValue({ ok: true, data: [] });
+
+    await setup();
+
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+
+    const homeLink = within(nav).getByRole('link', { name: 'Home' });
+    expect(homeLink).toHaveAttribute('href', '/');
+
+    const current = within(nav).getByText('Topics');
+    expect(current).toHaveAttribute('aria-current', 'page');
+    expect(current.tagName).not.toBe('A');
+  });
+
+  it('renders the JSON-LD BreadcrumbList schema script', async () => {
+    getCategoriesMock.mockResolvedValue({ ok: true, data: [] });
+
+    const { container } = await setup();
+
+    const scripts = container.querySelectorAll(
+      'script[type="application/ld+json"]',
+    );
+    const breadcrumbScript = Array.from(scripts).find((script) =>
+      script.textContent?.includes('"@type":"BreadcrumbList"'),
+    );
+    expect(breadcrumbScript).toBeDefined();
+    expect(breadcrumbScript?.textContent).toContain(
+      '"item":"https://example.com/topics"',
+    );
   });
 });
