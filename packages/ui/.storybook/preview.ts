@@ -124,8 +124,9 @@ const preview: Preview = {
     // Custom viewport presets matching this repo's Tailwind breakpoints
     // (`sm` 640px, `md` 768px — Tailwind v4 defaults, unmodified by
     // `configs/tailwind/preset.ts`), available from the toolbar for any
-    // story. Don't redefine viewports or override them per-story — see the
-    // `ui-storybook` skill.
+    // story. Don't redefine viewports or override them per-story, except the
+    // narrow case documented in the `ui-storybook` skill (a component whose
+    // rendering forks on a real, non-container media-query breakpoint).
     viewport: {
       viewports: {
         phone: {
