@@ -3,6 +3,7 @@ import type { TValueOf } from '@blog/config/utils';
 export const ICONS = {
   SUN: 'SUN',
   MOON: 'MOON',
+  HOUSE: 'HOUSE',
   SHARE: 'SHARE',
   COPY: 'COPY',
   CHECK: 'CHECK',
