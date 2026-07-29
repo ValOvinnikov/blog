@@ -4,6 +4,8 @@ import { Hero } from '@blog/ui/organisms';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 
+import { heroHiddenLabelVariants } from './hero-module-variants';
+
 export interface IHeroModuleProps {
   id: string;
   locale: string;
@@ -48,7 +50,9 @@ export async function HeroModule({ id }: IHeroModuleProps) {
             >
               {primaryAction.label}
               {primaryAction.hiddenLabelSuffix && (
-                <span className="sr-only">{`: ${primaryAction.hiddenLabelSuffix}`}</span>
+                <span
+                  className={heroHiddenLabelVariants()}
+                >{`: ${primaryAction.hiddenLabelSuffix}`}</span>
               )}
             </LinkButton>
           )}
