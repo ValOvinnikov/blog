@@ -69,15 +69,18 @@ export function toHeroModule(
           href: routes.post(heroPost.slug),
           target: undefined,
           platform: undefined,
-          // Only the generic fallback label needs a descriptive aria-label
-          // (Lighthouse's link-text audit fails on bare "Read more"); an
-          // editor-authored label is trusted as already descriptive. Uses
-          // the linked post's own title, not `title` above, since that can
-          // be an editor-overridden hero title that no longer matches the
-          // post the CTA actually links to.
-          ariaLabel: raw.primaryActionLabel
+          // Lighthouse's SEO link-text audit reads the link's visible text
+          // content, not `aria-label` — an `aria-label` on the generic
+          // fallback label doesn't satisfy it. Only the fallback label needs
+          // a descriptive suffix; an editor-authored label is trusted as
+          // already descriptive. Uses the linked post's own title, not
+          // `title` above, since that can be an editor-overridden hero title
+          // that no longer matches the post the CTA actually links to. The
+          // web layer renders this as visually-hidden (sr-only) text
+          // appended to the visible label, so it counts as link text.
+          hiddenLabelSuffix: raw.primaryActionLabel
             ? undefined
-            : `${DEFAULT_PRIMARY_ACTION_LABEL}: ${heroPost.title}`,
+            : heroPost.title,
         }
       : undefined,
     secondaryAction: toLink(raw.secondaryAction),
