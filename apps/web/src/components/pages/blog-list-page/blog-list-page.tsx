@@ -1,9 +1,14 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
+import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { CategoryChipList } from '@web/components/shared/category-chip-list';
+import { JsonLd } from '@web/components/shared/json-ld';
+import { SmartLink } from '@web/components/shared/smart-link';
 import { Link } from '@web/i18n/navigation';
+import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
+import { env } from '@web/utils/env/env';
 import { getCategoriesSafely } from '@web/utils/get-categories-safely';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
@@ -14,13 +19,16 @@ type TBlogListPageProps = { page: number };
 /**
  * BlogListPage — shared composition for `/blog` (page 1) and
  * `/blog/page/[page]` (pages ≥ 2): fetches one page window via the blog
- * service and renders it through the pure ui organisms.
+ * service, renders a `Home › Blog` `Breadcrumbs` trail (plus its
+ * `BreadcrumbList` JSON-LD) as page chrome above the archive content, then
+ * renders it through the pure ui organisms.
  */
 export async function BlogListPage({ page }: TBlogListPageProps) {
-  const [result, categories, t] = await Promise.all([
+  const [result, categories, t, breadcrumbsT] = await Promise.all([
     service.pages.blog.v1.getIndexPage({ page }),
     getCategoriesSafely(),
     getTranslations('pagination'),
+    getTranslations('breadcrumbs'),
   ]);
 
   if (!result.ok) {
@@ -39,31 +47,49 @@ export async function BlogListPage({ page }: TBlogListPageProps) {
 
   const items = await toPostListItems(posts);
 
+  const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
+  const trail: IBreadcrumbItem[] = [
+    { label: breadcrumbsT('home'), href: routes.home() },
+    { label: breadcrumbsT('blog'), href: routes.blogIndex() },
+  ];
+  const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
+
   return (
-    <BlogPageTemplate
-      heading={heading}
-      supportingText={supportingText}
-      categoryChips={<CategoryChipList categories={categories} />}
-      posts={
-        <PostsSection
-          posts={items}
-          title="All posts"
-          titleId="blog-posts-title"
-          linkAs={Link}
-          emptyMessage="No posts yet."
-        />
-      }
-      pagination={
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          createHref={routes.blogIndex}
-          ariaLabel={t('ariaLabel', { pageType: 'Blog' })}
-          previousLabel={t('previous')}
-          nextLabel={t('next')}
-          linkAs={Link}
-        />
-      }
-    />
+    <>
+      {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
+
+      <BlogPageTemplate
+        heading={heading}
+        breadcrumbs={
+          <Breadcrumbs
+            items={trail}
+            ariaLabel={breadcrumbsT('ariaLabel')}
+            linkAs={SmartLink}
+          />
+        }
+        supportingText={supportingText}
+        categoryChips={<CategoryChipList categories={categories} />}
+        posts={
+          <PostsSection
+            posts={items}
+            title="All posts"
+            titleId="blog-posts-title"
+            linkAs={Link}
+            emptyMessage="No posts yet."
+          />
+        }
+        pagination={
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            createHref={routes.blogIndex}
+            ariaLabel={t('ariaLabel', { pageType: 'Blog' })}
+            previousLabel={t('previous')}
+            nextLabel={t('next')}
+            linkAs={Link}
+          />
+        }
+      />
+    </>
   );
 }

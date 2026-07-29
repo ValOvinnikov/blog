@@ -100,7 +100,7 @@ describe(HeroModule, () => {
     expect(img.getAttribute('src')).not.toContain('h=900');
   });
 
-  it('gives the default "Read more" CTA a descriptive accessible name', async () => {
+  it('gives the default "Read more" CTA a descriptive accessible name via visually-hidden text', async () => {
     getHeroMock.mockResolvedValue({
       ok: true,
       data: {
@@ -112,7 +112,7 @@ describe(HeroModule, () => {
           label: 'Read more',
           href: '/blog/welcome-to-the-blog',
           target: undefined,
-          ariaLabel: 'Read more: Welcome to the blog',
+          hiddenLabelSuffix: 'Welcome to the blog',
         },
         secondaryAction: undefined,
       },
@@ -120,8 +120,37 @@ describe(HeroModule, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('link', { name: 'Read more: Welcome to the blog' }),
-    ).toBeVisible();
+    const link = screen.getByRole('link', {
+      name: 'Read more: Welcome to the blog',
+    });
+    expect(link).toBeVisible();
+    expect(link).toHaveTextContent('Read more: Welcome to the blog');
+  });
+
+  it('renders no hidden suffix when a custom (already-descriptive) label is authored', async () => {
+    getHeroMock.mockResolvedValue({
+      ok: true,
+      data: {
+        eyebrow: undefined,
+        title: 'Welcome to the blog',
+        subtitle: undefined,
+        sanityImage: undefined,
+        primaryAction: {
+          label: 'Explore our latest stories',
+          href: '/blog/welcome-to-the-blog',
+          target: undefined,
+          hiddenLabelSuffix: undefined,
+        },
+        secondaryAction: undefined,
+      },
+    });
+
+    await setup();
+
+    const link = screen.getByRole('link', {
+      name: 'Explore our latest stories',
+    });
+    expect(link).toBeVisible();
+    expect(link).toHaveTextContent('Explore our latest stories');
   });
 });

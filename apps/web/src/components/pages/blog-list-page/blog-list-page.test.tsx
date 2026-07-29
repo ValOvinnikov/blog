@@ -1,4 +1,4 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { makeCategoryWithPostCount } from '@web/testing/shared/category/fixtures';
 import {
   makePostCard,
@@ -26,6 +26,21 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/i18n/navigation', () => ({
   Link: ({
+    href,
+    children,
+    ...rest
+  }: {
+    href: string;
+    children: React.ReactNode;
+  }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
+}));
+
+vi.mock('@web/components/shared/smart-link', () => ({
+  SmartLink: ({
     href,
     children,
     ...rest
@@ -188,6 +203,58 @@ describe(`<${BlogListPage.name}/>`, () => {
     expect(screen.getByRole('link', { name: 'News' })).toHaveAttribute(
       'href',
       '/category/news',
+    );
+  });
+
+  it('renders the Home › Blog breadcrumbs trail', async () => {
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Blog',
+        supportingText: 'Essays and notes.',
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    await setup();
+
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+
+    const homeLink = within(nav).getByRole('link', { name: 'Home' });
+    expect(homeLink).toHaveAttribute('href', '/');
+
+    const current = within(nav).getByText('Blog');
+    expect(current).toHaveAttribute('aria-current', 'page');
+    expect(current.tagName).not.toBe('A');
+  });
+
+  it('renders the JSON-LD BreadcrumbList schema script', async () => {
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Blog',
+        supportingText: 'Essays and notes.',
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    const { container } = await setup();
+
+    const scripts = container.querySelectorAll(
+      'script[type="application/ld+json"]',
+    );
+    const breadcrumbScript = Array.from(scripts).find((script) =>
+      script.textContent?.includes('"@type":"BreadcrumbList"'),
+    );
+    expect(breadcrumbScript).toBeDefined();
+    expect(breadcrumbScript?.textContent).toContain(
+      '"item":"https://example.com/blog"',
     );
   });
 });
