@@ -28,7 +28,14 @@
     ".storybook/**/*.tsx",
     "e2e/**/*.ts",
     "playwright.config.ts",
-    "index.css.d.ts"
+    "index.css.d.ts",
+    // @blog/ui's wildcard subpath export ("./*": "./src/*", aliased below)
+    // means web's program type-checks @blog/ui *source* directly, so its
+    // ambient module declarations (e.g. the `*.svg`/`*.svg?url` types in
+    // src/assets/icons/svg.d.ts) must be in this program too — TS only
+    // loads global ambient .d.ts files via a program's own include, never
+    // transitively through import resolution.
+    "../../packages/ui/src/**/*.d.ts"
   ],
   "exclude": ["node_modules"]
 }

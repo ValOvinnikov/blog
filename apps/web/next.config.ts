@@ -106,11 +106,11 @@ const config: NextConfig = {
       // config in packages/ui.
       '*.svg': [
         {
-          condition: { query: /url/ },
+          condition: { query: /^\?url$/ },
           type: 'asset',
         },
         {
-          condition: { not: { query: /url/ } },
+          condition: { not: { query: /^\?url$/ } },
           loaders: ['@svgr/webpack'],
           as: '*.js',
         },
@@ -119,6 +119,13 @@ const config: NextConfig = {
   },
   transpilePackages: ['@blog/ui', '@blog/service', '@blog/config'],
   images: {
+    // This app never uses Next's static-image-import feature (all imagery
+    // is remote Sanity CDN URLs via SanityImage) — disabling it removes
+    // Next's own ambient `declare module '*.svg' { const content: any }`
+    // shim (next/image-types/global.d.ts), which would otherwise conflict
+    // with @blog/ui's typed SVGR declarations (svg.d.ts) for any .svg
+    // import transitively type-checked through @blog/ui's source.
+    disableStaticImages: true,
     remotePatterns: [
       {
         protocol: 'https',

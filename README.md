@@ -81,9 +81,19 @@ configured:
   built-in asset-URL handling.
 
 Ambient module types (`declare module '*.svg'` / `'*.svg?url'`) live in
-`packages/ui/src/assets/icons/svg.d.ts` — only `@blog/ui` needs them, since it's
-the only workspace that imports raw SVGs; `apps/web` only ever consumes
-`@blog/ui`'s already-typed components.
+`packages/ui/src/assets/icons/svg.d.ts`. `@blog/ui`'s own `tsconfig.json`
+picks them up via its `src` include; **`apps/web/tsconfig.json` also globs
+them in** (`../../packages/ui/src/**/*.d.ts`) — `@blog/ui` exports a wildcard
+subpath (`"./*": "./src/*"`), so web's `@blog/ui/*` alias resolves straight to
+`@blog/ui` source, and `tsc` type-checks that source (including any raw
+`.svg` import it makes) as part of web's own program. TypeScript never picks
+up a global ambient `.d.ts` transitively through import resolution — only via
+each program's own `include` — so both tsconfigs need the glob independently.
+`apps/web/next.config.ts` also sets `images.disableStaticImages: true`
+(unused otherwise — all imagery is remote Sanity CDN URLs) so Next's own
+built-in `declare module '*.svg' { const content: any }` shim
+(`next/image-types/global.d.ts`) never lands in `next-env.d.ts` and conflicts
+with `@blog/ui`'s typed declaration for the same wildcard pattern.
 
 ## Getting started
 
