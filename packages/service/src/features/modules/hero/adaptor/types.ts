@@ -8,7 +8,7 @@ import type { ILink, ISanityImage, TMaybeUndefined } from '@blog/config';
  * real (if visually hidden) text. `hiddenLabelSuffix` carries that text;
  * the web layer renders it as an `sr-only` span appended to `label`.
  */
-export type THeroPrimaryAction = Omit<ILink, 'ariaLabel'> & {
+type THeroPrimaryAction = Omit<ILink, 'ariaLabel'> & {
   hiddenLabelSuffix: TMaybeUndefined<string>;
 };
 
