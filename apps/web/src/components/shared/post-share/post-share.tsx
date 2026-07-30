@@ -6,6 +6,7 @@ import { type IShareLinkItem, PopoverMenu } from '@blog/ui/molecules';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useCopyToClipboard } from '@web/hooks/use-copy-to-clipboard';
 import { usePopover } from '@web/hooks/use-popover';
+import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
 import { postShareLiveRegionVariants } from './post-share-variants';
@@ -30,6 +31,7 @@ export type TPostShareProps = {
  * <PostMeta author={post.author} share={<PostShare url={url} title={post.title} links={shareLinks} />} />
  */
 export function PostShare({ url, title, links, className }: TPostShareProps) {
+  const t = useTranslations('postShare');
   const panelId = useId();
   const { open, toggle, triggerRef, panelRef } = usePopover();
   const { isCopied, copy } = useCopyToClipboard();
@@ -38,7 +40,7 @@ export function PostShare({ url, title, links, className }: TPostShareProps) {
     <PopoverMenu className={className}>
       <PopoverMenu.Trigger
         ref={triggerRef}
-        ariaLabel={`Share "${title}"`}
+        ariaLabel={t('shareAriaLabel', { title })}
         open={open}
         panelId={panelId}
         onClick={toggle}
@@ -49,7 +51,7 @@ export function PostShare({ url, title, links, className }: TPostShareProps) {
         ref={panelRef}
         id={panelId}
         open={open}
-        ariaLabel="Share options"
+        ariaLabel={t('panelAriaLabel')}
       >
         <PopoverMenu.Item
           icon={
@@ -61,7 +63,7 @@ export function PostShare({ url, title, links, className }: TPostShareProps) {
           }
           onClick={() => copy(url)}
         >
-          {isCopied ? 'Copied' : 'Copy link'}
+          {isCopied ? t('copied') : t('copyLink')}
         </PopoverMenu.Item>
         <PopoverMenu.Separator />
         {links.map((link) => (
@@ -81,7 +83,7 @@ export function PostShare({ url, title, links, className }: TPostShareProps) {
         aria-live="polite"
         className={postShareLiveRegionVariants()}
       >
-        {isCopied ? 'Link copied' : ''}
+        {isCopied ? t('linkCopied') : ''}
       </span>
     </PopoverMenu>
   );
