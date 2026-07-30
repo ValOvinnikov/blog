@@ -1,7 +1,6 @@
 import type { IWithDataTestId } from '@blog/config';
+import { IconButton } from '@blog/ui/atoms/icon-button';
 import type { ButtonHTMLAttributes, Ref } from 'react';
-
-import { popoverMenuTriggerVariants } from './popover-menu-trigger-variants';
 
 export interface IPopoverMenuTriggerProps
   extends ButtonHTMLAttributes<HTMLButtonElement>, IWithDataTestId {
@@ -24,23 +23,15 @@ export const PopoverMenuTrigger = ({
   open,
   panelId,
   ref,
-  className,
-  children,
-  dataTestId,
   ...rest
 }: IPopoverMenuTriggerProps) => (
-  <button
+  <IconButton
     {...rest}
     ref={ref}
-    type="button"
+    ariaLabel={ariaLabel}
+    title={ariaLabel}
     aria-haspopup="menu"
     aria-expanded={open}
     aria-controls={panelId}
-    aria-label={ariaLabel}
-    title={ariaLabel}
-    data-testid={dataTestId}
-    className={popoverMenuTriggerVariants({ class: className })}
-  >
-    {children}
-  </button>
+  />
 );
