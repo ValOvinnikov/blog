@@ -62,7 +62,7 @@
     "storybook": "catalog:",
     "tailwindcss": "^4.3.3",
     "typescript": "catalog:",
-    "vite-plugin-svgr": "^5.2.0",
+    "vite-plugin-svgr": "catalog:",
     "vitest": "catalog:"
   }
 }
