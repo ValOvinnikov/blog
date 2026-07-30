@@ -9,7 +9,7 @@ import { usePopover } from './use-popover';
  * be exercised directly against the hook, independent of any component.
  */
 const Harness = () => {
-  const { open, toggle, triggerRef, panelRef } = usePopover();
+  const { open, toggle, close, triggerRef, panelRef } = usePopover();
 
   return (
     <div>
@@ -23,7 +23,9 @@ const Harness = () => {
       </button>
       <div ref={panelRef} hidden={!open}>
         <button type="button">first</button>
-        <button type="button">second</button>
+        <button type="button" onClick={close}>
+          second
+        </button>
       </div>
     </div>
   );
@@ -84,6 +86,17 @@ describe(usePopover, () => {
     await user.click(trigger);
 
     fireEvent.mouseDown(document.body);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('exposes a close function that closes the panel and returns focus to the trigger', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+
+    await user.click(trigger);
+    await user.click(screen.getByRole('button', { name: 'second' }));
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
     expect(document.activeElement).toBe(trigger);

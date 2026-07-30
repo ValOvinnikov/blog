@@ -28,7 +28,13 @@ export type TUsePopoverOptions = {
  * their trigger/panel elements.
  *
  * The caller wires `triggerRef` onto `PopoverMenu.Trigger`'s `ref` and
- * `panelRef` onto `PopoverMenu.Panel`'s `ref`.
+ * `panelRef` onto `PopoverMenu.Panel`'s `ref`. `close` is exposed alongside
+ * `toggle` for callers that need to dismiss the panel from an action inside
+ * it that isn't itself a focus-out — e.g. `PostContentsRail`'s mobile panel
+ * closing on a TOC link click: the click keeps focus inside the panel (on
+ * the link just clicked), so `closeOnFocusOut` never fires, and only an
+ * explicit `close()` call collapses the overlay before the in-page anchor
+ * jump happens.
  */
 export const usePopover = ({
   trapFocus,
@@ -40,12 +46,12 @@ export const usePopover = ({
   const getTrigger = useCallback(() => triggerRef.current, []);
   const getPanel = useCallback(() => panelRef.current, []);
 
-  const { open, toggle } = useDismissibleMenu({
+  const { open, toggle, close } = useDismissibleMenu({
     getTrigger,
     getPanel,
     trapFocus,
     closeOnFocusOut,
   });
 
-  return { open, toggle, triggerRef, panelRef };
+  return { open, toggle, close, triggerRef, panelRef };
 };

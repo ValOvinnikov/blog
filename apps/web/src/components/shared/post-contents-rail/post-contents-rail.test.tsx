@@ -1,5 +1,10 @@
 import userEvent from '@testing-library/user-event';
-import { customRender, fireEvent, screen } from '@web/testing/custom-render';
+import {
+  customRender,
+  fireEvent,
+  screen,
+  within,
+} from '@web/testing/custom-render';
 import { mockPostHeadings } from '@web/testing/shared/post-contents-rail/fixtures';
 
 import { PostContentsRail } from './post-contents-rail';
@@ -154,6 +159,26 @@ describe(`<${PostContentsRail.name}/>`, () => {
     fireEvent.mouseDown(document.body);
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getAllByRole('link')).toHaveLength(mockPostHeadings.length);
+  });
+
+  it('closes the mobile disclosure when one of its own links is clicked, so the target heading is not left hidden behind the still-open overlay', async () => {
+    const user = userEvent.setup();
+    setup();
+    const trigger = screen.getByRole('button', { name: 'On this page' });
+    const panelId = trigger.getAttribute('aria-controls') ?? '';
+
+    await user.click(trigger);
+    const panel = document.getElementById(panelId)!;
+    const panelLink = within(panel).getByRole('link', {
+      name: mockPostHeadings.at(0)?.text,
+    });
+    await user.click(panelLink);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(panel).toHaveAttribute('hidden');
+    // The panel's own copy of the links is gone from the accessibility tree
+    // again — only the always-visible desktop copy remains.
     expect(screen.getAllByRole('link')).toHaveLength(mockPostHeadings.length);
   });
 

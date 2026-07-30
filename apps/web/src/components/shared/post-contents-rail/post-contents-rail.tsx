@@ -60,14 +60,21 @@ export const PostContentsRail = ({
   const t = useTranslations('postContentsRail');
   const labelId = useId();
   const panelId = useId();
-  const { open, toggle, triggerRef, panelRef } = usePopover({
+  const { open, toggle, close, triggerRef, panelRef } = usePopover({
     trapFocus: false,
     closeOnFocusOut: true,
   });
   const activeId = useActiveHeadingId(headings.map((heading) => heading.id));
   const label = t('ariaLabel');
 
-  const renderList = () => (
+  // `onNavigate` is only ever passed for the mobile panel's own list (see
+  // its call site below) — the desktop rail has no panel to close, so its
+  // call passes nothing and every link's `onClick` stays `undefined`.
+  // Closing before the anchor jump matters because a click leaves focus on
+  // the link that was just clicked — still inside the panel — so
+  // `closeOnFocusOut` never fires and the still-open, opaque overlay (up to
+  // `max-h-[70vh]`) would otherwise cover the very heading just scrolled to.
+  const renderList = (onNavigate?: () => void) => (
     <ol className={s.list()}>
       {headings.map((heading) => {
         const isActive = heading.id === activeId;
@@ -81,6 +88,7 @@ export const PostContentsRail = ({
               href={`#${heading.id}`}
               className={s.link({ isActive })}
               aria-current={isActive ? 'location' : undefined}
+              onClick={onNavigate}
             >
               {heading.text}
             </SmartLink>
@@ -113,7 +121,7 @@ export const PostContentsRail = ({
           <span aria-hidden="true" className={s.chevron({ open })} />
         </button>
         <div ref={panelRef} id={panelId} hidden={!open} className={s.panel()}>
-          {renderList()}
+          {renderList(close)}
         </div>
       </div>
     </nav>

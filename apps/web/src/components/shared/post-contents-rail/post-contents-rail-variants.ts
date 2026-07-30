@@ -18,17 +18,25 @@ export const postContentsRailVariants = tv({
     // real room to pin below the site `Header` for the entire scroll of the
     // post, same as the desktop rail (whose own containing block is the
     // grid row, stretched to the content column's height by CSS Grid's
-    // default `align-items: stretch`). `top-24` reuses the desktop rail's
-    // own offset (see `desktop` above) rather than a second magic number,
-    // so both presentations line up under the `Header` by the same gap.
+    // default `align-items: stretch`). The base (`<lg`) `top-*` here is a
+    // *different*, mobile-only number from `desktop`'s own `lg:top-24`
+    // below — the two slots are never sticky at the same time (`lg:static`
+    // clears this one the moment `desktop`'s `lg:sticky` takes over), so
+    // reusing one magic number for both, as an earlier revision did, was
+    // itself the bug: measured live (`390px` viewport, real `Header` +
+    // `BrandLockup` render), the site `Header`'s own height is ~63px —
+    // `top-24` (96px) overshoots it by ~33px, leaving a gap the article body
+    // scrolls through underneath the pinned mobile bar. `top-16` (64px) is
+    // the nearest Tailwind step to that measured 63px, so the bar lands
+    // flush against the `Header`'s real bottom edge with no bleed-through.
     // `z-10` matches the `Header`'s own elevation tier — the two never
     // fight for the same pixels since this sits further down the viewport,
-    // offset below the header by `top-24`. All of it is undone at `lg:` —
+    // offset below the header by `top-16`. All of it is undone at `lg:` —
     // `static`/`top-auto`/`z-auto` restore this exact pre-change, unpositioned
     // root so the desktop grid-item/stretch behavior above is untouched.
     root: [
       'w-full min-w-0',
-      'sticky top-24 z-10',
+      'sticky top-16 z-10',
       'lg:static lg:top-auto lg:z-auto',
     ],
     desktop: [
@@ -46,10 +54,25 @@ export const postContentsRailVariants = tv({
       'mb-3 block',
       'font-mono text-label tracking-label uppercase text-text',
     ],
+    // `px-4` insets the icon/label/chevron from the bar's own edges — this
+    // bar renders as a bordered, backgrounded strip (see `mobile` above), so
+    // (unlike plain reading-column text, which sits flush against the page's
+    // own `px-gutter`) it reads as its own boxed control and needs its own
+    // padding, same as `PrimaryNavigation`'s mobile dropdown toggle/panel
+    // (`p-4`) one level up in the same `lg:hidden` disclosure pattern.
+    // Deliberately no bare `p-0` alongside `px-4`/`py-3` here: `tv()`'s
+    // built-in `tailwind-merge` treats `p-0` as the most-specific class for
+    // *both* axes, so a trailing `p-0` was silently canceling the `py-3`
+    // right next to it (confirmed against the live-rendered class list —
+    // the button measured 16px tall, its icon's own height, with zero
+    // padding on every side). Explicit `px-4 py-3` covers all four sides
+    // without a conflicting shorthand, and Tailwind's own utility-class
+    // selector already beats the browser's default `<button>` padding on
+    // specificity, so dropping `p-0` doesn't reintroduce it.
     toggle: [
-      'flex w-full items-center gap-2 py-3',
+      'flex w-full items-center gap-2 px-4 py-3',
       'font-mono text-label tracking-label uppercase text-text',
-      'cursor-pointer border-0 bg-transparent p-0 text-left',
+      'cursor-pointer border-0 bg-transparent text-left',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
     ],
@@ -66,7 +89,7 @@ export const postContentsRailVariants = tv({
     panel: [
       'absolute inset-x-0 top-full',
       'bg-bg border-b border-border shadow-lg',
-      'max-h-[70vh] overflow-y-auto',
+      'max-h-[70vh] overflow-y-auto px-4',
       'pb-4',
     ],
     list: ['flex flex-col gap-2', 'font-mono text-copy', 'm-0 list-none p-0'],
