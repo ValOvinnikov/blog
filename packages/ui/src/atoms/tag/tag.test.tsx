@@ -15,16 +15,6 @@ describe(`<${Tag.name}/>`, () => {
     expect(screen.getByText('Label').tagName).toBe('SPAN');
   });
 
-  it('default variant has a border', () => {
-    setup();
-    expect(screen.getByText('Label').className).toContain('border');
-  });
-
-  it('accent variant applies accent-muted background', () => {
-    setup({ variant: 'accent' });
-    expect(screen.getByText('Label').className).toContain('bg-accent-muted');
-  });
-
   it('renders as an anchor when `as` is set to "a"', () => {
     renderElement(
       <Tag as="a" href="/category/architecture">

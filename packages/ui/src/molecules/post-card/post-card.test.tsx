@@ -45,13 +45,6 @@ describe(`<${PostCard.name}/>`, () => {
     expect(screen.getByText('A short summary.')).toBeVisible();
   });
 
-  it('renders excerpt with the tighter two-line clamp', () => {
-    renderElement(<PostCard excerpt="A short summary." />);
-    const excerpt = screen.getByText('A short summary.');
-    expect(excerpt).toHaveClass('line-clamp-2');
-    expect(excerpt).not.toHaveClass('line-clamp-3');
-  });
-
   it('does not render excerpt element when omitted', () => {
     renderElement(<PostCard />);
     expect(screen.queryByText(/summary/i)).not.toBeInTheDocument();

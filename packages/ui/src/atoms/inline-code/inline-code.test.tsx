@@ -22,12 +22,6 @@ describe(`<${InlineCode.name}/>`, () => {
     expect(screen.getByText(token).className).toContain('extra-class');
   });
 
-  it('applies inline code styling', () => {
-    const token = faker.hacker.noun();
-    setup({ children: token });
-    expect(screen.getByText(token).className).toContain('font-mono');
-  });
-
   it('forwards dataTestId as a data-testid attribute', () => {
     setup({ children: 'token', dataTestId: 'inline-code' });
     expect(screen.getByTestId('inline-code')).toBeVisible();

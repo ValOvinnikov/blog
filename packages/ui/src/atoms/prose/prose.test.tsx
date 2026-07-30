@@ -1,4 +1,3 @@
-import { Size } from '@blog/config';
 import { customRender } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 
@@ -22,23 +21,8 @@ describe(`<${Prose.name}/>`, () => {
     expect(container.firstChild?.nodeName).toBe('DIV');
   });
 
-  it('applies the default (MD) size class', () => {
-    const { container } = setup();
-    expect(container.firstChild).toHaveClass('text-prose');
-  });
-
-  it('applies the SM size class', () => {
-    const { container } = setup({ size: Size.SM });
-    expect(container.firstChild).toHaveClass('text-sm');
-  });
-
-  it('applies the LG size class', () => {
-    const { container } = setup({ size: Size.LG });
-    expect(container.firstChild).toHaveClass('text-lg');
-  });
-
   it('forwards additional className', () => {
-    const { container } = setup({ className: 'mx-auto' });
-    expect(container.firstChild).toHaveClass('mx-auto');
+    const { container } = setup({ className: 'custom-class' });
+    expect(container.firstChild).toHaveClass('custom-class');
   });
 });

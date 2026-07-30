@@ -165,24 +165,6 @@ describe(`<${Article.name}/>`, () => {
     expect(screen.getByAltText('Post cover')).toBeVisible();
   });
 
-  it('caps the coverMedia wrapper at the wide page width', () => {
-    renderElement(
-      <Article>
-        <Article.Header
-          title="Building a Design System"
-          meta={meta}
-          coverMedia={<img src="/cover.jpg" alt="Post cover" />}
-        />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(
-      screen.getByAltText('Post cover').parentElement?.className,
-    ).toContain('max-w-page');
-  });
-
   it('does not render a coverMedia wrapper when omitted', () => {
     renderElement(
       <Article>

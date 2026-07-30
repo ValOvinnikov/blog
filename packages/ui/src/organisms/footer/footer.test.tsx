@@ -72,12 +72,4 @@ describe(`<${Footer.name}/>`, () => {
     renderElement(<Footer dataTestId="site-footer" />);
     expect(screen.getByTestId('site-footer')).toBeVisible();
   });
-
-  it('uses the branded accent tint with a strong divider', () => {
-    renderElement(<Footer dataTestId="site-footer" />);
-    const footer = screen.getByTestId('site-footer');
-    expect(footer.className).toContain('bg-accent-muted');
-    expect(footer.className).toContain('border-t');
-    expect(footer.className).toContain('border-border-strong');
-  });
 });

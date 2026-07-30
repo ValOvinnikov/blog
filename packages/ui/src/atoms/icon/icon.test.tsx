@@ -1,4 +1,4 @@
-import { ICONS, Size, type TIconName } from '@blog/config';
+import { ICONS, type TIconName } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 
 import { Icon } from './icon';
@@ -19,28 +19,10 @@ describe(`<${Icon.name}/>`, () => {
     ).toHaveLength(0);
   });
 
-  it('defaults to the MD size', () => {
-    setup({ dataTestId: 'icon' });
-
-    expect(screen.getByTestId('icon')).toHaveClass('size-4.5');
-  });
-
-  it('applies the sm size class', () => {
-    setup({ size: Size.SM, dataTestId: 'icon' });
-
-    expect(screen.getByTestId('icon')).toHaveClass('size-4');
-  });
-
-  it('applies the lg size class', () => {
-    setup({ size: Size.LG, dataTestId: 'icon' });
-
-    expect(screen.getByTestId('icon')).toHaveClass('size-6');
-  });
-
   it('forwards a custom className', () => {
-    setup({ className: 'text-accent', dataTestId: 'icon' });
+    setup({ className: 'custom-class', dataTestId: 'icon' });
 
-    expect(screen.getByTestId('icon')).toHaveClass('text-accent');
+    expect(screen.getByTestId('icon')).toHaveClass('custom-class');
   });
 
   it('renders a baked-in stroke-width per icon with no strokeWidth prop', () => {

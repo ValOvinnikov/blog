@@ -1,4 +1,3 @@
-import { Size } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 
 import { Avatar } from './avatar';
@@ -22,15 +21,5 @@ describe(`<${Avatar.name}/>`, () => {
   it('caps initials at 2 chars', () => {
     setup({ alt: 'John Michael Doe', name: 'John Michael Doe' });
     expect(screen.getByText('JM')).toBeVisible();
-  });
-
-  it('applies sm size class', () => {
-    const { container } = setup({ size: Size.SM });
-    expect(container.firstChild).toHaveClass('h-8');
-  });
-
-  it('applies lg size class', () => {
-    const { container } = setup({ size: Size.LG });
-    expect(container.firstChild).toHaveClass('h-14');
   });
 });

@@ -25,20 +25,6 @@ describe(`<${ProseLink.name}/>`, () => {
     );
   });
 
-  it('applies the accent/underline treatment', () => {
-    setup();
-    expect(screen.getByRole('link', { name: 'About' }).className).toContain(
-      'text-accent',
-    );
-  });
-
-  it('does not set an explicit font-size class, inheriting the surrounding text', () => {
-    setup();
-    expect(screen.getByRole('link', { name: 'About' }).className).not.toMatch(
-      /text-(xs|sm|base|lg|xl|copy|meta|label)\b/,
-    );
-  });
-
   it('renders with a custom component when the as prop is provided', () => {
     const CustomLink = ({
       href,

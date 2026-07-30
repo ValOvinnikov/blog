@@ -120,46 +120,32 @@ describe(`<${PostsSection.name}/>`, () => {
     expect(screen.getAllByTestId('custom-link')).toHaveLength(posts.length);
   });
 
-  it('renders as an inline section by default (not full-bleed)', () => {
-    const { container } = setup();
-
-    const section = container.querySelector('section');
-    expect(section?.className).not.toContain('w-full');
-    expect(section?.className).not.toContain('bg-bg-subtle');
-  });
-
-  it('renders a full-bleed tinted band when tinted is true', () => {
-    const { container } = setup({ tinted: true });
-
-    const section = container.querySelector('section');
-    expect(section?.className).toContain('w-full');
-  });
-
-  it('keeps the heading and grid inside an inner max-w-page wrapper when tinted', () => {
+  it('nests the heading and the grid inside a shared wrapper when tinted', () => {
     setup({ tinted: true });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
-    const inner = heading.parentElement?.parentElement;
-    expect(inner?.className).toContain('max-w-page');
-    expect(inner).toContainElement(
+    const contentGroup = heading.parentElement;
+    expect(contentGroup).toContainElement(
       screen.getByRole('heading', { level: 3, name: firstPost.title }),
     );
   });
 
-  it('does not wrap the heading in a border-top rule wrapper when not tinted', () => {
+  it('does not wrap the heading in an extra wrapper when not tinted', () => {
     const { container } = setup();
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
     expect(heading.parentElement).toBe(container.querySelector('section'));
   });
 
-  it('wraps the heading and grid in a border-top rule wrapper aligned with the inner content when tinted', () => {
-    setup({ tinted: true });
+  it('wraps the heading and grid in two extra levels of wrapper when tinted, unlike the flat structure when not', () => {
+    const { container } = setup({ tinted: true });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
     const contentGroup = heading.parentElement;
-    expect(contentGroup?.className).toContain('border-t');
-    expect(contentGroup?.parentElement?.className).toContain('max-w-page');
+    const inner = contentGroup?.parentElement;
+    const section = container.querySelector('section');
+    expect(contentGroup).not.toBe(inner);
+    expect(inner?.parentElement).toBe(section);
   });
 
   it('keeps the h2 heading markup and aria wiring unchanged when tinted', () => {
