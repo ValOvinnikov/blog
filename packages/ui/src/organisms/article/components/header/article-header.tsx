@@ -28,7 +28,7 @@ export interface IArticleHeaderProps
   category?: IArticleHeaderCategory;
   /** Lead paragraph rendered below the title, inside the heading column. Omit to render no lead. */
   lead?: string;
-  /** Forwarded to `PostMeta` as-is (author, publishedAt, formattedDate, readingTimeMinutes?, share?). Rendered below the heading column, at the header's full width. Omit to render no `PostMeta` strip. */
+  /** Forwarded to `PostMeta` as-is (author, publishedAt, formattedDate, readingTimeMinutes?, share?). Rendered inside the heading column, below the lead paragraph. Omit to render no `PostMeta` strip. */
   meta?: Omit<IPostMetaProps, 'className' | 'dataTestId'>;
   /** Opaque cover media slot (e.g. a wrapped `SanityImage`), rendered below the metadata strip, capped at `max-w-page` (1120px). Omit to render no cover media. */
   coverMedia?: ReactNode;
