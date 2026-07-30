@@ -251,15 +251,23 @@ export default mergeConfig(
 ## What not to test
 
 - **Never assert always-present styling classes — REQUIRED, not a preference.**
-  Do not use `toHaveClass` (or match on `className`) for a class that is
-  **always** on the element (borders, spacing, colours, a fixed `mt-*`/`px-*`,
-  a token swap). Assert a class **only** when it appears **conditionally** —
-  it toggles with a prop/variant/state (`active`, `error`, a `size`/`hasX`
-  variant) and that toggle is the behaviour under test. A change that only
-  adds/adjusts always-on styling has **no** behavioural surface, so it gets
-  **no** unit test — ship it with the `no-tests-needed` label instead of
-  inventing a class assertion. Assert behaviour and rendered output, never
-  static styling.
+  Do not use `toHaveClass` (or match/contain on `className`) for a class that
+  renders the **same way on every render** — borders, spacing, colours, a
+  fixed `mt-*`/`px-*`/`max-w-*`, a token swap, an icon's hardcoded `size`
+  prop, a component split into more/fewer wrapper `<div>`s. **"Conditional"
+  means the class toggles at runtime for a reason the test controls** — a
+  prop/variant/state the test passes in (`active`, `error`, a `size`/`hasX`
+  variant) or a responsive breakpoint (`sm:`/`md:`/`lg:` prefix) the test
+  simulates via viewport/matchMedia — and that toggle is the behaviour under
+  test. **A class that changed as part of a bug fix is still not
+  conditional** unless the fixed component now also takes a prop/variant that
+  makes it toggle — "this class used to be X, now it's always Y" is exactly
+  the always-present case, not an exception to it, no matter how the change
+  originated. A change that only adds/adjusts always-on styling (including a
+  pure styling **bug fix** — wrong margin, wrong border scope, wrong icon
+  size) has **no** behavioural surface, so it gets **no** unit test — ship it
+  with the `no-tests-needed` label instead of inventing a class assertion.
+  Assert behaviour and rendered output, never static styling.
 - **No snapshot tests** — they couple tests to markup and break on unrelated changes.
 - **No implementation details** — test what a component does, not how it does it.
 - **No network calls** — always mock the Sanity client and `service` functions.
