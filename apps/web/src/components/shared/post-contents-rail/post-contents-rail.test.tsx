@@ -42,12 +42,27 @@ describe(`<${PostContentsRail.name}/>`, () => {
     ).toHaveLength(1);
   });
 
-  it('shows an "On this page" label above the always-visible desktop list, matching the mobile toggle\'s copy', () => {
+  it('labels the desktop list with a real "On this page" heading that names the nav landmark', () => {
     setup();
 
-    // Two occurrences of the shared copy: the desktop label above the list,
-    // and the mobile toggle button's own label span.
-    expect(screen.getAllByText('On this page')).toHaveLength(2);
+    // The desktop label is a real `<h2>` — it joins the document outline
+    // (reachable via screen-reader heading navigation) — and it's what names
+    // the surrounding `<nav>` landmark via `aria-labelledby`.
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: 'On this page',
+    });
+    expect(
+      screen.getByRole('navigation', { name: 'On this page' }),
+    ).toContainElement(heading);
+  });
+
+  it('shows the mobile toggle\'s own "On this page" copy, matching the desktop heading', () => {
+    setup();
+
+    expect(
+      screen.getByRole('button', { name: 'On this page' }),
+    ).toBeInTheDocument();
   });
 
   it('renders every heading as a link to its anchor in the always-visible desktop list', () => {
