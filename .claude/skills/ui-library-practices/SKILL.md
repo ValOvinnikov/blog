@@ -247,6 +247,25 @@ slot/media rules → **`compound-components.md`**.
           'rounded-sm px-4 py-2',
           'bg-accent text-accent-contrast' ]
   ```
+- **A bare empty slot array (`slotName: []`) is never left unexplained — REQUIRED, not a preference.**
+  A slot with no default classes still needs its key declared — dropping it
+  would violate the "every slot forwards `className` via `class:`" rule above
+  and the "one `tv({ slots })` call, every visual element is a key" rule
+  below — but an unexplained `[]` reads as leftover/accidental (e.g. after a
+  fix strips a slot's last class), not intentional. This is the one class of
+  empty-array slot that **must** carry an inline comment, as the specific
+  carve-out to the "no comments" rule two bullets up — every other empty-array
+  case stays uncommented:
+  ```ts
+  // ✅ empty slot, reason stated inline
+  root: [], // no default styling — kept only so `class` can merge the caller's className
+
+  // ❌ bare, unexplained — reads as leftover from a fix, not intentional
+  root: [],
+  ```
+  If nothing external ever needs to merge a class onto that element, don't
+  reach for this pattern at all — drop the slot's `class` forwarding and the
+  key entirely instead of leaving an empty placeholder "just in case."
 - **In `slots`-based `tv()` calls, every slot value is an array of strings** —
   never a bare string, even a single class, even in a `variants`/
   `compoundVariants` override. (Non-slot `base`/`variants` calls in
