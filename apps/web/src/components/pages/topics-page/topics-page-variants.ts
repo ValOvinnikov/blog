@@ -2,7 +2,7 @@ import { tv } from 'tailwind-variants';
 
 export const topicsPageVariants = tv({
   slots: {
-    root: ['bg-bg mx-auto w-full', 'max-w-page px-gutter py-page-y'],
+    root: ['bg-bg-subtle mx-auto w-full', 'max-w-page px-gutter py-page-y'],
     heading: 'mb-4',
     intro: 'mb-10',
     empty: 'mt-10',
