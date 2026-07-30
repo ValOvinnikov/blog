@@ -72,9 +72,34 @@ describe(`<${PostContentsRail.name}/>`, () => {
     expect(
       screen.getByRole('button', { name: 'On this page' }),
     ).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getAllByRole('link')).toHaveLength(
-      mockPostHeadings.length * 2,
+    // The always-visible desktop copy stays plain links; the now-visible
+    // mobile disclosure's copy carries `role="menuitem"` (see the
+    // `role="menu"`/`role="menuitem"` test below), so it counts separately.
+    expect(screen.getAllByRole('link')).toHaveLength(mockPostHeadings.length);
+    expect(screen.getAllByRole('menuitem')).toHaveLength(
+      mockPostHeadings.length,
     );
+  });
+
+  it('exposes the opened mobile disclosure panel and its links with the WAI-ARIA menu roles matching their trapped, roving-focus keyboard behaviour', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'On this page' }));
+
+    expect(screen.getByRole('menu')).toBeVisible();
+    mockPostHeadings.forEach((heading) => {
+      expect(
+        screen.getByRole('menuitem', { name: heading.text }),
+      ).toHaveAttribute('href', `#${heading.id}`);
+    });
+  });
+
+  it('never puts the WAI-ARIA menu roles on the always-visible desktop copy', () => {
+    setup();
+
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
   });
 
   it('closes the mobile disclosure on Escape', async () => {

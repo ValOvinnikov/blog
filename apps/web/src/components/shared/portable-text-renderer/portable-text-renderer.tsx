@@ -13,13 +13,25 @@ import {
   type PortableTextMarkComponentProps,
 } from '@portabletext/react';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { extractPostHeadings } from '@web/utils/extract-post-headings/extract-post-headings';
+import type { TPostHeading } from '@web/utils/extract-post-headings/extract-post-headings';
 
 import { CodeBlock } from './code-block';
 import { portableTextRendererVariants } from './portable-text-renderer-variants';
 
 export interface IPortableTextRendererProps {
   value: TPortableText;
+  /**
+   * The already-computed `extractPostHeadings(value)` outline. Passing it
+   * both opts each rendered h2/h3 into carrying its outline `id` (plus a
+   * matching `scroll-mt-*` so an anchor jump clears the sticky `Header`) and
+   * skips recomputing the outline a second time here. Only `BlogPostPage`
+   * passes this, for the post body it already extracted headings from for
+   * `PostContentsRail`'s gate. Every other consumer (page-builder modules
+   * such as `ContentModule`, which can render more than once on the same
+   * page) omits it, so their headings never carry an `id` that could
+   * collide with a same-titled heading in a sibling module.
+   */
+  headings?: TPostHeading[];
 }
 
 interface ILinkAnnotation {
@@ -31,27 +43,40 @@ const s = portableTextRendererVariants();
 
 /**
  * Builds the `block.h2`/`block.h3` renderers for a single `value` — closing
- * over a `_key` → slug `id` map (from `extractPostHeadings`, the single
- * source of truth for these ids) so each rendered heading gets the exact
- * `id` `PostContentsRail`'s links point at. Below the 3-H2 threshold the map
- * is empty and headings render without an `id`, same as before.
+ * over a `_key` → slug `id` map (from the caller-supplied `headings`, the
+ * single source of truth for these ids) so each rendered heading gets the
+ * exact `id` `PostContentsRail`'s links point at, plus the matching
+ * `scroll-mt-*` so the anchor jump clears the sticky header. `headings`
+ * omitted (the default for every consumer but `BlogPostPage`) leaves the map
+ * empty, so headings render with neither an `id` nor the anchor offset, same
+ * as before.
  */
 const headingBlockComponents = (
-  value: TPortableText,
+  headings: TPostHeading[],
 ): Record<'h2' | 'h3', PortableTextBlockComponent> => {
-  const idByKey = new Map(
-    extractPostHeadings(value).map((heading) => [heading.key, heading.id]),
-  );
+  const idByKey = new Map(headings.map((heading) => [heading.key, heading.id]));
   const headingId = (key?: string) => (key ? idByKey.get(key) : undefined);
+  const headingClassName = (key?: string) =>
+    headingId(key) ? s.headingAnchor() : undefined;
 
   const H2: PortableTextBlockComponent = ({ children, value: block }) => (
-    <Heading level={2} visual="prose-h2" id={headingId(block._key)}>
+    <Heading
+      level={2}
+      visual="prose-h2"
+      id={headingId(block._key)}
+      className={headingClassName(block._key)}
+    >
       {children}
     </Heading>
   );
 
   const H3: PortableTextBlockComponent = ({ children, value: block }) => (
-    <Heading level={3} visual="prose-h3" id={headingId(block._key)}>
+    <Heading
+      level={3}
+      visual="prose-h3"
+      id={headingId(block._key)}
+      className={headingClassName(block._key)}
+    >
       {children}
     </Heading>
   );
@@ -69,15 +94,24 @@ const headingBlockComponents = (
  * wraps the whole rendered output once (it's width-agnostic typography, not
  * a per-block wrapper) so sibling paragraphs/headings/code blocks are direct
  * children sharing one spacing rhythm. `h2`/`h3` blocks additionally get a
- * stable, URL-safe `id` (see `headingBlockComponents`) so `PostContentsRail`
- * links and deep-links resolve to a real in-page anchor.
+ * stable, URL-safe `id` (see `headingBlockComponents`), but only when the
+ * caller opts in via `headings` — omitted by every consumer except
+ * `BlogPostPage`, so a page-builder module rendered more than once on the
+ * same page (`ContentModule`) never stamps a colliding `id` on a same-titled
+ * heading in a sibling instance.
  *
  * @example
  * <ContentModule title={title}>
  *   <PortableTextRenderer value={body} />
  * </ContentModule>
+ *
+ * @example
+ * <PortableTextRenderer value={body} headings={extractPostHeadings(body)} />
  */
-export const PortableTextRenderer = ({ value }: IPortableTextRendererProps) => {
+export const PortableTextRenderer = ({
+  value,
+  headings,
+}: IPortableTextRendererProps) => {
   const components: PortableTextComponents = {
     block: {
       normal: ({ children }) => <p>{children}</p>,
@@ -94,7 +128,7 @@ export const PortableTextRenderer = ({ value }: IPortableTextRendererProps) => {
           {children}
         </Heading>
       ),
-      ...headingBlockComponents(value),
+      ...headingBlockComponents(headings ?? []),
       h4: ({ children }) => (
         <Heading level={4} visual="prose-h4">
           {children}

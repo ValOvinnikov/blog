@@ -155,11 +155,11 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
               <>
                 <PostContentsRail headings={headings} />
                 <div className={s.content()}>
-                  <PortableTextRenderer value={body} />
+                  <PortableTextRenderer value={body} headings={headings} />
                 </div>
               </>
             ) : (
-              <PortableTextRenderer value={body} />
+              <PortableTextRenderer value={body} headings={headings} />
             )}
           </Article.Body>
 
