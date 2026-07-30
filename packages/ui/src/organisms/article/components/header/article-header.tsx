@@ -26,11 +26,11 @@ export interface IArticleHeaderProps
    * with the post's `<h1>`. Omit to render no eyebrow.
    */
   category?: IArticleHeaderCategory;
-  /** Lead paragraph rendered below the metadata strip. Omit to render no lead. */
+  /** Lead paragraph rendered below the title, inside the heading column. Omit to render no lead. */
   lead?: string;
-  /** Forwarded to `PostMeta` as-is (author, publishedAt, formattedDate, readingTimeMinutes?, share?). Omit to render no `PostMeta` strip. */
+  /** Forwarded to `PostMeta` as-is (author, publishedAt, formattedDate, readingTimeMinutes?, share?). Rendered below the heading column, at the header's full width. Omit to render no `PostMeta` strip. */
   meta?: Omit<IPostMetaProps, 'className' | 'dataTestId'>;
-  /** Opaque cover media slot (e.g. a wrapped `SanityImage`), rendered below the lead, capped at `max-w-page` (1120px). Omit to render no cover media. */
+  /** Opaque cover media slot (e.g. a wrapped `SanityImage`), rendered below the metadata strip, capped at `max-w-page` (1120px). Omit to render no cover media. */
   coverMedia?: ReactNode;
 }
 
@@ -54,27 +54,29 @@ export const ArticleHeader = ({
 
   return (
     <header className={className} data-testid={dataTestId} {...rest}>
-      {category && (
-        <Eyebrow
-          href={category.href}
-          linkAs={category.linkAs}
-          className={s.category()}
-        >
-          {category.label}
-        </Eyebrow>
-      )}
-      <Heading level={1} visual="post" className={s.title()}>
-        {title}
-      </Heading>
+      <div className={s.headingGroup()}>
+        {category && (
+          <Eyebrow
+            href={category.href}
+            linkAs={category.linkAs}
+            className={s.category()}
+          >
+            {category.label}
+          </Eyebrow>
+        )}
+        <Heading level={1} visual="post" className={s.title()}>
+          {title}
+        </Heading>
+        {lead && (
+          <Text variant="lead" className={s.lead()}>
+            {lead}
+          </Text>
+        )}
+      </div>
       {meta && (
         <div className={s.meta()}>
           <PostMeta {...meta} />
         </div>
-      )}
-      {lead && (
-        <Text variant="lead" className={s.lead()}>
-          {lead}
-        </Text>
       )}
       {coverMedia && (
         <MediaFrame ratio="video" className={s.coverMedia()}>
