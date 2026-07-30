@@ -16,6 +16,12 @@ import { useCallback, useRef } from 'react';
  * the `panelId` that already links the toggle's `aria-controls` to the
  * panel's `id` — every lookup stays scoped to `containerRef.current`, never
  * `document`.
+ *
+ * `containerRef` also doubles as `useDismissibleMenu`'s `getContainer`, so
+ * the outside-click check treats anything inside the whole container —
+ * including sibling elements sharing it, like the always-visible `actions`
+ * slot — as "inside," matching this hook's original (pre-shared-core)
+ * container-wide scoping.
  */
 export const useMobileNavToggle = (panelId: string) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -35,7 +41,13 @@ export const useMobileNavToggle = (panelId: string) => {
     [panelId],
   );
 
-  const { open, toggle, close } = useDismissibleMenu({ getTrigger, getPanel });
+  const getContainer = useCallback(() => containerRef.current, []);
+
+  const { open, toggle, close } = useDismissibleMenu({
+    getTrigger,
+    getPanel,
+    getContainer,
+  });
 
   return { open, toggle, close, containerRef };
 };

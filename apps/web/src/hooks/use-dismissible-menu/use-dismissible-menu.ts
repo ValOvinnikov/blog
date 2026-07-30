@@ -11,6 +11,16 @@ const getFocusables = (panel: HTMLElement | null) =>
 export type TDismissibleMenuAccessors = {
   getTrigger: () => HTMLElement | null;
   getPanel: () => HTMLElement | null;
+  /**
+   * Optional wider "inside" boundary for the outside-click check. When
+   * provided, a pointer-down anywhere inside `getContainer()` counts as
+   * inside — not just inside the resolved trigger/panel — so sibling
+   * elements sharing that container (e.g. `SiteNavigation`'s always-visible
+   * `actions` slot) never trigger a dismiss. Omit it to keep the narrower
+   * trigger/panel-only scoping (`usePopover`'s behaviour, which never had a
+   * wider container to begin with).
+   */
+  getContainer?: () => HTMLElement | null;
 };
 
 /**
@@ -37,6 +47,7 @@ export type TDismissibleMenuAccessors = {
 export const useDismissibleMenu = ({
   getTrigger,
   getPanel,
+  getContainer,
 }: TDismissibleMenuAccessors) => {
   const [open, setOpenState] = useState(false);
 
@@ -67,7 +78,11 @@ export const useDismissibleMenu = ({
     const handlePointerDown = (event: MouseEvent) => {
       const target = event.target as Node;
 
-      if (getPanel()?.contains(target) || getTrigger()?.contains(target)) {
+      if (
+        getPanel()?.contains(target) ||
+        getTrigger()?.contains(target) ||
+        getContainer?.()?.contains(target)
+      ) {
         return;
       }
 
@@ -134,7 +149,7 @@ export const useDismissibleMenu = ({
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [open, getPanel, getTrigger, close]);
+  }, [open, getPanel, getTrigger, getContainer, close]);
 
   return { open, toggle, close };
 };

@@ -38,6 +38,45 @@ const Harness = () => {
   );
 };
 
+/**
+ * Harness exercising the optional `getContainer` accessor: a "sibling
+ * action" button shares a common ancestor with the trigger/panel (mirroring
+ * `SiteNavigation`'s `actions` slot sharing `containerRef` with
+ * `PrimaryNavigation`) but is neither the resolved trigger nor panel.
+ */
+const HarnessWithContainer = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const getTrigger = useCallback(() => triggerRef.current, []);
+  const getPanel = useCallback(() => panelRef.current, []);
+  const getContainer = useCallback(() => containerRef.current, []);
+
+  const { open, toggle } = useDismissibleMenu({
+    getTrigger,
+    getPanel,
+    getContainer,
+  });
+
+  return (
+    <div ref={containerRef}>
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-expanded={open}
+        onClick={toggle}
+      >
+        trigger
+      </button>
+      <div ref={panelRef} hidden={!open}>
+        <button type="button">first</button>
+      </div>
+      <button type="button">sibling action</button>
+    </div>
+  );
+};
+
 const setup = customRender(Harness, {});
 
 const getTrigger = () => screen.getByRole('button', { name: 'trigger' });
@@ -194,5 +233,49 @@ describe(useDismissibleMenu, () => {
     fireEvent.keyDown(document, { key: 'End' });
 
     expect(document.activeElement).toBe(last);
+  });
+
+  it('closes on a pointer-down on a sibling element outside the trigger/panel when no `getContainer` is given (narrow scoping, e.g. `usePopover`)', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+    await user.click(trigger);
+
+    const sibling = document.createElement('button');
+    sibling.textContent = 'sibling';
+    document.body.append(sibling);
+
+    fireEvent.mouseDown(sibling);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    sibling.remove();
+  });
+});
+
+describe(`${useDismissibleMenu.name} with getContainer`, () => {
+  const setupWithContainer = customRender(HarnessWithContainer, {});
+
+  beforeEach(() => {
+    setupWithContainer();
+  });
+
+  it('stays open on a pointer-down on a sibling element inside the container but outside the trigger/panel (e.g. the actions slot)', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+    await user.click(trigger);
+
+    fireEvent.mouseDown(screen.getByRole('button', { name: 'sibling action' }));
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('still closes on a pointer-down outside the container entirely', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+    await user.click(trigger);
+
+    fireEvent.mouseDown(document.body);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
 });
