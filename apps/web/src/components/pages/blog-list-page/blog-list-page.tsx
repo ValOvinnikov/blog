@@ -24,11 +24,12 @@ type TBlogListPageProps = { page: number };
  * then renders the archive content through the pure ui organisms.
  */
 export async function BlogListPage({ page }: TBlogListPageProps) {
-  const [result, categories, t, breadcrumbsT] = await Promise.all([
+  const [result, categories, t, breadcrumbsT, blogListT] = await Promise.all([
     service.pages.blog.v1.getIndexPage({ page }),
     getCategoriesSafely(),
     getTranslations('pagination'),
     getTranslations('breadcrumbs'),
+    getTranslations('blogListPage'),
   ]);
 
   if (!result.ok) {
@@ -73,10 +74,10 @@ export async function BlogListPage({ page }: TBlogListPageProps) {
         posts={
           <PostsSection
             posts={items}
-            title="All posts"
+            title={blogListT('title')}
             titleId="blog-posts-title"
             linkAs={SmartLink}
-            emptyMessage="No posts yet."
+            emptyMessage={blogListT('empty')}
           />
         }
         pagination={

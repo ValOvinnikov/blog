@@ -25,13 +25,14 @@ type TTagPageProps = { slug: string; page?: number };
  * pagination metadata as any other page.
  */
 export async function TagPage({ slug, page }: TTagPageProps) {
-  const [result, t, breadcrumbsT] = await Promise.all([
+  const [result, t, breadcrumbsT, tagPageT] = await Promise.all([
     service.pages.tag.v1.getTagPage(slug, {
       page,
       itemsPerPage: TAG_ITEMS_PER_PAGE,
     }),
     getTranslations('pagination'),
     getTranslations('breadcrumbs'),
+    getTranslations('tagPage'),
   ]);
 
   if (!result.ok) {
@@ -55,7 +56,7 @@ export async function TagPage({ slug, page }: TTagPageProps) {
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
   const trail: IBreadcrumbItem[] = [
     { label: breadcrumbsT('home'), href: routes.home() },
-    { label: `Tag: ${tag.title}`, href: routes.tag(slug) },
+    { label: tagPageT('label', { name: tag.title }), href: routes.tag(slug) },
   ];
   const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
 
@@ -77,10 +78,10 @@ export async function TagPage({ slug, page }: TTagPageProps) {
         posts={
           <PostsSection
             posts={items}
-            title={`Posts tagged ${tag.title}`}
+            title={tagPageT('title', { name: tag.title })}
             titleId="tag-posts-title"
             linkAs={SmartLink}
-            emptyMessage={`No posts tagged ${tag.title} yet.`}
+            emptyMessage={tagPageT('empty', { name: tag.title })}
           />
         }
         pagination={

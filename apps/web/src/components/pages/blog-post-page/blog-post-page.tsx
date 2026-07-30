@@ -74,9 +74,10 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
       />
     ),
   }));
-  const [format, t, relatedPostItems] = await Promise.all([
+  const [format, t, blogPostT, relatedPostItems] = await Promise.all([
     getFormatter(),
     getTranslations('breadcrumbs'),
+    getTranslations('blogPostPage'),
     toPostListItems(relatedPosts),
   ]);
 
@@ -154,7 +155,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
         {relatedPostItems.length > 0 && (
           <PostsSection
             posts={relatedPostItems}
-            title="Related reading"
+            title={blogPostT('relatedReading')}
             titleId="related-posts-title"
             linkAs={SmartLink}
             tinted

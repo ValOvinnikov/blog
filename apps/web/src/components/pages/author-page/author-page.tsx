@@ -41,13 +41,14 @@ const s = authorPageVariants();
  * `BreadcrumbBar` sibling before `<main>`.
  */
 export async function AuthorPage({ slug, page }: TAuthorPageProps) {
-  const [result, t, breadcrumbsT] = await Promise.all([
+  const [result, t, breadcrumbsT, authorPageT] = await Promise.all([
     service.pages.author.v1.getAuthorPage(slug, {
       page,
       itemsPerPage: AUTHOR_ITEMS_PER_PAGE,
     }),
     getTranslations('pagination'),
     getTranslations('breadcrumbs'),
+    getTranslations('authorPage'),
   ]);
 
   if (!result.ok) {
@@ -130,10 +131,10 @@ export async function AuthorPage({ slug, page }: TAuthorPageProps) {
         posts={
           <PostsSection
             posts={items}
-            title={`Posts by ${author.name}`}
+            title={authorPageT('title', { name: author.name })}
             titleId="author-posts-title"
             linkAs={SmartLink}
-            emptyMessage={`${author.name} hasn't published any posts yet.`}
+            emptyMessage={authorPageT('empty', { name: author.name })}
           />
         }
         pagination={

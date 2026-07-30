@@ -27,15 +27,17 @@ type TCategoryPageProps = { slug: string; page?: number };
  * gets the same pagination metadata as any other page.
  */
 export async function CategoryPage({ slug, page }: TCategoryPageProps) {
-  const [result, categories, t, breadcrumbsT] = await Promise.all([
-    service.pages.category.v1.getCategoryPage(slug, {
-      page,
-      itemsPerPage: CATEGORY_ITEMS_PER_PAGE,
-    }),
-    getCategoriesSafely(),
-    getTranslations('pagination'),
-    getTranslations('breadcrumbs'),
-  ]);
+  const [result, categories, t, breadcrumbsT, categoryPageT] =
+    await Promise.all([
+      service.pages.category.v1.getCategoryPage(slug, {
+        page,
+        itemsPerPage: CATEGORY_ITEMS_PER_PAGE,
+      }),
+      getCategoriesSafely(),
+      getTranslations('pagination'),
+      getTranslations('breadcrumbs'),
+      getTranslations('categoryPage'),
+    ]);
 
   if (!result.ok) {
     console.error(`Error to fetch category page: ${result.error}`);
@@ -83,10 +85,10 @@ export async function CategoryPage({ slug, page }: TCategoryPageProps) {
         posts={
           <PostsSection
             posts={items}
-            title={`Posts in ${category.title}`}
+            title={categoryPageT('title', { name: category.title })}
             titleId="category-posts-title"
             linkAs={SmartLink}
-            emptyMessage={`No posts in ${category.title} yet.`}
+            emptyMessage={categoryPageT('empty', { name: category.title })}
           />
         }
         pagination={
