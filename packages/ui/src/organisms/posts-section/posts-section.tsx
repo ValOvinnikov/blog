@@ -30,10 +30,10 @@ export interface IPostsSectionProps extends IWithDataTestId {
   /** Message rendered under the heading when `posts` is empty. Omit to keep the section rendering nothing (existing behavior). */
   emptyMessage?: string;
   /**
-   * Render as a full-bleed `--bg-subtle` band: the heading and grid sit
-   * inside an inner `max-w-page` container while the section itself spans
-   * full width. Omit (or pass `false`) for the existing inline behavior,
-   * sized by the parent. Heading markup/`aria` wiring is unchanged either way.
+   * Render as a distinct section separated from the content above it by a
+   * top rule, with the heading and grid constrained to the shared content
+   * column. Omit (or pass `false`) for the existing inline behavior, sized
+   * by the parent. Heading markup/`aria` wiring is unchanged either way.
    */
   tinted?: boolean;
 }
@@ -94,7 +94,13 @@ export const PostsSection = ({
       className={s.root({ class: className })}
       data-testid={dataTestId}
     >
-      {tinted ? <div className={s.inner()}>{content}</div> : content}
+      {tinted ? (
+        <div className={s.inner()}>
+          <div className={s.contentGroup()}>{content}</div>
+        </div>
+      ) : (
+        content
+      )}
     </section>
   );
 };

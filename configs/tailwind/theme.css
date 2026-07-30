@@ -26,6 +26,9 @@
   --color-surface-2: var(--surface-2); /* @role nested / code */
   --color-border: var(--border); /* @role hairline */
   --color-border-strong: var(--border-strong); /* @role emphasis / hover */
+  --color-border-emphasis: var(
+    --border-emphasis
+  ); /* @role high-contrast structural boundary */
   --color-text: var(--text); /* @role primary ink */
   --color-text-muted: var(--text-muted); /* @role secondary body text */
   --color-text-subtle: var(--text-subtle); /* @role metadata / low emphasis */
@@ -201,6 +204,14 @@
   --surface-2: oklch(0.975 0.003 250);
   --border: oklch(0.9 0.004 250);
   --border-strong: oklch(0.8 0.006 250);
+  /* --border-emphasis: darker than --border-strong for cases where a border
+     is the sole visual separator (no adjacent fill) and needs to read as a
+     meaningful boundary rather than a hairline — e.g. the "Related reading"
+     section rule in packages/ui/src/organisms/posts-section/ (#950). Verified
+     (OKLCH → sRGB → WCAG contrast, independently recomputed): light 3.29:1,
+     dark 3.73:1 vs --bg-subtle — both clear the WCAG 1.4.11 3:1 non-text
+     minimum (--border-strong itself only reaches 1.69:1 / 2.14:1 there). */
+  --border-emphasis: oklch(0.62 0.006 250);
   --text: oklch(0.2 0.01 250);
   --text-muted: oklch(0.46 0.01 250);
   --text-subtle: oklch(0.6 0.008 250);
@@ -271,6 +282,9 @@
   --surface-2: oklch(0.24 0.008 250);
   --border: oklch(0.3 0.008 250);
   --border-strong: oklch(0.42 0.01 250);
+  --border-emphasis: oklch(
+    0.55 0.01 250
+  ); /* see :root comment — verified dark ratio 3.73:1 vs --bg-subtle */
   --text: oklch(0.95 0.004 250);
   --text-muted: oklch(0.72 0.008 250);
   --text-subtle: oklch(0.56 0.008 250);

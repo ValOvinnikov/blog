@@ -133,18 +133,33 @@ describe(`<${PostsSection.name}/>`, () => {
 
     const section = container.querySelector('section');
     expect(section?.className).toContain('w-full');
-    expect(section?.className).toContain('bg-bg-subtle');
   });
 
   it('keeps the heading and grid inside an inner max-w-page wrapper when tinted', () => {
     setup({ tinted: true });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
-    const inner = heading.parentElement;
+    const inner = heading.parentElement?.parentElement;
     expect(inner?.className).toContain('max-w-page');
     expect(inner).toContainElement(
       screen.getByRole('heading', { level: 3, name: firstPost.title }),
     );
+  });
+
+  it('does not wrap the heading in a border-top rule wrapper when not tinted', () => {
+    const { container } = setup();
+
+    const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
+    expect(heading.parentElement).toBe(container.querySelector('section'));
+  });
+
+  it('wraps the heading and grid in a border-top rule wrapper aligned with the inner content when tinted', () => {
+    setup({ tinted: true });
+
+    const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
+    const contentGroup = heading.parentElement;
+    expect(contentGroup?.className).toContain('border-t');
+    expect(contentGroup?.parentElement?.className).toContain('max-w-page');
   });
 
   it('keeps the h2 heading markup and aria wiring unchanged when tinted', () => {
