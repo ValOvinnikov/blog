@@ -2,7 +2,7 @@ import { tv } from '@blog/ui/lib/styling';
 
 export const breadcrumbsVariants = tv({
   slots: {
-    root: ['my-4'],
+    root: [],
     list: [
       'flex flex-wrap items-center gap-x-1',
       'font-mono text-label text-subtle',
