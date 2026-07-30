@@ -66,11 +66,15 @@ category cap was narrowed to a single required reference in #809 on
   sit in a narrower, centered heading column (`max-w-[800px]`); the cover
   image renders below that column, back at the full 1120px width (#942).
   The article body is capped at `max-w-measure` (68ch,
-  tightened from the earlier `max-w-post`/760px for reading comfort — #932).
-  The "Related reading" section is separated from the article by a
-  `max-w-page`-width top rule (`--border-emphasis`), not a background fill —
-  the page canvas itself (including the hero) is `--bg-subtle` (#950/#951),
-  so a same-color fill would no longer read as distinct.
+  tightened from the earlier `max-w-post`/760px for reading comfort — #932)
+  — unless the post qualifies for the "On this page" contents rail (≥3 H2
+  headings, #934), in which case the body widens to `max-w-page` and splits
+  into a two-column grid: a sticky rail (desktop `≥1024px`) or a closed-by-
+  default disclosure (mobile) alongside the still-`max-w-measure`-capped
+  reading column. The "Related reading" section is separated from the article
+  by a `max-w-page`-width top rule (`--border-emphasis`), not a background
+  fill — the page canvas itself (including the hero) is `--bg-subtle`
+  (#950/#951), so a same-color fill would no longer read as distinct.
 - **Page canvas elevation (#950/#951, #973):** the content canvas renders on
   `--bg-subtle`, one step darker than the site chrome (`Header`,
   `BreadcrumbBar`, both `--bg`) — three visible elevation layers: chrome
