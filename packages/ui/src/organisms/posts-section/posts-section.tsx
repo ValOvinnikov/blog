@@ -94,7 +94,13 @@ export const PostsSection = ({
       className={s.root({ class: className })}
       data-testid={dataTestId}
     >
-      {tinted ? <div className={s.inner()}>{content}</div> : content}
+      {tinted ? (
+        <div className={s.inner()}>
+          <div className={s.contentGroup()}>{content}</div>
+        </div>
+      ) : (
+        content
+      )}
     </section>
   );
 };

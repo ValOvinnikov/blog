@@ -4,6 +4,7 @@ export const postsSectionVariants = tv({
   slots: {
     root: ['mt-[22px]'],
     inner: [],
+    contentGroup: [],
     label: [
       'font-mono text-label font-normal uppercase tracking-label text-subtle',
       'm-0 mb-3',
@@ -15,8 +16,9 @@ export const postsSectionVariants = tv({
   variants: {
     tinted: {
       true: {
-        root: ['mt-0 w-full bg-bg-subtle py-section'],
+        root: ['mt-0 w-full py-section'],
         inner: ['mx-auto max-w-page px-gutter'],
+        contentGroup: ['border-t border-border-strong pt-10'],
       },
     },
   },
