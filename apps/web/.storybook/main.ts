@@ -10,7 +10,21 @@ const config: StorybookConfig = {
   addons: ['@storybook/addon-docs'],
   framework: {
     name: '@storybook/nextjs-vite',
-    options: {},
+    options: {
+      // Without this, the framework's own image-asset Vite plugin (mimicking
+      // Next's built-in image loader) also claims `.svg` imports, racing
+      // `vite-plugin-svgr` below for the same files — Storybook warns about
+      // exactly this ("you are not passing image include/exclude patterns to
+      // the nextjs-vite plugin") on startup otherwise. The observed failure
+      // mode: a bare `.svg` import (meant to resolve to an SVGR component,
+      // per the `svgr()` config below) instead resolves to a raw
+      // `data:image/svg+xml,...` URL string, so `@blog/ui`'s `<Icon>` throws
+      // trying to `createElement` that string as a tag name. Excluding `.svg`
+      // here leaves `vite-plugin-svgr` as the sole handler.
+      image: {
+        excludeFiles: ['**/*.svg'],
+      },
+    },
   },
   features: {
     experimentalRSC: true,

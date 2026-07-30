@@ -13,6 +13,30 @@ process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ??= 'test-project';
 process.env.NEXT_PUBLIC_SANITY_DATASET ??= 'test-dataset';
 process.env.NEXT_PUBLIC_SITE_URL ??= 'https://example.com';
 
+// jsdom has no `IntersectionObserver` — `useActiveHeadingId` (behind
+// `PostContentsRail`) constructs one unconditionally in an effect, so any
+// test that renders it without mocking the hook itself would otherwise throw
+// `ReferenceError: IntersectionObserver is not defined`. A global no-op stub
+// here matches this file's other environment gap-fills (`next/font/google`,
+// `next-intl/server`) — tests that need to assert on actual intersection
+// behaviour (`use-active-heading-id.test.tsx`) install their own richer fake
+// via `vi.stubGlobal` in a scoped `beforeEach`/`afterEach`, which overrides
+// this default for the duration of that suite only.
+class NoopIntersectionObserver implements IntersectionObserver {
+  root = null;
+  rootMargin = '';
+  scrollMargin = '';
+  thresholds: number[] = [];
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
+  }
+}
+
+vi.stubGlobal('IntersectionObserver', NoopIntersectionObserver);
+
 type TGetTranslationsArg = string | { namespace?: string } | undefined;
 type TTranslationValues = Record<string, string | number>;
 

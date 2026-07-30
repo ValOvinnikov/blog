@@ -6,6 +6,7 @@ import { Article, PostsSection } from '@blog/ui/organisms';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
+import { PostContentsRail } from '@web/components/shared/post-contents-rail';
 import { PostShare } from '@web/components/shared/post-share';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -13,6 +14,10 @@ import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { buildShareLinks } from '@web/utils/build-share-links';
 import { env } from '@web/utils/env/env';
+import {
+  extractPostHeadings,
+  MIN_H2_HEADINGS_FOR_RAIL,
+} from '@web/utils/extract-post-headings/extract-post-headings';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import { notFound } from 'next/navigation';
@@ -31,10 +36,14 @@ const s = blogPostPageVariants();
  * `BreadcrumbBar` sibling before `<main>`, followed by `<main>` holding the
  * `Article` compound (`Article.Header` at `max-w-page` for the category
  * eyebrow, title, `PostMeta` with `PostShare` in its share slot, lead, and
- * cover image; `Article.Body`/`Article.Footer` narrowed back to `max-w-measure`
- * for the reading measure), plus a `BlogPosting` JSON-LD tag and, when the
- * post has any, a tinted "Related reading" `PostsSection` band after the
- * article. `Header`/`Footer` (site chrome) stay owned by `[locale]/layout.tsx`.
+ * cover image; `Article.Footer` narrowed back to `max-w-measure` for the
+ * reading measure), plus a `BlogPosting` JSON-LD tag and, when the post has
+ * any, a tinted "Related reading" `PostsSection` band after the article.
+ * `Article.Body` widens to `max-w-page` and shows `PostContentsRail` as a
+ * sticky left column (with the reading column narrowed back to
+ * `max-w-measure` alongside it) once `extractPostHeadings` finds 3+ H2s;
+ * below that it stays the plain `max-w-measure`, single-column body.
+ * `Header`/`Footer` (site chrome) stay owned by `[locale]/layout.tsx`.
  */
 export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   const result = await service.pages.post.v1.getPost(slug);
@@ -61,6 +70,9 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
     author,
     readingTimeMinutes,
   } = post;
+
+  const headings = extractPostHeadings(body);
+  const hasContentsRail = headings.length >= MIN_H2_HEADINGS_FOR_RAIL;
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
   const url = `${siteUrl}${routes.post(slug)}`;
@@ -138,8 +150,17 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
             }
           />
 
-          <Article.Body className={s.body()}>
-            <PortableTextRenderer value={body} />
+          <Article.Body className={s.body({ withRail: hasContentsRail })}>
+            {hasContentsRail ? (
+              <>
+                <PostContentsRail headings={headings} />
+                <div className={s.content()}>
+                  <PortableTextRenderer value={body} />
+                </div>
+              </>
+            ) : (
+              <PortableTextRenderer value={body} />
+            )}
           </Article.Body>
 
           <Article.Footer

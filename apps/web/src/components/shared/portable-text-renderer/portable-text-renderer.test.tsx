@@ -150,6 +150,41 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     expect(root?.children[2]?.tagName).toBe('P');
   });
 
+  it('gives h2/h3 blocks a stable, URL-safe id once the body has 3+ H2 headings, so PostContentsRail links resolve to a real anchor', () => {
+    const value: RichText = [
+      richTextBlock('h2', [richTextSpan('Getting started')]),
+      richTextBlock('normal', [richTextSpan('Intro.')]),
+      richTextBlock('h3', [richTextSpan('Prerequisites')]),
+      richTextBlock('h2', [richTextSpan('Configuration')]),
+      richTextBlock('h2', [richTextSpan('Deployment')]),
+    ];
+
+    setup({ value });
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Getting started' }),
+    ).toHaveAttribute('id', 'getting-started');
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Prerequisites' }),
+    ).toHaveAttribute('id', 'prerequisites');
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Configuration' }),
+    ).toHaveAttribute('id', 'configuration');
+  });
+
+  it('renders h2/h3 blocks with no id when the body has fewer than 3 H2 headings', () => {
+    const value: RichText = [
+      richTextBlock('h2', [richTextSpan('Only section')]),
+      richTextBlock('normal', [richTextSpan('Some text.')]),
+    ];
+
+    setup({ value });
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Only section' }),
+    ).not.toHaveAttribute('id');
+  });
+
   it('renders a code block with syntax highlighting', () => {
     const value: RichText = [
       {
