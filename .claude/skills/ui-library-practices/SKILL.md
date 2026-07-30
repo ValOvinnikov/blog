@@ -276,25 +276,27 @@ slot/media rules → **`compound-components.md`**.
           'rounded-sm px-4 py-2',
           'bg-accent text-accent-contrast' ]
   ```
-- **A bare empty slot array (`slotName: []`) is never left unexplained — REQUIRED, not a preference.**
-  A slot with no default classes still needs its key declared — dropping it
-  would violate the "every slot forwards `className` via `class:`" rule above
-  and the "one `tv({ slots })` call, every visual element is a key" rule
-  below — but an unexplained `[]` reads as leftover/accidental (e.g. after a
-  fix strips a slot's last class), not intentional. This is the one class of
-  empty-array slot that **must** carry an inline comment, as the specific
-  carve-out to the "no comments" rule two bullets up — every other empty-array
-  case stays uncommented:
-  ```ts
-  // ✅ empty slot, reason stated inline
-  root: [], // no default styling — kept only so `class` can merge the caller's className
+- **A slot with no default classes is never declared as a bare `slotName: []`
+  in `tv({ slots })` — REQUIRED, not a preference.** `tv`'s slot merge
+  (`s.slotName({ class: className })`) is only worth going through when there
+  are base classes for it to merge _with_; against an empty array it's a
+  no-op identical to using `className` directly. So an empty-array slot isn't
+  a documentation problem to comment around — it's a slot that shouldn't
+  exist. Drop the key from `slots` entirely and assign the incoming
+  `className` prop straight to that element instead:
+  ```tsx
+  // ✅ no base styling for this element — skip tv() for it, forward className directly
+  <nav className={className}>
 
-  // ❌ bare, unexplained — reads as leftover from a fix, not intentional
-  root: [],
+  // ❌ empty slot kept "for the merge" — the merge does nothing here
+  const s = myVariants(); // slots: { root: [], ... }
+  <nav className={s.root({ class: className })}>
   ```
-  If nothing external ever needs to merge a class onto that element, don't
-  reach for this pattern at all — drop the slot's `class` forwarding and the
-  key entirely instead of leaving an empty placeholder "just in case."
+  This doesn't conflict with "every visual element is a key in the single
+  `slots` object" below — that rule is about elements that **have** styling
+  to declare; an element with none was never a styling concern in the first
+  place. If the element later gains real base classes, add the slot key back
+  then, with those classes.
 - **In `slots`-based `tv()` calls, every slot value is an array of strings** —
   never a bare string, even a single class, even in a `variants`/
   `compoundVariants` override. (Non-slot `base`/`variants` calls in
