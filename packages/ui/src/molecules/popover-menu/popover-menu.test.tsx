@@ -1,5 +1,6 @@
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 
 import { PopoverMenu } from './popover-menu';
 
@@ -20,6 +21,27 @@ describe(`<${PopoverMenu.name}/>`, () => {
     expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
     expect(trigger).toHaveAttribute('aria-controls', 'p1');
+  });
+
+  it('forwards a ref on the trigger to the underlying button', () => {
+    const ref = createRef<HTMLButtonElement>();
+    renderElement(
+      <PopoverMenu>
+        <PopoverMenu.Trigger
+          ariaLabel="Open menu"
+          open={false}
+          panelId="p1"
+          ref={ref}
+        >
+          Trigger
+        </PopoverMenu.Trigger>
+        <PopoverMenu.Panel id="p1" open={false}>
+          <PopoverMenu.Item>Item one</PopoverMenu.Item>
+        </PopoverMenu.Panel>
+      </PopoverMenu>,
+    );
+
+    expect(ref.current).toBe(screen.getByRole('button', { name: 'Open menu' }));
   });
 
   it('hides the panel when open is false and shows it when open is true', () => {
