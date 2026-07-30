@@ -25,7 +25,7 @@ describe(`<${QuoteBlock.name}/>`, () => {
 
   it('merges extra className', () => {
     const quote = faker.lorem.sentence();
-    setup({ children: quote, className: 'ml-2' });
-    expect(screen.getByText(quote).className).toContain('ml-2');
+    setup({ children: quote, className: 'custom-class' });
+    expect(screen.getByText(quote).className).toContain('custom-class');
   });
 });

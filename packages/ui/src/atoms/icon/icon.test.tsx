@@ -20,9 +20,9 @@ describe(`<${Icon.name}/>`, () => {
   });
 
   it('forwards a custom className', () => {
-    setup({ className: 'text-accent', dataTestId: 'icon' });
+    setup({ className: 'custom-class', dataTestId: 'icon' });
 
-    expect(screen.getByTestId('icon')).toHaveClass('text-accent');
+    expect(screen.getByTestId('icon')).toHaveClass('custom-class');
   });
 
   it('renders a baked-in stroke-width per icon with no strokeWidth prop', () => {

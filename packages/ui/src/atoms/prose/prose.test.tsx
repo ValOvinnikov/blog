@@ -22,7 +22,7 @@ describe(`<${Prose.name}/>`, () => {
   });
 
   it('forwards additional className', () => {
-    const { container } = setup({ className: 'mx-auto' });
-    expect(container.firstChild).toHaveClass('mx-auto');
+    const { container } = setup({ className: 'custom-class' });
+    expect(container.firstChild).toHaveClass('custom-class');
   });
 });
