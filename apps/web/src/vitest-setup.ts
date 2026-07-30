@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { createTranslator } from 'next-intl';
 
 import '@testing-library/jest-dom/vitest';
 
@@ -12,68 +13,44 @@ process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ??= 'test-project';
 process.env.NEXT_PUBLIC_SANITY_DATASET ??= 'test-dataset';
 process.env.NEXT_PUBLIC_SITE_URL ??= 'https://example.com';
 
-type TTranslationValues = Record<string, string | number>;
 type TGetTranslationsArg = string | { namespace?: string } | undefined;
+type TTranslationValues = Record<string, string | number>;
 
 const toNamespace = (arg: TGetTranslationsArg): string | undefined =>
   typeof arg === 'string' ? arg : arg?.namespace;
 
-const resolveNamespace = (namespace?: string): Record<string, string> => {
-  const scope: unknown = namespace
-    ? namespace
-        .split('.')
-        .reduce<unknown>(
-          (acc, key) =>
-            typeof acc === 'object' && acc !== null
-              ? (acc as Record<string, unknown>)[key]
-              : undefined,
-          messages,
-        )
-    : messages;
-
-  if (typeof scope !== 'object' || scope === null) {
-    throw new Error(
-      `getTranslations mock: no messages found for namespace "${namespace}" in i18n/messages/en.json`,
-    );
-  }
-
-  return scope as Record<string, string>;
-};
-
-// Only supports flat `{param}` interpolation, not full ICU (plurals/select/
-// rich text) — extend here if a future message needs that.
-const interpolate = (template: string, values?: TTranslationValues): string =>
-  values
-    ? Object.entries(values).reduce(
-        (acc, [key, value]) => acc.replaceAll(`{${key}}`, String(value)),
-        template,
-      )
-    : template;
+// `createTranslator`'s `Namespace` type parameter is a `const` generic
+// inferred as a literal union from the *actual* messages shape, so it
+// rejects the plain `string | undefined` this mock resolves a namespace to
+// at runtime. Widened once here to the shape every call site below actually
+// uses (`t(key, values)`), rather than fighting the literal-union inference
+// per call.
+type TLooseTranslator = (key: string, values?: TTranslationValues) => string;
+const createLooseTranslator = createTranslator as unknown as (config: {
+  locale: string;
+  messages: typeof messages;
+  namespace?: string;
+}) => TLooseTranslator;
 
 // `next-intl/server`'s `setRequestLocale` is called by every locale-aware
 // layout/page but never asserted on — stub it globally so individual test
 // files don't repeat the mock. `getTranslations` is stubbed as a minimal
-// stand-in that resolves real strings from `i18n/messages/en.json` (so a
-// test catches a missing/renamed key) and performs `{param}` interpolation —
-// component tests then assert on the actual rendered copy instead of a fake.
-// `getFormatter` is stubbed the same way for `dateTime`: it delegates to the
-// real `Intl.DateTimeFormat` (via `toLocaleDateString`) under the `en` locale
-// that `i18n/messages/en.json` represents, so tests assert the real rendered
-// date string instead of a fake.
+// stand-in that resolves real strings from `i18n/messages/en.json` via
+// next-intl's own `createTranslator` (full ICU — interpolation, plurals,
+// select) so component tests assert on the actual rendered copy instead of
+// a fake. `getFormatter` is stubbed the same way for `dateTime`: it delegates
+// to the real `Intl.DateTimeFormat` (via `toLocaleDateString`) under the `en`
+// locale that `i18n/messages/en.json` represents, so tests assert the real
+// rendered date string instead of a fake.
 vi.mock('next-intl/server', () => ({
   setRequestLocale: vi.fn(),
-  getTranslations: vi.fn(async (arg?: TGetTranslationsArg) => {
-    const scoped = resolveNamespace(toNamespace(arg));
-    return (key: string, values?: TTranslationValues) => {
-      const template = scoped[key];
-      if (template === undefined) {
-        throw new Error(
-          `getTranslations mock: no message for key "${key}" in namespace "${toNamespace(arg)}"`,
-        );
-      }
-      return interpolate(template, values);
-    };
-  }),
+  getTranslations: vi.fn(async (arg?: TGetTranslationsArg) =>
+    createLooseTranslator({
+      locale: 'en',
+      messages,
+      namespace: toNamespace(arg),
+    }),
+  ),
   getFormatter: vi.fn(async () => ({
     dateTime: (date: Date, options?: Intl.DateTimeFormatOptions) =>
       date.toLocaleDateString('en', options),
