@@ -97,9 +97,11 @@ export default mergeConfig(
 ## What to test (and what not to)
 
 - **`@blog/ui`** — behaviour and contract, not markup snapshots. Query by role/
-  text (`getByRole("button", { name: ... })`), assert rendered props, variants,
-  and interactions via `@testing-library/user-event`. Never assert
-  always-present styling classes (see "What not to test").
+  text (`getByRole("button", { name: ... })`), assert rendered props and
+  interactions via `@testing-library/user-event`. Never assert presentation
+  CSS classes — not even ones that toggle with a prop/variant; a purely-visual
+  variant is Storybook + `no-tests-needed`, not a class assertion (see "What
+  not to test" for the full rule and the narrow data/state-driven exception).
 - **`@blog/service`** — pure logic: GROQ result → domain mapping, `urlForImage`
   output, error/empty handling. **Mock the Sanity client** (`vi.mock`); never
   hit the network. No `revalidate` timing tests.
