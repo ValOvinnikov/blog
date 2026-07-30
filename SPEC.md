@@ -61,13 +61,15 @@ category cap was narrowed to a single required reference in #809 on
   `/tag/[slug]/rss.xml`, and every tag archive URL is listed in the sitemap.
 - **Post-detail layout (#902):** `/blog/[slug]`'s `<main>` splits into
   per-region widths instead of one uniform clamp — the hero region
-  (`Article.Header`: category eyebrow linking to `routes.category`, capped
-  h1 title, meta strip, cover image) spans `max-w-page` (1120px); the article
-  body is capped at `max-w-measure` (68ch, tightened from the earlier
-  `max-w-post`/760px for reading comfort — #932). The "Related
-  reading" section renders in a full-bleed `--bg-subtle` tinted band (inner
-  `max-w-page`), visually separated from the article; the hero stays on the
-  page's normal `--bg` (not tinted).
+  (`Article.Header`) spans `max-w-page` (1120px) overall. Within it, the
+  category eyebrow, capped h1 title, lead paragraph, and metadata strip all
+  sit in a narrower, centered heading column (`max-w-[800px]`); the cover
+  image renders below that column, back at the full 1120px width (#942).
+  The article body is capped at `max-w-measure` (68ch,
+  tightened from the earlier `max-w-post`/760px for reading comfort — #932).
+  The "Related reading" section renders in a full-bleed `--bg-subtle`
+  tinted band (inner `max-w-page`), visually separated from the article;
+  the hero stays on the page's normal `--bg` (not tinted).
 
 Both environments are **live** (§13): merging to `main` deploys development;
 a `vX.Y.Z` tag promotes to production.
