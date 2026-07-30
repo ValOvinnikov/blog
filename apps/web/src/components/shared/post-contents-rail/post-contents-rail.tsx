@@ -41,17 +41,17 @@ const s = postContentsRailVariants();
  * still-open panel — `closeOnFocusOut` closes it the moment focus genuinely
  * leaves, without fighting the Tab that's already carrying focus onward.
  * Active-section highlighting comes from `useActiveHeadingId`, which observes
- * the heading elements
- * `PortableTextRenderer` rendered elsewhere on the page under these same
- * `id`s. The `postContentsRail.ariaLabel` message ("On this page") is the
- * single source for the visible copy on both presentations — the desktop
- * rail's real `<h2>` label above its list and the mobile disclosure's toggle
- * text — as well as the `<nav>` landmark's name, which derives from that
- * `<h2>` via `aria-labelledby` (the same pattern `PostsSection` uses for its
- * own "Related reading" heading). Per the accname spec, an element directly
- * referenced by `aria-labelledby` still contributes to the accessible name
- * even while hidden by `hidden lg:block`'s mobile-width `display:none`, so
- * the `<nav>` stays correctly named at every viewport.
+ * the heading elements `PortableTextRenderer` rendered elsewhere on the page
+ * under these same `id`s. The `postContentsRail.ariaLabel` message ("On this
+ * page") is the single source for the visible copy on both presentations —
+ * the desktop rail's real `<h2>` label above its list and the mobile
+ * disclosure's toggle text — as well as the `<nav>` landmark's name, which
+ * derives from that `<h2>` via `aria-labelledby` (the same pattern
+ * `PostsSection` uses for its own "Related reading" heading). Per the
+ * accname spec, an element directly referenced by `aria-labelledby` still
+ * contributes to the accessible name even while hidden by `hidden lg:block`'s
+ * mobile-width `display:none`, so the `<nav>` stays correctly named at every
+ * viewport.
  */
 export const PostContentsRail = ({
   headings,

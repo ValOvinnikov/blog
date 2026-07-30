@@ -174,7 +174,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     ).not.toHaveAttribute('id');
   });
 
-  it('gives h2/h3 blocks a stable, URL-safe id and a scroll-mt-* anchor offset once the caller opts in with the pre-computed headings, so PostContentsRail links (and deep-links) resolve below the sticky header, not behind it', () => {
+  it('gives h2/h3 blocks a stable, URL-safe id once the caller opts in with the pre-computed headings, so PostContentsRail links (and deep-links) resolve to the right heading', () => {
     const value: RichText = [
       richTextBlock('h2', [richTextSpan('Getting started')]),
       richTextBlock('normal', [richTextSpan('Intro.')]),
@@ -190,21 +190,19 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       name: 'Getting started',
     });
     expect(gettingStarted).toHaveAttribute('id', 'getting-started');
-    expect(gettingStarted.className).toContain('scroll-mt-24');
 
     const prerequisites = screen.getByRole('heading', {
       level: 3,
       name: 'Prerequisites',
     });
     expect(prerequisites).toHaveAttribute('id', 'prerequisites');
-    expect(prerequisites.className).toContain('scroll-mt-24');
 
     expect(
       screen.getByRole('heading', { level: 2, name: 'Configuration' }),
     ).toHaveAttribute('id', 'configuration');
   });
 
-  it("renders h2/h3 blocks with no id (and no scroll-mt-*) when headings is passed but the body has fewer than 3 H2 headings, matching extractPostHeadings' own below-threshold []", () => {
+  it("renders h2/h3 blocks with no id when headings is passed but the body has fewer than 3 H2 headings, matching extractPostHeadings' own below-threshold []", () => {
     const value: RichText = [
       richTextBlock('h2', [richTextSpan('Only section')]),
       richTextBlock('normal', [richTextSpan('Some text.')]),
@@ -217,7 +215,6 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       name: 'Only section',
     });
     expect(heading).not.toHaveAttribute('id');
-    expect(heading.className).not.toContain('scroll-mt-24');
   });
 
   it('never lets two separate PortableTextRenderer instances on the same page collide on heading ids — neither passes headings, so neither stamps any (the module_content-rendered-twice scenario)', () => {
