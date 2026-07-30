@@ -62,10 +62,10 @@ category cap was narrowed to a single required reference in #809 on
 - **Post-detail layout (#902):** `/blog/[slug]`'s `<main>` splits into
   per-region widths instead of one uniform clamp — the hero region
   (`Article.Header`) spans `max-w-page` (1120px) overall. Within it, the
-  category eyebrow, capped h1 title, and lead paragraph sit in a narrower,
-  centered heading column (`max-w-[800px]`); the metadata strip renders
-  below that column, back at the full 1120px width, directly above the
-  cover image (#942). The article body is capped at `max-w-measure` (68ch,
+  category eyebrow, capped h1 title, lead paragraph, and metadata strip all
+  sit in a narrower, centered heading column (`max-w-[800px]`); the cover
+  image renders below that column, back at the full 1120px width (#942).
+  The article body is capped at `max-w-measure` (68ch,
   tightened from the earlier `max-w-post`/760px for reading comfort — #932).
   The "Related reading" section renders in a full-bleed `--bg-subtle`
   tinted band (inner `max-w-page`), visually separated from the article;
