@@ -8,7 +8,11 @@ export const postContentsRailVariants = tv({
       'lg:sticky lg:top-24',
       'lg:border-r lg:border-border lg:pr-6',
     ],
-    mobile: ['border-b border-border', 'lg:hidden'],
+    mobile: ['border-b border-border mb-6', 'lg:hidden'],
+    desktopLabel: [
+      'mb-3 block',
+      'font-mono text-label tracking-label uppercase text-text',
+    ],
     toggle: [
       'flex w-full items-center gap-2 py-3',
       'font-mono text-label tracking-label uppercase text-text',
@@ -22,7 +26,7 @@ export const postContentsRailVariants = tv({
       'transition-transform duration-base ease-console',
     ],
     panel: ['pb-4'],
-    list: ['flex flex-col gap-2', 'font-mono text-label', 'm-0 list-none p-0'],
+    list: ['flex flex-col gap-2', 'font-mono text-copy', 'm-0 list-none p-0'],
     item: [],
     link: [
       'block text-subtle no-underline',

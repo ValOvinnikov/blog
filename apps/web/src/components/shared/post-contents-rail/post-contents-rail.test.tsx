@@ -42,6 +42,14 @@ describe(`<${PostContentsRail.name}/>`, () => {
     ).toHaveLength(1);
   });
 
+  it('shows an "On this page" label above the always-visible desktop list, matching the mobile toggle\'s copy', () => {
+    setup();
+
+    // Two occurrences of the shared copy: the desktop label above the list,
+    // and the mobile toggle button's own label span.
+    expect(screen.getAllByText('On this page')).toHaveLength(2);
+  });
+
   it('renders every heading as a link to its anchor in the always-visible desktop list', () => {
     setup();
 

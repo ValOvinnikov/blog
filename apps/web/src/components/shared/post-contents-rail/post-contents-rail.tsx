@@ -6,6 +6,7 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { useActiveHeadingId } from '@web/hooks/use-active-heading-id';
 import { usePopover } from '@web/hooks/use-popover';
 import type { TPostHeading } from '@web/utils/extract-post-headings/extract-post-headings';
+import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
 import { postContentsRailVariants } from './post-contents-rail-variants';
@@ -33,17 +34,22 @@ const s = postContentsRailVariants();
  * document order and on into the page afterward. Active-section highlighting
  * comes from `useActiveHeadingId`, which observes the heading elements
  * `PortableTextRenderer` rendered elsewhere on the page under these same
- * `id`s.
+ * `id`s. The `postContentsRail.ariaLabel` message ("On this page") is the
+ * single source for the visible copy on both presentations — the desktop
+ * rail's label above its list and the mobile disclosure's toggle text — as
+ * well as the `<nav>` landmark's `aria-label`.
  */
 export const PostContentsRail = ({
   headings,
   className,
 }: TPostContentsRailProps) => {
+  const t = useTranslations('postContentsRail');
   const panelId = useId();
   const { open, toggle, triggerRef, panelRef } = usePopover({
     trapFocus: false,
   });
   const activeId = useActiveHeadingId(headings.map((heading) => heading.id));
+  const label = t('ariaLabel');
 
   const renderList = () => (
     <ol className={s.list()}>
@@ -69,8 +75,11 @@ export const PostContentsRail = ({
   );
 
   return (
-    <nav aria-label="On this page" className={s.root({ class: className })}>
-      <div className={s.desktop()}>{renderList()}</div>
+    <nav aria-label={label} className={s.root({ class: className })}>
+      <div className={s.desktop()}>
+        <span className={s.desktopLabel()}>{label}</span>
+        {renderList()}
+      </div>
 
       <div className={s.mobile()}>
         <button
@@ -82,7 +91,7 @@ export const PostContentsRail = ({
           onClick={toggle}
         >
           <Icon name={ICONS.MENU_ROWS} size={Size.SM} />
-          <span className={s.toggleLabel()}>On this page</span>
+          <span className={s.toggleLabel()}>{label}</span>
           <span aria-hidden="true" className={s.chevron({ open })} />
         </button>
         <div ref={panelRef} id={panelId} hidden={!open} className={s.panel()}>
