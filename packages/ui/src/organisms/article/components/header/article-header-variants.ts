@@ -7,6 +7,6 @@ export const articleHeaderVariants = tv({
     title: ['mt-3 max-w-[18ch]'],
     lead: ['mt-4 max-w-measure'],
     meta: ['mt-4'],
-    coverMedia: ['mt-5 max-w-page mx-auto'],
+    coverMedia: ['mt-2 max-w-page mx-auto'],
   },
 });

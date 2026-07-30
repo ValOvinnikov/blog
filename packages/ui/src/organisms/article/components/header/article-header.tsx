@@ -36,7 +36,7 @@ export interface IArticleHeaderProps
 
 /**
  * Article.Header — post detail heading area: category eyebrow, title,
- * metadata strip, lead paragraph, and an optional wide cover media slot.
+ * lead paragraph, metadata strip, and an optional wide cover media slot.
  * Breadcrumb navigation stays a separate, page-composed concern — the
  * eyebrow here is a visual category label, not a nav landmark.
  */
@@ -72,12 +72,12 @@ export const ArticleHeader = ({
             {lead}
           </Text>
         )}
+        {meta && (
+          <div className={s.meta()}>
+            <PostMeta {...meta} />
+          </div>
+        )}
       </div>
-      {meta && (
-        <div className={s.meta()}>
-          <PostMeta {...meta} />
-        </div>
-      )}
       {coverMedia && (
         <MediaFrame ratio="video" className={s.coverMedia()}>
           {coverMedia}
