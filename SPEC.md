@@ -67,9 +67,16 @@ category cap was narrowed to a single required reference in #809 on
   image renders below that column, back at the full 1120px width (#942).
   The article body is capped at `max-w-measure` (68ch,
   tightened from the earlier `max-w-post`/760px for reading comfort — #932).
-  The "Related reading" section renders in a full-bleed `--bg-subtle`
-  tinted band (inner `max-w-page`), visually separated from the article;
-  the hero stays on the page's normal `--bg` (not tinted).
+  The "Related reading" section is separated from the article by a
+  `max-w-page`-width top rule (`--border-emphasis`), not a background fill —
+  the page canvas itself (including the hero) is `--bg-subtle` (#950/#951),
+  so a same-color fill would no longer read as distinct.
+- **Page canvas elevation (#950/#951):** every page's `<main>` renders on
+  `--bg-subtle`, one step darker than the site chrome (`Header`,
+  `BreadcrumbBar`, both `--bg`) — three visible elevation layers: chrome
+  `--bg` · canvas `--bg-subtle` · cards/cover media `--surface` (pops off
+  the canvas). Applies to every page template/route (home, blog index, post
+  detail, topics, generic pages, not-found).
 
 Both environments are **live** (§13): merging to `main` deploys development;
 a `vX.Y.Z` tag promotes to production.
