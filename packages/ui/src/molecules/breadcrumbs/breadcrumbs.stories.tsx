@@ -50,3 +50,20 @@ export const LongTrail: TStory = {
     ],
   },
 };
+
+// Truncation is driven by available width, not a viewport breakpoint — a
+// constrained container reproduces it at any canvas size, so this pins a
+// `className` width instead of the `ui-storybook` narrow-viewport exception
+// (that exception is reserved for real `md:`/`sm:`-style behavior forks).
+// The trail stays on one line; only the last segment truncates with an
+// ellipsis, while the House icon and earlier segments stay fully visible.
+export const Truncated: TStory = {
+  args: {
+    className: 'max-w-[280px]',
+    items: [
+      { label: 'Home', href: '/' },
+      { label: faker.commerce.department(), href: '/category/engineering' },
+      { label: faker.lorem.sentence(8), href: '/blog/example-post' },
+    ],
+  },
+};

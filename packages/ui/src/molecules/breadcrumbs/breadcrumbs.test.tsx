@@ -104,4 +104,23 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     setup({ className: 'custom-class' });
     expect(screen.getByRole('navigation')).toHaveClass('custom-class');
   });
+
+  it('keeps every item before the last from shrinking, so only the last one truncates', () => {
+    setup();
+    const listItems = screen.getAllByRole('listitem');
+    for (const item of listItems.slice(0, -1)) {
+      expect(item).toHaveClass('shrink-0');
+    }
+    const lastListItem = listItems[listItems.length - 1];
+    expect(lastListItem).toHaveClass('min-w-0');
+    expect(lastListItem).toHaveClass('flex-1');
+  });
+
+  it('sets a title attribute on the last item so its full text is available on hover', () => {
+    setup();
+    expect(screen.getByText(lastItem.label)).toHaveAttribute(
+      'title',
+      lastItem.label,
+    );
+  });
 });
