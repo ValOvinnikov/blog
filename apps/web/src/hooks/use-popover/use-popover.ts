@@ -12,6 +12,13 @@ export type TUsePopoverOptions = {
    * — where ordinary Tab order should carry through.
    */
   trapFocus?: boolean;
+  /**
+   * Forwarded to `useDismissibleMenu` as-is. Defaults to `false`, matching
+   * every existing caller (`PostShare`). Pass `true` for a non-modal overlay
+   * panel that must not stay open once focus moves past it — e.g.
+   * `PostContentsRail`'s `position: sticky` mobile disclosure.
+   */
+  closeOnFocusOut?: boolean;
 };
 
 /**
@@ -23,7 +30,10 @@ export type TUsePopoverOptions = {
  * The caller wires `triggerRef` onto `PopoverMenu.Trigger`'s `ref` and
  * `panelRef` onto `PopoverMenu.Panel`'s `ref`.
  */
-export const usePopover = ({ trapFocus }: TUsePopoverOptions = {}) => {
+export const usePopover = ({
+  trapFocus,
+  closeOnFocusOut,
+}: TUsePopoverOptions = {}) => {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -34,6 +44,7 @@ export const usePopover = ({ trapFocus }: TUsePopoverOptions = {}) => {
     getTrigger,
     getPanel,
     trapFocus,
+    closeOnFocusOut,
   });
 
   return { open, toggle, triggerRef, panelRef };

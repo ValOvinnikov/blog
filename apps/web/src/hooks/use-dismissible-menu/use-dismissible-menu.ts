@@ -34,6 +34,20 @@ export type TDismissibleMenuAccessors = {
    * on into the page afterward, not get trapped cycling inside it.
    */
   trapFocus?: boolean;
+  /**
+   * When `true`, closes the menu as soon as focus moves to an element
+   * outside both the trigger and the panel — without returning focus to the
+   * trigger, since focus has already moved somewhere else on purpose (e.g.
+   * a Tab that carried focus past the panel's last item). Defaults to
+   * `false`, so every existing caller (`usePopover`'s `PostShare`,
+   * `useMobileNavToggle`'s `SiteNavigation`) keeps its current behaviour —
+   * open until Escape, outside-click, or toggle. Pass `true` for a
+   * non-modal, `position: sticky` overlay panel — e.g.
+   * `PostContentsRail`'s mobile disclosure — where an opaque panel left open
+   * while focus moves past it would leave a sighted keyboard user's focus
+   * indicator hidden underneath it (WCAG 2.4.11).
+   */
+  closeOnFocusOut?: boolean;
 };
 
 /**
@@ -58,12 +72,21 @@ export type TDismissibleMenuAccessors = {
  * This is a conscious choice, not an oversight — it preserves the existing
  * dismissal/focus-return behaviour (and the tests that pin it) while
  * Arrow/Home/End layer standard menu roving on top.
+ *
+ * `closeOnFocusOut` is the opt-in counterpart for `trapFocus: false`
+ * panels that render as an opaque overlay over content that keeps its
+ * ordinary Tab order underneath — it closes the panel the moment focus
+ * genuinely leaves it (guarding the transient `relatedTarget === null` blur
+ * and focus moving within the panel/to the trigger), via `setOpenState`
+ * directly rather than `close()`, so it never fights the Tab that's already
+ * carrying focus onward.
  */
 export const useDismissibleMenu = ({
   getTrigger,
   getPanel,
   getContainer,
   trapFocus = true,
+  closeOnFocusOut = false,
 }: TDismissibleMenuAccessors) => {
   const [open, setOpenState] = useState(false);
 
@@ -168,6 +191,33 @@ export const useDismissibleMenu = ({
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [open, getPanel, getTrigger, getContainer, close, trapFocus]);
+
+  useEffect(() => {
+    if (!open || !closeOnFocusOut) return;
+
+    const panel = getPanel();
+    if (!panel) return;
+
+    const handleFocusOut = (event: FocusEvent) => {
+      const next = event.relatedTarget as Node | null;
+
+      if (
+        next === null ||
+        getPanel()?.contains(next) ||
+        getTrigger()?.contains(next)
+      ) {
+        return;
+      }
+
+      setOpenState(false);
+    };
+
+    panel.addEventListener('focusout', handleFocusOut);
+
+    return () => {
+      panel.removeEventListener('focusout', handleFocusOut);
+    };
+  }, [open, closeOnFocusOut, getPanel, getTrigger]);
 
   return { open, toggle, close };
 };
