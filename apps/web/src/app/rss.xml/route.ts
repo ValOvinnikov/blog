@@ -2,9 +2,7 @@ import { routes } from '@blog/config';
 import { service, type TArchivePostCard } from '@blog/service';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
 import { env } from '@web/utils/env/env';
-
-const FALLBACK_TITLE = 'Blog';
-const FALLBACK_DESCRIPTION = 'Latest posts';
+import { getTranslations } from 'next-intl/server';
 
 function toRssItem(post: TArchivePostCard, siteUrl: string): TRssItem {
   return {
@@ -55,17 +53,18 @@ async function getAllPublishedPosts(): Promise<TArchivePostCard[]> {
 export async function GET(): Promise<Response> {
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
 
-  const [posts, siteSettingsResult] = await Promise.all([
+  const [posts, siteSettingsResult, t] = await Promise.all([
     getAllPublishedPosts(),
     service.global.siteSettings.v1.getSiteSettings(),
+    getTranslations('rss'),
   ]);
 
   const title = siteSettingsResult.ok
     ? siteSettingsResult.data.brand.name
-    : FALLBACK_TITLE;
+    : t('fallbackTitle');
   const description = siteSettingsResult.ok
     ? siteSettingsResult.data.description
-    : FALLBACK_DESCRIPTION;
+    : t('fallbackDescription');
   if (!siteSettingsResult.ok) {
     console.error(
       `Error fetching site settings for RSS feed: ${siteSettingsResult.error}`,

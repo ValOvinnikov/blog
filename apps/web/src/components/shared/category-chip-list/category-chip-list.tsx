@@ -2,6 +2,7 @@ import { routes } from '@blog/config';
 import type { TCategoriesList } from '@blog/service';
 import { Tag } from '@blog/ui/atoms/tag';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { useTranslations } from 'next-intl';
 
 import { categoryChipListVariants } from './category-chip-list-variants';
 
@@ -29,19 +30,21 @@ export const CategoryChipList = ({
   categories,
   activeSlug,
 }: ICategoryChipListProps) => {
+  const t = useTranslations('categoryChipList');
+
   if (categories.length === 0) return null;
 
   const isAllActive = activeSlug === undefined;
 
   return (
-    <nav aria-label="Categories" className={categoryChipListVariants()}>
+    <nav aria-label={t('ariaLabel')} className={categoryChipListVariants()}>
       <Tag
         as={SmartLink}
         href={routes.blogIndex()}
         variant={isAllActive ? 'accent' : 'default'}
         aria-current={isAllActive ? 'page' : undefined}
       >
-        All
+        {t('all')}
       </Tag>
       {categories.map((category) => {
         const isActive = category.slug === activeSlug;

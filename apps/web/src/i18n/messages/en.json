@@ -2,7 +2,8 @@
   "pagination": {
     "previous": "Previous",
     "next": "Next",
-    "ariaLabel": "{pageType} pages"
+    "ariaLabel": "{pageType} pages",
+    "pageSuffix": "– Page {page}"
   },
   "breadcrumbs": {
     "home": "Home",
@@ -10,5 +11,65 @@
     "authorPrefix": "Author: {name}",
     "topics": "Topics",
     "blog": "Blog"
+  },
+  "notFound": {
+    "metaTitle": "Page not found",
+    "metaDescription": "The page you are looking for does not exist.",
+    "commandNotFound": "command not found",
+    "description": "That route doesn't resolve to anything here.",
+    "returnHome": "Return home"
+  },
+  "postShare": {
+    "shareAriaLabel": "Share \"{title}\"",
+    "panelAriaLabel": "Share options",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "linkCopied": "Link copied"
+  },
+  "siteNavigation": {
+    "toggleMenu": "Toggle navigation menu"
+  },
+  "brandLockupLink": {
+    "ariaLabel": "Home"
+  },
+  "categoryChipList": {
+    "ariaLabel": "Categories",
+    "all": "All"
+  },
+  "blogListPage": {
+    "title": "All posts",
+    "empty": "No posts yet."
+  },
+  "blogPostPage": {
+    "relatedReading": "Related reading"
+  },
+  "postContentsRail": {
+    "ariaLabel": "On this page"
+  },
+  "categoryPage": {
+    "title": "Posts in {name}",
+    "empty": "No posts in {name} yet."
+  },
+  "tagPage": {
+    "label": "Tag: {name}",
+    "title": "Posts tagged {name}",
+    "empty": "No posts tagged {name} yet."
+  },
+  "authorPage": {
+    "title": "Posts by {name}",
+    "empty": "{name} hasn't published any posts yet."
+  },
+  "topicsPage": {
+    "title": "Topics",
+    "intro": "Browse every post by topic.",
+    "empty": "No topics yet.",
+    "postsCount": "{count, plural, one {1 post} other {{count} posts}}"
+  },
+  "rss": {
+    "fallbackTitle": "Blog",
+    "fallbackDescription": "Latest posts"
+  },
+  "authorMetadata": {
+    "nameWithRole": "{name} — {role}"
   }
 }

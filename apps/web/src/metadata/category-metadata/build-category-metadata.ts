@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 /**
  * Metadata for a `/category/[slug]` page (page 1, `pageNumber` omitted) or a
@@ -19,10 +20,13 @@ export async function buildCategoryMetadata(
   slug: string,
   pageNumber?: number,
 ): Promise<Metadata> {
-  const result = await service.pages.category.v1.getCategoryPage(slug, {
-    page: pageNumber,
-    itemsPerPage: CATEGORY_ITEMS_PER_PAGE,
-  });
+  const [result, t] = await Promise.all([
+    service.pages.category.v1.getCategoryPage(slug, {
+      page: pageNumber,
+      itemsPerPage: CATEGORY_ITEMS_PER_PAGE,
+    }),
+    getTranslations('pagination'),
+  ]);
 
   if (!result.ok) {
     console.error(`Error to fetch category page metadata: ${result.error}`);
@@ -34,12 +38,10 @@ export async function buildCategoryMetadata(
 
   const { category } = result.data;
   const description = category.description ?? category.title;
-  // "– Page N" stays a hardcoded suffix until translation messages land
-  // (#321), matching `buildBlogListMetadata`.
   const title =
     pageNumber === undefined
       ? category.title
-      : `${category.title} – Page ${pageNumber}`;
+      : `${category.title} ${t('pageSuffix', { page: pageNumber })}`;
 
   return toMetadata(
     {

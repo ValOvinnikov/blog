@@ -29,9 +29,10 @@ const s = topicsPageVariants();
  * whole page (or, at build time, the whole static export).
  */
 export async function TopicsPage() {
-  const [categories, breadcrumbsT] = await Promise.all([
+  const [categories, breadcrumbsT, t] = await Promise.all([
     getCategoriesSafely(),
     getTranslations('breadcrumbs'),
+    getTranslations('topicsPage'),
   ]);
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
@@ -55,11 +56,11 @@ export async function TopicsPage() {
 
       <main className={s.root()}>
         <Heading level={1} className={s.heading()}>
-          Topics
+          {t('title')}
         </Heading>
-        <Text className={s.intro()}>Browse every post by topic.</Text>
+        <Text className={s.intro()}>{t('intro')}</Text>
         {categories.length === 0 ? (
-          <Text className={s.empty()}>No topics yet.</Text>
+          <Text className={s.empty()}>{t('empty')}</Text>
         ) : (
           <ul className={s.list()}>
             {categories.map((category) => (
@@ -76,9 +77,7 @@ export async function TopicsPage() {
                   <Text variant="card">{category.description}</Text>
                 ) : null}
                 <Text variant="card">
-                  {category.postCount === 1
-                    ? '1 post'
-                    : `${category.postCount} posts`}
+                  {t('postsCount', { count: category.postCount })}
                 </Text>
               </li>
             ))}

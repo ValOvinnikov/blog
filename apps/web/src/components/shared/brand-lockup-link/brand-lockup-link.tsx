@@ -1,6 +1,7 @@
 import type { TBrand } from '@blog/service';
 import { BrandLockup } from '@blog/ui/molecules';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { useTranslations } from 'next-intl';
 
 export interface IBrandLockupLinkProps {
   brand: TBrand;
@@ -12,12 +13,16 @@ export interface IBrandLockupLinkProps {
  * `BrandLockup` (`@blog/ui`, pure/prop-driven) — kept in `apps/web` because
  * linking stays out of `@blog/ui`. Used in the site header.
  */
-export const BrandLockupLink = ({ brand }: IBrandLockupLinkProps) => (
-  <SmartLink href="/" aria-label="Home">
-    <BrandLockup
-      prefix={brand.prefix}
-      suffix={brand.suffix}
-      specLine={brand.specLine}
-    />
-  </SmartLink>
-);
+export const BrandLockupLink = ({ brand }: IBrandLockupLinkProps) => {
+  const t = useTranslations('brandLockupLink');
+
+  return (
+    <SmartLink href="/" aria-label={t('ariaLabel')}>
+      <BrandLockup
+        prefix={brand.prefix}
+        suffix={brand.suffix}
+        specLine={brand.specLine}
+      />
+    </SmartLink>
+  );
+};

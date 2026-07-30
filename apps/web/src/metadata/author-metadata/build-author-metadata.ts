@@ -4,6 +4,7 @@ import { toMetadata } from '@web/metadata/to-metadata';
 import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 /**
  * Metadata for an `/author/[slug]` page (page 1, `pageNumber` omitted) or an
@@ -20,10 +21,14 @@ export async function buildAuthorMetadata(
   slug: string,
   pageNumber?: number,
 ): Promise<Metadata> {
-  const result = await service.pages.author.v1.getAuthorPage(slug, {
-    page: pageNumber,
-    itemsPerPage: AUTHOR_ITEMS_PER_PAGE,
-  });
+  const [result, t, authorMetadataT] = await Promise.all([
+    service.pages.author.v1.getAuthorPage(slug, {
+      page: pageNumber,
+      itemsPerPage: AUTHOR_ITEMS_PER_PAGE,
+    }),
+    getTranslations('pagination'),
+    getTranslations('authorMetadata'),
+  ]);
 
   if (!result.ok) {
     console.error(`Error to fetch author page metadata: ${result.error}`);
@@ -35,13 +40,16 @@ export async function buildAuthorMetadata(
 
   const { author } = result.data;
   const baseTitle = author.role
-    ? `${author.name} — ${author.role}`
+    ? authorMetadataT('nameWithRole', {
+        name: author.name,
+        role: author.role,
+      })
     : author.name;
   const description = blockTextToPlain(author.bio) ?? baseTitle;
-  // "– Page N" stays a hardcoded suffix until translation messages land
-  // (#321), matching `buildCategoryMetadata`.
   const title =
-    pageNumber === undefined ? baseTitle : `${baseTitle} – Page ${pageNumber}`;
+    pageNumber === undefined
+      ? baseTitle
+      : `${baseTitle} ${t('pageSuffix', { page: pageNumber })}`;
 
   return toMetadata(
     {

@@ -5,6 +5,7 @@ import { PrimaryNavigation } from '@blog/ui/molecules';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useMobileNavToggle } from '@web/hooks/use-mobile-nav-toggle';
 import { usePathname } from '@web/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { useEffect, useId, type ReactNode } from 'react';
 
 import { siteNavigationVariants } from './site-navigation-variants';
@@ -31,6 +32,7 @@ const isNavItemActive = (pathname: string, href: string): boolean => {
  * changes (so a nav link click never leaves it open on the next page).
  */
 export const SiteNavigation = ({ links, actions }: TSiteNavigationProps) => {
+  const t = useTranslations('siteNavigation');
   const pathname = usePathname();
   const panelId = useId();
   const { open, toggle, close, containerRef } = useMobileNavToggle(panelId);
@@ -56,7 +58,7 @@ export const SiteNavigation = ({ links, actions }: TSiteNavigationProps) => {
         mobileToggle={{
           open,
           onToggle: toggle,
-          ariaLabel: 'Toggle navigation menu',
+          ariaLabel: t('toggleMenu'),
           panelId,
         }}
       />
