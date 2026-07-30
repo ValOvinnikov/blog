@@ -21,17 +21,8 @@ describe(`<${IconButton.name}/>`, () => {
     expect(onClick).toHaveBeenCalledOnce();
   });
 
-  it('shows a pointer cursor on hover', () => {
-    setup();
-    expect(
-      screen.getByRole('button', { name: 'Toggle theme' }).className,
-    ).toContain('cursor-pointer');
-  });
-
-  it('disables pointer events (and thus the pointer cursor) when disabled', () => {
+  it('forwards disabled attribute', () => {
     setup({ ariaLabel: 'Toggle theme', disabled: true, children: <span /> });
-    expect(
-      screen.getByRole('button', { name: 'Toggle theme' }).className,
-    ).toContain('disabled:pointer-events-none');
+    expect(screen.getByRole('button', { name: 'Toggle theme' })).toBeDisabled();
   });
 });

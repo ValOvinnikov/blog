@@ -51,12 +51,6 @@ describe(`<${CardMeta.name}/>`, () => {
     expect(screen.getByText(category.toUpperCase())).toBeVisible();
   });
 
-  it('category element has text-accent class', () => {
-    setup();
-    const categoryEl = screen.getByText(category.toUpperCase());
-    expect(categoryEl).toHaveClass('text-accent');
-  });
-
   it('forwards dataTestId to root element', () => {
     setup({ dataTestId: 'card-meta' });
     expect(screen.getByTestId('card-meta')).toBeVisible();

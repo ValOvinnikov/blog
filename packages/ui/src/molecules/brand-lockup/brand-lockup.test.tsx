@@ -20,6 +20,9 @@ describe(`<${BrandLockup.name}/>`, () => {
   });
 
   it('renders the wordmark visibly rather than screen-reader-only', () => {
+    // `sr-only` is the sole observable here: jsdom doesn't apply real layout,
+    // so `toBeVisible()` can't distinguish visible text from clipped,
+    // screen-reader-only text the way it would in a real browser.
     const prefix = faker.word.noun();
     setup({ prefix });
     expect(screen.getByText(prefix)).not.toHaveClass('sr-only');

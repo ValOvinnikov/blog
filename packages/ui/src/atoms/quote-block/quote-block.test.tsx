@@ -17,15 +17,6 @@ describe(`<${QuoteBlock.name}/>`, () => {
     expect(screen.getByText(quote).tagName).toBe('BLOCKQUOTE');
   });
 
-  it('applies the accent-muted border and italic treatment classes', () => {
-    const quote = faker.lorem.sentence();
-    setup({ children: quote });
-    const element = screen.getByText(quote);
-    expect(element.className).toContain('border-accent-muted');
-    expect(element.className).toContain('italic');
-    expect(element.className).toContain('font-read');
-  });
-
   it('forwards data-testid', () => {
     const quote = faker.lorem.sentence();
     setup({ children: quote, dataTestId: 'quote-block' });

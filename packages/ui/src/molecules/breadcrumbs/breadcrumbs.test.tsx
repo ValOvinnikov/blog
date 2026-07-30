@@ -43,6 +43,8 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     const labelText = screen.getByText(firstItem.label);
 
     expect(icon).toHaveAttribute('aria-hidden', 'true');
+    // `sr-only` is the sole observable that the label text is kept for
+    // accessibility rather than shown alongside the icon.
     expect(labelText).toHaveClass('sr-only');
   });
 
@@ -103,17 +105,6 @@ describe(`<${Breadcrumbs.name}/>`, () => {
   it('accepts a className override on the root nav', () => {
     setup({ className: 'custom-class' });
     expect(screen.getByRole('navigation')).toHaveClass('custom-class');
-  });
-
-  it('keeps every item before the last from shrinking, so only the last one truncates', () => {
-    setup();
-    const listItems = screen.getAllByRole('listitem');
-    for (const item of listItems.slice(0, -1)) {
-      expect(item).toHaveClass('shrink-0');
-    }
-    const lastListItem = listItems[listItems.length - 1];
-    expect(lastListItem).toHaveClass('min-w-0');
-    expect(lastListItem).toHaveClass('flex-1');
   });
 
   it('sets a title attribute on the last item so its full text is available on hover', () => {

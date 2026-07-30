@@ -26,20 +26,6 @@ describe(`<${NavLink.name}/>`, () => {
     );
   });
 
-  it('active variant applies accent color', () => {
-    setup({ href: '/blog', isActive: true, children: 'Blog' });
-    expect(screen.getByRole('link', { name: 'Blog' }).className).toContain(
-      'text-accent',
-    );
-  });
-
-  it('inactive variant uses muted text for AA contrast on tinted chrome', () => {
-    setup({ href: '/blog', children: 'Blog' });
-    expect(screen.getByRole('link', { name: 'Blog' }).className).toContain(
-      'text-muted',
-    );
-  });
-
   it('sets aria-current="page" when active', () => {
     setup({ href: '/blog', isActive: true, children: 'Blog' });
     expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute(

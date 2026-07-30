@@ -10,20 +10,9 @@ describe(`<${Logo.name}/>`, () => {
     expect(screen.getByText('Val.')).toBeVisible();
   });
 
-  it('renders suffix with text-accent class when provided', () => {
+  it('renders suffix when provided', () => {
     setup({ suffix: 'dev' });
-    const suffixEl = screen.getByText('dev');
-    expect(suffixEl).toBeVisible();
-    expect(suffixEl.className).toContain('text-accent');
-  });
-
-  it('renders suffix with the same font-weight as the prefix', () => {
-    setup({ suffix: 'dev' });
-    const prefixEl = screen.getByText('Val.');
-    const suffixEl = screen.getByText('dev');
-    expect(suffixEl.className).toContain('font-medium');
-    expect(prefixEl.className).toContain('font-medium');
-    expect(suffixEl.className).not.toContain('font-normal');
+    expect(screen.getByText('dev')).toBeVisible();
   });
 
   it('renders without suffix span when suffix is omitted', () => {

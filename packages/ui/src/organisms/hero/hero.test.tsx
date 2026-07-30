@@ -97,22 +97,4 @@ describe(`<${Hero.name}/>`, () => {
     setup({ dataTestId: 'featured-hero' });
     expect(screen.getByTestId('featured-hero')).toBeVisible();
   });
-
-  it('gives the root section a full-bleed branded background and strong bottom divider', () => {
-    const { container } = setup();
-    const section = container.querySelector('section');
-    expect(section?.className).toContain('bg-accent-muted');
-    expect(section?.className).toContain('border-b');
-    expect(section?.className).toContain('border-border-strong');
-    expect(section?.className).toContain('w-full');
-  });
-
-  it('constrains and pads the content wrapper to the page width', () => {
-    setup();
-    const copyColumn = screen.getByTestId('hero-copy');
-    const content = copyColumn.closest('section > div');
-    expect(content?.className).toContain('max-w-page');
-    expect(content?.className).toContain('px-gutter');
-    expect(content?.className).toContain('pb-8');
-  });
 });
