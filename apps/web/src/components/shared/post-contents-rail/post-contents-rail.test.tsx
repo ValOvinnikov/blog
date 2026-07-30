@@ -63,7 +63,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
     expect(screen.getAllByRole('link')).toHaveLength(mockPostHeadings.length);
   });
 
-  it('opens the mobile disclosure on trigger click, exposing its own copy of the links', async () => {
+  it('opens the mobile disclosure on trigger click, exposing its own copy of the links as plain links', async () => {
     const user = userEvent.setup();
     setup();
 
@@ -72,34 +72,42 @@ describe(`<${PostContentsRail.name}/>`, () => {
     expect(
       screen.getByRole('button', { name: 'On this page' }),
     ).toHaveAttribute('aria-expanded', 'true');
-    // The always-visible desktop copy stays plain links; the now-visible
-    // mobile disclosure's copy carries `role="menuitem"` (see the
-    // `role="menu"`/`role="menuitem"` test below), so it counts separately.
-    expect(screen.getAllByRole('link')).toHaveLength(mockPostHeadings.length);
-    expect(screen.getAllByRole('menuitem')).toHaveLength(
-      mockPostHeadings.length,
+    // Both the always-visible desktop copy and the now-visible mobile
+    // disclosure's copy stay plain links — this is in-page navigation, not a
+    // command menu, so neither carries a `role="menu"`/`"menuitem"` override.
+    expect(screen.getAllByRole('link')).toHaveLength(
+      mockPostHeadings.length * 2,
     );
   });
 
-  it('exposes the opened mobile disclosure panel and its links with the WAI-ARIA menu roles matching their trapped, roving-focus keyboard behaviour', async () => {
+  it('never puts WAI-ARIA menu roles on either copy of the list', async () => {
     const user = userEvent.setup();
     setup();
 
     await user.click(screen.getByRole('button', { name: 'On this page' }));
 
-    expect(screen.getByRole('menu')).toBeVisible();
-    mockPostHeadings.forEach((heading) => {
-      expect(
-        screen.getByRole('menuitem', { name: heading.text }),
-      ).toHaveAttribute('href', `#${heading.id}`);
-    });
-  });
-
-  it('never puts the WAI-ARIA menu roles on the always-visible desktop copy', () => {
-    setup();
-
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
     expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
+  });
+
+  it('lets Tab carry focus through the open mobile disclosure and out into the page, instead of trapping it inside the panel', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'On this page' }));
+
+    const links = screen.getAllByRole('link', {
+      name: mockPostHeadings.at(-1)?.text,
+    });
+    const lastLinkInPanel = links.at(-1);
+    lastLinkInPanel?.focus();
+
+    await user.tab();
+
+    expect(document.activeElement).not.toBe(lastLinkInPanel);
+    expect(document.activeElement).not.toBe(
+      screen.getAllByRole('link', { name: mockPostHeadings.at(0)?.text }).at(0),
+    );
   });
 
   it('closes the mobile disclosure on Escape', async () => {

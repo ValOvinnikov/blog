@@ -39,6 +39,46 @@ const Harness = () => {
 };
 
 /**
+ * Harness exercising `trapFocus: false` — mirrors `PostContentsRail`'s
+ * mobile disclosure, which opts out of the Tab-trap/roving-focus behaviour
+ * because it's a plain in-page navigation panel, not a command menu. Adds a
+ * focusable element after the panel (like the article body Tab would land in
+ * next) so a non-trapping Tab from the panel's last item has somewhere real
+ * to prove it isn't wrapped back to the first item.
+ */
+const HarnessNoTrap = () => {
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const getTrigger = useCallback(() => triggerRef.current, []);
+  const getPanel = useCallback(() => panelRef.current, []);
+
+  const { open, toggle } = useDismissibleMenu({
+    getTrigger,
+    getPanel,
+    trapFocus: false,
+  });
+
+  return (
+    <div>
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-expanded={open}
+        onClick={toggle}
+      >
+        trigger
+      </button>
+      <div ref={panelRef} hidden={!open}>
+        <button type="button">first</button>
+        <button type="button">second</button>
+      </div>
+      <button type="button">after panel</button>
+    </div>
+  );
+};
+
+/**
  * Harness exercising the optional `getContainer` accessor: a "sibling
  * action" button shares a common ancestor with the trigger/panel (mirroring
  * `SiteNavigation`'s `actions` slot sharing `containerRef` with
@@ -249,6 +289,83 @@ describe(useDismissibleMenu, () => {
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
 
     sibling.remove();
+  });
+});
+
+describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
+  const setupNoTrap = customRender(HarnessNoTrap, {});
+
+  beforeEach(() => {
+    setupNoTrap();
+  });
+
+  it('does not trap Tab — tabbing from the last item moves focus out of the panel instead of wrapping to the first', async () => {
+    const user = userEvent.setup();
+    await user.click(getTrigger());
+
+    const last = screen.getByRole('button', { name: 'second' });
+    last.focus();
+
+    await user.tab();
+
+    expect(document.activeElement).toBe(
+      screen.getByRole('button', { name: 'after panel' }),
+    );
+  });
+
+  it('does not reverse-trap Shift+Tab — tabbing back from the first item moves focus to the trigger instead of wrapping to the last', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+    await user.click(trigger);
+
+    const first = screen.getByRole('button', { name: 'first' });
+    first.focus();
+
+    await user.tab({ shift: true });
+
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('does not move focus on ArrowDown/ArrowUp/Home/End', async () => {
+    const user = userEvent.setup();
+    await user.click(getTrigger());
+
+    const first = screen.getByRole('button', { name: 'first' });
+    first.focus();
+
+    fireEvent.keyDown(document, { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(first);
+
+    fireEvent.keyDown(document, { key: 'ArrowUp' });
+    expect(document.activeElement).toBe(first);
+
+    fireEvent.keyDown(document, { key: 'Home' });
+    expect(document.activeElement).toBe(first);
+
+    fireEvent.keyDown(document, { key: 'End' });
+    expect(document.activeElement).toBe(first);
+  });
+
+  it('still closes on Escape and returns focus to the trigger', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+    await user.click(trigger);
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('still closes on an outside pointer-down and returns focus to the trigger', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+    await user.click(trigger);
+
+    fireEvent.mouseDown(document.body);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(document.activeElement).toBe(trigger);
   });
 });
 

@@ -21,15 +21,30 @@ export type TDismissibleMenuAccessors = {
    * wider container to begin with).
    */
   getContainer?: () => HTMLElement | null;
+  /**
+   * When `false`, skips the Tab focus-trap and the Arrow/Home/End
+   * roving-focus handling entirely — Escape-to-close and
+   * outside-click-to-close still apply regardless. Defaults to `true`
+   * (the existing WAI-ARIA APG menu pattern), which is correct for
+   * command-style menus like `usePopover`'s (`PostShare`'s "Copy link" /
+   * share actions) and `useMobileNavToggle`'s (`SiteNavigation`'s mobile
+   * dropdown). Set to `false` for a non-modal, in-page navigation
+   * disclosure — e.g. `PostContentsRail`'s mobile panel — where ordinary
+   * Tab order should carry focus through the panel's links and straight
+   * on into the page afterward, not get trapped cycling inside it.
+   */
+  trapFocus?: boolean;
 };
 
 /**
  * useDismissibleMenu — the shared open-state/focus/dismissal core behind
  * `usePopover` and `useMobileNavToggle`: focus-into-panel on open,
- * Escape/outside-click dismissal, a Tab focus-trap scoped to the panel,
- * ArrowUp/ArrowDown/Home/End roving focus over the panel's focusable items
- * (WAI-ARIA APG menu pattern), and focus-return-to-trigger on every close
- * path (toggle, Escape, outside-click).
+ * Escape/outside-click dismissal, and focus-return-to-trigger on every close
+ * path (toggle, Escape, outside-click). By default (`trapFocus: true`) it
+ * also layers a Tab focus-trap scoped to the panel and ArrowUp/ArrowDown/
+ * Home/End roving focus over the panel's focusable items (WAI-ARIA APG menu
+ * pattern) — pass `trapFocus: false` to opt out of both and keep ordinary
+ * Tab order instead.
  *
  * Trigger/panel DOM nodes are located through `getTrigger`/`getPanel`
  * accessor callbacks rather than concrete refs, so callers can adapt
@@ -38,16 +53,17 @@ export type TDismissibleMenuAccessors = {
  * (`useMobileNavToggle`) — without duplicating the dismissal/focus-trap/
  * roving-focus logic itself.
  *
- * Tab decision: Tab deliberately stays trapped inside the panel (dialog-
- * style wrap, not "Tab exits the menu"). This is a conscious choice, not an
- * oversight — it preserves the existing dismissal/focus-return behaviour
- * (and the tests that pin it) while Arrow/Home/End layer standard menu
- * roving on top.
+ * Tab decision (`trapFocus: true`, the default): Tab deliberately stays
+ * trapped inside the panel (dialog-style wrap, not "Tab exits the menu").
+ * This is a conscious choice, not an oversight — it preserves the existing
+ * dismissal/focus-return behaviour (and the tests that pin it) while
+ * Arrow/Home/End layer standard menu roving on top.
  */
 export const useDismissibleMenu = ({
   getTrigger,
   getPanel,
   getContainer,
+  trapFocus = true,
 }: TDismissibleMenuAccessors) => {
   const [open, setOpenState] = useState(false);
 
@@ -94,6 +110,8 @@ export const useDismissibleMenu = ({
         close();
         return;
       }
+
+      if (!trapFocus) return;
 
       const focusable = getFocusables(getPanel());
       const first = focusable.at(0);
@@ -149,7 +167,7 @@ export const useDismissibleMenu = ({
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [open, getPanel, getTrigger, getContainer, close]);
+  }, [open, getPanel, getTrigger, getContainer, close, trapFocus]);
 
   return { open, toggle, close };
 };

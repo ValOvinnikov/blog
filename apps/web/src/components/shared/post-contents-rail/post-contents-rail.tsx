@@ -23,33 +23,29 @@ const s = postContentsRailVariants();
  * headings. A single `<nav>` landmark holds two CSS-breakpoint-driven
  * presentations of the same heading list (the `hidden lg:*` / `lg:hidden`
  * pairing established by `PrimaryNavigation`): a sticky left-column rail at
- * `lg:` and up, and a closed-by-default disclosure below it — reusing
- * `usePopover`'s open/close/Escape/outside-click/focus-trap core, the same
- * composition `PostShare` uses for its own trigger + panel. Because that
- * core implements the WAI-ARIA menu pattern (Tab-trapped, Arrow/Home/End
- * roving focus), the mobile panel and its links carry `role="menu"`/
- * `role="menuitem"` — matching `PopoverMenu`'s own pairing — so assistive
- * tech announces the actual keyboard behaviour; the desktop copy is a
- * plain, non-trapped link list and carries neither role. Active-section
- * highlighting comes from `useActiveHeadingId`, which observes the heading
- * elements `PortableTextRenderer` rendered elsewhere on the page under these
- * same `id`s.
+ * `lg:` and up, and a closed-by-default disclosure below it. The disclosure
+ * reuses `usePopover`'s open/close/Escape/outside-click core — the same
+ * composition `PostShare` uses for its own trigger + panel — but opts out of
+ * its Tab-trap/Arrow-roving-focus behaviour (`trapFocus: false`): unlike
+ * `PostShare`'s command-style share menu, this is plain in-page navigation,
+ * so both presentations stay ordinary `<nav>`/`<ol>`/`<li>`/link markup with
+ * no role overrides, and Tab moves through the panel's links in normal
+ * document order and on into the page afterward. Active-section highlighting
+ * comes from `useActiveHeadingId`, which observes the heading elements
+ * `PortableTextRenderer` rendered elsewhere on the page under these same
+ * `id`s.
  */
 export const PostContentsRail = ({
   headings,
   className,
 }: TPostContentsRailProps) => {
   const panelId = useId();
-  const { open, toggle, triggerRef, panelRef } = usePopover();
+  const { open, toggle, triggerRef, panelRef } = usePopover({
+    trapFocus: false,
+  });
   const activeId = useActiveHeadingId(headings.map((heading) => heading.id));
 
-  // The mobile disclosure panel reuses `usePopover`'s WAI-ARIA menu
-  // interaction (Tab-trapped, Arrow/Home/End roving focus) — same as
-  // `PopoverMenu`, so its panel/items carry the matching `role="menu"`/
-  // `role="menuitem"` (see `popover-menu-panel.tsx`/`popover-menu-item.tsx`).
-  // Desktop's always-visible sticky column has no such trapped keyboard
-  // behaviour, so its copy of the list stays a plain link list.
-  const renderList = (asMenu: boolean) => (
+  const renderList = () => (
     <ol className={s.list()}>
       {headings.map((heading) => {
         const isActive = heading.id === activeId;
@@ -63,7 +59,6 @@ export const PostContentsRail = ({
               href={`#${heading.id}`}
               className={s.link({ isActive })}
               aria-current={isActive ? 'location' : undefined}
-              role={asMenu ? 'menuitem' : undefined}
             >
               {heading.text}
             </SmartLink>
@@ -75,7 +70,7 @@ export const PostContentsRail = ({
 
   return (
     <nav aria-label="On this page" className={s.root({ class: className })}>
-      <div className={s.desktop()}>{renderList(false)}</div>
+      <div className={s.desktop()}>{renderList()}</div>
 
       <div className={s.mobile()}>
         <button
@@ -90,14 +85,8 @@ export const PostContentsRail = ({
           <span className={s.toggleLabel()}>On this page</span>
           <span aria-hidden="true" className={s.chevron({ open })} />
         </button>
-        <div
-          ref={panelRef}
-          id={panelId}
-          hidden={!open}
-          role="menu"
-          className={s.panel()}
-        >
-          {renderList(true)}
+        <div ref={panelRef} id={panelId} hidden={!open} className={s.panel()}>
+          {renderList()}
         </div>
       </div>
     </nav>
