@@ -477,8 +477,10 @@ changing a schema does **not** change existing documents.
   `Breadcrumbs` trail (`@blog/ui` molecule) as page chrome, wrapped in a
   web-level `BreadcrumbBar` (#903) rendered as a true DOM sibling of
   `<main>` — immediately after `<Header>`, before `<main>`, never nested
-  inside it — aligned to `max-w-page` (1120px) on every page regardless of
-  that page's own content width. The home page renders no bar. This is
+  inside it. `BreadcrumbBar`'s outer band spans the full viewport width
+  (matching `Header`'s own full-bleed `border-b`), with an inner wrapper
+  constraining the trail to `max-w-page` (1120px) on every page regardless
+  of that page's own content width (#937). The home page renders no bar. This is
   paired with a `BreadcrumbList` JSON-LD schema (`buildBreadcrumbListSchema`)
   built from the same trail, still co-located per page. Post pages (`/blog/{slug}`, #815) render
   `Home › Category › Post`, sitting next to the existing `BlogPosting`
