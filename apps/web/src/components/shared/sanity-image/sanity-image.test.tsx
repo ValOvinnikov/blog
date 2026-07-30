@@ -45,13 +45,13 @@ describe('SanityImage', () => {
 
   it('forwards className, sizes and loading to the rendered element', () => {
     setup({
-      className: 'rounded-lg',
+      className: 'custom-class',
       sizes: '(min-width: 1024px) 50vw, 100vw',
       loading: 'eager',
     });
 
     const img = screen.getByRole('img', { name: image.alt });
-    expect(img).toHaveClass('rounded-lg');
+    expect(img).toHaveClass('custom-class');
     expect(img).toHaveAttribute('sizes', '(min-width: 1024px) 50vw, 100vw');
     expect(img).toHaveAttribute('loading', 'eager');
   });

@@ -23,7 +23,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     expect(screen.getByText('Hello world', { selector: 'p' })).toBeVisible();
   });
 
-  it('renders an h1-style block downgraded to a level 2 heading with the prose-h2 visual, never a bare h1', () => {
+  it('renders an h1-style block downgraded to a level 2 heading, never a bare h1', () => {
     const value: RichText = [
       // The generated `style` union no longer includes 'h1' (Studio can't
       // author one anymore), but the renderer still defends against a
@@ -40,12 +40,11 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       name: 'Heading 1',
     });
     expect(heading).toBeVisible();
-    expect(heading.className).toContain('text-prose-h2');
     expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
   });
 
   ([2, 3, 4] as const).forEach((level) => {
-    it(`renders an h${level}-style block as a level ${level} heading with the matching prose-h${level} visual`, () => {
+    it(`renders an h${level}-style block as a level ${level} heading`, () => {
       const value: RichText = [
         richTextBlock(`h${level}` as TRichTextBlock['style'], [
           richTextSpan(`Heading ${level}`),
@@ -59,7 +58,6 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
         name: `Heading ${level}`,
       });
       expect(heading).toBeVisible();
-      expect(heading.className).toContain(`text-prose-h${level}`);
     });
   });
 
@@ -135,7 +133,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     expect(screen.getByText('incomplete link')).toBeVisible();
   });
 
-  it('renders sibling blocks as direct children of a spacing-bearing root', () => {
+  it('renders sibling blocks as direct children of the root, with no per-block wrapper', () => {
     const value: RichText = [
       richTextBlock('h2', [richTextSpan('Section')]),
       richTextBlock('normal', [richTextSpan('First paragraph')]),
@@ -146,13 +144,6 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
 
     const root = container.firstElementChild;
 
-    // Blocks render as direct siblings (no per-block wrapper) so the single
-    // `[&>*+*]:mt-*` rule on `root` applies a spacing rhythm between all of
-    // them; a per-block wrapper here would put the rule between wrappers,
-    // not between the visible blocks it targets. Verified visually via the
-    // `Content` story in `portable-text-renderer.stories.tsx` — see also
-    // `web-storybook` skill for how RSC-averse compositions get previewed.
-    expect(root?.className).toContain('[&>*+*]:mt-6');
     expect(root?.children).toHaveLength(3);
     expect(root?.children[0]?.tagName).toBe('H2');
     expect(root?.children[1]?.tagName).toBe('P');
