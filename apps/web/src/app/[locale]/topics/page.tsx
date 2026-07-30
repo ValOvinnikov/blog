@@ -8,7 +8,7 @@ type TProps = {
   params: Promise<ILocalizedParams>;
 };
 
-export function generateMetadata(): Metadata {
+export function generateMetadata(): Promise<Metadata> {
   return buildTopicsMetadata();
 }
 

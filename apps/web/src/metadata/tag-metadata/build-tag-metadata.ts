@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 /**
  * Metadata for a `/tag/[slug]` page (page 1, `pageNumber` omitted) or a
@@ -20,10 +21,13 @@ export async function buildTagMetadata(
   slug: string,
   pageNumber?: number,
 ): Promise<Metadata> {
-  const result = await service.pages.tag.v1.getTagPage(slug, {
-    page: pageNumber,
-    itemsPerPage: TAG_ITEMS_PER_PAGE,
-  });
+  const [result, t] = await Promise.all([
+    service.pages.tag.v1.getTagPage(slug, {
+      page: pageNumber,
+      itemsPerPage: TAG_ITEMS_PER_PAGE,
+    }),
+    getTranslations('pagination'),
+  ]);
 
   if (!result.ok) {
     console.error(`Error to fetch tag page metadata: ${result.error}`);
@@ -34,14 +38,14 @@ export async function buildTagMetadata(
   }
 
   const { seo } = result.data.tag;
-  // "– Page N" stays a hardcoded suffix until translation messages land
-  // (#321), matching `buildCategoryMetadata`.
   const title =
-    pageNumber === undefined ? seo.title : `${seo.title} – Page ${pageNumber}`;
+    pageNumber === undefined
+      ? seo.title
+      : `${seo.title} ${t('pageSuffix', { page: pageNumber })}`;
   const ogTitle =
     pageNumber === undefined
       ? seo.ogTitle
-      : `${seo.ogTitle} – Page ${pageNumber}`;
+      : `${seo.ogTitle} ${t('pageSuffix', { page: pageNumber })}`;
 
   return toMetadata(
     { ...seo, title, ogTitle },
