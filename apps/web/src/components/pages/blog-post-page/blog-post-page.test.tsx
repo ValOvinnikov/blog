@@ -1,6 +1,12 @@
-import type { RichText } from '@blog/config';
+import { ICONS, type RichText, Size } from '@blog/config';
+import { Icon } from '@blog/ui/atoms';
 import userEvent from '@testing-library/user-event';
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import {
+  customRenderAsync,
+  renderElement,
+  screen,
+  within,
+} from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
 import {
   richTextBlock,
@@ -86,6 +92,28 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(
       screen.getByRole('menuitem', { name: /Share on LinkedIn/ }),
     ).toBeVisible();
+  });
+
+  it('renders the X icon on the X share link and the LinkedIn icon on the LinkedIn share link, not the generic external-link glyph', async () => {
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+
+    await setup();
+    await userEvent.click(screen.getByRole('button', { name: /Share/ }));
+
+    const xSvg = screen
+      .getByRole('menuitem', { name: /Share on X/ })
+      .querySelector('svg');
+    const linkedInSvg = screen
+      .getByRole('menuitem', { name: /Share on LinkedIn/ })
+      .querySelector('svg');
+    const { container: fallbackContainer } = renderElement(
+      <Icon name={ICONS.EXTERNAL_LINK} size={Size.SM} />,
+    );
+    const fallbackSvg = fallbackContainer.querySelector('svg');
+
+    expect(xSvg?.outerHTML).not.toBe(linkedInSvg?.outerHTML);
+    expect(xSvg?.outerHTML).not.toBe(fallbackSvg?.outerHTML);
+    expect(linkedInSvg?.outerHTML).not.toBe(fallbackSvg?.outerHTML);
   });
 
   it('renders the reading time in the post meta strip', async () => {

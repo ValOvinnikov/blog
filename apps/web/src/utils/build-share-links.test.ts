@@ -1,5 +1,3 @@
-import type { IShareLinkItem } from '@blog/ui';
-
 import { buildShareLinks } from './build-share-links';
 
 describe(buildShareLinks, () => {
@@ -36,12 +34,19 @@ describe(buildShareLinks, () => {
     ]);
   });
 
-  it('returns items matching the IShareLinkItem shape (href + label, no icon)', () => {
-    const links: IShareLinkItem[] = buildShareLinks({ url, title });
+  it('returns a platform identifier matching each link (x, linkedin)', () => {
+    const links = buildShareLinks({ url, title });
+
+    expect(links.map((link) => link.platform)).toEqual(['x', 'linkedin']);
+  });
+
+  it('returns items matching the TShareLinkItem shape (href + label + platform, no icon)', () => {
+    const links = buildShareLinks({ url, title });
 
     links.forEach((link) => {
       expect(typeof link.href).toBe('string');
       expect(typeof link.label).toBe('string');
+      expect(typeof link.platform).toBe('string');
       expect(link.icon).toBeUndefined();
     });
   });

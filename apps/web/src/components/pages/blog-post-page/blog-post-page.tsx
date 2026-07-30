@@ -14,6 +14,7 @@ import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-sche
 import { buildShareLinks } from '@web/utils/build-share-links';
 import { env } from '@web/utils/env/env';
 import { toPostListItems } from '@web/utils/to-post-list-items';
+import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
@@ -66,7 +67,12 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   const schema = buildBlogPostingSchema(post, siteUrl);
   const shareLinks = buildShareLinks({ url, title }).map((link) => ({
     ...link,
-    icon: <Icon name={ICONS.EXTERNAL_LINK} size={Size.SM} />,
+    icon: (
+      <Icon
+        name={toSocialIconName(link.platform) ?? ICONS.EXTERNAL_LINK}
+        size={Size.SM}
+      />
+    ),
   }));
   const [format, t, relatedPostItems] = await Promise.all([
     getFormatter(),
