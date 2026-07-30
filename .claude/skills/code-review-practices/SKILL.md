@@ -137,6 +137,19 @@ code fences are not findings — report only hits in real code.
   story (follow `ui-storybook` skill). Both are required, not optional.
 - New/changed `service` functions have a co-located `*.test.ts`.
 - Bug fixes include a regression test that failed before the fix.
+- **No presentation CSS-class assertions.** Flag any `toHaveClass` / `className`
+  `toContain` on a Tailwind/CSS utility whose job is only appearance (layout,
+  spacing, colour, border, background, typography, radius/shadow, icon size) —
+  **even when it toggles with a prop/variant**, since a purely-visual variant
+  belongs in Storybook + `no-tests-needed`, not a class assertion (see
+  `testing-practices` → "What not to test"). The only allowed class assertion
+  is one where the class is the sole observable of a genuine data/state-driven
+  behaviour (e.g. code-block line highlighting driven by input data), and even
+  then a semantic/ARIA/rendered-output assertion is preferred. **This applies
+  to any test file the diff touches — do not grandfather a pre-existing class
+  assertion in a file being modified; a touched test file is expected to come
+  into compliance.** Stale assertions (a class no longer present in the
+  component) are always a blocking finding.
 - `pnpm test` green.
 
 ## 7. Hygiene
