@@ -104,4 +104,18 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     setup({ className: 'custom-class' });
     expect(screen.getByRole('navigation')).toHaveClass('custom-class');
   });
+
+  it('does not apply its own vertical margin on the root nav', () => {
+    setup();
+    expect(screen.getByRole('navigation')).not.toHaveClass('my-4');
+  });
+
+  it('renders the House icon at Size.SM, not the default Size.MD', () => {
+    setup();
+    const homeLink = screen.getByRole('link', { name: firstItem.label });
+    const icon = homeLink.querySelector('svg');
+
+    expect(icon).toHaveClass('size-4');
+    expect(icon).not.toHaveClass('size-4.5');
+  });
 });
