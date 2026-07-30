@@ -4,7 +4,7 @@ export const postMetaVariants = tv({
   slots: {
     root: [
       'flex flex-wrap items-center gap-2',
-      'border-y border-border py-[9px]',
+      'border-t border-border py-[14px]',
       'font-mono text-label text-subtle',
     ],
     author: ['flex items-center gap-2'],
