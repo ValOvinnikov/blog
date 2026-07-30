@@ -72,12 +72,12 @@ export const ArticleHeader = ({
             {lead}
           </Text>
         )}
-        {meta && (
-          <div className={s.meta()}>
-            <PostMeta {...meta} />
-          </div>
-        )}
       </div>
+      {meta && (
+        <div className={s.meta()}>
+          <PostMeta {...meta} />
+        </div>
+      )}
       {coverMedia && (
         <MediaFrame ratio="video" className={s.coverMedia()}>
           {coverMedia}
