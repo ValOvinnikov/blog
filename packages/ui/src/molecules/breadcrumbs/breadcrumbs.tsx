@@ -48,11 +48,7 @@ export const Breadcrumbs = ({
   const lastIndex = items.length - 1;
 
   return (
-    <nav
-      aria-label={ariaLabel}
-      className={s.root({ class: className })}
-      data-testid={dataTestId}
-    >
+    <nav aria-label={ariaLabel} className={className} data-testid={dataTestId}>
       <ol className={s.list()}>
         {items.map(({ label, href }, index) => {
           const isCurrent = index === lastIndex;
