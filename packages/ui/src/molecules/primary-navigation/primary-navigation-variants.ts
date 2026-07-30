@@ -8,7 +8,7 @@ export const primaryNavigationVariants = tv({
     panel: [
       'absolute inset-x-0 top-full z-20',
       'flex flex-col items-start gap-3 p-4',
-      'bg-bg border-b border-border',
+      'bg-bg border-b border-border shadow-lg',
     ],
   },
   variants: {
