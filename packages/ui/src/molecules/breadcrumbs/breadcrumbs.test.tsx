@@ -104,4 +104,40 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     setup({ className: 'custom-class' });
     expect(screen.getByRole('navigation')).toHaveClass('custom-class');
   });
+
+  it('never wraps the trail onto multiple lines', () => {
+    setup();
+    const list = screen.getByRole('list');
+    expect(list).toHaveClass('flex-nowrap');
+    expect(list).not.toHaveClass('flex-wrap');
+  });
+
+  it('keeps every item before the last from shrinking, so only the last one truncates', () => {
+    setup();
+    const listItems = screen.getAllByRole('listitem');
+    for (const item of listItems.slice(0, -1)) {
+      expect(item).toHaveClass('shrink-0');
+    }
+    const lastListItem = listItems[listItems.length - 1];
+    expect(lastListItem).toHaveClass('min-w-0');
+    expect(lastListItem).toHaveClass('flex-1');
+  });
+
+  it('marks the last item as truncatable text', () => {
+    setup();
+    expect(screen.getByText(lastItem.label)).toHaveClass('truncate');
+  });
+
+  it('sets a title attribute on the last item so its full text is available on hover', () => {
+    setup();
+    expect(screen.getByText(lastItem.label)).toHaveAttribute(
+      'title',
+      lastItem.label,
+    );
+  });
+
+  it('keeps the full untruncated text of the last item in the DOM for assistive tech', () => {
+    setup();
+    expect(screen.getByText(lastItem.label)).toBeInTheDocument();
+  });
 });

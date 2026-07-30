@@ -26,6 +26,11 @@ const s = breadcrumbsVariants();
  * Breadcrumbs — page-chrome navigation trail (e.g. `Home › Category ›
  * Post title`). Every item except the last renders as a link; the last item
  * is the current page, rendered as plain text with `aria-current="page"`.
+ * The trail stays on a single line at every viewport width; earlier items
+ * never shrink, and only the last (current) item truncates with an ellipsis
+ * when the full trail doesn't fit — its complete text stays in the DOM (and
+ * as its `title`) regardless of truncation, so nothing is lost for
+ * assistive tech or sighted hover users.
  * The first item renders a decorative House icon in place of its visible
  * label text — the label itself stays in the DOM as visually-hidden text so
  * the item keeps a real accessible name for assistive tech, and is also set
@@ -62,10 +67,10 @@ export const Breadcrumbs = ({
             label
           );
 
-          const title = isFirst ? label : undefined;
+          const title = isFirst || isCurrent ? label : undefined;
 
           return (
-            <li key={href} className={s.item()}>
+            <li key={href} className={s.item({ isCurrent })}>
               {isCurrent ? (
                 <span className={s.current()} aria-current="page" title={title}>
                   {content}
