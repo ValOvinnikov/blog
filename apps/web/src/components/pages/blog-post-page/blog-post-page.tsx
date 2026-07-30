@@ -30,7 +30,7 @@ const s = blogPostPageVariants();
  * `BreadcrumbBar` sibling before `<main>`, followed by `<main>` holding the
  * `Article` compound (`Article.Header` at `max-w-page` for the category
  * eyebrow, title, `PostMeta` with `PostShare` in its share slot, lead, and
- * cover image; `Article.Body`/`Article.Footer` narrowed back to `max-w-post`
+ * cover image; `Article.Body`/`Article.Footer` narrowed back to `max-w-measure`
  * for the reading measure), plus a `BlogPosting` JSON-LD tag and, when the
  * post has any, a tinted "Related reading" `PostsSection` band after the
  * article. `Header`/`Footer` (site chrome) stay owned by `[locale]/layout.tsx`.

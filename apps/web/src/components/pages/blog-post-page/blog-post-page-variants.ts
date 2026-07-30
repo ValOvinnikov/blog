@@ -2,10 +2,10 @@ import { tv } from 'tailwind-variants';
 
 export const blogPostPageVariants = tv({
   slots: {
-    root: ['bg-bg w-full', 'py-page-y'],
+    root: ['bg-bg w-full', 'pt-6 pb-page-y'],
     hero: ['mx-auto w-full', 'max-w-page px-gutter'],
-    body: ['mx-auto w-full', 'max-w-post px-gutter', 'mt-8'],
-    footer: ['mx-auto w-full', 'max-w-post px-gutter'],
+    body: ['mx-auto w-full', 'max-w-measure px-gutter', 'mt-8'],
+    footer: ['mx-auto w-full', 'max-w-measure px-gutter'],
     coverImage: ['size-full object-cover'],
   },
 });
