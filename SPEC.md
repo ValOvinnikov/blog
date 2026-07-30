@@ -77,10 +77,13 @@ category cap was narrowed to a single required reference in #809 on
   `--bg` · canvas `--bg-subtle` · cards/cover media `--surface` (pops off
   the canvas). The tint is applied **once** on the locale layout's content
   wrapper (the region between `<Header>` and `<Footer>`, #973) — individual
-  page/template roots set no background of their own and inherit it — so it
-  covers every route (home, blog index, post detail, topics, generic pages,
-  not-found) uniformly. The footer sits flush below the canvas on its own
-  `--accent-muted` band.
+  page/template roots under `[locale]/` set no background of their own and
+  inherit it (home, blog index, post detail, topics, generic pages). The one
+  exception is the root `not-found.tsx`, which renders _outside_ the
+  `[locale]` layout (Next's not-found boundary), so it can't inherit that
+  wrapper — its own template keeps `--bg-subtle` on its root to stay visually
+  consistent with the rest of the site. The footer sits flush below the
+  canvas on its own `--accent-muted` band.
 
 Both environments are **live** (§13): merging to `main` deploys development;
 a `vX.Y.Z` tag promotes to production.
