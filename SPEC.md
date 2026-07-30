@@ -71,12 +71,19 @@ category cap was narrowed to a single required reference in #809 on
   `max-w-page`-width top rule (`--border-emphasis`), not a background fill —
   the page canvas itself (including the hero) is `--bg-subtle` (#950/#951),
   so a same-color fill would no longer read as distinct.
-- **Page canvas elevation (#950/#951):** every page's `<main>` renders on
+- **Page canvas elevation (#950/#951, #973):** the content canvas renders on
   `--bg-subtle`, one step darker than the site chrome (`Header`,
   `BreadcrumbBar`, both `--bg`) — three visible elevation layers: chrome
   `--bg` · canvas `--bg-subtle` · cards/cover media `--surface` (pops off
-  the canvas). Applies to every page template/route (home, blog index, post
-  detail, topics, generic pages, not-found).
+  the canvas). The tint is applied **once** on the locale layout's content
+  wrapper (the region between `<Header>` and `<Footer>`, #973) — individual
+  page/template roots under `[locale]/` set no background of their own and
+  inherit it (home, blog index, post detail, topics, generic pages). The one
+  exception is the root `not-found.tsx`, which renders _outside_ the
+  `[locale]` layout (Next's not-found boundary), so it can't inherit that
+  wrapper — its own template keeps `--bg-subtle` on its root to stay visually
+  consistent with the rest of the site. The footer sits flush below the
+  canvas on its own `--accent-muted` band.
 
 Both environments are **live** (§13): merging to `main` deploys development;
 a `vX.Y.Z` tag promotes to production.
