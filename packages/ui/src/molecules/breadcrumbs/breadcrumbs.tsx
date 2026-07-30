@@ -1,4 +1,4 @@
-import { ICONS, type IWithDataTestId } from '@blog/config';
+import { ICONS, Size, type IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Icon } from '@blog/ui/atoms/icon';
 import { type ElementType } from 'react';
@@ -48,18 +48,14 @@ export const Breadcrumbs = ({
   const lastIndex = items.length - 1;
 
   return (
-    <nav
-      aria-label={ariaLabel}
-      className={s.root({ class: className })}
-      data-testid={dataTestId}
-    >
+    <nav aria-label={ariaLabel} className={className} data-testid={dataTestId}>
       <ol className={s.list()}>
         {items.map(({ label, href }, index) => {
           const isCurrent = index === lastIndex;
           const isFirst = index === 0;
           const content = isFirst ? (
             <>
-              <Icon name={ICONS.HOUSE} />
+              <Icon name={ICONS.HOUSE} size={Size.SM} />
               <span className={s.homeLabel()}>{label}</span>
             </>
           ) : (

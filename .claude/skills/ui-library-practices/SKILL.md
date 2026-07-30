@@ -177,6 +177,35 @@ replace them with bare string literals.
   `avatarUrl`, which forces every caller to hand-map. (`@blog/ui` still never
   imports `@blog/service`; structural typing bridges it.)
 - Server-component-safe by default. **No `"use client"` allowed** — see Purity.
+- **JSDoc says what a component/function is for, never how it's built —
+  REQUIRED, not a preference.** Add JSDoc above an exported component only
+  when its purpose isn't obvious from the name; skip it on type/interface/prop
+  declarations unless a constraint is genuinely non-obvious. Once you do write
+  one, it states what the thing is/does in plain terms — never CSS class
+  names, Tailwind utilities, breakpoint behaviour, DOM nesting, or "where this
+  renders relative to other elements" (that's what reading the code is for; a
+  comment restating it just drifts out of sync the next time the styling
+  changes). **Never mention an issue/PR/branch number in prose** — a comment
+  read a year from now has no use for "#903" or "on this branch"; the git
+  history already has that. The one exception is a literal `TODO`/`FIXME` in
+  its own comment (see the repo-wide `TODO in separate comment` convention)
+  that points at a real follow-up issue — that's a pointer to future work, not
+  a description of current implementation.
+  ```tsx
+  // ✅ what it's for, no implementation/ticket detail
+  /**
+   * BreadcrumbBar — the site-wide chrome band that hosts the `@blog/ui`
+   * `<Breadcrumbs>` molecule as a sibling of `<main>`, right after `<Header>`,
+   * on every page that has a breadcrumb trail. Home renders no bar.
+   */
+
+  // ❌ describes CSS mechanics and cites an issue number
+  /**
+   * BreadcrumbBar — ... The outer band spans the full viewport width
+   * (background + border), matching the header's own divider; an inner
+   * wrapper constrains the content to `max-w-page` (1120px) (#937).
+   */
+  ```
 
 ## Polymorphism — the `as` prop
 
@@ -247,6 +276,27 @@ slot/media rules → **`compound-components.md`**.
           'rounded-sm px-4 py-2',
           'bg-accent text-accent-contrast' ]
   ```
+- **A slot with no default classes is never declared as a bare `slotName: []`
+  in `tv({ slots })` — REQUIRED, not a preference.** `tv`'s slot merge
+  (`s.slotName({ class: className })`) is only worth going through when there
+  are base classes for it to merge _with_; against an empty array it's a
+  no-op identical to using `className` directly. So an empty-array slot isn't
+  a documentation problem to comment around — it's a slot that shouldn't
+  exist. Drop the key from `slots` entirely and assign the incoming
+  `className` prop straight to that element instead:
+  ```tsx
+  // ✅ no base styling for this element — skip tv() for it, forward className directly
+  <nav className={className}>
+
+  // ❌ empty slot kept "for the merge" — the merge does nothing here
+  const s = myVariants(); // slots: { root: [], ... }
+  <nav className={s.root({ class: className })}>
+  ```
+  This doesn't conflict with "every visual element is a key in the single
+  `slots` object" below — that rule is about elements that **have** styling
+  to declare; an element with none was never a styling concern in the first
+  place. If the element later gains real base classes, add the slot key back
+  then, with those classes.
 - **In `slots`-based `tv()` calls, every slot value is an array of strings** —
   never a bare string, even a single class, even in a `variants`/
   `compoundVariants` override. (Non-slot `base`/`variants` calls in
