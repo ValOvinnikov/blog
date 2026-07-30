@@ -43,6 +43,9 @@
   "blogPostPage": {
     "relatedReading": "Related reading"
   },
+  "postContentsRail": {
+    "ariaLabel": "On this page"
+  },
   "categoryPage": {
     "title": "Posts in {name}",
     "empty": "No posts in {name} yet."
