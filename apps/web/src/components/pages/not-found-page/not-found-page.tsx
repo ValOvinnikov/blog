@@ -1,6 +1,7 @@
 import { Heading, Text } from '@blog/ui/atoms';
 import { CommandLink, TerminalChip } from '@blog/ui/molecules';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { useTranslations } from 'next-intl';
 
 import { notFoundPageVariants } from './not-found-page-variants';
 
@@ -13,24 +14,26 @@ const s = notFoundPageVariants();
  * stays a self-contained, centered composition: no site chrome, just the
  * `TerminalChip` molecule, a short explanation, and a link home.
  */
-export const NotFoundPage = () => (
-  <main className={s.root()}>
-    <Heading level={1} visual="hero">
-      404
-    </Heading>
-    <TerminalChip
-      prefix="404: "
-      suffix="command not found"
-      className={s.chip()}
-    />
-    <Text className={s.copy()}>
-      That route doesn&apos;t resolve to anything here.
-    </Text>
-    <CommandLink
-      as={SmartLink}
-      href="/"
-      command="cd ~"
-      ariaLabel="Return home"
-    />
-  </main>
-);
+export const NotFoundPage = () => {
+  const t = useTranslations('notFound');
+
+  return (
+    <main className={s.root()}>
+      <Heading level={1} visual="hero">
+        404
+      </Heading>
+      <TerminalChip
+        prefix="404: "
+        suffix={t('commandNotFound')}
+        className={s.chip()}
+      />
+      <Text className={s.copy()}>{t('description')}</Text>
+      <CommandLink
+        as={SmartLink}
+        href="/"
+        command="cd ~"
+        ariaLabel={t('returnHome')}
+      />
+    </main>
+  );
+};
