@@ -3,7 +3,7 @@ import type { RichText } from '@blog/config';
 /** A post needs at least this many H2 headings before a table-of-contents rail earns its place. */
 export const MIN_H2_HEADINGS_FOR_RAIL = 3;
 
-export type TPostHeadingLevel = 2 | 3;
+type TPostHeadingLevel = 2 | 3;
 
 export type TPostHeading = {
   /** Stable, URL-safe slug — also the rendered heading's DOM `id` (wired by `PortableTextRenderer`). */
