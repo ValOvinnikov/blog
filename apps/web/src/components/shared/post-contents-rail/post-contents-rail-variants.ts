@@ -5,10 +5,13 @@ export const postContentsRailVariants = tv({
     // `sticky` lives on `root`, not `mobile`: `mobile`'s own parent box
     // (`root`, `< lg`) is exactly as tall as `mobile` itself, so it has no
     // room to pin — `root`'s parent (`Article.Body`) is the full post
-    // height. `top-16` (64px) matches the measured `Header` height (~63px).
+    // height. `top-20` (80px) adds a 16px gap below `top-16`'s Header-height
+    // match, so a sliver of page background separates the stuck bar from the
+    // Header (`shadow-md` alone reads flush against it). `headingAnchor`'s
+    // mobile `scroll-mt-32` tracks this offset.
     root: [
       'w-full min-w-0',
-      'sticky top-16 z-10',
+      'sticky top-20 z-10',
       'lg:static lg:top-auto lg:z-auto',
     ],
     desktop: [
