@@ -23,6 +23,18 @@ export const blogPostPageVariants = tv({
           'lg:max-w-page',
           'lg:grid lg:grid-cols-[220px_1fr] lg:gap-x-10',
         ],
+        // Mirrors `body`'s rail-column grid so the tag chips align under the
+        // same content column instead of staying centered at page width;
+        // `*:` pushes the single `TagList` child into the `1fr` track and
+        // caps it back to measure, same as `content`. `border-t` lives on
+        // `Article.Footer`'s root (the grid container itself), so it still
+        // spans the full grid width — narrowing it too needs a `packages/ui`
+        // change, not done here.
+        footer: [
+          'lg:max-w-page',
+          'lg:grid lg:grid-cols-[220px_1fr] lg:gap-x-10',
+          'lg:*:col-start-2 lg:*:max-w-measure',
+        ],
       },
       false: {
         body: ['max-w-measure'],

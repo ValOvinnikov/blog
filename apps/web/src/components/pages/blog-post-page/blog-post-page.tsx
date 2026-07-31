@@ -159,7 +159,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
           </Article.Body>
 
           <Article.Footer
-            className={s.footer()}
+            className={s.footer({ withRail: hasContentsRail })}
             tags={tags.map((tag) => ({
               label: tag.title,
               href: routes.tag(tag.slug),
