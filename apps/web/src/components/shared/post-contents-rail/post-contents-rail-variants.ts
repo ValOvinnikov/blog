@@ -18,7 +18,15 @@ export const postContentsRailVariants = tv({
     ],
     // `relative` gives this bar its own positioning context so `panel`
     // overlays it directly rather than depending on `root`'s box.
-    mobile: ['relative', 'bg-bg border-b border-border', 'mb-6', 'lg:hidden'],
+    // `shadow-md` — this bar shares `Header`'s exact `bg-bg`/`border-border`,
+    // so the hairline border alone doesn't read as a seam once it's sticky
+    // flush beneath it (#981).
+    mobile: [
+      'relative',
+      'bg-bg border-b border-border shadow-md',
+      'mb-6',
+      'lg:hidden',
+    ],
     desktopLabel: [
       'mb-3 block',
       'font-mono text-label tracking-label uppercase text-text',
