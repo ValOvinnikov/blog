@@ -100,6 +100,27 @@ describe(HeroModule, () => {
     expect(img.getAttribute('src')).not.toContain('h=900');
   });
 
+  it('sets fetchpriority="high" on the hero image (confirmed LCP element)', async () => {
+    getHeroMock.mockResolvedValue({
+      ok: true,
+      data: {
+        eyebrow: undefined,
+        title: 'Welcome to the blog',
+        subtitle: undefined,
+        sanityImage,
+        primaryAction: undefined,
+        secondaryAction: undefined,
+      },
+    });
+
+    await setup();
+
+    expect(screen.getByRole('img', { name: sanityImage.alt })).toHaveAttribute(
+      'fetchpriority',
+      'high',
+    );
+  });
+
   it('gives the default "Read more" CTA a descriptive accessible name via visually-hidden text', async () => {
     getHeroMock.mockResolvedValue({
       ok: true,

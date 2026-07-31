@@ -14,6 +14,8 @@ const image: ISanityImage = {
 
 const setup = customRender(SanityImage, {
   image,
+  projectId: 'test-project',
+  dataset: 'test-dataset',
   width: 960,
   height: 720,
 });
@@ -54,5 +56,22 @@ describe('SanityImage', () => {
     expect(img).toHaveClass('custom-class');
     expect(img).toHaveAttribute('sizes', '(min-width: 1024px) 50vw, 100vw');
     expect(img).toHaveAttribute('loading', 'eager');
+  });
+
+  it('sets fetchpriority="high" on the rendered img when priority is true', () => {
+    setup({ priority: true });
+
+    expect(screen.getByRole('img', { name: image.alt })).toHaveAttribute(
+      'fetchpriority',
+      'high',
+    );
+  });
+
+  it('renders no fetchpriority attribute when priority is omitted (default false)', () => {
+    setup();
+
+    expect(screen.getByRole('img', { name: image.alt })).not.toHaveAttribute(
+      'fetchpriority',
+    );
   });
 });

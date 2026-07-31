@@ -1,4 +1,4 @@
-import { ICONS, type RichText, Size } from '@blog/config';
+import { ICONS, type ISanityImage, type RichText, Size } from '@blog/config';
 import { Icon } from '@blog/ui/atoms';
 import userEvent from '@testing-library/user-event';
 import {
@@ -205,6 +205,27 @@ describe(`<${BlogPostPage.name}/>`, () => {
     await setup();
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  });
+
+  it('sets fetchpriority="high" on the hero image (confirmed LCP element) when heroImageSanity is present', async () => {
+    const heroImageSanity: ISanityImage = {
+      assetId: 'image-abc123-1600x1200-jpg',
+      alt: 'A scenic mountain range',
+      hotspot: { x: 0.5, y: 0.5, width: 1, height: 1 },
+      crop: undefined,
+      lqip: undefined,
+      dimensions: { width: 1600, height: 1200, aspectRatio: 1600 / 1200 },
+    };
+    getPostMock.mockResolvedValue({
+      ok: true,
+      data: { ...mockPostDetail, heroImageSanity },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('img', { name: mockPostDetail.heroImageAlt }),
+    ).toHaveAttribute('fetchpriority', 'high');
   });
 
   it('renders no PostContentsRail (and stays single-column) when the body has fewer than 3 H2 headings', async () => {

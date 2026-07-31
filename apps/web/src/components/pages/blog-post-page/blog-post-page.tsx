@@ -132,9 +132,12 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
               heroImageSanity ? (
                 <SanityImage
                   image={heroImageSanity}
+                  projectId={env.NEXT_PUBLIC_SANITY_PROJECT_ID}
+                  dataset={env.NEXT_PUBLIC_SANITY_DATASET}
                   width={1200}
                   height={675}
                   sizes="(min-width: 1024px) 800px, 100vw"
+                  priority
                   alt={heroImageAlt}
                   className={s.coverImage()}
                 />
