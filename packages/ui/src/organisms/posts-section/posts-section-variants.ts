@@ -16,7 +16,7 @@ export const postsSectionVariants = tv({
   variants: {
     tinted: {
       true: {
-        root: ['mt-0 w-full py-section'],
+        root: ['mt-0 w-full py-10'],
         inner: ['mx-auto max-w-page px-gutter'],
         contentGroup: ['border-t border-border-emphasis pt-10'],
       },
