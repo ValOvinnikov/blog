@@ -67,11 +67,19 @@ category cap was narrowed to a single required reference in #809 on
   image renders below that column, back at the full 1120px width (#942).
   The article body is capped at `max-w-measure` (68ch,
   tightened from the earlier `max-w-post`/760px for reading comfort — #932)
-  — unless the post qualifies for the "On this page" contents rail (≥3 H2
+  — unless the post qualifies for the "Topics" contents rail (≥3 H2
   headings, #934), in which case the body widens to `max-w-page` and splits
-  into a two-column grid: a sticky rail (desktop `≥1024px`) or a closed-by-
-  default disclosure (mobile) alongside the still-`max-w-measure`-capped
-  reading column. With the rail present, `Article.Footer` (the tag chips)
+  into a two-column grid: a sticky rail (desktop `≥1024px`) or a compact
+  selector (below `1024px`) alongside the still-`max-w-measure`-capped
+  reading column. The `max-w-measure` cap lives on each grid child
+  (`content`, `rail`, `footerInRail`), not on `body` — nesting it on both double-shrank
+  the reading column below `lg:` (to ~536px); capping per-child keeps it a
+  consistent 68ch (~616px) at every width (#995). The rail is labelled
+  **Topics**: at `≥1024px` a full vertical topic list with active-topic
+  highlighting; below that, a "TOPICS" label (stacked above on mobile,
+  inline-left on tablet) plus a bordered selector showing the current
+  active topic (defaults to the first heading, tracks scroll) that opens
+  the full list to jump (#995). With the rail present, `Article.Footer` (the tag chips)
   renders _inside_ that grid as a second row under the reading column —
   capped to `max-w-measure` and left-aligned with the body, so its top rule
   spans only the reading column rather than the full grid width — and the

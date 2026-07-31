@@ -234,7 +234,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     await setup();
 
     expect(
-      screen.queryByRole('navigation', { name: 'On this page' }),
+      screen.queryByRole('navigation', { name: 'Topics' }),
     ).not.toBeInTheDocument();
   });
 
@@ -252,7 +252,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    const rail = screen.getByRole('navigation', { name: 'On this page' });
+    const rail = screen.getByRole('navigation', { name: 'Topics' });
     expect(
       within(rail).getByRole('link', { name: 'Configuration' }),
     ).toHaveAttribute('href', '#configuration');
@@ -276,9 +276,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('navigation', { name: 'On this page' }),
-    ).toBeVisible();
+    expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'TypeScript' })).toHaveAttribute(
       'href',
       '/tag/typescript',

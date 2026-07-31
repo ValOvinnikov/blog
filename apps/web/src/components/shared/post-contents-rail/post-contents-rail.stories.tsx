@@ -29,7 +29,7 @@ export const MobileOpen: TStory = {
   globals: { viewport: 'mobile' },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('button', { name: 'On this page' }));
+    await userEvent.click(canvas.getByRole('button', { name: /Topics/ }));
   },
 };
 
@@ -39,7 +39,7 @@ export const MobileOpenItemHover: TStory = {
   globals: { viewport: 'mobile' },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('button', { name: 'On this page' }));
+    await userEvent.click(canvas.getByRole('button', { name: /Topics/ }));
     const links = canvas.getAllByRole('link', {
       name: mockPostHeadings.at(0)?.text,
     });
@@ -51,7 +51,7 @@ export const MobileOpenItemFocus: TStory = {
   globals: { viewport: 'mobile' },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('button', { name: 'On this page' }));
+    await userEvent.click(canvas.getByRole('button', { name: /Topics/ }));
     const links = canvas.getAllByRole('link', {
       name: mockPostHeadings.at(0)?.text,
     });

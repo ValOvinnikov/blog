@@ -1,7 +1,5 @@
 'use client';
 
-import { ICONS, Size } from '@blog/config';
-import { Icon } from '@blog/ui/atoms';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useActiveHeadingId } from '@web/hooks/use-active-heading-id';
 import { usePopover } from '@web/hooks/use-popover';
@@ -19,10 +17,10 @@ export type TPostContentsRailProps = {
 const s = postContentsRailVariants();
 
 /**
- * PostContentsRail — the "On this page" table of contents for long posts,
- * rendered by `BlogPostPage` once it has 3+ headings. A sticky rail at
- * `lg:` and up, and a closed-by-default disclosure below it, share the same
- * heading list and active-section highlighting from `useActiveHeadingId`.
+ * PostContentsRail — the "Topics" table of contents for long posts, rendered
+ * by `BlogPostPage` once it has 3+ headings. A sticky rail at `lg:` and up
+ * keeps the full list; below `lg:` a bordered selector shows the current
+ * topic and opens a closed-by-default disclosure with the full list.
  */
 export const PostContentsRail = ({
   headings,
@@ -30,6 +28,8 @@ export const PostContentsRail = ({
 }: TPostContentsRailProps) => {
   const t = useTranslations('postContentsRail');
   const labelId = useId();
+  const mobileLabelId = useId();
+  const currentTopicId = useId();
   const panelId = useId();
   // Plain in-page navigation, not a command menu: no Tab trap, and the
   // opaque overlay panel closes as soon as focus moves past it.
@@ -38,7 +38,10 @@ export const PostContentsRail = ({
     closeOnFocusOut: true,
   });
   const activeId = useActiveHeadingId(headings.map((heading) => heading.id));
-  const label = t('ariaLabel');
+  const label = t('label');
+  // Defaults to the first heading before the reader has scrolled past any.
+  const activeHeading =
+    headings.find((heading) => heading.id === activeId) ?? headings[0];
 
   // `onNavigate` closes the mobile panel before the anchor jump — a click
   // leaves focus on the clicked link, so `closeOnFocusOut` never fires.
@@ -76,18 +79,25 @@ export const PostContentsRail = ({
       </div>
 
       <div className={s.mobile()}>
-        <button
-          ref={triggerRef}
-          type="button"
-          className={s.toggle()}
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={toggle}
-        >
-          <Icon name={ICONS.MENU_ROWS} size={Size.SM} />
-          <span className={s.toggleLabel()}>{label}</span>
-          <span aria-hidden="true" className={s.chevron({ open })} />
-        </button>
+        <div className={s.selectorRow()}>
+          <span id={mobileLabelId} className={s.mobileLabel()}>
+            {label}
+          </span>
+          <button
+            ref={triggerRef}
+            type="button"
+            className={s.toggle()}
+            aria-expanded={open}
+            aria-controls={panelId}
+            aria-labelledby={`${mobileLabelId} ${currentTopicId}`}
+            onClick={toggle}
+          >
+            <span id={currentTopicId} className={s.toggleLabel()}>
+              {activeHeading?.text}
+            </span>
+            <span aria-hidden="true" className={s.chevron({ open })} />
+          </button>
+        </div>
         <div ref={panelRef} id={panelId} hidden={!open} className={s.panel()}>
           {renderList(close, true)}
         </div>

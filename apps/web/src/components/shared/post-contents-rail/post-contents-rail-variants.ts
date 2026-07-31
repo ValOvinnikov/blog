@@ -27,6 +27,7 @@ export const postContentsRailVariants = tv({
     mobile: [
       'relative',
       'bg-bg border-b border-border shadow-md',
+      'px-4 py-3',
       'mb-6',
       'lg:hidden',
     ],
@@ -34,16 +35,30 @@ export const postContentsRailVariants = tv({
       'mb-3 block',
       'font-mono text-label tracking-label uppercase text-text',
     ],
-    // No bare `p-0` alongside `px-4`/`py-3`: `tv()`'s `tailwind-merge` treats
-    // `p-0` as most-specific for both axes, silently canceling `py-3`.
+    // Stacked below `md:` (label above a full-width selector); inline-left
+    // at `md:`–`lg:` (label beside the selector in one row).
+    selectorRow: [
+      'flex flex-col gap-1.5',
+      'md:flex-row md:items-center md:gap-3',
+    ],
+    mobileLabel: [
+      'shrink-0',
+      'font-mono text-label tracking-label uppercase text-subtle',
+    ],
+    // A bordered form-field look, not a flush bar — the label + current
+    // topic text already convey it's expandable, so no leading icon.
     toggle: [
-      'flex w-full items-center gap-2 px-4 py-3',
-      'font-mono text-label tracking-label uppercase text-text',
-      'cursor-pointer border-0 bg-transparent text-left',
+      'flex w-full min-w-0 items-center justify-between gap-2',
+      'md:flex-1',
+      'border border-border rounded-md bg-bg px-3 py-2.5',
+      'font-mono text-copy text-text',
+      'cursor-pointer text-left',
+      'transition-colors duration-base ease-console',
+      'hover:bg-surface-2',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
     ],
-    toggleLabel: ['flex-1'],
+    toggleLabel: ['flex-1 truncate'],
     chevron: [
       'size-1.5 shrink-0 rotate-45 border-r-2 border-b-2 border-current',
       'transition-transform duration-base ease-console',
