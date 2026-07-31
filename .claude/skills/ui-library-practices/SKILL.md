@@ -276,6 +276,37 @@ slot/media rules → **`compound-components.md`**.
           'rounded-sm px-4 py-2',
           'bg-accent text-accent-contrast' ]
   ```
+- **A comment justifying a non-obvious value is 1–3 lines — REQUIRED, not a
+  preference, this has recurred and keeps getting reverted back to essays.**
+  State the number/decision and the one fact that makes it non-obvious; stop
+  there. It is not the place to re-derive the whole feature's layout model,
+  walk through alternative values considered, or restate what the surrounding
+  code already shows by being read. If the reasoning genuinely needs more than
+  3 lines, that's a signal the value itself is too clever — simplify the CSS
+  instead of writing a longer comment to explain it.
+  ```ts
+  // ✅ states the number and the one non-obvious fact, stops
+  // top-16 matches the site Header's measured ~63px height (not top-24 —
+  // that overshoots and leaves a gap the article scrolls through).
+  root: ['sticky top-16 z-10'],
+
+  // ❌ multi-paragraph essay re-deriving the whole layout, restating what's
+  // already visible in the surrounding slots, and walking through the
+  // measurement process step by step instead of just stating the result
+  root: [
+    // `< lg`, the `withRail: true` body used to jump straight to
+    // `max-w-page` — the same width as the `lg:` two-column grid — but below
+    // `lg:` there's no grid columning it down: `PostContentsRail`'s mobile
+    // disclosure (`w-full`) then spans the full `max-w-page` box while
+    // `content` (the article text, capped to `max-w-measure` with no
+    // `mx-auto` of its own) sits left-aligned inside it, so neither the rail
+    // strip nor the article text reads as centered on the page. Capping...
+    'sticky top-16 z-10',
+  ],
+  ```
+  This applies to any `{component-name}-variants.ts` file regardless of
+  workspace — `apps/web` components follow it too (`web-component-practices`
+  cross-references this section rather than restating it).
 - **A slot with no default classes is never declared as a bare `slotName: []`
   in `tv({ slots })` — REQUIRED, not a preference.** `tv`'s slot merge
   (`s.slotName({ class: className })`) is only worth going through when there

@@ -57,3 +57,10 @@ Generate the `aria-controls` id with `useId()`, not a hardcoded default.
 - `'use client'` stays on the smallest interactive leaf (CLAUDE.md conventions).
 - Testing an inverted composition needs a fake `@blog/ui` mock — that mock is
   the signal to slot-in instead (`testing-practices`).
+- `apps/web` components follow the same `{component-name}-variants.ts` +
+  `tv()` conventions as `packages/ui` — including comment discipline. A
+  non-obvious magic number (a sticky offset, a `scroll-mt` value) gets a
+  1–3 line comment stating the value and the one non-obvious fact behind it,
+  never a multi-paragraph essay re-deriving the layout — this has recurred on
+  `apps/web` variants files specifically. Full rule + before/after example:
+  `ui-library-practices` → "Group classes by concern".
