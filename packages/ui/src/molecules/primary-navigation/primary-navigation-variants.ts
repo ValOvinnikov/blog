@@ -2,7 +2,11 @@ import { tv } from '@blog/ui/lib/styling';
 
 export const primaryNavigationVariants = tv({
   slots: {
-    root: ['relative flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2'],
+    // No `relative` here: `panel`'s `absolute inset-x-0` deliberately relies
+    // on `Header`'s own `sticky` element (a valid CSS "positioned" value) as
+    // its containing block. Adding `relative` back would confine `panel` to
+    // this element's own intrinsic width instead of the full header.
+    root: ['flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2'],
     links: ['flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2'],
     toggle: ['shrink-0'],
     panel: [
