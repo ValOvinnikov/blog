@@ -86,11 +86,19 @@ export const postContentsRailVariants = tv({
     // beneath instead of pushing it down the page — matters most once
     // `root` is pinned mid-scroll. `max-h`+`overflow-y-auto` keeps a long
     // heading list from overrunning the viewport.
+    // `pt-4` (new — was unset) balances the existing `pb-4`: with no top
+    // padding, the first item sat flush against the `mobile` bar's own
+    // `border-b border-border` immediately above, so the border read as an
+    // internal list rule rather than a boundary separating the "ON THIS
+    // PAGE" toggle row from the list below it. Matching top/bottom padding
+    // gives the divider room to breathe on both the title side and the list
+    // side, so it reads as a clear section break instead of the two blocks
+    // merging visually.
     panel: [
       'absolute inset-x-0 top-full',
       'bg-bg border-b border-border shadow-lg',
       'max-h-[70vh] overflow-y-auto px-4',
-      'pb-4',
+      'pt-4 pb-4',
     ],
     list: ['flex flex-col gap-2', 'font-mono text-copy', 'm-0 list-none p-0'],
     item: [],
@@ -111,6 +119,43 @@ export const postContentsRailVariants = tv({
     },
     isSubheading: {
       true: { item: ['pl-3'] },
+    },
+    // `inPanel` replicates `PopoverMenuItem`'s row treatment (see
+    // `packages/ui/src/molecules/popover-menu/components/item/
+    // popover-menu-item-variants.ts`: `rounded-md px-3 py-2` + `hover:bg-
+    // surface-2`) — minus its border (there isn't one to begin with) — onto
+    // the rail's own `link` slot. `flex`/`block` are both block-level and
+    // stay full-width, so this doesn't narrow the link's own box or its
+    // focus ring — what changes is the box gaining rounded corners and
+    // internal padding, giving it a "pill" look inside the still-full-width
+    // row rather than a narrower, hugged box. It's scoped to
+    // the mobile disclosure's own copy of the list only: `PostContentsRail`
+    // passes it for the `renderList(close, true)` call inside `panel`, but
+    // omits it for the plain `renderList()` call inside `desktop`, so the
+    // sticky `lg:` side rail keeps its original plain-text look — the
+    // reported broken edge-to-edge focus ring (a full-width `block` link's
+    // ring spanning the entire panel width) and "needs share-menu-style
+    // affordance" feedback were both specific to the mobile overlay, not the
+    // narrow desktop column, and desktop must stay visually unchanged.
+    // `flex items-center` here overrides the base `block` (tailwind-merge
+    // resolves the conflicting display utility in favor of this, later,
+    // class), giving the icon-less row the same alignment `PopoverMenuItem`
+    // uses for its icon+label rows. `list`'s own `gap-1` override (down from
+    // the shared `gap-2` above) is scoped here too: now that `link` carries
+    // its own `py-2` in this variant, keeping the shared `gap-2` on top of
+    // that padding read as oversized double-spacing between mobile panel
+    // items; `gap-1` matches the spacing `PopoverMenu.Panel`'s own `flex
+    // flex-col gap-1` uses around its `py-2`-padded `PopoverMenuItem` rows.
+    // `list` is a single slot shared by both the desktop rail's plain
+    // `renderList()` call and this mobile panel's `renderList(close, true)`
+    // call, and desktop's `link` stays plain `block` with no added padding —
+    // gating the tighter gap behind `inPanel` (rather than tightening the
+    // shared slot directly) keeps desktop's own `gap-2` untouched.
+    inPanel: {
+      true: {
+        link: ['flex items-center rounded-md px-3 py-2', 'hover:bg-surface-2'],
+        list: ['gap-1'],
+      },
     },
   },
 });

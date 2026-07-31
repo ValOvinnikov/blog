@@ -74,8 +74,11 @@ export const PostContentsRail = ({
   // the link that was just clicked — still inside the panel — so
   // `closeOnFocusOut` never fires and the still-open, opaque overlay (up to
   // `max-h-[70vh]`) would otherwise cover the very heading just scrolled to.
-  const renderList = (onNavigate?: () => void) => (
-    <ol className={s.list()}>
+  // `inPanel` (also only ever `true` for the mobile call) opts that copy of
+  // the list into the share-menu-style item chrome — see `inPanel` on
+  // `postContentsRailVariants` for why the desktop call omits it.
+  const renderList = (onNavigate?: () => void, inPanel = false) => (
+    <ol className={s.list({ inPanel })}>
       {headings.map((heading) => {
         const isActive = heading.id === activeId;
 
@@ -86,7 +89,7 @@ export const PostContentsRail = ({
           >
             <SmartLink
               href={`#${heading.id}`}
-              className={s.link({ isActive })}
+              className={s.link({ isActive, inPanel })}
               aria-current={isActive ? 'location' : undefined}
               onClick={onNavigate}
             >
@@ -121,7 +124,7 @@ export const PostContentsRail = ({
           <span aria-hidden="true" className={s.chevron({ open })} />
         </button>
         <div ref={panelRef} id={panelId} hidden={!open} className={s.panel()}>
-          {renderList(close)}
+          {renderList(close, true)}
         </div>
       </div>
     </nav>
