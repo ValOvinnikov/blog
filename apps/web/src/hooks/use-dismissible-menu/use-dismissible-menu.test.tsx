@@ -39,6 +39,86 @@ const Harness = () => {
 };
 
 /**
+ * Harness exercising `trapFocus: false` — mirrors `PostContentsRail`'s
+ * mobile disclosure, which opts out of the Tab-trap/roving-focus behaviour
+ * because it's a plain in-page navigation panel, not a command menu. Adds a
+ * focusable element after the panel (like the article body Tab would land in
+ * next) so a non-trapping Tab from the panel's last item has somewhere real
+ * to prove it isn't wrapped back to the first item.
+ */
+const HarnessNoTrap = () => {
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const getTrigger = useCallback(() => triggerRef.current, []);
+  const getPanel = useCallback(() => panelRef.current, []);
+
+  const { open, toggle } = useDismissibleMenu({
+    getTrigger,
+    getPanel,
+    trapFocus: false,
+  });
+
+  return (
+    <div>
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-expanded={open}
+        onClick={toggle}
+      >
+        trigger
+      </button>
+      <div ref={panelRef} hidden={!open}>
+        <button type="button">first</button>
+        <button type="button">second</button>
+      </div>
+      <button type="button">after panel</button>
+    </div>
+  );
+};
+
+/**
+ * Harness exercising `closeOnFocusOut: true` alongside `trapFocus: false` —
+ * mirrors `PostContentsRail`'s mobile disclosure exactly: a non-trapping,
+ * opaque-overlay panel that must close the moment focus genuinely leaves it.
+ * Adds the same "after panel" focusable target as `HarnessNoTrap` so a Tab
+ * past the last item has somewhere real outside the panel/trigger to land.
+ */
+const HarnessCloseOnFocusOut = () => {
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const getTrigger = useCallback(() => triggerRef.current, []);
+  const getPanel = useCallback(() => panelRef.current, []);
+
+  const { open, toggle } = useDismissibleMenu({
+    getTrigger,
+    getPanel,
+    trapFocus: false,
+    closeOnFocusOut: true,
+  });
+
+  return (
+    <div>
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-expanded={open}
+        onClick={toggle}
+      >
+        trigger
+      </button>
+      <div ref={panelRef} hidden={!open}>
+        <button type="button">first</button>
+        <button type="button">second</button>
+      </div>
+      <button type="button">after panel</button>
+    </div>
+  );
+};
+
+/**
  * Harness exercising the optional `getContainer` accessor: a "sibling
  * action" button shares a common ancestor with the trigger/panel (mirroring
  * `SiteNavigation`'s `actions` slot sharing `containerRef` with
@@ -249,6 +329,198 @@ describe(useDismissibleMenu, () => {
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
 
     sibling.remove();
+  });
+});
+
+describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
+  const setupNoTrap = customRender(HarnessNoTrap, {});
+
+  beforeEach(() => {
+    setupNoTrap();
+  });
+
+  it('does not trap Tab — tabbing from the last item moves focus out of the panel instead of wrapping to the first', async () => {
+    const user = userEvent.setup();
+    await user.click(getTrigger());
+
+    const last = screen.getByRole('button', { name: 'second' });
+    last.focus();
+
+    await user.tab();
+
+    expect(document.activeElement).toBe(
+      screen.getByRole('button', { name: 'after panel' }),
+    );
+  });
+
+  it('does not reverse-trap Shift+Tab — tabbing back from the first item moves focus to the trigger instead of wrapping to the last', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+    await user.click(trigger);
+
+    const first = screen.getByRole('button', { name: 'first' });
+    first.focus();
+
+    await user.tab({ shift: true });
+
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('does not move focus on ArrowDown/ArrowUp/Home/End', async () => {
+    const user = userEvent.setup();
+    await user.click(getTrigger());
+
+    const first = screen.getByRole('button', { name: 'first' });
+    first.focus();
+
+    fireEvent.keyDown(document, { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(first);
+
+    fireEvent.keyDown(document, { key: 'ArrowUp' });
+    expect(document.activeElement).toBe(first);
+
+    fireEvent.keyDown(document, { key: 'Home' });
+    expect(document.activeElement).toBe(first);
+
+    fireEvent.keyDown(document, { key: 'End' });
+    expect(document.activeElement).toBe(first);
+  });
+
+  it('still closes on Escape and returns focus to the trigger', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+    await user.click(trigger);
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('still closes on an outside pointer-down and returns focus to the trigger', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+    await user.click(trigger);
+
+    fireEvent.mouseDown(document.body);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('with the default closeOnFocusOut (false), stays open when Tab carries focus past the last item and out of the panel', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+    await user.click(trigger);
+
+    const last = screen.getByRole('button', { name: 'second' });
+    last.focus();
+
+    await user.tab();
+
+    expect(document.activeElement).toBe(
+      screen.getByRole('button', { name: 'after panel' }),
+    );
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  });
+});
+
+describe(`${useDismissibleMenu.name} with closeOnFocusOut: true`, () => {
+  const setupCloseOnFocusOut = customRender(HarnessCloseOnFocusOut, {});
+
+  beforeEach(() => {
+    setupCloseOnFocusOut();
+  });
+
+  it('closes when Tab carries focus past the last item, leaving focus on the element it landed on instead of forcing it back to the trigger', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+    await user.click(trigger);
+
+    const last = screen.getByRole('button', { name: 'second' });
+    last.focus();
+
+    await user.tab();
+
+    const afterPanel = screen.getByRole('button', { name: 'after panel' });
+    expect(document.activeElement).toBe(afterPanel);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('closes when focus moves to an arbitrary element outside the trigger/panel', () => {
+    const trigger = getTrigger();
+    fireEvent.click(trigger);
+
+    const first = screen.getByRole('button', { name: 'first' });
+    first.focus();
+
+    const outside = document.createElement('button');
+    document.body.append(outside);
+
+    fireEvent.focusOut(first, { relatedTarget: outside });
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    outside.remove();
+  });
+
+  it('stays open when focus moves within the panel', () => {
+    const trigger = getTrigger();
+    fireEvent.click(trigger);
+
+    const first = screen.getByRole('button', { name: 'first' });
+    const last = screen.getByRole('button', { name: 'second' });
+    first.focus();
+
+    fireEvent.focusOut(first, { relatedTarget: last });
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('stays open when focus moves back to the trigger', () => {
+    const trigger = getTrigger();
+    fireEvent.click(trigger);
+
+    const first = screen.getByRole('button', { name: 'first' });
+    first.focus();
+
+    fireEvent.focusOut(first, { relatedTarget: trigger });
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('stays open on the transient relatedTarget === null blur', () => {
+    const trigger = getTrigger();
+    fireEvent.click(trigger);
+
+    const first = screen.getByRole('button', { name: 'first' });
+    first.focus();
+
+    fireEvent.focusOut(first, { relatedTarget: null });
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('still closes on Escape and returns focus to the trigger', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+    await user.click(trigger);
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('still closes on an outside pointer-down and returns focus to the trigger', async () => {
+    const user = userEvent.setup();
+    const trigger = getTrigger();
+    await user.click(trigger);
+
+    fireEvent.mouseDown(document.body);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(document.activeElement).toBe(trigger);
   });
 });
 

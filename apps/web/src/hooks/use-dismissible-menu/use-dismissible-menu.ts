@@ -12,42 +12,45 @@ export type TDismissibleMenuAccessors = {
   getTrigger: () => HTMLElement | null;
   getPanel: () => HTMLElement | null;
   /**
-   * Optional wider "inside" boundary for the outside-click check. When
-   * provided, a pointer-down anywhere inside `getContainer()` counts as
-   * inside — not just inside the resolved trigger/panel — so sibling
-   * elements sharing that container (e.g. `SiteNavigation`'s always-visible
-   * `actions` slot) never trigger a dismiss. Omit it to keep the narrower
-   * trigger/panel-only scoping (`usePopover`'s behaviour, which never had a
-   * wider container to begin with).
+   * Optional wider "inside" boundary for the outside-click check — a
+   * pointer-down anywhere inside `getContainer()` also counts as inside,
+   * so a sibling sharing that container never triggers a dismiss.
    */
   getContainer?: () => HTMLElement | null;
+  /**
+   * When `false`, skips the Tab focus-trap and Arrow/Home/End roving focus
+   * (Escape/outside-click still apply). Defaults to `true` for command-style
+   * menus; set `false` for a plain in-page navigation disclosure.
+   */
+  trapFocus?: boolean;
+  /**
+   * When `true`, closes the menu as soon as focus moves outside both trigger
+   * and panel, without returning focus to the trigger. Defaults to `false`.
+   * Needed for a non-modal overlay panel left open while focus moves past it
+   * (WCAG 2.4.11).
+   */
+  closeOnFocusOut?: boolean;
 };
 
 /**
  * useDismissibleMenu — the shared open-state/focus/dismissal core behind
  * `usePopover` and `useMobileNavToggle`: focus-into-panel on open,
- * Escape/outside-click dismissal, a Tab focus-trap scoped to the panel,
- * ArrowUp/ArrowDown/Home/End roving focus over the panel's focusable items
- * (WAI-ARIA APG menu pattern), and focus-return-to-trigger on every close
- * path (toggle, Escape, outside-click).
+ * Escape/outside-click dismissal, and focus-return-to-trigger on every close
+ * path. By default it also layers a Tab focus-trap and Arrow/Home/End
+ * roving focus over the panel's focusable items (WAI-ARIA APG menu pattern);
+ * `trapFocus: false` opts out of both and keeps ordinary Tab order.
  *
  * Trigger/panel DOM nodes are located through `getTrigger`/`getPanel`
  * accessor callbacks rather than concrete refs, so callers can adapt
- * whatever DOM-lookup strategy fits their markup — two forwarded refs
- * (`usePopover`) or a single container ref scoped by `querySelector`
- * (`useMobileNavToggle`) — without duplicating the dismissal/focus-trap/
- * roving-focus logic itself.
- *
- * Tab decision: Tab deliberately stays trapped inside the panel (dialog-
- * style wrap, not "Tab exits the menu"). This is a conscious choice, not an
- * oversight — it preserves the existing dismissal/focus-return behaviour
- * (and the tests that pin it) while Arrow/Home/End layer standard menu
- * roving on top.
+ * whatever DOM-lookup strategy fits their markup without duplicating the
+ * dismissal/focus-trap/roving-focus logic itself.
  */
 export const useDismissibleMenu = ({
   getTrigger,
   getPanel,
   getContainer,
+  trapFocus = true,
+  closeOnFocusOut = false,
 }: TDismissibleMenuAccessors) => {
   const [open, setOpenState] = useState(false);
 
@@ -94,6 +97,8 @@ export const useDismissibleMenu = ({
         close();
         return;
       }
+
+      if (!trapFocus) return;
 
       const focusable = getFocusables(getPanel());
       const first = focusable.at(0);
@@ -149,7 +154,34 @@ export const useDismissibleMenu = ({
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [open, getPanel, getTrigger, getContainer, close]);
+  }, [open, getPanel, getTrigger, getContainer, close, trapFocus]);
+
+  useEffect(() => {
+    if (!open || !closeOnFocusOut) return;
+
+    const panel = getPanel();
+    if (!panel) return;
+
+    const handleFocusOut = (event: FocusEvent) => {
+      const next = event.relatedTarget as Node | null;
+
+      if (
+        next === null ||
+        getPanel()?.contains(next) ||
+        getTrigger()?.contains(next)
+      ) {
+        return;
+      }
+
+      setOpenState(false);
+    };
+
+    panel.addEventListener('focusout', handleFocusOut);
+
+    return () => {
+      panel.removeEventListener('focusout', handleFocusOut);
+    };
+  }, [open, closeOnFocusOut, getPanel, getTrigger]);
 
   return { open, toggle, close };
 };

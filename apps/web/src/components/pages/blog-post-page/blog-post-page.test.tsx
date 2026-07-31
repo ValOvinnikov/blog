@@ -207,6 +207,36 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
   });
 
+  it('renders no PostContentsRail (and stays single-column) when the body has fewer than 3 H2 headings', async () => {
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+
+    await setup();
+
+    expect(
+      screen.queryByRole('navigation', { name: 'On this page' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders PostContentsRail once the body has 3+ H2 headings', async () => {
+    const body: RichText = [
+      richTextBlock('h2', [richTextSpan('Getting started')]),
+      richTextBlock('normal', [richTextSpan('Intro.')]),
+      richTextBlock('h2', [richTextSpan('Configuration')]),
+      richTextBlock('h2', [richTextSpan('Deployment')]),
+    ];
+    getPostMock.mockResolvedValue({
+      ok: true,
+      data: { ...mockPostDetail, body },
+    });
+
+    await setup();
+
+    const rail = screen.getByRole('navigation', { name: 'On this page' });
+    expect(
+      within(rail).getByRole('link', { name: 'Configuration' }),
+    ).toHaveAttribute('href', '#configuration');
+  });
+
   it('renders the JSON-LD BlogPosting schema script', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 

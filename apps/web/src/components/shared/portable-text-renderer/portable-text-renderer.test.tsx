@@ -1,10 +1,15 @@
 import type { RichText } from '@blog/config';
-import { customRender, screen } from '@web/testing/custom-render';
+import {
+  customRender,
+  renderElement,
+  screen,
+} from '@web/testing/custom-render';
 import {
   richTextBlock,
   richTextSpan,
   type TRichTextBlock,
 } from '@web/testing/shared/portable-text-renderer/fixtures';
+import { extractPostHeadings } from '@web/utils/extract-post-headings/extract-post-headings';
 
 import { PortableTextRenderer } from './portable-text-renderer';
 
@@ -148,6 +153,102 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     expect(root?.children[0]?.tagName).toBe('H2');
     expect(root?.children[1]?.tagName).toBe('P');
     expect(root?.children[2]?.tagName).toBe('P');
+  });
+
+  it('renders h2/h3 blocks with no id when the caller omits headings, even with 3+ H2 headings in the body (the page-builder-module default)', () => {
+    const value: RichText = [
+      richTextBlock('h2', [richTextSpan('Getting started')]),
+      richTextBlock('normal', [richTextSpan('Intro.')]),
+      richTextBlock('h3', [richTextSpan('Prerequisites')]),
+      richTextBlock('h2', [richTextSpan('Configuration')]),
+      richTextBlock('h2', [richTextSpan('Deployment')]),
+    ];
+
+    setup({ value });
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Getting started' }),
+    ).not.toHaveAttribute('id');
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Prerequisites' }),
+    ).not.toHaveAttribute('id');
+  });
+
+  it('gives h2/h3 blocks a stable, URL-safe id once the caller opts in with the pre-computed headings, so PostContentsRail links (and deep-links) resolve to the right heading', () => {
+    const value: RichText = [
+      richTextBlock('h2', [richTextSpan('Getting started')]),
+      richTextBlock('normal', [richTextSpan('Intro.')]),
+      richTextBlock('h3', [richTextSpan('Prerequisites')]),
+      richTextBlock('h2', [richTextSpan('Configuration')]),
+      richTextBlock('h2', [richTextSpan('Deployment')]),
+    ];
+
+    setup({ value, headings: extractPostHeadings(value) });
+
+    const gettingStarted = screen.getByRole('heading', {
+      level: 2,
+      name: 'Getting started',
+    });
+    expect(gettingStarted).toHaveAttribute('id', 'getting-started');
+
+    const prerequisites = screen.getByRole('heading', {
+      level: 3,
+      name: 'Prerequisites',
+    });
+    expect(prerequisites).toHaveAttribute('id', 'prerequisites');
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Configuration' }),
+    ).toHaveAttribute('id', 'configuration');
+  });
+
+  it("renders h2/h3 blocks with no id when headings is passed but the body has fewer than 3 H2 headings, matching extractPostHeadings' own below-threshold []", () => {
+    const value: RichText = [
+      richTextBlock('h2', [richTextSpan('Only section')]),
+      richTextBlock('normal', [richTextSpan('Some text.')]),
+    ];
+
+    setup({ value, headings: extractPostHeadings(value) });
+
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Only section',
+    });
+    expect(heading).not.toHaveAttribute('id');
+  });
+
+  it('never lets two separate PortableTextRenderer instances on the same page collide on heading ids — neither passes headings, so neither stamps any (the module_content-rendered-twice scenario)', () => {
+    const firstModuleBody: RichText = [
+      richTextBlock('h2', [richTextSpan('Overview')]),
+      richTextBlock('h2', [richTextSpan('Details')]),
+      richTextBlock('h2', [richTextSpan('Summary')]),
+    ];
+    const secondModuleBody: RichText = [
+      // Same heading text as the first module's outline — this is exactly
+      // the scenario `module_content` can hit twice on one `page_generic`.
+      richTextBlock('h2', [richTextSpan('Overview')]),
+      richTextBlock('h2', [richTextSpan('Details')]),
+      richTextBlock('h2', [richTextSpan('Summary')]),
+    ];
+
+    const { container: firstContainer } = renderElement(
+      <PortableTextRenderer value={firstModuleBody} />,
+    );
+    const { container: secondContainer } = renderElement(
+      <PortableTextRenderer value={secondModuleBody} />,
+    );
+
+    const firstIds = Array.from(firstContainer.querySelectorAll('h2')).map(
+      (heading) => heading.getAttribute('id'),
+    );
+    const secondIds = Array.from(secondContainer.querySelectorAll('h2')).map(
+      (heading) => heading.getAttribute('id'),
+    );
+
+    // Neither instance was opted in (no `headings` prop), so neither stamps
+    // any id at all — the collision the un-gated behaviour used to risk.
+    expect(firstIds.every((id) => id === null)).toBe(true);
+    expect(secondIds.every((id) => id === null)).toBe(true);
   });
 
   it('renders a code block with syntax highlighting', () => {
