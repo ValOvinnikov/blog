@@ -65,6 +65,10 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
 
   const headings = extractPostHeadings(body);
   const hasContentsRail = headings.length >= MIN_H2_HEADINGS_FOR_RAIL;
+  const footerTags = tags.map((tag) => ({
+    label: tag.title,
+    href: routes.tag(tag.slug),
+  }));
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
   const url = `${siteUrl}${routes.post(slug)}`;
@@ -91,6 +95,17 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
     { label: title, href: routes.post(slug) },
   ];
   const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
+
+  // Rendered in one of two structural positions below (nested inside
+  // `Article.Body`'s grid when the rail is present, or as `Article`'s
+  // direct sibling otherwise) — hoisted so the two branches can't drift.
+  const footer = (
+    <Article.Footer
+      className={hasContentsRail ? s.footerInRail() : s.footer()}
+      tags={footerTags}
+      linkAs={SmartLink}
+    />
+  );
 
   return (
     <>
@@ -148,24 +163,18 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
           <Article.Body className={s.body({ withRail: hasContentsRail })}>
             {hasContentsRail ? (
               <>
-                <PostContentsRail headings={headings} />
+                <PostContentsRail className={s.rail()} headings={headings} />
                 <div className={s.content()}>
                   <PortableTextRenderer value={body} headings={headings} />
                 </div>
+                {footer}
               </>
             ) : (
               <PortableTextRenderer value={body} headings={headings} />
             )}
           </Article.Body>
 
-          <Article.Footer
-            className={s.footer({ withRail: hasContentsRail })}
-            tags={tags.map((tag) => ({
-              label: tag.title,
-              href: routes.tag(tag.slug),
-            }))}
-            linkAs={SmartLink}
-          />
+          {!hasContentsRail && footer}
         </Article>
 
         {relatedPostItems.length > 0 && (

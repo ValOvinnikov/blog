@@ -258,6 +258,33 @@ describe(`<${BlogPostPage.name}/>`, () => {
     ).toHaveAttribute('href', '#configuration');
   });
 
+  it('renders the post tags when the post has both a contents rail and tags', async () => {
+    const body: RichText = [
+      richTextBlock('h2', [richTextSpan('Getting started')]),
+      richTextBlock('normal', [richTextSpan('Intro.')]),
+      richTextBlock('h2', [richTextSpan('Configuration')]),
+      richTextBlock('h2', [richTextSpan('Deployment')]),
+    ];
+    getPostMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockPostDetail,
+        body,
+        tags: [{ id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('navigation', { name: 'On this page' }),
+    ).toBeVisible();
+    expect(screen.getByRole('link', { name: 'TypeScript' })).toHaveAttribute(
+      'href',
+      '/tag/typescript',
+    );
+  });
+
   it('renders the JSON-LD BlogPosting schema script', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
