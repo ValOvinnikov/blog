@@ -3,6 +3,7 @@ import { LinkButton } from '@blog/ui/molecules';
 import { Hero } from '@blog/ui/organisms';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { env } from '@web/utils/env/env';
 
 import { heroHiddenLabelVariants } from './hero-module-variants';
 
@@ -86,9 +87,12 @@ export async function HeroModule({ id }: IHeroModuleProps) {
           */}
           <SanityImage
             image={sanityImage}
+            projectId={env.NEXT_PUBLIC_SANITY_PROJECT_ID}
+            dataset={env.NEXT_PUBLIC_SANITY_DATASET}
             width={1200}
             height={675}
             sizes="(min-width: 1024px) 50vw, 100vw"
+            priority
             className="size-full object-cover"
           />
         </Hero.Media>
