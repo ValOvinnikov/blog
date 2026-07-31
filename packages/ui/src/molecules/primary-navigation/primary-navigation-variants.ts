@@ -7,8 +7,13 @@ export const primaryNavigationVariants = tv({
     toggle: ['shrink-0'],
     panel: [
       'absolute inset-x-0 top-full z-20',
-      'flex flex-col items-start gap-3 p-4',
+      'flex flex-col items-start gap-1 p-2',
       'bg-bg border-b border-border shadow-lg',
+    ],
+    panelLink: [
+      'flex w-full items-center',
+      'rounded-md px-3 py-2',
+      'hover:bg-surface-2',
     ],
   },
   variants: {
