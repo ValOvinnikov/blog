@@ -61,9 +61,10 @@ export const PrimaryNavigation = ({
     links: linksSlot,
     toggle,
     panel,
+    panelLink,
   } = primaryNavigationVariants({ collapsible: Boolean(mobileToggle) });
 
-  const renderLinks = () =>
+  const renderLinks = (itemClassName?: string) =>
     links.map(({ href, label, isActive, target }) => (
       <NavLink
         key={href}
@@ -71,6 +72,7 @@ export const PrimaryNavigation = ({
         href={href}
         isActive={isActive}
         target={target}
+        className={itemClassName}
       >
         {label}
       </NavLink>
@@ -108,7 +110,7 @@ export const PrimaryNavigation = ({
             className={panel()}
             data-testid="primary-navigation-mobile-panel"
           >
-            {renderLinks()}
+            {renderLinks(panelLink())}
           </div>
         </Fragment>
       )}
