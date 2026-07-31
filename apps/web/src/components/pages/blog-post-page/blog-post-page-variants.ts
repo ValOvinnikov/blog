@@ -7,7 +7,13 @@ export const blogPostPageVariants = tv({
     body: ['mx-auto w-full px-gutter', 'mt-8'],
     // Caps the reading column back to measure width; `body` itself widens
     // to `max-w-page` (below) to make room for the rail's left column.
-    content: ['max-w-measure'],
+    content: ['max-w-measure', 'lg:col-start-2 lg:row-start-1'],
+    // Spans both grid rows so its sticky containing block reaches the
+    // footer row and the rail can descend to settle beside it.
+    rail: ['lg:col-start-1 lg:row-start-1 lg:row-span-2'],
+    // The content→footer vertical gap comes from `Article.Footer`'s own
+    // `mt-8` (see `article-footer-variants.ts`), not a grid row-gap here.
+    footerInRail: ['max-w-measure', 'lg:col-start-2 lg:row-start-2'],
     footer: ['mx-auto w-full', 'max-w-measure px-gutter'],
     coverImage: ['size-full object-cover'],
   },
@@ -22,18 +28,6 @@ export const blogPostPageVariants = tv({
           'max-w-measure',
           'lg:max-w-page',
           'lg:grid lg:grid-cols-[220px_1fr] lg:gap-x-10',
-        ],
-        // Mirrors `body`'s rail-column grid so the tag chips align under the
-        // same content column instead of staying centered at page width;
-        // `*:` pushes the single `TagList` child into the `1fr` track and
-        // caps it back to measure, same as `content`. `border-t` lives on
-        // `Article.Footer`'s root (the grid container itself), so it still
-        // spans the full grid width — narrowing it too needs a `packages/ui`
-        // change, not done here.
-        footer: [
-          'lg:max-w-page',
-          'lg:grid lg:grid-cols-[220px_1fr] lg:gap-x-10',
-          'lg:*:col-start-2 lg:*:max-w-measure',
         ],
       },
       false: {

@@ -71,8 +71,15 @@ category cap was narrowed to a single required reference in #809 on
   headings, #934), in which case the body widens to `max-w-page` and splits
   into a two-column grid: a sticky rail (desktop `≥1024px`) or a closed-by-
   default disclosure (mobile) alongside the still-`max-w-measure`-capped
-  reading column. The "Related reading" section is separated from the article
-  by a `max-w-page`-width top rule (`--border-emphasis`), not a background
+  reading column. With the rail present, `Article.Footer` (the tag chips)
+  renders _inside_ that grid as a second row under the reading column —
+  capped to `max-w-measure` and left-aligned with the body, so its top rule
+  spans only the reading column rather than the full grid width — and the
+  sticky rail spans both grid rows so it descends to sit beside the footer
+  instead of stopping at the end of the body (#996, superseding #987's
+  full-width-footer approach). The "Related reading" section is separated
+  from the article by a `max-w-page`-width top rule (`--border-emphasis`),
+  not a background
   fill — the page canvas itself (including the hero) is `--bg-subtle`
   (#950/#951), so a same-color fill would no longer read as distinct.
 - **Page canvas elevation (#950/#951, #973):** the content canvas renders on
