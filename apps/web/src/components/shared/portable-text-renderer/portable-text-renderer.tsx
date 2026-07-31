@@ -21,15 +21,10 @@ import { portableTextRendererVariants } from './portable-text-renderer-variants'
 export interface IPortableTextRendererProps {
   value: TPortableText;
   /**
-   * The already-computed `extractPostHeadings(value)` outline. Passing it
-   * both opts each rendered h2/h3 into carrying its outline `id` (plus a
-   * matching `scroll-mt-*` so an anchor jump clears the sticky `Header`) and
-   * skips recomputing the outline a second time here. Only `BlogPostPage`
-   * passes this, for the post body it already extracted headings from for
-   * `PostContentsRail`'s gate. Every other consumer (page-builder modules
-   * such as `ContentModule`, which can render more than once on the same
-   * page) omits it, so their headings never carry an `id` that could
-   * collide with a same-titled heading in a sibling module.
+   * The precomputed `extractPostHeadings(value)` outline; when passed, each
+   * matching h2/h3 renders with that heading's `id` so anchor links resolve.
+   * Omit it where the same body could render more than once (e.g. a
+   * repeatable page-builder module) to avoid colliding ids.
    */
   headings?: TPostHeading[];
 }
@@ -42,14 +37,9 @@ interface ILinkAnnotation {
 const s = portableTextRendererVariants();
 
 /**
- * Builds the `block.h2`/`block.h3` renderers for a single `value` — closing
- * over a `_key` → slug `id` map (from the caller-supplied `headings`, the
- * single source of truth for these ids) so each rendered heading gets the
- * exact `id` `PostContentsRail`'s links point at, plus the matching
- * `scroll-mt-*` so the anchor jump clears the sticky header. `headings`
- * omitted (the default for every consumer but `BlogPostPage`) leaves the map
- * empty, so headings render with neither an `id` nor the anchor offset, same
- * as before.
+ * Builds the `h2`/`h3` block renderers, stamping each rendered heading with
+ * the `id` from its matching entry in `headings` (empty by default) so it
+ * resolves to the anchor `PostContentsRail` links to.
  */
 const headingBlockComponents = (
   headings: TPostHeading[],
@@ -86,19 +76,10 @@ const headingBlockComponents = (
 
 /**
  * PortableTextRenderer — web-owned bridge from a Sanity Portable Text field
- * (the service layer's `RichText` view-model type) to rendered markup, via
- * `@portabletext/react`. Maps block styles and marks to `@blog/ui` atoms
- * (`Prose`, `Heading`) and custom types (a `code` block) to a syntax-
- * highlighted `CodeBlock` — the one place this bridges Sanity content and
- * `@blog/ui` presentation, keeping `@blog/ui` itself Sanity-free. `Prose`
- * wraps the whole rendered output once (it's width-agnostic typography, not
- * a per-block wrapper) so sibling paragraphs/headings/code blocks are direct
- * children sharing one spacing rhythm. `h2`/`h3` blocks additionally get a
- * stable, URL-safe `id` (see `headingBlockComponents`), but only when the
- * caller opts in via `headings` — omitted by every consumer except
- * `BlogPostPage`, so a page-builder module rendered more than once on the
- * same page (`ContentModule`) never stamps a colliding `id` on a same-titled
- * heading in a sibling instance.
+ * to rendered markup, via `@portabletext/react`. Maps block styles and marks
+ * to `@blog/ui` atoms and a `code` block to a syntax-highlighted `CodeBlock`,
+ * keeping `@blog/ui` itself Sanity-free. Optionally stamps `h2`/`h3` headings
+ * with stable anchor ids via `headings`, for use with `PostContentsRail`.
  *
  * @example
  * <ContentModule title={title}>

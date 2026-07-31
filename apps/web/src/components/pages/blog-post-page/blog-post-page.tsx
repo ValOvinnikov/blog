@@ -31,19 +31,11 @@ const s = blogPostPageVariants();
 
 /**
  * BlogPostPage — `/blog/{slug}` composition: fetches the post via
- * `service.pages.post.v1.getPost`, then renders a `Home › Category › Post`
- * `Breadcrumbs` trail (plus its `BreadcrumbList` JSON-LD) inside a
- * `BreadcrumbBar` sibling before `<main>`, followed by `<main>` holding the
- * `Article` compound (`Article.Header` at `max-w-page` for the category
- * eyebrow, title, `PostMeta` with `PostShare` in its share slot, lead, and
- * cover image; `Article.Footer` narrowed back to `max-w-measure` for the
- * reading measure), plus a `BlogPosting` JSON-LD tag and, when the post has
- * any, a tinted "Related reading" `PostsSection` band after the article.
- * `Article.Body` widens to `max-w-page` and shows `PostContentsRail` as a
- * sticky left column (with the reading column narrowed back to
- * `max-w-measure` alongside it) once `extractPostHeadings` finds 3+ H2s;
- * below that it stays the plain `max-w-measure`, single-column body.
- * `Header`/`Footer` (site chrome) stay owned by `[locale]/layout.tsx`.
+ * `service.pages.post.v1.getPost` and renders it as an `Article` compound
+ * with a `Home › Category › Post` breadcrumb trail, `BlogPosting` JSON-LD,
+ * an optional `PostContentsRail` once the body has enough headings, and a
+ * "Related reading" section when related posts exist. Site chrome
+ * (`Header`/`Footer`) stays owned by `[locale]/layout.tsx`.
  */
 export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   const result = await service.pages.post.v1.getPost(slug);

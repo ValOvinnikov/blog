@@ -35,15 +35,10 @@ const slugify = (text: string): string =>
     .replace(/^-+|-+$/g, '');
 
 /**
- * extractPostHeadings — pulls the ordered `h2`/`h3` outline out of a post's
- * Portable Text `body`, for the length-triggered "On this page" rail
- * (`PostContentsRail`). Returns `[]` unless the body has at least
- * `MIN_H2_HEADINGS_FOR_RAIL` H2-style blocks — the single gate both this
- * function and its caller (`BlogPostPage`) rely on, so a non-empty result is
- * always render-worthy on its own. Each returned heading carries a stable,
- * URL-safe slug `id` (deduped with a `-2`/`-3`… suffix when two headings
- * share the same text) that `PortableTextRenderer` renders as the matching
- * heading's DOM `id`, so rail links and deep-links resolve to a real anchor.
+ * extractPostHeadings — returns the ordered `h2`/`h3` outline of a post's
+ * Portable Text `body`, each with a stable, deduped slug `id`. Returns `[]`
+ * unless the body has at least `MIN_H2_HEADINGS_FOR_RAIL` H2s — the same gate
+ * `BlogPostPage` uses, so a non-empty result is always render-worthy.
  */
 export const extractPostHeadings = (
   body: RichText | undefined,

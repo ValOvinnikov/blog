@@ -19,39 +19,10 @@ export type TPostContentsRailProps = {
 const s = postContentsRailVariants();
 
 /**
- * PostContentsRail — the "On this page" table of contents for long posts;
- * `BlogPostPage` only renders it once `extractPostHeadings` has returned 3+
- * headings. A single `<nav>` landmark holds two CSS-breakpoint-driven
- * presentations of the same heading list (the `hidden lg:*` / `lg:hidden`
- * pairing established by `PrimaryNavigation`): a sticky left-column rail at
- * `lg:` and up, and a closed-by-default disclosure below it. The mobile
- * disclosure's panel is `position: sticky`-pinned and its expanded state is
- * an opaque overlay (it has to be — a push-down panel would expand at the
- * bar's DOM position, not its pinned visual position). The disclosure
- * reuses `usePopover`'s open/close/Escape/outside-click core — the same
- * composition `PostShare` uses for its own trigger + panel — but opts out of
- * its Tab-trap/Arrow-roving-focus behaviour (`trapFocus: false`): unlike
- * `PostShare`'s command-style share menu, this is plain in-page navigation,
- * so both presentations stay ordinary `<nav>`/`<ol>`/`<li>`/link markup with
- * no role overrides, and Tab moves through the panel's links in normal
- * document order and on into the page afterward. It also opts in to
- * `closeOnFocusOut: true`: since the panel is an opaque overlay and Tab
- * isn't trapped, leaving it open while focus moves past its last link would
- * strand a keyboard user's focus indicator on content hidden underneath the
- * still-open panel — `closeOnFocusOut` closes it the moment focus genuinely
- * leaves, without fighting the Tab that's already carrying focus onward.
- * Active-section highlighting comes from `useActiveHeadingId`, which observes
- * the heading elements `PortableTextRenderer` rendered elsewhere on the page
- * under these same `id`s. The `postContentsRail.ariaLabel` message ("On this
- * page") is the single source for the visible copy on both presentations —
- * the desktop rail's real `<h2>` label above its list and the mobile
- * disclosure's toggle text — as well as the `<nav>` landmark's name, which
- * derives from that `<h2>` via `aria-labelledby` (the same pattern
- * `PostsSection` uses for its own "Related reading" heading). Per the
- * accname spec, an element directly referenced by `aria-labelledby` still
- * contributes to the accessible name even while hidden by `hidden lg:block`'s
- * mobile-width `display:none`, so the `<nav>` stays correctly named at every
- * viewport.
+ * PostContentsRail — the "On this page" table of contents for long posts,
+ * rendered by `BlogPostPage` once it has 3+ headings. A sticky rail at
+ * `lg:` and up, and a closed-by-default disclosure below it, share the same
+ * heading list and active-section highlighting from `useActiveHeadingId`.
  */
 export const PostContentsRail = ({
   headings,
@@ -60,6 +31,8 @@ export const PostContentsRail = ({
   const t = useTranslations('postContentsRail');
   const labelId = useId();
   const panelId = useId();
+  // Plain in-page navigation, not a command menu: no Tab trap, and the
+  // opaque overlay panel closes as soon as focus moves past it.
   const { open, toggle, close, triggerRef, panelRef } = usePopover({
     trapFocus: false,
     closeOnFocusOut: true,
@@ -67,16 +40,8 @@ export const PostContentsRail = ({
   const activeId = useActiveHeadingId(headings.map((heading) => heading.id));
   const label = t('ariaLabel');
 
-  // `onNavigate` is only ever passed for the mobile panel's own list (see
-  // its call site below) — the desktop rail has no panel to close, so its
-  // call passes nothing and every link's `onClick` stays `undefined`.
-  // Closing before the anchor jump matters because a click leaves focus on
-  // the link that was just clicked — still inside the panel — so
-  // `closeOnFocusOut` never fires and the still-open, opaque overlay (up to
-  // `max-h-[70vh]`) would otherwise cover the very heading just scrolled to.
-  // `inPanel` (also only ever `true` for the mobile call) opts that copy of
-  // the list into the share-menu-style item chrome — see `inPanel` on
-  // `postContentsRailVariants` for why the desktop call omits it.
+  // `onNavigate` closes the mobile panel before the anchor jump — a click
+  // leaves focus on the clicked link, so `closeOnFocusOut` never fires.
   const renderList = (onNavigate?: () => void, inPanel = false) => (
     <ol className={s.list({ inPanel })}>
       {headings.map((heading) => {

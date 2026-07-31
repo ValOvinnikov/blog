@@ -3,17 +3,12 @@
 import { useEffect, useState } from 'react';
 
 /**
- * useActiveHeadingId — tracks which of the given heading `id`s is currently
- * the "active" section, for `PostContentsRail`'s `aria-current="location"`
- * highlighting. Observes each `#id` element (already rendered by
- * `PortableTextRenderer`) with an `IntersectionObserver` whose `rootMargin`
- * shrinks the effective viewport to a thin band below the sticky header —
- * of the headings currently crossing that band, the topmost one becomes
- * active. Returns `null` until the user has scrolled past the first heading.
+ * useActiveHeadingId — returns the `id` of the given headings currently in
+ * view, for `PostContentsRail`'s active-item highlighting; `null` until the
+ * user scrolls past the first heading.
  *
- * `ids` is taken as a plain array (not deduped/memoized by the caller) — this
- * hook only re-derives its own stable key (`ids.join('|')`) for the effect's
- * dependency, so passing a fresh array reference each render is safe.
+ * `ids` need not be deduped or memoized by the caller — a fresh array
+ * reference each render is safe.
  */
 export const useActiveHeadingId = (ids: string[]): string | null => {
   const [activeId, setActiveId] = useState<string | null>(null);
