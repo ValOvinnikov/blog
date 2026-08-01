@@ -56,7 +56,7 @@ first:
   rm node_modules   # removes only the symlink, not its target
   pnpm install
 
-See README.md § "Working with Claude Code".
+See docs/context/claude-code.md.
 EOF
 	exit 2
 fi

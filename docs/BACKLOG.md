@@ -15,11 +15,17 @@ body=..., labels=..."` — never `gh issue create` directly, see `CLAUDE.md`),
 > deliberately precedes Phase 3 — every later feature needs a live URL and env
 > plumbing to be testable.
 >
-> **Status 2026-07-21:** M0 and M1 are fully closed, and **Phase 3 (Blog
-> core) is closed** — every ticket in #75–94, #123, plus the later-filed
-> #327 (author route), #328 (`RESERVED_SLUGS` guard), and #285 (generic page
-> route) is done and merged. **M2 (Hardening) is next — #275 (D4 launch
-> hardening) is the open starting point.**
+> **Status 2026-08-01:** M0, M1, and **Phase 3 (Blog core)** are fully
+> closed. **M2 (Hardening)** — #275 (D4), M2.3 (#399), M2.4 (#352) are done;
+> M2.1 (draft preview) and M2.2 (Storybook CI job) are still open gaps.
+> **M3 (Differentiators)** — M3.3 (choose-your-depth reading, epic #957) has
+> shipped; M3.1/M3.2/M3.5 are filed and in progress; M3.4 (semantic search)
+> is blocked on the `packages/db` bootstrap. GitHub milestone numbering is
+> independent of this doc's M-numbers (a naming collision exists with an
+> unrelated, already-closed "M3 — Post taxonomy" milestone) — this backlog's
+> M3/differentiators section maps to GitHub milestone **M4 — Differentiators**;
+> the archived Phase 5/6 engagement + enhancement work (not yet represented
+> below) maps to **M5 — Engagement** and **M6 — Enhancements**.
 
 ## Roadmap
 
@@ -43,13 +49,13 @@ flowchart LR
   subgraph P3["✅ Phase 3 Blog core"]
     P3a["#75–#94, #123, #285, #327, #328<br/>blog/post/category/author/generic-page<br/>routes, feeds, JSON-LD, UI"]
   end
-  subgraph M2["🔧 M2 Hardening ◀ NOW"]
-    M21["#275 D4 launch hardening ◀ NOW"]
-    M22["draft preview · Storybook CI<br/>Lighthouse · #264 migration tests"]
+  subgraph M2["✅ M2 Hardening"]
+    M21["#275 D4 · #399 Lighthouse CI · #352 GROQ audit"]
+    M22["◀ NOW: draft preview (M2.1) · Storybook CI job (M2.2)"]
   end
-  subgraph M3["M3 Differentiators"]
-    M33["Reading depth ◀ SPEC'D + PLANNED<br/>specs + plans 2026-07-12"]
-    M31["agent-native MCP · semantic search<br/>publish-time AI · voice assistant"]
+  subgraph M3["M3 Differentiators (GitHub: M4)"]
+    M33["✅ Reading depth — epic #957"]
+    M31["#965 agent-native · #966 publish-time AI<br/>#967 voice assistant · #984/#985 search prereqs"]
   end
   DONE --> M0 --> M1 --> P3 --> M2 --> M3
   M14 -.->|webhook plumbing| M33
@@ -215,6 +221,7 @@ link` for remote caching.
 
 ### M2.3 · `chore(ci): Lighthouse CI with budgets`
 
+- **Filed:** #399 — ✅ closed
 - **Depends on:** M1.5
 - **Body:** Lighthouse CI against preview deploys for `/`, one post, one
   category page; budgets at ≥ 95 per SPEC §10. Non-required initially.
@@ -222,6 +229,7 @@ link` for remote caching.
 
 ### M2.4 · `perf(service): audit all GROQ queries for round-trips + projection efficiency`
 
+- **Filed:** #352 — ✅ closed
 - **Labels:** `layer:service`, `enhancement`
 - **Depends on:** Phase 3 routes landed (the audit is most useful once every
   query slice exists) — soft dependency, can start earlier.
@@ -266,25 +274,31 @@ scope the idea, not the design.
 - **Acceptance:** an MCP client can list + fetch posts; `.md` endpoints
   render valid Markdown; `llms.txt` served; documented in SPEC §1 surfaces.
 
-### M3.2 · `feat(cms): publish-time AI generation pipeline`
+### M3.2 · `feat(cms): publish-time AI generation pipeline` — ✅ **superseded, closed**
 
+- **Filed:** #966 — closed 2026-08-01, superseded. Its core scope (Claude
+  generates TL;DR/takeaways, writes back to Sanity as a draft, publish-time
+  only) shipped as part of M3.3's epic #957 (#958–962). The remaining piece
+  — related-post suggestions via embeddings — is now tracked under M3.4's
+  semantic search epic #1045 instead of here.
 - **Labels:** `layer:cms`, `layer:service`
 - **Depends on:** M1.4 (webhook plumbing)
-- **Body:** Generate once at publish instead of paying inference per reader:
-  Sanity webhook → serverless function → Claude generates TL;DR, key
-  takeaways, and related-post suggestions → written back into Sanity as
-  fields on the post (drafts of generated fields are human-approvable) →
-  revalidate. Zero runtime AI cost; output is fully static. Embeddings for
-  related-posts double as the search index for M3.4.
+- **Body (historical):** Generate once at publish instead of paying
+  inference per reader: Sanity webhook → serverless function → Claude
+  generates TL;DR, key takeaways, and related-post suggestions → written
+  back into Sanity as fields on the post (drafts of generated fields are
+  human-approvable) → revalidate. Zero runtime AI cost; output is fully
+  static. Embeddings for related-posts double as the search index for M3.4.
 - **Acceptance:** publishing a post populates summary/takeaways fields within
   a minute; human can edit/reject them; no AI calls on the reader hot path.
 
-### M3.3 · `feat: choose-your-depth reading` — **SPEC'D + PLANNED** (flagship)
+### M3.3 · `feat: choose-your-depth reading` — ✅ **shipped**
+
+- **Filed:** epic #957 → #958 (config) · #959 (cms) · #960 (service) ·
+  #961 (ui) · #962 (web) — all closed 2026-08-01.
 
 > Design: `docs/superpowers/specs/2026-07-12-reading-depth-design.md` ·
 > Plan: `docs/superpowers/plans/2026-07-12-reading-depth-plan.md`.
-> File the implementation issue from the spec when its prerequisites clear
-> (post route #76/#90; pipeline additionally #273/#274).
 
 - **Labels:** `layer:cms`, `layer:service`, `layer:ui`, `layer:web`
 - **Depends on:** #250 (modules[] page-builder), M3.2 (generated summaries)

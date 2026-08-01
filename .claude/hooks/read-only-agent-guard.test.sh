@@ -113,11 +113,11 @@ check 'ls -la' allow "ls"
 check '' allow "empty command"
 raw_check 'not json at all' allow "malformed (non-JSON) payload"
 
-# --- documented residual false positive (README "Working with Claude Code"):
+# --- documented residual false positive (docs/context/claude-code.md):
 # quote-naive segment splitting can misread a literal "&& mkdir " inside a
 # search pattern as a compound command. Pinned here as accepted behavior, not
-# a bug — if this ever flips to "allow" the splitting logic changed and this
-# note (and the README) need revisiting, not just the test.
+# a bug — if this ever flips to "allow" the splitting logic changed and that
+# doc (docs/context/claude-code.md) needs revisiting, not just the test.
 check 'rg "&& mkdir "' deny "known false positive: quoted && mkdir inside a pattern"
 
 echo "---"
