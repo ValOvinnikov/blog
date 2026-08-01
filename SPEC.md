@@ -85,9 +85,26 @@ category cap was narrowed to a single required reference in #809 on
   spans only the reading column rather than the full grid width — and the
   sticky rail spans both grid rows so it descends to sit beside the footer
   instead of stopping at the end of the body (#996, superseding #987's
-  full-width-footer approach). The "Related reading" section is separated
-  from the article by a `max-w-page`-width top rule (`--border-emphasis`),
-  not a background
+  full-width-footer approach).
+- **Choose-your-depth reading (#957, additive-only — no migration):** every
+  post renders at three reader-selectable depths — `SKIM` (a 3–7 item
+  takeaways panel with a "read the full article" affordance), `READ` (the
+  article exactly as written, the default), `DEEP` (the `READ` body plus its
+  authored `aside` blocks expanded in place, kind-labelled "Why not X" /
+  "Digression" / "Context") — via a `SegmentedControl` near the title. All
+  three depths ship in the same static HTML; switching is a pure CSS
+  show/hide keyed off a `data-depth` attribute (`DepthProvider`, a client
+  context wrapping the reading area, mirrors the theme toggle's no-flash
+  pre-hydration script + `localStorage` persistence, key `reading-depth`).
+  ISR, canonical URL, and SEO are unaffected — crawlers see the standard
+  `READ` article; no duplicate-content risk. Graceful degradation: no
+  approved `skim` → no `30s` option; no `aside` blocks (`hasAsides`) → no
+  `Deep` option; a post with neither renders the control hidden entirely
+  (today's default post shape, unchanged). A publish-time pipeline
+  (`POST /api/generate-skim`, secret-verified — see §9) drafts the `skim`
+  field for human approval; publishing the post **is** the approval step.
+- The "Related reading" section is separated from the article by a
+  `max-w-page`-width top rule (`--border-emphasis`), not a background
   fill — the page canvas itself (including the hero) is `--bg-subtle`
   (#950/#951), so a same-color fill would no longer read as distinct.
 - **Page canvas elevation (#950/#951, #973):** the content canvas renders on
@@ -215,8 +232,9 @@ apps/web
   page-render read client, authenticated with `SANITY_API_WRITE_TOKEN`
   (server-only, never bundled to the client). Writes are always scoped to a
   document's **draft** (`drafts.<id>`), never the published document, and are
-  triggered by an explicit pipeline action (e.g. a webhook-driven route
-  handler), never by a page render. A human still reviews and publishes the
+  triggered by an explicit pipeline action — concretely, `apps/web`'s
+  `POST /api/generate-skim` route (webhook-driven, secret-verified — see
+  §9) — never by a page render. A human still reviews and publishes the
   draft in Studio before it goes live — the write path only stages content,
   it never publishes.
 - **Web renders modules generically.** `apps/web/src/modules/module-map.ts`
@@ -376,8 +394,10 @@ via `blockText`, required — part of the choose-your-depth reading feature,
 | `NEXT_PUBLIC_SANITY_DATASET`               | web + service                                      | required                                                                                                                                               |
 | `NEXT_PUBLIC_SITE_URL`                     | web (SEO)                                          | optional until launch; canonical/OG/feeds                                                                                                              |
 | `SANITY_API_READ_TOKEN`                    | service (server)                                   | optional; private reads / future draft mode                                                                                                            |
-| `SANITY_API_WRITE_TOKEN`                   | service (server, `editorial.*` domain only)        | optional until the choose-your-depth pipeline (#957) ships; scoped Editor-role write token, never used by page-render reads — see §5                   |
+| `SANITY_API_WRITE_TOKEN`                   | service (server, `editorial.*` domain only)        | optional; scoped Editor-role write token for the choose-your-depth skim pipeline (#957), never used by page-render reads — see §5                      |
 | `SANITY_REVALIDATE_SECRET`                 | web (server)                                       | optional until the #93 revalidation route exists                                                                                                       |
+| `ANTHROPIC_API_KEY`                        | web (server, `/api/generate-skim` only)            | optional; absent → the route returns 503 (feature-flag-by-absence), reader path unaffected — see §9                                                    |
+| `SANITY_GENERATE_SECRET`                   | web (server, `/api/generate-skim` only)            | optional; secret-verifies the skim-generation webhook, same stance as `SANITY_REVALIDATE_SECRET`                                                       |
 | `SANITY_STUDIO_PROJECT_ID`                 | cms Studio + CLI                                   | required; **per environment** (env-driven; no ids in repo)                                                                                             |
 | `SANITY_STUDIO_DATASET`                    | cms Studio + CLI                                   | required                                                                                                                                               |
 | `SANITY_STUDIO_HOSTNAME`                   | cms CLI (deploy)                                   | deploy target `<host>.sanity.studio`; CI-only                                                                                                          |
@@ -474,6 +494,21 @@ changing a schema does **not** change existing documents.
   invalidate prerendered route entries on Vercel (#318), so the route also
   calls `revalidatePath('/', 'layout')` when a registered type matched —
   purging every page per publish (acceptable blast radius for a blog).
+- **Skim generation pipeline (#957):** `POST /api/generate-skim?secret=…`
+  (`apps/web`), triggered by a Sanity publish webhook on `post`. Verification
+  matches `/api/revalidate`'s _stance_ (feature-flag-by-absence, same 401/503
+  split), not its mechanism — `/api/revalidate` checks an HMAC signature over
+  the body (`@sanity/webhook`); this route does a constant-time
+  (`timingSafeEqual`) comparison of a plain shared secret against `?secret=`,
+  since there's no equivalent signature helper for a static secret. Absent
+  `ANTHROPIC_API_KEY`/`SANITY_GENERATE_SECRET` → 503; a missing/wrong
+  `secret` → 401. On success it reads the published post body
+  (`service.editorial.skim.v1.getPublishedPostBody`), asks Claude
+  (`claude-haiku-4-5`) for 3–7 zod-validated takeaways (a malformed response
+  → 422, draft untouched), then patches them onto the post's **draft**
+  (`service.editorial.skim.v1.saveSkimDraft` — never the published document).
+  Idempotent: re-running always overwrites only the draft's `skim` field. No
+  AI call ever happens on the reader path.
 - **Sanity CDN is deliberately bypassed** (`useCdn: false` in the service
   client): Next's tagged data cache is the sole caching layer. Reading through
   the CDN lets a just-purged tag refetch a still-stale CDN response and

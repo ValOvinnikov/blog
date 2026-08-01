@@ -2,6 +2,8 @@ export {};
 
 const ENV_KEYS = [
   'SANITY_REVALIDATE_SECRET',
+  'ANTHROPIC_API_KEY',
+  'SANITY_GENERATE_SECRET',
   'NEXT_PUBLIC_SITE_URL',
   'NEXT_PUBLIC_SANITY_PROJECT_ID',
   'NEXT_PUBLIC_SANITY_DATASET',
@@ -54,6 +56,8 @@ describe('env', () => {
   it('parses a valid environment and exposes typed values', async () => {
     delete process.env['SKIP_ENV_VALIDATION'];
     process.env['SANITY_REVALIDATE_SECRET'] = 'revalidate-secret';
+    process.env['ANTHROPIC_API_KEY'] = 'anthropic-key';
+    process.env['SANITY_GENERATE_SECRET'] = 'generate-secret';
     process.env['NEXT_PUBLIC_SITE_URL'] = 'https://example.com';
     process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
     process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
@@ -61,6 +65,8 @@ describe('env', () => {
     const { env } = await importEnvOnServer();
 
     expect(env.SANITY_REVALIDATE_SECRET).toBe('revalidate-secret');
+    expect(env.ANTHROPIC_API_KEY).toBe('anthropic-key');
+    expect(env.SANITY_GENERATE_SECRET).toBe('generate-secret');
     expect(env.NEXT_PUBLIC_SITE_URL).toBe('https://example.com');
     expect(env.NEXT_PUBLIC_SANITY_PROJECT_ID).toBe('abc123');
     expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe('staging');
@@ -75,6 +81,19 @@ describe('env', () => {
     const { env } = await importEnvOnServer();
 
     expect(env.SANITY_REVALIDATE_SECRET).toBeUndefined();
+  });
+
+  it('leaves ANTHROPIC_API_KEY and SANITY_GENERATE_SECRET undefined when absent (the skim pipeline stays disabled)', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    delete process.env['ANTHROPIC_API_KEY'];
+    delete process.env['SANITY_GENERATE_SECRET'];
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
+    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.ANTHROPIC_API_KEY).toBeUndefined();
+    expect(env.SANITY_GENERATE_SECRET).toBeUndefined();
   });
 
   it('throws when SANITY_REVALIDATE_SECRET is read on the client', async () => {

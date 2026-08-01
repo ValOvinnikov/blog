@@ -20,6 +20,7 @@
     "storybook:build": "storybook build"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
     "@blog/config": "workspace:*",
     "@blog/service": "workspace:*",
     "@blog/tailwind-config": "workspace:*",

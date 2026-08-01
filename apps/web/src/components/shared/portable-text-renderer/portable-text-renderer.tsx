@@ -1,7 +1,10 @@
-import type {
-  Code,
-  ImageWithAlt,
-  RichText as TPortableText,
+import {
+  ASIDE_KIND,
+  type Aside as TAsideBlock,
+  type Code,
+  type ImageWithAlt,
+  type RichText as TPortableText,
+  type TAsideKind,
 } from '@blog/config';
 import {
   Heading,
@@ -16,6 +19,7 @@ import {
   type PortableTextComponents,
   type PortableTextMarkComponentProps,
 } from '@portabletext/react';
+import { DeepAside } from '@web/components/shared/deep-aside';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { env } from '@web/utils/env/env';
@@ -34,6 +38,14 @@ export interface IPortableTextRendererProps {
    * repeatable page-builder module) to avoid colliding ids.
    */
   headings?: TPostHeading[];
+  /**
+   * Translated label per `ASIDE_KIND`, for an `aside` block's `DeepAside`
+   * wrapper — supplied by the caller (next-intl at the page level). A body
+   * with no `aside` blocks (the common case outside the post detail route)
+   * can omit this; an untranslated fallback (the raw `kind` value) is used
+   * in the rare case an `aside` block appears without it.
+   */
+  asideKindLabels?: Partial<Record<TAsideKind, string>>;
 }
 
 interface ILinkAnnotation {
@@ -100,6 +112,7 @@ const headingBlockComponents = (
 export const PortableTextRenderer = ({
   value,
   headings,
+  asideKindLabels,
 }: IPortableTextRendererProps) => {
   const components: PortableTextComponents = {
     block: {
@@ -164,6 +177,21 @@ export const PortableTextRenderer = ({
             loading="lazy"
             className={s.image()}
           />
+        );
+      },
+      // Unknown/missing `kind` renders as CONTEXT — forward-compat with a
+      // future `ASIDE_KIND` value the renderer doesn't know about yet.
+      aside: ({ value: asideValue }: { value: TAsideBlock }) => {
+        const kind = asideValue.kind ?? ASIDE_KIND.CONTEXT;
+        const label = asideKindLabels?.[kind] ?? kind;
+
+        return (
+          <DeepAside kind={kind} label={label}>
+            <PortableText
+              value={asideValue.body ?? []}
+              components={components}
+            />
+          </DeepAside>
         );
       },
     },

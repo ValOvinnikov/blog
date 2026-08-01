@@ -10,6 +10,12 @@ export const env = createEnv({
     // The on-demand revalidation route (issue #93) isn't built yet; optional
     // until it exists so the module doesn't force an unused required var.
     SANITY_REVALIDATE_SECRET: z.string().min(1).optional(),
+    // Both optional (feature-flag-by-absence, same stance as
+    // SANITY_REVALIDATE_SECRET): the publish-time skim-generation pipeline
+    // (`/api/generate-skim`) returns 503 without them; the reader path is
+    // fully unaffected either way.
+    ANTHROPIC_API_KEY: z.string().min(1).optional(),
+    SANITY_GENERATE_SECRET: z.string().min(1).optional(),
   },
   client: {
     NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
@@ -20,6 +26,8 @@ export const env = createEnv({
   // pick them up otherwise).
   runtimeEnv: {
     SANITY_REVALIDATE_SECRET: process.env.SANITY_REVALIDATE_SECRET,
+    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+    SANITY_GENERATE_SECRET: process.env.SANITY_GENERATE_SECRET,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,

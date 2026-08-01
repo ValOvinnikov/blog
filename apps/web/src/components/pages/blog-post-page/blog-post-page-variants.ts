@@ -4,7 +4,15 @@ export const blogPostPageVariants = tv({
   slots: {
     root: ['w-full', 'pt-6 pb-page-y'],
     hero: ['mx-auto w-full', 'max-w-page px-gutter'],
-    body: ['mx-auto w-full px-gutter', 'mt-8'],
+    // `body`/`footer`/`footerInRail` below all gate hidden under the SKIM
+    // depth ("SKIM replaces the body with a takeaways panel") — the inverse
+    // of `skimPanelVariants`' own gate, keyed off the same `DepthProvider`
+    // wrapper's `data-depth` via its `/depth` named group.
+    body: [
+      'mx-auto w-full px-gutter',
+      'mt-8',
+      'group-data-[depth=SKIM]/depth:hidden',
+    ],
     // Caps its own measure — nesting under an already max-w-measure'd `body`
     // double-shrinks it via body's own `px-gutter`. `lg:mx-0` keeps it
     // flush-left once the grid column is narrower than the measure.
@@ -21,9 +29,15 @@ export const blogPostPageVariants = tv({
     footerInRail: [
       'mx-auto max-w-measure',
       'lg:col-start-2 lg:row-start-2 lg:mx-0',
+      'group-data-[depth=SKIM]/depth:hidden',
     ],
-    footer: ['mx-auto w-full', 'max-w-measure px-gutter'],
+    footer: [
+      'mx-auto w-full',
+      'max-w-measure px-gutter',
+      'group-data-[depth=SKIM]/depth:hidden',
+    ],
     coverImage: ['size-full object-cover'],
+    depthToggle: ['mx-auto w-full max-w-page px-gutter', 'mb-6'],
   },
   variants: {
     // No `max-w-measure` on `body` itself: `content`/`rail`/`footerInRail`

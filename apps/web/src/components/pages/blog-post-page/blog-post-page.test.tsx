@@ -1,4 +1,10 @@
-import { ICONS, type ISanityImage, type RichText, Size } from '@blog/config';
+import {
+  ASIDE_KIND,
+  ICONS,
+  type ISanityImage,
+  type RichText,
+  Size,
+} from '@blog/config';
 import { Icon } from '@blog/ui/atoms';
 import userEvent from '@testing-library/user-event';
 import {
@@ -397,5 +403,73 @@ describe(`<${BlogPostPage.name}/>`, () => {
     await setup();
 
     expect(screen.queryByText('Related reading')).not.toBeInTheDocument();
+  });
+
+  it("renders no reading-depth control when the post has neither a skim nor asides (today's behavior)", async () => {
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+
+    await setup();
+
+    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+  });
+
+  it('renders the reading-depth control with the 30s option once the post has an approved skim', async () => {
+    getPostMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockPostDetail,
+        skim: {
+          takeaways: ['First.', 'Second.', 'Third.'],
+          generatedAt: '2026-01-01T00:00:00.000Z',
+          model: 'claude-haiku-4-5',
+        },
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('radiogroup', { name: 'Reading depth' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: '30s' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('radio', { name: 'Deep' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the reading-depth control with the Deep option once the post has asides', async () => {
+    getPostMock.mockResolvedValue({
+      ok: true,
+      data: { ...mockPostDetail, hasAsides: true },
+    });
+
+    await setup();
+
+    expect(screen.getByRole('radio', { name: 'Deep' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('radio', { name: '30s' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders an aside block from the body as a deep-dive aside with its translated kind label', async () => {
+    const body: RichText = [
+      ...mockPostDetail.body,
+      {
+        _type: 'aside',
+        _key: 'aside-1',
+        kind: ASIDE_KIND.WHY_NOT,
+        body: [richTextBlock('normal', [richTextSpan('Because Y.')])],
+      },
+    ];
+    getPostMock.mockResolvedValue({
+      ok: true,
+      data: { ...mockPostDetail, body, hasAsides: true },
+    });
+
+    await setup();
+
+    expect(screen.getByRole('note')).toBeInTheDocument();
+    expect(screen.getByText('Why not X')).toBeVisible();
+    expect(screen.getByText('Because Y.')).toBeVisible();
   });
 });
