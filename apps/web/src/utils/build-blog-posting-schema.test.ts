@@ -13,6 +13,8 @@ const post: TPostDetail = {
   heroImageSanity: undefined,
   featured: false,
   body: [],
+  skim: undefined,
+  hasAsides: false,
   seo: {
     title: 'Hello World',
     description: 'A sufficiently long excerpt for the post.',

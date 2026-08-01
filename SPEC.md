@@ -208,6 +208,17 @@ apps/web
   `TPostListModule`, `TContentModule`, `TCtaModule`). `module_postList` fetches
   its own posts (the newest `limit`); `module_hero` resolves its own
   custom-vs-fallback fields (see §6).
+- **Service also has a scoped write path, `service.editorial.*`** (e.g.
+  `service.editorial.skim.v1`, added for the choose-your-depth reading
+  pipeline, #957) — separate from the read-only flow described above.
+  `packages/service/src/sanity/write-client.ts` is a distinct client from the
+  page-render read client, authenticated with `SANITY_API_WRITE_TOKEN`
+  (server-only, never bundled to the client). Writes are always scoped to a
+  document's **draft** (`drafts.<id>`), never the published document, and are
+  triggered by an explicit pipeline action (e.g. a webhook-driven route
+  handler), never by a page render. A human still reviews and publishes the
+  draft in Studio before it goes live — the write path only stages content,
+  it never publishes.
 - **Web renders modules generically.** `apps/web/src/modules/module-map.ts`
   registers `MODULE_MAP: Record<Exclude<TModuleType, 'module_hero'>, (props) =>
 ReactNode>` — typed exhaustively over every module type in
@@ -365,6 +376,7 @@ via `blockText`, required — part of the choose-your-depth reading feature,
 | `NEXT_PUBLIC_SANITY_DATASET`               | web + service                                      | required                                                                                                                                               |
 | `NEXT_PUBLIC_SITE_URL`                     | web (SEO)                                          | optional until launch; canonical/OG/feeds                                                                                                              |
 | `SANITY_API_READ_TOKEN`                    | service (server)                                   | optional; private reads / future draft mode                                                                                                            |
+| `SANITY_API_WRITE_TOKEN`                   | service (server, `editorial.*` domain only)        | optional until the choose-your-depth pipeline (#957) ships; scoped Editor-role write token, never used by page-render reads — see §5                   |
 | `SANITY_REVALIDATE_SECRET`                 | web (server)                                       | optional until the #93 revalidation route exists                                                                                                       |
 | `SANITY_STUDIO_PROJECT_ID`                 | cms Studio + CLI                                   | required; **per environment** (env-driven; no ids in repo)                                                                                             |
 | `SANITY_STUDIO_DATASET`                    | cms Studio + CLI                                   | required                                                                                                                                               |

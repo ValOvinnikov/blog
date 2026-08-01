@@ -265,4 +265,78 @@ describe('getPost', () => {
       'cat-1',
     );
   });
+
+  it('maps a skim with 3+ takeaways onto the post detail', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostDetail({
+          skim: {
+            takeaways: ['One', 'Two', 'Three'],
+            generatedAt: '2026-07-20T00:00:00Z',
+            model: 'claude-haiku-4-5',
+          },
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world');
+
+    expect(result?.skim).toEqual({
+      takeaways: ['One', 'Two', 'Three'],
+      generatedAt: '2026-07-20T00:00:00Z',
+      model: 'claude-haiku-4-5',
+    });
+  });
+
+  it('treats an absent skim as undefined', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostDetail({ skim: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world');
+
+    expect(result?.skim).toBeUndefined();
+  });
+
+  it('treats a skim with fewer than 3 takeaways as undefined, mirroring the schema min(3) rule', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostDetail({
+          skim: {
+            takeaways: ['One', 'Two'],
+            generatedAt: null,
+            model: null,
+          },
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world');
+
+    expect(result?.skim).toBeUndefined();
+  });
+
+  it('reports hasAsides true when the body contains an aside block', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostDetail({
+          body: [{ _type: 'aside', _key: 'a1', kind: 'WHY_NOT', body: [] }],
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world');
+
+    expect(result?.hasAsides).toBe(true);
+  });
+
+  it('reports hasAsides false when the body has no aside blocks', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostDetail({ body: [] }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world');
+
+    expect(result?.hasAsides).toBe(false);
+  });
 });

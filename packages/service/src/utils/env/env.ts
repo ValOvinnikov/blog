@@ -12,6 +12,10 @@ export const env = createEnv({
     // misconfigured preview/dev quietly read production content.
     NEXT_PUBLIC_SANITY_DATASET: z.string().min(1),
     SANITY_API_READ_TOKEN: z.string().min(1).optional(),
+    // Scoped Editor-role token for the publish-time skim pipeline's draft
+    // write (`sanity/write-client.ts`). Optional — absent, the pipeline is
+    // disabled and the rest of the site is unaffected.
+    SANITY_API_WRITE_TOKEN: z.string().min(1).optional(),
   },
   // NODE_ENV is intentionally not validated here: it's a runtime-guaranteed
   // system var (Node/Next/Vitest always set it). client.ts reads it directly.

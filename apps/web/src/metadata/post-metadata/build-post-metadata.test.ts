@@ -26,6 +26,8 @@ const basePost: TPostDetail = {
   heroImageSanity: undefined,
   featured: false,
   body: [],
+  skim: undefined,
+  hasAsides: false,
   seo: makeSeo({
     title: 'Hello World',
     description: 'A sufficiently long excerpt for the card.',
