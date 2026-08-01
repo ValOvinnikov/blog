@@ -1,4 +1,8 @@
-import type { Code, RichText as TPortableText } from '@blog/config';
+import type {
+  Code,
+  ImageWithAlt,
+  RichText as TPortableText,
+} from '@blog/config';
 import {
   Heading,
   InlineCode,
@@ -12,8 +16,11 @@ import {
   type PortableTextComponents,
   type PortableTextMarkComponentProps,
 } from '@portabletext/react';
+import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { env } from '@web/utils/env/env';
 import type { TPostHeading } from '@web/utils/extract-post-headings/extract-post-headings';
+import { toPortableTextImage } from '@web/utils/to-portable-text-image';
 
 import { CodeBlock } from './code-block';
 import { portableTextRendererVariants } from './portable-text-renderer-variants';
@@ -77,9 +84,10 @@ const headingBlockComponents = (
 /**
  * PortableTextRenderer — web-owned bridge from a Sanity Portable Text field
  * to rendered markup, via `@portabletext/react`. Maps block styles and marks
- * to `@blog/ui` atoms and a `code` block to a syntax-highlighted `CodeBlock`,
- * keeping `@blog/ui` itself Sanity-free. Optionally stamps `h2`/`h3` headings
- * with stable anchor ids via `headings`, for use with `PostContentsRail`.
+ * to `@blog/ui` atoms, a `code` block to a syntax-highlighted `CodeBlock`,
+ * and an `imageWithAlt` block to `SanityImage`, keeping `@blog/ui` itself
+ * Sanity-free. Optionally stamps `h2`/`h3` headings with stable anchor ids
+ * via `headings`, for use with `PostContentsRail`.
  *
  * @example
  * <ContentModule title={title}>
@@ -142,6 +150,22 @@ export const PortableTextRenderer = ({
           highlightedLines={codeValue.highlightedLines}
         />
       ),
+      imageWithAlt: ({ value: imageValue }: { value: ImageWithAlt }) => {
+        const image = toPortableTextImage(imageValue);
+        if (!image) return null;
+
+        return (
+          <SanityImage
+            image={image}
+            projectId={env.NEXT_PUBLIC_SANITY_PROJECT_ID}
+            dataset={env.NEXT_PUBLIC_SANITY_DATASET}
+            width={1200}
+            sizes="(min-width: 1024px) 800px, 100vw"
+            loading="lazy"
+            className={s.image()}
+          />
+        );
+      },
     },
   };
 
