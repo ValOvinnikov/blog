@@ -1,0 +1,38 @@
+import { IMAGE_LAYOUT } from '@blog/config/constants';
+import { toTitleCase } from '@blog/utils';
+import {
+  imageAltField,
+  imageHotspotOptions,
+} from '@cms/schema-types/helpers/image-alt-field';
+import { defineField, defineType } from 'sanity';
+
+/**
+ * Image type used only inside `richTextSchema`'s body array. Composes the
+ * same `alt` field as `imageWithAltSchema` (shared, not duplicated — see
+ * `helpers/image-alt-field`) plus a `layout` choice that is meaningful for
+ * body content but not for hero/avatar/brand/OG/site-settings images, which
+ * stay on `imageWithAltSchema` unmodified.
+ */
+export const bodyImageSchema = defineType({
+  name: 'bodyImage',
+  title: 'Body Image',
+  type: 'image',
+  options: imageHotspotOptions,
+  fields: [
+    imageAltField(),
+    defineField({
+      name: 'layout',
+      title: 'Layout',
+      type: 'string',
+      description:
+        'How the image is positioned in body content. Leave unset to use the default (Inline).',
+      options: {
+        layout: 'radio',
+        list: Object.values(IMAGE_LAYOUT).map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
+      },
+    }),
+  ],
+});
