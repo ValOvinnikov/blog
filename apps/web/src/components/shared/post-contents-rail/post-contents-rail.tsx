@@ -39,16 +39,19 @@ export const PostContentsRail = ({
   });
   const activeId = useActiveHeadingId(headings.map((heading) => heading.id));
   const label = t('label');
-  // Defaults to the first heading before the reader has scrolled past any.
-  const activeHeading =
-    headings.find((heading) => heading.id === activeId) ?? headings[0];
+  // Falls back to the first heading before the reader has scrolled past any —
+  // shared by the selector display and the list highlight so they agree.
+  const activeHeadingId = activeId ?? headings[0]?.id;
+  const activeHeading = headings.find(
+    (heading) => heading.id === activeHeadingId,
+  );
 
   // `onNavigate` closes the mobile panel before the anchor jump — a click
   // leaves focus on the clicked link, so `closeOnFocusOut` never fires.
   const renderList = (onNavigate?: () => void, inPanel = false) => (
     <ol className={s.list({ inPanel })}>
       {headings.map((heading) => {
-        const isActive = heading.id === activeId;
+        const isActive = heading.id === activeHeadingId;
 
         return (
           <li
