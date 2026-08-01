@@ -1,6 +1,8 @@
 import { ICONS, type TIconName } from '@blog/config';
 import { type FC, type SVGProps } from 'react';
 
+import ArrowUpComponent from '@blog/ui/assets/icons/arrow-up.svg';
+import ArrowUpUrl from '@blog/ui/assets/icons/arrow-up.svg?url';
 import CheckSheetComponent from '@blog/ui/assets/icons/check-sheet.svg';
 import CheckSheetUrl from '@blog/ui/assets/icons/check-sheet.svg?url';
 import CheckComponent from '@blog/ui/assets/icons/check.svg';
@@ -65,4 +67,5 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.LINKEDIN]: { component: LinkedInComponent, url: LinkedInUrl },
   [ICONS.FACEBOOK]: { component: FacebookComponent, url: FacebookUrl },
   [ICONS.RSS]: { component: RssComponent, url: RssUrl },
+  [ICONS.ARROW_UP]: { component: ArrowUpComponent, url: ArrowUpUrl },
 };

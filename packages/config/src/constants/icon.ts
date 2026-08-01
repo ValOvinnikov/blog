@@ -17,6 +17,7 @@ export const ICONS = {
   LINKEDIN: 'LINKEDIN',
   FACEBOOK: 'FACEBOOK',
   RSS: 'RSS',
+  ARROW_UP: 'ARROW_UP',
 } as const;
 
 export type TIconName = TValueOf<typeof ICONS>;
