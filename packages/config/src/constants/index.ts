@@ -1,4 +1,6 @@
+export * from './aside';
 export * from './brand';
+export * from './depth';
 export * from './icon';
 export * from './language';
 export * from './link';
