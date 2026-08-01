@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 # Never let a second refresh run concurrently with (or cancel) one already in
-# progress — the job deletes and recreates the target dataset mid-run.
+# progress — the job wipes every document in the target dataset mid-run.
 concurrency:
   group: refresh-dev-dataset
   cancel-in-progress: false
@@ -37,7 +37,7 @@ jobs:
     # deploy/migrate jobs, which each need only their own environment's
     # secrets. Add a required reviewer on this environment (Settings →
     # Environments → dataset-refresh) for a human approval gate before the
-    # job runs, given it deletes the dev dataset.
+    # job runs, given it wipes every document in the dev dataset.
     environment: dataset-refresh
     env:
       SANITY_PROD_PROJECT_ID: ${{ vars.SANITY_PROD_PROJECT_ID }}

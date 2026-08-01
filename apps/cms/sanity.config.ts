@@ -142,15 +142,6 @@ export default defineConfig({
                   .title('Settings')
                   .items([
                     S.listItem()
-                      .title('Site Settings')
-                      .id(siteSchema.name)
-                      .icon(Settings)
-                      .child(
-                        S.document()
-                          .schemaType(siteSchema.name)
-                          .documentId(siteSchema.name),
-                      ),
-                    S.listItem()
                       .title('Navigation')
                       .id(navigationSchema.name)
                       .icon(Menu)
@@ -167,6 +158,16 @@ export default defineConfig({
                         S.document()
                           .schemaType(footerSchema.name)
                           .documentId(footerSchema.name),
+                      ),
+                    S.divider(),
+                    S.listItem()
+                      .title('Site Settings')
+                      .id(siteSchema.name)
+                      .icon(Settings)
+                      .child(
+                        S.document()
+                          .schemaType(siteSchema.name)
+                          .documentId(siteSchema.name),
                       ),
                   ]),
               ),
