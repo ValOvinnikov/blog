@@ -104,7 +104,8 @@ for an editable headline.
 
 **Objects** — `link` (unified internal/external, `LINK_TYPE` const),
 `socialLink`, `brand`, `specLine` (structured spec-line: `items` + a
-`SPEC_LINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt),
+`SPEC_LINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt;
+optional `layout` from `IMAGE_LAYOUT`, undefined = Inline),
 `seo` (all-optional
 override bag) + `openGraph`,
 `blockText` / `richText`, `aside` (deep-dive block type registered in

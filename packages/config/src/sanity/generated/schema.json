@@ -1211,6 +1211,31 @@
             "type": "string"
           },
           "optional": true
+        },
+        "layout": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "INLINE"
+              },
+              {
+                "type": "string",
+                "value": "FULL_BLEED"
+              },
+              {
+                "type": "string",
+                "value": "FLOAT_LEFT"
+              },
+              {
+                "type": "string",
+                "value": "FLOAT_RIGHT"
+              }
+            ]
+          },
+          "optional": true
         }
       }
     }
