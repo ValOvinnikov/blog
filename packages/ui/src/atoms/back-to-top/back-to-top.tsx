@@ -28,8 +28,7 @@ export const BackToTop = ({
     ariaLabel={ariaLabel}
     title={ariaLabel}
     onClick={onClick}
-    aria-hidden={!visible}
-    tabIndex={visible ? undefined : -1}
+    inert={!visible}
     dataTestId={dataTestId}
     className={backToTopVariants({ visible, class: className })}
   >

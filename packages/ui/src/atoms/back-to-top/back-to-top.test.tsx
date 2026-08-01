@@ -15,24 +15,20 @@ describe(`<${BackToTop.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Back to top' })).toBeVisible();
   });
 
-  it('is visible and focusable when visible is true', () => {
+  it('is visible and not inert when visible is true', () => {
     setup();
     const button = screen.getByRole('button', { name: 'Back to top' });
     expect(button).toBeVisible();
-    expect(button).not.toHaveAttribute('tabindex', '-1');
+    expect(button).not.toHaveAttribute('inert');
   });
 
-  it('is removed from the accessibility tree when visible is false', () => {
+  it('is inert when visible is false', () => {
     setup({ visible: false });
-    expect(
-      screen.queryByRole('button', { name: 'Back to top' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('is not focusable when visible is false', () => {
-    setup({ visible: false });
-    const button = screen.getByRole('button', { hidden: true });
-    expect(button).toHaveAttribute('tabindex', '-1');
+    const button = screen.getByRole('button', {
+      hidden: true,
+      name: 'Back to top',
+    });
+    expect(button).toHaveAttribute('inert');
   });
 
   it('calls onClick when clicked', async () => {
