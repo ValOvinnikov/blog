@@ -1,4 +1,5 @@
 export * from './action-list';
+export * from './aside';
 export * from './brand-lockup';
 export * from './breadcrumbs';
 export * from './card-meta';
