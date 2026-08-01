@@ -7,5 +7,6 @@ export const portableTextRendererVariants = tv({
     // `lg:`, a jump must also clear the sticky mobile TOC strip (`top-20` +
     // ~48px bar ≈ 128px) — `scroll-mt-32` rounds up.
     headingAnchor: ['scroll-mt-32', 'lg:scroll-mt-24'],
+    image: ['h-auto w-full rounded-lg border border-border'],
   },
 });

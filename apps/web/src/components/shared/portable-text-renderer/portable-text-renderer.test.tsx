@@ -269,4 +269,47 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       'const x = 1;',
     );
   });
+
+  it('renders an imageWithAlt block as an img with the CMS alt text, no unknown-block warning', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const value: RichText = [
+      {
+        _type: 'imageWithAlt',
+        _key: 'image-1',
+        asset: {
+          _ref: 'image-abc123-800x600-jpg',
+          _type: 'reference',
+        },
+        alt: 'A scenic mountain range',
+      },
+    ];
+
+    setup({ value });
+
+    const img = screen.getByRole('img', { name: 'A scenic mountain range' });
+    expect(img).toHaveAttribute(
+      'src',
+      expect.stringContaining('https://cdn.sanity.io'),
+    );
+    expect(warnSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining('Unknown block type'),
+    );
+
+    warnSpy.mockRestore();
+  });
+
+  it('renders nothing for an imageWithAlt block with no asset reference', () => {
+    const value: RichText = [
+      {
+        _type: 'imageWithAlt',
+        _key: 'image-1',
+        alt: 'Missing asset',
+      },
+    ];
+
+    const { container } = setup({ value });
+
+    expect(container.querySelector('img')).not.toBeInTheDocument();
+  });
 });

@@ -77,6 +77,15 @@ export const richTextDemo: RichText = [
     code: 'export const greet = (name: string) => `Hello, ${name}!`;',
   },
   richTextBlock('normal', [
-    richTextSpan('A closing paragraph after the code block.'),
+    richTextSpan('A paragraph after the code block, before an inline image.'),
+  ]),
+  {
+    _type: 'imageWithAlt',
+    _key: nextKey('image'),
+    asset: { _ref: 'image-abc123-1600x900-jpg', _type: 'reference' },
+    alt: 'A scenic mountain range at sunset',
+  },
+  richTextBlock('normal', [
+    richTextSpan('A closing paragraph after the image.'),
   ]),
 ];
