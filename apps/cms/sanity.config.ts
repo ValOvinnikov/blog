@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
+import { media } from 'sanity-plugin-media';
 
 import { requireEnv } from './sanity-env';
 
@@ -175,6 +176,7 @@ export default defineConfig({
     }),
     visionTool(),
     codeInput(),
+    media(),
   ],
 
   schema: {
