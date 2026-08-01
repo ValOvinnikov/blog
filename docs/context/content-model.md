@@ -1,0 +1,164 @@
+# Content model
+
+> Part of the docs split described in [`docs/README.md`](../README.md).
+> Referenced from `SPEC.md` §6. Update this file (not a duplicate) whenever
+> the Sanity schema changes shape.
+
+Source of truth: `apps/cms/src/schema-types/` (documents grouped `blog/`,
+`pages/`, `settings/`; shared `objects/`; `modules/` — standalone,
+cross-referenceable page-builder documents, not embedded objects). Naming
+convention `{group}_{name}` is being applied incrementally (#251):
+`settings_navigation`, `settings_footer`, `page_home`, `page_generic`, and
+every `module_*` document are done; `siteSettings` still carries a legacy
+name.
+
+**Modules are documents, not embedded objects** — pages reference them by
+`_ref`, so a module is independently listable, previewable, and reusable
+across pages (Studio's built-in **Incoming references** view shows which
+pages use a given module before it's edited or deleted). `MODULE_TYPE`
+(`packages/config/src/constants/module.ts`) is the single source of truth for
+the module type registry; every layer (cms schema list, `service.modules`
+namespace, web `MODULE_MAP`) derives from it, so omitting a type from one is a
+compile error or an obvious gap, not a silent drift — `MODULE_MAP`'s one
+intentional exception is `module_hero` (see [`data-flow.md`](./data-flow.md)),
+excluded because it's schema-forbidden from ever appearing in a `modules[]`
+array.
+
+**Module documents** (`apps/cms/src/schema-types/modules/`)
+
+- `module_hero` (`heroSchema`) — internal `title`, `featuredPost` (ref to
+  `post`, warning-only — falls back to the newest featured post), four
+  mode/custom field pairs (`heroEyebrow`, `heroTitle`, `heroSubtitle`,
+  `heroImage`) built via the `defineModeFieldPair` helper and driven by the
+  UPPERCASE `HERO_FIELD_MODE` const (`CUSTOM`/`NONE`/`POST_CATEGORY`/
+  `POST_TITLE`/`POST_EXCERPT`/`POST_IMAGE`), `primaryActionLabel`,
+  `secondaryAction` (`link`).
+- `module_postList` (`postListSchema`) — internal `title` (display heading),
+  `limit` (posts to fetch, 1–12).
+- `module_content` (`contentSchema`) — internal `title`, `body` (portable
+  text).
+- `module_cta` (`ctaSchema`) — internal `title`, `heading`, `text`, `action`
+  (`link`, required).
+
+Every module document gets a required internal `title` via the reusable
+`titleField` helper (§ below) so it's listable/previewable in Studio
+independent of its display fields.
+
+**Page documents reference modules**
+
+- `page_home` (`homeSchema`, singleton) — `titleField` (internal Studio label;
+  `preview.prepare` falls back to the generic "Unknown" when unset), `hero`
+  (single **required**
+  reference to a `module_hero`, kept
+  separate from the module list — it always renders first), `modules` (array of
+  references via `defineModulesField({ allow: [MODULE_TYPE.POST_LIST,
+MODULE_TYPE.CTA] })`), `seo`.
+- `page_generic` (`genericSchema`) — `title`, `slug` (source: title),
+  `modules` (array of references via `defineModulesField({ allow:
+[MODULE_TYPE.CONTENT, MODULE_TYPE.CTA] })`), `seo`.
+- `page_blog` (`blogPageSchema`, singleton) — the `/blog` index page config; a
+  non-module singleton: `titleField` (internal Studio label; `preview.prepare`
+  falls back to the generic "Unknown" when unset), `heading` (the
+  page `<h1>`), `supportingText` (optional line under it), `itemsPerPage`
+  (number, 1–24, drives the pagination window size), `seo`.
+
+`defineModulesField({ allow, description? })`
+(`schema-types/helpers/define-modules-field.ts`) builds the `modules` array
+field's `of` from the allowed `TModuleType[]`, one strong `reference` array
+member per allowed type — the single place that field shape is defined,
+replacing a hand-duplicated block per page document.
+
+**Other documents**
+
+- `post` — title, slug, excerpt, heroImage (`imageWithAlt`, **optional** — a
+  post without one renders imageless rather than 404ing), author (ref),
+  category (ref → `category`, required — the post's single primary
+  classification), tags (refs → `tag`, optional, max 6), publishedAt, body
+  (portable text incl. code blocks and `aside` blocks), featured, seo, skim
+  (`skim` object, **optional** — `takeaways` (3-7 items, each max 160 chars),
+  `generatedAt`/`model` read-only in Studio; pipeline-populated for the
+  choose-your-depth reading feature, #957).
+- `author` — name, slug, image, bio, role, socialLinks (unified `link`-based).
+- `category` — title, slug, description.
+- `tag` — title, slug, description, seo (topic taxonomy for posts; drives the
+  `/tag` archives + related-posts, alongside the section-level `category`).
+- `siteSettings` (singleton) — `titleField` (read-only, fixed value), brand
+  (`brand` object: name/prefix/suffix/logo/specLine/variant — `specLine` is
+  a `specLine` object, `{ items: string[] (max 4, each max 15 chars),
+separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
+  service layer can join it with a chosen separator glyph), description,
+  tagline, `defaultOgImage` (`imageWithAlt`, required — the last-resort
+  social image).
+- `settings_navigation` (singleton) — `titleField` (read-only, fixed value),
+  items (links).
+- `settings_footer` (singleton) — `titleField` (read-only, fixed value),
+  social links.
+
+**Reusable `titleField` helper** (`schema-types/helpers/title-field.ts`) —
+`titleField({ initialValue?, readOnly?, description?, max? })` returns a
+required `defineField({ name: 'title', type: 'string', … })`. Singletons pass
+a fixed `initialValue` + `readOnly: true` (this — not `preview.prepare` or the
+desk `S.document().title()`, which only labels the list item — is what fixes
+the document form showing "Untitled"). Content/module documents pass `max`
+for an editable headline.
+
+**Objects** — `link` (unified internal/external, `LINK_TYPE` const),
+`socialLink`, `brand`, `specLine` (structured spec-line: `items` + a
+`SPEC_LINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt),
+`seo` (all-optional
+override bag) + `openGraph`,
+`blockText` / `richText`, `aside` (deep-dive block type registered in
+`richText`'s portable-text array; `kind` from `ASIDE_KIND`, required; `body`
+via `blockText`, required — part of the choose-your-depth reading feature,
+#957), `skim` (see `post` above).
+
+**Conventions**
+
+- `defineType`/`defineField`/`defineArrayMember` everywhere; validation
+  `rule.required()` on every field the frontend assumes; images get
+  `hotspot: true` + required alt. Every schema definition is a **named
+  export** (`{localName}Schema`) — never `export default defineType`.
+- Enum-ish stored values come from `@blog/config` constants — **both key and
+  value UPPERCASE** (`LINK_TYPE.INTERNAL === 'INTERNAL'`,
+  `HERO_FIELD_MODE.CUSTOM === 'CUSTOM'`), `as const`; schema `options.list` and
+  migrations use the same constant.
+- Singletons enforced through desk structure; Studio also groups a top-level
+  **Modules** section with one browsable list per module type (Heroes, Post
+  Lists, Content, CTAs).
+- No migration was needed for the modules-as-documents redesign — datasets
+  were recreated clean before this model shipped.
+
+## Migrations & live data (core contract)
+
+Content is live in the `production` dataset. Schema and content are decoupled:
+changing a schema does **not** change existing documents.
+
+- Any change altering an _existing_ shape (rename/remove/move a field, rename a
+  `_type`, restructure a document) **requires a content migration** — decide
+  this before implementing, and surface the plan to the user. Additive,
+  optional-only changes need none (say so explicitly).
+- Tooling lives in `apps/cms/migrations/` (`README.md`) with helper scripts:
+  `migrate:new` (folders are now UTC-timestamped, `YYYYMMDDTHHmm-<slug>`, for
+  deterministic run order) / `migrate:dry` / `migrate:run` / `dataset:export`.
+- Workflow: **dry-run → dataset export (backup) → human-gated run**. Running
+  against `production` is human-gated, like deploys. Migrations must be
+  idempotent.
+- **`migrate:deploy`** runs only the migrations not yet recorded in a
+  per-dataset `migrationState` ledger document (`_id: 'migrationState'`, a
+  system doc — not a Studio schema type, never part of typegen), in order:
+  dry-run → run (`--no-dry-run --no-confirm`) → append `{id, runAt, sha}` to
+  the ledger, stopping on first failure. A second run with nothing new is a
+  no-op. `migrate:backfill` records the currently-pending folder migrations as
+  applied **without** running them (one-time, per dataset, for migrations that
+  predate the ledger). Both need a write token (`SANITY_AUTH_TOKEN` /
+  `SANITY_DEPLOY_TOKEN`) and remain **manual, local-only commands today** — no
+  CI workflow invokes them yet.
+- CI (`Migrations` job) validates every migration loads and — with a read
+  token — dry-runs each one read-only. It never mutates data.
+- Future: a gated post-merge workflow that runs `migrate:deploy` against
+  `production` automatically (write token, durable backup, release ordering
+  vs. the Vercel web deploy) — designed in
+  `docs/superpowers/specs/2026-07-10-migration-deployment-automation-design.md`
+  (#261, rollout steps 4–5); steps 1–3 (timestamped ids, the ledger,
+  `migrate:deploy`/`migrate:backfill`) are implemented and usable locally
+  today, e.g. `SANITY_STUDIO_DATASET=development pnpm --filter cms migrate:deploy`.

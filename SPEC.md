@@ -2,10 +2,21 @@
 
 > **The single durable reference for this project.** Any PR that changes
 > architecture, contracts, env vars, or the content model must update this file
-> in the same PR (the `code-review-practices` skill enforces this).
+> (or the relevant `docs/context/*.md` file it links to) in the same PR (the
+> `code-review-practices` skill enforces this).
 > `docs/archive/IMPLEMENTATION_BRIEF.md` is the archived bootstrap playbook —
 > historical context only; when it disagrees with this document, this document
 > wins.
+>
+> This file holds the durable architecture contract — what every layer owns,
+> what it may import, and the current product state. Long-form detail one
+> level down (full content model, full data flow, full env var reference,
+> rendering/i18n mechanics, SEO checklist, routing history, tooling roster)
+> lives in `docs/context/*.md`, linked from each section below — see
+> [`docs/README.md`](./docs/README.md) for the full docs map. **Section
+> numbers below are stable** — other files reference them by number
+> (`SPEC.md §N`); if a section is trimmed or its detail moves out, its number
+> stays put.
 
 ## 1. Product summary
 
@@ -34,95 +45,13 @@ built in that phase is merged. Post taxonomy (category `max: 4` cap + the
 category cap was narrowed to a single required reference in #809 on
 2026-07-24 (see §6 Content model).
 
-**Routing conventions** (decided 2026-07-14 — full rationale in
-`docs/archive/superpowers/specs/2026-07-14-blog-list-pagination-design.md`):
-
-- **One route-builder** — `routes` in `@blog/config` is the single source of
-  URL truth (`routes.post(slug)`, `routes.blogIndex(page?)`, …). No inline
-  path templates in `service` or `web`; the sitemap and JSON-LD consume it too.
-- **Pagination** — path-based, `/x/page/N` (static `page/` segment; singular).
-  Page 1 lives only at the base URL; `/x/page/1` → `permanentRedirect` (308).
-  Every page self-canonicalizes (never canonical-to-page-1); no
-  `rel=next/prev`; non-canonical or out-of-range page params → hard 404.
-- **Slug-space safety** — Next resolves static › dynamic › catch-all, so
-  section segments (`blog`, `category`, `tag`, `author`) always beat the root
-  generic `/[slug]`; `RESERVED_SLUGS` (#328) stops editors creating pages those
-  segments would shadow. No catch-all routes for fixed-shape paths. `tag` is in
-  `RESERVED_SLUGS` (#674) so `/tag/[slug]` can never be shadowed by a generic
-  page slugged `tag`; `topics` is in `RESERVED_SLUGS` (#752) so `/topics` can
-  never be shadowed by a generic page slugged `topics`.
-- **Tag axis** (#674) — `/tag/[slug]` (+ `/page/N`) mirrors the category
-  route's pagination/canonical/404 rules exactly (`routes.tag(slug, page?)`).
-  Post detail (`/blog/[slug]`) renders the post's tags as `Article.Footer`
-  chips linking to `routes.tag`, plus a shared-tag-ranked "Related reading"
-  section (up to 3, category-fallback when fewer than 3 share a tag) — the
-  heading stays category-neutral since the tag-based match isn't
-  category-scoped. Every tag also gets its own RSS feed at
-  `/tag/[slug]/rss.xml`, and every tag archive URL is listed in the sitemap.
-- **Post-detail layout (#902):** `/blog/[slug]`'s `<main>` splits into
-  per-region widths instead of one uniform clamp — the hero region
-  (`Article.Header`) spans `max-w-page` (1120px) overall. Within it, the
-  category eyebrow, capped h1 title, lead paragraph, and metadata strip all
-  sit in a narrower, centered heading column (`max-w-[800px]`); the cover
-  image renders below that column, back at the full 1120px width (#942).
-  The article body is capped at `max-w-measure` (68ch,
-  tightened from the earlier `max-w-post`/760px for reading comfort — #932)
-  — unless the post qualifies for the "Topics" contents rail (≥3 H2
-  headings, #934), in which case the body widens to `max-w-page` and splits
-  into a two-column grid: a sticky rail (desktop `≥1024px`) or a compact
-  selector (below `1024px`) alongside the still-`max-w-measure`-capped
-  reading column. The `max-w-measure` cap lives on each grid child
-  (`content`, `rail`, `footerInRail`), not on `body` — nesting it on both double-shrank
-  the reading column below `lg:` (to ~536px); capping per-child keeps it a
-  consistent 68ch (~616px) at every width (#995). The rail is labelled
-  **Topics**: at `≥1024px` a full vertical topic list with active-topic
-  highlighting; below that, a "TOPICS" label (stacked above on mobile,
-  inline-left on tablet) plus a bordered selector showing the current
-  active topic (defaults to the first heading, tracks scroll) that opens
-  the full list to jump (#995). With the rail present, `Article.Footer` (the tag chips)
-  renders _inside_ that grid as a second row under the reading column —
-  capped to `max-w-measure` and left-aligned with the body, so its top rule
-  spans only the reading column rather than the full grid width — and the
-  sticky rail spans both grid rows so it descends to sit beside the footer
-  instead of stopping at the end of the body (#996, superseding #987's
-  full-width-footer approach).
-- **Choose-your-depth reading (#957, additive-only — no migration):** every
-  post renders at three reader-selectable depths — `SKIM` (a 3–7 item
-  takeaways panel with a "read the full article" affordance), `READ` (the
-  article exactly as written, the default), `DEEP` (the `READ` body plus its
-  authored `aside` blocks expanded in place, kind-labelled "Why not X" /
-  "Digression" / "Context") — via a `SegmentedControl` near the title. All
-  three depths ship in the same static HTML; switching is a pure CSS
-  show/hide keyed off a `data-depth` attribute (`DepthProvider`, a client
-  context wrapping the reading area, mirrors the theme toggle's no-flash
-  pre-hydration script + `localStorage` persistence, key `reading-depth`).
-  ISR, canonical URL, and SEO are unaffected — crawlers see the standard
-  `READ` article; no duplicate-content risk. Graceful degradation: no
-  approved `skim` → no `30s` option; no `aside` blocks (`hasAsides`) → no
-  `Deep` option; a post with neither renders the control hidden entirely
-  (today's default post shape, unchanged). A publish-time pipeline
-  (`POST /api/generate-skim`, secret-verified — see §9) drafts the `skim`
-  field for human approval; publishing the post **is** the approval step.
-- The "Related reading" section is separated from the article by a
-  `max-w-page`-width top rule (`--border-emphasis`), not a background
-  fill — the page canvas itself (including the hero) is `--bg-subtle`
-  (#950/#951), so a same-color fill would no longer read as distinct.
-- **Page canvas elevation (#950/#951, #973):** the content canvas renders on
-  `--bg-subtle`, one step darker than the site chrome (`Header`,
-  `BreadcrumbBar`, both `--bg`) — three visible elevation layers: chrome
-  `--bg` · canvas `--bg-subtle` · cards/cover media `--surface` (pops off
-  the canvas). The tint is applied **once** on the locale layout's content
-  wrapper (the region between `<Header>` and `<Footer>`, #973) — individual
-  page/template roots under `[locale]/` set no background of their own and
-  inherit it (home, blog index, post detail, topics, generic pages). The one
-  exception is the root `not-found.tsx`, which renders _outside_ the
-  `[locale]` layout (Next's not-found boundary), so it can't inherit that
-  wrapper — its own template keeps `--bg-subtle` on its root to stay visually
-  consistent with the rest of the site. The footer sits flush below the
-  canvas on its own `--accent-muted` band.
-
 Both environments are **live** (§13): merging to `main` deploys development;
 a `vX.Y.Z` tag promotes to production.
+
+**Routing conventions, per-surface layout decisions, and their history**
+(pagination/canonical rules, the tag axis, post-detail layout, choose-your-depth
+reading, page canvas elevation) are documented in full in
+[`docs/context/surfaces-and-routing.md`](./docs/context/surfaces-and-routing.md).
 
 ## 2. Architecture principles
 
@@ -180,423 +109,77 @@ configs/
 | `cms` (app)     | `config` (constants), `utils`    | Schema types (source of truth), desk structure, content migrations                                                                                                                                      | hand-write shapes typegen should produce                          |
 
 The graph is acyclic. `apps/web` is the only place `ui` and `service` meet.
+Dependency-graph enforcement details and SVG/type-flow wiring:
+[`docs/context/frontend-conventions.md`](./docs/context/frontend-conventions.md).
 
 ## 5. Data flow & typegen
 
-```
-Sanity Studio (apps/cms)
-      │  pnpm typegen  (sanity schema extract → schema.json,
-      │                 sanity typegen generate → types.ts)
-      ▼
-packages/config/src/sanity/generated/{schema.json,types.ts}   (committed)
-      ▼
-@blog/service
-  ├─ service.pages.<page>   ──thin query──►  { title, hero?, modules[]: TModuleRef, seo }
-  └─ service.modules.<type> ──runQuery + groqd, keyed by module id──►  typed module view-model
-      ▼
-apps/web
-  ├─ page.tsx           fetches service.pages.<page>, checks result.ok
-  ├─ ModuleRenderer      maps each TModuleRef → MODULE_MAP[type]({ id, locale })
-  └─ per-module component  fetches service.modules.<type>, maps view-model ──plain typed props──►  @blog/ui organism
-```
+Sanity schema → `pnpm typegen` → `@blog/config` generated types →
+`@blog/service` (thin page queries + per-module fetchers, plus a scoped
+`service.editorial.*` write path for the skim pipeline) → `apps/web`
+(`ModuleRenderer` maps each module reference through `MODULE_MAP` to a
+Server Component, which fetches its own module data and maps it onto a pure
+`@blog/ui` organism). Typegen output is committed and can be non-deterministic
+— re-run until minimal.
 
-- Typegen config lives in `apps/cms/sanity.cli.ts`; the script is
-  `pnpm --filter cms typegen`. **Commit the generated files.**
-- Typegen output can be non-deterministic across runs — if the diff churns,
-  re-run until minimal before committing.
-- Generated types mark **every** field optional (validation is runtime-only).
-  The service layer restores the contract at the query boundary: explicit
-  `sub.field()` projections, `.notNull()` (always last in the chain) for
-  schema-required fields, `T | undefined` (never `| null`) in view-models —
-  spelled `TMaybeUndefined<T>` (the `@blog/config` alias) for a value that may
-  be absent, distinct from property optionality (`field?:`) — and **no faked
-  defaults**: absence handling belongs to `apps/web`.
-- Service loaders return `Promise<TViewModel>` and throw on missing data;
-  `safeAsync` in each feature's `application/service.ts` converts throws into
-  `AsyncResult<T>` (`{ ok: false, error }`). **Web must check `result.ok`
-  before touching `result.data`** and owns the failure decision (`notFound()`,
-  fallback, or early return).
-- **Page queries are thin.** `page_home`/`page_generic` project only page
-  fields plus lightweight module descriptors (`TModuleRef = { key, type, id }`,
-  from `to-module-ref.ts`) — no module internals, no `conditionalByType`. Each
-  module type owns its own fetcher (`service.modules.<type>.v1.get<Type>(id)`)
-  under `packages/service/src/features/modules/<type>/`, with its own GROQ,
-  transformer, and `T | undefined` view-model (`THeroModule`,
-  `TPostListModule`, `TContentModule`, `TCtaModule`). `module_postList` fetches
-  its own posts (the newest `limit`); `module_hero` resolves its own
-  custom-vs-fallback fields (see §6).
-- **Service also has a scoped write path, `service.editorial.*`** (e.g.
-  `service.editorial.skim.v1`, added for the choose-your-depth reading
-  pipeline, #957) — separate from the read-only flow described above.
-  `packages/service/src/sanity/write-client.ts` is a distinct client from the
-  page-render read client, authenticated with `SANITY_API_WRITE_TOKEN`
-  (server-only, never bundled to the client). Writes are always scoped to a
-  document's **draft** (`drafts.<id>`), never the published document, and are
-  triggered by an explicit pipeline action — concretely, `apps/web`'s
-  `POST /api/generate-skim` route (webhook-driven, secret-verified — see
-  §9) — never by a page render. A human still reviews and publishes the
-  draft in Studio before it goes live — the write path only stages content,
-  it never publishes.
-- **Web renders modules generically.** `apps/web/src/modules/module-map.ts`
-  registers `MODULE_MAP: Record<Exclude<TModuleType, 'module_hero'>, (props) =>
-ReactNode>` — typed exhaustively over every module type in
-  `TModuleType`/`MODULE_TYPE` (`@blog/config`) **except** `module_hero`, so
-  omitting any other module type from the map is a compile error.
-  `module_hero` is deliberately excluded: the CMS schema never allows a
-  `module_hero` entry inside any page's `modules[]` array (`page_generic`
-  allows only `content`/`cta`; `page_home` allows only `postList`/`cta`), so
-  it can never reach `ModuleRenderer` — see the home-route note below.
-  `module-renderer.tsx`'s `ModuleRenderer` walks a page's
-  `modules: TModuleRef[]`, resolves each entry through `MODULE_MAP` (cast to
-  `keyof typeof MODULE_MAP`, since the raw `TModuleType` still includes
-  `module_hero`), and renders the result keyed by the module's stable `_key`;
-  an unrecognized type — including a `module_hero` if the schema constraint
-  were ever loosened — renders nothing and logs a warning rather than failing
-  the page. Each per-module component
-  (`apps/web/src/modules/<type>/<type>-module.tsx`) is an async Server
-  Component that calls its `service.modules.<type>` fetcher, checks
-  `result.ok`, and maps the view-model onto the matching pure `@blog/ui`
-  organism — this is the only place that module's service and ui meet. The
-  home route instead renders `HeroModule` directly, as a dedicated `hero` prop
-  on `HomePageTemplate`, for `page_home`'s required `hero` reference (kept
-  separate from `modules[]` and from `MODULE_MAP`/`ModuleRenderer` entirely).
+Full diagram, the service/view-model contract (`AsyncResult`, `TMaybeUndefined`,
+no faked defaults), the module-registry mechanism, and the editorial write path:
+[`docs/context/data-flow.md`](./docs/context/data-flow.md).
 
 ## 6. Content model
 
-Source of truth: `apps/cms/src/schema-types/` (documents grouped `blog/`,
-`pages/`, `settings/`; shared `objects/`; `modules/` — standalone,
-cross-referenceable page-builder documents, not embedded objects). Naming
-convention `{group}_{name}` is being applied incrementally (#251):
-`settings_navigation`, `settings_footer`, `page_home`, `page_generic`, and
-every `module_*` document are done; `siteSettings` still carries a legacy
-name.
+Source of truth: `apps/cms/src/schema-types/` — documents (`post`, `author`,
+`category`, `tag`, page documents, singletons), standalone `module_*`
+page-builder documents, and shared objects (`link`, `imageWithAlt`, `seo`,
+`aside`, `skim`, …). Naming convention `{group}_{name}` is being applied
+incrementally (#251).
 
-**Modules are documents, not embedded objects** — pages reference them by
-`_ref`, so a module is independently listable, previewable, and reusable
-across pages (Studio's built-in **Incoming references** view shows which
-pages use a given module before it's edited or deleted). `MODULE_TYPE`
-(`packages/config/src/constants/module.ts`) is the single source of truth for
-the module type registry; every layer (cms schema list, `service.modules`
-namespace, web `MODULE_MAP`) derives from it, so omitting a type from one is a
-compile error or an obvious gap, not a silent drift — `MODULE_MAP`'s one
-intentional exception is `module_hero` (see §5), excluded because it's
-schema-forbidden from ever appearing in a `modules[]` array.
-
-**Module documents** (`apps/cms/src/schema-types/modules/`)
-
-- `module_hero` (`heroSchema`) — internal `title`, `featuredPost` (ref to
-  `post`, warning-only — falls back to the newest featured post), four
-  mode/custom field pairs (`heroEyebrow`, `heroTitle`, `heroSubtitle`,
-  `heroImage`) built via the `defineModeFieldPair` helper and driven by the
-  UPPERCASE `HERO_FIELD_MODE` const (`CUSTOM`/`NONE`/`POST_CATEGORY`/
-  `POST_TITLE`/`POST_EXCERPT`/`POST_IMAGE`), `primaryActionLabel`,
-  `secondaryAction` (`link`).
-- `module_postList` (`postListSchema`) — internal `title` (display heading),
-  `limit` (posts to fetch, 1–12).
-- `module_content` (`contentSchema`) — internal `title`, `body` (portable
-  text).
-- `module_cta` (`ctaSchema`) — internal `title`, `heading`, `text`, `action`
-  (`link`, required).
-
-Every module document gets a required internal `title` via the reusable
-`titleField` helper (§ below) so it's listable/previewable in Studio
-independent of its display fields.
-
-**Page documents reference modules**
-
-- `page_home` (`homeSchema`, singleton) — `titleField` (internal Studio label;
-  `preview.prepare` falls back to the generic "Unknown" when unset), `hero`
-  (single **required**
-  reference to a `module_hero`, kept
-  separate from the module list — it always renders first), `modules` (array of
-  references via `defineModulesField({ allow: [MODULE_TYPE.POST_LIST,
-MODULE_TYPE.CTA] })`), `seo`.
-- `page_generic` (`genericSchema`) — `title`, `slug` (source: title),
-  `modules` (array of references via `defineModulesField({ allow:
-[MODULE_TYPE.CONTENT, MODULE_TYPE.CTA] })`), `seo`.
-- `page_blog` (`blogPageSchema`, singleton) — the `/blog` index page config; a
-  non-module singleton: `titleField` (internal Studio label; `preview.prepare`
-  falls back to the generic "Unknown" when unset), `heading` (the
-  page `<h1>`), `supportingText` (optional line under it), `itemsPerPage`
-  (number, 1–24, drives the pagination window size), `seo`.
-
-`defineModulesField({ allow, description? })`
-(`schema-types/helpers/define-modules-field.ts`) builds the `modules` array
-field's `of` from the allowed `TModuleType[]`, one strong `reference` array
-member per allowed type — the single place that field shape is defined,
-replacing a hand-duplicated block per page document.
-
-**Other documents**
-
-- `post` — title, slug, excerpt, heroImage (`imageWithAlt`, **optional** — a
-  post without one renders imageless rather than 404ing), author (ref),
-  category (ref → `category`, required — the post's single primary
-  classification), tags (refs → `tag`, optional, max 6), publishedAt, body
-  (portable text incl. code blocks and `aside` blocks), featured, seo, skim
-  (`skim` object, **optional** — `takeaways` (3-7 items, each max 160 chars),
-  `generatedAt`/`model` read-only in Studio; pipeline-populated for the
-  choose-your-depth reading feature, #957).
-- `author` — name, slug, image, bio, role, socialLinks (unified `link`-based).
-- `category` — title, slug, description.
-- `tag` — title, slug, description, seo (topic taxonomy for posts; drives the
-  `/tag` archives + related-posts, alongside the section-level `category`).
-- `siteSettings` (singleton) — `titleField` (read-only, fixed value), brand
-  (`brand` object: name/prefix/suffix/logo/specLine/variant — `specLine` is
-  a `specLine` object, `{ items: string[] (max 4, each max 15 chars),
-separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
-  service layer can join it with a chosen separator glyph), description,
-  tagline, `defaultOgImage` (`imageWithAlt`, required — the last-resort
-  social image).
-- `settings_navigation` (singleton) — `titleField` (read-only, fixed value),
-  items (links).
-- `settings_footer` (singleton) — `titleField` (read-only, fixed value),
-  social links.
-
-**Reusable `titleField` helper** (`schema-types/helpers/title-field.ts`) —
-`titleField({ initialValue?, readOnly?, description?, max? })` returns a
-required `defineField({ name: 'title', type: 'string', … })`. Singletons pass
-a fixed `initialValue` + `readOnly: true` (this — not `preview.prepare` or the
-desk `S.document().title()`, which only labels the list item — is what fixes
-the document form showing "Untitled"). Content/module documents pass `max`
-for an editable headline.
-
-**Objects** — `link` (unified internal/external, `LINK_TYPE` const),
-`socialLink`, `brand`, `specLine` (structured spec-line: `items` + a
-`SPEC_LINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt),
-`seo` (all-optional
-override bag) + `openGraph`,
-`blockText` / `richText`, `aside` (deep-dive block type registered in
-`richText`'s portable-text array; `kind` from `ASIDE_KIND`, required; `body`
-via `blockText`, required — part of the choose-your-depth reading feature,
-#957), `skim` (see `post` above).
-
-**Conventions**
-
-- `defineType`/`defineField`/`defineArrayMember` everywhere; validation
-  `rule.required()` on every field the frontend assumes; images get
-  `hotspot: true` + required alt. Every schema definition is a **named
-  export** (`{localName}Schema`) — never `export default defineType`.
-- Enum-ish stored values come from `@blog/config` constants — **both key and
-  value UPPERCASE** (`LINK_TYPE.INTERNAL === 'INTERNAL'`,
-  `HERO_FIELD_MODE.CUSTOM === 'CUSTOM'`), `as const`; schema `options.list` and
-  migrations use the same constant.
-- Singletons enforced through desk structure; Studio also groups a top-level
-  **Modules** section with one browsable list per module type (Heroes, Post
-  Lists, Content, CTAs).
-- No migration was needed for the modules-as-documents redesign — datasets
-  were recreated clean before this model shipped.
+Full schema reference (every document/object, field-by-field), naming and
+validation conventions:
+[`docs/context/content-model.md`](./docs/context/content-model.md).
 
 ## 7. Environment & configuration
 
-| Variable                                   | Consumer                                           | Notes                                                                                                                                                  |
-| ------------------------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `NEXT_PUBLIC_SANITY_PROJECT_ID`            | web + service                                      | required; validated by Zod at import                                                                                                                   |
-| `NEXT_PUBLIC_SANITY_DATASET`               | web + service                                      | required                                                                                                                                               |
-| `NEXT_PUBLIC_SITE_URL`                     | web (SEO)                                          | optional until launch; canonical/OG/feeds                                                                                                              |
-| `SANITY_API_READ_TOKEN`                    | service (server)                                   | optional; private reads / future draft mode                                                                                                            |
-| `SANITY_API_WRITE_TOKEN`                   | service (server, `editorial.*` domain only)        | optional; scoped Editor-role write token for the choose-your-depth skim pipeline (#957), never used by page-render reads — see §5                      |
-| `SANITY_REVALIDATE_SECRET`                 | web (server)                                       | optional until the #93 revalidation route exists                                                                                                       |
-| `ANTHROPIC_API_KEY`                        | web (server, `/api/generate-skim` only)            | optional; absent → the route returns 503 (feature-flag-by-absence), reader path unaffected — see §9                                                    |
-| `SANITY_GENERATE_SECRET`                   | web (server, `/api/generate-skim` only)            | optional; secret-verifies the skim-generation webhook, same stance as `SANITY_REVALIDATE_SECRET`                                                       |
-| `SANITY_STUDIO_PROJECT_ID`                 | cms Studio + CLI                                   | required; **per environment** (env-driven; no ids in repo)                                                                                             |
-| `SANITY_STUDIO_DATASET`                    | cms Studio + CLI                                   | required                                                                                                                                               |
-| `SANITY_STUDIO_HOSTNAME`                   | cms CLI (deploy)                                   | deploy target `<host>.sanity.studio`; CI-only                                                                                                          |
-| `SANITY_DEPLOY_TOKEN`                      | CI (deploy)                                        | write/Deploy token; **project-scoped** → set per GitHub Environment                                                                                    |
-| `SANITY_AUTH_TOKEN`                        | cms `migrate:deploy`/`migrate:backfill`            | write token for the `migrationState` ledger client (`@sanity/client`); the standard Sanity CLI auth var — falls back to `SANITY_DEPLOY_TOKEN` if unset |
-| `VERCEL_TOKEN` / `_ORG_ID` / `_PROJECT_ID` | CI (deploy)                                        | Vercel CLI deploys; token is a Secret, ids are Variables                                                                                               |
-| `TURBO_TOKEN` / `TURBO_TEAM`               | CI (all)                                           | optional Vercel Remote Cache; no-op until configured                                                                                                   |
-| `SKIP_ENV_VALIDATION`                      | CI builds + `blog/[slug]`'s `generateStaticParams` | bypasses Zod env validation where no vars exist; also the escape hatch for a build that legitimately has no Sanity access (#889) — see §9              |
-| `LIGHTHOUSE_URLS`                          | CI (`lighthouse.yml`)                              | Variable; one full preview URL per line (`/` + one post page); no-op until a preview-URL mechanism lands (see `.lighthouse/README.md`)                 |
-| `SMOKE_URL`                                | CI (`playwright-smoke.yml`)                        | Variable; one already-deployed origin the Playwright smoke suite (`apps/web/e2e/`) runs against; no-op until set, same mechanism as `LIGHTHOUSE_URLS`  |
-
-- Env access is **always** through the validated entry points
-  (`apps/web/src/utils/env/env.ts` via `@t3-oss/env-nextjs`, service's env via
-  `env-core`) — never raw `process.env` in app code.
-- **Turborepo runs in strict env mode**: any env var a task needs must be
-  declared in `turbo.json` (`env`/`passThroughEnv`) or turbo strips it.
-  `pnpm --filter` bypasses turbo and can mask a missing declaration — verify
-  with `pnpm build` from root.
-- **Shared config presets bust their consumers' cache.** Each cached task
-  declares the `configs/*` presets it reads via `inputs` using the
-  `$TURBO_ROOT$` microsyntax (repo-root-relative, cross-package): `lint` ←
-  `configs/eslint`, `type-check` ← `configs/tsconfig`, `test` ← `configs/vitest`,
-  `build`/`storybook:build` ← `configs/tsconfig` + `configs/tailwind`. Without
-  this, editing a preset (e.g. `configs/eslint/base.js`) left `lint` a
-  `FULL TURBO` cache hit against stale rules. The tasks that actually needed the
-  fix are `lint` and `storybook:build` — the two with **no** `dependsOn: ["^…"]`,
-  so their hash is their own files only. `type-check`/`test`/`build` carry a
-  `dependsOn: ["^…"]` edge and, because every workspace lists the `configs/*`
-  packages as `devDependencies`, already invalidate on any preset edit through
-  Turbo's dependency closure; their explicit `inputs` pin the contract precisely
-  rather than fixing a live bug, and are preferred over a blunt
-  `globalDependencies: ["configs/**"]` (which over-invalidates across task types).
-  Globs stay single-level and extension-scoped (`*.js`/`*.json`/`*.ts`/`*.css`)
-  so `node_modules`/`.turbo` logs never leak into a task hash — note
-  `configs/tsconfig/*.json` also matches that package's own `package.json`, which
-  is intentional and conservative (#403).
-- Never read or commit `.env*` files.
+Every env var this repo uses, its consumer, and whether it's required is the
+canonical table in
+[`docs/context/environment-variables.md`](./docs/context/environment-variables.md)
+— includes the access conventions (validated entry points only, turbo strict
+env mode, cache-busting on shared config presets).
 
 ## 8. Migrations & live data (core contract)
 
 Content is live in the `production` dataset. Schema and content are decoupled:
-changing a schema does **not** change existing documents.
+changing a schema does **not** change existing documents. Any change altering
+an _existing_ shape (rename/remove/move a field, rename a `_type`, restructure
+a document) **requires a content migration** — decide this before
+implementing, and surface the plan to the user. Additive, optional-only
+changes need none (say so explicitly). Workflow: **dry-run → dataset export
+(backup) → human-gated run**, same as deploys.
 
-- Any change altering an _existing_ shape (rename/remove/move a field, rename a
-  `_type`, restructure a document) **requires a content migration** — decide
-  this before implementing, and surface the plan to the user. Additive,
-  optional-only changes need none (say so explicitly).
-- Tooling lives in `apps/cms/migrations/` (`README.md`) with helper scripts:
-  `migrate:new` (folders are now UTC-timestamped, `YYYYMMDDTHHmm-<slug>`, for
-  deterministic run order) / `migrate:dry` / `migrate:run` / `dataset:export`.
-- Workflow: **dry-run → dataset export (backup) → human-gated run**. Running
-  against `production` is human-gated, like deploys. Migrations must be
-  idempotent.
-- **`migrate:deploy`** runs only the migrations not yet recorded in a
-  per-dataset `migrationState` ledger document (`_id: 'migrationState'`, a
-  system doc — not a Studio schema type, never part of typegen), in order:
-  dry-run → run (`--no-dry-run --no-confirm`) → append `{id, runAt, sha}` to
-  the ledger, stopping on first failure. A second run with nothing new is a
-  no-op. `migrate:backfill` records the currently-pending folder migrations as
-  applied **without** running them (one-time, per dataset, for migrations that
-  predate the ledger). Both need a write token (`SANITY_AUTH_TOKEN` /
-  `SANITY_DEPLOY_TOKEN`) and remain **manual, local-only commands today** — no
-  CI workflow invokes them yet.
-- CI (`Migrations` job) validates every migration loads and — with a read
-  token — dry-runs each one read-only. It never mutates data.
-- Future: a gated post-merge workflow that runs `migrate:deploy` against
-  `production` automatically (write token, durable backup, release ordering
-  vs. the Vercel web deploy) — designed in
-  `docs/superpowers/specs/2026-07-10-migration-deployment-automation-design.md`
-  (#261, rollout steps 4–5); steps 1–3 (timestamped ids, the ledger,
-  `migrate:deploy`/`migrate:backfill`) are implemented and usable locally
-  today, e.g. `SANITY_STUDIO_DATASET=development pnpm --filter cms migrate:deploy`.
+Full migration tooling (`apps/cms/migrations/`, the `migrationState` ledger,
+`migrate:deploy`/`migrate:backfill`) is documented alongside the content model
+in [`docs/context/content-model.md`](./docs/context/content-model.md).
 
 ## 9. Rendering, caching & i18n
 
-- **Default:** static generation; `generateStaticParams` for dynamic routes
-  (service exposes `params` slices returning `{ slug }[]`).
-- **Build-time zero-results guard (`SKIP_ENV_VALIDATION`, #889):**
-  `blog/[slug]`'s `generateStaticParams` throws — failing the build — if its
-  params query resolves successfully but to zero posts, unless
-  `SKIP_ENV_VALIDATION` is set. A real build with valid Sanity access
-  resolving to zero posts is not a legitimate "no content yet" state for this
-  app (posts exist in production); it previously meant a build-scoped Sanity
-  token wasn't actually reaching the build step (e.g. a Vercel "Sensitive"
-  env var, redacted during `vercel build` but injected at runtime), silently
-  shipping a route with zero prebuilt paths. `SKIP_ENV_VALIDATION` is the same
-  flag CI's credential-less builds already set (§7's env table) — it doubles
-  as the intentional escape hatch for a build that genuinely has no Sanity
-  access.
-- **Revalidation:** time-based via `isr('tag')` in service queries; on-demand
-  via `app/api/revalidate` (#93, secret-verified,
-  `revalidateTag(tag, { expire: 0 })` — immediate expiry, not a stale-while-
-  revalidate profile) from a Sanity publish webhook. Tag expiry alone does not
-  invalidate prerendered route entries on Vercel (#318), so the route also
-  calls `revalidatePath('/', 'layout')` when a registered type matched —
-  purging every page per publish (acceptable blast radius for a blog).
-- **Skim generation pipeline (#957):** `POST /api/generate-skim?secret=…`
-  (`apps/web`), triggered by a Sanity publish webhook on `post`. Verification
-  matches `/api/revalidate`'s _stance_ (feature-flag-by-absence, same 401/503
-  split), not its mechanism — `/api/revalidate` checks an HMAC signature over
-  the body (`@sanity/webhook`); this route does a constant-time
-  (`timingSafeEqual`) comparison of a plain shared secret against `?secret=`,
-  since there's no equivalent signature helper for a static secret. Absent
-  `ANTHROPIC_API_KEY`/`SANITY_GENERATE_SECRET` → 503; a missing/wrong
-  `secret` → 401. On success it reads the published post body
-  (`service.editorial.skim.v1.getPublishedPostBody`), asks Claude
-  (`claude-haiku-4-5`) for 3–7 zod-validated takeaways (a malformed response
-  → 422, draft untouched), then patches them onto the post's **draft**
-  (`service.editorial.skim.v1.saveSkimDraft` — never the published document).
-  Idempotent: re-running always overwrites only the draft's `skim` field. No
-  AI call ever happens on the reader path.
-- **Sanity CDN is deliberately bypassed** (`useCdn: false` in the service
-  client): Next's tagged data cache is the sole caching layer. Reading through
-  the CDN lets a just-purged tag refetch a still-stale CDN response and
-  re-cache it — do not flip it back on as a perf optimisation (#316).
-- **Preview/drafts:** Next.js Draft Mode + Sanity Presentation — planned
-  post-deployment (see backlog), enabled by `SANITY_API_READ_TOKEN`.
-- **i18n:** all routes under `src/app/[locale]/`; next-intl middleware with
-  `localePrefix: 'never'` (URLs never show the locale). Locales come from
-  `LOCALE_ISO_CODES` in `@blog/config` (currently `en`). Never hardcode a
-  locale; `setRequestLocale(locale)` at the top of every layout/page. All
-  in-app links go through the single `SmartLink`
-  (`@web/components/shared/smart-link`), which is itself locale-aware — it
-  renders next-intl's `Link` internally, falling back to `next/link` only for
-  protocol-relative (`//host`) hrefs, and applies `rel="noopener noreferrer"`
-  on `target="_blank"`. Never use `next/link` or the i18n `Link` directly at a
-  call site. `@web/i18n/navigation` remains the source of the non-link
-  navigation helpers (`permanentRedirect`, `usePathname`) and of the `Link`
-  that `SmartLink` wraps internally.
-- **Root layout:** `src/app/layout.tsx` is a real root layout — it owns the
-  document shell (`<html>`/`<head>`/`<body>`, global stylesheet, fonts, the
-  dark-mode bootstrap script) with a fixed `lang` (`LOCALE_ISO_CODES.EN`; this
-  app has exactly one locale today). `[locale]/layout.tsx` nests inside it and
-  owns everything locale-aware (`NextIntlClientProvider`, `Header`/`Footer`
-  chrome, the locale-validation `notFound()`). This exists so root-level files
-  that need a layout to render into — chiefly `src/app/not-found.tsx` for
-  genuinely unmatched URLs — have one; `not-found.tsx` renders outside the
-  `[locale]` tree, so it has no `Header`/`Footer` chrome, just the terminal-
-  styled 404 body (#491).
+Static generation by default with time-based + on-demand ISR revalidation; the
+skim-generation pipeline (`/api/generate-skim`); the Sanity CDN is
+deliberately bypassed; i18n runs through `next-intl` with a locale-prefix-free
+URL scheme and a single `SmartLink` for all in-app navigation.
+
+Full mechanics:
+[`docs/context/rendering-caching-i18n.md`](./docs/context/rendering-caching-i18n.md).
 
 ## 10. SEO & accessibility
 
-- Per-route `generateMetadata` (title, description, canonical, Open Graph,
-  Twitter card) using `NEXT_PUBLIC_SITE_URL`.
-- **SEO fallback resolution lives in `service`**, not the routes: a single
-  `resolveSeo` transformer applies the ladder **authored `seo` →
-  content-derived → site defaults** once per field, returning a fully-resolved
-  `TSeoResolved`. `web` maps it to `Metadata` with one shared `toMetadata`
-  helper — no `??` fallback chains in route files. Page loaders
-  (`getHomePage`, `getIndexPage`, `getPage` for the generic page — #370,
-  `getPost` for the post detail page — #371) fetch site settings internally
-  (Next dedupes) and return `seo: TSeoResolved`. The home title is emitted
-  **absolute** (it is the brand) so the layout `%s | Brand` template does not
-  double-append; site settings contribute only `description` +
-  `defaultOgImage` as the final rung. If no image resolves at any rung,
-  `ogImageUrl` is absent and the route omits `og:image` / the twitter image
-  rather than emitting an empty tag. Post detail's `toMetadata` call also
-  passes `article.publishedTime`/`article.authors` (from the post
-  view-model) — an opt-in extension to `toMetadata`'s options, only emitted
-  for `ogType: 'article'` callers.
-- Paginated lists: every page **self-canonical** (never canonical-to-page-1),
-  no `rel=next/prev`, out-of-range → hard 404 (§1 routing conventions).
-- JSON-LD `Article`/`BlogPosting` on post pages (#94).
-- **Breadcrumbs & structured data (#835):** every content route renders a
-  `Breadcrumbs` trail (`@blog/ui` molecule) as page chrome, wrapped in a
-  web-level `BreadcrumbBar` (#903) rendered as a true DOM sibling of
-  `<main>` — immediately after `<Header>`, before `<main>`, never nested
-  inside it. `BreadcrumbBar`'s outer band spans the full viewport width
-  (matching `Header`'s own full-bleed `border-b`), with an inner wrapper
-  constraining the trail to `max-w-page` (1120px) on every page regardless
-  of that page's own content width (#937). The home page renders no bar. This is
-  paired with a `BreadcrumbList` JSON-LD schema (`buildBreadcrumbListSchema`)
-  built from the same trail, still co-located per page. Post pages (`/blog/{slug}`, #815) render
-  `Home › Category › Post`, sitting next to the existing `BlogPosting`
-  JSON-LD. Category archives (`/category/{slug}`, #836) render
-  `Home › {Category}`; tag archives (`/tag/{slug}`, #837) render
-  `Home › Tag: {Tag}`. Author archives (`/author/{slug}`, #838) render
-  `Home › Author: {Name}`; generic pages (`/{slug}`, #839) render
-  `Home › {Page title}`; the topics index (`/topics`, #840) renders
-  `Home › Topics` and the blog index (`/blog`, #840) renders `Home › Blog`.
-- `sitemap.ts`, `robots.ts`, RSS route (#92).
-- **Per-environment indexing (#841):** gated by `NEXT_PUBLIC_SANITY_DATASET`
-  (via the shared `isProductionEnvironment()` helper) — only the real
-  `production` dataset is indexable. Every other environment (e.g.
-  `development`, which can serve content byte-identical to production after a
-  dataset refresh) gets a page-level `<meta name="robots" content="noindex,
-nofollow">` from the root layout on every route, while `robots.ts` keeps
-  crawling allowed (so that noindex is actually seen) but omits the sitemap.
-  The blanket meta tag, not `robots.txt`, is the authoritative de-indexing
-  lever — a `Disallow: /` would stop crawlers from ever fetching the page to
-  see its `noindex`.
-- Security headers shipped from `next.config.ts`: strict CSP (documented
-  inline), HSTS, `X-Frame-Options: DENY`, referrer + permissions policies.
-- Semantic HTML; card titles are heading tags; no hardcoded `aria-label`s in
-  `ui` (always an `ariaLabel` prop); date formatting happens in `web` (pass
-  `formattedDate` down). Target Lighthouse ≥ 95 in all categories.
-- Mobile-first responsive design on Tailwind default breakpoints (`md`/`lg` as
-  the two layout tiers); fluid `clamp()` tokens preferred; page width owned by
-  `apps/web` (`max-w-content`), `ui` stays width-agnostic.
+Per-route `generateMetadata` with a `service`-owned SEO fallback ladder
+(authored → content-derived → site defaults), JSON-LD (`Article`/`BlogPosting`,
+`BreadcrumbList`), self-canonical pagination, per-environment `noindex`
+outside `production`, and the accessibility non-negotiables (no hardcoded
+`aria-label`s in `ui`, semantic heading tags, Lighthouse ≥ 95 target).
+
+Full checklist:
+[`docs/context/seo-accessibility.md`](./docs/context/seo-accessibility.md).
 
 ## 11. Quality bar
 
@@ -607,17 +190,11 @@ nofollow">` from the root layout on every route, while `robots.ts` keeps
 - Storybook stories are part of done for every new/changed `ui` component
   (`ui-storybook` skill) and for `web` compositions (`web-storybook` skill).
 - CI (required checks on PRs to `main`): Type-check, Lint, Test, Typegen,
-  Migrations (load + read-only dry-run), Build, dependency-review — plus
-  advisory jobs: knip (unused files/exports/dependencies), actionlint + zizmor
-  (workflow lint + security), Dependabot, Claude code review, Lighthouse CI
-  (`lighthouse.yml`, #399 — budget assertions against `.lighthouse/budgets.json`
-  for `/` and one post page; no-op until the `LIGHTHOUSE_URLS` Variable is set),
-  and Playwright smoke (`playwright-smoke.yml`, #275 — home + one post page
-  render 200 with zero console errors, against `SMOKE_URL`; no-op until that
-  Variable is set, same reason as Lighthouse — no PR preview deploys yet).
-  knip starts non-required and is promoted to a required check once it has
-  held zero false positives across two weeks of PRs (human-gated ruleset
-  change).
+  Migrations (load + read-only dry-run), Build, dependency-review — plus five
+  required checks (Zizmor, Actionlint, Knip, Commitlint, Hooks) and several
+  advisory jobs (Test Presence, Claude Code Review, Lighthouse CI, Playwright
+  smoke). Full workflow-by-workflow breakdown:
+  [`docs/context/ci-automation.md`](./docs/context/ci-automation.md).
 - Hooks: husky + lint-staged (eslint --fix + prettier on staged files).
 - Conventional commits; one concern per PR.
 
@@ -635,7 +212,7 @@ the gate sequence (also in `CLAUDE.md` — the operational source of truth):
 ## 13. Deployment topology
 
 Two long-lived environments, deployed by trigger. The full click-by-click setup
-and release runbook live in `docs/DEPLOY.md`; this is the shape.
+and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the shape.
 
 | Concern                 | Development                           | Production                         |
 | ----------------------- | ------------------------------------- | ---------------------------------- |
@@ -650,85 +227,27 @@ and release runbook live in `docs/DEPLOY.md`; this is the shape.
 
 - `main` is a continuous **staging line** (auto-deploys to development, which is
   also the local-dev dataset); a **`vMAJOR.MINOR.PATCH` git tag** promotes that
-  exact commit to production. The tag is the sole source of truth for the version
-  (`package.json` version is not synced). Content is never versioned — it flows
-  Studio → revalidation webhook independently of releases.
-- **Content migrations run inside the prod deploy, gated and ordered.** The prod
-  tag workflow is `verify → migrate → { deploy-studio, deploy-web }`: the
-  `migrate` job applies only un-applied migrations (`migrate:deploy`, tracked in
-  a per-dataset `migrationState` ledger) behind the `production` approval gate
-  and after a dataset-export backup, so readers never receive new code ahead of
-  the migrated data. Runbook in `docs/DEPLOY.md`.
-- The Sanity CLI is env-driven on **both** dataset (`SANITY_STUDIO_DATASET`) and
-  hostname (`SANITY_STUDIO_HOSTNAME`), so one `sanity.cli.ts` deploys either
-  Studio (`apps/cms/sanity.cli.ts`).
-- **Each environment is a separate Sanity project** (not one project with two
-  datasets); each has its own project id, kept **env-driven and never committed**
-  (this repo hardcodes no Sanity ids). Because Sanity tokens are
-  **project-scoped**, dev and prod each need their own deploy + read tokens,
-  wired as **environment-scoped** GitHub secrets/variables (the `development` and
-  `production` GitHub Environments) so each deploy job resolves its own project.
-- Two Vercel projects give full isolation. **Both** have Vercel's Git auto-deploy
-  disabled — declaratively, via `apps/web/vercel.json`'s
-  `git.deploymentEnabled: false` (#445; both projects share Root Directory
-  `apps/web`, so one committed file governs both, unlike the previous
-  per-project console "Ignored Build Step" setting it replaced) — and are
-  deployed **only** via the Vercel CLI from GitHub Actions — so nothing
-  deploys pre-merge, there are **no PR preview deploys**, and a `main` push
-  can never reach production.
-- **Deploys are CI-gated.** Each workflow runs a `verify` job
-  (type-check/lint/test/build) that the deploy jobs `needs`, so a deploy happens
-  only after checks pass on the exact commit:
-  `.github/workflows/deploy-development.yml` (on merge to `main` → dev Studio +
-  dev web, each deployed only when its turbo graph is affected by the merge, via
-  `turbo-ignore`; `workflow_dispatch` forces both) and
-  `.github/workflows/deploy-production.yml` (on a `v*` tag → prod Studio + prod
-  web, always both — a tag is a deliberate full release). Deploy steps are
-  guarded on their secret being present, so the workflows no-op green until the
-  one-time console setup (`docs/DEPLOY.md`).
+  exact commit to production. Content migrations run inside the gated prod
+  deploy (`verify → migrate → deploy`), never ahead of the migrated data.
+- **Each environment is a separate Sanity project** with its own env-driven,
+  never-committed project id and tokens; **two fully isolated Vercel
+  projects**, both with Git auto-deploy disabled — deploys only run via the
+  Vercel CLI from GitHub Actions, so there are no PR preview deploys and a
+  `main` push can never reach production.
+- Deploys are CI-gated behind a `verify` job (type-check/lint/test/build) on
+  the exact commit being deployed; deploy steps no-op green until the
+  one-time console setup ([`docs/DEPLOY.md`](./docs/DEPLOY.md)) provides their secret.
 - Historical phased rollout tickets (D0–D5) live in `docs/BACKLOG.md`.
-- **Development dataset refresh** (#363): `development` can be manually
-  replaced with a fresh copy of `production` (published-only, cross-project
-  export→import) via `refresh-dev-dataset.yml`, a `workflow_dispatch`-only
-  workflow — never automatic, never part of a deploy. Run only after that
-  release's production migrations complete (`docs/DEPLOY.md`'s "Refreshing
-  development from production"); the script's safety guard hardcodes the
-  target dataset, so a misconfigured environment fails loudly rather than
-  reversing direction.
+- Full topology detail (per-environment isolation rationale, dataset refresh
+  workflow, tag-as-source-of-truth) is in [`docs/DEPLOY.md`](./docs/DEPLOY.md) —
+  this section stays a summary to avoid drifting from that runbook.
 
 ## 14. Tooling: agents & skills
 
-The repo ships Claude Code configuration so contributors (human or AI) stay
-inside the layer contracts:
-
-- **Subagents** (`.claude/agents/`): `config`, `cms`, `service`, `ui`, `web` —
-  each scoped to one workspace, delegated in dependency order
-  (`config → cms → service → ui → web`). The orchestrator never writes layer
-  files before delegating. Plus read-only reviewers, each gating the commit
-  ask the same way `reviewer` does when dispatched: `reviewer` (pre-commit
-  review of the full diff — must return `APPROVE` before the orchestrator may
-  ask to commit), `a11y-reviewer` (accessibility audit of
-  `packages/ui`/`apps/web` diffs against `ui-library-practices`'
-  non-negotiable rules), and `seo-auditor` (SEO/metadata audit whenever a
-  diff touches `apps/web` routes, metadata, structured data, or feeds,
-  applying the `seo-and-metadata` skill as its checklist). `explore` is a
-  separate, non-gating Haiku discovery scout that answers broad "where / how
-  / whether" questions in a disposable context and returns conclusions with
-  `file:line` pointers, keeping that reading out of the orchestrator's
-  window. `test-writer` adds/extends co-located `*.test.ts(x)` coverage after
-  the layer agents finish, scoped to test files by enforcement. `board-keeper`
-  confirms one status write per PR open/merge (targeted, not a full sweep by
-  default) and reconciles the whole board on demand or when opted in.
-- **Skills** (`.claude/skills/`): `develop-feature` (lifecycle + delegation —
-  the entry point for any non-trivial task), `add-content-type` (cross-layer
-  recipe), `cms-schema-practices` (schema + migration quality bar),
-  `ui-library-practices`, `ui-storybook`, `web-storybook`,
-  `testing-practices`, `seo-and-metadata`, `code-review-practices`,
-  `open-pull-request`, `use-context7` (live version-matched docs).
-- **Settings** (`.claude/settings.json`): permission allowlist for the
-  project's standard commands (deploys and `.env` reads denied), hook wiring,
-  and plugin provisioning (`extraKnownMarketplaces` + `enabledPlugins`) so a
-  fresh clone resolves the plugins the repo's guidance depends on.
+The repo ships Claude Code configuration (subagents, hooks, skills, settings,
+MCP servers, a scheduled review routine) so contributors — human or AI — stay
+inside the layer contracts above. Full roster and rationale for every piece:
+[`docs/context/claude-code.md`](./docs/context/claude-code.md).
 
 ## 15. Out of scope (for now)
 
@@ -739,8 +258,16 @@ be layered on without violating the contracts above.
 
 ## 16. Maintaining this document
 
-- Architecture/contract/content-model/env changes ⇒ update this file in the
-  same PR.
-- The content model section (§6) describes the _current_ schema — update it
+- Architecture/contract/content-model/env changes ⇒ update this file **or**
+  the relevant `docs/context/*.md` file it links to, in the same PR — whichever
+  actually holds the detail that changed. Don't let a `docs/context/*.md` file
+  drift out of sync with a summary here.
+- **Section numbers are stable** — other files (`.claude/agents/*.md`,
+  `docs/BACKLOG.md`, active plan docs, even code comments like
+  `apps/web/playwright.config.ts`) cite sections by number. Never renumber an
+  existing section when trimming or splitting it out; add or remove content
+  within the section instead.
+- The content model section (§6) and its full reference
+  (`docs/context/content-model.md`) describe the _current_ schema — update it
   when #250/#251 land.
 - `docs/archive/IMPLEMENTATION_BRIEF.md` is frozen history; do not extend it.

@@ -1,0 +1,56 @@
+# Environment & configuration
+
+> Part of the docs split described in [`docs/README.md`](../README.md). The
+> canonical, complete list of every env var this repo uses, who consumes it,
+> and whether it's required. For the minimal subset needed to run `pnpm dev`
+> locally, see [`docs/context/getting-started.md`](./getting-started.md).
+
+| Variable                                   | Consumer                                           | Notes                                                                                                                                                  |
+| ------------------------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID`            | web + service                                      | required; validated by Zod at import                                                                                                                   |
+| `NEXT_PUBLIC_SANITY_DATASET`               | web + service                                      | required                                                                                                                                               |
+| `NEXT_PUBLIC_SITE_URL`                     | web (SEO)                                          | optional until launch; canonical/OG/feeds                                                                                                              |
+| `SANITY_API_READ_TOKEN`                    | service (server)                                   | optional; private reads / future draft mode                                                                                                            |
+| `SANITY_API_WRITE_TOKEN`                   | service (server, `editorial.*` domain only)        | optional; scoped Editor-role write token for the choose-your-depth skim pipeline (#957), never used by page-render reads — see `SPEC.md` §5            |
+| `SANITY_REVALIDATE_SECRET`                 | web (server)                                       | optional until the #93 revalidation route exists                                                                                                       |
+| `ANTHROPIC_API_KEY`                        | web (server, `/api/generate-skim` only)            | optional; absent → the route returns 503 (feature-flag-by-absence), reader path unaffected — see `SPEC.md` §9                                          |
+| `SANITY_GENERATE_SECRET`                   | web (server, `/api/generate-skim` only)            | optional; secret-verifies the skim-generation webhook, same stance as `SANITY_REVALIDATE_SECRET`                                                       |
+| `SANITY_STUDIO_PROJECT_ID`                 | cms Studio + CLI                                   | required; **per environment** (env-driven; no ids in repo)                                                                                             |
+| `SANITY_STUDIO_DATASET`                    | cms Studio + CLI                                   | required                                                                                                                                               |
+| `SANITY_STUDIO_HOSTNAME`                   | cms CLI (deploy)                                   | deploy target `<host>.sanity.studio`; CI-only                                                                                                          |
+| `SANITY_DEPLOY_TOKEN`                      | CI (deploy)                                        | write/Deploy token; **project-scoped** → set per GitHub Environment                                                                                    |
+| `SANITY_AUTH_TOKEN`                        | cms `migrate:deploy`/`migrate:backfill`            | write token for the `migrationState` ledger client (`@sanity/client`); the standard Sanity CLI auth var — falls back to `SANITY_DEPLOY_TOKEN` if unset |
+| `VERCEL_TOKEN` / `_ORG_ID` / `_PROJECT_ID` | CI (deploy)                                        | Vercel CLI deploys; token is a Secret, ids are Variables                                                                                               |
+| `TURBO_TOKEN` / `TURBO_TEAM`               | CI (all)                                           | optional Vercel Remote Cache; no-op until configured                                                                                                   |
+| `SKIP_ENV_VALIDATION`                      | CI builds + `blog/[slug]`'s `generateStaticParams` | bypasses Zod env validation where no vars exist; also the escape hatch for a build that legitimately has no Sanity access (#889) — see `SPEC.md` §9    |
+| `LIGHTHOUSE_URLS`                          | CI (`lighthouse.yml`)                              | Variable; one full preview URL per line (`/` + one post page); no-op until a preview-URL mechanism lands (see `.lighthouse/README.md`)                 |
+| `SMOKE_URL`                                | CI (`playwright-smoke.yml`)                        | Variable; one already-deployed origin the Playwright smoke suite (`apps/web/e2e/`) runs against; no-op until set, same mechanism as `LIGHTHOUSE_URLS`  |
+
+## Access conventions
+
+- Env access is **always** through the validated entry points
+  (`apps/web/src/utils/env/env.ts` via `@t3-oss/env-nextjs`, service's env via
+  `env-core`) — never raw `process.env` in app code.
+- **Turborepo runs in strict env mode**: any env var a task needs must be
+  declared in `turbo.json` (`env`/`passThroughEnv`) or turbo strips it.
+  `pnpm --filter` bypasses turbo and can mask a missing declaration — verify
+  with `pnpm build` from root.
+- **Shared config presets bust their consumers' cache.** Each cached task
+  declares the `configs/*` presets it reads via `inputs` using the
+  `$TURBO_ROOT$` microsyntax (repo-root-relative, cross-package): `lint` ←
+  `configs/eslint`, `type-check` ← `configs/tsconfig`, `test` ← `configs/vitest`,
+  `build`/`storybook:build` ← `configs/tsconfig` + `configs/tailwind`. Without
+  this, editing a preset (e.g. `configs/eslint/base.js`) left `lint` a
+  `FULL TURBO` cache hit against stale rules. The tasks that actually needed the
+  fix are `lint` and `storybook:build` — the two with **no** `dependsOn: ["^…"]`,
+  so their hash is their own files only. `type-check`/`test`/`build` carry a
+  `dependsOn: ["^…"]` edge and, because every workspace lists the `configs/*`
+  packages as `devDependencies`, already invalidate on any preset edit through
+  Turbo's dependency closure; their explicit `inputs` pin the contract precisely
+  rather than fixing a live bug, and are preferred over a blunt
+  `globalDependencies: ["configs/**"]` (which over-invalidates across task types).
+  Globs stay single-level and extension-scoped (`*.js`/`*.json`/`*.ts`/`*.css`)
+  so `node_modules`/`.turbo` logs never leak into a task hash — note
+  `configs/tsconfig/*.json` also matches that package's own `package.json`, which
+  is intentional and conservative (#403).
+- Never read or commit `.env*` files.

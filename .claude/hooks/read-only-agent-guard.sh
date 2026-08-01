@@ -153,7 +153,7 @@ pnpm_exec_denied() {
 # instead, which is the correct tool there anyway. This is a guardrail
 # against honest mistakes, not adversarial-proof (#397): further obfuscation
 # (case tricks, path-qualified binaries, wrapper commands) is accepted
-# residual risk, documented in README.md.
+# residual risk, documented in docs/context/claude-code.md.
 while IFS= read -r segment; do
   segment="${segment#"${segment%%[![:space:]]*}"}"
   [ -z "$segment" ] && continue

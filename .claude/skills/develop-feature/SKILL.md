@@ -281,7 +281,7 @@ changes, no untracked files, and no unpushed commits** — and a
 `worktree-agent-*` branch is never pushed under its own name, so these
 accumulate forever otherwise (26 once piled up). Worktrees created since
 issue #410 share the main checkout's `node_modules` (~80 MB each instead of
-~1.2 GB — see README §"Working with Claude Code"), but they still clutter
+~1.2 GB — see `docs/context/claude-code.md`), but they still clutter
 `git worktree list` and hold branches. A subagent cannot do this itself — it
 cannot remove the worktree it is standing in.
 
@@ -319,7 +319,7 @@ git worktree remove <worktree>                    # never --force
 ## 9. Deploy — human-gated, never automatic
 
 - `sanity deploy` (cms) and Vercel deploys are **manual, human-run** steps. Do
-  not run them. At most, remind the user of the commands (README → Deployment).
+  not run them. At most, remind the user of the commands (`docs/DEPLOY.md`).
 
 ## Guardrails
 

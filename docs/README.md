@@ -7,6 +7,22 @@ What lives where, and which docs are live vs. historical. See `CLAUDE.md`'s
 
 - **`SPEC.md`** (repo root) — the single durable architecture reference.
   Wins on conflict with everything else in this repo, including this index.
+  Section numbers are stable — see its own header note before renumbering
+  anything.
+- **`README.md`** (repo root) — what the project is and where things live;
+  intentionally short. Setup and deep-dive detail live in `docs/context/`.
+- **`docs/context/`** — one focused file per topic, linked from `README.md`
+  and `SPEC.md` rather than inlined there:
+  - `getting-started.md` — local setup, env vars, scripts, dependency catalogs.
+  - `claude-code.md` — every subagent/hook/skill/MCP server this repo ships.
+  - `ci-automation.md` — every GitHub Actions workflow, required vs. advisory.
+  - `frontend-conventions.md` — dependency rules, type flow, SVG icon wiring.
+  - `environment-variables.md` — the complete env var reference.
+  - `content-model.md` — full Sanity schema reference + migrations.
+  - `data-flow.md` — typegen → service → web data flow, module registry.
+  - `rendering-caching-i18n.md` — ISR, the skim pipeline, i18n mechanics.
+  - `seo-accessibility.md` — metadata, JSON-LD, breadcrumbs, a11y checklist.
+  - `surfaces-and-routing.md` — routing conventions + per-surface layout history.
 - **`docs/BACKLOG.md`** — ticket-ready roadmap.
 - **`docs/DEPLOY.md`** — deploy & release runbook, one-time environment setup.
 - **`docs/design-reference/`** — design-system reference (HTML mockup +

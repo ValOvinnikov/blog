@@ -294,11 +294,12 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   `docs/archive/superpowers/{specs,plans}/` instead of deleting them — that
   bucket is now frozen history, not an active destination; do not add new
   entries to it.)
-- **README sync:** `README.md` §"CI & automation" documents every workflow in
+- **Docs sync:** [`docs/context/ci-automation.md`](docs/context/ci-automation.md)
+  documents every workflow in
   `.github/workflows/` and the required status checks — a PR that adds or
-  changes a workflow updates that section in the same PR. Likewise a PR that
+  changes a workflow updates that file in the same PR. Likewise a PR that
   changes agent tooling (`.claude/` hooks/agents/skills/settings) updates
-  §"Working with Claude Code".
+  [`docs/context/claude-code.md`](docs/context/claude-code.md).
 - `.claude/skills/` is the single home for skills — edit one copy, no mirror.
 
 ## Delivery gate sequence (mandatory — never skip or bundle)
@@ -324,7 +325,7 @@ Every issue follows this exact order. **Committing is free (no approval needed);
 8. **Remove the subagent worktrees you created** (no gate — just do it). Nothing
    else will: the harness never auto-sweeps them because `worktree-agent-*`
    branches are never pushed. Worktrees share the main checkout's
-   `node_modules` (README §"Working with Claude Code"), but they still pile
+   `node_modules` (`docs/context/claude-code.md`), but they still pile
    up. See `develop-feature` step 8 for the safety checks — never delete
    uncommitted work.
 
