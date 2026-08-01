@@ -25,9 +25,12 @@ describe(`<${BackToTopButton.name}/>`, () => {
   it('is hidden while scrolled less than one viewport height', () => {
     setup();
 
-    expect(
-      screen.queryByRole('button', { name: 'Back to top' }),
-    ).not.toBeInTheDocument();
+    const button = screen.getByRole('button', {
+      hidden: true,
+      name: 'Back to top',
+    });
+
+    expect(button).toHaveAttribute('inert');
   });
 
   it('becomes visible once scrolled past one viewport height', () => {
