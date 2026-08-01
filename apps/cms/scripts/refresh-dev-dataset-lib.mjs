@@ -12,7 +12,7 @@
 /** The only dataset this script is ever allowed to read from. */
 export const SOURCE_DATASET = 'production';
 
-/** The only dataset this script is ever allowed to delete/recreate/write to. */
+/** The only dataset this script is ever allowed to wipe documents from and write to. */
 export const TARGET_DATASET = 'development';
 
 /**
