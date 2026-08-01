@@ -43,13 +43,13 @@ export const WithExternalLink: TStory = {
   },
 };
 
-// The `mobileToggle` collapse is driven by real `md:` media-query variants
+// The `mobileToggle` collapse is driven by real `lg:` media-query variants
 // (see primary-navigation-variants.ts), not a container query — a wrapping
 // element's width has no effect on which rules match, only the actual
 // canvas/viewport width does. `globals: { viewport: 'phone' }` (the
 // Storybook 10 replacement for the removed `parameters.viewport.
 // defaultViewport`) is the only way to default these stories to a width
-// under `md` so the collapsed state is what actually renders — an
+// under `lg` so the collapsed state is what actually renders — an
 // intentional, narrow exception to not overriding viewport per story.
 export const MobileClosed: TStory = {
   globals: { viewport: 'phone' },
