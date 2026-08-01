@@ -1,6 +1,7 @@
 import { imageWithAltSchema } from '@cms/schema-types/objects/image-with-alt';
 import { richTextSchema } from '@cms/schema-types/objects/rich-text';
 import { seoSchema } from '@cms/schema-types/objects/seo';
+import { skimSchema } from '@cms/schema-types/objects/skim';
 import { Newspaper } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -97,6 +98,13 @@ export const postSchema = defineType({
       title: 'Featured',
       type: 'boolean',
       description: 'Pin this post to the featured slot on the home page.',
+    }),
+    defineField({
+      name: 'skim',
+      title: 'Skim',
+      type: skimSchema.name,
+      description:
+        '30-second-skim takeaways for the choose-your-depth reading experience.',
     }),
     defineField({
       name: 'seo',

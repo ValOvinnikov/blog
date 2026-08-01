@@ -1,5 +1,6 @@
 import { defineArrayMember, defineType } from 'sanity';
 
+import { asideSchema } from './aside';
 import { imageWithAltSchema } from './image-with-alt';
 
 export const richTextSchema = defineType({
@@ -23,5 +24,6 @@ export const richTextSchema = defineType({
     }),
     defineArrayMember({ type: imageWithAltSchema.name }),
     defineArrayMember({ type: 'code' }),
+    defineArrayMember({ type: asideSchema.name }),
   ],
 });

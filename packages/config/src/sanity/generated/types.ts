@@ -115,6 +115,9 @@ export type RichText = Array<
   | ({
       _key: string;
     } & Code)
+  | ({
+      _key: string;
+    } & Aside)
 >;
 
 export type Module_postList = {
@@ -125,6 +128,13 @@ export type Module_postList = {
   _rev: string;
   title?: string;
   limit?: number;
+};
+
+export type Skim = {
+  _type: 'skim';
+  takeaways?: Array<string>;
+  generatedAt?: string;
+  model?: string;
 };
 
 export type Brand = {
@@ -181,6 +191,12 @@ export type BlockText = Array<{
   _type: 'block';
   _key: string;
 }>;
+
+export type Aside = {
+  _type: 'aside';
+  kind?: 'WHY_NOT' | 'DIGRESSION' | 'CONTEXT';
+  body?: BlockText;
+};
 
 export type SanityImageAssetReference = {
   _ref: string;
@@ -390,6 +406,7 @@ export type Blog_post = {
   publishedAt?: string;
   body?: RichText;
   featured?: boolean;
+  skim?: Skim;
   seo?: Seo;
 };
 
@@ -553,12 +570,14 @@ export type AllSanitySchemaTypes =
   | Module_content
   | RichText
   | Module_postList
+  | Skim
   | Brand
   | SpecLine
   | Seo
   | OpenGraph
   | SocialLink
   | BlockText
+  | Aside
   | SanityImageAssetReference
   | ImageWithAlt
   | Settings_footer
