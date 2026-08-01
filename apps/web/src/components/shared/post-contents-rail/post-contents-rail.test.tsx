@@ -201,10 +201,13 @@ describe(`<${PostContentsRail.name}/>`, () => {
     ).not.toHaveAttribute('aria-current');
   });
 
-  it('renders no aria-current when no heading is active', () => {
+  it('marks the first heading as current when no heading is active yet, agreeing with the selector default', () => {
     setup();
 
-    mockPostHeadings.forEach((heading) => {
+    expect(
+      screen.getAllByRole('link', { name: mockPostHeadings[0]?.text }).at(0),
+    ).toHaveAttribute('aria-current', 'location');
+    mockPostHeadings.slice(1).forEach((heading) => {
       expect(
         screen.getByRole('link', { name: heading.text }),
       ).not.toHaveAttribute('aria-current');
