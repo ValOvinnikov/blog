@@ -23,9 +23,9 @@ export const primaryNavigationVariants = tv({
   variants: {
     collapsible: {
       true: {
-        links: ['hidden md:flex'],
-        toggle: ['md:hidden'],
-        panel: ['md:hidden'],
+        links: ['hidden lg:flex'],
+        toggle: ['lg:hidden'],
+        panel: ['lg:hidden'],
       },
     },
   },

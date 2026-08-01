@@ -35,7 +35,7 @@ export interface IPrimaryNavigationProps
   className?: string;
   /** Component each NavLink renders as — defaults to a plain `<a>`. Pass the app router's Link to get client-side navigation. */
   linkAs?: TAnchorElementType;
-  /** Enables the responsive mobile toggle + dropdown panel below the `md` breakpoint: the inline links hide, a hamburger toggle appears, and a dropdown panel holding the same links shows/hides with `open`. Omit to keep links always inline (today's behaviour). */
+  /** Enables the responsive mobile toggle + dropdown panel below the `lg` breakpoint: the inline links hide, a hamburger toggle appears, and a dropdown panel holding the same links shows/hides with `open`. Omit to keep links always inline (today's behaviour). */
   mobileToggle?: IPrimaryNavigationMobileToggleProps;
 }
 
@@ -43,7 +43,7 @@ export interface IPrimaryNavigationProps
  * PrimaryNavigation — top-level `<nav>` landmark composing `NavLink` items
  * with an optional trailing `actions` slot (e.g. a theme toggle or menu
  * button). Pass `mobileToggle` to collapse the links behind a hamburger
- * toggle + dropdown panel below the `md` breakpoint — purely presentational,
+ * toggle + dropdown panel below the `lg` breakpoint — purely presentational,
  * the caller owns the open/closed state.
  */
 export const PrimaryNavigation = ({
