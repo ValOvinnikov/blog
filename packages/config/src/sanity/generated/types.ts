@@ -455,6 +455,15 @@ export type SanityImageHotspot = {
   width?: number;
 };
 
+export type MediaTag = {
+  _id: string;
+  _type: 'media.tag';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: Slug;
+};
+
 export type Code = {
   _type: 'code';
   language?: string;
@@ -600,6 +609,7 @@ export type AllSanitySchemaTypes =
   | Blog_author
   | SanityImageCrop
   | SanityImageHotspot
+  | MediaTag
   | Code
   | SanityImagePaletteSwatch
   | SanityImagePalette
