@@ -30,6 +30,18 @@ export default mergeConfig(
         'scripts/**/*.{test,spec}.mjs',
         'migrations/**/*.{test,spec}.ts',
       ],
+      // `sanity`'s main entry point (imported by every schema file for
+      // `defineType`/`defineField`) unconditionally imports a `.css` file as
+      // a side effect. By default vitest externalizes node_modules deps to
+      // Node's native loader, which can't parse `.css` and throws
+      // `Unknown file extension ".css"`. Inlining `sanity` routes it through
+      // Vite's transform pipeline instead, where the shared preset's
+      // `css: false` already strips CSS imports.
+      server: {
+        deps: {
+          inline: ['sanity'],
+        },
+      },
     },
   }),
 );
