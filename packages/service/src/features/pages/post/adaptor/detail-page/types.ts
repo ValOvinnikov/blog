@@ -15,8 +15,16 @@ export type TPostDetailAuthor = {
   socialLinks: TSocialLink[];
 };
 
+export type TPostSkim = {
+  takeaways: string[];
+  generatedAt: TMaybeUndefined<string>;
+  model: TMaybeUndefined<string>;
+};
+
 export type TPostDetail = Omit<TPostCard, 'author' | 'category'> & {
   body: RichText;
+  skim: TMaybeUndefined<TPostSkim>;
+  hasAsides: boolean;
   seo: TSeoResolved;
   author: TPostDetailAuthor;
   category: TCategory;

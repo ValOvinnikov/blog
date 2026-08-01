@@ -1,5 +1,6 @@
 // Public surface of the data layer. web imports `service` — never the raw client.
 
+import { createSkimService } from './features/editorial/skim';
 import { createCategoriesService } from './features/entities/categories';
 import { createFooterService } from './features/global/footer';
 import { createNavigationService } from './features/global/navigation';
@@ -17,6 +18,9 @@ import { createPostService } from './features/pages/post';
 import { createTagService } from './features/pages/tag';
 
 export const service = {
+  editorial: {
+    skim: createSkimService(),
+  },
   pages: {
     home: createHomeService(),
     generic: createGenericPageService(),
@@ -42,6 +46,7 @@ export const service = {
   },
 };
 
+export type { TPostBody, TSaveSkimDraftInput } from './features/editorial/skim';
 export type {
   TCategoriesList,
   TCategoryWithPostCount,
@@ -58,7 +63,11 @@ export type { TBlogIndexPage, TGetIndexPageArgs } from './features/pages/blog';
 export type { TCategoryPage } from './features/pages/category';
 export type { TGenericPage } from './features/pages/generic';
 export type { THomePage } from './features/pages/home';
-export type { TPostDetail, TPostDetailAuthor } from './features/pages/post';
+export type {
+  TPostDetail,
+  TPostDetailAuthor,
+  TPostSkim,
+} from './features/pages/post';
 export type { TTagPage } from './features/pages/tag';
 export { urlForImage } from './sanity/image';
 export type { TArchivePostCard } from './shared/transformers/to-archive-post-card';

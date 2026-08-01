@@ -10,7 +10,7 @@ import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferResultType } from 'groqd';
 
 import type { postDetailQuery } from './query';
-import type { TPostDetail, TPostDetailAuthor } from './types';
+import type { TPostDetail, TPostDetailAuthor, TPostSkim } from './types';
 
 export type TRawPostDetail = NonNullable<
   InferResultType<typeof postDetailQuery>
@@ -25,6 +25,18 @@ function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
     role: raw.role ?? undefined,
     bio: raw.bio ?? undefined,
     socialLinks: (raw.socialLinks ?? []).map(toSocialLink),
+  };
+}
+
+// Mirrors the schema's own `min(3)` takeaways rule (`skim.ts`) — fewer than
+// 3 takeaways is treated the same as no `skim` at all, never a partial list.
+function toPostSkim(raw: TRawPostDetail['skim']): TPostSkim | undefined {
+  if (!raw?.takeaways || raw.takeaways.length < 3) return undefined;
+
+  return {
+    takeaways: raw.takeaways,
+    generatedAt: raw.generatedAt ?? undefined,
+    model: raw.model ?? undefined,
   };
 }
 
@@ -46,6 +58,11 @@ export function toPostDetail(
     heroImageSanity: toSanityImage(raw.heroImageAsset),
     featured: raw.featured ?? false,
     body: raw.body,
+    skim: toPostSkim(raw.skim),
+    // `_type: 'aside'` is the schema's own registered block name (`apps/cms/src/schema-types/objects/aside.ts`),
+    // matching how `.filterByType('blog_post')`/module queries elsewhere in
+    // this package match against a document's own `_type` literal.
+    hasAsides: raw.body.some((block) => block._type === 'aside'),
     seo: resolveSeo(
       raw.seo ?? undefined,
       { title: raw.title, description: raw.excerpt, imageUrl: heroImageUrl },

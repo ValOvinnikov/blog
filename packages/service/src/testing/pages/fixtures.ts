@@ -74,6 +74,7 @@ export function makeRawPostDetail(
     heroImageAsset: makeRawSanityImage(),
     featured: false,
     body: [],
+    skim: null,
     seo: null,
     author: {
       _id: 'author-1',
