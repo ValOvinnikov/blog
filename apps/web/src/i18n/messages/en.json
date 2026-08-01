@@ -41,7 +41,22 @@
     "empty": "No posts yet."
   },
   "blogPostPage": {
-    "relatedReading": "Related reading"
+    "relatedReading": "Related reading",
+    "depthToggle": {
+      "ariaLabel": "Reading depth",
+      "skim": "30s",
+      "read": "Read",
+      "deep": "Deep"
+    },
+    "skimPanel": {
+      "label": "30-second summary",
+      "readFullArticle": "Read the full article"
+    },
+    "asideKind": {
+      "WHY_NOT": "Why not X",
+      "DIGRESSION": "Digression",
+      "CONTEXT": "Context"
+    }
   },
   "postContentsRail": {
     "label": "Topics"

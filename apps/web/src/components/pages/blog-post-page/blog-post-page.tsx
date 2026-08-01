@@ -1,14 +1,17 @@
-import { ICONS, Size, routes } from '@blog/config';
+import { ASIDE_KIND, ICONS, Size, type TAsideKind, routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Article, PostsSection } from '@blog/ui/organisms';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
+import { DepthProvider } from '@web/components/shared/depth-provider';
+import { DepthToggle } from '@web/components/shared/depth-toggle';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 import { PostContentsRail } from '@web/components/shared/post-contents-rail';
 import { PostShare } from '@web/components/shared/post-share';
 import { SanityImage } from '@web/components/shared/sanity-image';
+import { SkimPanel } from '@web/components/shared/skim-panel';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
@@ -55,6 +58,8 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
     category,
     tags,
     body,
+    skim,
+    hasAsides,
     relatedPosts,
     heroImageSanity,
     heroImageAlt,
@@ -65,6 +70,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
 
   const headings = extractPostHeadings(body);
   const hasContentsRail = headings.length >= MIN_H2_HEADINGS_FOR_RAIL;
+  const hasSkim = Boolean(skim);
   const footerTags = tags.map((tag) => ({
     label: tag.title,
     href: routes.tag(tag.slug),
@@ -96,6 +102,18 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   ];
   const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
 
+  const depthToggleLabels = {
+    skim: blogPostT('depthToggle.skim'),
+    read: blogPostT('depthToggle.read'),
+    deep: blogPostT('depthToggle.deep'),
+    ariaLabel: blogPostT('depthToggle.ariaLabel'),
+  };
+  const asideKindLabels: Record<TAsideKind, string> = {
+    [ASIDE_KIND.WHY_NOT]: blogPostT('asideKind.WHY_NOT'),
+    [ASIDE_KIND.DIGRESSION]: blogPostT('asideKind.DIGRESSION'),
+    [ASIDE_KIND.CONTEXT]: blogPostT('asideKind.CONTEXT'),
+  };
+
   // Rendered in one of two structural positions below (nested inside
   // `Article.Body`'s grid when the rail is present, or as `Article`'s
   // direct sibling otherwise) — hoisted so the two branches can't drift.
@@ -121,61 +139,84 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
       </BreadcrumbBar>
 
       <main className={s.root()}>
-        <Article>
-          <Article.Header
-            className={s.hero()}
-            title={title}
-            category={{
-              label: category.title,
-              href: routes.category(category.slug),
-              linkAs: SmartLink,
-            }}
-            lead={excerpt}
-            meta={{
-              author: { ...author, href: routes.author(author.slug) },
-              publishedAt,
-              formattedDate: format.dateTime(new Date(publishedAt), {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              }),
-              readingTimeMinutes,
-              linkAs: SmartLink,
-              share: <PostShare url={url} title={title} links={shareLinks} />,
-            }}
-            coverMedia={
-              heroImageSanity ? (
-                <SanityImage
-                  image={heroImageSanity}
-                  projectId={env.NEXT_PUBLIC_SANITY_PROJECT_ID}
-                  dataset={env.NEXT_PUBLIC_SANITY_DATASET}
-                  width={1200}
-                  height={675}
-                  sizes="(min-width: 1024px) 800px, 100vw"
-                  priority
-                  alt={heroImageAlt}
-                  className={s.coverImage()}
-                />
-              ) : undefined
-            }
+        <DepthProvider hasSkim={hasSkim} hasDeep={hasAsides}>
+          <DepthToggle
+            hasSkim={hasSkim}
+            hasDeep={hasAsides}
+            labels={depthToggleLabels}
+            className={s.depthToggle()}
           />
 
-          <Article.Body className={s.body({ withRail: hasContentsRail })}>
-            {hasContentsRail ? (
-              <>
-                <PostContentsRail className={s.rail()} headings={headings} />
-                <div className={s.content()}>
-                  <PortableTextRenderer value={body} headings={headings} />
-                </div>
-                {footer}
-              </>
-            ) : (
-              <PortableTextRenderer value={body} headings={headings} />
-            )}
-          </Article.Body>
+          <Article>
+            <Article.Header
+              className={s.hero()}
+              title={title}
+              category={{
+                label: category.title,
+                href: routes.category(category.slug),
+                linkAs: SmartLink,
+              }}
+              lead={excerpt}
+              meta={{
+                author: { ...author, href: routes.author(author.slug) },
+                publishedAt,
+                formattedDate: format.dateTime(new Date(publishedAt), {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                }),
+                readingTimeMinutes,
+                linkAs: SmartLink,
+                share: <PostShare url={url} title={title} links={shareLinks} />,
+              }}
+              coverMedia={
+                heroImageSanity ? (
+                  <SanityImage
+                    image={heroImageSanity}
+                    projectId={env.NEXT_PUBLIC_SANITY_PROJECT_ID}
+                    dataset={env.NEXT_PUBLIC_SANITY_DATASET}
+                    width={1200}
+                    height={675}
+                    sizes="(min-width: 1024px) 800px, 100vw"
+                    priority
+                    alt={heroImageAlt}
+                    className={s.coverImage()}
+                  />
+                ) : undefined
+              }
+            />
 
-          {!hasContentsRail && footer}
-        </Article>
+            <Article.Body className={s.body({ withRail: hasContentsRail })}>
+              {hasContentsRail ? (
+                <>
+                  <PostContentsRail className={s.rail()} headings={headings} />
+                  <div className={s.content()}>
+                    <PortableTextRenderer
+                      value={body}
+                      headings={headings}
+                      asideKindLabels={asideKindLabels}
+                    />
+                  </div>
+                  {footer}
+                </>
+              ) : (
+                <PortableTextRenderer
+                  value={body}
+                  headings={headings}
+                  asideKindLabels={asideKindLabels}
+                />
+              )}
+            </Article.Body>
+
+            {!hasContentsRail && footer}
+          </Article>
+
+          <SkimPanel
+            skim={skim}
+            label={blogPostT('skimPanel.label')}
+            readFullArticleLabel={blogPostT('skimPanel.readFullArticle')}
+          />
+        </DepthProvider>
 
         {relatedPostItems.length > 0 && (
           <PostsSection

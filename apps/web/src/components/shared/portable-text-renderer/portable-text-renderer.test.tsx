@@ -1,4 +1,4 @@
-import type { RichText } from '@blog/config';
+import { ASIDE_KIND, type RichText } from '@blog/config';
 import {
   customRender,
   renderElement,
@@ -311,5 +311,51 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     const { container } = setup({ value });
 
     expect(container.querySelector('img')).not.toBeInTheDocument();
+  });
+
+  it('renders an aside block as a DeepAside, with its body rendered through the same block components (visibility gating is pure CSS — no unit-test surface, see deep-aside.test.tsx)', () => {
+    const value: RichText = [
+      {
+        _type: 'aside',
+        _key: 'aside-1',
+        kind: ASIDE_KIND.WHY_NOT,
+        body: [richTextBlock('normal', [richTextSpan('Because Y.')])],
+      },
+    ];
+
+    setup({ value, asideKindLabels: { [ASIDE_KIND.WHY_NOT]: 'Why not X' } });
+
+    expect(screen.getByRole('note')).toBeInTheDocument();
+    expect(screen.getByText('Why not X')).toBeVisible();
+    expect(screen.getByText('Because Y.')).toBeVisible();
+  });
+
+  it('falls back to the raw kind value as the aside label when asideKindLabels is omitted', () => {
+    const value: RichText = [
+      {
+        _type: 'aside',
+        _key: 'aside-1',
+        kind: ASIDE_KIND.DIGRESSION,
+        body: [richTextBlock('normal', [richTextSpan('A tangent.')])],
+      },
+    ];
+
+    setup({ value });
+
+    expect(screen.getByText(ASIDE_KIND.DIGRESSION)).toBeVisible();
+  });
+
+  it('treats a missing aside kind as CONTEXT (forward-compat)', () => {
+    const value: RichText = [
+      {
+        _type: 'aside',
+        _key: 'aside-1',
+        body: [richTextBlock('normal', [richTextSpan('Some context.')])],
+      },
+    ];
+
+    setup({ value, asideKindLabels: { [ASIDE_KIND.CONTEXT]: 'Context' } });
+
+    expect(screen.getByText('Context')).toBeVisible();
   });
 });
