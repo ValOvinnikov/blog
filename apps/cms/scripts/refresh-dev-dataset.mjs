@@ -26,22 +26,21 @@
  * in the development dataset — content documents AND `sanity.imageAsset`/
  * `sanity.fileAsset` assets, since assets are themselves documents — is
  * wiped via the Data Mutations HTTP API (a query-based `delete: { query:
- * "*[!(_id in path(\"_.**\"))]" }` mutation, issued through `@sanity/client`)
- * before the import, so every refresh starts clean — no asset/document
- * accumulation across repeated runs. The `_id in path("_.**")` exclusion
- * skips Sanity's own system documents (schema-store manifests like
+ * WIPE_QUERY }` mutation, issued through `@sanity/client`) before the
+ * import, so every refresh starts clean — no asset/document accumulation
+ * across repeated runs. `WIPE_QUERY` (see ./refresh-dev-dataset-lib.mjs)
+ * excludes Sanity's own system documents (schema-store manifests like
  * `_.schemas.default`, role/group definitions like `_.groups.administrator`,
  * retention policy docs like `_.retention._maximum_project` — every system
- * document's `_id` lives under the reserved `_.` namespace and its `_type`
- * starts with `system.`; verified empirically against a real dataset with
- * `sanity documents query '*[_id in path("_.**")]{_id,_type}'`). Deleting
- * those requires the project's `manage` permission — which an Editor-scoped
- * token doesn't have and this script has no reason to touch, since they
- * aren't content. An unscoped `*[]` matches them too and 403s the whole wipe
- * (see the "why" note on `wipeDataset` below). This does NOT delete/recreate
- * the dataset itself (no `sanity datasets delete`/`create`): only
- * document-level writes, which only need Editor-level access — see the token
- * note below.
+ * document's `_id` lives under the reserved `_.` namespace). Deleting those
+ * requires the project's `manage` permission — which an Editor-scoped token
+ * doesn't have and this script has no reason to touch, since they aren't
+ * content. An unscoped `*[]` matches them too and 403s the whole wipe (see
+ * `WIPE_QUERY`'s doc comment in the lib file for exactly how it's scoped and
+ * why it uses `string::startsWith` rather than `path()`). This does NOT
+ * delete/recreate the dataset itself (no `sanity datasets delete`/`create`):
+ * only document-level writes, which only need Editor-level access — see the
+ * token note below.
  *
  * Drafts: published-only. `--no-drafts` on export means prod's unpublished
  * draft documents never leak into development.
@@ -75,6 +74,7 @@ import {
   assertSafeDatasetRefresh,
   SOURCE_DATASET,
   TARGET_DATASET,
+  WIPE_QUERY,
 } from './refresh-dev-dataset-lib.mjs';
 
 const cmsDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -109,33 +109,17 @@ const runSanity = (args, envOverrides) => {
 const WIPE_API_VERSION = '2024-08-01';
 
 /**
- * GROQ filter for "every document this script is allowed to touch": all of
- * them EXCEPT Sanity's own system documents. System document `_id`s live
- * under the reserved `_.` namespace (`_.schemas.default`,
- * `_.groups.administrator`, `_.retention._maximum_project`, ...) — confirmed
- * against a real dataset via `sanity documents query
- * '*[_id in path("_.**")]{_id,_type}'`, which returned exactly the documents
- * whose `_type` also starts with `system.` (13/13 in that check, no
- * false positives/negatives against the dataset's other 29 ordinary
- * documents). Deleting a system document requires the project's `manage`
- * permission; an unscoped `*[]` matches them too and fails the whole wipe
- * with "Insufficient permissions; permission 'manage' required" even though
- * the token has full Editor rights on ordinary content. Excluding them here
- * keeps the wipe at Editor-level access, matching the token note above.
- */
-const WIPE_QUERY = '*[!(_id in path("_.**"))]';
-
-/**
  * Delete every non-system document in `dataset` via the Data Mutations HTTP
  * API's query-based `delete` mutation (`{ delete: { query } }`, POSTed to
  * `/data/mutate/<dataset>` by `@sanity/client`'s `client.delete()`).
- * `WIPE_QUERY` matches every ordinary document, including
- * `sanity.imageAsset`/`sanity.fileAsset` (assets are documents too), so one
- * call empties the whole dataset of content while leaving Sanity's own
- * system documents untouched. This only requires document-level write
- * access (Editor is sufficient) — unlike `sanity datasets delete`, which
- * needs a dataset-management grant that isn't available on this project's
- * plan (see the module docstring).
+ * `WIPE_QUERY` (see ./refresh-dev-dataset-lib.mjs for its full "why", incl.
+ * why it's `string::startsWith` and not `path()`) matches every ordinary
+ * document, including `sanity.imageAsset`/`sanity.fileAsset` (assets are
+ * documents too), so one call empties the whole dataset of content while
+ * leaving Sanity's own system documents untouched. This only requires
+ * document-level write access (Editor is sufficient) — unlike `sanity
+ * datasets delete`, which needs a dataset-management grant that isn't
+ * available on this project's plan (see the module docstring).
  */
 const wipeDataset = async (projectId, dataset, token) => {
   const client = createClient({

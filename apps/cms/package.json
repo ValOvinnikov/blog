@@ -42,6 +42,7 @@
     "@sanity/cli": "^7.7.1",
     "@sanity/client": "^7.23.0",
     "eslint": "catalog:",
+    "groq-js": "^1.30.3",
     "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
