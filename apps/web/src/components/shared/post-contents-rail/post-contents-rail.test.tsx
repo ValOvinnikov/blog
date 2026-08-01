@@ -34,39 +34,47 @@ vi.mock('@web/components/shared/smart-link', () => ({
 
 const setup = customRender(PostContentsRail, { headings: mockPostHeadings });
 
+const getMobileTrigger = () => screen.getByRole('button', { name: /Topics/ });
+
 describe(`<${PostContentsRail.name}/>`, () => {
   beforeEach(() => {
     useActiveHeadingIdMock.mockReturnValue(null);
   });
 
-  it('renders a single "On this page" nav landmark', () => {
+  it('renders a single "Topics" nav landmark', () => {
     setup();
 
-    expect(
-      screen.getAllByRole('navigation', { name: 'On this page' }),
-    ).toHaveLength(1);
+    expect(screen.getAllByRole('navigation', { name: 'Topics' })).toHaveLength(
+      1,
+    );
   });
 
-  it('labels the desktop list with a real "On this page" heading that names the nav landmark', () => {
+  it('labels the desktop list with a real "Topics" heading that names the nav landmark', () => {
     setup();
 
     // The desktop label is a real `<h2>` — it joins the document outline
     // (reachable via screen-reader heading navigation) — and it's what names
     // the surrounding `<nav>` landmark via `aria-labelledby`.
-    const heading = screen.getByRole('heading', {
-      level: 2,
-      name: 'On this page',
-    });
-    expect(
-      screen.getByRole('navigation', { name: 'On this page' }),
-    ).toContainElement(heading);
+    const heading = screen.getByRole('heading', { level: 2, name: 'Topics' });
+    expect(screen.getByRole('navigation', { name: 'Topics' })).toContainElement(
+      heading,
+    );
   });
 
-  it('shows the mobile toggle\'s own "On this page" copy, matching the desktop heading', () => {
+  it('shows the mobile selector defaulting to the first heading before any scroll', () => {
     setup();
 
     expect(
-      screen.getByRole('button', { name: 'On this page' }),
+      screen.getByRole('button', { name: 'Topics Getting started' }),
+    ).toBeInTheDocument();
+  });
+
+  it('updates the mobile selector to the active heading reported by useActiveHeadingId', () => {
+    useActiveHeadingIdMock.mockReturnValue('configuration');
+    setup();
+
+    expect(
+      screen.getByRole('button', { name: 'Topics Configuration' }),
     ).toBeInTheDocument();
   });
 
@@ -84,7 +92,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
   it('starts with the mobile disclosure closed, so its copy of the links is not in the accessibility tree', () => {
     setup();
 
-    const trigger = screen.getByRole('button', { name: 'On this page' });
+    const trigger = getMobileTrigger();
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
     // One link per heading (the always-visible desktop copy) while the
     // `hidden`-attributed mobile panel's duplicate copy is excluded.
@@ -95,11 +103,9 @@ describe(`<${PostContentsRail.name}/>`, () => {
     const user = userEvent.setup();
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'On this page' }));
+    await user.click(getMobileTrigger());
 
-    expect(
-      screen.getByRole('button', { name: 'On this page' }),
-    ).toHaveAttribute('aria-expanded', 'true');
+    expect(getMobileTrigger()).toHaveAttribute('aria-expanded', 'true');
     // Both the always-visible desktop copy and the now-visible mobile
     // disclosure's copy stay plain links — this is in-page navigation, not a
     // command menu, so neither carries a `role="menu"`/`"menuitem"` override.
@@ -112,7 +118,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
     const user = userEvent.setup();
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'On this page' }));
+    await user.click(getMobileTrigger());
 
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
     expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
@@ -122,7 +128,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
     const user = userEvent.setup();
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'On this page' }));
+    await user.click(getMobileTrigger());
 
     const links = screen.getAllByRole('link', {
       name: mockPostHeadings.at(-1)?.text,
@@ -141,7 +147,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
   it('closes the mobile disclosure on Escape', async () => {
     const user = userEvent.setup();
     setup();
-    const trigger = screen.getByRole('button', { name: 'On this page' });
+    const trigger = getMobileTrigger();
 
     await user.click(trigger);
     fireEvent.keyDown(document, { key: 'Escape' });
@@ -153,7 +159,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
   it('closes the mobile disclosure on an outside click', async () => {
     const user = userEvent.setup();
     setup();
-    const trigger = screen.getByRole('button', { name: 'On this page' });
+    const trigger = getMobileTrigger();
 
     await user.click(trigger);
     fireEvent.mouseDown(document.body);
@@ -165,7 +171,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
   it('closes the mobile disclosure when one of its own links is clicked, so the target heading is not left hidden behind the still-open overlay', async () => {
     const user = userEvent.setup();
     setup();
-    const trigger = screen.getByRole('button', { name: 'On this page' });
+    const trigger = getMobileTrigger();
     const panelId = trigger.getAttribute('aria-controls') ?? '';
 
     await user.click(trigger);

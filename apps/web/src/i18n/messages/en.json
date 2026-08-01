@@ -44,7 +44,7 @@
     "relatedReading": "Related reading"
   },
   "postContentsRail": {
-    "ariaLabel": "On this page"
+    "label": "Topics"
   },
   "categoryPage": {
     "title": "Posts in {name}",
