@@ -303,7 +303,10 @@ replacing a hand-duplicated block per page document.
   post without one renders imageless rather than 404ing), author (ref),
   category (ref → `category`, required — the post's single primary
   classification), tags (refs → `tag`, optional, max 6), publishedAt, body
-  (portable text incl. code blocks), featured, seo.
+  (portable text incl. code blocks and `aside` blocks), featured, seo, skim
+  (`skim` object, **optional** — `takeaways` (3-7 items, each max 160 chars),
+  `generatedAt`/`model` read-only in Studio; pipeline-populated for the
+  choose-your-depth reading feature, #957).
 - `author` — name, slug, image, bio, role, socialLinks (unified `link`-based).
 - `category` — title, slug, description.
 - `tag` — title, slug, description, seo (topic taxonomy for posts; drives the
@@ -333,7 +336,10 @@ for an editable headline.
 `SPEC_LINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt),
 `seo` (all-optional
 override bag) + `openGraph`,
-`blockText` / `richText`.
+`blockText` / `richText`, `aside` (deep-dive block type registered in
+`richText`'s portable-text array; `kind` from `ASIDE_KIND`, required; `body`
+via `blockText`, required — part of the choose-your-depth reading feature,
+#957), `skim` (see `post` above).
 
 **Conventions**
 
