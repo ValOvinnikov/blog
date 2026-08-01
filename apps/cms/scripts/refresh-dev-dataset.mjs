@@ -22,9 +22,15 @@
  * runs BEFORE any network call, so a misconfigured run fails loudly without
  * touching either project.
  *
- * Replace semantics: full replace, including assets. The development dataset
- * is deleted and recreated empty before the import, so every refresh starts
- * clean — no asset/document accumulation across repeated runs.
+ * Replace semantics: full replace, including assets. Every document in the
+ * development dataset — content documents AND `sanity.imageAsset`/
+ * `sanity.fileAsset` assets, since assets are themselves documents — is
+ * wiped via the Data Mutations HTTP API (a query-based `delete: { query:
+ * "*[]" }` mutation, issued through `@sanity/client`) before the import, so
+ * every refresh starts clean — no asset/document accumulation across
+ * repeated runs. This does NOT delete/recreate the dataset itself (no
+ * `sanity datasets delete`/`create`): only document-level writes, which only
+ * need Editor-level access — see the token note below.
  *
  * Drafts: published-only. `--no-drafts` on export means prod's unpublished
  * draft documents never leak into development.
@@ -35,16 +41,19 @@
  *                                dataset (Viewer permission is sufficient for
  *                                an export)
  *   SANITY_DEV_PROJECT_ID     - target (development) Sanity project id
- *   SANITY_DEV_IMPORT_TOKEN   - token with permission to delete, create, and
- *                                import into the target project's
- *                                `development` dataset (deleting/creating a
- *                                dataset needs more than Editor — use an
- *                                Administrator-scope token)
+ *   SANITY_DEV_IMPORT_TOKEN   - token with document read/write access to the
+ *                                target project's `development` dataset
+ *                                (Editor permission is sufficient — this
+ *                                script only ever wipes and imports
+ *                                documents, it never deletes or creates the
+ *                                dataset itself, so no dataset-management
+ *                                grant is required)
  *
  * This assumes the `development` dataset already exists (per docs/DEPLOY.md's
- * one-time setup) — if it doesn't, the delete step fails loudly, which is the
+ * one-time setup) — if it doesn't, the wipe step fails loudly, which is the
  * correct behavior rather than silently masking a misconfiguration.
  */
+import { createClient } from '@sanity/client';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -84,7 +93,38 @@ const runSanity = (args, envOverrides) => {
   });
 };
 
-const main = () => {
+// Pinned so the client's request-building/response-shape behavior doesn't
+// silently drift underneath this script.
+const WIPE_API_VERSION = '2024-08-01';
+
+/**
+ * Delete every document in `dataset` via the Data Mutations HTTP API's
+ * query-based `delete` mutation (`{ delete: { query } }`, POSTed to
+ * `/data/mutate/<dataset>` by `@sanity/client`'s `client.delete()`). `*[]`
+ * matches every document, including `sanity.imageAsset`/`sanity.fileAsset`
+ * (assets are documents too), so one call empties the whole dataset. This
+ * only requires document-level write access (Editor is sufficient) — unlike
+ * `sanity datasets delete`, which needs a dataset-management grant that
+ * isn't available on this project's plan (see the module docstring).
+ */
+const wipeDataset = async (projectId, dataset, token) => {
+  const client = createClient({
+    projectId,
+    dataset,
+    token,
+    apiVersion: WIPE_API_VERSION,
+    useCdn: false,
+  });
+  const result = await client.delete(
+    { query: '*[]' },
+    { returnDocuments: false },
+  );
+  console.log(
+    `Deleted ${result.results.length} document(s) from "${dataset}" (project ${projectId}).`,
+  );
+};
+
+const main = async () => {
   const sourceProjectId = requireEnv('SANITY_PROD_PROJECT_ID');
   const sourceToken = requireEnv('SANITY_PROD_EXPORT_TOKEN');
   const targetProjectId = requireEnv('SANITY_DEV_PROJECT_ID');
@@ -124,24 +164,16 @@ const main = () => {
     );
 
     console.log(
-      `Deleting "${TARGET_DATASET}" (project ${targetProjectId}) so the refresh starts clean...`,
+      `Wiping all documents in "${TARGET_DATASET}" (project ${targetProjectId}) so the refresh starts clean...`,
     );
-    runSanity(['datasets', 'delete', TARGET_DATASET, '--force'], targetEnv);
-
-    console.log(
-      `Recreating empty "${TARGET_DATASET}" (project ${targetProjectId})...`,
-    );
-    runSanity(
-      ['datasets', 'create', TARGET_DATASET, '--visibility', 'public'],
-      targetEnv,
-    );
+    await wipeDataset(targetProjectId, TARGET_DATASET, targetToken);
 
     console.log(
       `Importing ${exportFile} -> "${TARGET_DATASET}" (project ${targetProjectId})...`,
     );
     // --replace is a defensive no-op here (the dataset was just emptied by the
-    // delete+create above) but keeps this idempotent if a re-run ever skips
-    // the delete step for some reason.
+    // wipe above) but keeps this idempotent if a re-run ever skips the wipe
+    // step for some reason.
     runSanity(
       [
         'datasets',
@@ -164,4 +196,7 @@ const main = () => {
   }
 };
 
-main();
+main().catch((error) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exit(1);
+});

@@ -180,10 +180,11 @@ provide.
 - [ ] Secret `SANITY_PROD_EXPORT_TOKEN` = `<PRD_EXPORT_TOKEN>` (Viewer — export
       only, never a deploy/migrate token)
 - [ ] Variable `SANITY_DEV_PROJECT_ID` = `<DEV_PROJECT_ID>` (import target)
-- [ ] Secret `SANITY_DEV_IMPORT_TOKEN` = `<DEV_IMPORT_TOKEN>` (**Administrator**
-      — deleting and recreating a dataset needs more than Editor)
+- [ ] Secret `SANITY_DEV_IMPORT_TOKEN` = `<DEV_IMPORT_TOKEN>` (**Editor** — the
+      script wipes documents and imports, it never deletes/creates the
+      dataset itself, so no dataset-management grant is needed)
 - [ ] (Recommended) require a reviewer on `dataset-refresh` — an extra human
-      gate before the job deletes and replaces the `development` dataset.
+      gate before the job wipes and replaces every document in `development`.
 
 **Repo level (Settings → Secrets and variables → Actions) — Turborepo Remote Cache**
 
@@ -308,8 +309,9 @@ The `development` dataset drifts from real content over time. `.github/workflows
 `development` with a fresh copy of `production`, cross-project (dev and prod
 are separate Sanity projects, so this is an export→import, not
 `sanity dataset copy`). Published documents only — drafts are excluded.
-Assets are included; since the target dataset is deleted and recreated each
-run, there's no cross-run asset accumulation.
+Assets are included; since every document in the target dataset is wiped
+before each run (assets are documents too), there's no cross-run asset
+accumulation.
 
 **Run this only after that release's production migrations have completed**
 (step 2 above) — refreshing from a not-yet-migrated `production` would copy
@@ -317,7 +319,7 @@ pre-migration shapes that no longer match the deployed schema:
 
 1. Confirm the `production` deploy's `migrate` job finished (Actions tab).
 2. Actions → **Refresh Dev Dataset** → **Run workflow** (`main`).
-3. The job exports `production` (published-only), deletes and recreates
+3. The job exports `production` (published-only), wipes every document in
    `development`, then imports — direction is hardcoded in
    `apps/cms/scripts/refresh-dev-dataset-lib.mjs`'s safety guard, so a
    misconfigured environment fails loudly rather than silently reversing.
