@@ -2,6 +2,7 @@ export * from './aside';
 export * from './brand';
 export * from './depth';
 export * from './icon';
+export * from './image-layout';
 export * from './language';
 export * from './link';
 export * from './module';
