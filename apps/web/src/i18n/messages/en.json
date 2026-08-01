@@ -56,6 +56,9 @@
       "WHY_NOT": "Why not X",
       "DIGRESSION": "Digression",
       "CONTEXT": "Context"
+    },
+    "backToTop": {
+      "ariaLabel": "Back to top"
     }
   },
   "postContentsRail": {
