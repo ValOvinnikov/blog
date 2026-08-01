@@ -18,6 +18,8 @@ export const mockPostDetail: TPostDetail = {
       children: [{ _type: 'span', _key: 's1', text: 'Body text.' }],
     },
   ],
+  skim: undefined,
+  hasAsides: false,
   seo: {
     title: 'Hello World',
     description: 'A sufficiently long excerpt for the card.',
