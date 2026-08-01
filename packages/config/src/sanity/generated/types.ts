@@ -111,7 +111,7 @@ export type RichText = Array<
     }
   | ({
       _key: string;
-    } & ImageWithAlt)
+    } & BodyImage)
   | ({
       _key: string;
     } & Code)
@@ -205,6 +205,16 @@ export type SanityImageAssetReference = {
   [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
 };
 
+export type BodyImage = {
+  _type: 'bodyImage';
+  asset?: SanityImageAssetReference;
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  alt?: string;
+  layout?: 'INLINE' | 'FULL_BLEED' | 'FLOAT_LEFT' | 'FLOAT_RIGHT';
+};
+
 export type ImageWithAlt = {
   _type: 'imageWithAlt';
   asset?: SanityImageAssetReference;
@@ -212,7 +222,6 @@ export type ImageWithAlt = {
   hotspot?: SanityImageHotspot;
   crop?: SanityImageCrop;
   alt?: string;
-  layout?: 'INLINE' | 'FULL_BLEED' | 'FLOAT_LEFT' | 'FLOAT_RIGHT';
 };
 
 export type Settings_footer = {
@@ -411,6 +420,22 @@ export type Blog_post = {
   seo?: Seo;
 };
 
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop';
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot';
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
 export type Blog_category = {
   _id: string;
   _type: 'blog_category';
@@ -438,22 +463,6 @@ export type Blog_author = {
       _key: string;
     } & SocialLink
   >;
-};
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop';
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot';
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
 };
 
 export type MediaTag = {
@@ -589,6 +598,7 @@ export type AllSanitySchemaTypes =
   | BlockText
   | Aside
   | SanityImageAssetReference
+  | BodyImage
   | ImageWithAlt
   | Settings_footer
   | Settings_navigation
@@ -606,10 +616,10 @@ export type AllSanitySchemaTypes =
   | Blog_authorReference
   | Blog_tagReference
   | Blog_post
-  | Blog_category
-  | Blog_author
   | SanityImageCrop
   | SanityImageHotspot
+  | Blog_category
+  | Blog_author
   | MediaTag
   | Code
   | SanityImagePaletteSwatch

@@ -1,7 +1,7 @@
 import { defineArrayMember, defineType } from 'sanity';
 
 import { asideSchema } from './aside';
-import { imageWithAltSchema } from './image-with-alt';
+import { bodyImageSchema } from './body-image';
 
 export const richTextSchema = defineType({
   name: 'richText',
@@ -22,7 +22,7 @@ export const richTextSchema = defineType({
         { title: 'Quote', value: 'blockquote' },
       ],
     }),
-    defineArrayMember({ type: imageWithAltSchema.name }),
+    defineArrayMember({ type: bodyImageSchema.name }),
     defineArrayMember({ type: 'code' }),
     defineArrayMember({ type: asideSchema.name }),
   ],

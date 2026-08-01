@@ -104,9 +104,13 @@ for an editable headline.
 
 **Objects** — `link` (unified internal/external, `LINK_TYPE` const),
 `socialLink`, `brand`, `specLine` (structured spec-line: `items` + a
-`SPEC_LINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt;
-optional `layout` from `IMAGE_LAYOUT`, undefined = Inline),
-`seo` (all-optional
+`SPEC_LINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt —
+used by `heroImage`, `author.avatar`, `brand`, `openGraph.image`, and
+site-settings favicon/logo), `bodyImage` (required alt; optional `layout`
+from `IMAGE_LAYOUT`, undefined = Inline — shares its `alt`/hotspot shape with
+`imageWithAlt` via the `image-alt-field` helper, but is a distinct type
+registered only as `richText`'s body-array image member, so the layout
+choice can't leak into hero/avatar/OG/brand images), `seo` (all-optional
 override bag) + `openGraph`,
 `blockText` / `richText`, `aside` (deep-dive block type registered in
 `richText`'s portable-text array; `kind` from `ASIDE_KIND`, required; `body`
