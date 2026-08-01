@@ -74,4 +74,27 @@ describe('SanityImage', () => {
       'fetchpriority',
     );
   });
+
+  it('withholds the LQIP preview for a priority image, rendering a single img with no hydration-gated placeholder swap', () => {
+    const { container } = setup({
+      priority: true,
+      image: { ...image, lqip: 'data:image/webp;base64,fake' },
+    });
+
+    const images = container.querySelectorAll('img');
+    expect(images).toHaveLength(1);
+    expect(images[0]).not.toHaveAttribute('data-lqip');
+    expect(images[0]).toHaveAttribute(
+      'src',
+      expect.stringContaining('https://cdn.sanity.io'),
+    );
+  });
+
+  it('renders the LQIP blur-up placeholder for a non-priority image with a preview available', () => {
+    const { container } = setup({
+      image: { ...image, lqip: 'data:image/webp;base64,fake' },
+    });
+
+    expect(container.querySelectorAll('img').length).toBeGreaterThan(1);
+  });
 });
