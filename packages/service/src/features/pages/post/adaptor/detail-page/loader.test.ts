@@ -339,4 +339,32 @@ describe('getPost', () => {
 
     expect(result?.hasAsides).toBe(false);
   });
+
+  it('preserves the optional layout field on a bodyImage body block', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostDetail({
+          body: [
+            {
+              _type: 'bodyImage',
+              _key: 'image-1',
+              asset: undefined,
+              media: undefined,
+              hotspot: undefined,
+              crop: undefined,
+              alt: 'A diagram',
+              layout: 'FLOAT_RIGHT',
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world');
+
+    expect(result?.body[0]).toMatchObject({
+      _type: 'bodyImage',
+      layout: 'FLOAT_RIGHT',
+    });
+  });
 });
