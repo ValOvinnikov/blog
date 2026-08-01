@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Article, PostsSection } from '@blog/ui/organisms';
+import { BackToTopButton } from '@web/components/shared/back-to-top-button';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { DepthProvider } from '@web/components/shared/depth-provider';
 import { DepthToggle } from '@web/components/shared/depth-toggle';
@@ -228,6 +229,8 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
           />
         )}
       </main>
+
+      <BackToTopButton />
     </>
   );
 }
