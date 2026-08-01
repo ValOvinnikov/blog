@@ -64,15 +64,14 @@ export const postContentsRailVariants = tv({
       'transition-transform duration-base ease-console',
     ],
     // Absolute against `mobile`'s `relative` box so it overlays the article
-    // body instead of pushing it down. `pt-4` balances `pb-4` so the toggle
-    // row's `border-b` reads as a section break, not an internal list rule.
+    // body instead of pushing it down. `p-4` matches the nav-menu and
+    // share-post popover panels so all three read as one system (#1005).
     panel: [
       'absolute inset-x-0 top-full',
       'bg-bg border-b border-border shadow-lg',
-      'max-h-[70vh] overflow-y-auto px-4',
-      'pt-4 pb-4',
+      'max-h-[70vh] overflow-y-auto p-4',
     ],
-    list: ['flex flex-col gap-2', 'font-mono text-copy', 'm-0 list-none p-0'],
+    list: ['flex flex-col gap-1', 'font-mono text-copy', 'm-0 list-none p-0'],
     item: [],
     link: [
       'block text-subtle no-underline',
@@ -93,12 +92,12 @@ export const postContentsRailVariants = tv({
       true: { item: ['pl-3'] },
     },
     // Replicates `PopoverMenuItem`'s row chrome (rounded pill + hover fill)
-    // on the mobile panel's copy of `link`/`list` only — the desktop rail's
+    // on the mobile panel's copy of `link` only — the desktop rail's
     // `renderList()` call omits it, so the side column stays plain text.
+    // `list`'s `gap-1` already matches on both, so no override is needed here.
     inPanel: {
       true: {
         link: ['flex items-center rounded-md px-3 py-2', 'hover:bg-surface-2'],
-        list: ['gap-1'],
       },
     },
   },
