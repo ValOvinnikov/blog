@@ -23,10 +23,9 @@ type TStory = StoryObj<typeof meta>;
  * reads clearly smaller than the one above it, and all sit below the page's
  * own title size.
  *
- * TODO(#1021): `PortableTextRenderer` doesn't register a `bodyImage` block
- * component yet, so the image block currently renders nothing (a hidden
- * "unknown block type" fallback) here — once #1021 wires up rendering, this
- * should again exercise a visible image with its layout (spacing, rounded
- * corners, alt text).
+ * The `bodyImage` block renders through `ImageWithCaption`, using the
+ * fixture's `FLOAT_LEFT` layout — at the `md` breakpoint and wider, the
+ * closing paragraph wraps around it; below `md`, it renders full width
+ * above the text.
  */
 export const Content: TStory = {};

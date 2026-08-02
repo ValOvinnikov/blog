@@ -1,4 +1,4 @@
-import type { RichText } from '@blog/config';
+import { IMAGE_LAYOUT, type RichText } from '@blog/config';
 
 export type TRichTextBlock = Extract<RichText[number], { _type: 'block' }>;
 export type TRichTextSpan = NonNullable<TRichTextBlock['children']>[number];
@@ -84,8 +84,14 @@ export const richTextDemo: RichText = [
     _key: nextKey('image'),
     asset: { _ref: 'image-abc123-1600x900-jpg', _type: 'reference' },
     alt: 'A scenic mountain range at sunset',
+    // A non-default layout (rather than the more common INLINE) so this
+    // fixture also exercises the floated width/wrap treatment, not just the
+    // full-width default.
+    layout: IMAGE_LAYOUT.FLOAT_LEFT,
   },
   richTextBlock('normal', [
-    richTextSpan('A closing paragraph after the image.'),
+    richTextSpan(
+      'A closing paragraph after the image, long enough to demonstrate text wrapping around the floated image above at the md breakpoint and wider. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    ),
   ]),
 ];

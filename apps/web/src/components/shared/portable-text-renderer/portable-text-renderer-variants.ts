@@ -11,6 +11,10 @@ export const portableTextRendererVariants = tv({
     // `scroll-mt-44` (176px) rounds up past the taller, stacked case (#1006)
     // so a TOC jump never lands a heading under the bar at either width.
     headingAnchor: ['scroll-mt-44', 'lg:scroll-mt-24'],
-    image: ['h-auto w-full rounded-lg border border-border'],
+    // Rounded corners, border, and surface background come from
+    // `ImageWithCaption`'s `MediaFrame` wrapper (`overflow-hidden` clips
+    // this image to those corners) — only sizing belongs here, since
+    // `SanityImage` renders a natural (non-`fill`) `<img>`.
+    image: ['h-auto w-full'],
   },
 });
