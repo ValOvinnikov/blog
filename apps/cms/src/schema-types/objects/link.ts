@@ -1,4 +1,5 @@
 import { SOCIAL_PLATFORMS, TLINK_TYPE } from '@blog/config/constants';
+import { toTitleCase } from '@blog/utils';
 import { categorySchema } from '@cms/schema-types/documents/blog/category';
 import { postSchema } from '@cms/schema-types/documents/blog/post';
 import { blogPageSchema } from '@cms/schema-types/documents/pages/blog-page';
@@ -110,7 +111,7 @@ export const linkSchema = defineType({
       description: 'Optional social platform, used for icon selection.',
       options: {
         list: Object.values(SOCIAL_PLATFORMS).map((value) => ({
-          title: value,
+          title: toTitleCase(value),
           value,
         })),
       },
