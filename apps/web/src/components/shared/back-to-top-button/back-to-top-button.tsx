@@ -8,17 +8,25 @@ import { useEffect, useState } from 'react';
  * BackToTopButton — client-side wrapper that owns scroll-position state for
  * `BackToTop`. Listens for scroll (passively, cleaned up on unmount) to
  * toggle visibility once the reader has scrolled past one viewport height,
- * and smooth-scrolls to the top of the page on click.
+ * and smooth-scrolls to the top of the page on click. Also watches the
+ * site chrome `<footer data-testid="site-footer">` (rendered once, in the
+ * root layout) via `IntersectionObserver` (cleaned up on unmount) and hides
+ * the button once it scrolls into view, so the fixed bottom-right button
+ * never overlaps footer content (e.g. the RSS icon link). Queries by test id
+ * rather than the bare `footer` tag — a tagged post also renders
+ * `Article.Footer`'s `<footer>` earlier in the DOM, which `querySelector`
+ * would otherwise match first.
  */
 export const BackToTopButton = () => {
   const t = useTranslations('blogPostPage');
-  const [visible, setVisible] = useState(false);
+  const [scrolledPastViewport, setScrolledPastViewport] = useState(false);
+  const [footerVisible, setFooterVisible] = useState(false);
 
   useEffect(() => {
     // One viewport height, per the back-to-top epic's spec — the point a
     // reader has scrolled past the initial screen of content.
     const handleScroll = () => {
-      setVisible(window.scrollY > window.innerHeight);
+      setScrolledPastViewport(window.scrollY > window.innerHeight);
     };
 
     handleScroll();
@@ -29,13 +37,28 @@ export const BackToTopButton = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const footer = document.querySelector('footer[data-testid="site-footer"]');
+    if (!footer) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      setFooterVisible(entry?.isIntersecting ?? false);
+    });
+
+    observer.observe(footer);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   const handleClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <BackToTop
-      visible={visible}
+      visible={scrolledPastViewport && !footerVisible}
       onClick={handleClick}
       ariaLabel={t('backToTop.ariaLabel')}
     />
