@@ -16,6 +16,22 @@ export const env = createEnv({
     // fully unaffected either way.
     ANTHROPIC_API_KEY: z.string().min(1).optional(),
     SANITY_GENERATE_SECRET: z.string().min(1).optional(),
+    // Feature-flag-by-absence (same stance as the two vars above): Web
+    // Analytics (`<Analytics />`) and Speed Insights (`<SpeedInsights />`,
+    // `apps/web/src/app/layout.tsx`) each load a same-origin script
+    // (`/_vercel/insights/script.js` / `/_vercel/speed-insights/script.js`)
+    // that Vercel's edge only proxies when the matching feature is turned on
+    // for that project in the dashboard — off, the request falls through to
+    // the app's own 404 page (console MIME-type error, issue #1072).
+    // `VERCEL_ENV` can't tell "real production" apart from blog-dev's own
+    // production target (both report `production`), so this is an explicit
+    // opt-in set only on the Vercel project(s) where those dashboard
+    // features are actually enabled — same human-gated console posture as
+    // this repo's other one-time Vercel/Sanity setup (`docs/DEPLOY.md`).
+    // Server-only: whether `<Analytics />`/`<SpeedInsights />` render at all
+    // is decided in the root layout (a Server Component) before the RSC
+    // payload is built, so the flag never needs to reach the client bundle.
+    VERCEL_ANALYTICS_ENABLED: z.enum(['true', 'false']).optional(),
   },
   client: {
     NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
@@ -28,6 +44,7 @@ export const env = createEnv({
     SANITY_REVALIDATE_SECRET: process.env.SANITY_REVALIDATE_SECRET,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     SANITY_GENERATE_SECRET: process.env.SANITY_GENERATE_SECRET,
+    VERCEL_ANALYTICS_ENABLED: process.env.VERCEL_ANALYTICS_ENABLED,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,

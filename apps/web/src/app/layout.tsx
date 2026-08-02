@@ -6,6 +6,7 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { jetbrainsMono, newsreader, spaceGrotesk } from '@web/config/fonts';
 import { themeBootstrapScript } from '@web/config/theme-script';
+import { isVercelAnalyticsEnabled } from '@web/utils/is-vercel-analytics-enabled';
 import { buildRootHtmlClassName } from '@web/utils/root-html-class-name';
 
 const FONT_VARIABLE_CLASS_NAMES = `${spaceGrotesk.variable} ${newsreader.variable} ${jetbrainsMono.variable}`;
@@ -42,6 +43,8 @@ export default async function RootLayout({ children }: TProps) {
     console.error(`Error to fetch site settings: ${result.error}`);
   }
 
+  const analyticsEnabled = isVercelAnalyticsEnabled();
+
   return (
     <html
       lang={LOCALE_ISO_CODES.EN.toLowerCase()}
@@ -58,11 +61,16 @@ export default async function RootLayout({ children }: TProps) {
       <body>
         {children}
         {/* Client components (use hooks internally) mounted at the leaf —
-            collect real-user Core Web Vitals and pageview analytics.
-            Zero-config: both no-op in development and auto-detect the
-            Vercel deployment in production. */}
-        <SpeedInsights />
-        <Analytics />
+            collect real-user Core Web Vitals and pageview analytics. Both
+            unconditionally request a same-origin script
+            (`/_vercel/speed-insights/script.js` / `/_vercel/insights/script.js`)
+            that Vercel's edge only proxies when the matching dashboard
+            feature is enabled for the deploying project — gated behind
+            `isVercelAnalyticsEnabled()` (env var, not `VERCEL_ENV`; see its
+            own comment) so a project without Speed Insights/Web Analytics
+            turned on doesn't 404 on that path (issue #1072). */}
+        {analyticsEnabled && <SpeedInsights />}
+        {analyticsEnabled && <Analytics />}
       </body>
     </html>
   );
