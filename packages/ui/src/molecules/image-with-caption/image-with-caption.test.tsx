@@ -1,3 +1,4 @@
+import { IMAGE_LAYOUT } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 
@@ -52,4 +53,13 @@ describe(`<${ImageWithCaption.name}/>`, () => {
     setup({ dataTestId: 'image-with-caption', children: undefined });
     expect(screen.getByTestId('image-with-caption')).toBeVisible();
   });
+
+  it.each(Object.values(IMAGE_LAYOUT))(
+    'renders the image and caption for the %s layout',
+    (layout) => {
+      setup({ layout });
+      expect(screen.getByRole('img')).toBeVisible();
+      expect(screen.getByText(caption)).toBeVisible();
+    },
+  );
 });
