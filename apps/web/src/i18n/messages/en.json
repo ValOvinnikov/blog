@@ -85,7 +85,8 @@
   },
   "rss": {
     "fallbackTitle": "Blog",
-    "fallbackDescription": "Latest posts"
+    "fallbackDescription": "Latest posts",
+    "feedLinkLabel": "RSS feed"
   },
   "authorMetadata": {
     "nameWithRole": "{name} — {role}"
