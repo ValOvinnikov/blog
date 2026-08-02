@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm storybook:build",
+  "outputDirectory": "storybook-static",
+  "ignoreCommand": "npx turbo-ignore@2.10.4 --task storybook:build @blog/ui"
+}
