@@ -179,26 +179,44 @@ jobs:
       cancel-in-progress: true
     environment: development
     env:
-      SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
-      SANITY_STUDIO_DATASET: development
-      SANITY_STUDIO_HOSTNAME: valovinnikov-blog-dev
-      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_DEPLOY_TOKEN }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      # Org/project ids are not sensitive — they live as environment-scoped
+      # Variables (not Secrets) so they stay inspectable in run logs.
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      # Distinct GitHub Environment variable from deploy-web's VERCEL_PROJECT_ID
+      # (cms-dev is its own Vercel project) — mapped to the local name the
+      # Vercel CLI actually reads.
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_CMS }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
+      # pnpm + node on PATH so `vercel build` can install the workspace deps
+      # (Vercel detects pnpm-lock.yaml and shells out to `pnpm`).
       - uses: ./.github/actions/setup
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
 
-      # No-op (green) until SANITY_DEPLOY_TOKEN is configured, so this is safe
-      # to merge before the one-time human setup exists.
-      - name: Deploy Studio
-        if: ${{ env.SANITY_AUTH_TOKEN != '' }}
-        working-directory: apps/cms
-        run: pnpm exec sanity deploy
+      # Deploys `cms-dev` (static `sanity build` output, apps/cms/vercel.json)
+      # via the Vercel CLI — its Git auto-deploy is disabled, same as web.
+      # Guarded on VERCEL_PROJECT_ID (not VERCEL_TOKEN, which deploy-web
+      # already has configured) so this stays a true no-op until the cms-dev
+      # Vercel project exists and VERCEL_PROJECT_ID_CMS is set.
+      # For `cms-dev`, Vercel "production" = main, so --prod targets its main
+      # URL, same as deploy-web.
+      - name: Deploy to Vercel (cms-dev)
+        if: ${{ env.VERCEL_PROJECT_ID != '' }}
+        run: |
+          set -euo pipefail
+          : "${VERCEL_TOKEN:?empty — set the VERCEL_TOKEN secret on the development environment}"
+          : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the development environment}"
+          # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
+          # green; the package is cached after the first resolution.
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --prebuilt --prod --token="$VERCEL_TOKEN"
 
   deploy-web:
     name: Deploy dev web

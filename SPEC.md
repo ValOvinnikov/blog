@@ -214,26 +214,29 @@ the gate sequence (also in `CLAUDE.md` — the operational source of truth):
 Two long-lived environments, deployed by trigger. The full click-by-click setup
 and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the shape.
 
-| Concern                 | Development                           | Production                         |
-| ----------------------- | ------------------------------------- | ---------------------------------- |
-| Sanity project          | separate dev project (id via env)     | separate prod project (id via env) |
-| Sanity dataset          | `development`                         | `production`                       |
-| Studio hostname         | `valovinnikov-blog-dev.sanity.studio` | `valovinnikov-blog.sanity.studio`  |
-| Vercel project          | `blog-dev`                            | `blog-prod`                        |
-| Deploy trigger          | push/merge to `main`                  | push git tag `v*`                  |
-| Web deploy mechanism    | Vercel CLI in GitHub Actions          | Vercel CLI in GitHub Actions       |
-| Studio deploy mechanism | GitHub Actions (`sanity deploy`)      | GitHub Actions (`sanity deploy`)   |
-| Revalidation webhook    | dev webhook → dev site                | prod webhook → prod site           |
+| Concern                 | Development                       | Production                         |
+| ----------------------- | --------------------------------- | ---------------------------------- |
+| Sanity project          | separate dev project (id via env) | separate prod project (id via env) |
+| Sanity dataset          | `development`                     | `production`                       |
+| Studio hostname         | `studio-dev.valstack.dev`         | `studio.valstack.dev`              |
+| Vercel project (web)    | `blog-dev`                        | `blog-prod`                        |
+| Vercel project (studio) | `cms-dev`                         | `cms-prod`                         |
+| Deploy trigger          | push/merge to `main`              | push git tag `v*`                  |
+| Web deploy mechanism    | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
+| Studio deploy mechanism | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
+| Revalidation webhook    | dev webhook → dev site            | prod webhook → prod site           |
 
 - `main` is a continuous **staging line** (auto-deploys to development, which is
   also the local-dev dataset); a **`vMAJOR.MINOR.PATCH` git tag** promotes that
   exact commit to production. Content migrations run inside the gated prod
   deploy (`verify → migrate → deploy`), never ahead of the migrated data.
 - **Each environment is a separate Sanity project** with its own env-driven,
-  never-committed project id and tokens; **two fully isolated Vercel
-  projects**, both with Git auto-deploy disabled — deploys only run via the
-  Vercel CLI from GitHub Actions, so there are no PR preview deploys and a
-  `main` push can never reach production.
+  never-committed project id and tokens; **four fully isolated Vercel
+  projects** (a web project and a Studio project per environment), all with
+  Git auto-deploy disabled — deploys only run via the Vercel CLI from GitHub
+  Actions, so there are no PR preview deploys and a `main` push can never
+  reach production. The Studio is a static `sanity build` export served from
+  its Vercel project — no `*.sanity.studio` hosting or `sanity deploy` anymore.
 - Deploys are CI-gated behind a `verify` job (type-check/lint/test/build) on
   the exact commit being deployed; deploy steps no-op green until the
   one-time console setup ([`docs/DEPLOY.md`](./docs/DEPLOY.md)) provides their secret.

@@ -26,18 +26,19 @@ Architecture rationale lives in `SPEC.md` §13 and
 
 ## Environment matrix
 
-| Concern               | Development                           | Production                         |
-| --------------------- | ------------------------------------- | ---------------------------------- |
-| Sanity project        | separate dev project (id via env)     | separate prod project (id via env) |
-| Sanity dataset        | `development`                         | `production`                       |
-| Studio hostname       | `valovinnikov-blog-dev.sanity.studio` | `valovinnikov-blog.sanity.studio`  |
-| Vercel project        | `blog-dev`                            | `blog-prod`                        |
-| Web URL (initial)     | `<DEV_WEB_URL>`                       | `<PRD_WEB_URL>`                    |
-| Deploy trigger        | push/merge to `main`                  | push git tag `v*`                  |
-| Web deploy            | Vercel CLI (GitHub Actions)           | Vercel CLI (GitHub Actions)        |
-| Studio deploy         | GitHub Actions                        | GitHub Actions                     |
-| CI gate before deploy | `verify` job on `main`                | `verify` job on the `v*` tag       |
-| Revalidation webhook  | dev → dev site                        | prod → prod site                   |
+| Concern               | Development                       | Production                         |
+| --------------------- | --------------------------------- | ---------------------------------- |
+| Sanity project        | separate dev project (id via env) | separate prod project (id via env) |
+| Sanity dataset        | `development`                     | `production`                       |
+| Studio hostname       | `studio-dev.valstack.dev`         | `studio.valstack.dev`              |
+| Vercel project (web)  | `blog-dev`                        | `blog-prod`                        |
+| Vercel project (cms)  | `cms-dev`                         | `cms-prod`                         |
+| Web URL (initial)     | `<DEV_WEB_URL>`                   | `<PRD_WEB_URL>`                    |
+| Deploy trigger        | push/merge to `main`              | push git tag `v*`                  |
+| Web deploy            | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
+| Studio deploy         | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
+| CI gate before deploy | `verify` job on `main`            | `verify` job on the `v*` tag       |
+| Revalidation webhook  | dev → dev site                    | prod → prod site                   |
 
 > `<DEV_WEB_URL>` / `<PRD_WEB_URL>` are each project's `*.vercel.app` URL — either
 > the auto-assigned one (e.g. `blog-web-<random>.vercel.app`) or a stable alias you
@@ -58,14 +59,15 @@ within this doc; the real values live in GitHub / Vercel / local `.env` and are
 | Sanity project id (public)                 | `<DEV_PROJECT_ID>`        | `<PRD_PROJECT_ID>`        |
 | Sanity dataset                             | `development`             | `production`              |
 | Sanity **Viewer** token                    | `<DEV_READ_TOKEN>`        | `<PRD_READ_TOKEN>`        |
-| Sanity **Deploy** token                    | `<DEV_DEPLOY_TOKEN>`      | `<PRD_DEPLOY_TOKEN>`      |
 | Sanity **Migrate** token (Editor)          | `<DEV_MIGRATE_TOKEN>`     | `<PRD_MIGRATE_TOKEN>`     |
 | Revalidate secret (`openssl rand -hex 32`) | `<DEV_REVALIDATE_SECRET>` | `<PRD_REVALIDATE_SECRET>` |
 
-Vercel (needed for **both** dev and prod web deploys — both go through the Vercel
-CLI in CI): `<VERCEL_TOKEN>` (account token) and `<VERCEL_ORG_ID>` are shared;
-`<VERCEL_PROJECT_ID>` is **per project** (`blog-dev` vs `blog-prod`, from
-`vercel link`).
+Vercel (needed for **both** environments — web and Studio each deploy via the
+Vercel CLI in CI): `<VERCEL_TOKEN>` (account token) and `<VERCEL_ORG_ID>` are
+shared across all four projects; `<VERCEL_PROJECT_ID>` is **per project**
+(`blog-dev` / `blog-prod` from `vercel link`, `cms-dev` / `cms-prod`
+likewise) — the web and Studio project ids are stored as two distinct
+GitHub Environment variables (`VERCEL_PROJECT_ID` / `VERCEL_PROJECT_ID_CMS`).
 
 ---
 
@@ -84,12 +86,14 @@ project-scoped, so mint them **inside** the matching project):
 - [ ] **API → Project ID:** copy → `<DEV_PROJECT_ID>` / `<PRD_PROJECT_ID>`.
 - [ ] **API → Tokens → Add API token** (per project):
   - [ ] `web-read` — permission **Viewer** → `<DEV_READ_TOKEN>` / `<PRD_READ_TOKEN>`.
-  - [ ] `ci-deploy` — permission **Deploy Studio** (write) → `<DEV_DEPLOY_TOKEN>` / `<PRD_DEPLOY_TOKEN>`.
-        (Distinct from the read token; `sanity deploy` needs write.)
   - [ ] `ci-migrate` — permission **Editor** → `<DEV_MIGRATE_TOKEN>` / `<PRD_MIGRATE_TOKEN>`.
-        (Content migrations mutate documents; the Deploy-Studio token can't —
-        a real `migrate:deploy` run gets "permission update required". Kept
-        separate from `ci-deploy` for least privilege.)
+        (Content migrations mutate documents; a read-only token can't. Least
+        privilege, scoped to migrations only.)
+
+> No `ci-deploy` / Deploy-Studio token anymore — Studio no longer deploys via
+> `sanity deploy`, it's a static `sanity build` output served from Vercel (see
+> below), so nothing needs Sanity's own deploy permission. If a project still
+> has an old `ci-deploy` token from before this change, it can be revoked.
 
 ### 2. Secrets to generate locally
 
@@ -98,22 +102,30 @@ openssl rand -hex 32   # → DEV_REVALIDATE_SECRET
 openssl rand -hex 32   # → PRD_REVALIDATE_SECRET
 ```
 
-### 3. Vercel — two projects · https://vercel.com
+### 3. Vercel — four projects · https://vercel.com
 
-For **each** project (`blog-dev`, `blog-prod`): Add New → Project → import
-`ValOvinnikov/blog`; **Root Directory `apps/web`** + tick _"Include files
-outside of the root directory"_; **Node.js 22.x**.
+Two projects per environment now — a web project (unchanged) and a Studio
+project (new, replacing `*.sanity.studio` hosting):
 
-Both projects have Vercel's Git auto-deploy **disabled** — every deploy goes
-through a CI-gated GitHub Actions job (no pre-merge/preview deploys, nothing
-deploys before checks pass). This is set **once, in code**, via
-`apps/web/vercel.json`'s `git.deploymentEnabled: false` — since both
-projects' Root Directory is `apps/web`, the committed file governs auto-deploy
-for both projects identically, and can't silently drift the way a
-per-project console toggle (the old "Ignored Build Step" setting) could — a
-missed one-time click on `blog-prod` once meant it deployed on every branch
-push, uncontrolled, until #445 replaced it with this file. Nothing to set per
-project in the dashboard for this anymore; only project linking remains:
+- **Web:** `blog-dev`, `blog-prod` — Add New → Project → import
+  `ValOvinnikov/blog`; **Root Directory `apps/web`** + tick _"Include files
+  outside of the root directory"_; **Node.js 22.x**.
+- **Studio:** `cms-dev`, `cms-prod` — same import flow; **Root Directory
+  `apps/cms`** + tick _"Include files outside of the root directory"_;
+  **Node.js 22.x**; Framework Preset **Other** (the build/output commands
+  come from `apps/cms/vercel.json`, not framework auto-detection).
+
+All four projects have Vercel's Git auto-deploy **disabled** — every deploy
+goes through a CI-gated GitHub Actions job (no pre-merge/preview deploys,
+nothing deploys before checks pass). This is set **once, in code**, via each
+app's own `vercel.json`'s `git.deploymentEnabled: false`
+(`apps/web/vercel.json`, `apps/cms/vercel.json`) — since the two projects
+sharing a Root Directory get the same committed file, it can't silently drift
+the way a per-project console toggle (the old "Ignored Build Step" setting)
+could — a missed one-time click on `blog-prod` once meant it deployed on
+every branch push, uncontrolled, until #445 replaced it with this file.
+Nothing to set per project in the dashboard for this anymore; only project
+linking + domains remain:
 
 - [ ] **`blog-dev`**
   - [ ] From repo root: `npx vercel link` → select `blog-dev`. Read the ids from
@@ -123,11 +135,26 @@ project in the dashboard for this anymore; only project linking remains:
   - [ ] From repo root: `npx vercel link` → select `blog-prod`. Read the ids
         from `.vercel/project.json` → `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
         (Then delete the local `.vercel/` dir — it's gitignored scratch.)
+- [ ] **`cms-dev`**
+  - [ ] From repo root: `npx vercel link` → select `cms-dev`. Read
+        `VERCEL_PROJECT_ID` from `.vercel/project.json` (`VERCEL_ORG_ID` is the
+        same value already recorded for `blog-dev` — one Vercel account/team).
+        (Then delete the local `.vercel/` dir.)
+  - [ ] Settings → Domains → add `studio-dev.valstack.dev`; add the DNS record
+        it shows you (CNAME to `cname.vercel-dns.com`, or per Vercel's
+        instructions) at whatever registrar/DNS host manages `valstack.dev`.
+- [ ] **`cms-prod`**
+  - [ ] From repo root: `npx vercel link` → select `cms-prod`. Read
+        `VERCEL_PROJECT_ID` from `.vercel/project.json`.
+        (Then delete the local `.vercel/` dir.)
+  - [ ] Settings → Domains → add `studio.valstack.dev`; add the DNS record it
+        shows you, same as above.
 
-#### Vercel env vars — set on **each** project (Production + Preview scopes)
+#### Vercel env vars
 
-Same five keys per project; each project points at its **own** Sanity project,
-so the id / dataset / URL / tokens all differ:
+**Web** (`blog-dev` / `blog-prod`, Production + Preview scopes) — same five
+keys per project; each project points at its **own** Sanity project, so the
+id / dataset / URL / tokens all differ:
 
 | Key                             | `blog-dev` value          | `blog-prod` value         |
 | ------------------------------- | ------------------------- | ------------------------- |
@@ -140,6 +167,16 @@ so the id / dataset / URL / tokens all differ:
 > `SANITY_API_READ_TOKEN` is server-only (never exposed to the browser). Each
 > project uses the Viewer token minted in its own Sanity project.
 
+**Studio** (`cms-dev` / `cms-prod`, Production scope — `vercel pull
+--environment=production` in CI only reads that scope): `sanity build`
+(invoked by `apps/cms/vercel.json`'s `buildCommand`) loads `sanity.cli.ts`,
+which requires these two:
+
+| Key                        | `cms-dev` value    | `cms-prod` value   |
+| -------------------------- | ------------------ | ------------------ |
+| `SANITY_STUDIO_PROJECT_ID` | `<DEV_PROJECT_ID>` | `<PRD_PROJECT_ID>` |
+| `SANITY_STUDIO_DATASET`    | `development`      | `production`       |
+
 ### 4. GitHub Actions — environment-scoped variables & secrets
 
 The deploy jobs run in the `development` / `production` **GitHub Environments**,
@@ -149,20 +186,20 @@ job resolves its own project's id + token:
 **`development` environment**
 
 - [ ] Variable `SANITY_STUDIO_PROJECT_ID` = `<DEV_PROJECT_ID>`
-- [ ] Secret `SANITY_DEPLOY_TOKEN` = `<DEV_DEPLOY_TOKEN>`
 - [ ] Secret `SANITY_MIGRATE_TOKEN` = `<DEV_MIGRATE_TOKEN>` (Editor — the migrate job)
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-dev**)
+- [ ] Variable `VERCEL_PROJECT_ID_CMS` = `<VERCEL_PROJECT_ID>` (**cms-dev**)
 
 **`production` environment**
 
 - [ ] Variable `SANITY_STUDIO_PROJECT_ID` = `<PRD_PROJECT_ID>`
-- [ ] Secret `SANITY_DEPLOY_TOKEN` = `<PRD_DEPLOY_TOKEN>`
 - [ ] Secret `SANITY_MIGRATE_TOKEN` = `<PRD_MIGRATE_TOKEN>` (Editor — the migrate job)
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-prod**)
+- [ ] Variable `VERCEL_PROJECT_ID_CMS` = `<VERCEL_PROJECT_ID>` (**cms-prod**)
 - [ ] (Optional) require a reviewer on `production` for a manual gate before prod
       deploys run.
 
@@ -217,10 +254,32 @@ Create **two** (the route `/api/revalidate` already exists):
 ### 6. Sanity — CORS origins · API → CORS origins
 
 - [ ] `http://localhost:3333` — credentials **on** (local Studio).
-- [ ] `https://valovinnikov-blog-dev.sanity.studio` — credentials **on**.
-- [ ] `https://valovinnikov-blog.sanity.studio` — credentials **on**.
+- [ ] `https://studio-dev.valstack.dev` — credentials **on** (dev project).
+- [ ] `https://studio.valstack.dev` — credentials **on** (prod project).
 - [ ] `https://<DEV_WEB_URL>` — credentials **off** (token reads).
 - [ ] `https://<PRD_WEB_URL>` — credentials **off**.
+- [ ] Remove the old `https://valovinnikov-blog-dev.sanity.studio` /
+      `https://valovinnikov-blog.sanity.studio` origins once the Vercel-hosted
+      Studio at the new domain is confirmed working (see "Decommissioning the
+      old `*.sanity.studio` Studio" below).
+
+### 6a. Decommissioning the old `*.sanity.studio` Studio
+
+Once `studio.valstack.dev` / `studio-dev.valstack.dev` are live and verified
+(Studio loads, signs in, and can read/write the correct dataset):
+
+- [ ] From `apps/cms`, with each project's env pointed at it (`SANITY_STUDIO_HOSTNAME`
+      is required here — `sanity undeploy` errors with "No application ID or
+      studio host provided" without it, even though nothing deploys with it
+      set anymore):
+      `SANITY_STUDIO_PROJECT_ID=<PRD_PROJECT_ID> SANITY_STUDIO_DATASET=production SANITY_STUDIO_HOSTNAME=valovinnikov-blog pnpm exec sanity undeploy`
+      (repeat for dev with `<DEV_PROJECT_ID>` / `development` /
+      `valovinnikov-blog-dev`). This removes the `*.sanity.studio` hosted
+      deployment; the Studio itself (project, dataset, content) is untouched —
+      only the old hosting target goes away.
+- [ ] Remove the two old CORS origins (previous checklist item).
+- [ ] Revoke any leftover `ci-deploy` Sanity token (§1) if one still exists —
+      nothing uses it anymore.
 
 ### 7. Local dev configuration
 
@@ -256,11 +315,11 @@ or before checks):
    deploy that depends on it); both deploy jobs `needs: [changes, verify,
 migrate]`. No artifact backup here — dev is the disposable staging line
    (see "Refreshing development from production" below for the manual
-   post-migration refresh); the job is guarded on `SANITY_DEPLOY_TOKEN`,
+   post-migration refresh); the job is guarded on `SANITY_MIGRATE_TOKEN`,
    so it's inert until that secret exists. **No approval gate on dev** (unlike
    prod) — dev auto-migrates.
-4. **`deploy-studio`** → `valovinnikov-blog-dev.sanity.studio` (development
-   dataset).
+4. **`deploy-studio`** → `cms-dev` via the Vercel CLI (`studio-dev.valstack.dev`),
+   same mechanism as `deploy-web`.
 5. **`deploy-web`** → `blog-dev` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
 
@@ -292,9 +351,10 @@ There are **no PR preview deployments** — deploys happen only on merge to `mai
    mutation, then runs `migrate:deploy --yes` to apply only the un-applied
    content migrations (dry → run → record in the `migrationState` ledger,
    idempotent). The `production` environment's required reviewer is the human
-   approval gate. Every step is guarded on `SANITY_DEPLOY_TOKEN`, so the job is a
+   approval gate. Every step is guarded on `SANITY_MIGRATE_TOKEN`, so the job is a
    **no-op until that secret is configured** — safe to ship ahead of setup.
-3. **`deploy-studio`** → `valovinnikov-blog.sanity.studio` (production dataset).
+3. **`deploy-studio`** → `cms-prod` via the Vercel CLI (`studio.valstack.dev`),
+   same mechanism as `deploy-web`.
 4. **`deploy-web`** → `blog-prod` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
 
