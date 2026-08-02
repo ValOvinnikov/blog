@@ -65,7 +65,8 @@
         "$TURBO_ROOT$/configs/tailwind/*.ts",
         "$TURBO_ROOT$/configs/tailwind/*.css"
       ],
-      "outputs": ["storybook-static/**"]
+      "outputs": ["storybook-static/**"],
+      "passThroughEnv": ["SKIP_ENV_VALIDATION"]
     }
   }
 }
