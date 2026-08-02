@@ -1,6 +1,6 @@
-import type { ILocalizedParams } from '@blog/config';
+import { ICONS, type ILocalizedParams, routes, Size } from '@blog/config';
 import { service } from '@blog/service';
-import { NavLink } from '@blog/ui/atoms';
+import { Icon, NavLink } from '@blog/ui/atoms';
 import { Footer, Header } from '@blog/ui/organisms';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { SiteNavigation } from '@web/components/shared/site-navigation';
@@ -16,6 +16,7 @@ import {
   getMessages,
   getNow,
   getTimeZone,
+  getTranslations,
   setRequestLocale,
 } from 'next-intl/server';
 
@@ -80,7 +81,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
 
   setRequestLocale(locale);
 
-  const [settingsResult, navResult, footerResult, messages, now, timeZone] =
+  const [settingsResult, navResult, footerResult, messages, now, timeZone, t] =
     await Promise.all([
       service.global.siteSettings.v1.getSiteSettings(),
       service.global.navigation.v1.getNavigation(),
@@ -88,6 +89,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
       getMessages(),
       getNow(),
       getTimeZone(),
+      getTranslations('rss'),
     ]);
 
   if (!settingsResult.ok) {
@@ -141,6 +143,14 @@ export default async function LocaleLayout({ children, params }: TProps) {
                 {link.label}
               </NavLink>
             ))}
+            <NavLink
+              as={SmartLink}
+              href={routes.rssFeed()}
+              icon={<Icon name={ICONS.RSS} size={Size.SM} />}
+              hideLabel
+            >
+              {t('feedLinkLabel')}
+            </NavLink>
           </Footer.Nav>
         </Footer>
       </div>

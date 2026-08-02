@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { ICONS, LOCALE_ISO_CODES, routes } from '@blog/config';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
 
@@ -9,6 +9,7 @@ const {
   getMessagesMock,
   getNowMock,
   getTimeZoneMock,
+  getTranslationsMock,
   setRequestLocaleMock,
   isProductionEnvironmentMock,
 } = vi.hoisted(() => ({
@@ -18,6 +19,7 @@ const {
   getMessagesMock: vi.fn(),
   getNowMock: vi.fn(),
   getTimeZoneMock: vi.fn(),
+  getTranslationsMock: vi.fn(),
   setRequestLocaleMock: vi.fn(),
   isProductionEnvironmentMock: vi.fn(),
 }));
@@ -36,10 +38,15 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
+const rssTranslations: Record<string, string> = {
+  feedLinkLabel: 'RSS feed',
+};
+
 vi.mock('next-intl/server', () => ({
   getMessages: getMessagesMock,
   getNow: getNowMock,
   getTimeZone: getTimeZoneMock,
+  getTranslations: getTranslationsMock,
   setRequestLocale: setRequestLocaleMock,
 }));
 
@@ -63,6 +70,9 @@ describe('LocaleLayout', () => {
     getMessagesMock.mockResolvedValue(messages);
     getNowMock.mockResolvedValue(now);
     getTimeZoneMock.mockResolvedValue('UTC');
+    getTranslationsMock.mockResolvedValue(
+      (key: string) => rssTranslations[key] ?? key,
+    );
     isProductionEnvironmentMock.mockReturnValue(true);
   });
 
@@ -133,5 +143,22 @@ describe('LocaleLayout', () => {
     expect(ui.props.messages).toBe(messages);
     expect(ui.props.now).toBe(now);
     expect(ui.props.timeZone).toBe('UTC');
+  });
+
+  it('adds a visible RSS feed link to the footer nav', async () => {
+    const ui = await LocaleLayout({
+      children: <div>content</div>,
+      params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
+    });
+
+    const [, , footer] = ui.props.children.props.children;
+    const [, footerNav] = footer.props.children;
+    const footerNavLinks = footerNav.props.children;
+    const rssLink = footerNavLinks[footerNavLinks.length - 1];
+
+    expect(rssLink.props.href).toBe(routes.rssFeed());
+    expect(rssLink.props.hideLabel).toBe(true);
+    expect(rssLink.props.children).toBe('RSS feed');
+    expect(rssLink.props.icon.props.name).toBe(ICONS.RSS);
   });
 });
