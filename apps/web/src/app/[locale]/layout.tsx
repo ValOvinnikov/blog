@@ -9,6 +9,7 @@ import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { routing } from '@web/i18n/routing';
 import { env } from '@web/utils/env/env';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
+import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
@@ -133,16 +134,30 @@ export default async function LocaleLayout({ children, params }: TProps) {
         <Footer>
           <Footer.Copyright title={brand.name} />
           <Footer.Nav>
-            {social.map((link) => (
-              <NavLink
-                key={link.href}
-                as={SmartLink}
-                href={link.href}
-                target={link.target}
-              >
-                {link.label}
-              </NavLink>
-            ))}
+            {social.map((link) => {
+              // `link.platform` is optional and free-form beyond the
+              // `SOCIAL_PLATFORMS` enum's known icon set — an unmapped
+              // platform falls back to the original label-only rendering
+              // (no `icon`/`hideLabel`) rather than hiding the link.
+              const iconName = link.platform && toSocialIconName(link.platform);
+
+              return (
+                <NavLink
+                  key={link.href}
+                  as={SmartLink}
+                  href={link.href}
+                  target={link.target}
+                  icon={
+                    iconName ? (
+                      <Icon name={iconName} size={Size.SM} />
+                    ) : undefined
+                  }
+                  hideLabel={Boolean(iconName)}
+                >
+                  {link.label}
+                </NavLink>
+              );
+            })}
             <NavLink
               as={SmartLink}
               href={routes.rssFeed()}
