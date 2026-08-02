@@ -41,6 +41,65 @@ describe(`<${NavLink.name}/>`, () => {
     );
   });
 
+  it('renders an icon alongside the visible label', () => {
+    setup({
+      icon: <svg data-testid="nav-icon" />,
+      children: 'RSS feed',
+    });
+
+    expect(screen.getByTestId('nav-icon')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'RSS feed' })).toBeVisible();
+  });
+
+  it('keeps the label as the accessible name when hideLabel is set', () => {
+    setup({
+      icon: <svg data-testid="nav-icon" />,
+      hideLabel: true,
+      children: 'RSS feed',
+    });
+
+    expect(screen.getByTestId('nav-icon')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'RSS feed' })).toBeVisible();
+  });
+
+  it('visually hides the label text when hideLabel is set', () => {
+    setup({ hideLabel: true, children: 'RSS feed' });
+
+    // `sr-only` is the sole observable that the label text is kept for
+    // accessibility rather than shown alongside the icon.
+    expect(screen.getByText('RSS feed')).toHaveClass('sr-only');
+  });
+
+  it('renders the label without a wrapper when hideLabel is not set', () => {
+    setup({ children: 'RSS feed' });
+
+    // `sr-only` is the sole observable here: jsdom doesn't apply real layout,
+    // so there's no other way to assert the label renders as plain visible
+    // text rather than wrapped in the visually-hidden span.
+    expect(screen.getByText('RSS feed')).not.toHaveClass('sr-only');
+  });
+
+  it('sets a title attribute on an icon-only link for sighted hover users', () => {
+    setup({
+      icon: <svg data-testid="nav-icon" />,
+      hideLabel: true,
+      children: 'RSS feed',
+    });
+
+    expect(screen.getByRole('link', { name: 'RSS feed' })).toHaveAttribute(
+      'title',
+      'RSS feed',
+    );
+  });
+
+  it('omits the title attribute when hideLabel is not set', () => {
+    setup({ children: 'RSS feed' });
+
+    expect(screen.getByRole('link', { name: 'RSS feed' })).not.toHaveAttribute(
+      'title',
+    );
+  });
+
   it('renders with a custom component when `as` prop is provided', () => {
     const CustomLink = ({
       href,

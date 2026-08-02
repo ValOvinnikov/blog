@@ -1,3 +1,5 @@
+import { ICONS, Size } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { NavLink } from './nav-link';
@@ -25,4 +27,19 @@ export const Active: TStory = {
 
 export const Inactive: TStory = {
   args: { isActive: false, children: 'Inactive link' },
+};
+
+export const WithIcon: TStory = {
+  args: {
+    children: 'RSS feed',
+    icon: <Icon name={ICONS.RSS} size={Size.SM} />,
+  },
+};
+
+export const IconOnly: TStory = {
+  args: {
+    children: 'RSS feed',
+    icon: <Icon name={ICONS.RSS} size={Size.SM} />,
+    hideLabel: true,
+  },
 };

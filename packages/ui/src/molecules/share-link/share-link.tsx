@@ -1,12 +1,12 @@
 import { type IWithDataTestId, Size } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
+import type { IWithIcon } from '@blog/ui/lib/react';
 import { LinkButton } from '@blog/ui/molecules/link-button';
-import type { ElementType, ReactNode } from 'react';
+import type { ElementType } from 'react';
 
-export interface IShareLinkItem {
+export interface IShareLinkItem extends IWithIcon {
   href: string;
   label: string;
-  icon?: ReactNode;
 }
 
 export interface IShareLinkProps extends IShareLinkItem, IWithDataTestId {
