@@ -81,6 +81,18 @@ describe(`<${PostsSection.name}/>`, () => {
     expect(screen.getByTestId('latest-posts-section')).toBeVisible();
   });
 
+  it('renders each post category lowercased in the footer', () => {
+    setup();
+
+    for (const post of posts) {
+      expect(
+        screen.getByText(post.category.title.toLowerCase(), {
+          exact: false,
+        }),
+      ).toBeVisible();
+    }
+  });
+
   it('renders readingTime when provided on a post', () => {
     const readingTime = `${faker.number.int({ min: 3, max: 15 })} min`;
     const postsWithReadingTime = posts.map((post, index) =>

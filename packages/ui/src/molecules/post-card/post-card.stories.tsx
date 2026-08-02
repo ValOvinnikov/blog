@@ -23,19 +23,13 @@ const meta = {
           dateValue="2024-03-10"
           dateLabel="March 10, 2024"
           readingTime="9 min"
-          category="design-system"
         />
         <PostCard.Title>
           <a href="/posts/building-a-design-system">
             Building a Design System from Scratch
           </a>
         </PostCard.Title>
-        <PostCard.Footer
-          publishedAt="2024-03-10T09:00:00Z"
-          formattedDate="March 10, 2024"
-          authorName="Jane Doe"
-          authorAvatarSrc="https://i.pravatar.cc/150?img=1"
-        />
+        <PostCard.Footer category="design-system" />
       </>
     ),
   },
@@ -66,7 +60,6 @@ export const WithoutFooter: TStory = {
           dateValue="2024-03-10"
           dateLabel="March 10, 2024"
           readingTime="9 min"
-          category="design-system"
         />
         <PostCard.Title>
           <a href="/posts/building-a-design-system">
@@ -88,9 +81,26 @@ export const WithTags: TStory = {
         <PostCard.Title>
           <a href="/posts/typescript-tips">TypeScript Tips for 2024</a>
         </PostCard.Title>
+        <PostCard.Footer category="typescript" />
+      </>
+    ),
+  },
+};
+
+export const WithAuthorFooter: TStory = {
+  args: {
+    children: (
+      <>
+        <PostCard.Title>
+          <a href="/posts/building-a-design-system">
+            Building a Design System from Scratch
+          </a>
+        </PostCard.Title>
         <PostCard.Footer
-          publishedAt="2024-06-01T00:00:00Z"
-          formattedDate="June 1, 2024"
+          publishedAt="2024-03-10T09:00:00Z"
+          formattedDate="March 10, 2024"
+          authorName="Jane Doe"
+          authorAvatarSrc="https://i.pravatar.cc/150?img=1"
         />
       </>
     ),

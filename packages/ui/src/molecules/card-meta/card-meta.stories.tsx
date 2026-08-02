@@ -18,7 +18,6 @@ const meta = {
   args: {
     dateValue,
     dateLabel,
-    category: faker.lorem.word(),
   },
 } satisfies Meta<typeof CardMeta>;
 
