@@ -12,12 +12,10 @@ const dateLabel = faker.date.past().toLocaleDateString('en-GB', {
   day: 'numeric',
 });
 const readingTime = `${faker.number.int({ min: 3, max: 15 })} min`;
-const category = faker.lorem.word();
 
 const setup = customRender(CardMeta, {
   dateValue,
   dateLabel,
-  category,
 });
 
 describe(`<${CardMeta.name}/>`, () => {
@@ -34,21 +32,21 @@ describe(`<${CardMeta.name}/>`, () => {
     expect(screen.getByText(readingTime)).toBeVisible();
   });
 
-  it('omits readingTime segment and its separator when not provided — only one aria-hidden separator', () => {
+  it('omits readingTime segment and its separator when not provided — only the decorative chevron is aria-hidden', () => {
     const { container } = setup();
-    const separators = container.querySelectorAll('[aria-hidden="true"]');
-    expect(separators).toHaveLength(1);
+    const hidden = container.querySelectorAll('[aria-hidden="true"]');
+    expect(hidden).toHaveLength(1);
   });
 
-  it('renders two separators when readingTime is provided', () => {
+  it('renders the chevron and separator as aria-hidden when readingTime is provided', () => {
     const { container } = setup({ readingTime });
-    const separators = container.querySelectorAll('[aria-hidden="true"]');
-    expect(separators).toHaveLength(2);
+    const hidden = container.querySelectorAll('[aria-hidden="true"]');
+    expect(hidden).toHaveLength(2);
   });
 
-  it('renders category in uppercase', () => {
+  it('renders a decorative chevron before the date', () => {
     setup();
-    expect(screen.getByText(category.toUpperCase())).toBeVisible();
+    expect(screen.getByText('❯')).toBeVisible();
   });
 
   it('forwards dataTestId to root element', () => {

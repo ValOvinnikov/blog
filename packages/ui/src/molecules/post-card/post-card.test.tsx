@@ -121,14 +121,30 @@ describe(`<${PostCard.name}/>`, () => {
   it('renders PostCard.Meta content', () => {
     renderElement(
       <PostCard>
-        <PostCard.Meta
-          dateValue="2024-01-01"
-          dateLabel="Jan 1, 2024"
-          category="design"
-        />
+        <PostCard.Meta dateValue="2024-01-01" dateLabel="Jan 1, 2024" />
       </PostCard>,
     );
     expect(screen.getByText('Jan 1, 2024')).toBeVisible();
+  });
+
+  it('renders the category lowercased with a trailing decorative arrow via PostCard.Footer', () => {
+    renderElement(
+      <PostCard>
+        <PostCard.Footer category="Design Systems" />
+      </PostCard>,
+    );
+    expect(screen.getByText(/design systems/)).toBeVisible();
+    const arrow = screen.getByText('→');
+    expect(arrow).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('does not render category text when omitted from PostCard.Footer', () => {
+    renderElement(
+      <PostCard>
+        <PostCard.Footer authorName="Jane Doe" />
+      </PostCard>,
+    );
+    expect(screen.queryByText('→')).not.toBeInTheDocument();
   });
 
   it('forwards data-testid to root element', () => {

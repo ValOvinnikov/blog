@@ -74,13 +74,13 @@ export const PostsSection = ({
                 dateValue={post.publishedAt}
                 dateLabel={post.formattedDate}
                 readingTime={post.readingTime}
-                category={post.category.title}
               />
               <PostCard.Title>
                 <Component href={post.href} className={s.titleLink()}>
                   {post.title}
                 </Component>
               </PostCard.Title>
+              <PostCard.Footer category={post.category.title} />
             </PostCard>
           ))}
         </div>

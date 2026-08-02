@@ -12,17 +12,22 @@ export interface IPostCardFooterProps extends Omit<
   authorAvatarSrc?: string;
   publishedAt?: string;
   formattedDate?: string;
+  /** Post category, rendered lowercased with a trailing decorative arrow. */
+  category?: string;
 }
+
+const s = postCardFooterVariants();
 
 export const PostCardFooter = ({
   authorName,
   authorAvatarSrc,
   publishedAt,
   formattedDate,
+  category,
   className,
   ...rest
 }: IPostCardFooterProps) => (
-  <div className={postCardFooterVariants({ class: className })} {...rest}>
+  <div className={s.root({ class: className })} {...rest}>
     {authorName && (
       <Avatar
         name={authorName}
@@ -34,6 +39,11 @@ export const PostCardFooter = ({
     {authorName && <span>{authorName}</span>}
     {publishedAt && formattedDate && (
       <time dateTime={publishedAt}>{formattedDate}</time>
+    )}
+    {category && (
+      <span className={s.category()}>
+        {category.toLowerCase()} <span aria-hidden="true">→</span>
+      </span>
     )}
   </div>
 );

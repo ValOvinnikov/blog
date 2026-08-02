@@ -10,8 +10,6 @@ export interface ICardMetaProps extends IWithDataTestId {
   dateLabel: string;
   /** Optional reading time (e.g. "9 min"). Omitting hides the segment and its separator. */
   readingTime?: string;
-  /** Post category displayed in uppercase accent colour. */
-  category: string;
   className?: string;
 }
 
@@ -19,17 +17,19 @@ const s = cardMetaVariants();
 
 /**
  * CardMeta — compact metadata row for post cards.
- * Renders: date [· readingTime] · CATEGORY
+ * Renders: ❯ date [· readingTime]
  */
 export const CardMeta = ({
   dateValue,
   dateLabel,
   readingTime,
-  category,
   className,
   dataTestId,
 }: ICardMetaProps) => (
   <div className={s.root({ class: className })} data-testid={dataTestId}>
+    <span className={s.chevron()} aria-hidden="true">
+      ❯
+    </span>
     <time dateTime={dateValue}>{dateLabel}</time>
     {readingTime && (
       <>
@@ -37,7 +37,5 @@ export const CardMeta = ({
         <span>{readingTime}</span>
       </>
     )}
-    <MetaSeparator />
-    <span className={s.category()}>{category.toUpperCase()}</span>
   </div>
 );
