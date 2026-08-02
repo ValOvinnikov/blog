@@ -1,10 +1,10 @@
-import type { ImageWithAlt } from '@blog/config';
+import type { BodyImage } from '@blog/config';
 
 import { toPortableTextImage } from './to-portable-text-image';
 
-function makeBlock(overrides: Partial<ImageWithAlt> = {}): ImageWithAlt {
+function makeBlock(overrides: Partial<BodyImage> = {}): BodyImage {
   return {
-    _type: 'imageWithAlt',
+    _type: 'bodyImage',
     asset: { _ref: 'image-abc123-800x600-jpg', _type: 'reference' },
     alt: 'A scenic mountain range',
     ...overrides,

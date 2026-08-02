@@ -130,8 +130,8 @@ no faked defaults), the module-registry mechanism, and the editorial write path:
 
 Source of truth: `apps/cms/src/schema-types/` — documents (`post`, `author`,
 `category`, `tag`, page documents, singletons), standalone `module_*`
-page-builder documents, and shared objects (`link`, `imageWithAlt`, `seo`,
-`aside`, `skim`, …). Naming convention `{group}_{name}` is being applied
+page-builder documents, and shared objects (`link`, `imageWithAlt`, `bodyImage`,
+`seo`, `aside`, `skim`, …). Naming convention `{group}_{name}` is being applied
 incrementally (#251).
 
 Full schema reference (every document/object, field-by-field), naming and

@@ -1,8 +1,8 @@
 import {
   ASIDE_KIND,
   type Aside as TAsideBlock,
+  type BodyImage,
   type Code,
-  type ImageWithAlt,
   type RichText as TPortableText,
   type TAsideKind,
 } from '@blog/config';
@@ -13,6 +13,7 @@ import {
   ProseLink,
   QuoteBlock,
 } from '@blog/ui/atoms';
+import { ImageWithCaption } from '@blog/ui/molecules';
 import {
   PortableText,
   type PortableTextBlockComponent,
@@ -97,7 +98,8 @@ const headingBlockComponents = (
  * PortableTextRenderer — web-owned bridge from a Sanity Portable Text field
  * to rendered markup, via `@portabletext/react`. Maps block styles and marks
  * to `@blog/ui` atoms, a `code` block to a syntax-highlighted `CodeBlock`,
- * and an `imageWithAlt` block to `SanityImage`, keeping `@blog/ui` itself
+ * and a `bodyImage` block to `SanityImage` wrapped in `ImageWithCaption`
+ * (carrying the editor-chosen `layout`), keeping `@blog/ui` itself
  * Sanity-free. Optionally stamps `h2`/`h3` headings with stable anchor ids
  * via `headings`, for use with `PostContentsRail`.
  *
@@ -163,20 +165,22 @@ export const PortableTextRenderer = ({
           highlightedLines={codeValue.highlightedLines}
         />
       ),
-      imageWithAlt: ({ value: imageValue }: { value: ImageWithAlt }) => {
+      bodyImage: ({ value: imageValue }: { value: BodyImage }) => {
         const image = toPortableTextImage(imageValue);
         if (!image) return null;
 
         return (
-          <SanityImage
-            image={image}
-            projectId={env.NEXT_PUBLIC_SANITY_PROJECT_ID}
-            dataset={env.NEXT_PUBLIC_SANITY_DATASET}
-            width={1200}
-            sizes="(min-width: 1024px) 800px, 100vw"
-            loading="lazy"
-            className={s.image()}
-          />
+          <ImageWithCaption layout={imageValue.layout}>
+            <SanityImage
+              image={image}
+              projectId={env.NEXT_PUBLIC_SANITY_PROJECT_ID}
+              dataset={env.NEXT_PUBLIC_SANITY_DATASET}
+              width={1200}
+              sizes="(min-width: 1024px) 800px, 100vw"
+              loading="lazy"
+              className={s.image()}
+            />
+          </ImageWithCaption>
         );
       },
       // Unknown/missing `kind` renders as CONTEXT — forward-compat with a

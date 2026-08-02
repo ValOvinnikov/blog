@@ -10,8 +10,33 @@ import {
   type TRichTextBlock,
 } from '@web/testing/shared/portable-text-renderer/fixtures';
 import { extractPostHeadings } from '@web/utils/extract-post-headings/extract-post-headings';
+import type { ReactNode } from 'react';
 
 import { PortableTextRenderer } from './portable-text-renderer';
+
+// Only `ImageWithCaption` is faked (the renderer also pulls `Aside` from
+// `@blog/ui/molecules` via `DeepAside`, so this must stay a partial mock).
+// Faking it keeps the `layout` pass-through assertion behavioural (a
+// `data-layout` attribute) rather than a CSS-class assertion on the real
+// component's `tv()` output.
+vi.mock('@blog/ui/molecules', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@blog/ui/molecules')>();
+
+  return {
+    ...actual,
+    ImageWithCaption: ({
+      layout,
+      children,
+    }: {
+      layout?: string;
+      children?: ReactNode;
+    }) => (
+      <div data-testid="image-with-caption" data-layout={layout}>
+        {children}
+      </div>
+    ),
+  };
+});
 
 const setup = customRender(PortableTextRenderer, {
   value: [],
@@ -270,14 +295,9 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     );
   });
 
-  // TODO(#1021): body-content images moved from `imageWithAlt` to the
-  // dedicated `bodyImage` type, but the renderer doesn't register a
-  // `bodyImage` block component yet — @portabletext/react falls back to its
-  // own hidden "unknown block type" element, so a `bodyImage` block renders
-  // no `img`, regardless of whether it has an asset reference. Once #1021
-  // wires up a `bodyImage` component, restore assertions that it renders as
-  // an `img` with the CMS alt text (and a no-asset case rendering nothing).
-  it('renders nothing for a bodyImage block, since the renderer has no bodyImage component registered yet', () => {
+  it('renders a bodyImage block as an img with the CMS alt text, no unknown-block warning', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
     const value: RichText = [
       {
         _type: 'bodyImage',
@@ -290,9 +310,74 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       },
     ];
 
+    setup({ value });
+
+    const img = screen.getByRole('img', { name: 'A scenic mountain range' });
+    expect(img).toHaveAttribute(
+      'src',
+      expect.stringContaining('https://cdn.sanity.io'),
+    );
+    expect(warnSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining('Unknown block type'),
+    );
+
+    warnSpy.mockRestore();
+  });
+
+  it('renders nothing for a bodyImage block with no asset reference', () => {
+    const value: RichText = [
+      {
+        _type: 'bodyImage',
+        _key: 'image-1',
+        alt: 'Missing asset',
+      },
+    ];
+
     const { container } = setup({ value });
 
     expect(container.querySelector('img')).not.toBeInTheDocument();
+  });
+
+  it("passes the block's chosen layout through to ImageWithCaption", () => {
+    const value: RichText = [
+      {
+        _type: 'bodyImage',
+        _key: 'image-1',
+        asset: {
+          _ref: 'image-abc123-800x600-jpg',
+          _type: 'reference',
+        },
+        alt: 'A scenic mountain range',
+        layout: 'FLOAT_LEFT',
+      },
+    ];
+
+    setup({ value });
+
+    expect(screen.getByTestId('image-with-caption')).toHaveAttribute(
+      'data-layout',
+      'FLOAT_LEFT',
+    );
+  });
+
+  it('passes no layout through when the block has none set, leaving the INLINE default to ImageWithCaption', () => {
+    const value: RichText = [
+      {
+        _type: 'bodyImage',
+        _key: 'image-1',
+        asset: {
+          _ref: 'image-abc123-800x600-jpg',
+          _type: 'reference',
+        },
+        alt: 'A scenic mountain range',
+      },
+    ];
+
+    setup({ value });
+
+    expect(screen.getByTestId('image-with-caption')).not.toHaveAttribute(
+      'data-layout',
+    );
   });
 
   it('renders an aside block as a DeepAside, with its body rendered through the same block components (visibility gating is pure CSS — no unit-test surface, see deep-aside.test.tsx)', () => {
