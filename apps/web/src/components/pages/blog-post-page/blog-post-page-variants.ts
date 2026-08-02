@@ -13,10 +13,17 @@ export const blogPostPageVariants = tv({
       'mt-8',
       'group-data-[depth=SKIM]/depth:hidden',
     ],
-    // Caps its own measure — nesting under an already max-w-measure'd `body`
-    // double-shrinks it via body's own `px-gutter`. `lg:mx-0` keeps it
-    // flush-left once the grid column is narrower than the measure.
-    content: ['mx-auto max-w-measure', 'lg:col-start-2 lg:row-start-1 lg:mx-0'],
+    // The breakout-safe column — fills whatever width its own container
+    // makes available (`body`'s own measure/page cap below `lg:`, or the
+    // grid's column-2 track at `lg:` once `withRail` is true), with no
+    // measure cap of its own. `PortableTextRenderer`'s own `Prose` root owns
+    // the reading-measure cap now (nested inside this box, around each text
+    // run), so a `FULL_BLEED` image — rendered as `Prose`'s sibling, not its
+    // child — can fill this box's full width outright. See the `withRail`
+    // variant below for the `--container-page` override that bounds a
+    // `FULL_BLEED` image to this column's own rendered width once there's a
+    // rail beside it (rather than the page-wide breakout it gets without one).
+    content: ['w-full', 'lg:col-start-2 lg:row-start-1'],
     // Spans both grid rows so its sticky containing block reaches the
     // footer row. Mirrors `content`'s own measure below `lg:`;
     // `lg:max-w-none` frees the fixed 220px track once it's a real rail.
@@ -40,12 +47,32 @@ export const blogPostPageVariants = tv({
     depthToggle: ['mx-auto w-full max-w-page px-gutter', 'mb-6'],
   },
   variants: {
-    // No `max-w-measure` on `body` itself: `content`/`rail`/`footerInRail`
-    // each cap their own width now, so `body` stays an unconstrained column
-    // below `lg:` and becomes the two-column grid at `lg:` and up.
+    // No `max-w-measure` on `body` itself: `rail`/`footerInRail` cap their
+    // own width, and `content` now stays deliberately uncapped (see its own
+    // comment above) — so `body` stays an unconstrained column below `lg:`
+    // and becomes the two-column grid at `lg:` and up.
     withRail: {
       true: {
         body: ['lg:max-w-page', 'lg:grid lg:grid-cols-[220px_1fr] lg:gap-x-10'],
+        // Scopes `ImageWithCaption`'s `FULL_BLEED` breakout math (`min(100vw,
+        // var(--container-page))`, in `image-with-caption-variants.ts`) to
+        // this column's own rendered width instead of the site-wide page
+        // cap: with a rail, the safe width to breakout to is column 2's
+        // `1fr` track, which is *narrower* than `max-w-page` by the rail's
+        // own 220px + the grid's `gap-x-10` — reusing the page-wide value
+        // here would still bleed a `FULL_BLEED` image left into the rail.
+        // `100%` resolves against `content`'s own width at the point
+        // `ImageWithCaption`'s figure actually consumes it (its own
+        // `width`/`margin` percentages share that same basis, since the
+        // figure is `content`'s direct child once `segmentPortableTextBody`
+        // pulls a `FULL_BLEED` image out of the measure-capped `Prose` run)
+        // — so the existing breakout formula ends up computing `width:
+        // content`'s own width, filling column 2 exactly, no overlap.
+        // Unprefixed (not `lg:`-scoped) would also cap mobile's already-
+        // correct edge-to-edge breakout down to the (narrower, gutter-
+        // bound) mobile `content` width — scoping to `lg:` keeps that intact,
+        // since the grid (and thus the rail) only exists at `lg:` and up.
+        content: ['lg:[--container-page:100%]'],
       },
       false: {
         body: ['max-w-measure'],

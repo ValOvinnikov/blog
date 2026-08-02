@@ -191,7 +191,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
               {hasContentsRail ? (
                 <>
                   <PostContentsRail className={s.rail()} headings={headings} />
-                  <div className={s.content()}>
+                  <div className={s.content({ withRail: true })}>
                     <PortableTextRenderer
                       value={body}
                       headings={headings}

@@ -25,7 +25,9 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { env } from '@web/utils/env/env';
 import type { TPostHeading } from '@web/utils/extract-post-headings/extract-post-headings';
+import { segmentPortableTextBody } from '@web/utils/segment-portable-text-body';
 import { toPortableTextImage } from '@web/utils/to-portable-text-image';
+import { Fragment } from 'react';
 
 import { CodeBlock } from './code-block';
 import { portableTextRendererVariants } from './portable-text-renderer-variants';
@@ -116,6 +118,25 @@ export const PortableTextRenderer = ({
   headings,
   asideKindLabels,
 }: IPortableTextRendererProps) => {
+  const renderBodyImage = (imageValue: BodyImage) => {
+    const image = toPortableTextImage(imageValue);
+    if (!image) return null;
+
+    return (
+      <ImageWithCaption layout={imageValue.layout}>
+        <SanityImage
+          image={image}
+          projectId={env.NEXT_PUBLIC_SANITY_PROJECT_ID}
+          dataset={env.NEXT_PUBLIC_SANITY_DATASET}
+          width={1200}
+          sizes="(min-width: 1024px) 800px, 100vw"
+          loading="lazy"
+          className={s.image()}
+        />
+      </ImageWithCaption>
+    );
+  };
+
   const components: PortableTextComponents = {
     block: {
       normal: ({ children }) => <p>{children}</p>,
@@ -165,24 +186,8 @@ export const PortableTextRenderer = ({
           highlightedLines={codeValue.highlightedLines}
         />
       ),
-      bodyImage: ({ value: imageValue }: { value: BodyImage }) => {
-        const image = toPortableTextImage(imageValue);
-        if (!image) return null;
-
-        return (
-          <ImageWithCaption layout={imageValue.layout}>
-            <SanityImage
-              image={image}
-              projectId={env.NEXT_PUBLIC_SANITY_PROJECT_ID}
-              dataset={env.NEXT_PUBLIC_SANITY_DATASET}
-              width={1200}
-              sizes="(min-width: 1024px) 800px, 100vw"
-              loading="lazy"
-              className={s.image()}
-            />
-          </ImageWithCaption>
-        );
-      },
+      bodyImage: ({ value: imageValue }: { value: BodyImage }) =>
+        renderBodyImage(imageValue),
       // Unknown/missing `kind` renders as CONTEXT — forward-compat with a
       // future `ASIDE_KIND` value the renderer doesn't know about yet.
       aside: ({ value: asideValue }: { value: TAsideBlock }) => {
@@ -201,9 +206,40 @@ export const PortableTextRenderer = ({
     },
   };
 
+  const segments = segmentPortableTextBody(value);
+  const hasBreakout = segments.some((segment) => segment.kind === 'BREAKOUT');
+
+  // The common case (no `FULL_BLEED` image in the body): render exactly as
+  // before, a single `Prose` wrapping every block directly, in one call —
+  // `segmentPortableTextBody` collapses to one `PROSE` segment here too, but
+  // going through the original single-call shape (rather than the segment
+  // loop below) keeps this path's DOM identical, unconditionally.
+  if (!hasBreakout) {
+    return (
+      <Prose className={s.root()}>
+        <PortableText value={value} components={components} />
+      </Prose>
+    );
+  }
+
+  // At least one `FULL_BLEED` image: each `PROSE` run keeps its own
+  // `Prose` wrapper (reading-measure width), rendered as a sibling of the
+  // breakout image rather than nesting the image inside it — that's what
+  // lets the image fill the full "breakout-safe" width of `content`
+  // (`blog-post-page-variants.ts`) instead of being capped to the measure.
   return (
-    <Prose className={s.root()}>
-      <PortableText value={value} components={components} />
-    </Prose>
+    <div className={s.segments()}>
+      {segments.map((segment, index) =>
+        segment.kind === 'PROSE' ? (
+          <Prose key={`prose-${index}`} className={s.root()}>
+            <PortableText value={segment.blocks} components={components} />
+          </Prose>
+        ) : (
+          <Fragment key={segment.block._key}>
+            {renderBodyImage(segment.block)}
+          </Fragment>
+        ),
+      )}
+    </div>
   );
 };
