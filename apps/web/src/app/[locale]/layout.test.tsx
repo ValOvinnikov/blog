@@ -1,4 +1,9 @@
-import { ICONS, LOCALE_ISO_CODES, routes } from '@blog/config';
+import {
+  ICONS,
+  LOCALE_ISO_CODES,
+  routes,
+  SOCIAL_PLATFORMS,
+} from '@blog/config';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
 
@@ -160,5 +165,63 @@ describe('LocaleLayout', () => {
     expect(rssLink.props.hideLabel).toBe(true);
     expect(rssLink.props.children).toBe('RSS feed');
     expect(rssLink.props.icon.props.name).toBe(ICONS.RSS);
+  });
+
+  it('renders a mapped social link icon-only, keeping its label as the accessible name', async () => {
+    getFooterMock.mockResolvedValue({
+      ok: true,
+      data: {
+        social: [
+          {
+            label: 'LinkedIn',
+            href: 'https://www.linkedin.com/in/example',
+            target: '_blank',
+            platform: SOCIAL_PLATFORMS.LINKEDIN,
+          },
+        ],
+      },
+    });
+
+    const ui = await LocaleLayout({
+      children: <div>content</div>,
+      params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
+    });
+
+    const [, , footer] = ui.props.children.props.children;
+    const [, footerNav] = footer.props.children;
+    const [[socialLink]] = footerNav.props.children;
+
+    expect(socialLink.props.hideLabel).toBe(true);
+    expect(socialLink.props.children).toBe('LinkedIn');
+    expect(socialLink.props.icon.props.name).toBe(ICONS.LINKEDIN);
+  });
+
+  it('falls back to label-only rendering for a social link with an unmapped platform', async () => {
+    getFooterMock.mockResolvedValue({
+      ok: true,
+      data: {
+        social: [
+          {
+            label: 'Mastodon',
+            href: 'https://mastodon.social/@example',
+            target: '_blank',
+            platform: SOCIAL_PLATFORMS.MASTODON,
+          },
+        ],
+      },
+    });
+
+    const ui = await LocaleLayout({
+      children: <div>content</div>,
+      params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
+    });
+
+    const [, , footer] = ui.props.children.props.children;
+    const [, footerNav] = footer.props.children;
+    const [[socialLink]] = footerNav.props.children;
+
+    expect(socialLink.props.hideLabel).toBe(false);
+    expect(socialLink.props.icon).toBeUndefined();
+    expect(socialLink.props.children).toBe('Mastodon');
   });
 });
