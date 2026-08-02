@@ -218,7 +218,7 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
 | ----------------------- | --------------------------------- | ---------------------------------- |
 | Sanity project          | separate dev project (id via env) | separate prod project (id via env) |
 | Sanity dataset          | `development`                     | `production`                       |
-| Studio hostname         | `studio-dev.valstack.dev`         | `studio.valstack.dev`              |
+| Studio hostname         | `studio-dev{your_hosting}`        | `studio.{your-hosting}`            |
 | Vercel project (web)    | `blog-dev`                        | `blog-prod`                        |
 | Vercel project (studio) | `cms-dev`                         | `cms-prod`                         |
 | Deploy trigger          | push/merge to `main`              | push git tag `v*`                  |
@@ -237,6 +237,11 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   Actions, so there are no PR preview deploys and a `main` push can never
   reach production. The Studio is a static `sanity build` export served from
   its Vercel project — no `*.sanity.studio` hosting or `sanity deploy` anymore.
+- `@blog/ui`'s Storybook is hosted separately (`blog-storybook` Vercel
+  project, `ui-library.{your-hosting}`) via Vercel's Git integration with PR
+  previews — a deliberate exception to the CI-gated, no-preview pattern
+  above, since it carries no Sanity data or credentials. See
+  [`docs/DEPLOY.md`](./docs/DEPLOY.md)'s Storybook section.
 - Deploys are CI-gated behind a `verify` job (type-check/lint/test/build) on
   the exact commit being deployed; deploy steps no-op green until the
   one-time console setup ([`docs/DEPLOY.md`](./docs/DEPLOY.md)) provides their secret.

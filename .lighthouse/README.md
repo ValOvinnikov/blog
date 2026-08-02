@@ -45,7 +45,7 @@ on the next run.
 
 This job is **active**: the repo Variable `LIGHTHOUSE_URLS` (Settings →
 Secrets and variables → Actions → Variables) is set to two **production**
-URLs — `https://valstack.dev/` and one live post page.
+URLs — `https://{your-hosting}/` and one live post page.
 
 It was first activated (#399), pointed at the `development` deployment, since
 this repo has **no PR preview deploys for web** by design (Vercel's native Git
