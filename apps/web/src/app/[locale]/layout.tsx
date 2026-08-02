@@ -131,7 +131,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
           <SiteNavigation links={navItems} actions={<ThemeToggleButton />} />
         </Header>
         <div className={s.content()}>{children}</div>
-        <Footer>
+        <Footer dataTestId="site-footer">
           <Footer.Copyright title={brand.name} />
           <Footer.Nav>
             {social.map((link) => {
