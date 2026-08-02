@@ -46,6 +46,9 @@ describe('buildBlogListMetadata', () => {
     expect(metadata.openGraph?.images).toEqual([
       { url: 'https://cdn.example.com/blog-og.jpg' },
     ]);
+    expect(metadata.alternates?.types).toEqual({
+      'application/rss+xml': '/rss.xml',
+    });
   });
 
   it('builds page-N metadata with a "– Page N" suffix, self-canonical to /blog/page/N — never /blog', async () => {
@@ -68,6 +71,9 @@ describe('buildBlogListMetadata', () => {
     expect(metadata.twitter?.title).toBe('The Blog OG – Page 2');
     expect(metadata.alternates?.canonical).toBe('/blog/page/2');
     expect(metadata.alternates?.canonical).not.toBe('/blog');
+    expect(metadata.alternates?.types).toEqual({
+      'application/rss+xml': '/rss.xml',
+    });
   });
 
   it('returns empty metadata when the index page fetch fails', async () => {

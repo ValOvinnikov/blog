@@ -125,6 +125,25 @@ describe('toMetadata', () => {
       (metadata.openGraph as { authors?: string[] })?.authors,
     ).toBeUndefined();
   });
+
+  it('adds alternates.types["application/rss+xml"] when feedUrl is provided', () => {
+    const metadata = toMetadata(seo, {
+      canonical: '/blog',
+      ogType: 'website',
+      feedUrl: '/rss.xml',
+    });
+
+    expect(metadata.alternates?.types).toEqual({
+      'application/rss+xml': '/rss.xml',
+    });
+    expect(metadata.alternates?.canonical).toBe('/blog');
+  });
+
+  it('omits alternates.types when feedUrl is not provided', () => {
+    const metadata = toMetadata(seo, { canonical: '/blog', ogType: 'website' });
+
+    expect(metadata.alternates?.types).toBeUndefined();
+  });
 });
 
 describe('toMetadata output resolved by Next itself (regression for #490)', () => {
