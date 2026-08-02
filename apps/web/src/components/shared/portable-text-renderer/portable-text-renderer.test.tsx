@@ -380,6 +380,55 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     );
   });
 
+  it('renders a FULL_BLEED bodyImage as a sibling of the surrounding text, not nested inside the same wrapper as the text before/after it (#1070 — a FULL_BLEED image must be free of the text measure cap)', () => {
+    const value: RichText = [
+      richTextBlock('normal', [richTextSpan('Before the image.')]),
+      {
+        _type: 'bodyImage',
+        _key: 'image-1',
+        asset: { _ref: 'image-abc123-800x600-jpg', _type: 'reference' },
+        alt: 'A scenic mountain range',
+        layout: 'FULL_BLEED',
+      },
+      richTextBlock('normal', [richTextSpan('After the image.')]),
+    ];
+
+    setup({ value });
+
+    const image = screen.getByTestId('image-with-caption');
+    expect(image).toHaveAttribute('data-layout', 'FULL_BLEED');
+
+    const before = screen.getByText('Before the image.');
+    const after = screen.getByText('After the image.');
+
+    expect(image.parentElement).not.toBe(before.parentElement);
+    expect(image.parentElement).not.toBe(after.parentElement);
+    expect(before.parentElement).not.toBe(after.parentElement);
+  });
+
+  it('keeps every block a direct child of a single wrapper when the body has a non-FULL_BLEED bodyImage (INLINE/FLOAT_LEFT/FLOAT_RIGHT stay nested with the surrounding text, unaffected by the FULL_BLEED breakout split)', () => {
+    const value: RichText = [
+      richTextBlock('normal', [richTextSpan('Before the image.')]),
+      {
+        _type: 'bodyImage',
+        _key: 'image-1',
+        asset: { _ref: 'image-abc123-800x600-jpg', _type: 'reference' },
+        alt: 'A scenic mountain range',
+        layout: 'FLOAT_LEFT',
+      },
+      richTextBlock('normal', [richTextSpan('After the image.')]),
+    ];
+
+    setup({ value });
+
+    const image = screen.getByTestId('image-with-caption');
+    const before = screen.getByText('Before the image.');
+    const after = screen.getByText('After the image.');
+
+    expect(image.parentElement).toBe(before.parentElement);
+    expect(image.parentElement).toBe(after.parentElement);
+  });
+
   it('renders an aside block as a DeepAside, with its body rendered through the same block components (visibility gating is pure CSS — no unit-test surface, see deep-aside.test.tsx)', () => {
     const value: RichText = [
       {
