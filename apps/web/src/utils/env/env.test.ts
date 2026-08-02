@@ -4,6 +4,7 @@ const ENV_KEYS = [
   'SANITY_REVALIDATE_SECRET',
   'ANTHROPIC_API_KEY',
   'SANITY_GENERATE_SECRET',
+  'VERCEL_ANALYTICS_ENABLED',
   'NEXT_PUBLIC_SITE_URL',
   'NEXT_PUBLIC_SANITY_PROJECT_ID',
   'NEXT_PUBLIC_SANITY_DATASET',
@@ -94,6 +95,37 @@ describe('env', () => {
 
     expect(env.ANTHROPIC_API_KEY).toBeUndefined();
     expect(env.SANITY_GENERATE_SECRET).toBeUndefined();
+  });
+
+  it('leaves VERCEL_ANALYTICS_ENABLED undefined when absent (Analytics/SpeedInsights stay omitted)', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    delete process.env['VERCEL_ANALYTICS_ENABLED'];
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
+    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.VERCEL_ANALYTICS_ENABLED).toBeUndefined();
+  });
+
+  it('parses VERCEL_ANALYTICS_ENABLED when set to "true"', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    process.env['VERCEL_ANALYTICS_ENABLED'] = 'true';
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
+    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.VERCEL_ANALYTICS_ENABLED).toBe('true');
+  });
+
+  it('throws when VERCEL_ANALYTICS_ENABLED is set to an unrecognized value', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    process.env['VERCEL_ANALYTICS_ENABLED'] = 'yes';
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
+    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
+
+    await expect(importEnvOnServer()).rejects.toThrow();
   });
 
   it('throws when SANITY_REVALIDATE_SECRET is read on the client', async () => {

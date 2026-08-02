@@ -19,7 +19,8 @@
         "NEXT_PUBLIC_SITE_URL",
         "SANITY_REVALIDATE_SECRET",
         "ANTHROPIC_API_KEY",
-        "SANITY_GENERATE_SECRET"
+        "SANITY_GENERATE_SECRET",
+        "VERCEL_ANALYTICS_ENABLED"
       ],
       "passThroughEnv": ["SKIP_ENV_VALIDATION"]
     },
