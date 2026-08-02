@@ -52,4 +52,12 @@ describe('routes', () => {
     expect(routes.author('jane-doe', 2)).toBe('/author/jane-doe/page/2');
     expect(routes.author('jane-doe', 10)).toBe('/author/jane-doe/page/10');
   });
+
+  it('builds the site-wide RSS feed path', () => {
+    expect(routes.rssFeed()).toBe('/rss.xml');
+  });
+
+  it('builds a per-tag RSS feed path off the tag base path, regardless of page', () => {
+    expect(routes.tagRssFeed('typescript')).toBe('/tag/typescript/rss.xml');
+  });
 });

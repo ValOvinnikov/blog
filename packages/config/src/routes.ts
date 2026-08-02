@@ -20,4 +20,7 @@ export const routes = {
     page === 1 ? `/author/${slug}` : `/author/${slug}/page/${page}`,
   topics: () => '/topics',
   genericPage: (slug: string) => `/${slug}`,
+  rssFeed: () => '/rss.xml',
+  /** No pagination variant — always the tag's base path + `/rss.xml`. */
+  tagRssFeed: (slug: string) => `${routes.tag(slug)}/rss.xml`,
 } as const;

@@ -5,6 +5,8 @@ type TToMetadataOptions = {
   canonical: string;
   ogType: 'website' | 'article';
   titleAbsolute?: boolean;
+  /** RSS feed URL for this page's content scope (site-wide or per-tag). Omit when no feed covers this page. */
+  feedUrl?: string;
   article?: {
     publishedTime?: string;
     authors?: string[];
@@ -39,7 +41,7 @@ export function toMetadata(
   seo: TSeoResolved,
   opts: TToMetadataOptions,
 ): Metadata {
-  const { canonical, ogType, titleAbsolute, article } = opts;
+  const { canonical, ogType, titleAbsolute, feedUrl, article } = opts;
   const ogImages = seo.ogImageUrl
     ? [{ url: seo.ogImageUrl }]
     : [{ url: FALLBACK_OG_IMAGE_PATH }];
@@ -50,7 +52,10 @@ export function toMetadata(
   return {
     title: titleAbsolute ? { absolute: seo.title } : seo.title,
     description: seo.description,
-    alternates: { canonical },
+    alternates: {
+      canonical,
+      ...(feedUrl && { types: { 'application/rss+xml': feedUrl } }),
+    },
     openGraph: {
       title: seo.ogTitle,
       description: seo.ogDescription,

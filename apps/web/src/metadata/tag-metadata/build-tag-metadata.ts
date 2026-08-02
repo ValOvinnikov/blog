@@ -16,6 +16,10 @@ import { getTranslations } from 'next-intl/server';
  *
  * Reuses `getTagPage` (also called by `TagPage`) — Next dedupes the fetch
  * per request, so this adds no extra round-trip.
+ *
+ * Every page also advertises the tag's own RSS feed
+ * (`/tag/[slug]/rss.xml`) via `alternates.types['application/rss+xml']` —
+ * the same feed regardless of which page of the tag's post list is showing.
  */
 export async function buildTagMetadata(
   slug: string,
@@ -52,6 +56,7 @@ export async function buildTagMetadata(
     {
       canonical: routes.tag(slug, pageNumber),
       ogType: 'website',
+      feedUrl: routes.tagRssFeed(slug),
     },
   );
 }

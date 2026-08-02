@@ -43,6 +43,9 @@ describe('buildTagMetadata', () => {
     expect(metadata.title).toBe('TypeScript');
     expect(metadata.description).toBe('Posts about TypeScript.');
     expect(metadata.alternates?.canonical).toBe('/tag/typescript');
+    expect(metadata.alternates?.types).toEqual({
+      'application/rss+xml': '/tag/typescript/rss.xml',
+    });
     expect(metadata.openGraph?.title).toBe('TypeScript');
     expect(metadata.openGraph?.description).toBe('Posts about TypeScript.');
     expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
@@ -88,6 +91,9 @@ describe('buildTagMetadata', () => {
     expect(metadata.openGraph?.title).toBe('TypeScript – Page 2');
     expect(metadata.alternates?.canonical).toBe('/tag/typescript/page/2');
     expect(metadata.alternates?.canonical).not.toBe('/tag/typescript');
+    expect(metadata.alternates?.types).toEqual({
+      'application/rss+xml': '/tag/typescript/rss.xml',
+    });
     expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
       page: 2,
       itemsPerPage: 9,
