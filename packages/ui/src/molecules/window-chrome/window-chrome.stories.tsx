@@ -1,6 +1,20 @@
+import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { WindowChrome } from './window-chrome';
+
+faker.seed(123);
+
+const guestUsername = faker.internet.username();
+const accountUsername = faker.internet.username();
+const promptHost = faker.internet.domainWord();
+const accountFirstName = faker.person.firstName();
+const accountLastName = faker.person.lastName();
+const accountName = `${accountFirstName} ${accountLastName}`;
+const accountEmail = faker.internet.email({
+  firstName: accountFirstName,
+  lastName: accountLastName,
+});
 
 const meta = {
   title: 'Molecules/WindowChrome',
@@ -10,8 +24,8 @@ const meta = {
     children: (
       <>
         <WindowChrome.Bar>
-          <WindowChrome.User>guest</WindowChrome.User>
-          <WindowChrome.Prompt>@ovinnikov:~$</WindowChrome.Prompt> auth login
+          <WindowChrome.User>{guestUsername}</WindowChrome.User>
+          <WindowChrome.Prompt>@{promptHost}:~$</WindowChrome.Prompt> auth login
           <WindowChrome.Tag>popover</WindowChrome.Tag>
         </WindowChrome.Bar>
         <WindowChrome.Body>Choose a sign-in provider.</WindowChrome.Body>
@@ -30,13 +44,13 @@ export const LoggedInAccountMenu: TStory = {
     children: (
       <>
         <WindowChrome.Bar>
-          <WindowChrome.User>val</WindowChrome.User>
-          <WindowChrome.Prompt>@ovinnikov:~$</WindowChrome.Prompt> whoami
+          <WindowChrome.User>{accountUsername}</WindowChrome.User>
+          <WindowChrome.Prompt>@{promptHost}:~$</WindowChrome.Prompt> whoami
           <WindowChrome.Tag>menu</WindowChrome.Tag>
         </WindowChrome.Bar>
         <WindowChrome.Body>
-          <p>Val Ovinnikov</p>
-          <p>val@icloud.com</p>
+          <p>{accountName}</p>
+          <p>{accountEmail}</p>
         </WindowChrome.Body>
       </>
     ),
