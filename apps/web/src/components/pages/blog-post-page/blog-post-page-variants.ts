@@ -26,9 +26,16 @@ export const blogPostPageVariants = tv({
     content: ['w-full', 'lg:col-start-2 lg:row-start-1'],
     // Spans both grid rows so its sticky containing block reaches the
     // footer row. Mirrors `content`'s own measure below `lg:`;
-    // `lg:max-w-none` frees the fixed 220px track once it's a real rail.
+    // `lg:max-w-none` frees the fixed 220px track once it's a real rail (the
+    // font-size no longer matters there, since there's no `ch`-based cap left
+    // to compute). Below `lg:`, `rail` is `Prose`'s grid sibling in this
+    // layout (see `footerInRail`'s comment below for the full `ch`-unit
+    // reasoning) — `text-prose` is load-bearing here for the same reason:
+    // without it, `rail`'s own `max-w-measure` computes its `68ch` against
+    // the ambient 16px instead of `Prose`'s 17px, landing narrower and out of
+    // alignment with `Prose`'s left/right edges.
     rail: [
-      'mx-auto max-w-measure',
+      'mx-auto max-w-measure text-prose',
       'lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:mx-0 lg:max-w-none',
     ],
     // The content→footer vertical gap comes from `Article.Footer`'s own
@@ -44,13 +51,15 @@ export const blogPostPageVariants = tv({
     // sharing a left edge with `Prose` but not a right one. Matching
     // `text-prose` here makes both edges line up exactly.
     footerInRail: [
-      'mx-auto max-w-measure text-prose',
+      'mx-auto text-prose',
+      'max-w-measure',
       'lg:col-start-2 lg:row-start-2 lg:mx-0',
       'group-data-[depth=SKIM]/depth:hidden',
     ],
     footer: [
       'mx-auto w-full',
-      'max-w-measure px-gutter',
+      'px-gutter',
+      'max-w-measure',
       'group-data-[depth=SKIM]/depth:hidden',
     ],
     coverImage: ['size-full object-cover'],
