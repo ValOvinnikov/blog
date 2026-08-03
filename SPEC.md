@@ -82,7 +82,11 @@ reading, page canvas elevation) are documented in full in
 - **groqd** query builder in the service layer
 - **Neon Postgres + Drizzle ORM** (`packages/db`) — the non-Sanity relational
   store for the engagement layer (Auth.js, comments, ratings, bookmarks,
-  subscribers); scaffolding tracked in #984, see §4 and §15
+  subscribers); scaffolded in #984, see §4 and §15
+- **Auth.js v5** (`next-auth@beta` + `@auth/drizzle-adapter`) in `apps/web` —
+  GitHub, Google, and email-magic-link sign-in against `@blog/db`'s adapter
+  tables (database session strategy); the magic-link email and a shared
+  Resend "send email" helper live in `apps/web/src/server/` (#1107)
 - **Vitest + Testing Library**; **Storybook** in `packages/ui` and `apps/web`
 - **Turborepo + pnpm** workspaces; Node ≥ 20.19 (CI runs 22), pnpm 9.15
 
