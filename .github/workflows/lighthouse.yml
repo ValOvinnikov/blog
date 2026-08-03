@@ -4,7 +4,7 @@ name: Lighthouse CI
 # for `/` and one post page, on every PR. Thresholds live in
 # .lighthouse/budgets.json (documented in .lighthouse/README.md).
 #
-# LIGHTHOUSE_URLS points at PRODUCTION (https://valstack.dev), not a per-PR
+# LIGHTHOUSE_URLS points at PRODUCTION (https://{your-hosting}), not a per-PR
 # preview: this repo has no PR preview deploys for web by design (Vercel's
 # native Git auto-deploy is disabled — apps/web/vercel.json,
 # git.deploymentEnabled: false, #445/#446; see SPEC.md §13), and no per-PR

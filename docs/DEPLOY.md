@@ -30,7 +30,7 @@ Architecture rationale lives in `SPEC.md` §13 and
 | --------------------- | --------------------------------- | ---------------------------------- |
 | Sanity project        | separate dev project (id via env) | separate prod project (id via env) |
 | Sanity dataset        | `development`                     | `production`                       |
-| Studio hostname       | `studio-dev.valstack.dev`         | `studio.valstack.dev`              |
+| Studio hostname       | `studio-dev.{your-hosting}`       | `studio.{your-hosting}`            |
 | Vercel project (web)  | `blog-dev`                        | `blog-prod`                        |
 | Vercel project (cms)  | `cms-dev`                         | `cms-prod`                         |
 | Web URL (initial)     | `<DEV_WEB_URL>`                   | `<PRD_WEB_URL>`                    |
@@ -108,7 +108,7 @@ Two projects per environment now — a web project (unchanged) and a Studio
 project (new, replacing `*.sanity.studio` hosting):
 
 - **Web:** `blog-dev`, `blog-prod` — Add New → Project → import
-  `ValOvinnikov/blog`; **Root Directory `apps/web`** + tick _"Include files
+  `{github_account}/blog`; **Root Directory `apps/web`** + tick _"Include files
   outside of the root directory"_; **Node.js 22.x**.
 - **Studio:** `cms-dev`, `cms-prod` — same import flow; **Root Directory
   `apps/cms`** + tick _"Include files outside of the root directory"_;
@@ -140,14 +140,14 @@ linking + domains remain:
         `VERCEL_PROJECT_ID` from `.vercel/project.json` (`VERCEL_ORG_ID` is the
         same value already recorded for `blog-dev` — one Vercel account/team).
         (Then delete the local `.vercel/` dir.)
-  - [ ] Settings → Domains → add `studio-dev.valstack.dev`; add the DNS record
+  - [ ] Settings → Domains → add `studio-dev.{your-hosting}`; add the DNS record
         it shows you (CNAME to `cname.vercel-dns.com`, or per Vercel's
-        instructions) at whatever registrar/DNS host manages `valstack.dev`.
+        instructions) at whatever registrar/DNS host manages `{your-hosting}`.
 - [ ] **`cms-prod`**
   - [ ] From repo root: `npx vercel link` → select `cms-prod`. Read
         `VERCEL_PROJECT_ID` from `.vercel/project.json`.
         (Then delete the local `.vercel/` dir.)
-  - [ ] Settings → Domains → add `studio.valstack.dev`; add the DNS record it
+  - [ ] Settings → Domains → add `studio.{your-hosting}`; add the DNS record it
         shows you, same as above.
 
 #### Vercel env vars
@@ -254,8 +254,8 @@ Create **two** (the route `/api/revalidate` already exists):
 ### 6. Sanity — CORS origins · API → CORS origins
 
 - [ ] `http://localhost:3333` — credentials **on** (local Studio).
-- [ ] `https://studio-dev.valstack.dev` — credentials **on** (dev project).
-- [ ] `https://studio.valstack.dev` — credentials **on** (prod project).
+- [ ] `https://studio-dev.{your-hosting}` — credentials **on** (dev project).
+- [ ] `https://studio.{your-hosting}` — credentials **on** (prod project).
 - [ ] `https://<DEV_WEB_URL>` — credentials **off** (token reads).
 - [ ] `https://<PRD_WEB_URL>` — credentials **off**.
 - [ ] Remove the old `https://valovinnikov-blog-dev.sanity.studio` /
@@ -265,7 +265,7 @@ Create **two** (the route `/api/revalidate` already exists):
 
 ### 6a. Decommissioning the old `*.sanity.studio` Studio
 
-Once `studio.valstack.dev` / `studio-dev.valstack.dev` are live and verified
+Once `studio.{your-hosting}` / `studio-dev.{your-hosting}` are live and verified
 (Studio loads, signs in, and can read/write the correct dataset):
 
 - [ ] From `apps/cms`, with each project's env pointed at it (`SANITY_STUDIO_HOSTNAME`
@@ -318,7 +318,7 @@ migrate]`. No artifact backup here — dev is the disposable staging line
    post-migration refresh); the job is guarded on `SANITY_MIGRATE_TOKEN`,
    so it's inert until that secret exists. **No approval gate on dev** (unlike
    prod) — dev auto-migrates.
-4. **`deploy-studio`** → `cms-dev` via the Vercel CLI (`studio-dev.valstack.dev`),
+4. **`deploy-studio`** → `cms-dev` via the Vercel CLI (`studio-dev.{your-hosting}`),
    same mechanism as `deploy-web`.
 5. **`deploy-web`** → `blog-dev` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
@@ -353,7 +353,7 @@ There are **no PR preview deployments** — deploys happen only on merge to `mai
    idempotent). The `production` environment's required reviewer is the human
    approval gate. Every step is guarded on `SANITY_MIGRATE_TOKEN`, so the job is a
    **no-op until that secret is configured** — safe to ship ahead of setup.
-3. **`deploy-studio`** → `cms-prod` via the Vercel CLI (`studio.valstack.dev`),
+3. **`deploy-studio`** → `cms-prod` via the Vercel CLI (`studio.{your-hosting}`),
    same mechanism as `deploy-web`.
 4. **`deploy-web`** → `blog-prod` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
@@ -412,3 +412,40 @@ commit or redeploy a prior Vercel build.
       deploy (no deploy runs before `verify` is green, and PRs never deploy).
 - [ ] Publishing in the Studio updates the corresponding site within seconds
       (webhook). Dev publishes hit the dev site; prod publishes hit prod.
+
+---
+
+## Storybook — hosted `@blog/ui` design system (optional, not a deploy environment)
+
+Unlike everything above, this is **not** part of the dev/prod pipeline — no
+Sanity project, no dataset, no CI-gated migration. It's a single Vercel
+project hosting `@blog/ui`'s Storybook build for visual PR review, and it
+deliberately uses Vercel's Git integration with PR previews **enabled** —
+the opposite of `blog-dev`/`blog-prod`/`cms-dev`/`cms-prod`, whose Git
+integration is disabled in favor of a CI-gated deploy. That's intentional:
+`@blog/ui` is pure and prop-driven (no `service`/Sanity import), so there's
+no content or credentials a pre-merge preview could leak — and the entire
+point of hosting Storybook is letting a reviewer see a component change
+_before_ it merges, which a post-merge-only deploy would defeat. See
+`docs/superpowers/specs/2026-08-02-storybook-vercel-hosting-design.md` (#339)
+for the full design discussion.
+
+Build/output/skip-when-unaffected config is in code
+(`packages/ui/vercel.json`), same philosophy as `apps/web`/`apps/cms`'s
+`vercel.json`; only project creation, domain, and confirming Git
+integration stays **on** are human-gated console steps:
+
+- [ ] Vercel → Add New → Project → import `{github_account}/blog`; **Root
+      Directory `packages/ui`** + tick _"Include files outside of the root
+      directory"_; **Node.js 22.x**; Framework Preset **Other** (build/output
+      commands come from `packages/ui/vercel.json`).
+- [ ] Confirm Git integration is **enabled**, with PR previews **on** — this
+      is the default for a newly imported project; the point is to leave it
+      as-is, unlike every other project above.
+- [ ] Settings → Domains → add `ui-library.{your_hosting}` (production
+      deployment only — previews keep Vercel's own auto-generated URLs); add
+      the DNS record it shows you at whatever registrar/DNS host manages
+      `{your_hosting}`.
+- [ ] No env vars, no CORS, no tokens — `@blog/ui` never imports `service` or
+      touches Sanity, so nothing here needs the Sanity/Vercel credential
+      dance the rest of this doc walks through.
