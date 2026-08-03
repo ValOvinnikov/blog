@@ -18,6 +18,8 @@ export const ICONS = {
   FACEBOOK: 'FACEBOOK',
   RSS: 'RSS',
   ARROW_UP: 'ARROW_UP',
+  GOOGLE: 'GOOGLE',
+  BOOKMARK: 'BOOKMARK',
 } as const;
 
 export type TIconName = TValueOf<typeof ICONS>;
