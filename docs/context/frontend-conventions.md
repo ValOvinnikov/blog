@@ -7,16 +7,19 @@
 ## Dependency rules (enforced, acyclic)
 
 ```
-web → ui, service, config, utils
+web → ui, service, db, config, utils
 service → config, utils   (no React, ever)
+db → config, utils        (no React, no Sanity SDK — sibling to service, not a dependent)
 ui → config               (no Sanity, no data fetching — stays publishable)
 cms → config              (generates the types typegen ships into config)
 configs/* → consumed by all
 ```
 
-`web` is the **only** place `ui` and `service` meet: Server Components fetch
-data through `service` and pass plain typed props into `ui`. Internal packages
-ship raw TypeScript (Just-in-Time pattern) and are transpiled by the web app via
+`web` is the **only** place `ui`, `service`, and `db` meet: Server Components
+fetch Sanity data through `service`, relational data through `db`, and pass
+plain typed props into `ui`. `db` and `service` never import each other — a
+feature needing both joins them in `web`. Internal packages ship raw
+TypeScript (Just-in-Time pattern) and are transpiled by the web app via
 `transpilePackages`.
 
 ## Type flow

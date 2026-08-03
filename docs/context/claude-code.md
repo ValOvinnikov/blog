@@ -21,7 +21,7 @@ contracts:
     consumed only by `web`; owns the `drizzle-kit generate`/`migrate`
     schema-migration workflow.
   - `ui` — building the pure, publishable `@blog/ui` design system.
-  - `web` — App Router routes, SEO, composition of `ui` + `service`.
+  - `web` — App Router routes, SEO, composition of `ui` + `service` + `db`.
   - `verify-runner` — read-only, Haiku-model runner for the integration
     verify pass (`develop-feature` §5: `type-check`/`lint`/`test`,
     the exact scenario-specific sequence it's given). `build` is not part of

@@ -75,8 +75,11 @@ flowchart LR
 ```
 
 Parked outside the flow: none — the `db` layer (formerly #13, now #984) is no
-longer deferred; it is the hard prerequisite that opens the M5 engagement
-phase (see the M5 section below).
+longer parked outside the roadmap; it is now sequenced as the hard
+prerequisite that opens the M5 engagement phase (see the M5 section below).
+Note: #984 still carries GitHub's `deferred` label — that label reflects
+"not yet started," which remains true, and is a separate, unresolved question
+from its roadmap position.
 
 ---
 
