@@ -167,6 +167,47 @@ id / dataset / URL / tokens all differ:
 > `SANITY_API_READ_TOKEN` is server-only (never exposed to the browser). Each
 > project uses the Viewer token minted in its own Sanity project.
 
+`@blog/db` (Neon Postgres, engagement layer — comments/ratings/auth/bookmarks/
+subscribers, `SPEC.md` §4/§8) needs two connection strings, same Production +
+Preview scopes as the five keys above:
+
+| Key                     | `blog-dev` value              | `blog-prod` value             |
+| ----------------------- | ----------------------------- | ----------------------------- |
+| `DATABASE_URL`          | `<DEV_DATABASE_URL>` (pooled) | `<PRD_DATABASE_URL>` (pooled) |
+| `DATABASE_URL_UNPOOLED` | `<DEV_DATABASE_URL_UNPOOLED>` | `<PRD_DATABASE_URL_UNPOOLED>` |
+
+> `DATABASE_URL` (the pooled Neon HTTP driver, `drizzle-orm/neon-http`) is
+> what the deployed app reads at runtime via `@blog/db`'s validated env entry
+> point. `DATABASE_URL_UNPOOLED` (direct connection) is what `drizzle-kit`
+> needs for `db:generate`/`db:migrate`/`db:studio` — those aren't run by the
+> deployed app itself, only by a human (or, later, a dedicated CI migrate
+> job — not wired yet, see `.claude/agents/db.md`'s "Migrations" section) —
+> but keeping both alongside the pooled value here means the same env source
+> covers local dev and any future CI job without a second place to update it.
+
+#### Neon Postgres — one project, per-branch environments
+
+Unlike Sanity (a separate **project** per environment), Neon uses one project
+with **branches**: a `development` branch backs `blog-dev`, a `production`
+branch backs `blog-prod`. This repo's Neon project already exists and is
+connected to both Vercel web projects (dev + prod) — provisioning notes for
+recreating this from scratch:
+
+- [ ] Neon console → create a project; add a `development` branch (or use
+      the project's default branch as prod and branch `development` off it).
+- [ ] Each branch → **Connection Details** gives both strings above: the
+      pooled one (host ends `-pooler`) → `DATABASE_URL`, the direct one →
+      `DATABASE_URL_UNPOOLED`.
+- [ ] Wire them into the matching Vercel project's env vars (table above) —
+      either by hand, or via Neon's Vercel integration (Vercel → Integrations
+      → Neon), which can inject both automatically per Vercel environment.
+- [ ] Enable `pgvector` (needed by M3.4 semantic search) once per branch —
+      this repo's own migration does it
+      (`packages/db/migrations/0000_enable_pgvector_extension.sql`); running
+      `pnpm --filter @blog/db db:migrate` against a fresh branch (with
+      `DATABASE_URL_UNPOOLED` sourced into the shell first) is sufficient, no
+      manual `CREATE EXTENSION` step needed.
+
 **Studio** (`cms-dev` / `cms-prod`, Production scope — `vercel pull
 --environment=production` in CI only reads that scope): `sanity build`
 (invoked by `apps/cms/vercel.json`'s `buildCommand`) loads `sanity.cli.ts`,
@@ -292,6 +333,14 @@ Local dev points at the **dev** project (`<DEV_PROJECT_ID>`):
       `NEXT_PUBLIC_SITE_URL=http://localhost:3000`.
 - [ ] (Optional) seed the dev `development` dataset — author fresh content in the
       dev Studio, or export/import from another dataset. It's empty until seeded.
+- [ ] `apps/web/.env.local` also carries `DATABASE_URL=<DEV_DATABASE_URL>` and
+      `DATABASE_URL_UNPOOLED=<DEV_DATABASE_URL_UNPOOLED>` (the `development`
+      Neon branch's pooled/unpooled connection strings) — the single local
+      source `@blog/db`'s `drizzle.config.ts` and runtime client both expect.
+      `packages/db`'s own CLI (`db:generate`/`db:migrate`/`db:studio`) runs
+      standalone via `pnpm --filter @blog/db db:*`, outside Next's own env
+      loading, so source these into the shell first:
+      `set -a && source apps/web/.env.local && set +a`.
 
 ---
 

@@ -57,6 +57,10 @@ export default mergeConfig(
           replacement: `${fileURLToPath(new URL('../../packages/service/src', import.meta.url))}/`,
         },
         {
+          find: /^@blog\/db\//,
+          replacement: `${fileURLToPath(new URL('../../packages/db/src', import.meta.url))}/`,
+        },
+        {
           find: /^@blog\/config\//,
           replacement: `${fileURLToPath(new URL('../../packages/config/src', import.meta.url))}/`,
         },

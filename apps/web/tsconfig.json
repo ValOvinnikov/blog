@@ -11,6 +11,7 @@
       "@web/*": ["./src/*"],
       "@blog/ui/*": ["../../packages/ui/src/*"],
       "@blog/service/*": ["../../packages/service/src/*"],
+      "@blog/db/*": ["../../packages/db/src/*"],
       "@blog/config/*": ["../../packages/config/src/*"]
     },
     "plugins": [
