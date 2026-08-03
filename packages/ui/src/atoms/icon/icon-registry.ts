@@ -3,6 +3,8 @@ import { type FC, type SVGProps } from 'react';
 
 import ArrowUpComponent from '@blog/ui/assets/icons/arrow-up.svg';
 import ArrowUpUrl from '@blog/ui/assets/icons/arrow-up.svg?url';
+import BookmarkComponent from '@blog/ui/assets/icons/bookmark.svg';
+import BookmarkUrl from '@blog/ui/assets/icons/bookmark.svg?url';
 import CheckSheetComponent from '@blog/ui/assets/icons/check-sheet.svg';
 import CheckSheetUrl from '@blog/ui/assets/icons/check-sheet.svg?url';
 import CheckComponent from '@blog/ui/assets/icons/check.svg';
@@ -17,6 +19,8 @@ import FacebookComponent from '@blog/ui/assets/icons/facebook.svg';
 import FacebookUrl from '@blog/ui/assets/icons/facebook.svg?url';
 import GitHubComponent from '@blog/ui/assets/icons/github.svg';
 import GitHubUrl from '@blog/ui/assets/icons/github.svg?url';
+import GoogleComponent from '@blog/ui/assets/icons/google.svg';
+import GoogleUrl from '@blog/ui/assets/icons/google.svg?url';
 import HouseComponent from '@blog/ui/assets/icons/house.svg';
 import HouseUrl from '@blog/ui/assets/icons/house.svg?url';
 import LinkedInComponent from '@blog/ui/assets/icons/linkedin.svg';
@@ -68,4 +72,6 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.FACEBOOK]: { component: FacebookComponent, url: FacebookUrl },
   [ICONS.RSS]: { component: RssComponent, url: RssUrl },
   [ICONS.ARROW_UP]: { component: ArrowUpComponent, url: ArrowUpUrl },
+  [ICONS.GOOGLE]: { component: GoogleComponent, url: GoogleUrl },
+  [ICONS.BOOKMARK]: { component: BookmarkComponent, url: BookmarkUrl },
 };
