@@ -33,8 +33,18 @@ export const blogPostPageVariants = tv({
     ],
     // The content→footer vertical gap comes from `Article.Footer`'s own
     // `mt-8` (see `article-footer-variants.ts`), not a grid row-gap here.
+    // `text-prose` is load-bearing, not typography: `max-w-measure` is
+    // `68ch` (`configs/tailwind/theme.css`), and `ch` resolves against the
+    // font-size of the element it's applied to. `footerInRail` and
+    // `PortableTextRenderer`'s `Prose` root are grid siblings (neither
+    // nests inside the other), so nothing arbitrates a shared width between
+    // them — `Prose` renders its `68ch` at its own `text-prose` (17px), so
+    // without a matching override here `footerInRail` would compute its
+    // `68ch` against the ambient 16px instead, landing ~38px narrower and
+    // sharing a left edge with `Prose` but not a right one. Matching
+    // `text-prose` here makes both edges line up exactly.
     footerInRail: [
-      'mx-auto max-w-measure',
+      'mx-auto max-w-measure text-prose',
       'lg:col-start-2 lg:row-start-2 lg:mx-0',
       'group-data-[depth=SKIM]/depth:hidden',
     ],
