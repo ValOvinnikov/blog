@@ -150,7 +150,7 @@ importers:
         version: 0.115.0(zod@4.4.3)
       '@auth/drizzle-adapter':
         specifier: ^1.11.3
-        version: 1.11.3(nodemailer@8.0.11)
+        version: 1.11.3
       '@blog/config':
         specifier: workspace:*
         version: link:../../packages/config
@@ -186,13 +186,10 @@ importers:
         version: 16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       next-auth:
         specifier: 5.0.0-beta.32
-        version: 5.0.0-beta.32(next@16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(nodemailer@8.0.11)(react@19.2.7)
+        version: 5.0.0-beta.32(next@16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
       next-intl:
         specifier: ^4.13.2
         version: 4.13.2(next@16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(typescript@6.0.3)
-      nodemailer:
-        specifier: ^8.0.11
-        version: 8.0.11
       react:
         specifier: 'catalog:'
         version: 19.2.7
@@ -257,9 +254,6 @@ importers:
       '@types/node':
         specifier: ^26
         version: 26.1.1
-      '@types/nodemailer':
-        specifier: ^8.0.1
-        version: 8.0.1
       '@types/react':
         specifier: ^19
         version: 19.2.17
@@ -4958,9 +4952,6 @@ packages:
   '@types/node@26.1.1':
     resolution: {integrity: sha512-nxAkRSVkN1Y0JC1W8ky/fTfkGsMmcrRsbx+3XoZE+rMOX71kLYTV7fLXpqud1GpbpP5TuffXFqfX7fH2GgZREw==}
 
-  '@types/nodemailer@8.0.1':
-    resolution: {integrity: sha512-PxpaInm8V1JQDd4j0ds5HfvWQk8JupS1C0Picb96QJsrrRDjBH+DlK7L4ZdNSqNULhiZRQHc40nLVShaGxXAMw==}
-
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
 
@@ -7917,10 +7908,6 @@ packages:
     resolution: {integrity: sha512-OXdegQq03OmXEjt2hZP33W2YPs/E5BcFQks46+G2gAxs4gHOIVD1u7EqlYLYSKsaIpyKCK9Gbk0ta1/gjRSMRQ==}
     engines: {node: '>=6'}
 
-  nodemailer@8.0.11:
-    resolution: {integrity: sha512-nrO/pDAUKl+wXX+lx16tDLbnm0fW6sK/x8mgohaCpg+CdCEl482bD4tCuAZk2DyliruiNTIZxRCoWkDqJEnAiA==}
-    engines: {node: '>=6.0.0'}
-
   normalize-package-data@8.0.0:
     resolution: {integrity: sha512-RWk+PI433eESQ7ounYxIp67CYuVsS1uYSonX3kA6ps/3LWfjVQa/ptEg6Y3T6uAMq1mWpX9PQ+qx+QaHpsc7gQ==}
     engines: {node: ^20.17.0 || >=22.9.0}
@@ -9795,6 +9782,9 @@ packages:
       use-sync-external-store:
         optional: true
 
+ignoredOptionalDependencies:
+  - nodemailer
+
 snapshots:
 
   '@acemir/cssom@0.9.31': {}
@@ -9906,19 +9896,17 @@ snapshots:
 
   '@asamuzakjp/nwsapi@2.3.9': {}
 
-  '@auth/core@0.41.3(nodemailer@8.0.11)':
+  '@auth/core@0.41.3':
     dependencies:
       '@panva/hkdf': 1.2.1
       jose: 6.2.8
       oauth4webapi: 3.8.6
       preact: 10.24.3
       preact-render-to-string: 6.5.11(preact@10.24.3)
-    optionalDependencies:
-      nodemailer: 8.0.11
 
-  '@auth/drizzle-adapter@1.11.3(nodemailer@8.0.11)':
+  '@auth/drizzle-adapter@1.11.3':
     dependencies:
-      '@auth/core': 0.41.3(nodemailer@8.0.11)
+      '@auth/core': 0.41.3
     transitivePeerDependencies:
       - '@simplewebauthn/browser'
       - '@simplewebauthn/server'
@@ -14838,10 +14826,6 @@ snapshots:
     dependencies:
       undici-types: 8.3.0
 
-  '@types/nodemailer@8.0.1':
-    dependencies:
-      '@types/node': 26.1.1
-
   '@types/normalize-package-data@2.4.4': {}
 
   '@types/parse-json@4.0.2': {}
@@ -17722,13 +17706,13 @@ snapshots:
   neo-async@2.6.2:
     optional: true
 
-  next-auth@5.0.0-beta.32(next@16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(nodemailer@8.0.11)(react@19.2.7):
+  next-auth@5.0.0-beta.32(next@16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7):
     dependencies:
-      '@auth/core': 0.41.3(nodemailer@8.0.11)
+      '@auth/core': 0.41.3
       next: 16.2.11(@babel/core@7.29.7)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react: 19.2.7
-    optionalDependencies:
-      nodemailer: 8.0.11
+    transitivePeerDependencies:
+      - nodemailer
 
   next-intl-swc-plugin-extractor@4.13.2: {}
 
@@ -17824,8 +17808,6 @@ snapshots:
       cron-parser: 4.9.0
       long-timeout: 0.1.1
       sorted-array-functions: 1.3.0
-
-  nodemailer@8.0.11: {}
 
   normalize-package-data@8.0.0:
     dependencies:
