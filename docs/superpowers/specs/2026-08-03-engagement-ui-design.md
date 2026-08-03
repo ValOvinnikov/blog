@@ -136,38 +136,68 @@ organisms (`PostsSection`/`PostCard`, `CommentItem`) — no new page primitives.
 from a header button, not a dedicated `/login` route and not a modal — it
 reuses an existing molecule, changes no route, and keeps the reader on the
 article (no engagement-context loss). A modal was rejected because `@blog/ui`
-has no dialog primitive and two provider buttons don't justify building a
+has no dialog primitive and three sign-in options don't justify building a
 focus-trapped one.
+
+**Decision (accepted, revised 2026-08-03): three sign-in methods, not
+two.** GitHub + Google OAuth alone would exclude readers without either
+account. Added **email magic link** (Auth.js's Email provider) as a third,
+password-free option — no credentials/password provider (Auth.js itself
+steers away from owning password storage/reset flows when OAuth + magic-link
+already cover the need). Rejected: adding more OAuth providers (Apple,
+Discord, etc. — each is the same shape of work per provider with diminishing
+reach for this audience) and full email+password (unwanted security/maintenance
+surface).
 
 **Placement & composition.** The control lives in the Header's **trailing
 actions cluster**, beside `ThemeToggleButton`, via `SiteNavigation`'s existing
 `actions` prop into `PrimaryNavigation` (`actions={<><ThemeToggleButton /><AuthMenu /></>}`).
-No new Header slot. Notably, auth needs **little or no new `@blog/ui`
-component** — it composes existing pure pieces:
+No new Header slot. Auth needs **no new `@blog/ui` composition** — it composes
+existing pure pieces plus the already-shipped `TextInput` atom (#1091):
 
-- _Logged-out:_ a `Button` ("Sign in") triggers a `PopoverMenu` with two items —
-  "Continue with GitHub" and "Continue with Google" (`Icon` + label), each
-  item's `onSelect` calling Auth.js `signIn(provider)`, which redirects to the
-  provider and back to the **same article**.
+- _Logged-out:_ a `Button` ("Sign in") triggers a `PopoverMenu` with three
+  items — "Continue with GitHub" and "Continue with Google" (`Icon` + label,
+  `onSelect` calling Auth.js `signIn(provider)`, redirecting to the provider
+  and back to the **same article**), plus "Continue with email" as a third
+  item that **expands in place** (no nested popover/modal) to reveal a
+  `TextInput` (email) + "Send link" `Button`, calling Auth.js `signIn('email',
+{ email })`. Submitting shows an inline "Check your inbox" confirmation
+  within the same popover — no route change, no page reload.
 - _Logged-in:_ the existing `Avatar` atom is the trigger; `PopoverMenu` shows a
   name/email header, **"My bookmarks"** (→ `/bookmarks`, Feature 4), and "Sign
   out" (`signOut()`).
 
 The only pure-UI addition is the **`google` icon asset**. Everything stateful
-(`useSession`, `signIn`, `signOut`) is the `AuthMenu` island in `apps/web`.
+(`useSession`, `signIn`, `signOut`, the expand/collapse + submitting/sent state
+of the email field) is the `AuthMenu` island in `apps/web`.
 
 **States.** _Loading_ (session resolving) → a neutral placeholder mirroring
 `ThemeToggle`'s `mounted=false` pattern, so there's no logged-out→logged-in
 flash. _Error_ (OAuth failure returns `?error=`) → a small inline notice near
-the sign-in button. _Logged-out_ / _logged-in_ as above.
+the sign-in button. _Email submitting_ → disabled field + button. _Email sent_
+→ inline "Check your inbox" replaces the field, popover stays open until
+dismissed. _Logged-out_ / _logged-in_ as above.
 
 **Responsive / theme.** On mobile the control collapses into the existing
 `PrimaryNavigation` mobile region rather than adding a second toggle row. The
 popover inherits `PopoverMenu` theming (`--surface`, `--border`), accent on
 interactive items.
 
-**Component surface.** No new pure component required beyond the icon; if a
-thin convenience wrapper is wanted, it is a `web` island, not a `ui` atom.
+**Component surface.** No new pure component required beyond the icon; the
+popover composition (OAuth buttons + expandable email field) is a `web`
+island, not a `ui` atom.
+
+**Shared infra note (new dependency this revision introduces):** the Email
+provider needs an email-sending mechanism — this reuses **Resend**, the same
+provider Feature 5's newsletter confirmation email already commits to (D9).
+Whichever of #1039 (auth) or #1044 (newsletter) is built first should land a
+small shared `apps/web` "send email via Resend" helper the other feature
+reuses, rather than each wiring Resend independently. Per the build order,
+auth ships first, so #1107 (auth's `web` sub-issue) owns creating it **and**
+documenting `RESEND_API_KEY` (per this repo's env-var convention) in its own
+PR. #1104 (newsletter's `web` sub-issue) only imports and calls the existing
+helper — it does **not** re-document `RESEND_API_KEY`, since it's the same
+value, already documented by #1107.
 
 ---
 
@@ -381,7 +411,9 @@ carries a **`density`/`variant` prop**:
 The CMS page-builder surface additionally needs a **Sanity module schema**
 (`apps/cms`) and a renderer in the existing `content-module` organism — so this
 feature spans `cms` + `ui` + `web`. The Resend call is a server action in the
-`NewsletterForm` island.
+`NewsletterForm` island, reusing the shared send-email helper Feature 1's
+auth epic stands up (see its "Shared infra note" above) rather than wiring
+Resend independently here.
 
 **States.** _Idle_ → field + button. _Submitting_ → disabled + spinner.
 _Success_ → "Almost there — check your inbox to confirm." _Error_ → inline:
@@ -537,6 +569,7 @@ islands: `AuthMenu`, `CommentThread`, `RatingBlock`, `BookmarkButton`,
 | D8  | Article-end newsletter | `compact` strip variant                            | `full` box; drop it                      |
 | D9  | Newsletter opt-in      | Double opt-in                                      | Single opt-in                            |
 | D10 | Moderation             | `/admin` queue now, auto pre-filter later          | Fully automatic only; Sanity Studio tool |
+| D13 | Sign-in methods        | GitHub + Google OAuth + email magic link           | More OAuth providers; email+password     |
 
 ## Non-goals (recorded for the eventual builds)
 
@@ -565,7 +598,10 @@ this order:
 3. **#1039 auth** — the spine; gates the write paths of #1040/#1041/#1043.
 4. **#1040 comments**, **#1041 ratings**, **#1043 bookmarks** — parallel once
    auth lands (each: `db` → `service`/route → `ui` → `web`).
-5. **#1044 newsletter** — independent of auth; `cms` module + `ui` + `web`.
+5. **#1044 newsletter** — independent of auth for gating (no sign-in required
+   to subscribe); shares Resend infra with #1039's magic-link email (D13) —
+   whichever lands first (auth, per this order) owns the shared send-email
+   helper. `cms` module + `ui` + `web`.
 6. **Moderation `/admin/comments`** — a `web`-owned sub-issue of #1040.
 
 No code changes in this issue — the next step is a `superpowers:writing-plans`
