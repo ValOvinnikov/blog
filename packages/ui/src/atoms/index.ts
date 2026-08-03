@@ -19,4 +19,6 @@ export * from './segmented-control';
 export * from './tag';
 export * from './terminal-typing';
 export * from './text';
+export * from './text-input';
+export * from './textarea';
 export * from './theme-toggle';
