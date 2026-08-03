@@ -19,6 +19,16 @@ per-issue implementation plan (`superpowers:writing-plans`) once reviewed.
   ratings, subscribers, and bookmarks all land in that same database.
 - **Auth (#1039) gates every write** in #1040/#1041/#1043. It is the root of
   the dependency graph within this set and should ship first.
+- **[`docs/design-reference/engagement-ui-mock.html`](../../design-reference/engagement-ui-mock.html)**
+  — the pixel-precise visual reference for all five features (open it in a
+  browser; it is a static, self-contained HTML mock using this repo's real
+  design tokens). This document specifies interaction/state/composition; the
+  mock specifies exact visual treatment. **Every implementing agent must open
+  this file, not just this document** — an early implementation of Feature 1
+  shipped without it and diverged completely from the intended visual
+  language (see the "Terminal window chrome" cross-cutting foundation below,
+  added in response). Any dispatch prompt for one of these five features must
+  name this file explicitly, by path, alongside this document.
 
 ## Purpose of this pass
 
@@ -112,6 +122,32 @@ prompt slot) and consistent with `command-link`.
 > atoms as the first UI work in this set. Rationale: two features need them;
 > divergent one-off inputs would fragment the form styling and a11y. Tradeoff:
 > slightly more up-front scope before either feature's visible payoff.
+
+### Terminal window chrome (new — shared by all five features)
+
+The mock (`docs/design-reference/engagement-ui-mock.html`) renders **every**
+feature's primary surface inside the same reusable "window" shell: a bordered,
+rounded card (`background: var(--surface)`) with a title bar
+(`background: var(--surface-2)`, bottom border, `.72rem` letter-spaced text)
+showing a `user@ovinnikov:~$ <command>` prompt on the left and an uppercase
+pill `tag` on the right (`popover`/`menu`/the post's own path), then a padded
+body. This shell is not called out anywhere else in this document, but it is
+load-bearing for every feature reading `## X — visual treatment` below —
+without it, an implementation reads as generic Tailwind UI rather than this
+site's terminal/console voice (the same voice `PostCard`, `CommandLink`, and
+`SegmentedControl` already established elsewhere in `@blog/ui`).
+
+> **Decision D14 (foundational, added retroactively):** introduce a shared
+> `@blog/ui` "window chrome" compound component (title-bar + body slots, the
+> `.win`/`.win__bar`/`.win__body`/`.tag` pattern in the mock) as shared
+> scaffolding for Features 1–5, the same way D0 introduced `TextInput`/
+> `Textarea`. Rationale: this cross-cutting gap is exactly why Feature 1's
+> first implementation (#1107) shipped without it — the pattern existed only
+> in the mock, was never named as a component in this document, and no review
+> gate checks visual fidelity against a static HTML reference. Build it once,
+> before or alongside whichever feature implements next, and have every
+> subsequent feature (including a follow-up pass on #1107 itself) compose it
+> rather than re-deriving the chrome inline.
 
 ### New icon assets
 
@@ -535,6 +571,7 @@ contextually, rather than four different logged-out treatments.
 
 | Component                        | Kind     | New?    | Purity / a11y notes                                                           |
 | -------------------------------- | -------- | ------- | ----------------------------------------------------------------------------- |
+| `WindowChrome`                   | molecule | **new** | title-bar (`user@host` prompt + tag pill) + body slots, D14; used by all five |
 | `TextInput`                      | atom     | **new** | controlled `value`/`onChange`, required `ariaLabel`, `invalid` variant        |
 | `Textarea`                       | atom     | **new** | as above + `rows`/`maxLength`                                                 |
 | `RatingSummary`                  | atom     | **new** | read-only aggregate, mono glyphs `aria-hidden`, name via `ariaLabel`          |
@@ -570,6 +607,7 @@ islands: `AuthMenu`, `CommentThread`, `RatingBlock`, `BookmarkButton`,
 | D9  | Newsletter opt-in      | Double opt-in                                      | Single opt-in                            |
 | D10 | Moderation             | `/admin` queue now, auto pre-filter later          | Fully automatic only; Sanity Studio tool |
 | D13 | Sign-in methods        | GitHub + Google OAuth + email magic link           | More OAuth providers; email+password     |
+| D14 | Shared window chrome   | New `@blog/ui` compound, built once for all five   | Per-feature inline chrome (what shipped) |
 
 ## Non-goals (recorded for the eventual builds)
 
