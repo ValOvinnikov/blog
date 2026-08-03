@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",
+    "@auth/drizzle-adapter": "^1.11.3",
     "@blog/config": "workspace:*",
     "@blog/db": "workspace:*",
     "@blog/service": "workspace:*",
@@ -32,11 +33,14 @@
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "next": "^16.2.11",
+    "next-auth": "5.0.0-beta.32",
     "next-intl": "^4.13.2",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-syntax-highlighter": "^15.6.6",
+    "resend": "^6.18.1",
     "sanity-image": "^1.1.0",
+    "server-only": "^0.0.1",
     "tailwind-variants": "^3.2.2",
     "zod": "catalog:"
   },

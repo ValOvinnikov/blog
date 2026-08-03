@@ -90,5 +90,23 @@
   },
   "authorMetadata": {
     "nameWithRole": "{name} — {role}"
+  },
+  "authMenu": {
+    "loadingAriaLabel": "Loading account status",
+    "signIn": "Sign in",
+    "panelAriaLabel": "Sign in options",
+    "continueWithGithub": "Continue with GitHub",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithEmail": "Continue with email",
+    "emailAriaLabel": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "sendLink": "Send link",
+    "sending": "Sending…",
+    "checkYourInbox": "Check your inbox for a sign-in link.",
+    "emailError": "Couldn't send the link. Try again.",
+    "oauthError": "Sign-in failed. Please try again.",
+    "accountMenuAriaLabel": "Account menu",
+    "myBookmarks": "My bookmarks",
+    "signOut": "Sign out"
   }
 }

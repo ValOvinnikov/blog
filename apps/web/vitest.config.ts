@@ -64,6 +64,15 @@ export default mergeConfig(
           find: /^@blog\/config\//,
           replacement: `${fileURLToPath(new URL('../../packages/config/src', import.meta.url))}/`,
         },
+        // `import 'server-only'` throws outside a react-server bundle; stub it
+        // to a no-op for the jsdom test env (the real guard still runs in the
+        // Next.js build). Same pattern as packages/db and packages/service.
+        {
+          find: /^server-only$/,
+          replacement: fileURLToPath(
+            new URL('./src/testing/server-only-stub.ts', import.meta.url),
+          ),
+        },
       ],
     },
     test: {
