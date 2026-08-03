@@ -6,7 +6,7 @@ import {
   within,
 } from '@web/testing/custom-render';
 
-import { AuthMenu } from './auth-menu';
+import { AuthMenu, toSessionUsername } from './auth-menu';
 
 const { useSessionMock, signInMock, signOutMock } = vi.hoisted(() => ({
   useSessionMock: vi.fn(),
@@ -65,6 +65,29 @@ describe(`<${AuthMenu.name}/>`, () => {
       expect(
         screen.getByRole('menuitem', { name: 'Continue with email' }),
       ).toBeVisible();
+    });
+
+    it('dresses the panel in the WindowChrome terminal shell (mock §01) with a generic, non-personal bar', async () => {
+      setup();
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Sign in' }));
+      const panel = screen.getByRole('menu');
+
+      expect(within(panel).getByText('guest')).toBeVisible();
+      expect(within(panel).getByText('~$')).toBeVisible();
+      expect(within(panel).getByText(/auth login/)).toBeVisible();
+      expect(within(panel).getByText('popover')).toBeVisible();
+      expect(within(panel).getByText(/choose a provider/)).toBeVisible();
+      expect(
+        within(panel).getByText(
+          'Redirects back to this article — you never lose your place.',
+        ),
+      ).toBeVisible();
+      // The bar's segments render as separate DOM nodes (User/Prompt/plain
+      // text) — assert the concatenated reading is properly space-separated
+      // ("guest ~$ auth login"), not touching ("guest~$auth login").
+      expect(panel.textContent).toMatch(/guest\s+~\$\s+auth login/);
     });
 
     it('calls signIn("github") when the GitHub item is clicked', async () => {
@@ -266,6 +289,21 @@ describe(`<${AuthMenu.name}/>`, () => {
       expect(screen.getByRole('menuitem', { name: 'Sign out' })).toBeVisible();
     });
 
+    it('dresses the panel in the WindowChrome terminal shell with the real session user, not a hardcoded name', async () => {
+      setup();
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Account menu' }));
+      const panel = screen.getByRole('menu');
+
+      // The mock's static bar reads "val" — this asserts the bar reflects
+      // *this* session's email-derived username, not that literal string.
+      expect(within(panel).getByText('val')).toBeVisible();
+      expect(within(panel).getByText('~$')).toBeVisible();
+      expect(within(panel).getByText(/whoami/)).toBeVisible();
+      expect(within(panel).getByText('menu')).toBeVisible();
+    });
+
     it('calls signOut when Sign out is clicked', async () => {
       setup();
       const user = userEvent.setup();
@@ -275,5 +313,59 @@ describe(`<${AuthMenu.name}/>`, () => {
 
       expect(signOutMock).toHaveBeenCalled();
     });
+
+    it('derives a different bar username for a different session (proves it is not hardcoded)', async () => {
+      useSessionMock.mockReturnValue({
+        data: {
+          user: {
+            name: 'Chester Reader',
+            email: 'chester@example.com',
+            image: null,
+          },
+          expires: '2099-01-01',
+        },
+        status: 'authenticated',
+      });
+      setup();
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Account menu' }));
+      const panel = screen.getByRole('menu');
+
+      expect(within(panel).getByText('chester')).toBeVisible();
+      expect(within(panel).queryByText('val')).not.toBeInTheDocument();
+    });
+  });
+});
+
+describe(toSessionUsername, () => {
+  it('prefers the email local part when email is present', () => {
+    expect(toSessionUsername('Val Ovinnikov', 'val@example.com')).toBe('val');
+  });
+
+  it('falls back to a slug of name when email is absent', () => {
+    expect(toSessionUsername('Val Ovinnikov', undefined)).toBe('valovinnikov');
+  });
+
+  it('falls back to the generic "user" noun when both are absent', () => {
+    expect(toSessionUsername(undefined, undefined)).toBe('user');
+  });
+
+  it('falls through to name when the email has an empty local part', () => {
+    expect(toSessionUsername('Val Ovinnikov', '@example.com')).toBe(
+      'valovinnikov',
+    );
+  });
+
+  it('falls through to the "user" fallback when the email local part is empty and name is absent', () => {
+    expect(toSessionUsername(undefined, '@example.com')).toBe('user');
+  });
+
+  it('falls through to the "user" fallback when name is whitespace-only and email is absent', () => {
+    expect(toSessionUsername('   ', undefined)).toBe('user');
+  });
+
+  it('falls through to the "user" fallback when both are empty/whitespace-only', () => {
+    expect(toSessionUsername('   ', '@example.com')).toBe('user');
   });
 });

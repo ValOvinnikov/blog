@@ -10,7 +10,30 @@ export const authMenuVariants = tv({
       'hover:border-accent hover:text-accent',
     ],
     avatarTrigger: ['size-8 rounded-full'],
-    accountHeader: ['flex flex-col gap-0.5 px-3 py-2'],
+    // `PopoverMenu.Panel` only positions the window now (`WindowChrome` owns
+    // the visual surface — border/bg/radius/shadow) — its own chrome is
+    // cancelled here rather than doubled up.
+    panel: [
+      'min-w-0 max-w-none rounded-none border-0 bg-transparent p-0 shadow-none',
+    ],
+    window: ['max-w-sm'],
+    cmdLine: [
+      'mb-3 flex items-center gap-1.5',
+      'font-mono text-copy text-muted',
+    ],
+    cmdPrompt: ['text-accent'],
+    cmdCursor: [
+      'inline-block h-[1em] w-[0.5ch] bg-accent',
+      'animate-[blink_1s_steps(1)_infinite]',
+    ],
+    providerButton: [
+      'mt-2 w-full justify-start gap-2 rounded-sm border border-border-strong bg-surface px-3.5 py-2',
+      'font-mono text-label text-text',
+      'transition-colors duration-base ease-console',
+      'hover:border-accent hover:bg-surface hover:text-accent',
+    ],
+    hint: ['mt-3 font-mono text-meta text-subtle'],
+    acctRow: ['mb-2 flex items-center gap-2 border-b border-border pb-3'],
     accountName: ['font-mono text-copy text-text'],
     accountEmail: ['font-mono text-meta text-subtle'],
     signOutItem: ['text-danger'],
@@ -25,9 +48,9 @@ export const authMenuVariants = tv({
       'rounded-md border border-border bg-surface px-3 py-2 shadow-lg',
       'font-mono text-meta text-danger',
     ],
-    emailForm: ['flex flex-col gap-2 px-3 py-2'],
+    emailForm: ['mt-2 flex flex-col gap-2'],
     emailFormActions: ['flex items-center gap-2'],
     emailHint: ['font-mono text-meta text-danger'],
-    emailSent: ['px-3 py-2 font-mono text-meta text-ok'],
+    emailSent: ['font-mono text-meta text-ok'],
   },
 });
