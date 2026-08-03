@@ -370,7 +370,7 @@ scope the idea, not the design.
 
 > **Design source of truth (both required reading before filing/building):**
 > `docs/superpowers/specs/2026-08-03-engagement-ui-design.md` (UX — placement,
-> states, component boundaries, prop surfaces, decision log D0–D10) and
+> states, component boundaries, prop surfaces, decision log D0–D10, D13) and
 > `docs/superpowers/specs/2026-08-03-engagement-visual-tokens-spec.md` (visual —
 > the console/terminal token map, D11 status tokens, D12 icons). The mock
 > `docs/design-reference/engagement-ui-mock.html` demonstrates the target look;
@@ -510,21 +510,35 @@ migrate`, wrapped as `db:generate`/`db:migrate` package scripts; wire the
 - **Milestone / labels:** GitHub `M5 — Engagement` · epic carries
   `enhancement`; sub-issues add `layer:db` / `layer:web`.
 - **Depends on:** F1 (db). **Gates the write paths of M5.2/M5.3/M5.4.**
-- **Design:** UX doc "Feature 1" (D1 — header `PopoverMenu`, not a route/modal);
-  visual spec §4.1. Needs the `google` icon (F3) but **no new `@blog/ui`
-  component** — composes existing `Avatar` / `PopoverMenu` / `Button`.
+- **Design:** UX doc "Feature 1" (D1 — header `PopoverMenu`, not a route/modal;
+  **D13, revised 2026-08-03** — three sign-in methods: GitHub + Google OAuth
+  **and email magic link**, not just the two OAuth providers); visual spec
+  §4.1. Needs the `google` icon (F3) and the `TextInput` atom (F2, #1091,
+  shipped) for the email field — **no other new `@blog/ui` component** —
+  composes existing `Avatar` / `PopoverMenu` / `Button` + `TextInput`.
 - **Sub-issues (parent #1039):**
   - **db** · **#1105** `feat(db): Auth.js adapter tables` — users / accounts /
-    sessions / verification_tokens in `@blog/db` per the Auth.js Drizzle adapter.
-  - **web** · **#1107** `feat(web): Auth.js (GitHub + Google) + AuthMenu island` —
-    provider config + session; the `AuthMenu` client island (logged-out
-    sign-in popover → `signIn(provider)`; logged-in `Avatar` dropdown with
-    name/email, "My bookmarks" → `/bookmarks`, "Sign out"); wired into the
-    header trailing-actions cluster beside `ThemeToggleButton` via the existing
+    sessions / verification_tokens in `@blog/db` per the Auth.js Drizzle
+    adapter (`verification_tokens` is also what the email magic-link provider
+    needs — already correctly scoped in this sub-issue, no change needed there).
+  - **web** · **#1107** `feat(web): Auth.js (GitHub + Google + email) +
+AuthMenu island` — provider config + session for all three methods; the
+    `AuthMenu` client island (logged-out popover with the two OAuth buttons
+    plus a third "Continue with email" item that expands in place to a
+    `TextInput` + submit, calling `signIn('email', { email })`, with inline
+    submitting/sent states; logged-in `Avatar` dropdown with name/email, "My
+    bookmarks" → `/bookmarks`, "Sign out"); wired into the header
+    trailing-actions cluster beside `ThemeToggleButton` via the existing
     `actions` prop; loading placeholder mirrors `ThemeToggle`'s `mounted=false`
-    (no auth-state flash); OAuth `?error=` inline notice.
-- **Acceptance:** sign-in/out round-trips both providers back to the same
-  article; session resolves without a logged-out→in flash; no new `ui` atom.
+    (no auth-state flash); OAuth `?error=` inline notice. **Also owns standing
+    up the shared Resend "send email" helper** (`RESEND_API_KEY`, documented
+    per this repo's env-var convention) that #1104 (newsletter's `web`
+    sub-issue) will reuse rather than duplicate — see the UX doc's "Shared
+    infra note" under Feature 1.
+- **Acceptance:** sign-in/out round-trips all three methods back to the same
+  article (OAuth redirect-back, email magic-link click-through); session
+  resolves without a logged-out→in flash; no new `ui` atom beyond reusing
+  `TextInput`.
 
 ### M5.2 · Threaded comments — epic **#1040**
 
@@ -608,7 +622,9 @@ migrate`, wrapped as `db:generate`/`db:migrate` package scripts; wire the
 
 - **Milestone / labels:** GitHub `M5 — Engagement` (moved from M6 — see the
   milestone note above) · sub-issues add `layer:db` / `layer:cms` /
-  `layer:ui` / `layer:web`. **Independent of auth.**
+  `layer:ui` / `layer:web`. **Independent of auth for gating** (no sign-in
+  required to subscribe) — but shares Resend send-email infra with auth's
+  email magic-link (D13); see #1104 below.
 - **Depends on:** F1, F2 (TextInput), F4 (status tokens). Layer order with cms:
   `cms → typegen → ui → web`.
 - **Design:** UX doc "Feature 5" (D7 three surfaces: footer + CMS module +
@@ -627,8 +643,10 @@ migrate`, wrapped as `db:generate`/`db:migrate` package scripts; wire the
   - **web** · **#1104** `feat(web): NewsletterForm island + Resend double
 opt-in` — the stateful form; footer placement (`full`), article-end
     (`compact`), CMS module renderer in the existing `content-module` organism;
-    Resend server action sends the confirmation email; a confirm route flips
-    `pending → active`; success copy "check your inbox."
+    a server action calling the **shared Resend send-email helper #1107
+    (auth) stands up** for its own email magic-link — reuse it here rather
+    than wiring Resend a second time; a confirm route flips `pending →
+active`; success copy "check your inbox."
 - **Acceptance:** signup appears in all three surfaces; submit sends a
   confirmation email and the subscriber activates only on click; client-side
   email-format + already-subscribed + server errors surface inline.
