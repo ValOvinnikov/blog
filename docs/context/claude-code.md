@@ -15,6 +15,11 @@ contracts:
     alias wiring, guards `src/sanity/generated/` (typegen-only).
   - `cms` — Sanity schemas, content modelling, typegen.
   - `service` — Sanity client, GROQ, typed fetchers (no React).
+  - `db` — `packages/db` (`@blog/db`): Neon Postgres + Drizzle, the
+    relational sibling to `service` for the engagement layer (Auth.js,
+    comments, ratings, bookmarks, subscribers); never Sanity, never React,
+    consumed only by `web`; owns the `drizzle-kit generate`/`migrate`
+    schema-migration workflow.
   - `ui` — building the pure, publishable `@blog/ui` design system.
   - `web` — App Router routes, SEO, composition of `ui` + `service`.
   - `verify-runner` — read-only, Haiku-model runner for the integration
