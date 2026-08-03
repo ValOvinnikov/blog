@@ -24,6 +24,11 @@
       // already detected from package.json `exports`.
       "entry": ["src/testing/server-only-stub.ts"]
     },
+    "packages/db": {
+      // Same reason as packages/service above: reachable only through a
+      // string in vitest.config.ts's `resolve.alias`.
+      "entry": ["src/testing/server-only-stub.ts"]
+    },
     "apps/web": {
       // The test render wrapper (customRender + RTL re-exports) is a testing
       // entry point, consumed by *.test.tsx (adoption lands in #666), not from
@@ -37,7 +42,12 @@
       // import graph can't see a bare string naming a package. Strict pnpm
       // (no hoisting) still requires it as a real apps/web devDependency so
       // Turbopack can resolve it.
-      "ignoreDependencies": ["@svgr/webpack"]
+      //
+      // @blog/db: this bootstrap (#984) wires the workspace dependency +
+      // alias ahead of any real usage — no file imports `@blog/db` yet, that
+      // lands with the M5.1 auth epic (#1105/#1107). Drop this entry once
+      // that first `import ... from '@blog/db'` exists in apps/web.
+      "ignoreDependencies": ["@svgr/webpack", "@blog/db"]
     }
   }
 }

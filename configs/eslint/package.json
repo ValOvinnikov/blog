@@ -7,6 +7,7 @@
     "./config": "./config.js",
     "./utils": "./utils.js",
     "./service": "./service.js",
+    "./db": "./db.js",
     "./ui": "./ui.js",
     "./web": "./web.js",
     "./cms": "./cms.js"

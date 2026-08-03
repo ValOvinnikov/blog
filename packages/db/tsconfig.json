@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@blog/tsconfig/base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    // Declare ambient globals explicitly so type resolution does not depend on
+    // pnpm's hoisting layout: "node" for `process.env`, "vitest/globals" for the
+    // `globals: true` test config. Without this, a dependency bump that reshuffles
+    // node_modules can drop @types/node discovery and break `tsc`.
+    "types": ["node", "vitest/globals"],
+    // No `@blog/config` alias yet — nothing in this package imports it (see
+    // vitest.config.ts for the full note). Add it back alongside a real
+    // `@blog/config: workspace:*` dependency once a schema/query file needs it.
+    "paths": {
+      "@blog/db/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "drizzle.config.ts"]
+}
