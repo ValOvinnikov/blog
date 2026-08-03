@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Engagement UI — design mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet" />
+<style>
+/* ── tokens verbatim from configs/tailwind/theme.css ────────────────── */
+:root{
+  color-scheme:light;
+  --font-display-family:'Space Grotesk',system-ui,sans-serif;
+  --font-body-family:'Newsreader',Georgia,serif;
+  --font-mono-family:'JetBrains Mono',ui-monospace,monospace;
+  --bg:oklch(0.99 0.002 250); --bg-subtle:oklch(0.965 0.003 250);
+  --surface:oklch(1 0 0); --surface-2:oklch(0.975 0.003 250);
+  --border:oklch(0.9 0.004 250); --border-strong:oklch(0.8 0.006 250);
+  --border-emphasis:oklch(0.62 0.006 250);
+  --text:oklch(0.2 0.01 250); --text-muted:oklch(0.46 0.01 250); --text-subtle:oklch(0.6 0.008 250);
+  --accent:oklch(0.53 0.17 250); --accent-hover:oklch(0.47 0.17 250);
+  --accent-muted:oklch(0.95 0.03 250); --accent-contrast:oklch(0.99 0 0);
+  --accent-solid:oklch(0.55 0.17 250); --accent-solid-hover:oklch(0.49 0.17 250);
+  --ring:var(--accent);
+  --duration-fast:120ms; --duration-base:200ms; --duration-slow:360ms;
+  --radius-sm:3px; --radius:6px; --radius-lg:10px;
+  --ease-console:cubic-bezier(0.2,0,0,1);
+  --logo-1:oklch(0.52 0.17 250); --logo-2:oklch(0.63 0.16 250); --logo-3:oklch(0.73 0.13 250);
+  --ok:oklch(0.6 0.15 150); --warn:oklch(0.72 0.15 75); --danger:oklch(0.58 0.2 25);
+}
+.indigo{
+  --accent:oklch(0.54 0.15 65); --accent-hover:oklch(0.48 0.15 65);
+  --accent-solid:oklch(0.54 0.15 65); --accent-solid-hover:oklch(0.48 0.15 65);
+  --accent-muted:oklch(0.95 0.03 65);
+  --logo-1:oklch(0.47 0.24 274); --logo-2:oklch(0.58 0.21 274); --logo-3:oklch(0.72 0.14 274);
+}
+.dark{
+  color-scheme:dark;
+  --bg:oklch(0.17 0.006 250); --bg-subtle:oklch(0.2 0.006 250);
+  --surface:oklch(0.21 0.007 250); --surface-2:oklch(0.24 0.008 250);
+  --border:oklch(0.3 0.008 250); --border-strong:oklch(0.42 0.01 250);
+  --border-emphasis:oklch(0.55 0.01 250);
+  --text:oklch(0.95 0.004 250); --text-muted:oklch(0.72 0.008 250); --text-subtle:oklch(0.56 0.008 250);
+  --accent:oklch(0.7 0.16 250); --accent-hover:oklch(0.76 0.16 250);
+  --accent-muted:oklch(0.3 0.06 250); --accent-contrast:oklch(0.16 0.006 250);
+  --accent-solid:oklch(0.7 0.16 250); --accent-solid-hover:oklch(0.76 0.16 250);
+  --logo-1:oklch(0.58 0.17 250); --logo-2:oklch(0.68 0.16 250); --logo-3:oklch(0.8 0.14 250);
+  --ok:oklch(0.72 0.16 150); --warn:oklch(0.8 0.15 80); --danger:oklch(0.7 0.17 25);
+}
+.dark.indigo{
+  --accent:oklch(0.8 0.15 80); --accent-hover:oklch(0.86 0.15 80);
+  --accent-solid:oklch(0.8 0.15 80); --accent-solid-hover:oklch(0.86 0.15 80);
+  --accent-muted:oklch(0.3 0.06 80);
+  --logo-1:oklch(0.52 0.24 274); --logo-2:oklch(0.64 0.2 274); --logo-3:oklch(0.78 0.13 274);
+}
+
+/* ── base ───────────────────────────────────────────────────────────── */
+*{box-sizing:border-box;}
+@keyframes blink{50%{opacity:0;}}
+html{background:var(--bg);color:var(--text);}
+body{
+  margin:0;font-family:var(--font-mono-family);
+  background:
+    radial-gradient(1200px 500px at 100% -10%, color-mix(in oklch, var(--accent) 7%, transparent), transparent 60%),
+    var(--bg);
+  color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.6;
+}
+::selection{background:var(--accent-muted);color:var(--accent);}
+:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:var(--radius-sm);}
+a{color:var(--accent);text-decoration:none;}
+.wrap{max-width:56rem;margin:0 auto;padding:0 clamp(1rem,5vw,2.5rem) 6rem;}
+
+/* prompt / terminal atoms */
+.cur{display:inline-block;width:.55ch;height:1.05em;transform:translateY(.15em);background:var(--accent);animation:blink 1s steps(1) infinite;}
+.prompt{color:var(--accent);user-select:none;}
+.dim{color:var(--text-subtle);}
+.muted{color:var(--text-muted);}
+.mono{font-family:var(--font-mono-family);}
+.serif{font-family:var(--font-body-family);}
+.disp{font-family:var(--font-display-family);letter-spacing:-.02em;}
+
+/* window shell */
+.win{
+  border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);
+  box-shadow:0 1px 0 color-mix(in oklch,var(--text) 4%,transparent), 0 18px 40px -32px color-mix(in oklch,var(--text) 40%,transparent);
+  overflow:hidden;
+}
+.win__bar{
+  display:flex;align-items:center;gap:.6ch;
+  padding:.55rem .9rem;border-bottom:1px solid var(--border);
+  background:var(--surface-2);font-size:.72rem;letter-spacing:.02em;
+}
+.win__bar .u{color:var(--accent);}
+.win__bar .p{color:var(--text-muted);}
+.win__body{padding:1.1rem 1.15rem;}
+.tag{
+  margin-left:auto;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-subtle);border:1px solid var(--border);border-radius:999px;padding:.12rem .6rem;
+}
+
+/* ── page chrome ────────────────────────────────────────────────────── */
+.top{
+  position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);
+  background:color-mix(in oklch,var(--bg) 82%,transparent);
+  border-bottom:1px solid var(--border);
+}
+.top__in{max-width:56rem;margin:0 auto;display:flex;align-items:center;gap:1rem;padding:.7rem clamp(1rem,5vw,2.5rem);}
+.brand{display:flex;align-items:center;gap:.6ch;font-weight:600;font-size:.9rem;}
+.brand .sq{display:inline-grid;grid-template-columns:repeat(3,4px);gap:2px;}
+.brand .sq i{width:4px;height:11px;border-radius:1px;display:block;}
+.brand .sq i:nth-child(1){background:var(--logo-1);} .brand .sq i:nth-child(2){background:var(--logo-2);} .brand .sq i:nth-child(3){background:var(--logo-3);}
+.controls{margin-left:auto;display:flex;align-items:center;gap:.4rem;}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;font-size:.7rem;}
+.seg button{font-family:inherit;font-size:inherit;background:transparent;color:var(--text-muted);border:0;padding:.32rem .6rem;cursor:pointer;transition:all var(--duration-base) var(--ease-console);}
+.seg button[aria-pressed="true"]{background:var(--accent-solid);color:var(--accent-contrast);}
+
+/* buttons */
+.btn{
+  font-family:var(--font-mono-family);font-size:.8rem;cursor:pointer;
+  display:inline-flex;align-items:center;gap:.6ch;padding:.5rem .85rem;
+  border:1px solid var(--border-strong);border-radius:var(--radius-sm);
+  background:var(--surface);color:var(--text);
+  transition:all var(--duration-base) var(--ease-console);
+}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn--solid{background:var(--accent-solid);border-color:var(--accent-solid);color:var(--accent-contrast);}
+.btn--solid:hover{background:var(--accent-solid-hover);border-color:var(--accent-solid-hover);color:var(--accent-contrast);}
+.btn--ghost{border-color:transparent;background:transparent;color:var(--text-muted);padding:.4rem .5rem;}
+.btn--ghost:hover{color:var(--accent);border-color:transparent;}
+
+/* section scaffolding */
+.hero{padding:2.6rem 0 1rem;}
+.hero h1{font-family:var(--font-display-family);font-size:clamp(2rem,1.4rem+2vw,3rem);line-height:1.05;letter-spacing:-.025em;margin:.4rem 0 .5rem;}
+.eyebrow{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text-subtle);}
+.lede{font-family:var(--font-body-family);font-size:1.05rem;color:var(--text-muted);max-width:60ch;}
+section.feat{margin-top:3.2rem;}
+.feat__head{display:flex;align-items:baseline;gap:1ch;margin-bottom:.9rem;flex-wrap:wrap;}
+.feat__n{color:var(--accent);font-size:.8rem;}
+.feat__t{font-family:var(--font-display-family);font-size:1.35rem;letter-spacing:-.02em;margin:0;}
+.feat__d{font-size:.75rem;color:var(--text-subtle);margin-left:auto;}
+.grid2{display:grid;gap:1rem;grid-template-columns:1fr 1fr;}
+@media(max-width:720px){.grid2{grid-template-columns:1fr;}}
+.state{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--text-subtle);margin:0 0 .5rem;}
+
+/* ── AUTH ───────────────────────────────────────────────────────────── */
+.pop{max-width:24rem;}
+.pop .cmd{font-size:.82rem;margin-bottom:.7rem;}
+.prov{width:100%;text-align:left;margin-top:.4rem;}
+.prov svg,.prov img{width:16px;height:16px;}
+.ghub{width:16px;height:16px;fill:var(--text);}
+.acct{display:flex;align-items:center;gap:.7ch;padding-bottom:.7rem;margin-bottom:.5rem;border-bottom:1px solid var(--border);}
+.ava{width:30px;height:30px;border-radius:var(--radius-sm);display:grid;place-items:center;font-weight:600;font-size:.8rem;color:var(--accent-contrast);background:linear-gradient(135deg,var(--logo-1),var(--logo-3));}
+.menu a{display:flex;gap:.7ch;align-items:center;padding:.42rem .3rem;color:var(--text);font-size:.8rem;border-radius:var(--radius-sm);}
+.menu a:hover{background:var(--surface-2);color:var(--accent);}
+.menu .kbd{margin-left:auto;font-size:.62rem;color:var(--text-subtle);border:1px solid var(--border);border-radius:3px;padding:0 .4ch;}
+
+/* ── RATING ─────────────────────────────────────────────────────────── */
+.rate{display:flex;align-items:center;gap:1ch;flex-wrap:wrap;font-size:1rem;}
+.rate .lbl{color:var(--text-subtle);font-size:.78rem;}
+.meter{letter-spacing:.15em;}
+.meter .on{color:var(--accent);} .meter .off{color:var(--border-strong);}
+.stars{display:inline-flex;gap:.1ch;cursor:pointer;font-size:1.15rem;user-select:none;}
+.stars span{color:var(--border-strong);transition:color var(--duration-fast) var(--ease-console),transform var(--duration-fast) var(--ease-console);}
+.stars span.lit{color:var(--accent);}
+.stars:hover span{transform:translateY(-1px);}
+.num{color:var(--text);font-weight:600;} .n{color:var(--text-subtle);font-size:.75rem;}
+.yours{font-size:.7rem;color:var(--ok);letter-spacing:.04em;}
+
+/* ── COMMENTS ───────────────────────────────────────────────────────── */
+.thread{display:flex;flex-direction:column;gap:.2rem;}
+.cmt{padding:.7rem 0;border-top:1px dashed var(--border);}
+.cmt:first-child{border-top:0;}
+.cmt__h{display:flex;align-items:center;gap:.8ch;font-size:.76rem;}
+.cmt__h .who{color:var(--accent);font-weight:600;}
+.cmt__h .at{color:var(--text-subtle);}
+.cmt__h .dot{color:var(--border-strong);}
+.cmt__b{font-family:var(--font-body-family);font-size:1rem;color:var(--text);margin:.35rem 0 .3rem;line-height:1.55;}
+.cmt__a{display:flex;gap:1.2ch;font-size:.72rem;color:var(--text-subtle);}
+.cmt__a button{font-family:inherit;font-size:inherit;background:0;border:0;color:var(--text-subtle);cursor:pointer;padding:0;}
+.cmt__a button:hover{color:var(--accent);}
+.reply{margin-left:1.5ch;padding-left:1.5ch;border-left:1px solid var(--border);position:relative;}
+.reply::before{content:"└─";position:absolute;left:-1.5ch;top:.7rem;color:var(--border-strong);font-size:.76rem;}
+.badge{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.06rem .5ch;border-radius:3px;border:1px solid;}
+.badge--pend{color:var(--warn);border-color:color-mix(in oklch,var(--warn) 50%,transparent);background:color-mix(in oklch,var(--warn) 12%,transparent);}
+.pend{border-left:2px solid var(--warn);padding-left:.9ch;background:color-mix(in oklch,var(--warn) 6%,transparent);}
+.pend-note{font-size:.68rem;color:var(--warn);margin-top:.2rem;}
+.tomb{font-family:var(--font-mono-family);font-size:.78rem;color:var(--text-subtle);font-style:normal;opacity:.75;padding:.5rem 0;}
+.form{margin-top:1rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface-2);}
+.form__top{display:flex;align-items:center;gap:.6ch;padding:.45rem .7rem;border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text-subtle);}
+.form textarea{
+  width:100%;border:0;resize:vertical;min-height:64px;background:transparent;color:var(--text);
+  font-family:var(--font-body-family);font-size:1rem;padding:.7rem;outline:0;
+}
+.form__foot{display:flex;align-items:center;gap:1ch;padding:.5rem .7rem;border-top:1px solid var(--border);}
+.count{font-size:.7rem;color:var(--text-subtle);}
+.count.warn{color:var(--warn);}
+.signin-gate{display:flex;align-items:center;gap:1ch;flex-wrap:wrap;padding:.9rem;border:1px dashed var(--border-strong);border-radius:var(--radius-sm);font-size:.82rem;color:var(--text-muted);}
+
+/* ── BOOKMARK ───────────────────────────────────────────────────────── */
+.bm{display:inline-flex;align-items:center;gap:.7ch;padding:.5rem .8rem;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);color:var(--text-muted);font-size:.8rem;cursor:pointer;font-family:inherit;transition:all var(--duration-base) var(--ease-console);}
+.bm:hover{border-color:var(--accent);color:var(--accent);}
+.bm svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6;}
+.bm[aria-pressed="true"]{color:var(--accent);border-color:var(--accent);background:var(--accent-muted);}
+.bm[aria-pressed="true"] svg{fill:var(--accent);stroke:var(--accent);}
+.bm .kbd{font-size:.62rem;color:var(--text-subtle);border:1px solid var(--border);border-radius:3px;padding:0 .4ch;}
+.ls{font-size:.8rem;}
+.ls .row{display:flex;gap:1.4ch;padding:.28rem 0;border-bottom:1px dashed var(--border);}
+.ls .row:last-child{border-bottom:0;}
+.ls .perm{color:var(--text-subtle);} .ls .fn{color:var(--accent);} .ls .fn:hover{text-decoration:underline;}
+
+/* ── NEWSLETTER ─────────────────────────────────────────────────────── */
+.nl-strip{display:flex;align-items:center;gap:1ch;flex-wrap:wrap;padding:.7rem .9rem;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius-sm);background:var(--surface-2);font-size:.82rem;}
+.field{display:flex;align-items:center;gap:.6ch;flex:1;min-width:220px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);padding:.35rem .6rem;}
+.field input{border:0;background:transparent;color:var(--text);font-family:var(--font-mono-family);font-size:.82rem;outline:0;width:100%;}
+.field .prompt{font-size:.82rem;}
+.nl-full{max-width:30rem;}
+.nl-full h3{font-family:var(--font-display-family);font-size:1.1rem;margin:.1rem 0 .3rem;}
+.nl-full p{font-family:var(--font-body-family);color:var(--text-muted);font-size:.95rem;margin:0 0 .9rem;}
+.nl-success{display:flex;align-items:center;gap:.8ch;color:var(--ok);font-size:.85rem;padding:.4rem 0;}
+.hint{font-size:.68rem;color:var(--text-subtle);margin-top:.5rem;}
+
+footer.note{margin-top:4rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.72rem;color:var(--text-subtle);}
+</style>
+</head>
+<body>
+
+<!-- top chrome: brand + auth control + theme switches -->
+<div class="top"><div class="top__in">
+  <div class="brand"><span class="sq"><i></i><i></i><i></i></span> ovinnikov<span class="dim">.dev</span></div>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Accent">
+      <button id="t-light" aria-pressed="true">light</button>
+      <button id="t-dark" aria-pressed="false">dark</button>
+    </div>
+    <div class="seg" role="group" aria-label="Hue">
+      <button id="h-console" aria-pressed="true">console</button>
+      <button id="h-indigo" aria-pressed="false">indigo</button>
+    </div>
+  </div>
+</div></div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <p class="eyebrow">engagement layer · design mock</p>
+    <h1>An engagement layer that reads&nbsp;like&nbsp;a&nbsp;shell.</h1>
+    <p class="lede">Five features — auth, ratings, comments, bookmarks, newsletter — rendered in the site's own console idiom instead of the rounded-card widgets every other blog ships. Every colour, border and motion value below is a live <span class="mono">theme.css</span> token. Flip the switches to see light / dark / indigo.</p>
+  </header>
+
+  <!-- ══ AUTH ══ -->
+  <section class="feat">
+    <div class="feat__head"><span class="feat__n">01</span><h2 class="feat__t">Auth · sign in</h2><span class="feat__d">#1039 · header popover</span></div>
+    <div class="grid2">
+      <div>
+        <p class="state">logged out — provider popover</p>
+        <div class="win pop">
+          <div class="win__bar"><span class="u">guest</span><span class="p">@ovinnikov:~$</span> auth login<span class="tag">popover</span></div>
+          <div class="win__body">
+            <div class="cmd mono"><span class="prompt">&gt;</span> choose a provider <span class="cur"></span></div>
+            <button class="btn prov"><svg class="ghub" viewBox="0 0 24 24"><path d="M12 3.4C7.6 3.4 4 7.05 4 11.55c0 3.6 2.3 6.65 5.5 7.75.4.07.55-.18.55-.4v-1.6c-2.24.5-2.71-1.08-2.71-1.08-.37-.95-.9-1.2-.9-1.2-.73-.5.06-.49.06-.49.81.06 1.23.85 1.23.85.72 1.26 1.9.9 2.36.69.07-.54.28-.9.5-1.11-1.79-.2-3.67-.9-3.67-4.07 0-.9.32-1.64.86-2.21-.09-.21-.37-1.05.08-2.2 0 0 .68-.22 2.22.85a7.6 7.6 0 0 1 4.04 0c1.54-1.07 2.22-.85 2.22-.85.45 1.15.17 1.99.08 2.2.54.57.86 1.31.86 2.21 0 3.18-1.89 3.87-3.69 4.07.29.26.56.78.56 1.58v2.34c0 .22.15.48.56.39A8.02 8.02 0 0 0 20 11.55c0-4.5-3.6-8.15-8-8.15z"/></svg> Continue with GitHub</button>
+            <button class="btn prov"><img alt="" src="google.svg" onerror="this.style.display='none'"/> <svg width="16" height="16" viewBox="0 0 24 24" style="display:none"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.46a5.52 5.52 0 0 1-2.4 3.62v3.01h3.88c2.27-2.09 3.58-5.17 3.58-8.82z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.9l-3.88-3.02c-1.07.72-2.45 1.15-4.06 1.15-3.13 0-5.77-2.11-6.71-4.95H1.28v3.11A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.29 14.28A7.2 7.2 0 0 1 4.91 12c0-.79.14-1.56.38-2.28V6.61H1.28A12 12 0 0 0 0 12c0 1.94.46 3.77 1.28 5.39l4.01-3.11z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.34.61 4.59 1.8l3.44-3.44C17.95 1.19 15.24 0 12 0A12 12 0 0 0 1.28 6.61l4.01 3.11C6.23 6.88 8.87 4.77 12 4.77z"/></svg> Continue with Google</button>
+            <p class="hint">Redirects back to this article — you never lose your place.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="state">logged in — account dropdown</p>
+        <div class="win pop">
+          <div class="win__bar"><span class="u">val</span><span class="p">@ovinnikov:~$</span> whoami<span class="tag">menu</span></div>
+          <div class="win__body">
+            <div class="acct">
+              <div class="ava">V</div>
+              <div><div style="font-size:.82rem;font-weight:600">Val Ovinnikov</div><div class="dim" style="font-size:.72rem">val@icloud.com</div></div>
+            </div>
+            <nav class="menu">
+              <a href="#">◈ My bookmarks <span class="kbd">⌘B</span></a>
+              <a href="#">⚙ Account settings</a>
+              <a href="#" style="color:var(--danger)">⏻ Sign out</a>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ RATING ══ -->
+  <section class="feat">
+    <div class="feat__head"><span class="feat__n">02</span><h2 class="feat__t">Ratings · terminal gauge</h2><span class="feat__d">#1041 · end of article</span></div>
+    <div class="win">
+      <div class="win__bar"><span class="p">~/post/</span><span class="u">static-first-rendering.md</span> <span class="dim">— rate this post</span></div>
+      <div class="win__body" style="display:flex;flex-direction:column;gap:1.1rem">
+        <div>
+          <p class="state">everyone — read-only aggregate</p>
+          <div class="rate">
+            <span class="prompt mono">rate</span>
+            <span class="meter mono"><span class="on">▐█████████</span><span class="off">░▌</span></span>
+            <span class="num mono">4.6</span><span class="dim mono">/5</span>
+            <span class="n">n=23 ratings</span>
+          </div>
+        </div>
+        <div>
+          <p class="state">logged in — interactive (hover the stars)</p>
+          <div class="rate">
+            <span class="prompt mono">you</span>
+            <span class="stars" id="stars" role="radiogroup" aria-label="Rate this post">
+              <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+            </span>
+            <span class="mono num" id="star-val">—</span><span class="dim mono">/5</span>
+            <span class="yours" id="yours" hidden>✓ your rating saved</span>
+          </div>
+        </div>
+        <div>
+          <p class="state">empty — no ratings yet</p>
+          <div class="rate">
+            <span class="prompt mono">rate</span>
+            <span class="meter mono"><span class="off">▐…………▌</span></span>
+            <span class="muted mono" style="font-size:.82rem">no ratings yet — be the first</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ COMMENTS ══ -->
+  <section class="feat">
+    <div class="feat__head"><span class="feat__n">03</span><h2 class="feat__t">Comments · session log</h2><span class="feat__d">#1040 · one reply level · moderated</span></div>
+    <div class="win">
+      <div class="win__bar"><span class="p">$</span> git log --comments <span class="u">--post=static-first</span> <span class="tag">Comments · 4</span></div>
+      <div class="win__body">
+        <div class="thread">
+
+          <div class="cmt">
+            <div class="cmt__h"><span class="prompt">&gt;</span><span class="who">@marina</span><span class="dot">·</span><span class="at">2 days ago</span></div>
+            <p class="cmt__b">The static-island split is the part people underrate. Keeping the article prerendered while comments hydrate separately is exactly why the LCP stays flat here.</p>
+            <div class="cmt__a"><button>↳ reply</button><span class="dim">#a1f</span></div>
+          </div>
+
+          <div class="reply">
+            <div class="cmt">
+              <div class="cmt__h"><span class="prompt">&gt;</span><span class="who">@val</span><span class="dot">·</span><span class="at">1 day ago</span><span class="dim">↳ @marina</span></div>
+              <p class="cmt__b">Right — the island only ships the interactive bytes. The prose is still one static file.</p>
+              <div class="cmt__a"><button>↳ reply</button><button>✕ delete</button><span class="dim">#b2e</span></div>
+            </div>
+          </div>
+
+          <div class="cmt">
+            <div class="cmt__h"><span class="prompt">&gt;</span><span class="who">@deleted</span><span class="dot">·</span><span class="at">1 day ago</span></div>
+            <p class="tomb">// comment removed by author — thread shape preserved</p>
+          </div>
+
+          <div class="cmt pend">
+            <div class="cmt__h"><span class="prompt">&gt;</span><span class="who">@val</span><span class="dot">·</span><span class="at">just now</span><span class="badge badge--pend">pending review</span></div>
+            <p class="cmt__b">Testing the moderation flow — this one is awaiting approval.</p>
+            <p class="pend-note">● Visible only to you until a moderator approves it. Others don't see it yet.</p>
+          </div>
+
+        </div>
+
+        <!-- logged-in form -->
+        <div class="form">
+          <div class="form__top"><span class="prompt">$</span> comment --as <span class="u" style="color:var(--accent)">@val</span> <span class="cur"></span></div>
+          <textarea id="cmt-in" placeholder="Add to the discussion…" maxlength="500"></textarea>
+          <div class="form__foot">
+            <span class="count" id="cmt-count">0/500</span>
+            <span style="margin-left:auto"></span>
+            <button class="btn btn--ghost">preview</button>
+            <button class="btn btn--solid">post ↵</button>
+          </div>
+        </div>
+
+        <!-- logged-out gate -->
+        <div style="margin-top:.8rem">
+          <p class="state">logged out</p>
+          <div class="signin-gate"><span class="prompt mono">$</span> sign in to join the discussion <button class="btn" style="margin-left:auto">↳ sign in</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ BOOKMARK ══ -->
+  <section class="feat">
+    <div class="feat__head"><span class="feat__n">04</span><h2 class="feat__t">Bookmarks · git stash for reading</h2><span class="feat__d">#1043 · header meta + /bookmarks</span></div>
+    <div class="grid2">
+      <div>
+        <p class="state">toggle — in the article meta strip (click it)</p>
+        <div class="win"><div class="win__body" style="display:flex;align-items:center;gap:1.2ch;flex-wrap:wrap">
+          <span class="dim mono" style="font-size:.75rem">by Val · Aug 3 · 6 min ·</span>
+          <button class="bm" id="bm" aria-pressed="false" aria-label="Save post">
+            <svg viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+            <span id="bm-txt">save</span> <span class="kbd">⌘S</span>
+          </button>
+          <span class="dim mono" id="bm-hint" style="font-size:.72rem">private — only you see it</span>
+        </div></div>
+      </div>
+      <div>
+        <p class="state">/bookmarks — saved-post listing</p>
+        <div class="win">
+          <div class="win__bar"><span class="p">$</span> ls ~/bookmarks <span class="u">-l</span></div>
+          <div class="win__body ls">
+            <div class="row"><span class="perm mono">drwx</span><span class="dim mono">Aug 01</span><a class="fn" href="#">static-first-rendering.md</a></div>
+            <div class="row"><span class="perm mono">drwx</span><span class="dim mono">Jul 28</span><a class="fn" href="#">the-cost-of-a-hydration.md</a></div>
+            <div class="row"><span class="perm mono">drwx</span><span class="dim mono">Jul 19</span><a class="fn" href="#">oklch-in-anger.md</a></div>
+            <p class="hint">3 saved · empty state reads <span class="mono">“no bookmarks yet — save a post to find it here.”</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ NEWSLETTER ══ -->
+  <section class="feat">
+    <div class="feat__head"><span class="feat__n">05</span><h2 class="feat__t">Newsletter · $ subscribe</h2><span class="feat__d">#1044 · footer + module + article end</span></div>
+    <div style="display:flex;flex-direction:column;gap:1rem">
+      <div>
+        <p class="state">compact strip — end of every article (low weight, one row)</p>
+        <div class="nl-strip">
+          <span class="prompt mono">$</span><span class="mono" style="font-size:.8rem">subscribe --email</span>
+          <span class="field"><span class="prompt">›</span><input type="email" placeholder="you@domain.dev" aria-label="Email address" /></span>
+          <button class="btn btn--solid">subscribe ↵</button>
+        </div>
+      </div>
+      <div class="grid2">
+        <div>
+          <p class="state">full — footer &amp; CMS page-builder module</p>
+          <div class="win nl-full"><div class="win__body">
+            <h3 class="disp">$ subscribe --to weekly</h3>
+            <p class="serif">New posts on rendering, type systems and the occasional OKLCH rabbit hole. No spam; unsubscribe in one line.</p>
+            <div class="field" style="margin-bottom:.7rem"><span class="prompt">›</span><input type="email" placeholder="you@domain.dev" aria-label="Email address" /></div>
+            <button class="btn btn--solid" style="width:100%;justify-content:center">subscribe ↵</button>
+            <p class="hint">Double opt-in — we send a confirmation link before anything lands.</p>
+          </div></div>
+        </div>
+        <div>
+          <p class="state">success state</p>
+          <div class="win nl-full"><div class="win__body">
+            <h3 class="disp">$ subscribe --to weekly</h3>
+            <div class="nl-success mono">✓ almost there<span class="cur"></span></div>
+            <p class="serif" style="margin-top:.3rem">Check your inbox for a confirmation link. You'll start getting posts once you click it.</p>
+            <p class="hint mono" style="color:var(--warn)">◐ awaiting confirmation · resend in 0:42</p>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="note mono">
+    design mock · docs/design-reference/engagement-ui-mock.html · every colour/space/motion value = a live theme.css token · pairs with 2026-08-03-engagement-ui-design.md
+  </footer>
+</div>
+
+<script>
+  const root = document.documentElement;
+  const setDark = d => { root.classList.toggle('dark', d); t_light.setAttribute('aria-pressed', String(!d)); t_dark.setAttribute('aria-pressed', String(d)); };
+  const setIndigo = i => { root.classList.toggle('indigo', i); h_console.setAttribute('aria-pressed', String(!i)); h_indigo.setAttribute('aria-pressed', String(i)); };
+  t_light.onclick = () => setDark(false); t_dark.onclick = () => setDark(true);
+  h_console.onclick = () => setIndigo(false); h_indigo.onclick = () => setIndigo(true);
+
+  // rating hover + click
+  const stars = [...document.querySelectorAll('#stars span')];
+  const paint = n => stars.forEach(s => s.classList.toggle('lit', +s.dataset.v <= n));
+  let chosen = 0;
+  stars.forEach(s => {
+    s.addEventListener('mouseenter', () => paint(+s.dataset.v));
+    s.addEventListener('click', () => { chosen = +s.dataset.v; document.getElementById('star-val').textContent = chosen; document.getElementById('yours').hidden = false; });
+  });
+  document.getElementById('stars').addEventListener('mouseleave', () => paint(chosen));
+
+  // comment counter
+  const ta = document.getElementById('cmt-in'), cc = document.getElementById('cmt-count');
+  ta.addEventListener('input', () => { cc.textContent = ta.value.length + '/500'; cc.classList.toggle('warn', ta.value.length > 450); });
+
+  // bookmark toggle
+  const bm = document.getElementById('bm');
+  bm.onclick = () => {
+    const on = bm.getAttribute('aria-pressed') === 'true';
+    bm.setAttribute('aria-pressed', String(!on));
+    bm.setAttribute('aria-label', on ? 'Save post' : 'Remove bookmark');
+    document.getElementById('bm-txt').textContent = on ? 'save' : 'saved';
+    document.getElementById('bm-hint').textContent = on ? 'private — only you see it' : '✓ stashed to ~/bookmarks';
+  };
+</script>
+</body>
+</html>

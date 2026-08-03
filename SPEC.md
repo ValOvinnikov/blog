@@ -80,6 +80,9 @@ reading, page canvas elevation) are documented in full in
 - **Tailwind CSS v4** (shared token preset) + `tailwind-variants`
 - **next-intl** for i18n (currently `en` only, `localePrefix: 'never'`)
 - **groqd** query builder in the service layer
+- **Neon Postgres + Drizzle ORM** (`packages/db`) — the non-Sanity relational
+  store for the engagement layer (Auth.js, comments, ratings, bookmarks,
+  subscribers); scaffolding tracked in #984, see §4 and §15
 - **Vitest + Testing Library**; **Storybook** in `packages/ui` and `apps/web`
 - **Turborepo + pnpm** workspaces; Node ≥ 20.19 (CI runs 22), pnpm 9.15
 
@@ -93,22 +96,27 @@ packages/
   config     Shared constants, generated Sanity types, tokens,        (@blog/config)
              polymorphic React helpers (via /react subpath)
   service    Data access: Sanity client, groqd queries, transformers  (@blog/service)
+  db         Relational data access: Neon + Drizzle (engagement layer) (@blog/db)
   ui         Atomic Design component library (atoms→organisms)       (@blog/ui)
   utils      Framework-free helpers (async, primitives)               (@blog/utils)
 configs/
   eslint, prettier, tailwind, tsconfig, vitest                        (@blog/*-config)
 ```
 
-| Layer           | Imports                          | Exposes                                                                                                                                                                                                 | Must never                                                        |
-| --------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `@blog/config`  | —                                | Constants (UPPERCASE key/value pairs), the `routes` URL builder (single source of URL truth), generated Sanity types + extracted schema, shared TS types, `/react` subpath for polymorphic prop helpers | contain app logic; force React on non-React consumers (subpath!)  |
-| `@blog/utils`   | —                                | Pure helpers (`safeAsync`, primitives)                                                                                                                                                                  | depend on any sibling                                             |
-| `@blog/service` | `config`, `utils`, Sanity SDKs   | The versioned `service` facade (`service.pages.post.v1.getPost(slug)` …), view-model types (`TPostDetail`, `THomePage`, …), `urlForImage`                                                               | import React or `@blog/ui`; return raw Sanity docs; fake defaults |
-| `@blog/ui`      | `config` (types + tokens)        | Atomic-design components up to organisms (pure, prop-driven, polymorphic `as`/`linkAs` slots). No template layer — page composition belongs in `web`.                                                   | import `service`/`sanity`/`fetch`; use `'use client'`             |
-| `web` (app)     | `ui`, `service`, `config`, utils | Routes, metadata, feeds, i18n, page composition; owns `PortableTextRenderer` and all framework-coupled wrappers (`SanityImage`, `SmartLink`, theme toggle)                                              | write GROQ; import Sanity SDKs; put data logic in components      |
-| `cms` (app)     | `config` (constants), `utils`    | Schema types (source of truth), desk structure, content migrations                                                                                                                                      | hand-write shapes typegen should produce                          |
+| Layer           | Imports                                | Exposes                                                                                                                                                                                                 | Must never                                                                       |
+| --------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `@blog/config`  | —                                      | Constants (UPPERCASE key/value pairs), the `routes` URL builder (single source of URL truth), generated Sanity types + extracted schema, shared TS types, `/react` subpath for polymorphic prop helpers | contain app logic; force React on non-React consumers (subpath!)                 |
+| `@blog/utils`   | —                                      | Pure helpers (`safeAsync`, primitives)                                                                                                                                                                  | depend on any sibling                                                            |
+| `@blog/service` | `config`, `utils`, Sanity SDKs         | The versioned `service` facade (`service.pages.post.v1.getPost(slug)` …), view-model types (`TPostDetail`, `THomePage`, …), `urlForImage`                                                               | import React or `@blog/ui`; return raw Sanity docs; fake defaults                |
+| `@blog/db`      | `config`, `utils`, Drizzle/Neon SDKs   | Typed query/mutation functions over Neon Postgres (Auth.js adapter tables, comments, ratings, bookmarks, subscribers) — the relational sibling to `service`, not a dependent of it                      | import React, `@blog/ui`, or any Sanity SDK; be imported by `cms`/`service`/`ui` |
+| `@blog/ui`      | `config` (types + tokens)              | Atomic-design components up to organisms (pure, prop-driven, polymorphic `as`/`linkAs` slots). No template layer — page composition belongs in `web`.                                                   | import `service`/`sanity`/`fetch`; use `'use client'`                            |
+| `web` (app)     | `ui`, `service`, `db`, `config`, utils | Routes, metadata, feeds, i18n, page composition; owns `PortableTextRenderer` and all framework-coupled wrappers (`SanityImage`, `SmartLink`, theme toggle)                                              | write GROQ; import Sanity SDKs; put data logic in components                     |
+| `cms` (app)     | `config` (constants), `utils`          | Schema types (source of truth), desk structure, content migrations                                                                                                                                      | hand-write shapes typegen should produce                                         |
 
-The graph is acyclic. `apps/web` is the only place `ui` and `service` meet.
+The graph is acyclic. `apps/web` is the only place `ui`, `service`, and `db`
+meet — `db` and `service` are parallel data layers (Neon vs. Sanity) that
+never reference each other; a feature needing both joins them in `web`.
+Full contract and migration mechanism: `.claude/agents/db.md`.
 Dependency-graph enforcement details and SVG/type-flow wiring:
 [`docs/context/frontend-conventions.md`](./docs/context/frontend-conventions.md).
 
@@ -159,6 +167,16 @@ changes need none (say so explicitly). Workflow: **dry-run → dataset export
 Full migration tooling (`apps/cms/migrations/`, the `migrationState` ledger,
 `migrate:deploy`/`migrate:backfill`) is documented alongside the content model
 in [`docs/context/content-model.md`](./docs/context/content-model.md).
+
+**`@blog/db` (Neon/Drizzle) has a separate, parallel migration mechanism** —
+schema migrations, not content migrations: a `packages/db/src/schema/*.ts`
+change is diffed by `drizzle-kit generate` into a reviewable, committed SQL
+file (that generation step is the dry-run — it never touches the database),
+applied to `development` freely, and applied to the shared/production Neon
+branch only after a backup (Neon branch snapshot or `pg_dump`) and only as a
+human-gated step, the same production gate as `sanity deploy` and Sanity
+content migrations. Full workflow: `.claude/agents/db.md`'s "Migrations"
+section (rollback strategy is an open decision, not yet settled).
 
 ## 9. Rendering, caching & i18n
 
@@ -259,10 +277,13 @@ inside the layer contracts above. Full roster and rationale for every piece:
 
 ## 15. Out of scope (for now)
 
-Comments, search, newsletter signup, multi-author dashboards, analytics beyond
-Vercel's built-in, and the AI/differentiator feature track (agent-native
-endpoints, publish-time generation — proposed in `docs/BACKLOG.md`). Each can
-be layered on without violating the contracts above.
+Multi-author dashboards, analytics beyond Vercel's built-in, semantic search,
+and the AI/differentiator feature track (agent-native endpoints, publish-time
+generation — proposed in `docs/BACKLOG.md`). Each can be layered on without
+violating the contracts above. **No longer out of scope:** comments, ratings,
+bookmarks, newsletter signup, and user auth — these are the actively-roadmapped
+M5 engagement layer (`docs/BACKLOG.md`'s "M5 — Engagement layer" section,
+epics #1039–#1044), built on the new `@blog/db` layer (§3, §4, §8).
 
 ## 16. Maintaining this document
 

@@ -17,6 +17,8 @@
       "Bash(pnpm create:*)",
       "Bash(vitest:*)",
       "Bash(pnpm storybook:*)",
+      "Bash(drizzle-kit:*)",
+      "Bash(npx drizzle-kit:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",

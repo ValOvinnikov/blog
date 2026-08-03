@@ -13,15 +13,21 @@ content; a Next.js 16 App Router site renders it; types flow end-to-end.
 ## Layer contracts (do not violate)
 
 ```
-web → ui, service, config, utils   service → config, utils (no React)
-ui → config (no Sanity/fetch)      cms → config (types via typegen)
-configs/* → consumed by all        graph is acyclic
+web → ui, service, db, config, utils   service → config, utils (no React)
+ui → config (no Sanity/fetch)          cms → config (types via typegen)
+db → config, utils (no React/Sanity)   configs/* → consumed by all
+graph is acyclic
 ```
 
 - `@blog/ui` is pure and prop-driven — never imports `service`/`sanity`/`fetch`.
 - `@blog/service` is the only package importing the Sanity SDKs; never imports React.
-- `apps/web` is the only place `ui` and `service` meet (Server Components fetch,
-  pass typed props to `ui`).
+- `@blog/db` is the only package importing the Neon/Drizzle SDKs — Postgres
+  data (Auth.js sessions, comments, ratings, bookmarks, subscribers); never
+  imports React or any Sanity SDK, and never imports/is imported by
+  `@blog/service` (siblings, not dependents — see `.claude/agents/db.md`).
+  **Only `apps/web` imports it.**
+- `apps/web` is the only place `ui` and `service` (and `db`) meet (Server
+  Components fetch, pass typed props to `ui`).
 - Content shapes come from the generated Sanity types in `@blog/config`
   (`packages/config/src/sanity/generated/types.ts`, produced by typegen) —
   never hand-redeclared.
@@ -40,12 +46,21 @@ order (`config → cms → service → ui → web` when config changes are invol
 otherwise `cms → service → ui → web`):
 `config` (`packages/config`, `packages/utils`, `configs/*` — constants, route
 helpers, shared config packages, alias wiring, guards typegen output), `cms`
-(schemas/typegen), `service` (data layer), `ui` (design system), `web`
+(schemas/typegen), `service` (Sanity data layer), `ui` (design system), `web`
 (frontend/SEO + composition).
+
+`db` (`packages/db`, Neon/Drizzle relational data — Auth.js sessions,
+comments, ratings, bookmarks, subscribers) is a **sibling to `service`, not a
+step in that chain** — it has no upstream layer of its own beyond `config`,
+and only `web` consumes it. Dispatch it whenever config/utils changes are
+settled and before the `web` work that composes its queries:
+`config → db → web` (parallel to, not blocking, `cms → service → ui`) when a
+feature touches both a Sanity-backed and a Neon-backed concern. See
+`.claude/agents/db.md`.
 
 **Delegating in-scope work to its sub-agent is REQUIRED, not optional — for the
 whole lifecycle, not just the first draft.** Every file that lives in a
-sub-agent's domain (`config`/`cms`/`service`/`ui`/`web` per the map above) is
+sub-agent's domain (`config`/`cms`/`service`/`ui`/`web`/`db` per the map above) is
 written, changed, fixed, renamed, and reworked **by that sub-agent** — the
 initial implementation, every review-remediation, every follow-up tweak, every
 "it's one line" edit. The orchestrator _orchestrates_; it does not hand-author
@@ -77,7 +92,7 @@ When a review turns up a blocking finding in a layer file, or a rename / knip /
 lint nit needs a two-line change, patching it inline _feels_ faster than
 re-dispatching the owning agent. That feeling is the rationalization this rule
 exists to stop: a two-line orchestrator edit to a `config`/`cms`/`service`/`ui`/
-`web` file is still the orchestrator doing a sub-agent's job. Route the fix to
+`web`/`db` file is still the orchestrator doing a sub-agent's job. Route the fix to
 the owning agent (dispatch, or `SendMessage` it), let it re-export, then
 re-verify and re-review. "Small", "mechanical", "the agent already did the hard
 part", and "it's a fix, not new code" are **not** exemptions — the only
@@ -246,6 +261,15 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   changes need no migration; say so explicitly. Use the tooling and workflow in
   `apps/cms/migrations/` (`README.md` + `migrate:dry`/`migrate:run`/`dataset:export`).
   Migrations against `production` are human-gated like `sanity deploy`.
+- **Check for `db` (Neon/Drizzle) migrations too.** Any change to a
+  `packages/db/src/schema/*.ts` table needs a generated migration — a schema
+  edit never touches existing rows by itself. Workflow: `db:generate`
+  (produces the reviewable SQL diff — this step _is_ the dry-run, since
+  drizzle-kit never touches the database at generate time) → back up the
+  shared/production Neon branch first → human-gated apply, same production
+  gate as Sanity's. Full mechanism in `.claude/agents/db.md`'s "Migrations"
+  section. Never hand-edit a migration file once it has been applied
+  anywhere shared (dev or prod) — write a new corrective migration instead.
 - Verify with `pnpm type-check`, `pnpm lint`, `pnpm test` from root. `pnpm build`
   is not part of the local loop — CI's `ci.yml` `build` job gates every PR;
   only reproduce it locally when diagnosing an actual CI build failure
@@ -392,5 +416,8 @@ push, so it stays under the push gate.
   deploy.
 - Read or commit `.env*` files.
 - Add a cross-layer import that creates a cycle.
+- Run a `db:migrate` against the shared/production Neon branch by hand — same
+  human-gated stance as `sanity deploy` and production content migrations
+  (`.claude/agents/db.md`'s "Migrations" section); local/dev applies are fine.
 - Push or open a PR without explicit approval for that specific action.
   (Committing needs no approval — commit freely as work reaches a coherent state.)
