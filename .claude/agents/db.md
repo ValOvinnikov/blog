@@ -144,12 +144,15 @@ generate`) diffs the schema against the last migration and writes a new
 backup-<date>`) or `pg_dump`, mirroring `pnpm --filter cms dataset:export`'s
    role for content migrations.
 5. **Production apply is human-gated**, same principle as `sanity deploy` and
-   production content migrations (`SPEC.md` §8/§13): it runs inside the
+   production content migrations (`SPEC.md` §8/§13): it should run inside the
    equivalent of the existing `migrate` CI job pattern (backup → apply →
    deploy, gated behind a version-tag push), not by hand from a local machine.
-   Wiring this specific CI step is part of `#984`'s own scope, not assumed to
-   pre-exist — confirm it's present before treating "merge to `main`" as safe
-   for a production-affecting schema change.
+   **This CI step does not exist yet** — `#984` only scaffolded the package and
+   the local `db:generate`/`db:migrate` workflow (its own acceptance criteria
+   scoped CI wiring out explicitly). Wiring it is separate follow-up work —
+   confirm it's landed before treating "merge to `main`" as safe for any
+   production-affecting schema change; until then, a production apply needs a
+   manual, reviewed, human-run step instead.
 6. **Never hand-edit a migration file once it has been applied anywhere
    shared** (dev or prod) — this desyncs drizzle-kit's journal from reality.
    If a mistake surfaces after the fact, write a **new** corrective migration;
