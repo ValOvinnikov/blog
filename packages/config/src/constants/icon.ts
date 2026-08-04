@@ -20,6 +20,7 @@ export const ICONS = {
   ARROW_UP: 'ARROW_UP',
   GOOGLE: 'GOOGLE',
   BOOKMARK: 'BOOKMARK',
+  SPINNER: 'SPINNER',
 } as const;
 
 export type TIconName = TValueOf<typeof ICONS>;
