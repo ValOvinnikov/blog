@@ -62,14 +62,18 @@ export function SignInMenu({
     emailSent,
   } = signInMenuVariants();
 
+  // `providerId` is the Auth.js provider id (`auth.ts`'s `GitHub`/`Google`
+  // configs use next-auth's default lowercase ids, no `id` override) —
+  // deliberately kept separate from `icon`, the unrelated `ICONS` key used
+  // only to pick which `<Icon />` glyph renders.
   const providers = [
     {
-      id: ICONS.GITHUB,
+      providerId: 'github',
       icon: ICONS.GITHUB,
       label: t('continueWithGithub'),
     },
     {
-      id: ICONS.GOOGLE,
+      providerId: 'google',
       icon: ICONS.GOOGLE,
       label: t('continueWithGoogle'),
     },
@@ -108,12 +112,12 @@ export function SignInMenu({
               {t('chooseProviderPrompt')}
               <span aria-hidden="true" className={cmdCursor()} />
             </p>
-            {providers.map(({ id, icon, label }) => (
+            {providers.map(({ providerId, icon, label }) => (
               <PopoverMenu.Item
-                key={id}
+                key={providerId}
                 className={providerButton()}
                 icon={<Icon name={icon} size={Size.SM} />}
-                onClick={() => signIn(id)}
+                onClick={() => signIn(providerId)}
               >
                 {label}
               </PopoverMenu.Item>
