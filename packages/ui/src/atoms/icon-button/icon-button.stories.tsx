@@ -17,6 +17,10 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
+// Hover the rendered button in the canvas to check the hover affordance —
+// the `border-emphasis` ring clears WCAG 1.4.11's 3:1 non-text minimum
+// against `bg` on its own in both themes (see icon-button-variants.ts),
+// with the `surface-2` fill as a secondary tint.
 export const Default: TStory = {};
 
 export const WithMoonIcon: TStory = {
