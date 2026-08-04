@@ -13,7 +13,7 @@ import { buildMagicLinkEmail } from './magic-link-email';
 import { resolveMagicLinkFromAddress } from './magic-link-from-address';
 
 // Verified sending domain once configured in Resend
-// (`MAGIC_LINK_FROM_ADDRESS`, e.g. `Sign in <sign-in@mail.valstack.dev>`),
+// (`MAGIC_LINK_FROM_ADDRESS`, e.g. `Sign in <sign-in@{domain}>`),
 // falling back to Resend's own shared testing sender otherwise.
 const MAGIC_LINK_FROM_ADDRESS = resolveMagicLinkFromAddress(
   env.MAGIC_LINK_FROM_ADDRESS,
