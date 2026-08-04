@@ -121,6 +121,64 @@ path with straightforward state; splitting there fragments things for no
 reason. The signal is genuine context boundaries within one file, not size
 alone.
 
+**Variants split the same way components do.** A single shared
+`{island}-variants.ts` holding every slot for every split-out sub-component
+recreates the same crowding this rule already fixes for components — once
+`AccountMenu`/`SignInMenu` own their own render trees, each also owns a
+co-located `account-menu-variants.ts` / `sign-in-menu-variants.ts` in its own
+folder for the slots _only it_ uses. A slot genuinely used by **two or more**
+sub-components (here, `panel` and `window` — both render inside the same
+`WindowChrome` shell) stays in the shared top-level `auth-menu-variants.ts`
+instead of being duplicated into each — duplicating a shared slot risks the
+two copies drifting apart on the next edit, exactly the "second repetition"
+failure mode this document keeps coming back to. The dispatcher's own
+single-consumer slots (e.g. `placeholderLabel`) stay in the top-level file
+too — it's the dispatcher's own file, not a subfolder concern:
+
+```
+auth-menu/
+  auth-menu.tsx
+  auth-menu-variants.ts              # dispatcher's own slots + genuinely shared ones (panel, window)
+  components/
+    account-menu/
+      account-menu.tsx
+      account-menu-variants.ts       # avatarTrigger, acctRow, accountName, accountEmail, signOutItem
+    sign-in-menu/
+      sign-in-menu.tsx
+      sign-in-menu-variants.ts       # signInTrigger, cmdLine, cmdPrompt, providerButton, hint, …
+```
+
+A component consuming both its own slots and a shared one calls both `tv()`
+functions (`const { avatarTrigger, ... } = accountMenuVariants(); const
+{ panel, window } = authMenuVariants();`) — this is a small amount of extra
+call-site surface in exchange for each variants file only describing the one
+component's own styling contract, which is the same trade this rule already
+makes for the components themselves.
+
+## Rule 4 — reach for a `@blog/ui` atom before a raw HTML element
+
+If `@blog/ui` already ships an atom for the element you're about to write —
+`Button`, `TextInput`, `IconButton`, `Avatar` — use it, even for something as
+small as a disabled loading placeholder. A raw `<button>`/`<input>` in
+`apps/web` should be the exception (a framework-coupled wrapper genuinely
+needs bare markup — `SmartLink`, `SanityImage`), not something reached for by
+default because it's faster to type. `Button` already forwards every native
+`ButtonHTMLAttributes` prop (`disabled`, `aria-hidden`, …) via `{...rest}`, so
+there is rarely a real capability gap forcing a hand-rolled element — check
+the atom's actual prop type before assuming it can't do what you need.
+
+```tsx
+// ❌ hand-rolled — no reason not to use Button, which forwards disabled/aria-hidden fine
+<button type="button" disabled aria-hidden="true" className={signInTrigger()}>
+  <span className={placeholderLabel()}>{t('signIn')}</span>
+</button>
+
+// ✅ reuses the design system, one class-merge to verify instead of a parallel implementation
+<Button disabled aria-hidden="true" className={signInTrigger()}>
+  <span className={placeholderLabel()}>{t('signIn')}</span>
+</Button>
+```
+
 ## Also
 
 - Pass view-models through (`author={post.author}`), don't hand-map fields — if
