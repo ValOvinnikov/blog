@@ -7,8 +7,8 @@ import { signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import type { RefObject } from 'react';
 
-import { authMenuVariants } from './auth-menu-variants';
-import { useEmailSignIn } from './use-email-sign-in';
+import { authMenuVariants } from '../../auth-menu-variants';
+import { useEmailSignIn } from '../../hooks/use-email-sign-in';
 
 export type TSignInMenuProps = {
   panelId: string;

@@ -12,7 +12,18 @@ export const authMenuVariants = tv({
       'transition-colors duration-base ease-console',
       'hover:border-accent hover:text-accent',
     ],
-    avatarTrigger: ['size-8 rounded-full'],
+    // `size-8` (32px) is `Avatar`'s smallest built-in size (`Size.SM` — no
+    // smaller option exists yet) — already the tightest fit around it
+    // without cropping the circle; `shrink-0` guards the flex-wrap header row.
+    // `border-emphasis`, not `border-strong` — `border-strong` fails WCAG
+    // 1.4.11's 3:1 non-text contrast against `--bg` (1.81:1 light / 2.26:1
+    // dark); `border-emphasis` clears it (3.54:1 / 3.94:1) — same fix as
+    // `icon-button-variants.ts`.
+    avatarTrigger: [
+      'size-8 shrink-0 rounded-full',
+      'transition-shadow duration-base ease-console',
+      'hover:ring-2 hover:ring-border-emphasis hover:ring-offset-2 hover:ring-offset-bg',
+    ],
     // `PopoverMenu.Panel` only positions the window now (`WindowChrome` owns
     // the visual surface — border/bg/radius/shadow) — its own chrome is
     // cancelled here rather than doubled up.

@@ -3,25 +3,17 @@
 import { Size } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms';
 import { PopoverMenu, WindowChrome } from '@blog/ui/molecules';
-import { SmartLink } from '@web/components/shared/smart-link';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import type { RefObject } from 'react';
 
-import { authMenuVariants } from './auth-menu-variants';
-import { toSessionUsername } from './to-session-username';
-
-// "My bookmarks" links here (Feature 4, #1043) — the route doesn't exist yet
-// (a 404 today is expected, see #1107's scope note), so there's no
-// `routes.bookmarks()` helper in `@blog/config` yet either; add one there
-// alongside the real route instead of introducing it for this single caller.
-const BOOKMARKS_PATH = '/bookmarks';
+import { authMenuVariants } from '../../auth-menu-variants';
+import { toSessionUsername } from '../../utils/to-session-username';
 
 export type TAccountMenuProps = {
   panelId: string;
   open: boolean;
   toggle: () => void;
-  close: () => void;
   triggerRef: RefObject<HTMLButtonElement | null>;
   panelRef: RefObject<HTMLDivElement | null>;
   name?: string | null;
@@ -32,15 +24,16 @@ export type TAccountMenuProps = {
 /**
  * AccountMenu — `AuthMenu`'s logged-in render branch (#1107): an
  * `Avatar`-triggered `PopoverMenu` dressed in the `WindowChrome` terminal
- * shell, showing the session's name/email, "My bookmarks", and "Sign out".
- * Open/close state and refs come from the parent's single `usePopover()`
- * call — this component never calls `usePopover()` itself.
+ * shell, showing the session's name/email and "Sign out". ("My bookmarks"
+ * is deliberately not here yet — the `/bookmarks` route doesn't exist until
+ * #1043 lands; add the item back alongside that route instead of linking to
+ * a 404 today.) Open/close state and refs come from the parent's single
+ * `usePopover()` call — this component never calls `usePopover()` itself.
  */
 export function AccountMenu({
   panelId,
   open,
   toggle,
-  close,
   triggerRef,
   panelRef,
   name,
@@ -104,14 +97,6 @@ export function AccountMenu({
                 {email && <p className={accountEmail()}>{email}</p>}
               </div>
             </div>
-            <PopoverMenu.Item
-              as={SmartLink}
-              href={BOOKMARKS_PATH}
-              onClick={close}
-              icon={<span aria-hidden="true">◈</span>}
-            >
-              {t('myBookmarks')}
-            </PopoverMenu.Item>
             <PopoverMenu.Item
               onClick={() => signOut()}
               className={signOutItem()}

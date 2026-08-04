@@ -284,7 +284,7 @@ describe(`<${AuthMenu.name}/>`, () => {
       });
     });
 
-    it('shows the account menu with name, email, My bookmarks, and Sign out', async () => {
+    it('shows the account menu with name, email, and Sign out', async () => {
       setup();
       const user = userEvent.setup();
 
@@ -297,10 +297,11 @@ describe(`<${AuthMenu.name}/>`, () => {
         within(panel).getAllByText('Val Ovinnikov').length,
       ).toBeGreaterThan(0);
       expect(within(panel).getByText('val@example.com')).toBeVisible();
-      expect(
-        screen.getByRole('menuitem', { name: 'My bookmarks' }),
-      ).toHaveAttribute('href', '/bookmarks');
       expect(screen.getByRole('menuitem', { name: 'Sign out' })).toBeVisible();
+      // The `/bookmarks` route doesn't exist yet (#1043) — no dead link.
+      expect(
+        screen.queryByRole('menuitem', { name: 'My bookmarks' }),
+      ).not.toBeInTheDocument();
     });
 
     it('dresses the panel in the WindowChrome terminal shell with the real session user, not a hardcoded name', async () => {

@@ -6,9 +6,9 @@ import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
-import { AccountMenu } from './account-menu';
 import { authMenuVariants } from './auth-menu-variants';
-import { SignInMenu } from './sign-in-menu';
+import { AccountMenu } from './components/account-menu/account-menu';
+import { SignInMenu } from './components/sign-in-menu/sign-in-menu';
 
 /**
  * AuthMenu — the header sign-in/account client island (#1107). Reads the
@@ -28,7 +28,7 @@ export function AuthMenu() {
   const oauthError = useOAuthErrorParam();
   const t = useTranslations('authMenu');
   const panelId = useId();
-  const { open, toggle, close, triggerRef, panelRef } = usePopover();
+  const { open, toggle, triggerRef, panelRef } = usePopover();
   const { signInTrigger, placeholderLabel } = authMenuVariants();
 
   if (sessionResult.status === 'loading') {
@@ -52,7 +52,6 @@ export function AuthMenu() {
         panelId={panelId}
         open={open}
         toggle={toggle}
-        close={close}
         triggerRef={triggerRef}
         panelRef={panelRef}
         name={name}
