@@ -111,6 +111,7 @@
     "emailError": "Couldn't send the link. Try again.",
     "oauthError": "Sign-in failed. Please try again.",
     "accountMenuAriaLabel": "Account menu",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "loadingAccountStatus": "Loading account status"
   }
 }

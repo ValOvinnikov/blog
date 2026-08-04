@@ -34,7 +34,7 @@ describe(`<${AuthMenu.name}/>`, () => {
     setLocationSearch('');
   });
 
-  it('renders no accessible trigger while the session is resolving', () => {
+  it('renders no accessible button while the session is resolving', () => {
     useSessionMock.mockReturnValue({ data: null, status: 'loading' });
 
     setup();
@@ -42,19 +42,17 @@ describe(`<${AuthMenu.name}/>`, () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it('reserves the sign-in trigger footprint while the session is resolving, to avoid a layout shift once it resolves', () => {
+  it('shows a neutral, disabled loading indicator while the session is resolving — not shaped like either the sign-in or account trigger', () => {
     useSessionMock.mockReturnValue({ data: null, status: 'loading' });
 
     setup();
 
-    // Real `<button>` with the same "Sign in" label `SignInMenu`'s trigger
-    // renders once resolved — hidden via `aria-hidden`/`invisible`, not a
-    // differently-shaped generic box, so its computed size matches the
-    // common (logged-out) resolved state exactly and the header doesn't
-    // reflow.
-    const placeholderTrigger = screen.getByRole('button', { hidden: true });
-    expect(placeholderTrigger).toBeDisabled();
-    expect(placeholderTrigger).toHaveTextContent('Sign in');
+    const status = screen.getByRole('status', {
+      name: 'Loading account status',
+    });
+    expect(status).toBeDisabled();
+    // Neither final state's label leaks into the neutral placeholder.
+    expect(status).not.toHaveTextContent('Sign in');
   });
 
   describe('logged out', () => {

@@ -2,6 +2,12 @@ import { tv } from 'tailwind-variants';
 
 export const accountMenuVariants = tv({
   slots: {
+    // `PopoverMenu`'s own base has no alignment opinion — needed here (but
+    // not by every `PopoverMenu` consumer, e.g. `SignInMenu`) because this
+    // trigger is a 32px circular `Avatar`, not text/icon content that
+    // already centers against its header siblings (`ThemeToggleButton`'s
+    // `IconButton`) by default.
+    menuRoot: ['flex flex-col items-center'],
     // `size-8` (32px) is `Avatar`'s smallest built-in size (`Size.SM` — no
     // smaller option exists yet) — already the tightest fit around it
     // without cropping the circle; `shrink-0` guards the flex-wrap header row.

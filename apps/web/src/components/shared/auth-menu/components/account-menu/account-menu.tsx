@@ -43,14 +43,20 @@ export function AccountMenu({
 }: TAccountMenuProps) {
   const t = useTranslations('authMenu');
   const { panel, window: windowSize } = authMenuVariants();
-  const { avatarTrigger, acctRow, accountName, accountEmail, signOutItem } =
-    accountMenuVariants();
+  const {
+    menuRoot,
+    avatarTrigger,
+    acctRow,
+    accountName,
+    accountEmail,
+    signOutItem,
+  } = accountMenuVariants();
 
   const displayName = name ?? email ?? '';
   const username = toSessionUsername(name, email);
 
   return (
-    <PopoverMenu>
+    <PopoverMenu className={menuRoot()}>
       <PopoverMenu.Trigger
         ref={triggerRef}
         ariaLabel={t('accountMenuAriaLabel')}
