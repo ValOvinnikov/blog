@@ -42,7 +42,7 @@ describe(`<${AuthMenu.name}/>`, () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it('shows a neutral, disabled loading indicator while the session is resolving — not shaped like either the sign-in or account trigger', () => {
+  it('shows a neutral loading status region while the session is resolving — not shaped like either the sign-in or account trigger', () => {
     useSessionMock.mockReturnValue({ data: null, status: 'loading' });
 
     setup();
@@ -50,7 +50,8 @@ describe(`<${AuthMenu.name}/>`, () => {
     const status = screen.getByRole('status', {
       name: 'Loading account status',
     });
-    expect(status).toBeDisabled();
+    // A live region, never an interactive element — no button role at all.
+    expect(status.tagName).toBe('SPAN');
     // Neither final state's label leaks into the neutral placeholder.
     expect(status).not.toHaveTextContent('Sign in');
   });
