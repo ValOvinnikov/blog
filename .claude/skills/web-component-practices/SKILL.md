@@ -76,17 +76,42 @@ Split along **context boundaries**, not arbitrary line counts:
   in the same folder. The parent file becomes a thin dispatcher: read
   session/loading state, render the matching sub-component, nothing else.
 
+Once a split produces **two or more** files of the same kind, group them into
+a matching subfolder rather than leaving everything flat at the top level —
+a flat folder with a dispatcher, two render branches, a hook, and a helper
+side by side is exactly the "crowded" problem this rule exists to fix one
+level up, just recreated inside the folder instead of inside one file. Mirror
+`@blog/ui`'s own compound-component precedent (`WindowChrome`'s
+`components/bar/`, `components/body/`, `components/tag/`, …, each sub-part in
+its own folder under `components/`, no barrel export since they're never
+imported from outside the parent) and this repo's existing top-level
+`src/hooks/` vs. `src/utils/` distinction — a stateful hook is not a "util,"
+even when, as here, it's private to one component rather than promoted to
+the shared top-level folder:
+
 ```
 src/components/shared/auth-menu/
-  auth-menu.tsx              # dispatcher: loading | AccountMenu | SignInMenu
-  account-menu.tsx           # logged-in render tree
-  sign-in-menu.tsx           # logged-out render tree, composes the hook below
-  use-email-sign-in.ts       # the email sub-flow's state machine
-  to-session-username.ts     # pure helper, tested directly
-  auth-menu-variants.ts
-  auth-menu.test.tsx          # + co-located tests for the split-out pieces
-  index.ts                    # re-exports AuthMenu only
+  auth-menu.tsx                    # dispatcher: loading | AccountMenu | SignInMenu
+  auth-menu-variants.ts            # shared styling contract for the whole island
+  auth-menu.test.tsx
+  index.ts                         # re-exports AuthMenu only
+  components/
+    account-menu/
+      account-menu.tsx             # logged-in render tree
+    sign-in-menu/
+      sign-in-menu.tsx             # logged-out render tree, composes the hook below
+  hooks/
+    use-email-sign-in.ts           # the email sub-flow's state machine
+    use-email-sign-in.test.tsx
+  utils/
+    to-session-username.ts         # pure helper, tested directly
+    to-session-username.test.ts
 ```
+
+A single split-out file of a given kind stays at the top level — don't create
+a one-entry `hooks/`/`utils/`/`components/` folder pre-emptively "for
+consistency." The subfolder earns its place at the second file of that kind,
+same as the parent split earning its place at the second context in one file.
 
 This is the same "extract at the second repetition" discipline
 (`.claude/agents/web.md`) applied one level earlier — a single component
