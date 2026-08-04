@@ -48,6 +48,13 @@ export const env = createEnv({
     // powers the Auth.js Email provider's magic-link (#1107) and, later, the
     // newsletter confirmation email (#1104, reuses this same helper/var).
     RESEND_API_KEY: z.string().min(1).optional(),
+    // The Auth.js Email provider's `from` address (`@web/server/auth/auth.ts`).
+    // Optional, same feature-flag-by-absence stance as the vars above: unset
+    // falls back to Resend's own shared testing sender
+    // (`onboarding@resend.dev`), which is fine for local dev/CI. Set to
+    // `Sign in <sign-in@mail.valstack.dev>` once a verified sending domain is
+    // configured in Resend.
+    MAGIC_LINK_FROM_ADDRESS: z.string().min(1).optional(),
   },
   client: {
     NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
@@ -67,6 +74,7 @@ export const env = createEnv({
     AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
+    MAGIC_LINK_FROM_ADDRESS: process.env.MAGIC_LINK_FROM_ADDRESS,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,

@@ -10,10 +10,14 @@ import GitHub from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
 
 import { buildMagicLinkEmail } from './magic-link-email';
+import { resolveMagicLinkFromAddress } from './magic-link-from-address';
 
-// Resend's own shared testing sender — swap for a verified sending domain
-// once this repo configures one in Resend (out of scope for #1107).
-const MAGIC_LINK_FROM_ADDRESS = 'Sign in <onboarding@resend.dev>';
+// Verified sending domain once configured in Resend
+// (`MAGIC_LINK_FROM_ADDRESS`, e.g. `Sign in <sign-in@{domain}>`),
+// falling back to Resend's own shared testing sender otherwise.
+const MAGIC_LINK_FROM_ADDRESS = resolveMagicLinkFromAddress(
+  env.MAGIC_LINK_FROM_ADDRESS,
+);
 
 // Hand-rolled `EmailConfig` instead of `next-auth/providers/nodemailer`'s
 // `Nodemailer` factory (CI fix, #1119 follow-up). That factory's *runtime*
