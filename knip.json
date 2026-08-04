@@ -36,18 +36,24 @@
       // Next.js plugin still contributes the app-router entries.
       // (packages/ui needs no such entry: its `./*` package.json export makes
       // the wrapper reachable as public API, so knip already sees it as used.)
-      "entry": ["src/testing/custom-render.tsx"],
+      //
+      // src/testing/server-only-stub.ts (#1107): same reason as
+      // packages/service and packages/db's own entries above — reachable
+      // only through a string in vitest.config.ts's `resolve.alias`.
+      "entry": [
+        "src/testing/custom-render.tsx",
+        "src/testing/server-only-stub.ts"
+      ],
       // Referenced only as a Turbopack loader string (next.config.ts
       // `turbopack.rules['*.svg'].loaders: ['@svgr/webpack']`) — knip's
       // import graph can't see a bare string naming a package. Strict pnpm
       // (no hoisting) still requires it as a real apps/web devDependency so
       // Turbopack can resolve it.
       //
-      // @blog/db: this bootstrap (#984) wires the workspace dependency +
-      // alias ahead of any real usage — no file imports `@blog/db` yet, that
-      // lands with the M5.1 auth epic (#1105/#1107). Drop this entry once
-      // that first `import ... from '@blog/db'` exists in apps/web.
-      "ignoreDependencies": ["@svgr/webpack", "@blog/db"]
+      // @blog/db dropped from this list (#1107): the Auth.js config
+      // (`src/server/auth/auth.ts`) is now the first real
+      // `import ... from '@blog/db'` in apps/web.
+      "ignoreDependencies": ["@svgr/webpack"]
     }
   }
 }

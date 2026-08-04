@@ -35,6 +35,8 @@ import RssComponent from '@blog/ui/assets/icons/rss.svg';
 import RssUrl from '@blog/ui/assets/icons/rss.svg?url';
 import ShareComponent from '@blog/ui/assets/icons/share.svg';
 import ShareUrl from '@blog/ui/assets/icons/share.svg?url';
+import SpinnerComponent from '@blog/ui/assets/icons/spinner.svg';
+import SpinnerUrl from '@blog/ui/assets/icons/spinner.svg?url';
 import SunComponent from '@blog/ui/assets/icons/sun.svg';
 import SunUrl from '@blog/ui/assets/icons/sun.svg?url';
 import XComponent from '@blog/ui/assets/icons/x.svg';
@@ -74,4 +76,5 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.ARROW_UP]: { component: ArrowUpComponent, url: ArrowUpUrl },
   [ICONS.GOOGLE]: { component: GoogleComponent, url: GoogleUrl },
   [ICONS.BOOKMARK]: { component: BookmarkComponent, url: BookmarkUrl },
+  [ICONS.SPINNER]: { component: SpinnerComponent, url: SpinnerUrl },
 };

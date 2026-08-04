@@ -48,9 +48,15 @@ const scriptSrc = isDev
   ? `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${VERCEL_SPEED_INSIGHTS_ORIGIN}`
   : `script-src 'self' 'unsafe-inline' ${VERCEL_SPEED_INSIGHTS_ORIGIN}`;
 
+// OAuth profile photos (`Avatar` in `AuthMenu`, a plain `<img>`, not
+// `next/image` — this is a CSP concern, not `images.remotePatterns`):
+// GitHub always serves from this one host, but Google has served profile
+// photos from several `lhN.googleusercontent.com` subdomains over time, so a
+// wildcard is pinned instead of one specific subdomain that could silently
+// stop matching.
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "img-src 'self' https://cdn.sanity.io data:",
+  "img-src 'self' https://cdn.sanity.io https://avatars.githubusercontent.com https://*.googleusercontent.com data:",
   scriptSrc,
   // 'unsafe-inline' is required because Next.js and Tailwind inject inline
   // <style> tags at runtime (e.g. Next's style-loader output, CSS-in-JS

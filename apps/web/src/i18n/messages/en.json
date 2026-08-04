@@ -90,5 +90,28 @@
   },
   "authorMetadata": {
     "nameWithRole": "{name} — {role}"
+  },
+  "authMenu": {
+    "signIn": "Sign in",
+    "panelAriaLabel": "Sign in options",
+    "guestLabel": "guest",
+    "promptHost": "~$",
+    "promptCommandSignIn": "auth login",
+    "promptCommandAccount": "whoami",
+    "chooseProviderPrompt": "choose a provider",
+    "continueWithGithub": "Continue with GitHub",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithEmail": "Continue with email",
+    "redirectHint": "Redirects back to this article — you never lose your place.",
+    "emailAriaLabel": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "sendLink": "Send link",
+    "sending": "Sending…",
+    "checkYourInbox": "Check your inbox for a sign-in link.",
+    "emailError": "Couldn't send the link. Try again.",
+    "oauthError": "Sign-in failed. Please try again.",
+    "accountMenuAriaLabel": "Account menu",
+    "signOut": "Sign out",
+    "loadingAccountStatus": "Loading account status"
   }
 }

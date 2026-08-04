@@ -156,7 +156,9 @@ describe('LocaleLayout', () => {
       params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
     });
 
-    const [, , footer] = ui.props.children.props.children;
+    // `ui.props.children` is now `<SessionProvider>` (#1107) — one more
+    // `.props.children` hop than before to reach the root div's own children.
+    const [, , footer] = ui.props.children.props.children.props.children;
     const [, footerNav] = footer.props.children;
     const footerNavLinks = footerNav.props.children;
     const rssLink = footerNavLinks[footerNavLinks.length - 1];
@@ -187,7 +189,9 @@ describe('LocaleLayout', () => {
       params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
     });
 
-    const [, , footer] = ui.props.children.props.children;
+    // `ui.props.children` is now `<SessionProvider>` (#1107) — one more
+    // `.props.children` hop than before to reach the root div's own children.
+    const [, , footer] = ui.props.children.props.children.props.children;
     const [, footerNav] = footer.props.children;
     const [[socialLink]] = footerNav.props.children;
 
@@ -216,7 +220,9 @@ describe('LocaleLayout', () => {
       params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
     });
 
-    const [, , footer] = ui.props.children.props.children;
+    // `ui.props.children` is now `<SessionProvider>` (#1107) — one more
+    // `.props.children` hop than before to reach the root div's own children.
+    const [, , footer] = ui.props.children.props.children.props.children;
     const [, footerNav] = footer.props.children;
     const [[socialLink]] = footerNav.props.children;
 

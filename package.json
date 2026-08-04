@@ -48,6 +48,9 @@
       "prismjs@<1.30.0": ">=1.30.0",
       "smol-toml@<1.6.1": ">=1.6.1",
       "uuid@<11.1.1": ">=11.1.1"
-    }
+    },
+    "ignoredOptionalDependencies": [
+      "nodemailer"
+    ]
   }
 }
