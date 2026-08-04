@@ -3,12 +3,13 @@
 import { Size } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms';
 import { PopoverMenu, WindowChrome } from '@blog/ui/molecules';
+import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
+import { toSessionUsername } from '@web/components/shared/auth-menu/utils/to-session-username';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import type { RefObject } from 'react';
 
-import { authMenuVariants } from '../../auth-menu-variants';
-import { toSessionUsername } from '../../utils/to-session-username';
+import { accountMenuVariants } from './account-menu-variants';
 
 export type TAccountMenuProps = {
   panelId: string;
@@ -41,15 +42,9 @@ export function AccountMenu({
   image,
 }: TAccountMenuProps) {
   const t = useTranslations('authMenu');
-  const {
-    avatarTrigger,
-    panel,
-    window: windowSize,
-    acctRow,
-    accountName,
-    accountEmail,
-    signOutItem,
-  } = authMenuVariants();
+  const { panel, window: windowSize } = authMenuVariants();
+  const { avatarTrigger, acctRow, accountName, accountEmail, signOutItem } =
+    accountMenuVariants();
 
   const displayName = name ?? email ?? '';
   const username = toSessionUsername(name, email);

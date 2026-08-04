@@ -3,12 +3,13 @@
 import { ICONS, Size } from '@blog/config';
 import { Button, Icon, TextInput } from '@blog/ui/atoms';
 import { PopoverMenu, WindowChrome } from '@blog/ui/molecules';
+import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
+import { useEmailSignIn } from '@web/components/shared/auth-menu/hooks/use-email-sign-in';
 import { signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import type { RefObject } from 'react';
 
-import { authMenuVariants } from '../../auth-menu-variants';
-import { useEmailSignIn } from '../../hooks/use-email-sign-in';
+import { signInMenuVariants } from './sign-in-menu-variants';
 
 export type TSignInMenuProps = {
   panelId: string;
@@ -46,10 +47,9 @@ export function SignInMenu({
     emailFormRef,
     handleEmailSubmit,
   } = useEmailSignIn(open);
+  const { panel, window: windowSize } = authMenuVariants();
   const {
     signInTrigger,
-    panel,
-    window: windowSize,
     cmdLine,
     cmdPrompt,
     cmdCursor,
@@ -60,7 +60,20 @@ export function SignInMenu({
     emailFormActions,
     emailHint,
     emailSent,
-  } = authMenuVariants();
+  } = signInMenuVariants();
+
+  const providers = [
+    {
+      id: ICONS.GITHUB,
+      icon: ICONS.GITHUB,
+      label: t('continueWithGithub'),
+    },
+    {
+      id: ICONS.GOOGLE,
+      icon: ICONS.GOOGLE,
+      label: t('continueWithGoogle'),
+    },
+  ];
 
   return (
     <PopoverMenu>
@@ -95,20 +108,16 @@ export function SignInMenu({
               {t('chooseProviderPrompt')}
               <span aria-hidden="true" className={cmdCursor()} />
             </p>
-            <PopoverMenu.Item
-              className={providerButton()}
-              icon={<Icon name={ICONS.GITHUB} size={Size.SM} />}
-              onClick={() => signIn('github')}
-            >
-              {t('continueWithGithub')}
-            </PopoverMenu.Item>
-            <PopoverMenu.Item
-              className={providerButton()}
-              icon={<Icon name={ICONS.GOOGLE} size={Size.SM} />}
-              onClick={() => signIn('google')}
-            >
-              {t('continueWithGoogle')}
-            </PopoverMenu.Item>
+            {providers.map(({ id, icon, label }) => (
+              <PopoverMenu.Item
+                key={id}
+                className={providerButton()}
+                icon={<Icon name={icon} size={Size.SM} />}
+                onClick={() => signIn(id)}
+              >
+                {label}
+              </PopoverMenu.Item>
+            ))}
             {emailStep === 'sent' && (
               <p role="status" aria-live="polite" className={emailSent()}>
                 {t('checkYourInbox')}

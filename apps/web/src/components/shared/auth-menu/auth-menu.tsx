@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@blog/ui/atoms';
 import { useOAuthErrorParam } from '@web/hooks/use-oauth-error-param';
 import { usePopover } from '@web/hooks/use-popover';
 import { useSession } from 'next-auth/react';
@@ -9,6 +10,7 @@ import { useId } from 'react';
 import { authMenuVariants } from './auth-menu-variants';
 import { AccountMenu } from './components/account-menu/account-menu';
 import { SignInMenu } from './components/sign-in-menu/sign-in-menu';
+import { signInMenuVariants } from './components/sign-in-menu/sign-in-menu-variants';
 
 /**
  * AuthMenu — the header sign-in/account client island (#1107). Reads the
@@ -17,11 +19,12 @@ import { SignInMenu } from './components/sign-in-menu/sign-in-menu';
  * branch renders), `useOAuthErrorParam()`, and `useId()`, then renders
  * `AccountMenu` (logged-in) or `SignInMenu` (logged-out) with those passed
  * down as props. While the session is resolving it renders the real
- * `signInTrigger` button shell with its label hidden (not a differently-
- * shaped generic box) — a first-time/anonymous visitor resolving to that
- * logged-out state is the common case, so this reserves its exact footprint
- * and avoids the header reflow a mismatched placeholder size caused; same
- * `visibility`-hiding approach `ThemeToggleButton` already uses correctly.
+ * `signInTrigger` shell (via the `Button` atom, not a raw `<button>`) with
+ * its label hidden (not a differently-shaped generic box) — a first-time/
+ * anonymous visitor resolving to that logged-out state is the common case,
+ * so this reserves its exact footprint and avoids the header reflow a
+ * mismatched placeholder size caused; same `visibility`-hiding approach
+ * `ThemeToggleButton` already uses correctly.
  */
 export function AuthMenu() {
   const sessionResult = useSession();
@@ -29,18 +32,14 @@ export function AuthMenu() {
   const t = useTranslations('authMenu');
   const panelId = useId();
   const { open, toggle, triggerRef, panelRef } = usePopover();
-  const { signInTrigger, placeholderLabel } = authMenuVariants();
+  const { placeholderLabel } = authMenuVariants();
+  const { signInTrigger } = signInMenuVariants();
 
   if (sessionResult.status === 'loading') {
     return (
-      <button
-        type="button"
-        disabled
-        aria-hidden="true"
-        className={signInTrigger()}
-      >
+      <Button disabled aria-hidden="true" className={signInTrigger()}>
         <span className={placeholderLabel()}>{t('signIn')}</span>
-      </button>
+      </Button>
     );
   }
 
