@@ -92,15 +92,12 @@
     "nameWithRole": "{name} — {role}"
   },
   "authMenu": {
-    "loadingAriaLabel": "Loading account status",
     "signIn": "Sign in",
     "panelAriaLabel": "Sign in options",
     "guestLabel": "guest",
     "promptHost": "~$",
     "promptCommandSignIn": "auth login",
     "promptCommandAccount": "whoami",
-    "panelTag": "popover",
-    "accountTag": "menu",
     "chooseProviderPrompt": "choose a provider",
     "continueWithGithub": "Continue with GitHub",
     "continueWithGoogle": "Continue with Google",

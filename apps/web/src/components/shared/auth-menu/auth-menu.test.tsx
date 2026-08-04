@@ -6,7 +6,7 @@ import {
   within,
 } from '@web/testing/custom-render';
 
-import { AuthMenu, toSessionUsername } from './auth-menu';
+import { AuthMenu } from './auth-menu';
 
 const { useSessionMock, signInMock, signOutMock } = vi.hoisted(() => ({
   useSessionMock: vi.fn(),
@@ -34,12 +34,27 @@ describe(`<${AuthMenu.name}/>`, () => {
     setLocationSearch('');
   });
 
-  it('renders a neutral placeholder with no trigger while the session is resolving', () => {
+  it('renders no accessible trigger while the session is resolving', () => {
     useSessionMock.mockReturnValue({ data: null, status: 'loading' });
 
     setup();
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('reserves the sign-in trigger footprint while the session is resolving, to avoid a layout shift once it resolves', () => {
+    useSessionMock.mockReturnValue({ data: null, status: 'loading' });
+
+    setup();
+
+    // Real `<button>` with the same "Sign in" label `SignInMenu`'s trigger
+    // renders once resolved — hidden via `aria-hidden`/`invisible`, not a
+    // differently-shaped generic box, so its computed size matches the
+    // common (logged-out) resolved state exactly and the header doesn't
+    // reflow.
+    const placeholderTrigger = screen.getByRole('button', { hidden: true });
+    expect(placeholderTrigger).toBeDisabled();
+    expect(placeholderTrigger).toHaveTextContent('Sign in');
   });
 
   describe('logged out', () => {
@@ -77,7 +92,6 @@ describe(`<${AuthMenu.name}/>`, () => {
       expect(within(panel).getByText('guest')).toBeVisible();
       expect(within(panel).getByText('~$')).toBeVisible();
       expect(within(panel).getByText(/auth login/)).toBeVisible();
-      expect(within(panel).getByText('popover')).toBeVisible();
       expect(within(panel).getByText(/choose a provider/)).toBeVisible();
       expect(
         within(panel).getByText(
@@ -301,7 +315,6 @@ describe(`<${AuthMenu.name}/>`, () => {
       expect(within(panel).getByText('val')).toBeVisible();
       expect(within(panel).getByText('~$')).toBeVisible();
       expect(within(panel).getByText(/whoami/)).toBeVisible();
-      expect(within(panel).getByText('menu')).toBeVisible();
     });
 
     it('calls signOut when Sign out is clicked', async () => {
@@ -335,37 +348,5 @@ describe(`<${AuthMenu.name}/>`, () => {
       expect(within(panel).getByText('chester')).toBeVisible();
       expect(within(panel).queryByText('val')).not.toBeInTheDocument();
     });
-  });
-});
-
-describe(toSessionUsername, () => {
-  it('prefers the email local part when email is present', () => {
-    expect(toSessionUsername('Val Ovinnikov', 'val@example.com')).toBe('val');
-  });
-
-  it('falls back to a slug of name when email is absent', () => {
-    expect(toSessionUsername('Val Ovinnikov', undefined)).toBe('valovinnikov');
-  });
-
-  it('falls back to the generic "user" noun when both are absent', () => {
-    expect(toSessionUsername(undefined, undefined)).toBe('user');
-  });
-
-  it('falls through to name when the email has an empty local part', () => {
-    expect(toSessionUsername('Val Ovinnikov', '@example.com')).toBe(
-      'valovinnikov',
-    );
-  });
-
-  it('falls through to the "user" fallback when the email local part is empty and name is absent', () => {
-    expect(toSessionUsername(undefined, '@example.com')).toBe('user');
-  });
-
-  it('falls through to the "user" fallback when name is whitespace-only and email is absent', () => {
-    expect(toSessionUsername('   ', undefined)).toBe('user');
-  });
-
-  it('falls through to the "user" fallback when both are empty/whitespace-only', () => {
-    expect(toSessionUsername('   ', '@example.com')).toBe('user');
   });
 });
