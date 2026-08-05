@@ -10,6 +10,7 @@ export * from './popover-menu';
 export * from './post-card';
 export * from './post-meta';
 export * from './primary-navigation';
+export * from './setting-row';
 export * from './share-link';
 export * from './tag-list';
 export * from './terminal-chip';
