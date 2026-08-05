@@ -40,9 +40,17 @@
       // src/testing/server-only-stub.ts (#1107): same reason as
       // packages/service and packages/db's own entries above — reachable
       // only through a string in vitest.config.ts's `resolve.alias`.
+      //
+      // toast-provider/index.ts (#1141): the toast-notification system's
+      // public API (epic #1138). `useToast` genuinely has no caller yet —
+      // the only planned one, `BookmarkButton`, lives on a separate,
+      // not-yet-merged branch (#1043). Once that wiring lands, this entry
+      // becomes redundant (a real import makes it non-unused regardless)
+      // but harmless to leave.
       "entry": [
         "src/testing/custom-render.tsx",
-        "src/testing/server-only-stub.ts"
+        "src/testing/server-only-stub.ts",
+        "src/components/shared/toast-provider/index.ts"
       ],
       // Referenced only as a Turbopack loader string (next.config.ts
       // `turbopack.rules['*.svg'].loaders: ['@svgr/webpack']`) — knip's
