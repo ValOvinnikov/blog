@@ -15,6 +15,17 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../../packages/config/src/sanity/generated/schema.json
+export type Module_newsletter = {
+  _id: string;
+  _type: 'module_newsletter';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  heading?: string;
+  description?: string;
+};
+
 export type Module_cta = {
   _id: string;
   _type: 'module_cta';
@@ -299,6 +310,13 @@ export type Module_ctaReference = {
   [internalGroqTypeReferenceTo]?: 'module_cta';
 };
 
+export type Module_newsletterReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_newsletter';
+};
+
 export type Page_home = {
   _id: string;
   _type: 'page_home';
@@ -314,6 +332,9 @@ export type Page_home = {
     | ({
         _key: string;
       } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
   >;
   seo?: Seo;
 };
@@ -360,6 +381,9 @@ export type Page_generic = {
     | ({
         _key: string;
       } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
   >;
   seo?: Seo;
 };
@@ -580,6 +604,7 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | Module_newsletter
   | Module_cta
   | Blog_postReference
   | Blog_categoryReference
@@ -607,6 +632,7 @@ export type AllSanitySchemaTypes =
   | Module_heroReference
   | Module_postListReference
   | Module_ctaReference
+  | Module_newsletterReference
   | Page_home
   | Module_hero
   | Module_contentReference
