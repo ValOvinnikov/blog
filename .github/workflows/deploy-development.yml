@@ -166,6 +166,46 @@ jobs:
         working-directory: apps/cms
         run: pnpm migrate:deploy --yes
 
+  # Apply Drizzle/db schema migrations to the dev Neon branch BEFORE dev
+  # serves new code — the same "code never ships ahead of a pending
+  # migration" discipline as the content `migrate` job above, for the
+  # separate relational store (`packages/db`, see .claude/agents/db.md's
+  # "Migrations" section). Only `deploy-web` depends on `@blog/db` (apps/cms
+  # never touches Postgres), so this is gated on `web` alone, not `cms`, and
+  # only `deploy-web` (not `deploy-studio`) needs it below. No artifact
+  # backup here — dev is the disposable staging line, same stance as the
+  # content migrate job. `drizzle-kit migrate` is a no-op when nothing is
+  # pending, and the apply step is guarded on DATABASE_URL_UNPOOLED so the
+  # job is inert until that secret is configured. No approval gate on dev,
+  # same as the content migrate job.
+  migrate-db:
+    name: Migrate dev database
+    needs: [changes, verify]
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Same reasoning as `migrate` above (#409) — never cancel a running
+    # migration mid-transaction; a newer merge queues behind it instead.
+    concurrency:
+      group: deploy-dev-migrate-db
+      cancel-in-progress: false
+    environment: development
+    env:
+      DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Apply pending db migrations
+        if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
+        run: pnpm --filter @blog/db db:migrate
+
   deploy-studio:
     name: Deploy dev Studio
     needs: [changes, verify, migrate]
@@ -220,7 +260,7 @@ jobs:
 
   deploy-web:
     name: Deploy dev web
-    needs: [changes, verify, migrate]
+    needs: [changes, verify, migrate, migrate-db]
     if: >-
       github.event_name == 'workflow_dispatch' ||
       needs.changes.outputs.web == 'true'
