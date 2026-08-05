@@ -12,8 +12,8 @@ import {
   type ReactNode,
   useContext,
   useEffect,
-  useRef,
   useState,
+  useSyncExternalStore,
 } from 'react';
 
 import { depthProviderVariants } from './depth-provider-variants';
@@ -30,6 +30,34 @@ export interface IDepthProviderProps extends IDepthAvailability {
 }
 
 const s = depthProviderVariants();
+
+// `useSyncExternalStore`'s server/client snapshot pair, used here purely to
+// ask React "is the render happening right now genuinely matching
+// pre-rendered server HTML?" — there is no store to subscribe to, so
+// `subscribeToNothing` is a no-op. React calls `getBootstrapScriptServerSnapshot`
+// on the server, *and*, on the client, for the one render that must match the
+// server-rendered DOM (its internal hydration flag); every other client
+// render — including a plain client-side mount with no server-rendered DOM to
+// hydrate against, e.g. an App Router client-side navigation into this route
+// segment for the first time in the tab — calls `getBootstrapScriptClientSnapshot`
+// instead, from its very first render. A ref-based "is this my first render"
+// guard can't see that distinction: a ref starts out identically on *any*
+// first render, hydrating or not. `getBootstrapScriptClientSnapshot` is a
+// hard-coded `false` because a client-side render of the bootstrap `<script>`
+// is inert anyway — React never executes a `<script>` tag it creates outside
+// an actual HTML parse — so nothing is lost by never rendering it there,
+// while `getBootstrapScriptServerSnapshot` (`true`) keeps the script present
+// for the server markup and the matching hydration render, letting the
+// browser's HTML parser run it before React hydrates.
+function subscribeToNothing() {
+  return () => {};
+}
+function getBootstrapScriptClientSnapshot() {
+  return false;
+}
+function getBootstrapScriptServerSnapshot() {
+  return true;
+}
 
 /**
  * DepthProvider — owns the reader's chosen article depth (30s skim / read /
@@ -61,22 +89,19 @@ const s = depthProviderVariants();
  * different post that doesn't remount this component — so a depth that was
  * valid on the previous post gets re-clamped for the new one.
  *
- * `isInitialRender` guards the bootstrap script so it renders only once, for
- * the initial server-rendered HTML (and the hydration render that must match
- * it) — never on a later client-only re-render of the same instance (e.g.
- * the `hasSkim`/`hasDeep` change above). It's a ref, not state: it starts
- * `true`, so SSR and the first client render both see that value and the
- * script still reaches the DOM in time to run before hydration; a mount
- * effect then flips it to `false`. Because mutating a ref never itself
- * triggers a render, that flip doesn't force an extra commit the way state
- * would — the script stays exactly as long as it needs to (through mount)
- * and simply isn't re-emitted on whatever *later* render actually happens
- * next (e.g. the `hasSkim`/`hasDeep` change above). React never executes a
- * `<script>` it renders client-side anyway, so re-rendering it there only
- * produced a console warning, no behaviour. Reading `ref.current` during
- * render is normally unsafe (the eslint-disabled line below), but it's
- * sound here specifically because the value is only ever read, never
- * written, during render — the write happens exclusively in the effect.
+ * `useSyncExternalStore` (see the snapshot pair above) gates the bootstrap
+ * script so it renders only for the render that's genuinely hydrating
+ * server-rendered HTML — never for a plain client-side mount (no matching
+ * server DOM), nor for a later client-only re-render of the same instance
+ * (e.g. the `hasSkim`/`hasDeep` change above). After a real hydration match,
+ * React re-checks the snapshot post-commit, finds it now disagrees
+ * (`getBootstrapScriptClientSnapshot` is always `false`), and schedules one
+ * more render that omits the script — the same "renders once, through
+ * mount, then never again" lifecycle the previous ref-based guard had, but
+ * one that also skips the script entirely on a mount React was never going
+ * to hydrate in the first place, instead of rendering it there only to have
+ * React log a "Scripts inside React components are never executed when
+ * rendering on the client" warning about it.
  *
  * @example
  * <DepthProvider hasSkim={Boolean(post.skim)} hasDeep={post.hasAsides}>
@@ -90,16 +115,16 @@ export const DepthProvider = ({
   hasDeep,
 }: IDepthProviderProps) => {
   const [depth, setDepthState] = useState<TDepth>(DEPTH.READ);
-  const isInitialRender = useRef(true);
+  const shouldRenderBootstrapScript = useSyncExternalStore(
+    subscribeToNothing,
+    getBootstrapScriptClientSnapshot,
+    getBootstrapScriptServerSnapshot,
+  );
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDepthState(readStoredDepth({ hasSkim, hasDeep }));
   }, [hasSkim, hasDeep]);
-
-  useEffect(() => {
-    isInitialRender.current = false;
-  }, []);
 
   const setDepth = (next: TDepth) => {
     try {
@@ -113,9 +138,7 @@ export const DepthProvider = ({
   return (
     <DepthContext.Provider value={{ depth, setDepth }}>
       <div className={s.root()} data-depth={depth} suppressHydrationWarning>
-        {/* eslint-disable-next-line react-hooks/refs -- read-only during
-        render; the ref is only ever written from the mount effect above. */}
-        {isInitialRender.current && (
+        {shouldRenderBootstrapScript && (
           <script
             dangerouslySetInnerHTML={{
               __html: buildDepthBootstrapScript({ hasSkim, hasDeep }),

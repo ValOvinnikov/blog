@@ -1,9 +1,34 @@
 import { DEPTH } from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import { DEPTH_STORAGE_KEY } from '@web/config/depth-script';
+import messages from '@web/i18n/messages/en.json';
 import { renderElement, screen, waitFor } from '@web/testing/custom-render';
+import { NextIntlClientProvider } from 'next-intl';
+import type { ReactElement } from 'react';
+import { renderToString } from 'react-dom/server';
 
 import { DepthProvider, useDepth } from './depth-provider';
+
+/**
+ * Renders `ui` against real server-rendered markup via `hydrateRoot` —
+ * genuinely hydrating a matching server-rendered `<script>`, the one case
+ * the plain `renderElement` (`createRoot`) calls elsewhere in this file
+ * can't exercise, since those mirror a plain client-side mount (e.g. an App
+ * Router client-side navigation into this route segment) rather than a
+ * genuine hydration pass.
+ */
+function renderHydrated(ui: ReactElement) {
+  const wrapped = (
+    <NextIntlClientProvider locale="en" messages={messages}>
+      {ui}
+    </NextIntlClientProvider>
+  );
+  const container = document.createElement('div');
+  container.innerHTML = renderToString(wrapped);
+  document.body.appendChild(container);
+
+  return renderElement(ui, { hydrate: true, container });
+}
 
 const ReadDepth = () => {
   const { depth, setDepth } = useDepth();
@@ -135,31 +160,46 @@ describe(`<${DepthProvider.name}/>`, () => {
     );
   });
 
-  it('renders the pre-hydration bootstrap script on the initial render', () => {
+  it('includes the bootstrap script in server-rendered markup — the browser executes it during the initial HTML parse, before React hydrates', () => {
+    const html = renderToString(
+      <NextIntlClientProvider locale="en" messages={messages}>
+        <DepthProvider hasSkim={true} hasDeep={true}>
+          <p>Article body</p>
+        </DepthProvider>
+      </NextIntlClientProvider>,
+    );
+
+    expect(html).toContain('<script');
+  });
+
+  it('never renders the bootstrap script on a plain client-side mount with no server-rendered markup to hydrate against — e.g. an App Router client-side navigation into this route segment for the first time in the tab. React never executes a client-rendered <script> tag anyway, so this is a pure no-op mount that used to render — and get console-warned about — for nothing', async () => {
     const { container } = renderElement(
       <DepthProvider hasSkim={true} hasDeep={true}>
-        <p>Article body</p>
+        <ReadDepth />
       </DepthProvider>,
     );
 
-    expect(container.querySelector('script')).not.toBeNull();
+    await waitFor(() =>
+      expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
+    );
+
+    expect(container.querySelector('script')).toBeNull();
   });
 
   it('omits the bootstrap script on a client-side re-render of the same instance — it must never re-render on navigation, since React never executes a script tag it renders client-side (only a console warning would result)', async () => {
-    const { container, rerender } = renderElement(
+    const { container, rerender } = renderHydrated(
       <DepthProvider hasSkim={false} hasDeep={true}>
         <ReadDepth />
       </DepthProvider>,
     );
 
-    expect(container.querySelector('script')).not.toBeNull();
-
-    // Wait for the mount effects (including the one that flips the
-    // initial-render ref) to settle before re-rendering, same as a real
-    // client-side navigation would.
+    // Wait for the mount effects (including the hydration-consistency check
+    // that flips the bootstrap-script snapshot to `false`) to settle before
+    // re-rendering, same as a real client-side navigation would.
     await waitFor(() =>
       expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
     );
+    expect(container.querySelector('script')).toBeNull();
 
     // Same component instance (no remount) — the client-side-navigation-to-
     // a-different-post case that used to re-render the script tag.
