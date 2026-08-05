@@ -42,6 +42,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
     const button = screen.getByRole('button', { name: 'Save post' });
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute('aria-pressed', 'false');
+    expect(button).toHaveTextContent('save');
   });
 
   it('stays disabled once authenticated until the initial bookmark status resolves', () => {
@@ -73,6 +74,9 @@ describe(`<${BookmarkButton.name}/>`, () => {
     expect(
       screen.getByRole('button', { name: 'Remove bookmark' }),
     ).toHaveAttribute('aria-pressed', 'true');
+    expect(
+      screen.getByRole('button', { name: 'Remove bookmark' }),
+    ).toHaveTextContent('saved');
   });
 
   it('recovers to an enabled, not-bookmarked toggle (instead of staying stuck disabled) when the initial status fetch rejects', async () => {
@@ -116,9 +120,11 @@ describe(`<${BookmarkButton.name}/>`, () => {
 
     await user.click(screen.getByRole('button', { name: 'Save post' }));
 
-    expect(
-      screen.getByRole('button', { name: 'Remove bookmark' }),
-    ).toHaveAttribute('aria-pressed', 'true');
+    const toggledButton = screen.getByRole('button', {
+      name: 'Remove bookmark',
+    });
+    expect(toggledButton).toHaveAttribute('aria-pressed', 'true');
+    expect(toggledButton).toHaveTextContent('saved');
     expect(setBookmarkStatusMock).toHaveBeenCalledWith('post-1', true);
   });
 

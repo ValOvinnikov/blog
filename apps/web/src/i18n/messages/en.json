@@ -121,6 +121,8 @@
     "mergeCountSuffix": " ×{count}"
   },
   "bookmarkButton": {
+    "save": "save",
+    "saved": "saved",
     "saveAriaLabel": "Save post",
     "removeAriaLabel": "Remove bookmark",
     "error": "Couldn't save that. Try again."
