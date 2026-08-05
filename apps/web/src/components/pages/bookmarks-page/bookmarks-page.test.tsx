@@ -71,11 +71,25 @@ describe(`<${BookmarksPage.name}/>`, () => {
     expect(
       screen.getByText('No bookmarks yet — save a post to find it here.'),
     ).toBeVisible();
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    expect(screen.queryByText(/saved$/)).not.toBeInTheDocument();
     expect(listBookmarksMock).toHaveBeenCalledWith('user-1');
     expect(getPostsByIdsMock).toHaveBeenCalledWith([]);
   });
 
-  it('renders resolved post cards sorted by bookmark recency', async () => {
+  it('renders the terminal window chrome with the ls ~/bookmarks -l prompt', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    listBookmarksMock.mockResolvedValue([]);
+    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
+
+    await setup();
+
+    expect(screen.getByText('$')).toBeVisible();
+    expect(screen.getByText(/ls ~\/bookmarks/)).toBeVisible();
+    expect(screen.getByText('-l')).toBeVisible();
+  });
+
+  it('renders resolved posts as ls -l rows, sorted by bookmark recency, with a saved-count hint', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listBookmarksMock.mockResolvedValue([
       { userId: 'user-1', postId: 'post-2', createdAt: new Date() },
@@ -84,8 +98,8 @@ describe(`<${BookmarksPage.name}/>`, () => {
     getPostsByIdsMock.mockResolvedValue({
       ok: true,
       data: [
-        makePostCard({ id: 'post-1', title: 'First Post', slug: 'first' }),
-        makePostCard({ id: 'post-2', title: 'Second Post', slug: 'second' }),
+        makePostCard({ id: 'post-1', slug: 'first' }),
+        makePostCard({ id: 'post-2', slug: 'second' }),
       ],
     });
 
@@ -93,10 +107,14 @@ describe(`<${BookmarksPage.name}/>`, () => {
 
     expect(getPostsByIdsMock).toHaveBeenCalledWith(['post-2', 'post-1']);
 
-    const headings = screen
-      .getAllByRole('heading', { level: 3 })
-      .map((heading) => heading.textContent);
-    expect(headings).toEqual(['Second Post', 'First Post']);
+    const links = screen.getAllByRole('link');
+    expect(links.map((link) => link.textContent)).toEqual([
+      'second.md',
+      'first.md',
+    ]);
+    expect(links[0]).toHaveAttribute('href', '/blog/second');
+    expect(links[1]).toHaveAttribute('href', '/blog/first');
+    expect(screen.getByText('2 saved')).toBeVisible();
   });
 
   it('renders nothing when resolving bookmarked posts fails', async () => {
