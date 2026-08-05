@@ -19,6 +19,8 @@ export const routes = {
   author: (slug: string, page = 1) =>
     page === 1 ? `/author/${slug}` : `/author/${slug}/page/${page}`,
   topics: () => '/topics',
+  /** Auth-gated "My bookmarks" listing (#1043/#1109) — no slug/pagination, one static path per reader. */
+  bookmarks: () => '/bookmarks',
   genericPage: (slug: string) => `/${slug}`,
   rssFeed: () => '/rss.xml',
   /** No pagination variant — always the tag's base path + `/rss.xml`. */

@@ -64,6 +64,11 @@ export const blogPostPageVariants = tv({
     ],
     coverImage: ['size-full object-cover'],
     depthToggle: ['mx-auto w-full max-w-page px-gutter', 'mb-6'],
+    // Groups `BookmarkButton` beside `PostShare` inside `PostMeta`'s single
+    // `share` slot — that slot is one opaque `ReactNode` with no gap opinion
+    // of its own (`ml-auto` only), so this is the wrapper that gives the two
+    // actions consistent spacing.
+    metaActions: ['inline-flex items-center gap-2'],
   },
   variants: {
     // No `max-w-measure` on `body` itself: `rail`/`footerInRail` cap their
