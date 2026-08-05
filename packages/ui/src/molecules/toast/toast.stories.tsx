@@ -1,12 +1,24 @@
 import { TOAST_TYPE } from '@blog/config';
+import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Toast } from './toast';
+import { toastVariants } from './toast-variants';
 
 const meta = {
   title: 'Molecules/Toast',
   component: Toast,
   tags: ['autodocs'],
+  argTypes: {
+    type: {
+      control: 'select',
+      options: objectKeys(toastVariants.variants.type),
+    },
+    phase: {
+      control: 'select',
+      options: objectKeys(toastVariants.variants.phase),
+    },
+  },
   args: {
     type: TOAST_TYPE.SUCCESS,
     command: 'bookmark',

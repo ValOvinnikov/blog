@@ -112,11 +112,15 @@ export const toastVariants = tv({
     paused: {
       true: { timer: ['[animation-play-state:paused]'] },
     },
+    loading: {
+      true: { glyph: ['animate-spin'] },
+    },
   },
   defaultVariants: {
     phase: 'visible',
     hasTime: false,
     paused: false,
+    loading: false,
   },
 });
 

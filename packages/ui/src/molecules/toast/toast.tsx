@@ -77,9 +77,15 @@ export const Toast = ({
   className,
   dataTestId,
 }: IToastProps) => {
-  const s = toastVariants({ type, phase, hasTime: Boolean(time), paused });
-  const { role, live } = TOAST_ANNOUNCEMENT[type];
   const isLoading = type === TOAST_TYPE.LOADING;
+  const s = toastVariants({
+    type,
+    phase,
+    hasTime: Boolean(time),
+    paused,
+    loading: isLoading,
+  });
+  const { role, live } = TOAST_ANNOUNCEMENT[type];
 
   return (
     <div
@@ -94,9 +100,9 @@ export const Toast = ({
           <Icon
             name={ICONS.SPINNER}
             size={Size.SM}
-            className={s.glyph({ class: 'animate-spin' })}
+            className={s.glyph()}
             aria-hidden="true"
-            data-testid="toast-spinner"
+            dataTestId="toast-spinner"
           />
         ) : (
           <span className={s.glyph()} aria-hidden="true">

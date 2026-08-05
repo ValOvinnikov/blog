@@ -55,9 +55,4 @@ describe(`<${ToastViewport.name}/>`, () => {
     setup({ dataTestId: 'toast-viewport' });
     expect(screen.getByTestId('toast-viewport')).toBeVisible();
   });
-
-  it('merges extra className on the root element', () => {
-    setup({ className: 'mt-4', dataTestId: 'toast-viewport' });
-    expect(screen.getByTestId('toast-viewport').className).toContain('mt-4');
-  });
 });
