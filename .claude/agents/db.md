@@ -101,14 +101,37 @@ studio`, local inspection only).
   `service` separately). Composite-unique constraints where the design
   requires them (ratings and bookmarks are both `(userId, postId)` unique —
   see the UX doc's Features 3 and 4).
-- **Queries/mutations** (`src/queries/<domain>.ts` or a `queries/` +
-  `mutations/` split if a domain's file grows past a handful of actions) —
-  typed async functions, e.g. `getCommentsForPost(postId)`,
-  `upsertRating(userId, postId, value)`, `getRatingSummary(postId)`. Mirror
-  `service`'s facade shape where it helps consistency (a small `db` object
-  grouping domains), but don't force a versioned `v1` facade unless a real
-  compatibility need appears — this package has one internal consumer
-  (`apps/web`), not the external-content-shape stability `service` protects.
+- **Queries/mutations** — **one folder per query/mutation function**, nested
+  inside a `src/queries/<domain>/` folder once a domain has more than one
+  action (a single-query domain can stay a flat `src/queries/<domain>.ts`,
+  promoted to a domain folder the moment a second query lands). Each query
+  gets its own same-named subfolder — `src/queries/bookmarks/add-bookmark/`
+  containing `add-bookmark.ts` + `add-bookmark.test.ts` + an `index.ts`
+  re-exporting the function — mirroring the atomic-folder convention
+  `packages/ui`'s atoms/molecules already use (e.g.
+  `packages/ui/src/atoms/caption/`: `caption.tsx` + `caption.test.tsx` +
+  `index.ts`), not a flat file-per-query. So a domain with four queries looks
+  like:
+  ```
+  src/queries/bookmarks/
+    add-bookmark/{add-bookmark.ts, add-bookmark.test.ts, index.ts}
+    remove-bookmark/{remove-bookmark.ts, remove-bookmark.test.ts, index.ts}
+    list-bookmarks/{list-bookmarks.ts, list-bookmarks.test.ts, index.ts}
+    is-bookmarked/{is-bookmarked.ts, is-bookmarked.test.ts, index.ts}
+    index.ts   # re-exports every query folder
+  ```
+  Each query file imports only the `drizzle-orm` operators it actually uses
+  (no shared grab-bag import across the domain). `src/queries/<domain>/index.ts`
+  re-exports every query folder (`export * from './add-bookmark'`, etc.) so
+  `src/queries/index.ts`'s `export * as <domain> from './<domain>'` keeps
+  working unchanged whether `<domain>` is a flat file or a folder-of-folders.
+  Split shared-setup test cases (e.g. a cross-cutting FK-cascade test) into
+  whichever query's own test file most naturally exercises them, not a
+  separate catch-all file. Mirror `service`'s facade shape where it helps
+  consistency (a small `db` object grouping domains), but don't force a
+  versioned `v1` facade unless a real compatibility need appears — this
+  package has one internal consumer (`apps/web`), not the
+  external-content-shape stability `service` protects.
 - **View-model types** exported alongside each query file — the shape `web`
   actually consumes, not a raw Drizzle row type leaking `null`s the caller
   has to re-interpret. Same "no faked defaults" discipline as `service`:
