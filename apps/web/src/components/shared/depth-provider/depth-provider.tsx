@@ -12,6 +12,7 @@ import {
   type ReactNode,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
@@ -60,6 +61,23 @@ const s = depthProviderVariants();
  * different post that doesn't remount this component — so a depth that was
  * valid on the previous post gets re-clamped for the new one.
  *
+ * `isInitialRender` guards the bootstrap script so it renders only once, for
+ * the initial server-rendered HTML (and the hydration render that must match
+ * it) — never on a later client-only re-render of the same instance (e.g.
+ * the `hasSkim`/`hasDeep` change above). It's a ref, not state: it starts
+ * `true`, so SSR and the first client render both see that value and the
+ * script still reaches the DOM in time to run before hydration; a mount
+ * effect then flips it to `false`. Because mutating a ref never itself
+ * triggers a render, that flip doesn't force an extra commit the way state
+ * would — the script stays exactly as long as it needs to (through mount)
+ * and simply isn't re-emitted on whatever *later* render actually happens
+ * next (e.g. the `hasSkim`/`hasDeep` change above). React never executes a
+ * `<script>` it renders client-side anyway, so re-rendering it there only
+ * produced a console warning, no behaviour. Reading `ref.current` during
+ * render is normally unsafe (the eslint-disabled line below), but it's
+ * sound here specifically because the value is only ever read, never
+ * written, during render — the write happens exclusively in the effect.
+ *
  * @example
  * <DepthProvider hasSkim={Boolean(post.skim)} hasDeep={post.hasAsides}>
  *   <DepthToggle hasSkim={Boolean(post.skim)} hasDeep={post.hasAsides} labels={labels} />
@@ -72,11 +90,16 @@ export const DepthProvider = ({
   hasDeep,
 }: IDepthProviderProps) => {
   const [depth, setDepthState] = useState<TDepth>(DEPTH.READ);
+  const isInitialRender = useRef(true);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDepthState(readStoredDepth({ hasSkim, hasDeep }));
   }, [hasSkim, hasDeep]);
+
+  useEffect(() => {
+    isInitialRender.current = false;
+  }, []);
 
   const setDepth = (next: TDepth) => {
     try {
@@ -90,11 +113,15 @@ export const DepthProvider = ({
   return (
     <DepthContext.Provider value={{ depth, setDepth }}>
       <div className={s.root()} data-depth={depth} suppressHydrationWarning>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: buildDepthBootstrapScript({ hasSkim, hasDeep }),
-          }}
-        />
+        {/* eslint-disable-next-line react-hooks/refs -- read-only during
+        render; the ref is only ever written from the mount effect above. */}
+        {isInitialRender.current && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: buildDepthBootstrapScript({ hasSkim, hasDeep }),
+            }}
+          />
+        )}
         {children}
       </div>
     </DepthContext.Provider>

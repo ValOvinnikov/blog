@@ -135,6 +135,43 @@ describe(`<${DepthProvider.name}/>`, () => {
     );
   });
 
+  it('renders the pre-hydration bootstrap script on the initial render', () => {
+    const { container } = renderElement(
+      <DepthProvider hasSkim={true} hasDeep={true}>
+        <p>Article body</p>
+      </DepthProvider>,
+    );
+
+    expect(container.querySelector('script')).not.toBeNull();
+  });
+
+  it('omits the bootstrap script on a client-side re-render of the same instance — it must never re-render on navigation, since React never executes a script tag it renders client-side (only a console warning would result)', async () => {
+    const { container, rerender } = renderElement(
+      <DepthProvider hasSkim={false} hasDeep={true}>
+        <ReadDepth />
+      </DepthProvider>,
+    );
+
+    expect(container.querySelector('script')).not.toBeNull();
+
+    // Wait for the mount effects (including the one that flips the
+    // initial-render ref) to settle before re-rendering, same as a real
+    // client-side navigation would.
+    await waitFor(() =>
+      expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
+    );
+
+    // Same component instance (no remount) — the client-side-navigation-to-
+    // a-different-post case that used to re-render the script tag.
+    rerender(
+      <DepthProvider hasSkim={true} hasDeep={false}>
+        <ReadDepth />
+      </DepthProvider>,
+    );
+
+    expect(container.querySelector('script')).toBeNull();
+  });
+
   it('setDepth persists the choice to localStorage and updates data-depth', async () => {
     const user = userEvent.setup();
     const { container } = renderElement(
