@@ -9,3 +9,4 @@ export * from './module';
 export * from './reserved-slug';
 export * from './size';
 export * from './spec-line';
+export * from './toast';
