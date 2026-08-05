@@ -252,6 +252,11 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   also the local-dev dataset); a **`vMAJOR.MINOR.PATCH` git tag** promotes that
   exact commit to production. Content migrations run inside the gated prod
   deploy (`verify → migrate → deploy`), never ahead of the migrated data.
+  `@blog/db`'s Drizzle/Neon schema migrations run the same way, alongside the
+  Sanity ones, via their own `migrate-db` job in both deploy workflows (dev:
+  automatic; prod: backed up via `pg_dump`, gated behind the same required-
+  reviewer approval) — see `docs/DEPLOY.md` and `.claude/agents/db.md`'s
+  "Migrations" section.
 - **Each environment is a separate Sanity project** with its own env-driven,
   never-committed project id and tokens; **four fully isolated Vercel
   projects** (a web project and a Studio project per environment), all with

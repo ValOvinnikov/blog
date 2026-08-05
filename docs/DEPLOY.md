@@ -373,9 +373,11 @@ or before checks):
    to the **development** dataset via `migrate:deploy` (a no-op when none are
    pending), so dev's data never lags its code — the #355 failure mode. It runs
    on the same condition as `verify` (so it's never skipped out from under a
-   deploy that depends on it); `deploy-studio`/`deploy-web` `needs: [changes,
-verify, migrate, migrate-db]`. No artifact backup here — dev is the
-   disposable staging line (see "Refreshing development from production"
+   deploy that depends on it); `deploy-studio` `needs: [changes, verify,
+migrate]` and `deploy-web` `needs: [changes, verify, migrate, migrate-db]`
+   (see step 4 below for why only `deploy-web` also needs `migrate-db`). No
+   artifact backup here — dev is the disposable staging line (see "Refreshing
+   development from production"
    below for the manual post-migration refresh); the job is guarded on
    `SANITY_MIGRATE_TOKEN`, so it's inert until that secret exists. **No
    approval gate on dev** (unlike prod) — dev auto-migrates.
