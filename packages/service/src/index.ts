@@ -2,6 +2,7 @@
 
 import { createSkimService } from './features/editorial/skim';
 import { createCategoriesService } from './features/entities/categories';
+import { createPostsService } from './features/entities/posts';
 import { createFooterService } from './features/global/footer';
 import { createNavigationService } from './features/global/navigation';
 import { createSiteSettingsService } from './features/global/site-settings';
@@ -38,6 +39,7 @@ export const service = {
   },
   entities: {
     categories: createCategoriesService(),
+    posts: createPostsService(),
   },
   global: {
     siteSettings: createSiteSettingsService(),
