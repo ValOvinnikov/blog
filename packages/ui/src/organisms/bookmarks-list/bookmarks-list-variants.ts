@@ -7,7 +7,6 @@ export const bookmarksListVariants = tv({
     row: [
       'flex items-center gap-[1.4ch]',
       'border-b border-dashed border-border py-[0.28rem]',
-      'last:border-b-0',
     ],
     perm: ['text-subtle'],
     date: ['text-subtle'],
