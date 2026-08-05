@@ -17,6 +17,7 @@ export * from './prose';
 export * from './prose-link';
 export * from './quote-block';
 export * from './segmented-control';
+export * from './status-badge';
 export * from './tag';
 export * from './terminal-typing';
 export * from './text';

@@ -36,6 +36,14 @@ export const Link: TStory = {
   args: { children: 'Read more', variant: 'link' },
 };
 
+export const Danger: TStory = {
+  args: { children: 'delete account', variant: 'danger' },
+};
+
+export const DangerDisabled: TStory = {
+  args: { children: 'delete account', variant: 'danger', disabled: true },
+};
+
 export const Small: TStory = {
   args: { children: 'Tag', size: Size.SM },
 };
