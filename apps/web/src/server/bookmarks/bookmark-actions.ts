@@ -2,6 +2,7 @@
 
 import { queries } from '@blog/db';
 import { auth } from '@web/server/auth/auth';
+import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 
 export type TSetBookmarkResult = { ok: true } | { ok: false };
 
@@ -45,7 +46,7 @@ export async function setBookmarkStatus(
     }
     return { ok: true };
   } catch (error) {
-    console.error('Failed to update bookmark:', error);
+    console.error('Failed to update bookmark:', sanitizeLogMessage(error));
     return { ok: false };
   }
 }
