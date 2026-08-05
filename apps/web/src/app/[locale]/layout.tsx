@@ -7,6 +7,7 @@ import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { SiteNavigation } from '@web/components/shared/site-navigation';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
+import { ToastProvider } from '@web/components/shared/toast-provider';
 import { routing } from '@web/i18n/routing';
 import { env } from '@web/utils/env/env';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
@@ -126,71 +127,82 @@ export default async function LocaleLayout({ children, params }: TProps) {
           mounted-gated flash-avoidance pattern rather than duplicating an
           `auth()` call at every layout render. */}
       <SessionProvider>
-        {/* `root` is the sticky-footer shell: `min-h-dvh flex-col` so short
-            pages still fill the viewport, `content` is `flex-1` so it grows to
-            push `Footer` to the bottom on short pages and yields naturally
-            (no overlap) once page content exceeds the viewport. */}
-        <div className={s.root()}>
-          <Header>
-            <Header.Brand>
-              <BrandLockupLink brand={brand} />
-            </Header.Brand>
-            <SiteNavigation
-              links={navItems}
-              actions={
-                <>
-                  <ThemeToggleButton />
-                  <AuthMenu />
-                </>
-              }
-            />
-          </Header>
-          <div className={s.content()}>{children}</div>
-          <Footer dataTestId="site-footer">
-            <Footer.Copyright title={brand.name} />
-            <Footer.Nav>
-              {social.map((link) => {
-                // `link.platform` is optional and free-form beyond the
-                // `SOCIAL_PLATFORMS` enum's known icon set — an unmapped
-                // platform falls back to the original label-only rendering
-                // (no `icon`/`hideLabel`) rather than hiding the link.
-                const iconName =
-                  link.platform && toSocialIconName(link.platform);
-
-                return (
-                  <NavLink
-                    key={link.href}
-                    as={SmartLink}
-                    href={link.href}
-                    target={link.target}
-                    icon={
-                      iconName ? (
-                        <Icon
-                          name={iconName}
-                          size={Size.SM}
-                          dataTestId={`social-icon-${link.platform}`}
-                        />
-                      ) : undefined
-                    }
-                    hideLabel={Boolean(iconName)}
-                  >
-                    {link.label}
-                  </NavLink>
-                );
-              })}
-              <NavLink
-                as={SmartLink}
-                href={routes.rssFeed()}
-                icon={
-                  <Icon name={ICONS.RSS} size={Size.SM} dataTestId="rss-icon" />
+        {/* `ToastProvider` is mounted once here, above the routed `children`,
+            so a toast fired by an engagement island survives a client-side
+            route change instead of being tied to the page that fired it —
+            it owns no visual layout of its own, it just renders its fixed
+            `ToastViewport` alongside whatever `children` mounts. */}
+        <ToastProvider>
+          {/* `root` is the sticky-footer shell: `min-h-dvh flex-col` so short
+              pages still fill the viewport, `content` is `flex-1` so it grows to
+              push `Footer` to the bottom on short pages and yields naturally
+              (no overlap) once page content exceeds the viewport. */}
+          <div className={s.root()}>
+            <Header>
+              <Header.Brand>
+                <BrandLockupLink brand={brand} />
+              </Header.Brand>
+              <SiteNavigation
+                links={navItems}
+                actions={
+                  <>
+                    <ThemeToggleButton />
+                    <AuthMenu />
+                  </>
                 }
-                hideLabel
-              >
-                {t('feedLinkLabel')}
-              </NavLink>
-            </Footer.Nav>
-          </Footer>
-        </div>
+              />
+            </Header>
+            <div className={s.content()}>{children}</div>
+            <Footer dataTestId="site-footer">
+              <Footer.Copyright title={brand.name} />
+              <Footer.Nav>
+                {social.map((link) => {
+                  // `link.platform` is optional and free-form beyond the
+                  // `SOCIAL_PLATFORMS` enum's known icon set — an unmapped
+                  // platform falls back to the original label-only rendering
+                  // (no `icon`/`hideLabel`) rather than hiding the link.
+                  const iconName =
+                    link.platform && toSocialIconName(link.platform);
+
+                  return (
+                    <NavLink
+                      key={link.href}
+                      as={SmartLink}
+                      href={link.href}
+                      target={link.target}
+                      icon={
+                        iconName ? (
+                          <Icon
+                            name={iconName}
+                            size={Size.SM}
+                            dataTestId={`social-icon-${link.platform}`}
+                          />
+                        ) : undefined
+                      }
+                      hideLabel={Boolean(iconName)}
+                    >
+                      {link.label}
+                    </NavLink>
+                  );
+                })}
+                <NavLink
+                  as={SmartLink}
+                  href={routes.rssFeed()}
+                  icon={
+                    <Icon
+                      name={ICONS.RSS}
+                      size={Size.SM}
+                      dataTestId="rss-icon"
+                    />
+                  }
+                  hideLabel
+                >
+                  {t('feedLinkLabel')}
+                </NavLink>
+              </Footer.Nav>
+            </Footer>
+          </div>
+        </ToastProvider>
       </SessionProvider>
     </NextIntlClientProvider>
   );

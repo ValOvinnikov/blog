@@ -113,5 +113,10 @@
     "accountMenuAriaLabel": "Account menu",
     "signOut": "Sign out",
     "loadingAccountStatus": "Loading account status"
+  },
+  "toastProvider": {
+    "viewportAriaLabel": "Notifications",
+    "dismissLabel": "Dismiss notification",
+    "mergeCountSuffix": " ×{count}"
   }
 }
