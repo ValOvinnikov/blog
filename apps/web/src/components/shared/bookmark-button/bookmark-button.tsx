@@ -38,7 +38,7 @@ export type TBookmarkButtonProps = {
  *   `useToast` success/info toast (#1138's original motivating use case),
  *   and rolls back + shows an error toast on failure.
  *
- * The save/remove toast carries an `undo ⌘Z` action (`performUndo`) that
+ * The save/remove toast carries an `undo` action (`performUndo`) that
  * re-applies the opposite value and confirms with its own async-revert-can-
  * fail `info`/`error` toast (design doc §4.5) — the secondary error toast
  * carries no further `retry` action, to avoid an unbounded retry chain. The
@@ -137,7 +137,6 @@ export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
 
       const undoAction = {
         label: t('toastUndoLabel'),
-        keyHint: '⌘Z',
         onAct: () => performUndo(next),
       };
 
