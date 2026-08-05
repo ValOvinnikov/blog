@@ -38,11 +38,11 @@ export const signInMenuVariants = tv({
     errorNotice: [
       'absolute top-full left-0 z-20 mt-2 min-w-[220px]',
       'rounded-md border border-border bg-surface px-3 py-2 shadow-lg',
-      'font-mono text-meta text-danger',
+      'font-mono text-meta text-error',
     ],
     emailForm: ['mt-2 flex flex-col gap-2'],
     emailFormActions: ['flex items-center gap-2'],
-    emailHint: ['font-mono text-meta text-danger'],
-    emailSent: ['mt-2 font-mono text-meta text-ok'],
+    emailHint: ['font-mono text-meta text-error'],
+    emailSent: ['mt-2 font-mono text-meta text-success'],
   },
 });

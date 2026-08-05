@@ -27,6 +27,6 @@ export const accountMenuVariants = tv({
     acctRow: ['mb-2 flex items-center gap-2 border-b border-border pb-3'],
     accountName: ['font-mono text-copy text-text'],
     accountEmail: ['font-mono text-meta text-subtle'],
-    signOutItem: ['text-danger'],
+    signOutItem: ['text-error'],
   },
 });

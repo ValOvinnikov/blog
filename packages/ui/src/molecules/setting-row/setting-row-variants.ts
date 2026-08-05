@@ -22,10 +22,10 @@ export const settingRowVariants = tv({
       },
       danger: {
         root: [
-          'rounded-sm border border-danger border-l-2 bg-danger-muted',
+          'rounded-sm border border-error border-l-2 bg-error-muted',
           'mt-2 px-3',
         ],
-        title: ['text-danger'],
+        title: ['text-error'],
       },
     },
   },

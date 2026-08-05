@@ -25,7 +25,7 @@ export const toastVariants = tv({
       'shrink-0 border-0 bg-transparent p-0',
       'text-subtle',
       'transition-colors duration-fast ease-console',
-      'cursor-pointer hover:text-danger',
+      'cursor-pointer hover:text-error',
       'focus-visible:ring-accent focus-visible:ring-offset-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
     ],
     body: ['flex flex-col gap-1.5 p-3'],
@@ -56,12 +56,12 @@ export const toastVariants = tv({
   variants: {
     type: {
       [TOAST_TYPE.SUCCESS]: {
-        root: ['border-l-ok'],
-        glyph: ['text-ok'],
-        cmdState: ['text-ok'],
-        prompt: ['text-ok'],
-        action: ['hover:border-ok hover:text-ok'],
-        timer: ['bg-ok'],
+        root: ['border-l-success'],
+        glyph: ['text-success'],
+        cmdState: ['text-success'],
+        prompt: ['text-success'],
+        action: ['hover:border-success hover:text-success'],
+        timer: ['bg-success'],
       },
       [TOAST_TYPE.INFO]: {
         root: ['border-l-accent'],
@@ -80,12 +80,12 @@ export const toastVariants = tv({
         timer: ['bg-warn'],
       },
       [TOAST_TYPE.ERROR]: {
-        root: ['border-l-danger'],
-        glyph: ['text-danger'],
-        cmdState: ['text-danger'],
-        prompt: ['text-danger'],
-        action: ['hover:border-danger hover:text-danger'],
-        timer: ['bg-danger'],
+        root: ['border-l-error'],
+        glyph: ['text-error'],
+        cmdState: ['text-error'],
+        prompt: ['text-error'],
+        action: ['hover:border-error hover:text-error'],
+        timer: ['bg-error'],
       },
       [TOAST_TYPE.LOADING]: {
         root: ['border-l-accent'],

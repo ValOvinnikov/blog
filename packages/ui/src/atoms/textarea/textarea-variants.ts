@@ -19,7 +19,7 @@ export const textareaVariants = tv({
   },
   variants: {
     invalid: {
-      true: { textarea: ['border-danger text-danger'] },
+      true: { textarea: ['border-error text-error'] },
     },
     hasPrompt: {
       true: { textarea: ['pl-8'] },
