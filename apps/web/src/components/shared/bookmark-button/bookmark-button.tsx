@@ -34,10 +34,11 @@ const ERROR_DISMISS_DELAY_MS = 4000;
  *   flashes bookmarked), so a returning signed-in reader sees no pop-in once
  *   the session resolves.
  * - **Authenticated** → fetches the real initial state via
- *   `getBookmarkStatus` (disabled until that resolves), then toggles
- *   optimistically: flips its own state immediately, calls
- *   `setBookmarkStatus`, and rolls back + shows a transient inline error on
- *   failure.
+ *   `getBookmarkStatus` (disabled until that resolves — a failed fetch still
+ *   resolves it, defaulting to "not bookmarked", so the toggle never gets
+ *   stuck disabled), then toggles optimistically: flips its own state
+ *   immediately, calls `setBookmarkStatus`, and rolls back + shows a
+ *   transient inline error on failure.
  */
 export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
   const t = useTranslations('bookmarkButton');
@@ -53,11 +54,23 @@ export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
 
     let cancelled = false;
 
-    getBookmarkStatus(postId).then((bookmarked) => {
-      if (cancelled) return;
-      setIsBookmarked(bookmarked);
-      setIsResolved(true);
-    });
+    getBookmarkStatus(postId)
+      .then((bookmarked) => {
+        if (cancelled) return;
+        setIsBookmarked(bookmarked);
+        setIsResolved(true);
+      })
+      .catch((fetchError: unknown) => {
+        // A transient failure here (e.g. the db read throwing) must not
+        // leave the toggle permanently disabled with no explanation —
+        // resolve to "not bookmarked" and let the reader retry via a normal
+        // toggle, same recovery shape as `useCopyToClipboard`'s own
+        // `.then().catch()`.
+        console.error('Failed to load bookmark status:', fetchError);
+        if (cancelled) return;
+        setIsBookmarked(false);
+        setIsResolved(true);
+      });
 
     return () => {
       cancelled = true;

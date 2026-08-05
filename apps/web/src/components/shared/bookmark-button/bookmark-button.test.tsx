@@ -75,6 +75,31 @@ describe(`<${BookmarkButton.name}/>`, () => {
     ).toHaveAttribute('aria-pressed', 'true');
   });
 
+  it('recovers to an enabled, not-bookmarked toggle (instead of staying stuck disabled) when the initial status fetch rejects', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    useSessionMock.mockReturnValue({
+      data: { user: { id: 'user-1' } },
+      status: 'authenticated',
+    });
+    getBookmarkStatusMock.mockRejectedValue(new Error('db unavailable'));
+
+    setup();
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled();
+    });
+    expect(screen.getByRole('button', { name: 'Save post' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Failed to load bookmark status:',
+      expect.any(Error),
+    );
+
+    errorSpy.mockRestore();
+  });
+
   it('optimistically toggles on click and calls setBookmarkStatus with the new value', async () => {
     useSessionMock.mockReturnValue({
       data: { user: { id: 'user-1' } },
