@@ -22,4 +22,22 @@ describe(`<${Avatar.name}/>`, () => {
     setup({ alt: 'John Michael Doe', name: 'John Michael Doe' });
     expect(screen.getByText('JM')).toBeVisible();
   });
+
+  it('derives 2 initials from an email address with no whitespace', () => {
+    setup({
+      alt: 'val.ovinnikov@icloud.com',
+      name: 'val.ovinnikov@icloud.com',
+    });
+    expect(screen.getByText('VO')).toBeVisible();
+  });
+
+  it('derives 2 initials from an email local-part with no secondary delimiter', () => {
+    setup({ alt: 'madonna@example.com', name: 'madonna@example.com' });
+    expect(screen.getByText('MA')).toBeVisible();
+  });
+
+  it('derives 2 initials from a single unstructured token with no whitespace', () => {
+    setup({ alt: 'madonna', name: 'madonna' });
+    expect(screen.getByText('MA')).toBeVisible();
+  });
 });
