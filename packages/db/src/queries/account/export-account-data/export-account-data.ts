@@ -1,0 +1,66 @@
+import { getDb } from '@blog/db/client';
+import { users } from '@blog/db/schema/auth';
+import { bookmarks } from '@blog/db/schema/bookmarks';
+import { desc, eq } from 'drizzle-orm';
+
+// The `/account` "export my data" download's profile slice — the raw
+// `users` row's nullable fields (name/email/emailVerified/image can all be
+// unset, e.g. a fresh OAuth sign-in before a provider returns them) mapped
+// to `undefined` rather than leaking Drizzle's `null`, per this package's
+// no-faked-defaults convention.
+export type TAccountProfileExport = {
+  id: string;
+  name: string | undefined;
+  email: string | undefined;
+  emailVerified: Date | undefined;
+  image: string | undefined;
+};
+
+// One bookmarked post in the export. `userId` is intentionally omitted here
+// (it's implicit — every row in this array belongs to the exported user).
+export type TAccountBookmarkExport = {
+  postId: string;
+  createdAt: Date;
+};
+
+export type TAccountDataExport = {
+  profile: TAccountProfileExport;
+  bookmarks: TAccountBookmarkExport[];
+};
+
+// Aggregates a user's profile + bookmarks into one JSON-serializable shape
+// for the `/account` "export my data" download (Epic #1151, D15 §4.6/6a).
+// Scoped to the two tables that exist today (`users`, `bookmarks`) — comments
+// (#1040), ratings (#1041), and newsletter subscription (#1044) each extend
+// this function to fold in their own table once they land; don't add those
+// tables here ahead of that.
+//
+// Returns `undefined` if `userId` doesn't match a `users` row, rather than a
+// half-empty export shape — callers (web) should treat that as "no such
+// account", not "an account with nothing in it".
+export async function exportAccountData(
+  userId: string,
+): Promise<TAccountDataExport | undefined> {
+  const db = getDb();
+
+  const [user] = await db.select().from(users).where(eq(users.id, userId));
+
+  if (!user) return undefined;
+
+  const userBookmarks = await db
+    .select({ postId: bookmarks.postId, createdAt: bookmarks.createdAt })
+    .from(bookmarks)
+    .where(eq(bookmarks.userId, userId))
+    .orderBy(desc(bookmarks.createdAt));
+
+  return {
+    profile: {
+      id: user.id,
+      name: user.name ?? undefined,
+      email: user.email ?? undefined,
+      emailVerified: user.emailVerified ?? undefined,
+      image: user.image ?? undefined,
+    },
+    bookmarks: userBookmarks,
+  };
+}
