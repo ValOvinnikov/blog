@@ -6,6 +6,7 @@ import { WindowChrome } from '@blog/ui/molecules';
 import { BookmarksList, type IBookmarkRow } from '@blog/ui/organisms';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { auth } from '@web/server/auth/auth';
+import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { redirect } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
@@ -52,7 +53,9 @@ export async function BookmarksPage() {
   const result = await service.entities.posts.v1.getPostsByIds(bookmarkOrder);
 
   if (!result.ok) {
-    console.error(`Failed to resolve bookmarked posts: ${result.error}`);
+    console.error(
+      `Failed to resolve bookmarked posts: ${sanitizeLogMessage(result.error)}`,
+    );
     return null;
   }
 

@@ -23,6 +23,7 @@ import {
   extractPostHeadings,
   MIN_H2_HEADINGS_FOR_RAIL,
 } from '@web/utils/extract-post-headings/extract-post-headings';
+import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import { notFound } from 'next/navigation';
@@ -46,7 +47,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   const result = await service.pages.post.v1.getPost(slug);
 
   if (!result.ok) {
-    console.error(`Error to fetch post: ${result.error}`);
+    console.error(`Error to fetch post: ${sanitizeLogMessage(result.error)}`);
     notFound();
   }
   if (result.data === null) {

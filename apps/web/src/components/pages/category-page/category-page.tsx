@@ -11,6 +11,7 @@ import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-sche
 import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
 import { env } from '@web/utils/env/env';
 import { getCategoriesSafely } from '@web/utils/get-categories-safely';
+import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -40,7 +41,9 @@ export async function CategoryPage({ slug, page }: TCategoryPageProps) {
     ]);
 
   if (!result.ok) {
-    console.error(`Error to fetch category page: ${result.error}`);
+    console.error(
+      `Error to fetch category page: ${sanitizeLogMessage(result.error)}`,
+    );
     notFound();
   }
   if (result.data === null) {

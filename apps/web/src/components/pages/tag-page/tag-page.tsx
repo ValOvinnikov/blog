@@ -8,6 +8,7 @@ import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
+import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
@@ -36,7 +37,9 @@ export async function TagPage({ slug, page }: TTagPageProps) {
   ]);
 
   if (!result.ok) {
-    console.error(`Error to fetch tag page: ${result.error}`);
+    console.error(
+      `Error to fetch tag page: ${sanitizeLogMessage(result.error)}`,
+    );
     notFound();
   }
   if (result.data === null) {
