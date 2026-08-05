@@ -197,6 +197,55 @@ describe(`<${ToastProvider.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
+  it('mouse-leave does not resume the timer while focus remains inside the toast', () => {
+    renderElement(
+      <ToastProvider>
+        <ToastHarness />
+      </ToastProvider>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+    const toastEl = screen.getByRole('status');
+    const dismissButton = screen.getByRole('button', {
+      name: 'Dismiss notification',
+    });
+
+    // Hover pauses, then focus also enters (tabbing to the dismiss button)
+    // before the mouse leaves without focus moving. `.focus()`/`.blur()` are
+    // used directly (not `fireEvent.focus`/`fireEvent.blur`, which dispatch
+    // only the non-bubbling `focus`/`blur` events) so jsdom also fires the
+    // bubbling `focusin`/`focusout` React's delegated onFocus/onBlur listens
+    // for.
+    fireEvent.mouseEnter(toastEl);
+    act(() => {
+      dismissButton.focus();
+    });
+    // `relatedTarget` must be something *outside* the toast — React only
+    // synthesizes a `mouseleave` when the pointer's destination isn't a
+    // descendant of the element (moving onto a child, like the dismiss
+    // button, correctly does not count as leaving).
+    fireEvent.mouseLeave(toastEl, { relatedTarget: document.body });
+
+    // The default 3.6s life would have elapsed by now if leaving with the
+    // mouse alone had resumed the timer — it must not have, since focus is
+    // still inside the toast.
+    act(() => {
+      vi.advanceTimersByTime(4000);
+    });
+    expect(screen.getByText('stashed to ~/bookmarks')).toBeVisible();
+
+    // Only once focus *also* leaves does the timer actually resume.
+    act(() => {
+      dismissButton.blur();
+    });
+    act(() => {
+      vi.advanceTimersByTime(3600 + TOAST_EXIT_ANIMATION_MS);
+    });
+    expect(
+      screen.queryByText('stashed to ~/bookmarks'),
+    ).not.toBeInTheDocument();
+  });
+
   it('collapses a rapid identical success repeat into one toast with a count suffix', () => {
     renderElement(
       <ToastProvider>

@@ -21,6 +21,7 @@ import {
   type IToastPayload,
   type IToastPromiseMessages,
 } from './toast-store';
+import { useToastRowPause } from './use-toast-row-pause';
 
 interface IUseToast {
   success: (payload: IToastPayload) => string;
@@ -85,7 +86,7 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
     [store],
   );
 
-  const rowRefs = useRef(new Map<string, HTMLDivElement | null>());
+  const rowPause = useToastRowPause(store.actions.pause, store.actions.resume);
   const scheduledEnterIds = useRef(new Set<string>());
 
   // Double-rAF before flipping `entering` -> `visible` so the browser paints
@@ -124,17 +125,13 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
 
-      const active = document.activeElement;
-      const focusedId = [...rowRefs.current.entries()].find(([, node]) =>
-        node?.contains(active),
-      )?.[0];
-
+      const focusedId = rowPause.getFocusedRowId(document.activeElement);
       store.actions.dismiss(focusedId);
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [state.visible.length, store]);
+  }, [state.visible.length, store, rowPause]);
 
   return (
     <ToastContext.Provider value={toast}>
@@ -146,24 +143,18 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
         {state.visible.map((record) => (
           <div
             key={record.id}
-            ref={(node) => {
-              rowRefs.current.set(record.id, node);
-            }}
+            ref={rowPause.registerRow(record.id)}
             className={s.row()}
-            onMouseEnter={() => store.actions.pause(record.id)}
-            onMouseLeave={() => store.actions.resume(record.id)}
-            onFocus={() => store.actions.pause(record.id)}
-            onBlur={(event) => {
-              // Focus moving between two elements inside the same toast
-              // (e.g. the action button -> the dismiss button) must not
-              // resume the timer — only leaving the toast entirely does.
-              if (
-                event.currentTarget.contains(event.relatedTarget as Node | null)
-              ) {
-                return;
-              }
-              store.actions.resume(record.id);
-            }}
+            onMouseEnter={() => rowPause.handleMouseEnter(record.id)}
+            onMouseLeave={() => rowPause.handleMouseLeave(record.id)}
+            onFocus={() => rowPause.handleFocus(record.id)}
+            onBlur={(event) =>
+              rowPause.handleBlur(
+                record.id,
+                event.currentTarget,
+                event.relatedTarget as Node | null,
+              )
+            }
           >
             <Toast
               type={record.type}

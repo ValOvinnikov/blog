@@ -211,6 +211,31 @@ describe(createToastStore, () => {
       expect(store.getState().visible[0]!.count).toBe(3);
     });
 
+    it('counter-merge while paused un-pauses and re-arms a fresh full-duration timer', () => {
+      const store = createToastStore();
+      const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
+      store.actions.pause(id);
+      expect(store.getState().visible[0]!.paused).toBe(true);
+
+      // A duplicate within the merge window arrives while the toast is
+      // still paused (e.g. it's being hovered).
+      const mergedId = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
+      expect(mergedId).toBe(id);
+
+      const merged = store.getState().visible.find((t) => t.id === id);
+      expect(merged?.paused).toBe(false);
+      expect(merged?.count).toBe(2);
+
+      // The re-armed timer must genuinely be running, not stuck behind a
+      // stale `paused: true` that nothing will ever clear (`pause()`
+      // no-ops once already paused, so continued hovering could never
+      // have cleared it either).
+      vi.advanceTimersByTime(TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS]!);
+      expect(store.getState().visible.find((t) => t.id === id)?.phase).toBe(
+        'leaving',
+      );
+    });
+
     it('does not merge once the 1s window has elapsed', () => {
       const store = createToastStore();
 

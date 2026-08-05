@@ -306,6 +306,13 @@ export const createToastStore = () => {
         patchRecord(existing.id, () => ({
           ...existing,
           count: nextCount,
+          // A repeat within the merge window is a fresh "same thing
+          // happened again" signal — like the coalesce-key branch above,
+          // it un-pauses and re-arms a full-duration timer rather than
+          // leaving a stale `paused: true` record with a new timer that
+          // continued hovering can no longer stop (`pause()` no-ops once
+          // already paused).
+          paused: false,
           createdAt: now,
         }));
         restartTimer(existing.id, existing.durationMs);
