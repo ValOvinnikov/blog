@@ -179,11 +179,16 @@ Preview scopes as the five keys above:
 > `DATABASE_URL` (the pooled Neon HTTP driver, `drizzle-orm/neon-http`) is
 > what the deployed app reads at runtime via `@blog/db`'s validated env entry
 > point. `DATABASE_URL_UNPOOLED` (direct connection) is what `drizzle-kit`
-> needs for `db:generate`/`db:migrate`/`db:studio` — those aren't run by the
-> deployed app itself, only by a human (or, later, a dedicated CI migrate
-> job — not wired yet, see `.claude/agents/db.md`'s "Migrations" section) —
-> but keeping both alongside the pooled value here means the same env source
-> covers local dev and any future CI job without a second place to update it.
+> needs for `db:generate`/`db:migrate`/`db:studio` — `db:generate` never runs
+> in CI (it's a local, human-review step), but `db:migrate` now runs
+> automatically via the `migrate-db` job in `deploy-development.yml` (no
+> approval gate) and `deploy-production.yml` (gated behind the `production`
+> Environment's required reviewer, same gate every other prod job uses) —
+> see `.claude/agents/db.md`'s "Migrations" section and "How a deploy
+> happens" below. These two Vercel-scoped values and the GitHub Environment
+> secret in §4 below are the same connection strings, just wired into two
+> different systems — keep them in sync when a Neon branch's credentials
+> rotate.
 
 #### Neon Postgres — one project, per-branch environments
 
@@ -228,6 +233,9 @@ job resolves its own project's id + token:
 
 - [ ] Variable `SANITY_STUDIO_PROJECT_ID` = `<DEV_PROJECT_ID>`
 - [ ] Secret `SANITY_MIGRATE_TOKEN` = `<DEV_MIGRATE_TOKEN>` (Editor — the migrate job)
+- [ ] Secret `DATABASE_URL_UNPOOLED` = `<DEV_DATABASE_URL_UNPOOLED>` (the `development`
+      Neon branch's direct connection string — the `migrate-db` job's
+      `drizzle-kit migrate`; same value as the Vercel env var above)
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-dev**)
@@ -237,6 +245,10 @@ job resolves its own project's id + token:
 
 - [ ] Variable `SANITY_STUDIO_PROJECT_ID` = `<PRD_PROJECT_ID>`
 - [ ] Secret `SANITY_MIGRATE_TOKEN` = `<PRD_MIGRATE_TOKEN>` (Editor — the migrate job)
+- [ ] Secret `DATABASE_URL_UNPOOLED` = `<PRD_DATABASE_URL_UNPOOLED>` (the `production`
+      Neon branch's direct connection string — the `migrate-db` job's
+      `pg_dump` backup + `drizzle-kit migrate`; same value as the Vercel env
+      var above)
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-prod**)
@@ -361,15 +373,27 @@ or before checks):
    to the **development** dataset via `migrate:deploy` (a no-op when none are
    pending), so dev's data never lags its code — the #355 failure mode. It runs
    on the same condition as `verify` (so it's never skipped out from under a
-   deploy that depends on it); both deploy jobs `needs: [changes, verify,
-migrate]`. No artifact backup here — dev is the disposable staging line
-   (see "Refreshing development from production" below for the manual
-   post-migration refresh); the job is guarded on `SANITY_MIGRATE_TOKEN`,
-   so it's inert until that secret exists. **No approval gate on dev** (unlike
-   prod) — dev auto-migrates.
-4. **`deploy-studio`** → `cms-dev` via the Vercel CLI (`studio-dev.{your-hosting}`),
+   deploy that depends on it); `deploy-studio` `needs: [changes, verify,
+migrate]` and `deploy-web` `needs: [changes, verify, migrate, migrate-db]`
+   (see step 4 below for why only `deploy-web` also needs `migrate-db`). No
+   artifact backup here — dev is the disposable staging line (see "Refreshing
+   development from production"
+   below for the manual post-migration refresh); the job is guarded on
+   `SANITY_MIGRATE_TOKEN`, so it's inert until that secret exists. **No
+   approval gate on dev** (unlike prod) — dev auto-migrates.
+4. **`migrate-db`** (`environment: development`) — the same idea as `migrate`
+   above, for the separate `@blog/db` (Drizzle/Neon) relational store: applies
+   any un-applied schema migrations to the **development** Neon branch via
+   `pnpm --filter @blog/db db:migrate` (`drizzle-kit migrate`, a no-op when
+   none are pending). Gated on `needs.changes.outputs.web` only (apps/cms
+   never touches Postgres, so a cms-only change doesn't trigger it); only
+   `deploy-web` `needs` it (not `deploy-studio`). No artifact backup here,
+   same disposable-staging-line stance as `migrate`; guarded on
+   `DATABASE_URL_UNPOOLED`, so it's inert until that secret exists. **No
+   approval gate on dev.** See `.claude/agents/db.md`'s "Migrations" section.
+5. **`deploy-studio`** → `cms-dev` via the Vercel CLI (`studio-dev.{your-hosting}`),
    same mechanism as `deploy-web`.
-5. **`deploy-web`** → `blog-dev` via the Vercel CLI
+6. **`deploy-web`** → `blog-dev` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
 
 Concurrency is scoped **per job**, not workflow-wide. `changes` / `verify` /
@@ -378,13 +402,13 @@ supersedes an in-flight build/deploy — "latest merge wins" still holds. (The
 supersede is slightly lazier than the old workflow-level cancel: a per-job
 group cancels an older run's `deploy-web`/`deploy-studio` only once the newer
 run's _same_ job is ready to start — i.e. after the newer run clears its own
-`changes` → `verify` → `migrate` chain — so an old deploy can finish before
-being superseded rather than being cut off the instant a new run starts.) The
-`migrate` job is the exception — its group uses `cancel-in-progress: false`
-(#409), so a newer merge **queues behind** a running migration instead of
-interrupting a dataset mutation mid-transaction. GitHub keeps at most one
-pending run per group, so a burst of merges collapses to "finish the current
-migration, then run the latest".
+`changes` → `verify` → `migrate`/`migrate-db` chain — so an old deploy can
+finish before being superseded rather than being cut off the instant a new
+run starts.) `migrate` and `migrate-db` are the exception — both groups use
+`cancel-in-progress: false` (#409), so a newer merge **queues behind** a
+running migration instead of interrupting a mutation mid-transaction. GitHub
+keeps at most one pending run per group, so a burst of merges collapses to
+"finish the current migration, then run the latest".
 
 There are **no PR preview deployments** — deploys happen only on merge to `main`.
 
@@ -402,14 +426,29 @@ There are **no PR preview deployments** — deploys happen only on merge to `mai
    idempotent). The `production` environment's required reviewer is the human
    approval gate. Every step is guarded on `SANITY_MIGRATE_TOKEN`, so the job is a
    **no-op until that secret is configured** — safe to ship ahead of setup.
-3. **`deploy-studio`** → `cms-prod` via the Vercel CLI (`studio.{your-hosting}`),
+3. **`migrate-db`** (`environment: production`, `needs: verify`) — the same
+   idea as `migrate` above, for the separate `@blog/db` (Drizzle/Neon)
+   relational store: `pg_dump`s the production Neon branch and uploads it as
+   a 30-day artifact **before** any mutation, then runs
+   `pnpm --filter @blog/db db:migrate` (`drizzle-kit migrate`) to apply only
+   the un-applied schema migrations (tracked in drizzle-kit's own journal
+   under `packages/db/migrations/meta`, idempotent). Reuses the **same**
+   `production` Environment required-reviewer gate as every other prod job —
+   no second approval mechanism. Every step is guarded on
+   `DATABASE_URL_UNPOOLED`, so the job is a **no-op until that secret is
+   configured** — safe to ship ahead of setup. Only `deploy-web` `needs` it
+   (apps/cms never touches Postgres). See `.claude/agents/db.md`'s
+   "Migrations" section.
+4. **`deploy-studio`** → `cms-prod` via the Vercel CLI (`studio.{your-hosting}`),
    same mechanism as `deploy-web`.
-4. **`deploy-web`** → `blog-prod` via the Vercel CLI
+5. **`deploy-web`** → `blog-prod` via the Vercel CLI
    (`vercel pull → build --prod → deploy --prebuilt --prod`).
 
-Both deploy jobs `needs: [verify, migrate]`, so **new code is never served
-before pending migrations run**; a failed or reviewer-rejected `migrate` skips
-both deploys, leaving the old code serving the old (un-migrated) data.
+`deploy-studio` `needs: [verify, migrate]`; `deploy-web` `needs: [verify,
+migrate, migrate-db]` — so **new code is never served before pending
+migrations run**; a failed or reviewer-rejected `migrate`/`migrate-db` skips
+the deploy(s) that depend on it, leaving the old code serving the old
+(un-migrated) data.
 
 ### Refreshing development from production (manual, post-migration)
 

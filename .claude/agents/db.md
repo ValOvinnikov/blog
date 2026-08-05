@@ -137,22 +137,38 @@ generate`) diffs the schema against the last migration and writes a new
 3. **Apply to local/dev.** `pnpm --filter @blog/db db:migrate` against the
    **development** Neon branch — no backup required first, same stance
    `docs/DEPLOY.md` already takes for the Sanity `development` dataset (the
-   disposable staging line; CI applies un-applied migrations automatically on
-   merge to `main` once this is wired into the pipeline).
-4. **Back up before applying to the shared/production branch.** Either a Neon
-   branch snapshot (`neonctl branches create --parent production --name
-backup-<date>`) or `pg_dump`, mirroring `pnpm --filter cms dataset:export`'s
-   role for content migrations.
+   disposable staging line). **CI also applies un-applied migrations
+   automatically on merge to `main`** — `deploy-development.yml`'s
+   `migrate-db` job (`environment: development`, no approval gate, guarded on
+   the `DATABASE_URL_UNPOOLED` GitHub Environment secret), gated on
+   `web` having turbo-ignore-detected changes (apps/cms never touches
+   Postgres) and `needs`-ed by `deploy-web` (not `deploy-studio`) — so code
+   never ships ahead of a pending dev schema change. A local apply is still
+   fine/normal for iterating before a merge.
+4. **Back up before applying to the shared/production branch.** The
+   production CI job (below) does this automatically via `pg_dump` against
+   `DATABASE_URL_UNPOOLED`, uploaded as a 30-day CI artifact, mirroring
+   `pnpm --filter cms dataset:export`'s role for content migrations. Doing
+   this by hand ad hoc (e.g. investigating outside a normal release) can use
+   the same `pg_dump` command, or a Neon branch snapshot
+   (`neonctl branches create --parent production --name backup-<date>`) —
+   `neonctl`/a Neon API token is **not** currently wired into this repo's CI
+   or local tooling, so `pg_dump` (which only needs the already-configured
+   `DATABASE_URL_UNPOOLED`) is the supported path; treat `neonctl` as a
+   manual fallback only.
 5. **Production apply is human-gated**, same principle as `sanity deploy` and
-   production content migrations (`SPEC.md` §8/§13): it should run inside the
-   equivalent of the existing `migrate` CI job pattern (backup → apply →
-   deploy, gated behind a version-tag push), not by hand from a local machine.
-   **This CI step does not exist yet** — `#984` only scaffolded the package and
-   the local `db:generate`/`db:migrate` workflow (its own acceptance criteria
-   scoped CI wiring out explicitly). Wiring it is separate follow-up work —
-   confirm it's landed before treating "merge to `main`" as safe for any
-   production-affecting schema change; until then, a production apply needs a
-   manual, reviewed, human-run step instead.
+   production content migrations (`SPEC.md` §8/§13): it runs inside
+   `deploy-production.yml`'s `migrate-db` job (`environment: production`,
+   `needs: verify`) — `pg_dump` backup (artifact) → `pnpm --filter @blog/db
+db:migrate` — gated behind a `vX.Y.Z` tag push **and** the `production`
+   GitHub Environment's required-reviewer approval (the same gate every
+   other production job reuses, not a second mechanism). Every step is
+   guarded on `DATABASE_URL_UNPOOLED`, so the job stays a no-op until that
+   secret is configured. Only `deploy-web` `needs` this job (apps/cms never
+   touches Postgres). See `docs/DEPLOY.md`'s "How a deploy happens" and
+   `docs/context/ci-automation.md` for the full description; do not run
+   `db:migrate` against the shared/production branch by hand outside this
+   gated CI path.
 6. **Never hand-edit a migration file once it has been applied anywhere
    shared** (dev or prod) — this desyncs drizzle-kit's journal from reality.
    If a mistake surfaces after the fact, write a **new** corrective migration;
