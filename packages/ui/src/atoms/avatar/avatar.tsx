@@ -1,5 +1,4 @@
 import type { Size } from '@blog/config';
-import { useState } from 'react';
 
 import {
   avatarImageVariants,
@@ -13,16 +12,23 @@ export type TAvatarProps = {
   name: string;
   size?: typeof Size.SM | typeof Size.MD | typeof Size.LG;
   className?: string;
+  onImageError?: () => void;
 };
 
 /**
- * Avatar atom — renders a provided image when it loads successfully, and
- * falls back to a two-letter initials badge both when no image is supplied
- * and when a supplied image fails to load at runtime.
+ * Avatar atom — renders a provided image, or a two-letter initials badge
+ * when no image is supplied. `onImageError` forwards the native `<img>`
+ * load-failure event so a stateful caller can swap `src` to `undefined`
+ * and trigger the same initials fallback on a runtime load failure.
  */
-export const Avatar = ({ src, alt, name, size, className }: TAvatarProps) => {
-  const [hasImageError, setHasImageError] = useState(false);
-
+export const Avatar = ({
+  src,
+  alt,
+  name,
+  size,
+  className,
+  onImageError,
+}: TAvatarProps) => {
   const initials = name
     .split(/\s+/)
     .slice(0, 2)
@@ -30,22 +36,20 @@ export const Avatar = ({ src, alt, name, size, className }: TAvatarProps) => {
     .join('')
     .slice(0, 2);
 
-  const showFallback = !src || hasImageError;
-
   return (
     <span className={avatarVariants({ size, class: className })}>
-      {showFallback ? (
-        <>
-          <span aria-hidden="true">{initials}</span>
-          <span className={avatarNameVariants()}>{name}</span>
-        </>
-      ) : (
+      {src ? (
         <img
           src={src}
           alt={alt}
           className={avatarImageVariants()}
-          onError={() => setHasImageError(true)}
+          onError={onImageError}
         />
+      ) : (
+        <>
+          <span aria-hidden="true">{initials}</span>
+          <span className={avatarNameVariants()}>{name}</span>
+        </>
       )}
     </span>
   );

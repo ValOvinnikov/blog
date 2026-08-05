@@ -31,10 +31,6 @@ export const WithImage: TStory = {
 
 export const Initials: TStory = {};
 
-export const BrokenImage: TStory = {
-  args: { src: 'https://example.invalid/broken-avatar.jpg' },
-};
-
 export const Small: TStory = {
   args: { size: Size.SM },
 };

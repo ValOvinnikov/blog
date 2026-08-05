@@ -27,13 +27,17 @@ describe(`<${Avatar.name}/>`, () => {
     expect(screen.getByText('JM')).toBeVisible();
   });
 
-  it('falls back to initials when the image fails to load', () => {
-    setup({ src: '/broken-photo.jpg', alt: 'Profile photo' });
+  it('calls onImageError when the image fails to load', () => {
+    const onImageError = vi.fn();
+    setup({
+      src: '/broken-photo.jpg',
+      alt: 'Profile photo',
+      onImageError,
+    });
 
     const image = screen.getByRole('img', { name: 'Profile photo' });
     fireEvent.error(image);
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('JD')).toBeVisible();
+    expect(onImageError).toHaveBeenCalledOnce();
   });
 });
