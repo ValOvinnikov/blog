@@ -2,8 +2,10 @@ import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
-import { addBookmark } from './add-bookmark';
-import { isBookmarked } from './is-bookmarked';
+import { addBookmark } from '../add-bookmark';
+import { isBookmarked } from '../is-bookmarked';
+
+import { removeBookmark } from './remove-bookmark';
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
@@ -35,17 +37,30 @@ afterEach(async () => {
   await db.delete(schema.users);
 });
 
-describe(isBookmarked, () => {
-  it('returns true when the pair exists', async () => {
+describe(removeBookmark, () => {
+  it('deletes an existing bookmark', async () => {
     await insertUser('user-1');
     await addBookmark('user-1', 'post-1');
 
-    expect(await isBookmarked('user-1', 'post-1')).toBe(true);
-  });
-
-  it('returns false when the pair does not exist', async () => {
-    await insertUser('user-1');
+    await removeBookmark('user-1', 'post-1');
 
     expect(await isBookmarked('user-1', 'post-1')).toBe(false);
+  });
+
+  it('is a no-op when the bookmark does not exist', async () => {
+    await insertUser('user-1');
+
+    await expect(removeBookmark('user-1', 'post-1')).resolves.toBeUndefined();
+  });
+
+  it("does not remove another user's bookmark for the same post", async () => {
+    await insertUser('user-1');
+    await insertUser('user-2');
+    await addBookmark('user-1', 'post-1');
+    await addBookmark('user-2', 'post-1');
+
+    await removeBookmark('user-1', 'post-1');
+
+    expect(await isBookmarked('user-2', 'post-1')).toBe(true);
   });
 });

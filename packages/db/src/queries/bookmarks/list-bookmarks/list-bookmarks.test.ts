@@ -2,7 +2,8 @@ import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
-import { addBookmark } from './add-bookmark';
+import { addBookmark } from '../add-bookmark';
+
 import { listBookmarks } from './list-bookmarks';
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
