@@ -165,7 +165,11 @@ export default async function LocaleLayout({ children, params }: TProps) {
                     target={link.target}
                     icon={
                       iconName ? (
-                        <Icon name={iconName} size={Size.SM} />
+                        <Icon
+                          name={iconName}
+                          size={Size.SM}
+                          dataTestId={`social-icon-${link.platform}`}
+                        />
                       ) : undefined
                     }
                     hideLabel={Boolean(iconName)}
@@ -177,7 +181,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
               <NavLink
                 as={SmartLink}
                 href={routes.rssFeed()}
-                icon={<Icon name={ICONS.RSS} size={Size.SM} />}
+                icon={
+                  <Icon name={ICONS.RSS} size={Size.SM} dataTestId="rss-icon" />
+                }
                 hideLabel
               >
                 {t('feedLinkLabel')}
