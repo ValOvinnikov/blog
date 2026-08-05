@@ -53,6 +53,10 @@ describe('routes', () => {
     expect(routes.author('jane-doe', 10)).toBe('/author/jane-doe/page/10');
   });
 
+  it('builds the bookmarks path', () => {
+    expect(routes.bookmarks()).toBe('/bookmarks');
+  });
+
   it('builds the site-wide RSS feed path', () => {
     expect(routes.rssFeed()).toBe('/rss.xml');
   });

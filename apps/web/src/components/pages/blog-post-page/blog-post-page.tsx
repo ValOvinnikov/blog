@@ -4,6 +4,7 @@ import { Icon } from '@blog/ui/atoms';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Article, PostsSection } from '@blog/ui/organisms';
 import { BackToTopButton } from '@web/components/shared/back-to-top-button';
+import { BookmarkButton } from '@web/components/shared/bookmark-button';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { DepthProvider } from '@web/components/shared/depth-provider';
 import { DepthToggle } from '@web/components/shared/depth-toggle';
@@ -54,6 +55,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
 
   const post = result.data;
   const {
+    id,
     title,
     excerpt,
     category,
@@ -168,7 +170,12 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
                 }),
                 readingTimeMinutes,
                 linkAs: SmartLink,
-                share: <PostShare url={url} title={title} links={shareLinks} />,
+                share: (
+                  <div className={s.metaActions()}>
+                    <BookmarkButton postId={id} />
+                    <PostShare url={url} title={title} links={shareLinks} />
+                  </div>
+                ),
               }}
               coverMedia={
                 heroImageSanity ? (

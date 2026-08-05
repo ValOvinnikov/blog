@@ -23,9 +23,13 @@ import { notFound } from 'next/navigation';
 
 import { BlogPostPage } from './blog-post-page';
 
-const { getPostMock } = vi.hoisted(() => ({
-  getPostMock: vi.fn(),
-}));
+const { getPostMock, useSessionMock, getBookmarkStatusMock } = vi.hoisted(
+  () => ({
+    getPostMock: vi.fn(),
+    useSessionMock: vi.fn(),
+    getBookmarkStatusMock: vi.fn(),
+  }),
+);
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -33,6 +37,32 @@ vi.mock('@blog/service', () => ({
       post: { v1: { getPost: getPostMock } },
     },
   },
+}));
+
+// `BookmarkButton` (article header meta strip, #1109) renders nothing for a
+// signed-out session — the default here — so every existing assertion below
+// (none of which concerns bookmarking) is unaffected; the "authenticated"
+// describe block further down opts in per-test.
+vi.mock('next-auth/react', () => ({ useSession: useSessionMock }));
+
+vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
+  getBookmarkStatus: getBookmarkStatusMock,
+  setBookmarkStatus: vi.fn(),
+}));
+
+// `BookmarkButton` calls `useToast()` unconditionally (it's a hook), so any
+// composition that renders it — signed in or not — needs this mocked; no
+// assertions here exercise the toast calls themselves (see
+// bookmark-button.test.tsx for those).
+vi.mock('@web/components/shared/toast-provider', () => ({
+  useToast: () => ({
+    success: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+    error: vi.fn(),
+    promise: vi.fn(),
+    dismiss: vi.fn(),
+  }),
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -57,6 +87,9 @@ const setup = customRenderAsync(BlogPostPage, {
 describe(`<${BlogPostPage.name}/>`, () => {
   beforeEach(() => {
     getPostMock.mockReset();
+    useSessionMock.mockReset();
+    useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
+    getBookmarkStatusMock.mockReset();
   });
 
   it('calls notFound() when the post does not exist', async () => {
@@ -98,6 +131,33 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(
       screen.getByRole('menuitem', { name: /Share on LinkedIn/ }),
     ).toBeVisible();
+  });
+
+  it('renders no bookmark toggle in the meta strip when signed out', async () => {
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+
+    await setup();
+
+    expect(
+      screen.queryByRole('button', { name: 'Save post' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders BookmarkButton beside the share widget, reflecting the post's saved state, when signed in", async () => {
+    useSessionMock.mockReturnValue({
+      data: { user: { id: 'user-1' } },
+      status: 'authenticated',
+    });
+    getBookmarkStatusMock.mockResolvedValue(true);
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+
+    await setup();
+
+    const bookmarkButton = await screen.findByRole('button', {
+      name: 'Remove bookmark',
+    });
+    expect(bookmarkButton).toHaveAttribute('aria-pressed', 'true');
+    expect(getBookmarkStatusMock).toHaveBeenCalledWith(mockPostDetail.id);
   });
 
   it('renders the X icon on the X share link and the LinkedIn icon on the LinkedIn share link, not the generic external-link glyph', async () => {
