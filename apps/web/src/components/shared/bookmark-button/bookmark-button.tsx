@@ -37,6 +37,13 @@ export type TBookmarkButtonProps = {
  *   immediately, calls `setBookmarkStatus`, confirms the save/remove via a
  *   `useToast` success/info toast (#1138's original motivating use case),
  *   and rolls back + shows an error toast on failure.
+ *
+ * The save/remove toast carries an `undo ⌘Z` action (`performUndo`) that
+ * re-applies the opposite value and confirms with its own async-revert-can-
+ * fail `info`/`error` toast (design doc §4.5) — the secondary error toast
+ * carries no further `retry` action, to avoid an unbounded retry chain. The
+ * error toast carries a `retry R` action (`performToggle` re-run with the
+ * same target value that just failed).
  */
 export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
   const t = useTranslations('bookmarkButton');
@@ -77,8 +84,38 @@ export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
 
   if (sessionResult.status === 'unauthenticated') return null;
 
-  const handleToggle = () => {
-    const next = !isBookmarked;
+  // The async, can-fail counterpart to `undo` (design doc §4.5) — reverts
+  // the optimistic flip back to whatever it was before `committedValue`, and
+  // confirms via its own `info`/`error` toast. That secondary error toast
+  // carries no `retry` action, so a failed undo can't chain into an
+  // unbounded retry-of-a-retry loop.
+  const performUndo = (committedValue: boolean) => {
+    const reverted = !committedValue;
+    setIsBookmarked(reverted);
+
+    startTransition(async () => {
+      const result = await setBookmarkStatus(postId, reverted);
+      if (!result.ok) {
+        setIsBookmarked(committedValue);
+        toast.error({
+          command: t('toastCommand'),
+          state: t('toastErrorState'),
+          message: t('error'),
+        });
+        return;
+      }
+
+      toast.info({
+        command: t('toastCommand'),
+        state: t('toastRevertedState'),
+        message: t('toastRevertedMessage'),
+      });
+    });
+  };
+
+  // Shared by the click handler and the error toast's `retry` action, so a
+  // retry is literally the same attempt re-run against the same target value.
+  const performToggle = (next: boolean) => {
     setIsBookmarked(next);
 
     startTransition(async () => {
@@ -89,24 +126,41 @@ export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
           command: t('toastCommand'),
           state: t('toastErrorState'),
           message: t('error'),
+          action: {
+            label: t('toastRetryLabel'),
+            keyHint: 'R',
+            onAct: () => performToggle(next),
+          },
         });
         return;
       }
+
+      const undoAction = {
+        label: t('toastUndoLabel'),
+        keyHint: '⌘Z',
+        onAct: () => performUndo(next),
+      };
 
       if (next) {
         toast.success({
           command: t('toastCommand'),
           state: t('toastSavedState'),
           message: t('toastSavedMessage'),
+          action: undoAction,
         });
       } else {
         toast.info({
           command: t('toastCommand'),
           state: t('toastRemovedState'),
           message: t('toastRemovedMessage'),
+          action: undoAction,
         });
       }
     });
+  };
+
+  const handleToggle = () => {
+    performToggle(!isBookmarked);
   };
 
   return (
