@@ -1,6 +1,6 @@
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 export type TConfirmSubscriberResult =
   | { outcome: 'confirmed'; subscriber: TSubscriber }
@@ -19,10 +19,37 @@ export type TConfirmSubscriberResult =
 // to succeed twice." An unrecognized/expired token returns `not-found`
 // rather than throwing, since an invalid link is an expected, not
 // exceptional, path here.
+//
+// The transition is a single conditional `UPDATE ... WHERE
+// confirmation_token = $token AND status = 'pending'`, not a read-then-write
+// (read the row, branch on its `status`, then update it): two concurrent
+// hits on the same link could otherwise both read `status: 'pending'`
+// before either write lands, and both would then run the update — one
+// clobbering the other's `confirmedAt` (last-write-wins), with both callers
+// seeing `confirmed` instead of one `confirmed`/one `already-confirmed`.
+// Gating the `UPDATE` itself on `status = 'pending'` means only the call
+// that actually performs the transition gets a row back from `RETURNING` —
+// Postgres serializes concurrent updates to the same row, so exactly one of
+// two racing calls can win this `WHERE`, never both.
 export async function confirmSubscriber(
   token: string,
 ): Promise<TConfirmSubscriberResult> {
   const db = getDb();
+
+  const [updated] = await db
+    .update(subscribers)
+    .set({ status: 'active', confirmedAt: new Date() })
+    .where(
+      and(
+        eq(subscribers.confirmationToken, token),
+        eq(subscribers.status, 'pending'),
+      ),
+    )
+    .returning();
+
+  if (updated) {
+    return { outcome: 'confirmed', subscriber: updated };
+  }
 
   const [existing] = await db
     .select()
@@ -33,26 +60,5 @@ export async function confirmSubscriber(
     return { outcome: 'not-found' };
   }
 
-  if (existing.status === 'active') {
-    return { outcome: 'already-confirmed', subscriber: existing };
-  }
-
-  const [updated] = await db
-    .update(subscribers)
-    .set({ status: 'active', confirmedAt: new Date() })
-    .where(eq(subscribers.id, existing.id))
-    .returning();
-
-  if (!updated) {
-    // Unreachable in practice: `existing` was just read by primary key's
-    // unique `confirmationToken`, so the update it drives by `id` has
-    // exactly one row to match. Thrown rather than silently returning
-    // `undefined` so a real regression here surfaces immediately instead
-    // of as a confusing downstream crash.
-    throw new Error(
-      `confirmSubscriber: update for subscriber "${existing.id}" returned no row.`,
-    );
-  }
-
-  return { outcome: 'confirmed', subscriber: updated };
+  return { outcome: 'already-confirmed', subscriber: existing };
 }

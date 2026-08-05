@@ -78,4 +78,36 @@ describe(confirmSubscriber, () => {
 
     expect(result).toEqual({ outcome: 'not-found' });
   });
+
+  // pglite serves a single connection, so two calls kicked off together
+  // still execute their statements one at a time under the hood — this
+  // can't force the true interleaving (both UPDATEs racing at the storage
+  // layer) that a real concurrent hit against Neon could produce. What it
+  // does verify is that calling concurrently on the same token never
+  // double-transitions the row and always settles into exactly one
+  // `confirmed` + one `already-confirmed`. The actual race safety comes
+  // from gating the `UPDATE` itself on `status = 'pending'` so only one of
+  // two racing calls can ever match that `WHERE`, not from this test — see
+  // the docstring on `confirmSubscriber`.
+  it('resolves two concurrent confirms of the same token into exactly one confirmed outcome', async () => {
+    const pending = await insertPendingSubscriber();
+
+    const [first, second] = await Promise.all([
+      confirmSubscriber(pending.confirmationToken),
+      confirmSubscriber(pending.confirmationToken),
+    ]);
+
+    const outcomes = [first.outcome, second.outcome].sort();
+    expect(outcomes).toEqual(['already-confirmed', 'confirmed']);
+
+    const confirmed = first.outcome === 'confirmed' ? first : second;
+    if (confirmed.outcome !== 'confirmed') {
+      throw new Error('expected one confirmed outcome');
+    }
+    const [row] = await db
+      .select()
+      .from(schema.subscribers)
+      .where(eq(schema.subscribers.id, pending.id));
+    expect(row?.confirmedAt).toEqual(confirmed.subscriber.confirmedAt);
+  });
 });

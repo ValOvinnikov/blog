@@ -88,4 +88,27 @@ describe(createPendingSubscriber, () => {
     const rows = await db.select().from(schema.subscribers);
     expect(rows).toHaveLength(1);
   });
+
+  // pglite serves a single connection, so two calls kicked off together
+  // still execute their statements one at a time under the hood — this
+  // can't force the true interleaving (both INSERTs racing at the storage
+  // layer) that a real concurrent hit against Neon could produce. What it
+  // does verify is that calling concurrently for a brand-new email never
+  // throws and always settles into a sane pair of outcomes with exactly
+  // one row persisted. The actual race safety comes from
+  // `.onConflictDoNothing()` making the `email` uniqueness check
+  // Postgres's job rather than a racy read-then-decide — see the
+  // docstring on `createPendingSubscriber`.
+  it('resolves two concurrent calls for the same brand-new email without an uncaught constraint error', async () => {
+    const [first, second] = await Promise.all([
+      createPendingSubscriber('reader@example.com'),
+      createPendingSubscriber('reader@example.com'),
+    ]);
+
+    const outcomes = [first.outcome, second.outcome].sort();
+    expect(outcomes).toEqual(['already-pending', 'created']);
+    expect(first.subscriber.id).toBe(second.subscriber.id);
+    const rows = await db.select().from(schema.subscribers);
+    expect(rows).toHaveLength(1);
+  });
 });
