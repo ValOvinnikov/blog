@@ -1,9 +1,11 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
+import { service } from '@blog/service';
 import { Heading } from '@blog/ui/atoms';
 import { PostsSection } from '@blog/ui/organisms';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { auth } from '@web/server/auth/auth';
+import { toPostListItems } from '@web/utils/to-post-list-items';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
@@ -19,23 +21,12 @@ const s = bookmarksPageVariants();
  * saved posts through the same `PostsSection`/`PostCard` grid every other
  * archive page uses — no new page primitive.
  *
- * **Known gap, flagged for `service`:** `@blog/db`'s `bookmarks` table only
- * stores each saved post's Sanity `_id`
- * (`queries.bookmarks.listBookmarks`) — turning those ids into the
- * `title`/`slug`/`excerpt`/hero-image `TPostCard` data `PostsSection` needs
- * requires a `@blog/service` query this package doesn't have yet. Every
- * existing post-list query filters by recency/category/tag/author
- * (`getIndexPage`, `getRelatedPosts`, `getPostList`) — none accepts an
- * explicit `_id` allow-list. Per this repo's layer contract that's a
- * `service`-layer addition (`web` doesn't write GROQ), so it's out of this
- * component's scope — reported back in #1109's findings rather than added
- * here. Until it lands, this renders the real "no bookmarks" empty state
- * only when the reader truly has none; a reader who *does* have bookmarks
- * sees an honest "saved, previews coming soon" message instead of an
- * incorrect empty state. The moment that service function exists, swap the
- * `posts={[]}` below for the resolved list — everything else here (the
- * auth gate, the `PostsSection` wiring, the true-empty copy) is already
- * correct as written.
+ * `@blog/db`'s `bookmarks` table only stores each saved post's Sanity `_id`
+ * (`queries.bookmarks.listBookmarks`, most-recently-bookmarked first), so
+ * those ids are resolved into `TPostCard` data via
+ * `service.entities.posts.v1.getPostsByIds`. That query doesn't preserve
+ * input order, so the resolved posts are re-sorted back into bookmark-
+ * recency order before rendering.
  */
 export async function BookmarksPage() {
   const session = await auth();
@@ -50,7 +41,21 @@ export async function BookmarksPage() {
     getTranslations('bookmarksPage'),
   ]);
 
-  const hasBookmarks = bookmarks.length > 0;
+  const bookmarkOrder = bookmarks.map((bookmark) => bookmark.postId);
+
+  const result = await service.entities.posts.v1.getPostsByIds(bookmarkOrder);
+
+  if (!result.ok) {
+    console.error(`Failed to resolve bookmarked posts: ${result.error}`);
+    return null;
+  }
+
+  const postsById = new Map(result.data.map((post) => [post.id, post]));
+  const orderedPosts = bookmarkOrder
+    .map((postId) => postsById.get(postId))
+    .filter((post) => post !== undefined);
+
+  const items = await toPostListItems(orderedPosts);
 
   return (
     <main className={s.root()}>
@@ -58,15 +63,11 @@ export async function BookmarksPage() {
         {t('title')}
       </Heading>
       <PostsSection
-        posts={[]}
+        posts={items}
         title={t('sectionTitle')}
         titleId="bookmarks-posts-title"
         linkAs={SmartLink}
-        emptyMessage={
-          hasBookmarks
-            ? t('pendingPreviews', { count: bookmarks.length })
-            : t('empty')
-        }
+        emptyMessage={t('empty')}
       />
     </main>
   );

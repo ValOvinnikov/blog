@@ -129,7 +129,6 @@
     "title": "My bookmarks",
     "metaDescription": "Posts you've saved to read later.",
     "sectionTitle": "Saved posts",
-    "empty": "No bookmarks yet — save a post to find it here.",
-    "pendingPreviews": "{count, plural, one {1 saved post} other {{count} saved posts}} — full previews are coming soon."
+    "empty": "No bookmarks yet — save a post to find it here."
   }
 }
