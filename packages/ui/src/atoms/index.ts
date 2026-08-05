@@ -1,5 +1,6 @@
 export * from './avatar';
 export * from './back-to-top';
+export * from './bookmark-toggle';
 export * from './brand-mark';
 export * from './button';
 export * from './caption';
