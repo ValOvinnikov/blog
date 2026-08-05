@@ -15,11 +15,36 @@ export type TAvatarProps = {
   onImageError?: () => void;
 };
 
+const getInitials = (name: string): string => {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+
+  if (words.length > 1) {
+    return words
+      .slice(0, 2)
+      .map((word) => word[0]?.toUpperCase() ?? '')
+      .join('');
+  }
+
+  const token = words[0] ?? '';
+  const localPart = token.split('@')[0] ?? token;
+  const segments = localPart.split(/[._-]+/).filter(Boolean);
+
+  if (segments.length > 1) {
+    return segments
+      .slice(0, 2)
+      .map((segment) => segment[0]?.toUpperCase() ?? '')
+      .join('');
+  }
+
+  return localPart.slice(0, 2).toUpperCase();
+};
+
 /**
- * Avatar atom — renders a provided image, or a two-letter initials badge
- * when no image is supplied. `onImageError` forwards the native `<img>`
- * load-failure event so a stateful caller can swap `src` to `undefined`
- * and trigger the same initials fallback on a runtime load failure.
+ * Avatar atom — renders a provided image, or an initials badge derived
+ * from `name` when no image is supplied. `onImageError` forwards the
+ * native `<img>` load-failure event so a stateful caller can swap `src`
+ * to `undefined` and trigger the same initials fallback on a runtime
+ * load failure.
  */
 export const Avatar = ({
   src,
@@ -29,12 +54,7 @@ export const Avatar = ({
   className,
   onImageError,
 }: TAvatarProps) => {
-  const initials = name
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((word) => word[0]?.toUpperCase() ?? '')
-    .join('')
-    .slice(0, 2);
+  const initials = getInitials(name);
 
   return (
     <span className={avatarVariants({ size, class: className })}>

@@ -43,6 +43,6 @@ export const signInMenuVariants = tv({
     emailForm: ['mt-2 flex flex-col gap-2'],
     emailFormActions: ['flex items-center gap-2'],
     emailHint: ['font-mono text-meta text-danger'],
-    emailSent: ['font-mono text-meta text-ok'],
+    emailSent: ['mt-2 font-mono text-meta text-ok'],
   },
 });
