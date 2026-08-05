@@ -12,6 +12,7 @@ export type TAvatarProps = {
   name: string;
   size?: typeof Size.SM | typeof Size.MD | typeof Size.LG;
   className?: string;
+  onImageError?: () => void;
 };
 
 const getInitials = (name: string): string => {
@@ -38,13 +39,32 @@ const getInitials = (name: string): string => {
   return localPart.slice(0, 2).toUpperCase();
 };
 
-export const Avatar = ({ src, alt, name, size, className }: TAvatarProps) => {
+/**
+ * Avatar atom — renders a provided image, or an initials badge derived
+ * from `name` when no image is supplied. `onImageError` forwards the
+ * native `<img>` load-failure event so a stateful caller can swap `src`
+ * to `undefined` and trigger the same initials fallback on a runtime
+ * load failure.
+ */
+export const Avatar = ({
+  src,
+  alt,
+  name,
+  size,
+  className,
+  onImageError,
+}: TAvatarProps) => {
   const initials = getInitials(name);
 
   return (
     <span className={avatarVariants({ size, class: className })}>
       {src ? (
-        <img src={src} alt={alt} className={avatarImageVariants()} />
+        <img
+          src={src}
+          alt={alt}
+          className={avatarImageVariants()}
+          onError={onImageError}
+        />
       ) : (
         <>
           <span aria-hidden="true">{initials}</span>
