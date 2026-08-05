@@ -19,7 +19,7 @@ export const textInputVariants = tv({
   },
   variants: {
     invalid: {
-      true: { input: ['border-danger text-danger'] },
+      true: { input: ['border-error text-error'] },
     },
     hasPrompt: {
       true: { input: ['pl-8'] },

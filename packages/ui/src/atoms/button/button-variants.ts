@@ -20,7 +20,7 @@ export const buttonVariants = tv({
         'border-border-strong bg-transparent text-text hover:border-accent hover:text-accent',
       link: 'border-transparent bg-transparent px-1 text-accent underline underline-offset-[3px] hover:text-accent-hover',
       danger:
-        'border-danger/55 bg-transparent text-danger hover:border-danger hover:bg-danger hover:text-bg',
+        'border-error/55 bg-transparent text-error hover:border-error hover:bg-error hover:text-bg',
     },
     size: {
       [Size.SM]: 'px-3 py-1.5 text-sm',

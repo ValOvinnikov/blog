@@ -112,7 +112,7 @@ Radius `--radius-sm`; transition `color,border,background` `--duration-base`
 
 Border `--border-strong`, background `--surface`, radius `--radius-sm`; leading
 prompt `›` in `--accent`; typed text `--text`, placeholder `--text-subtle`;
-`invalid` variant switches the border to `--danger` (§7). Focus = global
+`invalid` variant switches the border to `--error` (§7). Focus = global
 `--ring`. Font `--font-mono` for the newsletter email, `--font-body` for the
 comment `Textarea`.
 
@@ -135,7 +135,7 @@ Meter: filled cells `--accent`, empty cells `--border-strong`, bracketed
 | avatar tile                           | gradient `--logo-1 → --logo-3`, text `--accent-contrast`, radius `--radius-sm`                        |
 | menu item hover                       | background `--surface-2`, text `--accent`                                                             |
 | ⌘-key hint                            | 1px `--border`, text `--text-subtle`                                                                  |
-| "Sign out"                            | text `--danger` (§7)                                                                                  |
+| "Sign out"                            | text `--error` (§7)                                                                                   |
 
 ### 4.2 Ratings (#1041)
 
@@ -147,7 +147,7 @@ Meter: filled cells `--accent`, empty cells `--border-strong`, bracketed
 | numeral (`4.6`)           | `--text`, weight 600, `--font-mono`, size `--text-copy`/`--text-card-title` |
 | `/5` and `n=23`           | `--text-subtle`, `--text-meta`                                              |
 | star hover micro-lift     | `translateY(-1px)`, `--duration-fast` `--ease-console`                      |
-| "✓ your rating saved"     | `--ok` (§7)                                                                 |
+| "✓ your rating saved"     | `--success` (§7)                                                            |
 | empty-state text          | `--text-muted`                                                              |
 
 ### 4.3 Comments (#1040)
@@ -194,7 +194,7 @@ Meter: filled cells `--accent`, empty cells `--border-strong`, bracketed
 | full box                    | §3.1 window shell                                                                       |
 | full heading                | `--font-display`, `--text-card-title`+                                                  |
 | full description            | `--font-body`, `--text-muted`, `--text-prose`                                           |
-| success (`✓ almost there`)  | `--ok` (§7) + cursor                                                                    |
+| success (`✓ almost there`)  | `--success` (§7) + cursor                                                               |
 | "awaiting confirmation"     | `--warn` (§7), `--text-meta`                                                            |
 | hint text                   | `--text-subtle`                                                                         |
 
@@ -208,28 +208,28 @@ on the status tokens in §7. Mock: the "06 · Account" section of
 
 **`SettingRow` (shared by all three sections):**
 
-| Element                 | Token(s)                                                                                               |
-| ----------------------- | ------------------------------------------------------------------------------------------------------ |
-| row separator           | 1px dashed `--border`                                                                                  |
-| label                   | `--font-mono`, `--text`, weight 500, `--text-copy`                                                     |
-| description             | `--font-body`, `--text-subtle`, `--text-meta`                                                          |
-| control slot            | reuses §3.3 buttons / §3.4 field / status badge                                                        |
-| `tone="danger"` wrapper | 1px `--danger` border, **left 2px `--danger`**, background `--danger-muted` tint, radius `--radius-sm` |
+| Element                 | Token(s)                                                                                            |
+| ----------------------- | --------------------------------------------------------------------------------------------------- |
+| row separator           | 1px dashed `--border`                                                                               |
+| label                   | `--font-mono`, `--text`, weight 500, `--text-copy`                                                  |
+| description             | `--font-body`, `--text-subtle`, `--text-meta`                                                       |
+| control slot            | reuses §3.3 buttons / §3.4 field / status badge                                                     |
+| `tone="danger"` wrapper | 1px `--error` border, **left 2px `--error`**, background `--error-muted` tint, radius `--radius-sm` |
 
 **6a — privacy & data:**
 
-| Element                 | Token(s)                                                                                                                                                             |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| "Export my data" action | outline button (§3.3)                                                                                                                                                |
-| "Delete account" row    | `SettingRow tone="danger"`; heading `--danger`                                                                                                                       |
-| typed-confirm field     | §3.4 field; arms only on handle match                                                                                                                                |
-| delete button           | **danger button** — border `--danger` (mix), text `--danger`, background transparent; hover fill `--danger` with `--bg` text; `disabled` → reduced opacity, no hover |
+| Element                 | Token(s)                                                                                                                                                          |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| "Export my data" action | outline button (§3.3)                                                                                                                                             |
+| "Delete account" row    | `SettingRow tone="danger"`; heading `--error`                                                                                                                     |
+| typed-confirm field     | §3.4 field; arms only on handle match                                                                                                                             |
+| delete button           | **danger button** — border `--error` (mix), text `--error`, background transparent; hover fill `--error` with `--bg` text; `disabled` → reduced opacity, no hover |
 
 **6b — email & newsletter preferences:**
 
 | Element                      | Token(s)                                                        |
 | ---------------------------- | --------------------------------------------------------------- |
-| "subscribed" badge           | `--ok` text/border, `--ok-muted` background (§7)                |
+| "subscribed" badge           | `--success` text/border, `--success-muted` background (§7)      |
 | "pending confirmation" badge | `--warn` text/border, `--warn-muted` background                 |
 | email on file                | `--font-mono`, `--text`; "read-only in v1" note `--text-subtle` |
 | unsubscribe / resend         | outline button (§3.3)                                           |
@@ -241,7 +241,7 @@ on the status tokens in §7. Mock: the "06 · Account" section of
 | provider row separator       | 1px dashed `--border`                                                                 |
 | provider icon                | GitHub `currentColor` = `--text`; Google 4-colour (§8.1); email-link glyph `--accent` |
 | provider name                | `--text`, `--font-mono`                                                               |
-| linked state                 | `✓ linked` in `--ok`; `○ not linked` in `--text-subtle`                               |
+| linked state                 | `✓ linked` in `--success`; `○ not linked` in `--text-subtle`                          |
 | link / unlink action         | ghost button (§3.3)                                                                   |
 | "last method — can't unlink" | `--text-subtle`, italic (guard, not a button)                                         |
 | display-name field + avatar  | §3.4 field + `Avatar` (gradient `--logo-1→--logo-3`); save = solid button             |
@@ -249,8 +249,8 @@ on the status tokens in §7. Mock: the "06 · Account" section of
 **Note (same as elsewhere):** the mock renders the danger/ok/warn tints with
 `color-mix()`; ship them as the `*-muted` status tokens from §7, not inline
 mixes. The entire Account area therefore **depends on the §7 status-token
-decision (D11)** landing first — delete (`--danger`), subscription status
-(`--ok`/`--warn`) have no correct token to bind to until it does.
+decision (D11)** landing first — delete (`--error`), subscription status
+(`--success`/`--warn`) have no correct token to bind to until it does.
 
 ## 5. Typography roles
 
@@ -280,19 +280,19 @@ three distinct signals that must not collide with `--accent`:
 - **success** ("rating saved", "check your inbox") — green.
 - **danger** ("Sign out", "delete", invalid field) — red.
 
-The mock uses placeholder `--ok` / `--warn` / `--danger` plus low-alpha tints
+The mock uses placeholder `--success` / `--warn` / `--error` plus low-alpha tints
 (via `color-mix`). **These are not yet tokens.** Recommendation: add a small,
 WCAG-verified status set to `theme.css` `:root` / `.dark` (a `config`-layer
 change), following the existing OKLCH + contrast-annotation convention, e.g.:
 
 ```
 /* status (proposed — verify contrast per theme.css convention) */
---ok:      oklch(0.60 0.15 150);  /* dark: oklch(0.72 0.16 150) */
---warn:    oklch(0.72 0.15 75);   /* dark: oklch(0.80 0.15 80)  */
---danger:  oklch(0.58 0.20 25);   /* dark: oklch(0.70 0.17 25)  */
---ok-muted:     oklch(0.95 0.03 150);  /* dark: oklch(0.30 0.06 150) */
---warn-muted:   oklch(0.95 0.03 80);   /* dark: oklch(0.30 0.06 80)  */
---danger-muted: oklch(0.95 0.03 25);   /* dark: oklch(0.30 0.06 25)  */
+--success:      oklch(0.60 0.15 150);  /* dark: oklch(0.72 0.16 150) */
+--warn:         oklch(0.72 0.15 75);   /* dark: oklch(0.80 0.15 80)  */
+--error:        oklch(0.58 0.20 25);   /* dark: oklch(0.70 0.17 25)  */
+--success-muted: oklch(0.95 0.03 150); /* dark: oklch(0.30 0.06 150) */
+--warn-muted:    oklch(0.95 0.03 80);  /* dark: oklch(0.30 0.06 80)  */
+--error-muted:   oklch(0.95 0.03 25);  /* dark: oklch(0.30 0.06 25)  */
 ```
 
 **Do not ship inline `color-mix()`** for the badge/bar tints as the mock does —
@@ -302,6 +302,13 @@ are indicative; the `config` sub-agent must recompute each against `--bg` /
 the existing `--accent` / `--border-emphasis` comments document. Until this
 lands, the pending/success/danger states have no correct token to bind to — so
 this decision gates the `ui` work for comments, ratings, and newsletter.
+
+**`--info` addendum (2026-08-06):** shipped alongside this set is `--info` (+
+`--info-muted`) — a deliberate **alias** of `--accent`/`--accent-muted`, not a
+new hue: info conveys no success/failure valence, so it reuses the brand
+accent colour instead of introducing a fourth. The `TOAST_TYPE.INFO` variant
+(`packages/config/src/constants/toast.ts`) already renders via `--accent`
+directly, so it needed no change when `--info` was added.
 
 ## 8. Icons
 
@@ -352,11 +359,11 @@ state (`fill="none" stroke="currentColor"`), and the _saved_ state simply sets
 
 ## 10. Decision log addendum
 
-| #   | Decision        | Chosen                                                                                                                                           |
-| --- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| D11 | Status colours  | Add semantic `--ok`/`--warn`/`--danger` (+ `*-muted`) tokens to `theme.css` (`config` layer, WCAG-verified); no inline `color-mix` in components |
-| D12 | Google icon     | Ship the official 4-colour mark as the lone non-`currentColor` icon; monochrome `bookmark.svg` follows the normal convention                     |
-| D15 | Account visuals | Three `WindowChrome` sections on `/account` sharing one new `SettingRow` pattern (§4.6); danger/status treatments bind to the D11 status tokens  |
+| #   | Decision        | Chosen                                                                                                                                                                                                                                         |
+| --- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D11 | Status colours  | Add semantic `--success`/`--warn`/`--error` (+ `*-muted`) tokens to `theme.css` (`config` layer, WCAG-verified); no inline `color-mix` in components. `--info`/`--info-muted` added as `--accent`/`--accent-muted` aliases (2026-08-06 rename) |
+| D12 | Google icon     | Ship the official 4-colour mark as the lone non-`currentColor` icon; monochrome `bookmark.svg` follows the normal convention                                                                                                                   |
+| D15 | Account visuals | Three `WindowChrome` sections on `/account` sharing one new `SettingRow` pattern (§4.6); danger/status treatments bind to the D11 status tokens                                                                                                |
 
 Everything else inherits the decision log in `2026-08-03-engagement-ui-design.md`
 (Feature 6 / D15 there covers the account structure and per-section behaviour).
