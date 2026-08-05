@@ -15,6 +15,13 @@
       "when": 1785783551915,
       "tag": "0001_cultured_ego",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785917337390,
+      "tag": "0002_loud_wallow",
+      "breakpoints": true
     }
   ]
 }
