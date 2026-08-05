@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Feedback toast — design mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet" />
+<style>
+/* ── tokens verbatim from configs/tailwind/theme.css ────────────────── */
+:root{
+  color-scheme:light;
+  --font-display-family:'Space Grotesk',system-ui,sans-serif;
+  --font-body-family:'Newsreader',Georgia,serif;
+  --font-mono-family:'JetBrains Mono',ui-monospace,monospace;
+  --bg:oklch(0.99 0.002 250); --bg-subtle:oklch(0.965 0.003 250);
+  --surface:oklch(1 0 0); --surface-2:oklch(0.975 0.003 250);
+  --border:oklch(0.9 0.004 250); --border-strong:oklch(0.8 0.006 250);
+  --border-emphasis:oklch(0.62 0.006 250);
+  --text:oklch(0.2 0.01 250); --text-muted:oklch(0.46 0.01 250); --text-subtle:oklch(0.6 0.008 250);
+  --accent:oklch(0.53 0.17 250); --accent-hover:oklch(0.47 0.17 250);
+  --accent-muted:oklch(0.95 0.03 250); --accent-contrast:oklch(0.99 0 0);
+  --accent-solid:oklch(0.55 0.17 250); --accent-solid-hover:oklch(0.49 0.17 250);
+  --ring:var(--accent);
+  --duration-fast:120ms; --duration-base:200ms; --duration-slow:360ms;
+  --radius-sm:3px; --radius:6px; --radius-lg:10px;
+  --ease-console:cubic-bezier(0.2,0,0,1);
+  --logo-1:oklch(0.52 0.17 250); --logo-2:oklch(0.63 0.16 250); --logo-3:oklch(0.73 0.13 250);
+  --ok:oklch(0.6 0.15 150); --warn:oklch(0.72 0.15 75); --danger:oklch(0.58 0.2 25);
+}
+.indigo{
+  --accent:oklch(0.54 0.15 65); --accent-hover:oklch(0.48 0.15 65);
+  --accent-solid:oklch(0.54 0.15 65); --accent-solid-hover:oklch(0.48 0.15 65);
+  --accent-muted:oklch(0.95 0.03 65);
+  --logo-1:oklch(0.47 0.24 274); --logo-2:oklch(0.58 0.21 274); --logo-3:oklch(0.72 0.14 274);
+}
+.dark{
+  color-scheme:dark;
+  --bg:oklch(0.17 0.006 250); --bg-subtle:oklch(0.2 0.006 250);
+  --surface:oklch(0.21 0.007 250); --surface-2:oklch(0.24 0.008 250);
+  --border:oklch(0.3 0.008 250); --border-strong:oklch(0.42 0.01 250);
+  --border-emphasis:oklch(0.55 0.01 250);
+  --text:oklch(0.95 0.004 250); --text-muted:oklch(0.72 0.008 250); --text-subtle:oklch(0.56 0.008 250);
+  --accent:oklch(0.7 0.16 250); --accent-hover:oklch(0.76 0.16 250);
+  --accent-muted:oklch(0.3 0.06 250); --accent-contrast:oklch(0.16 0.006 250);
+  --accent-solid:oklch(0.7 0.16 250); --accent-solid-hover:oklch(0.76 0.16 250);
+  --logo-1:oklch(0.58 0.17 250); --logo-2:oklch(0.68 0.16 250); --logo-3:oklch(0.8 0.14 250);
+  --ok:oklch(0.72 0.16 150); --warn:oklch(0.8 0.15 80); --danger:oklch(0.7 0.17 25);
+}
+.dark.indigo{
+  --accent:oklch(0.8 0.15 80); --accent-hover:oklch(0.86 0.15 80);
+  --accent-solid:oklch(0.8 0.15 80); --accent-solid-hover:oklch(0.86 0.15 80);
+  --accent-muted:oklch(0.3 0.06 80);
+  --logo-1:oklch(0.52 0.24 274); --logo-2:oklch(0.64 0.2 274); --logo-3:oklch(0.78 0.13 274);
+}
+
+/* ── base ───────────────────────────────────────────────────────────── */
+*{box-sizing:border-box;}
+@keyframes blink{50%{opacity:0;}}
+html{background:var(--bg);color:var(--text);}
+body{
+  margin:0;font-family:var(--font-mono-family);
+  background:
+    radial-gradient(1200px 500px at 100% -10%, color-mix(in oklch, var(--accent) 7%, transparent), transparent 60%),
+    var(--bg);
+  color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.6;min-height:100vh;
+}
+::selection{background:var(--accent-muted);color:var(--accent);}
+:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:var(--radius-sm);}
+.wrap{max-width:56rem;margin:0 auto;padding:0 clamp(1rem,5vw,2.5rem) 6rem;}
+.cur{display:inline-block;width:.55ch;height:1.05em;transform:translateY(.15em);background:var(--accent);animation:blink 1s steps(1) infinite;}
+.prompt{color:var(--accent);user-select:none;}
+.dim{color:var(--text-subtle);}
+.muted{color:var(--text-muted);}
+.mono{font-family:var(--font-mono-family);}
+.disp{font-family:var(--font-display-family);letter-spacing:-.02em;}
+
+/* ── page chrome ────────────────────────────────────────────────────── */
+.top{
+  position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);
+  background:color-mix(in oklch,var(--bg) 82%,transparent);
+  border-bottom:1px solid var(--border);
+}
+.top__in{max-width:56rem;margin:0 auto;display:flex;align-items:center;gap:1rem;padding:.7rem clamp(1rem,5vw,2.5rem);}
+.brand{display:flex;align-items:center;gap:.6ch;font-weight:600;font-size:.9rem;}
+.brand .sq{display:inline-grid;grid-template-columns:repeat(3,4px);gap:2px;}
+.brand .sq i{width:4px;height:11px;border-radius:1px;display:block;}
+.brand .sq i:nth-child(1){background:var(--logo-1);} .brand .sq i:nth-child(2){background:var(--logo-2);} .brand .sq i:nth-child(3){background:var(--logo-3);}
+.controls{margin-left:auto;display:flex;align-items:center;gap:.4rem;}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;font-size:.7rem;}
+.seg button{font-family:inherit;font-size:inherit;background:transparent;color:var(--text-muted);border:0;padding:.32rem .6rem;cursor:pointer;transition:all var(--duration-base) var(--ease-console);}
+.seg button[aria-pressed="true"]{background:var(--accent-solid);color:var(--accent-contrast);}
+
+/* hero */
+.hero{padding:2.6rem 0 1rem;}
+.hero h1{font-family:var(--font-display-family);font-size:clamp(2rem,1.4rem+2vw,3rem);line-height:1.05;letter-spacing:-.025em;margin:.4rem 0 .5rem;}
+.eyebrow{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--text-subtle);}
+.lede{font-family:var(--font-body-family);font-size:1.05rem;color:var(--text-muted);max-width:60ch;}
+
+/* trigger console */
+.panel{margin-top:2.4rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);overflow:hidden;
+  box-shadow:0 1px 0 color-mix(in oklch,var(--text) 4%,transparent), 0 18px 40px -32px color-mix(in oklch,var(--text) 40%,transparent);}
+.panel__bar{display:flex;align-items:center;gap:.6ch;padding:.55rem .9rem;border-bottom:1px solid var(--border);background:var(--surface-2);font-size:.72rem;letter-spacing:.02em;}
+.panel__bar .u{color:var(--accent);} .panel__bar .p{color:var(--text-muted);}
+.panel__bar .tag{margin-left:auto;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-subtle);border:1px solid var(--border);border-radius:999px;padding:.12rem .6rem;}
+.panel__body{padding:1.1rem 1.15rem;}
+.panel__body p.hint{font-size:.72rem;color:var(--text-subtle);margin:0 0 1rem;}
+.triggers{display:flex;flex-wrap:wrap;gap:.6rem;}
+.btn{font-family:var(--font-mono-family);font-size:.8rem;cursor:pointer;display:inline-flex;align-items:center;gap:.6ch;
+  padding:.5rem .85rem;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);
+  transition:all var(--duration-base) var(--ease-console);}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn .g{font-size:.9rem;line-height:1;}
+.btn.ok:hover{border-color:var(--ok);color:var(--ok);}
+.btn.warn:hover{border-color:var(--warn);color:var(--warn);}
+.btn.danger:hover{border-color:var(--danger);color:var(--danger);}
+.opts{display:flex;gap:1.2ch;align-items:center;flex-wrap:wrap;margin-top:1rem;font-size:.72rem;color:var(--text-subtle);}
+.opts label{display:inline-flex;align-items:center;gap:.5ch;cursor:pointer;}
+.opts input{accent-color:var(--accent);}
+
+.spec{margin-top:2.4rem;font-size:.78rem;color:var(--text-muted);border-left:3px solid var(--accent);padding:.2rem 0 .2rem 1ch;}
+.spec code{color:var(--accent);font-size:.74rem;}
+footer.note{margin-top:4rem;padding-top:1.2rem;border-top:1px solid var(--border);font-size:.72rem;color:var(--text-subtle);}
+
+/* ══ LIVE ARTICLE PREVIEW — real bookmark → real toast ════════════════ */
+.demo{margin-top:2.2rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);overflow:hidden;
+  box-shadow:0 1px 0 color-mix(in oklch,var(--text) 4%,transparent), 0 18px 40px -32px color-mix(in oklch,var(--text) 40%,transparent);}
+.demo__bar{display:flex;align-items:center;gap:.6ch;padding:.55rem .9rem;border-bottom:1px solid var(--border);background:var(--surface-2);font-size:.72rem;letter-spacing:.02em;}
+.demo__bar .p{color:var(--text-muted);} .demo__bar .u{color:var(--accent);}
+.demo__bar .tag{margin-left:auto;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-subtle);border:1px solid var(--border);border-radius:999px;padding:.12rem .6rem;}
+.demo__body{padding:1.4rem 1.5rem 1.6rem;}
+.demo__title{font-family:var(--font-display-family);font-size:1.5rem;letter-spacing:-.02em;margin:0;}
+.demo__meta{display:flex;align-items:center;gap:1.2ch;flex-wrap:wrap;margin:.7rem 0 1.1rem;}
+.demo__meta .by{font-size:.75rem;color:var(--text-subtle);}
+.bm{display:inline-flex;align-items:center;gap:.7ch;padding:.5rem .8rem;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);color:var(--text-muted);font-size:.8rem;cursor:pointer;font-family:inherit;transition:all var(--duration-base) var(--ease-console);}
+.bm:hover{border-color:var(--accent);color:var(--accent);}
+.bm svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6;}
+.bm[aria-pressed="true"]{color:var(--accent);border-color:var(--accent);background:var(--accent-muted);}
+.bm[aria-pressed="true"] svg{fill:var(--accent);stroke:var(--accent);}
+.bm .kbd{font-size:.62rem;color:var(--text-subtle);border:1px solid var(--border);border-radius:3px;padding:0 .4ch;}
+.bm__hint{font-size:.72rem;color:var(--text-subtle);}
+.bm__hint.saved{color:var(--ok);}
+.demo__prose{font-family:var(--font-body-family);font-size:1.02rem;color:var(--text-muted);max-width:60ch;line-height:1.7;margin:0;}
+
+/* ══ TOAST STACK ══════════════════════════════════════════════════════ */
+.toaster{
+  position:fixed;right:clamp(.8rem,3vw,1.4rem);bottom:clamp(.8rem,3vw,1.4rem);z-index:60;
+  display:flex;flex-direction:column;gap:.6rem;align-items:flex-end;
+  width:min(23rem,calc(100vw - 1.6rem));pointer-events:none;
+}
+.toast{
+  pointer-events:auto;width:100%;overflow:hidden;position:relative;
+  border:1px solid var(--border);border-left:3px solid var(--tc,var(--accent));
+  border-radius:var(--radius);background:var(--surface);
+  box-shadow:0 1px 0 color-mix(in oklch,var(--text) 4%,transparent), 0 20px 44px -30px color-mix(in oklch,var(--text) 55%,transparent);
+  transform:translateX(120%);opacity:0;
+  transition:transform var(--duration-slow) var(--ease-console), opacity var(--duration-base) var(--ease-console), margin var(--duration-base) var(--ease-console);
+}
+.toast.in{transform:translateX(0);opacity:1;}
+.toast.out{transform:translateX(120%);opacity:0;}
+/* type accent colors */
+.toast.t-ok{--tc:var(--ok);}
+.toast.t-info{--tc:var(--accent);}
+.toast.t-warn{--tc:var(--warn);}
+.toast.t-danger{--tc:var(--danger);}
+
+.toast__bar{display:flex;align-items:center;gap:.6ch;padding:.42rem .7rem .42rem .8rem;
+  border-bottom:1px solid var(--border);background:var(--surface-2);font-size:.68rem;letter-spacing:.02em;}
+.toast__glyph{color:var(--tc,var(--accent));font-weight:700;font-size:.82rem;line-height:1;}
+.toast__cmd{color:var(--text-muted);}
+.toast__cmd b{color:var(--tc,var(--accent));font-weight:600;}
+.toast__time{margin-left:auto;color:var(--text-subtle);font-size:.62rem;}
+.toast__x{background:0;border:0;color:var(--text-subtle);cursor:pointer;font-family:inherit;font-size:.8rem;line-height:1;padding:0 0 0 .4ch;transition:color var(--duration-fast) var(--ease-console);}
+.toast__x:hover{color:var(--danger);}
+
+.toast__body{padding:.6rem .8rem .7rem;display:flex;flex-direction:column;gap:.4rem;}
+.toast__msg{font-size:.82rem;color:var(--text);display:flex;gap:.6ch;align-items:baseline;line-height:1.45;}
+.toast__msg .prompt{color:var(--tc,var(--accent));flex:0 0 auto;}
+.toast__msg .path{color:var(--tc,var(--accent));}
+.toast__actions{display:flex;gap:.6ch;align-items:center;margin-top:.1rem;}
+.toast__act{font-family:var(--font-mono-family);font-size:.72rem;cursor:pointer;display:inline-flex;align-items:center;gap:.5ch;
+  padding:.28rem .6rem;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface);color:var(--text-muted);
+  transition:all var(--duration-base) var(--ease-console);}
+.toast__act:hover{border-color:var(--tc,var(--accent));color:var(--tc,var(--accent));}
+.toast__act .kbd{font-size:.6rem;color:var(--text-subtle);border:1px solid var(--border);border-radius:3px;padding:0 .4ch;}
+
+/* shrinking timer line — the "process bar" */
+.toast__timer{position:absolute;left:0;bottom:0;height:2px;width:100%;transform-origin:left;background:var(--tc,var(--accent));opacity:.7;}
+.toast.run .toast__timer{animation:drain var(--life,3600ms) linear forwards;}
+.toast.paused .toast__timer{animation-play-state:paused;}
+@keyframes drain{from{transform:scaleX(1);}to{transform:scaleX(0);}}
+
+@media (prefers-reduced-motion: reduce){
+  .toast{transition:opacity var(--duration-base) linear;transform:none;}
+  .toast.in{transform:none;} .toast.out{transform:none;}
+  .toast.run .toast__timer{animation:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="top__in">
+  <div class="brand"><span class="sq"><i></i><i></i><i></i></span> ovinnikov<span class="dim">.dev</span></div>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Mode">
+      <button id="t-light" aria-pressed="true">light</button>
+      <button id="t-dark" aria-pressed="false">dark</button>
+    </div>
+    <div class="seg" role="group" aria-label="Hue">
+      <button id="h-console" aria-pressed="true">console</button>
+      <button id="h-indigo" aria-pressed="false">indigo</button>
+    </div>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="eyebrow">engagement layer · design mock</p>
+    <h1>Feedback that echoes&nbsp;like&nbsp;stdout.</h1>
+    <p class="lede">A transient toast for confirming small actions — bookmarked, rated, subscribed, deleted. It slides in from the bottom-right, auto-dismisses on a visible timer, and stacks when several fire in a row. Every value is a live <span class="mono">theme.css</span> token; flip the switches to check light / dark / indigo.</p>
+  </header>
+
+  <!-- live article context: click the bookmark to fire the real toast -->
+  <div class="demo">
+    <div class="demo__bar"><span class="p">~/post/</span><span class="u">static-first-rendering.md</span> <span class="tag">in context</span></div>
+    <div class="demo__body">
+      <h2 class="demo__title">Static-first rendering</h2>
+      <div class="demo__meta">
+        <span class="by mono">by Val · Aug 3 · 6 min ·</span>
+        <button class="bm" id="demo-bm" aria-pressed="false" aria-label="Save post">
+          <svg viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>
+          <span id="demo-bm-txt">save</span> <span class="kbd">⌘S</span>
+        </button>
+        <span class="bm__hint mono" id="demo-bm-hint">private — only you see it</span>
+      </div>
+      <p class="demo__prose">Keeping the article prerendered while the engagement layer hydrates separately is exactly why the LCP stays flat here. The prose ships as one static file; only the interactive islands cost bytes — and the toast that confirms your save is one of them.</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel__bar"><span class="u">val</span><span class="p">@ovinnikov:~$</span> notify --demo<span class="tag">toast</span></div>
+    <div class="panel__body">
+      <p class="hint">Fire a toast. Hover a live toast to pause its timer; click ✕ to dismiss early.</p>
+      <div class="triggers">
+        <button class="btn ok"    data-demo="bookmark"><span class="g">◈</span> save to bookmarks</button>
+        <button class="btn"       data-demo="rating"><span class="g">★</span> submit rating</button>
+        <button class="btn ok"    data-demo="subscribe"><span class="g">✉</span> subscribe</button>
+        <button class="btn"       data-demo="copy"><span class="g">⧉</span> copy link</button>
+        <button class="btn warn"  data-demo="pending"><span class="g">◐</span> post comment</button>
+        <button class="btn danger" data-demo="delete"><span class="g">✕</span> delete comment</button>
+        <button class="btn danger" data-demo="error"><span class="g">!</span> trigger error</button>
+      </div>
+      <div class="opts">
+        <label><input type="checkbox" id="opt-multi" /> fire 3 at once (test stacking)</label>
+        <label><input type="checkbox" id="opt-slow" /> slow timer (8s)</label>
+      </div>
+    </div>
+  </div>
+
+  <p class="spec">
+    Anatomy — a compact terminal window: title bar echoes the command (<code>bookmark · saved</code>) with a type glyph and elapsed time; body shows the result line with a colored <code>›</code> prompt; optional action (<code>undo ⌘Z</code>); a 2px timer line drains left-to-right as the auto-dismiss counts down. Type colors map to tokens — <code>--ok</code>, <code>--accent</code>, <code>--warn</code>, <code>--danger</code>. Respects <code>prefers-reduced-motion</code>: no slide, no drain, still auto-dismisses.
+  </p>
+
+  <footer class="note mono">
+    design mock · docs/design-reference/toast-notification-mock.html · spec: docs/superpowers/specs/2026-08-05-toast-notification-design.md · pairs with engagement-ui-mock.html
+  </footer>
+</div>
+
+<!-- live region for screen readers -->
+<div class="toaster" id="toaster" role="region" aria-label="Notifications"></div>
+<div aria-live="polite" aria-atomic="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);" id="sr"></div>
+
+<script>
+  const root = document.documentElement;
+  const setDark = d => { root.classList.toggle('dark', d); t_light.setAttribute('aria-pressed', String(!d)); t_dark.setAttribute('aria-pressed', String(d)); };
+  const setIndigo = i => { root.classList.toggle('indigo', i); h_console.setAttribute('aria-pressed', String(!i)); h_indigo.setAttribute('aria-pressed', String(i)); };
+  t_light.onclick = () => setDark(false); t_dark.onclick = () => setDark(true);
+  h_console.onclick = () => setIndigo(false); h_indigo.onclick = () => setIndigo(true);
+
+  const toaster = document.getElementById('toaster');
+  const sr = document.getElementById('sr');
+  const MAX = 4; // cap visible toasts
+
+  // demo recipes ----------------------------------------------------------
+  const RECIPES = {
+    bookmark:  { type:'ok',     cmd:['bookmark','saved'],      msg:['›','stashed to ', '~/bookmarks'], action:{label:'undo', kbd:'⌘Z'} },
+    bookmark_off:{ type:'info', cmd:['bookmark','removed'],    msg:['›','removed from ', '~/bookmarks'], action:{label:'undo', kbd:'⌘Z'} },
+    rating:    { type:'info',   cmd:['rate','recorded'],       msg:['›','your rating saved — ', '4★'] },
+    subscribe: { type:'ok',     cmd:['subscribe','pending'],   msg:['›','check your inbox to ', 'confirm'] },
+    copy:      { type:'info',   cmd:['clip','copied'],         msg:['›','link copied to ', 'clipboard'] },
+    pending:   { type:'warn',   cmd:['comment','queued'],      msg:['●','posted — ', 'awaiting review'] },
+    delete:    { type:'danger', cmd:['comment','removed'],     msg:['✕','comment deleted'], action:{label:'undo', kbd:'⌘Z'} },
+    error:     { type:'danger', cmd:['bookmark','failed'],     msg:['!','couldn’t save — ', 'retry?'], action:{label:'retry', kbd:'R'} },
+  };
+  const GLYPH = { ok:'✓', info:'›', warn:'◐', danger:'✕' };
+
+  let clock = 0;
+  function spawn(key){
+    const r = RECIPES[key]; if(!r) return;
+    const slow = document.getElementById('opt-slow').checked;
+    const life = slow ? 8000 : 3600;
+
+    // enforce cap: drop oldest
+    while(toaster.children.length >= MAX){ dismiss(toaster.firstElementChild, true); }
+
+    const el = document.createElement('div');
+    el.className = 'toast t-' + r.type;
+    el.style.setProperty('--life', life + 'ms');
+    el.setAttribute('role','status');
+
+    const [cmdName, cmdState] = r.cmd;
+    const [pfx, text, tail] = r.msg;
+    const actionHTML = r.action
+      ? `<div class="toast__actions"><button class="toast__act" data-act>${r.action.label}${r.action.kbd?` <span class="kbd">${r.action.kbd}</span>`:''}</button></div>`
+      : '';
+
+    el.innerHTML = `
+      <div class="toast__bar">
+        <span class="toast__glyph">${GLYPH[r.type]}</span>
+        <span class="toast__cmd">${cmdName} · <b>${cmdState}</b></span>
+        <span class="toast__time">just now</span>
+        <button class="toast__x" aria-label="Dismiss">✕</button>
+      </div>
+      <div class="toast__body">
+        <div class="toast__msg"><span class="prompt">${pfx}</span><span>${text}${tail?`<span class="path">${tail}</span>`:''}</span></div>
+        ${actionHTML}
+      </div>
+      <div class="toast__timer"></div>`;
+
+    toaster.appendChild(el);
+    sr.textContent = `${cmdName} ${cmdState}. ${text}${tail||''}`;
+
+    // animate in
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.add('in','run'); }));
+
+    // auto-dismiss timer (JS-driven so pause/resume is exact)
+    let remaining = life, startedAt = Date.now(), timer = setTimeout(() => dismiss(el), life);
+    el._pause = () => { clearTimeout(timer); remaining -= Date.now() - startedAt; el.classList.add('paused'); };
+    el._resume = () => { startedAt = Date.now(); timer = setTimeout(() => dismiss(el), remaining); el.classList.remove('paused'); };
+
+    el.addEventListener('mouseenter', el._pause);
+    el.addEventListener('mouseleave', el._resume);
+    el.addEventListener('focusin', el._pause);
+    el.addEventListener('focusout', el._resume);
+    el.querySelector('.toast__x').addEventListener('click', () => dismiss(el));
+    const act = el.querySelector('[data-act]');
+    if(act) act.addEventListener('click', () => { sr.textContent = `${r.action.label} — done`; dismiss(el); });
+
+    // relative-time ticker
+    const t0 = Date.now(), timeEl = el.querySelector('.toast__time');
+    el._tick = setInterval(() => {
+      const s = Math.round((Date.now()-t0)/1000);
+      timeEl.textContent = s < 2 ? 'just now' : s + 's ago';
+    }, 1000);
+  }
+
+  function dismiss(el, instant){
+    if(!el || el._dismissing) return;
+    el._dismissing = true;
+    clearInterval(el._tick);
+    el.classList.add('out'); el.classList.remove('in');
+    const done = () => el.remove();
+    if(instant){ el.remove(); return; }
+    el.addEventListener('transitionend', done, { once:true });
+    setTimeout(done, 600); // fallback
+  }
+
+  // wire triggers
+  document.querySelectorAll('[data-demo]').forEach(b => {
+    b.addEventListener('click', () => {
+      const key = b.dataset.demo;
+      if(document.getElementById('opt-multi').checked){
+        const keys = ['bookmark','rating','pending'];
+        keys.forEach((k,i) => setTimeout(() => spawn(k), i*180));
+      } else {
+        spawn(key);
+      }
+    });
+  });
+
+  // live article bookmark → real toast (matches the spec action catalog)
+  const bm = document.getElementById('demo-bm');
+  if(bm){
+    bm.addEventListener('click', () => {
+      const on = bm.getAttribute('aria-pressed') === 'true'; // state before toggle
+      bm.setAttribute('aria-pressed', String(!on));
+      bm.setAttribute('aria-label', on ? 'Save post' : 'Remove bookmark');
+      document.getElementById('demo-bm-txt').textContent = on ? 'save' : 'saved';
+      const hint = document.getElementById('demo-bm-hint');
+      hint.textContent = on ? 'private — only you see it' : '✓ stashed to ~/bookmarks';
+      hint.classList.toggle('saved', !on);
+      spawn(on ? 'bookmark_off' : 'bookmark');
+    });
+  }
+
+  // welcome toast
+  setTimeout(() => spawn('bookmark'), 500);
+</script>
+</body>
+</html>

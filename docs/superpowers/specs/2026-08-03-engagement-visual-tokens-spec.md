@@ -198,6 +198,60 @@ Meter: filled cells `--accent`, empty cells `--border-strong`, bracketed
 | "awaiting confirmation"     | `--warn` (§7), `--text-meta`                                                            |
 | hint text                   | `--text-subtle`                                                                         |
 
+### 4.6 Account area (`/account`, Feature 6 / D15)
+
+Three `WindowChrome` sections stacked on the hub, each titled with a terminal
+command (`$ account --privacy` / `--email` / `--identities`). All three lean on
+one new pattern — the **`SettingRow`** (label + description + control slot) — and
+on the status tokens in §7. Mock: the "06 · Account" section of
+`engagement-ui-mock.html`.
+
+**`SettingRow` (shared by all three sections):**
+
+| Element                 | Token(s)                                                                                               |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ |
+| row separator           | 1px dashed `--border`                                                                                  |
+| label                   | `--font-mono`, `--text`, weight 500, `--text-copy`                                                     |
+| description             | `--font-body`, `--text-subtle`, `--text-meta`                                                          |
+| control slot            | reuses §3.3 buttons / §3.4 field / status badge                                                        |
+| `tone="danger"` wrapper | 1px `--danger` border, **left 2px `--danger`**, background `--danger-muted` tint, radius `--radius-sm` |
+
+**6a — privacy & data:**
+
+| Element                 | Token(s)                                                                                                                                                             |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| "Export my data" action | outline button (§3.3)                                                                                                                                                |
+| "Delete account" row    | `SettingRow tone="danger"`; heading `--danger`                                                                                                                       |
+| typed-confirm field     | §3.4 field; arms only on handle match                                                                                                                                |
+| delete button           | **danger button** — border `--danger` (mix), text `--danger`, background transparent; hover fill `--danger` with `--bg` text; `disabled` → reduced opacity, no hover |
+
+**6b — email & newsletter preferences:**
+
+| Element                      | Token(s)                                                        |
+| ---------------------------- | --------------------------------------------------------------- |
+| "subscribed" badge           | `--ok` text/border, `--ok-muted` background (§7)                |
+| "pending confirmation" badge | `--warn` text/border, `--warn-muted` background                 |
+| email on file                | `--font-mono`, `--text`; "read-only in v1" note `--text-subtle` |
+| unsubscribe / resend         | outline button (§3.3)                                           |
+
+**6c — connected accounts / identity:**
+
+| Element                      | Token(s)                                                                              |
+| ---------------------------- | ------------------------------------------------------------------------------------- |
+| provider row separator       | 1px dashed `--border`                                                                 |
+| provider icon                | GitHub `currentColor` = `--text`; Google 4-colour (§8.1); email-link glyph `--accent` |
+| provider name                | `--text`, `--font-mono`                                                               |
+| linked state                 | `✓ linked` in `--ok`; `○ not linked` in `--text-subtle`                               |
+| link / unlink action         | ghost button (§3.3)                                                                   |
+| "last method — can't unlink" | `--text-subtle`, italic (guard, not a button)                                         |
+| display-name field + avatar  | §3.4 field + `Avatar` (gradient `--logo-1→--logo-3`); save = solid button             |
+
+**Note (same as elsewhere):** the mock renders the danger/ok/warn tints with
+`color-mix()`; ship them as the `*-muted` status tokens from §7, not inline
+mixes. The entire Account area therefore **depends on the §7 status-token
+decision (D11)** landing first — delete (`--danger`), subscription status
+(`--ok`/`--warn`) have no correct token to bind to until it does.
+
 ## 5. Typography roles
 
 | Role                                                                | Family token     | Size token(s)                                | Notes                                                     |
@@ -298,12 +352,14 @@ state (`fill="none" stroke="currentColor"`), and the _saved_ state simply sets
 
 ## 10. Decision log addendum
 
-| #   | Decision       | Chosen                                                                                                                                           |
-| --- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| D11 | Status colours | Add semantic `--ok`/`--warn`/`--danger` (+ `*-muted`) tokens to `theme.css` (`config` layer, WCAG-verified); no inline `color-mix` in components |
-| D12 | Google icon    | Ship the official 4-colour mark as the lone non-`currentColor` icon; monochrome `bookmark.svg` follows the normal convention                     |
+| #   | Decision        | Chosen                                                                                                                                           |
+| --- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| D11 | Status colours  | Add semantic `--ok`/`--warn`/`--danger` (+ `*-muted`) tokens to `theme.css` (`config` layer, WCAG-verified); no inline `color-mix` in components |
+| D12 | Google icon     | Ship the official 4-colour mark as the lone non-`currentColor` icon; monochrome `bookmark.svg` follows the normal convention                     |
+| D15 | Account visuals | Three `WindowChrome` sections on `/account` sharing one new `SettingRow` pattern (§4.6); danger/status treatments bind to the D11 status tokens  |
 
-Everything else inherits the decision log in `2026-08-03-engagement-ui-design.md`.
+Everything else inherits the decision log in `2026-08-03-engagement-ui-design.md`
+(Feature 6 / D15 there covers the account structure and per-section behaviour).
 No code in this issue — the visual contract above feeds the same per-issue
 `writing-plans` pass, with §7 (status tokens) sequenced first as a `config`
-prerequisite for the `ui` components.
+prerequisite for the `ui` components (including the whole Account area).

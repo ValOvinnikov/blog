@@ -10,6 +10,7 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { getCategoriesSafely } from '@web/utils/get-categories-safely';
+import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -33,7 +34,9 @@ export async function BlogListPage({ page }: TBlogListPageProps) {
   ]);
 
   if (!result.ok) {
-    console.error(`Error to fetch blog page: ${result.error}`);
+    console.error(
+      `Error to fetch blog page: ${sanitizeLogMessage(result.error)}`,
+    );
     notFound();
   }
 

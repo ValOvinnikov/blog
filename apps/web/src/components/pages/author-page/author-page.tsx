@@ -16,6 +16,7 @@ import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
+import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import { notFound } from 'next/navigation';
@@ -52,7 +53,9 @@ export async function AuthorPage({ slug, page }: TAuthorPageProps) {
   ]);
 
   if (!result.ok) {
-    console.error(`Error to fetch author page: ${result.error}`);
+    console.error(
+      `Error to fetch author page: ${sanitizeLogMessage(result.error)}`,
+    );
     notFound();
   }
   if (result.data === null) {
