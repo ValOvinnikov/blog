@@ -7,7 +7,7 @@ import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-var
 import { toSessionUsername } from '@web/components/shared/auth-menu/utils/to-session-username';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import type { RefObject } from 'react';
+import { useState, type RefObject } from 'react';
 
 import { accountMenuVariants } from './account-menu-variants';
 
@@ -55,6 +55,23 @@ export function AccountMenu({
   const displayName = name ?? email ?? '';
   const username = toSessionUsername(name, email);
 
+  // Tracks a runtime `<img>` load failure (e.g. a stale/broken OAuth avatar
+  // URL) so both `Avatar` renders below fall back to initials together —
+  // they show the same underlying image, so one shared flag is correct.
+  // Reset whenever `image` itself changes, so a failure recorded against a
+  // previous session's URL never incorrectly persists against a new one —
+  // done during render (comparing against the last-seen `image`) rather than
+  // in a `useEffect`, per React's "adjusting state when a prop changes"
+  // guidance: an effect here would still commit the stale-initials render
+  // first, then re-render a second time to clear it.
+  const [lastImage, setLastImage] = useState(image);
+  const [imageFailed, setImageFailed] = useState(false);
+  if (image !== lastImage) {
+    setLastImage(image);
+    setImageFailed(false);
+  }
+  const avatarSrc = imageFailed ? undefined : (image ?? undefined);
+
   return (
     <PopoverMenu className={menuRoot()}>
       <PopoverMenu.Trigger
@@ -66,10 +83,11 @@ export function AccountMenu({
         className={avatarTrigger()}
       >
         <Avatar
-          src={image ?? undefined}
+          src={avatarSrc}
           name={displayName}
           alt=""
           size={Size.SM}
+          onImageError={() => setImageFailed(true)}
         />
       </PopoverMenu.Trigger>
       <PopoverMenu.Panel
@@ -88,10 +106,11 @@ export function AccountMenu({
           <WindowChrome.Body>
             <div className={acctRow()}>
               <Avatar
-                src={image ?? undefined}
+                src={avatarSrc}
                 name={displayName}
                 alt=""
                 size={Size.SM}
+                onImageError={() => setImageFailed(true)}
               />
               <div>
                 <p className={accountName()}>{displayName}</p>
