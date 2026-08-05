@@ -131,7 +131,11 @@
     "toastSavedMessage": "stashed to ~/bookmarks",
     "toastRemovedState": "removed",
     "toastRemovedMessage": "removed from ~/bookmarks",
-    "toastErrorState": "failed"
+    "toastErrorState": "failed",
+    "toastRevertedState": "reverted",
+    "toastRevertedMessage": "reverted",
+    "toastUndoLabel": "undo",
+    "toastRetryLabel": "retry"
   },
   "bookmarksPage": {
     "title": "My bookmarks",
