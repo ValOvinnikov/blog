@@ -17,8 +17,8 @@ export const bookmarkToggleVariants = tv({
   variants: {
     isBookmarked: {
       true: {
-        root: 'border-accent bg-accent-muted text-accent',
-        icon: 'fill-current',
+        root: ['border-accent bg-accent-muted text-accent'],
+        icon: ['fill-current'],
       },
     },
   },

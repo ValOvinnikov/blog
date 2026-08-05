@@ -15,6 +15,11 @@ describe(`<${BookmarkToggle.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Save post' })).toBeVisible();
   });
 
+  it('sets title to the same accessible name as aria-label', () => {
+    setup();
+    expect(screen.getByRole('button')).toHaveAttribute('title', 'Save post');
+  });
+
   it('reflects aria-pressed="false" when not bookmarked', () => {
     setup();
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'false');

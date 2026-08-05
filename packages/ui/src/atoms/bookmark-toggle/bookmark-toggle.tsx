@@ -5,7 +5,8 @@ import { type ButtonHTMLAttributes } from 'react';
 import { bookmarkToggleVariants } from './bookmark-toggle-variants';
 
 export interface IBookmarkToggleProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'className'>,
+  extends
+    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'className'>,
     IWithDataTestId {
   isBookmarked: boolean;
   onToggle: () => void;
@@ -38,6 +39,7 @@ export const BookmarkToggle = ({
       type="button"
       aria-pressed={isBookmarked}
       aria-label={ariaLabel}
+      title={ariaLabel}
       disabled={disabled}
       onClick={onToggle}
       data-testid={dataTestId}
