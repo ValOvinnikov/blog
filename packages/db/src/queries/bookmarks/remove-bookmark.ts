@@ -1,0 +1,16 @@
+import { getDb } from '@blog/db/client';
+import { bookmarks } from '@blog/db/schema/bookmarks';
+import { and, eq } from 'drizzle-orm';
+
+// Removes a bookmark for (userId, postId). A no-op if it doesn't exist, so
+// `BookmarkToggle`'s "remove" action can call this unconditionally.
+export async function removeBookmark(
+  userId: string,
+  postId: string,
+): Promise<void> {
+  const db = getDb();
+
+  await db
+    .delete(bookmarks)
+    .where(and(eq(bookmarks.userId, userId), eq(bookmarks.postId, postId)));
+}
