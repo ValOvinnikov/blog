@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event';
-import { customRender, screen, waitFor } from '@web/testing/custom-render';
+import { act, customRender, screen, waitFor } from '@web/testing/custom-render';
 
 import { BookmarkButton } from './bookmark-button';
 
@@ -222,5 +222,200 @@ describe(`<${BookmarkButton.name}/>`, () => {
     });
     expect(toastSuccessMock).not.toHaveBeenCalled();
     expect(toastInfoMock).not.toHaveBeenCalled();
+  });
+
+  it('undoes a successful save: reverts state, re-invokes setBookmarkStatus, and shows a reverted-state info toast', async () => {
+    useSessionMock.mockReturnValue({
+      data: { user: { id: 'user-1' } },
+      status: 'authenticated',
+    });
+    getBookmarkStatusMock.mockResolvedValue(false);
+    setBookmarkStatusMock.mockResolvedValue({ ok: true });
+    const user = userEvent.setup();
+
+    setup();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Save post' }));
+    await waitFor(() => {
+      expect(toastSuccessMock).toHaveBeenCalled();
+    });
+    expect(setBookmarkStatusMock).toHaveBeenCalledWith('post-1', true);
+
+    const { action } = toastSuccessMock.mock.calls[0]![0];
+    await act(async () => action.onAct());
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Save post' })).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      );
+    });
+    expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
+    expect(setBookmarkStatusMock).toHaveBeenNthCalledWith(2, 'post-1', false);
+    expect(toastInfoMock).toHaveBeenCalledWith({
+      command: 'bookmark',
+      state: 'reverted',
+      message: 'reverted',
+    });
+  });
+
+  it('undoes a successful remove: re-bookmarks, re-invokes setBookmarkStatus, and shows a reverted-state info toast', async () => {
+    useSessionMock.mockReturnValue({
+      data: { user: { id: 'user-1' } },
+      status: 'authenticated',
+    });
+    getBookmarkStatusMock.mockResolvedValue(true);
+    setBookmarkStatusMock.mockResolvedValue({ ok: true });
+    const user = userEvent.setup();
+
+    setup();
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Remove bookmark' }),
+      ).toBeEnabled();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Remove bookmark' }));
+    await waitFor(() => {
+      expect(toastInfoMock).toHaveBeenCalledTimes(1);
+    });
+    expect(setBookmarkStatusMock).toHaveBeenCalledWith('post-1', false);
+
+    const { action } = toastInfoMock.mock.calls[0]![0];
+    await act(async () => action.onAct());
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Remove bookmark' }),
+      ).toHaveAttribute('aria-pressed', 'true');
+    });
+    expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
+    expect(setBookmarkStatusMock).toHaveBeenNthCalledWith(2, 'post-1', true);
+    // The undo's own success path is always `toast.info`, regardless of
+    // which direction it reverted — this is the second `info` call.
+    expect(toastInfoMock).toHaveBeenNthCalledWith(2, {
+      command: 'bookmark',
+      state: 'reverted',
+      message: 'reverted',
+    });
+  });
+
+  it('rolls back to the pre-undo committed state and shows an action-less error toast when the undo write fails', async () => {
+    useSessionMock.mockReturnValue({
+      data: { user: { id: 'user-1' } },
+      status: 'authenticated',
+    });
+    getBookmarkStatusMock.mockResolvedValue(false);
+    setBookmarkStatusMock
+      .mockResolvedValueOnce({ ok: true })
+      .mockResolvedValueOnce({ ok: false });
+    const user = userEvent.setup();
+
+    setup();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Save post' }));
+    await waitFor(() => {
+      expect(toastSuccessMock).toHaveBeenCalled();
+    });
+
+    const { action } = toastSuccessMock.mock.calls[0]![0];
+    await act(async () => action.onAct());
+
+    // Rolls back to the committed (saved) state the undo started from.
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Remove bookmark' }),
+      ).toHaveAttribute('aria-pressed', 'true');
+    });
+    expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
+    // Deliberate: no `action` on the undo-failure toast, to avoid an
+    // unbounded retry/undo chain.
+    expect(toastErrorMock).toHaveBeenCalledWith({
+      command: 'bookmark',
+      state: 'failed',
+      message: "Couldn't save that. Try again.",
+    });
+    expect(toastInfoMock).not.toHaveBeenCalled();
+  });
+
+  it('retries a failed save: re-invokes setBookmarkStatus with the same value and shows a success toast once it succeeds', async () => {
+    useSessionMock.mockReturnValue({
+      data: { user: { id: 'user-1' } },
+      status: 'authenticated',
+    });
+    getBookmarkStatusMock.mockResolvedValue(false);
+    setBookmarkStatusMock
+      .mockResolvedValueOnce({ ok: false })
+      .mockResolvedValueOnce({ ok: true });
+    const user = userEvent.setup();
+
+    setup();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Save post' }));
+    await waitFor(() => {
+      expect(toastErrorMock).toHaveBeenCalled();
+    });
+
+    const { action } = toastErrorMock.mock.calls[0]![0];
+    await act(async () => action.onAct());
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Remove bookmark' }),
+      ).toHaveAttribute('aria-pressed', 'true');
+    });
+    expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
+    expect(setBookmarkStatusMock).toHaveBeenNthCalledWith(2, 'post-1', true);
+    expect(toastSuccessMock).toHaveBeenCalledWith({
+      command: 'bookmark',
+      state: 'saved',
+      message: 'stashed to ~/bookmarks',
+      action: expect.objectContaining({ label: 'undo', keyHint: '⌘Z' }),
+    });
+  });
+
+  it('shows a fresh retry action when the retried save fails again', async () => {
+    useSessionMock.mockReturnValue({
+      data: { user: { id: 'user-1' } },
+      status: 'authenticated',
+    });
+    getBookmarkStatusMock.mockResolvedValue(false);
+    setBookmarkStatusMock.mockResolvedValue({ ok: false });
+    const user = userEvent.setup();
+
+    setup();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Save post' }));
+    await waitFor(() => {
+      expect(toastErrorMock).toHaveBeenCalledTimes(1);
+    });
+
+    const { action } = toastErrorMock.mock.calls[0]![0];
+    await act(async () => action.onAct());
+
+    await waitFor(() => {
+      expect(toastErrorMock).toHaveBeenCalledTimes(2);
+    });
+    expect(setBookmarkStatusMock).toHaveBeenCalledTimes(2);
+    expect(screen.getByRole('button', { name: 'Save post' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    const { action: secondAction } = toastErrorMock.mock.calls[1]![0];
+    expect(secondAction).toEqual(
+      expect.objectContaining({ label: 'retry', keyHint: 'R' }),
+    );
   });
 });
