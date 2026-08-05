@@ -101,10 +101,21 @@ studio`, local inspection only).
   `service` separately). Composite-unique constraints where the design
   requires them (ratings and bookmarks are both `(userId, postId)` unique —
   see the UX doc's Features 3 and 4).
-- **Queries/mutations** (`src/queries/<domain>.ts` or a `queries/` +
-  `mutations/` split if a domain's file grows past a handful of actions) —
-  typed async functions, e.g. `getCommentsForPost(postId)`,
-  `upsertRating(userId, postId, value)`, `getRatingSummary(postId)`. Mirror
+- **Queries/mutations** — **one file per query/mutation function**, in a
+  `src/queries/<domain>/` folder once a domain has more than one action (a
+  single-query domain can stay a flat `src/queries/<domain>.ts`, promoted to
+  a folder the moment a second query lands). Each file exports one typed
+  async function, e.g. `src/queries/bookmarks/add-bookmark.ts`,
+  `remove-bookmark.ts`, `list-bookmarks.ts`, `is-bookmarked.ts`, each
+  importing only the `drizzle-orm` operators it actually uses (no shared
+  grab-bag import across the domain). `src/queries/<domain>/index.ts`
+  re-exports every file (`export * from './add-bookmark'`, etc.) so
+  `src/queries/index.ts`'s `export * as <domain> from './<domain>'` keeps
+  working unchanged whether `<domain>` is a flat file or a folder. Co-locate
+  each function's test file next to it (`add-bookmark.test.ts` beside
+  `add-bookmark.ts`), not one combined domain test file — split shared-setup
+  cases (e.g. a cross-cutting FK-cascade test) into whichever query file's
+  test most naturally exercises them, not a separate catch-all file. Mirror
   `service`'s facade shape where it helps consistency (a small `db` object
   grouping domains), but don't force a versioned `v1` facade unless a real
   compatibility need appears — this package has one internal consumer
