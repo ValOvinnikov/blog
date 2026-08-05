@@ -112,11 +112,24 @@
     "oauthError": "Sign-in failed. Please try again.",
     "accountMenuAriaLabel": "Account menu",
     "signOut": "Sign out",
-    "loadingAccountStatus": "Loading account status"
+    "loadingAccountStatus": "Loading account status",
+    "myBookmarks": "My bookmarks"
   },
   "toastProvider": {
     "viewportAriaLabel": "Notifications",
     "dismissLabel": "Dismiss notification",
     "mergeCountSuffix": " ×{count}"
+  },
+  "bookmarkButton": {
+    "saveAriaLabel": "Save post",
+    "removeAriaLabel": "Remove bookmark",
+    "error": "Couldn't save that. Try again."
+  },
+  "bookmarksPage": {
+    "title": "My bookmarks",
+    "metaDescription": "Posts you've saved to read later.",
+    "sectionTitle": "Saved posts",
+    "empty": "No bookmarks yet — save a post to find it here.",
+    "pendingPreviews": "{count, plural, one {1 saved post} other {{count} saved posts}} — full previews are coming soon."
   }
 }

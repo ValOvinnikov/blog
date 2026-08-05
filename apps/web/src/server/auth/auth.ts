@@ -64,7 +64,7 @@ const emailProvider: EmailConfig = {
 // is statically rendered) eagerly evaluates the adapter and crashes on a
 // `DATABASE_URL` that's legitimately unset in CI's build environment
 // (feature-flag-by-absence, same stance as the other auth env vars).
-const { handlers } = NextAuth(() => ({
+const { handlers, auth } = NextAuth(() => ({
   adapter: DrizzleAdapter(getDb(), {
     usersTable: schema.users,
     accountsTable: schema.accounts,
@@ -76,6 +76,19 @@ const { handlers } = NextAuth(() => ({
   // table (`@blog/db`'s schema.ts) only exists to back that strategy.
   session: { strategy: 'database' },
   secret: env.AUTH_SECRET,
+  callbacks: {
+    // The default database-strategy `session` callback (`@auth/core`'s
+    // `defaultCallbacks.session`) only copies `name`/`email`/`image` onto
+    // `session.user`, dropping the adapter's own `user.id` — bookmarks
+    // (#1109) is the first feature needing a stable id to key a Postgres
+    // row by, so it's added back here. `user` (the adapter's row, not the
+    // token) is the callback's second argument under the database
+    // strategy — see `@auth/core`'s `lib/actions/session.js`.
+    session: ({ session, user }) => ({
+      ...session,
+      user: { ...session.user, id: user.id },
+    }),
+  },
   // Design has no dedicated `/login` route (sign-in is a header popover,
   // `AuthMenu`), so a failed OAuth callback redirects to `/` with `?error=`
   // appended rather than Auth.js's default unstyled `/api/auth/error` page —
@@ -97,10 +110,12 @@ const { handlers } = NextAuth(() => ({
   ],
 }));
 
-// Auth.js's own convention (see `next-auth`'s module docstring): re-exported
-// as-is by `src/app/api/auth/[...nextauth]/route.ts`. Only `GET`/`POST` are
-// exported — `auth`/`signIn`/`signOut` (server-action variants) have no
-// caller yet in this issue's scope (no protected routes; `AuthMenu` uses the
-// client `next-auth/react` versions instead) — add them here the moment a
-// Server Component/action needs one.
+// Auth.js's own convention (see `next-auth`'s module docstring): `GET`/`POST`
+// are re-exported as-is by `src/app/api/auth/[...nextauth]/route.ts`. `auth`
+// is the server-side session reader — bookmarks (#1109) is the first
+// consumer, gating `/bookmarks` and its server actions
+// (`@web/server/bookmarks/bookmark-actions.ts`); `signIn`/`signOut` still
+// have no server-action caller (`AuthMenu` uses the client `next-auth/react`
+// versions), so they stay unexported until one exists.
 export const { GET, POST } = handlers;
+export { auth };
