@@ -15,3 +15,5 @@ export type {
   IPostsSectionProps,
 } from './posts-section';
 export { PostsSection } from './posts-section';
+export type { IToastViewportProps } from './toast-viewport';
+export { ToastViewport } from './toast-viewport';

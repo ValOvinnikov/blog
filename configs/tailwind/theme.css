@@ -475,3 +475,15 @@
     opacity: 0;
   }
 }
+
+/* Toast timer/drain bar (#1140): the linear rate is applied per-instance via
+   inline style (animationTimingFunction), since a shell progress bar reads
+   as constant rate — easing here would misrepresent remaining time. */
+@keyframes toast-drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}

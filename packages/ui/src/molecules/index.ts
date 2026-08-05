@@ -13,4 +13,5 @@ export * from './primary-navigation';
 export * from './share-link';
 export * from './tag-list';
 export * from './terminal-chip';
+export * from './toast';
 export * from './window-chrome';
