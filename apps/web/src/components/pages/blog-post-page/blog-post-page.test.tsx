@@ -50,6 +50,21 @@ vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
   setBookmarkStatus: vi.fn(),
 }));
 
+// `BookmarkButton` calls `useToast()` unconditionally (it's a hook), so any
+// composition that renders it — signed in or not — needs this mocked; no
+// assertions here exercise the toast calls themselves (see
+// bookmark-button.test.tsx for those).
+vi.mock('@web/components/shared/toast-provider', () => ({
+  useToast: () => ({
+    success: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+    error: vi.fn(),
+    promise: vi.fn(),
+    dismiss: vi.fn(),
+  }),
+}));
+
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
     href,

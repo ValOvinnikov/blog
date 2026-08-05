@@ -125,7 +125,13 @@
     "saved": "saved",
     "saveAriaLabel": "Save post",
     "removeAriaLabel": "Remove bookmark",
-    "error": "Couldn't save that. Try again."
+    "error": "Couldn't save that. Try again.",
+    "toastCommand": "bookmark",
+    "toastSavedState": "saved",
+    "toastSavedMessage": "stashed to ~/bookmarks",
+    "toastRemovedState": "removed",
+    "toastRemovedMessage": "removed from ~/bookmarks",
+    "toastErrorState": "failed"
   },
   "bookmarksPage": {
     "title": "My bookmarks",

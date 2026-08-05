@@ -3,18 +3,38 @@ import { customRender, screen, waitFor } from '@web/testing/custom-render';
 
 import { BookmarkButton } from './bookmark-button';
 
-const { useSessionMock, getBookmarkStatusMock, setBookmarkStatusMock } =
-  vi.hoisted(() => ({
-    useSessionMock: vi.fn(),
-    getBookmarkStatusMock: vi.fn(),
-    setBookmarkStatusMock: vi.fn(),
-  }));
+const {
+  useSessionMock,
+  getBookmarkStatusMock,
+  setBookmarkStatusMock,
+  toastSuccessMock,
+  toastInfoMock,
+  toastErrorMock,
+} = vi.hoisted(() => ({
+  useSessionMock: vi.fn(),
+  getBookmarkStatusMock: vi.fn(),
+  setBookmarkStatusMock: vi.fn(),
+  toastSuccessMock: vi.fn(),
+  toastInfoMock: vi.fn(),
+  toastErrorMock: vi.fn(),
+}));
 
 vi.mock('next-auth/react', () => ({ useSession: useSessionMock }));
 
 vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
   getBookmarkStatus: getBookmarkStatusMock,
   setBookmarkStatus: setBookmarkStatusMock,
+}));
+
+vi.mock('@web/components/shared/toast-provider', () => ({
+  useToast: () => ({
+    success: toastSuccessMock,
+    info: toastInfoMock,
+    warning: vi.fn(),
+    error: toastErrorMock,
+    promise: vi.fn(),
+    dismiss: vi.fn(),
+  }),
 }));
 
 const setup = customRender(BookmarkButton, { postId: 'post-1' });
@@ -24,6 +44,9 @@ describe(`<${BookmarkButton.name}/>`, () => {
     useSessionMock.mockReset();
     getBookmarkStatusMock.mockReset();
     setBookmarkStatusMock.mockReset();
+    toastSuccessMock.mockReset();
+    toastInfoMock.mockReset();
+    toastErrorMock.mockReset();
   });
 
   it('renders nothing when the session is unauthenticated', () => {
@@ -104,7 +127,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('optimistically toggles on click and calls setBookmarkStatus with the new value', async () => {
+  it('optimistically toggles on click, calls setBookmarkStatus with the new value, and shows a success toast', async () => {
     useSessionMock.mockReturnValue({
       data: { user: { id: 'user-1' } },
       status: 'authenticated',
@@ -126,9 +149,48 @@ describe(`<${BookmarkButton.name}/>`, () => {
     expect(toggledButton).toHaveAttribute('aria-pressed', 'true');
     expect(toggledButton).toHaveTextContent('saved');
     expect(setBookmarkStatusMock).toHaveBeenCalledWith('post-1', true);
+    await waitFor(() => {
+      expect(toastSuccessMock).toHaveBeenCalledWith({
+        command: 'bookmark',
+        state: 'saved',
+        message: 'stashed to ~/bookmarks',
+      });
+    });
+    expect(toastInfoMock).not.toHaveBeenCalled();
+    expect(toastErrorMock).not.toHaveBeenCalled();
   });
 
-  it('rolls back the optimistic toggle and shows a transient error when the write fails', async () => {
+  it('shows an info toast when unsaving an already-bookmarked post', async () => {
+    useSessionMock.mockReturnValue({
+      data: { user: { id: 'user-1' } },
+      status: 'authenticated',
+    });
+    getBookmarkStatusMock.mockResolvedValue(true);
+    setBookmarkStatusMock.mockResolvedValue({ ok: true });
+    const user = userEvent.setup();
+
+    setup();
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Remove bookmark' }),
+      ).toBeEnabled();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Remove bookmark' }));
+
+    expect(setBookmarkStatusMock).toHaveBeenCalledWith('post-1', false);
+    await waitFor(() => {
+      expect(toastInfoMock).toHaveBeenCalledWith({
+        command: 'bookmark',
+        state: 'removed',
+        message: 'removed from ~/bookmarks',
+      });
+    });
+    expect(toastSuccessMock).not.toHaveBeenCalled();
+    expect(toastErrorMock).not.toHaveBeenCalled();
+  });
+
+  it('rolls back the optimistic toggle and shows an error toast when the write fails', async () => {
     useSessionMock.mockReturnValue({
       data: { user: { id: 'user-1' } },
       status: 'authenticated',
@@ -150,8 +212,12 @@ describe(`<${BookmarkButton.name}/>`, () => {
         'false',
       );
     });
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      "Couldn't save that. Try again.",
-    );
+    expect(toastErrorMock).toHaveBeenCalledWith({
+      command: 'bookmark',
+      state: 'failed',
+      message: "Couldn't save that. Try again.",
+    });
+    expect(toastSuccessMock).not.toHaveBeenCalled();
+    expect(toastInfoMock).not.toHaveBeenCalled();
   });
 });

@@ -1,6 +1,7 @@
 'use client';
 
 import { BookmarkToggle } from '@blog/ui/atoms';
+import { useToast } from '@web/components/shared/toast-provider';
 import {
   getBookmarkStatus,
   setBookmarkStatus,
@@ -16,10 +17,6 @@ export type TBookmarkButtonProps = {
   postId: string;
   className?: string;
 };
-
-// "Transient" per the design doc (Feature 4 states) — long enough to read,
-// short enough not to linger once the reader has moved on.
-const ERROR_DISMISS_DELAY_MS = 4000;
 
 /**
  * BookmarkButton — the article header meta strip's "save for later" client
@@ -37,15 +34,16 @@ const ERROR_DISMISS_DELAY_MS = 4000;
  *   `getBookmarkStatus` (disabled until that resolves — a failed fetch still
  *   resolves it, defaulting to "not bookmarked", so the toggle never gets
  *   stuck disabled), then toggles optimistically: flips its own state
- *   immediately, calls `setBookmarkStatus`, and rolls back + shows a
- *   transient inline error on failure.
+ *   immediately, calls `setBookmarkStatus`, confirms the save/remove via a
+ *   `useToast` success/info toast (#1138's original motivating use case),
+ *   and rolls back + shows an error toast on failure.
  */
 export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
   const t = useTranslations('bookmarkButton');
+  const toast = useToast();
   const sessionResult = useSession();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isResolved, setIsResolved] = useState(false);
-  const [error, setError] = useState<string | undefined>(undefined);
   const [isPending, startTransition] = useTransition();
   const s = bookmarkButtonVariants();
 
@@ -77,28 +75,36 @@ export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
     };
   }, [sessionResult.status, postId]);
 
-  useEffect(() => {
-    if (!error) return;
-
-    const timeout = setTimeout(
-      () => setError(undefined),
-      ERROR_DISMISS_DELAY_MS,
-    );
-    return () => clearTimeout(timeout);
-  }, [error]);
-
   if (sessionResult.status === 'unauthenticated') return null;
 
   const handleToggle = () => {
     const next = !isBookmarked;
     setIsBookmarked(next);
-    setError(undefined);
 
     startTransition(async () => {
       const result = await setBookmarkStatus(postId, next);
       if (!result.ok) {
         setIsBookmarked(!next);
-        setError(t('error'));
+        toast.error({
+          command: t('toastCommand'),
+          state: t('toastErrorState'),
+          message: t('error'),
+        });
+        return;
+      }
+
+      if (next) {
+        toast.success({
+          command: t('toastCommand'),
+          state: t('toastSavedState'),
+          message: t('toastSavedMessage'),
+        });
+      } else {
+        toast.info({
+          command: t('toastCommand'),
+          state: t('toastRemovedState'),
+          message: t('toastRemovedMessage'),
+        });
       }
     });
   };
@@ -114,11 +120,6 @@ export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
           sessionResult.status === 'loading' || !isResolved || isPending
         }
       />
-      {error && (
-        <p role="alert" className={s.errorNotice()}>
-          {error}
-        </p>
-      )}
     </span>
   );
 }
