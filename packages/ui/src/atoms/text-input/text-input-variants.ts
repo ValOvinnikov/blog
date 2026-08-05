@@ -1,4 +1,5 @@
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const textInputVariants = tv({
   slots: {
@@ -26,3 +27,5 @@ export const textInputVariants = tv({
     },
   },
 });
+
+export type TTextInputVariants = VariantProps<typeof textInputVariants>;

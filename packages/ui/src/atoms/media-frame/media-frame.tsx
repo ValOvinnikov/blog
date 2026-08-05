@@ -1,10 +1,12 @@
 import { type HTMLAttributes } from 'react';
-import { type VariantProps } from 'tailwind-variants';
 
-import { mediaFrameVariants } from './media-frame-variants';
+import {
+  mediaFrameVariants,
+  type TMediaFrameVariants,
+} from './media-frame-variants';
 
 export type TMediaFrameProps = HTMLAttributes<HTMLDivElement> &
-  VariantProps<typeof mediaFrameVariants>;
+  TMediaFrameVariants;
 
 /**
  * Positioning context for a Next.js `<Image fill />` child.

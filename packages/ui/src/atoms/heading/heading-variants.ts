@@ -1,5 +1,6 @@
 import { Size } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const headingVariants = tv({
   base: ['font-display font-medium text-text'],
@@ -26,3 +27,5 @@ export const headingVariants = tv({
     },
   },
 });
+
+export type THeadingVariants = VariantProps<typeof headingVariants>;

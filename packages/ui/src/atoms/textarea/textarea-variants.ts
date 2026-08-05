@@ -1,4 +1,5 @@
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const textareaVariants = tv({
   slots: {
@@ -26,3 +27,5 @@ export const textareaVariants = tv({
     },
   },
 });
+
+export type TTextareaVariants = VariantProps<typeof textareaVariants>;

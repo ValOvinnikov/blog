@@ -3,11 +3,11 @@ import type { TPolymorphicProps } from '@blog/config/react';
 import type { IWithIcon } from '@blog/ui/lib/react';
 import type { ElementType } from 'react';
 
-import { navLinkVariants } from './nav-link-variants';
+import { navLinkVariants, type TNavLinkVariants } from './nav-link-variants';
 
 type TNavLinkOwnProps = {
   className?: string;
-  isActive?: boolean;
+  isActive?: TNavLinkVariants['isActive'];
   /**
    * Visually hides the link's text content instead of removing it — the text
    * stays in the DOM as the link's real accessible name, so the link renders

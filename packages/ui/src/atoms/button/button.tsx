@@ -1,11 +1,10 @@
 import type { IWithDataTestId } from '@blog/config';
 import { type ButtonHTMLAttributes } from 'react';
-import { type VariantProps } from 'tailwind-variants';
 
-import { buttonVariants } from './button-variants';
+import { buttonVariants, type TButtonVariants } from './button-variants';
 
 export type TButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
-  VariantProps<typeof buttonVariants> &
+  TButtonVariants &
   IWithDataTestId;
 
 export const Button = ({
