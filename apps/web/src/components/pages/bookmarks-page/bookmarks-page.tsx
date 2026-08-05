@@ -74,7 +74,7 @@ export async function BookmarksPage() {
 
   return (
     <main className={s.root()}>
-      <Heading level={1} className={s.heading()}>
+      <Heading level={1} visual="section" className={s.heading()}>
         {t('title')}
       </Heading>
       <WindowChrome className={s.chrome()}>
