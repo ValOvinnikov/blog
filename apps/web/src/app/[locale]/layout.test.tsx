@@ -1,9 +1,7 @@
-import {
-  ICONS,
-  LOCALE_ISO_CODES,
-  routes,
-  SOCIAL_PLATFORMS,
-} from '@blog/config';
+import { LOCALE_ISO_CODES, routes, SOCIAL_PLATFORMS } from '@blog/config';
+import realMessages from '@web/i18n/messages/en.json';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
+import type { ReactNode } from 'react';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
 
@@ -17,6 +15,7 @@ const {
   getTranslationsMock,
   setRequestLocaleMock,
   isProductionEnvironmentMock,
+  useSessionMock,
 } = vi.hoisted(() => ({
   getSiteSettingsMock: vi.fn(),
   getNavigationMock: vi.fn(),
@@ -27,6 +26,7 @@ const {
   getTranslationsMock: vi.fn(),
   setRequestLocaleMock: vi.fn(),
   isProductionEnvironmentMock: vi.fn(),
+  useSessionMock: vi.fn(),
 }));
 
 vi.mock('@web/utils/is-production-environment', () => ({
@@ -55,13 +55,32 @@ vi.mock('next-intl/server', () => ({
   setRequestLocale: setRequestLocaleMock,
 }));
 
-vi.mock('@web/i18n/navigation', () => ({
-  usePathname: vi.fn(),
+// `LocaleLayout`'s resolved tree renders a real `SessionProvider` (`AuthMenu`
+// reads the session client-side — #1107). Mocked here (not just
+// `useSession`) so mounting it under `render()` never fires next-auth's real
+// session fetch — a plain pass-through, the same stance `auth-menu.test.tsx`
+// takes on this module.
+vi.mock('next-auth/react', () => ({
+  useSession: useSessionMock,
+  signIn: vi.fn(),
+  signOut: vi.fn(),
+  SessionProvider: ({ children }: { children: ReactNode }) => children,
 }));
 
 const brand = { name: 'Blog', logo: null };
 const now = new Date('2026-07-21T00:00:00.000Z');
-const messages = { pagination: { previous: 'Previous' } };
+
+// `LocaleLayout` is an async Server Component — `customRenderAsync` awaits
+// it, then mounts the resolved element tree via RTL's `render()`. The real
+// `en.json` messages (not a minimal stub) flow through the mocked
+// `getMessages()` below so every client component nested under `Header`/
+// `Footer` (`SiteNavigation`, `BrandLockupLink`, `AuthMenu`, ...) finds its
+// own namespace on the real `NextIntlClientProvider` `LocaleLayout` renders,
+// instead of throwing/falling back on a missing-message error.
+const setup = customRenderAsync(LocaleLayout, {
+  children: <div>content</div>,
+  params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
+});
 
 describe('LocaleLayout', () => {
   beforeEach(() => {
@@ -72,13 +91,14 @@ describe('LocaleLayout', () => {
     });
     getNavigationMock.mockResolvedValue({ ok: true, data: { items: [] } });
     getFooterMock.mockResolvedValue({ ok: true, data: { social: [] } });
-    getMessagesMock.mockResolvedValue(messages);
+    getMessagesMock.mockResolvedValue(realMessages);
     getNowMock.mockResolvedValue(now);
     getTimeZoneMock.mockResolvedValue('UTC');
     getTranslationsMock.mockResolvedValue(
       (key: string) => rssTranslations[key] ?? key,
     );
     isProductionEnvironmentMock.mockReturnValue(true);
+    useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
   });
 
   describe('generateStaticParams', () => {
@@ -137,6 +157,11 @@ describe('LocaleLayout', () => {
     });
   });
 
+  // This one still calls `LocaleLayout` directly and reads props off the
+  // resolved root element — it asserts what's actually passed to
+  // `NextIntlClientProvider`, which has no rendered-DOM equivalent to query
+  // for. Unlike the footer-nav tests below, this is a single hop on the root
+  // element, not a `.props.children` chain walk, so it's left as-is.
   it('passes real messages, locale, now, and timeZone to NextIntlClientProvider', async () => {
     const ui = await LocaleLayout({
       children: <div>content</div>,
@@ -145,28 +170,20 @@ describe('LocaleLayout', () => {
 
     expect(setRequestLocaleMock).toHaveBeenCalledWith(LOCALE_ISO_CODES.EN);
     expect(ui.props.locale).toBe(LOCALE_ISO_CODES.EN);
-    expect(ui.props.messages).toBe(messages);
+    expect(ui.props.messages).toBe(realMessages);
     expect(ui.props.now).toBe(now);
     expect(ui.props.timeZone).toBe('UTC');
   });
 
   it('adds a visible RSS feed link to the footer nav', async () => {
-    const ui = await LocaleLayout({
-      children: <div>content</div>,
-      params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
-    });
+    await setup();
 
-    // `ui.props.children` is now `<SessionProvider>` (#1107) — one more
-    // `.props.children` hop than before to reach the root div's own children.
-    const [, , footer] = ui.props.children.props.children.props.children;
-    const [, footerNav] = footer.props.children;
-    const footerNavLinks = footerNav.props.children;
-    const rssLink = footerNavLinks[footerNavLinks.length - 1];
+    const link = screen.getByRole('link', { name: 'RSS feed' });
 
-    expect(rssLink.props.href).toBe(routes.rssFeed());
-    expect(rssLink.props.hideLabel).toBe(true);
-    expect(rssLink.props.children).toBe('RSS feed');
-    expect(rssLink.props.icon.props.name).toBe(ICONS.RSS);
+    expect(link).toHaveAttribute('href', routes.rssFeed());
+    // `hideLabel` sets the link's `title` to its own label text (see
+    // `NavLink`) — the one DOM-observable trace of that prop being `true`.
+    expect(link).toHaveAttribute('title', 'RSS feed');
   });
 
   it('renders a mapped social link icon-only, keeping its label as the accessible name', async () => {
@@ -184,20 +201,17 @@ describe('LocaleLayout', () => {
       },
     });
 
-    const ui = await LocaleLayout({
-      children: <div>content</div>,
-      params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
-    });
+    await setup();
 
-    // `ui.props.children` is now `<SessionProvider>` (#1107) — one more
-    // `.props.children` hop than before to reach the root div's own children.
-    const [, , footer] = ui.props.children.props.children.props.children;
-    const [, footerNav] = footer.props.children;
-    const [[socialLink]] = footerNav.props.children;
+    const link = screen.getByRole('link', { name: 'LinkedIn' });
 
-    expect(socialLink.props.hideLabel).toBe(true);
-    expect(socialLink.props.children).toBe('LinkedIn');
-    expect(socialLink.props.icon.props.name).toBe(ICONS.LINKEDIN);
+    expect(link).toHaveAttribute(
+      'href',
+      'https://www.linkedin.com/in/example',
+    );
+    // A mapped platform renders icon-only (`hideLabel`), traced the same way
+    // as the RSS link above.
+    expect(link).toHaveAttribute('title', 'LinkedIn');
   });
 
   it('falls back to label-only rendering for a social link with an unmapped platform', async () => {
@@ -215,19 +229,13 @@ describe('LocaleLayout', () => {
       },
     });
 
-    const ui = await LocaleLayout({
-      children: <div>content</div>,
-      params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
-    });
+    await setup();
 
-    // `ui.props.children` is now `<SessionProvider>` (#1107) — one more
-    // `.props.children` hop than before to reach the root div's own children.
-    const [, , footer] = ui.props.children.props.children.props.children;
-    const [, footerNav] = footer.props.children;
-    const [[socialLink]] = footerNav.props.children;
+    const link = screen.getByRole('link', { name: 'Mastodon' });
 
-    expect(socialLink.props.hideLabel).toBe(false);
-    expect(socialLink.props.icon).toBeUndefined();
-    expect(socialLink.props.children).toBe('Mastodon');
+    expect(link).toHaveAttribute('href', 'https://mastodon.social/@example');
+    // An unmapped platform never sets `hideLabel` — no icon, and no `title`
+    // since the visible label text is already the accessible name.
+    expect(link).not.toHaveAttribute('title');
   });
 });
