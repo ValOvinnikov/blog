@@ -1,6 +1,6 @@
 import { LOCALE_ISO_CODES, routes, SOCIAL_PLATFORMS } from '@blog/config';
 import realMessages from '@web/i18n/messages/en.json';
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import type { ReactNode } from 'react';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
@@ -184,6 +184,10 @@ describe('LocaleLayout', () => {
     // `hideLabel` sets the link's `title` to its own label text (see
     // `NavLink`) — the one DOM-observable trace of that prop being `true`.
     expect(link).toHaveAttribute('title', 'RSS feed');
+    // The decorative icon is `aria-hidden` with no role, so a fixed
+    // `dataTestId` (`rss-icon`, from `layout.tsx`) is the only way to assert
+    // the *correct* icon rendered, not just any icon.
+    expect(within(link).getByTestId('rss-icon')).toBeVisible();
   });
 
   it('renders a mapped social link icon-only, keeping its label as the accessible name', async () => {
@@ -205,13 +209,15 @@ describe('LocaleLayout', () => {
 
     const link = screen.getByRole('link', { name: 'LinkedIn' });
 
-    expect(link).toHaveAttribute(
-      'href',
-      'https://www.linkedin.com/in/example',
-    );
+    expect(link).toHaveAttribute('href', 'https://www.linkedin.com/in/example');
     // A mapped platform renders icon-only (`hideLabel`), traced the same way
     // as the RSS link above.
     expect(link).toHaveAttribute('title', 'LinkedIn');
+    // `dataTestId={`social-icon-${link.platform}`}` in `layout.tsx` — asserts
+    // the *LinkedIn* icon rendered, not just any icon.
+    expect(
+      within(link).getByTestId(`social-icon-${SOCIAL_PLATFORMS.LINKEDIN}`),
+    ).toBeVisible();
   });
 
   it('falls back to label-only rendering for a social link with an unmapped platform', async () => {
@@ -237,5 +243,11 @@ describe('LocaleLayout', () => {
     // An unmapped platform never sets `hideLabel` — no icon, and no `title`
     // since the visible label text is already the accessible name.
     expect(link).not.toHaveAttribute('title');
+    // No `iconName` is resolved for an unmapped platform, so `layout.tsx`
+    // never even renders an `<Icon>` (no `dataTestId` to attach either) —
+    // restoring the original "no icon at all" coverage.
+    expect(
+      within(link).queryByTestId(`social-icon-${SOCIAL_PLATFORMS.MASTODON}`),
+    ).not.toBeInTheDocument();
   });
 });
