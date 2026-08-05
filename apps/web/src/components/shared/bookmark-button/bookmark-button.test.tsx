@@ -154,7 +154,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
         command: 'bookmark',
         state: 'saved',
         message: 'stashed to ~/bookmarks',
-        action: expect.objectContaining({ label: 'undo', keyHint: '⌘Z' }),
+        action: expect.objectContaining({ label: 'undo' }),
       });
     });
     expect(toastInfoMock).not.toHaveBeenCalled();
@@ -185,7 +185,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
         command: 'bookmark',
         state: 'removed',
         message: 'removed from ~/bookmarks',
-        action: expect.objectContaining({ label: 'undo', keyHint: '⌘Z' }),
+        action: expect.objectContaining({ label: 'undo' }),
       });
     });
     expect(toastSuccessMock).not.toHaveBeenCalled();
@@ -379,7 +379,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
       command: 'bookmark',
       state: 'saved',
       message: 'stashed to ~/bookmarks',
-      action: expect.objectContaining({ label: 'undo', keyHint: '⌘Z' }),
+      action: expect.objectContaining({ label: 'undo' }),
     });
   });
 

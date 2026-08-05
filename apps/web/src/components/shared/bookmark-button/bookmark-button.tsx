@@ -137,7 +137,6 @@ export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
 
       const undoAction = {
         label: t('toastUndoLabel'),
-        keyHint: '⌘Z',
         onAct: () => performUndo(next),
       };
 
