@@ -10,28 +10,34 @@ export interface IBookmarkToggleProps
     IWithDataTestId {
   isBookmarked: boolean;
   onToggle: () => void;
+  label: string;
   ariaLabel: string;
   disabled?: boolean;
   className?: string;
 }
 
 /**
- * BookmarkToggle — a pure, controlled icon-only toggle for saving a post to
+ * BookmarkToggle — a pure, controlled icon+label toggle for saving a post to
  * read later. The consumer owns the bookmarked state and its persistence;
- * this component only reflects it (`aria-pressed`) and reports the reader's
- * intent (`onToggle`). The outline glyph fills solid when bookmarked, no
- * separate icon asset is swapped.
+ * this component only reflects it (`aria-pressed`, icon fill, visible
+ * `label` text) and reports the reader's intent (`onToggle`). The outline
+ * glyph fills solid when bookmarked, no separate icon asset is swapped.
  */
 export const BookmarkToggle = ({
   isBookmarked,
   onToggle,
+  label,
   ariaLabel,
   disabled,
   className,
   dataTestId,
   ...rest
 }: IBookmarkToggleProps) => {
-  const { root, icon } = bookmarkToggleVariants({ isBookmarked });
+  const {
+    root,
+    icon,
+    label: labelSlot,
+  } = bookmarkToggleVariants({ isBookmarked });
 
   return (
     <button
@@ -46,6 +52,7 @@ export const BookmarkToggle = ({
       className={root({ class: className })}
     >
       <Icon name={ICONS.BOOKMARK} size={Size.MD} className={icon()} />
+      <span className={labelSlot()}>{label}</span>
     </button>
   );
 };

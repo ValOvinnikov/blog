@@ -6,6 +6,7 @@ import { BookmarkToggle } from './bookmark-toggle';
 const setup = customRender(BookmarkToggle, {
   isBookmarked: false,
   onToggle: vi.fn(),
+  label: 'save',
   ariaLabel: 'Save post',
 });
 
@@ -20,13 +21,23 @@ describe(`<${BookmarkToggle.name}/>`, () => {
     expect(screen.getByRole('button')).toHaveAttribute('title', 'Save post');
   });
 
+  it('renders the visible label text', () => {
+    setup();
+    expect(screen.getByText('save')).toBeVisible();
+  });
+
+  it('renders the given label when bookmarked', () => {
+    setup({ isBookmarked: true, label: 'saved', ariaLabel: 'Remove bookmark' });
+    expect(screen.getByText('saved')).toBeVisible();
+  });
+
   it('reflects aria-pressed="false" when not bookmarked', () => {
     setup();
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('reflects aria-pressed="true" when bookmarked', () => {
-    setup({ isBookmarked: true, ariaLabel: 'Remove bookmark' });
+    setup({ isBookmarked: true, label: 'saved', ariaLabel: 'Remove bookmark' });
     const button = screen.getByRole('button', { name: 'Remove bookmark' });
     expect(button).toHaveAttribute('aria-pressed', 'true');
   });

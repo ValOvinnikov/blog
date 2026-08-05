@@ -1,4 +1,6 @@
 export * from './article';
+export type { IBookmarkRow, IBookmarksListProps } from './bookmarks-list';
+export { BookmarksList } from './bookmarks-list';
 export * from './content-module';
 export * from './content-section';
 export * from './cta-module';

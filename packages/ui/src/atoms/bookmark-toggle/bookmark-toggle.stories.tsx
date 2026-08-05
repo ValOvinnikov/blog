@@ -8,6 +8,7 @@ const meta = {
   tags: ['autodocs'],
   args: {
     isBookmarked: false,
+    label: 'save',
     ariaLabel: 'Save post',
     onToggle: () => {},
   },
@@ -19,7 +20,7 @@ type TStory = StoryObj<typeof meta>;
 export const NotBookmarked: TStory = {};
 
 export const Bookmarked: TStory = {
-  args: { isBookmarked: true, ariaLabel: 'Remove bookmark' },
+  args: { isBookmarked: true, label: 'saved', ariaLabel: 'Remove bookmark' },
 };
 
 export const Disabled: TStory = {
