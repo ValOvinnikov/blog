@@ -153,16 +153,20 @@ site's terminal/console voice (the same voice `PostCard`, `CommandLink`, and
 
 The icon set (`packages/ui/src/assets/icons/`) has `github`, `share`, `copy`,
 etc., but is **missing**: a **`google`** glyph (auth provider button) and a
-**`bookmark`** glyph (bookmark toggle, filled + outline states). These are small
+**`bookmark`** glyph (bookmark toggle — outline only; the filled/active look is
+a CSS fill toggle on the same asset, not a second SVG). These are small
 `@blog/ui` asset additions and are called out per-feature below.
 
 ### Client-island + route inventory
 
 New `apps/web` client islands (each owns state, composes a pure component):
 `AuthMenu`, `CommentThread`, `RatingBlock`, `BookmarkButton`,
-`NewsletterForm`. New routes: **`/bookmarks`** (auth-gated, saved-post grid) and
-**`/admin/comments`** (role-gated moderation queue). Both compose existing pure
-organisms (`PostsSection`/`PostCard`, `CommentItem`) — no new page primitives.
+`NewsletterForm`. New routes: **`/bookmarks`** (auth-gated, saved-post
+terminal listing) and **`/admin/comments`** (role-gated moderation queue).
+`/admin/comments` composes the existing pure `CommentItem` organism — no new
+primitive there. `/bookmarks` composes a **new** pure organism,
+`BookmarksList` (per Feature 4's correction below), not `PostsSection`/
+`PostCard`.
 
 ---
 
@@ -383,28 +387,47 @@ export interface IRatingInputProps extends IWithDataTestId {
 
 ## Feature 4 — Bookmarks (#1043)
 
+> **Correction (2026-08-05):** the original pass of this section described an
+> icon-only toggle and a `PostCard`-grid `/bookmarks` listing — both wrong.
+> Neither was checked against
+> [`docs/design-reference/engagement-ui-mock.html`](../../design-reference/engagement-ui-mock.html)
+> before writing, the same mistake D14 already called out for Feature 1's
+> missing `WindowChrome` (the mock's "every implementing agent must open this
+> file" rule existed by the time this was written but wasn't followed for
+> this feature specifically). Corrected below to match the mock exactly. The
+> mock's `⌘S` keyboard-shortcut hint pill is an intentionally-dropped
+> embellishment — everything else in this section follows the mock.
+
 **Decision (accepted): bookmarks only** — not likes, not both. Ratings (#1041)
 already provide the public appreciation signal, so _likes_ would duplicate it;
 _bookmarks_ add distinct private "save-for-later" value and give the logged-in
-user menu a real destination. Icon-only, no public count (bookmarks are
-private).
+user menu a real destination. No public count (bookmarks are private).
 
 **Placement & composition.** A `BookmarkToggle` sits in the **article header
 meta strip, beside share** — saving is a decide-early action, so it belongs at
-the top, not buried after comments. The logged-in state is a filled icon; the
-logged-out state is hidden or renders a "Sign in to save" affordance. A new
-**`/bookmarks`** page (auth-gated) lists the user's saved posts by **reusing the
-existing `PostCard` grid / `PostsSection`** pattern — no new page primitive —
-and is reached from the user-menu "My bookmarks" item (Feature 1).
+the top, not buried after comments. Per the mock, the toggle is **icon +
+visible text**, not icon-only: an outline bookmark glyph, the word "save"
+(swaps to "saved" once bookmarked), a private-only hint reading "private —
+only you see it" (swaps to "✓ stashed to ~/bookmarks" once bookmarked) — the
+mock's `⌘S` kbd-hint pill is dropped, everything else matches. The logged-out
+state is hidden or renders a "Sign in to save" affordance. A new
+**`/bookmarks`** page (auth-gated) lists the user's saved posts as a
+**terminal directory listing** (`$ ls ~/bookmarks -l`), per the mock — **not**
+a `PostCard` grid: each row shows a decorative, `aria-hidden` `drwx`
+permission-style glyph, a pre-formatted date, and the post rendered as a
+filename-styled link (e.g. `static-first-rendering.md` — slug + `.md`); a
+trailing hint line reads "N saved" (or the design's stated empty-state copy
+when there are none). Reached from the user-menu "My bookmarks" item
+(Feature 1).
 
 **States.** _Logged-out_ → sign-in affordance (or hidden, per copy). _Not
-bookmarked_ → outline icon. _Bookmarked_ → filled icon (optimistic on toggle).
-_Loading_ → disabled/neutral. _Error_ → toggle rolls back + a transient inline
-message. `/bookmarks` _empty_ → "No bookmarks yet — save a post to find it
-here."
+bookmarked_ → outline icon + "save". _Bookmarked_ → filled icon + "saved"
+(optimistic on toggle). _Loading_ → disabled/neutral. _Error_ → toggle rolls
+back + a transient inline message. `/bookmarks` _empty_ → "No bookmarks yet —
+save a post to find it here."
 
-**Responsive / theme.** Icon target ≥44px on mobile; filled `--accent`, outline
-`--text-subtle`. Uses `aria-pressed` for toggle state.
+**Responsive / theme.** Icon target ≥44px on mobile; filled `--accent`,
+outline `--text-subtle`. Uses `aria-pressed` for toggle state.
 
 **Component surface (`@blog/ui`, pure):**
 
@@ -413,14 +436,32 @@ here."
 export interface IBookmarkToggleProps extends IWithDataTestId {
   isBookmarked: boolean;
   onToggle: () => void;
+  label: string; // "save" / "saved" — resolved by web
   ariaLabel: string; // "Save post" / "Remove bookmark" — resolved by web
   disabled?: boolean;
   className?: string;
 }
+
+// organisms/bookmarks-list — the /bookmarks terminal-listing organism
+export interface IBookmarkRow {
+  id: string;
+  formattedDate: string; // pre-formatted by web
+  filename: string; // e.g. "static-first-rendering.md" — web derives from slug
+  href: string;
+}
+export interface IBookmarksListProps extends IWithDataTestId {
+  rows: IBookmarkRow[];
+  emptyMessage: string;
+  hint?: string; // e.g. "3 saved"
+  linkAs?: TAnchorElementType;
+  className?: string;
+}
 ```
 
-Needs the new **`bookmark` icon asset** (filled + outline). The `/bookmarks`
-grid reuses `PostsSection` + `PostCard` as-is.
+Needs the new **`bookmark` icon asset** (currently outline-only in the tree —
+the "active = filled" look is achieved via a CSS fill toggle on the existing
+outline SVG, not a separate filled asset). `/bookmarks` is a **new page
+primitive** (`BookmarksList`), not a reuse of `PostsSection`/`PostCard`.
 
 ---
 
@@ -528,8 +569,8 @@ Designing the insert path to accommodate this now means the later switch needs
   `ThemeToggle`, in that order, via the existing `actions` prop. The logged-in
   dropdown carries **"My bookmarks" → `/bookmarks`**.
 - **Site footer:** gains the **`full` `NewsletterSignup`**.
-- **New routes:** `/bookmarks` (auth-gated, `PostCard` grid) and
-  `/admin/comments` (role-gated queue).
+- **New routes:** `/bookmarks` (auth-gated, terminal-listing `BookmarksList`)
+  and `/admin/comments` (role-gated queue).
 
 ### Article page `/blog/[slug]` — top to bottom, with graded visual weight
 
@@ -569,27 +610,29 @@ contextually, rather than four different logged-out treatments.
 
 ## Consolidated `@blog/ui` component list
 
-| Component                        | Kind     | New?    | Purity / a11y notes                                                           |
-| -------------------------------- | -------- | ------- | ----------------------------------------------------------------------------- |
-| `WindowChrome`                   | molecule | **new** | title-bar (`user@host` prompt + tag pill) + body slots, D14; used by all five |
-| `TextInput`                      | atom     | **new** | controlled `value`/`onChange`, required `ariaLabel`, `invalid` variant        |
-| `Textarea`                       | atom     | **new** | as above + `rows`/`maxLength`                                                 |
-| `RatingSummary`                  | atom     | **new** | read-only aggregate, mono glyphs `aria-hidden`, name via `ariaLabel`          |
-| `RatingInput`                    | atom     | **new** | interactive 1–5, hover + roving-tabindex keyboard, `ariaLabel`                |
-| `BookmarkToggle`                 | atom     | **new** | `isBookmarked`/`onToggle`, `aria-pressed`, `ariaLabel`; needs `bookmark` icon |
-| `CommentItem`                    | molecule | **new** | pre-formatted date prop, `actions` slot (shared with `/admin`), `linkAs`      |
-| `CommentList`                    | molecule | **new** | pure recursion (one visual level), reply-form slot injected by `web`          |
-| `CommentForm`                    | molecule | **new** | controlled, built on `Textarea`, visible length counter, `ariaLabel`          |
-| `NewsletterSignup`               | organism | **new** | `full`/`compact` variants, controlled, built on `TextInput`                   |
-| `CommentsSection`                | organism | **new** | `<h2 id={titleId}>`, `aria-labelledby`, empty state (mirrors `PostsSection`)  |
-| `Avatar`                         | atom     | reuse   | auth trigger                                                                  |
-| `PopoverMenu`                    | molecule | reuse   | sign-in provider list + account menu                                          |
-| `Button` / `IconButton` / `Icon` | atoms    | reuse   | sign-in button, actions; needs `google` icon                                  |
-| `PostsSection` / `PostCard`      | organism | reuse   | `/bookmarks` grid, related reading                                            |
+| Component                        | Kind     | New?    | Purity / a11y notes                                                                                                                 |
+| -------------------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `WindowChrome`                   | molecule | **new** | title-bar (`user@host` prompt + tag pill) + body slots, D14; used by all five                                                       |
+| `TextInput`                      | atom     | **new** | controlled `value`/`onChange`, required `ariaLabel`, `invalid` variant                                                              |
+| `Textarea`                       | atom     | **new** | as above + `rows`/`maxLength`                                                                                                       |
+| `RatingSummary`                  | atom     | **new** | read-only aggregate, mono glyphs `aria-hidden`, name via `ariaLabel`                                                                |
+| `RatingInput`                    | atom     | **new** | interactive 1–5, hover + roving-tabindex keyboard, `ariaLabel`                                                                      |
+| `BookmarkToggle`                 | atom     | **new** | `isBookmarked`/`onToggle`, `aria-pressed`, `ariaLabel` + visible `label`; needs `bookmark` icon                                     |
+| `BookmarksList`                  | organism | **new** | terminal `ls -l` listing, `aria-hidden` decorative permission glyph, pre-formatted date, filename-styled `linkAs` link, empty state |
+| `CommentItem`                    | molecule | **new** | pre-formatted date prop, `actions` slot (shared with `/admin`), `linkAs`                                                            |
+| `CommentList`                    | molecule | **new** | pure recursion (one visual level), reply-form slot injected by `web`                                                                |
+| `CommentForm`                    | molecule | **new** | controlled, built on `Textarea`, visible length counter, `ariaLabel`                                                                |
+| `NewsletterSignup`               | organism | **new** | `full`/`compact` variants, controlled, built on `TextInput`                                                                         |
+| `CommentsSection`                | organism | **new** | `<h2 id={titleId}>`, `aria-labelledby`, empty state (mirrors `PostsSection`)                                                        |
+| `Avatar`                         | atom     | reuse   | auth trigger                                                                                                                        |
+| `PopoverMenu`                    | molecule | reuse   | sign-in provider list + account menu                                                                                                |
+| `Button` / `IconButton` / `Icon` | atoms    | reuse   | sign-in button, actions; needs `google` icon                                                                                        |
+| `PostsSection` / `PostCard`      | organism | reuse   | related reading only — **not** `/bookmarks` (see `BookmarksList` above)                                                             |
 
-New assets: `google.svg`, `bookmark.svg` (filled + outline). New `apps/web`
-islands: `AuthMenu`, `CommentThread`, `RatingBlock`, `BookmarkButton`,
-`NewsletterForm`. New `apps/cms` schema: newsletter page-builder module.
+New assets: `google.svg`, `bookmark.svg` (outline; filled is a CSS fill
+toggle, not a second asset). New `apps/web` islands: `AuthMenu`,
+`CommentThread`, `RatingBlock`, `BookmarkButton`, `NewsletterForm`. New
+`apps/cms` schema: newsletter page-builder module.
 
 ## Decision log
 
