@@ -1,7 +1,4 @@
-import {
-  type IWithDataTestId,
-  type TNewsletterSignupStatus,
-} from '@blog/config';
+import { type IWithDataTestId, type TFormStatus } from '@blog/config';
 
 import { NewsletterSignupFieldRow } from './newsletter-signup-field-row';
 import { NewsletterSignupSuccessMessage } from './newsletter-signup-success-message';
@@ -11,7 +8,7 @@ export interface INewsletterSignupCompactProps extends IWithDataTestId {
   email: string;
   onEmailChange: (value: string) => void;
   onSubmit: () => void;
-  status: TNewsletterSignupStatus;
+  status: TFormStatus;
   errorMessage?: string;
   successMessage?: string;
   submitLabel: string;

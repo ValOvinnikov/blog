@@ -1,7 +1,4 @@
-import {
-  type IWithDataTestId,
-  type TNewsletterSignupStatus,
-} from '@blog/config';
+import { type IWithDataTestId, type TFormStatus } from '@blog/config';
 import { WindowChrome } from '@blog/ui/molecules/window-chrome';
 
 import { NewsletterSignupFieldRow } from './newsletter-signup-field-row';
@@ -12,7 +9,7 @@ export interface INewsletterSignupFullProps extends IWithDataTestId {
   email: string;
   onEmailChange: (value: string) => void;
   onSubmit: () => void;
-  status: TNewsletterSignupStatus;
+  status: TFormStatus;
   heading?: string;
   description?: string;
   errorMessage?: string;

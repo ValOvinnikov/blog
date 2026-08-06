@@ -1,4 +1,4 @@
-import type { TNewsletterSignupStatus } from '@blog/config';
+import type { TFormStatus } from '@blog/config';
 
 import {
   newsletterSignupVariants,
@@ -6,7 +6,7 @@ import {
 } from './newsletter-signup-variants';
 
 interface INewsletterSignupErrorMessageProps {
-  status: TNewsletterSignupStatus;
+  status: TFormStatus;
   message?: string;
   variant: TNewsletterSignupVariants['variant'];
 }

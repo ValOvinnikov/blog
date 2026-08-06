@@ -18,9 +18,7 @@ export interface ILocalizedParams {
 }
 
 /**
- * Lifecycle status for a controlled form submission (e.g. newsletter signup,
- * comments, ratings) — the caller owns the state, the component only reads
- * it to drive its UI.
+ * Lifecycle status for a controlled form submission — the caller owns the
+ * state, the component only reads it to drive its UI.
  */
-export type TNewsletterSignupStatus =
-  'idle' | 'submitting' | 'success' | 'error';
+export type TFormStatus = 'idle' | 'submitting' | 'success' | 'error';

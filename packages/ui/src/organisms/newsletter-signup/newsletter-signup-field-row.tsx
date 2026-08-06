@@ -1,4 +1,4 @@
-import { ICONS, type TNewsletterSignupStatus } from '@blog/config';
+import { ICONS, type TFormStatus } from '@blog/config';
 import { Button } from '@blog/ui/atoms/button';
 import { Icon } from '@blog/ui/atoms/icon';
 import { TextInput } from '@blog/ui/atoms/text-input';
@@ -14,7 +14,7 @@ interface INewsletterSignupFieldRowProps {
   email: string;
   onEmailChange: (value: string) => void;
   onSubmit: () => void;
-  status: TNewsletterSignupStatus;
+  status: TFormStatus;
   errorMessage?: string;
   submitLabel: string;
   emailAriaLabel: string;
