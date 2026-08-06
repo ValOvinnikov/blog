@@ -148,4 +148,49 @@ describe('subscribeToNewsletterAction', () => {
     expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
     errorSpy.mockRestore();
   });
+
+  it('still returns "success" (logging, not failing) when marking the cookie throws after a real successful signup', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    createPendingSubscriberMock.mockResolvedValue({
+      outcome: 'created',
+      subscriber,
+    });
+    sendEmailMock.mockResolvedValue(undefined);
+    markNewsletterSubscribedMock.mockRejectedValue(
+      new Error('cookie store down'),
+    );
+    const { subscribeToNewsletterAction } =
+      await import('./newsletter-actions');
+
+    await expect(
+      subscribeToNewsletterAction('reader@example.com'),
+    ).resolves.toEqual({ outcome: 'success' });
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Failed to set the newsletter-subscribed cookie:',
+      expect.any(String),
+    );
+    errorSpy.mockRestore();
+  });
+
+  it('still returns "already-subscribed" (logging, not failing) when marking the cookie throws', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    createPendingSubscriberMock.mockResolvedValue({
+      outcome: 'already-active',
+      subscriber: { ...subscriber, status: 'active' as const },
+    });
+    markNewsletterSubscribedMock.mockRejectedValue(
+      new Error('cookie store down'),
+    );
+    const { subscribeToNewsletterAction } =
+      await import('./newsletter-actions');
+
+    await expect(
+      subscribeToNewsletterAction('reader@example.com'),
+    ).resolves.toEqual({ outcome: 'already-subscribed' });
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Failed to set the newsletter-subscribed cookie:',
+      expect.any(String),
+    );
+    errorSpy.mockRestore();
+  });
 });

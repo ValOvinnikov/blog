@@ -38,10 +38,11 @@ const NEWSLETTER_FROM_ADDRESS = resolveNewsletterFromAddress(
  *   no email sent.
  *
  * Both `'success'` and `'already-subscribed'` also set
- * `NEWSLETTER_SUBSCRIBED_COOKIE` (`markNewsletterSubscribed`) — a signed-out
- * reader has no session to key "already subscribed" off, so this cookie is
- * the one durable signal `NewsletterForm`'s render call-sites use to stop
- * showing the form to someone who's already on the list. `'invalid'`/
+ * `NEWSLETTER_SUBSCRIBED_COOKIE` (`markNewsletterSubscribed`, via
+ * `markNewsletterSubscribedSafely` below) — a signed-out reader has no
+ * session to key "already subscribed" off, so this cookie is the one
+ * durable signal `NewsletterForm`'s render call-sites use to stop showing
+ * the form to someone who's already on the list. `'invalid'`/
  * `'server-error'` never set it (nothing was confirmed).
  *
  * A thrown error (a `sendEmail`/db failure) is caught and logged rather than
@@ -60,7 +61,7 @@ export async function subscribeToNewsletterAction(
     const result = await queries.subscribers.createPendingSubscriber(email);
 
     if (result.outcome === 'already-active') {
-      await markNewsletterSubscribed();
+      await markNewsletterSubscribedSafely();
       return { outcome: 'already-subscribed' };
     }
 
@@ -77,7 +78,7 @@ export async function subscribeToNewsletterAction(
       html,
     });
 
-    await markNewsletterSubscribed();
+    await markNewsletterSubscribedSafely();
     return { outcome: 'success' };
   } catch (error) {
     console.error(
@@ -85,5 +86,26 @@ export async function subscribeToNewsletterAction(
       sanitizeLogMessage(error),
     );
     return { outcome: 'server-error' };
+  }
+}
+
+/**
+ * markNewsletterSubscribedSafely — wraps `markNewsletterSubscribed` in its
+ * own try/catch, deliberately separate from the outer one above. By the
+ * point either call site calls this, the actual subscription (the db write,
+ * and for a brand-new/re-pending signup the confirmation email) has already
+ * succeeded — a failure setting the cookie afterward shouldn't turn that
+ * real success into a reported `'server-error'`, it should just mean this
+ * one reader sees the form again on their next visit. Logged, never
+ * rethrown.
+ */
+async function markNewsletterSubscribedSafely(): Promise<void> {
+  try {
+    await markNewsletterSubscribed();
+  } catch (error) {
+    console.error(
+      'Failed to set the newsletter-subscribed cookie:',
+      sanitizeLogMessage(error),
+    );
   }
 }
