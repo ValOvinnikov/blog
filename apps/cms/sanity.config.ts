@@ -8,10 +8,12 @@ import { homePageSchema } from '@cms/schema-types/documents/pages/home-page';
 import { genericSchema } from '@cms/schema-types/documents/pages/page';
 import { footerSchema } from '@cms/schema-types/documents/settings/footer';
 import { navigationSchema } from '@cms/schema-types/documents/settings/navigation';
+import { newsletterSettingsSchema } from '@cms/schema-types/documents/settings/newsletter';
 import { siteSchema } from '@cms/schema-types/documents/settings/site-settings';
 import { contentSchema } from '@cms/schema-types/modules/module-content';
 import { ctaSchema } from '@cms/schema-types/modules/module-cta';
 import { heroSchema } from '@cms/schema-types/modules/module-hero';
+import { newsletterSchema } from '@cms/schema-types/modules/module-newsletter';
 import { postListSchema } from '@cms/schema-types/modules/module-post-list';
 import { codeInput } from '@sanity/code-input';
 import { visionTool } from '@sanity/vision';
@@ -21,6 +23,7 @@ import {
   FileText,
   House,
   List,
+  Mail,
   Megaphone,
   Menu,
   Newspaper,
@@ -109,6 +112,9 @@ export default defineConfig({
                     S.documentTypeListItem(ctaSchema.name)
                       .title('CTAs')
                       .icon(Megaphone),
+                    S.documentTypeListItem(newsletterSchema.name)
+                      .title('Newsletter Signups')
+                      .icon(Mail),
                   ]),
               ),
             S.listItem()
@@ -131,6 +137,26 @@ export default defineConfig({
                     S.documentTypeListItem(authorSchema.name)
                       .title('Authors')
                       .icon(UserRound),
+                    S.divider(),
+                    S.listItem()
+                      .title('Settings')
+                      .id('blog-settings')
+                      .icon(Settings)
+                      .child(
+                        S.list()
+                          .title('Settings')
+                          .items([
+                            S.listItem()
+                              .title('Newsletter')
+                              .id(newsletterSettingsSchema.name)
+                              .icon(Mail)
+                              .child(
+                                S.document()
+                                  .schemaType(newsletterSettingsSchema.name)
+                                  .documentId(newsletterSettingsSchema.name),
+                              ),
+                          ]),
+                      ),
                   ]),
               ),
             S.divider(),

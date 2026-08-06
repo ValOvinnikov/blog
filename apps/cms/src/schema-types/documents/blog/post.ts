@@ -100,6 +100,14 @@ export const postSchema = defineType({
       description: 'Pin this post to the featured slot on the home page.',
     }),
     defineField({
+      name: 'newsletterEnabled',
+      title: 'Show Newsletter Signup',
+      type: 'boolean',
+      description:
+        'Show the newsletter signup form on this post page. Disable to opt this post out.',
+      initialValue: true,
+    }),
+    defineField({
       name: 'skim',
       title: 'Skim',
       type: skimSchema.name,

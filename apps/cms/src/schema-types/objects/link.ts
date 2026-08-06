@@ -2,7 +2,6 @@ import { SOCIAL_PLATFORMS, TLINK_TYPE } from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils';
 import { categorySchema } from '@cms/schema-types/documents/blog/category';
 import { postSchema } from '@cms/schema-types/documents/blog/post';
-import { blogPageSchema } from '@cms/schema-types/documents/pages/blog-page';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -57,10 +56,11 @@ export const linkSchema = defineType({
       to: [
         { type: postSchema.name },
         { type: categorySchema.name },
-        // Literal (not `genericSchema.name`): importing page.ts here closes a
-        // circular import (page → module-cta → link) — typegen fails otherwise.
+        // Literal (not `genericSchema.name` / `blogPageSchema.name`):
+        // importing page.ts or blog-page.ts here closes a circular import
+        // (page/blog-page → module-cta → link) — typegen fails otherwise.
         { type: 'page_generic' },
-        { type: blogPageSchema.name },
+        { type: 'page_blog' },
       ],
       hidden: ({ parent }) => !isLinkType(parent, TLINK_TYPE.INTERNAL),
       validation: (rule) =>
