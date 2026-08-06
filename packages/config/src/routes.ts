@@ -21,6 +21,10 @@ export const routes = {
   topics: () => '/topics',
   /** Auth-gated "My bookmarks" listing (#1043/#1109) — no slug/pagination, one static path per reader. */
   bookmarks: () => '/bookmarks',
+  /** Auth-gated account hub (#1151/#1154) — one static path per reader; grows more `WindowChrome` sections (6b/6c) without a new route. */
+  account: () => '/account',
+  /** The `/account` "export my data" download — a Route Handler, not a page, so it's outside `[locale]` like `rssFeed` below. */
+  accountExport: () => '/api/account/export',
   genericPage: (slug: string) => `/${slug}`,
   rssFeed: () => '/rss.xml',
   /** No pagination variant — always the tag's base path + `/rss.xml`. */

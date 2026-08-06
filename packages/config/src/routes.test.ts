@@ -57,6 +57,11 @@ describe('routes', () => {
     expect(routes.bookmarks()).toBe('/bookmarks');
   });
 
+  it('builds the account hub and its data-export paths', () => {
+    expect(routes.account()).toBe('/account');
+    expect(routes.accountExport()).toBe('/api/account/export');
+  });
+
   it('builds the site-wide RSS feed path', () => {
     expect(routes.rssFeed()).toBe('/rss.xml');
   });
