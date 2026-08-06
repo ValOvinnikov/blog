@@ -1,11 +1,11 @@
 import {
   NewsletterSignupCompact,
   type INewsletterSignupCompactProps,
-} from './newsletter-signup-compact';
+} from './components/compact/newsletter-signup-compact';
 import {
   NewsletterSignupFull,
   type INewsletterSignupFullProps,
-} from './newsletter-signup-full';
+} from './components/full/newsletter-signup-full';
 
 export type { INewsletterSignupCompactProps, INewsletterSignupFullProps };
 

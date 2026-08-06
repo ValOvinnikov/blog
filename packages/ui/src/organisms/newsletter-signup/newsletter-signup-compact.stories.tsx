@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { NewsletterSignupCompact } from './newsletter-signup-compact';
+import { NewsletterSignupCompact } from './components/compact/newsletter-signup-compact';
 
 const meta = {
   title: 'Organisms/NewsletterSignup/Compact',
@@ -9,7 +9,7 @@ const meta = {
   parameters: { layout: 'padded' },
   args: {
     email: '',
-    onEmailChange: () => {},
+    onChange: () => {},
     onSubmit: () => {},
     status: 'idle',
     submitLabel: 'subscribe ↵',

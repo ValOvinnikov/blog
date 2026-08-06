@@ -1,18 +1,17 @@
-import { ICONS, type TFormStatus } from '@blog/config';
+import { ALERT_TONE, ICONS, type TFormStatus } from '@blog/config';
+import { Alert } from '@blog/ui/atoms/alert';
 import { Button } from '@blog/ui/atoms/button';
 import { Icon } from '@blog/ui/atoms/icon';
 import { TextInput } from '@blog/ui/atoms/text-input';
-import { type SubmitEvent } from 'react';
-
-import { NewsletterSignupErrorMessage } from './newsletter-signup-error-message';
 import {
   newsletterSignupVariants,
   type TNewsletterSignupVariants,
-} from './newsletter-signup-variants';
+} from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
+import { type SubmitEvent } from 'react';
 
-interface INewsletterSignupFieldRowProps {
+interface INewsletterSignupContentProps {
   email: string;
-  onEmailChange: (value: string) => void;
+  onChange: (value: string) => void;
   onSubmit: () => void;
   status: TFormStatus;
   errorMessage?: string;
@@ -27,9 +26,9 @@ interface INewsletterSignupFieldRowProps {
  * density of the signup form — `Full` and `Compact` differ only in the
  * `$ subscribe --email` prompt prefix the `compact` variant prepends.
  */
-export const NewsletterSignupFieldRow = ({
+export const NewsletterSignupContent = ({
   email,
-  onEmailChange,
+  onChange,
   onSubmit,
   status,
   errorMessage,
@@ -37,7 +36,7 @@ export const NewsletterSignupFieldRow = ({
   emailAriaLabel,
   placeholder,
   variant,
-}: INewsletterSignupFieldRowProps) => {
+}: INewsletterSignupContentProps) => {
   const isCompact = variant === 'compact';
   const isSubmitting = status === 'submitting';
   const isError = status === 'error';
@@ -60,7 +59,7 @@ export const NewsletterSignupFieldRow = ({
       )}
       <TextInput
         value={email}
-        onChange={onEmailChange}
+        onChange={onChange}
         ariaLabel={emailAriaLabel}
         prompt="›"
         placeholder={placeholder}
@@ -79,11 +78,9 @@ export const NewsletterSignupFieldRow = ({
         {isSubmitting && <Icon name={ICONS.SPINNER} className={s.spinner()} />}
         {submitLabel}
       </Button>
-      <NewsletterSignupErrorMessage
-        status={status}
-        message={errorMessage}
-        variant={variant}
-      />
+      {isError && errorMessage && (
+        <Alert tone={ALERT_TONE.ERROR}>{errorMessage}</Alert>
+      )}
     </form>
   );
 };

@@ -1,13 +1,17 @@
-import { type IWithDataTestId, type TFormStatus } from '@blog/config';
+import {
+  ALERT_TONE,
+  type IWithDataTestId,
+  type TFormStatus,
+} from '@blog/config';
+import { Alert } from '@blog/ui/atoms/alert';
 import { WindowChrome } from '@blog/ui/molecules/window-chrome';
+import { newsletterSignupVariants } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
 
-import { NewsletterSignupFieldRow } from './newsletter-signup-field-row';
-import { NewsletterSignupSuccessMessage } from './newsletter-signup-success-message';
-import { newsletterSignupVariants } from './newsletter-signup-variants';
+import { NewsletterSignupContent } from '../content/newsletter-signup-content';
 
 export interface INewsletterSignupFullProps extends IWithDataTestId {
   email: string;
-  onEmailChange: (value: string) => void;
+  onChange: (value: string) => void;
   onSubmit: () => void;
   status: TFormStatus;
   heading?: string;
@@ -29,7 +33,7 @@ export interface INewsletterSignupFullProps extends IWithDataTestId {
  */
 export const NewsletterSignupFull = ({
   email,
-  onEmailChange,
+  onChange,
   onSubmit,
   status,
   heading,
@@ -53,16 +57,17 @@ export const NewsletterSignupFull = ({
       <WindowChrome.Body>
         {heading && <h3 className={s.heading()}>{heading}</h3>}
         {isSuccess ? (
-          <NewsletterSignupSuccessMessage
-            message={successMessage}
-            variant="full"
-          />
+          <Alert tone={ALERT_TONE.SUCCESS}>
+            <span aria-hidden="true">✓</span>
+            <span>{successMessage}</span>
+            <span className={s.cursor()} aria-hidden="true" />
+          </Alert>
         ) : (
           <>
             {description && <p className={s.description()}>{description}</p>}
-            <NewsletterSignupFieldRow
+            <NewsletterSignupContent
               email={email}
-              onEmailChange={onEmailChange}
+              onChange={onChange}
               onSubmit={onSubmit}
               status={status}
               errorMessage={errorMessage}

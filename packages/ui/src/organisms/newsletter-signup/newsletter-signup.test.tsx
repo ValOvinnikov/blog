@@ -8,7 +8,7 @@ faker.seed(123);
 
 const baseArgs = {
   email: '',
-  onEmailChange: vi.fn(),
+  onChange: vi.fn(),
   onSubmit: vi.fn(),
   status: 'idle' as const,
   submitLabel: 'Subscribe',
@@ -37,12 +37,12 @@ describe(`<${NewsletterSignup.Full.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
   });
 
-  it('calls onEmailChange with the new value and does not manage its own state', async () => {
-    const onEmailChange = vi.fn();
-    setupFull({ onEmailChange });
+  it('calls onChange with the new value and does not manage its own state', async () => {
+    const onChange = vi.fn();
+    setupFull({ onChange });
 
     await userEvent.type(screen.getByRole('textbox'), 'a');
-    expect(onEmailChange).toHaveBeenCalledWith('a');
+    expect(onChange).toHaveBeenCalledWith('a');
     expect(screen.getByRole('textbox')).toHaveValue('');
   });
 

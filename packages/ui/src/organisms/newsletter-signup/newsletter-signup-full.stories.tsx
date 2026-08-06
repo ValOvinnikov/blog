@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { NewsletterSignupFull } from './newsletter-signup-full';
+import { NewsletterSignupFull } from './components/full/newsletter-signup-full';
 
 const meta = {
   title: 'Organisms/NewsletterSignup/Full',
@@ -9,7 +9,7 @@ const meta = {
   parameters: { layout: 'padded' },
   args: {
     email: '',
-    onEmailChange: () => {},
+    onChange: () => {},
     onSubmit: () => {},
     status: 'idle',
     heading: '$ subscribe --to weekly',

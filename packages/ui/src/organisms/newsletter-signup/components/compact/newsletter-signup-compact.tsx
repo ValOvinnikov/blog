@@ -1,12 +1,16 @@
-import { type IWithDataTestId, type TFormStatus } from '@blog/config';
+import {
+  ALERT_TONE,
+  type IWithDataTestId,
+  type TFormStatus,
+} from '@blog/config';
+import { Alert } from '@blog/ui/atoms/alert';
+import { newsletterSignupVariants } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
 
-import { NewsletterSignupFieldRow } from './newsletter-signup-field-row';
-import { NewsletterSignupSuccessMessage } from './newsletter-signup-success-message';
-import { newsletterSignupVariants } from './newsletter-signup-variants';
+import { NewsletterSignupContent } from '../content/newsletter-signup-content';
 
 export interface INewsletterSignupCompactProps extends IWithDataTestId {
   email: string;
-  onEmailChange: (value: string) => void;
+  onChange: (value: string) => void;
   onSubmit: () => void;
   status: TFormStatus;
   errorMessage?: string;
@@ -25,7 +29,7 @@ export interface INewsletterSignupCompactProps extends IWithDataTestId {
  */
 export const NewsletterSignupCompact = ({
   email,
-  onEmailChange,
+  onChange,
   onSubmit,
   status,
   errorMessage,
@@ -42,14 +46,15 @@ export const NewsletterSignupCompact = ({
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
       {isSuccess ? (
-        <NewsletterSignupSuccessMessage
-          message={successMessage}
-          variant="compact"
-        />
+        <Alert tone={ALERT_TONE.SUCCESS}>
+          <span aria-hidden="true">✓</span>
+          <span>{successMessage}</span>
+          <span className={s.cursor()} aria-hidden="true" />
+        </Alert>
       ) : (
-        <NewsletterSignupFieldRow
+        <NewsletterSignupContent
           email={email}
-          onEmailChange={onEmailChange}
+          onChange={onChange}
           onSubmit={onSubmit}
           status={status}
           errorMessage={errorMessage}
