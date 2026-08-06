@@ -1,7 +1,7 @@
-import { ALERT_TYPE, ICONS, type TFormStatus } from '@blog/config';
+import { ALERT_TYPE, type TFormStatus } from '@blog/config';
 import { Alert } from '@blog/ui/atoms/alert';
 import { Button } from '@blog/ui/atoms/button';
-import { Icon } from '@blog/ui/atoms/icon';
+import { Spinner } from '@blog/ui/atoms/spinner';
 import { TextInput } from '@blog/ui/atoms/text-input';
 import {
   newsletterSignupVariants,
@@ -66,8 +66,15 @@ export const NewsletterSignupContent = ({
         aria-busy={isSubmitting}
         className={s.submit()}
       >
-        {isSubmitting && <Icon name={ICONS.SPINNER} className={s.spinner()} />}
-        {submitLabel}
+        {isSubmitting ? (
+          <Spinner
+            label={submitLabel}
+            className={s.spinner()}
+            dataTestId="newsletter-signup-spinner"
+          />
+        ) : (
+          submitLabel
+        )}
       </Button>
       {isError && errorMessage && (
         <Alert type={ALERT_TYPE.ERROR} message={errorMessage} />

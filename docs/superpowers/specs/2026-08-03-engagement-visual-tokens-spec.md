@@ -122,6 +122,31 @@ Meter: filled cells `--accent`, empty cells `--border-strong`, bracketed
 (`▐…▌`), `--font-mono`, letter-spacing ~`0.15em`. Thread tree connector: a
 `--border` left rule with a `└─` marker in `--border-strong`.
 
+### 3.6 Spinner (the shared `Spinner` atom)
+
+The one loading indicator for every async state. A **braille-dot cycle**
+(`⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏`), pure CSS — the animation swaps `::before` `content` across
+keyframes, so no JS and no `'use client'`.
+
+| Element          | Token(s)                                                                                                                   |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| glyph            | `--font-mono`, `--accent`; on a solid button, `--accent-contrast`                                                          |
+| label (optional) | `--text-muted`, `--text-copy`                                                                                              |
+| duration         | ~`0.9s` loop (indeterminate; not a `--duration-*` token — those are transition, not loop, values)                          |
+| reduced motion   | freeze on a stable glyph (`⠿`), `animation:none` — covered beyond the global reset so it reads as intentional, not stalled |
+
+A11y: `role="status"` + accessible name from the `label` prop; the animated
+glyph is `aria-hidden`. Fixed `width` (`1ch`) prevents layout shift as frames
+change. Used inline (`⠹ posting…`) and inside submitting buttons.
+
+**Backgrounding — does the glyph need a container?** Depends on scope:
+
+| Context                                                                    | Treatment                                                                                                                                                                                                                                                                                                                                                                          |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Inline — button, status line, **avatar tile**                              | **No background.** The bare glyph sits in place. On an avatar it renders _inside_ the tile (`--surface-2` bg, `--accent` glyph) at the tile's own size, so the tile holds its shape and swaps glyph→initials with no logged-out flash or layout shift.                                                                                                                             |
+| A whole region loading on demand — lazy island, "load more", initial fetch | **Yes — a reserved placeholder block:** `--surface-2` body, 1px dashed `--border-strong`, `--radius`, a `min-height`, spinner+label centred. It reserves layout and reads as "this box is loading" instead of a glyph floating in a collapsed region. **Not** a modal overlay / dimmed backdrop — nothing is blocked (the article is static), so an overlay would be heavy-handed. |
+| A **list** loading (comments, bookmarks)                                   | **Prefer a skeleton over a spinner:** pulsing `--surface-2` bars (opacity `0.5↔1` on `--ease-console`) mirroring the row shape; the braille spinner rides only inside each row's avatar tile. Skeletons show the shape while rows stream, which a centred spinner can't.                                                                                                           |
+
 ## 4. Per-feature token maps
 
 ### 4.1 Auth (#1039)

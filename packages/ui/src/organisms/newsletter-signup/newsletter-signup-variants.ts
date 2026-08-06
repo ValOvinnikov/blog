@@ -9,7 +9,7 @@ export const newsletterSignupVariants = tv({
     form: ['flex flex-col gap-3'],
     field: [],
     submit: ['inline-flex items-center justify-center gap-2'],
-    spinner: ['animate-spin'],
+    spinner: ['text-accent-contrast'],
     prompt: ['select-none text-accent'],
     label: ['font-mono text-copy text-text'],
     alert: [],

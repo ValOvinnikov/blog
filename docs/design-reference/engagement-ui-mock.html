@@ -80,6 +80,25 @@ a{color:var(--accent);text-decoration:none;}
 .serif{font-family:var(--font-body-family);}
 .disp{font-family:var(--font-display-family);letter-spacing:-.02em;}
 
+/* terminal spinner — pure CSS, animates ::before content (no JS) */
+@keyframes spin-dots{
+  0%{content:"⠋"}10%{content:"⠙"}20%{content:"⠹"}30%{content:"⠸"}40%{content:"⠼"}
+  50%{content:"⠴"}60%{content:"⠦"}70%{content:"⠧"}80%{content:"⠇"}90%{content:"⠏"}100%{content:"⠋"}
+}
+.spin{display:inline-flex;align-items:center;gap:.7ch;font-family:var(--font-mono-family);color:var(--accent);font-size:.85rem;}
+.spin::before{content:"⠋";display:inline-block;width:1ch;text-align:center;animation:spin-dots .9s infinite;}
+.spin .lbl{color:var(--text-muted);}
+/* reduced motion: freeze on a stable glyph instead of cycling */
+@media(prefers-reduced-motion:reduce){.spin::before{content:"⠿";animation:none;}}
+/* avatar loading + on-demand region loading + skeleton */
+.ava--load{background:var(--surface-2);border:1px solid var(--border);color:var(--accent);}
+.load-bare{display:flex;align-items:center;justify-content:center;gap:1ch;min-height:92px;color:var(--accent);}
+.load-box{display:flex;align-items:center;justify-content:center;gap:1ch;min-height:92px;border:1px dashed var(--border-strong);border-radius:var(--radius);background:var(--surface-2);color:var(--accent);}
+@keyframes skel{0%,100%{opacity:.5}50%{opacity:1}}
+.skel{display:block;height:.7rem;border-radius:var(--radius-sm);background:var(--surface-2);animation:skel 1.2s var(--ease-console) infinite;}
+.skel--40{width:40%}.skel--60{width:60%}.skel--80{width:80%}.skel--wide{width:100%}
+.cap{font-family:var(--font-mono-family);font-size:.66rem;color:var(--text-subtle);margin:.2rem 0 .35rem;}
+
 /* window shell */
 .win{
   border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);
@@ -272,6 +291,69 @@ footer.note{margin-top:4rem;padding-top:1.2rem;border-top:1px solid var(--border
     <h1>An engagement layer that reads&nbsp;like&nbsp;a&nbsp;shell.</h1>
     <p class="lede">Five features — auth, ratings, comments, bookmarks, newsletter — rendered in the site's own console idiom instead of the rounded-card widgets every other blog ships. Every colour, border and motion value below is a live <span class="mono">theme.css</span> token. Flip the switches to see light / dark / indigo.</p>
   </header>
+
+  <!-- ══ LOADING / SPINNER ══ -->
+  <section class="feat">
+    <div class="feat__head"><span class="feat__n mono">~</span><h2 class="feat__t">Loading &amp; async states</h2><span class="feat__d">shared spinner · every fetch / submit</span></div>
+    <div class="win">
+      <div class="win__bar"><span class="p">$</span> tail -f engagement.log<span class="tag">spinner</span></div>
+      <div class="win__body" style="display:flex;flex-direction:column;gap:1.1rem">
+        <div>
+          <p class="state">braille-dot spinner (pure CSS — no JS)</p>
+          <div style="display:flex;gap:2.2rem;flex-wrap:wrap;align-items:center">
+            <span class="spin" role="status" aria-label="Loading"><span class="lbl">loading</span></span>
+          </div>
+        </div>
+        <div>
+          <p class="state">in context</p>
+          <div style="display:flex;flex-direction:column;gap:.7rem">
+            <span class="spin" role="status" aria-label="Posting comment">posting comment…</span>
+            <span class="spin" role="status" aria-label="Preparing export">preparing archive…</span>
+            <div style="display:flex;gap:.8ch;flex-wrap:wrap">
+              <button class="btn btn--solid" disabled style="opacity:.85"><span class="spin" style="color:var(--accent-contrast);font-size:.8rem">sending…</span></button>
+              <button class="btn" disabled><span class="spin" style="font-size:.8rem">checking session…</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="state">on an avatar — session / image resolving</p>
+          <div style="display:flex;gap:1.4ch;align-items:center;flex-wrap:wrap">
+            <div class="ava ava--load"><span class="spin" style="font-size:.9rem"></span></div>
+            <span class="dim mono" style="font-size:.72rem">→ resolves to</span>
+            <div class="ava">V</div>
+            <span class="dim mono" style="font-size:.72rem">the tile keeps its size and swaps the glyph for initials — no logged-out flash, no layout shift</span>
+          </div>
+        </div>
+
+        <div>
+          <p class="state">content loading on demand — do we background it?</p>
+          <div class="grid2">
+            <div>
+              <p class="cap">✗ bare — floats in a collapsed region (avoid for whole sections)</p>
+              <div class="load-bare"><span class="spin">loading comments…</span></div>
+            </div>
+            <div>
+              <p class="cap">✓ backgrounded — reserves space, reads as “this box is loading”</p>
+              <div class="load-box"><span class="spin">loading comments…</span></div>
+            </div>
+          </div>
+          <p class="cap" style="margin-top:.7rem">✓✓ preferred for lists — skeleton keeps the shape while rows stream in (spinner only inside the avatar tiles)</p>
+          <div class="win"><div class="win__body" style="display:flex;flex-direction:column;gap:.9rem">
+            <div style="display:flex;gap:.9ch;align-items:flex-start">
+              <div class="ava ava--load" style="width:26px;height:26px;flex:none"><span class="spin" style="font-size:.72rem"></span></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:.4rem"><span class="skel skel--40"></span><span class="skel skel--wide"></span></div>
+            </div>
+            <div style="display:flex;gap:.9ch;align-items:flex-start">
+              <div class="ava ava--load" style="width:26px;height:26px;flex:none"><span class="spin" style="font-size:.72rem"></span></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:.4rem"><span class="skel skel--60"></span><span class="skel skel--80"></span></div>
+            </div>
+          </div></div>
+          <button class="btn" style="width:100%;justify-content:center;margin-top:.7rem"><span class="spin" style="font-size:.8rem">load 12 more comments…</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ══ AUTH ══ -->
   <section class="feat">

@@ -157,6 +157,42 @@ etc., but is **missing**: a **`google`** glyph (auth provider button) and a
 a CSS fill toggle on the same asset, not a second SVG). These are small
 `@blog/ui` asset additions and are called out per-feature below.
 
+### Loading spinner (new — shared by every feature's async state)
+
+Every feature has loading/submitting states (session resolving, posting a
+comment, saving a rating, toggling a bookmark, subscribing, exporting/deleting an
+account). Rather than each inventing a spinner, the design introduces one shared
+pure `Spinner` atom in the console idiom — a **braille-dot cycle**
+(`⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏`) rendered in `--font-mono`/`--accent`. It is **CSS-only** (the
+animation swaps `::before` content across keyframes), so it needs no `'use
+client'` and stays a valid `@blog/ui` atom. A11y: `role="status"` with the
+accessible name from a required `label` prop; the animated glyph is
+`aria-hidden`; `prefers-reduced-motion` freezes it on a stable glyph (no cycle).
+
+```ts
+// atoms/spinner/spinner.tsx
+export interface ISpinnerProps extends IWithDataTestId {
+  label: string; // accessible name, e.g. "Posting comment"
+  showLabel?: boolean; // also render label text beside the glyph
+  className?: string;
+}
+```
+
+Used inline (`⠹ posting…`) and inside submitting buttons (glyph in
+`--accent-contrast` on the solid fill). Build it alongside D0's form primitives —
+it's tiny and unblocks every feature's loading state.
+
+**Scope of the background matters (visual spec §3.6).** Inline uses (buttons,
+status, and the **avatar** — the spinner sits _inside_ the tile while the
+session/image resolves, holding its shape) need no container. A whole region
+loading on demand (a lazy island, "load more", initial fetch) gets a **reserved
+placeholder block** (`--surface-2`, dashed border, min-height, centred spinner)
+so it doesn't collapse — but **never a modal overlay/backdrop**; nothing is
+blocked. For **lists** (comments, bookmarks) prefer a **skeleton** (pulsing
+`--surface-2` bars mirroring the row, spinner only in the avatar tile) over a
+lone spinner — it shows the shape while rows stream. `CommentsSection` /
+`BookmarksList` therefore ship a skeleton state, not just a spinner.
+
 ### Client-island + route inventory
 
 New `apps/web` client islands (each owns state, composes a pure component):
@@ -615,6 +651,7 @@ contextually, rather than four different logged-out treatments.
 | `WindowChrome`                   | molecule | **new** | title-bar (`user@host` prompt + tag pill) + body slots, D14; used by all five                                                       |
 | `TextInput`                      | atom     | **new** | controlled `value`/`onChange`, required `ariaLabel`, `invalid` variant                                                              |
 | `Textarea`                       | atom     | **new** | as above + `rows`/`maxLength`                                                                                                       |
+| `Spinner`                        | atom     | **new** | CSS-only braille cycle, `role="status"` + `label`, glyph `aria-hidden`, reduced-motion freeze; every async state                    |
 | `RatingSummary`                  | atom     | **new** | read-only aggregate, mono glyphs `aria-hidden`, name via `ariaLabel`                                                                |
 | `RatingInput`                    | atom     | **new** | interactive 1–5, hover + roving-tabindex keyboard, `ariaLabel`                                                                      |
 | `BookmarkToggle`                 | atom     | **new** | `isBookmarked`/`onToggle`, `aria-pressed`, `ariaLabel` + visible `label`; needs `bookmark` icon                                     |

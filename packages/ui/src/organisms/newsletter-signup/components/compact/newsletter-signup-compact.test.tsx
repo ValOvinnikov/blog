@@ -58,6 +58,16 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     expect(button).toHaveAttribute('aria-busy', 'true');
   });
 
+  it('shows the Spinner atom inside the button while submitting', () => {
+    setup({ status: 'submitting' });
+
+    const button = screen.getByRole('button', { name: 'Subscribe' });
+    expect(screen.getByTestId('newsletter-signup-spinner')).toBeInTheDocument();
+    expect(button).toContainElement(
+      screen.getByTestId('newsletter-signup-spinner'),
+    );
+  });
+
   it('shows the success message and hides the field on success', () => {
     const successMessage = 'Almost there — check your inbox to confirm.';
     setup({ status: 'success', successMessage });
