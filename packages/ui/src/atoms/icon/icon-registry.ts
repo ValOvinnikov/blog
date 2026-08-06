@@ -23,6 +23,8 @@ import GoogleComponent from '@blog/ui/assets/icons/google.svg';
 import GoogleUrl from '@blog/ui/assets/icons/google.svg?url';
 import HouseComponent from '@blog/ui/assets/icons/house.svg';
 import HouseUrl from '@blog/ui/assets/icons/house.svg?url';
+import InfoComponent from '@blog/ui/assets/icons/info.svg';
+import InfoUrl from '@blog/ui/assets/icons/info.svg?url';
 import LinkedInComponent from '@blog/ui/assets/icons/linkedin.svg';
 import LinkedInUrl from '@blog/ui/assets/icons/linkedin.svg?url';
 import MenuRowsComponent from '@blog/ui/assets/icons/menu-rows.svg';
@@ -39,6 +41,8 @@ import SpinnerComponent from '@blog/ui/assets/icons/spinner.svg';
 import SpinnerUrl from '@blog/ui/assets/icons/spinner.svg?url';
 import SunComponent from '@blog/ui/assets/icons/sun.svg';
 import SunUrl from '@blog/ui/assets/icons/sun.svg?url';
+import WarningComponent from '@blog/ui/assets/icons/warning.svg';
+import WarningUrl from '@blog/ui/assets/icons/warning.svg?url';
 import XComponent from '@blog/ui/assets/icons/x.svg';
 import XUrl from '@blog/ui/assets/icons/x.svg?url';
 
@@ -77,4 +81,6 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.GOOGLE]: { component: GoogleComponent, url: GoogleUrl },
   [ICONS.BOOKMARK]: { component: BookmarkComponent, url: BookmarkUrl },
   [ICONS.SPINNER]: { component: SpinnerComponent, url: SpinnerUrl },
+  [ICONS.WARNING]: { component: WarningComponent, url: WarningUrl },
+  [ICONS.INFO]: { component: InfoComponent, url: InfoUrl },
 };

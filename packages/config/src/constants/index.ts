@@ -1,3 +1,4 @@
+export * from './alert';
 export * from './aside';
 export * from './brand';
 export * from './depth';

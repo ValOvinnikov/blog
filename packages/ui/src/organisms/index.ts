@@ -7,6 +7,11 @@ export * from './cta-module';
 export * from './footer';
 export * from './header';
 export * from './hero';
+export type {
+  INewsletterSignupCompactProps,
+  INewsletterSignupFullProps,
+} from './newsletter-signup';
+export { NewsletterSignup } from './newsletter-signup';
 export type { IPaginationProps } from './pagination';
 export { Pagination } from './pagination';
 export type { IPostGridProps } from './post-grid';

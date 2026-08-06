@@ -21,6 +21,8 @@ export const ICONS = {
   GOOGLE: 'GOOGLE',
   BOOKMARK: 'BOOKMARK',
   SPINNER: 'SPINNER',
+  WARNING: 'WARNING',
+  INFO: 'INFO',
 } as const;
 
 export type TIconName = TValueOf<typeof ICONS>;
