@@ -5,7 +5,6 @@ export const TOAST_TYPE = {
   INFO: 'INFO',
   WARNING: 'WARNING',
   ERROR: 'ERROR',
-  LOADING: 'LOADING',
 } as const;
 
 export type TToastType = TValueOf<typeof TOAST_TYPE>;
