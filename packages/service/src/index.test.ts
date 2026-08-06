@@ -1,11 +1,12 @@
 import { service } from './index';
 
 describe('service.modules', () => {
-  it('exposes v1.getHero/getPostList/getContent/getCta as functions', () => {
+  it('exposes v1.getHero/getPostList/getContent/getCta/getNewsletter as functions', () => {
     expect(typeof service.modules.hero.v1.getHero).toBe('function');
     expect(typeof service.modules.postList.v1.getPostList).toBe('function');
     expect(typeof service.modules.content.v1.getContent).toBe('function');
     expect(typeof service.modules.cta.v1.getCta).toBe('function');
+    expect(typeof service.modules.newsletter.v1.getNewsletter).toBe('function');
   });
 });
 
