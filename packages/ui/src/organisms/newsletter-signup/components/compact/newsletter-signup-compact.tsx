@@ -12,6 +12,7 @@ export interface INewsletterSignupCompactProps extends IWithDataTestId {
   onChange: (value: string) => void;
   onSubmit: () => void;
   status: TFormStatus;
+  heading: string;
   errorMessage?: string;
   successMessage?: string;
   submitLabel: string;
@@ -24,14 +25,15 @@ export interface INewsletterSignupCompactProps extends IWithDataTestId {
  * `NewsletterSignup.Compact` — a slim single-row `$ subscribe` strip for the
  * end of every article. Shares the same idle/submitting/success/error state
  * machine as `NewsletterSignup.Full`, driven entirely by the `status` prop;
- * has no room for a heading or description. The `$ subscribe --email` prompt
- * stays visible through every state, including success.
+ * has no room for a description. The `$` prompt and `heading` label stay
+ * visible through every state, including success.
  */
 export const NewsletterSignupCompact = ({
   email,
   onChange,
   onSubmit,
   status,
+  heading,
   errorMessage,
   successMessage,
   submitLabel,
@@ -48,7 +50,7 @@ export const NewsletterSignupCompact = ({
       <span className={s.prompt()} aria-hidden="true">
         $
       </span>
-      <span className={s.label()}>subscribe --email</span>
+      <span className={s.label()}>{heading}</span>
       {isSuccess ? (
         <Alert
           type={ALERT_TYPE.SUCCESS}

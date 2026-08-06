@@ -1,13 +1,17 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
 
 import { NewsletterSignupCompact } from './newsletter-signup-compact';
+
+faker.seed(123);
 
 const baseArgs = {
   email: '',
   onChange: vi.fn(),
   onSubmit: vi.fn(),
   status: 'idle' as const,
+  heading: 'subscribe --email',
   submitLabel: 'Subscribe',
   emailAriaLabel: 'Email address',
 };
@@ -15,7 +19,7 @@ const baseArgs = {
 const setup = customRender(NewsletterSignupCompact, baseArgs);
 
 describe(`<${NewsletterSignupCompact.name}/>`, () => {
-  it('renders as a slim strip with no heading', () => {
+  it('renders as a slim strip with no heading element', () => {
     setup();
 
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
@@ -23,6 +27,13 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     expect(
       screen.getByRole('textbox', { name: 'Email address' }),
     ).toBeVisible();
+  });
+
+  it('renders the heading prop as the label text', () => {
+    const heading = faker.lorem.sentence(3);
+    setup({ heading });
+
+    expect(screen.getByText(heading)).toBeVisible();
   });
 
   it('marks the prompt glyph as decorative', () => {

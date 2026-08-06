@@ -13,7 +13,7 @@ export interface INewsletterSignupFullProps extends IWithDataTestId {
   onChange: (value: string) => void;
   onSubmit: () => void;
   status: TFormStatus;
-  heading?: string;
+  heading: string;
   description?: string;
   errorMessage?: string;
   successMessage?: string;
@@ -54,7 +54,7 @@ export const NewsletterSignupFull = ({
       dataTestId={dataTestId}
     >
       <WindowChrome.Body>
-        {heading && <h3 className={s.heading()}>{heading}</h3>}
+        <h3 className={s.heading()}>{heading}</h3>
         {isSuccess ? (
           <Alert type={ALERT_TYPE.SUCCESS} message={successMessage ?? ''} />
         ) : (

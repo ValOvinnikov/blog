@@ -11,6 +11,7 @@ const baseArgs = {
   onChange: vi.fn(),
   onSubmit: vi.fn(),
   status: 'idle' as const,
+  heading: faker.lorem.sentence(3),
   submitLabel: 'Subscribe',
   emailAriaLabel: 'Email address',
 };

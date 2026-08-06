@@ -11,6 +11,7 @@ const meta = {
     onChange: () => {},
     onSubmit: () => {},
     status: 'idle',
+    heading: 'subscribe --email',
     submitLabel: 'subscribe ↵',
     emailAriaLabel: 'Email address',
     placeholder: 'you@domain.dev',
