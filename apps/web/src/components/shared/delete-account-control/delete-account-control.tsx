@@ -29,11 +29,19 @@ export type TDeleteAccountControlProps = {
  *
  * On confirm: calls the session-gated `deleteAccountAction` server action
  * (which re-reads the session itself — this never trusts a client-supplied
- * id), then signs the reader out and redirects home in one step via
- * `next-auth/react`'s `signOut({ callbackUrl })`. A failed delete shows a
- * retry-less error toast (the account still exists, so a plain "try again"
- * to the same danger button is enough — no `retry` action needed like
- * `BookmarkButton`'s optimistic toggle).
+ * id) through `useToast`'s `promise` helper, which shows a `loading` toast
+ * while the request is in flight and transitions it to `success`/`error` on
+ * settlement. `deleteAccountAction` resolves with a `Result` rather than
+ * rejecting on failure, so it's wrapped in a thin async function that throws
+ * when `result.ok` is `false` — that's what drives `toast.promise`'s error
+ * branch (a retry-less error toast; the account still exists, so a plain
+ * "try again" to the same danger button is enough — no `retry` action needed
+ * like `BookmarkButton`'s optimistic toggle). Only the true success path
+ * signs the reader out and redirects home in one step via `next-auth/react`'s
+ * `signOut({ callbackUrl })`. `isPending` (`useTransition`) still separately
+ * gates the input/button `disabled` state and the button's `aria-busy` —
+ * `toast.promise` owns the toast lifecycle, `useTransition` owns the local
+ * pending UI.
  */
 export function DeleteAccountControl({ handle }: TDeleteAccountControlProps) {
   const t = useTranslations('accountPage');
@@ -46,14 +54,34 @@ export function DeleteAccountControl({ handle }: TDeleteAccountControlProps) {
 
   const handleDelete = () => {
     startTransition(async () => {
-      const result = await deleteAccountAction();
-
-      if (!result.ok) {
-        toast.error({
-          command: t('deleteToastCommand'),
-          state: t('deleteToastErrorState'),
-          message: t('deleteError'),
-        });
+      try {
+        await toast.promise(
+          (async () => {
+            const result = await deleteAccountAction();
+            if (!result.ok) throw new Error('Failed to delete account');
+            return result;
+          })(),
+          {
+            loading: {
+              command: t('deleteToastCommand'),
+              state: t('deleteToastLoadingState'),
+              message: t('deleteToastLoadingMessage'),
+            },
+            success: {
+              command: t('deleteToastCommand'),
+              state: t('deleteToastSuccessState'),
+              message: t('deleteToastSuccessMessage'),
+            },
+            error: {
+              command: t('deleteToastCommand'),
+              state: t('deleteToastErrorState'),
+              message: t('deleteError'),
+            },
+          },
+        );
+      } catch {
+        // Already surfaced via the `toast.promise` error branch above —
+        // swallow here so a failed delete doesn't sign the reader out below.
         return;
       }
 
@@ -74,6 +102,7 @@ export function DeleteAccountControl({ handle }: TDeleteAccountControlProps) {
       <Button
         variant="danger"
         disabled={!isArmed || isPending}
+        aria-busy={isPending}
         onClick={handleDelete}
       >
         {t('deleteButton')}

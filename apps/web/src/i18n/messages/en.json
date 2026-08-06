@@ -113,7 +113,8 @@
     "accountMenuAriaLabel": "Account menu",
     "signOut": "Sign out",
     "loadingAccountStatus": "Loading account status",
-    "myBookmarks": "My bookmarks"
+    "myBookmarks": "My bookmarks",
+    "accountSettings": "Account settings"
   },
   "toastProvider": {
     "viewportAriaLabel": "Notifications",
@@ -161,6 +162,10 @@
     "deleteConfirmPlaceholder": "type: {handle}",
     "deleteButton": "delete account",
     "deleteToastCommand": "account",
+    "deleteToastLoadingState": "deleting",
+    "deleteToastLoadingMessage": "Deleting your account…",
+    "deleteToastSuccessState": "deleted",
+    "deleteToastSuccessMessage": "Your account has been deleted.",
     "deleteToastErrorState": "failed",
     "deleteError": "Couldn't delete your account. Try again."
   }
