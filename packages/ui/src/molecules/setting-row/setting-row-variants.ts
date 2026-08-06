@@ -13,7 +13,7 @@ export const settingRowVariants = tv({
       'font-mono text-copy font-medium text-text',
     ],
     description: ['mt-1 font-body text-meta text-subtle'],
-    control: ['flex flex-wrap items-center gap-2'],
+    control: ['flex flex-wrap items-center justify-end gap-2'],
   },
   variants: {
     tone: {
@@ -22,10 +22,18 @@ export const settingRowVariants = tv({
       },
       danger: {
         root: [
-          'rounded-sm border border-error border-l-2 bg-error-muted',
+          'relative rounded-sm border border-error',
+          'bg-error-muted',
           'mt-2 px-3',
+          'before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:rounded-l-sm before:bg-error',
         ],
         title: ['text-error'],
+        content: ['lg:max-w-md'],
+        control: [
+          'w-full flex-col items-stretch',
+          'md:w-auto md:flex-row md:items-center',
+          'ml-auto',
+        ],
       },
     },
   },
