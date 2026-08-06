@@ -9,6 +9,7 @@ import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { DepthProvider } from '@web/components/shared/depth-provider';
 import { DepthToggle } from '@web/components/shared/depth-toggle';
 import { JsonLd } from '@web/components/shared/json-ld';
+import { NewsletterForm } from '@web/components/shared/newsletter-form';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 import { PostContentsRail } from '@web/components/shared/post-contents-rail';
 import { PostShare } from '@web/components/shared/post-share';
@@ -92,12 +93,14 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
       />
     ),
   }));
-  const [format, t, blogPostT, relatedPostItems] = await Promise.all([
-    getFormatter(),
-    getTranslations('breadcrumbs'),
-    getTranslations('blogPostPage'),
-    toPostListItems(relatedPosts),
-  ]);
+  const [format, t, blogPostT, newsletterT, relatedPostItems] =
+    await Promise.all([
+      getFormatter(),
+      getTranslations('breadcrumbs'),
+      getTranslations('blogPostPage'),
+      getTranslations('newsletterForm'),
+      toPostListItems(relatedPosts),
+    ]);
 
   const trail: IBreadcrumbItem[] = [
     { label: t('home'), href: routes.home() },
@@ -226,6 +229,10 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
             readFullArticleLabel={blogPostT('skimPanel.readFullArticle')}
           />
         </DepthProvider>
+
+        <div className={s.newsletter()}>
+          <NewsletterForm variant="compact" heading={newsletterT('heading')} />
+        </div>
 
         {relatedPostItems.length > 0 && (
           <PostsSection

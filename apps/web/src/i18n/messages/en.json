@@ -168,5 +168,25 @@
     "deleteToastSuccessMessage": "Your account has been deleted.",
     "deleteToastErrorState": "failed",
     "deleteError": "Couldn't delete your account. Try again."
+  },
+  "newsletterForm": {
+    "heading": "Get new posts by email",
+    "description": "Subscribe to get new posts and updates delivered straight to your inbox.",
+    "submitLabel": "Subscribe",
+    "emailAriaLabel": "Email address",
+    "placeholder": "you@example.com",
+    "successMessage": "Almost there — check your inbox to confirm.",
+    "errorInvalid": "Enter a valid email address.",
+    "errorAlreadySubscribed": "That email is already subscribed.",
+    "errorServer": "Something went wrong. Please try again."
+  },
+  "newsletterConfirm": {
+    "confirmedTitle": "Subscription confirmed",
+    "confirmedMessage": "Your subscription is confirmed. Thanks for signing up!",
+    "invalidTitle": "Invalid confirmation link",
+    "invalidMessage": "This confirmation link is invalid or has expired.",
+    "errorTitle": "Something went wrong",
+    "errorMessage": "We couldn't confirm your subscription. Please try again later.",
+    "returnHome": "Return home"
   }
 }
