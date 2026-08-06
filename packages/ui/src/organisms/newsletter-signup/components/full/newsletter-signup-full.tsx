@@ -56,11 +56,7 @@ export const NewsletterSignupFull = ({
       <WindowChrome.Body>
         {heading && <h3 className={s.heading()}>{heading}</h3>}
         {isSuccess ? (
-          <Alert tone={ALERT_TYPE.SUCCESS}>
-            <span aria-hidden="true">✓</span>
-            <span>{successMessage}</span>
-            <span className={s.cursor()} aria-hidden="true" />
-          </Alert>
+          <Alert type={ALERT_TYPE.SUCCESS} message={successMessage ?? ''} />
         ) : (
           <>
             {description && <p className={s.description()}>{description}</p>}

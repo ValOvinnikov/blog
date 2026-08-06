@@ -9,46 +9,34 @@ faker.seed(123);
 const message = faker.lorem.sentence();
 
 const setup = customRender(Alert, {
-  tone: ALERT_TYPE.INFO,
-  children: message,
+  type: ALERT_TYPE.INFO,
+  message,
 });
 
 describe(`<${Alert.name}/>`, () => {
-  it('renders the given children', () => {
+  it('renders the given message', () => {
     setup();
     expect(screen.getByText(message)).toBeVisible();
   });
 
-  it('renders an assertive alert for the ERROR tone', () => {
-    setup({ tone: ALERT_TYPE.ERROR });
+  it('renders an assertive alert for the ERROR type', () => {
+    setup({ type: ALERT_TYPE.ERROR });
     expect(screen.getByRole('alert')).toHaveTextContent(message);
   });
 
-  it('renders a polite status for the SUCCESS tone', () => {
-    setup({ tone: ALERT_TYPE.SUCCESS });
+  it('renders a polite status for the SUCCESS type', () => {
+    setup({ type: ALERT_TYPE.SUCCESS });
     expect(screen.getByRole('status')).toHaveTextContent(message);
   });
 
-  it('renders a polite status for the WARNING tone', () => {
-    setup({ tone: ALERT_TYPE.WARNING });
+  it('renders a polite status for the WARNING type', () => {
+    setup({ type: ALERT_TYPE.WARNING });
     expect(screen.getByRole('status')).toHaveTextContent(message);
   });
 
-  it('renders a polite status for the INFO tone', () => {
-    setup({ tone: ALERT_TYPE.INFO });
+  it('renders a polite status for the INFO type', () => {
+    setup({ type: ALERT_TYPE.INFO });
     expect(screen.getByRole('status')).toHaveTextContent(message);
-  });
-
-  it('renders composed children, not just plain text', () => {
-    setup({
-      children: (
-        <>
-          {message}
-          <span data-testid="decoration" aria-hidden="true" />
-        </>
-      ),
-    });
-    expect(screen.getByTestId('decoration')).toBeVisible();
   });
 
   it('forwards dataTestId to the root element', () => {

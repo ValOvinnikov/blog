@@ -9,14 +9,14 @@ const meta = {
   component: Alert,
   tags: ['autodocs'],
   argTypes: {
-    tone: {
+    type: {
       control: 'select',
       options: objectKeys(ALERT_TYPE),
     },
   },
   args: {
-    tone: ALERT_TYPE.INFO,
-    children: 'New posts land in your inbox roughly twice a month.',
+    type: ALERT_TYPE.INFO,
+    message: 'New posts land in your inbox roughly twice a month.',
   },
 } satisfies Meta<typeof Alert>;
 
@@ -25,28 +25,28 @@ type TStory = StoryObj<typeof meta>;
 
 export const Success: TStory = {
   args: {
-    tone: ALERT_TYPE.SUCCESS,
-    children: 'Almost there — check your inbox to confirm.',
+    type: ALERT_TYPE.SUCCESS,
+    message: 'Almost there — check your inbox to confirm.',
   },
 };
 
 export const Warning: TStory = {
   args: {
-    tone: ALERT_TYPE.WARNING,
-    children: 'Your session expires in five minutes.',
+    type: ALERT_TYPE.WARNING,
+    message: 'Your session expires in five minutes.',
   },
 };
 
 export const Error: TStory = {
   args: {
-    tone: ALERT_TYPE.ERROR,
-    children: 'That email is already subscribed.',
+    type: ALERT_TYPE.ERROR,
+    message: 'That email is already subscribed.',
   },
 };
 
 export const Info: TStory = {
   args: {
-    tone: ALERT_TYPE.INFO,
-    children: 'New posts land in your inbox roughly twice a month.',
+    type: ALERT_TYPE.INFO,
+    message: 'New posts land in your inbox roughly twice a month.',
   },
 };

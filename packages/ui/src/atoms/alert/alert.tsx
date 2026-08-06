@@ -1,35 +1,48 @@
-import { ALERT_TYPE, type IWithDataTestId } from '@blog/config';
+import { ALERT_TYPE, ICONS, type IWithDataTestId } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
 import type { ComponentPropsWithoutRef } from 'react';
 
 import { alertVariants, type TAlertVariants } from './alert-variants';
 
+const ALERT_ICON = {
+  [ALERT_TYPE.SUCCESS]: ICONS.CHECK,
+  [ALERT_TYPE.WARNING]: ICONS.WARNING,
+  [ALERT_TYPE.ERROR]: ICONS.CLOSE,
+  [ALERT_TYPE.INFO]: ICONS.INFO,
+} as const;
+
 export interface IAlertProps
-  extends Omit<ComponentPropsWithoutRef<'div'>, 'role'>, IWithDataTestId {
-  tone: NonNullable<TAlertVariants['tone']>;
+  extends
+    Omit<ComponentPropsWithoutRef<'div'>, 'role' | 'children'>,
+    IWithDataTestId {
+  type: NonNullable<TAlertVariants['type']>;
+  message: string;
 }
 
 /**
- * Alert — a static, tone-coded inline message block for form feedback
- * (confirmations, warnings, and errors). Announces itself assertively for
- * the ERROR tone and politely for every other tone.
+ * Alert — a static, type-coded inline message block for form feedback
+ * (confirmations, warnings, and errors). Renders its own icon per type and
+ * announces itself assertively for the ERROR type and politely for every
+ * other type.
  */
 export const Alert = ({
-  tone,
+  type,
+  message,
   className,
   dataTestId,
-  children,
   ...rest
 }: IAlertProps) => {
-  const role = tone === ALERT_TYPE.ERROR ? 'alert' : 'status';
+  const role = type === ALERT_TYPE.ERROR ? 'alert' : 'status';
 
   return (
     <div
       {...rest}
       role={role}
       data-testid={dataTestId}
-      className={alertVariants({ tone, class: className })}
+      className={alertVariants({ type, class: className })}
     >
-      {children}
+      <Icon name={ALERT_ICON[type]} />
+      <span>{message}</span>
     </div>
   );
 };

@@ -1,6 +1,5 @@
+import { NewsletterSignup } from '@blog/ui/organisms/newsletter-signup/newsletter-signup';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-import { NewsletterSignup } from './newsletter-signup';
 
 const meta = {
   title: 'Organisms/NewsletterSignup/Compact',

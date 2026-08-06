@@ -23,8 +23,8 @@ interface INewsletterSignupContentProps {
 
 /**
  * The email input, submit button, and inline error feedback shared by every
- * density of the signup form — `Full` and `Compact` differ only in the
- * `$ subscribe --email` prompt prefix the `compact` variant prepends.
+ * density of the signup form — `Full` and `Compact` each wrap this with
+ * their own surrounding chrome.
  */
 export const NewsletterSignupContent = ({
   email,
@@ -37,7 +37,6 @@ export const NewsletterSignupContent = ({
   placeholder,
   variant,
 }: INewsletterSignupContentProps) => {
-  const isCompact = variant === 'compact';
   const isSubmitting = status === 'submitting';
   const isError = status === 'error';
   const s = newsletterSignupVariants({ variant });
@@ -49,14 +48,6 @@ export const NewsletterSignupContent = ({
 
   return (
     <form className={s.form()} onSubmit={handleSubmit} noValidate>
-      {isCompact && (
-        <>
-          <span className={s.prompt()} aria-hidden="true">
-            $
-          </span>
-          <span className={s.label()}>subscribe --email</span>
-        </>
-      )}
       <TextInput
         value={email}
         onChange={onChange}
@@ -79,7 +70,7 @@ export const NewsletterSignupContent = ({
         {submitLabel}
       </Button>
       {isError && errorMessage && (
-        <Alert tone={ALERT_TYPE.ERROR}>{errorMessage}</Alert>
+        <Alert type={ALERT_TYPE.ERROR} message={errorMessage} />
       )}
     </form>
   );

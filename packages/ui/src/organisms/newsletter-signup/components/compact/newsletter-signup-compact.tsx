@@ -24,7 +24,8 @@ export interface INewsletterSignupCompactProps extends IWithDataTestId {
  * `NewsletterSignup.Compact` — a slim single-row `$ subscribe` strip for the
  * end of every article. Shares the same idle/submitting/success/error state
  * machine as `NewsletterSignup.Full`, driven entirely by the `status` prop;
- * has no room for a heading or description.
+ * has no room for a heading or description. The `$ subscribe --email` prompt
+ * stays visible through every state, including success.
  */
 export const NewsletterSignupCompact = ({
   email,
@@ -44,12 +45,16 @@ export const NewsletterSignupCompact = ({
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
+      <span className={s.prompt()} aria-hidden="true">
+        $
+      </span>
+      <span className={s.label()}>subscribe --email</span>
       {isSuccess ? (
-        <Alert tone={ALERT_TYPE.SUCCESS}>
-          <span aria-hidden="true">✓</span>
-          <span>{successMessage}</span>
-          <span className={s.cursor()} aria-hidden="true" />
-        </Alert>
+        <Alert
+          type={ALERT_TYPE.SUCCESS}
+          message={successMessage ?? ''}
+          className={s.alert()}
+        />
       ) : (
         <NewsletterSignupContent
           email={email}

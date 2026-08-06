@@ -10,13 +10,9 @@ export const newsletterSignupVariants = tv({
     field: [],
     submit: ['inline-flex items-center justify-center gap-2'],
     spinner: ['animate-spin'],
-    cursor: [
-      'inline-block h-[1em] w-[0.5ch]',
-      'bg-success',
-      'animate-[blink_1s_steps(1)_infinite]',
-    ],
     prompt: ['select-none text-accent'],
     label: ['font-mono text-copy text-text'],
+    alert: [],
   },
   variants: {
     variant: {
@@ -26,16 +22,19 @@ export const newsletterSignupVariants = tv({
       },
       compact: {
         root: [
+          'flex flex-col gap-2',
+          'sm:flex-row sm:flex-wrap sm:items-center',
           'rounded-sm border border-border border-l-3 border-l-accent bg-surface-2',
           'px-3 py-2.5',
         ],
         form: [
-          'flex flex-col gap-2',
+          'flex flex-1 flex-col gap-2',
           'sm:flex-row sm:flex-wrap sm:items-center',
         ],
         field: ['flex-1 sm:min-w-[12rem]'],
         submit: ['shrink-0'],
         label: ['shrink-0'],
+        alert: ['flex-1'],
       },
     },
   },
