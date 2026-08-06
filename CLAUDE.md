@@ -39,6 +39,40 @@ investigate → plan → delegate each layer → test → review → commit (dep
 human-gated) — and it says which subagent owns which step. Subagents are not an
 automatic pipeline; this skill is how the right ones get used in the right order.
 
+## Mid-task decisions land in the ticket/spec before work continues
+
+When a design/scope/behavior decision gets settled in conversation — the user
+answers a clarifying question, a discussion converges on an approach, a
+placement/UX call gets made — that decision is **not** real until it's written
+into the governing issue body or spec/plan doc. A decision that lives only in
+chat history is invisible to every subagent, which starts cold and knows only
+what its dispatch prompt (sourced from the ticket/spec) tells it — and it's
+just as invisible to the orchestrator's own future re-dispatches, which should
+be pulling fresh context from the ticket/spec, not from memory of the
+conversation. This is exactly how the newsletter-signup feature (#1044)
+shipped wrong the first time: the "does the form show site-wide or is it
+scoped/configurable" question was discussed and answered in chat, never
+written back into the ticket, and implementation proceeded from the original
+under-specified issue — landing it globally in the root layout, requiring a
+revert (#1196).
+
+**The sequence when a decision is reached mid-task:**
+
+1. If a subagent is currently dispatched against the now-stale plan, stop
+   relying on its output — interrupt/stop it if still running, or discard its
+   result if it completes before you can. Don't let work proceed from context
+   the decision just superseded.
+2. Update the governing issue body (`gh issue edit`) or spec/plan doc
+   (`docs/superpowers/specs/*`) to state the decision plainly, before any
+   further implementation.
+3. Only then dispatch (fresh, or resume) — and the dispatch prompt should
+   quote/point at the now-updated ticket/spec, not restate the decision from
+   the orchestrator's own recollection of the chat.
+
+This applies to decisions a subagent couldn't have made on its own (design,
+scope, placement, cross-cutting behavior) — not routine implementation
+details a layer agent is already trusted to decide per its skill.
+
 ## Use the scoped agents
 
 Delegate layer work to the matching subagent in `.claude/agents/`, in dependency
