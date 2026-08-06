@@ -10,7 +10,7 @@ export const statusBadgeVariants = tv({
   ],
   variants: {
     tone: {
-      ok: 'border-ok bg-ok-muted text-ok',
+      ok: 'border-success bg-success-muted text-success',
       warn: 'border-warn bg-warn-muted text-warn',
       neutral: 'border-border bg-surface-2 text-text-subtle',
     },

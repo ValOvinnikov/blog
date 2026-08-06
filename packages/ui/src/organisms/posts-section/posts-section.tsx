@@ -3,7 +3,10 @@ import type { TAnchorElementType } from '@blog/config/react';
 import { PostCard } from '@blog/ui/molecules/post-card';
 import type { ElementType } from 'react';
 
-import { postsSectionVariants } from './posts-section-variants';
+import {
+  postsSectionVariants,
+  type TPostsSectionVariants,
+} from './posts-section-variants';
 
 export interface IPostCardCategoryData {
   title: string;
@@ -35,7 +38,7 @@ export interface IPostsSectionProps extends IWithDataTestId {
    * column. Omit (or pass `false`) for the existing inline behavior, sized
    * by the parent. Heading markup/`aria` wiring is unchanged either way.
    */
-  tinted?: boolean;
+  tinted?: TPostsSectionVariants['tinted'];
 }
 
 /**

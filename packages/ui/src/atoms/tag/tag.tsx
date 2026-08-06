@@ -1,12 +1,11 @@
 import type { TPolymorphicProps } from '@blog/config/react';
 import { type ElementType } from 'react';
-import { type VariantProps } from 'tailwind-variants';
 
-import { tagVariants } from './tag-variants';
+import { tagVariants, type TTagVariants } from './tag-variants';
 
 type TTagOwnProps = {
   className?: string;
-} & Omit<VariantProps<typeof tagVariants>, 'interactive'>;
+} & Omit<TTagVariants, 'interactive'>;
 
 export type TTagProps<C extends ElementType = 'span'> = TPolymorphicProps<
   C,

@@ -1,4 +1,5 @@
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const bookmarkToggleVariants = tv({
   slots: {
@@ -24,3 +25,7 @@ export const bookmarkToggleVariants = tv({
     },
   },
 });
+
+export type TBookmarkToggleVariants = VariantProps<
+  typeof bookmarkToggleVariants
+>;

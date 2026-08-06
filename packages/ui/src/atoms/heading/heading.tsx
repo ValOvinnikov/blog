@@ -1,17 +1,16 @@
 import { type IWithDataTestId, Size } from '@blog/config';
 import type { HTMLAttributes } from 'react';
-import type { VariantProps } from 'tailwind-variants';
 
-import { headingVariants } from './heading-variants';
+import { headingVariants, type THeadingVariants } from './heading-variants';
 
 export type THeadingProps = HTMLAttributes<HTMLHeadingElement> &
   IWithDataTestId & {
     level: 1 | 2 | 3 | 4;
-    visual?: VariantProps<typeof headingVariants>['visual'];
-    size?: VariantProps<typeof headingVariants>['size'];
+    visual?: THeadingVariants['visual'];
+    size?: THeadingVariants['size'];
   };
 
-type TSize = NonNullable<VariantProps<typeof headingVariants>['size']>;
+type TSize = NonNullable<THeadingVariants['size']>;
 type THeadingTag = 'h1' | 'h2' | 'h3' | 'h4';
 
 const defaultSizes: Record<1 | 2 | 3 | 4, TSize> = {

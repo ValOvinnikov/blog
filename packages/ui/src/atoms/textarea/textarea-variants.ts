@@ -1,4 +1,5 @@
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const textareaVariants = tv({
   slots: {
@@ -19,10 +20,12 @@ export const textareaVariants = tv({
   },
   variants: {
     invalid: {
-      true: { textarea: ['border-danger text-danger'] },
+      true: { textarea: ['border-error text-error'] },
     },
     hasPrompt: {
       true: { textarea: ['pl-8'] },
     },
   },
 });
+
+export type TTextareaVariants = VariantProps<typeof textareaVariants>;

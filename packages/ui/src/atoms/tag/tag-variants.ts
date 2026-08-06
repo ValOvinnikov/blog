@@ -1,4 +1,5 @@
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const tagVariants = tv({
   base: [
@@ -36,3 +37,5 @@ export const tagVariants = tv({
     interactive: false,
   },
 });
+
+export type TTagVariants = VariantProps<typeof tagVariants>;
