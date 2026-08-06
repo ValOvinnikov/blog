@@ -25,6 +25,11 @@ describe(`<${Spinner.name}/>`, () => {
     expect(screen.getByText(label)).toBeVisible();
   });
 
+  it('hides the visible label text from assistive tech so it is not announced twice alongside the root aria-label', () => {
+    setup({ showLabel: true });
+    expect(screen.getByText(label)).toHaveAttribute('aria-hidden', 'true');
+  });
+
   it('hides the animated glyph from assistive tech', () => {
     setup();
     const status = screen.getByRole('status', { name: label });
@@ -42,5 +47,12 @@ describe(`<${Spinner.name}/>`, () => {
     expect(screen.getByRole('status', { name: label })).toHaveClass(
       'text-accent-contrast',
     );
+  });
+
+  it('lets a className color override cascade to the glyph, which sets no color of its own', () => {
+    setup({ className: 'text-accent-contrast' });
+    const status = screen.getByRole('status', { name: label });
+    const glyph = status.firstElementChild;
+    expect(glyph).not.toHaveClass('text-accent', 'text-accent-contrast');
   });
 });

@@ -64,6 +64,7 @@ export const NewsletterSignupContent = ({
         onClick={onSubmit}
         disabled={isSubmitting}
         aria-busy={isSubmitting}
+        title={isSubmitting ? submitLabel : undefined}
         className={s.submit()}
       >
         {isSubmitting ? (

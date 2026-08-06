@@ -10,7 +10,6 @@ export type TSpinnerProps = Omit<
   IWithDataTestId & {
     label: string;
     showLabel?: boolean;
-    className?: string;
   };
 
 /**
@@ -21,7 +20,9 @@ export type TSpinnerProps = Omit<
  * `@blog/ui` atom. The accessible name always comes from `label` via
  * `aria-label` — `role="status"` does not pick up name-from-content, so the
  * glyph itself is `aria-hidden` and `showLabel` only controls whether that
- * same text is *also* rendered visibly beside it.
+ * same text is *also* rendered visibly beside it. The visible text is itself
+ * `aria-hidden` so it is never announced a second time alongside the root's
+ * `aria-label`.
  */
 export const Spinner = ({
   label,
@@ -41,7 +42,11 @@ export const Spinner = ({
       className={root({ class: className })}
     >
       <span className={glyph()} aria-hidden="true" />
-      {showLabel && <span className={text()}>{label}</span>}
+      {showLabel && (
+        <span className={text()} aria-hidden="true">
+          {label}
+        </span>
+      )}
     </span>
   );
 };
