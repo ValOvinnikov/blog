@@ -1,4 +1,4 @@
-import { ALERT_TONE, type IWithDataTestId } from '@blog/config';
+import { ALERT_TYPE, type IWithDataTestId } from '@blog/config';
 import type { ComponentPropsWithoutRef } from 'react';
 
 import { alertVariants, type TAlertVariants } from './alert-variants';
@@ -20,7 +20,7 @@ export const Alert = ({
   children,
   ...rest
 }: IAlertProps) => {
-  const role = tone === ALERT_TONE.ERROR ? 'alert' : 'status';
+  const role = tone === ALERT_TYPE.ERROR ? 'alert' : 'status';
 
   return (
     <div

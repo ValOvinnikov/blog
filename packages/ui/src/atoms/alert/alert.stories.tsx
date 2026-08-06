@@ -1,4 +1,4 @@
-import { ALERT_TONE } from '@blog/config';
+import { ALERT_TYPE } from '@blog/config';
 import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -11,11 +11,11 @@ const meta = {
   argTypes: {
     tone: {
       control: 'select',
-      options: objectKeys(ALERT_TONE),
+      options: objectKeys(ALERT_TYPE),
     },
   },
   args: {
-    tone: ALERT_TONE.INFO,
+    tone: ALERT_TYPE.INFO,
     children: 'New posts land in your inbox roughly twice a month.',
   },
 } satisfies Meta<typeof Alert>;
@@ -25,28 +25,28 @@ type TStory = StoryObj<typeof meta>;
 
 export const Success: TStory = {
   args: {
-    tone: ALERT_TONE.SUCCESS,
+    tone: ALERT_TYPE.SUCCESS,
     children: 'Almost there — check your inbox to confirm.',
   },
 };
 
 export const Warning: TStory = {
   args: {
-    tone: ALERT_TONE.WARNING,
+    tone: ALERT_TYPE.WARNING,
     children: 'Your session expires in five minutes.',
   },
 };
 
 export const Error: TStory = {
   args: {
-    tone: ALERT_TONE.ERROR,
+    tone: ALERT_TYPE.ERROR,
     children: 'That email is already subscribed.',
   },
 };
 
 export const Info: TStory = {
   args: {
-    tone: ALERT_TONE.INFO,
+    tone: ALERT_TYPE.INFO,
     children: 'New posts land in your inbox roughly twice a month.',
   },
 };

@@ -1,5 +1,5 @@
 import {
-  ALERT_TONE,
+  ALERT_TYPE,
   type IWithDataTestId,
   type TFormStatus,
 } from '@blog/config';
@@ -56,7 +56,7 @@ export const NewsletterSignupFull = ({
       <WindowChrome.Body>
         {heading && <h3 className={s.heading()}>{heading}</h3>}
         {isSuccess ? (
-          <Alert tone={ALERT_TONE.SUCCESS}>
+          <Alert tone={ALERT_TYPE.SUCCESS}>
             <span aria-hidden="true">✓</span>
             <span>{successMessage}</span>
             <span className={s.cursor()} aria-hidden="true" />

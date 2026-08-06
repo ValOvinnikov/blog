@@ -1,4 +1,4 @@
-import { ALERT_TONE } from '@blog/config';
+import { ALERT_TYPE } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -10,13 +10,13 @@ export const alertVariants = tv({
   ],
   variants: {
     tone: {
-      [ALERT_TONE.SUCCESS]: ['border-l-success text-success'],
-      [ALERT_TONE.WARNING]: ['border-l-warn text-warn'],
-      [ALERT_TONE.ERROR]: ['border-l-error text-error'],
-      [ALERT_TONE.INFO]: ['border-l-accent text-accent'],
+      [ALERT_TYPE.SUCCESS]: ['border-l-success text-success'],
+      [ALERT_TYPE.WARNING]: ['border-l-warn text-warn'],
+      [ALERT_TYPE.ERROR]: ['border-l-error text-error'],
+      [ALERT_TYPE.INFO]: ['border-l-accent text-accent'],
     },
   },
-  defaultVariants: { tone: ALERT_TONE.INFO },
+  defaultVariants: { tone: ALERT_TYPE.INFO },
 });
 
 export type TAlertVariants = VariantProps<typeof alertVariants>;

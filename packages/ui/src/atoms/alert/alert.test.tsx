@@ -1,4 +1,4 @@
-import { ALERT_TONE } from '@blog/config';
+import { ALERT_TYPE } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 
@@ -9,7 +9,7 @@ faker.seed(123);
 const message = faker.lorem.sentence();
 
 const setup = customRender(Alert, {
-  tone: ALERT_TONE.INFO,
+  tone: ALERT_TYPE.INFO,
   children: message,
 });
 
@@ -20,22 +20,22 @@ describe(`<${Alert.name}/>`, () => {
   });
 
   it('renders an assertive alert for the ERROR tone', () => {
-    setup({ tone: ALERT_TONE.ERROR });
+    setup({ tone: ALERT_TYPE.ERROR });
     expect(screen.getByRole('alert')).toHaveTextContent(message);
   });
 
   it('renders a polite status for the SUCCESS tone', () => {
-    setup({ tone: ALERT_TONE.SUCCESS });
+    setup({ tone: ALERT_TYPE.SUCCESS });
     expect(screen.getByRole('status')).toHaveTextContent(message);
   });
 
   it('renders a polite status for the WARNING tone', () => {
-    setup({ tone: ALERT_TONE.WARNING });
+    setup({ tone: ALERT_TYPE.WARNING });
     expect(screen.getByRole('status')).toHaveTextContent(message);
   });
 
   it('renders a polite status for the INFO tone', () => {
-    setup({ tone: ALERT_TONE.INFO });
+    setup({ tone: ALERT_TYPE.INFO });
     expect(screen.getByRole('status')).toHaveTextContent(message);
   });
 

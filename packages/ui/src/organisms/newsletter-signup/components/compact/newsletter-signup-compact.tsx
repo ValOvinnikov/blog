@@ -1,5 +1,5 @@
 import {
-  ALERT_TONE,
+  ALERT_TYPE,
   type IWithDataTestId,
   type TFormStatus,
 } from '@blog/config';
@@ -45,7 +45,7 @@ export const NewsletterSignupCompact = ({
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
       {isSuccess ? (
-        <Alert tone={ALERT_TONE.SUCCESS}>
+        <Alert tone={ALERT_TYPE.SUCCESS}>
           <span aria-hidden="true">✓</span>
           <span>{successMessage}</span>
           <span className={s.cursor()} aria-hidden="true" />
