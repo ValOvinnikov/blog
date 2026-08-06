@@ -12,13 +12,14 @@ export const authMenuVariants = tv({
     // shrink-fits toward the panel's 200px floor otherwise, wrapping long
     // items; 320px fits every item on one line, capped against the viewport.
     window: ['w-80 max-w-[calc(100vw-2rem)]'],
-    // The session-resolving placeholder — a non-interactive live region, not
-    // a button, so it's just sized/centered to match the 22×22 footprint of
-    // the triggers it stands in for (no border/bg/hover, those are
-    // `IconButton`'s interactive-affordance classes and don't apply here).
-    statusIndicator: ['inline-grid size-[22px] place-items-center'],
-    // The session-resolving placeholder's icon — a static glyph, spun via
-    // Tailwind's built-in `animate-spin`.
-    spinnerIcon: ['animate-spin'],
+    // The session-resolving placeholder — wraps `Spinner` (the live region),
+    // not a button, so it's just sized/centered to match the 22×22 footprint
+    // of the triggers it stands in for. `rounded-full bg-surface-2` mirror
+    // `Avatar`'s own base classes so this reads as "the avatar slot,
+    // mid-load" rather than a disconnected spinner (no border/hover, those
+    // are `IconButton`'s interactive-affordance classes and don't apply here).
+    statusIndicator: [
+      'inline-grid size-[22px] place-items-center rounded-full bg-surface-2',
+    ],
   },
 });
