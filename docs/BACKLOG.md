@@ -677,6 +677,25 @@ active`; success copy "check your inbox."
 - **Acceptance:** repeated writes past the threshold are throttled with a clear
   error; reads are unaffected.
 
+### M5.8 · Newsletter broadcast — new-post notification emails — not yet filed
+
+- **Milestone / labels:** GitHub `M5 — Engagement` · `enhancement`,
+  `layer:web`, `deferred`.
+- **Depends on:** M5.5 (#1044) — the `subscribers` table and its `active`
+  (confirmed) rows this would query.
+- **Body:** M5.5's acceptance stops at "confirmed subscribers are
+  queryable" — nothing today emails an `active` subscriber when a new post
+  publishes. This is the design doc's explicit non-goal ("newsletter
+  campaign composition / sending UI — signup only; authoring/sending
+  broadcasts is a separate concern", also covered by "Notifications
+  (email-on-reply, digest) for any feature" below). A future build needs: a
+  trigger (most likely reusing the existing ISR revalidation webhook's
+  publish-event infra, or a scheduled digest job), a query for `active`
+  subscribers, and a Resend send reusing the shared send-email helper
+  (#1107) — a single fixed template is enough for v1; no campaign-authoring
+  UI is implied by this scope.
+- **Acceptance:** TBD once scoped — not yet an epic/issue.
+
 ### Non-goals (from the design docs — recorded so epics don't sprawl)
 
 Public author profiles; comment reactions/voting/rich-text/@mentions; comment
