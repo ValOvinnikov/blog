@@ -69,7 +69,8 @@ export const Error: TStory = {
 
 export const Loading: TStory = {
   args: {
-    type: TOAST_TYPE.LOADING,
+    type: TOAST_TYPE.INFO,
+    isLoading: true,
     command: 'bookmark',
     state: 'saving',
     message: 'saving…',
