@@ -3,6 +3,7 @@ import { defineModulesField } from '@cms/schema-types/helpers/define-modules-fie
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { contentSchema } from '@cms/schema-types/modules/module-content';
 import { ctaSchema } from '@cms/schema-types/modules/module-cta';
+import { newsletterSchema } from '@cms/schema-types/modules/module-newsletter';
 import { seoSchema } from '@cms/schema-types/objects/seo';
 import { FileText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -47,7 +48,7 @@ export const genericSchema = defineType({
         }),
     }),
     defineModulesField({
-      allow: [contentSchema.name, ctaSchema.name],
+      allow: [contentSchema.name, ctaSchema.name, newsletterSchema.name],
     }),
     defineField({
       name: 'seo',

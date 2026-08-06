@@ -4,6 +4,7 @@ import { Icon, NavLink } from '@blog/ui/atoms';
 import { Footer, Header } from '@blog/ui/organisms';
 import { AuthMenu } from '@web/components/shared/auth-menu';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
+import { NewsletterForm } from '@web/components/shared/newsletter-form';
 import { SiteNavigation } from '@web/components/shared/site-navigation';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
@@ -85,16 +86,25 @@ export default async function LocaleLayout({ children, params }: TProps) {
 
   setRequestLocale(locale);
 
-  const [settingsResult, navResult, footerResult, messages, now, timeZone, t] =
-    await Promise.all([
-      service.global.siteSettings.v1.getSiteSettings(),
-      service.global.navigation.v1.getNavigation(),
-      service.global.footer.v1.getFooter(),
-      getMessages(),
-      getNow(),
-      getTimeZone(),
-      getTranslations('rss'),
-    ]);
+  const [
+    settingsResult,
+    navResult,
+    footerResult,
+    messages,
+    now,
+    timeZone,
+    t,
+    newsletterT,
+  ] = await Promise.all([
+    service.global.siteSettings.v1.getSiteSettings(),
+    service.global.navigation.v1.getNavigation(),
+    service.global.footer.v1.getFooter(),
+    getMessages(),
+    getNow(),
+    getTimeZone(),
+    getTranslations('rss'),
+    getTranslations('newsletterForm'),
+  ]);
 
   if (!settingsResult.ok) {
     console.error(`Error to fetch site settings: ${settingsResult.error}`);
@@ -153,6 +163,13 @@ export default async function LocaleLayout({ children, params }: TProps) {
               />
             </Header>
             <div className={s.content()}>{children}</div>
+            <div className={s.newsletterBand()}>
+              <NewsletterForm
+                variant="full"
+                heading={newsletterT('heading')}
+                description={newsletterT('description')}
+              />
+            </div>
             <Footer dataTestId="site-footer">
               <Footer.Copyright title={brand.name} />
               <Footer.Nav>
