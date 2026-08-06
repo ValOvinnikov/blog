@@ -39,9 +39,6 @@ array.
   text).
 - `module_cta` (`ctaSchema`) — internal `title`, `heading`, `text`, `action`
   (`link`, required).
-- `module_newsletter` (`newsletterSchema`) — internal `title`, `heading`
-  (string, optional, max 80 — falls back to a default if empty), `description`
-  (text, optional, max 300 — falls back to a default if empty).
 
 Every module document gets a required internal `title` via the reusable
 `titleField` helper (§ below) so it's listable/previewable in Studio
@@ -55,10 +52,10 @@ independent of its display fields.
   reference to a `module_hero`, kept
   separate from the module list — it always renders first), `modules` (array of
   references via `defineModulesField({ allow: [MODULE_TYPE.POST_LIST,
-MODULE_TYPE.CTA, MODULE_TYPE.NEWSLETTER] })`), `seo`.
+MODULE_TYPE.CTA] })`), `seo`.
 - `page_generic` (`genericSchema`) — `title`, `slug` (source: title),
   `modules` (array of references via `defineModulesField({ allow:
-[MODULE_TYPE.CONTENT, MODULE_TYPE.CTA, MODULE_TYPE.NEWSLETTER] })`), `seo`.
+[MODULE_TYPE.CONTENT, MODULE_TYPE.CTA] })`), `seo`.
 - `page_blog` (`blogPageSchema`, singleton) — the `/blog` index page config; a
   non-module singleton: `titleField` (internal Studio label; `preview.prepare`
   falls back to the generic "Unknown" when unset), `heading` (the

@@ -50,15 +50,6 @@ vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
   setBookmarkStatus: vi.fn(),
 }));
 
-// `NewsletterForm` (article-end `compact` strip, #1104) imports the real
-// `newsletter-actions.ts` otherwise, which reads a server-only env var at
-// module scope — mocked wholesale here (no assertions in this file exercise
-// the newsletter submit flow itself; see `newsletter-form.test.tsx` for
-// those).
-vi.mock('@web/server/newsletter/newsletter-actions', () => ({
-  subscribeToNewsletterAction: vi.fn(),
-}));
-
 // `BookmarkButton` calls `useToast()` unconditionally (it's a hook), so any
 // composition that renders it — signed in or not — needs this mocked; no
 // assertions here exercise the toast calls themselves (see

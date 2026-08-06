@@ -67,15 +67,6 @@ vi.mock('next-auth/react', () => ({
   SessionProvider: ({ children }: { children: ReactNode }) => children,
 }));
 
-// `NewsletterForm` (persistent footer band, #1104) imports the real
-// `newsletter-actions.ts` otherwise, which reads a server-only env var at
-// module scope — mocked wholesale here (no assertions in this file exercise
-// the newsletter submit flow itself; see `newsletter-form.test.tsx` for
-// those).
-vi.mock('@web/server/newsletter/newsletter-actions', () => ({
-  subscribeToNewsletterAction: vi.fn(),
-}));
-
 const brand = { name: 'Blog', logo: null };
 const now = new Date('2026-07-21T00:00:00.000Z');
 
@@ -258,14 +249,5 @@ describe('LocaleLayout', () => {
     expect(
       within(link).queryByTestId(`social-icon-${SOCIAL_PLATFORMS.MASTODON}`),
     ).not.toBeInTheDocument();
-  });
-
-  it('renders the persistent newsletter signup form above the footer', async () => {
-    await setup();
-
-    expect(
-      screen.getByRole('textbox', { name: 'Email address' }),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
   });
 });
