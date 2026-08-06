@@ -163,6 +163,24 @@ export const Header: TCompoundComponent<typeof HeaderRoot, typeof HeaderParts> =
   `relative overflow-hidden` so a `next/image fill` has the parent it expects,
   and let the consumer's image supply its own `object-fit`.
 
+## Namespaced exports without slot resolution
+
+Not every multi-part organism is a slot-compound. Some export a namespace of
+**mutually-exclusive alternatives** that never render together — e.g.
+`NewsletterSignup.Full` / `NewsletterSignup.Compact`, two independent
+densities of the same form, assembled via plain `Object.assign` rather than
+`mapCompoundSlots` (there is no `children` to resolve). The same
+`components/{child-name}/` layout still applies to these: each alternative,
+and any internal partial shared between them, gets its own
+`components/{name}/` folder next to the root assembly file. A `tv()` call
+that is genuinely shared across the alternatives (one `variant` axis, not
+independent per-child variants) is the one exception — it can stay a single
+root-level `{component}-variants.ts` instead of being split per child.
+Stories and tests still stay at the root (one `.stories.tsx` per exported
+alternative, one `.test.tsx` covering the assembly) — sub-components in
+`components/` are implementation detail, never independently exported or
+tested, same as true slot-compounds.
+
 ## When NOT to use compound
 
 If the component only ever needs to swap **one** element (a nav link, a
