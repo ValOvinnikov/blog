@@ -1,4 +1,5 @@
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const navLinkVariants = tv({
   slots: {
@@ -20,3 +21,5 @@ export const navLinkVariants = tv({
   },
   defaultVariants: { isActive: false },
 });
+
+export type TNavLinkVariants = VariantProps<typeof navLinkVariants>;

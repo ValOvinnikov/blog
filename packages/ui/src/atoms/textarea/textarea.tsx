@@ -1,7 +1,7 @@
 import type { IWithDataTestId } from '@blog/config';
 import { type ChangeEvent, type ComponentPropsWithoutRef } from 'react';
 
-import { textareaVariants } from './textarea-variants';
+import { textareaVariants, type TTextareaVariants } from './textarea-variants';
 
 export type TTextareaProps = Omit<
   ComponentPropsWithoutRef<'textarea'>,
@@ -11,7 +11,7 @@ export type TTextareaProps = Omit<
     value: string;
     onChange: (value: string) => void;
     ariaLabel: string;
-    invalid?: boolean;
+    invalid?: TTextareaVariants['invalid'];
     /** Decorative leading glyph (e.g. `$`, `›`) — the console prompt idiom. Purely visual; `ariaLabel` carries the accessible name. */
     prompt?: string;
     className?: string;

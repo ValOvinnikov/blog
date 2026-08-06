@@ -1,5 +1,6 @@
 import { Size } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const buttonVariants = tv({
   base: [
@@ -30,3 +31,5 @@ export const buttonVariants = tv({
   },
   defaultVariants: { variant: 'primary', size: Size.MD },
 });
+
+export type TButtonVariants = VariantProps<typeof buttonVariants>;

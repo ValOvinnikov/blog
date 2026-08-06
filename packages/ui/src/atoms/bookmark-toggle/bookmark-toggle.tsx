@@ -2,13 +2,16 @@ import { ICONS, Size, type IWithDataTestId } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { type ButtonHTMLAttributes } from 'react';
 
-import { bookmarkToggleVariants } from './bookmark-toggle-variants';
+import {
+  bookmarkToggleVariants,
+  type TBookmarkToggleVariants,
+} from './bookmark-toggle-variants';
 
 export interface IBookmarkToggleProps
   extends
     Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'className'>,
     IWithDataTestId {
-  isBookmarked: boolean;
+  isBookmarked: NonNullable<TBookmarkToggleVariants['isBookmarked']>;
   onToggle: () => void;
   label: string;
   ariaLabel: string;

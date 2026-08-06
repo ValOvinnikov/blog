@@ -1,4 +1,5 @@
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const mediaFrameVariants = tv({
   base: [
@@ -14,3 +15,5 @@ export const mediaFrameVariants = tv({
     },
   },
 });
+
+export type TMediaFrameVariants = VariantProps<typeof mediaFrameVariants>;

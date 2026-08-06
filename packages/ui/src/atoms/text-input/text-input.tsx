@@ -1,7 +1,10 @@
 import type { IWithDataTestId } from '@blog/config';
 import { type ChangeEvent, type ComponentPropsWithoutRef } from 'react';
 
-import { textInputVariants } from './text-input-variants';
+import {
+  textInputVariants,
+  type TTextInputVariants,
+} from './text-input-variants';
 
 export type TTextInputProps = Omit<
   ComponentPropsWithoutRef<'input'>,
@@ -11,7 +14,7 @@ export type TTextInputProps = Omit<
     value: string;
     onChange: (value: string) => void;
     ariaLabel: string;
-    invalid?: boolean;
+    invalid?: TTextInputVariants['invalid'];
     /** Decorative leading glyph (e.g. `$`, `›`) — the console prompt idiom. Purely visual; `ariaLabel` carries the accessible name. */
     prompt?: string;
     className?: string;

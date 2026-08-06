@@ -1,5 +1,6 @@
 import { Size } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const avatarVariants = tv({
   base: [
@@ -27,3 +28,5 @@ export const avatarImageVariants = tv({
 export const avatarNameVariants = tv({
   base: ['sr-only'],
 });
+
+export type TAvatarVariants = VariantProps<typeof avatarVariants>;
