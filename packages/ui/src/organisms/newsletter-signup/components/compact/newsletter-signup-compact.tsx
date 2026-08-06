@@ -4,9 +4,8 @@ import {
   type TFormStatus,
 } from '@blog/config';
 import { Alert } from '@blog/ui/atoms/alert';
+import { NewsletterSignupContent } from '@blog/ui/organisms/newsletter-signup/components/content/newsletter-signup-content';
 import { newsletterSignupVariants } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
-
-import { NewsletterSignupContent } from '../content/newsletter-signup-content';
 
 export interface INewsletterSignupCompactProps extends IWithDataTestId {
   email: string;

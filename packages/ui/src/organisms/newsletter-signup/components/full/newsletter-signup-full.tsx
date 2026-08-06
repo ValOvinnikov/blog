@@ -5,9 +5,8 @@ import {
 } from '@blog/config';
 import { Alert } from '@blog/ui/atoms/alert';
 import { WindowChrome } from '@blog/ui/molecules/window-chrome';
+import { NewsletterSignupContent } from '@blog/ui/organisms/newsletter-signup/components/content/newsletter-signup-content';
 import { newsletterSignupVariants } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
-
-import { NewsletterSignupContent } from '../content/newsletter-signup-content';
 
 export interface INewsletterSignupFullProps extends IWithDataTestId {
   email: string;

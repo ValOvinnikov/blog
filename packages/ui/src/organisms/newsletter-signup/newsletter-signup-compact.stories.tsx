@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { NewsletterSignupCompact } from './components/compact/newsletter-signup-compact';
+import { NewsletterSignup } from './newsletter-signup';
 
 const meta = {
   title: 'Organisms/NewsletterSignup/Compact',
-  component: NewsletterSignupCompact,
+  component: NewsletterSignup.Compact,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
   args: {
@@ -17,7 +17,7 @@ const meta = {
     placeholder: 'you@domain.dev',
     successMessage: 'Almost there — check your inbox to confirm.',
   },
-} satisfies Meta<typeof NewsletterSignupCompact>;
+} satisfies Meta<typeof NewsletterSignup.Compact>;
 
 export default meta;
 type TStory = StoryObj<typeof meta>;
