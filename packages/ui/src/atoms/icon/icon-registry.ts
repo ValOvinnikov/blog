@@ -33,8 +33,12 @@ import MenuComponent from '@blog/ui/assets/icons/menu.svg';
 import MenuUrl from '@blog/ui/assets/icons/menu.svg?url';
 import MoonComponent from '@blog/ui/assets/icons/moon.svg';
 import MoonUrl from '@blog/ui/assets/icons/moon.svg?url';
+import PowerComponent from '@blog/ui/assets/icons/power.svg';
+import PowerUrl from '@blog/ui/assets/icons/power.svg?url';
 import RssComponent from '@blog/ui/assets/icons/rss.svg';
 import RssUrl from '@blog/ui/assets/icons/rss.svg?url';
+import SettingsComponent from '@blog/ui/assets/icons/settings.svg';
+import SettingsUrl from '@blog/ui/assets/icons/settings.svg?url';
 import ShareComponent from '@blog/ui/assets/icons/share.svg';
 import ShareUrl from '@blog/ui/assets/icons/share.svg?url';
 import SpinnerComponent from '@blog/ui/assets/icons/spinner.svg';
@@ -83,4 +87,6 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.SPINNER]: { component: SpinnerComponent, url: SpinnerUrl },
   [ICONS.WARNING]: { component: WarningComponent, url: WarningUrl },
   [ICONS.INFO]: { component: InfoComponent, url: InfoUrl },
+  [ICONS.SETTINGS]: { component: SettingsComponent, url: SettingsUrl },
+  [ICONS.POWER]: { component: PowerComponent, url: PowerUrl },
 };
