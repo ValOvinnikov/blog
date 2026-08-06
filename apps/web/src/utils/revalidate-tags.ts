@@ -22,6 +22,7 @@ const REVALIDATE_TAGS = {
   settings_site: ['site-settings'],
   settings_navigation: ['navigation'],
   settings_footer: ['footer'],
+  settings_newsletter: ['newsletter-settings'],
   page_home: ['homePage'],
   page_blog: ['page_blog'],
   page_generic: ['page_generic'],
@@ -29,6 +30,7 @@ const REVALIDATE_TAGS = {
   module_postList: ['modules:postList'],
   module_content: ['modules:content'],
   module_cta: ['modules:cta'],
+  module_newsletter: ['modules:newsletter'],
 } as const satisfies Partial<Record<TSanityType, readonly string[]>>;
 
 /**

@@ -12,6 +12,7 @@ const post: TPostDetail = {
   heroImageAlt: 'A hero image',
   heroImageSanity: undefined,
   featured: false,
+  newsletterEnabled: true,
   body: [],
   skim: undefined,
   hasAsides: false,

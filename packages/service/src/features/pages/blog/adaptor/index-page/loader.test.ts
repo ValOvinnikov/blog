@@ -96,6 +96,34 @@ describe('getIndexPage', () => {
     });
   });
 
+  it('maps the thin page-builder modules array to module refs', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawBlogPage({
+          modules: [{ _id: 'newsletter-1', _type: 'module_newsletter' }],
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings())
+      .mockResolvedValueOnce({ posts: [], total: 0 });
+
+    const result = await getIndexPage();
+
+    expect(result.modules).toEqual([
+      { id: 'newsletter-1', type: 'module_newsletter' },
+    ]);
+  });
+
+  it('defaults modules to an empty array when the page has none', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawBlogPage({ modules: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings())
+      .mockResolvedValueOnce({ posts: [], total: 0 });
+
+    const result = await getIndexPage();
+
+    expect(result.modules).toEqual([]);
+  });
+
   it('tags the posts query with category alongside posts', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawBlogPage())

@@ -23,20 +23,38 @@ import { notFound } from 'next/navigation';
 
 import { BlogPostPage } from './blog-post-page';
 
-const { getPostMock, useSessionMock, getBookmarkStatusMock } = vi.hoisted(
-  () => ({
-    getPostMock: vi.fn(),
-    useSessionMock: vi.fn(),
-    getBookmarkStatusMock: vi.fn(),
-  }),
-);
+const {
+  getPostMock,
+  useSessionMock,
+  getBookmarkStatusMock,
+  getNewsletterSettingsMock,
+} = vi.hoisted(() => ({
+  getPostMock: vi.fn(),
+  useSessionMock: vi.fn(),
+  getBookmarkStatusMock: vi.fn(),
+  getNewsletterSettingsMock: vi.fn(),
+}));
 
 vi.mock('@blog/service', () => ({
   service: {
     pages: {
       post: { v1: { getPost: getPostMock } },
     },
+    global: {
+      newsletterSettings: {
+        v1: { getNewsletterSettings: getNewsletterSettingsMock },
+      },
+    },
   },
+}));
+
+// `NewsletterForm` imports `newsletter-actions.ts`, whose module-level
+// `resolveNewsletterFromAddress(env.NEWSLETTER_FROM_ADDRESS)` call touches
+// the real `@t3-oss/env-nextjs` server guard under jsdom — mocked out the
+// same way `newsletter-form.test.tsx` does; this suite doesn't exercise the
+// submit flow itself.
+vi.mock('@web/server/newsletter/newsletter-actions', () => ({
+  subscribeToNewsletterAction: vi.fn(),
 }));
 
 // `BookmarkButton` (article header meta strip, #1109) renders nothing for a
@@ -90,6 +108,18 @@ describe(`<${BlogPostPage.name}/>`, () => {
     useSessionMock.mockReset();
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
     getBookmarkStatusMock.mockReset();
+    getNewsletterSettingsMock.mockReset();
+    getNewsletterSettingsMock.mockResolvedValue({
+      ok: true,
+      data: { heading: 'Get new posts by email', description: undefined },
+    });
+  });
+
+  afterEach(() => {
+    // jsdom's `document.cookie` jar persists across `it`s in the same file —
+    // expire anything a test set so it never leaks into the next one.
+    document.cookie =
+      'newsletter_subscribed=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
   });
 
   it('calls notFound() when the post does not exist', async () => {
@@ -531,5 +561,72 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(screen.getByRole('note')).toBeInTheDocument();
     expect(screen.getByText('Why not X')).toBeVisible();
     expect(screen.getByText('Because Y.')).toBeVisible();
+  });
+
+  describe('newsletter signup', () => {
+    it('renders the compact newsletter signup, sourced from the newsletter settings singleton, when newsletterEnabled is true', async () => {
+      getPostMock.mockResolvedValue({
+        ok: true,
+        data: { ...mockPostDetail, newsletterEnabled: true },
+      });
+      getNewsletterSettingsMock.mockResolvedValue({
+        ok: true,
+        data: { heading: 'Get new posts by email', description: undefined },
+      });
+
+      await setup();
+
+      expect(screen.getByText('Get new posts by email')).toBeVisible();
+      expect(
+        screen.getByRole('textbox', { name: 'Email address' }),
+      ).toBeVisible();
+    });
+
+    it('omits the newsletter signup when the post opts out (newsletterEnabled: false)', async () => {
+      getPostMock.mockResolvedValue({
+        ok: true,
+        data: { ...mockPostDetail, newsletterEnabled: false },
+      });
+
+      await setup();
+
+      expect(
+        screen.queryByRole('textbox', { name: 'Email address' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('omits the newsletter signup when the settings fetch fails, even though newsletterEnabled is true', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      getPostMock.mockResolvedValue({
+        ok: true,
+        data: { ...mockPostDetail, newsletterEnabled: true },
+      });
+      getNewsletterSettingsMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
+
+      await setup();
+
+      expect(
+        screen.queryByRole('textbox', { name: 'Email address' }),
+      ).not.toBeInTheDocument();
+      expect(errorSpy).toHaveBeenCalled();
+      errorSpy.mockRestore();
+    });
+
+    it('hides the newsletter signup for an already-subscribed reader (cookie gate)', async () => {
+      document.cookie = 'newsletter_subscribed=1';
+      getPostMock.mockResolvedValue({
+        ok: true,
+        data: { ...mockPostDetail, newsletterEnabled: true },
+      });
+
+      await setup();
+
+      expect(
+        screen.queryByRole('textbox', { name: 'Email address' }),
+      ).not.toBeInTheDocument();
+    });
   });
 });

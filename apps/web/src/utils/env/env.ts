@@ -55,6 +55,12 @@ export const env = createEnv({
     // `Sign in <sign-in@mail.valstack.dev>` once a verified sending domain is
     // configured in Resend.
     MAGIC_LINK_FROM_ADDRESS: z.string().min(1).optional(),
+    // The newsletter confirmation email's `from` address
+    // (`@web/server/newsletter/newsletter-from-address.ts`), reusing the same
+    // `sendEmail` helper/stance as `MAGIC_LINK_FROM_ADDRESS` above: optional,
+    // falls back to Resend's own shared testing sender until a verified
+    // sending domain is configured.
+    NEWSLETTER_FROM_ADDRESS: z.string().min(1).optional(),
   },
   client: {
     NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
@@ -75,6 +81,7 @@ export const env = createEnv({
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     MAGIC_LINK_FROM_ADDRESS: process.env.MAGIC_LINK_FROM_ADDRESS,
+    NEWSLETTER_FROM_ADDRESS: process.env.NEWSLETTER_FROM_ADDRESS,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,

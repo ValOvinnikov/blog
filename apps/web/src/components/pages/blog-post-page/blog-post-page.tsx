@@ -9,6 +9,7 @@ import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { DepthProvider } from '@web/components/shared/depth-provider';
 import { DepthToggle } from '@web/components/shared/depth-toggle';
 import { JsonLd } from '@web/components/shared/json-ld';
+import { NewsletterForm } from '@web/components/shared/newsletter-form';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 import { PostContentsRail } from '@web/components/shared/post-contents-rail';
 import { PostShare } from '@web/components/shared/post-share';
@@ -70,6 +71,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
     publishedAt,
     author,
     readingTimeMinutes,
+    newsletterEnabled,
   } = post;
 
   const headings = extractPostHeadings(body);
@@ -92,12 +94,29 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
       />
     ),
   }));
-  const [format, t, blogPostT, relatedPostItems] = await Promise.all([
-    getFormatter(),
-    getTranslations('breadcrumbs'),
-    getTranslations('blogPostPage'),
-    toPostListItems(relatedPosts),
-  ]);
+  const [format, t, blogPostT, relatedPostItems, newsletterSettingsResult] =
+    await Promise.all([
+      getFormatter(),
+      getTranslations('breadcrumbs'),
+      getTranslations('blogPostPage'),
+      toPostListItems(relatedPosts),
+      service.global.newsletterSettings.v1.getNewsletterSettings(),
+    ]);
+
+  // Per-post opt-out (`newsletterEnabled`) gates the compact signup on this
+  // page; its heading is always CMS-sourced from the `settings_newsletter`
+  // singleton (never the page-builder module, never an i18n fallback —
+  // #1200). A failed settings fetch is optional/global data (SPEC.md's
+  // fetch-error stance): logged, and the signup is simply omitted rather
+  // than guessed at.
+  let newsletterHeading: string | undefined;
+  if (newsletterSettingsResult.ok) {
+    newsletterHeading = newsletterSettingsResult.data.heading ?? '';
+  } else {
+    console.error(
+      `Error to fetch newsletter settings: ${sanitizeLogMessage(newsletterSettingsResult.error)}`,
+    );
+  }
 
   const trail: IBreadcrumbItem[] = [
     { label: t('home'), href: routes.home() },
@@ -226,6 +245,12 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
             readFullArticleLabel={blogPostT('skimPanel.readFullArticle')}
           />
         </DepthProvider>
+
+        {newsletterEnabled && newsletterHeading !== undefined && (
+          <div className={s.newsletter()}>
+            <NewsletterForm variant="compact" heading={newsletterHeading} />
+          </div>
+        )}
 
         {relatedPostItems.length > 0 && (
           <PostsSection

@@ -83,4 +83,16 @@ describe(`<${BlogPageTemplate.name}/>`, () => {
 
     expect(screen.queryByTestId('social-links-slot')).not.toBeInTheDocument();
   });
+
+  it('renders modules after posts/pagination when passed', () => {
+    setup({ modules: <div data-testid="modules-slot" /> });
+
+    expect(screen.getByTestId('modules-slot')).toBeInTheDocument();
+  });
+
+  it('omits modules when not passed', () => {
+    setup();
+
+    expect(screen.queryByTestId('modules-slot')).not.toBeInTheDocument();
+  });
 });

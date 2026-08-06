@@ -73,6 +73,7 @@ export function makeRawPostDetail(
     heroImage: makeRawImage(),
     heroImageAsset: makeRawSanityImage(),
     featured: false,
+    newsletterEnabled: true,
     body: [],
     skim: null,
     seo: null,
@@ -119,6 +120,7 @@ export function makeRawBlogPage(
     heading: 'The Blog',
     supportingText: 'Notes on building things.',
     itemsPerPage: 9,
+    modules: [],
     seo: null,
     ...overrides,
   };
