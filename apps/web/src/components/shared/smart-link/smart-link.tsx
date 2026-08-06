@@ -5,6 +5,8 @@ import type { ComponentPropsWithoutRef } from 'react';
 type TSmartLinkProps = {
   href: string;
   target?: '_blank';
+  /** Forwarded to `next/link`'s own prop of the same name — set `false` for a link that isn't a real page navigation (e.g. a file-download route) so hovering it never triggers a wasted background prefetch fetch. */
+  prefetch?: boolean;
 } & Omit<ComponentPropsWithoutRef<'a'>, 'href' | 'target' | 'rel'>;
 
 const isProtocolRelative = (href: string) => href.startsWith('//');
@@ -27,6 +29,7 @@ const isProtocolRelative = (href: string) => href.startsWith('//');
 export function SmartLink({
   href,
   target,
+  prefetch,
   children,
   ...rest
 }: TSmartLinkProps) {
@@ -41,7 +44,7 @@ export function SmartLink({
   }
 
   return (
-    <Link href={href} target={target} rel={rel} {...rest}>
+    <Link href={href} target={target} rel={rel} prefetch={prefetch} {...rest}>
       {children}
     </Link>
   );

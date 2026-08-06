@@ -31,6 +31,17 @@ describe('SmartLink', () => {
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
+  it('renders normally when prefetch is disabled (e.g. a file-download link)', () => {
+    setup({
+      href: '/api/account/export',
+      prefetch: false,
+      children: 'Download',
+    });
+
+    const link = screen.getByRole('link', { name: 'Download' });
+    expect(link).toHaveAttribute('href', '/api/account/export');
+  });
+
   it('renders a protocol-relative href through plain next/link, adding rel for a new tab', () => {
     setup({
       href: '//cdn.example.com/asset',

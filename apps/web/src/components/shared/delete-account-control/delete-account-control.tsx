@@ -1,0 +1,83 @@
+'use client';
+
+import { routes } from '@blog/config';
+import { Button, TextInput } from '@blog/ui/atoms';
+import { useToast } from '@web/components/shared/toast-provider';
+import { deleteAccountAction } from '@web/server/account/account-actions';
+import { signOut } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
+import { useState, useTransition } from 'react';
+
+import { deleteAccountControlVariants } from './delete-account-control-variants';
+
+export type TDeleteAccountControlProps = {
+  /**
+   * The signed-in reader's derived handle (`toSessionUsername`) — the exact
+   * string (case-insensitively) they must retype to arm the delete button.
+   */
+  handle: string;
+};
+
+/**
+ * DeleteAccountControl — the `/account` "delete account" row's control-slot
+ * client island (#1151/#1154, D15 §4.6/6a): a typed-confirm `TextInput` that
+ * arms the danger `Button` only once its value matches `handle`
+ * case-insensitively. Slotted into `SettingRow`'s `children` from the
+ * server-rendered `AccountPage` (`web-component-practices` Rule 1 — the pure
+ * `SettingRow` never wraps this, it just renders it), so only this leaf pays
+ * for the client boundary.
+ *
+ * On confirm: calls the session-gated `deleteAccountAction` server action
+ * (which re-reads the session itself — this never trusts a client-supplied
+ * id), then signs the reader out and redirects home in one step via
+ * `next-auth/react`'s `signOut({ callbackUrl })`. A failed delete shows a
+ * retry-less error toast (the account still exists, so a plain "try again"
+ * to the same danger button is enough — no `retry` action needed like
+ * `BookmarkButton`'s optimistic toggle).
+ */
+export function DeleteAccountControl({ handle }: TDeleteAccountControlProps) {
+  const t = useTranslations('accountPage');
+  const toast = useToast();
+  const [typed, setTyped] = useState('');
+  const [isPending, startTransition] = useTransition();
+  const s = deleteAccountControlVariants();
+
+  const isArmed = typed.trim().toLowerCase() === handle.toLowerCase();
+
+  const handleDelete = () => {
+    startTransition(async () => {
+      const result = await deleteAccountAction();
+
+      if (!result.ok) {
+        toast.error({
+          command: t('deleteToastCommand'),
+          state: t('deleteToastErrorState'),
+          message: t('deleteError'),
+        });
+        return;
+      }
+
+      await signOut({ callbackUrl: routes.home() });
+    });
+  };
+
+  return (
+    <>
+      <TextInput
+        value={typed}
+        onChange={setTyped}
+        ariaLabel={t('deleteConfirmAriaLabel')}
+        placeholder={t('deleteConfirmPlaceholder', { handle })}
+        disabled={isPending}
+        className={s.field()}
+      />
+      <Button
+        variant="danger"
+        disabled={!isArmed || isPending}
+        onClick={handleDelete}
+      >
+        {t('deleteButton')}
+      </Button>
+    </>
+  );
+}
