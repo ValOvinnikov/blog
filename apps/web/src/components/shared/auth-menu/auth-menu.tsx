@@ -1,7 +1,6 @@
 'use client';
 
-import { ICONS } from '@blog/config';
-import { Icon } from '@blog/ui/atoms';
+import { Spinner } from '@blog/ui/atoms/spinner';
 import { useOAuthErrorParam } from '@web/hooks/use-oauth-error-param';
 import { usePopover } from '@web/hooks/use-popover';
 import { useSession } from 'next-auth/react';
@@ -32,24 +31,15 @@ export function AuthMenu() {
   const t = useTranslations('authMenu');
   const panelId = useId();
   const { open, toggle, triggerRef, panelRef } = usePopover();
-  const { statusIndicator, spinnerIcon } = authMenuVariants();
+  const { statusIndicator } = authMenuVariants();
 
   if (sessionResult.status === 'loading') {
     return (
-      // `role="status"`'s accessible name is "from author" only (ARIA-in-HTML) —
-      // it never picks up name-from-content, so the label has to be
-      // `aria-label`, not sr-only text inside the region.
-      <span
-        role="status"
-        aria-live="polite"
-        aria-label={t('loadingAccountStatus')}
-        className={statusIndicator()}
-      >
-        <Icon
-          name={ICONS.SPINNER}
-          aria-hidden="true"
-          className={spinnerIcon()}
-        />
+      // `Spinner` owns the live-region semantics (`role="status"` +
+      // `aria-label`) itself — this wrapper only reserves the 22×22
+      // footprint of the sign-in button / avatar trigger it stands in for.
+      <span className={statusIndicator()}>
+        <Spinner label={t('loadingAccountStatus')} />
       </span>
     );
   }
