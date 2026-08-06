@@ -1,4 +1,5 @@
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const postsSectionVariants = tv({
   slots: {
@@ -27,3 +28,5 @@ export const postsSectionVariants = tv({
     },
   },
 });
+
+export type TPostsSectionVariants = VariantProps<typeof postsSectionVariants>;
