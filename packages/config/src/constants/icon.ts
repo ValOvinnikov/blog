@@ -23,6 +23,8 @@ export const ICONS = {
   SPINNER: 'SPINNER',
   WARNING: 'WARNING',
   INFO: 'INFO',
+  SETTINGS: 'SETTINGS',
+  POWER: 'POWER',
 } as const;
 
 export type TIconName = TValueOf<typeof ICONS>;

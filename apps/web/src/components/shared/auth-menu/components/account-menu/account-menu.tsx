@@ -127,14 +127,14 @@ export function AccountMenu({
             <PopoverMenu.Item
               as={SmartLink}
               href={routes.account()}
-              icon={<span aria-hidden="true">⚙</span>}
+              icon={<Icon name={ICONS.SETTINGS} size={Size.SM} />}
             >
               {t('accountSettings')}
             </PopoverMenu.Item>
             <PopoverMenu.Item
               onClick={() => signOut()}
               className={signOutItem()}
-              icon={<span aria-hidden="true">⏻</span>}
+              icon={<Icon name={ICONS.POWER} size={Size.SM} />}
             >
               {t('signOut')}
             </PopoverMenu.Item>
