@@ -9,7 +9,6 @@ import { createSiteSettingsService } from './features/global/site-settings';
 import { createContentModuleService } from './features/modules/content';
 import { createCtaModuleService } from './features/modules/cta';
 import { createHeroModuleService } from './features/modules/hero';
-import { createNewsletterModuleService } from './features/modules/newsletter';
 import { createPostListModuleService } from './features/modules/post-list';
 import { createAuthorService } from './features/pages/author';
 import { createBlogService } from './features/pages/blog';
@@ -37,7 +36,6 @@ export const service = {
     postList: createPostListModuleService(),
     content: createContentModuleService(),
     cta: createCtaModuleService(),
-    newsletter: createNewsletterModuleService(),
   },
   entities: {
     categories: createCategoriesService(),
@@ -61,7 +59,6 @@ export type { TBrand, TSiteSettings } from './features/global/site-settings';
 export type { TContentModule } from './features/modules/content';
 export type { TCtaModule } from './features/modules/cta';
 export type { THeroModule } from './features/modules/hero';
-export type { TNewsletterModule } from './features/modules/newsletter';
 export type { TPostListModule } from './features/modules/post-list';
 export type { TAuthorDetail, TAuthorPage } from './features/pages/author';
 export type { TBlogIndexPage, TGetIndexPageArgs } from './features/pages/blog';
