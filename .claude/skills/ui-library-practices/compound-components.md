@@ -176,10 +176,18 @@ and any internal partial shared between them, gets its own
 that is genuinely shared across the alternatives (one `variant` axis, not
 independent per-child variants) is the one exception — it can stay a single
 root-level `{component}-variants.ts` instead of being split per child.
-Stories and tests still stay at the root (one `.stories.tsx` per exported
-alternative, one `.test.tsx` covering the assembly) — sub-components in
-`components/` are implementation detail, never independently exported or
-tested, same as true slot-compounds.
+Stories and tests move into `components/{name}/` alongside each alternative
+(`components/full/newsletter-signup-full.stories.tsx` +
+`.test.tsx`, same for `compact`) — each alternative is tested and
+demonstrated on its own, not through a shared root file. A thin root-level
+`.test.tsx` is only worth keeping if there's a case that exercises the
+_assembled_ export itself (e.g. `NewsletterSignup.Full`/`.Compact` identity,
+barrel shape) rather than either alternative's own behavior — otherwise
+delete it once its cases are redistributed. This differs from true
+slot-compounds (`Header`, `Hero`), where sub-components are never
+independently exported or tested and so have no stories/tests of their own
+at all — here, each namespaced alternative _is_ independently exported, so
+it gets its own.
 
 ## When NOT to use compound
 
