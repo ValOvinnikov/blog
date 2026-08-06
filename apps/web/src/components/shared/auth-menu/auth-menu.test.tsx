@@ -283,7 +283,7 @@ describe(`<${AuthMenu.name}/>`, () => {
       });
     });
 
-    it('shows the account menu with name, email, My bookmarks, and Sign out', async () => {
+    it('shows the account menu with name, email, My bookmarks, Account settings, and Sign out', async () => {
       setup();
       const user = userEvent.setup();
 
@@ -300,6 +300,9 @@ describe(`<${AuthMenu.name}/>`, () => {
       expect(
         screen.getByRole('menuitem', { name: 'My bookmarks' }),
       ).toHaveAttribute('href', '/bookmarks');
+      expect(
+        screen.getByRole('menuitem', { name: 'Account settings' }),
+      ).toHaveAttribute('href', '/account');
     });
 
     it('dresses the panel in the WindowChrome terminal shell with the real session user, not a hardcoded name', async () => {

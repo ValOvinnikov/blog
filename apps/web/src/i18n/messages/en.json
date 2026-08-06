@@ -113,7 +113,8 @@
     "accountMenuAriaLabel": "Account menu",
     "signOut": "Sign out",
     "loadingAccountStatus": "Loading account status",
-    "myBookmarks": "My bookmarks"
+    "myBookmarks": "My bookmarks",
+    "accountSettings": "Account settings"
   },
   "toastProvider": {
     "viewportAriaLabel": "Notifications",
