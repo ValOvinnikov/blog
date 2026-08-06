@@ -1,7 +1,7 @@
 import type { IWithDataTestId } from '@blog/config';
 import type { HTMLAttributes } from 'react';
 
-import { spinnerVariants } from './spinner-variants';
+import { spinnerVariants, type TSpinnerVariants } from './spinner-variants';
 
 export type TSpinnerProps = Omit<
   HTMLAttributes<HTMLSpanElement>,
@@ -10,6 +10,7 @@ export type TSpinnerProps = Omit<
   IWithDataTestId & {
     label: string;
     showLabel?: boolean;
+    size?: TSpinnerVariants['size'];
   };
 
 /**
@@ -27,11 +28,12 @@ export type TSpinnerProps = Omit<
 export const Spinner = ({
   label,
   showLabel = false,
+  size,
   className,
   dataTestId,
   ...rest
 }: TSpinnerProps) => {
-  const { root, glyph, text } = spinnerVariants();
+  const { root, glyph, text } = spinnerVariants({ size });
 
   return (
     <span
