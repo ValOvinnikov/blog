@@ -1,4 +1,5 @@
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const newsletterSignupVariants = tv({
   slots: {
@@ -44,3 +45,7 @@ export const newsletterSignupVariants = tv({
   },
   defaultVariants: { variant: 'full' },
 });
+
+export type TNewsletterSignupVariants = VariantProps<
+  typeof newsletterSignupVariants
+>;

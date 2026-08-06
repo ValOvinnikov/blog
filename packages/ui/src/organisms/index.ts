@@ -8,9 +8,8 @@ export * from './footer';
 export * from './header';
 export * from './hero';
 export type {
-  INewsletterSignupProps,
-  TNewsletterSignupStatus,
-  TNewsletterSignupVariant,
+  INewsletterSignupCompactProps,
+  INewsletterSignupFullProps,
 } from './newsletter-signup';
 export { NewsletterSignup } from './newsletter-signup';
 export type { IPaginationProps } from './pagination';
