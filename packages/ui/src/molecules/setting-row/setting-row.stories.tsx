@@ -1,7 +1,9 @@
+import { Avatar } from '@blog/ui/atoms/avatar';
 import { Button } from '@blog/ui/atoms/button';
 import { TextInput } from '@blog/ui/atoms/text-input';
 import { WindowChrome } from '@blog/ui/molecules/window-chrome';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 
 import { SettingRow } from './setting-row';
 
@@ -38,6 +40,50 @@ export const MultipleControls: TStory = {
       </>
     ),
   },
+};
+
+const WideControlDemo = () => {
+  const [name, setName] = useState('Bartholomew Featherstonehaugh-Whitmore');
+
+  return (
+    <WindowChrome>
+      <WindowChrome.Bar>
+        <WindowChrome.User>val</WindowChrome.User>
+        <WindowChrome.Prompt>@ovinnikov:~$</WindowChrome.Prompt> account
+        --identity
+      </WindowChrome.Bar>
+      <WindowChrome.Body>
+        <SettingRow
+          label="Display name"
+          description="Overrides your provider handle wherever your comments appear."
+        >
+          {/* Mirrors the avatar+input / save-button control layout a
+              consuming app slots into this row, so the content column's
+              max-width is checked against the same nested flex-grow
+              chain a real long-value control would use. */}
+          <div className="flex w-full flex-col gap-2 md:w-auto md:flex-row md:flex-wrap md:items-center">
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+              <Avatar name={name} alt="" />
+              <TextInput
+                value={name}
+                onChange={setName}
+                ariaLabel="Display name"
+                prompt="›"
+                className="min-w-0 flex-1"
+              />
+            </div>
+            <Button variant="primary" className="w-full md:w-auto">
+              save
+            </Button>
+          </div>
+        </SettingRow>
+      </WindowChrome.Body>
+    </WindowChrome>
+  );
+};
+
+export const WideControlContent: TStory = {
+  render: () => <WideControlDemo />,
 };
 
 export const Danger: TStory = {
