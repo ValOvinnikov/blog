@@ -2,11 +2,12 @@ import type { IWithDataTestId } from '@blog/config';
 import { Button } from '@blog/ui/atoms/button';
 import { StatusBadge } from '@blog/ui/atoms/status-badge';
 import { SettingRow } from '@blog/ui/molecules/setting-row';
+import type { ReactNode } from 'react';
 
 type TNewsletterPreferencesSectionSharedProps = {
   title: string;
   badgeLabel: string;
-  description: string;
+  description: ReactNode;
   actionLabel: string;
 };
 

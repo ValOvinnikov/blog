@@ -8,6 +8,7 @@ faker.seed(123);
 
 const title = faker.lorem.words(2);
 const description = faker.lorem.sentence();
+const email = faker.internet.email();
 
 describe(`<${NewsletterPreferencesSection.name}/>`, () => {
   describe('active status', () => {
@@ -16,7 +17,11 @@ describe(`<${NewsletterPreferencesSection.name}/>`, () => {
       status: 'active',
       title,
       badgeLabel: 'subscribed',
-      description,
+      description: (
+        <>
+          Weekly posts delivered to <span>{email}</span>.
+        </>
+      ),
       actionLabel: 'unsubscribe',
       onUnsubscribe,
     });
@@ -36,8 +41,8 @@ describe(`<${NewsletterPreferencesSection.name}/>`, () => {
       expect(screen.getByText('subscribed')).toBeVisible();
     });
 
-    it('renders the given description', () => {
-      expect(screen.getByText(description)).toBeVisible();
+    it('renders rich description content, e.g. an embedded email element', () => {
+      expect(screen.getByText(email)).toBeVisible();
     });
 
     it('calls onUnsubscribe when the action button is clicked', async () => {

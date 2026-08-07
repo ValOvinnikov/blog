@@ -31,8 +31,13 @@ export const Active: TStory = {
   args: {
     status: 'active',
     badgeLabel: 'subscribed',
-    description:
-      'Weekly posts delivered to val@icloud.com (your account email — read-only in v1).',
+    description: (
+      <>
+        Weekly posts delivered to{' '}
+        <span className="font-mono text-text">val@icloud.com</span> (your
+        account email — read-only in v1).
+      </>
+    ),
     actionLabel: 'unsubscribe',
     onUnsubscribe: () => {},
   },
