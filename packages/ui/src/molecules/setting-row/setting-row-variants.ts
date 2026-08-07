@@ -19,6 +19,10 @@ export const settingRowVariants = tv({
     tone: {
       default: {
         root: ['border-t border-dashed border-border first:border-t-0'],
+        control: [
+          'w-full flex-col items-stretch',
+          'md:w-auto md:flex-row md:items-center',
+        ],
       },
       danger: {
         root: [

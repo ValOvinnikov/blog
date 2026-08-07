@@ -27,6 +27,19 @@ export const WithoutControl: TStory = {
   args: { children: undefined },
 };
 
+export const MultipleControls: TStory = {
+  args: {
+    label: 'Connected identity',
+    description: 'Link a provider to sign in without a password.',
+    children: (
+      <>
+        <Button variant="ghost">link GitHub</Button>
+        <Button variant="ghost">unlink Google</Button>
+      </>
+    ),
+  },
+};
+
 export const Danger: TStory = {
   args: {
     tone: 'danger',
