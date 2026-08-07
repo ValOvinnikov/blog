@@ -198,6 +198,26 @@ describe('getPost', () => {
     ]);
   });
 
+  it('maps newsletterEnabled straight through from the raw post', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostDetail({ newsletterEnabled: false }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world');
+
+    expect(result?.newsletterEnabled).toBe(false);
+  });
+
+  it('defaults newsletterEnabled to true when absent', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostDetail({ newsletterEnabled: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('hello-world');
+
+    expect(result?.newsletterEnabled).toBe(true);
+  });
+
   it('maps an absent tags field to an empty array', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawPostDetail({ tags: null }))

@@ -7,6 +7,7 @@ import { homePageSchema } from './pages/home-page';
 import { genericSchema } from './pages/page';
 import { footerSchema } from './settings/footer';
 import { navigationSchema } from './settings/navigation';
+import { newsletterSettingsSchema } from './settings/newsletter';
 import { siteSchema } from './settings/site-settings';
 
 export const documents = [
@@ -20,4 +21,5 @@ export const documents = [
   siteSchema,
   navigationSchema,
   footerSchema,
+  newsletterSettingsSchema,
 ];

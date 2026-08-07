@@ -1,4 +1,8 @@
+import { defineModulesField } from '@cms/schema-types/helpers/define-modules-field';
 import { titleField } from '@cms/schema-types/helpers/title-field';
+import { ctaSchema } from '@cms/schema-types/modules/module-cta';
+import { newsletterSchema } from '@cms/schema-types/modules/module-newsletter';
+import { postListSchema } from '@cms/schema-types/modules/module-post-list';
 import { seoSchema } from '@cms/schema-types/objects/seo';
 import { Newspaper } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -41,6 +45,9 @@ export const blogPageSchema = defineType({
       description: 'Posts shown per page.',
       initialValue: 9,
       validation: (rule) => rule.required().min(1).max(24).integer(),
+    }),
+    defineModulesField({
+      allow: [postListSchema.name, ctaSchema.name, newsletterSchema.name],
     }),
     defineField({
       name: 'seo',

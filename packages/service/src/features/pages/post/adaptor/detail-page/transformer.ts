@@ -57,6 +57,11 @@ export function toPostDetail(
     heroImageAlt: raw.heroImage?.alt,
     heroImageSanity: toSanityImage(raw.heroImageAsset),
     featured: raw.featured ?? false,
+    // Schema default is `initialValue: true` (studio-only, not a stored
+    // fallback) — the migration backfilled every existing post's stored
+    // value to `true`, so `?? true` here only covers a theoretical
+    // unmigrated row, mirroring `featured`'s own `?? false` shape.
+    newsletterEnabled: raw.newsletterEnabled ?? true,
     body: raw.body,
     skim: toPostSkim(raw.skim),
     // `_type: 'aside'` is the schema's own registered block name (`apps/cms/src/schema-types/objects/aside.ts`),

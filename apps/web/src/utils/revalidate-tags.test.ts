@@ -22,6 +22,18 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
+  it('maps the newsletter module to its ISR tag plus the per-document tag', () => {
+    expect(
+      getRevalidateTagsForType('module_newsletter', 'newsletter-1'),
+    ).toEqual(['modules:newsletter', 'module:newsletter-1']);
+  });
+
+  it('maps the newsletter settings singleton to its ISR tag', () => {
+    expect(
+      getRevalidateTagsForType('settings_newsletter', 'settings-newsletter'),
+    ).toEqual(['newsletter-settings']);
+  });
+
   it('returns an empty list for an unknown type', () => {
     expect(getRevalidateTagsForType('nope', 'x')).toEqual([]);
   });

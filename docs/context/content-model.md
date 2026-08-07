@@ -39,6 +39,11 @@ array.
   text).
 - `module_cta` (`ctaSchema`) — internal `title`, `heading`, `text`, `action`
   (`link`, required).
+- `module_newsletter` (`newsletterSchema`) — internal `title`, `heading`
+  (required, max 80), `description` (optional, max 300). `heading`/
+  `description` come from the shared `newsletterContentFields()` helper
+  (`schema-types/helpers/newsletter-content-fields.ts`), reused by
+  `settings_newsletter` below.
 
 Every module document gets a required internal `title` via the reusable
 `titleField` helper (§ below) so it's listable/previewable in Studio
@@ -52,15 +57,18 @@ independent of its display fields.
   reference to a `module_hero`, kept
   separate from the module list — it always renders first), `modules` (array of
   references via `defineModulesField({ allow: [MODULE_TYPE.POST_LIST,
-MODULE_TYPE.CTA] })`), `seo`.
+MODULE_TYPE.CTA, MODULE_TYPE.NEWSLETTER] })`), `seo`.
 - `page_generic` (`genericSchema`) — `title`, `slug` (source: title),
   `modules` (array of references via `defineModulesField({ allow:
 [MODULE_TYPE.CONTENT, MODULE_TYPE.CTA] })`), `seo`.
-- `page_blog` (`blogPageSchema`, singleton) — the `/blog` index page config; a
-  non-module singleton: `titleField` (internal Studio label; `preview.prepare`
-  falls back to the generic "Unknown" when unset), `heading` (the
-  page `<h1>`), `supportingText` (optional line under it), `itemsPerPage`
-  (number, 1–24, drives the pagination window size), `seo`.
+- `page_blog` (`blogPageSchema`, singleton) — the `/blog` index page config:
+  `titleField` (internal Studio label; `preview.prepare` falls back to the
+  generic "Unknown" when unset), `heading` (the page `<h1>`), `supportingText`
+  (optional line under it), `itemsPerPage` (number, 1–24, drives the
+  pagination window size), `modules` (array of references via
+  `defineModulesField({ allow: [MODULE_TYPE.POST_LIST, MODULE_TYPE.CTA,
+MODULE_TYPE.NEWSLETTER] })`, optional — editors opt a newsletter-signup
+  module (or others) into this page rather than it being hardcoded), `seo`.
 
 `defineModulesField({ allow, description? })`
 (`schema-types/helpers/define-modules-field.ts`) builds the `modules` array
@@ -74,7 +82,9 @@ replacing a hand-duplicated block per page document.
   post without one renders imageless rather than 404ing), author (ref),
   category (ref → `category`, required — the post's single primary
   classification), tags (refs → `tag`, optional, max 6), publishedAt, body
-  (portable text incl. code blocks and `aside` blocks), featured, seo, skim
+  (portable text incl. code blocks and `aside` blocks), featured,
+  `newsletterEnabled` (boolean, default `true` — per-post opt-out of the
+  newsletter-signup form shown on its post page), seo, skim
   (`skim` object, **optional** — `takeaways` (3-7 items, each max 160 chars),
   `generatedAt`/`model` read-only in Studio; pipeline-populated for the
   choose-your-depth reading feature, #957).
@@ -82,25 +92,35 @@ replacing a hand-duplicated block per page document.
 - `category` — title, slug, description.
 - `tag` — title, slug, description, seo (topic taxonomy for posts; drives the
   `/tag` archives + related-posts, alongside the section-level `category`).
-- `siteSettings` (singleton) — `titleField` (read-only, fixed value), brand
+- `siteSettings` (singleton) — `titleField` (bare; see helper note below),
+  brand
   (`brand` object: name/prefix/suffix/logo/specLine/variant — `specLine` is
   a `specLine` object, `{ items: string[] (max 4, each max 15 chars),
 separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
   service layer can join it with a chosen separator glyph), description,
   tagline, `defaultOgImage` (`imageWithAlt`, required — the last-resort
   social image).
-- `settings_navigation` (singleton) — `titleField` (read-only, fixed value),
-  items (links).
-- `settings_footer` (singleton) — `titleField` (read-only, fixed value),
+- `settings_navigation` (singleton) — `titleField` (bare; see helper note
+  below), items (links).
+- `settings_footer` (singleton) — `titleField` (bare; see helper note below),
   social links.
+- `settings_newsletter` (singleton) — `titleField` (bare; see helper note
+  below), `heading` (required, max 80), `description` (optional, max 300) —
+  the CMS-authored source of the newsletter form's copy wherever it's
+  rendered outside the `module_newsletter` page-builder placement (e.g. the
+  per-post compact form gated by `post.newsletterEnabled`). Lives in the
+  desk's **Blog** section, directly after Authors, not the top-level
+  Settings group.
 
 **Reusable `titleField` helper** (`schema-types/helpers/title-field.ts`) —
 `titleField({ initialValue?, readOnly?, description?, max? })` returns a
-required `defineField({ name: 'title', type: 'string', … })`. Singletons pass
-a fixed `initialValue` + `readOnly: true` (this — not `preview.prepare` or the
-desk `S.document().title()`, which only labels the list item — is what fixes
-the document form showing "Untitled"). Content/module documents pass `max`
-for an editable headline.
+required `defineField({ name: 'title', type: 'string', … })`. Keep it **bare**
+for singletons: a fixed `initialValue` + `readOnly: true` does **not** fix the
+Studio "Untitled" heading — `initialValue` doesn't fire for a singleton
+opened by `documentId`, and `readOnly` then leaves the field permanently
+empty. Singletons resolve their Studio label via `preview.prepare` instead
+(select `title`, fall back to `'Unknown'`). Content/module documents pass
+`max` for an editable headline.
 
 **Objects** — `link` (unified internal/external, `LINK_TYPE` const),
 `socialLink`, `brand`, `specLine` (structured spec-line: `items` + a

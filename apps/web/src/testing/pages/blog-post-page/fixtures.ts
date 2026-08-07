@@ -10,6 +10,7 @@ export const mockPostDetail: TPostDetail = {
   heroImageAlt: 'A hero image',
   heroImageSanity: undefined,
   featured: false,
+  newsletterEnabled: true,
   body: [
     {
       _type: 'block',

@@ -15,6 +15,17 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../../packages/config/src/sanity/generated/schema.json
+export type Module_newsletter = {
+  _id: string;
+  _type: 'module_newsletter';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  heading?: string;
+  description?: string;
+};
+
 export type Module_cta = {
   _id: string;
   _type: 'module_cta';
@@ -224,6 +235,17 @@ export type ImageWithAlt = {
   alt?: string;
 };
 
+export type Settings_newsletter = {
+  _id: string;
+  _type: 'settings_newsletter';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  heading?: string;
+  description?: string;
+};
+
 export type Settings_footer = {
   _id: string;
   _type: 'settings_footer';
@@ -265,26 +287,6 @@ export type Settings_site = {
   defaultOgImage?: ImageWithAlt;
 };
 
-export type Page_blog = {
-  _id: string;
-  _type: 'page_blog';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  heading?: string;
-  supportingText?: string;
-  itemsPerPage?: number;
-  seo?: Seo;
-};
-
-export type Module_heroReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_hero';
-};
-
 export type Module_postListReference = {
   _ref: string;
   _type: 'reference';
@@ -297,6 +299,44 @@ export type Module_ctaReference = {
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'module_cta';
+};
+
+export type Module_newsletterReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_newsletter';
+};
+
+export type Page_blog = {
+  _id: string;
+  _type: 'page_blog';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  heading?: string;
+  supportingText?: string;
+  itemsPerPage?: number;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_postListReference)
+    | ({
+        _key: string;
+      } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
+  >;
+  seo?: Seo;
+};
+
+export type Module_heroReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_hero';
 };
 
 export type Page_home = {
@@ -314,6 +354,9 @@ export type Page_home = {
     | ({
         _key: string;
       } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
   >;
   seo?: Seo;
 };
@@ -416,6 +459,7 @@ export type Blog_post = {
   publishedAt?: string;
   body?: RichText;
   featured?: boolean;
+  newsletterEnabled?: boolean;
   skim?: Skim;
   seo?: Seo;
 };
@@ -580,6 +624,7 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | Module_newsletter
   | Module_cta
   | Blog_postReference
   | Blog_categoryReference
@@ -600,13 +645,15 @@ export type AllSanitySchemaTypes =
   | SanityImageAssetReference
   | BodyImage
   | ImageWithAlt
+  | Settings_newsletter
   | Settings_footer
   | Settings_navigation
   | Settings_site
-  | Page_blog
-  | Module_heroReference
   | Module_postListReference
   | Module_ctaReference
+  | Module_newsletterReference
+  | Page_blog
+  | Module_heroReference
   | Page_home
   | Module_hero
   | Module_contentReference

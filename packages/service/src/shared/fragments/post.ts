@@ -54,6 +54,7 @@ export const postDetailFragment = q
       .project(sanityImageFragment)
       .nullable(true),
     featured: sub.field('featured').nullable(true),
+    newsletterEnabled: sub.field('newsletterEnabled').nullable(true),
     body: sub.field('body[]').notNull(),
     skim: sub.field('skim').project(skimFragment).nullable(true),
     seo: sub.field('seo').project(seoFragment).nullable(true),

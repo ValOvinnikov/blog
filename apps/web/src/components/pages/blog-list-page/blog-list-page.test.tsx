@@ -8,10 +8,28 @@ import { notFound } from 'next/navigation';
 
 import { BlogListPage } from './blog-list-page';
 
-const { getIndexPageMock, getCategoriesMock } = vi.hoisted(() => ({
-  getIndexPageMock: vi.fn(),
-  getCategoriesMock: vi.fn(),
-}));
+const { getIndexPageMock, getCategoriesMock, moduleRendererMock } = vi.hoisted(
+  () => ({
+    getIndexPageMock: vi.fn(),
+    getCategoriesMock: vi.fn(),
+    // `ModuleRenderer` (and every module it dispatches to) is an async
+    // Server Component — real RSC async-component nesting isn't
+    // renderable through `@testing-library/react`'s client renderer (only
+    // Next's own RSC pipeline supports it, the same reason the home route's
+    // `page.tsx` composition has no test of its own). Stubbed as a plain
+    // sync component so this suite can assert BlogListPage passes the
+    // right `modules`/`locale` through without needing a real async render;
+    // `ModuleRenderer`'s own dispatch logic is covered by
+    // `module-renderer.test.tsx`.
+    moduleRendererMock: vi.fn(
+      ({ modules }: { modules: { id: string; type: string }[] }) => (
+        <div data-testid="module-renderer-stub">
+          {modules.map((module) => module.type).join(',')}
+        </div>
+      ),
+    ),
+  }),
+);
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -22,6 +40,10 @@ vi.mock('@blog/service', () => ({
       categories: { v1: { getCategories: getCategoriesMock } },
     },
   },
+}));
+
+vi.mock('@web/modules/module-renderer', () => ({
+  ModuleRenderer: moduleRendererMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -46,12 +68,13 @@ const post = makePostCard({
   category: makePostCardCategory(),
 });
 
-const setup = customRenderAsync(BlogListPage, { page: 1 });
+const setup = customRenderAsync(BlogListPage, { page: 1, locale: 'en' });
 
 describe(`<${BlogListPage.name}/>`, () => {
   beforeEach(() => {
     getIndexPageMock.mockReset();
     getCategoriesMock.mockReset();
+    moduleRendererMock.mockClear();
     getCategoriesMock.mockResolvedValue({
       ok: true,
       data: [
@@ -67,7 +90,13 @@ describe(`<${BlogListPage.name}/>`, () => {
   it('calls notFound() when the requested page is beyond totalPages', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
-      data: { posts: [post], currentPage: 5, totalPages: 1, total: 1 },
+      data: {
+        posts: [post],
+        modules: [],
+        currentPage: 5,
+        totalPages: 1,
+        total: 1,
+      },
     });
 
     await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');
@@ -95,6 +124,7 @@ describe(`<${BlogListPage.name}/>`, () => {
       data: {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
+        modules: [],
         posts: [post],
         currentPage: 1,
         totalPages: 3,
@@ -121,6 +151,7 @@ describe(`<${BlogListPage.name}/>`, () => {
       data: {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
+        modules: [],
         posts: [],
         currentPage: 1,
         totalPages: 1,
@@ -145,6 +176,7 @@ describe(`<${BlogListPage.name}/>`, () => {
       data: {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
+        modules: [],
         posts: [post],
         currentPage: 2,
         totalPages: 3,
@@ -169,6 +201,7 @@ describe(`<${BlogListPage.name}/>`, () => {
       data: {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
+        modules: [],
         posts: [post],
         currentPage: 1,
         totalPages: 3,
@@ -197,6 +230,7 @@ describe(`<${BlogListPage.name}/>`, () => {
       data: {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
+        modules: [],
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -222,6 +256,7 @@ describe(`<${BlogListPage.name}/>`, () => {
       data: {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
+        modules: [],
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -246,6 +281,7 @@ describe(`<${BlogListPage.name}/>`, () => {
       data: {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
+        modules: [],
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -264,6 +300,56 @@ describe(`<${BlogListPage.name}/>`, () => {
     expect(breadcrumbScript).toBeDefined();
     expect(breadcrumbScript?.textContent).toContain(
       '"item":"https://example.com/blog"',
+    );
+  });
+
+  it('passes an empty modules array to ModuleRenderer when the editor has not added any', async () => {
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Blog',
+        supportingText: 'Essays and notes.',
+        modules: [],
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    await setup();
+
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({ modules: [], locale: 'en' }),
+      undefined,
+    );
+  });
+
+  it('passes the page-builder modules through to ModuleRenderer when an editor has added one via page_blog.modules', async () => {
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Blog',
+        supportingText: 'Essays and notes.',
+        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    await setup();
+
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
+        locale: 'en',
+      }),
+      undefined,
+    );
+    expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
+      'module_newsletter',
     );
   });
 });

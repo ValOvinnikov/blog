@@ -69,6 +69,12 @@ export const blogPostPageVariants = tv({
     // of its own (`ml-auto` only), so this is the wrapper that gives the two
     // actions consistent spacing.
     metaActions: ['inline-flex items-center gap-2'],
+    // The end-of-article `NewsletterForm` (`compact`) strip — same width cap
+    // as `footer`/`footerInRail` (`max-w-measure` + `px-gutter`) so its
+    // left/right edges line up with the article body. `mt-6` (not the
+    // reverted implementation's `mt-10`) — a slim single-row strip reads as
+    // its own low-weight block without needing as much separation (#1200).
+    newsletter: ['mx-auto w-full', 'px-gutter', 'max-w-measure', 'mt-6'],
   },
   variants: {
     // No `max-w-measure` on `body` itself: `rail`/`footerInRail` cap their

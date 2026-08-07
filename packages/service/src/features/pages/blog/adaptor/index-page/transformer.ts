@@ -1,6 +1,7 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toArchivePostCard } from '@blog/service/shared/transformers/to-archive-post-card';
+import { toModule } from '@blog/service/shared/transformers/to-module';
 import { toTotalPages } from '@blog/utils';
 import type { InferResultType } from 'groqd';
 
@@ -22,6 +23,7 @@ export function toIndexPage(
   return {
     heading: rawPage.heading,
     supportingText: rawPage.supportingText ?? undefined,
+    modules: (rawPage.modules ?? []).map(toModule),
     seo: resolveSeo(
       rawPage.seo ?? undefined,
       { title: rawPage.heading },

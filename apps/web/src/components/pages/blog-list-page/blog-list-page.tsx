@@ -7,6 +7,7 @@ import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { CategoryChipList } from '@web/components/shared/category-chip-list';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { ModuleRenderer } from '@web/modules/module-renderer';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { getCategoriesSafely } from '@web/utils/get-categories-safely';
@@ -15,16 +16,19 @@ import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
-type TBlogListPageProps = { page: number };
+type TBlogListPageProps = { page: number; locale: string };
 
 /**
  * BlogListPage — shared composition for `/blog` (page 1) and
  * `/blog/page/[page]` (pages ≥ 2): fetches one page window via the blog
  * service, renders a `Home › Blog` `Breadcrumbs` trail (plus its
  * `BreadcrumbList` JSON-LD) inside a `BreadcrumbBar` sibling before `<main>`,
- * then renders the archive content through the pure ui organisms.
+ * then renders the archive content through the pure ui organisms. Any
+ * editor-added page-builder modules (`page_blog.modules` — today just the
+ * optional newsletter signup, #1200) render last, through the same
+ * `ModuleRenderer` the home page uses — no hardcoded placement.
  */
-export async function BlogListPage({ page }: TBlogListPageProps) {
+export async function BlogListPage({ page, locale }: TBlogListPageProps) {
   const [result, categories, t, breadcrumbsT, blogListT] = await Promise.all([
     service.pages.blog.v1.getIndexPage({ page }),
     getCategoriesSafely(),
@@ -40,7 +44,7 @@ export async function BlogListPage({ page }: TBlogListPageProps) {
     notFound();
   }
 
-  const { heading, supportingText, posts, currentPage, totalPages } =
+  const { heading, supportingText, modules, posts, currentPage, totalPages } =
     result.data;
 
   // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
@@ -94,6 +98,7 @@ export async function BlogListPage({ page }: TBlogListPageProps) {
             linkAs={SmartLink}
           />
         }
+        modules={<ModuleRenderer modules={modules} locale={locale} />}
       />
     </>
   );

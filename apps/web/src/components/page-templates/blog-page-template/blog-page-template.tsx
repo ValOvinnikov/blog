@@ -10,6 +10,7 @@ export interface IBlogPageTemplateProps {
   socialLinks?: ReactNode;
   posts: ReactNode;
   pagination?: ReactNode;
+  modules?: ReactNode;
 }
 
 const s = blogPageTemplateVariants();
@@ -23,7 +24,10 @@ const s = blogPageTemplateVariants();
  * eyebrow and avatar); `categoryChips` and `socialLinks` both render after
  * `supportingText`, before `posts` — `categoryChips` first (e.g. the
  * category chip nav row), then `socialLinks` (e.g. an author's social
- * links). `Header`/`Footer` stay owned by `layout.tsx`, matching
+ * links). `modules` renders after `pagination` — the Blog index page's own
+ * optional page-builder placement (`page_blog.modules`, rendered through
+ * `ModuleRenderer`); every other archive using this template simply never
+ * passes it. `Header`/`Footer` stay owned by `layout.tsx`, matching
  * `HomePageTemplate`.
  */
 export const BlogPageTemplate = ({
@@ -34,6 +38,7 @@ export const BlogPageTemplate = ({
   socialLinks,
   posts,
   pagination,
+  modules,
 }: IBlogPageTemplateProps) => (
   <main className={s.root()}>
     {introHeader ? <div className={s.introHeader()}>{introHeader}</div> : null}
@@ -47,5 +52,6 @@ export const BlogPageTemplate = ({
     {socialLinks ? <div className={s.socialLinks()}>{socialLinks}</div> : null}
     {posts}
     {pagination}
+    {modules}
   </main>
 );

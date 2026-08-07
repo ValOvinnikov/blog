@@ -1,6 +1,7 @@
 import { BRAND_VARIANTS } from '@blog/config';
 import type { TRawFooter } from '@blog/service/features/global/footer/adaptor/transformer';
 import type { TRawNavigation } from '@blog/service/features/global/navigation/adaptor/transformer';
+import type { TRawNewsletterSettings } from '@blog/service/features/global/newsletter-settings/adaptor/transformer';
 import type { TRawSiteSettings } from '@blog/service/features/global/site-settings/adaptor/transformer';
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 
@@ -35,6 +36,16 @@ export function makeRawNavigation(
 export function makeRawFooter(overrides: Partial<TRawFooter> = {}): TRawFooter {
   return {
     social: null,
+    ...overrides,
+  };
+}
+
+export function makeRawNewsletterSettings(
+  overrides: Partial<TRawNewsletterSettings> = {},
+): TRawNewsletterSettings {
+  return {
+    heading: 'Stay in the loop',
+    description: 'Get new posts in your inbox.',
     ...overrides,
   };
 }
