@@ -27,6 +27,8 @@ import InfoComponent from '@blog/ui/assets/icons/info.svg';
 import InfoUrl from '@blog/ui/assets/icons/info.svg?url';
 import LinkedInComponent from '@blog/ui/assets/icons/linkedin.svg';
 import LinkedInUrl from '@blog/ui/assets/icons/linkedin.svg?url';
+import MailComponent from '@blog/ui/assets/icons/mail.svg';
+import MailUrl from '@blog/ui/assets/icons/mail.svg?url';
 import MenuRowsComponent from '@blog/ui/assets/icons/menu-rows.svg';
 import MenuRowsUrl from '@blog/ui/assets/icons/menu-rows.svg?url';
 import MenuComponent from '@blog/ui/assets/icons/menu.svg';
@@ -89,4 +91,5 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.INFO]: { component: InfoComponent, url: InfoUrl },
   [ICONS.SETTINGS]: { component: SettingsComponent, url: SettingsUrl },
   [ICONS.POWER]: { component: PowerComponent, url: PowerUrl },
+  [ICONS.MAIL]: { component: MailComponent, url: MailUrl },
 };
