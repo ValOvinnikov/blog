@@ -187,6 +187,32 @@
       "deleteToastSuccessMessage": "Your account has been deleted.",
       "deleteToastErrorState": "failed",
       "deleteError": "Couldn't delete your account. Try again."
+    },
+    "newsletter": {
+      "promptHost": "~$",
+      "promptCommand": "account --email",
+      "label": "Newsletter",
+      "activeBadge": "subscribed",
+      "activeDescriptionPrefix": "Weekly posts delivered to",
+      "activeDescriptionSuffix": "(your account email — read-only in v1).",
+      "unsubscribeButton": "unsubscribe",
+      "pendingBadge": "pending confirmation",
+      "pendingDescription": "The double-opt-in link hasn't been clicked yet. Resend it if it never arrived.",
+      "resendButton": "↻ resend confirmation",
+      "unsubscribeToastCommand": "newsletter",
+      "unsubscribeToastLoadingState": "unsubscribing",
+      "unsubscribeToastLoadingMessage": "Unsubscribing…",
+      "unsubscribeToastSuccessState": "unsubscribed",
+      "unsubscribeToastSuccessMessage": "You've been unsubscribed.",
+      "unsubscribeToastErrorState": "failed",
+      "unsubscribeError": "Couldn't unsubscribe. Try again.",
+      "resendToastCommand": "newsletter",
+      "resendToastLoadingState": "resending",
+      "resendToastLoadingMessage": "Resending the confirmation email…",
+      "resendToastSuccessState": "resent",
+      "resendToastSuccessMessage": "Confirmation email resent.",
+      "resendToastErrorState": "failed",
+      "resendError": "Couldn't resend the confirmation email. Try again."
     }
   }
 }
