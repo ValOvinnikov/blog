@@ -78,13 +78,46 @@ describe(`<${IdentitySection.name}/>`, () => {
     await setup();
 
     expect(screen.getAllByText('✓ linked')).toHaveLength(2);
-    expect(screen.getByText('○ not linked')).toBeVisible();
     expect(
       screen.getByTestId('provider-link-control-github'),
     ).toHaveTextContent('unlink');
     expect(
       screen.getByTestId('provider-link-control-google'),
     ).toHaveTextContent('unlink');
+  });
+
+  it('renders each provider name as a level-3 heading, keeping the rows in the page heading outline', async () => {
+    authMock.mockResolvedValue(authedSession);
+    getLinkedProvidersMock.mockResolvedValue({
+      github: true,
+      google: false,
+      emailLink: true,
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'GitHub' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Google' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Email link' }),
+    ).toBeVisible();
+  });
+
+  it('shows no status text for a provider that is not linked', async () => {
+    authMock.mockResolvedValue(authedSession);
+    getLinkedProvidersMock.mockResolvedValue({
+      github: false,
+      google: true,
+      emailLink: true,
+    });
+
+    await setup();
+
+    expect(screen.queryByText(/not linked/)).not.toBeInTheDocument();
   });
 
   it('shows a link control for a provider that is not linked', async () => {
@@ -115,9 +148,13 @@ describe(`<${IdentitySection.name}/>`, () => {
     expect(
       screen.queryByTestId('provider-link-control-github'),
     ).not.toBeInTheDocument();
+    const linkedStatus = screen.getByText('✓ linked');
+    const notice = screen.getByText("last remaining method — can't unlink");
+    expect(notice).toBeVisible();
     expect(
-      screen.getByText("last remaining method — can't unlink"),
-    ).toBeVisible();
+      linkedStatus.compareDocumentPosition(notice) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it('shows the last-method notice for email link when it is the only linked method', async () => {
