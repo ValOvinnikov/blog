@@ -24,12 +24,15 @@ const s = accountPageVariants();
  * and owns its own `WindowChrome` markup — `AccountPage` itself no longer
  * composes any section's JSX directly.
  *
- * **Ordering rule:** 6a "privacy & data" (`PrivacySection`) always renders
- * *last* — a fixed anchor at the bottom of the page, the standard
- * settings-page convention for a danger-zone section, regardless of build
- * order or how many other sections exist. Every new section (6b now, 6c in
- * #1162, and beyond) inserts itself *above* `PrivacySection` in this list,
- * never below it.
+ * **Ordering rule:** the page's fixed, final section order (top to bottom)
+ * is **6c, then 6b, then 6a** — 6a "privacy & data" (`PrivacySection`)
+ * always renders *last*, a fixed anchor at the bottom of the page (the
+ * standard settings-page convention for a danger-zone section), and 6c
+ * "connected accounts / identity" (#1162, not yet built) always renders
+ * *first*, above 6b "email & newsletter preferences" (`NewsletterSection`).
+ * So 6b inserts itself directly above `PrivacySection`, as it does today,
+ * and when 6c lands it inserts itself above `NewsletterSection` — never
+ * between `NewsletterSection` and `PrivacySection`.
  */
 export async function AccountPage() {
   const session = await auth();
