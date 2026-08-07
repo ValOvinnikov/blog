@@ -36,10 +36,10 @@ export function AuthMenu() {
   if (sessionResult.status === 'loading') {
     return (
       // `Spinner` owns the live-region semantics (`role="status"` +
-      // `aria-label`) itself — this wrapper only reserves the 22×22
+      // `aria-label`) itself — this wrapper only reserves the 32×32
       // footprint of the sign-in button / avatar trigger it stands in for.
       <span className={statusIndicator()}>
-        <Spinner label={t('loadingAccountStatus')} />
+        <Spinner size="LG" label={t('loadingAccountStatus')} />
       </span>
     );
   }
