@@ -46,6 +46,8 @@ type TToastPhase = 'entering' | 'visible' | 'leaving';
 export interface IToastRecord {
   id: string;
   type: TToastType;
+  /** True while a `toast.promise` call is still in flight (§4.6). */
+  isLoading?: boolean;
   command: string;
   state: string;
   message: ReactNode;
@@ -388,7 +390,8 @@ export const createToastStore = () => {
       shown = true;
       enqueue({
         id,
-        type: TOAST_TYPE.LOADING,
+        type: TOAST_TYPE.INFO,
+        isLoading: true,
         command: messages.loading.command,
         state: messages.loading.state,
         message: messages.loading.message,
@@ -416,6 +419,7 @@ export const createToastStore = () => {
       patchRecord(id, (r) => ({
         ...r,
         type,
+        isLoading: false,
         command: payload.command,
         state: payload.state,
         message: payload.message,

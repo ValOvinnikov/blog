@@ -410,7 +410,8 @@ describe(createToastStore, () => {
       expect(store.getState().visible).toHaveLength(1);
       const loadingId = store.getState().visible[0]!.id;
       expect(store.getState().visible[0]).toMatchObject({
-        type: TOAST_TYPE.LOADING,
+        type: TOAST_TYPE.INFO,
+        isLoading: true,
         durationMs: undefined,
       });
 
@@ -421,6 +422,7 @@ describe(createToastStore, () => {
       expect(store.getState().visible[0]).toMatchObject({
         id: loadingId,
         type: TOAST_TYPE.SUCCESS,
+        isLoading: false,
         state: 'saved',
         durationMs: TOAST_DEFAULT_LIFE_MS[TOAST_TYPE.SUCCESS],
       });
@@ -448,6 +450,7 @@ describe(createToastStore, () => {
 
       expect(store.getState().visible[0]).toMatchObject({
         type: TOAST_TYPE.ERROR,
+        isLoading: false,
         state: 'failed',
         durationMs: undefined,
       });

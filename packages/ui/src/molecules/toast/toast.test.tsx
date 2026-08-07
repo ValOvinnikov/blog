@@ -88,11 +88,16 @@ describe(`<${Toast.name}/>`, () => {
     expect(screen.queryByTestId('toast-timer')).not.toBeInTheDocument();
   });
 
-  it('renders a decorative spinner for the loading type', () => {
-    setup({ type: TOAST_TYPE.LOADING });
+  it('renders a decorative spinner when isLoading is true', () => {
+    setup({ isLoading: true });
     const spinner = screen.getByTestId('toast-spinner');
     expect(spinner).toBeVisible();
     expect(spinner).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('exposes a single status region when isLoading is true, not a nested one from the spinner', () => {
+    setup({ isLoading: true });
+    expect(screen.queryAllByRole('status')).toHaveLength(1);
   });
 
   it('forwards data-testid to the root element', () => {

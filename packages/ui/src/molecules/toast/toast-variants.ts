@@ -18,6 +18,7 @@ export const toastVariants = tv({
       'font-mono text-label text-text',
     ],
     glyph: ['shrink-0 text-[0.82rem] leading-none font-bold'],
+    spinner: ['shrink-0'],
     cmdCommand: ['text-muted'],
     cmdState: ['font-semibold'],
     time: ['shrink-0 text-label text-subtle'],
@@ -87,14 +88,6 @@ export const toastVariants = tv({
         action: ['hover:border-error hover:text-error'],
         timer: ['bg-error'],
       },
-      [TOAST_TYPE.LOADING]: {
-        root: ['border-l-accent'],
-        glyph: ['text-accent'],
-        cmdState: ['text-accent'],
-        prompt: ['text-accent'],
-        action: ['hover:border-accent hover:text-accent'],
-        timer: ['bg-accent'],
-      },
     },
     phase: {
       entering: {
@@ -112,15 +105,11 @@ export const toastVariants = tv({
     paused: {
       true: { timer: ['[animation-play-state:paused]'] },
     },
-    loading: {
-      true: { glyph: ['animate-spin'] },
-    },
   },
   defaultVariants: {
     phase: 'visible',
     hasTime: false,
     paused: false,
-    loading: false,
   },
 });
 

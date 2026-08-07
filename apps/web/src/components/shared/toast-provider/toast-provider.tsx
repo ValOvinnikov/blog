@@ -158,6 +158,7 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
           >
             <Toast
               type={record.type}
+              isLoading={record.isLoading}
               command={record.command}
               state={
                 record.count && record.count > 1

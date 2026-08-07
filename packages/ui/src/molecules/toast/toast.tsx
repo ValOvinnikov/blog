@@ -1,11 +1,10 @@
 import {
-  ICONS,
   Size,
   TOAST_TYPE,
   type IWithDataTestId,
   type TToastType,
 } from '@blog/config';
-import { Icon } from '@blog/ui/atoms/icon';
+import { Spinner } from '@blog/ui/atoms/spinner';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { toastVariants, type TToastVariants } from './toast-variants';
@@ -18,6 +17,14 @@ export interface IToastAction {
 
 export interface IToastProps extends IWithDataTestId {
   type: TToastType;
+  /**
+   * Overlays the type's glyph with a `Spinner` for an in-flight action (e.g.
+   * a `toast.promise` pending state). The spinner is type-agnostic — it
+   * always renders in `Spinner`'s own default accent color, so pairing
+   * `isLoading: true` with `type: SUCCESS`/`WARNING`/`ERROR` won't tint it
+   * to match.
+   */
+  isLoading?: boolean;
   command: string;
   state: string;
   message: ReactNode;
@@ -31,10 +38,7 @@ export interface IToastProps extends IWithDataTestId {
   className?: string;
 }
 
-const TOAST_GLYPH: Record<
-  Exclude<TToastType, typeof TOAST_TYPE.LOADING>,
-  string
-> = {
+const TOAST_GLYPH: Record<TToastType, string> = {
   [TOAST_TYPE.SUCCESS]: '✓',
   [TOAST_TYPE.INFO]: '›',
   [TOAST_TYPE.WARNING]: '●',
@@ -49,11 +53,10 @@ const TOAST_ANNOUNCEMENT: Record<
   [TOAST_TYPE.INFO]: { role: 'status', live: 'polite' },
   [TOAST_TYPE.WARNING]: { role: 'status', live: 'polite' },
   [TOAST_TYPE.ERROR]: { role: 'alert', live: 'assertive' },
-  [TOAST_TYPE.LOADING]: { role: 'status', live: 'polite' },
 };
 
-const getToastGlyph = (type: TToastType): string =>
-  type === TOAST_TYPE.LOADING ? '◐' : TOAST_GLYPH[type];
+const getToastGlyph = (type: TToastType, isLoading: boolean): string =>
+  isLoading ? '◐' : TOAST_GLYPH[type];
 
 /**
  * Toast — a single compact terminal-window notification confirming or
@@ -64,6 +67,7 @@ const getToastGlyph = (type: TToastType): string =>
  */
 export const Toast = ({
   type,
+  isLoading = false,
   command,
   state,
   message,
@@ -77,13 +81,11 @@ export const Toast = ({
   className,
   dataTestId,
 }: IToastProps) => {
-  const isLoading = type === TOAST_TYPE.LOADING;
   const s = toastVariants({
     type,
     phase,
     hasTime: Boolean(time),
     paused,
-    loading: isLoading,
   });
   const { role, live } = TOAST_ANNOUNCEMENT[type];
 
@@ -97,16 +99,16 @@ export const Toast = ({
     >
       <div className={s.bar()}>
         {isLoading ? (
-          <Icon
-            name={ICONS.SPINNER}
+          <Spinner
+            label={state}
             size={Size.SM}
-            className={s.glyph()}
+            className={s.spinner()}
             aria-hidden="true"
             dataTestId="toast-spinner"
           />
         ) : (
           <span className={s.glyph()} aria-hidden="true">
-            {getToastGlyph(type)}
+            {getToastGlyph(type, isLoading)}
           </span>
         )}
         <span className={s.cmdCommand()}>
@@ -126,7 +128,7 @@ export const Toast = ({
       <div className={s.body()}>
         <div className={s.message()}>
           <span className={s.prompt()} aria-hidden="true">
-            {getToastGlyph(type)}
+            {getToastGlyph(type, isLoading)}
           </span>
           <span>{message}</span>
         </div>
