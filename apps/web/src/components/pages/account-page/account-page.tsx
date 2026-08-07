@@ -1,34 +1,35 @@
 import { routes } from '@blog/config';
 import { Heading } from '@blog/ui/atoms';
-import { LinkButton, SettingRow, WindowChrome } from '@blog/ui/molecules';
-import { DeleteAccountControl } from '@web/components/shared/delete-account-control';
-import { SmartLink } from '@web/components/shared/smart-link';
 import { auth } from '@web/server/auth/auth';
-import { toSessionUsername } from '@web/utils/to-session-username';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 import { accountPageVariants } from './account-page-variants';
+import { NewsletterSection } from './sections/newsletter-section';
+import { PrivacySection } from './sections/privacy-section';
 
 const s = accountPageVariants();
 
 /**
  * AccountPage — `/account` composition (Epic #1151, D15 §4.6): auth-gated
  * (a signed-out reader is redirected home, same stance `bookmarks-page`
- * already takes — this app has no dedicated `/login` route). Renders the
- * page's `h1` plus one `WindowChrome` section per settled sub-issue; today
- * that's just 6a "privacy & data" (this issue, #1154) — 6b (email/
- * newsletter prefs) and 6c (connected accounts/identity) are separate future
- * epics that each add their own sibling `WindowChrome` section here, so this
- * stays a plain list of sections rather than a single hard-coded chrome
- * block.
+ * already takes — this app has no dedicated `/login` route). This is the
+ * *only* place that guard lives — every section below trusts it rather than
+ * re-checking the session itself.
  *
- * 6a itself composes two `SettingRow`s inside one `WindowChrome`: "Export my
- * data" (a plain download link to the `/api/account/export` Route Handler —
- * no client JS needed to trigger the browser's save-as prompt) and the
- * `tone="danger"` "Delete account" row, whose typed-confirm interaction is
- * `DeleteAccountControl` (the one client island this page needs — slotted
- * into `SettingRow.children`, never wrapped, per `web-component-practices`).
+ * Renders the page's `h1` plus an ordered list of self-contained
+ * `WindowChrome` section components (#1158's section-extraction decision):
+ * each section reads its own session/translations/data (`auth()` is deduped
+ * per-request via React `cache`, so re-reading it here costs nothing extra)
+ * and owns its own `WindowChrome` markup — `AccountPage` itself no longer
+ * composes any section's JSX directly.
+ *
+ * **Ordering rule:** 6a "privacy & data" (`PrivacySection`) always renders
+ * *last* — a fixed anchor at the bottom of the page, the standard
+ * settings-page convention for a danger-zone section, regardless of build
+ * order or how many other sections exist. Every new section (6b now, 6c in
+ * #1162, and beyond) inserts itself *above* `PrivacySection` in this list,
+ * never below it.
  */
 export async function AccountPage() {
   const session = await auth();
@@ -37,8 +38,6 @@ export async function AccountPage() {
     redirect(routes.home());
   }
 
-  const { name, email } = session.user;
-  const handle = toSessionUsername(name, email);
   const t = await getTranslations('accountPage');
 
   return (
@@ -47,37 +46,8 @@ export async function AccountPage() {
         {t('title')}
       </Heading>
       <div className={s.sections()}>
-        <WindowChrome className={s.chrome()}>
-          <WindowChrome.Bar>
-            <WindowChrome.User>{handle}</WindowChrome.User>{' '}
-            <WindowChrome.Prompt>{t('promptHost')}</WindowChrome.Prompt>{' '}
-            {t('promptCommand')}
-            <WindowChrome.Tag>{t('promptTag')}</WindowChrome.Tag>
-          </WindowChrome.Bar>
-          <WindowChrome.Body>
-            <SettingRow
-              label={t('exportLabel')}
-              description={t('exportDescription')}
-            >
-              <LinkButton
-                as={SmartLink}
-                href={routes.accountExport()}
-                prefetch={false}
-                download
-                variant="ghost"
-              >
-                {t('exportButton')}
-              </LinkButton>
-            </SettingRow>
-            <SettingRow
-              tone="danger"
-              label={t('deleteLabel')}
-              description={t('deleteDescription')}
-            >
-              <DeleteAccountControl handle={handle} />
-            </SettingRow>
-          </WindowChrome.Body>
-        </WindowChrome>
+        <NewsletterSection />
+        <PrivacySection />
       </div>
     </main>
   );

@@ -44,7 +44,7 @@ export type TDeleteAccountControlProps = {
  * pending UI.
  */
 export function DeleteAccountControl({ handle }: TDeleteAccountControlProps) {
-  const t = useTranslations('accountPage');
+  const t = useTranslations('accountPage.privacy');
   const toast = useToast();
   const [typed, setTyped] = useState('');
   const [isPending, startTransition] = useTransition();
