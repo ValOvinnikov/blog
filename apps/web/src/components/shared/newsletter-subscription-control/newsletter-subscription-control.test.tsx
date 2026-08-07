@@ -90,18 +90,16 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     });
 
     expect(toastPromiseMock).toHaveBeenCalledWith(expect.any(Promise), {
+      command: 'newsletter',
       loading: {
-        command: 'newsletter',
         state: 'unsubscribing',
         message: 'Unsubscribing…',
       },
       success: {
-        command: 'newsletter',
         state: 'unsubscribed',
         message: "You've been unsubscribed.",
       },
       error: {
-        command: 'newsletter',
         state: 'failed',
         message: "Couldn't unsubscribe. Try again.",
       },
@@ -125,18 +123,16 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     });
 
     expect(toastPromiseMock).toHaveBeenCalledWith(expect.any(Promise), {
+      command: 'newsletter',
       loading: {
-        command: 'newsletter',
         state: 'resending',
         message: 'Resending the confirmation email…',
       },
       success: {
-        command: 'newsletter',
         state: 'resent',
         message: 'Confirmation email resent.',
       },
       error: {
-        command: 'newsletter',
         state: 'failed',
         message: "Couldn't resend the confirmation email. Try again.",
       },

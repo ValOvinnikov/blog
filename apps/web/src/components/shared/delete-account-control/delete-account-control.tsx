@@ -62,18 +62,16 @@ export function DeleteAccountControl({ handle }: TDeleteAccountControlProps) {
             return result;
           })(),
           {
+            command: t('deleteToastCommand'),
             loading: {
-              command: t('deleteToastCommand'),
               state: t('deleteToastLoadingState'),
               message: t('deleteToastLoadingMessage'),
             },
             success: {
-              command: t('deleteToastCommand'),
               state: t('deleteToastSuccessState'),
               message: t('deleteToastSuccessMessage'),
             },
             error: {
-              command: t('deleteToastCommand'),
               state: t('deleteToastErrorState'),
               message: t('deleteError'),
             },

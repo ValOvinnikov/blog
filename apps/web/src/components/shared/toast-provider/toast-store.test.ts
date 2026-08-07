@@ -372,13 +372,13 @@ describe(createToastStore, () => {
       const deferred = Promise.resolve('~/bookmarks');
 
       const returned = store.actions.promise(deferred, {
-        loading: { command: 'bookmark', state: 'saving', message: 'saving…' },
+        command: 'bookmark',
+        loading: { state: 'saving', message: 'saving…' },
         success: (value) => ({
-          command: 'bookmark',
           state: 'saved',
           message: `stashed to ${value}`,
         }),
-        error: { command: 'bookmark', state: 'failed', message: '! failed' },
+        error: { state: 'failed', message: '! failed' },
       });
 
       expect(returned).toBe(deferred);
@@ -401,9 +401,10 @@ describe(createToastStore, () => {
       });
 
       store.actions.promise(pending, {
-        loading: { command: 'bookmark', state: 'saving', message: 'saving…' },
-        success: { command: 'bookmark', state: 'saved', message: 'saved' },
-        error: { command: 'bookmark', state: 'failed', message: 'failed' },
+        command: 'bookmark',
+        loading: { state: 'saving', message: 'saving…' },
+        success: { state: 'saved', message: 'saved' },
+        error: { state: 'failed', message: 'failed' },
       });
 
       await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);
@@ -436,9 +437,10 @@ describe(createToastStore, () => {
       });
 
       const returned = store.actions.promise(pending, {
-        loading: { command: 'bookmark', state: 'saving', message: 'saving…' },
-        success: { command: 'bookmark', state: 'saved', message: 'saved' },
-        error: { command: 'bookmark', state: 'failed', message: '! failed' },
+        command: 'bookmark',
+        loading: { state: 'saving', message: 'saving…' },
+        success: { state: 'saved', message: 'saved' },
+        error: { state: 'failed', message: '! failed' },
       });
       // The store's own internal `.then` must not surface as an unhandled
       // rejection warning independently from this assertion's own handling.
@@ -464,9 +466,10 @@ describe(createToastStore, () => {
       });
 
       store.actions.promise(pending, {
-        loading: { command: 'bookmark', state: 'saving', message: 'saving…' },
-        success: { command: 'bookmark', state: 'saved', message: 'saved' },
-        error: { command: 'bookmark', state: 'failed', message: 'failed' },
+        command: 'bookmark',
+        loading: { state: 'saving', message: 'saving…' },
+        success: { state: 'saved', message: 'saved' },
+        error: { state: 'failed', message: 'failed' },
       });
 
       await vi.advanceTimersByTimeAsync(TOAST_PROMISE_GRACE_MS);
