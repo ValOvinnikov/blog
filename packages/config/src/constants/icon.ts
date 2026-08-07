@@ -25,6 +25,7 @@ export const ICONS = {
   INFO: 'INFO',
   SETTINGS: 'SETTINGS',
   POWER: 'POWER',
+  MAIL: 'MAIL',
 } as const;
 
 export type TIconName = TValueOf<typeof ICONS>;
