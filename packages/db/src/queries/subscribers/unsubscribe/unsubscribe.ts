@@ -1,0 +1,31 @@
+import { getDb } from '@blog/db/client';
+import { users } from '@blog/db/schema/auth';
+import { subscribers } from '@blog/db/schema/subscribers';
+import { eq } from 'drizzle-orm';
+
+// The `/account` 6b section's "unsubscribe" action (#1155/#1157/#1158).
+// `subscribers.status` only has `pending`/`active` — there is no
+// `unsubscribed` value, and adding one would need a schema migration for a
+// table with live rows (post-#1101). So unsubscribing **deletes** the row
+// for the user's account email instead of flipping a status; a subsequent
+// `getSubscriptionStatus` call then naturally reports `not-subscribed` with
+// no schema change needed.
+//
+// A no-op (not an error) if `userId` doesn't resolve to a `users` row, the
+// user has no email on file, or no `subscribers` row matches that email —
+// matching this package's other delete-style mutations (see
+// `removeBookmark`), and letting the caller invoke this unconditionally.
+export async function unsubscribe(userId: string): Promise<void> {
+  const db = getDb();
+
+  const [user] = await db
+    .select({ email: users.email })
+    .from(users)
+    .where(eq(users.id, userId));
+
+  if (!user?.email) return;
+
+  await db
+    .delete(subscribers)
+    .where(eq(subscribers.email, user.email.trim().toLowerCase()));
+}
