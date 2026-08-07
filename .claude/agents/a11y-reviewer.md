@@ -64,7 +64,24 @@ This list summarizes it; the skill file wins if they ever disagree.
    when both are present. `Intl.DateTimeFormat`/locale logic belongs in
    `apps/web`, never in `packages/ui`.
 3. **Card/section title slots render a real heading element** (`<h2>` etc.),
-   never a `<div>` — it must participate in the document outline.
+   never a `<div>` — it must participate in the document outline. **When a
+   diff adds, removes, or changes a heading element's level, check the
+   _composed page's_ actual heading hierarchy, not just internal consistency
+   within the diff's own files.** A diff can be perfectly self-consistent
+   (its own heading nests correctly relative to elements it directly wraps)
+   while still producing a level-skip once placed in the real page — e.g. a
+   diff adds an `<h3>` inside a section that itself has no `<h2>` anywhere
+   above it, so the rendered outline reads `h1 → h3`, skipping a level. Read
+   the parent page/layout component(s) that compose the changed file (follow
+   the import chain up, same as tracing any other cross-file contract) and
+   confirm the new/changed heading lands at a level the surrounding
+   structure actually supports. Real incident: #1233 restored an `<h3>` a
+   prior diff had dropped (correctly flagged as a regression at the time),
+   but neither that review nor #1233's own review caught that the page
+   composing it (`/account`) has exactly one `<h1>` and zero `<h2>` anywhere
+   — every row on that page has skipped straight from `h1` to `h3` since
+   #1152, undetected because each review only checked its own diff's
+   internal heading nesting, never the composed page.
 4. **Any anchor a component builds itself uses a polymorphic `linkAs`/`as`
    prop, never a bare `<a>`.** This includes organisms constructing a link to
    hand into another component's slot (e.g. `PostsSection` building the href
