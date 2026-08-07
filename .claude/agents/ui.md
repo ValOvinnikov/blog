@@ -85,9 +85,12 @@ archived brief.
 - Server-component-safe by default; `"use client"` only for interactivity.
 - JSDoc on exported components when the purpose isn't obvious from the name;
   skip JSDoc on type/interface/prop declarations unless a constraint is
-  non-obvious. States what the thing is for, never how it's styled/nested —
-  no CSS classes, no breakpoint/DOM mechanics, no issue/PR/branch numbers
-  (full rule + examples in `ui-library-practices`).
+  non-obvious. **One or two sentences, never a paragraph.** States what the
+  thing is for, never how it's styled/nested — no CSS classes, no
+  breakpoint/DOM mechanics, no issue/PR/branch numbers, no decision-history
+  walkthrough of every ticket that touched the file — if it's starting to
+  read like a changelog, it's too long (full rule + examples in
+  `ui-library-practices`).
 - **Extract at the second repetition.** A prop shape, variant matrix, or slot
   pattern used by two components becomes a shared type/helper/sub-component —
   never copy-paste a third instance. Discriminator/enum prop values come from

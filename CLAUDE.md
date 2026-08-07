@@ -231,6 +231,18 @@ already settled.
 
 ## Conventions
 
+- **Comments — short, or not at all.** Default to no comment. An inline
+  comment is only for something genuinely non-obvious on the next line — a
+  hidden constraint, a real gotcha, a workaround for a specific bug — never
+  to restate what the code already says (a competent developer can read the
+  code). A function/component doc comment, when one is warranted, is a
+  **short** statement of the non-obvious _why_ — never an exhaustive listing
+  of props/functionality (the type signature already documents that), and
+  never a decision-history narrative walking through every issue number that
+  touched the file (that belongs in the PR description and rots as the code
+  evolves further). If a doc comment is starting to read like a changelog or
+  a design-doc summary, it's too long — cut it down to the one or two
+  sentences a future reader actually needs.
 - All workspace source files live under `src/` within each package/app.
   Exceptions: root-level config files required by their tool (`sanity.config.ts`,
   `sanity.cli.ts`, `next.config.ts`, `vitest.config.ts`, etc.) stay at the

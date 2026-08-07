@@ -201,6 +201,10 @@ every field** (`.notNull()` or `.nullable(true)`).
 - Write a comment only when it explains something the code cannot — a groqd
   gotcha, a non-obvious cast, a business rule. Skip comments that restate what
   the code already says (`// title is required`) — they rot and mislead.
+- When a doc comment is warranted, keep it short — one or two sentences of
+  genuine _why_, never a listing of props/return shape (the types already
+  say that) and never a decision-history walkthrough of every issue number
+  that touched the file. If it reads like a changelog, cut it down.
 
 ## Testing
 
