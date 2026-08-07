@@ -40,7 +40,10 @@ array.
 - `module_cta` (`ctaSchema`) — internal `title`, `heading`, `text`, `action`
   (`link`, required).
 - `module_newsletter` (`newsletterSchema`) — internal `title`, `heading`
-  (optional, max 80), `description` (optional, max 300).
+  (required, max 80), `description` (optional, max 300). `heading`/
+  `description` come from the shared `newsletterContentFields()` helper
+  (`schema-types/helpers/newsletter-content-fields.ts`), reused by
+  `settings_newsletter` below.
 
 Every module document gets a required internal `title` via the reusable
 `titleField` helper (§ below) so it's listable/previewable in Studio
@@ -102,7 +105,7 @@ separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
 - `settings_footer` (singleton) — `titleField` (bare; see helper note below),
   social links.
 - `settings_newsletter` (singleton) — `titleField` (bare; see helper note
-  below), `heading` (optional, max 80), `description` (optional, max 300) —
+  below), `heading` (required, max 80), `description` (optional, max 300) —
   the CMS-authored source of the newsletter form's copy wherever it's
   rendered outside the `module_newsletter` page-builder placement (e.g. the
   per-post compact form gated by `post.newsletterEnabled`). Lives in the

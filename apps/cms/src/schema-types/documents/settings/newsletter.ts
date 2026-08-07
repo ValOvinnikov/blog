@@ -1,6 +1,7 @@
+import { newsletterContentFields } from '@cms/schema-types/helpers/newsletter-content-fields';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { Mail } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineType } from 'sanity';
 
 /**
  * Site-wide newsletter copy — the CMS-authored source of the newsletter
@@ -20,23 +21,5 @@ export const newsletterSettingsSchema = defineType({
       subtitle: 'Newsletter settings',
     }),
   },
-  fields: [
-    titleField(),
-    defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-      description:
-        'Signup heading shown wherever the newsletter form is rendered. Falls back to a default if left empty.',
-      validation: (rule) => rule.max(80),
-    }),
-    defineField({
-      name: 'description',
-      title: 'Description',
-      type: 'text',
-      description:
-        'Supporting copy shown under the heading. Falls back to a default if left empty.',
-      validation: (rule) => rule.max(300),
-    }),
-  ],
+  fields: [titleField(), ...newsletterContentFields()],
 });
