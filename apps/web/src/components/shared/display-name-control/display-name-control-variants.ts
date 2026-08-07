@@ -2,6 +2,12 @@ import { tv } from 'tailwind-variants';
 
 export const displayNameControlVariants = tv({
   slots: {
-    field: ['w-40'],
+    root: [
+      'flex w-full flex-col gap-2',
+      'md:w-auto md:flex-row md:flex-wrap md:items-center',
+    ],
+    avatarInputRow: ['flex min-w-0 flex-1 items-center gap-2'],
+    field: ['min-w-0 flex-1'],
+    button: ['w-full', 'md:w-auto'],
   },
 });

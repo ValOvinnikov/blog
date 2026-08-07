@@ -4,9 +4,11 @@ import { Icon } from '@blog/ui/atoms';
 import { SettingRow, WindowChrome } from '@blog/ui/molecules';
 import { DisplayNameControl } from '@web/components/shared/display-name-control';
 import { ProviderLinkControl } from '@web/components/shared/provider-link-control';
+import type { TLinkableProvider } from '@web/server/account/identity-actions';
 import { auth } from '@web/server/auth/auth';
 import { toSessionUsername } from '@web/utils/to-session-username';
 import { getTranslations } from 'next-intl/server';
+import type { ReactNode } from 'react';
 
 import { identitySectionVariants } from './identity-section-variants';
 
@@ -22,17 +24,30 @@ const s = identitySectionVariants();
  *
  * Renders one `SettingRow` per method — composed directly from `SettingRow`/
  * `Icon` (no dedicated `packages/ui` organism, per #1161's scope
- * correction) — plus a fourth `SettingRow` for the display-name edit. Each
- * provider row's action slot shows a `ProviderLinkControl` ("link"/
- * "unlink"), except when that method is the reader's *last* remaining
- * linked one (computed here from the three booleans `getLinkedProviders`
- * returns) — then it's replaced with static italic text, matching the
- * mock's `.readonly` treatment, since removing it would lock the reader out
- * entirely. Email link never gets a "link" action (there's nothing to
- * initiate — it's tied to the account's own verified email) and never gets
- * an "unlink" action either (`queries.account.unlinkProvider`'s `provider`
- * type deliberately excludes it, per #1160) — so its action slot is either
- * the last-method notice or nothing at all.
+ * correction) — plus a fourth `SettingRow` for the display-name edit. The
+ * three provider rows are driven from a local `providerRows` array + `.map()`
+ * (#1225) rather than three copy-pasted `SettingRow` blocks, since they only
+ * differ in icon, label copy, current linked state, and whether a
+ * link/unlink control is even possible (`provider: null` for email — see
+ * below). Each row's `label` renders as two explicit stacked lines — icon +
+ * provider name, then the linked/not-linked status on its own line (a
+ * `basis-full` span forces the wrap unconditionally, not just when the
+ * inline group happens to run out of room, #1225) — and its action slot
+ * shows a `ProviderLinkControl` ("link"/"unlink"), except when that method
+ * is the reader's *last* remaining linked one (computed here from the three
+ * booleans `getLinkedProviders` returns) — then it's replaced with static
+ * italic text, matching the mock's `.readonly` treatment, since removing it
+ * would lock the reader out entirely. Email link never gets a "link" action
+ * (there's nothing to initiate — it's tied to the account's own verified
+ * email) and never gets an "unlink" action either
+ * (`queries.account.unlinkProvider`'s `provider` type deliberately excludes
+ * it, per #1160), so its row config carries `provider: null` and its action
+ * slot is either the last-method notice or nothing at all. GitHub's `Icon`
+ * renders one `Size` step larger than Google's (#1225) — the octocat glyph
+ * has more internal padding baked into its source SVG than Google's "G",
+ * which fills its viewBox edge-to-edge, so matching `size` props alone read
+ * visibly smaller; the email glyph gets a matching `text-lg` bump for the
+ * same reason.
  *
  * Per #1158's page-ordering decision, this always renders *above*
  * `NewsletterSection` (and therefore also above `PrivacySection`) in
@@ -52,6 +67,40 @@ export async function IdentitySection() {
   ).length;
   const isLastMethod = (isLinked: boolean) => isLinked && linkedCount === 1;
 
+  const providerRows: {
+    id: 'github' | 'google' | 'email';
+    provider: TLinkableProvider | null;
+    icon: ReactNode;
+    label: string;
+    isLinked: boolean;
+  }[] = [
+    {
+      id: 'github',
+      provider: 'github',
+      icon: <Icon name={ICONS.GITHUB} size={Size.MD} />,
+      label: t('githubLabel'),
+      isLinked: linked.github,
+    },
+    {
+      id: 'google',
+      provider: 'google',
+      icon: <Icon name={ICONS.GOOGLE} size={Size.SM} />,
+      label: t('googleLabel'),
+      isLinked: linked.google,
+    },
+    {
+      id: 'email',
+      provider: null,
+      icon: (
+        <span className={s.emailIcon()} aria-hidden="true">
+          ✉
+        </span>
+      ),
+      label: t('emailLinkLabel'),
+      isLinked: linked.emailLink,
+    },
+  ];
+
   return (
     <WindowChrome>
       <WindowChrome.Bar>
@@ -60,81 +109,38 @@ export async function IdentitySection() {
         {t('promptCommand')}
       </WindowChrome.Bar>
       <WindowChrome.Body>
-        <SettingRow
-          label={
-            <>
-              <Icon name={ICONS.GITHUB} size={Size.SM} /> {t('githubLabel')}{' '}
-              <span
-                className={
-                  linked.github ? s.linkedStatus() : s.notLinkedStatus()
-                }
-              >
-                {linked.github ? t('linkedStatus') : t('notLinkedStatus')}
-              </span>
-            </>
-          }
-        >
-          {linked.github ? (
-            isLastMethod(linked.github) ? (
+        {providerRows.map(({ id, provider, icon, label, isLinked }) => (
+          <SettingRow
+            key={id}
+            label={
+              <>
+                <span className={s.providerName()}>
+                  {icon} {label}
+                </span>
+                <span className={s.providerStatusRow()}>
+                  <span
+                    className={
+                      isLinked ? s.linkedStatus() : s.notLinkedStatus()
+                    }
+                  >
+                    {isLinked ? t('linkedStatus') : t('notLinkedStatus')}
+                  </span>
+                </span>
+              </>
+            }
+          >
+            {isLastMethod(isLinked) ? (
               <span className={s.lastMethodNotice()}>
                 {t('lastMethodNotice')}
               </span>
-            ) : (
-              <ProviderLinkControl provider="github" action="unlink" />
-            )
-          ) : (
-            <ProviderLinkControl provider="github" action="link" />
-          )}
-        </SettingRow>
-        <SettingRow
-          label={
-            <>
-              <Icon name={ICONS.GOOGLE} size={Size.SM} /> {t('googleLabel')}{' '}
-              <span
-                className={
-                  linked.google ? s.linkedStatus() : s.notLinkedStatus()
-                }
-              >
-                {linked.google ? t('linkedStatus') : t('notLinkedStatus')}
-              </span>
-            </>
-          }
-        >
-          {linked.google ? (
-            isLastMethod(linked.google) ? (
-              <span className={s.lastMethodNotice()}>
-                {t('lastMethodNotice')}
-              </span>
-            ) : (
-              <ProviderLinkControl provider="google" action="unlink" />
-            )
-          ) : (
-            <ProviderLinkControl provider="google" action="link" />
-          )}
-        </SettingRow>
-        <SettingRow
-          label={
-            <>
-              <span className={s.emailIcon()} aria-hidden="true">
-                ✉
-              </span>{' '}
-              {t('emailLinkLabel')}{' '}
-              <span
-                className={
-                  linked.emailLink ? s.linkedStatus() : s.notLinkedStatus()
-                }
-              >
-                {linked.emailLink ? t('linkedStatus') : t('notLinkedStatus')}
-              </span>
-            </>
-          }
-        >
-          {isLastMethod(linked.emailLink) ? (
-            <span className={s.lastMethodNotice()}>
-              {t('lastMethodNotice')}
-            </span>
-          ) : null}
-        </SettingRow>
+            ) : provider ? (
+              <ProviderLinkControl
+                provider={provider}
+                action={isLinked ? 'unlink' : 'link'}
+              />
+            ) : null}
+          </SettingRow>
+        ))}
         <SettingRow
           label={t('displayNameLabel')}
           description={t('displayNameDescription')}
