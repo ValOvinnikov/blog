@@ -65,18 +65,16 @@ export function DisplayNameControl({
             return result;
           })(),
           {
+            command: t('saveToastCommand'),
             loading: {
-              command: t('saveToastCommand'),
               state: t('saveToastLoadingState'),
               message: t('saveToastLoadingMessage'),
             },
             success: {
-              command: t('saveToastCommand'),
               state: t('saveToastSuccessState'),
               message: t('saveToastSuccessMessage'),
             },
             error: {
-              command: t('saveToastCommand'),
               state: t('saveToastErrorState'),
               message: t('saveError'),
             },

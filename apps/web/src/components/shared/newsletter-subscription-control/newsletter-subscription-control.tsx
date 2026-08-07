@@ -83,18 +83,16 @@ export function NewsletterSubscriptionControl({
             return result;
           })(),
           {
+            command: t(commandKey),
             loading: {
-              command: t(commandKey),
               state: t(loadingStateKey),
               message: t(loadingMessageKey),
             },
             success: {
-              command: t(commandKey),
               state: t(successStateKey),
               message: t(successMessageKey),
             },
             error: {
-              command: t(commandKey),
               state: t(errorStateKey),
               message: t(errorMessageKey),
             },

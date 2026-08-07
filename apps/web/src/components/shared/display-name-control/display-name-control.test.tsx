@@ -83,18 +83,16 @@ describe(`<${DisplayNameControl.name}/>`, () => {
     });
 
     expect(toastPromiseMock).toHaveBeenCalledWith(expect.any(Promise), {
+      command: 'identity',
       loading: {
-        command: 'identity',
         state: 'saving',
         message: 'Saving your display name…',
       },
       success: {
-        command: 'identity',
         state: 'saved',
         message: 'Display name updated.',
       },
       error: {
-        command: 'identity',
         state: 'failed',
         message: "Couldn't update your display name. Try again.",
       },

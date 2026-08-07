@@ -43,17 +43,16 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.promise(Promise.resolve('done'), {
+            command: 'bookmark',
             loading: {
-              command: 'bookmark',
               state: 'saving',
               message: 'saving…',
             },
             success: {
-              command: 'bookmark',
               state: 'saved',
               message: 'stashed to ~/bookmarks',
             },
-            error: { command: 'bookmark', state: 'failed', message: 'failed' },
+            error: { state: 'failed', message: 'failed' },
           })
         }
       >

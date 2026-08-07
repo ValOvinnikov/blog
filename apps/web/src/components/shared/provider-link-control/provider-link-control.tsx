@@ -82,18 +82,16 @@ export function ProviderLinkControl({
             return result;
           })(),
           {
+            command: t('unlinkToastCommand'),
             loading: {
-              command: t('unlinkToastCommand'),
               state: t('unlinkToastLoadingState'),
               message: t('unlinkToastLoadingMessage'),
             },
             success: {
-              command: t('unlinkToastCommand'),
               state: t('unlinkToastSuccessState'),
               message: t('unlinkToastSuccessMessage'),
             },
             error: (error: unknown) => ({
-              command: t('unlinkToastCommand'),
               state: t('unlinkToastErrorState'),
               message:
                 error instanceof Error && error.message === 'last-method'

@@ -33,10 +33,25 @@ export interface IToastPayload {
   coalesceKey?: string;
 }
 
-type TToastPromiseMessage<T> = IToastPayload | ((value: T) => IToastPayload);
+type TToastPromiseState = Omit<IToastPayload, 'command'>;
 
+type TToastPromiseMessage<T> =
+  TToastPromiseState | ((value: T) => TToastPromiseState);
+
+/**
+ * `command` is a single top-level field rather than repeated inside each of
+ * `loading`/`success`/`error`: `success`/`error` can be a function of the
+ * resolved value/error, so in principle each state's payload could vary
+ * per-call — but across every real call site `command` is always identical
+ * across all three states, so that flexibility was never used. This is a
+ * simplification for the common case, not a hard API constraint — if a
+ * genuine need for a per-state-varying `command` ever comes up, reintroduce
+ * it as an optional per-state override that falls back to this top-level
+ * value.
+ */
 export interface IToastPromiseMessages<T> {
-  loading: Pick<IToastPayload, 'command' | 'state' | 'message'>;
+  command: string;
+  loading: Pick<IToastPayload, 'state' | 'message'>;
   success: TToastPromiseMessage<T>;
   error: TToastPromiseMessage<unknown>;
 }
@@ -79,9 +94,13 @@ let idCounter = 0;
 const generateId = () => `toast-${Date.now()}-${idCounter++}`;
 
 const resolvePayload = <T>(
+  command: string,
   message: TToastPromiseMessage<T>,
   value: T,
-): IToastPayload => (typeof message === 'function' ? message(value) : message);
+): IToastPayload => ({
+  ...(typeof message === 'function' ? message(value) : message),
+  command,
+});
 
 const isMergeableType = (type: TToastType) =>
   type === TOAST_TYPE.SUCCESS || type === TOAST_TYPE.INFO;
@@ -392,7 +411,7 @@ export const createToastStore = () => {
         id,
         type: TOAST_TYPE.INFO,
         isLoading: true,
-        command: messages.loading.command,
+        command: messages.command,
         state: messages.loading.state,
         message: messages.loading.message,
         durationMs: undefined,
@@ -435,9 +454,15 @@ export const createToastStore = () => {
 
     promiseInput.then(
       (value) =>
-        settle(TOAST_TYPE.SUCCESS, resolvePayload(messages.success, value)),
+        settle(
+          TOAST_TYPE.SUCCESS,
+          resolvePayload(messages.command, messages.success, value),
+        ),
       (error: unknown) =>
-        settle(TOAST_TYPE.ERROR, resolvePayload(messages.error, error)),
+        settle(
+          TOAST_TYPE.ERROR,
+          resolvePayload(messages.command, messages.error, error),
+        ),
     );
 
     return promiseInput;
