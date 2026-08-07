@@ -37,6 +37,13 @@ export type TDisplayNameControlProps = {
  * up the new name on next navigation. `isPending` (`useTransition`)
  * separately gates the input/button `disabled` state and the button's
  * `aria-busy`.
+ *
+ * Renders its own explicit two-row wrapper rather than relying on
+ * `SettingRow`'s generic control-slot stacking (#1225): `Avatar` +
+ * `TextInput` share one row with the input taking the remaining flex space
+ * (also fixing the input's previous fixed `w-40` truncating longer names),
+ * and the "save" `Button` sits on its own full-width row below on mobile,
+ * inline at the end of the row again from `md:` up.
  */
 export function DisplayNameControl({
   initialName,
@@ -49,7 +56,7 @@ export function DisplayNameControl({
   const [name, setName] = useState(initialName);
   const [imageFailed, setImageFailed] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const s = displayNameControlVariants();
+  const { root, avatarInputRow, field, button } = displayNameControlVariants();
 
   const avatarName = name.trim() || email || '';
   const avatarSrc = imageFailed ? undefined : (image ?? undefined);
@@ -92,30 +99,33 @@ export function DisplayNameControl({
   };
 
   return (
-    <>
-      <Avatar
-        src={avatarSrc}
-        name={avatarName}
-        alt=""
-        size={Size.SM}
-        onImageError={() => setImageFailed(true)}
-      />
-      <TextInput
-        value={name}
-        onChange={setName}
-        ariaLabel={t('displayNameAriaLabel')}
-        prompt="›"
-        disabled={isPending}
-        className={s.field()}
-      />
+    <div className={root()}>
+      <div className={avatarInputRow()}>
+        <Avatar
+          src={avatarSrc}
+          name={avatarName}
+          alt=""
+          size={Size.SM}
+          onImageError={() => setImageFailed(true)}
+        />
+        <TextInput
+          value={name}
+          onChange={setName}
+          ariaLabel={t('displayNameAriaLabel')}
+          prompt="›"
+          disabled={isPending}
+          className={field()}
+        />
+      </div>
       <Button
         variant="primary"
         disabled={isSaveDisabled}
         aria-busy={isPending}
         onClick={handleSave}
+        className={button()}
       >
         {t('saveButton')}
       </Button>
-    </>
+    </div>
   );
 }
