@@ -1,6 +1,6 @@
 import { ICONS, Size } from '@blog/config';
 import { queries } from '@blog/db';
-import { Icon } from '@blog/ui/atoms';
+import { Heading, Icon } from '@blog/ui/atoms';
 import { SettingRow, WindowChrome } from '@blog/ui/molecules';
 import { DisplayNameControl } from '@web/components/shared/display-name-control';
 import { ProviderLinkControl } from '@web/components/shared/provider-link-control';
@@ -25,7 +25,10 @@ const s = identitySectionVariants();
  * The three provider rows (GitHub/Google/email-link) are plain flex-row
  * markup — not `SettingRow` (#1233) — matching the mock's `.prov-row`
  * structure directly (`docs/design-reference/engagement-ui-mock.html`):
- * icon + provider name on the left, a small right-aligned stacked block
+ * icon + provider name on the left (wrapped in the same `Heading level={3}`
+ * `SettingRow` used internally, so the row still shows up for a
+ * heading-outline screen-reader navigation — losing that was a regression
+ * caught in #1233's a11y review), a small right-aligned stacked block
  * pushed to the row's edge via `ml-auto` on the right. After #1162/#1225
  * repeatedly fought `SettingRow`'s label(heading)+description+control model
  * to express what is really a single-line row, the decision was made to
@@ -118,9 +121,9 @@ export async function IdentitySection() {
       <WindowChrome.Body>
         {providerRows.map(({ id, provider, icon, label, isLinked }) => (
           <div key={id} className={s.providerRow()}>
-            <span className={s.providerName()}>
+            <Heading level={3} className={s.providerName()}>
               {icon} {label}
-            </span>
+            </Heading>
             <div className={s.providerStatus()}>
               {isLinked && (
                 <span className={s.linkedStatus()}>{t('linkedStatus')}</span>

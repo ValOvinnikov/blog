@@ -86,6 +86,27 @@ describe(`<${IdentitySection.name}/>`, () => {
     ).toHaveTextContent('unlink');
   });
 
+  it('renders each provider name as a level-3 heading, keeping the rows in the page heading outline', async () => {
+    authMock.mockResolvedValue(authedSession);
+    getLinkedProvidersMock.mockResolvedValue({
+      github: true,
+      google: false,
+      emailLink: true,
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'GitHub' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Google' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Email link' }),
+    ).toBeVisible();
+  });
+
   it('shows no status text for a provider that is not linked', async () => {
     authMock.mockResolvedValue(authedSession);
     getLinkedProvidersMock.mockResolvedValue({
