@@ -1,30 +1,23 @@
 import { type IWithDataTestId, Size } from '@blog/config';
+import { headingTags, type THeadingLevel } from '@blog/ui/lib/react';
 import type { HTMLAttributes } from 'react';
 
 import { headingVariants, type THeadingVariants } from './heading-variants';
 
 export type THeadingProps = HTMLAttributes<HTMLHeadingElement> &
   IWithDataTestId & {
-    level: 1 | 2 | 3 | 4;
+    level: THeadingLevel;
     visual?: THeadingVariants['visual'];
     size?: THeadingVariants['size'];
   };
 
 type TSize = NonNullable<THeadingVariants['size']>;
-type THeadingTag = 'h1' | 'h2' | 'h3' | 'h4';
 
-const defaultSizes: Record<1 | 2 | 3 | 4, TSize> = {
+const defaultSizes: Record<THeadingLevel, TSize> = {
   1: Size.XXL,
   2: Size.XL,
   3: Size.LG,
   4: Size.MD,
-};
-
-const headingTags: Record<1 | 2 | 3 | 4, THeadingTag> = {
-  1: 'h1',
-  2: 'h2',
-  3: 'h3',
-  4: 'h4',
 };
 
 /**
