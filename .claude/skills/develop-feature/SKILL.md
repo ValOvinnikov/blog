@@ -249,6 +249,23 @@ red check.
   dispatched reviewer, or vice versa. A review that
   never ran is a blocking finding in itself — "the diff is small" or "checks
   are green" does not substitute for the review.
+- **Non-blocking findings don't gate this PR, but don't let them evaporate
+  either.** A finding a reviewer correctly judged non-blocking (worth doing,
+  not worth delaying this diff for) still represents real, identified work —
+  relaying it to the user once in a summary and moving on is not the same as
+  tracking it. Real incident: `reviewer` flagged the same DRY-violation
+  pattern (near-identical repeated blocks) as non-blocking on #1162's review;
+  the orchestrator repeated the finding back to the user in its own summary
+  but took no further action, and the user had to independently notice the
+  same pattern in a sibling file and ask for it to be ticketed before
+  anything happened. For every non-blocking finding you judge genuinely
+  worth fixing (not every nitpick — use judgment same as anywhere else),
+  **file a follow-up issue via `board-keeper`** (`CLAUDE.md`'s "Never call
+  `gh issue create` directly" mechanics apply) before moving on to the next
+  step, rather than letting it live only in a chat summary. This applies
+  per-finding, not per-review — a review can return one blocking fix plus
+  three non-blocking notes, and only some of those three may warrant a
+  ticket; file the ones that do, say so for the ones that don't and why.
 
 ## 7. Hand off to the gate sequence
 
