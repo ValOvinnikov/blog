@@ -22,32 +22,39 @@ const s = identitySectionVariants();
  * `queries.account.getLinkedProviders` for the three sign-in methods this
  * repo ships (GitHub, Google, email magic link).
  *
- * Renders one `SettingRow` per method — composed directly from `SettingRow`/
- * `Icon` (no dedicated `packages/ui` organism, per #1161's scope
- * correction) — plus a fourth `SettingRow` for the display-name edit. The
- * three provider rows are driven from a local `providerRows` array + `.map()`
- * (#1225) rather than three copy-pasted `SettingRow` blocks, since they only
- * differ in icon, label copy, current linked state, and whether a
- * link/unlink control is even possible (`provider: null` for email — see
- * below). Each row's `label` renders as two explicit stacked lines — icon +
- * provider name, then the linked/not-linked status on its own line (a
- * `basis-full` span forces the wrap unconditionally, not just when the
- * inline group happens to run out of room, #1225) — and its action slot
- * shows a `ProviderLinkControl` ("link"/"unlink"), except when that method
- * is the reader's *last* remaining linked one (computed here from the three
- * booleans `getLinkedProviders` returns) — then it's replaced with static
- * italic text, matching the mock's `.readonly` treatment, since removing it
- * would lock the reader out entirely. Email link never gets a "link" action
+ * The three provider rows (GitHub/Google/email-link) are plain flex-row
+ * markup — not `SettingRow` (#1233) — matching the mock's `.prov-row`
+ * structure directly (`docs/design-reference/engagement-ui-mock.html`):
+ * icon + provider name on the left, a small right-aligned stacked block
+ * pushed to the row's edge via `ml-auto` on the right. After #1162/#1225
+ * repeatedly fought `SettingRow`'s label(heading)+description+control model
+ * to express what is really a single-line row, the decision was made to
+ * stop forcing it through that composition — see #1233 for the full
+ * rationale. Only the fourth row, display-name edit, still uses `SettingRow`
+ * (it genuinely fits label+description+control). The three provider rows
+ * are driven from a local `providerRows` array + `.map()` (#1225) rather
+ * than three copy-pasted blocks, since they only differ in icon, label
+ * copy, current linked state, and whether a link/unlink control is even
+ * possible (`provider: null` for email — see below).
+ *
+ * Each row's right-hand block (#1233): "✓ linked" status text only when
+ * linked (never a redundant "not linked" — the "link" button alone conveys
+ * that), stacked above the action. The action is a `ProviderLinkControl`
+ * ("link"/"unlink"), except when that method is the reader's *last*
+ * remaining linked one (computed here from the three booleans
+ * `getLinkedProviders` returns) — then it's replaced with static italic
+ * text, matching the mock's `.readonly` treatment, since removing it would
+ * lock the reader out entirely. Email link never gets a "link" action
  * (there's nothing to initiate — it's tied to the account's own verified
  * email) and never gets an "unlink" action either
  * (`queries.account.unlinkProvider`'s `provider` type deliberately excludes
- * it, per #1160), so its row config carries `provider: null` and its action
- * slot is either the last-method notice or nothing at all. GitHub's `Icon`
- * renders one `Size` step larger than Google's (#1225) — the octocat glyph
- * has more internal padding baked into its source SVG than Google's "G",
- * which fills its viewBox edge-to-edge, so matching `size` props alone read
- * visibly smaller; the email glyph gets a matching `text-lg` bump for the
- * same reason.
+ * it, per #1160), so its row config carries `provider: null` and its
+ * right-hand block is either the last-method notice or nothing at all.
+ * GitHub's `Icon` renders one `Size` step larger than Google's (#1225) — the
+ * octocat glyph has more internal padding baked into its source SVG than
+ * Google's "G", which fills its viewBox edge-to-edge, so matching `size`
+ * props alone read visibly smaller; the email glyph gets a matching
+ * `text-lg` bump for the same reason.
  *
  * Per #1158's page-ordering decision, this always renders *above*
  * `NewsletterSection` (and therefore also above `PrivacySection`) in
@@ -110,36 +117,26 @@ export async function IdentitySection() {
       </WindowChrome.Bar>
       <WindowChrome.Body>
         {providerRows.map(({ id, provider, icon, label, isLinked }) => (
-          <SettingRow
-            key={id}
-            label={
-              <>
-                <span className={s.providerName()}>
-                  {icon} {label}
+          <div key={id} className={s.providerRow()}>
+            <span className={s.providerName()}>
+              {icon} {label}
+            </span>
+            <div className={s.providerStatus()}>
+              {isLinked && (
+                <span className={s.linkedStatus()}>{t('linkedStatus')}</span>
+              )}
+              {isLastMethod(isLinked) ? (
+                <span className={s.lastMethodNotice()}>
+                  {t('lastMethodNotice')}
                 </span>
-                <span className={s.providerStatusRow()}>
-                  <span
-                    className={
-                      isLinked ? s.linkedStatus() : s.notLinkedStatus()
-                    }
-                  >
-                    {isLinked ? t('linkedStatus') : t('notLinkedStatus')}
-                  </span>
-                </span>
-              </>
-            }
-          >
-            {isLastMethod(isLinked) ? (
-              <span className={s.lastMethodNotice()}>
-                {t('lastMethodNotice')}
-              </span>
-            ) : provider ? (
-              <ProviderLinkControl
-                provider={provider}
-                action={isLinked ? 'unlink' : 'link'}
-              />
-            ) : null}
-          </SettingRow>
+              ) : provider ? (
+                <ProviderLinkControl
+                  provider={provider}
+                  action={isLinked ? 'unlink' : 'link'}
+                />
+              ) : null}
+            </div>
+          </div>
         ))}
         <SettingRow
           label={t('displayNameLabel')}

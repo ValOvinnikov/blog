@@ -221,7 +221,6 @@
       "googleLabel": "Google",
       "emailLinkLabel": "Email link",
       "linkedStatus": "✓ linked",
-      "notLinkedStatus": "○ not linked",
       "linkButton": "link",
       "unlinkButton": "unlink",
       "lastMethodNotice": "last remaining method — can't unlink",
