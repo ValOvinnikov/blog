@@ -9,10 +9,12 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 }));
 
 describe('getNewsletterSettings', () => {
-  it('throws when the newsletter settings document does not exist', async () => {
+  it('returns undefined heading/description when the document does not exist (not yet configured, not an error)', async () => {
     mockRun.mockResolvedValue(null);
 
-    await expect(getNewsletterSettings()).rejects.toThrow();
+    const result = await getNewsletterSettings();
+
+    expect(result).toEqual({ heading: undefined, description: undefined });
   });
 
   it('maps raw newsletter settings into a domain object', async () => {
