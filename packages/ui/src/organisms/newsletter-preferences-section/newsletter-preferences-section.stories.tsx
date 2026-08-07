@@ -8,6 +8,9 @@ const meta = {
   component: NewsletterPreferencesSection,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  args: {
+    title: 'Newsletter',
+  },
   render: (args) => (
     <WindowChrome>
       <WindowChrome.Bar>
@@ -27,7 +30,10 @@ type TStory = StoryObj<typeof meta>;
 export const Active: TStory = {
   args: {
     status: 'active',
-    email: 'val@icloud.com',
+    badgeLabel: 'subscribed',
+    description:
+      'Weekly posts delivered to val@icloud.com (your account email — read-only in v1).',
+    actionLabel: 'unsubscribe',
     onUnsubscribe: () => {},
   },
 };
@@ -35,6 +41,10 @@ export const Active: TStory = {
 export const Pending: TStory = {
   args: {
     status: 'pending',
+    badgeLabel: 'pending confirmation',
+    description:
+      "The double-opt-in link hasn't been clicked yet. Resend it if it never arrived.",
+    actionLabel: '↻ resend confirmation',
     onResendConfirmation: () => {},
   },
 };

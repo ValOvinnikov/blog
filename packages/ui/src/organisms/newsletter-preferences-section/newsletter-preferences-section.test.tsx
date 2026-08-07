@@ -6,14 +6,18 @@ import { NewsletterPreferencesSection } from './newsletter-preferences-section';
 
 faker.seed(123);
 
-const email = faker.internet.email();
+const title = faker.lorem.words(2);
+const description = faker.lorem.sentence();
 
 describe(`<${NewsletterPreferencesSection.name}/>`, () => {
   describe('active status', () => {
     const onUnsubscribe = vi.fn();
     const setup = customRender(NewsletterPreferencesSection, {
       status: 'active',
-      email,
+      title,
+      badgeLabel: 'subscribed',
+      description,
+      actionLabel: 'unsubscribe',
       onUnsubscribe,
     });
 
@@ -22,32 +26,26 @@ describe(`<${NewsletterPreferencesSection.name}/>`, () => {
       setup();
     });
 
-    it('renders the newsletter row title', () => {
+    it('renders the given title', () => {
       expect(
-        screen.getByRole('heading', { name: /newsletter/i }),
+        screen.getByRole('heading', { name: new RegExp(title) }),
       ).toBeVisible();
     });
 
-    it('renders the subscribed badge', () => {
+    it('renders the given badge label', () => {
       expect(screen.getByText('subscribed')).toBeVisible();
     });
 
-    it('renders the account email in the description', () => {
-      expect(screen.getByText(email)).toBeVisible();
+    it('renders the given description', () => {
+      expect(screen.getByText(description)).toBeVisible();
     });
 
-    it('calls onUnsubscribe when the unsubscribe button is clicked', async () => {
+    it('calls onUnsubscribe when the action button is clicked', async () => {
       await userEvent.click(
         screen.getByRole('button', { name: 'unsubscribe' }),
       );
 
       expect(onUnsubscribe).toHaveBeenCalledTimes(1);
-    });
-
-    it('does not render the resend confirmation action', () => {
-      expect(
-        screen.queryByRole('button', { name: /resend confirmation/i }),
-      ).not.toBeInTheDocument();
     });
   });
 
@@ -55,6 +53,10 @@ describe(`<${NewsletterPreferencesSection.name}/>`, () => {
     const onResendConfirmation = vi.fn();
     const setup = customRender(NewsletterPreferencesSection, {
       status: 'pending',
+      title,
+      badgeLabel: 'pending confirmation',
+      description,
+      actionLabel: '↻ resend confirmation',
       onResendConfirmation,
     });
 
@@ -63,35 +65,32 @@ describe(`<${NewsletterPreferencesSection.name}/>`, () => {
       setup();
     });
 
-    it('renders the newsletter row title', () => {
+    it('renders the given title', () => {
       expect(
-        screen.getByRole('heading', { name: /newsletter/i }),
+        screen.getByRole('heading', { name: new RegExp(title) }),
       ).toBeVisible();
     });
 
-    it('renders the pending confirmation badge', () => {
+    it('renders the given badge label', () => {
       expect(screen.getByText('pending confirmation')).toBeVisible();
     });
 
-    it('calls onResendConfirmation when the resend button is clicked', async () => {
+    it('calls onResendConfirmation when the action button is clicked', async () => {
       await userEvent.click(
-        screen.getByRole('button', { name: /resend confirmation/i }),
+        screen.getByRole('button', { name: '↻ resend confirmation' }),
       );
 
       expect(onResendConfirmation).toHaveBeenCalledTimes(1);
-    });
-
-    it('does not render the unsubscribe action', () => {
-      expect(
-        screen.queryByRole('button', { name: 'unsubscribe' }),
-      ).not.toBeInTheDocument();
     });
   });
 
   it('forwards dataTestId to the setting row', () => {
     customRender(NewsletterPreferencesSection, {
       status: 'active',
-      email,
+      title,
+      badgeLabel: 'subscribed',
+      description,
+      actionLabel: 'unsubscribe',
       onUnsubscribe: () => {},
     })({ dataTestId: 'newsletter-preferences-section' });
 
