@@ -216,6 +216,14 @@ existing convention (consumer, required/optional, notes) — see that file for
 the access-convention rules (validated entry points only, never raw
 `process.env`, turbo strict-env declarations in `turbo.json`).
 
+## Comments
+
+Default to none. A comment earns its place only for a genuine non-obvious
+_why_ — a locking/concurrency subtlety, a schema constraint the types can't
+express, an Auth.js adapter requirement. Never restate what a query already
+says, never list out every field/param, never narrate a decision history by
+issue number — one or two sentences at most.
+
 ## Testing
 
 - Co-locate `*.test.ts` (Vitest, `node` environment). Test query/mutation

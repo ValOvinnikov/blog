@@ -134,6 +134,11 @@ When invoked, before writing any code:
 - **Extract at the second repetition.** A constant shape, type helper, or
   preset fragment used by two consumers becomes a shared export here — never
   copy-paste a third instance into a downstream package.
+- **Comments — short, or not at all.** Default to none. A comment earns its
+  place only for a genuine non-obvious _why_ (e.g. why a value must match a
+  CMS/service string exactly). Never restate what the code says, never list
+  every field/consumer, never narrate a decision history by issue number —
+  one or two sentences at most.
 
 ## Testing
 

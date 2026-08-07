@@ -241,6 +241,14 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
   `NEXT_PUBLIC_SITE_URL`. Ship `sitemap.ts`, `robots.ts`, and an RSS route.
 - Target Lighthouse ≥ 95. Semantic HTML, image `alt`, focus states.
 
+## Comments
+
+Default to none. A doc comment, when warranted, is one or two sentences of
+genuine non-obvious _why_ — never a listing of props/behavior (the types
+already say that), never a walkthrough of every issue/PR that touched the
+file. If it reads like a changelog or a design-doc summary, it's too long —
+that history belongs in the PR description, not the source file.
+
 ## Testing
 
 - Component/route tests with Vitest + Testing Library (jsdom). Mock `service`

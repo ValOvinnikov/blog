@@ -86,6 +86,14 @@ reusable module documents `module_hero`, `module_postList`, `module_content`,
   non-deterministic — if unrelated types flip in the diff, re-run until the
   diff is minimal. Commit the generated files.
 
+## Comments
+
+Default to none. A comment earns its place only for a genuine non-obvious
+_why_ (a validation quirk, a migration constraint, a field that must match a
+constant elsewhere exactly). Never restate what a field/rule already says,
+never list out every field, never narrate a decision history by issue
+number — one or two sentences at most.
+
 ## Definition of done for a CMS task
 
 Run these checks **once, after all schema work is complete**:
