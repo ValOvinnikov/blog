@@ -11,6 +11,22 @@ import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 // namespace, matching this file tree's other action modules.
 export type TLinkableProvider = 'github' | 'google';
 
+const LINKABLE_PROVIDERS: readonly TLinkableProvider[] = ['github', 'google'];
+
+// `provider: TLinkableProvider` on `unlinkProviderAction` below is only a
+// compile-time constraint — a `'use server'` action's underlying endpoint
+// can be invoked directly (bypassing the client bundle and TypeScript
+// entirely), so an attacker can pass an arbitrary string at runtime. Without
+// this guard that string would flow straight into the `console.error` below
+// (CodeQL flagged this as both a format-string and log-injection issue,
+// since it's attacker-controlled) and into `queries.account.unlinkProvider`
+// on the same unvalidated assumption. Re-validating here, before `provider`
+// is used anywhere, means every downstream use — logged or passed to the db
+// call — operates on a value that's actually one of the two known literals.
+function isLinkableProvider(value: string): value is TLinkableProvider {
+  return (LINKABLE_PROVIDERS as readonly string[]).includes(value);
+}
+
 export type TUnlinkProviderResult =
   { ok: true } | { ok: false; reason: 'last-method' | 'unknown' };
 
@@ -20,17 +36,21 @@ export type TUpdateDisplayNameResult = { ok: true } | { ok: false };
  * unlinkProviderAction — the `/account` 6c "unlink" control's server write
  * (#1159/#1162), called from `ProviderLinkControl`. Reads the session itself
  * rather than trusting a caller-supplied `userId` — same defensive stance as
- * every other action in this file tree. `queries.account.unlinkProvider`
- * atomically rejects with `'last-method'` if `provider` is the reader's last
- * remaining linked sign-in method; that outcome is surfaced distinctly
- * (`reason: 'last-method'`) rather than folded into a generic failure, so
- * the client can show a specific error even in the unlikely event the UI's
- * own last-method guard (`IdentitySection`) raced a concurrent unlink from
+ * every other action in this file tree. Also re-validates `provider` at
+ * runtime via `isLinkableProvider` — see that function's own docs — before
+ * it's used anywhere. `queries.account.unlinkProvider` atomically rejects
+ * with `'last-method'` if `provider` is the reader's last remaining linked
+ * sign-in method; that outcome is surfaced distinctly (`reason:
+ * 'last-method'`) rather than folded into a generic failure, so the client
+ * can show a specific error even in the unlikely event the UI's own
+ * last-method guard (`IdentitySection`) raced a concurrent unlink from
  * another tab.
  */
 export async function unlinkProviderAction(
   provider: TLinkableProvider,
 ): Promise<TUnlinkProviderResult> {
+  if (!isLinkableProvider(provider)) return { ok: false, reason: 'unknown' };
+
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return { ok: false, reason: 'unknown' };

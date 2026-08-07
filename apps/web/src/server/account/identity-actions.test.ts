@@ -40,6 +40,26 @@ describe('unlinkProviderAction', () => {
     expect(unlinkProviderMock).not.toHaveBeenCalled();
   });
 
+  it('rejects a provider that is not literally "github" or "google" at runtime, without logging or querying it', async () => {
+    // `provider`'s `TLinkableProvider` type is compile-time only — a
+    // `'use server'` action's endpoint can be invoked directly with an
+    // arbitrary string, bypassing TypeScript entirely. Casting past the
+    // type here simulates that, exercising the runtime `isLinkableProvider`
+    // guard the same way an attacker-crafted request would.
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    authMock.mockResolvedValue(session);
+    const { unlinkProviderAction } = await import('./identity-actions');
+
+    await expect(
+      unlinkProviderAction('DROP TABLE accounts;--' as 'github'),
+    ).resolves.toEqual({ ok: false, reason: 'unknown' });
+
+    expect(authMock).not.toHaveBeenCalled();
+    expect(unlinkProviderMock).not.toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
   it("unlinks the session user's provider and returns { ok: true }", async () => {
     authMock.mockResolvedValue(session);
     unlinkProviderMock.mockResolvedValue({ outcome: 'unlinked' });
