@@ -69,6 +69,18 @@ describe(`<${NewsletterSection.name}/>`, () => {
     ).toHaveTextContent('unsubscribe');
   });
 
+  it('renders the bar as a level-2 heading', async () => {
+    authMock.mockResolvedValue(authedSession);
+    getSubscriptionStatusMock.mockResolvedValue({
+      outcome: 'active',
+      subscriber: { email: 'val@icloud.com' },
+    });
+
+    await setup();
+
+    expect(screen.getByRole('heading', { level: 2 })).toBeVisible();
+  });
+
   it('renders the pending state with a resend control', async () => {
     authMock.mockResolvedValue(authedSession);
     getSubscriptionStatusMock.mockResolvedValue({

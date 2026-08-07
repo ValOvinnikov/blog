@@ -86,6 +86,19 @@ describe(`<${IdentitySection.name}/>`, () => {
     ).toHaveTextContent('unlink');
   });
 
+  it('renders the bar as a level-2 heading', async () => {
+    authMock.mockResolvedValue(authedSession);
+    getLinkedProvidersMock.mockResolvedValue({
+      github: true,
+      google: false,
+      emailLink: true,
+    });
+
+    await setup();
+
+    expect(screen.getByRole('heading', { level: 2 })).toBeVisible();
+  });
+
   it('renders each provider name as a level-3 heading, keeping the rows in the page heading outline', async () => {
     authMock.mockResolvedValue(authedSession);
     getLinkedProvidersMock.mockResolvedValue({

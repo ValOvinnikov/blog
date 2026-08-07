@@ -47,7 +47,7 @@ export async function NewsletterSection() {
 
   return (
     <WindowChrome>
-      <WindowChrome.Bar>
+      <WindowChrome.Bar headingLevel={2}>
         <WindowChrome.User>{handle}</WindowChrome.User>{' '}
         <WindowChrome.Prompt>{t('promptHost')}</WindowChrome.Prompt>{' '}
         {t('promptCommand')}

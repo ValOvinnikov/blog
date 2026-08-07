@@ -39,7 +39,7 @@ export async function PrivacySection() {
 
   return (
     <WindowChrome>
-      <WindowChrome.Bar>
+      <WindowChrome.Bar headingLevel={2}>
         <WindowChrome.User>{handle}</WindowChrome.User>{' '}
         <WindowChrome.Prompt>{t('promptHost')}</WindowChrome.Prompt>{' '}
         {t('promptCommand')}

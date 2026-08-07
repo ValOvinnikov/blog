@@ -57,6 +57,16 @@ describe(`<${PrivacySection.name}/>`, () => {
     expect(screen.getAllByText('val').length).toBeGreaterThan(0);
   });
 
+  it('renders the bar as a level-2 heading', async () => {
+    authMock.mockResolvedValue({
+      user: { id: 'user-1', name: 'Val Ovinnikov', email: 'val@example.com' },
+    });
+
+    await setup();
+
+    expect(screen.getByRole('heading', { level: 2 })).toBeVisible();
+  });
+
   it('renders the export-my-data row as a download link to the export route', async () => {
     authMock.mockResolvedValue({
       user: { id: 'user-1', name: 'Val Ovinnikov', email: 'val@example.com' },
