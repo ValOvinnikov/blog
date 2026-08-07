@@ -109,10 +109,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   // #1200). A failed settings fetch is optional/global data (SPEC.md's
   // fetch-error stance): logged, and the signup is simply omitted rather
   // than guessed at.
-  let newsletterHeading: string | undefined;
-  if (newsletterSettingsResult.ok) {
-    newsletterHeading = newsletterSettingsResult.data.heading ?? '';
-  } else {
+  if (!newsletterSettingsResult.ok) {
     console.error(
       `Error to fetch newsletter settings: ${sanitizeLogMessage(newsletterSettingsResult.error)}`,
     );
@@ -246,9 +243,12 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
           />
         </DepthProvider>
 
-        {newsletterEnabled && newsletterHeading !== undefined && (
+        {newsletterEnabled && newsletterSettingsResult.ok && (
           <div className={s.newsletter()}>
-            <NewsletterForm variant="compact" heading={newsletterHeading} />
+            <NewsletterForm
+              variant="compact"
+              heading={newsletterSettingsResult.data.heading}
+            />
           </div>
         )}
 

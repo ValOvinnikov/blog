@@ -8,14 +8,10 @@ export type TRawNewsletterSettings = NonNullable<
 >;
 
 export function toNewsletterSettings(
-  raw: TRawNewsletterSettings | null,
+  raw: TRawNewsletterSettings,
 ): TNewsletterSettings {
-  if (!raw) {
-    return { heading: undefined, description: undefined };
-  }
-
   return {
-    heading: raw.heading ?? undefined,
+    heading: raw.heading,
     description: raw.description ?? undefined,
   };
 }

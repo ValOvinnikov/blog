@@ -11,7 +11,7 @@ export function toNewsletterModule(
   raw: TRawNewsletterModule,
 ): TNewsletterModule {
   return {
-    heading: raw.heading ?? undefined,
+    heading: raw.heading,
     description: raw.description ?? undefined,
   };
 }

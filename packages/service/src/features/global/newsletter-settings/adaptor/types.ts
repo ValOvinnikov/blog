@@ -1,6 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config';
 
 export type TNewsletterSettings = {
-  heading: TMaybeUndefined<string>;
+  heading: string;
   description: TMaybeUndefined<string>;
 };

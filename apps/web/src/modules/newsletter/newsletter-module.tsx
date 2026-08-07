@@ -16,9 +16,8 @@ const s = newsletterModuleVariants();
  * module's service and ui meet. This is the Blog index page's optional
  * page-builder placement (`page_blog.modules`) — editors opt in by adding
  * the module there, no hardcoded mount point (#1200). `heading`/`description`
- * are CMS-authored only (never an i18n fallback, per #1200) — an empty
- * `heading` renders an empty string rather than falling back to copy the
- * CMS field itself says is optional.
+ * are CMS-authored only (never an i18n fallback, per #1200); `heading` is a
+ * required CMS field, so it's always a non-empty string here.
  */
 export async function NewsletterModule({ id }: INewsletterModuleProps) {
   const result = await service.modules.newsletter.v1.getNewsletter(id);
@@ -31,7 +30,7 @@ export async function NewsletterModule({ id }: INewsletterModuleProps) {
     <div className={s.root()}>
       <NewsletterForm
         variant="full"
-        heading={heading ?? ''}
+        heading={heading}
         description={description}
       />
     </div>

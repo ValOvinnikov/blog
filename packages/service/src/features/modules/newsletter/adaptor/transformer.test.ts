@@ -12,12 +12,11 @@ describe('toNewsletterModule', () => {
     expect(newsletter.description).toBe('Get new posts in your inbox.');
   });
 
-  it('leaves heading and description undefined when not set (no faked default)', () => {
-    const raw = makeRawNewsletterModule({ heading: null, description: null });
+  it('leaves description undefined when not set (no faked default)', () => {
+    const raw = makeRawNewsletterModule({ description: null });
 
     const newsletter = toNewsletterModule(raw);
 
-    expect(newsletter.heading).toBeUndefined();
     expect(newsletter.description).toBeUndefined();
   });
 });

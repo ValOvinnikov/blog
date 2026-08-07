@@ -9,12 +9,10 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 }));
 
 describe('getNewsletterSettings', () => {
-  it('returns undefined heading/description when the document does not exist (not yet configured, not an error)', async () => {
+  it('throws when the newsletter settings document does not exist', async () => {
     mockRun.mockResolvedValue(null);
 
-    const result = await getNewsletterSettings();
-
-    expect(result).toEqual({ heading: undefined, description: undefined });
+    await expect(getNewsletterSettings()).rejects.toThrow();
   });
 
   it('maps raw newsletter settings into a domain object', async () => {
@@ -31,14 +29,11 @@ describe('getNewsletterSettings', () => {
     expect(result.description).toBe('Weekly updates, no spam.');
   });
 
-  it('leaves heading and description undefined when not set (no faked default)', async () => {
-    mockRun.mockResolvedValue(
-      makeRawNewsletterSettings({ heading: null, description: null }),
-    );
+  it('leaves description undefined when not set (no faked default)', async () => {
+    mockRun.mockResolvedValue(makeRawNewsletterSettings({ description: null }));
 
     const result = await getNewsletterSettings();
 
-    expect(result.heading).toBeUndefined();
     expect(result.description).toBeUndefined();
   });
 });
