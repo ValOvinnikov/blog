@@ -12,6 +12,8 @@ export type {
   INewsletterSignupFullProps,
 } from './newsletter-signup';
 export { NewsletterSignup } from './newsletter-signup';
+export type { TNewsletterPreferencesSectionProps } from './newsletter-preferences-section';
+export { NewsletterPreferencesSection } from './newsletter-preferences-section';
 export type { IPaginationProps } from './pagination';
 export { Pagination } from './pagination';
 export type { IPostGridProps } from './post-grid';
