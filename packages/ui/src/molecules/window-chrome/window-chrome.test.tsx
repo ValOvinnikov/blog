@@ -72,4 +72,29 @@ describe(`<${WindowChrome.name}/>`, () => {
 
     expect(screen.getByTestId('window-chrome').className).toContain('mt-4');
   });
+
+  it('renders the bar as a heading tag when headingLevel is set', () => {
+    const command = faker.hacker.phrase();
+    renderElement(
+      <WindowChrome>
+        <WindowChrome.Bar headingLevel={2}>{command}</WindowChrome.Bar>
+        <WindowChrome.Body>body</WindowChrome.Body>
+      </WindowChrome>,
+    );
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: command }),
+    ).toBeVisible();
+  });
+
+  it('renders the bar as a plain div when headingLevel is not set', () => {
+    renderElement(
+      <WindowChrome>
+        <WindowChrome.Bar>bar</WindowChrome.Bar>
+        <WindowChrome.Body>body</WindowChrome.Body>
+      </WindowChrome>,
+    );
+
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+  });
 });
