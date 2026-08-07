@@ -1,19 +1,13 @@
 import type { IWithDataTestId } from '@blog/config';
+import { headingTags, type THeadingLevel } from '@blog/ui/lib/react';
 import type { ComponentPropsWithoutRef } from 'react';
 
 import { windowChromeBarVariants } from './window-chrome-bar-variants';
 
 export interface IWindowChromeBarProps
   extends ComponentPropsWithoutRef<'div'>, IWithDataTestId {
-  headingLevel?: 1 | 2 | 3 | 4;
+  headingLevel?: THeadingLevel;
 }
-
-const headingTags: Record<1 | 2 | 3 | 4, 'h1' | 'h2' | 'h3' | 'h4'> = {
-  1: 'h1',
-  2: 'h2',
-  3: 'h3',
-  4: 'h4',
-};
 
 /**
  * WindowChromeBar — the `WindowChrome` title bar. A prompt-styled flex row
