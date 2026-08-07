@@ -237,7 +237,7 @@ on the status tokens in §7. Mock: the "06 · Account" section of
 | ----------------------- | --------------------------------------------------------------------------------------------------- |
 | row separator           | 1px dashed `--border`                                                                               |
 | label                   | `--font-mono`, `--text`, weight 500, `--text-copy`                                                  |
-| description             | `--font-body`, `--text-subtle`, `--text-meta`                                                       |
+| description             | `--font-body`, `--text-subtle`, `--text-copy`                                                       |
 | control slot            | reuses §3.3 buttons / §3.4 field / status badge                                                     |
 | `tone="danger"` wrapper | 1px `--error` border, **left 2px `--error`**, background `--error-muted` tint, radius `--radius-sm` |
 

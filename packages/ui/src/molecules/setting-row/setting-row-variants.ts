@@ -12,7 +12,7 @@ export const settingRowVariants = tv({
       'flex flex-wrap items-center gap-2',
       'font-mono text-copy font-medium text-text',
     ],
-    description: ['mt-1 font-body text-meta text-subtle'],
+    description: ['mt-1 font-body text-copy text-subtle'],
     control: ['flex flex-wrap items-center justify-end gap-2'],
   },
   variants: {
