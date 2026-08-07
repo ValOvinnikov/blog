@@ -130,11 +130,21 @@ mention writing one.
 | In Progress     | `47fc9ee4`                       |
 | Code Review     | `679cfd06`                       |
 | Done            | `98236657`                       |
+| Rejected        | `6ec9286b`                       |
+
+`Rejected` is the terminal status for an issue closed as not-planned/cancelled
+(e.g. `gh issue close --reason "not planned"`) — distinct from `Done`, which
+is for completed, merged work. GitHub's built-in "closed → Done" workflow
+fires automatically on any close, including not-planned ones, so a
+not-planned closure needs a follow-up write moving it from the auto-applied
+`Done` to `Rejected`.
 
 These match the "Board IDs" appendix in `open-pull-request/SKILL.md` (used at
-both its Gate 0 and Gate 5). If a field-list/item-list query ever disagrees
-with this table, trust the live query and say so loudly in your report — the
-table is stale and needs a follow-up edit here.
+both its Gate 0 and Gate 5) — `open-pull-request/SKILL.md` doesn't need its
+own `Rejected` row since it only governs the ship-a-PR path, not cancellation.
+If a field-list/item-list query ever disagrees with this table, trust the
+live query and say so loudly in your report — the table is stale and needs a
+follow-up edit here.
 
 ## Input you receive
 
@@ -574,6 +584,12 @@ covers):**
 - Todo/In Progress → Done (a fast-merged PR can skip Code Review entirely)
 - Any status → Done for a closed parent issue whose sub-issues are **all**
   independently evidenced as closed via merged `Closes` PRs (Step 3b)
+- Any status → Rejected for an issue whose `stateReason` is `NOT_PLANNED`
+  (e.g. closed via `gh issue close --reason "not planned"`). GitHub's
+  built-in "closed → Done" workflow auto-applies Done on any closure,
+  including not-planned ones — checking `stateReason` (not just `state`)
+  before treating a closed-issue's Done status as final is what tells the
+  two cases apart, and a not-planned closure gets moved to Rejected instead.
 
 For each, run:
 
