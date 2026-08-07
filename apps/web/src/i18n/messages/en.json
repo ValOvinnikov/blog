@@ -213,6 +213,37 @@
       "resendToastSuccessMessage": "Confirmation email resent.",
       "resendToastErrorState": "failed",
       "resendError": "Couldn't resend the confirmation email. Try again."
+    },
+    "identity": {
+      "promptHost": "~$",
+      "promptCommand": "account --identities",
+      "githubLabel": "GitHub",
+      "googleLabel": "Google",
+      "emailLinkLabel": "Email link",
+      "linkedStatus": "✓ linked",
+      "notLinkedStatus": "○ not linked",
+      "linkButton": "link",
+      "unlinkButton": "unlink",
+      "lastMethodNotice": "last remaining method — can't unlink",
+      "unlinkToastCommand": "identity",
+      "unlinkToastLoadingState": "unlinking",
+      "unlinkToastLoadingMessage": "Unlinking your account…",
+      "unlinkToastSuccessState": "unlinked",
+      "unlinkToastSuccessMessage": "Account unlinked.",
+      "unlinkToastErrorState": "failed",
+      "unlinkError": "Couldn't unlink. Try again.",
+      "unlinkLastMethodError": "That's your only remaining sign-in method — link another before unlinking this one.",
+      "displayNameLabel": "Display name",
+      "displayNameDescription": "Overrides your provider handle wherever your comments appear.",
+      "displayNameAriaLabel": "Display name",
+      "saveButton": "save",
+      "saveToastCommand": "identity",
+      "saveToastLoadingState": "saving",
+      "saveToastLoadingMessage": "Saving your display name…",
+      "saveToastSuccessState": "saved",
+      "saveToastSuccessMessage": "Display name updated.",
+      "saveToastErrorState": "failed",
+      "saveError": "Couldn't update your display name. Try again."
     }
   }
 }

@@ -7,6 +7,12 @@ const { authMock } = vi.hoisted(() => ({ authMock: vi.fn() }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
+vi.mock('@web/components/pages/account-page/sections/identity-section', () => ({
+  IdentitySection: () => (
+    <div data-testid="identity-section">identity section</div>
+  ),
+}));
+
 vi.mock(
   '@web/components/pages/account-page/sections/newsletter-section',
   () => ({
@@ -37,7 +43,7 @@ describe(`<${AccountPage.name}/>`, () => {
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
   });
 
-  it('renders the page heading and both sections, newsletter above privacy', async () => {
+  it('renders the page heading and all three sections, in 6c/6b/6a order', async () => {
     authMock.mockResolvedValue({
       user: { id: 'user-1', name: 'Val Ovinnikov', email: 'val@example.com' },
     });
@@ -48,12 +54,19 @@ describe(`<${AccountPage.name}/>`, () => {
       screen.getByRole('heading', { level: 1, name: 'Account' }),
     ).toBeVisible();
 
+    const identitySection = screen.getByTestId('identity-section');
     const newsletterSection = screen.getByTestId('newsletter-section');
     const privacySection = screen.getByTestId('privacy-section');
+    expect(identitySection).toBeVisible();
     expect(newsletterSection).toBeVisible();
     expect(privacySection).toBeVisible();
-    // #1158's page-ordering decision: 6a "privacy & data" always renders
-    // last, so 6b's newsletter section must precede it in document order.
+    // #1158/#1162's page-ordering decision: 6c "connected accounts" renders
+    // first, then 6b "email & newsletter preferences", then 6a "privacy &
+    // data" last — each must precede the next in document order.
+    expect(
+      identitySection.compareDocumentPosition(newsletterSection) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
     expect(
       newsletterSection.compareDocumentPosition(privacySection) &
         Node.DOCUMENT_POSITION_FOLLOWING,

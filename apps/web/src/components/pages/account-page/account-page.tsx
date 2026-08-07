@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 import { accountPageVariants } from './account-page-variants';
+import { IdentitySection } from './sections/identity-section';
 import { NewsletterSection } from './sections/newsletter-section';
 import { PrivacySection } from './sections/privacy-section';
 
@@ -28,11 +29,9 @@ const s = accountPageVariants();
  * is **6c, then 6b, then 6a** — 6a "privacy & data" (`PrivacySection`)
  * always renders *last*, a fixed anchor at the bottom of the page (the
  * standard settings-page convention for a danger-zone section), and 6c
- * "connected accounts / identity" (#1162, not yet built) always renders
- * *first*, above 6b "email & newsletter preferences" (`NewsletterSection`).
- * So 6b inserts itself directly above `PrivacySection`, as it does today,
- * and when 6c lands it inserts itself above `NewsletterSection` — never
- * between `NewsletterSection` and `PrivacySection`.
+ * "connected accounts / identity" (`IdentitySection`, #1162) always renders
+ * *first*, above 6b "email & newsletter preferences" (`NewsletterSection`) —
+ * never between `NewsletterSection` and `PrivacySection`.
  */
 export async function AccountPage() {
   const session = await auth();
@@ -49,6 +48,7 @@ export async function AccountPage() {
         {t('title')}
       </Heading>
       <div className={s.sections()}>
+        <IdentitySection />
         <NewsletterSection />
         <PrivacySection />
       </div>
