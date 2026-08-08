@@ -22,13 +22,7 @@ export const toastVariants = tv({
     cmdCommand: ['text-muted'],
     cmdState: ['font-semibold'],
     time: ['shrink-0 text-label text-subtle'],
-    dismiss: [
-      'shrink-0 border-0 bg-transparent p-0',
-      'text-subtle',
-      'transition-colors duration-fast ease-console',
-      'cursor-pointer hover:text-error',
-      'focus-visible:ring-accent focus-visible:ring-offset-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-    ],
+    dismiss: ['shrink-0 hover:text-error'],
     body: ['flex flex-col gap-1.5 p-3'],
     message: [
       'flex items-baseline gap-1.5',

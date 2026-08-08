@@ -1,9 +1,12 @@
 import {
+  ICONS,
   Size,
   TOAST_TYPE,
   type IWithDataTestId,
   type TToastType,
 } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
+import { IconButton } from '@blog/ui/atoms/icon-button';
 import { Spinner } from '@blog/ui/atoms/spinner';
 import type { CSSProperties, ReactNode } from 'react';
 
@@ -115,15 +118,14 @@ export const Toast = ({
           {command} · <span className={s.cmdState()}>{state}</span>
         </span>
         {time && <span className={s.time()}>{time}</span>}
-        <button
-          type="button"
-          aria-label={dismissLabel}
+        <IconButton
+          ariaLabel={dismissLabel}
           title={dismissLabel}
           onClick={onDismiss}
           className={s.dismiss()}
         >
-          <span aria-hidden="true">✕</span>
-        </button>
+          <Icon name={ICONS.CLOSE} size={Size.SM} />
+        </IconButton>
       </div>
       <div className={s.body()}>
         <div className={s.message()}>
