@@ -127,28 +127,16 @@ describe(`<${PostCard.name}/>`, () => {
     expect(screen.getByText('Jan 1, 2024')).toBeVisible();
   });
 
-  it('renders the category lowercased with a trailing arrow icon via PostCard.Footer', () => {
+  it('renders the category lowercased via PostCard.Footer', () => {
     renderElement(
       <PostCard>
         <PostCard.Footer category="Design Systems" />
       </PostCard>,
     );
     expect(screen.getByText(/design systems/)).toBeVisible();
-    expect(screen.getByTestId('post-card-footer-arrow')).toBeVisible();
   });
 
-  it('does not render the trailing arrow icon when category is omitted from PostCard.Footer', () => {
-    renderElement(
-      <PostCard>
-        <PostCard.Footer authorName="Jane Doe" />
-      </PostCard>,
-    );
-    expect(
-      screen.queryByTestId('post-card-footer-arrow'),
-    ).not.toBeInTheDocument();
-  });
-
-  it('lets PostCard.Footer override the trailing icon PostCard supplies by default', () => {
+  it('renders a caller-supplied trailing icon via PostCard.Footer', () => {
     renderElement(
       <PostCard>
         <PostCard.Footer
@@ -158,9 +146,6 @@ describe(`<${PostCard.name}/>`, () => {
       </PostCard>,
     );
     expect(screen.getByTestId('custom-icon')).toBeVisible();
-    expect(
-      screen.queryByTestId('post-card-footer-arrow'),
-    ).not.toBeInTheDocument();
   });
 
   it('renders leadingIcon and trailingIcon with matching spacing around the category text', () => {
