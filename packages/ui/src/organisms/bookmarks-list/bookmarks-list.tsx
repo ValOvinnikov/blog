@@ -1,6 +1,6 @@
 import type { IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
-import type { ElementType } from 'react';
+import type { ElementType, ReactNode } from 'react';
 
 import { bookmarksListVariants } from './bookmarks-list-variants';
 
@@ -18,6 +18,8 @@ export interface IBookmarksListProps extends IWithDataTestId {
   emptyMessage: string;
   /** Summary line rendered below the listing when `rows` isn't empty, e.g. "3 saved". */
   hint?: string;
+  /** Decorative glyph/icon rendered before each row's date, e.g. a `drwx`-style permission string. Same content for every row; omitted when not supplied. */
+  prefix?: ReactNode;
   /** Component each row's filename link renders as — defaults to a plain `<a>`. Pass the app router's Link for client-side navigation. */
   linkAs?: TAnchorElementType;
   className?: string;
@@ -25,16 +27,17 @@ export interface IBookmarksListProps extends IWithDataTestId {
 
 /**
  * BookmarksList — the `/bookmarks` page's terminal directory-listing body,
- * styled as `ls -l` output: one row per saved post with a decorative
- * permission glyph, a pre-formatted date, and the post rendered as a
- * filename-styled link. Renders `emptyMessage` in place of the listing when
- * there are no saved posts. The surrounding window-chrome shell (title bar,
- * `$ ls ~/bookmarks -l` prompt) is composed by the caller.
+ * styled as `ls -l` output: one row per saved post with an optional
+ * caller-supplied prefix glyph, a pre-formatted date, and the post rendered
+ * as a filename-styled link. Renders `emptyMessage` in place of the listing
+ * when there are no saved posts. The surrounding window-chrome shell (title
+ * bar, `$ ls ~/bookmarks -l` prompt) is composed by the caller.
  */
 export const BookmarksList = ({
   rows,
   emptyMessage,
   hint,
+  prefix,
   linkAs,
   className,
   dataTestId,
@@ -61,9 +64,15 @@ export const BookmarksList = ({
           <ul role="list" className={list()}>
             {rows.map((bookmark) => (
               <li key={bookmark.id} className={row()}>
-                <span className={perm()} aria-hidden="true">
-                  drwx
-                </span>
+                {prefix && (
+                  <span
+                    className={perm()}
+                    aria-hidden="true"
+                    data-testid="bookmarks-list-row-prefix"
+                  >
+                    {prefix}
+                  </span>
+                )}
                 <span className={date()}>{bookmark.formattedDate}</span>
                 <Component href={bookmark.href} className={filename()}>
                   {bookmark.filename}

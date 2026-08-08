@@ -243,8 +243,8 @@ Slots:
 - **Article.Footer** — Article.Footer — end-of-article furniture; renders the post's tags as a chip list of links. Props: tags: IArticleFooterTag[] · linkAs?: TAnchorElementType _(extends Omit<ComponentPropsWithoutRef<'footer'>, 'child…, IWithDataTestId)_
 
 ### BookmarksList — `organisms/bookmarks-list/bookmarks-list.tsx`
-the `/bookmarks` page's terminal directory-listing body, styled as `ls -l` output: one row per saved post with a decorative permission glyph, a pre-formatted date, and the post rendered as a filename-styled link.
-Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · linkAs?: TAnchorElementType · className?: string _(extends IWithDataTestId)_
+the `/bookmarks` page's terminal directory-listing body, styled as `ls -l` output: one row per saved post with an optional caller-supplied prefix glyph, a pre-formatted date, and the post rendered as a filename-styled link.
+Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?: ReactNode · linkAs?: TAnchorElementType · className?: string _(extends IWithDataTestId)_
 
 ### ContentModule — `organisms/content-module/content-module.tsx`
 page-builder organism rendering a portable-text content block behind an optional heading.
