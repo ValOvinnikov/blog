@@ -1,4 +1,5 @@
-import type { IWithDataTestId } from '@blog/config';
+import { ICONS, Size, type IWithDataTestId } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
 import { MetaSeparator } from '@blog/ui/atoms/meta-separator';
 
 import { cardMetaVariants } from './card-meta-variants';
@@ -27,9 +28,12 @@ export const CardMeta = ({
   dataTestId,
 }: ICardMetaProps) => (
   <div className={s.root({ class: className })} data-testid={dataTestId}>
-    <span className={s.chevron()} aria-hidden="true">
-      ❯
-    </span>
+    <Icon
+      name={ICONS.CHEVRON_RIGHT}
+      size={Size.SM}
+      className={s.chevron()}
+      dataTestId="card-meta-chevron"
+    />
     <time dateTime={dateValue}>{dateLabel}</time>
     {readingTime && (
       <>
