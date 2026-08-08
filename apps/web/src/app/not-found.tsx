@@ -15,8 +15,8 @@ import {
  * that API falls back to reading `headers()` — fatal ("Page changed from
  * static to dynamic at runtime") on an on-demand render of the otherwise-
  * static `[locale]/[slug]` route. The provider wraps `NotFoundPage` because
- * its `SmartLink`/`CommandLink` render next-intl's client `Link`, which
- * throws without one.
+ * its `SmartLink` renders next-intl's client `Link`, which throws without
+ * one.
  */
 export async function generateMetadata(): Promise<Metadata> {
   setRequestLocale(LOCALE_ISO_CODES.EN);

@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_59 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_58 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -159,10 +159,6 @@ Variants: isCurrent: (boolean)
 ### CardMeta — `molecules/card-meta/card-meta.tsx`
 compact metadata row for post cards.
 Props: dateValue: string · dateLabel: string · readingTime?: string · className?: string _(extends IWithDataTestId)_
-
-### CommandLink — `molecules/command-link/command-link.tsx`
-CommandLink molecule — a monospace, terminal-prompt-styled navigation link (`$ cd ~ →`).
-Props: prompt?: string · command: string · ariaLabel: string · showArrow?: boolean · showCursor?: boolean · className?: string _(extends IWithDataTestId)_
 
 ### ImageWithCaption — `molecules/image-with-caption/image-with-caption.tsx`
 Composes `MediaFrame` + `Caption` inside a `<figure>`.
