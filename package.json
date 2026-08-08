@@ -16,6 +16,8 @@
     "test:watch": "turbo run test:watch",
     "storybook:build": "turbo run storybook:build",
     "typegen": "turbo run typegen",
+    "gen:ui-index": "node scripts/gen-ui-index.mjs",
+    "gen:ui-index:check": "node scripts/gen-ui-index.mjs --verify",
     "knip": "knip",
     "format": "turbo run format",
     "prepare": "husky"

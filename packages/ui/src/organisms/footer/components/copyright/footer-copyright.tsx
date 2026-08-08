@@ -9,6 +9,10 @@ interface IFooterCopyrightProps extends Omit<
   title: string;
 }
 
+/**
+ * FooterCopyright — the copyright line in the site `Footer`; renders
+ * "© {year} {title}" with the current year filled in automatically.
+ */
 export const FooterCopyright = ({
   title,
   className,

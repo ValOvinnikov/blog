@@ -18,6 +18,10 @@ export interface IPostCardFooterProps extends Omit<
 
 const s = postCardFooterVariants();
 
+/**
+ * PostCardFooter — the byline row at the bottom of a `PostCard`: optional author
+ * avatar and name, published date, and a category tag.
+ */
 export const PostCardFooter = ({
   authorName,
   authorAvatarSrc,

@@ -26,6 +26,10 @@ export interface IFooterProps
   children?: TCompoundChildren<typeof FooterParts>;
 }
 
+/**
+ * Footer — the site footer shell; composes `Footer.Nav` and `Footer.Copyright`
+ * slots into a `<footer>`. Structure only — each slot owns its own content.
+ */
 const FooterRoot = ({
   children,
   className,

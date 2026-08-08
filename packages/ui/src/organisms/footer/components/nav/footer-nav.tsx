@@ -6,6 +6,10 @@ interface IFooterNavProps extends ComponentPropsWithoutRef<'nav'> {
   ariaLabel?: string;
 }
 
+/**
+ * FooterNav — the navigation region of the site `Footer`; a labelled `<nav>`
+ * wrapping the footer links.
+ */
 export const FooterNav = ({
   className,
   ariaLabel,

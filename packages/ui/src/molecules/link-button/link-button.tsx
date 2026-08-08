@@ -14,6 +14,11 @@ export type TLinkButtonProps<C extends ElementType = 'a'> = TPolymorphicProps<
   TLinkButtonOwnProps
 >;
 
+/**
+ * LinkButton — a navigation link that looks like a `Button`: applies the shared
+ * `buttonVariants` to an anchor (or any `as` element), so links can read as
+ * buttons. Polymorphic via `as`, defaulting to `<a>`.
+ */
 export const LinkButton = <C extends ElementType = 'a'>({
   as,
   className,

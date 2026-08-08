@@ -35,6 +35,11 @@ export interface IPostCardProps
   children?: TCompoundChildren<typeof PostCardParts>;
 }
 
+/**
+ * PostCard — the article summary card used in listings; composes
+ * `PostCard.Media`, `PostCard.Meta`, `PostCard.Title`, and `PostCard.Footer`
+ * slots around an optional `excerpt` and `tags` row, rendered as an `<article>`.
+ */
 const PostCardRoot = ({
   excerpt,
   tags,

@@ -3,6 +3,10 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 import { heroMediaVariants } from './hero-media-variants';
 
+/**
+ * HeroMedia — the media slot of a `Hero`; frames its content at a 16:9 ratio via
+ * `MediaFrame`.
+ */
 export const HeroMedia = ({
   className,
   ...rest

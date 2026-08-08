@@ -33,6 +33,11 @@ export interface IHeroProps
   children?: TCompoundChildren<typeof HeroParts>;
 }
 
+/**
+ * Hero — the page-top hero band: renders `title` as an `<h1>` with optional
+ * `eyebrow` and `excerpt`, plus `Hero.Cta` and `Hero.Media` slots. Switches to
+ * a two-column layout when a `Hero.Media` slot is present.
+ */
 const HeroRoot = ({
   title,
   titleId,

@@ -190,6 +190,20 @@ of the three exceptions above applies. If none does, the answer is `true`,
 full stop — do not reopen the "but I need the result" argument, it was
 already settled.
 
+## The `@blog/ui` component index
+
+`packages/ui/COMPONENTS.md` is a generated index of every `@blog/ui` component
+— its purpose, props, and compound slots (`Header.Brand`, `PostCard.Media`, …)
+— produced by `scripts/gen-ui-index.mjs`. **Consult it before deciding a feature
+needs a new UI component:** it's the cheapest way to spot an existing component
+to reuse or extend, and the `explore`, `ui`, and `web` agents are pointed at it
+for the same reason (dispatch prompts can point there too). It's regenerated on
+staged `packages/ui` changes by the pre-commit hook and guarded in CI via
+`pnpm gen:ui-index:check` — drift (stale index), description coverage (every
+exported component/slot documented), and structural completeness (no component
+silently unindexed). Never hand-edit it; fix the source and regenerate. A future
+`apps/web` index would live alongside its code as `apps/web/COMPONENTS.md`.
+
 ## Use the skills
 
 - `develop-feature` at the start of any non-trivial task (lifecycle + delegation).

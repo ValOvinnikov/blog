@@ -70,6 +70,8 @@ src/atoms/theme-toggle/
   `vitest.config.ts` (resolve.alias), and `.storybook/main.ts`. Same-folder
   imports (`./header-variants`) stay relative.
 
+> **The component index depends on these conventions.** `scripts/gen-ui-index.mjs` parses this structure — eponymous `{folder}/{folder}.tsx` exporting a component named after the folder, a named `I{X}Props`/`T{X}Props` or inline param type, `-variants.ts` siblings, and the `Object.assign(Root, Parts)` / object-literal compound shapes — to build `packages/ui/COMPONENTS.md`. Deviating can leave a component silently unindexed; CI's `pnpm gen:ui-index:check` completeness guard fails when it does, so keep to the layout above.
+
 ## Accessibility rules (non-negotiable)
 
 - **Never hardcode strings in UI components.** Any text that conveys meaning or
@@ -177,11 +179,19 @@ replace them with bare string literals.
   `avatarUrl`, which forces every caller to hand-map. (`@blog/ui` still never
   imports `@blog/service`; structural typing bridges it.)
 - Server-component-safe by default. **No `"use client"` allowed** — see Purity.
-- **JSDoc says what a component/function is for, never how it's built —
-  REQUIRED, not a preference.** Add JSDoc above an exported component only
-  when its purpose isn't obvious from the name; skip it on type/interface/prop
-  declarations unless a constraint is genuinely non-obvious. Once you do write
-  one, it states what the thing is/does in plain terms — never CSS class
+- **Every exported component carries a JSDoc description — REQUIRED, not a
+  preference.** This covers compound roots and every slot/part component
+  (`Header.Brand`, `PostCard.Media`, …), even when the name looks
+  self-explanatory: the description is the library's public API surface and
+  feeds `packages/ui/COMPONENTS.md` (the generated component index), whose CI
+  coverage guard — `pnpm gen:ui-index:check` — fails the build when one is
+  missing. Write it as `Name — what it's for`. This does **not** loosen the
+  repo-wide "default to no comment" rule: it applies to _exported components_
+  only — still skip JSDoc on type/interface/prop declarations (unless a
+  constraint is genuinely non-obvious) and on internal helpers, and never add
+  inline comments that restate the code. **JSDoc says what a component is for,
+  never how it's built.** It states what the thing is/does in plain terms —
+  never CSS class
   names, Tailwind utilities, breakpoint behaviour, DOM nesting, or "where this
   renders relative to other elements" (that's what reading the code is for; a
   comment restating it just drifts out of sync the next time the styling
@@ -406,6 +416,7 @@ issues and ensures every committed file is consistently formatted.
 - [ ] Interactive/foreign content hosted via a `ReactNode` slot, not a forwarded
       controlled-props bag. Data props shaped to accept the view-model directly.
 - [ ] Stories file created alongside the component.
+- [ ] Exported component (and every compound slot/part) has a `Name — …` JSDoc description; `pnpm gen:ui-index:check` passes.
 - [ ] Icons via `<Icon name={ICONS.X}>` (`@blog/ui/atoms/icon`); no `lucide-react`, no ad-hoc inline SVG.
 - [ ] `describe(Component.name, ...)` and `beforeEach` for shared setup.
 - [ ] Uses token utilities; dark mode intact.

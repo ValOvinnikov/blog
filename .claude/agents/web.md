@@ -27,10 +27,11 @@ When invoked, before writing any code:
    service exports in `packages/service/src/index.ts` to find the functions
    to reuse.
 3. If a **UI agent report** was provided, note the component names, prop shapes,
-   and compound sub-component names you will compose. If not, check existing
-   `@blog/ui` exports in `packages/ui/src/index.ts` to identify reusable
-   components — do not build reusable design-system components here; ask the
-   `ui` agent for those.
+   and compound sub-component names you will compose. If not, read
+   `packages/ui/COMPONENTS.md` (the generated index of every component — its
+   purpose, props, and compound slots) to identify reusable components — do
+   not build reusable design-system components here; ask the `ui` agent for
+   those.
 4. Service functions return the correct shape — pass props through directly when
    they match. Only transform when needed (e.g. formatting a date string before
    passing it to a UI component).

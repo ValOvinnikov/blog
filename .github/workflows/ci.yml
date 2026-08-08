@@ -127,6 +127,31 @@ jobs:
           echo "::error::Committed generated types in ${generated} are stale. Run 'pnpm typegen' locally and commit the regenerated files."
           exit 1
 
+  ui-index:
+    name: UI index
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # `--verify` runs three read-only guards over packages/ui/COMPONENTS.md
+      # (regenerated from the ui sources by scripts/gen-ui-index.mjs) in one
+      # parse: drift (committed index stale vs. the sources), structure (a
+      # component folder that produced no entry or a compound slot that didn't
+      # resolve — a silently-unindexed component), and descriptions (an exported
+      # component/slot with no JSDoc description). The pre-commit hook runs the
+      # same structure+description guards locally; this is the CI backstop.
+      # Nothing is committed.
+      - name: UI index (verify current, complete + documented)
+        run: pnpm gen:ui-index:check
+
   migrations:
     name: Migrations
     runs-on: ubuntu-latest

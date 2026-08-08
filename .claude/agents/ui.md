@@ -24,7 +24,9 @@ When invoked, before writing any code:
    and which component(s) to add or change.
 2. Read existing components at the same atomic level (`atoms/`, `molecules/`,
    `organisms/`) to understand current structure, naming conventions, and
-   patterns — follow what exists.
+   patterns — follow what exists. Skim `packages/ui/COMPONENTS.md` (the
+   generated index of every component — purpose, props, compound slots) first
+   to spot an existing component to reuse or extend before building a new one.
 3. While reading, identify any improvements to the current implementations
    (missing JSDoc, wrong token usage, structural issues) and flag them to the
    orchestrator before implementing the new work.
@@ -83,11 +85,14 @@ archived brief.
   `border-border`, `max-w-prose`) from `@blog/config/tailwind/preset` — no raw
   hex. Keep dark mode intact.
 - Server-component-safe by default; `"use client"` only for interactivity.
-- JSDoc on exported components when the purpose isn't obvious from the name;
-  skip JSDoc on type/interface/prop declarations unless a constraint is
-  non-obvious. **One or two sentences, never a paragraph.** States what the
-  thing is for, never how it's styled/nested — no CSS classes, no
-  breakpoint/DOM mechanics, no issue/PR/branch numbers, no decision-history
+- **Every exported component gets a JSDoc description** (incl. compound roots
+  and every slot/part, e.g. `PostCard.Media`), even when the name seems
+  obvious — it feeds the generated `packages/ui/COMPONENTS.md` index and the CI
+  coverage guard `pnpm gen:ui-index:check` fails when one is missing. Write it
+  as `Name — what it's for`, one or two sentences, never a paragraph. Skip
+  JSDoc on type/interface/prop declarations unless a constraint is non-obvious.
+  States what the thing is for, never how it's styled/nested — no CSS classes,
+  no breakpoint/DOM mechanics, no issue/PR/branch numbers, no decision-history
   walkthrough of every ticket that touched the file — if it's starting to
   read like a changelog, it's too long (full rule + examples in
   `ui-library-practices`).
@@ -119,7 +124,7 @@ Run these checks **once, after all work is complete**:
 
 - `pnpm --filter @blog/ui type-check`, `lint`, and `test` pass.
 - No `service`/`sanity`/`fetch` import; `className` forwarded; tokens used.
-- Exported from the barrel; JSDoc present; test co-located; Storybook story added.
+- Exported from the barrel; JSDoc description present on every exported component/slot; test co-located; Storybook story added.
 
 **Report back to the orchestrator** with:
 
