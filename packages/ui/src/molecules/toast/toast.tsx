@@ -124,7 +124,11 @@ export const Toast = ({
           onClick={onDismiss}
           className={s.dismiss()}
         >
-          <Icon name={ICONS.CLOSE} size={Size.SM} />
+          <Icon
+            name={ICONS.CLOSE}
+            size={Size.SM}
+            dataTestId="toast-dismiss-icon"
+          />
         </IconButton>
       </div>
       <div className={s.body()}>
