@@ -289,7 +289,7 @@ a pure, controlled subscribe form built on the `TextInput` atom, exposed as two 
 
 Compound component:
 - **NewsletterSignup.Full** — `NewsletterSignup.Full` — the rich, tinted window-shell signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · description?: string · errorMessage?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · className?: string _(extends IWithDataTestId)_
-- **NewsletterSignup.Compact** — `NewsletterSignup.Compact` — a slim single-row `$ subscribe` strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · errorMessage?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · className?: string _(extends IWithDataTestId)_
+- **NewsletterSignup.Compact** — `NewsletterSignup.Compact` — a slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · prefix?: ReactNode · errorMessage?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · className?: string _(extends IWithDataTestId)_
 
 ### Pagination — `organisms/pagination/pagination.tsx`
 prev/next + numbered links for paginated listings.

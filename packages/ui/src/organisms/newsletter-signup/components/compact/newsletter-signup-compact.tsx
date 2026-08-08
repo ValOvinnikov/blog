@@ -6,6 +6,7 @@ import {
 import { Alert } from '@blog/ui/atoms/alert';
 import { NewsletterSignupContent } from '@blog/ui/organisms/newsletter-signup/components/content/newsletter-signup-content';
 import { newsletterSignupVariants } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
+import type { ReactNode } from 'react';
 
 export interface INewsletterSignupCompactProps extends IWithDataTestId {
   email: string;
@@ -13,6 +14,8 @@ export interface INewsletterSignupCompactProps extends IWithDataTestId {
   onSubmit: () => void;
   status: TFormStatus;
   heading: string;
+  /** Decorative glyph or icon rendered ahead of `heading`, e.g. a `$` prompt — supplied by the caller. */
+  prefix?: ReactNode;
   errorMessage?: string;
   successMessage?: string;
   submitLabel: string;
@@ -22,11 +25,11 @@ export interface INewsletterSignupCompactProps extends IWithDataTestId {
 }
 
 /**
- * `NewsletterSignup.Compact` — a slim single-row `$ subscribe` strip for the
- * end of every article. Shares the same idle/submitting/success/error state
+ * `NewsletterSignup.Compact` — a slim single-row subscribe strip for the end
+ * of every article. Shares the same idle/submitting/success/error state
  * machine as `NewsletterSignup.Full`, driven entirely by the `status` prop;
- * has no room for a description. The `$` prompt and `heading` label stay
- * visible through every state, including success.
+ * has no room for a description. `prefix` and `heading` stay visible through
+ * every state, including success.
  */
 export const NewsletterSignupCompact = ({
   email,
@@ -34,6 +37,7 @@ export const NewsletterSignupCompact = ({
   onSubmit,
   status,
   heading,
+  prefix,
   errorMessage,
   successMessage,
   submitLabel,
@@ -47,9 +51,15 @@ export const NewsletterSignupCompact = ({
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
-      <span className={s.prompt()} aria-hidden="true">
-        $
-      </span>
+      {prefix && (
+        <span
+          className={s.prompt()}
+          aria-hidden="true"
+          data-testid="newsletter-signup-compact-prefix"
+        >
+          {prefix}
+        </span>
+      )}
       <span className={s.label()}>{heading}</span>
       {isSuccess ? (
         <Alert

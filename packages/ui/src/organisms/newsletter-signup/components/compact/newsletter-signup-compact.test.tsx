@@ -12,6 +12,7 @@ const baseArgs = {
   onSubmit: vi.fn(),
   status: 'idle' as const,
   heading: 'subscribe --email',
+  prefix: '$',
   submitLabel: 'Subscribe',
   emailAriaLabel: 'Email address',
 };
@@ -36,9 +37,23 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     expect(screen.getByText(heading)).toBeVisible();
   });
 
-  it('marks the prompt glyph as decorative', () => {
+  it('renders the prefix as a decorative glyph ahead of the heading', () => {
     setup();
-    expect(screen.getByText('$')).toHaveAttribute('aria-hidden', 'true');
+
+    const prefix = screen.getByTestId('newsletter-signup-compact-prefix');
+    expect(prefix).toHaveAttribute('aria-hidden', 'true');
+    expect(prefix).toHaveTextContent('$');
+    expect(
+      prefix.compareDocumentPosition(screen.getByText('subscribe --email')),
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it('renders no prefix element when prefix is omitted', () => {
+    setup({ prefix: undefined });
+
+    expect(
+      screen.queryByTestId('newsletter-signup-compact-prefix'),
+    ).not.toBeInTheDocument();
   });
 
   it('calls onSubmit when the submit button is clicked', async () => {
@@ -76,10 +91,13 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
-  it('keeps the $ subscribe --email prompt visible on success', () => {
+  it('keeps the prefix and heading visible on success', () => {
     const successMessage = 'Almost there — check your inbox to confirm.';
     setup({ status: 'success', successMessage });
 
+    expect(
+      screen.getByTestId('newsletter-signup-compact-prefix'),
+    ).toBeVisible();
     expect(screen.getByText('subscribe --email')).toBeVisible();
   });
 
