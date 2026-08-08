@@ -93,6 +93,7 @@ export async function BookmarksPage() {
             hint={
               rows.length > 0 ? t('hint', { count: rows.length }) : undefined
             }
+            prefix="drwx"
             linkAs={SmartLink}
           />
         </WindowChrome.Body>
