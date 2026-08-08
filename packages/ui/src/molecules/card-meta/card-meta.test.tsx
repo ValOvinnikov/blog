@@ -33,20 +33,26 @@ describe(`<${CardMeta.name}/>`, () => {
   });
 
   it('omits readingTime segment and its separator when not provided — only the decorative chevron is aria-hidden', () => {
-    const { container } = setup();
-    const hidden = container.querySelectorAll('[aria-hidden="true"]');
-    expect(hidden).toHaveLength(1);
+    setup();
+    expect(screen.getByTestId('card-meta-chevron')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+    expect(screen.queryByText('·')).not.toBeInTheDocument();
   });
 
   it('renders the chevron and separator as aria-hidden when readingTime is provided', () => {
-    const { container } = setup({ readingTime });
-    const hidden = container.querySelectorAll('[aria-hidden="true"]');
-    expect(hidden).toHaveLength(2);
+    setup({ readingTime });
+    expect(screen.getByTestId('card-meta-chevron')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
+    expect(screen.getByText('·')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('renders a decorative chevron before the date', () => {
     setup();
-    expect(screen.getByText('❯')).toBeVisible();
+    expect(screen.getByTestId('card-meta-chevron')).toBeVisible();
   });
 
   it('forwards dataTestId to root element', () => {
