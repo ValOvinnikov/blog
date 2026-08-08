@@ -116,7 +116,7 @@ export function NewsletterForm({
   };
 
   if (variant === 'compact') {
-    return <NewsletterSignup.Compact {...sharedProps} />;
+    return <NewsletterSignup.Compact {...sharedProps} prefix="$" />;
   }
 
   return <NewsletterSignup.Full {...sharedProps} description={description} />;
