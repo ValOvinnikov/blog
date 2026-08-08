@@ -8,6 +8,10 @@ export interface IPostGridProps
   children: ReactNode;
 }
 
+/**
+ * PostGrid — the responsive grid container that lays out `PostCard`s (or any
+ * children) in columns. Layout only — no data or per-item chrome of its own.
+ */
 export const PostGrid = ({
   children,
   className,

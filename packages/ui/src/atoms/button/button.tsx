@@ -7,6 +7,11 @@ export type TButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
   TButtonVariants &
   IWithDataTestId;
 
+/**
+ * Button — the styled `<button>` for in-page actions (submit, toggle, dismiss).
+ * Renders `type="button"` and takes its look from the shared `variant`/`size`
+ * scale; reach for `LinkButton` when the control is really a navigation link.
+ */
 export const Button = ({
   className,
   variant,

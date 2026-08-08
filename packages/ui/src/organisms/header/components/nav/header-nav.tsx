@@ -6,6 +6,10 @@ interface IHeaderNavProps extends ComponentPropsWithoutRef<'nav'> {
   ariaLabel?: string;
 }
 
+/**
+ * HeaderNav — the primary navigation region of the site `Header`; a labelled
+ * `<nav>` wrapping the header links.
+ */
 export const HeaderNav = ({
   className,
   ariaLabel,

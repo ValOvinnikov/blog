@@ -12,6 +12,11 @@ export interface IContentSectionProps
   titleId: string;
 }
 
+/**
+ * ContentSection — a titled `<section>` wrapper: renders an `<h2>` from
+ * `title`/`titleId` and wires `aria-labelledby` to it, so grouped page content
+ * is announced as a named region.
+ */
 export const ContentSection = ({
   children,
   className,

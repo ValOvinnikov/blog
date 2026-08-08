@@ -49,6 +49,9 @@ Useful starting points, in rough order of cheapness:
   concluding something does not exist.
 - `packages/config/src/sanity/generated/types.ts` — every content shape.
 - `packages/service/src/index.ts` — the whole data-access surface.
+- `packages/ui/COMPONENTS.md` — generated index of every `@blog/ui` component
+  (purpose, props, compound slots). Read this first to answer "is there
+  already a component that does X" before grepping the component tree.
 - `packages/ui/src/` — components by atomic tier.
 - `apps/web/src/app/` — routes.
 

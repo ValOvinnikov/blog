@@ -28,6 +28,11 @@ export interface IHeaderProps
   children?: TCompoundChildren<typeof HeaderParts>;
 }
 
+/**
+ * Header — the site header shell; composes a `Header.Brand` slot alongside
+ * grouped `Header.Nav` and `Header.Actions` slots into a `<header>`. The
+ * nav/actions group only renders when at least one of them is provided.
+ */
 const HeaderRoot = ({
   children,
   className,

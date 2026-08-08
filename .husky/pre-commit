@@ -1,1 +1,6 @@
 pnpm exec lint-staged
+
+# When a ui component source is staged: regenerate packages/ui/COMPONENTS.md,
+# stage it, and verify it (structure + descriptions). Blocks the commit if a
+# component is undocumented or unindexable. Fast no-op for every other commit.
+node scripts/gen-ui-index.mjs --if-staged
