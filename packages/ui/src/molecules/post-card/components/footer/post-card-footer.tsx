@@ -1,6 +1,6 @@
 import { Size } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import { postCardFooterVariants } from './post-card-footer-variants';
 
@@ -12,8 +12,12 @@ export interface IPostCardFooterProps extends Omit<
   authorAvatarSrc?: string;
   publishedAt?: string;
   formattedDate?: string;
-  /** Post category, rendered lowercased with a trailing decorative arrow. */
+  /** Post category, rendered lowercased alongside `leadingIcon`/`trailingIcon`. */
   category?: string;
+  /** Icon rendered before the category text, e.g. `<Icon name={ICONS.X} />`. */
+  leadingIcon?: ReactNode;
+  /** Icon rendered after the category text, e.g. `<Icon name={ICONS.ARROW} />`. */
+  trailingIcon?: ReactNode;
 }
 
 const s = postCardFooterVariants();
@@ -28,6 +32,8 @@ export const PostCardFooter = ({
   publishedAt,
   formattedDate,
   category,
+  leadingIcon,
+  trailingIcon,
   className,
   ...rest
 }: IPostCardFooterProps) => (
@@ -46,7 +52,7 @@ export const PostCardFooter = ({
     )}
     {category && (
       <span className={s.category()}>
-        {category.toLowerCase()} <span aria-hidden="true">→</span>
+        {leadingIcon} {category.toLowerCase()} {trailingIcon}
       </span>
     )}
   </div>

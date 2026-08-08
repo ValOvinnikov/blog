@@ -127,24 +127,54 @@ describe(`<${PostCard.name}/>`, () => {
     expect(screen.getByText('Jan 1, 2024')).toBeVisible();
   });
 
-  it('renders the category lowercased with a trailing decorative arrow via PostCard.Footer', () => {
+  it('renders the category lowercased with a trailing arrow icon via PostCard.Footer', () => {
     renderElement(
       <PostCard>
         <PostCard.Footer category="Design Systems" />
       </PostCard>,
     );
     expect(screen.getByText(/design systems/)).toBeVisible();
-    const arrow = screen.getByText('→');
-    expect(arrow).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByTestId('post-card-footer-arrow')).toBeVisible();
   });
 
-  it('does not render category text when omitted from PostCard.Footer', () => {
+  it('does not render the trailing arrow icon when category is omitted from PostCard.Footer', () => {
     renderElement(
       <PostCard>
         <PostCard.Footer authorName="Jane Doe" />
       </PostCard>,
     );
-    expect(screen.queryByText('→')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('post-card-footer-arrow'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('lets PostCard.Footer override the trailing icon PostCard supplies by default', () => {
+    renderElement(
+      <PostCard>
+        <PostCard.Footer
+          category="Design Systems"
+          trailingIcon={<span data-testid="custom-icon" />}
+        />
+      </PostCard>,
+    );
+    expect(screen.getByTestId('custom-icon')).toBeVisible();
+    expect(
+      screen.queryByTestId('post-card-footer-arrow'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders leadingIcon and trailingIcon with matching spacing around the category text', () => {
+    renderElement(
+      <PostCard>
+        <PostCard.Footer
+          category="Design Systems"
+          leadingIcon={<span aria-hidden="true">L</span>}
+          trailingIcon={<span aria-hidden="true">R</span>}
+        />
+      </PostCard>,
+    );
+    const categoryText = screen.getByText(/design systems/);
+    expect(categoryText.textContent).toBe('L design systems R');
   });
 
   it('forwards data-testid to root element', () => {

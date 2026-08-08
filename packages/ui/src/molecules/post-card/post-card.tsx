@@ -1,4 +1,5 @@
-import { type IWithDataTestId } from '@blog/config';
+import { ICONS, Size, type IWithDataTestId } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
 import { Tag } from '@blog/ui/atoms/tag';
 import {
   mapCompoundSlots,
@@ -7,12 +8,17 @@ import {
 } from '@blog/ui/lib/react';
 import { CardMeta } from '@blog/ui/molecules/card-meta';
 import {
+  cloneElement,
   type ComponentPropsWithoutRef,
   type ElementType,
   Fragment,
+  type ReactElement,
 } from 'react';
 
-import { PostCardFooter } from './components/footer/post-card-footer';
+import {
+  type IPostCardFooterProps,
+  PostCardFooter,
+} from './components/footer/post-card-footer';
 import { PostCardMedia } from './components/media/post-card-media';
 import { PostCardTitle } from './components/title/post-card-title';
 import { postCardVariants } from './post-card-variants';
@@ -49,6 +55,18 @@ const PostCardRoot = ({
   ...rest
 }: IPostCardProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, PostCardParts);
+  const footer = slots.Footer as ReactElement<IPostCardFooterProps> | undefined;
+  const footerSlot = footer
+    ? cloneElement(footer, {
+        trailingIcon: footer.props.trailingIcon ?? (
+          <Icon
+            name={ICONS.ARROW}
+            size={Size.SM}
+            dataTestId="post-card-footer-arrow"
+          />
+        ),
+      })
+    : undefined;
 
   return (
     <article
@@ -71,7 +89,7 @@ const PostCardRoot = ({
           </div>
         )}
         {excerpt && <p className={s.excerpt()}>{excerpt}</p>}
-        {slots.Footer}
+        {footerSlot}
       </div>
     </article>
   );
