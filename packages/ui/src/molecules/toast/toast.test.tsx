@@ -50,6 +50,13 @@ describe(`<${Toast.name}/>`, () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
+  it('renders the dismiss button using the close icon, not a raw glyph', () => {
+    setup();
+    const dismissButton = screen.getByRole('button', { name: dismissLabel });
+    expect(screen.getByTestId('toast-dismiss-icon')).toBeInTheDocument();
+    expect(dismissButton).not.toHaveTextContent('✕');
+  });
+
   it('renders the relative time when provided', () => {
     setup({ time: 'just now' });
     expect(screen.getByText('just now')).toBeVisible();

@@ -11,6 +11,8 @@ import CheckSheetComponent from '@blog/ui/assets/icons/check-sheet.svg';
 import CheckSheetUrl from '@blog/ui/assets/icons/check-sheet.svg?url';
 import CheckComponent from '@blog/ui/assets/icons/check.svg';
 import CheckUrl from '@blog/ui/assets/icons/check.svg?url';
+import ChevronRightComponent from '@blog/ui/assets/icons/chevron-right.svg';
+import ChevronRightUrl from '@blog/ui/assets/icons/chevron-right.svg?url';
 import CloseComponent from '@blog/ui/assets/icons/close.svg';
 import CloseUrl from '@blog/ui/assets/icons/close.svg?url';
 import CopyComponent from '@blog/ui/assets/icons/copy.svg';
@@ -72,6 +74,10 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.COPY]: { component: CopyComponent, url: CopyUrl },
   [ICONS.CHECK]: { component: CheckComponent, url: CheckUrl },
   [ICONS.CHECK_SHEET]: { component: CheckSheetComponent, url: CheckSheetUrl },
+  [ICONS.CHEVRON_RIGHT]: {
+    component: ChevronRightComponent,
+    url: ChevronRightUrl,
+  },
   [ICONS.EXTERNAL_LINK]: {
     component: ExternalLinkComponent,
     url: ExternalLinkUrl,
