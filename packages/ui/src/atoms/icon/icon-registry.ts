@@ -3,6 +3,8 @@ import { type FC, type SVGProps } from 'react';
 
 import ArrowUpComponent from '@blog/ui/assets/icons/arrow-up.svg';
 import ArrowUpUrl from '@blog/ui/assets/icons/arrow-up.svg?url';
+import ArrowComponent from '@blog/ui/assets/icons/arrow.svg';
+import ArrowUrl from '@blog/ui/assets/icons/arrow.svg?url';
 import BookmarkComponent from '@blog/ui/assets/icons/bookmark.svg';
 import BookmarkUrl from '@blog/ui/assets/icons/bookmark.svg?url';
 import CheckSheetComponent from '@blog/ui/assets/icons/check-sheet.svg';
@@ -84,6 +86,7 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.FACEBOOK]: { component: FacebookComponent, url: FacebookUrl },
   [ICONS.RSS]: { component: RssComponent, url: RssUrl },
   [ICONS.ARROW_UP]: { component: ArrowUpComponent, url: ArrowUpUrl },
+  [ICONS.ARROW]: { component: ArrowComponent, url: ArrowUrl },
   [ICONS.GOOGLE]: { component: GoogleComponent, url: GoogleUrl },
   [ICONS.BOOKMARK]: { component: BookmarkComponent, url: BookmarkUrl },
   [ICONS.SPINNER]: { component: SpinnerComponent, url: SpinnerUrl },

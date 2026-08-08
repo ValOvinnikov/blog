@@ -3,7 +3,6 @@ export * from './aside';
 export * from './brand-lockup';
 export * from './breadcrumbs';
 export * from './card-meta';
-export * from './command-link';
 export * from './image-with-caption';
 export * from './link-button';
 export * from './popover-menu';

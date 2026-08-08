@@ -1,4 +1,4 @@
-import { customRender, screen } from '@web/testing/custom-render';
+import { customRender, screen, within } from '@web/testing/custom-render';
 
 import { NotFoundPage } from './not-found-page';
 
@@ -22,5 +22,12 @@ describe(`<${NotFoundPage.name}/>`, () => {
   it('renders a link back home', () => {
     const link = screen.getByRole('link', { name: 'Return home' });
     expect(link).toHaveAttribute('href', '/');
+  });
+
+  it('renders the decorative arrow icon inside the link', () => {
+    const link = screen.getByRole('link', { name: 'Return home' });
+    expect(
+      within(link).getByTestId('not-found-arrow-icon'),
+    ).toBeInTheDocument();
   });
 });

@@ -1,11 +1,21 @@
-import { Heading, Text } from '@blog/ui/atoms';
-import { CommandLink, TerminalChip } from '@blog/ui/molecules';
+import { ICONS } from '@blog/config';
+import { Heading, Icon, Text } from '@blog/ui/atoms';
+import { TerminalChip } from '@blog/ui/molecules';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 
-import { notFoundPageVariants } from './not-found-page-variants';
+import {
+  notFoundLinkVariants,
+  notFoundPageVariants,
+} from './not-found-page-variants';
 
 const s = notFoundPageVariants();
+const {
+  root,
+  prompt: promptSlot,
+  command: commandSlot,
+  arrow,
+} = notFoundLinkVariants();
 
 /**
  * NotFoundPage — the terminal-styled 404 body content. Rendered from the
@@ -28,12 +38,15 @@ export const NotFoundPage = () => {
         className={s.chip()}
       />
       <Text className={s.copy()}>{t('description')}</Text>
-      <CommandLink
-        as={SmartLink}
-        href="/"
-        command="cd ~"
-        ariaLabel={t('returnHome')}
-      />
+      <SmartLink href="/" aria-label={t('returnHome')} className={root()}>
+        <span className={promptSlot()} aria-hidden="true">
+          $
+        </span>
+        <span className={commandSlot()}>cd ~</span>
+        <span className={arrow()} aria-hidden="true">
+          <Icon name={ICONS.ARROW} dataTestId="not-found-arrow-icon" />
+        </span>
+      </SmartLink>
     </main>
   );
 };
