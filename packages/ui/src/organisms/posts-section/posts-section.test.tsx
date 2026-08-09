@@ -93,6 +93,14 @@ describe(`<${PostsSection.name}/>`, () => {
     }
   });
 
+  it('renders a trailing arrow icon in each post category footer', () => {
+    setup();
+
+    expect(screen.getAllByTestId('post-card-footer-arrow')).toHaveLength(
+      posts.length,
+    );
+  });
+
   it('renders readingTime when provided on a post', () => {
     const readingTime = `${faker.number.int({ min: 3, max: 15 })} min`;
     const postsWithReadingTime = posts.map((post, index) =>

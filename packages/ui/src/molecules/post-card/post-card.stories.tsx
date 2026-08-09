@@ -1,3 +1,5 @@
+import { ICONS, Size } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { PostCard } from './post-card';
@@ -29,7 +31,10 @@ const meta = {
             Building a Design System from Scratch
           </a>
         </PostCard.Title>
-        <PostCard.Footer category="design-system" />
+        <PostCard.Footer
+          category="design-system"
+          trailingIcon={<Icon name={ICONS.ARROW} size={Size.SM} />}
+        />
       </>
     ),
   },
@@ -81,7 +86,30 @@ export const WithTags: TStory = {
         <PostCard.Title>
           <a href="/posts/typescript-tips">TypeScript Tips for 2024</a>
         </PostCard.Title>
-        <PostCard.Footer category="typescript" />
+        <PostCard.Footer
+          category="typescript"
+          trailingIcon={<Icon name={ICONS.ARROW} size={Size.SM} />}
+        />
+      </>
+    ),
+  },
+};
+
+export const WithFooterLeadingIcon: TStory = {
+  args: {
+    excerpt:
+      'A collection of practical TypeScript patterns that will level up your code.',
+    tags: ['typescript', 'javascript', 'tips'],
+    children: (
+      <>
+        <PostCard.Title>
+          <a href="/posts/typescript-tips">TypeScript Tips for 2024</a>
+        </PostCard.Title>
+        <PostCard.Footer
+          category="typescript"
+          leadingIcon={<Icon name={ICONS.BOOKMARK} size={Size.SM} />}
+          trailingIcon={<Icon name={ICONS.ARROW} size={Size.SM} />}
+        />
       </>
     ),
   },

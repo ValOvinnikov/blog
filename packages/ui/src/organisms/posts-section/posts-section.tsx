@@ -1,5 +1,6 @@
-import type { IWithDataTestId } from '@blog/config';
+import { ICONS, Size, type IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
+import { Icon } from '@blog/ui/atoms/icon';
 import { PostCard } from '@blog/ui/molecules/post-card';
 import type { ElementType } from 'react';
 
@@ -83,7 +84,16 @@ export const PostsSection = ({
                   {post.title}
                 </Component>
               </PostCard.Title>
-              <PostCard.Footer category={post.category.title} />
+              <PostCard.Footer
+                category={post.category.title}
+                trailingIcon={
+                  <Icon
+                    name={ICONS.ARROW}
+                    size={Size.SM}
+                    dataTestId="post-card-footer-arrow"
+                  />
+                }
+              />
             </PostCard>
           ))}
         </div>

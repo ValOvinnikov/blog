@@ -187,7 +187,7 @@ Slots:
 - **PostCard.Media** — the media region at the top of a `PostCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: _(extends ComponentPropsWithoutRef<'div'>)_
 - **PostCard.Meta** — compact metadata row for post cards. Props: dateValue: string · dateLabel: string · readingTime?: string · className?: string _(extends IWithDataTestId)_
 - **PostCard.Title** — the post heading inside a `PostCard`, rendered as a styled `<h3>`. Props: _(extends ComponentPropsWithoutRef<'h3'>)_
-- **PostCard.Footer** — the byline row at the bottom of a `PostCard`: optional author avatar and name, published date, and a category tag. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · category?: string _(extends Omit< ComponentPropsWithoutRef<'div'>, 'childre…)_
+- **PostCard.Footer** — the byline row at the bottom of a `PostCard`: optional author avatar and name, published date, and a category tag. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · category?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends Omit< ComponentPropsWithoutRef<'div'>, 'childre…)_
 
 ### PostMeta — `molecules/post-meta/post-meta.tsx`
 post detail metadata strip: author avatar + name, publish date, and estimated reading time.
