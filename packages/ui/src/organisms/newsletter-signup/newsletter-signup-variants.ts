@@ -3,7 +3,7 @@ import type { VariantProps } from 'tailwind-variants';
 
 export const newsletterSignupVariants = tv({
   slots: {
-    root: ['w-full'],
+    root: [],
     body: ['grid grid-cols-1 p-0', 'md:grid-cols-[1.1fr_1fr]'],
     pitchPane: ['flex flex-col gap-3 p-8'],
     heading: ['font-mono text-card-title font-medium text-accent', 'm-0'],
@@ -26,15 +26,20 @@ export const newsletterSignupVariants = tv({
     spinner: ['text-accent-contrast'],
     label: ['font-mono text-copy text-text'],
     alert: [],
+    // `prefix` + `label` group for `compact` — kept in its own inline-flex
+    // wrapper so the two never split across rows under the root's own
+    // `flex-col`/`sm:flex-row` stacking.
+    promptGroup: ['inline-flex shrink-0 items-center gap-1'],
   },
   variants: {
     variant: {
       full: {
+        root: ['w-full'],
         submit: ['w-full'],
       },
       compact: {
         root: [
-          'flex flex-col gap-2',
+          'inline-flex flex-col gap-2',
           'sm:flex-row sm:flex-wrap sm:items-center',
           'rounded-sm border border-border border-l-3 border-l-accent bg-surface-2',
           'px-3 py-2.5',
@@ -45,7 +50,6 @@ export const newsletterSignupVariants = tv({
         ],
         field: ['flex-1 sm:min-w-[12rem]'],
         submit: ['shrink-0'],
-        label: ['shrink-0'],
         alert: ['flex-1'],
       },
     },
