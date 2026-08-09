@@ -12,6 +12,7 @@ const meta = {
     onSubmit: () => {},
     status: 'idle',
     heading: 'subscribe --email',
+    prefix: <span aria-hidden="true">$</span>,
     submitLabel: 'subscribe ↵',
     emailAriaLabel: 'Email address',
     placeholder: 'you@domain.dev',
@@ -42,4 +43,8 @@ export const Error: TStory = {
     email: 'not-an-email',
     errorMessage: 'Enter a valid email address.',
   },
+};
+
+export const WithoutPrefix: TStory = {
+  args: { prefix: undefined },
 };
