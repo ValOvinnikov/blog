@@ -48,3 +48,12 @@ export const Error: TStory = {
 export const WithoutPrefix: TStory = {
   args: { prefix: undefined },
 };
+
+// The root's `flex-col`/`sm:flex-row` stacking is a real `sm:` media-query
+// fork, not a container query — pinning `phone` (an intentional exception,
+// see the `ui-storybook` skill) is the only way to default this story to a
+// canvas under `sm` so the prefix+heading group's one-line layout (and the
+// strip's content-sized, not full-width, footprint) is what actually renders.
+export const MobilePhone: TStory = {
+  globals: { viewport: 'phone' },
+};
