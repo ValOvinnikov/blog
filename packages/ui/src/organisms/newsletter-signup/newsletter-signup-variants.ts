@@ -10,7 +10,6 @@ export const newsletterSignupVariants = tv({
     field: [],
     submit: ['inline-flex items-center justify-center gap-2'],
     spinner: ['text-accent-contrast'],
-    prompt: ['select-none text-accent'],
     label: ['font-mono text-copy text-text'],
     alert: [],
   },

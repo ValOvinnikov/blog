@@ -12,7 +12,7 @@ const meta = {
     onSubmit: () => {},
     status: 'idle',
     heading: 'subscribe --email',
-    prefix: '$',
+    prefix: <span aria-hidden="true">$</span>,
     submitLabel: 'subscribe ↵',
     emailAriaLabel: 'Email address',
     placeholder: 'you@domain.dev',

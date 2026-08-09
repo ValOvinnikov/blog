@@ -14,7 +14,7 @@ export interface INewsletterSignupCompactProps extends IWithDataTestId {
   onSubmit: () => void;
   status: TFormStatus;
   heading: string;
-  /** Decorative glyph or icon rendered ahead of `heading`, e.g. a `$` prompt — supplied by the caller. */
+  /** Decorative glyph or icon rendered ahead of `heading`, e.g. a `$` prompt — rendered as-is; the caller owns its wrapper, styling, and accessibility. */
   prefix?: ReactNode;
   errorMessage?: string;
   successMessage?: string;
@@ -51,15 +51,7 @@ export const NewsletterSignupCompact = ({
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
-      {prefix && (
-        <span
-          className={s.prompt()}
-          aria-hidden="true"
-          data-testid="newsletter-signup-compact-prefix"
-        >
-          {prefix}
-        </span>
-      )}
+      {prefix}
       <span className={s.label()}>{heading}</span>
       {isSuccess ? (
         <Alert

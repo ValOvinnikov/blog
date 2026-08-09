@@ -12,7 +12,11 @@ const baseArgs = {
   onSubmit: vi.fn(),
   status: 'idle' as const,
   heading: 'subscribe --email',
-  prefix: '$',
+  prefix: (
+    <span data-testid="newsletter-signup-compact-prefix" aria-hidden="true">
+      $
+    </span>
+  ),
   submitLabel: 'Subscribe',
   emailAriaLabel: 'Email address',
 };
@@ -37,11 +41,10 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     expect(screen.getByText(heading)).toBeVisible();
   });
 
-  it('renders the prefix as a decorative glyph ahead of the heading', () => {
+  it('renders the prefix node as-is, ahead of the heading', () => {
     setup();
 
     const prefix = screen.getByTestId('newsletter-signup-compact-prefix');
-    expect(prefix).toHaveAttribute('aria-hidden', 'true');
     expect(prefix).toHaveTextContent('$');
     expect(
       prefix.compareDocumentPosition(screen.getByText('subscribe --email')),
