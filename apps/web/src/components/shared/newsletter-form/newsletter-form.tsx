@@ -1,6 +1,7 @@
 'use client';
 
-import type { TFormStatus } from '@blog/config';
+import { ICONS, Size, type TFormStatus } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/organisms';
 import { newsletterFormCompactPrefixVariants } from '@web/components/shared/newsletter-form/newsletter-form-variants';
 import { subscribeToNewsletterAction } from '@web/server/newsletter/newsletter-actions';
@@ -133,5 +134,22 @@ export function NewsletterForm({
     );
   }
 
-  return <NewsletterSignup.Full {...sharedProps} description={description} />;
+  const trustCues = [
+    {
+      icon: <Icon name={ICONS.SHIELD_CHECK} size={Size.SM} />,
+      label: t('trustCueNoSpam'),
+    },
+    {
+      icon: <Icon name={ICONS.CLOSE} size={Size.SM} />,
+      label: t('trustCueUnsubscribe'),
+    },
+  ];
+
+  return (
+    <NewsletterSignup.Full
+      {...sharedProps}
+      description={description}
+      trustCues={trustCues}
+    />
+  );
 }
