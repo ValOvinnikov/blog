@@ -18,7 +18,7 @@ interface INewsletterSignupContentProps {
   submitLabel: string;
   emailAriaLabel: string;
   placeholder?: string;
-  /** Decorative leading glyph or icon forwarded to the email `TextInput`'s `prompt`. */
+  /** Decorative leading glyph or icon forwarded to the email `TextInput`'s `leadingIcon`. */
   inputPrompt: ReactNode;
   variant: TNewsletterSignupVariants['variant'];
 }
@@ -55,7 +55,7 @@ export const NewsletterSignupContent = ({
         value={email}
         onChange={onChange}
         ariaLabel={emailAriaLabel}
-        prompt={inputPrompt}
+        leadingIcon={inputPrompt}
         placeholder={placeholder}
         type="email"
         invalid={isError}

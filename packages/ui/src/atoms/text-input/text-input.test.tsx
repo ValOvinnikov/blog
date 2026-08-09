@@ -36,29 +36,88 @@ describe(`<${TextInput.name}/>`, () => {
     expect(screen.getByRole('textbox')).toHaveValue('');
   });
 
-  it('has no leading prompt glyph by default', () => {
+  it('has no leading icon glyph by default', () => {
     setup();
     expect(screen.queryByText('$')).not.toBeInTheDocument();
   });
 
-  it('renders a decorative leading prompt glyph when given, hidden from the accessibility tree', () => {
-    setup({ prompt: '$' });
-    const prompt = screen.getByText('$');
-    expect(prompt).toBeVisible();
-    expect(prompt).toHaveAttribute('aria-hidden', 'true');
+  it('renders a decorative leading icon glyph when given, hidden from the accessibility tree', () => {
+    setup({ leadingIcon: '$' });
+    const leadingIcon = screen.getByText('$');
+    expect(leadingIcon).toBeVisible();
+    expect(leadingIcon).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('renders a non-string ReactNode prompt, such as an icon', () => {
+  it('renders a non-string ReactNode leadingIcon, such as an icon', () => {
     setup({
-      prompt: (
+      leadingIcon: (
         <Icon
           name={ICONS.CHEVRON_RIGHT}
           size={Size.SM}
-          dataTestId="prompt-icon"
+          dataTestId="leading-icon"
         />
       ),
     });
-    expect(screen.getByTestId('prompt-icon')).toBeVisible();
+    expect(screen.getByTestId('leading-icon')).toBeVisible();
+  });
+
+  it('has no trailing icon glyph by default', () => {
+    setup();
+    expect(screen.queryByText('$')).not.toBeInTheDocument();
+  });
+
+  it('renders a decorative trailing icon glyph when given, hidden from the accessibility tree, positioned after the input', () => {
+    setup({ trailingIcon: '$' });
+    const trailingIcon = screen.getByText('$');
+    expect(trailingIcon).toBeVisible();
+    expect(trailingIcon).toHaveAttribute('aria-hidden', 'true');
+    const input = screen.getByRole('textbox');
+    expect(
+      input.compareDocumentPosition(trailingIcon) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('renders a non-string ReactNode trailingIcon, such as an icon', () => {
+    setup({
+      trailingIcon: (
+        <Icon
+          name={ICONS.CHEVRON_RIGHT}
+          size={Size.SM}
+          dataTestId="trailing-icon"
+        />
+      ),
+    });
+    expect(screen.getByTestId('trailing-icon')).toBeVisible();
+  });
+
+  it('applies trailing padding to the input when trailingIcon is given', () => {
+    setup({ trailingIcon: '$' });
+    expect(screen.getByRole('textbox').className).toMatch(/pr-8/);
+  });
+
+  it('applies leading padding to the input when leadingIcon is given', () => {
+    setup({ leadingIcon: '$' });
+    expect(screen.getByRole('textbox').className).toMatch(/pl-8/);
+  });
+
+  it('renders both leadingIcon and trailingIcon together, each in its own position', () => {
+    setup({ leadingIcon: '$', trailingIcon: '#' });
+    const leadingIcon = screen.getByText('$');
+    const trailingIcon = screen.getByText('#');
+    expect(leadingIcon).toBeVisible();
+    expect(trailingIcon).toBeVisible();
+    const input = screen.getByRole('textbox');
+    expect(
+      leadingIcon.compareDocumentPosition(input) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      input.compareDocumentPosition(trailingIcon) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(input.className).toMatch(/pl-8/);
+    expect(input.className).toMatch(/pr-8/);
   });
 
   it('is not marked invalid by default', () => {
