@@ -32,7 +32,11 @@ const meta = {
     rows,
     emptyMessage: 'No bookmarks yet — save a post to find it here.',
     hint: '3 saved',
-    prefix: 'drwx',
+    prefix: (
+      <span className="text-subtle" aria-hidden="true">
+        drwx
+      </span>
+    ),
   },
 } satisfies Meta<typeof BookmarksList>;
 

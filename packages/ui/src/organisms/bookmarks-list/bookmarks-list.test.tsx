@@ -44,8 +44,14 @@ describe(`<${BookmarksList.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders the supplied prefix, hidden from assistive tech, once per row', () => {
-    setup({ prefix: 'drwx' });
+  it('renders the supplied prefix node as-is, unmodified, once per row', () => {
+    setup({
+      prefix: (
+        <span data-testid="bookmarks-list-row-prefix" aria-hidden="true">
+          drwx
+        </span>
+      ),
+    });
     const glyphs = screen.getAllByTestId('bookmarks-list-row-prefix');
 
     expect(glyphs).toHaveLength(rows.length);

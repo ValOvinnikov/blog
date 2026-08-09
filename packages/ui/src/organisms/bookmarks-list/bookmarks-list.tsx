@@ -18,7 +18,7 @@ export interface IBookmarksListProps extends IWithDataTestId {
   emptyMessage: string;
   /** Summary line rendered below the listing when `rows` isn't empty, e.g. "3 saved". */
   hint?: string;
-  /** Decorative glyph/icon rendered before each row's date, e.g. a `drwx`-style permission string. Same content for every row; omitted when not supplied. */
+  /** Arbitrary node rendered before each row's date, e.g. a `drwx`-style permission string or icon — rendered as-is with no wrapper, so the caller owns its element, styling, and accessibility. Same content for every row; omitted when not supplied. */
   prefix?: ReactNode;
   /** Component each row's filename link renders as — defaults to a plain `<a>`. Pass the app router's Link for client-side navigation. */
   linkAs?: TAnchorElementType;
@@ -47,7 +47,6 @@ export const BookmarksList = ({
     root,
     list,
     row,
-    perm,
     date,
     filename,
     hint: hintSlot,
@@ -64,15 +63,7 @@ export const BookmarksList = ({
           <ul role="list" className={list()}>
             {rows.map((bookmark) => (
               <li key={bookmark.id} className={row()}>
-                {prefix && (
-                  <span
-                    className={perm()}
-                    aria-hidden="true"
-                    data-testid="bookmarks-list-row-prefix"
-                  >
-                    {prefix}
-                  </span>
-                )}
+                {prefix}
                 <span className={date()}>{bookmark.formattedDate}</span>
                 <Component href={bookmark.href} className={filename()}>
                   {bookmark.filename}
