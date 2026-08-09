@@ -137,17 +137,21 @@ jobs:
       # to be undone. `pg_dump` refuses to dump from a server newer than
       # itself, and Ubuntu's default `postgresql-client` package trails
       # Neon's Postgres major version, so the PGDG apt repo installs a
-      # client matching the server rather than relying on whatever ships
-      # preinstalled on the runner image.
+      # client matching the server. The runner image's preinstalled v16
+      # client owns the unversioned `pg_dump` on `PATH` as a real binary,
+      # not a Debian alternatives symlink, so installing v17 alongside it
+      # doesn't repoint `pg_dump` — the versioned binary under
+      # `/usr/lib/postgresql/17/bin/` has to be invoked explicitly.
       - name: Back up production database
         if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
         run: |
           set -euo pipefail
+          PG_VERSION=17
           sudo apt-get install -y postgresql-common
           sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
           sudo apt-get update -y
-          sudo apt-get install -y postgresql-client-17
-          pg_dump "$DATABASE_URL_UNPOOLED" --format=custom --file="${RUNNER_TEMP}/prod-db-${GITHUB_REF_NAME}.dump"
+          sudo apt-get install -y "postgresql-client-${PG_VERSION}"
+          "/usr/lib/postgresql/${PG_VERSION}/bin/pg_dump" "$DATABASE_URL_UNPOOLED" --format=custom --file="${RUNNER_TEMP}/prod-db-${GITHUB_REF_NAME}.dump"
       - name: Upload backup artifact
         if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
