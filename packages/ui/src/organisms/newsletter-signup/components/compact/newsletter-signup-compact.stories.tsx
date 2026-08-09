@@ -52,8 +52,16 @@ export const WithoutPrefix: TStory = {
 // The root's `flex-col`/`sm:flex-row` stacking is a real `sm:` media-query
 // fork, not a container query — pinning `phone` (an intentional exception,
 // see the `ui-storybook` skill) is the only way to default this story to a
-// canvas under `sm` so the prefix+heading group's one-line layout (and the
-// strip's content-sized, not full-width, footprint) is what actually renders.
+// canvas under `sm` so the prefix+heading group's one-line layout, and the
+// strip spanning the full width of its container below `sm`, are what
+// actually render.
 export const MobilePhone: TStory = {
   globals: { viewport: 'phone' },
+  decorators: [
+    (Story) => (
+      <div className="border border-dashed border-accent">
+        <Story />
+      </div>
+    ),
+  ],
 };

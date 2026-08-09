@@ -39,8 +39,8 @@ export const newsletterSignupVariants = tv({
       },
       compact: {
         root: [
-          'inline-flex flex-col gap-2',
-          'sm:flex-row sm:flex-wrap sm:items-center',
+          'flex w-full flex-col gap-2',
+          'sm:inline-flex sm:w-auto sm:flex-row sm:flex-wrap sm:items-center',
           'rounded-sm border border-border border-l-3 border-l-accent bg-surface-2',
           'px-3 py-2.5',
         ],
