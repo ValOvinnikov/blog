@@ -73,6 +73,27 @@ This applies to decisions a subagent couldn't have made on its own (design,
 scope, placement, cross-cutting behavior) — not routine implementation
 details a layer agent is already trusted to decide per its skill.
 
+**The mirror-image failure: don't let a subagent silently resolve an
+ambiguity instead of surfacing it.** The above covers a decision the user
+already made mid-task; this covers a decision the user hasn't made yet
+because the ticket itself is ambiguous or self-contradictory. When a
+dispatched subagent's report says anything like "the issue said X but I did Y
+because…" — it noticed a tension between the ticket's literal wording and
+what it built, picked an interpretation, and explained its reasoning — that
+is **not** a settled decision just because the reasoning sounds good. Stop,
+present the tension plainly to the user (what the ticket says vs. what got
+built vs. why), and get an explicit answer — before commit/push/PR, and
+especially before reusing that same unconfirmed interpretation as precedent
+for another ticket. This is exactly how issues #1251 and #1252 both shipped
+a plain `prefix?: ReactNode` prop when their acceptance criteria literally
+said "compound slot" (a specific, different, `mapCompoundSlots`-based pattern
+in this codebase) — the implementing agent flagged the deviation in its own
+report, the orchestrator read that reasoning and silently accepted it as
+correct, and then propagated the same unconfirmed call into a second ticket
+via "same pattern as #1251." The user only caught it after both PRs were
+open, by asking why the implementation didn't match the ticket. A subagent's
+self-reported judgment call is a flag to raise, not a decision to rubber-stamp.
+
 ## Use the scoped agents
 
 Delegate layer work to the matching subagent in `.claude/agents/`, in dependency
