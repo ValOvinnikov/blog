@@ -5,8 +5,9 @@
 
 This supersedes an initial draft written without repo access. Every `⚠ VERIFY`
 item from that draft has been checked against the actual source, and three
-open design questions have been resolved with the user. This is the version
-to implement from.
+open design questions have been resolved with the user. A fourth question
+(success-state layout, §3d) surfaced during implementation and was resolved
+the same way. This is the version to implement from.
 
 ---
 
@@ -91,6 +92,18 @@ page). **Keep it.** The two-column grid described in §6 is the layout inside
 border/radius/background already provides the card framing — §6's "Card:
 1px border, 12px radius, surface-2 background" describes what `WindowChrome`
 already gives for free; don't duplicate it on an inner wrapper.
+
+### 3d. Success state — pitch pane stays visible, only the form pane swaps
+
+The pre-existing single-column `Full` was all-or-nothing on
+`status === 'success'`: the whole body swapped to just an `Alert`, hiding
+heading/description entirely. The spec's original acceptance criteria didn't
+address success-state behavior for the new two-column layout, and this
+surfaced as an open question during implementation.
+
+**Resolved:** the pitch pane (heading, description, trust cues) stays visible
+on success — only the form pane is replaced by the success `Alert`. The
+two-column layout persists; it doesn't collapse to a single message.
 
 ## 4. Scope / files
 
