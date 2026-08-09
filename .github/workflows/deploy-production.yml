@@ -134,14 +134,19 @@ jobs:
       # mutation, mirroring the Sanity job's dataset-export-before-mutate
       # step above. Custom format (-Fc, via --format=custom) so it restores
       # with `pg_restore` against a fresh Neon branch if a migration needs
-      # to be undone. `postgresql-client` ships preinstalled on GitHub's
-      # ubuntu-latest runner image; the `command -v` check is a defensive
-      # fallback rather than a load-bearing install step.
+      # to be undone. `pg_dump` refuses to dump from a server newer than
+      # itself, and Ubuntu's default `postgresql-client` package trails
+      # Neon's Postgres major version, so the PGDG apt repo installs a
+      # client matching the server rather than relying on whatever ships
+      # preinstalled on the runner image.
       - name: Back up production database
         if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
         run: |
           set -euo pipefail
-          command -v pg_dump || (sudo apt-get update -y && sudo apt-get install -y postgresql-client)
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client-17
           pg_dump "$DATABASE_URL_UNPOOLED" --format=custom --file="${RUNNER_TEMP}/prod-db-${GITHUB_REF_NAME}.dump"
       - name: Upload backup artifact
         if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
