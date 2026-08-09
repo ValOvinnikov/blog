@@ -1,7 +1,7 @@
 'use client';
 
-import { Size } from '@blog/config';
-import { Avatar, Button, TextInput } from '@blog/ui/atoms';
+import { ICONS, Size } from '@blog/config';
+import { Avatar, Button, Icon, TextInput } from '@blog/ui/atoms';
 import { useToast } from '@web/components/shared/toast-provider';
 import { updateDisplayNameAction } from '@web/server/account/identity-actions';
 import { useRouter } from 'next/navigation';
@@ -110,7 +110,13 @@ export function DisplayNameControl({
           value={name}
           onChange={setName}
           ariaLabel={t('displayNameAriaLabel')}
-          prompt="›"
+          leadingIcon={
+            <Icon
+              name={ICONS.CHEVRON_RIGHT}
+              size={Size.SM}
+              dataTestId="display-name-prompt-icon"
+            />
+          }
           disabled={isPending}
           className={field()}
         />

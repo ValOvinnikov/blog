@@ -4,8 +4,12 @@ import type { VariantProps } from 'tailwind-variants';
 export const textInputVariants = tv({
   slots: {
     root: ['relative w-full'],
-    prompt: [
+    leadingIcon: [
       'pointer-events-none absolute inset-y-0 left-3 flex items-center',
+      'font-mono text-copy text-accent select-none',
+    ],
+    trailingIcon: [
+      'pointer-events-none absolute inset-y-0 right-3 flex items-center',
       'font-mono text-copy text-accent select-none',
     ],
     input: [
@@ -22,8 +26,11 @@ export const textInputVariants = tv({
     invalid: {
       true: { input: ['border-error text-error'] },
     },
-    hasPrompt: {
+    hasLeadingIcon: {
       true: { input: ['pl-8'] },
+    },
+    hasTrailingIcon: {
+      true: { input: ['pr-8'] },
     },
   },
 });

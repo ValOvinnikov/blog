@@ -68,7 +68,7 @@ const WideControlDemo = () => {
                 value={name}
                 onChange={setName}
                 ariaLabel="Display name"
-                prompt="›"
+                leadingIcon="›"
                 className="min-w-0 flex-1"
               />
             </div>

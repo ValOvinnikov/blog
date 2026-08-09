@@ -22,17 +22,28 @@ type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
 
-export const WithPrompt: TStory = {
-  args: { prompt: '›' },
+export const WithLeadingIcon: TStory = {
+  args: { leadingIcon: '›' },
 };
 
-/** `prompt` accepts any `ReactNode`, not just a glyph — e.g. an `Icon`. */
-export const WithIconPrompt: TStory = {
-  args: { prompt: <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} /> },
+/** `leadingIcon` accepts any `ReactNode`, not just a glyph — e.g. an `Icon`. */
+export const WithLeadingIconAsIcon: TStory = {
+  args: { leadingIcon: <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} /> },
+};
+
+export const WithTrailingIcon: TStory = {
+  args: { trailingIcon: <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} /> },
+};
+
+export const WithLeadingAndTrailingIcon: TStory = {
+  args: {
+    leadingIcon: '›',
+    trailingIcon: <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} />,
+  },
 };
 
 export const Invalid: TStory = {
-  args: { invalid: true, value: 'not-an-email', prompt: '›' },
+  args: { invalid: true, value: 'not-an-email', leadingIcon: '›' },
 };
 
 const InteractiveDemo = () => {
@@ -44,7 +55,7 @@ const InteractiveDemo = () => {
       onChange={setValue}
       ariaLabel="Email address"
       placeholder="you@example.com"
-      prompt="›"
+      leadingIcon="›"
     />
   );
 };

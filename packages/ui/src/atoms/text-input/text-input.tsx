@@ -20,7 +20,9 @@ export type TTextInputProps = Omit<
     ariaLabel: string;
     invalid?: TTextInputVariants['invalid'];
     /** Decorative leading glyph or icon (e.g. `$`, a chevron `Icon`) — the console prompt idiom. Purely visual; `ariaLabel` carries the accessible name. */
-    prompt?: ReactNode;
+    leadingIcon?: ReactNode;
+    /** Decorative trailing glyph or icon. Purely visual; `ariaLabel` carries the accessible name. */
+    trailingIcon?: ReactNode;
     className?: string;
   };
 
@@ -35,16 +37,22 @@ export const TextInput = ({
   onChange,
   ariaLabel,
   invalid = false,
-  prompt,
+  leadingIcon,
+  trailingIcon,
   className,
   dataTestId,
   ...rest
 }: TTextInputProps) => {
   const {
     root,
-    prompt: promptSlot,
+    leadingIcon: leadingIconSlot,
+    trailingIcon: trailingIconSlot,
     input,
-  } = textInputVariants({ invalid, hasPrompt: Boolean(prompt) });
+  } = textInputVariants({
+    invalid,
+    hasLeadingIcon: Boolean(leadingIcon),
+    hasTrailingIcon: Boolean(trailingIcon),
+  });
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange(event.target.value);
@@ -52,9 +60,9 @@ export const TextInput = ({
 
   return (
     <div className={root({ class: className })} data-testid={dataTestId}>
-      {prompt && (
-        <span className={promptSlot()} aria-hidden="true">
-          {prompt}
+      {leadingIcon && (
+        <span className={leadingIconSlot()} aria-hidden="true">
+          {leadingIcon}
         </span>
       )}
       <input
@@ -65,6 +73,11 @@ export const TextInput = ({
         aria-invalid={invalid}
         className={input()}
       />
+      {trailingIcon && (
+        <span className={trailingIconSlot()} aria-hidden="true">
+          {trailingIcon}
+        </span>
+      )}
     </div>
   );
 };
