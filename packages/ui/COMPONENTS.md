@@ -125,7 +125,7 @@ Variants: variant: lead|muted|hero|card
 
 ### TextInput — `atoms/text-input/text-input.tsx`
 TextInput atom — a pure, controlled single-line field.
-Props: value: string · onChange: (value: string) => void · ariaLabel: string · invalid?: TTextInputVariants['invalid'] · prompt?: string · className?: string _(extends Omit< ComponentPropsWithoutRef<'input'>, 'onCha…, IWithDataTestId)_
+Props: value: string · onChange: (value: string) => void · ariaLabel: string · invalid?: TTextInputVariants['invalid'] · prompt?: ReactNode · className?: string _(extends Omit< ComponentPropsWithoutRef<'input'>, 'onCha…, IWithDataTestId)_
 Variants: invalid: (boolean) · hasPrompt: (boolean)
 
 ### Textarea — `atoms/textarea/textarea.tsx`

@@ -1,3 +1,5 @@
+import { ICONS, Size } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
@@ -44,6 +46,19 @@ describe(`<${TextInput.name}/>`, () => {
     const prompt = screen.getByText('$');
     expect(prompt).toBeVisible();
     expect(prompt).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('renders a non-string ReactNode prompt, such as an icon', () => {
+    setup({
+      prompt: (
+        <Icon
+          name={ICONS.CHEVRON_RIGHT}
+          size={Size.SM}
+          dataTestId="prompt-icon"
+        />
+      ),
+    });
+    expect(screen.getByTestId('prompt-icon')).toBeVisible();
   });
 
   it('is not marked invalid by default', () => {

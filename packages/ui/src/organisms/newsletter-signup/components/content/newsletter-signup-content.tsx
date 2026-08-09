@@ -7,7 +7,7 @@ import {
   newsletterSignupVariants,
   type TNewsletterSignupVariants,
 } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
-import { type SubmitEvent } from 'react';
+import { type ReactNode, type SubmitEvent } from 'react';
 
 interface INewsletterSignupContentProps {
   email: string;
@@ -18,6 +18,8 @@ interface INewsletterSignupContentProps {
   submitLabel: string;
   emailAriaLabel: string;
   placeholder?: string;
+  /** Decorative leading glyph or icon forwarded to the email `TextInput`'s `prompt`. */
+  inputPrompt: ReactNode;
   variant: TNewsletterSignupVariants['variant'];
 }
 
@@ -35,6 +37,7 @@ export const NewsletterSignupContent = ({
   submitLabel,
   emailAriaLabel,
   placeholder,
+  inputPrompt,
   variant,
 }: INewsletterSignupContentProps) => {
   const isSubmitting = status === 'submitting';
@@ -52,7 +55,7 @@ export const NewsletterSignupContent = ({
         value={email}
         onChange={onChange}
         ariaLabel={emailAriaLabel}
-        prompt="›"
+        prompt={inputPrompt}
         placeholder={placeholder}
         type="email"
         invalid={isError}

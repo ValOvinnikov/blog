@@ -1,9 +1,12 @@
 import {
   ALERT_TYPE,
+  ICONS,
+  Size,
   type IWithDataTestId,
   type TFormStatus,
 } from '@blog/config';
 import { Alert } from '@blog/ui/atoms/alert';
+import { Icon } from '@blog/ui/atoms/icon';
 import { WindowChrome } from '@blog/ui/molecules/window-chrome';
 import { NewsletterSignupContent } from '@blog/ui/organisms/newsletter-signup/components/content/newsletter-signup-content';
 import { newsletterSignupVariants } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
@@ -69,6 +72,13 @@ export const NewsletterSignupFull = ({
               submitLabel={submitLabel}
               emailAriaLabel={emailAriaLabel}
               placeholder={placeholder}
+              inputPrompt={
+                <Icon
+                  name={ICONS.CHEVRON_RIGHT}
+                  size={Size.SM}
+                  dataTestId="newsletter-signup-input-prompt"
+                />
+              }
               variant="full"
             />
           </>
