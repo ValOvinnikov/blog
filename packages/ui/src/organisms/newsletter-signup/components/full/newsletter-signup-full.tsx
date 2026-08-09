@@ -69,6 +69,7 @@ export const NewsletterSignupFull = ({
               submitLabel={submitLabel}
               emailAriaLabel={emailAriaLabel}
               placeholder={placeholder}
+              inputPrompt="›"
               variant="full"
             />
           </>

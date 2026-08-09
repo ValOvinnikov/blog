@@ -67,6 +67,7 @@ export const NewsletterSignupCompact = ({
           submitLabel={submitLabel}
           emailAriaLabel={emailAriaLabel}
           placeholder={placeholder}
+          inputPrompt="›"
           variant="compact"
         />
       )}
