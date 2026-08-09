@@ -1,5 +1,18 @@
+import { ICONS, Size } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/organisms/newsletter-signup/newsletter-signup';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+
+const trustCues = [
+  {
+    icon: <Icon name={ICONS.SHIELD_CHECK} size={Size.SM} />,
+    label: 'No spam',
+  },
+  {
+    icon: <Icon name={ICONS.X} size={Size.SM} />,
+    label: 'Unsubscribe in one line',
+  },
+];
 
 const meta = {
   title: 'Organisms/NewsletterSignup/Full',
@@ -26,7 +39,8 @@ type TStory = StoryObj<typeof meta>;
 
 /**
  * Access via `NewsletterSignup.Full` — the rich window-shell density used by
- * the site footer and CMS page-builder module.
+ * the site footer and CMS page-builder module, split into a pitch pane and a
+ * form pane side by side on desktop.
  */
 export const Default: TStory = {};
 
@@ -44,4 +58,25 @@ export const Error: TStory = {
     email: 'not-an-email',
     errorMessage: 'That email is already subscribed.',
   },
+};
+
+export const WithTrustCues: TStory = {
+  args: { trustCues },
+};
+
+// The pitch/form panes collapse from two columns to one at a real `md:`
+// media-query breakpoint (not a container query), so this story pins the
+// viewport to show the stacked mobile state — same precedent as
+// `PrimaryNavigation`'s `MobileClosed`/`MobileOpen` stories.
+export const MobilePhone: TStory = {
+  globals: { viewport: 'phone' },
+  args: { trustCues },
+};
+
+// `withThemeByClassName` drives the toolbar's light/dark toggle globally;
+// pinning it here gives the dark surface/accent/divider treatment its own
+// dedicated doc entry instead of relying on someone flipping the toolbar.
+export const DarkTheme: TStory = {
+  globals: { theme: 'dark' },
+  args: { trustCues },
 };

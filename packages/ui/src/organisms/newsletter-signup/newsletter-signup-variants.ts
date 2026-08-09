@@ -4,8 +4,22 @@ import type { VariantProps } from 'tailwind-variants';
 export const newsletterSignupVariants = tv({
   slots: {
     root: [],
-    heading: ['font-display text-card-title font-medium text-text', 'm-0 mb-1'],
-    description: ['font-body text-prose text-muted', 'm-0 mb-3'],
+    body: ['grid grid-cols-1 p-0', 'md:grid-cols-[1.1fr_1fr]'],
+    pitchPane: ['flex flex-col gap-3 p-8'],
+    heading: ['font-mono text-card-title font-medium text-accent', 'm-0'],
+    description: ['font-body text-prose text-text', 'm-0'],
+    trustCues: [
+      'flex flex-col gap-2 md:flex-row md:flex-wrap md:items-center md:gap-4',
+      'm-0 list-none p-0',
+      'font-mono text-label text-muted',
+    ],
+    trustCue: ['inline-flex items-center gap-1.5'],
+    trustCueIcon: ['shrink-0 text-muted'],
+    formPane: [
+      'flex flex-col justify-center gap-3',
+      'p-8',
+      'border-t border-border md:border-t-0 md:border-l',
+    ],
     form: ['flex flex-col gap-3'],
     field: [],
     submit: ['inline-flex items-center justify-center gap-2'],
@@ -20,7 +34,7 @@ export const newsletterSignupVariants = tv({
   variants: {
     variant: {
       full: {
-        root: ['w-full max-w-copy'],
+        root: ['w-full'],
         submit: ['w-full'],
       },
       compact: {
