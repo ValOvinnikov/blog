@@ -54,8 +54,10 @@ export const NewsletterSignupCompact = ({
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
-      {prefix}
-      <span className={s.label()}>{heading}</span>
+      <span className={s.promptGroup()}>
+        {prefix}
+        <span className={s.label()}>{heading}</span>
+      </span>
       {isSuccess ? (
         <Alert
           type={ALERT_TYPE.SUCCESS}
