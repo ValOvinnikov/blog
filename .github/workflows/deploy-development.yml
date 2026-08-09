@@ -38,7 +38,10 @@ env:
   TURBO_IGNORE_VERSION: 2.10.4
   # `sanity build` (run by the verify job's `pnpm build`) loads sanity.cli.ts,
   # which requires these. Sourced from repo Variables like ci.yml; the
-  # deploy-studio job overrides them with its environment-scoped values.
+  # deploy-studio job overrides SANITY_STUDIO_PROJECT_ID from its
+  # environment-scoped variable and hardcodes SANITY_STUDIO_DATASET (no
+  # environment-scoped variable exists for it — see deploy-studio's own env
+  # block below for why).
   SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
   SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
   # Vercel Remote Cache — lets verify replay task artifacts already built by PR
@@ -227,6 +230,13 @@ jobs:
       # (cms-dev is its own Vercel project) — mapped to the local name the
       # Vercel CLI actually reads.
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_CMS }}
+      # The `development` GitHub Environment only defines SANITY_STUDIO_PROJECT_ID
+      # as an environment-scoped variable, not SANITY_STUDIO_DATASET — this
+      # currently resolves correctly by coincidence (the repo-level default
+      # happens to be "development" too), but pin it explicitly so it can't
+      # silently break if that repo-level default ever changes. Mirrors the
+      # equivalent override on deploy-production.yml's deploy-studio job.
+      SANITY_STUDIO_DATASET: development
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
