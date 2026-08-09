@@ -143,6 +143,7 @@ describe(`<${AuthMenu.name}/>`, () => {
       expect(
         screen.queryByRole('menuitem', { name: 'Continue with email' }),
       ).not.toBeInTheDocument();
+      expect(screen.getByTestId('sign-in-prompt-icon')).toBeVisible();
     });
 
     it('moves focus into the email field once it expands (collapsed → expanded)', async () => {

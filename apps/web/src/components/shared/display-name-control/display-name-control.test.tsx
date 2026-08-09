@@ -63,6 +63,7 @@ describe(`<${DisplayNameControl.name}/>`, () => {
       'Val Ovinnikov',
     );
     expect(screen.getByText('VO')).toBeVisible();
+    expect(screen.getByTestId('display-name-prompt-icon')).toBeVisible();
   });
 
   it('saves the edited name through toast.promise and refreshes the router on success', async () => {

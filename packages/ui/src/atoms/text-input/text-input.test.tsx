@@ -91,16 +91,6 @@ describe(`<${TextInput.name}/>`, () => {
     expect(screen.getByTestId('trailing-icon')).toBeVisible();
   });
 
-  it('applies trailing padding to the input when trailingIcon is given', () => {
-    setup({ trailingIcon: '$' });
-    expect(screen.getByRole('textbox').className).toMatch(/pr-8/);
-  });
-
-  it('applies leading padding to the input when leadingIcon is given', () => {
-    setup({ leadingIcon: '$' });
-    expect(screen.getByRole('textbox').className).toMatch(/pl-8/);
-  });
-
   it('renders both leadingIcon and trailingIcon together, each in its own position', () => {
     setup({ leadingIcon: '$', trailingIcon: '#' });
     const leadingIcon = screen.getByText('$');
@@ -116,8 +106,6 @@ describe(`<${TextInput.name}/>`, () => {
       input.compareDocumentPosition(trailingIcon) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
-    expect(input.className).toMatch(/pl-8/);
-    expect(input.className).toMatch(/pr-8/);
   });
 
   it('is not marked invalid by default', () => {

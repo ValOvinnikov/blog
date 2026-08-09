@@ -148,7 +148,13 @@ export function SignInMenu({
                   onChange={setEmail}
                   ariaLabel={t('emailAriaLabel')}
                   placeholder={t('emailPlaceholder')}
-                  prompt="›"
+                  leadingIcon={
+                    <Icon
+                      name={ICONS.CHEVRON_RIGHT}
+                      size={Size.SM}
+                      dataTestId="sign-in-prompt-icon"
+                    />
+                  }
                   invalid={emailError}
                   disabled={emailStep === 'submitting'}
                 />
