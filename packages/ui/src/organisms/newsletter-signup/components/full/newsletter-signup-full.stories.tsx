@@ -9,7 +9,7 @@ const trustCues = [
     label: 'No spam',
   },
   {
-    icon: <Icon name={ICONS.X} size={Size.SM} />,
+    icon: <Icon name={ICONS.CLOSE} size={Size.SM} />,
     label: 'Unsubscribe in one line',
   },
 ];
