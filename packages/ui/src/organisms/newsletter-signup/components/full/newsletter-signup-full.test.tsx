@@ -37,6 +37,11 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
   });
 
+  it('renders the chevron icon as the email field prompt', () => {
+    setup();
+    expect(screen.getByTestId('newsletter-signup-input-prompt')).toBeVisible();
+  });
+
   it('calls onChange with the new value and does not manage its own state', async () => {
     const onChange = vi.fn();
     setup({ onChange });

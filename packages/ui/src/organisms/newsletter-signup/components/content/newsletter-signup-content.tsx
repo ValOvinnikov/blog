@@ -7,7 +7,7 @@ import {
   newsletterSignupVariants,
   type TNewsletterSignupVariants,
 } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
-import { type SubmitEvent } from 'react';
+import { type ReactNode, type SubmitEvent } from 'react';
 
 interface INewsletterSignupContentProps {
   email: string;
@@ -18,8 +18,8 @@ interface INewsletterSignupContentProps {
   submitLabel: string;
   emailAriaLabel: string;
   placeholder?: string;
-  /** Decorative leading glyph forwarded to the email `TextInput`'s `prompt`. */
-  inputPrompt: string;
+  /** Decorative leading glyph or icon forwarded to the email `TextInput`'s `prompt`. */
+  inputPrompt: ReactNode;
   variant: TNewsletterSignupVariants['variant'];
 }
 

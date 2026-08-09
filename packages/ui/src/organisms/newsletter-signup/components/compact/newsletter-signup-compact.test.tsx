@@ -41,6 +41,11 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     expect(screen.getByText('$')).toHaveAttribute('aria-hidden', 'true');
   });
 
+  it('renders the chevron icon as the email field prompt', () => {
+    setup();
+    expect(screen.getByTestId('newsletter-signup-input-prompt')).toBeVisible();
+  });
+
   it('calls onSubmit when the submit button is clicked', async () => {
     const onSubmit = vi.fn();
     setup({ onSubmit });

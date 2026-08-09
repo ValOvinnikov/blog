@@ -1,5 +1,9 @@
 import type { IWithDataTestId } from '@blog/config';
-import { type ChangeEvent, type ComponentPropsWithoutRef } from 'react';
+import {
+  type ChangeEvent,
+  type ComponentPropsWithoutRef,
+  type ReactNode,
+} from 'react';
 
 import {
   textInputVariants,
@@ -15,8 +19,8 @@ export type TTextInputProps = Omit<
     onChange: (value: string) => void;
     ariaLabel: string;
     invalid?: TTextInputVariants['invalid'];
-    /** Decorative leading glyph (e.g. `$`, `›`) — the console prompt idiom. Purely visual; `ariaLabel` carries the accessible name. */
-    prompt?: string;
+    /** Decorative leading glyph or icon (e.g. `$`, a chevron `Icon`) — the console prompt idiom. Purely visual; `ariaLabel` carries the accessible name. */
+    prompt?: ReactNode;
     className?: string;
   };
 

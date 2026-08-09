@@ -1,3 +1,5 @@
+import { ICONS, Size } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
@@ -22,6 +24,11 @@ export const Default: TStory = {};
 
 export const WithPrompt: TStory = {
   args: { prompt: '›' },
+};
+
+/** `prompt` accepts any `ReactNode`, not just a glyph — e.g. an `Icon`. */
+export const WithIconPrompt: TStory = {
+  args: { prompt: <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} /> },
 };
 
 export const Invalid: TStory = {
