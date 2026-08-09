@@ -115,6 +115,11 @@ describe(`<${BookmarksPage.name}/>`, () => {
     expect(links[0]).toHaveAttribute('href', '/blog/second');
     expect(links[1]).toHaveAttribute('href', '/blog/first');
     expect(screen.getByText('2 saved')).toBeVisible();
+    expect(screen.getAllByTestId('bookmarks-list-row-prefix')).toHaveLength(2);
+    for (const prefix of screen.getAllByTestId('bookmarks-list-row-prefix')) {
+      expect(prefix).toHaveTextContent('drwx');
+      expect(prefix).toHaveAttribute('aria-hidden', 'true');
+    }
   });
 
   it('renders nothing when resolving bookmarked posts fails', async () => {

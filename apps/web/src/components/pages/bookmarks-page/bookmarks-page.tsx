@@ -93,6 +93,15 @@ export async function BookmarksPage() {
             hint={
               rows.length > 0 ? t('hint', { count: rows.length }) : undefined
             }
+            prefix={
+              <span
+                aria-hidden="true"
+                data-testid="bookmarks-list-row-prefix"
+                className={s.prefix()}
+              >
+                drwx
+              </span>
+            }
             linkAs={SmartLink}
           />
         </WindowChrome.Body>

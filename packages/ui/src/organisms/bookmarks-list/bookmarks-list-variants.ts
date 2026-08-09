@@ -8,7 +8,6 @@ export const bookmarksListVariants = tv({
       'flex items-center gap-[1.4ch]',
       'border-b border-dashed border-border py-[0.28rem]',
     ],
-    perm: ['text-subtle'],
     date: ['text-subtle'],
     filename: [
       'text-accent',

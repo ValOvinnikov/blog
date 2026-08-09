@@ -37,11 +37,39 @@ describe(`<${BookmarksList.name}/>`, () => {
     expect(screen.getByRole('list')).toBeVisible();
   });
 
-  it('hides the decorative permission glyph from assistive tech', () => {
+  it('does not render a prefix glyph when omitted', () => {
     setup();
-    const glyphs = screen.getAllByText('drwx');
+    expect(
+      screen.queryByTestId('bookmarks-list-row-prefix'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the supplied prefix node as-is, unmodified, once per row', () => {
+    setup({
+      prefix: (
+        <span data-testid="bookmarks-list-row-prefix" aria-hidden="true">
+          drwx
+        </span>
+      ),
+    });
+    const glyphs = screen.getAllByTestId('bookmarks-list-row-prefix');
+
+    expect(glyphs).toHaveLength(rows.length);
     for (const glyph of glyphs) {
       expect(glyph).toHaveAttribute('aria-hidden', 'true');
+      expect(glyph).toHaveTextContent('drwx');
+    }
+  });
+
+  it('renders the prefix immediately before the row date and filename', () => {
+    setup({ prefix: 'drwx' });
+    const items = screen.getAllByRole('listitem');
+
+    for (const [index, item] of items.entries()) {
+      const bookmark = rows[index]!;
+      expect(item.textContent).toBe(
+        `drwx${bookmark.formattedDate}${bookmark.filename}`,
+      );
     }
   });
 

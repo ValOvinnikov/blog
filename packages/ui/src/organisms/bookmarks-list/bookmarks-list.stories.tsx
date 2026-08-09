@@ -32,6 +32,11 @@ const meta = {
     rows,
     emptyMessage: 'No bookmarks yet — save a post to find it here.',
     hint: '3 saved',
+    prefix: (
+      <span className="text-subtle" aria-hidden="true">
+        drwx
+      </span>
+    ),
   },
 } satisfies Meta<typeof BookmarksList>;
 
@@ -39,6 +44,10 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const Populated: TStory = {};
+
+export const WithoutPrefix: TStory = {
+  args: { prefix: undefined },
+};
 
 export const WithoutHint: TStory = {
   args: { hint: undefined },
