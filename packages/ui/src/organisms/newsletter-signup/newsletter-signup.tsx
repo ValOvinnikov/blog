@@ -5,9 +5,14 @@ import {
 import {
   NewsletterSignupFull,
   type INewsletterSignupFullProps,
+  type INewsletterSignupTrustCue,
 } from './components/full/newsletter-signup-full';
 
-export type { INewsletterSignupCompactProps, INewsletterSignupFullProps };
+export type {
+  INewsletterSignupCompactProps,
+  INewsletterSignupFullProps,
+  INewsletterSignupTrustCue,
+};
 
 /**
  * NewsletterSignup — a pure, controlled subscribe form built on the

@@ -47,6 +47,8 @@ import SettingsComponent from '@blog/ui/assets/icons/settings.svg';
 import SettingsUrl from '@blog/ui/assets/icons/settings.svg?url';
 import ShareComponent from '@blog/ui/assets/icons/share.svg';
 import ShareUrl from '@blog/ui/assets/icons/share.svg?url';
+import ShieldCheckComponent from '@blog/ui/assets/icons/shield-check.svg';
+import ShieldCheckUrl from '@blog/ui/assets/icons/shield-check.svg?url';
 import SpinnerComponent from '@blog/ui/assets/icons/spinner.svg';
 import SpinnerUrl from '@blog/ui/assets/icons/spinner.svg?url';
 import SunComponent from '@blog/ui/assets/icons/sun.svg';
@@ -101,4 +103,8 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.SETTINGS]: { component: SettingsComponent, url: SettingsUrl },
   [ICONS.POWER]: { component: PowerComponent, url: PowerUrl },
   [ICONS.MAIL]: { component: MailComponent, url: MailUrl },
+  [ICONS.SHIELD_CHECK]: {
+    component: ShieldCheckComponent,
+    url: ShieldCheckUrl,
+  },
 };

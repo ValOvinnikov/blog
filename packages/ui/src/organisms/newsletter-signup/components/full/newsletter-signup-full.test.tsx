@@ -1,3 +1,5 @@
+import { ICONS } from '@blog/config';
+import { Icon } from '@blog/ui/atoms/icon';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
@@ -37,9 +39,41 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
   });
 
+  it('associates the email field with its accessible label', () => {
+    setup();
+
+    expect(screen.getByLabelText('Email address')).toHaveAttribute(
+      'type',
+      'email',
+    );
+  });
+
   it('renders the chevron icon as the email field prompt', () => {
     setup();
     expect(screen.getByTestId('newsletter-signup-input-prompt')).toBeVisible();
+  });
+
+  it('renders trust cues when provided', () => {
+    const trustCues = [
+      {
+        icon: <Icon name={ICONS.SHIELD_CHECK} />,
+        label: 'No spam',
+      },
+      {
+        icon: <Icon name={ICONS.X} />,
+        label: 'Unsubscribe in one line',
+      },
+    ];
+    setup({ trustCues });
+
+    expect(screen.getByText('No spam')).toBeVisible();
+    expect(screen.getByText('Unsubscribe in one line')).toBeVisible();
+  });
+
+  it('renders no trust-cue row when trustCues is omitted', () => {
+    setup();
+
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
 
   it('calls onChange with the new value and does not manage its own state', async () => {
