@@ -17,8 +17,10 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const cmsDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+// Sanity's CLI re-joins an absolute --path onto its own cwd rather than
+// using it as-is, so this must stay relative (matching the pre-#1038 inline
+// command) or the extract silently writes into a bogus nested directory.
 const schemaPath = join(
-  cmsDir,
   '../../packages/config/src/sanity/generated/schema.json',
 );
 
