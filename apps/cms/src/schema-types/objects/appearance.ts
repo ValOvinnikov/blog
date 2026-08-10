@@ -4,6 +4,7 @@ import {
   CONTAINER_WIDTH,
   SPACING_SCALE,
 } from '@blog/config/constants';
+import { toTitleCase } from '@blog/utils';
 import { SlidersHorizontal } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -27,13 +28,10 @@ export const appearanceSchema = defineType({
       title: 'Background',
       type: 'string',
       options: {
-        list: [
-          { title: 'Default', value: BACKGROUND_TONE.DEFAULT },
-          { title: 'Subtle', value: BACKGROUND_TONE.SUBTLE },
-          { title: 'Surface', value: BACKGROUND_TONE.SURFACE },
-          { title: 'Accent tint', value: BACKGROUND_TONE.ACCENT_TINT },
-          { title: 'Inverse', value: BACKGROUND_TONE.INVERSE },
-        ],
+        list: Object.values(BACKGROUND_TONE).map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
       },
     }),
     defineField({
@@ -53,11 +51,10 @@ export const appearanceSchema = defineType({
       title: 'Container Width',
       type: 'string',
       options: {
-        list: [
-          { title: 'Narrow', value: CONTAINER_WIDTH.NARROW },
-          { title: 'Wide', value: CONTAINER_WIDTH.WIDE },
-          { title: 'Full', value: CONTAINER_WIDTH.FULL },
-        ],
+        list: Object.values(CONTAINER_WIDTH).map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
       },
     }),
     defineField({
@@ -65,10 +62,10 @@ export const appearanceSchema = defineType({
       title: 'Align',
       type: 'string',
       options: {
-        list: [
-          { title: 'Start', value: ALIGN.START },
-          { title: 'Center', value: ALIGN.CENTER },
-        ],
+        list: Object.values(ALIGN).map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
       },
     }),
     defineField({
