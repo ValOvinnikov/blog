@@ -134,14 +134,22 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
     [ASIDE_KIND.CONTEXT]: blogPostT('asideKind.CONTEXT'),
   };
 
-  // Rendered in one of two structural positions below (nested inside
-  // `Article.Body`'s grid when the rail is present, or as `Article`'s
-  // direct sibling otherwise) — hoisted so the two branches can't drift.
+  // Both render as `Article.Body`'s own last children (#1307) — genuine
+  // article content sharing the article's real content column, not a
+  // page-level sibling mimicking its width from outside. Hoisted so the
+  // rail/no-rail branches below can't drift.
   const footer = (
     <Article.Footer
       className={hasContentsRail ? s.footerInRail() : s.footer()}
       tags={footerTags}
       linkAs={SmartLink}
+    />
+  );
+  const newsletterForm = newsletterEnabled && newsletterSettingsResult.ok && (
+    <NewsletterForm
+      variant="compact"
+      heading={newsletterSettingsResult.data.heading}
+      className={hasContentsRail ? s.newsletterInRail() : s.newsletter()}
     />
   );
 
@@ -222,7 +230,6 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
                       asideKindLabels={asideKindLabels}
                     />
                   </div>
-                  {footer}
                 </>
               ) : (
                 <PortableTextRenderer
@@ -231,9 +238,9 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
                   asideKindLabels={asideKindLabels}
                 />
               )}
+              {footer}
+              {newsletterForm}
             </Article.Body>
-
-            {!hasContentsRail && footer}
           </Article>
 
           <SkimPanel
@@ -242,15 +249,6 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
             readFullArticleLabel={blogPostT('skimPanel.readFullArticle')}
           />
         </DepthProvider>
-
-        {newsletterEnabled && newsletterSettingsResult.ok && (
-          <div className={s.newsletter()}>
-            <NewsletterForm
-              variant="compact"
-              heading={newsletterSettingsResult.data.heading}
-            />
-          </div>
-        )}
 
         {relatedPostItems.length > 0 && (
           <PostsSection
