@@ -36,10 +36,10 @@ export const ALIGN = {
 export type TAlign = TValueOf<typeof ALIGN>;
 
 export type TAppearance = {
-  background: TBackgroundTone;
-  spacingTop: TSpacingScale;
-  spacingBottom: TSpacingScale;
-  containerWidth: TContainerWidth;
-  align: TAlign;
-  divider: boolean;
+  background?: TBackgroundTone;
+  spacingTop?: TSpacingScale;
+  spacingBottom?: TSpacingScale;
+  containerWidth?: TContainerWidth;
+  align?: TAlign;
+  divider?: boolean;
 };
