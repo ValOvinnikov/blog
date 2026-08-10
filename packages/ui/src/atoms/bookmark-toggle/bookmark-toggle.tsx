@@ -36,11 +36,7 @@ export const BookmarkToggle = ({
   dataTestId,
   ...rest
 }: IBookmarkToggleProps) => {
-  const {
-    root,
-    icon,
-    label: labelSlot,
-  } = bookmarkToggleVariants({ isBookmarked });
+  const { root, icon } = bookmarkToggleVariants({ isBookmarked });
 
   return (
     <button
@@ -55,7 +51,7 @@ export const BookmarkToggle = ({
       className={root({ class: className })}
     >
       <Icon name={ICONS.BOOKMARK} size={Size.MD} className={icon()} />
-      <span className={labelSlot()}>{label}</span>
+      <span>{label}</span>
     </button>
   );
 };

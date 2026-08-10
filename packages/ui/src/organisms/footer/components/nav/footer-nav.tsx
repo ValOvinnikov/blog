@@ -1,8 +1,10 @@
+import type { IWithDataTestId } from '@blog/config';
 import type { ComponentPropsWithoutRef } from 'react';
 
 import { footerNavVariants } from './footer-nav-variants';
 
-interface IFooterNavProps extends ComponentPropsWithoutRef<'nav'> {
+interface IFooterNavProps
+  extends ComponentPropsWithoutRef<'nav'>, IWithDataTestId {
   ariaLabel?: string;
 }
 
@@ -13,11 +15,13 @@ interface IFooterNavProps extends ComponentPropsWithoutRef<'nav'> {
 export const FooterNav = ({
   className,
   ariaLabel,
+  dataTestId,
   ...rest
 }: IFooterNavProps) => (
   <nav
     aria-label={ariaLabel}
     className={footerNavVariants({ class: className })}
+    data-testid={dataTestId}
     {...rest}
   />
 );

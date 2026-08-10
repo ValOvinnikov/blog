@@ -1,13 +1,11 @@
-import { Size } from '@blog/config';
+import { Size, type IWithDataTestId } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import { postCardFooterVariants } from './post-card-footer-variants';
 
-export interface IPostCardFooterProps extends Omit<
-  ComponentPropsWithoutRef<'div'>,
-  'children'
-> {
+export interface IPostCardFooterProps
+  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
   authorName?: string;
   authorAvatarSrc?: string;
   publishedAt?: string;
@@ -35,9 +33,14 @@ export const PostCardFooter = ({
   leadingIcon,
   trailingIcon,
   className,
+  dataTestId,
   ...rest
 }: IPostCardFooterProps) => (
-  <div className={s.root({ class: className })} {...rest}>
+  <div
+    className={s.root({ class: className })}
+    data-testid={dataTestId}
+    {...rest}
+  >
     {authorName && (
       <Avatar
         name={authorName}

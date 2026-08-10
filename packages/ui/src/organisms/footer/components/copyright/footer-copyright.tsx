@@ -1,11 +1,10 @@
+import type { IWithDataTestId } from '@blog/config';
 import type { ComponentPropsWithoutRef } from 'react';
 
 import { footerCopyrightVariants } from './footer-copyright-variants';
 
-interface IFooterCopyrightProps extends Omit<
-  ComponentPropsWithoutRef<'span'>,
-  'children'
-> {
+interface IFooterCopyrightProps
+  extends Omit<ComponentPropsWithoutRef<'span'>, 'children'>, IWithDataTestId {
   title: string;
 }
 
@@ -16,9 +15,14 @@ interface IFooterCopyrightProps extends Omit<
 export const FooterCopyright = ({
   title,
   className,
+  dataTestId,
   ...rest
 }: IFooterCopyrightProps) => (
-  <span className={footerCopyrightVariants({ class: className })} {...rest}>
+  <span
+    className={footerCopyrightVariants({ class: className })}
+    data-testid={dataTestId}
+    {...rest}
+  >
     &copy; {new Date().getFullYear()} {title}
   </span>
 );

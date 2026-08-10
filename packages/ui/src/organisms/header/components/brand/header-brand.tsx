@@ -1,6 +1,10 @@
+import type { IWithDataTestId } from '@blog/config';
 import type { ComponentPropsWithoutRef } from 'react';
 
 import { headerBrandVariants } from './header-brand-variants';
+
+interface IHeaderBrandProps
+  extends ComponentPropsWithoutRef<'span'>, IWithDataTestId {}
 
 /**
  * HeaderBrand — the brand/logo slot in the site `Header`; a styled `<span>` you
@@ -8,7 +12,12 @@ import { headerBrandVariants } from './header-brand-variants';
  */
 export const HeaderBrand = ({
   className,
+  dataTestId,
   ...rest
-}: ComponentPropsWithoutRef<'span'>) => (
-  <span className={headerBrandVariants({ class: className })} {...rest} />
+}: IHeaderBrandProps) => (
+  <span
+    className={headerBrandVariants({ class: className })}
+    data-testid={dataTestId}
+    {...rest}
+  />
 );

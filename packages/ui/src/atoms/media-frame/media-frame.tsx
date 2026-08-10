@@ -1,3 +1,4 @@
+import type { IWithDataTestId } from '@blog/config';
 import { type HTMLAttributes } from 'react';
 
 import {
@@ -6,7 +7,8 @@ import {
 } from './media-frame-variants';
 
 export type TMediaFrameProps = HTMLAttributes<HTMLDivElement> &
-  TMediaFrameVariants;
+  TMediaFrameVariants &
+  IWithDataTestId;
 
 /**
  * Positioning context for a Next.js `<Image fill />` child.
@@ -17,10 +19,15 @@ export const MediaFrame = ({
   ratio,
   className,
   children,
+  dataTestId,
   ...rest
 }: TMediaFrameProps) => {
   return (
-    <div className={mediaFrameVariants({ ratio, class: className })} {...rest}>
+    <div
+      className={mediaFrameVariants({ ratio, class: className })}
+      data-testid={dataTestId}
+      {...rest}
+    >
       {children}
     </div>
   );
