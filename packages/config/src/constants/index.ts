@@ -1,4 +1,5 @@
 export * from './alert';
+export * from './appearance';
 export * from './aside';
 export * from './brand';
 export * from './depth';
