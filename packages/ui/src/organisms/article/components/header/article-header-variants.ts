@@ -2,6 +2,7 @@ import { tv } from '@blog/ui/lib/styling';
 
 export const articleHeaderVariants = tv({
   slots: {
+    root: ['w-full'],
     headingGroup: ['max-w-[800px] mx-auto'],
     category: ['mb-2'],
     title: ['mt-3'],

@@ -1,6 +1,8 @@
 import type { IWithDataTestId } from '@blog/config';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
+import { articleBodyVariants } from './article-body-variants';
+
 export interface IArticleBodyProps
   extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
   children: ReactNode;
@@ -18,7 +20,11 @@ export const ArticleBody = ({
   ...rest
 }: IArticleBodyProps) => {
   return (
-    <div className={className} data-testid={dataTestId} {...rest}>
+    <div
+      className={articleBodyVariants({ class: className })}
+      data-testid={dataTestId}
+      {...rest}
+    >
       {children}
     </div>
   );

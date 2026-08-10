@@ -53,7 +53,11 @@ export const ArticleHeader = ({
   const s = articleHeaderVariants();
 
   return (
-    <header className={className} data-testid={dataTestId} {...rest}>
+    <header
+      className={s.root({ class: className })}
+      data-testid={dataTestId}
+      {...rest}
+    >
       <div className={s.headingGroup()}>
         {category && (
           <Eyebrow
