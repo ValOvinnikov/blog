@@ -1,4 +1,9 @@
-import type { ILink, ISanityImage, TMaybeUndefined } from '@blog/config';
+import type {
+  ILink,
+  ISanityImage,
+  TAppearance,
+  TMaybeUndefined,
+} from '@blog/config';
 
 /**
  * The hero's primary CTA has no `ariaLabel` — unlike `ILink`, whose
@@ -19,4 +24,5 @@ export type THeroModule = {
   sanityImage: TMaybeUndefined<ISanityImage>;
   primaryAction: TMaybeUndefined<THeroPrimaryAction>;
   secondaryAction: TMaybeUndefined<ILink>;
+  appearance: TMaybeUndefined<TAppearance>;
 };

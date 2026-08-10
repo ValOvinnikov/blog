@@ -1,3 +1,4 @@
+import { ALIGN, BACKGROUND_TONE, CONTAINER_WIDTH } from '@blog/config';
 import { makeRawCtaModule } from '@blog/service/testing/modules/fixtures';
 
 import { toCtaModule } from './transformer';
@@ -25,5 +26,37 @@ describe('toCtaModule', () => {
     const cta = toCtaModule(raw);
 
     expect(cta.text).toBeUndefined();
+  });
+
+  it('maps a fully-authored appearance object 1:1', () => {
+    const raw = makeRawCtaModule({
+      appearance: {
+        background: BACKGROUND_TONE.SURFACE,
+        spacingTop: 'LG',
+        spacingBottom: 'SM',
+        containerWidth: CONTAINER_WIDTH.NARROW,
+        align: ALIGN.CENTER,
+        divider: true,
+      },
+    });
+
+    const cta = toCtaModule(raw);
+
+    expect(cta.appearance).toEqual({
+      background: BACKGROUND_TONE.SURFACE,
+      spacingTop: 'LG',
+      spacingBottom: 'SM',
+      containerWidth: CONTAINER_WIDTH.NARROW,
+      align: ALIGN.CENTER,
+      divider: true,
+    });
+  });
+
+  it('leaves appearance undefined when the field is unset (no faked default)', () => {
+    const raw = makeRawCtaModule({ appearance: null });
+
+    const cta = toCtaModule(raw);
+
+    expect(cta.appearance).toBeUndefined();
   });
 });

@@ -1,3 +1,4 @@
+import { toAppearance } from '@blog/service/shared/transformers/to-appearance';
 import { toLink } from '@blog/service/shared/transformers/to-link';
 import type { InferResultType } from 'groqd';
 
@@ -11,5 +12,6 @@ export function toCtaModule(raw: TRawCtaModule): TCtaModule {
     heading: raw.heading,
     text: raw.text ?? undefined,
     action: toLink(raw.action),
+    appearance: toAppearance(raw.appearance),
   };
 }

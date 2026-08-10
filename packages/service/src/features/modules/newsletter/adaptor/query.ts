@@ -1,4 +1,5 @@
 import { q } from '@blog/service/sanity/query';
+import { appearanceFragment } from '@blog/service/shared/fragments/appearance';
 
 export const newsletterModuleQuery = q
   .parameters<{ id: string }>()
@@ -8,5 +9,9 @@ export const newsletterModuleQuery = q
   .project((sub) => ({
     heading: sub.field('heading').notNull(),
     description: sub.field('description').nullable(true),
+    appearance: sub
+      .field('appearance')
+      .project(appearanceFragment)
+      .nullable(true),
   }))
   .notNull();

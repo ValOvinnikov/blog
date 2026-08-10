@@ -1,4 +1,5 @@
 import { HERO_FIELD_MODE, routes } from '@blog/config';
+import { toAppearance } from '@blog/service/shared/transformers/to-appearance';
 import { toLink } from '@blog/service/shared/transformers/to-link';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
@@ -84,5 +85,6 @@ export function toHeroModule(
         }
       : undefined,
     secondaryAction: toLink(raw.secondaryAction),
+    appearance: toAppearance(raw.appearance),
   };
 }
