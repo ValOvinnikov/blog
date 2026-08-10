@@ -3,7 +3,6 @@
 import { ICONS, Size, type TFormStatus } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/organisms';
-import { newsletterFormCompactPrefixVariants } from '@web/components/shared/newsletter-form/newsletter-form-variants';
 import { subscribeToNewsletterAction } from '@web/server/newsletter/newsletter-actions';
 import { hasNewsletterSubscribedCookie } from '@web/utils/has-newsletter-subscribed-cookie';
 import { isValidEmail } from '@web/utils/is-valid-email';
@@ -118,20 +117,7 @@ export function NewsletterForm({
   };
 
   if (variant === 'compact') {
-    return (
-      <NewsletterSignup.Compact
-        {...sharedProps}
-        prefix={
-          <span
-            aria-hidden="true"
-            className={newsletterFormCompactPrefixVariants()}
-            data-testid="newsletter-signup-compact-prefix"
-          >
-            $
-          </span>
-        }
-      />
-    );
+    return <NewsletterSignup.Compact {...sharedProps} />;
   }
 
   const trustCues = [
