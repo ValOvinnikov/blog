@@ -24,6 +24,7 @@ export type Module_newsletter = {
   title?: string;
   heading?: string;
   description?: string;
+  appearance?: Appearance;
 };
 
 export type Module_cta = {
@@ -36,6 +37,7 @@ export type Module_cta = {
   heading?: string;
   text?: string;
   action?: Link;
+  appearance?: Appearance;
 };
 
 export type Blog_postReference = {
@@ -99,6 +101,7 @@ export type Module_content = {
   _rev: string;
   title?: string;
   body?: RichText;
+  appearance?: Appearance;
 };
 
 export type RichText = Array<
@@ -139,6 +142,7 @@ export type Module_postList = {
   _rev: string;
   title?: string;
   limit?: number;
+  appearance?: Appearance;
 };
 
 export type Skim = {
@@ -233,6 +237,16 @@ export type ImageWithAlt = {
   hotspot?: SanityImageHotspot;
   crop?: SanityImageCrop;
   alt?: string;
+};
+
+export type Appearance = {
+  _type: 'appearance';
+  background?: 'DEFAULT' | 'SUBTLE' | 'SURFACE' | 'ACCENT_TINT' | 'INVERSE';
+  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
+  align?: 'START' | 'CENTER';
+  divider?: boolean;
 };
 
 export type Settings_newsletter = {
@@ -379,6 +393,7 @@ export type Module_hero = {
   heroImage?: ImageWithAlt;
   primaryActionLabel?: string;
   secondaryAction?: Link;
+  appearance?: Appearance;
 };
 
 export type Module_contentReference = {
@@ -645,6 +660,7 @@ export type AllSanitySchemaTypes =
   | SanityImageAssetReference
   | BodyImage
   | ImageWithAlt
+  | Appearance
   | Settings_newsletter
   | Settings_footer
   | Settings_navigation

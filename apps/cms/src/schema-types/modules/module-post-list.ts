@@ -1,3 +1,4 @@
+import { appearanceField } from '@cms/schema-types/helpers/appearance-field';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { List } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -16,6 +17,7 @@ export const postListSchema = defineType({
       description: 'Maximum number of posts to show.',
       validation: (rule) => rule.required().integer().min(1).max(12),
     }),
+    appearanceField,
   ],
   preview: {
     select: {
