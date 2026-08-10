@@ -17,9 +17,13 @@
     "@blog/eslint-config": "workspace:*",
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
+    "@types/culori": "^4.0.1",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
+  },
+  "dependencies": {
+    "culori": "^4.0.2"
   }
 }
