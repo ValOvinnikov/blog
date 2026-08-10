@@ -1,3 +1,4 @@
+import { appearanceField } from '@cms/schema-types/helpers/appearance-field';
 import { newsletterContentFields } from '@cms/schema-types/helpers/newsletter-content-fields';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { Mail } from 'lucide-react';
@@ -11,6 +12,7 @@ export const newsletterSchema = defineType({
   fields: [
     titleField({ description: 'Internal label shown in the Studio.' }),
     ...newsletterContentFields(),
+    appearanceField,
   ],
   preview: {
     select: {

@@ -54,6 +54,14 @@
           "type": "string"
         },
         "optional": true
+      },
+      "appearance": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "appearance"
+        },
+        "optional": true
       }
     }
   },
@@ -118,6 +126,14 @@
         "value": {
           "type": "inline",
           "name": "link"
+        },
+        "optional": true
+      },
+      "appearance": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "appearance"
         },
         "optional": true
       }
@@ -427,6 +443,14 @@
           "name": "richText"
         },
         "optional": true
+      },
+      "appearance": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "appearance"
+        },
+        "optional": true
       }
     }
   },
@@ -693,6 +717,14 @@
         "type": "objectAttribute",
         "value": {
           "type": "number"
+        },
+        "optional": true
+      },
+      "appearance": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "appearance"
         },
         "optional": true
       }
@@ -1346,6 +1378,154 @@
           "type": "objectAttribute",
           "value": {
             "type": "string"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "appearance",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "appearance"
+          }
+        },
+        "background": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "DEFAULT"
+              },
+              {
+                "type": "string",
+                "value": "SUBTLE"
+              },
+              {
+                "type": "string",
+                "value": "SURFACE"
+              },
+              {
+                "type": "string",
+                "value": "ACCENT_TINT"
+              },
+              {
+                "type": "string",
+                "value": "INVERSE"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "spacingTop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "spacingBottom": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "containerWidth": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NARROW"
+              },
+              {
+                "type": "string",
+                "value": "WIDE"
+              },
+              {
+                "type": "string",
+                "value": "FULL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "align": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "START"
+              },
+              {
+                "type": "string",
+                "value": "CENTER"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "divider": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
           },
           "optional": true
         }
@@ -2146,6 +2326,14 @@
         "value": {
           "type": "inline",
           "name": "link"
+        },
+        "optional": true
+      },
+      "appearance": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "appearance"
         },
         "optional": true
       }

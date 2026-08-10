@@ -47,7 +47,10 @@ array.
 
 Every module document gets a required internal `title` via the reusable
 `titleField` helper (§ below) so it's listable/previewable in Studio
-independent of its display fields.
+independent of its display fields. Every module document also gets an
+optional `appearance` field via the shared `appearanceField` value
+(`schema-types/helpers/appearance-field.ts`) — see the `appearance` object
+below.
 
 **Page documents reference modules**
 
@@ -135,7 +138,12 @@ override bag) + `openGraph`,
 `blockText` / `richText`, `aside` (deep-dive block type registered in
 `richText`'s portable-text array; `kind` from `ASIDE_KIND`, required; `body`
 via `blockText`, required — part of the choose-your-depth reading feature,
-#957), `skim` (see `post` above).
+#957), `skim` (see `post` above), `appearance` (six all-optional fields, no
+defaults set at the schema level: `background` (`BACKGROUND_TONE`),
+`spacingTop`/`spacingBottom` (`SPACING_SCALE`), `containerWidth`
+(`CONTAINER_WIDTH`), `align` (`ALIGN`), `divider` (boolean) — attached to
+every `module_*` document via the shared `appearanceField` value; `service`/
+`ui` decide unset-vs-set and rendering defaults).
 
 **Conventions**
 

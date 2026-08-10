@@ -1,3 +1,4 @@
+import { appearanceField } from '@cms/schema-types/helpers/appearance-field';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { richTextSchema } from '@cms/schema-types/objects/rich-text';
 import { FileText } from 'lucide-react';
@@ -18,6 +19,7 @@ export const contentSchema = defineType({
         'Page content — supports rich text, images, and code blocks.',
       validation: (rule) => rule.required(),
     }),
+    appearanceField,
   ],
   preview: {
     select: {

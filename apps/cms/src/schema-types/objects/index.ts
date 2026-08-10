@@ -1,3 +1,4 @@
+import { appearanceSchema } from './appearance';
 import { asideSchema } from './aside';
 import { blockTextSchema } from './block-text';
 import { bodyImageSchema } from './body-image';
@@ -12,6 +13,7 @@ import { socialLinkSchema } from './social-link';
 import { specLineSchema } from './spec-line';
 
 export const objects = [
+  appearanceSchema,
   imageWithAltSchema,
   bodyImageSchema,
   asideSchema,
