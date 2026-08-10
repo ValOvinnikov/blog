@@ -10,6 +10,7 @@ import {
   Fragment,
 } from 'react';
 
+import { articleVariants } from './article-variants';
 import { ArticleBody } from './components/body/article-body';
 import { ArticleFooter } from './components/footer/article-footer';
 import { ArticleHeader } from './components/header/article-header';
@@ -40,7 +41,11 @@ const ArticleRoot = ({
 }: IArticleProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, ArticleParts);
   return (
-    <article className={className} data-testid={dataTestId} {...rest}>
+    <article
+      className={articleVariants({ class: className })}
+      data-testid={dataTestId}
+      {...rest}
+    >
       {slots.Header}
       {slots.Body}
       {slots.Footer}
