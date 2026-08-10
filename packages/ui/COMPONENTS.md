@@ -253,7 +253,8 @@ Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?:
 
 ### ContentModule — `organisms/content-module/content-module.tsx`
 page-builder organism rendering a portable-text content block behind an optional heading.
-Props: title?: string · titleId?: string · children: ReactNode _(extends Omit<ComponentPropsWithoutRef<'section'>, 'chil…, IWithDataTestId)_
+Props: title?: string · titleId?: string · children: ReactNode · wrapped?: TContentModuleVariants['wrapped'] _(extends Omit<ComponentPropsWithoutRef<'section'>, 'chil…, IWithDataTestId)_
+Variants: wrapped: (boolean)
 
 ### ContentSection — `organisms/content-section/content-section.tsx`
 a titled `<section>` wrapper: renders an `<h2>` from `title`/`titleId` and wires `aria-labelledby` to it, so grouped page content is announced as a named region.
@@ -261,7 +262,8 @@ Props: children: ReactNode · title: ReactNode · titleId: string _(extends Omit
 
 ### CtaModule — `organisms/cta-module/cta-module.tsx`
 page-builder organism rendering a heading, optional supporting text, and an optional action slot.
-Props: heading: string · headingId?: string · text?: string · action?: ReactNode _(extends Omit<ComponentPropsWithoutRef<'section'>, 'chil…, IWithDataTestId)_
+Props: heading: string · headingId?: string · text?: string · action?: ReactNode · wrapped?: TCtaModuleVariants['wrapped'] _(extends Omit<ComponentPropsWithoutRef<'section'>, 'chil…, IWithDataTestId)_
+Variants: wrapped: (boolean)
 
 ### Footer — `organisms/footer/footer.tsx`
 the site footer shell; composes `Footer.Nav` and `Footer.Copyright` slots into a `<footer>`.

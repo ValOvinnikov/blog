@@ -28,7 +28,26 @@ import { createTV } from 'tailwind-variants';
  * worthwhile as documented intent (matching the font-size precedent) and a
  * guard against that upstream catch-all narrowing in a future version, not
  * because it fixes an observed break in the currently pinned version.
+ *
+ * The custom `--spacing-*` tokens (`gutter`, `section`, `page-y`, `site-x`,
+ * `site-y`, `card-x`, `card-y`, defined in `theme.css`) are registered
+ * against every padding classGroup (`p`, `px`, `py`, `pt`, `pr`, `pb`, `pl`)
+ * for the same reason, but this one *does* fix an observed break: unlike
+ * `font-family`, `tailwind-merge`'s padding classGroups have no catch-all,
+ * so `py-section` and `py-0` were classified as non-conflicting and both
+ * landed on the element (`CtaModule`'s `wrapped` variant), leaving the
+ * winner up to stylesheet order instead of `tv()`'s override intent.
  */
+const SPACING_TOKENS = [
+  'gutter',
+  'section',
+  'page-y',
+  'site-x',
+  'site-y',
+  'card-x',
+  'card-y',
+];
+
 export const tv = createTV({
   twMergeConfig: {
     extend: {
@@ -59,6 +78,13 @@ export const tv = createTV({
             font: ['display', 'body', 'read', 'mono'],
           },
         ],
+        p: [{ p: SPACING_TOKENS }],
+        px: [{ px: SPACING_TOKENS }],
+        py: [{ py: SPACING_TOKENS }],
+        pt: [{ pt: SPACING_TOKENS }],
+        pr: [{ pr: SPACING_TOKENS }],
+        pb: [{ pb: SPACING_TOKENS }],
+        pl: [{ pl: SPACING_TOKENS }],
       },
     },
   },

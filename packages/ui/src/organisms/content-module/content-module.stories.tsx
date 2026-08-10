@@ -37,3 +37,9 @@ export const WithoutTitle: TStory = {
     titleId: undefined,
   },
 };
+
+export const Wrapped: TStory = {
+  args: {
+    wrapped: true,
+  },
+};
