@@ -1,7 +1,10 @@
 import type { IWithDataTestId } from '@blog/config';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
-import { ctaModuleVariants } from './cta-module-variants';
+import {
+  ctaModuleVariants,
+  type TCtaModuleVariants,
+} from './cta-module-variants';
 
 export interface ICtaModuleProps
   extends
@@ -11,6 +14,12 @@ export interface ICtaModuleProps
   headingId?: string;
   text?: string;
   action?: ReactNode;
+  /**
+   * Drops this component's own top margin and vertical padding. Set when a
+   * parent (e.g. `Section`) already owns the vertical spacing around it, so
+   * the two don't stack.
+   */
+  wrapped?: TCtaModuleVariants['wrapped'];
 }
 
 /**
@@ -26,9 +35,10 @@ export const CtaModule = ({
   action,
   className,
   dataTestId,
+  wrapped,
   ...rest
 }: ICtaModuleProps) => {
-  const s = ctaModuleVariants();
+  const s = ctaModuleVariants({ wrapped });
 
   return (
     <section

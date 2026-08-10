@@ -1,7 +1,10 @@
 import type { IWithDataTestId } from '@blog/config';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
-import { contentModuleVariants } from './content-module-variants';
+import {
+  contentModuleVariants,
+  type TContentModuleVariants,
+} from './content-module-variants';
 
 export interface IContentModuleProps
   extends
@@ -10,6 +13,11 @@ export interface IContentModuleProps
   title?: string;
   titleId?: string;
   children: ReactNode;
+  /**
+   * Drops this component's own top margin. Set when a parent (e.g. `Section`)
+   * already owns the vertical spacing around it, so the two don't stack.
+   */
+  wrapped?: TContentModuleVariants['wrapped'];
 }
 
 /**
@@ -23,9 +31,10 @@ export const ContentModule = ({
   children,
   className,
   dataTestId,
+  wrapped,
   ...rest
 }: IContentModuleProps) => {
-  const s = contentModuleVariants();
+  const s = contentModuleVariants({ wrapped });
 
   return (
     <section

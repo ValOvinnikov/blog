@@ -31,3 +31,9 @@ export const WithoutAction: TStory = {
     action: undefined,
   },
 };
+
+export const Wrapped: TStory = {
+  args: {
+    wrapped: true,
+  },
+};
