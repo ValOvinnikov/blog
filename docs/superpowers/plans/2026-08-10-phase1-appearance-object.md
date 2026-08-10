@@ -60,14 +60,20 @@ view-model barrel, matching where module view-models already live):**
 
 ```
 TAppearance = {
-  background: TBackgroundTone;
-  spacingTop: TSpacingScale;
-  spacingBottom: TSpacingScale;
-  containerWidth: TContainerWidth;
-  align: TAlign;
-  divider: boolean;
+  background?: TBackgroundTone;
+  spacingTop?: TSpacingScale;
+  spacingBottom?: TSpacingScale;
+  containerWidth?: TContainerWidth;
+  align?: TAlign;
+  divider?: boolean;
 }
 ```
+
+(Fields are individually optional — corrected 2026-08-10 per #1305: every Sanity
+sub-field is itself optional with no `initialValue`, so a partially-authored
+`appearance` object is possible. `service` maps each field literally with no
+faked defaults; `Section` applies its default table per-field, not only when
+the whole object is absent.)
 
 Service returns `TAppearance | undefined` (undefined when the Sanity field is
 unset — no faked defaults). `Section` supplies the rendering defaults.
@@ -149,7 +155,7 @@ the generated types gain the optional `appearance` shape that Task 3 projects.
       extract) passes; the generated `AllSanitySchemaTypes` now carries the
       optional `appearance` on each `module_*` type.
 - [ ] **Step 4:** Commit (`feat(cms): add optional appearance object to all
-  modules`). **PR body states: additive/optional — no content migration.**
+modules`). **PR body states: additive/optional — no content migration.**
 
 ---
 
@@ -211,7 +217,7 @@ the Contract's rendering defaults.
 - [ ] **Step 4:** Run tests — Expected: PASS. Add the story; regenerate
       `COMPONENTS.md`.
 - [ ] **Step 5:** Verify `pnpm --filter @blog/ui type-check` + test + `pnpm
-  gen:ui-index:check`; commit (`feat(ui): add Section appearance wrapper`).
+gen:ui-index:check`; commit (`feat(ui): add Section appearance wrapper`).
 
 ---
 
@@ -249,7 +255,7 @@ appearance={appearance}>`.
 ### Task 6: Integration verify + review + docs
 
 - [ ] **Step 1:** `verify-runner` (synchronous): `pnpm type-check && pnpm lint &&
-  pnpm test` from root — all green.
+pnpm test` from root — all green.
 - [ ] **Step 2:** `reviewer` over the full diff → fix blocking findings → re-run
       until `APPROVE`. `a11y-reviewer` too (ui/web touched).
 - [ ] **Step 3:** Update `SPEC.md` §6 (content model — the appearance object) and
