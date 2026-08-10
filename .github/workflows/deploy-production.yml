@@ -18,7 +18,10 @@ env:
   VERCEL_CLI_VERSION: 48.0.0
   # `sanity build` (run by the verify job's `pnpm build`) loads sanity.cli.ts,
   # which requires these. Sourced from repo Variables like ci.yml; the
-  # deploy-studio job overrides them with its environment-scoped values.
+  # deploy-studio job overrides SANITY_STUDIO_PROJECT_ID from its
+  # environment-scoped variable and hardcodes SANITY_STUDIO_DATASET (no
+  # environment-scoped variable exists for it — see deploy-studio's own env
+  # block below for why).
   SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
   SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
   # Vercel Remote Cache — lets verify replay task artifacts already built by PR
@@ -183,6 +186,13 @@ jobs:
       # (cms-prod is its own Vercel project) — mapped to the local name the
       # Vercel CLI actually reads.
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_CMS }}
+      # The `production` GitHub Environment only defines SANITY_STUDIO_PROJECT_ID
+      # as an environment-scoped variable, not SANITY_STUDIO_DATASET — without
+      # this override, `vars.SANITY_STUDIO_DATASET` (workflow-level env above)
+      # falls through to the repo-level default ("development"), which `sanity
+      # build` then bakes into the deployed Studio bundle. Hardcoded here rather
+      # than sourced from vars, mirroring the migrate job's existing override.
+      SANITY_STUDIO_DATASET: production
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
