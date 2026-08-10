@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_58 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_59 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -93,6 +93,11 @@ Props: className?: string _(extends IWithDataTestId)_
 ### QuoteBlock — `atoms/quote-block/quote-block.tsx`
 QuoteBlock atom — the accent-muted left rule + italic serif treatment for blockquotes inside Portable Text article body copy.
 Props: _(extends BlockquoteHTMLAttributes<HTMLQuoteElement>, IWithDataTestId)_
+
+### Section — `atoms/section/section.tsx`
+the appearance wrapper every page-builder module renders inside; maps an optional `appearance` object (background tone, spacing, container width, alignment, divider) to token-backed classes, falling back per-field to today's plain layout when `appearance` (or any of its fields) is unset.
+Props: appearance?: TAppearance · children: ReactNode · className?: string _(extends IWithDataTestId)_
+Variants: background: BACKGROUND_TONE.DEFAULT|BACKGROUND_TONE.SUBTLE|BACKGROUND_TONE.SURFACE|BACKGROUND_TONE.ACCENT_TINT|BACKGROUND_TONE.INVERSE · spacingTop: SPACING_SCALE.NONE|SPACING_SCALE.SM|SPACING_SCALE.MD|SPACING_SCALE.LG|SPACING_SCALE.XL · spacingBottom: SPACING_SCALE.NONE|SPACING_SCALE.SM|SPACING_SCALE.MD|SPACING_SCALE.LG|SPACING_SCALE.XL · containerWidth: CONTAINER_WIDTH.NARROW|CONTAINER_WIDTH.WIDE|CONTAINER_WIDTH.FULL · align: ALIGN.START|ALIGN.CENTER · divider: (boolean)
 
 ### SegmentedControl — `atoms/segmented-control/segmented-control.tsx`
 a fully controlled switch between a small, mutually exclusive set of views (e.g. a reader's chosen depth for an article).
