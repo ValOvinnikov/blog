@@ -30,6 +30,7 @@
     "@blog/config": "workspace:*",
     "@blog/utils": "workspace:*",
     "@sanity/code-input": "^7.2.10",
+    "@sanity/ui": "^3.5.1",
     "@sanity/vision": "^6.8.0",
     "lucide-react": "^1.24.0",
     "react": "catalog:",
