@@ -1,3 +1,5 @@
+import type { IWithDataTestId } from '@blog/config';
+
 import {
   avatarImageVariants,
   avatarNameVariants,
@@ -12,7 +14,7 @@ export type TAvatarProps = {
   size?: TAvatarVariants['size'];
   className?: string;
   onImageError?: () => void;
-};
+} & IWithDataTestId;
 
 const getInitials = (name: string): string => {
   const words = name.trim().split(/\s+/).filter(Boolean);
@@ -52,11 +54,15 @@ export const Avatar = ({
   size,
   className,
   onImageError,
+  dataTestId,
 }: TAvatarProps) => {
   const initials = getInitials(name);
 
   return (
-    <span className={avatarVariants({ size, class: className })}>
+    <span
+      className={avatarVariants({ size, class: className })}
+      data-testid={dataTestId}
+    >
       {src ? (
         <img
           src={src}

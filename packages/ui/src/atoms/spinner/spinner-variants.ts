@@ -15,9 +15,9 @@ export const spinnerVariants = tv({
   },
   variants: {
     size: {
-      [Size.SM]: { root: 'text-xs' },
-      [Size.MD]: { root: 'text-sm' },
-      [Size.LG]: { root: 'text-base' },
+      [Size.SM]: { root: ['text-xs'] },
+      [Size.MD]: { root: ['text-sm'] },
+      [Size.LG]: { root: ['text-base'] },
     },
   },
   defaultVariants: {

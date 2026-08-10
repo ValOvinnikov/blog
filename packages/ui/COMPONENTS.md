@@ -13,7 +13,7 @@ Variants: type: ALERT_TYPE.SUCCESS|ALERT_TYPE.WARNING|ALERT_TYPE.ERROR|ALERT_TYP
 
 ### Avatar — `atoms/avatar/avatar.tsx`
 Avatar atom — renders a provided image, or an initials badge derived from `name` when no image is supplied.
-Props: src?: string · alt: string · name: string · size?: TAvatarVariants['size'] · className?: string · onImageError?: () => void
+Props: src?: string · alt: string · name: string · size?: TAvatarVariants['size'] · className?: string · onImageError?: () => void _(extends IWithDataTestId)_
 Variants: size: Size.SM|Size.MD|Size.LG
 
 ### BackToTop — `atoms/back-to-top/back-to-top.tsx`
@@ -38,7 +38,7 @@ Variants: variant: primary|ghost|link|danger · size: Size.SM|Size.MD|Size.LG
 
 ### Caption — `atoms/caption/caption.tsx`
 Accessible caption for a media element.
-Props: _(extends HTMLAttributes<HTMLElement>)_
+Props: _(extends HTMLAttributes<HTMLElement>, IWithDataTestId)_
 
 ### Eyebrow — `atoms/eyebrow/eyebrow.tsx`
 Eyebrow atom — small uppercase label displayed above a heading to provide contextual category or section context.
@@ -65,16 +65,16 @@ Props: _(extends HTMLAttributes<HTMLElement>, IWithDataTestId)_
 
 ### Logo — `atoms/logo/logo.tsx`
 Logo atom — renders a brand mark with an optional monospace accent suffix.
-Props: prefix: string · suffix?: string _(extends HTMLAttributes<HTMLSpanElement>)_
+Props: prefix: string · suffix?: string _(extends HTMLAttributes<HTMLSpanElement>, IWithDataTestId)_
 
 ### MediaFrame — `atoms/media-frame/media-frame.tsx`
 Positioning context for a Next.js `<Image fill />` child.
-Props: _(extends HTMLAttributes<HTMLDivElement>, TMediaFrameVariants)_
+Props: _(extends HTMLAttributes<HTMLDivElement>, TMediaFrameVariants, IWithDataTestId)_
 Variants: ratio: video|square|portrait|classic
 
 ### MetaSeparator — `atoms/meta-separator/meta-separator.tsx`
 MetaSeparator atom — decorative separator for inline metadata lists (e.g. "Author · Date · Read time").
-Props: separator?: string _(extends HTMLAttributes<HTMLSpanElement>)_
+Props: separator?: string _(extends HTMLAttributes<HTMLSpanElement>, IWithDataTestId)_
 
 ### NavLink — `atoms/nav-link/nav-link.tsx`
 NavLink atom — a chrome-level navigation link (header/footer nav items).
@@ -111,7 +111,7 @@ Variants: tone: ok|warn|neutral
 
 ### Tag — `atoms/tag/tag.tsx`
 small pill-shaped label.
-Props: className?: string _(extends Omit<TTagVariants, 'interactive'>)_
+Props: className?: string _(extends Omit<TTagVariants, 'interactive'>, IWithDataTestId)_
 Variants: variant: default|accent · interactive: (boolean)
 
 ### TerminalTyping — `atoms/terminal-typing/terminal-typing.tsx`
@@ -120,7 +120,7 @@ Props: text: string · showCursor?: boolean _(extends Omit<ComponentPropsWithout
 
 ### Text — `atoms/text/text.tsx`
 the body-copy paragraph primitive: applies a `variant` from the type scale to a `<p>`.
-Props: _(extends HTMLAttributes<HTMLParagraphElement>, TTextVariants)_
+Props: _(extends HTMLAttributes<HTMLParagraphElement>, TTextVariants, IWithDataTestId)_
 Variants: variant: lead|muted|hero|card
 
 ### TextInput — `atoms/text-input/text-input.tsx`
@@ -184,10 +184,10 @@ the article summary card used in listings; composes `PostCard.Media`, `PostCard.
 Props: excerpt?: string · tags?: string[] · children?: TCompoundChildren<typeof PostCardParts> _(extends Omit<ComponentPropsWithoutRef<'article'>, 'chil…, IWithDataTestId)_
 
 Slots:
-- **PostCard.Media** — the media region at the top of a `PostCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: _(extends ComponentPropsWithoutRef<'div'>)_
+- **PostCard.Media** — the media region at the top of a `PostCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: _(extends ComponentPropsWithoutRef<'div'>, IWithDataTestId)_
 - **PostCard.Meta** — compact metadata row for post cards. Props: dateValue: string · dateLabel: string · readingTime?: string · className?: string _(extends IWithDataTestId)_
-- **PostCard.Title** — the post heading inside a `PostCard`, rendered as a styled `<h3>`. Props: _(extends ComponentPropsWithoutRef<'h3'>)_
-- **PostCard.Footer** — the byline row at the bottom of a `PostCard`: optional author avatar and name, published date, and a category tag. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · category?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends Omit< ComponentPropsWithoutRef<'div'>, 'childre…)_
+- **PostCard.Title** — the post heading inside a `PostCard`, rendered as a styled `<h3>`. Props: _(extends ComponentPropsWithoutRef<'h3'>, IWithDataTestId)_
+- **PostCard.Footer** — the byline row at the bottom of a `PostCard`: optional author avatar and name, published date, and a category tag. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · category?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends Omit<ComponentPropsWithoutRef<'div'>, 'children…, IWithDataTestId)_
 
 ### PostMeta — `molecules/post-meta/post-meta.tsx`
 post detail metadata strip: author avatar + name, publish date, and estimated reading time.
@@ -263,17 +263,17 @@ the site footer shell; composes `Footer.Nav` and `Footer.Copyright` slots into a
 Props: children?: TCompoundChildren<typeof FooterParts> _(extends Omit<ComponentPropsWithoutRef<'footer'>, 'child…, IWithDataTestId)_
 
 Slots:
-- **Footer.Nav** — the navigation region of the site `Footer`; a labelled `<nav>` wrapping the footer links. Props: ariaLabel?: string _(extends ComponentPropsWithoutRef<'nav'>)_
-- **Footer.Copyright** — the copyright line in the site `Footer`; renders "© {year} {title}" with the current year filled in automatically. Props: title: string _(extends Omit< ComponentPropsWithoutRef<'span'>, 'childr…)_
+- **Footer.Nav** — the navigation region of the site `Footer`; a labelled `<nav>` wrapping the footer links. Props: ariaLabel?: string _(extends ComponentPropsWithoutRef<'nav'>, IWithDataTestId)_
+- **Footer.Copyright** — the copyright line in the site `Footer`; renders "© {year} {title}" with the current year filled in automatically. Props: title: string _(extends Omit<ComponentPropsWithoutRef<'span'>, 'childre…, IWithDataTestId)_
 
 ### Header — `organisms/header/header.tsx`
 the site header shell; composes a `Header.Brand` slot alongside grouped `Header.Nav` and `Header.Actions` slots into a `<header>`.
 Props: children?: TCompoundChildren<typeof HeaderParts> _(extends Omit<ComponentPropsWithoutRef<'header'>, 'child…, IWithDataTestId)_
 
 Slots:
-- **Header.Brand** — the brand/logo slot in the site `Header`; a styled `<span>` you place the logo or wordmark in. Props: _(extends ComponentPropsWithoutRef<'span'>)_
-- **Header.Nav** — the primary navigation region of the site `Header`; a labelled `<nav>` wrapping the header links. Props: ariaLabel?: string _(extends ComponentPropsWithoutRef<'nav'>)_
-- **Header.Actions** — the trailing actions cluster in the site `Header` (e.g. theme toggle, auth controls); a styled `<div>` wrapper. Props: _(extends ComponentPropsWithoutRef<'div'>)_
+- **Header.Brand** — the brand/logo slot in the site `Header`; a styled `<span>` you place the logo or wordmark in. Props: _(extends ComponentPropsWithoutRef<'span'>, IWithDataTestId)_
+- **Header.Nav** — the primary navigation region of the site `Header`; a labelled `<nav>` wrapping the header links. Props: ariaLabel?: string _(extends ComponentPropsWithoutRef<'nav'>, IWithDataTestId)_
+- **Header.Actions** — the trailing actions cluster in the site `Header` (e.g. theme toggle, auth controls); a styled `<div>` wrapper. Props: _(extends ComponentPropsWithoutRef<'div'>, IWithDataTestId)_
 
 ### Hero — `organisms/hero/hero.tsx`
 the page-top hero band: renders `title` as an `<h1>` with optional `eyebrow` and `excerpt`, plus `Hero.Cta` and `Hero.Media` slots.
@@ -281,8 +281,8 @@ Props: title: string · titleId: string · eyebrow?: string · excerpt?: string 
 Variants: hasMedia: (boolean)
 
 Slots:
-- **Hero.Media** — the media slot of a `Hero`; frames its content at a 16:9 ratio via `MediaFrame`. Props: _(extends ComponentPropsWithoutRef<'div'>)_
-- **Hero.Cta** — the call-to-action slot of a `Hero`; a styled `<div>` for the hero's buttons or links. Props: _(extends ComponentPropsWithoutRef<'div'>)_
+- **Hero.Media** — the media slot of a `Hero`; frames its content at a 16:9 ratio via `MediaFrame`. Props: _(extends ComponentPropsWithoutRef<'div'>, IWithDataTestId)_
+- **Hero.Cta** — the call-to-action slot of a `Hero`; a styled `<div>` for the hero's buttons or links. Props: _(extends ComponentPropsWithoutRef<'div'>, IWithDataTestId)_
 
 ### NewsletterSignup — `organisms/newsletter-signup/newsletter-signup.tsx`
 a pure, controlled subscribe form built on the `TextInput` atom, exposed as two mutually-exclusive densities rather than a single component with a `variant` switch: `NewsletterSignup.Full` is the rich window-shell form used by the site footer and the CMS page-builder module; `NewsletterSignup.Compact` is the slim single-row strip for the end of every article.

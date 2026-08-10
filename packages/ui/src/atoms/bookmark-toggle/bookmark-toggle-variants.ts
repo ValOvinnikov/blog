@@ -14,7 +14,6 @@ export const bookmarkToggleVariants = tv({
       'disabled:pointer-events-none disabled:opacity-50',
     ],
     icon: ['fill-none shrink-0'],
-    label: [],
   },
   variants: {
     isBookmarked: {

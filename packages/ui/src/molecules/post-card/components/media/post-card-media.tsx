@@ -1,6 +1,10 @@
+import type { IWithDataTestId } from '@blog/config';
 import type { ComponentPropsWithoutRef } from 'react';
 
 import { postCardMediaVariants } from './post-card-media-variants';
+
+interface IPostCardMediaProps
+  extends ComponentPropsWithoutRef<'div'>, IWithDataTestId {}
 
 /**
  * PostCardMedia — the media region at the top of a `PostCard`; a styled `<div>`
@@ -8,7 +12,12 @@ import { postCardMediaVariants } from './post-card-media-variants';
  */
 export const PostCardMedia = ({
   className,
+  dataTestId,
   ...rest
-}: ComponentPropsWithoutRef<'div'>) => (
-  <div className={postCardMediaVariants({ class: className })} {...rest} />
+}: IPostCardMediaProps) => (
+  <div
+    className={postCardMediaVariants({ class: className })}
+    data-testid={dataTestId}
+    {...rest}
+  />
 );

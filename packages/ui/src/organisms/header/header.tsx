@@ -40,15 +40,16 @@ const HeaderRoot = ({
   ...rest
 }: IHeaderProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeaderParts);
+  const { root, navActionsGroup } = headerVariants();
   return (
     <header
-      className={headerVariants({ class: className })}
+      className={root({ class: className })}
       data-testid={dataTestId}
       {...rest}
     >
       {slots.Brand}
       {(slots.Nav || slots.Actions) && (
-        <div className="flex min-w-0 flex-wrap items-center gap-4">
+        <div className={navActionsGroup()}>
           {slots.Nav}
           {slots.Actions}
         </div>

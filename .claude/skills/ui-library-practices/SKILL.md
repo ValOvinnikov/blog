@@ -144,7 +144,11 @@ replace them with bare string literals.
   inline. Extend the right DOM props (`ComponentPropsWithoutRef<'button'>`) and
   spread `...rest` so consumers can pass `aria-*`, `id`, etc.
 - **Every prop interface extends `IWithDataTestId`** from `@blog/config`; wire
-  `dataTestId` to the root element's `data-testid`.
+  `dataTestId` to the root element's `data-testid`. **This covers compound
+  roots and every slot/part component** (`Header.Brand`, `PostCard.Footer`,
+  …), same as the JSDoc rule below — a slot is consumer-facing public API
+  the moment it's `Object.assign`'d onto its parent, not an internal detail
+  exempt from testability.
 - **A `tv()` variants file that defines a `variants` key exports its own derived
   type** — `export type T{X}Variants = VariantProps<typeof xVariants>;` **in the
   `*-variants.ts` file** — and the component types its props from that export
@@ -257,12 +261,24 @@ slot/media rules → **`compound-components.md`**.
 
 ## Styling
 
-- **All Tailwind classes live in a `{component-name}-variants.ts` file** — every
-  element in the component, not just the root. Placeholder spans, icon wrappers,
-  inner elements: all classes go through the variants file.
-- Use `tailwind-variants` (`tv`) for all base styles/variants/sizes. Even a
-  component with no variants defines a `tv`. `tv` handles `tailwind-merge`
-  internally — never wrap the call with `cn()`.
+- **No inline Tailwind classes in JSX — ever, non-negotiable.** The moment a
+  component applies _any_ class to _any_ element (root or inner: placeholder
+  spans, icon wrappers, everything), that class lives in a
+  `{component-name}-variants.ts` file behind `tv()`, never written directly
+  in the `.tsx`.
+- **A component that owns zero styling of its own doesn't need a `tv()` file
+  forced into existence just to have one.** A missing variants file is not
+  automatically a violation — check whether the component actually renders
+  any classes before flagging it. A pure pass-through wrapper that delegates
+  100% of its visual styling to a child/wrapped component (no classes on its
+  own root or elements) has nothing for `tv()` to hold, so it has none. This
+  is the exception to the rule above, not a loophole in it: the ban is on
+  _inline_ classes existing anywhere outside a variants file, not on every
+  component possessing one. If such a component later gains even one class
+  of its own, that's the moment it needs a variants file — not before.
+- Use `tailwind-variants` (`tv`) for all base styles/variants/sizes a
+  component does apply. `tv` handles `tailwind-merge` internally — never
+  wrap the call with `cn()`.
 - **A component with multiple visual slots uses exactly one `tv({ slots: {...} })`
   call** — never multiple separate `tv()` exports. Every named element (root plus
   each inner span/wrapper) becomes a key in the single `slots` object:

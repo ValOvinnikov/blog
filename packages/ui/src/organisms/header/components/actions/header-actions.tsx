@@ -1,6 +1,10 @@
+import type { IWithDataTestId } from '@blog/config';
 import type { ComponentPropsWithoutRef } from 'react';
 
 import { headerActionsVariants } from './header-actions-variants';
+
+interface IHeaderActionsProps
+  extends ComponentPropsWithoutRef<'div'>, IWithDataTestId {}
 
 /**
  * HeaderActions — the trailing actions cluster in the site `Header` (e.g. theme
@@ -8,7 +12,12 @@ import { headerActionsVariants } from './header-actions-variants';
  */
 export const HeaderActions = ({
   className,
+  dataTestId,
   ...rest
-}: ComponentPropsWithoutRef<'div'>) => (
-  <div className={headerActionsVariants({ class: className })} {...rest} />
+}: IHeaderActionsProps) => (
+  <div
+    className={headerActionsVariants({ class: className })}
+    data-testid={dataTestId}
+    {...rest}
+  />
 );

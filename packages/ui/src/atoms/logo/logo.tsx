@@ -1,8 +1,10 @@
+import type { IWithDataTestId } from '@blog/config';
 import { type HTMLAttributes } from 'react';
 
 import { logoVariants } from './logo-variants';
 
-export interface ILogoProps extends HTMLAttributes<HTMLSpanElement> {
+export interface ILogoProps
+  extends HTMLAttributes<HTMLSpanElement>, IWithDataTestId {
   prefix: string;
   suffix?: string;
 }
@@ -10,10 +12,20 @@ export interface ILogoProps extends HTMLAttributes<HTMLSpanElement> {
 /**
  * Logo atom — renders a brand mark with an optional monospace accent suffix.
  */
-export const Logo = ({ prefix, suffix, className, ...rest }: ILogoProps) => {
+export const Logo = ({
+  prefix,
+  suffix,
+  className,
+  dataTestId,
+  ...rest
+}: ILogoProps) => {
   const { root, suffix: suffixSlot } = logoVariants();
   return (
-    <span className={root({ class: className })} {...rest}>
+    <span
+      className={root({ class: className })}
+      data-testid={dataTestId}
+      {...rest}
+    >
       {prefix}
       {suffix !== undefined && <span className={suffixSlot()}>{suffix}</span>}
     </span>
