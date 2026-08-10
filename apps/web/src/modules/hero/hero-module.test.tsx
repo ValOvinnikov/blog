@@ -68,11 +68,36 @@ describe(HeroModule, () => {
         sanityImage: undefined,
         primaryAction: undefined,
         secondaryAction: undefined,
+        appearance: undefined,
       },
     });
 
     await setup();
 
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Welcome to the blog' }),
+    ).toBeVisible();
+  });
+
+  it('renders correctly when appearance.background is unset', async () => {
+    getHeroMock.mockResolvedValue({
+      ok: true,
+      data: {
+        eyebrow: undefined,
+        title: 'Welcome to the blog',
+        subtitle: undefined,
+        sanityImage: undefined,
+        primaryAction: undefined,
+        secondaryAction: undefined,
+        appearance: undefined,
+      },
+    });
+
+    await setup();
+
+    // Regression guard: `heroBackgroundVariants({ background: undefined })`
+    // must not throw or drop the heading — the resulting background class is
+    // presentation, covered by Storybook/manual check, not asserted here.
     expect(
       screen.getByRole('heading', { level: 1, name: 'Welcome to the blog' }),
     ).toBeVisible();

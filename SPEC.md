@@ -146,8 +146,27 @@ page-builder documents, and shared objects (`link`, `imageWithAlt`, `bodyImage`,
 `seo`, `aside`, `skim`, …). Naming convention `{group}_{name}` is being applied
 incrementally (#251).
 
+Every `module_*` document also carries an optional, all-fields-optional
+`appearance` object (`background`, `spacingTop`/`spacingBottom`,
+`containerWidth`, `align`, `divider` — stored values from `@blog/config`'s
+`BACKGROUND_TONE`/`SPACING_SCALE`/`CONTAINER_WIDTH`/`ALIGN` consts).
+`service.modules.<type>.v1` projects it into each view-model as
+`appearance: TAppearance | undefined`, with no faked defaults — unset stays
+unset end to end. In `apps/web`, every `MODULE_MAP`-registered module
+component renders its `@blog/ui` organism inside the pure `Section` atom
+(`packages/ui/src/atoms/section`), passing the fetched `appearance` straight
+through; `Section` maps it to token classes and supplies a rendering default
+per field when unset (`background=DEFAULT`, `spacingTop`/`spacingBottom=MD`,
+`containerWidth=WIDE`, `align=START`, `divider=false`). `module_hero` is the
+one exception: despite carrying `appearance` too, it never wraps in `Section`
+— it is already a self-contained full-bleed band (own background, own width,
+flush against the sticky header), and `Section`'s constrained/padded defaults
+would break that layout even with `appearance` unset (#1316, closed as
+not-planned). It only consumes `appearance.background`, re-applying `Section`'s
+own token mapping directly via `className`.
+
 Full schema reference (every document/object, field-by-field), naming and
-validation conventions:
+validation conventions, incl. the `appearance` object's own field list:
 [`docs/context/content-model.md`](./docs/context/content-model.md).
 
 ## 7. Environment & configuration

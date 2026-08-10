@@ -1,4 +1,4 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 
 import { ContentModule } from './content-module';
 
@@ -35,7 +35,7 @@ describe(ContentModule, () => {
   it('renders the title as an h2 labelling the section via a unique id derived from the module id', async () => {
     getContentMock.mockResolvedValue({
       ok: true,
-      data: { title: 'About us', body: [] },
+      data: { title: 'About us', body: [], appearance: undefined },
     });
 
     await setup();
@@ -45,6 +45,20 @@ describe(ContentModule, () => {
 
     const section = heading.closest('section');
     expect(section).toHaveAttribute('aria-labelledby', 'content-content-1');
+  });
+
+  it('renders correctly inside the Section appearance wrapper with no appearance authored', async () => {
+    getContentMock.mockResolvedValue({
+      ok: true,
+      data: { title: 'About us', body: [], appearance: undefined },
+    });
+
+    await setup();
+
+    const wrapper = screen.getByTestId('content-module-content-1');
+    expect(
+      within(wrapper).getByRole('heading', { level: 2, name: 'About us' }),
+    ).toBeVisible();
   });
 
   it('derives a different heading id for a different module id, avoiding duplicate DOM ids', async () => {
