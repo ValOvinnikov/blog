@@ -25,15 +25,17 @@ export const blogPostPageVariants = tv({
     // rail beside it (rather than the page-wide breakout it gets without one).
     content: ['w-full', 'lg:col-start-2 lg:row-start-1'],
     // Spans both grid rows so its sticky containing block reaches the
-    // footer row. Mirrors `content`'s own measure below `lg:`;
-    // `lg:max-w-none` frees the fixed 220px track once it's a real rail (the
-    // font-size no longer matters there, since there's no `ch`-based cap left
-    // to compute). Below `lg:`, `rail` is `Prose`'s grid sibling in this
-    // layout (see `footerInRail`'s comment below for the full `ch`-unit
-    // reasoning) — `text-prose` is load-bearing here for the same reason:
-    // without it, `rail`'s own `max-w-measure` computes its `68ch` against
-    // the ambient 16px instead of `Prose`'s 17px, landing narrower and out of
-    // alignment with `Prose`'s left/right edges.
+    // footer row (the optional `newsletterInRail` row below sits past
+    // `rail`'s own span — deliberately, so `rail` doesn't stretch/shift with
+    // `NewsletterForm`'s own client-side mount gate). Mirrors `content`'s own
+    // measure below `lg:`; `lg:max-w-none` frees the fixed 220px track once
+    // it's a real rail (the font-size no longer matters there, since there's
+    // no `ch`-based cap left to compute). Below `lg:`, `rail` is `Prose`'s
+    // grid sibling in this layout (see `footerInRail`'s comment below for
+    // the full `ch`-unit reasoning) — `text-prose` is load-bearing here for
+    // the same reason: without it, `rail`'s own `max-w-measure` computes its
+    // `68ch` against the ambient 16px instead of `Prose`'s 17px, landing
+    // narrower and out of alignment with `Prose`'s left/right edges.
     rail: [
       'mx-auto max-w-measure text-prose',
       'lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:mx-0 lg:max-w-none',
@@ -56,12 +58,11 @@ export const blogPostPageVariants = tv({
       'lg:col-start-2 lg:row-start-2 lg:mx-0',
       'group-data-[depth=SKIM]/depth:hidden',
     ],
-    footer: [
-      'mx-auto w-full',
-      'px-gutter',
-      'max-w-measure',
-      'group-data-[depth=SKIM]/depth:hidden',
-    ],
+    // Both `footer` and `newsletter` (below) now render as `Article.Body`'s
+    // own last children (#1307) — `body`'s base slot already applies
+    // `mx-auto`/`px-gutter`/`max-w-measure`, so neither needs its own width
+    // cap here, only the SKIM-depth gate.
+    footer: ['group-data-[depth=SKIM]/depth:hidden'],
     coverImage: ['size-full object-cover'],
     depthToggle: ['mx-auto w-full max-w-page px-gutter', 'mb-6'],
     // Groups `BookmarkButton` beside `PostShare` inside `PostMeta`'s single
@@ -69,12 +70,23 @@ export const blogPostPageVariants = tv({
     // of its own (`ml-auto` only), so this is the wrapper that gives the two
     // actions consistent spacing.
     metaActions: ['inline-flex items-center gap-2'],
-    // The end-of-article `NewsletterForm` (`compact`) strip — same width cap
-    // as `footer`/`footerInRail` (`max-w-measure` + `px-gutter`) so its
-    // left/right edges line up with the article body. `mt-6` (not the
-    // reverted implementation's `mt-10`) — a slim single-row strip reads as
-    // its own low-weight block without needing as much separation (#1200).
-    newsletter: ['mx-auto w-full', 'px-gutter', 'max-w-measure', 'mt-6'],
+    // The end-of-article `NewsletterForm` (`compact`) strip, nested inside
+    // `Article.Body` right after `footer` — genuine article content sharing
+    // the article's real content column, not a page-level sibling mimicking
+    // its width from outside (#1307). `mt-6` gives it its own gap under the
+    // tags footer above. Unlike `footer`, deliberately NOT gated under SKIM
+    // depth — it stayed visible at every depth before this move and still
+    // should.
+    newsletter: ['mt-6'],
+    // Rail variant's grid-positioned counterpart to `newsletter` above —
+    // mirrors `footerInRail`'s own mobile width cap / `lg:` column
+    // placement, one implicit row below it (`lg:row-start-3`).
+    newsletterInRail: [
+      'mx-auto text-prose',
+      'max-w-measure',
+      'mt-6',
+      'lg:col-start-2 lg:row-start-3 lg:mx-0',
+    ],
   },
   variants: {
     // No `max-w-measure` on `body` itself: `rail`/`footerInRail` cap their

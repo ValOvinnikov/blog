@@ -582,6 +582,20 @@ describe(`<${BlogPostPage.name}/>`, () => {
       ).toBeVisible();
     });
 
+    it('renders the newsletter signup inside the article, not as a page-level sibling (#1307)', async () => {
+      getPostMock.mockResolvedValue({
+        ok: true,
+        data: { ...mockPostDetail, newsletterEnabled: true },
+      });
+
+      await setup();
+
+      const article = screen.getByRole('article');
+      expect(
+        within(article).getByRole('textbox', { name: 'Email address' }),
+      ).toBeVisible();
+    });
+
     it('omits the newsletter signup when the post opts out (newsletterEnabled: false)', async () => {
       getPostMock.mockResolvedValue({
         ok: true,
