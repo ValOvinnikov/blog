@@ -1,3 +1,4 @@
+import { toAppearance } from '@blog/service/shared/transformers/to-appearance';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import type { InferResultType } from 'groqd';
 
@@ -18,5 +19,6 @@ export function toPostListModule(
   return {
     title: raw.title,
     posts: rawPosts.map(toPostCard),
+    appearance: toAppearance(raw.appearance),
   };
 }

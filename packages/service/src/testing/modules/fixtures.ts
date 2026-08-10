@@ -20,6 +20,7 @@ export function makeRawHeroModule(
     heroImageAsset: null,
     primaryActionLabel: null,
     secondaryAction: null,
+    appearance: null,
     ...overrides,
   };
 }
@@ -30,6 +31,7 @@ export function makeRawPostListModule(
   return {
     title: 'Latest',
     limit: 6,
+    appearance: null,
     ...overrides,
   };
 }
@@ -47,6 +49,7 @@ export function makeRawContentModule(
         children: [{ _type: 'span', _key: 'span-1', text: 'Hello.' }],
       },
     ],
+    appearance: null,
     ...overrides,
   };
 }
@@ -66,6 +69,7 @@ export function makeRawCtaModule(
       platform: null,
       accessibleLabel: null,
     },
+    appearance: null,
     ...overrides,
   };
 }
@@ -76,6 +80,7 @@ export function makeRawNewsletterModule(
   return {
     heading: 'Stay in the loop',
     description: 'Get new posts in your inbox.',
+    appearance: null,
     ...overrides,
   };
 }

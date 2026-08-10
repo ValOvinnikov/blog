@@ -1,3 +1,4 @@
+import { toAppearance } from '@blog/service/shared/transformers/to-appearance';
 import type { InferResultType } from 'groqd';
 
 import type { contentModuleQuery } from './query';
@@ -9,5 +10,6 @@ export function toContentModule(raw: TRawContentModule): TContentModule {
   return {
     title: raw.title,
     body: raw.body,
+    appearance: toAppearance(raw.appearance),
   };
 }

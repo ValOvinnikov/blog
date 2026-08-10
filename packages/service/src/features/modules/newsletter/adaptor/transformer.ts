@@ -1,3 +1,4 @@
+import { toAppearance } from '@blog/service/shared/transformers/to-appearance';
 import type { InferResultType } from 'groqd';
 
 import type { newsletterModuleQuery } from './query';
@@ -13,5 +14,6 @@ export function toNewsletterModule(
   return {
     heading: raw.heading,
     description: raw.description ?? undefined,
+    appearance: toAppearance(raw.appearance),
   };
 }
