@@ -95,4 +95,15 @@ describe(`<${BlogPageTemplate.name}/>`, () => {
 
     expect(screen.queryByTestId('modules-slot')).not.toBeInTheDocument();
   });
+
+  it('renders modules as a direct child of main, outside the constrained furniture container that wraps posts', () => {
+    setup({ modules: <div data-testid="modules-slot" /> });
+
+    const main = screen.getByRole('main');
+    const modules = screen.getByTestId('modules-slot');
+    const posts = screen.getByTestId('posts-slot');
+
+    expect(modules.parentElement).toBe(main);
+    expect(posts.parentElement).not.toBe(main);
+  });
 });

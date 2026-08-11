@@ -23,11 +23,13 @@ describe(`<${HomePageTemplate.name}/>`, () => {
     expect(main).toContainElement(screen.getByText('Modules content'));
   });
 
-  it('renders hero as a direct child of main, unwrapped by the modules container', () => {
+  it('renders hero and modules as direct, unwrapped children of main', () => {
     const main = screen.getByRole('main');
     const hero = screen.getByText('Hero content');
+    const modules = screen.getByText('Modules content');
 
     expect(hero.parentElement).toBe(main);
+    expect(modules.parentElement).toBe(main);
   });
 
   it('renders no breadcrumb navigation — home has no BreadcrumbBar', () => {

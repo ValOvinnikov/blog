@@ -78,6 +78,30 @@ describe(`<${GenericPage.name}/>`, () => {
     );
   });
 
+  it('renders ModuleRenderer as a direct child of main, with no constrained wrapper around it', async () => {
+    getPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        title: 'About Us',
+        slug: 'about-us',
+        modules: [{ id: 'module-1', type: 'module_content' }],
+        seo: makeSeo({
+          title: 'About Us',
+          description: 'Who we are.',
+          ogTitle: 'About Us',
+          ogDescription: 'Who we are.',
+        }),
+      },
+    });
+
+    await setup();
+
+    const main = screen.getByRole('main');
+    const moduleRenderer = screen.getByTestId('module-renderer');
+
+    expect(moduleRenderer.parentElement).toBe(main);
+  });
+
   it('renders the Home › {title} breadcrumbs trail', async () => {
     getPageMock.mockResolvedValue({
       ok: true,

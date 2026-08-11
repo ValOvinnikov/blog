@@ -146,24 +146,32 @@ page-builder documents, and shared objects (`link`, `imageWithAlt`, `bodyImage`,
 `seo`, `aside`, `skim`, …). Naming convention `{group}_{name}` is being applied
 incrementally (#251).
 
-Every `module_*` document also carries an optional, all-fields-optional
-`appearance` object (`background`, `spacingTop`/`spacingBottom`,
-`containerWidth`, `align`, `divider` — stored values from `@blog/config`'s
-`BACKGROUND_TONE`/`SPACING_SCALE`/`CONTAINER_WIDTH`/`ALIGN` consts).
-`service.modules.<type>.v1` projects it into each view-model as
-`appearance: TAppearance | undefined`, with no faked defaults — unset stays
-unset end to end. In `apps/web`, every `MODULE_MAP`-registered module
-component renders its `@blog/ui` organism inside the pure `Section` atom
-(`packages/ui/src/atoms/section`), passing the fetched `appearance` straight
-through; `Section` maps it to token classes and supplies a rendering default
-per field when unset (`background=DEFAULT`, `spacingTop`/`spacingBottom=MD`,
-`containerWidth=WIDE`, `align=START`, `divider=false`). `module_hero` is the
-one exception: despite carrying `appearance` too, it never wraps in `Section`
-— it is already a self-contained full-bleed band (own background, own width,
-flush against the sticky header), and `Section`'s constrained/padded defaults
-would break that layout even with `appearance` unset (#1316, closed as
-not-planned). It only consumes `appearance.background`, re-applying `Section`'s
-own token mapping directly via `className`.
+Every `module_*` document also carries a **required** `brandVariant` field
+(stored values from `@blog/config`'s `BRAND_VARIANT` const —
+`PRIMARY`/`SECONDARY` for `module_content`/`module_cta`/`module_newsletter`/
+`module_postList`; `module_hero`'s schema additionally allows
+`BRAND_PRIMARY`), plus an optional, all-remaining-fields-optional `appearance`
+object (`spacingTop`/`spacingBottom`, `containerWidth`, `align`, `divider` —
+stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`/`ALIGN` consts;
+`background` was removed from this object, replaced by the standalone
+`brandVariant` field). `service.modules.<type>.v1` projects `brandVariant` as
+a required `TBrandVariantOf<...>` (narrowed per module to exactly the
+options its schema allows) and `appearance` as `TAppearance | undefined`,
+with no faked defaults on `appearance` — unset stays unset end to end. In
+`apps/web`, every module component that renders a `@blog/ui` organism —
+including `module_hero` (rendered via its own dedicated template slot,
+outside `MODULE_MAP`'s generic `ModuleRenderer` pipeline (§5 above) — but
+still styled the same way as every other module now), no exception — wraps
+it in `apps/web`'s own `Section` component (`apps/web/src/components/shared/
+section`, relocated from `packages/ui`), passing `brandVariant` and
+`appearance` straight through. `Section` always renders a real `<section>`
+(no polymorphism); its outer element owns the full-bleed background (driven
+by `brandVariant`) and vertical spacing as padding, not margin, so stacked
+`Section`s tile edge-to-edge; its inner `<div>` owns `mx-auto` + gutter +
+`align` + `containerWidth`'s max-width, holding the wrapped organism as bare
+content (the four other organisms — `content-module`/`cta-module`/
+`posts-section`/`hero` — no longer render their own `<section>` landmark;
+`Section` is the sole landmark owner for every module).
 
 Full schema reference (every document/object, field-by-field), naming and
 validation conventions, incl. the `appearance` object's own field list:
