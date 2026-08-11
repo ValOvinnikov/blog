@@ -75,10 +75,10 @@ export type TLayout = {
 
 ### 2. `SectionHeader` (new shared field group)
 
-New object type, CMS field name `sectionHeader`, attached to
-`module_content`, `module_cta`, `module_postList`, `module_newsletter` only
-— **not** Hero (Hero keeps its own existing mode/custom field-pair title
-mechanism, which doesn't fit this generic shape).
+New object type, CMS field name `sectionHeader`, attached to `module_cta`,
+`module_postList`, `module_newsletter` only — **not** Hero (Hero keeps its
+own existing mode/custom field-pair title mechanism, which doesn't fit this
+generic shape) and **not** `module_content` (see below).
 
 ```ts
 export const HEADING_ALIGN = {
@@ -98,9 +98,18 @@ Both `heading` and `supportingText` are optional in the shared TS type.
 `SectionHeader` **replaces** each module's existing visible-heading field(s);
 each module's own `titleField()` becomes purely an internal Studio label
 going forward (already true for `module_cta`/`module_newsletter`; new
-behavior for `module_content`/`module_postList`, which currently
-dual-purpose their single `title` field as both internal label and visible
-heading).
+behavior for `module_postList`, which currently dual-purposes its single
+`title` field as both internal label and visible heading).
+
+**`module_content` does not get `SectionHeader` at all.** Its `body` field is
+already free-form Portable Text, which supports its own heading blocks — a
+separate structured heading field would just be a second, confusing way to
+add the same thing. `title` becomes purely an internal Studio label (already
+effectively true), and `ContentModule` loses its heading-rendering mechanism
+entirely: `ContentModuleUi` drops its `title`/`titleId` props and the
+conditional `<h2>` they drove. This also removes `ContentModule` (web)'s
+`titleId` computation and its `Section` call passes no `titleId` — see the
+`Section` landmark-labeling change below.
 
 **Per-module required override.** CTA and Newsletter currently _require_ a
 heading (`module_cta`'s old `heading` field has `rule.required()`;
@@ -113,11 +122,12 @@ a `{ requireHeading?: boolean }` option (same pattern as
 `brandVariantField({ list })`'s per-module override) — `module_cta` and
 `module_newsletter` pass `requireHeading: true` (Studio validation only,
 enforcing today's behavior unchanged, no UI guard changes needed for
-either), `module_content`/`module_postList` don't, staying genuinely
-optional like `ContentModule` today.
+either), `module_postList` doesn't, staying genuinely optional (matching
+`ContentModule`'s existing optional-heading behavior, even though
+`module_content` no longer uses `SectionHeader` itself).
 
-Per-module field mapping (also see Migration, below — none of this needs a
-data migration since nothing is populated in production yet):
+Per-module field mapping (see Migration, below, for how existing production
+content carries forward):
 
 - **`module_cta`**: `sectionHeader.heading` replaces the old required
   `heading` field; `sectionHeader.supportingText` replaces the old optional
@@ -129,14 +139,6 @@ data migration since nothing is populated in production yet):
   the old `heading`/`description` fields (from the shared
   `newsletterContentFields()` helper). Same situation as CTA — already
   rendered, only the data source changes.
-- **`module_content`**: `sectionHeader.heading` replaces the dual-purpose
-  `title`'s visible-heading use (`title` stays as internal label only).
-  `sectionHeader.supportingText` is a **genuinely new** field — `ContentModule`
-  (ui) has no existing supporting-text rendering; add an optional `<p>` under
-  the heading, following the same conditional-render pattern as
-  `CtaModule`'s `text`.
-  `sectionHeader.align` — no existing alignment mechanism on `ContentModule`'s
-  heading; wire it the same way as post-list (below).
 - **`module_postList`**: `sectionHeader.heading` replaces `title`'s
   dual-purpose visible-heading use (internal `title` stays, unchanged).
   `sectionHeader.supportingText` is new — `PostsSection` (ui) has no existing
@@ -171,20 +173,20 @@ restructure with nothing live to carry forward.
 
 **`SectionHeader` (Section 2): required.** Unlike `appearance`, the fields
 being restructured here — `module_cta.heading`/`text`,
-`module_newsletter.heading`/`description`, `module_content.title`,
-`module_postList.title` — are core authored content on modules already live
-in production. Transform:
+`module_newsletter.heading`/`description`, `module_postList.title` — are
+core authored content on modules already live in production. Transform:
 
 - **`module_cta`**: copy `heading` → `sectionHeader.heading`, `text` →
   `sectionHeader.supportingText`; remove the old `heading`/`text` fields.
 - **`module_newsletter`**: copy `heading` → `sectionHeader.heading`,
   `description` → `sectionHeader.supportingText`; remove the old
   `heading`/`description` fields.
-- **`module_content`**: copy `title` → `sectionHeader.heading`. `title`
+- **`module_postList`**: copy `title` → `sectionHeader.heading`. `title`
   itself is untouched (keeps its existing value, becomes purely an internal
   Studio label going forward).
-- **`module_postList`**: copy `title` → `sectionHeader.heading`. `title`
-  itself is untouched, same as `module_content`.
+
+`module_content` needs no migration step at all — `title` isn't moving
+anywhere, it simply stops being read for display.
 
 Standard dry-run → dataset export (backup) → human-gated run via
 `apps/cms/migrations/`, sequenced right after the schema+typegen step and
@@ -197,28 +199,35 @@ before `service` consumes the new shape.
   `TSectionHeader`.
 - `cms`: rename `appearance-field.ts` helper → `layout-field.ts` (with a
   Hero-specific variant omitting `containerWidth`), add a new
-  `section-header-field.ts` helper, wire it into `module_content`,
-  `module_cta` (removing old `heading`/`text` fields),
-  `module_postList`, `module_newsletter` (removing old
-  `heading`/`description` fields — `newsletterContentFields()` helper may
-  become unused and removable if `settings_newsletter` doesn't also need it;
-  confirm before deleting). `pnpm typegen` after schema changes.
-- `service`: every module's view-model gains `sectionHeader` (typed per
-  module via generated types), `appearance`→`layout` rename flows through
-  automatically via typegen.
-- `ui`: `hero-variants.ts` drops the hardcoded border; `ContentModule`/
-  `PostsSection` gain a new optional supporting-text paragraph and
-  heading-alignment class, following each component's existing
-  conditional-render/variant patterns. `Section` itself lives in `apps/web`,
-  not `packages/ui` (see #1337's Task 6), so its changes are listed under
-  `web` below.
+  `section-header-field.ts` helper, wire it into `module_cta` (removing old
+  `heading`/`text` fields), `module_postList`, `module_newsletter` (removing
+  old `heading`/`description` fields — `newsletterContentFields()` helper
+  may become unused and removable if `settings_newsletter` doesn't also need
+  it; confirm before deleting). `module_content` gets no `sectionHeader`
+  wiring at all. `pnpm typegen` after schema changes.
+- `service`: `cta`/`postList`/`newsletter` view-models gain `sectionHeader`
+  (typed per module via generated types), replacing their old top-level
+  heading fields; `content`'s view-model loses `title` from its query
+  projection entirely (internal-only fields aren't queried, matching
+  `cta`/`newsletter`'s existing pattern before this change).
+  `appearance`→`layout` rename flows through automatically via typegen.
+- `ui`: `hero-variants.ts` drops the hardcoded border; `CtaModule` gains a
+  heading-alignment class; `PostsSection` gains a new optional
+  supporting-text paragraph and a heading-alignment class, both driven by
+  `sectionHeader.align`/`supportingText`; `NewsletterSignupFull`/`.Compact`
+  gain the same alignment class. `ContentModule` loses its `title`/`titleId`
+  props and the conditional `<h2>` entirely — it becomes a pure `children`
+  wrapper. `Section` itself lives in `apps/web`, not `packages/ui` (see
+  #1337's Task 6), so its changes are listed under `web` below.
 - `web`: `Section`/`section-variants.ts` — rename `appearance`→`layout` prop,
   drop `align` variant, split `divider` into `dividerTop`/`dividerBottom`
-  variants, make `spacingTop`/`spacingBottom` responsive. Each of the 4
-  module components (`content`, `cta`, `post-list`, `newsletter`) reads
-  `sectionHeader` from its service result and passes `heading`/
-  `supportingText`/`align` through to its `ui` organism instead of the old
-  top-level fields.
+  variants, make `spacingTop`/`spacingBottom` responsive, and make `titleId`
+  optional (`aria-labelledby` only rendered when supplied). `cta`,
+  `post-list`, `newsletter` module components read `sectionHeader` from
+  their service result and pass `heading`/`supportingText`/`align` through
+  to their `ui` organism instead of the old top-level fields.
+  `content-module.tsx` (web) stops computing/passing `titleId` and drops the
+  `title`/`titleId` props it passed to `ContentModuleUi`.
 
 ## Testing
 
