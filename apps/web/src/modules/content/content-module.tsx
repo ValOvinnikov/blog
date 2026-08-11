@@ -34,7 +34,7 @@ export async function ContentModule({ id }: IContentModuleProps) {
       titleId={titleId}
       dataTestId={`content-module-${id}`}
     >
-      <ContentModuleUi title={title} titleId={titleId} wrapped>
+      <ContentModuleUi title={title} titleId={titleId} wrapped={true}>
         <PortableTextRenderer value={body} />
       </ContentModuleUi>
     </Section>

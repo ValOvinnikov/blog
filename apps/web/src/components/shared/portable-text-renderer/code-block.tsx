@@ -34,8 +34,8 @@ export const CodeBlock = ({
       <SyntaxHighlighter
         language={language ?? 'text'}
         style={codeBlockSyntaxTheme}
-        showLineNumbers
-        wrapLines
+        showLineNumbers={true}
+        wrapLines={true}
         lineProps={(lineNumber) => ({
           'data-testid': 'code-line',
           ...(highlightedLines?.includes(lineNumber)

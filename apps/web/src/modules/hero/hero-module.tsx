@@ -105,7 +105,7 @@ export async function HeroModule({ id }: IHeroModuleProps) {
               width={1200}
               height={675}
               sizes="(min-width: 1024px) 50vw, 100vw"
-              priority
+              priority={true}
               className="size-full object-cover"
             />
           </Hero.Media>
