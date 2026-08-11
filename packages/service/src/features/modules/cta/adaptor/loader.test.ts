@@ -14,7 +14,7 @@ describe('getCta', () => {
 
     const cta = await getCta('cta-1');
 
-    expect(cta.heading).toBe('Subscribe to the newsletter');
+    expect(cta.sectionHeader.heading).toBe('Subscribe to the newsletter');
     expect(cta.action?.href).toBe('/newsletter');
   });
 

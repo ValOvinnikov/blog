@@ -1,20 +1,14 @@
-import {
-  ALIGN,
-  BRAND_VARIANT,
-  CONTAINER_WIDTH,
-  SPACING_SCALE,
-} from '@blog/config';
+import { BRAND_VARIANT, CONTAINER_WIDTH, SPACING_SCALE } from '@blog/config';
 import { makeRawContentModule } from '@blog/service/testing/modules/fixtures';
 
 import { toContentModule } from './transformer';
 
 describe('toContentModule', () => {
-  it('maps title and body straight through (both schema-required)', () => {
-    const raw = makeRawContentModule({ title: 'About us' });
+  it('maps body straight through (schema-required)', () => {
+    const raw = makeRawContentModule();
 
     const module = toContentModule(raw);
 
-    expect(module.title).toBe('About us');
     expect(module.body).toHaveLength(1);
   });
 
@@ -26,56 +20,34 @@ describe('toContentModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('maps a fully-authored appearance object 1:1', () => {
+  it('maps a fully-authored layout object 1:1', () => {
     const raw = makeRawContentModule({
-      appearance: {
+      layout: {
         spacingTop: SPACING_SCALE.XL,
         spacingBottom: SPACING_SCALE.NONE,
         containerWidth: CONTAINER_WIDTH.FULL,
-        align: ALIGN.START,
-        divider: false,
+        dividerTop: false,
+        dividerBottom: true,
       },
     });
 
     const module = toContentModule(raw);
 
-    expect(module.appearance).toEqual({
+    expect(module.layout).toEqual({
       spacingTop: SPACING_SCALE.XL,
       spacingBottom: SPACING_SCALE.NONE,
       containerWidth: CONTAINER_WIDTH.FULL,
-      align: ALIGN.START,
-      divider: false,
+      dividerTop: false,
+      dividerBottom: true,
     });
   });
 
-  it('leaves appearance undefined when the field is unset (no faked default)', () => {
-    const raw = makeRawContentModule({ appearance: null });
+  it('leaves layout undefined when the field is unset (no faked default)', () => {
+    const raw = makeRawContentModule({ layout: null });
 
     const module = toContentModule(raw);
 
-    expect(module.appearance).toBeUndefined();
-  });
-
-  it('leaves an unset sub-field of a partially-authored appearance object undefined (no faked default)', () => {
-    const raw = makeRawContentModule({
-      appearance: {
-        spacingTop: null,
-        spacingBottom: null,
-        containerWidth: null,
-        align: null,
-        divider: null,
-      },
-    });
-
-    const module = toContentModule(raw);
-
-    expect(module.appearance).toEqual({
-      spacingTop: undefined,
-      spacingBottom: undefined,
-      containerWidth: undefined,
-      align: undefined,
-      divider: undefined,
-    });
+    expect(module.layout).toBeUndefined();
   });
 
   it('preserves the optional layout field on a bodyImage body block', () => {

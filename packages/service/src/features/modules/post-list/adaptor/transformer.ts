@@ -1,5 +1,6 @@
-import { toAppearance } from '@blog/service/shared/transformers/to-appearance';
+import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
+import { toSectionHeader } from '@blog/service/shared/transformers/to-section-header';
 import type { InferResultType } from 'groqd';
 
 import type { postListModulePostsQuery } from './posts.query';
@@ -15,11 +16,12 @@ export function toPostListModule(
   raw: TRawPostListModule,
   rawPosts: TRawPostListModulePosts,
 ): TPostListModule {
-  // The posts query already applied `limit` in GROQ, so no JS slice here.
   return {
     brandVariant: raw.brandVariant,
-    title: raw.title,
+    sectionHeader: raw.sectionHeader
+      ? toSectionHeader(raw.sectionHeader)
+      : { heading: undefined, supportingText: undefined, align: undefined },
     posts: rawPosts.map(toPostCard),
-    appearance: toAppearance(raw.appearance),
+    layout: toLayout(raw.layout),
   };
 }

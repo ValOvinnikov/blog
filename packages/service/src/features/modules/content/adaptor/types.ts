@@ -1,13 +1,12 @@
 import type {
   RichText,
-  TAppearance,
   TBrandVariantOf,
+  TLayout,
   TMaybeUndefined,
 } from '@blog/config';
 
 export type TContentModule = {
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
-  title: string;
   body: RichText;
-  appearance: TMaybeUndefined<TAppearance>;
+  layout: TMaybeUndefined<TLayout>;
 };

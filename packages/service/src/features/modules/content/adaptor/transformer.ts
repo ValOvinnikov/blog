@@ -1,4 +1,4 @@
-import { toAppearance } from '@blog/service/shared/transformers/to-appearance';
+import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import type { InferResultType } from 'groqd';
 
 import type { contentModuleQuery } from './query';
@@ -9,8 +9,7 @@ export type TRawContentModule = InferResultType<typeof contentModuleQuery>;
 export function toContentModule(raw: TRawContentModule): TContentModule {
   return {
     brandVariant: raw.brandVariant,
-    title: raw.title,
     body: raw.body,
-    appearance: toAppearance(raw.appearance),
+    layout: toLayout(raw.layout),
   };
 }

@@ -1,16 +1,19 @@
-import { ALIGN, BRAND_VARIANT, CONTAINER_WIDTH } from '@blog/config';
+import { BRAND_VARIANT, CONTAINER_WIDTH, HEADING_ALIGN } from '@blog/config';
 import { makeRawCtaModule } from '@blog/service/testing/modules/fixtures';
 
 import { toCtaModule } from './transformer';
 
 describe('toCtaModule', () => {
-  it('maps heading, text, and the resolved action link', () => {
+  it('maps sectionHeader and the resolved action link', () => {
     const raw = makeRawCtaModule();
 
     const cta = toCtaModule(raw);
 
-    expect(cta.heading).toBe('Subscribe to the newsletter');
-    expect(cta.text).toBe('Get new posts in your inbox.');
+    expect(cta.sectionHeader).toEqual({
+      heading: 'Subscribe to the newsletter',
+      supportingText: 'Get new posts in your inbox.',
+      align: undefined,
+    });
     expect(cta.action).toEqual({
       label: 'Subscribe',
       href: '/newsletter',
@@ -28,41 +31,62 @@ describe('toCtaModule', () => {
     expect(cta.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('leaves text undefined when not set (no faked default)', () => {
-    const raw = makeRawCtaModule({ text: null });
-
-    const cta = toCtaModule(raw);
-
-    expect(cta.text).toBeUndefined();
-  });
-
-  it('maps a fully-authored appearance object 1:1', () => {
+  it('leaves supportingText and align undefined when not set (no faked default)', () => {
     const raw = makeRawCtaModule({
-      appearance: {
-        spacingTop: 'LG',
-        spacingBottom: 'SM',
-        containerWidth: CONTAINER_WIDTH.NARROW,
-        align: ALIGN.CENTER,
-        divider: true,
+      sectionHeader: {
+        heading: 'Subscribe to the newsletter',
+        supportingText: null,
+        align: null,
       },
     });
 
     const cta = toCtaModule(raw);
 
-    expect(cta.appearance).toEqual({
-      spacingTop: 'LG',
-      spacingBottom: 'SM',
-      containerWidth: CONTAINER_WIDTH.NARROW,
-      align: ALIGN.CENTER,
-      divider: true,
-    });
+    expect(cta.sectionHeader.supportingText).toBeUndefined();
+    expect(cta.sectionHeader.align).toBeUndefined();
   });
 
-  it('leaves appearance undefined when the field is unset (no faked default)', () => {
-    const raw = makeRawCtaModule({ appearance: null });
+  it('maps a fully-authored layout object 1:1', () => {
+    const raw = makeRawCtaModule({
+      layout: {
+        spacingTop: 'LG',
+        spacingBottom: 'SM',
+        containerWidth: CONTAINER_WIDTH.NARROW,
+        dividerTop: true,
+        dividerBottom: false,
+      },
+    });
 
     const cta = toCtaModule(raw);
 
-    expect(cta.appearance).toBeUndefined();
+    expect(cta.layout).toEqual({
+      spacingTop: 'LG',
+      spacingBottom: 'SM',
+      containerWidth: CONTAINER_WIDTH.NARROW,
+      dividerTop: true,
+      dividerBottom: false,
+    });
+  });
+
+  it('leaves layout undefined when the field is unset (no faked default)', () => {
+    const raw = makeRawCtaModule({ layout: null });
+
+    const cta = toCtaModule(raw);
+
+    expect(cta.layout).toBeUndefined();
+  });
+
+  it('maps sectionHeader.align when authored', () => {
+    const raw = makeRawCtaModule({
+      sectionHeader: {
+        heading: 'Subscribe to the newsletter',
+        supportingText: null,
+        align: HEADING_ALIGN.CENTER,
+      },
+    });
+
+    const cta = toCtaModule(raw);
+
+    expect(cta.sectionHeader.align).toBe(HEADING_ALIGN.CENTER);
   });
 });

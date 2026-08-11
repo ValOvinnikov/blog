@@ -1,5 +1,6 @@
-import { toAppearance } from '@blog/service/shared/transformers/to-appearance';
+import { toLayout } from '@blog/service/shared/transformers/to-layout';
 import { toLink } from '@blog/service/shared/transformers/to-link';
+import { toRequiredSectionHeader } from '@blog/service/shared/transformers/to-section-header';
 import type { InferResultType } from 'groqd';
 
 import type { ctaModuleQuery } from './query';
@@ -10,9 +11,8 @@ export type TRawCtaModule = InferResultType<typeof ctaModuleQuery>;
 export function toCtaModule(raw: TRawCtaModule): TCtaModule {
   return {
     brandVariant: raw.brandVariant,
-    heading: raw.heading,
-    text: raw.text ?? undefined,
+    sectionHeader: toRequiredSectionHeader(raw.sectionHeader),
     action: toLink(raw.action),
-    appearance: toAppearance(raw.appearance),
+    layout: toLayout(raw.layout),
   };
 }

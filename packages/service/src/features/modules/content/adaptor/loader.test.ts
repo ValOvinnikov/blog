@@ -10,11 +10,10 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 
 describe('getContent', () => {
   it('maps the content module document', async () => {
-    mockRun.mockResolvedValueOnce(makeRawContentModule({ title: 'About us' }));
+    mockRun.mockResolvedValueOnce(makeRawContentModule());
 
     const content = await getContent('content-1');
 
-    expect(content.title).toBe('About us');
     expect(content.body).toHaveLength(1);
   });
 

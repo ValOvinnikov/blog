@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
-import { appearanceFragment } from '@blog/service/shared/fragments/appearance';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
+import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
 import { linkFragment } from '@blog/service/shared/fragments/link';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
@@ -32,9 +32,6 @@ export const heroModuleQuery = q
       .field('secondaryAction')
       .project(linkFragment)
       .nullable(true),
-    appearance: sub
-      .field('appearance')
-      .project(appearanceFragment)
-      .nullable(true),
+    layout: sub.field('layout').project(heroLayoutFragment).nullable(true),
   }))
   .notNull();
