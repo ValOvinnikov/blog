@@ -29,17 +29,24 @@ export const CONTAINER_WIDTH = {
 
 export type TContainerWidth = TValueOf<typeof CONTAINER_WIDTH>;
 
-export const ALIGN = {
-  START: 'START',
-  CENTER: 'CENTER',
-} as const;
-
-export type TAlign = TValueOf<typeof ALIGN>;
-
-export type TAppearance = {
+export type TLayout = {
   spacingTop?: TSpacingScale;
   spacingBottom?: TSpacingScale;
   containerWidth?: TContainerWidth;
-  align?: TAlign;
-  divider?: boolean;
+  dividerTop?: boolean;
+  dividerBottom?: boolean;
+};
+
+export const HEADING_ALIGN = {
+  LEFT: 'LEFT',
+  CENTER: 'CENTER',
+  RIGHT: 'RIGHT',
+} as const;
+
+export type THeadingAlign = TValueOf<typeof HEADING_ALIGN>;
+
+export type TSectionHeader = {
+  heading?: string;
+  supportingText?: string;
+  align?: THeadingAlign;
 };
