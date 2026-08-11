@@ -300,8 +300,8 @@ Props: children: ReactNode _(extends Pick<ComponentPropsWithoutRef<'div'>, 'clas
 
 ### PostsSection — `organisms/posts-section/posts-section.tsx`
 labeled section rendering a set of posts in a responsive grid, generic enough to reuse for other post listings (e.g. related posts, category pages).
-Props: posts: IPostCardData[] · title: string · titleId: string · className?: string · linkAs?: TAnchorElementType · emptyMessage?: string · tinted?: TPostsSectionVariants['tinted'] _(extends IWithDataTestId)_
-Variants: tinted: (boolean)
+Props: posts: IPostCardData[] · title: string · titleId: string · className?: string · linkAs?: TAnchorElementType · emptyMessage?: string · tinted?: TPostsSectionVariants['tinted'] · wrapped?: TPostsSectionVariants['wrapped'] _(extends IWithDataTestId)_
+Variants: tinted: (boolean) · wrapped: (boolean)
 
 ### ToastViewport — `organisms/toast-viewport/toast-viewport.tsx`
 the fixed, corner-anchored region that positions and stacks `Toast` children (desktop bottom-right, mobile bottom full-width).

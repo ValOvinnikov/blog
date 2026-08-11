@@ -169,4 +169,17 @@ describe(`<${PostsSection.name}/>`, () => {
       screen.getByRole('heading', { level: 2, name: 'Latest' }),
     ).toBeVisible();
   });
+
+  it('renders the same structure when wrapped', () => {
+    setup({ wrapped: true });
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Latest' }),
+    ).toBeVisible();
+    for (const post of posts) {
+      expect(
+        screen.getByRole('heading', { level: 3, name: post.title }),
+      ).toBeVisible();
+    }
+  });
 });
