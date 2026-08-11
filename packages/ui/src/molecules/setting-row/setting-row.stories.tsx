@@ -100,7 +100,7 @@ export const Danger: TStory = {
           ariaLabel="Type your handle to confirm deletion"
           placeholder="type: val"
         />
-        <Button variant="danger" disabled>
+        <Button variant="danger" disabled={true}>
           delete account
         </Button>
       </>
@@ -135,7 +135,7 @@ export const PrivacySection: TStory = {
             ariaLabel="Type your handle to confirm deletion"
             placeholder="type: val"
           />
-          <Button variant="danger" disabled>
+          <Button variant="danger" disabled={true}>
             delete account
           </Button>
         </SettingRow>

@@ -63,12 +63,12 @@ export const Copied: TStory = {
       <>
         <PopoverMenu.Trigger
           ariaLabel="Open menu"
-          open
+          open={true}
           panelId="popover-menu-panel"
         >
           <Icon name={ICONS.SHARE} size={Size.SM} />
         </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="popover-menu-panel" open ariaLabel="Menu">
+        <PopoverMenu.Panel id="popover-menu-panel" open={true} ariaLabel="Menu">
           <PopoverMenu.Item icon={<Icon name={ICONS.CHECK} size={Size.SM} />}>
             Copied
           </PopoverMenu.Item>
