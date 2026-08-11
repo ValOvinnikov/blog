@@ -26,7 +26,7 @@ export const Overview: TStory = {
         onSubmit={() => {}}
         status="idle"
         heading="$ subscribe --to weekly"
-        description="New posts on rendering, type systems and the occasional OKLCH rabbit hole. No spam; unsubscribe in one line."
+        supportingText="New posts on rendering, type systems and the occasional OKLCH rabbit hole. No spam; unsubscribe in one line."
         submitLabel="subscribe ↵"
         emailAriaLabel="Email address"
         placeholder="you@domain.dev"

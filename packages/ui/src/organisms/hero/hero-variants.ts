@@ -2,7 +2,7 @@ import { tv } from '@blog/ui/lib/styling';
 
 export const heroVariants = tv({
   slots: {
-    root: ['w-full', 'bg-brand-primary-muted border-b border-border-strong'],
+    root: ['w-full', 'bg-brand-primary-muted'],
     grid: ['grid grid-cols-1 items-stretch gap-[clamp(1.25rem,4vw,2rem)]'],
     copy: ['flex h-full flex-col', 'min-w-0'],
     title: ['mt-2.5 mb-3'],

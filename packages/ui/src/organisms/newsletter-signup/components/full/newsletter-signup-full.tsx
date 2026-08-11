@@ -9,7 +9,10 @@ import { Alert } from '@blog/ui/atoms/alert';
 import { Icon } from '@blog/ui/atoms/icon';
 import { WindowChrome } from '@blog/ui/molecules/window-chrome';
 import { NewsletterSignupContent } from '@blog/ui/organisms/newsletter-signup/components/content/newsletter-signup-content';
-import { newsletterSignupVariants } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
+import {
+  newsletterSignupVariants,
+  type TNewsletterSignupVariants,
+} from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
 import type { ReactNode } from 'react';
 
 export interface INewsletterSignupTrustCue {
@@ -24,7 +27,7 @@ export interface INewsletterSignupFullProps extends IWithDataTestId {
   status: TFormStatus;
   heading: string;
   headingId?: string;
-  description?: string;
+  supportingText?: string;
   errorMessage?: string;
   successMessage?: string;
   submitLabel: string;
@@ -32,6 +35,8 @@ export interface INewsletterSignupFullProps extends IWithDataTestId {
   placeholder?: string;
   /** Reassurance row (e.g. "no spam", "unsubscribe in one line") rendered under the pitch copy. Omit to skip the row entirely. */
   trustCues?: INewsletterSignupTrustCue[];
+  /** Horizontal alignment of the pitch pane's heading, supporting text, and trust cues. Defaults to left. */
+  align?: TNewsletterSignupVariants['align'];
   className?: string;
 }
 
@@ -50,18 +55,19 @@ export const NewsletterSignupFull = ({
   status,
   heading,
   headingId,
-  description,
+  supportingText,
   errorMessage,
   successMessage,
   submitLabel,
   emailAriaLabel,
   placeholder,
   trustCues,
+  align,
   className,
   dataTestId,
 }: INewsletterSignupFullProps) => {
   const isSuccess = status === 'success';
-  const s = newsletterSignupVariants({ variant: 'full' });
+  const s = newsletterSignupVariants({ variant: 'full', align });
 
   return (
     <WindowChrome
@@ -73,7 +79,9 @@ export const NewsletterSignupFull = ({
           <h3 id={headingId} className={s.heading()}>
             {heading}
           </h3>
-          {description && <p className={s.description()}>{description}</p>}
+          {supportingText && (
+            <p className={s.supportingText()}>{supportingText}</p>
+          )}
           {trustCues && trustCues.length > 0 && (
             <ul className={s.trustCues()}>
               {trustCues.map((cue) => (

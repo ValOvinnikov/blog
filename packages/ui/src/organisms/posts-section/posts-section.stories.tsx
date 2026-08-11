@@ -1,6 +1,9 @@
+import { HEADING_ALIGN } from '@blog/config';
+import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { PostsSection } from './posts-section';
+import { postsSectionVariants } from './posts-section-variants';
 
 const posts = [
   {
@@ -42,6 +45,12 @@ const meta = {
   component: PostsSection,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    align: {
+      control: 'select',
+      options: objectKeys(postsSectionVariants.variants.align),
+    },
+  },
   args: {
     title: 'Latest',
     titleId: 'latest-posts',
@@ -85,5 +94,20 @@ export const TintedBand: TStory = {
 export const Wrapped: TStory = {
   args: {
     wrapped: true,
+  },
+};
+
+export const WithSupportingText: TStory = {
+  args: {
+    supportingText:
+      'Hand-picked posts on design systems, TypeScript, and component architecture.',
+  },
+};
+
+export const Centered: TStory = {
+  args: {
+    align: HEADING_ALIGN.CENTER,
+    supportingText:
+      'Hand-picked posts on design systems, TypeScript, and component architecture.',
   },
 };
