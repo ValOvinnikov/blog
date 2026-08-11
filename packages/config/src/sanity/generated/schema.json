@@ -41,20 +41,6 @@
         },
         "optional": true
       },
-      "heading": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "description": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
       "brandVariant": {
         "type": "objectAttribute",
         "value": {
@@ -69,6 +55,20 @@
               "value": "SECONDARY"
             }
           ]
+        },
+        "optional": true
+      },
+      "heading": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "description": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
         },
         "optional": true
       },
@@ -124,6 +124,23 @@
         },
         "optional": true
       },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            }
+          ]
+        },
+        "optional": true
+      },
       "heading": {
         "type": "objectAttribute",
         "value": {
@@ -143,23 +160,6 @@
         "value": {
           "type": "inline",
           "name": "link"
-        },
-        "optional": true
-      },
-      "brandVariant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "SECONDARY"
-            }
-          ]
         },
         "optional": true
       },
@@ -470,14 +470,6 @@
         },
         "optional": true
       },
-      "body": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "richText"
-        },
-        "optional": true
-      },
       "brandVariant": {
         "type": "objectAttribute",
         "value": {
@@ -492,6 +484,14 @@
               "value": "SECONDARY"
             }
           ]
+        },
+        "optional": true
+      },
+      "body": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "richText"
         },
         "optional": true
       },
@@ -764,13 +764,6 @@
         },
         "optional": true
       },
-      "limit": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "number"
-        },
-        "optional": true
-      },
       "brandVariant": {
         "type": "objectAttribute",
         "value": {
@@ -785,6 +778,13 @@
               "value": "SECONDARY"
             }
           ]
+        },
+        "optional": true
+      },
+      "limit": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "number"
         },
         "optional": true
       },
@@ -2244,6 +2244,27 @@
         },
         "optional": true
       },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            }
+          ]
+        },
+        "optional": true
+      },
       "featuredPost": {
         "type": "objectAttribute",
         "value": {
@@ -2365,27 +2386,6 @@
         "value": {
           "type": "inline",
           "name": "link"
-        },
-        "optional": true
-      },
-      "brandVariant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "SECONDARY"
-            }
-          ]
         },
         "optional": true
       },
