@@ -84,10 +84,9 @@ describe(`<${Hero.name}/>`, () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
-  it('labels the section via the title heading, not a redundant string', () => {
-    const { container } = setup();
-    const section = container.querySelector('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'hero-title');
+  it('assigns titleId to the heading element', () => {
+    setup();
+
     expect(
       screen.getByRole('heading', { name: 'Building a Design System' }),
     ).toHaveAttribute('id', 'hero-title');

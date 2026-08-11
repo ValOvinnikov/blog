@@ -29,12 +29,6 @@ const setup = customRender(PostsSection, {
 });
 
 describe(`<${PostsSection.name}/>`, () => {
-  it('labels the section with its title', () => {
-    setup();
-
-    expect(screen.getByRole('region', { name: 'Latest' })).toBeVisible();
-  });
-
   it('renders the section title as a heading', () => {
     setup();
 
@@ -154,7 +148,7 @@ describe(`<${PostsSection.name}/>`, () => {
     const { container } = setup();
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
-    expect(heading.parentElement).toBe(container.querySelector('section'));
+    expect(heading.parentElement).toBe(container.firstElementChild);
   });
 
   it('wraps the heading and grid in two extra levels of wrapper when tinted, unlike the flat structure when not', () => {
@@ -163,15 +157,14 @@ describe(`<${PostsSection.name}/>`, () => {
     const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
     const contentGroup = heading.parentElement;
     const inner = contentGroup?.parentElement;
-    const section = container.querySelector('section');
+    const root = container.firstElementChild;
     expect(contentGroup).not.toBe(inner);
-    expect(inner?.parentElement).toBe(section);
+    expect(inner?.parentElement).toBe(root);
   });
 
-  it('keeps the h2 heading markup and aria wiring unchanged when tinted', () => {
+  it('keeps the h2 heading markup unchanged when tinted', () => {
     setup({ tinted: true });
 
-    expect(screen.getByRole('region', { name: 'Latest' })).toBeVisible();
     expect(
       screen.getByRole('heading', { level: 2, name: 'Latest' }),
     ).toBeVisible();

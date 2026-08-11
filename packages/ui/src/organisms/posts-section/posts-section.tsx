@@ -44,9 +44,8 @@ export interface IPostsSectionProps extends IWithDataTestId {
 
 /**
  * PostsSection — labeled section rendering a set of posts in a responsive
- * grid. Replaces the ad-hoc `ContentSection` + `PostGrid` composition on the
- * home page with a single organism; generic enough to reuse for other post
- * listings (e.g. related posts, category pages).
+ * grid, generic enough to reuse for other post listings (e.g. related posts,
+ * category pages).
  */
 export const PostsSection = ({
   posts,
@@ -102,11 +101,7 @@ export const PostsSection = ({
   );
 
   return (
-    <section
-      aria-labelledby={titleId}
-      className={s.root({ class: className })}
-      data-testid={dataTestId}
-    >
+    <div className={s.root({ class: className })} data-testid={dataTestId}>
       {tinted ? (
         <div className={s.inner()}>
           <div className={s.contentGroup()}>{content}</div>
@@ -114,6 +109,6 @@ export const PostsSection = ({
       ) : (
         content
       )}
-    </section>
+    </div>
   );
 };

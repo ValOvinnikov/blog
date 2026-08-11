@@ -44,15 +44,15 @@ describe(`<${CtaModule.name}/>`, () => {
     const { container } = setup({ action: undefined });
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
-    expect(container.querySelector('section > div')).not.toBeInTheDocument();
+    expect(
+      container.firstElementChild?.querySelector('div'),
+    ).not.toBeInTheDocument();
   });
 
-  it('labels the section via the heading when headingId is provided', () => {
+  it('assigns headingId to the heading element', () => {
     const heading = faker.lorem.sentence(4);
-    const { container } = setup({ heading, headingId: 'cta-heading' });
+    setup({ heading, headingId: 'cta-heading' });
 
-    const section = container.querySelector('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'cta-heading');
     expect(screen.getByRole('heading', { name: heading })).toHaveAttribute(
       'id',
       'cta-heading',

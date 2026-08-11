@@ -7,9 +7,7 @@ import {
 } from './cta-module-variants';
 
 export interface ICtaModuleProps
-  extends
-    Omit<ComponentPropsWithoutRef<'section'>, 'children'>,
-    IWithDataTestId {
+  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
   heading: string;
   headingId?: string;
   text?: string;
@@ -41,8 +39,7 @@ export const CtaModule = ({
   const s = ctaModuleVariants({ wrapped });
 
   return (
-    <section
-      aria-labelledby={headingId}
+    <div
       className={s.root({ class: className })}
       data-testid={dataTestId}
       {...rest}
@@ -52,6 +49,6 @@ export const CtaModule = ({
       </h2>
       {text && <p className={s.text()}>{text}</p>}
       {action && <div className={s.action()}>{action}</div>}
-    </section>
+    </div>
   );
 };
