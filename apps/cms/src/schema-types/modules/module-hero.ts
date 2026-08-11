@@ -1,8 +1,8 @@
 import { BRAND_VARIANT, HERO_FIELD_MODE } from '@blog/config/constants';
 import { postSchema } from '@cms/schema-types/documents/blog/post';
-import { appearanceField } from '@cms/schema-types/helpers/appearance-field';
 import { brandVariantField } from '@cms/schema-types/helpers/brand-variant-field';
 import { defineModeFieldPair } from '@cms/schema-types/helpers/define-mode-field-pair';
+import { heroLayoutField } from '@cms/schema-types/helpers/layout-field';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { linkSchema } from '@cms/schema-types/objects/link';
 import { Sparkles } from 'lucide-react';
@@ -96,7 +96,7 @@ export const heroSchema = defineType({
       type: linkSchema.name,
       description: 'Optional secondary CTA shown next to the primary action.',
     }),
-    appearanceField,
+    heroLayoutField,
   ],
   preview: {
     select: {

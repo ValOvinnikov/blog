@@ -58,27 +58,72 @@
         },
         "optional": true
       },
-      "heading": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "description": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "appearance": {
+      "sectionHeader": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "appearance"
+          "name": "requiredHeadingSectionHeader"
         },
         "optional": true
+      },
+      "layout": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "layout"
+        },
+        "optional": true
+      }
+    }
+  },
+  {
+    "name": "requiredHeadingSectionHeader",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "requiredHeadingSectionHeader"
+          }
+        },
+        "heading": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "supportingText": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "align": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "LEFT"
+              },
+              {
+                "type": "string",
+                "value": "CENTER"
+              },
+              {
+                "type": "string",
+                "value": "RIGHT"
+              }
+            ]
+          },
+          "optional": true
+        }
       }
     }
   },
@@ -141,17 +186,11 @@
         },
         "optional": true
       },
-      "heading": {
+      "sectionHeader": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "text": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
+          "type": "inline",
+          "name": "requiredHeadingSectionHeader"
         },
         "optional": true
       },
@@ -163,11 +202,11 @@
         },
         "optional": true
       },
-      "appearance": {
+      "layout": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "appearance"
+          "name": "layout"
         },
         "optional": true
       }
@@ -495,11 +534,11 @@
         },
         "optional": true
       },
-      "appearance": {
+      "layout": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "appearance"
+          "name": "layout"
         },
         "optional": true
       }
@@ -781,6 +820,14 @@
         },
         "optional": true
       },
+      "sectionHeader": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "sectionHeader"
+        },
+        "optional": true
+      },
       "limit": {
         "type": "objectAttribute",
         "value": {
@@ -788,13 +835,173 @@
         },
         "optional": true
       },
-      "appearance": {
+      "layout": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "appearance"
+          "name": "layout"
         },
         "optional": true
+      }
+    }
+  },
+  {
+    "name": "layout",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "layout"
+          }
+        },
+        "spacingTop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "spacingBottom": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "containerWidth": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NARROW"
+              },
+              {
+                "type": "string",
+                "value": "WIDE"
+              },
+              {
+                "type": "string",
+                "value": "FULL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "dividerTop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        },
+        "dividerBottom": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "sectionHeader",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "sectionHeader"
+          }
+        },
+        "heading": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "supportingText": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "align": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "LEFT"
+              },
+              {
+                "type": "string",
+                "value": "CENTER"
+              },
+              {
+                "type": "string",
+                "value": "RIGHT"
+              }
+            ]
+          },
+          "optional": true
+        }
       }
     }
   },
@@ -1453,7 +1660,7 @@
     }
   },
   {
-    "name": "appearance",
+    "name": "heroLayout",
     "type": "type",
     "value": {
       "type": "object",
@@ -1462,7 +1669,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "appearance"
+            "value": "heroLayout"
           }
         },
         "spacingTop": {
@@ -1523,45 +1730,14 @@
           },
           "optional": true
         },
-        "containerWidth": {
+        "dividerTop": {
           "type": "objectAttribute",
           "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "NARROW"
-              },
-              {
-                "type": "string",
-                "value": "WIDE"
-              },
-              {
-                "type": "string",
-                "value": "FULL"
-              }
-            ]
+            "type": "boolean"
           },
           "optional": true
         },
-        "align": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "START"
-              },
-              {
-                "type": "string",
-                "value": "CENTER"
-              }
-            ]
-          },
-          "optional": true
-        },
-        "divider": {
+        "dividerBottom": {
           "type": "objectAttribute",
           "value": {
             "type": "boolean"
@@ -2389,11 +2565,11 @@
         },
         "optional": true
       },
-      "appearance": {
+      "layout": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "appearance"
+          "name": "heroLayout"
         },
         "optional": true
       }

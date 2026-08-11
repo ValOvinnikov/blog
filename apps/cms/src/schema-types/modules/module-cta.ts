@@ -1,5 +1,6 @@
-import { appearanceField } from '@cms/schema-types/helpers/appearance-field';
 import { brandVariantField } from '@cms/schema-types/helpers/brand-variant-field';
+import { layoutField } from '@cms/schema-types/helpers/layout-field';
+import { sectionHeaderField } from '@cms/schema-types/helpers/section-header-field';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { linkSchema } from '@cms/schema-types/objects/link';
 import { Megaphone } from 'lucide-react';
@@ -13,29 +14,19 @@ export const ctaSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-      validation: (rule) => rule.required().max(80),
-    }),
-    defineField({
-      name: 'text',
-      title: 'Text',
-      type: 'text',
-    }),
+    sectionHeaderField({ requireHeading: true }),
     defineField({
       name: 'action',
       title: 'Action',
       type: linkSchema.name,
       validation: (rule) => rule.required(),
     }),
-    appearanceField,
+    layoutField,
   ],
   preview: {
     select: {
       title: 'title',
-      subtitle: 'heading',
+      subtitle: 'sectionHeader.heading',
     },
     prepare({ title, subtitle }) {
       return {

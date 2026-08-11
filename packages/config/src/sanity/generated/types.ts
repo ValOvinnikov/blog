@@ -23,9 +23,15 @@ export type Module_newsletter = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
+  sectionHeader?: RequiredHeadingSectionHeader;
+  layout?: Layout;
+};
+
+export type RequiredHeadingSectionHeader = {
+  _type: 'requiredHeadingSectionHeader';
   heading?: string;
-  description?: string;
-  appearance?: Appearance;
+  supportingText?: string;
+  align?: 'LEFT' | 'CENTER' | 'RIGHT';
 };
 
 export type Module_cta = {
@@ -36,10 +42,9 @@ export type Module_cta = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  heading?: string;
-  text?: string;
+  sectionHeader?: RequiredHeadingSectionHeader;
   action?: Link;
-  appearance?: Appearance;
+  layout?: Layout;
 };
 
 export type Blog_postReference = {
@@ -104,7 +109,7 @@ export type Module_content = {
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   body?: RichText;
-  appearance?: Appearance;
+  layout?: Layout;
 };
 
 export type RichText = Array<
@@ -145,8 +150,25 @@ export type Module_postList = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
+  sectionHeader?: SectionHeader;
   limit?: number;
-  appearance?: Appearance;
+  layout?: Layout;
+};
+
+export type Layout = {
+  _type: 'layout';
+  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
+  dividerTop?: boolean;
+  dividerBottom?: boolean;
+};
+
+export type SectionHeader = {
+  _type: 'sectionHeader';
+  heading?: string;
+  supportingText?: string;
+  align?: 'LEFT' | 'CENTER' | 'RIGHT';
 };
 
 export type Skim = {
@@ -243,13 +265,12 @@ export type ImageWithAlt = {
   alt?: string;
 };
 
-export type Appearance = {
-  _type: 'appearance';
+export type HeroLayout = {
+  _type: 'heroLayout';
   spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
-  align?: 'START' | 'CENTER';
-  divider?: boolean;
+  dividerTop?: boolean;
+  dividerBottom?: boolean;
 };
 
 export type Settings_newsletter = {
@@ -397,7 +418,7 @@ export type Module_hero = {
   heroImage?: ImageWithAlt;
   primaryActionLabel?: string;
   secondaryAction?: Link;
-  appearance?: Appearance;
+  layout?: HeroLayout;
 };
 
 export type Module_contentReference = {
@@ -644,6 +665,7 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | Module_newsletter
+  | RequiredHeadingSectionHeader
   | Module_cta
   | Blog_postReference
   | Blog_categoryReference
@@ -653,6 +675,8 @@ export type AllSanitySchemaTypes =
   | Module_content
   | RichText
   | Module_postList
+  | Layout
+  | SectionHeader
   | Skim
   | Brand
   | SpecLine
@@ -664,7 +688,7 @@ export type AllSanitySchemaTypes =
   | SanityImageAssetReference
   | BodyImage
   | ImageWithAlt
-  | Appearance
+  | HeroLayout
   | Settings_newsletter
   | Settings_footer
   | Settings_navigation

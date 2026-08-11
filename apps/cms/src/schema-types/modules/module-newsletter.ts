@@ -1,6 +1,6 @@
-import { appearanceField } from '@cms/schema-types/helpers/appearance-field';
 import { brandVariantField } from '@cms/schema-types/helpers/brand-variant-field';
-import { newsletterContentFields } from '@cms/schema-types/helpers/newsletter-content-fields';
+import { layoutField } from '@cms/schema-types/helpers/layout-field';
+import { sectionHeaderField } from '@cms/schema-types/helpers/section-header-field';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { Mail } from 'lucide-react';
 import { defineType } from 'sanity';
@@ -13,13 +13,13 @@ export const newsletterSchema = defineType({
   fields: [
     titleField({ description: 'Internal label shown in the Studio.' }),
     brandVariantField(),
-    ...newsletterContentFields(),
-    appearanceField,
+    sectionHeaderField({ requireHeading: true }),
+    layoutField,
   ],
   preview: {
     select: {
       title: 'title',
-      subtitle: 'heading',
+      subtitle: 'sectionHeader.heading',
     },
     prepare({ title, subtitle }) {
       return {
