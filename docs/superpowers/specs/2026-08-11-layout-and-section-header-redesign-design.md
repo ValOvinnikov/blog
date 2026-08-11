@@ -94,12 +94,27 @@ export type TSectionHeader = {
 };
 ```
 
-Both `heading` and `supportingText` are optional. `SectionHeader` **replaces**
-each module's existing visible-heading field(s); each module's own
-`titleField()` becomes purely an internal Studio label going forward (already
-true for `module_cta`/`module_newsletter`; new behavior for
-`module_content`/`module_postList`, which currently dual-purpose their single
-`title` field as both internal label and visible heading).
+Both `heading` and `supportingText` are optional in the shared TS type.
+`SectionHeader` **replaces** each module's existing visible-heading field(s);
+each module's own `titleField()` becomes purely an internal Studio label
+going forward (already true for `module_cta`/`module_newsletter`; new
+behavior for `module_content`/`module_postList`, which currently
+dual-purpose their single `title` field as both internal label and visible
+heading).
+
+**Per-module required override.** CTA and Newsletter currently _require_ a
+heading (`module_cta`'s old `heading` field has `rule.required()`;
+`NewsletterForm`'s `heading` prop is non-optional and its components render
+`<h3>{heading}</h3>` with no empty guard). Making `SectionHeader.heading`
+optional everywhere would silently allow an editor to publish a CTA or
+newsletter form with no heading, breaking that assumption. Decision: keep
+the shared TS type optional, but the `sectionHeaderField()` CMS helper takes
+a `{ requireHeading?: boolean }` option (same pattern as
+`brandVariantField({ list })`'s per-module override) — `module_cta` and
+`module_newsletter` pass `requireHeading: true` (Studio validation only,
+enforcing today's behavior unchanged, no UI guard changes needed for
+either), `module_content`/`module_postList` don't, staying genuinely
+optional like `ContentModule` today.
 
 Per-module field mapping (also see Migration, below — none of this needs a
 data migration since nothing is populated in production yet):
