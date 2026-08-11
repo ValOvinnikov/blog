@@ -50,7 +50,7 @@ export const NewsletterSignupContent = ({
   };
 
   return (
-    <form className={s.form()} onSubmit={handleSubmit} noValidate>
+    <form className={s.form()} onSubmit={handleSubmit} noValidate={true}>
       <TextInput
         value={email}
         onChange={onChange}

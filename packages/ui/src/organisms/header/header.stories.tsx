@@ -14,7 +14,7 @@ const meta = {
       <>
         <Header.Brand>My Blog</Header.Brand>
         <Header.Nav>
-          <NavLink href="/" isActive>
+          <NavLink href="/" isActive={true}>
             Home
           </NavLink>
           <NavLink href="/blog">Blog</NavLink>

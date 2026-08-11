@@ -46,7 +46,7 @@ export const Large: TStory = {
 export const OnSolidFill: TStory = {
   args: { label: 'Subscribing', showLabel: true },
   render: (args) => (
-    <Button variant="primary" disabled>
+    <Button variant="primary" disabled={true}>
       <Spinner {...args} className="text-brand-primary-contrast" />
     </Button>
   ),

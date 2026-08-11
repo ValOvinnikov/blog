@@ -60,10 +60,10 @@ describe(`<${PopoverMenu.name}/>`, () => {
 
     rerender(
       <PopoverMenu>
-        <PopoverMenu.Trigger ariaLabel="Open menu" open panelId="p1">
+        <PopoverMenu.Trigger ariaLabel="Open menu" open={true} panelId="p1">
           Trigger
         </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" open>
+        <PopoverMenu.Panel id="p1" open={true}>
           <PopoverMenu.Item>Item one</PopoverMenu.Item>
         </PopoverMenu.Panel>
       </PopoverMenu>,
@@ -75,10 +75,10 @@ describe(`<${PopoverMenu.name}/>`, () => {
   it('renders each Item with role="menuitem"', () => {
     renderElement(
       <PopoverMenu>
-        <PopoverMenu.Trigger ariaLabel="Open menu" open panelId="p1">
+        <PopoverMenu.Trigger ariaLabel="Open menu" open={true} panelId="p1">
           Trigger
         </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" open>
+        <PopoverMenu.Panel id="p1" open={true}>
           <PopoverMenu.Item>Item one</PopoverMenu.Item>
           <PopoverMenu.Item as="a" href="https://example.com">
             Item two
@@ -98,10 +98,10 @@ describe(`<${PopoverMenu.name}/>`, () => {
     const onClick = vi.fn();
     renderElement(
       <PopoverMenu>
-        <PopoverMenu.Trigger ariaLabel="Open menu" open panelId="p1">
+        <PopoverMenu.Trigger ariaLabel="Open menu" open={true} panelId="p1">
           Trigger
         </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" open>
+        <PopoverMenu.Panel id="p1" open={true}>
           <PopoverMenu.Item onClick={onClick}>Item one</PopoverMenu.Item>
         </PopoverMenu.Panel>
       </PopoverMenu>,
@@ -114,10 +114,10 @@ describe(`<${PopoverMenu.name}/>`, () => {
   it('renders a Separator between Items with role="separator"', () => {
     renderElement(
       <PopoverMenu>
-        <PopoverMenu.Trigger ariaLabel="Open menu" open panelId="p1">
+        <PopoverMenu.Trigger ariaLabel="Open menu" open={true} panelId="p1">
           Trigger
         </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" open>
+        <PopoverMenu.Panel id="p1" open={true}>
           <PopoverMenu.Item>Copy link</PopoverMenu.Item>
           <PopoverMenu.Separator />
           <PopoverMenu.Item as="a" href="https://example.com">
@@ -133,10 +133,10 @@ describe(`<${PopoverMenu.name}/>`, () => {
   it('forwards data-testid', () => {
     renderElement(
       <PopoverMenu dataTestId="popover-menu">
-        <PopoverMenu.Trigger ariaLabel="Open menu" open panelId="p1">
+        <PopoverMenu.Trigger ariaLabel="Open menu" open={true} panelId="p1">
           Trigger
         </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" open>
+        <PopoverMenu.Panel id="p1" open={true}>
           <PopoverMenu.Item>Item one</PopoverMenu.Item>
         </PopoverMenu.Panel>
       </PopoverMenu>,
@@ -148,10 +148,10 @@ describe(`<${PopoverMenu.name}/>`, () => {
   it('merges extra className', () => {
     renderElement(
       <PopoverMenu className="mt-4" dataTestId="popover-menu">
-        <PopoverMenu.Trigger ariaLabel="Open menu" open panelId="p1">
+        <PopoverMenu.Trigger ariaLabel="Open menu" open={true} panelId="p1">
           Trigger
         </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="p1" open>
+        <PopoverMenu.Panel id="p1" open={true}>
           <PopoverMenu.Item>Item one</PopoverMenu.Item>
         </PopoverMenu.Panel>
       </PopoverMenu>,
