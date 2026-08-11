@@ -7,7 +7,7 @@ export const skimPanelVariants = tv({
     root: ['hidden flex-col gap-6', 'group-data-[depth=SKIM]/depth:flex'],
     list: ['flex flex-col gap-3'],
     item: [
-      'rounded-lg border border-border bg-bg-subtle px-4 py-3',
+      'rounded-lg border border-border bg-primary-subtle px-4 py-3',
       'text-text',
     ],
   },

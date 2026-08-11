@@ -11,22 +11,22 @@ export const signInMenuVariants = tv({
       'size-auto min-h-0 whitespace-nowrap rounded-sm border border-border-strong bg-surface px-3 py-1.5',
       'font-mono font-normal text-label text-text',
       'transition-colors duration-base ease-console',
-      'hover:border-accent hover:text-accent',
+      'hover:border-brand-primary hover:text-brand-primary',
     ],
     cmdLine: [
       'mb-3 flex items-center gap-1.5',
       'font-mono text-copy text-muted',
     ],
-    cmdPrompt: ['text-accent'],
+    cmdPrompt: ['text-brand-primary'],
     cmdCursor: [
-      'inline-block h-[1em] w-[0.5ch] bg-accent',
+      'inline-block h-[1em] w-[0.5ch] bg-brand-primary',
       'animate-[blink_1s_steps(1)_infinite]',
     ],
     providerButton: [
       'mt-2 w-full justify-start gap-2 rounded-sm border border-border-strong bg-surface px-3.5 py-2',
       'font-mono text-label text-text',
       'transition-colors duration-base ease-console',
-      'hover:border-accent hover:bg-surface hover:text-accent',
+      'hover:border-brand-primary hover:bg-surface hover:text-brand-primary',
     ],
     hint: ['mt-3 font-mono text-meta text-subtle'],
     // Deliberately a sibling of `PopoverMenu.Panel`, not a child of it — the

@@ -45,8 +45,8 @@ describe(`<${CodeBlock.name}/>`, () => {
     // Which line is highlighted is driven entirely by the `highlightedLines`
     // input data, and there is no semantic/ARIA signal for "this line is
     // highlighted" — the class is the sole observable of that behaviour.
-    expect(lines[0]).not.toHaveClass('bg-accent-muted');
-    expect(lines[1]).toHaveClass('bg-accent-muted');
+    expect(lines[0]).not.toHaveClass('bg-brand-primary-muted');
+    expect(lines[1]).toHaveClass('bg-brand-primary-muted');
   });
 
   // #862 — the syntax highlighter must not paint its own hard-coded

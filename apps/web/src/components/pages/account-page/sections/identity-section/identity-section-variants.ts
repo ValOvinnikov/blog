@@ -9,7 +9,7 @@ export const identitySectionVariants = tv({
     providerName: ['inline-flex items-center gap-2 text-copy'],
     providerStatus: ['ml-auto flex flex-col items-end gap-1 text-right'],
     linkedStatus: ['font-mono text-copy text-success'],
-    emailIcon: ['text-accent text-lg leading-none'],
+    emailIcon: ['text-brand-primary text-lg leading-none'],
     lastMethodNotice: ['font-body text-copy text-text-subtle italic'],
   },
 });

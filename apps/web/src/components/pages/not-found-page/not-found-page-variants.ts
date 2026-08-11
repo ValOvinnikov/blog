@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants';
 export const notFoundPageVariants = tv({
   slots: {
     root: [
-      'bg-bg-subtle text-text',
+      'bg-primary-subtle text-text',
       'flex min-h-dvh flex-col items-center justify-center',
       'gap-6 px-gutter py-section text-center',
     ],
@@ -16,16 +16,16 @@ export const notFoundLinkVariants = tv({
   slots: {
     root: [
       'group inline-flex items-center gap-1.5',
-      'border-b border-accent pb-[3px]',
+      'border-b border-brand-primary pb-[3px]',
       'font-mono text-copy',
       'transition-colors duration-base ease-console',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
     ],
     prompt: ['select-none text-subtle'],
-    command: ['text-accent', 'group-hover:text-accent-hover'],
+    command: ['text-brand-primary', 'group-hover:text-brand-primary-hover'],
     arrow: [
-      'text-accent opacity-60',
+      'text-brand-primary opacity-60',
       'transition-transform duration-base ease-console',
       'group-hover:translate-x-0.5',
     ],
