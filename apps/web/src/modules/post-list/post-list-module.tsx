@@ -44,6 +44,7 @@ export async function PostListModule({ id }: IPostListModuleProps) {
         title={title}
         titleId={titleId}
         linkAs={SmartLink}
+        wrapped
       />
     </Section>
   );

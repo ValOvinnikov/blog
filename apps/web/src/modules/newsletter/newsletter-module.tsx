@@ -24,17 +24,19 @@ export async function NewsletterModule({ id }: INewsletterModuleProps) {
   if (!result.ok) return null;
 
   const { brandVariant, heading, description, appearance } = result.data;
+  const titleId = `newsletter-${id}`;
 
   return (
     <Section
       brandVariant={brandVariant}
       appearance={appearance}
-      titleId={`newsletter-${id}`}
+      titleId={titleId}
       dataTestId={`newsletter-module-${id}`}
     >
       <NewsletterForm
         variant="full"
         heading={heading}
+        headingId={titleId}
         description={description}
       />
     </Section>
