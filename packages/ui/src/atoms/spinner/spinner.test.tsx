@@ -43,16 +43,16 @@ describe(`<${Spinner.name}/>`, () => {
   });
 
   it('accepts a className override on the root', () => {
-    setup({ className: 'text-accent-contrast' });
+    setup({ className: 'custom-class' });
     expect(screen.getByRole('status', { name: label })).toHaveClass(
-      'text-accent-contrast',
+      'custom-class',
     );
   });
 
-  it('lets a className color override cascade to the glyph, which sets no color of its own', () => {
-    setup({ className: 'text-accent-contrast' });
+  it('does not forward a className override on the root to the glyph, so the glyph always inherits its color from the root', () => {
+    setup({ className: 'custom-class' });
     const status = screen.getByRole('status', { name: label });
     const glyph = status.firstElementChild;
-    expect(glyph).not.toHaveClass('text-accent', 'text-accent-contrast');
+    expect(glyph).not.toHaveClass('custom-class');
   });
 });

@@ -1,4 +1,5 @@
 import { Size } from '@blog/config';
+import { Button } from '@blog/ui/atoms/button';
 import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -41,26 +42,12 @@ export const Large: TStory = {
   args: { size: Size.LG, showLabel: true },
 };
 
-/** On a solid button fill, the glyph swaps to `--accent-contrast` via `className`. */
+/** On a solid `Button` fill, the glyph swaps to `text-brand-primary-contrast` via `className` so it reads against the fill. */
 export const OnSolidFill: TStory = {
   args: { label: 'Subscribing', showLabel: true },
   render: (args) => (
-    <button
-      type="button"
-      disabled
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '0.6ch',
-        background: 'var(--accent-solid)',
-        color: 'var(--accent-contrast)',
-        border: 'none',
-        borderRadius: 'var(--radius-sm)',
-        padding: '0.5rem 1rem',
-        fontFamily: 'var(--font-mono)',
-      }}
-    >
-      <Spinner {...args} className="text-accent-contrast" />
-    </button>
+    <Button variant="primary" disabled>
+      <Spinner {...args} className="text-brand-primary-contrast" />
+    </Button>
   ),
 };

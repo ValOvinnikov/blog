@@ -6,9 +6,9 @@ import { createTV } from 'tailwind-variants';
  * `tailwind-variants` runs `tailwind-merge` internally, whose default config has
  * no knowledge of our custom Tailwind theme. Without help it cannot tell a
  * custom text-<size> (`text-copy`, `text-meta`, …) apart from a custom
- * text-<color> (`text-accent-contrast`, `text-text`, …) — it lumps them into one
+ * text-<color> (`text-brand-primary-contrast`, `text-text`, …) — it lumps them into one
  * conflicting group and silently strips the color when both land on one element
- * (e.g. every primary Button lost its `text-accent-contrast`).
+ * (e.g. every primary Button lost its `text-brand-primary-contrast`).
  *
  * Registering the custom font-size names in tailwind-merge's `font-size`
  * classGroup lets it classify `text-<size>` correctly, so text colors survive.

@@ -6,8 +6,8 @@ export const popoverMenuItemVariants = tv({
     'rounded-md px-3 py-2',
     'font-display text-sm text-text',
     'transition-colors duration-base ease-console',
-    'hover:bg-surface-2 hover:text-accent',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+    'hover:bg-surface-2 hover:text-brand-primary',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
   ],
 });

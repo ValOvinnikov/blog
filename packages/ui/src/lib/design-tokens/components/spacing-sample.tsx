@@ -17,7 +17,7 @@ export const SpacingSample = ({ tokens }: TSpacingSampleProps) => (
           {token.name}
         </span>
         <span
-          className="h-4 shrink-0 rounded-sm bg-accent"
+          className="h-4 shrink-0 rounded-sm bg-brand-primary"
           style={{ width: token.value }}
         />
         <span className="font-mono text-label text-text-muted">

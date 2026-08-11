@@ -3,7 +3,7 @@ import { tv } from '@blog/ui/lib/styling';
 export const quoteBlockVariants = tv({
   base: [
     'my-4 py-0.5 pl-4',
-    'border-l-2 border-accent-muted',
+    'border-l-2 border-brand-primary-muted',
     'font-read text-prose text-muted italic',
   ],
 });

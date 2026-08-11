@@ -8,14 +8,14 @@ export const navLinkVariants = tv({
       'font-mono text-meta',
       'transition-colors duration-base ease-console',
       'hover:text-text',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
     ],
     label: ['sr-only'],
   },
   variants: {
     isActive: {
-      true: { root: ['text-accent'] },
+      true: { root: ['text-brand-primary'] },
       false: { root: ['text-muted'] },
     },
   },

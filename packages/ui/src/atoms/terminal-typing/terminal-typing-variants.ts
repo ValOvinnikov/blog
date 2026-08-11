@@ -9,7 +9,7 @@ export const terminalTypingVariants = tv({
     ],
     cursor: [
       'inline-block h-[1em] w-[0.5ch]',
-      'bg-accent',
+      'bg-brand-primary',
       'animate-[blink_1s_steps(1)_infinite]',
     ],
   },
