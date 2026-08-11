@@ -5,7 +5,10 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { env } from '@web/utils/env/env';
 
-import { heroHiddenLabelVariants } from './hero-module-variants';
+import {
+  heroBackgroundVariants,
+  heroHiddenLabelVariants,
+} from './hero-module-variants';
 
 export interface IHeroModuleProps {
   id: string;
@@ -15,6 +18,12 @@ export interface IHeroModuleProps {
 /**
  * HeroModule — fetches `module_hero` data and renders it through the `Hero`
  * organism. The only place this module's service and ui meet.
+ *
+ * `Hero` is not wrapped in `Section` (unlike the other module components):
+ * it's already its own full-bleed band rendered flush against the sticky
+ * `Header`, and `Section`'s constrained/padded layout would break that even
+ * with `appearance` unset (#1316, closed as not-planned). It only consumes
+ * `appearance.background`, applied directly via `className`.
  */
 export async function HeroModule({ id }: IHeroModuleProps) {
   const result = await service.modules.hero.v1.getHero(id);
@@ -28,6 +37,7 @@ export async function HeroModule({ id }: IHeroModuleProps) {
     sanityImage,
     primaryAction,
     secondaryAction,
+    appearance,
   } = result.data;
 
   // No title resolved from CMS config or fallback featured post — never
@@ -40,6 +50,7 @@ export async function HeroModule({ id }: IHeroModuleProps) {
       title={title}
       titleId="home-hero-title"
       excerpt={subtitle}
+      className={heroBackgroundVariants({ background: appearance?.background })}
     >
       {(primaryAction || secondaryAction) && (
         <Hero.Cta>

@@ -1,4 +1,4 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { makePostCard } from '@web/testing/shared/post/fixtures';
 
 import { PostListModule } from './post-list-module';
@@ -58,7 +58,7 @@ describe(PostListModule, () => {
   it('labels the section with a unique id derived from the module id', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
-      data: { title: 'Latest posts', posts: [post] },
+      data: { title: 'Latest posts', posts: [post], appearance: undefined },
     });
 
     const { container } = await setup();
@@ -71,6 +71,18 @@ describe(PostListModule, () => {
       'aria-labelledby',
       'latest-posts-post-list-1',
     );
+  });
+
+  it('renders correctly inside the Section appearance wrapper with no appearance authored', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: { title: 'Latest posts', posts: [post], appearance: undefined },
+    });
+
+    await setup();
+
+    const wrapper = screen.getByTestId('post-list-module-post-list-1');
+    expect(within(wrapper).getByText('Latest posts')).toBeVisible();
   });
 
   it('derives a different section id for a different module id, avoiding duplicate DOM ids', async () => {
