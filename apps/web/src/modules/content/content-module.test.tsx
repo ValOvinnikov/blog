@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 
 import { ContentModule } from './content-module';
@@ -35,7 +36,12 @@ describe(ContentModule, () => {
   it('renders the title as an h2 labelling the section via a unique id derived from the module id', async () => {
     getContentMock.mockResolvedValue({
       ok: true,
-      data: { title: 'About us', body: [], appearance: undefined },
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        title: 'About us',
+        body: [],
+        appearance: undefined,
+      },
     });
 
     await setup();
@@ -50,7 +56,12 @@ describe(ContentModule, () => {
   it('renders correctly inside the Section appearance wrapper with no appearance authored', async () => {
     getContentMock.mockResolvedValue({
       ok: true,
-      data: { title: 'About us', body: [], appearance: undefined },
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        title: 'About us',
+        body: [],
+        appearance: undefined,
+      },
     });
 
     await setup();
@@ -64,7 +75,11 @@ describe(ContentModule, () => {
   it('derives a different heading id for a different module id, avoiding duplicate DOM ids', async () => {
     getContentMock.mockResolvedValue({
       ok: true,
-      data: { title: 'Another section', body: [] },
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        title: 'Another section',
+        body: [],
+      },
     });
 
     await setup({ id: 'content-2' });

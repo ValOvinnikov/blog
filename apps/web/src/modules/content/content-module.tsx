@@ -1,7 +1,7 @@
 import { service } from '@blog/service';
-import { Section } from '@blog/ui/atoms';
 import { ContentModule as ContentModuleUi } from '@blog/ui/organisms';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
+import { Section } from '@web/components/shared/section';
 
 export interface IContentModuleProps {
   id: string;
@@ -11,9 +11,9 @@ export interface IContentModuleProps {
 /**
  * ContentModule — fetches `module_content` data and renders it through the
  * `ContentModule` ui organism, with the Portable Text body rendered by the
- * web-owned `PortableTextRenderer`, wrapped in `Section` for the
- * CMS-authored `appearance`. The only place this module's service and ui
- * meet.
+ * web-owned `PortableTextRenderer`, wrapped in `Section` (web's sole
+ * per-module landmark) for the CMS-authored `brandVariant`/`appearance`. The
+ * only place this module's service and ui meet.
  *
  * `ContentModuleUi`'s own top margin (`mt-[22px]`) is neutralized via its
  * `wrapped` prop — `Section` now owns that spacing (`appearance.spacingTop`),
@@ -24,11 +24,17 @@ export async function ContentModule({ id }: IContentModuleProps) {
 
   if (!result.ok) return null;
 
-  const { title, body, appearance } = result.data;
+  const { brandVariant, title, body, appearance } = result.data;
+  const titleId = `content-${id}`;
 
   return (
-    <Section appearance={appearance} dataTestId={`content-module-${id}`}>
-      <ContentModuleUi title={title} titleId={`content-${id}`} wrapped>
+    <Section
+      brandVariant={brandVariant}
+      appearance={appearance}
+      titleId={titleId}
+      dataTestId={`content-module-${id}`}
+    >
+      <ContentModuleUi title={title} titleId={titleId} wrapped>
         <PortableTextRenderer value={body} />
       </ContentModuleUi>
     </Section>
