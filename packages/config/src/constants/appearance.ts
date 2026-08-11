@@ -1,14 +1,12 @@
 import type { TValueOf } from '@blog/config/utils';
 
-export const BACKGROUND_TONE = {
-  DEFAULT: 'DEFAULT',
-  SUBTLE: 'SUBTLE',
-  SURFACE: 'SURFACE',
-  ACCENT_TINT: 'ACCENT_TINT',
-  INVERSE: 'INVERSE',
+export const BRAND_VARIANT = {
+  PRIMARY: 'PRIMARY',
+  SECONDARY: 'SECONDARY',
+  BRAND_PRIMARY: 'BRAND_PRIMARY',
 } as const;
 
-export type TBackgroundTone = TValueOf<typeof BACKGROUND_TONE>;
+export type TBrandVariant = TValueOf<typeof BRAND_VARIANT>;
 
 export const SPACING_SCALE = {
   NONE: 'NONE',
@@ -36,7 +34,6 @@ export const ALIGN = {
 export type TAlign = TValueOf<typeof ALIGN>;
 
 export type TAppearance = {
-  background?: TBackgroundTone;
   spacingTop?: TSpacingScale;
   spacingBottom?: TSpacingScale;
   containerWidth?: TContainerWidth;
