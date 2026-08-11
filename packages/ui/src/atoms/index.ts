@@ -17,7 +17,6 @@ export * from './nav-link';
 export * from './prose';
 export * from './prose-link';
 export * from './quote-block';
-export * from './section';
 export * from './segmented-control';
 export * from './spinner';
 export * from './status-badge';

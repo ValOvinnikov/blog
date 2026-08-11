@@ -32,15 +32,10 @@ describe(`<${ContentModule.name}/>`, () => {
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
   });
 
-  it('labels the section via the title heading when both are provided', () => {
+  it('assigns titleId to the heading element', () => {
     const title = faker.lorem.sentence(4);
-    const { container } = setup({
-      title,
-      titleId: 'content-module-title',
-    });
+    setup({ title, titleId: 'content-module-title' });
 
-    const section = container.querySelector('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'content-module-title');
     expect(screen.getByRole('heading', { name: title })).toHaveAttribute(
       'id',
       'content-module-title',

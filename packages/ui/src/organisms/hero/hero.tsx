@@ -23,9 +23,7 @@ const HeroParts = {
 } satisfies Record<string, ElementType>;
 
 export interface IHeroProps
-  extends
-    Omit<ComponentPropsWithoutRef<'section'>, 'children'>,
-    IWithDataTestId {
+  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
   title: string;
   titleId: string;
   eyebrow?: string;
@@ -52,36 +50,33 @@ const HeroRoot = ({
   const s = heroVariants({ hasMedia: Boolean(slots.Media) });
 
   return (
-    <section
-      aria-labelledby={titleId}
+    <div
       className={s.root({ class: className })}
       data-testid={dataTestId}
       {...rest}
     >
-      <div className={s.content()}>
-        <div className={s.grid()}>
-          <div className={s.copy()} data-testid="hero-copy">
-            {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-            <div className={s.title()}>
-              <Heading id={titleId} level={1} visual="hero">
-                {title}
-              </Heading>
-            </div>
-            {excerpt && (
-              <Text variant="hero" className={s.excerpt()}>
-                {excerpt}
-              </Text>
-            )}
-            {slots.Cta}
+      <div className={s.grid()}>
+        <div className={s.copy()} data-testid="hero-copy">
+          {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+          <div className={s.title()}>
+            <Heading id={titleId} level={1} visual="hero">
+              {title}
+            </Heading>
           </div>
-          {slots.Media}
+          {excerpt && (
+            <Text variant="hero" className={s.excerpt()}>
+              {excerpt}
+            </Text>
+          )}
+          {slots.Cta}
         </div>
-
-        {unmatched.map((node, i) => (
-          <Fragment key={i}>{node}</Fragment>
-        ))}
+        {slots.Media}
       </div>
-    </section>
+
+      {unmatched.map((node, i) => (
+        <Fragment key={i}>{node}</Fragment>
+      ))}
+    </div>
   );
 };
 

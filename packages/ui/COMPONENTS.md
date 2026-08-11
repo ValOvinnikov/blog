@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_59 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_57 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -93,11 +93,6 @@ Props: className?: string _(extends IWithDataTestId)_
 ### QuoteBlock — `atoms/quote-block/quote-block.tsx`
 QuoteBlock atom — the accent-muted left rule + italic serif treatment for blockquotes inside Portable Text article body copy.
 Props: _(extends BlockquoteHTMLAttributes<HTMLQuoteElement>, IWithDataTestId)_
-
-### Section — `atoms/section/section.tsx`
-the appearance wrapper every page-builder module renders inside; maps an optional `appearance` object (background tone, spacing, container width, alignment, divider) to token-backed classes, falling back per-field to today's plain layout when `appearance` (or any of its fields) is unset.
-Props: appearance?: TAppearance · children: ReactNode · className?: string _(extends IWithDataTestId)_
-Variants: background: BACKGROUND_TONE.DEFAULT|BACKGROUND_TONE.SUBTLE|BACKGROUND_TONE.SURFACE|BACKGROUND_TONE.ACCENT_TINT|BACKGROUND_TONE.INVERSE · spacingTop: SPACING_SCALE.NONE|SPACING_SCALE.SM|SPACING_SCALE.MD|SPACING_SCALE.LG|SPACING_SCALE.XL · spacingBottom: SPACING_SCALE.NONE|SPACING_SCALE.SM|SPACING_SCALE.MD|SPACING_SCALE.LG|SPACING_SCALE.XL · containerWidth: CONTAINER_WIDTH.NARROW|CONTAINER_WIDTH.WIDE|CONTAINER_WIDTH.FULL · align: ALIGN.START|ALIGN.CENTER · divider: (boolean)
 
 ### SegmentedControl — `atoms/segmented-control/segmented-control.tsx`
 a fully controlled switch between a small, mutually exclusive set of views (e.g. a reader's chosen depth for an article).
@@ -253,16 +248,12 @@ Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?:
 
 ### ContentModule — `organisms/content-module/content-module.tsx`
 page-builder organism rendering a portable-text content block behind an optional heading.
-Props: title?: string · titleId?: string · children: ReactNode · wrapped?: TContentModuleVariants['wrapped'] _(extends Omit<ComponentPropsWithoutRef<'section'>, 'chil…, IWithDataTestId)_
+Props: title?: string · titleId?: string · children: ReactNode · wrapped?: TContentModuleVariants['wrapped'] _(extends Omit<ComponentPropsWithoutRef<'div'>, 'children…, IWithDataTestId)_
 Variants: wrapped: (boolean)
-
-### ContentSection — `organisms/content-section/content-section.tsx`
-a titled `<section>` wrapper: renders an `<h2>` from `title`/`titleId` and wires `aria-labelledby` to it, so grouped page content is announced as a named region.
-Props: children: ReactNode · title: ReactNode · titleId: string _(extends Omit<ComponentPropsWithoutRef<'section'>, 'chil…, IWithDataTestId)_
 
 ### CtaModule — `organisms/cta-module/cta-module.tsx`
 page-builder organism rendering a heading, optional supporting text, and an optional action slot.
-Props: heading: string · headingId?: string · text?: string · action?: ReactNode · wrapped?: TCtaModuleVariants['wrapped'] _(extends Omit<ComponentPropsWithoutRef<'section'>, 'chil…, IWithDataTestId)_
+Props: heading: string · headingId?: string · text?: string · action?: ReactNode · wrapped?: TCtaModuleVariants['wrapped'] _(extends Omit<ComponentPropsWithoutRef<'div'>, 'children…, IWithDataTestId)_
 Variants: wrapped: (boolean)
 
 ### Footer — `organisms/footer/footer.tsx`
@@ -284,7 +275,7 @@ Slots:
 
 ### Hero — `organisms/hero/hero.tsx`
 the page-top hero band: renders `title` as an `<h1>` with optional `eyebrow` and `excerpt`, plus `Hero.Cta` and `Hero.Media` slots.
-Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · children?: TCompoundChildren<typeof HeroParts> _(extends Omit<ComponentPropsWithoutRef<'section'>, 'chil…, IWithDataTestId)_
+Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · children?: TCompoundChildren<typeof HeroParts> _(extends Omit<ComponentPropsWithoutRef<'div'>, 'children…, IWithDataTestId)_
 Variants: hasMedia: (boolean)
 
 Slots:
@@ -308,7 +299,7 @@ the responsive grid container that lays out `PostCard`s (or any children) in col
 Props: children: ReactNode _(extends Pick<ComponentPropsWithoutRef<'div'>, 'classNam…, IWithDataTestId)_
 
 ### PostsSection — `organisms/posts-section/posts-section.tsx`
-labeled section rendering a set of posts in a responsive grid.
+labeled section rendering a set of posts in a responsive grid, generic enough to reuse for other post listings (e.g. related posts, category pages).
 Props: posts: IPostCardData[] · title: string · titleId: string · className?: string · linkAs?: TAnchorElementType · emptyMessage?: string · tinted?: TPostsSectionVariants['tinted'] _(extends IWithDataTestId)_
 Variants: tinted: (boolean)
 

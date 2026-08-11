@@ -8,7 +8,7 @@ import {
 
 export interface IContentModuleProps
   extends
-    Omit<ComponentPropsWithoutRef<'section'>, 'children' | 'title'>,
+    Omit<ComponentPropsWithoutRef<'div'>, 'children' | 'title'>,
     IWithDataTestId {
   title?: string;
   titleId?: string;
@@ -37,8 +37,7 @@ export const ContentModule = ({
   const s = contentModuleVariants({ wrapped });
 
   return (
-    <section
-      aria-labelledby={title && titleId ? titleId : undefined}
+    <div
       className={s.root({ class: className })}
       data-testid={dataTestId}
       {...rest}
@@ -49,6 +48,6 @@ export const ContentModule = ({
         </h2>
       )}
       <div className={s.body()}>{children}</div>
-    </section>
+    </div>
   );
 };
