@@ -2,10 +2,11 @@ import { tv } from 'tailwind-variants';
 
 export const blogPageTemplateVariants = tv({
   slots: {
-    root: ['mx-auto w-full', 'max-w-page px-gutter py-page-y'],
+    root: ['w-full'],
+    furniture: ['mx-auto w-full', 'max-w-page px-gutter py-page-y'],
     introHeader: ['mb-6'],
-    heading: 'mb-6',
-    supportingText: 'text-muted mb-6',
+    heading: ['mb-6'],
+    supportingText: ['text-muted mb-6'],
     categoryChips: ['mb-8'],
     socialLinks: ['mb-10'],
   },
