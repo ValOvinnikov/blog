@@ -8,6 +8,9 @@ export const BRAND_VARIANT = {
 
 export type TBrandVariant = TValueOf<typeof BRAND_VARIANT>;
 
+export type TBrandVariantOf<TKeys extends keyof typeof BRAND_VARIANT> =
+  (typeof BRAND_VARIANT)[TKeys];
+
 export const SPACING_SCALE = {
   NONE: 'NONE',
   SM: 'SM',
