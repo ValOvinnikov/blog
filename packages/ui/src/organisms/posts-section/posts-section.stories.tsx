@@ -81,3 +81,9 @@ export const TintedBand: TStory = {
   },
   parameters: { layout: 'fullscreen' },
 };
+
+export const Wrapped: TStory = {
+  args: {
+    wrapped: true,
+  },
+};

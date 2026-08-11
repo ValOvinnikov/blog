@@ -40,6 +40,11 @@ export interface IPostsSectionProps extends IWithDataTestId {
    * by the parent. Heading markup/`aria` wiring is unchanged either way.
    */
   tinted?: TPostsSectionVariants['tinted'];
+  /**
+   * Drops this component's own top margin. Set when a parent (e.g. `Section`)
+   * already owns the vertical spacing around it, so the two don't stack.
+   */
+  wrapped?: TPostsSectionVariants['wrapped'];
 }
 
 /**
@@ -56,11 +61,12 @@ export const PostsSection = ({
   linkAs,
   emptyMessage,
   tinted,
+  wrapped,
 }: IPostsSectionProps) => {
   const isEmpty = posts.length === 0;
   if (isEmpty && !emptyMessage) return null;
   const Component = (linkAs ?? 'a') as ElementType;
-  const s = postsSectionVariants({ tinted });
+  const s = postsSectionVariants({ tinted, wrapped });
 
   const content = (
     <>

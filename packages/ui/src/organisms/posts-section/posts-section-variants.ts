@@ -26,6 +26,11 @@ export const postsSectionVariants = tv({
         contentGroup: ['border-t border-border-emphasis pt-10'],
       },
     },
+    wrapped: {
+      true: {
+        root: ['mt-0'],
+      },
+    },
   },
 });
 
