@@ -1,7 +1,11 @@
-import type { TAppearance, TBrandVariant, TMaybeUndefined } from '@blog/config';
+import type {
+  TAppearance,
+  TBrandVariantOf,
+  TMaybeUndefined,
+} from '@blog/config';
 
 export type TNewsletterModule = {
-  brandVariant: TBrandVariant;
+  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
   heading: string;
   description: TMaybeUndefined<string>;
   appearance: TMaybeUndefined<TAppearance>;
