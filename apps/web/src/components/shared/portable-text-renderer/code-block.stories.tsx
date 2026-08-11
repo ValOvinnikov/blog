@@ -41,7 +41,7 @@ export const Light: TStory = {};
 export const Dark: TStory = {
   decorators: [
     (Story) => (
-      <div className="dark bg-bg p-6">
+      <div className="dark bg-primary p-6">
         <Story />
       </div>
     ),
@@ -49,7 +49,7 @@ export const Dark: TStory = {
 };
 
 /**
- * Highlighted lines use the theme-aware `bg-accent-muted`.
+ * Highlighted lines use the theme-aware `bg-brand-primary-muted`.
  */
 export const WithHighlightedLines: TStory = {
   args: { highlightedLines: [3] },

@@ -11,6 +11,6 @@ export const codeBlockVariants = tv({
       'font-mono text-xs text-text-muted',
     ],
     pre: ['text-code'],
-    highlightedLine: ['bg-accent-muted'],
+    highlightedLine: ['bg-brand-primary-muted'],
   },
 });

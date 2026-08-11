@@ -15,12 +15,12 @@ export const authMenuVariants = tv({
     // The session-resolving placeholder — wraps `Spinner` (the live region),
     // not a button, so it's just sized/centered to match `Avatar`'s
     // `Size.LG` footprint (32px) exactly, matching `AccountMenu`'s actual
-    // `Avatar` usage. `rounded-full bg-bg-subtle` mirror `Avatar`'s own base
-    // classes so this reads as "the avatar slot, mid-load" rather than a
+    // `Avatar` usage. `rounded-full bg-primary-subtle` mirror `Avatar`'s own
+    // base classes so this reads as "the avatar slot, mid-load" rather than a
     // disconnected spinner (no border/hover, those are `IconButton`'s
     // interactive-affordance classes and don't apply here).
     statusIndicator: [
-      'inline-grid size-[32px] place-items-center rounded-full bg-bg-subtle',
+      'inline-grid size-[32px] place-items-center rounded-full bg-primary-subtle',
     ],
   },
 });

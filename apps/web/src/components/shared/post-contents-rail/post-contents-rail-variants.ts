@@ -23,12 +23,12 @@ export const postContentsRailVariants = tv({
     ],
     // `relative` gives this bar its own positioning context so `panel`
     // overlays it directly rather than depending on `root`'s box.
-    // `shadow-md` — this bar shares `Header`'s exact `bg-bg`/`border-border`,
+    // `shadow-md` — this bar shares `Header`'s exact `bg-primary`/`border-border`,
     // so the hairline border alone doesn't read as a seam once it's sticky
     // flush beneath it (#981).
     mobile: [
       'relative',
-      'bg-bg border-b border-border shadow-md',
+      'bg-primary border-b border-border shadow-md',
       'px-4 py-3',
       'mb-6',
       'lg:hidden',
@@ -52,13 +52,13 @@ export const postContentsRailVariants = tv({
     toggle: [
       'flex w-full min-w-0 items-center justify-between gap-2',
       'md:flex-1',
-      'border border-border rounded-md bg-bg px-3 py-2.5',
+      'border border-border rounded-md bg-primary px-3 py-2.5',
       'font-mono text-copy text-text',
       'cursor-pointer text-left',
       'transition-colors duration-base ease-console',
       'hover:bg-surface-2',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
     ],
     toggleLabel: ['flex-1 truncate'],
     chevron: [
@@ -70,7 +70,7 @@ export const postContentsRailVariants = tv({
     // share-post popover panels so all three read as one system (#1005).
     panel: [
       'absolute inset-x-0 top-full',
-      'bg-bg border-b border-border shadow-lg',
+      'bg-primary border-b border-border shadow-lg',
       'max-h-[70vh] overflow-y-auto p-4',
     ],
     list: ['flex flex-col gap-1', 'font-mono text-copy', 'm-0 list-none p-0'],
@@ -78,9 +78,9 @@ export const postContentsRailVariants = tv({
     link: [
       'block text-subtle no-underline',
       'transition-colors duration-base ease-console',
-      'hover:text-accent',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+      'hover:text-brand-primary',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
     ],
   },
   variants: {
@@ -88,7 +88,7 @@ export const postContentsRailVariants = tv({
       true: { chevron: ['-rotate-135'] },
     },
     isActive: {
-      true: { link: ['text-accent'] },
+      true: { link: ['text-brand-primary'] },
     },
     isSubheading: {
       true: { item: ['pl-3'] },
