@@ -1,12 +1,12 @@
-import type { IWithDataTestId, TAppearance, TBrandVariant } from '@blog/config';
+import type { IWithDataTestId, TBrandVariant, TLayout } from '@blog/config';
 import type { ReactNode } from 'react';
 
 import { sectionVariants } from './section-variants';
 
 export interface ISectionProps extends IWithDataTestId {
   brandVariant: TBrandVariant;
-  appearance?: TAppearance;
-  titleId: string;
+  layout?: TLayout;
+  titleId?: string;
   children: ReactNode;
   className?: string;
 }
@@ -16,11 +16,13 @@ export interface ISectionProps extends IWithDataTestId {
  * driven by `brandVariant`, vertical spacing as padding (not margin) so
  * stacked Sections tile edge-to-edge, wrapping a constrained inner `<div>`.
  * Module organisms compose into `children` without rendering their own
- * `<section>` landmark or outer spacing.
+ * `<section>` landmark or outer spacing. `titleId` is optional — a module
+ * with no unique heading (e.g. `ContentModule`) renders the landmark without
+ * an `aria-labelledby` rather than pointing at an element that never renders.
  */
 export const Section = ({
   brandVariant,
-  appearance,
+  layout,
   titleId,
   children,
   className,
@@ -28,11 +30,11 @@ export const Section = ({
 }: ISectionProps) => {
   const s = sectionVariants({
     brandVariant,
-    spacingTop: appearance?.spacingTop,
-    spacingBottom: appearance?.spacingBottom,
-    containerWidth: appearance?.containerWidth,
-    align: appearance?.align,
-    divider: appearance?.divider,
+    spacingTop: layout?.spacingTop,
+    spacingBottom: layout?.spacingBottom,
+    containerWidth: layout?.containerWidth,
+    dividerTop: layout?.dividerTop,
+    dividerBottom: layout?.dividerBottom,
   });
 
   return (

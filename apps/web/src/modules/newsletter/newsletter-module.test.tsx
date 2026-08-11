@@ -50,14 +50,17 @@ describe(NewsletterModule, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders the full newsletter signup with the CMS-authored heading/description', async () => {
+  it('renders the full newsletter signup with the CMS-authored heading/supportingText', async () => {
     getNewsletterMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        heading: 'Get new posts',
-        description: 'Straight to inbox.',
-        appearance: undefined,
+        sectionHeader: {
+          heading: 'Get new posts',
+          supportingText: 'Straight to inbox.',
+          align: undefined,
+        },
+        layout: undefined,
       },
     });
 
@@ -67,14 +70,17 @@ describe(NewsletterModule, () => {
     expect(screen.getByText('Straight to inbox.')).toBeVisible();
   });
 
-  it('renders correctly inside the Section appearance wrapper with no appearance authored', async () => {
+  it('renders correctly inside the Section layout wrapper with no layout authored', async () => {
     getNewsletterMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        heading: 'Get new posts',
-        description: 'Straight to inbox.',
-        appearance: undefined,
+        sectionHeader: {
+          heading: 'Get new posts',
+          supportingText: 'Straight to inbox.',
+          align: undefined,
+        },
+        layout: undefined,
       },
     });
 
@@ -89,9 +95,12 @@ describe(NewsletterModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        heading: 'Get new posts',
-        description: 'Straight to inbox.',
-        appearance: undefined,
+        sectionHeader: {
+          heading: 'Get new posts',
+          supportingText: 'Straight to inbox.',
+          align: undefined,
+        },
+        layout: undefined,
       },
     });
 
@@ -111,9 +120,12 @@ describe(NewsletterModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        heading: 'Get new posts',
-        description: 'Straight to inbox.',
-        appearance: undefined,
+        sectionHeader: {
+          heading: 'Get new posts',
+          supportingText: 'Straight to inbox.',
+          align: undefined,
+        },
+        layout: undefined,
       },
     });
 

@@ -10,7 +10,7 @@ const meta = {
   parameters: { layout: 'fullscreen' },
   args: {
     titleId: 'section-story-title',
-    appearance: {
+    layout: {
       spacingTop: SPACING_SCALE.MD,
       spacingBottom: SPACING_SCALE.MD,
     },
@@ -45,10 +45,11 @@ export const BrandPrimary: TStory = {
 export const WithDividerAndLargeSpacing: TStory = {
   args: {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    appearance: {
+    layout: {
       spacingTop: SPACING_SCALE.XL,
       spacingBottom: SPACING_SCALE.XL,
-      divider: true,
+      dividerTop: true,
+      dividerBottom: true,
     },
   },
 };

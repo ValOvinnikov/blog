@@ -1,5 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { ContentModule } from './content-module';
 
@@ -33,61 +33,34 @@ describe(ContentModule, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders the title as an h2 labelling the section via a unique id derived from the module id', async () => {
+  it('renders the body content, with no accessible name on the section landmark', async () => {
     getContentMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        title: 'About us',
         body: [],
-        appearance: undefined,
+        layout: undefined,
+      },
+    });
+
+    const { container } = await setup();
+
+    const section = container.querySelector('section');
+    expect(section).not.toHaveAttribute('aria-labelledby');
+  });
+
+  it('renders correctly inside the Section layout wrapper with no layout authored', async () => {
+    getContentMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        body: [],
+        layout: undefined,
       },
     });
 
     await setup();
 
-    const heading = screen.getByRole('heading', { level: 2, name: 'About us' });
-    expect(heading).toHaveAttribute('id', 'content-content-1');
-
-    const section = heading.closest('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'content-content-1');
-  });
-
-  it('renders correctly inside the Section appearance wrapper with no appearance authored', async () => {
-    getContentMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        title: 'About us',
-        body: [],
-        appearance: undefined,
-      },
-    });
-
-    await setup();
-
-    const wrapper = screen.getByTestId('content-module-content-1');
-    expect(
-      within(wrapper).getByRole('heading', { level: 2, name: 'About us' }),
-    ).toBeVisible();
-  });
-
-  it('derives a different heading id for a different module id, avoiding duplicate DOM ids', async () => {
-    getContentMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        title: 'Another section',
-        body: [],
-      },
-    });
-
-    await setup({ id: 'content-2' });
-
-    const heading = screen.getByRole('heading', {
-      level: 2,
-      name: 'Another section',
-    });
-    expect(heading).toHaveAttribute('id', 'content-content-2');
+    expect(screen.getByTestId('content-module-content-1')).toBeVisible();
   });
 });

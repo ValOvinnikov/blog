@@ -1,6 +1,11 @@
 'use client';
 
-import { ICONS, Size, type TFormStatus } from '@blog/config';
+import {
+  ICONS,
+  Size,
+  type THeadingAlign,
+  type TFormStatus,
+} from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/organisms';
 import { subscribeToNewsletterAction } from '@web/server/newsletter/newsletter-actions';
@@ -15,8 +20,10 @@ type TNewsletterFormProps = {
   heading: string;
   /** Forwarded to the rendered heading's `id`, so an outer landmark's `aria-labelledby` can resolve to it. */
   headingId?: string;
-  /** Ignored for `variant="compact"` — that density has no room for a description. */
-  description?: string;
+  /** Ignored for `variant="compact"` — that density has no room for supporting copy. */
+  supportingText?: string;
+  /** Horizontal alignment of the pitch pane. Ignored for `variant="compact"` — Compact has no alignment control. */
+  align?: THeadingAlign;
   className?: string;
 };
 
@@ -24,9 +31,9 @@ type TNewsletterFormProps = {
  * NewsletterForm — the double opt-in newsletter signup island (#1044,
  * placement redone by #1197/#1200), composed into the Blog index page's
  * `module_newsletter` page-builder module and every post page's foot.
- * `heading`/`description` are always CMS-sourced by the caller (the module's
- * own fields, or `settings_newsletter`) — this component never falls back to
- * i18n copy for them. Wraps `NewsletterSignup.Full`/`.Compact` (pure,
+ * `heading`/`supportingText` are always CMS-sourced by the caller (the
+ * module's own fields, or `settings_newsletter`) — this component never
+ * falls back to i18n copy for them. Wraps `NewsletterSignup.Full`/`.Compact` (pure,
  * controlled), owning:
  *
  * - Local `email`/`status` state, following the same "plain async handler,
@@ -57,7 +64,8 @@ export function NewsletterForm({
   variant,
   heading,
   headingId,
-  description,
+  supportingText,
+  align,
   className,
 }: TNewsletterFormProps) {
   const t = useTranslations('newsletterForm');
@@ -138,8 +146,9 @@ export function NewsletterForm({
   return (
     <NewsletterSignup.Full
       {...sharedProps}
-      description={description}
+      supportingText={supportingText}
       trustCues={trustCues}
+      align={align}
     />
   );
 }

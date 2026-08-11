@@ -12,29 +12,26 @@ export interface IContentModuleProps {
  * ContentModule — fetches `module_content` data and renders it through the
  * `ContentModule` ui organism, with the Portable Text body rendered by the
  * web-owned `PortableTextRenderer`, wrapped in `Section` (web's sole
- * per-module landmark) for the CMS-authored `brandVariant`/`appearance`. The
- * only place this module's service and ui meet.
- *
- * `ContentModuleUi`'s own top margin (`mt-[22px]`) is neutralized via its
- * `wrapped` prop — `Section` now owns that spacing (`appearance.spacingTop`),
- * and the two would otherwise stack.
+ * per-module landmark) for the CMS-authored `brandVariant`/`layout`. The
+ * only place this module's service and ui meet. No `titleId` is passed to
+ * `Section` — `ContentModule` renders no heading of its own (its rich-text
+ * `body` supplies any in-content headings), so the landmark has no unique
+ * element to label.
  */
 export async function ContentModule({ id }: IContentModuleProps) {
   const result = await service.modules.content.v1.getContent(id);
 
   if (!result.ok) return null;
 
-  const { brandVariant, title, body, appearance } = result.data;
-  const titleId = `content-${id}`;
+  const { brandVariant, body, layout } = result.data;
 
   return (
     <Section
       brandVariant={brandVariant}
-      appearance={appearance}
-      titleId={titleId}
+      layout={layout}
       dataTestId={`content-module-${id}`}
     >
-      <ContentModuleUi title={title} titleId={titleId} wrapped={true}>
+      <ContentModuleUi wrapped={true}>
         <PortableTextRenderer value={body} />
       </ContentModuleUi>
     </Section>

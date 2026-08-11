@@ -35,10 +35,13 @@ describe(CtaModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        heading: 'Get started',
-        text: undefined,
+        sectionHeader: {
+          heading: 'Get started',
+          supportingText: undefined,
+          align: undefined,
+        },
         action: undefined,
-        appearance: undefined,
+        layout: undefined,
       },
     });
 
@@ -54,15 +57,18 @@ describe(CtaModule, () => {
     expect(section).toHaveAttribute('aria-labelledby', 'cta-cta-1');
   });
 
-  it('renders correctly inside the Section appearance wrapper with no appearance authored', async () => {
+  it('renders correctly inside the Section layout wrapper with no layout authored', async () => {
     getCtaMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        heading: 'Get started',
-        text: undefined,
+        sectionHeader: {
+          heading: 'Get started',
+          supportingText: undefined,
+          align: undefined,
+        },
         action: undefined,
-        appearance: undefined,
+        layout: undefined,
       },
     });
 
@@ -82,9 +88,13 @@ describe(CtaModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        heading: 'Join us',
-        text: undefined,
+        sectionHeader: {
+          heading: 'Join us',
+          supportingText: undefined,
+          align: undefined,
+        },
         action: undefined,
+        layout: undefined,
       },
     });
 

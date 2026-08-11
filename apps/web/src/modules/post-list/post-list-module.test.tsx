@@ -61,9 +61,13 @@ describe(PostListModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        title: 'Latest posts',
+        sectionHeader: {
+          heading: 'Latest posts',
+          supportingText: undefined,
+          align: undefined,
+        },
         posts: [],
-        appearance: undefined,
+        layout: undefined,
       },
     });
 
@@ -78,9 +82,13 @@ describe(PostListModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        title: 'Latest posts',
+        sectionHeader: {
+          heading: 'Latest posts',
+          supportingText: undefined,
+          align: undefined,
+        },
         posts: [post],
-        appearance: undefined,
+        layout: undefined,
       },
     });
 
@@ -96,14 +104,18 @@ describe(PostListModule, () => {
     );
   });
 
-  it('renders correctly inside the Section appearance wrapper with no appearance authored', async () => {
+  it('renders correctly inside the Section layout wrapper with no layout authored', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        title: 'Latest posts',
+        sectionHeader: {
+          heading: 'Latest posts',
+          supportingText: undefined,
+          align: undefined,
+        },
         posts: [post],
-        appearance: undefined,
+        layout: undefined,
       },
     });
 
@@ -118,8 +130,13 @@ describe(PostListModule, () => {
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
-        title: 'More posts',
+        sectionHeader: {
+          heading: 'More posts',
+          supportingText: undefined,
+          align: undefined,
+        },
         posts: [post],
+        layout: undefined,
       },
     });
 
@@ -129,5 +146,26 @@ describe(PostListModule, () => {
       'id',
       'latest-posts-post-list-2',
     );
+  });
+
+  it('falls back to "Latest posts" when sectionHeader.heading is undefined', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: undefined,
+          supportingText: undefined,
+          align: undefined,
+        },
+        posts: [post],
+        layout: undefined,
+      },
+    });
+
+    await setup();
+
+    const label = screen.getByText('Latest posts');
+    expect(label).toHaveAttribute('id', 'latest-posts-post-list-1');
   });
 });
