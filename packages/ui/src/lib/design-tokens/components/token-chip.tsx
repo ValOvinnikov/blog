@@ -1,6 +1,6 @@
 export type TTokenChipProps = {
   /**
-   * The token's value — a raw-palette `var(--…)` (e.g. `var(--bg)`), which the
+   * The token's value — a raw-palette `var(--…)` (e.g. `var(--primary)`), which the
    * `.dark` wrapper re-scopes for the dark column. Raw-palette vars always
    * exist (they aren't tree-shaken like the `@theme` `--color-*` aliases).
    */

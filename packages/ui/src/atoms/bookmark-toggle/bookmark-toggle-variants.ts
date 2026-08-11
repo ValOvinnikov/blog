@@ -8,9 +8,9 @@ export const bookmarkToggleVariants = tv({
       'rounded-sm border border-border-strong bg-surface px-[0.8rem] py-2',
       'font-mono text-card-copy text-muted transition-colors duration-base ease-console',
       'cursor-pointer',
-      'hover:border-accent hover:text-accent',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+      'hover:border-brand-primary hover:text-brand-primary',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
       'disabled:pointer-events-none disabled:opacity-50',
     ],
     icon: ['fill-none shrink-0'],
@@ -18,7 +18,9 @@ export const bookmarkToggleVariants = tv({
   variants: {
     isBookmarked: {
       true: {
-        root: ['border-accent bg-accent-muted text-accent'],
+        root: [
+          'border-brand-primary bg-brand-primary-muted text-brand-primary',
+        ],
         icon: ['fill-current'],
       },
     },

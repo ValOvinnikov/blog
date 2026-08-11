@@ -38,7 +38,7 @@ export const toastVariants = tv({
       'font-mono text-label',
       'transition-colors duration-base ease-console',
       'cursor-pointer',
-      'focus-visible:ring-accent focus-visible:ring-offset-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+      'focus-visible:ring-brand-primary focus-visible:ring-offset-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
     ],
     actionKey: [
       'rounded-[3px] border border-border px-[0.4ch] text-label text-subtle',
@@ -59,12 +59,12 @@ export const toastVariants = tv({
         timer: ['bg-success'],
       },
       [TOAST_TYPE.INFO]: {
-        root: ['border-l-accent'],
-        glyph: ['text-accent'],
-        cmdState: ['text-accent'],
-        prompt: ['text-accent'],
-        action: ['hover:border-accent hover:text-accent'],
-        timer: ['bg-accent'],
+        root: ['border-l-brand-primary'],
+        glyph: ['text-brand-primary'],
+        cmdState: ['text-brand-primary'],
+        prompt: ['text-brand-primary'],
+        action: ['hover:border-brand-primary hover:text-brand-primary'],
+        timer: ['bg-brand-primary'],
       },
       [TOAST_TYPE.WARNING]: {
         root: ['border-l-warn'],

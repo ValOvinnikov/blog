@@ -12,7 +12,7 @@ export const primaryNavigationVariants = tv({
     panel: [
       'absolute inset-x-0 top-full z-20',
       'flex flex-col items-start gap-1 p-4',
-      'bg-bg border-b border-border shadow-lg',
+      'bg-primary border-b border-border shadow-lg',
     ],
     panelLink: [
       'flex w-full items-center',

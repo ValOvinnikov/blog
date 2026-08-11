@@ -11,9 +11,9 @@ export const postMetaVariants = tv({
     authorName: [
       'text-text font-medium no-underline',
       'transition-colors duration-base ease-console',
-      'hover:text-accent',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+      'hover:text-brand-primary',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
     ],
     share: ['ml-auto'],
   },

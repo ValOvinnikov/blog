@@ -9,7 +9,7 @@ export const alertVariants = tv({
       [ALERT_TYPE.SUCCESS]: ['text-success'],
       [ALERT_TYPE.WARNING]: ['text-warn'],
       [ALERT_TYPE.ERROR]: ['text-error'],
-      [ALERT_TYPE.INFO]: ['text-accent'],
+      [ALERT_TYPE.INFO]: ['text-brand-primary'],
     },
   },
   defaultVariants: { type: ALERT_TYPE.INFO },

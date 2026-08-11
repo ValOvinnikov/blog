@@ -52,7 +52,7 @@ export const Large: TStory = {
 };
 
 export const CustomColor: TStory = {
-  args: { name: ICONS.SHARE, className: 'text-accent' },
+  args: { name: ICONS.SHARE, className: 'text-brand-primary' },
 };
 
 export const WithAccessibleLabel: TStory = {

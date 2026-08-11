@@ -5,6 +5,6 @@ export const headerBrandVariants = tv({
     'font-display font-medium text-lg',
     'tracking-[-0.01em]',
     'text-text',
-    'transition-colors hover:text-accent',
+    'transition-colors hover:text-brand-primary',
   ],
 });

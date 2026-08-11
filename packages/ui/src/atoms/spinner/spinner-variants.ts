@@ -4,7 +4,11 @@ import type { VariantProps } from 'tailwind-variants';
 
 export const spinnerVariants = tv({
   slots: {
-    root: ['inline-flex items-center gap-[0.7ch]', 'font-mono', 'text-accent'],
+    root: [
+      'inline-flex items-center gap-[0.7ch]',
+      'font-mono',
+      'text-brand-primary',
+    ],
     glyph: [
       'inline-block',
       "before:inline-block before:w-[1ch] before:text-center before:content-['⠋']",

@@ -4,7 +4,7 @@ export const asideVariants = tv({
   slots: {
     root: [
       'my-6 rounded-sm p-4',
-      'border-l-2 border-accent-muted',
+      'border-l-2 border-brand-primary-muted',
       'bg-surface-2',
     ],
     label: ['mb-2'],

@@ -3,15 +3,15 @@ import { tv } from '@blog/ui/lib/styling';
 export const eyebrowVariants = tv({
   base: [
     'font-mono text-label font-medium uppercase tracking-eyebrow',
-    'text-accent',
+    'text-brand-primary',
   ],
   variants: {
     hasHref: {
       true: [
         'no-underline transition-colors duration-base ease-console',
-        'hover:text-accent-hover',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-        'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+        'hover:text-brand-primary-hover',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+        'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
       ],
     },
   },

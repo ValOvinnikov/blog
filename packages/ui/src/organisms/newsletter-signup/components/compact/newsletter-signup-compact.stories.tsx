@@ -59,7 +59,7 @@ export const MobilePhone: TStory = {
   globals: { viewport: 'phone' },
   decorators: [
     (Story) => (
-      <div className="border border-dashed border-accent">
+      <div className="border border-dashed border-brand-primary">
         <Story />
       </div>
     ),

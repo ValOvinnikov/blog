@@ -12,15 +12,15 @@ export const segmentedControlVariants = tv({
       'font-mono text-xs font-medium uppercase tracking-eyebrow',
       'cursor-pointer transition-colors duration-base ease-console',
       'text-muted hover:text-text',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-bg',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
     ],
   },
   variants: {
     selected: {
       true: {
         option: [
-          'bg-accent-solid text-accent-contrast hover:text-accent-contrast',
+          'bg-brand-primary-solid text-brand-primary-contrast hover:text-brand-primary-contrast',
         ],
       },
     },
