@@ -32,7 +32,7 @@ export function EnabledStateBooleanInput(props: BooleanInputProps) {
       validation={validation}
     >
       <Card
-        border
+        border={true}
         radius={2}
         padding={3}
         tone={readOnly ? 'transparent' : undefined}
