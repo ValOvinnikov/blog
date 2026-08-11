@@ -41,6 +41,21 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     expect(screen.getByText(heading)).toBeVisible();
   });
 
+  it('assigns headingId to the label element when provided', () => {
+    setup({ headingId: 'newsletter-compact-heading' });
+
+    expect(screen.getByText('subscribe --email')).toHaveAttribute(
+      'id',
+      'newsletter-compact-heading',
+    );
+  });
+
+  it('renders the label with no id when headingId is omitted', () => {
+    setup();
+
+    expect(screen.getByText('subscribe --email')).not.toHaveAttribute('id');
+  });
+
   it('renders the prefix node as-is, ahead of the heading', () => {
     setup();
 

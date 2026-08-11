@@ -12,6 +12,7 @@ const meta = {
     onSubmit: () => {},
     status: 'idle',
     heading: 'subscribe --email',
+    headingId: 'newsletter-signup-compact-heading',
     prefix: <span aria-hidden="true">$</span>,
     submitLabel: 'subscribe ↵',
     emailAriaLabel: 'Email address',

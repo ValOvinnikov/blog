@@ -30,6 +30,25 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     expect(screen.getByText(description)).toBeVisible();
   });
 
+  it('assigns headingId to the heading element when provided', () => {
+    const heading = faker.lorem.sentence(3);
+    setup({ heading, headingId: 'newsletter-full-heading' });
+
+    expect(screen.getByRole('heading', { name: heading })).toHaveAttribute(
+      'id',
+      'newsletter-full-heading',
+    );
+  });
+
+  it('renders the heading with no id when headingId is omitted', () => {
+    const heading = faker.lorem.sentence(3);
+    setup({ heading });
+
+    expect(screen.getByRole('heading', { name: heading })).not.toHaveAttribute(
+      'id',
+    );
+  });
+
   it('renders a labeled email field and submit button', () => {
     setup();
 
