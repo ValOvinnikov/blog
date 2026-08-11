@@ -1,23 +1,21 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, CONTAINER_WIDTH, HEADING_ALIGN } from '@blog/config';
 import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 
-import { toPostListModule } from './transformer';
+import { toPostListModule, type TRawPostListModulePosts } from './transformer';
+
+const rawPosts: TRawPostListModulePosts = [];
 
 describe('toPostListModule', () => {
-  it('maps the module title and the provided posts', () => {
-    const raw = makeRawPostListModule({ title: 'Recent writing', limit: 6 });
-    const rawPosts = [
-      makeRawPostCard({ _id: 'a' }),
-      makeRawPostCard({ _id: 'b' }),
-    ];
+  it('maps sectionHeader straight through', () => {
+    const raw = makeRawPostListModule();
 
     const module = toPostListModule(raw, rawPosts);
 
-    expect(module.title).toBe('Recent writing');
-    // The posts query already applied the limit in GROQ — the transformer maps
-    // whatever it is handed, without re-slicing.
-    expect(module.posts.map((p) => p.id)).toEqual(['a', 'b']);
+    expect(module.sectionHeader).toEqual({
+      heading: 'Latest',
+      supportingText: undefined,
+      align: undefined,
+    });
   });
 
   it('maps brandVariant straight through', () => {
@@ -25,15 +23,71 @@ describe('toPostListModule', () => {
       brandVariant: BRAND_VARIANT.SECONDARY,
     });
 
-    const module = toPostListModule(raw, []);
+    const module = toPostListModule(raw, rawPosts);
 
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('handles an empty post list', () => {
-    const raw = makeRawPostListModule({ title: 'Recent writing', limit: 6 });
+  it('leaves every sectionHeader field undefined when the field itself is unset (no faked default)', () => {
+    const raw = makeRawPostListModule({ sectionHeader: null });
 
-    const module = toPostListModule(raw, []);
+    const module = toPostListModule(raw, rawPosts);
+
+    expect(module.sectionHeader).toEqual({
+      heading: undefined,
+      supportingText: undefined,
+      align: undefined,
+    });
+  });
+
+  it('maps sectionHeader.align when authored', () => {
+    const raw = makeRawPostListModule({
+      sectionHeader: {
+        heading: 'Latest',
+        supportingText: null,
+        align: HEADING_ALIGN.RIGHT,
+      },
+    });
+
+    const module = toPostListModule(raw, rawPosts);
+
+    expect(module.sectionHeader.align).toBe(HEADING_ALIGN.RIGHT);
+  });
+
+  it('maps a fully-authored layout object 1:1', () => {
+    const raw = makeRawPostListModule({
+      layout: {
+        spacingTop: 'MD',
+        spacingBottom: 'MD',
+        containerWidth: CONTAINER_WIDTH.WIDE,
+        dividerTop: true,
+        dividerBottom: true,
+      },
+    });
+
+    const module = toPostListModule(raw, rawPosts);
+
+    expect(module.layout).toEqual({
+      spacingTop: 'MD',
+      spacingBottom: 'MD',
+      containerWidth: CONTAINER_WIDTH.WIDE,
+      dividerTop: true,
+      dividerBottom: true,
+    });
+  });
+
+  it('leaves layout undefined when the field is unset (no faked default)', () => {
+    const raw = makeRawPostListModule({ layout: null });
+
+    const module = toPostListModule(raw, rawPosts);
+
+    expect(module.layout).toBeUndefined();
+  });
+
+  it('maps posts through toPostCard', () => {
+    const raw = makeRawPostListModule();
+
+    const module = toPostListModule(raw, rawPosts);
 
     expect(module.posts).toEqual([]);
   });

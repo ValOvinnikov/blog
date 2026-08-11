@@ -1,8 +1,8 @@
 import type {
   ILink,
   ISanityImage,
-  TAppearance,
   TBrandVariantOf,
+  TLayout,
   TMaybeUndefined,
 } from '@blog/config';
 
@@ -26,5 +26,5 @@ export type THeroModule = {
   sanityImage: TMaybeUndefined<ISanityImage>;
   primaryAction: TMaybeUndefined<THeroPrimaryAction>;
   secondaryAction: TMaybeUndefined<ILink>;
-  appearance: TMaybeUndefined<TAppearance>;
+  layout: TMaybeUndefined<TLayout>;
 };

@@ -1,14 +1,18 @@
 import type {
   ILink,
-  TAppearance,
   TBrandVariantOf,
+  THeadingAlign,
+  TLayout,
   TMaybeUndefined,
 } from '@blog/config';
 
 export type TCtaModule = {
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
-  heading: string;
-  text: TMaybeUndefined<string>;
+  sectionHeader: {
+    heading: string;
+    supportingText: TMaybeUndefined<string>;
+    align: TMaybeUndefined<THeadingAlign>;
+  };
   action: TMaybeUndefined<ILink>;
-  appearance: TMaybeUndefined<TAppearance>;
+  layout: TMaybeUndefined<TLayout>;
 };

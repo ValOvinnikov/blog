@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { appearanceFragment } from '@blog/service/shared/fragments/appearance';
+import { layoutFragment } from '@blog/service/shared/fragments/layout';
 
 export const contentModuleQuery = q
   .parameters<{ id: string }>()
@@ -8,11 +8,7 @@ export const contentModuleQuery = q
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),
-    title: sub.field('title').notNull(),
     body: sub.field('body[]').notNull(),
-    appearance: sub
-      .field('appearance')
-      .project(appearanceFragment)
-      .nullable(true),
+    layout: sub.field('layout').project(layoutFragment).nullable(true),
   }))
   .notNull();

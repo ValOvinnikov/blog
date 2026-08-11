@@ -1,5 +1,6 @@
 import { q } from '@blog/service/sanity/query';
-import { appearanceFragment } from '@blog/service/shared/fragments/appearance';
+import { layoutFragment } from '@blog/service/shared/fragments/layout';
+import { sectionHeaderFragment } from '@blog/service/shared/fragments/section-header';
 
 export const postListModuleQuery = q
   .parameters<{ id: string }>()
@@ -8,11 +9,11 @@ export const postListModuleQuery = q
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),
-    title: sub.field('title').notNull(),
-    limit: sub.field('limit').notNull(),
-    appearance: sub
-      .field('appearance')
-      .project(appearanceFragment)
+    sectionHeader: sub
+      .field('sectionHeader')
+      .project(sectionHeaderFragment)
       .nullable(true),
+    limit: sub.field('limit').notNull(),
+    layout: sub.field('layout').project(layoutFragment).nullable(true),
   }))
   .notNull();

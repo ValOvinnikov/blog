@@ -21,7 +21,7 @@ export function makeRawHeroModule(
     heroImageAsset: null,
     primaryActionLabel: null,
     secondaryAction: null,
-    appearance: null,
+    layout: null,
     ...overrides,
   };
 }
@@ -31,9 +31,9 @@ export function makeRawPostListModule(
 ): TRawPostListModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    title: 'Latest',
+    sectionHeader: { heading: 'Latest', supportingText: null, align: null },
     limit: 6,
-    appearance: null,
+    layout: null,
     ...overrides,
   };
 }
@@ -43,7 +43,6 @@ export function makeRawContentModule(
 ): TRawContentModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    title: 'About us',
     body: [
       {
         _type: 'block',
@@ -52,7 +51,7 @@ export function makeRawContentModule(
         children: [{ _type: 'span', _key: 'span-1', text: 'Hello.' }],
       },
     ],
-    appearance: null,
+    layout: null,
     ...overrides,
   };
 }
@@ -62,8 +61,11 @@ export function makeRawCtaModule(
 ): TRawCtaModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    heading: 'Subscribe to the newsletter',
-    text: 'Get new posts in your inbox.',
+    sectionHeader: {
+      heading: 'Subscribe to the newsletter',
+      supportingText: 'Get new posts in your inbox.',
+      align: null,
+    },
     action: {
       label: 'Subscribe',
       linkType: TLINK_TYPE.EXTERNAL,
@@ -73,7 +75,7 @@ export function makeRawCtaModule(
       platform: null,
       accessibleLabel: null,
     },
-    appearance: null,
+    layout: null,
     ...overrides,
   };
 }
@@ -83,9 +85,12 @@ export function makeRawNewsletterModule(
 ): TRawNewsletterModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    heading: 'Stay in the loop',
-    description: 'Get new posts in your inbox.',
-    appearance: null,
+    sectionHeader: {
+      heading: 'Stay in the loop',
+      supportingText: 'Get new posts in your inbox.',
+      align: null,
+    },
+    layout: null,
     ...overrides,
   };
 }

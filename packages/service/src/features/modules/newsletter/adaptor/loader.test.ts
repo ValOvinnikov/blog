@@ -14,8 +14,10 @@ describe('getNewsletter', () => {
 
     const newsletter = await getNewsletter('newsletter-1');
 
-    expect(newsletter.heading).toBe('Stay in the loop');
-    expect(newsletter.description).toBe('Get new posts in your inbox.');
+    expect(newsletter.sectionHeader.heading).toBe('Stay in the loop');
+    expect(newsletter.sectionHeader.supportingText).toBe(
+      'Get new posts in your inbox.',
+    );
   });
 
   it('propagates when the module document is missing', async () => {

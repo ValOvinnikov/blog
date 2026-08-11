@@ -1,4 +1,5 @@
-import { toAppearance } from '@blog/service/shared/transformers/to-appearance';
+import { toLayout } from '@blog/service/shared/transformers/to-layout';
+import { toRequiredSectionHeader } from '@blog/service/shared/transformers/to-section-header';
 import type { InferResultType } from 'groqd';
 
 import type { newsletterModuleQuery } from './query';
@@ -13,8 +14,7 @@ export function toNewsletterModule(
 ): TNewsletterModule {
   return {
     brandVariant: raw.brandVariant,
-    heading: raw.heading,
-    description: raw.description ?? undefined,
-    appearance: toAppearance(raw.appearance),
+    sectionHeader: toRequiredSectionHeader(raw.sectionHeader),
+    layout: toLayout(raw.layout),
   };
 }

@@ -1,5 +1,6 @@
 import { q } from '@blog/service/sanity/query';
-import { appearanceFragment } from '@blog/service/shared/fragments/appearance';
+import { layoutFragment } from '@blog/service/shared/fragments/layout';
+import { requiredSectionHeaderFragment } from '@blog/service/shared/fragments/section-header';
 
 export const newsletterModuleQuery = q
   .parameters<{ id: string }>()
@@ -8,11 +9,10 @@ export const newsletterModuleQuery = q
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),
-    heading: sub.field('heading').notNull(),
-    description: sub.field('description').nullable(true),
-    appearance: sub
-      .field('appearance')
-      .project(appearanceFragment)
-      .nullable(true),
+    sectionHeader: sub
+      .field('sectionHeader')
+      .project(requiredSectionHeaderFragment)
+      .notNull(),
+    layout: sub.field('layout').project(layoutFragment).nullable(true),
   }))
   .notNull();

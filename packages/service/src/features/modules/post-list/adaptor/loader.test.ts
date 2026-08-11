@@ -15,7 +15,14 @@ describe('getPostList', () => {
     const querySpy = vi.spyOn(postsQuery, 'postListModulePostsQuery');
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostListModule({ title: 'Recent writing', limit: 3 }),
+        makeRawPostListModule({
+          sectionHeader: {
+            heading: 'Recent writing',
+            supportingText: null,
+            align: null,
+          },
+          limit: 3,
+        }),
       )
       .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
 
@@ -23,7 +30,7 @@ describe('getPostList', () => {
 
     // The module's `limit` is threaded into the GROQ posts query.
     expect(querySpy).toHaveBeenCalledWith(3);
-    expect(postList.title).toBe('Recent writing');
+    expect(postList.sectionHeader.heading).toBe('Recent writing');
     expect(postList.posts.map((p) => p.id)).toEqual(['a']);
   });
 
