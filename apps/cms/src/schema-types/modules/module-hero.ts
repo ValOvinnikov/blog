@@ -1,6 +1,7 @@
-import { HERO_FIELD_MODE } from '@blog/config/constants';
+import { BRAND_VARIANT, HERO_FIELD_MODE } from '@blog/config/constants';
 import { postSchema } from '@cms/schema-types/documents/blog/post';
 import { appearanceField } from '@cms/schema-types/helpers/appearance-field';
+import { brandVariantField } from '@cms/schema-types/helpers/brand-variant-field';
 import { defineModeFieldPair } from '@cms/schema-types/helpers/define-mode-field-pair';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { linkSchema } from '@cms/schema-types/objects/link';
@@ -87,6 +88,13 @@ export const heroSchema = defineType({
       title: 'Secondary Action',
       type: linkSchema.name,
       description: 'Optional secondary CTA shown next to the primary action.',
+    }),
+    brandVariantField({
+      list: [
+        BRAND_VARIANT.BRAND_PRIMARY,
+        BRAND_VARIANT.PRIMARY,
+        BRAND_VARIANT.SECONDARY,
+      ],
     }),
     appearanceField,
   ],

@@ -1,4 +1,5 @@
 import { appearanceField } from '@cms/schema-types/helpers/appearance-field';
+import { brandVariantField } from '@cms/schema-types/helpers/brand-variant-field';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { linkSchema } from '@cms/schema-types/objects/link';
 import { Megaphone } from 'lucide-react';
@@ -28,6 +29,7 @@ export const ctaSchema = defineType({
       type: linkSchema.name,
       validation: (rule) => rule.required(),
     }),
+    brandVariantField(),
     appearanceField,
   ],
   preview: {
