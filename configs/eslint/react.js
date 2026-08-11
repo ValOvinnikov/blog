@@ -14,6 +14,7 @@ export default [
       ...react.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
+      'react/jsx-boolean-value': ['error', 'always'],
     },
     // Pin to the installed React version instead of `settings.react.version:
     // 'detect'` — eslint-plugin-react's own detection routine calls a
