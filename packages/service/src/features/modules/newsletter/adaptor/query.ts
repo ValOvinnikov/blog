@@ -7,6 +7,7 @@ export const newsletterModuleQuery = q
   .filterRaw('_id == $id')
   .slice(0)
   .project((sub) => ({
+    brandVariant: sub.field('brandVariant').notNull(),
     heading: sub.field('heading').notNull(),
     description: sub.field('description').nullable(true),
     appearance: sub

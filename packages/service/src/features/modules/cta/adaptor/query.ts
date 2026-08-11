@@ -8,6 +8,7 @@ export const ctaModuleQuery = q
   .filterRaw('_id == $id')
   .slice(0)
   .project((sub) => ({
+    brandVariant: sub.field('brandVariant').notNull(),
     heading: sub.field('heading').notNull(),
     text: sub.field('text').nullable(true),
     action: sub.field('action').project(linkFragment).notNull(),

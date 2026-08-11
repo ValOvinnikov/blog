@@ -9,6 +9,7 @@ export type TRawCtaModule = InferResultType<typeof ctaModuleQuery>;
 
 export function toCtaModule(raw: TRawCtaModule): TCtaModule {
   return {
+    brandVariant: raw.brandVariant,
     heading: raw.heading,
     text: raw.text ?? undefined,
     action: toLink(raw.action),

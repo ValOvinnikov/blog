@@ -1,4 +1,4 @@
-import { HERO_FIELD_MODE } from '@blog/config';
+import { BRAND_VARIANT, HERO_FIELD_MODE } from '@blog/config';
 import { makeRawHeroModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
@@ -6,6 +6,16 @@ import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
 import { toHeroModule } from './transformer';
 
 describe('toHeroModule', () => {
+  it('maps brandVariant straight through', () => {
+    const raw = makeRawHeroModule({
+      brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
+    });
+
+    const hero = toHeroModule(raw, null);
+
+    expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
+  });
+
   it('uses the configured featured post as the fallback source', () => {
     const raw = makeRawHeroModule({
       featuredPost: makeRawPostCard({ _id: 'featured-ref' }),

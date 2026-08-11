@@ -7,6 +7,7 @@ export const postListModuleQuery = q
   .filterRaw('_id == $id')
   .slice(0)
   .project((sub) => ({
+    brandVariant: sub.field('brandVariant').notNull(),
     title: sub.field('title').notNull(),
     limit: sub.field('limit').notNull(),
     appearance: sub

@@ -1,8 +1,19 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { makeRawNewsletterModule } from '@blog/service/testing/modules/fixtures';
 
 import { toNewsletterModule } from './transformer';
 
 describe('toNewsletterModule', () => {
+  it('maps brandVariant straight through', () => {
+    const raw = makeRawNewsletterModule({
+      brandVariant: BRAND_VARIANT.SECONDARY,
+    });
+
+    const newsletter = toNewsletterModule(raw);
+
+    expect(newsletter.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
+  });
+
   it('maps heading and description', () => {
     const raw = makeRawNewsletterModule();
 

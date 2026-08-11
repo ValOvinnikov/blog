@@ -10,7 +10,6 @@ export function toAppearance(
   if (!raw) return undefined;
 
   return {
-    background: raw.background ?? undefined,
     spacingTop: raw.spacingTop ?? undefined,
     spacingBottom: raw.spacingBottom ?? undefined,
     containerWidth: raw.containerWidth ?? undefined,
