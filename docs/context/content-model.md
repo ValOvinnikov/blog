@@ -33,17 +33,16 @@ array.
   UPPERCASE `HERO_FIELD_MODE` const (`CUSTOM`/`NONE`/`POST_CATEGORY`/
   `POST_TITLE`/`POST_EXCERPT`/`POST_IMAGE`), `primaryActionLabel`,
   `secondaryAction` (`link`).
-- `module_postList` (`postListSchema`) — internal `title` (display heading),
-  `limit` (posts to fetch, 1–12).
+- `module_postList` (`postListSchema`) — internal `title`, `sectionHeader`
+  (optional — see below), `limit` (posts to fetch, 1–12).
 - `module_content` (`contentSchema`) — internal `title`, `body` (portable
-  text).
-- `module_cta` (`ctaSchema`) — internal `title`, `heading`, `text`, `action`
-  (`link`, required).
-- `module_newsletter` (`newsletterSchema`) — internal `title`, `heading`
-  (required, max 80), `description` (optional, max 300). `heading`/
-  `description` come from the shared `newsletterContentFields()` helper
-  (`schema-types/helpers/newsletter-content-fields.ts`), reused by
-  `settings_newsletter` below.
+  text). No `sectionHeader` — its rich-text `body` supplies any in-content
+  headings, so a separate structured heading field would just be a second
+  way to do the same thing.
+- `module_cta` (`ctaSchema`) — internal `title`, `sectionHeader` (heading
+  **required**), `action` (`link`, required).
+- `module_newsletter` (`newsletterSchema`) — internal `title`,
+  `sectionHeader` (heading **required**).
 
 Every module document gets a required internal `title` via the reusable
 `titleField` helper (§ below) so it's listable/previewable in Studio
@@ -52,9 +51,13 @@ independent of its display fields, immediately followed by a **required**
 (`schema-types/helpers/brand-variant-field.ts`) — stored values from
 `@blog/config`'s `BRAND_VARIANT` const, `PRIMARY`/`SECONDARY` by default;
 `module_hero` passes the wider `BRAND_PRIMARY`/`PRIMARY`/`SECONDARY` option
-list. Every module document also gets an optional `appearance` field via the
-shared `appearanceField` value (`schema-types/helpers/appearance-field.ts`)
-— see the `appearance` object below.
+list. `module_cta`/`module_postList`/`module_newsletter` also get a
+`sectionHeader` field via the shared `sectionHeaderField({ requireHeading?
+})` helper (`schema-types/helpers/section-header-field.ts`) — see the
+`sectionHeader` object below. Every module document (incl. `module_hero`)
+also gets an optional `layout` field via the shared `layoutField`/
+`heroLayoutField` values (`schema-types/helpers/layout-field.ts`) — see the
+`layout`/`heroLayout` objects below.
 
 **Page documents reference modules**
 
@@ -142,17 +145,28 @@ override bag) + `openGraph`,
 `blockText` / `richText`, `aside` (deep-dive block type registered in
 `richText`'s portable-text array; `kind` from `ASIDE_KIND`, required; `body`
 via `blockText`, required — part of the choose-your-depth reading feature,
-#957), `skim` (see `post` above), `appearance` (five all-optional fields, no
-defaults set at the schema level: `spacingTop`/`spacingBottom`
-(`SPACING_SCALE`), `containerWidth` (`CONTAINER_WIDTH`), `align` (`ALIGN`),
-`divider` (boolean) — attached to every `module_*` document via the shared
-`appearanceField` value; `service`/`apps/web`'s `Section` component decide
-unset-vs-set and rendering defaults). Background is no longer part of
-`appearance` — every `module_*` document instead gets its own standalone,
-**required** `brandVariant` field (`@blog/config`'s `BRAND_VARIANT` const)
-via the shared `brandVariantField()` helper, placed immediately after
-`titleField` in each schema's `fields` array (see "Page-builder modules"
-above).
+#957), `skim` (see `post` above), `layout`/`heroLayout` (all-optional
+fields, no defaults set at the schema level: `spacingTop`/`spacingBottom`
+(`SPACING_SCALE`), `containerWidth` (`CONTAINER_WIDTH`, `layout` only —
+`heroLayout` omits it, Hero's grid always manages its own width),
+`dividerTop`/`dividerBottom` (boolean) — the two types share their
+overlapping fields via `spacingAndDividerFields()` (same
+two-named-types-sharing-a-helper pattern as `imageWithAlt`/`bodyImage`), and
+are attached to every `module_*` document via the shared `layoutField`/
+`heroLayoutField` values; `service`/`apps/web`'s `Section` component decide
+unset-vs-set and rendering defaults), `sectionHeader`/
+`requiredHeadingSectionHeader` (`heading` (string, max 80 — required on the
+`requiredHeadingSectionHeader` variant used by `module_cta`/
+`module_newsletter`, optional on `module_postList`'s plain
+`sectionHeader`), `supportingText` (text, max 300), `align`
+(`HEADING_ALIGN`) — same shared-fields/two-named-types pattern, via
+`sectionHeaderField({ requireHeading? })`; attached to `module_cta`/
+`module_postList`/`module_newsletter` only — `module_content` and
+`module_hero` don't get one). Every `module_*` document gets its own
+standalone, **required** `brandVariant` field (`@blog/config`'s
+`BRAND_VARIANT` const) via the shared `brandVariantField()` helper, placed
+immediately after `titleField` in each schema's `fields` array (see
+"Page-builder modules" above).
 
 **Conventions**
 
