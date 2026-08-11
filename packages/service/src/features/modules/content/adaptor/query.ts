@@ -7,6 +7,7 @@ export const contentModuleQuery = q
   .filterRaw('_id == $id')
   .slice(0)
   .project((sub) => ({
+    brandVariant: sub.field('brandVariant').notNull(),
     title: sub.field('title').notNull(),
     body: sub.field('body[]').notNull(),
     appearance: sub

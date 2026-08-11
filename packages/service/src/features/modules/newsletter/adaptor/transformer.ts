@@ -12,6 +12,7 @@ export function toNewsletterModule(
   raw: TRawNewsletterModule,
 ): TNewsletterModule {
   return {
+    brandVariant: raw.brandVariant,
     heading: raw.heading,
     description: raw.description ?? undefined,
     appearance: toAppearance(raw.appearance),

@@ -17,6 +17,7 @@ export function toPostListModule(
 ): TPostListModule {
   // The posts query already applied `limit` in GROQ, so no JS slice here.
   return {
+    brandVariant: raw.brandVariant,
     title: raw.title,
     posts: rawPosts.map(toPostCard),
     appearance: toAppearance(raw.appearance),

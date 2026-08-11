@@ -1,4 +1,4 @@
-import { HERO_FIELD_MODE, TLINK_TYPE } from '@blog/config';
+import { BRAND_VARIANT, HERO_FIELD_MODE, TLINK_TYPE } from '@blog/config';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
 import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
@@ -9,6 +9,7 @@ export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
 ): TRawHeroModule {
   return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
     featuredPost: null,
     heroEyebrowMode: HERO_FIELD_MODE.POST_CATEGORY,
     heroEyebrow: null,
@@ -29,6 +30,7 @@ export function makeRawPostListModule(
   overrides: Partial<TRawPostListModule> = {},
 ): TRawPostListModule {
   return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
     title: 'Latest',
     limit: 6,
     appearance: null,
@@ -40,6 +42,7 @@ export function makeRawContentModule(
   overrides: Partial<TRawContentModule> = {},
 ): TRawContentModule {
   return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
     title: 'About us',
     body: [
       {
@@ -58,6 +61,7 @@ export function makeRawCtaModule(
   overrides: Partial<TRawCtaModule> = {},
 ): TRawCtaModule {
   return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
     heading: 'Subscribe to the newsletter',
     text: 'Get new posts in your inbox.',
     action: {
@@ -78,6 +82,7 @@ export function makeRawNewsletterModule(
   overrides: Partial<TRawNewsletterModule> = {},
 ): TRawNewsletterModule {
   return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
     heading: 'Stay in the loop',
     description: 'Get new posts in your inbox.',
     appearance: null,

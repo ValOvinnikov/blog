@@ -2,6 +2,7 @@ import type {
   ILink,
   ISanityImage,
   TAppearance,
+  TBrandVariant,
   TMaybeUndefined,
 } from '@blog/config';
 
@@ -18,6 +19,7 @@ type THeroPrimaryAction = Omit<ILink, 'ariaLabel'> & {
 };
 
 export type THeroModule = {
+  brandVariant: TBrandVariant;
   eyebrow: TMaybeUndefined<string>;
   title: TMaybeUndefined<string>;
   subtitle: TMaybeUndefined<string>;

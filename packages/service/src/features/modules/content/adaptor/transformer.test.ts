@@ -1,6 +1,6 @@
 import {
   ALIGN,
-  BACKGROUND_TONE,
+  BRAND_VARIANT,
   CONTAINER_WIDTH,
   SPACING_SCALE,
 } from '@blog/config';
@@ -18,10 +18,17 @@ describe('toContentModule', () => {
     expect(module.body).toHaveLength(1);
   });
 
+  it('maps brandVariant straight through', () => {
+    const raw = makeRawContentModule({ brandVariant: BRAND_VARIANT.SECONDARY });
+
+    const module = toContentModule(raw);
+
+    expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
+  });
+
   it('maps a fully-authored appearance object 1:1', () => {
     const raw = makeRawContentModule({
       appearance: {
-        background: BACKGROUND_TONE.ACCENT_TINT,
         spacingTop: SPACING_SCALE.XL,
         spacingBottom: SPACING_SCALE.NONE,
         containerWidth: CONTAINER_WIDTH.FULL,
@@ -33,7 +40,6 @@ describe('toContentModule', () => {
     const module = toContentModule(raw);
 
     expect(module.appearance).toEqual({
-      background: BACKGROUND_TONE.ACCENT_TINT,
       spacingTop: SPACING_SCALE.XL,
       spacingBottom: SPACING_SCALE.NONE,
       containerWidth: CONTAINER_WIDTH.FULL,
@@ -53,7 +59,6 @@ describe('toContentModule', () => {
   it('leaves an unset sub-field of a partially-authored appearance object undefined (no faked default)', () => {
     const raw = makeRawContentModule({
       appearance: {
-        background: BACKGROUND_TONE.SUBTLE,
         spacingTop: null,
         spacingBottom: null,
         containerWidth: null,
@@ -65,7 +70,6 @@ describe('toContentModule', () => {
     const module = toContentModule(raw);
 
     expect(module.appearance).toEqual({
-      background: BACKGROUND_TONE.SUBTLE,
       spacingTop: undefined,
       spacingBottom: undefined,
       containerWidth: undefined,

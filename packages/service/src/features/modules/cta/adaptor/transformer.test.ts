@@ -1,4 +1,4 @@
-import { ALIGN, BACKGROUND_TONE, CONTAINER_WIDTH } from '@blog/config';
+import { ALIGN, BRAND_VARIANT, CONTAINER_WIDTH } from '@blog/config';
 import { makeRawCtaModule } from '@blog/service/testing/modules/fixtures';
 
 import { toCtaModule } from './transformer';
@@ -20,6 +20,14 @@ describe('toCtaModule', () => {
     });
   });
 
+  it('maps brandVariant straight through', () => {
+    const raw = makeRawCtaModule({ brandVariant: BRAND_VARIANT.SECONDARY });
+
+    const cta = toCtaModule(raw);
+
+    expect(cta.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
+  });
+
   it('leaves text undefined when not set (no faked default)', () => {
     const raw = makeRawCtaModule({ text: null });
 
@@ -31,7 +39,6 @@ describe('toCtaModule', () => {
   it('maps a fully-authored appearance object 1:1', () => {
     const raw = makeRawCtaModule({
       appearance: {
-        background: BACKGROUND_TONE.SURFACE,
         spacingTop: 'LG',
         spacingBottom: 'SM',
         containerWidth: CONTAINER_WIDTH.NARROW,
@@ -43,7 +50,6 @@ describe('toCtaModule', () => {
     const cta = toCtaModule(raw);
 
     expect(cta.appearance).toEqual({
-      background: BACKGROUND_TONE.SURFACE,
       spacingTop: 'LG',
       spacingBottom: 'SM',
       containerWidth: CONTAINER_WIDTH.NARROW,

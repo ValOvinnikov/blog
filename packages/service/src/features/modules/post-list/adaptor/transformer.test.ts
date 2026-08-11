@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 
@@ -17,6 +18,16 @@ describe('toPostListModule', () => {
     // The posts query already applied the limit in GROQ — the transformer maps
     // whatever it is handed, without re-slicing.
     expect(module.posts.map((p) => p.id)).toEqual(['a', 'b']);
+  });
+
+  it('maps brandVariant straight through', () => {
+    const raw = makeRawPostListModule({
+      brandVariant: BRAND_VARIANT.SECONDARY,
+    });
+
+    const module = toPostListModule(raw, []);
+
+    expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
   it('handles an empty post list', () => {

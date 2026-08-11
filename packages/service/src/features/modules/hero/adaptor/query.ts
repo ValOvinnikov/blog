@@ -10,6 +10,7 @@ export const heroModuleQuery = q
   .filterRaw('_id == $id')
   .slice(0)
   .project((sub) => ({
+    brandVariant: sub.field('brandVariant').notNull(),
     featuredPost: sub
       .field('featuredPost')
       .deref()

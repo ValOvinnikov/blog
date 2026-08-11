@@ -48,6 +48,7 @@ export function toHeroModule(
         : heroPost?.heroImageSanity;
 
   return {
+    brandVariant: raw.brandVariant,
     eyebrow: getCustomOrFallback(
       raw.heroEyebrowMode,
       raw.heroEyebrow,
