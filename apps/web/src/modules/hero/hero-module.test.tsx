@@ -1,4 +1,4 @@
-import type { ISanityImage } from '@blog/config';
+import { BRAND_VARIANT, type ISanityImage } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { HeroModule } from './hero-module';
@@ -43,6 +43,7 @@ describe(HeroModule, () => {
     getHeroMock.mockResolvedValue({
       ok: true,
       data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
         eyebrow: undefined,
         title: undefined,
         subtitle: undefined,
@@ -58,10 +59,11 @@ describe(HeroModule, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders the resolved title as the top-level heading', async () => {
+  it('renders the resolved title as the top-level heading, labelling the Section via a unique id derived from the module id', async () => {
     getHeroMock.mockResolvedValue({
       ok: true,
       data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
         eyebrow: undefined,
         title: 'Welcome to the blog',
         subtitle: undefined,
@@ -74,15 +76,22 @@ describe(HeroModule, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Welcome to the blog' }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Welcome to the blog',
+    });
+    expect(heading).toBeVisible();
+    expect(heading).toHaveAttribute('id', 'hero-hero-1');
+
+    const section = heading.closest('section');
+    expect(section).toHaveAttribute('aria-labelledby', 'hero-hero-1');
   });
 
-  it('renders correctly when appearance.background is unset', async () => {
+  it('renders correctly inside the Section appearance wrapper with no appearance authored', async () => {
     getHeroMock.mockResolvedValue({
       ok: true,
       data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
         eyebrow: undefined,
         title: 'Welcome to the blog',
         subtitle: undefined,
@@ -95,18 +104,18 @@ describe(HeroModule, () => {
 
     await setup();
 
-    // Regression guard: `heroBackgroundVariants({ background: undefined })`
-    // must not throw or drop the heading — the resulting background class is
-    // presentation, covered by Storybook/manual check, not asserted here.
+    const wrapper = screen.getByTestId('hero-module-hero-1');
     expect(
       screen.getByRole('heading', { level: 1, name: 'Welcome to the blog' }),
     ).toBeVisible();
+    expect(wrapper.tagName).toBe('SECTION');
   });
 
   it('renders the hero image cropped to a 16:9 (675) height, not 4:3 (900)', async () => {
     getHeroMock.mockResolvedValue({
       ok: true,
       data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
         eyebrow: undefined,
         title: 'Welcome to the blog',
         subtitle: undefined,
@@ -129,6 +138,7 @@ describe(HeroModule, () => {
     getHeroMock.mockResolvedValue({
       ok: true,
       data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
         eyebrow: undefined,
         title: 'Welcome to the blog',
         subtitle: undefined,
@@ -150,6 +160,7 @@ describe(HeroModule, () => {
     getHeroMock.mockResolvedValue({
       ok: true,
       data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
         eyebrow: undefined,
         title: 'Welcome to the blog',
         subtitle: undefined,
@@ -177,6 +188,7 @@ describe(HeroModule, () => {
     getHeroMock.mockResolvedValue({
       ok: true,
       data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
         eyebrow: undefined,
         title: 'Welcome to the blog',
         subtitle: undefined,

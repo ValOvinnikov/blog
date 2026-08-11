@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 
 import { CtaModule } from './cta-module';
@@ -33,6 +34,7 @@ describe(CtaModule, () => {
     getCtaMock.mockResolvedValue({
       ok: true,
       data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
         heading: 'Get started',
         text: undefined,
         action: undefined,
@@ -56,6 +58,7 @@ describe(CtaModule, () => {
     getCtaMock.mockResolvedValue({
       ok: true,
       data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
         heading: 'Get started',
         text: undefined,
         action: undefined,
@@ -77,7 +80,12 @@ describe(CtaModule, () => {
   it('derives a different heading id for a different module id, avoiding duplicate DOM ids', async () => {
     getCtaMock.mockResolvedValue({
       ok: true,
-      data: { heading: 'Join us', text: undefined, action: undefined },
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        heading: 'Join us',
+        text: undefined,
+        action: undefined,
+      },
     });
 
     await setup({ id: 'cta-2' });

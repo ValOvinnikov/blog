@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 
 import { NewsletterModule } from './newsletter-module';
@@ -53,6 +54,7 @@ describe(NewsletterModule, () => {
     getNewsletterMock.mockResolvedValue({
       ok: true,
       data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
         heading: 'Get new posts',
         description: 'Straight to inbox.',
         appearance: undefined,
@@ -69,6 +71,7 @@ describe(NewsletterModule, () => {
     getNewsletterMock.mockResolvedValue({
       ok: true,
       data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
         heading: 'Get new posts',
         description: 'Straight to inbox.',
         appearance: undefined,
@@ -79,5 +82,28 @@ describe(NewsletterModule, () => {
 
     const wrapper = screen.getByTestId('newsletter-module-newsletter-1');
     expect(within(wrapper).getByText('Get new posts')).toBeVisible();
+  });
+
+  it('renders the newsletter form as a direct child of Section, with no wrapping div', async () => {
+    getNewsletterMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        heading: 'Get new posts',
+        description: 'Straight to inbox.',
+        appearance: undefined,
+      },
+    });
+
+    await setup();
+
+    const wrapper = screen.getByTestId('newsletter-module-newsletter-1');
+    expect(wrapper.tagName).toBe('SECTION');
+
+    // `Section`'s own constrained inner div wraps exactly one child — the
+    // newsletter form itself, with no extra module-owned wrapping div in
+    // between (the removed `newsletterModuleVariants` div).
+    const inner = wrapper.firstElementChild;
+    expect(inner?.children).toHaveLength(1);
   });
 });

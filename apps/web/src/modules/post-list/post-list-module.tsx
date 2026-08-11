@@ -1,10 +1,8 @@
 import { service } from '@blog/service';
-import { Section } from '@blog/ui/atoms';
 import { PostsSection } from '@blog/ui/organisms';
+import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { toPostListItems } from '@web/utils/to-post-list-items';
-
-import { postListModuleVariants } from './post-list-module-variants';
 
 export interface IPostListModuleProps {
   id: string;
@@ -13,32 +11,39 @@ export interface IPostListModuleProps {
 
 /**
  * PostListModule — fetches `module_postList` data and renders it through the
- * `PostsSection` organism, wrapped in `Section` for the CMS-authored
- * `appearance`. The only place this module's service and ui meet.
- *
- * `PostsSection` also renders outside the module pipeline (archive pages),
- * where it still owns its own top margin — so that margin is only
- * neutralized here, at this one call site, via `postListModuleVariants`,
- * rather than in `PostsSection` itself (which would regress those other
- * pages).
+ * `PostsSection` organism, wrapped in `Section` (web's sole per-module
+ * landmark) for the CMS-authored `brandVariant`/`appearance`. The only place
+ * this module's service and ui meet.
  */
 export async function PostListModule({ id }: IPostListModuleProps) {
   const result = await service.modules.postList.v1.getPostList(id);
 
   if (!result.ok) return null;
 
-  const { title, posts, appearance } = result.data;
+  const { brandVariant, title, posts, appearance } = result.data;
+  const titleId = `latest-posts-${id}`;
 
   const items = await toPostListItems(posts);
 
+  // No posts resolved (e.g. the referenced/latest posts are unpublished or
+  // filtered to zero) — `PostsSection` renders nothing without an
+  // `emptyMessage`, so skip `Section` entirely rather than emit an empty
+  // landmark whose `aria-labelledby` points at a heading id that never
+  // renders.
+  if (items.length === 0) return null;
+
   return (
-    <Section appearance={appearance} dataTestId={`post-list-module-${id}`}>
+    <Section
+      brandVariant={brandVariant}
+      appearance={appearance}
+      titleId={titleId}
+      dataTestId={`post-list-module-${id}`}
+    >
       <PostsSection
         posts={items}
         title={title}
-        titleId={`latest-posts-${id}`}
+        titleId={titleId}
         linkAs={SmartLink}
-        className={postListModuleVariants()}
       />
     </Section>
   );

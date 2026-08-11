@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { makePostCard } from '@web/testing/shared/post/fixtures';
 
@@ -55,10 +56,32 @@ describe(PostListModule, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
+  it('renders nothing when no posts resolve, never an empty landmark with a dangling aria-labelledby', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        title: 'Latest posts',
+        posts: [],
+        appearance: undefined,
+      },
+    });
+
+    const { container } = await setup();
+
+    expect(container).toBeEmptyDOMElement();
+    expect(container.querySelector('section')).not.toBeInTheDocument();
+  });
+
   it('labels the section with a unique id derived from the module id', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
-      data: { title: 'Latest posts', posts: [post], appearance: undefined },
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        title: 'Latest posts',
+        posts: [post],
+        appearance: undefined,
+      },
     });
 
     const { container } = await setup();
@@ -76,7 +99,12 @@ describe(PostListModule, () => {
   it('renders correctly inside the Section appearance wrapper with no appearance authored', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
-      data: { title: 'Latest posts', posts: [post], appearance: undefined },
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        title: 'Latest posts',
+        posts: [post],
+        appearance: undefined,
+      },
     });
 
     await setup();
@@ -88,7 +116,11 @@ describe(PostListModule, () => {
   it('derives a different section id for a different module id, avoiding duplicate DOM ids', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
-      data: { title: 'More posts', posts: [post] },
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        title: 'More posts',
+        posts: [post],
+      },
     });
 
     await setup({ id: 'post-list-2' });
