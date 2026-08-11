@@ -25,6 +25,7 @@ const meta = {
     onSubmit: () => {},
     status: 'idle',
     heading: '$ subscribe --to weekly',
+    headingId: 'newsletter-signup-full-heading',
     description:
       'New posts on rendering, type systems and the occasional OKLCH rabbit hole. No spam; unsubscribe in one line.',
     submitLabel: 'subscribe ↵',

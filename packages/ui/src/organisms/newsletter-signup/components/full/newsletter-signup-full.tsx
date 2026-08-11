@@ -23,6 +23,7 @@ export interface INewsletterSignupFullProps extends IWithDataTestId {
   onSubmit: () => void;
   status: TFormStatus;
   heading: string;
+  headingId?: string;
   description?: string;
   errorMessage?: string;
   successMessage?: string;
@@ -48,6 +49,7 @@ export const NewsletterSignupFull = ({
   onSubmit,
   status,
   heading,
+  headingId,
   description,
   errorMessage,
   successMessage,
@@ -68,7 +70,9 @@ export const NewsletterSignupFull = ({
     >
       <WindowChrome.Body className={s.body()}>
         <div className={s.pitchPane()}>
-          <h3 className={s.heading()}>{heading}</h3>
+          <h3 id={headingId} className={s.heading()}>
+            {heading}
+          </h3>
           {description && <p className={s.description()}>{description}</p>}
           {trustCues && trustCues.length > 0 && (
             <ul className={s.trustCues()}>
