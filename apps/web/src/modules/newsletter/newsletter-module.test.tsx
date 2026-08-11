@@ -84,6 +84,28 @@ describe(NewsletterModule, () => {
     expect(within(wrapper).getByText('Get new posts')).toBeVisible();
   });
 
+  it('resolves the Section landmark aria-labelledby to the rendered heading id', async () => {
+    getNewsletterMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        heading: 'Get new posts',
+        description: 'Straight to inbox.',
+        appearance: undefined,
+      },
+    });
+
+    const { container } = await setup();
+
+    const section = container.querySelector('section');
+    const labelledBy = section?.getAttribute('aria-labelledby');
+
+    expect(labelledBy).toBe('newsletter-newsletter-1');
+    expect(document.getElementById(labelledBy ?? '')).toHaveTextContent(
+      'Get new posts',
+    );
+  });
+
   it('renders the newsletter form as a direct child of Section, with no wrapping div', async () => {
     getNewsletterMock.mockResolvedValue({
       ok: true,

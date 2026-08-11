@@ -13,6 +13,8 @@ type TNewsletterFormProps = {
   /** `full` (Blog index page-builder module) vs `compact` (post page foot) — see `NewsletterSignup`'s two densities. */
   variant: 'full' | 'compact';
   heading: string;
+  /** Forwarded to the rendered heading's `id`, so an outer landmark's `aria-labelledby` can resolve to it. */
+  headingId?: string;
   /** Ignored for `variant="compact"` — that density has no room for a description. */
   description?: string;
   className?: string;
@@ -54,6 +56,7 @@ type TNewsletterFormProps = {
 export function NewsletterForm({
   variant,
   heading,
+  headingId,
   description,
   className,
 }: TNewsletterFormProps) {
@@ -108,6 +111,7 @@ export function NewsletterForm({
     onSubmit: handleSubmit,
     status,
     heading,
+    headingId,
     errorMessage,
     successMessage: t('successMessage'),
     submitLabel: t('submitLabel'),

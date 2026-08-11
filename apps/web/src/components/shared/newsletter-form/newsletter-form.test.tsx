@@ -150,6 +150,23 @@ describe(`<${NewsletterForm.name}/>`, () => {
     );
   });
 
+  it('forwards headingId to the rendered heading (full variant)', () => {
+    setup({ headingId: 'newsletter-module-heading' });
+
+    expect(
+      screen.getByRole('heading', { name: 'Get new posts by email' }),
+    ).toHaveAttribute('id', 'newsletter-module-heading');
+  });
+
+  it('forwards headingId to the rendered heading (compact variant)', () => {
+    setup({ variant: 'compact', headingId: 'newsletter-compact-heading' });
+
+    expect(screen.getByText('Get new posts by email')).toHaveAttribute(
+      'id',
+      'newsletter-compact-heading',
+    );
+  });
+
   it('renders the compact variant without a description', () => {
     setup({ variant: 'compact', description: 'ignored in compact' });
 
