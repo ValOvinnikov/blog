@@ -22,9 +22,9 @@ export type Module_newsletter = {
   _updatedAt: string;
   _rev: string;
   title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
   heading?: string;
   description?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
   appearance?: Appearance;
 };
 
@@ -35,10 +35,10 @@ export type Module_cta = {
   _updatedAt: string;
   _rev: string;
   title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
   heading?: string;
   text?: string;
   action?: Link;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
   appearance?: Appearance;
 };
 
@@ -102,8 +102,8 @@ export type Module_content = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  body?: RichText;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
+  body?: RichText;
   appearance?: Appearance;
 };
 
@@ -144,8 +144,8 @@ export type Module_postList = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  limit?: number;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
+  limit?: number;
   appearance?: Appearance;
 };
 
@@ -385,6 +385,7 @@ export type Module_hero = {
   _updatedAt: string;
   _rev: string;
   title?: string;
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   featuredPost?: Blog_postReference;
   heroEyebrowMode?: 'POST_CATEGORY' | 'CUSTOM';
   heroEyebrow?: string;
@@ -396,7 +397,6 @@ export type Module_hero = {
   heroImage?: ImageWithAlt;
   primaryActionLabel?: string;
   secondaryAction?: Link;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   appearance?: Appearance;
 };
 
