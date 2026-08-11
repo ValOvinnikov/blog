@@ -12,34 +12,28 @@ export interface ICtaModuleProps {
  * CtaModule — fetches `module_cta` data and renders it through the `CtaModule`
  * ui organism, with the action link built from a `SmartLink`, wrapped in
  * `Section` (web's sole per-module landmark) for the CMS-authored
- * `brandVariant`/`appearance`. The only place this module's service and ui
- * meet.
- *
- * `CtaModuleUi`'s own vertical spacing (`mt-[22px] py-section`) is
- * neutralized via its `wrapped` prop — `Section` now owns that spacing
- * (`appearance.spacingTop`/`spacingBottom`), and the two would otherwise
- * stack. Its `px-gutter` is untouched: `Section` adds no horizontal padding
- * of its own.
+ * `brandVariant`/`layout`. The only place this module's service and ui meet.
  */
 export async function CtaModule({ id }: ICtaModuleProps) {
   const result = await service.modules.cta.v1.getCta(id);
 
   if (!result.ok) return null;
 
-  const { brandVariant, heading, text, action, appearance } = result.data;
+  const { brandVariant, sectionHeader, action, layout } = result.data;
   const titleId = `cta-${id}`;
 
   return (
     <Section
       brandVariant={brandVariant}
-      appearance={appearance}
+      layout={layout}
       titleId={titleId}
       dataTestId={`cta-module-${id}`}
     >
       <CtaModuleUi
-        heading={heading}
+        heading={sectionHeader.heading}
         headingId={titleId}
-        text={text}
+        supportingText={sectionHeader.supportingText}
+        align={sectionHeader.align}
         action={
           action ? (
             <SmartLink href={action.href} target={action.target}>

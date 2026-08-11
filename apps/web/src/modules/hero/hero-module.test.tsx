@@ -70,7 +70,7 @@ describe(HeroModule, () => {
         sanityImage: undefined,
         primaryAction: undefined,
         secondaryAction: undefined,
-        appearance: undefined,
+        layout: undefined,
       },
     });
 
@@ -87,7 +87,7 @@ describe(HeroModule, () => {
     expect(section).toHaveAttribute('aria-labelledby', 'hero-hero-1');
   });
 
-  it('renders correctly inside the Section appearance wrapper with no appearance authored', async () => {
+  it('renders correctly inside the Section layout wrapper with no layout authored', async () => {
     getHeroMock.mockResolvedValue({
       ok: true,
       data: {
@@ -98,7 +98,7 @@ describe(HeroModule, () => {
         sanityImage: undefined,
         primaryAction: undefined,
         secondaryAction: undefined,
-        appearance: undefined,
+        layout: undefined,
       },
     });
 

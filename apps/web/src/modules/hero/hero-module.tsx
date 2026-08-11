@@ -16,7 +16,7 @@ export interface IHeroModuleProps {
 /**
  * HeroModule — fetches `module_hero` data and renders it through the `Hero`
  * organism, wrapped in `Section` (web's sole per-module landmark) for the
- * CMS-authored `brandVariant`/`appearance`. The only place this module's
+ * CMS-authored `brandVariant`/`layout`. The only place this module's
  * service and ui meet.
  */
 export async function HeroModule({ id }: IHeroModuleProps) {
@@ -32,7 +32,7 @@ export async function HeroModule({ id }: IHeroModuleProps) {
     sanityImage,
     primaryAction,
     secondaryAction,
-    appearance,
+    layout,
   } = result.data;
 
   // No title resolved from CMS config or fallback featured post — never
@@ -44,7 +44,7 @@ export async function HeroModule({ id }: IHeroModuleProps) {
   return (
     <Section
       brandVariant={brandVariant}
-      appearance={appearance}
+      layout={layout}
       titleId={titleId}
       dataTestId={`hero-module-${id}`}
     >

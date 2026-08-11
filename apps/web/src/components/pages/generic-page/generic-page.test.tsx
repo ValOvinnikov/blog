@@ -55,6 +55,29 @@ describe(`<${GenericPage.name}/>`, () => {
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
+  it('renders the page title as the h1', async () => {
+    getPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        title: 'About Us',
+        slug: 'about-us',
+        modules: [],
+        seo: makeSeo({
+          title: 'About Us',
+          description: 'Who we are.',
+          ogTitle: 'About Us',
+          ogDescription: 'Who we are.',
+        }),
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'About Us' }),
+    ).toBeInTheDocument();
+  });
+
   it('renders the ModuleRenderer with the fetched modules', async () => {
     getPageMock.mockResolvedValue({
       ok: true,

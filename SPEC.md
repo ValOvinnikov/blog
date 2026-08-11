@@ -150,31 +150,51 @@ Every `module_*` document also carries a **required** `brandVariant` field
 (stored values from `@blog/config`'s `BRAND_VARIANT` const —
 `PRIMARY`/`SECONDARY` for `module_content`/`module_cta`/`module_newsletter`/
 `module_postList`; `module_hero`'s schema additionally allows
-`BRAND_PRIMARY`), plus an optional, all-remaining-fields-optional `appearance`
-object (`spacingTop`/`spacingBottom`, `containerWidth`, `align`, `divider` —
-stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`/`ALIGN` consts;
-`background` was removed from this object, replaced by the standalone
-`brandVariant` field). `service.modules.<type>.v1` projects `brandVariant` as
-a required `TBrandVariantOf<...>` (narrowed per module to exactly the
-options its schema allows) and `appearance` as `TAppearance | undefined`,
-with no faked defaults on `appearance` — unset stays unset end to end. In
-`apps/web`, every module component that renders a `@blog/ui` organism —
-including `module_hero` (rendered via its own dedicated template slot,
-outside `MODULE_MAP`'s generic `ModuleRenderer` pipeline (§5 above) — but
-still styled the same way as every other module now), no exception — wraps
-it in `apps/web`'s own `Section` component (`apps/web/src/components/shared/
-section`, relocated from `packages/ui`), passing `brandVariant` and
-`appearance` straight through. `Section` always renders a real `<section>`
-(no polymorphism); its outer element owns the full-bleed background (driven
-by `brandVariant`) and vertical spacing as padding, not margin, so stacked
-`Section`s tile edge-to-edge; its inner `<div>` owns `mx-auto` + gutter +
-`align` + `containerWidth`'s max-width, holding the wrapped organism as bare
-content (the four other organisms — `content-module`/`cta-module`/
-`posts-section`/`hero` — no longer render their own `<section>` landmark;
-`Section` is the sole landmark owner for every module).
+`BRAND_PRIMARY`), plus an optional, all-remaining-fields-optional `layout`
+object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
+`module_hero`, which uses the leaner `heroLayout` type), `dividerTop`,
+`dividerBottom` — stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`
+consts; there is no `align` field on `layout` — see `SectionHeader` below
+for heading alignment). `module_cta`/`module_postList`/`module_newsletter`
+additionally carry a `sectionHeader` object (`heading`, `supportingText`,
+`align` — stored values from `HEADING_ALIGN`; all optional on
+`module_postList`, `heading` required on `module_cta`/`module_newsletter`
+via a per-module `requireHeading` override on the shared
+`sectionHeaderField()` helper). `module_content` has no `sectionHeader` —
+its rich-text `body` supplies any in-content headings, so a separate
+structured heading field would just be a second way to do the same thing.
+`module_hero` has no `sectionHeader` either — its heading fields are its
+own dedicated schema, unrelated to this shared shape.
+
+`service.modules.<type>.v1` projects `brandVariant` as a required
+`TBrandVariantOf<...>` (narrowed per module to exactly the options its
+schema allows), `layout` as `TLayout | undefined`, and (where applicable)
+`sectionHeader` as `TSectionHeader | undefined` — with no faked defaults on
+either: unset stays unset end to end. In `apps/web`, every module component
+that renders a `@blog/ui` organism — including `module_hero` (rendered via
+its own dedicated template slot, outside `MODULE_MAP`'s generic
+`ModuleRenderer` pipeline (§5 above) — but still styled the same way as
+every other module now), no exception — wraps it in `apps/web`'s own
+`Section` component (`apps/web/src/components/shared/section`, relocated
+from `packages/ui`), passing `brandVariant` and `layout` straight through,
+plus an optional `titleId` (the module's heading element id, when it has
+one). `Section` always renders a real `<section>`; its outer element owns
+the full-bleed background (driven by `brandVariant`) and vertical spacing as
+responsive padding (not margin, so stacked `Section`s tile edge-to-edge; the
+`spacingTop`/`spacingBottom` scale steps down at each Tailwind breakpoint,
+`px-gutter` unaffected), plus `dividerTop`/`dividerBottom` border rules; its
+inner `<div>` owns `mx-auto` + gutter + `containerWidth`'s max-width,
+holding the wrapped organism as bare content (the four other organisms —
+`content-module`/`cta-module`/`posts-section`/`hero` — no longer render
+their own `<section>` landmark; `Section` is the sole landmark owner for
+every module). `titleId` is optional — `aria-labelledby` is only rendered
+when supplied, so a module with no unique heading (`module_content`) gets a
+landmark with no accessible-name fallback rather than pointing at an element
+that never renders.
 
 Full schema reference (every document/object, field-by-field), naming and
-validation conventions, incl. the `appearance` object's own field list:
+validation conventions, incl. the `layout`/`sectionHeader` objects' own
+field lists:
 [`docs/context/content-model.md`](./docs/context/content-model.md).
 
 ## 7. Environment & configuration

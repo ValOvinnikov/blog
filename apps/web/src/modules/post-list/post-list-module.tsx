@@ -12,7 +12,7 @@ export interface IPostListModuleProps {
 /**
  * PostListModule — fetches `module_postList` data and renders it through the
  * `PostsSection` organism, wrapped in `Section` (web's sole per-module
- * landmark) for the CMS-authored `brandVariant`/`appearance`. The only place
+ * landmark) for the CMS-authored `brandVariant`/`layout`. The only place
  * this module's service and ui meet.
  */
 export async function PostListModule({ id }: IPostListModuleProps) {
@@ -20,7 +20,7 @@ export async function PostListModule({ id }: IPostListModuleProps) {
 
   if (!result.ok) return null;
 
-  const { brandVariant, title, posts, appearance } = result.data;
+  const { brandVariant, sectionHeader, posts, layout } = result.data;
   const titleId = `latest-posts-${id}`;
 
   const items = await toPostListItems(posts);
@@ -35,16 +35,18 @@ export async function PostListModule({ id }: IPostListModuleProps) {
   return (
     <Section
       brandVariant={brandVariant}
-      appearance={appearance}
+      layout={layout}
       titleId={titleId}
       dataTestId={`post-list-module-${id}`}
     >
       <PostsSection
         posts={items}
-        title={title}
+        title={sectionHeader.heading ?? 'Latest posts'}
         titleId={titleId}
+        supportingText={sectionHeader.supportingText}
+        align={sectionHeader.align}
         linkAs={SmartLink}
-        wrapped
+        wrapped={true}
       />
     </Section>
   );

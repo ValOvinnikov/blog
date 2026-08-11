@@ -1,5 +1,6 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
+import { Heading } from '@blog/ui/atoms';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
@@ -20,10 +21,14 @@ const s = genericPageVariants();
  * GenericPage — `/{slug}` composition for standalone `page_generic`
  * documents: fetches the page via `service.pages.generic.v1.getPage`,
  * renders a `Home › {title}` `Breadcrumbs` trail (plus its `BreadcrumbList`
- * JSON-LD) inside a `BreadcrumbBar` sibling before `<main>`, then renders
- * its `modules[]` through the shared `ModuleRenderer` — each module owns its
- * own full-bleed background/width via `Section`, so `<main>` here is an
- * unconstrained root. `Header`/`Footer` stay owned by `[locale]/layout.tsx`.
+ * JSON-LD) inside a `BreadcrumbBar` sibling before `<main>`, then its own
+ * `title` as the page's `<h1>` — `page_generic` documents allow only
+ * `module_content`/`module_cta` modules, neither of which renders a heading
+ * of its own, so this page-level `<h1>` is the only heading guaranteed to
+ * exist — before rendering `modules[]` through the shared `ModuleRenderer`.
+ * Each module owns its own full-bleed background/width via `Section`, so
+ * `<main>` here is otherwise an unconstrained root. `Header`/`Footer` stay
+ * owned by `[locale]/layout.tsx`.
  */
 export async function GenericPage({ slug, locale }: TGenericPageProps) {
   const [result, breadcrumbsT] = await Promise.all([
@@ -57,6 +62,9 @@ export async function GenericPage({ slug, locale }: TGenericPageProps) {
       </BreadcrumbBar>
 
       <main className={s.root()}>
+        <Heading level={1} visual="section" className={s.heading()}>
+          {title}
+        </Heading>
         <ModuleRenderer modules={modules} locale={locale} />
       </main>
     </>

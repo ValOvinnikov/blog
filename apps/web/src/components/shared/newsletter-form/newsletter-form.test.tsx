@@ -167,8 +167,8 @@ describe(`<${NewsletterForm.name}/>`, () => {
     );
   });
 
-  it('renders the compact variant without a description', () => {
-    setup({ variant: 'compact', description: 'ignored in compact' });
+  it('renders the compact variant without supporting text', () => {
+    setup({ variant: 'compact', supportingText: 'ignored in compact' });
 
     expect(screen.queryByText('ignored in compact')).not.toBeInTheDocument();
     expect(
@@ -176,8 +176,8 @@ describe(`<${NewsletterForm.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders the full variant with a description', () => {
-    setup({ description: 'Subscribe for updates.' });
+  it('renders the full variant with supporting text', () => {
+    setup({ supportingText: 'Subscribe for updates.' });
 
     expect(screen.getByText('Subscribe for updates.')).toBeVisible();
   });
