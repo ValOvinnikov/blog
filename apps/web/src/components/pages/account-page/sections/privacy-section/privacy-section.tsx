@@ -54,7 +54,7 @@ export async function PrivacySection() {
             as={SmartLink}
             href={routes.accountExport()}
             prefetch={false}
-            download
+            download={true}
             variant="ghost"
           >
             {t('exportButton')}

@@ -49,7 +49,7 @@ export default async function RootLayout({ children }: TProps) {
     <html
       lang={LOCALE_ISO_CODES.EN.toLowerCase()}
       className={buildRootHtmlClassName(FONT_VARIABLE_CLASS_NAMES, variant)}
-      suppressHydrationWarning
+      suppressHydrationWarning={true}
     >
       <head>
         <script

@@ -47,7 +47,7 @@ export async function CtaModule({ id }: ICtaModuleProps) {
             </SmartLink>
           ) : null
         }
-        wrapped
+        wrapped={true}
       />
     </Section>
   );

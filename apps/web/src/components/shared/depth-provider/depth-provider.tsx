@@ -137,7 +137,11 @@ export const DepthProvider = ({
 
   return (
     <DepthContext.Provider value={{ depth, setDepth }}>
-      <div className={s.root()} data-depth={depth} suppressHydrationWarning>
+      <div
+        className={s.root()}
+        data-depth={depth}
+        suppressHydrationWarning={true}
+      >
         {shouldRenderBootstrapScript && (
           <script
             dangerouslySetInnerHTML={{

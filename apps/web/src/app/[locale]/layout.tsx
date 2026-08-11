@@ -195,7 +195,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                       dataTestId="rss-icon"
                     />
                   }
-                  hideLabel
+                  hideLabel={true}
                 >
                   {t('feedLinkLabel')}
                 </NavLink>

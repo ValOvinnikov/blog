@@ -211,7 +211,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
                     width={1200}
                     height={675}
                     sizes="(min-width: 1024px) 800px, 100vw"
-                    priority
+                    priority={true}
                     alt={heroImageAlt}
                     className={s.coverImage()}
                   />
@@ -256,7 +256,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
             title={blogPostT('relatedReading')}
             titleId="related-posts-title"
             linkAs={SmartLink}
-            tinted
+            tinted={true}
           />
         )}
       </main>
