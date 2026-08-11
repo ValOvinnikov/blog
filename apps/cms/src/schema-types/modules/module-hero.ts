@@ -15,6 +15,13 @@ export const heroSchema = defineType({
   icon: Sparkles,
   fields: [
     titleField(),
+    brandVariantField({
+      list: [
+        BRAND_VARIANT.BRAND_PRIMARY,
+        BRAND_VARIANT.PRIMARY,
+        BRAND_VARIANT.SECONDARY,
+      ],
+    }),
     defineField({
       name: 'featuredPost',
       title: 'Featured Post',
@@ -88,13 +95,6 @@ export const heroSchema = defineType({
       title: 'Secondary Action',
       type: linkSchema.name,
       description: 'Optional secondary CTA shown next to the primary action.',
-    }),
-    brandVariantField({
-      list: [
-        BRAND_VARIANT.BRAND_PRIMARY,
-        BRAND_VARIANT.PRIMARY,
-        BRAND_VARIANT.SECONDARY,
-      ],
     }),
     appearanceField,
   ],

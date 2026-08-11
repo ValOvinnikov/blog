@@ -11,6 +11,7 @@ export const postListSchema = defineType({
   icon: List,
   fields: [
     titleField({ description: 'Display heading for this list.' }),
+    brandVariantField(),
     defineField({
       name: 'limit',
       title: 'Limit',
@@ -18,7 +19,6 @@ export const postListSchema = defineType({
       description: 'Maximum number of posts to show.',
       validation: (rule) => rule.required().integer().min(1).max(12),
     }),
-    brandVariantField(),
     appearanceField,
   ],
   preview: {

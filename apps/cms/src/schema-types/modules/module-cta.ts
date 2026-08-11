@@ -12,6 +12,7 @@ export const ctaSchema = defineType({
   icon: Megaphone,
   fields: [
     titleField(),
+    brandVariantField(),
     defineField({
       name: 'heading',
       title: 'Heading',
@@ -29,7 +30,6 @@ export const ctaSchema = defineType({
       type: linkSchema.name,
       validation: (rule) => rule.required(),
     }),
-    brandVariantField(),
     appearanceField,
   ],
   preview: {

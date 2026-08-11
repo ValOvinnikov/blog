@@ -12,8 +12,8 @@ export const newsletterSchema = defineType({
   icon: Mail,
   fields: [
     titleField({ description: 'Internal label shown in the Studio.' }),
-    ...newsletterContentFields(),
     brandVariantField(),
+    ...newsletterContentFields(),
     appearanceField,
   ],
   preview: {

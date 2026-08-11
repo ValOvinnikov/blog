@@ -12,6 +12,7 @@ export const contentSchema = defineType({
   icon: FileText,
   fields: [
     titleField(),
+    brandVariantField(),
     defineField({
       name: 'body',
       title: 'Body',
@@ -20,7 +21,6 @@ export const contentSchema = defineType({
         'Page content — supports rich text, images, and code blocks.',
       validation: (rule) => rule.required(),
     }),
-    brandVariantField(),
     appearanceField,
   ],
   preview: {

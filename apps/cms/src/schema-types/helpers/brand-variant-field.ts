@@ -1,5 +1,4 @@
-import type { TBrandVariant } from '@blog/config';
-import { BRAND_VARIANT } from '@blog/config/constants';
+import { BRAND_VARIANT, type TBrandVariant } from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils';
 import { defineField } from 'sanity';
 
