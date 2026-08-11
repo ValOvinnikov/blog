@@ -1,9 +1,4 @@
-import {
-  ALIGN,
-  BACKGROUND_TONE,
-  CONTAINER_WIDTH,
-  SPACING_SCALE,
-} from '@blog/config/constants';
+import { ALIGN, CONTAINER_WIDTH, SPACING_SCALE } from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils';
 import { EnabledStateBooleanInput } from '@cms/schema-types/components/enabled-state-boolean-input';
 import { SlidersHorizontal } from 'lucide-react';
@@ -24,19 +19,6 @@ export const appearanceSchema = defineType({
   icon: SlidersHorizontal,
   options: { collapsible: true, collapsed: true },
   fields: [
-    defineField({
-      name: 'background',
-      title: 'Background',
-      type: 'string',
-      description:
-        'Background tone for this section. Leave unset for the default page background.',
-      options: {
-        list: Object.values(BACKGROUND_TONE).map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
-      },
-    }),
     defineField({
       name: 'spacingTop',
       title: 'Spacing Top',

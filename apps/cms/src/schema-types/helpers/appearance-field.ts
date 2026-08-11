@@ -6,5 +6,5 @@ export const appearanceField = defineField({
   title: 'Appearance',
   type: appearanceSchema.name,
   description:
-    'Optional visual overrides — background, spacing, container width, alignment, divider.',
+    'Optional visual overrides — spacing, container width, alignment, divider.',
 });

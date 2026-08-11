@@ -55,6 +55,23 @@
         },
         "optional": true
       },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            }
+          ]
+        },
+        "optional": true
+      },
       "appearance": {
         "type": "objectAttribute",
         "value": {
@@ -126,6 +143,23 @@
         "value": {
           "type": "inline",
           "name": "link"
+        },
+        "optional": true
+      },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            }
+          ]
         },
         "optional": true
       },
@@ -444,6 +478,23 @@
         },
         "optional": true
       },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            }
+          ]
+        },
+        "optional": true
+      },
       "appearance": {
         "type": "objectAttribute",
         "value": {
@@ -717,6 +768,23 @@
         "type": "objectAttribute",
         "value": {
           "type": "number"
+        },
+        "optional": true
+      },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            }
+          ]
         },
         "optional": true
       },
@@ -1396,35 +1464,6 @@
             "type": "string",
             "value": "appearance"
           }
-        },
-        "background": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "DEFAULT"
-              },
-              {
-                "type": "string",
-                "value": "SUBTLE"
-              },
-              {
-                "type": "string",
-                "value": "SURFACE"
-              },
-              {
-                "type": "string",
-                "value": "ACCENT_TINT"
-              },
-              {
-                "type": "string",
-                "value": "INVERSE"
-              }
-            ]
-          },
-          "optional": true
         },
         "spacingTop": {
           "type": "objectAttribute",
@@ -2326,6 +2365,27 @@
         "value": {
           "type": "inline",
           "name": "link"
+        },
+        "optional": true
+      },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            }
+          ]
         },
         "optional": true
       },

@@ -24,6 +24,7 @@ export type Module_newsletter = {
   title?: string;
   heading?: string;
   description?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
   appearance?: Appearance;
 };
 
@@ -37,6 +38,7 @@ export type Module_cta = {
   heading?: string;
   text?: string;
   action?: Link;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
   appearance?: Appearance;
 };
 
@@ -101,6 +103,7 @@ export type Module_content = {
   _rev: string;
   title?: string;
   body?: RichText;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
   appearance?: Appearance;
 };
 
@@ -142,6 +145,7 @@ export type Module_postList = {
   _rev: string;
   title?: string;
   limit?: number;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
   appearance?: Appearance;
 };
 
@@ -241,7 +245,6 @@ export type ImageWithAlt = {
 
 export type Appearance = {
   _type: 'appearance';
-  background?: 'DEFAULT' | 'SUBTLE' | 'SURFACE' | 'ACCENT_TINT' | 'INVERSE';
   spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
@@ -393,6 +396,7 @@ export type Module_hero = {
   heroImage?: ImageWithAlt;
   primaryActionLabel?: string;
   secondaryAction?: Link;
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   appearance?: Appearance;
 };
 

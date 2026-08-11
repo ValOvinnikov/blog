@@ -1,4 +1,5 @@
 import { appearanceField } from '@cms/schema-types/helpers/appearance-field';
+import { brandVariantField } from '@cms/schema-types/helpers/brand-variant-field';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { List } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -10,6 +11,7 @@ export const postListSchema = defineType({
   icon: List,
   fields: [
     titleField({ description: 'Display heading for this list.' }),
+    brandVariantField(),
     defineField({
       name: 'limit',
       title: 'Limit',

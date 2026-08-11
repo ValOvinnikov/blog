@@ -1,4 +1,5 @@
 import { appearanceField } from '@cms/schema-types/helpers/appearance-field';
+import { brandVariantField } from '@cms/schema-types/helpers/brand-variant-field';
 import { newsletterContentFields } from '@cms/schema-types/helpers/newsletter-content-fields';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { Mail } from 'lucide-react';
@@ -11,6 +12,7 @@ export const newsletterSchema = defineType({
   icon: Mail,
   fields: [
     titleField({ description: 'Internal label shown in the Studio.' }),
+    brandVariantField(),
     ...newsletterContentFields(),
     appearanceField,
   ],
