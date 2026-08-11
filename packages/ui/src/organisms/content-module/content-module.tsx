@@ -7,11 +7,7 @@ import {
 } from './content-module-variants';
 
 export interface IContentModuleProps
-  extends
-    Omit<ComponentPropsWithoutRef<'div'>, 'children' | 'title'>,
-    IWithDataTestId {
-  title?: string;
-  titleId?: string;
+  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
   children: ReactNode;
   /**
    * Drops this component's own top margin. Set when a parent (e.g. `Section`)
@@ -22,12 +18,11 @@ export interface IContentModuleProps
 
 /**
  * ContentModule — page-builder organism rendering a portable-text content
- * block behind an optional heading. The web layer owns Portable Text
- * rendering and passes the rendered node as `children`.
+ * block. Renders no heading of its own — `body` is free-form rich text that
+ * can carry its own headings, so a separate structured heading field would
+ * just be a second way to do the same thing.
  */
 export const ContentModule = ({
-  title,
-  titleId,
   children,
   className,
   dataTestId,
@@ -42,11 +37,6 @@ export const ContentModule = ({
       data-testid={dataTestId}
       {...rest}
     >
-      {title && (
-        <h2 id={titleId} className={s.heading()}>
-          {title}
-        </h2>
-      )}
       <div className={s.body()}>{children}</div>
     </div>
   );

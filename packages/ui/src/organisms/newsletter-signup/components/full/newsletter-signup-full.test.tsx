@@ -21,13 +21,13 @@ const baseArgs = {
 const setup = customRender(NewsletterSignupFull, baseArgs);
 
 describe(`<${NewsletterSignupFull.name}/>`, () => {
-  it('renders the heading and description by default', () => {
+  it('renders the heading and supportingText by default', () => {
     const heading = faker.lorem.sentence(3);
-    const description = faker.lorem.sentence(8);
-    setup({ heading, description });
+    const supportingText = faker.lorem.sentence(8);
+    setup({ heading, supportingText });
 
     expect(screen.getByRole('heading', { name: heading })).toBeVisible();
-    expect(screen.getByText(description)).toBeVisible();
+    expect(screen.getByText(supportingText)).toBeVisible();
   });
 
   it('assigns headingId to the heading element when provided', () => {

@@ -8,8 +8,6 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
   args: {
-    title: 'About this project',
-    titleId: 'content-module-title',
     children: (
       <>
         <p>
@@ -30,13 +28,6 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
-
-export const WithoutTitle: TStory = {
-  args: {
-    title: undefined,
-    titleId: undefined,
-  },
-};
 
 export const Wrapped: TStory = {
   args: {

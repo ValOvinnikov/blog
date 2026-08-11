@@ -37,6 +37,19 @@ describe(`<${PostsSection.name}/>`, () => {
     ).toBeVisible();
   });
 
+  it('renders supportingText under the heading when provided', () => {
+    const supportingText = faker.lorem.sentence();
+    setup({ supportingText });
+
+    expect(screen.getByText(supportingText)).toBeVisible();
+  });
+
+  it('does not render supportingText when omitted', () => {
+    setup();
+
+    expect(screen.queryByText(faker.lorem.sentence())).not.toBeInTheDocument();
+  });
+
   it('renders a PostCard for each post', () => {
     setup();
 

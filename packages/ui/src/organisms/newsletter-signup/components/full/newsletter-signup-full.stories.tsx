@@ -1,6 +1,8 @@
-import { ICONS, Size } from '@blog/config';
+import { HEADING_ALIGN, ICONS, Size } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/organisms/newsletter-signup/newsletter-signup';
+import { newsletterSignupVariants } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
+import { objectKeys } from '@blog/utils';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const trustCues = [
@@ -19,6 +21,12 @@ const meta = {
   component: NewsletterSignup.Full,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
+  argTypes: {
+    align: {
+      control: 'select',
+      options: objectKeys(newsletterSignupVariants.variants.align),
+    },
+  },
   args: {
     email: '',
     onChange: () => {},
@@ -26,7 +34,7 @@ const meta = {
     status: 'idle',
     heading: '$ subscribe --to weekly',
     headingId: 'newsletter-signup-full-heading',
-    description:
+    supportingText:
       'New posts on rendering, type systems and the occasional OKLCH rabbit hole. No spam; unsubscribe in one line.',
     submitLabel: 'subscribe ↵',
     emailAriaLabel: 'Email address',
@@ -63,6 +71,10 @@ export const Error: TStory = {
 
 export const WithTrustCues: TStory = {
   args: { trustCues },
+};
+
+export const Centered: TStory = {
+  args: { align: HEADING_ALIGN.CENTER, trustCues },
 };
 
 // The pitch/form panes collapse from two columns to one at a real `md:`

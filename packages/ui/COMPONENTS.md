@@ -247,14 +247,14 @@ the `/bookmarks` page's terminal directory-listing body, styled as `ls -l` outpu
 Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?: ReactNode · linkAs?: TAnchorElementType · className?: string _(extends IWithDataTestId)_
 
 ### ContentModule — `organisms/content-module/content-module.tsx`
-page-builder organism rendering a portable-text content block behind an optional heading.
-Props: title?: string · titleId?: string · children: ReactNode · wrapped?: TContentModuleVariants['wrapped'] _(extends Omit<ComponentPropsWithoutRef<'div'>, 'children…, IWithDataTestId)_
+page-builder organism rendering a portable-text content block.
+Props: children: ReactNode · wrapped?: TContentModuleVariants['wrapped'] _(extends Omit<ComponentPropsWithoutRef<'div'>, 'children…, IWithDataTestId)_
 Variants: wrapped: (boolean)
 
 ### CtaModule — `organisms/cta-module/cta-module.tsx`
-page-builder organism rendering a heading, optional supporting text, and an optional action slot.
-Props: heading: string · headingId?: string · text?: string · action?: ReactNode · wrapped?: TCtaModuleVariants['wrapped'] _(extends Omit<ComponentPropsWithoutRef<'div'>, 'children…, IWithDataTestId)_
-Variants: wrapped: (boolean)
+page-builder organism rendering an optional heading, optional supporting text, and an optional action slot.
+Props: heading?: string · headingId?: string · supportingText?: string · action?: ReactNode · align?: TCtaModuleVariants['align'] · wrapped?: TCtaModuleVariants['wrapped'] _(extends Omit<ComponentPropsWithoutRef<'div'>, 'children…, IWithDataTestId)_
+Variants: wrapped: (boolean) · align: HEADING_ALIGN.LEFT|HEADING_ALIGN.CENTER|HEADING_ALIGN.RIGHT
 
 ### Footer — `organisms/footer/footer.tsx`
 the site footer shell; composes `Footer.Nav` and `Footer.Copyright` slots into a `<footer>`.
@@ -286,7 +286,7 @@ Slots:
 a pure, controlled subscribe form built on the `TextInput` atom, exposed as two mutually-exclusive densities rather than a single component with a `variant` switch: `NewsletterSignup.Full` is the rich window-shell form used by the site footer and the CMS page-builder module; `NewsletterSignup.Compact` is the slim single-row strip for the end of every article.
 
 Compound component:
-- **NewsletterSignup.Full** — `NewsletterSignup.Full` — the rich, tinted window-shell signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · description?: string · errorMessage?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · className?: string _(extends IWithDataTestId)_
+- **NewsletterSignup.Full** — `NewsletterSignup.Full` — the rich, tinted window-shell signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · supportingText?: string · errorMessage?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] · className?: string _(extends IWithDataTestId)_
 - **NewsletterSignup.Compact** — `NewsletterSignup.Compact` — a slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · className?: string _(extends IWithDataTestId)_
 
 ### Pagination — `organisms/pagination/pagination.tsx`
@@ -300,8 +300,8 @@ Props: children: ReactNode _(extends Pick<ComponentPropsWithoutRef<'div'>, 'clas
 
 ### PostsSection — `organisms/posts-section/posts-section.tsx`
 labeled section rendering a set of posts in a responsive grid, generic enough to reuse for other post listings (e.g. related posts, category pages).
-Props: posts: IPostCardData[] · title: string · titleId: string · className?: string · linkAs?: TAnchorElementType · emptyMessage?: string · tinted?: TPostsSectionVariants['tinted'] · wrapped?: TPostsSectionVariants['wrapped'] _(extends IWithDataTestId)_
-Variants: tinted: (boolean) · wrapped: (boolean)
+Props: posts: IPostCardData[] · title: string · titleId: string · className?: string · linkAs?: TAnchorElementType · supportingText?: string · align?: TPostsSectionVariants['align'] · emptyMessage?: string · tinted?: TPostsSectionVariants['tinted'] · wrapped?: TPostsSectionVariants['wrapped'] _(extends IWithDataTestId)_
+Variants: tinted: (boolean) · wrapped: (boolean) · align: HEADING_ALIGN.LEFT|HEADING_ALIGN.CENTER|HEADING_ALIGN.RIGHT
 
 ### ToastViewport — `organisms/toast-viewport/toast-viewport.tsx`
 the fixed, corner-anchored region that positions and stacks `Toast` children (desktop bottom-right, mobile bottom full-width).

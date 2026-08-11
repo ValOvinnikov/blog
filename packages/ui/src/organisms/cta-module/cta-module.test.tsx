@@ -18,14 +18,20 @@ describe(`<${CtaModule.name}/>`, () => {
     expect(screen.getByRole('heading', { name: heading })).toBeVisible();
   });
 
-  it('renders the text when provided', () => {
-    const text = faker.lorem.sentence(8);
-    setup({ text });
+  it('does not render a heading when heading is omitted', () => {
+    setup({ heading: undefined });
 
-    expect(screen.getByText(text)).toBeVisible();
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
   });
 
-  it('does not render text when omitted', () => {
+  it('renders supportingText when provided', () => {
+    const supportingText = faker.lorem.sentence(8);
+    setup({ supportingText });
+
+    expect(screen.getByText(supportingText)).toBeVisible();
+  });
+
+  it('does not render supportingText when omitted', () => {
     setup();
 
     expect(screen.queryByText(faker.lorem.sentence(8))).not.toBeInTheDocument();

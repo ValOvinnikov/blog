@@ -1,3 +1,4 @@
+import { HEADING_ALIGN } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -9,7 +10,7 @@ export const ctaModuleVariants = tv({
       'bg-subtle',
     ],
     heading: ['m-0'],
-    text: ['m-0', 'max-w-prose', 'text-subtle'],
+    supportingText: ['m-0', 'max-w-prose', 'text-subtle'],
     action: ['mt-2'],
   },
   variants: {
@@ -18,7 +19,13 @@ export const ctaModuleVariants = tv({
         root: ['mt-0 py-0'],
       },
     },
+    align: {
+      [HEADING_ALIGN.LEFT]: { root: ['items-start text-left'] },
+      [HEADING_ALIGN.CENTER]: { root: ['items-center text-center'] },
+      [HEADING_ALIGN.RIGHT]: { root: ['items-end text-right'] },
+    },
   },
+  defaultVariants: { align: HEADING_ALIGN.LEFT },
 });
 
 export type TCtaModuleVariants = VariantProps<typeof ctaModuleVariants>;

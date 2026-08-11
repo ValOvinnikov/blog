@@ -8,10 +8,11 @@ import {
 
 export interface ICtaModuleProps
   extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
-  heading: string;
+  heading?: string;
   headingId?: string;
-  text?: string;
+  supportingText?: string;
   action?: ReactNode;
+  align?: TCtaModuleVariants['align'];
   /**
    * Drops this component's own top margin and vertical padding. Set when a
    * parent (e.g. `Section`) already owns the vertical spacing around it, so
@@ -21,22 +22,24 @@ export interface ICtaModuleProps
 }
 
 /**
- * CtaModule — page-builder organism rendering a heading, optional supporting
- * text, and an optional action slot. `action` is a fully rendered link/button
- * passed in by the web layer — this component never builds the anchor itself.
- * The action wrapper is omitted entirely when `action` is absent.
+ * CtaModule — page-builder organism rendering an optional heading, optional
+ * supporting text, and an optional action slot. `action` is a fully rendered
+ * link/button passed in by the web layer — this component never builds the
+ * anchor itself. The heading/action wrappers are omitted entirely when
+ * absent.
  */
 export const CtaModule = ({
   heading,
   headingId,
-  text,
+  supportingText,
   action,
+  align,
   className,
   dataTestId,
   wrapped,
   ...rest
 }: ICtaModuleProps) => {
-  const s = ctaModuleVariants({ wrapped });
+  const s = ctaModuleVariants({ wrapped, align });
 
   return (
     <div
@@ -44,10 +47,12 @@ export const CtaModule = ({
       data-testid={dataTestId}
       {...rest}
     >
-      <h2 id={headingId} className={s.heading()}>
-        {heading}
-      </h2>
-      {text && <p className={s.text()}>{text}</p>}
+      {heading && (
+        <h2 id={headingId} className={s.heading()}>
+          {heading}
+        </h2>
+      )}
+      {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
       {action && <div className={s.action()}>{action}</div>}
     </div>
   );

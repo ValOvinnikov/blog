@@ -31,6 +31,10 @@ export interface IPostsSectionProps extends IWithDataTestId {
   className?: string;
   /** Component each card's title link renders as — defaults to a plain `<a>`. Pass the app router's Link to get client-side navigation. */
   linkAs?: TAnchorElementType;
+  /** Optional supporting copy rendered under the heading. */
+  supportingText?: string;
+  /** Horizontal alignment of the heading and supporting text. Defaults to left. */
+  align?: TPostsSectionVariants['align'];
   /** Message rendered under the heading when `posts` is empty. Omit to keep the section rendering nothing (existing behavior). */
   emptyMessage?: string;
   /**
@@ -59,6 +63,8 @@ export const PostsSection = ({
   className,
   dataTestId,
   linkAs,
+  supportingText,
+  align,
   emptyMessage,
   tinted,
   wrapped,
@@ -66,13 +72,14 @@ export const PostsSection = ({
   const isEmpty = posts.length === 0;
   if (isEmpty && !emptyMessage) return null;
   const Component = (linkAs ?? 'a') as ElementType;
-  const s = postsSectionVariants({ tinted, wrapped });
+  const s = postsSectionVariants({ tinted, wrapped, align });
 
   const content = (
     <>
       <h2 id={titleId} className={s.label()}>
         {title}
       </h2>
+      {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
       {isEmpty ? (
         <p className={s.emptyMessage()}>{emptyMessage}</p>
       ) : (

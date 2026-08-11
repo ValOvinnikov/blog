@@ -1,3 +1,4 @@
+import { HEADING_ALIGN } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -10,7 +11,7 @@ export const newsletterSignupVariants = tv({
       'font-mono text-card-title font-medium text-brand-primary',
       'm-0',
     ],
-    description: ['font-body text-prose text-text', 'm-0'],
+    supportingText: ['font-body text-prose text-text', 'm-0'],
     trustCues: [
       'flex flex-col gap-2 md:flex-row md:flex-wrap md:items-center md:gap-4',
       'm-0 list-none p-0',
@@ -56,8 +57,13 @@ export const newsletterSignupVariants = tv({
         alert: ['flex-1'],
       },
     },
+    align: {
+      [HEADING_ALIGN.LEFT]: { pitchPane: ['items-start text-left'] },
+      [HEADING_ALIGN.CENTER]: { pitchPane: ['items-center text-center'] },
+      [HEADING_ALIGN.RIGHT]: { pitchPane: ['items-end text-right'] },
+    },
   },
-  defaultVariants: { variant: 'full' },
+  defaultVariants: { variant: 'full', align: HEADING_ALIGN.LEFT },
 });
 
 export type TNewsletterSignupVariants = VariantProps<
