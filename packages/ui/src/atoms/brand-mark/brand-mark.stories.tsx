@@ -36,3 +36,7 @@ export const Large: TStory = {
 export const Standalone: TStory = {
   args: { title: 'Brand mark' },
 };
+
+export const WithImageSource: TStory = {
+  args: { src: 'https://placehold.co/64x64', title: 'Brand mark' },
+};

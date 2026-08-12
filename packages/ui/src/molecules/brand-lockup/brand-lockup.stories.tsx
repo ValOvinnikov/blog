@@ -6,16 +6,16 @@ const meta = {
   title: 'Molecules/BrandLockup',
   component: BrandLockup,
   tags: ['autodocs'],
-  args: {
-    prefix: 'brand',
-    suffix: 'io',
-  },
 } satisfies Meta<typeof BrandLockup>;
 
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
+
+export const WithImageSource: TStory = {
+  args: { src: 'https://placehold.co/64x64' },
+};
 
 export const WithSpecLine: TStory = {
   args: { specLine: 'v1.0.0 · build/local' },

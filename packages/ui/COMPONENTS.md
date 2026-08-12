@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_57 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_56 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -27,8 +27,8 @@ Props: isBookmarked: NonNullable<TBookmarkToggleVariants['isBookmarked']> · onT
 Variants: isBookmarked: (boolean)
 
 ### BrandMark — `atoms/brand-mark/brand-mark.tsx`
-BrandMark atom — the brand mark as three stacked polygon layers, coloured from the `--logo-1/2/3` design tokens via inline `style` (these tokens aren't mirrored into `@theme inline` as Tailwind utilities).
-Props: size?: TBrandMarkVariants['size'] · title?: string · className?: string _(extends Omit<SVGProps<SVGSVGElement>, 'className' | 'ti…, IWithDataTestId)_
+BrandMark atom — the brand mark, rendered from an uploaded image when `src` is supplied, or as three stacked polygon layers coloured from the `--logo-1/2/3` design tokens via inline `style` otherwise (these tokens aren't mirrored into `@theme inline` as Tailwind utilities).
+Props: size?: TBrandMarkVariants['size'] · title?: string · className?: string · src?: string _(extends Omit<SVGProps<SVGSVGElement>, 'className' | 'ti…, IWithDataTestId)_
 Variants: size: Size.SM|Size.MD|Size.LG
 
 ### Button — `atoms/button/button.tsx`
@@ -62,10 +62,6 @@ Props: ariaLabel: string · ref?: Ref<HTMLButtonElement> _(extends ButtonHTMLAtt
 ### InlineCode — `atoms/inline-code/inline-code.tsx`
 InlineCode atom — a single `<code>` token styled for inline use within running text (e.g. Portable Text `code` marks).
 Props: _(extends HTMLAttributes<HTMLElement>, IWithDataTestId)_
-
-### Logo — `atoms/logo/logo.tsx`
-Logo atom — renders a brand mark with an optional monospace accent suffix.
-Props: prefix: string · suffix?: string _(extends HTMLAttributes<HTMLSpanElement>, IWithDataTestId)_
 
 ### MediaFrame — `atoms/media-frame/media-frame.tsx`
 Positioning context for a Next.js `<Image fill />` child.
@@ -148,8 +144,8 @@ Aside molecule — an inline deep-dive digression rendered alongside a post's bo
 Props: kind: TAsideKind · label: string · children: ReactNode · className?: string _(extends IWithDataTestId)_
 
 ### BrandLockup — `molecules/brand-lockup/brand-lockup.tsx`
-BrandLockup molecule — the brand mark plus the wordmark (via the `Logo` atom), with an optional monospace spec line.
-Props: prefix: string · suffix?: string · size?: IBrandMarkProps['size'] · specLine?: string _(extends Omit<ComponentPropsWithoutRef<'div'>, 'children…, IWithDataTestId)_
+BrandLockup molecule — the brand mark plus an optional monospace spec line.
+Props: src?: string · size?: IBrandMarkProps['size'] · specLine?: string _(extends Omit<ComponentPropsWithoutRef<'div'>, 'children…, IWithDataTestId)_
 
 ### Breadcrumbs — `molecules/breadcrumbs/breadcrumbs.tsx`
 page-chrome navigation trail (e.g. `Home › Category › Post title`).

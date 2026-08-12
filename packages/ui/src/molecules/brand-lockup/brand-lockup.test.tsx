@@ -5,27 +5,19 @@ import { BrandLockup } from './brand-lockup';
 
 faker.seed(123);
 
-const setup = customRender(BrandLockup, {
-  prefix: faker.word.noun(),
-});
+const setup = customRender(BrandLockup, {});
 
 describe(`<${BrandLockup.name}/>`, () => {
-  it('renders the mark and the wordmark from prefix/suffix', () => {
-    const prefix = faker.word.noun();
-    const suffix = faker.word.noun();
-    const { container } = setup({ prefix, suffix });
+  it('renders the polygon mark when no src is provided', () => {
+    const { container } = setup();
     expect(container.querySelectorAll('polygon')).toHaveLength(3);
-    expect(screen.getByText(prefix)).toBeVisible();
-    expect(screen.getByText(suffix)).toBeVisible();
   });
 
-  it('renders the wordmark visibly rather than screen-reader-only', () => {
-    // `sr-only` is the sole observable here: jsdom doesn't apply real layout,
-    // so `toBeVisible()` can't distinguish visible text from clipped,
-    // screen-reader-only text the way it would in a real browser.
-    const prefix = faker.word.noun();
-    setup({ prefix });
-    expect(screen.getByText(prefix)).not.toHaveClass('sr-only');
+  it('renders an uploaded image mark when src is provided', () => {
+    const src = faker.image.url();
+    const { container } = setup({ src });
+    expect(container.querySelector('img')).toHaveAttribute('src', src);
+    expect(container.querySelectorAll('polygon')).toHaveLength(0);
   });
 
   it('renders the mark decoratively — no accessible role or name', () => {

@@ -31,4 +31,25 @@ describe(`<${BrandMark.name}/>`, () => {
     expect(polygons[1]).toHaveStyle({ fill: 'var(--logo-2)' });
     expect(polygons[2]).toHaveStyle({ fill: 'var(--logo-3)' });
   });
+
+  it('renders an image and no polygon mark when src is provided', () => {
+    const src = faker.image.url();
+    const { container } = setup({ src });
+    const image = container.querySelector('img');
+    expect(image).toHaveAttribute('src', src);
+    expect(container.querySelectorAll('polygon')).toHaveLength(0);
+  });
+
+  it('gives the image an empty alt when decorative (no title)', () => {
+    const src = faker.image.url();
+    const { container } = setup({ src });
+    expect(container.querySelector('img')).toHaveAttribute('alt', '');
+  });
+
+  it('gives the image an accessible name when a title is provided', () => {
+    const src = faker.image.url();
+    const title = faker.company.name();
+    setup({ src, title });
+    expect(screen.getByRole('img', { name: title })).toBeVisible();
+  });
 });
