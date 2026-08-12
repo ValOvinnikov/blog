@@ -9,6 +9,11 @@
   // from TS/JS source — invisible to knip's import graph the same way the
   // *.sh hooks already are (knip doesn't scan shell files at all).
   "ignore": ["docs/design-reference/**", ".claude/hooks/*.js"],
+  // Root devDependency needed for prettier-plugin-tailwindcss to resolve at
+  // runtime for any workspace's Prettier invocation (apps/web is the only
+  // config that imports it); nothing in source imports it directly, so
+  // knip's root-level import graph can't see the usage.
+  "ignoreDependencies": ["prettier-plugin-tailwindcss"],
   "workspaces": {
     "apps/cms": {
       // Each migration's default export is loaded by the Sanity CLI
