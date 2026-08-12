@@ -114,7 +114,7 @@ Tasks 1–2 (config utility + #568 refactor) have no CMS/schema dependency and c
 **Task scope changes (all folded into already-planned tasks, not new standalone tasks):**
 
 - **Task 4 (cms):** in addition to the `settings_theme` singleton + `logo` field on `settings_site`, this task now also (a) writes the `brand.variant → settings_theme` migration described above, and (b) removes the `variant` field from `apps/cms/src/schema-types/objects/brand.ts` (and its `BRAND_VARIANTS` import) once the migration is written. Sequence: add `settings_theme` schema → write + dry-run the migration → orchestrator runs the human-gated `migrate:run` → remove `brand.variant` field → typegen.
-- **Task 5 (service):** the `site-settings` fetcher's existing `variant` field (query/transformer/types) is dropped — `settings_site`'s view-model no longer carries a brand variant; the resolved `accentHue`/`logoHue` come only from `service.settings.theme.v1.getTheme()`.
+- **Task 5 (service):** the `site-settings` fetcher's existing `variant` field (query/transformer/types) is dropped — `settings_site`'s view-model no longer carries a brand variant; the resolved `accentHue`/`logoHue` come only from `service.global.themeSettings.v1.getTheme()`.
 - **Task 8 (web):** in addition to the `<style>` injector/fonts/logo-slot work, this task now also (a) removes `apps/web/src/utils/root-html-class-name.ts`'s Indigo branch (and its test) since there's no more `.indigo` class to toggle, (b) removes the `.indigo` block from `configs/tailwind/theme.css` (its verified color values are preserved by moving them into `console`'s `PRESET_REGISTRY`-adjacent reference, not deleted outright — they're now reachable only via a tenant's `accentHue: 65`/`logoHue: 274` override, not a static class), and (c) deletes `apps/web/src/utils/brand-icon-svg.ts` entirely, replacing `icon.tsx`'s fallback with a static default asset — see "Design decision: favicon uses the uploaded CMS logo" below for the full favicon rework (this supersedes what Task 2/#1318 shipped there, which kept the Console/Indigo split with computed-not-hand-computed hex; that file no longer exists after Task 8).
 - **Cleanup (fold into Task 8's dispatch, not a separate task):** once nothing references `BRAND_VARIANTS`/`TBrandVariants`, remove `packages/config/src/constants/brand.ts` and update `packages/ui/.storybook/preview.ts`'s brand-variant toolbar decorator (currently derives its options from `BRAND_VARIANTS` — either remove the toolbar or repoint it at something meaningful for the new preset system, implementer's call, state the reasoning in the report).
 
@@ -227,7 +227,7 @@ This closes #568 with an implementation (not just the spike's written recommenda
 - Modify: `packages/service/src/shared/transformers/build-image-url.ts` — extend `buildImageUrl` with an optional transform-options param (`{ width?, height?, fit? }`, mapping to `@sanity/image-url`'s `.width()`/`.height()`/`.fit()` chaining) per the "Design decision: favicon uses the uploaded CMS logo" section above — needed so Task 8's `icon.tsx` can request a small square crop of the uploaded logo without reaching into `packages/service/src/sanity/image.ts` directly. Existing no-options callers keep today's behavior unchanged (`.auto('format')` only).
 
 **Interfaces — Consumes:** `PRESET_REGISTRY`, `TThemeTokens` (Task 3); the generated `SettingsTheme` type + `SettingsSite.logo` (Task 4).
-**Produces:** `service.settings.theme.v1.getTheme(): Promise<Result<TThemeTokens>>` (fully-resolved, never partial). `TBrand` loses `prefix`/`suffix` (this task) and `variant` (#1389, later) — `logoUrl` was already there. `buildImageUrl(image, options?)` gains optional size/fit transform support.
+**Produces:** `service.global.themeSettings.v1.getTheme(): Promise<Result<TThemeTokens>>` (fully-resolved, never partial). `TBrand` loses `prefix`/`suffix` (this task) and `variant` (#1389, later) — `logoUrl` was already there. `buildImageUrl(image, options?)` gains optional size/fit transform support.
 
 - [ ] **Step 1 (test-writer, failing tests):** Write the three resolver test cases above against a not-yet-implemented `getTheme()`.
 - [ ] **Step 2:** Run — Expected: FAIL.
@@ -254,7 +254,7 @@ This closes #568 with an implementation (not just the spike's written recommenda
 
 ### Task 6: `@blog/ui` — `BrandMark` image variant
 
-**Dispatch:** `ui` subagent, then `test-writer` + `ui-storybook` story update.
+**Dispatch:** `ui` subagent, then `test-writer` + `ui-storybook` story update. **Lands on the same branch and in the same PR as Task 4/5** (see "Design decision: the single-PR requirement cascades to Task 6 + a Task 8 slice" below) — dispatch immediately after Task 5's commit, before pushing or opening a PR.
 
 **Scope note (added 2026-08-12, mid-Task-3):** this task also finishes "Design decision: BrandLockup goes logo-only" below — `BrandLockup` drops its `prefix`/`suffix` props in favor of passing `src` through to `BrandMark`, and the now-fully-orphaned `Logo` atom is deleted.
 
@@ -307,7 +307,7 @@ Note: until Task 8 actually defines `--font-ui` in `theme.css`/the injector, thi
 
 **Decision:** the favicon also uses the uploaded logo when present, via a fetch-through pattern — not a redirect (more robust across favicon-fetching clients/crawlers) and not re-generating from the upload (arbitrary formats don't need format conversion beyond what Sanity's CDN already does):
 
-1. `icon.tsx` reads `service.settings.site.v1.getSiteSettings()`'s `logo` field (Task 5).
+1. `icon.tsx` reads `service.global.siteSettings.v1.getSiteSettings()`'s `logo` field (Task 5).
 2. If present, build a small square-cropped Sanity CDN URL and `fetch()` those bytes server-side; return them as the response with the CDN's `Content-Type` header passed through.
 3. If `logo` is absent, or the fetch fails for any reason (network error, non-2xx, timeout), fall back to **one fixed, static default mark** — no per-tenant color generation (see "further decision" below).
 
@@ -322,11 +322,38 @@ Note: until Task 8 actually defines `--font-ui` in `theme.css`/the injector, thi
 
 ---
 
-### Task 8: `apps/web` — theme `<style>` injector, `next/font` wiring, logo rendering + retire the `.indigo` class
+## Design decision: the single-PR requirement cascades to Task 6 + a Task 8 slice (added 2026-08-12, mid-Task-5, caught by `git push`'s pre-push `type-check` gate)
 
-**Dispatch:** `web` subagent.
+**The gap found:** the correction above (Task 4/5 must land as one PR, since removing `brand.prefix`/`brand.suffix` reds `packages/service`'s type-check on `main` otherwise) turned out to be one layer short. Once Task 5's `service` adaptor stopped exposing `TBrand.prefix`/`TBrand.suffix`, `apps/web/src/components/shared/brand-lockup-link/brand-lockup-link.tsx` — the only `apps/web` consumer of those fields — breaks `pnpm --filter web type-check`. Fixing that file properly means passing `src={brand.logoUrl}` to `BrandLockup` instead, which requires `BrandLockup`'s prop API to already accept `src` — that's Task 6 (`ui`), not yet done. Grepped `apps/web/src` for any other `.prefix`/`.suffix` reference on `brand` — none; the break is contained to this one component pair.
 
-**Scope note (added 2026-08-12):** in addition to the injector/fonts/logo work, this task also finishes retiring the Console/Indigo brand-variant axis (see "Design decision: retiring the Console/Indigo brand-variant axis" above, and Task 4/5's matching scope additions) — the `.indigo` CSS class and its `apps/web` consumers become dead code once the theme injector resolves `accentHue`/`logoHue` from `settings_theme` directly — **and** wires the uploaded CMS logo into the favicon route per the "Design decision: favicon uses the uploaded CMS logo" section above.
+**Decision:** Task 6 (`ui` — `BrandMark`/`BrandLockup` logo-only rework) lands in the **same PR** as Task 4/5. From Task 8, only the minimal fix needed to keep `apps/web` compiling — `brand-lockup-link.tsx` passing `src={brand.logoUrl}` instead of `prefix`/`suffix` — lands in that same PR too (split out below as **Task 8a**). The rest of Task 8's scope (theme `<style>` injector, `next/font` wiring, favicon fetch-through, `.indigo` retirement) stays its own follow-up PR (**Task 8b**), since none of that is required to keep `main` green once Task 8a lands — it's genuinely additive/independent from this point on.
+
+**Why not fold all of Task 8 in too:** the injector/fonts/favicon/`.indigo`-retirement work is large or a review surface, self-contained once Tasks 4-6+8a are in (nothing downstream of it breaks the build), and doesn't need to block this PR the way the compile errors did. Smallest bundle that keeps every merge point green, per `CLAUDE.md`'s "prefer per-layer PRs... split only when each layer's PR merges to main green on its own."
+
+---
+
+### Task 8a: `apps/web` — `BrandLockupLink` passes `src` instead of `prefix`/`suffix`
+
+**Dispatch:** `web` subagent. **Lands on the same branch and in the same PR as Task 4/5/6** (see the design decision above) — dispatch immediately after Task 6's commit, before pushing or opening a PR.
+
+**Files:**
+
+- Modify: `apps/web/src/components/shared/brand-lockup-link/brand-lockup-link.tsx` (+ its test) — pass `src={brand.logoUrl}` to `BrandLockup` instead of `prefix={brand.prefix} suffix={brand.suffix}` (those props no longer exist on either `TBrand` or `BrandLockup` after Task 5/6). `logoUrl` is `undefined` when no logo is uploaded, which `BrandMark` already treats as "render the polygon fallback" — no extra branching needed here.
+
+**Interfaces — Consumes:** `BrandLockup`'s `src?: string` prop (Task 6), `TBrand.logoUrl` (already existed pre-Task-4, unaffected by the `prefix`/`suffix` removal).
+**Produces:** `apps/web`'s `pnpm type-check` green again.
+
+- [ ] **Step 1:** Dispatch `web` to update `brand-lockup-link.tsx` and its test.
+- [ ] **Step 2:** Verify `pnpm --filter web type-check` + test, then full-repo `pnpm type-check` — all green.
+- [ ] **Step 3:** Commit (`fix(web): pass logo src to BrandLockup instead of prefix/suffix`).
+
+---
+
+### Task 8b: `apps/web` — theme `<style>` injector, `next/font` wiring, favicon logo rendering + retire the `.indigo` class
+
+**Dispatch:** `web` subagent. **Own, separate PR** — not bundled with Task 4/5/6/8a (see the design decision above).
+
+**Scope note (added 2026-08-12):** in addition to the injector/fonts/favicon work, this task also finishes retiring the Console/Indigo brand-variant axis (see "Design decision: retiring the Console/Indigo brand-variant axis" above, and Task 4/5's matching scope additions) — the `.indigo` CSS class and its `apps/web` consumers become dead code once the theme injector resolves `accentHue`/`logoHue` from `settings_theme` directly — **and** wires the uploaded CMS logo into the favicon route per the "Design decision: favicon uses the uploaded CMS logo" section above. The `brand-lockup-link.tsx` fix itself already landed in Task 8a; do not redo it here.
 
 **Files:**
 
@@ -334,16 +361,15 @@ Note: until Task 8 actually defines `--font-ui` in `theme.css`/the injector, thi
 - Move: `valstack-mark.svg` (user-supplied, currently at repo root) → `apps/web/public/brand/valstack-mark.svg` (or wherever this repo's static-asset convention places it) — the fixed fallback mark, no color computation, no `logoHue`/`BRAND_VARIANTS` coupling.
 - Delete: `apps/web/src/utils/brand-icon-svg.ts` and its test — superseded by the static asset above (see "Further decision" in the Design decision section).
 
-- Modify: the root layout (`apps/web/src/app/[locale]/layout.tsx` or `apps/web/src/app/layout.tsx` — confirm which one currently renders `<head>`) — add a server-rendered `<style>` block (via `dangerouslySetInnerHTML`, same mechanism the existing `themeBootstrapScript` `<script>` tag already uses in this exact spot, per `apps/web/src/config/theme-script.ts`) declaring the resolved CSS custom properties under **both** `:root { … }` and `.dark { … }` — not inline `style` on `<html>`, which carries only one scope and breaks dark mode. Include `--font-ui`'s resolved value here (backing Task 7's new token), and derive `--brand-primary*` from the resolved `accentHue` and `--logo-1/2/3` from the resolved `logoHue` **independently** (they're no longer always the same hue — see Design decision). Fetch the resolved tokens via `service.settings.theme.v1.getTheme()` (Task 5).
+- Modify: the root layout (`apps/web/src/app/[locale]/layout.tsx` or `apps/web/src/app/layout.tsx` — confirm which one currently renders `<head>`) — add a server-rendered `<style>` block (via `dangerouslySetInnerHTML`, same mechanism the existing `themeBootstrapScript` `<script>` tag already uses in this exact spot, per `apps/web/src/config/theme-script.ts`) declaring the resolved CSS custom properties under **both** `:root { … }` and `.dark { … }` — not inline `style` on `<html>`, which carries only one scope and breaks dark mode. Include `--font-ui`'s resolved value here (backing Task 7's new token), and derive `--brand-primary*` from the resolved `accentHue` and `--logo-1/2/3` from the resolved `logoHue` **independently** (they're no longer always the same hue — see Design decision). Fetch the resolved tokens via `service.global.themeSettings.v1.getTheme()` (Task 5).
 - Modify: `apps/web/src/config/fonts.ts` — extend the current hardcoded single-font-per-role wiring to select between `FONT_CHOICE` options based on the resolved `headingFont`/`bodyFont` (add the `next/font/google` imports for whatever editorial font(s) Task 3 named).
-- Modify: `apps/web/src/components/shared/brand-lockup-link/brand-lockup-link.tsx` — per "Design decision: BrandLockup goes logo-only" above, pass `src={brand.logoUrl}` to `BrandLockup` instead of `prefix={brand.prefix} suffix={brand.suffix}` (those props no longer exist on either `TBrand` or `BrandLockup` after Task 5/6). `logoUrl` is `undefined` when no logo is uploaded, which `BrandMark` already treats as "render the polygon fallback" — no extra branching needed here.
 - Modify: `apps/web/src/metadata/default-social-image/default-social-image.tsx` — unaffected by the favicon/logo decisions above (a separate OG-image concern) — only check it still doesn't reference `BRAND_VARIANTS` anywhere (it shouldn't, per Task 2/#1318 which already made it Console-only-hardcoded).
 - Delete the branching logic in `apps/web/src/utils/root-html-class-name.ts` (and its test) — no more `.indigo` class to toggle; `buildRootHtmlClassName` either goes away entirely (if nothing else calls it) or collapses to just the font-variable base classes, implementer's call once all call sites are checked.
 - Modify: `configs/tailwind/theme.css` — remove the `.indigo { … }` block (its hand-verified values are preserved by copying them into the migration's literal `accentHue: 65`/`logoHue: 274` in Task 4, not deleted from history — just no longer expressed as a static CSS class).
 - Delete: `packages/config/src/constants/brand.ts` (`BRAND_VARIANTS`/`TBrandVariants`) once nothing imports it — re-check `packages/ui/.storybook/preview.ts`'s brand-variant toolbar decorator first (see Design decision's Cleanup note) and either remove it or repoint it, whichever the implementer judges makes more sense for exercising the new preset system in Storybook; state the reasoning in the report.
 - Test: a page/layout-level test asserting the injected `<style>` block contains the expected `--brand-primary`/`--logo-1/2/3`/`--font-ui`/etc. values for at least the `console` case (no `settings_theme` document → today's exact values), matching the "console reproduces today's site pixel-for-pixel" acceptance criterion. Also a case confirming a document with distinct `accentHue`/`logoHue` values (the "Indigo" reproduction) injects both independently.
 
-**Interfaces — Consumes:** `service.settings.theme.v1.getTheme()`, `service.settings.site.v1.getSiteSettings()`'s `logo` field (Task 5), the extended `buildImageUrl` (Task 5); `oklchToHex` (Task 1, for converting the resolved `TThemeTokens.accentHue`/`logoHue` into actual `oklch(...)` CSS values — or emit `oklch(l c h)` as a raw CSS value directly, since modern browsers support the `oklch()` CSS function natively and this avoids a hex-conversion round-trip; **confirm during implementation whether raw `oklch()` CSS or `oklchToHex`-derived hex is the right call** for the `<style>` injector specifically — `oklchToHex` remains needed elsewhere, for contexts that _can't_ read CSS custom properties, like Satori's OG image renderer in `default-social-image.tsx`, which is a different constraint than the injector's).
+**Interfaces — Consumes:** `service.global.themeSettings.v1.getTheme()`, `service.global.siteSettings.v1.getSiteSettings()`'s `logo` field (Task 5), the extended `buildImageUrl` (Task 5); `oklchToHex` (Task 1, for converting the resolved `TThemeTokens.accentHue`/`logoHue` into actual `oklch(...)` CSS values — or emit `oklch(l c h)` as a raw CSS value directly, since modern browsers support the `oklch()` CSS function natively and this avoids a hex-conversion round-trip; **confirm during implementation whether raw `oklch()` CSS or `oklchToHex`-derived hex is the right call** for the `<style>` injector specifically — `oklchToHex` remains needed elsewhere, for contexts that _can't_ read CSS custom properties, like Satori's OG image renderer in `default-social-image.tsx`, which is a different constraint than the injector's).
 **Produces:** the fully working preset pipeline, end-to-end.
 
 - [ ] **Step 1 (failing test):** Layout/page test asserting the rendered `<style>` block's content for the no-`settings_theme`-document case matches today's known `--brand-primary`/etc. values.
@@ -363,7 +389,9 @@ Note: until Task 8 actually defines `--font-ui` in `theme.css`/the injector, thi
 - [ ] **Step 4:** Update `SPEC.md` (content model — `settings_theme`, the `PRESET` registry, the theme-injection mechanism) and `docs/context/content-model.md`.
 - [ ] **Step 5:** Commit; **ask to push** (human gate); **ask to open PR** (human gate); on PR → board → `ci-watcher` → sweep worktrees.
 
-Given the scope, prefer **per-layer PRs** for Tasks 1–2 (config/web, standalone), 3 (config), 4 (cms), 5 (service), 6+7 (ui, can combine since both are small `packages/ui` changes), 8 (web) — each merges to `main` green on its own since every change here is additive. Task 9's SPEC.md sync lands in whichever PR completes the phase (likely Task 8's).
+**Corrected 2026-08-12** (superseding the original per-layer-PR breakdown below, once the actual build-breakage cascade was hit at push time): Tasks 1, 2, 3, and 7 landed/land as their own standalone PRs (each merges to `main` green on its own — confirmed for 1/2/3, already merged; 7 merged as #1390). **Tasks 4, 5, 6, and 8a land as one combined PR** — see "Design decision: retiring the Console/Indigo brand-variant axis" and "Design decision: the single-PR requirement cascades to Task 6 + a Task 8 slice" above for why: removing `brand.prefix`/`brand.suffix` from the schema breaks `packages/service` and then `apps/web` in a chain that isn't safely splittable. Task 8b (the injector/fonts/favicon/`.indigo`-retirement work) is its own follow-up PR once 4/5/6/8a merge. Task 9's SPEC.md sync lands in whichever PR completes the phase (likely Task 8b's).
+
+_(Original per-layer breakdown, superseded by the above:_ prefer **per-layer PRs** for Tasks 1–2 (config/web, standalone), 3 (config), 4 (cms), 5 (service), 6+7 (ui, can combine since both are small `packages/ui` changes), 8 (web) — each merges to `main` green on its own since every change here is additive._)
 
 ## Self-review (plan ↔ spec)
 
