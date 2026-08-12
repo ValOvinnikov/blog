@@ -40,7 +40,8 @@ DENSITY         = { DEFAULT, COMPACT }
 
 ```
 TThemeTokens = {
-  accentHue: number;          // 0–360, degrees — OKLCH hue channel
+  accentHue: number;          // 0–360, degrees — OKLCH hue channel (drives --brand-primary*)
+  logoHue?: number;           // 0–360, degrees — OKLCH hue channel for --logo-1/2/3 only; defaults to accentHue when unset
   headingFont: TFontChoice;
   bodyFont: TFontChoice;
   radiusScale: TRadiusScale;
@@ -48,6 +49,8 @@ TThemeTokens = {
   chromeOn: boolean;          // true = WindowChrome/Toast/TerminalChip/TerminalTyping render; false = editorial's chrome-free look
 }
 ```
+
+**`logoHue` added 2026-08-12** (see "Design decision: retiring the Console/Indigo brand-variant axis" below) — the button/UI accent and the logo mark are independently tunable; when a preset or tenant override doesn't set `logoHue`, it inherits `accentHue` (today's `console`/`editorial` behavior — logo and accent share one hue). `console`/`editorial`'s `PRESET_REGISTRY` entries leave `logoHue` unset.
 
 **`TPresetBundle` + `PRESET_REGISTRY` (mirrors the `Record<TKey, TBundle>` pattern already used by `packages/config/src/constants/spec-line.ts`'s `SPEC_LINE_SEPARATOR_CHARS`):**
 
@@ -99,6 +102,21 @@ Built on the `culori` package (new runtime dependency for `@blog/utils` — curr
 ## Sequencing note
 
 Tasks 1–2 (config utility + #568 refactor) have no CMS/schema dependency and can land as their own early PR. Tasks 3 (cms) → 4 (service) → 5–6 (ui) → 7 (web) follow the usual dependency order. Task 6 (chrome font swap) has no dependency on Tasks 3–5 and could run in parallel with them if useful — it only touches `packages/ui` variants files.
+
+## Design decision: retiring the Console/Indigo brand-variant axis (added 2026-08-12, mid-Task-3)
+
+**The gap found:** this repo already ships a tenant-configurable "site look" toggle — `siteSettings.brand.variant` (`BRAND_VARIANTS.CONSOLE`/`BRAND_VARIANTS.INDIGO`, `packages/config/src/constants/brand.ts`), applied as a `.indigo` CSS class (`configs/tailwind/theme.css`) that overrides the accent + logo tokens. Left alone, `settings_theme.accentHue` would become a _second_, unrelated "change the accent color" axis — confusing to author and to reason about.
+
+**Decision:** retire `siteSettings.brand.variant` / `BRAND_VARIANTS` / the `.indigo` CSS class entirely. "Indigo" becomes expressible purely as a `settings_theme` document: `{ preset: CONSOLE, accentHue: 65, logoHue: 274 }` — reproducing today's `.indigo` class exactly (its `--brand-primary`/`--brand-primary-solid` use `--logo-alt-accent` = `oklch(0.54 0.15 65)`, hue 65; its `--logo-1/2/3` use `--logo-alt-1/2/3`, hue 274 — two genuinely different, independently WCAG-verified hues, not one — see `theme.css`'s `.indigo` comment, epics #494/#515/#563). This is why `TThemeTokens` gained the optional `logoHue` field above rather than reusing `accentHue` for both.
+
+**Migration required:** any existing document with `siteSettings.brand.variant: INDIGO` needs migrating to a `settings_theme` singleton with `{ preset: CONSOLE, accentHue: 65, logoHue: 274 }` before `brand.variant` is removed from the schema — a genuine content-shape change, human-gated per this repo's migration workflow (`apps/cms/migrations/README.md`: dry-run → `dataset:export` backup → human-approved run). Sequence this migration **after** Task 4's `settings_theme` schema lands and **before** Task 4 removes the `brand.variant` field (i.e., as the second half of Task 4, not a separate task — the schema needs both shapes to exist simultaneously for the migration transform to read one and write the other).
+
+**Task scope changes (all folded into already-planned tasks, not new standalone tasks):**
+
+- **Task 4 (cms):** in addition to the `settings_theme` singleton + `logo` field on `settings_site`, this task now also (a) writes the `brand.variant → settings_theme` migration described above, and (b) removes the `variant` field from `apps/cms/src/schema-types/objects/brand.ts` (and its `BRAND_VARIANTS` import) once the migration is written. Sequence: add `settings_theme` schema → write + dry-run the migration → orchestrator runs the human-gated `migrate:run` → remove `brand.variant` field → typegen.
+- **Task 5 (service):** the `site-settings` fetcher's existing `variant` field (query/transformer/types) is dropped — `settings_site`'s view-model no longer carries a brand variant; the resolved `accentHue`/`logoHue` come only from `service.settings.theme.v1.getTheme()`.
+- **Task 8 (web):** in addition to the `<style>` injector/fonts/logo-slot work, this task now also (a) removes `apps/web/src/utils/root-html-class-name.ts`'s Indigo branch (and its test) since there's no more `.indigo` class to toggle, (b) removes the `.indigo` block from `configs/tailwind/theme.css` (its verified color values are preserved by moving them into `console`'s `PRESET_REGISTRY`-adjacent reference, not deleted outright — they're now reachable only via a tenant's `accentHue: 65`/`logoHue: 274` override, not a static class), and (c) refactors `apps/web/src/utils/brand-icon-svg.ts` + `apps/web/src/app/icon.tsx` to derive `LOGO_PALETTES` dynamically from the resolved theme's `logoHue` (via `oklchToHex`, Task 1) instead of the static `BRAND_VARIANTS`-keyed table — this changes what Task 2 (#1318) shipped (which kept the Console/Indigo split, just replaced hand-computed hex with computed hex) to be theme-driven instead of variant-driven.
+- **Cleanup (fold into Task 8's dispatch, not a separate task):** once nothing references `BRAND_VARIANTS`/`TBrandVariants`, remove `packages/config/src/constants/brand.ts` and update `packages/ui/.storybook/preview.ts`'s brand-variant toolbar decorator (currently derives its options from `BRAND_VARIANTS` — either remove the toolbar or repoint it at something meaningful for the new preset system, implementer's call, state the reasoning in the report).
 
 ---
 
@@ -165,23 +183,31 @@ This closes #568 with an implementation (not just the spike's written recommenda
 
 ---
 
-### Task 4: `apps/cms` — `settings_theme` singleton + `logo` field on `settings_site`
+### Task 4: `apps/cms` — `settings_theme` singleton + `logo` field on `settings_site` + retire `brand.variant`
 
-**Dispatch:** `cms` subagent. **Then orchestrator runs `pnpm typegen`.**
+**Dispatch:** `cms` subagent. **Then orchestrator runs `pnpm typegen`. Then orchestrator runs the human-gated migration.**
+
+**Scope note (added 2026-08-12):** this task now has two halves — see "Design decision: retiring the Console/Indigo brand-variant axis" above for the full rationale. Half A (schema addition) is purely additive, no migration. Half B (retiring `brand.variant`) is a real content-shape change and needs the migrate → human-gate → schema-removal sequence below, in that order — do not remove the `brand.variant` field until the migration has actually run.
 
 **Files:**
 
-- Create: `apps/cms/src/schema-types/documents/settings/theme.ts` — `settings_theme` singleton, following the exact pattern in `apps/cms/src/schema-types/documents/settings/site-settings.ts` (`defineType`, `titleField()`, `preview.prepare`). Fields: `preset` (string, `options.list` from `PRESET_ID` values — mirror the `link.ts`/`appearance.ts` `options.list` pattern), `accentHue` (number, 0–360, optional — validation `rule.min(0).max(360)`), `headingFont`/`bodyFont` (string, `options.list` from `FONT_CHOICE`), `radiusScale` (string, `options.list` from `RADIUS_SCALE`), `density` (string, `options.list` from `DENSITY`). All fields except `preset` optional (unset = use the selected preset's own default).
+- Create: `apps/cms/src/schema-types/documents/settings/theme.ts` — `settings_theme` singleton, following the exact pattern in `apps/cms/src/schema-types/documents/settings/site-settings.ts` (`defineType`, `titleField()`, `preview.prepare`). Fields: `preset` (string, `options.list` from `PRESET_ID` values — mirror the `link.ts`/`layout.ts` `options.list` pattern), `accentHue` (number, 0–360, optional — validation `rule.min(0).max(360)`), `logoHue` (number, 0–360, optional, same validation — defaults to `accentHue` when unset per the Contracts section), `headingFont`/`bodyFont` (string, `options.list` from `FONT_CHOICE`), `radiusScale` (string, `options.list` from `RADIUS_SCALE`), `density` (string, `options.list` from `DENSITY`). All fields except `preset` optional (unset = use the selected preset's own default).
 - Modify: `apps/cms/src/schema-types/documents/settings/site-settings.ts` — add a `logo` field (image type, following the exact `defaultOgImage` field's pattern at the end of that file: `type: imageWithAltSchema.name`, optional — not `.required()`, since D7 says upload-or-fallback).
 - Register `settings_theme` in the schema type list (same place `settings_newsletter`/other settings singletons are registered — check `apps/cms/src/schema-types/index.ts` or wherever the document list lives).
+- **Migration** (new, `apps/cms/migrations/`, follow `README.md`'s `migrate:new` scaffold): for every `siteSettings` document with `brand.variant === 'INDIGO'`, create/update the `settings_theme` singleton to `{ _id: 'settings_theme', _type: 'settings_theme', preset: 'CONSOLE', accentHue: 65, logoHue: 274 }` (the exact values that reproduce today's `.indigo` CSS class — see the Design decision section). Documents with `brand.variant === 'CONSOLE'` (or unset) need no `settings_theme` write — the no-document-means-console fallback already covers them.
+- Modify: `apps/cms/src/schema-types/objects/brand.ts` — remove the `variant` field and its `BRAND_VARIANTS` import. **Only after the migration above has actually run** (dry-run → `dataset:export` backup → orchestrator prompts for human-gated `migrate:run`, same as any other content migration) — removing the field before the migration runs orphans any `INDIGO`-variant document's intent with no way to recover it.
 
 **Interfaces — Consumes:** `PRESET_ID`, `FONT_CHOICE`, `RADIUS_SCALE`, `DENSITY` values (Task 3).
-**Produces:** after typegen, `SettingsTheme` in the generated types; `SettingsSite` gains an optional `logo` field.
+**Produces:** after typegen, `SettingsTheme` in the generated types; `SettingsSite` gains an optional `logo` field; `SettingsSite.brand` loses its `variant` field.
 
 - [ ] **Step 1:** Dispatch `cms` to add the `settings_theme` singleton schema + the `logo` field on `settings_site`, each field's `options.list` sourced from the Task 3 consts, register the new document type.
 - [ ] **Step 2:** Orchestrator runs `pnpm typegen`; re-run until the diff is minimal; commit `packages/config/src/sanity/generated/`.
 - [ ] **Step 3:** Verify `pnpm --filter cms type-check`; confirm the generated `SettingsTheme` type and `SettingsSite.logo` appear correctly.
-- [ ] **Step 4:** Commit (`feat(cms): add settings_theme singleton and logo field on settings_site`). **PR body states: additive/optional — no content migration.**
+- [ ] **Step 4:** Commit (`feat(cms): add settings_theme singleton and logo field on settings_site`). This half is additive/optional — no migration needed yet, state so in the PR body. This can land and merge as its own PR before the migration/removal half below.
+- [ ] **Step 5:** Dispatch `cms` to write the `brand.variant → settings_theme` migration per `apps/cms/migrations/README.md`'s scaffold (`migrate:new`). Dry-run it (`migrate:dry`) against a dataset with at least one `INDIGO`-variant `siteSettings` document (or a fixture) to confirm the transform produces the exact `{ preset: CONSOLE, accentHue: 65, logoHue: 274 }` shape.
+- [ ] **Step 6:** Orchestrator: run `dataset:export` (backup), present the migration's dry-run output to the user, get explicit approval, then run `migrate:run` against the live dataset(s) — human-gated, same as any content migration or deploy.
+- [ ] **Step 7:** Dispatch `cms` to remove `brand.variant`/`BRAND_VARIANTS` from `apps/cms/src/schema-types/objects/brand.ts` now that the migration has run. Orchestrator re-runs `pnpm typegen`.
+- [ ] **Step 8:** Verify `pnpm --filter cms type-check`; commit (`feat(cms): retire brand.variant, migrated to settings_theme`). Separate PR from Step 4's, since this half genuinely needs the migration gate in between.
 
 ---
 
@@ -192,9 +218,9 @@ This closes #568 with an implementation (not just the spike's written recommenda
 **Files:**
 
 - Create: `packages/service/src/features/global/theme-settings/` — mirror the exact directory structure of an existing settings fetcher (e.g. `packages/service/src/features/global/newsletter-settings/`, or `site-settings/` for the `logo` field addition): `adaptor/query.ts` (groqd query against `settings_theme`, all fields `.nullable(true)` since the whole document may not exist), `adaptor/transformer.ts`, `adaptor/types.ts`, `application/service.ts` exporting `createThemeSettingsService() → { v1: { getTheme: safeAsync(...) } }`.
-- Modify: `packages/service/src/features/global/site-settings/` (or wherever `settings_site` is currently fetched) — extend the existing fetcher's query/transformer/types to include `logo` (following the exact pattern `defaultOgImage` already uses there, since both are `imageWithAltSchema`-typed fields).
-- The resolver logic: `getTheme()` reads the `settings_theme` document (if any), determines the effective `preset` (document's `preset` field, or `PRESET_ID.CONSOLE` if no document exists — the neutral-base-equals-console fallback), looks up `PRESET_REGISTRY[preset].themeTokens` as the base, and layers the document's own optional overrides (`accentHue`, `headingFont`, `bodyFont`, `radiusScale`, `density`) on top where present. Returns a fully-resolved `TThemeTokens` (never partial — this is the one point in the ladder where "preset default" fills every gap, so downstream consumers get a complete object).
-- Test: cases for (a) no `settings_theme` document → console preset's tokens returned unchanged, (b) document exists with `preset: EDITORIAL`, no overrides → editorial preset's tokens returned unchanged, (c) document exists with `preset: EDITORIAL` + `accentHue` override → editorial's tokens with just that one field overridden.
+- Modify: `packages/service/src/features/global/site-settings/` (or wherever `settings_site` is currently fetched) — extend the existing fetcher's query/transformer/types to include `logo` (following the exact pattern `defaultOgImage` already uses there, since both are `imageWithAltSchema`-typed fields); **remove** the existing `variant` field from this fetcher's query/transformer/types (Task 4 Step 7 dropped it from the schema — the resolved `accentHue`/`logoHue` now come only from `getTheme()` below, not from `settings_site`).
+- The resolver logic: `getTheme()` reads the `settings_theme` document (if any), determines the effective `preset` (document's `preset` field, or `PRESET_ID.CONSOLE` if no document exists — the neutral-base-equals-console fallback), looks up `PRESET_REGISTRY[preset].themeTokens` as the base, and layers the document's own optional overrides (`accentHue`, `logoHue`, `headingFont`, `bodyFont`, `radiusScale`, `density`) on top where present. If `logoHue` ends up unset after layering (neither the preset nor the document set it), resolve it to the final `accentHue` value (the default-to-accentHue rule from the Contracts section) — so the returned `TThemeTokens.logoHue` is **always** a concrete number, never `undefined`, same "fully resolved" guarantee as every other field. Returns a fully-resolved `TThemeTokens` (never partial — this is the one point in the ladder where "preset default" fills every gap, so downstream consumers get a complete object).
+- Test: cases for (a) no `settings_theme` document → console preset's tokens returned unchanged (including `logoHue` resolving to `accentHue`'s value, 250), (b) document exists with `preset: EDITORIAL`, no overrides → editorial preset's tokens returned unchanged, (c) document exists with `preset: EDITORIAL` + `accentHue` override → editorial's tokens with just that one field overridden, (d) document exists with `preset: CONSOLE`, `accentHue: 65`, `logoHue: 274` (the "Indigo" reproduction case) → both hues returned independently, not one defaulting to the other.
 
 **Interfaces — Consumes:** `PRESET_REGISTRY`, `TThemeTokens` (Task 3); the generated `SettingsTheme` type + `SettingsSite.logo` (Task 4).
 **Produces:** `service.settings.theme.v1.getTheme(): Promise<Result<TThemeTokens>>` (fully-resolved, never partial). `service.settings.site.v1.getSiteSettings()`'s existing view-model gains `logo: TImageWithAlt | undefined`.
@@ -251,16 +277,23 @@ Note: until Task 8 actually defines `--font-ui` in `theme.css`/the injector, thi
 
 ---
 
-### Task 8: `apps/web` — theme `<style>` injector, `next/font` wiring, logo rendering
+### Task 8: `apps/web` — theme `<style>` injector, `next/font` wiring, logo rendering + retire the `.indigo` class
 
 **Dispatch:** `web` subagent.
 
+**Scope note (added 2026-08-12):** in addition to the injector/fonts/logo work, this task also finishes retiring the Console/Indigo brand-variant axis (see "Design decision" above, and Task 4/5's matching scope additions) — the `.indigo` CSS class and its `apps/web` consumers become dead code once the theme injector resolves `accentHue`/`logoHue` from `settings_theme` directly.
+
 **Files:**
 
-- Modify: the root layout (`apps/web/src/app/[locale]/layout.tsx` or `apps/web/src/app/layout.tsx` — confirm which one currently renders `<head>`) — add a server-rendered `<style>` block (via `dangerouslySetInnerHTML`, same mechanism the existing `themeBootstrapScript` `<script>` tag already uses in this exact spot, per `apps/web/src/config/theme-script.ts`) declaring the resolved CSS custom properties under **both** `:root { … }` and `.dark { … }` — not inline `style` on `<html>`, which carries only one scope and breaks dark mode. Include `--font-ui`'s resolved value here (backing Task 7's new token). Fetch the resolved tokens via `service.settings.theme.v1.getTheme()` (Task 5).
+- Modify: the root layout (`apps/web/src/app/[locale]/layout.tsx` or `apps/web/src/app/layout.tsx` — confirm which one currently renders `<head>`) — add a server-rendered `<style>` block (via `dangerouslySetInnerHTML`, same mechanism the existing `themeBootstrapScript` `<script>` tag already uses in this exact spot, per `apps/web/src/config/theme-script.ts`) declaring the resolved CSS custom properties under **both** `:root { … }` and `.dark { … }` — not inline `style` on `<html>`, which carries only one scope and breaks dark mode. Include `--font-ui`'s resolved value here (backing Task 7's new token), and derive `--brand-primary*` from the resolved `accentHue` and `--logo-1/2/3` from the resolved `logoHue` **independently** (they're no longer always the same hue — see Design decision). Fetch the resolved tokens via `service.settings.theme.v1.getTheme()` (Task 5).
 - Modify: `apps/web/src/config/fonts.ts` — extend the current hardcoded single-font-per-role wiring to select between `FONT_CHOICE` options based on the resolved `headingFont`/`bodyFont` (add the `next/font/google` imports for whatever editorial font(s) Task 3 named).
 - Modify: wherever `BrandMark` is currently rendered in `apps/web` (likely `Header`'s brand slot composition) — pass `src` from `service.settings.site.v1.getSiteSettings()`'s new `logo` field (Task 5) when present, omitting it (falling back to the polygon mark) when absent.
-- Test: a page/layout-level test asserting the injected `<style>` block contains the expected `--brand-primary`/`--font-ui`/etc. values for at least the `console` case (no `settings_theme` document → today's exact values), matching the "console reproduces today's site pixel-for-pixel" acceptance criterion.
+- Modify: `apps/web/src/utils/brand-icon-svg.ts` — replace the static `BRAND_VARIANTS`-keyed `LOGO_PALETTES` table with palette derivation from the resolved theme's `logoHue` (via `oklchToHex`, Task 1) — light/dark only, no more per-variant branching. `apps/web/src/app/icon.tsx` (the route consuming this) needs to fetch `service.settings.theme.v1.getTheme()` to get the hue to derive from.
+- Modify: `apps/web/src/metadata/default-social-image/default-social-image.tsx` — same treatment if it still branches on `BRAND_VARIANTS` anywhere (check; per Task 2/#1318 it was already Console-only, so this may need no further change beyond confirming its hardcoded hue still matches console's resolved `logoHue`).
+- Delete the branching logic in `apps/web/src/utils/root-html-class-name.ts` (and its test) — no more `.indigo` class to toggle; `buildRootHtmlClassName` either goes away entirely (if nothing else calls it) or collapses to just the font-variable base classes, implementer's call once all call sites are checked.
+- Modify: `configs/tailwind/theme.css` — remove the `.indigo { … }` block (its hand-verified values are preserved by copying them into the migration's literal `accentHue: 65`/`logoHue: 274` in Task 4, not deleted from history — just no longer expressed as a static CSS class).
+- Delete: `packages/config/src/constants/brand.ts` (`BRAND_VARIANTS`/`TBrandVariants`) once nothing imports it — re-check `packages/ui/.storybook/preview.ts`'s brand-variant toolbar decorator first (see Design decision's Cleanup note) and either remove it or repoint it, whichever the implementer judges makes more sense for exercising the new preset system in Storybook; state the reasoning in the report.
+- Test: a page/layout-level test asserting the injected `<style>` block contains the expected `--brand-primary`/`--logo-1/2/3`/`--font-ui`/etc. values for at least the `console` case (no `settings_theme` document → today's exact values), matching the "console reproduces today's site pixel-for-pixel" acceptance criterion. Also a case confirming a document with distinct `accentHue`/`logoHue` values (the "Indigo" reproduction) injects both independently.
 
 **Interfaces — Consumes:** `service.settings.theme.v1.getTheme()`, `service.settings.site.v1.getSiteSettings()`'s `logo` field (Task 5); `oklchToHex` (Task 1, for converting the resolved `TThemeTokens.accentHue` into the actual `oklch(...)` CSS values — or emit `oklch(l c h)` as a raw CSS value directly, since modern browsers support the `oklch()` CSS function natively and this avoids a hex-conversion round-trip; **confirm during implementation whether raw `oklch()` CSS or `oklchToHex`-derived hex is the right call** — raw CSS `oklch()` is likely simpler and more correct for the injector specifically, whereas `oklchToHex` exists for contexts that _can't_ read CSS custom properties, like `brand-icon-svg.ts`'s SVG route and Satori's OG image renderer, which is a different constraint than this task's).
 **Produces:** the fully working preset pipeline, end-to-end.
@@ -292,8 +325,9 @@ Given the scope, prefer **per-layer PRs** for Tasks 1–2 (config/web, standalon
 - `<style>` injector under both `:root`/`.dark`, not inline `html` style → Task 8. ✔
 - `--font-ui` themeable chrome font, chrome components stay opt-in exports → Task 7 (swap) + Task 3 (`chromeOn` flag, consumed by whichever `web` composition decides to render/omit the chrome components — noting this composition-level "omit chrome when `chromeOn: false`" wiring isn't explicitly a task above; **flag for Task 8 or a follow-up:** the plan covers making chrome themeable font-wise, but the actual _omission_ of `WindowChrome`/`Toast`/`TerminalChip`/`TerminalTyping` instances when `editorial` is active is a `web`-composition decision (which components currently render them, and gating that on `chromeOn`) not yet mapped to exact files — **this needs a fresh `explore` pass at Task 8 implementation time** to find every call site.
 - `console` preserved exactly / safety net (D6) → Contracts section's exact OKLCH values, Task 3/5/8's "no `settings_theme` document → console defaults" fallback chain.
-- Migration: none, stated per-task. ✔
+- Migration: **Task 4 now needs one** (`brand.variant → settings_theme`, added 2026-08-12 mid-Task-3 per the "Design decision" section) — the rest of the phase stays additive/migration-free, stated per-task.
 - #568 resolution folded in as Tasks 1–2, per the user's explicit decision this session. ✔
+- Retiring the existing Console/Indigo `brand.variant` axis in favor of `settings_theme.accentHue`/`logoHue` (added 2026-08-12, mid-Task-3, user-approved) → Task 4 (schema + migration), Task 5 (drop `variant` from site-settings, resolve `logoHue`), Task 8 (drop the `.indigo` CSS class and its `apps/web` consumers). `TThemeTokens` gained `logoHue?: number` to faithfully reproduce Indigo's independently-tuned button/logo hues (65/274) — this required amending Task 3's already-open PR (#1388) before merge.
 - No placeholder steps; every task names exact files, contract, and a concrete failing test — except Task 8's "explore chrome call sites" gap noted above, which is a legitimate scope discovery for that task's own dispatch, not a placeholder in this plan.
 
 **Deviation from the plan's own "no placeholders" rule, disclosed:** `voicePack`/`featureDefaults` in `TPresetBundle` are typed as `Record<string, never>` placeholders in Task 3, not empty objects with no type — this is intentional (Phases 3/4 aren't planned yet, and their real shape shouldn't be guessed here), not an oversight. Phase 3's own plan will change this type when it lands.
