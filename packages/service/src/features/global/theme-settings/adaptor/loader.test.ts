@@ -1,6 +1,7 @@
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
 import { makeRawThemeSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { wcagContrastRatio } from '@blog/utils';
 
 import { getTheme } from './loader';
 
@@ -8,6 +9,23 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
+
+// The real contrast math is covered by @blog/utils's own oklch.test.ts;
+// mocked here so one test below can force the resolver's AA-fallback branch
+// (a full 0–360 scan at 0.05° resolution found no real accentHue that fails
+// this fixed-L/C pairing — see that test for why it's simulated, not real).
+vi.mock('@blog/utils', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/utils')>()),
+  wcagContrastRatio: vi.fn(),
+}));
+
+const mockedWcagContrastRatio = vi.mocked(wcagContrastRatio);
+
+beforeEach(async () => {
+  const actual =
+    await vi.importActual<typeof import('@blog/utils')>('@blog/utils');
+  mockedWcagContrastRatio.mockImplementation(actual.wcagContrastRatio);
+});
 
 describe('getTheme', () => {
   it('falls back to the console preset when no settings_theme document exists', async () => {
@@ -61,5 +79,18 @@ describe('getTheme', () => {
 
     expect(result.accentHue).toBe(65);
     expect(result.logoHue).toBe(274);
+  });
+
+  it('falls back to the preset accentHue when a tenant override fails the AA guard', async () => {
+    mockedWcagContrastRatio.mockReturnValue(1);
+    mockRun.mockResolvedValue(
+      makeRawThemeSettings({ preset: PRESET_ID.EDITORIAL, accentHue: 310 }),
+    );
+
+    const result = await getTheme();
+
+    const editorial = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
+    expect(result.accentHue).toBe(editorial.accentHue);
+    expect(result.logoHue).toBe(editorial.accentHue);
   });
 });
