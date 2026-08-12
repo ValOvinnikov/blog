@@ -40,3 +40,15 @@ export const Standalone: TStory = {
 export const WithImageSource: TStory = {
   args: { src: 'https://placehold.co/64x64', title: 'Brand mark' },
 };
+
+export const WithWideImageSource: TStory = {
+  args: { src: 'https://placehold.co/320x64', title: 'Brand mark' },
+};
+
+export const StackedWithWideImageSource: TStory = {
+  args: {
+    src: 'https://placehold.co/320x64',
+    title: 'Brand mark',
+    stacked: true,
+  },
+};

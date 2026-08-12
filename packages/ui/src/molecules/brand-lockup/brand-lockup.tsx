@@ -14,8 +14,8 @@ export interface IBrandLockupProps
 
 /**
  * BrandLockup molecule — the brand mark plus an optional monospace spec
- * line. The spec line reveals at `md` (≥768px), only when `specLine` is
- * supplied.
+ * line, stacked with the mark above. The spec line reveals at `md`
+ * (≥768px), only when `specLine` is supplied.
  */
 export const BrandLockup = ({
   src,
@@ -33,7 +33,7 @@ export const BrandLockup = ({
       data-testid={dataTestId}
       {...rest}
     >
-      <BrandMark src={src} size={size} />
+      <BrandMark src={src} size={size} stacked={Boolean(specLine)} />
       {specLine && <span className={specLineSlot()}>{specLine}</span>}
     </div>
   );

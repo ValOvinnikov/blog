@@ -17,8 +17,19 @@ export const WithImageSource: TStory = {
   args: { src: 'https://placehold.co/64x64' },
 };
 
+export const WithWideImageSource: TStory = {
+  args: { src: 'https://placehold.co/320x64' },
+};
+
 export const WithSpecLine: TStory = {
   args: { specLine: 'v1.0.0 · build/local' },
+};
+
+export const WithWideImageSourceAndSpecLine: TStory = {
+  args: {
+    src: 'https://placehold.co/320x64',
+    specLine: 'v1.0.0 · build/local',
+  },
 };
 
 // Narrow-viewport exception (`ui-storybook` skill) — same as `PrimaryNavigation`'s mobile stories.
