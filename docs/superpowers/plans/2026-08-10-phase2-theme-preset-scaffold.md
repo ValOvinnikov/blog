@@ -221,9 +221,10 @@ This closes #568 with an implementation (not just the spike's written recommenda
 - Modify: `packages/service/src/features/global/site-settings/` (or wherever `settings_site` is currently fetched) — extend the existing fetcher's query/transformer/types to include `logo` (following the exact pattern `defaultOgImage` already uses there, since both are `imageWithAltSchema`-typed fields); **remove** the existing `variant` field from this fetcher's query/transformer/types (Task 4 Step 7 dropped it from the schema — the resolved `accentHue`/`logoHue` now come only from `getTheme()` below, not from `settings_site`).
 - The resolver logic: `getTheme()` reads the `settings_theme` document (if any), determines the effective `preset` (document's `preset` field, or `PRESET_ID.CONSOLE` if no document exists — the neutral-base-equals-console fallback), looks up `PRESET_REGISTRY[preset].themeTokens` as the base, and layers the document's own optional overrides (`accentHue`, `logoHue`, `headingFont`, `bodyFont`, `radiusScale`, `density`) on top where present. If `logoHue` ends up unset after layering (neither the preset nor the document set it), resolve it to the final `accentHue` value (the default-to-accentHue rule from the Contracts section) — so the returned `TThemeTokens.logoHue` is **always** a concrete number, never `undefined`, same "fully resolved" guarantee as every other field. Returns a fully-resolved `TThemeTokens` (never partial — this is the one point in the ladder where "preset default" fills every gap, so downstream consumers get a complete object).
 - Test: cases for (a) no `settings_theme` document → console preset's tokens returned unchanged (including `logoHue` resolving to `accentHue`'s value, 250), (b) document exists with `preset: EDITORIAL`, no overrides → editorial preset's tokens returned unchanged, (c) document exists with `preset: EDITORIAL` + `accentHue` override → editorial's tokens with just that one field overridden, (d) document exists with `preset: CONSOLE`, `accentHue: 65`, `logoHue: 274` (the "Indigo" reproduction case) → both hues returned independently, not one defaulting to the other.
+- Modify: `packages/service/src/shared/transformers/build-image-url.ts` — extend `buildImageUrl` with an optional transform-options param (`{ width?, height?, fit? }`, mapping to `@sanity/image-url`'s `.width()`/`.height()`/`.fit()` chaining) per the "Design decision: favicon uses the uploaded CMS logo" section above — needed so Task 8's `icon.tsx` can request a small square crop of the uploaded logo without reaching into `packages/service/src/sanity/image.ts` directly. Existing no-options callers keep today's behavior unchanged (`.auto('format')` only).
 
 **Interfaces — Consumes:** `PRESET_REGISTRY`, `TThemeTokens` (Task 3); the generated `SettingsTheme` type + `SettingsSite.logo` (Task 4).
-**Produces:** `service.settings.theme.v1.getTheme(): Promise<Result<TThemeTokens>>` (fully-resolved, never partial). `service.settings.site.v1.getSiteSettings()`'s existing view-model gains `logo: TImageWithAlt | undefined`.
+**Produces:** `service.settings.theme.v1.getTheme(): Promise<Result<TThemeTokens>>` (fully-resolved, never partial). `service.settings.site.v1.getSiteSettings()`'s existing view-model gains `logo: TImageWithAlt | undefined`. `buildImageUrl(image, options?)` gains optional size/fit transform support.
 
 - [ ] **Step 1 (test-writer, failing tests):** Write the three resolver test cases above against a not-yet-implemented `getTheme()`.
 - [ ] **Step 2:** Run — Expected: FAIL.
@@ -277,13 +278,34 @@ Note: until Task 8 actually defines `--font-ui` in `theme.css`/the injector, thi
 
 ---
 
+## Design decision: favicon uses the uploaded CMS logo, with fetch-through + fallback (added 2026-08-12, mid-Task-3)
+
+**The gap found:** D7 ("Logo: CMS image/SVG upload with the default polygon `BrandMark` as fallback") only scoped the on-page Header logo. `apps/web/src/app/icon.tsx` (the dynamic favicon route) was never addressed — it currently always **generates** the polygon mark as SVG (`buildBrandIconSvg`), theme/variant-driven, and would keep doing so even after a tenant uploads a custom logo, unless explicitly wired up.
+
+**Decision:** the favicon also uses the uploaded logo when present, via a fetch-through pattern — not a redirect (more robust across favicon-fetching clients/crawlers) and not re-generating from the upload (arbitrary formats don't need format conversion beyond what Sanity's CDN already does):
+
+1. `icon.tsx` reads `service.settings.site.v1.getSiteSettings()`'s `logo` field (Task 5).
+2. If present, build a small square-cropped Sanity CDN URL and `fetch()` those bytes server-side; return them as the response with the CDN's `Content-Type` header passed through.
+3. If `logo` is absent, or the fetch fails for any reason (network error, non-2xx, timeout), fall back to today's behavior: generate the polygon mark via `buildBrandIconSvg`, driven by the resolved theme's `logoHue` (Task 5's resolver) — same "upload-or-fallback, never let a broken favicon break the page" posture the route's own existing doc comment already establishes for its current brand-variant fetch.
+
+**Service-layer addition needed:** `packages/service/src/shared/transformers/build-image-url.ts`'s `buildImageUrl(image)` only supports `.auto('format')` today — no size/crop control. Extend it (or add a sibling helper, implementer's call) to accept an options param for `width`/`height`/`fit` (`@sanity/image-url`'s builder already supports `.width()`/`.height()`/`.fit('crop')` chaining) so `apps/web` can request a favicon-appropriate square crop (e.g. `64×64`) without `apps/web` reaching into `packages/service/src/sanity/image.ts`'s internals directly (layer-contract violation — `apps/web` only consumes `@blog/service`'s public exports).
+
+**Task scope changes:**
+
+- **Task 5 (service):** also extend `buildImageUrl` (or add a sibling helper) with size/fit transform support, per above.
+- **Task 8 (web):** also rewrites `icon.tsx` per the fetch-through-with-fallback logic above.
+
+---
+
 ### Task 8: `apps/web` — theme `<style>` injector, `next/font` wiring, logo rendering + retire the `.indigo` class
 
 **Dispatch:** `web` subagent.
 
-**Scope note (added 2026-08-12):** in addition to the injector/fonts/logo work, this task also finishes retiring the Console/Indigo brand-variant axis (see "Design decision" above, and Task 4/5's matching scope additions) — the `.indigo` CSS class and its `apps/web` consumers become dead code once the theme injector resolves `accentHue`/`logoHue` from `settings_theme` directly.
+**Scope note (added 2026-08-12):** in addition to the injector/fonts/logo work, this task also finishes retiring the Console/Indigo brand-variant axis (see "Design decision: retiring the Console/Indigo brand-variant axis" above, and Task 4/5's matching scope additions) — the `.indigo` CSS class and its `apps/web` consumers become dead code once the theme injector resolves `accentHue`/`logoHue` from `settings_theme` directly — **and** wires the uploaded CMS logo into the favicon route per the "Design decision: favicon uses the uploaded CMS logo" section above.
 
 **Files:**
+
+- Modify: `apps/web/src/app/icon.tsx` — fetch-through the uploaded `logo` (via the extended `buildImageUrl`, Task 5) when present, falling back to `buildBrandIconSvg` (theme-driven `logoHue`) when absent or on fetch failure. Update its doc comment to describe the new upload-or-fallback behavior, keeping the existing "a broken favicon must never break the page" framing.
 
 - Modify: the root layout (`apps/web/src/app/[locale]/layout.tsx` or `apps/web/src/app/layout.tsx` — confirm which one currently renders `<head>`) — add a server-rendered `<style>` block (via `dangerouslySetInnerHTML`, same mechanism the existing `themeBootstrapScript` `<script>` tag already uses in this exact spot, per `apps/web/src/config/theme-script.ts`) declaring the resolved CSS custom properties under **both** `:root { … }` and `.dark { … }` — not inline `style` on `<html>`, which carries only one scope and breaks dark mode. Include `--font-ui`'s resolved value here (backing Task 7's new token), and derive `--brand-primary*` from the resolved `accentHue` and `--logo-1/2/3` from the resolved `logoHue` **independently** (they're no longer always the same hue — see Design decision). Fetch the resolved tokens via `service.settings.theme.v1.getTheme()` (Task 5).
 - Modify: `apps/web/src/config/fonts.ts` — extend the current hardcoded single-font-per-role wiring to select between `FONT_CHOICE` options based on the resolved `headingFont`/`bodyFont` (add the `next/font/google` imports for whatever editorial font(s) Task 3 named).
