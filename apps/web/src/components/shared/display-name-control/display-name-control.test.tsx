@@ -43,8 +43,8 @@ vi.mock('@web/components/shared/toast-provider', () => ({
 }));
 
 const setup = customRender(DisplayNameControl, {
-  initialName: 'Val Ovinnikov',
-  email: 'val@icloud.com',
+  initialName: 'Jane Doe',
+  email: 'jane@icloud.com',
   image: null,
 });
 
@@ -60,9 +60,9 @@ describe(`<${DisplayNameControl.name}/>`, () => {
     setup();
 
     expect(screen.getByRole('textbox', { name: 'Display name' })).toHaveValue(
-      'Val Ovinnikov',
+      'Jane Doe',
     );
-    expect(screen.getByText('VO')).toBeVisible();
+    expect(screen.getByText('JD')).toBeVisible();
     expect(screen.getByTestId('display-name-prompt-icon')).toBeVisible();
   });
 

@@ -45,7 +45,7 @@ describe(`<${AccountPage.name}/>`, () => {
 
   it('renders the page heading and all three sections, in 6c/6b/6a order', async () => {
     authMock.mockResolvedValue({
-      user: { id: 'user-1', name: 'Val Ovinnikov', email: 'val@example.com' },
+      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
     });
 
     await setup();

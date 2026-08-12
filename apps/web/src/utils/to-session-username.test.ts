@@ -2,11 +2,11 @@ import { toSessionUsername } from './to-session-username';
 
 describe(toSessionUsername, () => {
   it('prefers the email local part when email is present', () => {
-    expect(toSessionUsername('Val Ovinnikov', 'val@example.com')).toBe('val');
+    expect(toSessionUsername('Jane Doe', 'jane@example.com')).toBe('jane');
   });
 
   it('falls back to a slug of name when email is absent', () => {
-    expect(toSessionUsername('Val Ovinnikov', undefined)).toBe('valovinnikov');
+    expect(toSessionUsername('Jane Doe', undefined)).toBe('janedoe');
   });
 
   it('falls back to the generic "user" noun when both are absent', () => {
@@ -14,9 +14,7 @@ describe(toSessionUsername, () => {
   });
 
   it('falls through to name when the email has an empty local part', () => {
-    expect(toSessionUsername('Val Ovinnikov', '@example.com')).toBe(
-      'valovinnikov',
-    );
+    expect(toSessionUsername('Jane Doe', '@example.com')).toBe('janedoe');
   });
 
   it('falls through to the "user" fallback when the email local part is empty and name is absent', () => {
