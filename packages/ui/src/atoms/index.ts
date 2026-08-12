@@ -10,7 +10,6 @@ export * from './heading';
 export * from './icon';
 export * from './icon-button';
 export * from './inline-code';
-export * from './logo';
 export * from './media-frame';
 export * from './meta-separator';
 export * from './nav-link';

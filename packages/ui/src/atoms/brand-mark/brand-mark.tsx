@@ -1,35 +1,54 @@
 import type { IWithDataTestId } from '@blog/config';
-import type { SVGProps } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 
 import {
   brandMarkVariants,
   type TBrandMarkVariants,
 } from './brand-mark-variants';
 
-export interface IBrandMarkProps
-  extends
-    Omit<SVGProps<SVGSVGElement>, 'className' | 'title'>,
-    IWithDataTestId {
+/** Attributes valid on both the `<svg>` and `<img>` render branches, so passthrough props aren't dropped when `src` selects the image variant. */
+type TBrandMarkRestProps = Omit<
+  ComponentPropsWithoutRef<'svg'> & ComponentPropsWithoutRef<'img'>,
+  'className' | 'title' | 'src' | 'alt'
+>;
+
+export interface IBrandMarkProps extends TBrandMarkRestProps, IWithDataTestId {
   size?: TBrandMarkVariants['size'];
   /** Accessible title for standalone use. Omit to keep the mark decorative. */
   title?: string;
   className?: string;
+  /** Uploaded brand-mark image source; renders in place of the polygon mark when set. */
+  src?: string;
 }
 
 /**
- * BrandMark atom — the brand mark as three stacked polygon layers, coloured
- * from the `--logo-1/2/3` design tokens via inline `style` (these tokens
+ * BrandMark atom — the brand mark, rendered from an uploaded image when
+ * `src` is supplied, or as three stacked polygon layers coloured from the
+ * `--logo-1/2/3` design tokens via inline `style` otherwise (these tokens
  * aren't mirrored into `@theme inline` as Tailwind utilities). Decorative by
  * default (no accessible name); pass `title` when it's used standalone
  * rather than nested inside a labelled composition.
  */
 export const BrandMark = ({
+  src,
   size,
   title,
   className,
   dataTestId,
   ...rest
 }: IBrandMarkProps) => {
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={title ?? ''}
+        className={brandMarkVariants({ size, class: className })}
+        data-testid={dataTestId}
+        {...rest}
+      />
+    );
+  }
+
   return (
     <svg
       viewBox="0 0 24 24"

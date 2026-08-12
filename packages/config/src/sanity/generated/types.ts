@@ -181,8 +181,6 @@ export type Skim = {
 export type Brand = {
   _type: 'brand';
   name?: string;
-  prefix?: string;
-  suffix?: string;
   logo?: ImageWithAlt;
   specLine?: SpecLine;
   variant?: 'CONSOLE' | 'INDIGO';
@@ -271,6 +269,24 @@ export type HeroLayout = {
   spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   dividerTop?: boolean;
   dividerBottom?: boolean;
+};
+
+export type Settings_theme = {
+  _id: string;
+  _type: 'settings_theme';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  preset?: 'CONSOLE' | 'EDITORIAL';
+  accentHue?: number;
+  logoHue?: number;
+  headingFont?:
+    'SPACE_GROTESK' | 'NEWSREADER' | 'JETBRAINS_MONO' | 'FRAUNCES' | 'INTER';
+  bodyFont?:
+    'SPACE_GROTESK' | 'NEWSREADER' | 'JETBRAINS_MONO' | 'FRAUNCES' | 'INTER';
+  radiusScale?: 'SM' | 'MD' | 'LG' | 'XL';
+  density?: 'DEFAULT' | 'COMPACT';
 };
 
 export type Settings_newsletter = {
@@ -689,6 +705,7 @@ export type AllSanitySchemaTypes =
   | BodyImage
   | ImageWithAlt
   | HeroLayout
+  | Settings_theme
   | Settings_newsletter
   | Settings_footer
   | Settings_navigation

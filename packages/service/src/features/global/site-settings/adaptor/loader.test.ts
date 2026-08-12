@@ -33,8 +33,6 @@ describe('getSiteSettings', () => {
         description: 'Great content',
         brand: {
           name: 'Awesome Blog',
-          prefix: 'val',
-          suffix: '.dev',
           specLine: {
             items: ['build 2026.07', 'online'],
             separator: SPEC_LINE_SEPARATORS.DOT,
@@ -49,8 +47,6 @@ describe('getSiteSettings', () => {
 
     expect(result.description).toBe('Great content');
     expect(result.brand.name).toBe('Awesome Blog');
-    expect(result.brand.prefix).toBe('val');
-    expect(result.brand.suffix).toBe('.dev');
     expect(result.brand.specLine).toBe(
       `build 2026.07 ${SPEC_LINE_SEPARATOR_CHARS.DOT} online`,
     );
@@ -62,8 +58,6 @@ describe('getSiteSettings', () => {
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          prefix: 'val',
-          suffix: '.dev',
           specLine: null,
           logo: makeRawImage('Logo'),
           variant: BRAND_VARIANTS.INDIGO,
@@ -81,8 +75,6 @@ describe('getSiteSettings', () => {
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          prefix: 'val',
-          suffix: '.dev',
           specLine: null,
           logo: makeRawImage('Logo'),
           variant: BRAND_VARIANTS.CONSOLE,
@@ -100,8 +92,6 @@ describe('getSiteSettings', () => {
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          prefix: 'val',
-          suffix: '.dev',
           specLine: {
             items: ['build 2026.07', 'online'],
             separator: SPEC_LINE_SEPARATORS.PIPE,
@@ -124,8 +114,6 @@ describe('getSiteSettings', () => {
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          prefix: 'val',
-          suffix: '.dev',
           specLine: {
             items: ['build 2026.07', 'online'],
             separator: SPEC_LINE_SEPARATORS.BULLET,
@@ -148,8 +136,6 @@ describe('getSiteSettings', () => {
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          prefix: 'val',
-          suffix: '.dev',
           specLine: {
             items: ['build 2026.07', 'online'],
             separator: SPEC_LINE_SEPARATORS.SLASH,
@@ -172,8 +158,6 @@ describe('getSiteSettings', () => {
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          prefix: 'val',
-          suffix: '.dev',
           specLine: { items: ['online'], separator: SPEC_LINE_SEPARATORS.DOT },
           logo: makeRawImage('Logo'),
           variant: BRAND_VARIANTS.CONSOLE,
@@ -191,8 +175,6 @@ describe('getSiteSettings', () => {
       makeRawSiteSettings({
         brand: {
           name: 'Awesome Blog',
-          prefix: 'val',
-          suffix: '.dev',
           specLine: { items: [], separator: SPEC_LINE_SEPARATORS.DOT },
           logo: makeRawImage('Logo'),
           variant: BRAND_VARIANTS.CONSOLE,
@@ -211,5 +193,22 @@ describe('getSiteSettings', () => {
     const result = await getSiteSettings();
 
     expect(result.defaultOgImageUrl).toContain('sanity.io');
+  });
+
+  it('leaves logoUrl undefined when no logo is uploaded (D7 fallback)', async () => {
+    mockRun.mockResolvedValue(
+      makeRawSiteSettings({
+        brand: {
+          name: 'Awesome Blog',
+          specLine: null,
+          logo: null,
+          variant: BRAND_VARIANTS.CONSOLE,
+        },
+      }),
+    );
+
+    const result = await getSiteSettings();
+
+    expect(result.brand.logoUrl).toBeUndefined();
   });
 });

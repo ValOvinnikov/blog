@@ -143,7 +143,7 @@ describe(resolveDefaultSocialImageProps, () => {
     getSiteSettingsMock.mockResolvedValue({
       ok: true,
       data: {
-        brand: { name: 'Test Brand', prefix: 'test', suffix: 'brand' },
+        brand: { name: 'Test Brand' },
         tagline: 'Building things',
       },
     });

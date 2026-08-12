@@ -6,9 +6,7 @@ import { BrandLockupLink } from './brand-lockup-link';
 
 const brand: TBrand = {
   name: 'Test Brand',
-  prefix: 'test',
-  suffix: 'brand',
-  logoUrl: undefined,
+  logoUrl: 'https://cdn.sanity.io/images/test/production/brand-mark.svg',
   specLine: undefined,
   variant: BRAND_VARIANTS.CONSOLE,
 };
@@ -17,12 +15,21 @@ const setup = customRender(BrandLockupLink, { brand });
 
 describe(`<${BrandLockupLink.name}/>`, () => {
   it('renders a link home labelled "Home" wrapping the brand lockup', () => {
-    setup();
+    const { container } = setup();
 
     const link = screen.getByRole('link', { name: 'Home' });
     expect(link).toHaveAttribute('href', '/');
-    expect(screen.getByText(brand.prefix)).toBeVisible();
-    expect(screen.getByText(brand.suffix as string)).toBeVisible();
+    expect(container.querySelector('img')).toHaveAttribute(
+      'src',
+      brand.logoUrl,
+    );
+  });
+
+  it('falls through to the polygon mark when no logo is uploaded', () => {
+    const { container } = setup({ brand: { ...brand, logoUrl: undefined } });
+
+    expect(container.querySelector('img')).not.toBeInTheDocument();
+    expect(container.querySelector('svg')).toBeInTheDocument();
   });
 
   it('passes the spec line through to the brand lockup when set', () => {

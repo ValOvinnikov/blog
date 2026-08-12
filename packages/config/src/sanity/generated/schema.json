@@ -1065,20 +1065,6 @@
           },
           "optional": true
         },
-        "prefix": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          },
-          "optional": true
-        },
-        "suffix": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          },
-          "optional": true
-        },
         "logo": {
           "type": "objectAttribute",
           "value": {
@@ -1744,6 +1730,181 @@
           },
           "optional": true
         }
+      }
+    }
+  },
+  {
+    "name": "settings_theme",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "settings_theme"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "title": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "preset": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "CONSOLE"
+            },
+            {
+              "type": "string",
+              "value": "EDITORIAL"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "accentHue": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "number"
+        },
+        "optional": true
+      },
+      "logoHue": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "number"
+        },
+        "optional": true
+      },
+      "headingFont": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "SPACE_GROTESK"
+            },
+            {
+              "type": "string",
+              "value": "NEWSREADER"
+            },
+            {
+              "type": "string",
+              "value": "JETBRAINS_MONO"
+            },
+            {
+              "type": "string",
+              "value": "FRAUNCES"
+            },
+            {
+              "type": "string",
+              "value": "INTER"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "bodyFont": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "SPACE_GROTESK"
+            },
+            {
+              "type": "string",
+              "value": "NEWSREADER"
+            },
+            {
+              "type": "string",
+              "value": "JETBRAINS_MONO"
+            },
+            {
+              "type": "string",
+              "value": "FRAUNCES"
+            },
+            {
+              "type": "string",
+              "value": "INTER"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "radiusScale": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "SM"
+            },
+            {
+              "type": "string",
+              "value": "MD"
+            },
+            {
+              "type": "string",
+              "value": "LG"
+            },
+            {
+              "type": "string",
+              "value": "XL"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "density": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "DEFAULT"
+            },
+            {
+              "type": "string",
+              "value": "COMPACT"
+            }
+          ]
+        },
+        "optional": true
       }
     }
   },

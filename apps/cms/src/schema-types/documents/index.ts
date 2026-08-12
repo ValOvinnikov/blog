@@ -9,6 +9,7 @@ import { footerSchema } from './settings/footer';
 import { navigationSchema } from './settings/navigation';
 import { newsletterSettingsSchema } from './settings/newsletter';
 import { siteSchema } from './settings/site-settings';
+import { themeSchema } from './settings/theme';
 
 export const documents = [
   postSchema,
@@ -22,4 +23,5 @@ export const documents = [
   navigationSchema,
   footerSchema,
   newsletterSettingsSchema,
+  themeSchema,
 ];

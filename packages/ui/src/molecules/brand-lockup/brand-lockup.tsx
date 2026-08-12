@@ -1,41 +1,31 @@
 import type { IWithDataTestId } from '@blog/config';
 import { BrandMark, type IBrandMarkProps } from '@blog/ui/atoms/brand-mark';
-import { Logo } from '@blog/ui/atoms/logo';
 import type { ComponentPropsWithoutRef } from 'react';
 
 import { brandLockupVariants } from './brand-lockup-variants';
 
 export interface IBrandLockupProps
   extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
-  prefix: string;
-  suffix?: string;
+  /** Uploaded brand-mark image source; falls through to `BrandMark`'s polygon fallback when unset. */
+  src?: string;
   size?: IBrandMarkProps['size'];
   specLine?: string;
 }
 
 /**
- * BrandLockup molecule — the brand mark plus the wordmark (via the `Logo`
- * atom), with an optional monospace spec line. The wordmark (prefix+suffix)
- * is visible at every viewport width, scaled down below the `sm` breakpoint
- * (<640px) so it doesn't crowd narrow headers, then growing to its full size
- * at `sm` (≥640px). The spec line reveals at `md` (≥768px), only when
- * `specLine` is supplied.
+ * BrandLockup molecule — the brand mark plus an optional monospace spec
+ * line. The spec line reveals at `md` (≥768px), only when `specLine` is
+ * supplied.
  */
 export const BrandLockup = ({
-  prefix,
-  suffix,
+  src,
   size,
   specLine,
   className,
   dataTestId,
   ...rest
 }: IBrandLockupProps) => {
-  const {
-    root,
-    text,
-    wordmark,
-    specLine: specLineSlot,
-  } = brandLockupVariants();
+  const { root, specLine: specLineSlot } = brandLockupVariants();
 
   return (
     <div
@@ -43,11 +33,8 @@ export const BrandLockup = ({
       data-testid={dataTestId}
       {...rest}
     >
-      <BrandMark size={size} />
-      <span className={text()}>
-        <Logo prefix={prefix} suffix={suffix} className={wordmark()} />
-        {specLine && <span className={specLineSlot()}>{specLine}</span>}
-      </span>
+      <BrandMark src={src} size={size} />
+      {specLine && <span className={specLineSlot()}>{specLine}</span>}
     </div>
   );
 };

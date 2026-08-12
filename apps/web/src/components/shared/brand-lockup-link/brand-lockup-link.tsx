@@ -8,21 +8,17 @@ export interface IBrandLockupLinkProps {
 }
 
 /**
- * BrandLockupLink — the primary brand identity (mark + wordmark), linked
- * home. Framework-coupled composition of `SmartLink` (routing) and
- * `BrandLockup` (`@blog/ui`, pure/prop-driven) — kept in `apps/web` because
- * linking stays out of `@blog/ui`. Used in the site header.
+ * BrandLockupLink — the primary brand identity (logo mark), linked home.
+ * Framework-coupled composition of `SmartLink` (routing) and `BrandLockup`
+ * (`@blog/ui`, pure/prop-driven) — kept in `apps/web` because linking stays
+ * out of `@blog/ui`. Used in the site header.
  */
 export const BrandLockupLink = ({ brand }: IBrandLockupLinkProps) => {
   const t = useTranslations('brandLockupLink');
 
   return (
     <SmartLink href="/" aria-label={t('ariaLabel')}>
-      <BrandLockup
-        prefix={brand.prefix}
-        suffix={brand.suffix}
-        specLine={brand.specLine}
-      />
+      <BrandLockup src={brand.logoUrl} specLine={brand.specLine} />
     </SmartLink>
   );
 };

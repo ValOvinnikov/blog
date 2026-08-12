@@ -10,6 +10,7 @@ import { footerSchema } from '@cms/schema-types/documents/settings/footer';
 import { navigationSchema } from '@cms/schema-types/documents/settings/navigation';
 import { newsletterSettingsSchema } from '@cms/schema-types/documents/settings/newsletter';
 import { siteSchema } from '@cms/schema-types/documents/settings/site-settings';
+import { themeSchema } from '@cms/schema-types/documents/settings/theme';
 import { contentSchema } from '@cms/schema-types/modules/module-content';
 import { ctaSchema } from '@cms/schema-types/modules/module-cta';
 import { heroSchema } from '@cms/schema-types/modules/module-hero';
@@ -27,6 +28,7 @@ import {
   Megaphone,
   Menu,
   Newspaper,
+  Palette,
   PanelBottom,
   Settings,
   Sparkles,
@@ -185,6 +187,15 @@ export default defineConfig({
                         S.document()
                           .schemaType(footerSchema.name)
                           .documentId(footerSchema.name),
+                      ),
+                    S.listItem()
+                      .title('Theme')
+                      .id(themeSchema.name)
+                      .icon(Palette)
+                      .child(
+                        S.document()
+                          .schemaType(themeSchema.name)
+                          .documentId(themeSchema.name),
                       ),
                     S.divider(),
                     S.listItem()

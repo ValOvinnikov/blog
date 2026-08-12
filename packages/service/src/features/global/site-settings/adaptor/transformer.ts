@@ -20,8 +20,6 @@ export function toSiteSettings(raw: TRawSiteSettings): TSiteSettings {
   return {
     brand: {
       name: raw.brand.name,
-      prefix: raw.brand.prefix,
-      suffix: raw.brand.suffix ?? undefined,
       specLine,
       logoUrl: buildImageUrl(raw.brand.logo),
       variant: raw.brand.variant,
