@@ -1,15 +1,18 @@
 import type { IWithDataTestId } from '@blog/config';
-import type { SVGProps } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 
 import {
   brandMarkVariants,
   type TBrandMarkVariants,
 } from './brand-mark-variants';
 
-export interface IBrandMarkProps
-  extends
-    Omit<SVGProps<SVGSVGElement>, 'className' | 'title'>,
-    IWithDataTestId {
+/** Attributes valid on both the `<svg>` and `<img>` render branches, so passthrough props aren't dropped when `src` selects the image variant. */
+type TBrandMarkRestProps = Omit<
+  ComponentPropsWithoutRef<'svg'> & ComponentPropsWithoutRef<'img'>,
+  'className' | 'title' | 'src' | 'alt'
+>;
+
+export interface IBrandMarkProps extends TBrandMarkRestProps, IWithDataTestId {
   size?: TBrandMarkVariants['size'];
   /** Accessible title for standalone use. Omit to keep the mark decorative. */
   title?: string;
@@ -41,6 +44,7 @@ export const BrandMark = ({
         alt={title ?? ''}
         className={brandMarkVariants({ size, class: className })}
         data-testid={dataTestId}
+        {...rest}
       />
     );
   }

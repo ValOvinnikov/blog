@@ -28,7 +28,7 @@ Variants: isBookmarked: (boolean)
 
 ### BrandMark — `atoms/brand-mark/brand-mark.tsx`
 BrandMark atom — the brand mark, rendered from an uploaded image when `src` is supplied, or as three stacked polygon layers coloured from the `--logo-1/2/3` design tokens via inline `style` otherwise (these tokens aren't mirrored into `@theme inline` as Tailwind utilities).
-Props: size?: TBrandMarkVariants['size'] · title?: string · className?: string · src?: string _(extends Omit<SVGProps<SVGSVGElement>, 'className' | 'ti…, IWithDataTestId)_
+Props: size?: TBrandMarkVariants['size'] · title?: string · className?: string · src?: string _(extends TBrandMarkRestProps, IWithDataTestId)_
 Variants: size: Size.SM|Size.MD|Size.LG
 
 ### Button — `atoms/button/button.tsx`

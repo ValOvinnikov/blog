@@ -52,4 +52,20 @@ describe(`<${BrandMark.name}/>`, () => {
     setup({ src, title });
     expect(screen.getByRole('img', { name: title })).toBeVisible();
   });
+
+  it('forwards passthrough props to the image the same as the svg mark', () => {
+    const src = faker.image.url();
+    const label = faker.lorem.words(2);
+    const { container: svgContainer } = setup({ 'aria-label': label });
+    expect(svgContainer.querySelector('svg')).toHaveAttribute(
+      'aria-label',
+      label,
+    );
+
+    const { container: imgContainer } = setup({ src, 'aria-label': label });
+    expect(imgContainer.querySelector('img')).toHaveAttribute(
+      'aria-label',
+      label,
+    );
+  });
 });
