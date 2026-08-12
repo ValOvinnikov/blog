@@ -32,7 +32,7 @@ export default async function RootLayout({ children }: TProps) {
   const result = await service.global.themeSettings.v1.getTheme();
 
   if (!result.ok) {
-    console.error(`Error to fetch theme settings: ${result.error}`);
+    console.error(`Error fetching theme settings: ${result.error}`);
   }
 
   const themeTokens = result.ok
@@ -40,14 +40,15 @@ export default async function RootLayout({ children }: TProps) {
     : PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
 
   const analyticsEnabled = isVercelAnalyticsEnabled();
+  const fontVariableClassName = await resolveFontVariableClassName(
+    themeTokens.headingFont,
+    themeTokens.bodyFont,
+  );
 
   return (
     <html
       lang={LOCALE_ISO_CODES.EN.toLowerCase()}
-      className={resolveFontVariableClassName(
-        themeTokens.headingFont,
-        themeTokens.bodyFont,
-      )}
+      className={fontVariableClassName}
       suppressHydrationWarning={true}
     >
       <head>
