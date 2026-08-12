@@ -1,15 +1,13 @@
 import '../../index.css';
 
-import { LOCALE_ISO_CODES, type TBrandVariants } from '@blog/config';
+import { LOCALE_ISO_CODES, PRESET_ID, PRESET_REGISTRY } from '@blog/config';
 import { service } from '@blog/service';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import { jetbrainsMono, newsreader, spaceGrotesk } from '@web/config/fonts';
+import { resolveFontVariableClassName } from '@web/config/fonts';
 import { themeBootstrapScript } from '@web/config/theme-script';
+import { buildThemeStyleBlock } from '@web/utils/build-theme-style-block';
 import { isVercelAnalyticsEnabled } from '@web/utils/is-vercel-analytics-enabled';
-import { buildRootHtmlClassName } from '@web/utils/root-html-class-name';
-
-const FONT_VARIABLE_CLASS_NAMES = `${spaceGrotesk.variable} ${newsreader.variable} ${jetbrainsMono.variable}`;
 
 type TProps = {
   children: React.ReactNode;
@@ -24,34 +22,40 @@ type TProps = {
  * threaded from `params` — this app has exactly one locale today
  * (`routing.ts`) and a root layout has no route params to read one from.
  *
- * Fetches site settings again here (`[locale]/layout.tsx` and its
- * `generateMetadata` both fetch the same tagged query in the same request)
- * purely to read the CMS-driven
- * brand variant onto `<html>` at server-render time — Next dedupes the
- * identical `getSiteSettings()` call via the data cache, so this costs no
- * extra network round trip. A fetch failure falls back to the Console
- * default rather than `notFound()`: this shell wraps the whole app,
- * including the not-found page itself, so it must always render.
+ * Resolves the tenant's theme tokens here to inject the `<style>` block and
+ * pick the `next/font` variable classes at server-render time. A fetch
+ * failure falls back to the Console preset's own tokens rather than
+ * `notFound()`: this shell wraps the whole app, including the not-found page
+ * itself, so it must always render.
  */
 export default async function RootLayout({ children }: TProps) {
-  const result = await service.global.siteSettings.v1.getSiteSettings();
+  const result = await service.global.themeSettings.v1.getTheme();
 
-  let variant: TBrandVariants | undefined;
-  if (result.ok) {
-    variant = result.data.brand.variant;
-  } else {
-    console.error(`Error to fetch site settings: ${result.error}`);
+  if (!result.ok) {
+    console.error(`Error to fetch theme settings: ${result.error}`);
   }
+
+  const themeTokens = result.ok
+    ? result.data
+    : PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
 
   const analyticsEnabled = isVercelAnalyticsEnabled();
 
   return (
     <html
       lang={LOCALE_ISO_CODES.EN.toLowerCase()}
-      className={buildRootHtmlClassName(FONT_VARIABLE_CLASS_NAMES, variant)}
+      className={resolveFontVariableClassName(
+        themeTokens.headingFont,
+        themeTokens.bodyFont,
+      )}
       suppressHydrationWarning={true}
     >
       <head>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: buildThemeStyleBlock(themeTokens),
+          }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: themeBootstrapScript,

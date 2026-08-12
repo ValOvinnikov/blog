@@ -1,11 +1,10 @@
-import { BRAND_VARIANTS } from '@blog/config';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import RootLayout from './layout';
 
-const { getSiteSettingsMock } = vi.hoisted(() => ({
-  getSiteSettingsMock: vi.fn(),
+const { getThemeMock } = vi.hoisted(() => ({
+  getThemeMock: vi.fn(),
 }));
 
 const { envMock } = vi.hoisted(() => ({
@@ -15,7 +14,7 @@ const { envMock } = vi.hoisted(() => ({
 vi.mock('@blog/service', () => ({
   service: {
     global: {
-      siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } },
+      themeSettings: { v1: { getTheme: getThemeMock } },
     },
   },
 }));
@@ -24,14 +23,21 @@ vi.mock('@web/utils/env/env', () => ({
   env: envMock,
 }));
 
+const CONSOLE_THEME_TOKENS = {
+  accentHue: 250,
+  logoHue: 250,
+  headingFont: 'SPACE_GROTESK',
+  bodyFont: 'NEWSREADER',
+  radiusScale: 'MD',
+  density: 'DEFAULT',
+  chromeOn: true,
+};
+
 describe(`<${RootLayout.name}/>`, () => {
   beforeEach(() => {
     vi.clearAllMocks();
     envMock.VERCEL_ANALYTICS_ENABLED = undefined;
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { brand: { variant: BRAND_VARIANTS.CONSOLE } },
-    });
+    getThemeMock.mockResolvedValue({ ok: true, data: CONSOLE_THEME_TOKENS });
   });
 
   it('mounts children in the body', async () => {
@@ -42,6 +48,43 @@ describe(`<${RootLayout.name}/>`, () => {
     const bodyChildren = [body.props.children].flat();
 
     expect(bodyChildren).toContainEqual(children);
+  });
+
+  it('injects the resolved theme tokens as a <style> block', async () => {
+    const html = await RootLayout({ children: <div>content</div> });
+
+    const [head] = html.props.children;
+    const headChildren = [head.props.children].flat();
+    const style = headChildren.find(
+      (child: React.ReactElement) => child?.type === 'style',
+    );
+
+    expect(style.props.dangerouslySetInnerHTML.__html).toContain(
+      '--brand-primary: oklch(0.53 0.17 250);',
+    );
+  });
+
+  it('falls back to the Console preset tokens when the theme fetch fails', async () => {
+    getThemeMock.mockResolvedValue({ ok: false, error: 'boom' });
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    const html = await RootLayout({ children: <div>content</div> });
+
+    const [head] = html.props.children;
+    const headChildren = [head.props.children].flat();
+    const style = headChildren.find(
+      (child: React.ReactElement) => child?.type === 'style',
+    );
+
+    expect(style.props.dangerouslySetInnerHTML.__html).toContain(
+      '--brand-primary: oklch(0.53 0.17 250);',
+    );
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('theme settings'),
+    );
+    consoleErrorSpy.mockRestore();
   });
 
   it('omits Analytics and SpeedInsights when VERCEL_ANALYTICS_ENABLED is unset', async () => {
