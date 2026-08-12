@@ -6,7 +6,7 @@ export const terminalChipVariants = tv({
       'inline-flex items-center gap-1.5',
       'rounded-sm border border-border-strong px-2.5 py-1',
       'bg-surface',
-      'font-mono text-label',
+      'font-ui text-label',
     ],
     prompt: ['text-brand-primary'],
     text: ['text-text'],
