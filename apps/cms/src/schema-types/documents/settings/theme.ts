@@ -3,19 +3,12 @@ import {
   FONT_CHOICE,
   PRESET_ID,
   RADIUS_SCALE,
-  type TRadiusScale,
+  RADIUS_SCALE_LABEL,
 } from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { Palette } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
-
-const RADIUS_SCALE_LABEL: Record<TRadiusScale, string> = {
-  [RADIUS_SCALE.SM]: 'Small',
-  [RADIUS_SCALE.MD]: 'Medium',
-  [RADIUS_SCALE.LG]: 'Large',
-  [RADIUS_SCALE.XL]: 'Extra Large',
-};
 
 export const themeSchema = defineType({
   name: 'settings_theme',
