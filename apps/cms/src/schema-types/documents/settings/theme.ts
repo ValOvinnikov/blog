@@ -3,11 +3,19 @@ import {
   FONT_CHOICE,
   PRESET_ID,
   RADIUS_SCALE,
+  type TRadiusScale,
 } from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { Palette } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
+
+const RADIUS_SCALE_LABEL: Record<TRadiusScale, string> = {
+  [RADIUS_SCALE.SM]: 'Small',
+  [RADIUS_SCALE.MD]: 'Medium',
+  [RADIUS_SCALE.LG]: 'Large',
+  [RADIUS_SCALE.XL]: 'Extra Large',
+};
 
 export const themeSchema = defineType({
   name: 'settings_theme',
@@ -88,7 +96,7 @@ export const themeSchema = defineType({
         "How rounded corners look on buttons, cards, and other boxes across the site, from sharp/square edges to very rounded. Leave blank to use the preset's default.",
       options: {
         list: Object.values(RADIUS_SCALE).map((value) => ({
-          title: toTitleCase(value),
+          title: RADIUS_SCALE_LABEL[value],
           value,
         })),
       },
