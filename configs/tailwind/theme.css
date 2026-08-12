@@ -334,34 +334,6 @@
   --logo-alt-accent: oklch(0.54 0.15 65);
 }
 
-/* Indigo variant (#512): swaps --brand-primary/--brand-primary-hover/
-   --logo-1/2/3 to the Indigo values computed and WCAG-verified in #494/#515.
-   --brand-primary-hover has no --logo-alt-* counterpart, so it's derived here
-   with the same -0.06 lightness delta the Console --brand-primary-hover
-   already uses (verified AA: light 6.57:1 vs --primary / 6.11:1 vs
-   --primary-subtle).
-   #563: --brand-primary-solid/--brand-primary-solid-hover/--brand-primary-muted
-   were missing here, so the primary Button (bg-brand-primary-solid) silently
-   stayed Console blue under this variant. Reuses --logo-alt-accent (no new
-   colors) for --brand-primary-solid, matching Console's own
-   --brand-primary-solid ≈ --brand-primary pattern above. Verified
-   (OKLCH → sRGB → WCAG contrast, independently recomputed): fill #a85700 vs
-   the existing white --brand-primary-contrast = 5.09:1 (AA pass); hover fill
-   #944500 vs white = 6.57:1 (AA pass). --brand-primary-muted mirrors
-   --brand-primary-muted's own light-mode shape (L 0.95, C 0.03) at this hue
-   for the indigo ::selection tint; selection text (--brand-primary) against
-   it measures 4.51:1 (AA pass). */
-.indigo {
-  --brand-primary: var(--logo-alt-accent);
-  --brand-primary-hover: oklch(0.48 0.15 65);
-  --brand-primary-solid: var(--logo-alt-accent);
-  --brand-primary-solid-hover: oklch(0.48 0.15 65);
-  --brand-primary-muted: oklch(0.95 0.03 65);
-  --logo-1: var(--logo-alt-1);
-  --logo-2: var(--logo-alt-2);
-  --logo-3: var(--logo-alt-3);
-}
-
 .dark {
   color-scheme: dark;
 
@@ -427,31 +399,6 @@
   --logo-alt-2: oklch(0.64 0.2 274);
   --logo-alt-3: oklch(0.78 0.13 274);
   --logo-alt-accent: oklch(0.8 0.15 80);
-}
-
-/* Dark-mode indigo variant (#512): same swap as `.indigo` above,
-   but using the dark `--logo-alt-*` values and the dark brand-primary-hover
-   delta (+0.06, matching Console's dark --brand-primary-hover convention).
-   Verified AA: 10.08:1 / 9.54:1 (--brand-primary) and 12.14:1 / 11.49:1
-   (--brand-primary-hover).
-   #563: --brand-primary-solid/--brand-primary-solid-hover/--brand-primary-muted
-   were missing here too — same bug as the light `.indigo` block above.
-   Reuses the dark --logo-alt-accent for --brand-primary-solid, matching
-   Console's dark --brand-primary-solid ≈ --brand-primary pattern. Verified
-   (independently recomputed): fill #f0b135 vs the existing near-black
-   --brand-primary-contrast = 10.23:1 (AAA pass); hover fill #ffc54d vs
-   near-black = 12.32:1 (AAA pass). --brand-primary-muted mirrors
-   --brand-primary-muted's own dark-mode shape (L 0.3, C 0.06) at this hue;
-   selection text (--brand-primary) against it measures 7.24:1 (AAA pass). */
-.dark.indigo {
-  --brand-primary: var(--logo-alt-accent);
-  --brand-primary-hover: oklch(0.86 0.15 80);
-  --brand-primary-solid: var(--logo-alt-accent);
-  --brand-primary-solid-hover: oklch(0.86 0.15 80);
-  --brand-primary-muted: oklch(0.3 0.06 80);
-  --logo-1: var(--logo-alt-1);
-  --logo-2: var(--logo-alt-2);
-  --logo-3: var(--logo-alt-3);
 }
 
 @layer base {
