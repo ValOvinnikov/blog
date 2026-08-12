@@ -192,6 +192,30 @@ when supplied, so a module with no unique heading (`module_content`) gets a
 landmark with no accessible-name fallback rather than pointing at an element
 that never renders.
 
+**Theme-as-content** (Phase 2 of the configurability epic, #1285/#1287): the
+optional `settings_theme` singleton (`preset` — `PRESET_ID.CONSOLE`/
+`EDITORIAL`, required, defaults to `CONSOLE` when the document itself doesn't
+exist — the neutral base a tenant always renders even unconfigured — plus
+optional `accentHue`/`logoHue`/`headingFont`/`bodyFont`/`radiusScale`/
+`density` overrides) is resolved by `service.global.themeSettings.v1.getTheme()`
+against `@blog/config`'s `PRESET_REGISTRY` into a fully-populated
+`TThemeTokens` (never partial — every gap is filled by the preset's own
+default). `apps/web`'s root layout fetches this once per request and injects
+the resolved tokens as a server-rendered `<style>` block declaring CSS custom
+properties under both `:root` and `.dark`, and selects the matching
+`next/font/google` pair (`headingFont`/`bodyFont`) via a per-font dynamically
+imported loader module so only the two fonts actually resolved for that
+render are bundled/preloaded. The favicon route (`apps/web/src/app/icon.tsx`)
+fetches through the tenant's uploaded `settings_site.brand.logo` as a small
+square crop when present, falling back to one static default mark with no
+per-tenant recoloring. The former `siteSettings.brand.variant`/
+`BRAND_VARIANT` binary look toggle (and its `.indigo` CSS class) is retired
+in favor of this — its one prior look ("Indigo") is now expressible as a
+`settings_theme` override (`accentHue`/`logoHue`) rather than a separate
+axis; migrating existing `INDIGO`-variant content and removing the field
+itself is tracked separately (#1389) since it's a live-data migration, not a
+schema-only change.
+
 Full schema reference (every document/object, field-by-field), naming and
 validation conventions, incl. the `layout`/`sectionHeader` objects' own
 field lists:

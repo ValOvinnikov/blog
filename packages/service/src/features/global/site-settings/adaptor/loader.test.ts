@@ -211,4 +211,40 @@ describe('getSiteSettings', () => {
 
     expect(result.brand.logoUrl).toBeUndefined();
   });
+
+  it('exposes the raw logo asset reference alongside the built logoUrl', async () => {
+    const logo = makeRawImage('Logo');
+    mockRun.mockResolvedValue(
+      makeRawSiteSettings({
+        brand: {
+          name: 'Awesome Blog',
+          specLine: null,
+          logo,
+          variant: BRAND_VARIANTS.CONSOLE,
+        },
+      }),
+    );
+
+    const result = await getSiteSettings();
+
+    expect(result.brand.logoAsset).toEqual(logo);
+    expect(result.brand.logoUrl).toBeDefined();
+  });
+
+  it('leaves logoAsset undefined when no logo is uploaded', async () => {
+    mockRun.mockResolvedValue(
+      makeRawSiteSettings({
+        brand: {
+          name: 'Awesome Blog',
+          specLine: null,
+          logo: null,
+          variant: BRAND_VARIANTS.CONSOLE,
+        },
+      }),
+    );
+
+    const result = await getSiteSettings();
+
+    expect(result.brand.logoAsset).toBeUndefined();
+  });
 });

@@ -7,6 +7,7 @@ import { BrandLockupLink } from './brand-lockup-link';
 const brand: TBrand = {
   name: 'Test Brand',
   logoUrl: 'https://cdn.sanity.io/images/test/production/brand-mark.svg',
+  logoAsset: undefined,
   specLine: undefined,
   variant: BRAND_VARIANTS.CONSOLE,
 };
