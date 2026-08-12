@@ -20,6 +20,8 @@ export const siteSchema = defineType({
     {
       name: 'seo',
       title: 'SEO',
+      description:
+        'Site-wide SEO and social defaults, used when a page does not set its own.',
       options: { collapsible: true, collapsed: true },
     },
   ],
