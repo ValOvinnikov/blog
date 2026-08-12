@@ -16,6 +16,13 @@ export const siteSchema = defineType({
       subtitle: 'Site settings',
     }),
   },
+  fieldsets: [
+    {
+      name: 'seo',
+      title: 'SEO',
+      options: { collapsible: true, collapsed: true },
+    },
+  ],
   fields: [
     titleField(),
     defineField({
@@ -30,6 +37,7 @@ export const siteSchema = defineType({
       type: 'text',
       description: 'Default meta description for the home page and RSS feed.',
       validation: (rule) => rule.required().min(50).max(160),
+      fieldset: 'seo',
     }),
     defineField({
       name: 'tagline',
@@ -37,6 +45,7 @@ export const siteSchema = defineType({
       type: 'string',
       description: 'Short strapline shown in the site header or hero.',
       validation: (rule) => rule.max(120),
+      fieldset: 'seo',
     }),
     defineField({
       name: 'defaultOgImage',
@@ -45,6 +54,7 @@ export const siteSchema = defineType({
       description:
         'Fallback social-sharing image used when a page has no own OG image.',
       validation: (rule) => rule.required(),
+      fieldset: 'seo',
     }),
   ],
 });
