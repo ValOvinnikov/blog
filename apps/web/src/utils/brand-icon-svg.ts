@@ -1,4 +1,5 @@
 import { BRAND_VARIANTS, type TBrandVariants } from '@blog/config';
+import { oklchToHex } from '@blog/utils';
 
 type TLogoLayerColors = {
   layer1: string;
@@ -11,19 +12,36 @@ type TLogoPalette = {
   dark: TLogoLayerColors;
 };
 
-// Hex values are the sRGB conversions of the `--logo-1/2/3` (Console) and
-// `--logo-alt-1/2/3` (Indigo) OKLCH tokens in `configs/tailwind/theme.css`
+// Hex values are derived via `oklchToHex` from the `--logo-1/2/3` (Console)
+// and `--logo-alt-1/2/3` (Indigo) OKLCH tokens in `configs/tailwind/theme.css`
 // (light and dark modes respectively). `icon.tsx` can't read CSS custom
-// properties server-side, so these are duplicated here rather than derived —
-// keep them in sync with `theme.css` if those tokens ever change.
+// properties server-side, so these OKLCH triples are duplicated here rather
+// than read from `theme.css` — keep them in sync with `theme.css` if those
+// tokens ever change.
 const LOGO_PALETTES: Record<TBrandVariants, TLogoPalette> = {
   [BRAND_VARIANTS.CONSOLE]: {
-    light: { layer1: '#006ac5', layer2: '#288de5', layer3: '#63adf6' },
-    dark: { layer1: '#007cd9', layer2: '#3b9cf6', layer3: '#73c3ff' },
+    light: {
+      layer1: oklchToHex(0.52, 0.17, 250),
+      layer2: oklchToHex(0.63, 0.16, 250),
+      layer3: oklchToHex(0.73, 0.13, 250),
+    },
+    dark: {
+      layer1: oklchToHex(0.58, 0.17, 250),
+      layer2: oklchToHex(0.68, 0.16, 250),
+      layer3: oklchToHex(0.8, 0.14, 250),
+    },
   },
   [BRAND_VARIANTS.INDIGO]: {
-    light: { layer1: '#3e36dd', layer2: '#5966f3', layer3: '#8a9cfc' },
-    dark: { layer1: '#4849ef', layer2: '#6a7bff', layer3: '#9eb0ff' },
+    light: {
+      layer1: oklchToHex(0.47, 0.24, 274),
+      layer2: oklchToHex(0.58, 0.21, 274),
+      layer3: oklchToHex(0.72, 0.14, 274),
+    },
+    dark: {
+      layer1: oklchToHex(0.52, 0.24, 274),
+      layer2: oklchToHex(0.64, 0.2, 274),
+      layer3: oklchToHex(0.78, 0.13, 274),
+    },
   },
 };
 
