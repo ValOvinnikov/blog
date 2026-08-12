@@ -271,6 +271,35 @@ export type HeroLayout = {
   dividerBottom?: boolean;
 };
 
+export type Settings_voice = {
+  _id: string;
+  _type: 'settings_voice';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  notFoundMetaTitle?: string;
+  notFoundMetaDescription?: string;
+  notFoundCommandNotFound?: string;
+  notFoundDescription?: string;
+  notFoundReturnHome?: string;
+  terminalPromptHost?: string;
+  authPromptCommandSignIn?: string;
+  authPromptCommandAccount?: string;
+  bookmarksPromptCommand?: string;
+  accountPrivacyPromptCommand?: string;
+  accountNewsletterPromptCommand?: string;
+  accountIdentityPromptCommand?: string;
+  bookmarkToastSavedMessage?: string;
+  bookmarkToastRemovedMessage?: string;
+  blogListEmpty?: string;
+  categoryEmpty?: string;
+  tagEmpty?: string;
+  authorEmpty?: string;
+  topicsEmpty?: string;
+  bookmarksEmpty?: string;
+};
+
 export type Settings_theme = {
   _id: string;
   _type: 'settings_theme';
@@ -705,6 +734,7 @@ export type AllSanitySchemaTypes =
   | BodyImage
   | ImageWithAlt
   | HeroLayout
+  | Settings_voice
   | Settings_theme
   | Settings_newsletter
   | Settings_footer
