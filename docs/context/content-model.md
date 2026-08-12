@@ -104,12 +104,21 @@ replacing a hand-duplicated block per page document.
   `/tag` archives + related-posts, alongside the section-level `category`).
 - `siteSettings` (singleton) — `titleField` (bare; see helper note below),
   brand
-  (`brand` object: name/prefix/suffix/logo/specLine/variant — `specLine` is
+  (`brand` object: name/logo/specLine/variant — `logo` is optional, falling
+  back to a default mark when unset; `specLine` is
   a `specLine` object, `{ items: string[] (max 4, each max 15 chars),
 separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
   service layer can join it with a chosen separator glyph), description,
   tagline, `defaultOgImage` (`imageWithAlt`, required — the last-resort
   social image).
+- `settings_theme` (singleton, `themeSchema`) — `titleField` (bare; see
+  helper note below), `preset` (required, `PRESET_ID` stored value:
+  `CONSOLE`/`EDITORIAL`), `accentHue`/`logoHue` (optional numbers, 0-360,
+  OKLCH hue channels — `logoHue` falls back to `accentHue` when unset),
+  `headingFont`/`bodyFont` (optional, `FONT_CHOICE`), `radiusScale`
+  (optional, `RADIUS_SCALE`), `density` (optional, `DENSITY`) — a
+  tenant-level theme override resolved against `PRESET_REGISTRY` in
+  `@blog/config`; part of the Phase 2 configurability epic (#1285).
 - `settings_navigation` (singleton) — `titleField` (bare; see helper note
   below), items (links).
 - `settings_footer` (singleton) — `titleField` (bare; see helper note below),
