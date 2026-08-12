@@ -20,25 +20,11 @@ export const brandSchema = defineType({
       validation: (rule) => rule.required().max(60),
     }),
     defineField({
-      name: 'prefix',
-      title: 'Logo Prefix',
-      type: 'string',
-      description: 'Primary header wordmark text, e.g. "val".',
-      validation: (rule) => rule.required().max(30),
-    }),
-    defineField({
-      name: 'suffix',
-      title: 'Logo Suffix',
-      type: 'string',
-      description: 'Accent suffix after the prefix, e.g. ".dev".',
-      validation: (rule) => rule.max(30),
-    }),
-    defineField({
       name: 'logo',
       title: 'Logo',
       type: imageWithAltSchema.name,
-      description: 'Site logo. SVG or high-res PNG recommended.',
-      validation: (rule) => rule.required(),
+      description:
+        'Site logo. SVG or high-res PNG recommended. Falls back to the default mark when unset.',
     }),
     defineField({
       name: 'specLine',
