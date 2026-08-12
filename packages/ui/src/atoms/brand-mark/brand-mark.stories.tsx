@@ -52,3 +52,15 @@ export const StackedWithWideImageSource: TStory = {
     stacked: true,
   },
 };
+
+// `stacked` sizing only takes effect at `md` and above; below that it must
+// render identically to the non-stacked case (see `BrandLockup`'s spec line,
+// which reveals at the same breakpoint).
+export const StackedWithWideImageSourceNarrowViewport: TStory = {
+  globals: { viewport: 'phone' },
+  args: {
+    src: 'https://placehold.co/320x64',
+    title: 'Brand mark',
+    stacked: true,
+  },
+};
