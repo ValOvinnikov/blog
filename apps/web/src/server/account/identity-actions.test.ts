@@ -20,7 +20,7 @@ vi.mock('@blog/db', () => ({
 }));
 
 const session = {
-  user: { id: 'user-1', email: 'val@icloud.com' },
+  user: { id: 'user-1', email: 'jane@icloud.com' },
 };
 
 describe('unlinkProviderAction', () => {
@@ -41,11 +41,10 @@ describe('unlinkProviderAction', () => {
   });
 
   it('rejects a provider that is not literally "github" or "google" at runtime, without logging or querying it', async () => {
-    // `provider`'s `TLinkableProvider` type is compile-time only — a
-    // `'use server'` action's endpoint can be invoked directly with an
-    // arbitrary string, bypassing TypeScript entirely. Casting past the
-    // type here simulates that, exercising the runtime `isLinkableProvider`
-    // guard the same way an attacker-crafted request would.
+    // `provider` is compile-time only — a `'use server'` action can be
+    // invoked with an arbitrary string at runtime, bypassing TypeScript.
+    // This cast simulates that, exercising the runtime `isLinkableProvider`
+    // guard.
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     authMock.mockResolvedValue(session);
     const { unlinkProviderAction } = await import('./identity-actions');
@@ -107,7 +106,7 @@ describe('updateDisplayNameAction', () => {
     authMock.mockResolvedValue(null);
     const { updateDisplayNameAction } = await import('./identity-actions');
 
-    await expect(updateDisplayNameAction('Val')).resolves.toEqual({
+    await expect(updateDisplayNameAction('Jane')).resolves.toEqual({
       ok: false,
     });
     expect(updateDisplayNameMock).not.toHaveBeenCalled();
@@ -128,13 +127,10 @@ describe('updateDisplayNameAction', () => {
     updateDisplayNameMock.mockResolvedValue(undefined);
     const { updateDisplayNameAction } = await import('./identity-actions');
 
-    await expect(updateDisplayNameAction('  Val Ovinnikov  ')).resolves.toEqual(
-      { ok: true },
-    );
-    expect(updateDisplayNameMock).toHaveBeenCalledWith(
-      'user-1',
-      'Val Ovinnikov',
-    );
+    await expect(updateDisplayNameAction('  Jane Doe  ')).resolves.toEqual({
+      ok: true,
+    });
+    expect(updateDisplayNameMock).toHaveBeenCalledWith('user-1', 'Jane Doe');
   });
 
   it('returns { ok: false } and logs when the db write throws', async () => {
@@ -143,7 +139,7 @@ describe('updateDisplayNameAction', () => {
     updateDisplayNameMock.mockRejectedValue(new Error('boom'));
     const { updateDisplayNameAction } = await import('./identity-actions');
 
-    await expect(updateDisplayNameAction('Val')).resolves.toEqual({
+    await expect(updateDisplayNameAction('Jane')).resolves.toEqual({
       ok: false,
     });
     expect(errorSpy).toHaveBeenCalled();

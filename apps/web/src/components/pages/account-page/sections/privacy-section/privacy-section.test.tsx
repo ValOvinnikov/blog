@@ -44,7 +44,7 @@ describe(`<${PrivacySection.name}/>`, () => {
 
   it('renders the 6a privacy & data window', async () => {
     authMock.mockResolvedValue({
-      user: { id: 'user-1', name: 'Val Ovinnikov', email: 'val@example.com' },
+      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
     });
 
     await setup();
@@ -52,14 +52,14 @@ describe(`<${PrivacySection.name}/>`, () => {
     expect(screen.getByText('~$')).toBeVisible();
     expect(screen.getByText(/account --privacy/)).toBeVisible();
     expect(screen.getByText('data')).toBeVisible();
-    // The session's email local part ("val") is the derived handle, shown
+    // The session's email local part ("jane") is the derived handle, shown
     // both in the window's user segment and passed to the delete control.
-    expect(screen.getAllByText('val').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('jane').length).toBeGreaterThan(0);
   });
 
   it('renders the bar as a level-2 heading', async () => {
     authMock.mockResolvedValue({
-      user: { id: 'user-1', name: 'Val Ovinnikov', email: 'val@example.com' },
+      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
     });
 
     await setup();
@@ -69,7 +69,7 @@ describe(`<${PrivacySection.name}/>`, () => {
 
   it('renders the export-my-data row as a download link to the export route', async () => {
     authMock.mockResolvedValue({
-      user: { id: 'user-1', name: 'Val Ovinnikov', email: 'val@example.com' },
+      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
     });
 
     await setup();
@@ -83,14 +83,14 @@ describe(`<${PrivacySection.name}/>`, () => {
 
   it('renders the delete-account row with the derived handle passed to the control', async () => {
     authMock.mockResolvedValue({
-      user: { id: 'user-1', name: 'Val Ovinnikov', email: 'val@example.com' },
+      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
     });
 
     await setup();
 
     expect(screen.getByText('⚠ Delete account')).toBeVisible();
     expect(screen.getByTestId('delete-account-control')).toHaveTextContent(
-      'val',
+      'jane',
     );
   });
 });

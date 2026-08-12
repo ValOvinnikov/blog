@@ -34,7 +34,7 @@ vi.mock('@web/components/shared/display-name-control', () => ({
 const setup = customRenderAsync(IdentitySection, {});
 
 const authedSession = {
-  user: { id: 'user-1', name: 'Val Ovinnikov', email: 'val@icloud.com' },
+  user: { id: 'user-1', name: 'Jane Doe', email: 'jane@icloud.com' },
 };
 
 describe(`<${IdentitySection.name}/>`, () => {
@@ -211,7 +211,7 @@ describe(`<${IdentitySection.name}/>`, () => {
     await setup();
 
     expect(screen.getByTestId('display-name-control')).toHaveTextContent(
-      'Val Ovinnikov',
+      'Jane Doe',
     );
   });
 });

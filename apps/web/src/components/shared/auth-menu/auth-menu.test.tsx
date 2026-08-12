@@ -274,8 +274,8 @@ describe(`<${AuthMenu.name}/>`, () => {
       useSessionMock.mockReturnValue({
         data: {
           user: {
-            name: 'Val Ovinnikov',
-            email: 'val@example.com',
+            name: 'Jane Doe',
+            email: 'jane@example.com',
             image: null,
           },
           expires: '2099-01-01',
@@ -291,12 +291,10 @@ describe(`<${AuthMenu.name}/>`, () => {
       await user.click(screen.getByRole('button', { name: 'Account menu' }));
       const panel = screen.getByRole('menu');
 
-      // Two "Val Ovinnikov" occurrences (the avatar's sr-only name span and
-      // the account header) — scope to the panel and use `getAllByText`.
-      expect(
-        within(panel).getAllByText('Val Ovinnikov').length,
-      ).toBeGreaterThan(0);
-      expect(within(panel).getByText('val@example.com')).toBeVisible();
+      // Two "Jane Doe" occurrences (the avatar's sr-only name span and the
+      // account header) — scope to the panel and use `getAllByText`.
+      expect(within(panel).getAllByText('Jane Doe').length).toBeGreaterThan(0);
+      expect(within(panel).getByText('jane@example.com')).toBeVisible();
       expect(screen.getByRole('menuitem', { name: 'Sign out' })).toBeVisible();
       expect(
         screen.getByRole('menuitem', { name: 'My bookmarks' }),
@@ -313,9 +311,9 @@ describe(`<${AuthMenu.name}/>`, () => {
       await user.click(screen.getByRole('button', { name: 'Account menu' }));
       const panel = screen.getByRole('menu');
 
-      // The mock's static bar reads "val" — this asserts the bar reflects
-      // *this* session's email-derived username, not that literal string.
-      expect(within(panel).getByText('val')).toBeVisible();
+      // Asserts the bar shows this session's email-derived username, not a
+      // hardcoded placeholder.
+      expect(within(panel).getByText('jane')).toBeVisible();
       expect(within(panel).getByText('~$')).toBeVisible();
       expect(within(panel).getByText(/whoami/)).toBeVisible();
     });
@@ -349,7 +347,7 @@ describe(`<${AuthMenu.name}/>`, () => {
       const panel = screen.getByRole('menu');
 
       expect(within(panel).getByText('chester')).toBeVisible();
-      expect(within(panel).queryByText('val')).not.toBeInTheDocument();
+      expect(within(panel).queryByText('jane')).not.toBeInTheDocument();
     });
   });
 });

@@ -37,8 +37,8 @@ const Wrapper = ({ name, email, image }: TWrapperProps) => {
 };
 
 const setup = customRender(Wrapper, {
-  name: 'Val Ovinnikov',
-  email: 'val@example.com',
+  name: 'Jane Doe',
+  email: 'jane@example.com',
   image: 'https://example.com/broken-avatar.png',
 });
 
@@ -63,7 +63,7 @@ describe(`<${AccountMenu.name}/>`, () => {
 
     const trigger = screen.getByRole('button', { name: 'Account menu' });
     expect(trigger.querySelector('img')).not.toBeInTheDocument();
-    expect(within(trigger).getByText('VO')).toBeVisible();
+    expect(within(trigger).getByText('JD')).toBeVisible();
   });
 
   it('also falls back to initials in the panel body avatar, since it shares the same failure state as the trigger', async () => {
@@ -77,7 +77,7 @@ describe(`<${AccountMenu.name}/>`, () => {
     const panel = screen.getByRole('menu');
 
     expect(panel.querySelector('img')).not.toBeInTheDocument();
-    expect(within(panel).getAllByText('VO').length).toBeGreaterThan(0);
+    expect(within(panel).getAllByText('JD').length).toBeGreaterThan(0);
   });
 
   it('does not carry a stale failure forward once a different image URL is supplied', () => {
@@ -88,8 +88,8 @@ describe(`<${AccountMenu.name}/>`, () => {
 
     rerender(
       <Wrapper
-        name="Val Ovinnikov"
-        email="val@example.com"
+        name="Jane Doe"
+        email="jane@example.com"
         image="https://example.com/a-different-avatar.png"
       />,
     );

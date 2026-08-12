@@ -24,7 +24,7 @@ vi.mock('@web/components/shared/newsletter-subscription-control', () => ({
 const setup = customRenderAsync(NewsletterSection, {});
 
 const authedSession = {
-  user: { id: 'user-1', name: 'Val Ovinnikov', email: 'val@icloud.com' },
+  user: { id: 'user-1', name: 'Jane Doe', email: 'jane@icloud.com' },
 };
 
 describe(`<${NewsletterSection.name}/>`, () => {
@@ -55,7 +55,7 @@ describe(`<${NewsletterSection.name}/>`, () => {
     authMock.mockResolvedValue(authedSession);
     getSubscriptionStatusMock.mockResolvedValue({
       outcome: 'active',
-      subscriber: { email: 'val@icloud.com' },
+      subscriber: { email: 'jane@icloud.com' },
     });
 
     await setup();
@@ -63,7 +63,7 @@ describe(`<${NewsletterSection.name}/>`, () => {
     expect(screen.getByText('~$')).toBeVisible();
     expect(screen.getByText(/account --email/)).toBeVisible();
     expect(screen.getByText('subscribed')).toBeVisible();
-    expect(screen.getByText('val@icloud.com')).toBeVisible();
+    expect(screen.getByText('jane@icloud.com')).toBeVisible();
     expect(
       screen.getByTestId('newsletter-subscription-control'),
     ).toHaveTextContent('unsubscribe');
@@ -73,7 +73,7 @@ describe(`<${NewsletterSection.name}/>`, () => {
     authMock.mockResolvedValue(authedSession);
     getSubscriptionStatusMock.mockResolvedValue({
       outcome: 'active',
-      subscriber: { email: 'val@icloud.com' },
+      subscriber: { email: 'jane@icloud.com' },
     });
 
     await setup();
@@ -85,7 +85,7 @@ describe(`<${NewsletterSection.name}/>`, () => {
     authMock.mockResolvedValue(authedSession);
     getSubscriptionStatusMock.mockResolvedValue({
       outcome: 'pending',
-      subscriber: { email: 'val@icloud.com' },
+      subscriber: { email: 'jane@icloud.com' },
     });
 
     await setup();
