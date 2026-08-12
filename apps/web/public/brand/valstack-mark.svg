@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
-  <style>
-    .l1{fill:#2E6BD6}.l2{fill:#4F87E8}.l3{fill:#7AA6F0}
-    @media (prefers-color-scheme:dark){.l1{fill:#3D78DE}.l2{fill:#5F92EC}.l3{fill:#93B8F5}}
-  </style>
-  <polygon class="l1" points="40,42 66,51 40,60 14,51"/>
-  <polygon class="l2" points="40,27 66,36 40,45 14,36"/>
-  <polygon class="l3" points="40,12 66,21 40,30 14,21"/>
-</svg>
