@@ -27,7 +27,7 @@ _(Inherited from the rollout plan's Global Constraints — layer order, delegati
 
 ```
 PRESET_ID       = { CONSOLE, EDITORIAL }
-FONT_CHOICE     = { SPACE_GROTESK, NEWSREADER, JETBRAINS_MONO, <editorial serif/sans picks — Task 5 confirms exact next/font/google names> }
+FONT_CHOICE     = { SPACE_GROTESK, NEWSREADER, JETBRAINS_MONO, <editorial serif/sans picks — Task 3 confirms exact next/font/google names> }
 RADIUS_SCALE    = { SM, MD, LG, XL }          # mirrors --radius-sm/--radius/--radius-lg/--radius-xl
 DENSITY         = { DEFAULT, COMPACT }
 ```
@@ -61,28 +61,32 @@ TPresetBundle = {
 PRESET_REGISTRY: Record<TPresetId, TPresetBundle>
 ```
 
-`console`'s `themeTokens` must reproduce today's literal values (`accentHue: 250` — see below, `headingFont`/`bodyFont` matching the current `spaceGrotesk`/`newsreader` picks, `radiusScale` matching the current flat `--radius`/`--radius-lg` usage, `density: DEFAULT`, `chromeOn: true`). `editorial`'s values are a real de-consoled alternative (serif/neutral fonts, `chromeOn: false`) — exact font picks confirmed in Task 5 against actual `next/font/google` availability.
+`console`'s `themeTokens` must reproduce today's literal values (`accentHue: 250` — see below, `headingFont`/`bodyFont` matching the current `spaceGrotesk`/`newsreader` picks, `radiusScale` matching the current flat `--radius`/`--radius-lg` usage, `density: DEFAULT`, `chromeOn: true`). `editorial`'s values are a real de-consoled alternative (serif/neutral fonts, `chromeOn: false`) — exact font picks confirmed in Task 3 against actual `next/font/google` availability.
+
+**Resolved in Task 3 (#1319, implemented 2026-08-12):** `editorial`'s final `themeTokens` — `headingFont: FRAUNCES` (distinctive display serif, structural inversion of console's sans-display/serif-body pairing), `bodyFont: INTER` (neutral, highly-legible UI sans, no mono/technical association), `accentHue: 28` (warm amber/terracotta, clearly distinct from console's blue-indigo `250`; WCAG contrast against `--text` still to be verified by Task 5's resolver per the guard below), `radiusScale: SM`, `density: COMPACT` (tighter, more restrained/print-editorial feel vs. console's default chrome-window look), `chromeOn: false`.
 
 **Accent OKLCH derivation contract (locked from `configs/tailwind/theme.css` lines 237–249, 350–374 — console's fixed hue is `250`):**
 
 Every accent-family token keeps its **lightness (L)** and **chroma (C)** fixed; only **hue (H)** varies with the tenant's `accentHue`:
 
 ```
---accent          = oklch(0.53 0.17 <hue>)
---accent-hover    = oklch(0.47 0.17 <hue>)
---accent-muted    = oklch(0.95 0.03 <hue>)
---accent-contrast = oklch(0.99 0    0)      # achromatic — never varies with hue
---accent-solid    = oklch(0.55 0.17 <hue>)
---accent-solid-hover = oklch(0.49 0.17 <hue>)
+--brand-primary          = oklch(0.53 0.17 <hue>)
+--brand-primary-hover    = oklch(0.47 0.17 <hue>)
+--brand-primary-muted    = oklch(0.95 0.03 <hue>)
+--brand-primary-contrast = oklch(0.99 0    0)      # achromatic — never varies with hue
+--brand-primary-solid    = oklch(0.55 0.17 <hue>)
+--brand-primary-solid-hover = oklch(0.49 0.17 <hue>)
 ```
 
-Dark-mode values are a **separate** fixed L/C set at the same hue — read the exact dark-mode numbers from `theme.css` lines 350–374 directly when implementing (not reproduced here to avoid transcription drift; copy them verbatim from the source file).
+(Corrected 2026-08-12, post-review on #1319: this section originally named these tokens `--accent*` — that name was never real. The actual `configs/tailwind/theme.css` custom properties are `--brand-primary*`, as above.)
 
-**Neutral surfaces are brand-agnostic — only the accent family varies with hue (locked constraint).** The page/ink neutrals — `--bg`, `--bg-subtle`, `--surface`, `--surface-2`, `--border`/`--border-strong`/`--border-emphasis`, and `--text`/`--text-muted`/`--text-subtle` — are near-achromatic (hue 250, chroma ≤ 0.01) and carry **no brand meaning**. A preset **must not** redefine them, and the resolver **must not** derive them from `accentHue`. They stay byte-identical across every preset, exactly as `.indigo` in `theme.css` today overrides only the `--accent*`/`--logo*` tokens and leaves every neutral untouched. This keeps the site's structural surfaces stable while the brand hue moves — the only axis a "preset"/brand variant should shift.
+Dark-mode values are a **separate** fixed L/C set at the same hue — read the exact dark-mode numbers from `theme.css`'s `.dark` block directly when implementing (not reproduced here to avoid transcription drift; copy them verbatim from the source file).
 
-Direct consequence for the Phase 1 Section appearance tones (`packages/config/src/constants/appearance.ts` `BACKGROUND_TONE`): of the module-background tones, **only `ACCENT_TINT` (`bg-accent-muted`) tracks the brand**, because `--accent-muted` _is_ an accent-family token and varies with `accentHue` per the table above. `DEFAULT` (`--bg`), `SUBTLE` (`--bg-subtle`) and `SURFACE` (`--surface`) are neutral and render identically under every preset. The intended model is therefore **neutral structural backgrounds + a single brand-tinted tone** — presets change the tint, never the neutrals.
+**Neutral surfaces are brand-agnostic — only the accent family varies with hue (locked constraint).** The page/ink neutrals — `--primary`, `--primary-subtle`, `--secondary`, `--surface`, `--surface-2`, `--border`/`--border-strong`/`--border-emphasis`, and `--text`/`--text-muted`/`--text-subtle` — are near-achromatic (hue 250, chroma ≤ 0.01) and carry **no brand meaning**. A preset **must not** redefine them, and the resolver **must not** derive them from `accentHue`. They stay byte-identical across every preset, exactly as `.indigo` in `theme.css` today overrides only the `--brand-primary*`/`--logo*` tokens and leaves every neutral untouched. This keeps the site's structural surfaces stable while the brand hue moves — the only axis a "preset"/brand variant should shift.
 
-**WCAG guard on the derived tint (blocking):** because a preset only rotates hue at fixed L/C, hue-rotation alone does **not** guarantee the tint stays legible. `--text` on `--accent-muted` is already borderline at console/indigo's hues (~4.51:1, just over the 4.5:1 AA floor — see `theme.css`'s `.indigo` comment), so the resolver (Task 4) **must contrast-check each derived `--accent-muted` against `--text`** in both light and dark and reject/adjust any `accentHue` that drops the pairing below AA — it cannot assume the fixed-L/C recipe preserves the ratio at every hue. This is the one background-related contrast check a new preset genuinely needs; the neutrals were verified once and don't move.
+(Corrected 2026-08-12: the paragraph originally here described a `BACKGROUND_TONE`/`ACCENT_TINT` model from `packages/config/src/constants/appearance.ts` — that file and const no longer exist. The Layout & SectionHeader redesign (epic #1370) and the earlier brand-variant epic replaced it: every `module_*` document now carries a required `brandVariant` field (`@blog/config`'s `BRAND_VARIANT` const — `PRIMARY`/`SECONDARY`/`BRAND_PRIMARY`), consumed by `apps/web`'s `Section` component (`section-variants.ts`). `BRAND_VARIANT.PRIMARY` → `bg-primary`, `SECONDARY` → `bg-secondary` (both neutral, byte-identical across every preset), `BRAND_PRIMARY` → `bg-brand-primary-muted` — the one variant that tracks the brand, since `--brand-primary-muted` is an accent-family token and varies with `accentHue` per the table above. Same "neutral structural backgrounds + a single brand-tinted variant" model the original paragraph described, just via `brandVariant` rather than a separate background-tone axis.)
+
+**WCAG guard on the derived tint (blocking):** because a preset only rotates hue at fixed L/C, hue-rotation alone does **not** guarantee the tint stays legible. `--text` on `--brand-primary-muted` is already borderline at console/indigo's hues (~4.51:1, just over the 4.5:1 AA floor — see `theme.css`'s `.indigo` comment), so the resolver (Task 5, service) **must contrast-check each derived `--brand-primary-muted` against `--text`** in both light and dark and reject/adjust any `accentHue` that drops the pairing below AA — it cannot assume the fixed-L/C recipe preserves the ratio at every hue. This is the one background-related contrast check a new preset genuinely needs; the neutrals were verified once and don't move.
 
 **Shared OKLCH utility — `packages/utils/src/color/oklch.ts`** (new folder, mirrors the existing `async/`/`pagination/`/`primitives/`/`reading-time/` one-folder-per-domain layout):
 
@@ -256,12 +260,12 @@ Note: until Task 8 actually defines `--font-ui` in `theme.css`/the injector, thi
 - Modify: the root layout (`apps/web/src/app/[locale]/layout.tsx` or `apps/web/src/app/layout.tsx` — confirm which one currently renders `<head>`) — add a server-rendered `<style>` block (via `dangerouslySetInnerHTML`, same mechanism the existing `themeBootstrapScript` `<script>` tag already uses in this exact spot, per `apps/web/src/config/theme-script.ts`) declaring the resolved CSS custom properties under **both** `:root { … }` and `.dark { … }` — not inline `style` on `<html>`, which carries only one scope and breaks dark mode. Include `--font-ui`'s resolved value here (backing Task 7's new token). Fetch the resolved tokens via `service.settings.theme.v1.getTheme()` (Task 5).
 - Modify: `apps/web/src/config/fonts.ts` — extend the current hardcoded single-font-per-role wiring to select between `FONT_CHOICE` options based on the resolved `headingFont`/`bodyFont` (add the `next/font/google` imports for whatever editorial font(s) Task 3 named).
 - Modify: wherever `BrandMark` is currently rendered in `apps/web` (likely `Header`'s brand slot composition) — pass `src` from `service.settings.site.v1.getSiteSettings()`'s new `logo` field (Task 5) when present, omitting it (falling back to the polygon mark) when absent.
-- Test: a page/layout-level test asserting the injected `<style>` block contains the expected `--accent`/`--font-ui`/etc. values for at least the `console` case (no `settings_theme` document → today's exact values), matching the "console reproduces today's site pixel-for-pixel" acceptance criterion.
+- Test: a page/layout-level test asserting the injected `<style>` block contains the expected `--brand-primary`/`--font-ui`/etc. values for at least the `console` case (no `settings_theme` document → today's exact values), matching the "console reproduces today's site pixel-for-pixel" acceptance criterion.
 
 **Interfaces — Consumes:** `service.settings.theme.v1.getTheme()`, `service.settings.site.v1.getSiteSettings()`'s `logo` field (Task 5); `oklchToHex` (Task 1, for converting the resolved `TThemeTokens.accentHue` into the actual `oklch(...)` CSS values — or emit `oklch(l c h)` as a raw CSS value directly, since modern browsers support the `oklch()` CSS function natively and this avoids a hex-conversion round-trip; **confirm during implementation whether raw `oklch()` CSS or `oklchToHex`-derived hex is the right call** — raw CSS `oklch()` is likely simpler and more correct for the injector specifically, whereas `oklchToHex` exists for contexts that _can't_ read CSS custom properties, like `brand-icon-svg.ts`'s SVG route and Satori's OG image renderer, which is a different constraint than this task's).
 **Produces:** the fully working preset pipeline, end-to-end.
 
-- [ ] **Step 1 (failing test):** Layout/page test asserting the rendered `<style>` block's content for the no-`settings_theme`-document case matches today's known `--accent`/etc. values.
+- [ ] **Step 1 (failing test):** Layout/page test asserting the rendered `<style>` block's content for the no-`settings_theme`-document case matches today's known `--brand-primary`/etc. values.
 - [ ] **Step 2:** Run — Expected: FAIL.
 - [ ] **Step 3 (web):** Dispatch `web` to implement the `<style>` injector, `next/font` selection wiring, and logo rendering.
 - [ ] **Step 4:** Run — Expected: PASS. Add an `editorial`-preset test case too (mocked `settings_theme` document) confirming the injected values differ correctly.
