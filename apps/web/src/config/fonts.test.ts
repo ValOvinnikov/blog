@@ -23,8 +23,8 @@ vi.mock('next/font/google', () => {
 });
 
 describe('resolveFontVariableClassName', () => {
-  it('resolves SPACE_GROTESK/NEWSREADER to their own variable classes', async () => {
-    const result = await resolveFontVariableClassName(
+  it('resolves SPACE_GROTESK/NEWSREADER to their own variable classes', () => {
+    const result = resolveFontVariableClassName(
       FONT_CHOICE.SPACE_GROTESK,
       FONT_CHOICE.NEWSREADER,
     );
@@ -34,8 +34,8 @@ describe('resolveFontVariableClassName', () => {
     );
   });
 
-  it('resolves FRAUNCES/INTER to their own variable classes', async () => {
-    const result = await resolveFontVariableClassName(
+  it('resolves FRAUNCES/INTER to their own variable classes', () => {
+    const result = resolveFontVariableClassName(
       FONT_CHOICE.FRAUNCES,
       FONT_CHOICE.INTER,
     );
@@ -45,8 +45,8 @@ describe('resolveFontVariableClassName', () => {
     );
   });
 
-  it('falls back to the Console default heading font for an unmapped choice', async () => {
-    const result = await resolveFontVariableClassName(
+  it('falls back to the Console default heading font for an unmapped choice', () => {
+    const result = resolveFontVariableClassName(
       FONT_CHOICE.JETBRAINS_MONO,
       FONT_CHOICE.NEWSREADER,
     );
@@ -56,8 +56,8 @@ describe('resolveFontVariableClassName', () => {
     );
   });
 
-  it('falls back to the Console default body font for an unmapped choice', async () => {
-    const result = await resolveFontVariableClassName(
+  it('falls back to the Console default body font for an unmapped choice', () => {
+    const result = resolveFontVariableClassName(
       FONT_CHOICE.SPACE_GROTESK,
       FONT_CHOICE.JETBRAINS_MONO,
     );

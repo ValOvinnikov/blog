@@ -40,7 +40,7 @@ export default async function RootLayout({ children }: TProps) {
     : PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
 
   const analyticsEnabled = isVercelAnalyticsEnabled();
-  const fontVariableClassName = await resolveFontVariableClassName(
+  const fontVariableClassName = resolveFontVariableClassName(
     themeTokens.headingFont,
     themeTokens.bodyFont,
   );
