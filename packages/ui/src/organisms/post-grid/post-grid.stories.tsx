@@ -13,7 +13,7 @@ const posts = [
     tags: ['design-system', 'tailwind', 'react'],
     publishedAt: '2024-06-01T00:00:00Z',
     formattedDate: 'June 1, 2024',
-    authorName: 'Val Ovinnikov',
+    authorName: 'Jane Doe',
   },
   {
     href: '/posts/typescript-tips',
@@ -23,7 +23,7 @@ const posts = [
     tags: ['typescript', 'javascript'],
     publishedAt: '2024-05-15T00:00:00Z',
     formattedDate: 'May 15, 2024',
-    authorName: 'Val Ovinnikov',
+    authorName: 'Jane Doe',
   },
   {
     href: '/posts/atomic-design',
@@ -33,7 +33,7 @@ const posts = [
     tags: ['atomic-design', 'components'],
     publishedAt: '2024-04-20T00:00:00Z',
     formattedDate: 'April 20, 2024',
-    authorName: 'Val Ovinnikov',
+    authorName: 'Jane Doe',
   },
 ];
 

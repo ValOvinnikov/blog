@@ -29,10 +29,10 @@ describe(`<${Avatar.name}/>`, () => {
 
   it('derives 2 initials from an email address with no whitespace', () => {
     setup({
-      alt: 'val.ovinnikov@icloud.com',
-      name: 'val.ovinnikov@icloud.com',
+      alt: 'jane.smith@example.com',
+      name: 'jane.smith@example.com',
     });
-    expect(screen.getByText('VO')).toBeVisible();
+    expect(screen.getByText('JS')).toBeVisible();
   });
 
   it('derives 2 initials from an email local-part with no secondary delimiter', () => {
