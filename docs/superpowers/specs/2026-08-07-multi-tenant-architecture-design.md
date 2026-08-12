@@ -205,6 +205,19 @@ injector reads the resolved tenant's theme and sets the CSS variables on
 `<html>` exactly as Feature 2 designs. `@blog/ui` is untouched. This is why
 Feature 2 is a hard prerequisite.
 
+**Caveat found in #1324/PR #1407 (added 2026-08-12): fonts don't fully fit
+this runtime model.** `headingFont`/`bodyFont` are the one `TThemeTokens`
+axis `next/font/google` can't resolve at request time — its optimization
+(subsetting, self-hosting, preloading) is a _build-time_ mechanism, and a
+font-loader call must be a static, top-level module-scope
+`next/font/google(...)` (a hard Next.js/Turbopack constraint, not a style
+preference — a dynamic-import-based attempt to scope this per-request broke
+the production build outright). Today's single-tenant site works around this
+by statically importing every preset's fonts and hand-setting `preload`
+per font (Console's stay `true`, Editorial's are `false`) — see Open
+decision 7 below for what this means once tenants (and their font choices)
+multiply.
+
 ## Provisioning a tenant (onboarding flow)
 
 An admin/automation flow, not a hot path:
@@ -306,6 +319,16 @@ deploy`): a Studio deployment per tenant (simple, isolated) vs. a single
    `routes` + tenant resolution).
 6. **Exact free-tier editor allowance** — verify on `sanity.io/pricing` (drives
    billing timing).
+7. **Font selection per tenant ⚠** (added 2026-08-12, from #1324/PR #1407) —
+   `headingFont`/`bodyFont` can't join the rest of `TThemeTokens` in the
+   runtime `<style>` injector model (§6): `next/font/google` optimization is
+   build-time only, and font-loader calls must be static/module-scope (a
+   dynamic-import-based per-request attempt broke the production build
+   outright). Needs a build-time, per-tenant-fixed mechanism (env var/config
+   baked into that tenant's own build) instead — fits naturally once this
+   epic introduces per-tenant builds, but is a real design item, not covered
+   by anything else in this doc. Confirm before ticketing Feature/whatever
+   covers per-tenant builds.
 
 ## Non-goals (recorded so epics don't sprawl)
 
