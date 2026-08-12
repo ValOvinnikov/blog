@@ -18,21 +18,27 @@ export const voiceSchema = defineType({
     {
       name: 'notFound',
       title: '404 page',
+      description: 'Overrides for the not-found page copy.',
       options: { collapsible: true, collapsed: true },
     },
     {
       name: 'terminalPrompts',
       title: 'Terminal prompts',
+      description:
+        'Overrides for the terminal-style prompt host and command text used across the auth menu, bookmarks page, and account page.',
       options: { collapsible: true, collapsed: true },
     },
     {
       name: 'bookmarks',
       title: 'Bookmarks',
+      description: 'Overrides for bookmark toast messages.',
       options: { collapsible: true, collapsed: true },
     },
     {
       name: 'emptyStates',
       title: 'Empty states',
+      description:
+        'Overrides for empty-state messages across list and archive pages.',
       options: { collapsible: true, collapsed: true },
     },
   ],

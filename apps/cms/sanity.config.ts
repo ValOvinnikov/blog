@@ -11,6 +11,7 @@ import { navigationSchema } from '@cms/schema-types/documents/settings/navigatio
 import { newsletterSettingsSchema } from '@cms/schema-types/documents/settings/newsletter';
 import { siteSchema } from '@cms/schema-types/documents/settings/site-settings';
 import { themeSchema } from '@cms/schema-types/documents/settings/theme';
+import { voiceSchema } from '@cms/schema-types/documents/settings/voice';
 import { contentSchema } from '@cms/schema-types/modules/module-content';
 import { ctaSchema } from '@cms/schema-types/modules/module-cta';
 import { heroSchema } from '@cms/schema-types/modules/module-hero';
@@ -27,6 +28,7 @@ import {
   Mail,
   Megaphone,
   Menu,
+  MessageSquareText,
   Newspaper,
   Palette,
   PanelBottom,
@@ -196,6 +198,15 @@ export default defineConfig({
                         S.document()
                           .schemaType(themeSchema.name)
                           .documentId(themeSchema.name),
+                      ),
+                    S.listItem()
+                      .title('Voice')
+                      .id(voiceSchema.name)
+                      .icon(MessageSquareText)
+                      .child(
+                        S.document()
+                          .schemaType(voiceSchema.name)
+                          .documentId(voiceSchema.name),
                       ),
                     S.divider(),
                     S.listItem()
