@@ -1,4 +1,5 @@
 import { service } from '@blog/service';
+import { oklchToHex } from '@blog/utils';
 import { ImageResponse } from 'next/og';
 
 export const size = { width: 1200, height: 630 };
@@ -6,19 +7,19 @@ export const contentType = 'image/png';
 
 // Satori (the `next/og` renderer) needs literal hex colours — it can't read
 // the site's OKLCH design tokens (`--logo-1/2/3`, `--bg`, `--text*` in
-// `configs/tailwind/theme.css`). These are that dark-mode palette's sRGB
-// equivalents, converted once by hand (Console brand variant only — no
+// `configs/tailwind/theme.css`). These are derived via `oklchToHex` from that
+// dark-mode palette's OKLCH triples (Console brand variant only — no
 // Indigo-variant OG image, out of scope for #490). The dark palette is used
 // regardless of the visitor's system theme: this is a single static asset
 // shared by every share surface, so it can't itself respond to
 // `prefers-color-scheme` the way the favicon route (`icon.tsx`) does.
 const COLORS = {
-  bg: '#0d1012',
-  logo1: '#007cd9',
-  logo2: '#3b9cf6',
-  logo3: '#73c3ff',
-  text: '#eceff1',
-  textMuted: '#a1a5a9',
+  bg: oklchToHex(0.17, 0.006, 250),
+  logo1: oklchToHex(0.58, 0.17, 250),
+  logo2: oklchToHex(0.68, 0.16, 250),
+  logo3: oklchToHex(0.8, 0.14, 250),
+  text: oklchToHex(0.95, 0.004, 250),
+  textMuted: oklchToHex(0.72, 0.008, 250),
 };
 
 const FONT_FAMILY = 'Space Grotesk';

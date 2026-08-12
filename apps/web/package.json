@@ -27,6 +27,7 @@
     "@blog/service": "workspace:*",
     "@blog/tailwind-config": "workspace:*",
     "@blog/ui": "workspace:*",
+    "@blog/utils": "workspace:*",
     "@portabletext/react": "^3.2.0",
     "@sanity/webhook": "^4.0.4",
     "@t3-oss/env-nextjs": "^0.13.11",
