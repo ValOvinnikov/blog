@@ -32,7 +32,7 @@ export const brandMarkImageVariants = tv({
       [Size.LG]: ['h-9 w-auto'],
     },
     stacked: {
-      true: ['h-auto w-full max-h-9'],
+      true: ['h-auto w-full max-h-9 object-left'],
     },
   },
   defaultVariants: {
