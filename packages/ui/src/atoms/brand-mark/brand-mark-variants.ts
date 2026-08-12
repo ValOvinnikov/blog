@@ -2,6 +2,7 @@ import { Size } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
+/** Polygon fallback mark — always drawn on a square viewBox, so a fixed square box never distorts it. */
 export const brandMarkVariants = tv({
   base: ['inline-block shrink-0'],
   variants: {
@@ -16,4 +17,30 @@ export const brandMarkVariants = tv({
   },
 });
 
+/**
+ * Uploaded logo image — a real-world logo is commonly non-square, so it's
+ * never boxed into a fixed square. Default sizing bounds height and lets
+ * width scale freely; `stacked` (mark rendered above a spec line) instead
+ * spans the available width and caps height, so a wide lockup can't grow tall.
+ */
+export const brandMarkImageVariants = tv({
+  base: ['inline-block shrink-0 object-contain'],
+  variants: {
+    size: {
+      [Size.SM]: ['h-5 w-auto'],
+      [Size.MD]: ['h-7 w-auto'],
+      [Size.LG]: ['h-9 w-auto'],
+    },
+    stacked: {
+      true: ['h-auto w-full max-h-9 object-left'],
+    },
+  },
+  defaultVariants: {
+    size: Size.MD,
+  },
+});
+
 export type TBrandMarkVariants = VariantProps<typeof brandMarkVariants>;
+export type TBrandMarkImageVariants = VariantProps<
+  typeof brandMarkImageVariants
+>;

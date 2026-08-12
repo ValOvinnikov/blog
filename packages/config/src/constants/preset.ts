@@ -26,6 +26,13 @@ export const RADIUS_SCALE = {
 
 export type TRadiusScale = TValueOf<typeof RADIUS_SCALE>;
 
+export const RADIUS_SCALE_LABEL: Record<TRadiusScale, string> = {
+  [RADIUS_SCALE.SM]: 'Small',
+  [RADIUS_SCALE.MD]: 'Medium',
+  [RADIUS_SCALE.LG]: 'Large',
+  [RADIUS_SCALE.XL]: 'Extra Large',
+};
+
 export const DENSITY = {
   DEFAULT: 'DEFAULT',
   COMPACT: 'COMPACT',

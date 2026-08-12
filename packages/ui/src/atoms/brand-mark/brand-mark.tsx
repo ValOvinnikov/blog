@@ -2,6 +2,7 @@ import type { IWithDataTestId } from '@blog/config';
 import type { ComponentPropsWithoutRef } from 'react';
 
 import {
+  brandMarkImageVariants,
   brandMarkVariants,
   type TBrandMarkVariants,
 } from './brand-mark-variants';
@@ -13,12 +14,15 @@ type TBrandMarkRestProps = Omit<
 >;
 
 export interface IBrandMarkProps extends TBrandMarkRestProps, IWithDataTestId {
+  /** Ignored on the uploaded-image branch when `stacked` is set — its sizing is container-width-driven instead. */
   size?: TBrandMarkVariants['size'];
   /** Accessible title for standalone use. Omit to keep the mark decorative. */
   title?: string;
   className?: string;
   /** Uploaded brand-mark image source; renders in place of the polygon mark when set. */
   src?: string;
+  /** Sizes the uploaded image to span the available width with a bounded height, instead of a fixed height — for rendering above a spec line. No effect on the polygon fallback, which is always square. */
+  stacked?: boolean;
 }
 
 /**
@@ -32,6 +36,7 @@ export interface IBrandMarkProps extends TBrandMarkRestProps, IWithDataTestId {
 export const BrandMark = ({
   src,
   size,
+  stacked,
   title,
   className,
   dataTestId,
@@ -42,7 +47,7 @@ export const BrandMark = ({
       <img
         src={src}
         alt={title ?? ''}
-        className={brandMarkVariants({ size, class: className })}
+        className={brandMarkImageVariants({ size, stacked, class: className })}
         data-testid={dataTestId}
         {...rest}
       />
