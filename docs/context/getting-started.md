@@ -6,7 +6,7 @@
 
 ## Requirements
 
-**Node 20.19+** and **pnpm 9+**.
+**Node 20.19+** and **pnpm 11+**.
 
 ## Install & configure
 

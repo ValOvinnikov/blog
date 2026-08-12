@@ -88,7 +88,7 @@ reading, page canvas elevation) are documented in full in
   tables (database session strategy); the magic-link email and a shared
   Resend "send email" helper live in `apps/web/src/server/` (#1107)
 - **Vitest + Testing Library**; **Storybook** in `packages/ui` and `apps/web`
-- **Turborepo + pnpm** workspaces; Node ≥ 20.19 (CI runs 22), pnpm 9.15
+- **Turborepo + pnpm** workspaces; Node ≥ 20.19 (CI runs 22), pnpm 11.21
 
 ## 4. Workspace map & layer contracts
 
