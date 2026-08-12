@@ -203,7 +203,10 @@ This closes #568 with an implementation (not just the spike's written recommenda
 - [ ] **Step 1:** Dispatch `cms` to add the `settings_theme` singleton schema, relax `settings_site`'s existing `brand.logo` field to optional, and remove `brand.prefix`/`brand.suffix` — the `settings_theme` fields' `options.list` sourced from the Task 3 consts, register the new document type.
 - [ ] **Step 2:** Orchestrator runs `pnpm typegen`; re-run until the diff is minimal; commit `packages/config/src/sanity/generated/`.
 - [ ] **Step 3:** Verify `pnpm --filter cms type-check`; confirm the generated `SettingsTheme` type and `SettingsSite.logo` appear correctly.
-- [ ] **Step 4:** Commit (`feat(cms): add settings_theme singleton, relax brand.logo to optional, drop prefix/suffix`). No migration needed (relaxing required→optional and dropping fields are both additive/non-orphaning changes) — state so explicitly in the PR body. Removing `prefix`/`suffix` from the schema reds `packages/service`'s type-check until Task 5 lands (the established interim-red-until-next-layer-merges pattern this repo already uses) — dispatch Task 5 promptly after this merges. This can land and merge as its own PR before the `variant`-removal half (#1389).
+- [ ] **Step 4:** Commit (`feat(cms): add settings_theme singleton, relax brand.logo to optional, drop prefix/suffix`). No migration needed (relaxing required→optional and dropping fields are both additive/non-orphaning changes) — state so explicitly in the PR body.
+
+**Correction (2026-08-12, caught by `git push`'s pre-push `type-check` gate):** the paragraph originally here claimed removing `prefix`/`suffix` reds `packages/service`'s type-check as an acceptable "interim-red-until-next-layer-merges" state this repo already uses, and that Step 4 could land and merge as its own PR. That was wrong — it directly contradicts `CLAUDE.md`'s "prefer per-layer PRs" rule: _"Keep it a single PR when a partial merge would break the build: e.g. renaming a shared `_type` or generated type that downstream consumes reds `type-check` until every layer lands."_ Removing `prefix`/`suffix` from the schema is exactly that case (`packages/service`'s `site-settings` adaptor consumes both fields). **Task 4 and Task 5 (below) land as one combined PR**, not two sequential per-layer PRs — do not push/open a PR after Step 4 alone. Dispatch Task 5 immediately after Step 4's commit, on the same branch, and only push/PR once both are committed and `pnpm type-check` is green across all packages. The `variant`-removal half (#1389, Steps 5-8 below) stays its own separate PR as originally planned — that one is genuinely gated behind the human-approved migration, a different kind of split than the build-breakage case above.
+
 - [ ] **Step 5:** Dispatch `cms` to write the `brand.variant → settings_theme` migration per `apps/cms/migrations/README.md`'s scaffold (`migrate:new`). Dry-run it (`migrate:dry`) against a dataset with at least one `INDIGO`-variant `siteSettings` document (or a fixture) to confirm the transform produces the exact `{ preset: CONSOLE, accentHue: 65, logoHue: 274 }` shape.
 - [ ] **Step 6:** Orchestrator: run `dataset:export` (backup), present the migration's dry-run output to the user, get explicit approval, then run `migrate:run` against the live dataset(s) — human-gated, same as any content migration or deploy.
 - [ ] **Step 7:** Dispatch `cms` to remove `brand.variant`/`BRAND_VARIANTS` from `apps/cms/src/schema-types/objects/brand.ts` now that the migration has run. Orchestrator re-runs `pnpm typegen`.
@@ -213,7 +216,7 @@ This closes #568 with an implementation (not just the spike's written recommenda
 
 ### Task 5: `@blog/service` — resolve preset + overrides into concrete theme tokens
 
-**Dispatch:** `service` subagent, then `test-writer` for the resolver tests.
+**Dispatch:** `service` subagent, then `test-writer` for the resolver tests. **Lands on the same branch and in the same PR as Task 4** (see the correction note at the end of Task 4, Step 4) — dispatch this task immediately after Task 4's commit, before pushing or opening a PR for either.
 
 **Files:**
 
