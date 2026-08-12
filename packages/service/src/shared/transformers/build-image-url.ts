@@ -6,7 +6,7 @@ import type { imageWithAltFragment } from '@blog/service/shared/fragments/image'
 import type { SanityImageSource } from '@sanity/image-url';
 import type { InferFragmentType } from 'groqd';
 
-type TRawImage = InferFragmentType<typeof imageWithAltFragment>;
+export type TRawImage = InferFragmentType<typeof imageWithAltFragment>;
 
 export function buildImageUrl(
   image: TRawImage | null | undefined,

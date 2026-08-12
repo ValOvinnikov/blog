@@ -22,6 +22,7 @@ export function toSiteSettings(raw: TRawSiteSettings): TSiteSettings {
       name: raw.brand.name,
       specLine,
       logoUrl: buildImageUrl(raw.brand.logo),
+      logoAsset: raw.brand.logo ?? undefined,
       variant: raw.brand.variant,
     },
     description: raw.description,
