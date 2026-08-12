@@ -36,3 +36,14 @@ export const WithWideImageSourceAndSpecLine: TStory = {
 export const NarrowViewport: TStory = {
   globals: { viewport: 'phone' },
 };
+
+// Below `md` the spec line is hidden, so the mark must render with the same
+// sizing as the no-spec-line case — regression coverage for the mobile
+// stacked-sizing bug.
+export const NarrowViewportWithWideImageSourceAndSpecLine: TStory = {
+  globals: { viewport: 'phone' },
+  args: {
+    src: 'https://placehold.co/320x64',
+    specLine: 'v1.0.0 · build/local',
+  },
+};

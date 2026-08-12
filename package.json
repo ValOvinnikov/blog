@@ -40,6 +40,7 @@
     "knip": "6.27.0",
     "lint-staged": "^17.0.8",
     "prettier": "catalog:",
+    "prettier-plugin-tailwindcss": "^0.8.0",
     "turbo": "^2.10.5",
     "typescript": "catalog:"
   }

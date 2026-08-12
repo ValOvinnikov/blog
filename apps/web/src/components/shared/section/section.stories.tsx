@@ -34,6 +34,10 @@ export const Primary: TStory = {
   args: { brandVariant: BRAND_VARIANT.PRIMARY },
 };
 
+export const DefaultSpacing: TStory = {
+  args: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
+};
+
 export const Secondary: TStory = {
   args: { brandVariant: BRAND_VARIANT.SECONDARY },
 };

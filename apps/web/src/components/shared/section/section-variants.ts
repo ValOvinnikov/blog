@@ -35,8 +35,8 @@ export const sectionVariants = tv({
     dividerBottom: { true: { root: ['border-b border-border'] } },
   },
   defaultVariants: {
-    spacingTop: SPACING_SCALE.NONE,
-    spacingBottom: SPACING_SCALE.NONE,
+    spacingTop: SPACING_SCALE.MD,
+    spacingBottom: SPACING_SCALE.MD,
     containerWidth: CONTAINER_WIDTH.WIDE,
     dividerTop: false,
     dividerBottom: false,

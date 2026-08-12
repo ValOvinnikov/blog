@@ -21,7 +21,9 @@ export const brandMarkVariants = tv({
  * Uploaded logo image — a real-world logo is commonly non-square, so it's
  * never boxed into a fixed square. Default sizing bounds height and lets
  * width scale freely; `stacked` (mark rendered above a spec line) instead
- * spans the available width and caps height, so a wide lockup can't grow tall.
+ * spans the available width and caps height at `md` and above, matching the
+ * breakpoint the spec line itself becomes visible at — below `md` the mark
+ * always renders with the same sizing as the no-spec-line case.
  */
 export const brandMarkImageVariants = tv({
   base: ['inline-block shrink-0 object-contain'],
@@ -32,7 +34,7 @@ export const brandMarkImageVariants = tv({
       [Size.LG]: ['h-9 w-auto'],
     },
     stacked: {
-      true: ['h-auto w-full max-h-9 object-left'],
+      true: ['md:h-auto md:w-full md:max-h-9 md:object-left'],
     },
   },
   defaultVariants: {

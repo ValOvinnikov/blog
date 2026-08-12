@@ -25,7 +25,7 @@ export const spacingAndDividerFields = () => [
     title: 'Spacing Top',
     type: 'string',
     description:
-      'Space above this section. Leave unset for the default spacing.',
+      'Space above this section. Leave unset to use the default (Medium).',
     options: { list: spacingOptions },
   }),
   defineField({
@@ -33,7 +33,7 @@ export const spacingAndDividerFields = () => [
     title: 'Spacing Bottom',
     type: 'string',
     description:
-      'Space below this section. Leave unset for the default spacing.',
+      'Space below this section. Leave unset to use the default (Medium).',
     options: { list: spacingOptions },
   }),
   defineField({
