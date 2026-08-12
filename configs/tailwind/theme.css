@@ -90,6 +90,7 @@
     ui-monospace,
     monospace
   );
+  --font-ui: var(--font-mono-family);
 }
 
 @theme {
