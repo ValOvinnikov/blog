@@ -7,9 +7,6 @@ export const themeSettingsQuery = q.star
   .filterByType('settings_theme')
   .slice(0)
   .project((sub) => ({
-    // `preset` is `rule.required()` in the schema, but stays `.nullable(true)`
-    // deliberately: console is the safety net, so any missing/unexpected value
-    // falls back to it in the transformer rather than throwing.
     preset: sub.field('preset').nullable(true),
     accentHue: sub.field('accentHue').nullable(true),
     logoHue: sub.field('logoHue').nullable(true),
