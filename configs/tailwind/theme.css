@@ -90,7 +90,7 @@
     ui-monospace,
     monospace
   );
-  --font-ui: var(--font-mono-family);
+  --font-ui: var(--font-mono-family, 'JetBrains Mono', ui-monospace, monospace);
 }
 
 @theme {
