@@ -28,7 +28,7 @@ Variants: isBookmarked: (boolean)
 
 ### BrandMark — `atoms/brand-mark/brand-mark.tsx`
 BrandMark atom — the brand mark, rendered from an uploaded image when `src` is supplied, or as three stacked polygon layers coloured from the `--logo-1/2/3` design tokens via inline `style` otherwise (these tokens aren't mirrored into `@theme inline` as Tailwind utilities).
-Props: size?: TBrandMarkVariants['size'] · title?: string · className?: string · src?: string _(extends TBrandMarkRestProps, IWithDataTestId)_
+Props: size?: TBrandMarkVariants['size'] · title?: string · className?: string · src?: string · stacked?: boolean _(extends TBrandMarkRestProps, IWithDataTestId)_
 Variants: size: Size.SM|Size.MD|Size.LG
 
 ### Button — `atoms/button/button.tsx`
@@ -144,7 +144,7 @@ Aside molecule — an inline deep-dive digression rendered alongside a post's bo
 Props: kind: TAsideKind · label: string · children: ReactNode · className?: string _(extends IWithDataTestId)_
 
 ### BrandLockup — `molecules/brand-lockup/brand-lockup.tsx`
-BrandLockup molecule — the brand mark plus an optional monospace spec line.
+BrandLockup molecule — the brand mark plus an optional monospace spec line, stacked with the mark above.
 Props: src?: string · size?: IBrandMarkProps['size'] · specLine?: string _(extends Omit<ComponentPropsWithoutRef<'div'>, 'children…, IWithDataTestId)_
 
 ### Breadcrumbs — `molecules/breadcrumbs/breadcrumbs.tsx`
