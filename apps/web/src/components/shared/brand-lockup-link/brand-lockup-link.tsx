@@ -18,11 +18,7 @@ export const BrandLockupLink = ({ brand }: IBrandLockupLinkProps) => {
 
   return (
     <SmartLink href="/" aria-label={t('ariaLabel')}>
-      <BrandLockup
-        prefix={brand.prefix}
-        suffix={brand.suffix}
-        specLine={brand.specLine}
-      />
+      <BrandLockup src={brand.logoUrl} specLine={brand.specLine} />
     </SmartLink>
   );
 };
