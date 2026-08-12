@@ -1,5 +1,11 @@
 import type { TValueOf } from '@blog/config/utils';
 
+import {
+  CONSOLE_VOICE_PACK,
+  EDITORIAL_VOICE_PACK,
+  type TVoicePack,
+} from './voice-pack';
+
 export const PRESET_ID = {
   CONSOLE: 'CONSOLE',
   EDITORIAL: 'EDITORIAL',
@@ -52,7 +58,7 @@ export type TThemeTokens = {
 
 export type TPresetBundle = {
   themeTokens: TThemeTokens;
-  voicePack: Record<string, never>;
+  voicePack: TVoicePack;
   featureDefaults: Record<string, never>;
 };
 
@@ -66,7 +72,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
       density: DENSITY.DEFAULT,
       chromeOn: true,
     },
-    voicePack: {},
+    voicePack: CONSOLE_VOICE_PACK,
     featureDefaults: {},
   },
   [PRESET_ID.EDITORIAL]: {
@@ -78,7 +84,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
       density: DENSITY.COMPACT,
       chromeOn: false,
     },
-    voicePack: {},
+    voicePack: EDITORIAL_VOICE_PACK,
     featureDefaults: {},
   },
 };
