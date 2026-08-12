@@ -118,6 +118,15 @@ export default mergeConfig(
 
 ## Conventions
 
+- **Mock user/author names and emails are always fake — never a real person's
+  name or email, including this repo's own maintainer.** Test fixtures for
+  account/auth/identity/author data (`user.name`, `user.email`,
+  `author.name`, avatar `alt`/`name` props, etc.) use a placeholder identity
+  (`'Jane Doe'`, `'jane@example.com'`, or similar) instead of a real one that
+  happened to be handy while writing the test. This applies to co-located
+  `*.test.ts(x)` fixtures and `.stories.tsx` mock data alike — not to actual
+  site content (blog posts, author bios) under `content/` or `docs/`, which
+  legitimately name real people on purpose.
 - Arrange–Act–Assert; one behaviour per `it`. Descriptive names:
   `it("renders the post title and author")`.
 - **When a suite targets a single exported function, pass the symbol itself to
