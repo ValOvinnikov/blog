@@ -188,6 +188,15 @@ export default defineConfig({
                           .schemaType(footerSchema.name)
                           .documentId(footerSchema.name),
                       ),
+                    S.listItem()
+                      .title('Theme')
+                      .id(themeSchema.name)
+                      .icon(Palette)
+                      .child(
+                        S.document()
+                          .schemaType(themeSchema.name)
+                          .documentId(themeSchema.name),
+                      ),
                     S.divider(),
                     S.listItem()
                       .title('Site Settings')
@@ -197,15 +206,6 @@ export default defineConfig({
                         S.document()
                           .schemaType(siteSchema.name)
                           .documentId(siteSchema.name),
-                      ),
-                    S.listItem()
-                      .title('Theme')
-                      .id(themeSchema.name)
-                      .icon(Palette)
-                      .child(
-                        S.document()
-                          .schemaType(themeSchema.name)
-                          .documentId(themeSchema.name),
                       ),
                   ]),
               ),
