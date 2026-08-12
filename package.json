@@ -2,7 +2,7 @@
   "name": "blog",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@9.15.0",
+  "packageManager": "pnpm@11.21.0",
   "engines": {
     "node": ">=20.19"
   },
@@ -42,19 +42,5 @@
     "prettier": "catalog:",
     "turbo": "^2.10.5",
     "typescript": "catalog:"
-  },
-  "pnpm": {
-    "overrides": {
-      "js-yaml@<3.15.0": ">=3.15.0",
-      "postcss": ">=8.5.23",
-      "prismjs@<1.30.0": ">=1.30.0",
-      "smol-toml@<1.6.1": ">=1.6.1",
-      "uuid@<11.1.1": ">=11.1.1",
-      "undici": ">=6.28.0",
-      "fast-uri": ">=3.1.5"
-    },
-    "ignoredOptionalDependencies": [
-      "nodemailer"
-    ]
   }
 }
