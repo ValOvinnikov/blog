@@ -208,7 +208,7 @@ const TOAST_FAILED_STATE = 'failed'; // bookmarkButton.toastErrorState, accountP
 
 **`promptSymbol`/`promptHost`/`promptFlag`/`promptTag` neutralize to `""` (empty string), not a rewritten word.** These four fields exist purely to render terminal-prompt _furniture_ (the `~$`/`$`/`-l`/`data` glyphs `WindowChrome.Prompt`/`WindowChrome.Tag` render literally as typed). There is no neutral English equivalent of a shell prompt symbol — the neutral/editorial UI simply doesn't have a prompt-line element there at all (this is exactly the composition-level gap the sibling chrome-gating epic closes; until it does, these four fields render as an empty string in the still-present `WindowChrome.Prompt`/`.Tag` slot, which is a harmless empty span, not broken markup — confirmed by checking `WindowChrome.Prompt`/`.Tag`'s implementation renders whatever string it's given with no assumed non-empty formatting).
 
-**36 distinct message paths** move into the pack (2 shared constants collapse what would otherwise be 6 duplicate entries — `TERMINAL_PROMPT_HOST` used at 4 paths, `TOAST_FAILED_STATE` used at 6 — down to 2 declarations).
+**64 distinct message paths** move into the pack (2 shared constants collapse what would otherwise be 6 duplicate entries — `TERMINAL_PROMPT_HOST` used at 4 paths, `TOAST_FAILED_STATE` used at 6 — down to 2 declarations).
 
 ### `CONSOLE_VOICE_PACK` / `EDITORIAL_VOICE_PACK` — `packages/config/src/constants/voice-pack.ts`
 
@@ -299,7 +299,7 @@ Tasks 1–3 (utils + config: deep-merge, voice-pack consts + completeness test) 
 - Create: `packages/config/src/constants/voice-pack.ts` — `TVoicePack` (exact shape from Contracts), `TERMINAL_PROMPT_HOST`/`TOAST_FAILED_STATE` shared constants, `CONSOLE_VOICE_PACK`/`EDITORIAL_VOICE_PACK`, populated **exactly** per the classification table above (copy each "Current" value verbatim — these are the literal strings from today's `en.json`, read directly from `apps/web/src/i18n/messages/en.json` at commit time, not retyped from memory).
 - Modify: `packages/config/src/constants/preset.ts` — change `TPresetBundle.voicePack`'s type from `Record<string, never>` to `TVoicePack`; update `PRESET_REGISTRY[PRESET_ID.CONSOLE].voicePack` to `CONSOLE_VOICE_PACK` and `PRESET_REGISTRY[PRESET_ID.EDITORIAL].voicePack` to `EDITORIAL_VOICE_PACK`.
 - Modify: `packages/config/src/constants/index.ts` (barrel) — export `TVoicePack`, `CONSOLE_VOICE_PACK`, `EDITORIAL_VOICE_PACK`.
-- Test: `packages/config/src/constants/voice-pack.test.ts` — **one assertion per row of the classification table** (36 assertions), each hardcoding the expected preserved value directly in the test (not reading `en.json` at test time — this test must keep passing even after Task 4 changes `en.json`, since it's asserting the **pack's** contents, the durable regression guard per spec's "a test proves the Step 0 extraction lost no console string"). Example:
+- Test: `packages/config/src/constants/voice-pack.test.ts` — **one assertion per row of the classification table** (64 assertions), each hardcoding the expected preserved value directly in the test (not reading `en.json` at test time — this test must keep passing even after Task 4 changes `en.json`, since it's asserting the **pack's** contents, the durable regression guard per spec's "a test proves the Step 0 extraction lost no console string"). Example:
 
 ```ts
 import { CONSOLE_VOICE_PACK } from './voice-pack';
@@ -313,7 +313,7 @@ describe('CONSOLE_VOICE_PACK', () => {
     expect(CONSOLE_VOICE_PACK.bookmarkButton?.toastSavedMessage).toBe(
       'stashed to ~/bookmarks',
     );
-    // ...one line per remaining row in the classification table, 36 total
+    // ...one line per remaining row in the classification table, 64 total
   });
 
   it('reuses the shared terminal-prompt-host constant at all four call sites', () => {
@@ -328,7 +328,7 @@ describe('CONSOLE_VOICE_PACK', () => {
 **Interfaces — Produces:** `TVoicePack`, `CONSOLE_VOICE_PACK`, `EDITORIAL_VOICE_PACK` from `@blog/config`. `PRESET_REGISTRY[*].voicePack` now typed `TVoicePack` (was `Record<string, never>`).
 
 - [ ] **Step 1:** Dispatch `config` to create `voice-pack.ts` with the exact contents from the Contracts section, reading `en.json`'s current values directly to confirm each copied string is exact (byte-for-byte, including the em-dash in `lastMethodNotice` and every symbol prefix).
-- [ ] **Step 2 (test-writer):** Write `voice-pack.test.ts` per the pattern above — all 36 rows plus the shared-constant reuse assertion.
+- [ ] **Step 2 (test-writer):** Write `voice-pack.test.ts` per the pattern above — all 64 rows plus the shared-constant reuse assertion.
 - [ ] **Step 3:** Run `pnpm --filter @blog/config test` — Expected: PASS (this isn't TDD-red-first since the pack and the test both encode the same already-known values; the test's job is regression-locking, not driving new behavior).
 - [ ] **Step 4:** Verify `pnpm --filter @blog/config type-check`; confirm `preset.ts`'s `PRESET_REGISTRY` still type-checks with the new `TVoicePack` type.
 - [ ] **Step 5:** Commit (`feat(config): extract console voice pack, wire PRESET_REGISTRY's voicePack slot`).
@@ -343,11 +343,11 @@ describe('CONSOLE_VOICE_PACK', () => {
 **Files:**
 
 - Modify: `apps/web/src/i18n/messages/en.json` — replace every "Current" value in the classification table with its "Neutralized" value, **at the same key path** (no key renames, no key removals/additions — this is a pure value-level edit). Every other key in the file stays byte-for-byte identical.
-- Test: no new test file — the existing `notFound`/`bookmarksPage`/`accountPage`/`authMenu` component tests that assert on rendered text (if any assert literal English strings rather than mocking `t()`) may need their expected strings updated to match the new neutral wording; grep for hardcoded assertions against any of the 36 changed values across `apps/web/src/**/*.test.tsx` and update them in this same task (they're testing the same behavior, just against updated fixture copy — not new test cases).
+- Test: no new test file — the existing `notFound`/`bookmarksPage`/`accountPage`/`authMenu` component tests that assert on rendered text (if any assert literal English strings rather than mocking `t()`) may need their expected strings updated to match the new neutral wording; grep for hardcoded assertions against any of the 64 changed values across `apps/web/src/**/*.test.tsx` and update them in this same task (they're testing the same behavior, just against updated fixture copy — not new test cases).
 
 **Interfaces — Consumes:** the classification table (Contracts section) as the literal source of truth for both old and new values.
 
-- [ ] **Step 1:** Dispatch `web` to edit `en.json` per the table, then grep `apps/web/src` for any test asserting one of the 36 old literal strings and update those assertions to the new neutral wording.
+- [ ] **Step 1:** Dispatch `web` to edit `en.json` per the table, then grep `apps/web/src` for any test asserting one of the 64 old literal strings and update those assertions to the new neutral wording.
 - [ ] **Step 2:** Run `pnpm --filter web test` — Expected: PASS (any test that broke on the copy change now passes with updated expectations; nothing else should be affected since key paths didn't move).
 - [ ] **Step 3:** Verify `pnpm --filter web type-check` + lint.
 - [ ] **Step 4:** Commit (`feat(web): neutralize en.json base wording, console voice preserved in the preset pack`).
@@ -425,7 +425,7 @@ describe('CONSOLE_VOICE_PACK', () => {
 
   (Unwrap each `Result` with an `if`, per this repo's convention — not a ternary — before use; a failed fetch of either falls back to the safe default: `CONSOLE`'s preset id / no overrides, never a thrown error or empty page.)
 
-- Test: `apps/web/src/i18n/request.test.ts` (new) — cases: (a) `CONSOLE` preset, no `settings_voice` document → resolved messages equal today's **original** (pre-neutralization) values at all 36 classification-table paths, proving the full round-trip (neutralized base + console pack = original wording, end-to-end); (b) `EDITORIAL` preset, no `settings_voice` document → resolved messages equal the neutralized base unchanged at those same 36 paths; (c) `CONSOLE` preset + a `settings_voice` document overriding only `notFoundCommandNotFound` → that one path reflects the override, every other of the 35 remaining paths still shows the console pack's value (proves "a CMS override changes one key without affecting others").
+- Test: `apps/web/src/i18n/request.test.ts` (new) — cases: (a) `CONSOLE` preset, no `settings_voice` document → resolved messages equal today's **original** (pre-neutralization) values at all 64 classification-table paths, proving the full round-trip (neutralized base + console pack = original wording, end-to-end); (b) `EDITORIAL` preset, no `settings_voice` document → resolved messages equal the neutralized base unchanged at those same 64 paths; (c) `CONSOLE` preset + a `settings_voice` document overriding only `notFoundCommandNotFound` → that one path reflects the override, every other of the 63 remaining paths still shows the console pack's value (proves "a CMS override changes one key without affecting others").
 
 **Interfaces — Consumes:** `deepMergePartial` (Task 1), `PRESET_REGISTRY`/`PRESET_ID`/`TVoicePack` (Task 2), `service.global.themeSettings.v1.getTheme()` + `service.global.voiceSettings.v1.getVoiceOverrides()` (Task 5).
 **Produces:** the fully working voice ladder, end-to-end.
@@ -453,11 +453,11 @@ describe('CONSOLE_VOICE_PACK', () => {
 ## Self-review (plan ↔ spec)
 
 - Step 0 preservation, non-negotiable, gates the rest (D5) → Task 2, with an explicit orchestrator checkpoint (Step 6) before Task 3 starts. ✔
-- `console` reproduces today's exact wording / `editorial` renders neutral wording → Task 6's test cases (a)/(b), asserting the full round-trip at all 36 paths, not just spot-checks. ✔
+- `console` reproduces today's exact wording / `editorial` renders neutral wording → Task 6's test cases (a)/(b), asserting the full round-trip at all 64 paths, not just spot-checks. ✔
 - A CMS override changes one key without affecting others → Task 6's test case (c) + Task 5's fan-out test (isolated single-field CMS doc → exactly one resulting key). ✔
 - Voice mechanism: code voice-packs + curated CMS overrides, neutral `en.json` base (D4) → Tasks 2 (packs), 3 (neutral base), 4 (curated CMS fields), 6 (merge). ✔
 - CMS voice-override keys per-locale-ready (D10) → satisfied by construction: `settings_voice` is scoped to the single active locale already (this repo is monolingual-EN today, one `settings_voice` singleton per tenant/project); adding a locale dimension later is additive (a second per-locale document or a locale field), no reshaping of the 20 field names needed. Noted, no current-phase work required beyond not baking in an English-only assumption into field _names_ (checked — none of the 20 field names reference "English" or embed locale-specific grammar assumptions).
 - `console` is the safety net (D6) → Task 2's completeness test + Task 6's round-trip test are the two enforcement points.
 - Migration: none, stated per-task (Task 4's cms schema is additive). ✔
 - Chrome composition gating and email templates — explicitly out of scope, each with its own follow-up ticket (see "Explicitly out of scope" in Global Constraints, and the orchestrator's separate board-keeper dispatch after this plan is approved).
-- No placeholders: every task names exact files, the exact 36-row classification table, the exact 20 CMS field names + their fan-out mapping, and concrete test cases with real assertions.
+- No placeholders: every task names exact files, the exact 64-row classification table, the exact 20 CMS field names + their fan-out mapping, and concrete test cases with real assertions.
