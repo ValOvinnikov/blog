@@ -48,8 +48,8 @@ const WideControlDemo = () => {
   return (
     <WindowChrome>
       <WindowChrome.Bar>
-        <WindowChrome.User>val</WindowChrome.User>
-        <WindowChrome.Prompt>@ovinnikov:~$</WindowChrome.Prompt> account
+        <WindowChrome.User>jane</WindowChrome.User>
+        <WindowChrome.Prompt>@janedoe:~$</WindowChrome.Prompt> account
         --identity
       </WindowChrome.Bar>
       <WindowChrome.Body>
@@ -57,10 +57,9 @@ const WideControlDemo = () => {
           label="Display name"
           description="Overrides your provider handle wherever your comments appear."
         >
-          {/* Mirrors the avatar+input / save-button control layout a
-              consuming app slots into this row, so the content column's
-              max-width is checked against the same nested flex-grow
-              chain a real long-value control would use. */}
+          {/* Mirrors a real avatar+input/save-button control so the content
+              column's max-width is exercised against the same flex-grow
+              chain. */}
           <div className="flex w-full flex-col gap-2 md:w-auto md:flex-row md:flex-wrap md:items-center">
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <Avatar name={name} alt="" />
@@ -98,7 +97,7 @@ export const Danger: TStory = {
           value=""
           onChange={() => {}}
           ariaLabel="Type your handle to confirm deletion"
-          placeholder="type: val"
+          placeholder="type: jane"
         />
         <Button variant="danger" disabled={true}>
           delete account
@@ -112,9 +111,8 @@ export const PrivacySection: TStory = {
   render: () => (
     <WindowChrome>
       <WindowChrome.Bar>
-        <WindowChrome.User>val</WindowChrome.User>
-        <WindowChrome.Prompt>@ovinnikov:~$</WindowChrome.Prompt> account
-        --privacy
+        <WindowChrome.User>jane</WindowChrome.User>
+        <WindowChrome.Prompt>@janedoe:~$</WindowChrome.Prompt> account --privacy
         <WindowChrome.Tag>data</WindowChrome.Tag>
       </WindowChrome.Bar>
       <WindowChrome.Body>
@@ -133,7 +131,7 @@ export const PrivacySection: TStory = {
             value=""
             onChange={() => {}}
             ariaLabel="Type your handle to confirm deletion"
-            placeholder="type: val"
+            placeholder="type: jane"
           />
           <Button variant="danger" disabled={true}>
             delete account
