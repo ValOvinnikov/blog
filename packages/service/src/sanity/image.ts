@@ -1,5 +1,6 @@
 import {
   createImageUrlBuilder,
+  type FitMode,
   type SanityImageSource,
 } from '@sanity/image-url';
 
@@ -14,6 +15,19 @@ function getImageUrlBuilder(): TImageUrlBuilder {
   return builder;
 }
 
-export function urlForImage(source: SanityImageSource): string {
-  return getImageUrlBuilder().image(source).auto('format').url();
+export type TImageTransformOptions = {
+  width?: number;
+  height?: number;
+  fit?: FitMode;
+};
+
+export function urlForImage(
+  source: SanityImageSource,
+  options?: TImageTransformOptions,
+): string {
+  let image = getImageUrlBuilder().image(source).auto('format');
+  if (options?.width) image = image.width(options.width);
+  if (options?.height) image = image.height(options.height);
+  if (options?.fit) image = image.fit(options.fit);
+  return image.url();
 }

@@ -3,6 +3,7 @@ import type { TRawFooter } from '@blog/service/features/global/footer/adaptor/tr
 import type { TRawNavigation } from '@blog/service/features/global/navigation/adaptor/transformer';
 import type { TRawNewsletterSettings } from '@blog/service/features/global/newsletter-settings/adaptor/transformer';
 import type { TRawSiteSettings } from '@blog/service/features/global/site-settings/adaptor/transformer';
+import type { TRawThemeSettings } from '@blog/service/features/global/theme-settings/adaptor/transformer';
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 
 export function makeRawSiteSettings(
@@ -11,8 +12,6 @@ export function makeRawSiteSettings(
   return {
     brand: {
       name: 'My Blog',
-      prefix: 'val',
-      suffix: null,
       specLine: null,
       logo: makeRawImage('Logo'),
       variant: BRAND_VARIANTS.CONSOLE,
@@ -46,6 +45,21 @@ export function makeRawNewsletterSettings(
   return {
     heading: 'Stay in the loop',
     description: 'Get new posts in your inbox.',
+    ...overrides,
+  };
+}
+
+export function makeRawThemeSettings(
+  overrides: Partial<NonNullable<TRawThemeSettings>> = {},
+): NonNullable<TRawThemeSettings> {
+  return {
+    preset: null,
+    accentHue: null,
+    logoHue: null,
+    headingFont: null,
+    bodyFont: null,
+    radiusScale: null,
+    density: null,
     ...overrides,
   };
 }

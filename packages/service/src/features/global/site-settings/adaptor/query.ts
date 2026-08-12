@@ -9,8 +9,6 @@ export const siteSettingsQuery = q.star
       .field('brand')
       .project((b) => ({
         name: b.field('name').notNull(),
-        prefix: b.field('prefix').notNull(),
-        suffix: b.field('suffix').nullable(true),
         specLine: b
           .field('specLine')
           .project((sl) => ({
@@ -18,7 +16,7 @@ export const siteSettingsQuery = q.star
             separator: sl.field('separator').notNull(),
           }))
           .nullable(true),
-        logo: b.field('logo').project(imageWithAltFragment).notNull(),
+        logo: b.field('logo').project(imageWithAltFragment).nullable(true),
         variant: b.field('variant').notNull(),
       }))
       .notNull(),

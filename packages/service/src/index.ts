@@ -7,6 +7,7 @@ import { createFooterService } from './features/global/footer';
 import { createNavigationService } from './features/global/navigation';
 import { createNewsletterSettingsService } from './features/global/newsletter-settings';
 import { createSiteSettingsService } from './features/global/site-settings';
+import { createThemeSettingsService } from './features/global/theme-settings';
 import { createContentModuleService } from './features/modules/content';
 import { createCtaModuleService } from './features/modules/cta';
 import { createHeroModuleService } from './features/modules/hero';
@@ -49,6 +50,7 @@ export const service = {
     navigation: createNavigationService(),
     footer: createFooterService(),
     newsletterSettings: createNewsletterSettingsService(),
+    themeSettings: createThemeSettingsService(),
   },
 };
 
@@ -61,6 +63,7 @@ export type { TFooter } from './features/global/footer';
 export type { TNavigation } from './features/global/navigation';
 export type { TNewsletterSettings } from './features/global/newsletter-settings';
 export type { TBrand, TSiteSettings } from './features/global/site-settings';
+export type { TThemeTokens } from './features/global/theme-settings';
 export type { TContentModule } from './features/modules/content';
 export type { TCtaModule } from './features/modules/cta';
 export type { THeroModule } from './features/modules/hero';

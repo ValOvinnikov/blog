@@ -42,4 +42,17 @@ describe('buildImageUrl', () => {
     });
     expect(buildImageUrl(makeRawImage())).toBeUndefined();
   });
+
+  it('forwards transform options to urlForImage', async () => {
+    const { urlForImage } = await import('@blog/service/sanity/image');
+    const image = makeRawImage();
+
+    buildImageUrl(image, { width: 64, height: 64, fit: 'crop' });
+
+    expect(urlForImage).toHaveBeenCalledWith(image, {
+      width: 64,
+      height: 64,
+      fit: 'crop',
+    });
+  });
 });
