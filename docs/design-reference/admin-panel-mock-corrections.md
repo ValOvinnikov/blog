@@ -189,6 +189,10 @@ and `PRESET_REGISTRY` defaults all match, the 20 voice fields are exact in name
 and grouping, favicon and logo-hue controls exist, and add-tenant is disabled
 with a stated reason while the tenants list ships for real. What follows is new.
 
+> **§13–§15 applied 2026-08-13** — fixed directly in the mock and verified in a
+> browser. Kept here as the record of why, since the reasoning binds the real
+> `apps/admin` build too, not just the mock.
+
 ## 13. Dark mode is wired as a property of the preset — it isn't
 
 `state.dark` is assigned in exactly one place: `state.dark = d.dark` on preset

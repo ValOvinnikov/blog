@@ -131,6 +131,8 @@ textarea.inp{resize:vertical;min-height:60px}
 .seg{display:inline-flex;background:var(--line-2);border-radius:10px;padding:3px;gap:3px;flex-wrap:wrap}
 .seg button{border:0;background:transparent;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted)}
 .seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.seg-sm{flex-wrap:nowrap;flex:none}
+.seg-sm button{padding:4px 10px;font-size:11.5px;white-space:nowrap}
 
 .disclosure{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
 .disclosure > summary{list-style:none;cursor:pointer;padding:14px 18px;display:flex;align-items:center;gap:10px;background:var(--surface);font-weight:600;font-size:14px}
@@ -216,7 +218,7 @@ input[type=range].hue::-moz-range-thumb{width:18px;height:18px;border:none;borde
   --p-font-head:'Fraunces',serif; --p-font-body:'Inter',sans-serif;
   --p-bg:#ffffff; --p-surface:#ffffff; --p-text:#12141a; --p-muted:#5b6472; --p-line:#e5e7eb;
 }
-.preview.console{--p-bg:var(--tw-primary);--p-surface:var(--tw-surface);--p-text:var(--tw-text);--p-muted:var(--tw-text-muted);--p-line:var(--tw-border)}
+.preview.dark{--p-bg:var(--tw-primary);--p-surface:var(--tw-surface);--p-text:var(--tw-text);--p-muted:var(--tw-text-muted);--p-line:var(--tw-border)}
 .previewbox{background:var(--p-bg);border:1px solid var(--p-line);border-radius:14px;padding:18px;color:var(--p-text);transition:.2s}
 .pv-chrome{display:none;align-items:center;gap:9px;margin:-4px -4px 14px;padding:7px 10px;background:color-mix(in oklch,var(--p-surface),transparent 20%);border:1px solid var(--p-line);border-radius:9px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--p-muted)}
 .preview.chromeon .pv-chrome{display:flex}
@@ -235,7 +237,10 @@ input[type=range].hue::-moz-range-thumb{width:18px;height:18px;border:none;borde
 .pv-card{margin-top:14px;background:var(--p-surface);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:var(--p-pad)}
 .pv-card .k{font-family:var(--p-font-head);font-weight:600;color:var(--p-text);margin-bottom:3px}
 .pv-card .v{font-family:var(--p-font-body);color:var(--p-muted);font-size:12.5px}
-.preview-note{font-size:11.5px;color:var(--faint);margin-top:9px;display:flex;gap:6px;align-items:center}
+.preview-note{font-size:11.5px;color:var(--faint);margin-top:9px;line-height:1.55}
+.preview-note p{margin:0 0 4px}
+.preview-note p:last-child{margin:0}
+.preview-note code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10.5px}
 
 /* full page tier */
 .device{border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);background:var(--surface)}
@@ -324,12 +329,12 @@ input[type=range].hue::-moz-range-thumb{width:18px;height:18px;border:none;borde
       <nav class="nav">
         <a data-page="look" class="active"><span class="ic">◑</span> Look <span class="pill">this milestone</span></a>
         <a data-page="voice"><span class="ic">❝</span> Voice <span class="pill">this milestone</span></a>
-        <a data-page="domain"><span class="ic">⌗</span> Domain</a>
-        <a data-page="email"><span class="ic">✉</span> Email</a>
+        <a data-page="domain" class="soon"><span class="ic">⌗</span> Domain <span class="pill">later</span></a>
+        <a data-page="email" class="soon"><span class="ic">✉</span> Email <span class="pill">later</span></a>
         <a data-page="subscribers" class="soon"><span class="ic">☰</span> Subscribers <span class="pill">later</span></a>
         <a data-page="comments" class="soon"><span class="ic">❐</span> Comments <span class="pill">later</span></a>
-        <a data-page="team"><span class="ic">◍</span> Team</a>
-        <a data-page="danger"><span class="ic">⚠</span> Danger zone</a>
+        <a data-page="team" class="soon"><span class="ic">◍</span> Team <span class="pill">later</span></a>
+        <a data-page="danger" class="soon"><span class="ic">⚠</span> Danger zone <span class="pill">later</span></a>
       </nav>
     </div>
 
@@ -540,7 +545,7 @@ input[type=range].hue::-moz-range-thumb{width:18px;height:18px;border:none;borde
           <!-- live preview -->
           <div class="stack">
             <div class="card">
-              <div class="hd"><h3>Live preview</h3><span class="desc">Real @blog/ui primitives</span></div>
+              <div class="hd"><h3>Live preview</h3><span class="desc" style="min-width:0">Real @blog/ui primitives</span><div class="seg seg-sm" id="modeSeg" style="margin-left:auto"><button data-m="0">Light</button><button data-m="1">Dark</button></div></div>
               <div class="bd">
                 <div class="preview" id="preview">
                   <div class="previewbox">
@@ -555,7 +560,7 @@ input[type=range].hue::-moz-range-thumb{width:18px;height:18px;border:none;borde
                     </div>
                     <div class="pv-card"><div class="k">Bookmark saved</div><div class="v">Tokens flow straight from the form above — no save, no reload.</div></div>
                   </div>
-                  <div class="preview-note">◔ Tier 1 · inline · unsaved form state → CSS custom properties, OKLCH ramp matching production</div>
+                  <div class="preview-note"><p>◔ Tier 1 · inline · unsaved form state → CSS custom properties, OKLCH ramp matching production</p><p>◑ Light/dark is a <b>reader</b> preference (<code>localStorage.theme</code>, falling back to <code>prefers-color-scheme</code>) — not tenant config. Every preset must work in both, so preview either.</p></div>
                 </div>
               </div>
             </div>
@@ -802,13 +807,15 @@ const FONTS=[
   ['Fraunces','Fraunces, serif'],
   ['Inter','Inter, sans-serif']
 ];
-// PRESET_REGISTRY defaults
+/* PRESET_REGISTRY defaults. NOTE: `previewDark` is NOT a registry field and is
+   never saved — TThemeTokens has no color-scheme property. It only says which
+   mode the preview opens in, because readers pick their own via a site toggle. */
 const PRESET={
-  CONSOLE:  {hue:250, head:'"Space Grotesk", system-ui, sans-serif', body:'Newsreader, Georgia, serif', radius:10, density:16, chrome:true,  dark:true },
-  EDITORIAL:{hue:28,  head:'Fraunces, serif',                        body:'Inter, sans-serif',          radius:6,  density:11, chrome:false, dark:false}
+  CONSOLE:  {previewDark:true,  hue:250, head:'"Space Grotesk", system-ui, sans-serif', body:'Newsreader, Georgia, serif', radius:10, density:16, chrome:true  },
+  EDITORIAL:{previewDark:false, hue:28,  head:'Fraunces, serif',                        body:'Inter, sans-serif',          radius:6,  density:11, chrome:false }
 };
 const state={preset:'EDITORIAL',hue:28,logoHue:28,logoFollow:true,radius:6,density:11,
-  headFont:'Fraunces, serif',bodyFont:'Inter, sans-serif',chrome:false,dark:false};
+  headFont:'Fraunces, serif',bodyFont:'Inter, sans-serif',chrome:false,previewDark:false};
 
 /* --- OKLCH token ramps (exact values from the brief) --- */
 function accentTokens(h,dark){
@@ -837,7 +844,7 @@ function buildFonts(id,which){
 }
 function setHue(v){
   state.hue=+v;document.getElementById('hueVal').textContent='hue '+v+'°';
-  const a=accentTokens(state.hue,state.dark);
+  const a=accentTokens(state.hue,state.previewDark);
   document.getElementById('swatch').style.background=a.primary;
   if(state.logoFollow){state.logoHue=state.hue;document.getElementById('logoHue').value=v;updateLogoUI();}
   applyPreview();
@@ -852,15 +859,21 @@ function toggleLogoFollow(on){
   updateLogoUI();applyPreview();
 }
 function updateLogoUI(){
-  const t=logoTokens(state.logoHue,state.dark);
+  const t=logoTokens(state.logoHue,state.previewDark);
   const tones=document.getElementById('logoTones').children;
   tones[0].style.background=t.l1;tones[1].style.background=t.l2;tones[2].style.background=t.l3;
+}
+function setPreviewMode(dark){
+  state.previewDark=!!dark;
+  selectSeg('modeSeg','m',state.previewDark?1:0);
+  applyPreview();
 }
 function setChrome(on){state.chrome=on;document.getElementById('chromeLbl').textContent=on?'On':'Off';applyPreview();}
 function selectSeg(segId,attr,val){document.getElementById(segId).querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset[attr]===+val));}
 
 function setPreset(p){
-  const d=PRESET[p];state.preset=p;state.dark=d.dark;
+  const d=PRESET[p];state.preset=p;
+  setPreviewMode(d.previewDark); // opens in the preset's natural mode; user can flip it
   state.hue=d.hue;state.headFont=d.head;state.bodyFont=d.body;state.radius=d.radius;state.density=d.density;state.chrome=d.chrome;
   if(state.logoFollow)state.logoHue=d.hue;
   document.querySelectorAll('.preset').forEach(el=>el.classList.toggle('on',el.dataset.preset===p));
@@ -873,9 +886,9 @@ function setPreset(p){
 }
 function applyPreview(){
   const pv=document.getElementById('preview');
-  pv.classList.toggle('console',state.dark);
+  pv.classList.toggle('dark',state.previewDark);
   pv.classList.toggle('chromeon',state.chrome);
-  const a=accentTokens(state.hue,state.dark), l=logoTokens(state.logoHue,state.dark);
+  const a=accentTokens(state.hue,state.previewDark), l=logoTokens(state.logoHue,state.previewDark);
   pv.style.setProperty('--p-accent',a.primary);
   pv.style.setProperty('--p-accent-solid',a.solid);
   pv.style.setProperty('--p-accent-contrast',a.contrast);
@@ -884,10 +897,11 @@ function applyPreview(){
   pv.style.setProperty('--p-pad',state.density+'px');
   pv.style.setProperty('--p-font-head',state.headFont);
   pv.style.setProperty('--p-font-body',state.bodyFont);
-  document.getElementById('pvPrompt').textContent = state.dark ? '~$ ./publish' : 'guest@northwind ~ %';
+  document.getElementById('pvPrompt').textContent = state.chrome ? '~$ ./publish' : 'guest@northwind ~ %';
 }
 document.getElementById('radiusSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{selectSeg('radiusSeg','r',b.dataset.r);state.radius=+b.dataset.r;applyPreview();});
 document.getElementById('densitySeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{selectSeg('densitySeg','d',b.dataset.d);state.density=+b.dataset.d;applyPreview();});
+document.getElementById('modeSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>setPreviewMode(+b.dataset.m));
 function resetLook(){setPreset(state.preset);toast('Reset to '+state.preset.toLowerCase()+' defaults');}
 
 /* ---------- VOICE (20 curated fields, 4 groups) ---------- */
@@ -1026,7 +1040,7 @@ buildFonts('bodyFonts','body');
 buildVoice();
 setHue(28);
 updateLogoUI();
-applyPreview();
+setPreviewMode(state.previewDark);
 </script>
 </body>
 </html>
