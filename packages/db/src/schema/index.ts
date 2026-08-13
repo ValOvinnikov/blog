@@ -5,4 +5,7 @@
 // re-exporting it here.
 export * from './auth';
 export * from './bookmarks';
+export * from './memberships';
 export * from './subscribers';
+export * from './tenant-domains';
+export * from './tenants';

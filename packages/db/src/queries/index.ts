@@ -4,4 +4,7 @@
 // re-exporting it here as its own namespace.
 export * as account from './account';
 export * as bookmarks from './bookmarks';
+export * as memberships from './memberships';
 export * as subscribers from './subscribers';
+export * as tenantDomains from './tenant-domains';
+export * as tenants from './tenants';
