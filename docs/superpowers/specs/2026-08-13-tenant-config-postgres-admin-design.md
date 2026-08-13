@@ -245,8 +245,17 @@ type.
 contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;" }`.
 - File size cap (e.g. 2 MB) — enforced server-side; a client-side check is
   UX-only and bypassable.
-- Dimension bounds are a nicety, not a hard requirement — reasonable min/max
-  pixel dimensions to reject absurd uploads, not precisely specified here.
+- Dimension bounds are a nicety for the **logo** — reasonable min/max pixel
+  dimensions to reject absurd uploads, not precisely specified here.
+- **The favicon is the exception: square aspect ratio is enforced at upload,
+  not advisory.** Reject a non-square favicon rather than accepting and
+  center-cropping it. This is stricter than it looks: Vercel Blob has no
+  on-the-fly transforms (unlike the Sanity CDN this project is used to), so
+  whatever is uploaded is exactly what browsers render at 16–32px. A wide
+  header-lockup image center-cropped to that size is unreadable — which is
+  the original bug this requirement comes from (#1408/#1409, superseded by
+  this design; the enforcement moves from Sanity schema validation to the
+  admin panel's upload path, but it does not become optional in the move).
 
 ## Migration mechanics
 
