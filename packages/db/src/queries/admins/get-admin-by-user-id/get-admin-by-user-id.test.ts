@@ -1,4 +1,4 @@
-import { ADMIN_ROLE } from '@blog/config/constants';
+import { ADMIN_ROLE, GRANTED_VIA } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import { eq } from 'drizzle-orm';
@@ -32,9 +32,11 @@ afterEach(async () => {
 describe(getAdminByUserId, () => {
   it('returns the row for an existing admin user', async () => {
     await insertUser('user-1');
-    await db
-      .insert(schema.admins)
-      .values({ userId: 'user-1', role: ADMIN_ROLE.SUPERADMIN });
+    await db.insert(schema.admins).values({
+      userId: 'user-1',
+      role: ADMIN_ROLE.SUPERADMIN,
+      grantedVia: GRANTED_VIA.BREAK_GLASS,
+    });
 
     const result = await getAdminByUserId('user-1');
 
@@ -56,9 +58,11 @@ describe(getAdminByUserId, () => {
 describe('foreign-key cascade', () => {
   it('removes an admin row when its owning user is deleted', async () => {
     await insertUser('user-1');
-    await db
-      .insert(schema.admins)
-      .values({ userId: 'user-1', role: ADMIN_ROLE.ADMIN });
+    await db.insert(schema.admins).values({
+      userId: 'user-1',
+      role: ADMIN_ROLE.ADMIN,
+      grantedVia: GRANTED_VIA.BREAK_GLASS,
+    });
 
     await db.delete(schema.users).where(eq(schema.users.id, 'user-1'));
 
@@ -70,14 +74,18 @@ describe('foreign-key cascade', () => {
 describe('unique constraint', () => {
   it('rejects a second admin row for the same user', async () => {
     await insertUser('user-1');
-    await db
-      .insert(schema.admins)
-      .values({ userId: 'user-1', role: ADMIN_ROLE.MODERATOR });
+    await db.insert(schema.admins).values({
+      userId: 'user-1',
+      role: ADMIN_ROLE.MODERATOR,
+      grantedVia: GRANTED_VIA.BREAK_GLASS,
+    });
 
     await expect(
-      db
-        .insert(schema.admins)
-        .values({ userId: 'user-1', role: ADMIN_ROLE.SUPERADMIN }),
+      db.insert(schema.admins).values({
+        userId: 'user-1',
+        role: ADMIN_ROLE.SUPERADMIN,
+        grantedVia: GRANTED_VIA.BREAK_GLASS,
+      }),
     ).rejects.toThrow();
   });
 });
