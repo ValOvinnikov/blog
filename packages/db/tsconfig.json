@@ -8,12 +8,10 @@
     // `globals: true` test config. Without this, a dependency bump that reshuffles
     // node_modules can drop @types/node discovery and break `tsc`.
     "types": ["node", "vitest/globals"],
-    // No `@blog/config` alias yet — nothing in this package imports it (see
-    // vitest.config.ts for the full note). Add it back alongside a real
-    // `@blog/config: workspace:*` dependency once a schema/query file needs it.
     "paths": {
-      "@blog/db/*": ["./src/*"]
+      "@blog/db/*": ["./src/*"],
+      "@blog/config/*": ["../../packages/config/src/*"]
     }
   },
-  "include": ["src", "drizzle.config.ts"]
+  "include": ["src", "scripts", "drizzle.config.ts"]
 }

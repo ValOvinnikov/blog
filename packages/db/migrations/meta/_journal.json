@@ -29,6 +29,13 @@
       "when": 1785965008858,
       "tag": "0003_mighty_leo",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1786618405349,
+      "tag": "0004_dry_maverick",
+      "breakpoints": true
     }
   ]
 }

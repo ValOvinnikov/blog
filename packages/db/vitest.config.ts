@@ -4,6 +4,7 @@ import preset from '@blog/vitest-config/preset';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
 const src = fileURLToPath(new URL('./src', import.meta.url));
+const configSrc = fileURLToPath(new URL('../config/src', import.meta.url));
 
 export default mergeConfig(
   preset,
@@ -21,12 +22,7 @@ export default mergeConfig(
     resolve: {
       alias: [
         { find: /^@blog\/db\//, replacement: `${src}/` },
-        // No `@blog/config` alias yet — nothing in this package imports it
-        // (no feature tables/queries land in this bootstrap, #984). Add the
-        // alias back here (and to tsconfig.json's `paths`, and `@blog/config:
-        // workspace:*` to package.json) together with the first schema/query
-        // file that actually needs it, per this repo's 1:1 alias↔dependency
-        // convention.
+        { find: /^@blog\/config\//, replacement: `${configSrc}/` },
         // `import 'server-only'` throws outside a react-server bundle; stub it
         // to a no-op for the node test env (the real guard still runs in build).
         {
