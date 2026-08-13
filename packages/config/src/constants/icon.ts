@@ -29,6 +29,13 @@ export const ICONS = {
   CHEVRON_RIGHT: 'CHEVRON_RIGHT',
   ARROW: 'ARROW',
   SHIELD_CHECK: 'SHIELD_CHECK',
+  GRID: 'GRID',
+  PLUS: 'PLUS',
+  PALETTE: 'PALETTE',
+  QUOTE: 'QUOTE',
+  GLOBE: 'GLOBE',
+  COMMENT: 'COMMENT',
+  USERS: 'USERS',
 } as const;
 
 export type TIconName = TValueOf<typeof ICONS>;
