@@ -1,12 +1,18 @@
 export {};
 
-const { authMock, unsubscribeMock, resendConfirmationMock, sendEmailMock } =
-  vi.hoisted(() => ({
-    authMock: vi.fn(),
-    unsubscribeMock: vi.fn(),
-    resendConfirmationMock: vi.fn(),
-    sendEmailMock: vi.fn(),
-  }));
+const {
+  authMock,
+  unsubscribeMock,
+  resendConfirmationMock,
+  sendEmailMock,
+  clearNewsletterSubscribedCookieMock,
+} = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  unsubscribeMock: vi.fn(),
+  resendConfirmationMock: vi.fn(),
+  sendEmailMock: vi.fn(),
+  clearNewsletterSubscribedCookieMock: vi.fn(),
+}));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
@@ -21,6 +27,10 @@ vi.mock('@blog/db', () => ({
 
 vi.mock('@web/server/email/send-email', () => ({
   sendEmail: sendEmailMock,
+}));
+
+vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
+  clearNewsletterSubscribedCookie: clearNewsletterSubscribedCookieMock,
 }));
 
 // The real `@t3-oss/env-nextjs` module throws when a server var is read
@@ -40,6 +50,7 @@ describe('unsubscribeAction', () => {
   beforeEach(() => {
     authMock.mockReset();
     unsubscribeMock.mockReset();
+    clearNewsletterSubscribedCookieMock.mockReset();
   });
 
   it('returns { ok: false } without unsubscribing when there is no session', async () => {
@@ -49,19 +60,22 @@ describe('unsubscribeAction', () => {
 
     await expect(unsubscribeAction()).resolves.toEqual({ ok: false });
     expect(unsubscribeMock).not.toHaveBeenCalled();
+    expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
   });
 
-  it('unsubscribes the session user and returns { ok: true }', async () => {
+  it('unsubscribes the session user, clears the cookie, and returns { ok: true }', async () => {
     authMock.mockResolvedValue(session);
     unsubscribeMock.mockResolvedValue(undefined);
+    clearNewsletterSubscribedCookieMock.mockResolvedValue(undefined);
     const { unsubscribeAction } =
       await import('./newsletter-subscription-actions');
 
     await expect(unsubscribeAction()).resolves.toEqual({ ok: true });
     expect(unsubscribeMock).toHaveBeenCalledWith('user-1');
+    expect(clearNewsletterSubscribedCookieMock).toHaveBeenCalledTimes(1);
   });
 
-  it('returns { ok: false } and logs when the db write throws', async () => {
+  it('returns { ok: false }, logs, and does not clear the cookie when the db write throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     authMock.mockResolvedValue(session);
     unsubscribeMock.mockRejectedValue(new Error('boom'));
@@ -70,6 +84,25 @@ describe('unsubscribeAction', () => {
 
     await expect(unsubscribeAction()).resolves.toEqual({ ok: false });
     expect(errorSpy).toHaveBeenCalled();
+    expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  it('still returns { ok: true } (logging, not failing) when clearing the cookie throws after a real successful unsubscribe', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    authMock.mockResolvedValue(session);
+    unsubscribeMock.mockResolvedValue(undefined);
+    clearNewsletterSubscribedCookieMock.mockRejectedValue(
+      new Error('cookie store down'),
+    );
+    const { unsubscribeAction } =
+      await import('./newsletter-subscription-actions');
+
+    await expect(unsubscribeAction()).resolves.toEqual({ ok: true });
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Failed to clear the newsletter-subscribed cookie:',
+      expect.any(String),
+    );
     errorSpy.mockRestore();
   });
 });
