@@ -85,8 +85,17 @@ the mistake already made once.** `bookmarks` and `subscribers` shipped without
 accepted, known gap for tables that already held data by the time multi-tenant
 was designed. This table doesn't exist yet. The multi-tenant doc's own advice
 applies directly: "cheapest path is to land the `tenantId` columns _with_
-each table's creation." Today there is exactly one tenant (a fixed default
-row); the column exists so Phase 8 is additive, not a migration.
+each table's creation."
+
+**Where the value comes from today, concretely:** there is no `tenants`
+table yet — that registry is genuinely Phase 8 scope and isn't pulled into
+this work. So `site_config.tenantId` can't be a live foreign-key lookup right
+now. Instead: a `DEFAULT_TENANT_ID` constant (a literal UUID) in
+`@blog/config`, used as the value for the one row that exists today. When
+Phase 8 eventually builds the real `tenants` table, its seed row uses this
+_exact same_ UUID as its `id` — so `site_config`'s existing row becomes a
+genuinely-FK'd row retroactively, with zero migration, instead of a value
+that needs backfilling into a new registry later.
 
 `features`/`feature_toggles` (Phase 4) gets the same treatment when it's
 built — typed columns or JSONB per what that phase's exact shape turns out to
@@ -129,18 +138,31 @@ precedent already in this repo: `apps/cms` (Sanity Studio) is already its own
 Vercel deployment, its own domain, "Vercel-hosted, not `sanity deploy`"
 (`SPEC.md` §13). `apps/admin` follows the same shape:
 
-- New workspace: `package.json`, `tsconfig.json`, `vitest.config.ts`, a
-  Next.js app skeleton, sharing `@blog/eslint-config`/`@blog/prettier-config`/
+- New workspace: `package.json`, `tsconfig.json`, `vitest.config.ts`. **Vite +
+  React, not Next.js** — a deliberate choice (2026-08-13): the admin app is an
+  authenticated CRUD dashboard, no SEO/ISR/public-crawl needs, and this repo
+  already has a non-Next.js React precedent (`apps/cms`, Sanity Studio, also
+  Vite-based). Sharing `@blog/eslint-config`/`@blog/prettier-config`/
   `configs/tailwind`, depending on `@blog/db`/`@blog/config`/`@blog/ui` the
-  same way `apps/web` does. Added to `turbo.json`'s pipeline and the pnpm
-  workspace list.
+  same way `apps/web` does — `@blog/ui` has no RSC-specific code paths (no
+  `'use client'` anywhere, prop-driven), so it works unchanged in a plain SPA.
+  Added to `turbo.json`'s pipeline and the pnpm workspace list. **Two costs
+  this choice accepts, named plainly rather than glossed over:** (1) the
+  shared-session cookie below needs `@auth/core` wired directly rather than
+  `next-auth`'s Next.js-native convenience; (2) writes to `@blog/db` need a
+  small hand-built API surface (Vercel Functions or a lightweight framework
+  like Hono, both first-class on Vercel) rather than Server Actions. Neither
+  blocks the choice, both are real, bounded extra plumbing versus reusing
+  `apps/web`'s existing patterns.
 - Its own Vercel project, its own domain (`admin.valstack.dev`) — human-gated
   provisioning, same as any other deploy setup (`docs/DEPLOY.md`).
 - **Session sharing across subdomains:** Auth.js session cookie set with
   `Domain: .valstack.dev` so a user already logged into the main site doesn't
   need a second login for admin — `requireAdmin()`'s `OWNER`-membership check
   gates access on top of the shared session, it doesn't replace
-  authentication.
+  authentication. Since `apps/admin` isn't Next.js, this is `@auth/core`
+  session validation (reading/verifying the same cookie `apps/web`'s
+  `next-auth` sets), not the `next-auth` convenience path.
 - **Tenant resolution is session-based, not host-based.** `admin.valstack.dev`
   is one fixed domain; which tenant's config a logged-in user sees/edits comes
   from their `memberships` row(s), the same way Vercel's own dashboard
@@ -193,6 +215,41 @@ future refinement (manually injecting a per-tenant `<link rel="preload">`
 pointing at the already-self-hosted asset) is noted but not committed to —
 worth investigating only if the non-default-font latency proves to matter in
 practice, not assumed solved here.
+
+## Email — Resend, per tenant
+
+Checked the current implementation (`apps/web/src/server/email/send-email.ts`,
+`magic-link-from-address.ts`, `newsletter-from-address.ts`): today it's one
+module-level `Resend` client keyed off a single `RESEND_API_KEY`, and a
+`from` address resolved from a single env var per email type
+(`MAGIC_LINK_FROM_ADDRESS`/`NEWSLETTER_FROM_ADDRESS`), falling back to
+Resend's shared testing sender.
+
+**Stays one shared Resend account/API key** — proportionate to the
+multi-tenant doc's own target ("tens of tenants on a lean budget"), and
+consistent with the same shared-over-per-tenant call already made for the
+Sanity read-token open decision. What changes: each tenant's verified sending
+domain becomes **tenant config data** (part of `site_config` or a sibling
+column), not an env var — `resolveNewsletterFromAddress`/
+`resolveMagicLinkFromAddress`'s env-var read is replaced with a per-tenant
+lookup. Resend supports multiple verified domains under one account, so this
+is a data change plus a one-time DNS-verification step per tenant during
+onboarding, not new infrastructure or a new Resend account per tenant.
+
+## Confirmed, not changed: Sanity stays project-per-tenant
+
+Came up in this same discussion (2026-08-13) — worth recording since it
+reinforces rather than merely repeats the multi-tenant doc's already-settled
+"Content is Sanity project-per-tenant." Checked Sanity's own dataset docs
+directly: datasets explicitly share "the same user access and billing" as
+their parent project, and private (authenticated-only) datasets are a
+Growth-plan-only feature — free tier doesn't support dataset-scoped access at
+all. So "one project, N datasets per tenant" would mean any project member
+(on free tier: any non-Viewer) sees every tenant's dataset — the exact same
+free-tier role limitation that motivated this whole doc, showing up again on
+the content side. Separate Sanity projects per tenant is confirmed necessary,
+not just preferred. No change to the multi-tenant doc from this — it already
+said project-per-tenant — this is additional grounding for why.
 
 ## Impact on in-flight and shipped Phase 2/3 work
 
