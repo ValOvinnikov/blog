@@ -168,3 +168,85 @@ describe(upsertSiteConfig, () => {
     ).rejects.toThrow();
   });
 });
+
+// Look and Voice save from separate admin-panel tabs, so a field absent from
+// one tab's submission must never overwrite what the other tab already set —
+// only an explicit value (or, for nullable columns, an explicit `null`)
+// changes anything.
+describe('partial updates — omission leaves a field untouched, explicit null clears it', () => {
+  it('preserves voice overrides when a later update omits the field entirely', async () => {
+    const tenantId = await insertTenant('acme');
+    await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      voiceOverrides: { notFoundDescription: 'Custom description.' },
+    });
+
+    const result = await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      accentHue: 28,
+    });
+
+    expect(result.voiceOverrides).toEqual({
+      notFoundDescription: 'Custom description.',
+    });
+  });
+
+  it('clears every voice override when explicitly updated with {}', async () => {
+    const tenantId = await insertTenant('acme');
+    await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      voiceOverrides: { notFoundDescription: 'Custom description.' },
+    });
+
+    const result = await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      voiceOverrides: {},
+    });
+
+    expect(result.voiceOverrides).toEqual({});
+  });
+
+  it('preserves logoHue when a later update omits the field', async () => {
+    const tenantId = await insertTenant('acme');
+    await upsertSiteConfig(tenantId, { ...baseInput, logoHue: 200 });
+
+    const result = await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      accentHue: 28,
+    });
+
+    expect(result.logoHue).toBe(200);
+  });
+
+  it('clears logoHue back to "follow accentHue" when explicitly set to null', async () => {
+    const tenantId = await insertTenant('acme');
+    await upsertSiteConfig(tenantId, { ...baseInput, logoHue: 200 });
+
+    const result = await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      logoHue: null,
+    });
+
+    expect(result.logoHue).toBeUndefined();
+  });
+
+  it('preserves logoAssetUrl on omission and clears it on explicit null', async () => {
+    const tenantId = await insertTenant('acme');
+    await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      logoAssetUrl: 'https://blob.example.com/logo.png',
+    });
+
+    const survived = await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      accentHue: 28,
+    });
+    expect(survived.logoAssetUrl).toBe('https://blob.example.com/logo.png');
+
+    const cleared = await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      logoAssetUrl: null,
+    });
+    expect(cleared.logoAssetUrl).toBeUndefined();
+  });
+});

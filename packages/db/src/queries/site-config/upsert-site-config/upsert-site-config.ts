@@ -68,10 +68,19 @@ export const voiceOverridesSchema = z
     return Object.fromEntries(entries);
   });
 
+// A field absent from the input is left untouched on `UPDATE` — Look and
+// Voice are saved from separate admin-panel tabs, so a Look save must never
+// wipe Voice data (or vice versa). `logoHue`/`logoAssetUrl`/`faviconAssetUrl`
+// additionally accept an explicit `null` to actually clear them (distinct
+// from omission) since `undefined` alone can't express "unset this" once a
+// value has been set. `voiceOverrides` follows the same omit-vs-present
+// rule one level up: omitted leaves the whole JSONB column untouched,
+// present (even `{}`) replaces it — the per-field blank-clears-that-key
+// behaviour inside it is unaffected either way.
 export const updateSiteConfigInputSchema = z.object({
   preset: z.enum(Object.values(PRESET_ID) as [TPresetId, ...TPresetId[]]),
   accentHue: hueSchema,
-  logoHue: hueSchema.optional(),
+  logoHue: hueSchema.nullable().optional(),
   headingFont: z.enum(
     Object.values(FONT_CHOICE) as [TFontChoice, ...TFontChoice[]],
   ),
@@ -82,8 +91,8 @@ export const updateSiteConfigInputSchema = z.object({
     Object.values(RADIUS_SCALE) as [TRadiusScale, ...TRadiusScale[]],
   ),
   density: z.enum(Object.values(DENSITY) as [TDensity, ...TDensity[]]),
-  logoAssetUrl: z.string().trim().url().optional(),
-  faviconAssetUrl: z.string().trim().url().optional(),
+  logoAssetUrl: z.string().trim().url().nullable().optional(),
+  faviconAssetUrl: z.string().trim().url().nullable().optional(),
   voiceOverrides: voiceOverridesSchema.optional(),
 });
 
@@ -94,21 +103,54 @@ export type TUpdateSiteConfigInput = z.input<
   typeof updateSiteConfigInputSchema
 >;
 
+type TSiteConfigWritable = Partial<typeof siteConfig.$inferInsert>;
+
+// Builds only the columns this call actually supplied — `undefined` means
+// "key absent from the input", so it's excluded from the object entirely
+// rather than passed through, which is what keeps an omitted column out of
+// both the `INSERT` values and the `UPDATE ... SET` clause.
+function presentOptionalFields(
+  parsed: z.output<typeof updateSiteConfigInputSchema>,
+): TSiteConfigWritable {
+  const fields: TSiteConfigWritable = {};
+
+  if (parsed.logoHue !== undefined) fields.logoHue = parsed.logoHue;
+  if (parsed.logoAssetUrl !== undefined) {
+    fields.logoAssetUrl = parsed.logoAssetUrl;
+  }
+  if (parsed.faviconAssetUrl !== undefined) {
+    fields.faviconAssetUrl = parsed.faviconAssetUrl;
+  }
+  if (parsed.voiceOverrides !== undefined) {
+    fields.voiceOverrides = parsed.voiceOverrides;
+  }
+
+  return fields;
+}
+
 export async function upsertSiteConfig(
   tenantId: string,
   input: TUpdateSiteConfigInput,
 ): Promise<TSiteConfigResult> {
   const db = getDb();
-  const { voiceOverrides, ...parsed } =
-    updateSiteConfigInputSchema.parse(input);
-  const values = { ...parsed, voiceOverrides: voiceOverrides ?? {} };
+  const parsed = updateSiteConfigInputSchema.parse(input);
+
+  const required = {
+    preset: parsed.preset,
+    accentHue: parsed.accentHue,
+    headingFont: parsed.headingFont,
+    bodyFont: parsed.bodyFont,
+    radiusScale: parsed.radiusScale,
+    density: parsed.density,
+  };
+  const optional = presentOptionalFields(parsed);
 
   const [row] = await db
     .insert(siteConfig)
-    .values({ tenantId, ...values })
+    .values({ tenantId, ...required, ...optional })
     .onConflictDoUpdate({
       target: siteConfig.tenantId,
-      set: { ...values, updatedAt: new Date() },
+      set: { ...required, ...optional, updatedAt: new Date() },
     })
     .returning();
 
