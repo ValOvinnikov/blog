@@ -250,6 +250,21 @@ already say that), never a walkthrough of every issue/PR that touched the
 file. If it reads like a changelog or a design-doc summary, it's too long —
 that history belongs in the PR description, not the source file.
 
+**Never reference project-management state in a comment.** No
+`docs/superpowers/**` path, no roadmap phase ("Phase 0", "Phase 8", "this
+milestone"), no issue number as narrative, no "not wired up yet / future
+consumer will…" note. Each is guaranteed to go stale: spec and plan docs are
+**deleted** once their work ships, phases get renumbered and re-scoped, and
+"nothing reads this yet" stops being true the moment someone adds a caller —
+without touching the comment. All of it belongs in the PR description, which is
+dated and reachable via `git blame`.
+
+Test to apply: _would this still be true and useful in a year if the roadmap
+were reorganised and the spec docs deleted?_ If no, delete it.
+
+Exception: a `TODO:`/`FIXME:` may cite an issue number, in its own comment
+block — it points at open work rather than narrating closed work.
+
 ## Testing
 
 - Component/route tests with Vitest + Testing Library (jsdom). Mock `service`
