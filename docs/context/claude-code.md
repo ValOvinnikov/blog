@@ -36,7 +36,15 @@ contracts:
     it must not import. Interactive primitives come from Base UI installed in
     that app and styled with the shared Tailwind tokens; nothing is added to
     `@blog/ui` for it (a component with one consumer isn't shared — the same
-    call #1157 made for `apps/web` page sections).
+    call #1157 made for `apps/web` page sections). Its "Start here" names the
+    three admin design documents — the product-design spec (intent), the
+    interactive mock (approved information architecture and layout), and the
+    corrections brief (real token values, and the defects the mock still
+    contains) — as required reading before any visual work, whether or not a
+    dispatch cites them. Naming them in the agent rather than the dispatch is
+    deliberate: built from the product spec alone, which carries no concrete
+    values by design, a surface passes every acceptance criterion and still
+    ships as a wireframe.
   - Those eight layer agents (`config`, `cms`, `service`, `ui`, `web`, `db`,
     `admin-app`, `auth`) additionally carry the two context7 MCP tools
     (`resolve-library-id`, `query-docs`) in their `tools:` frontmatter, so the
