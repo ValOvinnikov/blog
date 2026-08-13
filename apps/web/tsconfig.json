@@ -12,6 +12,7 @@
       "@blog/ui/*": ["../../packages/ui/src/*"],
       "@blog/service/*": ["../../packages/service/src/*"],
       "@blog/db/*": ["../../packages/db/src/*"],
+      "@blog/auth/*": ["../../packages/auth/src/*"],
       "@blog/config/*": ["../../packages/config/src/*"],
       "@blog/utils/*": ["../../packages/utils/src/*"]
     },
@@ -31,13 +32,13 @@
     "e2e/**/*.ts",
     "playwright.config.ts",
     "index.css.d.ts",
-    // @blog/ui's wildcard subpath export ("./*": "./src/*", aliased below)
-    // means web's program type-checks @blog/ui *source* directly, so its
-    // ambient module declarations (e.g. the `*.svg`/`*.svg?url` types in
-    // src/assets/icons/svg.d.ts) must be in this program too — TS only
-    // loads global ambient .d.ts files via a program's own include, never
-    // transitively through import resolution.
-    "../../packages/ui/src/**/*.d.ts"
+    // TS only loads global ambient .d.ts files via a program's own include,
+    // never transitively through import resolution — so any dependency's
+    // ambient declarations (e.g. @blog/ui's `*.svg`/`*.svg?url` types in
+    // src/assets/icons/svg.d.ts, @blog/auth's next-auth module augmentation)
+    // must be listed here explicitly.
+    "../../packages/ui/src/**/*.d.ts",
+    "../../packages/auth/src/**/*.d.ts"
   ],
   "exclude": ["node_modules"]
 }

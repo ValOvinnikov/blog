@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",
-    "@auth/drizzle-adapter": "^1.11.3",
+    "@blog/auth": "workspace:*",
     "@blog/config": "workspace:*",
     "@blog/db": "workspace:*",
     "@blog/service": "workspace:*",

@@ -1,4 +1,4 @@
-import { resolveMagicLinkFromAddress } from './magic-link-from-address';
+import { resolveMagicLinkFromAddress } from './resolve-magic-link-from-address';
 
 describe(resolveMagicLinkFromAddress, () => {
   it('falls back to the Resend shared testing sender when unset', () => {

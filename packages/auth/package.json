@@ -1,0 +1,38 @@
+{
+  "name": "@blog/auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@auth/drizzle-adapter": "^1.11.3",
+    "@blog/db": "workspace:*",
+    "@t3-oss/env-core": "^0.13.11",
+    "next-auth": "5.0.0-beta.32",
+    "server-only": "^0.0.1",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@blog/eslint-config": "workspace:*",
+    "@blog/prettier-config": "workspace:*",
+    "@blog/tsconfig": "workspace:*",
+    "@blog/vitest-config": "workspace:*",
+    "@types/node": "^26",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
