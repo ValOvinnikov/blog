@@ -9,8 +9,8 @@ export const adminRoleEnum = pgEnum(
 );
 
 // Platform-level operator access — deliberately has no `tenantId`, unlike
-// `memberships`. All three roles gate identically today; the column exists
-// so a future per-role distinction is a query change, not a migration.
+// `memberships`. `role` is stored even though every value currently gates
+// access identically.
 export const admins = pgTable('admins', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: text('user_id')

@@ -25,8 +25,7 @@
  */
 import { ADMIN_ROLE, type TAdminRole } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import { getAdminByUserId } from '@blog/db/queries/admins';
-import { admins } from '@blog/db/schema/admins';
+import { createAdmin, getAdminByUserId } from '@blog/db/queries/admins';
 import { users } from '@blog/db/schema/auth';
 import { eq } from 'drizzle-orm';
 
@@ -81,21 +80,16 @@ async function main(): Promise<void> {
     );
   }
 
-  const [inserted] = await db
-    .insert(admins)
-    .values({ userId: user.id, role: args.role })
-    .onConflictDoNothing()
-    .returning();
-
-  if (inserted) {
-    console.warn(`Granted ${args.role} on "${args.email}".`);
+  const existing = await getAdminByUserId(user.id);
+  if (existing) {
+    console.warn(
+      `"${args.email}" is already an admin (${existing.role}) — leaving it as-is.`,
+    );
     return;
   }
 
-  const existing = await getAdminByUserId(user.id);
-  console.warn(
-    `"${args.email}" is already an admin${existing ? ` (${existing.role})` : ''} — leaving it as-is.`,
-  );
+  const admin = await createAdmin(user.id, args.role);
+  console.warn(`Granted ${admin.role} on "${args.email}".`);
 }
 
 main()
