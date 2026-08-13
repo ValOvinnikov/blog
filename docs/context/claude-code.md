@@ -18,10 +18,19 @@ contracts:
   - `db` — `packages/db` (`@blog/db`): Neon Postgres + Drizzle, the
     relational sibling to `service` for the engagement layer (Auth.js,
     comments, ratings, bookmarks, subscribers); never Sanity, never React,
-    consumed only by `web`; owns the `drizzle-kit generate`/`migrate`
+    consumed only by the two apps (`web`, `admin`); owns the
+    `drizzle-kit generate`/`migrate`
     schema-migration workflow.
   - `ui` — building the pure, publishable `@blog/ui` design system.
   - `web` — App Router routes, SEO, composition of `ui` + `service` + `db`.
+  - `admin-app` — `apps/admin`, the operator/tenant admin panel: a second Next.js
+    app with its own deployment and domain, gated by the session `apps/web`
+    already issues. A sibling to `web`, not a step after it — its upstreams are
+    `config`, `db`, and `ui` only, so it never waits on `cms`/`service`, which
+    it must not import. Interactive primitives come from Base UI installed in
+    that app and styled with the shared Tailwind tokens; nothing is added to
+    `@blog/ui` for it (a component with one consumer isn't shared — the same
+    call #1157 made for `apps/web` page sections).
   - `verify-runner` — read-only, Haiku-model runner for the integration
     verify pass (`develop-feature` §5: `type-check`/`lint`/`test`,
     the exact scenario-specific sequence it's given). `build` is not part of
@@ -42,9 +51,10 @@ contracts:
   - `reviewer` — read-only pre-commit review of the full diff; gates the
     commit ask on an `APPROVE` verdict. Trusts `verify-runner`'s already-passed
     `type-check`/`lint`/`test` result rather than re-running it.
-  - `a11y-reviewer` — read-only accessibility audit of `packages/ui`/`apps/web`
-    diffs against `ui-library-practices`' non-negotiable rules; dispatched
-    alongside `reviewer` whenever a diff touches those layers.
+  - `a11y-reviewer` — read-only accessibility audit of
+    `packages/ui`/`apps/web`/`apps/admin` diffs against
+    `ui-library-practices`' non-negotiable rules; dispatched alongside
+    `reviewer` whenever a diff touches those layers.
   - `explore` — read-only discovery scout (Haiku). Answers "where is X / how
     does Y work" sweeps in a cheap, disposable context and returns conclusions
     with `file:line` pointers instead of file dumps, so the orchestrator's
@@ -190,7 +200,7 @@ contracts:
   - `pre-agent-gate0-guard.sh` — `PreToolUse` hook on the **`Agent` tool**
     (wired in `settings.json`, not in agent frontmatter, since it must see
     dispatches before any agent starts). Denies dispatching a **layer agent**
-    (`config`/`cms`/`service`/`ui`/`web`/`db`) to implement an issue that
+    (`config`/`cms`/`service`/`ui`/`web`/`db`/`admin-app`) to implement an issue that
     isn't `In Progress` on the board — i.e. Gate 0 was skipped. The deny
     message names the fix (dispatch `board-keeper` with
     `"starting work on #<n>"`).
