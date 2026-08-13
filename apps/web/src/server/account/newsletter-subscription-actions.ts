@@ -5,6 +5,7 @@ import { auth } from '@web/server/auth/auth';
 import { sendEmail } from '@web/server/email/send-email';
 import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newsletter-confirmation-email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
+import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie';
 import { env } from '@web/utils/env/env';
 import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 
@@ -19,6 +20,10 @@ export type TResendConfirmationActionResult = { ok: true } | { ok: false };
  * deletes the subscriber row (idempotent no-op if none exists); a subsequent
  * `getSubscriptionStatus` call then reports `not-subscribed`, so the 6b
  * section disappears from the page on the next render.
+ *
+ * Also clears `NEWSLETTER_SUBSCRIBED_COOKIE` (#1413) — without this, the
+ * cookie `subscribeToNewsletterAction` set at signup time keeps hiding
+ * `NewsletterForm` on the Home page for a reader who just unsubscribed.
  */
 export async function unsubscribeAction(): Promise<TUnsubscribeResult> {
   const session = await auth();
@@ -27,6 +32,7 @@ export async function unsubscribeAction(): Promise<TUnsubscribeResult> {
 
   try {
     await queries.subscribers.unsubscribe(userId);
+    await clearNewsletterSubscribedCookieSafely();
     return { ok: true };
   } catch (error) {
     console.error(
@@ -34,6 +40,26 @@ export async function unsubscribeAction(): Promise<TUnsubscribeResult> {
       sanitizeLogMessage(error),
     );
     return { ok: false };
+  }
+}
+
+/**
+ * clearNewsletterSubscribedCookieSafely — wraps
+ * `clearNewsletterSubscribedCookie` in its own try/catch, mirroring
+ * `newsletter-actions.ts`'s `markNewsletterSubscribedSafely`. By the point
+ * this runs, the db unsubscribe has already succeeded — a failure clearing
+ * the cookie afterward shouldn't turn that real success into a reported
+ * `{ ok: false }`, it should just mean this one reader doesn't see the form
+ * again until the cookie expires. Logged, never rethrown.
+ */
+async function clearNewsletterSubscribedCookieSafely(): Promise<void> {
+  try {
+    await clearNewsletterSubscribedCookie();
+  } catch (error) {
+    console.error(
+      'Failed to clear the newsletter-subscribed cookie:',
+      sanitizeLogMessage(error),
+    );
   }
 }
 

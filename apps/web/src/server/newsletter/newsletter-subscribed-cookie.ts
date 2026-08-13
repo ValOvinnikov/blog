@@ -29,3 +29,14 @@ export async function markNewsletterSubscribed(): Promise<void> {
     httpOnly: false,
   });
 }
+
+/**
+ * Counterpart to `markNewsletterSubscribed`. No options are passed to
+ * `delete` — the setter above sets no explicit `path`/`domain` either, so
+ * both default alike and this targets the exact cookie the setter created.
+ */
+export async function clearNewsletterSubscribedCookie(): Promise<void> {
+  const cookieStore = await cookies();
+
+  cookieStore.delete(NEWSLETTER_SUBSCRIBED_COOKIE_NAME);
+}

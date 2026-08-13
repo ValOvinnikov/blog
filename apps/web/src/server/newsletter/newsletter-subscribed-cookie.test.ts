@@ -1,7 +1,11 @@
-import { markNewsletterSubscribed } from './newsletter-subscribed-cookie';
+import {
+  clearNewsletterSubscribedCookie,
+  markNewsletterSubscribed,
+} from './newsletter-subscribed-cookie';
 
-const { setMock, cookiesMock } = vi.hoisted(() => ({
+const { setMock, deleteMock, cookiesMock } = vi.hoisted(() => ({
   setMock: vi.fn(),
+  deleteMock: vi.fn(),
   cookiesMock: vi.fn(),
 }));
 
@@ -57,5 +61,19 @@ describe(markNewsletterSubscribed, () => {
       '1',
       expect.objectContaining({ secure: false }),
     );
+  });
+});
+
+describe(clearNewsletterSubscribedCookie, () => {
+  beforeEach(() => {
+    deleteMock.mockReset();
+    cookiesMock.mockReset();
+    cookiesMock.mockResolvedValue({ delete: deleteMock });
+  });
+
+  it('deletes the newsletter-subscribed cookie', async () => {
+    await clearNewsletterSubscribedCookie();
+
+    expect(deleteMock).toHaveBeenCalledWith('newsletter_subscribed');
   });
 });
