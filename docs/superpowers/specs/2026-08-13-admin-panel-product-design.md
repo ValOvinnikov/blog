@@ -8,6 +8,26 @@
 > generic settings form. Intended as the design-implementation brief for
 > whoever (agent or human) builds `apps/admin`'s UI.
 
+## Read these three together — this doc alone is not sufficient
+
+This doc deliberately says **what** each page is for and **why** it behaves the
+way it does. It does not restate concrete token values, and an implementer who
+works from it alone will invent them (the mock did exactly that). Pair it with:
+
+1. **`docs/design-reference/admin-panel-mock.html`** — a complete interactive
+   mock. Its information architecture, layout, and interaction model are
+   approved; treat it as the visual starting point.
+2. **`docs/design-reference/admin-panel-mock-corrections.md`** — 12 verified
+   mismatches between that mock and this repo's real design tokens and content
+   model, each with the exact correct values and the source file they came
+   from. **Every concrete value — the OKLCH accent ramp, the radius and density
+   options, the five selectable fonts, the 20 voice fields — lives there, not
+   here.** Where the two disagree, the corrections brief wins on values and
+   this doc wins on intent.
+
+Do not copy a design-token value out of the mock without checking it against
+the corrections brief first.
+
 ## Two personas, two sections — not one flat app
 
 `apps/admin` serves two different people with two different role systems
@@ -42,12 +62,14 @@ while the list is short — the page, its route, and its data source cannot.
 **Add tenant — a wizard, not a form (deferred).** Unlike the list, this
 genuinely cannot ship early: it drives the provisioning flow, which depends on
 the tenant _resolution_ layer (host→tenant middleware, per-tenant Sanity
-client) that is deliberately sequenced later. Until then the entry point is
-either absent or visibly disabled with a reason — never a wizard that
-half-works. This is a UI over the provisioning
-flow the multi-tenant doc already designed: create the Sanity project → seed
-initial content → deploy the Studio → insert the `tenants`/`memberships`
-registry rows → map the domain. Several of these steps are slow and
+client) that is deliberately sequenced later. Until then the entry point
+renders **visibly disabled with a stated reason** — not hidden, and never a
+wizard that half-works.
+
+Its designed shape, for when it is built: a UI over the provisioning flow the
+multi-tenant doc already specifies — create the Sanity project → seed initial
+content → deploy the Studio → insert the `tenants`/`memberships` registry rows
+→ map the domain. Several of these steps are slow and
 asynchronous (Sanity project creation, Studio deployment) — the wizard needs
 per-step progress state, not a single submit-and-wait. Design it as discrete
 steps with clear pass/fail per step, resumable if one step fails partway
@@ -56,9 +78,11 @@ project already succeeded).
 
 ## Tenant section
 
-Seven tabs/pages. Two ship this milestone (Look, Voice); the rest are
-designed now so routing/nav doesn't need reshaping when they're built later —
-named explicitly per-item below.
+Eight tabs/pages. **Only Look and Voice are built this milestone.** The other
+six are designed here so routing/nav doesn't need reshaping when they arrive —
+each is labelled below with whether it ships now. "Design the shape now" means
+_document the intended UI_, not build a stub page; an unbuilt tab should not
+appear in the nav as a dead link.
 
 ### Look (this milestone)
 
@@ -68,15 +92,27 @@ named explicitly per-item below.
   uses.
 - Accent hue — not a bare number input. A color picker with a **live swatch**
   that updates instantly as the hue changes.
-- Logo upload.
+- Logo upload, and favicon upload beside it. The favicon must be uploaded
+  **pre-cropped square**: these go to Vercel Blob, which — unlike the Sanity
+  CDN this project is used to — has no on-the-fly image transforms, so what is
+  uploaded is what ships.
 
 **Advanced** (collapsed/secondary by default — real controls, just not
 equal-weight with Basic):
 
 - Heading font / body font — each option in the picker renders its own name
   _in that font_ (e.g. "Fraunces" displayed in Fraunces), not a plain text
-  list.
+  list. The selectable set is **closed** for a build-time reason, not an
+  aesthetic one: `next/font` loaders must be static and module-scoped, so a
+  font outside the list can't be chosen without a code change and a deploy.
 - Radius scale, density.
+- Logo hue — optional and separate from accent hue; drives the brand mark only
+  and **defaults to following accent when unset**. That optionality is the
+  interesting part of its UX: it needs a visible "follows accent" state, not
+  just a slider pre-set to the accent value.
+- Terminal chrome on/off. Its default comes from the preset, but it's a real
+  independent field — and the single most visually consequential toggle here,
+  since it's what makes a site read as a terminal at all.
 
 **Live preview, two tiers, both real:**
 
@@ -96,18 +132,26 @@ equal-weight with Basic):
 ### Voice (this milestone)
 
 Same Basic/Advanced split. Basic: nothing required — preset choice already
-determines the default voice, most tenants never open this tab. Advanced: the
-curated fields, grouped exactly the way the (retired) Sanity schema grouped
-them — 404 page, terminal prompts, bookmarks, empty states — plain text
-inputs, no live-preview mechanism needed here (text doesn't benefit from the
-same instant-swatch treatment color/font do).
+determines the default voice, most tenants never open this tab. Advanced: 20
+curated fields in four groups — 404 page (5), terminal prompts (7), bookmarks
+(2), empty states (6). Plain text inputs; no live-preview mechanism here (text
+doesn't benefit from the instant-swatch treatment color and fonts do).
 
-### Domain (design now, build with this milestone or shortly after)
+**The exact 20 field names and their groupings are in the corrections brief**
+(§8) — do not infer them, and do not carry over the mock's invented "Publish
+confirmation" or "No search results" fields.
+
+Every field is an **override, not a value**: empty means "inherit from the
+preset's voice pack". So each input needs a placeholder showing the inherited
+text, and clearing an input must read as "revert to preset" rather than "set
+to blank". This is the one genuinely non-obvious interaction on the tab.
+
+### Domain (not this milestone — design the shape now)
 
 Primary domain, custom domain DNS verification status. Not the wizard's job
 (that's initial mapping) — this is viewing/managing it post-setup.
 
-### Email (design now, build with this milestone or shortly after)
+### Email (not this milestone — design the shape now)
 
 Resend sending-domain verification status (per the companion doc's Email
 section) — shows whether the tenant's custom sending domain has completed
@@ -128,13 +172,13 @@ render identically. #1097 currently assumes `/admin/comments` lives inside
 `apps/web`; it needs the same rescoping #1204 already got (see the companion
 doc) to target `apps/admin` instead, once that app exists.
 
-### Team
+### Team (not this milestone — design the shape now)
 
 Manage this tenant's `memberships` — invite by email, change role
 (`OWNER`/`EDITOR`/`READER`), revoke access. Standard list + invite-form
 pattern, no novel interaction design needed.
 
-### Danger zone
+### Danger zone (not this milestone — design the shape now)
 
 Deactivate/delete tenant, data export. Standard destructive-action pattern —
 confirmation step, probably a type-to-confirm like the account page's
