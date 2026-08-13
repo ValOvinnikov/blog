@@ -65,7 +65,8 @@ site_config
   bodyFont      pgEnum(FONT_CHOICE values)
   radiusScale   pgEnum(RADIUS_SCALE values)
   density       pgEnum(DENSITY values)
-  logoAssetUrl  text, nullable   -- Vercel Blob URL
+  logoAssetUrl  text, nullable   -- Vercel Blob URL, full-size logo
+  faviconAssetUrl text, nullable -- Vercel Blob URL, pre-cropped square
   voiceOverrides jsonb           -- Record<string, string>, the curated keys
   createdAt / updatedAt
 ```
@@ -100,6 +101,33 @@ that needs backfilling into a new registry later.
 `features`/`feature_toggles` (Phase 4) gets the same treatment when it's
 built — typed columns or JSONB per what that phase's exact shape turns out to
 need, `tenantId` from day one either way.
+
+## Logo & favicon storage
+
+Checked Vercel Blob's actual docs/pricing rather than assume (2026-08-13).
+**Public-access-mode Vercel Blob** — direct public URL, no auth needed to
+read, exactly the "large media, images, public assets" use case Vercel names
+for it. Free tier (Hobby): 5 GB storage, 100 GB data transfer, 100K simple +
+10K advanced operations/month, hard-capped like Neon's and Sanity's free
+tiers rather than billed overage. Logos and favicons are tens-of-KB files —
+a non-issue at any realistic tenant count.
+
+**Real gap versus Sanity's asset pipeline: no on-the-fly image transforms.**
+`buildImageUrl(image, { width, height, fit })` currently works because
+Sanity's CDN accepts crop/resize URL params; Blob is a raw object store, it
+doesn't. Two ways to cover it — `next/image` at render time (works with any
+remote URL given `next.config.ts`'s `remotePatterns`), or pre-generating
+fixed variants at upload time in the admin panel. For the favicon
+specifically (needs one exact small square crop, not arbitrary per-request
+sizing) pre-generating at upload is simpler and more reliable than resizing
+on every request — hence `faviconAssetUrl` as its own column above, a
+separately-stored pre-cropped object, not derived from `logoAssetUrl` at
+serve time.
+
+**`apps/web/src/app/icon.tsx`'s fetch-through pattern is unchanged.** Fetch
+the asset's bytes server-side, return with the right `Content-Type`, fall
+back to the static default SVG on any failure — same mechanism, just reading
+`faviconAssetUrl` from `@blog/db` instead of a Sanity CDN URL.
 
 ## Migration mechanics
 
