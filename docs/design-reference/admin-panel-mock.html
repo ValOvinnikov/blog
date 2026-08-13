@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>apps/admin — Product Mock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&family=Newsreader:wght@400;500;600&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --surface-2:#fbfbfd; --line:#e5e7eb; --line-2:#eef0f3;
+  --text:#12141a; --muted:#5b6472; --faint:#8a93a3;
+  --brand:#4f46e5; --brand-weak:#eef2ff;
+  --ok:#16794d; --ok-weak:#e7f6ee; --warn:#9a6a00; --warn-weak:#fbf3df; --bad:#b42318; --bad-weak:#fdeceb;
+  --radius:12px; --radius-sm:8px; --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  --shadow-lg:0 12px 40px rgba(16,24,40,.14);
+  --ui:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--ui);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+a{color:inherit}
+.app{display:grid;grid-template-columns:264px 1fr;min-height:100vh}
+
+/* ---------- Sidebar ---------- */
+.side{background:#0f1115;color:#c9cfda;border-right:1px solid #1c1f26;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:auto}
+.side .brand{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid #1c1f26}
+.side .brand .logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#6366f1,#a855f7);display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
+.side .brand b{color:#fff;font-size:14px;letter-spacing:.2px}
+.side .brand span{color:#6b7280;font-size:12px}
+
+.switcher{margin:12px 12px 4px;padding:8px 10px;background:#161922;border:1px solid #232734;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:9px}
+.switcher .av{width:22px;height:22px;border-radius:6px;background:#2b2f3a;display:grid;place-items:center;font-size:11px;color:#e5e7eb;font-weight:600}
+.switcher .meta{flex:1;min-width:0}
+.switcher .meta b{display:block;color:#eef1f6;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.switcher .meta small{color:#6b7280;font-size:11px}
+.switcher .chev{color:#6b7280}
+
+.navgroup{padding:14px 12px 6px}
+.navgroup .lbl{color:#5a6373;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:0 10px 6px}
+.nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:#c9cfda;text-decoration:none;font-size:13px;cursor:pointer;margin-bottom:1px}
+.nav a .ic{width:16px;text-align:center;opacity:.75}
+.nav a .pill{margin-left:auto;background:#232734;color:#aab2c0;font-size:10.5px;padding:1px 7px;border-radius:999px}
+.nav a.soon{opacity:.55}
+.nav a.soon .pill{background:#20242e;color:#6b7280}
+.nav a:hover{background:#171b23}
+.nav a.active{background:#20242e;color:#fff}
+.nav a.active .ic{opacity:1;color:#a5b4fc}
+.side .foot{margin-top:auto;padding:12px 16px;border-top:1px solid #1c1f26;color:#6b7280;font-size:11.5px}
+
+/* ---------- Main ---------- */
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{position:sticky;top:0;z-index:5;background:rgba(246,247,249,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 26px;display:flex;align-items:center;gap:14px}
+.crumbs{font-size:13px;color:var(--muted)}
+.crumbs b{color:var(--text)}
+.topbar .role{margin-left:auto;display:flex;align-items:center;gap:10px}
+.rolechip{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 6px;font-size:12px;box-shadow:var(--shadow)}
+.rolechip .dot{width:7px;height:7px;border-radius:999px;background:var(--ok)}
+.rolechip .who{width:22px;height:22px;border-radius:999px;background:#dfe3ea;display:grid;place-items:center;font-size:11px;font-weight:600;color:#3a4150}
+
+.content{padding:26px;max-width:1180px;width:100%;margin:0 auto}
+.page{display:none;animation:fade .18s ease}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.h1{font-size:22px;font-weight:700;letter-spacing:-.01em;margin:0}
+.sub{color:var(--muted);margin:4px 0 0;font-size:13.5px}
+.pagehead{display:flex;align-items:flex-start;gap:16px;margin-bottom:22px}
+.pagehead .actions{margin-left:auto;display:flex;gap:8px}
+
+/* ---------- Primitives ---------- */
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:9px;padding:8px 13px;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:7px;box-shadow:var(--shadow)}
+.btn:hover{background:var(--surface-2)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{filter:brightness(1.05)}
+.btn.ghost{box-shadow:none;background:transparent;border-color:transparent}
+.btn.ghost:hover{background:var(--line-2)}
+.btn.danger{color:var(--bad);border-color:#f2c9c5;background:var(--bad-weak)}
+.btn.sm{padding:5px 9px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card .hd{padding:15px 18px;border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:10px}
+.card .hd h3{margin:0;font-size:15px;font-weight:650}
+.card .hd .desc{color:var(--muted);font-size:12.5px}
+.card .bd{padding:18px}
+.card .ft{padding:13px 18px;border-top:1px solid var(--line-2);display:flex;gap:8px;align-items:center;background:var(--surface-2);border-radius:0 0 var(--radius) var(--radius)}
+.grid2{display:grid;grid-template-columns:1fr 380px;gap:18px;align-items:start}
+@media(max-width:1000px){.grid2{grid-template-columns:1fr}}
+
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;border:1px solid transparent}
+.badge .d{width:6px;height:6px;border-radius:999px;background:currentColor}
+.b-ok{color:var(--ok);background:var(--ok-weak)}
+.b-warn{color:var(--warn);background:var(--warn-weak)}
+.b-bad{color:var(--bad);background:var(--bad-weak)}
+.b-neutral{color:var(--muted);background:var(--line-2)}
+.b-plan{color:#3730a3;background:#eef2ff}
+.b-plan.growth{color:#0e7490;background:#e0f7fb}
+
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:700;padding:10px 14px;border-bottom:1px solid var(--line-2)}
+td{padding:12px 14px;border-bottom:1px solid var(--line-2);font-size:13.5px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--surface-2)}
+.tname{display:flex;align-items:center;gap:10px}
+.tav{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:700;font-size:12px;color:#fff}
+.rowsub{color:var(--faint);font-size:12px}
+
+.searchbar{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px 11px;box-shadow:var(--shadow);max-width:320px}
+.searchbar input{border:0;outline:0;font-size:13px;width:100%;background:transparent;color:var(--text)}
+.searchbar .ic{color:var(--faint)}
+
+/* form bits */
+.field{margin-bottom:18px}
+.field:last-child{margin-bottom:0}
+.field > label{display:block;font-weight:600;font-size:13px;margin-bottom:5px}
+.field .hint{color:var(--muted);font-size:12px;margin:-1px 0 8px}
+.inp{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;background:var(--surface);color:var(--text)}
+.inp:focus{outline:2px solid var(--brand-weak);border-color:var(--brand)}
+textarea.inp{resize:vertical;min-height:60px}
+
+.seg{display:inline-flex;background:var(--line-2);border-radius:10px;padding:3px;gap:3px}
+.seg button{border:0;background:transparent;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+
+.disclosure{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.disclosure > summary{list-style:none;cursor:pointer;padding:14px 18px;display:flex;align-items:center;gap:10px;background:var(--surface);font-weight:600;font-size:14px}
+.disclosure > summary::-webkit-details-marker{display:none}
+.disclosure > summary .tw{margin-left:auto;color:var(--faint);transition:transform .15s}
+.disclosure[open] > summary .tw{transform:rotate(90deg)}
+.disclosure .inner{padding:18px;border-top:1px solid var(--line-2)}
+.tag-secondary{font-size:11px;color:var(--faint);font-weight:500;background:var(--line-2);padding:1px 8px;border-radius:999px}
+
+/* preset picker */
+.presetrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.preset{border:1.5px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;position:relative;background:var(--surface)}
+.preset.on{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-weak)}
+.preset .nm{font-weight:650;font-size:14px;display:flex;align-items:center;gap:8px}
+.preset .ds{color:var(--muted);font-size:12px;margin-top:3px}
+.preset .mini{margin-top:11px;height:52px;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:9px}
+.preset.console .mini{background:var(--tw-primary);font-family:var(--tw-font-mono)}
+.preset.console .mini b{color:var(--tw-brand);font-size:11px}
+.preset.console .mini i{color:var(--tw-text-muted);font-size:10px;font-style:normal}
+.preset.editorial .mini{background:#fbf7f0}
+.preset.editorial .mini b{color:#2a2320;font-family:'Fraunces',serif;font-size:14px}
+.preset.editorial .mini i{color:#8a7f74;font-style:normal;font-size:10px}
+.preset .chk{position:absolute;top:11px;right:11px;width:18px;height:18px;border-radius:999px;border:1.5px solid var(--line);display:grid;place-items:center;color:#fff;font-size:11px}
+.preset.on .chk{background:var(--brand);border-color:var(--brand)}
+
+/* accent hue */
+.hue-wrap{display:flex;align-items:center;gap:14px}
+.swatch{width:52px;height:52px;border-radius:12px;box-shadow:var(--shadow),inset 0 0 0 1px rgba(0,0,0,.06);flex:none}
+.hue-slider{flex:1}
+input[type=range].hue{width:100%;height:12px;border-radius:999px;-webkit-appearance:none;appearance:none;
+  background:linear-gradient(90deg,hsl(0 75% 55%),hsl(60 75% 55%),hsl(120 75% 55%),hsl(180 75% 55%),hsl(240 75% 55%),hsl(300 75% 55%),hsl(360 75% 55%))}
+input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:999px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.35),inset 0 0 0 1px rgba(0,0,0,.08);cursor:pointer}
+.hue-val{font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--muted);min-width:70px;text-align:right}
+
+/* logo upload */
+.upload{border:1.5px dashed var(--line);border-radius:12px;padding:18px;display:flex;align-items:center;gap:14px;background:var(--surface-2)}
+.upload .lg{width:56px;height:56px;border-radius:10px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--faint);font-size:11px}
+
+/* font picker */
+.fontlist{display:flex;flex-direction:column;gap:8px}
+.fontopt{display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;cursor:pointer;background:var(--surface)}
+.fontopt.on{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-weak)}
+.fontopt .name{font-size:17px}
+.fontopt .use{margin-left:auto;font-size:11px;color:var(--faint)}
+.fontopt .rdo{width:16px;height:16px;border-radius:999px;border:1.5px solid var(--line)}
+.fontopt.on .rdo{border-color:var(--brand);background:radial-gradient(circle at center,var(--brand) 0 5px,transparent 6px)}
+
+/* ---------- Live preview (tenant tokens) ----------
+   Console preset is driven by the real Tailwind design tokens from
+   configs/tailwind/theme.css (.dark block) — surfaces, text, and border
+   come straight from those OKLCH values, not hand-picked hexes. */
+:root{
+  /* console preset tokens — mirrored from configs/tailwind/theme.css .dark */
+  --tw-primary:oklch(0.17 0.006 250);      /* page bg  (--primary) */
+  --tw-surface:oklch(0.21 0.007 250);      /* cards    (--surface) */
+  --tw-text:oklch(0.95 0.004 250);         /* --text */
+  --tw-text-muted:oklch(0.72 0.008 250);   /* --text-muted */
+  --tw-border:oklch(0.3 0.008 250);        /* --border */
+  --tw-brand:oklch(0.7 0.16 250);          /* --brand-primary (dark) */
+  --tw-font-mono:'JetBrains Mono',ui-monospace,monospace; /* --font-mono-family */
+  --tw-font-display:'Space Grotesk',system-ui,sans-serif; /* --font-display-family */
+}
+.preview{
+  --p-radius:12px; --p-accent:#4f46e5; --p-font-head:'Inter'; --p-font-body:'Inter';
+  --p-bg:#ffffff; --p-surface:#ffffff; --p-text:#12141a; --p-muted:#5b6472; --p-line:#e5e7eb; --p-pad:16px;
+}
+.preview.console{
+  --p-bg:var(--tw-primary); --p-surface:var(--tw-surface); --p-text:var(--tw-text);
+  --p-muted:var(--tw-text-muted); --p-line:var(--tw-border);
+}
+.previewbox{background:var(--p-bg);border:1px solid var(--p-line);border-radius:14px;padding:18px;color:var(--p-text);transition:.2s}
+.pv-brand{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+.pv-mark{width:28px;height:28px;border-radius:calc(var(--p-radius) * .6);background:var(--p-accent);display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;font-family:var(--p-font-head)}
+.pv-brand b{font-family:var(--p-font-head);font-size:16px;color:var(--p-text)}
+.pv-h{font-family:var(--p-font-head);font-size:20px;font-weight:600;margin:0 0 4px;color:var(--p-text)}
+.pv-p{font-family:var(--p-font-body);color:var(--p-muted);font-size:13px;margin:0 0 13px}
+.pv-btns{display:flex;gap:8px;flex-wrap:wrap}
+.pv-btn{font-family:var(--p-font-body);border-radius:var(--p-radius);padding:8px 14px;font-size:13px;font-weight:600;border:1px solid var(--p-accent);cursor:default}
+.pv-btn.solid{background:var(--p-accent);color:#fff}
+.pv-btn.out{background:transparent;color:var(--p-accent)}
+.pv-chip{font-family:var(--p-font-body);display:inline-flex;align-items:center;gap:6px;border:1px solid var(--p-line);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--p-muted)}
+.pv-card{margin-top:14px;background:var(--p-surface);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:var(--p-pad)}
+.pv-card .k{font-family:var(--p-font-head);font-weight:600;color:var(--p-text);margin-bottom:3px}
+.pv-card .v{font-family:var(--p-font-body);color:var(--p-muted);font-size:12.5px}
+
+.preview-note{font-size:11.5px;color:var(--faint);margin-top:9px;display:flex;gap:6px;align-items:center}
+
+/* full page tier */
+.device{border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);background:var(--surface)}
+.device .bar{background:var(--surface-2);border-bottom:1px solid var(--line-2);padding:8px 12px;display:flex;align-items:center;gap:8px}
+.device .bar .dots{display:flex;gap:5px}
+.device .bar .dots i{width:9px;height:9px;border-radius:999px;background:#d5d9e0;display:block}
+.device .bar .url{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:3px 10px;font-size:11.5px;color:var(--muted);text-align:center}
+.device .frame{height:320px;overflow:auto;padding:20px}
+.frame-placeholder{height:100%;display:grid;place-items:center;text-align:center;color:var(--faint);border:1.5px dashed var(--line);border-radius:10px;font-size:12.5px}
+
+/* wizard */
+.wizard{display:grid;grid-template-columns:230px 1fr;gap:0;min-height:420px}
+.wizsteps{border-right:1px solid var(--line-2);padding:18px}
+.wizstep{display:flex;gap:11px;padding:9px 8px;border-radius:9px;position:relative}
+.wizstep .n{width:24px;height:24px;border-radius:999px;flex:none;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--line-2);color:var(--muted)}
+.wizstep .t{font-size:13px;font-weight:600}
+.wizstep .s{font-size:11.5px;color:var(--faint)}
+.wizstep.done .n{background:var(--ok);color:#fff}
+.wizstep.active .n{background:var(--brand);color:#fff}
+.wizstep.running .n{background:var(--warn);color:#fff}
+.wizstep.failed .n{background:var(--bad);color:#fff}
+.wizstep:not(:last-child)::after{content:"";position:absolute;left:19.5px;top:34px;bottom:-4px;width:2px;background:var(--line-2)}
+.wizstep.done:not(:last-child)::after{background:var(--ok)}
+.wizbody{padding:22px 24px}
+.steplog{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.logline{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.logline .st{width:15px;text-align:center}
+.spin{width:13px;height:13px;border:2px solid var(--line);border-top-color:var(--brand);border-radius:999px;display:inline-block;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* comment moderation */
+.cmt{display:flex;gap:12px;padding:15px 0;border-bottom:1px solid var(--line-2)}
+.cmt:last-child{border-bottom:none}
+.cmt .av{width:34px;height:34px;border-radius:999px;flex:none;display:grid;place-items:center;font-weight:600;color:#fff;font-size:12px}
+.cmt .body{flex:1;min-width:0}
+.cmt .who{font-weight:600;font-size:13px}
+.cmt .meta{color:var(--faint);font-size:11.5px}
+.cmt .txt{margin:5px 0 9px;font-size:13.5px;color:var(--text)}
+.cmt .acts{display:flex;gap:7px}
+
+/* dns records */
+.dns{font-family:'JetBrains Mono',monospace;font-size:12px}
+.dns td{padding:9px 12px}
+.copybtn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:2px 7px;font-size:11px;cursor:pointer;color:var(--muted)}
+
+/* misc */
+.note{display:flex;gap:11px;padding:13px 15px;border-radius:10px;background:var(--brand-weak);border:1px solid #dfe3ff;font-size:13px;color:#3730a3}
+.note.warn{background:var(--warn-weak);border-color:#f0e0b8;color:#7a5600}
+.note .i{font-size:15px;line-height:1.2}
+.divider{height:1px;background:var(--line-2);margin:18px 0}
+.kv{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line-2);font-size:13.5px}
+.kv:last-child{border-bottom:none}
+.kv .k{color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:16px}
+.rowflex{display:flex;align-items:center;gap:10px}
+.spacer{flex:1}
+.mut{color:var(--muted)}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f1115;color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:.25s;z-index:50;display:flex;gap:9px;align-items:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:40px 20px;color:var(--faint)}
+.empty .big{font-size:26px;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">V</div>
+      <div><b>Valstack</b><br><span>admin</span></div>
+    </div>
+
+    <div class="switcher" title="Tenant switcher (multi-tenant ready — one tenant today)">
+      <div class="av">NF</div>
+      <div class="meta"><b>Northwind Field Notes</b><small>tenant · northwind.dev</small></div>
+      <div class="chev">⌄</div>
+    </div>
+
+    <div class="navgroup">
+      <div class="lbl">Platform</div>
+      <nav class="nav">
+        <a data-page="tenants"><span class="ic">▤</span> Tenants</a>
+        <a data-page="add-tenant"><span class="ic">＋</span> Add tenant</a>
+      </nav>
+    </div>
+
+    <div class="navgroup">
+      <div class="lbl">Tenant · Northwind</div>
+      <nav class="nav">
+        <a data-page="look" class="active"><span class="ic">◑</span> Look <span class="pill">this milestone</span></a>
+        <a data-page="voice"><span class="ic">❝</span> Voice <span class="pill">this milestone</span></a>
+        <a data-page="domain"><span class="ic">⌗</span> Domain</a>
+        <a data-page="email"><span class="ic">✉</span> Email</a>
+        <a data-page="subscribers" class="soon"><span class="ic">☰</span> Subscribers <span class="pill">later</span></a>
+        <a data-page="comments" class="soon"><span class="ic">❐</span> Comments <span class="pill">later</span></a>
+        <a data-page="team"><span class="ic">◍</span> Team</a>
+        <a data-page="danger"><span class="ic">⚠</span> Danger zone</a>
+      </nav>
+    </div>
+
+    <div class="foot">Mock · not wired to data<br>Design brief: apps/admin</div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <div class="topbar">
+      <div class="crumbs" id="crumbs"><b>Tenant</b> › Look</div>
+      <div class="role">
+        <span class="rolechip" id="rolechip"><span class="who">VO</span><span class="dot"></span> OWNER · Tenant</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ===== PLATFORM: TENANTS ===== -->
+      <section class="page" id="page-tenants">
+        <div class="pagehead">
+          <div>
+            <h1 class="h1">Tenants</h1>
+            <p class="sub">Every site on the platform. Platform-operator view — gated by the <code>admins</code> table.</p>
+          </div>
+          <div class="actions">
+            <button class="btn" onclick="toast('Exported tenants.csv')">Export</button>
+            <button class="btn pri" onclick="go('add-tenant')">＋ Add tenant</button>
+          </div>
+        </div>
+
+        <div class="rowflex" style="margin-bottom:14px">
+          <div class="searchbar"><span class="ic">⌕</span><input placeholder="Search tenants…" oninput="filterTenants(this.value)"></div>
+          <div class="spacer"></div>
+          <span class="mut" style="font-size:12.5px">4 tenants · 3 active</span>
+        </div>
+
+        <div class="card">
+          <table id="tenantTable">
+            <thead><tr><th>Tenant</th><th>Plan</th><th>Status</th><th>Members</th><th>Created</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><div class="tname"><div class="tav" style="background:#4f46e5">NF</div><div><div>Northwind Field Notes</div><div class="rowsub">northwind.dev</div></div></div></td>
+                <td><span class="badge b-plan growth">Growth</span></td>
+                <td><span class="badge b-ok"><span class="d"></span>Active</span></td><td>3</td><td>Apr 2, 2026</td>
+                <td><button class="btn sm ghost" onclick="go('look')">Manage →</button></td></tr>
+              <tr><td><div class="tname"><div class="tav" style="background:#0e7490">HL</div><div><div>Harbor Lights</div><div class="rowsub">harborlights.co</div></div></div></td>
+                <td><span class="badge b-plan">Free</span></td>
+                <td><span class="badge b-ok"><span class="d"></span>Active</span></td><td>1</td><td>Jun 18, 2026</td>
+                <td><button class="btn sm ghost">Manage →</button></td></tr>
+              <tr><td><div class="tname"><div class="tav" style="background:#b45309">QP</div><div><div>Quarry Press</div><div class="rowsub">quarrypress.io</div></div></div></td>
+                <td><span class="badge b-plan growth">Growth</span></td>
+                <td><span class="badge b-ok"><span class="d"></span>Active</span></td><td>5</td><td>Jul 30, 2026</td>
+                <td><button class="btn sm ghost">Manage →</button></td></tr>
+              <tr><td><div class="tname"><div class="tav" style="background:#6b7280">ST</div><div><div>Studio Terra</div><div class="rowsub">studioterra.art</div></div></div></td>
+                <td><span class="badge b-plan">Free</span></td>
+                <td><span class="badge b-warn"><span class="d"></span>Suspended</span></td><td>2</td><td>Aug 1, 2026</td>
+                <td><button class="btn sm ghost">Manage →</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== PLATFORM: ADD TENANT (WIZARD) ===== -->
+      <section class="page" id="page-add-tenant">
+        <div class="pagehead">
+          <div>
+            <h1 class="h1">Add tenant</h1>
+            <p class="sub">Provisioning runs several slow, async steps — each shows pass/fail and is resumable if one fails partway.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="wizard">
+            <div class="wizsteps" id="wizSteps">
+              <div class="wizstep active" data-i="0"><div class="n">1</div><div><div class="t">Details</div><div class="s">Name, slug, plan</div></div></div>
+              <div class="wizstep" data-i="1"><div class="n">2</div><div><div class="t">Sanity project</div><div class="s">Create + configure</div></div></div>
+              <div class="wizstep" data-i="2"><div class="n">3</div><div><div class="t">Seed content</div><div class="s">Starter documents</div></div></div>
+              <div class="wizstep" data-i="3"><div class="n">4</div><div><div class="t">Deploy Studio</div><div class="s">Hosted Studio build</div></div></div>
+              <div class="wizstep" data-i="4"><div class="n">5</div><div><div class="t">Registry rows</div><div class="s">tenants + memberships</div></div></div>
+              <div class="wizstep" data-i="5"><div class="n">6</div><div><div class="t">Map domain</div><div class="s">DNS + verification</div></div></div>
+            </div>
+            <div class="wizbody" id="wizBody"><!-- injected --></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== TENANT: LOOK ===== -->
+      <section class="page active" id="page-look">
+        <div class="pagehead">
+          <div>
+            <h1 class="h1">Look</h1>
+            <p class="sub">Theme this site. Changes preview instantly below — nothing is live until you save.</p>
+          </div>
+          <div class="actions">
+            <button class="btn" onclick="resetLook()">Reset</button>
+            <button class="btn pri" onclick="toast('Saved theme · redeploying preview')">Save changes</button>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <!-- controls -->
+          <div class="stack">
+            <div class="card">
+              <div class="hd"><h3>Basic</h3><span class="desc">What most tenants touch</span></div>
+              <div class="bd stack">
+                <div class="field">
+                  <label>Preset</label>
+                  <div class="hint">The starting point nearly every tenant picks. Sets fonts, chrome, and voice defaults.</div>
+                  <div class="presetrow">
+                    <div class="preset console" data-preset="CONSOLE" onclick="setPreset('CONSOLE')">
+                      <div class="chk">✓</div>
+                      <div class="nm">Console</div>
+                      <div class="ds">Mono, terminal chrome. Today's identity.</div>
+                      <div class="mini"><b>~$ ./publish</b><i>› post shipped</i></div>
+                    </div>
+                    <div class="preset editorial on" data-preset="EDITORIAL" onclick="setPreset('EDITORIAL')">
+                      <div class="chk">✓</div>
+                      <div class="nm">Editorial</div>
+                      <div class="ds">Serif, de-consoled. Warm and magazine-like.</div>
+                      <div class="mini"><b>Field Notes</b><i>Dispatches from the coast</i></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Accent hue</label>
+                  <div class="hint">Drag to set the accent color. The swatch and samples update live.</div>
+                  <div class="hue-wrap">
+                    <div class="swatch" id="swatch"></div>
+                    <div class="hue-slider"><input type="range" min="0" max="360" value="255" class="hue" id="hue" oninput="setHue(this.value)"></div>
+                    <div class="hue-val" id="hueVal">hsl 255°</div>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Logo</label>
+                  <div class="hint">Shown as the brand mark. SVG or PNG, transparent background.</div>
+                  <div class="upload">
+                    <div class="lg">no logo</div>
+                    <div style="flex:1"><div style="font-weight:600">Drop a file or browse</div><div class="mut" style="font-size:12px">Falls back to the polygon wordmark if empty.</div></div>
+                    <button class="btn sm" onclick="toast('File picker (mock)')">Upload</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <details class="disclosure">
+              <summary>Advanced <span class="tag-secondary">optional</span><span class="tw">›</span></summary>
+              <div class="inner stack">
+                <div class="field">
+                  <label>Heading font</label>
+                  <div class="hint">Each option renders in its own typeface.</div>
+                  <div class="fontlist" id="headFonts"></div>
+                </div>
+                <div class="field">
+                  <label>Body font</label>
+                  <div class="fontlist" id="bodyFonts"></div>
+                </div>
+                <div class="field">
+                  <label>Radius scale</label>
+                  <div class="hint">Corner roundness across every surface.</div>
+                  <div class="seg" id="radiusSeg">
+                    <button data-r="4">Sharp</button>
+                    <button data-r="8">Soft</button>
+                    <button class="on" data-r="12">Round</button>
+                    <button data-r="18">Pill</button>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Density</label>
+                  <div class="hint">Spacing and control size.</div>
+                  <div class="seg" id="densitySeg">
+                    <button data-d="12">Compact</button>
+                    <button class="on" data-d="16">Cozy</button>
+                    <button data-d="22">Comfortable</button>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- live preview -->
+          <div class="stack">
+            <div class="card">
+              <div class="hd"><h3>Live preview</h3><span class="desc">Real @blog/ui primitives</span></div>
+              <div class="bd">
+                <div class="preview" id="preview">
+                  <div class="previewbox">
+                    <div class="pv-brand"><div class="pv-mark" id="pvMark">N</div><b>Northwind</b></div>
+                    <div class="pv-h">Reading the tide charts</div>
+                    <p class="pv-p">A short dispatch to show heading and body type, accent, and radius together.</p>
+                    <div class="pv-btns">
+                      <span class="pv-btn solid">Subscribe</span>
+                      <span class="pv-btn out">Read more</span>
+                      <span class="pv-chip">◷ 4 min read</span>
+                    </div>
+                    <div class="pv-card"><div class="k">Bookmark saved</div><div class="v">Tokens flow straight from the form above — no save, no reload.</div></div>
+                  </div>
+                  <div class="preview-note">◔ Tier 1 · inline · driven by unsaved form state via CSS custom properties</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="hd"><h3>Full-page preview</h3><span class="desc">Tier 2 · reserved</span></div>
+              <div class="bd">
+                <div class="device">
+                  <div class="bar"><div class="dots"><i></i><i></i><i></i></div><div class="url">preview.northwind.dev</div></div>
+                  <div class="frame">
+                    <div class="frame-placeholder">Iframe of the real site in preview mode.<br>Needs a save (or preview-mode URL) to reflect.<br><br>Space + routing reserved now; live-update mechanism is a build-time call.</div>
+                  </div>
+                </div>
+                <div class="preview-note">Different tier, different purpose: real layout &amp; content context, not an isolated control.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== TENANT: VOICE ===== -->
+      <section class="page" id="page-voice">
+        <div class="pagehead">
+          <div>
+            <h1 class="h1">Voice</h1>
+            <p class="sub">The words the site puts in its own mouth. Your preset already sets sensible defaults.</p>
+          </div>
+          <div class="actions"><button class="btn pri" onclick="toast('Saved voice strings')">Save changes</button></div>
+        </div>
+
+        <div class="stack" style="max-width:760px">
+          <div class="note"><span class="i">◔</span><div><b>Nothing required here.</b> Your <b>Editorial</b> preset already determines the default voice. Most tenants never open the fields below.</div></div>
+
+          <details class="disclosure" open>
+            <summary>Advanced — curated strings <span class="tag-secondary">optional</span><span class="tw">›</span></summary>
+            <div class="inner stack">
+              <div class="card">
+                <div class="hd"><h3>404 page</h3></div>
+                <div class="bd">
+                  <div class="field"><label>Heading</label><input class="inp" value="This page drifted off the map"></div>
+                  <div class="field"><label>Body</label><textarea class="inp">The link may be broken or the post retired. Head back to the front page.</textarea></div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="hd"><h3>Terminal prompts</h3><span class="desc">Console-preset chrome</span></div>
+                <div class="bd">
+                  <div class="field"><label>Prompt symbol</label><input class="inp" value="~$"></div>
+                  <div class="field"><label>Publish confirmation</label><input class="inp" value="› post shipped to production"></div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="hd"><h3>Bookmarks</h3></div>
+                <div class="bd">
+                  <div class="field"><label>Saved toast</label><input class="inp" value="Saved to your reading list"></div>
+                  <div class="field"><label>Removed toast</label><input class="inp" value="Removed from bookmarks"></div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="hd"><h3>Empty states</h3></div>
+                <div class="bd">
+                  <div class="field"><label>No posts yet</label><input class="inp" value="Nothing published yet — check back soon."></div>
+                  <div class="field"><label>No search results</label><input class="inp" value="No dispatches match that search."></div>
+                </div>
+              </div>
+              <div class="preview-note">Plain text — no live-swatch treatment; text doesn't benefit from it the way color and font do.</div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <!-- ===== TENANT: DOMAIN ===== -->
+      <section class="page" id="page-domain">
+        <div class="pagehead">
+          <div><h1 class="h1">Domain</h1><p class="sub">View and manage domains after initial setup. First mapping happens in the add-tenant wizard.</p></div>
+        </div>
+        <div class="stack" style="max-width:820px">
+          <div class="card">
+            <div class="hd"><h3>Primary domain</h3></div>
+            <div class="bd">
+              <div class="rowflex"><div style="font-size:15px;font-weight:600">northwind.dev</div><span class="badge b-ok"><span class="d"></span>Verified</span><div class="spacer"></div><button class="btn sm">Change primary</button></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="hd"><h3>Custom domain</h3><span class="desc">DNS verification</span></div>
+            <div class="bd">
+              <div class="rowflex" style="margin-bottom:12px"><div style="font-weight:600">notes.northwind.dev</div><span class="badge b-warn"><span class="d"></span>Pending — awaiting DNS</span></div>
+              <div class="note warn"><span class="i">⌗</span><div>Add these records at your DNS provider. Verification usually completes within an hour.</div></div>
+              <table class="dns" style="margin-top:12px">
+                <thead><tr><th>Type</th><th>Name</th><th>Value</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>CNAME</td><td>notes</td><td>cname.vercel-dns.com <button class="copybtn" onclick="toast('Copied')">copy</button></td><td><span class="badge b-warn"><span class="d"></span>Pending</span></td></tr>
+                  <tr><td>TXT</td><td>_vercel</td><td>vc-domain-verify=… <button class="copybtn" onclick="toast('Copied')">copy</button></td><td><span class="badge b-ok"><span class="d"></span>Found</span></td></tr>
+                </tbody>
+              </table>
+              <div class="rowflex" style="margin-top:14px"><button class="btn" onclick="toast('Re-checking DNS…')">Re-check now</button><button class="btn ghost danger">Remove domain</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== TENANT: EMAIL ===== -->
+      <section class="page" id="page-email">
+        <div class="pagehead"><div><h1 class="h1">Email</h1><p class="sub">Sending-domain verification for outgoing newsletter mail (Resend).</p></div></div>
+        <div class="stack" style="max-width:820px">
+          <div class="card">
+            <div class="hd"><h3>Sending domain</h3></div>
+            <div class="bd">
+              <div class="rowflex" style="margin-bottom:8px"><div style="font-weight:600">mail.northwind.dev</div><span class="badge b-warn"><span class="d"></span>2 of 3 records verified</span></div>
+              <p class="mut" style="font-size:13px;margin:0 0 12px">Until all records verify, newsletters send from the shared Valstack domain.</p>
+              <table class="dns">
+                <thead><tr><th>Record</th><th>Type</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>SPF (send)</td><td>TXT</td><td><span class="badge b-ok"><span class="d"></span>Verified</span></td></tr>
+                  <tr><td>DKIM</td><td>TXT</td><td><span class="badge b-ok"><span class="d"></span>Verified</span></td></tr>
+                  <tr><td>DMARC</td><td>TXT</td><td><span class="badge b-warn"><span class="d"></span>Pending</span></td></tr>
+                </tbody>
+              </table>
+              <div class="rowflex" style="margin-top:14px"><button class="btn" onclick="toast('Re-checking Resend…')">Re-check</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== TENANT: SUBSCRIBERS ===== -->
+      <section class="page" id="page-subscribers">
+        <div class="pagehead">
+          <div><h1 class="h1">Subscribers <span class="badge b-neutral" style="vertical-align:middle">design only</span></h1><p class="sub">Newsletter list from <code>@blog/db</code>. Shape designed now; built later.</p></div>
+          <div class="actions"><button class="btn" onclick="toast('Exported subscribers.csv')">Export CSV</button></div>
+        </div>
+        <div class="rowflex" style="margin-bottom:14px">
+          <div class="searchbar"><span class="ic">⌕</span><input placeholder="Search email…"></div>
+          <div class="spacer"></div><span class="mut" style="font-size:12.5px">1,284 active · 37 pending</span>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Email</th><th>Status</th><th>Subscribed</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>rae.linford@gmail.com</td><td><span class="badge b-ok"><span class="d"></span>Active</span></td><td>Aug 9, 2026</td><td><button class="btn sm ghost">Unsubscribe</button></td></tr>
+              <tr><td>j.okonkwo@fastmail.com</td><td><span class="badge b-ok"><span class="d"></span>Active</span></td><td>Aug 4, 2026</td><td><button class="btn sm ghost">Unsubscribe</button></td></tr>
+              <tr><td>mira.delacroix@hey.com</td><td><span class="badge b-warn"><span class="d"></span>Pending</span></td><td>Aug 12, 2026</td><td><button class="btn sm ghost">Unsubscribe</button></td></tr>
+              <tr><td>tom@harborlights.co</td><td><span class="badge b-neutral"><span class="d"></span>Unsubscribed</span></td><td>Jul 1, 2026</td><td><button class="btn sm ghost" disabled>—</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== TENANT: COMMENTS ===== -->
+      <section class="page" id="page-comments">
+        <div class="pagehead">
+          <div><h1 class="h1">Comments <span class="badge b-neutral" style="vertical-align:middle">design only</span></h1><p class="sub">Moderation queue (#1097). Reuses the pure <code>CommentItem</code> <code>actions</code> slot so queue and public thread render identically.</p></div>
+        </div>
+        <div class="stack" style="max-width:820px">
+          <div class="seg"><button class="on">Pending <span class="badge b-warn" style="margin-left:6px">2</span></button><button>Approved</button><button>Spam</button></div>
+          <div class="card"><div class="bd">
+            <div class="cmt">
+              <div class="av" style="background:#0e7490">RL</div>
+              <div class="body">
+                <div class="who">Rae Linford <span class="meta">· on "Reading the tide charts" · 2h ago</span></div>
+                <div class="txt">This matches what I saw at Cape Mercy last spring — do you publish the raw datasets anywhere?</div>
+                <div class="acts"><button class="btn sm pri" onclick="modAct(this,'Approved')">Approve</button><button class="btn sm" onclick="modAct(this,'Marked spam')">Mark spam</button><button class="btn sm ghost danger" onclick="modAct(this,'Deleted')">Delete</button></div>
+              </div>
+            </div>
+            <div class="cmt">
+              <div class="av" style="background:#b45309">AV</div>
+              <div class="body">
+                <div class="who">avax_deals <span class="meta">· on "The quiet season" · 5h ago</span></div>
+                <div class="txt">🔥 cheap watches and handbags at my profile link, don't miss out</div>
+                <div class="acts"><button class="btn sm pri" onclick="modAct(this,'Approved')">Approve</button><button class="btn sm" onclick="modAct(this,'Marked spam')">Mark spam</button><button class="btn sm ghost danger" onclick="modAct(this,'Deleted')">Delete</button></div>
+              </div>
+            </div>
+          </div></div>
+          <div class="preview-note">Server actions: approve / mark-spam / delete. #1097 rescoped from apps/web → apps/admin (mirrors #1204).</div>
+        </div>
+      </section>
+
+      <!-- ===== TENANT: TEAM ===== -->
+      <section class="page" id="page-team">
+        <div class="pagehead"><div><h1 class="h1">Team</h1><p class="sub">Manage this tenant's memberships — invite, change role, revoke.</p></div></div>
+        <div class="grid2">
+          <div class="card">
+            <div class="hd"><h3>Members</h3><span class="desc">3</span></div>
+            <table>
+              <tbody>
+                <tr><td><div class="tname"><div class="tav" style="background:#4f46e5;border-radius:999px">VO</div><div><div>Val Ovinnikov</div><div class="rowsub">val.ovinnikov@icloud.com</div></div></div></td>
+                  <td style="text-align:right"><select class="inp" style="width:auto;display:inline-block"><option selected>OWNER</option><option>EDITOR</option><option>READER</option></select></td></tr>
+                <tr><td><div class="tname"><div class="tav" style="background:#0e7490;border-radius:999px">JO</div><div><div>Jayne Okonkwo</div><div class="rowsub">j.okonkwo@fastmail.com</div></div></div></td>
+                  <td style="text-align:right"><select class="inp" style="width:auto;display:inline-block"><option>OWNER</option><option selected>EDITOR</option><option>READER</option></select> <button class="btn sm ghost danger">Revoke</button></td></tr>
+                <tr><td><div class="tname"><div class="tav" style="background:#b45309;border-radius:999px">MD</div><div><div>Mira Delacroix</div><div class="rowsub">mira.delacroix@hey.com</div></div></div></td>
+                  <td style="text-align:right"><select class="inp" style="width:auto;display:inline-block"><option>OWNER</option><option>EDITOR</option><option selected>READER</option></select> <button class="btn sm ghost danger">Revoke</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="hd"><h3>Invite member</h3></div>
+            <div class="bd">
+              <div class="field"><label>Email</label><input class="inp" placeholder="name@example.com"></div>
+              <div class="field"><label>Role</label><select class="inp"><option>OWNER</option><option selected>EDITOR</option><option>READER</option></select></div>
+              <button class="btn pri" style="width:100%" onclick="toast('Invitation sent')">Send invite</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== TENANT: DANGER ZONE ===== -->
+      <section class="page" id="page-danger">
+        <div class="pagehead"><div><h1 class="h1">Danger zone</h1><p class="sub">Irreversible actions. Follow the same type-to-confirm pattern as the account delete flow.</p></div></div>
+        <div class="stack" style="max-width:720px">
+          <div class="card">
+            <div class="hd"><h3>Export all data</h3></div>
+            <div class="bd rowflex"><div class="mut" style="flex:1">Download a full archive of content, subscribers, comments, and settings.</div><button class="btn" onclick="toast('Preparing export…')">Request export</button></div>
+          </div>
+          <div class="card" style="border-color:#f2c9c5">
+            <div class="hd" style="border-color:#f7dbd8"><h3 style="color:var(--bad)">Deactivate tenant</h3></div>
+            <div class="bd rowflex"><div class="mut" style="flex:1">Takes the site offline. Content and data are kept and can be restored.</div><button class="btn danger">Deactivate</button></div>
+          </div>
+          <div class="card" style="border-color:#f2c9c5">
+            <div class="hd" style="border-color:#f7dbd8"><h3 style="color:var(--bad)">Delete tenant</h3></div>
+            <div class="bd">
+              <p class="mut" style="margin-top:0">Permanently removes the Sanity project, registry rows, and all Postgres data. This cannot be undone.</p>
+              <div class="field"><label>Type <b>northwind.dev</b> to confirm</label><input class="inp" id="delConfirm" placeholder="northwind.dev" oninput="checkDel(this.value)"></div>
+              <button class="btn danger" id="delBtn" disabled>Delete this tenant permanently</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span>✓</span><span id="toastMsg">Saved</span></div>
+
+<script>
+/* ---------- routing ---------- */
+const PAGES = {
+  tenants:['Platform','Tenants'], 'add-tenant':['Platform','Add tenant'],
+  look:['Tenant','Look'], voice:['Tenant','Voice'], domain:['Tenant','Domain'],
+  email:['Tenant','Email'], subscribers:['Tenant','Subscribers'], comments:['Tenant','Comments'],
+  team:['Tenant','Team'], danger:['Tenant','Danger zone']
+};
+function go(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('page-'+page); if(el) el.classList.add('active');
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.dataset.page===page));
+  const c=PAGES[page]||['',''];
+  document.getElementById('crumbs').innerHTML='<b>'+c[0]+'</b> › '+c[1];
+  const isPlatform=c[0]==='Platform';
+  const rc=document.getElementById('rolechip');
+  rc.innerHTML = isPlatform
+    ? '<span class="who" style="background:#312e81;color:#c7d2fe">VO</span><span class="dot"></span> superadmin · Platform'
+    : '<span class="who">VO</span><span class="dot"></span> OWNER · Tenant';
+  if(page==='add-tenant') renderWizard();
+  window.scrollTo({top:0});
+}
+document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',()=>go(a.dataset.page)));
+
+/* ---------- toast ---------- */
+let tT;
+function toast(m){const t=document.getElementById('toast');document.getElementById('toastMsg').textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* ---------- tenants filter ---------- */
+function filterTenants(q){q=q.toLowerCase();document.querySelectorAll('#tenantTable tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none';});}
+
+/* ---------- LOOK: live theming ---------- */
+const FONTS_HEAD=[['Fraunces','Fraunces, serif'],['Newsreader','Newsreader, serif'],['Space Grotesk','Space Grotesk, sans-serif'],['Inter','Inter, sans-serif']];
+const FONTS_BODY=[['Inter','Inter, sans-serif'],['Source Serif 4','Source Serif 4, serif'],['IBM Plex Mono','IBM Plex Mono, monospace'],['JetBrains Mono','JetBrains Mono, monospace']];
+const state={preset:'EDITORIAL',hue:255,radius:12,density:16,headFont:'Fraunces, serif',bodyFont:'Source Serif 4, serif'};
+
+function buildFonts(id,list,which){
+  const box=document.getElementById(id);box.innerHTML='';
+  list.forEach(([name,stack],i)=>{
+    const d=document.createElement('div');
+    d.className='fontopt'+((which==='head'?i===0:i===1)?' on':'');
+    d.innerHTML='<div class="rdo"></div><div class="name" style="font-family:'+stack+'">'+name+'</div><span class="use">'+(which==='head'?'Headings':'Body')+'</span>';
+    d.onclick=()=>{box.querySelectorAll('.fontopt').forEach(x=>x.classList.remove('on'));d.classList.add('on');
+      if(which==='head')state.headFont=stack; else state.bodyFont=stack; applyPreview();};
+    box.appendChild(d);
+  });
+}
+function hueColor(h,l){return 'hsl('+h+' 72% '+(l||55)+'%)';}
+function setHue(v){state.hue=+v;document.getElementById('hueVal').textContent='hsl '+v+'°';document.getElementById('swatch').style.background=hueColor(v);applyPreview();}
+function setPreset(p){
+  state.preset=p;
+  document.querySelectorAll('.preset').forEach(el=>el.classList.toggle('on',el.dataset.preset===p));
+  // preset nudges defaults, like the real bundle
+  if(p==='CONSOLE'){state.headFont='JetBrains Mono, monospace';state.bodyFont='JetBrains Mono, monospace';state.radius=4;
+    selectSeg('radiusSeg','r',4);
+    setHue(250); // brand-primary hue from theme.css
+  } else {state.headFont='Fraunces, serif';state.bodyFont='Source Serif 4, serif';state.radius=12;selectSeg('radiusSeg','r',12);setHue(255);}
+  applyPreview();
+}
+function selectSeg(segId,attr,val){
+  const seg=document.getElementById(segId);
+  seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset[attr]===+val));
+}
+function applyPreview(){
+  const pv=document.getElementById('preview');
+  pv.classList.toggle('console',state.preset==='CONSOLE');
+  pv.style.setProperty('--p-accent',hueColor(state.hue));
+  pv.style.setProperty('--p-radius',state.radius+'px');
+  pv.style.setProperty('--p-font-head',state.headFont);
+  pv.style.setProperty('--p-font-body',state.bodyFont);
+  pv.style.setProperty('--p-pad',state.density+'px');
+}
+document.getElementById('radiusSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{selectSeg('radiusSeg','r',b.dataset.r);state.radius=+b.dataset.r;applyPreview();});
+document.getElementById('densitySeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{selectSeg('densitySeg','d',b.dataset.d);state.density=+b.dataset.d;applyPreview();});
+function resetLook(){setPreset('EDITORIAL');setHue(255);selectSeg('densitySeg','d',16);state.density=16;applyPreview();toast('Reset to preset defaults');}
+
+/* ---------- DANGER ---------- */
+function checkDel(v){const b=document.getElementById('delBtn');const ok=v.trim()==='northwind.dev';b.disabled=!ok;}
+document.getElementById('delBtn').onclick=()=>toast('Deletion scheduled (mock)');
+
+/* ---------- COMMENTS ---------- */
+function modAct(btn,label){const cmt=btn.closest('.cmt');cmt.style.opacity=.35;setTimeout(()=>cmt.remove(),200);toast(label);}
+
+/* ---------- WIZARD ---------- */
+const WIZ=[
+  {t:'Details',logs:null},
+  {t:'Create Sanity project',logs:['Requesting project slot','Configuring dataset "production"','Applying CORS + tokens']},
+  {t:'Seed content',logs:['Seeding settings singletons','Adding starter posts','Wiring initial navigation']},
+  {t:'Deploy Studio',logs:['Building Studio bundle','Uploading to hosted Studio','Warming CDN']},
+  {t:'Insert registry rows',logs:['INSERT tenants','INSERT memberships (OWNER)','Linking auth session domain']},
+  {t:'Map domain',logs:['Creating DNS records','Requesting certificate','Waiting for verification']}
+];
+let wizIdx=0, wizStatus=Array(6).fill('idle'); wizStatus[0]='active';
+function renderSteps(){
+  document.querySelectorAll('#wizSteps .wizstep').forEach((el,i)=>{
+    el.className='wizstep'+(wizStatus[i]==='done'?' done':wizStatus[i]==='running'?' running':wizStatus[i]==='failed'?' failed':i===wizIdx?' active':'');
+    el.querySelector('.n').textContent = wizStatus[i]==='done'?'✓':wizStatus[i]==='failed'?'!':(i+1);
+  });
+}
+function renderWizard(){
+  renderSteps();
+  const b=document.getElementById('wizBody');
+  if(wizIdx===0){
+    b.innerHTML=`<h3 style="margin:0 0 4px">Tenant details</h3><p class="mut" style="margin:0 0 18px">The fast part. Everything after this runs automatically.</p>
+      <div class="field"><label>Tenant name</label><input class="inp" id="wzName" value="Cedar & Salt"></div>
+      <div class="field"><label>Slug / subdomain</label><input class="inp" value="cedar-salt"><div class="hint">cedar-salt.valstack.dev — a custom domain can be mapped in step 6.</div></div>
+      <div class="field"><label>Plan</label><div class="seg"><button class="on">Free</button><button>Growth</button></div></div>
+      <div class="field"><label>Owner email</label><input class="inp" value="editor@cedarandsalt.co"><div class="hint">Seeds the first memberships row as OWNER.</div></div>
+      <div class="rowflex" style="margin-top:22px"><div class="spacer"></div><button class="btn pri" onclick="startProvision()">Begin provisioning →</button></div>`;
+    return;
+  }
+  const step=WIZ[wizIdx];
+  const st=wizStatus[wizIdx];
+  let logsHtml=(step.logs||[]).map((l,i)=>{
+    let icon='<span class="st mut">○</span>';
+    if(st==='running') icon = i<runningLog ? '<span class="st" style="color:var(--ok)">✓</span>' : i===runningLog ? '<span class="st"><span class="spin"></span></span>' : '<span class="st mut">○</span>';
+    if(st==='done') icon='<span class="st" style="color:var(--ok)">✓</span>';
+    if(st==='failed'&&i===runningLog) icon='<span class="st" style="color:var(--bad)">✕</span>';
+    return '<div class="logline">'+icon+' '+l+'</div>';
+  }).join('');
+  b.innerHTML=`<div class="rowflex" style="margin-bottom:4px"><h3 style="margin:0">Step ${wizIdx+1} · ${step.t}</h3>
+      ${st==='done'?'<span class="badge b-ok" style="margin-left:auto"><span class="d"></span>Done</span>':st==='failed'?'<span class="badge b-bad" style="margin-left:auto"><span class="d"></span>Failed</span>':st==='running'?'<span class="badge b-warn" style="margin-left:auto"><span class="d"></span>Running…</span>':''}</div>
+    <p class="mut" style="margin:0 0 6px">Slow, asynchronous — progress is tracked per sub-task so a failure is resumable, not start-over.</p>
+    <div class="steplog">${logsHtml}</div>
+    <div class="rowflex" style="margin-top:22px">
+      ${wizIdx>0&&st!=='running'?'<button class="btn" onclick="wizBack()">← Back</button>':''}
+      <div class="spacer"></div>
+      ${st==='failed'?'<button class="btn pri" onclick="runStep()">↻ Retry step</button>':''}
+      ${st==='done'&&wizIdx<5?'<button class="btn pri" onclick="nextStep()">Next step →</button>':''}
+      ${st==='done'&&wizIdx===5?'<button class="btn pri" onclick="finishWizard()">Finish · view tenant</button>':''}
+      ${st==='idle'?'<button class="btn pri" onclick="runStep()">Run step</button>':''}
+    </div>`;
+}
+let runningLog=0, provisionTimer;
+function startProvision(){wizIdx=1;wizStatus[1]='idle';renderWizard();}
+function runStep(){
+  const step=WIZ[wizIdx];wizStatus[wizIdx]='running';runningLog=0;renderWizard();
+  clearInterval(provisionTimer);
+  provisionTimer=setInterval(()=>{
+    runningLog++;
+    if(runningLog>=step.logs.length){
+      clearInterval(provisionTimer);
+      // step 4 (deploy) fails once to demo resumability, unless already retried
+      if(wizIdx===3 && !step._retried){ step._retried=true; wizStatus[wizIdx]='failed'; runningLog=step.logs.length-1; renderWizard();
+        setTimeout(()=>toast('Studio deploy failed — retry this step (earlier steps kept)'),300); return; }
+      wizStatus[wizIdx]='done';renderWizard();
+    } else renderWizard();
+  },700);
+}
+function nextStep(){wizIdx++;wizStatus[wizIdx]='idle';runningLog=0;renderWizard();}
+function wizBack(){if(wizIdx>0){wizIdx--;renderWizard();}}
+function finishWizard(){toast('Cedar & Salt provisioned');go('tenants');
+  // reset for next time
+  wizIdx=0;wizStatus=Array(6).fill('idle');wizStatus[0]='active';WIZ[3]._retried=false;}
+
+/* ---------- init ---------- */
+buildFonts('headFonts',FONTS_HEAD,'head');
+buildFonts('bodyFonts',FONTS_BODY,'body');
+setHue(255);
+applyPreview();
+</script>
+</body>
+</html>
