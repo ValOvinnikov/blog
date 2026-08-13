@@ -187,6 +187,39 @@ contracts:
     `test-writer` agent frontmatter) that denies any `Edit`/`Write` whose
     target isn't `*.test.ts`/`*.test.tsx`, backing the test-file-only scoping
     described above.
+  - `pre-agent-gate0-guard.sh` — `PreToolUse` hook on the **`Agent` tool**
+    (wired in `settings.json`, not in agent frontmatter, since it must see
+    dispatches before any agent starts). Denies dispatching a **layer agent**
+    (`config`/`cms`/`service`/`ui`/`web`/`db`) to implement an issue that
+    isn't `In Progress` on the board — i.e. Gate 0 was skipped. The deny
+    message names the fix (dispatch `board-keeper` with
+    `"starting work on #<n>"`).
+
+    Exists as a hook rather than more `CLAUDE.md` prose because the rule is
+    written as step 1 of a _lifecycle_ while the failure happens on a single
+    _action_: Gate 0 gets run when the orchestrator consciously enters
+    "shipping an issue" mode and skipped when a dispatch emerges from
+    conversational momentum (decision → spec → tickets → dispatch).
+    `CLAUDE.md` already carries two emphatic prose warnings about
+    structurally identical traps, so a third had no reason to work better.
+
+    Deliberately narrow, same posture as `read-only-agent-guard.sh` — a guard
+    that fires on honest work gets disabled and then protects nothing:
+
+    - Only layer agents are checked; reviewers, `explore`, `board-keeper`,
+      `ci-watcher` and `verify-runner` pass straight through.
+    - Only the `Implement issue #<n>` phrasing counts as an implementation
+      target. Dispatch prompts routinely cite other issues as context
+      (parents, siblings, superseded work), so matching every `#<n>` would
+      block on whichever number appeared first.
+    - No issue named → allow. Plenty of legitimate layer work isn't ticketed.
+
+    **Fails open** when `gh`/`jq` is missing, the board query errors, or the
+    issue isn't on the board: it warns on stderr and allows. A guard that
+    bricks every dispatch on a transient network blip is worse than none,
+    because it gets removed. `pre-agent-gate0-guard.test.sh` pins the matrix
+    with a stubbed `gh` on `PATH`, so it is hermetic — no network, no
+    dependence on live board state.
 - **Shared `node_modules` in agent worktrees** — a full `pnpm install` per
   isolated worktree duplicated ~1.1 GB and minutes of setup each time, so
   `.husky/post-checkout` seeds every new linked worktree instead (issue #410):

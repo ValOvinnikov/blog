@@ -54,3 +54,10 @@ jobs:
       - name: test-writer-scope-guard.sh deny/allow matrix
         # #459: pins the *.test.ts(x)-only suffix check.
         run: bash .claude/hooks/test-writer-scope-guard.test.sh
+
+      - name: pre-agent-gate0-guard.sh deny/allow matrix
+        # Pins the Gate 0 check on layer-agent dispatches: which agents are
+        # in scope, that only "Implement issue #N" counts as a target (bare
+        # #N is context), and that it fails open when the board can't be
+        # reached. Hermetic — stubs `gh` on PATH, no network.
+        run: bash .claude/hooks/pre-agent-gate0-guard.test.sh
