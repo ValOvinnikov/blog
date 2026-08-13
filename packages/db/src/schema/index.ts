@@ -7,6 +7,7 @@ export * from './admins';
 export * from './auth';
 export * from './bookmarks';
 export * from './memberships';
+export * from './site-config';
 export * from './subscribers';
 export * from './tenant-domains';
 export * from './tenants';

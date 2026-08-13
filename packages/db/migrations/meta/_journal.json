@@ -43,6 +43,13 @@
       "when": 1786624800939,
       "tag": "0005_fair_multiple_man",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786626846224,
+      "tag": "0006_mature_silver_samurai",
+      "breakpoints": true
     }
   ]
 }
