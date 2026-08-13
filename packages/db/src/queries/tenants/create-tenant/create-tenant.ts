@@ -12,10 +12,9 @@ export type TCreateTenantInput = {
   status: TTenantStatus;
 };
 
-// Registers a new tenant row. No idempotency built in here (unlike
-// `addBookmark`/`createPendingSubscriber`) — `slug` is unique, and a
-// duplicate is a genuine caller error the seed script (or, later, the admin
-// app's onboarding flow) checks for up front rather than silently no-oping.
+// No idempotency here (unlike `addBookmark`/`createPendingSubscriber`) —
+// `slug` is unique, and a duplicate is a genuine caller error to check for
+// up front, not silently no-op on.
 export async function createTenant(
   input: TCreateTenantInput,
 ): Promise<TTenant> {

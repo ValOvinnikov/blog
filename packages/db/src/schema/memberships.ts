@@ -17,8 +17,8 @@ export const membershipRoleEnum = pgEnum(
 );
 
 // Joins `users` x `tenants` — a user's role on a given tenant. A user may
-// hold at most one membership per tenant (unique on the pair); multiple
-// tenants per user is how the admin app's future tenant switcher works.
+// hold at most one membership per tenant (unique on the pair), but many
+// memberships across tenants.
 export const memberships = pgTable(
   'memberships',
   {

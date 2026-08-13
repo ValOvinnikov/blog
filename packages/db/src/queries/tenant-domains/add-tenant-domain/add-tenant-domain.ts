@@ -5,12 +5,10 @@ import {
 } from '@blog/db/schema/tenant-domains';
 import { eq } from 'drizzle-orm';
 
-// Adds a domain to a tenant. Idempotent for the exact same (tenantId,
-// domain) pair — matches `addBookmark`'s insert-first shape, since `domain`
-// is globally unique so a racy double-insert would otherwise throw. A
-// domain already claimed by a *different* tenant is a genuine conflict, not
-// a no-op, so that case throws distinctly rather than silently returning
-// someone else's row.
+// Idempotent for the exact same (tenantId, domain) pair, since `domain` is
+// globally unique and a racy double-insert would otherwise throw. A domain
+// already claimed by a *different* tenant throws distinctly rather than
+// silently returning someone else's row.
 export async function addTenantDomain(
   tenantId: string,
   domain: string,
