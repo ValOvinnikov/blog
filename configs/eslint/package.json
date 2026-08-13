@@ -10,7 +10,8 @@
     "./db": "./db.js",
     "./ui": "./ui.js",
     "./web": "./web.js",
-    "./cms": "./cms.js"
+    "./cms": "./cms.js",
+    "./auth": "./auth.js"
   },
   "dependencies": {
     "@eslint/js": "^10.0.1",

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@blog/tsconfig/base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node", "vitest/globals"],
+    "paths": {
+      "@blog/auth/*": ["./src/*"],
+      "@blog/db/*": ["../../packages/db/src/*"],
+      // Not imported directly by this package's own source — needed only
+      // because @blog/db/* resolves to source, and its schema files import
+      // @blog/config constants; type-checking that transitive closure needs
+      // this resolvable too. See packages/db/tsconfig.json for the same gap.
+      "@blog/config/*": ["../../packages/config/src/*"]
+    }
+  },
+  "include": ["src"]
+}

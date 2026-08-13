@@ -32,34 +32,14 @@ export const env = createEnv({
     // is decided in the root layout (a Server Component) before the RSC
     // payload is built, so the flag never needs to reach the client bundle.
     VERCEL_ANALYTICS_ENABLED: z.enum(['true', 'false']).optional(),
-    // Auth.js (#1107): all six optional, same feature-flag-by-absence stance
-    // as the Sanity/skim secrets above. Auth.js's own OAuth env-var
-    // inference expects exactly these names (`AUTH_{PROVIDER}_{ID|SECRET}`,
-    // `AUTH_SECRET`); missing ones just degrade that one sign-in method (or,
-    // for AUTH_SECRET, let Auth.js fall back to its own dev-only ephemeral
-    // secret) instead of crashing `pnpm dev`/`pnpm build` for anyone without
-    // them configured yet.
-    AUTH_SECRET: z.string().min(1).optional(),
-    AUTH_GITHUB_ID: z.string().min(1).optional(),
-    AUTH_GITHUB_SECRET: z.string().min(1).optional(),
-    AUTH_GOOGLE_ID: z.string().min(1).optional(),
-    AUTH_GOOGLE_SECRET: z.string().min(1).optional(),
     // Shared Resend "send email" helper (`@web/server/email/send-email`) —
-    // powers the Auth.js Email provider's magic-link (#1107) and, later, the
-    // newsletter confirmation email (#1104, reuses this same helper/var).
+    // powers the Auth.js Email provider's magic-link (via `@blog/auth`) and
+    // the newsletter confirmation email (reuses this same helper/var).
     RESEND_API_KEY: z.string().min(1).optional(),
-    // The Auth.js Email provider's `from` address (`@web/server/auth/auth.ts`).
-    // Optional, same feature-flag-by-absence stance as the vars above: unset
-    // falls back to Resend's own shared testing sender
-    // (`onboarding@resend.dev`), which is fine for local dev/CI. Set to
-    // `Sign in <sign-in@mail.valstack.dev>` once a verified sending domain is
-    // configured in Resend.
-    MAGIC_LINK_FROM_ADDRESS: z.string().min(1).optional(),
     // The newsletter confirmation email's `from` address
     // (`@web/server/newsletter/newsletter-from-address.ts`), reusing the same
-    // `sendEmail` helper/stance as `MAGIC_LINK_FROM_ADDRESS` above: optional,
-    // falls back to Resend's own shared testing sender until a verified
-    // sending domain is configured.
+    // `sendEmail` helper: optional, falls back to Resend's own shared
+    // testing sender until a verified sending domain is configured.
     NEWSLETTER_FROM_ADDRESS: z.string().min(1).optional(),
   },
   client: {
@@ -74,13 +54,7 @@ export const env = createEnv({
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     SANITY_GENERATE_SECRET: process.env.SANITY_GENERATE_SECRET,
     VERCEL_ANALYTICS_ENABLED: process.env.VERCEL_ANALYTICS_ENABLED,
-    AUTH_SECRET: process.env.AUTH_SECRET,
-    AUTH_GITHUB_ID: process.env.AUTH_GITHUB_ID,
-    AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
-    AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
-    AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
-    MAGIC_LINK_FROM_ADDRESS: process.env.MAGIC_LINK_FROM_ADDRESS,
     NEWSLETTER_FROM_ADDRESS: process.env.NEWSLETTER_FROM_ADDRESS,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,

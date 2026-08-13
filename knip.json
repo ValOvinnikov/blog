@@ -34,6 +34,11 @@
       // string in vitest.config.ts's `resolve.alias`.
       "entry": ["src/testing/server-only-stub.ts"]
     },
+    "packages/auth": {
+      // Same reason as packages/service/packages/db above: reachable only
+      // through a string in vitest.config.ts's `resolve.alias`.
+      "entry": ["src/testing/server-only-stub.ts"]
+    },
     "apps/web": {
       // The test render wrapper (customRender + RTL re-exports) is a testing
       // entry point, consumed by *.test.tsx (adoption lands in #666), not from

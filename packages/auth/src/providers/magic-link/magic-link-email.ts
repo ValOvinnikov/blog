@@ -10,9 +10,9 @@ export type TMagicLinkEmailContent = {
 
 /**
  * buildMagicLinkEmail — the plain-text-free HTML content for the Auth.js
- * Email provider's sign-in link, sent via `@web/server/email/send-email`.
- * Pure and framework-free so it's testable without mocking Auth.js/Resend —
- * `auth.ts`'s `sendVerificationRequest` is the only caller.
+ * Email provider's sign-in link. Pure and framework-free so it's testable
+ * without mocking Auth.js/the app's email transport —
+ * `magic-link-provider.ts`'s `sendVerificationRequest` is the only caller.
  */
 export function buildMagicLinkEmail({
   url,

@@ -64,8 +64,8 @@ export async function subscribeToNewsletterAction(
       confirmationUrl,
     });
 
-    // Resolved inside the action, not at module scope like `auth.ts`'s
-    // `MAGIC_LINK_FROM_ADDRESS` — `auth.ts` is never reached from a Client
+    // Resolved inside the action, not at module scope like `@blog/auth`'s
+    // magic-link `from` address — `auth.ts` is never reached from a Client
     // Component's render tree, but `NewsletterForm` (a `'use client'`
     // component composed into the Blog index page and every post page,
     // #1200) imports this module, so importing it eagerly touches

@@ -73,6 +73,14 @@ When invoked, before writing any code:
   domain silently signs everyone out and can break cross-app session sharing,
   so treat both as a compatibility surface rather than a preference: change one
   only when a ticket asks for it, never as a tidy-up.
+- **The session shape, and the callback that produces it** — the `session`
+  callback that puts `user.id` on `session.user`, together with the module
+  augmentation that types it. These two are halves of one contract and must
+  never be separated: if the augmentation lives here while each app supplies
+  its own callback, an app that forgets it gets `session.user.id` typed as a
+  guaranteed `string` while being `undefined` at runtime — drift `tsc` cannot
+  catch. Any field a consuming app needs on the session belongs here for the
+  same reason.
 
 ## What you do not own
 
