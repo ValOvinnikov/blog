@@ -195,9 +195,13 @@ for the live surface). Route inventory (built + planned; see SPEC.md §1):
 
 ## Tailwind v4
 
-- Global stylesheet imports tokens and scans the ui package:
-  `@import "tailwindcss";` then `@source "../../../packages/ui/src/**/*.{ts,tsx}";`
-- Consume the shared preset from `@blog/config/tailwind/preset`.
+- The app's `index.css` imports the shared tokens and tells Tailwind to scan
+  the ui package's source:
+  `@import '@blog/tailwind-config/theme.css';` then
+  `@source '../../packages/ui/src/**/*.{ts,tsx}';`. That theme file pulls in
+  `tailwindcss` itself, so the app never imports it directly — and there is no
+  JS preset: the package's `./preset` export is a Tailwind v3 leftover nothing
+  imports.
 - **Same class-organization rule as `@blog/ui`: no raw Tailwind strings inline
   in JSX.** Every component with styling gets a co-located `{component-name}-
 variants.ts` using `tailwind-variants` (`tv`), classes grouped by concern in

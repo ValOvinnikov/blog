@@ -3,7 +3,9 @@
   "extends": "@blog/tsconfig/base.json",
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
     "noEmit": true,
+    "moduleResolution": "Bundler",
     "types": ["vitest/globals"],
     "paths": {
       "@admin/*": ["./src/*"],
@@ -12,11 +14,19 @@
       "@blog/config/*": ["../../packages/config/src/*"],
       "@blog/ui/*": ["../../packages/ui/src/*"],
       "@blog/utils/*": ["../../packages/utils/src/*"]
-    }
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
+    "next-env.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
+    ".next/types/**/*.ts",
+    "index.css.d.ts",
     // TS only loads global ambient .d.ts files via a program's own include,
     // never transitively through import resolution — so any dependency's
     // ambient declarations (e.g. @blog/ui's *.svg types, @blog/auth's

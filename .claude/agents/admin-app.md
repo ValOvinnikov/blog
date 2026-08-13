@@ -150,7 +150,9 @@ page-builder and no SEO surface to justify them. What carries over:
 
 ## Tailwind
 
-- Consume the shared preset from `@blog/config/tailwind/preset`; use token
+- Tokens come from `@blog/tailwind-config`, imported in CSS —
+  `@import '@blog/tailwind-config/theme.css';` in the app's `index.css`, the
+  Tailwind v4 way. There is no `@blog/config/tailwind/preset`. Use token
   utilities, never hard-coded hex or arbitrary spacing.
 - **No raw Tailwind strings inline in JSX.** Every component with styling gets
   a co-located `{component-name}-variants.ts` using `tailwind-variants` (`tv`),
