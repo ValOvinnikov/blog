@@ -5,7 +5,7 @@ description: >-
   Components, metadata/SEO, sitemap/robots/RSS, ISR + revalidation webhook,
   Tailwind v4 wiring, and composing @blog/ui with @blog/service. The only place
   ui and service meet.
-tools: Read, Edit, Write, Grep, Glob, Bash
+tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
 ---

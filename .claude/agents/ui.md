@@ -5,7 +5,7 @@ description: >-
   editing Atomic Design components (atoms/molecules/organisms), component APIs,
   Tailwind token styling, and Portable Text rendering. Builds the reusable
   library; does NOT compose pages or fetch data (that's the web agent).
-tools: Read, Edit, Write, Grep, Glob, Bash
+tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
 ---

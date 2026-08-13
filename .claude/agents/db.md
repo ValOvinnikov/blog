@@ -10,7 +10,7 @@ description: >-
   Consumed by the two apps (`apps/web`, `apps/admin`) and by `@blog/auth`,
   which binds the Auth.js adapter to its tables — never by `cms`, `service`,
   or `ui`, and never importing `@blog/auth` back.
-tools: Read, Edit, Write, Grep, Glob, Bash
+tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
 ---
