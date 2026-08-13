@@ -21,12 +21,33 @@ fail=0
 stub_dir=$(mktemp -d)
 trap 'rm -rf "$stub_dir"' EXIT
 
-# Fake `gh` — echoes whatever status the current case wants. An empty
-# GATE0_TEST_STATUS models "issue not on the board"; GATE0_TEST_FAIL=1 models
-# an API/network failure.
+# Fake `gh`. Two modes:
+#
+#   default            — echo the canned GATE0_TEST_STATUS. Empty models
+#                        "issue not on the board"; GATE0_TEST_FAIL=1 models an
+#                        API/network failure.
+#   GATE0_TEST_BODY    — a raw GraphQL response body. The stub pulls the real
+#                        `--jq` expression out of its own argv and runs it over
+#                        that body with the real jq, so the guard's extraction
+#                        filter is genuinely exercised rather than bypassed.
+#                        Without this, a future edit to that filter would pass
+#                        CI while being broken.
 cat >"$stub_dir/gh" <<'STUB'
 #!/usr/bin/env bash
 [ "${GATE0_TEST_FAIL:-0}" = "1" ] && exit 1
+if [ -n "${GATE0_TEST_BODY:-}" ]; then
+  filter=""
+  while [ "$#" -gt 0 ]; do
+    if [ "$1" = "--jq" ]; then
+      filter=$2
+      break
+    fi
+    shift
+  done
+  [ -z "$filter" ] && exit 1
+  printf '%s' "$GATE0_TEST_BODY" | jq -r "$filter"
+  exit 0
+fi
 printf '%s' "${GATE0_TEST_STATUS:-}"
 exit 0
 STUB
@@ -85,6 +106,31 @@ check web "Fixes #1234 will follow later." allow "closing keyword is not a targe
 echo "Fails open when the board cannot be consulted:"
 GATE0_TEST_STATUS="" check ui "Implement issue #1436 — shells." allow "issue not on board"
 GATE0_TEST_FAIL=1 GATE0_TEST_STATUS="Todo" check ui "Implement issue #1436 — shells." allow "gh failure"
+
+echo "Real --jq extraction over raw GraphQL bodies:"
+unset GATE0_TEST_STATUS
+body() { GATE0_TEST_BODY=$1; export GATE0_TEST_BODY; }
+
+body '{"data":{"repository":{"issue":{"projectItems":{"nodes":[{"fieldValueByName":{"name":"Todo"}}]}}}}}'
+check ui "Implement issue #1436 — shells." deny "single project item, Todo"
+
+body '{"data":{"repository":{"issue":{"projectItems":{"nodes":[{"fieldValueByName":{"name":"In Progress"}}]}}}}}'
+check ui "Implement issue #1436 — shells." allow "single project item, In Progress"
+
+# Issue on no project at all — the filter must yield empty, not crash.
+body '{"data":{"repository":{"issue":{"projectItems":{"nodes":[]}}}}}'
+check ui "Implement issue #1436 — shells." allow "zero project items falls open"
+
+# An item with no Status field set yields a null fieldValueByName.
+body '{"data":{"repository":{"issue":{"projectItems":{"nodes":[{"fieldValueByName":null}]}}}}}'
+check ui "Implement issue #1436 — shells." allow "null Status falls open"
+
+# Multiple projects: the first non-null Status wins, and a leading null entry
+# must not shadow it.
+body '{"data":{"repository":{"issue":{"projectItems":{"nodes":[{"fieldValueByName":null},{"fieldValueByName":{"name":"Todo"}}]}}}}}'
+check ui "Implement issue #1436 — shells." deny "null then Todo still blocks"
+
+unset GATE0_TEST_BODY
 
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]
