@@ -29,9 +29,11 @@ cost more context than it saved and failed, even if the content was correct.
 apps/
   cms        Sanity Studio: schemas, desk structure, migrations       (cms)
   web        Next.js frontend: routes, SEO, i18n, composition         (web)
+  admin      Next.js admin panel: separate deploy, no Sanity          (admin-app)
 packages/
   config     Constants, generated Sanity types, routes builder        (@blog/config)
   service    Data access: Sanity client, groqd queries, transformers  (@blog/service)
+  db         Relational data: Neon Postgres via Drizzle               (@blog/db)
   ui         Atomic Design components, atoms→organisms (pure)         (@blog/ui)
   utils      Framework-free helpers                                   (@blog/utils)
 configs/     eslint, prettier, tailwind, tsconfig, vitest presets
@@ -39,8 +41,9 @@ docs/        BACKLOG.md (roadmap), DEPLOY.md
 SPEC.md      architecture — the durable reference
 ```
 
-Dependency order is `config → cms → service → ui → web`; the graph is
-acyclic. Source lives under `src/` in every workspace. Tests are co-located
+Dependency order is `config → cms → service → ui → web`, with
+`config → db → web` and `config → db → admin` (`apps/admin`, the admin panel)
+running alongside it rather than after it; the graph is acyclic. Source lives under `src/` in every workspace. Tests are co-located
 as `*.test.ts(x)`.
 
 Useful starting points, in rough order of cheapness:

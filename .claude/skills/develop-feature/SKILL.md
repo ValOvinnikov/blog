@@ -109,13 +109,20 @@ Hand each layer's work to its agent (use the Agent tool, or state which agent
 owns it). Do them in dependency order; later steps depend on earlier output.
 **Skip any agent whose layer has no changes** — don't invoke it at all.
 
-| Layer / work                                                 | Agent     | Skill it should apply                                                               |
-| ------------------------------------------------------------ | --------- | ----------------------------------------------------------------------------------- |
-| Constants, `routes`, shared types, `configs/*`, alias wiring | `config`  | —                                                                                   |
-| Sanity schema + `pnpm typegen`                               | `cms`     | `cms-schema-practices`                                                              |
-| GROQ + typed fetcher                                         | `service` | `add-content-type`, `testing-practices`                                             |
-| Components                                                   | `ui`      | `ui-library-practices`, `ui-storybook`, `testing-practices`                         |
-| Routes / metadata / feeds                                    | `web`     | `web-component-practices`, `seo-and-metadata`, `web-storybook`, `testing-practices` |
+| Layer / work                                                 | Agent       | Skill it should apply                                                               |
+| ------------------------------------------------------------ | ----------- | ----------------------------------------------------------------------------------- |
+| Constants, `routes`, shared types, `configs/*`, alias wiring | `config`    | —                                                                                   |
+| Sanity schema + `pnpm typegen`                               | `cms`       | `cms-schema-practices`                                                              |
+| GROQ + typed fetcher                                         | `service`   | `add-content-type`, `testing-practices`                                             |
+| Drizzle schema, migrations, typed queries                    | `db`        | `testing-practices`                                                                 |
+| Components                                                   | `ui`        | `ui-library-practices`, `ui-storybook`, `testing-practices`                         |
+| Routes / metadata / feeds                                    | `web`       | `web-component-practices`, `seo-and-metadata`, `web-storybook`, `testing-practices` |
+| Admin-panel routes, Server Actions, Base UI forms            | `admin-app` | `testing-practices`                                                                 |
+
+`db` and `admin-app` are the two rows that are **not** steps in that chain — they
+are siblings to `service` and `web` respectively, and neither consumes Sanity.
+`config → db → admin-app` runs in parallel to `cms → service → ui → web`, not after
+it.
 
 All subagents use **Sonnet** (set in each agent's definition file — do not
 override with a different model unless the user explicitly asks).
@@ -222,13 +229,13 @@ red check.
   full diff (`main...HEAD` + working tree). It applies `code-review-practices`
   — mechanical scan, contract pass, general pass — with fresh eyes and reports
   a verdict.
-- **If the diff touches `packages/ui` or `apps/web` components**, also dispatch
+- **If the diff touches `packages/ui`, `apps/web`, or `apps/admin` components**, also dispatch
   the **`a11y-reviewer` subagent** (`.claude/agents/a11y-reviewer.md`) over the
   same diff — it checks the `ui-library-practices` accessibility rules
   (`ariaLabel` prop convention, no in-component date formatting, real heading
   tags, polymorphic `linkAs`, `alt` text, `focus-visible`, icon labelling) that
   `reviewer`'s general pass does not specifically enumerate. Skip it entirely
-  for diffs with no `ui`/`web` files.
+  for diffs with no `ui`/`web`/`admin` files.
 - **If the diff touches `apps/web` routes, metadata, structured data, or
   feeds** (any of: `generateMetadata`, JSON-LD, `sitemap.ts`, `robots.ts`,
   `rss.xml/route.ts`, or a new/changed route under `apps/web/src/app`), also

@@ -96,6 +96,7 @@ reading, page canvas elevation) are documented in full in
 apps/
   cms        Sanity Studio: schemas, desk structure, migrations       (cms)
   web        Next.js frontend: routes, SEO, i18n, composition         (web)
+  admin      Next.js admin panel: own deploy/domain, no Sanity        (admin-app)
 packages/
   config     Shared constants, generated Sanity types, tokens,        (@blog/config)
              polymorphic React helpers (via /react subpath)
@@ -116,10 +117,13 @@ configs/
 | `@blog/ui`      | `config` (types + tokens)              | Atomic-design components up to organisms (pure, prop-driven, polymorphic `as`/`linkAs` slots). No template layer — page composition belongs in `web`.                                                                                                                                                           | import `service`/`sanity`/`fetch`; use `'use client'`                                             |
 | `web` (app)     | `ui`, `service`, `db`, `config`, utils | Routes, metadata, feeds, i18n, page composition; owns `PortableTextRenderer` and all framework-coupled wrappers (`SanityImage`, `SmartLink`, theme toggle)                                                                                                                                                      | write GROQ; import Sanity SDKs; put data logic in components                                      |
 | `cms` (app)     | `config` (constants), `utils`          | Schema types (source of truth), desk structure, content migrations                                                                                                                                                                                                                                              | hand-write shapes typegen should produce                                                          |
+| `admin` (app)   | `ui`, `db`, `config`, `utils`          | Operator/tenant admin panel — its own deployment and domain, behind the same Auth.js session as `web` (cookie scoped to the parent domain). Routes, Server Actions, and Base UI form surfaces styled with the shared tokens.                                                                                    | import Sanity SDKs or `@blog/service`; add components to `@blog/ui`                               |
 
 The graph is acyclic. `apps/web` is the only place `ui`, `service`, and `db`
 meet — `db` and `service` are parallel data layers (Neon vs. Sanity) that
 never reference each other; a feature needing both joins them in `web`.
+`apps/admin` consumes `ui` and `db` but never `service`, so it is a second
+consumer of `@blog/db` without being a second place those three meet.
 Full contract and migration mechanism: `.claude/agents/db.md`.
 Dependency-graph enforcement details and SVG/type-flow wiring:
 [`docs/context/frontend-conventions.md`](./docs/context/frontend-conventions.md).

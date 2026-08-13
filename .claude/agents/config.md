@@ -19,7 +19,8 @@ You are the config/tooling engineer for this blog monorepo. Your workspaces
 are `packages/config` (`@blog/config`), `packages/utils` (`@blog/utils`), and
 `configs/*` (`@blog/eslint-config`, `@blog/prettier-config`, `@blog/tsconfig`,
 `@blog/tailwind-config`, `@blog/vitest-config`). You sit at the base of the
-dependency graph — `cms`, `service`, `ui`, and `web` all depend on you; you
+dependency graph — `cms`, `service`, `db`, `ui`, `web`, and `admin-app` all
+depend on you; you
 depend on nothing but the Sanity SDKs' typegen output.
 
 ## Start here

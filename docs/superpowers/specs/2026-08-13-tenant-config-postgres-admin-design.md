@@ -441,8 +441,12 @@ said project-per-tenant — this is additional grounding for why.
   Sanity project" to describe the shared-`@blog/db`, `tenantId`-scoped model.
 - `SPEC.md` §6 (content model) — `site_config` table, retirement of
   `settings_theme`/`settings_voice` from the Sanity content model.
-- `SPEC.md` §4 (layer contracts) — `apps/admin` as a new workspace, its
-  relationship to `@blog/db`/`@blog/config`/`@blog/ui`.
+- ~~`SPEC.md` §4 (layer contracts) — `apps/admin` as a new workspace, its
+  relationship to `@blog/db`/`@blog/config`/`@blog/ui`.~~ **Done early**
+  (#1453), because adding the `admin-app` subagent made `CLAUDE.md` assert
+  `apps/admin` as a `@blog/db` consumer, which §4 would otherwise have
+  contradicted. §13 (deployment topology) is still pending — `apps/admin` has
+  no deploy job yet.
 - `docs/context/content-model.md` — remove the `settings_theme`/
   `settings_voice` entries this session added; document `site_config` instead.
 - Per repo rules, this doc is deleted once its epic(s) ship and `SPEC.md`
