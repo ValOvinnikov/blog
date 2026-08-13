@@ -1,0 +1,20 @@
+{
+  "name": "admin",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "test": "vitest run --passWithNoTests"
+  },
+  "devDependencies": {
+    "@blog/tsconfig": "workspace:*",
+    "@blog/vitest-config": "workspace:*",
+    "typescript": "catalog:",
+    "vite-plugin-svgr": "catalog:",
+    "vitest": "catalog:"
+  }
+}
