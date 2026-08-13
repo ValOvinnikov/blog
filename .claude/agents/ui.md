@@ -82,8 +82,8 @@ archived brief.
   ```
   No inline comments on each group — the classes are self-evident.
 - Token utilities only (`bg-bg`, `text-fg`, `text-muted`, `text-accent`,
-  `border-border`, `max-w-prose`) from `@blog/config/tailwind/preset` — no raw
-  hex. Keep dark mode intact.
+  `border-border`, `max-w-prose`) defined by `@blog/tailwind-config`'s
+  `theme.css`, which each app imports — no raw hex. Keep dark mode intact.
 - Server-component-safe by default; `"use client"` only for interactivity.
 - **Every exported component gets a JSDoc description** (incl. compound roots
   and every slot/part, e.g. `PostCard.Media`), even when the name seems

@@ -82,13 +82,83 @@ importers:
         version: 6.0.3
 
   apps/admin:
+    dependencies:
+      '@blog/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
+      '@blog/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@blog/tailwind-config':
+        specifier: workspace:*
+        version: link:../../configs/tailwind
+      '@t3-oss/env-nextjs':
+        specifier: ^0.13.11
+        version: 0.13.11(typescript@6.0.3)(valibot@1.4.2(typescript@6.0.3))(zod@4.4.3)
+      next:
+        specifier: ^16.2.11
+        version: 16.2.11(@babel/core@7.29.7(supports-color@8.1.1))(@playwright/test@1.61.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      next-auth:
+        specifier: 5.0.0-beta.32
+        version: 5.0.0-beta.32(next@16.2.11(@babel/core@7.29.7(supports-color@8.1.1))(@playwright/test@1.61.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.7
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.7(react@19.2.7)
+      resend:
+        specifier: ^6.18.1
+        version: 6.18.1
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
+      zod:
+        specifier: 'catalog:'
+        version: 4.4.3
     devDependencies:
+      '@blog/eslint-config':
+        specifier: workspace:*
+        version: link:../../configs/eslint
+      '@blog/prettier-config':
+        specifier: workspace:*
+        version: link:../../configs/prettier
       '@blog/tsconfig':
         specifier: workspace:*
         version: link:../../configs/tsconfig
       '@blog/vitest-config':
         specifier: workspace:*
         version: link:../../configs/vitest
+      '@tailwindcss/postcss':
+        specifier: ^4.3.3
+        version: 4.3.3
+      '@testing-library/jest-dom':
+        specifier: ^6.6.0
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: ^16.1.0
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@types/node':
+        specifier: ^26
+        version: 26.1.1
+      '@types/react':
+        specifier: ^19
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19
+        version: 19.2.3(@types/react@19.2.17)
+      eslint:
+        specifier: 'catalog:'
+        version: 10.7.0(jiti@2.7.0)(supports-color@8.1.1)
+      jsdom:
+        specifier: ^29.1.1
+        version: 29.1.1(@noble/hashes@2.2.0)
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.5
+      prettier-plugin-tailwindcss:
+        specifier: ^0.8.0
+        version: 0.8.0(prettier@3.9.5)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3

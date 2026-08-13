@@ -64,7 +64,8 @@ export default mergeConfig(
       ],
     },
     test: {
-      environment: 'node',
+      environment: 'jsdom',
+      setupFiles: ['./src/vitest-setup.ts'],
     },
   }),
 );
