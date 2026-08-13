@@ -56,7 +56,8 @@ When invoked, before writing any code:
 - **Never edit files outside `apps/admin`.** `packages/db`, `packages/ui`,
   `packages/config`, and `apps/web` each belong to another agent. If your work
   needs a change there, implement your side and report the required change.
-- Depend on `@blog/db`, `@blog/config`, `@blog/ui`, and `@blog/utils` only.
+- Depend on `@blog/db`, `@blog/auth`, `@blog/config`, `@blog/ui`, and
+  `@blog/utils` only.
   Whenever this app starts consuming a new workspace package, its alias must be
   added to `tsconfig.json` `paths` **and** `vitest.config.ts` `resolve.alias` —
   that wiring is the `config` agent's, so report it rather than editing shared
@@ -104,10 +105,15 @@ match it.
 
 ## Auth and access
 
-Both of this app's sections sit behind the **shared** Auth.js session — the
-same `next-auth` config as `apps/web`, with a cookie scoped to the parent
-domain, so a user already signed in on the main site is not asked to sign in
-again. The session authenticates; it does not authorize.
+Both of this app's sections sit behind the **shared** Auth.js session. The
+configuration comes from `@blog/auth` — the same object `apps/web` uses — which
+you pass to this app's own `NextAuth()` call. Never redefine providers, the
+adapter, or the session strategy here: a config that diverges from `apps/web`'s
+breaks the shared sign-in silently, and that shared config is the whole reason
+the package exists. This app hosts sign-in too, so a user may arrive here
+directly rather than via the main site.
+
+The session authenticates; it does not authorize.
 
 - **Platform** routes additionally require an `admins` row (global roles, not
   tenant-scoped).

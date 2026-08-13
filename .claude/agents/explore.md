@@ -34,6 +34,7 @@ packages/
   config     Constants, generated Sanity types, routes builder        (@blog/config)
   service    Data access: Sanity client, groqd queries, transformers  (@blog/service)
   db         Relational data: Neon Postgres via Drizzle               (@blog/db)
+  auth       Shared Auth.js config for both apps                      (@blog/auth)
   ui         Atomic Design components, atoms→organisms (pure)         (@blog/ui)
   utils      Framework-free helpers                                   (@blog/utils)
 configs/     eslint, prettier, tailwind, tsconfig, vitest presets
@@ -42,7 +43,7 @@ SPEC.md      architecture — the durable reference
 ```
 
 Dependency order is `config → cms → service → ui → web`, with
-`config → db → web` and `config → db → admin` (`apps/admin`, the admin panel)
+`config → db → auth → web` and `config → db → auth → admin` (`apps/admin`, the admin panel)
 running alongside it rather than after it; the graph is acyclic. Source lives under `src/` in every workspace. Tests are co-located
 as `*.test.ts(x)`.
 

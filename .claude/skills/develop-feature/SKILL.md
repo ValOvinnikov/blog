@@ -115,14 +115,16 @@ owns it). Do them in dependency order; later steps depend on earlier output.
 | Sanity schema + `pnpm typegen`                               | `cms`       | `cms-schema-practices`                                                              |
 | GROQ + typed fetcher                                         | `service`   | `add-content-type`, `testing-practices`                                             |
 | Drizzle schema, migrations, typed queries                    | `db`        | `testing-practices`                                                                 |
+| Shared Auth.js config (providers, adapter, session, cookies) | `auth`      | `testing-practices`                                                                 |
 | Components                                                   | `ui`        | `ui-library-practices`, `ui-storybook`, `testing-practices`                         |
 | Routes / metadata / feeds                                    | `web`       | `web-component-practices`, `seo-and-metadata`, `web-storybook`, `testing-practices` |
 | Admin-panel routes, Server Actions, Base UI forms            | `admin-app` | `testing-practices`                                                                 |
 
-`db` and `admin-app` are the two rows that are **not** steps in that chain — they
-are siblings to `service` and `web` respectively, and neither consumes Sanity.
-`config → db → admin-app` runs in parallel to `cms → service → ui → web`, not after
-it.
+`db`, `auth` and `admin-app` are the rows that are **not** steps in that chain.
+`db` and `admin-app` are siblings to `service` and `web` respectively, `auth` is
+a thin layer above `db`, and none of the three consumes Sanity.
+`config → db → auth → admin-app` runs in parallel to `cms → service → ui → web`,
+not after it.
 
 All subagents use **Sonnet** (set in each agent's definition file — do not
 override with a different model unless the user explicitly asks).
