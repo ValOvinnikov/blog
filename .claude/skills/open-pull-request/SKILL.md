@@ -305,7 +305,7 @@ Do not manually set Done.
 
 ```
 ## Summary
-- <what changed, listed per layer: config / cms / service / db / ui / web / admin>
+- <what changed, listed per layer: config / cms / service / db / auth / ui / web / admin>
 
 ## Test plan
 - [ ] pnpm typegen (if schema changed)

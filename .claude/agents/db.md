@@ -7,8 +7,9 @@ description: >-
   Drizzle schema definitions, drizzle-kit migrations, and typed query/mutation
   functions. The sibling to `service` for non-Sanity data: same contract
   (typed async functions, no React), different store (Neon, not Sanity).
-  Consumed only by the two apps (`apps/web`, `apps/admin`) — never by `cms`,
-  `service`, or `ui`.
+  Consumed by the two apps (`apps/web`, `apps/admin`) and by `@blog/auth`,
+  which binds the Auth.js adapter to its tables — never by `cms`, `service`,
+  or `ui`, and never importing `@blog/auth` back.
 tools: Read, Edit, Write, Grep, Glob, Bash
 model: sonnet
 isolation: worktree
@@ -61,11 +62,14 @@ relative paths only within a single slice (`./schema`, `./queries/comments`).
   free helpers) plus Drizzle/Neon SDKs (`drizzle-orm`, `drizzle-kit`,
   `@neondatabase/serverless`, the Auth.js Drizzle adapter). The dependency
   graph stays acyclic: `db → config, utils`, nothing more.
-- **Only the two apps import `@blog/db`** — `apps/web` and `apps/admin` (the
-  operator/tenant admin panel, owned by the `admin-app` agent). `cms`,
-  `service`, and `ui` never do — if one of them appears to need relational
-  data, that is a design smell to flag back to the orchestrator, not a reason
-  to add the import.
+- **Three things import `@blog/db`** — `apps/web`, `apps/admin` (the
+  operator/tenant admin panel, owned by the `admin-app` agent), and
+  `@blog/auth`, which binds the Auth.js adapter to your tables. **`@blog/db`
+  must never import `@blog/auth`** — the tables live here and `auth` reaches
+  for them, never the reverse. `cms`, `service`, and `ui` never import this
+  package at all — if one of them appears to need relational data, that is a
+  design smell to flag back to the orchestrator, not a reason to add the
+  import.
 - No `'use client'` — this package has no React at all, client or server.
 
 ## Bootstrapping the package (first work only — #984)

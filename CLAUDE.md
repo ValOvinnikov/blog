@@ -13,10 +13,11 @@ content; a Next.js 16 App Router site renders it; types flow end-to-end.
 ## Layer contracts (do not violate)
 
 ```
-web → ui, service, db, config, utils   service → config, utils (no React)
-admin → ui, db, config, utils          cms → config (types via typegen)
-ui → config (no Sanity/fetch)          configs/* → consumed by all
-db → config, utils (no React/Sanity)   graph is acyclic
+web → ui, service, db, auth, config, utils   service → config, utils (no React)
+admin → ui, db, auth, config, utils         cms → config (types via typegen)
+ui → config (no Sanity/fetch)               configs/* → consumed by all
+db → config, utils (no React/Sanity)        auth → db, config, utils
+graph is acyclic
 ```
 
 - `@blog/ui` is pure and prop-driven — never imports `service`/`sanity`/`fetch`.
@@ -25,12 +26,19 @@ db → config, utils (no React/Sanity)   graph is acyclic
   data (Auth.js sessions, comments, ratings, bookmarks, subscribers, tenants,
   memberships, admins, site config); never imports React or any Sanity SDK, and
   never imports/is imported by `@blog/service` (siblings, not dependents — see
-  `.claude/agents/db.md`). **Only the two apps import it.**
+  `.claude/agents/db.md`). **Imported only by the two apps and `@blog/auth`**,
+  which binds the Auth.js adapter to its tables.
 - `apps/web` is the only place `ui` and `service` (and `db`) meet (Server
   Components fetch, pass typed props to `ui`).
+- `@blog/auth` holds the Auth.js configuration both apps pass to their own
+  `NextAuth()` call — providers, the Drizzle adapter, session strategy, cookie
+  options. It sits above `db` (which owns the adapter tables) and **`db` must
+  never import it**. Sharing it is what keeps a session valid across both apps;
+  two independently maintained configs drift silently. See
+  `.claude/agents/auth.md`.
 - `apps/admin` is a separate Next.js app (its own deployment and domain) for
-  the operator/tenant admin panel — it consumes `db`, `ui`, `config`, `utils`
-  and **never Sanity or `@blog/service`**. Its interactive primitives come from
+  the operator/tenant admin panel — it consumes `db`, `auth`, `ui`, `config`,
+  and `utils`, and **never Sanity or `@blog/service`**. Its interactive primitives come from
   Base UI, styled in-app; nothing is added to `@blog/ui` for it. See
   `.claude/agents/admin-app.md`.
 - Content shapes come from the generated Sanity types in `@blog/config`
@@ -112,23 +120,31 @@ helpers, shared config packages, alias wiring, guards typegen output), `cms`
 `db` (`packages/db`, Neon/Drizzle relational data — Auth.js sessions,
 comments, ratings, bookmarks, subscribers, tenants, memberships, admins, site
 config) is a **sibling to `service`, not a step in that chain** — it has no
-upstream layer of its own beyond `config`, and only the two apps consume it.
+upstream layer of its own beyond `config`. Its consumers are the two apps plus
+`@blog/auth`, which binds the Auth.js adapter to its tables.
 Dispatch it whenever config/utils changes are settled and before the app work
 that composes its queries: `config → db → web` (parallel to, not blocking,
 `cms → service → ui`) when a feature touches both a Sanity-backed and a
 Neon-backed concern. See `.claude/agents/db.md`.
 
+`auth` (`packages/auth`, the shared Auth.js configuration — providers, the
+Drizzle adapter, session strategy, cookie options) is a **thin layer above
+`db`**, consumed only by the two apps: `config → db → auth → web`/`admin-app`.
+Dispatch it when any of those change. Never dispatch it for authorization —
+whether a signed-in user may see a page is each app's decision, made against an
+`admins` or `memberships` row. See `.claude/agents/auth.md`.
+
 `admin-app` (`apps/admin`, the operator/tenant admin panel — a separate Next.js
 app, its own deployment and domain) is a **sibling to `web`, not a step in the
-chain either**. Its only upstreams are `config`, `db`, and `ui`, so its
-dispatch order is `config → db → admin-app`; it never waits on `cms`/`service`,
-which it does not consume. Base UI is installed and styled inside that app —
+chain either**. Its only upstreams are `config`, `db`, `auth`, and `ui`, so its
+dispatch order is `config → db → auth → admin-app`; it never waits on
+`cms`/`service`, which it does not consume. Base UI is installed and styled inside that app —
 do not route its controls through the `ui` agent. See
 `.claude/agents/admin-app.md`.
 
 **Delegating in-scope work to its sub-agent is REQUIRED, not optional — for the
 whole lifecycle, not just the first draft.** Every file that lives in a
-sub-agent's domain (`config`/`cms`/`service`/`ui`/`web`/`db`/`admin-app` per the map above) is
+sub-agent's domain (`config`/`cms`/`service`/`ui`/`web`/`db`/`admin-app`/`auth` per the map above) is
 written, changed, fixed, renamed, and reworked **by that sub-agent** — the
 initial implementation, every review-remediation, every follow-up tweak, every
 "it's one line" edit. The orchestrator _orchestrates_; it does not hand-author
@@ -160,7 +176,7 @@ When a review turns up a blocking finding in a layer file, or a rename / knip /
 lint nit needs a two-line change, patching it inline _feels_ faster than
 re-dispatching the owning agent. That feeling is the rationalization this rule
 exists to stop: a two-line orchestrator edit to a `config`/`cms`/`service`/`ui`/
-`web`/`db`/`admin-app` file is still the orchestrator doing a sub-agent's job. Route the fix to
+`web`/`db`/`admin-app`/`auth` file is still the orchestrator doing a sub-agent's job. Route the fix to
 the owning agent (dispatch, or `SendMessage` it), let it re-export, then
 re-verify and re-review. "Small", "mechanical", "the agent already did the hard
 part", and "it's a fix, not new code" are **not** exemptions — the only

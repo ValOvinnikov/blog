@@ -18,9 +18,15 @@ contracts:
   - `db` — `packages/db` (`@blog/db`): Neon Postgres + Drizzle, the
     relational sibling to `service` for the engagement layer (Auth.js,
     comments, ratings, bookmarks, subscribers); never Sanity, never React,
-    consumed only by the two apps (`web`, `admin`); owns the
+    consumed by the two apps (`web`, `admin`) and by `@blog/auth`; owns the
     `drizzle-kit generate`/`migrate`
     schema-migration workflow.
+  - `auth` — `packages/auth` (`@blog/auth`): the Auth.js configuration both
+    apps pass to their own `NextAuth()` call (providers, the Drizzle adapter,
+    session strategy, cookie options). A thin layer above `db`, which owns the
+    adapter tables — and `db` must never import it. It exports configuration,
+    never a constructed NextAuth instance, so each app keeps its own request
+    context. Establishes identity only; authorization stays each app's call.
   - `ui` — building the pure, publishable `@blog/ui` design system.
   - `web` — App Router routes, SEO, composition of `ui` + `service` + `db`.
   - `admin-app` — `apps/admin`, the operator/tenant admin panel: a second Next.js
@@ -200,7 +206,7 @@ contracts:
   - `pre-agent-gate0-guard.sh` — `PreToolUse` hook on the **`Agent` tool**
     (wired in `settings.json`, not in agent frontmatter, since it must see
     dispatches before any agent starts). Denies dispatching a **layer agent**
-    (`config`/`cms`/`service`/`ui`/`web`/`db`/`admin-app`) to implement an issue that
+    (`config`/`cms`/`service`/`ui`/`web`/`db`/`admin-app`/`auth`) to implement an issue that
     isn't `In Progress` on the board — i.e. Gate 0 was skipped. The deny
     message names the fix (dispatch `board-keeper` with
     `"starting work on #<n>"`).
