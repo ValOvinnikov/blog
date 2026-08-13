@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>apps/admin — Product Mock</title>
+<title>apps/admin — Product Mock v2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&family=Newsreader:wght@400;500;600&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<!-- Closed FONT_CHOICE set (5): Space Grotesk, Newsreader, JetBrains Mono, Fraunces, Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&family=Newsreader:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
 :root{
   --bg:#f6f7f9; --surface:#ffffff; --surface-2:#fbfbfd; --line:#e5e7eb; --line-2:#eef0f3;
@@ -16,6 +17,11 @@
   --radius:12px; --radius-sm:8px; --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
   --shadow-lg:0 12px 40px rgba(16,24,40,.14);
   --ui:'Inter',system-ui,sans-serif;
+
+  /* Console preset surfaces — mirrored from configs/tailwind/theme.css .dark */
+  --tw-primary:oklch(0.17 0.006 250); --tw-surface:oklch(0.21 0.007 250);
+  --tw-text:oklch(0.95 0.004 250); --tw-text-muted:oklch(0.72 0.008 250);
+  --tw-border:oklch(0.3 0.008 250);
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -42,9 +48,9 @@ a{color:inherit}
 .navgroup .lbl{color:#5a6373;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:0 10px 6px}
 .nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:#c9cfda;text-decoration:none;font-size:13px;cursor:pointer;margin-bottom:1px}
 .nav a .ic{width:16px;text-align:center;opacity:.75}
-.nav a .pill{margin-left:auto;background:#232734;color:#aab2c0;font-size:10.5px;padding:1px 7px;border-radius:999px}
-.nav a.soon{opacity:.55}
-.nav a.soon .pill{background:#20242e;color:#6b7280}
+.nav a .pill{margin-left:auto;background:#232734;color:#aab2c0;font-size:10px;padding:1px 7px;border-radius:999px}
+.nav a.soon{opacity:.6}
+.nav a.soon .pill{background:#3a2a12;color:#d9a441}
 .nav a:hover{background:#171b23}
 .nav a.active{background:#20242e;color:#fff}
 .nav a.active .ic{opacity:1;color:#a5b4fc}
@@ -68,7 +74,8 @@ a{color:inherit}
 .h1{font-size:22px;font-weight:700;letter-spacing:-.01em;margin:0}
 .sub{color:var(--muted);margin:4px 0 0;font-size:13.5px}
 .pagehead{display:flex;align-items:flex-start;gap:16px;margin-bottom:22px}
-.pagehead .actions{margin-left:auto;display:flex;gap:8px}
+.pagehead .actions{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.pagehead .actions .row{display:flex;gap:8px}
 
 /* ---------- Primitives ---------- */
 .btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:9px;padding:8px 13px;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:7px;box-shadow:var(--shadow)}
@@ -80,13 +87,13 @@ a{color:inherit}
 .btn.danger{color:var(--bad);border-color:#f2c9c5;background:var(--bad-weak)}
 .btn.sm{padding:5px 9px;font-size:12px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.pri:disabled:hover{filter:none}
 
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
 .card .hd{padding:15px 18px;border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:10px}
 .card .hd h3{margin:0;font-size:15px;font-weight:650}
 .card .hd .desc{color:var(--muted);font-size:12.5px}
 .card .bd{padding:18px}
-.card .ft{padding:13px 18px;border-top:1px solid var(--line-2);display:flex;gap:8px;align-items:center;background:var(--surface-2);border-radius:0 0 var(--radius) var(--radius)}
 .grid2{display:grid;grid-template-columns:1fr 380px;gap:18px;align-items:start}
 @media(max-width:1000px){.grid2{grid-template-columns:1fr}}
 
@@ -121,7 +128,7 @@ tbody tr:hover{background:var(--surface-2)}
 .inp:focus{outline:2px solid var(--brand-weak);border-color:var(--brand)}
 textarea.inp{resize:vertical;min-height:60px}
 
-.seg{display:inline-flex;background:var(--line-2);border-radius:10px;padding:3px;gap:3px}
+.seg{display:inline-flex;background:var(--line-2);border-radius:10px;padding:3px;gap:3px;flex-wrap:wrap}
 .seg button{border:0;background:transparent;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted)}
 .seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
 
@@ -133,6 +140,15 @@ textarea.inp{resize:vertical;min-height:60px}
 .disclosure .inner{padding:18px;border-top:1px solid var(--line-2)}
 .tag-secondary{font-size:11px;color:var(--faint);font-weight:500;background:var(--line-2);padding:1px 8px;border-radius:999px}
 
+/* switch */
+.switch{position:relative;display:inline-block;width:36px;height:20px;vertical-align:middle;flex:none}
+.switch input{opacity:0;width:0;height:0;position:absolute}
+.switch .track{position:absolute;inset:0;background:var(--line);border-radius:999px;transition:.15s;cursor:pointer}
+.switch .track::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:999px;background:#fff;box-shadow:var(--shadow);transition:.15s}
+.switch input:checked + .track{background:var(--brand)}
+.switch input:checked + .track::after{transform:translateX(16px)}
+.switchrow{display:inline-flex;align-items:center;gap:9px;font-size:13px;cursor:pointer}
+
 /* preset picker */
 .presetrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .preset{border:1.5px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;position:relative;background:var(--surface)}
@@ -140,8 +156,8 @@ textarea.inp{resize:vertical;min-height:60px}
 .preset .nm{font-weight:650;font-size:14px;display:flex;align-items:center;gap:8px}
 .preset .ds{color:var(--muted);font-size:12px;margin-top:3px}
 .preset .mini{margin-top:11px;height:52px;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:9px}
-.preset.console .mini{background:var(--tw-primary);font-family:var(--tw-font-mono)}
-.preset.console .mini b{color:var(--tw-brand);font-size:11px}
+.preset.console .mini{background:var(--tw-primary);font-family:'JetBrains Mono',monospace}
+.preset.console .mini b{color:oklch(0.7 0.16 250);font-size:11px}
 .preset.console .mini i{color:var(--tw-text-muted);font-size:10px;font-style:normal}
 .preset.editorial .mini{background:#fbf7f0}
 .preset.editorial .mini b{color:#2a2320;font-family:'Fraunces',serif;font-size:14px}
@@ -149,18 +165,27 @@ textarea.inp{resize:vertical;min-height:60px}
 .preset .chk{position:absolute;top:11px;right:11px;width:18px;height:18px;border-radius:999px;border:1.5px solid var(--line);display:grid;place-items:center;color:#fff;font-size:11px}
 .preset.on .chk{background:var(--brand);border-color:var(--brand)}
 
-/* accent hue */
+/* hue controls */
 .hue-wrap{display:flex;align-items:center;gap:14px}
 .swatch{width:52px;height:52px;border-radius:12px;box-shadow:var(--shadow),inset 0 0 0 1px rgba(0,0,0,.06);flex:none}
 .hue-slider{flex:1}
-input[type=range].hue{width:100%;height:12px;border-radius:999px;-webkit-appearance:none;appearance:none;
-  background:linear-gradient(90deg,hsl(0 75% 55%),hsl(60 75% 55%),hsl(120 75% 55%),hsl(180 75% 55%),hsl(240 75% 55%),hsl(300 75% 55%),hsl(360 75% 55%))}
+input[type=range].hue{width:100%;height:12px;border-radius:999px;-webkit-appearance:none;appearance:none;background:#ccc}
 input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:999px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.35),inset 0 0 0 1px rgba(0,0,0,.08);cursor:pointer}
-.hue-val{font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--muted);min-width:70px;text-align:right}
+input[type=range].hue::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:999px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.35);cursor:pointer}
+.hue-val{font-variant-numeric:tabular-nums;font-size:12.5px;color:var(--muted);min-width:92px;text-align:right}
+.logotones{display:flex;border-radius:12px;overflow:hidden;flex:none;box-shadow:var(--shadow),inset 0 0 0 1px rgba(0,0,0,.06)}
+.logotones i{width:17px;height:52px;display:block}
 
-/* logo upload */
-.upload{border:1.5px dashed var(--line);border-radius:12px;padding:18px;display:flex;align-items:center;gap:14px;background:var(--surface-2)}
-.upload .lg{width:56px;height:56px;border-radius:10px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--faint);font-size:11px}
+/* logo/favicon upload */
+.uploads{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.uploads{grid-template-columns:1fr}}
+.upload{border:1.5px dashed var(--line);border-radius:12px;padding:14px;background:var(--surface-2)}
+.upload .top{display:flex;align-items:center;gap:12px}
+.upload .lg{width:48px;height:48px;border-radius:10px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--faint);font-size:10px;flex:none}
+.upload .lg.sq{border-radius:8px;width:40px;height:40px}
+.upload .t{font-weight:600;font-size:13px}
+.upload .h{color:var(--muted);font-size:11.5px;margin-top:2px}
+.upload button{margin-top:11px}
 
 /* font picker */
 .fontlist{display:flex;flex-direction:column;gap:8px}
@@ -168,47 +193,48 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
 .fontopt.on{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-weak)}
 .fontopt .name{font-size:17px}
 .fontopt .use{margin-left:auto;font-size:11px;color:var(--faint)}
-.fontopt .rdo{width:16px;height:16px;border-radius:999px;border:1.5px solid var(--line)}
+.fontopt .rdo{width:16px;height:16px;border-radius:999px;border:1.5px solid var(--line);flex:none}
 .fontopt.on .rdo{border-color:var(--brand);background:radial-gradient(circle at center,var(--brand) 0 5px,transparent 6px)}
 
+/* voice */
+.vfield{margin-bottom:14px}
+.vfield:last-child{margin-bottom:0}
+.vfield .vl{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.vfield .vl b{font-size:13px;font-weight:600}
+.vfield .vl code{font-size:11px;color:var(--faint);font-family:'JetBrains Mono',monospace}
+
 /* ---------- Live preview (tenant tokens) ----------
-   Console preset is driven by the real Tailwind design tokens from
-   configs/tailwind/theme.css (.dark block) — surfaces, text, and border
-   come straight from those OKLCH values, not hand-picked hexes. */
-:root{
-  /* console preset tokens — mirrored from configs/tailwind/theme.css .dark */
-  --tw-primary:oklch(0.17 0.006 250);      /* page bg  (--primary) */
-  --tw-surface:oklch(0.21 0.007 250);      /* cards    (--surface) */
-  --tw-text:oklch(0.95 0.004 250);         /* --text */
-  --tw-text-muted:oklch(0.72 0.008 250);   /* --text-muted */
-  --tw-border:oklch(0.3 0.008 250);        /* --border */
-  --tw-brand:oklch(0.7 0.16 250);          /* --brand-primary (dark) */
-  --tw-font-mono:'JetBrains Mono',ui-monospace,monospace; /* --font-mono-family */
-  --tw-font-display:'Space Grotesk',system-ui,sans-serif; /* --font-display-family */
-}
+   Accent + logo hues are derived with the real OKLCH ramp from
+   apps/web/src/utils/build-theme-style-block.ts — only the hue channel
+   tracks the slider; lightness/chroma are fixed per mode (that's what keeps
+   the WCAG contrast verified). Editorial previews in light mode, Console in
+   dark. These are the same values production renders, not an HSL stand-in. */
 .preview{
-  --p-radius:12px; --p-accent:#4f46e5; --p-font-head:'Inter'; --p-font-body:'Inter';
-  --p-bg:#ffffff; --p-surface:#ffffff; --p-text:#12141a; --p-muted:#5b6472; --p-line:#e5e7eb; --p-pad:16px;
+  --p-radius:6px; --p-pad:11px;
+  --p-accent:oklch(0.53 0.17 28); --p-accent-solid:oklch(0.55 0.17 28); --p-accent-contrast:oklch(0.99 0 0);
+  --p-logo-1:oklch(0.52 0.17 28); --p-logo-2:oklch(0.63 0.16 28); --p-logo-3:oklch(0.73 0.13 28);
+  --p-font-head:'Fraunces',serif; --p-font-body:'Inter',sans-serif;
+  --p-bg:#ffffff; --p-surface:#ffffff; --p-text:#12141a; --p-muted:#5b6472; --p-line:#e5e7eb;
 }
-.preview.console{
-  --p-bg:var(--tw-primary); --p-surface:var(--tw-surface); --p-text:var(--tw-text);
-  --p-muted:var(--tw-text-muted); --p-line:var(--tw-border);
-}
+.preview.console{--p-bg:var(--tw-primary);--p-surface:var(--tw-surface);--p-text:var(--tw-text);--p-muted:var(--tw-text-muted);--p-line:var(--tw-border)}
 .previewbox{background:var(--p-bg);border:1px solid var(--p-line);border-radius:14px;padding:18px;color:var(--p-text);transition:.2s}
+.pv-chrome{display:none;align-items:center;gap:9px;margin:-4px -4px 14px;padding:7px 10px;background:color-mix(in oklch,var(--p-surface),transparent 20%);border:1px solid var(--p-line);border-radius:9px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--p-muted)}
+.preview.chromeon .pv-chrome{display:flex}
+.pv-chrome .cd{display:flex;gap:5px}
+.pv-chrome .cd i{width:8px;height:8px;border-radius:999px;background:var(--p-line);display:block}
 .pv-brand{display:flex;align-items:center;gap:9px;margin-bottom:14px}
-.pv-mark{width:28px;height:28px;border-radius:calc(var(--p-radius) * .6);background:var(--p-accent);display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;font-family:var(--p-font-head)}
+.pv-mark{width:28px;height:28px;border-radius:calc(var(--p-radius) * .6);background:linear-gradient(135deg,var(--p-logo-1),var(--p-logo-3));display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;font-family:var(--p-font-head)}
 .pv-brand b{font-family:var(--p-font-head);font-size:16px;color:var(--p-text)}
 .pv-h{font-family:var(--p-font-head);font-size:20px;font-weight:600;margin:0 0 4px;color:var(--p-text)}
 .pv-p{font-family:var(--p-font-body);color:var(--p-muted);font-size:13px;margin:0 0 13px}
-.pv-btns{display:flex;gap:8px;flex-wrap:wrap}
+.pv-btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .pv-btn{font-family:var(--p-font-body);border-radius:var(--p-radius);padding:8px 14px;font-size:13px;font-weight:600;border:1px solid var(--p-accent);cursor:default}
-.pv-btn.solid{background:var(--p-accent);color:#fff}
+.pv-btn.solid{background:var(--p-accent-solid);color:var(--p-accent-contrast)}
 .pv-btn.out{background:transparent;color:var(--p-accent)}
 .pv-chip{font-family:var(--p-font-body);display:inline-flex;align-items:center;gap:6px;border:1px solid var(--p-line);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--p-muted)}
 .pv-card{margin-top:14px;background:var(--p-surface);border:1px solid var(--p-line);border-radius:var(--p-radius);padding:var(--p-pad)}
 .pv-card .k{font-family:var(--p-font-head);font-weight:600;color:var(--p-text);margin-bottom:3px}
 .pv-card .v{font-family:var(--p-font-body);color:var(--p-muted);font-size:12.5px}
-
 .preview-note{font-size:11.5px;color:var(--faint);margin-top:9px;display:flex;gap:6px;align-items:center}
 
 /* full page tier */
@@ -217,7 +243,7 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
 .device .bar .dots{display:flex;gap:5px}
 .device .bar .dots i{width:9px;height:9px;border-radius:999px;background:#d5d9e0;display:block}
 .device .bar .url{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:3px 10px;font-size:11.5px;color:var(--muted);text-align:center}
-.device .frame{height:320px;overflow:auto;padding:20px}
+.device .frame{height:300px;overflow:auto;padding:20px}
 .frame-placeholder{height:100%;display:grid;place-items:center;text-align:center;color:var(--faint);border:1.5px dashed var(--line);border-radius:10px;font-size:12.5px}
 
 /* wizard */
@@ -239,6 +265,7 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
 .logline .st{width:15px;text-align:center}
 .spin{width:13px;height:13px;border:2px solid var(--line);border-top-color:var(--brand);border-radius:999px;display:inline-block;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
+.wizard.disabled{opacity:.55;pointer-events:none;filter:grayscale(.3)}
 
 /* comment moderation */
 .cmt{display:flex;gap:12px;padding:15px 0;border-bottom:1px solid var(--line-2)}
@@ -250,7 +277,7 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
 .cmt .txt{margin:5px 0 9px;font-size:13.5px;color:var(--text)}
 .cmt .acts{display:flex;gap:7px}
 
-/* dns records */
+/* dns */
 .dns{font-family:'JetBrains Mono',monospace;font-size:12px}
 .dns td{padding:9px 12px}
 .copybtn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:2px 7px;font-size:11px;cursor:pointer;color:var(--muted)}
@@ -258,19 +285,15 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
 /* misc */
 .note{display:flex;gap:11px;padding:13px 15px;border-radius:10px;background:var(--brand-weak);border:1px solid #dfe3ff;font-size:13px;color:#3730a3}
 .note.warn{background:var(--warn-weak);border-color:#f0e0b8;color:#7a5600}
+.note.info{background:var(--surface-2);border-color:var(--line);color:var(--muted)}
 .note .i{font-size:15px;line-height:1.2}
-.divider{height:1px;background:var(--line-2);margin:18px 0}
 .kv{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line-2);font-size:13.5px}
-.kv:last-child{border-bottom:none}
-.kv .k{color:var(--muted)}
 .stack{display:flex;flex-direction:column;gap:16px}
 .rowflex{display:flex;align-items:center;gap:10px}
 .spacer{flex:1}
 .mut{color:var(--muted)}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f1115;color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:.25s;z-index:50;display:flex;gap:9px;align-items:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.empty{text-align:center;padding:40px 20px;color:var(--faint)}
-.empty .big{font-size:26px;margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -279,10 +302,10 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
   <aside class="side">
     <div class="brand">
       <div class="logo">V</div>
-      <div><b>Valstack</b><br><span>admin</span></div>
+      <div><b>Valstack</b><br><span>admin · admin.valstack.dev</span></div>
     </div>
 
-    <div class="switcher" title="Tenant switcher (multi-tenant ready — one tenant today)">
+    <div class="switcher" title="Tenant switcher — session-based (memberships), one tenant today">
       <div class="av">NF</div>
       <div class="meta"><b>Northwind Field Notes</b><small>tenant · northwind.dev</small></div>
       <div class="chev">⌄</div>
@@ -292,7 +315,7 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
       <div class="lbl">Platform</div>
       <nav class="nav">
         <a data-page="tenants"><span class="ic">▤</span> Tenants</a>
-        <a data-page="add-tenant"><span class="ic">＋</span> Add tenant</a>
+        <a data-page="add-tenant" class="soon"><span class="ic">＋</span> Add tenant <span class="pill">deferred</span></a>
       </nav>
     </div>
 
@@ -310,7 +333,7 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
       </nav>
     </div>
 
-    <div class="foot">Mock · not wired to data<br>Design brief: apps/admin</div>
+    <div class="foot">Mock v2 · corrected to real tokens<br>Brief: apps/admin product design</div>
   </aside>
 
   <!-- ============ MAIN ============ -->
@@ -329,11 +352,14 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
         <div class="pagehead">
           <div>
             <h1 class="h1">Tenants</h1>
-            <p class="sub">Every site on the platform. Platform-operator view — gated by the <code>admins</code> table.</p>
+            <p class="sub">Every site on the platform, read from the real <code>tenants</code> table. Gated by the <code>admins</code> row.</p>
           </div>
           <div class="actions">
-            <button class="btn" onclick="toast('Exported tenants.csv')">Export</button>
-            <button class="btn pri" onclick="go('add-tenant')">＋ Add tenant</button>
+            <div class="row">
+              <button class="btn" onclick="toast('Exported tenants.csv')">Export</button>
+              <button class="btn pri" disabled title="Deferred until Phase 8 (tenant resolution)">＋ Add tenant</button>
+            </div>
+            <div class="mut" style="font-size:11.5px">Provisioning is deferred — <a href="#" onclick="go('add-tenant');return false" style="color:var(--brand)">view wizard design ↗</a></div>
           </div>
         </div>
 
@@ -347,7 +373,7 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
           <table id="tenantTable">
             <thead><tr><th>Tenant</th><th>Plan</th><th>Status</th><th>Members</th><th>Created</th><th></th></tr></thead>
             <tbody>
-              <tr><td><div class="tname"><div class="tav" style="background:#4f46e5">NF</div><div><div>Northwind Field Notes</div><div class="rowsub">northwind.dev</div></div></div></td>
+              <tr><td><div class="tname"><div class="tav" style="background:oklch(0.55 0.17 250)">NF</div><div><div>Northwind Field Notes</div><div class="rowsub">northwind.dev</div></div></div></td>
                 <td><span class="badge b-plan growth">Growth</span></td>
                 <td><span class="badge b-ok"><span class="d"></span>Active</span></td><td>3</td><td>Apr 2, 2026</td>
                 <td><button class="btn sm ghost" onclick="go('look')">Manage →</button></td></tr>
@@ -355,7 +381,7 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
                 <td><span class="badge b-plan">Free</span></td>
                 <td><span class="badge b-ok"><span class="d"></span>Active</span></td><td>1</td><td>Jun 18, 2026</td>
                 <td><button class="btn sm ghost">Manage →</button></td></tr>
-              <tr><td><div class="tname"><div class="tav" style="background:#b45309">QP</div><div><div>Quarry Press</div><div class="rowsub">quarrypress.io</div></div></div></td>
+              <tr><td><div class="tname"><div class="tav" style="background:oklch(0.55 0.17 28)">QP</div><div><div>Quarry Press</div><div class="rowsub">quarrypress.io</div></div></div></td>
                 <td><span class="badge b-plan growth">Growth</span></td>
                 <td><span class="badge b-ok"><span class="d"></span>Active</span></td><td>5</td><td>Jul 30, 2026</td>
                 <td><button class="btn sm ghost">Manage →</button></td></tr>
@@ -366,30 +392,34 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
             </tbody>
           </table>
         </div>
+        <p class="mut" style="font-size:12px;margin-top:12px">The list ships from day one — active, not a placeholder. Today it renders a single real row; the extra rows here show the searchable multi-tenant design it's built for.</p>
       </section>
 
       <!-- ===== PLATFORM: ADD TENANT (WIZARD) ===== -->
       <section class="page" id="page-add-tenant">
         <div class="pagehead">
           <div>
-            <h1 class="h1">Add tenant</h1>
-            <p class="sub">Provisioning runs several slow, async steps — each shows pass/fail and is resumable if one fails partway.</p>
+            <h1 class="h1">Add tenant <span class="badge b-warn" style="vertical-align:middle"><span class="d"></span>deferred</span></h1>
+            <p class="sub">Design reference only. Provisioning drives the tenant-resolution layer, deliberately sequenced last (Phase 8).</p>
           </div>
         </div>
 
+        <div class="note warn" style="margin-bottom:16px"><span class="i">⚠</span><div><b>Not wired.</b> This wizard can't run today — provisioning depends on host→tenant resolution, per-tenant Sanity client factory, and tenant-addressable revalidation, which ship after the first tenant. Shown here so the final shape is designed, not discovered later.</div></div>
+
         <div class="card">
-          <div class="wizard">
+          <div class="wizard disabled" id="wizWrap">
             <div class="wizsteps" id="wizSteps">
               <div class="wizstep active" data-i="0"><div class="n">1</div><div><div class="t">Details</div><div class="s">Name, slug, plan</div></div></div>
               <div class="wizstep" data-i="1"><div class="n">2</div><div><div class="t">Sanity project</div><div class="s">Create + configure</div></div></div>
               <div class="wizstep" data-i="2"><div class="n">3</div><div><div class="t">Seed content</div><div class="s">Starter documents</div></div></div>
-              <div class="wizstep" data-i="3"><div class="n">4</div><div><div class="t">Deploy Studio</div><div class="s">Hosted Studio build</div></div></div>
+              <div class="wizstep" data-i="3"><div class="n">4</div><div><div class="t">Deploy Studio</div><div class="s">Vercel deploy</div></div></div>
               <div class="wizstep" data-i="4"><div class="n">5</div><div><div class="t">Registry rows</div><div class="s">tenants + memberships</div></div></div>
               <div class="wizstep" data-i="5"><div class="n">6</div><div><div class="t">Map domain</div><div class="s">DNS + verification</div></div></div>
             </div>
             <div class="wizbody" id="wizBody"><!-- injected --></div>
           </div>
         </div>
+        <div class="rowflex" style="margin-top:14px"><button class="btn" onclick="toggleWizard()" id="wizToggle">▶ Enable interactive walkthrough (mock)</button><span class="mut" style="font-size:12px">Lets you click through the provisioning states as a design demo.</span></div>
       </section>
 
       <!-- ===== TENANT: LOOK ===== -->
@@ -397,12 +427,12 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
         <div class="pagehead">
           <div>
             <h1 class="h1">Look</h1>
-            <p class="sub">Theme this site. Changes preview instantly below — nothing is live until you save.</p>
+            <p class="sub">Theme this site. Everything previews instantly below — nothing is live until you save.</p>
           </div>
-          <div class="actions">
-            <button class="btn" onclick="resetLook()">Reset</button>
-            <button class="btn pri" onclick="toast('Saved theme · redeploying preview')">Save changes</button>
-          </div>
+          <div class="actions"><div class="row">
+            <button class="btn" onclick="resetLook()">Reset to preset</button>
+            <button class="btn pri" onclick="toast('Saved to site_config · @blog/db')">Save changes</button>
+          </div></div>
         </div>
 
         <div class="grid2">
@@ -413,7 +443,7 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
               <div class="bd stack">
                 <div class="field">
                   <label>Preset</label>
-                  <div class="hint">The starting point nearly every tenant picks. Sets fonts, chrome, and voice defaults.</div>
+                  <div class="hint">The starting point nearly every tenant picks. Sets fonts, radius, density, chrome, and voice defaults.</div>
                   <div class="presetrow">
                     <div class="preset console" data-preset="CONSOLE" onclick="setPreset('CONSOLE')">
                       <div class="chk">✓</div>
@@ -432,21 +462,37 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
 
                 <div class="field">
                   <label>Accent hue</label>
-                  <div class="hint">Drag to set the accent color. The swatch and samples update live.</div>
+                  <div class="hint">Only the hue changes — lightness &amp; chroma are fixed (OKLCH), so contrast stays WCAG-verified.</div>
                   <div class="hue-wrap">
                     <div class="swatch" id="swatch"></div>
-                    <div class="hue-slider"><input type="range" min="0" max="360" value="255" class="hue" id="hue" oninput="setHue(this.value)"></div>
-                    <div class="hue-val" id="hueVal">hsl 255°</div>
+                    <div class="hue-slider"><input type="range" min="0" max="360" value="28" class="hue" id="hue" oninput="setHue(this.value)"></div>
+                    <div class="hue-val" id="hueVal">hue 28°</div>
                   </div>
                 </div>
 
                 <div class="field">
-                  <label>Logo</label>
-                  <div class="hint">Shown as the brand mark. SVG or PNG, transparent background.</div>
-                  <div class="upload">
-                    <div class="lg">no logo</div>
-                    <div style="flex:1"><div style="font-weight:600">Drop a file or browse</div><div class="mut" style="font-size:12px">Falls back to the polygon wordmark if empty.</div></div>
-                    <button class="btn sm" onclick="toast('File picker (mock)')">Upload</button>
+                  <label>Logo hue <span class="tag-secondary">optional</span></label>
+                  <div class="hint">Tints the wordmark's tonal steps (<code>--logo-1/2/3</code>). Follows the accent hue unless you set it.</div>
+                  <label class="switchrow"><span class="switch"><input type="checkbox" id="logoFollow" checked onchange="toggleLogoFollow(this.checked)"><span class="track"></span></span> Follow accent hue</label>
+                  <div class="hue-wrap" id="logoHueWrap" style="opacity:.5;pointer-events:none;margin-top:11px">
+                    <div class="logotones" id="logoTones"><i></i><i></i><i></i></div>
+                    <div class="hue-slider"><input type="range" min="0" max="360" value="28" class="hue" id="logoHue" oninput="setLogoHue(this.value)"></div>
+                    <div class="hue-val" id="logoHueVal">follows accent</div>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Brand images</label>
+                  <div class="hint">Stored in Vercel Blob — no on-the-fly transforms, so what you upload is what ships.</div>
+                  <div class="uploads">
+                    <div class="upload">
+                      <div class="top"><div class="lg">logo</div><div><div class="t">Logo</div><div class="h">SVG/PNG/JPEG/WebP · falls back to the polygon wordmark</div></div></div>
+                      <button class="btn sm" onclick="toast('File picker (mock)')">Upload logo</button>
+                    </div>
+                    <div class="upload">
+                      <div class="top"><div class="lg sq">◧</div><div><div class="t">Favicon</div><div class="h">Pre-cropped square — no serve-time resize</div></div></div>
+                      <button class="btn sm" onclick="toast('File picker (mock)')">Upload favicon</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -456,8 +502,13 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
               <summary>Advanced <span class="tag-secondary">optional</span><span class="tw">›</span></summary>
               <div class="inner stack">
                 <div class="field">
+                  <label>Terminal chrome</label>
+                  <div class="hint">Window frame + terminal prompt around the site — the single most defining console-vs-editorial switch. Defaults from your preset.</div>
+                  <label class="switchrow"><span class="switch"><input type="checkbox" id="chromeToggle" onchange="setChrome(this.checked)"><span class="track"></span></span> <span id="chromeLbl">Off</span></label>
+                </div>
+                <div class="field">
                   <label>Heading font</label>
-                  <div class="hint">Each option renders in its own typeface.</div>
+                  <div class="hint">Closed set of five (static <code>next/font</code> loaders). Each renders in its own face.</div>
                   <div class="fontlist" id="headFonts"></div>
                 </div>
                 <div class="field">
@@ -468,19 +519,18 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
                   <label>Radius scale</label>
                   <div class="hint">Corner roundness across every surface.</div>
                   <div class="seg" id="radiusSeg">
-                    <button data-r="4">Sharp</button>
-                    <button data-r="8">Soft</button>
-                    <button class="on" data-r="12">Round</button>
-                    <button data-r="18">Pill</button>
+                    <button data-r="6">Small</button>
+                    <button data-r="10">Medium</button>
+                    <button data-r="14">Large</button>
+                    <button data-r="20">Extra Large</button>
                   </div>
                 </div>
                 <div class="field">
                   <label>Density</label>
                   <div class="hint">Spacing and control size.</div>
                   <div class="seg" id="densitySeg">
-                    <button data-d="12">Compact</button>
-                    <button class="on" data-d="16">Cozy</button>
-                    <button data-d="22">Comfortable</button>
+                    <button data-d="16">Default</button>
+                    <button data-d="11">Compact</button>
                   </div>
                 </div>
               </div>
@@ -494,9 +544,10 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
               <div class="bd">
                 <div class="preview" id="preview">
                   <div class="previewbox">
+                    <div class="pv-chrome" id="pvChrome"><span class="cd"><i></i><i></i><i></i></span><span id="pvPrompt">~$ ./publish</span></div>
                     <div class="pv-brand"><div class="pv-mark" id="pvMark">N</div><b>Northwind</b></div>
                     <div class="pv-h">Reading the tide charts</div>
-                    <p class="pv-p">A short dispatch to show heading and body type, accent, and radius together.</p>
+                    <p class="pv-p">A short dispatch to show heading and body type, accent, logo tones, and radius together.</p>
                     <div class="pv-btns">
                       <span class="pv-btn solid">Subscribe</span>
                       <span class="pv-btn out">Read more</span>
@@ -504,7 +555,7 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
                     </div>
                     <div class="pv-card"><div class="k">Bookmark saved</div><div class="v">Tokens flow straight from the form above — no save, no reload.</div></div>
                   </div>
-                  <div class="preview-note">◔ Tier 1 · inline · driven by unsaved form state via CSS custom properties</div>
+                  <div class="preview-note">◔ Tier 1 · inline · unsaved form state → CSS custom properties, OKLCH ramp matching production</div>
                 </div>
               </div>
             </div>
@@ -532,45 +583,16 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
             <h1 class="h1">Voice</h1>
             <p class="sub">The words the site puts in its own mouth. Your preset already sets sensible defaults.</p>
           </div>
-          <div class="actions"><button class="btn pri" onclick="toast('Saved voice strings')">Save changes</button></div>
+          <div class="actions"><div class="row"><button class="btn pri" onclick="toast('Saved voiceOverrides · site_config')">Save changes</button></div></div>
         </div>
 
-        <div class="stack" style="max-width:760px">
-          <div class="note"><span class="i">◔</span><div><b>Nothing required here.</b> Your <b>Editorial</b> preset already determines the default voice. Most tenants never open the fields below.</div></div>
+        <div class="stack" style="max-width:820px">
+          <div class="note"><span class="i">◔</span><div><b>Nothing required here.</b> Your preset determines the default voice. Most tenants never open the fields below.</div></div>
+          <div class="note info"><span class="i">↩</span><div><b>Every field is an override.</b> Leave one blank to inherit the preset's voice-pack value (shown as the placeholder). Clearing a field reverts to the preset default — it does not set the string to empty.</div></div>
 
           <details class="disclosure" open>
-            <summary>Advanced — curated strings <span class="tag-secondary">optional</span><span class="tw">›</span></summary>
-            <div class="inner stack">
-              <div class="card">
-                <div class="hd"><h3>404 page</h3></div>
-                <div class="bd">
-                  <div class="field"><label>Heading</label><input class="inp" value="This page drifted off the map"></div>
-                  <div class="field"><label>Body</label><textarea class="inp">The link may be broken or the post retired. Head back to the front page.</textarea></div>
-                </div>
-              </div>
-              <div class="card">
-                <div class="hd"><h3>Terminal prompts</h3><span class="desc">Console-preset chrome</span></div>
-                <div class="bd">
-                  <div class="field"><label>Prompt symbol</label><input class="inp" value="~$"></div>
-                  <div class="field"><label>Publish confirmation</label><input class="inp" value="› post shipped to production"></div>
-                </div>
-              </div>
-              <div class="card">
-                <div class="hd"><h3>Bookmarks</h3></div>
-                <div class="bd">
-                  <div class="field"><label>Saved toast</label><input class="inp" value="Saved to your reading list"></div>
-                  <div class="field"><label>Removed toast</label><input class="inp" value="Removed from bookmarks"></div>
-                </div>
-              </div>
-              <div class="card">
-                <div class="hd"><h3>Empty states</h3></div>
-                <div class="bd">
-                  <div class="field"><label>No posts yet</label><input class="inp" value="Nothing published yet — check back soon."></div>
-                  <div class="field"><label>No search results</label><input class="inp" value="No dispatches match that search."></div>
-                </div>
-              </div>
-              <div class="preview-note">Plain text — no live-swatch treatment; text doesn't benefit from it the way color and font do.</div>
-            </div>
+            <summary>Advanced — 20 curated strings, 4 groups <span class="tag-secondary">optional</span><span class="tw">›</span></summary>
+            <div class="inner stack" id="voiceGroups"><!-- injected --></div>
           </details>
         </div>
       </section>
@@ -607,7 +629,7 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
 
       <!-- ===== TENANT: EMAIL ===== -->
       <section class="page" id="page-email">
-        <div class="pagehead"><div><h1 class="h1">Email</h1><p class="sub">Sending-domain verification for outgoing newsletter mail (Resend).</p></div></div>
+        <div class="pagehead"><div><h1 class="h1">Email</h1><p class="sub">Sending-domain verification for newsletter mail. One shared Resend account; each tenant's verified domain is config data.</p></div></div>
         <div class="stack" style="max-width:820px">
           <div class="card">
             <div class="hd"><h3>Sending domain</h3></div>
@@ -632,7 +654,7 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
       <section class="page" id="page-subscribers">
         <div class="pagehead">
           <div><h1 class="h1">Subscribers <span class="badge b-neutral" style="vertical-align:middle">design only</span></h1><p class="sub">Newsletter list from <code>@blog/db</code>. Shape designed now; built later.</p></div>
-          <div class="actions"><button class="btn" onclick="toast('Exported subscribers.csv')">Export CSV</button></div>
+          <div class="actions"><div class="row"><button class="btn" onclick="toast('Exported subscribers.csv')">Export CSV</button></div></div>
         </div>
         <div class="rowflex" style="margin-bottom:14px">
           <div class="searchbar"><span class="ic">⌕</span><input placeholder="Search email…"></div>
@@ -682,17 +704,17 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
 
       <!-- ===== TENANT: TEAM ===== -->
       <section class="page" id="page-team">
-        <div class="pagehead"><div><h1 class="h1">Team</h1><p class="sub">Manage this tenant's memberships — invite, change role, revoke.</p></div></div>
+        <div class="pagehead"><div><h1 class="h1">Team</h1><p class="sub">Manage this tenant's memberships — invite, change role, revoke. Real from day one because <code>memberships</code> exists.</p></div></div>
         <div class="grid2">
           <div class="card">
             <div class="hd"><h3>Members</h3><span class="desc">3</span></div>
             <table>
               <tbody>
-                <tr><td><div class="tname"><div class="tav" style="background:#4f46e5;border-radius:999px">VO</div><div><div>Val Ovinnikov</div><div class="rowsub">val.ovinnikov@icloud.com</div></div></div></td>
+                <tr><td><div class="tname"><div class="tav" style="background:oklch(0.55 0.17 250);border-radius:999px">VO</div><div><div>Val Ovinnikov</div><div class="rowsub">val.ovinnikov@icloud.com</div></div></div></td>
                   <td style="text-align:right"><select class="inp" style="width:auto;display:inline-block"><option selected>OWNER</option><option>EDITOR</option><option>READER</option></select></td></tr>
                 <tr><td><div class="tname"><div class="tav" style="background:#0e7490;border-radius:999px">JO</div><div><div>Jayne Okonkwo</div><div class="rowsub">j.okonkwo@fastmail.com</div></div></div></td>
                   <td style="text-align:right"><select class="inp" style="width:auto;display:inline-block"><option>OWNER</option><option selected>EDITOR</option><option>READER</option></select> <button class="btn sm ghost danger">Revoke</button></td></tr>
-                <tr><td><div class="tname"><div class="tav" style="background:#b45309;border-radius:999px">MD</div><div><div>Mira Delacroix</div><div class="rowsub">mira.delacroix@hey.com</div></div></div></td>
+                <tr><td><div class="tname"><div class="tav" style="background:oklch(0.55 0.17 28);border-radius:999px">MD</div><div><div>Mira Delacroix</div><div class="rowsub">mira.delacroix@hey.com</div></div></div></td>
                   <td style="text-align:right"><select class="inp" style="width:auto;display:inline-block"><option>OWNER</option><option>EDITOR</option><option selected>READER</option></select> <button class="btn sm ghost danger">Revoke</button></td></tr>
               </tbody>
             </table>
@@ -700,7 +722,7 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
           <div class="card">
             <div class="hd"><h3>Invite member</h3></div>
             <div class="bd">
-              <div class="field"><label>Email</label><input class="inp" placeholder="name@example.com"></div>
+              <div class="field"><label>Email</label><input class="inp" placeholder="name@example.com"><div class="hint">Validated with Zod <code>.email()</code> server-side.</div></div>
               <div class="field"><label>Role</label><select class="inp"><option>OWNER</option><option selected>EDITOR</option><option>READER</option></select></div>
               <button class="btn pri" style="width:100%" onclick="toast('Invitation sent')">Send invite</button>
             </div>
@@ -710,7 +732,7 @@ input[type=range].hue::-webkit-slider-thumb{-webkit-appearance:none;width:20px;h
 
       <!-- ===== TENANT: DANGER ZONE ===== -->
       <section class="page" id="page-danger">
-        <div class="pagehead"><div><h1 class="h1">Danger zone</h1><p class="sub">Irreversible actions. Follow the same type-to-confirm pattern as the account delete flow.</p></div></div>
+        <div class="pagehead"><div><h1 class="h1">Danger zone</h1><p class="sub">Irreversible actions. Same type-to-confirm pattern as the account delete flow.</p></div></div>
         <div class="stack" style="max-width:720px">
           <div class="card">
             <div class="hd"><h3>Export all data</h3></div>
@@ -768,68 +790,175 @@ function toast(m){const t=document.getElementById('toast');document.getElementBy
 /* ---------- tenants filter ---------- */
 function filterTenants(q){q=q.toLowerCase();document.querySelectorAll('#tenantTable tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none';});}
 
-/* ---------- LOOK: live theming ---------- */
-const FONTS_HEAD=[['Fraunces','Fraunces, serif'],['Newsreader','Newsreader, serif'],['Space Grotesk','Space Grotesk, sans-serif'],['Inter','Inter, sans-serif']];
-const FONTS_BODY=[['Inter','Inter, sans-serif'],['Source Serif 4','Source Serif 4, serif'],['IBM Plex Mono','IBM Plex Mono, monospace'],['JetBrains Mono','JetBrains Mono, monospace']];
-const state={preset:'EDITORIAL',hue:255,radius:12,density:16,headFont:'Fraunces, serif',bodyFont:'Source Serif 4, serif'};
+/* ============================================================
+   LOOK — theming with the REAL OKLCH ramp
+   (apps/web/src/utils/build-theme-style-block.ts). Only hue
+   tracks the slider; L/C are fixed per mode.
+   ============================================================ */
+const FONTS=[
+  ['Space Grotesk','"Space Grotesk", system-ui, sans-serif'],
+  ['Newsreader','Newsreader, Georgia, serif'],
+  ['JetBrains Mono','"JetBrains Mono", ui-monospace, monospace'],
+  ['Fraunces','Fraunces, serif'],
+  ['Inter','Inter, sans-serif']
+];
+// PRESET_REGISTRY defaults
+const PRESET={
+  CONSOLE:  {hue:250, head:'"Space Grotesk", system-ui, sans-serif', body:'Newsreader, Georgia, serif', radius:10, density:16, chrome:true,  dark:true },
+  EDITORIAL:{hue:28,  head:'Fraunces, serif',                        body:'Inter, sans-serif',          radius:6,  density:11, chrome:false, dark:false}
+};
+const state={preset:'EDITORIAL',hue:28,logoHue:28,logoFollow:true,radius:6,density:11,
+  headFont:'Fraunces, serif',bodyFont:'Inter, sans-serif',chrome:false,dark:false};
 
-function buildFonts(id,list,which){
+/* --- OKLCH token ramps (exact values from the brief) --- */
+function accentTokens(h,dark){
+  return dark
+    ? {primary:`oklch(0.7 0.16 ${h})`,  solid:`oklch(0.7 0.16 ${h})`,  contrast:`oklch(0.16 0.006 250)`}
+    : {primary:`oklch(0.53 0.17 ${h})`, solid:`oklch(0.55 0.17 ${h})`, contrast:`oklch(0.99 0 0)`};
+}
+function logoTokens(h,dark){
+  return dark
+    ? {l1:`oklch(0.58 0.17 ${h})`, l2:`oklch(0.68 0.16 ${h})`, l3:`oklch(0.8 0.14 ${h})`}
+    : {l1:`oklch(0.52 0.17 ${h})`, l2:`oklch(0.63 0.16 ${h})`, l3:`oklch(0.73 0.13 ${h})`};
+}
+/* slider track built from oklch(0.53 0.17 <h>) — matches what it selects */
+function hueGradient(l,c){let s=[];for(let h=0;h<=360;h+=20)s.push(`oklch(${l} ${c} ${h})`);return `linear-gradient(90deg,${s.join(',')})`;}
+
+function buildFonts(id,which){
   const box=document.getElementById(id);box.innerHTML='';
-  list.forEach(([name,stack],i)=>{
+  const sel=which==='head'?state.headFont:state.bodyFont;
+  FONTS.forEach(([name,stack])=>{
     const d=document.createElement('div');
-    d.className='fontopt'+((which==='head'?i===0:i===1)?' on':'');
+    d.className='fontopt'+(stack===sel?' on':'');
     d.innerHTML='<div class="rdo"></div><div class="name" style="font-family:'+stack+'">'+name+'</div><span class="use">'+(which==='head'?'Headings':'Body')+'</span>';
-    d.onclick=()=>{box.querySelectorAll('.fontopt').forEach(x=>x.classList.remove('on'));d.classList.add('on');
-      if(which==='head')state.headFont=stack; else state.bodyFont=stack; applyPreview();};
+    d.onclick=()=>{if(which==='head')state.headFont=stack;else state.bodyFont=stack;buildFonts(id,which);applyPreview();};
     box.appendChild(d);
   });
 }
-function hueColor(h,l){return 'hsl('+h+' 72% '+(l||55)+'%)';}
-function setHue(v){state.hue=+v;document.getElementById('hueVal').textContent='hsl '+v+'°';document.getElementById('swatch').style.background=hueColor(v);applyPreview();}
-function setPreset(p){
-  state.preset=p;
-  document.querySelectorAll('.preset').forEach(el=>el.classList.toggle('on',el.dataset.preset===p));
-  // preset nudges defaults, like the real bundle
-  if(p==='CONSOLE'){state.headFont='JetBrains Mono, monospace';state.bodyFont='JetBrains Mono, monospace';state.radius=4;
-    selectSeg('radiusSeg','r',4);
-    setHue(250); // brand-primary hue from theme.css
-  } else {state.headFont='Fraunces, serif';state.bodyFont='Source Serif 4, serif';state.radius=12;selectSeg('radiusSeg','r',12);setHue(255);}
+function setHue(v){
+  state.hue=+v;document.getElementById('hueVal').textContent='hue '+v+'°';
+  const a=accentTokens(state.hue,state.dark);
+  document.getElementById('swatch').style.background=a.primary;
+  if(state.logoFollow){state.logoHue=state.hue;document.getElementById('logoHue').value=v;updateLogoUI();}
   applyPreview();
 }
-function selectSeg(segId,attr,val){
-  const seg=document.getElementById(segId);
-  seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset[attr]===+val));
+function setLogoHue(v){state.logoHue=+v;document.getElementById('logoHueVal').textContent='hue '+v+'°';updateLogoUI();applyPreview();}
+function toggleLogoFollow(on){
+  state.logoFollow=on;
+  const wrap=document.getElementById('logoHueWrap');
+  wrap.style.opacity=on?'.5':'1';wrap.style.pointerEvents=on?'none':'auto';
+  if(on){state.logoHue=state.hue;document.getElementById('logoHue').value=state.hue;document.getElementById('logoHueVal').textContent='follows accent';}
+  else{document.getElementById('logoHueVal').textContent='hue '+state.logoHue+'°';}
+  updateLogoUI();applyPreview();
+}
+function updateLogoUI(){
+  const t=logoTokens(state.logoHue,state.dark);
+  const tones=document.getElementById('logoTones').children;
+  tones[0].style.background=t.l1;tones[1].style.background=t.l2;tones[2].style.background=t.l3;
+}
+function setChrome(on){state.chrome=on;document.getElementById('chromeLbl').textContent=on?'On':'Off';applyPreview();}
+function selectSeg(segId,attr,val){document.getElementById(segId).querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset[attr]===+val));}
+
+function setPreset(p){
+  const d=PRESET[p];state.preset=p;state.dark=d.dark;
+  state.hue=d.hue;state.headFont=d.head;state.bodyFont=d.body;state.radius=d.radius;state.density=d.density;state.chrome=d.chrome;
+  if(state.logoFollow)state.logoHue=d.hue;
+  document.querySelectorAll('.preset').forEach(el=>el.classList.toggle('on',el.dataset.preset===p));
+  document.getElementById('hue').value=d.hue;
+  document.getElementById('logoHue').value=state.logoHue;
+  document.getElementById('chromeToggle').checked=d.chrome;document.getElementById('chromeLbl').textContent=d.chrome?'On':'Off';
+  selectSeg('radiusSeg','r',d.radius);selectSeg('densitySeg','d',d.density);
+  buildFonts('headFonts','head');buildFonts('bodyFonts','body');
+  setHue(d.hue); // recomputes swatch + logo + preview
 }
 function applyPreview(){
   const pv=document.getElementById('preview');
-  pv.classList.toggle('console',state.preset==='CONSOLE');
-  pv.style.setProperty('--p-accent',hueColor(state.hue));
+  pv.classList.toggle('console',state.dark);
+  pv.classList.toggle('chromeon',state.chrome);
+  const a=accentTokens(state.hue,state.dark), l=logoTokens(state.logoHue,state.dark);
+  pv.style.setProperty('--p-accent',a.primary);
+  pv.style.setProperty('--p-accent-solid',a.solid);
+  pv.style.setProperty('--p-accent-contrast',a.contrast);
+  pv.style.setProperty('--p-logo-1',l.l1);pv.style.setProperty('--p-logo-2',l.l2);pv.style.setProperty('--p-logo-3',l.l3);
   pv.style.setProperty('--p-radius',state.radius+'px');
+  pv.style.setProperty('--p-pad',state.density+'px');
   pv.style.setProperty('--p-font-head',state.headFont);
   pv.style.setProperty('--p-font-body',state.bodyFont);
-  pv.style.setProperty('--p-pad',state.density+'px');
+  document.getElementById('pvPrompt').textContent = state.dark ? '~$ ./publish' : 'guest@northwind ~ %';
 }
 document.getElementById('radiusSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{selectSeg('radiusSeg','r',b.dataset.r);state.radius=+b.dataset.r;applyPreview();});
 document.getElementById('densitySeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{selectSeg('densitySeg','d',b.dataset.d);state.density=+b.dataset.d;applyPreview();});
-function resetLook(){setPreset('EDITORIAL');setHue(255);selectSeg('densitySeg','d',16);state.density=16;applyPreview();toast('Reset to preset defaults');}
+function resetLook(){setPreset(state.preset);toast('Reset to '+state.preset.toLowerCase()+' defaults');}
+
+/* ---------- VOICE (20 curated fields, 4 groups) ---------- */
+const VOICE=[
+  ['404 page',[
+    ['notFoundMetaTitle','Meta title','Page not found'],
+    ['notFoundMetaDescription','Meta description',"The page you're looking for doesn't exist."],
+    ['notFoundCommandNotFound','Command-not-found line','command not found: {path}'],
+    ['notFoundDescription','Description','This page drifted off the map.'],
+    ['notFoundReturnHome','Return-home link','cd ~  (return home)']
+  ]],
+  ['Terminal prompts',[
+    ['terminalPromptHost','Prompt host','guest@northwind'],
+    ['authPromptCommandSignIn','Sign-in command','auth login'],
+    ['authPromptCommandAccount','Account command','auth whoami'],
+    ['bookmarksPromptCommand','Bookmarks command','bookmarks ls'],
+    ['accountPrivacyPromptCommand','Privacy command','account privacy'],
+    ['accountNewsletterPromptCommand','Newsletter command','account newsletter'],
+    ['accountIdentityPromptCommand','Identity command','account identity']
+  ]],
+  ['Bookmarks',[
+    ['bookmarkToastSavedMessage','Saved toast','Saved to your reading list'],
+    ['bookmarkToastRemovedMessage','Removed toast','Removed from bookmarks']
+  ]],
+  ['Empty states',[
+    ['blogListEmpty','Blog list','Nothing published yet — check back soon.'],
+    ['categoryEmpty','Category','No posts in this category yet.'],
+    ['tagEmpty','Tag','No posts with this tag yet.'],
+    ['authorEmpty','Author',"This author hasn't published yet."],
+    ['topicsEmpty','Topics','No topics to show yet.'],
+    ['bookmarksEmpty','Bookmarks',"You haven't bookmarked anything yet."]
+  ]]
+];
+function buildVoice(){
+  const root=document.getElementById('voiceGroups');root.innerHTML='';
+  VOICE.forEach(([group,fields])=>{
+    const card=document.createElement('div');card.className='card';
+    let inner='<div class="hd"><h3>'+group+'</h3><span class="desc">'+fields.length+' field'+(fields.length>1?'s':'')+'</span></div><div class="bd">';
+    fields.forEach(([key,label,ph])=>{
+      const long=ph.length>40;
+      inner+='<div class="vfield"><div class="vl"><b>'+label+'</b><code>'+key+'</code></div>'+
+        (long?'<textarea class="inp" placeholder="'+ph.replace(/"/g,'&quot;')+'"></textarea>'
+             :'<input class="inp" placeholder="'+ph.replace(/"/g,'&quot;')+'">')+'</div>';
+    });
+    inner+='</div>';card.innerHTML=inner;root.appendChild(card);
+  });
+}
 
 /* ---------- DANGER ---------- */
-function checkDel(v){const b=document.getElementById('delBtn');const ok=v.trim()==='northwind.dev';b.disabled=!ok;}
+function checkDel(v){document.getElementById('delBtn').disabled=v.trim()!=='northwind.dev';}
 document.getElementById('delBtn').onclick=()=>toast('Deletion scheduled (mock)');
 
 /* ---------- COMMENTS ---------- */
 function modAct(btn,label){const cmt=btn.closest('.cmt');cmt.style.opacity=.35;setTimeout(()=>cmt.remove(),200);toast(label);}
 
-/* ---------- WIZARD ---------- */
+/* ---------- WIZARD (design reference; interactive walkthrough opt-in) ---------- */
 const WIZ=[
   {t:'Details',logs:null},
   {t:'Create Sanity project',logs:['Requesting project slot','Configuring dataset "production"','Applying CORS + tokens']},
   {t:'Seed content',logs:['Seeding settings singletons','Adding starter posts','Wiring initial navigation']},
-  {t:'Deploy Studio',logs:['Building Studio bundle','Uploading to hosted Studio','Warming CDN']},
+  {t:'Deploy Studio',logs:['Building Studio bundle','Deploying to Vercel','Warming CDN']},
   {t:'Insert registry rows',logs:['INSERT tenants','INSERT memberships (OWNER)','Linking auth session domain']},
   {t:'Map domain',logs:['Creating DNS records','Requesting certificate','Waiting for verification']}
 ];
-let wizIdx=0, wizStatus=Array(6).fill('idle'); wizStatus[0]='active';
+let wizIdx=0, wizStatus=Array(6).fill('idle'); wizStatus[0]='active'; let wizEnabled=false;
+function toggleWizard(){
+  wizEnabled=!wizEnabled;
+  document.getElementById('wizWrap').classList.toggle('disabled',!wizEnabled);
+  document.getElementById('wizToggle').textContent=wizEnabled?'■ Disable walkthrough':'▶ Enable interactive walkthrough (mock)';
+  renderWizard();
+}
 function renderSteps(){
   document.querySelectorAll('#wizSteps .wizstep').forEach((el,i)=>{
     el.className='wizstep'+(wizStatus[i]==='done'?' done':wizStatus[i]==='running'?' running':wizStatus[i]==='failed'?' failed':i===wizIdx?' active':'');
@@ -840,16 +969,15 @@ function renderWizard(){
   renderSteps();
   const b=document.getElementById('wizBody');
   if(wizIdx===0){
-    b.innerHTML=`<h3 style="margin:0 0 4px">Tenant details</h3><p class="mut" style="margin:0 0 18px">The fast part. Everything after this runs automatically.</p>
-      <div class="field"><label>Tenant name</label><input class="inp" id="wzName" value="Cedar & Salt"></div>
-      <div class="field"><label>Slug / subdomain</label><input class="inp" value="cedar-salt"><div class="hint">cedar-salt.valstack.dev — a custom domain can be mapped in step 6.</div></div>
+    b.innerHTML=`<h3 style="margin:0 0 4px">Tenant details</h3><p class="mut" style="margin:0 0 18px">The fast part. Everything after this runs automatically, each step resumable on failure.</p>
+      <div class="field"><label>Tenant name</label><input class="inp" value="Cedar & Salt"></div>
+      <div class="field"><label>Slug / subdomain</label><input class="inp" value="cedar-salt"><div class="hint">cedar-salt.valstack.dev — Zod <code>/^[a-z0-9-]+$/</code> + uniqueness check against <code>tenants</code>.</div></div>
       <div class="field"><label>Plan</label><div class="seg"><button class="on">Free</button><button>Growth</button></div></div>
       <div class="field"><label>Owner email</label><input class="inp" value="editor@cedarandsalt.co"><div class="hint">Seeds the first memberships row as OWNER.</div></div>
       <div class="rowflex" style="margin-top:22px"><div class="spacer"></div><button class="btn pri" onclick="startProvision()">Begin provisioning →</button></div>`;
     return;
   }
-  const step=WIZ[wizIdx];
-  const st=wizStatus[wizIdx];
+  const step=WIZ[wizIdx];const st=wizStatus[wizIdx];
   let logsHtml=(step.logs||[]).map((l,i)=>{
     let icon='<span class="st mut">○</span>';
     if(st==='running') icon = i<runningLog ? '<span class="st" style="color:var(--ok)">✓</span>' : i===runningLog ? '<span class="st"><span class="spin"></span></span>' : '<span class="st mut">○</span>';
@@ -859,7 +987,7 @@ function renderWizard(){
   }).join('');
   b.innerHTML=`<div class="rowflex" style="margin-bottom:4px"><h3 style="margin:0">Step ${wizIdx+1} · ${step.t}</h3>
       ${st==='done'?'<span class="badge b-ok" style="margin-left:auto"><span class="d"></span>Done</span>':st==='failed'?'<span class="badge b-bad" style="margin-left:auto"><span class="d"></span>Failed</span>':st==='running'?'<span class="badge b-warn" style="margin-left:auto"><span class="d"></span>Running…</span>':''}</div>
-    <p class="mut" style="margin:0 0 6px">Slow, asynchronous — progress is tracked per sub-task so a failure is resumable, not start-over.</p>
+    <p class="mut" style="margin:0 0 6px">Slow, asynchronous — progress tracked per sub-task so a failure is resumable, not start-over.</p>
     <div class="steplog">${logsHtml}</div>
     <div class="rowflex" style="margin-top:22px">
       ${wizIdx>0&&st!=='running'?'<button class="btn" onclick="wizBack()">← Back</button>':''}
@@ -879,23 +1007,25 @@ function runStep(){
     runningLog++;
     if(runningLog>=step.logs.length){
       clearInterval(provisionTimer);
-      // step 4 (deploy) fails once to demo resumability, unless already retried
-      if(wizIdx===3 && !step._retried){ step._retried=true; wizStatus[wizIdx]='failed'; runningLog=step.logs.length-1; renderWizard();
-        setTimeout(()=>toast('Studio deploy failed — retry this step (earlier steps kept)'),300); return; }
+      if(wizIdx===3 && !step._retried){step._retried=true;wizStatus[wizIdx]='failed';runningLog=step.logs.length-1;renderWizard();
+        setTimeout(()=>toast('Studio deploy failed — retry this step (earlier steps kept)'),300);return;}
       wizStatus[wizIdx]='done';renderWizard();
     } else renderWizard();
   },700);
 }
 function nextStep(){wizIdx++;wizStatus[wizIdx]='idle';runningLog=0;renderWizard();}
 function wizBack(){if(wizIdx>0){wizIdx--;renderWizard();}}
-function finishWizard(){toast('Cedar & Salt provisioned');go('tenants');
-  // reset for next time
+function finishWizard(){toast('Cedar & Salt provisioned (mock)');go('tenants');
   wizIdx=0;wizStatus=Array(6).fill('idle');wizStatus[0]='active';WIZ[3]._retried=false;}
 
 /* ---------- init ---------- */
-buildFonts('headFonts',FONTS_HEAD,'head');
-buildFonts('bodyFonts',FONTS_BODY,'body');
-setHue(255);
+document.getElementById('hue').style.background=hueGradient(0.53,0.17);
+document.getElementById('logoHue').style.background=hueGradient(0.63,0.16);
+buildFonts('headFonts','head');
+buildFonts('bodyFonts','body');
+buildVoice();
+setHue(28);
+updateLogoUI();
 applyPreview();
 </script>
 </body>

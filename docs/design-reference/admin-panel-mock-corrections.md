@@ -179,6 +179,59 @@ decision recorded in the product-design doc.
   not linking to a working wizard. Keep the wizard screens in the mock as
   design reference; just make the entry state honest.
 
+---
+
+# Round 2 — findings against the revised mock (v2)
+
+Items 1–12 above are **applied and verified correct**: HSL is fully gone, the
+OKLCH ramps and logo tokens match production exactly, radius/density/font sets
+and `PRESET_REGISTRY` defaults all match, the 20 voice fields are exact in name
+and grouping, favicon and logo-hue controls exist, and add-tenant is disabled
+with a stated reason while the tenants list ships for real. What follows is new.
+
+## 13. Dark mode is wired as a property of the preset — it isn't
+
+`state.dark` is assigned in exactly one place: `state.dark = d.dark` on preset
+change, from `PRESET = { CONSOLE: {…dark:true}, EDITORIAL: {…dark:false} }`.
+There is no independent control. So picking Console forces a dark preview and
+picking Editorial forces a light one, and **a tenant can never preview the
+other mode**.
+
+`TThemeTokens` has no `dark` field, and it shouldn't: dark mode is a _viewer_
+preference, not tenant configuration. `build-theme-style-block.ts` emits both a
+`:root {}` and a `.dark {}` block for whichever preset is chosen — precisely
+because both modes must work for every preset. An Editorial tenant's readers
+absolutely can be in dark mode.
+
+**Fix:** remove `dark` from the `PRESET` object entirely and add a
+light/dark toggle on the preview panel itself, independent of preset. It
+controls which of the two ramps the preview renders — it is a property of the
+_preview_, not of the tenant's saved config, and should read that way in the UI
+(a preview affordance, not a settings field).
+
+## 14. The preview prompt keys off dark mode instead of chrome
+
+`pvPrompt` switches between `'~$ ./publish'` and `'guest@northwind ~ %'` based
+on `state.dark`. Terminal voice is a function of `chromeOn` (and the voice
+pack), not of the color scheme. Key it off `state.chrome`. This is the same
+conflation as §13, just surfacing in a second place — worth fixing together.
+
+## 15. Sidebar milestone badges are inconsistent
+
+Subscribers and Comments carry a "later" badge; Domain, Email, Team, and Danger
+zone carry none — which reads as "those four ship now." Per the product-design
+doc, **only Look and Voice ship this milestone**; all six others are
+design-now/build-later. Badge all six the same way, or badge none of them and
+rely on the two "this milestone" badges to carry the distinction.
+
+## 16. Two ramp tokens are unused (minor — note, don't necessarily fix)
+
+`accentTokens()` returns `primary`/`solid`/`contrast` but omits
+`--brand-primary-hover` and `--brand-primary-muted` (see §1's table for values).
+Harmless while the preview has no hover states. If the inline preview samples
+gain hover or muted-surface treatments, add them then — a preview whose hover
+color is invented would reintroduce exactly the §1 problem.
+
 ## Out of scope for this revision
 
 Don't restructure the navigation, don't redesign the two-tier live preview
