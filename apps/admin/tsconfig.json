@@ -17,10 +17,12 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    // @blog/ui's wildcard subpath export ("./*": "./src/*", aliased above)
-    // type-checks @blog/ui *source* directly, so its ambient module
-    // declarations (e.g. *.svg types) must be in this program too.
-    "../../packages/ui/src/**/*.d.ts"
+    // TS only loads global ambient .d.ts files via a program's own include,
+    // never transitively through import resolution — so any dependency's
+    // ambient declarations (e.g. @blog/ui's *.svg types, @blog/auth's
+    // next-auth module augmentation) must be listed here explicitly.
+    "../../packages/ui/src/**/*.d.ts",
+    "../../packages/auth/src/**/*.d.ts"
   ],
   "exclude": ["node_modules"]
 }
