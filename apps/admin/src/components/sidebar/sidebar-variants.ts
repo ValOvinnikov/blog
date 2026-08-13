@@ -3,7 +3,10 @@ import { tv } from 'tailwind-variants';
 export const sidebarVariants = tv({
   slots: {
     root: [
-      'w-full shrink-0 border-b border-border bg-secondary',
+      // Deliberate dark island: the rail stays dark against an otherwise
+      // light admin panel, so it carries its own flipped token context
+      // rather than the app-wide `.dark` class.
+      'dark w-full shrink-0 border-b border-border bg-primary',
       'md:min-h-dvh md:w-64 md:border-r md:border-b-0',
       'flex flex-col gap-1 px-3 py-4',
     ],
