@@ -30,17 +30,41 @@ When invoked, before writing any code:
    in those documents, not here — work from the ones your dispatch points at.
    If the task needs a decision none of them settles, report the gap; do not
    invent one.
-2. **Where a mock and a written correction disagree, the correction wins on
+2. **Read all three of these before any visual work, whether or not your
+   dispatch names them.** They are this app's governing design set, and the
+   first of them says in its own opening section that it is not sufficient
+   alone:
+   - `docs/superpowers/specs/2026-08-13-admin-panel-product-design.md` — what
+     each page is for and why it behaves as it does. Deliberately states no
+     concrete token values.
+   - `docs/design-reference/admin-panel-mock.html` — the complete interactive
+     mock. Its information architecture, layout, and interaction model are
+     approved; treat it as the visual starting point.
+   - `docs/design-reference/admin-panel-mock-corrections.md` — verified
+     mismatches between that mock and this repo's real tokens and content
+     model, each with the correct value and its source file.
+
+   A surface built from the product doc alone will look like a wireframe: the
+   mock is where the icons, badges, dividers, and brand mark live, and an
+   implementer who skips it ships a plain-text approximation that passes every
+   acceptance criterion. That has already happened once.
+
+3. **Where a mock and a written correction disagree, the correction wins on
    concrete values and the mock wins on layout and interaction intent.** Never
    lift a colour, radius, spacing, or font value straight out of a mock — mocks
    in this repo have shipped with invented token ramps that do not match the
    real theme.
-3. Read `packages/ui/COMPONENTS.md` before building any component — it is the
+
+   The corrections brief also lists defects the mock still contains. A mock
+   detail that a correction flags as wrong is **not** a spec to reproduce —
+   check the brief before treating anything you see as intended.
+
+4. Read `packages/ui/COMPONENTS.md` before building any component — it is the
    generated index of every `@blog/ui` component, its props, and its compound
    slots. `SegmentedControl`, `TextInput`/`Textarea`, `Button`/`IconButton`,
    `PopoverMenu`, `SettingRow`, `StatusBadge`, `ActionList`, `Alert`,
    `Spinner`, and `Toast` already exist. Do not rebuild them.
-4. If a `db` or `config` change your work depends on (a new query, a constant,
+5. If a `db` or `config` change your work depends on (a new query, a constant,
    an alias) is supposed to have landed already, verify it before writing code
    against it.
 
