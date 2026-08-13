@@ -15,6 +15,8 @@ import ChevronRightComponent from '@blog/ui/assets/icons/chevron-right.svg';
 import ChevronRightUrl from '@blog/ui/assets/icons/chevron-right.svg?url';
 import CloseComponent from '@blog/ui/assets/icons/close.svg';
 import CloseUrl from '@blog/ui/assets/icons/close.svg?url';
+import CommentComponent from '@blog/ui/assets/icons/comment.svg';
+import CommentUrl from '@blog/ui/assets/icons/comment.svg?url';
 import CopyComponent from '@blog/ui/assets/icons/copy.svg';
 import CopyUrl from '@blog/ui/assets/icons/copy.svg?url';
 import ExternalLinkComponent from '@blog/ui/assets/icons/external-link.svg';
@@ -23,8 +25,12 @@ import FacebookComponent from '@blog/ui/assets/icons/facebook.svg';
 import FacebookUrl from '@blog/ui/assets/icons/facebook.svg?url';
 import GitHubComponent from '@blog/ui/assets/icons/github.svg';
 import GitHubUrl from '@blog/ui/assets/icons/github.svg?url';
+import GlobeComponent from '@blog/ui/assets/icons/globe.svg';
+import GlobeUrl from '@blog/ui/assets/icons/globe.svg?url';
 import GoogleComponent from '@blog/ui/assets/icons/google.svg';
 import GoogleUrl from '@blog/ui/assets/icons/google.svg?url';
+import GridComponent from '@blog/ui/assets/icons/grid.svg';
+import GridUrl from '@blog/ui/assets/icons/grid.svg?url';
 import HouseComponent from '@blog/ui/assets/icons/house.svg';
 import HouseUrl from '@blog/ui/assets/icons/house.svg?url';
 import InfoComponent from '@blog/ui/assets/icons/info.svg';
@@ -39,8 +45,14 @@ import MenuComponent from '@blog/ui/assets/icons/menu.svg';
 import MenuUrl from '@blog/ui/assets/icons/menu.svg?url';
 import MoonComponent from '@blog/ui/assets/icons/moon.svg';
 import MoonUrl from '@blog/ui/assets/icons/moon.svg?url';
+import PaletteComponent from '@blog/ui/assets/icons/palette.svg';
+import PaletteUrl from '@blog/ui/assets/icons/palette.svg?url';
+import PlusComponent from '@blog/ui/assets/icons/plus.svg';
+import PlusUrl from '@blog/ui/assets/icons/plus.svg?url';
 import PowerComponent from '@blog/ui/assets/icons/power.svg';
 import PowerUrl from '@blog/ui/assets/icons/power.svg?url';
+import QuoteComponent from '@blog/ui/assets/icons/quote.svg';
+import QuoteUrl from '@blog/ui/assets/icons/quote.svg?url';
 import RssComponent from '@blog/ui/assets/icons/rss.svg';
 import RssUrl from '@blog/ui/assets/icons/rss.svg?url';
 import SettingsComponent from '@blog/ui/assets/icons/settings.svg';
@@ -53,6 +65,8 @@ import SpinnerComponent from '@blog/ui/assets/icons/spinner.svg';
 import SpinnerUrl from '@blog/ui/assets/icons/spinner.svg?url';
 import SunComponent from '@blog/ui/assets/icons/sun.svg';
 import SunUrl from '@blog/ui/assets/icons/sun.svg?url';
+import UsersComponent from '@blog/ui/assets/icons/users.svg';
+import UsersUrl from '@blog/ui/assets/icons/users.svg?url';
 import WarningComponent from '@blog/ui/assets/icons/warning.svg';
 import WarningUrl from '@blog/ui/assets/icons/warning.svg?url';
 import XComponent from '@blog/ui/assets/icons/x.svg';
@@ -107,4 +121,11 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
     component: ShieldCheckComponent,
     url: ShieldCheckUrl,
   },
+  [ICONS.GRID]: { component: GridComponent, url: GridUrl },
+  [ICONS.PLUS]: { component: PlusComponent, url: PlusUrl },
+  [ICONS.PALETTE]: { component: PaletteComponent, url: PaletteUrl },
+  [ICONS.QUOTE]: { component: QuoteComponent, url: QuoteUrl },
+  [ICONS.GLOBE]: { component: GlobeComponent, url: GlobeUrl },
+  [ICONS.COMMENT]: { component: CommentComponent, url: CommentUrl },
+  [ICONS.USERS]: { component: UsersComponent, url: UsersUrl },
 };
