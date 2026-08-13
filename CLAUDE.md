@@ -278,6 +278,39 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   evolves further). If a doc comment is starting to read like a changelog or
   a design-doc summary, it's too long — cut it down to the one or two
   sentences a future reader actually needs.
+
+  **REQUIRED — a source comment must never reference project-management
+  state.** This is a hard prohibition, not a length guideline. Specifically,
+  never write into a comment in any `packages/*` or `apps/*` source file:
+
+  - a path into `docs/superpowers/specs/*` or `docs/superpowers/plans/*`
+  - a roadmap phase ("Phase 0", "Phase 8", "this milestone")
+  - an issue or PR number (`#1234`) as narrative — see the TODO exception below
+  - a "not wired up yet" / "future consumer will…" / "ships later" note
+
+  **Why these specifically, beyond being verbose.** Each one is guaranteed to
+  become false:
+
+  - Spec and plan docs are **deleted** once their work ships and `SPEC.md`
+    reflects the final shape (see the design-doc retention rule below), so a
+    comment citing one is a dead link by construction.
+  - Roadmap phases get renumbered and re-scoped. "Phase 8" was split and a new
+    "Phase 0" inserted ahead of it mid-programme; every comment naming a phase
+    silently went stale that day.
+  - "Nothing reads this yet" is self-evident from the absence of callers, and
+    stops being true the moment someone adds one — without touching the
+    comment.
+
+  All four belong in the **PR description**, which is dated, immutable, and
+  discoverable via `git blame`. Code comments are none of those things.
+
+  The test to apply: _would this sentence still be true and useful in a year if
+  the roadmap were reorganised and the spec docs deleted?_ If no, delete it.
+
+  **The one exception:** a `TODO:`/`FIXME:` may carry an issue number, in its
+  own comment block, because it is a pointer to open work rather than a
+  narrative about closed work.
+
 - All workspace source files live under `src/` within each package/app.
   Exceptions: root-level config files required by their tool (`sanity.config.ts`,
   `sanity.cli.ts`, `next.config.ts`, `vitest.config.ts`, etc.) stay at the
