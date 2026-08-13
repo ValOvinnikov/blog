@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_56 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_58 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -95,6 +95,14 @@ a fully controlled switch between a small, mutually exclusive set of views (e.g.
 Props: options: ISegmentedControlOption<TValue>[] · value: TValue · onChange: (value: TValue) => void · ariaLabel: string · className?: string _(extends IWithDataTestId)_
 Variants: selected: (boolean)
 
+### SliderShell — `atoms/slider-shell/slider-shell.tsx`
+the visual pieces of a single-value slider (a track, a filled range, and a draggable thumb), each independently rendered as its own `render`-prop target for a headless behavior library (e.g. Base UI's `Slider.Control`/`Slider.Indicator`/`Slider.Thumb`).
+
+Compound component:
+- **SliderShell.Track** — the groove a slider thumb moves along. Props: ref?: Ref<HTMLDivElement> _(extends ComponentPropsWithoutRef<'div'>, IWithDataTestId)_
+- **SliderShell.Range** — the filled portion of the track between a slider's minimum and its current value. Props: ref?: Ref<HTMLDivElement> _(extends ComponentPropsWithoutRef<'div'>, IWithDataTestId)_
+- **SliderShell.Thumb** — the draggable handle a slider's value is read from. Props: ref?: Ref<HTMLDivElement> _(extends ComponentPropsWithoutRef<'div'>, IWithDataTestId)_
+
 ### Spinner — `atoms/spinner/spinner.tsx`
 the shared indeterminate loading indicator for every async state (a submitting button, a session resolving, a region fetching on demand).
 Props: label: string · showLabel?: boolean · size?: TSpinnerVariants['size'] _(extends Omit< HTMLAttributes<HTMLSpanElement>, 'role' |…, IWithDataTestId)_
@@ -104,6 +112,10 @@ Variants: size: Size.SM|Size.MD|Size.LG
 a small inline pill signalling a state such as "subscribed", "pending confirmation", or "not linked".
 Props: tone: NonNullable<TStatusBadgeVariants['tone']> _(extends HTMLAttributes<HTMLSpanElement>, IWithDataTestId)_
 Variants: tone: ok|warn|neutral
+
+### SwitchShell — `atoms/switch-shell/switch-shell.tsx`
+the visual appearance of an on/off toggle.
+Props: ref?: Ref<HTMLButtonElement> _(extends ButtonHTMLAttributes<HTMLButtonElement>, IWithDataTestId)_
 
 ### Tag — `atoms/tag/tag.tsx`
 small pill-shaped label.
