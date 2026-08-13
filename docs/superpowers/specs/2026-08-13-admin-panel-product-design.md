@@ -185,6 +185,55 @@ confirmation step, probably a type-to-confirm like the account page's
 existing delete-account flow (`apps/web`'s `accountPage.privacy` section) for
 consistency with an established pattern in this codebase.
 
+## Component library — Base UI for behavior, `@blog/ui` for appearance
+
+**Decision (2026-08-13): adopt Base UI (`@base-ui/react`, v1.6.0+) in
+`apps/admin`.** It is the successor to Radix rather than a competitor — built
+by the teams behind Radix, Floating UI, and Material UI — and covers every gap
+the admin panel has: `tabs`, `slider`, `switch`, `select`, `radio-group`,
+`dialog`, `alert-dialog`, `toggle-group`, `number-field`. It also ships
+`Field`/`Fieldset`/`Form` primitives, which matter here because this app is
+almost entirely forms; Radix has no equivalent.
+
+**Where it lives, and why that is not negotiable.** Every headless library is
+client-side by necessity — they exist to manage interactive state — and
+`@blog/ui` forbids `'use client'`. So Base UI is a dependency of `apps/admin`,
+**never of `@blog/ui`**, and `@blog/ui` must not re-export a Base UI component
+(that would smuggle client-ness into a package whose entire contract is being
+pure).
+
+The split is the one this repo already uses for `Toast`: the presentational
+piece lives in `packages/ui/src/molecules/toast`, the stateful provider in
+`apps/web/src/components/shared/toast-provider`. Same shape here —
+**`@blog/ui` owns pure visual shells; the app wires Base UI behavior around
+them** via Base UI's `render` prop:
+
+```tsx
+<Tabs.Tab render={<TabTrigger />} value="look" />
+```
+
+This keeps one design language instead of two, and keeps the Look tab's live
+preview honest — the preview renders the same pure `@blog/ui` primitives the
+real site does, fed unsaved form state.
+
+**Concrete requirement on every shell built for this:** Base UI's `render` prop
+passes props down to the rendered element — event handlers, ARIA attributes,
+`data-*` state flags used for styling. A shell that drops unrecognised props or
+doesn't forward its ref will silently break keyboard nav, focus management, and
+state styling. Forward both, always.
+
+**Explicitly rejected: shadcn/ui.** It is copy-pasted components carrying their
+own styling opinions, and this repo has a mature `tailwind-variants` system
+with its own tokens and `*-variants.ts` convention. Adopting it would mean
+maintaining two design languages. (Noted because it is the reflexive
+recommendation, and a `vercel:shadcn` skill is available in this environment.)
+
+**Already covered by `@blog/ui` — do not rebuild:** `SegmentedControl` (preset
+/ radius / density pickers), `TextInput`/`Textarea` (the 20 voice fields),
+`Button`/`IconButton`, `PopoverMenu`, `SettingRow`, `StatusBadge` (tenant
+status/plan), `ActionList`, `Alert`, `Spinner`, `Toast`. Consult
+`packages/ui/COMPONENTS.md` before adding anything.
+
 ## Auth & access, restated for this doc's scope
 
 Both sections sit behind the shared `next-auth` session (companion doc:
