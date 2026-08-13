@@ -49,6 +49,57 @@ new, purpose-built admin app — not Sanity Studio.
 `settings_navigation`, `settings_footer`, `settings_newsletter` (signup copy),
 and the rest of `settings_site` (name, SEO fields).
 
+## Sequencing: registry first, resolution later
+
+The multi-tenant work was originally sequenced last, as one monolithic
+"Phase 8", on the rationale that per-tenant look/voice/behavior is just those
+settings _stored per Sanity project_ — so multi-tenant adds tenant resolution,
+not new per-tenant knobs. **Moving config into Postgres invalidates that
+rationale.** Once configuration lives in tenant-scoped rows, the config layer
+and the tenant-scoping layer are the same layer; you cannot build the first
+without deciding the second.
+
+"Phase 8" is therefore split, and only one half moves:
+
+**Tenant registry — built first (new Phase 0).** The `tenants`,
+`tenant_domains`, and `memberships` tables, plus one seed row for the existing
+site. Purely additive, and — critically — **nothing reads it at request time**.
+The public site still resolves its Sanity project from env vars exactly as it
+does today; no middleware, no client factory, no cache-key change. The only
+consumer is the admin app. That makes it a small, low-risk migration whose
+blast radius is a table nobody queries on the hot path yet.
+
+**Tenant resolution — stays last (Phase 8).** Host→tenant middleware, the
+per-tenant Sanity client factory (the multi-tenant doc's own "largest single
+change and the main risk"), tenant-scoped ISR tags, `forTenant()`, provisioning
+automation, Studio-per-tenant. This half keeps every one of its existing
+blocking open decisions — above all **tenant-addressable revalidation**, which
+that doc calls "the single biggest cross-tenant correctness risk in the design
+and is currently unaddressed." Splitting the registry out does **not** resolve
+that, and must not be read as doing so. It is deliberately left in front of the
+second tenant, not in front of the first.
+
+**What the split buys, concretely:**
+
+- `site_config.tenantId` is a genuine FK from its first migration — no
+  placeholder constant, no cross-phase promise (see the data-model section).
+- The admin panel is built once, in its final shape: real tenant list, real
+  switcher, real tenant-scoped routes — with one tenant. No single-tenant shell
+  to restructure later. This is a stated requirement, not a nice-to-have; see
+  the product-design companion doc.
+- `memberships` existing means the Team page and per-tenant access control are
+  real from day one rather than stubbed to "the only user is the owner."
+
+**What it deliberately does not buy:** the ability to actually add a second
+tenant. That needs provisioning, which needs resolution. The add-tenant wizard
+stays behind Phase 8 — see the product-design doc for how the UI handles that
+gap honestly.
+
+**Phases 1 and 5–7 are unaffected** by this reordering. Section appearance
+(Phase 1) is editorial content and stays in Sanity; the module catalogue,
+portfolio, and contact form are independent feature work that was never a
+multi-tenant prerequisite.
+
 ## Data model — `packages/db`
 
 One new table, following the existing `admins`/`subscribers` Drizzle
@@ -88,15 +139,21 @@ was designed. This table doesn't exist yet. The multi-tenant doc's own advice
 applies directly: "cheapest path is to land the `tenantId` columns _with_
 each table's creation."
 
-**Where the value comes from today, concretely:** there is no `tenants`
-table yet — that registry is genuinely Phase 8 scope and isn't pulled into
-this work. So `site_config.tenantId` can't be a live foreign-key lookup right
-now. Instead: a `DEFAULT_TENANT_ID` constant (a literal UUID) in
-`@blog/config`, used as the value for the one row that exists today. When
-Phase 8 eventually builds the real `tenants` table, its seed row uses this
-_exact same_ UUID as its `id` — so `site_config`'s existing row becomes a
-genuinely-FK'd row retroactively, with zero migration, instead of a value
-that needs backfilling into a new registry later.
+**Where the value comes from: a real FK, from the first migration.** The
+`tenants` registry is built _before_ this work, not after it — see
+[Sequencing](#sequencing-registry-first-resolution-later) below. So
+`site_config.tenantId` is an ordinary foreign key to an ordinary table that
+already has a row in it. There is no placeholder constant, no "retroactive
+FK", and no promise a later phase has to remember to keep.
+
+An earlier revision of this doc proposed a `DEFAULT_TENANT_ID` literal UUID in
+`@blog/config` to stand in until Phase 8 built the registry. That is
+deliberately dropped. It was a workaround for building things in the wrong
+order, and it carried two real costs: a cross-phase promise (the future seed
+row _must_ reuse that exact UUID, enforced by nothing but a comment), and an
+admin panel whose tenant list would have had to render a hardcoded fiction
+instead of a query. Building the registry first costs one small additive
+migration and removes both.
 
 `features`/`feature_toggles` (Phase 4) gets the same treatment when it's
 built — typed columns or JSONB per what that phase's exact shape turns out to

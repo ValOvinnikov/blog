@@ -9,15 +9,21 @@
 
 **Goal:** Turn the single-site console blog into a fully-customizable,
 multi-tenant platform where each client site controls its look, voice, and
-behavior from its own CMS — the terminal identity becoming one opt-in preset
+behavior from an admin panel — the terminal identity becoming one opt-in preset
 among others — without any `@blog/ui` change.
 
-**Architecture:** One override ladder (`tenant CMS override → preset default →
+**Architecture:** One override ladder (`tenant override → preset default →
 neutral base`) resolved entirely in `apps/web`, applied uniformly to look
 (theme tokens + logo), voice (next-intl packs), and behavior (feature toggles).
-Presets are code-owned in `@blog/config`. Multi-tenant later stores each
-tenant's preset+overrides in that tenant's own Sanity project and resolves the
-tenant by host. `@blog/ui` stays pure and ignorant throughout.
+Presets are code-owned in `@blog/config`. Each tenant's preset + overrides live
+in tenant-scoped Postgres rows edited through `apps/admin`; Sanity keeps
+editorial content only. Phase 8 resolves the tenant by host. `@blog/ui` stays
+pure and ignorant throughout.
+
+> **Revised 2026-08-13** — config storage moved from Sanity singletons to
+> Postgres, and the tenant registry moved to the front as Phase 0. The phase
+> _numbers_ below are unchanged (issues reference them); their storage and
+> ordering are not. See the two `2026-08-13-*` source specs.
 
 **Tech Stack:** Turborepo + pnpm; Sanity Studio v6 + typegen; Next.js 16 App
 Router + RSC; Tailwind v4 tokens; next-intl; `@blog/db` (Neon + Drizzle);
@@ -32,7 +38,12 @@ the final shape):**
 - `docs/superpowers/specs/2026-08-07-flexible-theming-and-page-builder-design.md`
   (Features 1, 3, 4, 5 → Phases 1, 5, 6, 7)
 - `docs/superpowers/specs/2026-08-07-multi-tenant-architecture-design.md`
-  (Phase 8)
+  (Phases 0 + 8)
+- `docs/superpowers/specs/2026-08-13-tenant-config-postgres-admin-design.md`
+  (**supersedes the storage decision in Phases 2–4**: theme/voice/feature
+  config lives in Postgres, not Sanity; owns the Phase 0 split rationale)
+- `docs/superpowers/specs/2026-08-13-admin-panel-product-design.md`
+  (the `apps/admin` editing surface those phases now write through)
 
 ---
 
@@ -82,19 +93,63 @@ test` (via `verify-runner`), then `reviewer` (+ `a11y-reviewer` for ui/web,
 ## Dependency graph (what unblocks what)
 
 ```
-Phase 1 (appearance object) ──▶ Phase 2 (theme + presets A/D) ──▶ Phase 3 (voice B)
-                                          │                              │
-                                          ├──────────────▶ Phase 4 (behavior C)
+Phase 0 (tenant registry) ──▶ Phase 2 (theme, Postgres) ──▶ Phase 3 (voice B)
+                                          │                        │
+                                          ├──────▶ Phase 4 (behavior C)
                                           ▼
+                              apps/admin (editing surface for 2–4)
+
+Phase 1 (appearance object) ── independent; editorial content, stays in Sanity
 Phase 5 (modules: gallery → faq → …) inherits appearance+theme
 Phase 6 (portfolio /work) ── independent, can run any time after Phase 1
 Phase 7 (contact form) ── gated on M5 foundations (#984/#1091/#1093/#1107)
-Phase 8 (multi-tenant) ── gated on Phases 2–4 (per-tenant look/voice/behavior)
-                          + its own open decisions (see Phase 8)
+Phase 8 (tenant resolution) ── gated on Phase 0 + Phases 2–4
+                               + its own open decisions (see Phase 8)
 ```
 
+**Reordered 2026-08-13.** Phase 0 was carved off the front of the old
+monolithic Phase 8 and now leads the program. The original ordering rested on
+config being stored per _Sanity project_, which made tenancy a purely
+downstream concern; storing config in tenant-scoped Postgres rows collapses
+that distinction — `site_config` needs a real `tenantId` FK in its very first
+migration. Rationale and the exact registry/resolution split live in
+`2026-08-13-tenant-config-postgres-admin-design.md` § Sequencing.
+
 Phases 5, 6, 7 are independent of each other and inherit the Phase 1–2 spine
-for free. Phase 8 is last and consumes 2–4.
+for free. Phase 8 is still last and still carries every blocking decision it
+always had — the split moved the cheap half forward, not the risky half.
+
+---
+
+## Phase 0 — Tenant registry
+
+**Delivers:** the `tenants`, `tenant_domains`, and `memberships` tables plus
+one seed row for the existing site — the identity every later phase's config
+hangs off. **Nothing reads it at request time**: the public site keeps
+resolving Sanity from env vars, unchanged. The only consumer is `apps/admin`.
+**Spec:** multi-tenant doc (registry half) + the tenant-config doc's
+§ Sequencing. **Migration:** three new tables via `drizzle-kit generate`
+(dev-free / prod-gated); no existing table or row is touched.
+
+**Epic → sub-issues:**
+
+- **config** — tenant-related UPPERCASE consts (`TENANT_STATUS`, `TENANT_PLAN`,
+  `MEMBERSHIP_ROLE` → `OWNER`/`EDITOR`/`READER`) with derived union types.
+- **db** — the three Drizzle tables (`tenants`: slug, primaryDomain,
+  sanityProjectId, sanityDataset, locale, plan, status; `tenant_domains`;
+  `memberships` joining `users` × `tenants` with a role), typed query
+  functions, and the single seed row for the live site. `db:generate` → review
+  the SQL diff → gated apply.
+
+**Acceptance:** `tenants` returns exactly one row for the existing site;
+`memberships` grants that site's owner `OWNER`; `apps/web`'s rendered output
+and query count are byte-identically unchanged (nothing on the request path
+reads these tables); the generated migration is additive-only.
+
+**Explicitly out of scope** — this is the registry, not resolution: no
+host→tenant middleware, no per-tenant Sanity client, no tenant-scoped cache
+tags, no provisioning. All of that stays in Phase 8 with its open decisions
+intact.
 
 ---
 
@@ -300,12 +355,18 @@ spam mitigation work; no CRM/inbox UI (non-goal).
 
 ---
 
-## Phase 8 — Multi-tenant
+## Phase 8 — Tenant resolution
 
 **Delivers:** many client sites off one app, each resolved by host, reading its
 own Sanity project and its own tenant-scoped engagement data — consuming the
-Phase 2–4 per-tenant knobs. **Spec:** multi-tenant doc. **Largest, last, and
-gated on unresolved decisions — do not ticket until they're signed off.**
+Phase 0 registry and the Phase 2–4 per-tenant knobs. **Spec:** multi-tenant
+doc. **Largest, last, and gated on unresolved decisions — do not ticket until
+they're signed off.**
+
+**The registry half is no longer here** — `tenants`/`tenant_domains`/
+`memberships` moved to Phase 0 (see the dependency graph note). What remains is
+the runtime half, which is where all the risk always was. Carving the tables
+out resolved none of the decisions below.
 
 **Blocking open decisions (resolve first, record in the spec, then ticket):**
 
@@ -315,14 +376,16 @@ gated on unresolved decisions — do not ticket until they're signed off.**
   before the content-reads epic.
 - **`tenantId` timing vs. M5** — `bookmarks`/`subscribers` already exist; decide
   whether `tenantId` lands with the remaining M5 tables (additive) or as a
-  backfill, **before** the rest of M5 builds.
+  backfill, **before** the rest of M5 builds. Phase 0 makes the additive option
+  strictly cheaper: the FK target now exists, so any new table can carry
+  `tenantId` from creation.
 - **Read-token model**, **Studio hosting shape (a vs. b)**, **URL scheme**,
   **Postgres RLS yes/no**, **exact free-tier editor allowance** — per the
   multi-tenant doc's Open Decisions.
 
-**Epic sequence (from the multi-tenant doc, once unblocked):** tenant
-foundation (config + db `tenants`/`tenant_domains`/`memberships` + web
-resolution middleware) → per-tenant content reads (service client factory +
+**Epic sequence (from the multi-tenant doc, once unblocked):** host→tenant
+resolution middleware in `web` (reading the Phase 0 registry, which by now
+already exists) → per-tenant content reads (service client factory +
 tenant-scoped ISR + tenant-aware revalidation) → engagement tenant-scoping
 (`tenantId` + `forTenant` accessor, while tables are empty) → auth tenancy →
 provisioning automation + per-project migration runner → Studio-per-tenant →
@@ -363,5 +426,9 @@ For every epic above, at build time:
 - i18n one-language-per-tenant (D10) → Global Constraints + Phase 3 per-locale-
   ready keys + Phase 8 registry `locale`. ✔
 - Theming Features 1/3/5 → Phases 1/5/6. Feature 4 → Phase 7. ✔
-- Multi-tenant doc → Phase 8, with its blocking decisions surfaced. ✔
+- Multi-tenant doc → split across Phase 0 (registry tables) and Phase 8
+  (resolution runtime), with every blocking decision left on Phase 8. ✔
+- Tenant-config doc → supersedes Phases 2–4's storage (Postgres, not Sanity)
+  and owns the Phase 0 rationale; admin-panel doc → the `apps/admin` surface
+  those phases write through. ✔
 - No orphan spec sections; no phase without an owning-layer breakdown.

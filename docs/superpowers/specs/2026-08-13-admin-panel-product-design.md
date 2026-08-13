@@ -19,18 +19,32 @@ from day one, not discovered later:
   the platform operators.
 - **Tenant** section — gated by `memberships` (multi-tenant doc:
   `OWNER`/`EDITOR`/`READER`, scoped per tenant). This is the customer,
-  configuring their own site. A user who belongs to multiple tenants (once
-  that's possible) needs a tenant switcher to pick which one's Tenant section
-  they're viewing — out of scope to build today (one tenant exists), but the
-  nav/routing shape should not assume "there is exactly one tenant forever."
+  configuring their own site. A user who belongs to multiple tenants picks
+  which one they're configuring via a tenant switcher.
+
+**Both sections, and the switcher, are built from the start — with one
+tenant.** There is no single-tenant shell that gets restructured later. The
+tenant list renders one row, the switcher shows one option, and every
+tenant-scoped route carries a real tenant id in its path/params. This is the
+whole reason the `tenants` registry is built before the config-to-Postgres
+work rather than after it: a tenant list that reads a real table with one row
+is honest and finished, whereas a hardcoded placeholder tenant is a fiction
+that has to be torn out. See the companion doc's sequencing section.
 
 ## Platform section
 
-**Tenant list** — every tenant, searchable, with status (active/suspended)
-and plan (Free/Growth) visible at a glance. Read-heavy, no live-preview
-concerns.
+**Tenant list (ships from the start)** — every tenant, searchable, with status
+(active/suspended) and plan (Free/Growth) visible at a glance. Read-heavy, no
+live-preview concerns. Reads the real `tenants` table; with one row it is
+still a finished page, not a placeholder. Search/filter chrome can be omitted
+while the list is short — the page, its route, and its data source cannot.
 
-**Add tenant — a wizard, not a form.** This is a UI over the provisioning
+**Add tenant — a wizard, not a form (deferred).** Unlike the list, this
+genuinely cannot ship early: it drives the provisioning flow, which depends on
+the tenant _resolution_ layer (host→tenant middleware, per-tenant Sanity
+client) that is deliberately sequenced later. Until then the entry point is
+either absent or visibly disabled with a reason — never a wizard that
+half-works. This is a UI over the provisioning
 flow the multi-tenant doc already designed: create the Sanity project → seed
 initial content → deploy the Studio → insert the `tenants`/`memberships`
 registry rows → map the domain. Several of these steps are slow and
@@ -141,9 +155,9 @@ revisiting once built).
 
 - `settings_features`/Phase 4's toggle UI — no tab exists for it yet; add one
   when that phase's data shape is real.
-- Multi-tenant switcher UX (a user who owns more than one tenant) — the nav
-  shape tolerates it existing later; the actual switcher UI isn't designed
-  until it's needed.
+- The add-tenant wizard's step implementations — the wizard's _shape_ is
+  designed above, but each provisioning step's mechanics belong with the
+  tenant-resolution work that unblocks it, not here.
 - Platform-section billing/usage-quota dashboards — named as a plausible
   future Platform-section page in conversation, not committed to here.
 
