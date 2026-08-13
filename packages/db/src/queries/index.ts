@@ -3,6 +3,7 @@
 // epic's `db` sub-issue, adding a `src/queries/<domain>.ts` file and
 // re-exporting it here as its own namespace.
 export * as account from './account';
+export * as admins from './admins';
 export * as bookmarks from './bookmarks';
 export * as memberships from './memberships';
 export * as subscribers from './subscribers';
