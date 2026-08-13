@@ -138,31 +138,27 @@ precedent already in this repo: `apps/cms` (Sanity Studio) is already its own
 Vercel deployment, its own domain, "Vercel-hosted, not `sanity deploy`"
 (`SPEC.md` §13). `apps/admin` follows the same shape:
 
-- New workspace: `package.json`, `tsconfig.json`, `vitest.config.ts`. **Vite +
-  React, not Next.js** — a deliberate choice (2026-08-13): the admin app is an
-  authenticated CRUD dashboard, no SEO/ISR/public-crawl needs, and this repo
-  already has a non-Next.js React precedent (`apps/cms`, Sanity Studio, also
-  Vite-based). Sharing `@blog/eslint-config`/`@blog/prettier-config`/
-  `configs/tailwind`, depending on `@blog/db`/`@blog/config`/`@blog/ui` the
-  same way `apps/web` does — `@blog/ui` has no RSC-specific code paths (no
-  `'use client'` anywhere, prop-driven), so it works unchanged in a plain SPA.
-  Added to `turbo.json`'s pipeline and the pnpm workspace list. **Two costs
-  this choice accepts, named plainly rather than glossed over:** (1) the
-  shared-session cookie below needs `@auth/core` wired directly rather than
-  `next-auth`'s Next.js-native convenience; (2) writes to `@blog/db` need a
-  small hand-built API surface (Vercel Functions or a lightweight framework
-  like Hono, both first-class on Vercel) rather than Server Actions. Neither
-  blocks the choice, both are real, bounded extra plumbing versus reusing
-  `apps/web`'s existing patterns.
+- New workspace: `package.json`, `tsconfig.json`, `vitest.config.ts`, a
+  Next.js app skeleton — **reconsidered back from Vite+React to Next.js**
+  (2026-08-13, same session): Vite+React was evaluated and its two real costs
+  (manual `@auth/core` session wiring instead of `next-auth`'s Next.js-native
+  handling; a hand-built API surface for `@blog/db` writes instead of Server
+  Actions) were enough to prefer reusing what `apps/web` already has proven
+  working, rather than accept that plumbing twice. `apps/cms` (Sanity Studio,
+  Vite-based) remains a valid non-Next.js precedent in this repo generally —
+  just not the better fit for an app that specifically needs to share
+  `apps/web`'s session and write pattern. Sharing
+  `@blog/eslint-config`/`@blog/prettier-config`/`configs/tailwind`, depending
+  on `@blog/db`/`@blog/config`/`@blog/ui` the same way `apps/web` does. Added
+  to `turbo.json`'s pipeline and the pnpm workspace list.
 - Its own Vercel project, its own domain (`admin.valstack.dev`) — human-gated
   provisioning, same as any other deploy setup (`docs/DEPLOY.md`).
 - **Session sharing across subdomains:** Auth.js session cookie set with
   `Domain: .valstack.dev` so a user already logged into the main site doesn't
   need a second login for admin — `requireAdmin()`'s `OWNER`-membership check
   gates access on top of the shared session, it doesn't replace
-  authentication. Since `apps/admin` isn't Next.js, this is `@auth/core`
-  session validation (reading/verifying the same cookie `apps/web`'s
-  `next-auth` sets), not the `next-auth` convenience path.
+  authentication. Both apps run `next-auth`, so this is the same session
+  config on both sides, not a cross-framework integration.
 - **Tenant resolution is session-based, not host-based.** `admin.valstack.dev`
   is one fixed domain; which tenant's config a logged-in user sees/edits comes
   from their `memberships` row(s), the same way Vercel's own dashboard
