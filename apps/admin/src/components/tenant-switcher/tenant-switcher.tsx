@@ -13,7 +13,6 @@ export type TTenantSwitcherProps = {
   /** Every tenant the signed-in user can switch into. Exactly one today. */
   tenants: TTenant[];
   activeTenantId: string;
-  ariaLabel?: string;
 };
 
 const initials = (slug: string) => slug.slice(0, 2).toUpperCase();
@@ -27,7 +26,6 @@ const initials = (slug: string) => slug.slice(0, 2).toUpperCase();
 export function TenantSwitcher({
   tenants,
   activeTenantId,
-  ariaLabel,
 }: TTenantSwitcherProps) {
   const active =
     tenants.find((tenant) => tenant.id === activeTenantId) ?? tenants[0];
@@ -63,7 +61,10 @@ export function TenantSwitcher({
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner sideOffset={6} align="start">
-          <Menu.Popup className={popup()} aria-label={ariaLabel}>
+          {/* Base UI points the popup's aria-labelledby at the trigger unconditionally,
+              which wins over any aria-label here per the accname algorithm — and the
+              trigger's own text (active tenant + domain) is already the right name. */}
+          <Menu.Popup className={popup()}>
             {tenants.map((tenant) => (
               <Menu.LinkItem
                 key={tenant.id}

@@ -28,11 +28,7 @@ export default async function TenantLayout({ children, params }: TProps) {
         },
       ]}
       switcher={
-        <TenantSwitcher
-          tenants={[tenant]}
-          activeTenantId={tenant.id}
-          ariaLabel="Switch tenant"
-        />
+        <TenantSwitcher tenants={[tenant]} activeTenantId={tenant.id} />
       }
       crumb="Tenant"
       roleLabel={`${membership.role} · Tenant`}
