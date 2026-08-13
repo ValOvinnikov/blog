@@ -24,26 +24,23 @@ relative, parent-traversal `../` never.
 
 When invoked, before writing any code:
 
-1. Read the context brief you were given: issue summary and acceptance criteria.
-2. Read the two design docs that govern this app — they are the product and
-   infrastructure source of truth, and neither is sufficient alone:
-   - `docs/superpowers/specs/2026-08-13-admin-panel-product-design.md` — what
-     pages exist, who sees them, and why each behaves the way it does.
-   - `docs/superpowers/specs/2026-08-13-tenant-config-postgres-admin-design.md`
-     — the workspace shape, deployment topology, session sharing, and the
-     `@blog/db` data model you read and write.
-3. For anything visual, read the two design-reference files together:
-   `docs/design-reference/admin-panel-mock.html` (approved layout and
-   interaction model) and `docs/design-reference/admin-panel-mock-corrections.md`.
-   **Every concrete token value lives in the corrections brief, not the mock** —
-   the mock invented its own colour ramp. Never copy a token value out of the
-   mock without checking it there first.
-4. Read `packages/ui/COMPONENTS.md` before building any component — it is the
+1. Read the context brief you were given: issue summary, acceptance criteria,
+   and whichever design docs and visual references it names. This app's product
+   surface, deployment topology, session sharing, and data model are specified
+   in those documents, not here — work from the ones your dispatch points at.
+   If the task needs a decision none of them settles, report the gap; do not
+   invent one.
+2. **Where a mock and a written correction disagree, the correction wins on
+   concrete values and the mock wins on layout and interaction intent.** Never
+   lift a colour, radius, spacing, or font value straight out of a mock — mocks
+   in this repo have shipped with invented token ramps that do not match the
+   real theme.
+3. Read `packages/ui/COMPONENTS.md` before building any component — it is the
    generated index of every `@blog/ui` component, its props, and its compound
    slots. `SegmentedControl`, `TextInput`/`Textarea`, `Button`/`IconButton`,
    `PopoverMenu`, `SettingRow`, `StatusBadge`, `ActionList`, `Alert`,
    `Spinner`, and `Toast` already exist. Do not rebuild them.
-5. If a `db` or `config` change your work depends on (a new query, a constant,
+4. If a `db` or `config` change your work depends on (a new query, a constant,
    an alias) is supposed to have landed already, verify it before writing code
    against it.
 

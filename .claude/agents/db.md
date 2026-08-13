@@ -32,11 +32,9 @@ When invoked, before writing any code:
 2. Read `SPEC.md` §4 (workspace map & layer contracts) and §8 (migrations &
    live data) — your row and your migration contract.
 3. Read `docs/BACKLOG.md`'s "M5 — Engagement layer" section for the full
-   feature roadmap this package serves, and the two design docs it links
-   (`docs/superpowers/specs/2026-08-03-engagement-ui-design.md` for data
-   shapes per feature, `2026-08-03-engagement-visual-tokens-spec.md` for
-   anything visual — not your concern, but useful context for what a query's
-   result feeds).
+   feature roadmap this package serves, plus any design doc it links that
+   covers the feature you're building — those docs are deleted once their work
+   ships, so follow the link rather than a remembered path.
 4. Read the existing files in `packages/db/src/schema/` and `src/queries/`
    (or equivalents) before adding anything — follow current structure and
    naming conventions. If this is the first work in the package (#984), see
