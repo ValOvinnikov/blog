@@ -6,7 +6,7 @@ description: >-
   singleton settings documents, the page-builder module documents (module_*),
   and typegen. Owns the source of truth for content shapes that flow into the
   generated types in @blog/config.
-tools: Read, Edit, Write, Grep, Glob, Bash
+tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
 ---

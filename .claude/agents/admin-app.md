@@ -6,7 +6,7 @@ description: >-
   Server Actions, the shared Auth.js session gate (requireAdmin / membership
   checks), and its Base UI + Tailwind form surfaces. Reads and writes relational
   data through @blog/db only; never touches Sanity, and never edits apps/web.
-tools: Read, Edit, Write, Grep, Glob, Bash
+tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
 ---

@@ -10,7 +10,7 @@ description: >-
   of `src/sanity/generated/` (typegen-owned, never hand-edited). Sits at the
   base of the dependency graph — every other layer depends on it; it depends
   on nothing.
-tools: Read, Edit, Write, Grep, Glob, Bash
+tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
 ---

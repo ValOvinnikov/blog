@@ -6,7 +6,7 @@ description: >-
   the Drizzle adapter, session strategy, and cookie options. Sits above
   @blog/db, which owns the adapter tables; consumed only by apps/web and
   apps/admin. Never imports React components, Sanity, or @blog/service.
-tools: Read, Edit, Write, Grep, Glob, Bash
+tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
 ---

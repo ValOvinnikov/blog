@@ -37,6 +37,15 @@ contracts:
     that app and styled with the shared Tailwind tokens; nothing is added to
     `@blog/ui` for it (a component with one consumer isn't shared — the same
     call #1157 made for `apps/web` page sections).
+  - Those eight layer agents (`config`, `cms`, `service`, `ui`, `web`, `db`,
+    `admin-app`, `auth`) additionally carry the two context7 MCP tools
+    (`resolve-library-id`, `query-docs`) in their `tools:` frontmatter, so the
+    `use-context7` skill is actually executable by the agent that hits an
+    unfamiliar library API mid-implementation. Without them the instruction to
+    check live docs was unfollowable, and an agent asked to verify a Base UI
+    contract substituted a raw `curl` of the vendor's docs site instead. The
+    read-only agents below are deliberately not granted them — they review and
+    report rather than implement against an API.
   - `verify-runner` — read-only, Haiku-model runner for the integration
     verify pass (`develop-feature` §5: `type-check`/`lint`/`test`,
     the exact scenario-specific sequence it's given). `build` is not part of
