@@ -1,4 +1,6 @@
+import { AdminShell } from '@admin/components/admin-shell';
 import { requireAdmin } from '@admin/server/auth/require-admin';
+import { adminRoutes } from '@admin/utils/routes/routes';
 
 type TProps = {
   children: React.ReactNode;
@@ -12,7 +14,20 @@ type TProps = {
  * `requireAdmin()` themselves.
  */
 export default async function PlatformLayout({ children }: TProps) {
-  await requireAdmin();
+  const admin = await requireAdmin();
 
-  return <>{children}</>;
+  return (
+    <AdminShell
+      sections={[
+        {
+          label: 'Platform',
+          items: [{ label: 'Tenants', href: adminRoutes.tenants() }],
+        },
+      ]}
+      crumb="Platform"
+      roleLabel={`${admin.role} · Platform`}
+    >
+      {children}
+    </AdminShell>
+  );
 }
