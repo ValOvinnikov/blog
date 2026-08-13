@@ -129,6 +129,68 @@ the asset's bytes server-side, return with the right `Content-Type`, fall
 back to the static default SVG on any failure — same mechanism, just reading
 `faviconAssetUrl` from `@blog/db` instead of a Sanity CDN URL.
 
+## Input validation
+
+Checked what this codebase already does before proposing anything new
+(2026-08-13): **Zod is the established validation library** (`.safeParse()`
+in `apps/web/src/app/api/generate-skim/route.ts`, and in `env.ts`'s env-var
+schemas), but there's no existing max-length convention for text fields
+(`identity-actions.ts`'s `updateDisplayNameAction` trims and checks
+non-empty, never caps length) and **no file-upload handling anywhere in this
+repo yet** — `apps/admin`'s logo/favicon upload is the first. So text-field
+limits follow the existing trim-then-validate shape; file upload validation
+is new ground, not a reused pattern.
+
+**Text fields (voice overrides, tenant name/slug, team invite email) — Zod
+schemas, server-side authoritative.** Client-side validation is UX sugar
+only, same posture `newsletter-actions.ts` already takes (re-validates email
+server-side even though the client form already checked) — never trust a
+client-only check for anything persisted.
+
+- Each of the 20 curated voice fields gets a Zod string schema:
+  `.trim().max(N)`, `N` sized to the field's role (~100 chars for short
+  labels like a prompt command, ~300 for longer copy like a 404 description)
+  — not one flat limit for all 20.
+- **Empty string is "clear the override," not "set to blank."** An emptied
+  form field should store `undefined`/absent in the `voiceOverrides` JSONB,
+  not `""` — preserving the same "blank falls through to the preset default"
+  semantic the retired Sanity schema had. Getting this wrong (storing literal
+  empty strings) would silently break the override ladder for anyone who
+  clears a field expecting the default back.
+- **Interpolation-token safety, checked and found not currently needed:**
+  some voice-style strings elsewhere in `en.json` carry required placeholders
+  (e.g. `deleteConfirmPlaceholder: 'type: {handle}'`), which would need a
+  `.refine()` checking the token survives editing. None of the 20 _curated_
+  fields carry one today (checked against the classification table) — noting
+  the principle for whenever a future curated field does, not inventing a
+  requirement that doesn't apply yet.
+- Tenant slug: `.regex(/^[a-z0-9-]+$/)` (URL-safe, since it's usable as a
+  platform subdomain per the multi-tenant doc) plus a uniqueness check
+  against the `tenants` table (Phase 8) — not just a format check.
+- Team invite email: Zod's built-in `.email()` — `apps/admin` is a new
+  codebase free to standardize on Zod throughout rather than mix in
+  `apps/web`'s separate loose-regex `isValidEmail` helper.
+
+**File uploads (logo, favicon) — server-side content sniffing, not
+trusted MIME type.** A browser-reported `Content-Type` is attacker-controlled
+input, not proof of what the file actually is — validate by inspecting the
+actual bytes (magic-number/file-type detection), not the upload's claimed
+type.
+
+- Allowed types: PNG, JPEG, WebP, SVG.
+- **SVG is the one format needing real sanitization** — it can carry
+  `<script>` tags and event-handler attributes. Either sanitize on upload
+  (strip scripts/handlers/external references before writing to Blob) or
+  don't accept SVG at all for v1; if it's accepted, sanitization isn't
+  optional. Defense-in-depth on top of sanitization, worth confirming against
+  Next.js's own documented safe-SVG pattern at implementation time:
+  `images: { dangerouslyAllowSVG: true, contentDispositionType: 'attachment',
+contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;" }`.
+- File size cap (e.g. 2 MB) — enforced server-side; a client-side check is
+  UX-only and bypassable.
+- Dimension bounds are a nicety, not a hard requirement — reasonable min/max
+  pixel dimensions to reject absurd uploads, not precisely specified here.
+
 ## Migration mechanics
 
 - **Retire the Sanity schemas** (`cms`): remove the `settings_theme` and
