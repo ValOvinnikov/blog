@@ -195,32 +195,39 @@ the admin panel has: `tabs`, `slider`, `switch`, `select`, `radio-group`,
 `Field`/`Fieldset`/`Form` primitives, which matter here because this app is
 almost entirely forms; Radix has no equivalent.
 
-**Where it lives, and why that is not negotiable.** Every headless library is
-client-side by necessity — they exist to manage interactive state — and
-`@blog/ui` forbids `'use client'`. So Base UI is a dependency of `apps/admin`,
-**never of `@blog/ui`**, and `@blog/ui` must not re-export a Base UI component
-(that would smuggle client-ness into a package whose entire contract is being
-pure).
-
-The split is the one this repo already uses for `Toast`: the presentational
-piece lives in `packages/ui/src/molecules/toast`, the stateful provider in
-`apps/web/src/components/shared/toast-provider`. Same shape here —
-**`@blog/ui` owns pure visual shells; the app wires Base UI behavior around
-them** via Base UI's `render` prop:
+**Where it lives: entirely in `apps/admin`.** Install Base UI there and style
+its parts with Tailwind directly. There is no shell layer, no wrapper
+components, and nothing added to `@blog/ui` for this.
 
 ```tsx
-<Tabs.Tab render={<TabTrigger />} value="look" />
+<Switch.Root className="h-6 w-11 rounded-full bg-secondary data-[checked]:bg-brand-primary-solid …">
+  <Switch.Thumb className="…" />
+</Switch.Root>
 ```
 
-This keeps one design language instead of two, and keeps the Look tab's live
-preview honest — the preview renders the same pure `@blog/ui` primitives the
-real site does, fed unsaved form state.
+**An earlier revision of this doc prescribed pure visual shells in `@blog/ui`,
+wired via Base UI's `render` prop. That was wrong and is withdrawn** (the
+shells were built, reviewed, and closed unmerged — PR #1443, issues
+#1435–#1438).
 
-**Concrete requirement on every shell built for this:** Base UI's `render` prop
-passes props down to the rendered element — event handlers, ARIA attributes,
-`data-*` state flags used for styling. A shell that drops unrecognised props or
-doesn't forward its ref will silently break keyboard nav, focus management, and
-state styling. Forward both, always.
+The reasoning that killed it: `apps/admin` is the only consumer, and **a
+component with one consumer isn't shared — it's misfiled.** Putting it in the
+design system buys nothing and costs an indirection layer whose only content is
+a class string. This repo had already settled the same question in **#1157** —
+a section organism built in `packages/ui` for `apps/web` page sections,
+rejected and closed unshipped, with the app composing primitives directly
+instead.
+
+If a control genuinely repeats across admin pages later, extract it to
+`@blog/ui` **then**. Moving a component out of an app is mechanical; predicting
+which ones deserve it is not.
+
+**What `@blog/ui` keeps giving you here** is the token vocabulary — the same
+Tailwind theme tokens (`brand-primary-solid`, `border`, `duration-base`, …)
+that its components use are what the admin panel styles Base UI with. One
+design language, without a component layer in between. The Look tab's live
+preview still renders real `@blog/ui` primitives fed unsaved form state; that
+was always independent of where the _controls_ live.
 
 **Explicitly rejected: shadcn/ui.** It is copy-pasted components carrying their
 own styling opinions, and this repo has a mature `tailwind-variants` system
