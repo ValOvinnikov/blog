@@ -1,3 +1,4 @@
+export * from './admin';
 export * from './alert';
 export * from './aside';
 export * from './brand';
