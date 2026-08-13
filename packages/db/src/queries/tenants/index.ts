@@ -4,3 +4,4 @@ export * from './create-tenant';
 export * from './get-tenant-by-domain';
 export * from './get-tenant-by-slug';
 export * from './list-tenants';
+export * from './list-tenants-by-ids';
