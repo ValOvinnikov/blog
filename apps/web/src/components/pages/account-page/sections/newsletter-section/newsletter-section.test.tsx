@@ -2,11 +2,11 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { NewsletterSection } from './newsletter-section';
 
-const { authMock, getSubscriptionStatusMock, getThemeMock } = vi.hoisted(
+const { authMock, getSubscriptionStatusMock, getChromeOnMock } = vi.hoisted(
   () => ({
     authMock: vi.fn(),
     getSubscriptionStatusMock: vi.fn(),
-    getThemeMock: vi.fn(),
+    getChromeOnMock: vi.fn(),
   }),
 );
 
@@ -18,12 +18,8 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock('@blog/service', () => ({
-  service: {
-    global: {
-      themeSettings: { v1: { getTheme: getThemeMock } },
-    },
-  },
+vi.mock('@web/utils/get-chrome-on', () => ({
+  getChromeOn: getChromeOnMock,
 }));
 
 vi.mock('@web/components/shared/newsletter-subscription-control', () => ({
@@ -42,8 +38,8 @@ describe(`<${NewsletterSection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
     getSubscriptionStatusMock.mockReset();
-    getThemeMock.mockReset();
-    getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: true } });
+    getChromeOnMock.mockReset();
+    getChromeOnMock.mockResolvedValue(true);
   });
 
   it('renders nothing when there is no session', async () => {
@@ -117,7 +113,7 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
   describe('plain (chromeOn: false)', () => {
     beforeEach(() => {
-      getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: false } });
+      getChromeOnMock.mockResolvedValue(false);
     });
 
     it('renders a plain section heading + card with no terminal shell', async () => {

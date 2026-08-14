@@ -21,9 +21,10 @@ const s = bookmarksPageVariants();
  * route, same stance `auth.ts`'s OAuth-error redirect already takes),
  * reached from `AccountMenu`'s "My bookmarks" item. Renders as a terminal
  * directory listing (`WindowChrome` + `BookmarksList`, `$ ls ~/bookmarks -l`)
- * per the engagement-UI design's corrected Feature 4 — not the
- * `PostsSection`/`PostCard` grid every archive page uses; bookmarks are the
- * one listing styled as `ls -l` output instead of cards.
+ * per the engagement-UI design's corrected Feature 4 when `chromeOn` is true
+ * — not the `PostsSection`/`PostCard` grid every archive page uses;
+ * bookmarks are the one listing styled as `ls -l` output instead of cards.
+ * Renders a plain list of title links instead when `chromeOn` is false.
  *
  * `@blog/db`'s `bookmarks` table only stores each saved post's Sanity `_id`
  * (`queries.bookmarks.listBookmarks`, most-recently-bookmarked first), so

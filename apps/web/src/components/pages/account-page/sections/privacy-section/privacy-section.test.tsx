@@ -2,19 +2,15 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { PrivacySection } from './privacy-section';
 
-const { authMock, getThemeMock } = vi.hoisted(() => ({
+const { authMock, getChromeOnMock } = vi.hoisted(() => ({
   authMock: vi.fn(),
-  getThemeMock: vi.fn(),
+  getChromeOnMock: vi.fn(),
 }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@blog/service', () => ({
-  service: {
-    global: {
-      themeSettings: { v1: { getTheme: getThemeMock } },
-    },
-  },
+vi.mock('@web/utils/get-chrome-on', () => ({
+  getChromeOn: getChromeOnMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -43,8 +39,8 @@ const setup = customRenderAsync(PrivacySection, {});
 describe(`<${PrivacySection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    getThemeMock.mockReset();
-    getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: true } });
+    getChromeOnMock.mockReset();
+    getChromeOnMock.mockResolvedValue(true);
   });
 
   it('renders nothing when there is no session', async () => {
@@ -107,7 +103,7 @@ describe(`<${PrivacySection.name}/>`, () => {
 
   describe('plain (chromeOn: false)', () => {
     beforeEach(() => {
-      getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: false } });
+      getChromeOnMock.mockResolvedValue(false);
     });
 
     it('renders a plain section heading + card, dropping the WindowChrome.Tag pill', async () => {

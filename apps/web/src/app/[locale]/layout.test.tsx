@@ -10,7 +10,7 @@ const {
   getSiteSettingsMock,
   getNavigationMock,
   getFooterMock,
-  getThemeMock,
+  getChromeOnMock,
   getMessagesMock,
   getNowMock,
   getTimeZoneMock,
@@ -22,7 +22,7 @@ const {
   getSiteSettingsMock: vi.fn(),
   getNavigationMock: vi.fn(),
   getFooterMock: vi.fn(),
-  getThemeMock: vi.fn(),
+  getChromeOnMock: vi.fn(),
   getMessagesMock: vi.fn(),
   getNowMock: vi.fn(),
   getTimeZoneMock: vi.fn(),
@@ -36,13 +36,16 @@ vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
 }));
 
+vi.mock('@web/utils/get-chrome-on', () => ({
+  getChromeOn: getChromeOnMock,
+}));
+
 vi.mock('@blog/service', () => ({
   service: {
     global: {
       siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } },
       navigation: { v1: { getNavigation: getNavigationMock } },
       footer: { v1: { getFooter: getFooterMock } },
-      themeSettings: { v1: { getTheme: getThemeMock } },
     },
   },
 }));
@@ -95,7 +98,7 @@ describe('LocaleLayout', () => {
     });
     getNavigationMock.mockResolvedValue({ ok: true, data: { items: [] } });
     getFooterMock.mockResolvedValue({ ok: true, data: { social: [] } });
-    getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: true } });
+    getChromeOnMock.mockResolvedValue(true);
     getMessagesMock.mockResolvedValue(realMessages);
     getNowMock.mockResolvedValue(now);
     getTimeZoneMock.mockResolvedValue('UTC');
@@ -257,7 +260,7 @@ describe('LocaleLayout', () => {
   });
 
   it('wires chromeOn: false into AuthMenu and ToastProvider as plain', async () => {
-    getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: false } });
+    getChromeOnMock.mockResolvedValue(false);
 
     await setup();
     const user = userEvent.setup();
@@ -265,9 +268,7 @@ describe('LocaleLayout', () => {
     await user.click(screen.getByRole('button', { name: 'Sign in' }));
     const panel = screen.getByRole('menu');
 
-    expect(
-      within(panel).getByRole('heading', { level: 2, name: 'Sign in' }),
-    ).toBeVisible();
     expect(within(panel).queryByText('Guest')).not.toBeInTheDocument();
+    expect(within(panel).getByText('Choose a sign-in method')).toBeVisible();
   });
 });

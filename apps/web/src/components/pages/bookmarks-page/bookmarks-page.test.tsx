@@ -4,12 +4,12 @@ import { redirect } from 'next/navigation';
 
 import { BookmarksPage } from './bookmarks-page';
 
-const { authMock, listBookmarksMock, getPostsByIdsMock, getThemeMock } =
+const { authMock, listBookmarksMock, getPostsByIdsMock, getChromeOnMock } =
   vi.hoisted(() => ({
     authMock: vi.fn(),
     listBookmarksMock: vi.fn(),
     getPostsByIdsMock: vi.fn(),
-    getThemeMock: vi.fn(),
+    getChromeOnMock: vi.fn(),
   }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
@@ -23,10 +23,11 @@ vi.mock('@blog/service', () => ({
     entities: {
       posts: { v1: { getPostsByIds: getPostsByIdsMock } },
     },
-    global: {
-      themeSettings: { v1: { getTheme: getThemeMock } },
-    },
   },
+}));
+
+vi.mock('@web/utils/get-chrome-on', () => ({
+  getChromeOn: getChromeOnMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -51,8 +52,8 @@ describe(`<${BookmarksPage.name}/>`, () => {
     authMock.mockReset();
     listBookmarksMock.mockReset();
     getPostsByIdsMock.mockReset();
-    getThemeMock.mockReset();
-    getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: true } });
+    getChromeOnMock.mockReset();
+    getChromeOnMock.mockResolvedValue(true);
   });
 
   it('redirects home without querying bookmarks when there is no session', async () => {
@@ -144,7 +145,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
 
   describe('plain (chromeOn: false)', () => {
     beforeEach(() => {
-      getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: false } });
+      getChromeOnMock.mockResolvedValue(false);
     });
 
     it('renders the true empty state with no ls -l chrome', async () => {

@@ -23,11 +23,13 @@ const {
 } = notFoundLinkVariants();
 
 /**
- * NotFoundPage — the terminal-styled 404 body content. Rendered from the
- * root `not-found.tsx`, which sits outside the `[locale]` route tree (this
- * app's `Header`/`Footer` chrome lives in `[locale]/layout.tsx`), so this
- * stays a self-contained, centered composition: no site chrome, just the
- * `TerminalChip` molecule, a short explanation, and a link home.
+ * NotFoundPage — the 404 body content. Rendered from the root
+ * `not-found.tsx`, which sits outside the `[locale]` route tree (this app's
+ * `Header`/`Footer` chrome lives in `[locale]/layout.tsx`), so this stays a
+ * self-contained, centered composition: no site chrome, just a short
+ * explanation and a link home. Renders the terminal-styled `TerminalChip`/
+ * prompt-line treatment when `plain` is unset, or a plain equivalent when
+ * `plain` is true (`chromeOn: false`).
  */
 export const NotFoundPage = ({ plain = false }: INotFoundPageProps) => {
   const t = useTranslations('notFound');
@@ -48,11 +50,7 @@ export const NotFoundPage = ({ plain = false }: INotFoundPageProps) => {
       )}
       <Text className={s.copy()}>{t('description')}</Text>
       {plain ? (
-        <SmartLink
-          href="/"
-          aria-label={t('returnHome')}
-          className={s.plainLink()}
-        >
+        <SmartLink href="/" className={s.plainLink()}>
           {t('returnHome')}
           <Icon
             name={ICONS.ARROW}

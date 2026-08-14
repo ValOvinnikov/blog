@@ -103,16 +103,18 @@ describe(`<${AuthMenu.name}/>`, () => {
       expect(panel.textContent).toMatch(/Guest\s+Sign in/);
     });
 
-    it('renders a plain "Sign in" heading with no terminal prompt line when plain', async () => {
+    it('renders a plain, non-heading "Sign in" label with no terminal prompt line when plain', async () => {
       setupPlain();
       const user = userEvent.setup();
 
       await user.click(screen.getByRole('button', { name: 'Sign in' }));
       const panel = screen.getByRole('menu');
 
-      expect(
-        within(panel).getByRole('heading', { level: 2, name: 'Sign in' }),
-      ).toBeVisible();
+      // Plain mode never introduces a new heading — the popover panel
+      // already has an accessible name via its own `ariaLabel`, and this
+      // panel renders before the page's own `<h1>` in `[locale]/layout.tsx`.
+      expect(within(panel).queryByRole('heading')).not.toBeInTheDocument();
+      expect(within(panel).getByText('Sign in')).toBeVisible();
       expect(within(panel).queryByText('Guest')).not.toBeInTheDocument();
       expect(
         within(panel).getByRole('menuitem', { name: 'Continue with GitHub' }),

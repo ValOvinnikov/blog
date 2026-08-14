@@ -1,7 +1,7 @@
 'use client';
 
 import { ICONS, Size } from '@blog/config';
-import { Button, Heading, Icon, Text, TextInput } from '@blog/ui/atoms';
+import { Button, Icon, Text, TextInput } from '@blog/ui/atoms';
 import { PopoverMenu, WindowChrome } from '@blog/ui/molecules';
 import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
 import { useEmailSignIn } from '@web/components/shared/auth-menu/hooks/use-email-sign-in';
@@ -56,7 +56,7 @@ export function SignInMenu({
     cmdLine,
     cmdPrompt,
     cmdCursor,
-    plainHeading,
+    plainLabel,
     plainPrompt,
     providerButton,
     hint,
@@ -186,9 +186,9 @@ export function SignInMenu({
       >
         {plain ? (
           <>
-            <Heading level={2} size={Size.SM} className={plainHeading()}>
+            <Text variant="card" className={plainLabel()}>
               {t('signIn')}
-            </Heading>
+            </Text>
             {menuContent}
           </>
         ) : (

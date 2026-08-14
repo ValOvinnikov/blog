@@ -1,18 +1,7 @@
-import { service } from '@blog/service';
+import { getThemeTokens } from './get-theme-tokens';
 
-/**
- * Fetches the tenant's `chromeOn` theme flag, falling back to `true` (the
- * console preset's chrome-wrapped composition, this app's existing
- * behavior) on failure — swapping to the plain fallback composition is a
- * presentational choice, never worth a hard failure.
- */
+/** Reads the tenant's `chromeOn` flag from the resolved theme tokens. */
 export async function getChromeOn(): Promise<boolean> {
-  const result = await service.global.themeSettings.v1.getTheme();
-
-  if (!result.ok) {
-    console.error('Failed to load theme settings:', result.error);
-    return true;
-  }
-
-  return result.data.chromeOn;
+  const { chromeOn } = await getThemeTokens();
+  return chromeOn;
 }

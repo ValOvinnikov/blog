@@ -2,11 +2,13 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { IdentitySection } from './identity-section';
 
-const { authMock, getLinkedProvidersMock, getThemeMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  getLinkedProvidersMock: vi.fn(),
-  getThemeMock: vi.fn(),
-}));
+const { authMock, getLinkedProvidersMock, getChromeOnMock } = vi.hoisted(
+  () => ({
+    authMock: vi.fn(),
+    getLinkedProvidersMock: vi.fn(),
+    getChromeOnMock: vi.fn(),
+  }),
+);
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
@@ -16,12 +18,8 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock('@blog/service', () => ({
-  service: {
-    global: {
-      themeSettings: { v1: { getTheme: getThemeMock } },
-    },
-  },
+vi.mock('@web/utils/get-chrome-on', () => ({
+  getChromeOn: getChromeOnMock,
 }));
 
 vi.mock('@web/components/shared/provider-link-control', () => ({
@@ -50,8 +48,8 @@ describe(`<${IdentitySection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
     getLinkedProvidersMock.mockReset();
-    getThemeMock.mockReset();
-    getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: true } });
+    getChromeOnMock.mockReset();
+    getChromeOnMock.mockResolvedValue(true);
   });
 
   it('renders nothing when there is no session', async () => {
@@ -227,7 +225,7 @@ describe(`<${IdentitySection.name}/>`, () => {
 
   describe('plain (chromeOn: false)', () => {
     beforeEach(() => {
-      getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: false } });
+      getChromeOnMock.mockResolvedValue(false);
     });
 
     it('renders a plain section heading + card with no terminal shell, preserving heading levels', async () => {
