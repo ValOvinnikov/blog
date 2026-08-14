@@ -1,4 +1,3 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import {
   applyMigrationFile,
@@ -36,20 +35,18 @@ describe('0008_silly_xorn (bookmarks/subscribers tenant_id backfill)', () => {
 
     // The `bookmarks`/`subscribers` shape before this migration: no
     // `tenant_id` column yet, matching rows created before this migration
-    // ever ran.
+    // ever ran. Raw SQL rather than `db.insert(schema.tenants)` — the
+    // current schema's `name` column postdates this migration too (see
+    // tenants-name-migration.test.ts), so a typed insert against a table
+    // that only has migrations up to this one applied would reference a
+    // column that doesn't exist yet.
     await db.execute(sql.raw(`insert into "users" ("id") values ('user-1')`));
-    const [tenant] = await db
-      .insert(schema.tenants)
-      .values({
-        slug: 'acme',
-        primaryDomain: 'acme.example.com',
-        sanityProjectId: 'abc123',
-        sanityDataset: 'production',
-        locale: 'en',
-        plan: TENANT_PLAN.FREE,
-        status: TENANT_STATUS.ACTIVE,
-      })
-      .returning();
+    const insertedTenant = await db.execute<{ id: string }>(
+      sql.raw(
+        `insert into "tenants" ("slug", "primary_domain", "sanity_project_id", "sanity_dataset", "locale", "plan", "status") values ('acme', 'acme.example.com', 'abc123', 'production', 'en', 'FREE', 'ACTIVE') returning "id"`,
+      ),
+    );
+    const tenant = insertedTenant.rows[0];
     if (!tenant) throw new Error('failed to seed a tenant row');
 
     await db.execute(

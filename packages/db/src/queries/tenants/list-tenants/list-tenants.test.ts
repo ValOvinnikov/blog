@@ -28,6 +28,7 @@ describe(listTenants, () => {
     await db.insert(schema.tenants).values([
       {
         slug: 'zeta',
+        name: 'Zeta',
         primaryDomain: 'zeta.example.com',
         sanityProjectId: 'p1',
         sanityDataset: 'production',
@@ -37,6 +38,7 @@ describe(listTenants, () => {
       },
       {
         slug: 'acme',
+        name: 'Acme',
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'p2',
         sanityDataset: 'production',

@@ -4,6 +4,7 @@ import { tenants, type TTenant } from '@blog/db/schema/tenants';
 
 export type TCreateTenantInput = {
   slug: string;
+  name: string;
   primaryDomain: string;
   sanityProjectId: string;
   sanityDataset: string;
