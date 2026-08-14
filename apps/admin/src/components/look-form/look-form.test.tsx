@@ -1,0 +1,129 @@
+import { defaultLookFormValues } from '@admin/utils/default-look-values/default-look-values';
+import { DENSITY, FONT_CHOICE, PRESET_ID, RADIUS_SCALE } from '@blog/config';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+import { LookForm } from './look-form';
+
+const { updateLookActionMock } = vi.hoisted(() => ({
+  updateLookActionMock: vi.fn(),
+}));
+
+vi.mock('@admin/server/site-config/update-look-action', () => ({
+  updateLookAction: updateLookActionMock,
+}));
+
+describe(LookForm, () => {
+  beforeEach(() => {
+    updateLookActionMock.mockReset();
+    updateLookActionMock.mockResolvedValue({ ok: true });
+  });
+
+  it('renders the current preset and accent hue from the given initial values', () => {
+    render(
+      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+    );
+
+    expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+    expect(screen.getByText('250°')).toBeVisible();
+  });
+
+  it('renders Basic and Advanced as visually distinct sections, Advanced collapsed by default', () => {
+    render(
+      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Basic' })).toBeVisible();
+    const summary = screen.getByText('Advanced').closest('summary');
+    expect(summary).not.toBeNull();
+    expect(summary?.closest('details')).not.toHaveAttribute('open');
+  });
+
+  it('notes that terminal chrome is not yet persisted', () => {
+    render(
+      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+    );
+
+    expect(
+      screen.getByText(/Not saved yet — site_config has no column/),
+    ).toBeInTheDocument();
+  });
+
+  it("choosing a preset resets every one of that preset's defaults", async () => {
+    const user = userEvent.setup();
+    render(
+      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+    );
+
+    await user.click(screen.getByRole('radio', { name: 'Editorial' }));
+
+    expect(screen.getByText('28°')).toBeVisible();
+  });
+
+  it('saves the current form state, excluding chromeOn, through updateLookAction', async () => {
+    const user = userEvent.setup();
+    render(
+      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => {
+      expect(updateLookActionMock).toHaveBeenCalledWith('acme', {
+        preset: PRESET_ID.CONSOLE,
+        accentHue: 250,
+        logoHue: null,
+        headingFont: FONT_CHOICE.SPACE_GROTESK,
+        bodyFont: FONT_CHOICE.NEWSREADER,
+        radiusScale: RADIUS_SCALE.MD,
+        density: DENSITY.DEFAULT,
+      });
+    });
+  });
+
+  it('shows a success alert once the save resolves', async () => {
+    const user = userEvent.setup();
+    render(
+      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'Saved to site_config.',
+    );
+  });
+
+  it('shows an error alert when the save fails', async () => {
+    updateLookActionMock.mockResolvedValue({ ok: false });
+    const user = userEvent.setup();
+    render(
+      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      "Couldn't save Look settings",
+    );
+  });
+
+  it('resets a diverged control back to the current preset on "Reset to preset"', async () => {
+    const user = userEvent.setup();
+    render(
+      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+    );
+
+    const slider = screen.getByRole('slider', { name: 'Accent hue' });
+    slider.focus();
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByText('251°')).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
+
+    expect(screen.getByText('250°')).toBeVisible();
+  });
+});
