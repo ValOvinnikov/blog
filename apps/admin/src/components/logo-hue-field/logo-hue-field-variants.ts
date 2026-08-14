@@ -2,7 +2,7 @@ import { tv } from 'tailwind-variants';
 
 export const logoHueFieldVariants = tv({
   slots: {
-    root: ['flex flex-col gap-3'],
+    root: ['flex w-full flex-col gap-3'],
     switchRow: ['flex items-center gap-2.5 text-sm text-text'],
     switchTrack: [
       'relative h-5 w-9 shrink-0 cursor-pointer rounded-full bg-secondary',

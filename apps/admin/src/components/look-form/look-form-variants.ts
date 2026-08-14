@@ -24,7 +24,7 @@ export const lookFormVariants = tv({
       'text-text-subtle transition-transform duration-base ease-console group-open:rotate-90',
     ],
     disclosureBody: ['flex flex-col gap-5 border-t border-border p-4'],
-    hueField: ['flex items-center gap-3'],
+    hueField: ['flex w-full items-center gap-3'],
     swatch: ['size-10 shrink-0 rounded-md ring-1 ring-inset ring-border'],
     hueValue: ['w-16 shrink-0 font-mono text-meta text-text-subtle'],
     switchRow: ['flex items-center gap-2.5 text-sm text-text'],
