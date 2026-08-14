@@ -1,4 +1,46 @@
+import { createTranslator } from 'next-intl';
+
 import '@testing-library/jest-dom/vitest';
+
+import messages from './i18n/messages/en.json';
+
+type TGetTranslationsArg = string | { namespace?: string } | undefined;
+type TTranslationValues = Record<string, string | number>;
+
+const toNamespace = (arg: TGetTranslationsArg): string | undefined =>
+  typeof arg === 'string' ? arg : arg?.namespace;
+
+// `createTranslator`'s `Namespace` type parameter is a `const` generic
+// inferred as a literal union from the *actual* messages shape, so it
+// rejects the plain `string | undefined` this mock resolves a namespace to
+// at runtime. Widened once here to the shape every call site below actually
+// uses (`t(key, values)`), rather than fighting the literal-union inference
+// per call.
+type TLooseTranslator = (key: string, values?: TTranslationValues) => string;
+const createLooseTranslator = createTranslator as unknown as (config: {
+  locale: string;
+  messages: typeof messages;
+  namespace?: string;
+}) => TLooseTranslator;
+
+// `next-intl/server`'s `setRequestLocale` is called by every locale-aware
+// layout/page but never asserted on — stub it globally so individual test
+// files don't repeat the mock. `getTranslations` is stubbed as a minimal
+// stand-in that resolves real strings from `i18n/messages/en.json` via
+// next-intl's own `createTranslator` (full ICU — interpolation, plurals,
+// select) so component tests assert on the actual rendered copy instead of
+// a fake.
+vi.mock('next-intl/server', () => ({
+  setRequestLocale: vi.fn(),
+  getTranslations: vi.fn(async (arg?: TGetTranslationsArg) =>
+    createLooseTranslator({
+      locale: 'en',
+      messages,
+      namespace: toNamespace(arg),
+    }),
+  ),
+  getMessages: vi.fn(async () => messages),
+}));
 
 // `next/navigation`'s `redirect()`/`notFound()` must keep throwing so a gate
 // component short-circuits exactly as it does at runtime (Next renders both

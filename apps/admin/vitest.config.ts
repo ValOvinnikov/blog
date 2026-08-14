@@ -66,6 +66,17 @@ export default mergeConfig(
     test: {
       environment: 'jsdom',
       setupFiles: ['./src/vitest-setup.ts'],
+      // next-intl's client `createNavigation` (`src/i18n/navigation.ts`)
+      // ships pre-built ESM with no extension — Node's own ESM resolver
+      // can't load that extensionless subpath when Vitest externalizes the
+      // dependency. Inlining it forces Vite's bundler-style resolver
+      // (which does resolve it) instead. Mirrors apps/web's identical
+      // vitest config.
+      server: {
+        deps: {
+          inline: ['next-intl'],
+        },
+      },
     },
   }),
 );
