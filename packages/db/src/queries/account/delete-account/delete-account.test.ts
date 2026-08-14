@@ -30,6 +30,7 @@ beforeEach(async () => {
     .insert(schema.tenants)
     .values({
       slug: 'acme',
+      name: 'Acme',
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',
       sanityDataset: 'production',

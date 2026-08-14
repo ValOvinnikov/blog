@@ -8,6 +8,7 @@
  *   set -a && source apps/web/.env.local && set +a
  *   pnpm --filter @blog/db db:seed-tenant -- \
  *     --slug=acme \
+ *     --name="Acme" \
  *     --primary-domain=acme.example.com \
  *     --sanity-project-id=<project id> \
  *     --sanity-dataset=production \
@@ -44,6 +45,7 @@ import { eq } from 'drizzle-orm';
 
 type TParsedArgs = {
   slug: string;
+  name: string;
   primaryDomain: string;
   sanityProjectId: string;
   sanityDataset: string;
@@ -97,6 +99,7 @@ function parseArgs(argv: string[]): TParsedArgs {
 
   return {
     slug: requireOne('slug'),
+    name: requireOne('name'),
     primaryDomain: requireOne('primary-domain'),
     sanityProjectId: requireOne('sanity-project-id'),
     sanityDataset: requireOne('sanity-dataset'),
@@ -120,6 +123,7 @@ async function main(): Promise<void> {
   } else {
     tenant = await createTenant({
       slug: args.slug,
+      name: args.name,
       primaryDomain: args.primaryDomain,
       sanityProjectId: args.sanityProjectId,
       sanityDataset: args.sanityDataset,

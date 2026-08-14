@@ -29,6 +29,7 @@ beforeEach(async () => {
     .insert(schema.tenants)
     .values({
       slug: 'acme',
+      name: 'Acme',
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',
       sanityDataset: 'production',
@@ -52,6 +53,7 @@ async function insertTenant(slug: string): Promise<string> {
     .insert(schema.tenants)
     .values({
       slug,
+      name: slug,
       primaryDomain: `${slug}.example.com`,
       sanityProjectId: 'abc123',
       sanityDataset: 'production',

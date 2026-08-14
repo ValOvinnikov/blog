@@ -27,6 +27,7 @@ describe(getTenantBySlug, () => {
   it('returns the row for an existing slug', async () => {
     await db.insert(schema.tenants).values({
       slug: 'acme',
+      name: 'Acme',
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',
       sanityDataset: 'production',

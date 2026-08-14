@@ -13,6 +13,7 @@ let db: PgliteDatabase<typeof schema>;
 
 const tenantInput: TCreateTenantInput = {
   slug: 'acme',
+  name: 'Acme',
   primaryDomain: 'acme.example.com',
   sanityProjectId: 'abc123',
   sanityDataset: 'production',

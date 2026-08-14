@@ -21,6 +21,7 @@ export const tenantStatusEnum = pgEnum(
 export const tenants = pgTable('tenants', {
   id: uuid('id').primaryKey().defaultRandom(),
   slug: text('slug').notNull().unique(),
+  name: text('name').notNull(),
   primaryDomain: text('primary_domain').notNull(),
   sanityProjectId: text('sanity_project_id').notNull(),
   sanityDataset: text('sanity_dataset').notNull(),

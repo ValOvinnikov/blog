@@ -20,6 +20,7 @@ async function insertTenant(
     .insert(schema.tenants)
     .values({
       slug,
+      name: slug,
       primaryDomain,
       sanityProjectId: 'abc123',
       sanityDataset: 'production',
