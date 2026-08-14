@@ -6,12 +6,14 @@ const {
   resendConfirmationMock,
   sendEmailMock,
   clearNewsletterSubscribedCookieMock,
+  getSoleTenantIdMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   unsubscribeMock: vi.fn(),
   resendConfirmationMock: vi.fn(),
   sendEmailMock: vi.fn(),
   clearNewsletterSubscribedCookieMock: vi.fn(),
+  getSoleTenantIdMock: vi.fn(),
 }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
@@ -33,6 +35,12 @@ vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
   clearNewsletterSubscribedCookie: clearNewsletterSubscribedCookieMock,
 }));
 
+vi.mock('@web/server/site-config/get-site-config', () => ({
+  getSoleTenantId: getSoleTenantIdMock,
+}));
+
+const TENANT_ID = 'tenant-1';
+
 // The real `@t3-oss/env-nextjs` module throws when a server var is read
 // under jsdom — mock it the same way `newsletter-actions.test.ts` does.
 vi.mock('@web/utils/env/env', () => ({
@@ -51,10 +59,23 @@ describe('unsubscribeAction', () => {
     authMock.mockReset();
     unsubscribeMock.mockReset();
     clearNewsletterSubscribedCookieMock.mockReset();
+    getSoleTenantIdMock.mockReset();
+    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
   });
 
   it('returns { ok: false } without unsubscribing when there is no session', async () => {
     authMock.mockResolvedValue(null);
+    const { unsubscribeAction } =
+      await import('./newsletter-subscription-actions');
+
+    await expect(unsubscribeAction()).resolves.toEqual({ ok: false });
+    expect(unsubscribeMock).not.toHaveBeenCalled();
+    expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
+  });
+
+  it('returns { ok: false } without unsubscribing when no tenant resolves', async () => {
+    authMock.mockResolvedValue(session);
+    getSoleTenantIdMock.mockResolvedValue(undefined);
     const { unsubscribeAction } =
       await import('./newsletter-subscription-actions');
 
@@ -71,7 +92,7 @@ describe('unsubscribeAction', () => {
       await import('./newsletter-subscription-actions');
 
     await expect(unsubscribeAction()).resolves.toEqual({ ok: true });
-    expect(unsubscribeMock).toHaveBeenCalledWith('user-1');
+    expect(unsubscribeMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
     expect(clearNewsletterSubscribedCookieMock).toHaveBeenCalledTimes(1);
   });
 
@@ -112,6 +133,8 @@ describe('resendConfirmationAction', () => {
     authMock.mockReset();
     resendConfirmationMock.mockReset();
     sendEmailMock.mockReset();
+    getSoleTenantIdMock.mockReset();
+    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
   });
 
   it('returns { ok: false } without resending when there is no session', async () => {
@@ -133,6 +156,17 @@ describe('resendConfirmationAction', () => {
     expect(resendConfirmationMock).not.toHaveBeenCalled();
   });
 
+  it('returns { ok: false } without resending when no tenant resolves', async () => {
+    authMock.mockResolvedValue(session);
+    getSoleTenantIdMock.mockResolvedValue(undefined);
+    const { resendConfirmationAction } =
+      await import('./newsletter-subscription-actions');
+
+    await expect(resendConfirmationAction()).resolves.toEqual({ ok: false });
+    expect(resendConfirmationMock).not.toHaveBeenCalled();
+    expect(sendEmailMock).not.toHaveBeenCalled();
+  });
+
   it('resends the confirmation email to the session email and returns { ok: true }', async () => {
     authMock.mockResolvedValue(session);
     resendConfirmationMock.mockResolvedValue({
@@ -144,7 +178,7 @@ describe('resendConfirmationAction', () => {
       await import('./newsletter-subscription-actions');
 
     await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
-    expect(resendConfirmationMock).toHaveBeenCalledWith('user-1');
+    expect(resendConfirmationMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({
         to: 'val@icloud.com',
