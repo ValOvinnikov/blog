@@ -1,8 +1,16 @@
 import { customRenderAsync, screen } from '@admin/testing/custom-render';
 import { PRESET_ID } from '@blog/config/constants';
+import userEvent from '@testing-library/user-event';
 import { redirect } from 'next/navigation';
 
 import VoicePage from './page';
+
+const ADVANCED_SUMMARY = 'Advanced — 20 curated strings, 4 groups';
+
+// Advanced starts collapsed — open it before reading any curated field.
+async function openAdvanced() {
+  await userEvent.setup().click(screen.getByText(ADVANCED_SUMMARY));
+}
 
 const { authMock, getTenantBySlugMock, getMembershipMock, getSiteConfigMock } =
   vi.hoisted(() => ({
@@ -58,6 +66,7 @@ describe(`<${VoicePage.name}/>`, () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
     await setup();
+    await openAdvanced();
 
     expect(
       screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
@@ -74,6 +83,7 @@ describe(`<${VoicePage.name}/>`, () => {
     });
 
     await setup();
+    await openAdvanced();
 
     expect(
       screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
@@ -87,6 +97,7 @@ describe(`<${VoicePage.name}/>`, () => {
     });
 
     await setup();
+    await openAdvanced();
 
     expect(
       screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),

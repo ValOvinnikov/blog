@@ -6,20 +6,27 @@ import type { TVoicePack } from '@blog/config/constants';
  * blank — the placeholder shown in its input. `TVoicePack`'s shape predates
  * the 20-key curated field set (it's nested by feature area, e.g.
  * `notFound.commandNotFound`, not flat); this maps each curated key to its
- * pack path where one already exists. A key with no `case` here has no
- * corresponding value anywhere in `TVoicePack` yet — its input renders with
- * no placeholder, which is accurate (there is genuinely nothing configured
- * to inherit), not a bug in this mapping.
+ * pack path. The 6 empty-state keys (`blogListEmpty`, `categoryEmpty`,
+ * `tagEmpty`, `authorEmpty`, `topicsEmpty`, `bookmarksEmpty`) have no `case`
+ * here because `TVoicePack` has no corresponding field for them at all —
+ * their input renders with no placeholder, which is accurate (there is
+ * genuinely nothing to inherit), not a bug in this mapping.
  */
 export function inheritedVoiceValue(
   voicePack: TVoicePack,
   key: TVoiceOverrideKey,
 ): string | undefined {
   switch (key) {
+    case 'notFoundMetaTitle':
+      return voicePack.notFound?.metaTitle;
+    case 'notFoundMetaDescription':
+      return voicePack.notFound?.metaDescription;
     case 'notFoundCommandNotFound':
       return voicePack.notFound?.commandNotFound;
     case 'notFoundDescription':
       return voicePack.notFound?.description;
+    case 'notFoundReturnHome':
+      return voicePack.notFound?.returnHome;
     case 'terminalPromptHost':
       return voicePack.authMenu?.promptHost;
     case 'authPromptCommandSignIn':

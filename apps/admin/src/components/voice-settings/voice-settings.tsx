@@ -136,7 +136,7 @@ export function VoiceSettings({
         />
       </div>
 
-      <details className={advanced()} open={true}>
+      <details className={advanced()}>
         <summary className={advancedSummary()}>
           Advanced — 20 curated strings, 4 groups
           <span className={advancedTag()}>optional</span>

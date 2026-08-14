@@ -17,6 +17,15 @@ vi.mocked(useRouter).mockReturnValue({
   refresh: vi.fn(),
 } as unknown as ReturnType<typeof useRouter>);
 
+const ADVANCED_SUMMARY = 'Advanced — 20 curated strings, 4 groups';
+
+// Advanced starts collapsed (matching the Look tab) — every test that reads
+// or interacts with a curated field opens it first, same as a real user
+// would have to.
+async function openAdvanced(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByText(ADVANCED_SUMMARY));
+}
+
 describe(VoiceSettings, () => {
   it('renders Basic empty, with a stated reason', () => {
     render(
@@ -38,7 +47,7 @@ describe(VoiceSettings, () => {
     ).toHaveLength(0);
   });
 
-  it('renders all 20 fields across the 4 named groups, with none invented', () => {
+  it('starts the Advanced section collapsed', () => {
     render(
       <VoiceSettings
         tenantSlug="acme"
@@ -47,6 +56,25 @@ describe(VoiceSettings, () => {
         saveAction={vi.fn()}
       />,
     );
+
+    expect(
+      screen.getByText(ADVANCED_SUMMARY).closest('details'),
+    ).not.toHaveAttribute('open');
+    expect(screen.getByText('404 page')).not.toBeVisible();
+  });
+
+  it('renders all 20 fields across the 4 named groups, with none invented, once expanded', async () => {
+    const user = userEvent.setup();
+    render(
+      <VoiceSettings
+        tenantSlug="acme"
+        voicePack={CONSOLE_VOICE_PACK}
+        initialOverrides={{}}
+        saveAction={vi.fn()}
+      />,
+    );
+
+    await openAdvanced(user);
 
     expect(screen.getAllByRole('textbox')).toHaveLength(20);
     expect(screen.getByText('404 page')).toBeVisible();
@@ -57,7 +85,8 @@ describe(VoiceSettings, () => {
     expect(screen.queryByText(/No search results/i)).not.toBeInTheDocument();
   });
 
-  it("shows the console preset's voice-pack value as the placeholder for an untouched field", () => {
+  it("shows the console preset's voice-pack value as the placeholder for an untouched field", async () => {
+    const user = userEvent.setup();
     render(
       <VoiceSettings
         tenantSlug="acme"
@@ -66,13 +95,15 @@ describe(VoiceSettings, () => {
         saveAction={vi.fn()}
       />,
     );
+    await openAdvanced(user);
 
     const input = screen.getByRole('textbox', { name: 'Terminal Prompt Host' });
     expect(input).toHaveValue('');
     expect(input).toHaveAttribute('placeholder', '~$');
   });
 
-  it('leaves the placeholder blank for a field with no path in the editorial voice pack', () => {
+  it('leaves the placeholder blank for a field with no path in the editorial voice pack', async () => {
+    const user = userEvent.setup();
     render(
       <VoiceSettings
         tenantSlug="acme"
@@ -81,12 +112,14 @@ describe(VoiceSettings, () => {
         saveAction={vi.fn()}
       />,
     );
+    await openAdvanced(user);
 
     const input = screen.getByRole('textbox', { name: 'Terminal Prompt Host' });
     expect(input.getAttribute('placeholder')).toBeFalsy();
   });
 
-  it('shows an explicit stored override as the field value, not just the placeholder', () => {
+  it('shows an explicit stored override as the field value, not just the placeholder', async () => {
+    const user = userEvent.setup();
     render(
       <VoiceSettings
         tenantSlug="acme"
@@ -95,6 +128,7 @@ describe(VoiceSettings, () => {
         saveAction={vi.fn()}
       />,
     );
+    await openAdvanced(user);
 
     expect(
       screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
@@ -112,6 +146,7 @@ describe(VoiceSettings, () => {
         saveAction={saveAction}
       />,
     );
+    await openAdvanced(user);
 
     await user.clear(
       screen.getByRole('textbox', { name: 'Terminal Prompt Host' }),
