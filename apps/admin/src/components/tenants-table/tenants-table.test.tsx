@@ -8,6 +8,7 @@ const render = renderWithIntl;
 const buildTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
   id: 'tenant-1',
   slug: 'acme',
+  name: 'Acme Inc.',
   primaryDomain: 'acme.example.com',
   sanityProjectId: 'proj-1',
   sanityDataset: 'production',

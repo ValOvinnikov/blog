@@ -7,6 +7,7 @@ import { TenantSwitcher } from './tenant-switcher';
 const tenant: TTenant = {
   id: 'tenant-1',
   slug: 'acme',
+  name: 'Acme Inc.',
   primaryDomain: 'acme.example.com',
   sanityProjectId: 'proj-1',
   sanityDataset: 'production',

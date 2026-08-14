@@ -28,6 +28,7 @@ vi.mock('@admin/server/auth/auth', () => ({ auth: vi.fn() }));
 const tenant: TTenant = {
   id: 'tenant-1',
   slug: 'acme',
+  name: 'Acme Inc.',
   primaryDomain: 'acme.example.com',
   sanityProjectId: 'proj-1',
   sanityDataset: 'production',
