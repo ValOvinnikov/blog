@@ -232,6 +232,26 @@ rather than a separate axis; migrating existing `INDIGO`-variant content and
 removing the field itself is tracked separately (#1389) since it's a
 live-data migration, not a schema-only change.
 
+**Voice-as-content** (the config-to-Postgres transition's E4/E5, wired live
+for the first time by E5): `apps/web/src/i18n/request.ts` resolves each
+request's `next-intl` messages as a three-layer merge — the neutral base
+(`i18n/messages/en.json`, neutralized per #1420) ← the resolved preset's
+`voicePack` (`@blog/config`'s `PRESET_REGISTRY[preset].voicePack`, via
+`deepMergePartial`) ← the tenant's `site_config.voiceOverrides`. The
+`preset` and `voiceOverrides` come from the same `site_config` row and the
+same cached read as theme (`get-site-config.ts`, tag `site-config`) — one
+row backs both. `voiceOverrides` stores its 20 curated fields as flat
+camelCase keys (e.g. `notFoundCommandNotFound`), matching `apps/admin`'s
+Voice tab (`apps/admin/src/utils/voice-fields/voice-fields.ts`);
+`apps/web/src/utils/apply-voice-overrides.ts` maps each flat key back to its
+nested message path and applies it last, cloning only the objects along
+that path so untouched namespaces keep referencing the cached messages
+module instead of being mutated in place. A fetch failure, or a tenant with
+no `site_config` row, falls back to the `CONSOLE` preset with no overrides
+— never a thrown error or an empty page. Same single-tenant caveat as
+theme: no host→tenant resolution exists yet, so this reads the sole
+`tenants` row.
+
 Full schema reference (every document/object, field-by-field), naming and
 validation conventions, incl. the `layout`/`sectionHeader` objects' own
 field lists:
