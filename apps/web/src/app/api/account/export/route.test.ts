@@ -1,20 +1,31 @@
 export {};
 
-const { authMock, exportAccountDataMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  exportAccountDataMock: vi.fn(),
-}));
+const { authMock, exportAccountDataMock, getSoleTenantIdMock } = vi.hoisted(
+  () => ({
+    authMock: vi.fn(),
+    exportAccountDataMock: vi.fn(),
+    getSoleTenantIdMock: vi.fn(),
+  }),
+);
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
+
+vi.mock('@web/server/site-config/get-site-config', () => ({
+  getSoleTenantId: getSoleTenantIdMock,
+}));
 
 vi.mock('@blog/db', () => ({
   queries: { account: { exportAccountData: exportAccountDataMock } },
 }));
 
+const TENANT_ID = 'tenant-1';
+
 describe('GET /api/account/export', () => {
   beforeEach(() => {
     authMock.mockReset();
     exportAccountDataMock.mockReset();
+    getSoleTenantIdMock.mockReset();
+    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
   });
 
   it('returns 401 without querying the db when there is no session', async () => {
@@ -56,7 +67,18 @@ describe('GET /api/account/export', () => {
     );
     expect(json.profile).toEqual(exportData.profile);
     expect(json.bookmarks[0].postId).toBe('post-1');
-    expect(exportAccountDataMock).toHaveBeenCalledWith('user-1');
+    expect(exportAccountDataMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
+  });
+
+  it('returns 404 without querying the db when no tenant resolves', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getSoleTenantIdMock.mockResolvedValue(undefined);
+    const { GET } = await import('./route');
+
+    const response = await GET();
+
+    expect(response.status).toBe(404);
+    expect(exportAccountDataMock).not.toHaveBeenCalled();
   });
 
   it('returns 500 when the export query throws', async () => {
