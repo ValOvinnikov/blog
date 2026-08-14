@@ -7,8 +7,18 @@ export const notFoundPageVariants = tv({
       'flex min-h-dvh flex-col items-center justify-center',
       'gap-6 px-gutter py-section text-center',
     ],
-    chip: 'mx-auto',
-    copy: 'max-w-copy mx-auto',
+    chip: ['mx-auto'],
+    copy: ['max-w-copy mx-auto'],
+    plainCopy: ['mx-auto text-lg font-medium text-text'],
+    plainLink: [
+      'inline-flex items-center gap-1.5',
+      'text-brand-primary underline underline-offset-4',
+      'transition-colors duration-base ease-console',
+      'hover:text-brand-primary-hover',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
+    ],
+    plainArrow: ['size-4'],
   },
 });
 

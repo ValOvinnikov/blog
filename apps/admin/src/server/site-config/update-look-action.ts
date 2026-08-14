@@ -1,6 +1,7 @@
 'use server';
 
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
+import { revalidateSiteConfig } from '@admin/server/site-config/revalidate-site-config';
 import { sanitizeLogMessage } from '@admin/utils/sanitize-log-message/sanitize-log-message';
 import {
   DENSITY,
@@ -58,6 +59,7 @@ export async function updateLookAction(
 
   try {
     await queries.siteConfig.upsertSiteConfig(tenant.id, parsed.data);
+    await revalidateSiteConfig();
     return { ok: true };
   } catch (error) {
     console.error('Failed to save Look settings:', sanitizeLogMessage(error));

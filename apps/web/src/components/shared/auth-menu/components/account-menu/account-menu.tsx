@@ -21,6 +21,8 @@ export type TAccountMenuProps = {
   name?: string | null;
   email?: string | null;
   image?: string | null;
+  /** Renders the panel without the `WindowChrome` terminal shell. */
+  plain?: boolean;
 };
 
 /**
@@ -40,6 +42,7 @@ export function AccountMenu({
   name,
   email,
   image,
+  plain = false,
 }: TAccountMenuProps) {
   const t = useTranslations('authMenu');
   const { panel, window: windowSize } = authMenuVariants();
@@ -72,6 +75,45 @@ export function AccountMenu({
   }
   const avatarSrc = imageFailed ? undefined : (image ?? undefined);
 
+  const menuContent = (
+    <>
+      <div className={acctRow()}>
+        <Avatar
+          src={avatarSrc}
+          name={displayName}
+          alt=""
+          size={Size.SM}
+          onImageError={() => setImageFailed(true)}
+        />
+        <div>
+          <p className={accountName()}>{displayName}</p>
+          {email && <p className={accountEmail()}>{email}</p>}
+        </div>
+      </div>
+      <PopoverMenu.Item
+        as={SmartLink}
+        href={routes.bookmarks()}
+        icon={<Icon name={ICONS.BOOKMARK} size={Size.SM} />}
+      >
+        {t('myBookmarks')}
+      </PopoverMenu.Item>
+      <PopoverMenu.Item
+        as={SmartLink}
+        href={routes.account()}
+        icon={<Icon name={ICONS.SETTINGS} size={Size.SM} />}
+      >
+        {t('accountSettings')}
+      </PopoverMenu.Item>
+      <PopoverMenu.Item
+        onClick={() => signOut()}
+        className={signOutItem()}
+        icon={<Icon name={ICONS.POWER} size={Size.SM} />}
+      >
+        {t('signOut')}
+      </PopoverMenu.Item>
+    </>
+  );
+
   return (
     <PopoverMenu className={menuRoot()}>
       <PopoverMenu.Trigger
@@ -95,51 +137,20 @@ export function AccountMenu({
         id={panelId}
         open={open}
         ariaLabel={t('accountMenuAriaLabel')}
-        className={panel()}
+        className={plain ? windowSize() : panel()}
       >
-        <WindowChrome className={windowSize()}>
-          <WindowChrome.Bar>
-            <WindowChrome.User>{username}</WindowChrome.User>{' '}
-            <WindowChrome.Prompt>{t('promptHost')}</WindowChrome.Prompt>{' '}
-            {t('promptCommandAccount')}
-          </WindowChrome.Bar>
-          <WindowChrome.Body>
-            <div className={acctRow()}>
-              <Avatar
-                src={avatarSrc}
-                name={displayName}
-                alt=""
-                size={Size.SM}
-                onImageError={() => setImageFailed(true)}
-              />
-              <div>
-                <p className={accountName()}>{displayName}</p>
-                {email && <p className={accountEmail()}>{email}</p>}
-              </div>
-            </div>
-            <PopoverMenu.Item
-              as={SmartLink}
-              href={routes.bookmarks()}
-              icon={<Icon name={ICONS.BOOKMARK} size={Size.SM} />}
-            >
-              {t('myBookmarks')}
-            </PopoverMenu.Item>
-            <PopoverMenu.Item
-              as={SmartLink}
-              href={routes.account()}
-              icon={<Icon name={ICONS.SETTINGS} size={Size.SM} />}
-            >
-              {t('accountSettings')}
-            </PopoverMenu.Item>
-            <PopoverMenu.Item
-              onClick={() => signOut()}
-              className={signOutItem()}
-              icon={<Icon name={ICONS.POWER} size={Size.SM} />}
-            >
-              {t('signOut')}
-            </PopoverMenu.Item>
-          </WindowChrome.Body>
-        </WindowChrome>
+        {plain ? (
+          menuContent
+        ) : (
+          <WindowChrome className={windowSize()}>
+            <WindowChrome.Bar>
+              <WindowChrome.User>{username}</WindowChrome.User>{' '}
+              <WindowChrome.Prompt>{t('promptHost')}</WindowChrome.Prompt>{' '}
+              {t('promptCommandAccount')}
+            </WindowChrome.Bar>
+            <WindowChrome.Body>{menuContent}</WindowChrome.Body>
+          </WindowChrome>
+        )}
       </PopoverMenu.Panel>
     </PopoverMenu>
   );

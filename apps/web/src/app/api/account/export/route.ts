@@ -1,5 +1,6 @@
 import { queries } from '@blog/db';
 import { auth } from '@web/server/auth/auth';
+import { getSoleTenantId } from '@web/server/site-config/get-site-config';
 import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { NextResponse } from 'next/server';
 
@@ -24,7 +25,16 @@ export async function GET(): Promise<NextResponse> {
   }
 
   try {
-    const data = await queries.account.exportAccountData(userId);
+    const tenantId = await getSoleTenantId();
+
+    if (!tenantId) {
+      return NextResponse.json(
+        { message: 'Account not found' },
+        { status: 404 },
+      );
+    }
+
+    const data = await queries.account.exportAccountData(tenantId, userId);
 
     if (!data) {
       return NextResponse.json(

@@ -2,13 +2,17 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { NewsletterSection } from './newsletter-section';
 
-const { authMock, getSubscriptionStatusMock, getSoleTenantIdMock } = vi.hoisted(
-  () => ({
-    authMock: vi.fn(),
-    getSubscriptionStatusMock: vi.fn(),
-    getSoleTenantIdMock: vi.fn(),
-  }),
-);
+const {
+  authMock,
+  getSubscriptionStatusMock,
+  getChromeOnMock,
+  getSoleTenantIdMock,
+} = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  getSubscriptionStatusMock: vi.fn(),
+  getChromeOnMock: vi.fn(),
+  getSoleTenantIdMock: vi.fn(),
+}));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
@@ -20,6 +24,10 @@ vi.mock('@blog/db', () => ({
   queries: {
     subscribers: { getSubscriptionStatus: getSubscriptionStatusMock },
   },
+}));
+
+vi.mock('@web/utils/get-chrome-on', () => ({
+  getChromeOn: getChromeOnMock,
 }));
 
 vi.mock('@web/components/shared/newsletter-subscription-control', () => ({
@@ -40,6 +48,8 @@ describe(`<${NewsletterSection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
     getSubscriptionStatusMock.mockReset();
+    getChromeOnMock.mockReset();
+    getChromeOnMock.mockResolvedValue(true);
     getSoleTenantIdMock.mockReset();
     getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
   });
@@ -121,5 +131,29 @@ describe(`<${NewsletterSection.name}/>`, () => {
     expect(
       screen.getByTestId('newsletter-subscription-control'),
     ).toHaveTextContent('resend');
+  });
+
+  describe('plain (chromeOn: false)', () => {
+    beforeEach(() => {
+      getChromeOnMock.mockResolvedValue(false);
+    });
+
+    it('renders a plain section heading + card with no terminal shell', async () => {
+      authMock.mockResolvedValue(authedSession);
+      getSubscriptionStatusMock.mockResolvedValue({
+        outcome: 'active',
+        subscriber: { email: 'jane@icloud.com' },
+      });
+
+      await setup();
+
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Newsletter' }),
+      ).toBeVisible();
+      expect(screen.getByText('Subscribed')).toBeVisible();
+      expect(
+        screen.getByTestId('newsletter-subscription-control'),
+      ).toHaveTextContent('unsubscribe');
+    });
   });
 });

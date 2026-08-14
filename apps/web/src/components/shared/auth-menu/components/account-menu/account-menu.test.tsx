@@ -16,9 +16,12 @@ import { AccountMenu, type TAccountMenuProps } from './account-menu';
  * This wrapper stands in for that parent so the panel can actually open/close
  * under test the same way it does inside `AuthMenu`.
  */
-type TWrapperProps = Pick<TAccountMenuProps, 'name' | 'email' | 'image'>;
+type TWrapperProps = Pick<
+  TAccountMenuProps,
+  'name' | 'email' | 'image' | 'plain'
+>;
 
-const Wrapper = ({ name, email, image }: TWrapperProps) => {
+const Wrapper = ({ name, email, image, plain }: TWrapperProps) => {
   const panelId = useId();
   const { open, toggle, triggerRef, panelRef } = usePopover();
 
@@ -32,6 +35,7 @@ const Wrapper = ({ name, email, image }: TWrapperProps) => {
       name={name}
       email={email}
       image={image}
+      plain={plain}
     />
   );
 };
@@ -95,5 +99,37 @@ describe(`<${AccountMenu.name}/>`, () => {
     );
 
     expect(getTriggerImage()).toBeInTheDocument();
+  });
+
+  it('renders the WindowChrome terminal bar when chromeOn (plain unset)', async () => {
+    setup();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Account menu' }));
+    const panel = screen.getByRole('menu');
+
+    expect(panel.textContent).toMatch(/jane\s+Account/);
+  });
+
+  it('renders a plain user-info row and link list with no terminal bar when plain', async () => {
+    const setupPlain = customRender(Wrapper, {
+      name: 'Jane Doe',
+      email: 'jane@example.com',
+      image: 'https://example.com/broken-avatar.png',
+      plain: true,
+    });
+    setupPlain();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Account menu' }));
+    const panel = screen.getByRole('menu');
+
+    expect(within(panel).getAllByText('Jane Doe').length).toBeGreaterThan(0);
+    expect(within(panel).getByText('jane@example.com')).toBeVisible();
+    expect(
+      screen.getByRole('menuitem', { name: 'My bookmarks' }),
+    ).toBeVisible();
+    expect(screen.getByRole('menuitem', { name: 'Sign out' })).toBeVisible();
+    expect(panel.textContent).not.toMatch(/jane\s+Account/);
   });
 });

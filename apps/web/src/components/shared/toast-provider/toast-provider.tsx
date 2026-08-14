@@ -40,6 +40,8 @@ const ToastContext = createContext<IUseToast | undefined>(undefined);
 
 export interface IToastProviderProps {
   children: ReactNode;
+  /** Renders every `Toast` in plain mode — see `Toast`'s own `plain` prop. */
+  plain?: boolean;
 }
 
 const s = toastProviderVariants();
@@ -60,7 +62,10 @@ const s = toastProviderVariants();
  *   <App />
  * </ToastProvider>
  */
-export const ToastProvider = ({ children }: IToastProviderProps) => {
+export const ToastProvider = ({
+  children,
+  plain = false,
+}: IToastProviderProps) => {
   // Lazy `useState` initializer (not `useRef`) — a stable, once-per-mount
   // store instance that's safe to read during render, unlike a ref.
   const [store] = useState(() => createToastStore());
@@ -159,12 +164,13 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
             <Toast
               type={record.type}
               isLoading={record.isLoading}
-              command={record.command}
-              state={
-                record.count && record.count > 1
-                  ? `${record.state}${t('mergeCountSuffix', { count: record.count })}`
-                  : record.state
-              }
+              {...(!plain && {
+                command: record.command,
+                state:
+                  record.count && record.count > 1
+                    ? `${record.state}${t('mergeCountSuffix', { count: record.count })}`
+                    : record.state,
+              })}
               message={record.message}
               time={record.time}
               action={
@@ -182,6 +188,7 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
               durationMs={record.durationMs}
               onDismiss={() => store.actions.dismiss(record.id)}
               phase={record.phase}
+              plain={plain}
               dataTestId={`toast-${record.id}`}
             />
           </div>

@@ -31,3 +31,35 @@ describe(`<${NotFoundPage.name}/>`, () => {
     ).toBeInTheDocument();
   });
 });
+
+describe(`<${NotFoundPage.name}/> (plain)`, () => {
+  const setupPlain = customRender(NotFoundPage, { plain: true });
+
+  beforeEach(() => {
+    setupPlain();
+  });
+
+  it('renders a single h1 landmark heading', () => {
+    expect(
+      screen.getByRole('heading', { level: 1, name: '404' }),
+    ).toBeVisible();
+  });
+
+  it('renders the plain "Not found" copy with no TerminalChip prompt styling', () => {
+    expect(screen.getByText('Not found')).toBeVisible();
+    expect(screen.queryByText('404: Not found')).not.toBeInTheDocument();
+  });
+
+  it('renders a plain link back home with no "cd ~" prompt-line styling', () => {
+    const link = screen.getByRole('link', { name: 'Return home' });
+    expect(link).toHaveAttribute('href', '/');
+    expect(screen.queryByText('cd ~')).not.toBeInTheDocument();
+  });
+
+  it('renders the decorative arrow icon inside the link', () => {
+    const link = screen.getByRole('link', { name: 'Return home' });
+    expect(
+      within(link).getByTestId('not-found-arrow-icon'),
+    ).toBeInTheDocument();
+  });
+});

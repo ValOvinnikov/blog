@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, routes, SOCIAL_PLATFORMS } from '@blog/config';
+import userEvent from '@testing-library/user-event';
 import realMessages from '@web/i18n/messages/en.json';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import type { ReactNode } from 'react';
@@ -9,6 +10,7 @@ const {
   getSiteSettingsMock,
   getNavigationMock,
   getFooterMock,
+  getChromeOnMock,
   getMessagesMock,
   getNowMock,
   getTimeZoneMock,
@@ -20,6 +22,7 @@ const {
   getSiteSettingsMock: vi.fn(),
   getNavigationMock: vi.fn(),
   getFooterMock: vi.fn(),
+  getChromeOnMock: vi.fn(),
   getMessagesMock: vi.fn(),
   getNowMock: vi.fn(),
   getTimeZoneMock: vi.fn(),
@@ -31,6 +34,10 @@ const {
 
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
+}));
+
+vi.mock('@web/utils/get-chrome-on', () => ({
+  getChromeOn: getChromeOnMock,
 }));
 
 vi.mock('@blog/service', () => ({
@@ -91,6 +98,7 @@ describe('LocaleLayout', () => {
     });
     getNavigationMock.mockResolvedValue({ ok: true, data: { items: [] } });
     getFooterMock.mockResolvedValue({ ok: true, data: { social: [] } });
+    getChromeOnMock.mockResolvedValue(true);
     getMessagesMock.mockResolvedValue(realMessages);
     getNowMock.mockResolvedValue(now);
     getTimeZoneMock.mockResolvedValue('UTC');
@@ -249,5 +257,18 @@ describe('LocaleLayout', () => {
     expect(
       within(link).queryByTestId(`social-icon-${SOCIAL_PLATFORMS.MASTODON}`),
     ).not.toBeInTheDocument();
+  });
+
+  it('wires chromeOn: false into AuthMenu and ToastProvider as plain', async () => {
+    getChromeOnMock.mockResolvedValue(false);
+
+    await setup();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
+    const panel = screen.getByRole('menu');
+
+    expect(within(panel).queryByText('Guest')).not.toBeInTheDocument();
+    expect(within(panel).getByText('Choose a sign-in method')).toBeVisible();
   });
 });

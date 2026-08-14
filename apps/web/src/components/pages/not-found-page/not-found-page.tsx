@@ -9,6 +9,11 @@ import {
   notFoundPageVariants,
 } from './not-found-page-variants';
 
+export interface INotFoundPageProps {
+  /** Renders the plain 404 body with no `TerminalChip`/prompt-line styling. */
+  plain?: boolean;
+}
+
 const s = notFoundPageVariants();
 const {
   root,
@@ -18,13 +23,15 @@ const {
 } = notFoundLinkVariants();
 
 /**
- * NotFoundPage — the terminal-styled 404 body content. Rendered from the
- * root `not-found.tsx`, which sits outside the `[locale]` route tree (this
- * app's `Header`/`Footer` chrome lives in `[locale]/layout.tsx`), so this
- * stays a self-contained, centered composition: no site chrome, just the
- * `TerminalChip` molecule, a short explanation, and a link home.
+ * NotFoundPage — the 404 body content. Rendered from the root
+ * `not-found.tsx`, which sits outside the `[locale]` route tree (this app's
+ * `Header`/`Footer` chrome lives in `[locale]/layout.tsx`), so this stays a
+ * self-contained, centered composition: no site chrome, just a short
+ * explanation and a link home. Renders the terminal-styled `TerminalChip`/
+ * prompt-line treatment when `plain` is unset, or a plain equivalent when
+ * `plain` is true (`chromeOn: false`).
  */
-export const NotFoundPage = () => {
+export const NotFoundPage = ({ plain = false }: INotFoundPageProps) => {
   const t = useTranslations('notFound');
 
   return (
@@ -32,21 +39,36 @@ export const NotFoundPage = () => {
       <Heading level={1} visual="hero">
         404
       </Heading>
-      <TerminalChip
-        prefix="404: "
-        suffix={t('commandNotFound')}
-        className={s.chip()}
-      />
+      {plain ? (
+        <Text className={s.plainCopy()}>{t('commandNotFound')}</Text>
+      ) : (
+        <TerminalChip
+          prefix="404: "
+          suffix={t('commandNotFound')}
+          className={s.chip()}
+        />
+      )}
       <Text className={s.copy()}>{t('description')}</Text>
-      <SmartLink href="/" aria-label={t('returnHome')} className={root()}>
-        <span className={promptSlot()} aria-hidden="true">
-          $
-        </span>
-        <span className={commandSlot()}>cd ~</span>
-        <span className={arrow()} aria-hidden="true">
-          <Icon name={ICONS.ARROW} dataTestId="not-found-arrow-icon" />
-        </span>
-      </SmartLink>
+      {plain ? (
+        <SmartLink href="/" className={s.plainLink()}>
+          {t('returnHome')}
+          <Icon
+            name={ICONS.ARROW}
+            className={s.plainArrow()}
+            dataTestId="not-found-arrow-icon"
+          />
+        </SmartLink>
+      ) : (
+        <SmartLink href="/" aria-label={t('returnHome')} className={root()}>
+          <span className={promptSlot()} aria-hidden="true">
+            $
+          </span>
+          <span className={commandSlot()}>cd ~</span>
+          <span className={arrow()} aria-hidden="true">
+            <Icon name={ICONS.ARROW} dataTestId="not-found-arrow-icon" />
+          </span>
+        </SmartLink>
+      )}
     </main>
   );
 };
