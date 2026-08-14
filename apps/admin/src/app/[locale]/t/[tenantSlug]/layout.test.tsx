@@ -75,4 +75,25 @@ describe(`<${TenantLayout.name}/>`, () => {
     expect(screen.getByText('tenant content')).toBeVisible();
     expect(redirect).not.toHaveBeenCalled();
   });
+
+  it('renders both the Platform and Tenant sections in the sidebar', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getTenantBySlugMock.mockResolvedValue({
+      id: 'tenant-1',
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+    });
+    getMembershipMock.mockResolvedValue({
+      id: 'membership-1',
+      userId: 'user-1',
+      tenantId: 'tenant-1',
+      role: 'OWNER',
+      createdAt: new Date(),
+    });
+
+    await setup();
+
+    expect(screen.getByText('Platform')).toBeVisible();
+    expect(screen.getByText('Tenant · acme')).toBeVisible();
+  });
 });
