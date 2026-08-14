@@ -1,6 +1,7 @@
 import { TenantsTable } from '@admin/components/tenants-table';
+import { Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { Button } from '@blog/ui/atoms';
+import { Button, Heading } from '@blog/ui/atoms';
 import { useTranslations } from 'next-intl';
 
 import { tenantsViewVariants } from './tenants-view-variants';
@@ -17,14 +18,16 @@ export type TTenantsViewProps = {
 export function TenantsView({ tenants }: TTenantsViewProps) {
   const t = useTranslations('tenantsView');
   const addTenantReasonText = t('addTenantReason');
-  const { root, header, title, description, addTenant, addTenantReason } =
+  const { root, header, description, addTenant, addTenantReason } =
     tenantsViewVariants();
 
   return (
     <div className={root()}>
       <div className={header()}>
         <div>
-          <h1 className={title()}>{t('title')}</h1>
+          <Heading level={1} size={Size.MD}>
+            {t('title')}
+          </Heading>
           <p className={description()}>
             {t.rich('description', { code: (chunks) => <code>{chunks}</code> })}
           </p>

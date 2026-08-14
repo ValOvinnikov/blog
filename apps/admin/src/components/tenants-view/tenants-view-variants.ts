@@ -4,7 +4,6 @@ export const tenantsViewVariants = tv({
   slots: {
     root: ['flex flex-col gap-6'],
     header: ['flex flex-wrap items-start justify-between gap-4'],
-    title: ['font-display text-2xl font-semibold text-text'],
     description: ['mt-1 max-w-md text-sm text-text-muted'],
     addTenant: ['flex flex-col items-end gap-1.5'],
     addTenantReason: ['max-w-64 text-right text-xs text-text-subtle'],
