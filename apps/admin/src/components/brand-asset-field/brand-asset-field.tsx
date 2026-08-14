@@ -10,9 +10,16 @@ import {
 import { ALERT_TYPE, Size } from '@blog/config';
 import { Alert } from '@blog/ui/atoms/alert';
 import { Button } from '@blog/ui/atoms/button';
+import { unstable_rethrow } from 'next/navigation';
 import { type ChangeEvent, useRef, useState, useTransition } from 'react';
 
 import { brandAssetFieldVariants } from './brand-asset-field-variants';
+
+// A thrown error from the action boundary itself (network failure, or the
+// platform rejecting the request before the action body even runs — e.g.
+// Next's own Server Action body-size cap) never reaches the action's own
+// `{ ok: false, error }` result shape, so it needs its own readable fallback.
+const UNEXPECTED_ERROR_MESSAGE = 'Something went wrong — try again.';
 
 export type TBrandAssetFieldProps = {
   tenantSlug: string;
@@ -70,11 +77,22 @@ export function BrandAssetField({
     formData.append('file', file);
 
     startTransition(async () => {
-      const result = await uploadBrandAssetAction(tenantSlug, kind, formData);
-      if (result.ok) {
-        onChange(result.url);
-      } else {
-        setError(result.error);
+      try {
+        const result = await uploadBrandAssetAction(tenantSlug, kind, formData);
+        if (result.ok) {
+          onChange(result.url);
+        } else {
+          setError(result.error);
+        }
+      } catch (thrownError) {
+        // Re-throws unchanged if this is Next's own redirect/notFound digest
+        // (e.g. the tenant gate inside the action) — anything else (a
+        // network failure, or the platform rejecting the request before the
+        // action body even runs, like a body-size-limit 413) falls through
+        // to the same readable-error path the action's own `{ ok: false }`
+        // result uses.
+        unstable_rethrow(thrownError);
+        setError(UNEXPECTED_ERROR_MESSAGE);
       }
     });
   }
@@ -82,11 +100,16 @@ export function BrandAssetField({
   function handleRemove() {
     setError(undefined);
     startTransition(async () => {
-      const result = await clearBrandAssetAction(tenantSlug, kind);
-      if (result.ok) {
-        onChange(undefined);
-      } else {
-        setError(result.error);
+      try {
+        const result = await clearBrandAssetAction(tenantSlug, kind);
+        if (result.ok) {
+          onChange(undefined);
+        } else {
+          setError(result.error);
+        }
+      } catch (thrownError) {
+        unstable_rethrow(thrownError);
+        setError(UNEXPECTED_ERROR_MESSAGE);
       }
     });
   }

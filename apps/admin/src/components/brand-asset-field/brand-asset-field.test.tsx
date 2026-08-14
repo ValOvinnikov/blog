@@ -157,6 +157,32 @@ describe(BrandAssetField, () => {
     expect(screen.getByAltText('Current favicon')).toBeInTheDocument();
   });
 
+  it('shows a readable fallback error, without crashing, when the action call itself throws (e.g. a body-size rejection)', async () => {
+    uploadBrandAssetActionMock.mockRejectedValue(
+      new Error('Body exceeded 1mb limit'),
+    );
+    const onChange = vi.fn();
+    const { container } = render(
+      <BrandAssetField
+        tenantSlug="acme"
+        kind="logo"
+        label="Logo"
+        hint="PNG, JPEG, or WebP."
+        currentUrl="https://example.blob.vercel-storage.com/logo.png"
+        onChange={onChange}
+      />,
+    );
+
+    const file = new File(['bytes'], 'logo.png', { type: 'image/png' });
+    await selectFile(container, file);
+
+    expect(
+      await screen.findByText('Something went wrong — try again.'),
+    ).toBeInTheDocument();
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.getByAltText('Current logo')).toBeInTheDocument();
+  });
+
   it('clears the saved value through the clear action when Remove is clicked', async () => {
     clearBrandAssetActionMock.mockResolvedValue({ ok: true });
     const onChange = vi.fn();

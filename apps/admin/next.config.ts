@@ -71,6 +71,18 @@ const securityHeaders = [
 ];
 
 const config: NextConfig = {
+  // Next's own Server Action body-size cap defaults to 1 MB — well under the
+  // Look tab's declared logo limit (`MAX_UPLOAD_BYTES.logo`, 4 MB in
+  // `@admin/utils/brand-asset-limits`). Without raising it here, any upload
+  // over ~1 MB never reaches `validateBrandAssetUpload` at all: Next's body
+  // parser 413s first. Set with headroom above the 4 MB logo ceiling (not
+  // an exact match) to absorb multipart/FormData framing overhead — keep
+  // this above `MAX_UPLOAD_BYTES.logo` if that constant ever grows.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '6mb',
+    },
+  },
   async headers() {
     return [
       {
