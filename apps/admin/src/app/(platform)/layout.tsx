@@ -1,6 +1,6 @@
 import { AdminShell } from '@admin/components/admin-shell';
 import { requireAdmin } from '@admin/server/auth/require-admin';
-import { adminRoutes } from '@admin/utils/routes/routes';
+import { platformNavSections } from '@admin/utils/nav-sections/nav-sections';
 
 type TProps = {
   children: React.ReactNode;
@@ -18,12 +18,7 @@ export default async function PlatformLayout({ children }: TProps) {
 
   return (
     <AdminShell
-      sections={[
-        {
-          label: 'Platform',
-          items: [{ label: 'Tenants', href: adminRoutes.tenants() }],
-        },
-      ]}
+      sections={platformNavSections()}
       crumb="Platform"
       roleLabel={`${admin.role} · Platform`}
     >

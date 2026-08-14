@@ -4,7 +4,7 @@ import { adminRoutes } from '@admin/utils/routes/routes';
 import { Menu } from '@base-ui/react/menu';
 import { ICONS, Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { Icon } from '@blog/ui/atoms';
+import { Avatar, Icon } from '@blog/ui/atoms';
 import Link from 'next/link';
 
 import { tenantSwitcherVariants } from './tenant-switcher-variants';
@@ -14,8 +14,6 @@ export type TTenantSwitcherProps = {
   tenants: TTenant[];
   activeTenantId: string;
 };
-
-const initials = (slug: string) => slug.slice(0, 2).toUpperCase();
 
 /**
  * The tenant picker in the sidebar. Behaviour (open state, focus, dismissal)
@@ -32,7 +30,6 @@ export function TenantSwitcher({
 
   const {
     trigger,
-    avatar,
     meta,
     name,
     domain,
@@ -50,9 +47,7 @@ export function TenantSwitcher({
   return (
     <Menu.Root>
       <Menu.Trigger className={trigger()}>
-        <span className={avatar()} aria-hidden="true">
-          {initials(active.slug)}
-        </span>
+        <Avatar name={active.slug} alt={active.slug} size={Size.SM} />
         <span className={meta()}>
           <span className={name()}>{active.slug}</span>
           <span className={domain()}>{active.primaryDomain}</span>

@@ -5,4 +5,6 @@
 export const adminRoutes = {
   tenants: () => '/tenants',
   tenant: (tenantSlug: string) => `/t/${tenantSlug}`,
+  look: (tenantSlug: string) => `/t/${tenantSlug}/look`,
+  voice: (tenantSlug: string) => `/t/${tenantSlug}/voice`,
 } as const;

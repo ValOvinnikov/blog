@@ -11,10 +11,6 @@ export const tenantSwitcherVariants = tv({
       'focus-visible:ring-offset-2 focus-visible:ring-offset-secondary',
       'data-[popup-open]:border-brand-primary',
     ],
-    avatar: [
-      'flex size-7 shrink-0 items-center justify-center rounded-sm',
-      'bg-brand-primary-muted font-mono text-xs font-semibold text-brand-primary',
-    ],
     meta: ['flex min-w-0 flex-1 flex-col'],
     name: ['truncate text-sm font-medium text-text'],
     domain: ['truncate font-mono text-meta text-text-subtle'],
