@@ -5,12 +5,17 @@ import {
   toLookFormValues,
 } from '@admin/utils/default-look-values/default-look-values';
 import { queries } from '@blog/db';
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
 type TProps = {
   params: Promise<{ tenantSlug: string }>;
 };
 
-export const metadata = { title: 'Look · Admin' };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('pageMetadata');
+  return { title: t('look') };
+}
 
 export default async function LookPage({ params }: TProps) {
   const { tenantSlug } = await params;
