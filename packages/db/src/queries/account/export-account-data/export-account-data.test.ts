@@ -47,9 +47,26 @@ afterEach(async () => {
   await db.delete(schema.tenants);
 });
 
+async function insertTenant(slug: string): Promise<string> {
+  const [tenant] = await db
+    .insert(schema.tenants)
+    .values({
+      slug,
+      primaryDomain: `${slug}.example.com`,
+      sanityProjectId: 'abc123',
+      sanityDataset: 'production',
+      locale: 'en',
+      plan: TENANT_PLAN.FREE,
+      status: TENANT_STATUS.ACTIVE,
+    })
+    .returning();
+  if (!tenant) throw new Error('failed to seed a tenant row');
+  return tenant.id;
+}
+
 describe(exportAccountData, () => {
   it('returns undefined for a userId with no matching users row', async () => {
-    expect(await exportAccountData('missing-user')).toBeUndefined();
+    expect(await exportAccountData(tenantId, 'missing-user')).toBeUndefined();
   });
 
   it("aggregates the user's profile fields and bookmarks", async () => {
@@ -74,7 +91,7 @@ describe(exportAccountData, () => {
       },
     ]);
 
-    const result = await exportAccountData('user-1');
+    const result = await exportAccountData(tenantId, 'user-1');
 
     expect(result).toEqual({
       profile: {
@@ -94,7 +111,7 @@ describe(exportAccountData, () => {
   it('maps unset nullable profile fields to undefined, never null', async () => {
     await db.insert(schema.users).values({ id: 'user-1' });
 
-    const result = await exportAccountData('user-1');
+    const result = await exportAccountData(tenantId, 'user-1');
 
     expect(result?.profile).toEqual({
       id: 'user-1',
@@ -108,7 +125,7 @@ describe(exportAccountData, () => {
   it('returns an empty bookmarks array for a user with none', async () => {
     await db.insert(schema.users).values({ id: 'user-1' });
 
-    const result = await exportAccountData('user-1');
+    const result = await exportAccountData(tenantId, 'user-1');
 
     expect(result?.bookmarks).toEqual([]);
   });
@@ -120,7 +137,22 @@ describe(exportAccountData, () => {
       { tenantId, userId: 'user-2', postId: 'post-2' },
     ]);
 
-    const result = await exportAccountData('user-1');
+    const result = await exportAccountData(tenantId, 'user-1');
+
+    expect(result?.bookmarks.map((bookmark) => bookmark.postId)).toEqual([
+      'post-1',
+    ]);
+  });
+
+  it("does not include the user's bookmarks from another tenant", async () => {
+    await db.insert(schema.users).values({ id: 'user-1' });
+    const otherTenantId = await insertTenant('other');
+    await db.insert(schema.bookmarks).values([
+      { tenantId, userId: 'user-1', postId: 'post-1' },
+      { tenantId: otherTenantId, userId: 'user-1', postId: 'post-2' },
+    ]);
+
+    const result = await exportAccountData(tenantId, 'user-1');
 
     expect(result?.bookmarks.map((bookmark) => bookmark.postId)).toEqual([
       'post-1',
