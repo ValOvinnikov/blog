@@ -11,5 +11,5 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DashboardOverviewPage() {
   const { tenant } = await resolveDashboardTenant();
 
-  return <TenantOverview tenantSlug={tenant.slug} />;
+  return <TenantOverview tenantName={tenant.name} />;
 }

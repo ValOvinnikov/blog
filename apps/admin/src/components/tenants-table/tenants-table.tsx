@@ -25,7 +25,7 @@ const formatCreatedAt = (date: Date) =>
  */
 export function TenantsTable({ tenants }: TTenantsTableProps) {
   const t = useTranslations('tenantsTable');
-  const { wrapper, table, head, row, cell, slug, domain, empty } =
+  const { wrapper, table, head, row, cell, name, domain, empty } =
     tenantsTableVariants();
 
   if (tenants.length === 0) {
@@ -59,7 +59,7 @@ export function TenantsTable({ tenants }: TTenantsTableProps) {
           {tenants.map((tenant) => (
             <tr className={row()} key={tenant.id}>
               <td className={cell()}>
-                <p className={slug()}>{tenant.slug}</p>
+                <p className={name()}>{tenant.name}</p>
                 <p className={domain()}>{tenant.primaryDomain}</p>
               </td>
               <td className={cell()}>

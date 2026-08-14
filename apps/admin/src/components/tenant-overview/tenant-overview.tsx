@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 import { tenantOverviewVariants } from './tenant-overview-variants';
 
 export type TTenantOverviewProps = {
-  tenantSlug: string;
+  tenantName: string;
 };
 
 /**
@@ -12,13 +12,13 @@ export type TTenantOverviewProps = {
  * and their own ticket — this page exists so the switcher and the
  * `memberships` gate have somewhere real to land in the meantime.
  */
-export function TenantOverview({ tenantSlug }: TTenantOverviewProps) {
+export function TenantOverview({ tenantName }: TTenantOverviewProps) {
   const t = useTranslations('tenantOverview');
   const { root, title, description } = tenantOverviewVariants();
 
   return (
     <div className={root()}>
-      <h1 className={title()}>{tenantSlug}</h1>
+      <h1 className={title()}>{tenantName}</h1>
       <p className={description()}>{t('description')}</p>
     </div>
   );

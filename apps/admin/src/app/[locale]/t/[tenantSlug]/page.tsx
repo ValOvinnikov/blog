@@ -1,4 +1,5 @@
 import { TenantOverview } from '@admin/components/tenant-overview';
+import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
@@ -13,6 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function TenantOverviewPage({ params }: TProps) {
   const { tenantSlug } = await params;
+  const { tenant } = await requireTenantMembership(tenantSlug);
 
-  return <TenantOverview tenantSlug={tenantSlug} />;
+  return <TenantOverview tenantName={tenant.name} />;
 }

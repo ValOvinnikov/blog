@@ -45,6 +45,7 @@ describe(`<${TenantLayout.name}/>`, () => {
     getTenantBySlugMock.mockResolvedValue({
       id: 'tenant-1',
       slug: 'acme',
+      name: 'Acme Inc.',
       primaryDomain: 'acme.example.com',
     });
     getMembershipMock.mockResolvedValue(undefined);
@@ -60,6 +61,7 @@ describe(`<${TenantLayout.name}/>`, () => {
     getTenantBySlugMock.mockResolvedValue({
       id: 'tenant-1',
       slug: 'acme',
+      name: 'Acme Inc.',
       primaryDomain: 'acme.example.com',
     });
     getMembershipMock.mockResolvedValue({
@@ -81,6 +83,7 @@ describe(`<${TenantLayout.name}/>`, () => {
     getTenantBySlugMock.mockResolvedValue({
       id: 'tenant-1',
       slug: 'acme',
+      name: 'Acme Inc.',
       primaryDomain: 'acme.example.com',
     });
     getMembershipMock.mockResolvedValue({

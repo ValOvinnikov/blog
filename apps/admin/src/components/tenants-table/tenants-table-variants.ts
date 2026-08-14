@@ -10,7 +10,7 @@ export const tenantsTableVariants = tv({
     ],
     row: ['border-b border-border last:border-b-0'],
     cell: ['px-4 py-3 align-middle text-text'],
-    slug: ['font-medium text-text'],
+    name: ['font-medium text-text'],
     domain: ['font-mono text-meta text-text-subtle'],
     empty: ['p-8 text-center text-sm text-text-muted'],
   },

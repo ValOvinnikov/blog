@@ -22,6 +22,7 @@ describe(TenantsPage, () => {
       {
         id: 'tenant-1',
         slug: 'acme',
+        name: 'Acme Inc.',
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'proj-1',
         sanityDataset: 'production',
@@ -36,7 +37,7 @@ describe(TenantsPage, () => {
     await setup();
 
     expect(listTenantsMock).toHaveBeenCalled();
-    expect(screen.getByText('acme')).toBeVisible();
+    expect(screen.getByText('Acme Inc.')).toBeVisible();
     expect(screen.getByText('Active')).toBeVisible();
   });
 });
