@@ -1,6 +1,6 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
-import { getSoleTenantId } from '@web/server/site-config/get-site-config';
+import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
 import { escapeXml } from '@web/utils/escape-xml';
 import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { NextResponse } from 'next/server';
@@ -56,6 +56,11 @@ function renderConfirmationPage({
  * `/api` (not `[locale]`) alongside this app's other Route Handlers
  * (`/api/account/export`, `/api/revalidate`) — none of them are locale-
  * prefixed, matching `localePrefix: 'never'`.
+ *
+ * `/api` routes are excluded from `proxy.ts`'s matcher (see its own docs),
+ * so the `x-tenant-id` request header it threads to Server Components/
+ * Actions never reaches here — this route resolves the tenant directly from
+ * its own request's `Host` header instead.
  */
 export async function GET(request: Request): Promise<NextResponse> {
   const token = new URL(request.url).searchParams.get('token');
@@ -74,7 +79,8 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   try {
-    const tenantId = await getSoleTenantId();
+    const host = request.headers.get('host');
+    const tenantId = await resolveTenantId(host);
     if (!tenantId) {
       return new NextResponse(
         renderConfirmationPage({

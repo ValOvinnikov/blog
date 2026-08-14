@@ -1,7 +1,8 @@
 import { queries } from '@blog/db';
 import { auth } from '@web/server/auth/auth';
-import { getSoleTenantId } from '@web/server/site-config/get-site-config';
+import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
 import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
+import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 /**
@@ -15,6 +16,10 @@ import { NextResponse } from 'next/server';
  * `bookmarks`) via `queries.account.exportAccountData`; comments/ratings/
  * newsletter each extend that query's own shape once they land, not this
  * route.
+ *
+ * `/api` routes are excluded from `proxy.ts`'s matcher, so the `x-tenant-id`
+ * header it threads to Server Components/Actions never reaches here — this
+ * route resolves the tenant directly from its own request's `Host` header.
  */
 export async function GET(): Promise<NextResponse> {
   const session = await auth();
@@ -25,7 +30,8 @@ export async function GET(): Promise<NextResponse> {
   }
 
   try {
-    const tenantId = await getSoleTenantId();
+    const host = (await headers()).get('host');
+    const tenantId = await resolveTenantId(host);
 
     if (!tenantId) {
       return NextResponse.json(

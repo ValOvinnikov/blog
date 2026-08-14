@@ -2,7 +2,7 @@
 
 import { queries } from '@blog/db';
 import { auth } from '@web/server/auth/auth';
-import { getSoleTenantId } from '@web/server/site-config/get-site-config';
+import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 
 export type TSetBookmarkResult = { ok: true } | { ok: false };
@@ -19,7 +19,7 @@ export async function getBookmarkStatus(postId: string): Promise<boolean> {
   const userId = session?.user?.id;
   if (!userId) return false;
 
-  const tenantId = await getSoleTenantId();
+  const tenantId = await getRequestTenantId();
   if (!tenantId) return false;
 
   return queries.bookmarks.isBookmarked(tenantId, userId, postId);
@@ -42,7 +42,7 @@ export async function setBookmarkStatus(
   const userId = session?.user?.id;
   if (!userId) return { ok: false };
 
-  const tenantId = await getSoleTenantId();
+  const tenantId = await getRequestTenantId();
   if (!tenantId) return { ok: false };
 
   try {

@@ -216,10 +216,23 @@ tokens as a server-rendered `<style>` block declaring CSS custom properties
 under both `:root` and `.dark`, and selects the matching `next/font/google`
 pair (`headingFont`/`bodyFont`) via a per-font dynamically imported loader
 module so only the two fonts actually resolved for that render are
-bundled/preloaded. `apps/web` has no host→tenant resolution yet (that lands
-with the public site's multi-tenant middleware, still unbuilt) — today's
-single-tenant deployment reads the sole `tenants` row rather than resolving
-one per request. The Sanity `settings_theme` schema this superseded is
+bundled/preloaded. `apps/web/src/proxy.ts` resolves the request's tenant from
+its `Host` header against `@blog/db`'s `tenant_domains`
+(`resolveTenantId()`, `apps/web/src/server/tenant/`), falling back to the
+sole `tenants` row outside production (`isProductionEnvironment()` — never
+`NODE_ENV`, which is `production` on every Vercel build including the live
+`blog-dev` deployment) and 404ing on an unmatched host in production; the
+resolved `tenantId` is threaded to Server Components/Actions via the
+`x-tenant-id` request header (unconditionally cleared before the conditional
+set, so a client-supplied value can never survive an unresolved lookup),
+read back with `getRequestTenantId()`. `get-site-config.ts` is a deliberate
+exception: it backs the theme/voice reads below via a fixed-cache-key
+`unstable_cache` read on nearly every route (including statically rendered
+ones), so wiring it to the per-request header would force those routes out
+of static rendering — a larger, sitewide tradeoff with no settled design yet
+(unresolved, not scoped into any existing epic). It keeps its own private
+sole-tenant resolution (`resolveSiteConfigTenantId`) until that tradeoff is
+decided. The Sanity `settings_theme` schema this superseded is
 retained only as a rollback path (unused by any read path) until the
 transition's retirement epic deletes it. The favicon route
 (`apps/web/src/app/icon.tsx`) fetches through the tenant's uploaded
@@ -248,9 +261,9 @@ nested message path and applies it last, cloning only the objects along
 that path so untouched namespaces keep referencing the cached messages
 module instead of being mutated in place. A fetch failure, or a tenant with
 no `site_config` row, falls back to the `CONSOLE` preset with no overrides
-— never a thrown error or an empty page. Same single-tenant caveat as
-theme: no host→tenant resolution exists yet, so this reads the sole
-`tenants` row.
+— never a thrown error or an empty page. Same `get-site-config.ts` caveat as
+theme, above: this reads the sole `tenants` row rather than the real
+`proxy.ts` resolution, pending the tenant-scoped caching design.
 
 `get-site-config.ts`'s cache carries a 3600s (`SITE_CONFIG_REVALIDATE_SECONDS`)
 fallback window as its safety net, but `apps/admin`'s Look/Voice save actions

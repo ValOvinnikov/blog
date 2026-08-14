@@ -6,14 +6,14 @@ const {
   resendConfirmationMock,
   sendEmailMock,
   clearNewsletterSubscribedCookieMock,
-  getSoleTenantIdMock,
+  getRequestTenantIdMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   unsubscribeMock: vi.fn(),
   resendConfirmationMock: vi.fn(),
   sendEmailMock: vi.fn(),
   clearNewsletterSubscribedCookieMock: vi.fn(),
-  getSoleTenantIdMock: vi.fn(),
+  getRequestTenantIdMock: vi.fn(),
 }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
@@ -35,8 +35,8 @@ vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
   clearNewsletterSubscribedCookie: clearNewsletterSubscribedCookieMock,
 }));
 
-vi.mock('@web/server/site-config/get-site-config', () => ({
-  getSoleTenantId: getSoleTenantIdMock,
+vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
+  getRequestTenantId: getRequestTenantIdMock,
 }));
 
 const TENANT_ID = 'tenant-1';
@@ -59,8 +59,8 @@ describe('unsubscribeAction', () => {
     authMock.mockReset();
     unsubscribeMock.mockReset();
     clearNewsletterSubscribedCookieMock.mockReset();
-    getSoleTenantIdMock.mockReset();
-    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
+    getRequestTenantIdMock.mockReset();
+    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
   });
 
   it('returns { ok: false } without unsubscribing when there is no session', async () => {
@@ -75,7 +75,7 @@ describe('unsubscribeAction', () => {
 
   it('returns { ok: false } without unsubscribing when no tenant resolves', async () => {
     authMock.mockResolvedValue(session);
-    getSoleTenantIdMock.mockResolvedValue(undefined);
+    getRequestTenantIdMock.mockResolvedValue(undefined);
     const { unsubscribeAction } =
       await import('./newsletter-subscription-actions');
 
@@ -133,8 +133,8 @@ describe('resendConfirmationAction', () => {
     authMock.mockReset();
     resendConfirmationMock.mockReset();
     sendEmailMock.mockReset();
-    getSoleTenantIdMock.mockReset();
-    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
+    getRequestTenantIdMock.mockReset();
+    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
   });
 
   it('returns { ok: false } without resending when there is no session', async () => {
@@ -158,7 +158,7 @@ describe('resendConfirmationAction', () => {
 
   it('returns { ok: false } without resending when no tenant resolves', async () => {
     authMock.mockResolvedValue(session);
-    getSoleTenantIdMock.mockResolvedValue(undefined);
+    getRequestTenantIdMock.mockResolvedValue(undefined);
     const { resendConfirmationAction } =
       await import('./newsletter-subscription-actions');
 

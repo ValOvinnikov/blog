@@ -2,13 +2,13 @@ import { getBookmarkStatus, setBookmarkStatus } from './bookmark-actions';
 
 const {
   authMock,
-  getSoleTenantIdMock,
+  getRequestTenantIdMock,
   isBookmarkedMock,
   addBookmarkMock,
   removeBookmarkMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
-  getSoleTenantIdMock: vi.fn(),
+  getRequestTenantIdMock: vi.fn(),
   isBookmarkedMock: vi.fn(),
   addBookmarkMock: vi.fn(),
   removeBookmarkMock: vi.fn(),
@@ -16,8 +16,8 @@ const {
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@web/server/site-config/get-site-config', () => ({
-  getSoleTenantId: getSoleTenantIdMock,
+vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
+  getRequestTenantId: getRequestTenantIdMock,
 }));
 
 vi.mock('@blog/db', () => ({
@@ -35,8 +35,8 @@ const TENANT_ID = 'tenant-1';
 describe('getBookmarkStatus', () => {
   beforeEach(() => {
     authMock.mockReset();
-    getSoleTenantIdMock.mockReset();
-    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
+    getRequestTenantIdMock.mockReset();
+    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
     isBookmarkedMock.mockReset();
   });
 
@@ -49,7 +49,7 @@ describe('getBookmarkStatus', () => {
 
   it('resolves false without querying the db when no tenant resolves', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getSoleTenantIdMock.mockResolvedValue(undefined);
+    getRequestTenantIdMock.mockResolvedValue(undefined);
 
     await expect(getBookmarkStatus('post-1')).resolves.toBe(false);
     expect(isBookmarkedMock).not.toHaveBeenCalled();
@@ -71,8 +71,8 @@ describe('getBookmarkStatus', () => {
 describe('setBookmarkStatus', () => {
   beforeEach(() => {
     authMock.mockReset();
-    getSoleTenantIdMock.mockReset();
-    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
+    getRequestTenantIdMock.mockReset();
+    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
     addBookmarkMock.mockReset();
     removeBookmarkMock.mockReset();
   });
@@ -89,7 +89,7 @@ describe('setBookmarkStatus', () => {
 
   it('returns { ok: false } without writing when no tenant resolves', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getSoleTenantIdMock.mockResolvedValue(undefined);
+    getRequestTenantIdMock.mockResolvedValue(undefined);
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       ok: false,

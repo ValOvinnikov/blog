@@ -1,22 +1,24 @@
 export {};
 
-const { authMock, exportAccountDataMock, getSoleTenantIdMock } = vi.hoisted(
-  () => ({
+const { authMock, exportAccountDataMock, resolveTenantIdMock, headersMock } =
+  vi.hoisted(() => ({
     authMock: vi.fn(),
     exportAccountDataMock: vi.fn(),
-    getSoleTenantIdMock: vi.fn(),
-  }),
-);
+    resolveTenantIdMock: vi.fn(),
+    headersMock: vi.fn(),
+  }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@web/server/site-config/get-site-config', () => ({
-  getSoleTenantId: getSoleTenantIdMock,
+vi.mock('@web/server/tenant/resolve-tenant-id', () => ({
+  resolveTenantId: resolveTenantIdMock,
 }));
 
 vi.mock('@blog/db', () => ({
   queries: { account: { exportAccountData: exportAccountDataMock } },
 }));
+
+vi.mock('next/headers', () => ({ headers: headersMock }));
 
 const TENANT_ID = 'tenant-1';
 
@@ -24,8 +26,10 @@ describe('GET /api/account/export', () => {
   beforeEach(() => {
     authMock.mockReset();
     exportAccountDataMock.mockReset();
-    getSoleTenantIdMock.mockReset();
-    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
+    resolveTenantIdMock.mockReset();
+    resolveTenantIdMock.mockResolvedValue(TENANT_ID);
+    headersMock.mockReset();
+    headersMock.mockResolvedValue(new Headers({ host: 'acme.example.com' }));
   });
 
   it('returns 401 without querying the db when there is no session', async () => {
@@ -72,13 +76,26 @@ describe('GET /api/account/export', () => {
 
   it('returns 404 without querying the db when no tenant resolves', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getSoleTenantIdMock.mockResolvedValue(undefined);
+    resolveTenantIdMock.mockResolvedValue(undefined);
     const { GET } = await import('./route');
 
     const response = await GET();
 
     expect(response.status).toBe(404);
     expect(exportAccountDataMock).not.toHaveBeenCalled();
+  });
+
+  it('resolves the tenant from the request Host header', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    exportAccountDataMock.mockResolvedValue({
+      profile: { id: 'user-1', name: 'Val', email: 'val@example.com' },
+      bookmarks: [],
+    });
+    const { GET } = await import('./route');
+
+    await GET();
+
+    expect(resolveTenantIdMock).toHaveBeenCalledWith('acme.example.com');
   });
 
   it('returns 500 when the export query throws', async () => {

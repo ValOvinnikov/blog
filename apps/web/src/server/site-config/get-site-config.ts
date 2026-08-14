@@ -6,12 +6,21 @@ const SITE_CONFIG_CACHE_TAG = 'site-config';
 const SITE_CONFIG_REVALIDATE_SECONDS = 3600;
 
 /**
- * `apps/web` has no host→tenant resolution yet — that lands with the
- * public site's multi-tenant middleware. Today's deployment serves exactly
- * one tenant, so this takes the sole `tenants` row rather than resolving
- * one per request.
+ * Deliberately still resolves the sole `tenants` row rather than the real
+ * `proxy.ts` host resolution every other tenant-scoped read now uses.
+ * `getSiteConfig` backs the theme `<style>` injector and the next-intl voice
+ * ladder, both read on effectively every route (including statically
+ * rendered ones) via this `unstable_cache`-wrapped call with a fixed cache
+ * key — switching it to the per-request `x-tenant-id` header would require
+ * reading a Dynamic API here, opting every one of those routes out of
+ * static rendering. That tradeoff — and the tenant-scoped caching contract
+ * it would need — is unresolved and undecided; it isn't made implicitly by
+ * this migration.
+ *
+ * TODO: fold this into `resolveTenantId()`/`getRequestTenantId()` once
+ * `site_config` reads have a tenant-scoped caching story (#1527).
  */
-export async function getSoleTenantId(): Promise<string | undefined> {
+async function resolveSiteConfigTenantId(): Promise<string | undefined> {
   const [tenant] = await queries.tenants.listTenants();
   return tenant?.id;
 }
@@ -23,7 +32,7 @@ export async function getSoleTenantId(): Promise<string | undefined> {
 // appears live within `SITE_CONFIG_REVALIDATE_SECONDS`.
 const getCachedSiteConfig = unstable_cache(
   async () => {
-    const tenantId = await getSoleTenantId();
+    const tenantId = await resolveSiteConfigTenantId();
     if (!tenantId) return undefined;
     return queries.siteConfig.getSiteConfig(tenantId);
   },

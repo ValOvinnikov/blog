@@ -2,12 +2,12 @@ const {
   createPendingSubscriberMock,
   sendEmailMock,
   markNewsletterSubscribedMock,
-  getSoleTenantIdMock,
+  getRequestTenantIdMock,
 } = vi.hoisted(() => ({
   createPendingSubscriberMock: vi.fn(),
   sendEmailMock: vi.fn(),
   markNewsletterSubscribedMock: vi.fn(),
-  getSoleTenantIdMock: vi.fn(),
+  getRequestTenantIdMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', () => ({
@@ -24,8 +24,8 @@ vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
   markNewsletterSubscribed: markNewsletterSubscribedMock,
 }));
 
-vi.mock('@web/server/site-config/get-site-config', () => ({
-  getSoleTenantId: getSoleTenantIdMock,
+vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
+  getRequestTenantId: getRequestTenantIdMock,
 }));
 
 const TENANT_ID = 'tenant-1';
@@ -53,8 +53,8 @@ describe('subscribeToNewsletterAction', () => {
     createPendingSubscriberMock.mockReset();
     sendEmailMock.mockReset();
     markNewsletterSubscribedMock.mockReset();
-    getSoleTenantIdMock.mockReset();
-    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
+    getRequestTenantIdMock.mockReset();
+    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
   });
 
   it('returns "invalid" without touching the db for a malformed email', async () => {
@@ -129,7 +129,7 @@ describe('subscribeToNewsletterAction', () => {
   });
 
   it('returns "server-error" without touching the db when no tenant resolves', async () => {
-    getSoleTenantIdMock.mockResolvedValue(undefined);
+    getRequestTenantIdMock.mockResolvedValue(undefined);
     const { subscribeToNewsletterAction } =
       await import('./newsletter-actions');
 
