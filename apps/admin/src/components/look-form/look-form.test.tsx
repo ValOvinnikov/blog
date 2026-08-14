@@ -5,12 +5,26 @@ import userEvent from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
 
-const { updateLookActionMock } = vi.hoisted(() => ({
+const {
+  updateLookActionMock,
+  uploadBrandAssetActionMock,
+  clearBrandAssetActionMock,
+} = vi.hoisted(() => ({
   updateLookActionMock: vi.fn(),
+  uploadBrandAssetActionMock: vi.fn(),
+  clearBrandAssetActionMock: vi.fn(),
 }));
 
 vi.mock('@admin/server/site-config/update-look-action', () => ({
   updateLookAction: updateLookActionMock,
+}));
+
+vi.mock('@admin/server/site-config/upload-brand-asset-action', () => ({
+  uploadBrandAssetAction: uploadBrandAssetActionMock,
+}));
+
+vi.mock('@admin/server/site-config/clear-brand-asset-action', () => ({
+  clearBrandAssetAction: clearBrandAssetActionMock,
 }));
 
 describe(LookForm, () => {
@@ -40,6 +54,37 @@ describe(LookForm, () => {
     const summary = screen.getByText('Advanced').closest('summary');
     expect(summary).not.toBeNull();
     expect(summary?.closest('details')).not.toHaveAttribute('open');
+  });
+
+  it('shows the favicon square requirement before any file is chosen', () => {
+    render(
+      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Upload logo' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Upload favicon' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Pre-cropped square, please/)).toBeVisible();
+  });
+
+  it("choosing a preset doesn't clear an already-saved brand image", async () => {
+    const user = userEvent.setup();
+    render(
+      <LookForm
+        tenantSlug="acme"
+        initialValues={{
+          ...defaultLookFormValues(),
+          logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
+        }}
+      />,
+    );
+
+    await user.click(screen.getByRole('radio', { name: 'Editorial' }));
+
+    expect(screen.getByAltText('Current logo')).toBeInTheDocument();
   });
 
   it('notes that terminal chrome is not yet persisted', () => {

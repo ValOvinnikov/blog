@@ -16,9 +16,12 @@ const scriptSrc = isDev
 // No Sanity CDN images, no OAuth avatar rendering, and no external font or
 // script origins load here today — every source below is 'self' (or
 // 'none') for that reason, tighter than apps/web's equivalent policy.
+// `img-src` additionally allows the Vercel Blob public storage host the Look
+// tab's logo/favicon thumbnails load from — a public-access Blob store's
+// pathname is per-store, not fixed, hence the wildcard subdomain.
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "img-src 'self'",
+  "img-src 'self' https://*.blob.vercel-storage.com",
   scriptSrc,
   // 'unsafe-inline' is required because Next.js and Tailwind inject inline
   // <style> tags at runtime; there is no static, hashable set of style

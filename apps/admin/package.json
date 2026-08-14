@@ -22,6 +22,8 @@
     "@blog/tailwind-config": "workspace:*",
     "@blog/ui": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.11",
+    "@vercel/blob": "^2.8.0",
+    "image-size": "^2.0.2",
     "next": "^16.2.11",
     "next-auth": "5.0.0-beta.32",
     "react": "catalog:",

@@ -1,5 +1,6 @@
 'use client';
 
+import { BrandAssetField } from '@admin/components/brand-asset-field';
 import { FontPicker } from '@admin/components/font-picker';
 import { HueSlider } from '@admin/components/hue-slider';
 import { LogoHueField } from '@admin/components/logo-hue-field';
@@ -58,9 +59,13 @@ export type TLookFormProps = {
  * Applying a preset (via the picker or "Reset to preset") re-seeds every
  * `PRESET_REGISTRY` default — that's what "preset" means: a starting point,
  * not a locked-in choice. Individual controls remain freely adjustable
- * afterward.
+ * afterward. Brand images are independent of preset, so `current`'s asset
+ * URLs carry through unchanged rather than being reset.
  */
-function applyPresetDefaults(preset: TPresetId): TLookFormValues {
+function applyPresetDefaults(
+  preset: TPresetId,
+  current: TLookFormValues,
+): TLookFormValues {
   const tokens = PRESET_REGISTRY[preset].themeTokens;
 
   return {
@@ -72,6 +77,8 @@ function applyPresetDefaults(preset: TPresetId): TLookFormValues {
     radiusScale: tokens.radiusScale,
     density: tokens.density,
     chromeOn: tokens.chromeOn,
+    logoAssetUrl: current.logoAssetUrl,
+    faviconAssetUrl: current.faviconAssetUrl,
   };
 }
 
@@ -91,12 +98,12 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
   }
 
   function handlePresetChange(preset: TPresetId) {
-    setValues(applyPresetDefaults(preset));
+    setValues((prev) => applyPresetDefaults(preset, prev));
     setSaveResult('idle');
   }
 
   function handleReset() {
-    setValues(applyPresetDefaults(values.preset));
+    setValues((prev) => applyPresetDefaults(prev.preset, prev));
     setSaveResult('idle');
   }
 
@@ -138,7 +145,7 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
     switchTrack,
     switchThumb,
     note,
-    comingSoon,
+    uploads,
   } = lookFormVariants();
 
   const swatchColor = buildAccentPreviewTokens(values.accentHue, false)[
@@ -234,9 +241,24 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
                 label="Brand images"
                 description="Stored in Vercel Blob — no on-the-fly transforms, so what you upload is what ships."
               >
-                <p className={comingSoon()}>
-                  Logo and favicon upload ship in a follow-up.
-                </p>
+                <div className={uploads()}>
+                  <BrandAssetField
+                    tenantSlug={tenantSlug}
+                    kind="logo"
+                    label="Logo"
+                    hint="PNG, JPEG, or WebP · falls back to the polygon wordmark"
+                    currentUrl={values.logoAssetUrl}
+                    onChange={(url) => updateField('logoAssetUrl', url)}
+                  />
+                  <BrandAssetField
+                    tenantSlug={tenantSlug}
+                    kind="favicon"
+                    label="Favicon"
+                    hint="Pre-cropped square, please — Blob can't crop it for you. Non-square uploads are rejected."
+                    currentUrl={values.faviconAssetUrl}
+                    onChange={(url) => updateField('faviconAssetUrl', url)}
+                  />
+                </div>
               </SettingRow>
             </div>
           </section>

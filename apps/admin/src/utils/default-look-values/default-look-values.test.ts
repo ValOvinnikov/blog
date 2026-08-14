@@ -14,6 +14,8 @@ describe(defaultLookFormValues, () => {
       radiusScale: RADIUS_SCALE.MD,
       density: DENSITY.DEFAULT,
       chromeOn: true,
+      logoAssetUrl: undefined,
+      faviconAssetUrl: undefined,
     });
   });
 });
@@ -30,8 +32,8 @@ describe(toLookFormValues, () => {
       bodyFont: FONT_CHOICE.INTER,
       radiusScale: RADIUS_SCALE.LG,
       density: DENSITY.COMPACT,
-      logoAssetUrl: undefined,
-      faviconAssetUrl: undefined,
+      logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
+      faviconAssetUrl: 'https://example.blob.vercel-storage.com/favicon.png',
       voiceOverrides: {},
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -46,6 +48,8 @@ describe(toLookFormValues, () => {
       radiusScale: RADIUS_SCALE.LG,
       density: DENSITY.COMPACT,
       chromeOn: false,
+      logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
+      faviconAssetUrl: 'https://example.blob.vercel-storage.com/favicon.png',
     });
   });
 
