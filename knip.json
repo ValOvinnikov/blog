@@ -64,6 +64,13 @@
       // (`src/server/auth/auth.ts`) is now the first real
       // `import ... from '@blog/db'` in apps/web.
       "ignoreDependencies": ["@svgr/webpack"]
+    },
+    "apps/admin": {
+      // next-intl navigation helpers (Link/usePathname), scaffolded to
+      // mirror apps/web's i18n/navigation.ts but not yet consumed by any
+      // component. Mark it an entry so its exports aren't reported unused;
+      // the Next.js plugin still contributes the app-router entries.
+      "entry": ["src/i18n/navigation.ts"]
     }
   }
 }
