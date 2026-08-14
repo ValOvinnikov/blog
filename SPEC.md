@@ -201,29 +201,36 @@ when supplied, so a module with no unique heading (`module_content`) gets a
 landmark with no accessible-name fallback rather than pointing at an element
 that never renders.
 
-**Theme-as-content** (Phase 2 of the configurability epic, #1285/#1287): the
-optional `settings_theme` singleton (`preset` — `PRESET_ID.CONSOLE`/
-`EDITORIAL`, required, defaults to `CONSOLE` when the document itself doesn't
-exist — the neutral base a tenant always renders even unconfigured — plus
-optional `accentHue`/`logoHue`/`headingFont`/`bodyFont`/`radiusScale`/
-`density` overrides) is resolved by `service.global.themeSettings.v1.getTheme()`
-against `@blog/config`'s `PRESET_REGISTRY` into a fully-populated
-`TThemeTokens` (never partial — every gap is filled by the preset's own
-default). `apps/web`'s root layout fetches this once per request and injects
-the resolved tokens as a server-rendered `<style>` block declaring CSS custom
-properties under both `:root` and `.dark`, and selects the matching
-`next/font/google` pair (`headingFont`/`bodyFont`) via a per-font dynamically
-imported loader module so only the two fonts actually resolved for that
-render are bundled/preloaded. The favicon route (`apps/web/src/app/icon.tsx`)
-fetches through the tenant's uploaded `settings_site.brand.logo` as a small
-square crop when present, falling back to one static default mark with no
-per-tenant recoloring. The former `siteSettings.brand.variant`/
-`BRAND_VARIANT` binary look toggle (and its `.indigo` CSS class) is retired
-in favor of this — its one prior look ("Indigo") is now expressible as a
-`settings_theme` override (`accentHue`/`logoHue`) rather than a separate
-axis; migrating existing `INDIGO`-variant content and removing the field
-itself is tracked separately (#1389) since it's a live-data migration, not a
-schema-only change.
+**Theme-as-content** (Phase 2 of the configurability epic, #1285/#1287,
+storage cut over to Postgres by the config-to-Postgres transition's E5): a
+tenant's row in `@blog/db`'s `site_config` table (`preset` —
+`PRESET_ID.CONSOLE`/`EDITORIAL`, required, plus `accentHue`/`logoHue`/
+`headingFont`/`bodyFont`/`radiusScale`/`density`) is read via
+`apps/web/src/server/site-config/get-site-config.ts` and resolved by
+`apps/web/src/utils/to-theme-tokens.ts` against `@blog/config`'s
+`PRESET_REGISTRY` into a fully-populated `TThemeTokens` (never partial —
+every gap, and the case of no row existing at all, is filled by the preset's
+own default). `apps/web`'s root layout fetches this once per request
+(`unstable_cache`-wrapped, tagged `site-config`) and injects the resolved
+tokens as a server-rendered `<style>` block declaring CSS custom properties
+under both `:root` and `.dark`, and selects the matching `next/font/google`
+pair (`headingFont`/`bodyFont`) via a per-font dynamically imported loader
+module so only the two fonts actually resolved for that render are
+bundled/preloaded. `apps/web` has no host→tenant resolution yet (that lands
+with the public site's multi-tenant middleware, still unbuilt) — today's
+single-tenant deployment reads the sole `tenants` row rather than resolving
+one per request. The Sanity `settings_theme` schema this superseded is
+retained only as a rollback path (unused by any read path) until the
+transition's retirement epic deletes it. The favicon route
+(`apps/web/src/app/icon.tsx`) fetches through the tenant's uploaded
+`settings_site.brand.logo` as a small square crop when present, falling back
+to one static default mark with no per-tenant recoloring. The former
+`siteSettings.brand.variant`/`BRAND_VARIANT` binary look toggle (and its
+`.indigo` CSS class) is retired in favor of this — its one prior look
+("Indigo") is now expressible as a theme override (`accentHue`/`logoHue`)
+rather than a separate axis; migrating existing `INDIGO`-variant content and
+removing the field itself is tracked separately (#1389) since it's a
+live-data migration, not a schema-only change.
 
 Full schema reference (every document/object, field-by-field), naming and
 validation conventions, incl. the `layout`/`sectionHeader` objects' own
