@@ -1,6 +1,13 @@
-import { pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 import { users } from './auth';
+import { tenants } from './tenants';
 
 // Feature 4 (#1043) — private "save for later" rows. Per the accepted design
 // decision (docs/superpowers/specs/2026-08-03-engagement-ui-design.md,
@@ -15,6 +22,9 @@ import { users } from './auth';
 export const bookmarks = pgTable(
   'bookmarks',
   {
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
     userId: text('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
@@ -22,12 +32,18 @@ export const bookmarks = pgTable(
     createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   },
   (bookmark) => [
-    // Composite primary key — one row per (userId, postId), matching the
-    // `accounts`/`verification_tokens` pattern already established in
-    // auth.ts for a table with no natural single-column key. This is also
-    // the acceptance criterion's "unique per user+post" constraint: adding
-    // an already-bookmarked pair conflicts here rather than duplicating.
-    primaryKey({ columns: [bookmark.userId, bookmark.postId] }),
+    // Composite primary key includes tenantId, not just (userId, postId):
+    // `postId` is a Sanity document `_id`, only unique within one tenant's
+    // own dataset (each tenant has its own `sanityProjectId`/`sanityDataset`
+    // — see tenants.ts), so two different tenants' posts can share the same
+    // `_id`. Without tenantId here, a bookmark on tenant A's post could
+    // collide with an unrelated post on tenant B that happens to share an
+    // `_id`, or block a user with memberships on both tenants from
+    // bookmarking both. `userId` alone doesn't rule this out either — Auth.js
+    // users are global identities, not tenant-scoped.
+    primaryKey({
+      columns: [bookmark.tenantId, bookmark.userId, bookmark.postId],
+    }),
   ],
 );
 

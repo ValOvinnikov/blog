@@ -1,3 +1,4 @@
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
@@ -20,6 +21,22 @@ async function insertUser(id: string): Promise<void> {
   await db.insert(schema.users).values({ id });
 }
 
+async function insertTenant(slug: string): Promise<string> {
+  const [tenant] = await db
+    .insert(schema.tenants)
+    .values({
+      slug,
+      primaryDomain: `${slug}.example.com`,
+      sanityProjectId: 'abc123',
+      sanityDataset: 'production',
+      locale: 'en',
+      plan: TENANT_PLAN.FREE,
+      status: TENANT_STATUS.ACTIVE,
+    })
+    .returning();
+  return tenant!.id;
+}
+
 // One in-memory Postgres instance for the whole file (spinning up pglite's
 // WASM engine is the slow part — seconds, not milliseconds) — `afterEach`
 // clears rows between tests instead of paying that cost per test.
@@ -33,18 +50,22 @@ beforeEach(() => {
 
 afterEach(async () => {
   await db.delete(schema.bookmarks);
+  await db.delete(schema.tenants);
   await db.delete(schema.users);
 });
 
 describe(listBookmarks, () => {
-  it("returns only the given user's bookmarks", async () => {
+  it("returns only the given tenant and user's bookmarks", async () => {
     await insertUser('user-1');
     await insertUser('user-2');
-    await addBookmark('user-1', 'post-1');
-    await addBookmark('user-1', 'post-2');
-    await addBookmark('user-2', 'post-3');
+    const tenantOneId = await insertTenant('acme');
+    const tenantTwoId = await insertTenant('other');
+    await addBookmark(tenantOneId, 'user-1', 'post-1');
+    await addBookmark(tenantOneId, 'user-1', 'post-2');
+    await addBookmark(tenantOneId, 'user-2', 'post-3');
+    await addBookmark(tenantTwoId, 'user-1', 'post-4');
 
-    const result = await listBookmarks('user-1');
+    const result = await listBookmarks(tenantOneId, 'user-1');
 
     expect(result.map((bookmark) => bookmark.postId).sort()).toEqual([
       'post-1',
@@ -54,23 +75,26 @@ describe(listBookmarks, () => {
 
   it('orders results by most recently bookmarked first', async () => {
     await insertUser('user-1');
+    const tenantId = await insertTenant('acme');
     // Insert directly with explicit timestamps rather than relying on two
     // calls to addBookmark() landing in different clock ticks (defaultNow()
     // could otherwise collide within the same statement/transaction).
     await db.insert(schema.bookmarks).values([
       {
+        tenantId,
         userId: 'user-1',
         postId: 'post-older',
         createdAt: new Date(2026, 0, 1),
       },
       {
+        tenantId,
         userId: 'user-1',
         postId: 'post-newer',
         createdAt: new Date(2026, 0, 2),
       },
     ]);
 
-    const result = await listBookmarks('user-1');
+    const result = await listBookmarks(tenantId, 'user-1');
 
     expect(result.map((bookmark) => bookmark.postId)).toEqual([
       'post-newer',
@@ -80,7 +104,8 @@ describe(listBookmarks, () => {
 
   it('returns an empty array when the user has no bookmarks', async () => {
     await insertUser('user-1');
+    const tenantId = await insertTenant('acme');
 
-    expect(await listBookmarks('user-1')).toEqual([]);
+    expect(await listBookmarks(tenantId, 'user-1')).toEqual([]);
   });
 });

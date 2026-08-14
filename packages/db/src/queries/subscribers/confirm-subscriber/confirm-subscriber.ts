@@ -32,6 +32,7 @@ export type TConfirmSubscriberResult =
 // Postgres serializes concurrent updates to the same row, so exactly one of
 // two racing calls can win this `WHERE`, never both.
 export async function confirmSubscriber(
+  tenantId: string,
   token: string,
 ): Promise<TConfirmSubscriberResult> {
   const db = getDb();
@@ -41,6 +42,7 @@ export async function confirmSubscriber(
     .set({ status: 'active', confirmedAt: new Date() })
     .where(
       and(
+        eq(subscribers.tenantId, tenantId),
         eq(subscribers.confirmationToken, token),
         eq(subscribers.status, 'pending'),
       ),
@@ -54,7 +56,12 @@ export async function confirmSubscriber(
   const [existing] = await db
     .select()
     .from(subscribers)
-    .where(eq(subscribers.confirmationToken, token));
+    .where(
+      and(
+        eq(subscribers.tenantId, tenantId),
+        eq(subscribers.confirmationToken, token),
+      ),
+    );
 
   if (!existing) {
     return { outcome: 'not-found' };

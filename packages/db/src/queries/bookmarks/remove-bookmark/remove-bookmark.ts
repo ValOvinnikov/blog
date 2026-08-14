@@ -2,9 +2,10 @@ import { getDb } from '@blog/db/client';
 import { bookmarks } from '@blog/db/schema/bookmarks';
 import { and, eq } from 'drizzle-orm';
 
-// Removes a bookmark for (userId, postId). A no-op if it doesn't exist, so
-// `BookmarkToggle`'s "remove" action can call this unconditionally.
+// Removes a bookmark for (tenantId, userId, postId). A no-op if it doesn't
+// exist, so `BookmarkToggle`'s "remove" action can call this unconditionally.
 export async function removeBookmark(
+  tenantId: string,
   userId: string,
   postId: string,
 ): Promise<void> {
@@ -12,5 +13,11 @@ export async function removeBookmark(
 
   await db
     .delete(bookmarks)
-    .where(and(eq(bookmarks.userId, userId), eq(bookmarks.postId, postId)));
+    .where(
+      and(
+        eq(bookmarks.tenantId, tenantId),
+        eq(bookmarks.userId, userId),
+        eq(bookmarks.postId, postId),
+      ),
+    );
 }

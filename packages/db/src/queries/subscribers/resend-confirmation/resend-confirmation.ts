@@ -1,7 +1,7 @@
 import { getDb } from '@blog/db/client';
 import { users } from '@blog/db/schema/auth';
 import { subscribers } from '@blog/db/schema/subscribers';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 // The `/account` 6b section's "resend confirmation" action
 // (#1155/#1157/#1158). This never sends email itself — `apps/web` owns that
@@ -21,6 +21,7 @@ export type TResendConfirmationResult =
 // no `subscribers` row, or a `subscribers` row that's already `active` — the
 // caller (web) has nothing to resend in any of those cases.
 export async function resendConfirmation(
+  tenantId: string,
   userId: string,
 ): Promise<TResendConfirmationResult> {
   const db = getDb();
@@ -37,7 +38,12 @@ export async function resendConfirmation(
   const [subscriber] = await db
     .select()
     .from(subscribers)
-    .where(eq(subscribers.email, user.email.trim().toLowerCase()));
+    .where(
+      and(
+        eq(subscribers.tenantId, tenantId),
+        eq(subscribers.email, user.email.trim().toLowerCase()),
+      ),
+    );
 
   if (!subscriber || subscriber.status !== 'pending') {
     return { outcome: 'not-pending' };
