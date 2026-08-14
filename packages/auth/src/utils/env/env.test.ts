@@ -37,20 +37,40 @@ describe('env', () => {
     restoreEnv();
   });
 
-  it('leaves every credential undefined when none are set', async () => {
+  it('leaves every optional credential undefined when none are set', async () => {
     delete process.env['SKIP_ENV_VALIDATION'];
     for (const key of ENV_KEYS) {
       delete process.env[key];
     }
+    process.env['AUTH_SECRET'] = 'test-secret';
 
     const { env } = await importEnv();
 
-    expect(env.AUTH_SECRET).toBeUndefined();
     expect(env.AUTH_GITHUB_ID).toBeUndefined();
     expect(env.AUTH_GITHUB_SECRET).toBeUndefined();
     expect(env.AUTH_GOOGLE_ID).toBeUndefined();
     expect(env.AUTH_GOOGLE_SECRET).toBeUndefined();
     expect(env.MAGIC_LINK_FROM_ADDRESS).toBeUndefined();
+  });
+
+  it('throws naming AUTH_SECRET when it is missing and validation is not skipped', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    for (const key of ENV_KEYS) {
+      delete process.env[key];
+    }
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    await expect(importEnv()).rejects.toThrow();
+
+    expect(consoleError).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.arrayContaining([
+        expect.objectContaining({ path: ['AUTH_SECRET'] }),
+      ]),
+    );
+    consoleError.mockRestore();
   });
 
   it('exposes configured credentials by their exact env var names', async () => {
