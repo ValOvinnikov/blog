@@ -12,6 +12,11 @@ export type TSaveVoiceOverridesResult = { ok: true } | { ok: false };
  * Persists the Voice tab's 20 curated overrides for the routed tenant.
  * Re-derives the tenant and re-checks membership from the session itself
  * via `requireTenantMembership` — never trusts a client-supplied tenant id.
+ * Shared by both `/t/[tenantSlug]/voice` and the slug-free `/dashboard/voice`
+ * (via `VoicePageContent`): `requireTenantMembership` takes a slug either
+ * way, and the dashboard route already resolved its tenant's real slug from
+ * the session's own `memberships`, so re-checking it here is a no-op
+ * re-verification rather than a second code path.
  *
  * `upsertSiteConfig` writes its typed theme columns on every call (they're
  * required, not optional), so a Voice-only save must round-trip the

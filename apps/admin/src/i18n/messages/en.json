@@ -4,7 +4,8 @@
     "tenants": "Tenants · Admin",
     "tenant": "Tenant · Admin",
     "look": "Look · Admin",
-    "voice": "Voice · Admin"
+    "voice": "Voice · Admin",
+    "selectTenant": "Choose a workspace · Admin"
   },
   "unauthorizedPage": {
     "heading": "Not authorized",
@@ -20,6 +21,7 @@
     "addTenant": "Add tenant",
     "addTenantDisabledReason": "Provisioning a new tenant isn't available yet.",
     "tenantLabel": "Tenant · {tenantSlug}",
+    "dashboardLabel": "Workspace",
     "look": "Look",
     "voice": "Voice",
     "domain": "Domain",
@@ -39,6 +41,14 @@
   "tenantLayout": {
     "crumb": "Tenant",
     "roleLabel": "{role} · Tenant"
+  },
+  "dashboardLayout": {
+    "crumb": "Dashboard",
+    "roleLabel": "{role}"
+  },
+  "dashboardTenantPicker": {
+    "heading": "Choose a workspace",
+    "description": "You have access to more than one workspace. Pick one to continue."
   },
   "tenantsView": {
     "title": "Tenants",

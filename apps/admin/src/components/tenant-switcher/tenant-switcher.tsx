@@ -10,9 +10,16 @@ import Link from 'next/link';
 import { tenantSwitcherVariants } from './tenant-switcher-variants';
 
 export type TTenantSwitcherProps = {
-  /** Every tenant the signed-in user can switch into. Exactly one today. */
+  /** Every tenant the signed-in user can switch into. */
   tenants: TTenant[];
   activeTenantId: string;
+  /**
+   * Builds each list item's link target. Defaults to the slug-routed
+   * `/t/{slug}` the sidebar's own switcher uses; the slug-free `/dashboard`
+   * tree passes its own tenant-select endpoint instead, reusing this same
+   * list-rendering rather than a second tenant picker.
+   */
+  hrefFor?: (tenant: TTenant) => string;
 };
 
 /**
@@ -24,6 +31,7 @@ export type TTenantSwitcherProps = {
 export function TenantSwitcher({
   tenants,
   activeTenantId,
+  hrefFor = (tenant) => adminRoutes.tenant(tenant.slug),
 }: TTenantSwitcherProps) {
   const active =
     tenants.find((tenant) => tenant.id === activeTenantId) ?? tenants[0];
@@ -66,7 +74,7 @@ export function TenantSwitcher({
               <Menu.LinkItem
                 key={tenant.id}
                 className={item()}
-                render={<Link href={adminRoutes.tenant(tenant.slug)} />}
+                render={<Link href={hrefFor(tenant)} />}
               >
                 <span className={itemName()}>{tenant.slug}</span>
                 <span className={itemDomain()}>{tenant.primaryDomain}</span>
