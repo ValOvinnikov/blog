@@ -7,3 +7,10 @@ export const ADMIN_ROLE = {
 } as const;
 
 export type TAdminRole = TValueOf<typeof ADMIN_ROLE>;
+
+export const GRANTED_VIA = {
+  BREAK_GLASS: 'BREAK_GLASS',
+  PROMOTION: 'PROMOTION',
+} as const;
+
+export type TGrantedVia = TValueOf<typeof GRANTED_VIA>;
