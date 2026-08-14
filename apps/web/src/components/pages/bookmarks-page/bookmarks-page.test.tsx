@@ -4,15 +4,25 @@ import { redirect } from 'next/navigation';
 
 import { BookmarksPage } from './bookmarks-page';
 
-const { authMock, listBookmarksMock, getPostsByIdsMock, getChromeOnMock } =
-  vi.hoisted(() => ({
-    authMock: vi.fn(),
-    listBookmarksMock: vi.fn(),
-    getPostsByIdsMock: vi.fn(),
-    getChromeOnMock: vi.fn(),
-  }));
+const {
+  authMock,
+  listBookmarksMock,
+  getPostsByIdsMock,
+  getChromeOnMock,
+  getSoleTenantIdMock,
+} = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  listBookmarksMock: vi.fn(),
+  getPostsByIdsMock: vi.fn(),
+  getChromeOnMock: vi.fn(),
+  getSoleTenantIdMock: vi.fn(),
+}));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
+
+vi.mock('@web/server/site-config/get-site-config', () => ({
+  getSoleTenantId: getSoleTenantIdMock,
+}));
 
 vi.mock('@blog/db', () => ({
   queries: { bookmarks: { listBookmarks: listBookmarksMock } },
@@ -45,6 +55,8 @@ vi.mock('@web/components/shared/smart-link', () => ({
   ),
 }));
 
+const TENANT_ID = 'tenant-1';
+
 const setup = customRenderAsync(BookmarksPage, {});
 
 describe(`<${BookmarksPage.name}/>`, () => {
@@ -54,10 +66,23 @@ describe(`<${BookmarksPage.name}/>`, () => {
     getPostsByIdsMock.mockReset();
     getChromeOnMock.mockReset();
     getChromeOnMock.mockResolvedValue(true);
+    getSoleTenantIdMock.mockReset();
+    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
   });
 
   it('redirects home without querying bookmarks when there is no session', async () => {
     authMock.mockResolvedValue(null);
+
+    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
+    expect(listBookmarksMock).not.toHaveBeenCalled();
+    expect(getPostsByIdsMock).not.toHaveBeenCalled();
+  });
+
+  it('redirects home without querying bookmarks when no tenant resolves', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getSoleTenantIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
@@ -81,7 +106,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
     ).toBeVisible();
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
     expect(screen.queryByText(/saved$/)).not.toBeInTheDocument();
-    expect(listBookmarksMock).toHaveBeenCalledWith('user-1');
+    expect(listBookmarksMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
     expect(getPostsByIdsMock).toHaveBeenCalledWith([]);
   });
 

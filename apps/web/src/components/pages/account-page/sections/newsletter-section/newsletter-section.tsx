@@ -4,6 +4,7 @@ import { SettingRow, WindowChrome } from '@blog/ui/molecules';
 import { NewsletterSubscriptionControl } from '@web/components/shared/newsletter-subscription-control';
 import { PlainSection } from '@web/components/shared/plain-section';
 import { auth } from '@web/server/auth/auth';
+import { getSoleTenantId } from '@web/server/site-config/get-site-config';
 import { getChromeOn } from '@web/utils/get-chrome-on';
 import { toSessionUsername } from '@web/utils/to-session-username';
 import { getTranslations } from 'next-intl/server';
@@ -40,10 +41,17 @@ export async function NewsletterSection() {
   if (!session?.user?.id) return null;
 
   const { id: userId, name, email } = session.user;
-  const [status, chromeOn] = await Promise.all([
-    queries.subscribers.getSubscriptionStatus(userId),
+
+  const [tenantId, chromeOn] = await Promise.all([
+    getSoleTenantId(),
     getChromeOn(),
   ]);
+  if (!tenantId) return null;
+
+  const status = await queries.subscribers.getSubscriptionStatus(
+    tenantId,
+    userId,
+  );
 
   if (status.outcome === 'not-subscribed') return null;
 

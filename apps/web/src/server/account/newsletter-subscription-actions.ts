@@ -6,6 +6,7 @@ import { sendEmail } from '@web/server/email/send-email';
 import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newsletter-confirmation-email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
 import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie';
+import { getSoleTenantId } from '@web/server/site-config/get-site-config';
 import { env } from '@web/utils/env/env';
 import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 
@@ -30,8 +31,11 @@ export async function unsubscribeAction(): Promise<TUnsubscribeResult> {
   const userId = session?.user?.id;
   if (!userId) return { ok: false };
 
+  const tenantId = await getSoleTenantId();
+  if (!tenantId) return { ok: false };
+
   try {
-    await queries.subscribers.unsubscribe(userId);
+    await queries.subscribers.unsubscribe(tenantId, userId);
     await clearNewsletterSubscribedCookieSafely();
     return { ok: true };
   } catch (error) {
@@ -82,8 +86,14 @@ export async function resendConfirmationAction(): Promise<TResendConfirmationAct
   const email = session?.user?.email;
   if (!userId || !email) return { ok: false };
 
+  const tenantId = await getSoleTenantId();
+  if (!tenantId) return { ok: false };
+
   try {
-    const result = await queries.subscribers.resendConfirmation(userId);
+    const result = await queries.subscribers.resendConfirmation(
+      tenantId,
+      userId,
+    );
     if (result.outcome === 'not-pending') return { ok: false };
 
     const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';

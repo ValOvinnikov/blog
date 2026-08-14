@@ -1,7 +1,7 @@
 import { getDb } from '@blog/db/client';
 import { users } from '@blog/db/schema/auth';
 import { subscribers } from '@blog/db/schema/subscribers';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 // The `/account` 6b section's "unsubscribe" action (#1155/#1157/#1158).
 // `subscribers.status` only has `pending`/`active` — there is no
@@ -15,7 +15,10 @@ import { eq } from 'drizzle-orm';
 // user has no email on file, or no `subscribers` row matches that email —
 // matching this package's other delete-style mutations (see
 // `removeBookmark`), and letting the caller invoke this unconditionally.
-export async function unsubscribe(userId: string): Promise<void> {
+export async function unsubscribe(
+  tenantId: string,
+  userId: string,
+): Promise<void> {
   const db = getDb();
 
   const [user] = await db
@@ -27,5 +30,10 @@ export async function unsubscribe(userId: string): Promise<void> {
 
   await db
     .delete(subscribers)
-    .where(eq(subscribers.email, user.email.trim().toLowerCase()));
+    .where(
+      and(
+        eq(subscribers.tenantId, tenantId),
+        eq(subscribers.email, user.email.trim().toLowerCase()),
+      ),
+    );
 }

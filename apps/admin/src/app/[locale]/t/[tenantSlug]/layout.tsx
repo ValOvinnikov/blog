@@ -2,6 +2,7 @@ import { AdminShell } from '@admin/components/admin-shell';
 import { TenantSwitcher } from '@admin/components/tenant-switcher';
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
 import {
+  platformNavSections,
   tenantNavSections,
   type TNavTranslator,
 } from '@admin/utils/nav-sections/nav-sections';
@@ -27,7 +28,10 @@ export default async function TenantLayout({ children, params }: TProps) {
 
   return (
     <AdminShell
-      sections={tenantNavSections(tNavSections, tenant.slug)}
+      sections={[
+        ...platformNavSections(tNavSections),
+        ...tenantNavSections(tNavSections, tenant.slug),
+      ]}
       switcher={
         <TenantSwitcher tenants={[tenant]} activeTenantId={tenant.id} />
       }

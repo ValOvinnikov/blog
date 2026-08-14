@@ -1,12 +1,19 @@
 export {};
 
-const { confirmSubscriberMock } = vi.hoisted(() => ({
+const { confirmSubscriberMock, getSoleTenantIdMock } = vi.hoisted(() => ({
   confirmSubscriberMock: vi.fn(),
+  getSoleTenantIdMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', () => ({
   queries: { subscribers: { confirmSubscriber: confirmSubscriberMock } },
 }));
+
+vi.mock('@web/server/site-config/get-site-config', () => ({
+  getSoleTenantId: getSoleTenantIdMock,
+}));
+
+const TENANT_ID = 'tenant-1';
 
 const subscriber = {
   id: 'sub-1',
@@ -20,6 +27,8 @@ const subscriber = {
 describe('GET /api/newsletter/confirm', () => {
   beforeEach(() => {
     confirmSubscriberMock.mockReset();
+    getSoleTenantIdMock.mockReset();
+    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
   });
 
   it('returns 400 without querying the db when no token is given', async () => {
@@ -50,7 +59,7 @@ describe('GET /api/newsletter/confirm', () => {
       'text/html; charset=utf-8',
     );
     expect(html).toContain('Subscription confirmed');
-    expect(confirmSubscriberMock).toHaveBeenCalledWith('token-abc');
+    expect(confirmSubscriberMock).toHaveBeenCalledWith(TENANT_ID, 'token-abc');
   });
 
   it('treats an already-confirmed token as success (idempotent)', async () => {
@@ -78,6 +87,18 @@ describe('GET /api/newsletter/confirm', () => {
 
     expect(response.status).toBe(404);
     expect(html).toContain('Invalid confirmation link');
+  });
+
+  it('returns 500 without querying the db when no tenant resolves', async () => {
+    getSoleTenantIdMock.mockResolvedValue(undefined);
+    const { GET } = await import('./route');
+
+    const response = await GET(
+      new Request('https://example.com/api/newsletter/confirm?token=token-abc'),
+    );
+
+    expect(response.status).toBe(500);
+    expect(confirmSubscriberMock).not.toHaveBeenCalled();
   });
 
   it('returns 500 and logs when the db query throws', async () => {

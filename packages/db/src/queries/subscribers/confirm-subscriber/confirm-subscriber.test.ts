@@ -1,3 +1,4 @@
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import { eq } from 'drizzle-orm';
@@ -14,6 +15,22 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
 
+async function insertTenant(slug: string): Promise<string> {
+  const [tenant] = await db
+    .insert(schema.tenants)
+    .values({
+      slug,
+      primaryDomain: `${slug}.example.com`,
+      sanityProjectId: 'abc123',
+      sanityDataset: 'production',
+      locale: 'en',
+      plan: TENANT_PLAN.FREE,
+      status: TENANT_STATUS.ACTIVE,
+    })
+    .returning();
+  return tenant!.id;
+}
+
 // One in-memory Postgres instance for the whole file (spinning up pglite's
 // WASM engine is the slow part — seconds, not milliseconds) — `afterEach`
 // clears rows between tests instead of paying that cost per test.
@@ -27,14 +44,16 @@ beforeEach(() => {
 
 afterEach(async () => {
   await db.delete(schema.subscribers);
+  await db.delete(schema.tenants);
 });
 
 async function insertPendingSubscriber(
+  tenantId: string,
   overrides: Partial<typeof schema.subscribers.$inferInsert> = {},
 ): Promise<schema.TSubscriber> {
   const [inserted] = await db
     .insert(schema.subscribers)
-    .values({ email: 'reader@example.com', ...overrides })
+    .values({ tenantId, email: 'reader@example.com', ...overrides })
     .returning();
 
   if (!inserted) throw new Error('failed to seed a subscriber row');
@@ -44,9 +63,10 @@ async function insertPendingSubscriber(
 
 describe(confirmSubscriber, () => {
   it('flips a pending subscriber to active and stamps confirmedAt', async () => {
-    const pending = await insertPendingSubscriber();
+    const tenantId = await insertTenant('acme');
+    const pending = await insertPendingSubscriber(tenantId);
 
-    const result = await confirmSubscriber(pending.confirmationToken);
+    const result = await confirmSubscriber(tenantId, pending.confirmationToken);
 
     expect(result.outcome).toBe('confirmed');
     if (result.outcome !== 'confirmed') throw new Error('expected confirmed');
@@ -61,11 +81,12 @@ describe(confirmSubscriber, () => {
   });
 
   it('is idempotent-safe: confirming an already-active row again does not error or restamp confirmedAt', async () => {
-    const pending = await insertPendingSubscriber();
-    const first = await confirmSubscriber(pending.confirmationToken);
+    const tenantId = await insertTenant('acme');
+    const pending = await insertPendingSubscriber(tenantId);
+    const first = await confirmSubscriber(tenantId, pending.confirmationToken);
     if (first.outcome !== 'confirmed') throw new Error('expected confirmed');
 
-    const second = await confirmSubscriber(pending.confirmationToken);
+    const second = await confirmSubscriber(tenantId, pending.confirmationToken);
 
     expect(second).toEqual({
       outcome: 'already-confirmed',
@@ -74,7 +95,22 @@ describe(confirmSubscriber, () => {
   });
 
   it('returns not-found for an unrecognized token', async () => {
-    const result = await confirmSubscriber('does-not-exist');
+    const tenantId = await insertTenant('acme');
+
+    const result = await confirmSubscriber(tenantId, 'does-not-exist');
+
+    expect(result).toEqual({ outcome: 'not-found' });
+  });
+
+  it("returns not-found for another tenant's token", async () => {
+    const tenantOneId = await insertTenant('acme');
+    const tenantTwoId = await insertTenant('other');
+    const pending = await insertPendingSubscriber(tenantOneId);
+
+    const result = await confirmSubscriber(
+      tenantTwoId,
+      pending.confirmationToken,
+    );
 
     expect(result).toEqual({ outcome: 'not-found' });
   });
@@ -90,11 +126,12 @@ describe(confirmSubscriber, () => {
   // two racing calls can ever match that `WHERE`, not from this test — see
   // the docstring on `confirmSubscriber`.
   it('resolves two concurrent confirms of the same token into exactly one confirmed outcome', async () => {
-    const pending = await insertPendingSubscriber();
+    const tenantId = await insertTenant('acme');
+    const pending = await insertPendingSubscriber(tenantId);
 
     const [first, second] = await Promise.all([
-      confirmSubscriber(pending.confirmationToken),
-      confirmSubscriber(pending.confirmationToken),
+      confirmSubscriber(tenantId, pending.confirmationToken),
+      confirmSubscriber(tenantId, pending.confirmationToken),
     ]);
 
     const outcomes = [first.outcome, second.outcome].sort();
