@@ -1,11 +1,10 @@
-import { timingSafeEqual } from 'node:crypto';
-
 import { service } from '@blog/service';
 import {
   generateTakeaways,
   SKIM_GENERATION_MODEL,
 } from '@web/server/skim/generate-takeaways';
 import { env } from '@web/utils/env/env';
+import { isSecretMatch } from '@web/utils/is-secret-match';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -16,17 +15,6 @@ export const runtime = 'nodejs';
 const requestBodySchema = z.object({ _id: z.string().min(1) });
 
 const WRITE_CLIENT_UNCONFIGURED_MARKER = 'SANITY_API_WRITE_TOKEN is not set';
-
-/** Constant-time secret comparison — a plain `===` leaks timing information proportional to how many leading characters match. */
-function isSecretMatch(provided: string | null, expected: string): boolean {
-  if (!provided) return false;
-
-  const providedBuffer = Buffer.from(provided);
-  const expectedBuffer = Buffer.from(expected);
-  if (providedBuffer.length !== expectedBuffer.length) return false;
-
-  return timingSafeEqual(providedBuffer, expectedBuffer);
-}
 
 /** `saveSkimDraft`'s write client throws this exact substring when `SANITY_API_WRITE_TOKEN` is absent — the one signal this route has for "unconfigured" vs. a genuine write failure, since that env var lives in `@blog/service`, not here. */
 function isWriteClientUnconfiguredError(error: unknown): boolean {
