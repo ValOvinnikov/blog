@@ -92,6 +92,15 @@ export const Paused: TStory = {
   },
 };
 
+export const Plain: TStory = {
+  args: {
+    plain: true,
+    command: undefined,
+    state: undefined,
+    action: { label: 'undo', onAct: () => {}, keyHint: '⌘Z' },
+  },
+};
+
 const ReducedMotionDemo = () => (
   <>
     {/*

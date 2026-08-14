@@ -213,7 +213,7 @@ Props: prefix: string · suffix?: string · showCursor?: boolean _(extends Omit<
 
 ### Toast — `molecules/toast/toast.tsx`
 a single compact terminal-window notification confirming or reporting the result of an engagement action (bookmark, rating, comment, subscription, auth).
-Props: type: TToastType · isLoading?: boolean · command: string · state: string · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · paused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> · className?: string _(extends IWithDataTestId)_
+Props: type: TToastType · isLoading?: boolean · command?: string · state?: string · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · paused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> · plain?: boolean · className?: string _(extends IWithDataTestId)_
 Variants: type: TOAST_TYPE.SUCCESS|TOAST_TYPE.INFO|TOAST_TYPE.WARNING|TOAST_TYPE.ERROR · phase: entering|visible|leaving · hasTime: (boolean) · paused: (boolean)
 
 ### WindowChrome — `molecules/window-chrome/window-chrome.tsx`

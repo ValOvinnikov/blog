@@ -28,8 +28,12 @@ export interface IToastProps extends IWithDataTestId {
    * to match.
    */
   isLoading?: boolean;
-  command: string;
-  state: string;
+  /**
+   * Required unless `plain` is set — the terminal-style command/state chip
+   * (e.g. "bookmark · saved") is only rendered when `plain` is falsy.
+   */
+  command?: string;
+  state?: string;
   message: ReactNode;
   time?: string;
   action?: IToastAction;
@@ -38,6 +42,11 @@ export interface IToastProps extends IWithDataTestId {
   durationMs?: number;
   onDismiss: () => void;
   phase: NonNullable<TToastVariants['phase']>;
+  /**
+   * Renders `message` alone, without the `command`/`state` chip — for
+   * presets that don't want the toast to read as terminal-log output.
+   */
+  plain?: boolean;
   className?: string;
 }
 
@@ -81,6 +90,7 @@ export const Toast = ({
   durationMs,
   onDismiss,
   phase,
+  plain = false,
   className,
   dataTestId,
 }: IToastProps) => {
@@ -92,6 +102,40 @@ export const Toast = ({
   });
   const { role, live } = TOAST_ANNOUNCEMENT[type];
 
+  const statusGlyph = isLoading ? (
+    <Spinner
+      label={state ?? type}
+      size={Size.SM}
+      className={s.spinner()}
+      aria-hidden="true"
+      dataTestId="toast-spinner"
+    />
+  ) : (
+    <span className={s.glyph()} aria-hidden="true">
+      {getToastGlyph(type, isLoading)}
+    </span>
+  );
+
+  const dismissButton = (
+    <IconButton
+      ariaLabel={dismissLabel}
+      title={dismissLabel}
+      onClick={onDismiss}
+      className={s.dismiss()}
+    >
+      <Icon name={ICONS.CLOSE} size={Size.SM} dataTestId="toast-dismiss-icon" />
+    </IconButton>
+  );
+
+  const actionButton = action && (
+    <button type="button" onClick={action.onAct} className={s.action()}>
+      {action.label}
+      {action.keyHint && (
+        <span className={s.actionKey()}>{action.keyHint}</span>
+      )}
+    </button>
+  );
+
   return (
     <div
       role={role}
@@ -100,55 +144,37 @@ export const Toast = ({
       className={s.root({ class: className })}
       data-testid={dataTestId}
     >
-      <div className={s.bar()}>
-        {isLoading ? (
-          <Spinner
-            label={state}
-            size={Size.SM}
-            className={s.spinner()}
-            aria-hidden="true"
-            dataTestId="toast-spinner"
-          />
-        ) : (
-          <span className={s.glyph()} aria-hidden="true">
-            {getToastGlyph(type, isLoading)}
-          </span>
-        )}
-        <span className={s.cmdCommand()}>
-          {command} · <span className={s.cmdState()}>{state}</span>
-        </span>
-        {time && <span className={s.time()}>{time}</span>}
-        <IconButton
-          ariaLabel={dismissLabel}
-          title={dismissLabel}
-          onClick={onDismiss}
-          className={s.dismiss()}
-        >
-          <Icon
-            name={ICONS.CLOSE}
-            size={Size.SM}
-            dataTestId="toast-dismiss-icon"
-          />
-        </IconButton>
-      </div>
-      <div className={s.body()}>
-        <div className={s.message()}>
-          <span className={s.prompt()} aria-hidden="true">
-            {getToastGlyph(type, isLoading)}
-          </span>
-          <span>{message}</span>
+      {plain ? (
+        <div className={s.plainRow()}>
+          {statusGlyph}
+          <span className={s.plainMessage()}>{message}</span>
+          {time && <span className={s.time()}>{time}</span>}
+          {dismissButton}
         </div>
-        {action && (
-          <div className={s.actions()}>
-            <button type="button" onClick={action.onAct} className={s.action()}>
-              {action.label}
-              {action.keyHint && (
-                <span className={s.actionKey()}>{action.keyHint}</span>
-              )}
-            </button>
+      ) : (
+        <>
+          <div className={s.bar()}>
+            {statusGlyph}
+            <span className={s.cmdCommand()}>
+              {command} · <span className={s.cmdState()}>{state}</span>
+            </span>
+            {time && <span className={s.time()}>{time}</span>}
+            {dismissButton}
           </div>
-        )}
-      </div>
+          <div className={s.body()}>
+            <div className={s.message()}>
+              <span className={s.prompt()} aria-hidden="true">
+                {getToastGlyph(type, isLoading)}
+              </span>
+              <span>{message}</span>
+            </div>
+            {actionButton && <div className={s.actions()}>{actionButton}</div>}
+          </div>
+        </>
+      )}
+      {plain && actionButton && (
+        <div className={s.plainActions()}>{actionButton}</div>
+      )}
       {durationMs !== undefined && (
         <div
           className={s.timer()}

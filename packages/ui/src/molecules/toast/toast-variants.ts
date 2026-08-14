@@ -30,7 +30,10 @@ export const toastVariants = tv({
       'leading-snug',
     ],
     prompt: ['shrink-0'],
+    plainRow: ['flex items-center gap-2', 'p-3', 'text-card-copy text-text'],
+    plainMessage: ['flex-1 leading-snug'],
     actions: ['flex items-center gap-1.5'],
+    plainActions: ['flex items-center gap-1.5', 'px-3 pb-3'],
     action: [
       'inline-flex items-center gap-1',
       'rounded-sm border border-border-strong px-2 py-1',
