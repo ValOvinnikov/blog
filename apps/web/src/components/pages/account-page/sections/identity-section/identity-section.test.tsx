@@ -2,9 +2,10 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { IdentitySection } from './identity-section';
 
-const { authMock, getLinkedProvidersMock } = vi.hoisted(() => ({
+const { authMock, getLinkedProvidersMock, getThemeMock } = vi.hoisted(() => ({
   authMock: vi.fn(),
   getLinkedProvidersMock: vi.fn(),
+  getThemeMock: vi.fn(),
 }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
@@ -12,6 +13,14 @@ vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 vi.mock('@blog/db', () => ({
   queries: {
     account: { getLinkedProviders: getLinkedProvidersMock },
+  },
+}));
+
+vi.mock('@blog/service', () => ({
+  service: {
+    global: {
+      themeSettings: { v1: { getTheme: getThemeMock } },
+    },
   },
 }));
 
@@ -41,6 +50,8 @@ describe(`<${IdentitySection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
     getLinkedProvidersMock.mockReset();
+    getThemeMock.mockReset();
+    getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: true } });
   });
 
   it('renders nothing when there is no session', async () => {
@@ -212,5 +223,35 @@ describe(`<${IdentitySection.name}/>`, () => {
     expect(screen.getByTestId('display-name-control')).toHaveTextContent(
       'Jane Doe',
     );
+  });
+
+  describe('plain (chromeOn: false)', () => {
+    beforeEach(() => {
+      getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: false } });
+    });
+
+    it('renders a plain section heading + card with no terminal shell, preserving heading levels', async () => {
+      authMock.mockResolvedValue(authedSession);
+      getLinkedProvidersMock.mockResolvedValue({
+        github: true,
+        google: false,
+        emailLink: true,
+      });
+
+      await setup();
+
+      expect(
+        screen.getByRole('heading', {
+          level: 2,
+          name: 'Connected accounts',
+        }),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'GitHub' }),
+      ).toBeVisible();
+      expect(
+        screen.getByTestId('provider-link-control-github'),
+      ).toHaveTextContent('unlink');
+    });
   });
 });

@@ -25,7 +25,12 @@ import { SignInMenu } from './components/sign-in-menu/sign-in-menu';
  * once the real trigger mounts) for never showing a misleading placeholder
  * shape.
  */
-export function AuthMenu() {
+export interface IAuthMenuProps {
+  /** Renders both branches' panel without the `WindowChrome` shell. */
+  plain?: boolean;
+}
+
+export function AuthMenu({ plain = false }: IAuthMenuProps) {
   const sessionResult = useSession();
   const oauthError = useOAuthErrorParam();
   const t = useTranslations('authMenu');
@@ -57,6 +62,7 @@ export function AuthMenu() {
         name={name}
         email={email}
         image={image}
+        plain={plain}
       />
     );
   }
@@ -69,6 +75,7 @@ export function AuthMenu() {
       triggerRef={triggerRef}
       panelRef={panelRef}
       oauthError={oauthError}
+      plain={plain}
     />
   );
 }

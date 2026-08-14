@@ -9,6 +9,11 @@ import {
   notFoundPageVariants,
 } from './not-found-page-variants';
 
+export interface INotFoundPageProps {
+  /** Renders the plain 404 body with no `TerminalChip`/prompt-line styling. */
+  plain?: boolean;
+}
+
 const s = notFoundPageVariants();
 const {
   root,
@@ -24,7 +29,7 @@ const {
  * stays a self-contained, centered composition: no site chrome, just the
  * `TerminalChip` molecule, a short explanation, and a link home.
  */
-export const NotFoundPage = () => {
+export const NotFoundPage = ({ plain = false }: INotFoundPageProps) => {
   const t = useTranslations('notFound');
 
   return (
@@ -32,21 +37,40 @@ export const NotFoundPage = () => {
       <Heading level={1} visual="hero">
         404
       </Heading>
-      <TerminalChip
-        prefix="404: "
-        suffix={t('commandNotFound')}
-        className={s.chip()}
-      />
+      {plain ? (
+        <Text className={s.plainCopy()}>{t('commandNotFound')}</Text>
+      ) : (
+        <TerminalChip
+          prefix="404: "
+          suffix={t('commandNotFound')}
+          className={s.chip()}
+        />
+      )}
       <Text className={s.copy()}>{t('description')}</Text>
-      <SmartLink href="/" aria-label={t('returnHome')} className={root()}>
-        <span className={promptSlot()} aria-hidden="true">
-          $
-        </span>
-        <span className={commandSlot()}>cd ~</span>
-        <span className={arrow()} aria-hidden="true">
-          <Icon name={ICONS.ARROW} dataTestId="not-found-arrow-icon" />
-        </span>
-      </SmartLink>
+      {plain ? (
+        <SmartLink
+          href="/"
+          aria-label={t('returnHome')}
+          className={s.plainLink()}
+        >
+          {t('returnHome')}
+          <Icon
+            name={ICONS.ARROW}
+            className={s.plainArrow()}
+            dataTestId="not-found-arrow-icon"
+          />
+        </SmartLink>
+      ) : (
+        <SmartLink href="/" aria-label={t('returnHome')} className={root()}>
+          <span className={promptSlot()} aria-hidden="true">
+            $
+          </span>
+          <span className={commandSlot()}>cd ~</span>
+          <span className={arrow()} aria-hidden="true">
+            <Icon name={ICONS.ARROW} dataTestId="not-found-arrow-icon" />
+          </span>
+        </SmartLink>
+      )}
     </main>
   );
 };

@@ -2,9 +2,20 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { PrivacySection } from './privacy-section';
 
-const { authMock } = vi.hoisted(() => ({ authMock: vi.fn() }));
+const { authMock, getThemeMock } = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  getThemeMock: vi.fn(),
+}));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
+
+vi.mock('@blog/service', () => ({
+  service: {
+    global: {
+      themeSettings: { v1: { getTheme: getThemeMock } },
+    },
+  },
+}));
 
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
@@ -32,6 +43,8 @@ const setup = customRenderAsync(PrivacySection, {});
 describe(`<${PrivacySection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
+    getThemeMock.mockReset();
+    getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: true } });
   });
 
   it('renders nothing when there is no session', async () => {
@@ -90,5 +103,26 @@ describe(`<${PrivacySection.name}/>`, () => {
     expect(screen.getByTestId('delete-account-control')).toHaveTextContent(
       'jane',
     );
+  });
+
+  describe('plain (chromeOn: false)', () => {
+    beforeEach(() => {
+      getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: false } });
+    });
+
+    it('renders a plain section heading + card, dropping the WindowChrome.Tag pill', async () => {
+      authMock.mockResolvedValue({
+        user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
+      });
+
+      await setup();
+
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Privacy' }),
+      ).toBeVisible();
+      const exportLink = screen.getByRole('link', { name: 'Request export' });
+      expect(exportLink).toHaveAttribute('href', '/api/account/export');
+      expect(screen.getByText('Delete account')).toBeVisible();
+    });
   });
 });

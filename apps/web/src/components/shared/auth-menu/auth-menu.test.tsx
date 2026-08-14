@@ -21,6 +21,7 @@ vi.mock('next-auth/react', () => ({
 }));
 
 const setup = customRender(AuthMenu, {});
+const setupPlain = customRender(AuthMenu, { plain: true });
 
 const setLocationSearch = (search: string) => {
   window.history.replaceState(null, '', `/${search}`);
@@ -100,6 +101,22 @@ describe(`<${AuthMenu.name}/>`, () => {
       // text) — assert the concatenated reading is properly space-separated
       // ("Guest Sign in"), not touching ("GuestSign in").
       expect(panel.textContent).toMatch(/Guest\s+Sign in/);
+    });
+
+    it('renders a plain "Sign in" heading with no terminal prompt line when plain', async () => {
+      setupPlain();
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Sign in' }));
+      const panel = screen.getByRole('menu');
+
+      expect(
+        within(panel).getByRole('heading', { level: 2, name: 'Sign in' }),
+      ).toBeVisible();
+      expect(within(panel).queryByText('Guest')).not.toBeInTheDocument();
+      expect(
+        within(panel).getByRole('menuitem', { name: 'Continue with GitHub' }),
+      ).toBeVisible();
     });
 
     it('calls signIn("github") when the GitHub item is clicked', async () => {
@@ -314,6 +331,20 @@ describe(`<${AuthMenu.name}/>`, () => {
       // hardcoded placeholder.
       expect(within(panel).getByText('jane')).toBeVisible();
       expect(panel.textContent).toMatch(/jane\s+Account/);
+    });
+
+    it('renders a plain user-info row and link list with no terminal bar when plain', async () => {
+      setupPlain();
+      const user = userEvent.setup();
+
+      await user.click(screen.getByRole('button', { name: 'Account menu' }));
+      const panel = screen.getByRole('menu');
+
+      expect(within(panel).getAllByText('Jane Doe').length).toBeGreaterThan(0);
+      expect(
+        screen.getByRole('menuitem', { name: 'My bookmarks' }),
+      ).toBeVisible();
+      expect(panel.textContent).not.toMatch(/jane\s+Account/);
     });
 
     it('calls signOut when Sign out is clicked', async () => {

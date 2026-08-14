@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, routes, SOCIAL_PLATFORMS } from '@blog/config';
+import userEvent from '@testing-library/user-event';
 import realMessages from '@web/i18n/messages/en.json';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import type { ReactNode } from 'react';
@@ -9,6 +10,7 @@ const {
   getSiteSettingsMock,
   getNavigationMock,
   getFooterMock,
+  getThemeMock,
   getMessagesMock,
   getNowMock,
   getTimeZoneMock,
@@ -20,6 +22,7 @@ const {
   getSiteSettingsMock: vi.fn(),
   getNavigationMock: vi.fn(),
   getFooterMock: vi.fn(),
+  getThemeMock: vi.fn(),
   getMessagesMock: vi.fn(),
   getNowMock: vi.fn(),
   getTimeZoneMock: vi.fn(),
@@ -39,6 +42,7 @@ vi.mock('@blog/service', () => ({
       siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } },
       navigation: { v1: { getNavigation: getNavigationMock } },
       footer: { v1: { getFooter: getFooterMock } },
+      themeSettings: { v1: { getTheme: getThemeMock } },
     },
   },
 }));
@@ -91,6 +95,7 @@ describe('LocaleLayout', () => {
     });
     getNavigationMock.mockResolvedValue({ ok: true, data: { items: [] } });
     getFooterMock.mockResolvedValue({ ok: true, data: { social: [] } });
+    getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: true } });
     getMessagesMock.mockResolvedValue(realMessages);
     getNowMock.mockResolvedValue(now);
     getTimeZoneMock.mockResolvedValue('UTC');
@@ -249,5 +254,20 @@ describe('LocaleLayout', () => {
     expect(
       within(link).queryByTestId(`social-icon-${SOCIAL_PLATFORMS.MASTODON}`),
     ).not.toBeInTheDocument();
+  });
+
+  it('wires chromeOn: false into AuthMenu and ToastProvider as plain', async () => {
+    getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: false } });
+
+    await setup();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
+    const panel = screen.getByRole('menu');
+
+    expect(
+      within(panel).getByRole('heading', { level: 2, name: 'Sign in' }),
+    ).toBeVisible();
+    expect(within(panel).queryByText('Guest')).not.toBeInTheDocument();
   });
 });

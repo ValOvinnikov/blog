@@ -4,11 +4,13 @@ import { redirect } from 'next/navigation';
 
 import { BookmarksPage } from './bookmarks-page';
 
-const { authMock, listBookmarksMock, getPostsByIdsMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  listBookmarksMock: vi.fn(),
-  getPostsByIdsMock: vi.fn(),
-}));
+const { authMock, listBookmarksMock, getPostsByIdsMock, getThemeMock } =
+  vi.hoisted(() => ({
+    authMock: vi.fn(),
+    listBookmarksMock: vi.fn(),
+    getPostsByIdsMock: vi.fn(),
+    getThemeMock: vi.fn(),
+  }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
@@ -20,6 +22,9 @@ vi.mock('@blog/service', () => ({
   service: {
     entities: {
       posts: { v1: { getPostsByIds: getPostsByIdsMock } },
+    },
+    global: {
+      themeSettings: { v1: { getTheme: getThemeMock } },
     },
   },
 }));
@@ -46,6 +51,8 @@ describe(`<${BookmarksPage.name}/>`, () => {
     authMock.mockReset();
     listBookmarksMock.mockReset();
     getPostsByIdsMock.mockReset();
+    getThemeMock.mockReset();
+    getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: true } });
   });
 
   it('redirects home without querying bookmarks when there is no session', async () => {
@@ -133,5 +140,56 @@ describe(`<${BookmarksPage.name}/>`, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
+  });
+
+  describe('plain (chromeOn: false)', () => {
+    beforeEach(() => {
+      getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: false } });
+    });
+
+    it('renders the true empty state with no ls -l chrome', async () => {
+      authMock.mockResolvedValue({ user: { id: 'user-1' } });
+      listBookmarksMock.mockResolvedValue([]);
+      getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
+
+      await setup();
+
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'My bookmarks' }),
+      ).toBeVisible();
+      expect(
+        screen.getByText('No bookmarks yet — save a post to find it here.'),
+      ).toBeVisible();
+      expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    });
+
+    it('renders resolved posts as a plain list of title links, no ls -l styling', async () => {
+      authMock.mockResolvedValue({ user: { id: 'user-1' } });
+      listBookmarksMock.mockResolvedValue([
+        { userId: 'user-1', postId: 'post-2', createdAt: new Date() },
+        { userId: 'user-1', postId: 'post-1', createdAt: new Date() },
+      ]);
+      getPostsByIdsMock.mockResolvedValue({
+        ok: true,
+        data: [
+          makePostCard({ id: 'post-1', slug: 'first', title: 'First post' }),
+          makePostCard({ id: 'post-2', slug: 'second', title: 'Second post' }),
+        ],
+      });
+
+      await setup();
+
+      const links = screen.getAllByRole('link');
+      expect(links.map((link) => link.textContent)).toEqual([
+        'Second post',
+        'First post',
+      ]);
+      expect(links[0]).toHaveAttribute('href', '/blog/second');
+      expect(screen.getByText('2 saved')).toBeVisible();
+      expect(
+        screen.queryByTestId('bookmarks-list-row-prefix'),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText('second.md')).not.toBeInTheDocument();
+    });
   });
 });

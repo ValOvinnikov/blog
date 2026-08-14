@@ -321,4 +321,30 @@ describe(`<${ToastProvider.name}/>`, () => {
       'useToast must be used within a ToastProvider',
     );
   });
+
+  it('renders the command/state chip by default (chromeOn: true)', () => {
+    renderElement(
+      <ToastProvider>
+        <ToastHarness />
+      </ToastProvider>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+
+    expect(screen.getByText(/Bookmark/)).toBeVisible();
+    expect(screen.getByText('Saved to bookmarks')).toBeVisible();
+  });
+
+  it('renders plain mode with no command/state chip when plain is set', () => {
+    renderElement(
+      <ToastProvider plain={true}>
+        <ToastHarness />
+      </ToastProvider>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+
+    expect(screen.getByText('Saved to bookmarks')).toBeVisible();
+    expect(screen.queryByText('Bookmark')).not.toBeInTheDocument();
+  });
 });

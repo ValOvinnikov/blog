@@ -2,16 +2,27 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { NewsletterSection } from './newsletter-section';
 
-const { authMock, getSubscriptionStatusMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  getSubscriptionStatusMock: vi.fn(),
-}));
+const { authMock, getSubscriptionStatusMock, getThemeMock } = vi.hoisted(
+  () => ({
+    authMock: vi.fn(),
+    getSubscriptionStatusMock: vi.fn(),
+    getThemeMock: vi.fn(),
+  }),
+);
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
 vi.mock('@blog/db', () => ({
   queries: {
     subscribers: { getSubscriptionStatus: getSubscriptionStatusMock },
+  },
+}));
+
+vi.mock('@blog/service', () => ({
+  service: {
+    global: {
+      themeSettings: { v1: { getTheme: getThemeMock } },
+    },
   },
 }));
 
@@ -31,6 +42,8 @@ describe(`<${NewsletterSection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
     getSubscriptionStatusMock.mockReset();
+    getThemeMock.mockReset();
+    getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: true } });
   });
 
   it('renders nothing when there is no session', async () => {
@@ -100,5 +113,29 @@ describe(`<${NewsletterSection.name}/>`, () => {
     expect(
       screen.getByTestId('newsletter-subscription-control'),
     ).toHaveTextContent('resend');
+  });
+
+  describe('plain (chromeOn: false)', () => {
+    beforeEach(() => {
+      getThemeMock.mockResolvedValue({ ok: true, data: { chromeOn: false } });
+    });
+
+    it('renders a plain section heading + card with no terminal shell', async () => {
+      authMock.mockResolvedValue(authedSession);
+      getSubscriptionStatusMock.mockResolvedValue({
+        outcome: 'active',
+        subscriber: { email: 'jane@icloud.com' },
+      });
+
+      await setup();
+
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Newsletter' }),
+      ).toBeVisible();
+      expect(screen.getByText('Subscribed')).toBeVisible();
+      expect(
+        screen.getByTestId('newsletter-subscription-control'),
+      ).toHaveTextContent('unsubscribe');
+    });
   });
 });

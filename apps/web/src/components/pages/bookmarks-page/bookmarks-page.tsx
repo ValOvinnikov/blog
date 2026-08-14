@@ -1,11 +1,12 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
 import { service } from '@blog/service';
-import { Heading } from '@blog/ui/atoms';
+import { Heading, Text } from '@blog/ui/atoms';
 import { WindowChrome } from '@blog/ui/molecules';
 import { BookmarksList, type IBookmarkRow } from '@blog/ui/organisms';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { auth } from '@web/server/auth/auth';
+import { getChromeOn } from '@web/utils/get-chrome-on';
 import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { redirect } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
@@ -42,11 +43,13 @@ export async function BookmarksPage() {
     redirect(routes.home());
   }
 
-  const [bookmarks, t, format] = await Promise.all([
+  const [bookmarks, t, format, chromeOn] = await Promise.all([
     queries.bookmarks.listBookmarks(userId),
     getTranslations('bookmarksPage'),
     getFormatter(),
+    getChromeOn(),
   ]);
+  const plain = !chromeOn;
 
   const bookmarkOrder = bookmarks.map((bookmark) => bookmark.postId);
 
@@ -64,13 +67,20 @@ export async function BookmarksPage() {
     .map((postId) => postsById.get(postId))
     .filter((post) => post !== undefined);
 
+  const formattedDates = new Map(
+    orderedPosts.map((post) => [
+      post.id,
+      format.dateTime(new Date(post.publishedAt), {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }),
+    ]),
+  );
+
   const rows: IBookmarkRow[] = orderedPosts.map((post) => ({
     id: post.id,
-    formattedDate: format.dateTime(new Date(post.publishedAt), {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }),
+    formattedDate: formattedDates.get(post.id) ?? '',
     filename: `${post.slug}.md`,
     href: routes.post(post.slug),
   }));
@@ -80,32 +90,61 @@ export async function BookmarksPage() {
       <Heading level={1} visual="section" className={s.heading()}>
         {t('title')}
       </Heading>
-      <WindowChrome className={s.chrome()}>
-        <WindowChrome.Bar>
-          <WindowChrome.Prompt>{t('promptSymbol')}</WindowChrome.Prompt>{' '}
-          {t('promptCommand')}{' '}
-          <WindowChrome.User>{t('promptFlag')}</WindowChrome.User>
-        </WindowChrome.Bar>
-        <WindowChrome.Body>
-          <BookmarksList
-            rows={rows}
-            emptyMessage={t('empty')}
-            hint={
-              rows.length > 0 ? t('hint', { count: rows.length }) : undefined
-            }
-            prefix={
-              <span
-                aria-hidden="true"
-                data-testid="bookmarks-list-row-prefix"
-                className={s.prefix()}
-              >
-                drwx
-              </span>
-            }
-            linkAs={SmartLink}
-          />
-        </WindowChrome.Body>
-      </WindowChrome>
+      {plain ? (
+        <div className={s.plainRoot()}>
+          {orderedPosts.length === 0 ? (
+            <Text>{t('empty')}</Text>
+          ) : (
+            <>
+              <ul role="list" className={s.plainList()}>
+                {orderedPosts.map((post) => (
+                  <li key={post.id} className={s.plainRow()}>
+                    <SmartLink
+                      href={routes.post(post.slug)}
+                      className={s.plainLink()}
+                    >
+                      {post.title}
+                    </SmartLink>
+                    <span className={s.plainDate()}>
+                      {formattedDates.get(post.id)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <Text className={s.plainHint()}>
+                {t('hint', { count: orderedPosts.length })}
+              </Text>
+            </>
+          )}
+        </div>
+      ) : (
+        <WindowChrome className={s.chrome()}>
+          <WindowChrome.Bar>
+            <WindowChrome.Prompt>{t('promptSymbol')}</WindowChrome.Prompt>{' '}
+            {t('promptCommand')}{' '}
+            <WindowChrome.User>{t('promptFlag')}</WindowChrome.User>
+          </WindowChrome.Bar>
+          <WindowChrome.Body>
+            <BookmarksList
+              rows={rows}
+              emptyMessage={t('empty')}
+              hint={
+                rows.length > 0 ? t('hint', { count: rows.length }) : undefined
+              }
+              prefix={
+                <span
+                  aria-hidden="true"
+                  data-testid="bookmarks-list-row-prefix"
+                  className={s.prefix()}
+                >
+                  drwx
+                </span>
+              }
+              linkAs={SmartLink}
+            />
+          </WindowChrome.Body>
+        </WindowChrome>
+      )}
     </main>
   );
 }

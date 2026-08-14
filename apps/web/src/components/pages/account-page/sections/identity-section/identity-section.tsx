@@ -3,9 +3,11 @@ import { queries } from '@blog/db';
 import { Heading, Icon } from '@blog/ui/atoms';
 import { SettingRow, WindowChrome } from '@blog/ui/molecules';
 import { DisplayNameControl } from '@web/components/shared/display-name-control';
+import { PlainSection } from '@web/components/shared/plain-section';
 import { ProviderLinkControl } from '@web/components/shared/provider-link-control';
 import type { TLinkableProvider } from '@web/server/account/identity-actions';
 import { auth } from '@web/server/auth/auth';
+import { getChromeOn } from '@web/utils/get-chrome-on';
 import { toSessionUsername } from '@web/utils/to-session-username';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
@@ -35,7 +37,10 @@ export async function IdentitySection() {
   const handle = toSessionUsername(name, email);
   const t = await getTranslations('accountPage.identity');
 
-  const linked = await queries.account.getLinkedProviders(userId);
+  const [linked, chromeOn] = await Promise.all([
+    queries.account.getLinkedProviders(userId),
+    getChromeOn(),
+  ]);
   const linkedCount = [linked.github, linked.google, linked.emailLink].filter(
     Boolean,
   ).length;
@@ -75,6 +80,51 @@ export async function IdentitySection() {
     },
   ];
 
+  const bodyContent = (
+    <>
+      {providerRows.map(({ id, provider, icon, label, isLinked }) => (
+        <div key={id} className={s.providerRow()}>
+          <Heading level={3} className={s.providerName()}>
+            {icon} {label}
+          </Heading>
+          <div className={s.providerStatus()}>
+            {isLinked && (
+              <span className={s.linkedStatus()}>{t('linkedStatus')}</span>
+            )}
+            {isLastMethod(isLinked) ? (
+              <span className={s.lastMethodNotice()}>
+                {t('lastMethodNotice')}
+              </span>
+            ) : provider ? (
+              <ProviderLinkControl
+                provider={provider}
+                action={isLinked ? 'unlink' : 'link'}
+              />
+            ) : null}
+          </div>
+        </div>
+      ))}
+      <SettingRow
+        label={t('displayNameLabel')}
+        description={t('displayNameDescription')}
+      >
+        <DisplayNameControl
+          initialName={name ?? ''}
+          email={email}
+          image={image}
+        />
+      </SettingRow>
+    </>
+  );
+
+  if (!chromeOn) {
+    return (
+      <PlainSection heading={t('promptCommand')} headingLevel={2}>
+        {bodyContent}
+      </PlainSection>
+    );
+  }
+
   return (
     <WindowChrome>
       <WindowChrome.Bar headingLevel={2}>
@@ -82,40 +132,7 @@ export async function IdentitySection() {
         <WindowChrome.Prompt>{t('promptHost')}</WindowChrome.Prompt>{' '}
         {t('promptCommand')}
       </WindowChrome.Bar>
-      <WindowChrome.Body>
-        {providerRows.map(({ id, provider, icon, label, isLinked }) => (
-          <div key={id} className={s.providerRow()}>
-            <Heading level={3} className={s.providerName()}>
-              {icon} {label}
-            </Heading>
-            <div className={s.providerStatus()}>
-              {isLinked && (
-                <span className={s.linkedStatus()}>{t('linkedStatus')}</span>
-              )}
-              {isLastMethod(isLinked) ? (
-                <span className={s.lastMethodNotice()}>
-                  {t('lastMethodNotice')}
-                </span>
-              ) : provider ? (
-                <ProviderLinkControl
-                  provider={provider}
-                  action={isLinked ? 'unlink' : 'link'}
-                />
-              ) : null}
-            </div>
-          </div>
-        ))}
-        <SettingRow
-          label={t('displayNameLabel')}
-          description={t('displayNameDescription')}
-        >
-          <DisplayNameControl
-            initialName={name ?? ''}
-            email={email}
-            image={image}
-          />
-        </SettingRow>
-      </WindowChrome.Body>
+      <WindowChrome.Body>{bodyContent}</WindowChrome.Body>
     </WindowChrome>
   );
 }

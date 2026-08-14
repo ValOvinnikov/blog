@@ -10,6 +10,7 @@ import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { ToastProvider } from '@web/components/shared/toast-provider';
 import { routing } from '@web/i18n/routing';
 import { env } from '@web/utils/env/env';
+import { getChromeOn } from '@web/utils/get-chrome-on';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import type { Metadata } from 'next';
@@ -85,16 +86,25 @@ export default async function LocaleLayout({ children, params }: TProps) {
 
   setRequestLocale(locale);
 
-  const [settingsResult, navResult, footerResult, messages, now, timeZone, t] =
-    await Promise.all([
-      service.global.siteSettings.v1.getSiteSettings(),
-      service.global.navigation.v1.getNavigation(),
-      service.global.footer.v1.getFooter(),
-      getMessages(),
-      getNow(),
-      getTimeZone(),
-      getTranslations('rss'),
-    ]);
+  const [
+    settingsResult,
+    navResult,
+    footerResult,
+    chromeOn,
+    messages,
+    now,
+    timeZone,
+    t,
+  ] = await Promise.all([
+    service.global.siteSettings.v1.getSiteSettings(),
+    service.global.navigation.v1.getNavigation(),
+    service.global.footer.v1.getFooter(),
+    getChromeOn(),
+    getMessages(),
+    getNow(),
+    getTimeZone(),
+    getTranslations('rss'),
+  ]);
 
   if (!settingsResult.ok) {
     console.error(`Error to fetch site settings: ${settingsResult.error}`);
@@ -104,6 +114,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
   const { brand } = settingsResult.data;
   const navItems = navResult.ok ? navResult.data.items : [];
   const social = footerResult.ok ? footerResult.data.social : [];
+  const plain = !chromeOn;
   const s = localeLayoutVariants();
 
   return (
@@ -132,7 +143,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
             route change instead of being tied to the page that fired it —
             it owns no visual layout of its own, it just renders its fixed
             `ToastViewport` alongside whatever `children` mounts. */}
-        <ToastProvider>
+        <ToastProvider plain={plain}>
           {/* `root` is the sticky-footer shell: `min-h-dvh flex-col` so short
               pages still fill the viewport, `content` is `flex-1` so it grows to
               push `Footer` to the bottom on short pages and yields naturally
@@ -147,7 +158,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                 actions={
                   <>
                     <ThemeToggleButton />
-                    <AuthMenu />
+                    <AuthMenu plain={plain} />
                   </>
                 }
               />
