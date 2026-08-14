@@ -64,14 +64,14 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
   it('renders the unsubscribe button copy for the "unsubscribe" action', () => {
     setup();
 
-    expect(screen.getByRole('button', { name: 'unsubscribe' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Unsubscribe' })).toBeVisible();
   });
 
   it('renders the resend button copy for the "resend" action', () => {
     setup({ action: 'resend' });
 
     expect(
-      screen.getByRole('button', { name: '↻ resend confirmation' }),
+      screen.getByRole('button', { name: 'Resend confirmation' }),
     ).toBeVisible();
   });
 
@@ -80,7 +80,7 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     const user = userEvent.setup();
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'unsubscribe' }));
+    await user.click(screen.getByRole('button', { name: 'Unsubscribe' }));
 
     await waitFor(() => {
       expect(unsubscribeActionMock).toHaveBeenCalled();
@@ -90,17 +90,17 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     });
 
     expect(toastPromiseMock).toHaveBeenCalledWith(expect.any(Promise), {
-      command: 'newsletter',
+      command: 'Newsletter',
       loading: {
-        state: 'unsubscribing',
+        state: 'Unsubscribing',
         message: 'Unsubscribing…',
       },
       success: {
-        state: 'unsubscribed',
+        state: 'Unsubscribed',
         message: "You've been unsubscribed.",
       },
       error: {
-        state: 'failed',
+        state: 'Failed',
         message: "Couldn't unsubscribe. Try again.",
       },
     });
@@ -112,7 +112,7 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     setup({ action: 'resend' });
 
     await user.click(
-      screen.getByRole('button', { name: '↻ resend confirmation' }),
+      screen.getByRole('button', { name: 'Resend confirmation' }),
     );
 
     await waitFor(() => {
@@ -123,17 +123,17 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     });
 
     expect(toastPromiseMock).toHaveBeenCalledWith(expect.any(Promise), {
-      command: 'newsletter',
+      command: 'Newsletter',
       loading: {
-        state: 'resending',
+        state: 'Resending',
         message: 'Resending the confirmation email…',
       },
       success: {
-        state: 'resent',
+        state: 'Resent',
         message: 'Confirmation email resent.',
       },
       error: {
-        state: 'failed',
+        state: 'Failed',
         message: "Couldn't resend the confirmation email. Try again.",
       },
     });
@@ -144,14 +144,14 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     const user = userEvent.setup();
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'unsubscribe' }));
+    await user.click(screen.getByRole('button', { name: 'Unsubscribe' }));
 
     await waitFor(() => {
       expect(toastPromiseMock).toHaveBeenCalled();
     });
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: 'unsubscribe' }),
+        screen.getByRole('button', { name: 'Unsubscribe' }),
       ).toHaveAttribute('aria-busy', 'false');
     });
     expect(routerRefreshMock).not.toHaveBeenCalled();
@@ -168,7 +168,7 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     const user = userEvent.setup();
     setup();
 
-    const button = screen.getByRole('button', { name: 'unsubscribe' });
+    const button = screen.getByRole('button', { name: 'Unsubscribe' });
     await user.click(button);
 
     await waitFor(() => {

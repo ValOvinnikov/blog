@@ -71,13 +71,13 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
   it('renders the link button copy for the "link" action', () => {
     setup();
 
-    expect(screen.getByRole('button', { name: 'link' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Link' })).toBeVisible();
   });
 
   it('renders the unlink button copy for the "unlink" action', () => {
     setup({ action: 'unlink' });
 
-    expect(screen.getByRole('button', { name: 'unlink' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Unlink' })).toBeVisible();
   });
 
   it('calls signIn with the provider and the /account redirect on "link"', async () => {
@@ -85,7 +85,7 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
     const user = userEvent.setup();
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'link' }));
+    await user.click(screen.getByRole('button', { name: 'Link' }));
 
     await waitFor(() => {
       expect(signInMock).toHaveBeenCalledWith('github', {
@@ -99,7 +99,7 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
     const user = userEvent.setup();
     setup({ action: 'unlink' });
 
-    await user.click(screen.getByRole('button', { name: 'unlink' }));
+    await user.click(screen.getByRole('button', { name: 'Unlink' }));
 
     await waitFor(() => {
       expect(unlinkProviderActionMock).toHaveBeenCalledWith('github');
@@ -111,13 +111,13 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
     expect(toastPromiseMock).toHaveBeenCalledWith(
       expect.any(Promise),
       expect.objectContaining({
-        command: 'identity',
+        command: 'Identity',
         loading: {
-          state: 'unlinking',
+          state: 'Unlinking',
           message: 'Unlinking your account…',
         },
         success: {
-          state: 'unlinked',
+          state: 'Unlinked',
           message: 'Account unlinked.',
         },
       }),
@@ -132,13 +132,13 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
     const user = userEvent.setup();
     setup({ action: 'unlink' });
 
-    await user.click(screen.getByRole('button', { name: 'unlink' }));
+    await user.click(screen.getByRole('button', { name: 'Unlink' }));
 
     await waitFor(() => {
       expect(toastPromiseMock).toHaveBeenCalled();
     });
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'unlink' })).toHaveAttribute(
+      expect(screen.getByRole('button', { name: 'Unlink' })).toHaveAttribute(
         'aria-busy',
         'false',
       );
@@ -160,7 +160,7 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
     const user = userEvent.setup();
     setup({ action: 'unlink' });
 
-    await user.click(screen.getByRole('button', { name: 'unlink' }));
+    await user.click(screen.getByRole('button', { name: 'Unlink' }));
 
     await waitFor(() => {
       expect(toastPromiseMock).toHaveBeenCalled();
@@ -185,7 +185,7 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
     const user = userEvent.setup();
     setup();
 
-    const button = screen.getByRole('button', { name: 'link' });
+    const button = screen.getByRole('button', { name: 'Link' });
     await user.click(button);
 
     await waitFor(() => {

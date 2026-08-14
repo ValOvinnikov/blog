@@ -88,10 +88,9 @@ describe(`<${AuthMenu.name}/>`, () => {
       await user.click(screen.getByRole('button', { name: 'Sign in' }));
       const panel = screen.getByRole('menu');
 
-      expect(within(panel).getByText('guest')).toBeVisible();
-      expect(within(panel).getByText('~$')).toBeVisible();
-      expect(within(panel).getByText(/auth login/)).toBeVisible();
-      expect(within(panel).getByText(/choose a provider/)).toBeVisible();
+      expect(within(panel).getByText('Guest')).toBeVisible();
+      expect(within(panel).getByText(/Sign in/)).toBeVisible();
+      expect(within(panel).getByText(/Choose a sign-in method/)).toBeVisible();
       expect(
         within(panel).getByText(
           'Redirects back to this article — you never lose your place.',
@@ -99,8 +98,8 @@ describe(`<${AuthMenu.name}/>`, () => {
       ).toBeVisible();
       // The bar's segments render as separate DOM nodes (User/Prompt/plain
       // text) — assert the concatenated reading is properly space-separated
-      // ("guest ~$ auth login"), not touching ("guest~$auth login").
-      expect(panel.textContent).toMatch(/guest\s+~\$\s+auth login/);
+      // ("Guest Sign in"), not touching ("GuestSign in").
+      expect(panel.textContent).toMatch(/Guest\s+Sign in/);
     });
 
     it('calls signIn("github") when the GitHub item is clicked', async () => {
@@ -314,8 +313,7 @@ describe(`<${AuthMenu.name}/>`, () => {
       // Asserts the bar shows this session's email-derived username, not a
       // hardcoded placeholder.
       expect(within(panel).getByText('jane')).toBeVisible();
-      expect(within(panel).getByText('~$')).toBeVisible();
-      expect(within(panel).getByText(/whoami/)).toBeVisible();
+      expect(panel.textContent).toMatch(/jane\s+Account/);
     });
 
     it('calls signOut when Sign out is clicked', async () => {

@@ -74,7 +74,7 @@ describe(`<${DisplayNameControl.name}/>`, () => {
     const input = screen.getByRole('textbox', { name: 'Display name' });
     await user.clear(input);
     await user.type(input, 'New Name');
-    await user.click(screen.getByRole('button', { name: 'save' }));
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(updateDisplayNameActionMock).toHaveBeenCalledWith('New Name');
@@ -84,17 +84,17 @@ describe(`<${DisplayNameControl.name}/>`, () => {
     });
 
     expect(toastPromiseMock).toHaveBeenCalledWith(expect.any(Promise), {
-      command: 'identity',
+      command: 'Identity',
       loading: {
-        state: 'saving',
+        state: 'Saving',
         message: 'Saving your display name…',
       },
       success: {
-        state: 'saved',
+        state: 'Saved',
         message: 'Display name updated.',
       },
       error: {
-        state: 'failed',
+        state: 'Failed',
         message: "Couldn't update your display name. Try again.",
       },
     });
@@ -107,7 +107,7 @@ describe(`<${DisplayNameControl.name}/>`, () => {
     const input = screen.getByRole('textbox', { name: 'Display name' });
     await user.clear(input);
 
-    expect(screen.getByRole('button', { name: 'save' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
     expect(updateDisplayNameActionMock).not.toHaveBeenCalled();
   });
 
@@ -116,13 +116,13 @@ describe(`<${DisplayNameControl.name}/>`, () => {
     const user = userEvent.setup();
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'save' }));
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(toastPromiseMock).toHaveBeenCalled();
     });
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'save' })).toHaveAttribute(
+      expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute(
         'aria-busy',
         'false',
       );

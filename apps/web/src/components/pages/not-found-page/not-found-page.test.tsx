@@ -15,8 +15,8 @@ describe(`<${NotFoundPage.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders the terminal-styled "command not found" copy', () => {
-    expect(screen.getByText('404: command not found')).toBeVisible();
+  it('renders the terminal-styled "Not found" copy', () => {
+    expect(screen.getByText('404: Not found')).toBeVisible();
   });
 
   it('renders a link back home', () => {

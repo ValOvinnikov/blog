@@ -62,8 +62,7 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('~$')).toBeVisible();
-    expect(screen.getByText(/account --identities/)).toBeVisible();
+    expect(screen.getByText(/Connected accounts/)).toBeVisible();
     expect(getLinkedProvidersMock).toHaveBeenCalledWith('user-1');
   });
 
@@ -77,7 +76,7 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getAllByText('✓ linked')).toHaveLength(2);
+    expect(screen.getAllByText('Linked')).toHaveLength(2);
     expect(
       screen.getByTestId('provider-link-control-github'),
     ).toHaveTextContent('unlink');
@@ -161,8 +160,8 @@ describe(`<${IdentitySection.name}/>`, () => {
     expect(
       screen.queryByTestId('provider-link-control-github'),
     ).not.toBeInTheDocument();
-    const linkedStatus = screen.getByText('✓ linked');
-    const notice = screen.getByText("last remaining method — can't unlink");
+    const linkedStatus = screen.getByText('Linked');
+    const notice = screen.getByText("Last remaining method — can't unlink");
     expect(notice).toBeVisible();
     expect(
       linkedStatus.compareDocumentPosition(notice) &
@@ -181,7 +180,7 @@ describe(`<${IdentitySection.name}/>`, () => {
     await setup();
 
     expect(
-      screen.getByText("last remaining method — can't unlink"),
+      screen.getByText("Last remaining method — can't unlink"),
     ).toBeVisible();
   });
 
@@ -196,7 +195,7 @@ describe(`<${IdentitySection.name}/>`, () => {
     await setup();
 
     expect(
-      screen.queryByText("last remaining method — can't unlink"),
+      screen.queryByText("Last remaining method — can't unlink"),
     ).not.toBeInTheDocument();
   });
 
