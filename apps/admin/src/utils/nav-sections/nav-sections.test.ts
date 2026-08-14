@@ -2,6 +2,7 @@ import messages from '@admin/i18n/messages/en.json';
 import { createTranslator } from 'next-intl';
 
 import {
+  dashboardNavSections,
   platformNavSections,
   tenantNavSections,
   type TNavTranslator,
@@ -65,5 +66,25 @@ describe('tenantNavSections', () => {
       'Team',
       'Danger zone',
     ]);
+  });
+});
+
+describe('dashboardNavSections', () => {
+  it('gives Look and Voice their slug-free /dashboard hrefs', () => {
+    const [dashboard] = dashboardNavSections(t);
+    const look = dashboard!.items.find((item) => item.label === 'Look');
+    const voice = dashboard!.items.find((item) => item.label === 'Voice');
+
+    expect(look?.href).toBe('/dashboard/look');
+    expect(voice?.href).toBe('/dashboard/voice');
+  });
+
+  it('lists the same eight destinations as tenantNavSections', () => {
+    const [dashboard] = dashboardNavSections(t);
+    const [tenant] = tenantNavSections(t, 'acme');
+
+    expect(dashboard!.items.map((item) => item.label)).toEqual(
+      tenant!.items.map((item) => item.label),
+    );
   });
 });

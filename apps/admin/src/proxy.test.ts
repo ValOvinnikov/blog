@@ -18,6 +18,9 @@ describe('proxy matcher', () => {
     expect(matcher.test('/tenants')).toBe(true);
     expect(matcher.test('/t/acme/look')).toBe(true);
     expect(matcher.test('/unauthorized')).toBe(true);
+    expect(matcher.test('/dashboard')).toBe(true);
+    expect(matcher.test('/dashboard/look')).toBe(true);
+    expect(matcher.test('/dashboard/select-tenant')).toBe(true);
   });
 
   it('excludes api, _next, _vercel, and dotted-extension paths', () => {

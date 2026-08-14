@@ -29,36 +29,57 @@ export const platformNavSections = (
   },
 ];
 
-export const tenantNavSections = (
-  t: TNavTranslator,
-  tenantSlug: string,
-): TSidebarNavSection[] => {
+type TTenantNavHrefs = { look: string; voice: string };
+
+/** The eight Tenant-section destinations, shared by the `/t/{slug}` and slug-free `/dashboard` sidebars — only the Look/Voice hrefs (and, via the caller, the section label) differ between them. */
+const tenantNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
   const shipping = { label: t('badgeThisMilestone'), tone: 'neutral' } as const;
   const later = { label: t('badgeLater'), tone: 'warn' } as const;
 
   return [
     {
-      label: t('tenantLabel', { tenantSlug }),
-      items: [
-        {
-          label: t('look'),
-          icon: ICONS.PALETTE,
-          href: adminRoutes.look(tenantSlug),
-          badge: shipping,
-        },
-        {
-          label: t('voice'),
-          icon: ICONS.QUOTE,
-          href: adminRoutes.voice(tenantSlug),
-          badge: shipping,
-        },
-        { label: t('domain'), icon: ICONS.GLOBE, badge: later },
-        { label: t('email'), icon: ICONS.MAIL, badge: later },
-        { label: t('subscribers'), icon: ICONS.MENU_ROWS, badge: later },
-        { label: t('comments'), icon: ICONS.COMMENT, badge: later },
-        { label: t('team'), icon: ICONS.USERS, badge: later },
-        { label: t('dangerZone'), icon: ICONS.WARNING, badge: later },
-      ],
+      label: t('look'),
+      icon: ICONS.PALETTE,
+      href: hrefs.look,
+      badge: shipping,
     },
+    {
+      label: t('voice'),
+      icon: ICONS.QUOTE,
+      href: hrefs.voice,
+      badge: shipping,
+    },
+    { label: t('domain'), icon: ICONS.GLOBE, badge: later },
+    { label: t('email'), icon: ICONS.MAIL, badge: later },
+    { label: t('subscribers'), icon: ICONS.MENU_ROWS, badge: later },
+    { label: t('comments'), icon: ICONS.COMMENT, badge: later },
+    { label: t('team'), icon: ICONS.USERS, badge: later },
+    { label: t('dangerZone'), icon: ICONS.WARNING, badge: later },
   ];
 };
+
+export const tenantNavSections = (
+  t: TNavTranslator,
+  tenantSlug: string,
+): TSidebarNavSection[] => [
+  {
+    label: t('tenantLabel', { tenantSlug }),
+    items: tenantNavItems(t, {
+      look: adminRoutes.look(tenantSlug),
+      voice: adminRoutes.voice(tenantSlug),
+    }),
+  },
+];
+
+/** The slug-free counterpart to `tenantNavSections` — same eight destinations, routed under `/dashboard` instead of `/t/{slug}`, labeled generically since the whole point of this tree is not naming the tenant in anything the URL-shy owner sees. */
+export const dashboardNavSections = (
+  t: TNavTranslator,
+): TSidebarNavSection[] => [
+  {
+    label: t('dashboardLabel'),
+    items: tenantNavItems(t, {
+      look: adminRoutes.dashboardLook(),
+      voice: adminRoutes.dashboardVoice(),
+    }),
+  },
+];

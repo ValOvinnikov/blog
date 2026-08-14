@@ -36,4 +36,24 @@ describe(TenantSwitcher, () => {
     const link = within(menu).getByRole('menuitem', { name: /acme/i });
     expect(link).toHaveAttribute('href', '/t/acme');
   });
+
+  it('links each tenant through a caller-supplied hrefFor instead of the default /t/{slug} route', async () => {
+    const user = userEvent.setup();
+    render(
+      <TenantSwitcher
+        tenants={[tenant]}
+        activeTenantId="tenant-1"
+        hrefFor={(t) => `/dashboard/select-tenant?tenantId=${t.id}`}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: /acme/i }));
+
+    const menu = await screen.findByRole('menu', { name: /acme/i });
+    const link = within(menu).getByRole('menuitem', { name: /acme/i });
+    expect(link).toHaveAttribute(
+      'href',
+      '/dashboard/select-tenant?tenantId=tenant-1',
+    );
+  });
 });

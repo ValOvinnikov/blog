@@ -1,20 +1,15 @@
 import { LookPageContent } from '@admin/components/look-page-content';
-import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
+import { resolveDashboardTenant } from '@admin/server/auth/resolve-dashboard-tenant';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-
-type TProps = {
-  params: Promise<{ tenantSlug: string }>;
-};
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('pageMetadata');
   return { title: t('look') };
 }
 
-export default async function LookPage({ params }: TProps) {
-  const { tenantSlug } = await params;
-  const { tenant } = await requireTenantMembership(tenantSlug);
+export default async function DashboardLookPage() {
+  const { tenant } = await resolveDashboardTenant();
 
   // Called directly (not `<LookPageContent tenant={tenant} />`) — an async
   // component nested via JSX only resolves under React's real RSC renderer,
