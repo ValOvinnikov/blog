@@ -86,38 +86,39 @@ export async function BookmarksPage() {
     href: routes.post(post.slug),
   }));
 
+  const plainContent =
+    orderedPosts.length === 0 ? (
+      <Text>{t('empty')}</Text>
+    ) : (
+      <>
+        <ul role="list" className={s.plainList()}>
+          {orderedPosts.map((post) => (
+            <li key={post.id} className={s.plainRow()}>
+              <SmartLink
+                href={routes.post(post.slug)}
+                className={s.plainLink()}
+              >
+                {post.title}
+              </SmartLink>
+              <span className={s.plainDate()}>
+                {formattedDates.get(post.id)}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <Text className={s.plainHint()}>
+          {t('hint', { count: orderedPosts.length })}
+        </Text>
+      </>
+    );
+
   return (
     <main className={s.root()}>
       <Heading level={1} visual="section" className={s.heading()}>
         {t('title')}
       </Heading>
       {plain ? (
-        <div className={s.plainRoot()}>
-          {orderedPosts.length === 0 ? (
-            <Text>{t('empty')}</Text>
-          ) : (
-            <>
-              <ul role="list" className={s.plainList()}>
-                {orderedPosts.map((post) => (
-                  <li key={post.id} className={s.plainRow()}>
-                    <SmartLink
-                      href={routes.post(post.slug)}
-                      className={s.plainLink()}
-                    >
-                      {post.title}
-                    </SmartLink>
-                    <span className={s.plainDate()}>
-                      {formattedDates.get(post.id)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <Text className={s.plainHint()}>
-                {t('hint', { count: orderedPosts.length })}
-              </Text>
-            </>
-          )}
-        </div>
+        <div className={s.plainRoot()}>{plainContent}</div>
       ) : (
         <WindowChrome className={s.chrome()}>
           <WindowChrome.Bar>
