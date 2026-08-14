@@ -56,10 +56,10 @@ export function TenantSwitcher({
     <Menu.Root>
       <Menu.Trigger className={trigger()}>
         <span aria-hidden="true">
-          <Avatar name={active.slug} alt={active.slug} size={Size.SM} />
+          <Avatar name={active.name} alt={active.name} size={Size.SM} />
         </span>
         <span className={meta()}>
-          <span className={name()}>{active.slug}</span>
+          <span className={name()}>{active.name}</span>
           <span className={domain()}>{active.primaryDomain}</span>
         </span>
         <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} className={chevron()} />
@@ -76,7 +76,7 @@ export function TenantSwitcher({
                 className={item()}
                 render={<Link href={hrefFor(tenant)} />}
               >
-                <span className={itemName()}>{tenant.slug}</span>
+                <span className={itemName()}>{tenant.name}</span>
                 <span className={itemDomain()}>{tenant.primaryDomain}</span>
               </Menu.LinkItem>
             ))}

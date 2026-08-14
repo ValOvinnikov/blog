@@ -50,11 +50,13 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
     listMembershipsForUserMock.mockResolvedValue([
       { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
     ]);
-    listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1', slug: 'acme' }]);
+    listTenantsByIdsMock.mockResolvedValue([
+      { id: 'tenant-1', slug: 'acme', name: 'Acme Inc.' },
+    ]);
 
     await setup();
 
-    expect(screen.getByRole('heading', { name: 'acme' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Acme Inc.' })).toBeVisible();
     expect(redirect).not.toHaveBeenCalled();
   });
 });

@@ -24,7 +24,7 @@ describe(TenantsView, () => {
     render(<TenantsView tenants={[tenant]} />);
 
     expect(screen.getByRole('heading', { name: 'Tenants' })).toBeVisible();
-    expect(screen.getByText('acme')).toBeVisible();
+    expect(screen.getByText('Acme Inc.')).toBeVisible();
   });
 
   it('renders add-tenant as visibly disabled with its reason stated', () => {

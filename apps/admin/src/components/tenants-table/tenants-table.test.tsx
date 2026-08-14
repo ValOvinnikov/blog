@@ -21,7 +21,7 @@ const buildTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
 });
 
 describe(TenantsTable, () => {
-  it('renders one row per tenant with its slug, domain, plan and status', () => {
+  it('renders one row per tenant with its name, domain, plan and status', () => {
     render(
       <TenantsTable
         tenants={[
@@ -29,6 +29,7 @@ describe(TenantsTable, () => {
           buildTenant({
             id: 'tenant-2',
             slug: 'harbor',
+            name: 'Harbor Co.',
             primaryDomain: 'harbor.example.com',
             plan: 'GROWTH',
             status: 'SUSPENDED',
@@ -37,12 +38,12 @@ describe(TenantsTable, () => {
       />,
     );
 
-    expect(screen.getByText('acme')).toBeVisible();
+    expect(screen.getByText('Acme Inc.')).toBeVisible();
     expect(screen.getByText('acme.example.com')).toBeVisible();
     expect(screen.getByText('Free')).toBeVisible();
     expect(screen.getByText('Active')).toBeVisible();
 
-    expect(screen.getByText('harbor')).toBeVisible();
+    expect(screen.getByText('Harbor Co.')).toBeVisible();
     expect(screen.getByText('Growth')).toBeVisible();
     expect(screen.getByText('Suspended')).toBeVisible();
   });

@@ -22,19 +22,19 @@ describe(TenantSwitcher, () => {
   it('shows the active tenant on the trigger', () => {
     render(<TenantSwitcher tenants={[tenant]} activeTenantId="tenant-1" />);
 
-    expect(screen.getByRole('button', { name: /acme/i })).toHaveTextContent(
-      'acme.example.com',
-    );
+    expect(
+      screen.getByRole('button', { name: /acme inc\./i }),
+    ).toHaveTextContent('acme.example.com');
   });
 
   it('opens a menu whose accessible name is the active tenant (from the trigger), listing every tenant the user can switch into and linking to its route', async () => {
     const user = userEvent.setup();
     render(<TenantSwitcher tenants={[tenant]} activeTenantId="tenant-1" />);
 
-    await user.click(screen.getByRole('button', { name: /acme/i }));
+    await user.click(screen.getByRole('button', { name: /acme inc\./i }));
 
-    const menu = await screen.findByRole('menu', { name: /acme/i });
-    const link = within(menu).getByRole('menuitem', { name: /acme/i });
+    const menu = await screen.findByRole('menu', { name: /acme inc\./i });
+    const link = within(menu).getByRole('menuitem', { name: /acme inc\./i });
     expect(link).toHaveAttribute('href', '/t/acme');
   });
 
@@ -48,10 +48,10 @@ describe(TenantSwitcher, () => {
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: /acme/i }));
+    await user.click(screen.getByRole('button', { name: /acme inc\./i }));
 
-    const menu = await screen.findByRole('menu', { name: /acme/i });
-    const link = within(menu).getByRole('menuitem', { name: /acme/i });
+    const menu = await screen.findByRole('menu', { name: /acme inc\./i });
+    const link = within(menu).getByRole('menuitem', { name: /acme inc\./i });
     expect(link).toHaveAttribute(
       'href',
       '/dashboard/select-tenant?tenantId=tenant-1',

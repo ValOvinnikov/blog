@@ -5,9 +5,9 @@ import { TenantOverview } from './tenant-overview';
 const render = renderWithIntl;
 
 describe(TenantOverview, () => {
-  it('renders the routed tenant slug as the heading', () => {
-    render(<TenantOverview tenantSlug="acme" />);
+  it('renders the tenant name as the heading', () => {
+    render(<TenantOverview tenantName="Acme Inc." />);
 
-    expect(screen.getByRole('heading', { name: 'acme' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Acme Inc.' })).toBeVisible();
   });
 });
