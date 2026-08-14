@@ -49,9 +49,7 @@ describe(`<${PrivacySection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('~$')).toBeVisible();
-    expect(screen.getByText(/account --privacy/)).toBeVisible();
-    expect(screen.getByText('data')).toBeVisible();
+    expect(screen.getByText(/Privacy/)).toBeVisible();
     // The session's email local part ("jane") is the derived handle, shown
     // both in the window's user segment and passed to the delete control.
     expect(screen.getAllByText('jane').length).toBeGreaterThan(0);
@@ -75,7 +73,7 @@ describe(`<${PrivacySection.name}/>`, () => {
     await setup();
 
     const exportLink = screen.getByRole('link', {
-      name: '↓ request export',
+      name: 'Request export',
     });
     expect(exportLink).toHaveAttribute('href', '/api/account/export');
     expect(exportLink).toHaveAttribute('download');
@@ -88,7 +86,7 @@ describe(`<${PrivacySection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('⚠ Delete account')).toBeVisible();
+    expect(screen.getByText('Delete account')).toBeVisible();
     expect(screen.getByTestId('delete-account-control')).toHaveTextContent(
       'jane',
     );

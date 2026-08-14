@@ -77,16 +77,14 @@ describe(`<${BookmarksPage.name}/>`, () => {
     expect(getPostsByIdsMock).toHaveBeenCalledWith([]);
   });
 
-  it('renders the terminal window chrome with the ls ~/bookmarks -l prompt', async () => {
+  it('renders the terminal window chrome with the My bookmarks prompt', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listBookmarksMock.mockResolvedValue([]);
     getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
 
     await setup();
 
-    expect(screen.getByText('$')).toBeVisible();
-    expect(screen.getByText(/ls ~\/bookmarks/)).toBeVisible();
-    expect(screen.getByText('-l')).toBeVisible();
+    expect(screen.getAllByText('My bookmarks')).toHaveLength(2);
   });
 
   it('renders resolved posts as ls -l rows, sorted by bookmark recency, with a saved-count hint', async () => {

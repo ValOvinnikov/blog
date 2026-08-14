@@ -185,16 +185,14 @@ describe(`<${NewsletterForm.name}/>`, () => {
   it('renders trust cues for the full variant', () => {
     setup();
 
-    expect(screen.getByText('no spam')).toBeVisible();
-    expect(screen.getByText('unsubscribe in one line')).toBeVisible();
+    expect(screen.getByText('No spam')).toBeVisible();
+    expect(screen.getByText('Unsubscribe anytime')).toBeVisible();
   });
 
   it('does not render trust cues for the compact variant', () => {
     setup({ variant: 'compact' });
 
-    expect(screen.queryByText('no spam')).not.toBeInTheDocument();
-    expect(
-      screen.queryByText('unsubscribe in one line'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('No spam')).not.toBeInTheDocument();
+    expect(screen.queryByText('Unsubscribe anytime')).not.toBeInTheDocument();
   });
 });

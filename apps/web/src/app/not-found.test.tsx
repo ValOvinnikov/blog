@@ -17,7 +17,7 @@ vi.mock('next-intl/server', () => ({
   setRequestLocale: setRequestLocaleMock,
 }));
 
-const messages = { notFound: { commandNotFound: 'command not found' } };
+const messages = { notFound: { commandNotFound: 'Not found' } };
 const t = Object.assign((key: string) => `translated:${key}`, {
   rich: vi.fn(),
   markup: vi.fn(),

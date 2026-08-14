@@ -40,7 +40,7 @@ const armAndClickDelete = async (user: ReturnType<typeof userEvent.setup>) => {
     }),
     'val',
   );
-  await user.click(screen.getByRole('button', { name: 'delete account' }));
+  await user.click(screen.getByRole('button', { name: 'Delete account' }));
 };
 
 describe(`<${DeleteAccountControl.name}/>`, () => {
@@ -55,7 +55,7 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
     const user = userEvent.setup();
     setup();
 
-    const button = screen.getByRole('button', { name: 'delete account' });
+    const button = screen.getByRole('button', { name: 'Delete account' });
     const field = screen.getByRole('textbox', {
       name: 'Type your handle to confirm deletion',
     });
@@ -81,7 +81,7 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'delete account' }),
+      screen.getByRole('button', { name: 'Delete account' }),
     ).toBeEnabled();
   });
 
@@ -100,17 +100,17 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
     });
 
     expect(toastPromiseMock).toHaveBeenCalledWith(expect.any(Promise), {
-      command: 'account',
+      command: 'Account',
       loading: {
-        state: 'deleting',
+        state: 'Deleting',
         message: 'Deleting your account…',
       },
       success: {
-        state: 'deleted',
+        state: 'Deleted',
         message: 'Your account has been deleted.',
       },
       error: {
-        state: 'failed',
+        state: 'Failed',
         message: "Couldn't delete your account. Try again.",
       },
     });
@@ -127,7 +127,7 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
     const user = userEvent.setup();
     setup();
 
-    const button = screen.getByRole('button', { name: 'delete account' });
+    const button = screen.getByRole('button', { name: 'Delete account' });
     await armAndClickDelete(user);
 
     await waitFor(() => {
@@ -153,7 +153,7 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
     });
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: 'delete account' }),
+        screen.getByRole('button', { name: 'Delete account' }),
       ).toHaveAttribute('aria-busy', 'false');
     });
     expect(signOutMock).not.toHaveBeenCalled();

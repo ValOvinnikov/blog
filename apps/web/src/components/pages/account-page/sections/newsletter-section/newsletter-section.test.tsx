@@ -60,9 +60,10 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('~$')).toBeVisible();
-    expect(screen.getByText(/account --email/)).toBeVisible();
-    expect(screen.getByText('subscribed')).toBeVisible();
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
+      /jane\s+Newsletter/,
+    );
+    expect(screen.getByText('Subscribed')).toBeVisible();
     expect(screen.getByText('jane@icloud.com')).toBeVisible();
     expect(
       screen.getByTestId('newsletter-subscription-control'),
@@ -90,7 +91,7 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('pending confirmation')).toBeVisible();
+    expect(screen.getByText('Pending confirmation')).toBeVisible();
     expect(
       screen.getByText(
         "The double-opt-in link hasn't been clicked yet. Resend it if it never arrived.",

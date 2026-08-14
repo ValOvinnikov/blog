@@ -20,10 +20,10 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.success({
-            command: 'bookmark',
-            state: 'saved',
-            message: 'stashed to ~/bookmarks',
-            action: { label: 'undo', onAct: successAction, keyHint: '⌘Z' },
+            command: 'Bookmark',
+            state: 'Saved',
+            message: 'Saved to bookmarks',
+            action: { label: 'Undo', onAct: successAction, keyHint: '⌘Z' },
           })
         }
       >
@@ -32,8 +32,8 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.error({
-            command: 'bookmark',
-            state: 'failed',
+            command: 'Bookmark',
+            state: 'Failed',
             message: "couldn't save",
           })
         }
@@ -43,16 +43,16 @@ const ToastHarness = () => {
       <button
         onClick={() =>
           toast.promise(Promise.resolve('done'), {
-            command: 'bookmark',
+            command: 'Bookmark',
             loading: {
-              state: 'saving',
+              state: 'Saving',
               message: 'saving…',
             },
             success: {
-              state: 'saved',
-              message: 'stashed to ~/bookmarks',
+              state: 'Saved',
+              message: 'Saved to bookmarks',
             },
-            error: { state: 'failed', message: 'failed' },
+            error: { state: 'Failed', message: 'failed' },
           })
         }
       >
@@ -107,7 +107,7 @@ describe(`<${ToastProvider.name}/>`, () => {
     fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
 
     expect(screen.getByRole('status')).toBeVisible();
-    expect(screen.getByText('stashed to ~/bookmarks')).toBeVisible();
+    expect(screen.getByText('Saved to bookmarks')).toBeVisible();
   });
 
   it('shows an error toast with assertive alert semantics when fired', () => {
@@ -138,9 +138,7 @@ describe(`<${ToastProvider.name}/>`, () => {
       vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
     });
 
-    expect(
-      screen.queryByText('stashed to ~/bookmarks'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
   });
 
   it('running the action callback also dismisses the toast', () => {
@@ -152,16 +150,14 @@ describe(`<${ToastProvider.name}/>`, () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
     // The accessible name concatenates the label and key-hint with no
-    // separating space ("undo⌘Z"), so match by substring.
-    fireEvent.click(screen.getByRole('button', { name: /^undo/ }));
+    // separating space ("Undo⌘Z"), so match by substring.
+    fireEvent.click(screen.getByRole('button', { name: /^Undo/ }));
     act(() => {
       vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
     });
 
     expect(successAction).toHaveBeenCalledTimes(1);
-    expect(
-      screen.queryByText('stashed to ~/bookmarks'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
   });
 
   it('pauses auto-dismiss on hover and resumes from the exact remaining time on mouse-leave', () => {
@@ -184,16 +180,14 @@ describe(`<${ToastProvider.name}/>`, () => {
     act(() => {
       vi.advanceTimersByTime(4000);
     });
-    expect(screen.getByText('stashed to ~/bookmarks')).toBeVisible();
+    expect(screen.getByText('Saved to bookmarks')).toBeVisible();
 
     fireEvent.mouseLeave(toastEl);
     act(() => {
       vi.advanceTimersByTime(2600 + TOAST_EXIT_ANIMATION_MS);
     });
 
-    expect(
-      screen.queryByText('stashed to ~/bookmarks'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
   });
 
   it('mouse-leave does not resume the timer while focus remains inside the toast', () => {
@@ -231,7 +225,7 @@ describe(`<${ToastProvider.name}/>`, () => {
     act(() => {
       vi.advanceTimersByTime(4000);
     });
-    expect(screen.getByText('stashed to ~/bookmarks')).toBeVisible();
+    expect(screen.getByText('Saved to bookmarks')).toBeVisible();
 
     // Only once focus *also* leaves does the timer actually resume.
     act(() => {
@@ -240,9 +234,7 @@ describe(`<${ToastProvider.name}/>`, () => {
     act(() => {
       vi.advanceTimersByTime(3600 + TOAST_EXIT_ANIMATION_MS);
     });
-    expect(
-      screen.queryByText('stashed to ~/bookmarks'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
   });
 
   it('collapses a rapid identical success repeat into one toast with a count suffix', () => {
@@ -256,7 +248,7 @@ describe(`<${ToastProvider.name}/>`, () => {
     fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
 
     expect(screen.getAllByRole('status')).toHaveLength(1);
-    expect(screen.getByText('saved ×2')).toBeVisible();
+    expect(screen.getByText('Saved ×2')).toBeVisible();
   });
 
   it('Esc with no toast focused dismisses the newest toast', () => {
@@ -274,9 +266,7 @@ describe(`<${ToastProvider.name}/>`, () => {
       vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
     });
 
-    expect(
-      screen.queryByText('stashed to ~/bookmarks'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
     expect(screen.getByText("couldn't save")).toBeVisible();
   });
 
@@ -304,7 +294,7 @@ describe(`<${ToastProvider.name}/>`, () => {
     });
 
     expect(screen.queryByText("couldn't save")).not.toBeInTheDocument();
-    expect(screen.getByText('stashed to ~/bookmarks')).toBeVisible();
+    expect(screen.getByText('Saved to bookmarks')).toBeVisible();
   });
 
   it('toast.promise shows the resolved toast when the promise settles quickly', async () => {
@@ -322,7 +312,7 @@ describe(`<${ToastProvider.name}/>`, () => {
     });
 
     expect(screen.getByRole('status')).toBeVisible();
-    expect(screen.getByText('stashed to ~/bookmarks')).toBeVisible();
+    expect(screen.getByText('Saved to bookmarks')).toBeVisible();
     expect(screen.queryByText('saving…')).not.toBeInTheDocument();
   });
 
