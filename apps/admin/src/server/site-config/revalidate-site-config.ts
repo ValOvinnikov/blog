@@ -2,6 +2,7 @@ import { env } from '@admin/utils/env/env';
 import { sanitizeLogMessage } from '@admin/utils/sanitize-log-message/sanitize-log-message';
 
 const REVALIDATE_PATH = '/api/revalidate-site-config';
+const SITE_CONFIG_REVALIDATE_TIMEOUT_MS = 5000;
 
 /**
  * Best-effort call to `apps/web`'s on-demand revalidation endpoint after a
@@ -25,6 +26,7 @@ export async function revalidateSiteConfig(): Promise<void> {
     const response = await fetch(new URL(REVALIDATE_PATH, webAppUrl), {
       method: 'POST',
       headers: { Authorization: `Bearer ${secret}` },
+      signal: AbortSignal.timeout(SITE_CONFIG_REVALIDATE_TIMEOUT_MS),
     });
 
     if (!response.ok) {

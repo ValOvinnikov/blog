@@ -31,7 +31,7 @@ describe(revalidateSiteConfig, () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it('POSTs the shared secret as a bearer token to the web app revalidation route', async () => {
+  it('POSTs the shared secret as a bearer token to the web app revalidation route, with a timeout signal', async () => {
     envMock.WEB_APP_URL = 'https://example.com';
     envMock.SITE_CONFIG_REVALIDATE_SECRET = 'shared-secret';
     fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
@@ -43,6 +43,7 @@ describe(revalidateSiteConfig, () => {
       {
         method: 'POST',
         headers: { Authorization: 'Bearer shared-secret' },
+        signal: expect.any(AbortSignal),
       },
     );
   });
@@ -87,6 +88,21 @@ describe(revalidateSiteConfig, () => {
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       expect.stringContaining('Failed to call'),
       expect.stringContaining('network down'),
+    );
+  });
+
+  it('logs but does not throw (and never hangs the caller) when the call times out', async () => {
+    envMock.WEB_APP_URL = 'https://example.com';
+    envMock.SITE_CONFIG_REVALIDATE_SECRET = 'shared-secret';
+    fetchMock.mockRejectedValue(
+      new DOMException('The signal timed out', 'TimeoutError'),
+    );
+
+    await expect(revalidateSiteConfig()).resolves.toBeUndefined();
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Failed to call'),
+      expect.stringContaining('timed out'),
     );
   });
 });
