@@ -29,15 +29,15 @@ export const lookFormVariants = tv({
     hueValue: ['w-16 shrink-0 font-mono text-meta text-text-subtle'],
     switchRow: ['flex items-center gap-2.5 text-sm text-text'],
     switchTrack: [
-      'relative h-6 w-11 shrink-0 cursor-pointer rounded-full bg-secondary',
+      'relative h-5 w-9 shrink-0 cursor-pointer rounded-full bg-secondary',
       'transition-colors duration-base ease-console',
       'data-[checked]:bg-brand-primary-solid',
       'outline-hidden focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
     ],
     switchThumb: [
-      'block size-5 translate-x-0.5 rounded-full bg-surface shadow',
+      'absolute left-0.5 top-0.5 size-4 rounded-full bg-surface shadow',
       'transition-transform duration-base ease-console',
-      'data-[checked]:translate-x-[22px]',
+      'data-[checked]:translate-x-4',
     ],
     note: ['text-xs text-text-subtle'],
     uploads: ['grid grid-cols-1 gap-3 sm:grid-cols-2'],
