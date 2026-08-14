@@ -64,6 +64,14 @@
       // (`src/server/auth/auth.ts`) is now the first real
       // `import ... from '@blog/db'` in apps/web.
       "ignoreDependencies": ["@svgr/webpack"]
+    },
+    "apps/admin": {
+      // Referenced only as a Turbopack loader string (next.config.ts
+      // `turbopack.rules['*.svg'].loaders: ['@svgr/webpack']`) — knip's
+      // import graph can't see a bare string naming a package. Strict pnpm
+      // (no hoisting) still requires it as a real apps/admin devDependency so
+      // Turbopack can resolve it.
+      "ignoreDependencies": ["@svgr/webpack"]
     }
   }
 }
