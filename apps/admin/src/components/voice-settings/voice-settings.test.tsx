@@ -1,12 +1,14 @@
+import { renderWithIntl, screen, within } from '@admin/testing/custom-render';
 import {
   CONSOLE_VOICE_PACK,
   EDITORIAL_VOICE_PACK,
 } from '@blog/config/constants';
-import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRouter } from 'next/navigation';
 
 import { VoiceSettings } from './voice-settings';
+
+const render = renderWithIntl;
 
 vi.mocked(useRouter).mockReturnValue({
   push: vi.fn(),

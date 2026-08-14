@@ -1,9 +1,10 @@
 import {
-  tenantPlanBadge,
-  tenantStatusBadge,
+  tenantPlanTone,
+  tenantStatusTone,
 } from '@admin/utils/tenant-badges/tenant-badges';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { StatusBadge } from '@blog/ui/atoms';
+import { useTranslations } from 'next-intl';
 
 import { tenantsTableVariants } from './tenants-table-variants';
 
@@ -23,13 +24,14 @@ const formatCreatedAt = (date: Date) =>
  * Purely presentational — the page fetching `listTenants()` owns the data.
  */
 export function TenantsTable({ tenants }: TTenantsTableProps) {
+  const t = useTranslations('tenantsTable');
   const { wrapper, table, head, row, cell, slug, domain, empty } =
     tenantsTableVariants();
 
   if (tenants.length === 0) {
     return (
       <div className={wrapper()}>
-        <p className={empty()}>No tenants yet.</p>
+        <p className={empty()}>{t('empty')}</p>
       </div>
     );
   }
@@ -40,40 +42,39 @@ export function TenantsTable({ tenants }: TTenantsTableProps) {
         <thead>
           <tr>
             <th className={head()} scope="col">
-              Tenant
+              {t('columnTenant')}
             </th>
             <th className={head()} scope="col">
-              Plan
+              {t('columnPlan')}
             </th>
             <th className={head()} scope="col">
-              Status
+              {t('columnStatus')}
             </th>
             <th className={head()} scope="col">
-              Created
+              {t('columnCreated')}
             </th>
           </tr>
         </thead>
         <tbody>
-          {tenants.map((tenant) => {
-            const status = tenantStatusBadge(tenant.status);
-            const plan = tenantPlanBadge(tenant.plan);
-
-            return (
-              <tr className={row()} key={tenant.id}>
-                <td className={cell()}>
-                  <p className={slug()}>{tenant.slug}</p>
-                  <p className={domain()}>{tenant.primaryDomain}</p>
-                </td>
-                <td className={cell()}>
-                  <StatusBadge tone={plan.tone}>{plan.label}</StatusBadge>
-                </td>
-                <td className={cell()}>
-                  <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
-                </td>
-                <td className={cell()}>{formatCreatedAt(tenant.createdAt)}</td>
-              </tr>
-            );
-          })}
+          {tenants.map((tenant) => (
+            <tr className={row()} key={tenant.id}>
+              <td className={cell()}>
+                <p className={slug()}>{tenant.slug}</p>
+                <p className={domain()}>{tenant.primaryDomain}</p>
+              </td>
+              <td className={cell()}>
+                <StatusBadge tone={tenantPlanTone(tenant.plan)}>
+                  {t(`plan.${tenant.plan}`)}
+                </StatusBadge>
+              </td>
+              <td className={cell()}>
+                <StatusBadge tone={tenantStatusTone(tenant.status)}>
+                  {t(`status.${tenant.status}`)}
+                </StatusBadge>
+              </td>
+              <td className={cell()}>{formatCreatedAt(tenant.createdAt)}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

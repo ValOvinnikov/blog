@@ -1,6 +1,10 @@
 import { AdminShell } from '@admin/components/admin-shell';
 import { requireAdmin } from '@admin/server/auth/require-admin';
-import { platformNavSections } from '@admin/utils/nav-sections/nav-sections';
+import {
+  platformNavSections,
+  type TNavTranslator,
+} from '@admin/utils/nav-sections/nav-sections';
+import { getTranslations } from 'next-intl/server';
 
 type TProps = {
   children: React.ReactNode;
@@ -15,12 +19,16 @@ type TProps = {
  */
 export default async function PlatformLayout({ children }: TProps) {
   const admin = await requireAdmin();
+  const t = await getTranslations('platformLayout');
+  const tNavSections = (await getTranslations(
+    'navSections',
+  )) as unknown as TNavTranslator;
 
   return (
     <AdminShell
-      sections={platformNavSections()}
-      crumb="Platform"
-      roleLabel={`${admin.role} · Platform`}
+      sections={platformNavSections(tNavSections)}
+      crumb={t('crumb')}
+      roleLabel={t('roleLabel', { role: admin.role })}
     >
       {children}
     </AdminShell>

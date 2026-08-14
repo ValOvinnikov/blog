@@ -1,7 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { renderWithIntl, screen } from '@admin/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { LogoHueField } from './logo-hue-field';
+
+const render = renderWithIntl;
 
 describe(LogoHueField, () => {
   it('shows the follows-accent state, distinct from any explicit hue, when logoHue is unset', () => {

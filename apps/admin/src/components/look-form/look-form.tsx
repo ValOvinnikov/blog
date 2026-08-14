@@ -19,7 +19,6 @@ import {
   ICONS,
   PRESET_REGISTRY,
   RADIUS_SCALE,
-  RADIUS_SCALE_LABEL,
   type TDensity,
   type TPresetId,
   type TRadiusScale,
@@ -31,24 +30,10 @@ import { Icon } from '@blog/ui/atoms/icon';
 import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
 import { Text } from '@blog/ui/atoms/text';
 import { SettingRow } from '@blog/ui/molecules/setting-row';
+import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 
 import { lookFormVariants } from './look-form-variants';
-
-const DENSITY_LABEL: Record<TDensity, string> = {
-  [DENSITY.DEFAULT]: 'Default',
-  [DENSITY.COMPACT]: 'Compact',
-};
-
-const RADIUS_OPTIONS = Object.values(RADIUS_SCALE).map((scale) => ({
-  value: scale,
-  label: RADIUS_SCALE_LABEL[scale],
-}));
-
-const DENSITY_OPTIONS = Object.values(DENSITY).map((density) => ({
-  value: density,
-  label: DENSITY_LABEL[density],
-}));
 
 export type TLookFormProps = {
   tenantSlug: string;
@@ -122,6 +107,26 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
     });
   }
 
+  const t = useTranslations('lookForm');
+
+  const radiusOptions = Object.values(RADIUS_SCALE).map((scale) => ({
+    value: scale,
+    label: t(`radiusScaleOptionLabel.${scale}`),
+  }));
+
+  const densityOptions = Object.values(DENSITY).map((density) => ({
+    value: density,
+    label: t(`densityOptionLabel.${density}`),
+  }));
+
+  const accentHueLabel = t('accentHueLabel');
+  const headingFontLabel = t('headingFontLabel');
+  const bodyFontLabel = t('bodyFontLabel');
+  const radiusScaleLabel = t('radiusScaleLabel');
+  const densityLabel = t('densityLabel');
+  const terminalChromeLabel = t('terminalChromeLabel');
+  const optionalTag = t('optionalTag');
+
   const {
     root,
     pageHead,
@@ -133,7 +138,7 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
     cardHead,
     cardHeadDesc,
     cardBody,
-    optionalTag,
+    optionalTag: optionalTagClass,
     disclosure,
     summary,
     summaryIcon,
@@ -156,43 +161,37 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
     <div className={root()}>
       <div className={pageHead()}>
         <div className={pageHeadText()}>
-          <Heading level={1}>Look</Heading>
-          <Text variant="muted">
-            Theme this site. Everything previews instantly below — nothing is
-            live until you save.
-          </Text>
+          <Heading level={1}>{t('heading')}</Heading>
+          <Text variant="muted">{t('subtitle')}</Text>
         </div>
         <div className={actions()}>
           <Button type="button" variant="ghost" onClick={handleReset}>
-            Reset to preset
+            {t('resetButton')}
           </Button>
           <Button type="button" onClick={handleSave} disabled={isPending}>
-            {isPending ? 'Saving…' : 'Save changes'}
+            {isPending ? t('savingButton') : t('saveButton')}
           </Button>
         </div>
       </div>
 
       {saveResult === 'success' && (
-        <Alert type={ALERT_TYPE.SUCCESS} message="Saved to site_config." />
+        <Alert type={ALERT_TYPE.SUCCESS} message={t('alertSuccess')} />
       )}
       {saveResult === 'error' && (
-        <Alert
-          type={ALERT_TYPE.ERROR}
-          message="Couldn't save Look settings — try again."
-        />
+        <Alert type={ALERT_TYPE.ERROR} message={t('alertError')} />
       )}
 
       <div className={grid()}>
         <div className={stack()}>
           <section className={card()}>
             <header className={cardHead()}>
-              <Heading level={2}>Basic</Heading>
-              <span className={cardHeadDesc()}>What most tenants touch</span>
+              <Heading level={2}>{t('basicHeading')}</Heading>
+              <span className={cardHeadDesc()}>{t('basicDescription')}</span>
             </header>
             <div className={cardBody()}>
               <SettingRow
-                label="Preset"
-                description="The starting point nearly every tenant picks. Sets fonts, radius, density, chrome, and voice defaults."
+                label={t('presetLabel')}
+                description={t('presetDescription')}
               >
                 <PresetPicker
                   value={values.preset}
@@ -201,8 +200,8 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
               </SettingRow>
 
               <SettingRow
-                label="Accent hue"
-                description="Only the hue changes — lightness & chroma are fixed (OKLCH), so contrast stays WCAG-verified."
+                label={accentHueLabel}
+                description={t('accentHueDescription')}
               >
                 <div className={hueField()}>
                   <span
@@ -211,7 +210,7 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
                     style={{ background: swatchColor }}
                   />
                   <HueSlider
-                    ariaLabel="Accent hue"
+                    ariaLabel={accentHueLabel}
                     value={values.accentHue}
                     onChange={(value) => updateField('accentHue', value)}
                     trackStyle={{ background: accentHueGradient() }}
@@ -223,11 +222,11 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
               <SettingRow
                 label={
                   <>
-                    Logo hue
-                    <span className={optionalTag()}>optional</span>
+                    {t('logoHueLabel')}
+                    <span className={optionalTagClass()}>{optionalTag}</span>
                   </>
                 }
-                description="Tints the wordmark's tonal steps (--logo-1/2/3). Follows the accent hue unless you set it."
+                description={t('logoHueDescription')}
               >
                 <LogoHueField
                   accentHue={values.accentHue}
@@ -238,23 +237,23 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
               </SettingRow>
 
               <SettingRow
-                label="Brand images"
-                description="Stored in Vercel Blob — no on-the-fly transforms, so what you upload is what ships."
+                label={t('brandImagesLabel')}
+                description={t('brandImagesDescription')}
               >
                 <div className={uploads()}>
                   <BrandAssetField
                     tenantSlug={tenantSlug}
                     kind="logo"
-                    label="Logo"
-                    hint="PNG, JPEG, or WebP · falls back to the polygon wordmark"
+                    label={t('logoFieldLabel')}
+                    hint={t('logoFieldHint')}
                     currentUrl={values.logoAssetUrl}
                     onChange={(url) => updateField('logoAssetUrl', url)}
                   />
                   <BrandAssetField
                     tenantSlug={tenantSlug}
                     kind="favicon"
-                    label="Favicon"
-                    hint="Pre-cropped square, please — Blob can't crop it for you. Non-square uploads are rejected."
+                    label={t('faviconFieldLabel')}
+                    hint={t('faviconFieldHint')}
                     currentUrl={values.faviconAssetUrl}
                     onChange={(url) => updateField('faviconAssetUrl', url)}
                   />
@@ -270,13 +269,13 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
                 className={summaryIcon()}
                 aria-hidden="true"
               />
-              Advanced
-              <span className={optionalTag()}>optional</span>
+              {t('advancedSummary')}
+              <span className={optionalTagClass()}>{optionalTag}</span>
             </summary>
             <div className={disclosureBody()}>
               <SettingRow
-                label="Terminal chrome"
-                description="Window frame + terminal prompt around the site — the single most defining console-vs-editorial switch. Defaults from your preset. Not saved yet — site_config has no column for this field."
+                label={terminalChromeLabel}
+                description={t('terminalChromeDescription')}
               >
                 <div className={switchRow()}>
                   <Switch.Root
@@ -284,53 +283,55 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
                     onCheckedChange={(checked) =>
                       updateField('chromeOn', checked)
                     }
-                    aria-label="Terminal chrome"
+                    aria-label={terminalChromeLabel}
                     className={switchTrack()}
                   >
                     <Switch.Thumb className={switchThumb()} />
                   </Switch.Root>
-                  <span>{values.chromeOn ? 'On' : 'Off'}</span>
+                  <span>
+                    {values.chromeOn ? t('switchOn') : t('switchOff')}
+                  </span>
                 </div>
               </SettingRow>
 
               <SettingRow
-                label="Heading font"
-                description="Closed set of five (static next/font loaders). Each renders in its own face."
+                label={headingFontLabel}
+                description={t('headingFontDescription')}
               >
                 <FontPicker
-                  ariaLabel="Heading font"
+                  ariaLabel={headingFontLabel}
                   value={values.headingFont}
                   onChange={(font) => updateField('headingFont', font)}
                 />
               </SettingRow>
 
-              <SettingRow label="Body font">
+              <SettingRow label={bodyFontLabel}>
                 <FontPicker
-                  ariaLabel="Body font"
+                  ariaLabel={bodyFontLabel}
                   value={values.bodyFont}
                   onChange={(font) => updateField('bodyFont', font)}
                 />
               </SettingRow>
 
               <SettingRow
-                label="Radius scale"
-                description="Corner roundness across every surface."
+                label={radiusScaleLabel}
+                description={t('radiusScaleDescription')}
               >
                 <SegmentedControl<TRadiusScale>
-                  ariaLabel="Radius scale"
-                  options={RADIUS_OPTIONS}
+                  ariaLabel={radiusScaleLabel}
+                  options={radiusOptions}
                   value={values.radiusScale}
                   onChange={(scale) => updateField('radiusScale', scale)}
                 />
               </SettingRow>
 
               <SettingRow
-                label="Density"
-                description="Spacing and control size."
+                label={densityLabel}
+                description={t('densityDescription')}
               >
                 <SegmentedControl<TDensity>
-                  ariaLabel="Density"
-                  options={DENSITY_OPTIONS}
+                  ariaLabel={densityLabel}
+                  options={densityOptions}
                   value={values.density}
                   onChange={(density) => updateField('density', density)}
                 />
@@ -338,10 +339,7 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
             </div>
           </details>
 
-          <p className={note()}>
-            Radius scale and density are saved with the rest of this form but
-            don&apos;t yet drive the inline preview above.
-          </p>
+          <p className={note()}>{t('footerNote')}</p>
         </div>
 
         <div className={stack()}>

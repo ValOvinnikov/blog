@@ -11,15 +11,10 @@ import { ALERT_TYPE, Size } from '@blog/config';
 import { Alert } from '@blog/ui/atoms/alert';
 import { Button } from '@blog/ui/atoms/button';
 import { unstable_rethrow } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { type ChangeEvent, useRef, useState, useTransition } from 'react';
 
 import { brandAssetFieldVariants } from './brand-asset-field-variants';
-
-// A thrown error from the action boundary itself (network failure, or the
-// platform rejecting the request before the action body even runs — e.g.
-// Next's own Server Action body-size cap) never reaches the action's own
-// `{ ok: false, error }` result shape, so it needs its own readable fallback.
-const UNEXPECTED_ERROR_MESSAGE = 'Something went wrong — try again.';
 
 export type TBrandAssetFieldProps = {
   tenantSlug: string;
@@ -45,6 +40,7 @@ export function BrandAssetField({
   currentUrl,
   onChange,
 }: TBrandAssetFieldProps) {
+  const t = useTranslations('brandAssetField');
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | undefined>(undefined);
   const [isPending, startTransition] = useTransition();
@@ -92,7 +88,7 @@ export function BrandAssetField({
         // to the same readable-error path the action's own `{ ok: false }`
         // result uses.
         unstable_rethrow(thrownError);
-        setError(UNEXPECTED_ERROR_MESSAGE);
+        setError(t('unexpectedError'));
       }
     });
   }
@@ -109,7 +105,7 @@ export function BrandAssetField({
         }
       } catch (thrownError) {
         unstable_rethrow(thrownError);
-        setError(UNEXPECTED_ERROR_MESSAGE);
+        setError(t('unexpectedError'));
       }
     });
   }
@@ -123,7 +119,7 @@ export function BrandAssetField({
           {currentUrl ? (
             <img
               src={currentUrl}
-              alt={`Current ${lowerLabel}`}
+              alt={t('currentAlt', { label: lowerLabel })}
               className={thumbImage()}
             />
           ) : (
@@ -154,10 +150,10 @@ export function BrandAssetField({
           disabled={isPending}
         >
           {isPending
-            ? 'Uploading…'
+            ? t('uploading')
             : currentUrl
-              ? `Replace ${lowerLabel}`
-              : `Upload ${lowerLabel}`}
+              ? t('replace', { label: lowerLabel })
+              : t('upload', { label: lowerLabel })}
         </Button>
         {currentUrl && (
           <Button
@@ -167,7 +163,7 @@ export function BrandAssetField({
             onClick={handleRemove}
             disabled={isPending}
           >
-            Remove
+            {t('remove')}
           </Button>
         )}
       </div>

@@ -1,7 +1,9 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { renderWithIntl, screen, waitFor } from '@admin/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { BrandAssetField } from './brand-asset-field';
+
+const render = renderWithIntl;
 
 const { uploadBrandAssetActionMock, clearBrandAssetActionMock } = vi.hoisted(
   () => ({

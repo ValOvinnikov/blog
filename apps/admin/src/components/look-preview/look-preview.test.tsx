@@ -1,8 +1,10 @@
+import { renderWithIntl, screen } from '@admin/testing/custom-render';
 import { FONT_CHOICE } from '@blog/config';
-import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { LookPreview } from './look-preview';
+
+const render = renderWithIntl;
 
 const BASE_PROPS = {
   tenantSlug: 'acme',

@@ -1,8 +1,10 @@
 /**
- * The 20 curated voice-override fields, grouped and labelled exactly as
+ * The 20 curated voice-override fields, grouped exactly as
  * `apps/cms/src/schema-types/documents/settings/voice.ts` defines them
  * (fieldset `title`s for groups, field `title`s for labels) — this is the
  * Postgres-backed port of that schema's field set, not a redesign of it.
+ * Display text for `groupKey`/`key` lives in `i18n/messages/en.json` under
+ * `voiceFieldGroups`/`voiceFieldLabels`, not here.
  */
 export type TVoiceOverrideKey =
   | 'notFoundMetaTitle'
@@ -30,81 +32,57 @@ export type TVoiceOverrides = Record<TVoiceOverrideKey, string>;
 
 export type TVoiceField = {
   key: TVoiceOverrideKey;
-  label: string;
   /** Longer-form copy (descriptions, empty states) renders as a `Textarea`; short prompts/commands/labels render as a single-line `TextInput`. */
   multiline?: boolean;
 };
 
+export type TVoiceFieldGroupKey =
+  'notFoundPage' | 'terminalPrompts' | 'bookmarks' | 'emptyStates';
+
 export type TVoiceFieldGroup = {
-  title: string;
+  groupKey: TVoiceFieldGroupKey;
   fields: TVoiceField[];
 };
 
 export const VOICE_FIELD_GROUPS: TVoiceFieldGroup[] = [
   {
-    title: '404 page',
+    groupKey: 'notFoundPage',
     fields: [
-      { key: 'notFoundMetaTitle', label: 'Not Found Meta Title' },
-      {
-        key: 'notFoundMetaDescription',
-        label: 'Not Found Meta Description',
-        multiline: true,
-      },
-      { key: 'notFoundCommandNotFound', label: 'Not Found Command Not Found' },
-      {
-        key: 'notFoundDescription',
-        label: 'Not Found Description',
-        multiline: true,
-      },
-      { key: 'notFoundReturnHome', label: 'Not Found Return Home' },
+      { key: 'notFoundMetaTitle' },
+      { key: 'notFoundMetaDescription', multiline: true },
+      { key: 'notFoundCommandNotFound' },
+      { key: 'notFoundDescription', multiline: true },
+      { key: 'notFoundReturnHome' },
     ],
   },
   {
-    title: 'Terminal prompts',
+    groupKey: 'terminalPrompts',
     fields: [
-      { key: 'terminalPromptHost', label: 'Terminal Prompt Host' },
-      {
-        key: 'authPromptCommandSignIn',
-        label: 'Auth Prompt Command — Sign In',
-      },
-      {
-        key: 'authPromptCommandAccount',
-        label: 'Auth Prompt Command — Account',
-      },
-      { key: 'bookmarksPromptCommand', label: 'Bookmarks Prompt Command' },
-      {
-        key: 'accountPrivacyPromptCommand',
-        label: 'Account Privacy Prompt Command',
-      },
-      {
-        key: 'accountNewsletterPromptCommand',
-        label: 'Account Newsletter Prompt Command',
-      },
-      {
-        key: 'accountIdentityPromptCommand',
-        label: 'Account Identity Prompt Command',
-      },
+      { key: 'terminalPromptHost' },
+      { key: 'authPromptCommandSignIn' },
+      { key: 'authPromptCommandAccount' },
+      { key: 'bookmarksPromptCommand' },
+      { key: 'accountPrivacyPromptCommand' },
+      { key: 'accountNewsletterPromptCommand' },
+      { key: 'accountIdentityPromptCommand' },
     ],
   },
   {
-    title: 'Bookmarks',
+    groupKey: 'bookmarks',
     fields: [
-      { key: 'bookmarkToastSavedMessage', label: 'Bookmark Toast — Saved' },
-      {
-        key: 'bookmarkToastRemovedMessage',
-        label: 'Bookmark Toast — Removed',
-      },
+      { key: 'bookmarkToastSavedMessage' },
+      { key: 'bookmarkToastRemovedMessage' },
     ],
   },
   {
-    title: 'Empty states',
+    groupKey: 'emptyStates',
     fields: [
-      { key: 'blogListEmpty', label: 'Blog List Empty', multiline: true },
-      { key: 'categoryEmpty', label: 'Category Empty', multiline: true },
-      { key: 'tagEmpty', label: 'Tag Empty', multiline: true },
-      { key: 'authorEmpty', label: 'Author Empty', multiline: true },
-      { key: 'topicsEmpty', label: 'Topics Empty', multiline: true },
-      { key: 'bookmarksEmpty', label: 'Bookmarks Empty', multiline: true },
+      { key: 'blogListEmpty', multiline: true },
+      { key: 'categoryEmpty', multiline: true },
+      { key: 'tagEmpty', multiline: true },
+      { key: 'authorEmpty', multiline: true },
+      { key: 'topicsEmpty', multiline: true },
+      { key: 'bookmarksEmpty', multiline: true },
     ],
   },
 ];

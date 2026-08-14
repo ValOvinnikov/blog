@@ -4,12 +4,13 @@ import type {
   TVoiceOverrideKey,
   TVoiceOverrides,
 } from '@admin/utils/voice-fields/voice-fields';
+import { useTranslations } from 'next-intl';
 
 import { voiceFieldGroupVariants } from './voice-field-group-variants';
 
 export type TVoiceFieldGroupProps = {
   title: string;
-  fields: TVoiceField[];
+  fields: (TVoiceField & { label: string })[];
   values: TVoiceOverrides;
   placeholders: Partial<Record<TVoiceOverrideKey, string>>;
   onFieldChange: (key: TVoiceOverrideKey, value: string) => void;
@@ -28,6 +29,7 @@ export function VoiceFieldGroup({
   onFieldChange,
   disabled = false,
 }: TVoiceFieldGroupProps) {
+  const t = useTranslations('voiceFieldGroup');
   const {
     root,
     header,
@@ -41,7 +43,7 @@ export function VoiceFieldGroup({
       <div className={header()}>
         <h3 className={titleSlot()}>{title}</h3>
         <span className={count()}>
-          {fields.length} field{fields.length === 1 ? '' : 's'}
+          {t('fieldCount', { count: fields.length })}
         </span>
       </div>
       <div className={body()}>

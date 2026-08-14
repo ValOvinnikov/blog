@@ -1,8 +1,10 @@
+import { renderWithIntl, screen, within } from '@admin/testing/custom-render';
 import { ICONS } from '@blog/config';
-import { render, screen, within } from '@testing-library/react';
 import { usePathname } from 'next/navigation';
 
 import { Sidebar } from './sidebar';
+
+const render = renderWithIntl;
 
 const setPathname = (pathname: string) => {
   vi.mocked(usePathname).mockReturnValue(pathname);

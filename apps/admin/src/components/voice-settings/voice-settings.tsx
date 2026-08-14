@@ -12,6 +12,7 @@ import { ALERT_TYPE } from '@blog/config';
 import type { TVoicePack } from '@blog/config/constants';
 import { Alert, Button } from '@blog/ui/atoms';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useMemo, useState, useTransition } from 'react';
 
 import { voiceSettingsVariants } from './voice-settings-variants';
@@ -51,6 +52,9 @@ export function VoiceSettings({
   initialOverrides,
   saveAction,
 }: TVoiceSettingsProps) {
+  const t = useTranslations('voiceSettings');
+  const tGroups = useTranslations('voiceFieldGroups');
+  const tLabels = useTranslations('voiceFieldLabels');
   const router = useRouter();
   const [values, setValues] = useState<TVoiceOverrides>(() =>
     buildInitialValues(initialOverrides),
@@ -97,11 +101,8 @@ export function VoiceSettings({
     <div className={root()}>
       <div className={pagehead()}>
         <div>
-          <h1 className={title()}>Voice</h1>
-          <p className={description()}>
-            The words the site puts in its own mouth. Your preset already sets
-            sensible defaults.
-          </p>
+          <h1 className={title()}>{t('heading')}</h1>
+          <p className={description()}>{t('description')}</p>
         </div>
         <Button
           variant="primary"
@@ -109,48 +110,45 @@ export function VoiceSettings({
           disabled={isPending}
           aria-busy={isPending}
         >
-          Save changes
+          {t('saveButton')}
         </Button>
       </div>
 
       {status === 'success' && (
         <Alert
           type={ALERT_TYPE.SUCCESS}
-          message="Saved voiceOverrides."
+          message={t('alertSuccess')}
           className={alert()}
         />
       )}
       {status === 'error' && (
         <Alert
           type={ALERT_TYPE.ERROR}
-          message="Couldn't save — try again."
+          message={t('alertError')}
           className={alert()}
         />
       )}
 
       <div className={basicCard()}>
-        <h2 className={basicTitle()}>Basic</h2>
-        <Alert
-          type={ALERT_TYPE.INFO}
-          message="Nothing required here. Your preset determines the default voice. Most tenants never open the Advanced fields below."
-        />
+        <h2 className={basicTitle()}>{t('basicHeading')}</h2>
+        <Alert type={ALERT_TYPE.INFO} message={t('basicAlert')} />
       </div>
 
       <details className={advanced()}>
         <summary className={advancedSummary()}>
-          Advanced — 20 curated strings, 4 groups
-          <span className={advancedTag()}>optional</span>
+          {t('advancedSummary')}
+          <span className={advancedTag()}>{t('optionalTag')}</span>
         </summary>
         <div className={advancedBody()}>
-          <Alert
-            type={ALERT_TYPE.INFO}
-            message="Every field is an override. Leave one blank to inherit the preset's voice-pack value (shown as the placeholder). Clearing a field reverts to the preset default — it does not set the string to empty."
-          />
+          <Alert type={ALERT_TYPE.INFO} message={t('advancedOverrideInfo')} />
           {VOICE_FIELD_GROUPS.map((group) => (
             <VoiceFieldGroup
-              key={group.title}
-              title={group.title}
-              fields={group.fields}
+              key={group.groupKey}
+              title={tGroups(group.groupKey)}
+              fields={group.fields.map((field) => ({
+                ...field,
+                label: tLabels(field.key),
+              }))}
               values={values}
               placeholders={placeholders}
               onFieldChange={handleFieldChange}
