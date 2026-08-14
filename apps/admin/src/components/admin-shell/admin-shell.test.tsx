@@ -1,3 +1,4 @@
+import { ICONS } from '@blog/config';
 import { render, screen } from '@testing-library/react';
 
 import { AdminShell } from './admin-shell';
@@ -9,7 +10,7 @@ describe(AdminShell, () => {
         sections={[
           {
             label: 'Platform section',
-            items: [{ label: 'Tenants', href: '/tenants' }],
+            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
           },
         ]}
         crumb="Platform"

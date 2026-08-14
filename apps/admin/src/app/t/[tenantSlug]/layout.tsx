@@ -1,6 +1,7 @@
 import { AdminShell } from '@admin/components/admin-shell';
 import { TenantSwitcher } from '@admin/components/tenant-switcher';
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
+import { tenantNavSections } from '@admin/utils/nav-sections/nav-sections';
 
 type TProps = {
   children: React.ReactNode;
@@ -10,9 +11,7 @@ type TProps = {
 /**
  * Gates page rendering for everything nested under this segment behind a
  * `memberships` row for the routed tenant (`requireTenantMembership`) — the
- * Tenant section, independent of the Platform `admins` gate. Look and Voice
- * (and every other tenant tab) land as additions to `sections` below, not a
- * reshape of this layout.
+ * Tenant section, independent of the Platform `admins` gate.
  */
 export default async function TenantLayout({ children, params }: TProps) {
   const { tenantSlug } = await params;
@@ -20,13 +19,7 @@ export default async function TenantLayout({ children, params }: TProps) {
 
   return (
     <AdminShell
-      sections={[
-        {
-          label: `Tenant · ${tenant.slug}`,
-          items: [],
-          note: 'Look and Voice ship soon.',
-        },
-      ]}
+      sections={tenantNavSections(tenant.slug)}
       switcher={
         <TenantSwitcher tenants={[tenant]} activeTenantId={tenant.id} />
       }

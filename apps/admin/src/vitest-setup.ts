@@ -4,8 +4,10 @@ import '@testing-library/jest-dom/vitest';
 // component short-circuits exactly as it does at runtime (Next renders both
 // via a thrown digest) — mocked globally since every layout under a gated
 // segment calls one of them, not just the one test file that asserts on it.
-// This mock is total: it exports only these two, so a future test importing
-// e.g. `usePathname` gets `undefined` and must widen it.
+// This mock is total: a future test importing another export gets
+// `undefined` and must widen it. `usePathname` defaults to `/` — tests that
+// care about a specific route override it with `vi.mocked(usePathname)
+// .mockReturnValue(...)`.
 vi.mock('next/navigation', () => ({
   redirect: vi.fn(() => {
     throw new Error('NEXT_REDIRECT');
@@ -13,6 +15,7 @@ vi.mock('next/navigation', () => ({
   notFound: vi.fn(() => {
     throw new Error('NEXT_NOT_FOUND');
   }),
+  usePathname: vi.fn(() => '/'),
 }));
 
 // jsdom implements neither the Pointer Events capture methods nor

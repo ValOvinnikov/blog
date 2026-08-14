@@ -1,12 +1,36 @@
-import Link from 'next/link';
+import { Size, type TIconName } from '@blog/config';
+import {
+  Avatar,
+  Icon,
+  StatusBadge,
+  type TStatusBadgeProps,
+} from '@blog/ui/atoms';
 import type { ReactNode } from 'react';
 
+import { SidebarNavLink } from './sidebar-nav-link';
 import { sidebarVariants } from './sidebar-variants';
 
-type TSidebarNavItem = {
+type TSidebarNavBadge = {
   label: string;
-  href: string;
+  tone: TStatusBadgeProps['tone'];
 };
+
+type TSidebarNavItemBase = {
+  label: string;
+  icon: TIconName;
+  badge?: TSidebarNavBadge;
+};
+
+/**
+ * An item either links somewhere — its active state is detected from the
+ * current route, not passed in — or, with no `href`, renders as an inert
+ * row. Never an `<a>` with nowhere to go.
+ */
+type TSidebarNavItem = TSidebarNavItemBase &
+  (
+    | { href: string; disabledReason?: never }
+    | { href?: undefined; disabledReason?: string }
+  );
 
 export type TSidebarNavSection = {
   label: string;
@@ -28,28 +52,37 @@ export type TSidebarProps = {
  * The persistent nav shell for both the Platform and Tenant sections. Each
  * caller supplies only the sections it's authorized to show — the component
  * itself carries no authorization logic. Growing a section (e.g. adding a
- * built tab) is a matter of appending to its `items`, not reshaping this
- * component.
+ * built tab) is a matter of appending an item, not reshaping this component.
  */
 export function Sidebar({ sections, switcher }: TSidebarProps) {
   const {
     root,
     brand,
-    brandName,
     brandMeta,
+    brandName,
+    brandTagline,
     switcherSlot,
     section,
     sectionLabel,
     list,
-    link,
+    row,
+    rowBody,
+    rowLabel,
+    rowReason,
+    badgeSlot,
     note,
   } = sidebarVariants();
 
   return (
     <aside className={root()}>
       <div className={brand()}>
-        <span className={brandName()}>Valstack</span>
-        <span className={brandMeta()}>admin</span>
+        <span aria-hidden="true">
+          <Avatar name="Valstack" alt="Valstack" size={Size.SM} />
+        </span>
+        <div className={brandMeta()}>
+          <span className={brandName()}>Valstack</span>
+          <span className={brandTagline()}>admin</span>
+        </div>
       </div>
 
       {switcher && <div className={switcherSlot()}>{switcher}</div>}
@@ -60,13 +93,44 @@ export function Sidebar({ sections, switcher }: TSidebarProps) {
           {navSection.items.length > 0 ? (
             <nav aria-label={navSection.label}>
               <ul className={list()}>
-                {navSection.items.map((item) => (
-                  <li key={item.href}>
-                    <Link href={item.href} className={link()}>
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
+                {navSection.items.map((item) => {
+                  const badge = item.badge && (
+                    <StatusBadge tone={item.badge.tone} className={badgeSlot()}>
+                      {item.badge.label}
+                    </StatusBadge>
+                  );
+
+                  if (item.href) {
+                    return (
+                      <li key={item.label}>
+                        <SidebarNavLink href={item.href}>
+                          <Icon name={item.icon} size={Size.SM} />
+                          <span className={rowBody()}>
+                            <span className={rowLabel()}>{item.label}</span>
+                          </span>
+                          {badge}
+                        </SidebarNavLink>
+                      </li>
+                    );
+                  }
+
+                  return (
+                    <li key={item.label}>
+                      <div className={row({ state: 'inert' })}>
+                        <Icon name={item.icon} size={Size.SM} />
+                        <span className={rowBody()}>
+                          <span className={rowLabel()}>{item.label}</span>
+                          {item.disabledReason && (
+                            <span className={rowReason()}>
+                              {item.disabledReason}
+                            </span>
+                          )}
+                        </span>
+                        {badge}
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </nav>
           ) : (
