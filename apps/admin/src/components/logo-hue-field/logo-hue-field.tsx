@@ -6,6 +6,7 @@ import {
   buildLogoPreviewTokens,
 } from '@admin/utils/theme-preview-tokens/theme-preview-tokens';
 import { Switch } from '@base-ui/react/switch';
+import { useTranslations } from 'next-intl';
 
 import { logoHueFieldVariants } from './logo-hue-field-variants';
 
@@ -28,6 +29,7 @@ export function LogoHueField({
   onChange,
   isDark,
 }: TLogoHueFieldProps) {
+  const t = useTranslations('logoHueField');
   const follows = logoHue === undefined;
   const resolvedHue = logoHue ?? accentHue;
   const tones = buildLogoPreviewTokens(resolvedHue, isDark);
@@ -51,12 +53,12 @@ export function LogoHueField({
           onCheckedChange={(checked) =>
             onChange(checked ? undefined : accentHue)
           }
-          aria-label="Follow accent hue"
+          aria-label={t('followAccentHue')}
           className={switchTrack()}
         >
           <Switch.Thumb className={switchThumb()} />
         </Switch.Root>
-        <span>Follow accent hue</span>
+        <span>{t('followAccentHue')}</span>
       </div>
 
       <div className={hueField()}>
@@ -66,14 +68,14 @@ export function LogoHueField({
           <span className={tone()} style={{ background: tones['--logo-3'] }} />
         </span>
         <HueSlider
-          ariaLabel="Logo hue"
+          ariaLabel={t('logoHueAriaLabel')}
           value={resolvedHue}
           onChange={onChange}
           disabled={follows}
           trackStyle={{ background: accentHueGradient() }}
         />
         <span className={hueValue()}>
-          {follows ? 'follows accent' : `hue ${resolvedHue}°`}
+          {follows ? t('followsAccent') : t('hueValue', { hue: resolvedHue })}
         </span>
       </div>
     </div>

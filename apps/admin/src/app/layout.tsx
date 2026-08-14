@@ -2,10 +2,12 @@ import '../../index.css';
 
 import { LOCALE_ISO_CODES } from '@blog/config';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
-export const metadata: Metadata = {
-  title: 'Admin',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('pageMetadata');
+  return { title: t('root') };
+}
 
 type TProps = {
   children: React.ReactNode;

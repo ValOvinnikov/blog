@@ -1,7 +1,9 @@
+import { renderWithIntl, screen } from '@admin/testing/custom-render';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { render, screen } from '@testing-library/react';
 
 import { TenantsView } from './tenants-view';
+
+const render = renderWithIntl;
 
 const tenant: TTenant = {
   id: 'tenant-1',

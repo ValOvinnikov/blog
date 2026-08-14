@@ -1,7 +1,9 @@
+import { renderWithIntl, screen } from '@admin/testing/custom-render';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { render, screen } from '@testing-library/react';
 
 import { TenantsTable } from './tenants-table';
+
+const render = renderWithIntl;
 
 const buildTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
   id: 'tenant-1',

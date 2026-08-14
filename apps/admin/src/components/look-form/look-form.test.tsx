@@ -1,9 +1,11 @@
+import { renderWithIntl, screen, waitFor } from '@admin/testing/custom-render';
 import { defaultLookFormValues } from '@admin/utils/default-look-values/default-look-values';
 import { DENSITY, FONT_CHOICE, PRESET_ID, RADIUS_SCALE } from '@blog/config';
-import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
+
+const render = renderWithIntl;
 
 const {
   updateLookActionMock,

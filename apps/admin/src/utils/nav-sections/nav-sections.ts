@@ -2,48 +2,62 @@ import type { TSidebarNavSection } from '@admin/components/sidebar';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import { ICONS } from '@blog/config';
 
-const LATER = { label: 'later', tone: 'warn' } as const;
+/** Structurally compatible with both `useTranslations`'s and `getTranslations`'s return type, without fighting next-intl's per-namespace literal-key generic. */
+export type TNavTranslator = (
+  key: string,
+  values?: Record<string, string | number>,
+) => string;
 
-export const platformNavSections = (): TSidebarNavSection[] => [
+export const platformNavSections = (
+  t: TNavTranslator,
+): TSidebarNavSection[] => [
   {
-    label: 'Platform',
+    label: t('platformLabel'),
     items: [
-      { label: 'Tenants', icon: ICONS.GRID, href: adminRoutes.tenants() },
       {
-        label: 'Add tenant',
+        label: t('tenants'),
+        icon: ICONS.GRID,
+        href: adminRoutes.tenants(),
+      },
+      {
+        label: t('addTenant'),
         icon: ICONS.PLUS,
-        badge: { label: 'deferred', tone: 'warn' },
-        disabledReason: "Provisioning a new tenant isn't available yet.",
+        badge: { label: t('badgeDeferred'), tone: 'warn' },
+        disabledReason: t('addTenantDisabledReason'),
       },
     ],
   },
 ];
 
-export const tenantNavSections = (tenantSlug: string): TSidebarNavSection[] => {
-  const shipping = { label: 'this milestone', tone: 'neutral' } as const;
+export const tenantNavSections = (
+  t: TNavTranslator,
+  tenantSlug: string,
+): TSidebarNavSection[] => {
+  const shipping = { label: t('badgeThisMilestone'), tone: 'neutral' } as const;
+  const later = { label: t('badgeLater'), tone: 'warn' } as const;
 
   return [
     {
-      label: `Tenant · ${tenantSlug}`,
+      label: t('tenantLabel', { tenantSlug }),
       items: [
         {
-          label: 'Look',
+          label: t('look'),
           icon: ICONS.PALETTE,
           href: adminRoutes.look(tenantSlug),
           badge: shipping,
         },
         {
-          label: 'Voice',
+          label: t('voice'),
           icon: ICONS.QUOTE,
           href: adminRoutes.voice(tenantSlug),
           badge: shipping,
         },
-        { label: 'Domain', icon: ICONS.GLOBE, badge: LATER },
-        { label: 'Email', icon: ICONS.MAIL, badge: LATER },
-        { label: 'Subscribers', icon: ICONS.MENU_ROWS, badge: LATER },
-        { label: 'Comments', icon: ICONS.COMMENT, badge: LATER },
-        { label: 'Team', icon: ICONS.USERS, badge: LATER },
-        { label: 'Danger zone', icon: ICONS.WARNING, badge: LATER },
+        { label: t('domain'), icon: ICONS.GLOBE, badge: later },
+        { label: t('email'), icon: ICONS.MAIL, badge: later },
+        { label: t('subscribers'), icon: ICONS.MENU_ROWS, badge: later },
+        { label: t('comments'), icon: ICONS.COMMENT, badge: later },
+        { label: t('team'), icon: ICONS.USERS, badge: later },
+        { label: t('dangerZone'), icon: ICONS.WARNING, badge: later },
       ],
     },
   ];

@@ -2,11 +2,11 @@ import { VOICE_FIELD_GROUPS, VOICE_OVERRIDE_KEYS } from './voice-fields';
 
 describe('VOICE_FIELD_GROUPS', () => {
   it('has exactly 4 groups named after the CMS voice schema fieldsets', () => {
-    expect(VOICE_FIELD_GROUPS.map((group) => group.title)).toEqual([
-      '404 page',
-      'Terminal prompts',
-      'Bookmarks',
-      'Empty states',
+    expect(VOICE_FIELD_GROUPS.map((group) => group.groupKey)).toEqual([
+      'notFoundPage',
+      'terminalPrompts',
+      'bookmarks',
+      'emptyStates',
     ]);
   });
 
@@ -21,13 +21,9 @@ describe('VOICE_FIELD_GROUPS', () => {
     ]);
   });
 
-  it('never includes the mock-invented "Publish confirmation" or "No search results" fields', () => {
-    const labels = VOICE_FIELD_GROUPS.flatMap((group) =>
-      group.fields.map((field) => field.label),
-    );
-
-    expect(labels).not.toContain('Publish confirmation');
-    expect(labels).not.toContain('No search results');
+  it('never includes the mock-invented "publishConfirmation" or "noSearchResults" fields', () => {
+    expect(VOICE_OVERRIDE_KEYS).not.toContain('publishConfirmation');
+    expect(VOICE_OVERRIDE_KEYS).not.toContain('noSearchResults');
   });
 
   it('includes every field name from the corrections brief exactly once', () => {

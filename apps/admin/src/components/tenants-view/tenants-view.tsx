@@ -1,6 +1,7 @@
 import { TenantsTable } from '@admin/components/tenants-table';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Button } from '@blog/ui/atoms';
+import { useTranslations } from 'next-intl';
 
 import { tenantsViewVariants } from './tenants-view-variants';
 
@@ -8,15 +9,14 @@ export type TTenantsViewProps = {
   tenants: TTenant[];
 };
 
-const ADD_TENANT_REASON =
-  'Provisioning is deferred until the tenant-resolution layer ships.';
-
 /**
  * The Tenants page body: heading, the (deliberately disabled) add-tenant
  * entry point, and the real tenant list. Ships from day one — with one
  * tenant it's still a finished page, not a placeholder.
  */
 export function TenantsView({ tenants }: TTenantsViewProps) {
+  const t = useTranslations('tenantsView');
+  const addTenantReasonText = t('addTenantReason');
   const { root, header, title, description, addTenant, addTenantReason } =
     tenantsViewVariants();
 
@@ -24,23 +24,22 @@ export function TenantsView({ tenants }: TTenantsViewProps) {
     <div className={root()}>
       <div className={header()}>
         <div>
-          <h1 className={title()}>Tenants</h1>
+          <h1 className={title()}>{t('title')}</h1>
           <p className={description()}>
-            Every site on the platform, read from the real <code>tenants</code>{' '}
-            table.
+            {t.rich('description', { code: (chunks) => <code>{chunks}</code> })}
           </p>
         </div>
         <div className={addTenant()}>
           <Button
             variant="primary"
             disabled={true}
-            title={ADD_TENANT_REASON}
+            title={addTenantReasonText}
             aria-describedby="add-tenant-reason"
           >
-            + Add tenant
+            {t('addTenant')}
           </Button>
           <p id="add-tenant-reason" className={addTenantReason()}>
-            {ADD_TENANT_REASON}
+            {addTenantReasonText}
           </p>
         </div>
       </div>

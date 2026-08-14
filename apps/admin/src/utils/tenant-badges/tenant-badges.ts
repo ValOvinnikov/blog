@@ -7,23 +7,20 @@ import {
 
 type TBadgeTone = 'ok' | 'warn' | 'neutral';
 
-const TENANT_STATUS_BADGE: Record<
-  TTenantStatus,
-  { tone: TBadgeTone; label: string }
-> = {
-  [TENANT_STATUS.ACTIVE]: { tone: 'ok', label: 'Active' },
-  [TENANT_STATUS.SUSPENDED]: { tone: 'warn', label: 'Suspended' },
+// Tone is a design-system concern, not display text — the visible label for
+// each status/plan lives in `i18n/messages/en.json` under `tenantsTable`,
+// keyed by these same enum values.
+const TENANT_STATUS_TONE: Record<TTenantStatus, TBadgeTone> = {
+  [TENANT_STATUS.ACTIVE]: 'ok',
+  [TENANT_STATUS.SUSPENDED]: 'warn',
 };
 
-const TENANT_PLAN_BADGE: Record<
-  TTenantPlan,
-  { tone: TBadgeTone; label: string }
-> = {
-  [TENANT_PLAN.FREE]: { tone: 'neutral', label: 'Free' },
-  [TENANT_PLAN.GROWTH]: { tone: 'ok', label: 'Growth' },
+const TENANT_PLAN_TONE: Record<TTenantPlan, TBadgeTone> = {
+  [TENANT_PLAN.FREE]: 'neutral',
+  [TENANT_PLAN.GROWTH]: 'ok',
 };
 
-export const tenantStatusBadge = (status: TTenantStatus) =>
-  TENANT_STATUS_BADGE[status];
+export const tenantStatusTone = (status: TTenantStatus) =>
+  TENANT_STATUS_TONE[status];
 
-export const tenantPlanBadge = (plan: TTenantPlan) => TENANT_PLAN_BADGE[plan];
+export const tenantPlanTone = (plan: TTenantPlan) => TENANT_PLAN_TONE[plan];

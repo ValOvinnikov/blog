@@ -1,7 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { renderWithIntl, screen } from '@admin/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { VoiceFieldGroup } from './voice-field-group';
+
+const render = renderWithIntl;
 
 const fields = [
   { key: 'terminalPromptHost' as const, label: 'Terminal Prompt Host' },

@@ -5,6 +5,7 @@ import {
   StatusBadge,
   type TStatusBadgeProps,
 } from '@blog/ui/atoms';
+import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { SidebarNavLink } from './sidebar-nav-link';
@@ -55,6 +56,7 @@ export type TSidebarProps = {
  * built tab) is a matter of appending an item, not reshaping this component.
  */
 export function Sidebar({ sections, switcher }: TSidebarProps) {
+  const t = useTranslations('sidebar');
   const {
     root,
     brand,
@@ -77,11 +79,11 @@ export function Sidebar({ sections, switcher }: TSidebarProps) {
     <aside className={root()}>
       <div className={brand()}>
         <span aria-hidden="true">
-          <Avatar name="Valstack" alt="Valstack" size={Size.SM} />
+          <Avatar name={t('brandName')} alt={t('brandName')} size={Size.SM} />
         </span>
         <div className={brandMeta()}>
-          <span className={brandName()}>Valstack</span>
-          <span className={brandTagline()}>admin</span>
+          <span className={brandName()}>{t('brandName')}</span>
+          <span className={brandTagline()}>{t('brandTagline')}</span>
         </div>
       </div>
 

@@ -1,7 +1,9 @@
+import { renderWithIntl, screen } from '@admin/testing/custom-render';
 import { ICONS } from '@blog/config';
-import { render, screen } from '@testing-library/react';
 
 import { AdminShell } from './admin-shell';
+
+const render = renderWithIntl;
 
 describe(AdminShell, () => {
   it('renders the sidebar, topbar and page content together', () => {

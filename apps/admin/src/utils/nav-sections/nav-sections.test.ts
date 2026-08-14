@@ -1,8 +1,21 @@
-import { platformNavSections, tenantNavSections } from './nav-sections';
+import messages from '@admin/i18n/messages/en.json';
+import { createTranslator } from 'next-intl';
+
+import {
+  platformNavSections,
+  tenantNavSections,
+  type TNavTranslator,
+} from './nav-sections';
+
+const t = createTranslator({
+  locale: 'EN',
+  messages,
+  namespace: 'navSections',
+}) as unknown as TNavTranslator;
 
 describe('platformNavSections', () => {
   it('gives Tenants a real href and Add tenant a deferred, hrefless entry', () => {
-    const [platform] = platformNavSections();
+    const [platform] = platformNavSections(t);
     const tenants = platform!.items.find((item) => item.label === 'Tenants');
     const addTenant = platform!.items.find(
       (item) => item.label === 'Add tenant',
@@ -17,7 +30,7 @@ describe('platformNavSections', () => {
 
 describe('tenantNavSections', () => {
   it('gives Look and Voice distinct real hrefs, badged "this milestone" in neutral tone', () => {
-    const [tenant] = tenantNavSections('acme');
+    const [tenant] = tenantNavSections(t, 'acme');
     const look = tenant!.items.find((item) => item.label === 'Look');
     const voice = tenant!.items.find((item) => item.label === 'Voice');
 
@@ -29,7 +42,7 @@ describe('tenantNavSections', () => {
   });
 
   it('badges the remaining six destinations "later" in warn tone, with no href', () => {
-    const [tenant] = tenantNavSections('acme');
+    const [tenant] = tenantNavSections(t, 'acme');
     const later = tenant!.items.filter((item) => item.badge?.label === 'later');
 
     expect(later).toHaveLength(6);
@@ -40,7 +53,7 @@ describe('tenantNavSections', () => {
   });
 
   it('lists all eight tenant destinations', () => {
-    const [tenant] = tenantNavSections('acme');
+    const [tenant] = tenantNavSections(t, 'acme');
 
     expect(tenant!.items.map((item) => item.label)).toEqual([
       'Look',

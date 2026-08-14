@@ -1,6 +1,194 @@
 {
+  "pageMetadata": {
+    "root": "Admin",
+    "tenants": "Tenants · Admin",
+    "tenant": "Tenant · Admin",
+    "look": "Look · Admin",
+    "voice": "Voice · Admin"
+  },
   "unauthorizedPage": {
     "heading": "Not authorized",
     "description": "Your account does not have access to this application."
+  },
+  "sidebar": {
+    "brandName": "Valstack",
+    "brandTagline": "admin"
+  },
+  "navSections": {
+    "platformLabel": "Platform",
+    "tenants": "Tenants",
+    "addTenant": "Add tenant",
+    "addTenantDisabledReason": "Provisioning a new tenant isn't available yet.",
+    "tenantLabel": "Tenant · {tenantSlug}",
+    "look": "Look",
+    "voice": "Voice",
+    "domain": "Domain",
+    "email": "Email",
+    "subscribers": "Subscribers",
+    "comments": "Comments",
+    "team": "Team",
+    "dangerZone": "Danger zone",
+    "badgeDeferred": "deferred",
+    "badgeLater": "later",
+    "badgeThisMilestone": "this milestone"
+  },
+  "platformLayout": {
+    "crumb": "Platform",
+    "roleLabel": "{role} · Platform"
+  },
+  "tenantLayout": {
+    "crumb": "Tenant",
+    "roleLabel": "{role} · Tenant"
+  },
+  "tenantsView": {
+    "title": "Tenants",
+    "description": "Every site on the platform, read from the real <code>tenants</code> table.",
+    "addTenant": "+ Add tenant",
+    "addTenantReason": "Provisioning is deferred until the tenant-resolution layer ships."
+  },
+  "tenantsTable": {
+    "empty": "No tenants yet.",
+    "columnTenant": "Tenant",
+    "columnPlan": "Plan",
+    "columnStatus": "Status",
+    "columnCreated": "Created",
+    "status": {
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended"
+    },
+    "plan": {
+      "FREE": "Free",
+      "GROWTH": "Growth"
+    }
+  },
+  "tenantOverview": {
+    "description": "Look and Voice ship soon — this is where they'll live."
+  },
+  "presetPicker": {
+    "ariaLabel": "Preset",
+    "console": "Console",
+    "editorial": "Editorial"
+  },
+  "logoHueField": {
+    "followAccentHue": "Follow accent hue",
+    "logoHueAriaLabel": "Logo hue",
+    "followsAccent": "follows accent",
+    "hueValue": "hue {hue}°"
+  },
+  "lookForm": {
+    "heading": "Look",
+    "subtitle": "Theme this site. Everything previews instantly below — nothing is live until you save.",
+    "resetButton": "Reset to preset",
+    "saveButton": "Save changes",
+    "savingButton": "Saving…",
+    "alertSuccess": "Saved to site_config.",
+    "alertError": "Couldn't save Look settings — try again.",
+    "basicHeading": "Basic",
+    "basicDescription": "What most tenants touch",
+    "presetLabel": "Preset",
+    "presetDescription": "The starting point nearly every tenant picks. Sets fonts, radius, density, chrome, and voice defaults.",
+    "accentHueLabel": "Accent hue",
+    "accentHueDescription": "Only the hue changes — lightness & chroma are fixed (OKLCH), so contrast stays WCAG-verified.",
+    "logoHueLabel": "Logo hue",
+    "optionalTag": "optional",
+    "logoHueDescription": "Tints the wordmark's tonal steps (--logo-1/2/3). Follows the accent hue unless you set it.",
+    "brandImagesLabel": "Brand images",
+    "brandImagesDescription": "Stored in Vercel Blob — no on-the-fly transforms, so what you upload is what ships.",
+    "logoFieldLabel": "Logo",
+    "logoFieldHint": "PNG, JPEG, or WebP · falls back to the polygon wordmark",
+    "faviconFieldLabel": "Favicon",
+    "faviconFieldHint": "Pre-cropped square, please — Blob can't crop it for you. Non-square uploads are rejected.",
+    "advancedSummary": "Advanced",
+    "terminalChromeLabel": "Terminal chrome",
+    "terminalChromeDescription": "Window frame + terminal prompt around the site — the single most defining console-vs-editorial switch. Defaults from your preset. Not saved yet — site_config has no column for this field.",
+    "switchOn": "On",
+    "switchOff": "Off",
+    "headingFontLabel": "Heading font",
+    "headingFontDescription": "Closed set of five (static next/font loaders). Each renders in its own face.",
+    "bodyFontLabel": "Body font",
+    "radiusScaleLabel": "Radius scale",
+    "radiusScaleDescription": "Corner roundness across every surface.",
+    "densityLabel": "Density",
+    "densityDescription": "Spacing and control size.",
+    "footerNote": "Radius scale and density are saved with the rest of this form but don't yet drive the inline preview above.",
+    "radiusScaleOptionLabel": {
+      "SM": "Small",
+      "MD": "Medium",
+      "LG": "Large",
+      "XL": "Extra Large"
+    },
+    "densityOptionLabel": {
+      "DEFAULT": "Default",
+      "COMPACT": "Compact"
+    }
+  },
+  "lookPreview": {
+    "modeLight": "Light",
+    "modeDark": "Dark",
+    "previewColorSchemeAriaLabel": "Preview color scheme",
+    "livePreviewHeading": "Live preview",
+    "livePreviewDescription": "Real @blog/ui primitives",
+    "terminalPrompt": "~$ ./publish",
+    "sampleHeading": "Reading the tide charts",
+    "samplePara": "A short dispatch to show heading and body type, accent, logo tones, and radius together.",
+    "subscribeButton": "Subscribe",
+    "readMoreButton": "Read more",
+    "readTimeChip": "4 min read",
+    "previewNote": "Unsaved form state → CSS custom properties, matching production's OKLCH ramp. Nothing here is live until you save.",
+    "fullPagePreviewHeading": "Full-page preview",
+    "fullPagePreviewDescription": "Reserved — needs a save to reflect",
+    "deviceUrl": "preview.{tenantSlug}.dev",
+    "framePlaceholder": "Iframe of the real site in preview mode. Needs a save (or a preview-mode URL) to reflect — space and routing reserved now."
+  },
+  "brandAssetField": {
+    "unexpectedError": "Something went wrong — try again.",
+    "currentAlt": "Current {label}",
+    "uploading": "Uploading…",
+    "replace": "Replace {label}",
+    "upload": "Upload {label}",
+    "remove": "Remove"
+  },
+  "voiceSettings": {
+    "heading": "Voice",
+    "description": "The words the site puts in its own mouth. Your preset already sets sensible defaults.",
+    "saveButton": "Save changes",
+    "alertSuccess": "Saved voiceOverrides.",
+    "alertError": "Couldn't save — try again.",
+    "basicHeading": "Basic",
+    "basicAlert": "Nothing required here. Your preset determines the default voice. Most tenants never open the Advanced fields below.",
+    "advancedSummary": "Advanced — 20 curated strings, 4 groups",
+    "optionalTag": "optional",
+    "advancedOverrideInfo": "Every field is an override. Leave one blank to inherit the preset's voice-pack value (shown as the placeholder). Clearing a field reverts to the preset default — it does not set the string to empty."
+  },
+  "voiceFieldGroup": {
+    "fieldCount": "{count, plural, one {# field} other {# fields}}"
+  },
+  "voiceFieldGroups": {
+    "notFoundPage": "404 page",
+    "terminalPrompts": "Terminal prompts",
+    "bookmarks": "Bookmarks",
+    "emptyStates": "Empty states"
+  },
+  "voiceFieldLabels": {
+    "notFoundMetaTitle": "Not Found Meta Title",
+    "notFoundMetaDescription": "Not Found Meta Description",
+    "notFoundCommandNotFound": "Not Found Command Not Found",
+    "notFoundDescription": "Not Found Description",
+    "notFoundReturnHome": "Not Found Return Home",
+    "terminalPromptHost": "Terminal Prompt Host",
+    "authPromptCommandSignIn": "Auth Prompt Command — Sign In",
+    "authPromptCommandAccount": "Auth Prompt Command — Account",
+    "bookmarksPromptCommand": "Bookmarks Prompt Command",
+    "accountPrivacyPromptCommand": "Account Privacy Prompt Command",
+    "accountNewsletterPromptCommand": "Account Newsletter Prompt Command",
+    "accountIdentityPromptCommand": "Account Identity Prompt Command",
+    "bookmarkToastSavedMessage": "Bookmark Toast — Saved",
+    "bookmarkToastRemovedMessage": "Bookmark Toast — Removed",
+    "blogListEmpty": "Blog List Empty",
+    "categoryEmpty": "Category Empty",
+    "tagEmpty": "Tag Empty",
+    "authorEmpty": "Author Empty",
+    "topicsEmpty": "Topics Empty",
+    "bookmarksEmpty": "Bookmarks Empty"
   }
 }

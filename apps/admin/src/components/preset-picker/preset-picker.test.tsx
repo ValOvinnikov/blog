@@ -1,8 +1,10 @@
+import { renderWithIntl, screen } from '@admin/testing/custom-render';
 import { PRESET_ID } from '@blog/config';
-import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { PresetPicker } from './preset-picker';
+
+const render = renderWithIntl;
 
 describe(PresetPicker, () => {
   it('renders both presets and marks the current value selected', () => {
