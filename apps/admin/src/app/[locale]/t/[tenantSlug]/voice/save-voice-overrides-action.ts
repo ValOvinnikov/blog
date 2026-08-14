@@ -1,6 +1,7 @@
 'use server';
 
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
+import { revalidateSiteConfig } from '@admin/server/site-config/revalidate-site-config';
 import type { TVoiceOverrides } from '@admin/utils/voice-fields/voice-fields';
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
 import { queries } from '@blog/db';
@@ -41,6 +42,7 @@ export async function saveVoiceOverridesAction(
       faviconAssetUrl: existing?.faviconAssetUrl,
       voiceOverrides: overrides,
     });
+    await revalidateSiteConfig();
 
     return { ok: true };
   } catch (error) {

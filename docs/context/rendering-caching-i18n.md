@@ -25,6 +25,18 @@
   invalidate prerendered route entries on Vercel (#318), so the route also
   calls `revalidatePath('/', 'layout')` when a registered type matched —
   purging every page per publish (acceptable blast radius for a blog).
+- **`site_config` on-demand revalidation:** `POST /api/revalidate-site-config`
+  (`apps/web`) mirrors `/api/revalidate`'s cache-purge shape
+  (`revalidateTag('site-config', { expire: 0 })` +
+  `revalidatePath('/', 'layout')` fallback) but not its verification
+  mechanism or its caller — it's called by `apps/admin`'s Look/Voice save
+  actions after a `site_config` write, not by a Sanity webhook, so it
+  verifies a plain shared secret (`SITE_CONFIG_REVALIDATE_SECRET`, sent as a
+  bearer token) rather than `@sanity/webhook`'s HMAC signature. `apps/admin`
+  calls it best-effort (`@admin/server/site-config/revalidate-site-config`)
+  — a failed call is logged, never thrown, and the site-config cache's own
+  3600s (`SITE_CONFIG_REVALIDATE_SECONDS`) window remains the fallback
+  either way.
 - **Skim generation pipeline (#957):** `POST /api/generate-skim?secret=…`
   (`apps/web`), triggered by a Sanity publish webhook on `post`. Verification
   matches `/api/revalidate`'s _stance_ (feature-flag-by-absence, same 401/503

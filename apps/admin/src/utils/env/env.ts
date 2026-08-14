@@ -16,10 +16,23 @@ export const env = createEnv({
     // surfaces as a readable "uploads aren't configured" error from the
     // upload action rather than an import-time crash.
     BLOB_READ_WRITE_TOKEN: z.string().min(1).optional(),
+    // Base URL of the `apps/web` deployment this app's Look/Voice saves call
+    // after a successful `site_config` write, to revalidate `apps/web`'s
+    // cache on-demand instead of waiting out the 3600s fallback window.
+    // Optional (feature-flag-by-absence, paired with
+    // `SITE_CONFIG_REVALIDATE_SECRET` below): absent, the call is skipped
+    // and logged — the save itself still succeeds.
+    WEB_APP_URL: z.string().url().optional(),
+    // MUST be byte-identical to `apps/web`'s own `SITE_CONFIG_REVALIDATE_SECRET`
+    // — same posture as `AUTH_SECRET` — sent as a bearer token to
+    // `apps/web`'s `/api/revalidate-site-config` route.
+    SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
   },
   runtimeEnv: {
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
+    WEB_APP_URL: process.env.WEB_APP_URL,
+    SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
   },
   emptyStringAsUndefined: true,
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
