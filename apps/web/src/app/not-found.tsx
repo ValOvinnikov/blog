@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { NotFoundPage } from '@web/components/pages/not-found-page';
+import { getChromeOn } from '@web/utils/get-chrome-on';
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import {
@@ -30,11 +31,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function NotFound() {
   setRequestLocale(LOCALE_ISO_CODES.EN);
-  const messages = await getMessages();
+  const [messages, chromeOn] = await Promise.all([
+    getMessages(),
+    getChromeOn(),
+  ]);
 
   return (
     <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
-      <NotFoundPage />
+      <NotFoundPage plain={!chromeOn} />
     </NextIntlClientProvider>
   );
 }

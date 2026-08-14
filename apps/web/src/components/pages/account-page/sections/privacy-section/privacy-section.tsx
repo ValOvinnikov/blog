@@ -1,8 +1,10 @@
 import { routes } from '@blog/config';
 import { LinkButton, SettingRow, WindowChrome } from '@blog/ui/molecules';
 import { DeleteAccountControl } from '@web/components/shared/delete-account-control';
+import { PlainSection } from '@web/components/shared/plain-section';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { auth } from '@web/server/auth/auth';
+import { getChromeOn } from '@web/utils/get-chrome-on';
 import { toSessionUsername } from '@web/utils/to-session-username';
 import { getTranslations } from 'next-intl/server';
 
@@ -35,7 +37,41 @@ export async function PrivacySection() {
 
   const { name, email } = session.user;
   const handle = toSessionUsername(name, email);
-  const t = await getTranslations('accountPage.privacy');
+  const [t, chromeOn] = await Promise.all([
+    getTranslations('accountPage.privacy'),
+    getChromeOn(),
+  ]);
+
+  const bodyContent = (
+    <>
+      <SettingRow label={t('exportLabel')} description={t('exportDescription')}>
+        <LinkButton
+          as={SmartLink}
+          href={routes.accountExport()}
+          prefetch={false}
+          download={true}
+          variant="ghost"
+        >
+          {t('exportButton')}
+        </LinkButton>
+      </SettingRow>
+      <SettingRow
+        tone="danger"
+        label={t('deleteLabel')}
+        description={t('deleteDescription')}
+      >
+        <DeleteAccountControl handle={handle} />
+      </SettingRow>
+    </>
+  );
+
+  if (!chromeOn) {
+    return (
+      <PlainSection heading={t('promptCommand')} headingLevel={2}>
+        {bodyContent}
+      </PlainSection>
+    );
+  }
 
   return (
     <WindowChrome>
@@ -45,29 +81,7 @@ export async function PrivacySection() {
         {t('promptCommand')}
         <WindowChrome.Tag>{t('promptTag')}</WindowChrome.Tag>
       </WindowChrome.Bar>
-      <WindowChrome.Body>
-        <SettingRow
-          label={t('exportLabel')}
-          description={t('exportDescription')}
-        >
-          <LinkButton
-            as={SmartLink}
-            href={routes.accountExport()}
-            prefetch={false}
-            download={true}
-            variant="ghost"
-          >
-            {t('exportButton')}
-          </LinkButton>
-        </SettingRow>
-        <SettingRow
-          tone="danger"
-          label={t('deleteLabel')}
-          description={t('deleteDescription')}
-        >
-          <DeleteAccountControl handle={handle} />
-        </SettingRow>
-      </WindowChrome.Body>
+      <WindowChrome.Body>{bodyContent}</WindowChrome.Body>
     </WindowChrome>
   );
 }

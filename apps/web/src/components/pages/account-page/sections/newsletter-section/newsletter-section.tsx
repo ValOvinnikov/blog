@@ -2,8 +2,10 @@ import { queries } from '@blog/db';
 import { StatusBadge } from '@blog/ui/atoms';
 import { SettingRow, WindowChrome } from '@blog/ui/molecules';
 import { NewsletterSubscriptionControl } from '@web/components/shared/newsletter-subscription-control';
+import { PlainSection } from '@web/components/shared/plain-section';
 import { auth } from '@web/server/auth/auth';
 import { getSoleTenantId } from '@web/server/site-config/get-site-config';
+import { getChromeOn } from '@web/utils/get-chrome-on';
 import { toSessionUsername } from '@web/utils/to-session-username';
 import { getTranslations } from 'next-intl/server';
 
@@ -40,7 +42,10 @@ export async function NewsletterSection() {
 
   const { id: userId, name, email } = session.user;
 
-  const tenantId = await getSoleTenantId();
+  const [tenantId, chromeOn] = await Promise.all([
+    getSoleTenantId(),
+    getChromeOn(),
+  ]);
   if (!tenantId) return null;
 
   const status = await queries.subscribers.getSubscriptionStatus(
@@ -53,6 +58,46 @@ export async function NewsletterSection() {
   const handle = toSessionUsername(name, email);
   const t = await getTranslations('accountPage.newsletter');
 
+  const settingRow =
+    status.outcome === 'active' ? (
+      <SettingRow
+        label={
+          <>
+            {t('label')} <StatusBadge tone="ok">{t('activeBadge')}</StatusBadge>
+          </>
+        }
+        description={
+          <>
+            {t('activeDescriptionPrefix')}{' '}
+            <span className={s.email()}>{email}</span>{' '}
+            {t('activeDescriptionSuffix')}
+          </>
+        }
+      >
+        <NewsletterSubscriptionControl action="unsubscribe" />
+      </SettingRow>
+    ) : (
+      <SettingRow
+        label={
+          <>
+            {t('label')}{' '}
+            <StatusBadge tone="warn">{t('pendingBadge')}</StatusBadge>
+          </>
+        }
+        description={t('pendingDescription')}
+      >
+        <NewsletterSubscriptionControl action="resend" />
+      </SettingRow>
+    );
+
+  if (!chromeOn) {
+    return (
+      <PlainSection heading={t('promptCommand')} headingLevel={2}>
+        {settingRow}
+      </PlainSection>
+    );
+  }
+
   return (
     <WindowChrome>
       <WindowChrome.Bar headingLevel={2}>
@@ -60,39 +105,7 @@ export async function NewsletterSection() {
         <WindowChrome.Prompt>{t('promptHost')}</WindowChrome.Prompt>{' '}
         {t('promptCommand')}
       </WindowChrome.Bar>
-      <WindowChrome.Body>
-        {status.outcome === 'active' ? (
-          <SettingRow
-            label={
-              <>
-                {t('label')}{' '}
-                <StatusBadge tone="ok">{t('activeBadge')}</StatusBadge>
-              </>
-            }
-            description={
-              <>
-                {t('activeDescriptionPrefix')}{' '}
-                <span className={s.email()}>{email}</span>{' '}
-                {t('activeDescriptionSuffix')}
-              </>
-            }
-          >
-            <NewsletterSubscriptionControl action="unsubscribe" />
-          </SettingRow>
-        ) : (
-          <SettingRow
-            label={
-              <>
-                {t('label')}{' '}
-                <StatusBadge tone="warn">{t('pendingBadge')}</StatusBadge>
-              </>
-            }
-            description={t('pendingDescription')}
-          >
-            <NewsletterSubscriptionControl action="resend" />
-          </SettingRow>
-        )}
-      </WindowChrome.Body>
+      <WindowChrome.Body>{settingRow}</WindowChrome.Body>
     </WindowChrome>
   );
 }
