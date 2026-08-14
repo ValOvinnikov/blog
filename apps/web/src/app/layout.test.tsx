@@ -3,41 +3,51 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import RootLayout from './layout';
 
-const { getThemeMock } = vi.hoisted(() => ({
-  getThemeMock: vi.fn(),
+const { listTenantsMock, getSiteConfigMock } = vi.hoisted(() => ({
+  listTenantsMock: vi.fn(),
+  getSiteConfigMock: vi.fn(),
 }));
 
 const { envMock } = vi.hoisted(() => ({
   envMock: { VERCEL_ANALYTICS_ENABLED: undefined as string | undefined },
 }));
 
-vi.mock('@blog/service', () => ({
-  service: {
-    global: {
-      themeSettings: { v1: { getTheme: getThemeMock } },
-    },
+vi.mock('@blog/db', () => ({
+  queries: {
+    tenants: { listTenants: listTenantsMock },
+    siteConfig: { getSiteConfig: getSiteConfigMock },
   },
+}));
+
+// `unstable_cache` requires a Next.js request-scoped store this test
+// doesn't set up — pass the wrapped function straight through instead.
+vi.mock('next/cache', () => ({
+  unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
 }));
 
 vi.mock('@web/utils/env/env', () => ({
   env: envMock,
 }));
 
-const CONSOLE_THEME_TOKENS = {
+const TENANT = { id: 'tenant-1' };
+
+const CONSOLE_SITE_CONFIG_ROW = {
+  preset: 'CONSOLE',
   accentHue: 250,
   logoHue: 250,
   headingFont: 'SPACE_GROTESK',
   bodyFont: 'NEWSREADER',
   radiusScale: 'MD',
   density: 'DEFAULT',
-  chromeOn: true,
+  voiceOverrides: {},
 };
 
 describe(`<${RootLayout.name}/>`, () => {
   beforeEach(() => {
     vi.clearAllMocks();
     envMock.VERCEL_ANALYTICS_ENABLED = undefined;
-    getThemeMock.mockResolvedValue({ ok: true, data: CONSOLE_THEME_TOKENS });
+    listTenantsMock.mockResolvedValue([TENANT]);
+    getSiteConfigMock.mockResolvedValue(CONSOLE_SITE_CONFIG_ROW);
   });
 
   it('mounts children in the body', async () => {
@@ -64,8 +74,8 @@ describe(`<${RootLayout.name}/>`, () => {
     );
   });
 
-  it('falls back to the Console preset tokens when the theme fetch fails', async () => {
-    getThemeMock.mockResolvedValue({ ok: false, error: 'boom' });
+  it('falls back to the Console preset tokens when the site config fetch fails', async () => {
+    listTenantsMock.mockRejectedValue(new Error('boom'));
     const consoleErrorSpy = vi
       .spyOn(console, 'error')
       .mockImplementation(() => {});
@@ -82,7 +92,7 @@ describe(`<${RootLayout.name}/>`, () => {
       '--brand-primary: oklch(0.53 0.17 250);',
     );
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('theme settings'),
+      expect.stringContaining('site config'),
     );
     consoleErrorSpy.mockRestore();
   });

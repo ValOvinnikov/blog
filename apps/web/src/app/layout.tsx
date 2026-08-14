@@ -1,13 +1,14 @@
 import '../../index.css';
 
-import { LOCALE_ISO_CODES, PRESET_ID, PRESET_REGISTRY } from '@blog/config';
-import { service } from '@blog/service';
+import { LOCALE_ISO_CODES, type TThemeTokens } from '@blog/config';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { resolveFontVariableClassName } from '@web/config/fonts';
 import { themeBootstrapScript } from '@web/config/theme-script';
+import { getSiteConfig } from '@web/server/site-config/get-site-config';
 import { buildThemeStyleBlock } from '@web/utils/build-theme-style-block';
 import { isVercelAnalyticsEnabled } from '@web/utils/is-vercel-analytics-enabled';
+import { toThemeTokens } from '@web/utils/to-theme-tokens';
 
 type TProps = {
   children: React.ReactNode;
@@ -29,15 +30,15 @@ type TProps = {
  * itself, so it must always render.
  */
 export default async function RootLayout({ children }: TProps) {
-  const result = await service.global.themeSettings.v1.getTheme();
+  const result = await getSiteConfig();
 
-  if (!result.ok) {
-    console.error(`Error fetching theme settings: ${result.error}`);
+  let themeTokens: TThemeTokens;
+  if (result.ok) {
+    themeTokens = toThemeTokens(result.data);
+  } else {
+    console.error(`Error fetching site config: ${result.error}`);
+    themeTokens = toThemeTokens(undefined);
   }
-
-  const themeTokens = result.ok
-    ? result.data
-    : PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
 
   const analyticsEnabled = isVercelAnalyticsEnabled();
   const fontVariableClassName = resolveFontVariableClassName(
