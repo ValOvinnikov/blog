@@ -47,7 +47,9 @@ export function TenantSwitcher({
   return (
     <Menu.Root>
       <Menu.Trigger className={trigger()}>
-        <Avatar name={active.slug} alt={active.slug} size={Size.SM} />
+        <span aria-hidden="true">
+          <Avatar name={active.slug} alt={active.slug} size={Size.SM} />
+        </span>
         <span className={meta()}>
           <span className={name()}>{active.slug}</span>
           <span className={domain()}>{active.primaryDomain}</span>

@@ -76,7 +76,9 @@ export function Sidebar({ sections, switcher }: TSidebarProps) {
   return (
     <aside className={root()}>
       <div className={brand()}>
-        <Avatar name="Valstack" alt="Valstack" size={Size.SM} />
+        <span aria-hidden="true">
+          <Avatar name="Valstack" alt="Valstack" size={Size.SM} />
+        </span>
         <div className={brandMeta()}>
           <span className={brandName()}>Valstack</span>
           <span className={brandTagline()}>admin</span>

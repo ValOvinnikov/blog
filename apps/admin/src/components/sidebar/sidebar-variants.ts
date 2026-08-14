@@ -36,12 +36,10 @@ export const sidebarVariants = tv({
       resting: {
         row: ['text-text-muted', 'hover:bg-surface hover:text-text'],
       },
-      // Rendered as a non-interactive row (no href, no focus stop) for a
-      // destination that isn't built yet — WCAG's contrast minimum has an
-      // explicit exception for text belonging to an inactive UI component,
-      // which is what makes `text-subtle` (otherwise under 4.5:1 on this
-      // rail) an accessible choice here.
-      inert: { row: ['text-text-subtle'] },
+      // Not dimmed: the label is the only way to learn this destination's
+      // name, so it stays at full (muted) legibility — the badge carries
+      // the "not available yet" signal instead.
+      inert: { row: ['text-text-muted'] },
     },
   },
   defaultVariants: {
