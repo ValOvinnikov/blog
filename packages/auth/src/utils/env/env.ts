@@ -1,15 +1,17 @@
 import { createEnv } from '@t3-oss/env-core';
 import { z } from 'zod';
 
-// Every credential here is optional — feature-flag-by-absence, matching the
-// rest of this repo's Auth.js wiring: a missing OAuth/email credential
-// disables just that one provider instead of crashing the app. `AUTH_SECRET`
-// is likewise optional here (Auth.js itself throws `MissingSecretError` for a
-// real production deploy without one, but a local `pnpm dev`/`pnpm build`
-// with it unset must not fail at import time).
+// Every provider credential here is optional — feature-flag-by-absence,
+// matching the rest of this repo's Auth.js wiring: a missing OAuth/email
+// credential disables just that one provider instead of crashing the app.
+// `AUTH_SECRET` is not a provider credential and is required: Auth.js cannot
+// function without it, so leaving it optional only defers the failure to a
+// `MissingSecret` error on the first request instead of naming the variable
+// at startup. `skipValidation` (below) is what still lets CI/local builds
+// that never set it succeed.
 export const env = createEnv({
   server: {
-    AUTH_SECRET: z.string().min(1).optional(),
+    AUTH_SECRET: z.string().min(1),
     AUTH_GITHUB_ID: z.string().min(1).optional(),
     AUTH_GITHUB_SECRET: z.string().min(1).optional(),
     AUTH_GOOGLE_ID: z.string().min(1).optional(),
