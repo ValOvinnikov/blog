@@ -196,8 +196,8 @@ Variants: collapsible: (boolean)
 
 ### SettingRow — `molecules/setting-row/setting-row.tsx`
 a label + description + control-slot row shared by every `/account` section (privacy & data, email preferences, connected accounts).
-Props: label: ReactNode · labelLevel?: THeadingProps['level'] · description?: ReactNode · tone?: TSettingRowVariants['tone'] · children?: ReactNode _(extends Omit< ComponentPropsWithoutRef<'div'>, 'childre…, IWithDataTestId)_
-Variants: tone: default|danger
+Props: label: ReactNode · labelLevel?: THeadingProps['level'] · description?: ReactNode · tone?: TSettingRowVariants['tone'] · controlGrows?: TSettingRowVariants['controlGrows'] · children?: ReactNode _(extends Omit< ComponentPropsWithoutRef<'div'>, 'childre…, IWithDataTestId)_
+Variants: tone: default|danger · controlGrows: (boolean)
 
 ### ShareLink — `molecules/share-link/share-link.tsx`
 ShareLink molecule — a single external share action (e.g. "Share on X"), rendered through `LinkButton` with `target="_blank"` and `rel="noopener noreferrer"` baked in, since every share link opens the target platform in a new tab.

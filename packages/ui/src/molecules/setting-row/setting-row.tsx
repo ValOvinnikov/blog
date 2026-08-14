@@ -16,6 +16,13 @@ export type TSettingRowProps = Omit<
     labelLevel?: THeadingProps['level'];
     description?: ReactNode;
     tone?: TSettingRowVariants['tone'];
+    /**
+     * Opts the control slot into growing to fill the row's remaining width
+     * (`flex-1`) at desktop widths, instead of the default shrink-to-fit —
+     * for a control (e.g. a wide slider) whose design calls for it to read
+     * as edge-to-edge rather than sized to its own content.
+     */
+    controlGrows?: TSettingRowVariants['controlGrows'];
     children?: ReactNode;
   };
 
@@ -30,6 +37,7 @@ export const SettingRow = ({
   labelLevel = 3,
   description,
   tone,
+  controlGrows,
   children,
   className,
   dataTestId,
@@ -41,7 +49,7 @@ export const SettingRow = ({
     title,
     description: descriptionSlot,
     control,
-  } = settingRowVariants({ tone });
+  } = settingRowVariants({ tone, controlGrows });
 
   return (
     <div
