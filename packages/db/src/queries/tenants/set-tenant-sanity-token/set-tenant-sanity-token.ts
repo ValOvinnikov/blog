@@ -18,6 +18,8 @@ export async function setTenantSanityToken(
     env.TENANT_TOKEN_ENCRYPTION_KEY,
   );
 
+  // A no-op if `tenantId` doesn't match a `tenants` row, matching this
+  // package's other update/delete-style mutations (see `updateDisplayName`).
   await db
     .update(tenants)
     .set({ sanityReadTokenEncrypted: encrypted })

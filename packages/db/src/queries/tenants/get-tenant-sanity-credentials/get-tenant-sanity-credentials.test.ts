@@ -78,4 +78,23 @@ describe(getTenantSanityCredentials, () => {
       getTenantSanityCredentials('00000000-0000-0000-0000-000000000000'),
     ).resolves.toBeUndefined();
   });
+
+  it('throws when the encryption key is not configured', async () => {
+    const tenant = await createTenant({
+      slug: 'acme',
+      name: 'Acme',
+      primaryDomain: 'acme.example.com',
+      sanityProjectId: 'abc123',
+      sanityDataset: 'production',
+      locale: 'en',
+      plan: TENANT_PLAN.FREE,
+      status: TENANT_STATUS.ACTIVE,
+    });
+    await setTenantSanityToken(tenant.id, 'sk-real-token-value');
+    delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
+
+    await expect(getTenantSanityCredentials(tenant.id)).rejects.toThrow(
+      'TENANT_TOKEN_ENCRYPTION_KEY is not configured.',
+    );
+  });
 });
