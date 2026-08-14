@@ -1,12 +1,12 @@
 # Multi-Tenant Architecture — Design
 
-**Status:** Design / brainstorm pass (no code in this issue). Resolves the open
+**Status:** Design pass. Resolves the open
 items handed off from Feature 6 of
 [`2026-08-07-flexible-theming-and-page-builder-design.md`](./2026-08-07-flexible-theming-and-page-builder-design.md).
 Output feeds per-epic `superpowers:writing-plans` passes and `board-keeper`
-ticketing once reviewed. Nothing filed yet. **Several decisions here are
-_proposed_ (marked ⚠), pending explicit confirmation — this doc records the
-recommended shape, not a rubber-stamp.**
+ticketing. **All 7 items in §Open decisions are resolved as of 2026-08-14** —
+see that section for the final call on each. Phase 0 (tenant registry) has
+already shipped; epic 2 (per-tenant content reads) is next and unblocked.
 **Date:** 2026-08-07
 **Scope:** How the blog becomes a multi-tenant platform serving many client
 sites — each edited by that client's own staff, isolated, at the scale of
@@ -111,9 +111,9 @@ request-scoped context read by RSCs). Unknown host → platform marketing page o
 `@blog/service` moves from a module-level client bound to
 `NEXT_PUBLIC_SANITY_PROJECT_ID` to a **client factory keyed by `projectId`**
 (with a small LRU of clients). The resolved tenant supplies projectId + dataset;
-the read token is either shared (a platform robot token with access to all
-tenant projects) or per-tenant (stored encrypted in the registry) — **open
-decision, see §Open**. Every existing `service.*` call gains the tenant context
+the read token is **per-tenant, stored encrypted in the registry**
+(resolved 2026-08-14, see §Open decision 2 — not a shared platform token, to
+contain blast radius to one tenant per leak). Every existing `service.*` call gains the tenant context
 as an argument (or reads it from the request-scoped resolver). View-model shapes
 are unchanged — only _which project_ they read from changes.
 
@@ -124,19 +124,18 @@ The revalidation webhook (`/api/revalidate`, `SPEC.md` §9) must carry the tenan
 it) and call `revalidateTag` on that tenant's namespace only. This is a real
 change to the caching contract and must land with the service change.
 
-**⚠ Known blocker to resolve here — Vercel tag revalidation is insufficient on
-its own.** This repo already learned (the hard way) that on Vercel
-`revalidateTag` — even with `expire: 0` — does **not** invalidate prerendered
-routes; the current webhook additionally calls `revalidatePath('/', 'layout')`
-(and `useCdn` stays `false`) to force it. But `revalidatePath('/', 'layout')` is
-**global — it would purge every tenant**, defeating the per-tenant tag scoping
-above. So tenant-scoped revalidation is not free: it needs either genuinely
-path-addressable tenant output (e.g. a tenant-prefixed route segment so one
-tenant's paths can be revalidated in isolation) or verification that tag-only
-revalidation actually invalidates prerendered output on the target
-Next.js/Vercel version. This is the single biggest cross-tenant correctness risk
-in the design and is currently unaddressed — settle it before epic 2 is
-ticketed.
+**Vercel tag revalidation is insufficient on its own — resolved 2026-08-14:
+accept the global purge for v1.** This repo already learned (the hard way)
+that on Vercel `revalidateTag` — even with `expire: 0` — does **not**
+invalidate prerendered routes; the current webhook additionally calls
+`revalidatePath('/', 'layout')` (and `useCdn` stays `false`) to force it. That
+call is **global — it purges every tenant** on any one tenant's publish,
+defeating the per-tenant tag scoping above in isolation terms — but this is
+**not a cross-tenant data leak**, just a synchronized cold-render cost every
+tenant pays. Accepted for v1 rather than gating epic 2 on routing-architecture
+work (e.g. a tenant-prefixed route segment for path-addressable purges) with
+no real tenant count/traffic yet to measure the blast radius against. Revisit
+as a follow-up perf ticket once it matters.
 
 ### 3. Engagement — shared Neon + `tenantId` (proposed ⚠)
 
@@ -156,8 +155,8 @@ One Neon database. Add:
 `WHERE tenantId`" structurally impossible, `@blog/db` exposes a
 `forTenant(tenantId)` factory returning query functions that inject the scope;
 callers cannot get an unscoped handle for tenant data. **Postgres Row-Level
-Security is a proposed defense-in-depth layer** (a `tenant_id` session GUC +
-policies) — strong, but adds operational complexity; open decision.
+Security is a confirmed defense-in-depth layer (resolved 2026-08-14: yes)**
+— a `tenant_id` session GUC + policies on top of `forTenant`.
 
 Auth.js **users stay global** — one person can hold memberships in multiple
 tenants; the adapter tables (users/accounts/sessions) get **no** `tenantId`.
@@ -304,31 +303,48 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
 
 ## Open decisions (need sign-off before ticketing)
 
-1. **Frontend topology ⚠** — shared Next.js app (this doc's assumption) vs.
-   deployment-per-tenant. Recommended: **shared app** (one deploy, one Neon
-   migration, lean at tens). Confirm.
-2. **Read-token model ⚠** — one platform robot token across all tenant projects
-   vs. per-tenant tokens in the registry (encrypted). Trade convenience vs.
-   blast radius.
-3. **Studio hosting ⚠** — Vercel either way (per `SPEC.md` §13, no `sanity
-deploy`): a Studio deployment per tenant (simple, isolated) vs. a single
-   deployment with per-host dynamic config (one deploy, but must avoid the
-   multi-workspace name leak). Start simple.
-4. **Postgres RLS ⚠** — defense-in-depth on top of `forTenant`, yes/no.
-5. **URL scheme** — custom domains only, platform subdomains, or both (affects
-   `routes` + tenant resolution).
-6. **Exact free-tier editor allowance** — verify on `sanity.io/pricing` (drives
-   billing timing).
-7. **Font selection per tenant ⚠** (added 2026-08-12, from #1324/PR #1407) —
+1. **Frontend topology — resolved 2026-08-14: shared app.** One Vercel
+   deployment, one Neon migration, tenant resolved by `Host` header in
+   middleware — lean at tens of tenants. This is the topology every other
+   section of this doc already assumes.
+2. **Read-token model — resolved 2026-08-14: per-tenant encrypted tokens.**
+   Each tenant gets its own Sanity read token, stored encrypted in the
+   `tenants` registry (never a shared platform-wide token) — explicit choice
+   to contain blast radius to one tenant per leak over the convenience of a
+   single shared token. The client factory (§2) resolves a tenant's token by
+   decrypting its registry row, not from a shared env var. Encryption-at-rest
+   mechanism (KMS-backed vs. app-level) and rotation flow are epic-2
+   implementation details, not further open decisions here.
+3. **Studio hosting — resolved 2026-08-14: shape (a), one Studio codebase
+   built + deployed per tenant.** Simple, provably isolated; revisit shape
+   (b) (single deployment, per-host dynamic config) only if per-tenant Studio
+   deployments become the operational bottleneck.
+4. **Postgres RLS — resolved 2026-08-14: yes.** Defense-in-depth on top of
+   `forTenant(tenantId)` — a `tenant_id` session GUC + policies on every
+   engagement table.
+5. **URL scheme — resolved 2026-08-14: custom domains only.** No platform
+   subdomain scheme; every tenant maps its own domain in `tenant_domains`.
+6. **Exact free-tier editor allowance — resolved 2026-08-14, verified against
+   `sanity.io/pricing`.** Free plan: 20 total seats, but **only
+   Administrator and Viewer roles are available — there is no scoped Editor
+   role on Free.** A free-tier tenant's content editors must hold full
+   Administrator rights to edit anything; a real non-admin Editor role
+   requires Growth ($15/seat/month, up to 50 seats, adds Editor/Developer/
+   Contributor roles). This sharpens the upgrade-before-cap policy (§Sanity
+   free-tier limits): it isn't only the 10k-doc cap that pushes a tenant to
+   Growth, it's wanting _any_ non-admin editor at all — a tenant onboarding
+   with more than one content-editing staffer who isn't meant to hold full
+   project-admin rights needs Growth from day one.
+7. **Font selection per tenant — resolved 2026-08-14: fixed preset
+   catalogue.** (Added 2026-08-12, from #1324/PR #1407 —
    `headingFont`/`bodyFont` can't join the rest of `TThemeTokens` in the
    runtime `<style>` injector model (§6): `next/font/google` optimization is
-   build-time only, and font-loader calls must be static/module-scope (a
-   dynamic-import-based per-request attempt broke the production build
-   outright). Needs a build-time, per-tenant-fixed mechanism (env var/config
-   baked into that tenant's own build) instead — fits naturally once this
-   epic introduces per-tenant builds, but is a real design item, not covered
-   by anything else in this doc. Confirm before ticketing Feature/whatever
-   covers per-tenant builds.
+   build-time only, and font-loader calls must be static/module-scope.) Since
+   decision 1 confirms a **shared app** (no per-tenant build to bake a
+   font choice into), tenants pick from a small, curated set of fonts the
+   app already statically imports — same pattern as today's Console/
+   Editorial presets. No arbitrary per-tenant font choice; revisit only if
+   real tenant demand for custom fonts outgrows the catalogue.
 
 ## Non-goals (recorded so epics don't sprawl)
 
