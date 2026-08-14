@@ -111,4 +111,41 @@ describe(`<${Toast.name}/>`, () => {
     setup({ dataTestId: 'toast' });
     expect(screen.getByTestId('toast')).toBeVisible();
   });
+
+  describe('plain mode', () => {
+    it('renders the message but not the command/state chip', () => {
+      setup({ plain: true });
+      expect(screen.getByText(message)).toBeVisible();
+      expect(
+        screen.queryByText(
+          (_, el) => el?.textContent === `${command} · ${state}`,
+        ),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText(command)).not.toBeInTheDocument();
+      expect(screen.queryByText(state)).not.toBeInTheDocument();
+    });
+
+    it('still calls onDismiss when the dismiss button is clicked', async () => {
+      const onDismiss = vi.fn();
+      setup({ plain: true, onDismiss });
+      await userEvent.click(screen.getByRole('button', { name: dismissLabel }));
+      expect(onDismiss).toHaveBeenCalledTimes(1);
+    });
+
+    it('still renders the relative time when provided', () => {
+      setup({ plain: true, time: 'just now' });
+      expect(screen.getByText('just now')).toBeVisible();
+    });
+
+    it('still renders an action button and calls onAct when clicked', async () => {
+      const onAct = vi.fn();
+      const label = faker.word.verb();
+      setup({ plain: true, action: { label, onAct } });
+
+      const actionButton = screen.getByRole('button', { name: label });
+      await userEvent.click(actionButton);
+
+      expect(onAct).toHaveBeenCalledTimes(1);
+    });
+  });
 });
