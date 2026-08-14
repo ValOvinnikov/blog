@@ -241,6 +241,7 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
               <SettingRow
                 label={accentHueLabel}
                 description={t('accentHueDescription')}
+                controlGrows={true}
               >
                 <div className={hueField()}>
                   <span
@@ -261,6 +262,7 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
               <SettingRow
                 label={t('logoHueLabel')}
                 description={t('logoHueDescription')}
+                controlGrows={true}
               >
                 <LogoHueField
                   accentHue={values.accentHue}
