@@ -18,6 +18,7 @@
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
     "@types/culori": "^4.0.1",
+    "@types/node": "^26",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:",
