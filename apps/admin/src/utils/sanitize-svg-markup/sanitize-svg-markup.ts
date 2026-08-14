@@ -11,20 +11,65 @@ const purify = createDOMPurify(new JSDOM('').window);
 
 const URI_BEARING_ATTRIBUTES = ['href', 'xlink:href', 'src'];
 
+// Matches a CSS `url(...)` reference with optional quoting, capturing just
+// the URL so it can be checked against the same fragment/`data:` allow-list
+// as the URI-bearing attributes above. Presentation attributes such as
+// `fill`/`stroke`/`filter`/`mask`/`clip-path`/`marker-start`/`cursor`, and a
+// `<style>` element's rule text, all carry this syntax — DOMPurify's own
+// scheme check doesn't reach it (`style` is in its `URI_SAFE_ATTRIBUTES`
+// exempt list, and a bare `url(https://…)` never matches its href-oriented
+// `ALLOWED_URI_REGEXP`).
+const CSS_URL_REFERENCE_PATTERN = /url\(\s*(['"]?)([^'")]+)\1\s*\)/gi;
+
+function isSameDocumentOrInlineReference(uri: string): boolean {
+  return uri.startsWith('#') || uri.startsWith('data:');
+}
+
+function stripUnsafeCssUrlReferences(value: string): string {
+  return value.replace(CSS_URL_REFERENCE_PATTERN, (match, _quote, uri) =>
+    isSameDocumentOrInlineReference(uri) ? match : '',
+  );
+}
+
 // DOMPurify's default `ALLOWED_URI_REGEXP` already blocks `javascript:`, but
 // it applies to every allowed attribute value (not just URI ones), so
 // narrowing it globally would also strip plain numeric/text attributes like
-// `cx="12"`. This hook instead runs after DOMPurify's own pass and further
-// restricts the small set of attributes that are actually URIs to a
-// same-document fragment or an inline `data:` URI — either has nothing to
-// fetch, unlike an `http(s):`/`ftp:`/etc. reference reaching outside the
-// file it shipped in.
+// `cx="12"`. These hooks instead run after DOMPurify's own pass and further
+// restrict every URI reference this markup can carry — a direct attribute
+// value, or a CSS `url(...)` target inside any attribute or a `<style>`
+// element's text — to a same-document fragment or an inline `data:` URI:
+// either has nothing to fetch, unlike an `http(s):`/`ftp:`/etc. reference
+// reaching outside the file it shipped in.
 purify.addHook('afterSanitizeAttributes', (node) => {
   for (const attrName of URI_BEARING_ATTRIBUTES) {
     const value = node.getAttribute(attrName);
-    if (value && !value.startsWith('#') && !value.startsWith('data:')) {
+    if (value && !isSameDocumentOrInlineReference(value)) {
       node.removeAttribute(attrName);
     }
+  }
+
+  if (!node.attributes) {
+    return;
+  }
+  for (const attr of Array.from(node.attributes)) {
+    if (
+      URI_BEARING_ATTRIBUTES.includes(attr.name) ||
+      !attr.value.includes('url(')
+    ) {
+      continue;
+    }
+    const sanitized = stripUnsafeCssUrlReferences(attr.value).trim();
+    if (sanitized) {
+      node.setAttribute(attr.name, sanitized);
+    } else {
+      node.removeAttribute(attr.name);
+    }
+  }
+});
+
+purify.addHook('afterSanitizeElements', (node) => {
+  if (node.nodeName?.toLowerCase() === 'style' && node.textContent) {
+    node.textContent = stripUnsafeCssUrlReferences(node.textContent);
   }
 });
 

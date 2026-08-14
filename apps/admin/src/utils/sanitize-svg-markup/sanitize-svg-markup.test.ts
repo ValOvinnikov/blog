@@ -59,6 +59,44 @@ describe(sanitizeSvgMarkup, () => {
     expect(result).toContain('fill="url(#g)"');
   });
 
+  it('keeps a data: URI reference in a presentation attribute', () => {
+    const markup =
+      '<svg viewBox="0 0 24 24"><rect fill="url(data:image/svg+xml;base64,PHN2Zy8+)"/></svg>';
+
+    const result = sanitizeSvgMarkup(markup);
+
+    expect(result).toContain('url(data:image/svg+xml;base64,PHN2Zy8+)');
+  });
+
+  it('strips an external url() reference from a presentation attribute', () => {
+    const markup =
+      '<svg viewBox="0 0 24 24"><rect fill="url(https://attacker.example/track.png#x)"/></svg>';
+
+    const result = sanitizeSvgMarkup(markup);
+
+    expect(result).not.toContain('attacker.example');
+    expect(result).not.toContain('url(');
+  });
+
+  it('strips an external url() reference from a <style> element', () => {
+    const markup =
+      '<svg viewBox="0 0 24 24"><style>.a{fill:url(https://attacker.example/t.png)}</style><rect class="a" width="10" height="10"/></svg>';
+
+    const result = sanitizeSvgMarkup(markup);
+
+    expect(result).not.toContain('attacker.example');
+    expect(result).not.toContain('url(');
+  });
+
+  it('keeps a fragment url() reference inside a <style> element', () => {
+    const markup =
+      '<svg viewBox="0 0 24 24"><style>.a{fill:url(#g)}</style><rect class="a" width="10" height="10"/></svg>';
+
+    const result = sanitizeSvgMarkup(markup);
+
+    expect(result).toContain('url(#g)');
+  });
+
   it('returns undefined when nothing recognizable as an SVG survives sanitization', () => {
     const result = sanitizeSvgMarkup('not svg markup at all');
 

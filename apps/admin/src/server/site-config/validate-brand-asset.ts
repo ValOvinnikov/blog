@@ -85,8 +85,10 @@ function validateSvgAsset(
  * doubles as the format allow-list: only PNG/JPEG/WebP/SVG map to a
  * `contentType` below, so anything else falls through to "unsupported". SVG
  * additionally runs through `sanitizeSvgMarkup` — real markup parsing that
- * strips `<script>`, event-handler attributes, and any URI reference that
- * isn't a same-document fragment — before its sanitized (not original) bytes
+ * strips `<script>`, event-handler attributes, and any URI reference — a
+ * direct attribute value or a CSS `url(...)` target in an attribute or a
+ * `<style>` element — that isn't a same-document fragment or `data:` URI —
+ * before its sanitized (not original) bytes
  * are ever returned; the raster formats need no such pass, since `image-size`
  * only ever reads their header bytes, never anything that gets echoed back
  * out. Favicon square-ness is enforced here, not advisory: Vercel Blob has no
