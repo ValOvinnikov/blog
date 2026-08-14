@@ -5,7 +5,7 @@ import { sendEmail } from '@web/server/email/send-email';
 import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newsletter-confirmation-email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie';
-import { getSoleTenantId } from '@web/server/site-config/get-site-config';
+import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { env } from '@web/utils/env/env';
 import { isValidEmail } from '@web/utils/is-valid-email';
 import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
@@ -51,7 +51,7 @@ export async function subscribeToNewsletterAction(
     return { outcome: 'invalid' };
   }
 
-  const tenantId = await getSoleTenantId();
+  const tenantId = await getRequestTenantId();
   if (!tenantId) {
     return { outcome: 'server-error' };
   }

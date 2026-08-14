@@ -6,18 +6,18 @@ const {
   authMock,
   getSubscriptionStatusMock,
   getChromeOnMock,
-  getSoleTenantIdMock,
+  getRequestTenantIdMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   getSubscriptionStatusMock: vi.fn(),
   getChromeOnMock: vi.fn(),
-  getSoleTenantIdMock: vi.fn(),
+  getRequestTenantIdMock: vi.fn(),
 }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@web/server/site-config/get-site-config', () => ({
-  getSoleTenantId: getSoleTenantIdMock,
+vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
+  getRequestTenantId: getRequestTenantIdMock,
 }));
 
 vi.mock('@blog/db', () => ({
@@ -50,8 +50,8 @@ describe(`<${NewsletterSection.name}/>`, () => {
     getSubscriptionStatusMock.mockReset();
     getChromeOnMock.mockReset();
     getChromeOnMock.mockResolvedValue(true);
-    getSoleTenantIdMock.mockReset();
-    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
+    getRequestTenantIdMock.mockReset();
+    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
   });
 
   it('renders nothing when there is no session', async () => {
@@ -65,7 +65,7 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
   it('renders nothing when no tenant resolves', async () => {
     authMock.mockResolvedValue(authedSession);
-    getSoleTenantIdMock.mockResolvedValue(undefined);
+    getRequestTenantIdMock.mockResolvedValue(undefined);
 
     const { container } = await setup();
 

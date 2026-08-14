@@ -6,7 +6,7 @@ import { WindowChrome } from '@blog/ui/molecules';
 import { BookmarksList, type IBookmarkRow } from '@blog/ui/organisms';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { auth } from '@web/server/auth/auth';
-import { getSoleTenantId } from '@web/server/site-config/get-site-config';
+import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { getChromeOn } from '@web/utils/get-chrome-on';
 import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { redirect } from 'next/navigation';
@@ -45,7 +45,7 @@ export async function BookmarksPage() {
     redirect(routes.home());
   }
 
-  const tenantId = await getSoleTenantId();
+  const tenantId = await getRequestTenantId();
   if (!tenantId) {
     redirect(routes.home());
   }

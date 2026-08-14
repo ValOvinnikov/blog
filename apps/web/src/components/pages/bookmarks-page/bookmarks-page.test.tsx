@@ -9,19 +9,19 @@ const {
   listBookmarksMock,
   getPostsByIdsMock,
   getChromeOnMock,
-  getSoleTenantIdMock,
+  getRequestTenantIdMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   listBookmarksMock: vi.fn(),
   getPostsByIdsMock: vi.fn(),
   getChromeOnMock: vi.fn(),
-  getSoleTenantIdMock: vi.fn(),
+  getRequestTenantIdMock: vi.fn(),
 }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@web/server/site-config/get-site-config', () => ({
-  getSoleTenantId: getSoleTenantIdMock,
+vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
+  getRequestTenantId: getRequestTenantIdMock,
 }));
 
 vi.mock('@blog/db', () => ({
@@ -66,8 +66,8 @@ describe(`<${BookmarksPage.name}/>`, () => {
     getPostsByIdsMock.mockReset();
     getChromeOnMock.mockReset();
     getChromeOnMock.mockResolvedValue(true);
-    getSoleTenantIdMock.mockReset();
-    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
+    getRequestTenantIdMock.mockReset();
+    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
   });
 
   it('redirects home without querying bookmarks when there is no session', async () => {
@@ -82,7 +82,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
 
   it('redirects home without querying bookmarks when no tenant resolves', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getSoleTenantIdMock.mockResolvedValue(undefined);
+    getRequestTenantIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 

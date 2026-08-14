@@ -1,16 +1,16 @@
 export {};
 
-const { confirmSubscriberMock, getSoleTenantIdMock } = vi.hoisted(() => ({
+const { confirmSubscriberMock, resolveTenantIdMock } = vi.hoisted(() => ({
   confirmSubscriberMock: vi.fn(),
-  getSoleTenantIdMock: vi.fn(),
+  resolveTenantIdMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', () => ({
   queries: { subscribers: { confirmSubscriber: confirmSubscriberMock } },
 }));
 
-vi.mock('@web/server/site-config/get-site-config', () => ({
-  getSoleTenantId: getSoleTenantIdMock,
+vi.mock('@web/server/tenant/resolve-tenant-id', () => ({
+  resolveTenantId: resolveTenantIdMock,
 }));
 
 const TENANT_ID = 'tenant-1';
@@ -27,8 +27,8 @@ const subscriber = {
 describe('GET /api/newsletter/confirm', () => {
   beforeEach(() => {
     confirmSubscriberMock.mockReset();
-    getSoleTenantIdMock.mockReset();
-    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
+    resolveTenantIdMock.mockReset();
+    resolveTenantIdMock.mockResolvedValue(TENANT_ID);
   });
 
   it('returns 400 without querying the db when no token is given', async () => {
@@ -62,6 +62,23 @@ describe('GET /api/newsletter/confirm', () => {
     expect(confirmSubscriberMock).toHaveBeenCalledWith(TENANT_ID, 'token-abc');
   });
 
+  it('resolves the tenant from the request Host header', async () => {
+    confirmSubscriberMock.mockResolvedValue({
+      outcome: 'confirmed',
+      subscriber,
+    });
+    const { GET } = await import('./route');
+
+    await GET(
+      new Request(
+        'https://example.com/api/newsletter/confirm?token=token-abc',
+        { headers: { host: 'acme.example.com' } },
+      ),
+    );
+
+    expect(resolveTenantIdMock).toHaveBeenCalledWith('acme.example.com');
+  });
+
   it('treats an already-confirmed token as success (idempotent)', async () => {
     confirmSubscriberMock.mockResolvedValue({
       outcome: 'already-confirmed',
@@ -90,7 +107,7 @@ describe('GET /api/newsletter/confirm', () => {
   });
 
   it('returns 500 without querying the db when no tenant resolves', async () => {
-    getSoleTenantIdMock.mockResolvedValue(undefined);
+    resolveTenantIdMock.mockResolvedValue(undefined);
     const { GET } = await import('./route');
 
     const response = await GET(
