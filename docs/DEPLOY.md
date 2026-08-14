@@ -171,10 +171,11 @@ id / dataset / URL / tokens all differ:
 subscribers, `SPEC.md` §4/§8) needs two connection strings, same Production +
 Preview scopes as the five keys above:
 
-| Key                     | `blog-dev` value              | `blog-prod` value             |
-| ----------------------- | ----------------------------- | ----------------------------- |
-| `DATABASE_URL`          | `<DEV_DATABASE_URL>` (pooled) | `<PRD_DATABASE_URL>` (pooled) |
-| `DATABASE_URL_UNPOOLED` | `<DEV_DATABASE_URL_UNPOOLED>` | `<PRD_DATABASE_URL_UNPOOLED>` |
+| Key                           | `blog-dev` value              | `blog-prod` value             |
+| ----------------------------- | ----------------------------- | ----------------------------- |
+| `DATABASE_URL`                | `<DEV_DATABASE_URL>` (pooled) | `<PRD_DATABASE_URL>` (pooled) |
+| `DATABASE_URL_UNPOOLED`       | `<DEV_DATABASE_URL_UNPOOLED>` | `<PRD_DATABASE_URL_UNPOOLED>` |
+| `TENANT_TOKEN_ENCRYPTION_KEY` | `<DEV_TENANT_TOKEN_KEY>`      | `<PRD_TENANT_TOKEN_KEY>`      |
 
 > `DATABASE_URL` (the pooled Neon HTTP driver, `drizzle-orm/neon-http`) is
 > what the deployed app reads at runtime via `@blog/db`'s validated env entry
@@ -189,6 +190,13 @@ Preview scopes as the five keys above:
 > secret in §4 below are the same connection strings, just wired into two
 > different systems — keep them in sync when a Neon branch's credentials
 > rotate.
+
+> `TENANT_TOKEN_ENCRYPTION_KEY` decrypts `tenants.sanityReadTokenEncrypted`
+> (`@blog/utils`'s `encryptSecret`/`decryptSecret`, AES-256-GCM) — a 32-byte
+> key, base64-encoded. Generate one per environment with
+> `openssl rand -base64 32`; **dev and prod must use different keys.**
+> Rotating this key means re-encrypting every tenant's stored token, so treat
+> it with the same care as the read tokens it protects.
 
 #### Neon Postgres — one project, per-branch environments
 
