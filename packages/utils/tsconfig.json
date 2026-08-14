@@ -3,10 +3,10 @@
   "extends": "@blog/tsconfig/base.json",
   "compilerOptions": {
     "noEmit": true,
-    // Declare vitest's ambient test globals explicitly (vitest config sets
-    // `globals: true`) so type resolution does not depend on pnpm's hoisting
-    // layout — matches @blog/ui, @blog/service, and web.
-    "types": ["vitest/globals"]
+    // Declare ambient globals explicitly so type resolution does not depend on
+    // pnpm's hoisting layout: "node" for node:crypto, "vitest/globals" for the
+    // `globals: true` test config — matches @blog/db and @blog/service.
+    "types": ["node", "vitest/globals"]
   },
   "include": ["src"]
 }
