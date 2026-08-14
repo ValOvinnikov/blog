@@ -83,6 +83,60 @@ const config: NextConfig = {
       bodySizeLimit: '6mb',
     },
   },
+  turbopack: {
+    rules: {
+      // @blog/ui's icon assets (packages/ui/src/assets/icons) ship from
+      // source (transpilePackages below), so Turbopack sees their raw .svg
+      // imports directly:
+      //   import Sun from '.../sun.svg'        -> SVGR React component
+      //   import SunUrl from '.../sun.svg?url' -> emitted asset URL
+      // The two rules are disjoint on the `?url` query so exactly one
+      // applies per import. Mirrors the Vitest/Storybook (vite-plugin-svgr)
+      // config in packages/ui, and apps/web's identical Turbopack rules.
+      //
+      // SVGO's default `preset-default` includes `removeViewBox`, which
+      // strips `viewBox` whenever it's numerically identical to the source
+      // file's own `width`/`height` (true of every icon in
+      // packages/ui/src/assets/icons — they all ship `24x24`). That's not
+      // actually redundant: `@blog/ui`'s `<Icon>` resizes the compiled
+      // `<svg>` via CSS (`size-4`/`size-4.5`/`size-6`), and without a
+      // `viewBox` the browser can't rescale the internal `<path>`
+      // coordinates into the new box, so icons render cropped at every size
+      // but 24px. `@svgr/webpack`'s loader `options` map straight onto
+      // `@svgr/core`'s `Config` (unlike `vite-plugin-svgr`, which nests them
+      // under `svgrOptions`), so `svgoConfig` sits at the top level here.
+      // Disabling just `removeViewBox` (keeping the rest of
+      // `preset-default`, plus `prefixIds`, which SVGR's own svgo plugin
+      // always runs alongside it) preserves every other optimization.
+      '*.svg': [
+        {
+          condition: { query: /^\?url$/ },
+          type: 'asset',
+        },
+        {
+          condition: { not: { query: /^\?url$/ } },
+          loaders: [
+            {
+              loader: '@svgr/webpack',
+              options: {
+                svgoConfig: {
+                  plugins: [
+                    {
+                      name: 'preset-default',
+                      params: { overrides: { removeViewBox: false } },
+                    },
+                    'prefixIds',
+                  ],
+                },
+              },
+            },
+          ],
+          as: '*.js',
+        },
+      ],
+    },
+  },
+  transpilePackages: ['@blog/ui'],
   async headers() {
     return [
       {
