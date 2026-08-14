@@ -10,6 +10,7 @@ import {
 import { ALERT_TYPE, Size } from '@blog/config';
 import { Alert } from '@blog/ui/atoms/alert';
 import { Button } from '@blog/ui/atoms/button';
+import Image from 'next/image';
 import { unstable_rethrow } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { type ChangeEvent, useRef, useState, useTransition } from 'react';
@@ -117,9 +118,11 @@ export function BrandAssetField({
       <div className={top()}>
         <span className={thumb()}>
           {currentUrl ? (
-            <img
+            <Image
               src={currentUrl}
               alt={t('currentAlt', { label: lowerLabel })}
+              fill={true}
+              sizes="48px"
               className={thumbImage()}
             />
           ) : (

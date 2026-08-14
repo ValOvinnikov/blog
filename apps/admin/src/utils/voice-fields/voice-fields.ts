@@ -36,7 +36,7 @@ export type TVoiceField = {
   multiline?: boolean;
 };
 
-export type TVoiceFieldGroupKey =
+type TVoiceFieldGroupKey =
   'notFoundPage' | 'terminalPrompts' | 'bookmarks' | 'emptyStates';
 
 export type TVoiceFieldGroup = {

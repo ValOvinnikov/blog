@@ -166,6 +166,17 @@ const config: NextConfig = {
     },
   },
   transpilePackages: ['@blog/ui'],
+  images: {
+    // Matches the CSP `img-src` allowance above: a public-access Vercel
+    // Blob store's pathname is per-store, not fixed, hence the wildcard
+    // subdomain rather than one pinned hostname.
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.blob.vercel-storage.com',
+      },
+    ],
+  },
   async headers() {
     return [
       {

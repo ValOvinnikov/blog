@@ -5,7 +5,7 @@ import {
   type TTenantStatus,
 } from '@blog/config/constants';
 
-export type TBadgeTone = 'ok' | 'warn' | 'neutral';
+type TBadgeTone = 'ok' | 'warn' | 'neutral';
 
 // Tone is a design-system concern, not display text — the visible label for
 // each status/plan lives in `i18n/messages/en.json` under `tenantsTable`,
