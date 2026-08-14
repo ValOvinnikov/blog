@@ -57,6 +57,21 @@ describe(`<${SettingRow.name}/>`, () => {
     ).toBeVisible();
   });
 
+  it('stops the content slot from growing when controlGrows is set', () => {
+    setup({
+      controlGrows: true,
+      children: <div>accent hue slider</div>,
+    });
+    const heading = screen.getByRole('heading', { level: 3, name: label });
+    expect(heading.closest('div')).toHaveClass('md:flex-none');
+  });
+
+  it('lets the content slot grow by default', () => {
+    setup({ children: <div>accent hue slider</div> });
+    const heading = screen.getByRole('heading', { level: 3, name: label });
+    expect(heading.closest('div')).not.toHaveClass('md:flex-none');
+  });
+
   it('forwards dataTestId to the root element', () => {
     setup({ dataTestId: 'setting-row' });
     expect(screen.getByTestId('setting-row')).toBeVisible();
