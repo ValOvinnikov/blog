@@ -15,7 +15,7 @@
  *     --locale=en \
  *     --owner-email=owner@example.com \
  *     [--plan=FREE|GROWTH] [--status=ACTIVE|SUSPENDED] \
- *     [--domain=extra.example.com ...]
+ *     [--domain=extra.example.com ...] [--sanity-read-token=<token>]
  *
  * Idempotent: re-running with the same `--slug` reuses the existing tenant
  * row instead of failing, and every write below (domain, membership) is
@@ -39,7 +39,11 @@ import {
 import { getDb } from '@blog/db/client';
 import { createMembership } from '@blog/db/queries/memberships';
 import { addTenantDomain } from '@blog/db/queries/tenant-domains';
-import { createTenant, getTenantBySlug } from '@blog/db/queries/tenants';
+import {
+  createTenant,
+  getTenantBySlug,
+  setTenantSanityToken,
+} from '@blog/db/queries/tenants';
 import { users } from '@blog/db/schema/auth';
 import { eq } from 'drizzle-orm';
 
@@ -54,6 +58,7 @@ type TParsedArgs = {
   plan: TTenantPlan;
   status: TTenantStatus;
   extraDomains: string[];
+  sanityReadToken?: string;
 };
 
 function isTenantPlan(value: string): value is TTenantPlan {
@@ -108,6 +113,7 @@ function parseArgs(argv: string[]): TParsedArgs {
     plan,
     status,
     extraDomains: flags.get('domain') ?? [],
+    sanityReadToken: flags.get('sanity-read-token')?.[0],
   };
 }
 
@@ -132,6 +138,11 @@ async function main(): Promise<void> {
       status: args.status,
     });
     console.warn(`Created tenant "${args.slug}" (${tenant.id}).`);
+  }
+
+  if (args.sanityReadToken) {
+    await setTenantSanityToken(tenant.id, args.sanityReadToken);
+    console.warn(`Sanity read token set for tenant "${args.slug}".`);
   }
 
   for (const domain of [args.primaryDomain, ...args.extraDomains]) {
