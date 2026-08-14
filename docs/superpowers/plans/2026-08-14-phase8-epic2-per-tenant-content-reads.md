@@ -329,6 +329,7 @@ describe(setTenantSanityToken, () => {
   it('stores the token encrypted, not as plaintext', async () => {
     const tenant = await createTenant({
       slug: 'acme',
+      name: 'Acme Inc.',
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',
       sanityDataset: 'production',
@@ -352,6 +353,7 @@ describe(setTenantSanityToken, () => {
     delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
     const tenant = await createTenant({
       slug: 'acme',
+      name: 'Acme Inc.',
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',
       sanityDataset: 'production',
@@ -487,6 +489,7 @@ describe(getTenantSanityCredentials, () => {
   it('resolves the decrypted token alongside project/dataset', async () => {
     const tenant = await createTenant({
       slug: 'acme',
+      name: 'Acme Inc.',
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',
       sanityDataset: 'production',
@@ -508,6 +511,7 @@ describe(getTenantSanityCredentials, () => {
   it('resolves undefined when the tenant has no token set yet', async () => {
     const tenant = await createTenant({
       slug: 'acme',
+      name: 'Acme Inc.',
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',
       sanityDataset: 'production',
@@ -943,6 +947,11 @@ import { createGroqBuilder, makeSafeQueryRunner } from 'groqd';
 
 import { getClient, type TTenantSanityContext } from './client';
 
+// Re-exported so downstream loaders/callers can `import { ...,
+// type TTenantSanityContext } from '@blog/service/sanity/query'` without
+// also reaching into './client' directly.
+export type { TTenantSanityContext };
+
 type TSchemaConfig = {
   schemaTypes: AllSanitySchemaTypes;
   referenceSymbol: typeof internalGroqTypeReferenceTo;
@@ -1372,49 +1381,77 @@ git commit -m "feat(web): scope the bookmarks page's post fetch to the resolved 
 - Produces: no new exports — same `POST` handler, now also purging the
   `t:<projectId>:<tag>` form alongside the legacy unprefixed tag.
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Write the failing tests**
+
+The existing `route.test.ts` mocks `isValidSignature`/`revalidateTag`/
+`revalidatePath` as `isValidSignatureMock`/`revalidateTagMock`/
+`revalidatePathMock` (via `vi.hoisted`), and builds every request through a
+`makeRequest(body, signature)` helper. Extend that helper to accept optional
+extra headers, then add two new test cases using it — do not construct a
+`Request` by hand or invent different mock names.
 
 ```typescript
-// apps/web/src/app/api/revalidate/route.test.ts — add a new test case to the
-// existing suite (read the file first for its exact existing mock setup for
-// `isValidSignature`/`revalidateTag`/`revalidatePath`, then follow the same
-// pattern):
+// apps/web/src/app/api/revalidate/route.test.ts — replace the existing
+// `makeRequest` function with this (adds an optional third parameter; the
+// two-argument call sites in every existing test keep working unchanged):
+function makeRequest(
+  body: unknown,
+  signature?: string,
+  extraHeaders?: Record<string, string>,
+): Request {
+  const headers = new Headers(extraHeaders);
+  if (signature !== undefined) {
+    headers.set('sanity-webhook-signature', signature);
+  }
+  return new Request('https://example.com/api/revalidate', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body),
+  });
+}
+
+// Add these two cases inside the existing `describe('POST /api/revalidate', ...)` block:
 
 it('revalidates both the legacy tag and the tenant-scoped tag when sanity-project-id is present', async () => {
-  mockIsValidSignature.mockResolvedValue(true);
-  const request = new Request('http://localhost/api/revalidate', {
-    method: 'POST',
-    headers: {
-      [SIGNATURE_HEADER_NAME]: 'valid-signature',
-      'sanity-project-id': 'tenant-a-project',
-    },
-    body: JSON.stringify({ _type: 'blog_post', _id: 'post-1' }),
-  });
+  isValidSignatureMock.mockResolvedValue(true);
+  const { POST } = await import('./route');
 
+  const request = makeRequest(
+    { _type: 'blog_post', _id: 'post-1' },
+    't=1,v=valid-signature',
+    { 'sanity-project-id': 'tenant-a-project' },
+  );
   await POST(request);
 
-  expect(mockRevalidateTag).toHaveBeenCalledWith('post', { expire: 0 });
-  expect(mockRevalidateTag).toHaveBeenCalledWith('t:tenant-a-project:post', {
+  expect(revalidateTagMock).toHaveBeenCalledWith('post', { expire: 0 });
+  expect(revalidateTagMock).toHaveBeenCalledWith('t:tenant-a-project:post', {
     expire: 0,
   });
-  expect(mockRevalidateTag).toHaveBeenCalledWith('posts', { expire: 0 });
-  expect(mockRevalidateTag).toHaveBeenCalledWith('t:tenant-a-project:posts', {
+  expect(revalidateTagMock).toHaveBeenCalledWith('posts', { expire: 0 });
+  expect(revalidateTagMock).toHaveBeenCalledWith('t:tenant-a-project:posts', {
     expire: 0,
   });
+  expect(revalidateTagMock).toHaveBeenCalledWith('homePage', { expire: 0 });
+  expect(revalidateTagMock).toHaveBeenCalledWith(
+    't:tenant-a-project:homePage',
+    { expire: 0 },
+  );
+  expect(revalidateTagMock).toHaveBeenCalledTimes(6);
 });
 
-it('revalidates only the legacy tag when sanity-project-id is absent', async () => {
-  mockIsValidSignature.mockResolvedValue(true);
-  const request = new Request('http://localhost/api/revalidate', {
-    method: 'POST',
-    headers: { [SIGNATURE_HEADER_NAME]: 'valid-signature' },
-    body: JSON.stringify({ _type: 'blog_post', _id: 'post-1' }),
-  });
+it('revalidates only the legacy tags when sanity-project-id is absent', async () => {
+  isValidSignatureMock.mockResolvedValue(true);
+  const { POST } = await import('./route');
 
+  const request = makeRequest(
+    { _type: 'blog_post', _id: 'post-1' },
+    't=1,v=valid-signature',
+  );
   await POST(request);
 
-  expect(mockRevalidateTag).toHaveBeenCalledWith('post', { expire: 0 });
-  expect(mockRevalidateTag).not.toHaveBeenCalledWith(
+  expect(revalidateTagMock).toHaveBeenCalledWith('post', { expire: 0 });
+  expect(revalidateTagMock).toHaveBeenCalledTimes(3);
+  expect(revalidateTagMock).not.toHaveBeenCalledWith(
     expect.stringMatching(/^t:/),
     expect.anything(),
   );

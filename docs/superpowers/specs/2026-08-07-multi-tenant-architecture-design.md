@@ -70,7 +70,7 @@ Recap of the inherited, settled decisions (do not relitigate here):
 ```
                     ┌─────────────────────────────────────────┐
   tenant domains →  │  Next.js middleware: host → tenant       │
-  (custom + *.plat) │  lookup in `tenants` registry (Neon)     │
+  (custom only)     │  lookup in `tenants` registry (Neon)     │
                     │  → { tenantId, sanityProjectId, dataset } │
                     └───────────────┬──────────────────────────┘
                                     │ request-scoped tenant context
@@ -82,13 +82,14 @@ Recap of the inherited, settled decisions (do not relitigate here):
    scoped ISR tags           tenants/memberships        theme content)
 ```
 
-### 1. Tenant registry & resolution ⚠
+### 1. Tenant registry & resolution — shipped
 
 A `tenants` table in Neon is the source of truth: `id`, `slug`, `primaryDomain`,
 `sanityProjectId`, `sanityDataset`, `locale` (the tenant's single language — see
 below), `plan` (`FREE`/`GROWTH`), `status` (`ACTIVE`/`SUSPENDED`), timestamps. A
-`tenant_domains` table (one-to-many) holds custom domains + the platform
-subdomain (`<slug>.platform.tld`).
+`tenant_domains` table (one-to-many) holds every custom domain a tenant
+answers to (resolved 2026-08-14: custom domains only, see §Open decision
+5 — no platform subdomain scheme).
 
 **i18n posture — one language per tenant (decided 2026-08-10, see the
 configurability doc's D10).** Each tenant is **monolingual**; its `locale`
@@ -106,7 +107,7 @@ the tenant (cached — the registry is small and changes rarely), and attach the
 resolved `tenantId` + Sanity coordinates to the request (header or a
 request-scoped context read by RSCs). Unknown host → platform marketing page or 404. This is the _only_ new hot-path lookup, and it is cacheable.
 
-### 2. Content reads — per-tenant Sanity client ⚠
+### 2. Content reads — per-tenant Sanity client — in progress (epic #1543)
 
 `@blog/service` moves from a module-level client bound to
 `NEXT_PUBLIC_SANITY_PROJECT_ID` to a **client factory keyed by `projectId`**
@@ -191,8 +192,9 @@ Keep the current model: a static `sanity build` export served from **Vercel**,
   must be computed **per host to expose only that tenant's workspace** — more
   moving parts, but removes the deployment fan-out.
 
-**Recommendation ⚠:** start with **(a)** while tenant count is small (simplest,
-provably isolated); move to **(b)** if per-tenant Studio deployments become the
+**Resolved 2026-08-14:** start with **(a)** while tenant count is small
+(simplest, provably isolated); move to **(b)** if per-tenant Studio
+deployments become the
 bottleneck. Either way it is **Vercel, consistent with §13 — no `sanity
 deploy`.**
 
@@ -231,8 +233,8 @@ An admin/automation flow, not a hot path:
    Studio deployment (§5 shape (b)). No `sanity deploy`.
 4. **Insert registry rows** — `tenants` (+ `sanityProjectId`), the owner's
    `memberships` row, and `tenant_domains`.
-5. **Map the domain** in Vercel (custom domain) or assign the platform
-   subdomain.
+5. **Map the domain** in Vercel — custom domain only (resolved 2026-08-14,
+   §Open decision 5).
 6. **No Neon migration** — the shared DB is already migrated; a new tenant is
    rows, not schema. (This asymmetry is a key advantage — see below.)
 
@@ -263,10 +265,10 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
   10k documents or the editor cap can deactivate a tenant's project. The
   registry's `plan` field + a usage check must move a tenant to **Growth
   before** it approaches a limit, not after.
-- **Verify the editor allowance.** Sources conflict (~20 seats vs. ~2 non-admin
-  editors / 2 roles). **Action: confirm the exact current free-tier editor
-  number on `sanity.io/pricing` before onboarding real tenants** — it sets how
-  soon each tenant starts paying.
+- **Editor allowance — resolved 2026-08-14, see §Open decision 6.** Free
+  plan: 20 total seats, Administrator/Viewer roles only, no scoped Editor
+  role — a free-tier tenant's editors need Growth ($15/seat/month) for a
+  real non-admin Editor role.
 - **The gray area is scale-gated.** Fine at tens; confirm with Sanity before
   hundreds. This doc's whole design targets the modest-count regime; the
   explicit escape hatch at scale is **Payload** (self-hosted, one instance,
@@ -275,8 +277,8 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
 ## Layer-contract impact
 
 - **`@blog/config`** — new UPPERCASE consts (`TENANT_ROLE`, `TENANT_PLAN`,
-  `TENANT_STATUS`); possibly tenant-aware `routes` helpers if URLs embed a
-  tenant slug (only for the platform-subdomain scheme).
+  `TENANT_STATUS`). No tenant-aware `routes` helper changes — custom domains
+  only (resolved 2026-08-14) means no tenant slug is ever embedded in a URL.
 - **`@blog/service`** — the big one: per-tenant Sanity client factory; tenant
   context threaded through every fetcher; tenant-scoped ISR tags. Stays
   Sanity-only, no React.
@@ -295,8 +297,9 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
 
 - **Content:** strong — separate Sanity projects, no shared dataset.
 - **Engagement:** logical — shared DB, enforced by the `forTenant` accessor and
-  (proposed) Postgres RLS as a backstop. Every write records `tenantId` from the
-  resolved context, never from client input.
+  Postgres RLS as a confirmed backstop (resolved 2026-08-14, §Open decision
+  4). Every write records `tenantId` from the resolved context, never from
+  client input.
 - **Cross-tenant leakage risks to test explicitly:** cache tags (a mis-scoped
   tag serving A's content to B), the revalidation webhook (project→tenant
   mapping), and any admin/cross-tenant view. Each needs a targeted test.
