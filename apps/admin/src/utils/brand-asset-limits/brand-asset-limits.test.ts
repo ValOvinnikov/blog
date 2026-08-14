@@ -11,11 +11,17 @@ describe(quickClientImageCheck, () => {
     expect(quickClientImageCheck(file, 'logo')).toBeUndefined();
   });
 
-  it('rejects an unsupported MIME type', () => {
+  it('accepts an SVG within the logo size limit', () => {
     const file = makeFile('image/svg+xml', 1024);
 
+    expect(quickClientImageCheck(file, 'logo')).toBeUndefined();
+  });
+
+  it('rejects an unsupported MIME type', () => {
+    const file = makeFile('image/gif', 1024);
+
     expect(quickClientImageCheck(file, 'logo')).toBe(
-      'Choose a PNG, JPEG, or WebP image.',
+      'Choose a PNG, JPEG, WebP, or SVG image.',
     );
   });
 

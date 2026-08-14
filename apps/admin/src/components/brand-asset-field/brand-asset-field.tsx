@@ -124,6 +124,10 @@ export function BrandAssetField({
               fill={true}
               sizes="48px"
               className={thumbImage()}
+              // A vector source has no raster grid for the optimizer to
+              // resample — and skipping it avoids needing
+              // `images.dangerouslyAllowSVG` in next.config.ts at all.
+              unoptimized={currentUrl.endsWith('.svg')}
             />
           ) : (
             <span aria-hidden="true">—</span>
