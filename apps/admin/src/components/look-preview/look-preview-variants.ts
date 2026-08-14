@@ -9,7 +9,12 @@ export const lookPreviewVariants = tv({
     ],
     cardHeadText: ['min-w-0'],
     cardBody: ['flex flex-col gap-4 p-4'],
-    previewBox: ['rounded-lg border border-border p-5'],
+    previewBox: ['rounded-lg border border-border bg-primary p-5'],
+    // No base classes — carries only the conditional `dark` class below, for
+    // WindowChrome (an external component whose own surface/border/text
+    // classes already read `--surface`/`--border`/`--text`) so re-theming the
+    // sample content only needs toggling this class, not restyling it.
+    previewSurface: [],
     brandRow: ['flex items-center gap-2'],
     brandName: ['text-base font-semibold text-text'],
     sampleHeading: ['text-xl font-semibold text-text'],
@@ -31,5 +36,14 @@ export const lookPreviewVariants = tv({
       'mt-3 flex min-h-40 items-center justify-center rounded-md border border-dashed border-border p-4',
     ],
     framePlaceholder: ['text-center text-xs text-text-subtle'],
+  },
+  variants: {
+    isDark: {
+      true: {
+        previewBox: ['dark'],
+        previewSurface: ['dark'],
+      },
+      false: {},
+    },
   },
 });

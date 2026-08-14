@@ -14,9 +14,6 @@ export const lookFormVariants = tv({
     ],
     cardHeadDesc: ['text-sm text-text-subtle'],
     cardBody: ['flex flex-col gap-5 p-4'],
-    optionalTag: [
-      'ml-2 rounded-full bg-secondary px-2 py-0.5 text-xs font-normal text-text-subtle',
-    ],
     disclosure: ['group rounded-lg border border-border bg-surface shadow-sm'],
     summary: [
       'flex cursor-pointer list-none items-center gap-2 p-4 text-sm font-semibold text-text',

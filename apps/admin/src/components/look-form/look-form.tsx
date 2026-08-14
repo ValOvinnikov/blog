@@ -19,6 +19,7 @@ import {
   ICONS,
   PRESET_REGISTRY,
   RADIUS_SCALE,
+  Size,
   type TDensity,
   type TPresetId,
   type TRadiusScale,
@@ -67,18 +68,44 @@ function applyPresetDefaults(
   };
 }
 
+function valuesEqual(a: TLookFormValues, b: TLookFormValues): boolean {
+  return (
+    a.preset === b.preset &&
+    a.accentHue === b.accentHue &&
+    a.logoHue === b.logoHue &&
+    a.headingFont === b.headingFont &&
+    a.bodyFont === b.bodyFont &&
+    a.radiusScale === b.radiusScale &&
+    a.density === b.density &&
+    a.chromeOn === b.chromeOn &&
+    a.logoAssetUrl === b.logoAssetUrl &&
+    a.faviconAssetUrl === b.faviconAssetUrl
+  );
+}
+
 export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
   const [values, setValues] = useState<TLookFormValues>(initialValues);
+  // The last known-persisted state: `handleSave`'s own fields on a
+  // successful save, plus the two brand-asset URLs the instant their own
+  // (independently persisted) upload/remove action succeeds — everything
+  // `isDirty` compares `values` against.
+  const [savedValues, setSavedValues] =
+    useState<TLookFormValues>(initialValues);
   const [isPending, startTransition] = useTransition();
   const [saveResult, setSaveResult] = useState<'idle' | 'success' | 'error'>(
     'idle',
   );
+
+  const isDirty = !valuesEqual(values, savedValues);
 
   function updateField<K extends keyof TLookFormValues>(
     key: K,
     value: TLookFormValues[K],
   ) {
     setValues((prev) => ({ ...prev, [key]: value }));
+    if (key === 'logoAssetUrl' || key === 'faviconAssetUrl') {
+      setSavedValues((prev) => ({ ...prev, [key]: value }));
+    }
     setSaveResult('idle');
   }
 
@@ -104,6 +131,7 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
         density: values.density,
       });
       setSaveResult(result.ok ? 'success' : 'error');
+      if (result.ok) setSavedValues(values);
     });
   }
 
@@ -125,7 +153,6 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
   const radiusScaleLabel = t('radiusScaleLabel');
   const densityLabel = t('densityLabel');
   const terminalChromeLabel = t('terminalChromeLabel');
-  const optionalTag = t('optionalTag');
 
   const {
     root,
@@ -138,7 +165,6 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
     cardHead,
     cardHeadDesc,
     cardBody,
-    optionalTag: optionalTagClass,
     disclosure,
     summary,
     summaryIcon,
@@ -161,14 +187,25 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
     <div className={root()}>
       <div className={pageHead()}>
         <div className={pageHeadText()}>
-          <Heading level={1}>{t('heading')}</Heading>
+          <Heading level={1} size={Size.MD}>
+            {t('heading')}
+          </Heading>
           <Text variant="muted">{t('subtitle')}</Text>
         </div>
         <div className={actions()}>
-          <Button type="button" variant="ghost" onClick={handleReset}>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={handleReset}
+            disabled={!isDirty}
+          >
             {t('resetButton')}
           </Button>
-          <Button type="button" onClick={handleSave} disabled={isPending}>
+          <Button
+            type="button"
+            onClick={handleSave}
+            disabled={isPending || !isDirty}
+          >
             {isPending ? t('savingButton') : t('saveButton')}
           </Button>
         </div>
@@ -185,7 +222,9 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
         <div className={stack()}>
           <section className={card()}>
             <header className={cardHead()}>
-              <Heading level={2}>{t('basicHeading')}</Heading>
+              <Heading level={2} size={Size.XS}>
+                {t('basicHeading')}
+              </Heading>
               <span className={cardHeadDesc()}>{t('basicDescription')}</span>
             </header>
             <div className={cardBody()}>
@@ -220,12 +259,7 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
               </SettingRow>
 
               <SettingRow
-                label={
-                  <>
-                    {t('logoHueLabel')}
-                    <span className={optionalTagClass()}>{optionalTag}</span>
-                  </>
-                }
+                label={t('logoHueLabel')}
                 description={t('logoHueDescription')}
               >
                 <LogoHueField
@@ -270,7 +304,6 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
                 aria-hidden="true"
               />
               {t('advancedSummary')}
-              <span className={optionalTagClass()}>{optionalTag}</span>
             </summary>
             <div className={disclosureBody()}>
               <SettingRow
