@@ -141,6 +141,9 @@ importers:
       '@blog/vitest-config':
         specifier: workspace:*
         version: link:../../configs/vitest
+      '@svgr/webpack':
+        specifier: ^8.1.0
+        version: 8.1.0(supports-color@8.1.1)(typescript@6.0.3)
       '@tailwindcss/postcss':
         specifier: ^4.3.3
         version: 4.3.3
