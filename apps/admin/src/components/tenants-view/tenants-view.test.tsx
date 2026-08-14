@@ -12,6 +12,7 @@ const tenant: TTenant = {
   primaryDomain: 'acme.example.com',
   sanityProjectId: 'proj-1',
   sanityDataset: 'production',
+  sanityReadTokenEncrypted: null,
   locale: 'en',
   plan: 'FREE',
   status: 'ACTIVE',
