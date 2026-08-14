@@ -2,15 +2,24 @@ import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
 
 import { saveVoiceOverridesAction } from './save-voice-overrides-action';
 
-const { requireTenantMembershipMock, getSiteConfigMock, upsertSiteConfigMock } =
-  vi.hoisted(() => ({
-    requireTenantMembershipMock: vi.fn(),
-    getSiteConfigMock: vi.fn(),
-    upsertSiteConfigMock: vi.fn(),
-  }));
+const {
+  requireTenantMembershipMock,
+  getSiteConfigMock,
+  upsertSiteConfigMock,
+  revalidateSiteConfigMock,
+} = vi.hoisted(() => ({
+  requireTenantMembershipMock: vi.fn(),
+  getSiteConfigMock: vi.fn(),
+  upsertSiteConfigMock: vi.fn(),
+  revalidateSiteConfigMock: vi.fn(),
+}));
 
 vi.mock('@admin/server/auth/require-tenant-membership', () => ({
   requireTenantMembership: requireTenantMembershipMock,
+}));
+
+vi.mock('@admin/server/site-config/revalidate-site-config', () => ({
+  revalidateSiteConfig: revalidateSiteConfigMock,
 }));
 
 vi.mock('@blog/db', () => ({
@@ -52,6 +61,8 @@ describe(saveVoiceOverridesAction, () => {
     requireTenantMembershipMock.mockReset();
     getSiteConfigMock.mockReset();
     upsertSiteConfigMock.mockReset();
+    revalidateSiteConfigMock.mockReset();
+    revalidateSiteConfigMock.mockResolvedValue(undefined);
     requireTenantMembershipMock.mockResolvedValue({
       tenant,
       membership: { role: 'OWNER' },
@@ -131,6 +142,7 @@ describe(saveVoiceOverridesAction, () => {
     const result = await saveVoiceOverridesAction('acme', overrides);
 
     expect(result).toEqual({ ok: false });
+    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('returns ok:true on a successful save', async () => {
@@ -140,5 +152,14 @@ describe(saveVoiceOverridesAction, () => {
     const result = await saveVoiceOverridesAction('acme', overrides);
 
     expect(result).toEqual({ ok: true });
+  });
+
+  it('calls the site-config revalidation webhook after a successful save', async () => {
+    getSiteConfigMock.mockResolvedValue(undefined);
+    upsertSiteConfigMock.mockResolvedValue({});
+
+    await saveVoiceOverridesAction('acme', overrides);
+
+    expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
   });
 });

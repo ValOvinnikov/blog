@@ -3,6 +3,8 @@ export {};
 const ENV_KEYS = [
   'RESEND_API_KEY',
   'BLOB_READ_WRITE_TOKEN',
+  'WEB_APP_URL',
+  'SITE_CONFIG_REVALIDATE_SECRET',
   'SKIP_ENV_VALIDATION',
 ] as const;
 
@@ -102,6 +104,50 @@ describe('env', () => {
   it('never throws at import time when BLOB_READ_WRITE_TOKEN is absent', async () => {
     delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['BLOB_READ_WRITE_TOKEN'];
+
+    await expect(importEnvOnServer()).resolves.toBeDefined();
+  });
+
+  it('parses a valid WEB_APP_URL and exposes it typed', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    process.env['WEB_APP_URL'] = 'https://example.com';
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.WEB_APP_URL).toBe('https://example.com');
+  });
+
+  it('leaves WEB_APP_URL undefined when absent (revalidation calls are skipped)', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    delete process.env['WEB_APP_URL'];
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.WEB_APP_URL).toBeUndefined();
+  });
+
+  it('parses a valid SITE_CONFIG_REVALIDATE_SECRET and exposes it typed', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    process.env['SITE_CONFIG_REVALIDATE_SECRET'] = 'shared-secret';
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.SITE_CONFIG_REVALIDATE_SECRET).toBe('shared-secret');
+  });
+
+  it('leaves SITE_CONFIG_REVALIDATE_SECRET undefined when absent (revalidation calls are skipped)', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    delete process.env['SITE_CONFIG_REVALIDATE_SECRET'];
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.SITE_CONFIG_REVALIDATE_SECRET).toBeUndefined();
+  });
+
+  it('never throws at import time when WEB_APP_URL/SITE_CONFIG_REVALIDATE_SECRET are absent', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    delete process.env['WEB_APP_URL'];
+    delete process.env['SITE_CONFIG_REVALIDATE_SECRET'];
 
     await expect(importEnvOnServer()).resolves.toBeDefined();
   });

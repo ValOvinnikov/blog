@@ -2,15 +2,22 @@ import { DENSITY, FONT_CHOICE, PRESET_ID, RADIUS_SCALE } from '@blog/config';
 
 import { updateLookAction, type TUpdateLookInput } from './update-look-action';
 
-const { requireTenantMembershipMock, upsertSiteConfigMock } = vi.hoisted(
-  () => ({
-    requireTenantMembershipMock: vi.fn(),
-    upsertSiteConfigMock: vi.fn(),
-  }),
-);
+const {
+  requireTenantMembershipMock,
+  upsertSiteConfigMock,
+  revalidateSiteConfigMock,
+} = vi.hoisted(() => ({
+  requireTenantMembershipMock: vi.fn(),
+  upsertSiteConfigMock: vi.fn(),
+  revalidateSiteConfigMock: vi.fn(),
+}));
 
 vi.mock('@admin/server/auth/require-tenant-membership', () => ({
   requireTenantMembership: requireTenantMembershipMock,
+}));
+
+vi.mock('@admin/server/site-config/revalidate-site-config', () => ({
+  revalidateSiteConfig: revalidateSiteConfigMock,
 }));
 
 vi.mock('@blog/db', () => ({
@@ -31,6 +38,8 @@ describe(updateLookAction, () => {
   beforeEach(() => {
     requireTenantMembershipMock.mockReset();
     upsertSiteConfigMock.mockReset();
+    revalidateSiteConfigMock.mockReset();
+    revalidateSiteConfigMock.mockResolvedValue(undefined);
   });
 
   it('re-resolves the tenant from the session against the routed slug before writing anything', async () => {
@@ -45,6 +54,18 @@ describe(updateLookAction, () => {
     expect(requireTenantMembershipMock).toHaveBeenCalledWith('acme');
     expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', VALID_INPUT);
     expect(result).toEqual({ ok: true });
+  });
+
+  it('calls the site-config revalidation webhook after a successful save', async () => {
+    requireTenantMembershipMock.mockResolvedValue({
+      tenant: { id: 'tenant-1', slug: 'acme' },
+      membership: { role: 'OWNER' },
+    });
+    upsertSiteConfigMock.mockResolvedValue({});
+
+    await updateLookAction('acme', VALID_INPUT);
+
+    expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
   });
 
   it('rejects a payload with an out-of-range hue without ever calling the tenant gate', async () => {
@@ -67,6 +88,7 @@ describe(updateLookAction, () => {
     const result = await updateLookAction('acme', VALID_INPUT);
 
     expect(result).toEqual({ ok: false });
+    expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('propagates the unauthenticated/unauthorized redirect the tenant gate throws', async () => {
