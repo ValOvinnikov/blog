@@ -16,9 +16,12 @@ const scriptSrc = isDev
 // No Sanity CDN images, no OAuth avatar rendering, and no external font or
 // script origins load here today — every source below is 'self' (or
 // 'none') for that reason, tighter than apps/web's equivalent policy.
+// `img-src` additionally allows the Vercel Blob public storage host the Look
+// tab's logo/favicon thumbnails load from — a public-access Blob store's
+// pathname is per-store, not fixed, hence the wildcard subdomain.
 const contentSecurityPolicy = [
   "default-src 'self'",
-  "img-src 'self'",
+  "img-src 'self' https://*.blob.vercel-storage.com",
   scriptSrc,
   // 'unsafe-inline' is required because Next.js and Tailwind inject inline
   // <style> tags at runtime; there is no static, hashable set of style
@@ -68,6 +71,18 @@ const securityHeaders = [
 ];
 
 const config: NextConfig = {
+  // Next's own Server Action body-size cap defaults to 1 MB — well under the
+  // Look tab's declared logo limit (`MAX_UPLOAD_BYTES.logo`, 4 MB in
+  // `@admin/utils/brand-asset-limits`). Without raising it here, any upload
+  // over ~1 MB never reaches `validateBrandAssetUpload` at all: Next's body
+  // parser 413s first. Set with headroom above the 4 MB logo ceiling (not
+  // an exact match) to absorb multipart/FormData framing overhead — keep
+  // this above `MAX_UPLOAD_BYTES.logo` if that constant ever grows.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '6mb',
+    },
+  },
   turbopack: {
     rules: {
       // @blog/ui's icon assets (packages/ui/src/assets/icons) ship from

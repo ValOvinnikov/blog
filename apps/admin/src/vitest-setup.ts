@@ -11,6 +11,11 @@ import '@testing-library/jest-dom/vitest';
 // `refresh: vi.fn()` on every render, matching apps/web's own setup — a test
 // that asserts a call to `refresh` overrides it with `vi.mocked(useRouter)
 // .mockReturnValue(...)`.
+// `unstable_rethrow` is a no-op stub: real Next.js only re-throws an error
+// shaped like its own internal redirect/notFound digest, and returns
+// normally for anything else — a plain caught `Error` in a test (e.g. a
+// component's own error-boundary-style try/catch) should fall through the
+// same way, not be swallowed or crash the test.
 vi.mock('next/navigation', () => ({
   redirect: vi.fn(() => {
     throw new Error('NEXT_REDIRECT');
@@ -18,6 +23,7 @@ vi.mock('next/navigation', () => ({
   notFound: vi.fn(() => {
     throw new Error('NEXT_NOT_FOUND');
   }),
+  unstable_rethrow: vi.fn(),
   usePathname: vi.fn(() => '/'),
   useRouter: vi.fn(() => ({
     push: vi.fn(),

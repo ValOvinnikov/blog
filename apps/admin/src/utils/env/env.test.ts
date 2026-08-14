@@ -1,6 +1,10 @@
 export {};
 
-const ENV_KEYS = ['RESEND_API_KEY', 'SKIP_ENV_VALIDATION'] as const;
+const ENV_KEYS = [
+  'RESEND_API_KEY',
+  'BLOB_READ_WRITE_TOKEN',
+  'SKIP_ENV_VALIDATION',
+] as const;
 
 const originalEnv = Object.fromEntries(
   ENV_KEYS.map((key) => [key, process.env[key]]),
@@ -73,6 +77,31 @@ describe('env', () => {
   it('skips validation entirely when SKIP_ENV_VALIDATION is set', async () => {
     process.env['SKIP_ENV_VALIDATION'] = 'true';
     delete process.env['RESEND_API_KEY'];
+
+    await expect(importEnvOnServer()).resolves.toBeDefined();
+  });
+
+  it('parses a valid BLOB_READ_WRITE_TOKEN and exposes it typed', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    process.env['BLOB_READ_WRITE_TOKEN'] = 'vercel_blob_rw_store_token';
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.BLOB_READ_WRITE_TOKEN).toBe('vercel_blob_rw_store_token');
+  });
+
+  it('leaves BLOB_READ_WRITE_TOKEN undefined when absent (uploads stay unavailable)', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    delete process.env['BLOB_READ_WRITE_TOKEN'];
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.BLOB_READ_WRITE_TOKEN).toBeUndefined();
+  });
+
+  it('never throws at import time when BLOB_READ_WRITE_TOKEN is absent', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    delete process.env['BLOB_READ_WRITE_TOKEN'];
 
     await expect(importEnvOnServer()).resolves.toBeDefined();
   });

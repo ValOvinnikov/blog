@@ -19,6 +19,8 @@ export type TLookFormValues = {
   density: TDensity;
   /** Preview-only: `site_config` has no persisted column for this field yet. */
   chromeOn: boolean;
+  logoAssetUrl: string | undefined;
+  faviconAssetUrl: string | undefined;
 };
 
 /**
@@ -38,6 +40,8 @@ export function defaultLookFormValues(): TLookFormValues {
     radiusScale: consoleTokens.radiusScale,
     density: consoleTokens.density,
     chromeOn: consoleTokens.chromeOn,
+    logoAssetUrl: undefined,
+    faviconAssetUrl: undefined,
   };
 }
 
@@ -58,5 +62,7 @@ export function toLookFormValues(
     radiusScale: siteConfig.radiusScale,
     density: siteConfig.density,
     chromeOn: PRESET_REGISTRY[siteConfig.preset].themeTokens.chromeOn,
+    logoAssetUrl: siteConfig.logoAssetUrl,
+    faviconAssetUrl: siteConfig.faviconAssetUrl,
   };
 }

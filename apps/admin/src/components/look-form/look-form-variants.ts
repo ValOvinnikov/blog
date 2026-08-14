@@ -43,6 +43,6 @@ export const lookFormVariants = tv({
       'data-[checked]:translate-x-[22px]',
     ],
     note: ['text-xs text-text-subtle'],
-    comingSoon: ['text-sm text-text-subtle'],
+    uploads: ['grid grid-cols-1 gap-3 sm:grid-cols-2'],
   },
 });
