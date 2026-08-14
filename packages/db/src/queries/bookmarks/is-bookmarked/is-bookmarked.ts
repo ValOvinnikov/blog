@@ -5,6 +5,7 @@ import { and, eq } from 'drizzle-orm';
 // Whether a user has already bookmarked a post — resolves `BookmarkToggle`'s
 // initial filled/outline icon state on first render.
 export async function isBookmarked(
+  tenantId: string,
   userId: string,
   postId: string,
 ): Promise<boolean> {
@@ -13,7 +14,13 @@ export async function isBookmarked(
   const [existing] = await db
     .select({ userId: bookmarks.userId })
     .from(bookmarks)
-    .where(and(eq(bookmarks.userId, userId), eq(bookmarks.postId, postId)));
+    .where(
+      and(
+        eq(bookmarks.tenantId, tenantId),
+        eq(bookmarks.userId, userId),
+        eq(bookmarks.postId, postId),
+      ),
+    );
 
   return existing !== undefined;
 }

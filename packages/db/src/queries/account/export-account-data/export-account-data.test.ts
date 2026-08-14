@@ -1,3 +1,4 @@
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
@@ -13,6 +14,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
+let tenantId: string;
 
 // One in-memory Postgres instance for the whole file (spinning up pglite's
 // WASM engine is the slow part — seconds, not milliseconds) — `afterEach`
@@ -21,13 +23,28 @@ beforeAll(async () => {
   db = await createTestDb();
 }, 30_000);
 
-beforeEach(() => {
+beforeEach(async () => {
   getDbMock.mockReturnValue(db);
+  const [tenant] = await db
+    .insert(schema.tenants)
+    .values({
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+      sanityProjectId: 'abc123',
+      sanityDataset: 'production',
+      locale: 'en',
+      plan: TENANT_PLAN.FREE,
+      status: TENANT_STATUS.ACTIVE,
+    })
+    .returning();
+  if (!tenant) throw new Error('failed to seed a tenant row');
+  tenantId = tenant.id;
 });
 
 afterEach(async () => {
   await db.delete(schema.bookmarks);
   await db.delete(schema.users);
+  await db.delete(schema.tenants);
 });
 
 describe(exportAccountData, () => {
@@ -44,11 +61,13 @@ describe(exportAccountData, () => {
     });
     await db.insert(schema.bookmarks).values([
       {
+        tenantId,
         userId: 'user-1',
         postId: 'post-older',
         createdAt: new Date(2026, 0, 1),
       },
       {
+        tenantId,
         userId: 'user-1',
         postId: 'post-newer',
         createdAt: new Date(2026, 0, 2),
@@ -97,8 +116,8 @@ describe(exportAccountData, () => {
   it("does not include another user's bookmarks", async () => {
     await db.insert(schema.users).values([{ id: 'user-1' }, { id: 'user-2' }]);
     await db.insert(schema.bookmarks).values([
-      { userId: 'user-1', postId: 'post-1' },
-      { userId: 'user-2', postId: 'post-2' },
+      { tenantId, userId: 'user-1', postId: 'post-1' },
+      { tenantId, userId: 'user-2', postId: 'post-2' },
     ]);
 
     const result = await exportAccountData('user-1');

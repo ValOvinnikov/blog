@@ -1,3 +1,4 @@
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import { eq } from 'drizzle-orm';
@@ -14,6 +15,7 @@ const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
+let tenantId: string;
 
 // One in-memory Postgres instance for the whole file (spinning up pglite's
 // WASM engine is the slow part — seconds, not milliseconds) — `afterEach`
@@ -22,8 +24,22 @@ beforeAll(async () => {
   db = await createTestDb();
 }, 30_000);
 
-beforeEach(() => {
+beforeEach(async () => {
   getDbMock.mockReturnValue(db);
+  const [tenant] = await db
+    .insert(schema.tenants)
+    .values({
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+      sanityProjectId: 'abc123',
+      sanityDataset: 'production',
+      locale: 'en',
+      plan: TENANT_PLAN.FREE,
+      status: TENANT_STATUS.ACTIVE,
+    })
+    .returning();
+  if (!tenant) throw new Error('failed to seed a tenant row');
+  tenantId = tenant.id;
 });
 
 afterEach(async () => {
@@ -31,6 +47,7 @@ afterEach(async () => {
   await db.delete(schema.sessions);
   await db.delete(schema.accounts);
   await db.delete(schema.users);
+  await db.delete(schema.tenants);
 });
 
 // Seeds a full "signed-in user" fixture — a users row plus one row in every
@@ -49,7 +66,9 @@ async function seedUserWithRelatedRows(userId: string): Promise<void> {
     userId,
     expires: new Date(2030, 0, 1),
   });
-  await db.insert(schema.bookmarks).values({ userId, postId: 'post-1' });
+  await db
+    .insert(schema.bookmarks)
+    .values({ tenantId, userId, postId: 'post-1' });
 }
 
 describe(deleteAccount, () => {

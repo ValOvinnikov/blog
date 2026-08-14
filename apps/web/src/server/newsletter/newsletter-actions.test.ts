@@ -2,10 +2,12 @@ const {
   createPendingSubscriberMock,
   sendEmailMock,
   markNewsletterSubscribedMock,
+  getSoleTenantIdMock,
 } = vi.hoisted(() => ({
   createPendingSubscriberMock: vi.fn(),
   sendEmailMock: vi.fn(),
   markNewsletterSubscribedMock: vi.fn(),
+  getSoleTenantIdMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', () => ({
@@ -21,6 +23,12 @@ vi.mock('@web/server/email/send-email', () => ({
 vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
   markNewsletterSubscribed: markNewsletterSubscribedMock,
 }));
+
+vi.mock('@web/server/site-config/get-site-config', () => ({
+  getSoleTenantId: getSoleTenantIdMock,
+}));
+
+const TENANT_ID = 'tenant-1';
 
 // The real `@t3-oss/env-nextjs` module throws when a server var is read
 // under jsdom — mock it the same way `send-email.test.ts` does.
@@ -45,6 +53,8 @@ describe('subscribeToNewsletterAction', () => {
     createPendingSubscriberMock.mockReset();
     sendEmailMock.mockReset();
     markNewsletterSubscribedMock.mockReset();
+    getSoleTenantIdMock.mockReset();
+    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
   });
 
   it('returns "invalid" without touching the db for a malformed email', async () => {
@@ -73,6 +83,7 @@ describe('subscribeToNewsletterAction', () => {
     ).resolves.toEqual({ outcome: 'success' });
 
     expect(createPendingSubscriberMock).toHaveBeenCalledWith(
+      TENANT_ID,
       'reader@example.com',
     );
     expect(sendEmailMock).toHaveBeenCalledWith(
@@ -115,6 +126,19 @@ describe('subscribeToNewsletterAction', () => {
     ).resolves.toEqual({ outcome: 'already-subscribed' });
     expect(sendEmailMock).not.toHaveBeenCalled();
     expect(markNewsletterSubscribedMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns "server-error" without touching the db when no tenant resolves', async () => {
+    getSoleTenantIdMock.mockResolvedValue(undefined);
+    const { subscribeToNewsletterAction } =
+      await import('./newsletter-actions');
+
+    await expect(
+      subscribeToNewsletterAction('reader@example.com'),
+    ).resolves.toEqual({ outcome: 'server-error' });
+    expect(createPendingSubscriberMock).not.toHaveBeenCalled();
+    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
   });
 
   it('returns "server-error" and logs when the db write throws', async () => {

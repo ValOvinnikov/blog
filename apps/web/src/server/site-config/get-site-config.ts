@@ -11,7 +11,7 @@ const SITE_CONFIG_REVALIDATE_SECONDS = 3600;
  * one tenant, so this takes the sole `tenants` row rather than resolving
  * one per request.
  */
-async function getSoleTenantId(): Promise<string | undefined> {
+export async function getSoleTenantId(): Promise<string | undefined> {
   const [tenant] = await queries.tenants.listTenants();
   return tenant?.id;
 }

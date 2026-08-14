@@ -6,6 +6,7 @@ import { WindowChrome } from '@blog/ui/molecules';
 import { BookmarksList, type IBookmarkRow } from '@blog/ui/organisms';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { auth } from '@web/server/auth/auth';
+import { getSoleTenantId } from '@web/server/site-config/get-site-config';
 import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { redirect } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
@@ -42,8 +43,13 @@ export async function BookmarksPage() {
     redirect(routes.home());
   }
 
+  const tenantId = await getSoleTenantId();
+  if (!tenantId) {
+    redirect(routes.home());
+  }
+
   const [bookmarks, t, format] = await Promise.all([
-    queries.bookmarks.listBookmarks(userId),
+    queries.bookmarks.listBookmarks(tenantId, userId),
     getTranslations('bookmarksPage'),
     getFormatter(),
   ]);

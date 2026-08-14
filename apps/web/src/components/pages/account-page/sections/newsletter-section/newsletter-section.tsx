@@ -3,6 +3,7 @@ import { StatusBadge } from '@blog/ui/atoms';
 import { SettingRow, WindowChrome } from '@blog/ui/molecules';
 import { NewsletterSubscriptionControl } from '@web/components/shared/newsletter-subscription-control';
 import { auth } from '@web/server/auth/auth';
+import { getSoleTenantId } from '@web/server/site-config/get-site-config';
 import { toSessionUsername } from '@web/utils/to-session-username';
 import { getTranslations } from 'next-intl/server';
 
@@ -38,7 +39,14 @@ export async function NewsletterSection() {
   if (!session?.user?.id) return null;
 
   const { id: userId, name, email } = session.user;
-  const status = await queries.subscribers.getSubscriptionStatus(userId);
+
+  const tenantId = await getSoleTenantId();
+  if (!tenantId) return null;
+
+  const status = await queries.subscribers.getSubscriptionStatus(
+    tenantId,
+    userId,
+  );
 
   if (status.outcome === 'not-subscribed') return null;
 

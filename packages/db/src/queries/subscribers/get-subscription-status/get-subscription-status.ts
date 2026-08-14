@@ -1,7 +1,7 @@
 import { getDb } from '@blog/db/client';
 import { users } from '@blog/db/schema/auth';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 // The three states the `/account` 6b section (#1155/#1157/#1158) branches
 // its `SettingRow` on. `subscribers` has no `userId` column (it's a
@@ -14,19 +14,22 @@ export type TSubscriptionStatusResult =
   | { outcome: 'pending'; subscriber: TSubscriber }
   | { outcome: 'not-subscribed' };
 
-// Resolves `userId`'s newsletter subscription status via their account
-// email — `active`/`pending` mirror `subscribers.status` directly;
-// `not-subscribed` covers both "no `users` row", "the user has no email
-// on file yet" (e.g. a fresh OAuth sign-in before a provider returns one),
-// and "no `subscribers` row for that email" as the same terminal state, since
-// the `/account` page treats all three identically (skip rendering the 6b
-// section — see #1158).
+// Resolves `userId`'s newsletter subscription status for `tenantId` via
+// their account email — `active`/`pending` mirror `subscribers.status`
+// directly; `not-subscribed` covers "no `users` row", "the user has no
+// email on file yet" (e.g. a fresh OAuth sign-in before a provider returns
+// one), and "no `subscribers` row for that (tenantId, email) pair" as the
+// same terminal state, since the `/account` page treats all three
+// identically (skip rendering the 6b section — see #1158). `tenantId` is
+// required because the same account email can hold a subscription on more
+// than one tenant.
 //
 // `users.email` is compared case-insensitively/trimmed against
 // `subscribers.email` (normalized at write time in create-pending-subscriber)
 // rather than relying on Postgres's case-sensitive `text` equality to happen
 // to line up with whatever casing a sign-in provider returned.
 export async function getSubscriptionStatus(
+  tenantId: string,
   userId: string,
 ): Promise<TSubscriptionStatusResult> {
   const db = getDb();
@@ -43,7 +46,12 @@ export async function getSubscriptionStatus(
   const [subscriber] = await db
     .select()
     .from(subscribers)
-    .where(eq(subscribers.email, user.email.trim().toLowerCase()));
+    .where(
+      and(
+        eq(subscribers.tenantId, tenantId),
+        eq(subscribers.email, user.email.trim().toLowerCase()),
+      ),
+    );
 
   if (!subscriber) {
     return { outcome: 'not-subscribed' };

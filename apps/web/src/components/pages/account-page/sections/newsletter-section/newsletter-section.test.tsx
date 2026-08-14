@@ -2,12 +2,19 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { NewsletterSection } from './newsletter-section';
 
-const { authMock, getSubscriptionStatusMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  getSubscriptionStatusMock: vi.fn(),
-}));
+const { authMock, getSubscriptionStatusMock, getSoleTenantIdMock } = vi.hoisted(
+  () => ({
+    authMock: vi.fn(),
+    getSubscriptionStatusMock: vi.fn(),
+    getSoleTenantIdMock: vi.fn(),
+  }),
+);
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
+
+vi.mock('@web/server/site-config/get-site-config', () => ({
+  getSoleTenantId: getSoleTenantIdMock,
+}));
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -23,6 +30,8 @@ vi.mock('@web/components/shared/newsletter-subscription-control', () => ({
 
 const setup = customRenderAsync(NewsletterSection, {});
 
+const TENANT_ID = 'tenant-1';
+
 const authedSession = {
   user: { id: 'user-1', name: 'Jane Doe', email: 'jane@icloud.com' },
 };
@@ -31,10 +40,22 @@ describe(`<${NewsletterSection.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
     getSubscriptionStatusMock.mockReset();
+    getSoleTenantIdMock.mockReset();
+    getSoleTenantIdMock.mockResolvedValue(TENANT_ID);
   });
 
   it('renders nothing when there is no session', async () => {
     authMock.mockResolvedValue(null);
+
+    const { container } = await setup();
+
+    expect(container).toBeEmptyDOMElement();
+    expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
+  });
+
+  it('renders nothing when no tenant resolves', async () => {
+    authMock.mockResolvedValue(authedSession);
+    getSoleTenantIdMock.mockResolvedValue(undefined);
 
     const { container } = await setup();
 

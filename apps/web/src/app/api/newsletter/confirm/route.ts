@@ -1,5 +1,6 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
+import { getSoleTenantId } from '@web/server/site-config/get-site-config';
 import { escapeXml } from '@web/utils/escape-xml';
 import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { NextResponse } from 'next/server';
@@ -73,7 +74,22 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   try {
-    const result = await queries.subscribers.confirmSubscriber(token);
+    const tenantId = await getSoleTenantId();
+    if (!tenantId) {
+      return new NextResponse(
+        renderConfirmationPage({
+          title: t('errorTitle'),
+          message: t('errorMessage'),
+          returnHomeLabel,
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        },
+      );
+    }
+
+    const result = await queries.subscribers.confirmSubscriber(tenantId, token);
 
     if (result.outcome === 'not-found') {
       return new NextResponse(
