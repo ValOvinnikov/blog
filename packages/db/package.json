@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@blog/config": "workspace:*",
+    "@blog/utils": "workspace:*",
     "@neondatabase/serverless": "^1.1.0",
     "@t3-oss/env-core": "^0.13.11",
     "drizzle-orm": "^0.45.2",

@@ -11,6 +11,11 @@ import { z } from 'zod';
 export const env = createEnv({
   server: {
     DATABASE_URL: z.string().min(1),
+    // Decrypts tenants.sanityReadTokenEncrypted (@blog/utils's
+    // encryptSecret/decryptSecret). A 32-byte key, base64-encoded — generate
+    // with `openssl rand -base64 32`. Optional: absent, the encrypted-token
+    // queries throw rather than silently returning plaintext-adjacent data.
+    TENANT_TOKEN_ENCRYPTION_KEY: z.string().min(1).optional(),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,
