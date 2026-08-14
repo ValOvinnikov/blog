@@ -1,6 +1,7 @@
 import { TenantSwitcher } from '@admin/components/tenant-switcher';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { Heading } from '@blog/ui/atoms/heading';
 import { useTranslations } from 'next-intl';
 
 import { dashboardTenantPickerVariants } from './dashboard-tenant-picker-variants';
@@ -21,7 +22,7 @@ export function DashboardTenantPicker({
   tenants,
 }: TDashboardTenantPickerProps) {
   const t = useTranslations('dashboardTenantPicker');
-  const { root, heading, description } = dashboardTenantPickerVariants();
+  const { root, description } = dashboardTenantPickerVariants();
 
   const [firstTenant] = tenants;
 
@@ -31,7 +32,7 @@ export function DashboardTenantPicker({
 
   return (
     <div className={root()}>
-      <h1 className={heading()}>{t('heading')}</h1>
+      <Heading level={1}>{t('heading')}</Heading>
       <p className={description()}>{t('description')}</p>
       <TenantSwitcher
         tenants={tenants}
