@@ -32,4 +32,8 @@ describe('encryptSecret / decryptSecret', () => {
       'Malformed encrypted secret.',
     );
   });
+
+  it('round-trips an empty-string secret', () => {
+    expect(decryptSecret(encryptSecret('', TEST_KEY), TEST_KEY)).toBe('');
+  });
 });

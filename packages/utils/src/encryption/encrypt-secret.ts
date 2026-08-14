@@ -28,10 +28,15 @@ export function encryptSecret(plaintext: string, keyBase64: string): string {
 /** Inverse of {@link encryptSecret}. Throws on a wrong key or malformed input — GCM's auth tag makes tampering/corruption detectable, not silently wrong. */
 export function decryptSecret(encrypted: string, keyBase64: string): string {
   const key = Buffer.from(keyBase64, 'base64');
-  const [ivB64, authTagB64, ciphertextB64] = encrypted.split('.');
-  if (!ivB64 || !authTagB64 || !ciphertextB64) {
+  const segments = encrypted.split('.');
+  if (segments.length !== 3) {
     throw new Error('Malformed encrypted secret.');
   }
+  const [ivB64, authTagB64, ciphertextB64] = segments as [
+    string,
+    string,
+    string,
+  ];
 
   const decipher = createDecipheriv(
     ALGORITHM,
