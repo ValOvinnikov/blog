@@ -7,6 +7,9 @@ import '@testing-library/jest-dom/vitest';
 // This mock is total: a future test importing another export gets
 // `undefined` and must widen it. `usePathname` defaults to `/` — tests that
 // care about a specific route override it with `vi.mocked(usePathname)
+// .mockReturnValue(...)`. `useRouter`'s default stub returns a brand-new
+// `refresh: vi.fn()` on every render, matching apps/web's own setup — a test
+// that asserts a call to `refresh` overrides it with `vi.mocked(useRouter)
 // .mockReturnValue(...)`.
 vi.mock('next/navigation', () => ({
   redirect: vi.fn(() => {
@@ -16,6 +19,14 @@ vi.mock('next/navigation', () => ({
     throw new Error('NEXT_NOT_FOUND');
   }),
   usePathname: vi.fn(() => '/'),
+  useRouter: vi.fn(() => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+  })),
 }));
 
 // jsdom implements neither the Pointer Events capture methods nor
