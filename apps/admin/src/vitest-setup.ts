@@ -43,3 +43,23 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
   }
   vi.stubGlobal('ResizeObserver', NoopResizeObserver);
 }
+
+// `next/font/google`'s loader functions (`@admin/config/fonts`'s five
+// `FONT_CHOICE` loaders) rely on a Next.js build-time transform that doesn't
+// exist under Vitest, so calling them directly throws. Stubbed globally,
+// since the Look tab's font pickers are evaluated at module load time by
+// anything importing them, not just their own test file.
+vi.mock('next/font/google', () => {
+  const createFontMock = (fontName: string) => () => ({
+    className: `mock-${fontName}-className`,
+    style: { fontFamily: `mock-${fontName}-font-family` },
+  });
+
+  return {
+    Space_Grotesk: createFontMock('space-grotesk'),
+    Newsreader: createFontMock('newsreader'),
+    JetBrains_Mono: createFontMock('jetbrains-mono'),
+    Fraunces: createFontMock('fraunces'),
+    Inter: createFontMock('inter'),
+  };
+});
