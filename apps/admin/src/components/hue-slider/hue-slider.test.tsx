@@ -26,6 +26,26 @@ describe(HueSlider, () => {
     expect(handleChange).toHaveBeenCalledWith(101);
   });
 
+  it('applies the given trackStyle gradient to the track element', () => {
+    render(
+      <HueSlider
+        ariaLabel="Accent hue"
+        value={100}
+        onChange={vi.fn()}
+        trackStyle={{ background: 'linear-gradient(90deg, red, blue)' }}
+      />,
+    );
+
+    // The accessible "slider" role lands on Base UI's native <input>, nested
+    // inside the Thumb; its grandparent is the Track.
+    const thumb = screen.getByRole('slider', { name: 'Accent hue' })
+      .parentElement as HTMLElement;
+    const track = thumb.parentElement;
+    expect(track).toHaveStyle({
+      background: 'linear-gradient(90deg, red, blue)',
+    });
+  });
+
   it('marks the slider disabled when disabled is passed', () => {
     render(
       <HueSlider

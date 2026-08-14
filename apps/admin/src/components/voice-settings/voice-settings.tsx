@@ -8,9 +8,9 @@ import {
   type TVoiceOverrideKey,
   type TVoiceOverrides,
 } from '@admin/utils/voice-fields/voice-fields';
-import { ALERT_TYPE } from '@blog/config';
+import { ALERT_TYPE, ICONS, Size } from '@blog/config';
 import type { TVoicePack } from '@blog/config/constants';
-import { Alert, Button } from '@blog/ui/atoms';
+import { Alert, Button, Heading, Icon } from '@blog/ui/atoms';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState, useTransition } from 'react';
@@ -73,13 +73,11 @@ export function VoiceSettings({
   const {
     root,
     pagehead,
-    title,
     description,
     basicCard,
-    basicTitle,
     advanced,
     advancedSummary,
-    advancedTag,
+    advancedSummaryIcon,
     advancedBody,
     alert,
   } = voiceSettingsVariants();
@@ -101,7 +99,9 @@ export function VoiceSettings({
     <div className={root()}>
       <div className={pagehead()}>
         <div>
-          <h1 className={title()}>{t('heading')}</h1>
+          <Heading level={1} size={Size.MD}>
+            {t('heading')}
+          </Heading>
           <p className={description()}>{t('description')}</p>
         </div>
         <Button
@@ -130,14 +130,20 @@ export function VoiceSettings({
       )}
 
       <div className={basicCard()}>
-        <h2 className={basicTitle()}>{t('basicHeading')}</h2>
+        <Heading level={2} size={Size.XS}>
+          {t('basicHeading')}
+        </Heading>
         <Alert type={ALERT_TYPE.INFO} message={t('basicAlert')} />
       </div>
 
       <details className={advanced()}>
         <summary className={advancedSummary()}>
+          <Icon
+            name={ICONS.CHEVRON_RIGHT}
+            className={advancedSummaryIcon()}
+            aria-hidden="true"
+          />
           {t('advancedSummary')}
-          <span className={advancedTag()}>{t('optionalTag')}</span>
         </summary>
         <div className={advancedBody()}>
           <Alert type={ALERT_TYPE.INFO} message={t('advancedOverrideInfo')} />

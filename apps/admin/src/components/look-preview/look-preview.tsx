@@ -68,6 +68,7 @@ export function LookPreview({
     cardHeadText,
     cardBody,
     previewBox,
+    previewSurface,
     brandRow,
     brandName,
     sampleHeading,
@@ -81,7 +82,7 @@ export function LookPreview({
     deviceUrl,
     frame,
     framePlaceholder,
-  } = lookPreviewVariants();
+  } = lookPreviewVariants({ isDark });
 
   const sample = (
     <>
@@ -121,7 +122,9 @@ export function LookPreview({
       <section className={card()}>
         <header className={cardHead()}>
           <div className={cardHeadText()}>
-            <Heading level={2}>{t('livePreviewHeading')}</Heading>
+            <Heading level={2} size={Size.XS}>
+              {t('livePreviewHeading')}
+            </Heading>
             <Text variant="muted">{t('livePreviewDescription')}</Text>
           </div>
           <SegmentedControl
@@ -133,7 +136,7 @@ export function LookPreview({
         </header>
         <div className={cardBody()} style={tokenStyle}>
           {chromeOn ? (
-            <WindowChrome>
+            <WindowChrome className={previewSurface()}>
               <WindowChrome.Bar>
                 <WindowChrome.Prompt>{t('terminalPrompt')}</WindowChrome.Prompt>
               </WindowChrome.Bar>
@@ -149,7 +152,9 @@ export function LookPreview({
       <section className={card()}>
         <header className={cardHead()}>
           <div className={cardHeadText()}>
-            <Heading level={2}>{t('fullPagePreviewHeading')}</Heading>
+            <Heading level={2} size={Size.XS}>
+              {t('fullPagePreviewHeading')}
+            </Heading>
             <Text variant="muted">{t('fullPagePreviewDescription')}</Text>
           </div>
         </header>

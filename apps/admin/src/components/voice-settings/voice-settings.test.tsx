@@ -65,6 +65,39 @@ describe(VoiceSettings, () => {
     expect(screen.getByText('404 page')).not.toBeVisible();
   });
 
+  it('shows a chevron affordance on the Advanced disclosure toggle', () => {
+    render(
+      <VoiceSettings
+        tenantSlug="acme"
+        voicePack={CONSOLE_VOICE_PACK}
+        initialOverrides={{}}
+        saveAction={vi.fn()}
+      />,
+    );
+
+    const summary = screen.getByText(ADVANCED_SUMMARY).closest('summary');
+    expect(summary?.querySelector('svg')).not.toBeNull();
+  });
+
+  it('expands the Advanced section on click', async () => {
+    const user = userEvent.setup();
+    render(
+      <VoiceSettings
+        tenantSlug="acme"
+        voicePack={CONSOLE_VOICE_PACK}
+        initialOverrides={{}}
+        saveAction={vi.fn()}
+      />,
+    );
+
+    await openAdvanced(user);
+
+    expect(
+      screen.getByText(ADVANCED_SUMMARY).closest('details'),
+    ).toHaveAttribute('open');
+    expect(screen.getByText('404 page')).toBeVisible();
+  });
+
   it('renders all 20 fields across the 4 named groups, with none invented, once expanded', async () => {
     const user = userEvent.setup();
     render(

@@ -116,12 +116,14 @@ describe(LookForm, () => {
       <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
     );
 
+    screen.getByRole('slider', { name: 'Accent hue' }).focus();
+    await user.keyboard('{ArrowRight}');
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() => {
       expect(updateLookActionMock).toHaveBeenCalledWith('acme', {
         preset: PRESET_ID.CONSOLE,
-        accentHue: 250,
+        accentHue: 251,
         logoHue: null,
         headingFont: FONT_CHOICE.SPACE_GROTESK,
         bodyFont: FONT_CHOICE.NEWSREADER,
@@ -137,6 +139,8 @@ describe(LookForm, () => {
       <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
     );
 
+    screen.getByRole('slider', { name: 'Accent hue' }).focus();
+    await user.keyboard('{ArrowRight}');
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(await screen.findByRole('status')).toHaveTextContent(
@@ -151,11 +155,33 @@ describe(LookForm, () => {
       <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
     );
 
+    screen.getByRole('slider', { name: 'Accent hue' }).focus();
+    await user.keyboard('{ArrowRight}');
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       "Couldn't save Look settings",
     );
+  });
+
+  it('disables Reset to preset and Save changes until the form is dirty', async () => {
+    const user = userEvent.setup();
+    render(
+      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Reset to preset' }),
+    ).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+
+    screen.getByRole('slider', { name: 'Accent hue' }).focus();
+    await user.keyboard('{ArrowRight}');
+
+    expect(
+      screen.getByRole('button', { name: 'Reset to preset' }),
+    ).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled();
   });
 
   it('resets a diverged control back to the current preset on "Reset to preset"', async () => {
