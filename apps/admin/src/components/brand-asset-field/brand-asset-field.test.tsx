@@ -122,11 +122,11 @@ describe(BrandAssetField, () => {
       />,
     );
 
-    const file = new File(['bytes'], 'logo.svg', { type: 'image/svg+xml' });
+    const file = new File(['bytes'], 'logo.gif', { type: 'image/gif' });
     await selectFile(container, file);
 
     expect(
-      await screen.findByText('Choose a PNG, JPEG, or WebP image.'),
+      await screen.findByText('Choose a PNG, JPEG, WebP, or SVG image.'),
     ).toBeInTheDocument();
     expect(uploadBrandAssetActionMock).not.toHaveBeenCalled();
     expect(onChange).not.toHaveBeenCalled();

@@ -7,6 +7,7 @@ export const ACCEPTED_IMAGE_MIME_TYPES = [
   'image/png',
   'image/jpeg',
   'image/webp',
+  'image/svg+xml',
 ] as const;
 type TAcceptedImageMimeType = (typeof ACCEPTED_IMAGE_MIME_TYPES)[number];
 
@@ -49,7 +50,7 @@ export function quickClientImageCheck(
   if (
     !ACCEPTED_IMAGE_MIME_TYPES.includes(file.type as TAcceptedImageMimeType)
   ) {
-    return 'Choose a PNG, JPEG, or WebP image.';
+    return 'Choose a PNG, JPEG, WebP, or SVG image.';
   }
 
   if (file.size > MAX_UPLOAD_BYTES[kind]) {
