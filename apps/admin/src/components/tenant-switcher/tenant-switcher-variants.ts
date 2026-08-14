@@ -16,7 +16,12 @@ export const tenantSwitcherVariants = tv({
     domain: ['truncate font-mono text-meta text-text-subtle'],
     chevron: ['shrink-0 rotate-90 text-text-subtle'],
     popup: [
-      'min-w-56 overflow-hidden rounded-md border border-border',
+      // Base UI portals this to document.body, outside the sidebar's own
+      // `dark` island — carry the flipped token context here too, the same
+      // way the sidebar root does, so the popup reads as part of the same
+      // control as its (dark) trigger rather than resolving the light
+      // `:root` palette by accident of where the portal happens to mount.
+      'dark min-w-56 overflow-hidden rounded-md border border-border',
       'bg-surface p-1 shadow-lg outline-none',
     ],
     item: [
