@@ -17,9 +17,10 @@ async function getSoleTenantId(): Promise<string | undefined> {
 }
 
 // `apps/admin`'s Look/Voice saves write `site_config` directly via
-// `@blog/db` but never call `revalidateTag`/`revalidatePath` here — it's a
-// separate Vercel deployment with no wiring into this app's cache, so a
-// save can take up to `SITE_CONFIG_REVALIDATE_SECONDS` to appear live.
+// `@blog/db`, then call `/api/revalidate-site-config` (a separate Vercel
+// deployment, so this is a cross-app HTTP call rather than a shared cache
+// reference) to expire this tag immediately. Absent that call, a save still
+// appears live within `SITE_CONFIG_REVALIDATE_SECONDS`.
 const getCachedSiteConfig = unstable_cache(
   async () => {
     const tenantId = await getSoleTenantId();

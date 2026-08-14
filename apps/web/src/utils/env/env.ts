@@ -10,6 +10,11 @@ export const env = createEnv({
     // The on-demand revalidation route (issue #93) isn't built yet; optional
     // until it exists so the module doesn't force an unused required var.
     SANITY_REVALIDATE_SECRET: z.string().min(1).optional(),
+    // Verifies `apps/admin`'s Look/Voice-save revalidation call
+    // (`/api/revalidate-site-config`), same feature-flag-by-absence stance
+    // as `SANITY_REVALIDATE_SECRET`: absent, the route 500s instead of
+    // revalidating.
+    SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
     // Both optional (feature-flag-by-absence, same stance as
     // SANITY_REVALIDATE_SECRET): the publish-time skim-generation pipeline
     // (`/api/generate-skim`) returns 503 without them; the reader path is
@@ -51,6 +56,7 @@ export const env = createEnv({
   // pick them up otherwise).
   runtimeEnv: {
     SANITY_REVALIDATE_SECRET: process.env.SANITY_REVALIDATE_SECRET,
+    SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     SANITY_GENERATE_SECRET: process.env.SANITY_GENERATE_SECRET,
     VERCEL_ANALYTICS_ENABLED: process.env.VERCEL_ANALYTICS_ENABLED,
