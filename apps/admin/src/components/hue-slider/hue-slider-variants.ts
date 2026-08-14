@@ -2,7 +2,7 @@ import { tv } from 'tailwind-variants';
 
 export const hueSliderVariants = tv({
   slots: {
-    root: ['w-full touch-none select-none'],
+    root: ['min-w-40 flex-1 touch-none select-none'],
     control: ['flex items-center py-2'],
     track: [
       'relative h-3 w-full grow rounded-full',
