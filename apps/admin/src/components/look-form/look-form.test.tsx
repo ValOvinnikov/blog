@@ -35,17 +35,25 @@ describe(LookForm, () => {
     updateLookActionMock.mockResolvedValue({ ok: true });
   });
 
-  it('renders the current preset and accent hue from the given initial values', () => {
-    render(
-      <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
-    );
+  // On CI's shared runners, mounting LookForm's full control tree (preset
+  // picker, hue slider, font pickers, both preview panels) as the first
+  // render in this file consistently lands just over Vitest's 5000ms
+  // default — not a code regression, just cold-start cost under contention.
+  it(
+    'renders the current preset and accent hue from the given initial values',
+    { timeout: 15000 },
+    () => {
+      render(
+        <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,
+      );
 
-    expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
-    expect(screen.getByText('250°')).toBeVisible();
-  });
+      expect(screen.getByRole('radio', { name: 'Console' })).toHaveAttribute(
+        'aria-checked',
+        'true',
+      );
+      expect(screen.getByText('250°')).toBeVisible();
+    },
+  );
 
   it('renders Basic and Advanced as visually distinct sections, Advanced collapsed by default', () => {
     render(
