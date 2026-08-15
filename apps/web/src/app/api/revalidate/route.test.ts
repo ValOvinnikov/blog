@@ -23,8 +23,12 @@ vi.mock('@web/utils/env/env', () => ({
   env: { SANITY_REVALIDATE_SECRET: 'test-secret' },
 }));
 
-function makeRequest(body: unknown, signature?: string): Request {
-  const headers = new Headers();
+function makeRequest(
+  body: unknown,
+  signature?: string,
+  extraHeaders?: Record<string, string>,
+): Request {
+  const headers = new Headers(extraHeaders);
   if (signature !== undefined) {
     headers.set('sanity-webhook-signature', signature);
   }
@@ -70,6 +74,51 @@ describe('POST /api/revalidate', () => {
     expect(revalidateTagMock).toHaveBeenCalledTimes(3);
     expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
     expect(revalidatePathMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('revalidates both the legacy tag and the tenant-scoped tag when sanity-project-id is present', async () => {
+    isValidSignatureMock.mockResolvedValue(true);
+    const { POST } = await import('./route');
+
+    const request = makeRequest(
+      { _type: 'blog_post', _id: 'post-1' },
+      't=1,v=valid-signature',
+      { 'sanity-project-id': 'tenant-a-project' },
+    );
+    await POST(request);
+
+    expect(revalidateTagMock).toHaveBeenCalledWith('post', { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith('t:tenant-a-project:post', {
+      expire: 0,
+    });
+    expect(revalidateTagMock).toHaveBeenCalledWith('posts', { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith('t:tenant-a-project:posts', {
+      expire: 0,
+    });
+    expect(revalidateTagMock).toHaveBeenCalledWith('homePage', { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledWith(
+      't:tenant-a-project:homePage',
+      { expire: 0 },
+    );
+    expect(revalidateTagMock).toHaveBeenCalledTimes(6);
+  });
+
+  it('revalidates only the legacy tags when sanity-project-id is absent', async () => {
+    isValidSignatureMock.mockResolvedValue(true);
+    const { POST } = await import('./route');
+
+    const request = makeRequest(
+      { _type: 'blog_post', _id: 'post-1' },
+      't=1,v=valid-signature',
+    );
+    await POST(request);
+
+    expect(revalidateTagMock).toHaveBeenCalledWith('post', { expire: 0 });
+    expect(revalidateTagMock).toHaveBeenCalledTimes(3);
+    expect(revalidateTagMock).not.toHaveBeenCalledWith(
+      expect.stringMatching(/^t:/),
+      expect.anything(),
+    );
   });
 
   it('returns 401 and revalidates nothing for an invalid signature', async () => {

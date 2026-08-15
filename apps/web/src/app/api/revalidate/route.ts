@@ -69,7 +69,18 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const { _type: type, _id: id } = parsedBody;
-  const revalidated = getRevalidateTagsForType(type, id);
+  const baseTags = getRevalidateTagsForType(type, id);
+  // Sanity includes this header on every webhook request automatically
+  // (no custom GROQ projection needed) — it identifies which tenant's
+  // project published. Emitting both the legacy and tenant-scoped form
+  // keeps this webhook correct regardless of how many service.* loaders
+  // have migrated to tenant-scoped tags yet (an unmigrated loader's cache
+  // only ever holds the legacy tag; a migrated one only the prefixed tag —
+  // purging both is a no-op for whichever one wasn't actually set).
+  const tenantProjectId = request.headers.get('sanity-project-id');
+  const revalidated = tenantProjectId
+    ? [...baseTags, ...baseTags.map((tag) => `t:${tenantProjectId}:${tag}`)]
+    : baseTags;
 
   for (const tag of revalidated) {
     // `{ expire: 0 }` forces immediate expiration — the next request blocks
