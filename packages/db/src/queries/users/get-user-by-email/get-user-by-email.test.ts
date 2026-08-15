@@ -43,6 +43,16 @@ describe(getUserByEmail, () => {
     expect(result).toMatchObject({ id: 'user-1' });
   });
 
+  it('matches a differently-cased lookup against a mixed-case stored email', async () => {
+    await db
+      .insert(schema.users)
+      .values({ id: 'user-1', email: 'User@Example.com' });
+
+    const result = await getUserByEmail('user@example.com');
+
+    expect(result).toMatchObject({ id: 'user-1', email: 'User@Example.com' });
+  });
+
   it('returns undefined for an email with no row', async () => {
     const result = await getUserByEmail('missing@example.com');
 
