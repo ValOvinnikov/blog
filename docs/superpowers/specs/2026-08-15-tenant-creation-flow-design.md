@@ -1,0 +1,180 @@
+# Tenant Creation Flow — Design
+
+**Status:** Design pass. Implements epic 5 ("Provisioning automation") of
+[`2026-08-07-multi-tenant-architecture-design.md`](./2026-08-07-multi-tenant-architecture-design.md)'s
+sequencing — the next phase after per-tenant content reads (epic 2a, #1543,
+shipped). Reconciles this design against the existing UI mock at
+[`docs/design-reference/admin-panel-mock.html`](../../design-reference/admin-panel-mock.html)'s
+"Add tenant" wizard, which predates and partially conflicts with later-resolved
+spec decisions — those conflicts and their resolutions are called out below.
+
+**Date:** 2026-08-15
+
+**Scope:** How a platform operator provisions a brand-new tenant end to end —
+Sanity project, seeded starter content, Studio deployment, registry rows, and
+domain mapping — triggered from `apps/admin`, executed by CI, with per-step
+resumable retry. Excludes self-serve signup, billing, and cross-tenant admin
+analytics (all explicit non-goals in the parent spec, unchanged here).
+
+## Conflicts with the existing mock — resolved
+
+The mock at `docs/design-reference/admin-panel-mock.html` designed this wizard
+before three later spec decisions landed. Each conflict below was raised and
+resolved explicitly (not silently) before this design was written:
+
+1. **Slug field vs. "custom domains only."** The mock's Details step collects
+   a "Slug / subdomain" producing `<slug>.valstack.dev`, implying a
+   platform-subdomain URL scheme. The parent spec's Open Decision 5 (resolved
+   2026-08-14) is custom-domains-only, no platform subdomain scheme. Resolved:
+   the slug is **Studio-only** — it becomes the Studio's own hostname
+   (`studio-<slug>.valstack.dev`, a subdomain of the platform's own domain, so
+   DNS is ours to control) and never the public site's address. The mock's
+   hint text is stale and gets corrected when this ships.
+2. **Resumability model.** The mock's wizard UI is built around per-step
+   resumable retry (per-step Run/Retry buttons, "earlier steps kept" framing).
+   Resolved: build it that way — per-step resumable retry, not full-restart —
+   despite the larger engineering scope, since the mock's design intent is
+   explicit and deliberate, not decorative.
+3. **DNS verification gating "Finish."** The mock's step 6 log sequence ends
+   on "Waiting for verification" before the wizard can finish. Resolved:
+   don't block — the tenant reaches provisioning-`READY` once the domain is
+   *added* to the shared web app's Vercel project; DNS verification is a
+   separate, non-blocking status the tenant detail page shows independently
+   (DNS propagation is tenant-controlled and can take hours).
+
+## Architecture
+
+**Trigger — `apps/admin`'s "Add tenant" wizard, matching the mock's shape.**
+Step 1 ("Details") collects tenant name, slug (Studio hostname only, per
+above), plan, and owner email — all client-side, fast. Submitting it is a
+Server Action that:
+
+1. Resolves the owner email to an existing registered user (`@blog/db` user
+   lookup) — the operator picks an *existing* user, no invite-email flow (a
+   non-goal, matches the parent spec's admin-first framing).
+2. Inserts `tenants` (with `provisioningStatus: PENDING` and an empty
+   per-step status map — see Data model), `tenant_domains`, and the owner's
+   `memberships` row (`role: OWNER`).
+3. Dispatches the provisioning GitHub Actions workflow
+   (`workflow_dispatch` via the GitHub API) with the new tenant's id as
+   input.
+4. Redirects to the tenant's status page (steps 2–6 of the wizard), which
+   polls the tenant row for live per-step status.
+
+**Provisioning workflow — new `.github/workflows/provision-tenant.yml`,**
+CI-owned like every other deploy in this repo (`SPEC.md` §13 — Vercel CLI in
+GitHub Actions, never a direct API call from application code holding
+long-lived deploy tokens). Runs five steps, **each independently idempotent**
+— checks the tenant's persisted per-step state before acting, so re-dispatching
+the same workflow for the same tenant id resumes rather than repeats:
+
+1. **Create Sanity project** — Projects API: project + `production` dataset +
+   CORS + a minted read token. Idempotency check: does `tenants.sanityProjectId`
+   already have a value? If so, skip creation and reuse it.
+2. **Seed content** — a fixed starter template (singletons + one starter post
+   + initial navigation — same content every new tenant gets, no per-tenant
+   customization at creation time), via `apps/cms/migrations` tooling against
+   the new dataset. Idempotency check: a `seededAt` timestamp on the tenant row.
+3. **Deploy Studio** — creates the tenant's own Vercel project (Studio is
+   per-tenant deployed, per the parent spec's resolved shape (a)), builds
+   `sanity build`, deploys to `studio-<slug>.valstack.dev`. Idempotency
+   check: does `tenants.studioVercelProjectId` exist?
+4. **Insert remaining registry state** — the `tenants`/`tenant_domains`/
+   `memberships` rows already exist from the Server Action (step 1 above);
+   this step encrypts and persists the minted Sanity read token
+   (`packages/utils`' `encryptSecret`, per epic 2a) and links the auth session
+   domain. Idempotency check: is `sanityReadTokenEncrypted` already set?
+5. **Map domain** — adds the tenant's custom domain to the *shared* web app's
+   existing Vercel project (not a new project — frontend topology is shared
+   app) via Vercel's Domains API. Idempotency check: is the domain already
+   registered on the project? DNS verification is checked but never blocks —
+   the step completes once the domain is *added*, regardless of verification
+   state.
+
+Each step reports its own status back via the callback route below —
+`idle → running → done`/`failed` — so the admin UI's per-step Retry button
+re-dispatches the same workflow and only the failed-or-later steps actually do
+work.
+
+**Status callback — new `apps/admin` API route,** authenticated by a shared
+secret header (same pattern as the existing Sanity revalidation webhook — see
+`apps/web/src/app/api/revalidate/route.ts`). The workflow calls it after every
+step with `{ tenantId, step, status, error? }`; the route updates the tenant's
+per-step status map and (on the last step) the overall `provisioningStatus`.
+
+## Data model
+
+`packages/db/src/schema/tenants.ts` gains:
+
+- `provisioningStatus` (`TENANT_PROVISIONING_STATUS`: `PENDING` / `PROVISIONING`
+  / `READY` / `FAILED`) — additive, nullable-then-defaulted column, migration
+  required.
+- `provisioningSteps` (jsonb) — a map of the five step keys
+  (`sanityProject`/`seedContent`/`deployStudio`/`registryRows`/`mapDomain`) to
+  `{ status: idle|running|done|failed, error?: string }`. A jsonb column
+  avoids a join table at this scale (tens of tenants, five fixed steps) while
+  still giving the admin UI everything it needs to render the wizard's
+  per-step state.
+- `sanityProjectId`, `studioVercelProjectId`, `seededAt` — the per-step
+  idempotency markers named above. All nullable, all additive.
+
+`@blog/config` gains `TENANT_PROVISIONING_STATUS` and
+`TENANT_PROVISIONING_STEP` (the five step keys), both UPPERCASE const pairs
+per this repo's convention.
+
+## Layer-contract impact
+
+- **`@blog/config`** — the two new const pairs above.
+- **`@blog/db`** — `tenants` schema changes (migration required, additive/
+  nullable, no backfill); new queries (`createTenantDraft`,
+  `updateProvisioningStep`, `getTenantProvisioningStatus`).
+- **`apps/admin`** — the wizard UI (Details form + per-step status/retry
+  view, matching the mock's visual shape with corrected slug copy), the
+  Server Action, the status-callback API route.
+- **New GitHub Actions workflow** — the actual provisioning logic (Sanity
+  Projects API, content seed, Studio Vercel project + deploy, domain add on
+  the shared web project). Not owned by any of the eight code layers; CI
+  config, same bucket as this repo's other deploy workflows.
+- **`@blog/service`, `@blog/ui`, `apps/web`, `@blog/auth`** — untouched. No
+  new Sanity read paths beyond what epic 2a already built; the provisioning
+  workflow talks to Sanity's *management* API (Projects), not the read client
+  `@blog/service` owns.
+- Graph stays acyclic.
+
+## Error handling & testing
+
+A step's failure sets its own `provisioningSteps.<step>.status = 'failed'`
+with the error message, and (if it's not the last step) leaves later steps
+`idle` — the admin UI's per-step Retry button re-dispatches the workflow,
+which resumes via the idempotency checks above rather than repeating
+completed work. No automatic rollback of partially-created external resources
+(a failed-and-abandoned tenant still needs manual Sanity/Vercel cleanup if the
+operator gives up entirely, but that's an explicit non-goal for this design —
+resumability handles the common case of "retry until it works").
+
+Testing: `db` query unit tests for the new queries and idempotency-check
+logic; `admin-app` Server Action and status-callback route tests (mocked
+GitHub API dispatch, mocked db). The GitHub Actions workflow's actual
+external-API logic is validated by a dry-run/staging execution rather than
+unit tests, matching how this repo already treats its deploy workflows — no
+unit tests for `.yml` logic.
+
+## Non-goals (inherited from the parent spec, unchanged)
+
+Self-serve signup, billing/subscription integration, a cross-tenant
+super-admin analytics dashboard, migrating to Payload, central multi-project
+Studio management. Also new to this design: automatic rollback/cleanup of
+partially-provisioned external resources on total abandonment (resumability
+covers retry; full teardown is a manual operator action, not built here).
+
+## Spec sync when built
+
+- `SPEC.md` **§13** — provisioning joins the deployment topology
+  (per-tenant Sanity project + Studio + domain mapping, CI-triggered from
+  `apps/admin`).
+- The parent design doc (`2026-08-07-multi-tenant-architecture-design.md`)
+  marks epic 5 shipped once this lands; per the design-doc retention rule it
+  stays alive until every epic in its sequencing ships.
+- `docs/design-reference/admin-panel-mock.html`'s "Add tenant" wizard section
+  loses its `deferred` badge and stale slug-as-public-address copy once this
+  ships for real.
