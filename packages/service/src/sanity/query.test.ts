@@ -1,8 +1,16 @@
-import { q, runQuery, type TSlugParams } from './query';
+import { isr, q, runQuery, type TSlugParams } from './query';
 
-vi.mock('./client', () => ({ getClient: () => ({ fetch: mockFetch }) }));
+// `vi.mock`'s factory runs eagerly the moment `./client` first resolves
+// (importing `./query` above triggers that), so the mocks it returns must be
+// initialized via `vi.hoisted` — a plain `const` declared after `vi.mock`
+// hits the temporal dead zone.
+const { mockFetch, getClientMock } = vi.hoisted(() => {
+  const mockFetch = vi.fn();
+  const getClientMock = vi.fn(() => ({ fetch: mockFetch }));
+  return { mockFetch, getClientMock };
+});
 
-const mockFetch = vi.fn();
+vi.mock('./client', () => ({ getClient: getClientMock }));
 
 /**
  * `.notNull()` fragment fields on a `slice(0)` query make groqd's
@@ -31,5 +39,50 @@ describe(runQuery, () => {
     await expect(
       runQuery(query, { parameters: { slug: 'nonexistent' } }),
     ).rejects.toThrow();
+  });
+});
+
+describe(isr, () => {
+  it('leaves tags unprefixed with no project id', () => {
+    expect(isr(['posts', 'author'])).toEqual({
+      next: { revalidate: 3600, tags: ['posts', 'author'] },
+    });
+  });
+
+  it('prefixes every tag with t:<projectId>: when a project id is given', () => {
+    expect(isr(['posts', 'author'], 'tenant-a')).toEqual({
+      next: {
+        revalidate: 3600,
+        tags: ['t:tenant-a:posts', 't:tenant-a:author'],
+      },
+    });
+  });
+
+  it('accepts a single tag string the same as an array of one', () => {
+    expect(isr('posts', 'tenant-a')).toEqual({
+      next: { revalidate: 3600, tags: ['t:tenant-a:posts'] },
+    });
+  });
+});
+
+describe('runQuery tenant threading', () => {
+  it('passes the tenant context through to getClient', async () => {
+    mockFetch.mockResolvedValue(null);
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    const query = q.star.filterByType('blog_post').slice(0);
+    await runQuery(query, { tenant }).catch(() => {
+      // The slice(0)+notNull edge case from the test above doesn't apply
+      // here (no .notNull() fragment); a null fetch resolves to null, not a
+      // throw, for this unprojected query — this test only cares that
+      // `getClient` (mocked via vi.mock('./client', ...) above) is called
+      // with the tenant argument, not with the query's result shape.
+    });
+
+    expect(getClientMock).toHaveBeenCalledWith(tenant);
   });
 });
