@@ -15,5 +15,6 @@ export * from './reserved-slug';
 export * from './size';
 export * from './spec-line';
 export * from './tenant';
+export * from './tenant-provisioning';
 export * from './toast';
 export * from './voice-pack';
