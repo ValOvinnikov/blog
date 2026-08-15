@@ -1,7 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Link, usePathname } from '@admin/i18n/navigation';
 import type { ReactNode } from 'react';
 
 import { sidebarVariants } from './sidebar-variants';

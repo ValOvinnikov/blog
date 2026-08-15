@@ -58,12 +58,20 @@ vi.mock('next-intl/server', () => ({
 // normally for anything else — a plain caught `Error` in a test (e.g. a
 // component's own error-boundary-style try/catch) should fall through the
 // same way, not be swallowed or crash the test.
+// `permanentRedirect` is stubbed for the same reason as `usePathname`/
+// `useRouter` below: not asserted on directly, but `@admin/i18n/navigation`'s
+// `createNavigation` (next-intl) reads it off `next/navigation`
+// unconditionally while wiring up its own exports, even when a test never
+// calls it — matching apps/web's identical setup.
 vi.mock('next/navigation', () => ({
   redirect: vi.fn(() => {
     throw new Error('NEXT_REDIRECT');
   }),
   notFound: vi.fn(() => {
     throw new Error('NEXT_NOT_FOUND');
+  }),
+  permanentRedirect: vi.fn(() => {
+    throw new Error('NEXT_REDIRECT');
   }),
   unstable_rethrow: vi.fn(),
   usePathname: vi.fn(() => '/'),

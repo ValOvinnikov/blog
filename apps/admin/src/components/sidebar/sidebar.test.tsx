@@ -1,13 +1,34 @@
 import { renderWithIntl, screen, within } from '@admin/testing/custom-render';
 import { ICONS } from '@blog/config';
-import { usePathname } from 'next/navigation';
+import type { ComponentPropsWithoutRef } from 'react';
 
 import { Sidebar } from './sidebar';
+
+const { usePathnameMock } = vi.hoisted(() => ({
+  usePathnameMock: vi.fn(),
+}));
+
+// `SidebarNavLink` resolves the active route via `@admin/i18n/navigation`
+// (next-intl's locale-aware `usePathname`), not plain `next/navigation` —
+// mocking the wrong module here previously let a broken import ship
+// unnoticed (see `sidebar-nav-link.tsx`).
+vi.mock('@admin/i18n/navigation', () => ({
+  usePathname: usePathnameMock,
+  Link: ({
+    href,
+    children,
+    ...rest
+  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
+}));
 
 const render = renderWithIntl;
 
 const setPathname = (pathname: string) => {
-  vi.mocked(usePathname).mockReturnValue(pathname);
+  usePathnameMock.mockReturnValue(pathname);
 };
 
 describe(Sidebar, () => {
