@@ -7,6 +7,10 @@ import { NextResponse } from 'next/server';
 // `revalidateTag` requires the Node.js runtime (it isn't supported on Edge).
 export const runtime = 'nodejs';
 
+// Sent by Sanity on every webhook request automatically — not exported by
+// any Sanity SDK, so this is the single source of truth for the literal.
+export const SANITY_PROJECT_ID_HEADER = 'sanity-project-id';
+
 interface IRevalidateWebhookBody {
   _type: string;
   _id: string;
@@ -70,14 +74,12 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const { _type: type, _id: id } = parsedBody;
   const baseTags = getRevalidateTagsForType(type, id);
-  // Sanity includes this header on every webhook request automatically
-  // (no custom GROQ projection needed) — it identifies which tenant's
-  // project published. Emitting both the legacy and tenant-scoped form
-  // keeps this webhook correct regardless of how many service.* loaders
-  // have migrated to tenant-scoped tags yet (an unmigrated loader's cache
-  // only ever holds the legacy tag; a migrated one only the prefixed tag —
-  // purging both is a no-op for whichever one wasn't actually set).
-  const tenantProjectId = request.headers.get('sanity-project-id');
+  // Identifies which tenant's project published. Emitting both the legacy
+  // and tenant-scoped form keeps this webhook correct regardless of how many
+  // service.* loaders have migrated to tenant-scoped tags yet (an unmigrated
+  // loader's cache only ever holds the legacy tag; a migrated one only the
+  // prefixed tag — purging both is a no-op for whichever one wasn't set).
+  const tenantProjectId = request.headers.get(SANITY_PROJECT_ID_HEADER);
   const revalidated = tenantProjectId
     ? [...baseTags, ...baseTags.map((tag) => `t:${tenantProjectId}:${tag}`)]
     : baseTags;

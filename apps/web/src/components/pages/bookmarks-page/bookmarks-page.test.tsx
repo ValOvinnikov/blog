@@ -118,6 +118,22 @@ describe(`<${BookmarksPage.name}/>`, () => {
     expect(getPostsByIdsMock).toHaveBeenCalledWith([], undefined);
   });
 
+  it('forwards the resolved tenant Sanity context to getPostsByIds', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    listBookmarksMock.mockResolvedValue([]);
+    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
+    const tenant = {
+      projectId: 'tenant-project',
+      dataset: 'production',
+      token: 'tenant-token',
+    };
+    getTenantSanityContextMock.mockResolvedValue(tenant);
+
+    await setup();
+
+    expect(getPostsByIdsMock).toHaveBeenCalledWith([], tenant);
+  });
+
   it('renders the terminal window chrome with the My bookmarks prompt', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listBookmarksMock.mockResolvedValue([]);

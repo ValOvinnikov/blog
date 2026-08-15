@@ -1,4 +1,4 @@
-export {};
+import { SANITY_PROJECT_ID_HEADER } from './route';
 
 const { isValidSignatureMock } = vi.hoisted(() => ({
   isValidSignatureMock: vi.fn(),
@@ -83,7 +83,7 @@ describe('POST /api/revalidate', () => {
     const request = makeRequest(
       { _type: 'blog_post', _id: 'post-1' },
       't=1,v=valid-signature',
-      { 'sanity-project-id': 'tenant-a-project' },
+      { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
     );
     await POST(request);
 

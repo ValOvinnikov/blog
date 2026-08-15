@@ -51,17 +51,17 @@ export async function BookmarksPage() {
     redirect(routes.home());
   }
 
-  const [bookmarks, t, format, chromeOn] = await Promise.all([
+  const [bookmarks, t, format, chromeOn, tenant] = await Promise.all([
     queries.bookmarks.listBookmarks(tenantId, userId),
     getTranslations('bookmarksPage'),
     getFormatter(),
     getChromeOn(),
+    getTenantSanityContext(),
   ]);
   const plain = !chromeOn;
 
   const bookmarkOrder = bookmarks.map((bookmark) => bookmark.postId);
 
-  const tenant = await getTenantSanityContext();
   const result = await service.entities.posts.v1.getPostsByIds(
     bookmarkOrder,
     tenant,
