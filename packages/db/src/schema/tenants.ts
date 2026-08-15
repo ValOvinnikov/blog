@@ -2,9 +2,18 @@ import {
   TENANT_PLAN,
   TENANT_STATUS,
   type TTenantPlan,
+  type TTenantProvisioningStatus,
+  type TTenantProvisioningStep,
   type TTenantStatus,
 } from '@blog/config/constants';
-import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  jsonb,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 export const tenantPlanEnum = pgEnum(
   'tenant_plan',
@@ -16,6 +25,22 @@ export const tenantStatusEnum = pgEnum(
   Object.values(TENANT_STATUS) as [TTenantStatus, ...TTenantStatus[]],
 );
 
+// Lowercase, deliberately distinct from the uppercase `TENANT_PROVISIONING_STATUS`
+// (the tenant's overall status) — this is one step's own progress within
+// `provisioningSteps`, not a `@blog/config` const pair since it has no
+// separate key/value form, just a literal union scoped to this jsonb shape.
+export type TProvisioningStepStatus = 'idle' | 'running' | 'done' | 'failed';
+
+export type TProvisioningStepState = {
+  status: TProvisioningStepStatus;
+  error?: string;
+};
+
+export type TTenantProvisioningSteps = Record<
+  TTenantProvisioningStep,
+  TProvisioningStepState
+>;
+
 // `primaryDomain` is the canonical domain; `tenant_domains` holds every
 // domain (including this one) a tenant answers to.
 export const tenants = pgTable('tenants', {
@@ -23,8 +48,11 @@ export const tenants = pgTable('tenants', {
   slug: text('slug').notNull().unique(),
   name: text('name').notNull(),
   primaryDomain: text('primary_domain').notNull(),
-  sanityProjectId: text('sanity_project_id').notNull(),
-  sanityDataset: text('sanity_dataset').notNull(),
+  // Nullable: null until provisioning step 1 (Create Sanity project) creates
+  // the project and fills these in — a draft tenant genuinely has neither
+  // yet, not a value standing in for one.
+  sanityProjectId: text('sanity_project_id'),
+  sanityDataset: text('sanity_dataset'),
   // Sanity read token for this tenant's project, AES-256-GCM encrypted
   // (`@blog/utils`'s encryptSecret) with TENANT_TOKEN_ENCRYPTION_KEY.
   // Nullable: a tenant provisioned before this column existed, or one still
@@ -34,6 +62,18 @@ export const tenants = pgTable('tenants', {
   locale: text('locale').notNull(),
   plan: tenantPlanEnum('plan').notNull(),
   status: tenantStatusEnum('status').notNull(),
+  // Plain `text`, not a pgEnum, mirroring `TENANT_PROVISIONING_STATUS`'s own
+  // shape one level up. Nullable: a tenant created before provisioning
+  // tracking existed (or not yet provisioning at all) has none.
+  provisioningStatus: text(
+    'provisioning_status',
+  ).$type<TTenantProvisioningStatus>(),
+  // Map of every `TENANT_PROVISIONING_STEP` key to its own progress — see
+  // `TTenantProvisioningSteps` above.
+  provisioningSteps:
+    jsonb('provisioning_steps').$type<TTenantProvisioningSteps>(),
+  studioVercelProjectId: text('studio_vercel_project_id'),
+  seededAt: timestamp('seeded_at', { mode: 'date' }),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()
