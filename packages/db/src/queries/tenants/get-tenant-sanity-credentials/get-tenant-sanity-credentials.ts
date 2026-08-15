@@ -20,7 +20,18 @@ export async function getTenantSanityCredentials(
     .from(tenants)
     .where(eq(tenants.id, tenantId));
 
-  if (!tenant?.sanityReadTokenEncrypted) return undefined;
+  // `sanityProjectId`/`sanityDataset` are nullable (a draft tenant has
+  // neither until provisioning step 1 runs), but provisioning always sets
+  // them before it ever persists a read token (step 4) — so a token without
+  // both is an inconsistent state this treats the same as "not set up yet"
+  // rather than a value to trust.
+  if (
+    !tenant?.sanityReadTokenEncrypted ||
+    !tenant.sanityProjectId ||
+    !tenant.sanityDataset
+  ) {
+    return undefined;
+  }
 
   if (!env.TENANT_TOKEN_ENCRYPTION_KEY) {
     throw new Error('TENANT_TOKEN_ENCRYPTION_KEY is not configured.');
