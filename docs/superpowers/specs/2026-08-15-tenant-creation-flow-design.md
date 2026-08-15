@@ -29,7 +29,8 @@ as its own future ticket).
 The mock at `docs/design-reference/admin-panel-mock.html` designed this wizard
 before several later spec decisions landed, and the parent spec has one
 internal self-contradiction of its own. Each conflict below was raised and
-resolved explicitly (not silently) before this design was written:
+resolved explicitly — not silently absorbed — whether caught during the
+initial design pass or by review afterward:
 
 1. **Slug field vs. "custom domains only."** The mock's Details step collects
    a "Slug / subdomain" producing `<slug>.valstack.dev`, implying a
@@ -62,14 +63,21 @@ resolved explicitly (not silently) before this design was written:
    end-to-end wizard (it never stops before Studio) and the parent spec's
    step-by-step narrative. Epic 6 becomes redundant once this ships — its
    work lands as a side effect, not a separate epic.
+5. **The mock's Details step never collects a domain.** The mock's step 1
+   form has only Tenant name / Slug / Plan / Owner email; "Map domain" is a
+   later step (6) with no earlier field to draw from. But `tenants.primaryDomain`
+   is `NOT NULL` (see Data model) and the Server Action needs a real value at
+   insert time, before the workflow's "Map domain" step ever runs. Resolved:
+   the wizard's Details step gains a **domain** field, a genuine addition
+   beyond the mock's original shape — not something to silently fold in as if
+   the mock already had it.
 
 ## Architecture
 
-**Trigger — `apps/admin`'s "Add tenant" wizard, matching the mock's shape.**
-Step 1 ("Details") collects tenant name, slug (Studio hostname only, per
-above), **domain** (the tenant's own custom domain — needed at insert time,
-see Data model), plan, and owner email — all client-side, fast. Submitting it
-is a Server Action that:
+**Trigger — `apps/admin`'s "Add tenant" wizard, matching the mock's shape**
+(with the domain field added per §5 above). Step 1 ("Details") collects
+tenant name, slug (Studio hostname only, per §1), domain, plan, and owner
+email — all client-side, fast. Submitting it is a Server Action that:
 
 1. Resolves the owner email to an existing registered user (`@blog/db` user
    lookup) — the operator picks an *existing* user, no invite-email flow (a
@@ -153,23 +161,23 @@ the tenant's per-step status map and (on the last step) the overall
   / `READY` / `FAILED`) — additive, nullable-then-defaulted column, migration
   required.
 - `provisioningSteps` (jsonb) — a map of the five step keys
-  (`sanityProject`/`seedContent`/`deployStudio`/`registryRows`/`mapDomain`) to
+  (`sanityProject`/`seedContent`/`deployStudio`/`persistToken`/`mapDomain`) to
   `{ status: idle|running|done|failed, error?: string }`. A jsonb column
   avoids a join table at this scale (tens of tenants, five fixed steps) while
   still giving the admin UI everything it needs to render the wizard's
   per-step state.
 - `studioVercelProjectId`, `seededAt` — new, nullable, additive per-step
   idempotency markers.
-- `sanityProjectId`, `sanityDataset`, `primaryDomain` — **already exist as
-  `NOT NULL`** (no default). This design requires relaxing all three to
-  nullable via a migration (safe/additive — no existing rows lose data, and
-  the one production tenant already has values for all three). `primaryDomain`
-  is now collected upfront in the wizard's Details step so it's never
-  actually null in practice; `sanityProjectId`/`sanityDataset` stay genuinely
-  null until provisioning step 1 creates the Sanity project. `locale`
-  (also `NOT NULL`, no default) is unaffected by this change — the Server
-  Action supplies the platform's default locale at insert time, so it's
-  never null; no migration needed for that column.
+- `sanityProjectId`, `sanityDataset` — **already exist as `NOT NULL`** (no
+  default). This design requires relaxing both to nullable via a migration
+  (safe/additive — no existing row loses data, and the one production tenant
+  already has values for both) — they stay genuinely null until provisioning
+  step 1 creates the Sanity project.
+- `primaryDomain` and `locale` — **already exist as `NOT NULL`** too, but
+  neither needs a migration: the wizard's Details step now collects a domain
+  value upfront (see Architecture), and the Server Action supplies the
+  platform's default locale at insert time — both columns always get a real
+  value at insert, so their existing `NOT NULL` constraint is satisfied as-is.
 
 `@blog/config` gains `TENANT_PROVISIONING_STATUS` and
 `TENANT_PROVISIONING_STEP` (the five step keys), both UPPERCASE const pairs
@@ -179,9 +187,9 @@ per this repo's convention.
 
 - **`@blog/config`** — the two new const pairs above.
 - **`@blog/db`** — `tenants` schema changes: new nullable columns (additive,
-  no backfill) plus relaxing `sanityProjectId`/`sanityDataset`/`primaryDomain`
-  from `NOT NULL` to nullable (safe — no existing row loses data, see Data
-  model); new queries (`createTenantDraft`, `updateProvisioningStep`,
+  no backfill) plus relaxing `sanityProjectId`/`sanityDataset` from `NOT NULL`
+  to nullable (safe — no existing row loses data, see Data model); new
+  queries (`createTenantDraft`, `updateProvisioningStep`,
   `getTenantProvisioningStatus`).
 - **`apps/admin`** — the wizard UI (Details form + per-step status/retry
   view, matching the mock's visual shape with corrected slug copy), the
