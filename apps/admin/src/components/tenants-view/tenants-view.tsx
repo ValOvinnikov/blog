@@ -1,7 +1,10 @@
 import { TenantsTable } from '@admin/components/tenants-table';
+import { Link } from '@admin/i18n/navigation';
+import { adminRoutes } from '@admin/utils/routes/routes';
 import { Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { Button, Heading } from '@blog/ui/atoms';
+import { Heading } from '@blog/ui/atoms';
+import { LinkButton } from '@blog/ui/molecules';
 import { useTranslations } from 'next-intl';
 
 import { tenantsViewVariants } from './tenants-view-variants';
@@ -11,15 +14,13 @@ export type TTenantsViewProps = {
 };
 
 /**
- * The Tenants page body: heading, the (deliberately disabled) add-tenant
- * entry point, and the real tenant list. Ships from day one — with one
- * tenant it's still a finished page, not a placeholder.
+ * The Tenants page body: heading, the add-tenant entry point, and the real
+ * tenant list. Ships from day one — with one tenant it's still a finished
+ * page, not a placeholder.
  */
 export function TenantsView({ tenants }: TTenantsViewProps) {
   const t = useTranslations('tenantsView');
-  const addTenantReasonText = t('addTenantReason');
-  const { root, header, description, addTenant, addTenantReason } =
-    tenantsViewVariants();
+  const { root, header, description } = tenantsViewVariants();
 
   return (
     <div className={root()}>
@@ -32,19 +33,9 @@ export function TenantsView({ tenants }: TTenantsViewProps) {
             {t.rich('description', { code: (chunks) => <code>{chunks}</code> })}
           </p>
         </div>
-        <div className={addTenant()}>
-          <Button
-            variant="primary"
-            disabled={true}
-            title={addTenantReasonText}
-            aria-describedby="add-tenant-reason"
-          >
-            {t('addTenant')}
-          </Button>
-          <p id="add-tenant-reason" className={addTenantReason()}>
-            {addTenantReasonText}
-          </p>
-        </div>
+        <LinkButton as={Link} href={adminRoutes.addTenant()} variant="primary">
+          {t('addTenant')}
+        </LinkButton>
       </div>
       <TenantsTable tenants={tenants} />
     </div>
