@@ -20,3 +20,14 @@ export const TENANT_PROVISIONING_STEP = {
 } as const;
 
 export type TTenantProvisioningStep = TValueOf<typeof TENANT_PROVISIONING_STEP>;
+
+export const TENANT_PROVISIONING_STEP_STATUS = {
+  IDLE: 'IDLE',
+  RUNNING: 'RUNNING',
+  DONE: 'DONE',
+  FAILED: 'FAILED',
+} as const;
+
+export type TTenantProvisioningStepStatus = TValueOf<
+  typeof TENANT_PROVISIONING_STEP_STATUS
+>;
