@@ -81,6 +81,7 @@ export type {
 } from './features/pages/post';
 export type { TTagPage } from './features/pages/tag';
 export { urlForImage } from './sanity/image';
+export type { TTenantSanityContext } from './sanity/query';
 export { buildImageUrl } from './shared/transformers/build-image-url';
 export type { TRawImage } from './shared/transformers/build-image-url';
 export type { TArchivePostCard } from './shared/transformers/to-archive-post-card';
