@@ -25,6 +25,12 @@ export const tenants = pgTable('tenants', {
   primaryDomain: text('primary_domain').notNull(),
   sanityProjectId: text('sanity_project_id').notNull(),
   sanityDataset: text('sanity_dataset').notNull(),
+  // Sanity read token for this tenant's project, AES-256-GCM encrypted
+  // (`@blog/utils`'s encryptSecret) with TENANT_TOKEN_ENCRYPTION_KEY.
+  // Nullable: a tenant provisioned before this column existed, or one still
+  // being set up, has no token yet — @blog/service's client factory falls
+  // back to the legacy single-tenant client until it's set.
+  sanityReadTokenEncrypted: text('sanity_read_token_encrypted'),
   locale: text('locale').notNull(),
   plan: tenantPlanEnum('plan').notNull(),
   status: tenantStatusEnum('status').notNull(),
