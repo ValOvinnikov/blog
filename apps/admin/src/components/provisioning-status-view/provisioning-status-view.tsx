@@ -20,13 +20,9 @@ import { useState, useTransition } from 'react';
 
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
 
-const STEP_ORDER: TTenantProvisioningStep[] = [
-  TENANT_PROVISIONING_STEP.SANITY_PROJECT,
-  TENANT_PROVISIONING_STEP.SEED_CONTENT,
-  TENANT_PROVISIONING_STEP.DEPLOY_STUDIO,
-  TENANT_PROVISIONING_STEP.PERSIST_TOKEN,
-  TENANT_PROVISIONING_STEP.MAP_DOMAIN,
-];
+// Object key insertion order matches the config-declared step sequence, so
+// this can't drift if a step is ever reordered there.
+const STEP_ORDER = Object.values(TENANT_PROVISIONING_STEP);
 
 const STEP_TONE: Record<
   Exclude<TTenantProvisioningStepStatus, 'FAILED'>,

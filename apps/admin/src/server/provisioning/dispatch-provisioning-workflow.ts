@@ -9,13 +9,14 @@ const DISPATCH_TIMEOUT_MS = 5000;
 
 /**
  * Best-effort `workflow_dispatch` trigger for `.github/workflows/provision-tenant.yml`
- * — the narrowly-scoped (`actions: write` only) exception to this repo's
- * deploy-credentials-stay-in-CI rule (see the tenant-creation-flow design
- * doc's Architecture section). Never throws: a failure here (missing token,
- * network error, the workflow file not existing yet, a non-2xx response) is
- * logged and swallowed — the tenant row this call follows has already been
- * created either way, and an operator can always retry the dispatch later
- * from the tenant's status page.
+ * — a deliberate, narrowly-scoped (`actions: write` only) exception to
+ * keeping deploy-adjacent credentials inside CI: only the trigger crosses
+ * into application code here, never the provisioning work itself. Never
+ * throws: a failure here (missing token, network error, the workflow file
+ * not existing yet, a non-2xx response) is logged and swallowed — the
+ * tenant row this call follows has already been created either way, and an
+ * operator can always retry the dispatch later from the tenant's status
+ * page.
  */
 export async function dispatchProvisioningWorkflow(
   tenantId: string,

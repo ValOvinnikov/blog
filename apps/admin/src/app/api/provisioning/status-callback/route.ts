@@ -35,9 +35,8 @@ const statusCallbackSchema = z.object({
 });
 
 // Only the workflow's last step ever settles the tenant's overall
-// `provisioningStatus` — see the tenant-creation-flow design doc's
-// "Status callback" section. Every earlier step's callback updates only its
-// own entry in `provisioningSteps`, regardless of whether it succeeded or
+// `provisioningStatus`. Every earlier step's callback updates only its own
+// entry in `provisioningSteps`, regardless of whether it succeeded or
 // failed, since a mid-sequence failure is resumable (the admin UI's Retry
 // button re-dispatches the workflow, which resumes past whatever already
 // succeeded).
