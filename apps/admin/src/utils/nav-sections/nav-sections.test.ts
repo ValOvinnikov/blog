@@ -15,7 +15,7 @@ const t = createTranslator({
 }) as unknown as TNavTranslator;
 
 describe('platformNavSections', () => {
-  it('gives Tenants a real href and Add tenant a deferred, hrefless entry', () => {
+  it('gives both Tenants and Add tenant real hrefs', () => {
     const [platform] = platformNavSections(t);
     const tenants = platform!.items.find((item) => item.label === 'Tenants');
     const addTenant = platform!.items.find(
@@ -23,9 +23,8 @@ describe('platformNavSections', () => {
     );
 
     expect(tenants).toMatchObject({ href: '/tenants' });
-    expect(addTenant?.href).toBeUndefined();
-    expect(addTenant?.badge).toEqual({ label: 'deferred', tone: 'warn' });
-    expect(addTenant?.disabledReason).toBeTruthy();
+    expect(addTenant).toMatchObject({ href: '/add-tenant' });
+    expect(addTenant?.badge).toBeUndefined();
   });
 });
 

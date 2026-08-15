@@ -22,8 +22,7 @@ export const platformNavSections = (
       {
         label: t('addTenant'),
         icon: ICONS.PLUS,
-        badge: { label: t('badgeDeferred'), tone: 'warn' },
-        disabledReason: t('addTenantDisabledReason'),
+        href: adminRoutes.addTenant(),
       },
     ],
   },

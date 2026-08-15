@@ -5,7 +5,9 @@
     "tenant": "Tenant · Admin",
     "look": "Look · Admin",
     "voice": "Voice · Admin",
-    "selectTenant": "Choose a workspace · Admin"
+    "selectTenant": "Choose a workspace · Admin",
+    "addTenant": "Add tenant · Admin",
+    "tenantStatus": "Tenant status · Admin"
   },
   "unauthorizedPage": {
     "heading": "Not authorized",
@@ -19,7 +21,6 @@
     "platformLabel": "Platform",
     "tenants": "Tenants",
     "addTenant": "Add tenant",
-    "addTenantDisabledReason": "Provisioning a new tenant isn't available yet.",
     "tenantLabel": "Tenant · {tenantSlug}",
     "dashboardLabel": "Workspace",
     "look": "Look",
@@ -30,7 +31,6 @@
     "comments": "Comments",
     "team": "Team",
     "dangerZone": "Danger zone",
-    "badgeDeferred": "deferred",
     "badgeLater": "later",
     "badgeThisMilestone": "this milestone"
   },
@@ -53,8 +53,7 @@
   "tenantsView": {
     "title": "Tenants",
     "description": "Every site on the platform, read from the real <code>tenants</code> table.",
-    "addTenant": "+ Add tenant",
-    "addTenantReason": "Provisioning is deferred until the tenant-resolution layer ships."
+    "addTenant": "+ Add tenant"
   },
   "tenantsTable": {
     "empty": "No tenants yet.",
@@ -198,5 +197,48 @@
     "authorEmpty": "Author Empty",
     "topicsEmpty": "Topics Empty",
     "bookmarksEmpty": "Bookmarks Empty"
+  },
+  "tenantDetailsForm": {
+    "heading": "Tenant details",
+    "description": "The fast part. Everything after this runs automatically, each step resumable on failure.",
+    "nameLabel": "Tenant name",
+    "slugLabel": "Slug",
+    "slugHint": "Becomes the Studio's own hostname, e.g. studio-yourslug.valstack.dev — never the public site address.",
+    "domainLabel": "Domain",
+    "domainHint": "The public domain this tenant's site will answer to.",
+    "planLabel": "Plan",
+    "planOptionFree": "Free",
+    "planOptionGrowth": "Growth",
+    "ownerEmailLabel": "Owner email",
+    "ownerEmailHint": "Must match an existing registered user — seeds the first membership as OWNER.",
+    "submitButton": "Begin provisioning →",
+    "submittingButton": "Creating…"
+  },
+  "provisioningStatusView": {
+    "heading": "Provisioning {name}",
+    "description": "Each step is independently resumable — a failed step's Retry re-dispatches the workflow, which skips whatever already succeeded.",
+    "stepLabel": {
+      "SANITY_PROJECT": "Create Sanity project",
+      "SEED_CONTENT": "Seed content",
+      "DEPLOY_STUDIO": "Deploy Studio",
+      "PERSIST_TOKEN": "Persist read token",
+      "MAP_DOMAIN": "Map domain"
+    },
+    "statusLabel": {
+      "IDLE": "Not started",
+      "RUNNING": "Running…",
+      "DONE": "Done",
+      "FAILED": "Failed"
+    },
+    "retryButton": "Retry",
+    "retryingButton": "Retrying…",
+    "dnsHeading": "Domain verification",
+    "dnsStatus": {
+      "NOT_CONFIGURED": "Not configured",
+      "NOT_ADDED": "Not added yet",
+      "PENDING": "Pending — awaiting DNS",
+      "VERIFIED": "Verified",
+      "ERROR": "Couldn't check"
+    }
   }
 }
