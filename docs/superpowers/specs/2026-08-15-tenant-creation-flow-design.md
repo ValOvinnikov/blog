@@ -1,9 +1,14 @@
 # Tenant Creation Flow — Design
 
-**Status:** Design pass. Implements epic 5 ("Provisioning automation") of
+**Status:** Design pass. Implements epic 5 ("Provisioning automation") **and**
+epic 6 ("Studio-per-tenant") of
 [`2026-08-07-multi-tenant-architecture-design.md`](./2026-08-07-multi-tenant-architecture-design.md)'s
-sequencing — the next phase after per-tenant content reads (epic 2a, #1543,
-shipped). Reconciles this design against the existing UI mock at
+sequencing as one design — the next phase after per-tenant content reads
+(epic 2a, #1543, shipped). The parent spec lists those as separate epics but
+its own step-by-step provisioning narrative includes Studio deployment
+alongside the rest — see "Conflicts with the existing mock" §4 for how that
+self-contradiction is resolved. Reconciles this design against the existing
+UI mock at
 [`docs/design-reference/admin-panel-mock.html`](../../design-reference/admin-panel-mock.html)'s
 "Add tenant" wizard, which predates and partially conflicts with later-resolved
 spec decisions — those conflicts and their resolutions are called out below.
@@ -13,13 +18,17 @@ spec decisions — those conflicts and their resolutions are called out below.
 **Scope:** How a platform operator provisions a brand-new tenant end to end —
 Sanity project, seeded starter content, Studio deployment, registry rows, and
 domain mapping — triggered from `apps/admin`, executed by CI, with per-step
-resumable retry. Excludes self-serve signup, billing, and cross-tenant admin
-analytics (all explicit non-goals in the parent spec, unchanged here).
+resumable retry. Excludes self-serve signup, billing, cross-tenant admin
+analytics (all explicit non-goals in the parent spec, unchanged here), and the
+**per-project migration runner** (a day-2 tool for pushing schema/content
+changes to every *existing* tenant, not part of creating a new one — tracked
+as its own future ticket).
 
 ## Conflicts with the existing mock — resolved
 
 The mock at `docs/design-reference/admin-panel-mock.html` designed this wizard
-before three later spec decisions landed. Each conflict below was raised and
+before several later spec decisions landed, and the parent spec has one
+internal self-contradiction of its own. Each conflict below was raised and
 resolved explicitly (not silently) before this design was written:
 
 1. **Slug field vs. "custom domains only."** The mock's Details step collects
@@ -40,31 +49,52 @@ resolved explicitly (not silently) before this design was written:
    don't block — the tenant reaches provisioning-`READY` once the domain is
    *added* to the shared web app's Vercel project; DNS verification is a
    separate, non-blocking status the tenant detail page shows independently
-   (DNS propagation is tenant-controlled and can take hours).
+   (DNS propagation is tenant-controlled and can take hours). Shown via a
+   live Vercel API call (domain verification status) on each render of the
+   tenant detail page — no polling/cron needed at this scale, the operator
+   just refreshes the page to re-check.
+4. **The parent spec's own epic 5/6 split contradicts its own provisioning
+   narrative.** "Sequencing & epics" lists "Provisioning automation" (epic 5)
+   and "Studio-per-tenant" (epic 6) as separate items, but the same doc's
+   "Provisioning a tenant" 6-step narrative includes Studio deployment as
+   step 3 — the parent spec disagrees with itself. Resolved: this design
+   keeps Studio deployment in scope here, matching both the mock's
+   end-to-end wizard (it never stops before Studio) and the parent spec's
+   step-by-step narrative. Epic 6 becomes redundant once this ships — its
+   work lands as a side effect, not a separate epic.
 
 ## Architecture
 
 **Trigger — `apps/admin`'s "Add tenant" wizard, matching the mock's shape.**
 Step 1 ("Details") collects tenant name, slug (Studio hostname only, per
-above), plan, and owner email — all client-side, fast. Submitting it is a
-Server Action that:
+above), **domain** (the tenant's own custom domain — needed at insert time,
+see Data model), plan, and owner email — all client-side, fast. Submitting it
+is a Server Action that:
 
 1. Resolves the owner email to an existing registered user (`@blog/db` user
    lookup) — the operator picks an *existing* user, no invite-email flow (a
    non-goal, matches the parent spec's admin-first framing).
-2. Inserts `tenants` (with `provisioningStatus: PENDING` and an empty
-   per-step status map — see Data model), `tenant_domains`, and the owner's
-   `memberships` row (`role: OWNER`).
+2. Inserts `tenants` (with `primaryDomain` from the form, `provisioningStatus:
+   PENDING`, an empty per-step status map — see Data model — `sanityProjectId`/
+   `sanityDataset` left null until provisioning creates them, and `locale`
+   defaulted to the platform's default locale — no per-tenant locale choice at
+   creation), `tenant_domains`, and the owner's `memberships` row
+   (`role: OWNER`).
 3. Dispatches the provisioning GitHub Actions workflow
    (`workflow_dispatch` via the GitHub API) with the new tenant's id as
    input.
 4. Redirects to the tenant's status page (steps 2–6 of the wizard), which
    polls the tenant row for live per-step status.
 
-**Provisioning workflow — new `.github/workflows/provision-tenant.yml`,**
-CI-owned like every other deploy in this repo (`SPEC.md` §13 — Vercel CLI in
-GitHub Actions, never a direct API call from application code holding
-long-lived deploy tokens). Runs five steps, **each independently idempotent**
+**Provisioning workflow — new `.github/workflows/provision-tenant.yml`.**
+The `apps/admin` Server Action holds a narrowly-scoped GitHub PAT
+(`actions: write` only) to trigger it via `workflow_dispatch` — that's a
+real, deliberate exception, distinct from this repo's actual deploy-token
+rule: the *deploy* credentials (Vercel/Sanity Projects API tokens) never
+leave the CI environment, staying CI-owned like every other deploy in this
+repo (`SPEC.md` §13 — Vercel CLI runs inside GitHub Actions, never from
+application code). Only the trigger crosses that boundary; the provisioning
+work itself doesn't. Runs five steps, **each independently idempotent**
 — checks the tenant's persisted per-step state before acting, so re-dispatching
 the same workflow for the same tenant id resumes rather than repeats:
 
@@ -73,17 +103,24 @@ the same workflow for the same tenant id resumes rather than repeats:
    already have a value? If so, skip creation and reuse it.
 2. **Seed content** — a fixed starter template (singletons + one starter post
    + initial navigation — same content every new tenant gets, no per-tenant
-   customization at creation time), via `apps/cms/migrations` tooling against
-   the new dataset. Idempotency check: a `seededAt` timestamp on the tenant row.
+   customization at creation time), via a new dedicated seed script
+   (`@sanity/client`-based, creating documents directly against the empty
+   dataset). `apps/cms/migrations`' existing tooling doesn't fit this: it
+   transforms *existing* documents in an already-populated dataset (defaults
+   to `production`, human-gated for real datasets) — a brand-new empty
+   dataset needs document creation, not migration. Idempotency check: a
+   `seededAt` timestamp on the tenant row.
 3. **Deploy Studio** — creates the tenant's own Vercel project (Studio is
    per-tenant deployed, per the parent spec's resolved shape (a)), builds
    `sanity build`, deploys to `studio-<slug>.valstack.dev`. Idempotency
    check: does `tenants.studioVercelProjectId` exist?
-4. **Insert remaining registry state** — the `tenants`/`tenant_domains`/
-   `memberships` rows already exist from the Server Action (step 1 above);
-   this step encrypts and persists the minted Sanity read token
-   (`packages/utils`' `encryptSecret`, per epic 2a) and links the auth session
-   domain. Idempotency check: is `sanityReadTokenEncrypted` already set?
+4. **Persist the read token** — the `tenants`/`tenant_domains`/`memberships`
+   rows already exist from the Server Action (step 1 above); this step
+   encrypts and persists the minted Sanity read token (`packages/utils`'
+   `encryptSecret`, per epic 2a). No `@blog/auth` involvement — domain-to-
+   tenant resolution already works via the existing `tenant_domains` +
+   `resolveTenantId` read path (epic 1), so there's nothing new to wire up
+   here. Idempotency check: is `sanityReadTokenEncrypted` already set?
 5. **Map domain** — adds the tenant's custom domain to the *shared* web app's
    existing Vercel project (not a new project — frontend topology is shared
    app) via Vercel's Domains API. Idempotency check: is the domain already
@@ -96,11 +133,17 @@ Each step reports its own status back via the callback route below —
 re-dispatches the same workflow and only the failed-or-later steps actually do
 work.
 
-**Status callback — new `apps/admin` API route,** authenticated by a shared
-secret header (same pattern as the existing Sanity revalidation webhook — see
-`apps/web/src/app/api/revalidate/route.ts`). The workflow calls it after every
-step with `{ tenantId, step, status, error? }`; the route updates the tenant's
-per-step status map and (on the last step) the overall `provisioningStatus`.
+**Status callback — new `apps/admin` API route,** authenticated by a bearer
+token compared against a GitHub Actions secret — a simpler mechanism than the
+existing Sanity revalidation webhook (`apps/web/src/app/api/revalidate/route.ts`),
+which verifies an HMAC signature over the raw request body via `@sanity/webhook`'s
+`isValidSignature` because it accepts calls from Sanity's own infrastructure. This
+callback only ever originates from our own CI runner holding a repo secret, so a
+direct bearer-token comparison is sufficient — not the same pattern, a
+deliberately lighter one for a narrower trust boundary. The workflow calls it
+after every step with `{ tenantId, step, status, error? }`; the route updates
+the tenant's per-step status map and (on the last step) the overall
+`provisioningStatus`.
 
 ## Data model
 
@@ -115,8 +158,18 @@ per-step status map and (on the last step) the overall `provisioningStatus`.
   avoids a join table at this scale (tens of tenants, five fixed steps) while
   still giving the admin UI everything it needs to render the wizard's
   per-step state.
-- `sanityProjectId`, `studioVercelProjectId`, `seededAt` — the per-step
-  idempotency markers named above. All nullable, all additive.
+- `studioVercelProjectId`, `seededAt` — new, nullable, additive per-step
+  idempotency markers.
+- `sanityProjectId`, `sanityDataset`, `primaryDomain` — **already exist as
+  `NOT NULL`** (no default). This design requires relaxing all three to
+  nullable via a migration (safe/additive — no existing rows lose data, and
+  the one production tenant already has values for all three). `primaryDomain`
+  is now collected upfront in the wizard's Details step so it's never
+  actually null in practice; `sanityProjectId`/`sanityDataset` stay genuinely
+  null until provisioning step 1 creates the Sanity project. `locale`
+  (also `NOT NULL`, no default) is unaffected by this change — the Server
+  Action supplies the platform's default locale at insert time, so it's
+  never null; no migration needed for that column.
 
 `@blog/config` gains `TENANT_PROVISIONING_STATUS` and
 `TENANT_PROVISIONING_STEP` (the five step keys), both UPPERCASE const pairs
@@ -125,9 +178,11 @@ per this repo's convention.
 ## Layer-contract impact
 
 - **`@blog/config`** — the two new const pairs above.
-- **`@blog/db`** — `tenants` schema changes (migration required, additive/
-  nullable, no backfill); new queries (`createTenantDraft`,
-  `updateProvisioningStep`, `getTenantProvisioningStatus`).
+- **`@blog/db`** — `tenants` schema changes: new nullable columns (additive,
+  no backfill) plus relaxing `sanityProjectId`/`sanityDataset`/`primaryDomain`
+  from `NOT NULL` to nullable (safe — no existing row loses data, see Data
+  model); new queries (`createTenantDraft`, `updateProvisioningStep`,
+  `getTenantProvisioningStatus`).
 - **`apps/admin`** — the wizard UI (Details form + per-step status/retry
   view, matching the mock's visual shape with corrected slug copy), the
   Server Action, the status-callback API route.
@@ -173,8 +228,11 @@ covers retry; full teardown is a manual operator action, not built here).
   (per-tenant Sanity project + Studio + domain mapping, CI-triggered from
   `apps/admin`).
 - The parent design doc (`2026-08-07-multi-tenant-architecture-design.md`)
-  marks epic 5 shipped once this lands; per the design-doc retention rule it
-  stays alive until every epic in its sequencing ships.
+  marks **both** epic 5 and epic 6 shipped once this lands (per the §4
+  resolution above — epic 6 ships as a side effect, not separately) and notes
+  the per-project migration runner as the one piece of epic 5's original
+  description still open, tracked as its own ticket. Per the design-doc
+  retention rule the doc stays alive until every epic in its sequencing ships.
 - `docs/design-reference/admin-panel-mock.html`'s "Add tenant" wizard section
   loses its `deferred` badge and stale slug-as-public-address copy once this
   ships for real.
