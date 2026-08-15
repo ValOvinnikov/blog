@@ -4,6 +4,7 @@ import {
   type TTenantPlan,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
+  type TTenantProvisioningStepStatus,
   type TTenantStatus,
 } from '@blog/config/constants';
 import {
@@ -25,14 +26,8 @@ export const tenantStatusEnum = pgEnum(
   Object.values(TENANT_STATUS) as [TTenantStatus, ...TTenantStatus[]],
 );
 
-// Lowercase, deliberately distinct from the uppercase `TENANT_PROVISIONING_STATUS`
-// (the tenant's overall status) — this is one step's own progress within
-// `provisioningSteps`, not a `@blog/config` const pair since it has no
-// separate key/value form, just a literal union scoped to this jsonb shape.
-export type TProvisioningStepStatus = 'idle' | 'running' | 'done' | 'failed';
-
 export type TProvisioningStepState = {
-  status: TProvisioningStepStatus;
+  status: TTenantProvisioningStepStatus;
   error?: string;
 };
 

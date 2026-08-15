@@ -23,11 +23,11 @@ async function insertDraftTenant(): Promise<string> {
       status: TENANT_STATUS.ACTIVE,
       provisioningStatus: 'PENDING',
       provisioningSteps: {
-        SANITY_PROJECT: { status: 'idle' },
-        SEED_CONTENT: { status: 'idle' },
-        DEPLOY_STUDIO: { status: 'idle' },
-        PERSIST_TOKEN: { status: 'idle' },
-        MAP_DOMAIN: { status: 'idle' },
+        SANITY_PROJECT: { status: 'IDLE' },
+        SEED_CONTENT: { status: 'IDLE' },
+        DEPLOY_STUDIO: { status: 'IDLE' },
+        PERSIST_TOKEN: { status: 'IDLE' },
+        MAP_DOMAIN: { status: 'IDLE' },
       },
     })
     .returning();
@@ -56,15 +56,15 @@ describe(updateProvisioningStep, () => {
     const tenant = await updateProvisioningStep({
       tenantId,
       step: 'SANITY_PROJECT',
-      status: 'running',
+      status: 'RUNNING',
     });
 
     expect(tenant.provisioningSteps).toEqual({
-      SANITY_PROJECT: { status: 'running' },
-      SEED_CONTENT: { status: 'idle' },
-      DEPLOY_STUDIO: { status: 'idle' },
-      PERSIST_TOKEN: { status: 'idle' },
-      MAP_DOMAIN: { status: 'idle' },
+      SANITY_PROJECT: { status: 'RUNNING' },
+      SEED_CONTENT: { status: 'IDLE' },
+      DEPLOY_STUDIO: { status: 'IDLE' },
+      PERSIST_TOKEN: { status: 'IDLE' },
+      MAP_DOMAIN: { status: 'IDLE' },
     });
   });
 
@@ -74,20 +74,20 @@ describe(updateProvisioningStep, () => {
     await updateProvisioningStep({
       tenantId,
       step: 'SANITY_PROJECT',
-      status: 'done',
+      status: 'DONE',
     });
     const tenant = await updateProvisioningStep({
       tenantId,
       step: 'SEED_CONTENT',
-      status: 'running',
+      status: 'RUNNING',
     });
 
     expect(tenant.provisioningSteps).toEqual({
-      SANITY_PROJECT: { status: 'done' },
-      SEED_CONTENT: { status: 'running' },
-      DEPLOY_STUDIO: { status: 'idle' },
-      PERSIST_TOKEN: { status: 'idle' },
-      MAP_DOMAIN: { status: 'idle' },
+      SANITY_PROJECT: { status: 'DONE' },
+      SEED_CONTENT: { status: 'RUNNING' },
+      DEPLOY_STUDIO: { status: 'IDLE' },
+      PERSIST_TOKEN: { status: 'IDLE' },
+      MAP_DOMAIN: { status: 'IDLE' },
     });
   });
 
@@ -97,12 +97,12 @@ describe(updateProvisioningStep, () => {
     const tenant = await updateProvisioningStep({
       tenantId,
       step: 'SANITY_PROJECT',
-      status: 'failed',
+      status: 'FAILED',
       error: 'Sanity Projects API returned 429',
     });
 
     expect(tenant.provisioningSteps?.['SANITY_PROJECT']).toEqual({
-      status: 'failed',
+      status: 'FAILED',
       error: 'Sanity Projects API returned 429',
     });
   });
@@ -113,7 +113,7 @@ describe(updateProvisioningStep, () => {
     const tenant = await updateProvisioningStep({
       tenantId,
       step: 'SANITY_PROJECT',
-      status: 'done',
+      status: 'DONE',
     });
 
     expect(tenant.provisioningStatus).toBe('PENDING');
@@ -125,13 +125,13 @@ describe(updateProvisioningStep, () => {
     const tenant = await updateProvisioningStep({
       tenantId,
       step: 'MAP_DOMAIN',
-      status: 'done',
+      status: 'DONE',
       provisioningStatus: 'READY',
     });
 
     expect(tenant.provisioningStatus).toBe('READY');
     expect(tenant.provisioningSteps?.['MAP_DOMAIN']).toEqual({
-      status: 'done',
+      status: 'DONE',
     });
   });
 
@@ -140,7 +140,7 @@ describe(updateProvisioningStep, () => {
       updateProvisioningStep({
         tenantId: '00000000-0000-0000-0000-000000000000',
         step: 'SANITY_PROJECT',
-        status: 'running',
+        status: 'RUNNING',
       }),
     ).rejects.toThrow();
   });

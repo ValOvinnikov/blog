@@ -1,20 +1,17 @@
 import type {
   TTenantProvisioningStatus,
   TTenantProvisioningStep,
+  TTenantProvisioningStepStatus,
 } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import {
-  tenants,
-  type TProvisioningStepStatus,
-  type TTenant,
-} from '@blog/db/schema/tenants';
+import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { eq, sql } from 'drizzle-orm';
 
 export type TUpdateProvisioningStepInput = {
   tenantId: string;
   step: TTenantProvisioningStep;
-  status: TProvisioningStepStatus;
-  // Only meaningful (and only ever set) alongside `status: 'failed'`. No
+  status: TTenantProvisioningStepStatus;
+  // Only meaningful (and only ever set) alongside `status: FAILED`. No
   // faked default — omitted entirely rather than stored as `''` when there
   // is no error.
   error?: string;
@@ -36,7 +33,7 @@ export async function updateProvisioningStep(
 ): Promise<TTenant> {
   const db = getDb();
 
-  const stepState: { status: TProvisioningStepStatus; error?: string } =
+  const stepState: { status: TTenantProvisioningStepStatus; error?: string } =
     input.error === undefined
       ? { status: input.status }
       : { status: input.status, error: input.error };

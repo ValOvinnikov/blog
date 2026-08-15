@@ -27,11 +27,11 @@ afterEach(async () => {
 describe(getTenantProvisioningStatus, () => {
   it('returns the overall status and per-step map for an existing tenant', async () => {
     const provisioningSteps: TTenantProvisioningSteps = {
-      SANITY_PROJECT: { status: 'done' },
-      SEED_CONTENT: { status: 'running' },
-      DEPLOY_STUDIO: { status: 'idle' },
-      PERSIST_TOKEN: { status: 'idle' },
-      MAP_DOMAIN: { status: 'idle' },
+      SANITY_PROJECT: { status: 'DONE' },
+      SEED_CONTENT: { status: 'RUNNING' },
+      DEPLOY_STUDIO: { status: 'IDLE' },
+      PERSIST_TOKEN: { status: 'IDLE' },
+      MAP_DOMAIN: { status: 'IDLE' },
     };
     const [tenant] = await db
       .insert(schema.tenants)
