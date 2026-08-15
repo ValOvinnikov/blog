@@ -55,15 +55,10 @@ export default [
       ],
     },
   },
-  // `scripts/provision-tenant/**` is ops-script territory, not the
-  // query-layer surface the rule above protects (see CLAUDE.md's `db`
-  // layer contract and `.claude/agents/db.md`) — the tenant-provisioning
-  // workflow's content seeder is a standalone Node script that talks to a
-  // brand-new tenant's Sanity project directly via `@sanity/client`, the
-  // same data client `@blog/service` itself uses, never `@blog/service` or
-  // the Studio-only `sanity`/`next-sanity`/`groqd` packages. Every other
-  // restriction (no React, no `@blog/ui`, no `@blog/service`) still applies
-  // here unchanged.
+  // The provisioning content seeder is a standalone Node script that talks
+  // to a brand-new tenant's Sanity project directly via `@sanity/client` —
+  // every other restriction (no React, no `@blog/ui`, no `@blog/service`,
+  // no Studio SDKs, no other `@sanity/*` package) still applies.
   {
     files: ['scripts/provision-tenant/**/*.{ts,tsx}'],
     rules: {
@@ -90,11 +85,14 @@ export default [
                 'sanity/*',
                 'next-sanity',
                 'next-sanity/*',
+                '@sanity/*',
                 'groqd',
                 'groqd/*',
+                '!@sanity/client',
+                '!@sanity/client/*',
               ],
               message:
-                '@blog/db must not import @blog/service or the Studio SDKs — a feature needing both joins them in apps/web. `@sanity/client` itself is the one exception here (see the provisioning content seeder).',
+                '@blog/db must not import @blog/service or the Studio SDKs — a feature needing both joins them in apps/web. `@sanity/client` is the one exception here.',
             },
           ],
         },
