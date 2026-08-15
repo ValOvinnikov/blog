@@ -1,3 +1,7 @@
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP,
+} from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -15,6 +19,16 @@ const tenant: TTenant = {
   locale: 'en',
   plan: 'FREE',
   status: 'ACTIVE',
+  provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+  provisioningSteps: {
+    [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: { status: 'done' },
+    [TENANT_PROVISIONING_STEP.SEED_CONTENT]: { status: 'done' },
+    [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: { status: 'done' },
+    [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: { status: 'done' },
+    [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: { status: 'done' },
+  },
+  studioVercelProjectId: null,
+  seededAt: new Date('2026-01-01T00:00:00.000Z'),
   createdAt: new Date(),
   updatedAt: new Date(),
 };
