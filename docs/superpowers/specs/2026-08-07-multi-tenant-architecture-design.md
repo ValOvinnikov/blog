@@ -114,9 +114,13 @@ request-scoped context read by RSCs). Unknown host → platform marketing page o
 (with a small LRU of clients). The resolved tenant supplies projectId + dataset;
 the read token is **per-tenant, stored encrypted in the registry**
 (resolved 2026-08-14, see §Open decision 2 — not a shared platform token, to
-contain blast radius to one tenant per leak). Every existing `service.*` call gains the tenant context
-as an argument (or reads it from the request-scoped resolver). View-model shapes
-are unchanged — only _which project_ they read from changes.
+contain blast radius to one tenant per leak). The mechanism landed as epic 2a
+(#1543, merged): `getClient()`/`runQuery()`/`isr()` all take an optional
+tenant context, proven end-to-end on one loader (`getPostsByIds` / the
+bookmarks page). Every other `service.*` call gaining the tenant context is
+epic 2b, tracked separately — until a given loader migrates, it keeps reading
+the legacy single-tenant client unchanged. View-model shapes are unchanged —
+only _which project_ they read from changes.
 
 **ISR / caching must be tenant-scoped.** Every cache tag gains a `tenantId`
 prefix (`t:<id>:post:<slug>`) so revalidating tenant A never purges tenant B.
