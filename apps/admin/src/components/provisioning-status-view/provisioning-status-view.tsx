@@ -41,7 +41,7 @@ const DNS_TONE: Record<TDomainVerificationStatus, 'ok' | 'warn' | 'neutral'> = {
   ERROR: 'warn',
 };
 
-export type TProvisioningStatusViewProps = {
+type TProvisioningStatusViewProps = {
   tenant: TTenant;
   domainVerificationStatus: TDomainVerificationStatus;
 };
