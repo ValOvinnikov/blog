@@ -12,7 +12,10 @@ export default mergeConfig(
     test: {
       environment: 'node',
       mockReset: true,
-      include: ['src/**/*.{test,spec}.ts'],
+      // `scripts/provision-tenant/**` is ops-script territory (not the
+      // query-layer `src/`), but its request-shape and idempotency-skip
+      // logic still gets the same unit-test coverage.
+      include: ['src/**/*.{test,spec}.ts', 'scripts/**/*.{test,spec}.ts'],
       env: {
         // `env.ts` validates at import time; SKIP_ENV_VALIDATION lets tests
         // import client/env modules without a real Neon connection string.

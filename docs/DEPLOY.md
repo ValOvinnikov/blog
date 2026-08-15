@@ -256,13 +256,52 @@ job resolves its own project's id + token:
 - [ ] Secret `DATABASE_URL_UNPOOLED` = `<PRD_DATABASE_URL_UNPOOLED>` (the `production`
       Neon branch's direct connection string — the `migrate-db` job's
       `pg_dump` backup + `drizzle-kit migrate`; same value as the Vercel env
-      var above)
+      var above; `provision-tenant.yml` also reuses this same secret, mapped
+      to `DATABASE_URL`, the env var name `@blog/db`'s runtime client
+      actually reads — see below)
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-prod**)
 - [ ] Variable `VERCEL_PROJECT_ID_CMS` = `<VERCEL_PROJECT_ID>` (**cms-prod**)
 - [ ] (Optional) require a reviewer on `production` for a manual gate before prod
       deploys run.
+
+`.github/workflows/provision-tenant.yml` (`workflow_dispatch` only, triggered
+from `apps/admin`'s "Add tenant" wizard) also runs in this same `production`
+environment — one tenant registry, not a per-environment one — and needs a
+few secrets/vars nothing else in this repo has needed yet:
+
+- [ ] Secret `SANITY_MANAGEMENT_TOKEN` — an **organization-level** Sanity
+      token with "create project" permission (broader than `SANITY_MIGRATE_TOKEN`,
+      which is scoped to one already-existing project). Mint it at
+      https://manage.sanity.io → your organization → API → Tokens. Used to
+      create each new tenant's Sanity project/dataset/CORS entry and to mint
+      its transient seed-content token and its persisted read-only token.
+- [ ] Secret `TENANT_PROVISIONING_CALLBACK_SECRET` — a shared secret
+      (`openssl rand -hex 32`), **byte-identical** to `apps/admin`'s own
+      `TENANT_PROVISIONING_CALLBACK_SECRET` env var. The workflow sends it as
+      `Authorization: Bearer <secret>` on every call to
+      `POST /api/provisioning/status-callback`; a mismatch makes every
+      callback 401 (the tenant row still gets provisioned, but the admin
+      wizard's live per-step status never updates).
+- [ ] Secret `TENANT_TOKEN_ENCRYPTION_KEY` — the **same** value already set
+      as the `blog-prod`/`cms-prod`-adjacent Vercel env var of the same name
+      (see the `@blog/db` env vars table above). `setTenantSanityToken`
+      throws without it.
+- [ ] Variable `ADMIN_APP_BASE_URL` — the deployed `apps/admin` origin (no
+      trailing slash/path), e.g. `https://admin.{your-hosting}`. Used both as
+      the status-callback target and as the CORS origin step 1 adds to each
+      new tenant's Sanity project. `apps/admin` has no deploy workflow of its
+      own yet (not in `docs/DEPLOY.md`'s environment matrix), so there's no
+      existing convention to reuse here — this is a new variable.
+- [ ] Variable `VERCEL_TEAM_ID` — only needed if the Vercel account is
+      team-owned; omit otherwise.
+- [ ] `VERCEL_TOKEN` / `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` above are reused
+      as-is: `VERCEL_TOKEN` needs project-creation scope (not just deploy
+      scope) for this workflow to create each tenant's Studio Vercel project;
+      `VERCEL_PROJECT_ID` here means the **shared web** project (`blog-prod`)
+      — the one the "Map domain" step adds every tenant's custom domain to,
+      never a per-tenant project.
 
 > Repo-level `SANITY_STUDIO_PROJECT_ID` / `SANITY_STUDIO_DATASET` remain the
 > fallback for `ci.yml` (which sets no environment) — point them at whichever
