@@ -1,4 +1,9 @@
 import { renderWithIntl, screen } from '@admin/testing/custom-render';
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+} from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import { TenantsTable } from './tenants-table';
@@ -16,6 +21,26 @@ const buildTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
   locale: 'en',
   plan: 'FREE',
   status: 'ACTIVE',
+  provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+  provisioningSteps: {
+    [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+    },
+    [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
+      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+    },
+    [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
+      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+    },
+    [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
+      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+    },
+    [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+    },
+  },
+  studioVercelProjectId: null,
+  seededAt: new Date('2026-04-02T00:00:00.000Z'),
   createdAt: new Date('2026-04-02T00:00:00.000Z'),
   updatedAt: new Date('2026-04-02T00:00:00.000Z'),
   ...overrides,
