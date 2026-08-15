@@ -7,5 +7,8 @@ export * from './get-tenant-provisioning-status';
 export * from './get-tenant-sanity-credentials';
 export * from './list-tenants';
 export * from './list-tenants-by-ids';
+export * from './set-tenant-sanity-project';
 export * from './set-tenant-sanity-token';
+export * from './set-tenant-seeded-at';
+export * from './set-tenant-studio-vercel-project';
 export * from './update-provisioning-step';
