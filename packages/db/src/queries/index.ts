@@ -10,3 +10,4 @@ export * as siteConfig from './site-config';
 export * as subscribers from './subscribers';
 export * as tenantDomains from './tenant-domains';
 export * as tenants from './tenants';
+export * as users from './users';
