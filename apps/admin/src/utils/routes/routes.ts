@@ -4,6 +4,8 @@
  */
 export const adminRoutes = {
   tenants: () => '/tenants',
+  addTenant: () => '/add-tenant',
+  tenantStatus: (tenantId: string) => `/tenants/${tenantId}`,
   tenant: (tenantSlug: string) => `/t/${tenantSlug}`,
   look: (tenantSlug: string) => `/t/${tenantSlug}/look`,
   voice: (tenantSlug: string) => `/t/${tenantSlug}/voice`,
