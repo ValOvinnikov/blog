@@ -6,7 +6,9 @@ items handed off from Feature 6 of
 Output feeds per-epic `superpowers:writing-plans` passes and `board-keeper`
 ticketing. **All 7 items in §Open decisions are resolved as of 2026-08-14** —
 see that section for the final call on each. Phase 0 (tenant registry) has
-already shipped; epic 2 (per-tenant content reads) is next and unblocked.
+already shipped; epic 2a (per-tenant content reads infrastructure) has
+shipped too, proven on one loader — epic 2b (migrating the remaining
+`service.*` loaders) is next and unblocked.
 **Date:** 2026-08-07
 **Scope:** How the blog becomes a multi-tenant platform serving many client
 sites — each edited by that client's own staff, isolated, at the scale of
@@ -107,16 +109,20 @@ the tenant (cached — the registry is small and changes rarely), and attach the
 resolved `tenantId` + Sanity coordinates to the request (header or a
 request-scoped context read by RSCs). Unknown host → platform marketing page or 404. This is the _only_ new hot-path lookup, and it is cacheable.
 
-### 2. Content reads — per-tenant Sanity client — in progress (epic #1543)
+### 2. Content reads — per-tenant Sanity client — epic 2a shipped (#1543), epic 2b next
 
 `@blog/service` moves from a module-level client bound to
 `NEXT_PUBLIC_SANITY_PROJECT_ID` to a **client factory keyed by `projectId`**
 (with a small LRU of clients). The resolved tenant supplies projectId + dataset;
 the read token is **per-tenant, stored encrypted in the registry**
 (resolved 2026-08-14, see §Open decision 2 — not a shared platform token, to
-contain blast radius to one tenant per leak). Every existing `service.*` call gains the tenant context
-as an argument (or reads it from the request-scoped resolver). View-model shapes
-are unchanged — only _which project_ they read from changes.
+contain blast radius to one tenant per leak). The mechanism landed as epic 2a
+(#1543, merged): `getClient()`/`runQuery()`/`isr()` all take an optional
+tenant context, proven end-to-end on one loader (`getPostsByIds` / the
+bookmarks page). Every other `service.*` call gaining the tenant context is
+epic 2b, tracked separately — until a given loader migrates, it keeps reading
+the legacy single-tenant client unchanged. View-model shapes are unchanged —
+only _which project_ they read from changes.
 
 **ISR / caching must be tenant-scoped.** Every cache tag gains a `tenantId`
 prefix (`t:<id>:post:<slug>`) so revalidating tenant A never purges tenant B.

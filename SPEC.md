@@ -328,6 +328,15 @@ URL scheme and a single `SmartLink` for all in-app navigation.
 Full mechanics:
 [`docs/context/rendering-caching-i18n.md`](./docs/context/rendering-caching-i18n.md).
 
+Cache tags can be tenant-scoped (`t:<projectId>:<tag>`, alongside the legacy
+unprefixed form); the revalidation webhook purges both per publish, keyed off
+Sanity's own `sanity-project-id` webhook header. `@blog/service`'s
+`getClient()`/`runQuery()`/`isr()` all take an optional tenant context —
+called with none, they behave exactly as before (legacy single-tenant client,
+unprefixed tags), which is what keeps every not-yet-migrated `service.*`
+loader compiling and working unchanged while the migration proceeds
+loader-by-loader.
+
 ## 10. SEO & accessibility
 
 Per-route `generateMetadata` with a `service`-owned SEO fallback ladder

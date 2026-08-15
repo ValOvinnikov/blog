@@ -600,17 +600,31 @@ gh project item-edit --id <ITEM_ID> --project-id PVT_kwHOAIMQW84BcK3T \
 ```
 
 **Then immediately re-query that exact item** (don't trust the command's exit
-code — that's the known silent-failure mode):
+code — that's the known silent-failure mode). The re-query must be a **second,
+independent** API call, not the mutation's own echoed response and not
+`gh project item-list` — a real incident (#1543, 2026-08-15) had a prior
+dispatch report a write as verified via `item-list`, when a direct node query
+minutes later showed the field had never actually changed. Use a direct
+`node(id:...)` GraphQL query instead — it reads the item's live field state,
+not a listing that can lag or cache:
 
 ```
-gh project item-list 2 --owner ValOvinnikov --format json -L 200 \
-  | jq '.items[] | select(.id=="<ITEM_ID>") | .status'
+gh api graphql -f query='query {
+  node(id: "<ITEM_ID>") {
+    ... on ProjectV2Item {
+      fieldValueByName(name: "Status") {
+        ... on ProjectV2ItemFieldSingleSelectValue { name }
+      }
+    }
+  }
+}'
 ```
 
-If the re-query still shows the old status, retry the edit once. If it still
-doesn't stick after retry, stop trying, report it as a **failed write** (not a
-silent success) with the exact command you ran, and let the orchestrator
-decide whether to retry again or escalate.
+Confirm the returned `name` matches the status you just set. If it still shows
+the old status, retry the edit once. If it still doesn't stick after retry,
+stop trying, report it as a **failed write** (not a silent success) with the
+exact command you ran, and let the orchestrator decide whether to retry again
+or escalate.
 
 **Not safe — list for the orchestrator, do not touch:**
 
