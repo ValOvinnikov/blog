@@ -54,4 +54,44 @@ describe(getPostsByIds, () => {
       }),
     );
   });
+
+  it('threads tenant context into runQuery and scopes the tags to it', async () => {
+    mockRun.mockResolvedValue([]);
+    const tenant = {
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok',
+    };
+
+    await getPostsByIds(['a'], tenant);
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        tenant,
+        next: {
+          revalidate: 3600,
+          tags: [
+            't:tenant-a:posts',
+            't:tenant-a:author',
+            't:tenant-a:category',
+          ],
+        },
+      }),
+    );
+  });
+
+  it('omits tenant scoping when no tenant is given (legacy behavior unchanged)', async () => {
+    mockRun.mockResolvedValue([]);
+
+    await getPostsByIds(['a']);
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        tenant: undefined,
+        next: { revalidate: 3600, tags: ['posts', 'author', 'category'] },
+      }),
+    );
+  });
 });

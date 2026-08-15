@@ -4,7 +4,12 @@ import type {
 } from '@blog/config';
 import { createGroqBuilder, makeSafeQueryRunner } from 'groqd';
 
-import { getClient } from './client';
+import { getClient, type TTenantSanityContext } from './client';
+
+// Re-exported so downstream loaders/callers can `import { ...,
+// type TTenantSanityContext } from '@blog/service/sanity/query'` without
+// also reaching into './client' directly.
+export type { TTenantSanityContext };
 
 type TSchemaConfig = {
   schemaTypes: AllSanitySchemaTypes;
@@ -18,11 +23,16 @@ export type TSlugParams = { slug: string };
 
 type TNextFetchOptions = {
   next?: { revalidate?: number | false; tags?: string[] };
+  tenant?: TTenantSanityContext;
 };
 
 export const runQuery = makeSafeQueryRunner<TNextFetchOptions>(
-  (query, { parameters, next }) =>
-    getClient().fetch(query, parameters ?? {}, next ? { next } : undefined),
+  (query, { parameters, next, tenant }) =>
+    getClient(tenant).fetch(
+      query,
+      parameters ?? {},
+      next ? { next } : undefined,
+    ),
 );
 
 /**
@@ -36,7 +46,24 @@ export const runQuery = makeSafeQueryRunner<TNextFetchOptions>(
  * is a defensive completeness rule for the tag scheme itself — it does not
  * replace or depend on the webhook's blanket `revalidatePath('/', 'layout')`
  * backstop, which stays regardless.
+ *
+ * No-arg `scopeProjectId` keeps producing the legacy unprefixed tags (every
+ * loader not yet migrated to per-tenant context). Passed a `projectId`,
+ * every tag is prefixed `t:<projectId>:<tag>` — the revalidation webhook
+ * (`apps/web/src/app/api/revalidate/route.ts`) purges both forms on every
+ * publish, so this is forward-compatible with loaders migrating one at a
+ * time, no webhook change required per loader.
  */
-export const isr = (tag: string | string[]): TNextFetchOptions => ({
-  next: { revalidate: 3600, tags: Array.isArray(tag) ? tag : [tag] },
-});
+export const isr = (
+  tag: string | string[],
+  scopeProjectId?: string,
+): TNextFetchOptions => {
+  const tags = Array.isArray(tag) ? tag : [tag];
+
+  return {
+    next: {
+      revalidate: 3600,
+      tags: scopeProjectId ? tags.map((t) => `t:${scopeProjectId}:${t}`) : tags,
+    },
+  };
+};
