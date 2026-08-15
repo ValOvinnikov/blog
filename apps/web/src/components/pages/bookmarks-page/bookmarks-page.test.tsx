@@ -10,18 +10,24 @@ const {
   getPostsByIdsMock,
   getChromeOnMock,
   getRequestTenantIdMock,
+  getTenantSanityContextMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   listBookmarksMock: vi.fn(),
   getPostsByIdsMock: vi.fn(),
   getChromeOnMock: vi.fn(),
   getRequestTenantIdMock: vi.fn(),
+  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
 vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
   getRequestTenantId: getRequestTenantIdMock,
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
+  getTenantSanityContext: getTenantSanityContextMock,
 }));
 
 vi.mock('@blog/db', () => ({
@@ -68,6 +74,8 @@ describe(`<${BookmarksPage.name}/>`, () => {
     getChromeOnMock.mockResolvedValue(true);
     getRequestTenantIdMock.mockReset();
     getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
+    getTenantSanityContextMock.mockReset();
+    getTenantSanityContextMock.mockResolvedValue(undefined);
   });
 
   it('redirects home without querying bookmarks when there is no session', async () => {
@@ -107,7 +115,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
     expect(screen.queryByText(/saved$/)).not.toBeInTheDocument();
     expect(listBookmarksMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
-    expect(getPostsByIdsMock).toHaveBeenCalledWith([]);
+    expect(getPostsByIdsMock).toHaveBeenCalledWith([], undefined);
   });
 
   it('renders the terminal window chrome with the My bookmarks prompt', async () => {
@@ -136,7 +144,10 @@ describe(`<${BookmarksPage.name}/>`, () => {
 
     await setup();
 
-    expect(getPostsByIdsMock).toHaveBeenCalledWith(['post-2', 'post-1']);
+    expect(getPostsByIdsMock).toHaveBeenCalledWith(
+      ['post-2', 'post-1'],
+      undefined,
+    );
 
     const links = screen.getAllByRole('link');
     expect(links.map((link) => link.textContent)).toEqual([

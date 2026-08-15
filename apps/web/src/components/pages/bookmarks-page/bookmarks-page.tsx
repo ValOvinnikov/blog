@@ -7,6 +7,7 @@ import { BookmarksList, type IBookmarkRow } from '@blog/ui/organisms';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { auth } from '@web/server/auth/auth';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { getChromeOn } from '@web/utils/get-chrome-on';
 import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { redirect } from 'next/navigation';
@@ -60,7 +61,11 @@ export async function BookmarksPage() {
 
   const bookmarkOrder = bookmarks.map((bookmark) => bookmark.postId);
 
-  const result = await service.entities.posts.v1.getPostsByIds(bookmarkOrder);
+  const tenant = await getTenantSanityContext();
+  const result = await service.entities.posts.v1.getPostsByIds(
+    bookmarkOrder,
+    tenant,
+  );
 
   if (!result.ok) {
     console.error(
