@@ -28,6 +28,9 @@ describe('0009_quick_jazinda (tenants name backfill)', () => {
     const priorMigrations = migrationFiles.filter(
       (file) => file < BACKFILL_MIGRATION,
     );
+    const laterMigrations = migrationFiles.filter(
+      (file) => file > BACKFILL_MIGRATION,
+    );
 
     for (const file of priorMigrations) {
       await applyMigrationFile(db, file);
@@ -47,6 +50,15 @@ describe('0009_quick_jazinda (tenants name backfill)', () => {
     );
 
     await applyMigrationFile(db, BACKFILL_MIGRATION);
+
+    // Every migration after the one under test still needs applying too —
+    // the typed `tenants` table below reflects the current schema code, not
+    // just the state as of BACKFILL_MIGRATION, so a later additive column
+    // (e.g. the encrypted Sanity token) must exist in this test db as well
+    // for the select to succeed.
+    for (const file of laterMigrations) {
+      await applyMigrationFile(db, file);
+    }
 
     const rows = await db.select().from(tenants).orderBy(tenants.slug);
     const namesBySlug = Object.fromEntries(
