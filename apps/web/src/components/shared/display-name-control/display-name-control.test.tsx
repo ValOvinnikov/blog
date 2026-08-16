@@ -31,7 +31,7 @@ vi.mock('@web/server/account/identity-actions', () => ({
   updateDisplayNameAction: updateDisplayNameActionMock,
 }));
 
-vi.mock('@web/components/shared/toast-provider', () => ({
+vi.mock('@web/context/toast-provider', () => ({
   useToast: () => ({
     success: vi.fn(),
     info: vi.fn(),

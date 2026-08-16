@@ -1,4 +1,4 @@
-import { DepthProvider } from '@web/components/shared/depth-provider';
+import { DepthProvider } from '@web/context/depth-provider';
 import { renderElement, screen, within } from '@web/testing/custom-render';
 
 import { DepthToggle, type IDepthToggleLabels } from './depth-toggle';

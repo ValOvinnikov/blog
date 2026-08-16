@@ -37,7 +37,7 @@ vi.mock('@web/server/account/newsletter-subscription-actions', () => ({
   resendConfirmationAction: resendConfirmationActionMock,
 }));
 
-vi.mock('@web/components/shared/toast-provider', () => ({
+vi.mock('@web/context/toast-provider', () => ({
   useToast: () => ({
     success: vi.fn(),
     info: vi.fn(),

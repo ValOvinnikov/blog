@@ -7,7 +7,7 @@ import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { SiteNavigation } from '@web/components/shared/site-navigation';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
-import { ToastProvider } from '@web/components/shared/toast-provider';
+import { ToastProvider } from '@web/context/toast-provider';
 import { routing } from '@web/i18n/routing';
 import { env } from '@web/utils/env/env';
 import { getChromeOn } from '@web/utils/get-chrome-on';
