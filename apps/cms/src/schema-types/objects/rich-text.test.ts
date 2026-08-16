@@ -17,13 +17,7 @@ const getBlockMember = () => {
 };
 
 describe('richTextSchema block styles', () => {
-  it('excludes H1 so the body never competes with the page/post title', () => {
-    const { styles } = getBlockMember();
-
-    expect(styles?.map((style) => style.value)).not.toContain('h1');
-  });
-
-  it('only offers normal, H2–H4, and blockquote', () => {
+  it('only offers normal, H2–H4, and blockquote — excluding H1 so the body never competes with the page/post title', () => {
     const { styles } = getBlockMember();
 
     expect(styles?.map((style) => style.value)).toEqual([
