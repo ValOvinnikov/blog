@@ -7,7 +7,7 @@ import { resolveFontVariableClassName } from '@web/config/fonts';
 import { themeBootstrapScript } from '@web/config/theme-script';
 import { buildThemeStyleBlock } from '@web/utils/build-theme-style-block';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';
-import { isVercelAnalyticsEnabled } from '@web/utils/is-vercel-analytics-enabled';
+import { isWebAnalyticsEnabled } from '@web/utils/is-web-analytics-enabled';
 
 type TProps = {
   children: React.ReactNode;
@@ -31,7 +31,7 @@ type TProps = {
 export default async function RootLayout({ children }: TProps) {
   const themeTokens = await getThemeTokens();
 
-  const analyticsEnabled = isVercelAnalyticsEnabled();
+  const analyticsEnabled = isWebAnalyticsEnabled();
   const fontVariableClassName = resolveFontVariableClassName(
     themeTokens.headingFont,
     themeTokens.bodyFont,
@@ -63,7 +63,7 @@ export default async function RootLayout({ children }: TProps) {
             (`/_vercel/speed-insights/script.js` / `/_vercel/insights/script.js`)
             that Vercel's edge only proxies when the matching dashboard
             feature is enabled for the deploying project — gated behind
-            `isVercelAnalyticsEnabled()` (env var, not `VERCEL_ENV`; see its
+            `isWebAnalyticsEnabled()` (env var, not `VERCEL_ENV`; see its
             own comment) so a project without Speed Insights/Web Analytics
             turned on doesn't 404 on that path (issue #1072). */}
         {analyticsEnabled && <SpeedInsights />}

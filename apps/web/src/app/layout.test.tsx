@@ -9,7 +9,7 @@ const { listTenantsMock, getSiteConfigMock } = vi.hoisted(() => ({
 }));
 
 const { envMock } = vi.hoisted(() => ({
-  envMock: { VERCEL_ANALYTICS_ENABLED: undefined as string | undefined },
+  envMock: { WEB_ANALYTICS_ENABLED: undefined as string | undefined },
 }));
 
 vi.mock('@blog/db', () => ({
@@ -45,7 +45,7 @@ const CONSOLE_SITE_CONFIG_ROW = {
 describe(`<${RootLayout.name}/>`, () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    envMock.VERCEL_ANALYTICS_ENABLED = undefined;
+    envMock.WEB_ANALYTICS_ENABLED = undefined;
     listTenantsMock.mockResolvedValue([TENANT]);
     getSiteConfigMock.mockResolvedValue(CONSOLE_SITE_CONFIG_ROW);
   });
@@ -97,7 +97,7 @@ describe(`<${RootLayout.name}/>`, () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it('omits Analytics and SpeedInsights when VERCEL_ANALYTICS_ENABLED is unset', async () => {
+  it('omits Analytics and SpeedInsights when WEB_ANALYTICS_ENABLED is unset', async () => {
     const html = await RootLayout({ children: <div>content</div> });
 
     const [, body] = html.props.children;
@@ -115,8 +115,8 @@ describe(`<${RootLayout.name}/>`, () => {
     ).toBe(false);
   });
 
-  it('mounts Analytics and SpeedInsights when VERCEL_ANALYTICS_ENABLED is "true"', async () => {
-    envMock.VERCEL_ANALYTICS_ENABLED = 'true';
+  it('mounts Analytics and SpeedInsights when WEB_ANALYTICS_ENABLED is "true"', async () => {
+    envMock.WEB_ANALYTICS_ENABLED = 'true';
     const html = await RootLayout({ children: <div>content</div> });
 
     const [, body] = html.props.children;

@@ -33,10 +33,13 @@ export const env = createEnv({
     // opt-in set only on the Vercel project(s) where those dashboard
     // features are actually enabled — same human-gated console posture as
     // this repo's other one-time Vercel/Sanity setup (`docs/DEPLOY.md`).
+    // Named `WEB_` rather than `VERCEL_` because Vercel reserves the entire
+    // `VERCEL_` prefix for its own system-injected variables — a custom var
+    // with that prefix can never actually be created in the dashboard.
     // Server-only: whether `<Analytics />`/`<SpeedInsights />` render at all
     // is decided in the root layout (a Server Component) before the RSC
     // payload is built, so the flag never needs to reach the client bundle.
-    VERCEL_ANALYTICS_ENABLED: z.enum(['true', 'false']).optional(),
+    WEB_ANALYTICS_ENABLED: z.enum(['true', 'false']).optional(),
     // Shared Resend "send email" helper (`@web/server/email/send-email`) —
     // powers the Auth.js Email provider's magic-link (via `@blog/auth`) and
     // the newsletter confirmation email (reuses this same helper/var).
@@ -59,7 +62,7 @@ export const env = createEnv({
     SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     SANITY_GENERATE_SECRET: process.env.SANITY_GENERATE_SECRET,
-    VERCEL_ANALYTICS_ENABLED: process.env.VERCEL_ANALYTICS_ENABLED,
+    WEB_ANALYTICS_ENABLED: process.env.WEB_ANALYTICS_ENABLED,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     NEWSLETTER_FROM_ADDRESS: process.env.NEWSLETTER_FROM_ADDRESS,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
