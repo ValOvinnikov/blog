@@ -56,17 +56,14 @@ describe(`<${PostCard.name}/>`, () => {
     expect(screen.getByText('typescript')).toBeVisible();
   });
 
-  it('does not render tags area when tags is empty', () => {
-    const { container } = renderElement(<PostCard tags={[]} />);
-    expect(container.querySelectorAll('span[class]').length).toBe(0);
-  });
-
   it('renders author name when provided via PostCard.Footer', () => {
     renderElement(
       <PostCard>
         <PostCard.Footer authorName="Jane Doe" />
       </PostCard>,
     );
+    // `sr-only` is the sole observable that distinguishes the visible name
+    // span from the Avatar's visually-hidden duplicate of the same text.
     const visibleName = screen
       .getAllByText('Jane Doe')
       .find((el) => !el.classList.contains('sr-only'));

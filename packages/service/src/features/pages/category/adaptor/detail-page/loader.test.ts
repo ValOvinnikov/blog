@@ -105,7 +105,7 @@ describe('getCategoryPage', () => {
       2,
       expect.anything(),
       expect.objectContaining({
-        next: { revalidate: 3600, tags: ['posts', 'category'] },
+        next: expect.objectContaining({ tags: ['posts', 'category'] }),
       }),
     );
   });

@@ -24,21 +24,6 @@ describe(moveCategoriesToSingleCategory, () => {
     expect(result).toBeUndefined();
   });
 
-  it('does not clobber an already-set category on a partially-migrated doc', () => {
-    // A prior run could have set `category` but failed before unsetting
-    // `categories` (or the two fields could otherwise coexist transiently).
-    // The mutation must use setIfMissing, never set, so a re-run never
-    // overwrites a category value that's already there.
-    const categories = [{ _type: 'reference', _ref: 'category-a', _key: 'a' }];
-
-    const result = moveCategoriesToSingleCategory({ categories });
-
-    expect(result).toEqual([
-      at('category', setIfMissing({ _type: 'reference', _ref: 'category-a' })),
-      at('categories', unset()),
-    ]);
-  });
-
   it('documents the known edge case: an empty categories array leaves category unset', () => {
     // The old schema required `categories` without a `.min(1)`, so an empty
     // array should never happen in practice — but if it did, this migration

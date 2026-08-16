@@ -8,7 +8,10 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 }));
 
 describe('getTagPaginationParams', () => {
-  it('returns { slug, page } entries for pages 2..N per tag', async () => {
+  // Branch coverage (zero posts, single-page corpus, multi-page corpus) lives
+  // in `./transformer.test.ts` — this loader has no logic beyond delegating
+  // the raw query result to it.
+  it('delegates the raw query result to the pagination transformer', async () => {
     mockRun.mockResolvedValueOnce([
       { slug: 'typescript', postCount: 20 },
       { slug: 'react', postCount: 9 },
@@ -20,21 +23,5 @@ describe('getTagPaginationParams', () => {
       { slug: 'typescript', page: '2' },
       { slug: 'typescript', page: '3' },
     ]);
-  });
-
-  it('returns an empty array when there are no tags', async () => {
-    mockRun.mockResolvedValueOnce([]);
-
-    const params = await getTagPaginationParams(9);
-
-    expect(params).toEqual([]);
-  });
-
-  it('returns an empty array when every tag fits on one page', async () => {
-    mockRun.mockResolvedValueOnce([{ slug: 'typescript', postCount: 0 }]);
-
-    const params = await getTagPaginationParams(9);
-
-    expect(params).toEqual([]);
   });
 });

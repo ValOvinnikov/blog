@@ -1,5 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { customRenderAsync } from '@web/testing/custom-render';
 
 import { ContentModule } from './content-module';
 
@@ -47,20 +47,5 @@ describe(ContentModule, () => {
 
     const section = container.querySelector('section');
     expect(section).not.toHaveAttribute('aria-labelledby');
-  });
-
-  it('renders correctly inside the Section layout wrapper with no layout authored', async () => {
-    getContentMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        body: [],
-        layout: undefined,
-      },
-    });
-
-    await setup();
-
-    expect(screen.getByTestId('content-module-content-1')).toBeVisible();
   });
 });

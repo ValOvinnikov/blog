@@ -8,7 +8,10 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 }));
 
 describe('getCategoryPaginationParams', () => {
-  it('returns { slug, page } entries for pages 2..N per category', async () => {
+  // Branch coverage (zero posts, single-page corpus, multi-page corpus) lives
+  // in `./transformer.test.ts` — this loader has no logic beyond delegating
+  // the raw query result to it.
+  it('delegates the raw query result to the pagination transformer', async () => {
     mockRun.mockResolvedValueOnce([
       { slug: 'engineering', postCount: 20 },
       { slug: 'design', postCount: 9 },
@@ -20,21 +23,5 @@ describe('getCategoryPaginationParams', () => {
       { slug: 'engineering', page: '2' },
       { slug: 'engineering', page: '3' },
     ]);
-  });
-
-  it('returns an empty array when there are no categories', async () => {
-    mockRun.mockResolvedValueOnce([]);
-
-    const params = await getCategoryPaginationParams(9);
-
-    expect(params).toEqual([]);
-  });
-
-  it('returns an empty array when every category fits on one page', async () => {
-    mockRun.mockResolvedValueOnce([{ slug: 'engineering', postCount: 0 }]);
-
-    const params = await getCategoryPaginationParams(9);
-
-    expect(params).toEqual([]);
   });
 });

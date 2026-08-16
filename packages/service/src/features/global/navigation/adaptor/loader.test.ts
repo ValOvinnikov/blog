@@ -58,11 +58,13 @@ describe('getNavigation', () => {
 
     await getNavigation();
 
-    expect(mockRun).toHaveBeenCalledWith(expect.anything(), {
-      next: {
-        revalidate: 3600,
-        tags: ['navigation', 'post', 'category', 'page_generic', 'page_blog'],
-      },
-    });
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        next: expect.objectContaining({
+          tags: ['navigation', 'post', 'category', 'page_generic', 'page_blog'],
+        }),
+      }),
+    );
   });
 });

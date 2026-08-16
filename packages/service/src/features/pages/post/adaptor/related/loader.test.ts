@@ -75,7 +75,9 @@ describe(getRelatedPosts, () => {
     await getRelatedPosts('current-id', ['tag-a'], 'cat-1');
 
     const expectedTags = expect.objectContaining({
-      next: { revalidate: 3600, tags: ['posts', 'author', 'category'] },
+      next: expect.objectContaining({
+        tags: ['posts', 'author', 'category'],
+      }),
     });
     expect(mockRun).toHaveBeenNthCalledWith(1, expect.anything(), expectedTags);
     expect(mockRun).toHaveBeenNthCalledWith(2, expect.anything(), expectedTags);

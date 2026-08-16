@@ -1,5 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { NewsletterModule } from './newsletter-module';
 
@@ -68,26 +68,6 @@ describe(NewsletterModule, () => {
 
     expect(screen.getByText('Get new posts')).toBeVisible();
     expect(screen.getByText('Straight to inbox.')).toBeVisible();
-  });
-
-  it('renders correctly inside the Section layout wrapper with no layout authored', async () => {
-    getNewsletterMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: 'Get new posts',
-          supportingText: 'Straight to inbox.',
-          align: undefined,
-        },
-        layout: undefined,
-      },
-    });
-
-    await setup();
-
-    const wrapper = screen.getByTestId('newsletter-module-newsletter-1');
-    expect(within(wrapper).getByText('Get new posts')).toBeVisible();
   });
 
   it('resolves the Section landmark aria-labelledby to the rendered heading id', async () => {

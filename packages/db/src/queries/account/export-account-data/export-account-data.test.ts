@@ -74,8 +74,8 @@ describe(exportAccountData, () => {
   it("aggregates the user's profile fields and bookmarks", async () => {
     await db.insert(schema.users).values({
       id: 'user-1',
-      name: 'Val',
-      email: 'val@example.com',
+      name: 'Jane Doe',
+      email: 'jane@example.com',
       image: 'https://example.com/avatar.png',
     });
     await db.insert(schema.bookmarks).values([
@@ -98,8 +98,8 @@ describe(exportAccountData, () => {
     expect(result).toEqual({
       profile: {
         id: 'user-1',
-        name: 'Val',
-        email: 'val@example.com',
+        name: 'Jane Doe',
+        email: 'jane@example.com',
         emailVerified: undefined,
         image: 'https://example.com/avatar.png',
       },

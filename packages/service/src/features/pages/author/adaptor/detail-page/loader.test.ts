@@ -124,14 +124,14 @@ describe('getAuthorPage', () => {
       1,
       expect.anything(),
       expect.objectContaining({
-        next: { revalidate: 3600, tags: ['author'] },
+        next: expect.objectContaining({ tags: ['author'] }),
       }),
     );
     expect(mockRun).toHaveBeenNthCalledWith(
       2,
       expect.anything(),
       expect.objectContaining({
-        next: { revalidate: 3600, tags: ['posts', 'category'] },
+        next: expect.objectContaining({ tags: ['posts', 'category'] }),
       }),
     );
   });

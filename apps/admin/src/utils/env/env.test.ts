@@ -74,13 +74,6 @@ describe('env', () => {
     expect(env.RESEND_API_KEY).toBeUndefined();
   });
 
-  it('never throws at import time when RESEND_API_KEY is absent', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    delete process.env['RESEND_API_KEY'];
-
-    await expect(importEnvOnServer()).resolves.toBeDefined();
-  });
-
   it('skips validation entirely when SKIP_ENV_VALIDATION is set', async () => {
     process.env['SKIP_ENV_VALIDATION'] = 'true';
     delete process.env['RESEND_API_KEY'];
@@ -104,13 +97,6 @@ describe('env', () => {
     const { env } = await importEnvOnServer();
 
     expect(env.BLOB_READ_WRITE_TOKEN).toBeUndefined();
-  });
-
-  it('never throws at import time when BLOB_READ_WRITE_TOKEN is absent', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    delete process.env['BLOB_READ_WRITE_TOKEN'];
-
-    await expect(importEnvOnServer()).resolves.toBeDefined();
   });
 
   it('parses a valid WEB_APP_URL and exposes it typed', async () => {

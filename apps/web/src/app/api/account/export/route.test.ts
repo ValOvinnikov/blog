@@ -55,7 +55,7 @@ describe('GET /api/account/export', () => {
   it('streams the export as a downloadable JSON attachment', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     const exportData = {
-      profile: { id: 'user-1', name: 'Val', email: 'val@example.com' },
+      profile: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
       bookmarks: [{ postId: 'post-1', createdAt: new Date('2026-01-01') }],
     };
     exportAccountDataMock.mockResolvedValue(exportData);
@@ -88,7 +88,7 @@ describe('GET /api/account/export', () => {
   it('resolves the tenant from the request Host header', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     exportAccountDataMock.mockResolvedValue({
-      profile: { id: 'user-1', name: 'Val', email: 'val@example.com' },
+      profile: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
       bookmarks: [],
     });
     const { GET } = await import('./route');

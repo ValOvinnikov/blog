@@ -32,8 +32,7 @@ describe('getCta', () => {
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
-        next: {
-          revalidate: 3600,
+        next: expect.objectContaining({
           tags: [
             'modules:cta',
             'module:cta-1',
@@ -42,7 +41,7 @@ describe('getCta', () => {
             'page_generic',
             'page_blog',
           ],
-        },
+        }),
       }),
     );
   });

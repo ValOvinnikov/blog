@@ -178,15 +178,16 @@ describe(`<${Article.name}/>`, () => {
   });
 
   it('renders Article.Body children', () => {
+    const body = faker.lorem.paragraph();
     renderElement(
       <Article>
         <Article.Header title="Building a Design System" meta={meta} />
         <Article.Body>
-          <p>{faker.lorem.paragraph()}</p>
+          <p>{body}</p>
         </Article.Body>
       </Article>,
     );
-    expect(screen.getByRole('article')).toBeVisible();
+    expect(screen.getByText(body)).toBeVisible();
   });
 
   it('renders Article.Footer tags as links to their routes', () => {

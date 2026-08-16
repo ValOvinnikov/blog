@@ -40,13 +40,15 @@ describe(`<${ImageWithCaption.name}/>`, () => {
     expect(container.querySelector('figcaption')).toBeNull();
   });
 
-  it('forwards className to MediaFrame', () => {
+  it('forwards className to MediaFrame, not the figure root', () => {
     const { container } = setup({
-      className: 'aspect-video',
+      className: 'custom-class',
       children: undefined,
     });
-    const frame = container.querySelector('.aspect-video');
-    expect(frame).not.toBeNull();
+    // MediaFrame has no role/text of its own here (children is empty), so
+    // its class list is the sole observable that className routed to the
+    // frame rather than the <figure> root.
+    expect(container.firstChild?.firstChild).toHaveClass('custom-class');
   });
 
   it('forwards dataTestId to the root figure', () => {

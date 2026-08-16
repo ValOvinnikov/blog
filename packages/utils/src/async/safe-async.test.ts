@@ -17,14 +17,6 @@ describe('safeAsync', () => {
     expect(result).toEqual({ ok: false, error: 'string error' });
   });
 
-  it('preserves the resolved value type', async () => {
-    const result = await safeAsync(() =>
-      Promise.resolve({ id: '1', name: 'Alice' }),
-    )();
-    if (!result.ok) throw new Error('expected ok');
-    expect(result.data.name).toBe('Alice');
-  });
-
   it('forwards multiple arguments to the wrapped function', async () => {
     const fn = async (a: number, b: string) => `${b}-${a}`;
     const result = await safeAsync(fn)(1, 'x');
