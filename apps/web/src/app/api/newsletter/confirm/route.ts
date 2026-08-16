@@ -46,21 +46,16 @@ function renderConfirmationPage({
 }
 
 /**
- * `GET /api/newsletter/confirm?token=…` — the double opt-in confirmation
- * link every newsletter confirmation email points at (#1044, redone by
- * #1200). Flips the matching `subscribers` row from `pending` to `active`
- * via `queries.subscribers.confirmSubscriber` and renders a plain result
- * page — `confirmed`/`already-confirmed` both read as success (the query's
- * own idempotency guarantee), a missing/invalid token or a `?token=`-less
- * request reads as 400/404, and a db failure reads as 500. Sits under
- * `/api` (not `[locale]`) alongside this app's other Route Handlers
- * (`/api/account/export`, `/api/revalidate`) — none of them are locale-
- * prefixed, matching `localePrefix: 'never'`.
+ * `GET /api/newsletter/confirm?token=…` — the double opt-in confirmation link
+ * every newsletter confirmation email points at. Flips the matching
+ * `subscribers` row from `pending` to `active` via
+ * `queries.subscribers.confirmSubscriber` and renders a plain result page;
+ * `confirmed`/`already-confirmed` both read as success (the query's own
+ * idempotency guarantee).
  *
- * `/api` routes are excluded from `proxy.ts`'s matcher (see its own docs),
- * so the `x-tenant-id` request header it threads to Server Components/
- * Actions never reaches here — this route resolves the tenant directly from
- * its own request's `Host` header instead.
+ * `/api` routes are excluded from `proxy.ts`'s matcher, so the `x-tenant-id`
+ * header it threads to Server Components/Actions never reaches here — this
+ * route resolves the tenant directly from its own request's `Host` header.
  */
 export async function GET(request: Request): Promise<NextResponse> {
   const token = new URL(request.url).searchParams.get('token');

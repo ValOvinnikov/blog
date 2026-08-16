@@ -19,14 +19,13 @@ import { getTranslations } from 'next-intl/server';
 type TBlogListPageProps = { page: number; locale: string };
 
 /**
- * BlogListPage — shared composition for `/blog` (page 1) and
- * `/blog/page/[page]` (pages ≥ 2): fetches one page window via the blog
- * service, renders a `Home › Blog` `Breadcrumbs` trail (plus its
- * `BreadcrumbList` JSON-LD) inside a `BreadcrumbBar` sibling before `<main>`,
- * then renders the archive content through the pure ui organisms. Any
- * editor-added page-builder modules (`page_blog.modules` — today just the
- * optional newsletter signup, #1200) render last, through the same
- * `ModuleRenderer` the home page uses — no hardcoded placement.
+ * Shared composition for `/blog` (page 1) and `/blog/page/[page]` (pages ≥
+ * 2): fetches one page window via the blog service, renders a `Home ›
+ * Blog` `Breadcrumbs` trail (plus its `BreadcrumbList` JSON-LD) inside a
+ * `BreadcrumbBar` sibling before `<main>`, then renders the archive content
+ * through the pure ui organisms. Any editor-added page-builder modules
+ * (`page_blog.modules`) render last, through the same `ModuleRenderer` the
+ * home page uses — no hardcoded placement.
  */
 export async function BlogListPage({ page, locale }: TBlogListPageProps) {
   const [result, categories, t, breadcrumbsT, blogListT] = await Promise.all([

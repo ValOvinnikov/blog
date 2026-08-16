@@ -26,7 +26,7 @@ vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
   setBookmarkStatus: setBookmarkStatusMock,
 }));
 
-vi.mock('@web/components/shared/toast-provider', () => ({
+vi.mock('@web/context/toast-provider', () => ({
   useToast: () => ({
     success: toastSuccessMock,
     info: toastInfoMock,

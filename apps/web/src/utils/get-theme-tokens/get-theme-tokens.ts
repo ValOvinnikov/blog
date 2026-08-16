@@ -1,7 +1,6 @@
 import type { TThemeTokens } from '@blog/config';
 import { getSiteConfig } from '@web/server/site-config/get-site-config';
-
-import { toThemeTokens } from './to-theme-tokens';
+import { toThemeTokens } from '@web/utils/to-theme-tokens';
 
 /**
  * Resolves the tenant's full theme tokens from the `@blog/db`-backed

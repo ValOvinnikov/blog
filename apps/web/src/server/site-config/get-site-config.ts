@@ -6,16 +6,11 @@ const SITE_CONFIG_CACHE_TAG = 'site-config';
 const SITE_CONFIG_REVALIDATE_SECONDS = 3600;
 
 /**
- * Deliberately still resolves the sole `tenants` row rather than the real
- * `proxy.ts` host resolution every other tenant-scoped read now uses.
- * `getSiteConfig` backs the theme `<style>` injector and the next-intl voice
- * ladder, both read on effectively every route (including statically
- * rendered ones) via this `unstable_cache`-wrapped call with a fixed cache
- * key — switching it to the per-request `x-tenant-id` header would require
- * reading a Dynamic API here, opting every one of those routes out of
- * static rendering. That tradeoff — and the tenant-scoped caching contract
- * it would need — is unresolved and undecided; it isn't made implicitly by
- * this migration.
+ * Deliberately still resolves the sole `tenants` row rather than the
+ * per-request `x-tenant-id` host resolution every other tenant-scoped read
+ * uses — this backs an `unstable_cache`-wrapped call with a fixed cache key,
+ * and reading the per-request header here would opt every route consuming
+ * it out of static rendering.
  *
  * TODO: fold this into `resolveTenantId()`/`getRequestTenantId()` once
  * `site_config` reads have a tenant-scoped caching story (#1527).

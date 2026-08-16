@@ -18,25 +18,21 @@ import { bookmarksPageVariants } from './bookmarks-page-variants';
 const s = bookmarksPageVariants();
 
 /**
- * BookmarksPage — `/bookmarks` composition (#1043/#1109): auth-gated (a
- * signed-out reader is redirected home — this app has no dedicated `/login`
- * route, same stance `auth.ts`'s OAuth-error redirect already takes),
- * reached from `AccountMenu`'s "My bookmarks" item. Renders as a terminal
- * directory listing (`WindowChrome` + `BookmarksList`, `$ ls ~/bookmarks -l`)
- * per the engagement-UI design's corrected Feature 4 when `chromeOn` is true
- * — not the `PostsSection`/`PostCard` grid every archive page uses;
- * bookmarks are the one listing styled as `ls -l` output instead of cards.
- * Renders a plain list of title links instead when `chromeOn` is false.
+ * `/bookmarks` composition: auth-gated (a signed-out reader is redirected
+ * home; this app has no dedicated `/login` route), reached from
+ * `AccountMenu`'s "My bookmarks" item. Renders as a terminal directory
+ * listing (`WindowChrome` + `BookmarksList`, `$ ls ~/bookmarks -l`) when
+ * `chromeOn` is true — not the `PostsSection`/`PostCard` grid every archive
+ * page uses. Renders a plain list of title links instead when `chromeOn` is
+ * false.
  *
- * `@blog/db`'s `bookmarks` table only stores each saved post's Sanity `_id`
- * (`queries.bookmarks.listBookmarks`, most-recently-bookmarked first), so
- * those ids are resolved into `TPostCard` data via
- * `service.entities.posts.v1.getPostsByIds`. That query doesn't preserve
- * input order, so the resolved posts are re-sorted back into bookmark-
- * recency order before rendering. `hint` reports the count of rows actually
- * rendered (post ids that failed to resolve — e.g. deleted/unpublished posts
- * — are silently dropped above), not the raw bookmark-row count, so it never
- * overstates what's on screen.
+ * `@blog/db`'s `bookmarks` table only stores each saved post's Sanity `_id`,
+ * so those ids are resolved into post data via
+ * `service.entities.posts.v1.getPostsByIds`, which doesn't preserve input
+ * order — the resolved posts are re-sorted back into bookmark-recency order
+ * before rendering. `hint` reports the count of rows actually rendered (post
+ * ids that failed to resolve are silently dropped), not the raw
+ * bookmark-row count.
  */
 export async function BookmarksPage() {
   const session = await auth();

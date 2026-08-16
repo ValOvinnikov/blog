@@ -14,27 +14,18 @@ import { newsletterSectionVariants } from './newsletter-section-variants';
 const s = newsletterSectionVariants();
 
 /**
- * NewsletterSection — the `/account` 6b "email & newsletter preferences"
- * `WindowChrome` (#1155/#1158, D15 §4.6/6b). Reads its own session and
- * translations rather than receiving them as props from `AccountPage` — see
- * `PrivacySection`'s own docs for why. Also reads
- * `queries.subscribers.getSubscriptionStatus` for the signed-in reader's
- * account email, since this section is the only one whose very presence on
- * the page depends on fetched data rather than always rendering once
- * authed.
+ * The `/account` "email & newsletter preferences" `WindowChrome`. Reads its
+ * own session and translations rather than receiving them as props from
+ * `AccountPage` — see `PrivacySection`'s own docs for why. Also reads
+ * `queries.subscribers.getSubscriptionStatus`, since this section is the
+ * only one whose very presence on the page depends on fetched data rather
+ * than always rendering once authed.
  *
- * Renders **one** `SettingRow`, composed directly from `SettingRow`/
- * `StatusBadge`/`Button` (via `NewsletterSubscriptionControl`) — no
- * dedicated `packages/ui` organism, per #1158's scope correction — whose
- * label/badge/description/action switch on the `active`/`pending` outcome
- * (the mock's two panels are illustrative of the row's two states, not two
- * permanent rows). When the outcome is `not-subscribed`, this renders
- * nothing: managing an *existing* subscription is this section's whole job,
- * and there's no mocked "subscribe from here" affordance (that's the
- * separate `NewsletterForm` module, #1044/#1200).
- *
- * Per #1158's page-ordering decision, this always renders *above*
- * `PrivacySection` in `AccountPage`'s section list.
+ * Renders **one** `SettingRow` whose label/badge/description/action switch
+ * on the `active`/`pending` outcome. When the outcome is `not-subscribed`,
+ * this renders nothing: managing an *existing* subscription is this
+ * section's whole job — subscribing is the separate `NewsletterForm`
+ * module's job.
  */
 export async function NewsletterSection() {
   const session = await auth();

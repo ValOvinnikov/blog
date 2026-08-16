@@ -14,17 +14,14 @@ export type TUnsubscribeResult = { ok: true } | { ok: false };
 export type TResendConfirmationActionResult = { ok: true } | { ok: false };
 
 /**
- * unsubscribeAction — the `/account` 6b "unsubscribe" control's server write
- * (#1155/#1158), called from `NewsletterSubscriptionControl`. Reads the
- * session itself rather than trusting a caller-supplied `userId` — same
- * defensive stance as `deleteAccountAction`. `queries.subscribers.unsubscribe`
- * deletes the subscriber row (idempotent no-op if none exists); a subsequent
- * `getSubscriptionStatus` call then reports `not-subscribed`, so the 6b
- * section disappears from the page on the next render.
+ * `NewsletterSubscriptionControl`'s "unsubscribe" server write. Reads the
+ * session itself rather than trusting a caller-supplied `userId`.
+ * `queries.subscribers.unsubscribe` deletes the subscriber row
+ * (idempotent no-op if none exists).
  *
- * Also clears `NEWSLETTER_SUBSCRIBED_COOKIE` (#1413) — without this, the
- * cookie `subscribeToNewsletterAction` set at signup time keeps hiding
- * `NewsletterForm` on the Home page for a reader who just unsubscribed.
+ * Also clears `NEWSLETTER_SUBSCRIBED_COOKIE` — without this, the cookie
+ * `subscribeToNewsletterAction` set at signup time keeps hiding
+ * `NewsletterForm` for a reader who just unsubscribed.
  */
 export async function unsubscribeAction(): Promise<TUnsubscribeResult> {
   const session = await auth();
@@ -68,17 +65,12 @@ async function clearNewsletterSubscribedCookieSafely(): Promise<void> {
 }
 
 /**
- * resendConfirmationAction — the `/account` 6b "resend confirmation"
- * control's server write (#1155/#1158). `queries.subscribers
- * .resendConfirmation` only validates the pending row still exists and
- * hands back its unchanged `confirmationToken` — it never sends email
- * itself (see that query's own docs) — so this action mirrors
- * `subscribeToNewsletterAction`'s exact email-sending block: build the
- * `/api/newsletter/confirm?token=…` URL, `buildNewsletterConfirmationEmail`,
- * `resolveNewsletterFromAddress`, `sendEmail`. The session's own `email` is
- * the `to` address — `resendConfirmation` doesn't return the subscriber's
- * email, and it's the same value anyway (the db function resolves the
- * subscriber by joining through `users.email`).
+ * `NewsletterSubscriptionControl`'s "resend confirmation" server write.
+ * `queries.subscribers.resendConfirmation` only validates the pending row
+ * still exists and hands back its unchanged `confirmationToken` — it never
+ * sends email itself, so this action mirrors
+ * `subscribeToNewsletterAction`'s email-sending block. The session's own
+ * `email` is the `to` address since `resendConfirmation` doesn't return one.
  */
 export async function resendConfirmationAction(): Promise<TResendConfirmationActionResult> {
   const session = await auth();

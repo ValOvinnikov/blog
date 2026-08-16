@@ -1,8 +1,8 @@
 import { DEPTH } from '@blog/config';
 import type { TPostSkim } from '@blog/service';
 import userEvent from '@testing-library/user-event';
-import { DepthProvider } from '@web/components/shared/depth-provider';
 import { DEPTH_STORAGE_KEY } from '@web/config/depth-script';
+import { DepthProvider } from '@web/context/depth-provider';
 import { renderElement, screen, waitFor } from '@web/testing/custom-render';
 
 import { SkimPanel, type ISkimPanelProps } from './skim-panel';

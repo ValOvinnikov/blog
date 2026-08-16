@@ -6,16 +6,11 @@ import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 /**
- * `GET /api/account/export` — the `/account` "export my data" download
- * (#1151/#1154, D15 §4.6/6a). The first file-download route in this app: a
+ * `GET /api/account/export` — the `/account` "export my data" download. A
  * plain Route Handler (not a Server Action, which can't stream a
  * `Content-Disposition` response) gated by the session cookie the browser
  * already sends, so a signed-in reader's `LinkButton` can point straight at
- * this URL with a `download` attribute — no client JS needed to trigger the
- * save-as prompt. Scoped to the two tables that exist today (`users`,
- * `bookmarks`) via `queries.account.exportAccountData`; comments/ratings/
- * newsletter each extend that query's own shape once they land, not this
- * route.
+ * this URL with a `download` attribute.
  *
  * `/api` routes are excluded from `proxy.ts`'s matcher, so the `x-tenant-id`
  * header it threads to Server Components/Actions never reaches here — this

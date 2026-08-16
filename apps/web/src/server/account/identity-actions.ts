@@ -33,18 +33,13 @@ export type TUnlinkProviderResult =
 export type TUpdateDisplayNameResult = { ok: true } | { ok: false };
 
 /**
- * unlinkProviderAction — the `/account` 6c "unlink" control's server write
- * (#1159/#1162), called from `ProviderLinkControl`. Reads the session itself
- * rather than trusting a caller-supplied `userId` — same defensive stance as
- * every other action in this file tree. Also re-validates `provider` at
- * runtime via `isLinkableProvider` — see that function's own docs — before
- * it's used anywhere. `queries.account.unlinkProvider` atomically rejects
- * with `'last-method'` if `provider` is the reader's last remaining linked
- * sign-in method; that outcome is surfaced distinctly (`reason:
- * 'last-method'`) rather than folded into a generic failure, so the client
- * can show a specific error even in the unlikely event the UI's own
- * last-method guard (`IdentitySection`) raced a concurrent unlink from
- * another tab.
+ * `ProviderLinkControl`'s "unlink" server write. Reads the session itself
+ * rather than trusting a caller-supplied `userId`.
+ * `queries.account.unlinkProvider` atomically rejects with `'last-method'`
+ * if `provider` is the reader's last remaining linked sign-in method; that
+ * outcome is surfaced distinctly rather than folded into a generic failure,
+ * so the client can show a specific error even if the UI's own last-method
+ * guard raced a concurrent unlink from another tab.
  */
 export async function unlinkProviderAction(
   provider: TLinkableProvider,
@@ -68,12 +63,10 @@ export async function unlinkProviderAction(
 }
 
 /**
- * updateDisplayNameAction — the `/account` 6c "display name" row's server
- * write (#1159/#1162), called from `DisplayNameControl`. Reads the session
- * itself rather than trusting a caller-supplied `userId`.
- * `queries.account.updateDisplayName` performs no validation of its own (see
- * that query's own docs), so this trims `name` and rejects an empty result
- * before ever reaching the database.
+ * `DisplayNameControl`'s server write. Reads the session itself rather than
+ * trusting a caller-supplied `userId`. `queries.account.updateDisplayName`
+ * performs no validation of its own, so this trims `name` and rejects an
+ * empty result before ever reaching the database.
  */
 export async function updateDisplayNameAction(
   name: string,

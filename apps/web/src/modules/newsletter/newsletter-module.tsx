@@ -8,15 +8,14 @@ export interface INewsletterModuleProps {
 }
 
 /**
- * NewsletterModule — fetches `module_newsletter` data and renders it through
- * the `NewsletterForm` client island (`full` density) as `Section`'s direct
- * child, wrapped in `Section` (web's sole per-module landmark) for the
- * CMS-authored `brandVariant`/`layout` — the only place this module's
- * service and ui meet. This is the Blog index page's optional page-builder
- * placement (`page_blog.modules`) — editors opt in by adding the module
- * there, no hardcoded mount point (#1200). `sectionHeader.heading` is a
- * CMS-required field for this module (`requireHeading: true`), so it's
- * always a non-empty string here.
+ * Fetches `module_newsletter` data and renders it through the
+ * `NewsletterForm` client island (`full` density) as `Section`'s direct
+ * child, wrapped in `Section` for the CMS-authored `brandVariant`/`layout`.
+ * This is the Blog index page's optional page-builder placement
+ * (`page_blog.modules`) — editors opt in by adding the module there, no
+ * hardcoded mount point. `sectionHeader.heading` is a CMS-required field for
+ * this module (`requireHeading: true`), so it's always a non-empty string
+ * here.
  */
 export async function NewsletterModule({ id }: INewsletterModuleProps) {
   const result = await service.modules.newsletter.v1.getNewsletter(id);

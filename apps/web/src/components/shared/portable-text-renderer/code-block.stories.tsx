@@ -27,7 +27,7 @@ type TStory = StoryObj<typeof meta>;
 /**
  * Light theme (default) — the code block's background is `bg-surface-2`
  * from the wrapping `<figure>`; syntax token colors read from the `:root`
- * `--code-*` custom properties in `index.css` (#862).
+ * `--code-*` custom properties in `index.css`.
  */
 export const Light: TStory = {};
 

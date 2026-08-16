@@ -12,26 +12,20 @@ import { PrivacySection } from './sections/privacy-section';
 const s = accountPageVariants();
 
 /**
- * AccountPage — `/account` composition (Epic #1151, D15 §4.6): auth-gated
- * (a signed-out reader is redirected home, same stance `bookmarks-page`
- * already takes — this app has no dedicated `/login` route). This is the
- * *only* place that guard lives — every section below trusts it rather than
- * re-checking the session itself.
+ * `/account` composition: auth-gated (a signed-out reader is redirected
+ * home; this app has no dedicated `/login` route). This is the *only* place
+ * that guard lives — every section below trusts it rather than re-checking
+ * the session itself.
  *
  * Renders the page's `h1` plus an ordered list of self-contained
- * `WindowChrome` section components (#1158's section-extraction decision):
- * each section reads its own session/translations/data (`auth()` is deduped
- * per-request via React `cache`, so re-reading it here costs nothing extra)
- * and owns its own `WindowChrome` markup — `AccountPage` itself no longer
- * composes any section's JSX directly.
+ * `WindowChrome` section components; each reads its own
+ * session/translations/data (`auth()` is deduped per-request via React
+ * `cache`, so re-reading it costs nothing extra).
  *
- * **Ordering rule:** the page's fixed, final section order (top to bottom)
- * is **6c, then 6b, then 6a** — 6a "privacy & data" (`PrivacySection`)
- * always renders *last*, a fixed anchor at the bottom of the page (the
- * standard settings-page convention for a danger-zone section), and 6c
- * "connected accounts / identity" (`IdentitySection`, #1162) always renders
- * *first*, above 6b "email & newsletter preferences" (`NewsletterSection`) —
- * never between `NewsletterSection` and `PrivacySection`.
+ * **Ordering rule:** the fixed, final section order (top to bottom) is
+ * identity, then newsletter, then privacy — `PrivacySection` always renders
+ * *last* as a fixed danger-zone anchor at the bottom of the page, and
+ * `IdentitySection` always renders *first*.
  */
 export async function AccountPage() {
   const session = await auth();

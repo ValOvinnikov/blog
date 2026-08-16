@@ -20,13 +20,11 @@ function getResendClient(): Resend {
 }
 
 /**
- * sendEmail — the shared Resend "send email" helper (#1107). Deliberately
- * generic (`to`/`from`/`subject`/`html` only, no auth-specific fields) so the
- * Auth.js Email provider's magic-link (`@web/server/auth/auth.ts`) and, later,
- * the newsletter confirmation email (#1104) can both call it without either
- * feature reshaping it around the other's needs. Callers own their own
- * content (subject/html) and `from` address; this function only owns the
- * Resend client and surfaces a clear error on failure.
+ * The shared Resend "send email" helper — deliberately generic
+ * (`to`/`from`/`subject`/`html` only, no auth-specific fields) so callers
+ * like the Auth.js Email provider's magic-link and the newsletter
+ * confirmation email can share it without either reshaping it around the
+ * other's needs.
  */
 export async function sendEmail({
   to,

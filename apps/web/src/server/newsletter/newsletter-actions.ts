@@ -17,32 +17,18 @@ export type TSubscribeResult =
   | { outcome: 'server-error' };
 
 /**
- * subscribeToNewsletterAction — `NewsletterForm`'s submit action (#1044,
- * redone by #1200 for scoped placement). Re-validates the email format
- * server-side (never trusts `NewsletterForm`'s client-only check), then
- * hands off to `queries.subscribers.createPendingSubscriber`:
+ * `NewsletterForm`'s submit action. Re-validates the email format
+ * server-side, then hands off to
+ * `queries.subscribers.createPendingSubscriber`: a `'created'`/
+ * `'already-pending'` outcome (re-)sends the confirmation email, while
+ * `'already-active'` returns the inline error without emailing. Both
+ * `'success'` and `'already-subscribed'` also set
+ * `NEWSLETTER_SUBSCRIBED_COOKIE` — a signed-out reader has no session to key
+ * "already subscribed" off, so the cookie is the durable signal
+ * `NewsletterForm`'s render call-sites use to stop showing the form.
  *
- * - `'created'` / `'already-pending'` → sends (or re-sends) the confirmation
- *   email via the shared `sendEmail` helper, embedding the row's
- *   `confirmationToken` in `/api/newsletter/confirm?token=…`. The token is
- *   never rotated on a re-submission (see that query's own docs), so this is
- *   always the same link the reader's first confirmation email already sent.
- * - `'already-active'` → the "already subscribed" inline error, no email
- *   sent.
- *
- * Both `'success'` and `'already-subscribed'` also set
- * `NEWSLETTER_SUBSCRIBED_COOKIE` (`markNewsletterSubscribed`, via
- * `markNewsletterSubscribedSafely` below) — a signed-out reader has no
- * session to key "already subscribed" off, so this cookie is the one
- * durable signal `NewsletterForm`'s render call-sites use to stop showing
- * the form to someone who's already on the list (#1200's shared cookie-gate
- * requirement). `'invalid'`/`'server-error'` never set it (nothing was
- * confirmed).
- *
- * A thrown error (a `sendEmail`/db failure) is caught and logged rather than
- * left to reject the server action — `NewsletterForm` only branches on the
- * returned `outcome`, mirroring `deleteAccountAction`/`setBookmarkStatus`'s
- * resolve-never-throw shape.
+ * A thrown error is caught and logged rather than left to reject the server
+ * action — `NewsletterForm` only branches on the returned `outcome`.
  */
 export async function subscribeToNewsletterAction(
   email: string,
@@ -73,16 +59,11 @@ export async function subscribeToNewsletterAction(
       confirmationUrl,
     });
 
-    // Resolved inside the action, not at module scope like `@blog/auth`'s
-    // magic-link `from` address — `auth.ts` is never reached from a Client
-    // Component's render tree, but `NewsletterForm` (a `'use client'`
-    // component composed into the Blog index page and every post page,
-    // #1200) imports this module, so importing it eagerly touches
-    // `env.NEWSLETTER_FROM_ADDRESS` (a server-only var) the moment any of
-    // those pages' modules are evaluated — including under Vitest's jsdom
-    // environment, where `@t3-oss/env-nextjs` throws for a server var read
-    // outside a real server context. Reading it lazily here means importing
-    // this module alone is always safe.
+    // Resolved inside the action, not at module scope — the `'use client'`
+    // `NewsletterForm` imports this module, so an eager read of
+    // `env.NEWSLETTER_FROM_ADDRESS` (server-only) would throw under Vitest's
+    // jsdom environment; reading it lazily here keeps importing this module
+    // safe from a client boundary.
     const fromAddress = resolveNewsletterFromAddress(
       env.NEWSLETTER_FROM_ADDRESS,
     );

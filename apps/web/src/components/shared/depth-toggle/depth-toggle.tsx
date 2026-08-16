@@ -2,7 +2,7 @@
 
 import { DEPTH, type TDepth } from '@blog/config';
 import { SegmentedControl, type ISegmentedControlOption } from '@blog/ui/atoms';
-import { useDepth } from '@web/components/shared/depth-provider';
+import { useDepth } from '@web/context/depth-provider';
 
 export interface IDepthToggleLabels {
   skim: string;

@@ -23,13 +23,12 @@ export type TSignInMenuProps = {
 };
 
 /**
- * SignInMenu — `AuthMenu`'s logged-out render branch (#1107): a
- * `PopoverMenu` dressed in the `WindowChrome` terminal shell offering
- * GitHub, Google, and an inline-expanding email (magic-link) sign-in, plus
- * the OAuth redirect-back error notice. The email sub-flow's state machine
- * lives in `useEmailSignIn`; open/close state and refs come from the
- * parent's single `usePopover()` call — this component never calls
- * `usePopover()` itself.
+ * `AuthMenu`'s logged-out render branch: a `PopoverMenu` dressed in the
+ * `WindowChrome` terminal shell offering GitHub, Google, and an
+ * inline-expanding email (magic-link) sign-in, plus the OAuth redirect-back
+ * error notice. The email sub-flow's state machine lives in
+ * `useEmailSignIn`; open/close state and refs come from the parent's single
+ * `usePopover()` call — this component never calls `usePopover()` itself.
  */
 export function SignInMenu({
   panelId,

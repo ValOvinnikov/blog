@@ -32,12 +32,12 @@ vi.mocked(useRouter).mockReturnValue({
   refresh: routerRefreshMock,
 } as unknown as ReturnType<typeof useRouter>);
 
-vi.mock('@web/server/account/newsletter-subscription-actions', () => ({
+vi.mock('@web/server/newsletter/newsletter-subscription-actions', () => ({
   unsubscribeAction: unsubscribeActionMock,
   resendConfirmationAction: resendConfirmationActionMock,
 }));
 
-vi.mock('@web/components/shared/toast-provider', () => ({
+vi.mock('@web/context/toast-provider', () => ({
   useToast: () => ({
     success: vi.fn(),
     info: vi.fn(),

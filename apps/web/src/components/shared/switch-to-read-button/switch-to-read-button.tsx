@@ -2,7 +2,7 @@
 
 import { DEPTH } from '@blog/config';
 import { Button } from '@blog/ui/atoms';
-import { useDepth } from '@web/components/shared/depth-provider';
+import { useDepth } from '@web/context/depth-provider';
 
 export interface ISwitchToReadButtonProps {
   /** Button copy — supplied by the caller (next-intl at the page level). */

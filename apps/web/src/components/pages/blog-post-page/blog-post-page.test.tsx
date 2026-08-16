@@ -72,7 +72,7 @@ vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
 // composition that renders it — signed in or not — needs this mocked; no
 // assertions here exercise the toast calls themselves (see
 // bookmark-button.test.tsx for those).
-vi.mock('@web/components/shared/toast-provider', () => ({
+vi.mock('@web/context/toast-provider', () => ({
   useToast: () => ({
     success: vi.fn(),
     info: vi.fn(),
