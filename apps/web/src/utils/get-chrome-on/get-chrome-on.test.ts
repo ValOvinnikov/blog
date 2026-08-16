@@ -1,7 +1,8 @@
-import { getChromeOn } from './get-chrome-on';
-import { getThemeTokens } from './get-theme-tokens';
+import { getThemeTokens } from '@web/utils/get-theme-tokens';
 
-vi.mock('./get-theme-tokens', () => ({
+import { getChromeOn } from './get-chrome-on';
+
+vi.mock('@web/utils/get-theme-tokens', () => ({
   getThemeTokens: vi.fn(),
 }));
 

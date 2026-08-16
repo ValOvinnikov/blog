@@ -1,4 +1,4 @@
-import { getThemeTokens } from './get-theme-tokens';
+import { getThemeTokens } from '@web/utils/get-theme-tokens';
 
 /** Reads the tenant's `chromeOn` flag from the resolved theme tokens. */
 export async function getChromeOn(): Promise<boolean> {

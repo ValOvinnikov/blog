@@ -129,8 +129,12 @@ When invoked, before writing any code:
 - **Metadata builders** live in `src/metadata/` (e.g. `blog-list-metadata/`)
   — shared `generateMetadata` helpers, one folder per builder, co-located test.
 - **Helper functions** (slot builders, data transformers, formatters) live in
-  `src/utils/`. One file per function or closely related group, named after its
-  purpose: `to-post-list-items.ts`, `hero-slots.ts`, `card-slots.ts`.
+  `src/utils/`, **one folder per function or closely related group** — same
+  shape as `components/`/`modules/`/`metadata/` above: the helper file, its
+  co-located test, and an `index.ts` barrel re-export, e.g.
+  `src/utils/to-post-list-items/to-post-list-items.ts` +
+  `to-post-list-items.test.ts` + `index.ts`. Never a bare file directly under
+  `src/utils/`.
 - **Extract at the second repetition.** A slot-builder or composition pattern
   used by two routes becomes a `src/utils/` helper — never copy-paste a third.
   Discriminators (`_type` names, stored enum values) come from `@blog/config`
