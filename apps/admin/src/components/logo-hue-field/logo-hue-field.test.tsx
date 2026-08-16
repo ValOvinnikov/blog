@@ -1,4 +1,4 @@
-import { renderWithIntl, screen } from '@admin/testing/custom-render';
+import { renderWithIntl, screen, waitFor } from '@admin/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { LogoHueField } from './logo-hue-field';
@@ -53,7 +53,7 @@ describe(LogoHueField, () => {
 
     await user.click(screen.getByRole('switch', { name: 'Follow accent hue' }));
 
-    expect(handleChange).toHaveBeenCalledWith(200);
+    await waitFor(() => expect(handleChange).toHaveBeenCalledWith(200));
   });
 
   it('switching follow back on reports undefined', async () => {
@@ -70,6 +70,6 @@ describe(LogoHueField, () => {
 
     await user.click(screen.getByRole('switch', { name: 'Follow accent hue' }));
 
-    expect(handleChange).toHaveBeenCalledWith(undefined);
+    await waitFor(() => expect(handleChange).toHaveBeenCalledWith(undefined));
   });
 });
