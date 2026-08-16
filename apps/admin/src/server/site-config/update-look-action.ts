@@ -2,7 +2,6 @@
 
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@admin/server/site-config/revalidate-site-config';
-import { sanitizeLogMessage } from '@admin/utils/sanitize-log-message/sanitize-log-message';
 import {
   DENSITY,
   FONT_CHOICE,
@@ -14,6 +13,7 @@ import {
   type TRadiusScale,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { sanitizeLogMessage } from '@blog/utils';
 import { z } from 'zod';
 
 const HUE_MIN = 0;

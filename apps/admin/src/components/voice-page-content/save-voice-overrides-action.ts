@@ -5,6 +5,7 @@ import { revalidateSiteConfig } from '@admin/server/site-config/revalidate-site-
 import type { TVoiceOverrides } from '@admin/utils/voice-fields/voice-fields';
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
 import { queries } from '@blog/db';
+import { sanitizeLogMessage } from '@blog/utils';
 
 export type TSaveVoiceOverridesResult = { ok: true } | { ok: false };
 
@@ -53,7 +54,7 @@ export async function saveVoiceOverridesAction(
   } catch (error) {
     console.error(
       `Failed to save voice overrides for tenant "${tenantSlug}":`,
-      error,
+      sanitizeLogMessage(error),
     );
     return { ok: false };
   }

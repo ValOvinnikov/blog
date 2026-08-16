@@ -1,5 +1,5 @@
 import { env } from '@admin/utils/env/env';
-import { sanitizeLogMessage } from '@admin/utils/sanitize-log-message/sanitize-log-message';
+import { sanitizeLogMessage } from '@blog/utils';
 
 export type TDomainVerificationStatus =
   'NOT_CONFIGURED' | 'NOT_ADDED' | 'PENDING' | 'VERIFIED' | 'ERROR';

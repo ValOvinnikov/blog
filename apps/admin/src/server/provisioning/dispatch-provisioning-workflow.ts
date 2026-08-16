@@ -1,5 +1,5 @@
 import { env } from '@admin/utils/env/env';
-import { sanitizeLogMessage } from '@admin/utils/sanitize-log-message/sanitize-log-message';
+import { sanitizeLogMessage } from '@blog/utils';
 
 const REPO_OWNER = 'ValOvinnikov';
 const REPO_NAME = 'blog';

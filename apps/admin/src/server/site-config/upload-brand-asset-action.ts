@@ -8,8 +8,8 @@ import {
   type TBrandAssetKind,
 } from '@admin/utils/brand-asset-limits/brand-asset-limits';
 import { env } from '@admin/utils/env/env';
-import { sanitizeLogMessage } from '@admin/utils/sanitize-log-message/sanitize-log-message';
 import { queries } from '@blog/db';
+import { sanitizeLogMessage } from '@blog/utils';
 import { del, put } from '@vercel/blob';
 
 export type TUploadBrandAssetResult =

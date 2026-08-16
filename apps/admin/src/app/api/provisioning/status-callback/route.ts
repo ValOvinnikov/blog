@@ -1,6 +1,5 @@
 import { env } from '@admin/utils/env/env';
 import { isSecretMatch } from '@admin/utils/is-secret-match/is-secret-match';
-import { sanitizeLogMessage } from '@admin/utils/sanitize-log-message/sanitize-log-message';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -10,6 +9,7 @@ import {
   type TTenantProvisioningStepStatus,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { sanitizeLogMessage } from '@blog/utils';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
