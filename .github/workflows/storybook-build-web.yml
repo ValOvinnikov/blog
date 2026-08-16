@@ -1,0 +1,65 @@
+name: Storybook Build (apps/web)
+
+# Scope: apps/web's own Storybook only — NOT packages/ui's. The hosted
+# `blog-storybook` Vercel project (docs/DEPLOY.md) builds and previews
+# packages/ui's Storybook on every PR already; its Root Directory is scoped
+# to packages/ui, so it never builds or validates apps/web's own stories.
+# This workflow closes that gap. Path-filtered (unlike ci.yml/actionlint.yml/
+# zizmor.yml) because it is advisory, not a required status check — a
+# path-skipped advisory workflow just reports nothing, it doesn't block a PR
+# by staying "Pending" forever the way a required check would.
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - 'configs/tsconfig/**'
+      - 'configs/tailwind/**'
+      - '.github/workflows/storybook-build-web.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: storybook-build-web-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PNPM_VERSION: 11.21.0
+  NODE_VERSION: '22'
+  # Vercel Remote Cache for turbo tasks — shares artifacts with ci.yml's own
+  # jobs. No-op until TURBO_TOKEN (repo Secret) and TURBO_TEAM (repo
+  # Variable) exist; turbo then falls back to the local cache.
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+jobs:
+  storybook-build-web:
+    name: Storybook build (web)
+    # ADVISORY — deliberately NOT a required status check in the branch
+    # ruleset. It nudges rather than blocks: stories can rot silently without
+    # this job, but it genuinely gates on the PR's own diff (unlike the
+    # advisory-by-necessity checks elsewhere in this repo's CI), so it stays
+    # non-blocking by choice rather than because it lacks signal.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # `--filter=web` scopes the turbo run to apps/web's own storybook:build
+      # task only — packages/ui's is intentionally excluded (see the scope
+      # comment above). It never fetches Sanity content, so
+      # SKIP_ENV_VALIDATION matches ci.yml's `build` job's stance for
+      # apps/web (its own env validation, via `@t3-oss/env-nextjs`, runs at
+      # module import time regardless of whether a story actually needs it).
+      - name: Storybook build (apps/web)
+        run: pnpm exec turbo run storybook:build --filter=web
+        env:
+          SKIP_ENV_VALIDATION: 'true'
