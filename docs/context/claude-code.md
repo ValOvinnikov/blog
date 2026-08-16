@@ -60,9 +60,10 @@ contracts:
     the routine sequence — CI's `ci.yml` `build` job gates every PR, so a
     local re-run would just duplicate it; `verify-runner` still runs `build`
     on request when reproducing an actual CI build failure
-    (`open-pull-request` Gate 5a). Dispatched **synchronously** (not
-    background — verify blocks `reviewer`, so there's no other work to queue
-    while waiting) right before step 6's review. Runs each command in order,
+    (`open-pull-request` Gate 5a). Dispatched in the background, like every
+    other subagent, right before step 6's review — the orchestrator resumes
+    on its completion notification rather than waiting synchronously. Runs
+    each command in order,
     stops at the first failure, and reports which command failed plus
     trimmed output — no root-cause diagnosis or fix suggestion. Never given
     `pnpm typegen`: that mutates generated files, which its read-only guard
