@@ -12,8 +12,11 @@ import {
 
 const STUDIO_ROOT_DIRECTORY = 'apps/cms';
 
-export function studioDomainForSlug(slug: string): string {
-  return `studio-${slug}.valstack.dev`;
+export function studioDomainForSlug(
+  slug: string,
+  platformDomain: string,
+): string {
+  return `studio-${slug}.${platformDomain}`;
 }
 
 export type TCreateStudioVercelProjectDeps = { exec: TExecFn };
@@ -24,7 +27,7 @@ export type TCreateTenantStudioResult = { studioVercelProjectId: string };
  * Step 3 — creates the tenant's own Vercel project (rooted at `apps/cms`,
  * inheriting that directory's committed `vercel.json`, so Git auto-deploy
  * stays disabled the same way it is for `cms-dev`/`cms-prod`), points
- * `studio-<slug>.valstack.dev` at it, then builds and deploys via the same
+ * `studio-<slug>.<platformDomain>` at it, then builds and deploys via the same
  * `vercel pull → build --prod → deploy --prebuilt --prod` sequence
  * `deploy-production.yml`'s `deploy-studio` job uses — just against a
  * freshly created project instead of the existing `VERCEL_PROJECT_ID_CMS`.
@@ -60,7 +63,7 @@ export async function createTenantStudio(
     await setTenantStudioVercelProject(tenant.id, studioVercelProjectId);
   }
 
-  const domain = studioDomainForSlug(tenant.slug);
+  const domain = studioDomainForSlug(tenant.slug, env.platformDomain);
   const existingDomains = await listVercelProjectDomains({
     token: env.vercelToken,
     teamId: env.vercelTeamId,

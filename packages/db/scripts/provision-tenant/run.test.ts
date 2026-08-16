@@ -54,6 +54,7 @@ const env = {
   vercelCliVersion: '48.0.0',
   adminAppBaseUrl: 'https://admin.example.com',
   callbackSecret: 'shh',
+  platformDomain: 'valstack.dev',
 };
 
 beforeEach(() => {

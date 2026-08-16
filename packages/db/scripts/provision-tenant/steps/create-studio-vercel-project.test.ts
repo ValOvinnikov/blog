@@ -39,6 +39,7 @@ const env: TProvisionEnv = {
   vercelCliVersion: '48.0.0',
   adminAppBaseUrl: 'https://admin.example.com',
   callbackSecret: 'shh',
+  platformDomain: 'valstack.dev',
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
@@ -72,8 +73,16 @@ beforeEach(() => {
 });
 
 describe(studioDomainForSlug, () => {
-  it('builds the studio-<slug>.valstack.dev hostname', () => {
-    expect(studioDomainForSlug('acme')).toBe('studio-acme.valstack.dev');
+  it('builds the studio-<slug>.<platformDomain> hostname', () => {
+    expect(studioDomainForSlug('acme', 'valstack.dev')).toBe(
+      'studio-acme.valstack.dev',
+    );
+  });
+
+  it('honors a different platform domain', () => {
+    expect(studioDomainForSlug('acme', 'example.com')).toBe(
+      'studio-acme.example.com',
+    );
   });
 });
 
