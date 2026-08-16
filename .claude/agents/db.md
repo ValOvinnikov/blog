@@ -67,7 +67,8 @@ relative paths only within a single slice (`./schema`, `./queries/comments`).
   directory; every other path in this package keeps the blanket prohibition.
 - Depend only on `@blog/config` and `@blog/utils` (types, constants, framework-
   free helpers) plus Drizzle/Neon SDKs (`drizzle-orm`, `drizzle-kit`,
-  `@neondatabase/serverless`, the Auth.js Drizzle adapter). The dependency
+  `@neondatabase/serverless`, the Auth.js Drizzle adapter) — plus `@sanity/client`,
+  scoped to `scripts/provision-tenant/` per the exception above. The dependency
   graph stays acyclic: `db → config, utils`, nothing more.
 - **Three things import `@blog/db`** — `apps/web`, `apps/admin` (the
   operator/tenant admin panel, owned by the `admin-app` agent), and
