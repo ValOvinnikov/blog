@@ -53,24 +53,34 @@ describe('env', () => {
     expect(env.MAGIC_LINK_FROM_ADDRESS).toBeUndefined();
   });
 
-  it('throws naming AUTH_SECRET when it is missing and validation is not skipped', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    for (const key of ENV_KEYS) {
-      delete process.env[key];
-    }
-    const consoleError = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+  describe('validation failure', () => {
+    let consoleError: ReturnType<typeof vi.spyOn>;
 
-    await expect(importEnv()).rejects.toThrow();
+    // createEnv logs `❌ Invalid environment variables: [...]` via console.error
+    // right before throwing; suppress that expected output in these tests.
+    beforeEach(() => {
+      consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
 
-    expect(consoleError).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.arrayContaining([
-        expect.objectContaining({ path: ['AUTH_SECRET'] }),
-      ]),
-    );
-    consoleError.mockRestore();
+    afterEach(() => {
+      consoleError.mockRestore();
+    });
+
+    it('throws naming AUTH_SECRET when it is missing and validation is not skipped', async () => {
+      delete process.env['SKIP_ENV_VALIDATION'];
+      for (const key of ENV_KEYS) {
+        delete process.env[key];
+      }
+
+      await expect(importEnv()).rejects.toThrow();
+
+      expect(consoleError).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.arrayContaining([
+          expect.objectContaining({ path: ['AUTH_SECRET'] }),
+        ]),
+      );
+    });
   });
 
   it('exposes configured credentials by their exact env var names', async () => {
