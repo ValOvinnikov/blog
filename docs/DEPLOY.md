@@ -268,7 +268,7 @@ job resolves its own project's id + token:
 > fallback for `ci.yml` (which sets no environment) — point them at whichever
 > project CI's typegen/migration checks should target.
 
-- [x] Repo-level secret `SANITY_API_READ_TOKEN` (Settings → Secrets and
+- [ ] Repo-level secret `SANITY_API_READ_TOKEN` (Settings → Secrets and
       variables → Actions → New repository secret) — a **Viewer** token
       minted in whichever project the repo-level `SANITY_STUDIO_PROJECT_ID`
       above points at. Backs `ci.yml`'s Migrations job (both the dry-run
