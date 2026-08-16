@@ -119,15 +119,6 @@ describe('env', () => {
     expect(env.VERCEL_ANALYTICS_ENABLED).toBe('true');
   });
 
-  it('throws when VERCEL_ANALYTICS_ENABLED is set to an unrecognized value', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['VERCEL_ANALYTICS_ENABLED'] = 'yes';
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
-
-    await expect(importEnvOnServer()).rejects.toThrow();
-  });
-
   it('throws when SANITY_REVALIDATE_SECRET is read on the client', async () => {
     delete process.env['SKIP_ENV_VALIDATION'];
     process.env['SANITY_REVALIDATE_SECRET'] = 'revalidate-secret';
@@ -150,28 +141,49 @@ describe('env', () => {
     expect(env.NEXT_PUBLIC_SITE_URL).toBeUndefined();
   });
 
-  it('throws when NEXT_PUBLIC_SITE_URL is not a valid URL', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['NEXT_PUBLIC_SITE_URL'] = 'not-a-url';
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
+  describe('validation failure', () => {
+    // createEnv logs `❌ Invalid environment variables: [...]` via console.error
+    // right before throwing; suppress that expected output in these tests.
+    beforeEach(() => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
 
-    await expect(importEnv()).rejects.toThrow();
-  });
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
 
-  it('throws when NEXT_PUBLIC_SANITY_PROJECT_ID is missing', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    delete process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
+    it('throws when VERCEL_ANALYTICS_ENABLED is set to an unrecognized value', async () => {
+      delete process.env['SKIP_ENV_VALIDATION'];
+      process.env['VERCEL_ANALYTICS_ENABLED'] = 'yes';
+      process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
+      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
-    await expect(importEnv()).rejects.toThrow();
-  });
+      await expect(importEnvOnServer()).rejects.toThrow();
+    });
 
-  it('throws when NEXT_PUBLIC_SANITY_DATASET is empty (no default)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = '';
+    it('throws when NEXT_PUBLIC_SITE_URL is not a valid URL', async () => {
+      delete process.env['SKIP_ENV_VALIDATION'];
+      process.env['NEXT_PUBLIC_SITE_URL'] = 'not-a-url';
+      process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
+      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
-    await expect(importEnv()).rejects.toThrow();
+      await expect(importEnv()).rejects.toThrow();
+    });
+
+    it('throws when NEXT_PUBLIC_SANITY_PROJECT_ID is missing', async () => {
+      delete process.env['SKIP_ENV_VALIDATION'];
+      delete process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
+      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
+
+      await expect(importEnv()).rejects.toThrow();
+    });
+
+    it('throws when NEXT_PUBLIC_SANITY_DATASET is empty (no default)', async () => {
+      delete process.env['SKIP_ENV_VALIDATION'];
+      process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
+      process.env['NEXT_PUBLIC_SANITY_DATASET'] = '';
+
+      await expect(importEnv()).rejects.toThrow();
+    });
   });
 });

@@ -38,18 +38,30 @@ describe('env', () => {
     expect(env.DATABASE_URL).toBe('postgresql://user:pass@host/db');
   });
 
-  it('throws when DATABASE_URL is missing', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    delete process.env['DATABASE_URL'];
+  describe('invalid environment', () => {
+    // @t3-oss/env-* logs `❌ Invalid environment variables: [...]` via
+    // console.error before throwing; suppress that expected output here.
+    beforeEach(() => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
 
-    await expect(importEnv()).rejects.toThrow();
-  });
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
 
-  it('throws when DATABASE_URL is empty (no default)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['DATABASE_URL'] = '';
+    it('throws when DATABASE_URL is missing', async () => {
+      delete process.env['SKIP_ENV_VALIDATION'];
+      delete process.env['DATABASE_URL'];
 
-    await expect(importEnv()).rejects.toThrow();
+      await expect(importEnv()).rejects.toThrow();
+    });
+
+    it('throws when DATABASE_URL is empty (no default)', async () => {
+      delete process.env['SKIP_ENV_VALIDATION'];
+      process.env['DATABASE_URL'] = '';
+
+      await expect(importEnv()).rejects.toThrow();
+    });
   });
 
   it('skips validation when SKIP_ENV_VALIDATION is set, even with DATABASE_URL missing', async () => {
