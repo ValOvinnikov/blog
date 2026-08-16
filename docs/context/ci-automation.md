@@ -33,6 +33,18 @@ from the required Migrations job precisely so a routine drift in an existing
 live document (independent of any given PR's diff) can't fail a required
 check — same reasoning as Lighthouse CI / Playwright smoke below.
 
+**Document validation always warns once, on `migrationState`, by accepted
+design.** `migrationState` (`apps/cms/scripts/migrate.mjs`'s single fixed-`_id`
+migration ledger document) is deliberately not a Studio schema type — it's
+tooling infrastructure, never edited via the Studio UI. `sanity documents
+validate` has no exclusion flag for a `_type`/`_id` (checked against the CLI's
+own `--help` and source as of `sanity@^6.8.0`/CLI `7.15.1` — none exists), so
+it always emits `Could not find schema type for type 'migrationState',
+skipping validation`. Harmless and expected — the job is advisory, so this
+carries no functional cost. Don't chase it with a schema entry; that would
+add Studio-schema surface for a document nothing but `migrate.mjs` ever
+touches.
+
 **Lighthouse CI and Playwright smoke stay advisory by design, and both run
 only on push to `main`, not on every PR push.** Playwright smoke is still a
 structural no-op — it depends on a preview/smoke URL this repo doesn't
