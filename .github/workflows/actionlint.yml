@@ -12,6 +12,12 @@ on:
 permissions:
   contents: read
 
+# A force-push/synchronize supersedes the running suite for the same ref —
+# cancel it instead of paying for two full parallel runs.
+concurrency:
+  group: actionlint-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   ACTIONLINT_VERSION: 1.7.12
   # sha256 of actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz — the pin.

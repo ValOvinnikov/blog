@@ -13,6 +13,12 @@ env:
 permissions:
   contents: read
 
+# A force-push/synchronize supersedes the running suite for the same ref —
+# cancel it instead of paying for two full parallel runs.
+concurrency:
+  group: zizmor-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   zizmor:
     name: Zizmor
