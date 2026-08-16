@@ -1,7 +1,7 @@
 'use client';
 
 import { BookmarkToggle } from '@blog/ui/atoms';
-import { useToast } from '@web/components/shared/toast-provider';
+import { useToast } from '@web/context/toast-provider';
 import {
   getBookmarkStatus,
   setBookmarkStatus,
@@ -19,31 +19,19 @@ export type TBookmarkButtonProps = {
 };
 
 /**
- * BookmarkButton — the article header meta strip's "save for later" client
- * island (#1043/#1109), composed beside `PostShare` in `PostMeta`'s `share`
- * slot. Wraps the pure `BookmarkToggle` atom; owns everything stateful:
- *
- * - **Logged out** → renders nothing (the design doc's accepted alternative
- *   to a "Sign in to save" affordance — there's no existing cross-component
- *   way to open the header's `AuthMenu` popover from here, and hiding the
- *   action entirely is the simpler, still-sanctioned option).
- * - **Session resolving** → a disabled/neutral `BookmarkToggle` (never
- *   flashes bookmarked), so a returning signed-in reader sees no pop-in once
- *   the session resolves.
- * - **Authenticated** → fetches the real initial state via
- *   `getBookmarkStatus` (disabled until that resolves — a failed fetch still
- *   resolves it, defaulting to "not bookmarked", so the toggle never gets
- *   stuck disabled), then toggles optimistically: flips its own state
- *   immediately, calls `setBookmarkStatus`, confirms the save/remove via a
- *   `useToast` success/info toast (#1138's original motivating use case),
- *   and rolls back + shows an error toast on failure.
+ * The article header meta strip's "save for later" client island, composed
+ * beside `PostShare` in `PostMeta`'s `share` slot. Wraps the pure
+ * `BookmarkToggle` atom; renders nothing when logged out or while the
+ * session resolves, and once authenticated toggles optimistically —
+ * flipping its own state immediately, then rolling back and showing an
+ * error toast on failure.
  *
  * The save/remove toast carries an `undo` action (`performUndo`) that
  * re-applies the opposite value and confirms with its own async-revert-can-
- * fail `info`/`error` toast (design doc §4.5) — the secondary error toast
- * carries no further `retry` action, to avoid an unbounded retry chain. The
- * error toast carries a `retry R` action (`performToggle` re-run with the
- * same target value that just failed).
+ * fail `info`/`error` toast; that secondary error toast carries no further
+ * `retry` action, to avoid an unbounded retry chain. The primary error toast
+ * carries a `retry` action (`performToggle` re-run with the same target
+ * value that just failed).
  */
 export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
   const t = useTranslations('bookmarkButton');

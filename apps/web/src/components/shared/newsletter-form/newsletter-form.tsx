@@ -28,37 +28,20 @@ type TNewsletterFormProps = {
 };
 
 /**
- * NewsletterForm — the double opt-in newsletter signup island (#1044,
- * placement redone by #1197/#1200), composed into the Blog index page's
- * `module_newsletter` page-builder module and every post page's foot.
- * `heading`/`supportingText` are always CMS-sourced by the caller (the
- * module's own fields, or `settings_newsletter`) — this component never
- * falls back to i18n copy for them. Wraps `NewsletterSignup.Full`/`.Compact` (pure,
- * controlled), owning:
+ * The double opt-in newsletter signup island, composed into the Blog
+ * index page's `module_newsletter` page-builder module and every post
+ * page's foot. `heading`/`supportingText` are always CMS-sourced by the
+ * caller — this component never falls back to i18n copy for them.
  *
- * - Local `email`/`status` state, following the same "plain async handler,
- *   no `useTransition`" shape as `AuthMenu`'s `useEmailSignIn`.
- * - Client-side email-format validation before submitting — an invalid
- *   address never round-trips to the server, straight to `status: 'error'`.
- * - The `subscribeToNewsletterAction` server-action call, mapping its
- *   `outcome` (`'success'` / `'already-subscribed'` / `'server-error'`; a
- *   client-caught `'invalid'` never reaches the server) onto
- *   `status`/`errorMessage`.
- * - Hiding itself for a reader who's already subscribed: subscription isn't
- *   tied to a session (a signed-out reader can subscribe), so there's no
- *   account-based way to know this — `subscribeToNewsletterAction` sets a
- *   long-lived cookie instead. This is the **single** component both the
- *   `full` and `compact` render call-sites go through — #1200's critical
- *   requirement is that the gate lives here once, not duplicated per variant
- *   — so nothing rendering `NewsletterForm` can bypass it. Both call sites
- *   are statically rendered with ISR (SPEC.md §2.5), so reading the cookie
- *   via `next/headers`'s `cookies()` in either's Server Component render
- *   path would opt that route out of static rendering entirely. Instead this
- *   mirrors `ThemeToggleButton`/`AuthMenu`'s own mounted-gate shape: render
- *   nothing until a mount effect resolves the cookie client-side, then
- *   render nothing (subscribed) or the real form (not subscribed) — the
- *   server-rendered HTML and the first client render both have nothing, so
- *   there's no hydration mismatch and no show-then-hide flash.
+ * Subscription isn't tied to a session (a signed-out reader can subscribe),
+ * so there's no account-based way to know a reader already subscribed;
+ * `subscribeToNewsletterAction` sets a long-lived cookie instead, and this
+ * is the single component both the `full` and `compact` render call sites
+ * go through, so the gate lives here once. Both call sites are statically
+ * rendered with ISR, so reading the cookie via `next/headers`'s `cookies()`
+ * server-side would opt them out of static rendering — instead this renders
+ * nothing until a mount effect resolves the cookie client-side, matching
+ * server and first-client render so there's no hydration mismatch.
  */
 export function NewsletterForm({
   variant,

@@ -7,12 +7,8 @@ import { env } from '@web/utils/env/env';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import type { MetadataRoute } from 'next';
 
-// `getPostParams()` now projects `{ slug, publishedAt }`, so post entries set
-// `lastModified` below. `getCategoryParams()`/`getTagParams()`/
-// `getAuthorParams()`/`getPageSlugs()` (and the pagination variants) still
-// project only `{ slug }` (or `{ slug, page }`) — no query in web's reach
-// exposes a `publishedAt`/`_updatedAt` field for those yet, so `lastModified`
-// stays unset for them until a service-layer change adds one.
+// Only `getPostParams()` projects a `publishedAt` field, so `lastModified`
+// stays unset for category/tag/author/generic-page entries.
 function toEntry(
   path: string,
   siteUrl: string,
@@ -33,31 +29,14 @@ function toEntry(
 }
 
 /**
- * Site-wide sitemap: home, blog index + every numbered page, the `/topics`
- * hub, every published post, category, tag, and author archive (plus their
- * numbered pages 2..N for category/tag/author — pages 2..N of a
- * category/tag/author archive are near-duplicate slices of the same post
- * list (same title/description pattern, decreasing content density),
- * included anyway for consistency with the numbered `/blog/page/N` entries
- * already listed below, rather than treating paginated archives as
- * crawlable-but-not-advertised; `itemsPerPage` below must match the value
- * each numbered-page route's own `generateStaticParams` uses, or the two
- * disagree on how many pages exist), and every generic page. Every entry
- * carries a `languages` alternate for each configured locale — a no-op today
- * (`localePrefix: 'never'` means every locale resolves to the same
- * unprefixed path) but keeps this future-proof if locale-prefixed routing is
- * ever introduced.
+ * Site-wide sitemap covering every static and archive route, including
+ * numbered pagination pages for consistency with the numbered `/blog/page/N`
+ * entries — `itemsPerPage` here must match each route's own
+ * `generateStaticParams` or the two disagree on how many pages exist.
  *
  * Returns an empty sitemap (logged) when `NEXT_PUBLIC_SITE_URL` is unset —
  * every URL in a sitemap must be absolute, so there is no meaningful
- * relative fallback (mirrors `buildBlogPostingSchema`'s same judgment call).
- *
- * `lastModified` (#780): post entries set it from `getPostParams()`'s
- * `publishedAt` field. Category/tag/author/generic-page params queries still
- * project only slug/page — none carries a `publishedAt`/`_updatedAt` field
- * yet, so those entries leave `lastModified` unset until a service-layer
- * change adds one; `toEntry()` already accepts an optional `lastModified`
- * param so wiring it in later is a one-line change per entry.
+ * relative fallback.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = env.NEXT_PUBLIC_SITE_URL;

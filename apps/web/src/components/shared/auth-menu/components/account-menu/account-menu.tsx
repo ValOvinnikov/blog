@@ -26,12 +26,11 @@ export type TAccountMenuProps = {
 };
 
 /**
- * AccountMenu — `AuthMenu`'s logged-in render branch (#1107): an
- * `Avatar`-triggered `PopoverMenu` dressed in the `WindowChrome` terminal
- * shell, showing the session's name/email, "My bookmarks" (`/bookmarks`,
- * #1043/#1109), "Account settings" (`/account`, #1154), and "Sign out".
- * Open/close state and refs come from the parent's single `usePopover()`
- * call — this component never calls `usePopover()` itself.
+ * `AuthMenu`'s logged-in render branch: an `Avatar`-triggered `PopoverMenu`
+ * dressed in the `WindowChrome` terminal shell, showing the session's
+ * name/email, "My bookmarks", "Account settings", and "Sign out". Open/close
+ * state and refs come from the parent's single `usePopover()` call — this
+ * component never calls `usePopover()` itself.
  */
 export function AccountMenu({
   panelId,
