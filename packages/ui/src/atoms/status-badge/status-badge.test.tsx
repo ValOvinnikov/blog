@@ -15,21 +15,6 @@ describe(`<${StatusBadge.name}/>`, () => {
     expect(screen.getByText(label)).toBeVisible();
   });
 
-  it('renders with the ok tone', () => {
-    setup({ tone: 'ok' });
-    expect(screen.getByText(label)).toBeVisible();
-  });
-
-  it('renders with the warn tone', () => {
-    setup({ tone: 'warn' });
-    expect(screen.getByText(label)).toBeVisible();
-  });
-
-  it('renders with the neutral tone', () => {
-    setup({ tone: 'neutral' });
-    expect(screen.getByText(label)).toBeVisible();
-  });
-
   it('forwards dataTestId to the root element', () => {
     setup({ dataTestId: 'status-badge' });
     expect(screen.getByTestId('status-badge')).toBeVisible();

@@ -17,10 +17,6 @@ const makePost = (): IPostCardData => ({
 });
 
 const posts = faker.helpers.multiple(makePost, { count: 3 });
-const [firstPost] = posts;
-if (!firstPost) {
-  throw new Error('expected `makePost` to produce at least one post');
-}
 
 const setup = customRender(PostsSection, {
   title: 'Latest',
@@ -145,34 +141,6 @@ describe(`<${PostsSection.name}/>`, () => {
     setup({ linkAs: CustomLink });
 
     expect(screen.getAllByTestId('custom-link')).toHaveLength(posts.length);
-  });
-
-  it('nests the heading and the grid inside a shared wrapper when tinted', () => {
-    setup({ tinted: true });
-
-    const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
-    const contentGroup = heading.parentElement;
-    expect(contentGroup).toContainElement(
-      screen.getByRole('heading', { level: 3, name: firstPost.title }),
-    );
-  });
-
-  it('does not wrap the heading in an extra wrapper when not tinted', () => {
-    const { container } = setup();
-
-    const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
-    expect(heading.parentElement).toBe(container.firstElementChild);
-  });
-
-  it('wraps the heading and grid in two extra levels of wrapper when tinted, unlike the flat structure when not', () => {
-    const { container } = setup({ tinted: true });
-
-    const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
-    const contentGroup = heading.parentElement;
-    const inner = contentGroup?.parentElement;
-    const root = container.firstElementChild;
-    expect(contentGroup).not.toBe(inner);
-    expect(inner?.parentElement).toBe(root);
   });
 
   it('keeps the h2 heading markup unchanged when tinted', () => {

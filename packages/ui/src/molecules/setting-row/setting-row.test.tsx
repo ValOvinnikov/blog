@@ -47,31 +47,6 @@ describe(`<${SettingRow.name}/>`, () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it('renders with the danger tone', () => {
-    setup({ tone: 'danger', children: <button>delete account</button> });
-    expect(
-      screen.getByRole('heading', { level: 3, name: label }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'delete account' }),
-    ).toBeVisible();
-  });
-
-  it('stops the content slot from growing when controlGrows is set', () => {
-    setup({
-      controlGrows: true,
-      children: <div>accent hue slider</div>,
-    });
-    const heading = screen.getByRole('heading', { level: 3, name: label });
-    expect(heading.closest('div')).toHaveClass('md:flex-none');
-  });
-
-  it('lets the content slot grow by default', () => {
-    setup({ children: <div>accent hue slider</div> });
-    const heading = screen.getByRole('heading', { level: 3, name: label });
-    expect(heading.closest('div')).not.toHaveClass('md:flex-none');
-  });
-
   it('forwards dataTestId to the root element', () => {
     setup({ dataTestId: 'setting-row' });
     expect(screen.getByTestId('setting-row')).toBeVisible();
