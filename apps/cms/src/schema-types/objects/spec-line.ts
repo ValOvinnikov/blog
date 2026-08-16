@@ -2,7 +2,7 @@ import {
   SPEC_LINE_SEPARATOR_CHARS,
   SPEC_LINE_SEPARATORS,
 } from '@blog/config/constants';
-import { toTitleCase } from '@blog/utils';
+import { toTitleCase } from '@blog/utils/primitives';
 import { defineField, defineType } from 'sanity';
 
 export const specLineSchema = defineType({

@@ -1,6 +1,6 @@
 import { Size } from '@blog/config';
 import { Button } from '@blog/ui/atoms/button';
-import { objectKeys } from '@blog/utils';
+import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Spinner } from './spinner';

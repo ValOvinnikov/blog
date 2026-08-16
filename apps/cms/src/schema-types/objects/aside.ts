@@ -1,5 +1,5 @@
 import { ASIDE_KIND } from '@blog/config/constants';
-import { toTitleCase } from '@blog/utils';
+import { toTitleCase } from '@blog/utils/primitives';
 import { MessageSquareText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 

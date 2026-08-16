@@ -1,5 +1,5 @@
 import { ICONS, Size } from '@blog/config';
-import { objectKeys, toTitleCase } from '@blog/utils';
+import { objectKeys, toTitleCase } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Icon } from './icon';

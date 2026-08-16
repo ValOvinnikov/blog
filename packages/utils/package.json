@@ -4,7 +4,14 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./async": "./src/async/index.ts",
+    "./color": "./src/color/index.ts",
+    "./encryption": "./src/encryption/index.ts",
+    "./merge": "./src/merge/index.ts",
+    "./pagination": "./src/pagination/index.ts",
+    "./primitives": "./src/primitives/index.ts",
+    "./reading-time": "./src/reading-time/index.ts"
   },
   "scripts": {
     "lint": "eslint .",

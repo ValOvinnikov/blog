@@ -1,5 +1,5 @@
 import { TOAST_TYPE } from '@blog/config';
-import { objectKeys } from '@blog/utils';
+import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Toast } from './toast';
