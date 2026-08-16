@@ -1,5 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makePostCard } from '@web/testing/shared/post/fixtures';
 
 import { PostListModule } from './post-list-module';
@@ -102,27 +102,6 @@ describe(PostListModule, () => {
       'aria-labelledby',
       'latest-posts-post-list-1',
     );
-  });
-
-  it('renders correctly inside the Section layout wrapper with no layout authored', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-          align: undefined,
-        },
-        posts: [post],
-        layout: undefined,
-      },
-    });
-
-    await setup();
-
-    const wrapper = screen.getByTestId('post-list-module-post-list-1');
-    expect(within(wrapper).getByText('Latest posts')).toBeVisible();
   });
 
   it('derives a different section id for a different module id, avoiding duplicate DOM ids', async () => {

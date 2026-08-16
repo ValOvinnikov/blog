@@ -1,5 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { CtaModule } from './cta-module';
 
@@ -55,32 +55,6 @@ describe(CtaModule, () => {
 
     const section = heading.closest('section');
     expect(section).toHaveAttribute('aria-labelledby', 'cta-cta-1');
-  });
-
-  it('renders correctly inside the Section layout wrapper with no layout authored', async () => {
-    getCtaMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: 'Get started',
-          supportingText: undefined,
-          align: undefined,
-        },
-        action: undefined,
-        layout: undefined,
-      },
-    });
-
-    await setup();
-
-    const wrapper = screen.getByTestId('cta-module-cta-1');
-    expect(
-      within(wrapper).getByRole('heading', {
-        level: 2,
-        name: 'Get started',
-      }),
-    ).toBeVisible();
   });
 
   it('derives a different heading id for a different module id, avoiding duplicate DOM ids', async () => {

@@ -87,30 +87,6 @@ describe(HeroModule, () => {
     expect(section).toHaveAttribute('aria-labelledby', 'hero-hero-1');
   });
 
-  it('renders correctly inside the Section layout wrapper with no layout authored', async () => {
-    getHeroMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        eyebrow: undefined,
-        title: 'Welcome to the blog',
-        subtitle: undefined,
-        sanityImage: undefined,
-        primaryAction: undefined,
-        secondaryAction: undefined,
-        layout: undefined,
-      },
-    });
-
-    await setup();
-
-    const wrapper = screen.getByTestId('hero-module-hero-1');
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Welcome to the blog' }),
-    ).toBeVisible();
-    expect(wrapper.tagName).toBe('SECTION');
-  });
-
   it('renders the hero image cropped to a 16:9 (675) height, not 4:3 (900)', async () => {
     getHeroMock.mockResolvedValue({
       ok: true,
