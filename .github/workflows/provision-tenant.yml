@@ -85,4 +85,4 @@ jobs:
         # instead.
         env:
           TENANT_ID: ${{ inputs.tenantId }}
-        run: pnpm --filter @blog/db provision-tenant -- --tenant-id="$TENANT_ID"
+        run: pnpm --filter @blog/db db:provision-tenant -- --tenant-id="$TENANT_ID"

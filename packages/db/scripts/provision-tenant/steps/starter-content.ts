@@ -1,3 +1,4 @@
+import { BRAND_VARIANTS, PRESET_ID, TLINK_TYPE } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 // Fixed document ids (published, not `drafts.`-prefixed) — every field a
@@ -91,7 +92,7 @@ export function buildStarterDocuments(
         _type: 'link',
         _key: 'starter-nav-blog',
         label: 'Blog',
-        linkType: 'EXTERNAL',
+        linkType: TLINK_TYPE.EXTERNAL,
         url: '/blog',
         openInNewTab: false,
       },
@@ -108,7 +109,7 @@ export function buildStarterDocuments(
     _id: STARTER_DOCUMENT_IDS.THEME,
     _type: 'settings_theme',
     title: 'Theme',
-    preset: 'CONSOLE',
+    preset: PRESET_ID.CONSOLE,
   };
 
   const voice: TSanityDocument = {
@@ -128,7 +129,11 @@ export function buildStarterDocuments(
     _id: STARTER_DOCUMENT_IDS.SITE,
     _type: 'settings_site',
     title: 'Site Settings',
-    brand: { _type: 'brand', name: tenant.name, variant: 'CONSOLE' },
+    brand: {
+      _type: 'brand',
+      name: tenant.name,
+      variant: BRAND_VARIANTS.CONSOLE,
+    },
     description:
       `${tenant.name} was just provisioned on the platform. Edit this ` +
       'default description in Site Settings once you have real copy.',

@@ -4,16 +4,19 @@
  * `apps/admin`'s status-callback route both on success and failure.
  *
  * Invoked only by `.github/workflows/provision-tenant.yml` via
- * `pnpm --filter @blog/db provision-tenant -- --tenant-id=<uuid>` — never
+ * `pnpm --filter @blog/db db:provision-tenant -- --tenant-id=<uuid>` — never
  * run by hand against a shared/production tenant outside that workflow.
  *
  * `--conditions=react-server` makes `getDb()`'s `import 'server-only'`
  * resolve to a no-op outside Next.js's own build, same trick
  * `scripts/seed-tenant.ts` relies on.
  */
+import { pathToFileURL } from 'node:url';
+
 import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
+  type TTenantProvisioningStep,
 } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
@@ -41,7 +44,7 @@ function parseTenantId(argv: string[]): string {
 }
 
 type TStep = {
-  key: (typeof TENANT_PROVISIONING_STEP)[keyof typeof TENANT_PROVISIONING_STEP];
+  key: TTenantProvisioningStep;
   run: (
     tenant: TTenant,
     env: TProvisionEnv,
@@ -62,10 +65,14 @@ const STEPS: TStep[] = [
   { key: TENANT_PROVISIONING_STEP.MAP_DOMAIN, run: mapTenantDomain },
 ];
 
-async function main(): Promise<void> {
-  const tenantId = parseTenantId(process.argv.slice(2));
-  const env = loadProvisionEnv();
-  let tenant = await getTenantRow(tenantId);
+// Exported for direct testing of the step sequencing without also exercising
+// argv parsing / env loading / the tenant-row fetch `main()` wraps it in.
+export async function runSteps(
+  tenantId: string,
+  initialTenant: TTenant,
+  env: TProvisionEnv,
+): Promise<{ ok: boolean }> {
+  let tenant = initialTenant;
 
   for (const step of STEPS) {
     await reportStepStatus({
@@ -106,13 +113,33 @@ async function main(): Promise<void> {
       // in (idle, on a first run). The admin UI's per-step Retry button
       // re-dispatches this whole workflow, which resumes at this step via
       // its own idempotency check.
-      process.exitCode = 1;
-      return;
+      return { ok: false };
     }
+  }
+
+  return { ok: true };
+}
+
+async function main(): Promise<void> {
+  const tenantId = parseTenantId(process.argv.slice(2));
+  const env = loadProvisionEnv();
+  const tenant = await getTenantRow(tenantId);
+
+  const { ok } = await runSteps(tenantId, tenant, env);
+  if (!ok) {
+    process.exitCode = 1;
   }
 }
 
-main().catch((error: unknown) => {
-  console.error('provision-tenant: unexpected failure:', error);
-  process.exitCode = 1;
-});
+// Only auto-run when this file is the CLI entrypoint (`tsx run.ts`) — guards
+// against `main()` firing as an import side effect when a test imports
+// `runSteps` from this same module.
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  main().catch((error: unknown) => {
+    console.error('provision-tenant: unexpected failure:', error);
+    process.exitCode = 1;
+  });
+}
