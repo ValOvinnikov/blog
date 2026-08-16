@@ -412,7 +412,12 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
 - `@blog/ui`'s Storybook is hosted separately (`blog-storybook` Vercel
   project, `ui-library.{your-hosting}`) via Vercel's Git integration with PR
   previews — a deliberate exception to the CI-gated, no-preview pattern
-  above, since it carries no Sanity data or credentials. See
+  above, since it carries no Sanity data or credentials. `apps/web`'s own
+  Storybook mirrors this as a second such exception: a separate,
+  root-Directory-scoped Vercel project (`web-storybook.{your-hosting}`,
+  config in the repo-root `vercel.json` rather than `apps/web/vercel.json`,
+  which stays claimed by the CI-gated main site deploy) with the same
+  Git-integration/PR-preview setup. See
   [`docs/DEPLOY.md`](./docs/DEPLOY.md)'s Storybook section.
 - Deploys are CI-gated behind a `verify` job (type-check/lint/test/build) on
   the exact commit being deployed; deploy steps no-op green until the
