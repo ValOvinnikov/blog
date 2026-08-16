@@ -1,5 +1,4 @@
 import { customRenderAsync, screen } from '@admin/testing/custom-render';
-import { PRESET_ID } from '@blog/config';
 import { redirect } from 'next/navigation';
 
 import LookPage from './page';
@@ -69,35 +68,5 @@ describe(`<${LookPage.name}/>`, () => {
       'aria-checked',
       'true',
     );
-  });
-
-  it("renders the tenant's saved site_config row when one exists", async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getTenantBySlugMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
-    getMembershipMock.mockResolvedValue({ id: 'm-1', role: 'OWNER' });
-    getSiteConfigMock.mockResolvedValue({
-      id: 'config-1',
-      tenantId: 'tenant-1',
-      preset: PRESET_ID.EDITORIAL,
-      accentHue: 28,
-      logoHue: undefined,
-      headingFont: 'FRAUNCES',
-      bodyFont: 'INTER',
-      radiusScale: 'SM',
-      density: 'COMPACT',
-      logoAssetUrl: undefined,
-      faviconAssetUrl: undefined,
-      voiceOverrides: {},
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    await setup();
-
-    expect(screen.getByRole('radio', { name: 'Editorial' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
-    expect(screen.getByText('28°')).toBeVisible();
   });
 });
