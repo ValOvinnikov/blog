@@ -1,9 +1,9 @@
 'use server';
 
 import { queries } from '@blog/db';
+import { sanitizeLogMessage } from '@blog/utils';
 import { auth } from '@web/server/auth/auth';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
-import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 
 export type TSetBookmarkResult = { ok: true } | { ok: false };
 

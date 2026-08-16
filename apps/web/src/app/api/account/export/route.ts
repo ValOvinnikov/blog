@@ -1,7 +1,7 @@
 import { queries } from '@blog/db';
+import { sanitizeLogMessage } from '@blog/utils';
 import { auth } from '@web/server/auth/auth';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
-import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 

@@ -1,6 +1,7 @@
 'use server';
 
 import { queries } from '@blog/db';
+import { sanitizeLogMessage } from '@blog/utils';
 import { auth } from '@web/server/auth/auth';
 import { sendEmail } from '@web/server/email/send-email';
 import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newsletter-confirmation-email';
@@ -8,7 +9,6 @@ import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-
 import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { env } from '@web/utils/env/env';
-import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 
 export type TUnsubscribeResult = { ok: true } | { ok: false };
 export type TResendConfirmationActionResult = { ok: true } | { ok: false };

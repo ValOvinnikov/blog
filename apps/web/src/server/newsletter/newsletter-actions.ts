@@ -1,6 +1,7 @@
 'use server';
 
 import { queries } from '@blog/db';
+import { sanitizeLogMessage } from '@blog/utils';
 import { sendEmail } from '@web/server/email/send-email';
 import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newsletter-confirmation-email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
@@ -8,7 +9,6 @@ import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subs
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { env } from '@web/utils/env/env';
 import { isValidEmail } from '@web/utils/is-valid-email';
-import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 
 export type TSubscribeResult =
   | { outcome: 'success' }
