@@ -1,0 +1,88 @@
+name: Provision Tenant
+
+# Provisions one tenant end to end — Sanity project, seeded starter content,
+# Studio deployment, and domain mapping — for a `tenants` row already
+# inserted by `apps/admin`'s "Add tenant" wizard Server Action. Dispatched
+# via the GitHub API by `apps/admin/src/server/provisioning/dispatch-provisioning-workflow.ts`,
+# never by hand from the Actions UI in normal operation (though a human can
+# always re-run it manually with the same `tenantId` to retry a failed step
+# — every step is independently idempotent, see `packages/db/scripts/provision-tenant/`).
+#
+# Deliberately manually-triggered only, same posture as `refresh-dev-dataset.yml`
+# — it should NOT no-op green when a secret is missing (unlike the
+# auto-triggered deploy workflows): `packages/db/scripts/provision-tenant/run.ts`
+# fails loudly, before any network call, if a required env var is absent.
+on:
+  workflow_dispatch:
+    inputs:
+      tenantId:
+        description: 'tenants.id of the row to provision (already inserted by the admin wizard)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+# Two dispatches for the SAME tenant must never run concurrently — each
+# step's idempotency check reads-then-writes the tenant row, which a
+# parallel run for the same tenant could race (e.g. two Sanity projects
+# minted before either persists). Queue behind a running provision rather
+# than cancel it — a cancelled run could leave an external resource
+# (Sanity project, Vercel project) created but not yet persisted.
+concurrency:
+  group: provision-tenant-${{ inputs.tenantId }}
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 11.21.0
+  NODE_VERSION: '22'
+
+jobs:
+  provision:
+    name: Provision tenant
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Reuses the same `production` GitHub Environment (and required-reviewer
+    # gate, if configured) every other prod-affecting job in this repo uses
+    # — there is only one tenant registry (one Neon database), not a
+    # per-environment one, so this isn't a new environment, just the same
+    # production credentials store gaining a few more secrets/vars. See
+    # docs/DEPLOY.md's "One-time setup" for what's new here.
+    environment: production
+    env:
+      SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}
+      # The *shared* apps/web Vercel project — step 5 adds every tenant's
+      # custom domain to this one project, never a per-tenant project.
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      ADMIN_APP_BASE_URL: ${{ vars.ADMIN_APP_BASE_URL }}
+      TENANT_PROVISIONING_CALLBACK_SECRET: ${{ secrets.TENANT_PROVISIONING_CALLBACK_SECRET }}
+      TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
+      # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
+      # specifically — mapped here from the existing `DATABASE_URL_UNPOOLED`
+      # secret rather than provisioning a brand-new one: a short-lived CI
+      # script is exactly the direct-connection use case that secret is
+      # already scoped for (same reasoning `migrate-db` already relies on).
+      DATABASE_URL: ${{ secrets.DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # pnpm + node on PATH — also what `vercel build`/`sanity build` (run
+      # from inside the provisioning script's Studio-deploy step) need to
+      # install the workspace deps.
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Run provisioning steps
+        # `inputs.tenantId` is attacker-influenceable (any repo collaborator
+        # who can trigger workflow_dispatch controls it) — never interpolate
+        # a `${{ }}` expression directly into a `run:` shell script (template
+        # injection); pass it through `env` and reference the shell variable
+        # instead.
+        env:
+          TENANT_ID: ${{ inputs.tenantId }}
+        run: pnpm --filter @blog/db db:provision-tenant -- --tenant-id="$TENANT_ID"

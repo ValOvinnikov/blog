@@ -55,4 +55,48 @@ export default [
       ],
     },
   },
+  // The provisioning content seeder is a standalone Node script that talks
+  // to a brand-new tenant's Sanity project directly via `@sanity/client` —
+  // every other restriction (no React, no `@blog/ui`, no `@blog/service`,
+  // no Studio SDKs, no other `@sanity/*` package) still applies.
+  {
+    files: ['scripts/provision-tenant/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [noVitestGlobalsImportPath],
+          patterns: [
+            {
+              group: ['react', 'react/*', 'react-dom', 'react-dom/*'],
+              message:
+                '@blog/db must not import React — it has no React at all, client or server.',
+            },
+            {
+              group: ['@blog/ui', '@blog/ui/*'],
+              message:
+                '@blog/db must not import @blog/ui — db has no presentation concerns.',
+            },
+            {
+              group: [
+                '@blog/service',
+                '@blog/service/*',
+                'sanity',
+                'sanity/*',
+                'next-sanity',
+                'next-sanity/*',
+                '@sanity/*',
+                'groqd',
+                'groqd/*',
+                '!@sanity/client',
+                '!@sanity/client/*',
+              ],
+              message:
+                '@blog/db must not import @blog/service or the Studio SDKs — a feature needing both joins them in apps/web. `@sanity/client` is the one exception here.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];

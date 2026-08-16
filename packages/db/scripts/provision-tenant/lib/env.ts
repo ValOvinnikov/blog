@@ -1,0 +1,41 @@
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`provision-tenant: missing required env var ${name}.`);
+  }
+  return value;
+}
+
+export type TProvisionEnv = {
+  // Broader-scoped than the existing `SANITY_MIGRATE_TOKEN` — an
+  // organization-level token with "create project" permission.
+  sanityManagementToken: string;
+  vercelToken: string;
+  vercelOrgId: string;
+  // Only needed when the Vercel account is team-owned.
+  vercelTeamId: string | undefined;
+  // The *shared* `apps/web` Vercel project id — step 5 adds every tenant's
+  // custom domain to this one project, never a per-tenant project.
+  vercelWebProjectId: string;
+  vercelCliVersion: string;
+  // Base origin of the deployed `apps/admin` app (no trailing slash/path) —
+  // both the status-callback target and the Sanity CORS origin step 1 adds.
+  adminAppBaseUrl: string;
+  callbackSecret: string;
+};
+
+const DEFAULT_VERCEL_CLI_VERSION = '48.0.0';
+
+export function loadProvisionEnv(): TProvisionEnv {
+  return {
+    sanityManagementToken: requireEnv('SANITY_MANAGEMENT_TOKEN'),
+    vercelToken: requireEnv('VERCEL_TOKEN'),
+    vercelOrgId: requireEnv('VERCEL_ORG_ID'),
+    vercelTeamId: process.env['VERCEL_TEAM_ID'],
+    vercelWebProjectId: requireEnv('VERCEL_PROJECT_ID'),
+    vercelCliVersion:
+      process.env['VERCEL_CLI_VERSION'] ?? DEFAULT_VERCEL_CLI_VERSION,
+    adminAppBaseUrl: requireEnv('ADMIN_APP_BASE_URL'),
+    callbackSecret: requireEnv('TENANT_PROVISIONING_CALLBACK_SECRET'),
+  };
+}

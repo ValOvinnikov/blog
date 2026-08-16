@@ -58,9 +58,17 @@ relative paths only within a single slice (`./schema`, `./queries/comments`).
   both (e.g. a comment referencing a post), the **join happens in `apps/web`**
   (fetch the post via `service`, fetch its comments via `db`, compose in the
   Server Component) — never inside either data package.
+  **One scoped exception:** `packages/db/scripts/provision-tenant/` imports
+  `@sanity/client` directly to create a new tenant's Sanity project/dataset/
+  CORS entry and seed its starter content via Sanity's Management API — a
+  different concern from `service`'s content-read facade, and the one place
+  `db` genuinely needs to speak to Sanity itself rather than joining through
+  `apps/web`. Enforced by a `configs/eslint/db.js` override scoped to that one
+  directory; every other path in this package keeps the blanket prohibition.
 - Depend only on `@blog/config` and `@blog/utils` (types, constants, framework-
   free helpers) plus Drizzle/Neon SDKs (`drizzle-orm`, `drizzle-kit`,
-  `@neondatabase/serverless`, the Auth.js Drizzle adapter). The dependency
+  `@neondatabase/serverless`, the Auth.js Drizzle adapter) — plus `@sanity/client`,
+  scoped to `scripts/provision-tenant/` per the exception above. The dependency
   graph stays acyclic: `db → config, utils`, nothing more.
 - **Three things import `@blog/db`** — `apps/web`, `apps/admin` (the
   operator/tenant admin panel, owned by the `admin-app` agent), and
@@ -265,8 +273,9 @@ block — it points at open work rather than narrating closed work.
 Run these checks **once, after all work is complete**:
 
 - `pnpm --filter @blog/db type-check`, `lint`, and `test` pass.
-- No React import; no Sanity SDK import; no `@blog/service` import; graph
-  stays acyclic.
+- No React import; no Sanity SDK import outside the scoped
+  `scripts/provision-tenant/` exception above; no `@blog/service` import;
+  graph stays acyclic.
 - Any new/changed schema has a committed, generated migration (never a
   hand-edited one) under `packages/db/migrations/`.
 - Any new env var is documented in
