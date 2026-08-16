@@ -1,5 +1,5 @@
 import { CONTAINER_WIDTH, SPACING_SCALE } from '@blog/config/constants';
-import { toTitleCase } from '@blog/utils';
+import { toTitleCase } from '@blog/utils/primitives';
 import { EnabledStateBooleanInput } from '@cms/schema-types/components/enabled-state-boolean-input';
 import { SlidersHorizontal } from 'lucide-react';
 import { defineField, defineType } from 'sanity';

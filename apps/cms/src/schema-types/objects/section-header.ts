@@ -1,5 +1,5 @@
 import { HEADING_ALIGN } from '@blog/config/constants';
-import { toTitleCase } from '@blog/utils';
+import { toTitleCase } from '@blog/utils/primitives';
 import { defineField, defineType } from 'sanity';
 
 const alignOptions = Object.values(HEADING_ALIGN).map((value) => ({

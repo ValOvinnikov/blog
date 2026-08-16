@@ -1,5 +1,5 @@
 import { IMAGE_LAYOUT } from '@blog/config/constants';
-import { toTitleCase } from '@blog/utils';
+import { toTitleCase } from '@blog/utils/primitives';
 import {
   imageAltField,
   imageHotspotOptions,

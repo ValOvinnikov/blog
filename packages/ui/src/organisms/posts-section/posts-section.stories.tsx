@@ -1,5 +1,5 @@
 import { HEADING_ALIGN } from '@blog/config';
-import { objectKeys } from '@blog/utils';
+import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { PostsSection } from './posts-section';

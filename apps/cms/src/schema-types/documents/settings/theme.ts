@@ -5,7 +5,7 @@ import {
   RADIUS_SCALE,
   RADIUS_SCALE_LABEL,
 } from '@blog/config/constants';
-import { toTitleCase } from '@blog/utils';
+import { toTitleCase } from '@blog/utils/primitives';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { Palette } from 'lucide-react';
 import { defineField, defineType } from 'sanity';

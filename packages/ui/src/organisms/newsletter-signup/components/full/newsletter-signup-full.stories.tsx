@@ -2,7 +2,7 @@ import { HEADING_ALIGN, ICONS, Size } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
-import { objectKeys } from '@blog/utils';
+import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const trustCues = [

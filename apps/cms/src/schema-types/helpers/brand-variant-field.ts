@@ -1,5 +1,5 @@
 import { BRAND_VARIANT, type TBrandVariant } from '@blog/config/constants';
-import { toTitleCase } from '@blog/utils';
+import { toTitleCase } from '@blog/utils/primitives';
 import { defineField } from 'sanity';
 
 export const brandVariantField = (options?: { list?: TBrandVariant[] }) =>

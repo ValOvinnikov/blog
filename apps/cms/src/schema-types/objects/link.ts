@@ -1,5 +1,5 @@
 import { SOCIAL_PLATFORMS, TLINK_TYPE } from '@blog/config/constants';
-import { toTitleCase } from '@blog/utils';
+import { toTitleCase } from '@blog/utils/primitives';
 import { categorySchema } from '@cms/schema-types/documents/blog/category';
 import { postSchema } from '@cms/schema-types/documents/blog/post';
 import { Link2 } from 'lucide-react';
