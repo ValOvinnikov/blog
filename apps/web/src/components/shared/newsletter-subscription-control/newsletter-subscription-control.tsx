@@ -5,7 +5,7 @@ import { useToast } from '@web/context/toast-provider';
 import {
   resendConfirmationAction,
   unsubscribeAction,
-} from '@web/server/account/newsletter-subscription-actions';
+} from '@web/server/newsletter/newsletter-subscription-actions';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';

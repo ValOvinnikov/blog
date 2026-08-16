@@ -135,6 +135,16 @@ When invoked, before writing any code:
   `src/utils/to-post-list-items/to-post-list-items.ts` +
   `to-post-list-items.test.ts` + `index.ts`. Never a bare file directly under
   `src/utils/`.
+- **Server Actions and server-only helpers** (`'use server'` files, auth-gated
+  writes, email senders) live in `src/server/`, grouped **by domain** into one
+  folder per domain — `account/`, `newsletter/`, `bookmarks/`, `tenant/`,
+  `email/`, `auth/`, `site-config/`, `skim/` are the existing ones — not
+  one-folder-per-file like `utils/` above. A file belongs in the domain
+  folder matching what it actually _does_, not where its UI caller happens to
+  live: `newsletter-subscription-actions.ts` (unsubscribe/resend-confirmation
+  writes) belongs in `server/newsletter/` alongside the rest of the
+  newsletter server code, even though it's called from an `/account` page
+  section.
 - **Extract at the second repetition.** A slot-builder or composition pattern
   used by two routes becomes a `src/utils/` helper — never copy-paste a third.
   Discriminators (`_type` names, stored enum values) come from `@blog/config`

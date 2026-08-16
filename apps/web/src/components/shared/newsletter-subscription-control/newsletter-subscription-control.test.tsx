@@ -32,7 +32,7 @@ vi.mocked(useRouter).mockReturnValue({
   refresh: routerRefreshMock,
 } as unknown as ReturnType<typeof useRouter>);
 
-vi.mock('@web/server/account/newsletter-subscription-actions', () => ({
+vi.mock('@web/server/newsletter/newsletter-subscription-actions', () => ({
   unsubscribeAction: unsubscribeActionMock,
   resendConfirmationAction: resendConfirmationActionMock,
 }));
