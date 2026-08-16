@@ -159,6 +159,19 @@ code fences are not findings — report only hits in real code.
   before this review is dispatched — reviewer trusts that result rather than
   re-running the suite. `build` is CI-only (`ci.yml`'s `build` job gates every
   PR); it is not part of the local/review loop.
+- **Comment length and content (blocking).** Read every doc comment the diff
+  adds or touches, not just grep for keywords. Flag as blocking: more than
+  ~2 sentences of prose: an issue/PR number cited as narrative (anything
+  outside a `TODO:`/`FIXME:` block); a `docs/superpowers/**` path, a roadmap
+  phase name, or a "not wired up yet" note; a step-by-step walkthrough of
+  internal implementation (what each hook/branch does) instead of one
+  sentence of non-obvious _why_; a listing of props/behavior the type
+  signature already states. A comment that reads like a changelog or a
+  design-doc summary is too long — that content belongs in the PR
+  description (dated, reachable via `git blame`), not the source file. This
+  applies per layer agent's own `## Comments` section (see e.g.
+  `.claude/agents/web.md`) — the reviewer is the independent check that
+  catches it even when the authoring agent doesn't self-police.
 
 ## How to run a review here
 
@@ -186,6 +199,7 @@ pass does not skip the later ones:
      not overwrite/lose data).
    - **Maintainability:** naming, single responsibility, duplication, test coverage.
 
-On PRs, the `claude-code-review` CI workflow (`.github/workflows/`) also runs
-the general `/code-review` automatically — but don't rely on it in place of
-the pre-commit review: CI reviews after the push, this review gates the commit.
+There is no CI-side review workflow — the `reviewer` subagent's pre-commit
+pass, run before every push, is the only gate. (A `claude-code-review` CI
+workflow existed briefly but was removed as redundant with this pass — see
+`docs/context/ci-automation.md`.)
