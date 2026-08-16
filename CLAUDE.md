@@ -187,12 +187,9 @@ dispatch defaults to `run_in_background: true`. "The next step depends on
 this result" does **not** justify `run_in_background: false` — background
 dispatch preserves ordering too (the orchestrator resumes on notification,
 then runs the dependent step); foreground only costs the ability to respond
-to the user while it runs. Only the three exceptions below stay synchronous,
+to the user while it runs. Only the two exceptions below stay synchronous,
 each for its own stated reason:
 
-- `verify-runner` before `reviewer` (`develop-feature` skill §5, and
-  `verify-runner.md`'s own frontmatter) — reviewer genuinely cannot run
-  before verify's pass/fail is known.
 - Gate 0 (`open-pull-request` skill): `board-keeper` with the
   `"starting work on #<n>"` trigger — the branch checkout right after it
   depends on the issue (and, if any, its parent) actually being set to In
@@ -204,8 +201,13 @@ each for its own stated reason:
   reported until that board write is confirmed, so that one board-keeper
   dispatch stays synchronous.
 
-This list is exhaustive — every other dispatch (layer agents, `reviewer`,
-`a11y-reviewer`, `seo-auditor`, `ci-watcher`, ...) runs in the background.
+This list is exhaustive — every other dispatch (layer agents, `verify-runner`,
+`reviewer`, `a11y-reviewer`, `seo-auditor`, `ci-watcher`, ...) runs in the
+background. `verify-runner` before `reviewer` is **not** an exception:
+dispatch it with `run_in_background: true` like everything else — the
+orchestrator resumes on its completion notification and dispatches `reviewer`
+then, same ordering as a synchronous wait would have given, without blocking
+the ability to respond to the user in the meantime.
 
 **How completion is detected — no polling, no synchronous wait.** The
 orchestrator never needs to block on a background dispatch to learn its
@@ -221,8 +223,9 @@ unblocked, act on notification" — never "fire, then find some other way to
 wait."
 
 **Known failure mode — read this before typing `run_in_background: false`
-on a `reviewer`/`ci-watcher`/`board-keeper` call that isn't one of the three
-exceptions above.** The rationalization is always the same shape: "I can't
+on a `verify-runner`/`reviewer`/`ci-watcher`/`board-keeper` call that isn't
+one of the two exceptions above.** The rationalization is always the same
+shape: "I can't
 commit/report/move on until I know whether this passed, so I'll just wait
 for it synchronously." That reasoning is explicitly rejected in the
 "Dispatch subagents in the background by default" paragraph above ("The next
@@ -236,7 +239,7 @@ it runs, which is exactly the failure this note exists to prevent (a
 synchronous `reviewer` dispatch left no way to respond to a live user
 message until it returned, blocking a real conversation for no ordering
 benefit). Before setting `run_in_background: false` on anything, name which
-of the three exceptions above applies. If none does, the answer is `true`,
+of the two exceptions above applies. If none does, the answer is `true`,
 full stop — do not reopen the "but I need the result" argument, it was
 already settled.
 

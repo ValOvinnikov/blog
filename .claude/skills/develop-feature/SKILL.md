@@ -164,12 +164,13 @@ to run the integration verify pass instead of running it inline yourself —
 `turbo run type-check`/`lint`/`test` output across up to 11 packages
 is purely mechanical (a compiler/test runner either succeeds or fails; no
 interpretation is needed to know which), so it belongs in the subagent's
-disposable Haiku context, not this session's. **Dispatch it synchronously
-(`run_in_background: false`), not in the background** — verify is a blocking
-prerequisite before `reviewer` can run in step 6, so there is no other queued
-work to do while waiting on it (unlike `ci-watcher`, which does have other
-work to fill the wait). Give it the exact ordered command sequence for the
-scenario at hand; it does not decide or guess scope.
+disposable Haiku context, not this session's. **Dispatch it in the background
+(`run_in_background: true`), same as every other subagent** — verify is a
+blocking prerequisite before `reviewer` can run in step 6, but that ordering
+holds regardless: the orchestrator resumes on `verify-runner`'s completion
+notification and dispatches `reviewer` then, without sitting blocked and
+unable to respond to the user meanwhile. Give it the exact ordered command
+sequence for the scenario at hand; it does not decide or guess scope.
 
 **`pnpm typegen` never goes to `verify-runner`.** It mutates
 `packages/config/src/sanity/generated/` in place — that is a write, not a

@@ -5,10 +5,11 @@ description: >-
   scenario command sequence it's given — build is CI-only, not part of the
   routine sequence) and reports pass/fail — never
   diagnoses or fixes. Use in `develop-feature` §5, as a blocking prerequisite
-  before the `reviewer` subagent can run. Dispatched **synchronously**
-  (`run_in_background: false`), not background: the orchestrator cannot
-  proceed until it knows the result, so there is no other queued work to do
-  in parallel while it waits. Always pass the exact ordered command sequence
+  before the `reviewer` subagent can run. Dispatched in the **background**
+  (`run_in_background: true`), like every other subagent — the orchestrator
+  resumes on its completion notification and dispatches `reviewer` then, so
+  ordering is preserved without blocking the ability to respond to the user
+  meanwhile. Always pass the exact ordered command sequence
   for the scenario at hand (single-package / CMS-only / multi-layer) — never
   let it guess scope. Never hand it `pnpm typegen`: that mutates generated
   files, which the read-only guard wired below denies — run it inline in the
