@@ -1,8 +1,8 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
+import { sanitizeLogMessage } from '@blog/utils';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
 import { escapeXml } from '@web/utils/escape-xml';
-import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { NextResponse } from 'next/server';
 import { getTranslations } from 'next-intl/server';
 

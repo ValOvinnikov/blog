@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Article, PostsSection } from '@blog/ui/organisms';
+import { sanitizeLogMessage } from '@blog/utils';
 import { BackToTopButton } from '@web/components/shared/back-to-top-button';
 import { BookmarkButton } from '@web/components/shared/bookmark-button';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
@@ -24,7 +25,6 @@ import {
   extractPostHeadings,
   MIN_H2_HEADINGS_FOR_RAIL,
 } from '@web/utils/extract-post-headings/extract-post-headings';
-import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import { notFound } from 'next/navigation';

@@ -1,8 +1,8 @@
 'use server';
 
 import { queries } from '@blog/db';
+import { sanitizeLogMessage } from '@blog/utils';
 import { auth } from '@web/server/auth/auth';
-import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 
 export type TDeleteAccountResult = { ok: true } | { ok: false };
 

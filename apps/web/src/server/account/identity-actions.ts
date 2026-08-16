@@ -1,8 +1,8 @@
 'use server';
 
 import { queries } from '@blog/db';
+import { sanitizeLogMessage } from '@blog/utils';
 import { auth } from '@web/server/auth/auth';
-import { sanitizeLogMessage } from '@web/utils/sanitize-log-message';
 
 // The two sign-in methods `ProviderLinkControl` can unlink — mirrors
 // `@blog/db`'s own `TLinkableProvider` (email link has no `accounts` row to
