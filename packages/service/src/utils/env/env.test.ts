@@ -50,20 +50,32 @@ describe('env', () => {
     expect(env.SANITY_API_WRITE_TOKEN).toBe('secret-write-token');
   });
 
-  it('throws when NEXT_PUBLIC_SANITY_PROJECT_ID is missing', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    delete process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
+  describe('validation failures', () => {
+    // @t3-oss/env-nextjs logs `❌ Invalid environment variables: [...]` via
+    // console.error before throwing; suppress that expected noise here.
+    beforeEach(() => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
 
-    await expect(importEnv()).rejects.toThrow();
-  });
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
 
-  it('throws when NEXT_PUBLIC_SANITY_DATASET is empty (no default)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = '';
+    it('throws when NEXT_PUBLIC_SANITY_PROJECT_ID is missing', async () => {
+      delete process.env['SKIP_ENV_VALIDATION'];
+      delete process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
+      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
-    await expect(importEnv()).rejects.toThrow();
+      await expect(importEnv()).rejects.toThrow();
+    });
+
+    it('throws when NEXT_PUBLIC_SANITY_DATASET is empty (no default)', async () => {
+      delete process.env['SKIP_ENV_VALIDATION'];
+      process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
+      process.env['NEXT_PUBLIC_SANITY_DATASET'] = '';
+
+      await expect(importEnv()).rejects.toThrow();
+    });
   });
 
   it('leaves SANITY_API_READ_TOKEN undefined when absent', async () => {
