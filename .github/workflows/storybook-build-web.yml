@@ -4,15 +4,21 @@ name: Storybook Build (apps/web)
 # `blog-storybook` Vercel project (docs/DEPLOY.md) builds and previews
 # packages/ui's Storybook on every PR already; its Root Directory is scoped
 # to packages/ui, so it never builds or validates apps/web's own stories.
-# This workflow closes that gap. Path-filtered (unlike ci.yml/actionlint.yml/
-# zizmor.yml) because it is advisory, not a required status check — a
-# path-skipped advisory workflow just reports nothing, it doesn't block a PR
-# by staying "Pending" forever the way a required check would.
+# This workflow closes that gap. `packages/ui/**` is in the path filter too
+# (not because it builds packages/ui's own Storybook — it never does, see
+# the job step below) — apps/web's stories directly import @blog/ui
+# components, so a packages/ui change can break an apps/web story just as
+# easily as an apps/web change can. Path-filtered at all (unlike
+# ci.yml/actionlint.yml/zizmor.yml) because it is advisory, not a required
+# status check — a path-skipped advisory workflow just reports nothing, it
+# doesn't block a PR by staying "Pending" forever the way a required check
+# would.
 on:
   pull_request:
     branches: [main]
     paths:
       - 'apps/web/**'
+      - 'packages/ui/**'
       - 'configs/tsconfig/**'
       - 'configs/tailwind/**'
       - '.github/workflows/storybook-build-web.yml'
