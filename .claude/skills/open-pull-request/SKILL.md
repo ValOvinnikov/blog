@@ -96,8 +96,8 @@ Work through these gates in order. **Committing is free; stop at the push and PR
 
 1. Dispatch **`board-keeper`** **synchronously** (this blocks the branch
    checkout below, so it's a documented exception to the background-by-default
-   rule alongside `verify-runner` and Gate 7 — see `CLAUDE.md`'s
-   "Dispatch subagents in the background by default" section) with the
+   rule alongside Gate 7 — see `CLAUDE.md`'s "Dispatch subagents in the
+   background by default" section) with the
    trigger `"starting work on #<n>"`. In one dispatch it: looks up the item ID
    (memory first, then the API), sets the issue's status → In Progress with
    re-verify, and — if the issue has a parent — checks the parent's board

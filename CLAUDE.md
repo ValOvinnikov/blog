@@ -225,9 +225,8 @@ wait."
 **Known failure mode — read this before typing `run_in_background: false`
 on a `verify-runner`/`reviewer`/`ci-watcher`/`board-keeper` call that isn't
 one of the two exceptions above.** The rationalization is always the same
-shape: "I can't
-commit/report/move on until I know whether this passed, so I'll just wait
-for it synchronously." That reasoning is explicitly rejected in the
+shape: "I can't commit/report/move on until I know whether this passed, so
+I'll just wait for it synchronously." That reasoning is explicitly rejected in the
 "Dispatch subagents in the background by default" paragraph above ("The next
 step depends on this result" does **not** justify `run_in_background:
 false`) — but it's easy to type the override anyway

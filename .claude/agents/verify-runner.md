@@ -32,13 +32,11 @@ order, and report pass/fail data back. You never decide why something
 failed, and you never suggest a fix — diagnosis and remediation stay with the
 orchestrator.
 
-**Dispatched synchronously (`run_in_background: false`), not background.**
-This differs from `ci-watcher` (#464): verify is a blocking prerequisite — the
-orchestrator cannot move on to `reviewer` until it knows your result, so
-there is no other queued work for it to do in parallel while it waits. The
-orchestrator should not dispatch you in the background; it needs your report
-before its next step, unlike `ci-watcher`'s CI-polling wait which has other
-work to fill.
+**Dispatched in the background (`run_in_background: true`), like every
+other subagent.** Verify is still a blocking prerequisite — the orchestrator
+does not dispatch `reviewer` until it knows your result — but it resumes on
+your completion notification and dispatches `reviewer` then, rather than
+sitting blocked and unable to respond to the user in the meantime.
 
 Read-only is enforced, not just asked (#425, reused here per #466): you run
 under `permissionMode: dontAsk` (any Bash call the permission layer would
