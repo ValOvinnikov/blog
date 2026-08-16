@@ -1,8 +1,8 @@
 name: Lighthouse CI
 
 # Advisory Lighthouse CI budget assertions (#399) against a stable, known URL
-# for `/` and one post page, on every PR. Thresholds live in
-# .lighthouse/budgets.json (documented in .lighthouse/README.md).
+# for `/` and one post page, on every push to main (post-merge). Thresholds
+# live in .lighthouse/budgets.json (documented in .lighthouse/README.md).
 #
 # LIGHTHOUSE_URLS points at PRODUCTION (https://{your-hosting}), not a per-PR
 # preview: this repo has no PR preview deploys for web by design (Vercel's
@@ -16,22 +16,28 @@ name: Lighthouse CI
 # SEO category's crawlability audit — plus dev carries cold-start/unwarmed-ISR
 # performance noise unrelated to any PR's changes (#826). Production is the
 # only environment where the budgets reflect real, indexable behavior. This
-# means the job checks production's current health on every PR rather than
-# the PR's own diff — an accepted limitation until a true per-PR preview
-# target exists (none is currently tracked); it's still a useful early-warning
-# budget, and stays advisory (non-required) per #399.
+# means the job checks production's current health on every merge rather
+# than that merge's own diff — an accepted limitation until a true per-PR
+# preview target exists (none is currently tracked); it's still a useful
+# early-warning budget, and stays advisory (non-required) per #399.
 #
 # No-op (green) if the repo Variable LIGHTHOUSE_URLS is ever unset — mirrors
 # the guarded-step pattern in deploy-development.yml (steps check
 # `env.SOME_TOKEN != ''` and no-op green until configured).
+#
+# Runs on push to main (post-merge), not on every PR push: it was
+# structurally a no-op on PRs anyway (same production URLs, no per-PR
+# preview to diff against), so a PR-push trigger bought no signal.
+# `workflow_dispatch` keeps a manual trigger available.
 on:
-  pull_request:
+  push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
-# A force-push/synchronize supersedes the running job for the same ref.
+# A subsequent push to main supersedes the running job for the same ref.
 concurrency:
   group: lighthouse-${{ github.ref }}
   cancel-in-progress: true

@@ -156,14 +156,18 @@ jobs:
     name: Migrations
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Read-only guard against broken content migrations. Content is live in the
-    # `production` dataset, so a malformed or un-runnable migration must not slip
-    # through. `sanity migrations list` loads + registers every migration (fails
-    # on import errors / bad defineMigration). When a read-only Sanity token is
-    # configured (repo/org secret `SANITY_API_READ_TOKEN`), it additionally
-    # dry-runs each migration against the dataset — this never mutates data
-    # (`sanity migrations run` defaults to dry mode; `--no-dry-run` is never used
-    # here). Actually applying a migration to production stays human-gated.
+    # Read-only guard against broken content migrations and invalid documents.
+    # Content is live in the `production` dataset, so a malformed or
+    # un-runnable migration must not slip through. `sanity migrations list`
+    # loads + registers every migration (fails on import errors / bad
+    # defineMigration). When a read-only Sanity token is configured (repo/org
+    # secret `SANITY_API_READ_TOKEN`), it additionally dry-runs each migration
+    # against the dataset — this never mutates data (`sanity migrations run`
+    # defaults to dry mode; `--no-dry-run` is never used here) — and validates
+    # every existing document against the Studio schema, catching documents
+    # that drifted out of validity (e.g. after a schema change) before they
+    # can break production rendering. Actually applying a migration to
+    # production stays human-gated.
     env:
       SANITY_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
     steps:
@@ -199,6 +203,18 @@ jobs:
             pnpm exec sanity migrations run "${id}"
             echo "::endgroup::"
           done
+
+      # Read-only: `sanity documents validate` downloads every document in the
+      # configured dataset and checks it against the Studio schema — it never
+      # writes. Same guard + token as the dry-run step above (a read scope is
+      # sufficient for validation, so no separate secret is needed). `--yes`
+      # skips the interactive confirmation prompt, which CI has no TTY for.
+      - name: Validate documents against schema (read-only; requires SANITY_API_READ_TOKEN)
+        if: ${{ env.SANITY_READ_TOKEN != '' }}
+        working-directory: apps/cms
+        env:
+          SANITY_AUTH_TOKEN: ${{ env.SANITY_READ_TOKEN }}
+        run: pnpm exec sanity documents validate --yes
 
   build:
     name: Build
