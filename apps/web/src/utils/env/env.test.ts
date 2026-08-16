@@ -125,7 +125,14 @@ describe('env', () => {
     process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
     process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
+    // `createEnv` logs `❌ Invalid environment variables: [...]` via
+    // console.error before throwing — expected here, silenced so this
+    // passing test's output stays clean.
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
     await expect(importEnvOnServer()).rejects.toThrow();
+
+    errorSpy.mockRestore();
   });
 
   it('throws when SANITY_REVALIDATE_SECRET is read on the client', async () => {
@@ -156,7 +163,11 @@ describe('env', () => {
     process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
     process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
     await expect(importEnv()).rejects.toThrow();
+
+    errorSpy.mockRestore();
   });
 
   it('throws when NEXT_PUBLIC_SANITY_PROJECT_ID is missing', async () => {
@@ -164,7 +175,11 @@ describe('env', () => {
     delete process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
     process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
     await expect(importEnv()).rejects.toThrow();
+
+    errorSpy.mockRestore();
   });
 
   it('throws when NEXT_PUBLIC_SANITY_DATASET is empty (no default)', async () => {
@@ -172,6 +187,10 @@ describe('env', () => {
     process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
     process.env['NEXT_PUBLIC_SANITY_DATASET'] = '';
 
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
     await expect(importEnv()).rejects.toThrow();
+
+    errorSpy.mockRestore();
   });
 });
