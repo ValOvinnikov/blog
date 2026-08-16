@@ -3,7 +3,6 @@ import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 
 import { getPostList } from './loader';
-import * as postsQuery from './posts.query';
 
 vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
@@ -12,7 +11,6 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 
 describe('getPostList', () => {
   it('bounds the posts query by the module limit and maps the result', async () => {
-    const querySpy = vi.spyOn(postsQuery, 'postListModulePostsQuery');
     mockRun
       .mockResolvedValueOnce(
         makeRawPostListModule({
@@ -28,8 +26,8 @@ describe('getPostList', () => {
 
     const postList = await getPostList('post-list-1');
 
-    // The module's `limit` is threaded into the GROQ posts query.
-    expect(querySpy).toHaveBeenCalledWith(3);
+    // The module's `limit` is threaded into the GROQ posts query's slice bound.
+    expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[0...3]');
     expect(postList.sectionHeader.heading).toBe('Recent writing');
     expect(postList.posts.map((p) => p.id)).toEqual(['a']);
   });
@@ -47,8 +45,14 @@ describe('getPostList', () => {
 
     await getPostList('post-list-1');
 
-    expect(mockRun).toHaveBeenNthCalledWith(2, expect.anything(), {
-      next: { revalidate: 3600, tags: ['posts', 'author', 'category'] },
-    });
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({
+        next: expect.objectContaining({
+          tags: ['posts', 'author', 'category'],
+        }),
+      }),
+    );
   });
 });

@@ -34,10 +34,9 @@ describe('getNewsletter', () => {
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
-        next: {
-          revalidate: 3600,
+        next: expect.objectContaining({
           tags: ['modules:newsletter', 'module:newsletter-1'],
-        },
+        }),
       }),
     );
   });

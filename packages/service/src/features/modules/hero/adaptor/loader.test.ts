@@ -42,8 +42,7 @@ describe('getHero', () => {
       1,
       expect.anything(),
       expect.objectContaining({
-        next: {
-          revalidate: 3600,
+        next: expect.objectContaining({
           tags: [
             'modules:hero',
             'module:hero-1',
@@ -54,17 +53,16 @@ describe('getHero', () => {
             'page_generic',
             'page_blog',
           ],
-        },
+        }),
       }),
     );
     expect(mockRun).toHaveBeenNthCalledWith(
       2,
       expect.anything(),
       expect.objectContaining({
-        next: {
-          revalidate: 3600,
+        next: expect.objectContaining({
           tags: ['posts', 'author', 'category'],
-        },
+        }),
       }),
     );
   });

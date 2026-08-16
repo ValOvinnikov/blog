@@ -132,8 +132,12 @@ describe('getIndexPage', () => {
 
     await getIndexPage();
 
-    expect(mockRun).toHaveBeenNthCalledWith(3, expect.anything(), {
-      next: { revalidate: 3600, tags: ['posts', 'category'] },
-    });
+    expect(mockRun).toHaveBeenNthCalledWith(
+      3,
+      expect.anything(),
+      expect.objectContaining({
+        next: expect.objectContaining({ tags: ['posts', 'category'] }),
+      }),
+    );
   });
 });

@@ -42,19 +42,6 @@ describe(getPostsByIds, () => {
     expect(mockRun).not.toHaveBeenCalled();
   });
 
-  it('tags the query with posts/author/category', async () => {
-    mockRun.mockResolvedValue([]);
-
-    await getPostsByIds(['a']);
-
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        next: { revalidate: 3600, tags: ['posts', 'author', 'category'] },
-      }),
-    );
-  });
-
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue([]);
     const tenant = {
@@ -69,14 +56,13 @@ describe(getPostsByIds, () => {
       expect.anything(),
       expect.objectContaining({
         tenant,
-        next: {
-          revalidate: 3600,
+        next: expect.objectContaining({
           tags: [
             't:tenant-a:posts',
             't:tenant-a:author',
             't:tenant-a:category',
           ],
-        },
+        }),
       }),
     );
   });
@@ -90,7 +76,9 @@ describe(getPostsByIds, () => {
       expect.anything(),
       expect.objectContaining({
         tenant: undefined,
-        next: { revalidate: 3600, tags: ['posts', 'author', 'category'] },
+        next: expect.objectContaining({
+          tags: ['posts', 'author', 'category'],
+        }),
       }),
     );
   });

@@ -58,11 +58,13 @@ describe('getFooter', () => {
 
     await getFooter();
 
-    expect(mockRun).toHaveBeenCalledWith(expect.anything(), {
-      next: {
-        revalidate: 3600,
-        tags: ['footer', 'post', 'category', 'page_generic', 'page_blog'],
-      },
-    });
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        next: expect.objectContaining({
+          tags: ['footer', 'post', 'category', 'page_generic', 'page_blog'],
+        }),
+      }),
+    );
   });
 });

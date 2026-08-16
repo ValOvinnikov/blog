@@ -8,7 +8,10 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 }));
 
 describe('getAuthorPaginationParams', () => {
-  it('returns { slug, page } entries for pages 2..N per author', async () => {
+  // Branch coverage (zero posts, single-page corpus, multi-page corpus) lives
+  // in `./transformer.test.ts` — this loader has no logic beyond delegating
+  // the raw query result to it.
+  it('delegates the raw query result to the pagination transformer', async () => {
     mockRun.mockResolvedValueOnce([
       { slug: 'jane-doe', postCount: 20 },
       { slug: 'john-smith', postCount: 9 },
@@ -20,21 +23,5 @@ describe('getAuthorPaginationParams', () => {
       { slug: 'jane-doe', page: '2' },
       { slug: 'jane-doe', page: '3' },
     ]);
-  });
-
-  it('returns an empty array when there are no authors', async () => {
-    mockRun.mockResolvedValueOnce([]);
-
-    const params = await getAuthorPaginationParams(9);
-
-    expect(params).toEqual([]);
-  });
-
-  it('returns an empty array when every author fits on one page', async () => {
-    mockRun.mockResolvedValueOnce([{ slug: 'jane-doe', postCount: 0 }]);
-
-    const params = await getAuthorPaginationParams(9);
-
-    expect(params).toEqual([]);
   });
 });
