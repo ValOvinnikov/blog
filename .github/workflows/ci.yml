@@ -156,14 +156,18 @@ jobs:
     name: Migrations
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Read-only guard against broken content migrations. Content is live in the
-    # `production` dataset, so a malformed or un-runnable migration must not slip
-    # through. `sanity migrations list` loads + registers every migration (fails
-    # on import errors / bad defineMigration). When a read-only Sanity token is
-    # configured (repo/org secret `SANITY_API_READ_TOKEN`), it additionally
-    # dry-runs each migration against the dataset — this never mutates data
-    # (`sanity migrations run` defaults to dry mode; `--no-dry-run` is never used
-    # here). Actually applying a migration to production stays human-gated.
+    # Read-only guard against broken content migrations. Content is live in
+    # the `production` dataset, so a malformed or un-runnable migration must
+    # not slip through. `sanity migrations list` loads + registers every
+    # migration (fails on import errors / bad defineMigration). When a
+    # read-only Sanity token is configured (repo/org secret
+    # `SANITY_API_READ_TOKEN`), it additionally dry-runs each migration
+    # against the dataset — this never mutates data (`sanity migrations run`
+    # defaults to dry mode; `--no-dry-run` is never used here). Actually
+    # applying a migration to production stays human-gated. Document-schema
+    # validation against the live dataset lives in the separate
+    # `document-validation` job below (advisory, not part of this required
+    # check) — see that job's comment for why.
     env:
       SANITY_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
     steps:
@@ -199,6 +203,43 @@ jobs:
             pnpm exec sanity migrations run "${id}"
             echo "::endgroup::"
           done
+
+  document-validation:
+    name: Document validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # ADVISORY — deliberately NOT a required status check in the branch
+    # ruleset, unlike the Migrations job above. `sanity documents validate`
+    # checks every existing document in the live dataset against the current
+    # Studio schema. A routine schema evolution can drift existing content
+    # out of validity independent of what any given PR touches, so a hard
+    # failure here would block every future PR the moment one existing
+    # document drifts — the same "doesn't gate on the PR's own diff" reason
+    # Lighthouse CI / Playwright smoke stay advisory in this workflow file.
+    env:
+      SANITY_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Read-only: `sanity documents validate` downloads every document in the
+      # configured dataset and checks it against the Studio schema — it never
+      # writes. Same guard + token as the Migrations job's dry-run step (a
+      # read scope is sufficient for validation, so no separate secret is
+      # needed). `--yes` skips the interactive confirmation prompt, which CI
+      # has no TTY for.
+      - name: Validate documents against schema (read-only; requires SANITY_API_READ_TOKEN)
+        if: ${{ env.SANITY_READ_TOKEN != '' }}
+        working-directory: apps/cms
+        env:
+          SANITY_AUTH_TOKEN: ${{ env.SANITY_READ_TOKEN }}
+        run: pnpm exec sanity documents validate --yes
 
   build:
     name: Build

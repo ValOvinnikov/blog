@@ -545,3 +545,34 @@ integration stays **on** are human-gated console steps:
 - [ ] No env vars, no CORS, no tokens — `@blog/ui` never imports `service` or
       touches Sanity, so nothing here needs the Sanity/Vercel credential
       dance the rest of this doc walks through.
+
+### `apps/web`'s own Storybook (second, separate hosted project)
+
+Same idea, mirrored for `apps/web`'s own stories (#1573) — a broken story
+there needs the same pre-merge visual signal as `@blog/ui`, and the hosted
+`packages/ui` project above only ever builds `packages/ui`'s Storybook (its
+Root Directory scopes it there), so nothing else covers `apps/web`'s.
+
+One difference from the `packages/ui` setup: this project's build config
+can't live in `apps/web/vercel.json` — that file already belongs to the
+primary `blog-web-dev`/`blog-web-prod` project (`git.deploymentEnabled:
+false`, keeping its Git auto-deploy off in favor of the CI-gated pipeline),
+and Vercel reads one `vercel.json` per Root Directory regardless of which
+project is asking — a second project also rooted at `apps/web` would inherit
+that same `deploymentEnabled: false` and silently never deploy. Config
+instead lives in a **repo-root `vercel.json`** (a new file, distinct from
+every package's own), with the Root Directory set to the repo root itself:
+
+- [ ] Vercel → Add New → Project → import `{github_account}/blog`; **Root
+      Directory** left at the repo root (`.`) — do **not** set it to
+      `apps/web`; **Node.js 22.x**; Framework Preset **Other** (build/output
+      commands come from the root `vercel.json`).
+- [ ] Confirm Git integration is **enabled**, with PR previews **on** — same
+      as the `packages/ui` project above.
+- [ ] Settings → Domains → add `web-storybook.{your_hosting}` (production
+      deployment only); add the DNS record at whatever registrar/DNS host
+      manages `{your_hosting}`.
+- [ ] No env vars, no CORS, no tokens — `apps/web`'s stories are
+      component-level (no full-page compositions that would fetch live
+      Sanity content), so this needs nothing the `packages/ui` project
+      above doesn't already skip.

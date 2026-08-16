@@ -3,11 +3,11 @@ name: Playwright Smoke
 # Minimal launch-hardening smoke suite (#275): home render + one real
 # post-detail render, both asserting a 200 response and zero console errors
 # (apps/web/e2e/*.spec.ts, config in apps/web/playwright.config.ts). Runs
-# against a real, already-deployed `SMOKE_URL` on every PR — never a locally
-# built app in CI — because this repo has no per-PR preview deploys for web
-# by design: Vercel's native Git auto-deploy is disabled
-# (apps/web/vercel.json, git.deploymentEnabled: false, #445/#446; see
-# SPEC.md §13).
+# against a real, already-deployed `SMOKE_URL` on push to main (post-merge)
+# — never a locally built app in CI — because this repo has no per-PR
+# preview deploys for web by design: Vercel's native Git auto-deploy is
+# disabled (apps/web/vercel.json, git.deploymentEnabled: false, #445/#446;
+# see SPEC.md §13).
 #
 # No-op (green) until the repo Variable SMOKE_URL is set — mirrors
 # lighthouse.yml's guarded-step pattern exactly (both wait on the same
@@ -18,14 +18,20 @@ name: Playwright Smoke
 # it stays green until SMOKE_URL is configured, so marking it required now
 # doesn't block merges; promoting it is a separate, human-gated
 # branch-ruleset decision, same as lighthouse.yml's advisory note.
+#
+# Moved off every-PR-push to merge-to-main-only, same reasoning as
+# lighthouse.yml: structurally a no-op on PRs anyway (no per-PR preview URL
+# exists), so a PR-push trigger bought no signal. `workflow_dispatch` keeps
+# a manual trigger available.
 on:
-  pull_request:
+  push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
-# A force-push/synchronize supersedes the running job for the same ref.
+# A subsequent push to main supersedes the running job for the same ref.
 concurrency:
   group: playwright-smoke-${{ github.ref }}
   cancel-in-progress: true
