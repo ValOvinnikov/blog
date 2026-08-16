@@ -268,6 +268,14 @@ job resolves its own project's id + token:
 > fallback for `ci.yml` (which sets no environment) — point them at whichever
 > project CI's typegen/migration checks should target.
 
+- [x] Repo-level secret `SANITY_API_READ_TOKEN` (Settings → Secrets and
+      variables → Actions → New repository secret) — a **Viewer** token
+      minted in whichever project the repo-level `SANITY_STUDIO_PROJECT_ID`
+      above points at. Backs `ci.yml`'s Migrations job (both the dry-run
+      step and the separate advisory `document-validation` job) — until
+      it's set, both steps stay guarded (`if: env.SANITY_READ_TOKEN != ''`)
+      and no-op green rather than fail.
+
 **`dataset-refresh` environment** — a dedicated GitHub Environment (separate
 from `development`/`production`) for `refresh-dev-dataset.yml`
 (`workflow_dispatch` only, #363): this single job needs **both** projects'
