@@ -81,7 +81,7 @@ export async function createTenantAction(
   }
 
   const [existingSlug, existingDomain] = await Promise.all([
-    queries.tenants.getTenantBySlug(slug),
+    queries.tenants.getTenantBySlug(slug, { includeArchived: true }),
     queries.tenantDomains.getTenantByDomain(domain),
   ]);
 

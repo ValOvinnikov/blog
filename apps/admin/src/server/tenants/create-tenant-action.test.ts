@@ -105,6 +105,18 @@ describe('createTenantAction', () => {
     expect(createTenantDraftMock).not.toHaveBeenCalled();
   });
 
+  it('checks slug availability including archived tenants, so a deprovisioned slug stays reserved', async () => {
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    // Succeeds and redirects (NEXT_REDIRECT) — only the pre-redirect call
+    // args to getTenantBySlug matter here.
+    await createTenantAction(validInput).catch(() => undefined);
+
+    expect(getTenantBySlugMock).toHaveBeenCalledWith('acme', {
+      includeArchived: true,
+    });
+  });
+
   it('returns a field error when the domain is already taken', async () => {
     getTenantByDomainMock.mockResolvedValue({ id: 'existing-tenant' });
     const { createTenantAction } = await import('./create-tenant-action');

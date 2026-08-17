@@ -1,3 +1,4 @@
+import { ArchivedTenantsToggle } from '@admin/components/archived-tenants-toggle';
 import { TenantsTable } from '@admin/components/tenants-table';
 import { Link } from '@admin/i18n/navigation';
 import { adminRoutes } from '@admin/utils/routes/routes';
@@ -11,6 +12,7 @@ import { tenantsViewVariants } from './tenants-view-variants';
 
 export type TTenantsViewProps = {
   tenants: TTenant[];
+  showArchived: boolean;
 };
 
 /**
@@ -18,9 +20,9 @@ export type TTenantsViewProps = {
  * tenant list. Ships from day one — with one tenant it's still a finished
  * page, not a placeholder.
  */
-export function TenantsView({ tenants }: TTenantsViewProps) {
+export function TenantsView({ tenants, showArchived }: TTenantsViewProps) {
   const t = useTranslations('tenantsView');
-  const { root, header, description } = tenantsViewVariants();
+  const { root, header, description, toolbar } = tenantsViewVariants();
 
   return (
     <div className={root()}>
@@ -36,6 +38,9 @@ export function TenantsView({ tenants }: TTenantsViewProps) {
         <LinkButton as={Link} href={adminRoutes.addTenant()} variant="primary">
           {t('addTenant')}
         </LinkButton>
+      </div>
+      <div className={toolbar()}>
+        <ArchivedTenantsToggle showArchived={showArchived} />
       </div>
       <TenantsTable tenants={tenants} />
     </div>

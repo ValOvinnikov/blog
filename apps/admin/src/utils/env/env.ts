@@ -27,13 +27,15 @@ export const env = createEnv({
     // — same posture as `AUTH_SECRET` — sent as a bearer token to
     // `apps/web`'s `/api/revalidate-site-config` route.
     SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
-    // A narrowly-scoped (`actions: write` only) GitHub PAT the "Add tenant"
-    // wizard's Server Action uses to trigger `provision-tenant.yml` via
-    // `workflow_dispatch` — a deliberate exception to keeping deploy-adjacent
-    // credentials inside CI: only the trigger crosses into application code,
-    // never the provisioning work itself. Optional: absent, the dispatch
-    // call is skipped and logged — the tenant draft is still created, so an
-    // operator can retry once this is configured.
+    // A narrowly-scoped (`actions: write` only) GitHub PAT used to trigger
+    // both `provision-tenant.yml` (the "Add tenant" wizard) and
+    // `deprovision-tenant.yml` (the tenant status page's "Deprovision
+    // tenant" control) via `workflow_dispatch` — a deliberate exception to
+    // keeping deploy-adjacent credentials inside CI: only the trigger
+    // crosses into application code, never the provisioning/deprovisioning
+    // work itself. Optional: absent, the dispatch call is skipped and
+    // logged — the triggering action still succeeds, so an operator can
+    // retry once this is configured.
     TENANT_PROVISIONING_GITHUB_TOKEN: z.string().min(1).optional(),
     // Shared secret the provisioning workflow sends as
     // `Authorization: Bearer <secret>` when it calls this app's status-callback

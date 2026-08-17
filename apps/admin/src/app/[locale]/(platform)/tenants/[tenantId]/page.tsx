@@ -1,4 +1,4 @@
-import { ProvisioningStatusView } from '@admin/components/provisioning-status-view';
+import { TenantStatusView } from '@admin/components/tenant-status-view';
 import { getDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
 import { queries } from '@blog/db';
 import type { Metadata } from 'next';
@@ -28,7 +28,7 @@ export default async function TenantStatusPage({ params }: TProps) {
   );
 
   return (
-    <ProvisioningStatusView
+    <TenantStatusView
       tenant={tenant}
       domainVerificationStatus={domainVerificationStatus}
     />

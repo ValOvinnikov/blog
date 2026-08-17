@@ -5,5 +5,6 @@ export const tenantsViewVariants = tv({
     root: ['flex flex-col gap-6'],
     header: ['flex flex-wrap items-start justify-between gap-4'],
     description: ['mt-1 max-w-md text-sm text-text-muted'],
+    toolbar: ['flex justify-end'],
   },
 });
