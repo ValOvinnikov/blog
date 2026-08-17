@@ -2,7 +2,6 @@ import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-  type TTenantProvisioningStep,
 } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { render, screen, within } from '@testing-library/react';
@@ -55,7 +54,7 @@ const tenant: TTenant = {
     [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
       status: TENANT_PROVISIONING_STEP_STATUS.DONE,
     },
-    ['CREATE_WEBHOOK' as TTenantProvisioningStep]: {
+    [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
       status: TENANT_PROVISIONING_STEP_STATUS.DONE,
     },
   },

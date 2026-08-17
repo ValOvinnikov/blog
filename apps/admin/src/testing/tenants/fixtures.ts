@@ -4,7 +4,6 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
-  type TTenantProvisioningStep,
 } from '@blog/config';
 import type {
   TProvisioningStepState,
@@ -23,7 +22,7 @@ export function idleProvisioningSteps(): TTenantProvisioningSteps {
     [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: idle,
     [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: idle,
     [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: idle,
-    ['CREATE_WEBHOOK' as TTenantProvisioningStep]: idle,
+    [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: idle,
   };
 }
 
