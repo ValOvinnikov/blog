@@ -3,7 +3,9 @@ import {
   createSanityDataset,
   createSanityProject,
   createSanityRobotToken,
+  createSanityWebhook,
   deleteSanityRobotToken,
+  listSanityWebhooks,
 } from './sanity-management-client';
 
 const fetchMock = vi.fn();
@@ -155,5 +157,89 @@ describe(deleteSanityRobotToken, () => {
       'https://api.sanity.io/v2021-06-07/projects/proj123/robots/robot1',
     );
     expect(init.method).toBe('DELETE');
+  });
+});
+
+describe(listSanityWebhooks, () => {
+  it('GETs the project-scoped hooks endpoint and returns the list', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          { id: 'hook1', url: 'https://web.example.com/api/revalidate' },
+        ]),
+        { status: 200 },
+      ),
+    );
+
+    const result = await listSanityWebhooks({
+      token: 'tok',
+      projectId: 'proj123',
+    });
+
+    expect(result).toEqual([
+      { id: 'hook1', url: 'https://web.example.com/api/revalidate' },
+    ]);
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(
+      'https://proj123.api.sanity.io/v2021-06-07/hooks/projects/proj123',
+    );
+    expect(init.method ?? 'GET').toBe('GET');
+  });
+});
+
+describe(createSanityWebhook, () => {
+  it('POSTs a document webhook to the project-scoped hooks endpoint', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 'hook1',
+          url: 'https://web.example.com/api/revalidate',
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const result = await createSanityWebhook({
+      token: 'tok',
+      projectId: 'proj123',
+      dataset: 'production',
+      name: 'web-revalidate',
+      url: 'https://web.example.com/api/revalidate',
+      secret: 'shh',
+    });
+
+    expect(result).toEqual({
+      id: 'hook1',
+      url: 'https://web.example.com/api/revalidate',
+    });
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(
+      'https://proj123.api.sanity.io/v2021-06-07/hooks/projects/proj123',
+    );
+    expect(init.method).toBe('POST');
+    expect(JSON.parse(init.body as string)).toEqual({
+      type: 'document',
+      name: 'web-revalidate',
+      dataset: 'production',
+      url: 'https://web.example.com/api/revalidate',
+      apiVersion: 'v2021-06-07',
+      httpMethod: 'POST',
+      secret: 'shh',
+    });
+  });
+
+  it('throws with the response status and body on failure', async () => {
+    fetchMock.mockResolvedValue(new Response('nope', { status: 402 }));
+
+    await expect(
+      createSanityWebhook({
+        token: 'tok',
+        projectId: 'proj123',
+        dataset: 'production',
+        name: 'web-revalidate',
+        url: 'https://web.example.com/api/revalidate',
+        secret: 'shh',
+      }),
+    ).rejects.toThrow(/402/);
   });
 });

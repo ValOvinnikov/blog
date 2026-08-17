@@ -1,5 +1,5 @@
 /**
- * Provisioning workflow entrypoint — runs the five independently-idempotent
+ * Provisioning workflow entrypoint — runs the six independently-idempotent
  * steps in order for one tenant, reporting each step's status back to
  * `apps/admin`'s status-callback route both on success and failure.
  *
@@ -24,6 +24,7 @@ import { loadProvisionEnv, type TProvisionEnv } from './lib/env';
 import { getTenantRow } from './lib/get-tenant-row';
 import { sanitizeLogMessage } from './lib/sanitize-log-message';
 import { reportStepStatus } from './lib/status-callback';
+import { createTenantRevalidateWebhook } from './steps/create-revalidate-webhook';
 import { createTenantSanityProject } from './steps/create-sanity-project';
 import { createTenantStudio } from './steps/create-studio-vercel-project';
 import { mapTenantDomain } from './steps/map-domain';
@@ -63,6 +64,10 @@ const STEPS: TStep[] = [
     run: persistTenantSanityToken,
   },
   { key: TENANT_PROVISIONING_STEP.MAP_DOMAIN, run: mapTenantDomain },
+  {
+    key: TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
+    run: createTenantRevalidateWebhook,
+  },
 ];
 
 // Exported for direct testing of the step sequencing without also exercising

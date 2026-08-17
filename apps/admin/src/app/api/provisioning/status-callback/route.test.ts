@@ -108,14 +108,14 @@ describe('POST /api/provisioning/status-callback', () => {
 
     await POST(
       postRequest(
-        { tenantId: 'tenant-1', step: 'MAP_DOMAIN', status: 'DONE' },
+        { tenantId: 'tenant-1', step: 'CREATE_WEBHOOK', status: 'DONE' },
         'callback-secret',
       ),
     );
 
     expect(updateProvisioningStepMock).toHaveBeenCalledWith({
       tenantId: 'tenant-1',
-      step: 'MAP_DOMAIN',
+      step: 'CREATE_WEBHOOK',
       status: 'DONE',
       provisioningStatus: 'READY',
     });
@@ -128,9 +128,9 @@ describe('POST /api/provisioning/status-callback', () => {
       postRequest(
         {
           tenantId: 'tenant-1',
-          step: 'MAP_DOMAIN',
+          step: 'CREATE_WEBHOOK',
           status: 'FAILED',
-          error: 'Domains API returned 500',
+          error: 'Webhook creation returned 500',
         },
         'callback-secret',
       ),
@@ -138,9 +138,9 @@ describe('POST /api/provisioning/status-callback', () => {
 
     expect(updateProvisioningStepMock).toHaveBeenCalledWith({
       tenantId: 'tenant-1',
-      step: 'MAP_DOMAIN',
+      step: 'CREATE_WEBHOOK',
       status: 'FAILED',
-      error: 'Domains API returned 500',
+      error: 'Webhook creation returned 500',
       provisioningStatus: 'FAILED',
     });
   });
@@ -159,6 +159,23 @@ describe('POST /api/provisioning/status-callback', () => {
       tenantId: 'tenant-1',
       step: 'DEPLOY_STUDIO',
       status: 'FAILED',
+    });
+  });
+
+  it('leaves the overall status untouched when MAP_DOMAIN finishes (no longer the terminal step)', async () => {
+    const { POST } = await import('./route');
+
+    await POST(
+      postRequest(
+        { tenantId: 'tenant-1', step: 'MAP_DOMAIN', status: 'DONE' },
+        'callback-secret',
+      ),
+    );
+
+    expect(updateProvisioningStepMock).toHaveBeenCalledWith({
+      tenantId: 'tenant-1',
+      step: 'MAP_DOMAIN',
+      status: 'DONE',
     });
   });
 

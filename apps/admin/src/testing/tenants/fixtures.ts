@@ -22,6 +22,7 @@ export function idleProvisioningSteps(): TTenantProvisioningSteps {
     [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: idle,
     [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: idle,
     [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: idle,
+    [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: idle,
   };
 }
 
@@ -42,6 +43,7 @@ export function makeTenant(overrides: Partial<TTenant> = {}): TTenant {
     provisioningSteps: idleProvisioningSteps(),
     studioVercelProjectId: null,
     seededAt: null,
+    webhookCreatedAt: null,
     deprovisionedAt: null,
     createdAt: new Date('2026-04-02T00:00:00.000Z'),
     updatedAt: new Date('2026-04-02T00:00:00.000Z'),

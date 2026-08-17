@@ -311,6 +311,15 @@ few secrets/vars nothing else in this repo has needed yet:
       `VERCEL_PROJECT_ID` here means the **shared web** project (`blog-prod`)
       — the one the "Map domain" step adds every tenant's custom domain to,
       never a per-tenant project.
+- [ ] Variable `WEB_APP_URL` — the deployed `apps/web` origin (no trailing
+      slash), e.g. `https://{your-web-domain}`. Used to build the target URL
+      for the revalidation webhook this workflow creates on each new tenant's
+      Sanity project.
+- [ ] Secret `SANITY_REVALIDATE_SECRET` — the **same** value already set as
+      `apps/web`'s own `SANITY_REVALIDATE_SECRET` Vercel env var. Every
+      tenant's webhook is created with this shared secret; a mismatch makes
+      that tenant's webhook calls fail `apps/web`'s signature check, so
+      content publishes in that tenant's Studio never trigger revalidation.
 
 > Repo-level `SANITY_STUDIO_PROJECT_ID` / `SANITY_STUDIO_DATASET` remain the
 > fallback for `ci.yml` (which sets no environment) — point them at whichever

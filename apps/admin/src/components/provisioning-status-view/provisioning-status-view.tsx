@@ -48,9 +48,10 @@ type TProvisioningStatusViewProps = {
 };
 
 /**
- * The wizard's remaining-steps view — the five provisioning steps (Sanity
- * project → seed content → deploy Studio → persist read token → map domain)
- * read live from `tenant.provisioningSteps`, each independently retryable.
+ * The wizard's remaining-steps view — the provisioning steps (Sanity project
+ * → seed content → deploy Studio → persist read token → map domain → create
+ * webhook) read live from `tenant.provisioningSteps`, each independently
+ * retryable.
  * No polling: the operator refreshes (or Retry's own `router.refresh()`
  * does it) to see updated status, matching how the DNS check below is also
  * a live-on-render call, not a background poll.

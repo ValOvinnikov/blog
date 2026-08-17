@@ -69,6 +69,9 @@ export const tenants = pgTable('tenants', {
     jsonb('provisioning_steps').$type<TTenantProvisioningSteps>(),
   studioVercelProjectId: text('studio_vercel_project_id'),
   seededAt: timestamp('seeded_at', { mode: 'date' }),
+  // Set once provisioning creates the Sanity webhook pointing at apps/web's
+  // shared revalidation endpoint. Nullable: unset until that step runs.
+  webhookCreatedAt: timestamp('webhook_created_at', { mode: 'date' }),
   // Set once `scripts/deprovision-tenant` finishes tearing a tenant's infra
   // down (alongside `status` moving to ARCHIVED). The row is archived, never
   // hard-deleted, so `slug`'s unique constraint keeps a deprovisioned

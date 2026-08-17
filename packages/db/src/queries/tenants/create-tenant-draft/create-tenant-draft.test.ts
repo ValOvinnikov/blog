@@ -66,6 +66,7 @@ describe(createTenantDraft, () => {
       DEPLOY_STUDIO: { status: 'IDLE' },
       PERSIST_TOKEN: { status: 'IDLE' },
       MAP_DOMAIN: { status: 'IDLE' },
+      CREATE_WEBHOOK: { status: 'IDLE' },
     });
   });
 
