@@ -3,6 +3,7 @@ import type { TValueOf } from '@blog/config/utils';
 export const TENANT_STATUS = {
   ACTIVE: 'ACTIVE',
   SUSPENDED: 'SUSPENDED',
+  ARCHIVED: 'ARCHIVED',
 } as const;
 
 export type TTenantStatus = TValueOf<typeof TENANT_STATUS>;
