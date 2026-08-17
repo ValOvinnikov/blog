@@ -3,16 +3,23 @@
 # unless $1 is affected since $VERCEL_GIT_PREVIOUS_SHA. Falls back to a
 # real git-computed base when Vercel doesn't supply one (e.g. a branch's
 # first push), instead of building unconditionally.
-set -e
-
 PACKAGE="$1"
 ROOT="$(git rev-parse --show-toplevel)"
+REPO_URL="https://github.com/${VERCEL_GIT_REPO_OWNER}/${VERCEL_GIT_REPO_SLUG}.git"
 
-git -C "$ROOT" fetch --quiet --depth=100 origin main 2>/dev/null || true
+echo "[debug] ROOT=$ROOT"
+echo "[debug] VERCEL_GIT_PREVIOUS_SHA=$VERCEL_GIT_PREVIOUS_SHA"
+echo "[debug] REPO_URL=$REPO_URL"
+echo "[debug] fetching main by explicit URL (no 'origin' remote exists in this clone)..."
+git -C "$ROOT" fetch --depth=100 "$REPO_URL" main
+echo "[debug] fetch exit=$?"
 
 BASE="$VERCEL_GIT_PREVIOUS_SHA"
 if [ -z "$BASE" ]; then
-  BASE=$(git -C "$ROOT" merge-base HEAD origin/main 2>/dev/null || true)
+  echo "[debug] VERCEL_GIT_PREVIOUS_SHA empty, computing merge-base against FETCH_HEAD..."
+  BASE=$(git -C "$ROOT" merge-base HEAD FETCH_HEAD)
+  MERGE_BASE_EXIT=$?
+  echo "[debug] merge-base exit=$MERGE_BASE_EXIT BASE=$BASE"
 fi
 
 if [ -z "$BASE" ]; then
