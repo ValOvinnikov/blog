@@ -2,17 +2,17 @@
 # Vercel ignoreCommand for a turbo-scoped package: skip the build (exit 0)
 # unless $1 is affected since $VERCEL_GIT_PREVIOUS_SHA. Falls back to a
 # real git-computed base when Vercel doesn't supply one (e.g. a branch's
-# first push), instead of building unconditionally.
-set -e
-
+# first push). Vercel's build clone has no 'origin' remote configured, so
+# this fetches by explicit URL and diffs against FETCH_HEAD instead of
+# origin/main.
 PACKAGE="$1"
 ROOT="$(git rev-parse --show-toplevel)"
-
-git -C "$ROOT" fetch --quiet --depth=100 origin main 2>/dev/null || true
+REPO_URL="https://github.com/${VERCEL_GIT_REPO_OWNER}/${VERCEL_GIT_REPO_SLUG}.git"
 
 BASE="$VERCEL_GIT_PREVIOUS_SHA"
 if [ -z "$BASE" ]; then
-  BASE=$(git -C "$ROOT" merge-base HEAD origin/main 2>/dev/null || true)
+  git -C "$ROOT" fetch --quiet --depth=100 "$REPO_URL" main 2>/dev/null || true
+  BASE=$(git -C "$ROOT" merge-base HEAD FETCH_HEAD 2>/dev/null || true)
 fi
 
 if [ -z "$BASE" ]; then
