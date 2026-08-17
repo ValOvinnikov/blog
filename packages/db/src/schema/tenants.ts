@@ -70,9 +70,9 @@ export const tenants = pgTable('tenants', {
   studioVercelProjectId: text('studio_vercel_project_id'),
   seededAt: timestamp('seeded_at', { mode: 'date' }),
   // Set once `scripts/deprovision-tenant` finishes tearing a tenant's infra
-  // down. The row is archived, never hard-deleted — this is the marker, not
-  // a change to `status` — so `slug`'s unique constraint keeps a
-  // deprovisioned tenant's slug from being silently re-registered.
+  // down (alongside `status` moving to ARCHIVED). The row is archived, never
+  // hard-deleted, so `slug`'s unique constraint keeps a deprovisioned
+  // tenant's slug from being silently re-registered.
   deprovisionedAt: timestamp('deprovisioned_at', { mode: 'date' }),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
