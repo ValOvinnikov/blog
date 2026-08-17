@@ -68,7 +68,9 @@
     "plan": {
       "FREE": "Free",
       "GROWTH": "Growth"
-    }
+    },
+    "manage": "Manage →",
+    "manageAriaLabel": "Manage {tenantName}"
   },
   "tenantOverview": {
     "description": "Look and Voice ship soon — this is where they'll live."

@@ -75,6 +75,29 @@ describe(TenantsTable, () => {
     expect(screen.getByText('Suspended')).toBeVisible();
   });
 
+  it('links each row\'s "Manage" control to that tenant\'s status page', () => {
+    render(
+      <TenantsTable
+        tenants={[
+          buildTenant(),
+          buildTenant({
+            id: 'tenant-2',
+            slug: 'harbor',
+            name: 'Harbor Co.',
+            primaryDomain: 'harbor.example.com',
+          }),
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('link', { name: 'Manage Acme Inc.' }),
+    ).toHaveAttribute('href', '/tenants/tenant-1');
+    expect(
+      screen.getByRole('link', { name: 'Manage Harbor Co.' }),
+    ).toHaveAttribute('href', '/tenants/tenant-2');
+  });
+
   it('renders an empty state instead of an empty table when there are no tenants', () => {
     render(<TenantsTable tenants={[]} />);
 

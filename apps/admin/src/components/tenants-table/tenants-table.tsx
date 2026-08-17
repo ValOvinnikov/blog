@@ -1,9 +1,13 @@
+import { Link } from '@admin/i18n/navigation';
+import { adminRoutes } from '@admin/utils/routes/routes';
 import {
   tenantPlanTone,
   tenantStatusTone,
 } from '@admin/utils/tenant-badges/tenant-badges';
+import { Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { StatusBadge } from '@blog/ui/atoms';
+import { LinkButton } from '@blog/ui/molecules';
 import { useTranslations } from 'next-intl';
 
 import { tenantsTableVariants } from './tenants-table-variants';
@@ -53,6 +57,7 @@ export function TenantsTable({ tenants }: TTenantsTableProps) {
             <th className={head()} scope="col">
               {t('columnCreated')}
             </th>
+            <th className={head()} scope="col" />
           </tr>
         </thead>
         <tbody>
@@ -73,6 +78,17 @@ export function TenantsTable({ tenants }: TTenantsTableProps) {
                 </StatusBadge>
               </td>
               <td className={cell()}>{formatCreatedAt(tenant.createdAt)}</td>
+              <td className={cell()}>
+                <LinkButton
+                  as={Link}
+                  href={adminRoutes.tenantStatus(tenant.id)}
+                  variant="ghost"
+                  size={Size.SM}
+                  aria-label={t('manageAriaLabel', { tenantName: tenant.name })}
+                >
+                  {t('manage')}
+                </LinkButton>
+              </td>
             </tr>
           ))}
         </tbody>
