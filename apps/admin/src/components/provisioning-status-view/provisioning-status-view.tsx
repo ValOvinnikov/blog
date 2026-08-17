@@ -11,6 +11,7 @@ import {
 } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Button } from '@blog/ui/atoms/button';
+import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
 import { StatusBadge } from '@blog/ui/atoms/status-badge';
 import { Text } from '@blog/ui/atoms/text';
@@ -62,12 +63,14 @@ export function ProvisioningStatusView({
   const router = useRouter();
   const [retryingStep, setRetryingStep] =
     useState<TTenantProvisioningStep | null>(null);
+  const [isStarting, setIsStarting] = useState(false);
   const [, startTransition] = useTransition();
 
   const {
     root,
     header,
     description,
+    startAction,
     card,
     list,
     step,
@@ -80,6 +83,11 @@ export function ProvisioningStatusView({
   } = provisioningStatusViewVariants();
 
   const steps = tenant.provisioningSteps;
+  const allIdle = STEP_ORDER.every((stepKey) => {
+    const status =
+      steps?.[stepKey]?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
+    return status === TENANT_PROVISIONING_STEP_STATUS.IDLE;
+  });
 
   function handleRetry(stepKey: TTenantProvisioningStep) {
     setRetryingStep(stepKey);
@@ -90,16 +98,39 @@ export function ProvisioningStatusView({
     });
   }
 
+  function handleStart() {
+    setIsStarting(true);
+    startTransition(async () => {
+      await retryProvisioningStepAction(tenant.id);
+      router.refresh();
+      setIsStarting(false);
+    });
+  }
+
   return (
     <div className={root()}>
       <div className={header()}>
+        <Eyebrow>{t('eyebrow')}</Eyebrow>
         <Heading level={1} size={Size.MD}>
-          {t('heading', { name: tenant.name })}
+          {tenant.name}
         </Heading>
         <Text variant="muted" className={description()}>
           {t('description')}
         </Text>
       </div>
+
+      {allIdle && (
+        <div className={startAction()}>
+          <Button
+            type="button"
+            variant="primary"
+            onClick={handleStart}
+            disabled={isStarting}
+          >
+            {isStarting ? t('startingButton') : t('startButton')}
+          </Button>
+        </div>
+      )}
 
       <div className={card()}>
         <div className={list()}>

@@ -5,6 +5,7 @@ export const provisioningStatusViewVariants = tv({
     root: ['flex flex-col gap-6'],
     header: ['flex flex-col gap-1'],
     description: ['text-sm text-text-muted'],
+    startAction: ['flex'],
     card: ['rounded-md border border-border bg-surface p-6'],
     list: ['flex flex-col gap-4'],
     step: [

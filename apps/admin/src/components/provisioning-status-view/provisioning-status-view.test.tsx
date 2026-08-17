@@ -27,6 +27,21 @@ describe(ProvisioningStatusView, () => {
     retryProvisioningStepActionMock.mockResolvedValue(undefined);
   });
 
+  it('splits the heading into an eyebrow and the tenant name', () => {
+    const tenant = makeTenant({ name: 'Acme Inc.' });
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+      />,
+    );
+
+    expect(screen.getByText('Provisioning status')).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
+    ).toBeVisible();
+  });
+
   it('lists all five provisioning steps in order', () => {
     const tenant = makeTenant();
     render(
@@ -124,5 +139,77 @@ describe(ProvisioningStatusView, () => {
 
     expect(screen.getByText('acme.example.com')).toBeVisible();
     expect(screen.getByText('Verified')).toBeVisible();
+  });
+
+  it('explains an unconfigured domain-verification integration without naming env vars', () => {
+    const tenant = makeTenant();
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+      />,
+    );
+
+    const copy = screen.getByText(
+      'Domain verification unavailable — Vercel integration not configured for this environment',
+    );
+    expect(copy).toBeVisible();
+    expect(copy.textContent).not.toMatch(
+      /VERCEL_API_TOKEN|VERCEL_WEB_PROJECT_ID/,
+    );
+  });
+
+  it('shows a Start provisioning action when every step is idle', () => {
+    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+      />,
+    );
+
+    expect(
+      screen.getAllByRole('button', { name: 'Start provisioning' }),
+    ).toHaveLength(1);
+  });
+
+  it('hides the Start provisioning action once any step has progressed past idle', () => {
+    const tenant = makeTenant({
+      provisioningSteps: {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+        },
+      },
+    });
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+      />,
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'Start provisioning' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('re-dispatches the workflow for this tenant when Start provisioning is clicked', async () => {
+    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    const user = userEvent.setup();
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+      />,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Start provisioning' }),
+    );
+
+    await waitFor(() => {
+      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith('tenant-1');
+    });
   });
 });
