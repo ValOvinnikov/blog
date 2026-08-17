@@ -2,5 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm storybook:build",
   "outputDirectory": "storybook-static",
-  "ignoreCommand": "if [ -z \"$VERCEL_GIT_PREVIOUS_SHA\" ]; then exit 1; fi; turbo query affected --base=\"$VERCEL_GIT_PREVIOUS_SHA\" --packages @blog/ui --exit-code"
+  "ignoreCommand": "git fetch --quiet --depth=100 origin main 2>/dev/null; BASE=\"$VERCEL_GIT_PREVIOUS_SHA\"; if [ -z \"$BASE\" ]; then BASE=$(git merge-base HEAD origin/main 2>/dev/null); fi; if [ -z \"$BASE\" ]; then exit 1; fi; turbo query affected --base=\"$BASE\" --packages @blog/ui --exit-code"
 }
