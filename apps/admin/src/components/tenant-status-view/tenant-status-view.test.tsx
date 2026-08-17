@@ -27,9 +27,8 @@ describe(TenantStatusView, () => {
       />,
     );
 
-    expect(
-      screen.getByRole('heading', { name: /Provisioning Acme Inc\./ }),
-    ).toBeVisible();
+    expect(screen.getByText('Provisioning status')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Acme Inc.' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Danger zone' })).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Deprovision tenant' }),
