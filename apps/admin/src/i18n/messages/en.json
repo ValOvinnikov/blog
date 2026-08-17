@@ -63,7 +63,8 @@
     "columnCreated": "Created",
     "status": {
       "ACTIVE": "Active",
-      "SUSPENDED": "Suspended"
+      "SUSPENDED": "Suspended",
+      "ARCHIVED": "Archived"
     },
     "plan": {
       "FREE": "Free",
@@ -246,5 +247,25 @@
       "ERROR": "Couldn't check"
     },
     "dnsNotConfiguredHint": "The Vercel integration isn't configured on this deployment, so domain verification can't run — this isn't specific to this tenant."
+  },
+  "archivedTenantsToggle": {
+    "ariaLabel": "Tenant visibility",
+    "activeOption": "Active",
+    "allOption": "All"
+  },
+  "deprovisionTenantControl": {
+    "heading": "Danger zone",
+    "description": "Deprovisioning removes this tenant's domain, Studio project, and Sanity project, then archives the tenant row. This cannot be undone.",
+    "triggerButton": "Deprovision tenant",
+    "dialogTitle": "Deprovision {name}",
+    "dialogDescription": "This dispatches deprovision-tenant.yml, which tears down every provisioned resource for this tenant. Type the tenant's slug to confirm.",
+    "confirmLabel": "Type \"{slug}\" to confirm",
+    "confirmHint": "Must match the tenant's slug exactly.",
+    "dryRunLabel": "Dry run (preview only, nothing is deleted)",
+    "cancelButton": "Cancel",
+    "confirmButton": "Deprovision",
+    "confirmingButton": "Dispatching…",
+    "archivedBadge": "Deprovisioned",
+    "archivedAt": "Deprovisioned {date}"
   }
 }

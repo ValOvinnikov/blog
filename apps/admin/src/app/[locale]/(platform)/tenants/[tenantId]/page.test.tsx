@@ -22,6 +22,10 @@ vi.mock('@admin/server/provisioning/retry-provisioning-step-action', () => ({
   retryProvisioningStepAction: vi.fn(),
 }));
 
+vi.mock('@admin/server/provisioning/deprovision-tenant-action', () => ({
+  deprovisionTenantAction: vi.fn(),
+}));
+
 const setup = customRenderAsync(TenantStatusPage, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),
 });
@@ -33,7 +37,7 @@ describe(TenantStatusPage, () => {
     getDomainVerificationStatusMock.mockResolvedValue('NOT_CONFIGURED');
   });
 
-  it('renders the provisioning status view for the resolved tenant', async () => {
+  it('renders the provisioning status view and the deprovisioning control for the resolved tenant', async () => {
     const tenant = makeTenant();
     listTenantsByIdsMock.mockResolvedValue([tenant]);
 
@@ -45,6 +49,9 @@ describe(TenantStatusPage, () => {
     );
     expect(
       screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Deprovision tenant' }),
     ).toBeVisible();
   });
 

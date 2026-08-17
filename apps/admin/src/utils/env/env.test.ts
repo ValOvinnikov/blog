@@ -6,6 +6,7 @@ const ENV_KEYS = [
   'WEB_APP_URL',
   'SITE_CONFIG_REVALIDATE_SECRET',
   'TENANT_PROVISIONING_GITHUB_TOKEN',
+  'TENANT_PROVISIONING_GITHUB_REPO',
   'TENANT_PROVISIONING_CALLBACK_SECRET',
   'VERCEL_API_TOKEN',
   'VERCEL_WEB_PROJECT_ID',
@@ -159,6 +160,31 @@ describe('env', () => {
     const { env } = await importEnvOnServer();
 
     expect(env.TENANT_PROVISIONING_GITHUB_TOKEN).toBeUndefined();
+  });
+
+  it('parses a valid TENANT_PROVISIONING_GITHUB_REPO and exposes it typed', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    process.env['TENANT_PROVISIONING_GITHUB_REPO'] = 'acme-org/acme-repo';
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.TENANT_PROVISIONING_GITHUB_REPO).toBe('acme-org/acme-repo');
+  });
+
+  it('leaves TENANT_PROVISIONING_GITHUB_REPO undefined when absent (dispatch is skipped)', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    delete process.env['TENANT_PROVISIONING_GITHUB_REPO'];
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.TENANT_PROVISIONING_GITHUB_REPO).toBeUndefined();
+  });
+
+  it('rejects a TENANT_PROVISIONING_GITHUB_REPO value with no slash', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    process.env['TENANT_PROVISIONING_GITHUB_REPO'] = 'acme-repo';
+
+    await expect(importEnvOnServer()).rejects.toThrow();
   });
 
   it('parses a valid TENANT_PROVISIONING_CALLBACK_SECRET and exposes it typed', async () => {

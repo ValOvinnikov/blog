@@ -305,6 +305,15 @@ few secrets/vars nothing else in this repo has needed yet:
 - [ ] Variable `PLATFORM_DOMAIN` — the platform domain each tenant's Studio
       subdomain is minted under (`studio-<slug>.<PLATFORM_DOMAIN>`), e.g.
       `valstack.dev` in production.
+- [ ] `apps/admin`'s own Vercel project (not this GitHub Actions
+      environment) needs env var `TENANT_PROVISIONING_GITHUB_REPO` = `<owner>/<repo>`
+      (e.g. `ValOvinnikov/blog`), paired with its own
+      `TENANT_PROVISIONING_GITHUB_TOKEN` — the "Add tenant" wizard's and the
+      tenant status page's "Deprovision tenant" control's Server Actions
+      dispatch `provision-tenant.yml`/`deprovision-tenant.yml` directly
+      against the GitHub API from `apps/admin` itself, not from a CI job, so
+      there's no `GITHUB_REPOSITORY`-style var to infer this from. See
+      `docs/context/environment-variables.md`.
 - [ ] `VERCEL_TOKEN` / `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` above are reused
       as-is: `VERCEL_TOKEN` needs project-creation scope (not just deploy
       scope) for this workflow to create each tenant's Studio Vercel project;

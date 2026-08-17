@@ -40,7 +40,7 @@ export async function getDomainVerificationStatus(
 
     if (!response.ok) {
       console.error(
-        `Vercel domain check responded with ${response.status} for "${domain}".`,
+        `Vercel domain check responded with ${response.status} for "${sanitizeLogMessage(domain)}".`,
       );
       return 'ERROR';
     }

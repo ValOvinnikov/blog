@@ -8,8 +8,17 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t('tenants') };
 }
 
-export default async function TenantsPage() {
-  const tenants = await queries.tenants.listTenants();
+type TProps = {
+  searchParams: Promise<{ archived?: string }>;
+};
 
-  return <TenantsView tenants={tenants} />;
+export default async function TenantsPage({ searchParams }: TProps) {
+  const { archived } = await searchParams;
+  const showArchived = archived === '1';
+
+  const tenants = await queries.tenants.listTenants({
+    includeArchived: showArchived,
+  });
+
+  return <TenantsView tenants={tenants} showArchived={showArchived} />;
 }

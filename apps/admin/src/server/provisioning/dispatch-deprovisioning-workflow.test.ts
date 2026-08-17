@@ -1,4 +1,4 @@
-import { dispatchProvisioningWorkflow } from './dispatch-provisioning-workflow';
+import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workflow';
 
 const { envMock } = vi.hoisted(() => ({
   envMock: {
@@ -9,7 +9,7 @@ const { envMock } = vi.hoisted(() => ({
 
 vi.mock('@admin/utils/env/env', () => ({ env: envMock }));
 
-describe(dispatchProvisioningWorkflow, () => {
+describe(dispatchDeprovisioningWorkflow, () => {
   const fetchMock = vi.fn();
 
   beforeEach(() => {
@@ -22,7 +22,11 @@ describe(dispatchProvisioningWorkflow, () => {
   it('skips the dispatch call when no token is configured', async () => {
     envMock.TENANT_PROVISIONING_GITHUB_TOKEN = undefined;
 
-    await dispatchProvisioningWorkflow('tenant-1');
+    await dispatchDeprovisioningWorkflow({
+      tenantId: 'tenant-1',
+      confirm: 'acme',
+      dryRun: true,
+    });
 
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -30,33 +34,48 @@ describe(dispatchProvisioningWorkflow, () => {
   it('skips the dispatch call when no repo is configured', async () => {
     envMock.TENANT_PROVISIONING_GITHUB_REPO = undefined;
 
-    await dispatchProvisioningWorkflow('tenant-1');
+    await dispatchDeprovisioningWorkflow({
+      tenantId: 'tenant-1',
+      confirm: 'acme',
+      dryRun: true,
+    });
 
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('POSTs a workflow_dispatch request with the tenant id as an input', async () => {
+  it('POSTs a workflow_dispatch request with tenantId, confirm, and dryRun as inputs', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
-    await dispatchProvisioningWorkflow('tenant-1');
+    await dispatchDeprovisioningWorkflow({
+      tenantId: 'tenant-1',
+      confirm: 'acme',
+      dryRun: true,
+    });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://api.github.com/repos/acme-org/acme-repo/actions/workflows/provision-tenant.yml/dispatches',
+      'https://api.github.com/repos/acme-org/acme-repo/actions/workflows/deprovision-tenant.yml/dispatches',
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({
           Authorization: 'Bearer ghp_token',
         }),
-        body: JSON.stringify({ ref: 'main', inputs: { tenantId: 'tenant-1' } }),
+        body: JSON.stringify({
+          ref: 'main',
+          inputs: { tenantId: 'tenant-1', confirm: 'acme', dryRun: 'true' },
+        }),
       }),
     );
   });
 
-  it('never throws when the dispatch call responds with a non-2xx status (e.g. the workflow not existing yet)', async () => {
+  it('never throws when the dispatch call responds with a non-2xx status', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 404 }));
 
     await expect(
-      dispatchProvisioningWorkflow('tenant-1'),
+      dispatchDeprovisioningWorkflow({
+        tenantId: 'tenant-1',
+        confirm: 'acme',
+        dryRun: true,
+      }),
     ).resolves.toBeUndefined();
   });
 
@@ -64,7 +83,11 @@ describe(dispatchProvisioningWorkflow, () => {
     fetchMock.mockRejectedValue(new Error('network down'));
 
     await expect(
-      dispatchProvisioningWorkflow('tenant-1'),
+      dispatchDeprovisioningWorkflow({
+        tenantId: 'tenant-1',
+        confirm: 'acme',
+        dryRun: true,
+      }),
     ).resolves.toBeUndefined();
   });
 });

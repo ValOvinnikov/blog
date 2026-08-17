@@ -10,10 +10,8 @@
 export function sanitizeLogMessage(value: unknown): string {
   const raw = value instanceof Error ? value.message : String(value);
 
-  return Array.from(raw)
-    .map((char) => {
-      const codePoint = char.codePointAt(0) ?? 0;
-      return codePoint < 0x20 || codePoint === 0x7f ? ' ' : char;
-    })
-    .join('');
+  // Control-character range is intentional: CodeQL's log-injection sanitizer
+  // only recognizes this literal regex idiom, not a per-character loop.
+  // eslint-disable-next-line no-control-regex
+  return raw.replace(/[\x00-\x1f\x7f]/g, ' ');
 }

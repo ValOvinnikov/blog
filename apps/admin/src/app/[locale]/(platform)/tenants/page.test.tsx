@@ -1,4 +1,8 @@
-import { customRenderAsync, screen } from '@admin/testing/custom-render';
+import {
+  customRenderAsync,
+  screen,
+  within,
+} from '@admin/testing/custom-render';
 
 import TenantsPage from './page';
 
@@ -10,14 +14,16 @@ vi.mock('@blog/db', () => ({
   queries: { tenants: { listTenants: listTenantsMock } },
 }));
 
-const setup = customRenderAsync(TenantsPage, {});
+const setup = customRenderAsync(TenantsPage, {
+  searchParams: Promise.resolve({}),
+});
 
 describe(TenantsPage, () => {
   beforeEach(() => {
     listTenantsMock.mockReset();
   });
 
-  it('renders the real tenant rows from listTenants', async () => {
+  it('renders the real tenant rows from listTenants, excluding archived by default', async () => {
     listTenantsMock.mockResolvedValue([
       {
         id: 'tenant-1',
@@ -36,8 +42,16 @@ describe(TenantsPage, () => {
 
     await setup();
 
-    expect(listTenantsMock).toHaveBeenCalled();
+    expect(listTenantsMock).toHaveBeenCalledWith({ includeArchived: false });
     expect(screen.getByText('Acme Inc.')).toBeVisible();
-    expect(screen.getByText('Active')).toBeVisible();
+    expect(within(screen.getByRole('table')).getByText('Active')).toBeVisible();
+  });
+
+  it('includes archived tenants when ?archived=1 is set', async () => {
+    listTenantsMock.mockResolvedValue([]);
+
+    await setup({ searchParams: Promise.resolve({ archived: '1' }) });
+
+    expect(listTenantsMock).toHaveBeenCalledWith({ includeArchived: true });
   });
 });

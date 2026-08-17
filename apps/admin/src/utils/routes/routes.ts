@@ -3,7 +3,8 @@
  * these paths inline elsewhere.
  */
 export const adminRoutes = {
-  tenants: () => '/tenants',
+  tenants: (options?: { archived?: boolean }) =>
+    options?.archived ? '/tenants?archived=1' : '/tenants',
   addTenant: () => '/add-tenant',
   tenantStatus: (tenantId: string) => `/tenants/${tenantId}`,
   tenant: (tenantSlug: string) => `/t/${tenantSlug}`,

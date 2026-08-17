@@ -1,4 +1,5 @@
 import { Link } from '@admin/i18n/navigation';
+import { formatDate } from '@admin/utils/format-date/format-date';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import {
   tenantPlanTone,
@@ -15,13 +16,6 @@ import { tenantsTableVariants } from './tenants-table-variants';
 export type TTenantsTableProps = {
   tenants: TTenant[];
 };
-
-const formatCreatedAt = (date: Date) =>
-  date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
 
 /**
  * Every tenant on the platform, with status and plan visible at a glance.
@@ -77,7 +71,7 @@ export function TenantsTable({ tenants }: TTenantsTableProps) {
                   {t(`status.${tenant.status}`)}
                 </StatusBadge>
               </td>
-              <td className={cell()}>{formatCreatedAt(tenant.createdAt)}</td>
+              <td className={cell()}>{formatDate(tenant.createdAt)}</td>
               <td className={cell()}>
                 <LinkButton
                   as={Link}

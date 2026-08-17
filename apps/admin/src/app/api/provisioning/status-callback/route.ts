@@ -119,7 +119,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     });
   } catch (caughtError) {
     console.error(
-      `status-callback: failed to update tenant "${tenantId}":`,
+      `status-callback: failed to update tenant "${sanitizeLogMessage(tenantId)}":`,
       sanitizeLogMessage(caughtError),
     );
     return NextResponse.json(
