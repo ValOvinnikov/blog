@@ -22,6 +22,8 @@ const env: TProvisionEnv = {
   adminAppBaseUrl: 'https://admin.example.com',
   callbackSecret: 'shh',
   platformDomain: 'example.com',
+  webAppBaseUrl: 'https://example.com',
+  revalidateSecret: 'revalidate-shh',
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {

@@ -8,6 +8,8 @@ const REQUIRED_ENV: Record<string, string> = {
   ADMIN_APP_BASE_URL: 'https://admin.example.com',
   TENANT_PROVISIONING_CALLBACK_SECRET: 'shh',
   PLATFORM_DOMAIN: 'example.com',
+  WEB_APP_URL: 'https://example.com',
+  SANITY_REVALIDATE_SECRET: 'revalidate-shh',
 };
 
 const originalEnv: Record<string, string | undefined> = {};
@@ -47,6 +49,8 @@ describe(loadProvisionEnv, () => {
       adminAppBaseUrl: 'https://admin.example.com',
       callbackSecret: 'shh',
       platformDomain: 'example.com',
+      webAppBaseUrl: 'https://example.com',
+      revalidateSecret: 'revalidate-shh',
     });
   });
 

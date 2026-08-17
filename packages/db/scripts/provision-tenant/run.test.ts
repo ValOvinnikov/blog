@@ -24,6 +24,9 @@ const { persistTenantSanityTokenMock } = vi.hoisted(() => ({
 const { mapTenantDomainMock } = vi.hoisted(() => ({
   mapTenantDomainMock: vi.fn(),
 }));
+const { createTenantRevalidateWebhookMock } = vi.hoisted(() => ({
+  createTenantRevalidateWebhookMock: vi.fn(),
+}));
 
 vi.mock('./lib/status-callback', () => ({
   reportStepStatus: reportStepStatusMock,
@@ -43,6 +46,9 @@ vi.mock('./steps/persist-sanity-token', () => ({
 vi.mock('./steps/map-domain', () => ({
   mapTenantDomain: mapTenantDomainMock,
 }));
+vi.mock('./steps/create-revalidate-webhook', () => ({
+  createTenantRevalidateWebhook: createTenantRevalidateWebhookMock,
+}));
 
 const baseTenant = { id: 'tenant-1', name: 'Acme' } as TTenant;
 const env = {
@@ -55,6 +61,8 @@ const env = {
   adminAppBaseUrl: 'https://admin.example.com',
   callbackSecret: 'shh',
   platformDomain: 'example.com',
+  webAppBaseUrl: 'https://example.com',
+  revalidateSecret: 'revalidate-shh',
 };
 
 beforeEach(() => {
@@ -64,6 +72,7 @@ beforeEach(() => {
   createTenantStudioMock.mockReset();
   persistTenantSanityTokenMock.mockReset().mockResolvedValue(undefined);
   mapTenantDomainMock.mockReset().mockResolvedValue(undefined);
+  createTenantRevalidateWebhookMock.mockReset().mockResolvedValue(undefined);
 });
 
 describe(runSteps, () => {
@@ -79,6 +88,7 @@ describe(runSteps, () => {
     expect(createTenantStudioMock).toHaveBeenCalledTimes(1);
     expect(persistTenantSanityTokenMock).toHaveBeenCalledTimes(1);
     expect(mapTenantDomainMock).toHaveBeenCalledTimes(1);
+    expect(createTenantRevalidateWebhookMock).toHaveBeenCalledTimes(1);
 
     const statuses = reportStepStatusMock.mock.calls.map((call) => {
       const [input] = call as [{ step: string; status: string }];
@@ -125,6 +135,14 @@ describe(runSteps, () => {
         TENANT_PROVISIONING_STEP.MAP_DOMAIN,
         TENANT_PROVISIONING_STEP_STATUS.DONE,
       ],
+      [
+        TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
+        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      ],
+      [
+        TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
+        TENANT_PROVISIONING_STEP_STATUS.DONE,
+      ],
     ]);
   });
 
@@ -159,6 +177,7 @@ describe(runSteps, () => {
     expect(createTenantStudioMock).not.toHaveBeenCalled();
     expect(persistTenantSanityTokenMock).not.toHaveBeenCalled();
     expect(mapTenantDomainMock).not.toHaveBeenCalled();
+    expect(createTenantRevalidateWebhookMock).not.toHaveBeenCalled();
 
     const lastCall = reportStepStatusMock.mock.calls.at(-1) as [
       { step: string; status: string; error: string },

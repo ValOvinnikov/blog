@@ -49,6 +49,9 @@ async function insertProvisionedTenant(): Promise<string> {
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
           status: TENANT_PROVISIONING_STEP_STATUS.DONE,
         },
+        [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
       },
       studioVercelProjectId: 'prj_studio',
     })

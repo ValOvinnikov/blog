@@ -25,6 +25,15 @@ export type TProvisionEnv = {
   // Platform domain each tenant's Studio subdomain is minted under
   // (`studio-<slug>.<platformDomain>`) — see `studioDomainForSlug`.
   platformDomain: string;
+  // Base origin of the deployed, shared `apps/web` app (no trailing
+  // slash/path) — every tenant's revalidation webhook targets the same
+  // `${webAppBaseUrl}/api/revalidate`, since that route tenant-scopes its
+  // own cache tags off Sanity's `sanity-project-id` header.
+  webAppBaseUrl: string;
+  // Must be byte-identical to `apps/web`'s own `SANITY_REVALIDATE_SECRET` —
+  // the value each tenant's webhook is created with, and the value that
+  // route verifies incoming requests against.
+  revalidateSecret: string;
 };
 
 const DEFAULT_VERCEL_CLI_VERSION = '48.0.0';
@@ -41,5 +50,7 @@ export function loadProvisionEnv(): TProvisionEnv {
     adminAppBaseUrl: requireEnv('ADMIN_APP_BASE_URL'),
     callbackSecret: requireEnv('TENANT_PROVISIONING_CALLBACK_SECRET'),
     platformDomain: requireEnv('PLATFORM_DOMAIN'),
+    webAppBaseUrl: requireEnv('WEB_APP_URL'),
+    revalidateSecret: requireEnv('SANITY_REVALIDATE_SECRET'),
   };
 }

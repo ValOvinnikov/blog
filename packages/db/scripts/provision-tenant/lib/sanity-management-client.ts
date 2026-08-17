@@ -119,3 +119,77 @@ export async function deleteSanityRobotToken(input: {
     { method: 'DELETE' },
   );
 }
+
+// Webhooks are documented against the project-scoped host
+// (`{projectId}.api.sanity.io`), unlike every endpoint above, which all work
+// against the generic `api.sanity.io` host — see
+// https://www.sanity.io/docs/http-reference/webhooks.
+function sanityWebhooksApiBase(projectId: string): string {
+  return `https://${projectId}.api.sanity.io/v2021-06-07`;
+}
+
+async function sanityWebhooksRequest<T>(
+  projectId: string,
+  path: string,
+  token: string,
+  init: RequestInit = {},
+): Promise<T> {
+  const response = await fetch(`${sanityWebhooksApiBase(projectId)}${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      ...init.headers,
+    },
+  });
+
+  if (!response.ok) {
+    const body = await response.text().catch(() => '');
+    throw new Error(
+      `Sanity Webhooks API ${init.method ?? 'GET'} ${path} failed: ${response.status} ${body}`,
+    );
+  }
+
+  const text = await response.text();
+  return (text ? JSON.parse(text) : undefined) as T;
+}
+
+export type TSanityWebhook = { id: string; url: string };
+
+export async function listSanityWebhooks(input: {
+  token: string;
+  projectId: string;
+}): Promise<TSanityWebhook[]> {
+  return sanityWebhooksRequest<TSanityWebhook[]>(
+    input.projectId,
+    `/hooks/projects/${input.projectId}`,
+    input.token,
+  );
+}
+
+export async function createSanityWebhook(input: {
+  token: string;
+  projectId: string;
+  dataset: string;
+  name: string;
+  url: string;
+  secret: string;
+}): Promise<TSanityWebhook> {
+  return sanityWebhooksRequest<TSanityWebhook>(
+    input.projectId,
+    `/hooks/projects/${input.projectId}`,
+    input.token,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'document',
+        name: input.name,
+        dataset: input.dataset,
+        url: input.url,
+        apiVersion: 'v2021-06-07',
+        httpMethod: 'POST',
+        secret: input.secret,
+      }),
+    },
+  );
+}
