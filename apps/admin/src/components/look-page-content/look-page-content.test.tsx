@@ -54,6 +54,7 @@ const tenant: TTenant = {
   },
   studioVercelProjectId: null,
   seededAt: new Date('2026-01-01T00:00:00.000Z'),
+  deprovisionedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 };
