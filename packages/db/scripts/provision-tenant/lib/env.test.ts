@@ -2,6 +2,7 @@ import { loadProvisionEnv } from './env';
 
 const REQUIRED_ENV: Record<string, string> = {
   SANITY_MANAGEMENT_TOKEN: 'sanity-token',
+  SANITY_ORGANIZATION_ID: 'org-abc',
   VERCEL_TOKEN: 'vercel-token',
   VERCEL_ORG_ID: 'org-1',
   VERCEL_PROJECT_ID: 'proj-1',
@@ -38,6 +39,7 @@ describe(loadProvisionEnv, () => {
 
     expect(env).toEqual({
       sanityManagementToken: 'sanity-token',
+      sanityOrganizationId: 'org-abc',
       vercelToken: 'vercel-token',
       vercelOrgId: 'org-1',
       vercelTeamId: undefined,

@@ -14,6 +14,7 @@ vi.mock('@blog/db/queries/tenants', () => ({
 
 const env: TProvisionEnv = {
   sanityManagementToken: 'mgmt-token',
+  sanityOrganizationId: 'org-abc',
   vercelToken: 'v-token',
   vercelOrgId: 'org_1',
   vercelTeamId: undefined,
