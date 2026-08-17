@@ -132,11 +132,15 @@ both, so the two must never maintain it separately.
 Full contract and migration mechanism: `.claude/agents/db.md`.
 
 ¹ `@blog/db`'s Sanity-SDK prohibition has one scoped exception:
-`packages/db/scripts/provision-tenant/` imports `@sanity/client` directly to
-create a new tenant's Sanity project/dataset/CORS entry and seed its starter
-content during provisioning — the one place in this package that talks to
-Sanity's Management API rather than Neon. Enforced by a dedicated
-`configs/eslint/db.js` override scoped to that directory; every other path in
+`packages/db/scripts/provision-tenant/` talks to Sanity's Management API
+directly (via `@sanity/client` for content seeding, raw `fetch` for the
+project/dataset/CORS/webhook management calls) to create a new tenant's
+Sanity project/dataset/CORS entry, seed its starter content, and create a
+revalidation webhook (pointing at `apps/web`'s shared, already tenant-aware
+revalidate endpoint) during provisioning — the one place in this package
+that talks to Sanity rather than Neon.
+Enforced by a dedicated `configs/eslint/db.js` override scoped to that
+directory; every other path in
 `@blog/db` keeps the blanket prohibition.
 Dependency-graph enforcement details and SVG/type-flow wiring:
 [`docs/context/frontend-conventions.md`](./docs/context/frontend-conventions.md).
