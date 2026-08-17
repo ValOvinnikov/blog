@@ -38,6 +38,7 @@ export async function createTenantSanityProject(
   const project = await createSanityProject({
     token: env.sanityManagementToken,
     displayName: tenant.name,
+    organizationId: env.sanityOrganizationId,
   });
 
   await createSanityDataset({

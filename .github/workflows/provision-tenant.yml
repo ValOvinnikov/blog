@@ -51,6 +51,7 @@ jobs:
     environment: production
     env:
       SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
+      SANITY_ORGANIZATION_ID: ${{ vars.SANITY_ORGANIZATION_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
       VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}

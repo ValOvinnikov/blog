@@ -28,6 +28,7 @@ vi.mock('../lib/sanity-management-client', () => ({
 
 const env: TProvisionEnv = {
   sanityManagementToken: 'mgmt-token',
+  sanityOrganizationId: 'org-abc',
   vercelToken: 'v-token',
   vercelOrgId: 'org_1',
   vercelTeamId: undefined,
@@ -93,6 +94,7 @@ describe(createTenantSanityProject, () => {
     expect(createSanityProjectMock).toHaveBeenCalledWith({
       token: 'mgmt-token',
       displayName: 'Acme',
+      organizationId: 'org-abc',
     });
     expect(createSanityDatasetMock).toHaveBeenCalledWith({
       token: 'mgmt-token',
