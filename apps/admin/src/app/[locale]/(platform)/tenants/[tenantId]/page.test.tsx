@@ -44,7 +44,7 @@ describe(TenantStatusPage, () => {
       'acme.example.com',
     );
     expect(
-      screen.getByRole('heading', { name: /Provisioning Acme Inc\./ }),
+      screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
     ).toBeVisible();
   });
 

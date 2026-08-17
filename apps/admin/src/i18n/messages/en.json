@@ -217,7 +217,7 @@
     "submittingButton": "Creating…"
   },
   "provisioningStatusView": {
-    "heading": "Provisioning {name}",
+    "eyebrow": "Provisioning status",
     "description": "Each step is independently resumable — a failed step's Retry re-dispatches the workflow, which skips whatever already succeeded.",
     "stepLabel": {
       "SANITY_PROJECT": "Create Sanity project",
@@ -234,13 +234,16 @@
     },
     "retryButton": "Retry",
     "retryingButton": "Retrying…",
+    "startButton": "Start provisioning",
+    "startingButton": "Starting…",
     "dnsHeading": "Domain verification",
     "dnsStatus": {
-      "NOT_CONFIGURED": "Not configured",
+      "NOT_CONFIGURED": "Unavailable",
       "NOT_ADDED": "Not added yet",
       "PENDING": "Pending — awaiting DNS",
       "VERIFIED": "Verified",
       "ERROR": "Couldn't check"
-    }
+    },
+    "dnsNotConfiguredHint": "The Vercel integration isn't configured on this deployment, so domain verification can't run — this isn't specific to this tenant."
   }
 }
