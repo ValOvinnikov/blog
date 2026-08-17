@@ -121,7 +121,7 @@ async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
   const db = getDb();
 
-  let tenant = await getTenantBySlug(args.slug);
+  let tenant = await getTenantBySlug(args.slug, { includeArchived: true });
   if (tenant) {
     console.warn(
       `Tenant "${args.slug}" already exists (${tenant.id}) — reusing it.`,
