@@ -1,11 +1,11 @@
 'use client';
 
+import { Link } from '@admin/i18n/navigation';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import { Menu } from '@base-ui/react/menu';
 import { ICONS, Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Avatar, Icon } from '@blog/ui/atoms';
-import Link from 'next/link';
 
 import { tenantSwitcherVariants } from './tenant-switcher-variants';
 

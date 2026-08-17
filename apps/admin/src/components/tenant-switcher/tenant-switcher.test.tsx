@@ -6,8 +6,25 @@ import {
 import type { TTenant } from '@blog/db/schema/tenants';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ComponentPropsWithoutRef } from 'react';
 
 import { TenantSwitcher } from './tenant-switcher';
+
+// `TenantSwitcher` links each tenant through `@admin/i18n/navigation`'s
+// `Link` (next-intl's locale-aware navigation), not plain `next/link` —
+// mocking the wrong module here would let a broken import ship unnoticed
+// (see `sidebar.test.tsx`'s identical mock for `sidebar-nav-link.tsx`).
+vi.mock('@admin/i18n/navigation', () => ({
+  Link: ({
+    href,
+    children,
+    ...rest
+  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
+}));
 
 const tenant: TTenant = {
   id: 'tenant-1',
