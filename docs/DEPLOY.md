@@ -296,6 +296,9 @@ few secrets/vars nothing else in this repo has needed yet:
       existing convention to reuse here — this is a new variable.
 - [ ] Variable `VERCEL_TEAM_ID` — only needed if the Vercel account is
       team-owned; omit otherwise.
+- [ ] Variable `PLATFORM_DOMAIN` — the platform domain each tenant's Studio
+      subdomain is minted under (`studio-<slug>.<PLATFORM_DOMAIN>`), e.g.
+      `valstack.dev` in production.
 - [ ] `VERCEL_TOKEN` / `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` above are reused
       as-is: `VERCEL_TOKEN` needs project-creation scope (not just deploy
       scope) for this workflow to create each tenant's Studio Vercel project;

@@ -7,6 +7,7 @@ const REQUIRED_ENV: Record<string, string> = {
   VERCEL_PROJECT_ID: 'proj-1',
   ADMIN_APP_BASE_URL: 'https://admin.example.com',
   TENANT_PROVISIONING_CALLBACK_SECRET: 'shh',
+  PLATFORM_DOMAIN: 'example.com',
 };
 
 const originalEnv: Record<string, string | undefined> = {};
@@ -45,6 +46,7 @@ describe(loadProvisionEnv, () => {
       vercelCliVersion: '48.0.0',
       adminAppBaseUrl: 'https://admin.example.com',
       callbackSecret: 'shh',
+      platformDomain: 'example.com',
     });
   });
 

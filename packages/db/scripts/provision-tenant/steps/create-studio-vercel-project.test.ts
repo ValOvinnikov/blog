@@ -39,6 +39,7 @@ const env: TProvisionEnv = {
   vercelCliVersion: '48.0.0',
   adminAppBaseUrl: 'https://admin.example.com',
   callbackSecret: 'shh',
+  platformDomain: 'example.com',
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
@@ -72,8 +73,16 @@ beforeEach(() => {
 });
 
 describe(studioDomainForSlug, () => {
-  it('builds the studio-<slug>.valstack.dev hostname', () => {
-    expect(studioDomainForSlug('acme')).toBe('studio-acme.valstack.dev');
+  it('builds the studio-<slug>.<platformDomain> hostname', () => {
+    expect(studioDomainForSlug('acme', 'example.com')).toBe(
+      'studio-acme.example.com',
+    );
+  });
+
+  it('honors a different platform domain', () => {
+    expect(studioDomainForSlug('acme', 'example.com')).toBe(
+      'studio-acme.example.com',
+    );
   });
 });
 
@@ -126,7 +135,7 @@ describe(createTenantStudio, () => {
   it('adds the studio domain only when not already registered', async () => {
     const tenant = baseTenant({ studioVercelProjectId: 'prj_existing' });
     listVercelProjectDomainsMock.mockResolvedValue([
-      { name: 'studio-acme.valstack.dev' },
+      { name: 'studio-acme.example.com' },
     ]);
     const exec = vi.fn();
 

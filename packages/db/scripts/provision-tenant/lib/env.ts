@@ -22,6 +22,9 @@ export type TProvisionEnv = {
   // both the status-callback target and the Sanity CORS origin step 1 adds.
   adminAppBaseUrl: string;
   callbackSecret: string;
+  // Platform domain each tenant's Studio subdomain is minted under
+  // (`studio-<slug>.<platformDomain>`) — see `studioDomainForSlug`.
+  platformDomain: string;
 };
 
 const DEFAULT_VERCEL_CLI_VERSION = '48.0.0';
@@ -37,5 +40,6 @@ export function loadProvisionEnv(): TProvisionEnv {
       process.env['VERCEL_CLI_VERSION'] ?? DEFAULT_VERCEL_CLI_VERSION,
     adminAppBaseUrl: requireEnv('ADMIN_APP_BASE_URL'),
     callbackSecret: requireEnv('TENANT_PROVISIONING_CALLBACK_SECRET'),
+    platformDomain: requireEnv('PLATFORM_DOMAIN'),
   };
 }

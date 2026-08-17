@@ -58,6 +58,7 @@ jobs:
       # custom domain to this one project, never a per-tenant project.
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
       ADMIN_APP_BASE_URL: ${{ vars.ADMIN_APP_BASE_URL }}
+      PLATFORM_DOMAIN: ${{ vars.PLATFORM_DOMAIN }}
       TENANT_PROVISIONING_CALLBACK_SECRET: ${{ secrets.TENANT_PROVISIONING_CALLBACK_SECRET }}
       TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
       # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
