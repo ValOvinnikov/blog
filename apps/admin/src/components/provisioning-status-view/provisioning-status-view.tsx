@@ -80,6 +80,7 @@ export function ProvisioningStatusView({
     failedBadge,
     dnsCard,
     dnsRow,
+    dnsHint,
   } = provisioningStatusViewVariants();
 
   const steps = tenant.provisioningSteps;
@@ -186,6 +187,11 @@ export function ProvisioningStatusView({
             {t(`dnsStatus.${domainVerificationStatus}`)}
           </StatusBadge>
         </div>
+        {domainVerificationStatus === 'NOT_CONFIGURED' && (
+          <Text variant="muted" className={dnsHint()}>
+            {t('dnsNotConfiguredHint')}
+          </Text>
+        )}
       </div>
     </div>
   );

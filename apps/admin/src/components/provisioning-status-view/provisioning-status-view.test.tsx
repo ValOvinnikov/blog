@@ -141,7 +141,7 @@ describe(ProvisioningStatusView, () => {
     expect(screen.getByText('Verified')).toBeVisible();
   });
 
-  it('explains an unconfigured domain-verification integration without naming env vars', () => {
+  it('keeps the NOT_CONFIGURED badge short and explains it in adjacent text, without naming env vars', () => {
     const tenant = makeTenant();
     render(
       <ProvisioningStatusView
@@ -150,11 +150,13 @@ describe(ProvisioningStatusView, () => {
       />,
     );
 
-    const copy = screen.getByText(
-      'Domain verification unavailable — Vercel integration not configured for this environment',
+    expect(screen.getByText('Unavailable')).toBeVisible();
+
+    const hint = screen.getByText(
+      "The Vercel integration isn't configured on this deployment, so domain verification can't run — this isn't specific to this tenant.",
     );
-    expect(copy).toBeVisible();
-    expect(copy.textContent).not.toMatch(
+    expect(hint).toBeVisible();
+    expect(hint.textContent).not.toMatch(
       /VERCEL_API_TOKEN|VERCEL_WEB_PROJECT_ID/,
     );
   });

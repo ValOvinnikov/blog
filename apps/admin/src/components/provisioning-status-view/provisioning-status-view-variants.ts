@@ -21,5 +21,6 @@ export const provisioningStatusViewVariants = tv({
     ],
     dnsCard: ['rounded-md border border-border bg-surface p-6'],
     dnsRow: ['flex flex-wrap items-center gap-3'],
+    dnsHint: ['text-xs text-text-muted'],
   },
 });
