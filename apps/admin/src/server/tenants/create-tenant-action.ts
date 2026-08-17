@@ -4,9 +4,9 @@ import { routing } from '@admin/i18n/routing';
 import { requireAdmin } from '@admin/server/auth/require-admin';
 import { dispatchProvisioningWorkflow } from '@admin/server/provisioning/dispatch-provisioning-workflow';
 import { adminRoutes } from '@admin/utils/routes/routes';
-import { sanitizeLogMessage } from '@admin/utils/sanitize-log-message/sanitize-log-message';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/config';
 import { queries } from '@blog/db';
+import { sanitizeLogMessage } from '@blog/utils';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 

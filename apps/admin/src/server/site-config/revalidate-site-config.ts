@@ -1,5 +1,5 @@
 import { env } from '@admin/utils/env/env';
-import { sanitizeLogMessage } from '@admin/utils/sanitize-log-message/sanitize-log-message';
+import { sanitizeLogMessage } from '@blog/utils';
 
 const REVALIDATE_PATH = '/api/revalidate-site-config';
 const SITE_CONFIG_REVALIDATE_TIMEOUT_MS = 5000;
