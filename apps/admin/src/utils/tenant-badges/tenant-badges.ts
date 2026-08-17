@@ -13,6 +13,7 @@ type TBadgeTone = 'ok' | 'warn' | 'neutral';
 const TENANT_STATUS_TONE: Record<TTenantStatus, TBadgeTone> = {
   [TENANT_STATUS.ACTIVE]: 'ok',
   [TENANT_STATUS.SUSPENDED]: 'warn',
+  [TENANT_STATUS.ARCHIVED]: 'neutral',
 };
 
 const TENANT_PLAN_TONE: Record<TTenantPlan, TBadgeTone> = {
