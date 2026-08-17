@@ -48,7 +48,7 @@ export async function dispatchProvisioningWorkflow(
 
     if (!response.ok) {
       console.error(
-        `Provisioning workflow dispatch responded with ${response.status} for tenant "${tenantId}".`,
+        `Provisioning workflow dispatch responded with ${response.status} for tenant "${sanitizeLogMessage(tenantId)}".`,
       );
     }
   } catch (error) {

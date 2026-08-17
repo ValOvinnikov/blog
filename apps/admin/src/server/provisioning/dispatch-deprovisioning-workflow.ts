@@ -58,7 +58,7 @@ export async function dispatchDeprovisioningWorkflow({
 
     if (!response.ok) {
       console.error(
-        `Deprovisioning workflow dispatch responded with ${response.status} for tenant "${tenantId}".`,
+        `Deprovisioning workflow dispatch responded with ${response.status} for tenant "${sanitizeLogMessage(tenantId)}".`,
       );
     }
   } catch (error) {

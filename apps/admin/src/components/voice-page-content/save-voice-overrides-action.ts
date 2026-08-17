@@ -53,7 +53,7 @@ export async function saveVoiceOverridesAction(
     return { ok: true };
   } catch (error) {
     console.error(
-      `Failed to save voice overrides for tenant "${tenantSlug}":`,
+      `Failed to save voice overrides for tenant "${sanitizeLogMessage(tenantSlug)}":`,
       sanitizeLogMessage(error),
     );
     return { ok: false };
