@@ -24,7 +24,7 @@ const env: TProvisionEnv = {
   vercelCliVersion: '48.0.0',
   adminAppBaseUrl: 'https://admin.example.com',
   callbackSecret: 'shh',
-  platformDomain: 'valstack.dev',
+  platformDomain: 'example.com',
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
