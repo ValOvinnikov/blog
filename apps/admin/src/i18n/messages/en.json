@@ -224,7 +224,8 @@
       "SEED_CONTENT": "Seed content",
       "DEPLOY_STUDIO": "Deploy Studio",
       "PERSIST_TOKEN": "Persist read token",
-      "MAP_DOMAIN": "Map domain"
+      "MAP_DOMAIN": "Map domain",
+      "CREATE_WEBHOOK": "Create revalidation webhook"
     },
     "statusLabel": {
       "IDLE": "Not started",

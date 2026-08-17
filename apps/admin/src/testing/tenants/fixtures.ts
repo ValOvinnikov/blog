@@ -4,6 +4,7 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
+  type TTenantProvisioningStep,
 } from '@blog/config';
 import type {
   TProvisioningStepState,
@@ -22,6 +23,7 @@ export function idleProvisioningSteps(): TTenantProvisioningSteps {
     [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: idle,
     [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: idle,
     [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: idle,
+    ['CREATE_WEBHOOK' as TTenantProvisioningStep]: idle,
   };
 }
 
@@ -42,6 +44,7 @@ export function makeTenant(overrides: Partial<TTenant> = {}): TTenant {
     provisioningSteps: idleProvisioningSteps(),
     studioVercelProjectId: null,
     seededAt: null,
+    webhookCreatedAt: null,
     deprovisionedAt: null,
     createdAt: new Date('2026-04-02T00:00:00.000Z'),
     updatedAt: new Date('2026-04-02T00:00:00.000Z'),

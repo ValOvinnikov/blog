@@ -44,7 +44,7 @@ function overallStatusFor(
   step: TTenantProvisioningStep,
   status: TTenantProvisioningStepStatus,
 ): TTenantProvisioningStatus | undefined {
-  if (step !== TENANT_PROVISIONING_STEP.MAP_DOMAIN) return undefined;
+  if (step !== TENANT_PROVISIONING_STEP.CREATE_WEBHOOK) return undefined;
   if (status === TENANT_PROVISIONING_STEP_STATUS.DONE) {
     return TENANT_PROVISIONING_STATUS.READY;
   }
