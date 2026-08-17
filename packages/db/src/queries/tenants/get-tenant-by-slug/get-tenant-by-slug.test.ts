@@ -46,4 +46,40 @@ describe(getTenantBySlug, () => {
 
     expect(result).toBeUndefined();
   });
+
+  it('excludes a deprovisioned tenant by default', async () => {
+    await db.insert(schema.tenants).values({
+      slug: 'acme',
+      name: 'Acme',
+      primaryDomain: 'acme.example.com',
+      sanityProjectId: 'abc123',
+      sanityDataset: 'production',
+      locale: 'en',
+      plan: TENANT_PLAN.FREE,
+      status: TENANT_STATUS.ARCHIVED,
+      deprovisionedAt: new Date(),
+    });
+
+    const result = await getTenantBySlug('acme');
+
+    expect(result).toBeUndefined();
+  });
+
+  it('returns a deprovisioned tenant when includeArchived is true', async () => {
+    await db.insert(schema.tenants).values({
+      slug: 'acme',
+      name: 'Acme',
+      primaryDomain: 'acme.example.com',
+      sanityProjectId: 'abc123',
+      sanityDataset: 'production',
+      locale: 'en',
+      plan: TENANT_PLAN.FREE,
+      status: TENANT_STATUS.ARCHIVED,
+      deprovisionedAt: new Date(),
+    });
+
+    const result = await getTenantBySlug('acme', { includeArchived: true });
+
+    expect(result).toMatchObject({ slug: 'acme' });
+  });
 });

@@ -58,4 +58,64 @@ describe(listTenants, () => {
 
     expect(result).toEqual([]);
   });
+
+  it('excludes deprovisioned tenants by default', async () => {
+    await db.insert(schema.tenants).values([
+      {
+        slug: 'acme',
+        name: 'Acme',
+        primaryDomain: 'acme.example.com',
+        sanityProjectId: 'p1',
+        sanityDataset: 'production',
+        locale: 'en',
+        plan: TENANT_PLAN.FREE,
+        status: TENANT_STATUS.ACTIVE,
+      },
+      {
+        slug: 'zeta',
+        name: 'Zeta',
+        primaryDomain: 'zeta.example.com',
+        sanityProjectId: 'p2',
+        sanityDataset: 'production',
+        locale: 'en',
+        plan: TENANT_PLAN.FREE,
+        status: TENANT_STATUS.ARCHIVED,
+        deprovisionedAt: new Date(),
+      },
+    ]);
+
+    const result = await listTenants();
+
+    expect(result.map((tenant) => tenant.slug)).toEqual(['acme']);
+  });
+
+  it('includes deprovisioned tenants when includeArchived is true', async () => {
+    await db.insert(schema.tenants).values([
+      {
+        slug: 'acme',
+        name: 'Acme',
+        primaryDomain: 'acme.example.com',
+        sanityProjectId: 'p1',
+        sanityDataset: 'production',
+        locale: 'en',
+        plan: TENANT_PLAN.FREE,
+        status: TENANT_STATUS.ACTIVE,
+      },
+      {
+        slug: 'zeta',
+        name: 'Zeta',
+        primaryDomain: 'zeta.example.com',
+        sanityProjectId: 'p2',
+        sanityDataset: 'production',
+        locale: 'en',
+        plan: TENANT_PLAN.FREE,
+        status: TENANT_STATUS.ARCHIVED,
+        deprovisionedAt: new Date(),
+      },
+    ]);
+
+    const result = await listTenants({ includeArchived: true });
+
+    expect(result.map((tenant) => tenant.slug)).toEqual(['acme', 'zeta']);
+  });
 });

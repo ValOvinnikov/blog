@@ -44,18 +44,20 @@ afterEach(async () => {
 });
 
 describe(archiveTenant, () => {
-  it('stamps deprovisionedAt and returns the updated row', async () => {
+  it('stamps deprovisionedAt, sets status to ARCHIVED, and returns the updated row', async () => {
     const tenantId = await insertTenant();
 
     const result = await archiveTenant(tenantId);
 
     expect(result.deprovisionedAt).toBeInstanceOf(Date);
+    expect(result.status).toBe(TENANT_STATUS.ARCHIVED);
 
     const [row] = await db
       .select()
       .from(tenants)
       .where(eq(tenants.id, tenantId));
     expect(row?.deprovisionedAt).toBeInstanceOf(Date);
+    expect(row?.status).toBe(TENANT_STATUS.ARCHIVED);
   });
 
   it('leaves the slug intact so it stays reserved', async () => {
