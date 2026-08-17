@@ -37,6 +37,17 @@ export const env = createEnv({
     // logged — the triggering action still succeeds, so an operator can
     // retry once this is configured.
     TENANT_PROVISIONING_GITHUB_TOKEN: z.string().min(1).optional(),
+    // The `owner/repo` this app's own Server Actions dispatch
+    // `provision-tenant.yml`/`deprovision-tenant.yml` against — unlike
+    // `PLATFORM_DOMAIN` (a CI-side GitHub Environment Variable), this call
+    // originates from `apps/admin` itself, not a CI job, so there's no
+    // `GITHUB_REPOSITORY`-style var to read the target repo from. Optional,
+    // paired with `TENANT_PROVISIONING_GITHUB_TOKEN` above — absent, the
+    // dispatch is skipped and logged the same way a missing token is.
+    TENANT_PROVISIONING_GITHUB_REPO: z
+      .string()
+      .regex(/^[^/\s]+\/[^/\s]+$/, 'Expected "owner/repo".')
+      .optional(),
     // Shared secret the provisioning workflow sends as
     // `Authorization: Bearer <secret>` when it calls this app's status-callback
     // route after each step — compared with a constant-time check, not an HMAC
@@ -66,6 +77,8 @@ export const env = createEnv({
     SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
     TENANT_PROVISIONING_GITHUB_TOKEN:
       process.env.TENANT_PROVISIONING_GITHUB_TOKEN,
+    TENANT_PROVISIONING_GITHUB_REPO:
+      process.env.TENANT_PROVISIONING_GITHUB_REPO,
     TENANT_PROVISIONING_CALLBACK_SECRET:
       process.env.TENANT_PROVISIONING_CALLBACK_SECRET,
     VERCEL_API_TOKEN: process.env.VERCEL_API_TOKEN,

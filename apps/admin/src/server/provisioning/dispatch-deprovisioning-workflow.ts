@@ -1,8 +1,7 @@
 import { env } from '@admin/utils/env/env';
+import { parseTenantProvisioningRepo } from '@admin/utils/tenant-provisioning-repo/tenant-provisioning-repo';
 import { sanitizeLogMessage } from '@blog/utils';
 
-const REPO_OWNER = 'ValOvinnikov';
-const REPO_NAME = 'blog';
 const WORKFLOW_FILE = 'deprovision-tenant.yml';
 const WORKFLOW_REF = 'main';
 const DISPATCH_TIMEOUT_MS = 5000;
@@ -29,17 +28,18 @@ export async function dispatchDeprovisioningWorkflow({
   dryRun,
 }: TDispatchDeprovisioningWorkflowInput): Promise<void> {
   const token = env.TENANT_PROVISIONING_GITHUB_TOKEN;
+  const repo = parseTenantProvisioningRepo(env.TENANT_PROVISIONING_GITHUB_REPO);
 
-  if (!token) {
+  if (!token || !repo) {
     console.error(
-      'Skipped deprovisioning workflow dispatch: TENANT_PROVISIONING_GITHUB_TOKEN is not configured.',
+      'Skipped deprovisioning workflow dispatch: TENANT_PROVISIONING_GITHUB_TOKEN or TENANT_PROVISIONING_GITHUB_REPO is not configured.',
     );
     return;
   }
 
   try {
     const response = await fetch(
-      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_FILE}/dispatches`,
+      `https://api.github.com/repos/${repo.owner}/${repo.repo}/actions/workflows/${WORKFLOW_FILE}/dispatches`,
       {
         method: 'POST',
         headers: {

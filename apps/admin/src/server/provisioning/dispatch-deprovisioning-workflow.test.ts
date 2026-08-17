@@ -3,6 +3,7 @@ import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workfl
 const { envMock } = vi.hoisted(() => ({
   envMock: {
     TENANT_PROVISIONING_GITHUB_TOKEN: undefined as string | undefined,
+    TENANT_PROVISIONING_GITHUB_REPO: undefined as string | undefined,
   },
 }));
 
@@ -15,10 +16,23 @@ describe(dispatchDeprovisioningWorkflow, () => {
     fetchMock.mockReset();
     vi.stubGlobal('fetch', fetchMock);
     envMock.TENANT_PROVISIONING_GITHUB_TOKEN = 'ghp_token';
+    envMock.TENANT_PROVISIONING_GITHUB_REPO = 'acme-org/acme-repo';
   });
 
   it('skips the dispatch call when no token is configured', async () => {
     envMock.TENANT_PROVISIONING_GITHUB_TOKEN = undefined;
+
+    await dispatchDeprovisioningWorkflow({
+      tenantId: 'tenant-1',
+      confirm: 'acme',
+      dryRun: true,
+    });
+
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('skips the dispatch call when no repo is configured', async () => {
+    envMock.TENANT_PROVISIONING_GITHUB_REPO = undefined;
 
     await dispatchDeprovisioningWorkflow({
       tenantId: 'tenant-1',
@@ -39,7 +53,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://api.github.com/repos/ValOvinnikov/blog/actions/workflows/deprovision-tenant.yml/dispatches',
+      'https://api.github.com/repos/acme-org/acme-repo/actions/workflows/deprovision-tenant.yml/dispatches',
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({
