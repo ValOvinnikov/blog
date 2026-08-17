@@ -38,10 +38,14 @@ export type TSanityProject = { id: string };
 export async function createSanityProject(input: {
   token: string;
   displayName: string;
+  organizationId: string;
 }): Promise<TSanityProject> {
   return sanityManagementRequest<TSanityProject>('/projects', input.token, {
     method: 'POST',
-    body: JSON.stringify({ displayName: input.displayName }),
+    body: JSON.stringify({
+      displayName: input.displayName,
+      organizationId: input.organizationId,
+    }),
   });
 }
 

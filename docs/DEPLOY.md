@@ -277,6 +277,12 @@ few secrets/vars nothing else in this repo has needed yet:
       https://manage.sanity.io → your organization → API → Tokens. Used to
       create each new tenant's Sanity project/dataset/CORS entry and to mint
       its transient seed-content token and its persisted read-only token.
+- [ ] Variable `SANITY_ORGANIZATION_ID` — the Sanity organization id every
+      tenant project must be created under (find it at
+      https://manage.sanity.io → your organization → Settings). Sent as
+      `organizationId` in the Management API's `POST /projects` body;
+      without it the project is silently created in whichever org the
+      token's owner defaults to, not necessarily this one.
 - [ ] Secret `TENANT_PROVISIONING_CALLBACK_SECRET` — a shared secret
       (`openssl rand -hex 32`), **byte-identical** to `apps/admin`'s own
       `TENANT_PROVISIONING_CALLBACK_SECRET` env var. The workflow sends it as

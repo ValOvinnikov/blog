@@ -10,6 +10,10 @@ export type TProvisionEnv = {
   // Broader-scoped than the existing `SANITY_MIGRATE_TOKEN` — an
   // organization-level token with "create project" permission.
   sanityManagementToken: string;
+  // The Sanity organization every tenant project must be created under —
+  // omitting it silently creates the project in whichever org the token's
+  // owner defaults to, not necessarily this repo's org.
+  sanityOrganizationId: string;
   vercelToken: string;
   vercelOrgId: string;
   // Only needed when the Vercel account is team-owned.
@@ -41,6 +45,7 @@ const DEFAULT_VERCEL_CLI_VERSION = '48.0.0';
 export function loadProvisionEnv(): TProvisionEnv {
   return {
     sanityManagementToken: requireEnv('SANITY_MANAGEMENT_TOKEN'),
+    sanityOrganizationId: requireEnv('SANITY_ORGANIZATION_ID'),
     vercelToken: requireEnv('VERCEL_TOKEN'),
     vercelOrgId: requireEnv('VERCEL_ORG_ID'),
     vercelTeamId: process.env['VERCEL_TEAM_ID'],

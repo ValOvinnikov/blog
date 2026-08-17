@@ -20,7 +20,7 @@ afterEach(() => {
 });
 
 describe(createSanityProject, () => {
-  it('POSTs to /projects with the display name', async () => {
+  it('POSTs to /projects with the display name and organization id', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ id: 'proj123' }), { status: 200 }),
     );
@@ -28,13 +28,17 @@ describe(createSanityProject, () => {
     const result = await createSanityProject({
       token: 'tok',
       displayName: 'Acme',
+      organizationId: 'org-abc',
     });
 
     expect(result).toEqual({ id: 'proj123' });
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(url).toBe('https://api.sanity.io/v2021-06-07/projects');
     expect(init.method).toBe('POST');
-    expect(JSON.parse(init.body as string)).toEqual({ displayName: 'Acme' });
+    expect(JSON.parse(init.body as string)).toEqual({
+      displayName: 'Acme',
+      organizationId: 'org-abc',
+    });
     expect((init.headers as Record<string, string>)['Authorization']).toBe(
       'Bearer tok',
     );
@@ -44,7 +48,11 @@ describe(createSanityProject, () => {
     fetchMock.mockResolvedValue(new Response('nope', { status: 402 }));
 
     await expect(
-      createSanityProject({ token: 'tok', displayName: 'Acme' }),
+      createSanityProject({
+        token: 'tok',
+        displayName: 'Acme',
+        organizationId: 'org-abc',
+      }),
     ).rejects.toThrow(/402/);
   });
 });

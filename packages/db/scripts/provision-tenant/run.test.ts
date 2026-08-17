@@ -53,6 +53,7 @@ vi.mock('./steps/create-revalidate-webhook', () => ({
 const baseTenant = { id: 'tenant-1', name: 'Acme' } as TTenant;
 const env = {
   sanityManagementToken: 'sanity-token',
+  sanityOrganizationId: 'org-abc',
   vercelToken: 'vercel-token',
   vercelOrgId: 'org-1',
   vercelTeamId: undefined,
