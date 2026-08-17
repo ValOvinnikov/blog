@@ -2,5 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm exec turbo run storybook:build --filter=web",
   "outputDirectory": "apps/web/storybook-static",
-  "ignoreCommand": "if [ -z \"$VERCEL_GIT_PREVIOUS_SHA\" ]; then exit 1; fi; turbo query affected --base=\"$VERCEL_GIT_PREVIOUS_SHA\" --packages web --exit-code"
+  "ignoreCommand": "sh \"$(git rev-parse --show-toplevel)/scripts/vercel-ignore-affected.sh\" web"
 }
