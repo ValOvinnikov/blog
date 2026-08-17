@@ -1,0 +1,166 @@
+/**
+ * Deprovisioning workflow entrypoint — reverses `provision-tenant`'s five
+ * steps for one tenant: removes its domain from the shared web project,
+ * deletes its Studio Vercel project and Sanity project, clears the
+ * provisioning-artifact columns, then archives (never hard-deletes) the
+ * `tenants` row.
+ *
+ * Invoked only by `.github/workflows/deprovision-tenant.yml` via
+ * `pnpm --filter @blog/db db:deprovision-tenant -- --tenant-id=<uuid>
+ * --confirm=<slug>` — never run by hand against a shared/production tenant
+ * outside that workflow. Defaults to a dry run (`--dry-run` unset or
+ * anything other than `"false"`); an operator must pass `--dry-run=false`
+ * to actually delete anything, on top of `--confirm` matching the tenant's
+ * live slug.
+ *
+ * `--conditions=react-server` makes `getDb()`'s `import 'server-only'`
+ * resolve to a no-op outside Next.js's own build, same trick
+ * `provision-tenant/run.ts` relies on.
+ */
+import { pathToFileURL } from 'node:url';
+
+import type { TTenant } from '@blog/db/schema/tenants';
+
+import { loadDeprovisionEnv, type TDeprovisionEnv } from './lib/env';
+import { getTenantRow } from './lib/get-tenant-row';
+import { sanitizeLogMessage } from './lib/sanitize-log-message';
+import { archiveTenantRow } from './steps/archive-tenant';
+import { clearTenantArtifacts } from './steps/clear-artifacts';
+import { deleteTenantSanityProject } from './steps/delete-sanity-project';
+import { deleteTenantStudioProject } from './steps/delete-studio-project';
+import { removeTenantDomain } from './steps/remove-domain';
+
+const TENANT_ID_FLAG = '--tenant-id=';
+const CONFIRM_FLAG = '--confirm=';
+const DRY_RUN_FLAG = '--dry-run=';
+
+function parseFlagValue(argv: string[], flag: string): string | undefined {
+  return argv.find((arg) => arg.startsWith(flag))?.slice(flag.length);
+}
+
+function parseTenantId(argv: string[]): string {
+  const value = parseFlagValue(argv, TENANT_ID_FLAG) ?? process.env['TENANT_ID'];
+  if (!value) {
+    throw new Error(
+      'deprovision-tenant: missing required --tenant-id=<uuid> (or TENANT_ID env var).',
+    );
+  }
+  return value;
+}
+
+function parseConfirm(argv: string[]): string {
+  const value = parseFlagValue(argv, CONFIRM_FLAG) ?? process.env['CONFIRM'];
+  if (!value) {
+    throw new Error(
+      'deprovision-tenant: missing required --confirm=<tenant-slug> (or CONFIRM env var).',
+    );
+  }
+  return value;
+}
+
+// Defaults to a dry run — an operator must explicitly pass `--dry-run=false`
+// (or `DRY_RUN=false`) to perform real deletions.
+function parseDryRun(argv: string[]): boolean {
+  const value = parseFlagValue(argv, DRY_RUN_FLAG) ?? process.env['DRY_RUN'];
+  return value !== 'false';
+}
+
+type TStep = {
+  name: string;
+  run: (tenant: TTenant, env: TDeprovisionEnv) => Promise<void>;
+};
+
+const STEPS: TStep[] = [
+  { name: 'remove-domain', run: removeTenantDomain },
+  { name: 'delete-studio-project', run: deleteTenantStudioProject },
+  { name: 'delete-sanity-project', run: deleteTenantSanityProject },
+  { name: 'clear-artifacts', run: clearTenantArtifacts },
+  { name: 'archive-tenant', run: archiveTenantRow },
+];
+
+// Exported for direct testing of the step sequencing without also exercising
+// the confirmation guard, argv parsing, env loading, or the tenant-row fetch
+// `main()` wraps it in.
+export async function runSteps(
+  tenant: TTenant,
+  env: TDeprovisionEnv,
+): Promise<{ ok: boolean }> {
+  for (const step of STEPS) {
+    console.warn(`deprovision-tenant: running step "${step.name}"...`);
+
+    try {
+      await step.run(tenant, env);
+      console.warn(`deprovision-tenant: step "${step.name}" done.`);
+    } catch (error) {
+      console.error(
+        `deprovision-tenant: step "${step.name}" failed: ${sanitizeLogMessage(error)}`,
+      );
+      // Stop here — later steps stay untouched. Re-running the workflow for
+      // the same tenant resumes at this step via its own idempotency check.
+      return { ok: false };
+    }
+  }
+
+  return { ok: true };
+}
+
+export type TRunDeprovisioningResult = { ok: boolean; skipped?: true };
+
+// Exported for direct testing of the confirmation/idempotency guard —
+// the settled safety requirement this workflow exists to enforce — without
+// exercising argv parsing, env loading, or the tenant-row fetch `main()`
+// wraps it in.
+export async function runDeprovisioning(
+  tenant: TTenant,
+  confirm: string,
+  env: TDeprovisionEnv,
+): Promise<TRunDeprovisioningResult> {
+  if (tenant.deprovisionedAt) {
+    console.warn(
+      `deprovision-tenant: tenant "${tenant.id}" is already deprovisioned (at ${tenant.deprovisionedAt.toISOString()}) — nothing to do.`,
+    );
+    return { ok: true, skipped: true };
+  }
+
+  if (confirm !== tenant.slug) {
+    throw new Error(
+      `deprovision-tenant: --confirm="${confirm}" does not match tenant slug "${tenant.slug}" — aborting before any destructive action.`,
+    );
+  }
+
+  if (env.dryRun) {
+    console.warn(
+      `deprovision-tenant: DRY RUN for tenant "${tenant.id}" (slug "${tenant.slug}") — no changes will be made.`,
+    );
+  }
+
+  return runSteps(tenant, env);
+}
+
+async function main(): Promise<void> {
+  const argv = process.argv.slice(2);
+  const tenantId = parseTenantId(argv);
+  const confirm = parseConfirm(argv);
+  const dryRun = parseDryRun(argv);
+  const env = loadDeprovisionEnv(dryRun);
+
+  const tenant = await getTenantRow(tenantId);
+
+  const { ok } = await runDeprovisioning(tenant, confirm, env);
+  if (!ok) {
+    process.exitCode = 1;
+  }
+}
+
+// Only auto-run when this file is the CLI entrypoint (`tsx run.ts`) — guards
+// against `main()` firing as an import side effect when a test imports
+// `runSteps` from this same module.
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  main().catch((error: unknown) => {
+    console.error('deprovision-tenant: unexpected failure:', error);
+    process.exitCode = 1;
+  });
+}

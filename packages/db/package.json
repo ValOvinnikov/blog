@@ -13,6 +13,7 @@
     "db:seed-tenant": "tsx --conditions=react-server scripts/seed-tenant.ts",
     "db:seed-admin": "tsx --conditions=react-server scripts/seed-admin.ts",
     "db:provision-tenant": "tsx --conditions=react-server scripts/provision-tenant/run.ts",
+    "db:deprovision-tenant": "tsx --conditions=react-server scripts/deprovision-tenant/run.ts",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",

@@ -1,0 +1,91 @@
+name: Deprovision Tenant
+
+# Reverses `provision-tenant.yml` for one tenant — removes its custom domain
+# from the shared `apps/web` Vercel project, deletes its Studio Vercel
+# project and its Sanity project (dataset/CORS/tokens go with it), clears
+# its persisted Sanity credentials, and archives (never hard-deletes) the
+# `tenants` row. Dispatched by hand from the Actions UI by an operator; there
+# is no wizard triggering this automatically.
+#
+# Destructive, so `workflow_dispatch` alone is not enough: `confirm` must
+# match the tenant's live slug (checked before any deletion) and `dryRun`
+# defaults to `true` — an operator must explicitly set it to `false` to
+# delete anything. See `packages/db/scripts/deprovision-tenant/run.ts`.
+#
+# Deliberately manually-triggered only, same posture as
+# `refresh-dev-dataset.yml`/`provision-tenant.yml` — it should NOT no-op
+# green when a secret is missing: the script fails loudly, before any
+# network call, if a required env var is absent.
+on:
+  workflow_dispatch:
+    inputs:
+      tenantId:
+        description: 'tenants.id of the row to deprovision'
+        required: true
+        type: string
+      confirm:
+        description: "Tenant's slug, typed to confirm — must match exactly or the run aborts before any destructive step"
+        required: true
+        type: string
+      dryRun:
+        description: 'Preview only — logs what would be deleted without deleting anything. Set to false to actually deprovision.'
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+# Two dispatches for the SAME tenant must never run concurrently — each
+# step's idempotency check reads-then-writes the tenant row, which a
+# parallel run for the same tenant could race. Queue behind a running
+# deprovision rather than cancel it — a cancelled run could leave an
+# external resource half-deleted.
+concurrency:
+  group: deprovision-tenant-${{ inputs.tenantId }}
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 11.21.0
+  NODE_VERSION: '22'
+
+jobs:
+  deprovision:
+    name: Deprovision tenant
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Same `production` GitHub Environment (and required-reviewer gate, if
+    # configured) `provision-tenant.yml` uses — one tenant registry, one
+    # Neon database, not a per-environment one.
+    environment: production
+    env:
+      SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID }}
+      # The *shared* apps/web Vercel project — step 1 removes the tenant's
+      # domain from this one project, never a per-tenant project.
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
+      # specifically — mapped here from the existing `DATABASE_URL_UNPOOLED`
+      # secret rather than provisioning a brand-new one, same as
+      # `provision-tenant.yml`.
+      DATABASE_URL: ${{ secrets.DATABASE_URL_UNPOOLED }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Run deprovisioning steps
+        # `inputs.*` are attacker-influenceable (any repo collaborator who
+        # can trigger workflow_dispatch controls them) — never interpolate a
+        # `${{ }}` expression directly into a `run:` shell script (template
+        # injection); pass them through `env` and reference the shell
+        # variables instead.
+        env:
+          TENANT_ID: ${{ inputs.tenantId }}
+          CONFIRM: ${{ inputs.confirm }}
+          DRY_RUN: ${{ inputs.dryRun }}
+        run: pnpm --filter @blog/db db:deprovision-tenant -- --tenant-id="$TENANT_ID" --confirm="$CONFIRM" --dry-run="$DRY_RUN"
