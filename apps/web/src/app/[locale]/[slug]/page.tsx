@@ -2,6 +2,7 @@ import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { GenericPage } from '@web/components/pages/generic-page';
 import { buildGenericPageMetadata } from '@web/metadata/generic-page-metadata';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
@@ -16,7 +17,7 @@ export async function generateStaticParams() {
   const result = await service.pages.generic.v1.getPageSlugs();
 
   if (!result.ok) {
-    console.error('Error to fetch generic page slugs:', result.error);
+    logger.error('generic_page.slugs_fetch_failed', { error: result.error });
     return [];
   }
 

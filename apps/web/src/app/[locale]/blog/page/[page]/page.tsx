@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { BlogListPage } from '@web/components/pages/blog-list-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildBlogListMetadata } from '@web/metadata/blog-list-metadata';
+import { logger } from '@web/utils/logger/logger';
 import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -18,7 +19,9 @@ type TProps = {
 export async function generateStaticParams() {
   const result = await service.pages.blog.v1.getIndexPageParams();
   if (!result.ok) {
-    console.error(`Error to fetch blog page params: ${result.error}`);
+    logger.error('blog_pagination.params_fetch_failed', {
+      error: result.error,
+    });
     return [];
   }
 

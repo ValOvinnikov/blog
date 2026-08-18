@@ -1,5 +1,6 @@
 import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import { env } from '@web/utils/env/env';
+import { logger } from '@web/utils/logger/logger';
 import { getRevalidateTagsForType } from '@web/utils/revalidate-tags';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
@@ -36,9 +37,7 @@ function isRevalidateWebhookBody(
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.SANITY_REVALIDATE_SECRET;
   if (!secret) {
-    console.error(
-      'Revalidate webhook: SANITY_REVALIDATE_SECRET is not configured.',
-    );
+    logger.error('revalidate.secret_missing');
     return NextResponse.json(
       { message: 'Revalidation secret is not configured.' },
       { status: 500 },

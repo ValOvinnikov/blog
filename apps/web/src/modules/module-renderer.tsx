@@ -1,4 +1,5 @@
 import type { TModule } from '@blog/service';
+import { logger } from '@web/utils/logger/logger';
 import { Fragment, type ReactNode } from 'react';
 
 import { MODULE_MAP } from './module-map';
@@ -28,7 +29,9 @@ export async function ModuleRenderer({
       const Component = MODULE_MAP[module.type as keyof typeof MODULE_MAP];
 
       if (!Component) {
-        console.warn(`ModuleRenderer: unknown module type "${module.type}"`);
+        logger.warn('module_renderer.unknown_module_type', {
+          moduleType: module.type,
+        });
         return null;
       }
 

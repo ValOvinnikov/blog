@@ -190,8 +190,7 @@ describe('subscribeToNewsletterAction', () => {
       subscribeToNewsletterAction('reader@example.com'),
     ).resolves.toEqual({ outcome: 'success' });
     expect(errorSpy).toHaveBeenCalledWith(
-      'Failed to set the newsletter-subscribed cookie:',
-      expect.any(String),
+      expect.stringContaining('newsletter.subscribed_cookie_set_failed'),
     );
     errorSpy.mockRestore();
   });
@@ -212,8 +211,7 @@ describe('subscribeToNewsletterAction', () => {
       subscribeToNewsletterAction('reader@example.com'),
     ).resolves.toEqual({ outcome: 'already-subscribed' });
     expect(errorSpy).toHaveBeenCalledWith(
-      'Failed to set the newsletter-subscribed cookie:',
-      expect.any(String),
+      expect.stringContaining('newsletter.subscribed_cookie_set_failed'),
     );
     errorSpy.mockRestore();
   });

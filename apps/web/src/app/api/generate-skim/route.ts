@@ -5,6 +5,7 @@ import {
 } from '@web/server/skim/generate-takeaways';
 import { env } from '@web/utils/env/env';
 import { isSecretMatch } from '@web/utils/is-secret-match';
+import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -47,9 +48,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   const { SANITY_GENERATE_SECRET: secret, ANTHROPIC_API_KEY: apiKey } = env;
 
   if (!secret || !apiKey) {
-    console.error(
-      'generate-skim: ANTHROPIC_API_KEY or SANITY_GENERATE_SECRET is not configured.',
-    );
+    logger.error('generate_skim.config_missing');
     return NextResponse.json(
       { message: 'Skim generation is not configured.' },
       { status: 503 },
@@ -83,10 +82,10 @@ export async function POST(request: Request): Promise<NextResponse> {
   const bodyResult =
     await service.editorial.skim.v1.getPublishedPostBody(postId);
   if (!bodyResult.ok) {
-    console.error(
-      'generate-skim: failed to read the published post body:',
-      bodyResult.error,
-    );
+    logger.error('generate_skim.post_body_fetch_failed', {
+      postId,
+      error: bodyResult.error,
+    });
     return NextResponse.json(
       { message: 'Failed to read the published post.' },
       { status: 500 },
@@ -97,10 +96,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   try {
     takeaways = await generateTakeaways(bodyResult.data, apiKey);
   } catch (error) {
-    console.error(
-      'generate-skim: Claude returned an unusable response:',
-      error,
-    );
+    logger.error('generate_skim.generation_failed', { postId, error });
     return NextResponse.json(
       { message: 'Failed to generate takeaways.' },
       { status: 422 },
@@ -113,10 +109,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     model: SKIM_GENERATION_MODEL,
   });
   if (!saveResult.ok) {
-    console.error(
-      'generate-skim: failed to save the skim draft:',
-      saveResult.error,
-    );
+    logger.error('generate_skim.draft_save_failed', {
+      postId,
+      error: saveResult.error,
+    });
     const status = isWriteClientUnconfiguredError(saveResult.error) ? 503 : 500;
     return NextResponse.json(
       { message: 'Failed to save the skim draft.' },

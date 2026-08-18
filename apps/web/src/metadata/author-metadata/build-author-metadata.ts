@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
@@ -31,7 +32,10 @@ export async function buildAuthorMetadata(
   ]);
 
   if (!result.ok) {
-    console.error(`Error to fetch author page metadata: ${result.error}`);
+    logger.error('author_metadata.fetch_failed', {
+      slug,
+      error: result.error,
+    });
     return {};
   }
   if (result.data === null) {

@@ -6,6 +6,7 @@ import {
   getBookmarkStatus,
   setBookmarkStatus,
 } from '@web/server/bookmarks/bookmark-actions';
+import { logger } from '@web/utils/logger/logger';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState, useTransition } from 'react';
@@ -59,7 +60,10 @@ export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
         // resolve to "not bookmarked" and let the reader retry via a normal
         // toggle, same recovery shape as `useCopyToClipboard`'s own
         // `.then().catch()`.
-        console.error('Failed to load bookmark status:', fetchError);
+        logger.error('bookmark_button.status_fetch_failed', {
+          postId,
+          error: fetchError,
+        });
         if (cancelled) return;
         setIsBookmarked(false);
         setIsResolved(true);

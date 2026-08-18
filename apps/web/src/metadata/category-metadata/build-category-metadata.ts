@@ -2,6 +2,7 @@ import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
@@ -29,7 +30,10 @@ export async function buildCategoryMetadata(
   ]);
 
   if (!result.ok) {
-    console.error(`Error to fetch category page metadata: ${result.error}`);
+    logger.error('category_metadata.fetch_failed', {
+      slug,
+      error: result.error,
+    });
     return {};
   }
   if (result.data === null) {

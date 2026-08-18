@@ -2,6 +2,7 @@ import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { AuthorPage } from '@web/components/pages/author-page';
 import { buildAuthorMetadata } from '@web/metadata/author-metadata';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
@@ -16,7 +17,7 @@ export async function generateStaticParams() {
   const result = await service.pages.author.v1.getAuthorParams();
 
   if (!result.ok) {
-    console.error(`Error to fetch author params: ${result.error}`);
+    logger.error('author_page.params_fetch_failed', { error: result.error });
     return [];
   }
 

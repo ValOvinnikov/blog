@@ -121,8 +121,7 @@ describe('unsubscribeAction', () => {
 
     await expect(unsubscribeAction()).resolves.toEqual({ ok: true });
     expect(errorSpy).toHaveBeenCalledWith(
-      'Failed to clear the newsletter-subscribed cookie:',
-      expect.any(String),
+      expect.stringContaining('newsletter.subscribed_cookie_clear_failed'),
     );
     errorSpy.mockRestore();
   });

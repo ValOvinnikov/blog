@@ -289,6 +289,9 @@ importers:
       '@blog/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@blog/insight':
+        specifier: workspace:*
+        version: link:../../packages/insight
       '@blog/service':
         specifier: workspace:*
         version: link:../../packages/service

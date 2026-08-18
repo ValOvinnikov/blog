@@ -4,6 +4,7 @@ import { CategoryPage } from '@web/components/pages/category-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildCategoryMetadata } from '@web/metadata/category-metadata';
 import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
+import { logger } from '@web/utils/logger/logger';
 import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -24,7 +25,9 @@ export async function generateStaticParams() {
   );
 
   if (!result.ok) {
-    console.error(`Error to fetch category pagination params: ${result.error}`);
+    logger.error('category_pagination.params_fetch_failed', {
+      error: result.error,
+    });
     return [];
   }
 

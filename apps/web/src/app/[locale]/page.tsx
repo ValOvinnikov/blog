@@ -4,6 +4,7 @@ import { HomePageTemplate } from '@web/components/page-templates/home-page-templ
 import { toMetadata } from '@web/metadata/to-metadata';
 import { HeroModule } from '@web/modules/hero/hero-module';
 import { ModuleRenderer } from '@web/modules/module-renderer';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
@@ -16,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const result = await service.pages.home.v1.getHomePage();
 
   if (!result.ok) {
-    console.error(`Error to fetch home page metadata: ${result.error}`);
+    logger.error('home_page.metadata_fetch_failed', { error: result.error });
     return {};
   }
 
@@ -34,7 +35,7 @@ export default async function HomePage({ params }: TProps) {
   const result = await service.pages.home.v1.getHomePage();
 
   if (!result.ok) {
-    console.error(`Error to fetch home page: ${result.error}`);
+    logger.error('home_page.fetch_failed', { error: result.error });
     notFound();
   }
 

@@ -2,6 +2,7 @@ import { PRESET_ID, PRESET_REGISTRY, type TPresetId } from '@blog/config';
 import { deepMergePartial } from '@blog/utils';
 import { getSiteConfig } from '@web/server/site-config/get-site-config';
 import { applyVoiceOverrides } from '@web/utils/apply-voice-overrides';
+import { logger } from '@web/utils/logger/logger';
 import { hasLocale } from 'next-intl';
 import { getRequestConfig } from 'next-intl/server';
 
@@ -27,7 +28,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       voiceOverrides = result.data.voiceOverrides;
     }
   } else {
-    console.error(`Error fetching site config: ${result.error}`);
+    logger.error('site_config.fetch_failed', { error: result.error });
   }
 
   const withPreset = deepMergePartial(

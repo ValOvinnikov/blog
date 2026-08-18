@@ -1,8 +1,8 @@
 'use server';
 
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
 import { auth } from '@web/server/auth/auth';
+import { logger } from '@web/utils/logger/logger';
 
 export type TDeleteAccountResult = { ok: true } | { ok: false };
 
@@ -21,7 +21,7 @@ export async function deleteAccountAction(): Promise<TDeleteAccountResult> {
     await queries.account.deleteAccount(userId);
     return { ok: true };
   } catch (error) {
-    console.error('Failed to delete account:', sanitizeLogMessage(error));
+    logger.error('account.delete_failed', { error });
     return { ok: false };
   }
 }

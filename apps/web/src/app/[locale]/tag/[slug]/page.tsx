@@ -2,6 +2,7 @@ import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { TagPage } from '@web/components/pages/tag-page';
 import { buildTagMetadata } from '@web/metadata/tag-metadata';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
@@ -16,7 +17,7 @@ export async function generateStaticParams() {
   const result = await service.pages.tag.v1.getTagParams();
 
   if (!result.ok) {
-    console.error(`Error to fetch tag params: ${result.error}`);
+    logger.error('tag_page.params_fetch_failed', { error: result.error });
     return [];
   }
 

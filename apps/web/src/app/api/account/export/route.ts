@@ -1,7 +1,7 @@
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
 import { auth } from '@web/server/auth/auth';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
+import { logger } from '@web/utils/logger/logger';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 
@@ -52,9 +52,7 @@ export async function GET(): Promise<NextResponse> {
       },
     });
   } catch (error) {
-    console.error(
-      `Failed to export account data: ${sanitizeLogMessage(error)}`,
-    );
+    logger.error('account.export_failed', { error });
     return NextResponse.json({ message: 'Export failed' }, { status: 500 });
   }
 }

@@ -2,7 +2,6 @@ import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
-import { sanitizeLogMessage } from '@blog/utils';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { CategoryChipList } from '@web/components/shared/category-chip-list';
@@ -12,6 +11,7 @@ import { ModuleRenderer } from '@web/modules/module-renderer';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { getCategoriesSafely } from '@web/utils/get-categories-safely';
+import { logger } from '@web/utils/logger/logger';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -37,9 +37,7 @@ export async function BlogListPage({ page, locale }: TBlogListPageProps) {
   ]);
 
   if (!result.ok) {
-    console.error(
-      `Error to fetch blog page: ${sanitizeLogMessage(result.error)}`,
-    );
+    logger.error('blog_list_page.fetch_failed', { page, error: result.error });
     notFound();
   }
 
