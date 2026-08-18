@@ -1,9 +1,9 @@
 import { routes, type ILocalizedParams } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { BlogListPage } from '@web/components/pages/blog-list-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildBlogListMetadata } from '@web/metadata/blog-list-metadata';
+import { logger } from '@web/utils/logger/logger';
 import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -12,8 +12,6 @@ import { setRequestLocale } from 'next-intl/server';
 type TProps = {
   params: Promise<ILocalizedParams & { page: string }>;
 };
-
-const logger = createLogger();
 
 // Pages beyond the build-time list still render on demand via ISR
 // (dynamicParams defaults to true); correctness rides on the explicit

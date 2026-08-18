@@ -1,4 +1,3 @@
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import {
   generateTakeaways,
@@ -6,6 +5,7 @@ import {
 } from '@web/server/skim/generate-takeaways';
 import { env } from '@web/utils/env/env';
 import { isSecretMatch } from '@web/utils/is-secret-match';
+import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -14,8 +14,6 @@ import { z } from 'zod';
 export const runtime = 'nodejs';
 
 const requestBodySchema = z.object({ _id: z.string().min(1) });
-
-const logger = createLogger();
 
 const WRITE_CLIENT_UNCONFIGURED_MARKER = 'SANITY_API_WRITE_TOKEN is not set';
 

@@ -1,16 +1,14 @@
 import { routes } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service, type TArchivePostCard, type TTagPage } from '@blog/service';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
 import { env } from '@web/utils/env/env';
+import { logger } from '@web/utils/logger/logger';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import { notFound } from 'next/navigation';
 
 type TProps = {
   params: Promise<{ slug: string }>;
 };
-
-const logger = createLogger();
 
 function toRssItem(post: TArchivePostCard, siteUrl: string): TRssItem {
   return {

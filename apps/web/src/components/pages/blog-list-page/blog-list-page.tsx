@@ -1,5 +1,4 @@
 import { routes } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
@@ -12,13 +11,12 @@ import { ModuleRenderer } from '@web/modules/module-renderer';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { getCategoriesSafely } from '@web/utils/get-categories-safely';
+import { logger } from '@web/utils/logger/logger';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 type TBlogListPageProps = { page: number; locale: string };
-
-const logger = createLogger();
 
 /**
  * Shared composition for `/blog` (page 1) and `/blog/page/[page]` (pages ≥

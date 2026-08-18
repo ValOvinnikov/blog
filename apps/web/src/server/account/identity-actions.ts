@@ -1,8 +1,8 @@
 'use server';
 
 import { queries } from '@blog/db';
-import { createLogger } from '@blog/insight';
 import { auth } from '@web/server/auth/auth';
+import { logger } from '@web/utils/logger/logger';
 
 // The two sign-in methods `ProviderLinkControl` can unlink — mirrors
 // `@blog/db`'s own `TLinkableProvider` (email link has no `accounts` row to
@@ -12,8 +12,6 @@ import { auth } from '@web/server/auth/auth';
 export type TLinkableProvider = 'github' | 'google';
 
 const LINKABLE_PROVIDERS: readonly TLinkableProvider[] = ['github', 'google'];
-
-const logger = createLogger();
 
 // `provider: TLinkableProvider` on `unlinkProviderAction` below is only a
 // compile-time constraint — a `'use server'` action's underlying endpoint

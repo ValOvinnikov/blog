@@ -1,10 +1,8 @@
 import { routes } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
-
-const logger = createLogger();
 
 /**
  * Metadata for a post detail page (`/blog/{slug}`) — canonical, OG, Twitter,

@@ -1,6 +1,5 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { Heading, Text } from '@blog/ui/atoms';
 import { WindowChrome } from '@blog/ui/molecules';
@@ -10,14 +9,13 @@ import { auth } from '@web/server/auth/auth';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { getChromeOn } from '@web/utils/get-chrome-on';
+import { logger } from '@web/utils/logger/logger';
 import { redirect } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
 import { bookmarksPageVariants } from './bookmarks-page-variants';
 
 const s = bookmarksPageVariants();
-
-const logger = createLogger();
 
 /**
  * `/bookmarks` composition: auth-gated (a signed-out reader is redirected

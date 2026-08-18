@@ -1,10 +1,10 @@
 import type { ILocalizedParams } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { HomePageTemplate } from '@web/components/page-templates/home-page-template';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { HeroModule } from '@web/modules/hero/hero-module';
 import { ModuleRenderer } from '@web/modules/module-renderer';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
@@ -12,8 +12,6 @@ import { setRequestLocale } from 'next-intl/server';
 type TProps = {
   params: Promise<ILocalizedParams>;
 };
-
-const logger = createLogger();
 
 export async function generateMetadata(): Promise<Metadata> {
   const result = await service.pages.home.v1.getHomePage();

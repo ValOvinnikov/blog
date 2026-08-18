@@ -1,9 +1,7 @@
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { oklchToHex } from '@blog/utils';
+import { logger } from '@web/utils/logger/logger';
 import { ImageResponse } from 'next/og';
-
-const logger = createLogger();
 
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';

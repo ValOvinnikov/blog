@@ -1,12 +1,10 @@
 'use server';
 
 import { queries } from '@blog/db';
-import { createLogger } from '@blog/insight';
 import { auth } from '@web/server/auth/auth';
+import { logger } from '@web/utils/logger/logger';
 
 export type TDeleteAccountResult = { ok: true } | { ok: false };
-
-const logger = createLogger();
 
 /**
  * `DeleteAccountControl`'s server write, called only after its typed-confirm

@@ -1,5 +1,4 @@
 import { ICONS, type ILocalizedParams, routes, Size } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { Icon, NavLink } from '@blog/ui/atoms';
 import { Footer, Header } from '@blog/ui/organisms';
@@ -13,6 +12,7 @@ import { routing } from '@web/i18n/routing';
 import { env } from '@web/utils/env/env';
 import { getChromeOn } from '@web/utils/get-chrome-on';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
+import { logger } from '@web/utils/logger/logger';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -27,8 +27,6 @@ import {
 } from 'next-intl/server';
 
 import { localeLayoutVariants } from './layout-variants';
-
-const logger = createLogger();
 
 export async function generateMetadata(): Promise<Metadata> {
   const result = await service.global.siteSettings.v1.getSiteSettings();

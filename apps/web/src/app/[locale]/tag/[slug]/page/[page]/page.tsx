@@ -1,9 +1,9 @@
 import { routes, type ILocalizedParams } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { TagPage } from '@web/components/pages/tag-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildTagMetadata } from '@web/metadata/tag-metadata';
+import { logger } from '@web/utils/logger/logger';
 import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import type { Metadata } from 'next';
@@ -13,8 +13,6 @@ import { setRequestLocale } from 'next-intl/server';
 type TProps = {
   params: Promise<ILocalizedParams & { slug: string; page: string }>;
 };
-
-const logger = createLogger();
 
 // CI's build environment can't always construct the Sanity client; an
 // uncaught throw here would crash the entire `next build`. `dynamicParams`

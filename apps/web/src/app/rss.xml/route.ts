@@ -1,11 +1,9 @@
 import { routes } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service, type TArchivePostCard } from '@blog/service';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
 import { env } from '@web/utils/env/env';
+import { logger } from '@web/utils/logger/logger';
 import { getTranslations } from 'next-intl/server';
-
-const logger = createLogger();
 
 function toRssItem(post: TArchivePostCard, siteUrl: string): TRssItem {
   return {

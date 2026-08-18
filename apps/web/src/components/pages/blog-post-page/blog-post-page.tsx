@@ -1,5 +1,4 @@
 import { ASIDE_KIND, ICONS, Size, type TAsideKind, routes } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
@@ -25,6 +24,7 @@ import {
   extractPostHeadings,
   MIN_H2_HEADINGS_FOR_RAIL,
 } from '@web/utils/extract-post-headings/extract-post-headings';
+import { logger } from '@web/utils/logger/logger';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import { notFound } from 'next/navigation';
@@ -35,8 +35,6 @@ import { blogPostPageVariants } from './blog-post-page-variants';
 type TBlogPostPageProps = { slug: string };
 
 const s = blogPostPageVariants();
-
-const logger = createLogger();
 
 /**
  * BlogPostPage — `/blog/{slug}` composition: fetches the post via

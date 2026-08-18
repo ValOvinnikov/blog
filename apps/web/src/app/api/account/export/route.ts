@@ -1,11 +1,9 @@
 import { queries } from '@blog/db';
-import { createLogger } from '@blog/insight';
 import { auth } from '@web/server/auth/auth';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
+import { logger } from '@web/utils/logger/logger';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-
-const logger = createLogger();
 
 /**
  * `GET /api/account/export` — the `/account` "export my data" download. A

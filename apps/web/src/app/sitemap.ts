@@ -1,14 +1,12 @@
 import { routes } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { routing } from '@web/i18n/routing';
 import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
 import { env } from '@web/utils/env/env';
+import { logger } from '@web/utils/logger/logger';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import type { MetadataRoute } from 'next';
-
-const logger = createLogger();
 
 // Only `getPostParams()` projects a `publishedAt` field, so `lastModified`
 // stays unset for category/tag/author/generic-page entries.

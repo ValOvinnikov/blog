@@ -1,9 +1,7 @@
 import type { TThemeTokens } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { getSiteConfig } from '@web/server/site-config/get-site-config';
+import { logger } from '@web/utils/logger/logger';
 import { toThemeTokens } from '@web/utils/to-theme-tokens';
-
-const logger = createLogger();
 
 /**
  * Resolves the tenant's full theme tokens from the `@blog/db`-backed

@@ -1,8 +1,8 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
-import { createLogger } from '@blog/insight';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
 import { escapeXml } from '@web/utils/escape-xml';
+import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { getTranslations } from 'next-intl/server';
 
@@ -11,8 +11,6 @@ type TConfirmationPageCopy = {
   message: string;
   returnHomeLabel: string;
 };
-
-const logger = createLogger();
 
 /**
  * A minimal, self-contained HTML page — this route handler can't render

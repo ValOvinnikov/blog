@@ -1,5 +1,4 @@
 import { Size, routes } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { Avatar, Eyebrow, Icon } from '@blog/ui/atoms';
 import {
@@ -17,6 +16,7 @@ import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
+import { logger } from '@web/utils/logger/logger';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import { notFound } from 'next/navigation';
@@ -27,8 +27,6 @@ import { authorPageVariants } from './author-page-variants';
 type TAuthorPageProps = { slug: string; page?: number };
 
 const s = authorPageVariants();
-
-const logger = createLogger();
 
 /**
  * AuthorPage — shared composition for `/author/[slug]` (page 1, `page`

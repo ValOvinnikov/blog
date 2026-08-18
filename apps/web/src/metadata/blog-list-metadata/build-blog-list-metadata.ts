@@ -1,11 +1,9 @@
 import { routes } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-
-const logger = createLogger();
 
 /**
  * Metadata for a blog list page. Every page self-canonicalizes — page 2+

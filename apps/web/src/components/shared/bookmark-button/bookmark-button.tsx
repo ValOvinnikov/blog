@@ -1,19 +1,17 @@
 'use client';
 
-import { createLogger } from '@blog/insight';
 import { BookmarkToggle } from '@blog/ui/atoms';
 import { useToast } from '@web/context/toast-provider';
 import {
   getBookmarkStatus,
   setBookmarkStatus,
 } from '@web/server/bookmarks/bookmark-actions';
+import { logger } from '@web/utils/logger/logger';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState, useTransition } from 'react';
 
 import { bookmarkButtonVariants } from './bookmark-button-variants';
-
-const logger = createLogger();
 
 export type TBookmarkButtonProps = {
   /** The post's Sanity `_id` — `blog-post-page` threads this through from its existing `service.pages.post.v1.getPost` fetch, no separate lookup. */

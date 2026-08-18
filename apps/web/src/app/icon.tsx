@@ -1,9 +1,7 @@
-import { createLogger } from '@blog/insight';
 import { buildImageUrl, service, type TRawImage } from '@blog/service';
+import { logger } from '@web/utils/logger/logger';
 
 export const contentType = 'image/svg+xml';
-
-const logger = createLogger();
 
 const FAVICON_SIZE = 64;
 const FETCH_TIMEOUT_MS = 5000;

@@ -1,13 +1,11 @@
 import { routes } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-
-const logger = createLogger();
 
 /**
  * Metadata for an `/author/[slug]` page (page 1, `pageNumber` omitted) or an

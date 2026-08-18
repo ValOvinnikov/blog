@@ -1,6 +1,6 @@
-import { createLogger } from '@blog/insight';
 import { env } from '@web/utils/env/env';
 import { isSecretMatch } from '@web/utils/is-secret-match';
+import { logger } from '@web/utils/logger/logger';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 
@@ -8,8 +8,6 @@ import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 
 const SITE_CONFIG_CACHE_TAG = 'site-config';
-
-const logger = createLogger();
 
 /**
  * On-demand revalidation endpoint for `apps/admin`'s Look/Voice saves —

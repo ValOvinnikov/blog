@@ -1,10 +1,8 @@
-import { createLogger } from '@blog/insight';
 import type { TModule } from '@blog/service';
+import { logger } from '@web/utils/logger/logger';
 import { Fragment, type ReactNode } from 'react';
 
 import { MODULE_MAP } from './module-map';
-
-const logger = createLogger();
 
 export interface IModuleRendererProps {
   modules: TModule[];

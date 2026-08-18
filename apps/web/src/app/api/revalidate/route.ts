@@ -1,6 +1,6 @@
-import { createLogger } from '@blog/insight';
 import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import { env } from '@web/utils/env/env';
+import { logger } from '@web/utils/logger/logger';
 import { getRevalidateTagsForType } from '@web/utils/revalidate-tags';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
@@ -11,8 +11,6 @@ export const runtime = 'nodejs';
 // Sent by Sanity on every webhook request automatically — not exported by
 // any Sanity SDK, so this is the single source of truth for the literal.
 export const SANITY_PROJECT_ID_HEADER = 'sanity-project-id';
-
-const logger = createLogger();
 
 interface IRevalidateWebhookBody {
   _type: string;

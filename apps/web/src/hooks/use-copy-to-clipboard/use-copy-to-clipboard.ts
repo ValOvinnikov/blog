@@ -1,11 +1,9 @@
 'use client';
 
-import { createLogger } from '@blog/insight';
+import { logger } from '@web/utils/logger/logger';
 import { useEffect, useState } from 'react';
 
 const DEFAULT_RESET_DELAY_MS = 2000;
-
-const logger = createLogger();
 
 /**
  * useCopyToClipboard — writes text to `navigator.clipboard` and exposes a

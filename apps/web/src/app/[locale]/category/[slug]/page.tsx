@@ -1,16 +1,14 @@
 import type { ILocalizedParams } from '@blog/config';
-import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { CategoryPage } from '@web/components/pages/category-page';
 import { buildCategoryMetadata } from '@web/metadata/category-metadata';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
   params: Promise<ILocalizedParams & { slug: string }>;
 };
-
-const logger = createLogger();
 
 // CI's build environment can't always construct the Sanity client; an
 // uncaught throw here would crash the entire `next build`. `dynamicParams`

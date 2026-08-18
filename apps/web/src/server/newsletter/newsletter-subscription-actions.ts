@@ -1,7 +1,6 @@
 'use server';
 
 import { queries } from '@blog/db';
-import { createLogger } from '@blog/insight';
 import { auth } from '@web/server/auth/auth';
 import { sendEmail } from '@web/server/email/send-email';
 import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newsletter-confirmation-email';
@@ -9,11 +8,10 @@ import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-
 import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { env } from '@web/utils/env/env';
+import { logger } from '@web/utils/logger/logger';
 
 export type TUnsubscribeResult = { ok: true } | { ok: false };
 export type TResendConfirmationActionResult = { ok: true } | { ok: false };
-
-const logger = createLogger();
 
 /**
  * `NewsletterSubscriptionControl`'s "unsubscribe" server write. Reads the

@@ -1,7 +1,5 @@
-import { createLogger } from '@blog/insight';
 import { service, type TCategoriesList } from '@blog/service';
-
-const logger = createLogger();
+import { logger } from '@web/utils/logger/logger';
 
 /**
  * Fetches every category for the category chip row, falling back to an
