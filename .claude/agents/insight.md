@@ -5,9 +5,8 @@ description: >-
   observability domain's home: createLogger (synchronous, single-line JSON
   log emission via console.*), LOG_LEVEL, and log-injection sanitization.
   Sits at the base of the dependency graph alongside @blog/config/@blog/utils
-  — depends on nothing, framework-free. Not yet consumed by any app; web and
-  admin-app migrate their console.* call sites onto it only as separately
-  ticketed work.
+  — depends on nothing, framework-free. Consumed by both apps via their own shared
+  logger module; service/db/auth never log at all.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree

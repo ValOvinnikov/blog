@@ -51,6 +51,13 @@ When invoked, before writing any code:
 - **`@blog/db` must never import `@blog/auth`.** The tables live in `db`; this
   package reaches for them. If you find yourself wanting `db` to know about
   auth, the design is inverted — report it rather than adding the import.
+- **Never log — return the error to the caller.** This layer does not call
+  `console.*`, and does not take a `@blog/insight` dependency. Failures
+  propagate as a `Result` via `safeAsync`; the app layer (`apps/web` /
+  `apps/admin`) logs them through its shared logger, once, with the request
+  context attached. Logging here as well would put the same failure into the
+  log pipeline twice, and this layer's copy would be the one lacking the
+  route/request context that makes it actionable.
 - Depend only on `@blog/db`, `@blog/config`, `@blog/utils`, and the
   `next-auth`/`@auth/*` packages. The graph stays acyclic:
   `auth → db, config, utils`.
