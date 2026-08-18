@@ -660,3 +660,24 @@ the Root Directory rather than honoring the nested path.
       component-level (no full-page compositions that would fetch live
       Sanity content), so this needs nothing the `packages/ui` project
       above doesn't already skip.
+
+### Deploy-skip behaviour and the Vercel build rate limit
+
+Both Storybook projects share `scripts/vercel-ignore-affected.sh` as their
+`ignoreCommand`. A PR push builds a project only when turbo sees its package
+as **affected**, or when one of its watched deploy-config paths changed (its
+own `vercel.json`, or the shared ignore script). Everything else skips, so an
+unrelated PR triggers neither deployment and consumes no build quota.
+
+Because `apps/web` and `apps/cms`'s primary projects set
+`git.deploymentEnabled: false` (CI-gated pipeline), these two Storybook
+projects are the **only** ones that preview-deploy on a PR. Deploy volume is
+therefore already minimal — each builds only when genuinely affected. When a
+run still reports `Deployment rate limited — retry in 24 hours` (as on #1684),
+that is Vercel's **account-level** build rate limit refusing the deployment
+at creation, _before_ the ignore step runs — not a skip-logic bug and not
+specific to the PR that surfaced it. Those checks aren't required, so the
+failure is cosmetic. The levers are the Vercel plan (removing the per-window
+limit) or accepting the occasional non-blocking noise; there is no
+`ignoreCommand` env var exposing PR draft state, so gating previews to
+non-draft PRs isn't achievable from the ignore command alone.

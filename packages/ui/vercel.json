@@ -2,5 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm storybook:build",
   "outputDirectory": "storybook-static",
-  "ignoreCommand": "sh \"$(git rev-parse --show-toplevel)/scripts/vercel-ignore-affected.sh\" @blog/ui"
+  "ignoreCommand": "sh \"$(git rev-parse --show-toplevel)/scripts/vercel-ignore-affected.sh\" @blog/ui packages/ui/vercel.json scripts/vercel-ignore-affected.sh"
 }
