@@ -5,6 +5,8 @@ import {
   createSanityRobotToken,
   createSanityWebhook,
   deleteSanityRobotToken,
+  listSanityCorsOrigins,
+  listSanityDatasets,
   listSanityWebhooks,
 } from './sanity-management-client';
 
@@ -76,8 +78,30 @@ describe(createSanityDataset, () => {
   });
 });
 
+describe(listSanityDatasets, () => {
+  it('GETs the project-scoped datasets endpoint and returns the list', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify([{ name: 'production' }]), {
+        status: 200,
+      }),
+    );
+
+    const result = await listSanityDatasets({
+      token: 'tok',
+      projectId: 'proj123',
+    });
+
+    expect(result).toEqual([{ name: 'production' }]);
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(
+      'https://api.sanity.io/v2021-06-07/projects/proj123/datasets',
+    );
+    expect(init.method ?? 'GET').toBe('GET');
+  });
+});
+
 describe(addSanityCorsOrigin, () => {
-  it('POSTs the origin with credentials allowed', async () => {
+  it('POSTs to the corrected /projects/:id/cors path with credentials allowed', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
 
     await addSanityCorsOrigin({
@@ -88,13 +112,35 @@ describe(addSanityCorsOrigin, () => {
     });
 
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe(
-      'https://api.sanity.io/v2021-06-07/projects/proj123/cors-origins',
-    );
+    expect(url).toBe('https://api.sanity.io/v2021-06-07/projects/proj123/cors');
+    expect(init.method).toBe('POST');
     expect(JSON.parse(init.body as string)).toEqual({
       origin: 'https://admin.example.com',
       allowCredentials: true,
     });
+  });
+});
+
+describe(listSanityCorsOrigins, () => {
+  it('GETs the project-scoped cors endpoint and returns the list', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify([{ id: 'cors1', origin: 'https://admin.example.com' }]),
+        { status: 200 },
+      ),
+    );
+
+    const result = await listSanityCorsOrigins({
+      token: 'tok',
+      projectId: 'proj123',
+    });
+
+    expect(result).toEqual([
+      { id: 'cors1', origin: 'https://admin.example.com' },
+    ]);
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('https://api.sanity.io/v2021-06-07/projects/proj123/cors');
+    expect(init.method ?? 'GET').toBe('GET');
   });
 });
 
