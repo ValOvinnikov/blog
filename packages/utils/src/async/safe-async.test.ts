@@ -1,4 +1,24 @@
-import { safeAsync } from './safe-async';
+import { safeAsync, type TResult } from './safe-async';
+
+describe('TResult', () => {
+  it('defaults the error type param to unknown, matching an explicit TResult<T, unknown>', () => {
+    const withDefault: TResult<number> = { ok: false, error: 'boom' };
+    const withExplicitUnknown: TResult<number, unknown> = withDefault;
+
+    expect(withExplicitUnknown).toEqual(withDefault);
+  });
+
+  it('narrows the error field when a code union is supplied', () => {
+    type TCode = 'NOT_FOUND' | 'DUPLICATE';
+
+    const result: TResult<number, TCode> = { ok: false, error: 'NOT_FOUND' };
+
+    if (!result.ok) {
+      const code: TCode = result.error;
+      expect(code).toBe('NOT_FOUND');
+    }
+  });
+});
 
 describe('safeAsync', () => {
   it('returns ok:true with resolved data', async () => {

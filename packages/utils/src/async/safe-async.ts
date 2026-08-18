@@ -1,4 +1,5 @@
-export type TResult<T> = { ok: true; data: T } | { ok: false; error: unknown };
+export type TResult<T, E = unknown> =
+  { ok: true; data: T } | { ok: false; error: E };
 
 export function safeAsync<A extends unknown[], T>(
   fn: (...args: A) => Promise<T>,
