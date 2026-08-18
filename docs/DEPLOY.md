@@ -635,7 +635,17 @@ and Vercel reads one `vercel.json` per Root Directory regardless of which
 project is asking — a second project also rooted at `apps/web` would inherit
 that same `deploymentEnabled: false` and silently never deploy. Config
 instead lives in a **repo-root `vercel.json`** (a new file, distinct from
-every package's own), with the Root Directory set to the repo root itself:
+every package's own), with the Root Directory set to the repo root itself.
+
+Because the Root Directory is the repo root but Storybook builds into
+`apps/web/storybook-static` (one level down), the root `vercel.json`'s
+`buildCommand` copies that result up to a repo-root `storybook-static` and
+sets `outputDirectory` to `storybook-static` — so the output basename sits at
+the Root Directory, exactly as `packages/ui`'s does. Don't "simplify" the copy
+away or point `outputDirectory` back at the nested `apps/web/storybook-static`:
+the deploy then fails with `No Output Directory named "storybook-static" found`
+whenever the project's dashboard default/framework preset resolves output at
+the Root Directory rather than honoring the nested path.
 
 - [ ] Vercel → Add New → Project → import `{github_account}/blog`; **Root
       Directory** left at the repo root (`.`) — do **not** set it to
