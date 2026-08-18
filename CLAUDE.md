@@ -48,10 +48,12 @@ graph is acyclic
   nothing. The `sanitizeLogMessage` copy is a **deliberate, temporary
   duplication** of `@blog/utils`'s existing copy (not an import — `insight`
   stays dependency-free) — `@blog/utils`'s copy is removed once every call
-  site has migrated off it onto `@blog/insight` instead, as separate
-  follow-up work. Not consumed by any app yet — `web` and `admin-app`
-  migrate their `console.*` call sites onto it as separate, already-scoped
-  work, not as part of standing up the package itself. See
+  site has migrated off it onto `@blog/insight` instead, tracked as its own
+  follow-up. Both apps consume it: `apps/web` and `apps/admin` each expose one
+  shared logger at `src/utils/logger/logger.ts` carrying their own `service`
+  value, and import that rather than calling `createLogger` per module.
+  `service`, `db` and `auth` never log at all — failures reach the caller and
+  the app layer logs them once, with request context. See
   `.claude/agents/insight.md`.
 - Content shapes come from the generated Sanity types in `@blog/config`
   (`packages/config/src/sanity/generated/types.ts`, produced by typegen) —
@@ -157,10 +159,10 @@ do not route its controls through the `ui` agent. See
 `insight` (`packages/insight`, the structured logger core — `createLogger`,
 `LOG_LEVEL`, and its own temporary copy of `sanitizeLogMessage`) is
 **independent, like `config`/`utils`** — depends on nothing, not a step in
-any chain. Not consumed by any app yet — dispatch `web`/`admin-app` to
-migrate their `console.*` call sites onto it only when that migration is
-itself the scope of the work, not as a side effect of a change to `insight`
-itself. See `.claude/agents/insight.md`.
+any chain. Both apps consume it through their own shared logger module, so
+dispatch `insight` only for changes to the logger core itself — a change to
+how an app _uses_ the logger belongs to `web`/`admin-app`. See
+`.claude/agents/insight.md`.
 
 **Delegating in-scope work to its sub-agent is REQUIRED, not optional — for the
 whole lifecycle, not just the first draft.** Every file that lives in a

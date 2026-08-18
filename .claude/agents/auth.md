@@ -51,6 +51,11 @@ When invoked, before writing any code:
 - **`@blog/db` must never import `@blog/auth`.** The tables live in `db`; this
   package reaches for them. If you find yourself wanting `db` to know about
   auth, the design is inverted — report it rather than adding the import.
+- **Never log.** This layer does not call `console.*`, and does not take a
+  `@blog/insight` dependency. It is configuration, not request-handling code —
+  there is no caller-facing error path of its own to report on, and Auth.js
+  surfaces its own failures. Anything worth logging belongs to the app that
+  calls `NextAuth()` with this config, where the request context lives.
 - Depend only on `@blog/db`, `@blog/config`, `@blog/utils`, and the
   `next-auth`/`@auth/*` packages. The graph stays acyclic:
   `auth → db, config, utils`.

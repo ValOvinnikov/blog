@@ -65,6 +65,13 @@ relative paths only within a single slice (`./schema`, `./queries/comments`).
   `db` genuinely needs to speak to Sanity itself rather than joining through
   `apps/web`. Enforced by a `configs/eslint/db.js` override scoped to that one
   directory; every other path in this package keeps the blanket prohibition.
+- **Never log — let the failure reach the caller.** This layer does not call
+  `console.*`, and does not take a `@blog/insight` dependency. Query and
+  mutation functions currently `throw` on failure and return `Promise<T>`;
+  whichever app calls them catches and logs through its own shared logger,
+  once, with the request context attached. Logging here as well would put the
+  same failure into the pipeline twice, and this layer's copy would be the one
+  lacking the route/request context that makes it actionable.
 - Depend only on `@blog/config` and `@blog/utils` (types, constants, framework-
   free helpers) plus Drizzle/Neon SDKs (`drizzle-orm`, `drizzle-kit`,
   `@neondatabase/serverless`, the Auth.js Drizzle adapter) — plus `@sanity/client`,
