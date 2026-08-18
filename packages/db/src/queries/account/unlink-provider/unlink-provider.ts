@@ -46,6 +46,10 @@ export type TUnlinkProviderResult =
 // this user: the `WHERE provider = ...` clause simply matches no row, and a
 // follow-up read distinguishes that from a guard rejection to pick the
 // right outcome.
+//
+// Callers must pass the authenticated session's own user id here (never a
+// client-supplied value) — this function performs no authorization check
+// and unlinks the given provider from whatever account it is given.
 export async function unlinkProvider(
   userId: string,
   provider: TLinkableProvider,

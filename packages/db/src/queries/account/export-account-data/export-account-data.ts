@@ -43,6 +43,10 @@ export type TAccountDataExport = {
 // Returns `undefined` if `userId` doesn't match a `users` row, rather than a
 // half-empty export shape — callers (web) should treat that as "no such
 // account", not "an account with nothing in it".
+//
+// Callers must pass the authenticated session's own user id here (never a
+// client-supplied value) — this function performs no authorization check
+// and returns whatever account's data it is given.
 export async function exportAccountData(
   tenantId: string,
   userId: string,
