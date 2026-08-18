@@ -33,7 +33,7 @@ describe(TenantDetailsPanel, () => {
   });
 
   describe('locked (editable=false)', () => {
-    it('renders every text field as a read-only input, pre-filled from the tenant', () => {
+    it('renders every field, including plan, as a read-only input with an accessible name', () => {
       const tenant = makeTenant({
         name: 'Acme Inc.',
         slug: 'acme',
@@ -64,15 +64,18 @@ describe(TenantDetailsPanel, () => {
       expect(localeInput).toHaveAttribute('readonly');
 
       // plan has no HTML read-only state for a radiogroup, so it renders as
-      // plain, labelled text instead.
-      expect(screen.getByText('Growth')).toBeVisible();
+      // a read-only text field too — same structure as the other four,
+      // and (unlike a bare labelled span) with a real accessible name.
+      const planInput = screen.getByRole('textbox', { name: 'Plan' });
+      expect(planInput).toHaveValue('Growth');
+      expect(planInput).toHaveAttribute('readonly');
     });
 
     it('keeps read-only fields focusable and in the tab order, unlike a disabled field', () => {
       const tenant = makeTenant();
       render(<TenantDetailsPanel tenant={tenant} editable={false} />);
 
-      for (const name of ['Name', 'Slug', 'Primary domain', 'Locale']) {
+      for (const name of ['Name', 'Slug', 'Primary domain', 'Locale', 'Plan']) {
         const input = screen.getByRole('textbox', { name });
         expect(input).toHaveAttribute('readonly');
         expect(input).not.toBeDisabled();

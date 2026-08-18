@@ -6,17 +6,20 @@ export const tenantDetailsPanelVariants = tv({
       'flex flex-col gap-4 rounded-md border border-border bg-surface p-6',
     ],
     fields: ['flex flex-col gap-5'],
-    field: ['flex flex-col gap-1.5 rounded-md transition-colors duration-base'],
+    field: ['flex flex-col gap-1.5'],
     fieldLabel: ['text-sm font-medium text-text'],
-    fieldValue: ['break-words text-sm text-text'],
     fieldError: ['text-xs text-error'],
     actions: ['mt-2 flex items-center justify-end'],
+    lockedInput: [],
   },
   variants: {
     locked: {
-      // Not dimmed (that's what `disabled` does) — a subtle tinted card so a
-      // read-only field still reads as distinct from an editable one.
-      true: { field: ['bg-surface-2 px-3 py-2'] },
+      // Not dimmed (that's what `disabled` does) — a background tint on the
+      // `<input>` itself, since the input paints its own `bg-surface` over
+      // any tint applied only to the wrapper around it.
+      true: {
+        lockedInput: ['[&>input]:cursor-default [&>input]:bg-surface-2'],
+      },
       false: {},
     },
   },
