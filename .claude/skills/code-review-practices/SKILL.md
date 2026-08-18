@@ -29,9 +29,9 @@ D() { git diff "$BASE"...HEAD; git diff; }
 # apps/web and apps/admin log through their shared logger
 # (src/utils/logger/logger.ts, wrapping createLogger from @blog/insight);
 # service/db/auth never log at all — they return the error to the caller.
-# Exempt: packages/insight/src/** (the logger itself), scripts/**,
-# apps/cms/scripts/**, packages/db/scripts/** (stdout IS the interface),
-# *.test.ts(x), and apps/web/e2e/**.
+# Exempt: packages/insight/src/** (the logger itself), <repo-root>/scripts/**,
+# apps/cms/scripts/**, packages/db/scripts/**, packages/db/drizzle.config.ts
+# (stdout IS the interface), *.test.ts(x), and apps/web/e2e/**.
 D | grep -nE '^\+.*console\.(log|info|debug|trace|warn|error)'
 D | grep -nE '^\+.*\bdebugger\b'
 
