@@ -99,4 +99,13 @@ export default [
       ],
     },
   },
+  {
+    // provision-tenant/deprovision-tenant are standalone CLI tools — stdout
+    // IS their interface. drizzle.config.ts is loaded only by the
+    // drizzle-kit CLI (db:generate/db:migrate/db:studio) — same category.
+    files: ['scripts/**/*.{ts,tsx}', 'drizzle.config.ts'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
 ];

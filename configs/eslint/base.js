@@ -30,7 +30,7 @@ export default [
     },
     rules: {
       curly: ['error', 'all'],
-      'no-console': ['error', { allow: ['warn', 'error'] }],
+      'no-console': 'error',
       'no-restricted-imports': [
         'error',
         { paths: [noVitestGlobalsImportPath] },
@@ -62,6 +62,16 @@ export default [
           alphabetize: { order: 'asc', caseInsensitive: true },
         },
       ],
+    },
+  },
+  {
+    // Workspace-specific console exemptions (the insight logger, CLI
+    // scripts, e2e specs) live in their own layer preset — `files` here
+    // resolves relative to each consuming workspace, so a repo-root path
+    // like `packages/insight/src/**` would never match from this shared file.
+    files: ['**/*.test.{ts,tsx}'],
+    rules: {
+      'no-console': 'off',
     },
   },
   {

@@ -6,6 +6,7 @@
   "exports": {
     "./config": "./config.js",
     "./utils": "./utils.js",
+    "./insight": "./insight.js",
     "./service": "./service.js",
     "./db": "./db.js",
     "./ui": "./ui.js",
