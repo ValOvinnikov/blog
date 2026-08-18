@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url';
+
 import type { StorybookConfig } from '@storybook/nextjs-vite';
 import svgr from 'vite-plugin-svgr';
 
@@ -31,6 +33,19 @@ const config: StorybookConfig = {
   },
   viteFinal: async (config) => {
     config.plugins = config.plugins ?? [];
+    // `NewsletterForm` imports this `'use server'` action module, which
+    // pulls in `@blog/db` (guarded by `server-only`) — that throws the
+    // instant it's evaluated in a browser bundle. Aliasing the exact
+    // specifier to a Storybook-only stand-in keeps the real module out of
+    // this build entirely, same technique as `web-storybook`'s `@blog/service`
+    // module-mock approach, scoped to just this one import path.
+    config.resolve ??= {};
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@web/server/newsletter/newsletter-actions': fileURLToPath(
+        new URL('./mocks/newsletter-actions.ts', import.meta.url),
+      ),
+    };
     // web stories compose @blog/ui components (from source, per the pnpm
     // workspace link), so any story pulling in @blog/ui's icon registry
     // needs the same `.svg` -> React component handling as packages/ui's
