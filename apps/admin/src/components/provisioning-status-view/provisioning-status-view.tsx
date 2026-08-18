@@ -141,11 +141,13 @@ export function ProvisioningStatusView({
     stepTitle,
     stepError,
     trailing,
+    stepStatusLive,
     failedBadge,
     detailsColumn,
     goToTenantButton,
     dnsCard,
     dnsRow,
+    dnsStatusLive,
     dnsHint,
   } = provisioningStatusViewVariants();
 
@@ -280,15 +282,17 @@ export function ProvisioningStatusView({
                     )}
                   </div>
                   <div className={trailing()}>
-                    {isFailed ? (
-                      <span className={failedBadge()}>
-                        {t(`statusLabel.${status}`)}
-                      </span>
-                    ) : (
-                      <StatusBadge tone={STEP_TONE[status]}>
-                        {t(`statusLabel.${status}`)}
-                      </StatusBadge>
-                    )}
+                    <span className={stepStatusLive()} aria-live="polite">
+                      {isFailed ? (
+                        <span className={failedBadge()}>
+                          {t(`statusLabel.${status}`)}
+                        </span>
+                      ) : (
+                        <StatusBadge tone={STEP_TONE[status]}>
+                          {t(`statusLabel.${status}`)}
+                        </StatusBadge>
+                      )}
+                    </span>
                     {isFailed && (
                       <Button
                         type="button"
@@ -327,9 +331,11 @@ export function ProvisioningStatusView({
         </Heading>
         <div className={dnsRow()}>
           <Text>{tenant.primaryDomain}</Text>
-          <StatusBadge tone={DNS_TONE[domainStatus]}>
-            {t(`dnsStatus.${domainStatus}`)}
-          </StatusBadge>
+          <span className={dnsStatusLive()} aria-live="polite">
+            <StatusBadge tone={DNS_TONE[domainStatus]}>
+              {t(`dnsStatus.${domainStatus}`)}
+            </StatusBadge>
+          </span>
         </div>
         {domainStatus === 'NOT_CONFIGURED' && (
           <Text variant="muted" className={dnsHint()}>

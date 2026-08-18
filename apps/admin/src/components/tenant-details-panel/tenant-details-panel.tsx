@@ -157,9 +157,15 @@ export function TenantDetailsPanel({
             ariaLabel={t('nameLabel')}
             value={values.name}
             onChange={(fieldValue) => updateField('name', fieldValue)}
+            invalid={Boolean(fieldErrors.name)}
+            aria-describedby={
+              fieldErrors.name ? 'tenant-detail-name-error' : undefined
+            }
           />
           {fieldErrors.name && (
-            <span className={fieldError()}>{fieldErrors.name}</span>
+            <span id="tenant-detail-name-error" className={fieldError()}>
+              {fieldErrors.name}
+            </span>
           )}
         </div>
 
@@ -172,9 +178,15 @@ export function TenantDetailsPanel({
             ariaLabel={t('slugLabel')}
             value={values.slug}
             onChange={(fieldValue) => updateField('slug', fieldValue)}
+            invalid={Boolean(fieldErrors.slug)}
+            aria-describedby={
+              fieldErrors.slug ? 'tenant-detail-slug-error' : undefined
+            }
           />
           {fieldErrors.slug && (
-            <span className={fieldError()}>{fieldErrors.slug}</span>
+            <span id="tenant-detail-slug-error" className={fieldError()}>
+              {fieldErrors.slug}
+            </span>
           )}
         </div>
 
@@ -187,9 +199,17 @@ export function TenantDetailsPanel({
             ariaLabel={t('domainLabel')}
             value={values.primaryDomain}
             onChange={(fieldValue) => updateField('primaryDomain', fieldValue)}
+            invalid={Boolean(fieldErrors.primaryDomain)}
+            aria-describedby={
+              fieldErrors.primaryDomain
+                ? 'tenant-detail-domain-error'
+                : undefined
+            }
           />
           {fieldErrors.primaryDomain && (
-            <span className={fieldError()}>{fieldErrors.primaryDomain}</span>
+            <span id="tenant-detail-domain-error" className={fieldError()}>
+              {fieldErrors.primaryDomain}
+            </span>
           )}
         </div>
 
@@ -212,9 +232,15 @@ export function TenantDetailsPanel({
             ariaLabel={t('localeLabel')}
             value={values.locale}
             onChange={(fieldValue) => updateField('locale', fieldValue)}
+            invalid={Boolean(fieldErrors.locale)}
+            aria-describedby={
+              fieldErrors.locale ? 'tenant-detail-locale-error' : undefined
+            }
           />
           {fieldErrors.locale && (
-            <span className={fieldError()}>{fieldErrors.locale}</span>
+            <span id="tenant-detail-locale-error" className={fieldError()}>
+              {fieldErrors.locale}
+            </span>
           )}
         </div>
       </div>

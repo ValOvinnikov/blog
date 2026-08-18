@@ -25,6 +25,7 @@ export const provisioningStatusViewVariants = tv({
     stepTitle: ['text-sm font-medium text-text'],
     stepError: ['text-xs text-error'],
     trailing: ['flex flex-none items-center gap-2 self-start'],
+    stepStatusLive: ['inline-flex items-center'],
     failedBadge: [
       'inline-flex items-center rounded-sm border border-error bg-error/10',
       'px-2 py-0.5 font-mono text-label font-medium uppercase tracking-label text-error',
@@ -33,6 +34,7 @@ export const provisioningStatusViewVariants = tv({
     goToTenantButton: ['self-start'],
     dnsCard: ['rounded-md border border-border bg-surface p-6'],
     dnsRow: ['flex flex-wrap items-center gap-3'],
+    dnsStatusLive: ['inline-flex items-center'],
     dnsHint: ['text-xs text-text-muted'],
   },
   variants: {

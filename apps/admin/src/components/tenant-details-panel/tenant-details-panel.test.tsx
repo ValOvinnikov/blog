@@ -130,6 +130,37 @@ describe(TenantDetailsPanel, () => {
       expect(refreshMock).not.toHaveBeenCalled();
     });
 
+    it("associates a field's error with its input via aria-invalid and aria-describedby", async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: false,
+        fieldErrors: {
+          name: 'Enter a tenant name.',
+          primaryDomain: 'Enter a valid domain.',
+        },
+      });
+      const user = userEvent.setup();
+      const tenant = makeTenant();
+      render(<TenantDetailsPanel tenant={tenant} editable={true} />);
+
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await screen.findByText('Enter a tenant name.');
+
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      expect(nameInput).toBeInvalid();
+      expect(nameInput).toHaveAccessibleDescription('Enter a tenant name.');
+
+      const domainInput = screen.getByRole('textbox', {
+        name: 'Primary domain',
+      });
+      expect(domainInput).toBeInvalid();
+      expect(domainInput).toHaveAccessibleDescription('Enter a valid domain.');
+
+      // Fields with no error of their own stay valid and undescribed.
+      const slugInput = screen.getByRole('textbox', { name: 'Slug' });
+      expect(slugInput).not.toBeInvalid();
+      expect(slugInput).toHaveAccessibleDescription('');
+    });
+
     it('shows the form-level provisioning-started error and does not refresh, without a successful save', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,

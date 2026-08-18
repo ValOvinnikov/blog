@@ -472,6 +472,50 @@ describe(ProvisioningStatusView, () => {
       expect(screen.queryByText('Running…')).not.toBeInTheDocument();
     });
 
+    it('announces a polled step-status transition through a stable aria-live region', async () => {
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        },
+      });
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+        />,
+      );
+
+      const liveRegionBefore = screen
+        .getByText('Running…')
+        .closest('[aria-live="polite"]');
+      expect(liveRegionBefore).not.toBeNull();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+
+      // The new status text is announced by the same live region — not a
+      // freshly mounted one, which some screen readers announce on mount
+      // regardless of content, defeating the point of a targeted update.
+      const liveRegionAfter = screen
+        .getByText('Done')
+        .closest('[aria-live="polite"]');
+      expect(liveRegionAfter).toBe(liveRegionBefore);
+    });
+
     it('stops polling once the tenant reaches a terminal status', async () => {
       const tenant = makeTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
@@ -571,6 +615,31 @@ describe(ProvisioningStatusView, () => {
         'acme.example.com',
       );
       expect(screen.getByText('Verified')).toBeVisible();
+    });
+
+    it('announces a polled DNS-status transition through a stable aria-live region', async () => {
+      const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
+      getDomainVerificationStatusActionMock.mockResolvedValue('VERIFIED');
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="PENDING"
+        />,
+      );
+
+      const liveRegionBefore = screen
+        .getByText('Pending — awaiting DNS')
+        .closest('[aria-live="polite"]');
+      expect(liveRegionBefore).not.toBeNull();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS);
+      });
+
+      const liveRegionAfter = screen
+        .getByText('Verified')
+        .closest('[aria-live="polite"]');
+      expect(liveRegionAfter).toBe(liveRegionBefore);
     });
 
     it('stops polling the domain once it reaches VERIFIED', async () => {
