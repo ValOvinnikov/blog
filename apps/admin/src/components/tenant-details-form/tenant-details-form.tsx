@@ -9,6 +9,7 @@ import { Alert } from '@blog/ui/atoms/alert';
 import { Button } from '@blog/ui/atoms/button';
 import { Heading } from '@blog/ui/atoms/heading';
 import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
+import { Spinner } from '@blog/ui/atoms/spinner';
 import { Text } from '@blog/ui/atoms/text';
 import { TextInput } from '@blog/ui/atoms/text-input';
 import { useTranslations } from 'next-intl';
@@ -50,14 +51,16 @@ export function TenantDetailsForm() {
     root,
     header,
     description,
+    cardWrap,
     card,
+    overlay,
     fields,
     field,
     label,
     hint,
     fieldError,
     actions,
-  } = tenantDetailsFormVariants();
+  } = tenantDetailsFormVariants({ pending: isPending });
 
   function updateField<K extends keyof TFormValues>(
     key: K,
@@ -95,88 +98,100 @@ export function TenantDetailsForm() {
 
       {formError && <Alert type={ALERT_TYPE.ERROR} message={formError} />}
 
-      <div className={card()}>
-        <div className={fields()}>
-          <div className={field()}>
-            <label className={label()} htmlFor="tenant-name">
-              {t('nameLabel')}
-            </label>
-            <TextInput
-              id="tenant-name"
-              ariaLabel={t('nameLabel')}
-              value={values.name}
-              onChange={(value) => updateField('name', value)}
-            />
-            {fieldErrors.name && (
-              <span className={fieldError()}>{fieldErrors.name}</span>
-            )}
+      <div className={cardWrap()}>
+        <div className={card()} inert={isPending}>
+          <div className={fields()}>
+            <div className={field()}>
+              <label className={label()} htmlFor="tenant-name">
+                {t('nameLabel')}
+              </label>
+              <TextInput
+                id="tenant-name"
+                ariaLabel={t('nameLabel')}
+                value={values.name}
+                onChange={(value) => updateField('name', value)}
+              />
+              {fieldErrors.name && (
+                <span className={fieldError()}>{fieldErrors.name}</span>
+              )}
+            </div>
+
+            <div className={field()}>
+              <label className={label()} htmlFor="tenant-slug">
+                {t('slugLabel')}
+              </label>
+              <TextInput
+                id="tenant-slug"
+                ariaLabel={t('slugLabel')}
+                value={values.slug}
+                onChange={(value) => updateField('slug', value)}
+              />
+              <span className={hint()}>{t('slugHint')}</span>
+              {fieldErrors.slug && (
+                <span className={fieldError()}>{fieldErrors.slug}</span>
+              )}
+            </div>
+
+            <div className={field()}>
+              <label className={label()} htmlFor="tenant-domain">
+                {t('domainLabel')}
+              </label>
+              <TextInput
+                id="tenant-domain"
+                ariaLabel={t('domainLabel')}
+                value={values.domain}
+                onChange={(value) => updateField('domain', value)}
+              />
+              <span className={hint()}>{t('domainHint')}</span>
+              {fieldErrors.domain && (
+                <span className={fieldError()}>{fieldErrors.domain}</span>
+              )}
+            </div>
+
+            <div className={field()}>
+              <span className={label()}>{t('planLabel')}</span>
+              <SegmentedControl<TTenantPlan>
+                ariaLabel={t('planLabel')}
+                options={planOptions}
+                value={values.plan}
+                onChange={(plan) => updateField('plan', plan)}
+              />
+            </div>
+
+            <div className={field()}>
+              <label className={label()} htmlFor="tenant-owner-email">
+                {t('ownerEmailLabel')}
+              </label>
+              <TextInput
+                id="tenant-owner-email"
+                type="email"
+                ariaLabel={t('ownerEmailLabel')}
+                value={values.ownerEmail}
+                onChange={(value) => updateField('ownerEmail', value)}
+              />
+              <span className={hint()}>{t('ownerEmailHint')}</span>
+              {fieldErrors.ownerEmail && (
+                <span className={fieldError()}>{fieldErrors.ownerEmail}</span>
+              )}
+            </div>
           </div>
 
-          <div className={field()}>
-            <label className={label()} htmlFor="tenant-slug">
-              {t('slugLabel')}
-            </label>
-            <TextInput
-              id="tenant-slug"
-              ariaLabel={t('slugLabel')}
-              value={values.slug}
-              onChange={(value) => updateField('slug', value)}
-            />
-            <span className={hint()}>{t('slugHint')}</span>
-            {fieldErrors.slug && (
-              <span className={fieldError()}>{fieldErrors.slug}</span>
-            )}
-          </div>
-
-          <div className={field()}>
-            <label className={label()} htmlFor="tenant-domain">
-              {t('domainLabel')}
-            </label>
-            <TextInput
-              id="tenant-domain"
-              ariaLabel={t('domainLabel')}
-              value={values.domain}
-              onChange={(value) => updateField('domain', value)}
-            />
-            <span className={hint()}>{t('domainHint')}</span>
-            {fieldErrors.domain && (
-              <span className={fieldError()}>{fieldErrors.domain}</span>
-            )}
-          </div>
-
-          <div className={field()}>
-            <span className={label()}>{t('planLabel')}</span>
-            <SegmentedControl<TTenantPlan>
-              ariaLabel={t('planLabel')}
-              options={planOptions}
-              value={values.plan}
-              onChange={(plan) => updateField('plan', plan)}
-            />
-          </div>
-
-          <div className={field()}>
-            <label className={label()} htmlFor="tenant-owner-email">
-              {t('ownerEmailLabel')}
-            </label>
-            <TextInput
-              id="tenant-owner-email"
-              type="email"
-              ariaLabel={t('ownerEmailLabel')}
-              value={values.ownerEmail}
-              onChange={(value) => updateField('ownerEmail', value)}
-            />
-            <span className={hint()}>{t('ownerEmailHint')}</span>
-            {fieldErrors.ownerEmail && (
-              <span className={fieldError()}>{fieldErrors.ownerEmail}</span>
-            )}
+          <div className={actions()}>
+            <Button type="button" onClick={handleSubmit} disabled={isPending}>
+              {isPending ? t('submittingButton') : t('submitButton')}
+            </Button>
           </div>
         </div>
 
-        <div className={actions()}>
-          <Button type="button" onClick={handleSubmit} disabled={isPending}>
-            {isPending ? t('submittingButton') : t('submitButton')}
-          </Button>
-        </div>
+        {isPending && (
+          <div className={overlay()}>
+            <Spinner
+              label={t('submittingButton')}
+              size={Size.LG}
+              showLabel={true}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

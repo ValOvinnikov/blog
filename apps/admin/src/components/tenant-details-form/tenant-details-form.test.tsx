@@ -1,4 +1,4 @@
-import { renderWithIntl, screen } from '@admin/testing/custom-render';
+import { renderWithIntl, screen, waitFor } from '@admin/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { TenantDetailsForm } from './tenant-details-form';
@@ -86,6 +86,36 @@ describe(TenantDetailsForm, () => {
     expect(
       await screen.findByText('No registered user matches this email.'),
     ).toBeVisible();
+  });
+
+  it('shows a full-form loading overlay while the create action is pending', async () => {
+    let resolveAction: (value: { ok: boolean }) => void = () => {};
+    createTenantActionMock.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveAction = resolve;
+        }),
+    );
+    const user = userEvent.setup();
+    render(<TenantDetailsForm />);
+
+    await fillValidForm(user);
+    await user.click(
+      screen.getByRole('button', { name: /begin provisioning/i }),
+    );
+
+    expect(screen.getByRole('status', { name: 'Creating…' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Creating…' })).toBeDisabled();
+    expect(
+      screen.getByRole('textbox', { name: 'Tenant name' }).closest('[inert]'),
+    ).not.toBeNull();
+
+    resolveAction({ ok: false });
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('status', { name: 'Creating…' }),
+      ).not.toBeInTheDocument(),
+    );
   });
 
   it('shows a general error returned from the Server Action', async () => {

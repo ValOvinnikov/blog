@@ -6,15 +6,20 @@ export const provisioningStatusViewVariants = tv({
     header: ['flex flex-col gap-1'],
     description: ['text-sm text-text-muted'],
     startAction: ['flex'],
+    layout: ['flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_280px]'],
     card: ['rounded-md border border-border bg-surface p-6'],
-    list: ['flex flex-col gap-4'],
-    step: [
-      'flex flex-wrap items-center gap-3',
-      'border-b border-border pb-4 last:border-b-0 last:pb-0',
+    list: ['flex flex-col'],
+    step: ['flex flex-wrap gap-3'],
+    indicatorCol: ['flex flex-none flex-col items-center self-stretch'],
+    circle: [
+      'flex h-6 w-6 flex-none items-center justify-center',
+      'rounded-full border text-xs font-bold',
     ],
-    stepBody: ['flex min-w-0 flex-1 flex-col gap-1'],
+    connector: ['my-1 w-0.5 flex-1 bg-border'],
+    stepBody: ['flex min-w-0 flex-1 flex-col gap-1 pb-4'],
     stepTitle: ['text-sm font-medium text-text'],
     stepError: ['text-xs text-error'],
+    trailing: ['flex flex-none items-center gap-2 self-start'],
     failedBadge: [
       'inline-flex items-center rounded-sm border border-error bg-error/10',
       'px-2 py-0.5 font-mono text-label font-medium uppercase tracking-label text-error',
@@ -22,5 +27,20 @@ export const provisioningStatusViewVariants = tv({
     dnsCard: ['rounded-md border border-border bg-surface p-6'],
     dnsRow: ['flex flex-wrap items-center gap-3'],
     dnsHint: ['text-xs text-text-muted'],
+  },
+  variants: {
+    status: {
+      IDLE: { circle: ['border-border bg-surface-2 text-text-muted'] },
+      RUNNING: { circle: ['border-warn bg-warn-muted text-warn'] },
+      DONE: { circle: ['border-success bg-success-muted text-success'] },
+      FAILED: { circle: ['border-error bg-error-muted text-error'] },
+    },
+    isDone: {
+      true: { connector: ['bg-success'] },
+      false: {},
+    },
+  },
+  defaultVariants: {
+    isDone: false,
   },
 });

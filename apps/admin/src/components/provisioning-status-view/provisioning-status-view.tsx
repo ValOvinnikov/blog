@@ -1,5 +1,6 @@
 'use client';
 
+import { TenantDetailsPanel } from '@admin/components/tenant-details-panel';
 import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
 import { getTenantProvisioningStatusAction } from '@admin/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@admin/server/provisioning/retry-provisioning-step-action';
@@ -69,10 +70,11 @@ type TProvisioningStatusViewProps = {
  * The wizard's remaining-steps view — the provisioning steps (Sanity project
  * → seed content → deploy Studio → persist read token → map domain → create
  * webhook) read live from `tenant.provisioningSteps`, each independently
- * retryable. While provisioning hasn't reached a terminal status, this polls
- * for fresh status so an operator watching a run in progress sees steps
- * advance without reloading. Retry's own `router.refresh()` still covers
- * picking up a fresh full tenant row after a step retry.
+ * retryable, alongside a read-only summary of the tenant row itself. While
+ * provisioning hasn't reached a terminal status, this polls for fresh status
+ * so an operator watching a run in progress sees the step circles advance
+ * without reloading. Retry's own `router.refresh()` still covers picking up
+ * a fresh full tenant row after a step retry.
  */
 export function ProvisioningStatusView({
   tenant,
@@ -104,12 +106,17 @@ export function ProvisioningStatusView({
     header,
     description,
     startAction,
+    layout,
     card,
     list,
     step,
+    indicatorCol,
+    circle,
+    connector,
     stepBody,
     stepTitle,
     stepError,
+    trailing,
     failedBadge,
     dnsCard,
     dnsRow,
@@ -189,61 +196,86 @@ export function ProvisioningStatusView({
         </div>
       )}
 
-      <div className={card()}>
-        <div className={list()}>
-          {STEP_ORDER.map((stepKey) => {
-            const stepState = provisioningSteps?.[stepKey];
-            const status =
-              stepState?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
-            const isFailed = status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
-            const isRunning =
-              status === TENANT_PROVISIONING_STEP_STATUS.RUNNING;
-            const isRetrying = retryingStep === stepKey;
+      <div className={layout()}>
+        <div className={card()}>
+          <div className={list()}>
+            {STEP_ORDER.map((stepKey, index) => {
+              const stepState = provisioningSteps?.[stepKey];
+              const status =
+                stepState?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
+              const isFailed =
+                status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
+              const isRunning =
+                status === TENANT_PROVISIONING_STEP_STATUS.RUNNING;
+              const isDone = status === TENANT_PROVISIONING_STEP_STATUS.DONE;
+              const isRetrying = retryingStep === stepKey;
+              const isLast = index === STEP_ORDER.length - 1;
+              const title = t(`stepLabel.${stepKey}`);
 
-            return (
-              <div className={step()} key={stepKey}>
-                <div className={stepBody()}>
-                  <span className={stepTitle()}>
-                    {t(`stepLabel.${stepKey}`)}
-                  </span>
-                  {isFailed && stepState?.error && (
-                    <span className={stepError()}>{stepState.error}</span>
-                  )}
-                </div>
-                {isFailed ? (
-                  <span className={failedBadge()}>
-                    {t(`statusLabel.${status}`)}
-                  </span>
-                ) : (
-                  <>
-                    {isRunning && (
-                      <Spinner
-                        label={t(`statusLabel.${status}`)}
-                        size={Size.SM}
+              return (
+                <div className={step()} key={stepKey}>
+                  <div className={indicatorCol()}>
+                    <span
+                      className={circle({ status })}
+                      aria-hidden={isRunning ? undefined : true}
+                    >
+                      {isRunning ? (
+                        <Spinner
+                          label={t('stepRunningLabel', { step: title })}
+                          size={Size.SM}
+                        />
+                      ) : isDone ? (
+                        '✓'
+                      ) : isFailed ? (
+                        '!'
+                      ) : (
+                        index + 1
+                      )}
+                    </span>
+                    {!isLast && (
+                      <span
+                        className={connector({ isDone })}
+                        aria-hidden="true"
                       />
                     )}
-                    <StatusBadge
-                      tone={STEP_TONE[status]}
-                      aria-hidden={isRunning ? 'true' : undefined}
-                    >
-                      {t(`statusLabel.${status}`)}
-                    </StatusBadge>
-                  </>
-                )}
-                {isFailed && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => handleRetry(stepKey)}
-                    disabled={isRetrying}
-                  >
-                    {isRetrying ? t('retryingButton') : t('retryButton')}
-                  </Button>
-                )}
-              </div>
-            );
-          })}
+                  </div>
+                  <div className={stepBody()}>
+                    <span className={stepTitle()}>{title}</span>
+                    {isFailed && stepState?.error && (
+                      <span className={stepError()}>{stepState.error}</span>
+                    )}
+                  </div>
+                  <div className={trailing()}>
+                    {isFailed ? (
+                      <span className={failedBadge()}>
+                        {t(`statusLabel.${status}`)}
+                      </span>
+                    ) : (
+                      <StatusBadge
+                        tone={STEP_TONE[status]}
+                        aria-hidden={isRunning ? 'true' : undefined}
+                      >
+                        {t(`statusLabel.${status}`)}
+                      </StatusBadge>
+                    )}
+                    {isFailed && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => handleRetry(stepKey)}
+                        disabled={isRetrying}
+                      >
+                        {isRetrying ? t('retryingButton') : t('retryButton')}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
+
+        <TenantDetailsPanel tenant={tenant} />
       </div>
 
       <div className={dnsCard()}>

@@ -3,6 +3,7 @@ import {
   renderWithIntl,
   screen,
   waitFor,
+  within,
 } from '@admin/testing/custom-render';
 import {
   idleProvisioningSteps,
@@ -103,6 +104,42 @@ describe(ProvisioningStatusView, () => {
     expect(screen.getAllByText('Running…')[0]).toBeVisible();
   });
 
+  it("shows a running step's spinner inside its circle with an accessible name, not hidden", () => {
+    const tenant = makeTenant({
+      provisioningSteps: {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+        },
+      },
+    });
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+      />,
+    );
+
+    expect(
+      screen.getByRole('status', {
+        name: 'Create Sanity project — running',
+      }),
+    ).toBeVisible();
+  });
+
+  it('renders the read-only tenant details panel alongside the steps', () => {
+    const tenant = makeTenant({ name: 'Acme Inc.', slug: 'acme' });
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+      />,
+    );
+
+    expect(screen.getByText('Tenant details')).toBeVisible();
+    expect(screen.getByText('acme')).toBeVisible();
+  });
+
   it('shows the error message and a Retry button for a failed step, with no Retry for others', () => {
     const tenant = makeTenant({
       provisioningSteps: {
@@ -158,8 +195,11 @@ describe(ProvisioningStatusView, () => {
       />,
     );
 
-    expect(screen.getByText('acme.example.com')).toBeVisible();
-    expect(screen.getByText('Verified')).toBeVisible();
+    const dnsCard = screen.getByRole('heading', {
+      name: 'Domain verification',
+    }).parentElement as HTMLElement;
+    expect(within(dnsCard).getByText('acme.example.com')).toBeVisible();
+    expect(within(dnsCard).getByText('Verified')).toBeVisible();
   });
 
   it('keeps the NOT_CONFIGURED badge short and explains it in adjacent text, without naming env vars', () => {
@@ -274,7 +314,7 @@ describe(ProvisioningStatusView, () => {
     // Found without `hidden: true` — genuinely present in the accessibility
     // tree, not merely rendered with an ancestor `aria-hidden` masking it.
     expect(
-      screen.getByRole('status', { name: 'Running…' }),
+      screen.getByRole('status', { name: 'Create Sanity project — running' }),
     ).toBeInTheDocument();
     // The adjacent StatusBadge repeats the same text visually; it must be
     // hidden from the accessibility tree so it isn't announced a second time.
@@ -316,6 +356,12 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
+      expect(
+        screen.getByRole('status', {
+          name: 'Create Sanity project — running',
+        }),
+      ).toBeInTheDocument();
+
       await act(async () => {
         await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
       });
@@ -324,6 +370,13 @@ describe(ProvisioningStatusView, () => {
         'tenant-1',
       );
       expect(screen.getByText('Done')).toBeVisible();
+      // The step's circle re-renders off the same polled state as the
+      // badge — the running spinner is gone now that the step is DONE.
+      expect(
+        screen.queryByRole('status', {
+          name: 'Create Sanity project — running',
+        }),
+      ).not.toBeInTheDocument();
     });
 
     it('stops polling once the tenant reaches a terminal status', async () => {

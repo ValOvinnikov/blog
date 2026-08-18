@@ -234,6 +234,7 @@
       "DONE": "Done",
       "FAILED": "Failed"
     },
+    "stepRunningLabel": "{step} — running",
     "retryButton": "Retry",
     "retryingButton": "Retrying…",
     "startButton": "Start provisioning",
@@ -247,6 +248,18 @@
       "ERROR": "Couldn't check"
     },
     "dnsNotConfiguredHint": "The Vercel integration isn't configured on this deployment, so domain verification can't run — this isn't specific to this tenant."
+  },
+  "tenantDetailsPanel": {
+    "heading": "Tenant details",
+    "nameLabel": "Name",
+    "slugLabel": "Slug",
+    "domainLabel": "Primary domain",
+    "planLabel": "Plan",
+    "localeLabel": "Locale",
+    "planValue": {
+      "FREE": "Free",
+      "GROWTH": "Growth"
+    }
   },
   "archivedTenantsToggle": {
     "ariaLabel": "Tenant visibility",
