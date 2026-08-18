@@ -10,6 +10,7 @@ const {
   toastSuccessMock,
   toastInfoMock,
   toastErrorMock,
+  reportClientErrorMock,
 } = vi.hoisted(() => ({
   useSessionMock: vi.fn(),
   getBookmarkStatusMock: vi.fn(),
@@ -17,9 +18,14 @@ const {
   toastSuccessMock: vi.fn(),
   toastInfoMock: vi.fn(),
   toastErrorMock: vi.fn(),
+  reportClientErrorMock: vi.fn(),
 }));
 
 vi.mock('next-auth/react', () => ({ useSession: useSessionMock }));
+
+vi.mock('@web/utils/report-client-error', () => ({
+  reportClientError: reportClientErrorMock,
+}));
 
 vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
   getBookmarkStatus: getBookmarkStatusMock,
@@ -47,6 +53,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
     toastSuccessMock.mockReset();
     toastInfoMock.mockReset();
     toastErrorMock.mockReset();
+    reportClientErrorMock.mockReset();
   });
 
   it('renders nothing when the session is unauthenticated', () => {
@@ -108,7 +115,8 @@ describe(`<${BookmarkButton.name}/>`, () => {
       data: { user: { id: 'user-1' } },
       status: 'authenticated',
     });
-    getBookmarkStatusMock.mockRejectedValue(new Error('db unavailable'));
+    const fetchError = new Error('db unavailable');
+    getBookmarkStatusMock.mockRejectedValue(fetchError);
 
     setup();
 
@@ -121,6 +129,10 @@ describe(`<${BookmarkButton.name}/>`, () => {
     );
     expect(errorSpy).toHaveBeenCalledWith(
       expect.stringContaining('bookmark_button.status_fetch_failed'),
+    );
+    expect(reportClientErrorMock).toHaveBeenCalledWith(
+      'bookmark_button.status_fetch_failed',
+      fetchError,
     );
 
     errorSpy.mockRestore();
