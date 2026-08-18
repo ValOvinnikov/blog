@@ -62,6 +62,7 @@ const env = {
   adminAppBaseUrl: 'https://admin.example.com',
   callbackSecret: 'shh',
   platformDomain: 'example.com',
+  tenantSanityDataset: 'test-dataset',
   webAppBaseUrl: 'https://example.com',
   revalidateSecret: 'revalidate-shh',
 };

@@ -10,16 +10,14 @@ import {
   listSanityDatasets,
 } from '../lib/sanity-management-client';
 
-const SANITY_DATASET = 'production';
-
 export type TCreateSanityProjectResult = {
   sanityProjectId: string;
   sanityDataset: string;
 };
 
 /**
- * Step 1 — creates the tenant's own Sanity project, its `production`
- * dataset, and a CORS entry for the admin app's origin.
+ * Step 1 — creates the tenant's own Sanity project, its dataset (named per
+ * `env.tenantSanityDataset`), and a CORS entry for the admin app's origin.
  *
  * The project id is persisted the moment it's minted, before the dataset/CORS
  * calls: Sanity has no delete-project API to clean up an orphan, so a retry
@@ -44,7 +42,7 @@ export async function createTenantSanityProject(
 
     await setTenantSanityProject(tenant.id, {
       sanityProjectId: projectId,
-      sanityDataset: SANITY_DATASET,
+      sanityDataset: env.tenantSanityDataset,
     });
   }
 
@@ -52,11 +50,11 @@ export async function createTenantSanityProject(
     token: env.sanityManagementToken,
     projectId,
   });
-  if (!datasets.some((dataset) => dataset.name === SANITY_DATASET)) {
+  if (!datasets.some((dataset) => dataset.name === env.tenantSanityDataset)) {
     await createSanityDataset({
       token: env.sanityManagementToken,
       projectId,
-      dataset: SANITY_DATASET,
+      dataset: env.tenantSanityDataset,
     });
   }
 
@@ -73,5 +71,5 @@ export async function createTenantSanityProject(
     });
   }
 
-  return { sanityProjectId: projectId, sanityDataset: SANITY_DATASET };
+  return { sanityProjectId: projectId, sanityDataset: env.tenantSanityDataset };
 }

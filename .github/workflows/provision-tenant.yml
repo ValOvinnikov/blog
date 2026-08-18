@@ -23,6 +23,10 @@ on:
         description: 'Override ADMIN_APP_BASE_URL for this run only (e.g. a local tunnel URL) — leave blank to use the production Environment value'
         required: false
         type: string
+      tenantSanityDataset:
+        description: 'Override TENANT_SANITY_DATASET for this run only — leave blank to use the production Environment value'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -68,6 +72,14 @@ jobs:
       # always fall back to the production Environment value unaffected.
       ADMIN_APP_BASE_URL: ${{ inputs.adminAppBaseUrl || vars.ADMIN_APP_BASE_URL }}
       PLATFORM_DOMAIN: ${{ vars.PLATFORM_DOMAIN }}
+      # Each tenant's own Sanity project gets exactly one dataset, named to
+      # match whichever environment provisioned it — externalized here
+      # rather than hardcoded in TS. Overridable per-dispatch via the
+      # tenantSanityDataset input (e.g. for manual local testing), same
+      # fallback pattern as ADMIN_APP_BASE_URL above — the real dispatch
+      # from apps/admin never sets this input, so it always falls back to
+      # the production Environment value unaffected.
+      TENANT_SANITY_DATASET: ${{ inputs.tenantSanityDataset || vars.TENANT_SANITY_DATASET }}
       # Reuses the same variable/secret names `apps/admin`/`apps/web` already
       # use for the same values (not new var names) — see
       # docs/context/environment-variables.md's `WEB_APP_URL`/

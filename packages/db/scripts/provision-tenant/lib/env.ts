@@ -29,6 +29,8 @@ export type TProvisionEnv = {
   // Platform domain each tenant's Studio subdomain is minted under
   // (`studio-<slug>.<platformDomain>`) — see `studioDomainForSlug`.
   platformDomain: string;
+  // Name of the Sanity dataset created for each tenant's project.
+  tenantSanityDataset: string;
   // Base origin of the deployed, shared `apps/web` app (no trailing
   // slash/path) — every tenant's revalidation webhook targets the same
   // `${webAppBaseUrl}/api/revalidate`, since that route tenant-scopes its
@@ -55,6 +57,7 @@ export function loadProvisionEnv(): TProvisionEnv {
     adminAppBaseUrl: requireEnv('ADMIN_APP_BASE_URL'),
     callbackSecret: requireEnv('TENANT_PROVISIONING_CALLBACK_SECRET'),
     platformDomain: requireEnv('PLATFORM_DOMAIN'),
+    tenantSanityDataset: requireEnv('TENANT_SANITY_DATASET'),
     webAppBaseUrl: requireEnv('WEB_APP_URL'),
     revalidateSecret: requireEnv('SANITY_REVALIDATE_SECRET'),
   };
