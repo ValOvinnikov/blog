@@ -57,7 +57,7 @@ When invoked, before writing any code:
   - Optional/global data (site settings in layout): log the error and apply
     fallbacks — or return early if a fallback is not possible.
   ```ts
-  const logger = createLogger();
+  import { logger } from '@web/utils/logger/logger';
 
   const result = await service.global.siteSettings.v1.getSiteSettings();
   if (!result.ok) {
@@ -66,11 +66,15 @@ When invoked, before writing any code:
   }
   const { title, navigation } = result.data;
   ```
-- **Log through `createLogger` from `@blog/insight` — never bare `console.*`.**
-  Declare one `const logger = createLogger();` at module level (not inside a
-  render or request path). Call `logger.error` / `logger.warn` with a **static,
-  lowercase, dot-namespaced event name** and pass the error plus any
-  identifiers as structured `context` fields:
+- **Log through the shared logger — never bare `console.*`, and never call
+  `createLogger` yourself.** This app has one logger at
+  `src/utils/logger/logger.ts` (`createLogger({ service: 'web' })`); import it
+  as `import { logger } from '@web/utils/logger/logger';`. The `service` field
+  it carries is what separates this app's lines from `apps/admin`'s in the
+  shared log pipeline, so a locally-constructed logger silently loses it.
+  Call `logger.error` / `logger.warn` with a **static, lowercase,
+  dot-namespaced event name** and pass the error plus any identifiers as
+  structured `context` fields:
   ```ts
   logger.error('blog_post_page.fetch_failed', { slug, error: result.error });
   ```
