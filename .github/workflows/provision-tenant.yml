@@ -19,6 +19,10 @@ on:
         description: 'tenants.id of the row to provision (already inserted by the admin wizard)'
         required: true
         type: string
+      adminAppBaseUrl:
+        description: 'Override ADMIN_APP_BASE_URL for this run only (e.g. a local tunnel URL) — leave blank to use the production Environment value'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -58,7 +62,11 @@ jobs:
       # The *shared* apps/web Vercel project — step 5 adds every tenant's
       # custom domain to this one project, never a per-tenant project.
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
-      ADMIN_APP_BASE_URL: ${{ vars.ADMIN_APP_BASE_URL }}
+      # Overridable per-dispatch via the adminAppBaseUrl input (e.g. a local
+      # tunnel URL) for manual testing — real dispatches from apps/admin's
+      # dispatch-provisioning-workflow.ts never set this input, so they
+      # always fall back to the production Environment value unaffected.
+      ADMIN_APP_BASE_URL: ${{ inputs.adminAppBaseUrl || vars.ADMIN_APP_BASE_URL }}
       PLATFORM_DOMAIN: ${{ vars.PLATFORM_DOMAIN }}
       # Reuses the same variable/secret names `apps/admin`/`apps/web` already
       # use for the same values (not new var names) — see
