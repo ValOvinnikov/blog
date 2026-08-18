@@ -48,6 +48,7 @@ export async function createVercelProject(input: {
       body: JSON.stringify({
         name: input.name,
         rootDirectory: input.rootDirectory,
+        framework: 'sanity',
       }),
     },
   );
