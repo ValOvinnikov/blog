@@ -1,11 +1,16 @@
 import { safeAsync, type TResult } from './safe-async';
 
 describe('TResult', () => {
-  it('defaults the error type param to unknown, matching an explicit TResult<T, unknown>', () => {
-    const withDefault: TResult<number> = { ok: false, error: 'boom' };
-    const withExplicitUnknown: TResult<number, unknown> = withDefault;
+  it('defaults the error type param to unknown, not any', () => {
+    const result: TResult<number> = { ok: false, error: 'boom' };
 
-    expect(withExplicitUnknown).toEqual(withDefault);
+    if (!result.ok) {
+      // @ts-expect-error -- `error` is `unknown`, so a property access
+      // without narrowing must be rejected; `any` would allow this.
+      const length: number = result.error.length;
+
+      expect(length).toBe(4);
+    }
   });
 
   it('narrows the error field when a code union is supplied', () => {
