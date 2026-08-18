@@ -67,8 +67,18 @@ workflow** — mirroring `packages/ui`'s existing `blog-storybook` project
 (neither appears in the table above; a hosted Vercel deployment isn't a
 GitHub Actions workflow). A second Vercel project, rooted at the repo root
 (`vercel.json`, scoped via turbo to `storybook:build --filter=web`), builds
-and previews `apps/web`'s own stories on every PR — see
+and previews `apps/web`'s own stories — see
 [`docs/DEPLOY.md`](../DEPLOY.md)'s Storybook section for the setup.
+
+Both Storybook projects share one `ignoreCommand`
+(`scripts/vercel-ignore-affected.sh <package> <watched-paths…>`): a PR push
+builds a project only when turbo sees its package as **affected**, _or_ when
+one of its watched deploy-config paths changed — its own `vercel.json` and
+the shared ignore script itself. Watching the config files means a
+deploy-config change (which turbo can't see as "affecting" the package) still
+gets validated by a real build instead of being silently skipped; watching
+the script means a change to the skip logic self-verifies. Everything else
+skips, so an unrelated PR triggers neither Storybook deployment.
 
 One-time environment setup (datasets, tokens, Vercel projects, secrets,
 webhooks, CORS) is human-gated console work — see [`docs/DEPLOY.md`](../DEPLOY.md)
