@@ -88,6 +88,22 @@ describe('updateTenantDetailsAction', () => {
     });
   });
 
+  it('maps a provisioning-started outcome onto a form-level error, without a successful update', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: 'provisioning-started',
+    });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', validInput);
+
+    expect(result).toEqual({
+      ok: false,
+      error:
+        "This tenant's provisioning has already started; its details can no longer be edited.",
+    });
+  });
+
   it('returns the updated tenant on success', async () => {
     const tenant = makeTenant({ name: 'Acme' });
     updateTenantDetailsMock.mockResolvedValue({

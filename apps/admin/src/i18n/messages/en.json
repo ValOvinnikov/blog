@@ -263,7 +263,8 @@
       "GROWTH": "Growth"
     },
     "saveButton": "Save changes",
-    "savingButton": "Saving…"
+    "savingButton": "Saving…",
+    "provisioningStartedError": "This tenant's provisioning has already started; its details can no longer be edited."
   },
   "archivedTenantsToggle": {
     "ariaLabel": "Tenant visibility",

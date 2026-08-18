@@ -9,6 +9,7 @@ import { TENANT_PLAN, type TTenantPlan } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { sanitizeLogMessage } from '@blog/utils';
+import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 
 const updateTenantDetailsInputSchema = z.object({
@@ -74,14 +75,25 @@ export async function updateTenantDetailsAction(
       parsed.data,
     );
 
-    if (result.outcome === 'slug-taken') {
-      return {
-        ok: false,
-        fieldErrors: { slug: 'This slug is already in use.' },
-      };
+    switch (result.outcome) {
+      case 'updated':
+        return { ok: true, tenant: result.tenant };
+      case 'slug-taken':
+        return {
+          ok: false,
+          fieldErrors: { slug: 'This slug is already in use.' },
+        };
+      case 'provisioning-started': {
+        const t = await getTranslations('tenantDetailsPanel');
+        return { ok: false, error: t('provisioningStartedError') };
+      }
+      default: {
+        const unhandledOutcome: never = result;
+        throw new Error(
+          `updateTenantDetailsAction: unhandled outcome ${JSON.stringify(unhandledOutcome)}`,
+        );
+      }
     }
-
-    return { ok: true, tenant: result.tenant };
   } catch (error) {
     console.error(
       'Failed to update tenant details:',

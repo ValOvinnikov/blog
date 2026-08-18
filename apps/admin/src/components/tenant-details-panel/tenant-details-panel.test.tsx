@@ -129,5 +129,25 @@ describe(TenantDetailsPanel, () => {
       ).toBeVisible();
       expect(refreshMock).not.toHaveBeenCalled();
     });
+
+    it('shows the form-level provisioning-started error and does not refresh, without a successful save', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: false,
+        error:
+          "This tenant's provisioning has already started; its details can no longer be edited.",
+      });
+      const user = userEvent.setup();
+      const tenant = makeTenant();
+      render(<TenantDetailsPanel tenant={tenant} editable={true} />);
+
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(
+        await screen.findByText(
+          "This tenant's provisioning has already started; its details can no longer be edited.",
+        ),
+      ).toBeVisible();
+      expect(refreshMock).not.toHaveBeenCalled();
+    });
   });
 });
