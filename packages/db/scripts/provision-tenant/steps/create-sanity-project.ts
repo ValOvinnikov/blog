@@ -6,6 +6,8 @@ import {
   addSanityCorsOrigin,
   createSanityDataset,
   createSanityProject,
+  listSanityCorsOrigins,
+  listSanityDatasets,
 } from '../lib/sanity-management-client';
 
 const SANITY_DATASET = 'production';
@@ -17,9 +19,11 @@ export type TCreateSanityProjectResult = {
 
 /**
  * Step 1 — creates the tenant's own Sanity project, its `production`
- * dataset, and a CORS entry for the admin app's origin. Idempotent: skips
- * creation entirely once `tenants.sanityProjectId`/`sanityDataset` are
- * already set, returning the persisted values instead.
+ * dataset, and a CORS entry for the admin app's origin.
+ *
+ * The project id is persisted the moment it's minted, before the dataset/CORS
+ * calls: Sanity has no delete-project API to clean up an orphan, so a retry
+ * must be able to find a project it already created rather than re-minting one.
  *
  * Does NOT mint a token — see `steps/persist-sanity-token.ts` for why that's
  * step 4's job, not this one.
@@ -28,36 +32,46 @@ export async function createTenantSanityProject(
   tenant: TTenant,
   env: TProvisionEnv,
 ): Promise<TCreateSanityProjectResult> {
-  if (tenant.sanityProjectId && tenant.sanityDataset) {
-    return {
-      sanityProjectId: tenant.sanityProjectId,
-      sanityDataset: tenant.sanityDataset,
-    };
+  let projectId = tenant.sanityProjectId;
+
+  if (!projectId) {
+    const project = await createSanityProject({
+      token: env.sanityManagementToken,
+      displayName: tenant.name,
+      organizationId: env.sanityOrganizationId,
+    });
+    projectId = project.id;
+
+    await setTenantSanityProject(tenant.id, {
+      sanityProjectId: projectId,
+      sanityDataset: SANITY_DATASET,
+    });
   }
 
-  const project = await createSanityProject({
+  const datasets = await listSanityDatasets({
     token: env.sanityManagementToken,
-    displayName: tenant.name,
-    organizationId: env.sanityOrganizationId,
+    projectId,
   });
+  if (!datasets.some((dataset) => dataset.name === SANITY_DATASET)) {
+    await createSanityDataset({
+      token: env.sanityManagementToken,
+      projectId,
+      dataset: SANITY_DATASET,
+    });
+  }
 
-  await createSanityDataset({
+  const corsOrigins = await listSanityCorsOrigins({
     token: env.sanityManagementToken,
-    projectId: project.id,
-    dataset: SANITY_DATASET,
+    projectId,
   });
+  if (!corsOrigins.some((cors) => cors.origin === env.adminAppBaseUrl)) {
+    await addSanityCorsOrigin({
+      token: env.sanityManagementToken,
+      projectId,
+      origin: env.adminAppBaseUrl,
+      allowCredentials: true,
+    });
+  }
 
-  await addSanityCorsOrigin({
-    token: env.sanityManagementToken,
-    projectId: project.id,
-    origin: env.adminAppBaseUrl,
-    allowCredentials: true,
-  });
-
-  await setTenantSanityProject(tenant.id, {
-    sanityProjectId: project.id,
-    sanityDataset: SANITY_DATASET,
-  });
-
-  return { sanityProjectId: project.id, sanityDataset: SANITY_DATASET };
+  return { sanityProjectId: projectId, sanityDataset: SANITY_DATASET };
 }

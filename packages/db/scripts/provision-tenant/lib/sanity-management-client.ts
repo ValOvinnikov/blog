@@ -61,6 +61,18 @@ export async function createSanityDataset(input: {
   );
 }
 
+export type TSanityDataset = { name: string };
+
+export async function listSanityDatasets(input: {
+  token: string;
+  projectId: string;
+}): Promise<TSanityDataset[]> {
+  return sanityManagementRequest<TSanityDataset[]>(
+    `/projects/${input.projectId}/datasets`,
+    input.token,
+  );
+}
+
 export async function addSanityCorsOrigin(input: {
   token: string;
   projectId: string;
@@ -68,7 +80,7 @@ export async function addSanityCorsOrigin(input: {
   allowCredentials?: boolean;
 }): Promise<void> {
   await sanityManagementRequest(
-    `/projects/${input.projectId}/cors-origins`,
+    `/projects/${input.projectId}/cors`,
     input.token,
     {
       method: 'POST',
@@ -77,6 +89,18 @@ export async function addSanityCorsOrigin(input: {
         allowCredentials: input.allowCredentials ?? false,
       }),
     },
+  );
+}
+
+export type TSanityCorsOrigin = { id: string; origin: string };
+
+export async function listSanityCorsOrigins(input: {
+  token: string;
+  projectId: string;
+}): Promise<TSanityCorsOrigin[]> {
+  return sanityManagementRequest<TSanityCorsOrigin[]>(
+    `/projects/${input.projectId}/cors`,
+    input.token,
   );
 }
 
