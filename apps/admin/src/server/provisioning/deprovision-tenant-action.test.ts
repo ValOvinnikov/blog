@@ -1,17 +1,17 @@
 export {};
 
 const {
-  requireAdminMock,
+  requireSuperAdminMock,
   listTenantsByIdsMock,
   dispatchDeprovisioningWorkflowMock,
 } = vi.hoisted(() => ({
-  requireAdminMock: vi.fn(),
+  requireSuperAdminMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   dispatchDeprovisioningWorkflowMock: vi.fn(),
 }));
 
-vi.mock('@admin/server/auth/require-admin', () => ({
-  requireAdmin: requireAdminMock,
+vi.mock('@admin/server/auth/require-super-admin', () => ({
+  requireSuperAdmin: requireSuperAdminMock,
 }));
 
 vi.mock('@blog/db', () => ({
@@ -32,16 +32,19 @@ const tenant = {
 
 describe('deprovisionTenantAction', () => {
   beforeEach(() => {
-    requireAdminMock.mockReset();
-    requireAdminMock.mockResolvedValue({ id: 'admin-1' });
+    requireSuperAdminMock.mockReset();
+    requireSuperAdminMock.mockResolvedValue({
+      id: 'admin-1',
+      role: 'SUPERADMIN',
+    });
     listTenantsByIdsMock.mockReset();
     listTenantsByIdsMock.mockResolvedValue([tenant]);
     dispatchDeprovisioningWorkflowMock.mockReset();
     dispatchDeprovisioningWorkflowMock.mockResolvedValue(undefined);
   });
 
-  it('requires an admin session before dispatching', async () => {
-    requireAdminMock.mockImplementation(() => {
+  it('requires a super-admin session before dispatching', async () => {
+    requireSuperAdminMock.mockImplementation(() => {
       throw new Error('NEXT_REDIRECT');
     });
     const { deprovisionTenantAction } =
