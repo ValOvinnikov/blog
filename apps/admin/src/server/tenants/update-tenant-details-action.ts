@@ -1,6 +1,7 @@
 'use server';
 
 import { requireAdmin } from '@admin/server/auth/require-admin';
+import { logger } from '@admin/utils/logger/logger';
 import {
   DOMAIN_PATTERN,
   SLUG_PATTERN,
@@ -8,7 +9,6 @@ import {
 import { TENANT_PLAN, type TTenantPlan } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { sanitizeLogMessage } from '@blog/utils';
 import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 
@@ -95,10 +95,7 @@ export async function updateTenantDetailsAction(
       }
     }
   } catch (error) {
-    console.error(
-      'Failed to update tenant details:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('tenants.update_details_failed', { tenantId, error });
     return { ok: false, error: "Couldn't save tenant details — try again." };
   }
 }
