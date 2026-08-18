@@ -118,9 +118,16 @@ contracts:
     as one verified operation, so creation and placement can never be
     decoupled into a forgettable second step. Re-queries every status write
     it makes to catch `gh project item-edit`'s known silent-failure mode,
-    checks the active `gh` token carries the `project` scope before writing
-    anything (board writes fail outright without it — not part of GitHub's
-    default OAuth scopes), and reports destructive-looking moves (e.g.
+    runs a three-step preflight before any board write — is `gh` installed,
+    is the GraphQL API reachable, does the token carry the `project` scope —
+    and reports the three outcomes distinctly rather than collapsing them.
+    A web/remote session has no `gh` binary and serves only a pinned set of
+    PR-review GraphQL operations, so Projects v2 (GraphQL-only, no REST
+    equivalent) is unreachable there whatever the token carries; that is
+    reported as outstanding board work rather than misdiagnosed as a missing
+    scope, and the MCP-backed half of the dispatch — issue creation, labels,
+    milestones, sub-issue links — still completes. It also reports
+    destructive-looking moves (e.g.
     reopening a wrongly-closed issue) for the orchestrator instead of
     applying them. Dispatched to create any new issue, when starting work on
     an issue (`open-pull-request` Gate 0 — sets the issue itself to In

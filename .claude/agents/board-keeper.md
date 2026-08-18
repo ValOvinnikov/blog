@@ -66,31 +66,66 @@ issue list --json headRefName,body,labels,...` queries in Step 2 (the
   `list_pull_requests`/`list_issues` response shape — don't swap without
   verifying the fields first).
 
-## Prerequisite — `gh` auth scope
+## Prerequisite — environment preflight, then `gh` auth scope
 
 Every board write in this file (`gh project item-edit`, `gh project
 item-add`, or the underlying `updateProjectV2ItemFieldValue`/`addSubIssue`
-GraphQL mutations) requires the active `gh` token to carry the `project`
-scope. GitHub's default OAuth scopes for `gh auth login` do **not** include
-it — a token with only the defaults (typically `repo`, `read:org`, `gist`,
-`admin:public_key`) fails every Projects v2 call with `INSUFFICIENT_SCOPES`
-/ "your authentication token is missing required scopes [read:project]".
-This is not a flaky API and not something to retry around — it's a fixed,
-diagnosable precondition.
+GraphQL mutations) goes through `gh` and the GraphQL API. Three separate
+things can block that, and **they are not interchangeable** — run the checks
+in order and report the one that actually fired. Reporting the wrong one
+sends the orchestrator after a fix that cannot work.
 
-Check it before doing anything else:
+### 1. Is `gh` installed at all?
+
+```
+command -v gh >/dev/null || echo "NO_GH"
+```
+
+Claude Code **web/remote sessions ship without the `gh` binary.** If this
+prints `NO_GH`, do not run any other `gh` command and do not interpret their
+output — `gh auth status` on a missing binary emits "command not found",
+which the step-3 `grep` below reads as a missing scope. That specific
+misreading is why this check exists.
+
+### 2. Is the GraphQL API reachable?
+
+```
+gh api graphql -f query='query{viewer{login}}' >/dev/null 2>&1 || echo "NO_GRAPHQL"
+```
+
+Web/remote sessions serve only a pinned set of PR-review GraphQL operations
+and reject the rest with HTTP 403 ("This GraphQL query is not enabled for
+this session"). **Projects v2 is GraphQL-only — GitHub exposes no REST
+equivalent** — so `NO_GRAPHQL` means board work is impossible in this
+session whatever the token carries. Installing `gh` does not help, and
+neither does any scope change.
+
+### 3. Does the token carry the `project` scope?
+
+Only meaningful once 1 and 2 both pass.
 
 ```
 gh auth status 2>&1 | grep -q "'project'" && echo OK || echo MISSING
 ```
 
-If it prints `MISSING`, **stop immediately** — don't attempt any board
-write, don't try to fix it yourself. The fix (`gh auth refresh -h github.com
--s project`) is an interactive device-code flow that needs a human in a
-browser; a non-interactive dispatch like this one can't drive it. Report the
-exact fix command to the orchestrator in Step 5 and stop — a reconciliation
-attempted on a scope-broken token produces incomplete, misleading results,
-not a partial success.
+`gh auth status` cannot introspect app-style tokens — it reports "The token
+in GH_TOKEN is invalid" even where `gh api user` succeeds — so treat
+`MISSING` as authoritative only when step 2 passed.
+
+### What each outcome means
+
+| Outcome | Report | Fix |
+| --- | --- | --- |
+| `NO_GH` / `NO_GRAPHQL` | Board writes are **not possible in this session**. List the issue numbers still needing board work. | Run the board work from a local session with the human's own credentials. There is no in-session fix — do not suggest one. |
+| `MISSING` | The token lacks `project` scope. | `gh auth refresh -h github.com -s project` — interactive device-code flow, needs a human in a browser. |
+
+**Stop before any board write in all three cases — but do not stop the whole
+dispatch.** Everything here that does not touch Projects v2 — creating
+issues, setting labels and milestones, linking sub-issues, all via the
+`mcp__github__*` tools — is unaffected by every one of these failures,
+because the MCP server authenticates independently of `gh` and uses REST.
+Finish that work, verify it, and report the board portion as outstanding. A
+dispatch that cannot reach the board is not a dispatch that can do nothing.
 
 ## Scratch files — namespace them, never a fixed path
 
