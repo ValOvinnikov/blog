@@ -13,7 +13,9 @@ const MAX_USER_AGENT_LENGTH = 300;
 // that protects the endpoint from an error-boundary render loop hammering
 // it. Module-scoped state, so it resets on every full page load/navigation
 // and is shared across every `reportClientError` caller on the page.
-const MAX_REPORTS_PER_PAGE_LOAD = 5;
+// Exported so the test suite can pin the exact cap instead of duplicating
+// it as a magic number.
+export const MAX_REPORTS_PER_PAGE_LOAD = 5;
 
 const seenFingerprints = new Set<string>();
 let reportCount = 0;

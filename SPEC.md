@@ -351,6 +351,22 @@ unprefixed tags), which is what keeps every not-yet-migrated `service.*`
 loader compiling and working unchanged while the migration proceeds
 loader-by-loader.
 
+Client-side error capture is a self-hosted route, not a third-party SDK
+(`web`'s Lighthouse performance budget rules out shipping an SDK on every
+page view): `app/error.tsx`/`app/global-error.tsx` report render failures on
+mount, and the two existing explicit client catches report alongside their
+`logger.*` calls, all via `@web/utils/report-client-error`
+(`navigator.sendBeacon`, falling back to `fetch(..., { keepalive: true })`;
+deduped by fingerprint and circuit-broken per page load) to
+`POST /api/client-log` — the app's first unauthenticated public write
+endpoint. That route enforces a `.strict()` Zod schema with a fixed field
+set (unknown keys rejected), a payload-size cap enforced on the request
+stream itself (not just the caller-supplied `Content-Length` header), and an
+in-memory rate limiter — the repo's only rate limiter today, and explicitly
+**per serverless instance**, not a cross-instance guarantee (a client whose
+requests land on different Vercel instances gets a fresh counter on each
+one). `window.onerror`/`unhandledrejection` are deliberately out of scope.
+
 ## 10. SEO & accessibility
 
 Per-route `generateMetadata` with a `service`-owned SEO fallback ladder

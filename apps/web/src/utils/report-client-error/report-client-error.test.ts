@@ -89,15 +89,15 @@ describe('reportClientError', () => {
     expect(sendBeacon).toHaveBeenCalledTimes(2);
   });
 
-  it('hard-stops after the circuit breaker limit is reached', async () => {
-    const { reportClientError } = await freshModule();
+  it('hard-stops at exactly MAX_REPORTS_PER_PAGE_LOAD reports, even with distinct fingerprints', async () => {
+    const { reportClientError, MAX_REPORTS_PER_PAGE_LOAD } =
+      await freshModule();
 
-    for (let i = 0; i < 10; i += 1) {
+    for (let i = 0; i < MAX_REPORTS_PER_PAGE_LOAD + 5; i += 1) {
       reportClientError('copy_to_clipboard.write_failed', new Error(`e${i}`));
     }
 
-    expect(sendBeacon.mock.calls.length).toBeLessThan(10);
-    expect(sendBeacon.mock.calls.length).toBeGreaterThan(0);
+    expect(sendBeacon).toHaveBeenCalledTimes(MAX_REPORTS_PER_PAGE_LOAD);
   });
 
   it('includes the digest when passed through extra', async () => {

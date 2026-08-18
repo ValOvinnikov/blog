@@ -31,6 +31,26 @@ function postRequest(
   });
 }
 
+// Simulates a genuine chunked-transfer request: a `ReadableStream` body has
+// no synchronously-known length, so unlike `postRequest`'s plain string
+// body, the runtime never populates a `content-length` header for it at
+// all — this is the shape the pre-read byte-cap enforcement exists for.
+function postStreamRequest(byteLength: number) {
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(new Uint8Array(byteLength).fill(97));
+      controller.close();
+    },
+  });
+
+  return new Request('https://example.com/api/client-log', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: stream,
+    duplex: 'half',
+  } as RequestInit);
+}
+
 async function freshRoute() {
   vi.resetModules();
   return import('./route');
@@ -96,6 +116,39 @@ describe('POST /api/client-log', () => {
 
     expect(response.status).toBe(413);
     expect(loggerErrorMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects an oversized streamed body with no Content-Length at all, without buffering it first', async () => {
+    const { POST } = await freshRoute();
+    const request = postStreamRequest(9 * 1024);
+    expect(request.headers.get('content-length')).toBeNull();
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(413);
+    expect(loggerErrorMock).not.toHaveBeenCalled();
+  });
+
+  it('accepts a streamed body with no Content-Length that is within the payload cap', async () => {
+    const { POST } = await freshRoute();
+    const body = JSON.stringify(validPayload);
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode(body));
+        controller.close();
+      },
+    });
+    const request = new Request('https://example.com/api/client-log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: stream,
+      duplex: 'half',
+    } as RequestInit);
+    expect(request.headers.get('content-length')).toBeNull();
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(204);
   });
 
   it('strips control characters from the message before logging, so a payload cannot forge a log entry', async () => {
