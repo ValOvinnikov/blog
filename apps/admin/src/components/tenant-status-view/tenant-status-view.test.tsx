@@ -5,8 +5,8 @@ import { TenantStatusView } from './tenant-status-view';
 
 const render = renderWithIntl;
 
-// Both Server Action modules these child components import transitively
-// pull in `requireAdmin` → Auth.js — mocked here purely to keep this render
+// Every Server Action module these child components import transitively
+// pulls in `requireAdmin` → Auth.js — mocked here purely to keep this render
 // test from loading that chain, same as `provisioning-status-view.test.tsx`
 // and `deprovision-tenant-control.test.tsx` do for their own renders.
 vi.mock('@admin/server/provisioning/retry-provisioning-step-action', () => ({
@@ -16,6 +16,13 @@ vi.mock('@admin/server/provisioning/retry-provisioning-step-action', () => ({
 vi.mock('@admin/server/provisioning/deprovision-tenant-action', () => ({
   deprovisionTenantAction: vi.fn(),
 }));
+
+vi.mock(
+  '@admin/server/provisioning/get-tenant-provisioning-status-action',
+  () => ({
+    getTenantProvisioningStatusAction: vi.fn(),
+  }),
+);
 
 describe(TenantStatusView, () => {
   it('renders both provisioning progress and the deprovisioning control', () => {
