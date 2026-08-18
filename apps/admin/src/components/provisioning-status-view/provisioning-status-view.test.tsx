@@ -249,9 +249,12 @@ describe(ProvisioningStatusView, () => {
     );
 
     expect(screen.getByText('Tenant details')).toBeVisible();
-    expect(screen.getByText('acme')).toBeVisible();
+
+    const slugInput = screen.getByRole('textbox', { name: 'Slug' });
+    expect(slugInput).toHaveValue('acme');
+    expect(slugInput).toHaveAttribute('readonly');
     expect(
-      screen.queryByRole('textbox', { name: 'Slug' }),
+      screen.queryByRole('button', { name: 'Save changes' }),
     ).not.toBeInTheDocument();
   });
 

@@ -30,6 +30,17 @@ type TFormValues = {
   locale: string;
 };
 
+type TTextFieldKey = 'name' | 'slug' | 'primaryDomain' | 'locale';
+
+const TEXT_FIELD_ID: Record<TTextFieldKey, string> = {
+  name: 'tenant-detail-name',
+  slug: 'tenant-detail-slug',
+  primaryDomain: 'tenant-detail-domain',
+  locale: 'tenant-detail-locale',
+};
+
+const PLAN_LABEL_ID = 'tenant-detail-plan-label';
+
 function valuesFromTenant(tenant: TTenant): TFormValues {
   return {
     name: tenant.name,
@@ -41,10 +52,12 @@ function valuesFromTenant(tenant: TTenant): TFormValues {
 }
 
 /**
- * The tenant row's editable summary — inputs and a save control while
+ * The tenant row's summary — one render path for both states. While
  * provisioning hasn't started (`editable`, the same `allIdle` condition the
- * "Start provisioning" button uses), otherwise the same values rendered as
- * static content once a run is under way or finished.
+ * "Start provisioning" button uses) every field is a live control; once
+ * anything has progressed past idle, the text fields go `readOnly` (kept
+ * focusable and full-contrast, unlike `disabled`) and the plan field — the
+ * one control HTML has no read-only state for — swaps to plain text.
  */
 export function TenantDetailsPanel({
   tenant,
@@ -69,24 +82,14 @@ export function TenantDetailsPanel({
     setValues(valuesFromTenant(tenant));
   }
 
-  const {
-    root,
-    list,
-    row,
-    label,
-    value,
-    fields,
-    field,
-    fieldLabel,
-    fieldError,
-    actions,
-  } = tenantDetailsPanelVariants();
+  const { root, fields, field, fieldLabel, fieldValue, fieldError, actions } =
+    tenantDetailsPanelVariants();
 
   function updateField<K extends keyof TFormValues>(
     key: K,
-    fieldValue: TFormValues[K],
+    nextValue: TFormValues[K],
   ) {
-    setValues((prev) => ({ ...prev, [key]: fieldValue }));
+    setValues((prev) => ({ ...prev, [key]: nextValue }));
   }
 
   function handleSave() {
@@ -109,35 +112,12 @@ export function TenantDetailsPanel({
     { value: TENANT_PLAN.GROWTH, label: t('planOptionGrowth') },
   ];
 
-  if (!editable) {
-    const rows: { key: string; label: string; value: string }[] = [
-      { key: 'name', label: t('nameLabel'), value: tenant.name },
-      { key: 'slug', label: t('slugLabel'), value: tenant.slug },
-      { key: 'domain', label: t('domainLabel'), value: tenant.primaryDomain },
-      {
-        key: 'plan',
-        label: t('planLabel'),
-        value: t(`planValue.${tenant.plan}`),
-      },
-      { key: 'locale', label: t('localeLabel'), value: tenant.locale },
-    ];
-
-    return (
-      <div className={root()}>
-        <Heading level={2} size={Size.XS}>
-          {t('heading')}
-        </Heading>
-        <dl className={list()}>
-          {rows.map((entry) => (
-            <div className={row()} key={entry.key}>
-              <dt className={label()}>{entry.label}</dt>
-              <dd className={value()}>{entry.value}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    );
-  }
+  const textFields: { key: TTextFieldKey; label: string }[] = [
+    { key: 'name', label: t('nameLabel') },
+    { key: 'slug', label: t('slugLabel') },
+    { key: 'primaryDomain', label: t('domainLabel') },
+    { key: 'locale', label: t('localeLabel') },
+  ];
 
   return (
     <div className={root()}>
@@ -145,111 +125,65 @@ export function TenantDetailsPanel({
         {t('heading')}
       </Heading>
 
-      {formError && <Alert type={ALERT_TYPE.ERROR} message={formError} />}
+      {editable && formError && (
+        <Alert type={ALERT_TYPE.ERROR} message={formError} />
+      )}
 
       <div className={fields()}>
-        <div className={field()}>
-          <label className={fieldLabel()} htmlFor="tenant-detail-name">
-            {t('nameLabel')}
-          </label>
-          <TextInput
-            id="tenant-detail-name"
-            ariaLabel={t('nameLabel')}
-            value={values.name}
-            onChange={(fieldValue) => updateField('name', fieldValue)}
-            invalid={Boolean(fieldErrors.name)}
-            aria-describedby={
-              fieldErrors.name ? 'tenant-detail-name-error' : undefined
-            }
-          />
-          {fieldErrors.name && (
-            <span id="tenant-detail-name-error" className={fieldError()}>
-              {fieldErrors.name}
-            </span>
-          )}
-        </div>
+        {textFields.map(({ key, label: labelText }) => {
+          const id = TEXT_FIELD_ID[key];
+          const errorId = `${id}-error`;
+          const errorMessage = editable ? fieldErrors[key] : undefined;
 
-        <div className={field()}>
-          <label className={fieldLabel()} htmlFor="tenant-detail-slug">
-            {t('slugLabel')}
-          </label>
-          <TextInput
-            id="tenant-detail-slug"
-            ariaLabel={t('slugLabel')}
-            value={values.slug}
-            onChange={(fieldValue) => updateField('slug', fieldValue)}
-            invalid={Boolean(fieldErrors.slug)}
-            aria-describedby={
-              fieldErrors.slug ? 'tenant-detail-slug-error' : undefined
-            }
-          />
-          {fieldErrors.slug && (
-            <span id="tenant-detail-slug-error" className={fieldError()}>
-              {fieldErrors.slug}
-            </span>
-          )}
-        </div>
+          return (
+            <div className={field({ locked: !editable })} key={key}>
+              <label className={fieldLabel()} htmlFor={id}>
+                {labelText}
+              </label>
+              <TextInput
+                id={id}
+                ariaLabel={labelText}
+                value={values[key]}
+                onChange={(nextValue) => updateField(key, nextValue)}
+                readOnly={!editable}
+                invalid={Boolean(errorMessage)}
+                aria-describedby={errorMessage ? errorId : undefined}
+              />
+              {errorMessage && (
+                <span id={errorId} className={fieldError()}>
+                  {errorMessage}
+                </span>
+              )}
+            </div>
+          );
+        })}
 
-        <div className={field()}>
-          <label className={fieldLabel()} htmlFor="tenant-detail-domain">
-            {t('domainLabel')}
-          </label>
-          <TextInput
-            id="tenant-detail-domain"
-            ariaLabel={t('domainLabel')}
-            value={values.primaryDomain}
-            onChange={(fieldValue) => updateField('primaryDomain', fieldValue)}
-            invalid={Boolean(fieldErrors.primaryDomain)}
-            aria-describedby={
-              fieldErrors.primaryDomain
-                ? 'tenant-detail-domain-error'
-                : undefined
-            }
-          />
-          {fieldErrors.primaryDomain && (
-            <span id="tenant-detail-domain-error" className={fieldError()}>
-              {fieldErrors.primaryDomain}
-            </span>
-          )}
-        </div>
-
-        <div className={field()}>
-          <span className={fieldLabel()}>{t('planLabel')}</span>
-          <SegmentedControl<TTenantPlan>
-            ariaLabel={t('planLabel')}
-            options={planOptions}
-            value={values.plan}
-            onChange={(plan) => updateField('plan', plan)}
-          />
-        </div>
-
-        <div className={field()}>
-          <label className={fieldLabel()} htmlFor="tenant-detail-locale">
-            {t('localeLabel')}
-          </label>
-          <TextInput
-            id="tenant-detail-locale"
-            ariaLabel={t('localeLabel')}
-            value={values.locale}
-            onChange={(fieldValue) => updateField('locale', fieldValue)}
-            invalid={Boolean(fieldErrors.locale)}
-            aria-describedby={
-              fieldErrors.locale ? 'tenant-detail-locale-error' : undefined
-            }
-          />
-          {fieldErrors.locale && (
-            <span id="tenant-detail-locale-error" className={fieldError()}>
-              {fieldErrors.locale}
+        <div className={field({ locked: !editable })}>
+          <span className={fieldLabel()} id={PLAN_LABEL_ID}>
+            {t('planLabel')}
+          </span>
+          {editable ? (
+            <SegmentedControl<TTenantPlan>
+              ariaLabel={t('planLabel')}
+              options={planOptions}
+              value={values.plan}
+              onChange={(plan) => updateField('plan', plan)}
+            />
+          ) : (
+            <span className={fieldValue()} aria-labelledby={PLAN_LABEL_ID}>
+              {t(`planValue.${values.plan}`)}
             </span>
           )}
         </div>
       </div>
 
-      <div className={actions()}>
-        <Button type="button" onClick={handleSave} disabled={isPending}>
-          {isPending ? t('savingButton') : t('saveButton')}
-        </Button>
-      </div>
+      {editable && (
+        <div className={actions()}>
+          <Button type="button" onClick={handleSave} disabled={isPending}>
+            {isPending ? t('savingButton') : t('saveButton')}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
