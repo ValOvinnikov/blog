@@ -11,7 +11,13 @@ export function sanitizeLogMessage(value: unknown): string {
   const raw = value instanceof Error ? value.message : String(value);
 
   // Control-character range is intentional: CodeQL's log-injection sanitizer
-  // only recognizes this literal regex idiom, not a per-character loop.
-  // eslint-disable-next-line no-control-regex
-  return raw.replace(/[\x00-\x1f\x7f]/g, ' ');
+  // only recognizes this literal regex idiom, not a per-character loop. Keep
+  // this call as-is and chain further sanitization as additional `.replace`
+  // calls rather than folding them into this character class.
+  return (
+    raw
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\x00-\x1f\x7f]/g, ' ')
+      .replace(/[\u2028\u2029]/g, ' ')
+  ); // line/paragraph separators: unmatched above, unescaped by JSON.stringify
 }
