@@ -1,34 +1,120 @@
-import { Size } from '@blog/config';
+'use client';
+
+import {
+  updateTenantDetailsAction,
+  type TUpdateTenantDetailsFieldErrors,
+} from '@admin/server/tenants/update-tenant-details-action';
+import { ALERT_TYPE, Size, TENANT_PLAN, type TTenantPlan } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { Alert } from '@blog/ui/atoms/alert';
+import { Button } from '@blog/ui/atoms/button';
 import { Heading } from '@blog/ui/atoms/heading';
+import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
+import { TextInput } from '@blog/ui/atoms/text-input';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useState, useTransition } from 'react';
 
 import { tenantDetailsPanelVariants } from './tenant-details-panel-variants';
 
 export type TTenantDetailsPanelProps = {
   tenant: TTenant;
+  editable: boolean;
 };
 
+type TFormValues = {
+  name: string;
+  slug: string;
+  primaryDomain: string;
+  plan: TTenantPlan;
+  locale: string;
+};
+
+type TTextFieldKey = 'name' | 'slug' | 'primaryDomain' | 'locale';
+
+const TEXT_FIELD_ID: Record<TTextFieldKey, string> = {
+  name: 'tenant-detail-name',
+  slug: 'tenant-detail-slug',
+  primaryDomain: 'tenant-detail-domain',
+  locale: 'tenant-detail-locale',
+};
+
+const PLAN_FIELD_ID = 'tenant-detail-plan';
+
+function valuesFromTenant(tenant: TTenant): TFormValues {
+  return {
+    name: tenant.name,
+    slug: tenant.slug,
+    primaryDomain: tenant.primaryDomain,
+    plan: tenant.plan,
+    locale: tenant.locale,
+  };
+}
+
 /**
- * Read-only summary of the tenant row the operator already created — editing
- * only ever happens on the separate add-tenant page, so this panel has no
- * inputs or controls, just the values as provisioning found them.
+ * The tenant row's summary — one render path for both states. Locked
+ * fields go `readOnly` rather than `disabled`, since a disabled field
+ * drops out of the tab order and dims exactly the values an operator
+ * most wants to read and copy.
  */
-export function TenantDetailsPanel({ tenant }: TTenantDetailsPanelProps) {
+export function TenantDetailsPanel({
+  tenant,
+  editable,
+}: TTenantDetailsPanelProps) {
   const t = useTranslations('tenantDetailsPanel');
+  const router = useRouter();
+  const [renderedTenant, setRenderedTenant] = useState(tenant);
+  const [values, setValues] = useState<TFormValues>(() =>
+    valuesFromTenant(tenant),
+  );
+  const [fieldErrors, setFieldErrors] =
+    useState<TUpdateTenantDetailsFieldErrors>({});
+  const [formError, setFormError] = useState<string | undefined>(undefined);
+  const [isPending, startTransition] = useTransition();
 
-  const { root, list, row, label, value } = tenantDetailsPanelVariants();
+  // A fresh `tenant` prop (a successful save's own `router.refresh()`)
+  // should replace whatever the form last held — adjusted during render,
+  // per React's guidance for state derived from props.
+  if (tenant !== renderedTenant) {
+    setRenderedTenant(tenant);
+    setValues(valuesFromTenant(tenant));
+  }
 
-  const rows: { key: string; label: string; value: string }[] = [
-    { key: 'name', label: t('nameLabel'), value: tenant.name },
-    { key: 'slug', label: t('slugLabel'), value: tenant.slug },
-    { key: 'domain', label: t('domainLabel'), value: tenant.primaryDomain },
-    {
-      key: 'plan',
-      label: t('planLabel'),
-      value: t(`planValue.${tenant.plan}`),
-    },
-    { key: 'locale', label: t('localeLabel'), value: tenant.locale },
+  const { root, fields, field, fieldLabel, fieldError, actions, lockedInput } =
+    tenantDetailsPanelVariants();
+
+  function updateField<K extends keyof TFormValues>(
+    key: K,
+    nextValue: TFormValues[K],
+  ) {
+    setValues((prev) => ({ ...prev, [key]: nextValue }));
+  }
+
+  function handleSave() {
+    setFormError(undefined);
+    setFieldErrors({});
+
+    startTransition(async () => {
+      const result = await updateTenantDetailsAction(tenant.id, values);
+      if (!result.ok) {
+        setFieldErrors(result.fieldErrors ?? {});
+        setFormError(result.error);
+        return;
+      }
+      router.refresh();
+    });
+  }
+
+  const planOptions = [
+    { value: TENANT_PLAN.FREE, label: t('planOptionFree') },
+    { value: TENANT_PLAN.GROWTH, label: t('planOptionGrowth') },
+  ];
+
+  const textFields: { key: TTextFieldKey; label: string }[] = [
+    { key: 'name', label: t('nameLabel') },
+    { key: 'slug', label: t('slugLabel') },
+    { key: 'primaryDomain', label: t('domainLabel') },
+    { key: 'locale', label: t('localeLabel') },
   ];
 
   return (
@@ -36,14 +122,72 @@ export function TenantDetailsPanel({ tenant }: TTenantDetailsPanelProps) {
       <Heading level={2} size={Size.XS}>
         {t('heading')}
       </Heading>
-      <dl className={list()}>
-        {rows.map((entry) => (
-          <div className={row()} key={entry.key}>
-            <dt className={label()}>{entry.label}</dt>
-            <dd className={value()}>{entry.value}</dd>
-          </div>
-        ))}
-      </dl>
+
+      {editable && formError && (
+        <Alert type={ALERT_TYPE.ERROR} message={formError} />
+      )}
+
+      <div className={fields()}>
+        {textFields.map(({ key, label: labelText }) => {
+          const id = TEXT_FIELD_ID[key];
+          const errorId = `${id}-error`;
+          const errorMessage = editable ? fieldErrors[key] : undefined;
+
+          return (
+            <div className={field()} key={key}>
+              <label className={fieldLabel()} htmlFor={id}>
+                {labelText}
+              </label>
+              <TextInput
+                id={id}
+                ariaLabel={labelText}
+                value={values[key]}
+                onChange={(nextValue) => updateField(key, nextValue)}
+                readOnly={!editable}
+                invalid={Boolean(errorMessage)}
+                aria-describedby={errorMessage ? errorId : undefined}
+                className={lockedInput({ locked: !editable })}
+              />
+              {errorMessage && (
+                <span id={errorId} className={fieldError()}>
+                  {errorMessage}
+                </span>
+              )}
+            </div>
+          );
+        })}
+
+        <div className={field()}>
+          <label className={fieldLabel()} htmlFor={PLAN_FIELD_ID}>
+            {t('planLabel')}
+          </label>
+          {editable ? (
+            <SegmentedControl<TTenantPlan>
+              ariaLabel={t('planLabel')}
+              options={planOptions}
+              value={values.plan}
+              onChange={(plan) => updateField('plan', plan)}
+            />
+          ) : (
+            <TextInput
+              id={PLAN_FIELD_ID}
+              ariaLabel={t('planLabel')}
+              value={t(`planValue.${values.plan}`)}
+              onChange={() => undefined}
+              readOnly={true}
+              className={lockedInput({ locked: true })}
+            />
+          )}
+        </div>
+      </div>
+
+      {editable && (
+        <div className={actions()}>
+          <Button type="button" onClick={handleSave} disabled={isPending}>
+            {isPending ? t('savingButton') : t('saveButton')}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

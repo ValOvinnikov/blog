@@ -4,18 +4,12 @@ import { routing } from '@admin/i18n/routing';
 import { requireAdmin } from '@admin/server/auth/require-admin';
 import { dispatchProvisioningWorkflow } from '@admin/server/provisioning/dispatch-provisioning-workflow';
 import { logger } from '@admin/utils/logger/logger';
+import { DOMAIN_PATTERN, SLUG_PATTERN } from '@admin/utils/path/path';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/config';
 import { queries } from '@blog/db';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-
-// Studio-hostname slug only (`studio-<slug>.valstack.dev`) — the platform
-// has no public subdomain scheme (custom domains only), so this never
-// becomes part of the tenant's own site address.
-const SLUG_PATTERN = /^[a-z0-9-]+$/;
-const DOMAIN_PATTERN =
-  /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/;
 
 const createTenantInputSchema = z.object({
   name: z.string().trim().min(1, 'Enter a tenant name.'),
