@@ -39,6 +39,7 @@ export async function createVercelProject(input: {
   teamId: string | undefined;
   name: string;
   rootDirectory: string;
+  gitRepository: string;
 }): Promise<TVercelProject> {
   return vercelRequest<TVercelProject>(
     withTeamId('/v11/projects', input.teamId),
@@ -49,6 +50,7 @@ export async function createVercelProject(input: {
         name: input.name,
         rootDirectory: input.rootDirectory,
         framework: 'sanity',
+        gitRepository: { repo: input.gitRepository, type: 'github' },
       }),
     },
   );

@@ -16,7 +16,7 @@ afterEach(() => {
 });
 
 describe(createVercelProject, () => {
-  it('POSTs to /v11/projects with name + rootDirectory + framework', async () => {
+  it('POSTs to /v11/projects with name + rootDirectory + framework + gitRepository', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ id: 'prj_1', name: 'studio-acme' }), {
         status: 200,
@@ -28,6 +28,7 @@ describe(createVercelProject, () => {
       teamId: undefined,
       name: 'studio-acme',
       rootDirectory: 'apps/cms',
+      gitRepository: 'acme/blog',
     });
 
     expect(result).toEqual({ id: 'prj_1', name: 'studio-acme' });
@@ -37,6 +38,7 @@ describe(createVercelProject, () => {
       name: 'studio-acme',
       rootDirectory: 'apps/cms',
       framework: 'sanity',
+      gitRepository: { repo: 'acme/blog', type: 'github' },
     });
   });
 
@@ -50,6 +52,7 @@ describe(createVercelProject, () => {
       teamId: 'team_1',
       name: 'studio-acme',
       rootDirectory: 'apps/cms',
+      gitRepository: 'acme/blog',
     });
 
     const [url] = fetchMock.mock.calls[0] as [string];

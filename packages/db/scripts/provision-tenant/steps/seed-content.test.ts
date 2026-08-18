@@ -26,6 +26,7 @@ const env: TProvisionEnv = {
   tenantSanityDataset: 'test-dataset',
   webAppBaseUrl: 'https://example.com',
   revalidateSecret: 'revalidate-shh',
+  githubRepository: 'acme/blog',
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {

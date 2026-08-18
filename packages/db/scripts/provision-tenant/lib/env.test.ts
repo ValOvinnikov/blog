@@ -12,6 +12,7 @@ const REQUIRED_ENV: Record<string, string> = {
   TENANT_SANITY_DATASET: 'test-dataset',
   WEB_APP_URL: 'https://example.com',
   SANITY_REVALIDATE_SECRET: 'revalidate-shh',
+  GITHUB_REPOSITORY: 'acme/blog',
 };
 
 const originalEnv: Record<string, string | undefined> = {};
@@ -55,6 +56,7 @@ describe(loadProvisionEnv, () => {
       tenantSanityDataset: 'test-dataset',
       webAppBaseUrl: 'https://example.com',
       revalidateSecret: 'revalidate-shh',
+      githubRepository: 'acme/blog',
     });
   });
 

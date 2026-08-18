@@ -40,6 +40,9 @@ export type TProvisionEnv = {
   // the value each tenant's webhook is created with, and the value that
   // route verifies incoming requests against.
   revalidateSecret: string;
+  // `owner/repo` this Studio's Vercel project connects to. GitHub Actions
+  // provides this automatically — no secret to configure.
+  githubRepository: string;
 };
 
 const DEFAULT_VERCEL_CLI_VERSION = '48.0.0';
@@ -60,5 +63,6 @@ export function loadProvisionEnv(): TProvisionEnv {
     tenantSanityDataset: requireEnv('TENANT_SANITY_DATASET'),
     webAppBaseUrl: requireEnv('WEB_APP_URL'),
     revalidateSecret: requireEnv('SANITY_REVALIDATE_SECRET'),
+    githubRepository: requireEnv('GITHUB_REPOSITORY'),
   };
 }

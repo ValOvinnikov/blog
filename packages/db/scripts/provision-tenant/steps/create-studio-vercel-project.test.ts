@@ -44,6 +44,7 @@ const env: TProvisionEnv = {
   tenantSanityDataset: 'test-dataset',
   webAppBaseUrl: 'https://example.com',
   revalidateSecret: 'revalidate-shh',
+  githubRepository: 'acme/blog',
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
@@ -117,6 +118,7 @@ describe(createTenantStudio, () => {
       teamId: undefined,
       name: 'studio-acme',
       rootDirectory: 'apps/cms',
+      gitRepository: 'acme/blog',
     });
     expect(setTenantStudioVercelProjectMock).toHaveBeenCalledWith(
       'tenant-1',
