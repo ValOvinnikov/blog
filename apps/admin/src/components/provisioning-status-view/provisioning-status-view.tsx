@@ -1,23 +1,30 @@
 'use client';
 
 import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
+import { getTenantProvisioningStatusAction } from '@admin/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@admin/server/provisioning/retry-provisioning-step-action';
 import {
   Size,
+  TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
+  type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
 } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
+import type {
+  TTenant,
+  TTenantProvisioningSteps,
+} from '@blog/db/schema/tenants';
 import { Button } from '@blog/ui/atoms/button';
 import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
+import { Spinner } from '@blog/ui/atoms/spinner';
 import { StatusBadge } from '@blog/ui/atoms/status-badge';
 import { Text } from '@blog/ui/atoms/text';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
 
@@ -33,6 +40,17 @@ const STEP_TONE: Record<
   RUNNING: 'warn',
   DONE: 'ok',
 };
+
+const POLL_INTERVAL_MS = 4000;
+
+function isTerminalProvisioningStatus(
+  status: TTenantProvisioningStatus | null,
+): boolean {
+  return (
+    status === TENANT_PROVISIONING_STATUS.READY ||
+    status === TENANT_PROVISIONING_STATUS.FAILED
+  );
+}
 
 const DNS_TONE: Record<TDomainVerificationStatus, 'ok' | 'warn' | 'neutral'> = {
   NOT_CONFIGURED: 'neutral',
@@ -51,10 +69,10 @@ type TProvisioningStatusViewProps = {
  * The wizard's remaining-steps view — the provisioning steps (Sanity project
  * → seed content → deploy Studio → persist read token → map domain → create
  * webhook) read live from `tenant.provisioningSteps`, each independently
- * retryable.
- * No polling: the operator refreshes (or Retry's own `router.refresh()`
- * does it) to see updated status, matching how the DNS check below is also
- * a live-on-render call, not a background poll.
+ * retryable. While provisioning hasn't reached a terminal status, this polls
+ * for fresh status so an operator watching a run in progress sees steps
+ * advance without reloading. Retry's own `router.refresh()` still covers
+ * picking up a fresh full tenant row after a step retry.
  */
 export function ProvisioningStatusView({
   tenant,
@@ -66,6 +84,20 @@ export function ProvisioningStatusView({
     useState<TTenantProvisioningStep | null>(null);
   const [isStarting, setIsStarting] = useState(false);
   const [, startTransition] = useTransition();
+  const [renderedTenant, setRenderedTenant] = useState(tenant);
+  const [provisioningStatus, setProvisioningStatus] =
+    useState<TTenantProvisioningStatus | null>(tenant.provisioningStatus);
+  const [provisioningSteps, setProvisioningSteps] =
+    useState<TTenantProvisioningSteps | null>(tenant.provisioningSteps);
+
+  // A fresh `tenant` prop (e.g. after Retry's own `router.refresh()`) should
+  // win over whatever polling last saw — adjusted during render, per React's
+  // guidance for state derived from props, rather than in an effect.
+  if (tenant !== renderedTenant) {
+    setRenderedTenant(tenant);
+    setProvisioningStatus(tenant.provisioningStatus);
+    setProvisioningSteps(tenant.provisioningSteps);
+  }
 
   const {
     root,
@@ -84,10 +116,33 @@ export function ProvisioningStatusView({
     dnsHint,
   } = provisioningStatusViewVariants();
 
-  const steps = tenant.provisioningSteps;
+  useEffect(() => {
+    if (isTerminalProvisioningStatus(provisioningStatus)) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const intervalId = setInterval(() => {
+      void getTenantProvisioningStatusAction(tenant.id).then((result) => {
+        if (cancelled || !result) {
+          return;
+        }
+        setProvisioningStatus(result.provisioningStatus);
+        setProvisioningSteps(result.provisioningSteps);
+      });
+    }, POLL_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(intervalId);
+    };
+  }, [tenant.id, provisioningStatus]);
+
   const allIdle = STEP_ORDER.every((stepKey) => {
     const status =
-      steps?.[stepKey]?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
+      provisioningSteps?.[stepKey]?.status ??
+      TENANT_PROVISIONING_STEP_STATUS.IDLE;
     return status === TENANT_PROVISIONING_STEP_STATUS.IDLE;
   });
 
@@ -137,10 +192,12 @@ export function ProvisioningStatusView({
       <div className={card()}>
         <div className={list()}>
           {STEP_ORDER.map((stepKey) => {
-            const stepState = steps?.[stepKey];
+            const stepState = provisioningSteps?.[stepKey];
             const status =
               stepState?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
             const isFailed = status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
+            const isRunning =
+              status === TENANT_PROVISIONING_STEP_STATUS.RUNNING;
             const isRetrying = retryingStep === stepKey;
 
             return (
@@ -158,9 +215,20 @@ export function ProvisioningStatusView({
                     {t(`statusLabel.${status}`)}
                   </span>
                 ) : (
-                  <StatusBadge tone={STEP_TONE[status]}>
-                    {t(`statusLabel.${status}`)}
-                  </StatusBadge>
+                  <>
+                    {isRunning && (
+                      <Spinner
+                        label={t(`statusLabel.${status}`)}
+                        size={Size.SM}
+                      />
+                    )}
+                    <StatusBadge
+                      tone={STEP_TONE[status]}
+                      aria-hidden={isRunning ? 'true' : undefined}
+                    >
+                      {t(`statusLabel.${status}`)}
+                    </StatusBadge>
+                  </>
                 )}
                 {isFailed && (
                   <Button

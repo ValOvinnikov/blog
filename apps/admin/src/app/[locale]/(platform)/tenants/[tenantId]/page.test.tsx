@@ -26,6 +26,13 @@ vi.mock('@admin/server/provisioning/deprovision-tenant-action', () => ({
   deprovisionTenantAction: vi.fn(),
 }));
 
+vi.mock(
+  '@admin/server/provisioning/get-tenant-provisioning-status-action',
+  () => ({
+    getTenantProvisioningStatusAction: vi.fn(),
+  }),
+);
+
 const setup = customRenderAsync(TenantStatusPage, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),
 });

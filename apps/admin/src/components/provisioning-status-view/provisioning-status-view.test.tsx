@@ -1,9 +1,15 @@
-import { renderWithIntl, screen, waitFor } from '@admin/testing/custom-render';
+import {
+  act,
+  renderWithIntl,
+  screen,
+  waitFor,
+} from '@admin/testing/custom-render';
 import {
   idleProvisioningSteps,
   makeTenant,
 } from '@admin/testing/tenants/fixtures';
 import {
+  TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/config';
@@ -13,18 +19,33 @@ import { ProvisioningStatusView } from './provisioning-status-view';
 
 const render = renderWithIntl;
 
-const { retryProvisioningStepActionMock } = vi.hoisted(() => ({
+const POLL_INTERVAL_MS = 4000;
+
+const {
+  retryProvisioningStepActionMock,
+  getTenantProvisioningStatusActionMock,
+} = vi.hoisted(() => ({
   retryProvisioningStepActionMock: vi.fn(),
+  getTenantProvisioningStatusActionMock: vi.fn(),
 }));
 
 vi.mock('@admin/server/provisioning/retry-provisioning-step-action', () => ({
   retryProvisioningStepAction: retryProvisioningStepActionMock,
 }));
 
+vi.mock(
+  '@admin/server/provisioning/get-tenant-provisioning-status-action',
+  () => ({
+    getTenantProvisioningStatusAction: getTenantProvisioningStatusActionMock,
+  }),
+);
+
 describe(ProvisioningStatusView, () => {
   beforeEach(() => {
     retryProvisioningStepActionMock.mockReset();
     retryProvisioningStepActionMock.mockResolvedValue(undefined);
+    getTenantProvisioningStatusActionMock.mockReset();
+    getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
   });
 
   it('splits the heading into an eyebrow and the tenant name', () => {
@@ -212,6 +233,166 @@ describe(ProvisioningStatusView, () => {
 
     await waitFor(() => {
       expect(retryProvisioningStepActionMock).toHaveBeenCalledWith('tenant-1');
+    });
+  });
+
+  it('shows a spinner alongside a running step, and no spinner for other statuses', () => {
+    const tenant = makeTenant({
+      provisioningSteps: {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+        },
+      },
+    });
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+      />,
+    );
+
+    expect(screen.getAllByRole('status')).toHaveLength(1);
+  });
+
+  it('exposes the running spinner as the sole accessible status announcement, hiding the duplicate badge text', () => {
+    const tenant = makeTenant({
+      provisioningSteps: {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+        },
+      },
+    });
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+      />,
+    );
+
+    // Found without `hidden: true` — genuinely present in the accessibility
+    // tree, not merely rendered with an ancestor `aria-hidden` masking it.
+    expect(
+      screen.getByRole('status', { name: 'Running…' }),
+    ).toBeInTheDocument();
+    // The adjacent StatusBadge repeats the same text visually; it must be
+    // hidden from the accessibility tree so it isn't announced a second time.
+    expect(screen.getByText('Running…')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  describe('live polling', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('polls for fresh status while provisioning is not terminal, and re-renders on a new result', async () => {
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        },
+      });
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+        />,
+      );
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
+      });
+
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
+        'tenant-1',
+      );
+      expect(screen.getByText('Done')).toBeVisible();
+    });
+
+    it('stops polling once the tenant reaches a terminal status', async () => {
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+      });
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
+        provisioningSteps: idleProvisioningSteps(),
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+        />,
+      );
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
+      });
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(1);
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS * 2);
+      });
+
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not poll at all when the tenant is already at a terminal status', async () => {
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+        />,
+      );
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS * 2);
+      });
+
+      expect(getTenantProvisioningStatusActionMock).not.toHaveBeenCalled();
+    });
+
+    it('stops polling once the component unmounts', async () => {
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+      });
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: idleProvisioningSteps(),
+      });
+      const { unmount } = render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+        />,
+      );
+
+      unmount();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS * 2);
+      });
+
+      expect(getTenantProvisioningStatusActionMock).not.toHaveBeenCalled();
     });
   });
 });
