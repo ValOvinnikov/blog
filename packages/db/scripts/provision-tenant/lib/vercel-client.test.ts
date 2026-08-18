@@ -16,7 +16,7 @@ afterEach(() => {
 });
 
 describe(createVercelProject, () => {
-  it('POSTs to /v11/projects with name + rootDirectory', async () => {
+  it('POSTs to /v11/projects with name + rootDirectory + framework', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ id: 'prj_1', name: 'studio-acme' }), {
         status: 200,
@@ -36,6 +36,7 @@ describe(createVercelProject, () => {
     expect(JSON.parse(init.body as string)).toEqual({
       name: 'studio-acme',
       rootDirectory: 'apps/cms',
+      framework: 'sanity',
     });
   });
 
