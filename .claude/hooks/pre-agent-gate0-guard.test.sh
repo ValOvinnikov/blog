@@ -84,6 +84,7 @@ GATE0_TEST_STATUS="Code Review" check web "Implement issue #99 — thing." deny 
 GATE0_TEST_STATUS="Done" check service "Implement issue #99 — thing." deny "Done blocks"
 GATE0_TEST_STATUS="Todo" check admin-app "Implement issue #1452 — admin scaffold." deny "admin-app is a layer agent"
 GATE0_TEST_STATUS="Todo" check auth "Implement issue #1457 — shared auth config." deny "auth is a layer agent"
+GATE0_TEST_STATUS="Todo" check insight "Implement issue #1639 — logger core." deny "insight is a layer agent"
 
 echo "Layer agent + implementation target, correctly In Progress:"
 export GATE0_TEST_STATUS="In Progress"
@@ -91,6 +92,7 @@ check ui "Implement issue #1436 — Switch and Slider shells." allow "In Progres
 check db "Implement issue **#1432** — registry tables." allow "In Progress passes (bold)"
 check admin-app "Implement issue #1452 — admin scaffold." allow "admin-app In Progress passes"
 check auth "Implement issue #1457 — shared auth config." allow "auth In Progress passes"
+check insight "Implement issue #1639 — logger core." allow "insight In Progress passes"
 
 echo "Non-layer agents are never checked:"
 export GATE0_TEST_STATUS="Todo"
