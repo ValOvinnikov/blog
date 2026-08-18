@@ -39,15 +39,70 @@ function truncateStack(stack: string): string {
   return stack.slice(0, MAX_STACK_LENGTH) + STACK_TRUNCATION_MARKER;
 }
 
-function normalizeContextValue(value: unknown): unknown {
-  if (!(value instanceof Error)) {
+// Small on purpose: real context objects are a handful of levels deep, and
+// this only needs to be generous enough to find an Error a caller nested a
+// couple of layers down (e.g. `{ details: { cause: err } }`).
+const MAX_NORMALIZE_DEPTH = 5;
+const DEPTH_LIMIT_MARKER = '[MaxDepthExceeded]';
+const CIRCULAR_MARKER = '[Circular]';
+
+function normalizeError(error: Error): TLogContext {
+  const normalized: TLogContext = { message: sanitizeLogMessage(error) };
+  if (typeof error.stack === 'string') {
+    normalized.stack = truncateStack(error.stack);
+  }
+
+  return normalized;
+}
+
+function isPlainObject(value: object): boolean {
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+}
+
+// Recurses into plain objects/arrays only, so a nested Error is found and
+// unwrapped wherever a caller put it (not just at the top level). Depth is
+// bounded and visited ancestors are tracked so a cyclic context object
+// degrades to a marker instead of hanging or crashing JSON.stringify. Other
+// object types (Date, RegExp, Map, class instances, ...) pass through
+// untouched, same as the pre-recursion behavior, so their own serialization
+// (e.g. Date's toJSON) isn't clobbered.
+function normalizeContextValue(
+  value: unknown,
+  depth: number,
+  ancestors: Set<object>,
+): unknown {
+  if (value instanceof Error) {
+    return normalizeError(value);
+  }
+
+  if (value === null || typeof value !== 'object') {
     return value;
   }
 
-  const normalized: TLogContext = { message: sanitizeLogMessage(value) };
-  if (typeof value.stack === 'string') {
-    normalized.stack = truncateStack(value.stack);
+  const isArray = Array.isArray(value);
+  if (!isArray && !isPlainObject(value)) {
+    return value;
   }
+
+  if (ancestors.has(value)) {
+    return CIRCULAR_MARKER;
+  }
+
+  if (depth >= MAX_NORMALIZE_DEPTH) {
+    return DEPTH_LIMIT_MARKER;
+  }
+
+  ancestors.add(value);
+  const normalized = isArray
+    ? value.map((item) => normalizeContextValue(item, depth + 1, ancestors))
+    : Object.fromEntries(
+        Object.entries(value as TLogContext).map(([key, nested]) => [
+          key,
+          normalizeContextValue(nested, depth + 1, ancestors),
+        ]),
+      );
+  ancestors.delete(value);
 
   return normalized;
 }
@@ -55,7 +110,7 @@ function normalizeContextValue(value: unknown): unknown {
 function normalizeContext(context: TLogContext): TLogContext {
   const normalized: TLogContext = {};
   for (const [key, value] of Object.entries(context)) {
-    normalized[key] = normalizeContextValue(value);
+    normalized[key] = normalizeContextValue(value, 0, new Set());
   }
 
   return normalized;

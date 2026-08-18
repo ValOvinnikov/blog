@@ -143,4 +143,104 @@ describe(createLogger, () => {
 
     expect(debugSpy).toHaveBeenCalledTimes(1);
   });
+
+  it('unwraps an Error nested one level deep inside a plain object', () => {
+    const logger = createLogger();
+    const cause = new Error('nested boom');
+    cause.stack = 'Error: nested boom\n  at somewhere ()';
+
+    logger.error('request.failed', { details: { cause } });
+
+    const parsed = JSON.parse(captureCall(errorSpy)) as {
+      details: { cause: { message: string; stack: string } };
+    };
+    expect(parsed.details.cause.message).toBe('nested boom');
+    expect(parsed.details.cause.stack).toBe(cause.stack);
+  });
+
+  it('unwraps Errors nested inside an array', () => {
+    const logger = createLogger();
+    const first = new Error('first failure');
+    const second = new Error('second failure');
+
+    logger.error('batch.failed', {
+      errors: [first, second, 'not an error'],
+    });
+
+    const parsed = JSON.parse(captureCall(errorSpy)) as {
+      errors: [{ message: string }, { message: string }, string];
+    };
+    expect(parsed.errors[0].message).toBe('first failure');
+    expect(parsed.errors[1].message).toBe('second failure');
+    expect(parsed.errors[2]).toBe('not an error');
+  });
+
+  it('terminates without hanging or throwing on a cyclic context object', () => {
+    const logger = createLogger();
+    const cyclic: Record<string, unknown> = { name: 'cycle' };
+    cyclic.self = cyclic;
+
+    expect(() =>
+      logger.error('cyclic.context', { data: cyclic }),
+    ).not.toThrow();
+
+    const parsed = JSON.parse(captureCall(errorSpy)) as {
+      data: { name: string; self: string };
+    };
+    expect(parsed.data.name).toBe('cycle');
+    expect(parsed.data.self).toBe('[Circular]');
+  });
+
+  it('still unwraps an Error nested just within the depth limit', () => {
+    const logger = createLogger();
+    const error = new Error('within limit');
+
+    // 4 wrapper levels puts the object holding `error` one level short of
+    // the recursion bound, so it should still be reached and unwrapped.
+    let value: unknown = { error };
+    for (let i = 0; i < 4; i++) {
+      value = { nested: value };
+    }
+
+    logger.error('deep.context', { deep: value });
+
+    const parsed = JSON.parse(captureCall(errorSpy)) as Record<string, unknown>;
+    let cursor = parsed.deep as Record<string, unknown>;
+    for (let i = 0; i < 4; i++) {
+      cursor = cursor.nested as Record<string, unknown>;
+    }
+    expect((cursor.error as { message: string }).message).toBe('within limit');
+  });
+
+  it('does not unwrap an Error nested past the depth limit, and does not throw', () => {
+    const logger = createLogger();
+    const error = new Error('too deep');
+
+    // 5 wrapper levels puts the object holding `error` exactly at the
+    // recursion bound, so it should be replaced by the depth marker instead
+    // of being recursed into.
+    let value: unknown = { error };
+    for (let i = 0; i < 5; i++) {
+      value = { nested: value };
+    }
+
+    expect(() => logger.error('deep.context', { deep: value })).not.toThrow();
+
+    const parsed = JSON.parse(captureCall(errorSpy)) as Record<string, unknown>;
+    let cursor = parsed.deep as Record<string, unknown>;
+    for (let i = 0; i < 4; i++) {
+      cursor = cursor.nested as Record<string, unknown>;
+    }
+    expect(cursor.nested).toBe('[MaxDepthExceeded]');
+    expect(JSON.stringify(parsed)).not.toContain('too deep');
+  });
+
+  it('does not run a plain string context value through sanitizeLogMessage (only Error.message is)', () => {
+    const logger = createLogger();
+    const multiline = 'first line\nsecond line';
+    logger.info('note', { text: multiline });
+
+    const parsed = JSON.parse(captureCall(infoSpy)) as Record<string, unknown>;
+    expect(parsed.text).toBe(multiline);
+  });
 });
