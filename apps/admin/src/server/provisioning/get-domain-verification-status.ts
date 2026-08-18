@@ -10,9 +10,9 @@ const VERCEL_TIMEOUT_MS = 5000;
  * Live, non-blocking DNS-verification check against Vercel's Domains API —
  * informational only: a tenant counts as provisioned once its domain is
  * added to the Vercel project, not once DNS actually verifies (that's
- * tenant-controlled and can take hours). Called fresh on every render of
- * the tenant status page — no polling/cron at this scale, the operator
- * just refreshes.
+ * tenant-controlled and can take hours). Called on first render of the
+ * tenant status page and, via `getDomainVerificationStatusAction`, polled
+ * from the client afterward.
  */
 export async function getDomainVerificationStatus(
   domain: string,

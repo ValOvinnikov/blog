@@ -24,6 +24,17 @@ vi.mock(
   }),
 );
 
+vi.mock(
+  '@admin/server/provisioning/get-domain-verification-status-action',
+  () => ({
+    getDomainVerificationStatusAction: vi.fn(),
+  }),
+);
+
+vi.mock('@admin/server/tenants/update-tenant-details-action', () => ({
+  updateTenantDetailsAction: vi.fn(),
+}));
+
 describe(TenantStatusView, () => {
   it('renders both provisioning progress and the deprovisioning control', () => {
     const tenant = makeTenant();

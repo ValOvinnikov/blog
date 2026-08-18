@@ -6,10 +6,15 @@ export const provisioningStatusViewVariants = tv({
     header: ['flex flex-col gap-1'],
     description: ['text-sm text-text-muted'],
     startAction: ['flex'],
-    layout: ['flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_280px]'],
-    card: ['rounded-md border border-border bg-surface p-6'],
-    list: ['flex flex-col'],
-    step: ['flex flex-wrap gap-3'],
+    layout: [
+      'flex flex-col gap-6',
+      'lg:grid lg:min-h-[420px] lg:grid-cols-[230px_minmax(0,1fr)]',
+    ],
+    steps: [
+      'flex h-full flex-col rounded-md border border-border bg-surface p-6',
+    ],
+    list: ['flex flex-1 flex-col'],
+    step: ['flex flex-1 flex-wrap gap-3'],
     indicatorCol: ['flex flex-none flex-col items-center self-stretch'],
     circle: [
       'flex h-6 w-6 flex-none items-center justify-center',
@@ -24,6 +29,8 @@ export const provisioningStatusViewVariants = tv({
       'inline-flex items-center rounded-sm border border-error bg-error/10',
       'px-2 py-0.5 font-mono text-label font-medium uppercase tracking-label text-error',
     ],
+    detailsColumn: ['flex flex-col gap-4'],
+    goToTenantButton: ['self-start'],
     dnsCard: ['rounded-md border border-border bg-surface p-6'],
     dnsRow: ['flex flex-wrap items-center gap-3'],
     dnsHint: ['text-xs text-text-muted'],
