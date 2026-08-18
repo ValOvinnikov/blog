@@ -30,6 +30,12 @@ export async function dispatchProvisioningWorkflow(
     return;
   }
 
+  // Local-dev-only: forwarded as the workflow's `adminAppBaseUrl` input only
+  // when set, so a real (production) dispatch never sends this key and CI's
+  // `inputs.adminAppBaseUrl || vars.ADMIN_APP_BASE_URL` fallback is untouched.
+  const adminAppBaseUrlOverride =
+    env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE;
+
   try {
     const response = await fetch(
       `https://api.github.com/repos/${repo.owner}/${repo.repo}/actions/workflows/${WORKFLOW_FILE}/dispatches`,
@@ -41,7 +47,15 @@ export async function dispatchProvisioningWorkflow(
           'X-GitHub-Api-Version': '2022-11-28',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ref: WORKFLOW_REF, inputs: { tenantId } }),
+        body: JSON.stringify({
+          ref: WORKFLOW_REF,
+          inputs: {
+            tenantId,
+            ...(adminAppBaseUrlOverride && {
+              adminAppBaseUrl: adminAppBaseUrlOverride,
+            }),
+          },
+        }),
         signal: AbortSignal.timeout(DISPATCH_TIMEOUT_MS),
       },
     );

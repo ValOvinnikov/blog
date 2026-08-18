@@ -56,6 +56,14 @@ export const env = createEnv({
     // webhook's signed-payload verification). Optional: absent, the route
     // responds 500 rather than accepting an unauthenticated call.
     TENANT_PROVISIONING_CALLBACK_SECRET: z.string().min(1).optional(),
+    // Local-dev-only escape hatch forwarded as the `adminAppBaseUrl`
+    // workflow_dispatch input, letting a developer point a manual
+    // provisioning run at a tunneled local `apps/admin` (e.g. a Tailscale
+    // funnel URL) instead of the production admin app — must never be set in
+    // the production Vercel project. Optional: absent, the input is omitted
+    // entirely and CI falls back to the production `ADMIN_APP_BASE_URL`
+    // Environment variable, unchanged from today.
+    TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE: z.string().url().optional(),
     // Read-scoped Vercel API token the tenant status page uses to check a
     // custom domain's live DNS verification state (Vercel's Domains API) on
     // each render — informational only, never blocks provisioning. Optional:
@@ -81,6 +89,8 @@ export const env = createEnv({
       process.env.TENANT_PROVISIONING_GITHUB_REPO,
     TENANT_PROVISIONING_CALLBACK_SECRET:
       process.env.TENANT_PROVISIONING_CALLBACK_SECRET,
+    TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE:
+      process.env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE,
     VERCEL_API_TOKEN: process.env.VERCEL_API_TOKEN,
     VERCEL_WEB_PROJECT_ID: process.env.VERCEL_WEB_PROJECT_ID,
     VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
