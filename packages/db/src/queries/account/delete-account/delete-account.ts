@@ -17,6 +17,10 @@ import { eq } from 'drizzle-orm';
 //
 // A no-op (not an error) if `userId` doesn't match a `users` row, matching
 // this package's other delete-style mutations (see `removeBookmark`).
+//
+// Callers must pass the authenticated session's own user id here (never a
+// client-supplied value) — this function performs no authorization check
+// and deletes whatever account id it is given.
 export async function deleteAccount(userId: string): Promise<void> {
   const db = getDb();
 
