@@ -182,21 +182,19 @@ export function ProvisioningStatusView({
     let cancelled = false;
 
     const intervalId = setInterval(() => {
-      void getDomainVerificationStatusAction(tenant.primaryDomain).then(
-        (result) => {
-          if (cancelled) {
-            return;
-          }
-          setDomainStatus(result);
-        },
-      );
+      void getDomainVerificationStatusAction(tenant.id).then((result) => {
+        if (cancelled) {
+          return;
+        }
+        setDomainStatus(result);
+      });
     }, DOMAIN_POLL_INTERVAL_MS);
 
     return () => {
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [tenant.primaryDomain, domainStatus]);
+  }, [tenant.id, domainStatus]);
 
   const allIdle = STEP_ORDER.every((stepKey) => {
     const status =

@@ -612,7 +612,7 @@ describe(ProvisioningStatusView, () => {
       });
 
       expect(getDomainVerificationStatusActionMock).toHaveBeenCalledWith(
-        'acme.example.com',
+        tenant.id,
       );
       expect(screen.getByText('Verified')).toBeVisible();
     });
@@ -696,7 +696,7 @@ describe(ProvisioningStatusView, () => {
       });
 
       expect(getDomainVerificationStatusActionMock).toHaveBeenCalledWith(
-        tenant.primaryDomain,
+        tenant.id,
       );
       // Step polling never starts — provisioning was already terminal — so
       // this is genuinely the domain check running on its own.
