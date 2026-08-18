@@ -45,8 +45,8 @@ contracts:
     deliberate: built from the product spec alone, which carries no concrete
     values by design, a surface passes every acceptance criterion and still
     ships as a wireframe.
-  - Those eight layer agents (`config`, `cms`, `service`, `ui`, `web`, `db`,
-    `admin-app`, `auth`) additionally carry the two context7 MCP tools
+  - Those nine layer agents (`config`, `cms`, `service`, `ui`, `web`, `db`,
+    `admin-app`, `auth`, `insight`) additionally carry the two context7 MCP tools
     (`resolve-library-id`, `query-docs`) in their `tools:` frontmatter, so the
     `use-context7` skill is actually executable by the agent that hits an
     unfamiliar library API mid-implementation. Without them the instruction to
@@ -231,7 +231,7 @@ contracts:
   - `pre-agent-gate0-guard.sh` — `PreToolUse` hook on the **`Agent` tool**
     (wired in `settings.json`, not in agent frontmatter, since it must see
     dispatches before any agent starts). Denies dispatching a **layer agent**
-    (`config`/`cms`/`service`/`ui`/`web`/`db`/`admin-app`/`auth`) to implement an issue that
+    (`config`/`cms`/`service`/`ui`/`web`/`db`/`admin-app`/`auth`/`insight`) to implement an issue that
     isn't `In Progress` on the board — i.e. Gate 0 was skipped. The deny
     message names the fix (dispatch `board-keeper` with
     `"starting work on #<n>"`).

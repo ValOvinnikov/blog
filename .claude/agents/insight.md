@@ -99,8 +99,8 @@ block — it points at open work rather than narrating closed work.
 
 ## Testing
 
-- Co-located `*.test.ts` (Vitest, `node` environment via
-  `configs/vitest/preset.ts`, same as `packages/utils`).
+- Co-located `*.test.ts` (Vitest, `node` environment + `globals: true` inlined
+  in `vitest.config.ts`, same as `packages/utils`'s).
 - Cover: valid single-line JSON output; a context value containing `\n`/`\r`/
   control characters cannot terminate the line or forge a second entry;
   reserved fields survive a same-named context key; stack traces longer than
