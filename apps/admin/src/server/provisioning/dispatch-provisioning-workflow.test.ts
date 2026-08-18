@@ -4,6 +4,8 @@ const { envMock } = vi.hoisted(() => ({
   envMock: {
     TENANT_PROVISIONING_GITHUB_TOKEN: undefined as string | undefined,
     TENANT_PROVISIONING_GITHUB_REPO: undefined as string | undefined,
+    TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE: undefined as
+      string | undefined,
   },
 }));
 
@@ -17,6 +19,7 @@ describe(dispatchProvisioningWorkflow, () => {
     vi.stubGlobal('fetch', fetchMock);
     envMock.TENANT_PROVISIONING_GITHUB_TOKEN = 'ghp_token';
     envMock.TENANT_PROVISIONING_GITHUB_REPO = 'acme-org/acme-repo';
+    envMock.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE = undefined;
   });
 
   it('skips the dispatch call when no token is configured', async () => {
@@ -48,6 +51,40 @@ describe(dispatchProvisioningWorkflow, () => {
           Authorization: 'Bearer ghp_token',
         }),
         body: JSON.stringify({ ref: 'main', inputs: { tenantId: 'tenant-1' } }),
+      }),
+    );
+  });
+
+  it('omits adminAppBaseUrl from the dispatch body when no override is configured', async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+
+    await dispatchProvisioningWorkflow('tenant-1');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://api.github.com/repos/acme-org/acme-repo/actions/workflows/provision-tenant.yml/dispatches',
+      expect.objectContaining({
+        body: JSON.stringify({ ref: 'main', inputs: { tenantId: 'tenant-1' } }),
+      }),
+    );
+  });
+
+  it('includes adminAppBaseUrl in the dispatch body when the local-dev override is configured', async () => {
+    envMock.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE =
+      'https://tenant-dev.tailnet.ts.net';
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+
+    await dispatchProvisioningWorkflow('tenant-1');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://api.github.com/repos/acme-org/acme-repo/actions/workflows/provision-tenant.yml/dispatches',
+      expect.objectContaining({
+        body: JSON.stringify({
+          ref: 'main',
+          inputs: {
+            tenantId: 'tenant-1',
+            adminAppBaseUrl: 'https://tenant-dev.tailnet.ts.net',
+          },
+        }),
       }),
     );
   });

@@ -8,6 +8,7 @@ const ENV_KEYS = [
   'TENANT_PROVISIONING_GITHUB_TOKEN',
   'TENANT_PROVISIONING_GITHUB_REPO',
   'TENANT_PROVISIONING_CALLBACK_SECRET',
+  'TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE',
   'VERCEL_API_TOKEN',
   'VERCEL_WEB_PROJECT_ID',
   'VERCEL_TEAM_ID',
@@ -203,6 +204,27 @@ describe('env', () => {
     const { env } = await importEnvOnServer();
 
     expect(env.TENANT_PROVISIONING_CALLBACK_SECRET).toBeUndefined();
+  });
+
+  it('parses a valid TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE and exposes it typed', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    process.env['TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE'] =
+      'https://tenant-dev.tailnet.ts.net';
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE).toBe(
+      'https://tenant-dev.tailnet.ts.net',
+    );
+  });
+
+  it('leaves TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE undefined when absent (the workflow dispatch omits the override input)', async () => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    delete process.env['TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE'];
+
+    const { env } = await importEnvOnServer();
+
+    expect(env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE).toBeUndefined();
   });
 
   it('parses valid Vercel domain-check vars and exposes them typed', async () => {
