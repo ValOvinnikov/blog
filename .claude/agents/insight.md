@@ -23,6 +23,25 @@ All source files live under `packages/insight/src/`. Import within the package
 with the workspace's own-name alias (`@blog/insight/*` → `./src/*`);
 same-directory `./` stays relative, parent-traversal `../` never.
 
+**Folder-per-concern layout.** Like `packages/utils/src/` (`async/`, `color/`,
+`log/`, …), never put an implementation file directly under `src/` — each
+concern gets its own folder with its own `index.ts` barrel, re-exported from
+the top-level `src/index.ts`. `packages/insight` goes one level further for
+its `utils/` group specifically: each helper inside it gets its own folder
+too (`utils/sanitize-log-message/`), not just the outer `utils/` folder —
+that extra nesting is deliberate for this package, not a mistake to align
+back to `packages/utils`'s shallower shape. Current shape:
+
+```
+src/index.ts                        — export * from './logger'; export * from './utils';
+src/logger/{index,logger,logger.test}.ts
+src/utils/index.ts                  — export * from './sanitize-log-message';
+src/utils/sanitize-log-message/{index,sanitize-log-message,sanitize-log-message.test}.ts
+```
+
+A new concern (event-name constants, a client-log contract type, …) gets its
+own top-level folder the same way `logger/` and `utils/` do.
+
 ## Start here
 
 When invoked, before writing any code:
