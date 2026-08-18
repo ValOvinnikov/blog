@@ -1,4 +1,5 @@
 import { routes, type ILocalizedParams } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { TagPage } from '@web/components/pages/tag-page';
 import { permanentRedirect } from '@web/i18n/navigation';
@@ -13,6 +14,8 @@ type TProps = {
   params: Promise<ILocalizedParams & { slug: string; page: string }>;
 };
 
+const logger = createLogger();
+
 // CI's build environment can't always construct the Sanity client; an
 // uncaught throw here would crash the entire `next build`. `dynamicParams`
 // stays default `true`, so a missed build-time slug/page pair still renders
@@ -23,7 +26,9 @@ export async function generateStaticParams() {
     await service.pages.tag.v1.getTagPaginationParams(TAG_ITEMS_PER_PAGE);
 
   if (!result.ok) {
-    console.error(`Error to fetch tag pagination params: ${result.error}`);
+    logger.error('tag_pagination.params_fetch_failed', {
+      error: result.error,
+    });
     return [];
   }
 

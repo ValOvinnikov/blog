@@ -1,8 +1,8 @@
 import { routes } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
-import { sanitizeLogMessage } from '@blog/utils';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { CategoryChipList } from '@web/components/shared/category-chip-list';
@@ -17,6 +17,8 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 type TBlogListPageProps = { page: number; locale: string };
+
+const logger = createLogger();
 
 /**
  * Shared composition for `/blog` (page 1) and `/blog/page/[page]` (pages ≥
@@ -37,9 +39,7 @@ export async function BlogListPage({ page, locale }: TBlogListPageProps) {
   ]);
 
   if (!result.ok) {
-    console.error(
-      `Error to fetch blog page: ${sanitizeLogMessage(result.error)}`,
-    );
+    logger.error('blog_list_page.fetch_failed', { page, error: result.error });
     notFound();
   }
 

@@ -1,3 +1,4 @@
+import { createLogger } from '@blog/insight';
 import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import { env } from '@web/utils/env/env';
 import { getRevalidateTagsForType } from '@web/utils/revalidate-tags';
@@ -10,6 +11,8 @@ export const runtime = 'nodejs';
 // Sent by Sanity on every webhook request automatically — not exported by
 // any Sanity SDK, so this is the single source of truth for the literal.
 export const SANITY_PROJECT_ID_HEADER = 'sanity-project-id';
+
+const logger = createLogger();
 
 interface IRevalidateWebhookBody {
   _type: string;
@@ -36,9 +39,7 @@ function isRevalidateWebhookBody(
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.SANITY_REVALIDATE_SECRET;
   if (!secret) {
-    console.error(
-      'Revalidate webhook: SANITY_REVALIDATE_SECRET is not configured.',
-    );
+    logger.error('revalidate.secret_missing');
     return NextResponse.json(
       { message: 'Revalidation secret is not configured.' },
       { status: 500 },

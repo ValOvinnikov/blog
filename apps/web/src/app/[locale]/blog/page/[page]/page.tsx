@@ -1,4 +1,5 @@
 import { routes, type ILocalizedParams } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { BlogListPage } from '@web/components/pages/blog-list-page';
 import { permanentRedirect } from '@web/i18n/navigation';
@@ -12,13 +13,17 @@ type TProps = {
   params: Promise<ILocalizedParams & { page: string }>;
 };
 
+const logger = createLogger();
+
 // Pages beyond the build-time list still render on demand via ISR
 // (dynamicParams defaults to true); correctness rides on the explicit
 // range check in BlogListPage, not on this list.
 export async function generateStaticParams() {
   const result = await service.pages.blog.v1.getIndexPageParams();
   if (!result.ok) {
-    console.error(`Error to fetch blog page params: ${result.error}`);
+    logger.error('blog_pagination.params_fetch_failed', {
+      error: result.error,
+    });
     return [];
   }
 

@@ -1,9 +1,9 @@
 import { ASIDE_KIND, ICONS, Size, type TAsideKind, routes } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Article, PostsSection } from '@blog/ui/organisms';
-import { sanitizeLogMessage } from '@blog/utils';
 import { BackToTopButton } from '@web/components/shared/back-to-top-button';
 import { BookmarkButton } from '@web/components/shared/bookmark-button';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
@@ -36,6 +36,8 @@ type TBlogPostPageProps = { slug: string };
 
 const s = blogPostPageVariants();
 
+const logger = createLogger();
+
 /**
  * BlogPostPage — `/blog/{slug}` composition: fetches the post via
  * `service.pages.post.v1.getPost` and renders it as an `Article` compound
@@ -48,7 +50,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   const result = await service.pages.post.v1.getPost(slug);
 
   if (!result.ok) {
-    console.error(`Error to fetch post: ${sanitizeLogMessage(result.error)}`);
+    logger.error('blog_post_page.fetch_failed', { slug, error: result.error });
     notFound();
   }
   if (result.data === null) {
@@ -110,9 +112,9 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   // fetch-error stance): logged, and the signup is simply omitted rather
   // than guessed at.
   if (!newsletterSettingsResult.ok) {
-    console.error(
-      `Error to fetch newsletter settings: ${sanitizeLogMessage(newsletterSettingsResult.error)}`,
-    );
+    logger.error('blog_post_page.newsletter_settings_fetch_failed', {
+      error: newsletterSettingsResult.error,
+    });
   }
 
   const trail: IBreadcrumbItem[] = [

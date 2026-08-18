@@ -1,5 +1,6 @@
 'use client';
 
+import { createLogger } from '@blog/insight';
 import { BookmarkToggle } from '@blog/ui/atoms';
 import { useToast } from '@web/context/toast-provider';
 import {
@@ -11,6 +12,8 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState, useTransition } from 'react';
 
 import { bookmarkButtonVariants } from './bookmark-button-variants';
+
+const logger = createLogger();
 
 export type TBookmarkButtonProps = {
   /** The post's Sanity `_id` — `blog-post-page` threads this through from its existing `service.pages.post.v1.getPost` fetch, no separate lookup. */
@@ -59,7 +62,10 @@ export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
         // resolve to "not bookmarked" and let the reader retry via a normal
         // toggle, same recovery shape as `useCopyToClipboard`'s own
         // `.then().catch()`.
-        console.error('Failed to load bookmark status:', fetchError);
+        logger.error('bookmark_button.status_fetch_failed', {
+          postId,
+          error: fetchError,
+        });
         if (cancelled) return;
         setIsBookmarked(false);
         setIsResolved(true);

@@ -1,9 +1,11 @@
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
+import { createLogger } from '@blog/insight';
 import { auth } from '@web/server/auth/auth';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
+
+const logger = createLogger();
 
 /**
  * `GET /api/account/export` — the `/account` "export my data" download. A
@@ -52,9 +54,7 @@ export async function GET(): Promise<NextResponse> {
       },
     });
   } catch (error) {
-    console.error(
-      `Failed to export account data: ${sanitizeLogMessage(error)}`,
-    );
+    logger.error('account.export_failed', { error });
     return NextResponse.json({ message: 'Export failed' }, { status: 500 });
   }
 }

@@ -1,10 +1,10 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { Heading, Text } from '@blog/ui/atoms';
 import { WindowChrome } from '@blog/ui/molecules';
 import { BookmarksList, type IBookmarkRow } from '@blog/ui/organisms';
-import { sanitizeLogMessage } from '@blog/utils';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { auth } from '@web/server/auth/auth';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
@@ -16,6 +16,8 @@ import { getFormatter, getTranslations } from 'next-intl/server';
 import { bookmarksPageVariants } from './bookmarks-page-variants';
 
 const s = bookmarksPageVariants();
+
+const logger = createLogger();
 
 /**
  * `/bookmarks` composition: auth-gated (a signed-out reader is redirected
@@ -64,9 +66,9 @@ export async function BookmarksPage() {
   );
 
   if (!result.ok) {
-    console.error(
-      `Failed to resolve bookmarked posts: ${sanitizeLogMessage(result.error)}`,
-    );
+    logger.error('bookmarks_page.posts_resolve_failed', {
+      error: result.error,
+    });
     return null;
   }
 

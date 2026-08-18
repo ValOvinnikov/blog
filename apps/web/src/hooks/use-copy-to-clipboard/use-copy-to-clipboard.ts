@@ -1,8 +1,11 @@
 'use client';
 
+import { createLogger } from '@blog/insight';
 import { useEffect, useState } from 'react';
 
 const DEFAULT_RESET_DELAY_MS = 2000;
+
+const logger = createLogger();
 
 /**
  * useCopyToClipboard — writes text to `navigator.clipboard` and exposes a
@@ -23,7 +26,9 @@ export const useCopyToClipboard = (resetMs = DEFAULT_RESET_DELAY_MS) => {
     navigator.clipboard
       .writeText(text)
       .then(() => setIsCopied(true))
-      .catch((error: unknown) => console.error('Failed to copy link:', error));
+      .catch((error: unknown) =>
+        logger.error('copy_to_clipboard.write_failed', { error }),
+      );
   };
 
   return { isCopied, copy };

@@ -1,4 +1,5 @@
 import { Size, routes } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { Avatar, Eyebrow, Icon } from '@blog/ui/atoms';
 import {
@@ -8,7 +9,6 @@ import {
   type IBreadcrumbItem,
 } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
-import { sanitizeLogMessage } from '@blog/utils';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
@@ -27,6 +27,8 @@ import { authorPageVariants } from './author-page-variants';
 type TAuthorPageProps = { slug: string; page?: number };
 
 const s = authorPageVariants();
+
+const logger = createLogger();
 
 /**
  * AuthorPage — shared composition for `/author/[slug]` (page 1, `page`
@@ -53,9 +55,7 @@ export async function AuthorPage({ slug, page }: TAuthorPageProps) {
   ]);
 
   if (!result.ok) {
-    console.error(
-      `Error to fetch author page: ${sanitizeLogMessage(result.error)}`,
-    );
+    logger.error('author_page.fetch_failed', { slug, error: result.error });
     notFound();
   }
   if (result.data === null) {

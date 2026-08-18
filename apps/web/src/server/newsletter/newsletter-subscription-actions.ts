@@ -1,7 +1,7 @@
 'use server';
 
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
+import { createLogger } from '@blog/insight';
 import { auth } from '@web/server/auth/auth';
 import { sendEmail } from '@web/server/email/send-email';
 import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newsletter-confirmation-email';
@@ -12,6 +12,8 @@ import { env } from '@web/utils/env/env';
 
 export type TUnsubscribeResult = { ok: true } | { ok: false };
 export type TResendConfirmationActionResult = { ok: true } | { ok: false };
+
+const logger = createLogger();
 
 /**
  * `NewsletterSubscriptionControl`'s "unsubscribe" server write. Reads the
@@ -36,10 +38,7 @@ export async function unsubscribeAction(): Promise<TUnsubscribeResult> {
     await clearNewsletterSubscribedCookieSafely();
     return { ok: true };
   } catch (error) {
-    console.error(
-      'Failed to unsubscribe from the newsletter:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('newsletter.unsubscribe_failed', { error });
     return { ok: false };
   }
 }
@@ -57,10 +56,7 @@ async function clearNewsletterSubscribedCookieSafely(): Promise<void> {
   try {
     await clearNewsletterSubscribedCookie();
   } catch (error) {
-    console.error(
-      'Failed to clear the newsletter-subscribed cookie:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('newsletter.subscribed_cookie_clear_failed', { error });
   }
 }
 
@@ -100,10 +96,7 @@ export async function resendConfirmationAction(): Promise<TResendConfirmationAct
     await sendEmail({ to: email, from: fromAddress, subject, html });
     return { ok: true };
   } catch (error) {
-    console.error(
-      'Failed to resend the newsletter confirmation email:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('newsletter.confirmation_resend_failed', { error });
     return { ok: false };
   }
 }

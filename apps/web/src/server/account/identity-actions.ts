@@ -1,7 +1,7 @@
 'use server';
 
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
+import { createLogger } from '@blog/insight';
 import { auth } from '@web/server/auth/auth';
 
 // The two sign-in methods `ProviderLinkControl` can unlink — mirrors
@@ -13,16 +13,15 @@ export type TLinkableProvider = 'github' | 'google';
 
 const LINKABLE_PROVIDERS: readonly TLinkableProvider[] = ['github', 'google'];
 
+const logger = createLogger();
+
 // `provider: TLinkableProvider` on `unlinkProviderAction` below is only a
 // compile-time constraint — a `'use server'` action's underlying endpoint
 // can be invoked directly (bypassing the client bundle and TypeScript
-// entirely), so an attacker can pass an arbitrary string at runtime. Without
-// this guard that string would flow straight into the `console.error` below
-// (CodeQL flagged this as both a format-string and log-injection issue,
-// since it's attacker-controlled) and into `queries.account.unlinkProvider`
-// on the same unvalidated assumption. Re-validating here, before `provider`
-// is used anywhere, means every downstream use — logged or passed to the db
-// call — operates on a value that's actually one of the two known literals.
+// entirely), so an attacker can pass an arbitrary string at runtime.
+// Re-validating here, before `provider` is used anywhere, means every
+// downstream use — logged or passed to the db call — operates on a value
+// that's actually one of the two known literals.
 function isLinkableProvider(value: string): value is TLinkableProvider {
   return (LINKABLE_PROVIDERS as readonly string[]).includes(value);
 }
@@ -57,7 +56,7 @@ export async function unlinkProviderAction(
     }
     return { ok: true };
   } catch (error) {
-    console.error(`Failed to unlink ${provider}:`, sanitizeLogMessage(error));
+    logger.error('account.provider_unlink_failed', { provider, error });
     return { ok: false, reason: 'unknown' };
   }
 }
@@ -82,7 +81,7 @@ export async function updateDisplayNameAction(
     await queries.account.updateDisplayName(userId, trimmedName);
     return { ok: true };
   } catch (error) {
-    console.error('Failed to update display name:', sanitizeLogMessage(error));
+    logger.error('account.display_name_update_failed', { error });
     return { ok: false };
   }
 }

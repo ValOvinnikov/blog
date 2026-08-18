@@ -1,7 +1,10 @@
 import { routes } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
 import type { Metadata } from 'next';
+
+const logger = createLogger();
 
 /**
  * Metadata for a `/[slug]` standalone page (`page_generic`). Unlike
@@ -18,10 +21,10 @@ export async function buildGenericPageMetadata(
   const result = await service.pages.generic.v1.getPage(slug);
 
   if (!result.ok) {
-    console.error(
-      `Error to fetch generic page metadata for "${slug}":`,
-      result.error,
-    );
+    logger.error('generic_page_metadata.fetch_failed', {
+      slug,
+      error: result.error,
+    });
     return {};
   }
 

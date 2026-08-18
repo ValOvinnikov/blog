@@ -1,8 +1,8 @@
 import { routes } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
-import { sanitizeLogMessage } from '@blog/utils';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { CategoryChipList } from '@web/components/shared/category-chip-list';
@@ -17,6 +17,8 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 type TCategoryPageProps = { slug: string; page?: number };
+
+const logger = createLogger();
 
 /**
  * CategoryPage — shared composition for `/category/[slug]` (page 1, `page`
@@ -41,9 +43,7 @@ export async function CategoryPage({ slug, page }: TCategoryPageProps) {
     ]);
 
   if (!result.ok) {
-    console.error(
-      `Error to fetch category page: ${sanitizeLogMessage(result.error)}`,
-    );
+    logger.error('category_page.fetch_failed', { slug, error: result.error });
     notFound();
   }
   if (result.data === null) {

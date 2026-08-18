@@ -38,8 +38,7 @@ describe('getCategoriesSafely', () => {
 
     await expect(getCategoriesSafely()).resolves.toEqual([]);
     expect(errorSpy).toHaveBeenCalledWith(
-      'Failed to load categories:',
-      expect.any(Error),
+      expect.stringContaining('categories.fetch_failed'),
     );
 
     errorSpy.mockRestore();

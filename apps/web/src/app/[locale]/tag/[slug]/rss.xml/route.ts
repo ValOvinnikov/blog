@@ -1,4 +1,5 @@
 import { routes } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service, type TArchivePostCard, type TTagPage } from '@blog/service';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
 import { env } from '@web/utils/env/env';
@@ -8,6 +9,8 @@ import { notFound } from 'next/navigation';
 type TProps = {
   params: Promise<{ slug: string }>;
 };
+
+const logger = createLogger();
 
 function toRssItem(post: TArchivePostCard, siteUrl: string): TRssItem {
   return {
@@ -32,7 +35,10 @@ async function getAllTagPosts(slug: string): Promise<TTagPage | null> {
     itemsPerPage: TAG_ITEMS_PER_PAGE,
   });
   if (!firstPage.ok) {
-    console.error(`Error fetching tag page for RSS feed: ${firstPage.error}`);
+    logger.error('tag_rss.first_page_fetch_failed', {
+      slug,
+      error: firstPage.error,
+    });
     return null;
   }
   if (firstPage.data === null) return null;
@@ -55,7 +61,7 @@ async function getAllTagPosts(slug: string): Promise<TTagPage | null> {
 
   const restPosts = restPages.flatMap((page) => {
     if (!page.ok) {
-      console.error(`Error fetching tag page for RSS feed: ${page.error}`);
+      logger.error('tag_rss.page_fetch_failed', { slug, error: page.error });
       return [];
     }
     return page.data?.posts ?? [];

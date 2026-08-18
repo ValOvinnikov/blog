@@ -1,8 +1,11 @@
 import { routes } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service, type TArchivePostCard } from '@blog/service';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
 import { env } from '@web/utils/env/env';
 import { getTranslations } from 'next-intl/server';
+
+const logger = createLogger();
 
 function toRssItem(post: TArchivePostCard, siteUrl: string): TRssItem {
   return {
@@ -16,9 +19,9 @@ function toRssItem(post: TArchivePostCard, siteUrl: string): TRssItem {
 async function getAllPublishedPosts(): Promise<TArchivePostCard[]> {
   const firstPageResult = await service.pages.blog.v1.getIndexPage({ page: 1 });
   if (!firstPageResult.ok) {
-    console.error(
-      `Error fetching blog index page for RSS feed: ${firstPageResult.error}`,
-    );
+    logger.error('rss.index_page_fetch_failed', {
+      error: firstPageResult.error,
+    });
     return [];
   }
 
@@ -35,7 +38,7 @@ async function getAllPublishedPosts(): Promise<TArchivePostCard[]> {
 
   const restPosts = restResults.flatMap((result) => {
     if (!result.ok) {
-      console.error(`Error fetching blog page for RSS feed: ${result.error}`);
+      logger.error('rss.page_fetch_failed', { error: result.error });
       return [];
     }
     return result.data.posts;
@@ -66,9 +69,9 @@ export async function GET(): Promise<Response> {
     ? siteSettingsResult.data.description
     : t('fallbackDescription');
   if (!siteSettingsResult.ok) {
-    console.error(
-      `Error fetching site settings for RSS feed: ${siteSettingsResult.error}`,
-    );
+    logger.error('rss.site_settings_fetch_failed', {
+      error: siteSettingsResult.error,
+    });
   }
 
   const xml = buildRssFeed(

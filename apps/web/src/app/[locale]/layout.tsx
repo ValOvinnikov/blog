@@ -1,4 +1,5 @@
 import { ICONS, type ILocalizedParams, routes, Size } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { Icon, NavLink } from '@blog/ui/atoms';
 import { Footer, Header } from '@blog/ui/organisms';
@@ -27,6 +28,8 @@ import {
 
 import { localeLayoutVariants } from './layout-variants';
 
+const logger = createLogger();
+
 export async function generateMetadata(): Promise<Metadata> {
   const result = await service.global.siteSettings.v1.getSiteSettings();
 
@@ -51,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
     : { robots: { index: false, follow: false } };
 
   if (!result.ok) {
-    console.error(`Error to fetch site settings: ${result.error}`);
+    logger.error('site_settings.fetch_failed', { error: result.error });
     return { metadataBase, ...robotsMetadata };
   }
 
@@ -107,7 +110,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
   ]);
 
   if (!settingsResult.ok) {
-    console.error(`Error to fetch site settings: ${settingsResult.error}`);
+    logger.error('site_settings.fetch_failed', { error: settingsResult.error });
     notFound();
   }
 

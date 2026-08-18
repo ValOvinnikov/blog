@@ -1,8 +1,8 @@
 import { routes } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
-import { sanitizeLogMessage } from '@blog/utils';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
@@ -15,6 +15,8 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 type TTagPageProps = { slug: string; page?: number };
+
+const logger = createLogger();
 
 /**
  * TagPage — shared composition for `/tag/[slug]` (page 1, `page` omitted)
@@ -37,9 +39,7 @@ export async function TagPage({ slug, page }: TTagPageProps) {
   ]);
 
   if (!result.ok) {
-    console.error(
-      `Error to fetch tag page: ${sanitizeLogMessage(result.error)}`,
-    );
+    logger.error('tag_page.fetch_failed', { slug, error: result.error });
     notFound();
   }
   if (result.data === null) {

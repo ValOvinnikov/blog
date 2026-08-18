@@ -1,6 +1,9 @@
+import { createLogger } from '@blog/insight';
 import { buildImageUrl, service, type TRawImage } from '@blog/service';
 
 export const contentType = 'image/svg+xml';
+
+const logger = createLogger();
 
 const FAVICON_SIZE = 64;
 const FETCH_TIMEOUT_MS = 5000;
@@ -36,9 +39,7 @@ async function fetchLogoIcon(
   });
 
   if (!response.ok) {
-    console.error(
-      `Error fetching uploaded logo for icon: received ${response.status}`,
-    );
+    logger.error('icon.logo_response_not_ok', { status: response.status });
     return undefined;
   }
 
@@ -64,7 +65,7 @@ export default async function Icon() {
   const result = await service.global.siteSettings.v1.getSiteSettings();
 
   if (!result.ok) {
-    console.error(`Error fetching site settings for icon: ${result.error}`);
+    logger.error('icon.site_settings_fetch_failed', { error: result.error });
     return buildFallbackResponse();
   }
 
@@ -86,7 +87,7 @@ export default async function Icon() {
       });
     }
   } catch (error) {
-    console.error(`Error fetching uploaded logo for icon: ${error}`);
+    logger.error('icon.logo_fetch_failed', { error });
   }
 
   return buildFallbackResponse();

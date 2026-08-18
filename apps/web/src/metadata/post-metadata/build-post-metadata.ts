@@ -1,7 +1,10 @@
 import { routes } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
 import type { Metadata } from 'next';
+
+const logger = createLogger();
 
 /**
  * Metadata for a post detail page (`/blog/{slug}`) — canonical, OG, Twitter,
@@ -12,7 +15,7 @@ export async function buildPostMetadata(slug: string): Promise<Metadata> {
   const result = await service.pages.post.v1.getPost(slug);
 
   if (!result.ok) {
-    console.error(`Error to fetch post metadata: ${result.error}`);
+    logger.error('post_metadata.fetch_failed', { slug, error: result.error });
     return {};
   }
   if (result.data === null) {

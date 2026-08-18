@@ -1,4 +1,5 @@
 import type { ILocalizedParams } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { BlogPostPage } from '@web/components/pages/blog-post-page';
 import { buildPostMetadata } from '@web/metadata/post-metadata';
@@ -9,6 +10,8 @@ type TProps = {
   params: Promise<ILocalizedParams & { slug: string }>;
 };
 
+const logger = createLogger();
+
 // CI's build environment can't always construct the Sanity client; an
 // uncaught throw here would crash the entire `next build`. `dynamicParams`
 // stays default `true`, so a missed build-time slug still renders on demand.
@@ -16,7 +19,7 @@ export async function generateStaticParams() {
   const result = await service.pages.post.v1.getPostParams();
 
   if (!result.ok) {
-    console.error('Error to fetch post params:', result.error);
+    logger.error('blog_post.params_fetch_failed', { error: result.error });
     return [];
   }
 

@@ -1,3 +1,4 @@
+import { createLogger } from '@blog/insight';
 import { env } from '@web/utils/env/env';
 import { isSecretMatch } from '@web/utils/is-secret-match';
 import { revalidatePath, revalidateTag } from 'next/cache';
@@ -7,6 +8,8 @@ import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 
 const SITE_CONFIG_CACHE_TAG = 'site-config';
+
+const logger = createLogger();
 
 /**
  * On-demand revalidation endpoint for `apps/admin`'s Look/Voice saves —
@@ -20,9 +23,7 @@ const SITE_CONFIG_CACHE_TAG = 'site-config';
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.SITE_CONFIG_REVALIDATE_SECRET;
   if (!secret) {
-    console.error(
-      'revalidate-site-config: SITE_CONFIG_REVALIDATE_SECRET is not configured.',
-    );
+    logger.error('revalidate_site_config.secret_missing');
     return NextResponse.json(
       { message: 'Revalidation secret is not configured.' },
       { status: 500 },

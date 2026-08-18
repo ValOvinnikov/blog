@@ -1,9 +1,12 @@
 import { routes } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+
+const logger = createLogger();
 
 /**
  * Metadata for a `/tag/[slug]` page (page 1, `pageNumber` omitted) or a
@@ -34,7 +37,7 @@ export async function buildTagMetadata(
   ]);
 
   if (!result.ok) {
-    console.error(`Error to fetch tag page metadata: ${result.error}`);
+    logger.error('tag_metadata.fetch_failed', { slug, error: result.error });
     return {};
   }
   if (result.data === null) {

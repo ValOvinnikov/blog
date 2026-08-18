@@ -1,4 +1,5 @@
 import type { ILocalizedParams } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { HomePageTemplate } from '@web/components/page-templates/home-page-template';
 import { toMetadata } from '@web/metadata/to-metadata';
@@ -12,11 +13,13 @@ type TProps = {
   params: Promise<ILocalizedParams>;
 };
 
+const logger = createLogger();
+
 export async function generateMetadata(): Promise<Metadata> {
   const result = await service.pages.home.v1.getHomePage();
 
   if (!result.ok) {
-    console.error(`Error to fetch home page metadata: ${result.error}`);
+    logger.error('home_page.metadata_fetch_failed', { error: result.error });
     return {};
   }
 
@@ -34,7 +37,7 @@ export default async function HomePage({ params }: TProps) {
   const result = await service.pages.home.v1.getHomePage();
 
   if (!result.ok) {
-    console.error(`Error to fetch home page: ${result.error}`);
+    logger.error('home_page.fetch_failed', { error: result.error });
     notFound();
   }
 

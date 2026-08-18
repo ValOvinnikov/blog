@@ -1,6 +1,6 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
+import { createLogger } from '@blog/insight';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
 import { escapeXml } from '@web/utils/escape-xml';
 import { NextResponse } from 'next/server';
@@ -11,6 +11,8 @@ type TConfirmationPageCopy = {
   message: string;
   returnHomeLabel: string;
 };
+
+const logger = createLogger();
 
 /**
  * A minimal, self-contained HTML page — this route handler can't render
@@ -115,10 +117,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } },
     );
   } catch (error) {
-    console.error(
-      'Failed to confirm newsletter subscription:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('newsletter.confirm_failed', { error });
     return new NextResponse(
       renderConfirmationPage({
         title: t('errorTitle'),

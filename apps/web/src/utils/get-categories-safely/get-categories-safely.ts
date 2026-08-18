@@ -1,4 +1,7 @@
+import { createLogger } from '@blog/insight';
 import { service, type TCategoriesList } from '@blog/service';
+
+const logger = createLogger();
 
 /**
  * Fetches every category for the category chip row, falling back to an
@@ -9,7 +12,7 @@ export async function getCategoriesSafely(): Promise<TCategoriesList> {
   const result = await service.entities.categories.v1.getCategories();
 
   if (!result.ok) {
-    console.error('Failed to load categories:', result.error);
+    logger.error('categories.fetch_failed', { error: result.error });
     return [];
   }
 

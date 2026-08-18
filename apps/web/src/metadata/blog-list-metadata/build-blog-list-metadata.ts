@@ -1,8 +1,11 @@
 import { routes } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+
+const logger = createLogger();
 
 /**
  * Metadata for a blog list page. Every page self-canonicalizes — page 2+
@@ -22,7 +25,10 @@ export async function buildBlogListMetadata(page: number): Promise<Metadata> {
   ]);
 
   if (!result.ok) {
-    console.error(`Error to fetch blog index page metadata: ${result.error}`);
+    logger.error('blog_list_metadata.fetch_failed', {
+      page,
+      error: result.error,
+    });
     return {};
   }
 

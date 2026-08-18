@@ -1,6 +1,9 @@
 import type { TThemeTokens } from '@blog/config';
+import { createLogger } from '@blog/insight';
 import { getSiteConfig } from '@web/server/site-config/get-site-config';
 import { toThemeTokens } from '@web/utils/to-theme-tokens';
+
+const logger = createLogger();
 
 /**
  * Resolves the tenant's full theme tokens from the `@blog/db`-backed
@@ -13,7 +16,9 @@ export async function getThemeTokens(): Promise<TThemeTokens> {
   const result = await getSiteConfig();
 
   if (!result.ok) {
-    console.error(`Error fetching site config: ${result.error}`);
+    logger.error('theme_tokens.site_config_fetch_failed', {
+      error: result.error,
+    });
     return toThemeTokens(undefined);
   }
 

@@ -1,6 +1,9 @@
+import { createLogger } from '@blog/insight';
 import { service } from '@blog/service';
 import { oklchToHex } from '@blog/utils';
 import { ImageResponse } from 'next/og';
+
+const logger = createLogger();
 
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
@@ -128,7 +131,7 @@ export async function buildDefaultSocialImage({
       `${brandName}${tagline ?? ''}`,
     );
   } catch (error) {
-    console.error(`Error loading font for default social image: ${error}`);
+    logger.error('default_social_image.font_load_failed', { error });
     return renderMarkOnly();
   }
 
@@ -198,9 +201,10 @@ export async function resolveDefaultSocialImageProps(
   const result = await service.global.siteSettings.v1.getSiteSettings();
 
   if (!result.ok) {
-    console.error(
-      `Error fetching site settings for ${routeName}: ${result.error}`,
-    );
+    logger.error('default_social_image.site_settings_fetch_failed', {
+      routeName,
+      error: result.error,
+    });
     return {};
   }
 
