@@ -54,7 +54,9 @@ export async function generateMetadata(): Promise<Metadata> {
     : { robots: { index: false, follow: false } };
 
   if (!result.ok) {
-    logger.error('site_settings.fetch_failed', { error: result.error });
+    logger.error('site_settings.metadata_fetch_failed', {
+      error: result.error,
+    });
     return { metadataBase, ...robotsMetadata };
   }
 
@@ -110,7 +112,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
   ]);
 
   if (!settingsResult.ok) {
-    logger.error('site_settings.fetch_failed', { error: settingsResult.error });
+    logger.error('site_settings.layout_fetch_failed', {
+      error: settingsResult.error,
+    });
     notFound();
   }
 
