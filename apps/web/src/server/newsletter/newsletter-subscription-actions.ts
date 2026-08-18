@@ -1,7 +1,6 @@
 'use server';
 
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
 import { auth } from '@web/server/auth/auth';
 import { sendEmail } from '@web/server/email/send-email';
 import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newsletter-confirmation-email';
@@ -9,6 +8,7 @@ import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-
 import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { env } from '@web/utils/env/env';
+import { logger } from '@web/utils/logger/logger';
 
 export type TUnsubscribeResult = { ok: true } | { ok: false };
 export type TResendConfirmationActionResult = { ok: true } | { ok: false };
@@ -36,10 +36,7 @@ export async function unsubscribeAction(): Promise<TUnsubscribeResult> {
     await clearNewsletterSubscribedCookieSafely();
     return { ok: true };
   } catch (error) {
-    console.error(
-      'Failed to unsubscribe from the newsletter:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('newsletter.unsubscribe_failed', { error });
     return { ok: false };
   }
 }
@@ -57,10 +54,7 @@ async function clearNewsletterSubscribedCookieSafely(): Promise<void> {
   try {
     await clearNewsletterSubscribedCookie();
   } catch (error) {
-    console.error(
-      'Failed to clear the newsletter-subscribed cookie:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('newsletter.subscribed_cookie_clear_failed', { error });
   }
 }
 
@@ -100,10 +94,7 @@ export async function resendConfirmationAction(): Promise<TResendConfirmationAct
     await sendEmail({ to: email, from: fromAddress, subject, html });
     return { ok: true };
   } catch (error) {
-    console.error(
-      'Failed to resend the newsletter confirmation email:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('newsletter.confirmation_resend_failed', { error });
     return { ok: false };
   }
 }

@@ -80,8 +80,27 @@ When invoked, before writing any code:
 - **Never edit files outside `apps/admin`.** `packages/db`, `packages/ui`,
   `packages/config`, and `apps/web` each belong to another agent. If your work
   needs a change there, implement your side and report the required change.
+- **Log through the shared logger — never bare `console.*`, and never call
+  `createLogger` yourself.** This app has one logger at
+  `src/utils/logger/logger.ts` (`createLogger({ service: 'admin' })`) — import
+  it. The `service` field it carries is what separates this app's lines from
+  `apps/web`'s in the shared log pipeline, so a locally-constructed logger
+  silently loses it. Call `logger.error` / `logger.warn` with a **static, lowercase,
+  dot-namespaced event name**, passing the error and any identifiers as
+  structured `context` fields:
+  ```ts
+  logger.error('provisioning.dispatch_failed', { tenantId, step, error });
+  ```
+  **Never interpolate a dynamic value into the event name** — no template
+  literals, no concatenation. Tenant ids, slugs, domains, and status codes
+  belong in the context object. Keeping the event name static is what makes
+  failures groupable downstream and what preserves the log-injection barrier
+  CodeQL checks. Pass the raw `error` through; the logger normalizes it to
+  message + capped stack, so no manual sanitizing wrapper is needed. **Never
+  log a secret's value** — log whether it was configured, not what it was, and
+  log a response's status code rather than its body.
 - Depend on `@blog/db`, `@blog/auth`, `@blog/config`, `@blog/ui`, and
-  `@blog/utils` only.
+  `@blog/insight` only.
   Whenever this app starts consuming a new workspace package, its alias must be
   added to `tsconfig.json` `paths` **and** `vitest.config.ts` `resolve.alias` —
   that wiring is the `config` agent's, so report it rather than editing shared

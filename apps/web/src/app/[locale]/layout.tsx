@@ -12,6 +12,7 @@ import { routing } from '@web/i18n/routing';
 import { env } from '@web/utils/env/env';
 import { getChromeOn } from '@web/utils/get-chrome-on';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
+import { logger } from '@web/utils/logger/logger';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -51,7 +52,9 @@ export async function generateMetadata(): Promise<Metadata> {
     : { robots: { index: false, follow: false } };
 
   if (!result.ok) {
-    console.error(`Error to fetch site settings: ${result.error}`);
+    logger.error('site_settings.metadata_fetch_failed', {
+      error: result.error,
+    });
     return { metadataBase, ...robotsMetadata };
   }
 
@@ -107,7 +110,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
   ]);
 
   if (!settingsResult.ok) {
-    console.error(`Error to fetch site settings: ${settingsResult.error}`);
+    logger.error('site_settings.layout_fetch_failed', {
+      error: settingsResult.error,
+    });
     notFound();
   }
 

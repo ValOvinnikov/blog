@@ -1,6 +1,6 @@
 'use server';
 
-import { requireAdmin } from '@admin/server/auth/require-admin';
+import { requireSuperAdmin } from '@admin/server/auth/require-super-admin';
 
 import { dispatchProvisioningWorkflow } from './dispatch-provisioning-workflow';
 
@@ -14,6 +14,6 @@ import { dispatchProvisioningWorkflow } from './dispatch-provisioning-workflow';
 export async function retryProvisioningStepAction(
   tenantId: string,
 ): Promise<void> {
-  await requireAdmin();
+  await requireSuperAdmin();
   await dispatchProvisioningWorkflow(tenantId);
 }

@@ -57,13 +57,36 @@ When invoked, before writing any code:
   - Optional/global data (site settings in layout): log the error and apply
     fallbacks — or return early if a fallback is not possible.
   ```ts
+  import { logger } from '@web/utils/logger/logger';
+
   const result = await service.global.siteSettings.v1.getSiteSettings();
   if (!result.ok) {
-    console.error('Failed to load site settings:', result.error);
+    logger.error('site_settings.fetch_failed', { error: result.error });
     return;
   }
   const { title, navigation } = result.data;
   ```
+- **Log through the shared logger — never bare `console.*`, and never call
+  `createLogger` yourself.** This app has one logger at
+  `src/utils/logger/logger.ts` (`createLogger({ service: 'web' })`); import it
+  as `import { logger } from '@web/utils/logger/logger';`. The `service` field
+  it carries is what separates this app's lines from `apps/admin`'s in the
+  shared log pipeline, so a locally-constructed logger silently loses it.
+  Call `logger.error` / `logger.warn` with a **static, lowercase,
+  dot-namespaced event name** and pass the error plus any identifiers as
+  structured `context` fields:
+  ```ts
+  logger.error('blog_post_page.fetch_failed', { slug, error: result.error });
+  ```
+  **Never interpolate a dynamic value into the event name** — no template
+  literals, no concatenation. Slugs, ids, locales, and status codes go in the
+  context object. The event name is what makes failures groupable in the log
+  pipeline, and keeping it static is also what preserves the log-injection
+  barrier that CodeQL checks. Pass the raw `error` straight through; the logger
+  normalizes it to message + capped stack itself, so no manual sanitizing
+  wrapper is needed. Give two different failure sites two different event
+  names, even in the same file — a shared name makes them indistinguishable
+  downstream.
 - `"use client"` only where interaction truly requires it (theme toggle, share
   buttons, mobile nav). Default to Server Components.
 - **Never use `next/link` or the i18n `Link` directly.** All links go through the

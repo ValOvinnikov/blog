@@ -3,7 +3,6 @@ import { service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Article, PostsSection } from '@blog/ui/organisms';
-import { sanitizeLogMessage } from '@blog/utils';
 import { BackToTopButton } from '@web/components/shared/back-to-top-button';
 import { BookmarkButton } from '@web/components/shared/bookmark-button';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
@@ -25,6 +24,7 @@ import {
   extractPostHeadings,
   MIN_H2_HEADINGS_FOR_RAIL,
 } from '@web/utils/extract-post-headings/extract-post-headings';
+import { logger } from '@web/utils/logger/logger';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import { notFound } from 'next/navigation';
@@ -48,7 +48,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   const result = await service.pages.post.v1.getPost(slug);
 
   if (!result.ok) {
-    console.error(`Error to fetch post: ${sanitizeLogMessage(result.error)}`);
+    logger.error('blog_post_page.fetch_failed', { slug, error: result.error });
     notFound();
   }
   if (result.data === null) {
@@ -110,9 +110,9 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
   // fetch-error stance): logged, and the signup is simply omitted rather
   // than guessed at.
   if (!newsletterSettingsResult.ok) {
-    console.error(
-      `Error to fetch newsletter settings: ${sanitizeLogMessage(newsletterSettingsResult.error)}`,
-    );
+    logger.error('blog_post_page.newsletter_settings_fetch_failed', {
+      error: newsletterSettingsResult.error,
+    });
   }
 
   const trail: IBreadcrumbItem[] = [

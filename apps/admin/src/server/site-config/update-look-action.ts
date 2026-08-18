@@ -2,6 +2,7 @@
 
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@admin/server/site-config/revalidate-site-config';
+import { logger } from '@admin/utils/logger/logger';
 import {
   DENSITY,
   FONT_CHOICE,
@@ -13,7 +14,6 @@ import {
   type TRadiusScale,
 } from '@blog/config';
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
 import { z } from 'zod';
 
 const HUE_MIN = 0;
@@ -62,7 +62,10 @@ export async function updateLookAction(
     await revalidateSiteConfig();
     return { ok: true };
   } catch (error) {
-    console.error('Failed to save Look settings:', sanitizeLogMessage(error));
+    logger.error('site_config.look_save_failed', {
+      tenantId: tenant.id,
+      error,
+    });
     return { ok: false };
   }
 }

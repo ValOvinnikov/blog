@@ -2,13 +2,13 @@ import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
-import { sanitizeLogMessage } from '@blog/utils';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
+import { logger } from '@web/utils/logger/logger';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
@@ -37,9 +37,7 @@ export async function TagPage({ slug, page }: TTagPageProps) {
   ]);
 
   if (!result.ok) {
-    console.error(
-      `Error to fetch tag page: ${sanitizeLogMessage(result.error)}`,
-    );
+    logger.error('tag_page.fetch_failed', { slug, error: result.error });
     notFound();
   }
   if (result.data === null) {

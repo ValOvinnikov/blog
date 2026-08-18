@@ -1,5 +1,5 @@
 import { env } from '@admin/utils/env/env';
-import { sanitizeLogMessage } from '@blog/utils';
+import { logger } from '@admin/utils/logger/logger';
 
 const REVALIDATE_PATH = '/api/revalidate-site-config';
 const SITE_CONFIG_REVALIDATE_TIMEOUT_MS = 5000;
@@ -16,9 +16,7 @@ export async function revalidateSiteConfig(): Promise<void> {
   const { WEB_APP_URL: webAppUrl, SITE_CONFIG_REVALIDATE_SECRET: secret } = env;
 
   if (!webAppUrl || !secret) {
-    console.error(
-      'Skipped site-config revalidation webhook: WEB_APP_URL or SITE_CONFIG_REVALIDATE_SECRET is not configured.',
-    );
+    logger.error('site_config.revalidate_skipped');
     return;
   }
 
@@ -30,14 +28,11 @@ export async function revalidateSiteConfig(): Promise<void> {
     });
 
     if (!response.ok) {
-      console.error(
-        `Site-config revalidation webhook responded with ${response.status}.`,
-      );
+      logger.error('site_config.revalidate_failed', {
+        responseStatus: response.status,
+      });
     }
   } catch (error) {
-    console.error(
-      'Failed to call the site-config revalidation webhook:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('site_config.revalidate_error', { error });
   }
 }

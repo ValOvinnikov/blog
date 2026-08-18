@@ -1,14 +1,14 @@
 export {};
 
-const { requireAdminMock, dispatchProvisioningWorkflowMock } = vi.hoisted(
+const { requireSuperAdminMock, dispatchProvisioningWorkflowMock } = vi.hoisted(
   () => ({
-    requireAdminMock: vi.fn(),
+    requireSuperAdminMock: vi.fn(),
     dispatchProvisioningWorkflowMock: vi.fn(),
   }),
 );
 
-vi.mock('@admin/server/auth/require-admin', () => ({
-  requireAdmin: requireAdminMock,
+vi.mock('@admin/server/auth/require-super-admin', () => ({
+  requireSuperAdmin: requireSuperAdminMock,
 }));
 
 vi.mock('./dispatch-provisioning-workflow', () => ({
@@ -17,14 +17,17 @@ vi.mock('./dispatch-provisioning-workflow', () => ({
 
 describe('retryProvisioningStepAction', () => {
   beforeEach(() => {
-    requireAdminMock.mockReset();
-    requireAdminMock.mockResolvedValue({ id: 'admin-1' });
+    requireSuperAdminMock.mockReset();
+    requireSuperAdminMock.mockResolvedValue({
+      id: 'admin-1',
+      role: 'SUPERADMIN',
+    });
     dispatchProvisioningWorkflowMock.mockReset();
     dispatchProvisioningWorkflowMock.mockResolvedValue(undefined);
   });
 
-  it('requires an admin session before dispatching', async () => {
-    requireAdminMock.mockImplementation(() => {
+  it('requires a super-admin session before dispatching', async () => {
+    requireSuperAdminMock.mockImplementation(() => {
       throw new Error('NEXT_REDIRECT');
     });
     const { retryProvisioningStepAction } =

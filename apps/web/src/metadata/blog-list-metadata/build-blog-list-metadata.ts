@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
@@ -22,7 +23,10 @@ export async function buildBlogListMetadata(page: number): Promise<Metadata> {
   ]);
 
   if (!result.ok) {
-    console.error(`Error to fetch blog index page metadata: ${result.error}`);
+    logger.error('blog_list_metadata.fetch_failed', {
+      page,
+      error: result.error,
+    });
     return {};
   }
 

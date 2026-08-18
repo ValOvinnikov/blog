@@ -1,6 +1,7 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
 /**
@@ -18,10 +19,10 @@ export async function buildGenericPageMetadata(
   const result = await service.pages.generic.v1.getPage(slug);
 
   if (!result.ok) {
-    console.error(
-      `Error to fetch generic page metadata for "${slug}":`,
-      result.error,
-    );
+    logger.error('generic_page_metadata.fetch_failed', {
+      slug,
+      error: result.error,
+    });
     return {};
   }
 

@@ -45,7 +45,7 @@ describe('getThemeTokens', () => {
       }),
     );
     expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('site config'),
+      expect.stringContaining('theme_tokens.site_config_fetch_failed'),
     );
 
     errorSpy.mockRestore();

@@ -2,6 +2,7 @@ import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { CategoryPage } from '@web/components/pages/category-page';
 import { buildCategoryMetadata } from '@web/metadata/category-metadata';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
@@ -16,7 +17,7 @@ export async function generateStaticParams() {
   const result = await service.pages.category.v1.getCategoryParams();
 
   if (!result.ok) {
-    console.error(`Error to fetch category params: ${result.error}`);
+    logger.error('category_page.params_fetch_failed', { error: result.error });
     return [];
   }
 

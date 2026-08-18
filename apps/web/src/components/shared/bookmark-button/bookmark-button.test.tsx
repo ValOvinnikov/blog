@@ -120,8 +120,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
       'false',
     );
     expect(errorSpy).toHaveBeenCalledWith(
-      'Failed to load bookmark status:',
-      expect.any(Error),
+      expect.stringContaining('bookmark_button.status_fetch_failed'),
     );
 
     errorSpy.mockRestore();

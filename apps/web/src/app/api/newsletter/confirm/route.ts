@@ -1,8 +1,8 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
 import { escapeXml } from '@web/utils/escape-xml';
+import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { getTranslations } from 'next-intl/server';
 
@@ -115,10 +115,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } },
     );
   } catch (error) {
-    console.error(
-      'Failed to confirm newsletter subscription:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('newsletter.confirm_failed', { error });
     return new NextResponse(
       renderConfirmationPage({
         title: t('errorTitle'),

@@ -1,7 +1,6 @@
 'use server';
 
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
 import { sendEmail } from '@web/server/email/send-email';
 import { buildNewsletterConfirmationEmail } from '@web/server/newsletter/newsletter-confirmation-email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
@@ -9,6 +8,7 @@ import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subs
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { env } from '@web/utils/env/env';
 import { isValidEmail } from '@web/utils/is-valid-email';
+import { logger } from '@web/utils/logger/logger';
 
 export type TSubscribeResult =
   | { outcome: 'success' }
@@ -78,10 +78,7 @@ export async function subscribeToNewsletterAction(
     await markNewsletterSubscribedSafely();
     return { outcome: 'success' };
   } catch (error) {
-    console.error(
-      'Failed to subscribe to newsletter:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('newsletter.subscribe_failed', { error });
     return { outcome: 'server-error' };
   }
 }
@@ -100,9 +97,6 @@ async function markNewsletterSubscribedSafely(): Promise<void> {
   try {
     await markNewsletterSubscribed();
   } catch (error) {
-    console.error(
-      'Failed to set the newsletter-subscribed cookie:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('newsletter.subscribed_cookie_set_failed', { error });
   }
 }

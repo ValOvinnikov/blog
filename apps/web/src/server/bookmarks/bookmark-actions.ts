@@ -1,9 +1,9 @@
 'use server';
 
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
 import { auth } from '@web/server/auth/auth';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { logger } from '@web/utils/logger/logger';
 
 export type TSetBookmarkResult = { ok: true } | { ok: false };
 
@@ -53,7 +53,7 @@ export async function setBookmarkStatus(
     }
     return { ok: true };
   } catch (error) {
-    console.error('Failed to update bookmark:', sanitizeLogMessage(error));
+    logger.error('bookmark.update_failed', { postId, error });
     return { ok: false };
   }
 }

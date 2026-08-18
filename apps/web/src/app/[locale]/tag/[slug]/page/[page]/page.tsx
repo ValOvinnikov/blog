@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { TagPage } from '@web/components/pages/tag-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildTagMetadata } from '@web/metadata/tag-metadata';
+import { logger } from '@web/utils/logger/logger';
 import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import type { Metadata } from 'next';
@@ -23,7 +24,9 @@ export async function generateStaticParams() {
     await service.pages.tag.v1.getTagPaginationParams(TAG_ITEMS_PER_PAGE);
 
   if (!result.ok) {
-    console.error(`Error to fetch tag pagination params: ${result.error}`);
+    logger.error('tag_pagination.params_fetch_failed', {
+      error: result.error,
+    });
     return [];
   }
 

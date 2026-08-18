@@ -11,9 +11,9 @@
       "@admin/*": ["./src/*"],
       "@blog/db/*": ["../../packages/db/src/*"],
       "@blog/auth/*": ["../../packages/auth/src/*"],
+      "@blog/insight/*": ["../../packages/insight/src/*"],
       "@blog/config/*": ["../../packages/config/src/*"],
-      "@blog/ui/*": ["../../packages/ui/src/*"],
-      "@blog/utils/*": ["../../packages/utils/src/*"]
+      "@blog/ui/*": ["../../packages/ui/src/*"]
     },
     "plugins": [
       {

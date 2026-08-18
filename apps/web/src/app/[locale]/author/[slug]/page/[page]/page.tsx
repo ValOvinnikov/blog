@@ -4,6 +4,7 @@ import { AuthorPage } from '@web/components/pages/author-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildAuthorMetadata } from '@web/metadata/author-metadata';
 import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
+import { logger } from '@web/utils/logger/logger';
 import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -24,7 +25,9 @@ export async function generateStaticParams() {
   );
 
   if (!result.ok) {
-    console.error(`Error to fetch author pagination params: ${result.error}`);
+    logger.error('author_pagination.params_fetch_failed', {
+      error: result.error,
+    });
     return [];
   }
 

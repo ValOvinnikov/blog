@@ -4,6 +4,7 @@ import { routing } from '@web/i18n/routing';
 import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
 import { env } from '@web/utils/env/env';
+import { logger } from '@web/utils/logger/logger';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import type { MetadataRoute } from 'next';
 
@@ -41,7 +42,7 @@ function toEntry(
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = env.NEXT_PUBLIC_SITE_URL;
   if (!siteUrl) {
-    console.error('Cannot build sitemap: NEXT_PUBLIC_SITE_URL is not set.');
+    logger.error('sitemap.site_url_missing');
     return [];
   }
 
@@ -70,73 +71,73 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
 
   if (!postParamsResult.ok) {
-    console.error(
-      `Error fetching post params for sitemap: ${postParamsResult.error}`,
-    );
+    logger.error('sitemap.post_params_fetch_failed', {
+      error: postParamsResult.error,
+    });
   }
   const posts = postParamsResult.ok ? postParamsResult.data : [];
 
   if (!categoryParamsResult.ok) {
-    console.error(
-      `Error fetching category params for sitemap: ${categoryParamsResult.error}`,
-    );
+    logger.error('sitemap.category_params_fetch_failed', {
+      error: categoryParamsResult.error,
+    });
   }
   const categories = categoryParamsResult.ok ? categoryParamsResult.data : [];
 
   if (!tagParamsResult.ok) {
-    console.error(
-      `Error fetching tag params for sitemap: ${tagParamsResult.error}`,
-    );
+    logger.error('sitemap.tag_params_fetch_failed', {
+      error: tagParamsResult.error,
+    });
   }
   const tags = tagParamsResult.ok ? tagParamsResult.data : [];
 
   if (!authorParamsResult.ok) {
-    console.error(
-      `Error fetching author params for sitemap: ${authorParamsResult.error}`,
-    );
+    logger.error('sitemap.author_params_fetch_failed', {
+      error: authorParamsResult.error,
+    });
   }
   const authors = authorParamsResult.ok ? authorParamsResult.data : [];
 
   if (!categoryPaginationParamsResult.ok) {
-    console.error(
-      `Error fetching category pagination params for sitemap: ${categoryPaginationParamsResult.error}`,
-    );
+    logger.error('sitemap.category_pagination_params_fetch_failed', {
+      error: categoryPaginationParamsResult.error,
+    });
   }
   const categoryPages = categoryPaginationParamsResult.ok
     ? categoryPaginationParamsResult.data
     : [];
 
   if (!tagPaginationParamsResult.ok) {
-    console.error(
-      `Error fetching tag pagination params for sitemap: ${tagPaginationParamsResult.error}`,
-    );
+    logger.error('sitemap.tag_pagination_params_fetch_failed', {
+      error: tagPaginationParamsResult.error,
+    });
   }
   const tagPages = tagPaginationParamsResult.ok
     ? tagPaginationParamsResult.data
     : [];
 
   if (!authorPaginationParamsResult.ok) {
-    console.error(
-      `Error fetching author pagination params for sitemap: ${authorPaginationParamsResult.error}`,
-    );
+    logger.error('sitemap.author_pagination_params_fetch_failed', {
+      error: authorPaginationParamsResult.error,
+    });
   }
   const authorPages = authorPaginationParamsResult.ok
     ? authorPaginationParamsResult.data
     : [];
 
   if (!blogParamsResult.ok) {
-    console.error(
-      `Error fetching blog page params for sitemap: ${blogParamsResult.error}`,
-    );
+    logger.error('sitemap.blog_page_params_fetch_failed', {
+      error: blogParamsResult.error,
+    });
   }
   const blogPageNumbers = blogParamsResult.ok
     ? blogParamsResult.data.map(({ page }) => Number(page))
     : [];
 
   if (!genericPageSlugsResult.ok) {
-    console.error(
-      `Error fetching generic page slugs for sitemap: ${genericPageSlugsResult.error}`,
-    );
+    logger.error('sitemap.generic_page_slugs_fetch_failed', {
+      error: genericPageSlugsResult.error,
+    });
   }
   const genericPageSlugs = genericPageSlugsResult.ok
     ? genericPageSlugsResult.data

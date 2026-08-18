@@ -119,12 +119,15 @@ owns it). Do them in dependency order; later steps depend on earlier output.
 | Components                                                   | `ui`        | `ui-library-practices`, `ui-storybook`, `testing-practices`                         |
 | Routes / metadata / feeds                                    | `web`       | `web-component-practices`, `seo-and-metadata`, `web-storybook`, `testing-practices` |
 | Admin-panel routes, Server Actions, Base UI forms            | `admin-app` | `testing-practices`                                                                 |
+| Structured logging (`createLogger`, log sanitization)        | `insight`   | `testing-practices`                                                                 |
 
-`db`, `auth` and `admin-app` are the rows that are **not** steps in that chain.
-`db` and `admin-app` are siblings to `service` and `web` respectively, `auth` is
-a thin layer above `db`, and none of the three consumes Sanity.
+`db`, `auth`, `admin-app`, and `insight` are the rows that are **not** steps in
+that chain. `db` and `admin-app` are siblings to `service` and `web`
+respectively, `auth` is a thin layer above `db`, `insight` is independent (like
+`config`/`utils`), and none of the four consumes Sanity.
 `config → db → auth → admin-app` runs in parallel to `cms → service → ui → web`,
-not after it.
+not after it. `insight` has no upstream and no downstream in this chain today
+— dispatch it standalone when the work is genuinely `packages/insight`'s.
 
 All subagents use **Sonnet** (set in each agent's definition file — do not
 override with a different model unless the user explicitly asks).

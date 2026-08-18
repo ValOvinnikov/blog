@@ -92,7 +92,7 @@ describe(`<${RootLayout.name}/>`, () => {
       '--brand-primary: oklch(0.53 0.17 250);',
     );
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('site config'),
+      expect.stringContaining('theme_tokens.site_config_fetch_failed'),
     );
     consoleErrorSpy.mockRestore();
   });

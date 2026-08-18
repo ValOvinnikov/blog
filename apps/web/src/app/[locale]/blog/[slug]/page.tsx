@@ -2,6 +2,7 @@ import type { ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { BlogPostPage } from '@web/components/pages/blog-post-page';
 import { buildPostMetadata } from '@web/metadata/post-metadata';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
@@ -16,7 +17,7 @@ export async function generateStaticParams() {
   const result = await service.pages.post.v1.getPostParams();
 
   if (!result.ok) {
-    console.error('Error to fetch post params:', result.error);
+    logger.error('blog_post.params_fetch_failed', { error: result.error });
     return [];
   }
 

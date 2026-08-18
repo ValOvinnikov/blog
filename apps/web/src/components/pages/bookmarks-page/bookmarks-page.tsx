@@ -4,12 +4,12 @@ import { service } from '@blog/service';
 import { Heading, Text } from '@blog/ui/atoms';
 import { WindowChrome } from '@blog/ui/molecules';
 import { BookmarksList, type IBookmarkRow } from '@blog/ui/organisms';
-import { sanitizeLogMessage } from '@blog/utils';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { auth } from '@web/server/auth/auth';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { getChromeOn } from '@web/utils/get-chrome-on';
+import { logger } from '@web/utils/logger/logger';
 import { redirect } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
@@ -64,9 +64,9 @@ export async function BookmarksPage() {
   );
 
   if (!result.ok) {
-    console.error(
-      `Failed to resolve bookmarked posts: ${sanitizeLogMessage(result.error)}`,
-    );
+    logger.error('bookmarks_page.posts_resolve_failed', {
+      error: result.error,
+    });
     return null;
   }
 
