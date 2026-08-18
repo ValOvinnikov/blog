@@ -3,7 +3,9 @@ import { sanitizeLogMessage } from './sanitize-log-message';
 /**
  * Local to `@blog/utils/log` rather than `@blog/config`: `@blog/utils` sits
  * below `@blog/config` in the dependency graph, so importing config's
- * constants here would invert it.
+ * constants here would invert it. Values stay lowercase (breaking the
+ * repo's usual UPPERCASE-value convention) because log aggregators expect
+ * lowercase severity strings.
  */
 export const LOG_LEVEL = {
   ERROR: 'error',
@@ -23,8 +25,9 @@ export interface ILogger {
   debug(event: string, context?: TLogContext): void;
 }
 
-// Vercel truncates individual log lines at a few KB; a truncated stack would
-// break JSON parseability, so it's capped well under that budget.
+// Vercel truncates individual log lines at a few KB after we emit valid
+// JSON; an uncapped stack risks that post-emission cut landing mid-structure,
+// so it's capped well under that budget before it ever reaches JSON.stringify.
 const MAX_STACK_LENGTH = 4000;
 const STACK_TRUNCATION_MARKER = '...[truncated]';
 
@@ -66,11 +69,11 @@ function emit(
   context?: TLogContext,
 ): void {
   const line = {
+    ...normalizeContext(baseContext),
+    ...(context ? normalizeContext(context) : {}),
     level,
     event,
     ts: new Date().toISOString(),
-    ...normalizeContext(baseContext),
-    ...(context ? normalizeContext(context) : {}),
   };
 
   consoleMethod(JSON.stringify(line));

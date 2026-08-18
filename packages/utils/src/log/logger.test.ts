@@ -66,6 +66,21 @@ describe(createLogger, () => {
     expect(parsed.text).toBe(`first line\r\nsecond line\x00${forgedEntry}`);
   });
 
+  it('does not let a spoofed reserved field in context override level/event/ts', () => {
+    const logger = createLogger();
+    logger.error('real.event', {
+      level: 'not-a-real-level',
+      event: 'spoofed',
+      ts: 'fake',
+    });
+
+    const parsed = JSON.parse(captureCall(errorSpy)) as Record<string, unknown>;
+    expect(parsed.level).toBe(LOG_LEVEL.ERROR);
+    expect(parsed.event).toBe('real.event');
+    expect(typeof parsed.ts).toBe('string');
+    expect(parsed.ts).not.toBe('fake');
+  });
+
   it('sanitizes an Error passed in context and truncates a long stack', () => {
     const logger = createLogger();
     const error = new Error('boom\nwith a newline');
