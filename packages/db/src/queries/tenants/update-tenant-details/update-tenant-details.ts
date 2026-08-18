@@ -1,4 +1,7 @@
-import type { TTenantPlan } from '@blog/config/constants';
+import {
+  TENANT_PROVISIONING_STEP_STATUS,
+  type TTenantPlan,
+} from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
@@ -13,7 +16,9 @@ export type TUpdateTenantDetailsInput = {
 };
 
 export type TUpdateTenantDetailsResult =
-  { outcome: 'updated'; tenant: TTenant } | { outcome: 'slug-taken' };
+  | { outcome: 'updated'; tenant: TTenant }
+  | { outcome: 'slug-taken' }
+  | { outcome: 'provisioning-started' };
 
 // Pre-checked rather than caught off the `slug_unique` constraint: a typed
 // `slug-taken` outcome the caller can map straight onto a field error,
@@ -33,6 +38,16 @@ export async function updateTenantDetails(
     throw new Error(
       `updateTenantDetails: no tenant found for id "${tenantId}".`,
     );
+  }
+
+  // Editing slug/primaryDomain after any step has moved past IDLE would
+  // desync the row from Vercel/Sanity resources provisioning already created.
+  const hasStartedProvisioning = Object.values(
+    existing.provisioningSteps ?? {},
+  ).some((step) => step.status !== TENANT_PROVISIONING_STEP_STATUS.IDLE);
+
+  if (hasStartedProvisioning) {
+    return { outcome: 'provisioning-started' };
   }
 
   const [slugConflict] = await db

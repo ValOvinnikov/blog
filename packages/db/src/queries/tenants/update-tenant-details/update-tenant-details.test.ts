@@ -1,11 +1,15 @@
 import {
   TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
 } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
-import { tenants } from '@blog/db/schema/tenants';
+import {
+  tenants,
+  type TTenantProvisioningSteps,
+} from '@blog/db/schema/tenants';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
@@ -34,6 +38,7 @@ async function insertTenantWithDomain(overrides?: {
   domain?: string;
   sanityProjectId?: string;
   provisioningStatus?: (typeof TENANT_PROVISIONING_STATUS)[keyof typeof TENANT_PROVISIONING_STATUS];
+  provisioningSteps?: TTenantProvisioningSteps;
 }): Promise<string> {
   const slug = overrides?.slug ?? 'acme';
   const domain = overrides?.domain ?? 'acme.example.com';
@@ -49,6 +54,7 @@ async function insertTenantWithDomain(overrides?: {
       status: TENANT_STATUS.ACTIVE,
       sanityProjectId: overrides?.sanityProjectId,
       provisioningStatus: overrides?.provisioningStatus,
+      provisioningSteps: overrides?.provisioningSteps,
     })
     .returning();
 
@@ -158,6 +164,86 @@ describe(updateTenantDetails, () => {
       sanityProjectId: 'abc123',
       provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
       status: TENANT_STATUS.ACTIVE,
+    });
+  });
+
+  it('refuses with provisioning-started and leaves the row unchanged when a step is RUNNING', async () => {
+    const tenantId = await insertTenantWithDomain({
+      provisioningSteps: {
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      },
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      name: 'New Name',
+    });
+
+    expect(result).toEqual({ outcome: 'provisioning-started' });
+
+    const [row] = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(row?.name).toBe('Acme');
+  });
+
+  it('refuses with provisioning-started when a step is DONE', async () => {
+    const tenantId = await insertTenantWithDomain({
+      provisioningSteps: {
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      },
+    });
+
+    const result = await updateTenantDetails(tenantId, validInput);
+
+    expect(result).toEqual({ outcome: 'provisioning-started' });
+  });
+
+  it('still updates when every step is IDLE', async () => {
+    const tenantId = await insertTenantWithDomain({
+      provisioningSteps: {
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      },
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      name: 'New Name',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { name: 'New Name' },
+    });
+  });
+
+  it('still updates when provisioningSteps is null', async () => {
+    const tenantId = await insertTenantWithDomain();
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      name: 'New Name',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { name: 'New Name' },
     });
   });
 
