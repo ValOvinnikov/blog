@@ -1,6 +1,6 @@
 import { env } from '@admin/utils/env/env';
 import { logger } from '@admin/utils/logger/logger';
-import { DOMAIN_PATTERN } from '@admin/utils/tenant-validation/tenant-validation';
+import { DOMAIN_PATTERN } from '@admin/utils/path/path';
 
 export type TDomainVerificationStatus =
   'NOT_CONFIGURED' | 'NOT_ADDED' | 'PENDING' | 'VERIFIED' | 'ERROR';

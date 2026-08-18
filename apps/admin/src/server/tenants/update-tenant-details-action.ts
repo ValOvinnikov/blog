@@ -2,10 +2,7 @@
 
 import { requireAdmin } from '@admin/server/auth/require-admin';
 import { logger } from '@admin/utils/logger/logger';
-import {
-  DOMAIN_PATTERN,
-  SLUG_PATTERN,
-} from '@admin/utils/tenant-validation/tenant-validation';
+import { DOMAIN_PATTERN, SLUG_PATTERN } from '@admin/utils/path/path';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';

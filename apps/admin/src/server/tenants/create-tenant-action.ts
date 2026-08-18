@@ -4,11 +4,8 @@ import { routing } from '@admin/i18n/routing';
 import { requireAdmin } from '@admin/server/auth/require-admin';
 import { dispatchProvisioningWorkflow } from '@admin/server/provisioning/dispatch-provisioning-workflow';
 import { logger } from '@admin/utils/logger/logger';
+import { DOMAIN_PATTERN, SLUG_PATTERN } from '@admin/utils/path/path';
 import { adminRoutes } from '@admin/utils/routes/routes';
-import {
-  DOMAIN_PATTERN,
-  SLUG_PATTERN,
-} from '@admin/utils/tenant-validation/tenant-validation';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/config';
 import { queries } from '@blog/db';
 import { redirect } from 'next/navigation';
