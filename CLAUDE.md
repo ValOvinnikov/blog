@@ -17,6 +17,7 @@ web → ui, service, db, auth, config, utils   service → config, utils (no Rea
 admin → ui, db, auth, config, utils         cms → config (types via typegen)
 ui → config (no Sanity/fetch)               configs/* → consumed by all
 db → config, utils (no React/Sanity)        auth → db, config, utils
+insight → nothing (base of graph, like config/utils)
 graph is acyclic
 ```
 
@@ -41,6 +42,16 @@ graph is acyclic
   and `utils`, and **never Sanity or `@blog/service`**. Its interactive primitives come from
   Base UI, styled in-app; nothing is added to `@blog/ui` for it. See
   `.claude/agents/admin-app.md`.
+- `@blog/insight` (`packages/insight`) holds the structured logger core —
+  `createLogger`, `LOG_LEVEL`, and its own copy of `sanitizeLogMessage`. Sits
+  at the base of the dependency graph alongside `config`/`utils` — depends on
+  nothing. The `sanitizeLogMessage` copy is a **deliberate, temporary
+  duplication** of `@blog/utils`'s existing copy (not an import — `insight`
+  stays dependency-free) — `@blog/utils`'s copy is removed once #1640/#1641
+  migrate every call site off it (#1642). Not consumed by any app yet — `web`
+  and `admin-app` migrate their `console.*` call sites onto it as separate,
+  already-ticketed work, not as part of standing up the package itself. See
+  `.claude/agents/insight.md`.
 - Content shapes come from the generated Sanity types in `@blog/config`
   (`packages/config/src/sanity/generated/types.ts`, produced by typegen) —
   never hand-redeclared.
@@ -142,9 +153,17 @@ dispatch order is `config → db → auth → admin-app`; it never waits on
 do not route its controls through the `ui` agent. See
 `.claude/agents/admin-app.md`.
 
+`insight` (`packages/insight`, the structured logger core — `createLogger`,
+`LOG_LEVEL`, and its own temporary copy of `sanitizeLogMessage`) is
+**independent, like `config`/`utils`** — depends on nothing, not a step in
+any chain. Not consumed by any app yet — dispatch `web`/`admin-app` to
+migrate their `console.*` call sites onto it only when that migration is the
+ticketed scope of the work (#1640/#1641), not as a side effect of a change to
+`insight` itself. See `.claude/agents/insight.md`.
+
 **Delegating in-scope work to its sub-agent is REQUIRED, not optional — for the
 whole lifecycle, not just the first draft.** Every file that lives in a
-sub-agent's domain (`config`/`cms`/`service`/`ui`/`web`/`db`/`admin-app`/`auth` per the map above) is
+sub-agent's domain (`config`/`cms`/`service`/`ui`/`web`/`db`/`admin-app`/`auth`/`insight` per the map above) is
 written, changed, fixed, renamed, and reworked **by that sub-agent** — the
 initial implementation, every review-remediation, every follow-up tweak, every
 "it's one line" edit. The orchestrator _orchestrates_; it does not hand-author
