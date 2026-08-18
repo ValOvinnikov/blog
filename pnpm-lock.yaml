@@ -95,15 +95,15 @@ importers:
       '@blog/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@blog/insight':
+        specifier: workspace:*
+        version: link:../../packages/insight
       '@blog/tailwind-config':
         specifier: workspace:*
         version: link:../../configs/tailwind
       '@blog/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      '@blog/utils':
-        specifier: workspace:*
-        version: link:../../packages/utils
       '@t3-oss/env-nextjs':
         specifier: ^0.13.11
         version: 0.13.11(typescript@6.0.3)(valibot@1.4.2(typescript@6.0.3))(zod@4.4.3)

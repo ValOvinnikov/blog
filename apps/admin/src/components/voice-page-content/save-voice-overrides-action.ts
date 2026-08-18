@@ -2,10 +2,10 @@
 
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@admin/server/site-config/revalidate-site-config';
+import { logger } from '@admin/utils/logger/logger';
 import type { TVoiceOverrides } from '@admin/utils/voice-fields/voice-fields';
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
 
 export type TSaveVoiceOverridesResult = { ok: true } | { ok: false };
 
@@ -52,10 +52,10 @@ export async function saveVoiceOverridesAction(
 
     return { ok: true };
   } catch (error) {
-    console.error(
-      `Failed to save voice overrides for tenant "${sanitizeLogMessage(tenantSlug)}":`,
-      sanitizeLogMessage(error),
-    );
+    logger.error('site_config.voice_save_failed', {
+      tenantId: tenant.id,
+      error,
+    });
     return { ok: false };
   }
 }

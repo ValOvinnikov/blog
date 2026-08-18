@@ -1,5 +1,5 @@
 import { env } from '@admin/utils/env/env';
-import { sanitizeLogMessage } from '@blog/utils';
+import { logger } from '@admin/utils/logger/logger';
 
 export type TDomainVerificationStatus =
   'NOT_CONFIGURED' | 'NOT_ADDED' | 'PENDING' | 'VERIFIED' | 'ERROR';
@@ -39,19 +39,17 @@ export async function getDomainVerificationStatus(
     if (response.status === 404) return 'NOT_ADDED';
 
     if (!response.ok) {
-      console.error(
-        `Vercel domain check responded with ${response.status} for "${sanitizeLogMessage(domain)}".`,
-      );
+      logger.error('provisioning.domain_check_failed', {
+        domain,
+        responseStatus: response.status,
+      });
       return 'ERROR';
     }
 
     const data = (await response.json()) as { verified?: boolean };
     return data.verified ? 'VERIFIED' : 'PENDING';
   } catch (error) {
-    console.error(
-      'Failed to check domain verification status:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('provisioning.domain_check_error', { domain, error });
     return 'ERROR';
   }
 }

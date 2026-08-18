@@ -1,6 +1,6 @@
 import { env } from '@admin/utils/env/env';
+import { logger } from '@admin/utils/logger/logger';
 import { parseTenantProvisioningRepo } from '@admin/utils/tenant-provisioning-repo/tenant-provisioning-repo';
-import { sanitizeLogMessage } from '@blog/utils';
 
 const WORKFLOW_FILE = 'provision-tenant.yml';
 const WORKFLOW_REF = 'main';
@@ -24,9 +24,7 @@ export async function dispatchProvisioningWorkflow(
   const repo = parseTenantProvisioningRepo(env.TENANT_PROVISIONING_GITHUB_REPO);
 
   if (!token || !repo) {
-    console.error(
-      'Skipped provisioning workflow dispatch: TENANT_PROVISIONING_GITHUB_TOKEN or TENANT_PROVISIONING_GITHUB_REPO is not configured.',
-    );
+    logger.error('provisioning.dispatch_skipped', { tenantId });
     return;
   }
 
@@ -61,14 +59,12 @@ export async function dispatchProvisioningWorkflow(
     );
 
     if (!response.ok) {
-      console.error(
-        `Provisioning workflow dispatch responded with ${response.status} for tenant "${sanitizeLogMessage(tenantId)}".`,
-      );
+      logger.error('provisioning.dispatch_failed', {
+        tenantId,
+        responseStatus: response.status,
+      });
     }
   } catch (error) {
-    console.error(
-      'Failed to dispatch the provisioning workflow:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('provisioning.dispatch_error', { tenantId, error });
   }
 }

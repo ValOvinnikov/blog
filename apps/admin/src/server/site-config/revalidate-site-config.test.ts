@@ -13,6 +13,16 @@ vi.mock('@admin/utils/env/env', () => ({
   },
 }));
 
+function loggedEvent(
+  spy: ReturnType<typeof vi.spyOn>,
+): Record<string, unknown> {
+  const call = spy.mock.calls.at(-1) as [string] | undefined;
+  if (!call) {
+    throw new Error('console.error was not called');
+  }
+  return JSON.parse(call[0]) as Record<string, unknown>;
+}
+
 describe(revalidateSiteConfig, () => {
   const fetchMock = vi.fn();
   const consoleErrorSpy = vi
@@ -54,7 +64,9 @@ describe(revalidateSiteConfig, () => {
     await revalidateSiteConfig();
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(consoleErrorSpy).toHaveBeenCalled();
+    expect(loggedEvent(consoleErrorSpy).event).toBe(
+      'site_config.revalidate_skipped',
+    );
   });
 
   it('logs and skips the call when SITE_CONFIG_REVALIDATE_SECRET is not configured', async () => {
@@ -63,7 +75,9 @@ describe(revalidateSiteConfig, () => {
     await revalidateSiteConfig();
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(consoleErrorSpy).toHaveBeenCalled();
+    expect(loggedEvent(consoleErrorSpy).event).toBe(
+      'site_config.revalidate_skipped',
+    );
   });
 
   it('logs but does not throw when the response is not ok', async () => {
@@ -73,9 +87,9 @@ describe(revalidateSiteConfig, () => {
 
     await expect(revalidateSiteConfig()).resolves.toBeUndefined();
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('401'),
-    );
+    const logged = loggedEvent(consoleErrorSpy);
+    expect(logged.event).toBe('site_config.revalidate_failed');
+    expect(logged.responseStatus).toBe(401);
   });
 
   it('logs but does not throw when fetch itself rejects', async () => {
@@ -85,10 +99,9 @@ describe(revalidateSiteConfig, () => {
 
     await expect(revalidateSiteConfig()).resolves.toBeUndefined();
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Failed to call'),
-      expect.stringContaining('network down'),
-    );
+    const logged = loggedEvent(consoleErrorSpy);
+    expect(logged.event).toBe('site_config.revalidate_error');
+    expect((logged.error as { message: string }).message).toBe('network down');
   });
 
   it('logs but does not throw (and never hangs the caller) when the call times out', async () => {
@@ -100,9 +113,8 @@ describe(revalidateSiteConfig, () => {
 
     await expect(revalidateSiteConfig()).resolves.toBeUndefined();
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Failed to call'),
-      expect.stringContaining('timed out'),
+    expect(loggedEvent(consoleErrorSpy).event).toBe(
+      'site_config.revalidate_error',
     );
   });
 });

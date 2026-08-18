@@ -1,5 +1,6 @@
 import { env } from '@admin/utils/env/env';
 import { isSecretMatch } from '@admin/utils/is-secret-match/is-secret-match';
+import { logger } from '@admin/utils/logger/logger';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -9,7 +10,6 @@ import {
   type TTenantProvisioningStepStatus,
 } from '@blog/config';
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -66,9 +66,7 @@ function overallStatusFor(
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.TENANT_PROVISIONING_CALLBACK_SECRET;
   if (!secret) {
-    console.error(
-      'status-callback: TENANT_PROVISIONING_CALLBACK_SECRET is not configured.',
-    );
+    logger.error('provisioning.status_callback_secret_missing');
     return NextResponse.json(
       { message: 'Callback secret is not configured.' },
       { status: 500 },
@@ -118,10 +116,12 @@ export async function POST(request: Request): Promise<NextResponse> {
         : { provisioningStatus: overallStatusFor(step, status) }),
     });
   } catch (caughtError) {
-    console.error(
-      `status-callback: failed to update tenant "${sanitizeLogMessage(tenantId)}":`,
-      sanitizeLogMessage(caughtError),
-    );
+    logger.error('provisioning.status_callback_update_failed', {
+      tenantId,
+      step,
+      status,
+      error: caughtError,
+    });
     return NextResponse.json(
       { message: 'Failed to record the step update.' },
       { status: 500 },
