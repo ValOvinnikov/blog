@@ -48,6 +48,7 @@ const env: TProvisionEnv = {
   adminAppBaseUrl: 'https://admin.example.com',
   callbackSecret: 'shh',
   platformDomain: 'example.com',
+  tenantSanityDataset: 'test-dataset',
   webAppBaseUrl: 'https://example.com',
   revalidateSecret: 'revalidate-shh',
 };
@@ -110,11 +111,11 @@ describe(createTenantSanityProject, () => {
   it('creates nothing when the project, dataset, and CORS entry all already exist', async () => {
     const tenant = baseTenant({
       sanityProjectId: 'proj123',
-      sanityDataset: 'production',
+      sanityDataset: 'test-dataset',
     });
     listSanityDatasetsMock.mockImplementation(async () => {
       callOrder.push('listSanityDatasets');
-      return [{ name: 'production' }];
+      return [{ name: 'test-dataset' }];
     });
     listSanityCorsOriginsMock.mockImplementation(async () => {
       callOrder.push('listSanityCorsOrigins');
@@ -125,7 +126,7 @@ describe(createTenantSanityProject, () => {
 
     expect(result).toEqual({
       sanityProjectId: 'proj123',
-      sanityDataset: 'production',
+      sanityDataset: 'test-dataset',
     });
     expect(createSanityProjectMock).not.toHaveBeenCalled();
     expect(setTenantSanityProjectMock).not.toHaveBeenCalled();
@@ -153,12 +154,12 @@ describe(createTenantSanityProject, () => {
     });
     expect(setTenantSanityProjectMock).toHaveBeenCalledWith('tenant-1', {
       sanityProjectId: 'proj456',
-      sanityDataset: 'production',
+      sanityDataset: 'test-dataset',
     });
     expect(createSanityDatasetMock).toHaveBeenCalledWith({
       token: 'mgmt-token',
       projectId: 'proj456',
-      dataset: 'production',
+      dataset: 'test-dataset',
     });
     expect(addSanityCorsOriginMock).toHaveBeenCalledWith({
       token: 'mgmt-token',
@@ -168,7 +169,7 @@ describe(createTenantSanityProject, () => {
     });
     expect(result).toEqual({
       sanityProjectId: 'proj456',
-      sanityDataset: 'production',
+      sanityDataset: 'test-dataset',
     });
 
     // The persist call must land immediately after project creation and
@@ -197,7 +198,7 @@ describe(createTenantSanityProject, () => {
 
     expect(setTenantSanityProjectMock).toHaveBeenCalledWith('tenant-1', {
       sanityProjectId: 'proj456',
-      sanityDataset: 'production',
+      sanityDataset: 'test-dataset',
     });
     expect(callOrder.indexOf('setTenantSanityProject')).toBeGreaterThan(-1);
     expect(callOrder.indexOf('setTenantSanityProject')).toBeLessThan(
@@ -208,7 +209,7 @@ describe(createTenantSanityProject, () => {
   it('only creates the dataset when the project is already persisted but the dataset is missing', async () => {
     const tenant = baseTenant({
       sanityProjectId: 'proj123',
-      sanityDataset: 'production',
+      sanityDataset: 'test-dataset',
     });
     listSanityCorsOriginsMock.mockImplementation(async () => {
       callOrder.push('listSanityCorsOrigins');
@@ -222,23 +223,23 @@ describe(createTenantSanityProject, () => {
     expect(createSanityDatasetMock).toHaveBeenCalledWith({
       token: 'mgmt-token',
       projectId: 'proj123',
-      dataset: 'production',
+      dataset: 'test-dataset',
     });
     expect(addSanityCorsOriginMock).not.toHaveBeenCalled();
     expect(result).toEqual({
       sanityProjectId: 'proj123',
-      sanityDataset: 'production',
+      sanityDataset: 'test-dataset',
     });
   });
 
   it('only adds the CORS origin when the project and dataset already exist but the CORS entry is missing', async () => {
     const tenant = baseTenant({
       sanityProjectId: 'proj123',
-      sanityDataset: 'production',
+      sanityDataset: 'test-dataset',
     });
     listSanityDatasetsMock.mockImplementation(async () => {
       callOrder.push('listSanityDatasets');
-      return [{ name: 'production' }];
+      return [{ name: 'test-dataset' }];
     });
 
     const result = await createTenantSanityProject(tenant, env);
@@ -254,7 +255,7 @@ describe(createTenantSanityProject, () => {
     });
     expect(result).toEqual({
       sanityProjectId: 'proj123',
-      sanityDataset: 'production',
+      sanityDataset: 'test-dataset',
     });
   });
 });
