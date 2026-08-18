@@ -56,27 +56,30 @@ describe('isClientLogRateLimited', () => {
     expect(isClientLogRateLimited('client-a')).toBe(false);
   });
 
-  it('sweeps an expired entry off the tracked-client Map instead of leaking it forever', async () => {
-    const { isClientLogRateLimited, MAX_TRACKED_CLIENTS } = await freshModule();
+  it('sweeps expired entries off the tracked-client Map on the very next call, independent of the eviction cap', async () => {
+    const { isClientLogRateLimited, getTrackedClientCountForTests } =
+      await freshModule();
 
-    // One tracked client, then let its window fully elapse.
-    isClientLogRateLimited('client-a');
+    // Five distinct tracked clients, nowhere near MAX_TRACKED_CLIENTS, so
+    // nothing here can trigger FIFO eviction — a size drop can only come
+    // from the sweep. (Asserting the boolean `isClientLogRateLimited`
+    // return alone can't distinguish "swept" from "evicted": both a working
+    // sweep and a stubbed-out no-op sweep would still let a 6th distinct
+    // key through as `false`, since eviction only kicks in at the cap.)
+    for (let i = 0; i < 5; i += 1) {
+      isClientLogRateLimited(`client-${i}`);
+    }
+    expect(getTrackedClientCountForTests()).toBe(5);
+
     vi.advanceTimersByTime(60_001);
 
-    // Fill the Map back up to exactly its cap with fresh distinct clients —
-    // if the expired `client-a` entry were still occupying a slot, this
-    // would already be at (or over) capacity and the next new client below
-    // would have to evict one of these instead of getting its own slot.
-    for (let i = 0; i < MAX_TRACKED_CLIENTS; i += 1) {
-      isClientLogRateLimited(`fresh-${i}`);
-    }
-
-    // None of the just-added fresh-* clients should have been evicted to
-    // make room — proof the earlier sweep actually freed client-a's slot.
-    for (let i = 0; i < 20; i += 1) {
-      isClientLogRateLimited('fresh-0');
-    }
-    expect(isClientLogRateLimited('fresh-0')).toBe(true);
+    // The sweep runs unconditionally at the top of every call, before this
+    // one's own key is even looked up — so this single call for a brand
+    // new key must both clear all 5 now-expired entries and add exactly
+    // one new one. Without the sweep, size would be 6 (5 stale + 1 new);
+    // with it, it's 1.
+    isClientLogRateLimited('client-new');
+    expect(getTrackedClientCountForTests()).toBe(1);
   });
 
   it('evicts the oldest tracked client once the tracked-client cap is reached, forgetting its rate-limit history', async () => {
