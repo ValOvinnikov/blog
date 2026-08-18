@@ -1,6 +1,6 @@
 'use server';
 
-import { requireAdmin } from '@admin/server/auth/require-admin';
+import { requireSuperAdmin } from '@admin/server/auth/require-super-admin';
 import { queries } from '@blog/db';
 import { z } from 'zod';
 
@@ -29,7 +29,7 @@ export async function deprovisionTenantAction(
   tenantId: string,
   input: TDeprovisionTenantInput,
 ): Promise<TDeprovisionTenantResult> {
-  await requireAdmin();
+  await requireSuperAdmin();
 
   const parsed = deprovisionTenantInputSchema.safeParse(input);
   if (!parsed.success) {
