@@ -47,10 +47,11 @@ graph is acyclic
   at the base of the dependency graph alongside `config`/`utils` — depends on
   nothing. The `sanitizeLogMessage` copy is a **deliberate, temporary
   duplication** of `@blog/utils`'s existing copy (not an import — `insight`
-  stays dependency-free) — `@blog/utils`'s copy is removed once #1640/#1641
-  migrate every call site off it (#1642). Not consumed by any app yet — `web`
-  and `admin-app` migrate their `console.*` call sites onto it as separate,
-  already-ticketed work, not as part of standing up the package itself. See
+  stays dependency-free) — `@blog/utils`'s copy is removed once every call
+  site has migrated off it onto `@blog/insight` instead, as separate
+  follow-up work. Not consumed by any app yet — `web` and `admin-app`
+  migrate their `console.*` call sites onto it as separate, already-scoped
+  work, not as part of standing up the package itself. See
   `.claude/agents/insight.md`.
 - Content shapes come from the generated Sanity types in `@blog/config`
   (`packages/config/src/sanity/generated/types.ts`, produced by typegen) —
@@ -157,9 +158,9 @@ do not route its controls through the `ui` agent. See
 `LOG_LEVEL`, and its own temporary copy of `sanitizeLogMessage`) is
 **independent, like `config`/`utils`** — depends on nothing, not a step in
 any chain. Not consumed by any app yet — dispatch `web`/`admin-app` to
-migrate their `console.*` call sites onto it only when that migration is the
-ticketed scope of the work (#1640/#1641), not as a side effect of a change to
-`insight` itself. See `.claude/agents/insight.md`.
+migrate their `console.*` call sites onto it only when that migration is
+itself the scope of the work, not as a side effect of a change to `insight`
+itself. See `.claude/agents/insight.md`.
 
 **Delegating in-scope work to its sub-agent is REQUIRED, not optional — for the
 whole lifecycle, not just the first draft.** Every file that lives in a

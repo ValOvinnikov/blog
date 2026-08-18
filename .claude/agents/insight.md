@@ -56,16 +56,17 @@ Record<string, unknown>) => void`. Emits one JSON object per call
   inverting nothing but adding one where none is needed.
 - **Sanitizer duplication (temporary, deliberate).** `@blog/utils` already
   exports `sanitizeLogMessage` — the CodeQL-recognized log-injection
-  sanitizing barrier from #1637, consumed today by ~20 existing call sites
-  across `apps/web`/`apps/admin`. Rather than importing it (which would give
-  this package a dependency) or moving it (which would break those ~20 call
-  sites until they migrate), **copy it into `packages/insight/src/`
-  unchanged** — same implementation, same behavior. `@blog/utils`'s copy is
-  removed once every call site has migrated onto `@blog/insight` (tracked in
-  #1642) — at that point this package's copy becomes the single canonical
-  one. Keep both copies byte-identical while they coexist; if you find a bug
-  in the sanitizer, fix your copy and report the same fix is needed in
-  `@blog/utils`'s, don't silently diverge them.
+  sanitizing barrier, consumed today by ~20 existing call sites across
+  `apps/web`/`apps/admin`. Rather than importing it (which would give this
+  package a dependency) or moving it (which would break those ~20 call sites
+  until they migrate), **copy it into `packages/insight/src/` unchanged** —
+  same implementation, same behavior. `@blog/utils`'s copy is removed once
+  every one of those call sites has migrated onto `@blog/insight` instead —
+  that removal is separate follow-up work, not yours to do here, and not
+  something to attempt until it's genuinely true. Keep both copies
+  byte-identical while they coexist; if you find a bug in the sanitizer, fix
+  your copy and report the same fix is needed in `@blog/utils`'s, don't
+  silently diverge them.
 - **Stack-trace capping.** Vercel truncates individual log lines at a few KB;
   a truncated JSON line is unparseable. Cap the serialized stack trace length
   before it's included in the emitted JSON, with a clear truncation marker.
@@ -75,9 +76,9 @@ Record<string, unknown>) => void`. Emits one JSON object per call
 ## What you do not own
 
 - Any `apps/web`/`apps/admin` call site. Standing up this package does not
-  migrate anyone onto it — that's `web`/`admin-app`'s ticketed work
-  (currently #1640/#1641), dispatched separately, only when that's the scope
-  of the task at hand.
+  migrate anyone onto it — that's `web`/`admin-app`'s work, dispatched
+  separately, only when migrating call sites is itself the scope of the task
+  at hand.
 - `@blog/utils`'s existing `sanitizeLogMessage` — read it for reference, copy
   it, never edit it from here.
 
