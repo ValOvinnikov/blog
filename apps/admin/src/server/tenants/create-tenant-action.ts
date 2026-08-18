@@ -3,10 +3,10 @@
 import { routing } from '@admin/i18n/routing';
 import { requireAdmin } from '@admin/server/auth/require-admin';
 import { dispatchProvisioningWorkflow } from '@admin/server/provisioning/dispatch-provisioning-workflow';
+import { logger } from '@admin/utils/logger/logger';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/config';
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
@@ -111,7 +111,7 @@ export async function createTenantAction(
     });
     tenantId = tenant.id;
   } catch (error) {
-    console.error('Failed to create tenant draft:', sanitizeLogMessage(error));
+    logger.error('tenants.create_draft_failed', { slug, domain, error });
     return { ok: false, error: "Couldn't create the tenant — try again." };
   }
 

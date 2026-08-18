@@ -7,8 +7,8 @@ import {
   type TBrandAssetKind,
 } from '@admin/utils/brand-asset-limits/brand-asset-limits';
 import { env } from '@admin/utils/env/env';
+import { logger } from '@admin/utils/logger/logger';
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
 import { del } from '@vercel/blob';
 
 export type TClearBrandAssetResult =
@@ -58,19 +58,21 @@ export async function clearBrandAssetAction(
       try {
         await del(previousUrl, { token: env.BLOB_READ_WRITE_TOKEN });
       } catch (error) {
-        console.error(
-          `Failed to delete previous ${targetKind} asset:`,
-          sanitizeLogMessage(error),
-        );
+        logger.error('site_config.brand_asset_delete_failed', {
+          tenantId: tenant.id,
+          kind: targetKind,
+          error,
+        });
       }
     }
 
     return { ok: true };
   } catch (error) {
-    console.error(
-      `Failed to clear ${targetKind} asset:`,
-      sanitizeLogMessage(error),
-    );
+    logger.error('site_config.brand_asset_clear_failed', {
+      tenantId: tenant.id,
+      kind: targetKind,
+      error,
+    });
     return {
       ok: false,
       error: `Couldn't remove the ${targetKind} — try again.`,

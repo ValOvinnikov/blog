@@ -19,6 +19,7 @@
     "@blog/auth": "workspace:*",
     "@blog/config": "workspace:*",
     "@blog/db": "workspace:*",
+    "@blog/insight": "workspace:*",
     "@blog/tailwind-config": "workspace:*",
     "@blog/ui": "workspace:*",
     "@blog/utils": "workspace:*",

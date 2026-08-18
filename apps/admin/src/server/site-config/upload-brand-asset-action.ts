@@ -8,8 +8,8 @@ import {
   type TBrandAssetKind,
 } from '@admin/utils/brand-asset-limits/brand-asset-limits';
 import { env } from '@admin/utils/env/env';
+import { logger } from '@admin/utils/logger/logger';
 import { queries } from '@blog/db';
-import { sanitizeLogMessage } from '@blog/utils';
 import { del, put } from '@vercel/blob';
 
 export type TUploadBrandAssetResult =
@@ -87,19 +87,21 @@ export async function uploadBrandAssetAction(
       try {
         await del(previousUrl, { token: env.BLOB_READ_WRITE_TOKEN });
       } catch (error) {
-        console.error(
-          `Failed to delete previous ${targetKind} asset:`,
-          sanitizeLogMessage(error),
-        );
+        logger.error('site_config.brand_asset_delete_failed', {
+          tenantId: tenant.id,
+          kind: targetKind,
+          error,
+        });
       }
     }
 
     return { ok: true, url: blob.url };
   } catch (error) {
-    console.error(
-      `Failed to upload ${targetKind} asset:`,
-      sanitizeLogMessage(error),
-    );
+    logger.error('site_config.brand_asset_upload_failed', {
+      tenantId: tenant.id,
+      kind: targetKind,
+      error,
+    });
     return {
       ok: false,
       error: `Couldn't upload the ${targetKind} — try again.`,

@@ -1,6 +1,6 @@
 import { env } from '@admin/utils/env/env';
+import { logger } from '@admin/utils/logger/logger';
 import { parseTenantProvisioningRepo } from '@admin/utils/tenant-provisioning-repo/tenant-provisioning-repo';
-import { sanitizeLogMessage } from '@blog/utils';
 
 const WORKFLOW_FILE = 'deprovision-tenant.yml';
 const WORKFLOW_REF = 'main';
@@ -31,9 +31,7 @@ export async function dispatchDeprovisioningWorkflow({
   const repo = parseTenantProvisioningRepo(env.TENANT_PROVISIONING_GITHUB_REPO);
 
   if (!token || !repo) {
-    console.error(
-      'Skipped deprovisioning workflow dispatch: TENANT_PROVISIONING_GITHUB_TOKEN or TENANT_PROVISIONING_GITHUB_REPO is not configured.',
-    );
+    logger.error('provisioning.deprovision_dispatch_skipped', { tenantId });
     return;
   }
 
@@ -57,14 +55,15 @@ export async function dispatchDeprovisioningWorkflow({
     );
 
     if (!response.ok) {
-      console.error(
-        `Deprovisioning workflow dispatch responded with ${response.status} for tenant "${sanitizeLogMessage(tenantId)}".`,
-      );
+      logger.error('provisioning.deprovision_dispatch_failed', {
+        tenantId,
+        responseStatus: response.status,
+      });
     }
   } catch (error) {
-    console.error(
-      'Failed to dispatch the deprovisioning workflow:',
-      sanitizeLogMessage(error),
-    );
+    logger.error('provisioning.deprovision_dispatch_error', {
+      tenantId,
+      error,
+    });
   }
 }
