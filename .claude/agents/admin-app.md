@@ -80,10 +80,12 @@ When invoked, before writing any code:
 - **Never edit files outside `apps/admin`.** `packages/db`, `packages/ui`,
   `packages/config`, and `apps/web` each belong to another agent. If your work
   needs a change there, implement your side and report the required change.
-- **Log through `createLogger` from `@blog/insight` — never bare `console.*`.**
-  This app has one shared logger at `src/utils/logger/logger.ts`
-  (`createLogger({ service: 'admin' })`) — import it rather than creating
-  another. Call `logger.error` / `logger.warn` with a **static, lowercase,
+- **Log through the shared logger — never bare `console.*`, and never call
+  `createLogger` yourself.** This app has one logger at
+  `src/utils/logger/logger.ts` (`createLogger({ service: 'admin' })`) — import
+  it. The `service` field it carries is what separates this app's lines from
+  `apps/web`'s in the shared log pipeline, so a locally-constructed logger
+  silently loses it. Call `logger.error` / `logger.warn` with a **static, lowercase,
   dot-namespaced event name**, passing the error and any identifiers as
   structured `context` fields:
   ```ts
