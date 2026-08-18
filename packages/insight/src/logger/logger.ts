@@ -60,13 +60,19 @@ function isPlainObject(value: object): boolean {
   return proto === Object.prototype || proto === null;
 }
 
+// JSON.stringify does not escape U+2028/U+2029, so a raw one in any string
+// context value (not just an Error's message) could be mistaken for a line
+// break by a naive log-line splitter. Unlike sanitizeLogMessage, this does
+// NOT strip the \x00-\x1f/\x7f range: JSON.stringify already escapes those,
+// and stripping them here would mangle legitimate multi-line string content.
+function escapeLineSeparators(text: string): string {
+  return text.replace(/[\u2028\u2029]/g, ' ');
+}
+
 // Recurses into plain objects/arrays only, so a nested Error is found and
 // unwrapped wherever a caller put it (not just at the top level). Depth is
 // bounded and visited ancestors are tracked so a cyclic context object
-// degrades to a marker instead of hanging or crashing JSON.stringify. Other
-// object types (Date, RegExp, Map, class instances, ...) pass through
-// untouched, same as the pre-recursion behavior, so their own serialization
-// (e.g. Date's toJSON) isn't clobbered.
+// degrades to a marker instead of hanging or crashing JSON.stringify.
 function normalizeContextValue(
   value: unknown,
   depth: number,
@@ -74,6 +80,10 @@ function normalizeContextValue(
 ): unknown {
   if (value instanceof Error) {
     return normalizeError(value);
+  }
+
+  if (typeof value === 'string') {
+    return escapeLineSeparators(value);
   }
 
   if (value === null || typeof value !== 'object') {
@@ -109,8 +119,9 @@ function normalizeContextValue(
 
 function normalizeContext(context: TLogContext): TLogContext {
   const normalized: TLogContext = {};
+  const ancestors = new Set<object>();
   for (const [key, value] of Object.entries(context)) {
-    normalized[key] = normalizeContextValue(value, 0, new Set());
+    normalized[key] = normalizeContextValue(value, 0, ancestors);
   }
 
   return normalized;

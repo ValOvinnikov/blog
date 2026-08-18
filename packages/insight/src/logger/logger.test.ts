@@ -1,5 +1,8 @@
 import { createLogger, LOG_LEVEL } from './logger';
 
+const LINE_SEPARATOR = String.fromCharCode(0x2028);
+const PARAGRAPH_SEPARATOR = String.fromCharCode(0x2029);
+
 function captureCall(spy: ReturnType<typeof vi.spyOn>): string {
   const call = spy.mock.calls.at(-1);
   if (!call) {
@@ -242,5 +245,106 @@ describe(createLogger, () => {
 
     const parsed = JSON.parse(captureCall(infoSpy)) as Record<string, unknown>;
     expect(parsed.text).toBe(multiline);
+  });
+
+  it('neutralizes a raw U+2028 in a plain string context value', () => {
+    const logger = createLogger();
+    const withSeparator = `first line${LINE_SEPARATOR}second line`;
+    logger.error('note', { text: withSeparator });
+
+    const line = captureCall(errorSpy);
+    expect(line.includes(LINE_SEPARATOR)).toBe(false);
+
+    const parsed = JSON.parse(line) as Record<string, unknown>;
+    expect(parsed.text).toBe('first line second line');
+  });
+
+  it('neutralizes a raw U+2029 in a plain string context value', () => {
+    const logger = createLogger();
+    const withSeparator = `first para${PARAGRAPH_SEPARATOR}second para`;
+    logger.error('note', { text: withSeparator });
+
+    const line = captureCall(errorSpy);
+    expect(line.includes(PARAGRAPH_SEPARATOR)).toBe(false);
+
+    const parsed = JSON.parse(line) as Record<string, unknown>;
+    expect(parsed.text).toBe('first para second para');
+  });
+
+  it('neutralizes U+2028/U+2029 in a string nested inside a plain object and an array', () => {
+    const logger = createLogger();
+    logger.error('note', {
+      details: { message: `nested${LINE_SEPARATOR}message` },
+      items: [`array${PARAGRAPH_SEPARATOR}item`],
+    });
+
+    const line = captureCall(errorSpy);
+    expect(line.includes(LINE_SEPARATOR)).toBe(false);
+    expect(line.includes(PARAGRAPH_SEPARATOR)).toBe(false);
+
+    const parsed = JSON.parse(line) as {
+      details: { message: string };
+      items: string[];
+    };
+    expect(parsed.details.message).toBe('nested message');
+    expect(parsed.items[0]).toBe('array item');
+  });
+
+  it('does not mark a shared (non-cyclic) reference as circular', () => {
+    const logger = createLogger();
+    const shared = { id: 1 };
+
+    logger.error('shared.ref', { a: shared, b: shared });
+
+    const parsed = JSON.parse(captureCall(errorSpy)) as {
+      a: { id: number };
+      b: { id: number };
+    };
+    expect(parsed.a).toEqual({ id: 1 });
+    expect(parsed.b).toEqual({ id: 1 });
+  });
+
+  it('passes a Date nested in context through untouched instead of recursing into it', () => {
+    const logger = createLogger();
+    const date = new Date('2024-01-01T00:00:00.000Z');
+
+    logger.error('mixed.types', { date });
+
+    const parsed = JSON.parse(captureCall(errorSpy)) as { date: string };
+    expect(parsed.date).toBe(date.toISOString());
+  });
+
+  it('passes a class instance nested in context through untouched instead of recursing into it', () => {
+    class Point {
+      constructor(
+        public x: number,
+        public y: number,
+      ) {}
+    }
+    const logger = createLogger();
+
+    logger.error('mixed.types', { point: new Point(1, 2) });
+
+    const parsed = JSON.parse(captureCall(errorSpy)) as {
+      point: { x: number; y: number };
+    };
+    expect(parsed.point).toEqual({ x: 1, y: 2 });
+  });
+
+  it('treats an Object.create(null) value as a plain object and recurses into it', () => {
+    const logger = createLogger();
+    const cause = new Error('null-proto boom');
+    const nullProtoObj: Record<string, unknown> = Object.create(null) as Record<
+      string,
+      unknown
+    >;
+    nullProtoObj.cause = cause;
+
+    logger.error('request.failed', { details: nullProtoObj });
+
+    const parsed = JSON.parse(captureCall(errorSpy)) as {
+      details: { cause: { message: string } };
+    };
+    expect(parsed.details.cause.message).toBe('null-proto boom');
   });
 });
