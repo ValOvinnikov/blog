@@ -65,6 +65,7 @@ const env = {
   tenantSanityDataset: 'test-dataset',
   webAppBaseUrl: 'https://example.com',
   revalidateSecret: 'revalidate-shh',
+  githubRepository: 'acme/blog',
 };
 
 beforeEach(() => {

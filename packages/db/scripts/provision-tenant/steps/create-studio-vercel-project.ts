@@ -57,6 +57,7 @@ export async function createTenantStudio(
       teamId: env.vercelTeamId,
       name: `studio-${tenant.slug}`,
       rootDirectory: STUDIO_ROOT_DIRECTORY,
+      gitRepository: env.githubRepository,
     });
     studioVercelProjectId = project.id;
 
