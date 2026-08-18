@@ -1,4 +1,4 @@
-import { sanitizeLogMessage } from './sanitize-log-message';
+import { sanitizeLogMessage } from '../utils/sanitize-log-message';
 
 /**
  * Local to `@blog/insight` rather than `@blog/config`: this package sits at
