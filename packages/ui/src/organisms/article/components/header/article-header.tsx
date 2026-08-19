@@ -1,11 +1,11 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
 import { MediaFrame } from '@blog/ui/atoms/media-frame';
 import { Text } from '@blog/ui/atoms/text';
 import { PostMeta, type IPostMetaProps } from '@blog/ui/molecules/post-meta';
-import { type ComponentPropsWithoutRef, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 import { articleHeaderVariants } from './article-header-variants';
 
@@ -17,22 +17,22 @@ export interface IArticleHeaderCategory {
   linkAs?: TAnchorElementType;
 }
 
-export interface IArticleHeaderProps
-  extends Omit<ComponentPropsWithoutRef<'header'>, 'title'>, IWithDataTestId {
-  title: string;
-  /**
-   * Category eyebrow rendered above the title as non-heading markup (a `<p>`,
-   * or a link when `href` is given) — never an `<h*>`, so it can't compete
-   * with the post's `<h1>`. Omit to render no eyebrow.
-   */
-  category?: IArticleHeaderCategory;
-  /** Lead paragraph rendered below the title, inside the heading column. Omit to render no lead. */
-  lead?: string;
-  /** Forwarded to `PostMeta` as-is (author, publishedAt, formattedDate, readingTimeMinutes?, share?). Rendered inside the heading column, below the lead paragraph. Omit to render no `PostMeta` strip. */
-  meta?: Omit<IPostMetaProps, 'className' | 'dataTestId'>;
-  /** Opaque cover media slot (e.g. a wrapped `SanityImage`), rendered below the metadata strip, capped at `max-w-page` (1120px). Omit to render no cover media. */
-  coverMedia?: ReactNode;
-}
+export type TArticleHeaderProps = IWithClassName &
+  IWithDataTestId & {
+    title: string;
+    /**
+     * Category eyebrow rendered above the title as non-heading markup (a `<p>`,
+     * or a link when `href` is given) — never an `<h*>`, so it can't compete
+     * with the post's `<h1>`. Omit to render no eyebrow.
+     */
+    category?: IArticleHeaderCategory;
+    /** Lead paragraph rendered below the title, inside the heading column. Omit to render no lead. */
+    lead?: string;
+    /** Forwarded to `PostMeta` as-is (author, publishedAt, formattedDate, readingTimeMinutes?, share?). Rendered inside the heading column, below the lead paragraph. Omit to render no `PostMeta` strip. */
+    meta?: Omit<IPostMetaProps, 'className' | 'dataTestId'>;
+    /** Opaque cover media slot (e.g. a wrapped `SanityImage`), rendered below the metadata strip, capped at `max-w-page` (1120px). Omit to render no cover media. */
+    coverMedia?: ReactNode;
+  };
 
 /**
  * Article.Header — post detail heading area: category eyebrow, title,
@@ -48,16 +48,11 @@ export const ArticleHeader = ({
   coverMedia,
   className,
   dataTestId,
-  ...rest
-}: IArticleHeaderProps) => {
+}: TArticleHeaderProps) => {
   const s = articleHeaderVariants();
 
   return (
-    <header
-      className={s.root({ class: className })}
-      data-testid={dataTestId}
-      {...rest}
-    >
+    <header className={s.root({ class: className })} data-testid={dataTestId}>
       <div className={s.headingGroup()}>
         {category && (
           <Eyebrow

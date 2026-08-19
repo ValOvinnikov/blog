@@ -1,4 +1,4 @@
-import { type IWithDataTestId } from '@blog/config';
+import { type IWithClassName, type IWithDataTestId } from '@blog/config';
 import { Tag } from '@blog/ui/atoms/tag';
 import {
   mapCompoundSlots,
@@ -6,11 +6,7 @@ import {
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
 import { CardMeta } from '@blog/ui/molecules/card-meta';
-import {
-  type ComponentPropsWithoutRef,
-  type ElementType,
-  Fragment,
-} from 'react';
+import { Fragment, type ElementType } from 'react';
 
 import { PostCardFooter } from './components/footer/post-card-footer';
 import { PostCardMedia } from './components/media/post-card-media';
@@ -26,14 +22,12 @@ const PostCardParts = {
   Footer: PostCardFooter,
 } satisfies Record<string, ElementType>;
 
-export interface IPostCardProps
-  extends
-    Omit<ComponentPropsWithoutRef<'article'>, 'children'>,
-    IWithDataTestId {
-  excerpt?: string;
-  tags?: string[];
-  children?: TCompoundChildren<typeof PostCardParts>;
-}
+export type TPostCardProps = IWithClassName &
+  IWithDataTestId & {
+    excerpt?: string;
+    tags?: string[];
+    children?: TCompoundChildren<typeof PostCardParts>;
+  };
 
 /**
  * PostCard — the article summary card used in listings; composes
@@ -46,16 +40,11 @@ const PostCardRoot = ({
   children,
   className,
   dataTestId,
-  ...rest
-}: IPostCardProps) => {
+}: TPostCardProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, PostCardParts);
 
   return (
-    <article
-      className={s.root({ class: className })}
-      data-testid={dataTestId}
-      {...rest}
-    >
+    <article className={s.root({ class: className })} data-testid={dataTestId}>
       {slots.Media}
       <div className={s.content()}>
         {slots.Meta}

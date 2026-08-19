@@ -1,19 +1,12 @@
-import type { IWithDataTestId } from '@blog/config';
-import {
-  type ChangeEvent,
-  type ComponentPropsWithoutRef,
-  type ReactNode,
-} from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import { type AriaAttributes, type ChangeEvent, type ReactNode } from 'react';
 
 import {
   textInputVariants,
   type TTextInputVariants,
 } from './text-input-variants';
 
-export type TTextInputProps = Omit<
-  ComponentPropsWithoutRef<'input'>,
-  'onChange' | 'value'
-> &
+export type TTextInputProps = IWithClassName &
   IWithDataTestId & {
     value: string;
     onChange: (value: string) => void;
@@ -23,7 +16,13 @@ export type TTextInputProps = Omit<
     leadingIcon?: ReactNode;
     /** Decorative trailing glyph or icon. Purely visual; `ariaLabel` carries the accessible name. */
     trailingIcon?: ReactNode;
-    className?: string;
+    id?: string;
+    type?: string;
+    placeholder?: string;
+    required?: boolean;
+    readOnly?: boolean;
+    disabled?: boolean;
+    'aria-describedby'?: AriaAttributes['aria-describedby'];
   };
 
 /**
@@ -41,7 +40,13 @@ export const TextInput = ({
   trailingIcon,
   className,
   dataTestId,
-  ...rest
+  id,
+  type,
+  placeholder,
+  required,
+  readOnly,
+  disabled,
+  'aria-describedby': ariaDescribedby,
 }: TTextInputProps) => {
   const {
     root,
@@ -66,11 +71,17 @@ export const TextInput = ({
         </span>
       )}
       <input
-        {...rest}
+        id={id}
+        type={type}
+        placeholder={placeholder}
+        required={required}
+        readOnly={readOnly}
+        disabled={disabled}
         value={value}
         onChange={handleChange}
         aria-label={ariaLabel}
         aria-invalid={invalid}
+        aria-describedby={ariaDescribedby}
         className={input()}
       />
       {trailingIcon && (

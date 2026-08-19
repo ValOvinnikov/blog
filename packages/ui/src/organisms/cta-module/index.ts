@@ -1,2 +1,2 @@
-export type { ICtaModuleProps } from './cta-module';
+export type { TCtaModuleProps } from './cta-module';
 export { CtaModule } from './cta-module';

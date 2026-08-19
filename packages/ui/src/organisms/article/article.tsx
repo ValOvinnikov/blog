@@ -1,14 +1,10 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
-import {
-  type ComponentPropsWithoutRef,
-  type ElementType,
-  Fragment,
-} from 'react';
+import { Fragment, type ElementType } from 'react';
 
 import { articleVariants } from './article-variants';
 import { ArticleBody } from './components/body/article-body';
@@ -21,30 +17,22 @@ const ArticleParts = {
   Footer: ArticleFooter,
 } satisfies Record<string, ElementType>;
 
-export interface IArticleProps
-  extends
-    Omit<ComponentPropsWithoutRef<'article'>, 'children'>,
-    IWithDataTestId {
-  children: TCompoundChildren<typeof ArticleParts>;
-}
+export type TArticleProps = IWithClassName &
+  IWithDataTestId & {
+    children: TCompoundChildren<typeof ArticleParts>;
+  };
 
 /**
  * Article — the full blog-post layout shell; composes `Article.Header`,
  * `Article.Body`, and `Article.Footer` slots into a single `<article>`.
  * Structure only — each slot owns its own content and styling.
  */
-const ArticleRoot = ({
-  children,
-  className,
-  dataTestId,
-  ...rest
-}: IArticleProps) => {
+const ArticleRoot = ({ children, className, dataTestId }: TArticleProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, ArticleParts);
   return (
     <article
       className={articleVariants({ class: className })}
       data-testid={dataTestId}
-      {...rest}
     >
       {slots.Header}
       {slots.Body}

@@ -1,23 +1,24 @@
-import { ICONS, Size, type IWithDataTestId } from '@blog/config';
+import {
+  ICONS,
+  type IWithClassName,
+  type IWithDataTestId,
+  Size,
+} from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
-import { type ButtonHTMLAttributes } from 'react';
 
 import {
   bookmarkToggleVariants,
   type TBookmarkToggleVariants,
 } from './bookmark-toggle-variants';
 
-export interface IBookmarkToggleProps
-  extends
-    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'className'>,
-    IWithDataTestId {
-  isBookmarked: NonNullable<TBookmarkToggleVariants['isBookmarked']>;
-  onToggle: () => void;
-  label: string;
-  ariaLabel: string;
-  disabled?: boolean;
-  className?: string;
-}
+export type TBookmarkToggleProps = IWithClassName &
+  IWithDataTestId & {
+    isBookmarked: NonNullable<TBookmarkToggleVariants['isBookmarked']>;
+    onToggle: () => void;
+    label: string;
+    ariaLabel: string;
+    disabled?: boolean;
+  };
 
 /**
  * BookmarkToggle — a pure, controlled icon+label toggle for saving a post to
@@ -34,13 +35,11 @@ export const BookmarkToggle = ({
   disabled,
   className,
   dataTestId,
-  ...rest
-}: IBookmarkToggleProps) => {
+}: TBookmarkToggleProps) => {
   const { root, icon } = bookmarkToggleVariants({ isBookmarked });
 
   return (
     <button
-      {...rest}
       type="button"
       aria-pressed={isBookmarked}
       aria-label={ariaLabel}

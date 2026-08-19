@@ -1,14 +1,16 @@
-import type { IWithDataTestId, TIconName } from '@blog/config';
-import { type SVGProps } from 'react';
+import type { IWithClassName, IWithDataTestId, TIconName } from '@blog/config';
+import type { AriaAttributes } from 'react';
 
 import { ICON_REGISTRY } from './icon-registry';
 import { iconVariants, type TIconVariants } from './icon-variants';
 
-export interface IIconProps
-  extends Omit<SVGProps<SVGSVGElement>, 'name'>, IWithDataTestId {
-  name: TIconName;
-  size?: TIconVariants['size'];
-}
+export type TIconProps = IWithClassName &
+  IWithDataTestId & {
+    name: TIconName;
+    size?: TIconVariants['size'];
+    'aria-label'?: AriaAttributes['aria-label'];
+    'aria-hidden'?: AriaAttributes['aria-hidden'];
+  };
 
 /**
  * Icon — renders any icon from the bespoke icon set by name. Each SVG
@@ -26,8 +28,7 @@ export const Icon = ({
   dataTestId,
   'aria-label': ariaLabel,
   'aria-hidden': ariaHidden,
-  ...rest
-}: IIconProps) => {
+}: TIconProps) => {
   const { component: IconGlyph } = ICON_REGISTRY[name];
   const resolvedAriaHidden = ariaHidden ?? (ariaLabel ? undefined : true);
 
@@ -37,7 +38,6 @@ export const Icon = ({
       aria-hidden={resolvedAriaHidden}
       className={iconVariants({ size, class: className })}
       data-testid={dataTestId}
-      {...rest}
     />
   );
 };

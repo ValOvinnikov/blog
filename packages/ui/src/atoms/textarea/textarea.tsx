@@ -1,12 +1,9 @@
-import type { IWithDataTestId } from '@blog/config';
-import { type ChangeEvent, type ComponentPropsWithoutRef } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import { type ChangeEvent } from 'react';
 
 import { textareaVariants, type TTextareaVariants } from './textarea-variants';
 
-export type TTextareaProps = Omit<
-  ComponentPropsWithoutRef<'textarea'>,
-  'onChange' | 'value'
-> &
+export type TTextareaProps = IWithClassName &
   IWithDataTestId & {
     value: string;
     onChange: (value: string) => void;
@@ -14,7 +11,11 @@ export type TTextareaProps = Omit<
     invalid?: TTextareaVariants['invalid'];
     /** Decorative leading glyph (e.g. `$`, `›`) — the console prompt idiom. Purely visual; `ariaLabel` carries the accessible name. */
     prompt?: string;
-    className?: string;
+    id?: string;
+    placeholder?: string;
+    rows?: number;
+    maxLength?: number;
+    disabled?: boolean;
   };
 
 /**
@@ -32,7 +33,9 @@ export const Textarea = ({
   maxLength,
   className,
   dataTestId,
-  ...rest
+  id,
+  placeholder,
+  disabled,
 }: TTextareaProps) => {
   const {
     root,
@@ -52,7 +55,9 @@ export const Textarea = ({
         </span>
       )}
       <textarea
-        {...rest}
+        id={id}
+        placeholder={placeholder}
+        disabled={disabled}
         rows={rows}
         maxLength={maxLength}
         value={value}

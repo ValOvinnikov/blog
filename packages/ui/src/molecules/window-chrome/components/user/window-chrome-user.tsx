@@ -1,10 +1,12 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import { windowChromeUserVariants } from './window-chrome-user-variants';
 
-export interface IWindowChromeUserProps
-  extends ComponentPropsWithoutRef<'span'>, IWithDataTestId {}
+export type TWindowChromeUserProps = IWithClassName &
+  IWithDataTestId & {
+    children?: ReactNode;
+  };
 
 /**
  * WindowChromeUser — the accent-coloured "who" segment of a `WindowChrome.Bar`
@@ -14,11 +16,12 @@ export interface IWindowChromeUserProps
 export const WindowChromeUser = ({
   className,
   dataTestId,
-  ...rest
-}: IWindowChromeUserProps) => (
+  children,
+}: TWindowChromeUserProps) => (
   <span
     className={windowChromeUserVariants({ class: className })}
     data-testid={dataTestId}
-    {...rest}
-  />
+  >
+    {children}
+  </span>
 );

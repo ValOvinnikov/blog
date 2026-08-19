@@ -1,14 +1,17 @@
-import { type IWithDataTestId, Size } from '@blog/config';
+import { type IWithClassName, type IWithDataTestId, Size } from '@blog/config';
 import { headingTags, type THeadingLevel } from '@blog/ui/lib/react';
-import type { HTMLAttributes } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import { headingVariants, type THeadingVariants } from './heading-variants';
 
-export type THeadingProps = HTMLAttributes<HTMLHeadingElement> &
+export type THeadingProps = IWithClassName &
   IWithDataTestId & {
     level: THeadingLevel;
     visual?: THeadingVariants['visual'];
     size?: THeadingVariants['size'];
+    id?: string;
+    style?: CSSProperties;
+    children?: ReactNode;
   };
 
 type TSize = NonNullable<THeadingVariants['size']>;
@@ -43,18 +46,23 @@ export const Heading = ({
   size,
   className,
   dataTestId,
-  ...rest
+  id,
+  style,
+  children,
 }: THeadingProps) => {
   const Tag = headingTags[level];
   return (
     <Tag
+      id={id}
+      style={style}
       className={headingVariants({
         visual,
         size: visual ? undefined : (size ?? defaultSizes[level]),
         class: className,
       })}
       data-testid={dataTestId}
-      {...rest}
-    />
+    >
+      {children}
+    </Tag>
   );
 };

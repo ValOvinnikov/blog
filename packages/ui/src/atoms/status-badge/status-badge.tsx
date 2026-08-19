@@ -1,14 +1,15 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { HTMLAttributes } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import {
   statusBadgeVariants,
   type TStatusBadgeVariants,
 } from './status-badge-variants';
 
-export type TStatusBadgeProps = HTMLAttributes<HTMLSpanElement> &
+export type TStatusBadgeProps = IWithClassName &
   IWithDataTestId & {
     tone: NonNullable<TStatusBadgeVariants['tone']>;
+    children?: ReactNode;
   };
 
 /**
@@ -20,13 +21,14 @@ export const StatusBadge = ({
   tone,
   className,
   dataTestId,
-  ...rest
+  children,
 }: TStatusBadgeProps) => {
   return (
     <span
-      {...rest}
       data-testid={dataTestId}
       className={statusBadgeVariants({ tone, class: className })}
-    />
+    >
+      {children}
+    </span>
   );
 };

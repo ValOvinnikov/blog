@@ -1,2 +1,2 @@
-export type { IPostGridProps } from './post-grid';
+export type { TPostGridProps } from './post-grid';
 export { PostGrid } from './post-grid';

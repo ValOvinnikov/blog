@@ -1,15 +1,22 @@
-import type { IWithDataTestId } from '@blog/config';
-import { type ButtonHTMLAttributes } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { AriaAttributes, MouseEventHandler, ReactNode } from 'react';
 
 import { buttonVariants, type TButtonVariants } from './button-variants';
 
-export type TButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
-  TButtonVariants &
-  IWithDataTestId;
+export type TButtonProps = IWithClassName &
+  IWithDataTestId &
+  TButtonVariants & {
+    type?: 'button' | 'submit' | 'reset';
+    title?: string;
+    children?: ReactNode;
+    onClick?: MouseEventHandler<HTMLButtonElement>;
+    disabled?: boolean;
+    'aria-busy'?: AriaAttributes['aria-busy'];
+  };
 
 /**
  * Button — the styled `<button>` for in-page actions (submit, toggle, dismiss).
- * Renders `type="button"` and takes its look from the shared `variant`/`size`
+ * Defaults to `type="button"` and takes its look from the shared `variant`/`size`
  * scale; reach for `LinkButton` when the control is really a navigation link.
  */
 export const Button = ({
@@ -17,14 +24,24 @@ export const Button = ({
   variant,
   size,
   dataTestId,
-  ...rest
+  type = 'button',
+  title,
+  children,
+  onClick,
+  disabled,
+  'aria-busy': ariaBusy,
 }: TButtonProps) => {
   return (
     <button
-      {...rest}
-      type="button"
+      type={type}
+      title={title}
+      onClick={onClick}
+      disabled={disabled}
+      aria-busy={ariaBusy}
       data-testid={dataTestId}
       className={buttonVariants({ variant, size, class: className })}
-    />
+    >
+      {children}
+    </button>
   );
 };

@@ -1,2 +1,2 @@
-export type { IHeroProps } from './hero';
+export type { THeroProps } from './hero';
 export { Hero } from './hero';

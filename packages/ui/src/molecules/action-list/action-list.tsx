@@ -1,10 +1,12 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { HTMLAttributes } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import { actionListVariants } from './action-list-variants';
 
-export interface IActionListProps
-  extends HTMLAttributes<HTMLDivElement>, IWithDataTestId {}
+export type TActionListProps = IWithClassName &
+  IWithDataTestId & {
+    children?: ReactNode;
+  };
 
 /**
  * ActionList — flex wrapper for hero CTA buttons.
@@ -14,12 +16,10 @@ export const ActionList = ({
   className,
   dataTestId,
   children,
-  ...rest
-}: IActionListProps) => (
+}: TActionListProps) => (
   <div
     className={actionListVariants({ class: className })}
     data-testid={dataTestId}
-    {...rest}
   >
     {children}
   </div>

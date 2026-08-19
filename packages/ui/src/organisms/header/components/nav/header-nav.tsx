@@ -1,12 +1,13 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import { headerNavVariants } from './header-nav-variants';
 
-interface IHeaderNavProps
-  extends ComponentPropsWithoutRef<'nav'>, IWithDataTestId {
-  ariaLabel?: string;
-}
+export type THeaderNavProps = IWithClassName &
+  IWithDataTestId & {
+    ariaLabel?: string;
+    children?: ReactNode;
+  };
 
 /**
  * HeaderNav — the primary navigation region of the site `Header`; a labelled
@@ -16,12 +17,13 @@ export const HeaderNav = ({
   className,
   ariaLabel,
   dataTestId,
-  ...rest
-}: IHeaderNavProps) => (
+  children,
+}: THeaderNavProps) => (
   <nav
     aria-label={ariaLabel}
     className={headerNavVariants({ class: className })}
     data-testid={dataTestId}
-    {...rest}
-  />
+  >
+    {children}
+  </nav>
 );

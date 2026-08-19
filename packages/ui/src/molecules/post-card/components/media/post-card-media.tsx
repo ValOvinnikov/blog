@@ -1,10 +1,12 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import { postCardMediaVariants } from './post-card-media-variants';
 
-interface IPostCardMediaProps
-  extends ComponentPropsWithoutRef<'div'>, IWithDataTestId {}
+export type TPostCardMediaProps = IWithClassName &
+  IWithDataTestId & {
+    children?: ReactNode;
+  };
 
 /**
  * PostCardMedia — the media region at the top of a `PostCard`; a styled `<div>`
@@ -13,11 +15,12 @@ interface IPostCardMediaProps
 export const PostCardMedia = ({
   className,
   dataTestId,
-  ...rest
-}: IPostCardMediaProps) => (
+  children,
+}: TPostCardMediaProps) => (
   <div
     className={postCardMediaVariants({ class: className })}
     data-testid={dataTestId}
-    {...rest}
-  />
+  >
+    {children}
+  </div>
 );

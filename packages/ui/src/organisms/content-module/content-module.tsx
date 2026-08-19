@@ -1,20 +1,20 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import {
   contentModuleVariants,
   type TContentModuleVariants,
 } from './content-module-variants';
 
-export interface IContentModuleProps
-  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
-  children: ReactNode;
-  /**
-   * Drops this component's own top margin. Set when a parent (e.g. `Section`)
-   * already owns the vertical spacing around it, so the two don't stack.
-   */
-  wrapped?: TContentModuleVariants['wrapped'];
-}
+export type TContentModuleProps = IWithClassName &
+  IWithDataTestId & {
+    children: ReactNode;
+    /**
+     * Drops this component's own top margin. Set when a parent (e.g. `Section`)
+     * already owns the vertical spacing around it, so the two don't stack.
+     */
+    wrapped?: TContentModuleVariants['wrapped'];
+  };
 
 /**
  * ContentModule — page-builder organism rendering a portable-text content
@@ -27,16 +27,11 @@ export const ContentModule = ({
   className,
   dataTestId,
   wrapped,
-  ...rest
-}: IContentModuleProps) => {
+}: TContentModuleProps) => {
   const s = contentModuleVariants({ wrapped });
 
   return (
-    <div
-      className={s.root({ class: className })}
-      data-testid={dataTestId}
-      {...rest}
-    >
+    <div className={s.root({ class: className })} data-testid={dataTestId}>
       <div className={s.body()}>{children}</div>
     </div>
   );

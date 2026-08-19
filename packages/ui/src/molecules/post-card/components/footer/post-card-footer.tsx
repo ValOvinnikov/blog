@@ -1,22 +1,22 @@
-import { Size, type IWithDataTestId } from '@blog/config';
+import { Size, type IWithClassName, type IWithDataTestId } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import { postCardFooterVariants } from './post-card-footer-variants';
 
-export interface IPostCardFooterProps
-  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
-  authorName?: string;
-  authorAvatarSrc?: string;
-  publishedAt?: string;
-  formattedDate?: string;
-  /** Post category, rendered lowercased alongside `leadingIcon`/`trailingIcon`. */
-  category?: string;
-  /** Icon rendered before the category text, e.g. `<Icon name={ICONS.X} />`. */
-  leadingIcon?: ReactNode;
-  /** Icon rendered after the category text, e.g. `<Icon name={ICONS.ARROW} />`. */
-  trailingIcon?: ReactNode;
-}
+export type TPostCardFooterProps = IWithClassName &
+  IWithDataTestId & {
+    authorName?: string;
+    authorAvatarSrc?: string;
+    publishedAt?: string;
+    formattedDate?: string;
+    /** Post category, rendered lowercased alongside `leadingIcon`/`trailingIcon`. */
+    category?: string;
+    /** Icon rendered before the category text, e.g. `<Icon name={ICONS.X} />`. */
+    leadingIcon?: ReactNode;
+    /** Icon rendered after the category text, e.g. `<Icon name={ICONS.ARROW} />`. */
+    trailingIcon?: ReactNode;
+  };
 
 const s = postCardFooterVariants();
 
@@ -34,13 +34,8 @@ export const PostCardFooter = ({
   trailingIcon,
   className,
   dataTestId,
-  ...rest
-}: IPostCardFooterProps) => (
-  <div
-    className={s.root({ class: className })}
-    data-testid={dataTestId}
-    {...rest}
-  >
+}: TPostCardFooterProps) => (
+  <div className={s.root({ class: className })} data-testid={dataTestId}>
     {authorName && (
       <Avatar
         name={authorName}

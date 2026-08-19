@@ -1,10 +1,12 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import { windowChromePromptVariants } from './window-chrome-prompt-variants';
 
-export interface IWindowChromePromptProps
-  extends ComponentPropsWithoutRef<'span'>, IWithDataTestId {}
+export type TWindowChromePromptProps = IWithClassName &
+  IWithDataTestId & {
+    children?: ReactNode;
+  };
 
 /**
  * WindowChromePrompt — the muted "where" segment of a `WindowChrome.Bar`
@@ -14,11 +16,12 @@ export interface IWindowChromePromptProps
 export const WindowChromePrompt = ({
   className,
   dataTestId,
-  ...rest
-}: IWindowChromePromptProps) => (
+  children,
+}: TWindowChromePromptProps) => (
   <span
     className={windowChromePromptVariants({ class: className })}
     data-testid={dataTestId}
-    {...rest}
-  />
+  >
+    {children}
+  </span>
 );

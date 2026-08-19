@@ -1,16 +1,15 @@
-import type { IWithDataTestId } from '@blog/config';
-import { BrandMark, type IBrandMarkProps } from '@blog/ui/atoms/brand-mark';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import { BrandMark, type TBrandMarkProps } from '@blog/ui/atoms/brand-mark';
 
 import { brandLockupVariants } from './brand-lockup-variants';
 
-export interface IBrandLockupProps
-  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
-  /** Uploaded brand-mark image source; falls through to `BrandMark`'s polygon fallback when unset. */
-  src?: string;
-  size?: IBrandMarkProps['size'];
-  specLine?: string;
-}
+export type TBrandLockupProps = IWithClassName &
+  IWithDataTestId & {
+    /** Uploaded brand-mark image source; falls through to `BrandMark`'s polygon fallback when unset. */
+    src?: string;
+    size?: TBrandMarkProps['size'];
+    specLine?: string;
+  };
 
 /**
  * BrandLockup molecule — the brand mark plus an optional monospace spec
@@ -23,16 +22,11 @@ export const BrandLockup = ({
   specLine,
   className,
   dataTestId,
-  ...rest
-}: IBrandLockupProps) => {
+}: TBrandLockupProps) => {
   const { root, specLine: specLineSlot } = brandLockupVariants();
 
   return (
-    <div
-      className={root({ class: className })}
-      data-testid={dataTestId}
-      {...rest}
-    >
+    <div className={root({ class: className })} data-testid={dataTestId}>
       <BrandMark src={src} size={size} stacked={Boolean(specLine)} />
       {specLine && <span className={specLineSlot()}>{specLine}</span>}
     </div>

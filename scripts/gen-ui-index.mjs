@@ -117,19 +117,41 @@ const findComponent = (sf, name) => {
   return fallback;
 };
 
-// Prefer `I<Name>Props`; else the first exported interface/type alias ending in
-// "Props".
+// Prefer `I<Name>Props`, then `T<Name>Props`; else the first exported
+// interface/type alias ending in "Props" (source order — only a fallback,
+// since a file with multiple `*Props` declarations, e.g. a compound
+// component's own props plus a nested slot-config props type, would
+// otherwise pick whichever happens to be declared first).
 const findPropsType = (sf, name) => {
-  const preferred = `I${name}Props`;
+  const preferredNames = [`I${name}Props`, `T${name}Props`];
   const candidates = [];
   for (const stmt of sf.statements) {
     if (ts.isInterfaceDeclaration(stmt) || ts.isTypeAliasDeclaration(stmt)) {
       const n = stmt.name.text;
-      if (n === preferred) return stmt;
       if (n.endsWith('Props')) candidates.push(stmt);
     }
   }
+  for (const preferred of preferredNames) {
+    const match = candidates.find((c) => c.name.text === preferred);
+    if (match) return match;
+  }
   return candidates[0] ?? null;
+};
+
+// A Level-2 polymorphic component's exported `I<Name>Props`/`T<Name>Props` is
+// typically a bare `TPolymorphicProps<C, <Name>OwnProps>` reference (or an
+// intersection of references) with no members of its own — the authored
+// surface lives on the local `<Name>OwnProps` type it wraps. Resolves that
+// sibling type by exact name so a caller can fall through to it instead of
+// documenting an empty props list.
+const findOwnPropsType = (sf, name) => {
+  const ownNames = [`I${name}OwnProps`, `T${name}OwnProps`];
+  for (const stmt of sf.statements) {
+    if (ts.isInterfaceDeclaration(stmt) || ts.isTypeAliasDeclaration(stmt)) {
+      if (ownNames.includes(stmt.name.text)) return stmt;
+    }
+  }
+  return null;
 };
 
 const truncate = (s, max) => (s.length > max ? `${s.slice(0, max - 1)}…` : s);
@@ -275,9 +297,19 @@ const componentParamType = (node) => {
 const describeComponent = (sf, file, name) => {
   const comp = findComponent(sf, name);
   const propsType = findPropsType(sf, name) ?? componentParamType(comp?.node);
-  const { props, extendsList } = propsType
+  let { props, extendsList } = propsType
     ? extractProps(propsType, sf)
     : { props: [], extendsList: [] };
+
+  // The chosen props type carried no members of its own — try the sibling
+  // `<Name>OwnProps` type before giving up and documenting an empty list.
+  if (props.length === 0) {
+    const ownPropsType = findOwnPropsType(sf, name);
+    if (ownPropsType) {
+      const own = extractProps(ownPropsType, sf);
+      if (own.props.length) ({ props, extendsList } = own);
+    }
+  }
   const variantsFile = file.replace(/\.tsx?$/, '-variants.ts');
   const variants = existsSync(variantsFile)
     ? extractVariants(variantsFile, parse(variantsFile))
@@ -473,7 +505,11 @@ const renderSub = (s) => {
 };
 
 const renderEntry = (e) => {
-  const lines = [`### ${e.name} — \`${e.path}\``];
+  // Prettier's markdown printer requires a blank line after every ATX
+  // heading and before a list starts under a lead-in paragraph (`Slots:`/
+  // `Compound component:`) — match that here so the raw generator output
+  // never drifts from what a commit-time `prettier --write` would produce.
+  const lines = [`### ${e.name} — \`${e.path}\``, ''];
   lines.push(e.purpose || '_No description._');
 
   const props = propsFragment(e.props, e.extendsList);
@@ -481,11 +517,11 @@ const renderEntry = (e) => {
   if (e.variants.length) lines.push(`Variants: ${e.variants.join(' · ')}`);
 
   if (e.members) {
-    lines.push('', 'Compound component:');
+    lines.push('', 'Compound component:', '');
     for (const m of e.members) lines.push(renderSub(m));
   }
   if (e.slots) {
-    lines.push('', 'Slots:');
+    lines.push('', 'Slots:', '');
     for (const s of e.slots) lines.push(renderSub(s));
   }
   return lines.join('\n');
