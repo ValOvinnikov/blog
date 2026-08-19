@@ -26,12 +26,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Shellcheck .claude/hooks
+      - name: Shellcheck .claude/hooks and scripts
         # shellcheck is preinstalled on ubuntu-latest (same fact actionlint.yml
         # relies on for workflow run: blocks) — these standalone scripts aren't
         # inside any run: block, so actionlint's shellcheck pass never reaches
         # them.
-        run: shellcheck .claude/hooks/*.sh
+        run: shellcheck .claude/hooks/*.sh scripts/*.sh
 
       - name: read-only-agent-guard.sh deny/allow matrix
         # Pins the cases hand-tested across #425's review rounds (see the test
@@ -61,3 +61,12 @@ jobs:
         # #N is context), and that it fails open when the board can't be
         # reached. Hermetic — stubs `gh` on PATH, no network.
         run: bash .claude/hooks/pre-agent-gate0-guard.test.sh
+
+      - name: vercel-ignore-affected.sh base-resolution matrix
+        # #1712: pins which commit the Vercel ignoreCommand diffs against in
+        # each situation. A wrong base here silently stops a project
+        # deploying with no failing signal anywhere — see the test file's own
+        # header. Hermetic: local git fixtures, `pnpm` stubbed on PATH, and
+        # the GitHub URL the script builds rewritten to a local path, so no
+        # network and no turbo workspace are needed.
+        run: sh scripts/vercel-ignore-affected.test.sh
