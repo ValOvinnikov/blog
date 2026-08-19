@@ -1,17 +1,17 @@
 import {
   NewsletterSignupCompact,
-  type INewsletterSignupCompactProps,
+  type TNewsletterSignupCompactProps,
 } from './components/compact/newsletter-signup-compact';
 import {
   NewsletterSignupFull,
-  type INewsletterSignupFullProps,
   type INewsletterSignupTrustCue,
+  type TNewsletterSignupFullProps,
 } from './components/full/newsletter-signup-full';
 
 export type {
-  INewsletterSignupCompactProps,
-  INewsletterSignupFullProps,
   INewsletterSignupTrustCue,
+  TNewsletterSignupCompactProps,
+  TNewsletterSignupFullProps,
 };
 
 /**

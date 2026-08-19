@@ -1,2 +1,2 @@
-export type { IToastViewportProps } from './toast-viewport';
+export type { TToastViewportProps } from './toast-viewport';
 export { ToastViewport } from './toast-viewport';

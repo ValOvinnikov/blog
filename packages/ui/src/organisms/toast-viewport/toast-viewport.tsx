@@ -1,13 +1,13 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { ReactNode } from 'react';
 
 import { toastViewportVariants } from './toast-viewport-variants';
 
-export interface IToastViewportProps extends IWithDataTestId {
-  ariaLabel: string;
-  children?: ReactNode;
-  className?: string;
-}
+export type TToastViewportProps = IWithClassName &
+  IWithDataTestId & {
+    ariaLabel: string;
+    children?: ReactNode;
+  };
 
 /**
  * ToastViewport — the fixed, corner-anchored region that positions and
@@ -21,7 +21,7 @@ export const ToastViewport = ({
   children,
   className,
   dataTestId,
-}: IToastViewportProps) => (
+}: TToastViewportProps) => (
   <div
     role="region"
     aria-label={ariaLabel}

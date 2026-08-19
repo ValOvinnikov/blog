@@ -1,4 +1,4 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { KeyboardEvent } from 'react';
 
 import { segmentedControlVariants } from './segmented-control-variants';
@@ -11,15 +11,14 @@ export interface ISegmentedControlOption<TValue extends string = string> {
   label: string;
 }
 
-export interface ISegmentedControlProps<
-  TValue extends string = string,
-> extends IWithDataTestId {
-  options: ISegmentedControlOption<TValue>[];
-  value: TValue;
-  onChange: (value: TValue) => void;
-  ariaLabel: string;
-  className?: string;
-}
+export type TSegmentedControlProps<TValue extends string = string> =
+  IWithClassName &
+    IWithDataTestId & {
+      options: ISegmentedControlOption<TValue>[];
+      value: TValue;
+      onChange: (value: TValue) => void;
+      ariaLabel: string;
+    };
 
 const s = segmentedControlVariants();
 
@@ -52,7 +51,7 @@ export const SegmentedControl = <TValue extends string = string>({
   ariaLabel,
   className,
   dataTestId,
-}: ISegmentedControlProps<TValue>) => {
+}: TSegmentedControlProps<TValue>) => {
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const isNext = NEXT_OPTION_KEYS.has(event.key);
     const isPrevious = PREVIOUS_OPTION_KEYS.has(event.key);

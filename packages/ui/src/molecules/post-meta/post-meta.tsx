@@ -1,4 +1,4 @@
-import { type IWithDataTestId, Size } from '@blog/config';
+import { type IWithClassName, type IWithDataTestId, Size } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { MetaSeparator } from '@blog/ui/atoms/meta-separator';
@@ -6,24 +6,24 @@ import { type ElementType, type ReactNode } from 'react';
 
 import { postMetaVariants } from './post-meta-variants';
 
-export interface IPostMetaProps extends IWithDataTestId {
-  author: {
-    name: string;
-    imageUrl?: string;
-    /** Link target for the author name — omit to render plain text. `PostMeta` never imports routes; the href is built and passed in by `apps/web`. */
-    href?: string;
+export type TPostMetaProps = IWithClassName &
+  IWithDataTestId & {
+    author: {
+      name: string;
+      imageUrl?: string;
+      /** Link target for the author name — omit to render plain text. `PostMeta` never imports routes; the href is built and passed in by `apps/web`. */
+      href?: string;
+    };
+    /** ISO 8601 date string, used only for `<time dateTime>`. */
+    publishedAt: string;
+    /** Human-readable date string, pre-formatted in the web layer. */
+    formattedDate: string;
+    readingTimeMinutes?: number;
+    /** Component the author name link renders as — pass the app router's Link for client-side navigation. Defaults to a plain `<a>`. */
+    linkAs?: TAnchorElementType;
+    /** Opaque share widget, right-aligned in the strip — omit to render `PostMeta` without a share action. `PostMeta` knows nothing about its contents or state; the interactive widget is built in `apps/web` and passed in. */
+    share?: ReactNode;
   };
-  /** ISO 8601 date string, used only for `<time dateTime>`. */
-  publishedAt: string;
-  /** Human-readable date string, pre-formatted in the web layer. */
-  formattedDate: string;
-  readingTimeMinutes?: number;
-  /** Component the author name link renders as — pass the app router's Link for client-side navigation. Defaults to a plain `<a>`. */
-  linkAs?: TAnchorElementType;
-  /** Opaque share widget, right-aligned in the strip — omit to render `PostMeta` without a share action. `PostMeta` knows nothing about its contents or state; the interactive widget is built in `apps/web` and passed in. */
-  share?: ReactNode;
-  className?: string;
-}
 
 const s = postMetaVariants();
 
@@ -40,7 +40,7 @@ export const PostMeta = ({
   share,
   className,
   dataTestId,
-}: IPostMetaProps) => {
+}: TPostMetaProps) => {
   const LinkComponent = (linkAs ?? 'a') as ElementType;
 
   return (

@@ -1,5 +1,5 @@
 export type {
   ISegmentedControlOption,
-  ISegmentedControlProps,
+  TSegmentedControlProps,
 } from './segmented-control';
 export { SegmentedControl } from './segmented-control';

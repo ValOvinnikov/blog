@@ -185,11 +185,11 @@ variant.
 
 - **Arrow functions only.** `export const MyComponent = (props) => { ... }`.
   Never `function MyComponent`.
-- Props are an explicit `type` (`T`-prefix), never inline. The surface is
-  enumerated, not inherited from the DOM — see "Closed prop types" above.
-  Prefer `type` over `interface`: a handful of components still declare
-  `interface I{X}Props` and get converted as they're next touched, so write
-  the `type`/`T` form in anything you add or edit.
+- Props are an explicit `type` (`T`-prefix), never an `interface` and never
+  inline. The surface is enumerated, not inherited from the DOM — see "Closed
+  prop types" above. This holds across the whole library with no exceptions;
+  an `interface I{X}Props` anywhere in `packages/ui` is a defect, not a
+  legacy case to leave alone.
 - **Every prop type composes `IWithClassName` and `IWithDataTestId`** from `@blog/config`; wire
   `dataTestId` to the root element's `data-testid`. **This covers compound
   roots and every slot/part component** (`Header.Brand`, `PostCard.Footer`,

@@ -1,2 +1,2 @@
-export type { IAsideProps } from './aside';
+export type { TAsideProps } from './aside';
 export { Aside } from './aside';

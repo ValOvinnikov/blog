@@ -2,6 +2,7 @@ import {
   ALERT_TYPE,
   ICONS,
   Size,
+  type IWithClassName,
   type IWithDataTestId,
   type TFormStatus,
 } from '@blog/config';
@@ -11,22 +12,22 @@ import { NewsletterSignupContent } from '@blog/ui/organisms/newsletter-signup/co
 import { newsletterSignupVariants } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
 import type { ReactNode } from 'react';
 
-export interface INewsletterSignupCompactProps extends IWithDataTestId {
-  email: string;
-  onChange: (value: string) => void;
-  onSubmit: () => void;
-  status: TFormStatus;
-  heading: string;
-  headingId?: string;
-  /** Decorative glyph or icon rendered ahead of `heading`, e.g. a `$` prompt — rendered as-is; the caller owns its wrapper, styling, and accessibility. */
-  prefix?: ReactNode;
-  errorMessage?: string;
-  successMessage?: string;
-  submitLabel: string;
-  emailAriaLabel: string;
-  placeholder?: string;
-  className?: string;
-}
+export type TNewsletterSignupCompactProps = IWithClassName &
+  IWithDataTestId & {
+    email: string;
+    onChange: (value: string) => void;
+    onSubmit: () => void;
+    status: TFormStatus;
+    heading: string;
+    headingId?: string;
+    /** Decorative glyph or icon rendered ahead of `heading`, e.g. a `$` prompt — rendered as-is; the caller owns its wrapper, styling, and accessibility. */
+    prefix?: ReactNode;
+    errorMessage?: string;
+    successMessage?: string;
+    submitLabel: string;
+    emailAriaLabel: string;
+    placeholder?: string;
+  };
 
 /**
  * `NewsletterSignup.Compact` — a slim single-row subscribe strip for the end
@@ -50,7 +51,7 @@ export const NewsletterSignupCompact = ({
   placeholder,
   className,
   dataTestId,
-}: INewsletterSignupCompactProps) => {
+}: TNewsletterSignupCompactProps) => {
   const isSuccess = status === 'success';
   const s = newsletterSignupVariants({ variant: 'compact' });
 

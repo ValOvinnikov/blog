@@ -4,7 +4,7 @@ import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
 import { MediaFrame } from '@blog/ui/atoms/media-frame';
 import { Text } from '@blog/ui/atoms/text';
-import { PostMeta, type IPostMetaProps } from '@blog/ui/molecules/post-meta';
+import { PostMeta, type TPostMetaProps } from '@blog/ui/molecules/post-meta';
 import { type ReactNode } from 'react';
 
 import { articleHeaderVariants } from './article-header-variants';
@@ -29,7 +29,7 @@ export type TArticleHeaderProps = IWithClassName &
     /** Lead paragraph rendered below the title, inside the heading column. Omit to render no lead. */
     lead?: string;
     /** Forwarded to `PostMeta` as-is (author, publishedAt, formattedDate, readingTimeMinutes?, share?). Rendered inside the heading column, below the lead paragraph. Omit to render no `PostMeta` strip. */
-    meta?: Omit<IPostMetaProps, 'className' | 'dataTestId'>;
+    meta?: Omit<TPostMetaProps, 'className' | 'dataTestId'>;
     /** Opaque cover media slot (e.g. a wrapped `SanityImage`), rendered below the metadata strip, capped at `max-w-page` (1120px). Omit to render no cover media. */
     coverMedia?: ReactNode;
   };

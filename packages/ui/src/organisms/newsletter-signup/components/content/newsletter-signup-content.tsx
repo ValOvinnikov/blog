@@ -9,7 +9,7 @@ import {
 } from '@blog/ui/organisms/newsletter-signup/newsletter-signup-variants';
 import { type ReactNode, type SubmitEvent } from 'react';
 
-interface INewsletterSignupContentProps {
+type TNewsletterSignupContentProps = {
   email: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
@@ -21,7 +21,7 @@ interface INewsletterSignupContentProps {
   /** Decorative leading glyph or icon forwarded to the email `TextInput`'s `leadingIcon`. */
   inputPrompt: ReactNode;
   variant: TNewsletterSignupVariants['variant'];
-}
+};
 
 /**
  * The email input, submit button, and inline error feedback shared by every
@@ -39,7 +39,7 @@ export const NewsletterSignupContent = ({
   placeholder,
   inputPrompt,
   variant,
-}: INewsletterSignupContentProps) => {
+}: TNewsletterSignupContentProps) => {
   const isSubmitting = status === 'submitting';
   const isError = status === 'error';
   const s = newsletterSignupVariants({ variant });
