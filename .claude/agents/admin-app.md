@@ -109,13 +109,14 @@ When invoked, before writing any code:
   routine noise and fires alerts nobody can act on.
   **A `TResult` failure is not automatically an `error`:** branch on the
   `ERROR_CODE` first, and log only the branches a human would do something
-  about. Reaching a branch that _should_ be unreachable — a duplicate slug
-  that the pre-check already cleared, meaning the race really fired — is the
-  case for `warn`: it is the only evidence the guard works.
+  about. The governing test, stated in full in `SPEC.md` §17: **log the gap
+  between what the user was told and what actually happened — no gap, no
+  log.** A specific message the operator can act on is the whole truth, so it
+  needs no line; a deliberately vague one ("try again") hides the cause, so
+  the log is the only place that cause exists.
   ```ts
   if (!result.ok) {
     if (result.error === ERROR_CODE.DB_DUPLICATE_SLUG) {
-      logger.warn('tenants.create_draft_slug_race', { slug });
       return {
         ok: false,
         fieldErrors: { slug: 'This slug is already in use.' },

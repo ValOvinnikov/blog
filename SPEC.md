@@ -489,3 +489,80 @@ epics #1039–#1044), built on the new `@blog/db` layer (§3, §4, §8).
   (`docs/context/content-model.md`) describe the _current_ schema — update it
   when #250/#251 land.
 - `docs/archive/IMPLEMENTATION_BRIEF.md` is frozen history; do not extend it.
+
+## 17. Observability & logging
+
+The logger core is `@blog/insight` (`createLogger`, `LOG_LEVEL`) — a
+zero-dependency package at the base of the graph alongside `config`/`utils`.
+Each app owns **one** shared logger at `src/utils/logger/logger.ts`
+(`createLogger({ service: 'web' | 'admin' })`) and imports it; modules never
+call `createLogger` themselves, because the `service` field is what separates
+the two apps' lines downstream. Output is single-line structured JSON to
+stdout — stdout is the transport, so there is no logging framework.
+
+`service`, `db`, and `auth` **never log**. They return the failure to the
+caller, and the app layer logs it once, with request context. A failure logged
+in two layers is one failure that looks like two.
+
+Event names are static, lowercase and dot-namespaced (`tenants.create_failed`).
+Dynamic values — slugs, ids, domains, status codes — are structured context
+fields, never interpolated into the name. A static name is what makes failures
+groupable, and it is also the log-injection barrier CodeQL checks. Two distinct
+failure sites get two distinct names, even in the same file.
+
+### What belongs in the log stream
+
+**Log the gap between what the user was told and what actually happened. No
+gap, no log.**
+
+A log line exists for someone who is not present at the moment of failure and
+cannot see what the user saw. So the test is not whether a failure was shown in
+the UI — it is whether the UI message already contains what a diagnostician
+would need:
+
+- The message _is_ the whole truth and the reader can fix it themselves — a
+  validation error, a duplicate slug, a not-found on a user-supplied URL. There
+  is no gap. Do not log it; it is a return value, not a failure.
+- The message is deliberately vague — "Couldn't create the tenant — try
+  again" — precisely because the cause is not something to show an operator.
+  The gap is total, and the log is the only place the cause exists anywhere.
+
+This inverts the intuition usefully: **the vaguer the user-facing message, the
+more necessary the log line.** A specific message means the system understood
+the failure and handed it to someone who can act; a generic one means it did
+not.
+
+Two corollaries. A failure crossing a boundary we do not control (Sanity,
+Vercel, a CI callback) is logged even when surfaced, because the remote detail
+cannot be shown and cannot be reproduced afterwards. And anything asynchronous
+is logged regardless, because there may be no one watching at all.
+
+### Levels
+
+Pick by who can act on the line. `error` — something is broken and a human
+needs to look. `warn` — handled, but worth seeing: a fallback engaged, a retry,
+a degraded path taken. An expected, user-correctable outcome is never `error`;
+it fires alerts nobody can act on and buries real breakages in routine noise.
+
+**A `TResult` failure is not automatically an `error`.** Since expected
+failures became values rather than exceptions, the instinct to log every
+`!result.ok` uniformly is the main way routine input errors reach the error
+rate. Branch on the `ERROR_CODE` first; log only the branches a human would do
+something about.
+
+### Logging is not auditing
+
+The rule above is about diagnostics, and it deliberately leaves business
+questions — "who archived this tenant, and when?" — unanswered. Those belong
+in durable, queryable, append-only relational data, not in the log stream: logs
+expire, cannot be queried by business key, and carry no integrity guarantee.
+Answering audit questions with log retention turns the pipeline into an
+expensive, lossy database, and couples noise-reduction work to compliance.
+
+### Where logs land
+
+Server logs go to Vercel Runtime Logs, per project, with a build-time vs
+runtime split for static and ISR routes. `apps/web` captures client-side errors
+through its own `/api/client-log` endpoint rather than a third-party browser
+agent, to protect the Lighthouse budget on public pages. A drain to
+Grafana Cloud Loki is the intended destination and is not yet wired up.
