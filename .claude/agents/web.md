@@ -99,11 +99,7 @@ When invoked, before writing any code:
   `ERROR_CODE` first, and log only the branches a human would do something
   about.
   ```ts
-  const result = await queries.bookmarks.addBookmark({
-    tenantId,
-    userId,
-    postId,
-  });
+  const result = await queries.bookmarks.addBookmark(tenantId, userId, postId);
   if (!result.ok) {
     if (result.error === ERROR_CODE.DB_NOT_FOUND) {
       logger.warn('bookmarks.add_row_vanished', { postId });
