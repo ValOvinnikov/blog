@@ -1,6 +1,6 @@
 import { tv } from 'tailwind-variants';
 
-export const globalErrorPageVariants = tv({
+export const errorPageLayoutVariants = tv({
   slots: {
     root: [
       'bg-primary-subtle text-text',

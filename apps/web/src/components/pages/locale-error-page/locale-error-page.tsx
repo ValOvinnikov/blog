@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Heading, Text } from '@blog/ui/atoms';
-import { errorPageVariants } from '@web/components/pages/error-page/error-page-variants';
+import { errorPageLayoutVariants } from '@web/components/shared/error-page-layout';
 import { reportClientError } from '@web/utils/report-client-error';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
@@ -11,7 +11,7 @@ export type TLocaleErrorPageProps = {
   reset: () => void;
 };
 
-const s = errorPageVariants();
+const s = errorPageLayoutVariants();
 
 /**
  * Rendered by `[locale]/error.tsx` — sits below `NextIntlClientProvider`, so
@@ -19,8 +19,7 @@ const s = errorPageVariants();
  * hardcoded English) this one can translate its copy. It catches errors
  * thrown anywhere in the localized route tree; `app/error.tsx` still handles
  * the narrower case of `[locale]/layout.tsx` itself throwing, which a
- * boundary nested inside that layout can't reach. Shares `ErrorPage`'s
- * layout classes rather than forking a third identical `*-variants.ts`.
+ * boundary nested inside that layout can't reach.
  */
 export function LocaleErrorPage({ error, reset }: TLocaleErrorPageProps) {
   const t = useTranslations('localeErrorPage');

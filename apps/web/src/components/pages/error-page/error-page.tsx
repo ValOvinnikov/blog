@@ -1,17 +1,16 @@
 'use client';
 
 import { Button, Heading, Text } from '@blog/ui/atoms';
+import { errorPageLayoutVariants } from '@web/components/shared/error-page-layout';
 import { reportClientError } from '@web/utils/report-client-error';
 import { useEffect } from 'react';
-
-import { errorPageVariants } from './error-page-variants';
 
 export type TErrorPageProps = {
   error: Error & { digest?: string };
   reset: () => void;
 };
 
-const s = errorPageVariants();
+const s = errorPageLayoutVariants();
 
 /**
  * Rendered by `app/error.tsx` — the error boundary for everything below the
