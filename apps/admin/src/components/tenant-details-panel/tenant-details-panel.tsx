@@ -53,7 +53,7 @@ function valuesFromTenant(tenant: TTenant): TFormValues {
 }
 
 /**
- * The tenant row's summary — one render path for both states.
+ * Renders form controls when editable, plain text when locked.
  */
 export function TenantDetailsPanel({
   tenant,
@@ -78,7 +78,7 @@ export function TenantDetailsPanel({
     setValues(valuesFromTenant(tenant));
   }
 
-  const { root, fields, field, fieldLabel, fieldError, actions } =
+  const { root, fields, field, fieldLabel, fieldError, lockedValue, actions } =
     tenantDetailsPanelVariants();
 
   function updateField<K extends keyof TFormValues>(
@@ -107,6 +107,9 @@ export function TenantDetailsPanel({
     { value: TENANT_PLAN.FREE, label: t('planOptionFree') },
     { value: TENANT_PLAN.GROWTH, label: t('planOptionGrowth') },
   ];
+  const planLabel =
+    planOptions.find((option) => option.value === values.plan)?.label ??
+    values.plan;
 
   const textFields: { key: TTextFieldKey; label: string }[] = [
     { key: 'name', label: t('nameLabel') },
@@ -125,57 +128,62 @@ export function TenantDetailsPanel({
         <Alert type={ALERT_TYPE.ERROR} message={formError} />
       )}
 
-      <div className={fields()}>
-        {textFields.map(({ key, label: labelText }) => {
-          const id = TEXT_FIELD_ID[key];
-          const errorId = `${id}-error`;
-          const errorMessage = isEditable ? fieldErrors[key] : undefined;
+      {isEditable ? (
+        <div className={fields()}>
+          {textFields.map(({ key, label: labelText }) => {
+            const id = TEXT_FIELD_ID[key];
+            const errorId = `${id}-error`;
+            const errorMessage = fieldErrors[key];
 
-          return (
-            <div className={field()} key={key}>
-              <label className={fieldLabel()} htmlFor={id}>
-                {labelText}
-              </label>
-              <TextInput
-                id={id}
-                ariaLabel={labelText}
-                value={values[key]}
-                onChange={(nextValue) => updateField(key, nextValue)}
-                isDisabled={!isEditable}
-                invalid={Boolean(errorMessage)}
-                aria-describedby={errorMessage ? errorId : undefined}
-              />
-              {errorMessage && (
-                <span id={errorId} className={fieldError()}>
-                  {errorMessage}
-                </span>
-              )}
-            </div>
-          );
-        })}
+            return (
+              <div className={field()} key={key}>
+                <label className={fieldLabel()} htmlFor={id}>
+                  {labelText}
+                </label>
+                <TextInput
+                  id={id}
+                  ariaLabel={labelText}
+                  value={values[key]}
+                  onChange={(nextValue) => updateField(key, nextValue)}
+                  invalid={Boolean(errorMessage)}
+                  aria-describedby={errorMessage ? errorId : undefined}
+                />
+                {errorMessage && (
+                  <span id={errorId} className={fieldError()}>
+                    {errorMessage}
+                  </span>
+                )}
+              </div>
+            );
+          })}
 
-        <div className={field()}>
-          <label className={fieldLabel()} htmlFor={PLAN_FIELD_ID}>
-            {t('planLabel')}
-          </label>
-          {isEditable ? (
+          <div className={field()}>
+            <label className={fieldLabel()} htmlFor={PLAN_FIELD_ID}>
+              {t('planLabel')}
+            </label>
             <SegmentedControl<TTenantPlan>
               ariaLabel={t('planLabel')}
               options={planOptions}
               value={values.plan}
               onChange={(plan) => updateField('plan', plan)}
             />
-          ) : (
-            <TextInput
-              id={PLAN_FIELD_ID}
-              ariaLabel={t('planLabel')}
-              value={t(`planValue.${values.plan}`)}
-              onChange={() => undefined}
-              isDisabled={true}
-            />
-          )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <dl className={fields()}>
+          {textFields.map(({ key, label: labelText }) => (
+            <div className={field()} key={key}>
+              <dt className={fieldLabel()}>{labelText}</dt>
+              <dd className={lockedValue()}>{values[key]}</dd>
+            </div>
+          ))}
+
+          <div className={field()}>
+            <dt className={fieldLabel()}>{t('planLabel')}</dt>
+            <dd className={lockedValue()}>{planLabel}</dd>
+          </div>
+        </dl>
+      )}
 
       {isEditable && (
         <div className={actions()}>

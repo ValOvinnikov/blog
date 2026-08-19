@@ -258,10 +258,6 @@
     "planOptionFree": "Free",
     "planOptionGrowth": "Growth",
     "localeLabel": "Locale",
-    "planValue": {
-      "FREE": "Free",
-      "GROWTH": "Growth"
-    },
     "saveButton": "Save changes",
     "savingButton": "Saving…",
     "provisioningStartedError": "This tenant's provisioning has already started; its details can no longer be edited."
