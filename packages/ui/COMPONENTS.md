@@ -68,7 +68,7 @@ Variants: size: Size.SM|Size.MD|Size.LG
 ### IconButton — `atoms/icon-button/icon-button.tsx`
 
 A 22×22 icon-only button.
-Props: ariaLabel: string · title?: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · inert?: boolean · 'aria-expanded'?: AriaAttributes['aria-expanded'] · 'aria-controls'?: AriaAttributes['aria-controls'] · 'aria-haspopup'?: AriaAttributes['aria-haspopup'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
+Props: ariaLabel: string · title?: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · isInert?: boolean · 'aria-expanded'?: AriaAttributes['aria-expanded'] · 'aria-controls'?: AriaAttributes['aria-controls'] · 'aria-haspopup'?: AriaAttributes['aria-haspopup'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
 
 ### InlineCode — `atoms/inline-code/inline-code.tsx`
 
@@ -146,7 +146,7 @@ Variants: variant: lead|muted|hero|card
 ### TextInput — `atoms/text-input/text-input.tsx`
 
 TextInput atom — a pure, controlled single-line field.
-Props: value: string · onChange: (value: string) => void · ariaLabel: string · invalid?: TTextInputVariants['invalid'] · leadingIcon?: ReactNode · trailingIcon?: ReactNode · id?: string · type?: string · placeholder?: string · required?: boolean · isDisabled?: boolean · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
+Props: value: string · onChange: (value: string) => void · ariaLabel: string · invalid?: TTextInputVariants['invalid'] · leadingIcon?: ReactNode · trailingIcon?: ReactNode · id?: string · type?: string · placeholder?: string · isRequired?: boolean · isDisabled?: boolean · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
 Variants: invalid: (boolean) · hasLeadingIcon: (boolean) · hasTrailingIcon: (boolean)
 
 ### Textarea — `atoms/textarea/textarea.tsx`

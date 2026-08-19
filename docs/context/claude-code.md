@@ -261,6 +261,62 @@ contracts:
     because it gets removed. `pre-agent-gate0-guard.test.sh` pins the matrix
     with a stubbed `gh` on `PATH`, so it is hermetic — no network, no
     dependence on live board state.
+- **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js` and
+  `boolean-prop-prefix.js` are the repo's only hand-written rules (with a
+  `create()` visitor). They sit alongside two `no-restricted-imports` helpers
+  that are configuration rather than rules: `no-upstream-imports.js`, a
+  flat-config preset blocking a base-of-the-graph package from importing
+  `@blog/service`/`@blog/ui`, and `no-vitest-globals-import.js`, a shared
+  `paths` entry banning redundant value imports of Vitest's globals, which
+  every config declaring its own `no-restricted-imports` must spread in —
+  flat config replaces a rule's options wholesale rather than merging them.
+
+  The two rules matter to agents specifically because `post-edit-lint.sh`
+  surfaces their violations in the same turn as the edit, so a convention
+  breach is corrected before it reaches review:
+  - `no-prop-spread.js` — bans `{...rest}` spread onto a JSX element in
+    `@blog/ui`. Registered in `ui.js` only. `@blog/ui` prop types are closed
+    and enumerated, so a spread promises a surface `tv()` never styles: the
+    bug that motivated it was a `TextInput` accepting every native `<input>`
+    attribute while visibly honouring almost none of them. The six
+    polymorphic components that legitimately forward a caller-chosen
+    element's props are an explicit filename allowlist inside the rule — not
+    inferred from `TPolymorphicProps`, since `Eyebrow` is polymorphic without
+    using it. `*.test.tsx`/`*.stories.tsx` are out of scope: they consume
+    component APIs rather than define them, and their spreads land on local
+    mock components.
+  - `boolean-prop-prefix.js` — requires boolean members of `T*Props`/`I*Props`
+    to start with `is`/`has`/`can`/`should` (`prefetch`/`priority` allowlisted
+    as third-party passthrough names). Registered in `ui.js`, `web.js`, and
+    `admin.js`. This cannot be `@typescript-eslint/naming-convention`: its
+    boolean form needs `types: ['boolean']` and therefore type-aware linting,
+    which `base.js` does not enable. Reading the declared annotation
+    syntactically catches most cases, because props here are always annotated
+    — and it buys something the built-in rule cannot do, scoping by enclosing type
+    name so a `TResult`'s `ok` discriminant is never touched. **Known blind
+    spot:** a prop annotated with an indexed access into a variants type
+    (`invalid?: TTextInputVariants['invalid']`) is `boolean` at runtime but
+    is not a `boolean` _annotation_, so the rule cannot see it — resolving
+    that needs the type information this repo does not enable. Seven such
+    props exist in `@blog/ui`; renaming them is tracked in issue #1739.
+
+  Both carry `RuleTester` unit coverage (`*.test.js`, run by `configs/eslint`'s
+  `node --test` script, which `pnpm test` picks up).
+
+  Only `no-prop-spread.js` is file-aware: it reads `context.filename` inside
+  `create()` to apply its six-file allowlist and skip tests/stories. Keeping
+  that next to the logic it governs is a locality choice, not a forced one —
+  a workspace-relative glob would work too, since `ui.js` has exactly one
+  consumer. Worth knowing before writing one anywhere shared, though:
+  flat-config `files` globs resolve against the **consuming workspace**, not
+  the repo root, so a root-relative override in a preset with several
+  consumers silently matches nothing and the rule passes CI by never running.
+
+  `boolean-prop-prefix.js` needs no file filtering at all. It scopes
+  structurally, visiting only type and interface declarations whose name
+  matches `T*Props`/`I*Props`, so file path is irrelevant to it. Where it
+  applies is decided purely by which presets register it.
+
 - **Shared `node_modules` in agent worktrees** — a full `pnpm install` per
   isolated worktree duplicated ~1.1 GB and minutes of setup each time, so
   `.husky/post-checkout` seeds every new linked worktree instead (issue #410):

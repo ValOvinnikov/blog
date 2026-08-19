@@ -73,7 +73,14 @@ export const ArticleHeader = ({
         )}
         {meta && (
           <div className={s.meta()}>
-            <PostMeta {...meta} />
+            <PostMeta
+              author={meta.author}
+              publishedAt={meta.publishedAt}
+              formattedDate={meta.formattedDate}
+              readingTimeMinutes={meta.readingTimeMinutes}
+              linkAs={meta.linkAs}
+              share={meta.share}
+            />
           </div>
         )}
       </div>
