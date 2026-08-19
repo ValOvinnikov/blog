@@ -113,7 +113,7 @@ export async function BookmarksPage() {
             </li>
           ))}
         </ul>
-        <Text className={s.plainHint()}>
+        <Text variant="meta" className={s.plainHint()}>
           {t('hint', { count: orderedPosts.length })}
         </Text>
       </>

@@ -14,7 +14,6 @@ export const tenantSwitcherVariants = tv({
     meta: ['flex min-w-0 flex-1 flex-col'],
     name: ['truncate text-sm font-medium text-text'],
     domain: ['truncate font-mono text-meta text-text-subtle'],
-    chevron: ['shrink-0 rotate-90 text-text-subtle'],
     popup: [
       // Base UI portals this to document.body, outside the sidebar's own
       // `dark` island — carry the flipped token context here too, the same

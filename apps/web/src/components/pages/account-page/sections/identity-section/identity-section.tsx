@@ -84,7 +84,7 @@ export async function IdentitySection() {
     <>
       {providerRows.map(({ id, provider, icon, label, isLinked }) => (
         <div key={id} className={s.providerRow()}>
-          <Heading level={3} className={s.providerName()}>
+          <Heading level={3} visual="copy" className={s.providerName()}>
             {icon} {label}
           </Heading>
           <div className={s.providerStatus()}>

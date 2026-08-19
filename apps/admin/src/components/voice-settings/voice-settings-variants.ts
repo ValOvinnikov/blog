@@ -15,9 +15,6 @@ export const voiceSettingsVariants = tv({
       'marker:hidden [&::-webkit-details-marker]:hidden',
       'outline-hidden focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
     ],
-    advancedSummaryIcon: [
-      'text-text-subtle transition-transform duration-base ease-console group-open:rotate-90',
-    ],
     advancedBody: ['flex flex-col gap-4 border-t border-border p-4'],
     alert: ['w-fit'],
   },

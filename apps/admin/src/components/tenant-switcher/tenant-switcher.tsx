@@ -36,17 +36,8 @@ export function TenantSwitcher({
   const active =
     tenants.find((tenant) => tenant.id === activeTenantId) ?? tenants[0];
 
-  const {
-    trigger,
-    meta,
-    name,
-    domain,
-    chevron,
-    popup,
-    item,
-    itemName,
-    itemDomain,
-  } = tenantSwitcherVariants();
+  const { trigger, meta, name, domain, popup, item, itemName, itemDomain } =
+    tenantSwitcherVariants();
 
   if (!active) {
     return null;
@@ -62,7 +53,7 @@ export function TenantSwitcher({
           <span className={name()}>{active.name}</span>
           <span className={domain()}>{active.primaryDomain}</span>
         </span>
-        <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} className={chevron()} />
+        <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} variant="chevronDown" />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner sideOffset={6} align="start">

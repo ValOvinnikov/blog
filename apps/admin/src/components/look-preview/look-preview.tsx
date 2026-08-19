@@ -71,8 +71,6 @@ export function LookPreview({
     previewSurface,
     brandRow,
     brandName,
-    sampleHeading,
-    samplePara,
     actionsRow,
     chip,
     note,
@@ -97,12 +95,12 @@ export function LookPreview({
       </div>
       <Heading
         level={3}
-        className={sampleHeading()}
+        visual="preview"
         style={{ fontFamily: heading.fontFamily }}
       >
         {t('sampleHeading')}
       </Heading>
-      <Text className={samplePara()} style={{ fontFamily: body.fontFamily }}>
+      <Text variant="supporting" style={{ fontFamily: body.fontFamily }}>
         {t('samplePara')}
       </Text>
       <div className={actionsRow()}>

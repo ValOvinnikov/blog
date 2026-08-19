@@ -35,6 +35,10 @@ const meta = {
       control: 'select',
       options: objectKeys(iconVariants.variants.size),
     },
+    variant: {
+      control: 'select',
+      options: objectKeys(iconVariants.variants.variant),
+    },
   },
 } satisfies Meta<typeof Icon>;
 
@@ -61,4 +65,35 @@ export const WithAccessibleLabel: TStory = {
 
 export const Gallery: TStory = {
   render: () => <IconGallery />,
+};
+
+export const ChevronDown: TStory = {
+  args: { name: ICONS.CHEVRON_RIGHT, variant: 'chevronDown' },
+};
+
+/**
+ * `chevronOpen` rotates via the native `<details>`/`<summary>` disclosure
+ * state (`group-open:`), so it needs a real open and closed pair to show
+ * both rotation states — a static `args.variant` alone would only ever
+ * render one of them.
+ */
+export const ChevronOpenDisclosure: TStory = {
+  render: () => (
+    <div className="flex gap-8">
+      <details className="group">
+        <summary className="flex cursor-pointer list-none items-center gap-2">
+          <Icon name={ICONS.CHEVRON_RIGHT} variant="chevronOpen" />
+          Closed
+        </summary>
+        <p className="pt-2 text-sm">Revealed content</p>
+      </details>
+      <details className="group" open={true}>
+        <summary className="flex cursor-pointer list-none items-center gap-2">
+          <Icon name={ICONS.CHEVRON_RIGHT} variant="chevronOpen" />
+          Open
+        </summary>
+        <p className="pt-2 text-sm">Revealed content</p>
+      </details>
+    </div>
+  ),
 };

@@ -69,3 +69,17 @@ export const Statement: TStory = {
     children: 'A larger, full-color standalone statement of body copy.',
   },
 };
+
+export const MetaVariant: TStory = {
+  args: {
+    variant: 'meta',
+    children: 'A small metadata line, rendered in the subtle token color.',
+  },
+};
+
+export const Emphasis: TStory = {
+  args: {
+    variant: 'emphasis',
+    children: 'Card-sized copy rendered bold and full-color for emphasis.',
+  },
+};

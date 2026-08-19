@@ -72,6 +72,14 @@ export const VisualProseH4: TStory = {
   args: { level: 4, visual: 'prose-h4', children: 'Prose H4 Heading' },
 };
 
+export const VisualPreview: TStory = {
+  args: { level: 3, visual: 'preview', children: 'Sample Preview Heading' },
+};
+
+export const VisualCopy: TStory = {
+  args: { level: 3, visual: 'copy', children: 'Copy-sized Heading' },
+};
+
 /**
  * The `post` visual (the page's real title, e.g. `PostPage`'s h1) must
  * always read as the largest heading on the page. `prose-h2`/`prose-h3`/

@@ -77,7 +77,6 @@ export function VoiceSettings({
     basicCard,
     advanced,
     advancedSummary,
-    advancedSummaryIcon,
     advancedBody,
     alert,
   } = voiceSettingsVariants();
@@ -140,7 +139,7 @@ export function VoiceSettings({
         <summary className={advancedSummary()}>
           <Icon
             name={ICONS.CHEVRON_RIGHT}
-            className={advancedSummaryIcon()}
+            variant="chevronOpen"
             aria-hidden="true"
           />
           {t('advancedSummary')}

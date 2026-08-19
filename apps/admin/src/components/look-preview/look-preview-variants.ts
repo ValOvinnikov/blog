@@ -17,8 +17,6 @@ export const lookPreviewVariants = tv({
     previewSurface: [],
     brandRow: ['flex items-center gap-2'],
     brandName: ['text-base font-semibold text-text'],
-    sampleHeading: ['text-xl font-semibold text-text'],
-    samplePara: ['text-sm text-text-muted'],
     actionsRow: ['flex flex-wrap items-center gap-2 pt-1'],
     chip: [
       'inline-flex items-center rounded-full border border-border px-2.5 py-1 text-xs text-text-muted',
