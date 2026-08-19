@@ -407,6 +407,28 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   is read repeatedly. This keeps "we've already established this" visible in
   one place instead of re-deriving or re-typing the same access path at every
   usage.
+- **No bare `console.*` — log through the app's shared logger.** `apps/web`
+  and `apps/admin` each own one logger at `src/utils/logger/logger.ts`
+  (`createLogger({ service })` from `@blog/insight`); import it rather than
+  calling `createLogger` per module, or the `service` field that separates the
+  two apps' lines is lost. `service`, `db`, and `auth` never log at all —
+  they return the failure to the caller, and the app layer logs it once with
+  request context. The rule is declared as `no-console` in
+  `configs/eslint/base.js`, which also exempts tests; every other exemption is
+  layered in a per-workspace preset, because flat-config `files` globs resolve
+  against the consuming workspace and not the repo root — `insight.js` for the
+  logger itself, `db.js` for that package's `scripts/**` and
+  `drizzle.config.ts`, `web.js` for `e2e/**`, each being a place where stdout
+  _is_ the interface. Root and `apps/cms` scripts need no entry: they are
+  `.mjs`, outside the rule's `.ts`/`.tsx` scope.
+  Event names are static, lowercase and dot-namespaced; dynamic values go in
+  the context object, never interpolated into the name.
+  **Log the gap between what the user was told and what actually happened —
+  no gap, no log:** a specific, self-correctable message (a validation error,
+  a duplicate slug) is the whole truth and needs no line, while a deliberately
+  vague one hides the cause and must be logged. A `TResult` failure is not
+  automatically an `error` — branch on the `ERROR_CODE` and log only what a
+  human would act on. Full contract in `SPEC.md` §17.
 - Co-locate `*.test.ts(x)`; `pnpm test` must pass.
 - After a schema change: `pnpm typegen`, then commit the regenerated files in
   `packages/config/src/sanity/generated/`. Typegen can be non-deterministic —
