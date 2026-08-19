@@ -7,15 +7,15 @@ import { getDomainVerificationStatusAction } from '@admin/server/provisioning/ge
 import { getTenantProvisioningStatusAction } from '@admin/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@admin/server/provisioning/retry-provisioning-step-action';
 import { adminRoutes } from '@admin/utils/routes/routes';
+import { Size } from '@blog/config';
 import {
-  Size,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
-} from '@blog/config';
+} from '@blog/db/constants';
 import type {
   TTenant,
   TTenantProvisioningSteps,

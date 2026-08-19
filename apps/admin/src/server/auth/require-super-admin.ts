@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { ADMIN_ROLE } from '@blog/config';
+import { ADMIN_ROLE } from '@blog/db';
 import type { TAdmin } from '@blog/db/schema/admins';
 import { redirect } from 'next/navigation';
 

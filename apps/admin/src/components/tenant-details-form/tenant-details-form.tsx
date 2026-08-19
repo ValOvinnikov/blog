@@ -4,7 +4,8 @@ import {
   createTenantAction,
   type TCreateTenantFieldErrors,
 } from '@admin/server/tenants/create-tenant-action';
-import { ALERT_TYPE, Size, TENANT_PLAN, type TTenantPlan } from '@blog/config';
+import { ALERT_TYPE, Size } from '@blog/config';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import { Alert } from '@blog/ui/atoms/alert';
 import { Button } from '@blog/ui/atoms/button';
 import { Heading } from '@blog/ui/atoms/heading';

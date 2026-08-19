@@ -4,13 +4,8 @@ import { recordAuditEvent } from '@admin/server/audit/record-audit-event';
 import { requireAdmin } from '@admin/server/auth/require-admin';
 import { logger } from '@admin/utils/logger/logger';
 import { DOMAIN_PATTERN, SLUG_PATTERN } from '@admin/utils/path/path';
-import {
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  TENANT_PLAN,
-  type TTenantPlan,
-} from '@blog/config';
-import { queries } from '@blog/db';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';

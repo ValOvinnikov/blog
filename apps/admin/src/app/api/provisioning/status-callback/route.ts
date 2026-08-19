@@ -1,16 +1,16 @@
 import { env } from '@admin/utils/env/env';
 import { isSecretMatch } from '@admin/utils/is-secret-match/is-secret-match';
 import { logger } from '@admin/utils/logger/logger';
+import { ERROR_CODE } from '@blog/config';
 import {
-  ERROR_CODE,
+  queries,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
-} from '@blog/config';
-import { queries } from '@blog/db';
+} from '@blog/db';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 

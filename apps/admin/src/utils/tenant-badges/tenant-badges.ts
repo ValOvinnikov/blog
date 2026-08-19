@@ -3,7 +3,7 @@ import {
   TENANT_STATUS,
   type TTenantPlan,
   type TTenantStatus,
-} from '@blog/config/constants';
+} from '@blog/db';
 
 type TBadgeTone = 'ok' | 'warn' | 'neutral';
 

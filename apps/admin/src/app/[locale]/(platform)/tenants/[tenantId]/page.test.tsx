@@ -10,7 +10,8 @@ const { listTenantsByIdsMock, getDomainVerificationStatusMock } = vi.hoisted(
   }),
 );
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await import('@blog/db/constants')),
   queries: { tenants: { listTenantsByIds: listTenantsByIdsMock } },
 }));
 

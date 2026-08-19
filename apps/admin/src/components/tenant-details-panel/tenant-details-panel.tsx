@@ -4,7 +4,8 @@ import {
   updateTenantDetailsAction,
   type TUpdateTenantDetailsFieldErrors,
 } from '@admin/server/tenants/update-tenant-details-action';
-import { ALERT_TYPE, Size, TENANT_PLAN, type TTenantPlan } from '@blog/config';
+import { ALERT_TYPE, Size } from '@blog/config';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Alert } from '@blog/ui/atoms/alert';
 import { Button } from '@blog/ui/atoms/button';

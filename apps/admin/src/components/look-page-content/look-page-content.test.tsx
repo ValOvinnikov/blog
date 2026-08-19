@@ -1,10 +1,10 @@
 import { customRenderAsync, screen } from '@admin/testing/custom-render';
+import { PRESET_ID } from '@blog/config';
 import {
-  PRESET_ID,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/config';
+} from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import { LookPageContent } from './look-page-content';
@@ -13,7 +13,8 @@ const { getSiteConfigMock } = vi.hoisted(() => ({
   getSiteConfigMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await import('@blog/db/constants')),
   queries: { siteConfig: { getSiteConfig: getSiteConfigMock } },
 }));
 
