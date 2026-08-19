@@ -256,7 +256,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
             title={blogPostT('relatedReading')}
             titleId="related-posts-title"
             linkAs={SmartLink}
-            tinted={true}
+            isTinted={true}
           />
         )}
       </main>

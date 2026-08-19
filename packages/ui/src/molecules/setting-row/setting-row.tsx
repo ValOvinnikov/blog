@@ -19,7 +19,7 @@ export type TSettingRowProps = IWithClassName &
      * for a control (e.g. a wide slider) whose design calls for it to read
      * as edge-to-edge rather than sized to its own content.
      */
-    controlGrows?: TSettingRowVariants['controlGrows'];
+    canControlGrow?: TSettingRowVariants['controlGrows'];
     children?: ReactNode;
   };
 
@@ -34,7 +34,7 @@ export const SettingRow = ({
   labelLevel = 3,
   description,
   tone,
-  controlGrows,
+  canControlGrow,
   children,
   className,
   dataTestId,
@@ -45,7 +45,7 @@ export const SettingRow = ({
     title,
     description: descriptionSlot,
     control,
-  } = settingRowVariants({ tone, controlGrows });
+  } = settingRowVariants({ tone, controlGrows: canControlGrow });
 
   return (
     <div data-testid={dataTestId} className={root({ class: className })}>

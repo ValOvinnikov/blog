@@ -18,7 +18,7 @@ export type TCtaModuleProps = IWithClassName &
      * parent (e.g. `Section`) already owns the vertical spacing around it, so
      * the two don't stack.
      */
-    wrapped?: TCtaModuleVariants['wrapped'];
+    isWrapped?: TCtaModuleVariants['wrapped'];
   };
 
 /**
@@ -36,9 +36,9 @@ export const CtaModule = ({
   align,
   className,
   dataTestId,
-  wrapped,
+  isWrapped,
 }: TCtaModuleProps) => {
-  const s = ctaModuleVariants({ wrapped, align });
+  const s = ctaModuleVariants({ wrapped: isWrapped, align });
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>

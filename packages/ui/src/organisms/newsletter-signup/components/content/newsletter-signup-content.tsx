@@ -58,7 +58,7 @@ export const NewsletterSignupContent = ({
         leadingIcon={inputPrompt}
         placeholder={placeholder}
         type="email"
-        invalid={isError}
+        isInvalid={isError}
         isDisabled={isSubmitting}
         className={s.field()}
       />

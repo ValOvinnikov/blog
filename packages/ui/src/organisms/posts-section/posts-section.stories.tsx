@@ -86,14 +86,14 @@ export const TintedBand: TStory = {
   args: {
     title: 'Related reading',
     titleId: 'related-posts-title',
-    tinted: true,
+    isTinted: true,
   },
   parameters: { layout: 'fullscreen' },
 };
 
 export const Wrapped: TStory = {
   args: {
-    wrapped: true,
+    isWrapped: true,
   },
 };
 

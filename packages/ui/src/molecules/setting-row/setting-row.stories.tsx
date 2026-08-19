@@ -89,7 +89,7 @@ export const ControlGrows: TStory = {
   args: {
     label: 'Accent hue',
     description: 'Drag to pick the accent color used across the admin UI.',
-    controlGrows: true,
+    canControlGrow: true,
     children: (
       <div
         className="h-8 w-full rounded-sm"

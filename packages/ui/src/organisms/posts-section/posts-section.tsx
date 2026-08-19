@@ -48,12 +48,12 @@ export type TPostsSectionProps = IWithClassName &
      * column. Omit (or pass `false`) for the existing inline behavior, sized
      * by the parent. Heading markup/`aria` wiring is unchanged either way.
      */
-    tinted?: TPostsSectionVariants['tinted'];
+    isTinted?: TPostsSectionVariants['tinted'];
     /**
      * Drops this component's own top margin. Set when a parent (e.g. `Section`)
      * already owns the vertical spacing around it, so the two don't stack.
      */
-    wrapped?: TPostsSectionVariants['wrapped'];
+    isWrapped?: TPostsSectionVariants['wrapped'];
   };
 
 /**
@@ -71,13 +71,17 @@ export const PostsSection = ({
   supportingText,
   align,
   emptyMessage,
-  tinted,
-  wrapped,
+  isTinted,
+  isWrapped,
 }: TPostsSectionProps) => {
   const isEmpty = posts.length === 0;
   if (isEmpty && !emptyMessage) return null;
   const Component = (linkAs ?? 'a') as ElementType;
-  const s = postsSectionVariants({ tinted, wrapped, align });
+  const s = postsSectionVariants({
+    tinted: isTinted,
+    wrapped: isWrapped,
+    align,
+  });
 
   const content = (
     <>
@@ -120,7 +124,7 @@ export const PostsSection = ({
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
-      {tinted ? (
+      {isTinted ? (
         <div className={s.inner()}>
           <div className={s.contentGroup()}>{content}</div>
         </div>

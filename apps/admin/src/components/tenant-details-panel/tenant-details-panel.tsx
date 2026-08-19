@@ -145,7 +145,7 @@ export function TenantDetailsPanel({
                   ariaLabel={labelText}
                   value={values[key]}
                   onChange={(nextValue) => updateField(key, nextValue)}
-                  invalid={Boolean(errorMessage)}
+                  isInvalid={Boolean(errorMessage)}
                   aria-describedby={errorMessage ? errorId : undefined}
                 />
                 {errorMessage && (

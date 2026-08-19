@@ -8,7 +8,7 @@ export type TTextareaProps = IWithClassName &
     value: string;
     onChange: (value: string) => void;
     ariaLabel: string;
-    invalid?: TTextareaVariants['invalid'];
+    isInvalid?: TTextareaVariants['invalid'];
     /** Decorative leading glyph (e.g. `$`, `›`) — the console prompt idiom. Purely visual; `ariaLabel` carries the accessible name. */
     prompt?: string;
     id?: string;
@@ -27,7 +27,7 @@ export const Textarea = ({
   value,
   onChange,
   ariaLabel,
-  invalid = false,
+  isInvalid = false,
   prompt,
   rows,
   maxLength,
@@ -41,7 +41,7 @@ export const Textarea = ({
     root,
     prompt: promptSlot,
     textarea,
-  } = textareaVariants({ invalid, hasPrompt: Boolean(prompt) });
+  } = textareaVariants({ invalid: isInvalid, hasPrompt: Boolean(prompt) });
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     onChange(event.target.value);
@@ -63,7 +63,7 @@ export const Textarea = ({
         value={value}
         onChange={handleChange}
         aria-label={ariaLabel}
-        aria-invalid={invalid}
+        aria-invalid={isInvalid}
         className={textarea()}
       />
     </div>

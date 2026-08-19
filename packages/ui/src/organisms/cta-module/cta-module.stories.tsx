@@ -57,6 +57,6 @@ export const Centered: TStory = {
 
 export const Wrapped: TStory = {
   args: {
-    wrapped: true,
+    isWrapped: true,
   },
 };
