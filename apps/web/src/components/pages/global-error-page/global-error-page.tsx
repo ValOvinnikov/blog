@@ -1,17 +1,16 @@
 'use client';
 
 import { Button, Heading, Text } from '@blog/ui/atoms';
+import { errorPageLayoutVariants } from '@web/components/shared/error-page-layout';
 import { reportClientError } from '@web/utils/report-client-error';
 import { useEffect } from 'react';
-
-import { globalErrorPageVariants } from './global-error-page-variants';
 
 export type TGlobalErrorPageProps = {
   error: Error & { digest?: string };
   reset: () => void;
 };
 
-const s = globalErrorPageVariants();
+const s = errorPageLayoutVariants();
 
 /**
  * The content rendered inside `app/global-error.tsx`'s own `<html>`/`<body>`
