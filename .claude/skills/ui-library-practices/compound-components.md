@@ -148,8 +148,17 @@ export const Header: TCompoundComponent<typeof HeaderRoot, typeof HeaderParts> =
   export type THeroCtaProps = IWithClassName &
     IWithDataTestId & { children?: ReactNode };
 
-  export const HeroCta = ({ className, children }: THeroCtaProps) => (
-    <div className={heroCtaVariants({ class: className })}>{children}</div>
+  export const HeroCta = ({
+    className,
+    children,
+    dataTestId,
+  }: THeroCtaProps) => (
+    <div
+      className={heroCtaVariants({ class: className })}
+      data-testid={dataTestId}
+    >
+      {children}
+    </div>
   );
   // consumer: <Hero.Cta><Button as="a" href="/post">Read more</Button></Hero.Cta>
 

@@ -82,7 +82,7 @@ src/atoms/theme-toggle/
 
   ```tsx
   // ✅ consumer supplies the label      // ❌ component decides its own label
-  <nav aria-label={ariaLabel} {...rest} />   <nav aria-label="Site navigation" />
+  <nav aria-label={ariaLabel} />             <nav aria-label="Site navigation" />
   ```
 
 - **Never format dates inside a UI component.** Date display is locale-dependent
@@ -185,9 +185,11 @@ variant.
 
 - **Arrow functions only.** `export const MyComponent = (props) => { ... }`.
   Never `function MyComponent`.
-- Props are an explicit `type` (`T`-prefix), never inline and never an
-  `interface`. The surface is enumerated, not inherited from the DOM — see
-  "Closed prop types" below.
+- Props are an explicit `type` (`T`-prefix), never inline. The surface is
+  enumerated, not inherited from the DOM — see "Closed prop types" above.
+  Prefer `type` over `interface`: a handful of components still declare
+  `interface I{X}Props` and get converted as they're next touched, so write
+  the `type`/`T` form in anything you add or edit.
 - **Every prop type composes `IWithClassName` and `IWithDataTestId`** from `@blog/config`; wire
   `dataTestId` to the root element's `data-testid`. **This covers compound
   roots and every slot/part component** (`Header.Brand`, `PostCard.Footer`,
@@ -277,7 +279,7 @@ A component that renders as different elements takes an `as` prop. Pick the
   need element-specific prop inference:
   ```tsx
   type TLinkAs = 'a' | ComponentType<AnchorHTMLAttributes<HTMLAnchorElement>>;
-  export type TNavLinkProps = IWithClassName &
+  export type TSidebarLinkProps = IWithClassName &
     IWithDataTestId & {
       as?: TLinkAs;
       href?: string;
@@ -472,9 +474,10 @@ issues and ensures every committed file is consistently formatted.
 - [ ] Arrow-function component; no inline sub-components — each lives in
       `components/{child-name}/` with its own `{child-name}-variants.ts` (never
       importing the parent's variants).
-- [ ] Props interface extends `IWithDataTestId`; `dataTestId` wired to the root
-      `data-testid`.
-- [ ] Props typed (`I`/`T` prefix); `className` forwarded via `class:` in `tv()`.
+- [ ] Props are a closed `type` composing `IWithClassName` + `IWithDataTestId`
+      — no `extends` of a DOM prop set, no `...rest` spread; `dataTestId` wired
+      to the root `data-testid`.
+- [ ] Props typed (`T` prefix); `className` forwarded via `class:` in `tv()`.
 - [ ] All Tailwind classes in `{component}-variants.ts`; none inline on any
       element; grouped by concern; no `cn()`.
 - [ ] Interactive/foreign content hosted via a `ReactNode` slot, not a forwarded
@@ -486,6 +489,6 @@ issues and ensures every committed file is consistently formatted.
 - [ ] Uses token utilities; dark mode intact.
 - [ ] Exported from the barrel (`index.ts` → `atoms/index.ts` → `src/index.ts`);
       the component `index.ts` exports **only** the component and its props
-      interface — never the variants file.
+      type — never the variants file.
 - [ ] Multi-arrangement layouts are mobile-first with `md:`/`lg:` only — no
       custom breakpoints, no page-width `max-w-*` baked in.
