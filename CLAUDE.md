@@ -25,7 +25,8 @@ graph is acyclic
 - `@blog/service` is the only package importing the Sanity SDKs; never imports React.
 - `@blog/db` is the only package importing the Neon/Drizzle SDKs — Postgres
   data (Auth.js sessions, comments, ratings, bookmarks, subscribers, tenants,
-  memberships, admins, site config); never imports React or any Sanity SDK, and
+  memberships, admins, site config, audit events); never imports React or any
+  Sanity SDK, and
   never imports/is imported by `@blog/service` (siblings, not dependents — see
   `.claude/agents/db.md`). **Imported only by the two apps and `@blog/auth`**,
   which binds the Auth.js adapter to its tables.
@@ -133,7 +134,7 @@ helpers, shared config packages, alias wiring, guards typegen output), `cms`
 
 `db` (`packages/db`, Neon/Drizzle relational data — Auth.js sessions,
 comments, ratings, bookmarks, subscribers, tenants, memberships, admins, site
-config) is a **sibling to `service`, not a step in that chain** — it has no
+config, audit events) is a **sibling to `service`, not a step in that chain** — it has no
 upstream layer of its own beyond `config`. Its consumers are the two apps plus
 `@blog/auth`, which binds the Auth.js adapter to its tables.
 Dispatch it whenever config/utils changes are settled and before the app work
