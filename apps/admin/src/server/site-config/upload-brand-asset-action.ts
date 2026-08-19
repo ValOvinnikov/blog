@@ -1,5 +1,6 @@
 'use server';
 
+import { recordAuditEvent } from '@admin/server/audit/record-audit-event';
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
 import { getSiteConfigOrDefaults } from '@admin/server/site-config/site-config-or-defaults';
 import { validateBrandAssetUpload } from '@admin/server/site-config/validate-brand-asset';
@@ -9,6 +10,7 @@ import {
 } from '@admin/utils/brand-asset-limits/brand-asset-limits';
 import { env } from '@admin/utils/env/env';
 import { logger } from '@admin/utils/logger/logger';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
 import { del, put } from '@vercel/blob';
 
@@ -94,6 +96,14 @@ export async function uploadBrandAssetAction(
         });
       }
     }
+
+    await recordAuditEvent({
+      logEvent: 'site_config.brand_asset_upload_audit_failed',
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+      targetId: tenant.id,
+      details: { asset: targetKind, operation: 'upload', url: blob.url },
+    });
 
     return { ok: true, url: blob.url };
   } catch (error) {

@@ -1,20 +1,31 @@
 import { env } from '@admin/utils/env/env';
-import { DENSITY, FONT_CHOICE, PRESET_ID, RADIUS_SCALE } from '@blog/config';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  DENSITY,
+  FONT_CHOICE,
+  PRESET_ID,
+  RADIUS_SCALE,
+} from '@blog/config';
 
 import { uploadBrandAssetAction } from './upload-brand-asset-action';
 
 const {
   requireTenantMembershipMock,
+  authMock,
   getSiteConfigOrDefaultsMock,
   validateBrandAssetUploadMock,
   upsertSiteConfigMock,
+  insertAuditEventMock,
   putMock,
   delMock,
 } = vi.hoisted(() => ({
   requireTenantMembershipMock: vi.fn(),
+  authMock: vi.fn(),
   getSiteConfigOrDefaultsMock: vi.fn(),
   validateBrandAssetUploadMock: vi.fn(),
   upsertSiteConfigMock: vi.fn(),
+  insertAuditEventMock: vi.fn(),
   putMock: vi.fn(),
   delMock: vi.fn(),
 }));
@@ -22,6 +33,8 @@ const {
 vi.mock('@admin/server/auth/require-tenant-membership', () => ({
   requireTenantMembership: requireTenantMembershipMock,
 }));
+
+vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
 
 vi.mock('@admin/server/site-config/site-config-or-defaults', () => ({
   getSiteConfigOrDefaults: getSiteConfigOrDefaultsMock,
@@ -32,7 +45,10 @@ vi.mock('@admin/server/site-config/validate-brand-asset', () => ({
 }));
 
 vi.mock('@blog/db', () => ({
-  queries: { siteConfig: { upsertSiteConfig: upsertSiteConfigMock } },
+  queries: {
+    siteConfig: { upsertSiteConfig: upsertSiteConfigMock },
+    auditEvents: { insertAuditEvent: insertAuditEventMock },
+  },
 }));
 
 vi.mock('@vercel/blob', () => ({
@@ -62,9 +78,11 @@ function makeFormData(file: File | null): FormData {
 describe(uploadBrandAssetAction, () => {
   beforeEach(() => {
     requireTenantMembershipMock.mockReset();
+    authMock.mockReset();
     getSiteConfigOrDefaultsMock.mockReset();
     validateBrandAssetUploadMock.mockReset();
     upsertSiteConfigMock.mockReset();
+    insertAuditEventMock.mockReset();
     putMock.mockReset();
     delMock.mockReset();
 
@@ -72,6 +90,10 @@ describe(uploadBrandAssetAction, () => {
       tenant: { id: 'tenant-1', slug: 'acme' },
       membership: { role: 'OWNER' },
     });
+    authMock.mockResolvedValue({
+      user: { id: 'operator-1', email: 'operator@example.com' },
+    });
+    insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...THEME_FIELDS,
       logoAssetUrl: undefined,
@@ -155,6 +177,41 @@ describe(uploadBrandAssetAction, () => {
     });
   });
 
+  it('records exactly one SETTINGS_UPDATED audit event identifying the asset and operation', async () => {
+    validateBrandAssetUploadMock.mockResolvedValue({
+      ok: true,
+      asset: {
+        buffer: Buffer.from('bytes'),
+        contentType: 'image/png',
+        extension: 'png',
+      },
+    });
+    putMock.mockResolvedValue({
+      url: 'https://example.blob.vercel-storage.com/logo-abc.png',
+    });
+    upsertSiteConfigMock.mockResolvedValue({});
+
+    await uploadBrandAssetAction(
+      'acme',
+      'logo',
+      makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
+    );
+
+    expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
+    expect(insertAuditEventMock).toHaveBeenCalledWith({
+      actorId: 'operator-1',
+      actorEmail: 'operator@example.com',
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+      targetId: 'tenant-1',
+      details: {
+        asset: 'logo',
+        operation: 'upload',
+        url: 'https://example.blob.vercel-storage.com/logo-abc.png',
+      },
+    });
+  });
+
   it('deletes the previous asset after a successful replace, without blocking the result on it', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...THEME_FIELDS,
@@ -210,6 +267,34 @@ describe(uploadBrandAssetAction, () => {
       error: "Couldn't upload the logo — try again.",
     });
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  it('records no audit event when the site_config write itself fails', async () => {
+    validateBrandAssetUploadMock.mockResolvedValue({
+      ok: true,
+      asset: {
+        buffer: Buffer.from('bytes'),
+        contentType: 'image/png',
+        extension: 'png',
+      },
+    });
+    putMock.mockResolvedValue({
+      url: 'https://example.blob.vercel-storage.com/logo-abc.png',
+    });
+    upsertSiteConfigMock.mockRejectedValue(new Error('db unavailable'));
+
+    const result = await uploadBrandAssetAction(
+      'acme',
+      'logo',
+      makeFormData(new File(['x'], 'logo.png', { type: 'image/png' })),
+    );
+
+    expect(result).toEqual({
+      ok: false,
+      error: "Couldn't upload the logo — try again.",
+    });
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('reports a readable error and never touches Blob when the token is unconfigured', async () => {
