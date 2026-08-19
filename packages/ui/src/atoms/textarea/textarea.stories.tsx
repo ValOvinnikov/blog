@@ -37,6 +37,11 @@ export const Disabled: TStory = {
   args: { value: 'Locked for editing.', isDisabled: true },
 };
 
+/** An empty disabled field still shows its placeholder, dimmed relative to an active field's. */
+export const DisabledEmpty: TStory = {
+  args: { value: '', isDisabled: true },
+};
+
 const InteractiveDemo = () => {
   const [value, setValue] = useState('');
 

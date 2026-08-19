@@ -19,12 +19,12 @@ export const textInputVariants = tv({
       'border-border-strong',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
-      'disabled:pointer-events-none disabled:opacity-50',
+      'disabled:pointer-events-none disabled:border-border-emphasis disabled:bg-surface-2 disabled:text-muted disabled:placeholder:opacity-50',
     ],
   },
   variants: {
     invalid: {
-      true: { input: ['border-error text-error'] },
+      true: { input: ['border-error text-error', 'disabled:border-error'] },
     },
     hasLeadingIcon: {
       true: { input: ['pl-8'] },

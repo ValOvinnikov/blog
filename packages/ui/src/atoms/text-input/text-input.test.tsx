@@ -140,4 +140,10 @@ describe(`<${TextInput.name}/>`, () => {
     setup({ isDisabled: true });
     expect(screen.getByRole('textbox')).toBeDisabled();
   });
+
+  it('keeps the error border when both invalid and isDisabled are true', () => {
+    setup({ invalid: true, isDisabled: true });
+    // sole observable of the disabled-state border-color override winning over the invalid one
+    expect(screen.getByRole('textbox')).toHaveClass('disabled:border-error');
+  });
 });
