@@ -2,6 +2,14 @@ import { act, renderHook, waitFor } from '@web/testing/custom-render';
 
 import { useCopyToClipboard } from './use-copy-to-clipboard';
 
+const { reportClientErrorMock } = vi.hoisted(() => ({
+  reportClientErrorMock: vi.fn(),
+}));
+
+vi.mock('@web/utils/report-client-error', () => ({
+  reportClientError: reportClientErrorMock,
+}));
+
 const originalClipboard = navigator.clipboard;
 let writeText: ReturnType<typeof vi.fn>;
 
@@ -15,6 +23,7 @@ describe(useCopyToClipboard, () => {
   beforeEach(() => {
     writeText = vi.fn().mockResolvedValue(undefined);
     setClipboard({ writeText });
+    reportClientErrorMock.mockClear();
   });
 
   afterEach(() => {
@@ -73,5 +82,23 @@ describe(useCopyToClipboard, () => {
       expect(consoleError).toHaveBeenCalled();
     });
     expect(result.current.isCopied).toBe(false);
+  });
+
+  it('reports the error through the client transport when the clipboard write rejects', async () => {
+    const rejection = new Error('denied');
+    writeText.mockRejectedValue(rejection);
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { result } = renderHook(() => useCopyToClipboard());
+
+    act(() => {
+      result.current.copy('https://example.com/blog/hello');
+    });
+
+    await waitFor(() => {
+      expect(reportClientErrorMock).toHaveBeenCalledWith(
+        'copy_to_clipboard.write_failed',
+        rejection,
+      );
+    });
   });
 });

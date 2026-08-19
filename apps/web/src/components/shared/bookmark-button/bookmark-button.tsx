@@ -7,6 +7,7 @@ import {
   setBookmarkStatus,
 } from '@web/server/bookmarks/bookmark-actions';
 import { logger } from '@web/utils/logger/logger';
+import { reportClientError } from '@web/utils/report-client-error';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState, useTransition } from 'react';
@@ -64,6 +65,7 @@ export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
           postId,
           error: fetchError,
         });
+        reportClientError('bookmark_button.status_fetch_failed', fetchError);
         if (cancelled) return;
         setIsBookmarked(false);
         setIsResolved(true);
