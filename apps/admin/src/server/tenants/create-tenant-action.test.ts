@@ -158,7 +158,7 @@ describe('createTenantAction', () => {
     );
   });
 
-  it('returns a slug field error and logs the TOCTOU race at warn (not error) when createTenantDraft reports DB_DUPLICATE_SLUG', async () => {
+  it('returns a slug field error and logs nothing when createTenantDraft reports DB_DUPLICATE_SLUG', async () => {
     createTenantDraftMock.mockResolvedValue({
       ok: false,
       error: 'DB_DUPLICATE_SLUG',
@@ -173,10 +173,7 @@ describe('createTenantAction', () => {
     });
     expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
-    expect(loggerWarnMock).toHaveBeenCalledWith(
-      'tenants.create_draft_slug_race',
-      { slug: 'acme' },
-    );
+    expect(loggerWarnMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 

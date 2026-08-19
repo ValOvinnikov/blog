@@ -106,7 +106,6 @@ export async function createTenantAction(
 
     if (!result.ok) {
       if (result.error === ERROR_CODE.DB_DUPLICATE_SLUG) {
-        logger.warn('tenants.create_draft_slug_race', { slug });
         return {
           ok: false,
           fieldErrors: { slug: 'This slug is already in use.' },
