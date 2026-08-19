@@ -127,7 +127,7 @@ async function main(): Promise<void> {
       `Tenant "${args.slug}" already exists (${tenant.id}) — reusing it.`,
     );
   } else {
-    tenant = await createTenant({
+    const created = await createTenant({
       slug: args.slug,
       name: args.name,
       primaryDomain: args.primaryDomain,
@@ -137,6 +137,10 @@ async function main(): Promise<void> {
       plan: args.plan,
       status: args.status,
     });
+    if (!created.ok) {
+      throw new Error(`seed-tenant: createTenant failed (${created.error}).`);
+    }
+    tenant = created.data;
     console.warn(`Created tenant "${args.slug}" (${tenant.id}).`);
   }
 
@@ -146,7 +150,12 @@ async function main(): Promise<void> {
   }
 
   for (const domain of [args.primaryDomain, ...args.extraDomains]) {
-    await addTenantDomain(tenant.id, domain);
+    const domainResult = await addTenantDomain(tenant.id, domain);
+    if (!domainResult.ok) {
+      throw new Error(
+        `seed-tenant: addTenantDomain failed for "${domain}" (${domainResult.error}).`,
+      );
+    }
     console.warn(`Domain "${domain}" -> tenant "${args.slug}".`);
   }
 

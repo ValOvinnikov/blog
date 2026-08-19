@@ -1,4 +1,4 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
+import { ERROR_CODE, TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
@@ -36,17 +36,45 @@ afterEach(async () => {
 
 describe(createTenant, () => {
   it('inserts a new tenant row', async () => {
-    const tenant = await createTenant(tenantInput);
+    const result = await createTenant(tenantInput);
 
-    expect(tenant).toMatchObject(tenantInput);
-    expect(tenant.id).toEqual(expect.any(String));
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data).toMatchObject(tenantInput);
+    expect(result.data.id).toEqual(expect.any(String));
   });
 
-  it('rejects a second tenant with an already-used slug', async () => {
+  it('returns DB_DUPLICATE_SLUG for a second tenant with an already-used slug', async () => {
     await createTenant(tenantInput);
 
-    await expect(
-      createTenant({ ...tenantInput, primaryDomain: 'other.example.com' }),
-    ).rejects.toThrow();
+    const result = await createTenant({
+      ...tenantInput,
+      primaryDomain: 'other.example.com',
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      error: ERROR_CODE.DB_DUPLICATE_SLUG,
+    });
+
+    const rows = await db.select().from(schema.tenants);
+    expect(rows).toHaveLength(1);
+  });
+
+  // pglite serves a single connection, so a real concurrent UPDATE landing
+  // between this call's no-op insert and its follow-up read can't be
+  // forced here — `updateTenantDetails` renaming the slug away is the
+  // real-world trigger. The follow-up read is spied to simulate that exact
+  // window.
+  it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
+    await createTenant(tenantInput);
+
+    const selectSpy = vi.spyOn(db, 'select').mockReturnValueOnce({
+      from: () => ({ where: () => Promise.resolve([]) }),
+    } as unknown as ReturnType<typeof db.select>);
+
+    const result = await createTenant(tenantInput);
+
+    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
+    selectSpy.mockRestore();
   });
 });

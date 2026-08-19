@@ -26,7 +26,7 @@ afterEach(async () => {
 
 describe(getTenantRow, () => {
   it('returns the row for an existing tenant id', async () => {
-    const tenant = await createTenant({
+    const created = await createTenant({
       slug: 'acme',
       name: 'Acme',
       primaryDomain: 'acme.example.com',
@@ -36,10 +36,11 @@ describe(getTenantRow, () => {
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
     });
+    if (!created.ok) throw new Error('setup: createTenant failed.');
 
-    const result = await getTenantRow(tenant.id);
+    const result = await getTenantRow(created.data.id);
 
-    expect(result).toMatchObject({ id: tenant.id, slug: 'acme' });
+    expect(result).toMatchObject({ id: created.data.id, slug: 'acme' });
   });
 
   it('throws for an unknown tenant id', async () => {

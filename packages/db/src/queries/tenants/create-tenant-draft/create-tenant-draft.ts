@@ -1,13 +1,15 @@
 import {
+  ERROR_CODE,
   MEMBERSHIP_ROLE,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
+  type TErrorCode,
   type TTenantPlan,
   type TTenantProvisioningStep,
 } from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
+import { getDb, type TDb } from '@blog/db/client';
 import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import {
@@ -16,6 +18,7 @@ import {
   type TTenant,
   type TTenantProvisioningSteps,
 } from '@blog/db/schema/tenants';
+import type { TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
 export type TCreateTenantDraftInput = {
@@ -54,6 +57,12 @@ function buildIdleProvisioningSteps(): TTenantProvisioningSteps {
 // input rather than a hardcoded default: this layer never guesses a value
 // the caller hasn't actually supplied.
 //
+// The initial insert uses the same atomic `onConflictDoNothing()` +
+// follow-up read pattern as `createTenant`/`addTenantDomain` — a duplicate
+// `slug` is a typed `DB_DUPLICATE_SLUG` outcome rather than a raw Postgres
+// constraint error, and (since nothing was written yet) needs no
+// compensating cleanup.
+//
 // Not wrapped in a `db.transaction()` — the runtime `neon-http` driver has
 // no multi-statement transaction support (see `unlinkProvider` for the same
 // constraint elsewhere in this package). The two dependent inserts run
@@ -65,10 +74,10 @@ function buildIdleProvisioningSteps(): TTenantProvisioningSteps {
 // `tenants.slug` is unique) permanently block retrying with the same slug.
 export async function createTenantDraft(
   input: TCreateTenantDraftInput,
-): Promise<TTenant> {
+): Promise<TResult<TTenant, TErrorCode>> {
   const db = getDb();
 
-  const [tenant] = await db
+  const [inserted] = await db
     .insert(tenants)
     .values({
       slug: input.slug,
@@ -80,24 +89,24 @@ export async function createTenantDraft(
       provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
       provisioningSteps: buildIdleProvisioningSteps(),
     })
+    .onConflictDoNothing({ target: tenants.slug })
     .returning();
 
-  if (!tenant) {
-    throw new Error(
-      `createTenantDraft: insert for slug "${input.slug}" returned no row.`,
-    );
-  }
+  const tenant = inserted
+    ? { ok: true as const, data: inserted }
+    : await resolveSlugConflict(db, input.slug);
+  if (!tenant.ok) return tenant;
 
   try {
     const [domainRow, membershipRow] = await Promise.all([
       db
         .insert(tenantDomains)
-        .values({ tenantId: tenant.id, domain: input.domain })
+        .values({ tenantId: tenant.data.id, domain: input.domain })
         .returning(),
       db
         .insert(memberships)
         .values({
-          tenantId: tenant.id,
+          tenantId: tenant.data.id,
           userId: input.ownerUserId,
           role: MEMBERSHIP_ROLE.OWNER,
         })
@@ -106,19 +115,39 @@ export async function createTenantDraft(
 
     if (!domainRow[0]) {
       throw new Error(
-        `createTenantDraft: tenant_domains insert for tenant "${tenant.id}" returned no row.`,
+        `createTenantDraft: tenant_domains insert for tenant "${tenant.data.id}" returned no row.`,
       );
     }
 
     if (!membershipRow[0]) {
       throw new Error(
-        `createTenantDraft: memberships insert for tenant "${tenant.id}" returned no row.`,
+        `createTenantDraft: memberships insert for tenant "${tenant.data.id}" returned no row.`,
       );
     }
   } catch (error) {
-    await db.delete(tenants).where(eq(tenants.id, tenant.id));
+    await db.delete(tenants).where(eq(tenants.id, tenant.data.id));
     throw error;
   }
 
   return tenant;
+}
+
+// Only reached once the insert itself has no-opped on a `slug` conflict.
+async function resolveSlugConflict(
+  db: TDb,
+  slug: string,
+): Promise<TResult<TTenant, TErrorCode>> {
+  const [existing] = await db
+    .select()
+    .from(tenants)
+    .where(eq(tenants.slug, slug));
+
+  if (!existing) {
+    // A real, if narrow, race: the insert only no-ops on a `slug`
+    // conflict, but `updateTenantDetails` can rename an existing tenant's
+    // slug away between this call's failed insert and this read.
+    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
+  }
+
+  return { ok: false, error: ERROR_CODE.DB_DUPLICATE_SLUG };
 }

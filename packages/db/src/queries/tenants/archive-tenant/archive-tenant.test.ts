@@ -1,4 +1,4 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
+import { ERROR_CODE, TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { createTestDb } from '@blog/db/testing/create-test-db';
@@ -49,8 +49,9 @@ describe(archiveTenant, () => {
 
     const result = await archiveTenant(tenantId);
 
-    expect(result.deprovisionedAt).toBeInstanceOf(Date);
-    expect(result.status).toBe(TENANT_STATUS.ARCHIVED);
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.deprovisionedAt).toBeInstanceOf(Date);
+    expect(result.data.status).toBe(TENANT_STATUS.ARCHIVED);
 
     const [row] = await db
       .select()
@@ -65,14 +66,15 @@ describe(archiveTenant, () => {
 
     const result = await archiveTenant(tenantId);
 
-    expect(result.slug).toBe('acme');
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.slug).toBe('acme');
   });
 
-  it('throws for a tenant id that does not exist', async () => {
+  it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
     const missingId = '00000000-0000-0000-0000-000000000000';
 
-    await expect(archiveTenant(missingId)).rejects.toThrow(
-      `archiveTenant: update for tenant "${missingId}" returned no row.`,
-    );
+    const result = await archiveTenant(missingId);
+
+    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
   });
 });

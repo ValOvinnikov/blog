@@ -1,4 +1,4 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
+import { ERROR_CODE, TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import { eq } from 'drizzle-orm';
@@ -59,12 +59,15 @@ describe(addBookmark, () => {
     await insertUser('user-1');
     const tenantId = await insertTenant('acme');
 
-    const bookmark = await addBookmark(tenantId, 'user-1', 'post-1');
+    const result = await addBookmark(tenantId, 'user-1', 'post-1');
 
-    expect(bookmark).toMatchObject({
-      tenantId,
-      userId: 'user-1',
-      postId: 'post-1',
+    expect(result).toEqual({
+      ok: true,
+      data: expect.objectContaining({
+        tenantId,
+        userId: 'user-1',
+        postId: 'post-1',
+      }),
     });
   });
 
@@ -106,6 +109,25 @@ describe(addBookmark, () => {
     await expect(
       addBookmark('00000000-0000-0000-0000-000000000000', 'user-1', 'post-1'),
     ).rejects.toThrow();
+  });
+
+  // pglite serves a single connection, so a real concurrent DELETE landing
+  // between this call's no-op insert and its follow-up read can't be forced
+  // here — `removeBookmark` deleting the same tuple is the real-world
+  // trigger. The follow-up read is spied to simulate that exact window.
+  it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
+    await insertUser('user-1');
+    const tenantId = await insertTenant('acme');
+    await addBookmark(tenantId, 'user-1', 'post-1');
+
+    const selectSpy = vi.spyOn(db, 'select').mockReturnValueOnce({
+      from: () => ({ where: () => Promise.resolve([]) }),
+    } as unknown as ReturnType<typeof db.select>);
+
+    const result = await addBookmark(tenantId, 'user-1', 'post-1');
+
+    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
+    selectSpy.mockRestore();
   });
 });
 

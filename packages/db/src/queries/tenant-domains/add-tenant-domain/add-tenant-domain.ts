@@ -1,18 +1,23 @@
+import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
   tenantDomains,
   type TTenantDomain,
 } from '@blog/db/schema/tenant-domains';
+import type { TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
 // Idempotent for the exact same (tenantId, domain) pair, since `domain` is
 // globally unique and a racy double-insert would otherwise throw. A domain
-// already claimed by a *different* tenant throws distinctly rather than
-// silently returning someone else's row.
+// already claimed by a *different* tenant is a typed `DB_DUPLICATE_DOMAIN`
+// failure rather than silently returning someone else's row. The no-op
+// insert's follow-up read finding nothing (`DB_NOT_FOUND`) is a real,
+// if narrow, outcome: `updateTenantDetails` can rewrite an existing row's
+// `domain` value between this call's failed insert and its re-read.
 export async function addTenantDomain(
   tenantId: string,
   domain: string,
-): Promise<TTenantDomain> {
+): Promise<TResult<TTenantDomain, TErrorCode>> {
   const db = getDb();
 
   const [inserted] = await db
@@ -21,7 +26,7 @@ export async function addTenantDomain(
     .onConflictDoNothing()
     .returning();
 
-  if (inserted) return inserted;
+  if (inserted) return { ok: true, data: inserted };
 
   const [existing] = await db
     .select()
@@ -29,16 +34,12 @@ export async function addTenantDomain(
     .where(eq(tenantDomains.domain, domain));
 
   if (!existing) {
-    throw new Error(
-      `addTenantDomain: expected an existing row for domain "${domain}" after a no-op insert.`,
-    );
+    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
   }
 
   if (existing.tenantId !== tenantId) {
-    throw new Error(
-      `addTenantDomain: domain "${domain}" is already assigned to a different tenant.`,
-    );
+    return { ok: false, error: ERROR_CODE.DB_DUPLICATE_DOMAIN };
   }
 
-  return existing;
+  return { ok: true, data: existing };
 }
