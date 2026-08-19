@@ -1,27 +1,49 @@
-import { DENSITY, FONT_CHOICE, PRESET_ID, RADIUS_SCALE } from '@blog/config';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  DENSITY,
+  FONT_CHOICE,
+  PRESET_ID,
+  RADIUS_SCALE,
+} from '@blog/config';
 
 import { updateLookAction, type TUpdateLookInput } from './update-look-action';
 
 const {
   requireTenantMembershipMock,
+  authMock,
   upsertSiteConfigMock,
   revalidateSiteConfigMock,
+  insertAuditEventMock,
+  loggerErrorMock,
 } = vi.hoisted(() => ({
   requireTenantMembershipMock: vi.fn(),
+  authMock: vi.fn(),
   upsertSiteConfigMock: vi.fn(),
   revalidateSiteConfigMock: vi.fn(),
+  insertAuditEventMock: vi.fn(),
+  loggerErrorMock: vi.fn(),
 }));
 
 vi.mock('@admin/server/auth/require-tenant-membership', () => ({
   requireTenantMembership: requireTenantMembershipMock,
 }));
 
+vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
+
 vi.mock('@admin/server/site-config/revalidate-site-config', () => ({
   revalidateSiteConfig: revalidateSiteConfigMock,
 }));
 
+vi.mock('@admin/utils/logger/logger', () => ({
+  logger: { error: loggerErrorMock },
+}));
+
 vi.mock('@blog/db', () => ({
-  queries: { siteConfig: { upsertSiteConfig: upsertSiteConfigMock } },
+  queries: {
+    siteConfig: { upsertSiteConfig: upsertSiteConfigMock },
+    auditEvents: { insertAuditEvent: insertAuditEventMock },
+  },
 }));
 
 const VALID_INPUT: TUpdateLookInput = {
@@ -37,9 +59,16 @@ const VALID_INPUT: TUpdateLookInput = {
 describe(updateLookAction, () => {
   beforeEach(() => {
     requireTenantMembershipMock.mockReset();
+    authMock.mockReset();
+    authMock.mockResolvedValue({
+      user: { id: 'operator-1', email: 'operator@example.com' },
+    });
     upsertSiteConfigMock.mockReset();
     revalidateSiteConfigMock.mockReset();
     revalidateSiteConfigMock.mockResolvedValue(undefined);
+    insertAuditEventMock.mockReset();
+    insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
+    loggerErrorMock.mockReset();
   });
 
   it('re-resolves the tenant from the session against the routed slug before writing anything', async () => {
@@ -89,6 +118,46 @@ describe(updateLookAction, () => {
 
     expect(result).toEqual({ ok: false });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  it('records a SETTINGS_UPDATED audit event against the site config, with the operator as actor', async () => {
+    requireTenantMembershipMock.mockResolvedValue({
+      tenant: { id: 'tenant-1', slug: 'acme' },
+      membership: { role: 'OWNER' },
+    });
+    upsertSiteConfigMock.mockResolvedValue({});
+
+    await updateLookAction('acme', VALID_INPUT);
+
+    expect(insertAuditEventMock).toHaveBeenCalledWith({
+      actorId: 'operator-1',
+      actorEmail: 'operator@example.com',
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+      targetId: 'tenant-1',
+      details: VALID_INPUT,
+    });
+  });
+
+  it('still returns ok when the audit write fails, and logs the failure', async () => {
+    requireTenantMembershipMock.mockResolvedValue({
+      tenant: { id: 'tenant-1', slug: 'acme' },
+      membership: { role: 'OWNER' },
+    });
+    upsertSiteConfigMock.mockResolvedValue({});
+    insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
+
+    const result = await updateLookAction('acme', VALID_INPUT);
+
+    expect(result).toEqual({ ok: true });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'site_config.look_audit_failed',
+      expect.objectContaining({
+        targetId: 'tenant-1',
+        error: expect.any(Error),
+      }),
+    );
   });
 
   it('propagates the unauthenticated/unauthorized redirect the tenant gate throws', async () => {

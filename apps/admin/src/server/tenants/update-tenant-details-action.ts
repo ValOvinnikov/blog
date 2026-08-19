@@ -1,9 +1,15 @@
 'use server';
 
+import { recordAuditEvent } from '@admin/server/audit/record-audit-event';
 import { requireAdmin } from '@admin/server/auth/require-admin';
 import { logger } from '@admin/utils/logger/logger';
 import { DOMAIN_PATTERN, SLUG_PATTERN } from '@admin/utils/path/path';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  TENANT_PLAN,
+  type TTenantPlan,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { getTranslations } from 'next-intl/server';
@@ -74,6 +80,13 @@ export async function updateTenantDetailsAction(
 
     switch (result.outcome) {
       case 'updated':
+        await recordAuditEvent({
+          logEvent: 'tenants.update_details_audit_failed',
+          action: AUDIT_ACTION.SETTINGS_UPDATED,
+          targetType: AUDIT_TARGET_TYPE.TENANT,
+          targetId: tenantId,
+          details: parsed.data,
+        });
         return { ok: true, tenant: result.tenant };
       case 'slug-taken':
         return {

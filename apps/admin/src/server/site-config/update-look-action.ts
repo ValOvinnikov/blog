@@ -1,9 +1,12 @@
 'use server';
 
+import { recordAuditEvent } from '@admin/server/audit/record-audit-event';
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@admin/server/site-config/revalidate-site-config';
 import { logger } from '@admin/utils/logger/logger';
 import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
   DENSITY,
   FONT_CHOICE,
   PRESET_ID,
@@ -60,6 +63,13 @@ export async function updateLookAction(
   try {
     await queries.siteConfig.upsertSiteConfig(tenant.id, parsed.data);
     await revalidateSiteConfig();
+    await recordAuditEvent({
+      logEvent: 'site_config.look_audit_failed',
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+      targetId: tenant.id,
+      details: parsed.data,
+    });
     return { ok: true };
   } catch (error) {
     logger.error('site_config.look_save_failed', {

@@ -1,12 +1,19 @@
 'use server';
 
 import { routing } from '@admin/i18n/routing';
+import { recordAuditEvent } from '@admin/server/audit/record-audit-event';
 import { requireAdmin } from '@admin/server/auth/require-admin';
 import { dispatchProvisioningWorkflow } from '@admin/server/provisioning/dispatch-provisioning-workflow';
 import { logger } from '@admin/utils/logger/logger';
 import { DOMAIN_PATTERN, SLUG_PATTERN } from '@admin/utils/path/path';
 import { adminRoutes } from '@admin/utils/routes/routes';
-import { ERROR_CODE, TENANT_PLAN, type TTenantPlan } from '@blog/config';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  ERROR_CODE,
+  TENANT_PLAN,
+  type TTenantPlan,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -124,6 +131,14 @@ export async function createTenantAction(
     logger.error('tenants.create_draft_failed', { slug, domain, error });
     return { ok: false, error: "Couldn't create the tenant — try again." };
   }
+
+  await recordAuditEvent({
+    logEvent: 'tenants.create_audit_failed',
+    action: AUDIT_ACTION.CREATED,
+    targetType: AUDIT_TARGET_TYPE.TENANT,
+    targetId: tenantId,
+    details: { name, slug, domain, plan, ownerEmail },
+  });
 
   await dispatchProvisioningWorkflow(tenantId);
 
