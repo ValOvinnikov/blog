@@ -688,7 +688,29 @@ Both Storybook projects share `scripts/vercel-ignore-affected.sh` as their
 `ignoreCommand`. A PR push builds a project only when turbo sees its package
 as **affected**, or when one of its watched deploy-config paths changed (its
 own `vercel.json`, or the shared ignore script). Everything else skips, so an
-unrelated PR triggers neither deployment and consumes no build quota.
+unrelated PR triggers neither deployment and consumes no build quota. A change
+touching only `packages/config/src/types/**` or
+`packages/config/src/sanity/generated/**` also skips — turbo marks every
+dependent affected by any `packages/config` change, but a bare
+`storybook build` transpiles without type-checking, so type-only files can't
+reach the output.
+
+The commit that diff is taken against is `VERCEL_GIT_PREVIOUS_SHA` when Vercel
+supplies one, else the merge-base with `main`, else `HEAD^1`.
+
+**That last fallback is load-bearing on `main`, and its absence once bricked a
+project.** On a `main` build the merge-base with `main` is `HEAD` itself, and a
+commit diffed against itself shows nothing affected — so every `main` build
+skipped. No build meant no successful deployment, which meant
+`VERCEL_GIT_PREVIOUS_SHA` stayed empty, which meant the next merge did the same
+thing. `blog-web-ui` sat in that deadlock showing "No Production Deployment"
+until the `HEAD^1` fallback was added.
+
+If a Storybook project ever shows "No Production Deployment" again, note that
+the code fix cannot bootstrap it: the project needs **one** successful
+production deployment before `VERCEL_GIT_PREVIOUS_SHA` has anything to hold.
+Promote an existing successful preview deployment to production in the
+dashboard — a console action, like everything else in this doc.
 
 Because `apps/web` and `apps/cms`'s primary projects set
 `git.deploymentEnabled: false` (CI-gated pipeline), these two Storybook
