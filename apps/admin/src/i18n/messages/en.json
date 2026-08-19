@@ -260,7 +260,9 @@
     "localeLabel": "Locale",
     "saveButton": "Save changes",
     "savingButton": "Saving…",
-    "provisioningStartedError": "This tenant's provisioning has already started; its details can no longer be edited."
+    "provisioningStartedError": "This tenant's provisioning has already started; its details can no longer be edited.",
+    "lockedAnnouncement": "Tenant details locked while provisioning runs.",
+    "unlockedAnnouncement": "Tenant details unlocked and editable again."
   },
   "archivedTenantsToggle": {
     "ariaLabel": "Tenant visibility",

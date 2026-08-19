@@ -1,12 +1,27 @@
+import messages from '@admin/i18n/messages/en.json';
 import { renderWithIntl, screen, waitFor } from '@admin/testing/custom-render';
 import { makeTenant } from '@admin/testing/tenants/fixtures';
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db';
+import { render as rtlRender } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRouter } from 'next/navigation';
+import { NextIntlClientProvider } from 'next-intl';
+import type { ReactElement } from 'react';
 
 import { TenantDetailsPanel } from './tenant-details-panel';
 
 const render = renderWithIntl;
+
+// Applies the same wrapper on mount and on every `rerender()` call, so the
+// live region's node identity is preserved across rerenders.
+function withIntl(ui: ReactElement) {
+  return (
+    <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
+      {ui}
+    </NextIntlClientProvider>
+  );
+}
 
 const { updateTenantDetailsActionMock } = vi.hoisted(() => ({
   updateTenantDetailsActionMock: vi.fn(),
@@ -205,6 +220,85 @@ describe(TenantDetailsPanel, () => {
         ),
       ).toBeVisible();
       expect(refreshMock).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('lock transition announcement', () => {
+    it('announces the lock transition once — not on mount, not on an unrelated re-render', () => {
+      const tenant = makeTenant();
+      const { container, rerender } = rtlRender(
+        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
+      );
+
+      const liveRegion = container.querySelector('[aria-live="assertive"]');
+      expect(liveRegion).not.toBeNull();
+      expect(liveRegion).toHaveTextContent('');
+
+      // A re-render that leaves `isEditable` unchanged (e.g. a fresh tenant
+      // reference from an unrelated prop update) must not fire it.
+      rerender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={makeTenant({ name: 'Acme Renamed' })}
+            isEditable={true}
+          />,
+        ),
+      );
+      expect(liveRegion).toHaveTextContent('');
+
+      rerender(
+        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={false} />),
+      );
+      expect(liveRegion).toHaveTextContent(
+        'Tenant details locked while provisioning runs.',
+      );
+
+      // A further re-render still locked must not re-fire the announcement.
+      rerender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={makeTenant({ name: 'Acme Again' })}
+            isEditable={false}
+          />,
+        ),
+      );
+      expect(liveRegion).toHaveTextContent(
+        'Tenant details locked while provisioning runs.',
+      );
+    });
+
+    it('announces the unlock transition once provisioning finishes', () => {
+      const tenant = makeTenant();
+      const { container, rerender } = rtlRender(
+        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={false} />),
+      );
+
+      const liveRegion = container.querySelector('[aria-live="assertive"]');
+      expect(liveRegion).toHaveTextContent('');
+
+      rerender(
+        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
+      );
+      expect(liveRegion).toHaveTextContent(
+        'Tenant details unlocked and editable again.',
+      );
+    });
+
+    it('keeps the announcement visually hidden rather than displayed in the panel', () => {
+      const tenant = makeTenant();
+      const { container, rerender } = rtlRender(
+        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
+      );
+
+      rerender(
+        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={false} />),
+      );
+
+      const liveRegion = container.querySelector('[aria-live="assertive"]');
+      expect(liveRegion).toHaveTextContent(
+        'Tenant details locked while provisioning runs.',
+      );
+      expect(liveRegion).toHaveClass('sr-only');
     });
   });
 });

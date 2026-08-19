@@ -69,6 +69,8 @@ export function TenantDetailsPanel({
     useState<TUpdateTenantDetailsFieldErrors>({});
   const [formError, setFormError] = useState<string | undefined>(undefined);
   const [isPending, startTransition] = useTransition();
+  const [wasEditable, setWasEditable] = useState(isEditable);
+  const [lockAnnouncement, setLockAnnouncement] = useState('');
 
   // A fresh `tenant` prop (a successful save's own `router.refresh()`)
   // should replace whatever the form last held — adjusted during render,
@@ -78,8 +80,25 @@ export function TenantDetailsPanel({
     setValues(valuesFromTenant(tenant));
   }
 
-  const { root, fields, field, fieldLabel, fieldError, lockedValue, actions } =
-    tenantDetailsPanelVariants();
+  // Same derived-during-render pattern: only an actual `isEditable`
+  // transition updates the announcement, never an unrelated re-render.
+  if (isEditable !== wasEditable) {
+    setWasEditable(isEditable);
+    setLockAnnouncement(
+      isEditable ? t('unlockedAnnouncement') : t('lockedAnnouncement'),
+    );
+  }
+
+  const {
+    root,
+    fields,
+    field,
+    fieldLabel,
+    fieldError,
+    lockedValue,
+    actions,
+    lockAnnouncementLive,
+  } = tenantDetailsPanelVariants();
 
   function updateField<K extends keyof TFormValues>(
     key: K,
@@ -123,6 +142,10 @@ export function TenantDetailsPanel({
       <Heading level={2} size={Size.XS}>
         {t('heading')}
       </Heading>
+
+      <span className={lockAnnouncementLive()} aria-live="assertive">
+        {lockAnnouncement}
+      </span>
 
       {isEditable && formError && (
         <Alert type={ALERT_TYPE.ERROR} message={formError} />
