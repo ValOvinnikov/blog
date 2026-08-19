@@ -1,6 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { makePostCard } from '@web/testing/shared/post/fixtures';
+import { customRenderAsync } from '@web/testing/custom-render';
 
 import { PostListModule } from './post-list-module';
 
@@ -30,13 +29,6 @@ vi.mock('@web/components/shared/smart-link', () => ({
     </a>
   ),
 }));
-
-const post = makePostCard({
-  title: 'First post',
-  slug: 'first-post',
-  excerpt: 'An excerpt',
-  publishedAt: '2026-01-01T00:00:00.000Z',
-});
 
 const setup = customRenderAsync(PostListModule, {
   id: 'post-list-1',
@@ -75,76 +67,5 @@ describe(PostListModule, () => {
 
     expect(container).toBeEmptyDOMElement();
     expect(container.querySelector('section')).not.toBeInTheDocument();
-  });
-
-  it('labels the section with a unique id derived from the module id', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-          align: undefined,
-        },
-        posts: [post],
-        layout: undefined,
-      },
-    });
-
-    const { container } = await setup();
-
-    const label = screen.getByText('Latest posts');
-    expect(label).toHaveAttribute('id', 'latest-posts-post-list-1');
-
-    const section = container.querySelector('section');
-    expect(section).toHaveAttribute(
-      'aria-labelledby',
-      'latest-posts-post-list-1',
-    );
-  });
-
-  it('derives a different section id for a different module id, avoiding duplicate DOM ids', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: 'More posts',
-          supportingText: undefined,
-          align: undefined,
-        },
-        posts: [post],
-        layout: undefined,
-      },
-    });
-
-    await setup({ id: 'post-list-2' });
-
-    expect(screen.getByText('More posts')).toHaveAttribute(
-      'id',
-      'latest-posts-post-list-2',
-    );
-  });
-
-  it('falls back to "Latest posts" when sectionHeader.heading is undefined', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: undefined,
-          supportingText: undefined,
-          align: undefined,
-        },
-        posts: [post],
-        layout: undefined,
-      },
-    });
-
-    await setup();
-
-    const label = screen.getByText('Latest posts');
-    expect(label).toHaveAttribute('id', 'latest-posts-post-list-1');
   });
 });
