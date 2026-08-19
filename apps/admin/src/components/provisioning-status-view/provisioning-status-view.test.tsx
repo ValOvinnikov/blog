@@ -250,9 +250,12 @@ describe(ProvisioningStatusView, () => {
 
     expect(screen.getByText('Tenant details')).toBeVisible();
 
-    const slugInput = screen.getByRole('textbox', { name: 'Slug' });
-    expect(slugInput).toHaveValue('acme');
-    expect(slugInput).toBeDisabled();
+    expect(
+      screen.queryByRole('textbox', { name: 'Slug' }),
+    ).not.toBeInTheDocument();
+    const slugTerm = screen.getByText('Slug');
+    expect(slugTerm.tagName).toBe('DT');
+    expect(slugTerm.nextElementSibling).toHaveTextContent('acme');
     expect(
       screen.queryByRole('button', { name: 'Save changes' }),
     ).not.toBeInTheDocument();

@@ -33,7 +33,15 @@ describe(TenantDetailsPanel, () => {
   });
 
   describe('locked (isEditable=false)', () => {
-    it('renders every field, including plan, as a disabled input with an accessible name', () => {
+    function getLockedValue(labelText: string) {
+      const term = screen.getByText(labelText);
+      expect(term.tagName).toBe('DT');
+      const value = term.nextElementSibling;
+      expect(value?.tagName).toBe('DD');
+      return value as HTMLElement;
+    }
+
+    it('renders every field, including plan, as selectable text carrying its label — not a disabled input', () => {
       const tenant = makeTenant({
         name: 'Acme Inc.',
         slug: 'acme',
@@ -45,30 +53,25 @@ describe(TenantDetailsPanel, () => {
 
       expect(screen.getByText('Tenant details')).toBeVisible();
 
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
-      expect(nameInput).toHaveValue('Acme Inc.');
-      expect(nameInput).toBeDisabled();
+      // No disabled inputs remain in the accessibility tree at all — a
+      // regression to disabled TextInputs would still surface here, since
+      // getByRole finds disabled controls unless they're aria-hidden.
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
 
-      const slugInput = screen.getByRole('textbox', { name: 'Slug' });
-      expect(slugInput).toHaveValue('acme');
-      expect(slugInput).toBeDisabled();
+      const nameValue = getLockedValue('Name');
+      expect(nameValue).toHaveTextContent('Acme Inc.');
+      expect(nameValue.closest('dl')).toBeInTheDocument();
 
-      const domainInput = screen.getByRole('textbox', {
-        name: 'Primary domain',
-      });
-      expect(domainInput).toHaveValue('acme.example.com');
-      expect(domainInput).toBeDisabled();
+      expect(getLockedValue('Slug')).toHaveTextContent('acme');
+      expect(getLockedValue('Primary domain')).toHaveTextContent(
+        'acme.example.com',
+      );
+      expect(getLockedValue('Locale')).toHaveTextContent('EN');
 
-      const localeInput = screen.getByRole('textbox', { name: 'Locale' });
-      expect(localeInput).toHaveValue('EN');
-      expect(localeInput).toBeDisabled();
-
-      // plan has no HTML disabled state for a radiogroup, so it renders as
-      // a disabled text field too — same structure as the other four,
-      // and (unlike a bare labelled span) with a real accessible name.
-      const planInput = screen.getByRole('textbox', { name: 'Plan' });
-      expect(planInput).toHaveValue('Growth');
-      expect(planInput).toBeDisabled();
+      // The human-readable plan label, not the raw TENANT_PLAN constant.
+      const planValue = getLockedValue('Plan');
+      expect(planValue).toHaveTextContent('Growth');
+      expect(planValue).not.toHaveTextContent('GROWTH');
     });
 
     it('renders no enabled editing affordances — no Save button, no editable plan control', () => {
@@ -78,6 +81,7 @@ describe(TenantDetailsPanel, () => {
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
       expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
       expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     });
   });
 
