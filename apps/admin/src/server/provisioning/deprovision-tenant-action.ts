@@ -55,7 +55,15 @@ export async function deprovisionTenantAction(
     return { ok: false, error: "Doesn't match the tenant's slug." };
   }
 
-  await dispatchDeprovisioningWorkflow({ tenantId, confirm, dryRun });
+  const dispatched = await dispatchDeprovisioningWorkflow({
+    tenantId,
+    confirm,
+    dryRun,
+  });
+
+  if (!dispatched) {
+    return { ok: false, error: 'Could not start deprovisioning. Try again.' };
+  }
 
   // A dry run never actually deprovisions anything — only a real dispatch
   // is a lifecycle fact worth recording.

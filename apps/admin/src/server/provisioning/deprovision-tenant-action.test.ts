@@ -57,7 +57,7 @@ describe('deprovisionTenantAction', () => {
     listTenantsByIdsMock.mockReset();
     listTenantsByIdsMock.mockResolvedValue([tenant]);
     dispatchDeprovisioningWorkflowMock.mockReset();
-    dispatchDeprovisioningWorkflowMock.mockResolvedValue(undefined);
+    dispatchDeprovisioningWorkflowMock.mockResolvedValue(true);
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
@@ -153,6 +153,20 @@ describe('deprovisionTenantAction', () => {
       targetId: 'tenant-1',
       details: { slug: 'acme' },
     });
+  });
+
+  it('returns an error and writes no audit event when the dispatch fails', async () => {
+    dispatchDeprovisioningWorkflowMock.mockResolvedValue(false);
+    const { deprovisionTenantAction } =
+      await import('./deprovision-tenant-action');
+
+    const result = await deprovisionTenantAction('tenant-1', {
+      confirm: 'acme',
+      dryRun: false,
+    });
+
+    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('records no audit event for a dry run', async () => {

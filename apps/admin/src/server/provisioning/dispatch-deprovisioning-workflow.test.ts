@@ -19,34 +19,36 @@ describe(dispatchDeprovisioningWorkflow, () => {
     envMock.TENANT_PROVISIONING_GITHUB_REPO = 'acme-org/acme-repo';
   });
 
-  it('skips the dispatch call when no token is configured', async () => {
+  it('skips the dispatch call and returns false when no token is configured', async () => {
     envMock.TENANT_PROVISIONING_GITHUB_TOKEN = undefined;
 
-    await dispatchDeprovisioningWorkflow({
+    const result = await dispatchDeprovisioningWorkflow({
       tenantId: 'tenant-1',
       confirm: 'acme',
       dryRun: true,
     });
 
     expect(fetchMock).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('skips the dispatch call when no repo is configured', async () => {
+  it('skips the dispatch call and returns false when no repo is configured', async () => {
     envMock.TENANT_PROVISIONING_GITHUB_REPO = undefined;
 
-    await dispatchDeprovisioningWorkflow({
+    const result = await dispatchDeprovisioningWorkflow({
       tenantId: 'tenant-1',
       confirm: 'acme',
       dryRun: true,
     });
 
     expect(fetchMock).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('POSTs a workflow_dispatch request with tenantId, confirm, and dryRun as inputs', async () => {
+  it('POSTs a workflow_dispatch request with tenantId, confirm, and dryRun as inputs, and returns true', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
-    await dispatchDeprovisioningWorkflow({
+    const result = await dispatchDeprovisioningWorkflow({
       tenantId: 'tenant-1',
       confirm: 'acme',
       dryRun: true,
@@ -65,9 +67,10 @@ describe(dispatchDeprovisioningWorkflow, () => {
         }),
       }),
     );
+    expect(result).toBe(true);
   });
 
-  it('never throws when the dispatch call responds with a non-2xx status', async () => {
+  it('never throws, and returns false, when the dispatch call responds with a non-2xx status', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 404 }));
 
     await expect(
@@ -76,10 +79,10 @@ describe(dispatchDeprovisioningWorkflow, () => {
         confirm: 'acme',
         dryRun: true,
       }),
-    ).resolves.toBeUndefined();
+    ).resolves.toBe(false);
   });
 
-  it('never throws when the request itself fails', async () => {
+  it('never throws, and returns false, when the request itself fails', async () => {
     fetchMock.mockRejectedValue(new Error('network down'));
 
     await expect(
@@ -88,6 +91,20 @@ describe(dispatchDeprovisioningWorkflow, () => {
         confirm: 'acme',
         dryRun: true,
       }),
-    ).resolves.toBeUndefined();
+    ).resolves.toBe(false);
+  });
+
+  it('never throws, and returns false, when the request times out', async () => {
+    fetchMock.mockRejectedValue(
+      new DOMException('The operation timed out.', 'TimeoutError'),
+    );
+
+    await expect(
+      dispatchDeprovisioningWorkflow({
+        tenantId: 'tenant-1',
+        confirm: 'acme',
+        dryRun: true,
+      }),
+    ).resolves.toBe(false);
   });
 });
