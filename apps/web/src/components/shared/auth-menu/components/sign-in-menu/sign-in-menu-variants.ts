@@ -2,17 +2,6 @@ import { tv } from 'tailwind-variants';
 
 export const signInMenuVariants = tv({
   slots: {
-    // `min-h-0`/`font-normal` guard against `Button`'s own base `min-h-9`/
-    // `font-medium` bleeding through when this renders via the `Button` atom
-    // (the loading placeholder) — neither conflicts by classGroup with
-    // anything else here, so nothing here would otherwise cancel them, and
-    // the placeholder would end up taller/bolder than the real trigger.
-    signInTrigger: [
-      'size-auto min-h-0 whitespace-nowrap rounded-sm border border-border-strong bg-surface px-3 py-1.5',
-      'font-mono font-normal text-label text-text',
-      'transition-colors duration-base ease-console',
-      'hover:border-brand-primary hover:text-brand-primary',
-    ],
     cmdLine: [
       'mb-3 flex items-center gap-1.5',
       'font-mono text-copy text-muted',
@@ -24,12 +13,7 @@ export const signInMenuVariants = tv({
     ],
     plainLabel: ['mb-3 font-semibold text-text'],
     plainPrompt: ['mb-3'],
-    providerButton: [
-      'mt-2 w-full justify-start gap-2 rounded-sm border border-border-strong bg-surface px-3.5 py-2',
-      'font-mono text-label text-text',
-      'transition-colors duration-base ease-console',
-      'hover:border-brand-primary hover:bg-surface hover:text-brand-primary',
-    ],
+    providerButton: ['mt-2'],
     hint: ['mt-3 font-mono text-meta text-subtle'],
     // Deliberately a sibling of `PopoverMenu.Panel`, not a child of it — the
     // panel is `hidden` while the popover is closed, which would remove an

@@ -1,9 +1,13 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { AriaAttributes, MouseEventHandler, ReactNode, Ref } from 'react';
 
-import { iconButtonVariants } from './icon-button-variants';
+import {
+  iconButtonVariants,
+  type TIconButtonVariants,
+} from './icon-button-variants';
 
 export type TIconButtonProps = IWithClassName &
+  TIconButtonVariants &
   IWithDataTestId & {
     ariaLabel: string;
     title?: string;
@@ -18,11 +22,17 @@ export type TIconButtonProps = IWithClassName &
     ref?: Ref<HTMLButtonElement>;
   };
 
-/** A 22×22 icon-only button. Pass `ariaLabel` — no hardcoded accessible name. */
+/**
+ * A compact button for icon, labelled, or avatar-triggered actions: a 22×22
+ * icon-only default, a `bordered` variant sized to its text label, and a
+ * 32×32 circular `avatar` variant. Pass `ariaLabel` — no hardcoded
+ * accessible name.
+ */
 export const IconButton = ({
   ariaLabel,
   title,
   className,
+  variant,
   children,
   dataTestId,
   ref,
@@ -45,7 +55,7 @@ export const IconButton = ({
     aria-controls={ariaControls}
     aria-haspopup={ariaHaspopup}
     data-testid={dataTestId}
-    className={iconButtonVariants({ class: className })}
+    className={iconButtonVariants({ variant, class: className })}
   >
     {children}
   </button>

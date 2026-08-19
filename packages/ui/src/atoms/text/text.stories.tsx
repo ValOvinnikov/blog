@@ -48,3 +48,24 @@ export const Card: TStory = {
     children: 'Compact excerpt for post cards with tighter leading.',
   },
 };
+
+export const Supporting: TStory = {
+  args: {
+    variant: 'supporting',
+    children: 'A muted secondary line supporting a heading or label.',
+  },
+};
+
+export const Hint: TStory = {
+  args: {
+    variant: 'hint',
+    children: 'A small muted hint or note, smaller than Supporting.',
+  },
+};
+
+export const Statement: TStory = {
+  args: {
+    variant: 'statement',
+    children: 'A larger, full-color standalone statement of body copy.',
+  },
+};

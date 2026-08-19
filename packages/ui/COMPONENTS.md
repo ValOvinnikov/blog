@@ -67,8 +67,9 @@ Variants: size: Size.SM|Size.MD|Size.LG
 
 ### IconButton — `atoms/icon-button/icon-button.tsx`
 
-A 22×22 icon-only button.
-Props: ariaLabel: string · title?: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · isInert?: boolean · 'aria-expanded'?: AriaAttributes['aria-expanded'] · 'aria-controls'?: AriaAttributes['aria-controls'] · 'aria-haspopup'?: AriaAttributes['aria-haspopup'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
+A compact button for icon, labelled, or avatar-triggered actions: a 22×22 icon-only default, a `bordered` variant sized to its text label, and a 32×32 circular `avatar` variant.
+Props: ariaLabel: string · title?: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · isInert?: boolean · 'aria-expanded'?: AriaAttributes['aria-expanded'] · 'aria-controls'?: AriaAttributes['aria-controls'] · 'aria-haspopup'?: AriaAttributes['aria-haspopup'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, TIconButtonVariants, IWithDataTestId)_
+Variants: variant: bordered|avatar
 
 ### InlineCode — `atoms/inline-code/inline-code.tsx`
 
@@ -141,7 +142,7 @@ Props: text: string · hasCursor?: boolean _(extends IWithClassName, IWithDataTe
 
 the body-copy paragraph primitive: applies a `variant` from the type scale to a `<p>`.
 Props: style?: CSSProperties · children?: ReactNode _(extends IWithClassName, TTextVariants, IWithDataTestId)_
-Variants: variant: lead|muted|hero|card
+Variants: variant: lead|muted|hero|card|supporting|hint|statement
 
 ### TextInput — `atoms/text-input/text-input.tsx`
 
@@ -206,9 +207,9 @@ Props: children?: TCompoundChildren<typeof PopoverMenuSlotParts> _(extends IWith
 
 Slots:
 
-- **PopoverMenu.Trigger** — icon-button that opens/closes a `PopoverMenu.Panel`. Props: ariaLabel: string · isOpen: boolean · panelId: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
+- **PopoverMenu.Trigger** — icon-button that opens/closes a `PopoverMenu.Panel`. Props: ariaLabel: string · isOpen: boolean · panelId: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · variant?: TIconButtonVariants['variant'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
 - **PopoverMenu.Panel** — the non-modal menu surface (`role="menu"`) a `PopoverMenu.Trigger` opens. Props: id: string · isOpen: boolean · ariaLabel?: string · children?: ReactNode · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
-- **PopoverMenu.Item** — a single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). Props: className?: string · icon?: ReactNode
+- **PopoverMenu.Item** — a single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). Props: className?: string · icon?: ReactNode _(extends TPopoverMenuItemVariants)_ · Variants: variant: bordered
 - **PopoverMenu.Separator** — a thin hairline dividing groups of `PopoverMenu.Item`s inside a `PopoverMenu.Panel` (e.g. a "Copy link" action from a list of social-share links). Props: className?: string _(extends IWithDataTestId)_
 
 ### PostCard — `molecules/post-card/post-card.tsx`

@@ -1,4 +1,5 @@
 import { ICONS, Size } from '@blog/config';
+import { Avatar } from '@blog/ui/atoms/avatar';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
@@ -114,6 +115,64 @@ export const Closed: TStory = {
           >
             Copy link
           </PopoverMenu.Item>
+        </PopoverMenu.Panel>
+      </>
+    ),
+  },
+};
+
+export const BorderedItems: TStory = {
+  args: {
+    children: (
+      <>
+        <PopoverMenu.Trigger
+          ariaLabel="Open menu"
+          isOpen={true}
+          panelId="popover-menu-panel-bordered"
+        >
+          <Icon name={ICONS.SHARE} size={Size.SM} />
+        </PopoverMenu.Trigger>
+        <PopoverMenu.Panel
+          id="popover-menu-panel-bordered"
+          isOpen={true}
+          ariaLabel="Menu"
+        >
+          <PopoverMenu.Item
+            variant="bordered"
+            icon={<Icon name={ICONS.GITHUB} size={Size.SM} />}
+          >
+            Continue with GitHub
+          </PopoverMenu.Item>
+          <PopoverMenu.Item
+            variant="bordered"
+            icon={<Icon name={ICONS.GOOGLE} size={Size.SM} />}
+          >
+            Continue with Google
+          </PopoverMenu.Item>
+        </PopoverMenu.Panel>
+      </>
+    ),
+  },
+};
+
+export const AvatarTrigger: TStory = {
+  args: {
+    children: (
+      <>
+        <PopoverMenu.Trigger
+          ariaLabel="Open account menu"
+          isOpen={false}
+          panelId="popover-menu-panel-avatar"
+          variant="avatar"
+        >
+          <Avatar name="Ada Lovelace" alt="" size={Size.SM} />
+        </PopoverMenu.Trigger>
+        <PopoverMenu.Panel
+          id="popover-menu-panel-avatar"
+          isOpen={false}
+          ariaLabel="Account menu"
+        >
+          <PopoverMenu.Item>Account settings</PopoverMenu.Item>
         </PopoverMenu.Panel>
       </>
     ),

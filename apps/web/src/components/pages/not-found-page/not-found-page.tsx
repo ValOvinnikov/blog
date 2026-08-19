@@ -40,7 +40,9 @@ export const NotFoundPage = ({ isPlain = false }: INotFoundPageProps) => {
         404
       </Heading>
       {isPlain ? (
-        <Text className={s.plainCopy()}>{t('commandNotFound')}</Text>
+        <Text variant="statement" className={s.plainCopy()}>
+          {t('commandNotFound')}
+        </Text>
       ) : (
         <TerminalChip
           prefix="404: "

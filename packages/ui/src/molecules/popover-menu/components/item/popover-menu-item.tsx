@@ -2,9 +2,12 @@ import type { IWithDataTestId } from '@blog/config';
 import type { TPolymorphicProps } from '@blog/config/react';
 import type { ElementType, ReactNode } from 'react';
 
-import { popoverMenuItemVariants } from './popover-menu-item-variants';
+import {
+  popoverMenuItemVariants,
+  type TPopoverMenuItemVariants,
+} from './popover-menu-item-variants';
 
-type TPopoverMenuItemOwnProps = {
+type TPopoverMenuItemOwnProps = TPopoverMenuItemVariants & {
   className?: string;
   icon?: ReactNode;
 };
@@ -22,6 +25,7 @@ export const PopoverMenuItem = <C extends ElementType = 'button'>({
   as,
   icon,
   className,
+  variant,
   children,
   dataTestId,
   ...rest
@@ -34,7 +38,7 @@ export const PopoverMenuItem = <C extends ElementType = 'button'>({
       role="menuitem"
       type={isButton ? 'button' : undefined}
       data-testid={dataTestId}
-      className={popoverMenuItemVariants({ class: className })}
+      className={popoverMenuItemVariants({ variant, class: className })}
       {...rest}
     >
       {icon}
