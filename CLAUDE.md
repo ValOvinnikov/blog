@@ -388,6 +388,40 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   `export const TLINK_TYPE = { INTERNAL: 'INTERNAL', EXTERNAL: 'EXTERNAL' } as const;`
   The uppercase value is the stored/serialized value, so schema `options.list`
   and migrations use it too; derive unions with `(typeof C)[keyof typeof C]`.
+
+  **The exception is a storage layer's own vocabulary** — a const whose values
+  that layer persists, read _only_ by that layer and the app on top of it.
+  Those live with the layer that stores them. Everything else stays in
+  `@blog/config`, which remains the default.
+
+  `@blog/db` owns `TENANT_STATUS`, `TENANT_PLAN`, `MEMBERSHIP_ROLE`,
+  `ADMIN_ROLE`, `GRANTED_VIA` and `TENANT_PROVISIONING_*` on that basis.
+
+  **Reach is the test — not how the column is typed.** Those six are stored
+  three different ways (`pgEnum`, plain `text().$type<>()`, and a `jsonb` map
+  keyed by step) and it makes no difference. The counter-example is
+  `PRESET_ID` / `FONT_CHOICE` / `RADIUS_SCALE` / `DENSITY`: they _do_ back
+  `pgEnum` columns in `site-config.ts`, yet stay in `@blog/config` because
+  `apps/cms` reads all four and `apps/web` / `@blog/service` read some.
+  Backing a `pgEnum` neither qualifies a const nor disqualifies one.
+
+  **`AUDIT_ACTION` / `AUDIT_TARGET_TYPE` are a deliberate exception** and stay
+  in `@blog/config`. Only `db` and `apps/admin` read them today, so by reach
+  alone they would move — but auditing is a cross-cutting concern whose
+  vocabulary grows as more surfaces become auditable, and `audit_events`
+  stores both as plain `text().$type<>()` precisely so a new action never
+  needs a schema change. Pinning that vocabulary inside the storage layer
+  would put it behind the wrong door. Don't "fix" this by relocating them.
+
+  Where a const _does_ back a `pgEnum`, it and its column move together:
+  `Object.values(…)` builds the enum's value list, so reordering the const
+  silently reorders a Postgres enum. Confirm with `db:generate` that no
+  migration appears.
+
+  Shape and casing rules are unchanged wherever a const lives; only the home
+  moves. "Only one app happens to use it today" is not enough — the layer has
+  to be where the values are actually persisted.
+
 - `'use client'` never in `@blog/ui` (it stays pure and prop-driven). In
   `apps/web` it IS the right tool — add it at the _leaf boundary_ that
   genuinely needs the client: React hooks (`useState`/`useEffect`), browser
