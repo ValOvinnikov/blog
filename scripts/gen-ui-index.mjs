@@ -479,7 +479,11 @@ const renderSub = (s) => {
 };
 
 const renderEntry = (e) => {
-  const lines = [`### ${e.name} — \`${e.path}\``];
+  // Prettier's markdown printer requires a blank line after every ATX
+  // heading and before a list starts under a lead-in paragraph (`Slots:`/
+  // `Compound component:`) — match that here so the raw generator output
+  // never drifts from what a commit-time `prettier --write` would produce.
+  const lines = [`### ${e.name} — \`${e.path}\``, ''];
   lines.push(e.purpose || '_No description._');
 
   const props = propsFragment(e.props, e.extendsList);
@@ -487,11 +491,11 @@ const renderEntry = (e) => {
   if (e.variants.length) lines.push(`Variants: ${e.variants.join(' · ')}`);
 
   if (e.members) {
-    lines.push('', 'Compound component:');
+    lines.push('', 'Compound component:', '');
     for (const m of e.members) lines.push(renderSub(m));
   }
   if (e.slots) {
-    lines.push('', 'Slots:');
+    lines.push('', 'Slots:', '');
     for (const s of e.slots) lines.push(renderSub(s));
   }
   return lines.join('\n');
