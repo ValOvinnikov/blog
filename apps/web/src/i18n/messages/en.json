@@ -19,6 +19,12 @@
     "description": "The page you're looking for doesn't exist.",
     "returnHome": "Return home"
   },
+  "localeErrorPage": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred while rendering this page. You can try again, or head back to the homepage.",
+    "retry": "Try again",
+    "goHome": "Go home"
+  },
   "postShare": {
     "shareAriaLabel": "Share \"{title}\"",
     "panelAriaLabel": "Share options",
