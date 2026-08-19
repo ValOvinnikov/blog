@@ -15,7 +15,7 @@ import {
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
-} from '@blog/db';
+} from '@blog/db/constants';
 import type {
   TTenant,
   TTenantProvisioningSteps,
