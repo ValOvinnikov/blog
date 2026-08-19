@@ -1,22 +1,35 @@
-export {};
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 
 const {
   requireSuperAdminMock,
+  authMock,
   listTenantsByIdsMock,
   dispatchDeprovisioningWorkflowMock,
+  insertAuditEventMock,
+  loggerErrorMock,
 } = vi.hoisted(() => ({
   requireSuperAdminMock: vi.fn(),
+  authMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   dispatchDeprovisioningWorkflowMock: vi.fn(),
+  insertAuditEventMock: vi.fn(),
+  loggerErrorMock: vi.fn(),
 }));
 
 vi.mock('@admin/server/auth/require-super-admin', () => ({
   requireSuperAdmin: requireSuperAdminMock,
 }));
 
+vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
+
+vi.mock('@admin/utils/logger/logger', () => ({
+  logger: { error: loggerErrorMock },
+}));
+
 vi.mock('@blog/db', () => ({
   queries: {
     tenants: { listTenantsByIds: listTenantsByIdsMock },
+    auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
 }));
 
@@ -37,10 +50,17 @@ describe('deprovisionTenantAction', () => {
       id: 'admin-1',
       role: 'SUPERADMIN',
     });
+    authMock.mockReset();
+    authMock.mockResolvedValue({
+      user: { id: 'operator-1', email: 'operator@example.com' },
+    });
     listTenantsByIdsMock.mockReset();
     listTenantsByIdsMock.mockResolvedValue([tenant]);
     dispatchDeprovisioningWorkflowMock.mockReset();
     dispatchDeprovisioningWorkflowMock.mockResolvedValue(undefined);
+    insertAuditEventMock.mockReset();
+    insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
+    loggerErrorMock.mockReset();
   });
 
   it('requires a super-admin session before dispatching', async () => {
@@ -114,5 +134,56 @@ describe('deprovisionTenantAction', () => {
       confirm: 'acme',
       dryRun: false,
     });
+  });
+
+  it('records a DEPROVISIONED audit event for a real (non-dry-run) dispatch', async () => {
+    const { deprovisionTenantAction } =
+      await import('./deprovision-tenant-action');
+
+    await deprovisionTenantAction('tenant-1', {
+      confirm: 'acme',
+      dryRun: false,
+    });
+
+    expect(insertAuditEventMock).toHaveBeenCalledWith({
+      actorId: 'operator-1',
+      actorEmail: 'operator@example.com',
+      action: AUDIT_ACTION.DEPROVISIONED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: 'tenant-1',
+      details: { slug: 'acme' },
+    });
+  });
+
+  it('records no audit event for a dry run', async () => {
+    const { deprovisionTenantAction } =
+      await import('./deprovision-tenant-action');
+
+    await deprovisionTenantAction('tenant-1', {
+      confirm: 'acme',
+      dryRun: true,
+    });
+
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  it('still returns ok when the audit write fails, and logs the failure', async () => {
+    insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
+    const { deprovisionTenantAction } =
+      await import('./deprovision-tenant-action');
+
+    const result = await deprovisionTenantAction('tenant-1', {
+      confirm: 'acme',
+      dryRun: false,
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'provisioning.deprovision_audit_failed',
+      expect.objectContaining({
+        targetId: 'tenant-1',
+        error: expect.any(Error),
+      }),
+    );
   });
 });

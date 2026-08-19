@@ -1,21 +1,26 @@
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { redirect } from 'next/navigation';
 
 const {
   requireAdminMock,
+  authMock,
   dispatchProvisioningWorkflowMock,
   getUserByEmailMock,
   getTenantBySlugMock,
   getTenantByDomainMock,
   createTenantDraftMock,
+  insertAuditEventMock,
   loggerErrorMock,
   loggerWarnMock,
 } = vi.hoisted(() => ({
   requireAdminMock: vi.fn(),
+  authMock: vi.fn(),
   dispatchProvisioningWorkflowMock: vi.fn(),
   getUserByEmailMock: vi.fn(),
   getTenantBySlugMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
   createTenantDraftMock: vi.fn(),
+  insertAuditEventMock: vi.fn(),
   loggerErrorMock: vi.fn(),
   loggerWarnMock: vi.fn(),
 }));
@@ -23,6 +28,8 @@ const {
 vi.mock('@admin/server/auth/require-admin', () => ({
   requireAdmin: requireAdminMock,
 }));
+
+vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
 
 vi.mock('@admin/server/provisioning/dispatch-provisioning-workflow', () => ({
   dispatchProvisioningWorkflow: dispatchProvisioningWorkflowMock,
@@ -40,6 +47,7 @@ vi.mock('@blog/db', () => ({
       createTenantDraft: createTenantDraftMock,
     },
     tenantDomains: { getTenantByDomain: getTenantByDomainMock },
+    auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
 }));
 
@@ -55,6 +63,10 @@ describe('createTenantAction', () => {
   beforeEach(() => {
     requireAdminMock.mockReset();
     requireAdminMock.mockResolvedValue({ id: 'admin-1' });
+    authMock.mockReset();
+    authMock.mockResolvedValue({
+      user: { id: 'operator-1', email: 'operator@example.com' },
+    });
     dispatchProvisioningWorkflowMock.mockReset();
     dispatchProvisioningWorkflowMock.mockResolvedValue(undefined);
     getUserByEmailMock.mockReset();
@@ -71,6 +83,8 @@ describe('createTenantAction', () => {
       ok: true,
       data: { id: 'tenant-1' },
     });
+    insertAuditEventMock.mockReset();
+    insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
     loggerWarnMock.mockReset();
     vi.mocked(redirect).mockClear();
@@ -222,6 +236,48 @@ describe('createTenantAction', () => {
 
     expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
     expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+  });
+
+  it('records a CREATED audit event for the new tenant, with the operator as actor', async () => {
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    await expect(createTenantAction(validInput)).rejects.toThrow(
+      'NEXT_REDIRECT',
+    );
+
+    expect(insertAuditEventMock).toHaveBeenCalledWith({
+      actorId: 'operator-1',
+      actorEmail: 'operator@example.com',
+      action: AUDIT_ACTION.CREATED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: 'tenant-1',
+      details: {
+        name: 'Acme',
+        slug: 'acme',
+        domain: 'acme.example.com',
+        plan: 'FREE',
+        ownerEmail: 'owner@example.com',
+      },
+    });
+  });
+
+  it('still dispatches provisioning and redirects when the audit write fails, and logs the failure', async () => {
+    insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    await expect(createTenantAction(validInput)).rejects.toThrow(
+      'NEXT_REDIRECT',
+    );
+
+    expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'tenants.create_audit_failed',
+      expect.objectContaining({
+        targetId: 'tenant-1',
+        error: expect.any(Error),
+      }),
+    );
   });
 
   it('requires an admin session before doing anything else', async () => {

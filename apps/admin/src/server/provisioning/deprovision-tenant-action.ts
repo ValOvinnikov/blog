@@ -1,6 +1,8 @@
 'use server';
 
+import { recordAuditEvent } from '@admin/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@admin/server/auth/require-super-admin';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
 import { z } from 'zod';
 
@@ -54,6 +56,18 @@ export async function deprovisionTenantAction(
   }
 
   await dispatchDeprovisioningWorkflow({ tenantId, confirm, dryRun });
+
+  // A dry run never actually deprovisions anything — only a real dispatch
+  // is a lifecycle fact worth recording.
+  if (!dryRun) {
+    await recordAuditEvent({
+      logEvent: 'provisioning.deprovision_audit_failed',
+      action: AUDIT_ACTION.DEPROVISIONED,
+      targetType: AUDIT_TARGET_TYPE.TENANT,
+      targetId: tenantId,
+      details: { slug: tenant.slug },
+    });
+  }
 
   return { ok: true };
 }
