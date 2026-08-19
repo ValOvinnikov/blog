@@ -1,4 +1,5 @@
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const iconButtonVariants = tv({
   base: [
@@ -18,4 +19,26 @@ export const iconButtonVariants = tv({
     'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
     'disabled:pointer-events-none disabled:opacity-50',
   ],
+  variants: {
+    variant: {
+      bordered: [
+        'size-auto min-h-0 whitespace-nowrap',
+        'rounded-sm border border-border-strong bg-surface px-3 py-1.5',
+        'font-mono font-normal text-label text-text',
+        'transition-colors duration-base ease-console',
+        'hover:border-brand-primary hover:text-brand-primary',
+      ],
+      avatar: [
+        'size-8 rounded-full border-0',
+        'transition-shadow duration-base ease-console',
+        // `border-emphasis`, not `border-strong`, for the hover ring —
+        // `border-strong` fails WCAG 1.4.11's 3:1 non-text contrast against
+        // `--primary` (1.81:1 light / 2.26:1 dark); `border-emphasis`
+        // clears it (3.54:1 / 3.94:1).
+        'hover:ring-2 hover:ring-border-emphasis hover:ring-offset-2 hover:ring-offset-primary',
+      ],
+    },
+  },
 });
+
+export type TIconButtonVariants = VariantProps<typeof iconButtonVariants>;

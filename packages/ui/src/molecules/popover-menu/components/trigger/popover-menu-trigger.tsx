@@ -1,5 +1,6 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import { IconButton } from '@blog/ui/atoms/icon-button';
+import type { TIconButtonVariants } from '@blog/ui/atoms/icon-button/icon-button-variants';
 import type { MouseEventHandler, ReactNode, Ref } from 'react';
 
 export type TPopoverMenuTriggerProps = IWithClassName &
@@ -11,6 +12,8 @@ export type TPopoverMenuTriggerProps = IWithClassName &
     panelId: string;
     children: ReactNode;
     onClick?: MouseEventHandler<HTMLButtonElement>;
+    /** Forwarded to the underlying `IconButton`'s own `variant` axis. */
+    variant?: TIconButtonVariants['variant'];
     /** Forwarded to the underlying `<button>` so the caller can manage focus (e.g. return focus here when the panel closes). */
     ref?: Ref<HTMLButtonElement>;
   };
@@ -26,6 +29,7 @@ export const PopoverMenuTrigger = ({
   panelId,
   ref,
   className,
+  variant,
   dataTestId,
   children,
   onClick,
@@ -37,6 +41,7 @@ export const PopoverMenuTrigger = ({
     aria-haspopup="menu"
     aria-expanded={isOpen}
     aria-controls={panelId}
+    variant={variant}
     className={className}
     dataTestId={dataTestId}
     onClick={onClick}

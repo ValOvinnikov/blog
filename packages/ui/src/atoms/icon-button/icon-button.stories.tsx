@@ -1,4 +1,5 @@
 import { ICONS, Size } from '@blog/config';
+import { Avatar } from '@blog/ui/atoms/avatar';
 import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -32,4 +33,21 @@ export const WithMoonIcon: TStory = {
 
 export const Disabled: TStory = {
   args: { isDisabled: true },
+};
+
+export const Bordered: TStory = {
+  args: {
+    variant: 'bordered',
+    ariaLabel: 'Sign in',
+    children: 'Sign in',
+  },
+};
+
+export const AvatarVariant: TStory = {
+  name: 'Avatar',
+  args: {
+    variant: 'avatar',
+    ariaLabel: 'Open account menu',
+    children: <Avatar name="Ada Lovelace" alt="" size={Size.SM} />,
+  },
 };

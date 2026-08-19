@@ -9,7 +9,7 @@ export const notFoundPageVariants = tv({
     ],
     chip: ['mx-auto'],
     copy: ['max-w-copy mx-auto'],
-    plainCopy: ['mx-auto text-lg font-medium text-text'],
+    plainCopy: ['mx-auto'],
     plainLink: [
       'inline-flex items-center gap-1.5',
       'text-brand-primary underline underline-offset-4',

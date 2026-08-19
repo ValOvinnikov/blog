@@ -1,4 +1,5 @@
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const popoverMenuItemVariants = tv({
   base: [
@@ -10,4 +11,17 @@ export const popoverMenuItemVariants = tv({
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
   ],
+  variants: {
+    variant: {
+      bordered: [
+        'justify-start rounded-sm border border-border-strong bg-surface px-3.5 py-2',
+        'font-mono text-label text-text',
+        'hover:border-brand-primary hover:bg-surface hover:text-brand-primary',
+      ],
+    },
+  },
 });
+
+export type TPopoverMenuItemVariants = VariantProps<
+  typeof popoverMenuItemVariants
+>;

@@ -121,6 +121,7 @@ export function AccountMenu({
         isOpen={isOpen}
         panelId={panelId}
         onClick={toggle}
+        variant="avatar"
         className={avatarTrigger()}
       >
         <Avatar

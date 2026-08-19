@@ -4,7 +4,6 @@ export const provisioningStatusViewVariants = tv({
   slots: {
     root: ['flex flex-col gap-6'],
     header: ['flex flex-col gap-1'],
-    description: ['text-sm text-text-muted'],
     startAction: ['flex'],
     layout: [
       'flex flex-col gap-6',
@@ -35,7 +34,6 @@ export const provisioningStatusViewVariants = tv({
     dnsCard: ['rounded-md border border-border bg-surface p-6'],
     dnsRow: ['flex flex-wrap items-center gap-3'],
     dnsStatusLive: ['inline-flex items-center'],
-    dnsHint: ['text-xs text-text-muted'],
   },
   variants: {
     status: {

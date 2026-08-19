@@ -51,7 +51,6 @@ export function SignInMenu({
   } = useEmailSignIn(isOpen);
   const { panel, window: windowSize } = authMenuVariants();
   const {
-    signInTrigger,
     cmdLine,
     cmdPrompt,
     cmdCursor,
@@ -101,6 +100,7 @@ export function SignInMenu({
       {providers.map(({ providerId, icon, label }) => (
         <PopoverMenu.Item
           key={providerId}
+          variant="bordered"
           className={providerButton()}
           icon={<Icon name={icon} size={Size.SM} />}
           onClick={() => signIn(providerId)}
@@ -115,6 +115,7 @@ export function SignInMenu({
       )}
       {emailStep === 'collapsed' && (
         <PopoverMenu.Item
+          variant="bordered"
           className={providerButton()}
           onClick={() => setEmailStep('expanded')}
         >
@@ -172,7 +173,7 @@ export function SignInMenu({
         isOpen={isOpen}
         panelId={panelId}
         onClick={toggle}
-        className={signInTrigger()}
+        variant="bordered"
       >
         {t('signIn')}
       </PopoverMenu.Trigger>

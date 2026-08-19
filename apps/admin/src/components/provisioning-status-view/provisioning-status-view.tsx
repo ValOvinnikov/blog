@@ -128,7 +128,6 @@ export function ProvisioningStatusView({
   const {
     root,
     header,
-    description,
     startAction,
     layout,
     steps,
@@ -148,7 +147,6 @@ export function ProvisioningStatusView({
     dnsCard,
     dnsRow,
     dnsStatusLive,
-    dnsHint,
   } = provisioningStatusViewVariants();
 
   useEffect(() => {
@@ -228,9 +226,7 @@ export function ProvisioningStatusView({
         <Heading level={1} size={Size.MD}>
           {tenant.name}
         </Heading>
-        <Text variant="muted" className={description()}>
-          {t('description')}
-        </Text>
+        <Text variant="supporting">{t('description')}</Text>
       </div>
 
       {allIdle && (
@@ -336,9 +332,7 @@ export function ProvisioningStatusView({
           </span>
         </div>
         {domainStatus === 'NOT_CONFIGURED' && (
-          <Text variant="muted" className={dnsHint()}>
-            {t('dnsNotConfiguredHint')}
-          </Text>
+          <Text variant="hint">{t('dnsNotConfiguredHint')}</Text>
         )}
       </div>
     </div>
