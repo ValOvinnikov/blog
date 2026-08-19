@@ -44,7 +44,11 @@ contracts:
     dispatch cites them. Naming them in the agent rather than the dispatch is
     deliberate: built from the product spec alone, which carries no concrete
     values by design, a surface passes every acceptance criterion and still
-    ships as a wireframe.
+    ships as a wireframe. It also owns this app's audit-trail duty:
+    operator-initiated lifecycle mutations record a durable `audit_events` row
+    via `recordAuditEvent`, gated on the mutation actually having succeeded —
+    auditing is a separate concern from logging, and a false record is worse
+    than a missing one.
   - Those nine layer agents (`config`, `cms`, `service`, `ui`, `web`, `db`,
     `admin-app`, `auth`, `insight`) additionally carry the two context7 MCP tools
     (`resolve-library-id`, `query-docs`) in their `tools:` frontmatter, so the
