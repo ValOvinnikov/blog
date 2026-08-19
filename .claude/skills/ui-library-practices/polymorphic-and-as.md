@@ -4,6 +4,16 @@ Reference for the `ui-library-practices` skill. SKILL.md covers the decision
 (Level 1 union by default). Read this when you actually need element-specific
 prop inference, or when an organism builds an anchor to hand into a slot.
 
+> **These components are the one sanctioned exception to "Closed prop types."**
+> Everywhere else in `@blog/ui`, a component enumerates its props and never
+> spreads `...rest`. A Level 2 polymorphic component keeps
+> `TPolymorphicProps<C, OwnProps>` and its spread precisely because forwarding
+> the caller-chosen element's props is its contract — the props belong to an
+> element the component doesn't choose, so it cannot enumerate them. That
+> reasoning does not extend to a component that renders a fixed element:
+> "consumers might want to pass `aria-*`" is not a reason to reopen the
+> surface, it's a reason to name the prop.
+
 ## Level 2 — fully polymorphic (element-specific prop inference)
 
 When the component is a generic wrapper that should accept **any** element and

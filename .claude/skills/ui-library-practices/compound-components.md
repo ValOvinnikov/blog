@@ -68,11 +68,20 @@ header/
 ```tsx
 // components/brand/header-brand.tsx
 import { headerBrandVariants } from './header-brand-variants';
+export type THeaderBrandProps = IWithClassName &
+  IWithDataTestId & { children?: ReactNode };
+
 export const HeaderBrand = ({
   className,
-  ...rest
-}: ComponentPropsWithoutRef<'span'>) => (
-  <span className={headerBrandVariants({ class: className })} {...rest} />
+  children,
+  dataTestId,
+}: THeaderBrandProps) => (
+  <span
+    className={headerBrandVariants({ class: className })}
+    data-testid={dataTestId}
+  >
+    {children}
+  </span>
 );
 ```
 
@@ -93,25 +102,17 @@ const HeaderParts = {
   Nav: HeaderNav,
 } satisfies Record<string, ElementType>;
 
-export interface IHeaderProps
-  extends
-    Omit<ComponentPropsWithoutRef<'header'>, 'children'>,
-    IWithDataTestId {
-  children?: TCompoundChildren<typeof HeaderParts>;
-}
+export type THeaderProps = IWithClassName &
+  IWithDataTestId & {
+    children?: TCompoundChildren<typeof HeaderParts>;
+  };
 
-const HeaderRoot = ({
-  children,
-  className,
-  dataTestId,
-  ...rest
-}: IHeaderProps) => {
+const HeaderRoot = ({ children, className, dataTestId }: THeaderProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeaderParts);
   return (
     <header
       className={headerVariants({ class: className })}
       data-testid={dataTestId}
-      {...rest}
     >
       {slots.Brand}
       {slots.Nav}
@@ -144,16 +145,21 @@ export const Header: TCompoundComponent<typeof HeaderRoot, typeof HeaderParts> =
   treatment.
   ```tsx
   // ✅ generic wrapper, consumer owns the element and its style
-  export const HeroCta = ({ className, ...rest }: ComponentPropsWithoutRef<'div'>) => (
-    <div className={heroCtaVariants({ class: className })} {...rest} />
+  export type THeroCtaProps = IWithClassName &
+    IWithDataTestId & { children?: ReactNode };
+
+  export const HeroCta = ({ className, children }: THeroCtaProps) => (
+    <div className={heroCtaVariants({ class: className })}>{children}</div>
   );
   // consumer: <Hero.Cta><Button as="a" href="/post">Read more</Button></Hero.Cta>
 
   // ❌ slot steals buttonVariants, forcing button styling on any child
-  <Component className={buttonVariants({ class: heroCtaVariants(...) })} {...rest} />
+  <div className={buttonVariants({ class: heroCtaVariants() })}>
+    {children}
+  </div>;
   ```
 - **Barrel exports stay unchanged by compound-ness:** `index.ts` exports only
-  the assembled compound (`Header`) and its root props type (`IHeaderProps`) —
+  the assembled compound (`Header`) and its root props type (`THeaderProps`) —
   never the sub-components or their prop types. Consumers reach sub-components
   only through dot-notation (`Header.Brand`).
 - **Image/media slots are positioning containers, not the image itself.** A
