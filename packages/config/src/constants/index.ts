@@ -3,6 +3,7 @@ export * from './alert';
 export * from './aside';
 export * from './brand';
 export * from './depth';
+export * from './error';
 export * from './icon';
 export * from './image-layout';
 export * from './language';

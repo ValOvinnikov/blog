@@ -1,4 +1,29 @@
-import { safeAsync } from './safe-async';
+import { safeAsync, type TResult } from './safe-async';
+
+describe('TResult', () => {
+  it('defaults the error type param to unknown, not any', () => {
+    const result: TResult<number> = { ok: false, error: 'boom' };
+
+    if (!result.ok) {
+      // @ts-expect-error -- `error` is `unknown`, so a property access
+      // without narrowing must be rejected; `any` would allow this.
+      const length: number = result.error.length;
+
+      expect(length).toBe(4);
+    }
+  });
+
+  it('narrows the error field when a code union is supplied', () => {
+    type TCode = 'NOT_FOUND' | 'DUPLICATE';
+
+    const result: TResult<number, TCode> = { ok: false, error: 'NOT_FOUND' };
+
+    if (!result.ok) {
+      const code: TCode = result.error;
+      expect(code).toBe('NOT_FOUND');
+    }
+  });
+});
 
 describe('safeAsync', () => {
   it('returns ok:true with resolved data', async () => {
