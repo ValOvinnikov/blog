@@ -87,6 +87,28 @@ When invoked, before writing any code:
   wrapper is needed. Give two different failure sites two different event
   names, even in the same file — a shared name makes them indistinguishable
   downstream.
+- **Pick the level by who can act on the line.** `error` — something is broken
+  and a human needs to look: an unreachable dependency, a failed write, an
+  `ERROR_CODE` you did not anticipate. `warn` — handled, but worth seeing: a
+  fallback engaged, a retry, a rare race that actually fired. **Never log an
+  expected, user-correctable outcome at `error`.** A validation failure, or a
+  not-found on a user-supplied slug or id, is a return value, not a failure —
+  a visitor typing a dead URL is not an incident, and logging it at `error`
+  buries the real breakages in routine noise.
+  **A `TResult` failure is not automatically an `error`:** branch on the
+  `ERROR_CODE` first, and log only the branches a human would do something
+  about.
+  ```ts
+  const result = await queries.bookmarks.addBookmark(tenantId, userId, postId);
+  if (!result.ok) {
+    if (result.error === ERROR_CODE.DB_NOT_FOUND) {
+      logger.warn('bookmarks.add_row_vanished', { postId });
+      return { ok: false };
+    }
+    logger.error('bookmarks.add_failed', { postId, error: result.error });
+    return { ok: false };
+  }
+  ```
 - `"use client"` only where interaction truly requires it (theme toggle, share
   buttons, mobile nav). Default to Server Components.
 - **Never use `next/link` or the i18n `Link` directly.** All links go through the

@@ -99,6 +99,33 @@ When invoked, before writing any code:
   message + capped stack, so no manual sanitizing wrapper is needed. **Never
   log a secret's value** — log whether it was configured, not what it was, and
   log a response's status code rather than its body.
+- **Pick the level by who can act on the line.** `error` — something is broken
+  and a human needs to look: an unreachable dependency, a failed write, an
+  `ERROR_CODE` you did not anticipate. `warn` — handled, but worth seeing: a
+  fallback engaged, a retry, a rare race that actually fired. **Never log an
+  expected, user-correctable outcome at `error`.** A validation failure, a
+  duplicate slug or domain, a not-found on user-supplied input is a return
+  value, not a failure — logging it at `error` buries the real breakages in
+  routine noise and fires alerts nobody can act on.
+  **A `TResult` failure is not automatically an `error`:** branch on the
+  `ERROR_CODE` first, and log only the branches a human would do something
+  about. The governing test, stated in full in `SPEC.md` §17: **log the gap
+  between what the user was told and what actually happened — no gap, no
+  log.** A specific message the operator can act on is the whole truth, so it
+  needs no line; a deliberately vague one ("try again") hides the cause, so
+  the log is the only place that cause exists.
+  ```ts
+  if (!result.ok) {
+    if (result.error === ERROR_CODE.DB_DUPLICATE_SLUG) {
+      return {
+        ok: false,
+        fieldErrors: { slug: 'This slug is already in use.' },
+      };
+    }
+    logger.error('tenants.create_draft_failed', { slug, error: result.error });
+    return { ok: false, error: "Couldn't create the tenant — try again." };
+  }
+  ```
 - Depend on `@blog/db`, `@blog/auth`, `@blog/config`, `@blog/ui`, and
   `@blog/insight` only.
   Whenever this app starts consuming a new workspace package, its alias must be
