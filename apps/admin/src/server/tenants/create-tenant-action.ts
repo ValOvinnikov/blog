@@ -105,17 +105,18 @@ export async function createTenantAction(
     });
 
     if (!result.ok) {
-      logger.error('tenants.create_draft_failed', {
-        slug,
-        domain,
-        error: result.error,
-      });
       if (result.error === ERROR_CODE.DB_DUPLICATE_SLUG) {
+        logger.warn('tenants.create_draft_slug_race', { slug });
         return {
           ok: false,
           fieldErrors: { slug: 'This slug is already in use.' },
         };
       }
+      logger.error('tenants.create_draft_failed', {
+        slug,
+        domain,
+        error: result.error,
+      });
       return { ok: false, error: "Couldn't create the tenant — try again." };
     }
 
