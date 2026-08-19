@@ -25,7 +25,8 @@ vi.mock('@admin/utils/logger/logger', () => ({
   logger: { error: loggerErrorMock },
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await import('@blog/db/constants')),
   queries: {
     tenants: { updateTenantDetails: updateTenantDetailsMock },
     auditEvents: { insertAuditEvent: insertAuditEventMock },

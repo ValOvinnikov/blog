@@ -1,6 +1,6 @@
 import { renderWithIntl, screen, waitFor } from '@admin/testing/custom-render';
 import { makeTenant } from '@admin/testing/tenants/fixtures';
-import { TENANT_PLAN } from '@blog/config';
+import { TENANT_PLAN } from '@blog/db';
 import userEvent from '@testing-library/user-event';
 import { useRouter } from 'next/navigation';
 

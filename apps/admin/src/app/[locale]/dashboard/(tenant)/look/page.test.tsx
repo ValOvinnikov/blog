@@ -17,7 +17,8 @@ const {
 
 vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await import('@blog/db/constants')),
   queries: {
     memberships: { listMembershipsForUser: listMembershipsForUserMock },
     tenants: { listTenantsByIds: listTenantsByIdsMock },

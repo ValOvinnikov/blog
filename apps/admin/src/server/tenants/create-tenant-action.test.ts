@@ -39,7 +39,8 @@ vi.mock('@admin/utils/logger/logger', () => ({
   logger: { error: loggerErrorMock, warn: loggerWarnMock },
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await import('@blog/db/constants')),
   queries: {
     users: { getUserByEmail: getUserByEmailMock },
     tenants: {

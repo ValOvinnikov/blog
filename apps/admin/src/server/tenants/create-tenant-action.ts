@@ -7,14 +7,8 @@ import { dispatchProvisioningWorkflow } from '@admin/server/provisioning/dispatc
 import { logger } from '@admin/utils/logger/logger';
 import { DOMAIN_PATTERN, SLUG_PATTERN } from '@admin/utils/path/path';
 import { adminRoutes } from '@admin/utils/routes/routes';
-import {
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  ERROR_CODE,
-  TENANT_PLAN,
-  type TTenantPlan,
-} from '@blog/config';
-import { queries } from '@blog/db';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE, ERROR_CODE } from '@blog/config';
+import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 

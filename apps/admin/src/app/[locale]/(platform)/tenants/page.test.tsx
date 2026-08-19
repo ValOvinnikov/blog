@@ -10,7 +10,8 @@ const { listTenantsMock } = vi.hoisted(() => ({
   listTenantsMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await import('@blog/db/constants')),
   queries: { tenants: { listTenants: listTenantsMock } },
 }));
 

@@ -3,7 +3,7 @@ import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/config';
+} from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import { TenantsTable } from './tenants-table';

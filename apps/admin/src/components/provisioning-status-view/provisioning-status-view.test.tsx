@@ -13,7 +13,7 @@ import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/config';
+} from '@blog/db';
 import userEvent from '@testing-library/user-event';
 
 import { ProvisioningStatusView } from './provisioning-status-view';

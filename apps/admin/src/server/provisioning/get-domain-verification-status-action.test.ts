@@ -14,7 +14,8 @@ vi.mock('@admin/server/auth/require-admin', () => ({
   requireAdmin: requireAdminMock,
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await import('@blog/db/constants')),
   queries: { tenants: { listTenantsByIds: listTenantsByIdsMock } },
 }));
 
