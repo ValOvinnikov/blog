@@ -1,34 +1,41 @@
-import { jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import type { TAuditAction, TAuditTargetType } from '@blog/config/constants';
+import {
+  index,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
-import { users } from './auth';
-
-// Durable, append-only record of operator-initiated mutations (see
-// SPEC.md §17, "Logging is not auditing") — distinct from the structured
-// log stream, which never carries business facts. No update or delete query
-// is exported for this table anywhere in this package; a correction is a
-// new row, never an edit to an existing one.
-//
-// `action` and `targetType` are plain, free-form `text` rather than a
-// `pgEnum` — the set of audited actions and target kinds grows with each
-// mutation that starts writing to this table, and a closed enum would force
-// a migration for every addition. `targetId` is likewise plain `text`, not
-// a Postgres FK: this table describes mutations across several different
-// target tables (tenants, admins, memberships, ...), so no single FK target
-// applies to every row.
-export const auditEvents = pgTable('audit_events', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  // Nullable, `onDelete: 'set null'` — mirrors `admins.grantedBy`. The actor
-  // is always supplied at insert time; nullability only exists so a later
-  // account deletion anonymizes the row instead of cascading it away, since
-  // deleting a user must never delete the audit history of what they did.
-  actorId: text('actor_id').references(() => users.id, {
-    onDelete: 'set null',
-  }),
-  action: text('action').notNull(),
-  targetType: text('target_type').notNull(),
-  targetId: text('target_id').notNull(),
-  details: jsonb('details').$type<Record<string, unknown>>(),
-  createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
-});
+// `action`/`targetType` are plain `text`, not `pgEnum` — a new audited
+// action or target type never forces a migration this way — but stay bound
+// to `@blog/config`'s closed unions via `.$type<>()`. `targetId` has no
+// Postgres FK: rows span several target tables (tenants, domains, site
+// config, ...), so no single FK target applies to every row.
+export const auditEvents = pgTable(
+  'audit_events',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    actorId: text('actor_id').notNull(),
+    // Snapshot of the actor's email at insert time — the row's only way back
+    // to "who did this" once the actor account itself may be long deleted.
+    actorEmail: text('actor_email').notNull(),
+    action: text('action').notNull().$type<TAuditAction>(),
+    targetType: text('target_type').notNull().$type<TAuditTargetType>(),
+    targetId: text('target_id').notNull(),
+    details: jsonb('details').$type<Record<string, unknown>>(),
+    createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+  },
+  // Unlike this package's other tables, this one is append-only and
+  // unbounded — "every event for target X" is the obvious query, so it
+  // gets the index other, bounded reference tables here don't need.
+  (auditEvent) => [
+    index('audit_events_target_idx').on(
+      auditEvent.targetType,
+      auditEvent.targetId,
+    ),
+  ],
+);
 
 export type TAuditEvent = typeof auditEvents.$inferSelect;
