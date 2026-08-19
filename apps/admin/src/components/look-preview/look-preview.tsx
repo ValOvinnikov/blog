@@ -25,7 +25,7 @@ export type TLookPreviewProps = {
   logoHue: number | undefined;
   headingFont: TFontChoice;
   bodyFont: TFontChoice;
-  chromeOn: boolean;
+  isChromeOn: boolean;
 };
 
 /**
@@ -41,7 +41,7 @@ export function LookPreview({
   logoHue,
   headingFont,
   bodyFont,
-  chromeOn,
+  isChromeOn,
 }: TLookPreviewProps) {
   const t = useTranslations('lookPreview');
   const [mode, setMode] = useState<TPreviewMode>('light');
@@ -135,7 +135,7 @@ export function LookPreview({
           />
         </header>
         <div className={cardBody()} style={tokenStyle}>
-          {chromeOn ? (
+          {isChromeOn ? (
             <WindowChrome className={previewSurface()}>
               <WindowChrome.Bar>
                 <WindowChrome.Prompt>{t('terminalPrompt')}</WindowChrome.Prompt>

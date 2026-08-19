@@ -19,7 +19,7 @@ import { tenantDetailsPanelVariants } from './tenant-details-panel-variants';
 
 export type TTenantDetailsPanelProps = {
   tenant: TTenant;
-  editable: boolean;
+  isEditable: boolean;
 };
 
 type TFormValues = {
@@ -52,14 +52,11 @@ function valuesFromTenant(tenant: TTenant): TFormValues {
 }
 
 /**
- * The tenant row's summary — one render path for both states. Locked
- * fields go `readOnly` rather than `disabled`, since a disabled field
- * drops out of the tab order and dims exactly the values an operator
- * most wants to read and copy.
+ * The tenant row's summary — one render path for both states.
  */
 export function TenantDetailsPanel({
   tenant,
-  editable,
+  isEditable,
 }: TTenantDetailsPanelProps) {
   const t = useTranslations('tenantDetailsPanel');
   const router = useRouter();
@@ -80,7 +77,7 @@ export function TenantDetailsPanel({
     setValues(valuesFromTenant(tenant));
   }
 
-  const { root, fields, field, fieldLabel, fieldError, actions, lockedInput } =
+  const { root, fields, field, fieldLabel, fieldError, actions } =
     tenantDetailsPanelVariants();
 
   function updateField<K extends keyof TFormValues>(
@@ -123,7 +120,7 @@ export function TenantDetailsPanel({
         {t('heading')}
       </Heading>
 
-      {editable && formError && (
+      {isEditable && formError && (
         <Alert type={ALERT_TYPE.ERROR} message={formError} />
       )}
 
@@ -131,7 +128,7 @@ export function TenantDetailsPanel({
         {textFields.map(({ key, label: labelText }) => {
           const id = TEXT_FIELD_ID[key];
           const errorId = `${id}-error`;
-          const errorMessage = editable ? fieldErrors[key] : undefined;
+          const errorMessage = isEditable ? fieldErrors[key] : undefined;
 
           return (
             <div className={field()} key={key}>
@@ -143,10 +140,9 @@ export function TenantDetailsPanel({
                 ariaLabel={labelText}
                 value={values[key]}
                 onChange={(nextValue) => updateField(key, nextValue)}
-                readOnly={!editable}
+                isDisabled={!isEditable}
                 invalid={Boolean(errorMessage)}
                 aria-describedby={errorMessage ? errorId : undefined}
-                className={lockedInput({ locked: !editable })}
               />
               {errorMessage && (
                 <span id={errorId} className={fieldError()}>
@@ -161,7 +157,7 @@ export function TenantDetailsPanel({
           <label className={fieldLabel()} htmlFor={PLAN_FIELD_ID}>
             {t('planLabel')}
           </label>
-          {editable ? (
+          {isEditable ? (
             <SegmentedControl<TTenantPlan>
               ariaLabel={t('planLabel')}
               options={planOptions}
@@ -174,16 +170,15 @@ export function TenantDetailsPanel({
               ariaLabel={t('planLabel')}
               value={t(`planValue.${values.plan}`)}
               onChange={() => undefined}
-              readOnly={true}
-              className={lockedInput({ locked: true })}
+              isDisabled={true}
             />
           )}
         </div>
       </div>
 
-      {editable && (
+      {isEditable && (
         <div className={actions()}>
-          <Button type="button" onClick={handleSave} disabled={isPending}>
+          <Button type="button" onClick={handleSave} isDisabled={isPending}>
             {isPending ? t('savingButton') : t('saveButton')}
           </Button>
         </div>

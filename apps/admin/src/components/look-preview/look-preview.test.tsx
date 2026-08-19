@@ -12,7 +12,7 @@ const BASE_PROPS = {
   logoHue: undefined,
   headingFont: FONT_CHOICE.SPACE_GROTESK,
   bodyFont: FONT_CHOICE.NEWSREADER,
-  chromeOn: false,
+  isChromeOn: false,
 };
 
 describe(LookPreview, () => {
@@ -35,14 +35,14 @@ describe(LookPreview, () => {
     });
   });
 
-  it('shows no terminal chrome bar when chromeOn is false', () => {
-    render(<LookPreview {...BASE_PROPS} chromeOn={false} />);
+  it('shows no terminal chrome bar when isChromeOn is false', () => {
+    render(<LookPreview {...BASE_PROPS} isChromeOn={false} />);
 
     expect(screen.queryByText('~$ ./publish')).not.toBeInTheDocument();
   });
 
-  it('shows the terminal chrome bar when chromeOn is true', () => {
-    render(<LookPreview {...BASE_PROPS} chromeOn={true} />);
+  it('shows the terminal chrome bar when isChromeOn is true', () => {
+    render(<LookPreview {...BASE_PROPS} isChromeOn={true} />);
 
     expect(screen.getByText('~$ ./publish')).toBeVisible();
   });

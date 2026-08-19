@@ -148,7 +148,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
             route change instead of being tied to the page that fired it —
             it owns no visual layout of its own, it just renders its fixed
             `ToastViewport` alongside whatever `children` mounts. */}
-        <ToastProvider plain={plain}>
+        <ToastProvider isPlain={plain}>
           {/* `root` is the sticky-footer shell: `min-h-dvh flex-col` so short
               pages still fill the viewport, `content` is `flex-1` so it grows to
               push `Footer` to the bottom on short pages and yields naturally
@@ -163,7 +163,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                 actions={
                   <>
                     <ThemeToggleButton />
-                    <AuthMenu plain={plain} />
+                    <AuthMenu isPlain={plain} />
                   </>
                 }
               />
@@ -176,7 +176,8 @@ export default async function LocaleLayout({ children, params }: TProps) {
                   // `link.platform` is optional and free-form beyond the
                   // `SOCIAL_PLATFORMS` enum's known icon set — an unmapped
                   // platform falls back to the original label-only rendering
-                  // (no `icon`/`hideLabel`) rather than hiding the link.
+                  // (no `icon`, `hasLabel` stays true) rather than hiding
+                  // the link.
                   const iconName =
                     link.platform && toSocialIconName(link.platform);
 
@@ -195,7 +196,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                           />
                         ) : undefined
                       }
-                      hideLabel={Boolean(iconName)}
+                      hasLabel={!iconName}
                     >
                       {link.label}
                     </NavLink>
@@ -211,7 +212,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                       dataTestId="rss-icon"
                     />
                   }
-                  hideLabel={true}
+                  hasLabel={false}
                 >
                   {t('feedLinkLabel')}
                 </NavLink>

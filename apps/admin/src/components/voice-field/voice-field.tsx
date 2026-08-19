@@ -10,8 +10,8 @@ export type TVoiceFieldProps = {
   onChange: (value: string) => void;
   /** The preset voice pack's value for this key — shown as the placeholder, since a blank field means "inherit" rather than "blank". */
   placeholder?: string;
-  multiline?: boolean;
-  disabled?: boolean;
+  isMultiline?: boolean;
+  isDisabled?: boolean;
 };
 
 /**
@@ -27,8 +27,8 @@ export function VoiceField({
   value,
   onChange,
   placeholder,
-  multiline = false,
-  disabled = false,
+  isMultiline = false,
+  isDisabled = false,
 }: TVoiceFieldProps) {
   const {
     root,
@@ -47,14 +47,14 @@ export function VoiceField({
         </label>
         <code className={keyBadge()}>{fieldKey}</code>
       </div>
-      {multiline ? (
+      {isMultiline ? (
         <Textarea
           id={inputId}
           ariaLabel={label}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          disabled={disabled}
+          isDisabled={isDisabled}
           rows={3}
           className={control()}
         />
@@ -65,7 +65,7 @@ export function VoiceField({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          disabled={disabled}
+          isDisabled={isDisabled}
           className={control()}
         />
       )}

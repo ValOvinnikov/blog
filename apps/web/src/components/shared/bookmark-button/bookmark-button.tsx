@@ -163,7 +163,7 @@ export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
         onToggle={handleToggle}
         label={isBookmarked ? t('saved') : t('save')}
         ariaLabel={isBookmarked ? t('removeAriaLabel') : t('saveAriaLabel')}
-        disabled={
+        isDisabled={
           sessionResult.status === 'loading' || !isResolved || isPending
         }
       />

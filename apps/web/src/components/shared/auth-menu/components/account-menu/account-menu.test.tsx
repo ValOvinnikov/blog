@@ -18,24 +18,24 @@ import { AccountMenu, type TAccountMenuProps } from './account-menu';
  */
 type TWrapperProps = Pick<
   TAccountMenuProps,
-  'name' | 'email' | 'image' | 'plain'
+  'name' | 'email' | 'image' | 'isPlain'
 >;
 
-const Wrapper = ({ name, email, image, plain }: TWrapperProps) => {
+const Wrapper = ({ name, email, image, isPlain }: TWrapperProps) => {
   const panelId = useId();
   const { open, toggle, triggerRef, panelRef } = usePopover();
 
   return (
     <AccountMenu
       panelId={panelId}
-      open={open}
+      isOpen={open}
       toggle={toggle}
       triggerRef={triggerRef}
       panelRef={panelRef}
       name={name}
       email={email}
       image={image}
-      plain={plain}
+      isPlain={isPlain}
     />
   );
 };
@@ -116,7 +116,7 @@ describe(`<${AccountMenu.name}/>`, () => {
       name: 'Jane Doe',
       email: 'jane@example.com',
       image: 'https://example.com/broken-avatar.png',
-      plain: true,
+      isPlain: true,
     });
     setupPlain();
     const user = userEvent.setup();

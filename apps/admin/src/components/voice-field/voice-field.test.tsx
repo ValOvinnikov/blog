@@ -29,7 +29,7 @@ describe(VoiceField, () => {
         label="Not Found Description"
         value=""
         onChange={vi.fn()}
-        multiline={true}
+        isMultiline={true}
       />,
     );
     expect(

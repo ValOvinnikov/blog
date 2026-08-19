@@ -10,20 +10,5 @@ export const tenantDetailsPanelVariants = tv({
     fieldLabel: ['text-sm font-medium text-text'],
     fieldError: ['text-xs text-error'],
     actions: ['mt-2 flex items-center justify-end'],
-    lockedInput: [],
-  },
-  variants: {
-    locked: {
-      // Not dimmed (that's what `disabled` does) — a background tint on the
-      // `<input>` itself, since the input paints its own `bg-surface` over
-      // any tint applied only to the wrapper around it.
-      true: {
-        lockedInput: ['[&>input]:cursor-default [&>input]:bg-surface-2'],
-      },
-      false: {},
-    },
-  },
-  defaultVariants: {
-    locked: false,
   },
 });

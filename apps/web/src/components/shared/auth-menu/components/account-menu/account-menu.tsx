@@ -14,7 +14,7 @@ import { accountMenuVariants } from './account-menu-variants';
 
 export type TAccountMenuProps = {
   panelId: string;
-  open: boolean;
+  isOpen: boolean;
   toggle: () => void;
   triggerRef: RefObject<HTMLButtonElement | null>;
   panelRef: RefObject<HTMLDivElement | null>;
@@ -22,7 +22,7 @@ export type TAccountMenuProps = {
   email?: string | null;
   image?: string | null;
   /** Renders the panel without the `WindowChrome` terminal shell. */
-  plain?: boolean;
+  isPlain?: boolean;
 };
 
 /**
@@ -34,14 +34,14 @@ export type TAccountMenuProps = {
  */
 export function AccountMenu({
   panelId,
-  open,
+  isOpen,
   toggle,
   triggerRef,
   panelRef,
   name,
   email,
   image,
-  plain = false,
+  isPlain = false,
 }: TAccountMenuProps) {
   const t = useTranslations('authMenu');
   const { panel, window: windowSize } = authMenuVariants();
@@ -118,7 +118,7 @@ export function AccountMenu({
       <PopoverMenu.Trigger
         ref={triggerRef}
         ariaLabel={t('accountMenuAriaLabel')}
-        open={open}
+        isOpen={isOpen}
         panelId={panelId}
         onClick={toggle}
         className={avatarTrigger()}
@@ -134,11 +134,11 @@ export function AccountMenu({
       <PopoverMenu.Panel
         ref={panelRef}
         id={panelId}
-        open={open}
+        isOpen={isOpen}
         ariaLabel={t('accountMenuAriaLabel')}
-        className={plain ? windowSize() : panel()}
+        className={isPlain ? windowSize() : panel()}
       >
-        {plain ? (
+        {isPlain ? (
           menuContent
         ) : (
           <WindowChrome className={windowSize()}>

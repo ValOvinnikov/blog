@@ -33,7 +33,7 @@ describe(`<${NotFoundPage.name}/>`, () => {
 });
 
 describe(`<${NotFoundPage.name}/> (plain)`, () => {
-  const setupPlain = customRender(NotFoundPage, { plain: true });
+  const setupPlain = customRender(NotFoundPage, { isPlain: true });
 
   beforeEach(() => {
     setupPlain();

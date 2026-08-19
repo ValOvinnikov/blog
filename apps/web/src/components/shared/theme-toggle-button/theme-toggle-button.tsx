@@ -38,6 +38,6 @@ export const ThemeToggleButton = () => {
   };
 
   return (
-    <ThemeToggle isDark={isDark} onToggle={handleToggle} mounted={mounted} />
+    <ThemeToggle isDark={isDark} onToggle={handleToggle} isMounted={mounted} />
   );
 };

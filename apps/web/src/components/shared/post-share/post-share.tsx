@@ -41,7 +41,7 @@ export function PostShare({ url, title, links, className }: TPostShareProps) {
       <PopoverMenu.Trigger
         ref={triggerRef}
         ariaLabel={t('shareAriaLabel', { title })}
-        open={open}
+        isOpen={open}
         panelId={panelId}
         onClick={toggle}
       >
@@ -50,7 +50,7 @@ export function PostShare({ url, title, links, className }: TPostShareProps) {
       <PopoverMenu.Panel
         ref={panelRef}
         id={panelId}
-        open={open}
+        isOpen={open}
         ariaLabel={t('panelAriaLabel')}
       >
         <PopoverMenu.Item

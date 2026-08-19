@@ -335,9 +335,9 @@ describe(`<${ToastProvider.name}/>`, () => {
     expect(screen.getByText('Saved to bookmarks')).toBeVisible();
   });
 
-  it('renders plain mode with no command/state chip when plain is set', () => {
+  it('renders plain mode with no command/state chip when isPlain is set', () => {
     renderElement(
-      <ToastProvider plain={true}>
+      <ToastProvider isPlain={true}>
         <ToastHarness />
       </ToastProvider>,
     );

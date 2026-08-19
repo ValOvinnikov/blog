@@ -46,13 +46,13 @@ describe(HueSlider, () => {
     });
   });
 
-  it('marks the slider disabled when disabled is passed', () => {
+  it('marks the slider disabled when isDisabled is passed', () => {
     render(
       <HueSlider
         ariaLabel="Logo hue"
         value={50}
         onChange={vi.fn()}
-        disabled={true}
+        isDisabled={true}
       />,
     );
 

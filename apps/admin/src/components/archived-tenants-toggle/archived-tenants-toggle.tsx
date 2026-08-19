@@ -6,7 +6,7 @@ import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
 import { useTranslations } from 'next-intl';
 
 export type TArchivedTenantsToggleProps = {
-  showArchived: boolean;
+  shouldShowArchived: boolean;
 };
 
 type TTenantVisibility = 'active' | 'all';
@@ -17,12 +17,12 @@ type TTenantVisibility = 'active' | 'all';
  * — there is no client-side list to filter.
  */
 export function ArchivedTenantsToggle({
-  showArchived,
+  shouldShowArchived,
 }: TArchivedTenantsToggleProps) {
   const t = useTranslations('archivedTenantsToggle');
   const router = useRouter();
 
-  const value: TTenantVisibility = showArchived ? 'all' : 'active';
+  const value: TTenantVisibility = shouldShowArchived ? 'all' : 'active';
 
   function handleChange(next: TTenantVisibility) {
     router.push(adminRoutes.tenants({ archived: next === 'all' }));

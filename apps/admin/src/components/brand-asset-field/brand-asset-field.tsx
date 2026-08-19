@@ -154,7 +154,7 @@ export function BrandAssetField({
           size={Size.SM}
           variant="ghost"
           onClick={() => inputRef.current?.click()}
-          disabled={isPending}
+          isDisabled={isPending}
         >
           {isPending
             ? t('uploading')
@@ -168,7 +168,7 @@ export function BrandAssetField({
             size={Size.SM}
             variant="ghost"
             onClick={handleRemove}
-            disabled={isPending}
+            isDisabled={isPending}
           >
             {t('remove')}
           </Button>

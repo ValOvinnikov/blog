@@ -17,7 +17,7 @@ describe(ArchivedTenantsToggle, () => {
   });
 
   it('shows Active selected by default', () => {
-    render(<ArchivedTenantsToggle showArchived={false} />);
+    render(<ArchivedTenantsToggle shouldShowArchived={false} />);
 
     expect(screen.getByRole('radio', { name: 'Active' })).toHaveAttribute(
       'aria-checked',
@@ -25,8 +25,8 @@ describe(ArchivedTenantsToggle, () => {
     );
   });
 
-  it('shows All selected when showArchived is true', () => {
-    render(<ArchivedTenantsToggle showArchived={true} />);
+  it('shows All selected when shouldShowArchived is true', () => {
+    render(<ArchivedTenantsToggle shouldShowArchived={true} />);
 
     expect(screen.getByRole('radio', { name: 'All' })).toHaveAttribute(
       'aria-checked',
@@ -36,7 +36,7 @@ describe(ArchivedTenantsToggle, () => {
 
   it('navigates to the archived tenant list when All is selected', async () => {
     const user = userEvent.setup();
-    render(<ArchivedTenantsToggle showArchived={false} />);
+    render(<ArchivedTenantsToggle shouldShowArchived={false} />);
 
     await user.click(screen.getByRole('radio', { name: 'All' }));
 
@@ -45,7 +45,7 @@ describe(ArchivedTenantsToggle, () => {
 
   it('navigates back to the active-only list when Active is selected', async () => {
     const user = userEvent.setup();
-    render(<ArchivedTenantsToggle showArchived={true} />);
+    render(<ArchivedTenantsToggle shouldShowArchived={true} />);
 
     await user.click(screen.getByRole('radio', { name: 'Active' }));
 

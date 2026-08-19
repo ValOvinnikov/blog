@@ -107,7 +107,7 @@ export function VoiceSettings({
         <Button
           variant="primary"
           onClick={handleSave}
-          disabled={isPending}
+          isDisabled={isPending}
           aria-busy={isPending}
         >
           {t('saveButton')}
@@ -158,7 +158,7 @@ export function VoiceSettings({
               values={values}
               placeholders={placeholders}
               onFieldChange={handleFieldChange}
-              disabled={isPending}
+              isDisabled={isPending}
             />
           ))}
         </div>

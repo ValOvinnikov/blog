@@ -71,7 +71,7 @@ export function LogoHueField({
           ariaLabel={t('logoHueAriaLabel')}
           value={resolvedHue}
           onChange={onChange}
-          disabled={follows}
+          isDisabled={follows}
           trackStyle={{ background: accentHueGradient() }}
         />
         <span className={hueValue()}>

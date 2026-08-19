@@ -92,7 +92,7 @@ export function ProviderLinkControl({
   return (
     <Button
       variant="ghost"
-      disabled={isPending}
+      isDisabled={isPending}
       aria-busy={isPending}
       onClick={isLink ? handleLink : handleUnlink}
     >

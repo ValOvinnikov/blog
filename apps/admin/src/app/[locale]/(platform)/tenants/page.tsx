@@ -20,5 +20,5 @@ export default async function TenantsPage({ searchParams }: TProps) {
     includeArchived: showArchived,
   });
 
-  return <TenantsView tenants={tenants} showArchived={showArchived} />;
+  return <TenantsView tenants={tenants} shouldShowArchived={showArchived} />;
 }

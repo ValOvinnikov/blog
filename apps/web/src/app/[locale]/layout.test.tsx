@@ -189,8 +189,8 @@ describe('LocaleLayout', () => {
     const link = screen.getByRole('link', { name: 'RSS feed' });
 
     expect(link).toHaveAttribute('href', routes.rssFeed());
-    // `hideLabel` sets the link's `title` to its own label text (see
-    // `NavLink`) — the one DOM-observable trace of that prop being `true`.
+    // `hasLabel={false}` sets the link's `title` to its own label text (see
+    // `NavLink`) — the one DOM-observable trace of that prop being `false`.
     expect(link).toHaveAttribute('title', 'RSS feed');
     // The decorative icon is `aria-hidden` with no role, so a fixed
     // `dataTestId` (`rss-icon`, from `layout.tsx`) is the only way to assert
@@ -218,8 +218,8 @@ describe('LocaleLayout', () => {
     const link = screen.getByRole('link', { name: 'LinkedIn' });
 
     expect(link).toHaveAttribute('href', 'https://www.linkedin.com/in/example');
-    // A mapped platform renders icon-only (`hideLabel`), traced the same way
-    // as the RSS link above.
+    // A mapped platform renders icon-only (`hasLabel={false}`), traced the
+    // same way as the RSS link above.
     expect(link).toHaveAttribute('title', 'LinkedIn');
     // `dataTestId={`social-icon-${link.platform}`}` in `layout.tsx` — asserts
     // the *LinkedIn* icon rendered, not just any icon.
@@ -248,7 +248,7 @@ describe('LocaleLayout', () => {
     const link = screen.getByRole('link', { name: 'Mastodon' });
 
     expect(link).toHaveAttribute('href', 'https://mastodon.social/@example');
-    // An unmapped platform never sets `hideLabel` — no icon, and no `title`
+    // An unmapped platform keeps `hasLabel` true — no icon, and no `title`
     // since the visible label text is already the accessible name.
     expect(link).not.toHaveAttribute('title');
     // No `iconName` is resolved for an unmapped platform, so `layout.tsx`

@@ -105,13 +105,13 @@ export function DisplayNameControl({
               dataTestId="display-name-prompt-icon"
             />
           }
-          disabled={isPending}
+          isDisabled={isPending}
           className={field()}
         />
       </div>
       <Button
         variant="primary"
-        disabled={isSaveDisabled}
+        isDisabled={isSaveDisabled}
         aria-busy={isPending}
         onClick={handleSave}
         className={button()}

@@ -197,14 +197,14 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
             type="button"
             variant="ghost"
             onClick={handleReset}
-            disabled={!isDirty}
+            isDisabled={!isDirty}
           >
             {t('resetButton')}
           </Button>
           <Button
             type="button"
             onClick={handleSave}
-            disabled={isPending || !isDirty}
+            isDisabled={isPending || !isDirty}
           >
             {isPending ? t('savingButton') : t('saveButton')}
           </Button>
@@ -384,7 +384,7 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
             logoHue={values.logoHue}
             headingFont={values.headingFont}
             bodyFont={values.bodyFont}
-            chromeOn={values.chromeOn}
+            isChromeOn={values.chromeOn}
           />
         </div>
       </div>

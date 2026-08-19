@@ -160,7 +160,7 @@ export function DeprovisionTenantControl({
                 type="button"
                 variant="danger"
                 onClick={handleConfirm}
-                disabled={isPending || confirm !== tenant.slug}
+                isDisabled={isPending || confirm !== tenant.slug}
               >
                 {isPending ? t('confirmingButton') : t('confirmButton')}
               </Button>

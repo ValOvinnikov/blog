@@ -38,7 +38,7 @@ export default async function NotFound() {
 
   return (
     <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
-      <NotFoundPage plain={!chromeOn} />
+      <NotFoundPage isPlain={!chromeOn} />
     </NextIntlClientProvider>
   );
 }
