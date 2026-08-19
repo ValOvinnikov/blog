@@ -21,8 +21,8 @@ them.
 ## Layout
 
 - `constants/` — UPPERCASE key/value const pairs (`as const`), one file per
-  domain (`link.ts`, `module.ts`, `size.ts`, `language.ts`, `tenant.ts`, …),
-  re-exported from `constants/index.ts`.
+  domain (`link.ts`, `module.ts`, `size.ts`, `language.ts`, …), re-exported
+  from `constants/index.ts`.
 - `routes.ts` — the single source of truth for URL construction
   (`routes.post(slug)`, `routes.blogIndex(page?)`, …); co-located
   `routes.test.ts`.
