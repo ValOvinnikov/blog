@@ -22,7 +22,7 @@ describe(`<${IconButton.name}/>`, () => {
   });
 
   it('forwards disabled attribute', () => {
-    setup({ ariaLabel: 'Toggle theme', disabled: true, children: <span /> });
+    setup({ ariaLabel: 'Toggle theme', isDisabled: true, children: <span /> });
     expect(screen.getByRole('button', { name: 'Toggle theme' })).toBeDisabled();
   });
 });

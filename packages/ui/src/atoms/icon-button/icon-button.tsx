@@ -9,7 +9,7 @@ export type TIconButtonProps = IWithClassName &
     title?: string;
     children: ReactNode;
     onClick?: MouseEventHandler<HTMLButtonElement>;
-    disabled?: boolean;
+    isDisabled?: boolean;
     inert?: boolean;
     'aria-expanded'?: AriaAttributes['aria-expanded'];
     'aria-controls'?: AriaAttributes['aria-controls'];
@@ -27,7 +27,7 @@ export const IconButton = ({
   dataTestId,
   ref,
   onClick,
-  disabled,
+  isDisabled,
   inert,
   'aria-expanded': ariaExpanded,
   'aria-controls': ariaControls,
@@ -39,7 +39,7 @@ export const IconButton = ({
     aria-label={ariaLabel}
     title={title}
     onClick={onClick}
-    disabled={disabled}
+    disabled={isDisabled}
     inert={inert}
     aria-expanded={ariaExpanded}
     aria-controls={ariaControls}

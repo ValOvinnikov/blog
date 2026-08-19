@@ -29,24 +29,24 @@ export const Default: TStory = {};
 
 /** The `label` text is also rendered visibly beside the glyph. */
 export const WithVisibleLabel: TStory = {
-  args: { label: 'Posting comment', showLabel: true },
+  args: { label: 'Posting comment', hasLabel: true },
 };
 
 /** Fits inside a compact footprint, such as beside an `Avatar` at `Size.SM`. */
 export const Small: TStory = {
-  args: { size: Size.SM, showLabel: true },
+  args: { size: Size.SM, hasLabel: true },
 };
 
 /** The larger size for a more prominent standalone loading state. */
 export const Large: TStory = {
-  args: { size: Size.LG, showLabel: true },
+  args: { size: Size.LG, hasLabel: true },
 };
 
 /** On a solid `Button` fill, the glyph swaps to `text-brand-primary-contrast` via `className` so it reads against the fill. */
 export const OnSolidFill: TStory = {
-  args: { label: 'Subscribing', showLabel: true },
+  args: { label: 'Subscribing', hasLabel: true },
   render: (args) => (
-    <Button variant="primary" disabled={true}>
+    <Button variant="primary" isDisabled={true}>
       <Spinner {...args} className="text-brand-primary-contrast" />
     </Button>
   ),

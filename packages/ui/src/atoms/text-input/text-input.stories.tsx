@@ -46,6 +46,10 @@ export const Invalid: TStory = {
   args: { invalid: true, value: 'not-an-email', leadingIcon: '›' },
 };
 
+export const Disabled: TStory = {
+  args: { value: 'you@example.com', isDisabled: true },
+};
+
 const InteractiveDemo = () => {
   const [value, setValue] = useState('');
 

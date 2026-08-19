@@ -17,7 +17,7 @@ export type TBookmarkToggleProps = IWithClassName &
     onToggle: () => void;
     label: string;
     ariaLabel: string;
-    disabled?: boolean;
+    isDisabled?: boolean;
   };
 
 /**
@@ -32,7 +32,7 @@ export const BookmarkToggle = ({
   onToggle,
   label,
   ariaLabel,
-  disabled,
+  isDisabled,
   className,
   dataTestId,
 }: TBookmarkToggleProps) => {
@@ -44,7 +44,7 @@ export const BookmarkToggle = ({
       aria-pressed={isBookmarked}
       aria-label={ariaLabel}
       title={ariaLabel}
-      disabled={disabled}
+      disabled={isDisabled}
       onClick={onToggle}
       data-testid={dataTestId}
       className={root({ class: className })}

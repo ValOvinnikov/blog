@@ -10,7 +10,7 @@ export type TButtonProps = IWithClassName &
     title?: string;
     children?: ReactNode;
     onClick?: MouseEventHandler<HTMLButtonElement>;
-    disabled?: boolean;
+    isDisabled?: boolean;
     'aria-busy'?: AriaAttributes['aria-busy'];
   };
 
@@ -28,7 +28,7 @@ export const Button = ({
   title,
   children,
   onClick,
-  disabled,
+  isDisabled,
   'aria-busy': ariaBusy,
 }: TButtonProps) => {
   return (
@@ -36,7 +36,7 @@ export const Button = ({
       type={type}
       title={title}
       onClick={onClick}
-      disabled={disabled}
+      disabled={isDisabled}
       aria-busy={ariaBusy}
       data-testid={dataTestId}
       className={buttonVariants({ variant, size, class: className })}

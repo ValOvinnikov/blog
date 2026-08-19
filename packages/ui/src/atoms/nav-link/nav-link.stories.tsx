@@ -40,6 +40,6 @@ export const IconOnly: TStory = {
   args: {
     children: 'RSS feed',
     icon: <Icon name={ICONS.RSS} size={Size.SM} />,
-    hideLabel: true,
+    hasLabel: false,
   },
 };

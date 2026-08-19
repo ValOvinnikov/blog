@@ -51,10 +51,10 @@ describe(`<${NavLink.name}/>`, () => {
     expect(screen.getByRole('link', { name: 'RSS feed' })).toBeVisible();
   });
 
-  it('keeps the label as the accessible name when hideLabel is set', () => {
+  it('keeps the label as the accessible name when hasLabel is false', () => {
     setup({
       icon: <svg data-testid="nav-icon" />,
-      hideLabel: true,
+      hasLabel: false,
       children: 'RSS feed',
     });
 
@@ -62,15 +62,15 @@ describe(`<${NavLink.name}/>`, () => {
     expect(screen.getByRole('link', { name: 'RSS feed' })).toBeVisible();
   });
 
-  it('visually hides the label text when hideLabel is set', () => {
-    setup({ hideLabel: true, children: 'RSS feed' });
+  it('visually hides the label text when hasLabel is false', () => {
+    setup({ hasLabel: false, children: 'RSS feed' });
 
     // `sr-only` is the sole observable that the label text is kept for
     // accessibility rather than shown alongside the icon.
     expect(screen.getByText('RSS feed')).toHaveClass('sr-only');
   });
 
-  it('renders the label without a wrapper when hideLabel is not set', () => {
+  it('renders the label without a wrapper when hasLabel is not set', () => {
     setup({ children: 'RSS feed' });
 
     // `sr-only` is the sole observable here: jsdom doesn't apply real layout,
@@ -82,7 +82,7 @@ describe(`<${NavLink.name}/>`, () => {
   it('sets a title attribute on an icon-only link for sighted hover users', () => {
     setup({
       icon: <svg data-testid="nav-icon" />,
-      hideLabel: true,
+      hasLabel: false,
       children: 'RSS feed',
     });
 
@@ -92,7 +92,7 @@ describe(`<${NavLink.name}/>`, () => {
     );
   });
 
-  it('omits the title attribute when hideLabel is not set', () => {
+  it('omits the title attribute when hasLabel is not set', () => {
     setup({ children: 'RSS feed' });
 
     expect(screen.getByRole('link', { name: 'RSS feed' })).not.toHaveAttribute(

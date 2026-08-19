@@ -23,19 +23,23 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 const InteractiveDemo = () => {
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <PopoverMenu>
       <PopoverMenu.Trigger
         ariaLabel="Open menu"
-        open={open}
+        isOpen={isOpen}
         panelId="popover-menu-panel"
-        onClick={() => setOpen((current) => !current)}
+        onClick={() => setIsOpen((current) => !current)}
       >
         <Icon name={ICONS.SHARE} size={Size.SM} />
       </PopoverMenu.Trigger>
-      <PopoverMenu.Panel id="popover-menu-panel" open={open} ariaLabel="Menu">
+      <PopoverMenu.Panel
+        id="popover-menu-panel"
+        isOpen={isOpen}
+        ariaLabel="Menu"
+      >
         <PopoverMenu.Item
           icon={<Icon name={ICONS.EXTERNAL_LINK} size={Size.SM} />}
         >
@@ -63,12 +67,16 @@ export const Copied: TStory = {
       <>
         <PopoverMenu.Trigger
           ariaLabel="Open menu"
-          open={true}
+          isOpen={true}
           panelId="popover-menu-panel"
         >
           <Icon name={ICONS.SHARE} size={Size.SM} />
         </PopoverMenu.Trigger>
-        <PopoverMenu.Panel id="popover-menu-panel" open={true} ariaLabel="Menu">
+        <PopoverMenu.Panel
+          id="popover-menu-panel"
+          isOpen={true}
+          ariaLabel="Menu"
+        >
           <PopoverMenu.Item icon={<Icon name={ICONS.CHECK} size={Size.SM} />}>
             Copied
           </PopoverMenu.Item>
@@ -91,14 +99,14 @@ export const Closed: TStory = {
       <>
         <PopoverMenu.Trigger
           ariaLabel="Open menu"
-          open={false}
+          isOpen={false}
           panelId="popover-menu-panel"
         >
           <Icon name={ICONS.SHARE} size={Size.SM} />
         </PopoverMenu.Trigger>
         <PopoverMenu.Panel
           id="popover-menu-panel"
-          open={false}
+          isOpen={false}
           ariaLabel="Menu"
         >
           <PopoverMenu.Item

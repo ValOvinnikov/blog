@@ -50,13 +50,13 @@ describe(`<${BookmarkToggle.name}/>`, () => {
   });
 
   it('forwards the disabled attribute', () => {
-    setup({ disabled: true });
+    setup({ isDisabled: true });
     expect(screen.getByRole('button')).toBeDisabled();
   });
 
   it('does not call onToggle when disabled', async () => {
     const onToggle = vi.fn();
-    setup({ disabled: true, onToggle });
+    setup({ isDisabled: true, onToggle });
     await userEvent.click(screen.getByRole('button'));
     expect(onToggle).not.toHaveBeenCalled();
   });

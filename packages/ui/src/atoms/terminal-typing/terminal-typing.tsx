@@ -5,7 +5,7 @@ import { terminalTypingVariants } from './terminal-typing-variants';
 export type TTerminalTypingProps = IWithClassName &
   IWithDataTestId & {
     text: string;
-    showCursor?: boolean;
+    hasCursor?: boolean;
   };
 
 /**
@@ -19,7 +19,7 @@ export type TTerminalTypingProps = IWithClassName &
  */
 export const TerminalTyping = ({
   text,
-  showCursor = true,
+  hasCursor = true,
   className,
   dataTestId,
 }: TTerminalTypingProps) => {
@@ -28,7 +28,7 @@ export const TerminalTyping = ({
   return (
     <span className={root({ class: className })} data-testid={dataTestId}>
       {text}
-      {showCursor && <span className={cursor()} aria-hidden="true" />}
+      {hasCursor && <span className={cursor()} aria-hidden="true" />}
     </span>
   );
 };

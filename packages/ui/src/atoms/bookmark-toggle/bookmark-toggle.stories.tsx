@@ -24,5 +24,5 @@ export const Bookmarked: TStory = {
 };
 
 export const Disabled: TStory = {
-  args: { disabled: true },
+  args: { isDisabled: true },
 };

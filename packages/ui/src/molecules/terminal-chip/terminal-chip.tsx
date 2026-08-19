@@ -6,7 +6,7 @@ export type TTerminalChipProps = IWithClassName &
   IWithDataTestId & {
     prefix: string;
     suffix?: string;
-    showCursor?: boolean;
+    hasCursor?: boolean;
   };
 
 /**
@@ -18,7 +18,7 @@ export type TTerminalChipProps = IWithClassName &
 export const TerminalChip = ({
   prefix,
   suffix,
-  showCursor = true,
+  hasCursor = true,
   className,
   dataTestId,
 }: TTerminalChipProps) => {
@@ -33,7 +33,7 @@ export const TerminalChip = ({
         {prefix}
         {suffix}
       </span>
-      {showCursor && <span className={cursor()} aria-hidden="true" />}
+      {hasCursor && <span className={cursor()} aria-hidden="true" />}
     </span>
   );
 };

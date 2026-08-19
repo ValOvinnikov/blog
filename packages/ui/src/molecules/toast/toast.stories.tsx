@@ -88,13 +88,13 @@ export const WithAction: TStory = {
 export const Paused: TStory = {
   args: {
     action: { label: 'undo', onAct: () => {}, keyHint: '⌘Z' },
-    paused: true,
+    isPaused: true,
   },
 };
 
 export const Plain: TStory = {
   args: {
-    plain: true,
+    isPlain: true,
     command: undefined,
     state: undefined,
     action: { label: 'undo', onAct: () => {}, keyHint: '⌘Z' },

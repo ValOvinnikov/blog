@@ -29,8 +29,8 @@ export interface IToastProps extends IWithDataTestId {
    */
   isLoading?: boolean;
   /**
-   * Required unless `plain` is set — the terminal-style command/state chip
-   * (e.g. "bookmark · saved") is only rendered when `plain` is falsy.
+   * Required unless `isPlain` is set — the terminal-style command/state chip
+   * (e.g. "bookmark · saved") is only rendered when `isPlain` is falsy.
    */
   command?: string;
   state?: string;
@@ -38,7 +38,7 @@ export interface IToastProps extends IWithDataTestId {
   time?: string;
   action?: IToastAction;
   dismissLabel: string;
-  paused?: boolean;
+  isPaused?: boolean;
   durationMs?: number;
   onDismiss: () => void;
   phase: NonNullable<TToastVariants['phase']>;
@@ -46,7 +46,7 @@ export interface IToastProps extends IWithDataTestId {
    * Renders `message` alone, without the `command`/`state` chip — for
    * presets that don't want the toast to read as terminal-log output.
    */
-  plain?: boolean;
+  isPlain?: boolean;
   className?: string;
 }
 
@@ -86,11 +86,11 @@ export const Toast = ({
   time,
   action,
   dismissLabel,
-  paused = false,
+  isPaused = false,
   durationMs,
   onDismiss,
   phase,
-  plain = false,
+  isPlain = false,
   className,
   dataTestId,
 }: IToastProps) => {
@@ -98,7 +98,7 @@ export const Toast = ({
     type,
     phase,
     hasTime: Boolean(time),
-    paused,
+    paused: isPaused,
   });
   const { role, live } = TOAST_ANNOUNCEMENT[type];
 
@@ -144,7 +144,7 @@ export const Toast = ({
       className={s.root({ class: className })}
       data-testid={dataTestId}
     >
-      {plain ? (
+      {isPlain ? (
         <div className={s.plainRow()}>
           {statusGlyph}
           <span className={s.plainMessage()}>{message}</span>
@@ -172,7 +172,7 @@ export const Toast = ({
           </div>
         </>
       )}
-      {plain && actionButton && (
+      {isPlain && actionButton && (
         <div className={s.plainActions()}>{actionButton}</div>
       )}
       {durationMs !== undefined && (

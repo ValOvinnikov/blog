@@ -11,7 +11,7 @@ describe(`<${Button.name}/>`, () => {
   });
 
   it('forwards disabled attribute', () => {
-    setup({ disabled: true, children: 'Disabled' });
+    setup({ isDisabled: true, children: 'Disabled' });
     expect(screen.getByRole('button', { name: 'Disabled' })).toBeDisabled();
   });
 });

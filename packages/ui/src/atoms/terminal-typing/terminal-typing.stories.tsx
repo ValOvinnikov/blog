@@ -17,5 +17,5 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const NoCursor: TStory = {
-  args: { showCursor: false },
+  args: { hasCursor: false },
 };

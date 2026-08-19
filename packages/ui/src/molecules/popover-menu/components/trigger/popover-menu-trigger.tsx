@@ -6,7 +6,7 @@ export type TPopoverMenuTriggerProps = IWithClassName &
   IWithDataTestId & {
     ariaLabel: string;
     /** Whether the panel this trigger controls is currently open — drives `aria-expanded`. The caller (`apps/web`) owns the open/closed state. */
-    open: boolean;
+    isOpen: boolean;
     /** `id` of the `PopoverMenu.Panel` this trigger controls — wired to `aria-controls`. */
     panelId: string;
     children: ReactNode;
@@ -17,12 +17,12 @@ export type TPopoverMenuTriggerProps = IWithClassName &
 
 /**
  * PopoverMenuTrigger — icon-button that opens/closes a `PopoverMenu.Panel`.
- * Presentational only: `open` and the click handler are fully controlled by
+ * Presentational only: `isOpen` and the click handler are fully controlled by
  * the caller, which also owns any focus-trap/outside-click behaviour.
  */
 export const PopoverMenuTrigger = ({
   ariaLabel,
-  open,
+  isOpen,
   panelId,
   ref,
   className,
@@ -35,7 +35,7 @@ export const PopoverMenuTrigger = ({
     ariaLabel={ariaLabel}
     title={ariaLabel}
     aria-haspopup="menu"
-    aria-expanded={open}
+    aria-expanded={isOpen}
     aria-controls={panelId}
     className={className}
     dataTestId={dataTestId}

@@ -8,7 +8,7 @@ export interface IThemeToggleProps extends IWithDataTestId {
   className?: string;
   isDark: boolean;
   onToggle: () => void;
-  mounted?: boolean;
+  isMounted?: boolean;
   lightLabel?: string;
   darkLabel?: string;
 }
@@ -17,7 +17,7 @@ export interface IThemeToggleProps extends IWithDataTestId {
  * A pure, controlled theme-switch button. The consumer owns the actual theme
  * state (e.g. reading/writing `document.documentElement` and `localStorage`
  * in `apps/web`) and passes it down via `isDark`/`onToggle`. Renders a
- * placeholder while `mounted` is `false` to avoid a hydration-mismatch flash
+ * placeholder while `isMounted` is `false` to avoid a hydration-mismatch flash
  * before the consumer knows the real theme.
  */
 export const ThemeToggle = ({
@@ -25,7 +25,7 @@ export const ThemeToggle = ({
   dataTestId,
   isDark,
   onToggle,
-  mounted = true,
+  isMounted = true,
   lightLabel = 'Switch to light theme',
   darkLabel = 'Switch to dark theme',
 }: IThemeToggleProps) => {
@@ -39,7 +39,7 @@ export const ThemeToggle = ({
       dataTestId={dataTestId}
       className={className}
     >
-      {mounted ? (
+      {isMounted ? (
         isDark ? (
           <Icon name={ICONS.SUN} size={Size.MD} />
         ) : (

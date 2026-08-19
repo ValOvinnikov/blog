@@ -27,5 +27,5 @@ export const CustomLabels: TStory = {
 };
 
 export const Unmounted: TStory = {
-  args: { isDark: false, mounted: false },
+  args: { isDark: false, isMounted: false },
 };

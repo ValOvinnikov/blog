@@ -59,13 +59,13 @@ export const NewsletterSignupContent = ({
         placeholder={placeholder}
         type="email"
         invalid={isError}
-        disabled={isSubmitting}
+        isDisabled={isSubmitting}
         className={s.field()}
       />
       <Button
         variant="primary"
         onClick={onSubmit}
-        disabled={isSubmitting}
+        isDisabled={isSubmitting}
         aria-busy={isSubmitting}
         title={isSubmitting ? submitLabel : undefined}
         className={s.submit()}

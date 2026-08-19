@@ -21,25 +21,25 @@ Variants: size: Size.SM|Size.MD|Size.LG
 ### BackToTop — `atoms/back-to-top/back-to-top.tsx`
 
 a floating icon button that jumps the page back to its top.
-Props: visible: boolean · onClick: () => void · ariaLabel: string · className?: string _(extends IWithDataTestId)_
+Props: isVisible: boolean · onClick: () => void · ariaLabel: string · className?: string _(extends IWithDataTestId)_
 Variants: visible: (boolean)
 
 ### BookmarkToggle — `atoms/bookmark-toggle/bookmark-toggle.tsx`
 
 a pure, controlled icon+label toggle for saving a post to read later.
-Props: isBookmarked: NonNullable<TBookmarkToggleVariants['isBookmarked']> · onToggle: () => void · label: string · ariaLabel: string · disabled?: boolean _(extends IWithClassName, IWithDataTestId)_
+Props: isBookmarked: NonNullable<TBookmarkToggleVariants['isBookmarked']> · onToggle: () => void · label: string · ariaLabel: string · isDisabled?: boolean _(extends IWithClassName, IWithDataTestId)_
 Variants: isBookmarked: (boolean)
 
 ### BrandMark — `atoms/brand-mark/brand-mark.tsx`
 
 BrandMark atom — the brand mark, rendered from an uploaded image when `src` is supplied, or as three stacked polygon layers coloured from the `--logo-1/2/3` design tokens via inline `style` otherwise (these tokens aren't mirrored into `@theme inline` as Tailwind utilities).
-Props: size?: TBrandMarkVariants['size'] · title?: string · src?: string · stacked?: boolean _(extends IWithClassName, IWithDataTestId)_
+Props: size?: TBrandMarkVariants['size'] · title?: string · src?: string · isStacked?: boolean _(extends IWithClassName, IWithDataTestId)_
 Variants: size: Size.SM|Size.MD|Size.LG
 
 ### Button — `atoms/button/button.tsx`
 
 the styled `<button>` for in-page actions (submit, toggle, dismiss).
-Props: type?: 'button' | 'submit' | 'reset' · title?: string · children?: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · disabled?: boolean · 'aria-busy'?: AriaAttributes['aria-busy'] _(extends IWithClassName, IWithDataTestId, TButtonVariants)_
+Props: type?: 'button' | 'submit' | 'reset' · title?: string · children?: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · 'aria-busy'?: AriaAttributes['aria-busy'] _(extends IWithClassName, IWithDataTestId, TButtonVariants)_
 Variants: variant: primary|ghost|link|danger · size: Size.SM|Size.MD|Size.LG
 
 ### Caption — `atoms/caption/caption.tsx`
@@ -68,7 +68,7 @@ Variants: size: Size.SM|Size.MD|Size.LG
 ### IconButton — `atoms/icon-button/icon-button.tsx`
 
 A 22×22 icon-only button.
-Props: ariaLabel: string · title?: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · disabled?: boolean · inert?: boolean · 'aria-expanded'?: AriaAttributes['aria-expanded'] · 'aria-controls'?: AriaAttributes['aria-controls'] · 'aria-haspopup'?: AriaAttributes['aria-haspopup'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
+Props: ariaLabel: string · title?: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · inert?: boolean · 'aria-expanded'?: AriaAttributes['aria-expanded'] · 'aria-controls'?: AriaAttributes['aria-controls'] · 'aria-haspopup'?: AriaAttributes['aria-haspopup'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
 
 ### InlineCode — `atoms/inline-code/inline-code.tsx`
 
@@ -89,7 +89,7 @@ Props: separator?: string _(extends IWithClassName, IWithDataTestId)_
 ### NavLink — `atoms/nav-link/nav-link.tsx`
 
 NavLink atom — a chrome-level navigation link (header/footer nav items).
-Props: className?: string · isActive?: TNavLinkVariants['isActive'] · hideLabel?: boolean _(extends IWithIcon, IWithDataTestId)_
+Props: className?: string · isActive?: TNavLinkVariants['isActive'] · hasLabel?: boolean _(extends IWithIcon, IWithDataTestId)_
 Variants: isActive: (boolean)
 
 ### Prose — `atoms/prose/prose.tsx`
@@ -117,7 +117,7 @@ Variants: selected: (boolean)
 ### Spinner — `atoms/spinner/spinner.tsx`
 
 the shared indeterminate loading indicator for every async state (a submitting button, a session resolving, a region fetching on demand).
-Props: label: string · showLabel?: boolean · size?: TSpinnerVariants['size'] · 'aria-hidden'?: AriaAttributes['aria-hidden'] _(extends IWithClassName, IWithDataTestId)_
+Props: label: string · hasLabel?: boolean · size?: TSpinnerVariants['size'] · 'aria-hidden'?: AriaAttributes['aria-hidden'] _(extends IWithClassName, IWithDataTestId)_
 Variants: size: Size.SM|Size.MD|Size.LG
 
 ### StatusBadge — `atoms/status-badge/status-badge.tsx`
@@ -135,7 +135,7 @@ Variants: variant: default|accent · interactive: (boolean)
 ### TerminalTyping — `atoms/terminal-typing/terminal-typing.tsx`
 
 TerminalTyping atom — a monospace, terminal-styled wordmark for a hero-intro flourish.
-Props: text: string · showCursor?: boolean _(extends IWithClassName, IWithDataTestId)_
+Props: text: string · hasCursor?: boolean _(extends IWithClassName, IWithDataTestId)_
 
 ### Text — `atoms/text/text.tsx`
 
@@ -146,19 +146,19 @@ Variants: variant: lead|muted|hero|card
 ### TextInput — `atoms/text-input/text-input.tsx`
 
 TextInput atom — a pure, controlled single-line field.
-Props: value: string · onChange: (value: string) => void · ariaLabel: string · invalid?: TTextInputVariants['invalid'] · leadingIcon?: ReactNode · trailingIcon?: ReactNode · id?: string · type?: string · placeholder?: string · required?: boolean · readOnly?: boolean · disabled?: boolean · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
+Props: value: string · onChange: (value: string) => void · ariaLabel: string · invalid?: TTextInputVariants['invalid'] · leadingIcon?: ReactNode · trailingIcon?: ReactNode · id?: string · type?: string · placeholder?: string · required?: boolean · isDisabled?: boolean · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
 Variants: invalid: (boolean) · hasLeadingIcon: (boolean) · hasTrailingIcon: (boolean)
 
 ### Textarea — `atoms/textarea/textarea.tsx`
 
 Textarea atom — a pure, controlled multi-line field.
-Props: value: string · onChange: (value: string) => void · ariaLabel: string · invalid?: TTextareaVariants['invalid'] · prompt?: string · id?: string · placeholder?: string · rows?: number · maxLength?: number · disabled?: boolean _(extends IWithClassName, IWithDataTestId)_
+Props: value: string · onChange: (value: string) => void · ariaLabel: string · invalid?: TTextareaVariants['invalid'] · prompt?: string · id?: string · placeholder?: string · rows?: number · maxLength?: number · isDisabled?: boolean _(extends IWithClassName, IWithDataTestId)_
 Variants: invalid: (boolean) · hasPrompt: (boolean)
 
 ### ThemeToggle — `atoms/theme-toggle/theme-toggle.tsx`
 
 A pure, controlled theme-switch button.
-Props: className?: string · isDark: boolean · onToggle: () => void · mounted?: boolean · lightLabel?: string · darkLabel?: string _(extends IWithDataTestId)_
+Props: className?: string · isDark: boolean · onToggle: () => void · isMounted?: boolean · lightLabel?: string · darkLabel?: string _(extends IWithDataTestId)_
 
 ## Molecules
 
@@ -206,8 +206,8 @@ Props: children?: TCompoundChildren<typeof PopoverMenuSlotParts> _(extends IWith
 
 Slots:
 
-- **PopoverMenu.Trigger** — icon-button that opens/closes a `PopoverMenu.Panel`. Props: ariaLabel: string · open: boolean · panelId: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
-- **PopoverMenu.Panel** — the non-modal menu surface (`role="menu"`) a `PopoverMenu.Trigger` opens. Props: id: string · open: boolean · ariaLabel?: string · children?: ReactNode · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
+- **PopoverMenu.Trigger** — icon-button that opens/closes a `PopoverMenu.Panel`. Props: ariaLabel: string · isOpen: boolean · panelId: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
+- **PopoverMenu.Panel** — the non-modal menu surface (`role="menu"`) a `PopoverMenu.Trigger` opens. Props: id: string · isOpen: boolean · ariaLabel?: string · children?: ReactNode · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
 - **PopoverMenu.Item** — a single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). Props: className?: string · icon?: ReactNode
 - **PopoverMenu.Separator** — a thin hairline dividing groups of `PopoverMenu.Item`s inside a `PopoverMenu.Panel` (e.g. a "Copy link" action from a list of social-share links). Props: className?: string _(extends IWithDataTestId)_
 
@@ -253,12 +253,12 @@ Props: tags: (string | ITagListItem)[] · linkAs?: TAnchorElementType _(extends 
 ### TerminalChip — `molecules/terminal-chip/terminal-chip.tsx`
 
 TerminalChip molecule — a monospace, terminal-prompt-styled chip for the wordmark, with an optional blinking cursor.
-Props: prefix: string · suffix?: string · showCursor?: boolean _(extends IWithClassName, IWithDataTestId)_
+Props: prefix: string · suffix?: string · hasCursor?: boolean _(extends IWithClassName, IWithDataTestId)_
 
 ### Toast — `molecules/toast/toast.tsx`
 
 a single compact terminal-window notification confirming or reporting the result of an engagement action (bookmark, rating, comment, subscription, auth).
-Props: type: TToastType · isLoading?: boolean · command?: string · state?: string · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · paused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> · plain?: boolean · className?: string _(extends IWithDataTestId)_
+Props: type: TToastType · isLoading?: boolean · command?: string · state?: string · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · isPaused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> · isPlain?: boolean · className?: string _(extends IWithDataTestId)_
 Variants: type: TOAST_TYPE.SUCCESS|TOAST_TYPE.INFO|TOAST_TYPE.WARNING|TOAST_TYPE.ERROR · phase: entering|visible|leaving · hasTime: (boolean) · paused: (boolean)
 
 ### WindowChrome — `molecules/window-chrome/window-chrome.tsx`
