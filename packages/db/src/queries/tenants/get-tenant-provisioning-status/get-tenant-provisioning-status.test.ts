@@ -1,4 +1,4 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TTenantProvisioningSteps } from '@blog/db/schema/tenants';
 import { createTestDb } from '@blog/db/testing/create-test-db';

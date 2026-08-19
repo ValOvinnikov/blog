@@ -1,4 +1,4 @@
-import { GRANTED_VIA } from '@blog/config/constants';
+import { GRANTED_VIA } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
   applyMigrationFile,

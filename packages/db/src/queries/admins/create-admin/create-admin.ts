@@ -1,5 +1,5 @@
-import type { TAdminRole, TGrantedVia } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
+import type { TAdminRole, TGrantedVia } from '@blog/db/constants';
 import { admins, type TAdmin } from '@blog/db/schema/admins';
 import { eq } from 'drizzle-orm';
 

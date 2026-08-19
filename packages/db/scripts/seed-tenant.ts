@@ -29,14 +29,14 @@
  * build (the condition Next.js itself sets), so this plain-Node script can
  * reuse the real query functions instead of duplicating their SQL.
  */
+import { getDb } from '@blog/db/client';
 import {
   MEMBERSHIP_ROLE,
   TENANT_PLAN,
   TENANT_STATUS,
   type TTenantPlan,
   type TTenantStatus,
-} from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
+} from '@blog/db/constants';
 import { createMembership } from '@blog/db/queries/memberships';
 import { addTenantDomain } from '@blog/db/queries/tenant-domains';
 import {

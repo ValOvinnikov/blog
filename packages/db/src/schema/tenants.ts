@@ -6,7 +6,7 @@ import {
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
   type TTenantStatus,
-} from '@blog/config/constants';
+} from '@blog/db/constants';
 import {
   jsonb,
   pgEnum,

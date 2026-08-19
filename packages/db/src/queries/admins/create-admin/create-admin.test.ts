@@ -1,4 +1,4 @@
-import { ADMIN_ROLE, GRANTED_VIA } from '@blog/config/constants';
+import { ADMIN_ROLE, GRANTED_VIA } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import { eq } from 'drizzle-orm';

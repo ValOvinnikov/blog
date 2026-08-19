@@ -1,4 +1,4 @@
-import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/config/constants';
+import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
 import {
   pgEnum,
   pgTable,

@@ -1,11 +1,10 @@
+import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
+import { getDb } from '@blog/db/client';
 import {
-  ERROR_CODE,
-  type TErrorCode,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
-} from '@blog/config/constants';
-import { getDb } from '@blog/db/client';
+} from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import type { TResult } from '@blog/utils';
 import { eq, sql } from 'drizzle-orm';

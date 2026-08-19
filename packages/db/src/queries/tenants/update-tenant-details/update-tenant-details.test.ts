@@ -3,7 +3,7 @@ import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
-} from '@blog/config/constants';
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import {
