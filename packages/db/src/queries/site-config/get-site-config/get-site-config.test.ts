@@ -1,4 +1,5 @@
-import { PRESET_ID, TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
+import { PRESET_ID } from '@blog/config/constants';
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';

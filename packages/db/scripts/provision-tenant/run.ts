@@ -17,7 +17,7 @@ import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStep,
-} from '@blog/config/constants';
+} from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import { loadProvisionEnv, type TProvisionEnv } from './lib/env';

@@ -1,5 +1,5 @@
-import type { TTenantProvisioningStatus } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
+import type { TTenantProvisioningStatus } from '@blog/db/constants';
 import {
   tenants,
   type TTenantProvisioningSteps,

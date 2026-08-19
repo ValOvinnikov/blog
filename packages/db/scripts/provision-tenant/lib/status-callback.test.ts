@@ -1,7 +1,7 @@
 import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/config/constants';
+} from '@blog/db/constants';
 
 import { reportStepStatus } from './status-callback';
 

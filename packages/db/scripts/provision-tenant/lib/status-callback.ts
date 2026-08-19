@@ -1,7 +1,7 @@
 import type {
   TTenantProvisioningStep,
   TTenantProvisioningStepStatus,
-} from '@blog/config/constants';
+} from '@blog/db/constants';
 
 import { sanitizeLogMessage } from './sanitize-log-message';
 

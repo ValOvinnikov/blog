@@ -1,5 +1,5 @@
-import type { TMembershipRole } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
+import type { TMembershipRole } from '@blog/db/constants';
 import { memberships, type TMembership } from '@blog/db/schema/memberships';
 import { and, eq } from 'drizzle-orm';
 

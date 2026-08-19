@@ -1,9 +1,6 @@
-import {
-  ERROR_CODE,
-  TENANT_STATUS,
-  type TErrorCode,
-} from '@blog/config/constants';
+import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
+import { TENANT_STATUS } from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import type { TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';

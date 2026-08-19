@@ -3,7 +3,7 @@ import {
   GRANTED_VIA,
   type TAdminRole,
   type TGrantedVia,
-} from '@blog/config/constants';
+} from '@blog/db/constants';
 import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { users } from './auth';

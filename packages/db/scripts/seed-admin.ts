@@ -23,12 +23,8 @@
  * build (the condition Next.js itself sets), so this plain-Node script can
  * reuse the real query functions instead of duplicating their SQL.
  */
-import {
-  ADMIN_ROLE,
-  GRANTED_VIA,
-  type TAdminRole,
-} from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
+import { ADMIN_ROLE, GRANTED_VIA, type TAdminRole } from '@blog/db/constants';
 import { createAdmin, getAdminByUserId } from '@blog/db/queries/admins';
 import { users } from '@blog/db/schema/auth';
 import { eq } from 'drizzle-orm';
