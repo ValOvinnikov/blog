@@ -74,12 +74,12 @@ export function DeleteAccountControl({ handle }: TDeleteAccountControlProps) {
         onChange={setTyped}
         ariaLabel={t('deleteConfirmAriaLabel')}
         placeholder={t('deleteConfirmPlaceholder', { handle })}
-        disabled={isPending}
+        isDisabled={isPending}
         className={s.field()}
       />
       <Button
         variant="danger"
-        disabled={!isArmed || isPending}
+        isDisabled={!isArmed || isPending}
         aria-busy={isPending}
         onClick={handleDelete}
       >

@@ -31,5 +31,5 @@ export const WithMoonIcon: TStory = {
 };
 
 export const Disabled: TStory = {
-  args: { disabled: true },
+  args: { isDisabled: true },
 };

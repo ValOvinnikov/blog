@@ -4,7 +4,7 @@ import type { TToken } from '../parse-theme-tokens';
 
 export type TTypeSpecimensProps = {
   tokens: TToken[];
-  fontOnly?: boolean;
+  isFontOnly?: boolean;
 };
 
 const SAMPLE = 'The quick brown fox jumps over the lazy dog';
@@ -14,13 +14,15 @@ const SAMPLE = 'The quick brown fox jumps over the lazy dog';
  * declared value. Rows are divided by a hairline so each specimen is clearly
  * separated (mirrors the colour table's row rhythm).
  */
-export const TypeSpecimens = ({ tokens, fontOnly }: TTypeSpecimensProps) => (
+export const TypeSpecimens = ({ tokens, isFontOnly }: TTypeSpecimensProps) => (
   <div className="divide-y divide-border">
     {tokens.map((token) => {
-      const style: CSSProperties = fontOnly
+      const style: CSSProperties = isFontOnly
         ? { fontFamily: token.value }
         : { fontSize: token.value };
-      const descriptor = fontOnly ? `font-${token.name}` : `text-${token.name}`;
+      const descriptor = isFontOnly
+        ? `font-${token.name}`
+        : `text-${token.name}`;
 
       return (
         <div key={token.cssVar} className="py-5 first:pt-0">

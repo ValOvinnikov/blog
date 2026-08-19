@@ -55,7 +55,7 @@ export const MobileClosed: TStory = {
   globals: { viewport: 'phone' },
   args: {
     mobileToggle: {
-      open: false,
+      isOpen: false,
       onToggle: () => {},
       ariaLabel: 'Toggle navigation menu',
       panelId: 'primary-navigation-panel',
@@ -67,7 +67,7 @@ export const MobileOpen: TStory = {
   globals: { viewport: 'phone' },
   args: {
     mobileToggle: {
-      open: true,
+      isOpen: true,
       onToggle: () => {},
       ariaLabel: 'Toggle navigation menu',
       panelId: 'primary-navigation-panel',
@@ -76,14 +76,14 @@ export const MobileOpen: TStory = {
 };
 
 const InteractiveMobileDemo = () => {
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <PrimaryNavigation
       links={links}
       mobileToggle={{
-        open,
-        onToggle: () => setOpen((current) => !current),
+        isOpen,
+        onToggle: () => setIsOpen((current) => !current),
         ariaLabel: 'Toggle navigation menu',
         panelId: 'primary-navigation-interactive-panel',
       }}

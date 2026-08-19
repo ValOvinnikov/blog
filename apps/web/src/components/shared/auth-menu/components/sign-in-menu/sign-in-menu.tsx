@@ -13,13 +13,13 @@ import { signInMenuVariants } from './sign-in-menu-variants';
 
 export type TSignInMenuProps = {
   panelId: string;
-  open: boolean;
+  isOpen: boolean;
   toggle: () => void;
   triggerRef: RefObject<HTMLButtonElement | null>;
   panelRef: RefObject<HTMLDivElement | null>;
   oauthError: string | null;
   /** Renders the panel without the `WindowChrome` terminal shell. */
-  plain?: boolean;
+  isPlain?: boolean;
 };
 
 /**
@@ -32,12 +32,12 @@ export type TSignInMenuProps = {
  */
 export function SignInMenu({
   panelId,
-  open,
+  isOpen,
   toggle,
   triggerRef,
   panelRef,
   oauthError,
-  plain = false,
+  isPlain = false,
 }: TSignInMenuProps) {
   const t = useTranslations('authMenu');
   const {
@@ -48,7 +48,7 @@ export function SignInMenu({
     emailError,
     emailFormRef,
     handleEmailSubmit,
-  } = useEmailSignIn(open);
+  } = useEmailSignIn(isOpen);
   const { panel, window: windowSize } = authMenuVariants();
   const {
     signInTrigger,
@@ -85,7 +85,7 @@ export function SignInMenu({
 
   const menuContent = (
     <>
-      {plain ? (
+      {isPlain ? (
         <Text variant="card" className={plainPrompt()}>
           {t('chooseProviderPrompt')}
         </Text>
@@ -142,7 +142,7 @@ export function SignInMenu({
               />
             }
             invalid={emailError}
-            disabled={emailStep === 'submitting'}
+            isDisabled={emailStep === 'submitting'}
           />
           {emailError && (
             <p role="status" aria-live="polite" className={emailHint()}>
@@ -152,7 +152,7 @@ export function SignInMenu({
           <div className={emailFormActions()}>
             <Button
               size={Size.SM}
-              disabled={emailStep === 'submitting'}
+              isDisabled={emailStep === 'submitting'}
               onClick={handleEmailSubmit}
             >
               {emailStep === 'submitting' ? t('sending') : t('sendLink')}
@@ -169,7 +169,7 @@ export function SignInMenu({
       <PopoverMenu.Trigger
         ref={triggerRef}
         ariaLabel={t('signIn')}
-        open={open}
+        isOpen={isOpen}
         panelId={panelId}
         onClick={toggle}
         className={signInTrigger()}
@@ -179,11 +179,11 @@ export function SignInMenu({
       <PopoverMenu.Panel
         ref={panelRef}
         id={panelId}
-        open={open}
+        isOpen={isOpen}
         ariaLabel={t('panelAriaLabel')}
-        className={plain ? windowSize() : panel()}
+        className={isPlain ? windowSize() : panel()}
       >
-        {plain ? (
+        {isPlain ? (
           <>
             <Text variant="card" className={plainLabel()}>
               {t('signIn')}
@@ -201,7 +201,7 @@ export function SignInMenu({
           </WindowChrome>
         )}
       </PopoverMenu.Panel>
-      {Boolean(oauthError) && !open && (
+      {Boolean(oauthError) && !isOpen && (
         <p role="alert" className={errorNotice()}>
           {t('oauthError')}
         </p>

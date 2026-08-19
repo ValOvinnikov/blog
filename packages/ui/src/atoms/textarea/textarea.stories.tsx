@@ -33,6 +33,10 @@ export const WithMaxLength: TStory = {
   args: { maxLength: 280 },
 };
 
+export const Disabled: TStory = {
+  args: { value: 'Locked for editing.', isDisabled: true },
+};
+
 const InteractiveDemo = () => {
   const [value, setValue] = useState('');
 

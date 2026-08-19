@@ -177,7 +177,7 @@ export function TenantDetailsForm() {
           </div>
 
           <div className={actions()}>
-            <Button type="button" onClick={handleSubmit} disabled={isPending}>
+            <Button type="button" onClick={handleSubmit} isDisabled={isPending}>
               {isPending ? t('submittingButton') : t('submitButton')}
             </Button>
           </div>
@@ -188,7 +188,7 @@ export function TenantDetailsForm() {
             <Spinner
               label={t('submittingButton')}
               size={Size.LG}
-              showLabel={true}
+              hasLabel={true}
             />
           </div>
         )}

@@ -95,7 +95,7 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
     it('renders the toggle button with the given ariaLabel', () => {
       setup({
         mobileToggle: {
-          open: false,
+          isOpen: false,
           onToggle: () => {},
           ariaLabel,
           panelId,
@@ -105,10 +105,10 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       expect(screen.getByRole('button', { name: ariaLabel })).toBeVisible();
     });
 
-    it('reflects open as aria-expanded and links the toggle to the panel via aria-controls/id', () => {
+    it('reflects isOpen as aria-expanded and links the toggle to the panel via aria-controls/id', () => {
       setup({
         mobileToggle: {
-          open: true,
+          isOpen: true,
           onToggle: () => {},
           ariaLabel,
           panelId,
@@ -123,10 +123,10 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       ).toHaveAttribute('id', panelId);
     });
 
-    it('hides the panel when open is false and shows it when open is true', () => {
+    it('hides the panel when isOpen is false and shows it when isOpen is true', () => {
       const { rerender } = setup({
         mobileToggle: {
-          open: false,
+          isOpen: false,
           onToggle: () => {},
           ariaLabel,
           panelId,
@@ -140,7 +140,12 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
       rerender(
         <PrimaryNavigation
           links={links}
-          mobileToggle={{ open: true, onToggle: () => {}, ariaLabel, panelId }}
+          mobileToggle={{
+            isOpen: true,
+            onToggle: () => {},
+            ariaLabel,
+            panelId,
+          }}
         />,
       );
 
@@ -156,7 +161,7 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
     it('calls onToggle when the toggle button is clicked', async () => {
       const onToggle = vi.fn();
       setup({
-        mobileToggle: { open: false, onToggle, ariaLabel, panelId },
+        mobileToggle: { isOpen: false, onToggle, ariaLabel, panelId },
       });
 
       await userEvent.click(screen.getByRole('button', { name: ariaLabel }));

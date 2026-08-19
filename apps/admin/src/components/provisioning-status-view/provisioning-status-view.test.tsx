@@ -252,7 +252,7 @@ describe(ProvisioningStatusView, () => {
 
     const slugInput = screen.getByRole('textbox', { name: 'Slug' });
     expect(slugInput).toHaveValue('acme');
-    expect(slugInput).toHaveAttribute('readonly');
+    expect(slugInput).toBeDisabled();
     expect(
       screen.queryByRole('button', { name: 'Save changes' }),
     ).not.toBeInTheDocument();

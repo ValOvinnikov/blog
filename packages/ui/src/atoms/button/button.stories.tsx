@@ -41,7 +41,7 @@ export const Danger: TStory = {
 };
 
 export const DangerDisabled: TStory = {
-  args: { children: 'delete account', variant: 'danger', disabled: true },
+  args: { children: 'delete account', variant: 'danger', isDisabled: true },
 };
 
 export const Small: TStory = {
@@ -53,5 +53,5 @@ export const Large: TStory = {
 };
 
 export const Disabled: TStory = {
-  args: { children: 'Disabled', disabled: true },
+  args: { children: 'Disabled', isDisabled: true },
 };

@@ -12,7 +12,7 @@ export type THueSliderProps = {
   ariaLabel: string;
   value: number;
   onChange: (value: number) => void;
-  disabled?: boolean;
+  isDisabled?: boolean;
   /** The gradient track — callers own the color formula (`accentHueGradient`). */
   trackStyle?: CSSProperties;
   className?: string;
@@ -27,7 +27,7 @@ export function HueSlider({
   ariaLabel,
   value,
   onChange,
-  disabled,
+  isDisabled,
   trackStyle,
   className,
 }: THueSliderProps) {
@@ -42,7 +42,7 @@ export function HueSlider({
       }}
       min={HUE_MIN}
       max={HUE_MAX}
-      disabled={disabled}
+      disabled={isDisabled}
       className={root({ class: className })}
     >
       <Slider.Control className={control()}>

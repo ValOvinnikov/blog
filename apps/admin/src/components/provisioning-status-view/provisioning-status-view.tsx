@@ -239,7 +239,7 @@ export function ProvisioningStatusView({
             type="button"
             variant="primary"
             onClick={handleStart}
-            disabled={isStarting}
+            isDisabled={isStarting}
           >
             {isStarting ? t('startingButton') : t('startButton')}
           </Button>
@@ -296,7 +296,7 @@ export function ProvisioningStatusView({
                         type="button"
                         variant="ghost"
                         onClick={() => handleRetry(stepKey)}
-                        disabled={isRetrying}
+                        isDisabled={isRetrying}
                       >
                         {isRetrying ? t('retryingButton') : t('retryButton')}
                       </Button>
@@ -309,7 +309,7 @@ export function ProvisioningStatusView({
         </aside>
 
         <div className={detailsColumn()}>
-          <TenantDetailsPanel tenant={tenant} editable={allIdle} />
+          <TenantDetailsPanel tenant={tenant} isEditable={allIdle} />
           {provisioningStatus === TENANT_PROVISIONING_STATUS.READY && (
             <LinkButton
               as={Link}

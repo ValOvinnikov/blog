@@ -23,7 +23,7 @@ export interface INavItem {
 
 export interface IPrimaryNavigationMobileToggleProps {
   /** Whether the mobile dropdown panel is currently open — drives `aria-expanded` on the toggle button, the toggle icon, and the panel's visibility. The caller (`apps/web`) owns the open/closed state. */
-  open: boolean;
+  isOpen: boolean;
   /** Click handler wired to the toggle button — the caller owns the state transition. */
   onToggle: () => void;
   /** Accessible name for the toggle button — never hardcoded here. */
@@ -39,7 +39,7 @@ export type TPrimaryNavigationProps = IWithClassName &
     ariaLabel?: string;
     /** Component each NavLink renders as — defaults to a plain `<a>`. Pass the app router's Link to get client-side navigation. */
     linkAs?: TAnchorElementType;
-    /** Enables the responsive mobile toggle + dropdown panel below the `lg` breakpoint: the inline links hide, a hamburger toggle appears, and a dropdown panel holding the same links shows/hides with `open`. Omit to keep links always inline (today's behaviour). */
+    /** Enables the responsive mobile toggle + dropdown panel below the `lg` breakpoint: the inline links hide, a hamburger toggle appears, and a dropdown panel holding the same links shows/hides with `isOpen`. Omit to keep links always inline (today's behaviour). */
     mobileToggle?: IPrimaryNavigationMobileToggleProps;
   };
 
@@ -96,19 +96,19 @@ export const PrimaryNavigation = ({
           <IconButton
             ariaLabel={mobileToggle.ariaLabel}
             title={mobileToggle.ariaLabel}
-            aria-expanded={mobileToggle.open}
+            aria-expanded={mobileToggle.isOpen}
             aria-controls={mobileToggle.panelId}
             onClick={mobileToggle.onToggle}
             className={toggle()}
           >
             <Icon
-              name={mobileToggle.open ? ICONS.CLOSE : ICONS.MENU}
+              name={mobileToggle.isOpen ? ICONS.CLOSE : ICONS.MENU}
               size={Size.MD}
             />
           </IconButton>
           <div
             id={mobileToggle.panelId}
-            hidden={!mobileToggle.open}
+            hidden={!mobileToggle.isOpen}
             className={panel()}
             data-testid="primary-navigation-mobile-panel"
           >

@@ -47,8 +47,8 @@ describe(`<${ThemeToggle.name}/>`, () => {
     );
   });
 
-  it('renders the placeholder and no icon when mounted is false', () => {
-    setup({ mounted: false });
+  it('renders the placeholder and no icon when isMounted is false', () => {
+    setup({ isMounted: false });
     const button = screen.getByRole('button');
     expect(button.querySelector('svg')).not.toBeInTheDocument();
     expect(
@@ -56,8 +56,8 @@ describe(`<${ThemeToggle.name}/>`, () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the icon when mounted is true', () => {
-    setup({ mounted: true });
+  it('renders the icon when isMounted is true', () => {
+    setup({ isMounted: true });
     expect(screen.getByRole('button').querySelector('svg')).toBeInTheDocument();
   });
 });

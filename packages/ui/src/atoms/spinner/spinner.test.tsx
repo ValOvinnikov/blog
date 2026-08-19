@@ -20,13 +20,13 @@ describe(`<${Spinner.name}/>`, () => {
     expect(screen.queryByText(label)).not.toBeInTheDocument();
   });
 
-  it('renders the label as visible text when showLabel is true', () => {
-    setup({ showLabel: true });
+  it('renders the label as visible text when hasLabel is true', () => {
+    setup({ hasLabel: true });
     expect(screen.getByText(label)).toBeVisible();
   });
 
   it('hides the visible label text from assistive tech so it is not announced twice alongside the root aria-label', () => {
-    setup({ showLabel: true });
+    setup({ hasLabel: true });
     expect(screen.getByText(label)).toHaveAttribute('aria-hidden', 'true');
   });
 

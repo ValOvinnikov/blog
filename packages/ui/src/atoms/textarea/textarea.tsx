@@ -15,7 +15,7 @@ export type TTextareaProps = IWithClassName &
     placeholder?: string;
     rows?: number;
     maxLength?: number;
-    disabled?: boolean;
+    isDisabled?: boolean;
   };
 
 /**
@@ -35,7 +35,7 @@ export const Textarea = ({
   dataTestId,
   id,
   placeholder,
-  disabled,
+  isDisabled,
 }: TTextareaProps) => {
   const {
     root,
@@ -57,7 +57,7 @@ export const Textarea = ({
       <textarea
         id={id}
         placeholder={placeholder}
-        disabled={disabled}
+        disabled={isDisabled}
         rows={rows}
         maxLength={maxLength}
         value={value}

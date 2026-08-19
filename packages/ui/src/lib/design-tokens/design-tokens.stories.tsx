@@ -45,7 +45,7 @@ export const Typography: TStory = {
 export const Fonts: TStory = {
   render: () =>
     section('Fonts', tokensByCategory.font, (t) => (
-      <TypeSpecimens tokens={t} fontOnly={true} />
+      <TypeSpecimens tokens={t} isFontOnly={true} />
     )),
 };
 

@@ -76,4 +76,14 @@ describe(`<${Textarea.name}/>`, () => {
     const { container } = setup({ className: 'custom-class' });
     expect(container.firstChild).toHaveClass('custom-class');
   });
+
+  it('is not disabled by default', () => {
+    setup();
+    expect(screen.getByRole('textbox')).toBeEnabled();
+  });
+
+  it('renders the native disabled attribute when isDisabled is true', () => {
+    setup({ isDisabled: true });
+    expect(screen.getByRole('textbox')).toBeDisabled();
+  });
 });

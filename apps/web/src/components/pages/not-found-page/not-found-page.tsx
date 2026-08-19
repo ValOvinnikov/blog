@@ -11,7 +11,7 @@ import {
 
 export interface INotFoundPageProps {
   /** Renders the plain 404 body with no `TerminalChip`/prompt-line styling. */
-  plain?: boolean;
+  isPlain?: boolean;
 }
 
 const s = notFoundPageVariants();
@@ -28,10 +28,10 @@ const {
  * `Header`/`Footer` chrome lives in `[locale]/layout.tsx`), so this stays a
  * self-contained, centered composition: no site chrome, just a short
  * explanation and a link home. Renders the terminal-styled `TerminalChip`/
- * prompt-line treatment when `plain` is unset, or a plain equivalent when
- * `plain` is true (`chromeOn: false`).
+ * prompt-line treatment when `isPlain` is unset, or a plain equivalent when
+ * `isPlain` is true (`chromeOn: false`).
  */
-export const NotFoundPage = ({ plain = false }: INotFoundPageProps) => {
+export const NotFoundPage = ({ isPlain = false }: INotFoundPageProps) => {
   const t = useTranslations('notFound');
 
   return (
@@ -39,7 +39,7 @@ export const NotFoundPage = ({ plain = false }: INotFoundPageProps) => {
       <Heading level={1} visual="hero">
         404
       </Heading>
-      {plain ? (
+      {isPlain ? (
         <Text className={s.plainCopy()}>{t('commandNotFound')}</Text>
       ) : (
         <TerminalChip
@@ -49,7 +49,7 @@ export const NotFoundPage = ({ plain = false }: INotFoundPageProps) => {
         />
       )}
       <Text className={s.copy()}>{t('description')}</Text>
-      {plain ? (
+      {isPlain ? (
         <SmartLink href="/" className={s.plainLink()}>
           {t('returnHome')}
           <Icon

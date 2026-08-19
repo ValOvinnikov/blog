@@ -96,7 +96,7 @@ export function NewsletterSubscriptionControl({
   return (
     <Button
       variant="ghost"
-      disabled={isPending}
+      isDisabled={isPending}
       aria-busy={isPending}
       onClick={handleClick}
     >

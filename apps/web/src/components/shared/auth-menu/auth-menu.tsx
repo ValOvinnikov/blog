@@ -22,10 +22,10 @@ import { SignInMenu } from './components/sign-in-menu/sign-in-menu';
  */
 export interface IAuthMenuProps {
   /** Renders both branches' panel without the `WindowChrome` shell. */
-  plain?: boolean;
+  isPlain?: boolean;
 }
 
-export function AuthMenu({ plain = false }: IAuthMenuProps) {
+export function AuthMenu({ isPlain = false }: IAuthMenuProps) {
   const sessionResult = useSession();
   const oauthError = useOAuthErrorParam();
   const t = useTranslations('authMenu');
@@ -50,14 +50,14 @@ export function AuthMenu({ plain = false }: IAuthMenuProps) {
     return (
       <AccountMenu
         panelId={panelId}
-        open={open}
+        isOpen={open}
         toggle={toggle}
         triggerRef={triggerRef}
         panelRef={panelRef}
         name={name}
         email={email}
         image={image}
-        plain={plain}
+        isPlain={isPlain}
       />
     );
   }
@@ -65,12 +65,12 @@ export function AuthMenu({ plain = false }: IAuthMenuProps) {
   return (
     <SignInMenu
       panelId={panelId}
-      open={open}
+      isOpen={open}
       toggle={toggle}
       triggerRef={triggerRef}
       panelRef={panelRef}
       oauthError={oauthError}
-      plain={plain}
+      isPlain={isPlain}
     />
   );
 }

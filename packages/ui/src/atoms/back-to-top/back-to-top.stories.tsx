@@ -16,9 +16,9 @@ export default meta;
 type TStory = StoryObj<typeof BackToTop>;
 
 export const Visible: TStory = {
-  args: { visible: true },
+  args: { isVisible: true },
 };
 
 export const Hidden: TStory = {
-  args: { visible: false },
+  args: { isVisible: false },
 };

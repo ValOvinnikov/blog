@@ -32,8 +32,8 @@ describe(TenantDetailsPanel, () => {
     });
   });
 
-  describe('locked (editable=false)', () => {
-    it('renders every field, including plan, as a read-only input with an accessible name', () => {
+  describe('locked (isEditable=false)', () => {
+    it('renders every field, including plan, as a disabled input with an accessible name', () => {
       const tenant = makeTenant({
         name: 'Acme Inc.',
         slug: 'acme',
@@ -41,51 +41,39 @@ describe(TenantDetailsPanel, () => {
         plan: TENANT_PLAN.GROWTH,
         locale: 'EN',
       });
-      render(<TenantDetailsPanel tenant={tenant} editable={false} />);
+      render(<TenantDetailsPanel tenant={tenant} isEditable={false} />);
 
       expect(screen.getByText('Tenant details')).toBeVisible();
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
       expect(nameInput).toHaveValue('Acme Inc.');
-      expect(nameInput).toHaveAttribute('readonly');
+      expect(nameInput).toBeDisabled();
 
       const slugInput = screen.getByRole('textbox', { name: 'Slug' });
       expect(slugInput).toHaveValue('acme');
-      expect(slugInput).toHaveAttribute('readonly');
+      expect(slugInput).toBeDisabled();
 
       const domainInput = screen.getByRole('textbox', {
         name: 'Primary domain',
       });
       expect(domainInput).toHaveValue('acme.example.com');
-      expect(domainInput).toHaveAttribute('readonly');
+      expect(domainInput).toBeDisabled();
 
       const localeInput = screen.getByRole('textbox', { name: 'Locale' });
       expect(localeInput).toHaveValue('EN');
-      expect(localeInput).toHaveAttribute('readonly');
+      expect(localeInput).toBeDisabled();
 
-      // plan has no HTML read-only state for a radiogroup, so it renders as
-      // a read-only text field too — same structure as the other four,
+      // plan has no HTML disabled state for a radiogroup, so it renders as
+      // a disabled text field too — same structure as the other four,
       // and (unlike a bare labelled span) with a real accessible name.
       const planInput = screen.getByRole('textbox', { name: 'Plan' });
       expect(planInput).toHaveValue('Growth');
-      expect(planInput).toHaveAttribute('readonly');
-    });
-
-    it('keeps read-only fields focusable and in the tab order, unlike a disabled field', () => {
-      const tenant = makeTenant();
-      render(<TenantDetailsPanel tenant={tenant} editable={false} />);
-
-      for (const name of ['Name', 'Slug', 'Primary domain', 'Locale', 'Plan']) {
-        const input = screen.getByRole('textbox', { name });
-        expect(input).toHaveAttribute('readonly');
-        expect(input).not.toBeDisabled();
-        expect(input).not.toHaveAttribute('tabindex', '-1');
-      }
+      expect(planInput).toBeDisabled();
     });
 
     it('renders no enabled editing affordances — no Save button, no editable plan control', () => {
       const tenant = makeTenant();
-      render(<TenantDetailsPanel tenant={tenant} editable={false} />);
+      render(<TenantDetailsPanel tenant={tenant} isEditable={false} />);
 
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
       expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
@@ -93,8 +81,8 @@ describe(TenantDetailsPanel, () => {
     });
   });
 
-  describe('editable (editable=true)', () => {
-    it('renders every field as an editable, non-read-only control, pre-filled from the tenant', () => {
+  describe('editable (isEditable=true)', () => {
+    it('renders every field as an editable, enabled control, pre-filled from the tenant', () => {
       const tenant = makeTenant({
         name: 'Acme Inc.',
         slug: 'acme',
@@ -102,11 +90,11 @@ describe(TenantDetailsPanel, () => {
         plan: TENANT_PLAN.FREE,
         locale: 'EN',
       });
-      render(<TenantDetailsPanel tenant={tenant} editable={true} />);
+      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
       expect(nameInput).toHaveValue('Acme Inc.');
-      expect(nameInput).not.toHaveAttribute('readonly');
+      expect(nameInput).not.toBeDisabled();
 
       expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('acme');
       expect(
@@ -129,7 +117,7 @@ describe(TenantDetailsPanel, () => {
       });
       const user = userEvent.setup();
       const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
-      render(<TenantDetailsPanel tenant={tenant} editable={true} />);
+      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
 
       await user.clear(screen.getByRole('textbox', { name: 'Name' }));
       await user.type(
@@ -154,7 +142,7 @@ describe(TenantDetailsPanel, () => {
       });
       const user = userEvent.setup();
       const tenant = makeTenant();
-      render(<TenantDetailsPanel tenant={tenant} editable={true} />);
+      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
 
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
@@ -174,7 +162,7 @@ describe(TenantDetailsPanel, () => {
       });
       const user = userEvent.setup();
       const tenant = makeTenant();
-      render(<TenantDetailsPanel tenant={tenant} editable={true} />);
+      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
 
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
       await screen.findByText('Enter a tenant name.');
@@ -203,7 +191,7 @@ describe(TenantDetailsPanel, () => {
       });
       const user = userEvent.setup();
       const tenant = makeTenant();
-      render(<TenantDetailsPanel tenant={tenant} editable={true} />);
+      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
 
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 

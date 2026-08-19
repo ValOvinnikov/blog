@@ -40,8 +40,8 @@ const ToastContext = createContext<IUseToast | undefined>(undefined);
 
 export interface IToastProviderProps {
   children: ReactNode;
-  /** Renders every `Toast` in plain mode — see `Toast`'s own `plain` prop. */
-  plain?: boolean;
+  /** Renders every `Toast` in plain mode — see `Toast`'s own `isPlain` prop. */
+  isPlain?: boolean;
 }
 
 const s = toastProviderVariants();
@@ -64,7 +64,7 @@ const s = toastProviderVariants();
  */
 export const ToastProvider = ({
   children,
-  plain = false,
+  isPlain = false,
 }: IToastProviderProps) => {
   // Lazy `useState` initializer (not `useRef`) — a stable, once-per-mount
   // store instance that's safe to read during render, unlike a ref.
@@ -164,7 +164,7 @@ export const ToastProvider = ({
             <Toast
               type={record.type}
               isLoading={record.isLoading}
-              {...(!plain && {
+              {...(!isPlain && {
                 command: record.command,
                 state:
                   record.count && record.count > 1
@@ -184,11 +184,11 @@ export const ToastProvider = ({
                 }
               }
               dismissLabel={t('dismissLabel')}
-              paused={record.paused}
+              isPaused={record.paused}
               durationMs={record.durationMs}
               onDismiss={() => store.actions.dismiss(record.id)}
               phase={record.phase}
-              plain={plain}
+              isPlain={isPlain}
               dataTestId={`toast-${record.id}`}
             />
           </div>

@@ -27,7 +27,7 @@ export const BrandLockup = ({
 
   return (
     <div className={root({ class: className })} data-testid={dataTestId}>
-      <BrandMark src={src} size={size} stacked={Boolean(specLine)} />
+      <BrandMark src={src} size={size} isStacked={Boolean(specLine)} />
       {specLine && <span className={specLineSlot()}>{specLine}</span>}
     </div>
   );

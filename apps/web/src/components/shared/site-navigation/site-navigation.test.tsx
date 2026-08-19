@@ -13,7 +13,7 @@ vi.mock('@web/i18n/navigation', () => ({
 }));
 
 type TFakeMobileToggle = {
-  open: boolean;
+  isOpen: boolean;
   onToggle: () => void;
   ariaLabel: string;
   panelId: string;
@@ -51,13 +51,13 @@ vi.mock('@blog/ui/molecules', () => ({
         <>
           <button
             type="button"
-            aria-expanded={mobileToggle.open}
+            aria-expanded={mobileToggle.isOpen}
             aria-controls={mobileToggle.panelId}
             onClick={mobileToggle.onToggle}
           >
             {mobileToggle.ariaLabel}
           </button>
-          <div id={mobileToggle.panelId} hidden={!mobileToggle.open}>
+          <div id={mobileToggle.panelId} hidden={!mobileToggle.isOpen}>
             {links.map((link) => (
               <a key={link.href} href={link.href}>
                 {link.label}

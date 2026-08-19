@@ -8,7 +8,7 @@ export type TPopoverMenuPanelProps = IWithClassName &
     /** `id` referenced by the triggering `PopoverMenu.Trigger`'s `aria-controls`. */
     id: string;
     /** Whether the panel is visible — fully controlled by the caller. */
-    open: boolean;
+    isOpen: boolean;
     ariaLabel?: string;
     children?: ReactNode;
     /** Forwarded to the underlying panel `<div>` so the caller can manage focus-trap/outside-click detection against the real node. */
@@ -19,11 +19,11 @@ export type TPopoverMenuPanelProps = IWithClassName &
  * PopoverMenuPanel — the non-modal menu surface (`role="menu"`) a
  * `PopoverMenu.Trigger` opens. Presentational only: visibility, focus-trap,
  * and Escape/outside-click dismissal are the caller's responsibility —
- * `@blog/ui` only reads the `open` prop.
+ * `@blog/ui` only reads the `isOpen` prop.
  */
 export const PopoverMenuPanel = ({
   id,
-  open,
+  isOpen,
   ariaLabel,
   ref,
   className,
@@ -35,7 +35,7 @@ export const PopoverMenuPanel = ({
     id={id}
     role="menu"
     aria-label={ariaLabel}
-    hidden={!open}
+    hidden={!isOpen}
     data-testid={dataTestId}
     className={popoverMenuPanelVariants({ class: className })}
   >

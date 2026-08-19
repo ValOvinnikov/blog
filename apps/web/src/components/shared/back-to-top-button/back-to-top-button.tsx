@@ -58,7 +58,7 @@ export const BackToTopButton = () => {
 
   return (
     <BackToTop
-      visible={scrolledPastViewport && !footerVisible}
+      isVisible={scrolledPastViewport && !footerVisible}
       onClick={handleClick}
       ariaLabel={t('backToTop.ariaLabel')}
     />

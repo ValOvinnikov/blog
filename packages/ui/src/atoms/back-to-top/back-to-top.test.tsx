@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { BackToTop } from './back-to-top';
 
 const setup = customRender(BackToTop, {
-  visible: true,
+  isVisible: true,
   onClick: vi.fn(),
   ariaLabel: 'Back to top',
 });
@@ -15,15 +15,15 @@ describe(`<${BackToTop.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Back to top' })).toBeVisible();
   });
 
-  it('is visible and not inert when visible is true', () => {
+  it('is visible and not inert when isVisible is true', () => {
     setup();
     const button = screen.getByRole('button', { name: 'Back to top' });
     expect(button).toBeVisible();
     expect(button).not.toHaveAttribute('inert');
   });
 
-  it('is inert when visible is false', () => {
-    setup({ visible: false });
+  it('is inert when isVisible is false', () => {
+    setup({ isVisible: false });
     const button = screen.getByRole('button', {
       hidden: true,
       name: 'Back to top',

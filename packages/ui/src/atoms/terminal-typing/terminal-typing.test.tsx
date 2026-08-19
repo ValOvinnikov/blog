@@ -21,10 +21,10 @@ describe(`<${TerminalTyping.name}/>`, () => {
     expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(1);
   });
 
-  it('omits the cursor when showCursor is false', () => {
+  it('omits the cursor when hasCursor is false', () => {
     const { container } = setup({
       text: faker.word.noun(),
-      showCursor: false,
+      hasCursor: false,
     });
     expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(0);
   });

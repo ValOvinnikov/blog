@@ -114,7 +114,7 @@ describe(`<${Toast.name}/>`, () => {
 
   describe('plain mode', () => {
     it('renders the message but not the command/state chip', () => {
-      setup({ plain: true });
+      setup({ isPlain: true });
       expect(screen.getByText(message)).toBeVisible();
       expect(
         screen.queryByText(
@@ -127,20 +127,20 @@ describe(`<${Toast.name}/>`, () => {
 
     it('still calls onDismiss when the dismiss button is clicked', async () => {
       const onDismiss = vi.fn();
-      setup({ plain: true, onDismiss });
+      setup({ isPlain: true, onDismiss });
       await userEvent.click(screen.getByRole('button', { name: dismissLabel }));
       expect(onDismiss).toHaveBeenCalledTimes(1);
     });
 
     it('still renders the relative time when provided', () => {
-      setup({ plain: true, time: 'just now' });
+      setup({ isPlain: true, time: 'just now' });
       expect(screen.getByText('just now')).toBeVisible();
     });
 
     it('still renders an action button and calls onAct when clicked', async () => {
       const onAct = vi.fn();
       const label = faker.word.verb();
-      setup({ plain: true, action: { label, onAct } });
+      setup({ isPlain: true, action: { label, onAct } });
 
       const actionButton = screen.getByRole('button', { name: label });
       await userEvent.click(actionButton);

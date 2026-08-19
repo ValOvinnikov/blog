@@ -56,7 +56,7 @@ export const SiteNavigation = ({ links, actions }: TSiteNavigationProps) => {
         actions={actions}
         linkAs={SmartLink}
         mobileToggle={{
-          open,
+          isOpen: open,
           onToggle: toggle,
           ariaLabel: t('toggleMenu'),
           panelId,

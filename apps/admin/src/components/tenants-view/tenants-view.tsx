@@ -12,7 +12,7 @@ import { tenantsViewVariants } from './tenants-view-variants';
 
 export type TTenantsViewProps = {
   tenants: TTenant[];
-  showArchived: boolean;
+  shouldShowArchived: boolean;
 };
 
 /**
@@ -20,7 +20,10 @@ export type TTenantsViewProps = {
  * tenant list. Ships from day one — with one tenant it's still a finished
  * page, not a placeholder.
  */
-export function TenantsView({ tenants, showArchived }: TTenantsViewProps) {
+export function TenantsView({
+  tenants,
+  shouldShowArchived,
+}: TTenantsViewProps) {
   const t = useTranslations('tenantsView');
   const { root, header, description, toolbar } = tenantsViewVariants();
 
@@ -40,7 +43,7 @@ export function TenantsView({ tenants, showArchived }: TTenantsViewProps) {
         </LinkButton>
       </div>
       <div className={toolbar()}>
-        <ArchivedTenantsToggle showArchived={showArchived} />
+        <ArchivedTenantsToggle shouldShowArchived={shouldShowArchived} />
       </div>
       <TenantsTable tenants={tenants} />
     </div>

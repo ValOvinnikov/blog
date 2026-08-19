@@ -22,8 +22,8 @@ describe(`<${TerminalChip.name}/>`, () => {
     expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(2);
   });
 
-  it('omits the cursor when showCursor is false', () => {
-    const { container } = setup({ showCursor: false });
+  it('omits the cursor when hasCursor is false', () => {
+    const { container } = setup({ hasCursor: false });
     expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(1);
   });
 

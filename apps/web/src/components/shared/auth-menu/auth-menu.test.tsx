@@ -21,7 +21,7 @@ vi.mock('next-auth/react', () => ({
 }));
 
 const setup = customRender(AuthMenu, {});
-const setupPlain = customRender(AuthMenu, { plain: true });
+const setupPlain = customRender(AuthMenu, { isPlain: true });
 
 const setLocationSearch = (search: string) => {
   window.history.replaceState(null, '', `/${search}`);
