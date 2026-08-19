@@ -125,6 +125,7 @@ describe(uploadBrandAssetAction, () => {
 
     expect(result).toEqual({ ok: false, error: 'Choose a file to upload.' });
     expect(putMock).not.toHaveBeenCalled();
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('returns the validation error and never calls Blob when validation fails', async () => {
@@ -145,6 +146,7 @@ describe(uploadBrandAssetAction, () => {
     });
     expect(putMock).not.toHaveBeenCalled();
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('uploads, saves the theme fields plus the new logo URL, and returns it', async () => {
@@ -314,6 +316,7 @@ describe(uploadBrandAssetAction, () => {
       });
       expect(validateBrandAssetUploadMock).not.toHaveBeenCalled();
       expect(putMock).not.toHaveBeenCalled();
+      expect(insertAuditEventMock).not.toHaveBeenCalled();
     } finally {
       // @ts-expect-error -- restore the mocked env module for later tests
       env.BLOB_READ_WRITE_TOKEN = 'test-token';
