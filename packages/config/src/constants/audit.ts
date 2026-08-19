@@ -2,7 +2,6 @@ import type { TValueOf } from '@blog/config/utils';
 
 export const AUDIT_TARGET_TYPE = {
   TENANT: 'TENANT',
-  TENANT_DOMAIN: 'TENANT_DOMAIN',
   SITE_CONFIG: 'SITE_CONFIG',
 } as const;
 
@@ -16,8 +15,6 @@ export const AUDIT_ACTION = {
   CREATED: 'CREATED',
   ARCHIVED: 'ARCHIVED',
   DEPROVISIONED: 'DEPROVISIONED',
-  DOMAIN_CHANGED: 'DOMAIN_CHANGED',
-  PLAN_CHANGED: 'PLAN_CHANGED',
   SETTINGS_UPDATED: 'SETTINGS_UPDATED',
 } as const;
 

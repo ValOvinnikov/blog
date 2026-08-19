@@ -32,7 +32,7 @@ describe('recordAuditEvent', () => {
 
     await recordAuditEvent({
       logEvent: 'test.audit_failed',
-      action: AUDIT_ACTION.PLAN_CHANGED,
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-1',
       details: { previousPlan: 'FREE', plan: 'PRO' },
@@ -41,7 +41,7 @@ describe('recordAuditEvent', () => {
     expect(insertAuditEventMock).toHaveBeenCalledWith({
       actorId: 'user-1',
       actorEmail: 'operator@example.com',
-      action: AUDIT_ACTION.PLAN_CHANGED,
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: 'tenant-1',
       details: { previousPlan: 'FREE', plan: 'PRO' },
