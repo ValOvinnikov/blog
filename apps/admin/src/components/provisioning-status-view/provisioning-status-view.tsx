@@ -1,9 +1,12 @@
 'use client';
 
 import { TenantDetailsPanel } from '@admin/components/tenant-details-panel';
+import { Link } from '@admin/i18n/navigation';
 import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
+import { getDomainVerificationStatusAction } from '@admin/server/provisioning/get-domain-verification-status-action';
 import { getTenantProvisioningStatusAction } from '@admin/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@admin/server/provisioning/retry-provisioning-step-action';
+import { adminRoutes } from '@admin/utils/routes/routes';
 import {
   Size,
   TENANT_PROVISIONING_STATUS,
@@ -20,9 +23,9 @@ import type {
 import { Button } from '@blog/ui/atoms/button';
 import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
-import { Spinner } from '@blog/ui/atoms/spinner';
 import { StatusBadge } from '@blog/ui/atoms/status-badge';
 import { Text } from '@blog/ui/atoms/text';
+import { LinkButton } from '@blog/ui/molecules';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState, useTransition } from 'react';
@@ -42,7 +45,12 @@ const STEP_TONE: Record<
   DONE: 'ok',
 };
 
-const POLL_INTERVAL_MS = 4000;
+const STEP_POLL_INTERVAL_MS = 4000;
+// The domain check makes a live Vercel API call with its own 5s timeout —
+// slower and less urgent than step polling — so it runs on a longer,
+// independent interval rather than sharing the step interval and risking
+// overlapping in-flight requests.
+const DOMAIN_POLL_INTERVAL_MS = 10000;
 
 function isTerminalProvisioningStatus(
   status: TTenantProvisioningStatus | null,
@@ -51,6 +59,12 @@ function isTerminalProvisioningStatus(
     status === TENANT_PROVISIONING_STATUS.READY ||
     status === TENANT_PROVISIONING_STATUS.FAILED
   );
+}
+
+function isTerminalDomainVerificationStatus(
+  status: TDomainVerificationStatus,
+): boolean {
+  return status === 'VERIFIED' || status === 'NOT_CONFIGURED';
 }
 
 const DNS_TONE: Record<TDomainVerificationStatus, 'ok' | 'warn' | 'neutral'> = {
@@ -70,11 +84,10 @@ type TProvisioningStatusViewProps = {
  * The wizard's remaining-steps view — the provisioning steps (Sanity project
  * → seed content → deploy Studio → persist read token → map domain → create
  * webhook) read live from `tenant.provisioningSteps`, each independently
- * retryable, alongside a read-only summary of the tenant row itself. While
- * provisioning hasn't reached a terminal status, this polls for fresh status
- * so an operator watching a run in progress sees the step circles advance
- * without reloading. Retry's own `router.refresh()` still covers picking up
- * a fresh full tenant row after a step retry.
+ * retryable, alongside an editable summary of the tenant row itself. While
+ * provisioning hasn't reached a terminal status, this polls for fresh step
+ * status; the domain verification badge polls on its own, slower interval
+ * so a slow or failed Vercel lookup can never stall step polling.
  */
 export function ProvisioningStatusView({
   tenant,
@@ -91,14 +104,25 @@ export function ProvisioningStatusView({
     useState<TTenantProvisioningStatus | null>(tenant.provisioningStatus);
   const [provisioningSteps, setProvisioningSteps] =
     useState<TTenantProvisioningSteps | null>(tenant.provisioningSteps);
+  const [renderedDomainStatus, setRenderedDomainStatus] = useState(
+    domainVerificationStatus,
+  );
+  const [domainStatus, setDomainStatus] = useState<TDomainVerificationStatus>(
+    domainVerificationStatus,
+  );
 
-  // A fresh `tenant` prop (e.g. after Retry's own `router.refresh()`) should
-  // win over whatever polling last saw — adjusted during render, per React's
+  // A fresh `tenant`/`domainVerificationStatus` prop (e.g. after a Retry,
+  // Start, or details save's own `router.refresh()`) should win over
+  // whatever polling last saw — adjusted during render, per React's
   // guidance for state derived from props, rather than in an effect.
   if (tenant !== renderedTenant) {
     setRenderedTenant(tenant);
     setProvisioningStatus(tenant.provisioningStatus);
     setProvisioningSteps(tenant.provisioningSteps);
+  }
+  if (domainVerificationStatus !== renderedDomainStatus) {
+    setRenderedDomainStatus(domainVerificationStatus);
+    setDomainStatus(domainVerificationStatus);
   }
 
   const {
@@ -107,7 +131,7 @@ export function ProvisioningStatusView({
     description,
     startAction,
     layout,
-    card,
+    steps,
     list,
     step,
     indicatorCol,
@@ -117,9 +141,13 @@ export function ProvisioningStatusView({
     stepTitle,
     stepError,
     trailing,
+    stepStatusLive,
     failedBadge,
+    detailsColumn,
+    goToTenantButton,
     dnsCard,
     dnsRow,
+    dnsStatusLive,
     dnsHint,
   } = provisioningStatusViewVariants();
 
@@ -138,13 +166,35 @@ export function ProvisioningStatusView({
         setProvisioningStatus(result.provisioningStatus);
         setProvisioningSteps(result.provisioningSteps);
       });
-    }, POLL_INTERVAL_MS);
+    }, STEP_POLL_INTERVAL_MS);
 
     return () => {
       cancelled = true;
       clearInterval(intervalId);
     };
   }, [tenant.id, provisioningStatus]);
+
+  useEffect(() => {
+    if (isTerminalDomainVerificationStatus(domainStatus)) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const intervalId = setInterval(() => {
+      void getDomainVerificationStatusAction(tenant.id).then((result) => {
+        if (cancelled) {
+          return;
+        }
+        setDomainStatus(result);
+      });
+    }, DOMAIN_POLL_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(intervalId);
+    };
+  }, [tenant.id, domainStatus]);
 
   const allIdle = STEP_ORDER.every((stepKey) => {
     const status =
@@ -197,7 +247,7 @@ export function ProvisioningStatusView({
       )}
 
       <div className={layout()}>
-        <div className={card()}>
+        <aside className={steps()}>
           <div className={list()}>
             {STEP_ORDER.map((stepKey, index) => {
               const stepState = provisioningSteps?.[stepKey];
@@ -205,8 +255,6 @@ export function ProvisioningStatusView({
                 stepState?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
               const isFailed =
                 status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
-              const isRunning =
-                status === TENANT_PROVISIONING_STEP_STATUS.RUNNING;
               const isDone = status === TENANT_PROVISIONING_STEP_STATUS.DONE;
               const isRetrying = retryingStep === stepKey;
               const isLast = index === STEP_ORDER.length - 1;
@@ -215,22 +263,8 @@ export function ProvisioningStatusView({
               return (
                 <div className={step()} key={stepKey}>
                   <div className={indicatorCol()}>
-                    <span
-                      className={circle({ status })}
-                      aria-hidden={isRunning ? undefined : true}
-                    >
-                      {isRunning ? (
-                        <Spinner
-                          label={t('stepRunningLabel', { step: title })}
-                          size={Size.SM}
-                        />
-                      ) : isDone ? (
-                        '✓'
-                      ) : isFailed ? (
-                        '!'
-                      ) : (
-                        index + 1
-                      )}
+                    <span className={circle({ status })} aria-hidden="true">
+                      {isDone ? '✓' : isFailed ? '!' : index + 1}
                     </span>
                     {!isLast && (
                       <span
@@ -246,18 +280,17 @@ export function ProvisioningStatusView({
                     )}
                   </div>
                   <div className={trailing()}>
-                    {isFailed ? (
-                      <span className={failedBadge()}>
-                        {t(`statusLabel.${status}`)}
-                      </span>
-                    ) : (
-                      <StatusBadge
-                        tone={STEP_TONE[status]}
-                        aria-hidden={isRunning ? 'true' : undefined}
-                      >
-                        {t(`statusLabel.${status}`)}
-                      </StatusBadge>
-                    )}
+                    <span className={stepStatusLive()} aria-live="polite">
+                      {isFailed ? (
+                        <span className={failedBadge()}>
+                          {t(`statusLabel.${status}`)}
+                        </span>
+                      ) : (
+                        <StatusBadge tone={STEP_TONE[status]}>
+                          {t(`statusLabel.${status}`)}
+                        </StatusBadge>
+                      )}
+                    </span>
                     {isFailed && (
                       <Button
                         type="button"
@@ -273,9 +306,21 @@ export function ProvisioningStatusView({
               );
             })}
           </div>
-        </div>
+        </aside>
 
-        <TenantDetailsPanel tenant={tenant} />
+        <div className={detailsColumn()}>
+          <TenantDetailsPanel tenant={tenant} editable={allIdle} />
+          {provisioningStatus === TENANT_PROVISIONING_STATUS.READY && (
+            <LinkButton
+              as={Link}
+              href={adminRoutes.tenant(tenant.slug)}
+              variant="primary"
+              className={goToTenantButton()}
+            >
+              {t('goToTenantButton')}
+            </LinkButton>
+          )}
+        </div>
       </div>
 
       <div className={dnsCard()}>
@@ -284,11 +329,13 @@ export function ProvisioningStatusView({
         </Heading>
         <div className={dnsRow()}>
           <Text>{tenant.primaryDomain}</Text>
-          <StatusBadge tone={DNS_TONE[domainVerificationStatus]}>
-            {t(`dnsStatus.${domainVerificationStatus}`)}
-          </StatusBadge>
+          <span className={dnsStatusLive()} aria-live="polite">
+            <StatusBadge tone={DNS_TONE[domainStatus]}>
+              {t(`dnsStatus.${domainStatus}`)}
+            </StatusBadge>
+          </span>
         </div>
-        {domainVerificationStatus === 'NOT_CONFIGURED' && (
+        {domainStatus === 'NOT_CONFIGURED' && (
           <Text variant="muted" className={dnsHint()}>
             {t('dnsNotConfiguredHint')}
           </Text>

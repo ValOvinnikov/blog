@@ -31,6 +31,24 @@ describe(getDomainVerificationStatus, () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it('rejects a domain containing path-traversal characters without making a request', async () => {
+    const result = await getDomainVerificationStatus('../../v9/projects/other');
+
+    expect(result).toBe('ERROR');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('percent-encodes the domain when building the Vercel request URL', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ verified: true }), { status: 200 }),
+    );
+
+    await getDomainVerificationStatus('example.com');
+
+    const [calledUrl] = fetchMock.mock.calls[0] as [URL];
+    expect(calledUrl.pathname).toBe('/v9/projects/prj_123/domains/example.com');
+  });
+
   it('returns NOT_ADDED for a 404 response', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 404 }));
 

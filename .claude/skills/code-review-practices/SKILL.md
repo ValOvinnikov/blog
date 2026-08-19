@@ -25,9 +25,14 @@ and treat every hit as a blocking finding unless explicitly allowed:
 BASE=main
 D() { git diff "$BASE"...HEAD; git diff; }
 
-# Debug artifacts — console.log/info/debug/trace never land
-# (console.warn/error are allowed in apps/web server code)
-D | grep -nE '^\+.*console\.(log|info|debug|trace)'
+# Debug artifacts — no bare console.* lands in app or package source.
+# apps/web and apps/admin log through their shared logger
+# (src/utils/logger/logger.ts, wrapping createLogger from @blog/insight);
+# service/db/auth never log at all — they return the error to the caller.
+# Exempt: packages/insight/src/** (the logger itself), <repo-root>/scripts/**,
+# apps/cms/scripts/**, packages/db/scripts/**, packages/db/drizzle.config.ts
+# (stdout IS the interface), *.test.ts(x), and apps/web/e2e/**.
+D | grep -nE '^\+.*console\.(log|info|debug|trace|warn|error)'
 D | grep -nE '^\+.*\bdebugger\b'
 
 # Focused/skipped tests
@@ -154,7 +159,7 @@ code fences are not findings — report only hits in real code.
 
 ## 7. Hygiene
 
-- Conventional commit, one concern per PR. No stray `console.log`, no committed
+- Conventional commit, one concern per PR. No stray bare `console.*`, no committed
   secrets/`.env`. `type-check`/`lint`/`test` are confirmed by `verify-runner`
   before this review is dispatched — reviewer trusts that result rather than
   re-running the suite. `build` is CI-only (`ci.yml`'s `build` job gates every

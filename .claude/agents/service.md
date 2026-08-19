@@ -45,6 +45,13 @@ relative paths only within a single slice (`./query`, `./types`).
 - **Only** `@blog/service` imports `sanity` / `next-sanity` / `@sanity/image-url`.
   No other package may. If `web` or `ui` needs data, it goes through a function
   you export here.
+- **Never log — return the error to the caller.** This layer does not call
+  `console.*`, and does not take a `@blog/insight` dependency. Failures
+  propagate as a `TResult` via `safeAsync`; the app layer (`apps/web` /
+  `apps/admin`) logs them through its shared logger, once, with the request
+  context attached. Logging here as well would put the same failure into the
+  pipeline twice, and this layer's copy would be the one lacking the
+  route/request context that makes it actionable.
 - Depend only on `@blog/config`, `@blog/utils`, and the Sanity SDKs. Generated
   content types come from `@blog/config` — do not redeclare content shapes.
   Import from the package root or plain subpaths, never `@blog/config/react`

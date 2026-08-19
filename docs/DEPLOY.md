@@ -647,12 +647,33 @@ the deploy then fails with `No Output Directory named "storybook-static" found`
 whenever the project's dashboard default/framework preset resolves output at
 the Root Directory rather than honoring the nested path.
 
+**Troubleshooting:** if the deploy instead fails with
+`cp: cannot stat 'apps/web/storybook-static'`, the project's Root Directory is
+wrong — it's set to `apps/web` rather than the repo root, so the
+`buildCommand` runs from `apps/web` and its `cp` looks for
+`apps/web/apps/web/storybook-static`. Set the Root Directory back to the repo
+root (`.`). (A Root Directory of `apps/web` also makes the project read
+`apps/web/vercel.json`, whose `git.deploymentEnabled: false` belongs to the
+main web app — a second reason not to root it there.)
+
 - [ ] Vercel → Add New → Project → import `{github_account}/blog`; **Root
       Directory** left at the repo root (`.`) — do **not** set it to
       `apps/web`; **Node.js 22.x**; Framework Preset **Other** (build/output
       commands come from the root `vercel.json`).
 - [ ] Confirm Git integration is **enabled**, with PR previews **on** — same
       as the `packages/ui` project above.
+- [ ] **Per-project PR status check:** on a PR that triggers this project's
+      build, a `Vercel – <project-name>` check should appear reflecting the
+      deploy's pass/fail — the `packages/ui` project (set up above) already
+      posts one, and this project should too, else a broken Storybook build
+      here is invisible on the PR and shows only in the Vercel dashboard. If
+      it's missing, re-check that this project's Git integration + PR previews
+      (the toggle above) are **on** and that the Vercel GitHub app is
+      authorized to post commit statuses for it, matching the `packages/ui`
+      project. Do **not** make this check **required** on `main` branch
+      protection — Storybook previews can hit the account-level build rate
+      limit (below), and a required check would let that infra failure block
+      merges.
 - [ ] Settings → Domains → add `web-storybook.{your_hosting}` (production
       deployment only); add the DNS record at whatever registrar/DNS host
       manages `{your_hosting}`.

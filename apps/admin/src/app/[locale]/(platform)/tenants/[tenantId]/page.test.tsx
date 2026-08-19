@@ -33,6 +33,17 @@ vi.mock(
   }),
 );
 
+vi.mock(
+  '@admin/server/provisioning/get-domain-verification-status-action',
+  () => ({
+    getDomainVerificationStatusAction: vi.fn(),
+  }),
+);
+
+vi.mock('@admin/server/tenants/update-tenant-details-action', () => ({
+  updateTenantDetailsAction: vi.fn(),
+}));
+
 const setup = customRenderAsync(TenantStatusPage, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),
 });
