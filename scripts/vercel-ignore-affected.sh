@@ -21,11 +21,11 @@ if [ -z "$BASE" ]; then
 fi
 
 # On a main build FETCH_HEAD *is* main, so the merge-base above resolves to
-# HEAD itself — and a commit diffed against itself reports nothing changed, so
-# every main build skips and no deployment ever happens. The project then never
-# gets a successful deployment to populate VERCEL_GIT_PREVIOUS_SHA, so the
-# fallback runs again next merge and the deadlock sustains itself. Compare
-# against the previous commit instead, which is what a main build needs.
+# HEAD itself — and a commit diffed against itself shows nothing affected, so
+# the build skips, no deployment happens, VERCEL_GIT_PREVIOUS_SHA stays empty,
+# and the next merge repeats it. Comparing against the previous commit breaks
+# that. Also covers a redeploy whose supplied SHA is already HEAD, where the
+# clone may still be shallow — hence the deepen.
 if [ -n "$BASE" ] && [ "$BASE" = "$(git -C "$ROOT" rev-parse HEAD)" ]; then
   git -C "$ROOT" rev-parse --verify --quiet HEAD^1 >/dev/null 2>&1 ||
     git -C "$ROOT" fetch --quiet --deepen=1 "$REPO_URL" 2>/dev/null || true

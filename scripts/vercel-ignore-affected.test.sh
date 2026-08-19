@@ -259,6 +259,46 @@ git -C "$repo" commit --quiet -m 'root commit'
 VERCEL_GIT_PREVIOUS_SHA='' \
 	build 'unresolvable base builds rather than skips' "$repo"
 
+# --- shallow build clone: deepening to reach HEAD^1 ------------------------
+# Vercel's build clone is shallow, so HEAD^1 can be missing exactly when the
+# fallback needs it. Reaching that state takes a supplied PREVIOUS_SHA that
+# already equals HEAD (Vercel redeploying an already-deployed commit): the
+# depth=100 fetch is inside the empty-PREVIOUS_SHA branch, so in this path
+# nothing has deepened the clone by the time HEAD^1 is wanted.
+origin="$workdir/shallow-origin"
+seed="$workdir/shallow-seed"
+repo="$workdir/shallow"
+git init --quiet --bare --initial-branch=main "$origin"
+git clone --quiet "file://$origin" "$seed" 2>/dev/null
+git -C "$seed" symbolic-ref HEAD refs/heads/main
+mkdir -p "$seed/packages/ui/src"
+echo 'export const c = 1;' >"$seed/packages/ui/src/index.ts"
+git -C "$seed" add -A
+git -C "$seed" commit --quiet -m 'first'
+echo 'export const c = 2;' >"$seed/packages/ui/src/index.ts"
+git -C "$seed" add -A
+git -C "$seed" commit --quiet -m 'second'
+git -C "$seed" push --quiet origin main
+
+git clone --quiet --depth=1 "file://$origin" "$repo"
+git -C "$repo" config "url.file://$origin.insteadOf" \
+	'https://github.com/test-owner/test-repo.git'
+
+# Guard the fixture itself: if the clone ever stops being shallow, the case
+# below would pass without the deepen path ever running, and would silently
+# stop covering the thing it exists to cover.
+if git -C "$repo" rev-parse --verify --quiet HEAD^1 >/dev/null 2>&1; then
+	printf 'FAIL fixture is not shallow — HEAD^1 already present, deepen path untested\n'
+	fails=$((fails + 1))
+fi
+
+# The seed is a full clone of the same origin, so its HEAD^1 is the parent
+# the shallow clone must arrive at once deepened.
+parent=$(git -C "$seed" rev-parse HEAD^1)
+VERCEL_GIT_PREVIOUS_SHA="$(git -C "$repo" rev-parse HEAD)" \
+	build 'shallow clone deepens to reach HEAD^1' "$repo"
+expect_base "$parent" 'shallow clone resolves HEAD^1 after deepening'
+
 if [ "$fails" -eq 0 ]; then
 	echo "vercel-ignore-affected: all cases pass"
 else
