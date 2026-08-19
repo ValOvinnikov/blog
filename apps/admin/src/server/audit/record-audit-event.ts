@@ -15,11 +15,10 @@ export type TRecordAuditEventInput = {
 };
 
 /**
- * Never throws and never changes what its caller returns. Per #1709's
- * failure policy, a lost audit write is logged at `error` and swallowed
- * rather than blocking or rolling back the mutation it describes — the
- * runtime `neon-http` driver has no multi-statement transactions, so the
- * two writes can't be coupled atomically.
+ * Never throws and never changes what its caller returns: a lost audit
+ * write is logged at `error` and swallowed rather than blocking or rolling
+ * back the mutation it describes, because the runtime `neon-http` driver has
+ * no multi-statement transactions to couple the two writes atomically.
  */
 export async function recordAuditEvent({
   logEvent,
