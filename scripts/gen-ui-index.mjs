@@ -138,6 +138,22 @@ const findPropsType = (sf, name) => {
   return candidates[0] ?? null;
 };
 
+// A Level-2 polymorphic component's exported `I<Name>Props`/`T<Name>Props` is
+// typically a bare `TPolymorphicProps<C, <Name>OwnProps>` reference (or an
+// intersection of references) with no members of its own — the authored
+// surface lives on the local `<Name>OwnProps` type it wraps. Resolves that
+// sibling type by exact name so a caller can fall through to it instead of
+// documenting an empty props list.
+const findOwnPropsType = (sf, name) => {
+  const ownNames = [`I${name}OwnProps`, `T${name}OwnProps`];
+  for (const stmt of sf.statements) {
+    if (ts.isInterfaceDeclaration(stmt) || ts.isTypeAliasDeclaration(stmt)) {
+      if (ownNames.includes(stmt.name.text)) return stmt;
+    }
+  }
+  return null;
+};
+
 const truncate = (s, max) => (s.length > max ? `${s.slice(0, max - 1)}…` : s);
 
 // Walk a props type into its own property members and the named types it
@@ -281,9 +297,19 @@ const componentParamType = (node) => {
 const describeComponent = (sf, file, name) => {
   const comp = findComponent(sf, name);
   const propsType = findPropsType(sf, name) ?? componentParamType(comp?.node);
-  const { props, extendsList } = propsType
+  let { props, extendsList } = propsType
     ? extractProps(propsType, sf)
     : { props: [], extendsList: [] };
+
+  // The chosen props type carried no members of its own — try the sibling
+  // `<Name>OwnProps` type before giving up and documenting an empty list.
+  if (props.length === 0) {
+    const ownPropsType = findOwnPropsType(sf, name);
+    if (ownPropsType) {
+      const own = extractProps(ownPropsType, sf);
+      if (own.props.length) ({ props, extendsList } = own);
+    }
+  }
   const variantsFile = file.replace(/\.tsx?$/, '-variants.ts');
   const variants = existsSync(variantsFile)
     ? extractVariants(variantsFile, parse(variantsFile))

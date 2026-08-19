@@ -50,7 +50,7 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### Eyebrow — `atoms/eyebrow/eyebrow.tsx`
 
 Eyebrow atom — small uppercase label displayed above a heading to provide contextual category or section context.
-Props: _(extends TEyebrowOwnProps, Omit<HTMLAttributes<HTMLElement>, keyof TEyebro…)_
+Props: href?: string · linkAs?: TAnchorElementType _(extends IWithDataTestId)_
 Variants: hasHref: (boolean)
 
 ### Heading — `atoms/heading/heading.tsx`
@@ -89,7 +89,7 @@ Props: separator?: string _(extends IWithClassName, IWithDataTestId)_
 ### NavLink — `atoms/nav-link/nav-link.tsx`
 
 NavLink atom — a chrome-level navigation link (header/footer nav items).
-Props: _(extends TPolymorphicProps< C, TNavLinkOwnProps >)_
+Props: className?: string · isActive?: TNavLinkVariants['isActive'] · hideLabel?: boolean _(extends IWithIcon, IWithDataTestId)_
 Variants: isActive: (boolean)
 
 ### Prose — `atoms/prose/prose.tsx`
@@ -101,7 +101,7 @@ Variants: size: Size.SM|Size.MD|Size.LG
 ### ProseLink — `atoms/prose-link/prose-link.tsx`
 
 ProseLink atom — the accent/underline treatment for inline links inside Portable Text article body copy.
-Props: _(extends TPolymorphicProps< C, TProseLinkOwnProps >)_
+Props: className?: string _(extends IWithDataTestId)_
 
 ### QuoteBlock — `atoms/quote-block/quote-block.tsx`
 
@@ -129,7 +129,7 @@ Variants: tone: ok|warn|neutral
 ### Tag — `atoms/tag/tag.tsx`
 
 small pill-shaped label.
-Props: _(extends TPolymorphicProps< C, TTagOwnProps >)_
+Props: className?: string _(extends Omit<TTagVariants, 'interactive'>, IWithDataTestId)_
 Variants: variant: default|accent · interactive: (boolean)
 
 ### TerminalTyping — `atoms/terminal-typing/terminal-typing.tsx`
@@ -197,7 +197,7 @@ Variants: layout: IMAGE_LAYOUT.INLINE|IMAGE_LAYOUT.FULL_BLEED|IMAGE_LAYOUT.FLOAT
 ### LinkButton — `molecules/link-button/link-button.tsx`
 
 a navigation link that looks like a `Button`: applies the shared `buttonVariants` to an anchor (or any `as` element), so links can read as buttons.
-Props: _(extends TPolymorphicProps< C, TLinkButtonOwnProps >)_
+Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonVariants>)_
 
 ### PopoverMenu — `molecules/popover-menu/popover-menu.tsx`
 
@@ -208,7 +208,7 @@ Slots:
 
 - **PopoverMenu.Trigger** — icon-button that opens/closes a `PopoverMenu.Panel`. Props: ariaLabel: string · open: boolean · panelId: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
 - **PopoverMenu.Panel** — the non-modal menu surface (`role="menu"`) a `PopoverMenu.Trigger` opens. Props: id: string · open: boolean · ariaLabel?: string · children?: ReactNode · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
-- **PopoverMenu.Item** — a single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). Props: _(extends TPolymorphicProps<C, TPopoverMenuItemOwnProps>, IWithDataTestId)_
+- **PopoverMenu.Item** — a single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). Props: className?: string · icon?: ReactNode
 - **PopoverMenu.Separator** — a thin hairline dividing groups of `PopoverMenu.Item`s inside a `PopoverMenu.Panel` (e.g. a "Copy link" action from a list of social-share links). Props: className?: string _(extends IWithDataTestId)_
 
 ### PostCard — `molecules/post-card/post-card.tsx`
