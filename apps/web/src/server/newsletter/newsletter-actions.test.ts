@@ -71,8 +71,8 @@ describe('subscribeToNewsletterAction', () => {
 
   it('sends a confirmation email and returns "success" for a brand-new subscriber', async () => {
     createPendingSubscriberMock.mockResolvedValue({
-      outcome: 'created',
-      subscriber,
+      ok: true,
+      data: { outcome: 'created', subscriber },
     });
     sendEmailMock.mockResolvedValue(undefined);
     const { subscribeToNewsletterAction } =
@@ -99,8 +99,8 @@ describe('subscribeToNewsletterAction', () => {
 
   it('re-sends the confirmation email and returns "success" for an already-pending subscriber', async () => {
     createPendingSubscriberMock.mockResolvedValue({
-      outcome: 'already-pending',
-      subscriber,
+      ok: true,
+      data: { outcome: 'already-pending', subscriber },
     });
     sendEmailMock.mockResolvedValue(undefined);
     const { subscribeToNewsletterAction } =
@@ -115,8 +115,11 @@ describe('subscribeToNewsletterAction', () => {
 
   it('returns "already-subscribed" without sending an email for an already-active subscriber', async () => {
     createPendingSubscriberMock.mockResolvedValue({
-      outcome: 'already-active',
-      subscriber: { ...subscriber, status: 'active' as const },
+      ok: true,
+      data: {
+        outcome: 'already-active',
+        subscriber: { ...subscriber, status: 'active' as const },
+      },
     });
     const { subscribeToNewsletterAction } =
       await import('./newsletter-actions');
@@ -141,6 +144,24 @@ describe('subscribeToNewsletterAction', () => {
     expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
   });
 
+  it('returns "server-error" and logs when createPendingSubscriber resolves a typed failure', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    createPendingSubscriberMock.mockResolvedValue({
+      ok: false,
+      error: 'DB_NOT_FOUND',
+    });
+    const { subscribeToNewsletterAction } =
+      await import('./newsletter-actions');
+
+    await expect(
+      subscribeToNewsletterAction('reader@example.com'),
+    ).resolves.toEqual({ outcome: 'server-error' });
+    expect(errorSpy).toHaveBeenCalled();
+    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
   it('returns "server-error" and logs when the db write throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     createPendingSubscriberMock.mockRejectedValue(new Error('db down'));
@@ -158,8 +179,8 @@ describe('subscribeToNewsletterAction', () => {
   it('returns "server-error" and logs when sending the confirmation email throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     createPendingSubscriberMock.mockResolvedValue({
-      outcome: 'created',
-      subscriber,
+      ok: true,
+      data: { outcome: 'created', subscriber },
     });
     sendEmailMock.mockRejectedValue(new Error('resend down'));
     const { subscribeToNewsletterAction } =
@@ -176,8 +197,8 @@ describe('subscribeToNewsletterAction', () => {
   it('still returns "success" (logging, not failing) when marking the cookie throws after a real successful signup', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     createPendingSubscriberMock.mockResolvedValue({
-      outcome: 'created',
-      subscriber,
+      ok: true,
+      data: { outcome: 'created', subscriber },
     });
     sendEmailMock.mockResolvedValue(undefined);
     markNewsletterSubscribedMock.mockRejectedValue(
@@ -198,8 +219,11 @@ describe('subscribeToNewsletterAction', () => {
   it('still returns "already-subscribed" (logging, not failing) when marking the cookie throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     createPendingSubscriberMock.mockResolvedValue({
-      outcome: 'already-active',
-      subscriber: { ...subscriber, status: 'active' as const },
+      ok: true,
+      data: {
+        outcome: 'already-active',
+        subscriber: { ...subscriber, status: 'active' as const },
+      },
     });
     markNewsletterSubscribedMock.mockRejectedValue(
       new Error('cookie store down'),

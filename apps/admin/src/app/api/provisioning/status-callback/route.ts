@@ -2,6 +2,7 @@ import { env } from '@admin/utils/env/env';
 import { isSecretMatch } from '@admin/utils/is-secret-match/is-secret-match';
 import { logger } from '@admin/utils/logger/logger';
 import {
+  ERROR_CODE,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
@@ -105,26 +106,31 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const { tenantId, step, status, error } = parsed.data;
 
-  try {
-    await queries.tenants.updateProvisioningStep({
-      tenantId,
-      step,
-      status,
-      ...(error === undefined ? {} : { error }),
-      ...(overallStatusFor(step, status) === undefined
-        ? {}
-        : { provisioningStatus: overallStatusFor(step, status) }),
-    });
-  } catch (caughtError) {
+  const result = await queries.tenants.updateProvisioningStep({
+    tenantId,
+    step,
+    status,
+    ...(error === undefined ? {} : { error }),
+    ...(overallStatusFor(step, status) === undefined
+      ? {}
+      : { provisioningStatus: overallStatusFor(step, status) }),
+  });
+
+  if (!result.ok) {
     logger.error('provisioning.status_callback_update_failed', {
       tenantId,
       step,
       status,
-      error: caughtError,
+      error: result.error,
     });
+    const notFound = result.error === ERROR_CODE.DB_NOT_FOUND;
     return NextResponse.json(
-      { message: 'Failed to record the step update.' },
-      { status: 500 },
+      {
+        message: notFound
+          ? 'No tenant matches this callback.'
+          : 'Failed to record the step update.',
+      },
+      { status: notFound ? 404 : 500 },
     );
   }
 

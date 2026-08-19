@@ -48,13 +48,18 @@ export async function subscribeToNewsletterAction(
       email,
     );
 
-    if (result.outcome === 'already-active') {
+    if (!result.ok) {
+      logger.error('newsletter.subscribe_failed', { error: result.error });
+      return { outcome: 'server-error' };
+    }
+
+    if (result.data.outcome === 'already-active') {
       await markNewsletterSubscribedSafely();
       return { outcome: 'already-subscribed' };
     }
 
     const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
-    const confirmationUrl = `${siteUrl}/api/newsletter/confirm?token=${result.subscriber.confirmationToken}`;
+    const confirmationUrl = `${siteUrl}/api/newsletter/confirm?token=${result.data.subscriber.confirmationToken}`;
     const { subject, html } = buildNewsletterConfirmationEmail({
       confirmationUrl,
     });
@@ -69,7 +74,7 @@ export async function subscribeToNewsletterAction(
     );
 
     await sendEmail({
-      to: result.subscriber.email,
+      to: result.data.subscriber.email,
       from: fromAddress,
       subject,
       html,

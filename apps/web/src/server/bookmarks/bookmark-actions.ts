@@ -47,7 +47,18 @@ export async function setBookmarkStatus(
 
   try {
     if (isBookmarked) {
-      await queries.bookmarks.addBookmark(tenantId, userId, postId);
+      const result = await queries.bookmarks.addBookmark(
+        tenantId,
+        userId,
+        postId,
+      );
+      if (!result.ok) {
+        logger.error('bookmark.update_failed', {
+          postId,
+          error: result.error,
+        });
+        return { ok: false };
+      }
     } else {
       await queries.bookmarks.removeBookmark(tenantId, userId, postId);
     }

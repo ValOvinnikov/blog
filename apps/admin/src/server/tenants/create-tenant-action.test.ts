@@ -59,7 +59,10 @@ describe('createTenantAction', () => {
     getTenantByDomainMock.mockReset();
     getTenantByDomainMock.mockResolvedValue(undefined);
     createTenantDraftMock.mockReset();
-    createTenantDraftMock.mockResolvedValue({ id: 'tenant-1' });
+    createTenantDraftMock.mockResolvedValue({
+      ok: true,
+      data: { id: 'tenant-1' },
+    });
     vi.mocked(redirect).mockClear();
   });
 
@@ -132,6 +135,37 @@ describe('createTenantAction', () => {
 
   it('returns a generic error when createTenantDraft throws', async () => {
     createTenantDraftMock.mockRejectedValue(new Error('unique violation'));
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    const result = await createTenantAction(validInput);
+
+    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('returns a slug field error when createTenantDraft reports DB_DUPLICATE_SLUG', async () => {
+    createTenantDraftMock.mockResolvedValue({
+      ok: false,
+      error: 'DB_DUPLICATE_SLUG',
+    });
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    const result = await createTenantAction(validInput);
+
+    expect(result).toEqual({
+      ok: false,
+      fieldErrors: { slug: expect.any(String) },
+    });
+    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('returns a generic error when createTenantDraft reports any other typed failure', async () => {
+    createTenantDraftMock.mockResolvedValue({
+      ok: false,
+      error: 'DB_NOT_FOUND',
+    });
     const { createTenantAction } = await import('./create-tenant-action');
 
     const result = await createTenantAction(validInput);

@@ -100,13 +100,25 @@ describe('setBookmarkStatus', () => {
 
   it('adds a bookmark for the signed-in user when isBookmarked is true', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    addBookmarkMock.mockResolvedValue({});
+    addBookmarkMock.mockResolvedValue({ ok: true, data: {} });
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       ok: true,
     });
     expect(addBookmarkMock).toHaveBeenCalledWith(TENANT_ID, 'user-1', 'post-1');
     expect(removeBookmarkMock).not.toHaveBeenCalled();
+  });
+
+  it('returns { ok: false } when addBookmark resolves a typed failure', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    addBookmarkMock.mockResolvedValue({ ok: false, error: 'DB_NOT_FOUND' });
+
+    await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
+      ok: false,
+    });
+
+    errorSpy.mockRestore();
   });
 
   it('removes a bookmark for the signed-in user when isBookmarked is false', async () => {
