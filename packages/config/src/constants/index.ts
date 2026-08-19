@@ -1,5 +1,6 @@
 export * from './admin';
 export * from './alert';
+export * from './audit';
 export * from './aside';
 export * from './brand';
 export * from './depth';

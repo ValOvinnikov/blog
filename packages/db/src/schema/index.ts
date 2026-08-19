@@ -4,6 +4,7 @@
 // owning epic's `db` sub-issue, adding a `src/schema/<domain>.ts` file and
 // re-exporting it here.
 export * from './admins';
+export * from './audit-events';
 export * from './auth';
 export * from './bookmarks';
 export * from './memberships';
