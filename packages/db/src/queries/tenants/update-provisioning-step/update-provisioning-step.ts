@@ -1,10 +1,13 @@
-import type {
-  TTenantProvisioningStatus,
-  TTenantProvisioningStep,
-  TTenantProvisioningStepStatus,
+import {
+  ERROR_CODE,
+  type TErrorCode,
+  type TTenantProvisioningStatus,
+  type TTenantProvisioningStep,
+  type TTenantProvisioningStepStatus,
 } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import type { TResult } from '@blog/utils';
 import { eq, sql } from 'drizzle-orm';
 
 export type TUpdateProvisioningStepInput = {
@@ -28,9 +31,14 @@ export type TUpdateProvisioningStepInput = {
 // written only when supplied, matching `TProvisioningStepState`'s optional
 // field; the overall `provisioningStatus` column is left untouched unless
 // this call explicitly supplies one.
+//
+// `tenantId` not matching any row is a real, reachable outcome — this is
+// called from an externally-triggered CI callback (see
+// `apps/admin`'s status-callback route) carrying an id it does not itself
+// validate.
 export async function updateProvisioningStep(
   input: TUpdateProvisioningStepInput,
-): Promise<TTenant> {
+): Promise<TResult<TTenant, TErrorCode>> {
   const db = getDb();
 
   const stepState: { status: TTenantProvisioningStepStatus; error?: string } =
@@ -55,10 +63,8 @@ export async function updateProvisioningStep(
     .returning();
 
   if (!tenant) {
-    throw new Error(
-      `updateProvisioningStep: update for tenant "${input.tenantId}" returned no row.`,
-    );
+    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
   }
 
-  return tenant;
+  return { ok: true, data: tenant };
 }

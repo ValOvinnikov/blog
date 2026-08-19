@@ -6,7 +6,7 @@ import { dispatchProvisioningWorkflow } from '@admin/server/provisioning/dispatc
 import { logger } from '@admin/utils/logger/logger';
 import { DOMAIN_PATTERN, SLUG_PATTERN } from '@admin/utils/path/path';
 import { adminRoutes } from '@admin/utils/routes/routes';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/config';
+import { ERROR_CODE, TENANT_PLAN, type TTenantPlan } from '@blog/config';
 import { queries } from '@blog/db';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -95,7 +95,7 @@ export async function createTenantAction(
 
   let tenantId: string;
   try {
-    const tenant = await queries.tenants.createTenantDraft({
+    const result = await queries.tenants.createTenantDraft({
       name,
       slug,
       domain,
@@ -103,7 +103,23 @@ export async function createTenantAction(
       plan,
       ownerUserId: owner.id,
     });
-    tenantId = tenant.id;
+
+    if (!result.ok) {
+      if (result.error === ERROR_CODE.DB_DUPLICATE_SLUG) {
+        return {
+          ok: false,
+          fieldErrors: { slug: 'This slug is already in use.' },
+        };
+      }
+      logger.error('tenants.create_draft_failed', {
+        slug,
+        domain,
+        error: result.error,
+      });
+      return { ok: false, error: "Couldn't create the tenant — try again." };
+    }
+
+    tenantId = result.data.id;
   } catch (error) {
     logger.error('tenants.create_draft_failed', { slug, domain, error });
     return { ok: false, error: "Couldn't create the tenant — try again." };

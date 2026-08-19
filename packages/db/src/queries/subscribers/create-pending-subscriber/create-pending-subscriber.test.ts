@@ -1,4 +1,4 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
+import { ERROR_CODE, TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
@@ -49,13 +49,22 @@ afterEach(async () => {
   await db.delete(schema.tenants);
 });
 
+// Unwraps a successful `TResult`, failing the test with the error code
+// otherwise — every case below expects success, so this keeps each
+// assertion focused on the resolved `data` shape.
+function unwrapOk<T>(result: { ok: boolean; data?: T; error?: unknown }): T {
+  if (!result.ok) {
+    throw new Error(`expected ok:true, got error "${String(result.error)}"`);
+  }
+  return result.data as T;
+}
+
 describe(createPendingSubscriber, () => {
   it('inserts a new pending row for a fresh email', async () => {
     const tenantId = await insertTenant('acme');
 
-    const result = await createPendingSubscriber(
-      tenantId,
-      'reader@example.com',
+    const result = unwrapOk(
+      await createPendingSubscriber(tenantId, 'reader@example.com'),
     );
 
     expect(result.outcome).toBe('created');
@@ -73,11 +82,12 @@ describe(createPendingSubscriber, () => {
 
   it('normalizes email casing/whitespace so it collides with an existing row', async () => {
     const tenantId = await insertTenant('acme');
-    const first = await createPendingSubscriber(tenantId, 'Reader@Example.com');
+    const first = unwrapOk(
+      await createPendingSubscriber(tenantId, 'Reader@Example.com'),
+    );
 
-    const second = await createPendingSubscriber(
-      tenantId,
-      '  reader@example.com  ',
+    const second = unwrapOk(
+      await createPendingSubscriber(tenantId, '  reader@example.com  '),
     );
 
     expect(second.outcome).toBe('already-pending');
@@ -88,7 +98,9 @@ describe(createPendingSubscriber, () => {
 
   it('is idempotent-safe for a duplicate submission while still pending', async () => {
     const tenantId = await insertTenant('acme');
-    const first = await createPendingSubscriber(tenantId, 'reader@example.com');
+    const first = unwrapOk(
+      await createPendingSubscriber(tenantId, 'reader@example.com'),
+    );
 
     const second = await createPendingSubscriber(
       tenantId,
@@ -96,12 +108,12 @@ describe(createPendingSubscriber, () => {
     );
 
     expect(second).toEqual({
-      outcome: 'already-pending',
-      subscriber: first.subscriber,
+      ok: true,
+      data: { outcome: 'already-pending', subscriber: first.subscriber },
     });
     // The token is not rotated — the already-sent confirmation email's link
     // must keep working.
-    expect(second.subscriber.confirmationToken).toBe(
+    expect(unwrapOk(second).subscriber.confirmationToken).toBe(
       first.subscriber.confirmationToken,
     );
     const rows = await db.select().from(schema.subscribers);
@@ -117,9 +129,8 @@ describe(createPendingSubscriber, () => {
       confirmedAt: new Date(),
     });
 
-    const result = await createPendingSubscriber(
-      tenantId,
-      'reader@example.com',
+    const result = unwrapOk(
+      await createPendingSubscriber(tenantId, 'reader@example.com'),
     );
 
     expect(result.outcome).toBe('already-active');
@@ -132,13 +143,11 @@ describe(createPendingSubscriber, () => {
     const tenantOneId = await insertTenant('acme');
     const tenantTwoId = await insertTenant('other');
 
-    const first = await createPendingSubscriber(
-      tenantOneId,
-      'reader@example.com',
+    const first = unwrapOk(
+      await createPendingSubscriber(tenantOneId, 'reader@example.com'),
     );
-    const second = await createPendingSubscriber(
-      tenantTwoId,
-      'reader@example.com',
+    const second = unwrapOk(
+      await createPendingSubscriber(tenantTwoId, 'reader@example.com'),
     );
 
     expect(first.outcome).toBe('created');
@@ -166,10 +175,31 @@ describe(createPendingSubscriber, () => {
       createPendingSubscriber(tenantId, 'reader@example.com'),
     ]);
 
-    const outcomes = [first.outcome, second.outcome].sort();
+    const outcomes = [unwrapOk(first).outcome, unwrapOk(second).outcome].sort();
     expect(outcomes).toEqual(['already-pending', 'created']);
-    expect(first.subscriber.id).toBe(second.subscriber.id);
+    expect(unwrapOk(first).subscriber.id).toBe(unwrapOk(second).subscriber.id);
     const rows = await db.select().from(schema.subscribers);
     expect(rows).toHaveLength(1);
+  });
+
+  // pglite serves a single connection, so a real concurrent DELETE landing
+  // between this call's no-op insert and its follow-up read can't be
+  // forced here — `unsubscribe` deleting the same row is the real-world
+  // trigger. The follow-up read is spied to simulate that exact window.
+  it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
+    const tenantId = await insertTenant('acme');
+    await createPendingSubscriber(tenantId, 'reader@example.com');
+
+    const selectSpy = vi.spyOn(db, 'select').mockReturnValueOnce({
+      from: () => ({ where: () => Promise.resolve([]) }),
+    } as unknown as ReturnType<typeof db.select>);
+
+    const result = await createPendingSubscriber(
+      tenantId,
+      'reader@example.com',
+    );
+
+    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
+    selectSpy.mockRestore();
   });
 });

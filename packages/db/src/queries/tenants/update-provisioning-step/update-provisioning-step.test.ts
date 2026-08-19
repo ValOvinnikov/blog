@@ -1,4 +1,4 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
+import { ERROR_CODE, TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
@@ -54,13 +54,14 @@ describe(updateProvisioningStep, () => {
   it('updates only the given step, leaving every other step untouched', async () => {
     const tenantId = await insertDraftTenant();
 
-    const tenant = await updateProvisioningStep({
+    const result = await updateProvisioningStep({
       tenantId,
       step: 'SANITY_PROJECT',
       status: 'RUNNING',
     });
 
-    expect(tenant.provisioningSteps).toEqual({
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.provisioningSteps).toEqual({
       SANITY_PROJECT: { status: 'RUNNING' },
       SEED_CONTENT: { status: 'IDLE' },
       DEPLOY_STUDIO: { status: 'IDLE' },
@@ -78,13 +79,14 @@ describe(updateProvisioningStep, () => {
       step: 'SANITY_PROJECT',
       status: 'DONE',
     });
-    const tenant = await updateProvisioningStep({
+    const result = await updateProvisioningStep({
       tenantId,
       step: 'SEED_CONTENT',
       status: 'RUNNING',
     });
 
-    expect(tenant.provisioningSteps).toEqual({
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.provisioningSteps).toEqual({
       SANITY_PROJECT: { status: 'DONE' },
       SEED_CONTENT: { status: 'RUNNING' },
       DEPLOY_STUDIO: { status: 'IDLE' },
@@ -97,14 +99,15 @@ describe(updateProvisioningStep, () => {
   it('stores the error message only when one is supplied', async () => {
     const tenantId = await insertDraftTenant();
 
-    const tenant = await updateProvisioningStep({
+    const result = await updateProvisioningStep({
       tenantId,
       step: 'SANITY_PROJECT',
       status: 'FAILED',
       error: 'Sanity Projects API returned 429',
     });
 
-    expect(tenant.provisioningSteps?.['SANITY_PROJECT']).toEqual({
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.provisioningSteps?.['SANITY_PROJECT']).toEqual({
       status: 'FAILED',
       error: 'Sanity Projects API returned 429',
     });
@@ -113,38 +116,40 @@ describe(updateProvisioningStep, () => {
   it('leaves the overall provisioningStatus untouched when not supplied', async () => {
     const tenantId = await insertDraftTenant();
 
-    const tenant = await updateProvisioningStep({
+    const result = await updateProvisioningStep({
       tenantId,
       step: 'SANITY_PROJECT',
       status: 'DONE',
     });
 
-    expect(tenant.provisioningStatus).toBe('PENDING');
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.provisioningStatus).toBe('PENDING');
   });
 
   it('updates the overall provisioningStatus when supplied on the last step', async () => {
     const tenantId = await insertDraftTenant();
 
-    const tenant = await updateProvisioningStep({
+    const result = await updateProvisioningStep({
       tenantId,
       step: 'MAP_DOMAIN',
       status: 'DONE',
       provisioningStatus: 'READY',
     });
 
-    expect(tenant.provisioningStatus).toBe('READY');
-    expect(tenant.provisioningSteps?.['MAP_DOMAIN']).toEqual({
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.provisioningStatus).toBe('READY');
+    expect(result.data.provisioningSteps?.['MAP_DOMAIN']).toEqual({
       status: 'DONE',
     });
   });
 
-  it('rejects for a tenant id that does not exist', async () => {
-    await expect(
-      updateProvisioningStep({
-        tenantId: '00000000-0000-0000-0000-000000000000',
-        step: 'SANITY_PROJECT',
-        status: 'RUNNING',
-      }),
-    ).rejects.toThrow();
+  it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
+    const result = await updateProvisioningStep({
+      tenantId: '00000000-0000-0000-0000-000000000000',
+      step: 'SANITY_PROJECT',
+      status: 'RUNNING',
+    });
+
+    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
   });
 });

@@ -1,12 +1,27 @@
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
 import { createTenant } from '@blog/db/queries/tenants/create-tenant';
 import * as schema from '@blog/db/schema';
-import { tenants } from '@blog/db/schema/tenants';
+import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import { eq } from 'drizzle-orm';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { setTenantSanityToken } from './set-tenant-sanity-token';
+
+async function insertTenant(): Promise<TTenant> {
+  const result = await createTenant({
+    slug: 'acme',
+    name: 'Acme',
+    primaryDomain: 'acme.example.com',
+    sanityProjectId: 'abc123',
+    sanityDataset: 'production',
+    locale: 'en',
+    plan: TENANT_PLAN.FREE,
+    status: TENANT_STATUS.ACTIVE,
+  });
+  if (!result.ok) throw new Error('setup: createTenant failed.');
+  return result.data;
+}
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 
@@ -36,16 +51,7 @@ afterEach(async () => {
 
 describe(setTenantSanityToken, () => {
   it('stores the token encrypted, not as plaintext', async () => {
-    const tenant = await createTenant({
-      slug: 'acme',
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    });
+    const tenant = await insertTenant();
 
     await setTenantSanityToken(tenant.id, 'sk-real-token-value');
 
@@ -60,16 +66,7 @@ describe(setTenantSanityToken, () => {
 
   it('throws when the encryption key is not configured', async () => {
     delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
-    const tenant = await createTenant({
-      slug: 'acme',
-      name: 'Acme',
-      primaryDomain: 'acme.example.com',
-      sanityProjectId: 'abc123',
-      sanityDataset: 'production',
-      locale: 'en',
-      plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ACTIVE,
-    });
+    const tenant = await insertTenant();
 
     await expect(
       setTenantSanityToken(tenant.id, 'sk-real-token-value'),

@@ -1,5 +1,7 @@
+import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
+import type { TResult } from '@blog/utils';
 import { and, eq } from 'drizzle-orm';
 
 // The three shapes `NewsletterForm`'s server action (#1104) needs to
@@ -43,7 +45,7 @@ export type TCreatePendingSubscriberResult =
 export async function createPendingSubscriber(
   tenantId: string,
   email: string,
-): Promise<TCreatePendingSubscriberResult> {
+): Promise<TResult<TCreatePendingSubscriberResult, TErrorCode>> {
   const db = getDb();
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -54,7 +56,7 @@ export async function createPendingSubscriber(
     .returning();
 
   if (inserted) {
-    return { outcome: 'created', subscriber: inserted };
+    return { ok: true, data: { outcome: 'created', subscriber: inserted } };
   }
 
   const [existing] = await db
@@ -68,19 +70,22 @@ export async function createPendingSubscriber(
     );
 
   if (!existing) {
-    // Unreachable in practice: the insert only no-ops on a (tenantId,
-    // email) conflict, which means a row satisfying this exact where
-    // already exists. Thrown rather than silently returning `undefined` so
-    // a real regression here surfaces immediately instead of as a
-    // confusing downstream crash.
-    throw new Error(
-      `createPendingSubscriber: expected an existing row for tenant "${tenantId}" / "${normalizedEmail}" after a no-op insert.`,
-    );
+    // A real, if narrow, race: the insert only no-ops on a (tenantId,
+    // email) conflict, but `unsubscribe` can delete that exact row between
+    // the failed insert and this read (a rapid subscribe/unsubscribe
+    // double-click, or two tabs).
+    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
   }
 
   if (existing.status === 'active') {
-    return { outcome: 'already-active', subscriber: existing };
+    return {
+      ok: true,
+      data: { outcome: 'already-active', subscriber: existing },
+    };
   }
 
-  return { outcome: 'already-pending', subscriber: existing };
+  return {
+    ok: true,
+    data: { outcome: 'already-pending', subscriber: existing },
+  };
 }

@@ -35,7 +35,7 @@ const validBody = {
 describe('POST /api/provisioning/status-callback', () => {
   beforeEach(() => {
     updateProvisioningStepMock.mockReset();
-    updateProvisioningStepMock.mockResolvedValue({});
+    updateProvisioningStepMock.mockResolvedValue({ ok: true, data: {} });
   });
 
   it('rejects a missing bearer token', async () => {
@@ -177,6 +177,30 @@ describe('POST /api/provisioning/status-callback', () => {
       step: 'MAP_DOMAIN',
       status: 'DONE',
     });
+  });
+
+  it('responds 404 when updateProvisioningStep reports DB_NOT_FOUND', async () => {
+    updateProvisioningStepMock.mockResolvedValue({
+      ok: false,
+      error: 'DB_NOT_FOUND',
+    });
+    const { POST } = await import('./route');
+
+    const response = await POST(postRequest(validBody, 'callback-secret'));
+
+    expect(response.status).toBe(404);
+  });
+
+  it('responds 500 when updateProvisioningStep reports any other failure', async () => {
+    updateProvisioningStepMock.mockResolvedValue({
+      ok: false,
+      error: 'SOMETHING_ELSE',
+    });
+    const { POST } = await import('./route');
+
+    const response = await POST(postRequest(validBody, 'callback-secret'));
+
+    expect(response.status).toBe(500);
   });
 
   it('responds 500 when the secret is not configured', async () => {

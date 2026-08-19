@@ -16,9 +16,16 @@ export async function archiveTenantRow(
   if (tenant.deprovisionedAt) return;
 
   if (env.dryRun) {
-    console.warn(`[dry-run] would mark tenant "${tenant.id}" as deprovisioned.`);
+    console.warn(
+      `[dry-run] would mark tenant "${tenant.id}" as deprovisioned.`,
+    );
     return;
   }
 
-  await archiveTenant(tenant.id);
+  const result = await archiveTenant(tenant.id);
+  if (!result.ok) {
+    throw new Error(
+      `archive-tenant: archiveTenant failed for "${tenant.id}" (${result.error}).`,
+    );
+  }
 }

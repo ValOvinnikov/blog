@@ -7,6 +7,8 @@ const {
   getTenantBySlugMock,
   getTenantByDomainMock,
   createTenantDraftMock,
+  loggerErrorMock,
+  loggerWarnMock,
 } = vi.hoisted(() => ({
   requireAdminMock: vi.fn(),
   dispatchProvisioningWorkflowMock: vi.fn(),
@@ -14,6 +16,8 @@ const {
   getTenantBySlugMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
   createTenantDraftMock: vi.fn(),
+  loggerErrorMock: vi.fn(),
+  loggerWarnMock: vi.fn(),
 }));
 
 vi.mock('@admin/server/auth/require-admin', () => ({
@@ -22,6 +26,10 @@ vi.mock('@admin/server/auth/require-admin', () => ({
 
 vi.mock('@admin/server/provisioning/dispatch-provisioning-workflow', () => ({
   dispatchProvisioningWorkflow: dispatchProvisioningWorkflowMock,
+}));
+
+vi.mock('@admin/utils/logger/logger', () => ({
+  logger: { error: loggerErrorMock, warn: loggerWarnMock },
 }));
 
 vi.mock('@blog/db', () => ({
@@ -59,7 +67,12 @@ describe('createTenantAction', () => {
     getTenantByDomainMock.mockReset();
     getTenantByDomainMock.mockResolvedValue(undefined);
     createTenantDraftMock.mockReset();
-    createTenantDraftMock.mockResolvedValue({ id: 'tenant-1' });
+    createTenantDraftMock.mockResolvedValue({
+      ok: true,
+      data: { id: 'tenant-1' },
+    });
+    loggerErrorMock.mockReset();
+    loggerWarnMock.mockReset();
     vi.mocked(redirect).mockClear();
   });
 
@@ -130,7 +143,7 @@ describe('createTenantAction', () => {
     expect(createTenantDraftMock).not.toHaveBeenCalled();
   });
 
-  it('returns a generic error when createTenantDraft throws', async () => {
+  it('returns a generic error and logs at error level when createTenantDraft throws', async () => {
     createTenantDraftMock.mockRejectedValue(new Error('unique violation'));
     const { createTenantAction } = await import('./create-tenant-action');
 
@@ -139,6 +152,48 @@ describe('createTenantAction', () => {
     expect(result).toEqual({ ok: false, error: expect.any(String) });
     expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'tenants.create_draft_failed',
+      expect.objectContaining({ slug: 'acme' }),
+    );
+  });
+
+  it('returns a slug field error and logs nothing when createTenantDraft reports DB_DUPLICATE_SLUG', async () => {
+    createTenantDraftMock.mockResolvedValue({
+      ok: false,
+      error: 'DB_DUPLICATE_SLUG',
+    });
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    const result = await createTenantAction(validInput);
+
+    expect(result).toEqual({
+      ok: false,
+      fieldErrors: { slug: expect.any(String) },
+    });
+    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(redirect).not.toHaveBeenCalled();
+    expect(loggerWarnMock).not.toHaveBeenCalled();
+    expect(loggerErrorMock).not.toHaveBeenCalled();
+  });
+
+  it('returns a generic error and logs at error level when createTenantDraft reports any other typed failure', async () => {
+    createTenantDraftMock.mockResolvedValue({
+      ok: false,
+      error: 'DB_NOT_FOUND',
+    });
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    const result = await createTenantAction(validInput);
+
+    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(redirect).not.toHaveBeenCalled();
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'tenants.create_draft_failed',
+      expect.objectContaining({ slug: 'acme', error: 'DB_NOT_FOUND' }),
+    );
+    expect(loggerWarnMock).not.toHaveBeenCalled();
   });
 
   it('creates the tenant draft with the resolved owner id and platform default locale', async () => {

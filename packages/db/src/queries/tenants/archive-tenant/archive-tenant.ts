@@ -1,12 +1,21 @@
-import { TENANT_STATUS } from '@blog/config/constants';
+import {
+  ERROR_CODE,
+  TENANT_STATUS,
+  type TErrorCode,
+} from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import type { TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
 // Marks a tenant deprovisioned by stamping `deprovisionedAt` and setting
 // `status` to ARCHIVED — the row is archived, never hard-deleted, so
 // `slug`'s unique constraint keeps holding the name even after teardown.
-export async function archiveTenant(tenantId: string): Promise<TTenant> {
+// `tenantId` not matching any row (a stale id, or a second concurrent
+// deprovision attempt) is a real, reachable outcome, not a bug.
+export async function archiveTenant(
+  tenantId: string,
+): Promise<TResult<TTenant, TErrorCode>> {
   const db = getDb();
 
   const [tenant] = await db
@@ -16,10 +25,8 @@ export async function archiveTenant(tenantId: string): Promise<TTenant> {
     .returning();
 
   if (!tenant) {
-    throw new Error(
-      `archiveTenant: update for tenant "${tenantId}" returned no row.`,
-    );
+    return { ok: false, error: ERROR_CODE.DB_NOT_FOUND };
   }
 
-  return tenant;
+  return { ok: true, data: tenant };
 }

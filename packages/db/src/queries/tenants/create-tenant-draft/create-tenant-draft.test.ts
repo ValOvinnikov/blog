@@ -1,4 +1,4 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
+import { ERROR_CODE, TENANT_PLAN, TENANT_STATUS } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
 import { eq } from 'drizzle-orm';
@@ -47,9 +47,10 @@ describe(createTenantDraft, () => {
   it('inserts a tenant row left in PENDING with an idle per-step map and no Sanity project yet', async () => {
     await insertUser('user-1');
 
-    const tenant = await createTenantDraft(draftInput);
+    const result = await createTenantDraft(draftInput);
 
-    expect(tenant).toMatchObject({
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data).toMatchObject({
       slug: 'acme',
       name: 'Acme',
       primaryDomain: 'acme.example.com',
@@ -60,7 +61,7 @@ describe(createTenantDraft, () => {
       sanityProjectId: null,
       sanityDataset: null,
     });
-    expect(tenant.provisioningSteps).toEqual({
+    expect(result.data.provisioningSteps).toEqual({
       SANITY_PROJECT: { status: 'IDLE' },
       SEED_CONTENT: { status: 'IDLE' },
       DEPLOY_STUDIO: { status: 'IDLE' },
@@ -73,15 +74,16 @@ describe(createTenantDraft, () => {
   it('inserts the primary domain into tenant_domains', async () => {
     await insertUser('user-1');
 
-    const tenant = await createTenantDraft(draftInput);
+    const result = await createTenantDraft(draftInput);
 
+    if (!result.ok) throw new Error('expected ok:true');
     const [domainRow] = await db
       .select()
       .from(schema.tenantDomains)
-      .where(eq(schema.tenantDomains.tenantId, tenant.id));
+      .where(eq(schema.tenantDomains.tenantId, result.data.id));
 
     expect(domainRow).toMatchObject({
-      tenantId: tenant.id,
+      tenantId: result.data.id,
       domain: 'acme.example.com',
     });
   });
@@ -89,15 +91,16 @@ describe(createTenantDraft, () => {
   it('inserts an OWNER membership row for the given owner user id', async () => {
     await insertUser('user-1');
 
-    const tenant = await createTenantDraft(draftInput);
+    const result = await createTenantDraft(draftInput);
 
+    if (!result.ok) throw new Error('expected ok:true');
     const [membershipRow] = await db
       .select()
       .from(schema.memberships)
-      .where(eq(schema.memberships.tenantId, tenant.id));
+      .where(eq(schema.memberships.tenantId, result.data.id));
 
     expect(membershipRow).toMatchObject({
-      tenantId: tenant.id,
+      tenantId: result.data.id,
       userId: 'user-1',
       role: 'OWNER',
     });
@@ -151,5 +154,44 @@ describe(createTenantDraft, () => {
       .from(schema.tenantDomains)
       .where(eq(schema.tenantDomains.domain, draftInput.domain));
     expect(domainRows).toHaveLength(1);
+  });
+
+  it('returns DB_DUPLICATE_SLUG for a second draft with an already-used slug, without touching dependent rows', async () => {
+    await insertUser('user-1');
+    await insertUser('user-2');
+    await createTenantDraft(draftInput);
+
+    const result = await createTenantDraft({
+      ...draftInput,
+      domain: 'other.example.com',
+      ownerUserId: 'user-2',
+    });
+
+    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_DUPLICATE_SLUG });
+
+    const secondMembershipRows = await db
+      .select()
+      .from(schema.memberships)
+      .where(eq(schema.memberships.userId, 'user-2'));
+    expect(secondMembershipRows).toHaveLength(0);
+  });
+
+  // pglite serves a single connection, so a real concurrent UPDATE landing
+  // between this call's no-op insert and its follow-up read can't be
+  // forced here — `updateTenantDetails` renaming the slug away is the
+  // real-world trigger. The follow-up read is spied to simulate that exact
+  // window.
+  it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
+    await insertUser('user-1');
+    await createTenantDraft(draftInput);
+
+    const selectSpy = vi.spyOn(db, 'select').mockReturnValueOnce({
+      from: () => ({ where: () => Promise.resolve([]) }),
+    } as unknown as ReturnType<typeof db.select>);
+
+    const result = await createTenantDraft(draftInput);
+
+    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
+    selectSpy.mockRestore();
   });
 });

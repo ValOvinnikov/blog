@@ -44,7 +44,9 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
 }
 
 beforeEach(() => {
-  archiveTenantMock.mockReset().mockResolvedValue({});
+  archiveTenantMock
+    .mockReset()
+    .mockResolvedValue({ ok: true, data: baseTenant() });
 });
 
 describe(archiveTenantRow, () => {
