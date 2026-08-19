@@ -13,6 +13,15 @@ export interface IWithDataTestId {
   dataTestId?: string;
 }
 
+/**
+ * `className` carries layout concerns the parent controls — margins, width,
+ * flex/grid placement — never appearance, which belongs to the component's
+ * own variants.
+ */
+export interface IWithClassName {
+  className?: string;
+}
+
 export interface ILocalizedParams {
   locale: TLocaleIsoCode;
 }
