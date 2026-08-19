@@ -57,4 +57,11 @@ export default [
       ],
     },
   },
+  {
+    // Playwright specs may log to aid debugging a failed run.
+    files: ['e2e/**/*.{ts,tsx}'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
 ];

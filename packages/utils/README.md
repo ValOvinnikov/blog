@@ -19,7 +19,6 @@ logic it needs without inheriting framework baggage.
 - `async/` — `safeAsync`, a result-wrapping helper for async calls (`TResult<T>`).
 - `color/` — `oklchToHex`, `wcagContrastRatio`, `WCAG_AA_CONTRAST_MIN`.
 - `encryption/` — `encryptSecret` / `decryptSecret`.
-- `log/` — `sanitizeLogMessage`.
 - `merge/` — `deepMergePartial`, `TDeepPartial<T>`.
 - `pagination/` — `toTotalPages`.
 - `primitives/` — `objectKeys`, `toTitleCase`.

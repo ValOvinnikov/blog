@@ -34,13 +34,12 @@ describe('getDomainVerificationStatusAction', () => {
     requireAdminMock.mockImplementation(() => {
       throw new Error('NEXT_REDIRECT');
     });
-    const { getDomainVerificationStatusAction } = await import(
-      './get-domain-verification-status-action'
-    );
+    const { getDomainVerificationStatusAction } =
+      await import('./get-domain-verification-status-action');
 
-    await expect(
-      getDomainVerificationStatusAction('tenant-1'),
-    ).rejects.toThrow('NEXT_REDIRECT');
+    await expect(getDomainVerificationStatusAction('tenant-1')).rejects.toThrow(
+      'NEXT_REDIRECT',
+    );
     expect(listTenantsByIdsMock).not.toHaveBeenCalled();
     expect(getDomainVerificationStatusMock).not.toHaveBeenCalled();
   });
@@ -50,9 +49,8 @@ describe('getDomainVerificationStatusAction', () => {
       makeTenant({ id: 'tenant-1', primaryDomain: 'acme.example.com' }),
     ]);
     getDomainVerificationStatusMock.mockResolvedValue('VERIFIED');
-    const { getDomainVerificationStatusAction } = await import(
-      './get-domain-verification-status-action'
-    );
+    const { getDomainVerificationStatusAction } =
+      await import('./get-domain-verification-status-action');
 
     const result = await getDomainVerificationStatusAction('tenant-1');
 
@@ -70,9 +68,8 @@ describe('getDomainVerificationStatusAction', () => {
 
   it('returns ERROR without checking any domain when the tenant id resolves to no row', async () => {
     listTenantsByIdsMock.mockResolvedValue([]);
-    const { getDomainVerificationStatusAction } = await import(
-      './get-domain-verification-status-action'
-    );
+    const { getDomainVerificationStatusAction } =
+      await import('./get-domain-verification-status-action');
 
     const result = await getDomainVerificationStatusAction('unknown-tenant');
 

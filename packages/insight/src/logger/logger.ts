@@ -154,7 +154,6 @@ export function createLogger(baseContext: TLogContext = {}): ILogger {
       emit(console.warn, LOG_LEVEL.WARN, event, baseContext, context);
     },
     info(event, context) {
-      // eslint-disable-next-line no-console -- structured stdout logging is this module's job
       emit(console.info, LOG_LEVEL.INFO, event, baseContext, context);
     },
     debug(event, context) {
@@ -162,7 +161,6 @@ export function createLogger(baseContext: TLogContext = {}): ILogger {
         return;
       }
 
-      // eslint-disable-next-line no-console -- structured stdout logging is this module's job
       emit(console.debug, LOG_LEVEL.DEBUG, event, baseContext, context);
     },
   };

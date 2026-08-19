@@ -32,9 +32,7 @@ describe(getDomainVerificationStatus, () => {
   });
 
   it('rejects a domain containing path-traversal characters without making a request', async () => {
-    const result = await getDomainVerificationStatus(
-      '../../v9/projects/other',
-    );
+    const result = await getDomainVerificationStatus('../../v9/projects/other');
 
     expect(result).toBe('ERROR');
     expect(fetchMock).not.toHaveBeenCalled();
@@ -48,9 +46,7 @@ describe(getDomainVerificationStatus, () => {
     await getDomainVerificationStatus('example.com');
 
     const [calledUrl] = fetchMock.mock.calls[0] as [URL];
-    expect(calledUrl.pathname).toBe(
-      '/v9/projects/prj_123/domains/example.com',
-    );
+    expect(calledUrl.pathname).toBe('/v9/projects/prj_123/domains/example.com');
   });
 
   it('returns NOT_ADDED for a 404 response', async () => {
