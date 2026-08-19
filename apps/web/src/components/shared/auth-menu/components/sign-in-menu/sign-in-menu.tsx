@@ -129,7 +129,7 @@ export function SignInMenu({
         >
           <TextInput
             type="email"
-            required={true}
+            isRequired={true}
             value={email}
             onChange={setEmail}
             ariaLabel={t('emailAriaLabel')}

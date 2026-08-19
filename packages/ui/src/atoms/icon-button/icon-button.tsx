@@ -10,7 +10,7 @@ export type TIconButtonProps = IWithClassName &
     children: ReactNode;
     onClick?: MouseEventHandler<HTMLButtonElement>;
     isDisabled?: boolean;
-    inert?: boolean;
+    isInert?: boolean;
     'aria-expanded'?: AriaAttributes['aria-expanded'];
     'aria-controls'?: AriaAttributes['aria-controls'];
     'aria-haspopup'?: AriaAttributes['aria-haspopup'];
@@ -28,7 +28,7 @@ export const IconButton = ({
   ref,
   onClick,
   isDisabled,
-  inert,
+  isInert,
   'aria-expanded': ariaExpanded,
   'aria-controls': ariaControls,
   'aria-haspopup': ariaHaspopup,
@@ -40,7 +40,7 @@ export const IconButton = ({
     title={title}
     onClick={onClick}
     disabled={isDisabled}
-    inert={inert}
+    inert={isInert}
     aria-expanded={ariaExpanded}
     aria-controls={ariaControls}
     aria-haspopup={ariaHaspopup}

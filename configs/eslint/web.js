@@ -3,6 +3,7 @@ import path from 'node:path';
 import nextPlugin from '@next/eslint-plugin-next';
 import checkFile from 'eslint-plugin-check-file';
 
+import { booleanPropPrefixRule } from './boolean-prop-prefix.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
 import react from './react.js';
 import storybook from './storybook.js';
@@ -32,7 +33,11 @@ export default [
   },
   {
     files: ['**/*.{ts,tsx}'],
+    plugins: {
+      blog: { rules: { 'boolean-prop-prefix': booleanPropPrefixRule } },
+    },
     rules: {
+      'blog/boolean-prop-prefix': 'error',
       'no-restricted-imports': [
         'error',
         {

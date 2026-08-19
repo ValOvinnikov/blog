@@ -1,5 +1,7 @@
 import path from 'node:path';
 
+import { booleanPropPrefixRule } from './boolean-prop-prefix.js';
+import { noPropSpreadRule } from './no-prop-spread.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
 import react from './react.js';
 import storybook from './storybook.js';
@@ -15,7 +17,17 @@ export default [
   ...storybook(packageJsonPath),
   {
     files: ['**/*.{ts,tsx}'],
+    plugins: {
+      blog: {
+        rules: {
+          'no-prop-spread': noPropSpreadRule,
+          'boolean-prop-prefix': booleanPropPrefixRule,
+        },
+      },
+    },
     rules: {
+      'blog/no-prop-spread': 'error',
+      'blog/boolean-prop-prefix': 'error',
       'no-restricted-globals': [
         'error',
         {

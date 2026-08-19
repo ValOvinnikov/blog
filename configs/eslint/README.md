@@ -10,6 +10,24 @@
 - `no-upstream-imports.js` — the `no-restricted-imports` rule that enforces
   the dependency graph (e.g. blocking `@blog/config`/`@blog/utils` from
   importing `@blog/service`/`@blog/ui`).
+- `no-prop-spread.js` — bans `{...rest}`/`{...props}` spread onto a JSX
+  element in `@blog/ui` component source, with an explicit file allowlist
+  for polymorphic components that forward props to a caller-chosen `as`
+  element. `.test.tsx`/`.stories.tsx` files are out of scope — they spread
+  fixtures onto local mock components, not `@blog/ui`'s own surface.
+  Registered only in `ui.js`. Co-located `no-prop-spread.test.js`
+  (`RuleTester`, run via `node --test`).
+- `boolean-prop-prefix.js` — requires boolean-typed members of `T*Props`/
+  `I*Props` declarations to start with `is`/`has`/`can`/`should`. A
+  syntactic rule (no type-aware linting) scoped by the enclosing type's
+  name, which is what keeps it from ever touching a `Result` discriminant's
+  `ok`. Allowlists `prefetch`/`priority` (third-party passthrough).
+  Registered in `ui.js`, `web.js`, and `admin.js`. Co-located
+  `boolean-prop-prefix.test.js`. Known gap: a prop typed as an indexed
+  access into a `tv()` variants type (e.g. `TFooVariants['bar']`) is boolean
+  at runtime but isn't caught, since the rule only inspects the syntactic
+  annotation shape — flagging it would require type-aware linting, which
+  this repo's ESLint setup doesn't run.
 - Per-layer subpaths that compose `base.js` (and, where relevant,
   `no-upstream-imports.js`) with that layer's own constraints — `./config`,
   `./utils`, `./insight`, `./service`, `./db`, `./ui`, `./web`, `./cms`,
