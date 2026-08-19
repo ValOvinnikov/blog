@@ -117,17 +117,23 @@ const findComponent = (sf, name) => {
   return fallback;
 };
 
-// Prefer `I<Name>Props`; else the first exported interface/type alias ending in
-// "Props".
+// Prefer `I<Name>Props`, then `T<Name>Props`; else the first exported
+// interface/type alias ending in "Props" (source order — only a fallback,
+// since a file with multiple `*Props` declarations, e.g. a compound
+// component's own props plus a nested slot-config props type, would
+// otherwise pick whichever happens to be declared first).
 const findPropsType = (sf, name) => {
-  const preferred = `I${name}Props`;
+  const preferredNames = [`I${name}Props`, `T${name}Props`];
   const candidates = [];
   for (const stmt of sf.statements) {
     if (ts.isInterfaceDeclaration(stmt) || ts.isTypeAliasDeclaration(stmt)) {
       const n = stmt.name.text;
-      if (n === preferred) return stmt;
       if (n.endsWith('Props')) candidates.push(stmt);
     }
+  }
+  for (const preferred of preferredNames) {
+    const match = candidates.find((c) => c.name.text === preferred);
+    if (match) return match;
   }
   return candidates[0] ?? null;
 };
