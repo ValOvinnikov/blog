@@ -196,6 +196,38 @@ The session authenticates; it does not authorize.
   tenants the session may act on from its `memberships`, then check the routed
   tenant id against that set.
 
+## Audit trail
+
+Operator-initiated lifecycle mutations record a durable audit event. This is
+**not** logging: log lines expire and can't be queried by business key, so the
+question "who archived this tenant, and when" must be answerable from the
+`audit_events` table alone.
+
+Call `recordAuditEvent` (`@admin/server/audit/record-audit-event`) — never
+`insertAuditEvent` directly. It resolves the actor from the session, never
+throws, and never changes what its caller returns: a lost audit write is
+logged at `error` and swallowed rather than blocking the mutation it
+describes, because the `neon-http` driver has no multi-statement transactions
+to couple the two writes atomically.
+
+**Record only what actually happened.** Write the event after the mutation is
+confirmed, and gate it on a real success signal — not on having reached the
+end of the function. A best-effort helper that swallows its own failures and
+returns `void` is not a success signal; make it report success and branch on
+that. A false record is worse than a missing one: it asserts something that
+did not occur, and nothing downstream can tell the difference.
+
+Be precise about what the event attests to. An entry written after
+successfully _requesting_ an out-of-repo workflow proves the request, not the
+outcome — say so in the PR rather than letting the action name imply more.
+
+Use the existing `AUDIT_ACTION` / `AUDIT_TARGET_TYPE` members in
+`@blog/config`. If none fits, that is a question for the orchestrator, not a
+new member you add: an action with no producer is dead vocabulary that implies
+the system records something it doesn't, and Knip cannot catch it — its
+unused-export analysis is whole-binding, so dead keys inside a const object
+are invisible.
+
 ## File organisation
 
 Same folder discipline as `apps/web` (see `.claude/agents/web.md` — read it
@@ -285,6 +317,9 @@ block — it points at open work rather than narrating closed work.
   `testing-practices` skill (`.claude/skills/testing-practices/SKILL.md`).
 - Mock `@blog/db` query/mutation functions; assert that fetched data renders and
   that a form submission calls the action with the values the user entered.
+- **A mutation that records an audit event gets a test that it is _not_
+  recorded when the mutation fails**, alongside the happy path. The failure
+  case is the one that matters — a wrong entry is worse than a missing one.
 - **Authorization gates get a test each** — an unauthenticated request, an
   authenticated request without the required row, and a permitted request. This
   is the one place in this app where a missing test is a real risk.
@@ -301,6 +336,8 @@ Run these checks **once, after all work is complete**:
   `apps/admin`.
 - Every route added under a gated segment is actually gated; every Server Action
   validates its input and re-checks authorization.
+- Every new operator-initiated lifecycle mutation records an audit event, or
+  the report says explicitly why it doesn't.
 
 **Report back to the orchestrator** with:
 
