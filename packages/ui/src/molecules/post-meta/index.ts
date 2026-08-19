@@ -1,2 +1,2 @@
-export type { IPostMetaProps } from './post-meta';
+export type { TPostMetaProps } from './post-meta';
 export { PostMeta } from './post-meta';

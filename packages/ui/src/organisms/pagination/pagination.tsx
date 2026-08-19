@@ -1,22 +1,22 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import type { ElementType } from 'react';
 
 import { paginationVariants } from './pagination-variants';
 
-export interface IPaginationProps extends IWithDataTestId {
-  /** 1-based current page. */
-  currentPage: number;
-  totalPages: number;
-  /** Builds the href for a page number — URL scheme stays in the app. */
-  createHref: (page: number) => string;
-  ariaLabel: string;
-  previousLabel: string;
-  nextLabel: string;
-  /** Component links render as — pass the app router's Link for client-side navigation. */
-  linkAs?: TAnchorElementType;
-  className?: string;
-}
+export type TPaginationProps = IWithClassName &
+  IWithDataTestId & {
+    /** 1-based current page. */
+    currentPage: number;
+    totalPages: number;
+    /** Builds the href for a page number — URL scheme stays in the app. */
+    createHref: (page: number) => string;
+    ariaLabel: string;
+    previousLabel: string;
+    nextLabel: string;
+    /** Component links render as — pass the app router's Link for client-side navigation. */
+    linkAs?: TAnchorElementType;
+  };
 
 const s = paginationVariants();
 
@@ -46,7 +46,7 @@ export const Pagination = ({
   linkAs,
   className,
   dataTestId,
-}: IPaginationProps) => {
+}: TPaginationProps) => {
   if (totalPages <= 1) return null;
 
   const Component = (linkAs ?? 'a') as ElementType;

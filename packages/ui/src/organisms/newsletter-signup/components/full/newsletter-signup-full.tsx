@@ -2,6 +2,7 @@ import {
   ALERT_TYPE,
   ICONS,
   Size,
+  type IWithClassName,
   type IWithDataTestId,
   type TFormStatus,
 } from '@blog/config';
@@ -20,25 +21,25 @@ export interface INewsletterSignupTrustCue {
   label: string;
 }
 
-export interface INewsletterSignupFullProps extends IWithDataTestId {
-  email: string;
-  onChange: (value: string) => void;
-  onSubmit: () => void;
-  status: TFormStatus;
-  heading: string;
-  headingId?: string;
-  supportingText?: string;
-  errorMessage?: string;
-  successMessage?: string;
-  submitLabel: string;
-  emailAriaLabel: string;
-  placeholder?: string;
-  /** Reassurance row (e.g. "no spam", "unsubscribe in one line") rendered under the pitch copy. Omit to skip the row entirely. */
-  trustCues?: INewsletterSignupTrustCue[];
-  /** Horizontal alignment of the pitch pane's heading, supporting text, and trust cues. Defaults to left. */
-  align?: TNewsletterSignupVariants['align'];
-  className?: string;
-}
+export type TNewsletterSignupFullProps = IWithClassName &
+  IWithDataTestId & {
+    email: string;
+    onChange: (value: string) => void;
+    onSubmit: () => void;
+    status: TFormStatus;
+    heading: string;
+    headingId?: string;
+    supportingText?: string;
+    errorMessage?: string;
+    successMessage?: string;
+    submitLabel: string;
+    emailAriaLabel: string;
+    placeholder?: string;
+    /** Reassurance row (e.g. "no spam", "unsubscribe in one line") rendered under the pitch copy. Omit to skip the row entirely. */
+    trustCues?: INewsletterSignupTrustCue[];
+    /** Horizontal alignment of the pitch pane's heading, supporting text, and trust cues. Defaults to left. */
+    align?: TNewsletterSignupVariants['align'];
+  };
 
 /**
  * `NewsletterSignup.Full` — the rich, tinted window-shell signup form used
@@ -65,7 +66,7 @@ export const NewsletterSignupFull = ({
   align,
   className,
   dataTestId,
-}: INewsletterSignupFullProps) => {
+}: TNewsletterSignupFullProps) => {
   const isSuccess = status === 'success';
   const s = newsletterSignupVariants({ variant: 'full', align });
 

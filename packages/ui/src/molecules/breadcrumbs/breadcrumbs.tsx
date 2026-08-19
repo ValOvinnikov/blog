@@ -1,4 +1,9 @@
-import { ICONS, Size, type IWithDataTestId } from '@blog/config';
+import {
+  ICONS,
+  Size,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Icon } from '@blog/ui/atoms/icon';
 import { type ElementType } from 'react';
@@ -10,15 +15,15 @@ export interface IBreadcrumbItem {
   href: string;
 }
 
-export interface IBreadcrumbsProps extends IWithDataTestId {
-  /** Full trail including the current page as the last item. */
-  items: IBreadcrumbItem[];
-  /** aria-label for the nav — passed in (i18n), never hardcoded in @blog/ui. */
-  ariaLabel: string;
-  /** Component each link renders as — pass the app router's Link for client-side navigation. Defaults to a plain `<a>`. */
-  linkAs?: TAnchorElementType;
-  className?: string;
-}
+export type TBreadcrumbsProps = IWithClassName &
+  IWithDataTestId & {
+    /** Full trail including the current page as the last item. */
+    items: IBreadcrumbItem[];
+    /** aria-label for the nav — passed in (i18n), never hardcoded in @blog/ui. */
+    ariaLabel: string;
+    /** Component each link renders as — pass the app router's Link for client-side navigation. Defaults to a plain `<a>`. */
+    linkAs?: TAnchorElementType;
+  };
 
 const s = breadcrumbsVariants();
 
@@ -48,7 +53,7 @@ export const Breadcrumbs = ({
   linkAs,
   className,
   dataTestId,
-}: IBreadcrumbsProps) => {
+}: TBreadcrumbsProps) => {
   const LinkComponent = (linkAs ?? 'a') as ElementType;
   const lastIndex = items.length - 1;
 

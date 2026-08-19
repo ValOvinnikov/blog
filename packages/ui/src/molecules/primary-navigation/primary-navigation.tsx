@@ -21,7 +21,7 @@ export interface INavItem {
   target?: '_blank';
 }
 
-export interface IPrimaryNavigationMobileToggleProps {
+export type TPrimaryNavigationMobileToggleProps = {
   /** Whether the mobile dropdown panel is currently open — drives `aria-expanded` on the toggle button, the toggle icon, and the panel's visibility. The caller (`apps/web`) owns the open/closed state. */
   isOpen: boolean;
   /** Click handler wired to the toggle button — the caller owns the state transition. */
@@ -30,7 +30,7 @@ export interface IPrimaryNavigationMobileToggleProps {
   ariaLabel: string;
   /** Shared id linking the toggle's `aria-controls` to the dropdown panel's `id`. */
   panelId: string;
-}
+};
 
 export type TPrimaryNavigationProps = IWithClassName &
   IWithDataTestId & {
@@ -40,7 +40,7 @@ export type TPrimaryNavigationProps = IWithClassName &
     /** Component each NavLink renders as — defaults to a plain `<a>`. Pass the app router's Link to get client-side navigation. */
     linkAs?: TAnchorElementType;
     /** Enables the responsive mobile toggle + dropdown panel below the `lg` breakpoint: the inline links hide, a hamburger toggle appears, and a dropdown panel holding the same links shows/hides with `isOpen`. Omit to keep links always inline (today's behaviour). */
-    mobileToggle?: IPrimaryNavigationMobileToggleProps;
+    mobileToggle?: TPrimaryNavigationMobileToggleProps;
   };
 
 /**

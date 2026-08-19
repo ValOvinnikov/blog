@@ -2,6 +2,7 @@ import {
   ICONS,
   Size,
   TOAST_TYPE,
+  type IWithClassName,
   type IWithDataTestId,
   type TToastType,
 } from '@blog/config';
@@ -18,37 +19,37 @@ export interface IToastAction {
   keyHint?: string;
 }
 
-export interface IToastProps extends IWithDataTestId {
-  type: TToastType;
-  /**
-   * Overlays the type's glyph with a `Spinner` for an in-flight action (e.g.
-   * a `toast.promise` pending state). The spinner is type-agnostic — it
-   * always renders in `Spinner`'s own default accent color, so pairing
-   * `isLoading: true` with `type: SUCCESS`/`WARNING`/`ERROR` won't tint it
-   * to match.
-   */
-  isLoading?: boolean;
-  /**
-   * Required unless `isPlain` is set — the terminal-style command/state chip
-   * (e.g. "bookmark · saved") is only rendered when `isPlain` is falsy.
-   */
-  command?: string;
-  state?: string;
-  message: ReactNode;
-  time?: string;
-  action?: IToastAction;
-  dismissLabel: string;
-  isPaused?: boolean;
-  durationMs?: number;
-  onDismiss: () => void;
-  phase: NonNullable<TToastVariants['phase']>;
-  /**
-   * Renders `message` alone, without the `command`/`state` chip — for
-   * presets that don't want the toast to read as terminal-log output.
-   */
-  isPlain?: boolean;
-  className?: string;
-}
+export type TToastProps = IWithClassName &
+  IWithDataTestId & {
+    type: TToastType;
+    /**
+     * Overlays the type's glyph with a `Spinner` for an in-flight action (e.g.
+     * a `toast.promise` pending state). The spinner is type-agnostic — it
+     * always renders in `Spinner`'s own default accent color, so pairing
+     * `isLoading: true` with `type: SUCCESS`/`WARNING`/`ERROR` won't tint it
+     * to match.
+     */
+    isLoading?: boolean;
+    /**
+     * Required unless `isPlain` is set — the terminal-style command/state chip
+     * (e.g. "bookmark · saved") is only rendered when `isPlain` is falsy.
+     */
+    command?: string;
+    state?: string;
+    message: ReactNode;
+    time?: string;
+    action?: IToastAction;
+    dismissLabel: string;
+    isPaused?: boolean;
+    durationMs?: number;
+    onDismiss: () => void;
+    phase: NonNullable<TToastVariants['phase']>;
+    /**
+     * Renders `message` alone, without the `command`/`state` chip — for
+     * presets that don't want the toast to read as terminal-log output.
+     */
+    isPlain?: boolean;
+  };
 
 const TOAST_GLYPH: Record<TToastType, string> = {
   [TOAST_TYPE.SUCCESS]: '✓',
@@ -93,7 +94,7 @@ export const Toast = ({
   isPlain = false,
   className,
   dataTestId,
-}: IToastProps) => {
+}: TToastProps) => {
   const s = toastVariants({
     type,
     phase,

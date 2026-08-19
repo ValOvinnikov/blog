@@ -1,4 +1,4 @@
-import { type IWithDataTestId, Size } from '@blog/config';
+import { type IWithClassName, type IWithDataTestId, Size } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import type { IWithIcon } from '@blog/ui/lib/react';
 import { LinkButton } from '@blog/ui/molecules/link-button';
@@ -9,11 +9,12 @@ export interface IShareLinkItem extends IWithIcon {
   label: string;
 }
 
-export interface IShareLinkProps extends IShareLinkItem, IWithDataTestId {
-  className?: string;
-  /** Component this share link renders as — defaults to a plain `<a>`. Pass the app router's Link to get client-side navigation. */
-  as?: TAnchorElementType;
-}
+export type TShareLinkProps = IShareLinkItem &
+  IWithClassName &
+  IWithDataTestId & {
+    /** Component this share link renders as — defaults to a plain `<a>`. Pass the app router's Link to get client-side navigation. */
+    as?: TAnchorElementType;
+  };
 
 /**
  * ShareLink molecule — a single external share action (e.g. "Share on X"),
@@ -30,7 +31,7 @@ export const ShareLink = ({
   className,
   dataTestId,
   as,
-}: IShareLinkProps) => {
+}: TShareLinkProps) => {
   // Widened for LinkButton's `as` slot: the restricted `TAnchorElementType`
   // union (no `rel`) would otherwise reject the `rel` prop below. The clean
   // fix is adding `rel` to `TAnchorElementType`

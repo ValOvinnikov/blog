@@ -1,17 +1,22 @@
-import { ICONS, Size, type IWithDataTestId } from '@blog/config';
+import {
+  ICONS,
+  Size,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { IconButton } from '@blog/ui/atoms/icon-button';
 
 import { themeTogglePlaceholderVariants } from './theme-toggle-variants';
 
-export interface IThemeToggleProps extends IWithDataTestId {
-  className?: string;
-  isDark: boolean;
-  onToggle: () => void;
-  isMounted?: boolean;
-  lightLabel?: string;
-  darkLabel?: string;
-}
+export type TThemeToggleProps = IWithClassName &
+  IWithDataTestId & {
+    isDark: boolean;
+    onToggle: () => void;
+    isMounted?: boolean;
+    lightLabel?: string;
+    darkLabel?: string;
+  };
 
 /**
  * A pure, controlled theme-switch button. The consumer owns the actual theme
@@ -28,7 +33,7 @@ export const ThemeToggle = ({
   isMounted = true,
   lightLabel = 'Switch to light theme',
   darkLabel = 'Switch to dark theme',
-}: IThemeToggleProps) => {
+}: TThemeToggleProps) => {
   const label = isDark ? lightLabel : darkLabel;
 
   return (

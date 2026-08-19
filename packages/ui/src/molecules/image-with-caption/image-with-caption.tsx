@@ -1,4 +1,4 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import { Caption } from '@blog/ui/atoms/caption';
 import { MediaFrame } from '@blog/ui/atoms/media-frame';
 import type { ReactNode } from 'react';
@@ -8,13 +8,13 @@ import {
   type TImageWithCaptionVariants,
 } from './image-with-caption-variants';
 
-export interface IImageWithCaptionProps extends IWithDataTestId {
-  caption?: string;
-  /** Editorial width/wrap treatment for the figure — defaults to `INLINE`. */
-  layout?: TImageWithCaptionVariants['layout'];
-  className?: string;
-  children?: ReactNode;
-}
+export type TImageWithCaptionProps = IWithClassName &
+  IWithDataTestId & {
+    caption?: string;
+    /** Editorial width/wrap treatment for the figure — defaults to `INLINE`. */
+    layout?: TImageWithCaptionVariants['layout'];
+    children?: ReactNode;
+  };
 
 /**
  * Composes `MediaFrame` + `Caption` inside a `<figure>`. Pass the image
@@ -29,7 +29,7 @@ export const ImageWithCaption = ({
   className,
   children,
   dataTestId,
-}: IImageWithCaptionProps) => {
+}: TImageWithCaptionProps) => {
   const s = imageWithCaptionVariants({ layout });
 
   return (

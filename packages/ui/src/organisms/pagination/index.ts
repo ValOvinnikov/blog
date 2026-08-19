@@ -1,2 +1,2 @@
-export type { IPaginationProps } from './pagination';
+export type { TPaginationProps } from './pagination';
 export { Pagination } from './pagination';

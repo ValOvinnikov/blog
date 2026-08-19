@@ -1,5 +1,5 @@
 export type {
-  INewsletterSignupCompactProps,
-  INewsletterSignupFullProps,
+  TNewsletterSignupCompactProps,
+  TNewsletterSignupFullProps,
 } from './newsletter-signup';
 export { NewsletterSignup } from './newsletter-signup';

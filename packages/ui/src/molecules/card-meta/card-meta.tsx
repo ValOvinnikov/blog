@@ -1,18 +1,23 @@
-import { ICONS, Size, type IWithDataTestId } from '@blog/config';
+import {
+  ICONS,
+  Size,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { MetaSeparator } from '@blog/ui/atoms/meta-separator';
 
 import { cardMetaVariants } from './card-meta-variants';
 
-export interface ICardMetaProps extends IWithDataTestId {
-  /** ISO-8601 date string placed in `<time dateTime>`. */
-  dateValue: string;
-  /** Human-readable date string, pre-formatted by the web layer. */
-  dateLabel: string;
-  /** Optional reading time (e.g. "9 min"). Omitting hides the segment and its separator. */
-  readingTime?: string;
-  className?: string;
-}
+export type TCardMetaProps = IWithClassName &
+  IWithDataTestId & {
+    /** ISO-8601 date string placed in `<time dateTime>`. */
+    dateValue: string;
+    /** Human-readable date string, pre-formatted by the web layer. */
+    dateLabel: string;
+    /** Optional reading time (e.g. "9 min"). Omitting hides the segment and its separator. */
+    readingTime?: string;
+  };
 
 const s = cardMetaVariants();
 
@@ -26,7 +31,7 @@ export const CardMeta = ({
   readingTime,
   className,
   dataTestId,
-}: ICardMetaProps) => (
+}: TCardMetaProps) => (
   <div className={s.root({ class: className })} data-testid={dataTestId}>
     <Icon
       name={ICONS.CHEVRON_RIGHT}

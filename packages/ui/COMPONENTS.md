@@ -21,7 +21,7 @@ Variants: size: Size.SM|Size.MD|Size.LG
 ### BackToTop — `atoms/back-to-top/back-to-top.tsx`
 
 a floating icon button that jumps the page back to its top.
-Props: isVisible: boolean · onClick: () => void · ariaLabel: string · className?: string _(extends IWithDataTestId)_
+Props: isVisible: boolean · onClick: () => void · ariaLabel: string _(extends IWithClassName, IWithDataTestId)_
 Variants: visible: (boolean)
 
 ### BookmarkToggle — `atoms/bookmark-toggle/bookmark-toggle.tsx`
@@ -111,7 +111,7 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### SegmentedControl — `atoms/segmented-control/segmented-control.tsx`
 
 a fully controlled switch between a small, mutually exclusive set of views (e.g. a reader's chosen depth for an article).
-Props: options: ISegmentedControlOption<TValue>[] · value: TValue · onChange: (value: TValue) => void · ariaLabel: string · className?: string _(extends IWithDataTestId)_
+Props: options: ISegmentedControlOption<TValue>[] · value: TValue · onChange: (value: TValue) => void · ariaLabel: string _(extends IWithClassName, IWithDataTestId)_
 Variants: selected: (boolean)
 
 ### Spinner — `atoms/spinner/spinner.tsx`
@@ -158,7 +158,7 @@ Variants: invalid: (boolean) · hasPrompt: (boolean)
 ### ThemeToggle — `atoms/theme-toggle/theme-toggle.tsx`
 
 A pure, controlled theme-switch button.
-Props: className?: string · isDark: boolean · onToggle: () => void · isMounted?: boolean · lightLabel?: string · darkLabel?: string _(extends IWithDataTestId)_
+Props: isDark: boolean · onToggle: () => void · isMounted?: boolean · lightLabel?: string · darkLabel?: string _(extends IWithClassName, IWithDataTestId)_
 
 ## Molecules
 
@@ -170,7 +170,7 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### Aside — `molecules/aside/aside.tsx`
 
 Aside molecule — an inline deep-dive digression rendered alongside a post's body copy, set visually apart from the surrounding prose so a reader in the deep-dive depth can tell at a glance that it's supplementary rather than part of the main argument.
-Props: kind: TAsideKind · label: string · children: ReactNode · className?: string _(extends IWithDataTestId)_
+Props: kind: TAsideKind · label: string · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### BrandLockup — `molecules/brand-lockup/brand-lockup.tsx`
 
@@ -180,18 +180,18 @@ Props: src?: string · size?: TBrandMarkProps['size'] · specLine?: string _(ext
 ### Breadcrumbs — `molecules/breadcrumbs/breadcrumbs.tsx`
 
 page-chrome navigation trail (e.g. `Home › Category › Post title`).
-Props: items: IBreadcrumbItem[] · ariaLabel: string · linkAs?: TAnchorElementType · className?: string _(extends IWithDataTestId)_
+Props: items: IBreadcrumbItem[] · ariaLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: isCurrent: (boolean)
 
 ### CardMeta — `molecules/card-meta/card-meta.tsx`
 
 compact metadata row for post cards.
-Props: dateValue: string · dateLabel: string · readingTime?: string · className?: string _(extends IWithDataTestId)_
+Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
 
 ### ImageWithCaption — `molecules/image-with-caption/image-with-caption.tsx`
 
 Composes `MediaFrame` + `Caption` inside a `<figure>`.
-Props: caption?: string · layout?: TImageWithCaptionVariants['layout'] · className?: string · children?: ReactNode _(extends IWithDataTestId)_
+Props: caption?: string · layout?: TImageWithCaptionVariants['layout'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: layout: IMAGE_LAYOUT.INLINE|IMAGE_LAYOUT.FULL_BLEED|IMAGE_LAYOUT.FLOAT_LEFT|IMAGE_LAYOUT.FLOAT_RIGHT
 
 ### LinkButton — `molecules/link-button/link-button.tsx`
@@ -219,19 +219,19 @@ Props: excerpt?: string · tags?: string[] · children?: TCompoundChildren<typeo
 Slots:
 
 - **PostCard.Media** — the media region at the top of a `PostCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **PostCard.Meta** — compact metadata row for post cards. Props: dateValue: string · dateLabel: string · readingTime?: string · className?: string _(extends IWithDataTestId)_
+- **PostCard.Meta** — compact metadata row for post cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
 - **PostCard.Title** — the post heading inside a `PostCard`, rendered as a styled `<h3>`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PostCard.Footer** — the byline row at the bottom of a `PostCard`: optional author avatar and name, published date, and a category tag. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · category?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### PostMeta — `molecules/post-meta/post-meta.tsx`
 
 post detail metadata strip: author avatar + name, publish date, and estimated reading time.
-Props: author: { name: string; imageUrl?: string; /** Link target for the auth… · publishedAt: string · formattedDate: string · readingTimeMinutes?: number · linkAs?: TAnchorElementType · share?: ReactNode · className?: string _(extends IWithDataTestId)_
+Props: author: { name: string; imageUrl?: string; /** Link target for the auth… · publishedAt: string · formattedDate: string · readingTimeMinutes?: number · linkAs?: TAnchorElementType · share?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### PrimaryNavigation — `molecules/primary-navigation/primary-navigation.tsx`
 
 top-level `<nav>` landmark composing `NavLink` items with an optional trailing `actions` slot (e.g. a theme toggle or menu button).
-Props: links: INavItem[] · actions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: IPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
+Props: links: INavItem[] · actions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
 Variants: collapsible: (boolean)
 
 ### SettingRow — `molecules/setting-row/setting-row.tsx`
@@ -243,7 +243,7 @@ Variants: tone: default|danger · controlGrows: (boolean)
 ### ShareLink — `molecules/share-link/share-link.tsx`
 
 ShareLink molecule — a single external share action (e.g. "Share on X"), rendered through `LinkButton` with `target="_blank"` and `rel="noopener noreferrer"` baked in, since every share link opens the target platform in a new tab.
-Props: className?: string · as?: TAnchorElementType _(extends IShareLinkItem, IWithDataTestId)_
+Props: as?: TAnchorElementType _(extends IShareLinkItem, IWithClassName, IWithDataTestId)_
 
 ### TagList — `molecules/tag-list/tag-list.tsx`
 
@@ -258,7 +258,7 @@ Props: prefix: string · suffix?: string · hasCursor?: boolean _(extends IWithC
 ### Toast — `molecules/toast/toast.tsx`
 
 a single compact terminal-window notification confirming or reporting the result of an engagement action (bookmark, rating, comment, subscription, auth).
-Props: type: TToastType · isLoading?: boolean · command?: string · state?: string · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · isPaused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> · isPlain?: boolean · className?: string _(extends IWithDataTestId)_
+Props: type: TToastType · isLoading?: boolean · command?: string · state?: string · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · isPaused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> · isPlain?: boolean _(extends IWithClassName, IWithDataTestId)_
 Variants: type: TOAST_TYPE.SUCCESS|TOAST_TYPE.INFO|TOAST_TYPE.WARNING|TOAST_TYPE.ERROR · phase: entering|visible|leaving · hasTime: (boolean) · paused: (boolean)
 
 ### WindowChrome — `molecules/window-chrome/window-chrome.tsx`
@@ -283,14 +283,14 @@ Props: children: TCompoundChildren<typeof ArticleParts> _(extends IWithClassName
 
 Slots:
 
-- **Article.Header** — Article.Header — post detail heading area: category eyebrow, title, lead paragraph, metadata strip, and an optional wide cover media slot. Props: title: string · category?: IArticleHeaderCategory · lead?: string · meta?: Omit<IPostMetaProps, 'className' | 'dataTestId'> · coverMedia?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Article.Header** — Article.Header — post detail heading area: category eyebrow, title, lead paragraph, metadata strip, and an optional wide cover media slot. Props: title: string · category?: IArticleHeaderCategory · lead?: string · meta?: Omit<TPostMetaProps, 'className' | 'dataTestId'> · coverMedia?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **Article.Body** — Article.Body — reading-content wrapper for a post detail's body (e.g. a `PortableTextRenderer`). Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **Article.Footer** — Article.Footer — end-of-article furniture; renders the post's tags as a chip list of links. Props: tags: IArticleFooterTag[] · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
 ### BookmarksList — `organisms/bookmarks-list/bookmarks-list.tsx`
 
 the `/bookmarks` page's terminal directory-listing body, styled as `ls -l` output: one row per saved post with an optional caller-supplied prefix glyph, a pre-formatted date, and the post rendered as a filename-styled link.
-Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?: ReactNode · linkAs?: TAnchorElementType · className?: string _(extends IWithDataTestId)_
+Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?: ReactNode · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
 ### ContentModule — `organisms/content-module/content-module.tsx`
 
@@ -342,13 +342,13 @@ a pure, controlled subscribe form built on the `TextInput` atom, exposed as two 
 
 Compound component:
 
-- **NewsletterSignup.Full** — `NewsletterSignup.Full` — the rich, tinted window-shell signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · supportingText?: string · errorMessage?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] · className?: string _(extends IWithDataTestId)_
-- **NewsletterSignup.Compact** — `NewsletterSignup.Compact` — a slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · className?: string _(extends IWithDataTestId)_
+- **NewsletterSignup.Full** — `NewsletterSignup.Full` — the rich, tinted window-shell signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · supportingText?: string · errorMessage?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Compact** — `NewsletterSignup.Compact` — a slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string _(extends IWithClassName, IWithDataTestId)_
 
 ### Pagination — `organisms/pagination/pagination.tsx`
 
 prev/next + numbered links for paginated listings.
-Props: currentPage: number · totalPages: number · createHref: (page: number) => string · ariaLabel: string · previousLabel: string · nextLabel: string · linkAs?: TAnchorElementType · className?: string _(extends IWithDataTestId)_
+Props: currentPage: number · totalPages: number · createHref: (page: number) => string · ariaLabel: string · previousLabel: string · nextLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: current: (boolean)
 
 ### PostGrid — `organisms/post-grid/post-grid.tsx`
@@ -359,10 +359,10 @@ Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### PostsSection — `organisms/posts-section/posts-section.tsx`
 
 labeled section rendering a set of posts in a responsive grid, generic enough to reuse for other post listings (e.g. related posts, category pages).
-Props: posts: IPostCardData[] · title: string · titleId: string · className?: string · linkAs?: TAnchorElementType · supportingText?: string · align?: TPostsSectionVariants['align'] · emptyMessage?: string · tinted?: TPostsSectionVariants['tinted'] · wrapped?: TPostsSectionVariants['wrapped'] _(extends IWithDataTestId)_
+Props: posts: IPostCardData[] · title: string · titleId: string · linkAs?: TAnchorElementType · supportingText?: string · align?: TPostsSectionVariants['align'] · emptyMessage?: string · tinted?: TPostsSectionVariants['tinted'] · wrapped?: TPostsSectionVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
 Variants: tinted: (boolean) · wrapped: (boolean) · align: HEADING_ALIGN.LEFT|HEADING_ALIGN.CENTER|HEADING_ALIGN.RIGHT
 
 ### ToastViewport — `organisms/toast-viewport/toast-viewport.tsx`
 
 the fixed, corner-anchored region that positions and stacks `Toast` children (desktop bottom-right, mobile bottom full-width).
-Props: ariaLabel: string · children?: ReactNode · className?: string _(extends IWithDataTestId)_
+Props: ariaLabel: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_

@@ -1,15 +1,20 @@
-import { ICONS, Size, type IWithDataTestId } from '@blog/config';
+import {
+  ICONS,
+  Size,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import { IconButton } from '@blog/ui/atoms/icon-button';
 
 import { backToTopVariants } from './back-to-top-variants';
 
-export interface IBackToTopProps extends IWithDataTestId {
-  isVisible: boolean;
-  onClick: () => void;
-  ariaLabel: string;
-  className?: string;
-}
+export type TBackToTopProps = IWithClassName &
+  IWithDataTestId & {
+    isVisible: boolean;
+    onClick: () => void;
+    ariaLabel: string;
+  };
 
 /**
  * BackToTop — a floating icon button that jumps the page back to its top.
@@ -23,7 +28,7 @@ export const BackToTop = ({
   ariaLabel,
   className,
   dataTestId,
-}: IBackToTopProps) => (
+}: TBackToTopProps) => (
   <IconButton
     ariaLabel={ariaLabel}
     title={ariaLabel}

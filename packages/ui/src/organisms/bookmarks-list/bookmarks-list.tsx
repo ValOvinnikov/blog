@@ -1,4 +1,4 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import type { ElementType, ReactNode } from 'react';
 
@@ -13,17 +13,17 @@ export interface IBookmarkRow {
   href: string;
 }
 
-export interface IBookmarksListProps extends IWithDataTestId {
-  rows: IBookmarkRow[];
-  emptyMessage: string;
-  /** Summary line rendered below the listing when `rows` isn't empty, e.g. "3 saved". */
-  hint?: string;
-  /** Arbitrary node rendered before each row's date, e.g. a `drwx`-style permission string or icon — rendered as-is with no wrapper, so the caller owns its element, styling, and accessibility. Same content for every row; omitted when not supplied. */
-  prefix?: ReactNode;
-  /** Component each row's filename link renders as — defaults to a plain `<a>`. Pass the app router's Link for client-side navigation. */
-  linkAs?: TAnchorElementType;
-  className?: string;
-}
+export type TBookmarksListProps = IWithClassName &
+  IWithDataTestId & {
+    rows: IBookmarkRow[];
+    emptyMessage: string;
+    /** Summary line rendered below the listing when `rows` isn't empty, e.g. "3 saved". */
+    hint?: string;
+    /** Arbitrary node rendered before each row's date, e.g. a `drwx`-style permission string or icon — rendered as-is with no wrapper, so the caller owns its element, styling, and accessibility. Same content for every row; omitted when not supplied. */
+    prefix?: ReactNode;
+    /** Component each row's filename link renders as — defaults to a plain `<a>`. Pass the app router's Link for client-side navigation. */
+    linkAs?: TAnchorElementType;
+  };
 
 /**
  * BookmarksList — the `/bookmarks` page's terminal directory-listing body,
@@ -41,7 +41,7 @@ export const BookmarksList = ({
   linkAs,
   className,
   dataTestId,
-}: IBookmarksListProps) => {
+}: TBookmarksListProps) => {
   const Component = (linkAs ?? 'a') as ElementType;
   const {
     root,

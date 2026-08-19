@@ -1,15 +1,15 @@
-import type { IWithDataTestId, TAsideKind } from '@blog/config';
+import type { IWithClassName, IWithDataTestId, TAsideKind } from '@blog/config';
 import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import type { ReactNode } from 'react';
 
 import { asideVariants } from './aside-variants';
 
-export interface IAsideProps extends IWithDataTestId {
-  kind: TAsideKind;
-  label: string;
-  children: ReactNode;
-  className?: string;
-}
+export type TAsideProps = IWithClassName &
+  IWithDataTestId & {
+    kind: TAsideKind;
+    label: string;
+    children: ReactNode;
+  };
 
 const s = asideVariants();
 
@@ -34,7 +34,7 @@ export const Aside = ({
   children,
   className,
   dataTestId,
-}: IAsideProps) => (
+}: TAsideProps) => (
   <aside
     role="note"
     aria-label={label}

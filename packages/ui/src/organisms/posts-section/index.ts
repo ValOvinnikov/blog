@@ -1,6 +1,6 @@
 export type {
   IPostCardCategoryData,
   IPostCardData,
-  IPostsSectionProps,
+  TPostsSectionProps,
 } from './posts-section';
 export { PostsSection } from './posts-section';
