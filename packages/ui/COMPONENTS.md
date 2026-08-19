@@ -57,13 +57,13 @@ Variants: hasHref: (boolean)
 
 Semantic heading (`level` picks the rendered `h1`–`h4` tag) with an independent `visual` treatment.
 Props: level: THeadingLevel · visual?: THeadingVariants['visual'] · size?: THeadingVariants['size'] · id?: string · style?: CSSProperties · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: visual: hero|post|card|section|prose-h2|prose-h3|prose-h4 · size: Size.XS|Size.SM|Size.MD|Size.LG|Size.XL|Size.XXL
+Variants: visual: hero|post|card|section|prose-h2|prose-h3|prose-h4|preview|copy · size: Size.XS|Size.SM|Size.MD|Size.LG|Size.XL|Size.XXL
 
 ### Icon — `atoms/icon/icon.tsx`
 
 renders any icon from the bespoke icon set by name.
-Props: name: TIconName · size?: TIconVariants['size'] · 'aria-label'?: AriaAttributes['aria-label'] · 'aria-hidden'?: AriaAttributes['aria-hidden'] _(extends IWithClassName, IWithDataTestId)_
-Variants: size: Size.SM|Size.MD|Size.LG
+Props: name: TIconName · size?: TIconVariants['size'] · variant?: TIconVariants['variant'] · 'aria-label'?: AriaAttributes['aria-label'] · 'aria-hidden'?: AriaAttributes['aria-hidden'] _(extends IWithClassName, IWithDataTestId)_
+Variants: size: Size.SM|Size.MD|Size.LG · variant: chevronDown|chevronOpen
 
 ### IconButton — `atoms/icon-button/icon-button.tsx`
 
@@ -142,7 +142,7 @@ Props: text: string · hasCursor?: boolean _(extends IWithClassName, IWithDataTe
 
 the body-copy paragraph primitive: applies a `variant` from the type scale to a `<p>`.
 Props: style?: CSSProperties · children?: ReactNode _(extends IWithClassName, TTextVariants, IWithDataTestId)_
-Variants: variant: lead|muted|hero|card|supporting|hint|statement
+Variants: variant: lead|muted|hero|card|supporting|hint|statement|meta|emphasis
 
 ### TextInput — `atoms/text-input/text-input.tsx`
 

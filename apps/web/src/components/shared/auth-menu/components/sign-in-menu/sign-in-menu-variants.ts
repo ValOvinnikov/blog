@@ -11,7 +11,7 @@ export const signInMenuVariants = tv({
       'inline-block h-[1em] w-[0.5ch] bg-brand-primary',
       'animate-[blink_1s_steps(1)_infinite]',
     ],
-    plainLabel: ['mb-3 font-semibold text-text'],
+    plainLabel: ['mb-3'],
     plainPrompt: ['mb-3'],
     providerButton: ['mt-2'],
     hint: ['mt-3 font-mono text-meta text-subtle'],

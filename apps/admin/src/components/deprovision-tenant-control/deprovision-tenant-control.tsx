@@ -44,7 +44,6 @@ export function DeprovisionTenantControl({
 
   const {
     card,
-    description,
     archivedRow,
     backdrop,
     popup,
@@ -105,9 +104,7 @@ export function DeprovisionTenantControl({
       <Heading level={2} size={Size.XS}>
         {t('heading')}
       </Heading>
-      <Text variant="muted" className={description()}>
-        {t('description')}
-      </Text>
+      <Text variant="supporting">{t('description')}</Text>
 
       <AlertDialog.Root open={open} onOpenChange={handleOpenChange}>
         <AlertDialog.Trigger render={<Button type="button" variant="danger" />}>

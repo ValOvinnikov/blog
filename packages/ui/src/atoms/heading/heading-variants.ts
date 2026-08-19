@@ -16,6 +16,8 @@ export const headingVariants = tv({
       'prose-h2': ['text-prose-h2 leading-[1.15] tracking-[-0.015em]'],
       'prose-h3': ['text-prose-h3 leading-[1.2] tracking-[-0.01em]'],
       'prose-h4': ['text-prose-h4 leading-[1.3] tracking-[-0.005em]'],
+      preview: ['text-xl font-semibold'],
+      copy: ['text-copy'],
     },
     size: {
       [Size.XS]: ['text-lg leading-tight tracking-tight'],

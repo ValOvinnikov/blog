@@ -6,7 +6,7 @@ export const identitySectionVariants = tv({
       'flex flex-wrap items-center gap-2 py-2',
       'border-t border-dashed border-border first:border-t-0',
     ],
-    providerName: ['inline-flex items-center gap-2 text-copy'],
+    providerName: ['inline-flex items-center gap-2'],
     providerStatus: ['ml-auto flex flex-col items-end gap-1 text-right'],
     linkedStatus: ['font-mono text-copy text-success'],
     emailIcon: ['text-brand-primary text-lg leading-none'],

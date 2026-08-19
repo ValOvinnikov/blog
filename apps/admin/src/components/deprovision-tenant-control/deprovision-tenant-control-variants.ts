@@ -5,7 +5,6 @@ export const deprovisionTenantControlVariants = tv({
     card: [
       'flex flex-col gap-3 rounded-md border border-error/40 bg-surface p-6',
     ],
-    description: ['text-sm text-text-muted'],
     archivedRow: ['flex flex-wrap items-center gap-3'],
     backdrop: [
       'fixed inset-0 bg-primary/70 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 transition-opacity duration-base ease-console',

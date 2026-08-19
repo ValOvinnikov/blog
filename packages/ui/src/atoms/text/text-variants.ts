@@ -13,6 +13,8 @@ export const textVariants = tv(
         supporting: ['text-sm', 'text-text-muted'],
         hint: ['text-xs', 'text-text-muted'],
         statement: ['text-lg font-medium', 'text-text'],
+        meta: ['text-meta', 'text-subtle'],
+        emphasis: ['text-card-copy leading-[1.55] font-semibold', 'text-text'],
       },
     },
     defaultVariants: { variant: 'lead' },

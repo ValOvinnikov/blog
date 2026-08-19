@@ -10,6 +10,12 @@ export const iconVariants = tv({
       [Size.MD]: ['size-4.5'],
       [Size.LG]: ['size-6'],
     },
+    variant: {
+      chevronDown: ['rotate-90 text-text-subtle'],
+      chevronOpen: [
+        'text-text-subtle transition-transform duration-base ease-console group-open:rotate-90',
+      ],
+    },
   },
   defaultVariants: {
     size: Size.MD,

@@ -17,6 +17,6 @@ export const bookmarksPageVariants = tv({
       'hover:text-brand-primary-hover',
     ],
     plainDate: ['text-meta text-subtle'],
-    plainHint: ['mt-4 text-meta text-subtle'],
+    plainHint: ['mt-4'],
   },
 });

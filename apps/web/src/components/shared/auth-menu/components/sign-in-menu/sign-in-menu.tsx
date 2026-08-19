@@ -186,7 +186,7 @@ export function SignInMenu({
       >
         {isPlain ? (
           <>
-            <Text variant="card" className={plainLabel()}>
+            <Text variant="emphasis" className={plainLabel()}>
               {t('signIn')}
             </Text>
             {menuContent}

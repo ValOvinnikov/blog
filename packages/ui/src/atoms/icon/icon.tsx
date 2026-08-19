@@ -8,6 +8,7 @@ export type TIconProps = IWithClassName &
   IWithDataTestId & {
     name: TIconName;
     size?: TIconVariants['size'];
+    variant?: TIconVariants['variant'];
     'aria-label'?: AriaAttributes['aria-label'];
     'aria-hidden'?: AriaAttributes['aria-hidden'];
   };
@@ -24,6 +25,7 @@ export type TIconProps = IWithClassName &
 export const Icon = ({
   name,
   size,
+  variant,
   className,
   dataTestId,
   'aria-label': ariaLabel,
@@ -36,7 +38,7 @@ export const Icon = ({
     <IconGlyph
       aria-label={ariaLabel}
       aria-hidden={resolvedAriaHidden}
-      className={iconVariants({ size, class: className })}
+      className={iconVariants({ size, variant, class: className })}
       data-testid={dataTestId}
     />
   );
