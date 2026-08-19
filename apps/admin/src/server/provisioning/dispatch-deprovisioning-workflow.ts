@@ -13,10 +13,10 @@ export type TDispatchDeprovisioningWorkflowInput = {
 };
 
 /**
- * Best-effort `workflow_dispatch` trigger for
- * `.github/workflows/deprovision-tenant.yml`, mirroring
- * `dispatchProvisioningWorkflow`'s posture: never throws, a failure here
- * (missing token, network error, non-2xx response) is logged and swallowed.
+ * `workflow_dispatch` trigger for `.github/workflows/deprovision-tenant.yml`.
+ * Never throws — every failure (missing token, network error, non-2xx
+ * response) is logged and swallowed — but reports success via its return
+ * value so the caller can tell whether the workflow was actually requested.
  * `confirm` is re-checked here against the tenant's live slug by the caller
  * before this is ever invoked, but the workflow itself re-validates it
  * independently — this dispatch is a convenience trigger, not the safety
@@ -26,13 +26,13 @@ export async function dispatchDeprovisioningWorkflow({
   tenantId,
   confirm,
   dryRun,
-}: TDispatchDeprovisioningWorkflowInput): Promise<void> {
+}: TDispatchDeprovisioningWorkflowInput): Promise<boolean> {
   const token = env.TENANT_PROVISIONING_GITHUB_TOKEN;
   const repo = parseTenantProvisioningRepo(env.TENANT_PROVISIONING_GITHUB_REPO);
 
   if (!token || !repo) {
     logger.error('provisioning.deprovision_dispatch_skipped', { tenantId });
-    return;
+    return false;
   }
 
   try {
@@ -59,11 +59,15 @@ export async function dispatchDeprovisioningWorkflow({
         tenantId,
         responseStatus: response.status,
       });
+      return false;
     }
+
+    return true;
   } catch (error) {
     logger.error('provisioning.deprovision_dispatch_error', {
       tenantId,
       error,
     });
+    return false;
   }
 }
