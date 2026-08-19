@@ -82,7 +82,7 @@ src/atoms/theme-toggle/
 
   ```tsx
   // ✅ consumer supplies the label      // ❌ component decides its own label
-  <nav aria-label={ariaLabel} {...rest} />   <nav aria-label="Site navigation" />
+  <nav aria-label={ariaLabel} />             <nav aria-label="Site navigation" />
   ```
 
 - **Never format dates inside a UI component.** Date display is locale-dependent
@@ -136,14 +136,61 @@ replace them with bare string literals.
   const Tag = headingTags[level];
   ```
 
+## Closed prop types
+
+**A component's prop type enumerates exactly what it supports. It never
+`extends` a DOM prop set, and never spreads `...rest` onto the element.**
+
+```tsx
+export type TFooProps = IWithClassName &
+  IWithDataTestId & {
+    variant?: TFooVariants['variant'];
+    children?: ReactNode;
+  };
+```
+
+**Why.** `extends ComponentPropsWithoutRef<'input'> ` + `{...rest}` promises
+support for every HTML attribute, while the component only styles the handful
+its `tv()` definition knows about. Nothing connects the two, so the gap is
+silent: `readOnly` on `TextInput` produced a correctly non-editable field with
+zero visual change, and a consumer worked around it with
+`[&>input]:bg-surface-2` reaching through the component's private DOM. A
+measurement across both apps found the wide types bought fifteen attributes in
+total; on most components they bought nothing but `className`.
+
+The deeper point: **naming a prop forces the question "so what does it look
+like?"** Nobody decided `TextInput` should support `readOnly` — it arrived free
+with the wide type and no one asked what it should render as.
+
+**When a consumer genuinely needs a native prop, name it** — do not reopen the
+surface. `Button` names `type`; `Heading` names `id` and `style`; `Icon` names
+`aria-hidden`. Adding one is a deliberate act, and the reviewer's next question
+should be "where's the styling for it?"
+
+**Attributes the component must control are simply absent** from the type — a
+caller cannot pass `role` to `PopoverMenu.Item` because it isn't in the type,
+rather than because a spread happens to be ordered before it.
+
+**The one exception: polymorphic (`as`-based) components** keep
+`TPolymorphicProps<C, Own>` and their spread. Forwarding to a caller-chosen
+component is their entire contract — see `polymorphic-and-as.md`.
+
+**`className` is layout, not appearance.** It carries what only the parent can
+know — margins, width, flex/grid placement. Appearance belongs to the
+component's own variants. A consumer restyling internals through `className`
+(or worse, a `[&>child]:` selector) means a variant is missing; add the
+variant.
+
 ## Component conventions
 
 - **Arrow functions only.** `export const MyComponent = (props) => { ... }`.
   Never `function MyComponent`.
-- Props are an explicit `interface` (`I`-prefix) or `type` (`T`-prefix), never
-  inline. Extend the right DOM props (`ComponentPropsWithoutRef<'button'>`) and
-  spread `...rest` so consumers can pass `aria-*`, `id`, etc.
-- **Every prop interface extends `IWithDataTestId`** from `@blog/config`; wire
+- Props are an explicit `type` (`T`-prefix), never inline. The surface is
+  enumerated, not inherited from the DOM — see "Closed prop types" above.
+  Prefer `type` over `interface`: a handful of components still declare
+  `interface I{X}Props` and get converted as they're next touched, so write
+  the `type`/`T` form in anything you add or edit.
+- **Every prop type composes `IWithClassName` and `IWithDataTestId`** from `@blog/config`; wire
   `dataTestId` to the root element's `data-testid`. **This covers compound
   roots and every slot/part component** (`Header.Brand`, `PostCard.Footer`,
   …), same as the JSDoc rule below — a slot is consumer-facing public API
@@ -172,9 +219,9 @@ replace them with bare string literals.
   `apps/web` and passed _in_ (see `web-component-practices`).
   ```tsx
   // ✅ opaque slot — PostMeta knows nothing about share state
-  export interface IPostMetaProps { share?: ReactNode; … }
+  export type TPostMetaProps = … & { share?: ReactNode; … };
   // ❌ forwarded controlled bag — ~10 props tunnel through a component that reads none
-  export interface IPostMetaProps { share?: IShareButtonsProps; … }
+  export type TPostMetaProps = … & { share?: TShareButtonsProps; … };
   ```
 - **Shape data props to the view-model you're fed.** A component's data prop
   should structurally accept the `@blog/service` view-model field passed to it,
@@ -232,9 +279,12 @@ A component that renders as different elements takes an `as` prop. Pick the
   need element-specific prop inference:
   ```tsx
   type TLinkAs = 'a' | ComponentType<AnchorHTMLAttributes<HTMLAnchorElement>>;
-  export interface INavLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
-    as?: TLinkAs;
-  }
+  export type TSidebarLinkProps = IWithClassName &
+    IWithDataTestId & {
+      as?: TLinkAs;
+      href?: string;
+      children?: ReactNode;
+    };
   ```
 - **Level 2 — fully polymorphic.** The component accepts _any_ element and
   exposes _that element's_ props (`href` only when `as="a"`). Use the shared
@@ -424,9 +474,10 @@ issues and ensures every committed file is consistently formatted.
 - [ ] Arrow-function component; no inline sub-components — each lives in
       `components/{child-name}/` with its own `{child-name}-variants.ts` (never
       importing the parent's variants).
-- [ ] Props interface extends `IWithDataTestId`; `dataTestId` wired to the root
-      `data-testid`.
-- [ ] Props typed (`I`/`T` prefix); `className` forwarded via `class:` in `tv()`.
+- [ ] Props are a closed `type` composing `IWithClassName` + `IWithDataTestId`
+      — no `extends` of a DOM prop set, no `...rest` spread; `dataTestId` wired
+      to the root `data-testid`.
+- [ ] Props typed (`T` prefix); `className` forwarded via `class:` in `tv()`.
 - [ ] All Tailwind classes in `{component}-variants.ts`; none inline on any
       element; grouped by concern; no `cn()`.
 - [ ] Interactive/foreign content hosted via a `ReactNode` slot, not a forwarded
@@ -438,6 +489,6 @@ issues and ensures every committed file is consistently formatted.
 - [ ] Uses token utilities; dark mode intact.
 - [ ] Exported from the barrel (`index.ts` → `atoms/index.ts` → `src/index.ts`);
       the component `index.ts` exports **only** the component and its props
-      interface — never the variants file.
+      type — never the variants file.
 - [ ] Multi-arrangement layouts are mobile-first with `md:`/`lg:` only — no
       custom breakpoints, no page-width `max-w-*` baked in.

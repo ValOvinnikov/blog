@@ -59,9 +59,13 @@ archived brief.
 
 ## API & styling conventions
 
-- One component per file; explicit prop `type`; extend the right DOM props and
-  spread `...rest`. Forward `className` via the `tv()` `class:` key — never
-  wrap with `cn()`. Co-locate variants in a `{component-name}-variants.ts` file.
+- One component per file; **closed prop types — never `extends` a DOM prop set,
+  never spread `...rest`**. Enumerate exactly what the component supports:
+  `export type TFooProps = IWithClassName & IWithDataTestId & { … }`. Forward
+  `className` via the `tv()` `class:` key — never wrap with `cn()`. Co-locate
+  variants in a `{component-name}-variants.ts` file. Polymorphic (`as`-based)
+  components are the one exception and keep `TPolymorphicProps<C, Own>` plus
+  their spread — see `ui-library-practices`, "Closed prop types".
 - **Arrow functions only.** `export const MyComponent = (props) => { ... }` —
   never `function MyComponent`. Applies to generics too, including polymorphic
   components: `export const Container = <C extends ElementType = 'div'>(props: TContainerProps<C>) => { ... }`.
