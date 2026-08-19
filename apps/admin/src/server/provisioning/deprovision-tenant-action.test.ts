@@ -173,11 +173,12 @@ describe('deprovisionTenantAction', () => {
     const { deprovisionTenantAction } =
       await import('./deprovision-tenant-action');
 
-    await deprovisionTenantAction('tenant-1', {
+    const result = await deprovisionTenantAction('tenant-1', {
       confirm: 'acme',
       dryRun: true,
     });
 
+    expect(result).toEqual({ ok: true });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 

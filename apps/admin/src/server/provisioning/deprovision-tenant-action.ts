@@ -62,7 +62,7 @@ export async function deprovisionTenantAction(
   });
 
   if (!dispatched) {
-    return { ok: false, error: 'Could not start deprovisioning. Try again.' };
+    return { ok: false, error: "Couldn't start deprovisioning — try again." };
   }
 
   // A dry run never actually deprovisions anything — only a real dispatch
