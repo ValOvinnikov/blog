@@ -1,2 +1,2 @@
-export type { IFooterProps } from './footer';
+export type { TFooterProps } from './footer';
 export { Footer } from './footer';

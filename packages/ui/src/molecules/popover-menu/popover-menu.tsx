@@ -1,14 +1,10 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
-import {
-  type ComponentPropsWithoutRef,
-  type ElementType,
-  Fragment,
-} from 'react';
+import { Fragment, type ElementType } from 'react';
 
 import { PopoverMenuItem } from './components/item/popover-menu-item';
 import { PopoverMenuPanel } from './components/panel/popover-menu-panel';
@@ -27,10 +23,10 @@ const PopoverMenuParts = {
   Separator: PopoverMenuSeparator,
 } satisfies Record<string, ElementType>;
 
-export interface IPopoverMenuProps
-  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
-  children?: TCompoundChildren<typeof PopoverMenuSlotParts>;
-}
+export type TPopoverMenuProps = IWithClassName &
+  IWithDataTestId & {
+    children?: TCompoundChildren<typeof PopoverMenuSlotParts>;
+  };
 
 /**
  * PopoverMenu — positioned trigger + non-modal menu panel primitive
@@ -45,15 +41,13 @@ const PopoverMenuRoot = ({
   children,
   className,
   dataTestId,
-  ...rest
-}: IPopoverMenuProps) => {
+}: TPopoverMenuProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, PopoverMenuSlotParts);
 
   return (
     <div
       className={popoverMenuVariants({ class: className })}
       data-testid={dataTestId}
-      {...rest}
     >
       {slots.Trigger}
       {slots.Panel}

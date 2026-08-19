@@ -1,18 +1,19 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { HTMLAttributes, Ref } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode, Ref } from 'react';
 
 import { popoverMenuPanelVariants } from './popover-menu-panel-variants';
 
-export interface IPopoverMenuPanelProps
-  extends HTMLAttributes<HTMLDivElement>, IWithDataTestId {
-  /** `id` referenced by the triggering `PopoverMenu.Trigger`'s `aria-controls`. */
-  id: string;
-  /** Whether the panel is visible — fully controlled by the caller. */
-  open: boolean;
-  ariaLabel?: string;
-  /** Forwarded to the underlying panel `<div>` so the caller can manage focus-trap/outside-click detection against the real node. */
-  ref?: Ref<HTMLDivElement>;
-}
+export type TPopoverMenuPanelProps = IWithClassName &
+  IWithDataTestId & {
+    /** `id` referenced by the triggering `PopoverMenu.Trigger`'s `aria-controls`. */
+    id: string;
+    /** Whether the panel is visible — fully controlled by the caller. */
+    open: boolean;
+    ariaLabel?: string;
+    children?: ReactNode;
+    /** Forwarded to the underlying panel `<div>` so the caller can manage focus-trap/outside-click detection against the real node. */
+    ref?: Ref<HTMLDivElement>;
+  };
 
 /**
  * PopoverMenuPanel — the non-modal menu surface (`role="menu"`) a
@@ -28,10 +29,8 @@ export const PopoverMenuPanel = ({
   className,
   children,
   dataTestId,
-  ...rest
-}: IPopoverMenuPanelProps) => (
+}: TPopoverMenuPanelProps) => (
   <div
-    {...rest}
     ref={ref}
     id={id}
     role="menu"

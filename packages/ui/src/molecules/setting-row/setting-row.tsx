@@ -1,16 +1,13 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import { Heading, type THeadingProps } from '@blog/ui/atoms/heading';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import {
   settingRowVariants,
   type TSettingRowVariants,
 } from './setting-row-variants';
 
-export type TSettingRowProps = Omit<
-  ComponentPropsWithoutRef<'div'>,
-  'children'
-> &
+export type TSettingRowProps = IWithClassName &
   IWithDataTestId & {
     label: ReactNode;
     labelLevel?: THeadingProps['level'];
@@ -41,7 +38,6 @@ export const SettingRow = ({
   children,
   className,
   dataTestId,
-  ...rest
 }: TSettingRowProps) => {
   const {
     root,
@@ -52,11 +48,7 @@ export const SettingRow = ({
   } = settingRowVariants({ tone, controlGrows });
 
   return (
-    <div
-      {...rest}
-      data-testid={dataTestId}
-      className={root({ class: className })}
-    >
+    <div data-testid={dataTestId} className={root({ class: className })}>
       <div className={content()}>
         <Heading level={labelLevel} className={title()}>
           {label}

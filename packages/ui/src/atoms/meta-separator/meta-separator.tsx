@@ -1,12 +1,11 @@
-import type { IWithDataTestId } from '@blog/config';
-import { type HTMLAttributes } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 
 import { metaSeparatorVariants } from './meta-separator-variants';
 
-export interface IMetaSeparatorProps
-  extends HTMLAttributes<HTMLSpanElement>, IWithDataTestId {
-  separator?: string;
-}
+export type TMetaSeparatorProps = IWithClassName &
+  IWithDataTestId & {
+    separator?: string;
+  };
 
 /**
  * MetaSeparator atom — decorative separator for inline metadata lists
@@ -18,14 +17,12 @@ export const MetaSeparator = ({
   separator = '·',
   className,
   dataTestId,
-  ...rest
-}: IMetaSeparatorProps) => {
+}: TMetaSeparatorProps) => {
   return (
     <span
       className={metaSeparatorVariants({ class: className })}
       aria-hidden="true"
       data-testid={dataTestId}
-      {...rest}
     >
       {separator}
     </span>

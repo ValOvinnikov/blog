@@ -1,14 +1,13 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 
 import { terminalChipVariants } from './terminal-chip-variants';
 
-export interface ITerminalChipProps
-  extends Omit<ComponentPropsWithoutRef<'span'>, 'children'>, IWithDataTestId {
-  prefix: string;
-  suffix?: string;
-  showCursor?: boolean;
-}
+export type TTerminalChipProps = IWithClassName &
+  IWithDataTestId & {
+    prefix: string;
+    suffix?: string;
+    showCursor?: boolean;
+  };
 
 /**
  * TerminalChip molecule — a monospace, terminal-prompt-styled chip for the
@@ -22,16 +21,11 @@ export const TerminalChip = ({
   showCursor = true,
   className,
   dataTestId,
-  ...rest
-}: ITerminalChipProps) => {
+}: TTerminalChipProps) => {
   const { root, prompt, text, cursor } = terminalChipVariants();
 
   return (
-    <span
-      className={root({ class: className })}
-      data-testid={dataTestId}
-      {...rest}
-    >
+    <span className={root({ class: className })} data-testid={dataTestId}>
       <span className={prompt()} aria-hidden="true">
         {'>'}
       </span>

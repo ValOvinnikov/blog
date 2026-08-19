@@ -1,13 +1,14 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import { headingTags, type THeadingLevel } from '@blog/ui/lib/react';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ReactNode } from 'react';
 
 import { windowChromeBarVariants } from './window-chrome-bar-variants';
 
-export interface IWindowChromeBarProps
-  extends ComponentPropsWithoutRef<'div'>, IWithDataTestId {
-  headingLevel?: THeadingLevel;
-}
+export type TWindowChromeBarProps = IWithClassName &
+  IWithDataTestId & {
+    headingLevel?: THeadingLevel;
+    children?: ReactNode;
+  };
 
 /**
  * WindowChromeBar — the `WindowChrome` title bar. A prompt-styled flex row
@@ -22,14 +23,15 @@ export const WindowChromeBar = ({
   className,
   dataTestId,
   headingLevel,
-  ...rest
-}: IWindowChromeBarProps) => {
+  children,
+}: TWindowChromeBarProps) => {
   const Tag = headingLevel ? headingTags[headingLevel] : 'div';
   return (
     <Tag
       className={windowChromeBarVariants({ class: className })}
       data-testid={dataTestId}
-      {...rest}
-    />
+    >
+      {children}
+    </Tag>
   );
 };

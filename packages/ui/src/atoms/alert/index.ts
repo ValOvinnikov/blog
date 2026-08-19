@@ -1,2 +1,2 @@
-export type { IAlertProps } from './alert';
+export type { TAlertProps } from './alert';
 export { Alert } from './alert';

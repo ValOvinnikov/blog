@@ -1,10 +1,12 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { BlockquoteHTMLAttributes } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import { quoteBlockVariants } from './quote-block-variants';
 
-export type TQuoteBlockProps = BlockquoteHTMLAttributes<HTMLQuoteElement> &
-  IWithDataTestId;
+export type TQuoteBlockProps = IWithClassName &
+  IWithDataTestId & {
+    children?: ReactNode;
+  };
 
 /**
  * QuoteBlock atom — the accent-muted left rule + italic serif treatment for
@@ -14,11 +16,12 @@ export type TQuoteBlockProps = BlockquoteHTMLAttributes<HTMLQuoteElement> &
 export const QuoteBlock = ({
   className,
   dataTestId,
-  ...rest
+  children,
 }: TQuoteBlockProps) => (
   <blockquote
     className={quoteBlockVariants({ class: className })}
     data-testid={dataTestId}
-    {...rest}
-  />
+  >
+    {children}
+  </blockquote>
 );

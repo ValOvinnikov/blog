@@ -1,11 +1,13 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import { MediaFrame } from '@blog/ui/atoms/media-frame';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { ReactNode } from 'react';
 
 import { heroMediaVariants } from './hero-media-variants';
 
-interface IHeroMediaProps
-  extends ComponentPropsWithoutRef<'div'>, IWithDataTestId {}
+export type THeroMediaProps = IWithClassName &
+  IWithDataTestId & {
+    children?: ReactNode;
+  };
 
 /**
  * HeroMedia — the media slot of a `Hero`; frames its content at a 16:9 ratio via
@@ -14,12 +16,13 @@ interface IHeroMediaProps
 export const HeroMedia = ({
   className,
   dataTestId,
-  ...rest
-}: IHeroMediaProps) => (
+  children,
+}: THeroMediaProps) => (
   <MediaFrame
     ratio="video"
     className={heroMediaVariants({ class: className })}
     dataTestId={dataTestId}
-    {...rest}
-  />
+  >
+    {children}
+  </MediaFrame>
 );

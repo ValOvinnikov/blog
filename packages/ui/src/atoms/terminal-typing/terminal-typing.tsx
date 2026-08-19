@@ -1,13 +1,12 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 
 import { terminalTypingVariants } from './terminal-typing-variants';
 
-export interface ITerminalTypingProps
-  extends Omit<ComponentPropsWithoutRef<'span'>, 'children'>, IWithDataTestId {
-  text: string;
-  showCursor?: boolean;
-}
+export type TTerminalTypingProps = IWithClassName &
+  IWithDataTestId & {
+    text: string;
+    showCursor?: boolean;
+  };
 
 /**
  * TerminalTyping atom — a monospace, terminal-styled wordmark for a hero-intro
@@ -23,16 +22,11 @@ export const TerminalTyping = ({
   showCursor = true,
   className,
   dataTestId,
-  ...rest
-}: ITerminalTypingProps) => {
+}: TTerminalTypingProps) => {
   const { root, cursor } = terminalTypingVariants();
 
   return (
-    <span
-      className={root({ class: className })}
-      data-testid={dataTestId}
-      {...rest}
-    >
+    <span className={root({ class: className })} data-testid={dataTestId}>
       {text}
       {showCursor && <span className={cursor()} aria-hidden="true" />}
     </span>

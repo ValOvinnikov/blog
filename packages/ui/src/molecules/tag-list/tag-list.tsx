@@ -1,7 +1,6 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Tag } from '@blog/ui/atoms/tag';
-import type { HTMLAttributes } from 'react';
 
 import { tagListVariants } from './tag-list-variants';
 
@@ -10,13 +9,13 @@ interface ITagListItem {
   href?: string;
 }
 
-export interface ITagListProps
-  extends HTMLAttributes<HTMLDivElement>, IWithDataTestId {
-  /** Plain labels render as spans; pass `{ label, href }` to make a tag a link. */
-  tags: (string | ITagListItem)[];
-  /** Component linked tags render as — pass the app router's Link for client-side navigation. */
-  linkAs?: TAnchorElementType;
-}
+export type TTagListProps = IWithClassName &
+  IWithDataTestId & {
+    /** Plain labels render as spans; pass `{ label, href }` to make a tag a link. */
+    tags: (string | ITagListItem)[];
+    /** Component linked tags render as — pass the app router's Link for client-side navigation. */
+    linkAs?: TAnchorElementType;
+  };
 
 /**
  * TagList — renders a row of `Tag`s from a mixed list of plain labels and
@@ -28,8 +27,7 @@ export const TagList = ({
   linkAs,
   className,
   dataTestId,
-  ...rest
-}: ITagListProps) => {
+}: TTagListProps) => {
   if (tags.length === 0) return null;
 
   const items = tags.map((tag) =>
@@ -40,7 +38,6 @@ export const TagList = ({
     <div
       className={tagListVariants({ class: className })}
       data-testid={dataTestId}
-      {...rest}
     >
       {items.map(({ label, href }) =>
         href ? (

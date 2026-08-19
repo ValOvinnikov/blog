@@ -1,14 +1,10 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
-import {
-  type ComponentPropsWithoutRef,
-  type ElementType,
-  Fragment,
-} from 'react';
+import { Fragment, type ElementType } from 'react';
 
 import { WindowChromeBar } from './components/bar/window-chrome-bar';
 import { WindowChromeBody } from './components/body/window-chrome-body';
@@ -29,10 +25,10 @@ const WindowChromeParts = {
   Tag: WindowChromeTag,
 } satisfies Record<string, ElementType>;
 
-export interface IWindowChromeProps
-  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
-  children?: TCompoundChildren<typeof WindowChromeSlotParts>;
-}
+export type TWindowChromeProps = IWithClassName &
+  IWithDataTestId & {
+    children?: TCompoundChildren<typeof WindowChromeSlotParts>;
+  };
 
 /**
  * WindowChrome — the reusable terminal-window shell (a bordered, rounded
@@ -47,8 +43,7 @@ const WindowChromeRoot = ({
   children,
   className,
   dataTestId,
-  ...rest
-}: IWindowChromeProps) => {
+}: TWindowChromeProps) => {
   const { slots, unmatched } = mapCompoundSlots(
     children,
     WindowChromeSlotParts,
@@ -58,7 +53,6 @@ const WindowChromeRoot = ({
     <div
       className={windowChromeVariants({ class: className })}
       data-testid={dataTestId}
-      {...rest}
     >
       {slots.Bar}
       {slots.Body}

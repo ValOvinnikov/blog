@@ -1,9 +1,14 @@
-import { ICONS, type IWithDataTestId, Size } from '@blog/config';
+import {
+  ICONS,
+  type IWithClassName,
+  type IWithDataTestId,
+  Size,
+} from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Icon } from '@blog/ui/atoms/icon';
 import { IconButton } from '@blog/ui/atoms/icon-button';
 import { NavLink } from '@blog/ui/atoms/nav-link';
-import { Fragment, type HTMLAttributes, type ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 
 import { primaryNavigationVariants } from './primary-navigation-variants';
 
@@ -27,17 +32,16 @@ export interface IPrimaryNavigationMobileToggleProps {
   panelId: string;
 }
 
-export interface IPrimaryNavigationProps
-  extends Omit<HTMLAttributes<HTMLElement>, 'children'>, IWithDataTestId {
-  links: INavItem[];
-  actions?: ReactNode;
-  ariaLabel?: string;
-  className?: string;
-  /** Component each NavLink renders as — defaults to a plain `<a>`. Pass the app router's Link to get client-side navigation. */
-  linkAs?: TAnchorElementType;
-  /** Enables the responsive mobile toggle + dropdown panel below the `lg` breakpoint: the inline links hide, a hamburger toggle appears, and a dropdown panel holding the same links shows/hides with `open`. Omit to keep links always inline (today's behaviour). */
-  mobileToggle?: IPrimaryNavigationMobileToggleProps;
-}
+export type TPrimaryNavigationProps = IWithClassName &
+  IWithDataTestId & {
+    links: INavItem[];
+    actions?: ReactNode;
+    ariaLabel?: string;
+    /** Component each NavLink renders as — defaults to a plain `<a>`. Pass the app router's Link to get client-side navigation. */
+    linkAs?: TAnchorElementType;
+    /** Enables the responsive mobile toggle + dropdown panel below the `lg` breakpoint: the inline links hide, a hamburger toggle appears, and a dropdown panel holding the same links shows/hides with `open`. Omit to keep links always inline (today's behaviour). */
+    mobileToggle?: IPrimaryNavigationMobileToggleProps;
+  };
 
 /**
  * PrimaryNavigation — top-level `<nav>` landmark composing `NavLink` items
@@ -54,8 +58,7 @@ export const PrimaryNavigation = ({
   dataTestId,
   linkAs,
   mobileToggle,
-  ...rest
-}: IPrimaryNavigationProps) => {
+}: TPrimaryNavigationProps) => {
   const {
     root,
     links: linksSlot,
@@ -83,7 +86,6 @@ export const PrimaryNavigation = ({
       aria-label={ariaLabel}
       className={root({ class: className })}
       data-testid={dataTestId}
-      {...rest}
     >
       <div className={linksSlot()} data-testid="primary-navigation-links">
         {renderLinks()}

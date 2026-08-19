@@ -1,14 +1,10 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
-import {
-  type ComponentPropsWithoutRef,
-  type ElementType,
-  Fragment,
-} from 'react';
+import { Fragment, type ElementType } from 'react';
 
 import { HeaderActions } from './components/actions/header-actions';
 import { HeaderBrand } from './components/brand/header-brand';
@@ -21,32 +17,21 @@ const HeaderParts = {
   Actions: HeaderActions,
 } satisfies Record<string, ElementType>;
 
-export interface IHeaderProps
-  extends
-    Omit<ComponentPropsWithoutRef<'header'>, 'children'>,
-    IWithDataTestId {
-  children?: TCompoundChildren<typeof HeaderParts>;
-}
+export type THeaderProps = IWithClassName &
+  IWithDataTestId & {
+    children?: TCompoundChildren<typeof HeaderParts>;
+  };
 
 /**
  * Header — the site header shell; composes a `Header.Brand` slot alongside
  * grouped `Header.Nav` and `Header.Actions` slots into a `<header>`. The
  * nav/actions group only renders when at least one of them is provided.
  */
-const HeaderRoot = ({
-  children,
-  className,
-  dataTestId,
-  ...rest
-}: IHeaderProps) => {
+const HeaderRoot = ({ children, className, dataTestId }: THeaderProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeaderParts);
   const { root, navActionsGroup } = headerVariants();
   return (
-    <header
-      className={root({ class: className })}
-      data-testid={dataTestId}
-      {...rest}
-    >
+    <header className={root({ class: className })} data-testid={dataTestId}>
       {slots.Brand}
       {(slots.Nav || slots.Actions) && (
         <div className={navActionsGroup()}>

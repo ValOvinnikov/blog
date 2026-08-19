@@ -1,14 +1,10 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
-import {
-  type ComponentPropsWithoutRef,
-  type ElementType,
-  Fragment,
-} from 'react';
+import { Fragment, type ElementType } from 'react';
 
 import { FooterCopyright } from './components/copyright/footer-copyright';
 import { FooterNav } from './components/nav/footer-nav';
@@ -19,29 +15,21 @@ const FooterParts = {
   Copyright: FooterCopyright,
 } satisfies Record<string, ElementType>;
 
-export interface IFooterProps
-  extends
-    Omit<ComponentPropsWithoutRef<'footer'>, 'children'>,
-    IWithDataTestId {
-  children?: TCompoundChildren<typeof FooterParts>;
-}
+export type TFooterProps = IWithClassName &
+  IWithDataTestId & {
+    children?: TCompoundChildren<typeof FooterParts>;
+  };
 
 /**
  * Footer — the site footer shell; composes `Footer.Nav` and `Footer.Copyright`
  * slots into a `<footer>`. Structure only — each slot owns its own content.
  */
-const FooterRoot = ({
-  children,
-  className,
-  dataTestId,
-  ...rest
-}: IFooterProps) => {
+const FooterRoot = ({ children, className, dataTestId }: TFooterProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, FooterParts);
   return (
     <footer
       className={footerVariants({ class: className })}
       data-testid={dataTestId}
-      {...rest}
     >
       {slots.Copyright}
       {slots.Nav}

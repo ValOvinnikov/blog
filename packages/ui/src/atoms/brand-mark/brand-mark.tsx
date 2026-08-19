@@ -1,5 +1,4 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 
 import {
   brandMarkImageVariants,
@@ -7,23 +6,17 @@ import {
   type TBrandMarkVariants,
 } from './brand-mark-variants';
 
-/** Attributes valid on both the `<svg>` and `<img>` render branches, so passthrough props aren't dropped when `src` selects the image variant. */
-type TBrandMarkRestProps = Omit<
-  ComponentPropsWithoutRef<'svg'> & ComponentPropsWithoutRef<'img'>,
-  'className' | 'title' | 'src' | 'alt'
->;
-
-export interface IBrandMarkProps extends TBrandMarkRestProps, IWithDataTestId {
-  /** Ignored on the uploaded-image branch at `md` and above when `stacked` is set — its sizing is container-width-driven there instead. */
-  size?: TBrandMarkVariants['size'];
-  /** Accessible title for standalone use. Omit to keep the mark decorative. */
-  title?: string;
-  className?: string;
-  /** Uploaded brand-mark image source; renders in place of the polygon mark when set. */
-  src?: string;
-  /** Sizes the uploaded image to span the available width with a bounded height at `md` and above, instead of a fixed height — for rendering above a spec line at the breakpoint the spec line itself is visible. No effect below `md`, and no effect on the polygon fallback, which is always square. */
-  stacked?: boolean;
-}
+export type TBrandMarkProps = IWithClassName &
+  IWithDataTestId & {
+    /** Ignored on the uploaded-image branch at `md` and above when `stacked` is set — its sizing is container-width-driven there instead. */
+    size?: TBrandMarkVariants['size'];
+    /** Accessible title for standalone use. Omit to keep the mark decorative. */
+    title?: string;
+    /** Uploaded brand-mark image source; renders in place of the polygon mark when set. */
+    src?: string;
+    /** Sizes the uploaded image to span the available width with a bounded height at `md` and above, instead of a fixed height — for rendering above a spec line at the breakpoint the spec line itself is visible. No effect below `md`, and no effect on the polygon fallback, which is always square. */
+    stacked?: boolean;
+  };
 
 /**
  * BrandMark atom — the brand mark, rendered from an uploaded image when
@@ -40,8 +33,7 @@ export const BrandMark = ({
   title,
   className,
   dataTestId,
-  ...rest
-}: IBrandMarkProps) => {
+}: TBrandMarkProps) => {
   if (src) {
     return (
       <img
@@ -49,7 +41,6 @@ export const BrandMark = ({
         alt={title ?? ''}
         className={brandMarkImageVariants({ size, stacked, class: className })}
         data-testid={dataTestId}
-        {...rest}
       />
     );
   }
@@ -61,7 +52,6 @@ export const BrandMark = ({
       role={title ? 'img' : undefined}
       aria-hidden={title ? undefined : true}
       data-testid={dataTestId}
-      {...rest}
     >
       {title && <title>{title}</title>}
       <polygon points="12,3 22,7 12,11 2,7" style={{ fill: 'var(--logo-1)' }} />

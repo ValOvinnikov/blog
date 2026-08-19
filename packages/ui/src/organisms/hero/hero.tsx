@@ -1,4 +1,4 @@
-import type { IWithDataTestId } from '@blog/config';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
 import { Text } from '@blog/ui/atoms/text';
@@ -7,11 +7,7 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
-import {
-  type ComponentPropsWithoutRef,
-  type ElementType,
-  Fragment,
-} from 'react';
+import { Fragment, type ElementType } from 'react';
 
 import { HeroCta } from './components/cta/hero-cta';
 import { HeroMedia } from './components/media/hero-media';
@@ -22,14 +18,14 @@ const HeroParts = {
   Cta: HeroCta,
 } satisfies Record<string, ElementType>;
 
-export interface IHeroProps
-  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
-  title: string;
-  titleId: string;
-  eyebrow?: string;
-  excerpt?: string;
-  children?: TCompoundChildren<typeof HeroParts>;
-}
+export type THeroProps = IWithClassName &
+  IWithDataTestId & {
+    title: string;
+    titleId: string;
+    eyebrow?: string;
+    excerpt?: string;
+    children?: TCompoundChildren<typeof HeroParts>;
+  };
 
 /**
  * Hero — the page-top hero band: renders `title` as an `<h1>` with optional
@@ -44,17 +40,12 @@ const HeroRoot = ({
   children,
   className,
   dataTestId,
-  ...rest
-}: IHeroProps) => {
+}: THeroProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeroParts);
   const s = heroVariants({ hasMedia: Boolean(slots.Media) });
 
   return (
-    <div
-      className={s.root({ class: className })}
-      data-testid={dataTestId}
-      {...rest}
-    >
+    <div className={s.root({ class: className })} data-testid={dataTestId}>
       <div className={s.grid()}>
         <div className={s.copy()} data-testid="hero-copy">
           {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}

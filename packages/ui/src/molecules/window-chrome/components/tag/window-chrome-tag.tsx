@@ -1,10 +1,12 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import { windowChromeTagVariants } from './window-chrome-tag-variants';
 
-export interface IWindowChromeTagProps
-  extends ComponentPropsWithoutRef<'span'>, IWithDataTestId {}
+export type TWindowChromeTagProps = IWithClassName &
+  IWithDataTestId & {
+    children?: ReactNode;
+  };
 
 /**
  * WindowChromeTag — the trailing uppercase pill on a `WindowChrome.Bar`
@@ -14,11 +16,12 @@ export interface IWindowChromeTagProps
 export const WindowChromeTag = ({
   className,
   dataTestId,
-  ...rest
-}: IWindowChromeTagProps) => (
+  children,
+}: TWindowChromeTagProps) => (
   <span
     className={windowChromeTagVariants({ class: className })}
     data-testid={dataTestId}
-    {...rest}
-  />
+  >
+    {children}
+  </span>
 );

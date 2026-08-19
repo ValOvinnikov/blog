@@ -1,11 +1,14 @@
-import type { IWithDataTestId } from '@blog/config';
-import { type HTMLAttributes } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { CSSProperties, ReactNode } from 'react';
 
 import { textVariants, type TTextVariants } from './text-variants';
 
-export type TTextProps = HTMLAttributes<HTMLParagraphElement> &
+export type TTextProps = IWithClassName &
   TTextVariants &
-  IWithDataTestId;
+  IWithDataTestId & {
+    style?: CSSProperties;
+    children?: ReactNode;
+  };
 
 /**
  * Text — the body-copy paragraph primitive: applies a `variant` from the type
@@ -15,11 +18,14 @@ export const Text = ({
   variant,
   className,
   dataTestId,
-  ...rest
+  style,
+  children,
 }: TTextProps) => (
   <p
     className={textVariants({ variant, class: className })}
     data-testid={dataTestId}
-    {...rest}
-  />
+    style={style}
+  >
+    {children}
+  </p>
 );

@@ -1,12 +1,12 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import { articleBodyVariants } from './article-body-variants';
 
-export interface IArticleBodyProps
-  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>, IWithDataTestId {
-  children: ReactNode;
-}
+export type TArticleBodyProps = IWithClassName &
+  IWithDataTestId & {
+    children: ReactNode;
+  };
 
 /**
  * Article.Body — reading-content wrapper for a post detail's body
@@ -17,13 +17,11 @@ export const ArticleBody = ({
   children,
   className,
   dataTestId,
-  ...rest
-}: IArticleBodyProps) => {
+}: TArticleBodyProps) => {
   return (
     <div
       className={articleBodyVariants({ class: className })}
       data-testid={dataTestId}
-      {...rest}
     >
       {children}
     </div>

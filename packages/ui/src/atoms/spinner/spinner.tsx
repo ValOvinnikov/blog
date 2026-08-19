@@ -1,16 +1,14 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { HTMLAttributes } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { AriaAttributes } from 'react';
 
 import { spinnerVariants, type TSpinnerVariants } from './spinner-variants';
 
-export type TSpinnerProps = Omit<
-  HTMLAttributes<HTMLSpanElement>,
-  'role' | 'aria-label'
-> &
+export type TSpinnerProps = IWithClassName &
   IWithDataTestId & {
     label: string;
     showLabel?: boolean;
     size?: TSpinnerVariants['size'];
+    'aria-hidden'?: AriaAttributes['aria-hidden'];
   };
 
 /**
@@ -31,15 +29,15 @@ export const Spinner = ({
   size,
   className,
   dataTestId,
-  ...rest
+  'aria-hidden': ariaHidden,
 }: TSpinnerProps) => {
   const { root, glyph, text } = spinnerVariants({ size });
 
   return (
     <span
-      {...rest}
       role="status"
       aria-label={label}
+      aria-hidden={ariaHidden}
       data-testid={dataTestId}
       className={root({ class: className })}
     >

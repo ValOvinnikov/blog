@@ -1,12 +1,12 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import { postGridVariants } from './post-grid-variants';
 
-export interface IPostGridProps
-  extends Pick<ComponentPropsWithoutRef<'div'>, 'className'>, IWithDataTestId {
-  children: ReactNode;
-}
+export type TPostGridProps = IWithClassName &
+  IWithDataTestId & {
+    children: ReactNode;
+  };
 
 /**
  * PostGrid — the responsive grid container that lays out `PostCard`s (or any
@@ -16,7 +16,7 @@ export const PostGrid = ({
   children,
   className,
   dataTestId,
-}: IPostGridProps) => (
+}: TPostGridProps) => (
   <div
     className={postGridVariants({ class: className })}
     data-testid={dataTestId}

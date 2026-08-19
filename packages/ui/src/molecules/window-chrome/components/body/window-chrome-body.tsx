@@ -1,10 +1,12 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import { windowChromeBodyVariants } from './window-chrome-body-variants';
 
-export interface IWindowChromeBodyProps
-  extends ComponentPropsWithoutRef<'div'>, IWithDataTestId {}
+export type TWindowChromeBodyProps = IWithClassName &
+  IWithDataTestId & {
+    children?: ReactNode;
+  };
 
 /**
  * WindowChromeBody — the padded content slot below a `WindowChrome.Bar`.
@@ -15,11 +17,12 @@ export interface IWindowChromeBodyProps
 export const WindowChromeBody = ({
   className,
   dataTestId,
-  ...rest
-}: IWindowChromeBodyProps) => (
+  children,
+}: TWindowChromeBodyProps) => (
   <div
     className={windowChromeBodyVariants({ class: className })}
     data-testid={dataTestId}
-    {...rest}
-  />
+  >
+    {children}
+  </div>
 );

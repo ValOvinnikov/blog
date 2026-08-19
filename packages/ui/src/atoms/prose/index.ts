@@ -1,2 +1,2 @@
-export type { IProseProps } from './prose';
+export type { TProseProps } from './prose';
 export { Prose } from './prose';

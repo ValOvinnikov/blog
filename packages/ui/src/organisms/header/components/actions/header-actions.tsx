@@ -1,10 +1,12 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import { headerActionsVariants } from './header-actions-variants';
 
-interface IHeaderActionsProps
-  extends ComponentPropsWithoutRef<'div'>, IWithDataTestId {}
+export type THeaderActionsProps = IWithClassName &
+  IWithDataTestId & {
+    children?: ReactNode;
+  };
 
 /**
  * HeaderActions — the trailing actions cluster in the site `Header` (e.g. theme
@@ -13,11 +15,12 @@ interface IHeaderActionsProps
 export const HeaderActions = ({
   className,
   dataTestId,
-  ...rest
-}: IHeaderActionsProps) => (
+  children,
+}: THeaderActionsProps) => (
   <div
     className={headerActionsVariants({ class: className })}
     data-testid={dataTestId}
-    {...rest}
-  />
+  >
+    {children}
+  </div>
 );

@@ -1,9 +1,12 @@
-import type { IWithDataTestId } from '@blog/config';
-import type { HTMLAttributes } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import { inlineCodeVariants } from './inline-code-variants';
 
-export type TInlineCodeProps = HTMLAttributes<HTMLElement> & IWithDataTestId;
+export type TInlineCodeProps = IWithClassName &
+  IWithDataTestId & {
+    children?: ReactNode;
+  };
 
 /**
  * InlineCode atom — a single `<code>` token styled for inline use within
@@ -12,14 +15,15 @@ export type TInlineCodeProps = HTMLAttributes<HTMLElement> & IWithDataTestId;
  */
 export const InlineCode = ({
   className,
+  children,
   dataTestId,
-  ...rest
 }: TInlineCodeProps) => {
   return (
     <code
       className={inlineCodeVariants({ class: className })}
       data-testid={dataTestId}
-      {...rest}
-    />
+    >
+      {children}
+    </code>
   );
 };

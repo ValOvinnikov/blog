@@ -1,6 +1,10 @@
-import { ALERT_TYPE, ICONS, type IWithDataTestId } from '@blog/config';
+import {
+  ALERT_TYPE,
+  ICONS,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
-import type { ComponentPropsWithoutRef } from 'react';
 
 import { alertVariants, type TAlertVariants } from './alert-variants';
 
@@ -11,13 +15,11 @@ const ALERT_ICON = {
   [ALERT_TYPE.INFO]: ICONS.INFO,
 } as const;
 
-export interface IAlertProps
-  extends
-    Omit<ComponentPropsWithoutRef<'div'>, 'role' | 'children'>,
-    IWithDataTestId {
-  type: NonNullable<TAlertVariants['type']>;
-  message: string;
-}
+export type TAlertProps = IWithClassName &
+  IWithDataTestId & {
+    type: NonNullable<TAlertVariants['type']>;
+    message: string;
+  };
 
 /**
  * Alert — a static, type-coded inline message block for form feedback
@@ -30,13 +32,11 @@ export const Alert = ({
   message,
   className,
   dataTestId,
-  ...rest
-}: IAlertProps) => {
+}: TAlertProps) => {
   const role = type === ALERT_TYPE.ERROR ? 'alert' : 'status';
 
   return (
     <div
-      {...rest}
       role={role}
       data-testid={dataTestId}
       className={alertVariants({ type, class: className })}

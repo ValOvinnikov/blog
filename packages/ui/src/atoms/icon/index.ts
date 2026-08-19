@@ -1,2 +1,2 @@
-export type { IIconProps } from './icon';
+export type { TIconProps } from './icon';
 export { Icon } from './icon';

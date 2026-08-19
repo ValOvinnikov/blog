@@ -13,7 +13,7 @@ export type {
 export { NewsletterSignup } from './newsletter-signup';
 export type { IPaginationProps } from './pagination';
 export { Pagination } from './pagination';
-export type { IPostGridProps } from './post-grid';
+export type { TPostGridProps } from './post-grid';
 export { PostGrid } from './post-grid';
 export type {
   IPostCardCategoryData,
