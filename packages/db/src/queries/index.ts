@@ -4,6 +4,7 @@
 // re-exporting it here as its own namespace.
 export * as account from './account';
 export * as admins from './admins';
+export * as auditEvents from './audit-events';
 export * as bookmarks from './bookmarks';
 export * as memberships from './memberships';
 export * as siteConfig from './site-config';
