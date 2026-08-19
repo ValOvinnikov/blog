@@ -62,8 +62,8 @@ describe(`<${Textarea.name}/>`, () => {
     );
   });
 
-  it('marks the field invalid via aria-invalid when invalid is true', () => {
-    setup({ invalid: true });
+  it('marks the field invalid via aria-invalid when isInvalid is true', () => {
+    setup({ isInvalid: true });
     expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
   });
 
@@ -87,8 +87,8 @@ describe(`<${Textarea.name}/>`, () => {
     expect(screen.getByRole('textbox')).toBeDisabled();
   });
 
-  it('keeps the error border when both invalid and isDisabled are true', () => {
-    setup({ invalid: true, isDisabled: true });
+  it('keeps the error border when both isInvalid and isDisabled are true', () => {
+    setup({ isInvalid: true, isDisabled: true });
     // sole observable of the disabled-state border-color override winning over the invalid one
     expect(screen.getByRole('textbox')).toHaveClass('disabled:border-error');
   });

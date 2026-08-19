@@ -31,7 +31,7 @@ export async function ContentModule({ id }: IContentModuleProps) {
       layout={layout}
       dataTestId={`content-module-${id}`}
     >
-      <ContentModuleUi wrapped={true}>
+      <ContentModuleUi isWrapped={true}>
         <PortableTextRenderer value={body} />
       </ContentModuleUi>
     </Section>

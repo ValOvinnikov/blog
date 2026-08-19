@@ -26,7 +26,7 @@ export const WithPrompt: TStory = {
 };
 
 export const Invalid: TStory = {
-  args: { invalid: true, value: 'x', prompt: '$' },
+  args: { isInvalid: true, value: 'x', prompt: '$' },
 };
 
 export const WithMaxLength: TStory = {

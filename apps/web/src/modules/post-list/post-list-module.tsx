@@ -46,7 +46,7 @@ export async function PostListModule({ id }: IPostListModuleProps) {
         supportingText={sectionHeader.supportingText}
         align={sectionHeader.align}
         linkAs={SmartLink}
-        wrapped={true}
+        isWrapped={true}
       />
     </Section>
   );

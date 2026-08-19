@@ -144,7 +144,7 @@ describe(`<${PostsSection.name}/>`, () => {
   });
 
   it('keeps the h2 heading markup unchanged when tinted', () => {
-    setup({ tinted: true });
+    setup({ isTinted: true });
 
     expect(
       screen.getByRole('heading', { level: 2, name: 'Latest' }),
@@ -152,7 +152,7 @@ describe(`<${PostsSection.name}/>`, () => {
   });
 
   it('renders the same structure when wrapped', () => {
-    setup({ wrapped: true });
+    setup({ isWrapped: true });
 
     expect(
       screen.getByRole('heading', { level: 2, name: 'Latest' }),

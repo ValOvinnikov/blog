@@ -31,6 +31,6 @@ export const Default: TStory = {};
 
 export const Wrapped: TStory = {
   args: {
-    wrapped: true,
+    isWrapped: true,
   },
 };

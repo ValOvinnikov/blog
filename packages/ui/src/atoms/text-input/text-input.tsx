@@ -11,7 +11,7 @@ export type TTextInputProps = IWithClassName &
     value: string;
     onChange: (value: string) => void;
     ariaLabel: string;
-    invalid?: TTextInputVariants['invalid'];
+    isInvalid?: TTextInputVariants['invalid'];
     /** Decorative leading glyph or icon (e.g. `$`, a chevron `Icon`) — the console prompt idiom. Purely visual; `ariaLabel` carries the accessible name. */
     leadingIcon?: ReactNode;
     /** Decorative trailing glyph or icon. Purely visual; `ariaLabel` carries the accessible name. */
@@ -34,7 +34,7 @@ export const TextInput = ({
   value,
   onChange,
   ariaLabel,
-  invalid = false,
+  isInvalid = false,
   leadingIcon,
   trailingIcon,
   className,
@@ -52,7 +52,7 @@ export const TextInput = ({
     trailingIcon: trailingIconSlot,
     input,
   } = textInputVariants({
-    invalid,
+    invalid: isInvalid,
     hasLeadingIcon: Boolean(leadingIcon),
     hasTrailingIcon: Boolean(trailingIcon),
   });
@@ -77,7 +77,7 @@ export const TextInput = ({
         value={value}
         onChange={handleChange}
         aria-label={ariaLabel}
-        aria-invalid={invalid}
+        aria-invalid={isInvalid}
         aria-describedby={ariaDescribedby}
         className={input()}
       />

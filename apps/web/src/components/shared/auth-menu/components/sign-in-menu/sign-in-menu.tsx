@@ -142,7 +142,7 @@ export function SignInMenu({
                 dataTestId="sign-in-prompt-icon"
               />
             }
-            invalid={emailError}
+            isInvalid={emailError}
             isDisabled={emailStep === 'submitting'}
           />
           {emailError && (

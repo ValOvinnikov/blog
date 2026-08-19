@@ -147,13 +147,13 @@ Variants: variant: lead|muted|hero|card|supporting|hint|statement
 ### TextInput — `atoms/text-input/text-input.tsx`
 
 TextInput atom — a pure, controlled single-line field.
-Props: value: string · onChange: (value: string) => void · ariaLabel: string · invalid?: TTextInputVariants['invalid'] · leadingIcon?: ReactNode · trailingIcon?: ReactNode · id?: string · type?: string · placeholder?: string · isRequired?: boolean · isDisabled?: boolean · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
+Props: value: string · onChange: (value: string) => void · ariaLabel: string · isInvalid?: TTextInputVariants['invalid'] · leadingIcon?: ReactNode · trailingIcon?: ReactNode · id?: string · type?: string · placeholder?: string · isRequired?: boolean · isDisabled?: boolean · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
 Variants: invalid: (boolean) · hasLeadingIcon: (boolean) · hasTrailingIcon: (boolean)
 
 ### Textarea — `atoms/textarea/textarea.tsx`
 
 Textarea atom — a pure, controlled multi-line field.
-Props: value: string · onChange: (value: string) => void · ariaLabel: string · invalid?: TTextareaVariants['invalid'] · prompt?: string · id?: string · placeholder?: string · rows?: number · maxLength?: number · isDisabled?: boolean _(extends IWithClassName, IWithDataTestId)_
+Props: value: string · onChange: (value: string) => void · ariaLabel: string · isInvalid?: TTextareaVariants['invalid'] · prompt?: string · id?: string · placeholder?: string · rows?: number · maxLength?: number · isDisabled?: boolean _(extends IWithClassName, IWithDataTestId)_
 Variants: invalid: (boolean) · hasPrompt: (boolean)
 
 ### ThemeToggle — `atoms/theme-toggle/theme-toggle.tsx`
@@ -238,7 +238,7 @@ Variants: collapsible: (boolean)
 ### SettingRow — `molecules/setting-row/setting-row.tsx`
 
 a label + description + control-slot row shared by every `/account` section (privacy & data, email preferences, connected accounts).
-Props: label: ReactNode · labelLevel?: THeadingProps['level'] · description?: ReactNode · tone?: TSettingRowVariants['tone'] · controlGrows?: TSettingRowVariants['controlGrows'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Props: label: ReactNode · labelLevel?: THeadingProps['level'] · description?: ReactNode · tone?: TSettingRowVariants['tone'] · canControlGrow?: TSettingRowVariants['controlGrows'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: tone: default|danger · controlGrows: (boolean)
 
 ### ShareLink — `molecules/share-link/share-link.tsx`
@@ -296,13 +296,13 @@ Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?:
 ### ContentModule — `organisms/content-module/content-module.tsx`
 
 page-builder organism rendering a portable-text content block.
-Props: children: ReactNode · wrapped?: TContentModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
+Props: children: ReactNode · isWrapped?: TContentModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
 Variants: wrapped: (boolean)
 
 ### CtaModule — `organisms/cta-module/cta-module.tsx`
 
 page-builder organism rendering an optional heading, optional supporting text, and an optional action slot.
-Props: heading?: string · headingId?: string · supportingText?: string · action?: ReactNode · align?: TCtaModuleVariants['align'] · wrapped?: TCtaModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
+Props: heading?: string · headingId?: string · supportingText?: string · action?: ReactNode · align?: TCtaModuleVariants['align'] · isWrapped?: TCtaModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
 Variants: wrapped: (boolean) · align: HEADING_ALIGN.LEFT|HEADING_ALIGN.CENTER|HEADING_ALIGN.RIGHT
 
 ### Footer — `organisms/footer/footer.tsx`
@@ -360,7 +360,7 @@ Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### PostsSection — `organisms/posts-section/posts-section.tsx`
 
 labeled section rendering a set of posts in a responsive grid, generic enough to reuse for other post listings (e.g. related posts, category pages).
-Props: posts: IPostCardData[] · title: string · titleId: string · linkAs?: TAnchorElementType · supportingText?: string · align?: TPostsSectionVariants['align'] · emptyMessage?: string · tinted?: TPostsSectionVariants['tinted'] · wrapped?: TPostsSectionVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
+Props: posts: IPostCardData[] · title: string · titleId: string · linkAs?: TAnchorElementType · supportingText?: string · align?: TPostsSectionVariants['align'] · emptyMessage?: string · isTinted?: TPostsSectionVariants['tinted'] · isWrapped?: TPostsSectionVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
 Variants: tinted: (boolean) · wrapped: (boolean) · align: HEADING_ALIGN.LEFT|HEADING_ALIGN.CENTER|HEADING_ALIGN.RIGHT
 
 ### ToastViewport — `organisms/toast-viewport/toast-viewport.tsx`

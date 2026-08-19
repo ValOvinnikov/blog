@@ -13,7 +13,7 @@ export type TContentModuleProps = IWithClassName &
      * Drops this component's own top margin. Set when a parent (e.g. `Section`)
      * already owns the vertical spacing around it, so the two don't stack.
      */
-    wrapped?: TContentModuleVariants['wrapped'];
+    isWrapped?: TContentModuleVariants['wrapped'];
   };
 
 /**
@@ -26,9 +26,9 @@ export const ContentModule = ({
   children,
   className,
   dataTestId,
-  wrapped,
+  isWrapped,
 }: TContentModuleProps) => {
-  const s = contentModuleVariants({ wrapped });
+  const s = contentModuleVariants({ wrapped: isWrapped });
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
