@@ -23,7 +23,7 @@ export type TNewsletterSignupCompactProps = IWithClassName &
     /** Decorative glyph or icon rendered ahead of `heading`, e.g. a `$` prompt — rendered as-is; the caller owns its wrapper, styling, and accessibility. */
     prefix?: ReactNode;
     errorMessage?: string;
-    /** Id for the error `Alert`, passed to the email `TextInput` as `aria-describedby` while the error is showing. Caller-generated so two instances on one page never collide. */
+    /** Caller-generated so two instances on one page never collide. */
     errorMessageId?: string;
     successMessage?: string;
     submitLabel: string;
