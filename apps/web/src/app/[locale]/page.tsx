@@ -1,4 +1,4 @@
-import type { ILocalizedParams } from '@blog/config';
+import { MODULE_PAGE_CONTEXT, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { HomePageTemplate } from '@web/components/page-templates/home-page-template';
 import { toMetadata } from '@web/metadata/to-metadata';
@@ -44,7 +44,13 @@ export default async function HomePage({ params }: TProps) {
   return (
     <HomePageTemplate
       hero={<HeroModule id={hero.id} locale={locale} />}
-      modules={<ModuleRenderer modules={modules} locale={locale} />}
+      modules={
+        <ModuleRenderer
+          modules={modules}
+          locale={locale}
+          context={{ type: MODULE_PAGE_CONTEXT.HOME, isPaginated: false }}
+        />
+      }
     />
   );
 }

@@ -4,8 +4,11 @@ import { notFound } from 'next/navigation';
 
 import { GenericPage } from './generic-page';
 
-const { getPageMock } = vi.hoisted(() => ({
+const { getPageMock, moduleRendererMock } = vi.hoisted(() => ({
   getPageMock: vi.fn(),
+  moduleRendererMock: vi.fn(({ modules }: { modules: { id: string }[] }) => (
+    <div data-testid="module-renderer">{modules.length} modules</div>
+  )),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -17,9 +20,7 @@ vi.mock('@blog/service', () => ({
 }));
 
 vi.mock('@web/modules/module-renderer', () => ({
-  ModuleRenderer: ({ modules }: { modules: { id: string }[] }) => (
-    <div data-testid="module-renderer">{modules.length} modules</div>
-  ),
+  ModuleRenderer: moduleRendererMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -45,6 +46,7 @@ const setup = customRenderAsync(GenericPage, {
 describe(`<${GenericPage.name}/>`, () => {
   beforeEach(() => {
     getPageMock.mockReset();
+    moduleRendererMock.mockClear();
   });
 
   it('calls notFound() when the page does not exist', async () => {
@@ -98,6 +100,32 @@ describe(`<${GenericPage.name}/>`, () => {
 
     expect(screen.getByTestId('module-renderer')).toHaveTextContent(
       '1 modules',
+    );
+  });
+
+  it('passes an unpaginated GENERIC page context to ModuleRenderer', async () => {
+    getPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        title: 'About Us',
+        slug: 'about-us',
+        modules: [],
+        seo: makeSeo({
+          title: 'About Us',
+          description: 'Who we are.',
+          ogTitle: 'About Us',
+          ogDescription: 'Who we are.',
+        }),
+      },
+    });
+
+    await setup();
+
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context: { type: 'GENERIC', isPaginated: false },
+      }),
+      undefined,
     );
   });
 

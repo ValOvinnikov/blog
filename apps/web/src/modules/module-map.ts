@@ -1,4 +1,4 @@
-import type { TModuleType } from '@blog/config';
+import type { TModulePageContext, TModuleType } from '@blog/config';
 import type { ReactNode } from 'react';
 
 import { ContentModule } from './content/content-module';
@@ -9,6 +9,8 @@ import { PostListModule } from './post-list/post-list-module';
 export type TModuleComponentProps = {
   id: string;
   locale: string;
+  /** Every module but `PostListModule` ignores this — see `page-context.ts`. */
+  context?: TModulePageContext;
 };
 
 /**

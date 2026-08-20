@@ -195,6 +195,30 @@ describe(`<${BlogListPage.name}/>`, () => {
     expect(previousLink).toHaveAttribute('href', '/blog');
   });
 
+  it('passes an unpaginated BLOG page context to ModuleRenderer', async () => {
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Blog',
+        supportingText: 'Essays and notes.',
+        modules: [],
+        posts: [post],
+        currentPage: 1,
+        totalPages: 3,
+        total: 20,
+      },
+    });
+
+    await setup();
+
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context: { type: 'BLOG', isPaginated: false },
+      }),
+      undefined,
+    );
+  });
+
   it('renders the topic chip row', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
