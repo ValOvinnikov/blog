@@ -11,7 +11,7 @@ export const topicSchema = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
-      description: 'Category name shown in filters and navigation.',
+      description: 'Topic name shown in filters and navigation.',
       validation: (rule) => rule.required().max(60),
     }),
     defineField({
@@ -19,7 +19,7 @@ export const topicSchema = defineType({
       title: 'Slug',
       type: 'slug',
       description:
-        'URL path segment for the category page — auto-generated from title.',
+        'URL path segment for the topic page — auto-generated from title.',
       options: {
         source: 'title',
         maxLength: 96,
@@ -31,7 +31,7 @@ export const topicSchema = defineType({
       title: 'Description',
       type: 'text',
       description:
-        'Brief explanation of what this category covers, shown on the category page.',
+        'Brief explanation of what this topic covers, shown on the topic page.',
       validation: (rule) => rule.max(300),
     }),
   ],
