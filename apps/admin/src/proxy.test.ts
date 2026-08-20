@@ -6,9 +6,9 @@ vi.mock('next-intl/middleware', () => ({
 
 const { config } = await import('./proxy');
 
-function buildMatcherRegExp() {
+const buildMatcherRegExp = () => {
   return new RegExp(`^${config.matcher}$`);
-}
+};
 
 describe('proxy matcher', () => {
   it('rewrites real content routes through locale middleware', () => {

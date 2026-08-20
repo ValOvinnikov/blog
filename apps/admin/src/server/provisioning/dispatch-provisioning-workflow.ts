@@ -17,9 +17,9 @@ const DISPATCH_TIMEOUT_MS = 5000;
  * operator can always retry the dispatch later from the tenant's status
  * page.
  */
-export async function dispatchProvisioningWorkflow(
+export const dispatchProvisioningWorkflow = async (
   tenantId: string,
-): Promise<void> {
+): Promise<void> => {
   const token = env.TENANT_PROVISIONING_GITHUB_TOKEN;
   const repo = parseTenantProvisioningRepo(env.TENANT_PROVISIONING_GITHUB_REPO);
 
@@ -67,4 +67,4 @@ export async function dispatchProvisioningWorkflow(
   } catch (error) {
     logger.error('provisioning.dispatch_error', { tenantId, error });
   }
-}
+};

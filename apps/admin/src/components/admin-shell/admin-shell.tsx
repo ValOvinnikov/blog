@@ -18,13 +18,13 @@ export type TAdminShellProps = {
  * itself — each layout decides what `sections`/`roleLabel` it's entitled to
  * show before this ever renders.
  */
-export function AdminShell({
+export const AdminShell = ({
   sections,
   switcher,
   crumb,
   roleLabel,
   children,
-}: TAdminShellProps) {
+}: TAdminShellProps) => {
   const { root, main, content } = adminShellVariants();
 
   return (
@@ -36,4 +36,4 @@ export function AdminShell({
       </div>
     </div>
   );
-}
+};

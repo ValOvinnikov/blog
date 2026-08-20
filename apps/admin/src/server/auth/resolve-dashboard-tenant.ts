@@ -26,32 +26,33 @@ export type TDashboardTenantContext = {
  * `/dashboard/select-tenant` rather than guessing. Called from a layout so
  * every route nested under the gated segment is protected by existing there.
  */
-export async function resolveDashboardTenant(): Promise<TDashboardTenantContext> {
-  const { memberships, tenants } = await listSessionTenants();
-  const tenantById = new Map(tenants.map((tenant) => [tenant.id, tenant]));
+export const resolveDashboardTenant =
+  async (): Promise<TDashboardTenantContext> => {
+    const { memberships, tenants } = await listSessionTenants();
+    const tenantById = new Map(tenants.map((tenant) => [tenant.id, tenant]));
 
-  if (memberships.length === 1) {
-    const membership = memberships[0]!;
-    const tenant = tenantById.get(membership.tenantId);
+    if (memberships.length === 1) {
+      const membership = memberships[0]!;
+      const tenant = tenantById.get(membership.tenantId);
 
-    if (!tenant) {
-      redirect('/unauthorized');
+      if (!tenant) {
+        redirect('/unauthorized');
+      }
+
+      return { tenant, membership, tenants };
     }
 
-    return { tenant, membership, tenants };
-  }
+    const cookieStore = await cookies();
+    const activeTenantId = cookieStore.get(ACTIVE_TENANT_COOKIE)?.value;
+    const activeMembership = memberships.find(
+      (membership) => membership.tenantId === activeTenantId,
+    );
+    const activeTenant =
+      activeMembership && tenantById.get(activeMembership.tenantId);
 
-  const cookieStore = await cookies();
-  const activeTenantId = cookieStore.get(ACTIVE_TENANT_COOKIE)?.value;
-  const activeMembership = memberships.find(
-    (membership) => membership.tenantId === activeTenantId,
-  );
-  const activeTenant =
-    activeMembership && tenantById.get(activeMembership.tenantId);
+    if (!activeMembership || !activeTenant) {
+      redirect(adminRoutes.dashboardSelectTenant());
+    }
 
-  if (!activeMembership || !activeTenant) {
-    redirect(adminRoutes.dashboardSelectTenant());
-  }
-
-  return { tenant: activeTenant, membership: activeMembership, tenants };
-}
+    return { tenant: activeTenant, membership: activeMembership, tenants };
+  };

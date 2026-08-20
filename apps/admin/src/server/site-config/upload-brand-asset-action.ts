@@ -26,11 +26,11 @@ export type TUploadBrandAssetResult =
  * though the client only ever sends one of two literals, since a Server
  * Action is a public HTTP endpoint regardless of what its caller's types say.
  */
-export async function uploadBrandAssetAction(
+export const uploadBrandAssetAction = async (
   tenantSlug: string,
   kind: TBrandAssetKind,
   formData: FormData,
-): Promise<TUploadBrandAssetResult> {
+): Promise<TUploadBrandAssetResult> => {
   const { tenant } = await requireTenantMembership(tenantSlug);
 
   const parsedKind = brandAssetKindSchema.safeParse(kind);
@@ -117,4 +117,4 @@ export async function uploadBrandAssetAction(
       error: `Couldn't upload the ${targetKind} — try again.`,
     };
   }
-}
+};

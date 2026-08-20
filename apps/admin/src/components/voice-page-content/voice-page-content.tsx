@@ -14,7 +14,7 @@ export type TVoicePageContentProps = {
  * the slug-free `/dashboard/voice` — both resolve a `TTenant` however fits
  * their own routing (URL param vs. session membership) and hand it here.
  */
-export async function VoicePageContent({ tenant }: TVoicePageContentProps) {
+export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
   const config = await queries.siteConfig.getSiteConfig(tenant.id);
   const presetId = config?.preset ?? PRESET_ID.CONSOLE;
 
@@ -26,4 +26,4 @@ export async function VoicePageContent({ tenant }: TVoicePageContentProps) {
       saveAction={saveVoiceOverridesAction}
     />
   );
-}
+};

@@ -15,7 +15,7 @@ export type TSidebarNavLinkProps = {
  * route to decide the active state. `Sidebar` itself, and every inert row it
  * renders, stay server components.
  */
-export function SidebarNavLink({ href, children }: TSidebarNavLinkProps) {
+export const SidebarNavLink = ({ href, children }: TSidebarNavLinkProps) => {
   const pathname = usePathname();
   const isActive = pathname === href;
   const { row } = sidebarVariants();
@@ -29,4 +29,4 @@ export function SidebarNavLink({ href, children }: TSidebarNavLinkProps) {
       {children}
     </Link>
   );
-}
+};

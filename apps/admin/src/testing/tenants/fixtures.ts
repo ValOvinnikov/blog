@@ -11,7 +11,7 @@ import type {
   TTenantProvisioningSteps,
 } from '@blog/db/schema/tenants';
 
-export function idleProvisioningSteps(): TTenantProvisioningSteps {
+export const idleProvisioningSteps = (): TTenantProvisioningSteps => {
   const idle: TProvisioningStepState = {
     status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
   };
@@ -24,10 +24,10 @@ export function idleProvisioningSteps(): TTenantProvisioningSteps {
     [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: idle,
     [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: idle,
   };
-}
+};
 
 /** Shared `TTenant` fixture builder — used by any test that needs a full tenant row rather than a single field. */
-export function makeTenant(overrides: Partial<TTenant> = {}): TTenant {
+export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   return {
     id: 'tenant-1',
     slug: 'acme',
@@ -49,4 +49,4 @@ export function makeTenant(overrides: Partial<TTenant> = {}): TTenant {
     updatedAt: new Date('2026-04-02T00:00:00.000Z'),
     ...overrides,
   };
-}
+};

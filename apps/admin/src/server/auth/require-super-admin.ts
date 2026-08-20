@@ -12,7 +12,7 @@ import { requireAdmin } from './require-admin';
  * to `/unauthorized`, since `ADMIN`/`MODERATOR` are lesser platform roles,
  * not synonyms for it.
  */
-export async function requireSuperAdmin(): Promise<TAdmin> {
+export const requireSuperAdmin = async (): Promise<TAdmin> => {
   const admin = await requireAdmin();
 
   if (admin.role !== ADMIN_ROLE.SUPERADMIN) {
@@ -20,4 +20,4 @@ export async function requireSuperAdmin(): Promise<TAdmin> {
   }
 
   return admin;
-}
+};

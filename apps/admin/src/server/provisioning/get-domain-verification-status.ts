@@ -18,9 +18,9 @@ const VERCEL_TIMEOUT_MS = 5000;
  * and URL-encoded here too so this function stays safe for any future
  * caller, not just today's.
  */
-export async function getDomainVerificationStatus(
+export const getDomainVerificationStatus = async (
   domain: string,
-): Promise<TDomainVerificationStatus> {
+): Promise<TDomainVerificationStatus> => {
   const {
     VERCEL_API_TOKEN: token,
     VERCEL_WEB_PROJECT_ID: projectId,
@@ -61,4 +61,4 @@ export async function getDomainVerificationStatus(
     logger.error('provisioning.domain_check_error', { domain, error });
     return 'ERROR';
   }
-}
+};

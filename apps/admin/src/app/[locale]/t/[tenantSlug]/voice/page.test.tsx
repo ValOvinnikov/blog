@@ -7,9 +7,9 @@ import VoicePage from './page';
 const ADVANCED_SUMMARY = 'Advanced — 20 curated strings, 4 groups';
 
 // Advanced starts collapsed — open it before reading any curated field.
-async function openAdvanced() {
+const openAdvanced = async () => {
   await userEvent.setup().click(screen.getByText(ADVANCED_SUMMARY));
-}
+};
 
 const { authMock, getTenantBySlugMock, getMembershipMock, getSiteConfigMock } =
   vi.hoisted(() => ({

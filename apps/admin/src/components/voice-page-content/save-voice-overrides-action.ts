@@ -26,10 +26,10 @@ export type TSaveVoiceOverridesResult = { ok: true } | { ok: false };
  * `site_config` row yet (Look never saved) falls back to the CONSOLE
  * preset's own registry defaults.
  */
-export async function saveVoiceOverridesAction(
+export const saveVoiceOverridesAction = async (
   tenantSlug: string,
   overrides: TVoiceOverrides,
-): Promise<TSaveVoiceOverridesResult> {
+): Promise<TSaveVoiceOverridesResult> => {
   const { tenant } = await requireTenantMembership(tenantSlug);
 
   const existing = await queries.siteConfig.getSiteConfig(tenant.id);
@@ -58,4 +58,4 @@ export async function saveVoiceOverridesAction(
     });
     return { ok: false };
   }
-}
+};

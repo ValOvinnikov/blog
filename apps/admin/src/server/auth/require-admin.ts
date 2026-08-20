@@ -12,7 +12,7 @@ import { auth } from './auth';
  * page) so every route nested under a gated segment is protected by existing
  * there, never by a per-page check someone could forget to add.
  */
-export async function requireAdmin(): Promise<TAdmin> {
+export const requireAdmin = async (): Promise<TAdmin> => {
   const session = await auth();
   const userId = session?.user?.id;
 
@@ -27,4 +27,4 @@ export async function requireAdmin(): Promise<TAdmin> {
   }
 
   return admin;
-}
+};

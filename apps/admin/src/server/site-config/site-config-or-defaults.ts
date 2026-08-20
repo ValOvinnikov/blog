@@ -30,9 +30,9 @@ export type TSiteConfigThemeAndAssets = {
  * defaults only, this never touches the extra `chromeOn`/`logoHue` fields
  * `TLookFormValues` carries for the Look form's own state.
  */
-export async function getSiteConfigOrDefaults(
+export const getSiteConfigOrDefaults = async (
   tenantId: string,
-): Promise<TSiteConfigThemeAndAssets> {
+): Promise<TSiteConfigThemeAndAssets> => {
   const siteConfig = await queries.siteConfig.getSiteConfig(tenantId);
   if (siteConfig) {
     return {
@@ -59,4 +59,4 @@ export async function getSiteConfigOrDefaults(
     logoAssetUrl: undefined,
     faviconAssetUrl: undefined,
   };
-}
+};

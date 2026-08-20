@@ -4,6 +4,6 @@
  * barrel), so the mock never eagerly loads the Neon/Drizzle client or
  * validates `DATABASE_URL`.
  */
-export async function mockDbConstants() {
+export const mockDbConstants = async () => {
   return await import('@blog/db/constants');
-}
+};

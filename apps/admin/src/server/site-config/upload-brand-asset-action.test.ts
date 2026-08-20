@@ -69,11 +69,11 @@ const THEME_FIELDS = {
   density: DENSITY.DEFAULT,
 };
 
-function makeFormData(file: File | null): FormData {
+const makeFormData = (file: File | null): FormData => {
   const formData = new FormData();
   if (file) formData.append('file', file);
   return formData;
-}
+};
 
 describe(uploadBrandAssetAction, () => {
   beforeEach(() => {

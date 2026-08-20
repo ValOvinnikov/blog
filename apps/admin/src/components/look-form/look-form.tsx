@@ -48,10 +48,10 @@ export type TLookFormProps = {
  * afterward. Brand images are independent of preset, so `current`'s asset
  * URLs carry through unchanged rather than being reset.
  */
-function applyPresetDefaults(
+const applyPresetDefaults = (
   preset: TPresetId,
   current: TLookFormValues,
-): TLookFormValues {
+): TLookFormValues => {
   const tokens = PRESET_REGISTRY[preset].themeTokens;
 
   return {
@@ -66,9 +66,9 @@ function applyPresetDefaults(
     logoAssetUrl: current.logoAssetUrl,
     faviconAssetUrl: current.faviconAssetUrl,
   };
-}
+};
 
-function valuesEqual(a: TLookFormValues, b: TLookFormValues): boolean {
+const valuesEqual = (a: TLookFormValues, b: TLookFormValues): boolean => {
   return (
     a.preset === b.preset &&
     a.accentHue === b.accentHue &&
@@ -81,9 +81,9 @@ function valuesEqual(a: TLookFormValues, b: TLookFormValues): boolean {
     a.logoAssetUrl === b.logoAssetUrl &&
     a.faviconAssetUrl === b.faviconAssetUrl
   );
-}
+};
 
-export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
+export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
   const [values, setValues] = useState<TLookFormValues>(initialValues);
   // The last known-persisted state: `handleSave`'s own fields on a
   // successful save, plus the two brand-asset URLs the instant their own
@@ -98,28 +98,28 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
 
   const isDirty = !valuesEqual(values, savedValues);
 
-  function updateField<K extends keyof TLookFormValues>(
+  const updateField = <K extends keyof TLookFormValues>(
     key: K,
     value: TLookFormValues[K],
-  ) {
+  ) => {
     setValues((prev) => ({ ...prev, [key]: value }));
     if (key === 'logoAssetUrl' || key === 'faviconAssetUrl') {
       setSavedValues((prev) => ({ ...prev, [key]: value }));
     }
     setSaveResult('idle');
-  }
+  };
 
-  function handlePresetChange(preset: TPresetId) {
+  const handlePresetChange = (preset: TPresetId) => {
     setValues((prev) => applyPresetDefaults(preset, prev));
     setSaveResult('idle');
-  }
+  };
 
-  function handleReset() {
+  const handleReset = () => {
     setValues((prev) => applyPresetDefaults(prev.preset, prev));
     setSaveResult('idle');
-  }
+  };
 
-  function handleSave() {
+  const handleSave = () => {
     startTransition(async () => {
       const result = await updateLookAction(tenantSlug, {
         preset: values.preset,
@@ -133,7 +133,7 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
       setSaveResult(result.ok ? 'success' : 'error');
       if (result.ok) setSavedValues(values);
     });
-  }
+  };
 
   const t = useTranslations('lookForm');
 
@@ -390,4 +390,4 @@ export function LookForm({ tenantSlug, initialValues }: TLookFormProps) {
       </div>
     </div>
   );
-}
+};

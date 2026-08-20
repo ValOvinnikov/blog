@@ -1,8 +1,8 @@
 import { MAX_UPLOAD_BYTES, quickClientImageCheck } from './brand-asset-limits';
 
-function makeFile(type: string, sizeBytes: number): File {
+const makeFile = (type: string, sizeBytes: number): File => {
   return new File([new Uint8Array(sizeBytes)], 'upload', { type });
-}
+};
 
 describe(quickClientImageCheck, () => {
   it('accepts a PNG within the logo size limit', () => {

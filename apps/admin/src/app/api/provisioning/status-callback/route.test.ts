@@ -13,7 +13,7 @@ vi.mock('@admin/utils/env/env', () => ({
   env: { TENANT_PROVISIONING_CALLBACK_SECRET: 'callback-secret' },
 }));
 
-function postRequest(body: unknown, token?: string): Request {
+const postRequest = (body: unknown, token?: string): Request => {
   const headers: HeadersInit = { 'content-type': 'application/json' };
   if (token !== undefined) headers['authorization'] = `Bearer ${token}`;
 
@@ -25,7 +25,7 @@ function postRequest(body: unknown, token?: string): Request {
       body: JSON.stringify(body),
     },
   );
-}
+};
 
 const validBody = {
   tenantId: 'tenant-1',

@@ -5,6 +5,6 @@ const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
 };
 
 /** Shared short-date formatter (e.g. "Apr 2, 2026") for admin list/detail views. */
-export function formatDate(date: Date): string {
+export const formatDate = (date: Date): string => {
   return date.toLocaleDateString('en-US', DATE_FORMAT_OPTIONS);
-}
+};

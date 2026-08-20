@@ -12,10 +12,10 @@ import type { TVoicePack } from '@blog/config/constants';
  * their input renders with no placeholder, which is accurate (there is
  * genuinely nothing to inherit), not a bug in this mapping.
  */
-export function inheritedVoiceValue(
+export const inheritedVoiceValue = (
   voicePack: TVoicePack,
   key: TVoiceOverrideKey,
-): string | undefined {
+): string | undefined => {
   switch (key) {
     case 'notFoundMetaTitle':
       return voicePack.notFound?.metaTitle;
@@ -48,4 +48,4 @@ export function inheritedVoiceValue(
     default:
       return undefined;
   }
-}
+};

@@ -21,15 +21,15 @@ const URI_BEARING_ATTRIBUTES = ['href', 'xlink:href', 'src'];
 // `ALLOWED_URI_REGEXP`).
 const CSS_URL_REFERENCE_PATTERN = /url\(\s*(['"]?)([^'")]+)\1\s*\)/gi;
 
-function isSameDocumentOrInlineReference(uri: string): boolean {
+const isSameDocumentOrInlineReference = (uri: string): boolean => {
   return uri.startsWith('#') || uri.startsWith('data:');
-}
+};
 
-function stripUnsafeCssUrlReferences(value: string): string {
+const stripUnsafeCssUrlReferences = (value: string): string => {
   return value.replace(CSS_URL_REFERENCE_PATTERN, (match, _quote, uri) =>
     isSameDocumentOrInlineReference(uri) ? match : '',
   );
-}
+};
 
 // DOMPurify's default `ALLOWED_URI_REGEXP` already blocks `javascript:`, but
 // it applies to every allowed attribute value (not just URI ones), so
@@ -80,7 +80,7 @@ purify.addHook('afterSanitizeElements', (node) => {
  * empty upload, or one that was nothing but the content this function
  * removes) — that's a rejection, not a best-effort empty file.
  */
-export function sanitizeSvgMarkup(markup: string): string | undefined {
+export const sanitizeSvgMarkup = (markup: string): string | undefined => {
   const clean = purify.sanitize(markup, {
     USE_PROFILES: { svg: true, svgFilters: true },
     FORBID_TAGS: ['script', 'foreignObject'],
@@ -88,4 +88,4 @@ export function sanitizeSvgMarkup(markup: string): string | undefined {
   });
 
   return /<svg[\s>]/i.test(clean) ? clean : undefined;
-}
+};

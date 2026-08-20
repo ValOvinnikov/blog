@@ -41,7 +41,7 @@ const INITIAL_VALUES: TFormValues = {
  * component receives back from that call is therefore a validation failure
  * to show inline, never a success payload.
  */
-export function TenantDetailsForm() {
+export const TenantDetailsForm = () => {
   const t = useTranslations('tenantDetailsForm');
   const [values, setValues] = useState<TFormValues>(INITIAL_VALUES);
   const [fieldErrors, setFieldErrors] = useState<TCreateTenantFieldErrors>({});
@@ -64,14 +64,14 @@ export function TenantDetailsForm() {
     planControl,
   } = tenantDetailsFormVariants({ pending: isPending });
 
-  function updateField<K extends keyof TFormValues>(
+  const updateField = <K extends keyof TFormValues>(
     key: K,
     value: TFormValues[K],
-  ) {
+  ) => {
     setValues((prev) => ({ ...prev, [key]: value }));
-  }
+  };
 
-  function handleSubmit() {
+  const handleSubmit = () => {
     setFormError(undefined);
     setFieldErrors({});
 
@@ -80,7 +80,7 @@ export function TenantDetailsForm() {
       setFieldErrors(result.fieldErrors ?? {});
       setFormError(result.error);
     });
-  }
+  };
 
   const planOptions = [
     { value: TENANT_PLAN.FREE, label: t('planOptionFree') },
@@ -198,4 +198,4 @@ export function TenantDetailsForm() {
       </div>
     </div>
   );
-}
+};

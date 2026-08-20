@@ -3,7 +3,7 @@ import { MAX_UPLOAD_BYTES } from '@admin/utils/brand-asset-limits/brand-asset-li
 import { validateBrandAssetUpload } from './validate-brand-asset';
 
 /** A minimal, CRC-less PNG — `image-size` only reads the IHDR chunk's fixed byte offsets, never validates checksums or decodes pixel data. */
-function buildPngBuffer(width: number, height: number): Buffer {
+const buildPngBuffer = (width: number, height: number): Buffer => {
   const buffer = Buffer.alloc(33);
   buffer.write('\x89PNG\r\n\x1a\n', 0, 'latin1');
   buffer.writeUInt32BE(13, 8);
@@ -13,9 +13,9 @@ function buildPngBuffer(width: number, height: number): Buffer {
   buffer[24] = 8; // bit depth
   buffer[25] = 6; // color type (RGBA)
   return buffer;
-}
+};
 
-function pngFile(width: number, height: number, sizeOverrideBytes?: number) {
+const pngFile = (width: number, height: number, sizeOverrideBytes?: number) => {
   const bytes = buildPngBuffer(width, height);
   const padded = sizeOverrideBytes
     ? Buffer.concat([bytes, Buffer.alloc(sizeOverrideBytes)])
@@ -23,11 +23,11 @@ function pngFile(width: number, height: number, sizeOverrideBytes?: number) {
   return new File([new Uint8Array(padded)], 'upload.png', {
     type: 'image/png',
   });
-}
+};
 
-function svgFile(markup: string, filename = 'upload.svg') {
+const svgFile = (markup: string, filename = 'upload.svg') => {
   return new File([markup], filename, { type: 'image/svg+xml' });
-}
+};
 
 describe(validateBrandAssetUpload, () => {
   it('accepts a square PNG for the favicon', async () => {

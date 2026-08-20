@@ -23,14 +23,14 @@ export type THueSliderProps = {
  * fields — its own gradient-track formula and follow-accent state live in
  * the caller, this component only carries the drag interaction.
  */
-export function HueSlider({
+export const HueSlider = ({
   ariaLabel,
   value,
   onChange,
   isDisabled,
   trackStyle,
   className,
-}: THueSliderProps) {
+}: THueSliderProps) => {
   const { root, control, track, thumb } = hueSliderVariants();
 
   return (
@@ -52,4 +52,4 @@ export function HueSlider({
       </Slider.Control>
     </Slider.Root>
   );
-}
+};
