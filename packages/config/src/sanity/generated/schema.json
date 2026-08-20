@@ -244,7 +244,7 @@
   },
   {
     "type": "type",
-    "name": "blog_category.reference",
+    "name": "blog_topic.reference",
     "value": {
       "type": "object",
       "attributes": {
@@ -269,7 +269,7 @@
           "optional": true
         }
       },
-      "dereferencesTo": "blog_category"
+      "dereferencesTo": "blog_topic"
     }
   },
   {
@@ -387,7 +387,7 @@
               },
               {
                 "type": "inline",
-                "name": "blog_category.reference"
+                "name": "blog_topic.reference"
               },
               {
                 "type": "inline",
@@ -3282,11 +3282,11 @@
         },
         "optional": true
       },
-      "category": {
+      "topic": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "blog_category.reference"
+          "name": "blog_topic.reference"
         },
         "optional": true
       },
@@ -3448,7 +3448,7 @@
     }
   },
   {
-    "name": "blog_category",
+    "name": "blog_topic",
     "type": "document",
     "attributes": {
       "_id": {
@@ -3461,7 +3461,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "string",
-          "value": "blog_category"
+          "value": "blog_topic"
         }
       },
       "_createdAt": {

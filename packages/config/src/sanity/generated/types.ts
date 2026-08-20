@@ -54,11 +54,11 @@ export type Blog_postReference = {
   [internalGroqTypeReferenceTo]?: 'blog_post';
 };
 
-export type Blog_categoryReference = {
+export type Blog_topicReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'blog_category';
+  [internalGroqTypeReferenceTo]?: 'blog_topic';
 };
 
 export type Page_genericReference = {
@@ -82,7 +82,7 @@ export type Link = {
   linkType?: 'INTERNAL' | 'EXTERNAL';
   internalReference?:
     | Blog_postReference
-    | Blog_categoryReference
+    | Blog_topicReference
     | Page_genericReference
     | Page_blogReference;
   url?: string;
@@ -535,7 +535,7 @@ export type Blog_post = {
   excerpt?: string;
   heroImage?: ImageWithAlt;
   author?: Blog_authorReference;
-  category?: Blog_categoryReference;
+  topic?: Blog_topicReference;
   tags?: Array<
     {
       _key: string;
@@ -565,9 +565,9 @@ export type SanityImageHotspot = {
   width?: number;
 };
 
-export type Blog_category = {
+export type Blog_topic = {
   _id: string;
-  _type: 'blog_category';
+  _type: 'blog_topic';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -713,7 +713,7 @@ export type AllSanitySchemaTypes =
   | RequiredHeadingSectionHeader
   | Module_cta
   | Blog_postReference
-  | Blog_categoryReference
+  | Blog_topicReference
   | Page_genericReference
   | Page_blogReference
   | Link
@@ -756,7 +756,7 @@ export type AllSanitySchemaTypes =
   | Blog_post
   | SanityImageCrop
   | SanityImageHotspot
-  | Blog_category
+  | Blog_topic
   | Blog_author
   | MediaTag
   | Code
