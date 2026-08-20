@@ -25,7 +25,7 @@ const meta = {
       <>
         <Article.Header
           title={faker.lorem.sentence({ min: 4, max: 8 })}
-          category={{ label: 'Engineering', href: '/category/engineering' }}
+          category={{ label: 'Engineering', href: '/topics/engineering' }}
           lead={faker.lorem.paragraph()}
           meta={{
             author: {
@@ -54,7 +54,7 @@ export const WithCoverMedia: TStory = {
       <>
         <Article.Header
           title={faker.lorem.sentence({ min: 4, max: 8 })}
-          category={{ label: 'Engineering', href: '/category/engineering' }}
+          category={{ label: 'Engineering', href: '/topics/engineering' }}
           lead={faker.lorem.paragraph()}
           meta={{
             author: {

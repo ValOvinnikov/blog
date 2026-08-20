@@ -32,6 +32,6 @@ export const AsLink: TStory = {
     children: 'architecture',
     variant: 'accent',
     as: 'a',
-    href: '/category/architecture',
+    href: '/topics/architecture',
   },
 };

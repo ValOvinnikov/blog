@@ -37,6 +37,6 @@ export const Linked: TStory = {
   args: {
     tags: faker.helpers
       .multiple(() => faker.lorem.word(), { count: 5 })
-      .map((label) => ({ label, href: `/category/${label}` })),
+      .map((label) => ({ label, href: `/topics/${label}` })),
   },
 };

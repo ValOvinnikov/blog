@@ -74,7 +74,7 @@ describe(`<${Article.name}/>`, () => {
       <Article>
         <Article.Header
           title="Building a Design System"
-          category={{ label: 'Engineering', href: '/category/engineering' }}
+          category={{ label: 'Engineering', href: '/topics/engineering' }}
           meta={meta}
         />
         <Article.Body>
@@ -84,7 +84,7 @@ describe(`<${Article.name}/>`, () => {
     );
     expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
       'href',
-      '/category/engineering',
+      '/topics/engineering',
     );
   });
 
@@ -93,7 +93,7 @@ describe(`<${Article.name}/>`, () => {
       <Article>
         <Article.Header
           title="Building a Design System"
-          category={{ label: 'Engineering', href: '/category/engineering' }}
+          category={{ label: 'Engineering', href: '/topics/engineering' }}
           meta={meta}
         />
         <Article.Body>

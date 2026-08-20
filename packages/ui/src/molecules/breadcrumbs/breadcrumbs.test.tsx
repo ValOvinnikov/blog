@@ -9,7 +9,7 @@ faker.seed(123);
 const firstItem = { label: 'Home', href: '/' };
 const middleItem = {
   label: faker.commerce.department(),
-  href: `/category/${faker.lorem.slug()}`,
+  href: `/topics/${faker.lorem.slug()}`,
 };
 const lastItem = {
   label: faker.lorem.sentence(4),

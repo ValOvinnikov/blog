@@ -17,13 +17,13 @@ describe(`<${Tag.name}/>`, () => {
 
   it('renders as an anchor when `as` is set to "a"', () => {
     renderElement(
-      <Tag as="a" href="/category/architecture">
+      <Tag as="a" href="/topics/architecture">
         Architecture
       </Tag>,
     );
     expect(screen.getByRole('link', { name: 'Architecture' })).toHaveAttribute(
       'href',
-      '/category/architecture',
+      '/topics/architecture',
     );
   });
 

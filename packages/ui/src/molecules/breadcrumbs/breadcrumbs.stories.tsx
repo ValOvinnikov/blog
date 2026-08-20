@@ -24,7 +24,7 @@ export const Default: TStory = {
   args: {
     items: [
       { label: 'Home', href: '/' },
-      { label: faker.commerce.department(), href: '/category/engineering' },
+      { label: faker.commerce.department(), href: '/topics/engineering' },
       { label: faker.lorem.sentence(4), href: '/blog/example-post' },
     ],
   },
@@ -34,7 +34,7 @@ export const TwoLevels: TStory = {
   args: {
     items: [
       { label: 'Home', href: '/' },
-      { label: faker.commerce.department(), href: '/category/design' },
+      { label: faker.commerce.department(), href: '/topics/design' },
     ],
   },
 };
@@ -44,7 +44,7 @@ export const LongTrail: TStory = {
     items: [
       { label: 'Home', href: '/' },
       { label: 'Blog', href: '/blog' },
-      { label: faker.commerce.department(), href: '/category/architecture' },
+      { label: faker.commerce.department(), href: '/topics/architecture' },
       { label: faker.lorem.words(3), href: '/tag/systems' },
       { label: faker.lorem.sentence(5), href: '/blog/deep-dive' },
     ],
@@ -62,7 +62,7 @@ export const Truncated: TStory = {
     className: 'max-w-[280px]',
     items: [
       { label: 'Home', href: '/' },
-      { label: faker.commerce.department(), href: '/category/engineering' },
+      { label: faker.commerce.department(), href: '/topics/engineering' },
       { label: faker.lorem.sentence(8), href: '/blog/example-post' },
     ],
   },

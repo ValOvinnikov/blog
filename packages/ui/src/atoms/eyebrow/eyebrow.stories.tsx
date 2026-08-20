@@ -15,10 +15,10 @@ export const Default: TStory = {
   args: { children: 'Featured Post' },
 };
 
-export const CategoryLabel: TStory = {
+export const TopicLabel: TStory = {
   args: { children: 'Engineering' },
 };
 
-export const AsCategoryLink: TStory = {
-  args: { children: 'Engineering', href: '/category/engineering' },
+export const AsTopicLink: TStory = {
+  args: { children: 'Engineering', href: '/topics/engineering' },
 };

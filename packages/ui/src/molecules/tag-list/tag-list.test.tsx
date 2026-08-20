@@ -35,11 +35,11 @@ describe(`<${TagList.name}/>`, () => {
 
   it('renders a tag with an href as a link', () => {
     setup({
-      tags: [{ label: 'Architecture', href: '/category/architecture' }],
+      tags: [{ label: 'Architecture', href: '/topics/architecture' }],
     });
     expect(screen.getByRole('link', { name: 'Architecture' })).toHaveAttribute(
       'href',
-      '/category/architecture',
+      '/topics/architecture',
     );
   });
 
@@ -62,7 +62,7 @@ describe(`<${TagList.name}/>`, () => {
       </a>
     );
     setup({
-      tags: [{ label: 'Architecture', href: '/category/architecture' }],
+      tags: [{ label: 'Architecture', href: '/topics/architecture' }],
       linkAs: CustomLink,
     });
     expect(screen.getByRole('link', { name: 'Architecture' })).toHaveAttribute(
@@ -73,12 +73,12 @@ describe(`<${TagList.name}/>`, () => {
 
   it('renders a mix of plain and linked tags from a single array', () => {
     setup({
-      tags: ['Plain', { label: 'Linked', href: '/category/linked' }],
+      tags: ['Plain', { label: 'Linked', href: '/topics/linked' }],
     });
     expect(screen.getByText('Plain')).toBeVisible();
     expect(screen.getByRole('link', { name: 'Linked' })).toHaveAttribute(
       'href',
-      '/category/linked',
+      '/topics/linked',
     );
   });
 });
