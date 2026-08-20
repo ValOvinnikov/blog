@@ -411,14 +411,23 @@ reaches into every post card, so it is not a local deletion). Sub-issues:
 config → cms → service → web, plus a migration that drops the field.
 **Independent of E2–E8** — can run in parallel at any point after E1.
 
-**E10 — `/{slug}` generic pages may host a post list.** Adds `module_postList`
-to `page_generic`'s allowed `modules[]` types. Sub-issues: cms → web. Smallest
-epic; depends only on E2.
+**E10 — dropped 2026-08-20, closed not-planned (#1832).** It would have added
+`module_postList` to `page_generic`'s allowed `modules[]` types. The maintainer
+rejected the premise: a generic page ("About", "Start here") is site furniture,
+not a blog surface, so a post list does not belong on it. This spec originally
+called the existing restriction "a restriction with no real justification",
+framing it as an implementation accident; it is a deliberate content-model
+boundary. `page_generic` already permits only `module_content` and
+`module_cta`, so nothing needs undoing.
+
+`GENERIC` remains in `MODULE_PAGE_CONTEXT` — generic pages still render their
+content and CTA modules through `ModuleRenderer`, so the page kind is still
+meaningful context. Only the _post-list_ module will never receive it.
 
 ### Order
 
-`E1 → E2 → E3 → E4 → (E5, E6) → (E7, E8) → E10`, with **E9 parallel** any time
-after E1. E5/E6 and E7/E8 are each an index-and-children pair and are best
+`E1 → E2 → E3 → E4 → (E5, E6) → (E7, E8)`, with **E9 parallel** any time
+after E1. (E10 was dropped; it was a leaf, so nothing re-orders.) E5/E6 and E7/E8 are each an index-and-children pair and are best
 reviewed together in sequence, though either merges green alone.
 
 `@blog/db`'s `starter-content.ts` is a sibling sub-issue in every epic that
@@ -430,7 +439,7 @@ changes Sanity fixtures — E1, E6, and E8.
   contract survives — it is what scopes a `modules[]` post list, and it is E2's
   first sub-issue — but its premise (`modules[]` on the taxonomy documents, grid
   untouched) does not.
-- Create ten board entries for E1–E10 above. Gather every sub-issue's title,
+- Create ten board entries for E1–E10 above (E10 has since been dropped). Gather every sub-issue's title,
   body and labels up front and dispatch `board-keeper` once per epic with the
   whole set, rather than issue by issue. Label each sub-issue with its
   `layer:*` label.
@@ -440,7 +449,7 @@ changes Sanity fixtures — E1, E6, and E8.
   body carries the per-layer checklist instead.
 - **Sub-issues are created just-in-time.** All ten epics exist on the board
   immediately so the programme's shape and order are visible, but only the
-  unblocked ones (E2–E4) carry layer sub-issues at first. E5–E10 get theirs
+  unblocked ones (E2–E4) carry layer sub-issues at first. E5–E9 get theirs
   when their turn comes, written against what E2–E4 actually shipped rather
   than against a design those epics will refine.
 - `SPEC.md` §6 (content model) and `docs/context/surfaces-and-routing.md`,
