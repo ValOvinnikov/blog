@@ -5,7 +5,7 @@ import { en, Faker } from '@faker-js/faker';
 // without touching the global `faker` singleton other suites rely on.
 const fixtureFaker = new Faker({ locale: [en] });
 fixtureFaker.seed(123);
-const AUTHOR_IMAGE_URL = fixtureFaker.image.avatarGitHub();
+export const AUTHOR_IMAGE_URL = fixtureFaker.image.avatarGitHub();
 
 export function makeAuthor(
   overrides: Partial<TAuthorDetail> = {},
