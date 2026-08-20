@@ -13,6 +13,12 @@ type TProps = {
   children: React.ReactNode;
 };
 
+// Fixed public hostname for every Sanity project's asset CDN (not per-tenant),
+// so it's safe to hardcode, like next.config.ts's CSP/remotePatterns entries.
+// No `crossOrigin`: the logo, avatar, and hero image load as plain (non-CORS)
+// requests, and an anonymous preconnect would open a connection they can't reuse.
+const SANITY_IMAGE_CDN_ORIGIN = 'https://cdn.sanity.io';
+
 /**
  * The real root layout — `[locale]/layout.tsx` is the de facto root for
  * every localized route (this app has one locale, hidden from the URL by
@@ -44,6 +50,7 @@ export default async function RootLayout({ children }: TProps) {
       suppressHydrationWarning={true}
     >
       <head>
+        <link rel="preconnect" href={SANITY_IMAGE_CDN_ORIGIN} />
         <style
           dangerouslySetInnerHTML={{
             __html: buildThemeStyleBlock(themeTokens),
