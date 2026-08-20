@@ -52,6 +52,8 @@ beforeEach(() => {
 afterEach(async () => {
   await db.delete(schema.siteConfig);
   await db.delete(schema.tenantDomains);
+  await db.delete(schema.bookmarks);
+  await db.delete(schema.subscribers);
   await db.delete(schema.memberships);
   await db.delete(schema.users);
   await db.delete(schema.tenants);
@@ -141,6 +143,34 @@ describe(deleteTenant, () => {
       .from(schema.siteConfig)
       .where(eq(schema.siteConfig.tenantId, tenantId));
     expect(remainingSiteConfig).toEqual([]);
+  });
+
+  it('cascades to dependent subscriber and bookmark rows for that tenant', async () => {
+    const tenantId = await insertTenant({ archived: true });
+    await db.insert(schema.users).values({ id: 'user-1' });
+    await db.insert(schema.subscribers).values({
+      tenantId,
+      email: 'reader@example.com',
+    });
+    await db.insert(schema.bookmarks).values({
+      tenantId,
+      userId: 'user-1',
+      postId: 'post-1',
+    });
+
+    await deleteTenant(tenantId);
+
+    const remainingSubscribers = await db
+      .select()
+      .from(schema.subscribers)
+      .where(eq(schema.subscribers.tenantId, tenantId));
+    expect(remainingSubscribers).toEqual([]);
+
+    const remainingBookmarks = await db
+      .select()
+      .from(schema.bookmarks)
+      .where(eq(schema.bookmarks.tenantId, tenantId));
+    expect(remainingBookmarks).toEqual([]);
   });
 
   it('frees the slug for a new tenant after a successful delete', async () => {
