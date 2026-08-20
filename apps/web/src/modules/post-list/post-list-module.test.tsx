@@ -86,7 +86,7 @@ describe(PostListModule, () => {
             title: 'First post',
             excerpt: 'An excerpt',
             publishedAt: '2026-01-01T00:00:00.000Z',
-            category: { id: 'cat-1', title: 'News', slug: 'news' },
+            topic: { id: 'cat-1', title: 'News', slug: 'news' },
             readingTimeMinutes: 2,
           },
         ],

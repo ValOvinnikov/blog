@@ -8,14 +8,14 @@ import {
   type IPostCardData,
 } from '@blog/ui/organisms';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { CategoryChipList } from '@web/components/shared/category-chip-list';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { TopicChipList } from '@web/components/shared/topic-chip-list';
 import { makeAuthor } from '@web/testing/shared/author/fixtures';
-import { makeCategoryWithPostCount } from '@web/testing/shared/category/fixtures';
 import {
   makePostCard,
-  makePostCardCategory,
+  makePostCardTopic,
 } from '@web/testing/shared/post/fixtures';
+import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 import { blockTextToPlain } from '@web/utils/block-text-to-plain';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';
 
@@ -33,7 +33,7 @@ const toCardData = (post: TPostCard): IPostCardData => ({
     day: 'numeric',
   }),
   readingTime: `${post.readingTimeMinutes} min`,
-  category: { title: post.category.title },
+  topic: { title: post.topic.title },
 });
 
 const posts = [
@@ -42,32 +42,32 @@ const posts = [
     title: 'How we ship reviews faster',
     slug: 'how-we-ship-reviews-faster',
     publishedAt: '2026-03-04T00:00:00.000Z',
-    category: makePostCardCategory({ id: 'cat-1', title: 'Engineering' }),
+    topic: makePostCardTopic({ id: 'cat-1', title: 'Engineering' }),
   }),
   makePostCard({
     id: 'post-2',
     title: 'A tour of the new editor',
     slug: 'a-tour-of-the-new-editor',
     publishedAt: '2026-02-18T00:00:00.000Z',
-    category: makePostCardCategory({ id: 'cat-2', title: 'Product' }),
+    topic: makePostCardTopic({ id: 'cat-2', title: 'Product' }),
   }),
   makePostCard({
     id: 'post-3',
     title: 'Notes from our first year',
     slug: 'notes-from-our-first-year',
     publishedAt: '2026-01-09T00:00:00.000Z',
-    category: makePostCardCategory({ id: 'cat-3', title: 'News' }),
+    topic: makePostCardTopic({ id: 'cat-3', title: 'News' }),
   }),
 ].map(toCardData);
 
-const categories = [
-  makeCategoryWithPostCount({
+const topics = [
+  makeTopicWithPostCount({
     id: 'cat-1',
     title: 'Engineering',
     slug: 'engineering',
   }),
-  makeCategoryWithPostCount({ id: 'cat-2', title: 'Product', slug: 'product' }),
-  makeCategoryWithPostCount({ id: 'cat-3', title: 'News', slug: 'news' }),
+  makeTopicWithPostCount({ id: 'cat-2', title: 'Product', slug: 'product' }),
+  makeTopicWithPostCount({ id: 'cat-3', title: 'News', slug: 'news' }),
 ];
 
 const author = makeAuthor({
@@ -102,11 +102,11 @@ type TStory = StoryObj<typeof meta>;
 /** The bare shell — only `heading` and `posts`, no optional slots. */
 export const Minimal: TStory = {};
 
-/** `/blog` — category chips, pagination, and a page-builder module below the shell. */
+/** `/blog` — topic chips, pagination, and a page-builder module below the shell. */
 export const BlogIndex: TStory = {
   args: {
     supportingText: 'Essays and notes on building this site.',
-    categoryChips: <CategoryChipList categories={categories} />,
+    topicChips: <TopicChipList topics={topics} />,
     pagination: (
       <Pagination
         currentPage={1}
@@ -126,20 +126,18 @@ export const BlogIndex: TStory = {
   },
 };
 
-/** `/category/[slug]` — category chips highlighting the active category, no modules. */
-export const Category: TStory = {
+/** `/topics/[slug]` — topic chips highlighting the active topic, no modules. */
+export const Topic: TStory = {
   args: {
     heading: 'Engineering',
     supportingText: 'Posts about building things.',
-    categoryChips: (
-      <CategoryChipList categories={categories} activeSlug="engineering" />
-    ),
+    topicChips: <TopicChipList topics={topics} activeSlug="engineering" />,
     pagination: (
       <Pagination
         currentPage={1}
         totalPages={2}
-        createHref={(page) => `/category/engineering/page/${page}`}
-        ariaLabel="Category pagination"
+        createHref={(page) => `/topics/engineering/page/${page}`}
+        ariaLabel="Topic pagination"
         previousLabel="Previous"
         nextLabel="Next"
         linkAs={SmartLink}

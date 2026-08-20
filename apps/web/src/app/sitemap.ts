@@ -2,14 +2,14 @@ import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { routing } from '@web/i18n/routing';
 import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
-import { CATEGORY_ITEMS_PER_PAGE } from '@web/utils/category-items-per-page';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
+import { TOPIC_ITEMS_PER_PAGE } from '@web/utils/topic-items-per-page';
 import type { MetadataRoute } from 'next';
 
 // Only `getPostParams()` projects a `publishedAt` field, so `lastModified`
-// stays unset for category/tag/author/generic-page entries.
+// stays unset for topic/tag/author/generic-page entries.
 function toEntry(
   path: string,
   siteUrl: string,
@@ -48,22 +48,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const [
     postParamsResult,
-    categoryParamsResult,
+    topicParamsResult,
     tagParamsResult,
     authorParamsResult,
-    categoryPaginationParamsResult,
+    topicPaginationParamsResult,
     tagPaginationParamsResult,
     authorPaginationParamsResult,
     blogParamsResult,
     genericPageSlugsResult,
   ] = await Promise.all([
     service.pages.post.v1.getPostParams(),
-    service.pages.category.v1.getCategoryParams(),
+    service.pages.topic.v1.getTopicParams(),
     service.pages.tag.v1.getTagParams(),
     service.pages.author.v1.getAuthorParams(),
-    service.pages.category.v1.getCategoryPaginationParams(
-      CATEGORY_ITEMS_PER_PAGE,
-    ),
+    service.pages.topic.v1.getTopicPaginationParams(TOPIC_ITEMS_PER_PAGE),
     service.pages.tag.v1.getTagPaginationParams(TAG_ITEMS_PER_PAGE),
     service.pages.author.v1.getAuthorPaginationParams(AUTHOR_ITEMS_PER_PAGE),
     service.pages.blog.v1.getIndexPageParams(),
@@ -77,12 +75,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
   const posts = postParamsResult.ok ? postParamsResult.data : [];
 
-  if (!categoryParamsResult.ok) {
-    logger.error('sitemap.category_params_fetch_failed', {
-      error: categoryParamsResult.error,
+  if (!topicParamsResult.ok) {
+    logger.error('sitemap.topic_params_fetch_failed', {
+      error: topicParamsResult.error,
     });
   }
-  const categories = categoryParamsResult.ok ? categoryParamsResult.data : [];
+  const topics = topicParamsResult.ok ? topicParamsResult.data : [];
 
   if (!tagParamsResult.ok) {
     logger.error('sitemap.tag_params_fetch_failed', {
@@ -98,13 +96,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
   const authors = authorParamsResult.ok ? authorParamsResult.data : [];
 
-  if (!categoryPaginationParamsResult.ok) {
-    logger.error('sitemap.category_pagination_params_fetch_failed', {
-      error: categoryPaginationParamsResult.error,
+  if (!topicPaginationParamsResult.ok) {
+    logger.error('sitemap.topic_pagination_params_fetch_failed', {
+      error: topicPaginationParamsResult.error,
     });
   }
-  const categoryPages = categoryPaginationParamsResult.ok
-    ? categoryPaginationParamsResult.data
+  const topicPages = topicPaginationParamsResult.ok
+    ? topicPaginationParamsResult.data
     : [];
 
   if (!tagPaginationParamsResult.ok) {
@@ -151,9 +149,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...posts.map(({ slug, publishedAt }) =>
       toEntry(routes.post(slug), siteUrl, publishedAt),
     ),
-    ...categories.map(({ slug }) => toEntry(routes.category(slug), siteUrl)),
-    ...categoryPages.map(({ slug, page }) =>
-      toEntry(routes.category(slug, Number(page)), siteUrl),
+    ...topics.map(({ slug }) => toEntry(routes.topic(slug), siteUrl)),
+    ...topicPages.map(({ slug, page }) =>
+      toEntry(routes.topic(slug, Number(page)), siteUrl),
     ),
     ...tags.map(({ slug }) => toEntry(routes.tag(slug), siteUrl)),
     ...tagPages.map(({ slug, page }) =>

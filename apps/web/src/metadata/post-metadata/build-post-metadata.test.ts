@@ -45,7 +45,7 @@ const basePost: TPostDetail = {
     bio: undefined,
     socialLinks: [],
   },
-  category: {
+  topic: {
     id: 'cat-1',
     title: 'News',
     slug: 'news',

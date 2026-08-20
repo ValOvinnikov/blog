@@ -1,18 +1,18 @@
 import { service } from '@blog/service';
 
-import { getCategoriesSafely } from './get-categories-safely';
+import { getTopicsSafely } from './get-topics-safely';
 
 vi.mock('@blog/service', () => ({
   service: {
     entities: {
-      categories: { v1: { getCategories: vi.fn() } },
+      topics: { v1: { getTopics: vi.fn() } },
     },
   },
 }));
 
-describe('getCategoriesSafely', () => {
-  it('returns the categories from the service on success', async () => {
-    const categories = [
+describe('getTopicsSafely', () => {
+  it('returns the topics from the service on success', async () => {
+    const topics = [
       {
         id: 'cat-1',
         title: 'Engineering',
@@ -21,24 +21,24 @@ describe('getCategoriesSafely', () => {
         postCount: 3,
       },
     ];
-    vi.mocked(service.entities.categories.v1.getCategories).mockResolvedValue({
+    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue({
       ok: true,
-      data: categories,
+      data: topics,
     });
 
-    await expect(getCategoriesSafely()).resolves.toEqual(categories);
+    await expect(getTopicsSafely()).resolves.toEqual(topics);
   });
 
   it('falls back to an empty list and logs when the fetch resolves to a failure result', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.mocked(service.entities.categories.v1.getCategories).mockResolvedValue({
+    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
 
-    await expect(getCategoriesSafely()).resolves.toEqual([]);
+    await expect(getTopicsSafely()).resolves.toEqual([]);
     expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('categories.fetch_failed'),
+      expect.stringContaining('topics.fetch_failed'),
     );
 
     errorSpy.mockRestore();

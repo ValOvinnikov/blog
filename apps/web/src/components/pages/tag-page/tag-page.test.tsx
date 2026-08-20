@@ -1,7 +1,7 @@
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import {
   makePostCard,
-  makePostCardCategory,
+  makePostCardTopic,
 } from '@web/testing/shared/post/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTag } from '@web/testing/shared/tag/fixtures';
@@ -50,7 +50,7 @@ const post = makePostCard({
   title: 'My Post Title',
   slug: 'my-post-slug',
   publishedAt: '2026-01-01T00:00:00.000Z',
-  category: makePostCardCategory(),
+  topic: makePostCardTopic(),
 });
 
 const setup = customRenderAsync(TagPage, {

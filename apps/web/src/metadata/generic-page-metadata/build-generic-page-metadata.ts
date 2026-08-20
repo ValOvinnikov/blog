@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 
 /**
  * Metadata for a `/[slug]` standalone page (`page_generic`). Unlike
- * `TCategory`/`TAuthorDetail`, `TGenericPage.seo` is already a fully-resolved
+ * `TTopic`/`TAuthorDetail`, `TGenericPage.seo` is already a fully-resolved
  * `TSeoResolved` (authored → content → site defaults), so this maps it
  * straight through `toMetadata` rather than building fallback fields itself.
  *

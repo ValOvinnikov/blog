@@ -10,7 +10,7 @@ import { getTranslations } from 'next-intl/server';
 /**
  * Metadata for an `/author/[slug]` page (page 1, `pageNumber` omitted) or an
  * `/author/[slug]/page/[page]` page (`pageNumber` ≥ 2). `TAuthorDetail`
- * carries no dedicated `seo`/OG fields (same situation as `TCategory`), so
+ * carries no dedicated `seo`/OG fields (same situation as `TTopic`), so
  * this builds `Metadata` directly from the author's own `name`/`role`/`bio`
  * rather than inventing fields the service layer doesn't provide. Every page
  * self-canonicalizes — page 2+ must never canonical to `/author/[slug]`.

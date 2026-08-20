@@ -11,14 +11,14 @@ const items = [
     title: 'Building a Design System from Scratch',
     excerpt:
       'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS.',
-    category: { title: 'Design systems' },
+    topic: { title: 'Design systems' },
   }),
   makePostListItem({
     id: 'post-2',
     href: '/blog/typescript-tips',
     title: 'TypeScript Tips for 2026',
     excerpt: 'A collection of practical TypeScript patterns.',
-    category: { title: 'TypeScript' },
+    topic: { title: 'TypeScript' },
   }),
 ];
 

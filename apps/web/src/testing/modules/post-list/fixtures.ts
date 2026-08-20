@@ -11,7 +11,7 @@ export function makePostListItem(
     publishedAt: '2026-01-01T00:00:00.000Z',
     formattedDate: 'January 1, 2026',
     readingTime: '2 min',
-    category: { title: 'News' },
+    topic: { title: 'News' },
     ...overrides,
   };
 }

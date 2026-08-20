@@ -4,7 +4,7 @@ import { buildBreadcrumbListSchema } from './build-breadcrumb-list-schema';
 
 const trail: IBreadcrumbItem[] = [
   { label: 'Home', href: '/' },
-  { label: 'Engineering', href: '/category/engineering' },
+  { label: 'Engineering', href: '/topics/engineering' },
   { label: 'Hello World', href: '/blog/hello-world' },
 ];
 
@@ -26,7 +26,7 @@ describe(buildBreadcrumbListSchema, () => {
           '@type': 'ListItem',
           position: 2,
           name: 'Engineering',
-          item: 'https://example.com/category/engineering',
+          item: 'https://example.com/topics/engineering',
         },
         {
           '@type': 'ListItem',
@@ -51,7 +51,7 @@ describe(buildBreadcrumbListSchema, () => {
 
     expect(schema?.itemListElement.map((item) => item.item)).toEqual([
       'https://blog.example.com/',
-      'https://blog.example.com/category/engineering',
+      'https://blog.example.com/topics/engineering',
       'https://blog.example.com/blog/hello-world',
     ]);
   });

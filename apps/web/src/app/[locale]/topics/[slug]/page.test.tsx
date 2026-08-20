@@ -1,34 +1,34 @@
-import CategoryDetailPage, {
+import TopicDetailPage, {
   generateMetadata,
   generateStaticParams,
 } from './page';
 
-const { getCategoryParamsMock } = vi.hoisted(() => ({
-  getCategoryParamsMock: vi.fn(),
+const { getTopicParamsMock } = vi.hoisted(() => ({
+  getTopicParamsMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
   service: {
     pages: {
-      category: { v1: { getCategoryParams: getCategoryParamsMock } },
+      topic: { v1: { getTopicParams: getTopicParamsMock } },
     },
   },
 }));
 
-vi.mock('@web/components/pages/category-page', () => ({
-  CategoryPage: ({ slug }: { slug: string }) => (
-    <div data-testid="category-page">{slug}</div>
+vi.mock('@web/components/pages/topic-page', () => ({
+  TopicPage: ({ slug }: { slug: string }) => (
+    <div data-testid="topic-page">{slug}</div>
   ),
 }));
 
-vi.mock('@web/metadata/category-metadata', () => ({
-  buildCategoryMetadata: vi.fn().mockResolvedValue({ title: 'Engineering' }),
+vi.mock('@web/metadata/topic-metadata', () => ({
+  buildTopicMetadata: vi.fn().mockResolvedValue({ title: 'Engineering' }),
 }));
 
-describe('CategoryDetailPage', () => {
+describe('TopicDetailPage', () => {
   describe('generateStaticParams', () => {
-    it('returns the category slugs on success', async () => {
-      getCategoryParamsMock.mockResolvedValue({
+    it('returns the topic slugs on success', async () => {
+      getTopicParamsMock.mockResolvedValue({
         ok: true,
         data: [{ slug: 'engineering' }, { slug: 'design' }],
       });
@@ -40,7 +40,7 @@ describe('CategoryDetailPage', () => {
 
     it('returns an empty array when the fetch resolves to a failure result', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      getCategoryParamsMock.mockResolvedValue({
+      getTopicParamsMock.mockResolvedValue({
         ok: false,
         error: new Error('boom'),
       });
@@ -53,7 +53,7 @@ describe('CategoryDetailPage', () => {
   });
 
   describe('generateMetadata', () => {
-    it('delegates to buildCategoryMetadata with the resolved slug', async () => {
+    it('delegates to buildTopicMetadata with the resolved slug', async () => {
       const metadata = await generateMetadata({
         params: Promise.resolve({ locale: 'EN', slug: 'engineering' }),
       });
@@ -62,8 +62,8 @@ describe('CategoryDetailPage', () => {
     });
   });
 
-  it('renders CategoryPage with the resolved slug', async () => {
-    const ui = await CategoryDetailPage({
+  it('renders TopicPage with the resolved slug', async () => {
+    const ui = await TopicDetailPage({
       params: Promise.resolve({ locale: 'EN', slug: 'engineering' }),
     });
 

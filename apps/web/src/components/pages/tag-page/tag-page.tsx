@@ -22,7 +22,7 @@ type TTagPageProps = { slug: string; page?: number };
  * for the tag, renders a `Home › Tag: {name}` `Breadcrumbs` trail (plus its
  * `BreadcrumbList` JSON-LD) inside a `BreadcrumbBar` sibling before `<main>`,
  * then renders the posts through the same pure ui organisms as
- * `CategoryPage`. `getTagPage` always windows — page 1 gets the same
+ * `TopicPage`. `getTagPage` always windows — page 1 gets the same
  * pagination metadata as any other page.
  */
 export async function TagPage({ slug, page }: TTagPageProps) {

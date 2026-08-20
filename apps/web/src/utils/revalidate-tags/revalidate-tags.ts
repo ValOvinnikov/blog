@@ -18,7 +18,7 @@ type TSanityType = Extract<AllSanitySchemaTypes, { _type: string }>['_type'];
 const REVALIDATE_TAGS = {
   blog_post: ['post', 'posts', 'homePage'],
   blog_author: ['author', 'posts'],
-  blog_category: ['category', 'categories', 'posts'],
+  blog_topic: ['topic', 'topics', 'posts'],
   settings_site: ['site-settings'],
   settings_navigation: ['navigation'],
   settings_footer: ['footer'],

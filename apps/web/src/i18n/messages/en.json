@@ -39,8 +39,8 @@
   "brandLockupLink": {
     "ariaLabel": "Home"
   },
-  "categoryChipList": {
-    "ariaLabel": "Categories",
+  "topicChipList": {
+    "ariaLabel": "Topics",
     "all": "All"
   },
   "blogListPage": {
@@ -74,7 +74,7 @@
   "postContentsRail": {
     "label": "Topics"
   },
-  "categoryPage": {
+  "topicPage": {
     "title": "Posts in {name}",
     "empty": "No posts in {name} yet."
   },

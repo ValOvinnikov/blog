@@ -1,7 +1,7 @@
 import { customRenderAsync } from '@web/testing/custom-render';
 import { notFound } from 'next/navigation';
 
-import CategoryNumberedPage, {
+import TopicNumberedPage, {
   generateMetadata,
   generateStaticParams,
 } from './page';
@@ -12,22 +12,20 @@ const { permanentRedirectMock } = vi.hoisted(() => ({
   }),
 }));
 
-const { getCategoryPageMock, getCategoryPaginationParamsMock } = vi.hoisted(
-  () => ({
-    getCategoryPageMock: vi.fn(),
-    getCategoryPaginationParamsMock: vi.fn(),
-  }),
-);
+const { getTopicPageMock, getTopicPaginationParamsMock } = vi.hoisted(() => ({
+  getTopicPageMock: vi.fn(),
+  getTopicPaginationParamsMock: vi.fn(),
+}));
 
 // Isolates the redirect/404/static-params branches — none of the tested
 // paths should ever reach the real service/fetch chain.
 vi.mock('@blog/service', () => ({
   service: {
     pages: {
-      category: {
+      topic: {
         v1: {
-          getCategoryPage: getCategoryPageMock,
-          getCategoryPaginationParams: getCategoryPaginationParamsMock,
+          getTopicPage: getTopicPageMock,
+          getTopicPaginationParams: getTopicPaginationParamsMock,
         },
       },
     },
@@ -38,7 +36,7 @@ vi.mock('@web/i18n/navigation', () => ({
   permanentRedirect: permanentRedirectMock,
 }));
 
-const setup = customRenderAsync(CategoryNumberedPage, {
+const setup = customRenderAsync(TopicNumberedPage, {
   params: Promise.resolve({
     locale: 'EN',
     slug: 'engineering',
@@ -46,14 +44,14 @@ const setup = customRenderAsync(CategoryNumberedPage, {
   }),
 });
 
-describe('CategoryNumberedPage', () => {
+describe('TopicNumberedPage', () => {
   beforeEach(() => {
     permanentRedirectMock.mockClear();
   });
 
   describe('generateStaticParams', () => {
-    it('returns the category pagination params on success', async () => {
-      getCategoryPaginationParamsMock.mockResolvedValue({
+    it('returns the topic pagination params on success', async () => {
+      getTopicPaginationParamsMock.mockResolvedValue({
         ok: true,
         data: [
           { slug: 'engineering', page: '2' },
@@ -67,12 +65,12 @@ describe('CategoryNumberedPage', () => {
         { slug: 'engineering', page: '2' },
         { slug: 'design', page: '2' },
       ]);
-      expect(getCategoryPaginationParamsMock).toHaveBeenCalledWith(9);
+      expect(getTopicPaginationParamsMock).toHaveBeenCalledWith(9);
     });
 
     it('returns an empty array when the fetch resolves to a failure result', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      getCategoryPaginationParamsMock.mockResolvedValue({
+      getTopicPaginationParamsMock.mockResolvedValue({
         ok: false,
         error: new Error('boom'),
       });
@@ -95,7 +93,7 @@ describe('CategoryNumberedPage', () => {
       });
 
       expect(metadata).toEqual({});
-      expect(getCategoryPageMock).not.toHaveBeenCalled();
+      expect(getTopicPageMock).not.toHaveBeenCalled();
     });
 
     it('returns empty metadata for a non-canonical page param', async () => {
@@ -111,10 +109,10 @@ describe('CategoryNumberedPage', () => {
     });
 
     it('builds metadata for page 2', async () => {
-      getCategoryPageMock.mockResolvedValue({
+      getTopicPageMock.mockResolvedValue({
         ok: true,
         data: {
-          category: {
+          topic: {
             id: 'cat-1',
             title: 'Engineering',
             slug: 'engineering',
@@ -136,18 +134,18 @@ describe('CategoryNumberedPage', () => {
       });
 
       expect(metadata.title).toBe('Engineering – Page 2');
-      expect(getCategoryPageMock).toHaveBeenCalledWith('engineering', {
+      expect(getTopicPageMock).toHaveBeenCalledWith('engineering', {
         page: 2,
         itemsPerPage: 9,
       });
     });
   });
 
-  it('redirects /category/[slug]/page/1 to /category/[slug] (canonical page 1 has one URL)', async () => {
+  it('redirects /topics/[slug]/page/1 to /topics/[slug] (canonical page 1 has one URL)', async () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(permanentRedirectMock).toHaveBeenCalledWith({
-      href: '/category/engineering',
+      href: '/topics/engineering',
       locale: 'EN',
     });
   });

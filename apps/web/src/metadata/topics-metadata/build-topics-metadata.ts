@@ -4,9 +4,9 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 /**
- * Metadata for the static `/topics` hub. Unlike `buildCategoryMetadata` /
+ * Metadata for the static `/topics` hub. Unlike `buildTopicMetadata` /
  * `buildAuthorMetadata`, this needs no per-slug fetch — the page lists every
- * category, so its title/description are fixed copy rather than derived from
+ * topic, so its title/description are fixed copy rather than derived from
  * a single document. Shares the `topicsPage` message namespace with
  * `TopicsPage` itself — the `<h1>`/intro copy and the metadata title/
  * description are the same strings.

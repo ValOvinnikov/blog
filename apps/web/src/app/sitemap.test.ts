@@ -2,8 +2,8 @@ export {};
 
 const {
   getPostParamsMock,
-  getCategoryParamsMock,
-  getCategoryPaginationParamsMock,
+  getTopicParamsMock,
+  getTopicPaginationParamsMock,
   getTagParamsMock,
   getTagPaginationParamsMock,
   getAuthorParamsMock,
@@ -12,8 +12,8 @@ const {
   getPageSlugsMock,
 } = vi.hoisted(() => ({
   getPostParamsMock: vi.fn(),
-  getCategoryParamsMock: vi.fn(),
-  getCategoryPaginationParamsMock: vi.fn(),
+  getTopicParamsMock: vi.fn(),
+  getTopicPaginationParamsMock: vi.fn(),
   getTagParamsMock: vi.fn(),
   getTagPaginationParamsMock: vi.fn(),
   getAuthorParamsMock: vi.fn(),
@@ -26,10 +26,10 @@ vi.mock('@blog/service', () => ({
   service: {
     pages: {
       post: { v1: { getPostParams: getPostParamsMock } },
-      category: {
+      topic: {
         v1: {
-          getCategoryParams: getCategoryParamsMock,
-          getCategoryPaginationParams: getCategoryPaginationParamsMock,
+          getTopicParams: getTopicParamsMock,
+          getTopicPaginationParams: getTopicPaginationParamsMock,
         },
       },
       tag: {
@@ -57,8 +57,8 @@ vi.mock('@web/utils/env/env', () => ({
 /** Resolves every params mock to an empty result; tests override as needed. */
 function mockAllEmpty() {
   getPostParamsMock.mockResolvedValue({ ok: true, data: [] });
-  getCategoryParamsMock.mockResolvedValue({ ok: true, data: [] });
-  getCategoryPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+  getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
+  getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
   getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
   getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
   getAuthorParamsMock.mockResolvedValue({ ok: true, data: [] });
@@ -71,8 +71,8 @@ describe('sitemap', () => {
   afterEach(() => {
     vi.resetModules();
     getPostParamsMock.mockReset();
-    getCategoryParamsMock.mockReset();
-    getCategoryPaginationParamsMock.mockReset();
+    getTopicParamsMock.mockReset();
+    getTopicPaginationParamsMock.mockReset();
     getTagParamsMock.mockReset();
     getTagPaginationParamsMock.mockReset();
     getAuthorParamsMock.mockReset();
@@ -81,7 +81,7 @@ describe('sitemap', () => {
     getPageSlugsMock.mockReset();
   });
 
-  it('includes home, blog index, topics hub, post, category, tag, author, blog page and generic page entries', async () => {
+  it('includes home, blog index, topics hub, post, topic, tag, author, blog page and generic page entries', async () => {
     mockAllEmpty();
     getPostParamsMock.mockResolvedValue({
       ok: true,
@@ -90,7 +90,7 @@ describe('sitemap', () => {
         { slug: 'second-post', publishedAt: '2026-01-02T00:00:00.000Z' },
       ],
     });
-    getCategoryParamsMock.mockResolvedValue({
+    getTopicParamsMock.mockResolvedValue({
       ok: true,
       data: [{ slug: 'news' }],
     });
@@ -122,15 +122,15 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/blog/page/3');
     expect(urls).toContain('https://example.com/blog/first-post');
     expect(urls).toContain('https://example.com/blog/second-post');
-    expect(urls).toContain('https://example.com/category/news');
+    expect(urls).toContain('https://example.com/topics/news');
     expect(urls).toContain('https://example.com/tag/typescript');
     expect(urls).toContain('https://example.com/author/jane-doe');
     expect(urls).toContain('https://example.com/about');
   });
 
-  it('includes numbered category, tag and author pagination pages', async () => {
+  it('includes numbered topic, tag and author pagination pages', async () => {
     mockAllEmpty();
-    getCategoryPaginationParamsMock.mockResolvedValue({
+    getTopicPaginationParamsMock.mockResolvedValue({
       ok: true,
       data: [{ slug: 'news', page: '2' }],
     });
@@ -150,15 +150,15 @@ describe('sitemap', () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
-    expect(urls).toContain('https://example.com/category/news/page/2');
+    expect(urls).toContain('https://example.com/topics/news/page/2');
     expect(urls).toContain('https://example.com/tag/typescript/page/2');
     expect(urls).toContain('https://example.com/tag/typescript/page/3');
     expect(urls).toContain('https://example.com/author/jane-doe/page/2');
   });
 
-  it('omits category pagination pages when the fetch resolves to a failure result', async () => {
+  it('omits topic pagination pages when the fetch resolves to a failure result', async () => {
     mockAllEmpty();
-    getCategoryPaginationParamsMock.mockResolvedValue({
+    getTopicPaginationParamsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
@@ -167,7 +167,7 @@ describe('sitemap', () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
-    expect(urls).not.toContain('https://example.com/category/news/page/2');
+    expect(urls).not.toContain('https://example.com/topics/news/page/2');
     expect(urls).toContain('https://example.com/');
   });
 
@@ -222,7 +222,7 @@ describe('sitemap', () => {
       ok: true,
       data: [{ slug: 'first-post', publishedAt: '2026-01-01T00:00:00.000Z' }],
     });
-    getCategoryParamsMock.mockResolvedValue({
+    getTopicParamsMock.mockResolvedValue({
       ok: true,
       data: [{ slug: 'news' }],
     });
@@ -232,12 +232,12 @@ describe('sitemap', () => {
     const postEntry = entries.find(
       (entry) => entry.url === 'https://example.com/blog/first-post',
     );
-    const categoryEntry = entries.find(
-      (entry) => entry.url === 'https://example.com/category/news',
+    const topicEntry = entries.find(
+      (entry) => entry.url === 'https://example.com/topics/news',
     );
 
     expect(postEntry?.lastModified).toBe('2026-01-01T00:00:00.000Z');
-    expect(categoryEntry?.lastModified).toBeUndefined();
+    expect(topicEntry?.lastModified).toBeUndefined();
   });
 
   it('carries a languages alternate for each configured locale', async () => {
@@ -298,9 +298,9 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/blog');
   });
 
-  it('omits categories when the category params fetch resolves to a failure result', async () => {
+  it('omits topics when the topic params fetch resolves to a failure result', async () => {
     mockAllEmpty();
-    getCategoryParamsMock.mockResolvedValue({
+    getTopicParamsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
@@ -309,7 +309,7 @@ describe('sitemap', () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
-    expect(urls).not.toContain('https://example.com/category/news');
+    expect(urls).not.toContain('https://example.com/topics/news');
     expect(urls).toContain('https://example.com/');
   });
 
