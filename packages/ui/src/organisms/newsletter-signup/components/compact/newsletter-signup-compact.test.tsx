@@ -87,6 +87,14 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
+  it('calls onSubmit when Enter is pressed in the field', async () => {
+    const onSubmit = vi.fn();
+    setup({ onSubmit, email: faker.internet.email() });
+
+    await userEvent.type(screen.getByRole('textbox'), '{Enter}');
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
+
   it('disables the field and button and marks the button busy while submitting', () => {
     setup({ status: 'submitting' });
 
