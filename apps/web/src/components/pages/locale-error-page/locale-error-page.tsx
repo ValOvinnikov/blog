@@ -29,11 +29,18 @@ export function LocaleErrorPage({ error, reset }: TLocaleErrorPageProps) {
   const t = useTranslations('localeErrorPage');
   const announcementRef = useRef<HTMLSpanElement>(null);
   const mainRef = useRef<HTMLElement>(null);
+  const reportedErrorRef = useRef<Error | null>(null);
 
   useEffect(() => {
-    reportClientError('locale_error_boundary.render_failed', error, {
-      digest: error.digest,
-    });
+    // Guarded on the error identity itself, not effect re-entry — `t` must
+    // stay a real dependency for the announcement below, but its identity
+    // isn't ours to rely on for "did the error actually change".
+    if (reportedErrorRef.current !== error) {
+      reportedErrorRef.current = error;
+      reportClientError('locale_error_boundary.render_failed', error, {
+        digest: error.digest,
+      });
+    }
     // Written after mount, not on first paint — a live region that's
     // already populated when it enters the DOM is unreliably announced.
     if (announcementRef.current) {
