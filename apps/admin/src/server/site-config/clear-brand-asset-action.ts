@@ -1,5 +1,6 @@
 'use server';
 
+import { recordAuditEvent } from '@admin/server/audit/record-audit-event';
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
 import { getSiteConfigOrDefaults } from '@admin/server/site-config/site-config-or-defaults';
 import {
@@ -8,6 +9,7 @@ import {
 } from '@admin/utils/brand-asset-limits/brand-asset-limits';
 import { env } from '@admin/utils/env/env';
 import { logger } from '@admin/utils/logger/logger';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
 import { del } from '@vercel/blob';
 
@@ -65,6 +67,14 @@ export async function clearBrandAssetAction(
         });
       }
     }
+
+    await recordAuditEvent({
+      logEvent: 'site_config.brand_asset_clear_audit_failed',
+      action: AUDIT_ACTION.SETTINGS_UPDATED,
+      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+      targetId: tenant.id,
+      details: { asset: targetKind, operation: 'clear' },
+    });
 
     return { ok: true };
   } catch (error) {
