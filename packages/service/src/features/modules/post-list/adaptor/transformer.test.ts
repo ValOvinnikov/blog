@@ -91,4 +91,20 @@ describe('toPostListModule', () => {
 
     expect(module.posts).toEqual([]);
   });
+
+  it('leaves total undefined when omitted (unpaginated context)', () => {
+    const raw = makeRawPostListModule();
+
+    const module = toPostListModule(raw, rawPosts);
+
+    expect(module.total).toBeUndefined();
+  });
+
+  it('maps total straight through when given (paginated context)', () => {
+    const raw = makeRawPostListModule();
+
+    const module = toPostListModule(raw, rawPosts, 42);
+
+    expect(module.total).toBe(42);
+  });
 });
