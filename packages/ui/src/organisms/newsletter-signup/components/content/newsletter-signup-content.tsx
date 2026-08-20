@@ -15,6 +15,8 @@ type TNewsletterSignupContentProps = {
   onSubmit: () => void;
   status: TFormStatus;
   errorMessage?: string;
+  /** Id for the error `Alert`, passed to the email `TextInput` as `aria-describedby` while the error is showing. Caller-generated so two instances on one page never collide. */
+  errorMessageId?: string;
   submitLabel: string;
   emailAriaLabel: string;
   placeholder?: string;
@@ -34,6 +36,7 @@ export const NewsletterSignupContent = ({
   onSubmit,
   status,
   errorMessage,
+  errorMessageId,
   submitLabel,
   emailAriaLabel,
   placeholder,
@@ -60,6 +63,7 @@ export const NewsletterSignupContent = ({
         type="email"
         isInvalid={isError}
         isDisabled={isSubmitting}
+        aria-describedby={isError && errorMessage ? errorMessageId : undefined}
         className={s.field()}
       />
       <Button
@@ -81,7 +85,11 @@ export const NewsletterSignupContent = ({
         )}
       </Button>
       {isError && errorMessage && (
-        <Alert type={ALERT_TYPE.ERROR} message={errorMessage} />
+        <Alert
+          type={ALERT_TYPE.ERROR}
+          message={errorMessage}
+          id={errorMessageId}
+        />
       )}
     </form>
   );

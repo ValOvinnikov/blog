@@ -43,6 +43,7 @@ export const Error: TStory = {
     status: 'error',
     email: 'not-an-email',
     errorMessage: 'Enter a valid email address.',
+    errorMessageId: 'newsletter-signup-compact-error',
   },
 };
 

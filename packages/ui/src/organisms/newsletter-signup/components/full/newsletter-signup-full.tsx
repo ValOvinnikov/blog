@@ -31,6 +31,8 @@ export type TNewsletterSignupFullProps = IWithClassName &
     headingId?: string;
     supportingText?: string;
     errorMessage?: string;
+    /** Id for the error `Alert`, passed to the email `TextInput` as `aria-describedby` while the error is showing. Caller-generated so two instances on one page never collide. */
+    errorMessageId?: string;
     successMessage?: string;
     submitLabel: string;
     emailAriaLabel: string;
@@ -58,6 +60,7 @@ export const NewsletterSignupFull = ({
   headingId,
   supportingText,
   errorMessage,
+  errorMessageId,
   successMessage,
   submitLabel,
   emailAriaLabel,
@@ -106,6 +109,7 @@ export const NewsletterSignupFull = ({
               onSubmit={onSubmit}
               status={status}
               errorMessage={errorMessage}
+              errorMessageId={errorMessageId}
               submitLabel={submitLabel}
               emailAriaLabel={emailAriaLabel}
               placeholder={placeholder}

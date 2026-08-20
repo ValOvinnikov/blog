@@ -9,7 +9,7 @@ _56 components · generated from `packages/ui/src`. Paths are relative to `packa
 ### Alert — `atoms/alert/alert.tsx`
 
 a static, type-coded inline message block for form feedback (confirmations, warnings, and errors).
-Props: type: NonNullable<TAlertVariants['type']> · message: string _(extends IWithClassName, IWithDataTestId)_
+Props: type: NonNullable<TAlertVariants['type']> · message: string · id?: string _(extends IWithClassName, IWithDataTestId)_
 Variants: type: ALERT_TYPE.SUCCESS|ALERT_TYPE.WARNING|ALERT_TYPE.ERROR|ALERT_TYPE.INFO
 
 ### Avatar — `atoms/avatar/avatar.tsx`
@@ -343,8 +343,8 @@ a pure, controlled subscribe form built on the `TextInput` atom, exposed as two 
 
 Compound component:
 
-- **NewsletterSignup.Full** — `NewsletterSignup.Full` — the rich, tinted window-shell signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · supportingText?: string · errorMessage?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
-- **NewsletterSignup.Compact** — `NewsletterSignup.Compact` — a slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Full** — `NewsletterSignup.Full` — the rich, tinted window-shell signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · supportingText?: string · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Compact** — `NewsletterSignup.Compact` — a slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string _(extends IWithClassName, IWithDataTestId)_
 
 ### Pagination — `organisms/pagination/pagination.tsx`
 
