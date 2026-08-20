@@ -44,7 +44,7 @@ export function LocaleErrorPage({ error, reset }: TLocaleErrorPageProps) {
     // Written after mount, not on first paint — a live region that's
     // already populated when it enters the DOM is unreliably announced.
     if (announcementRef.current) {
-      announcementRef.current.textContent = t('title');
+      announcementRef.current.textContent = t('announcement');
     }
     mainRef.current?.focus();
   }, [error, t]);

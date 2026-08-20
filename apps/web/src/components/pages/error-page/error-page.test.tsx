@@ -66,7 +66,23 @@ describe(`<${ErrorPage.name}/>`, () => {
 
     const liveRegion = container.querySelector('[aria-live="assertive"]');
     expect(liveRegion).not.toBeNull();
-    expect(liveRegion).toHaveTextContent('Something went wrong');
+    expect(liveRegion?.textContent).toBe(
+      'Something went wrong. You can try again, or go home.',
+    );
+  });
+
+  it('names both available actions in the announcement, matching the rendered controls', () => {
+    const { container } = setup();
+
+    const liveRegion = container.querySelector('[aria-live="assertive"]');
+    const announcement = liveRegion?.textContent?.toLowerCase() ?? '';
+    const tryAgainLabel =
+      screen.getByRole('button', { name: 'Try again' }).textContent ?? '';
+    const goHomeLabel =
+      screen.getByRole('link', { name: 'Go home' }).textContent ?? '';
+
+    expect(announcement).toContain(tryAgainLabel.toLowerCase());
+    expect(announcement).toContain(goHomeLabel.toLowerCase());
   });
 
   it('sets aria-atomic on the live region', () => {

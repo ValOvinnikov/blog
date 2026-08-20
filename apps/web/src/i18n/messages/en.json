@@ -21,6 +21,7 @@
   },
   "localeErrorPage": {
     "title": "Something went wrong",
+    "announcement": "Something went wrong. You can try again, or go home.",
     "description": "An unexpected error occurred while rendering this page. You can try again, or head back to the homepage.",
     "retry": "Try again",
     "goHome": "Go home"
