@@ -18,6 +18,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
+import { reactivateTenant } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import { loadProvisionEnv, type TProvisionEnv } from './lib/env';
@@ -77,7 +78,18 @@ export async function runSteps(
   initialTenant: TTenant,
   env: TProvisionEnv,
 ): Promise<{ ok: boolean }> {
-  let tenant = initialTenant;
+  // Un-archives a re-provisioned tenant before any step runs, so it stays
+  // deprovisionable and slug-resolvable once this run succeeds — see
+  // `reactivateTenant` for why a SUSPENDED tenant is left untouched.
+  const reactivateResult = await reactivateTenant(tenantId);
+  if (!reactivateResult.ok) {
+    console.error(
+      `provision-tenant: reactivateTenant failed for "${tenantId}" (${reactivateResult.error}).`,
+    );
+    return { ok: false };
+  }
+
+  let tenant = reactivateResult.data;
 
   for (const step of STEPS) {
     await reportStepStatus({

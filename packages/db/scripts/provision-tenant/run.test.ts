@@ -1,11 +1,16 @@
+import { ERROR_CODE } from '@blog/config/constants';
 import {
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
+  TENANT_STATUS,
 } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import { runSteps } from './run';
 
+const { reactivateTenantMock } = vi.hoisted(() => ({
+  reactivateTenantMock: vi.fn(),
+}));
 const { reportStepStatusMock } = vi.hoisted(() => ({
   reportStepStatusMock: vi.fn(),
 }));
@@ -28,6 +33,9 @@ const { createTenantRevalidateWebhookMock } = vi.hoisted(() => ({
   createTenantRevalidateWebhookMock: vi.fn(),
 }));
 
+vi.mock('@blog/db/queries/tenants', () => ({
+  reactivateTenant: reactivateTenantMock,
+}));
 vi.mock('./lib/status-callback', () => ({
   reportStepStatus: reportStepStatusMock,
 }));
@@ -50,7 +58,12 @@ vi.mock('./steps/create-revalidate-webhook', () => ({
   createTenantRevalidateWebhook: createTenantRevalidateWebhookMock,
 }));
 
-const baseTenant = { id: 'tenant-1', name: 'Acme' } as TTenant;
+const baseTenant = {
+  id: 'tenant-1',
+  name: 'Acme',
+  status: TENANT_STATUS.ACTIVE,
+  deprovisionedAt: null,
+} as TTenant;
 const env = {
   sanityManagementToken: 'sanity-token',
   sanityOrganizationId: 'org-abc',
@@ -69,6 +82,9 @@ const env = {
 };
 
 beforeEach(() => {
+  reactivateTenantMock
+    .mockReset()
+    .mockResolvedValue({ ok: true, data: baseTenant });
   reportStepStatusMock.mockReset().mockResolvedValue(undefined);
   createTenantSanityProjectMock.mockReset();
   seedTenantContentMock.mockReset().mockResolvedValue(undefined);
@@ -190,5 +206,46 @@ describe(runSteps, () => {
       status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
       error: 'seed failed',
     });
+  });
+
+  it('reactivates a previously archived tenant before any step runs', async () => {
+    const archivedTenant = {
+      ...baseTenant,
+      status: TENANT_STATUS.ARCHIVED,
+      deprovisionedAt: new Date('2026-01-01T00:00:00.000Z'),
+    } as TTenant;
+    reactivateTenantMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...archivedTenant,
+        status: TENANT_STATUS.ACTIVE,
+        deprovisionedAt: null,
+      },
+    });
+    createTenantSanityProjectMock.mockResolvedValue({});
+    createTenantStudioMock.mockResolvedValue({});
+
+    const result = await runSteps('tenant-1', archivedTenant, env);
+
+    expect(result).toEqual({ ok: true });
+    expect(reactivateTenantMock).toHaveBeenCalledWith('tenant-1');
+
+    const [tenantSeenBySanityProject] = createTenantSanityProjectMock.mock
+      .calls[0] as [TTenant];
+    expect(tenantSeenBySanityProject.status).toBe(TENANT_STATUS.ACTIVE);
+    expect(tenantSeenBySanityProject.deprovisionedAt).toBeNull();
+  });
+
+  it('stops before any step when reactivateTenant fails', async () => {
+    reactivateTenantMock.mockResolvedValue({
+      ok: false,
+      error: ERROR_CODE.DB_NOT_FOUND,
+    });
+
+    const result = await runSteps('tenant-1', baseTenant, env);
+
+    expect(result).toEqual({ ok: false });
+    expect(createTenantSanityProjectMock).not.toHaveBeenCalled();
+    expect(reportStepStatusMock).not.toHaveBeenCalled();
   });
 });
