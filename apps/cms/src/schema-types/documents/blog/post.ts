@@ -6,8 +6,8 @@ import { Newspaper } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
 import { authorSchema } from './author';
-import { categorySchema } from './category';
 import { tagSchema } from './tag';
+import { topicSchema } from './topic';
 
 export const postSchema = defineType({
   name: 'blog_post',
@@ -57,11 +57,11 @@ export const postSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'category',
-      title: 'Category',
+      name: 'topic',
+      title: 'Topic',
       type: 'reference',
       description: "The post's primary topic classification.",
-      to: [{ type: categorySchema.name }],
+      to: [{ type: topicSchema.name }],
       validation: (rule) => rule.required(),
     }),
     defineField({

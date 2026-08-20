@@ -1,7 +1,7 @@
 import { authorSchema } from './blog/author';
-import { categorySchema } from './blog/category';
 import { postSchema } from './blog/post';
 import { tagSchema } from './blog/tag';
+import { topicSchema } from './blog/topic';
 import { blogPageSchema } from './pages/blog-page';
 import { homePageSchema } from './pages/home-page';
 import { genericSchema } from './pages/page';
@@ -15,7 +15,7 @@ import { voiceSchema } from './settings/voice';
 export const documents = [
   postSchema,
   authorSchema,
-  categorySchema,
+  topicSchema,
   tagSchema,
   genericSchema,
   homePageSchema,

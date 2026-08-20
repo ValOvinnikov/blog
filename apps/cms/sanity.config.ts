@@ -1,8 +1,8 @@
 import { schemaTypes } from '@cms/schema-types';
 import { authorSchema } from '@cms/schema-types/documents/blog/author';
-import { categorySchema } from '@cms/schema-types/documents/blog/category';
 import { postSchema } from '@cms/schema-types/documents/blog/post';
 import { tagSchema } from '@cms/schema-types/documents/blog/tag';
+import { topicSchema } from '@cms/schema-types/documents/blog/topic';
 import { blogPageSchema } from '@cms/schema-types/documents/pages/blog-page';
 import { homePageSchema } from '@cms/schema-types/documents/pages/home-page';
 import { genericSchema } from '@cms/schema-types/documents/pages/page';
@@ -132,8 +132,8 @@ export default defineConfig({
                     S.documentTypeListItem(postSchema.name)
                       .title('Posts')
                       .icon(Newspaper),
-                    S.documentTypeListItem(categorySchema.name)
-                      .title('Categories')
+                    S.documentTypeListItem(topicSchema.name)
+                      .title('Topics')
                       .icon(Tags),
                     S.documentTypeListItem(tagSchema.name)
                       .title('Tags')
