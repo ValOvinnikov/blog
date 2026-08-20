@@ -210,16 +210,31 @@ Production contents: 12 `blog_post`, 15 `blog_tag`, 1 `blog_category`,
 1 `blog_author`, `page_home` + `page_blog`, 1 `module_hero`,
 1 `module_postList`, 4 settings singletons, 15 image assets.
 
-One scripted `sanity/migrate` transform, following the repo's standard
-workflow — `migrate:dry` → `dataset:export` backup → **human-gated**
-`migrate:run`, dev dataset first:
+Scripted `sanity/migrate` transforms, following the repo's standard workflow —
+`migrate:dry` → `dataset:export` backup → **human-gated** `migrate:run`, dev
+dataset first:
 
-1. Retype the 1 `blog_category` document to `blog_topic`.
-2. Rename the `category` field to `topic` on 12 `blog_post` documents (the
-   `_ref` target is unchanged).
+1. **Create `blog_topic` from `blog_category`, and repoint posts.** A
+   document's `_type` is **immutable in Sanity** — it cannot be patched, and
+   Sanity's own docs state there is no straightforward way to change it with
+   the migration tooling. So this is not a retype: the migration
+   `createIfNotExists` a `blog_topic` document carrying the category's
+   `title`/`slug`/`description` under a deterministic new id, then patches
+   each post's reference onto it while unsetting the old `category` field
+   (which also covers renaming that field to `topic`).
+2. **Delete the legacy `blog_category` documents** — a _separate_ migration,
+   run only after step 1 has completed against the same dataset. A document
+   with incoming strong references cannot be deleted, so running the two in
+   one pass would race the repointing.
 3. Create `page_topic` ×1 and `page_tag` ×15, each with its own
    `module_postList`, plus the `page_topicIndex` and `page_tagIndex`
    singletons with their `module_taxonomyList`.
+
+Steps 1–2 belong to E1; step 3 is split across E6 and E8.
+
+**Deploy ordering:** run steps 1–2 against `production` _before_ deploying the
+web code that reads `topic`, so no window exists where live documents have
+neither shape populated for the code currently reading them.
 
 Step 3 is **30 new documents** to preserve behaviour that is automatic today.
 That cost was weighed explicitly against auto-creating page documents via a
