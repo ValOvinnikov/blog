@@ -105,4 +105,103 @@ describe(PostListModule, () => {
       screen.getByRole('region', { name: 'Latest posts' }),
     ).toBeInTheDocument();
   });
+
+  it('passes the given context straight through to getPostList', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'Latest posts',
+          supportingText: undefined,
+          align: undefined,
+        },
+        posts: [],
+        layout: undefined,
+      },
+    });
+
+    const context = { type: 'HOME' as const, isPaginated: false as const };
+
+    await setup({ context });
+
+    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', context);
+  });
+
+  it('calls getPostList with an undefined context when the caller omits one, and renders no pagination nav', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'Latest posts',
+          supportingText: undefined,
+          align: undefined,
+        },
+        posts: [
+          {
+            id: 'post-1',
+            slug: 'first-post',
+            title: 'First post',
+            excerpt: 'An excerpt',
+            publishedAt: '2026-01-01T00:00:00.000Z',
+            topic: { id: 'topic-1', title: 'News', slug: 'news' },
+            readingTimeMinutes: 2,
+          },
+        ],
+        layout: undefined,
+      },
+    });
+
+    await setup();
+
+    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', undefined);
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+  });
+
+  it('renders a pager with correct hrefs for a paginated topic context', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'Latest posts',
+          supportingText: undefined,
+          align: undefined,
+        },
+        posts: [
+          {
+            id: 'post-1',
+            slug: 'first-post',
+            title: 'First post',
+            excerpt: 'An excerpt',
+            publishedAt: '2026-01-01T00:00:00.000Z',
+            topic: { id: 'topic-1', title: 'News', slug: 'news' },
+            readingTimeMinutes: 2,
+          },
+        ],
+        layout: undefined,
+        total: 30,
+      },
+    });
+
+    await setup({
+      context: {
+        type: 'TOPIC',
+        topicSlug: 'engineering',
+        isPaginated: true,
+        page: 2,
+        pageSize: 12,
+      },
+    });
+
+    const nav = screen.getByRole('navigation', { name: 'Topic pages' });
+    expect(nav).toBeInTheDocument();
+
+    const previousLink = screen.getByRole('link', { name: 'Previous' });
+    expect(previousLink).toHaveAttribute('href', '/topics/engineering');
+
+    const nextLink = screen.getByRole('link', { name: 'Next' });
+    expect(nextLink).toHaveAttribute('href', '/topics/engineering/page/3');
+  });
 });
