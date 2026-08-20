@@ -29,6 +29,7 @@ export default [
     },
     rules: {
       'blog/boolean-prop-prefix': 'error',
+      'func-style': ['error', 'expression', { allowArrowFunctions: true }],
       'no-restricted-imports': [
         'error',
         {
@@ -52,6 +53,14 @@ export default [
           ],
         },
       ],
+    },
+  },
+  {
+    // Next.js requires named function declarations for these reserved
+    // exports (docs and codemods emit `function`, not arrow expressions).
+    files: ['**/page.tsx', '**/layout.tsx', '**/route.ts', 'src/middleware.ts'],
+    rules: {
+      'func-style': 'off',
     },
   },
 ];
