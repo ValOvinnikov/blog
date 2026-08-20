@@ -1,3 +1,14 @@
+// Weights/styles mirror apps/web/src/config/font-loaders/*.ts's next/font
+// loaders — keep both lists in sync when adding or removing one.
+import '@fontsource/space-grotesk/400.css';
+import '@fontsource/space-grotesk/500.css';
+import '@fontsource/space-grotesk/700.css';
+import '@fontsource/newsreader/400.css';
+import '@fontsource/newsreader/500.css';
+import '@fontsource/newsreader/400-italic.css';
+import '@fontsource/newsreader/500-italic.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
 import '../index.css';
 import './preview.css';
 
