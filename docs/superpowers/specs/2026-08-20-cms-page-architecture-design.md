@@ -210,16 +210,31 @@ Production contents: 12 `blog_post`, 15 `blog_tag`, 1 `blog_category`,
 1 `blog_author`, `page_home` + `page_blog`, 1 `module_hero`,
 1 `module_postList`, 4 settings singletons, 15 image assets.
 
-One scripted `sanity/migrate` transform, following the repo's standard
-workflow — `migrate:dry` → `dataset:export` backup → **human-gated**
-`migrate:run`, dev dataset first:
+Scripted `sanity/migrate` transforms, following the repo's standard workflow —
+`migrate:dry` → `dataset:export` backup → **human-gated** `migrate:run`, dev
+dataset first:
 
-1. Retype the 1 `blog_category` document to `blog_topic`.
-2. Rename the `category` field to `topic` on 12 `blog_post` documents (the
-   `_ref` target is unchanged).
+1. **Create `blog_topic` from `blog_category`, and repoint posts.** A
+   document's `_type` is **immutable in Sanity** — it cannot be patched, and
+   Sanity's own docs state there is no straightforward way to change it with
+   the migration tooling. So this is not a retype: the migration
+   `createIfNotExists` a `blog_topic` document carrying the category's
+   `title`/`slug`/`description` under a deterministic new id, then patches
+   each post's reference onto it while unsetting the old `category` field
+   (which also covers renaming that field to `topic`).
+2. **Delete the legacy `blog_category` documents** — a _separate_ migration,
+   run only after step 1 has completed against the same dataset. A document
+   with incoming strong references cannot be deleted, so running the two in
+   one pass would race the repointing.
 3. Create `page_topic` ×1 and `page_tag` ×15, each with its own
    `module_postList`, plus the `page_topicIndex` and `page_tagIndex`
    singletons with their `module_taxonomyList`.
+
+Steps 1–2 belong to E1; step 3 is split across E6 and E8.
+
+**Deploy ordering:** run steps 1–2 against `production` _before_ deploying the
+web code that reads `topic`, so no window exists where live documents have
+neither shape populated for the code currently reading them.
 
 Step 3 is **30 new documents** to preserve behaviour that is automatic today.
 That cost was weighed explicitly against auto-creating page documents via a
@@ -397,12 +412,19 @@ changes Sanity fixtures — E1, E6, and E8.
   contract survives — it is what scopes a `modules[]` post list, and it is E2's
   first sub-issue — but its premise (`modules[]` on the taxonomy documents, grid
   untouched) does not.
-- Create ten parent issues, E1–E10 above, each with one sub-issue per layer.
-  Gather every sub-issue's title, body and labels up front and dispatch
-  `board-keeper` once per epic with the whole set, rather than issue by issue.
-  Label each sub-issue with its `layer:*` label; E1's single non-splittable PR
-  still gets one issue per layer for tracking, with the PR referencing all of
-  them.
+- Create ten board entries for E1–E10 above. Gather every sub-issue's title,
+  body and labels up front and dispatch `board-keeper` once per epic with the
+  whole set, rather than issue by issue. Label each sub-issue with its
+  `layer:*` label.
+- **E1 is a flat issue, not an epic.** The per-layer-sub-issue convention
+  exists to mirror per-layer PRs, and E1 deliberately has none — six
+  sub-issues for one PR that can only close one of them would be noise. Its
+  body carries the per-layer checklist instead.
+- **Sub-issues are created just-in-time.** All ten epics exist on the board
+  immediately so the programme's shape and order are visible, but only the
+  unblocked ones (E2–E4) carry layer sub-issues at first. E5–E10 get theirs
+  when their turn comes, written against what E2–E4 actually shipped rather
+  than against a design those epics will refine.
 - `SPEC.md` §6 (content model) and `docs/context/surfaces-and-routing.md`,
   `content-model.md`, `data-flow.md`, `seo-accessibility.md` all need syncing as
   each epic lands.
