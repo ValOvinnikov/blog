@@ -5,7 +5,7 @@ import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-po
 // inside the `tags[]` array, so this correlates each tag's own post count via
 // GROQ's `^._id` parent-scope operator — one round-trip for every tag's slug
 // + post count, no per-slug fan-out (mirrors
-// packages/service/src/features/entities/categories/adaptor/query.ts, #751).
+// packages/service/src/features/entities/topics/adaptor/query.ts).
 export const tagPaginationParamsQuery = q.star
   .filterByType('blog_tag')
   .project((sub) => ({

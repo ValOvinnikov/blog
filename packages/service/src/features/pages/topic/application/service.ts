@@ -10,7 +10,7 @@ export function createTopicService() {
     v1: {
       // Loader still returns `TTopicPage | null` for "topic not
       // found"; safeAsync only wraps arbitrary query failures, so callers
-      // check `.ok` first, then `.data !== null` (see #713).
+      // check `.ok` first, then `.data !== null`.
       getTopicPage: safeAsync((slug: string, args: TGetTopicPageArgs) =>
         getTopicPage(slug, args),
       ),

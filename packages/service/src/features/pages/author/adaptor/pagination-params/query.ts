@@ -4,7 +4,7 @@ import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-po
 // `^._id` (GROQ's parent-scope operator) correlates each `blog_post` back to
 // the enclosing author document within this per-item projection — one
 // round-trip for every author's slug + post count, no per-slug fan-out
-// (mirrors packages/service/src/features/entities/categories/adaptor/query.ts, #751).
+// (mirrors packages/service/src/features/entities/topics/adaptor/query.ts).
 export const authorPaginationParamsQuery = q.star
   .filterByType('blog_author')
   .project((sub) => ({
