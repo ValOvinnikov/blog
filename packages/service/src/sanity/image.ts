@@ -19,6 +19,7 @@ export type TImageTransformOptions = {
   width?: number;
   height?: number;
   fit?: FitMode;
+  quality?: number;
 };
 
 export function urlForImage(
@@ -29,5 +30,6 @@ export function urlForImage(
   if (options?.width) image = image.width(options.width);
   if (options?.height) image = image.height(options.height);
   if (options?.fit) image = image.fit(options.fit);
+  if (options?.quality) image = image.quality(options.quality);
   return image.url();
 }
