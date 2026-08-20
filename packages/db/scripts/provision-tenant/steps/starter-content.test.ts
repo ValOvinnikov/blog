@@ -36,13 +36,13 @@ describe(buildStarterDocuments, () => {
     expect(excerpt.length).toBeLessThanOrEqual(300);
   });
 
-  it('post references the starter author and category by id', () => {
+  it('post references the starter author and topic by id', () => {
     const post = buildStarterDocuments(tenant, assets).find(
       (doc) => doc._id === STARTER_DOCUMENT_IDS.POST,
-    ) as unknown as { author: { _ref: string }; category: { _ref: string } };
+    ) as unknown as { author: { _ref: string }; topic: { _ref: string } };
 
     expect(post.author._ref).toBe(STARTER_DOCUMENT_IDS.AUTHOR);
-    expect(post.category._ref).toBe(STARTER_DOCUMENT_IDS.CATEGORY);
+    expect(post.topic._ref).toBe(STARTER_DOCUMENT_IDS.TOPIC);
   });
 
   it('wires the uploaded asset ids into author image and default OG image', () => {
