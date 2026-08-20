@@ -130,6 +130,7 @@ export function TenantDetailsPanel({
     lockedValue,
     actions,
     lockAnnouncementLive,
+    planControl,
   } = tenantDetailsPanelVariants();
 
   function updateField<K extends keyof TFormValues>(
@@ -221,6 +222,7 @@ export function TenantDetailsPanel({
               options={planOptions}
               value={values.plan}
               onChange={(plan) => updateField('plan', plan)}
+              className={planControl()}
             />
           </div>
         </div>
