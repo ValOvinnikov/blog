@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { makePostCard } from '@web/testing/shared/post/fixtures';
 
 const { getIndexPageMock, getSiteSettingsMock } = vi.hoisted(() => ({

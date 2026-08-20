@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 export {};
 
 const ENV_KEYS = [

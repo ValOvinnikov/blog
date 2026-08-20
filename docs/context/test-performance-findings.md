@@ -56,6 +56,40 @@ Four files look node-safe by grep but genuinely need jsdom, because they use
 - `src/utils/build-rss-feed/build-rss-feed.test.ts`
 - `src/utils/env/env.test.ts`
 
+## Measured effect of the split — wall-clock win NOT demonstrated
+
+Two full `apps/web` runs, back to back on the same machine:
+
+| config                         | wall    | environment |
+| ------------------------------ | ------- | ----------- |
+| baseline (all 151 under jsdom) | 516.12s | 1911.48s    |
+| split (62 files on `node`)     | 543.49s | 1507.15s    |
+
+Both runs: 151 files / 976 tests passing. The split removes ~21% of the
+environment work, but **wall-clock did not improve** — the two runs are within
+noise of each other.
+
+The machine was saturated throughout (load 100-780 on 8 cores), so runtime was
+bound by CPU starvation, not by the jsdom work being removed. Removing real
+work from a queue that is already starved does not shorten it.
+
+So the split is _correct and does less work_, but its wall-clock benefit is
+unproven. Re-run the two-config comparison on a quiet machine before treating
+it as a performance fix. That result would also indicate whether the
+oversubscription below is the dominant term.
+
+## Config gotcha: `include` merges, `exclude` replaces
+
+A project's `include` is **merged** with the inherited root `include` rather
+than replacing it, so an `include`-based split silently widens each project to
+the whole suite. The first attempt matched 143 + 151 = 294 files (81 `.tsx`
+render tests wrongly on `node`, 475 failures). Split via `exclude` instead, and
+verify the partition with `vitest list --project <name> --filesOnly`.
+
+The `.ts` files that do need a DOM opt back in with their own
+`/** @vitest-environment jsdom */` docblock, which overrides the project's
+environment per file.
+
 ## Rejected: `--no-isolate`
 
 Fast (roughly halves the jsdom set) but **incorrect here**: the full `apps/web`

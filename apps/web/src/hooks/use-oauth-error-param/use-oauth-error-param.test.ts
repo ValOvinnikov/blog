@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { renderHook, waitFor } from '@web/testing/custom-render';
 
 import { useOAuthErrorParam } from './use-oauth-error-param';

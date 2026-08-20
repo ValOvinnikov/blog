@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { makePostCard } from '@web/testing/shared/post/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTag } from '@web/testing/shared/tag/fixtures';
