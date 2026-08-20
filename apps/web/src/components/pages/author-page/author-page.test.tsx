@@ -101,7 +101,7 @@ describe(`<${AuthorPage.name}/>`, () => {
     expect(screen.getByText('Builds things.')).toBeVisible();
     expect(screen.getByRole('img', { name: 'Jane Doe' })).toHaveAttribute(
       'src',
-      'https://cdn.example.com/jane.jpg',
+      author.imageUrl,
     );
 
     const xLink = screen.getByRole('link', { name: 'X' });

@@ -1,4 +1,5 @@
 import type { TPostDetail } from '@blog/service';
+import { AUTHOR_IMAGE_URL } from '@web/testing/shared/author/fixtures';
 
 export const mockPostDetail: TPostDetail = {
   id: 'post-1',
@@ -32,7 +33,7 @@ export const mockPostDetail: TPostDetail = {
     id: 'author-1',
     name: 'Jane Doe',
     slug: 'jane-doe',
-    imageUrl: 'https://cdn.example.com/jane.jpg',
+    imageUrl: AUTHOR_IMAGE_URL,
     role: 'Writer',
     bio: [
       {
