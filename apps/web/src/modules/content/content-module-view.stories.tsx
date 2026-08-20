@@ -15,6 +15,13 @@ const meta = {
     body: richTextDemo,
     layout: undefined,
   },
+  decorators: [
+    (Story) => (
+      <div className="py-section">
+        <Story />
+      </div>
+    ),
+  ],
 } satisfies Meta<typeof ContentModuleView>;
 
 export default meta;
@@ -35,11 +42,4 @@ export const WithDividerAndLargeSpacing: TStory = {
       dividerBottom: true,
     },
   },
-  decorators: [
-    (Story) => (
-      <div className="py-section">
-        <Story />
-      </div>
-    ),
-  ],
 };
