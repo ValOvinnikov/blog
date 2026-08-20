@@ -152,6 +152,14 @@ In its place `blog_author` gains an **optional `profilePage` reference to
 `apps/web` can build `routes.genericPage(slug)`; when the reference is unset
 the byline renders as plain text, which `PostMeta` already supports.
 
+The reference is restricted to `page_generic` **only** — `to: [{ type:
+'page_generic' }]`, so the Studio picker offers nothing else. This is
+load-bearing rather than incidental: the page-document family grows from three
+types to seven in this design, and an unrestricted picker would offer
+`page_home`, `page_blog`, `page_topic`, `page_tag` and the two index
+singletons, none of which can serve as an author profile. No `options.filter`
+is needed — the `to` restriction alone gives the behaviour.
+
 Ordering within E9: land the `profilePage` reference first, then remove `slug`,
 so no intermediate commit leaves the byline unable to link.
 
