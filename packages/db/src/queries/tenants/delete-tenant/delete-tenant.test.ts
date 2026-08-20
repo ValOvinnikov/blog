@@ -18,17 +18,21 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 let db: PgliteDatabase<typeof schema>;
 
-async function insertTenant(): Promise<string> {
+async function insertTenant(
+  options: { archived?: boolean; slug?: string } = {},
+): Promise<string> {
+  const { archived = true, slug = 'acme' } = options;
+
   const [tenant] = await db
     .insert(schema.tenants)
     .values({
-      slug: 'acme',
+      slug,
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       locale: 'en',
       plan: TENANT_PLAN.FREE,
-      status: TENANT_STATUS.ARCHIVED,
-      deprovisionedAt: new Date(),
+      status: archived ? TENANT_STATUS.ARCHIVED : TENANT_STATUS.ACTIVE,
+      deprovisionedAt: archived ? new Date() : undefined,
     })
     .returning();
 
@@ -47,16 +51,19 @@ beforeEach(() => {
 
 afterEach(async () => {
   await db.delete(schema.siteConfig);
+  await db.delete(schema.tenantDomains);
   await db.delete(schema.memberships);
   await db.delete(schema.users);
   await db.delete(schema.tenants);
 });
 
 describe(deleteTenant, () => {
-  it('deletes the tenant row', async () => {
-    const tenantId = await insertTenant();
+  it('deletes an archived tenant row', async () => {
+    const tenantId = await insertTenant({ archived: true });
 
-    await deleteTenant(tenantId);
+    const result = await deleteTenant(tenantId);
+
+    expect(result).toEqual({ outcome: 'deleted' });
 
     const remaining = await db
       .select()
@@ -65,13 +72,39 @@ describe(deleteTenant, () => {
     expect(remaining).toEqual([]);
   });
 
-  it('cascades to dependent membership rows for that tenant', async () => {
-    const tenantId = await insertTenant();
+  it('refuses to delete a tenant that is not archived, and the row survives', async () => {
+    const tenantId = await insertTenant({ archived: false });
+
+    const result = await deleteTenant(tenantId);
+
+    expect(result).toEqual({ outcome: 'not-archived' });
+
+    const remaining = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(remaining).toHaveLength(1);
+  });
+
+  it('returns not-found for a tenant id that does not exist', async () => {
+    const missingId = '00000000-0000-0000-0000-000000000000';
+
+    const result = await deleteTenant(missingId);
+
+    expect(result).toEqual({ outcome: 'not-found' });
+  });
+
+  it('cascades to dependent membership and tenant_domains rows for that tenant', async () => {
+    const tenantId = await insertTenant({ archived: true });
     await db.insert(schema.users).values({ id: 'user-1' });
     await db.insert(schema.memberships).values({
       userId: 'user-1',
       tenantId,
       role: MEMBERSHIP_ROLE.OWNER,
+    });
+    await db.insert(schema.tenantDomains).values({
+      tenantId,
+      domain: 'acme.example.com',
     });
 
     await deleteTenant(tenantId);
@@ -81,10 +114,16 @@ describe(deleteTenant, () => {
       .from(schema.memberships)
       .where(eq(schema.memberships.tenantId, tenantId));
     expect(remainingMemberships).toEqual([]);
+
+    const remainingDomains = await db
+      .select()
+      .from(schema.tenantDomains)
+      .where(eq(schema.tenantDomains.tenantId, tenantId));
+    expect(remainingDomains).toEqual([]);
   });
 
   it('cascades to a dependent site_config row for that tenant', async () => {
-    const tenantId = await insertTenant();
+    const tenantId = await insertTenant({ archived: true });
     await db.insert(schema.siteConfig).values({
       tenantId,
       preset: PRESET_ID.CONSOLE,
@@ -104,9 +143,23 @@ describe(deleteTenant, () => {
     expect(remainingSiteConfig).toEqual([]);
   });
 
-  it('is a no-op when the tenant does not exist', async () => {
-    const missingId = '00000000-0000-0000-0000-000000000000';
+  it('frees the slug for a new tenant after a successful delete', async () => {
+    const tenantId = await insertTenant({ archived: true, slug: 'acme' });
 
-    await expect(deleteTenant(missingId)).resolves.toBeUndefined();
+    await deleteTenant(tenantId);
+
+    const [newTenant] = await db
+      .insert(schema.tenants)
+      .values({
+        slug: 'acme',
+        name: 'Acme Reborn',
+        primaryDomain: 'acme-reborn.example.com',
+        locale: 'en',
+        plan: TENANT_PLAN.FREE,
+        status: TENANT_STATUS.ACTIVE,
+      })
+      .returning();
+
+    expect(newTenant?.slug).toBe('acme');
   });
 });
