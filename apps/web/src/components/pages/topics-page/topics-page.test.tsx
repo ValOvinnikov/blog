@@ -2,14 +2,14 @@ import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 
 import { TopicsPage } from './topics-page';
 
-const { getCategoriesMock } = vi.hoisted(() => ({
-  getCategoriesMock: vi.fn(),
+const { getTopicsMock } = vi.hoisted(() => ({
+  getTopicsMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
   service: {
     entities: {
-      categories: { v1: { getCategories: getCategoriesMock } },
+      topics: { v1: { getTopics: getTopicsMock } },
     },
   },
 }));
@@ -33,11 +33,11 @@ const setup = customRenderAsync(TopicsPage, {});
 
 describe(`<${TopicsPage.name}/>`, () => {
   beforeEach(() => {
-    getCategoriesMock.mockReset();
+    getTopicsMock.mockReset();
   });
 
   it('renders the page heading', async () => {
-    getCategoriesMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicsMock.mockResolvedValue({ ok: true, data: [] });
 
     await setup();
 
@@ -46,8 +46,8 @@ describe(`<${TopicsPage.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders a card per category, linking to its category archive', async () => {
-    getCategoriesMock.mockResolvedValue({
+  it('renders a card per topic, linking to its topic archive', async () => {
+    getTopicsMock.mockResolvedValue({
       ok: true,
       data: [
         {
@@ -63,13 +63,13 @@ describe(`<${TopicsPage.name}/>`, () => {
     await setup();
 
     const link = screen.getByRole('link', { name: 'Engineering' });
-    expect(link).toHaveAttribute('href', '/category/engineering');
+    expect(link).toHaveAttribute('href', '/topics/engineering');
     expect(screen.getByText('Posts about building things.')).toBeVisible();
     expect(screen.getByText('5 posts')).toBeVisible();
   });
 
-  it('omits the description when the category has none', async () => {
-    getCategoriesMock.mockResolvedValue({
+  it('omits the description when the topic has none', async () => {
+    getTopicsMock.mockResolvedValue({
       ok: true,
       data: [
         {
@@ -89,8 +89,8 @@ describe(`<${TopicsPage.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders singular "1 post" for a category with exactly one post', async () => {
-    getCategoriesMock.mockResolvedValue({
+  it('renders singular "1 post" for a topic with exactly one post', async () => {
+    getTopicsMock.mockResolvedValue({
       ok: true,
       data: [
         {
@@ -108,19 +108,19 @@ describe(`<${TopicsPage.name}/>`, () => {
     expect(screen.getByText('1 post')).toBeVisible();
   });
 
-  it('renders an empty-state message when there are no categories', async () => {
-    getCategoriesMock.mockResolvedValue({ ok: true, data: [] });
+  it('renders an empty-state message when there are no topics', async () => {
+    getTopicsMock.mockResolvedValue({ ok: true, data: [] });
 
     await setup();
 
     expect(screen.getByText('No topics yet.')).toBeVisible();
-    // Only the breadcrumb "Home" link renders — no category cards.
+    // Only the breadcrumb "Home" link renders — no topic cards.
     expect(screen.getAllByRole('link')).toHaveLength(1);
   });
 
   it('renders the empty state instead of crashing when the fetch resolves to a failure result', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getCategoriesMock.mockResolvedValue({
+    getTopicsMock.mockResolvedValue({
       ok: false,
       error: new Error('Configuration must contain `projectId`'),
     });
@@ -128,14 +128,14 @@ describe(`<${TopicsPage.name}/>`, () => {
     await setup();
 
     expect(screen.getByText('No topics yet.')).toBeVisible();
-    // Only the breadcrumb "Home" link renders — no category cards.
+    // Only the breadcrumb "Home" link renders — no topic cards.
     expect(screen.getAllByRole('link')).toHaveLength(1);
 
     errorSpy.mockRestore();
   });
 
   it('renders the Home › Topics breadcrumbs trail', async () => {
-    getCategoriesMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicsMock.mockResolvedValue({ ok: true, data: [] });
 
     await setup();
 
@@ -150,7 +150,7 @@ describe(`<${TopicsPage.name}/>`, () => {
   });
 
   it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
-    getCategoriesMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicsMock.mockResolvedValue({ ok: true, data: [] });
 
     await setup();
 
@@ -164,7 +164,7 @@ describe(`<${TopicsPage.name}/>`, () => {
   });
 
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    getCategoriesMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicsMock.mockResolvedValue({ ok: true, data: [] });
 
     const { container } = await setup();
 

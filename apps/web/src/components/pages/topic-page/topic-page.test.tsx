@@ -1,28 +1,28 @@
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import {
-  makeCategory,
-  makeCategoryWithPostCount,
-} from '@web/testing/shared/category/fixtures';
-import {
   makePostCard,
-  makePostCardCategory,
+  makePostCardTopic,
 } from '@web/testing/shared/post/fixtures';
+import {
+  makeTopic,
+  makeTopicWithPostCount,
+} from '@web/testing/shared/topic/fixtures';
 import { notFound } from 'next/navigation';
 
-import { CategoryPage } from './category-page';
+import { TopicPage } from './topic-page';
 
-const { getCategoryPageMock, getCategoriesMock } = vi.hoisted(() => ({
-  getCategoryPageMock: vi.fn(),
-  getCategoriesMock: vi.fn(),
+const { getTopicPageMock, getTopicsMock } = vi.hoisted(() => ({
+  getTopicPageMock: vi.fn(),
+  getTopicsMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
   service: {
     pages: {
-      category: { v1: { getCategoryPage: getCategoryPageMock } },
+      topic: { v1: { getTopicPage: getTopicPageMock } },
     },
     entities: {
-      categories: { v1: { getCategories: getCategoriesMock } },
+      topics: { v1: { getTopics: getTopicsMock } },
     },
   },
 }));
@@ -46,32 +46,32 @@ const post = makePostCard({
   title: 'My Post Title',
   slug: 'my-post-slug',
   publishedAt: '2026-01-01T00:00:00.000Z',
-  category: makePostCardCategory(),
+  topic: makePostCardTopic(),
 });
 
-const category = makeCategory({
+const topic = makeTopic({
   title: 'News',
   slug: 'news',
   description: 'The latest updates.',
 });
 
-const setup = customRenderAsync(CategoryPage, {
+const setup = customRenderAsync(TopicPage, {
   slug: 'news',
 });
 
-describe(`<${CategoryPage.name}/>`, () => {
+describe(`<${TopicPage.name}/>`, () => {
   beforeEach(() => {
-    getCategoryPageMock.mockReset();
-    getCategoriesMock.mockReset();
-    getCategoriesMock.mockResolvedValue({
+    getTopicPageMock.mockReset();
+    getTopicsMock.mockReset();
+    getTopicsMock.mockResolvedValue({
       ok: true,
       data: [
-        makeCategoryWithPostCount({
+        makeTopicWithPostCount({
           title: 'News',
           slug: 'news',
           postCount: 1,
         }),
-        makeCategoryWithPostCount({
+        makeTopicWithPostCount({
           id: 'cat-2',
           title: 'Design',
           slug: 'design',
@@ -81,8 +81,8 @@ describe(`<${CategoryPage.name}/>`, () => {
     });
   });
 
-  it('calls notFound() when the category does not exist', async () => {
-    getCategoryPageMock.mockResolvedValue({ ok: true, data: null });
+  it('calls notFound() when the topic does not exist', async () => {
+    getTopicPageMock.mockResolvedValue({ ok: true, data: null });
 
     await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
 
@@ -91,7 +91,7 @@ describe(`<${CategoryPage.name}/>`, () => {
 
   it('calls notFound() when the fetch fails', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getCategoryPageMock.mockResolvedValue({
+    getTopicPageMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
@@ -103,11 +103,11 @@ describe(`<${CategoryPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('renders the category heading, description, and posts', async () => {
-    getCategoryPageMock.mockResolvedValue({
+  it('renders the topic heading, description, and posts', async () => {
+    getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category,
+        topic,
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -128,11 +128,11 @@ describe(`<${CategoryPage.name}/>`, () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders the empty-state message when the category has no posts', async () => {
-    getCategoryPageMock.mockResolvedValue({
+  it('renders the empty-state message when the topic has no posts', async () => {
+    getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category,
+        topic,
         posts: [],
         currentPage: 1,
         totalPages: 1,
@@ -154,11 +154,11 @@ describe(`<${CategoryPage.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders the category chip row with the current category highlighted', async () => {
-    getCategoryPageMock.mockResolvedValue({
+  it('renders the topic chip row with the current topic highlighted', async () => {
+    getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category,
+        topic,
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -168,9 +168,7 @@ describe(`<${CategoryPage.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('navigation', { name: 'Categories' }),
-    ).toBeVisible();
+    expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'News' })).toHaveAttribute(
       'aria-current',
       'page',
@@ -183,11 +181,11 @@ describe(`<${CategoryPage.name}/>`, () => {
     );
   });
 
-  it('calls getCategoryPage with the fixed itemsPerPage, page undefined, on page 1', async () => {
-    getCategoryPageMock.mockResolvedValue({
+  it('calls getTopicPage with the fixed itemsPerPage, page undefined, on page 1', async () => {
+    getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category,
+        topic,
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -197,17 +195,17 @@ describe(`<${CategoryPage.name}/>`, () => {
 
     await setup();
 
-    expect(getCategoryPageMock).toHaveBeenCalledWith('news', {
+    expect(getTopicPageMock).toHaveBeenCalledWith('news', {
       page: undefined,
       itemsPerPage: 9,
     });
   });
 
-  it('calls the paginated getCategoryPage with the fixed itemsPerPage when a page is given', async () => {
-    getCategoryPageMock.mockResolvedValue({
+  it('calls the paginated getTopicPage with the fixed itemsPerPage when a page is given', async () => {
+    getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category,
+        topic,
         posts: [post],
         currentPage: 2,
         totalPages: 3,
@@ -217,17 +215,17 @@ describe(`<${CategoryPage.name}/>`, () => {
 
     await setup({ page: 2 });
 
-    expect(getCategoryPageMock).toHaveBeenCalledWith('news', {
+    expect(getTopicPageMock).toHaveBeenCalledWith('news', {
       page: 2,
       itemsPerPage: 9,
     });
   });
 
   it('renders pagination on page 1 when there is more than one page', async () => {
-    getCategoryPageMock.mockResolvedValue({
+    getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category,
+        topic,
         posts: [post],
         currentPage: 1,
         totalPages: 3,
@@ -238,15 +236,15 @@ describe(`<${CategoryPage.name}/>`, () => {
     await setup();
 
     expect(
-      screen.getByRole('navigation', { name: 'Category pages' }),
+      screen.getByRole('navigation', { name: 'Topic pages' }),
     ).toBeVisible();
   });
 
-  it('renders pagination wired to routes.category(slug, page) when a page is given', async () => {
-    getCategoryPageMock.mockResolvedValue({
+  it('renders pagination wired to routes.topic(slug, page) when a page is given', async () => {
+    getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category,
+        topic,
         posts: [post],
         currentPage: 2,
         totalPages: 3,
@@ -257,19 +255,19 @@ describe(`<${CategoryPage.name}/>`, () => {
     await setup({ page: 2 });
 
     expect(
-      screen.getByRole('navigation', { name: 'Category pages' }),
+      screen.getByRole('navigation', { name: 'Topic pages' }),
     ).toBeVisible();
     const nextLink = screen.getByRole('link', { name: 'Next' });
-    expect(nextLink).toHaveAttribute('href', '/category/news/page/3');
+    expect(nextLink).toHaveAttribute('href', '/topics/news/page/3');
     const previousLink = screen.getByRole('link', { name: 'Previous' });
-    expect(previousLink).toHaveAttribute('href', '/category/news');
+    expect(previousLink).toHaveAttribute('href', '/topics/news');
   });
 
   it('calls notFound() when the requested page is beyond totalPages', async () => {
-    getCategoryPageMock.mockResolvedValue({
+    getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category,
+        topic,
         posts: [],
         currentPage: 5,
         totalPages: 1,
@@ -282,11 +280,11 @@ describe(`<${CategoryPage.name}/>`, () => {
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the Home › Category breadcrumbs trail', async () => {
-    getCategoryPageMock.mockResolvedValue({
+  it('renders the Home › Topic breadcrumbs trail', async () => {
+    getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category,
+        topic,
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -307,10 +305,10 @@ describe(`<${CategoryPage.name}/>`, () => {
   });
 
   it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
-    getCategoryPageMock.mockResolvedValue({
+    getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category,
+        topic,
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -330,10 +328,10 @@ describe(`<${CategoryPage.name}/>`, () => {
   });
 
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    getCategoryPageMock.mockResolvedValue({
+    getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
-        category,
+        topic,
         posts: [post],
         currentPage: 1,
         totalPages: 1,
@@ -351,7 +349,7 @@ describe(`<${CategoryPage.name}/>`, () => {
     );
     expect(breadcrumbScript).toBeDefined();
     expect(breadcrumbScript?.textContent).toContain(
-      '"item":"https://example.com/category/news"',
+      '"item":"https://example.com/topics/news"',
     );
   });
 });

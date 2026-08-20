@@ -1,9 +1,9 @@
-import type { TPostCard, TPostCardCategory } from '@blog/service';
+import type { TPostCard, TPostCardTopic } from '@blog/service';
 import { makePostCardAuthor } from '@web/testing/shared/author/fixtures';
 
-export function makePostCardCategory(
-  overrides: Partial<TPostCardCategory> = {},
-): TPostCardCategory {
+export function makePostCardTopic(
+  overrides: Partial<TPostCardTopic> = {},
+): TPostCardTopic {
   return {
     id: 'cat-1',
     title: 'News',
@@ -24,7 +24,7 @@ export function makePostCard(overrides: Partial<TPostCard> = {}): TPostCard {
     heroImageSanity: undefined,
     featured: false,
     author: makePostCardAuthor(),
-    category: makePostCardCategory(),
+    topic: makePostCardTopic(),
     readingTimeMinutes: 2,
     ...overrides,
   };

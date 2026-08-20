@@ -1,6 +1,6 @@
 import { customRender, screen } from '@web/testing/custom-render';
 
-import { CategoryChipList } from './category-chip-list';
+import { TopicChipList } from './topic-chip-list';
 
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
@@ -17,7 +17,7 @@ vi.mock('@web/components/shared/smart-link', () => ({
   ),
 }));
 
-const categories = [
+const topics = [
   {
     id: 'cat-1',
     title: 'Engineering',
@@ -34,22 +34,20 @@ const categories = [
   },
 ];
 
-const setup = customRender(CategoryChipList, { categories });
+const setup = customRender(TopicChipList, { topics });
 
-describe(`<${CategoryChipList.name}/>`, () => {
-  it('renders a Categories nav landmark', () => {
+describe(`<${TopicChipList.name}/>`, () => {
+  it('renders a Topics nav landmark', () => {
     setup();
 
-    expect(
-      screen.getByRole('navigation', { name: 'Categories' }),
-    ).toBeVisible();
+    expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
   });
 
-  it('renders nothing when there are no categories', () => {
-    setup({ categories: [] });
+  it('renders nothing when there are no topics', () => {
+    setup({ topics: [] });
 
     expect(
-      screen.queryByRole('navigation', { name: 'Categories' }),
+      screen.queryByRole('navigation', { name: 'Topics' }),
     ).not.toBeInTheDocument();
   });
 
@@ -62,16 +60,16 @@ describe(`<${CategoryChipList.name}/>`, () => {
     );
   });
 
-  it('renders one chip per category linking to its archive', () => {
+  it('renders one chip per topic linking to its archive', () => {
     setup();
 
     expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
       'href',
-      '/category/engineering',
+      '/topics/engineering',
     );
     expect(screen.getByRole('link', { name: 'Design' })).toHaveAttribute(
       'href',
-      '/category/design',
+      '/topics/design',
     );
   });
 
@@ -87,7 +85,7 @@ describe(`<${CategoryChipList.name}/>`, () => {
     ).not.toHaveAttribute('aria-current');
   });
 
-  it('marks the matching category chip as the current page when activeSlug is given', () => {
+  it('marks the matching topic chip as the current page when activeSlug is given', () => {
     setup({ activeSlug: 'engineering' });
 
     expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
