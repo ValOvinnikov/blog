@@ -15,7 +15,10 @@ meet:
    `TagPage`/`AuthorPage`, always paginated, always correctly scoped, with no
    editor control over position, heading, or styling.
 
-Current state:
+Current state **as of this design, before E1** — E1 has since shipped, so
+`blog_category`/`CategoryPage`/`/category/*` below now read `topic`,
+`TopicPage` and `/topics/*`. Left in the original vocabulary because it
+records the starting point the design argued from.
 
 | Route                           | CMS document         | Post grid                            | Page size                       |
 | ------------------------------- | -------------------- | ------------------------------------ | ------------------------------- |
@@ -47,8 +50,8 @@ hardcoded grid plus a second, editor-added latest-N list below it.
 ## Approach
 
 Every public page becomes a CMS document, and the two post-rendering systems
-collapse into one module whose behaviour is determined by **which slot holds
-it**.
+become two module types — a paginated archive and a latest-N teaser — each
+admitted by its own kind of slot.
 
 ### Page document family
 
@@ -72,26 +75,47 @@ Every "required slot" above is a **reference to a standalone `module_*`
 document**, exactly as `page_home.hero` already references a `module_hero`.
 Modules remain their own documents; only the way a page points at them changes.
 
-### Mode inferred by slot
+### Two post-list modules, one per mode
 
-A `module_postList` renders differently according to the slot it occupies. Not
-a heuristic on page type, and not an editor-picked field:
+The two legacy systems differ on exactly two axes: **scope** (which posts) and
+**window** (how many). Rather than one module carrying a mode, there are two
+module types, and each slot admits only one of them:
 
-- **In a page's required `postList` field** → paginated grid, scoped to that
-  page's entity, page number supplied by the route.
-- **Inside any `modules[]` array** → latest-N, scoped by page context.
+- **`module_postList`** — the paginated archive. Occupies a page's required
+  `postList` field. Carries `pageSize` and the empty-state message; the route
+  supplies the page number.
+- **`module_postLatest`** — the latest-N teaser. An item inside `modules[]`.
+  Carries `limit`. Never paginates, and needs no empty-state message: a teaser
+  with nothing to show renders nothing.
 
-This is what makes the required slot pay for itself. Pagination is inherently a
-route concern — `/topics/foo/page/3` is owned by the URL — so a module can only
-paginate if the route hands it the page number, and only one module per page
-can be given it. Because the paginated list is a **field** rather than an array
-item, having two is structurally impossible and no validation rule is needed.
+Pagination is inherently a route concern — `/topics/foo/page/3` is owned by the
+URL — so only the module in the required field can paginate, and because that
+is a **field** rather than an array item, having two is structurally impossible
+and no validation rule is needed.
 
-The same rule governs `module_taxonomyList`: whether it lists topics or tags
-follows from which index page's slot it occupies.
+Two named types rather than one ambiguous one is also what makes the choice
+visible to the editor. Under a single `module_postList` whose mode followed
+from its slot, the same "Post List" behaved as a teaser in the home page's
+`modules[]` and as a paginated archive in a required slot, with nothing in the
+Studio indicating which — and each placement carried the other's irrelevant
+fields.
 
-Page context (the contract #1333 specified) is retained for the `modules[]`
-case, so a latest-N list on a topic page still scopes to that topic.
+**Scope resolves from the parent page document, not from a runtime prop.**
+`page_topic` holds a `topic` reference alongside its slot, so the GROQ
+projection reads the scope from the page the module belongs to. `page_blog` and
+`page_home` hold no such reference, so their lists are global. This applies to
+both modules: a `module_postLatest` in `page_topic.modules[]` still scopes to
+that topic. Scope is therefore a data relationship in Sanity rather than
+something threaded down through the renderer.
+
+`module_postLatest` is not permitted in `page_generic.modules[]`, and
+`page_generic` has no required `postList` field for an archive to occupy — so
+neither post-list module can appear on a generic page. A generic page is site
+furniture, not a blog surface. Same boundary that dropped E10.
+
+`module_taxonomyList` keeps slot inference: whether it lists topics or tags
+follows from which index page's slot it occupies. It has one mode, so no
+equivalent split applies.
 
 ### Vocabulary and URL alignment
 
@@ -183,14 +207,22 @@ so no intermediate commit leaves the byline unable to link.
 
 ### What else retires
 
-The hardcoded archive grids in `BlogListPage`/`CategoryPage`/`TagPage` collapse
-into the single module. `page_blog.itemsPerPage` and the three
-`*_ITEMS_PER_PAGE` web constants retire in favour of `limit` on the module,
-whose range widens from 1–12 to **1–24** so the blog index keeps the page size
+The hardcoded archive grids in `BlogListPage`/`TopicPage`/`TagPage` collapse
+into `module_postList`. `page_blog.itemsPerPage` and the three
+`*_ITEMS_PER_PAGE` web constants retire in favour of **`pageSize`** on
+`module_postList`, ranged **1–24** so the blog index keeps the page size
 `itemsPerPage` already permitted.
 
-`page_generic` gains `module_postList` in its allowed `modules[]` types; with
-context scoping it resolves to global latest there, which is correct.
+`module_postLatest` keeps `limit` at its original 1–12 — a teaser never needs a
+full page's worth. E2 widened `limit` to 1–24 on the then-single module; that
+widening moves to the archive's `pageSize`, and the teaser reverts to 1–12.
+Because every archive document is created fresh by the E4/E6/E8 seeding
+migrations, `pageSize` can be defined as a new field with no legacy documents
+to migrate.
+
+`MODULE_PAGE_CONTEXT`'s `isPaginated` half retires with this split. The page-kind
+half survives for `module_content`/`module_cta`, which still care which page
+kind they render on — that is all the contract ever claimed to be for.
 
 ### Missing page documents 404
 
@@ -210,6 +242,9 @@ archive 404s. This was chosen with the cost visible (see Migration).
 
 ## New components
 
+- **`module_postLatest`** — a new module document for the latest-N teaser,
+  carrying `limit`. Splits out of today's `module_postList`, which becomes the
+  paginated archive.
 - **`module_taxonomyList`** — a new module document listing taxonomy entries as
   cards. Source inferred by slot.
 - **A taxonomy card + card grid in `@blog/ui`** — `/topics` currently hand-rolls
@@ -244,19 +279,36 @@ dataset first:
    run only after step 1 has completed against the same dataset. A document
    with incoming strong references cannot be deleted, so running the two in
    one pass would race the repointing.
-3. Create `page_topic` ×1 and `page_tag` ×15, each with its own
+3. **Seed `page_blog`'s archive module.** Create a `module_postList`
+   carrying the `pageSize` that `page_blog.itemsPerPage` currently holds, then
+   patch `page_blog.postList` to reference it — before that field is flipped to
+   required, per the ordering trap below.
+4. **Retype the one existing `module_postList` to `module_postLatest`.** That
+   single production document is a latest-N teaser on `page_home`, and under
+   the split `module_postList` means the paginated archive. `_type` is
+   immutable, so this is the same create → repoint → delete shape as step 1:
+   `createIfNotExists` a `module_postLatest` under a deterministic id carrying
+   the existing `limit` and section header, repoint `page_home.modules[]` at
+   it, then delete the original in a _separate_ follow-up migration once the
+   reference has moved.
+5. Create `page_topic` ×1 and `page_tag` ×15, each with its own
    `module_postList`, plus the `page_topicIndex` and `page_tagIndex`
    singletons with their `module_taxonomyList`.
 
-Steps 1–2 belong to E1; step 3 is split across E6 and E8.
+Steps 1–2 belong to E1 and steps 3–4 to E4. Step 5 splits four ways: the
+`page_topic` seeding to E6 and `page_tag` to E8, with the `page_topicIndex`
+and `page_tagIndex` singletons and their `module_taxonomyList` belonging to
+the index-page epics that introduce them, E5 and E7.
 
 **Deploy ordering:** run steps 1–2 against `production` _before_ deploying the
 web code that reads `topic`, so no window exists where live documents have
 neither shape populated for the code currently reading them.
 
-Step 3 is **30 new documents** to preserve behaviour that is automatic today.
-That cost was weighed explicitly against auto-creating page documents via a
-Sanity document action, and the seeded-migration route was chosen.
+Step 5 is **36 new documents** to preserve behaviour that is automatic today —
+`page_tag` ×15 with their modules is 30 of them, plus `page_topic` and its
+module, and the two index singletons with their `module_taxonomyList`. That
+cost was weighed explicitly against auto-creating page documents via a Sanity
+document action, and the seeded-migration route was chosen.
 
 `packages/db`'s `starter-content.ts` provisions new tenants with
 `blog_category` fixtures — it needs the same rename and the same page-document
@@ -301,20 +353,20 @@ with real routes. It is currently
   (`settings_navigation`); this is an editorial decision, made in Studio.
 - An author index route (`/authors`). Author archives are being removed, not
   relocated.
-- An editor-facing "source" or "mode" field on `module_postList`. Inference by
-  slot replaces it.
+- An editor-facing "source" or "mode" field on a post-list module. Two module
+  types replace it — the type _is_ the mode.
 
 ## Decisions taken, with their rejected alternatives
 
-| Decision                                           | Rejected alternative                                                                                      | Why                                                                                                                             |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Post list is a required slot                       | An item inside `modules[]` with a max-one validation rule                                                 | The field makes duplicates structurally impossible and a page can never render empty — no seeding fallback, no validation rule  |
-| Mode inferred by slot                              | Inferred from page type; or an explicit editor field                                                      | Slot inference is unambiguous; page-type inference needs a first-one-wins tie-break, and a field reintroduces wrong-choice risk |
-| Per-entity page documents referencing the taxonomy | A per-kind singleton configuring all archives; or `modules[]` on the taxonomy document (#1332's approach) | Each entry gets its own composable page; the taxonomy document stays pure taxonomy rather than becoming page-shaped             |
-| Rename to `topic` everywhere                       | URL-only rename keeping `blog_category`                                                                   | A lasting vocabulary mismatch between Studio and URLs is worse than one non-splittable PR                                       |
-| Author pages removed                               | Converting them to `page_author` documents                                                                | An author profile is an ordinary page; the byline link is already optional and JSON-LD emits no author URL                      |
-| 404 on missing page document                       | Runtime fallback to a default archive                                                                     | Keeps a single code path; guarded by two Studio validation rules                                                                |
-| `limit` widened to 1–24                            | Keeping 1–12                                                                                              | 12 would silently cap the blog index below the 24 `itemsPerPage` already allowed                                                |
+| Decision                                                  | Rejected alternative                                                                                      | Why                                                                                                                                                                                                              |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Post list is a required slot                              | An item inside `modules[]` with a max-one validation rule                                                 | The field makes duplicates structurally impossible and a page can never render empty — no seeding fallback, no validation rule                                                                                   |
+| Two module types, `module_postList` + `module_postLatest` | One module with the mode inferred by slot; or an explicit editor mode field                               | The type is the mode: impossible combinations become unrepresentable in the Studio and in TypeScript, each type carries only its own fields, and the editor picks by intent rather than by where they dropped it |
+| Per-entity page documents referencing the taxonomy        | A per-kind singleton configuring all archives; or `modules[]` on the taxonomy document (#1332's approach) | Each entry gets its own composable page; the taxonomy document stays pure taxonomy rather than becoming page-shaped                                                                                              |
+| Rename to `topic` everywhere                              | URL-only rename keeping `blog_category`                                                                   | A lasting vocabulary mismatch between Studio and URLs is worse than one non-splittable PR                                                                                                                        |
+| Author pages removed                                      | Converting them to `page_author` documents                                                                | An author profile is an ordinary page; the byline link is already optional and JSON-LD emits no author URL                                                                                                       |
+| 404 on missing page document                              | Runtime fallback to a default archive                                                                     | Keeps a single code path; guarded by two Studio validation rules                                                                                                                                                 |
+| `pageSize` widened to 1–24                                | Keeping the teaser's 1–12 for both                                                                        | 12 would silently cap the blog index below the 24 `itemsPerPage` already allowed                                                                                                                                 |
 
 ## Delivery — one epic per page surface
 
@@ -344,6 +396,13 @@ genuinely does not compile.
    so its registration is an addition to that `Exclude`, not a new `MODULE_MAP`
    entry. Either way the same PR must carry it.
 
+   The split moves `module_postList` the **other** way. It is a live
+   `MODULE_MAP` key today because pre-split it could sit in `modules[]`; once
+   it only ever occupies the required `postList` field it follows the
+   `module_hero` precedent and must be **removed** from `MODULE_MAP` and added
+   to that `Exclude`. Its replacement in `modules[]`, `module_postLatest`, is
+   the new `MODULE_MAP` entry. Both edits land in the same PR as the schema.
+
 A third, softer one: **a field cannot be made required before the migration
 that populates it**, or the existing singleton shows as invalid in Studio.
 Where an epic makes a slot required on a document that already exists, the
@@ -367,6 +426,12 @@ dormant until a page uses it. Sub-issues: config (page-context contract, as
 (`PostListModule` renders paginated when given pagination context). Fully
 splittable; every PR additive.
 
+**Shipped as a single module with a mode.** The two-module split was decided
+after E2 landed, so E4 carries the refactor: E2's paginated query, `total`, and
+pager wiring all survive and move onto `module_postList`, while the page-context
+plumbing it added (`isPaginated`, the pagination-href helper's unreachable
+branches, the page-type label map) is deleted there.
+
 **E3 — `module_taxonomyList` and the taxonomy card UI.** New module document
 plus the `@blog/ui` card and grid that `/topics` currently hand-rolls. Check
 `packages/ui/COMPONENTS.md` for something extendable first. Sub-issues: cms +
@@ -375,15 +440,28 @@ ui (card, grid, stories). Ships before the two index-page epics that consume it.
 
 ### Page epics
 
-**E4 — `/blog` moves to the required slot.** `page_blog` gains its required
-`postList` reference; `BlogListPage`'s hardcoded grid is removed;
-`itemsPerPage` retires. Sub-issues: cms → service → web, plus the migration
-seeding `page_blog`'s module. Subject to the required-field ordering rule
-above. Proves the design on the one page that already has a document.
+**E4 — `/blog` moves to the required slot, and the post-list module splits in
+two.** `page_blog` gains its required `postList` reference; `BlogListPage`'s
+hardcoded grid is removed; `itemsPerPage` retires.
+
+E4 also carries the `module_postList` / `module_postLatest` split, because it
+is the first epic where both modes coexist and the one that breaks without it:
+under the pre-split contract the same `BLOG` page context would have to mean
+both "unpaginated `modules[]` teaser" and "paginated required slot" on the same
+page. Scope moves to resolving from the parent page document, and
+`MODULE_PAGE_CONTEXT` loses its `isPaginated` half.
+
+Sub-issues: cms + web **combined** for `module_postLatest` (constraint 2 — a
+new `module_*` type reds `apps/web` until `MODULE_MAP` registers it) → service
+→ web, plus two migrations: seeding `page_blog`'s archive module, and the
+step-4 teaser retype above. Subject to the required-field ordering rule above.
+Proves the design on the one page that already has a document.
 
 **E5 — `/topics` index page.** `page_topicIndex` singleton with its required
 `taxonomyList` slot; replaces the hardcoded `TopicsPage` and moves its heading
-and intro copy out of i18n keys into content. Sub-issues: cms → service → web.
+and intro copy out of i18n keys into content. Sub-issues: cms → service → web,
+plus the migration seeding the singleton and its `module_taxonomyList`
+(migration step 5 above).
 
 **E6 — `/topics/{slug}` page.** `page_topic` with its required `postList` slot
 and `topic` reference; retires `CATEGORY_ITEMS_PER_PAGE` and the hardcoded
@@ -392,7 +470,8 @@ and the missing-page warning on the taxonomy document). Sub-issues: cms →
 service → web, plus the seeding migration for the 1 existing topic.
 
 **E7 — `/tags` index page.** `page_tagIndex` singleton, mirroring E5. New route
-— nothing exists today. Sub-issues: cms → service → web.
+— nothing exists today. Sub-issues: cms → service → web, plus the same
+singleton-seeding migration as E5.
 
 **E8 — `/tags/{slug}` page.** `page_tag`, the `/tag/` → `/tags/` URL move, the
 `/tags/{slug}/rss.xml` feed move, and the seeding migration for
@@ -412,7 +491,9 @@ config → cms → service → web, plus a migration that drops the field.
 **Independent of E2–E8** — can run in parallel at any point after E1.
 
 **E10 — dropped 2026-08-20, closed not-planned (#1832).** It would have added
-`module_postList` to `page_generic`'s allowed `modules[]` types. The maintainer
+`module_postList` to `page_generic`'s allowed `modules[]` types — pre-split
+vocabulary, when one module served both modes; the equivalent proposal today
+would concern `module_postLatest`. The maintainer
 rejected the premise: a generic page ("About", "Start here") is site furniture,
 not a blog surface, so a post list does not belong on it. This spec originally
 called the existing restriction "a restriction with no real justification",
@@ -435,10 +516,13 @@ changes Sanity fixtures — E1, E6, and E8.
 
 ## Board actions
 
-- Close #1333–#1336 and epic #1332 as superseded by this design. Its page-context
-  contract survives — it is what scopes a `modules[]` post list, and it is E2's
-  first sub-issue — but its premise (`modules[]` on the taxonomy documents, grid
-  untouched) does not.
+- Close #1333–#1336 and epic #1332 as superseded by this design. Its
+  page-context contract shipped as E2's first sub-issue and survives in reduced
+  form — the page-kind half still tells `module_content`/`module_cta` which page
+  they render on — but it does **not** scope post lists: that resolves from the
+  parent page document, and the contract's `isPaginated` half retires with the
+  two-module split. #1332's own premise (`modules[]` on the taxonomy documents,
+  grid untouched) does not survive either.
 - Create ten board entries for E1–E10 above (E10 has since been dropped). Gather every sub-issue's title,
   body and labels up front and dispatch `board-keeper` once per epic with the
   whole set, rather than issue by issue. Label each sub-issue with its
