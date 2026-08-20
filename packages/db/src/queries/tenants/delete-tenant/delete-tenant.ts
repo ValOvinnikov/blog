@@ -7,15 +7,11 @@ export type TDeleteTenantResult =
   | { outcome: 'not-archived' }
   | { outcome: 'not-found' };
 
-// Hard-deletes a tenant row — unlike `archiveTenant`, this is irreversible.
-// Relies on cascading FKs on every tenant-scoped table (memberships,
-// tenant_domains, subscribers, bookmarks, site_config) to sweep dependent
-// rows, so a new tenant-scoped table needs its own cascading FK to stay
-// swept. A non-archived tenant is refused here rather than left to whichever
-// caller happens to check first, since this is the mutation's only
-// irreversible step. A missing id is a typed outcome rather than a throw,
-// same reasoning `archiveTenant` already applies to this table: a stale id
-// or a second concurrent delete attempt is a reachable race, not a bug.
+// Hard-deletes a tenant row — unlike `archiveTenant`, this is irreversible and
+// relies on cascading FKs on every tenant-scoped table to sweep dependent
+// rows, so a new tenant-scoped table needs its own cascade to stay swept.
+// Refusal and not-found are typed outcomes rather than throws, since a stale
+// id or an unarchived tenant are reachable, non-exceptional callers.
 export async function deleteTenant(
   tenantId: string,
 ): Promise<TDeleteTenantResult> {
