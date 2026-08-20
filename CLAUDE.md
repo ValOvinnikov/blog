@@ -577,6 +577,18 @@ Every issue follows this exact order. **Committing is free (no approval needed);
    up. See `develop-feature` step 8 for the safety checks — never delete
    uncommitted work.
 
+   **Only the ones _this session_ created.** Several Claude jobs run in
+   parallel on this machine and share `.claude/worktrees/`, so
+   `git worktree list` shows other jobs' live worktrees too — build the
+   removal list from your own dispatch record, never from that listing.
+   Every live session/agent worktree carries a lock file
+   (`$(git rev-parse --git-common-dir)/worktrees/<name>/locked`) naming its
+   owner and pid; if it exists, the worktree is not yours to touch — skip it.
+   `git worktree remove` failing with `fatal: cannot remove a locked working
+tree` is that guard working, so never answer it with `-f -f` or
+   `git worktree unlock`: forcing it destroys a live session's uncommitted
+   work (it already cost #669's config agent its work once).
+
 **Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work and commits — never the push or PR.** Those two gates always require fresh, explicit confirmation.
 
 **Board reconciliation (not a gate — no approval needed).** After step 7 opens

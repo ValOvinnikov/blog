@@ -353,6 +353,19 @@ contracts:
     silently building stale code. The `post-checkout` hook produces the
     farm copies the pnpm layout needs, covers manually created worktrees
     too, and keeps a single mechanism in charge.
+- **Worktree ownership across parallel sessions** — `.claude/worktrees/` is
+  shared by every Claude job running against this checkout, so
+  `git worktree list` mixes one session's worktrees with other jobs' live
+  ones. The harness locks each worktree it materializes, recording the owner
+  and pid in `$(git rev-parse --git-common-dir)/worktrees/<name>/locked`
+  (e.g. `claude session fix-1788-storybook-fonts (pid 76582 start …)`), and
+  `git worktree remove` refuses a locked path outright
+  (`fatal: cannot remove a locked working tree`). That refusal is the safety
+  net: `-f -f` or
+  `git worktree unlock` on another job's worktree destroys its uncommitted
+  work. `develop-feature` §8 is the teardown procedure — remove only the
+  worktrees the current session created, checked against the lock file first.
+
 - **Env files in agent worktrees** (issue #404) — the same
   `.husky/post-checkout` hook copies `.env.local`/`.env.*.local` from the
   primary checkout into every new linked worktree, so `pnpm build` works

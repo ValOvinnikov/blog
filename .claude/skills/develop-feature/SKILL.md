@@ -315,7 +315,51 @@ issue #410 share the main checkout's `node_modules` (~80 MB each instead of
 `git worktree list` and hold branches. A subagent cannot do this itself — it
 cannot remove the worktree it is standing in.
 
-For each worktree created for this task:
+### Only your own worktrees — never enumerate `git worktree list`
+
+**This machine runs several Claude sessions at once, each with its own
+worktrees, all under the same `.claude/worktrees/`.** `git worktree list`
+therefore shows other jobs' live worktrees alongside yours. Cleaning up means
+removing **the worktrees this session created** — not everything that happens
+to be listed. Build the removal list from your own dispatch record (note each
+worktree path as you create/dispatch it), never by looping over
+`git worktree list` output.
+
+Then, before touching any path on that list, confirm it is still yours:
+
+```bash
+name=$(basename <worktree>)
+lock=$(git rev-parse --git-common-dir)/worktrees/$name/locked
+[ -f "$lock" ] && { echo "OWNED BY: $(cat "$lock")"; }   # -> skip, not yours
+```
+
+The harness locks every worktree it materializes for a live session or agent,
+with a reason naming the owner and its pid — `claude session
+fix-1788-storybook-fonts (pid 76582 start …)` / `claude agent
+agent-a6bad5fd611dd5df6 (pid …)`. A lock file present means **some process
+still owns that worktree**: another parallel job, or one of your own subagents
+that has not finished. Skip it and move on.
+
+Attempting removal anyway gives you:
+
+```
+fatal: cannot remove a locked working tree, lock reason: claude session … (pid …)
+use 'remove -f -f' to override or unlock first
+```
+
+**That message is the guard working, not an obstacle to route around.** Do not
+run `git worktree remove -f -f`, do not `git worktree unlock` a worktree you do
+not own, and do not retry it later in the same session. Forcing it deletes a
+live session's working directory out from under it — that is exactly how #669's
+config agent lost its uncommitted work to a broad sweep. A locked worktree that
+is not yours needs no action from you at all: its owner removes it when that job
+ends.
+
+A bare `git worktree prune` is safe (it only drops metadata for directories that
+are already gone) — a `for` loop over `git worktree list` is not.
+
+For each worktree **you created for this task**, and that the ownership check
+above cleared:
 
 ```bash
 branch=$(git -C <worktree> branch --show-current)
@@ -324,7 +368,8 @@ git cherry origin/<feat-branch> "$branch"         # must print no '+' lines
 git worktree remove <worktree>                    # never --force
 ```
 
-- **Both checks must pass**, and only then remove.
+- **All three checks must pass** — unlocked, clean, landed — and only then
+  remove.
 - **Compare against the pushed `feat/` branch — NOT `origin/main`.** At this
   point the PR is open but unmerged, so the agent's commits are on `feat/…`,
   not yet on `main`; checking `origin/main` reports every commit as unmerged
@@ -341,10 +386,17 @@ git worktree remove <worktree>                    # never --force
 - Worktrees created before the shared-`node_modules` change (issue #410) hold
   a private ~1.1 GB `node_modules`, so their deletion is slow — remove them
   one at a time with a generous timeout; an interrupted removal leaves a
-  half-deleted worktree that then needs `--force`. Shared-deps worktrees
+  half-deleted worktree that then needs `--force` — the one legitimate use of
+  that flag, on a worktree you own that you were already mid-way through
+  removing, and still never `-f -f` on a locked one. Shared-deps worktrees
   (root `node_modules` is a symlink) remove in seconds.
 - If a worktree still exists after its PR merged, the same checks work against
   `origin/main`.
+- **Leftovers from earlier sessions are not yours to sweep on your own
+  initiative.** Unlocked `agent-*` worktrees with no live owner do accumulate,
+  but clearing them is a separate, explicitly requested cleanup — not part of
+  this gate. When asked to do it, apply the same three checks to each one
+  individually, and still skip every locked path.
 
 ## 9. Deploy — human-gated, never automatic
 
