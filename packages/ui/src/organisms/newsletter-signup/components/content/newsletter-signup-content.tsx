@@ -64,7 +64,7 @@ export const NewsletterSignupContent = ({
       />
       <Button
         variant="primary"
-        onClick={onSubmit}
+        type="submit"
         isDisabled={isSubmitting}
         aria-busy={isSubmitting}
         title={isSubmitting ? submitLabel : undefined}
