@@ -412,12 +412,19 @@ changes Sanity fixtures — E1, E6, and E8.
   contract survives — it is what scopes a `modules[]` post list, and it is E2's
   first sub-issue — but its premise (`modules[]` on the taxonomy documents, grid
   untouched) does not.
-- Create ten parent issues, E1–E10 above, each with one sub-issue per layer.
-  Gather every sub-issue's title, body and labels up front and dispatch
-  `board-keeper` once per epic with the whole set, rather than issue by issue.
-  Label each sub-issue with its `layer:*` label; E1's single non-splittable PR
-  still gets one issue per layer for tracking, with the PR referencing all of
-  them.
+- Create ten board entries for E1–E10 above. Gather every sub-issue's title,
+  body and labels up front and dispatch `board-keeper` once per epic with the
+  whole set, rather than issue by issue. Label each sub-issue with its
+  `layer:*` label.
+- **E1 is a flat issue, not an epic.** The per-layer-sub-issue convention
+  exists to mirror per-layer PRs, and E1 deliberately has none — six
+  sub-issues for one PR that can only close one of them would be noise. Its
+  body carries the per-layer checklist instead.
+- **Sub-issues are created just-in-time.** All ten epics exist on the board
+  immediately so the programme's shape and order are visible, but only the
+  unblocked ones (E2–E4) carry layer sub-issues at first. E5–E10 get theirs
+  when their turn comes, written against what E2–E4 actually shipped rather
+  than against a design those epics will refine.
 - `SPEC.md` §6 (content model) and `docs/context/surfaces-and-routing.md`,
   `content-model.md`, `data-flow.md`, `seo-accessibility.md` all need syncing as
   each epic lands.
