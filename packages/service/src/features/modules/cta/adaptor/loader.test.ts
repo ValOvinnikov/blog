@@ -37,7 +37,7 @@ describe('getCta', () => {
             'modules:cta',
             'module:cta-1',
             'post',
-            'category',
+            'topic',
             'page_generic',
             'page_blog',
           ],

@@ -5,7 +5,7 @@ import { toCtaModule } from './transformer';
 import type { TCtaModule } from './types';
 
 // `ctaModuleQuery` projects `action` through `linkFragment`, whose
-// `internalReference` can resolve to `blog_post`/`blog_category`/
+// `internalReference` can resolve to `blog_post`/`blog_topic`/
 // `page_generic`/`page_blog` — every one of those types' tags must be
 // included (tag-scope contract, `sanity/query.ts`).
 export async function getCta(id: string): Promise<TCtaModule> {
@@ -15,7 +15,7 @@ export async function getCta(id: string): Promise<TCtaModule> {
       'modules:cta',
       `module:${id}`,
       'post',
-      'category',
+      'topic',
       'page_generic',
       'page_blog',
     ]),

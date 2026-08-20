@@ -124,7 +124,7 @@ describe('getIndexPage', () => {
     expect(result.modules).toEqual([]);
   });
 
-  it('tags the posts query with category alongside posts', async () => {
+  it('tags the posts query with topic alongside posts', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawBlogPage())
       .mockResolvedValueOnce(makeRawSiteSettings())
@@ -136,7 +136,7 @@ describe('getIndexPage', () => {
       3,
       expect.anything(),
       expect.objectContaining({
-        next: expect.objectContaining({ tags: ['posts', 'category'] }),
+        next: expect.objectContaining({ tags: ['posts', 'topic'] }),
       }),
     );
   });

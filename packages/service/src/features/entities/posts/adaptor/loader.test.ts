@@ -57,11 +57,7 @@ describe(getPostsByIds, () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({
-          tags: [
-            't:tenant-a:posts',
-            't:tenant-a:author',
-            't:tenant-a:category',
-          ],
+          tags: ['t:tenant-a:posts', 't:tenant-a:author', 't:tenant-a:topic'],
         }),
       }),
     );
@@ -77,7 +73,7 @@ describe(getPostsByIds, () => {
       expect.objectContaining({
         tenant: undefined,
         next: expect.objectContaining({
-          tags: ['posts', 'author', 'category'],
+          tags: ['posts', 'author', 'topic'],
         }),
       }),
     );

@@ -22,7 +22,7 @@ export async function getPostsByIds(
   const raw = await runQuery(postsByIdsQuery, {
     parameters: { ids },
     tenant,
-    ...isr(['posts', 'author', 'category'], tenant?.projectId),
+    ...isr(['posts', 'author', 'topic'], tenant?.projectId),
   });
 
   return toPostsByIds(raw);

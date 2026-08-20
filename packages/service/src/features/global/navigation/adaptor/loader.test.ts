@@ -62,7 +62,7 @@ describe('getNavigation', () => {
       expect.anything(),
       expect.objectContaining({
         next: expect.objectContaining({
-          tags: ['navigation', 'post', 'category', 'page_generic', 'page_blog'],
+          tags: ['navigation', 'post', 'topic', 'page_generic', 'page_blog'],
         }),
       }),
     );

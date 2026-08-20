@@ -38,7 +38,7 @@ describe('getPostList', () => {
     await expect(getPostList('missing')).rejects.toThrow();
   });
 
-  it('tags the posts query with author/category alongside posts', async () => {
+  it('tags the posts query with author/topic alongside posts', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawPostListModule({ limit: 3 }))
       .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
@@ -50,7 +50,7 @@ describe('getPostList', () => {
       expect.anything(),
       expect.objectContaining({
         next: expect.objectContaining({
-          tags: ['posts', 'author', 'category'],
+          tags: ['posts', 'author', 'topic'],
         }),
       }),
     );
