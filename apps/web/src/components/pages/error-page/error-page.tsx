@@ -1,9 +1,11 @@
 'use client';
 
+import { routes } from '@blog/config';
 import { Button, Heading, Text } from '@blog/ui/atoms';
+import { LinkButton } from '@blog/ui/molecules';
 import { errorPageLayoutVariants } from '@web/components/shared/error-page-layout';
 import { reportClientError } from '@web/utils/report-client-error';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export type TErrorPageProps = {
   error: Error & { digest?: string };
@@ -14,21 +16,34 @@ const s = errorPageLayoutVariants();
 
 /**
  * Rendered by `app/error.tsx` — the error boundary for everything below the
- * root layout, including `[locale]/layout.tsx` itself. A failure in that
- * layout is exactly the case this boundary exists to catch, so it can't
- * assume the `NextIntlClientProvider`/site chrome that layout normally sets
- * up is available — this stays a small, self-contained, hardcoded-English
- * fallback rather than reaching for `useTranslations` or site chrome.
+ * root layout, including `[locale]/layout.tsx` itself. It can't assume
+ * `NextIntlClientProvider` is available, so this stays hardcoded English and
+ * "Go home" is a plain anchor rather than `SmartLink`.
  */
 export function ErrorPage({ error, reset }: TErrorPageProps) {
+  const announcementRef = useRef<HTMLSpanElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     reportClientError('error_boundary.render_failed', error, {
       digest: error.digest,
     });
+    // Written after mount, not on first paint — a live region that's
+    // already populated when it enters the DOM is unreliably announced.
+    if (announcementRef.current) {
+      announcementRef.current.textContent = 'Something went wrong';
+    }
+    mainRef.current?.focus();
   }, [error]);
 
   return (
-    <main className={s.root()}>
+    <main ref={mainRef} tabIndex={-1} className={s.root()}>
+      <span
+        ref={announcementRef}
+        aria-live="assertive"
+        aria-atomic="true"
+        className={s.announcement()}
+      />
       <Heading level={1} visual="hero">
         Something went wrong
       </Heading>
@@ -38,9 +53,9 @@ export function ErrorPage({ error, reset }: TErrorPageProps) {
       </Text>
       <div className={s.actions()}>
         <Button onClick={reset}>Try again</Button>
-        <Button variant="ghost" onClick={() => window.location.assign('/')}>
+        <LinkButton href={routes.home()} variant="ghost">
           Go home
-        </Button>
+        </LinkButton>
       </div>
     </main>
   );
