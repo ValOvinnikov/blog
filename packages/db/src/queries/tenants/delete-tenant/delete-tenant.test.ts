@@ -1,3 +1,4 @@
+import { PRESET_ID } from '@blog/config/constants';
 import {
   MEMBERSHIP_ROLE,
   TENANT_PLAN,
@@ -45,6 +46,7 @@ beforeEach(() => {
 });
 
 afterEach(async () => {
+  await db.delete(schema.siteConfig);
   await db.delete(schema.memberships);
   await db.delete(schema.users);
   await db.delete(schema.tenants);
@@ -79,6 +81,27 @@ describe(deleteTenant, () => {
       .from(schema.memberships)
       .where(eq(schema.memberships.tenantId, tenantId));
     expect(remainingMemberships).toEqual([]);
+  });
+
+  it('cascades to a dependent site_config row for that tenant', async () => {
+    const tenantId = await insertTenant();
+    await db.insert(schema.siteConfig).values({
+      tenantId,
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 250,
+      headingFont: 'SPACE_GROTESK',
+      bodyFont: 'NEWSREADER',
+      radiusScale: 'MD',
+      density: 'DEFAULT',
+    });
+
+    await deleteTenant(tenantId);
+
+    const remainingSiteConfig = await db
+      .select()
+      .from(schema.siteConfig)
+      .where(eq(schema.siteConfig.tenantId, tenantId));
+    expect(remainingSiteConfig).toEqual([]);
   });
 
   it('is a no-op when the tenant does not exist', async () => {
