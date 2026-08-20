@@ -1,8 +1,8 @@
 // Public surface of the data layer. web imports `service` — never the raw client.
 
 import { createSkimService } from './features/editorial/skim';
-import { createCategoriesService } from './features/entities/categories';
 import { createPostsService } from './features/entities/posts';
+import { createTopicsService } from './features/entities/topics';
 import { createFooterService } from './features/global/footer';
 import { createNavigationService } from './features/global/navigation';
 import { createNewsletterSettingsService } from './features/global/newsletter-settings';
@@ -42,7 +42,7 @@ export const service = {
     newsletter: createNewsletterModuleService(),
   },
   entities: {
-    categories: createCategoriesService(),
+    topics: createTopicsService(),
     posts: createPostsService(),
   },
   global: {
@@ -56,9 +56,9 @@ export const service = {
 
 export type { TPostBody, TSaveSkimDraftInput } from './features/editorial/skim';
 export type {
-  TCategoriesList,
-  TCategoryWithPostCount,
-} from './features/entities/categories';
+  TTopicsList,
+  TTopicWithPostCount,
+} from './features/entities/topics';
 export type { TFooter } from './features/global/footer';
 export type { TNavigation } from './features/global/navigation';
 export type { TNewsletterSettings } from './features/global/newsletter-settings';

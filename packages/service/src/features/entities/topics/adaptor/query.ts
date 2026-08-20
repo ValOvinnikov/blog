@@ -1,17 +1,17 @@
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
-import { categoryFragment } from '@blog/service/shared/fragments/category';
+import { topicFragment } from '@blog/service/shared/fragments/topic';
 
-export const categoriesQuery = q.star
-  .filterByType('blog_category')
+export const topicsQuery = q.star
+  .filterByType('blog_topic')
   .order('title asc')
   .project((sub) => ({
-    ...categoryFragment,
+    ...topicFragment,
     // `perspective: 'published'` (sanity/client.ts) already excludes drafts,
     // so a plain reference count plus `PUBLISHED_POST_FILTER` (excluding
     // future-dated posts) is the published-post count. `^._id` (GROQ's
     // parent-scope operator) correlates each `blog_post` back to the
-    // enclosing category document within this per-item projection.
+    // enclosing topic document within this per-item projection.
     postCount: sub
       .count(
         sub.star

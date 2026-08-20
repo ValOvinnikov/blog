@@ -1,23 +1,23 @@
-import { makeRawCategoryWithPostCount } from '@blog/service/testing/entities/fixtures';
+import { makeRawTopicWithPostCount } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 
-import { getCategories } from './loader';
+import { getTopics } from './loader';
 
 vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
 
-describe('getCategories', () => {
-  it('maps every raw category into a domain category with its post count', async () => {
+describe('getTopics', () => {
+  it('maps every raw topic into a domain topic with its post count', async () => {
     mockRun.mockResolvedValue([
-      makeRawCategoryWithPostCount({
+      makeRawTopicWithPostCount({
         _id: 'a',
         title: 'Design',
         slug: 'design',
         postCount: 3,
       }),
-      makeRawCategoryWithPostCount({
+      makeRawTopicWithPostCount({
         _id: 'b',
         title: 'Engineering',
         slug: 'engineering',
@@ -25,18 +25,18 @@ describe('getCategories', () => {
       }),
     ]);
 
-    const result = await getCategories();
+    const result = await getTopics();
 
-    expect(result.map((c) => c.id)).toEqual(['a', 'b']);
+    expect(result.map((t) => t.id)).toEqual(['a', 'b']);
     expect(result[0]?.title).toBe('Design');
     expect(result[0]?.postCount).toBe(3);
     expect(result[1]?.postCount).toBe(0);
   });
 
-  it('returns an empty list when there are no categories', async () => {
+  it('returns an empty list when there are no topics', async () => {
     mockRun.mockResolvedValue([]);
 
-    const result = await getCategories();
+    const result = await getTopics();
 
     expect(result).toEqual([]);
   });
