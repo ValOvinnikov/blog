@@ -22,5 +22,8 @@ export default defineConfig({
     globals: true,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     css: false,
+    // Vitest's 5000ms default is crossed by real render-work tests (1.3-1.9s)
+    // under root `pnpm test`'s parallel-turbo contention across packages.
+    testTimeout: 20_000,
   },
 });
