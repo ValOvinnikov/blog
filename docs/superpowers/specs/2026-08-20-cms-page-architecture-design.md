@@ -130,6 +130,31 @@ Deletion surface: 2 route files, `AuthorPage`, the author metadata builder, the
 author items-per-page util, `packages/service/src/features/pages/author/`, the
 sitemap entries, `routes.author()`, and ~5 test files.
 
+#### The `blog_author` schema changes too
+
+`slug` exists solely to address the archive route, so it goes with it. This is
+**not** a no-op field deletion — it is currently `required()` in the schema and
+projected as `.notNull()` by **both** author fragments
+(`packages/service/src/shared/fragments/author.ts`), which back every post card
+and the post detail page. Removing it therefore touches:
+
+- `apps/cms` — drop the field; retarget the `name`/`image`/`bio`/`socialLinks`
+  descriptions, which all still say "author page".
+- `packages/service` — drop `slug` from `authorCardFragment` and
+  `authorDetailFragment`, and from the view-model types.
+- `apps/web` — `blog-post-page.tsx:189` builds `author.href` from
+  `routes.author(author.slug)`; it reads the profile-page reference instead.
+- The migration — removing a field from live documents. Additive-only rules do
+  not apply here.
+
+In its place `blog_author` gains an **optional `profilePage` reference to
+`page_generic`**. The fragments project the referenced page's slug so
+`apps/web` can build `routes.genericPage(slug)`; when the reference is unset
+the byline renders as plain text, which `PostMeta` already supports.
+
+Ordering within E9: land the `profilePage` reference first, then remove `slug`,
+so no intermediate commit leaves the byline unable to link.
+
 ### What else retires
 
 The hardcoded archive grids in `BlogListPage`/`CategoryPage`/`TagPage` collapse
@@ -320,9 +345,12 @@ and the hardcoded tag grid. Sub-issues: config (routes helper) → cms → servi
 **E9 — remove `/author/{slug}`.** Delete the author routes, `AuthorPage`, the
 metadata builder, `packages/service/src/features/pages/author/`,
 `routes.author()`, `AUTHOR_ITEMS_PER_PAGE`, and the sitemap entries; add
-`blog_author`'s optional `page_generic` reference and point bylines at it.
-Sub-issues: config → cms → service → web. **Independent of E2–E8** — can run in
-parallel at any point after E1.
+`blog_author`'s optional `profilePage` reference and point bylines at it; then
+remove the now-dead `slug` field from `blog_author` and both author fragments
+(see "The `blog_author` schema changes too" above — this reaches into every
+post card, so it is not a local deletion). Sub-issues: config → cms → service →
+web, plus a migration that drops the field. **Independent of E2–E8** — can run
+in parallel at any point after E1.
 
 **E10 — `/{slug}` generic pages may host a post list.** Adds `module_postList`
 to `page_generic`'s allowed `modules[]` types. Sub-issues: cms → web. Smallest
