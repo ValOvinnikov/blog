@@ -111,3 +111,18 @@ export const Centered: TStory = {
       'Hand-picked posts on design systems, TypeScript, and component architecture.',
   },
 };
+
+export const VisuallyHiddenTitle: TStory = {
+  args: {
+    title: undefined,
+    titleId: 'latest-posts-fallback',
+    titleFallback: 'Latest posts',
+  },
+};
+
+export const NoTitle: TStory = {
+  args: {
+    title: undefined,
+    titleId: undefined,
+  },
+};

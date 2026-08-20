@@ -47,6 +47,9 @@
     "title": "All posts",
     "empty": "No posts yet."
   },
+  "postListModule": {
+    "fallbackHeading": "Latest posts"
+  },
   "blogPostPage": {
     "relatedReading": "Related reading",
     "depthToggle": {

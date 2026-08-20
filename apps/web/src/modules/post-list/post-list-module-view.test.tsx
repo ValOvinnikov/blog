@@ -31,6 +31,7 @@ const setup = customRender(PostListModuleView, {
   },
   items: [post],
   layout: undefined,
+  titleFallback: 'Posts',
 });
 
 describe(PostListModuleView, () => {
@@ -45,6 +46,10 @@ describe(PostListModuleView, () => {
       'aria-labelledby',
       'latest-posts-post-list-1',
     );
+    expect(section).not.toHaveAttribute('aria-label');
+    expect(
+      screen.getByRole('region', { name: 'Latest posts' }),
+    ).toBeInTheDocument();
   });
 
   it('derives a different section id for a different module id, avoiding duplicate DOM ids', () => {
@@ -63,7 +68,7 @@ describe(PostListModuleView, () => {
     );
   });
 
-  it('falls back to "Latest posts" when sectionHeader.heading is undefined', () => {
+  it('renders a visually hidden heading from titleFallback and labels the section via aria-labelledby when sectionHeader.heading is undefined', () => {
     setup({
       sectionHeader: {
         heading: undefined,
@@ -72,7 +77,15 @@ describe(PostListModuleView, () => {
       },
     });
 
-    const label = screen.getByText('Latest posts');
-    expect(label).toHaveAttribute('id', 'latest-posts-post-list-1');
+    const heading = screen.getByRole('heading', { level: 2, name: 'Posts' });
+    expect(heading).toHaveClass('sr-only');
+    expect(heading).toHaveAttribute('id', 'latest-posts-post-list-1');
+
+    const region = screen.getByRole('region', { name: 'Posts' });
+    expect(region).toHaveAttribute(
+      'aria-labelledby',
+      'latest-posts-post-list-1',
+    );
+    expect(region).not.toHaveAttribute('aria-label');
   });
 });

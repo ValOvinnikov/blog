@@ -19,6 +19,7 @@ export const postsSectionVariants = tv({
     ],
     titleLink: ['before:absolute before:inset-0'],
     emptyMessage: ['text-copy text-muted'],
+    labelFallback: ['sr-only'],
   },
   variants: {
     tinted: {

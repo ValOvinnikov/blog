@@ -9,14 +9,15 @@ export interface IPostListModuleViewProps extends Omit<
 > {
   id: string;
   items: IPostCardData[];
+  titleFallback: string;
 }
 
 /**
- * Pure view for `PostListModule` — the `Section` full-bleed landmark around
- * the `PostsSection` organism, with card title links composed via
- * `SmartLink`. `items` is always non-empty here — the wrapper's
- * content-validity guard skips rendering this view entirely when no posts
- * resolve.
+ * `items` is always non-empty here — the wrapper's content-validity guard
+ * skips rendering this view entirely when no posts resolve.
+ * `sectionHeader.heading` is optional; when absent, `PostsSection` renders a
+ * visually hidden `<h2>` from `titleFallback`, keeping the landmark and
+ * heading outline intact.
  */
 export const PostListModuleView = ({
   id,
@@ -24,7 +25,9 @@ export const PostListModuleView = ({
   sectionHeader,
   items,
   layout,
+  titleFallback,
 }: IPostListModuleViewProps) => {
+  const { heading, supportingText, align } = sectionHeader;
   const titleId = `latest-posts-${id}`;
 
   return (
@@ -36,10 +39,11 @@ export const PostListModuleView = ({
     >
       <PostsSection
         posts={items}
-        title={sectionHeader.heading ?? 'Latest posts'}
+        title={heading}
         titleId={titleId}
-        supportingText={sectionHeader.supportingText}
-        align={sectionHeader.align}
+        titleFallback={titleFallback}
+        supportingText={supportingText}
+        align={align}
         linkAs={SmartLink}
         isWrapped={true}
       />

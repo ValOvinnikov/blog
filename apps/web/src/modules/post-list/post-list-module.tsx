@@ -1,5 +1,6 @@
 import { service } from '@blog/service';
 import { toPostListItems } from '@web/utils/to-post-list-items';
+import { getTranslations } from 'next-intl/server';
 
 import { PostListModuleView } from './post-list-module-view';
 
@@ -13,7 +14,10 @@ export interface IPostListModuleProps {
  * `PostListModuleView`.
  */
 export async function PostListModule({ id }: IPostListModuleProps) {
-  const result = await service.modules.postList.v1.getPostList(id);
+  const [result, t] = await Promise.all([
+    service.modules.postList.v1.getPostList(id),
+    getTranslations('postListModule'),
+  ]);
 
   if (!result.ok) return null;
 
@@ -23,9 +27,8 @@ export async function PostListModule({ id }: IPostListModuleProps) {
 
   // No posts resolved (e.g. the referenced/latest posts are unpublished or
   // filtered to zero) — `PostsSection` renders nothing without an
-  // `emptyMessage`, so skip the view entirely rather than emit an empty
-  // landmark whose `aria-labelledby` points at a heading id that never
-  // renders.
+  // `emptyMessage`, so skip the view entirely rather than emit a landmark
+  // whose `aria-labelledby` points at a heading id that never renders.
   if (items.length === 0) return null;
 
   return (
@@ -35,6 +38,7 @@ export async function PostListModule({ id }: IPostListModuleProps) {
       sectionHeader={sectionHeader}
       items={items}
       layout={layout}
+      titleFallback={t('fallbackHeading')}
     />
   );
 }
