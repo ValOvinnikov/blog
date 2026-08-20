@@ -95,6 +95,15 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
+  it('submits through a real submit control, not an onClick shortcut', () => {
+    setup();
+
+    expect(screen.getByRole('button', { name: 'Subscribe' })).toHaveAttribute(
+      'type',
+      'submit',
+    );
+  });
+
   it('disables the field and button and marks the button busy while submitting', () => {
     setup({ status: 'submitting' });
 
