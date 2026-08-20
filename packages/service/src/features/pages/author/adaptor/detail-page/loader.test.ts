@@ -113,7 +113,7 @@ describe('getAuthorPage', () => {
     );
   });
 
-  it('tags the author query with author, and the posts query with posts alongside category', async () => {
+  it('tags the author query with author, and the posts query with posts alongside topic', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawAuthor())
       .mockResolvedValueOnce({ posts: [], total: 0 });
@@ -131,7 +131,7 @@ describe('getAuthorPage', () => {
       2,
       expect.anything(),
       expect.objectContaining({
-        next: expect.objectContaining({ tags: ['posts', 'category'] }),
+        next: expect.objectContaining({ tags: ['posts', 'topic'] }),
       }),
     );
   });

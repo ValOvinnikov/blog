@@ -153,7 +153,7 @@ describe('getTagPage', () => {
     expect(result?.tag.seo.description).toBe('Site default description');
   });
 
-  it('tags the posts query with category alongside posts', async () => {
+  it('tags the posts query with topic alongside posts', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawTagPageTag())
       .mockResolvedValueOnce({ posts: [], total: 0 })
@@ -165,7 +165,7 @@ describe('getTagPage', () => {
       2,
       expect.anything(),
       expect.objectContaining({
-        next: expect.objectContaining({ tags: ['posts', 'category'] }),
+        next: expect.objectContaining({ tags: ['posts', 'topic'] }),
       }),
     );
   });

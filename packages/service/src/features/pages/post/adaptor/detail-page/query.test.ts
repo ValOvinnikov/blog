@@ -1,6 +1,6 @@
 import {
   makeRawAuthor,
-  makeRawCategory,
+  makeRawTopic,
 } from '@blog/service/testing/entities/fixtures';
 import { makeRawPostDetail } from '@blog/service/testing/pages/fixtures';
 
@@ -14,7 +14,7 @@ describe('postDetailQuery', () => {
       featured: null,
       seo: null,
       author: makeRawAuthor({ role: null }),
-      category: makeRawCategory({ description: null }),
+      topic: makeRawTopic({ description: null }),
     });
 
     expect(() => postDetailQuery.parse(raw)).not.toThrow();

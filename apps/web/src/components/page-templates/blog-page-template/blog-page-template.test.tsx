@@ -58,17 +58,17 @@ describe(`<${BlogPageTemplate.name}/>`, () => {
     expect(screen.queryByTestId('intro-header-slot')).not.toBeInTheDocument();
   });
 
-  it('renders categoryChips after supportingText and before posts when passed', () => {
-    setup({ categoryChips: <div data-testid="category-chips-slot" /> });
+  it('renders topicChips after supportingText and before posts when passed', () => {
+    setup({ topicChips: <div data-testid="topic-chips-slot" /> });
 
-    expect(screen.getByTestId('category-chips-slot')).toBeInTheDocument();
+    expect(screen.getByTestId('topic-chips-slot')).toBeInTheDocument();
     expect(screen.getByTestId('posts-slot')).toBeInTheDocument();
   });
 
-  it('omits categoryChips when not passed', () => {
+  it('omits topicChips when not passed', () => {
     setup();
 
-    expect(screen.queryByTestId('category-chips-slot')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('topic-chips-slot')).not.toBeInTheDocument();
   });
 
   it('renders socialLinks after supportingText and before posts when passed', () => {

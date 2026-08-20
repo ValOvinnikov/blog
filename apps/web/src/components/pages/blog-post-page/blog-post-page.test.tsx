@@ -239,7 +239,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     );
   });
 
-  it('renders the Home › Category › Post breadcrumbs trail', async () => {
+  it('renders the Home › Topic › Post breadcrumbs trail', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     await setup();
@@ -249,8 +249,8 @@ describe(`<${BlogPostPage.name}/>`, () => {
     const homeLink = within(nav).getByRole('link', { name: 'Home' });
     expect(homeLink).toHaveAttribute('href', '/');
 
-    const categoryLink = within(nav).getByRole('link', { name: 'Engineering' });
-    expect(categoryLink).toHaveAttribute('href', '/category/engineering');
+    const topicLink = within(nav).getByRole('link', { name: 'Engineering' });
+    expect(topicLink).toHaveAttribute('href', '/topics/engineering');
 
     const current = within(nav).getByText('Hello World');
     expect(current).toHaveAttribute('aria-current', 'page');
@@ -271,15 +271,15 @@ describe(`<${BlogPostPage.name}/>`, () => {
     ).toBeTruthy();
   });
 
-  it('renders the category eyebrow linked to the category archive page, in addition to the breadcrumbs trail', async () => {
+  it('renders the topic eyebrow linked to the topic archive page, in addition to the breadcrumbs trail', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     await setup();
 
-    const categoryLinks = screen.getAllByRole('link', { name: 'Engineering' });
-    expect(categoryLinks).toHaveLength(2);
-    categoryLinks.forEach((link) => {
-      expect(link).toHaveAttribute('href', '/category/engineering');
+    const topicLinks = screen.getAllByRole('link', { name: 'Engineering' });
+    expect(topicLinks).toHaveLength(2);
+    topicLinks.forEach((link) => {
+      expect(link).toHaveAttribute('href', '/topics/engineering');
     });
   });
 
@@ -404,7 +404,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     );
     expect(breadcrumbScript).toBeDefined();
     expect(breadcrumbScript?.textContent).toContain(
-      '"item":"https://example.com/category/engineering"',
+      '"item":"https://example.com/topics/engineering"',
     );
   });
 
@@ -445,7 +445,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders a "Related reading" section when relatedPosts is non-empty, even when a related post is in a different category (tag-matched, not category-scoped)', async () => {
+  it('renders a "Related reading" section when relatedPosts is non-empty, even when a related post is in a different topic (tag-matched, not topic-scoped)', async () => {
     getPostMock.mockResolvedValue({
       ok: true,
       data: {
@@ -467,8 +467,8 @@ describe(`<${BlogPostPage.name}/>`, () => {
               slug: 'jane-doe',
               imageUrl: undefined,
             },
-            category: {
-              id: 'cat-2',
+            topic: {
+              id: 'topic-2',
               title: 'Design',
               slug: 'design',
             },

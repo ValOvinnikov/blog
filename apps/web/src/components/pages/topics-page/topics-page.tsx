@@ -6,7 +6,7 @@ import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
-import { getCategoriesSafely } from '@web/utils/get-categories-safely';
+import { getTopicsSafely } from '@web/utils/get-topics-safely';
 import { getTranslations } from 'next-intl/server';
 
 import { topicsPageVariants } from './topics-page-variants';
@@ -14,23 +14,23 @@ import { topicsPageVariants } from './topics-page-variants';
 const s = topicsPageVariants();
 
 /**
- * TopicsPage — `/topics` composition: fetches every category (with its
- * published-post count) via `getCategoriesSafely` and renders each as a
- * card linking to its `/category/[slug]` archive. This is a category
+ * TopicsPage — `/topics` composition: fetches every topic (with its
+ * published-post count) via `getTopicsSafely` and renders each as a
+ * card linking to its `/topics/[slug]` archive. This is a topic
  * *index*, not a post archive, so it uses its own lightweight shell rather
- * than forcing category cards through `BlogPageTemplate`'s `posts` slot,
- * which is built specifically for post grids (blog index, category, tag,
+ * than forcing topic cards through `BlogPageTemplate`'s `posts` slot,
+ * which is built specifically for post grids (blog index, topic, tag,
  * author archives). Renders a `Home › Topics` `Breadcrumbs` trail (plus its
  * `BreadcrumbList` JSON-LD) inside a `BreadcrumbBar` sibling before `<main>`.
  *
- * `getCategoriesSafely` unwraps `getCategories`'s `AsyncResult`, falling
- * back to an empty list on failure — this is a category index, not
+ * `getTopicsSafely` unwraps `getTopics`'s `AsyncResult`, falling
+ * back to an empty list on failure — this is a topic index, not
  * critical page content, so a fetch failure here must never crash the
  * whole page (or, at build time, the whole static export).
  */
 export async function TopicsPage() {
-  const [categories, breadcrumbsT, t] = await Promise.all([
-    getCategoriesSafely(),
+  const [topics, breadcrumbsT, t] = await Promise.all([
+    getTopicsSafely(),
     getTranslations('breadcrumbs'),
     getTranslations('topicsPage'),
   ]);
@@ -59,25 +59,25 @@ export async function TopicsPage() {
           {t('title')}
         </Heading>
         <Text className={s.intro()}>{t('intro')}</Text>
-        {categories.length === 0 ? (
+        {topics.length === 0 ? (
           <Text className={s.empty()}>{t('empty')}</Text>
         ) : (
           <ul className={s.list()}>
-            {categories.map((category) => (
-              <li key={category.id} className={s.card()}>
+            {topics.map((topic) => (
+              <li key={topic.id} className={s.card()}>
                 <Heading level={2} visual="card">
                   <SmartLink
-                    href={routes.category(category.slug)}
+                    href={routes.topic(topic.slug)}
                     className={s.cardLink()}
                   >
-                    {category.title}
+                    {topic.title}
                   </SmartLink>
                 </Heading>
-                {category.description ? (
-                  <Text variant="card">{category.description}</Text>
+                {topic.description ? (
+                  <Text variant="card">{topic.description}</Text>
                 ) : null}
                 <Text variant="card">
-                  {t('postsCount', { count: category.postCount })}
+                  {t('postsCount', { count: topic.postCount })}
                 </Text>
               </li>
             ))}

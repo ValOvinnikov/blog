@@ -10,11 +10,11 @@ export type TPostCardFooterProps = IWithClassName &
     authorAvatarSrc?: string;
     publishedAt?: string;
     formattedDate?: string;
-    /** Post category, rendered lowercased alongside `leadingIcon`/`trailingIcon`. */
-    category?: string;
-    /** Icon rendered before the category text, e.g. `<Icon name={ICONS.X} />`. */
+    /** Post topic, rendered lowercased alongside `leadingIcon`/`trailingIcon`. */
+    topic?: string;
+    /** Icon rendered before the topic text, e.g. `<Icon name={ICONS.X} />`. */
     leadingIcon?: ReactNode;
-    /** Icon rendered after the category text, e.g. `<Icon name={ICONS.ARROW} />`. */
+    /** Icon rendered after the topic text, e.g. `<Icon name={ICONS.ARROW} />`. */
     trailingIcon?: ReactNode;
   };
 
@@ -22,14 +22,14 @@ const s = postCardFooterVariants();
 
 /**
  * PostCardFooter — the byline row at the bottom of a `PostCard`: optional author
- * avatar and name, published date, and a category tag.
+ * avatar and name, published date, and a topic tag.
  */
 export const PostCardFooter = ({
   authorName,
   authorAvatarSrc,
   publishedAt,
   formattedDate,
-  category,
+  topic,
   leadingIcon,
   trailingIcon,
   className,
@@ -48,9 +48,9 @@ export const PostCardFooter = ({
     {publishedAt && formattedDate && (
       <time dateTime={publishedAt}>{formattedDate}</time>
     )}
-    {category && (
-      <span className={s.category()}>
-        {leadingIcon} {category.toLowerCase()} {trailingIcon}
+    {topic && (
+      <span className={s.topic()}>
+        {leadingIcon} {topic.toLowerCase()} {trailingIcon}
       </span>
     )}
   </div>

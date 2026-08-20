@@ -2,14 +2,14 @@ import { BRAND_VARIANTS, PRESET_ID, TLINK_TYPE } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 // Fixed document ids (published, not `drafts.`-prefixed) — every field a
-// `blog_post`/`settings_*` singleton/`blog_author`/`blog_category` document
+// `blog_post`/`settings_*` singleton/`blog_author`/`blog_topic` document
 // requires per `apps/cms/src/schema-types`, so the seeded dataset validates
 // against the real schema rather than an invented shape. No generated
 // `@blog/config` types exist for a not-yet-created project's dataset, so
 // these stay loosely typed (`TSanityDocument`), not `any`.
 export const STARTER_DOCUMENT_IDS = {
   AUTHOR: 'provisioning.author.starter',
-  CATEGORY: 'provisioning.category.starter',
+  TOPIC: 'provisioning.topic.starter',
   POST: 'provisioning.post.starter',
   NAVIGATION: 'provisioning.settings.navigation',
   FOOTER: 'provisioning.settings.footer',
@@ -47,9 +47,9 @@ export function buildStarterDocuments(
     },
   };
 
-  const category: TSanityDocument = {
-    _id: STARTER_DOCUMENT_IDS.CATEGORY,
-    _type: 'blog_category',
+  const topic: TSanityDocument = {
+    _id: STARTER_DOCUMENT_IDS.TOPIC,
+    _type: 'blog_topic',
     title: 'Announcements',
     slug: { _type: 'slug', current: 'announcements' },
   };
@@ -63,7 +63,7 @@ export function buildStarterDocuments(
       `This is the first post on ${tenant.name}. Edit or delete it from ` +
       'the Studio once you are ready to publish real content here.',
     author: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.AUTHOR },
-    category: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.CATEGORY },
+    topic: { _type: 'reference', _ref: STARTER_DOCUMENT_IDS.TOPIC },
     publishedAt: now,
     body: [
       {
@@ -146,7 +146,7 @@ export function buildStarterDocuments(
 
   return [
     author,
-    category,
+    topic,
     post,
     navigation,
     footer,

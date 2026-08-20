@@ -62,7 +62,7 @@ describe('getFooter', () => {
       expect.anything(),
       expect.objectContaining({
         next: expect.objectContaining({
-          tags: ['footer', 'post', 'category', 'page_generic', 'page_blog'],
+          tags: ['footer', 'post', 'topic', 'page_generic', 'page_blog'],
         }),
       }),
     );

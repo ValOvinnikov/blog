@@ -1,6 +1,14 @@
 import { getRevalidateTagsForType } from './revalidate-tags';
 
 describe('getRevalidateTagsForType', () => {
+  it('maps the topic document type to its ISR tags', () => {
+    expect(getRevalidateTagsForType('blog_topic', 'topic-1')).toEqual([
+      'topic',
+      'topics',
+      'posts',
+    ]);
+  });
+
   it('maps a known document type to its ISR tags', () => {
     expect(getRevalidateTagsForType('blog_post', 'post-1')).toEqual([
       'post',

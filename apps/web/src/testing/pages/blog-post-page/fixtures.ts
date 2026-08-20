@@ -45,8 +45,8 @@ export const mockPostDetail: TPostDetail = {
     ],
     socialLinks: [],
   },
-  category: {
-    id: 'cat-1',
+  topic: {
+    id: 'topic-1',
     title: 'Engineering',
     slug: 'engineering',
     description: undefined,

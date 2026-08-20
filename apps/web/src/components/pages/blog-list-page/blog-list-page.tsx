@@ -4,13 +4,13 @@ import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
 import { Pagination, PostsSection } from '@blog/ui/organisms';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
-import { CategoryChipList } from '@web/components/shared/category-chip-list';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { TopicChipList } from '@web/components/shared/topic-chip-list';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
-import { getCategoriesSafely } from '@web/utils/get-categories-safely';
+import { getTopicsSafely } from '@web/utils/get-topics-safely';
 import { logger } from '@web/utils/logger/logger';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
@@ -28,9 +28,9 @@ type TBlogListPageProps = { page: number; locale: string };
  * home page uses — no hardcoded placement.
  */
 export async function BlogListPage({ page, locale }: TBlogListPageProps) {
-  const [result, categories, t, breadcrumbsT, blogListT] = await Promise.all([
+  const [result, topics, t, breadcrumbsT, blogListT] = await Promise.all([
     service.pages.blog.v1.getIndexPage({ page }),
-    getCategoriesSafely(),
+    getTopicsSafely(),
     getTranslations('pagination'),
     getTranslations('breadcrumbs'),
     getTranslations('blogListPage'),
@@ -74,7 +74,7 @@ export async function BlogListPage({ page, locale }: TBlogListPageProps) {
       <BlogPageTemplate
         heading={heading}
         supportingText={supportingText}
-        categoryChips={<CategoryChipList categories={categories} />}
+        topicChips={<TopicChipList topics={topics} />}
         posts={
           <PostsSection
             posts={items}

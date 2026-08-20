@@ -32,7 +32,7 @@ const meta = {
           </a>
         </PostCard.Title>
         <PostCard.Footer
-          category="design-system"
+          topic="design-system"
           trailingIcon={<Icon name={ICONS.ARROW} size={Size.SM} />}
         />
       </>
@@ -87,7 +87,7 @@ export const WithTags: TStory = {
           <a href="/posts/typescript-tips">TypeScript Tips for 2024</a>
         </PostCard.Title>
         <PostCard.Footer
-          category="typescript"
+          topic="typescript"
           trailingIcon={<Icon name={ICONS.ARROW} size={Size.SM} />}
         />
       </>
@@ -106,7 +106,7 @@ export const WithFooterLeadingIcon: TStory = {
           <a href="/posts/typescript-tips">TypeScript Tips for 2024</a>
         </PostCard.Title>
         <PostCard.Footer
-          category="typescript"
+          topic="typescript"
           leadingIcon={<Icon name={ICONS.BOOKMARK} size={Size.SM} />}
           trailingIcon={<Icon name={ICONS.ARROW} size={Size.SM} />}
         />

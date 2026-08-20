@@ -20,7 +20,7 @@ export const Default: TStory = {
       <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Engineering', href: '/category/engineering' },
+          { label: 'Engineering', href: '/topics/engineering' },
           {
             label: 'How we ship reviews faster',
             href: '/blog/how-we-ship-reviews-faster',
@@ -60,7 +60,7 @@ export const LongCurrentPage: TStory = {
       <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Engineering', href: '/category/engineering' },
+          { label: 'Engineering', href: '/topics/engineering' },
           {
             label:
               'A very long post title that keeps going well past a comfortable line length for the current breadcrumb segment',

@@ -16,7 +16,7 @@ export { Pagination } from './pagination';
 export type { TPostGridProps } from './post-grid';
 export { PostGrid } from './post-grid';
 export type {
-  IPostCardCategoryData,
+  IPostCardTopicData,
   IPostCardData,
   TPostsSectionProps,
 } from './posts-section';

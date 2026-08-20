@@ -22,11 +22,11 @@ export async function getIndexPage({
   ]);
   const pageSize = rawPage.itemsPerPage;
   const start = (page - 1) * pageSize;
-  // `archivePostCardFragment` derefs `category` — that tag must ride
+  // `archivePostCardFragment` derefs `topic` — that tag must ride
   // alongside `posts` (tag-scope contract, `sanity/query.ts`).
   const rawPosts = await runQuery(
     buildIndexPageQuery(start, start + pageSize),
-    isr(['posts', 'category']),
+    isr(['posts', 'topic']),
   );
   return toIndexPage(rawPage, rawPosts, settings, page, pageSize);
 }

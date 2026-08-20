@@ -1,6 +1,6 @@
 import {
   makePostCard,
-  makePostCardCategory,
+  makePostCardTopic,
 } from '@web/testing/shared/post/fixtures';
 import { getFormatter } from 'next-intl/server';
 
@@ -8,14 +8,14 @@ import { toPostListItems } from './to-post-list-items';
 
 describe('toPostListItems', () => {
   it('maps a post card into the href/formattedDate shape PostsSection expects', async () => {
-    const category = makePostCardCategory({ title: 'Engineering' });
+    const topic = makePostCardTopic({ title: 'Engineering' });
     const post = makePostCard({
       id: 'post-1',
       slug: 'hello-world',
       title: 'Hello World',
       excerpt: 'An excerpt.',
       publishedAt: '2026-01-15T00:00:00.000Z',
-      category,
+      topic,
       readingTimeMinutes: 2,
     });
 
@@ -29,7 +29,7 @@ describe('toPostListItems', () => {
       publishedAt: '2026-01-15T00:00:00.000Z',
       formattedDate: 'January 15, 2026',
       readingTime: '2 min',
-      category,
+      topic,
     });
   });
 

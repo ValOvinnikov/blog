@@ -1,7 +1,7 @@
 import { SOCIAL_PLATFORMS, TLINK_TYPE } from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils/primitives';
-import { categorySchema } from '@cms/schema-types/documents/blog/category';
 import { postSchema } from '@cms/schema-types/documents/blog/post';
+import { topicSchema } from '@cms/schema-types/documents/blog/topic';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -55,7 +55,7 @@ export const linkSchema = defineType({
       type: 'reference',
       to: [
         { type: postSchema.name },
-        { type: categorySchema.name },
+        { type: topicSchema.name },
         // Literal (not `genericSchema.name` / `blogPageSchema.name`):
         // importing page.ts or blog-page.ts here closes a circular import
         // (page/blog-page → module-cta → link) — typegen fails otherwise.

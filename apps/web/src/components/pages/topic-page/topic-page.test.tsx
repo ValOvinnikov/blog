@@ -1,0 +1,355 @@
+import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import {
+  makePostCard,
+  makePostCardTopic,
+} from '@web/testing/shared/post/fixtures';
+import {
+  makeTopic,
+  makeTopicWithPostCount,
+} from '@web/testing/shared/topic/fixtures';
+import { notFound } from 'next/navigation';
+
+import { TopicPage } from './topic-page';
+
+const { getTopicPageMock, getTopicsMock } = vi.hoisted(() => ({
+  getTopicPageMock: vi.fn(),
+  getTopicsMock: vi.fn(),
+}));
+
+vi.mock('@blog/service', () => ({
+  service: {
+    pages: {
+      topic: { v1: { getTopicPage: getTopicPageMock } },
+    },
+    entities: {
+      topics: { v1: { getTopics: getTopicsMock } },
+    },
+  },
+}));
+
+vi.mock('@web/components/shared/smart-link', () => ({
+  SmartLink: ({
+    href,
+    children,
+    ...rest
+  }: {
+    href: string;
+    children: React.ReactNode;
+  }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
+}));
+
+const post = makePostCard({
+  title: 'My Post Title',
+  slug: 'my-post-slug',
+  publishedAt: '2026-01-01T00:00:00.000Z',
+  topic: makePostCardTopic(),
+});
+
+const topic = makeTopic({
+  title: 'News',
+  slug: 'news',
+  description: 'The latest updates.',
+});
+
+const setup = customRenderAsync(TopicPage, {
+  slug: 'news',
+});
+
+describe(`<${TopicPage.name}/>`, () => {
+  beforeEach(() => {
+    getTopicPageMock.mockReset();
+    getTopicsMock.mockReset();
+    getTopicsMock.mockResolvedValue({
+      ok: true,
+      data: [
+        makeTopicWithPostCount({
+          title: 'News',
+          slug: 'news',
+          postCount: 1,
+        }),
+        makeTopicWithPostCount({
+          id: 'topic-2',
+          title: 'Design',
+          slug: 'design',
+          postCount: 2,
+        }),
+      ],
+    });
+  });
+
+  it('calls notFound() when the topic does not exist', async () => {
+    getTopicPageMock.mockResolvedValue({ ok: true, data: null });
+
+    await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls notFound() when the fetch fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getTopicPageMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+
+    errorSpy.mockRestore();
+  });
+
+  it('renders the topic heading, description, and posts', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic,
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'News' }),
+    ).toBeVisible();
+    expect(screen.getByText('The latest updates.')).toBeVisible();
+
+    const link = screen.getByRole('link', { name: 'My Post Title' });
+    expect(link).toBeVisible();
+    expect(link).toHaveAttribute('href', '/blog/my-post-slug');
+    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+  });
+
+  it('renders the empty-state message when the topic has no posts', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic,
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'News' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Posts in News' }),
+    ).toBeVisible();
+    expect(screen.getByText('No posts in News yet.')).toBeVisible();
+    expect(
+      screen.queryByRole('link', { name: 'My Post Title' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the topic chip row with the current topic highlighted', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic,
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    await setup();
+
+    expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
+    expect(screen.getByRole('link', { name: 'News' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByRole('link', { name: 'Design' })).not.toHaveAttribute(
+      'aria-current',
+    );
+    expect(screen.getByRole('link', { name: 'All' })).not.toHaveAttribute(
+      'aria-current',
+    );
+  });
+
+  it('calls getTopicPage with the fixed itemsPerPage, page undefined, on page 1', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic,
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    await setup();
+
+    expect(getTopicPageMock).toHaveBeenCalledWith('news', {
+      page: undefined,
+      itemsPerPage: 9,
+    });
+  });
+
+  it('calls the paginated getTopicPage with the fixed itemsPerPage when a page is given', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic,
+        posts: [post],
+        currentPage: 2,
+        totalPages: 3,
+        total: 20,
+      },
+    });
+
+    await setup({ page: 2 });
+
+    expect(getTopicPageMock).toHaveBeenCalledWith('news', {
+      page: 2,
+      itemsPerPage: 9,
+    });
+  });
+
+  it('renders pagination on page 1 when there is more than one page', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic,
+        posts: [post],
+        currentPage: 1,
+        totalPages: 3,
+        total: 20,
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByRole('navigation', { name: 'Topic pages' }),
+    ).toBeVisible();
+  });
+
+  it('renders pagination wired to routes.topic(slug, page) when a page is given', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic,
+        posts: [post],
+        currentPage: 2,
+        totalPages: 3,
+        total: 20,
+      },
+    });
+
+    await setup({ page: 2 });
+
+    expect(
+      screen.getByRole('navigation', { name: 'Topic pages' }),
+    ).toBeVisible();
+    const nextLink = screen.getByRole('link', { name: 'Next' });
+    expect(nextLink).toHaveAttribute('href', '/topics/news/page/3');
+    const previousLink = screen.getByRole('link', { name: 'Previous' });
+    expect(previousLink).toHaveAttribute('href', '/topics/news');
+  });
+
+  it('calls notFound() when the requested page is beyond totalPages', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic,
+        posts: [],
+        currentPage: 5,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders the Home › Topic breadcrumbs trail', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic,
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    await setup();
+
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+
+    const homeLink = within(nav).getByRole('link', { name: 'Home' });
+    expect(homeLink).toHaveAttribute('href', '/');
+
+    const current = within(nav).getByText('News');
+    expect(current).toHaveAttribute('aria-current', 'page');
+    expect(current.tagName).not.toBe('A');
+  });
+
+  it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic,
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    await setup();
+
+    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    const main = screen.getByRole('main');
+
+    expect(main.contains(nav)).toBe(false);
+    expect(
+      nav.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('renders the JSON-LD BreadcrumbList schema script', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic,
+        posts: [post],
+        currentPage: 1,
+        totalPages: 1,
+        total: 1,
+      },
+    });
+
+    const { container } = await setup();
+
+    const scripts = container.querySelectorAll(
+      'script[type="application/ld+json"]',
+    );
+    const breadcrumbScript = Array.from(scripts).find((script) =>
+      script.textContent?.includes('"@type":"BreadcrumbList"'),
+    );
+    expect(breadcrumbScript).toBeDefined();
+    expect(breadcrumbScript?.textContent).toContain(
+      '"item":"https://example.com/topics/news"',
+    );
+  });
+});

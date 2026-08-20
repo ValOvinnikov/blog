@@ -12,7 +12,7 @@ type TGetAuthorPageArgs = {
 };
 
 /**
- * Always windows, mirroring the category archive (`getCategoryPage`) —
+ * Always windows, mirroring the topic archive (`getTopicPage`) —
  * `page` defaults to 1 so the unnumbered `/author/[slug]` route gets the
  * same sliced-query + pagination-metadata shape as `/author/[slug]/page/
  * [page]` (pages ≥ 2). Authors have no CMS-authored page-size field like
@@ -29,11 +29,11 @@ export async function getAuthorPage(
       parameters: { slug },
       ...isr('author'),
     }),
-    // `archivePostCardFragment` derefs `category` — that tag must ride
+    // `archivePostCardFragment` derefs `topic` — that tag must ride
     // alongside `posts` (tag-scope contract, `sanity/query.ts`).
     runQuery(buildAuthorPostsPageQuery(start, start + itemsPerPage), {
       parameters: { slug },
-      ...isr(['posts', 'category']),
+      ...isr(['posts', 'topic']),
     }),
   ]);
   if (!rawAuthor) return null;

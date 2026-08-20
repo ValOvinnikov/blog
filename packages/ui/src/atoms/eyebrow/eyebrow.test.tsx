@@ -19,10 +19,10 @@ describe(`<${Eyebrow.name}/>`, () => {
   });
 
   it('renders as a link when href is provided', () => {
-    setup({ href: '/category/engineering', children: 'Engineering' });
+    setup({ href: '/topics/engineering', children: 'Engineering' });
     expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
       'href',
-      '/category/engineering',
+      '/topics/engineering',
     );
   });
 
@@ -39,7 +39,7 @@ describe(`<${Eyebrow.name}/>`, () => {
       </a>
     );
     setup({
-      href: '/category/engineering',
+      href: '/topics/engineering',
       linkAs: CustomLink,
       children: 'Engineering',
     });

@@ -22,7 +22,7 @@ const VOICE_OVERRIDE_PATHS: Record<string, readonly string[]> = {
   bookmarkToastSavedMessage: ['bookmarkButton', 'toastSavedMessage'],
   bookmarkToastRemovedMessage: ['bookmarkButton', 'toastRemovedMessage'],
   blogListEmpty: ['blogListPage', 'empty'],
-  categoryEmpty: ['categoryPage', 'empty'],
+  categoryEmpty: ['topicPage', 'empty'],
   tagEmpty: ['tagPage', 'empty'],
   authorEmpty: ['authorPage', 'empty'],
   topicsEmpty: ['topicsPage', 'empty'],

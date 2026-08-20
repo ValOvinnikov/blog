@@ -39,7 +39,7 @@ const s = blogPostPageVariants();
 /**
  * BlogPostPage — `/blog/{slug}` composition: fetches the post via
  * `service.pages.post.v1.getPost` and renders it as an `Article` compound
- * with a `Home › Category › Post` breadcrumb trail, `BlogPosting` JSON-LD,
+ * with a `Home › Topic › Post` breadcrumb trail, `BlogPosting` JSON-LD,
  * an optional `PostContentsRail` once the body has enough headings, and a
  * "Related reading" section when related posts exist. Site chrome
  * (`Header`/`Footer`) stays owned by `[locale]/layout.tsx`.
@@ -60,7 +60,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
     id,
     title,
     excerpt,
-    category,
+    topic,
     tags,
     body,
     skim,
@@ -117,7 +117,7 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
 
   const trail: IBreadcrumbItem[] = [
     { label: t('home'), href: routes.home() },
-    { label: category.title, href: routes.category(category.slug) },
+    { label: topic.title, href: routes.topic(topic.slug) },
     { label: title, href: routes.post(slug) },
   ];
   const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
@@ -179,9 +179,9 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
             <Article.Header
               className={s.hero()}
               title={title}
-              category={{
-                label: category.title,
-                href: routes.category(category.slug),
+              topic={{
+                label: topic.title,
+                href: routes.topic(topic.slug),
                 linkAs: SmartLink,
               }}
               lead={excerpt}

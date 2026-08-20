@@ -1,12 +1,12 @@
 import { routes } from '@blog/config';
-import type { TPostCardCategory } from '@blog/service';
+import type { TPostCardTopic } from '@blog/service';
 import type { IPostCardData } from '@blog/ui/organisms';
 import { getFormatter } from 'next-intl/server';
 
 /**
  * Structural source shape accepted by `toPostListItems` — satisfied by both
  * `TPostCard` (post detail's related posts, the post-list module) and the
- * leaner `TArchivePostCard` (blog/category/tag/author archive pages).
+ * leaner `TArchivePostCard` (blog/topic/tag/author archive pages).
  */
 type TPostListItemSource = {
   id: string;
@@ -14,7 +14,7 @@ type TPostListItemSource = {
   title: string;
   excerpt: string;
   publishedAt: string;
-  category: TPostCardCategory;
+  topic: TPostCardTopic;
   readingTimeMinutes: number;
 };
 
@@ -45,6 +45,6 @@ export const toPostListItems = async (
       day: 'numeric',
     }),
     readingTime: `${post.readingTimeMinutes} min`,
-    category: post.category,
+    topic: post.topic,
   }));
 };

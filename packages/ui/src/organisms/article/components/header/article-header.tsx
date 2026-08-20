@@ -9,11 +9,11 @@ import { type ReactNode } from 'react';
 
 import { articleHeaderVariants } from './article-header-variants';
 
-export interface IArticleHeaderCategory {
+export interface IArticleHeaderTopic {
   label: string;
-  /** Link target for the category label — omit to render plain (non-linked) text. */
+  /** Link target for the topic label — omit to render plain (non-linked) text. */
   href?: string;
-  /** Component the category link renders as — pass the app router's Link for client-side navigation. Defaults to a plain `<a>`. */
+  /** Component the topic link renders as — pass the app router's Link for client-side navigation. Defaults to a plain `<a>`. */
   linkAs?: TAnchorElementType;
 }
 
@@ -21,11 +21,11 @@ export type TArticleHeaderProps = IWithClassName &
   IWithDataTestId & {
     title: string;
     /**
-     * Category eyebrow rendered above the title as non-heading markup (a `<p>`,
+     * Topic eyebrow rendered above the title as non-heading markup (a `<p>`,
      * or a link when `href` is given) — never an `<h*>`, so it can't compete
      * with the post's `<h1>`. Omit to render no eyebrow.
      */
-    category?: IArticleHeaderCategory;
+    topic?: IArticleHeaderTopic;
     /** Lead paragraph rendered below the title, inside the heading column. Omit to render no lead. */
     lead?: string;
     /** Forwarded to `PostMeta` as-is (author, publishedAt, formattedDate, readingTimeMinutes?, share?). Rendered inside the heading column, below the lead paragraph. Omit to render no `PostMeta` strip. */
@@ -35,14 +35,14 @@ export type TArticleHeaderProps = IWithClassName &
   };
 
 /**
- * Article.Header — post detail heading area: category eyebrow, title,
+ * Article.Header — post detail heading area: topic eyebrow, title,
  * lead paragraph, metadata strip, and an optional wide cover media slot.
  * Breadcrumb navigation stays a separate, page-composed concern — the
- * eyebrow here is a visual category label, not a nav landmark.
+ * eyebrow here is a visual topic label, not a nav landmark.
  */
 export const ArticleHeader = ({
   title,
-  category,
+  topic,
   lead,
   meta,
   coverMedia,
@@ -54,13 +54,13 @@ export const ArticleHeader = ({
   return (
     <header className={s.root({ class: className })} data-testid={dataTestId}>
       <div className={s.headingGroup()}>
-        {category && (
+        {topic && (
           <Eyebrow
-            href={category.href}
-            linkAs={category.linkAs}
-            className={s.category()}
+            href={topic.href}
+            linkAs={topic.linkAs}
+            className={s.topic()}
           >
-            {category.label}
+            {topic.label}
           </Eyebrow>
         )}
         <Heading level={1} visual="post" className={s.title()}>

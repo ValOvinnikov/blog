@@ -49,7 +49,7 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Eyebrow — `atoms/eyebrow/eyebrow.tsx`
 
-Eyebrow atom — small uppercase label displayed above a heading to provide contextual category or section context.
+Eyebrow atom — small uppercase label displayed above a heading to provide contextual topic or section context.
 Props: href?: string · linkAs?: TAnchorElementType _(extends IWithDataTestId, Omit<HTMLAttributes<HTMLElement>, keyof TEyebro…)_
 Variants: hasHref: (boolean)
 
@@ -180,7 +180,7 @@ Props: src?: string · size?: TBrandMarkProps['size'] · specLine?: string _(ext
 
 ### Breadcrumbs — `molecules/breadcrumbs/breadcrumbs.tsx`
 
-page-chrome navigation trail (e.g. `Home › Category › Post title`).
+page-chrome navigation trail (e.g. `Home › Topic › Post title`).
 Props: items: IBreadcrumbItem[] · ariaLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: isCurrent: (boolean)
 
@@ -222,7 +222,7 @@ Slots:
 - **PostCard.Media** — the media region at the top of a `PostCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PostCard.Meta** — compact metadata row for post cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
 - **PostCard.Title** — the post heading inside a `PostCard`, rendered as a styled `<h3>`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **PostCard.Footer** — the byline row at the bottom of a `PostCard`: optional author avatar and name, published date, and a category tag. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · category?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **PostCard.Footer** — the byline row at the bottom of a `PostCard`: optional author avatar and name, published date, and a topic tag. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### PostMeta — `molecules/post-meta/post-meta.tsx`
 
@@ -284,7 +284,7 @@ Props: children: TCompoundChildren<typeof ArticleParts> _(extends IWithClassName
 
 Slots:
 
-- **Article.Header** — Article.Header — post detail heading area: category eyebrow, title, lead paragraph, metadata strip, and an optional wide cover media slot. Props: title: string · category?: IArticleHeaderCategory · lead?: string · meta?: Omit<TPostMetaProps, 'className' | 'dataTestId'> · coverMedia?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Article.Header** — Article.Header — post detail heading area: topic eyebrow, title, lead paragraph, metadata strip, and an optional wide cover media slot. Props: title: string · topic?: IArticleHeaderTopic · lead?: string · meta?: Omit<TPostMetaProps, 'className' | 'dataTestId'> · coverMedia?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **Article.Body** — Article.Body — reading-content wrapper for a post detail's body (e.g. a `PortableTextRenderer`). Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **Article.Footer** — Article.Footer — end-of-article furniture; renders the post's tags as a chip list of links. Props: tags: IArticleFooterTag[] · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
@@ -359,7 +359,7 @@ Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### PostsSection — `organisms/posts-section/posts-section.tsx`
 
-labeled section rendering a set of posts in a responsive grid, generic enough to reuse for other post listings (e.g. related posts, category pages).
+labeled section rendering a set of posts in a responsive grid, generic enough to reuse for other post listings (e.g. related posts, topic pages).
 Props: posts: IPostCardData[] · title?: string · titleId?: string · titleFallback?: string · linkAs?: TAnchorElementType · supportingText?: string · align?: TPostsSectionVariants['align'] · emptyMessage?: string · isTinted?: TPostsSectionVariants['tinted'] · isWrapped?: TPostsSectionVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
 Variants: tinted: (boolean) · wrapped: (boolean) · align: HEADING_ALIGN.LEFT|HEADING_ALIGN.CENTER|HEADING_ALIGN.RIGHT
 

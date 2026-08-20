@@ -124,10 +124,10 @@ describe(`<${PostCard.name}/>`, () => {
     expect(screen.getByText('Jan 1, 2024')).toBeVisible();
   });
 
-  it('renders the category lowercased via PostCard.Footer', () => {
+  it('renders the topic lowercased via PostCard.Footer', () => {
     renderElement(
       <PostCard>
-        <PostCard.Footer category="Design Systems" />
+        <PostCard.Footer topic="Design Systems" />
       </PostCard>,
     );
     expect(screen.getByText(/design systems/)).toBeVisible();
@@ -137,7 +137,7 @@ describe(`<${PostCard.name}/>`, () => {
     renderElement(
       <PostCard>
         <PostCard.Footer
-          category="Design Systems"
+          topic="Design Systems"
           trailingIcon={<span data-testid="custom-icon" />}
         />
       </PostCard>,
@@ -145,18 +145,18 @@ describe(`<${PostCard.name}/>`, () => {
     expect(screen.getByTestId('custom-icon')).toBeVisible();
   });
 
-  it('renders leadingIcon and trailingIcon with matching spacing around the category text', () => {
+  it('renders leadingIcon and trailingIcon with matching spacing around the topic text', () => {
     renderElement(
       <PostCard>
         <PostCard.Footer
-          category="Design Systems"
+          topic="Design Systems"
           leadingIcon={<span aria-hidden="true">L</span>}
           trailingIcon={<span aria-hidden="true">R</span>}
         />
       </PostCard>,
     );
-    const categoryText = screen.getByText(/design systems/);
-    expect(categoryText.textContent).toBe('L design systems R');
+    const topicText = screen.getByText(/design systems/);
+    expect(topicText.textContent).toBe('L design systems R');
   });
 
   it('forwards data-testid to root element', () => {

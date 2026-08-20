@@ -18,7 +18,7 @@ const INTERNAL_HREF_BUILDERS: Record<
   (slug: string | null) => string | undefined
 > = {
   blog_post: (slug) => (slug ? routes.post(slug) : undefined),
-  blog_category: (slug) => (slug ? routes.category(slug) : undefined),
+  blog_topic: (slug) => (slug ? routes.topic(slug) : undefined),
   page_generic: (slug) => (slug ? routes.genericPage(slug) : undefined),
   page_blog: () => routes.blogIndex(),
 };

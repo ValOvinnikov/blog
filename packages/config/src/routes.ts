@@ -9,9 +9,9 @@ export const routes = {
   /** Page 1 lives at /blog only; pages ≥ 2 under the static `page/` segment. */
   blogIndex: (page = 1) => (page === 1 ? '/blog' : `/blog/page/${page}`),
   post: (slug: string) => `/blog/${slug}`,
-  /** Page 1 lives at /category/{slug} only; pages ≥ 2 under the static `page/` segment. */
-  category: (slug: string, page = 1) =>
-    page === 1 ? `/category/${slug}` : `/category/${slug}/page/${page}`,
+  /** Page 1 lives at /topics/{slug} only; pages ≥ 2 under the static `page/` segment. */
+  topic: (slug: string, page = 1) =>
+    page === 1 ? `/topics/${slug}` : `/topics/${slug}/page/${page}`,
   /** Page 1 lives at /tag/{slug} only; pages ≥ 2 under the static `page/` segment. */
   tag: (slug: string, page = 1) =>
     page === 1 ? `/tag/${slug}` : `/tag/${slug}/page/${page}`,

@@ -48,7 +48,7 @@ describe('getHero', () => {
             'module:hero-1',
             'posts',
             'author',
-            'category',
+            'topic',
             'post',
             'page_generic',
             'page_blog',
@@ -61,7 +61,7 @@ describe('getHero', () => {
       expect.anything(),
       expect.objectContaining({
         next: expect.objectContaining({
-          tags: ['posts', 'author', 'category'],
+          tags: ['posts', 'author', 'topic'],
         }),
       }),
     );

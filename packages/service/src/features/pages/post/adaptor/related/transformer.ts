@@ -5,22 +5,20 @@ import {
 import type { InferResultType } from 'groqd';
 
 import { RELATED_POSTS_LIMIT } from './constants';
-import type { relatedByCategoryQuery, relatedByTagsQuery } from './query';
+import type { relatedByTagsQuery, relatedByTopicQuery } from './query';
 
 export type TRawRelatedByTags = InferResultType<typeof relatedByTagsQuery>;
-export type TRawRelatedByCategory = InferResultType<
-  typeof relatedByCategoryQuery
->;
+export type TRawRelatedByTopic = InferResultType<typeof relatedByTopicQuery>;
 
 /**
  * Ranks the shared-tag candidate pool by exact shared-tag count desc,
  * `publishedAt` desc tiebreak, then backfills any remaining slots (up to
- * `RELATED_POSTS_LIMIT`) from the primary-category candidate pool —
+ * `RELATED_POSTS_LIMIT`) from the primary-topic candidate pool —
  * excluding posts already picked by the tag ranking.
  */
 export function toRelatedPosts(
   byTags: TRawRelatedByTags,
-  byCategory: TRawRelatedByCategory,
+  byTopic: TRawRelatedByTopic,
   currentTagIds: string[],
 ): TPostCard[] {
   const ranked = byTags
@@ -42,7 +40,7 @@ export function toRelatedPosts(
   if (ranked.length >= RELATED_POSTS_LIMIT) return ranked;
 
   const rankedIds = new Set(ranked.map((post) => post.id));
-  const backfill = byCategory
+  const backfill = byTopic
     .filter((raw) => !rankedIds.has(raw._id))
     .slice(0, RELATED_POSTS_LIMIT - ranked.length)
     .map(toPostCard);

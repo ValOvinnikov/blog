@@ -1,4 +1,4 @@
-import { makeRawCategory } from '@blog/service/testing/entities/fixtures';
+import { makeRawTopic } from '@blog/service/testing/entities/fixtures';
 import {
   makeRawArchivePostCard,
   makeRawBlogPage,
@@ -19,7 +19,7 @@ describe('buildIndexPageQuery', () => {
     const raw = {
       posts: [
         makeRawArchivePostCard({
-          category: makeRawCategory({ description: null }),
+          topic: makeRawTopic({ description: null }),
         }),
       ],
       total: 1,

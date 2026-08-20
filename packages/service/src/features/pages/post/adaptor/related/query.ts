@@ -3,8 +3,8 @@ import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-po
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 import {
-  RELATED_POSTS_CATEGORY_CANDIDATE_LIMIT,
   RELATED_POSTS_TAG_CANDIDATE_LIMIT,
+  RELATED_POSTS_TOPIC_CANDIDATE_LIMIT,
 } from './constants';
 
 export type TRelatedByTagsParams = {
@@ -12,9 +12,9 @@ export type TRelatedByTagsParams = {
   tagIds: string[];
 };
 
-export type TRelatedByCategoryParams = {
+export type TRelatedByTopicParams = {
   currentId: string;
-  categoryId: string;
+  topicId: string;
 };
 
 /**
@@ -29,7 +29,7 @@ export type TRelatedByCategoryParams = {
  * a genuinely closer (higher shared-tag-count) match published slightly
  * earlier than the cutoff is vanishingly unlikely to be missed, but bounded
  * so a popular tag can't grow this fetch unboundedly (mirrors
- * `relatedByCategoryQuery`'s `RELATED_POSTS_CATEGORY_CANDIDATE_LIMIT` bound
+ * `relatedByTopicQuery`'s `RELATED_POSTS_TOPIC_CANDIDATE_LIMIT` bound
  * below).
  */
 export const relatedByTagsQuery = q
@@ -48,12 +48,12 @@ export const relatedByTagsQuery = q
       .nullable(true),
   }));
 
-/** Recency-ordered backfill pool from the post's primary category. */
-export const relatedByCategoryQuery = q
-  .parameters<TRelatedByCategoryParams>()
+/** Recency-ordered backfill pool from the post's primary topic. */
+export const relatedByTopicQuery = q
+  .parameters<TRelatedByTopicParams>()
   .star.filterByType('blog_post')
-  .filterRaw('_id != $currentId && category._ref == $categoryId')
+  .filterRaw('_id != $currentId && topic._ref == $topicId')
   .filterRaw(PUBLISHED_POST_FILTER)
   .order('publishedAt desc')
-  .slice(0, RELATED_POSTS_CATEGORY_CANDIDATE_LIMIT)
+  .slice(0, RELATED_POSTS_TOPIC_CANDIDATE_LIMIT)
   .project(postCardFragment);

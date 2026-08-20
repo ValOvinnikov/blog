@@ -8,11 +8,11 @@ import { getTranslations } from 'next-intl/server';
 
 /**
  * Metadata for a `/tag/[slug]` page (page 1, `pageNumber` omitted) or a
- * `/tag/[slug]/page/[page]` page (`pageNumber` ≥ 2). Unlike `TCategory`,
+ * `/tag/[slug]/page/[page]` page (`pageNumber` ≥ 2). Unlike `TTopic`,
  * `TTagPageTag.seo` is already a fully-resolved `TSeoResolved` (authored →
  * content → site defaults), so this maps it straight through `toMetadata`,
  * only overlaying the "– Page N" suffix on `title`/`ogTitle` for page ≥ 2 —
- * matching `buildCategoryMetadata`'s pagination behaviour. Every page
+ * matching `buildTopicMetadata`'s pagination behaviour. Every page
  * self-canonicalizes — page 2+ must never canonical to `/tag/[slug]`.
  *
  * Reuses `getTagPage` (also called by `TagPage`) — Next dedupes the fetch

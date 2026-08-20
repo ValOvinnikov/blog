@@ -1,17 +1,17 @@
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { makeCategoryWithPostCount } from '@web/testing/shared/category/fixtures';
 import {
   makePostCard,
-  makePostCardCategory,
+  makePostCardTopic,
 } from '@web/testing/shared/post/fixtures';
+import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 import { notFound } from 'next/navigation';
 
 import { BlogListPage } from './blog-list-page';
 
-const { getIndexPageMock, getCategoriesMock, moduleRendererMock } = vi.hoisted(
+const { getIndexPageMock, getTopicsMock, moduleRendererMock } = vi.hoisted(
   () => ({
     getIndexPageMock: vi.fn(),
-    getCategoriesMock: vi.fn(),
+    getTopicsMock: vi.fn(),
     // `ModuleRenderer` (and every module it dispatches to) is an async
     // Server Component — real RSC async-component nesting isn't
     // renderable through `@testing-library/react`'s client renderer (only
@@ -37,7 +37,7 @@ vi.mock('@blog/service', () => ({
       blog: { v1: { getIndexPage: getIndexPageMock } },
     },
     entities: {
-      categories: { v1: { getCategories: getCategoriesMock } },
+      topics: { v1: { getTopics: getTopicsMock } },
     },
   },
 }));
@@ -65,7 +65,7 @@ const post = makePostCard({
   title: 'My Post Title',
   slug: 'my-post-slug',
   publishedAt: '2026-01-01T00:00:00.000Z',
-  category: makePostCardCategory(),
+  topic: makePostCardTopic(),
 });
 
 const setup = customRenderAsync(BlogListPage, { page: 1, locale: 'en' });
@@ -73,12 +73,12 @@ const setup = customRenderAsync(BlogListPage, { page: 1, locale: 'en' });
 describe(`<${BlogListPage.name}/>`, () => {
   beforeEach(() => {
     getIndexPageMock.mockReset();
-    getCategoriesMock.mockReset();
+    getTopicsMock.mockReset();
     moduleRendererMock.mockClear();
-    getCategoriesMock.mockResolvedValue({
+    getTopicsMock.mockResolvedValue({
       ok: true,
       data: [
-        makeCategoryWithPostCount({
+        makeTopicWithPostCount({
           title: 'News',
           slug: 'news',
           postCount: 1,
@@ -195,7 +195,7 @@ describe(`<${BlogListPage.name}/>`, () => {
     expect(previousLink).toHaveAttribute('href', '/blog');
   });
 
-  it('renders the category chip row', async () => {
+  it('renders the topic chip row', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -211,16 +211,14 @@ describe(`<${BlogListPage.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('navigation', { name: 'Categories' }),
-    ).toBeVisible();
+    expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'All' })).toHaveAttribute(
       'href',
       '/blog',
     );
     expect(screen.getByRole('link', { name: 'News' })).toHaveAttribute(
       'href',
-      '/category/news',
+      '/topics/news',
     );
   });
 
