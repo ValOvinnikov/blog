@@ -3,6 +3,7 @@ import type { TRawContentModule } from '@blog/service/features/modules/content/a
 import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
 import type { TRawNewsletterModule } from '@blog/service/features/modules/newsletter/adaptor/transformer';
+import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
 
 export function makeRawHeroModule(
@@ -29,6 +30,18 @@ export function makeRawHeroModule(
 export function makeRawPostListModule(
   overrides: Partial<TRawPostListModule> = {},
 ): TRawPostListModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    sectionHeader: { heading: 'Latest', supportingText: null, align: null },
+    limit: 6,
+    layout: null,
+    ...overrides,
+  };
+}
+
+export function makeRawPostLatestModule(
+  overrides: Partial<TRawPostLatestModule> = {},
+): TRawPostLatestModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
     sectionHeader: { heading: 'Latest', supportingText: null, align: null },
