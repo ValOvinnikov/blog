@@ -4,6 +4,7 @@ export * from './archive-tenant';
 export * from './clear-tenant-provisioning-artifacts';
 export * from './create-tenant';
 export * from './create-tenant-draft';
+export * from './delete-tenant';
 export * from './get-tenant-by-slug';
 export * from './get-tenant-provisioning-status';
 export * from './get-tenant-sanity-credentials';
