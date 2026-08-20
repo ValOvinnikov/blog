@@ -1,13 +1,13 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 
-import { getCategoryPaginationParams } from './loader';
+import { getTopicPaginationParams } from './loader';
 
 vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
 
-describe('getCategoryPaginationParams', () => {
+describe('getTopicPaginationParams', () => {
   // Branch coverage (zero posts, single-page corpus, multi-page corpus) lives
   // in `./transformer.test.ts` — this loader has no logic beyond delegating
   // the raw query result to it.
@@ -17,7 +17,7 @@ describe('getCategoryPaginationParams', () => {
       { slug: 'design', postCount: 9 },
     ]);
 
-    const params = await getCategoryPaginationParams(9);
+    const params = await getTopicPaginationParams(9);
 
     expect(params).toEqual([
       { slug: 'engineering', page: '2' },

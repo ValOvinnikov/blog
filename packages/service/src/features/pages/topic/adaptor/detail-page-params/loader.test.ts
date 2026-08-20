@@ -1,25 +1,25 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 
-import { getCategoryParams } from './loader';
+import { getTopicParams } from './loader';
 
 vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
 
-describe('getCategoryParams', () => {
+describe('getTopicParams', () => {
   it('returns all slug entries', async () => {
     mockRun.mockResolvedValue([{ slug: 'engineering' }, { slug: 'design' }]);
 
-    const params = await getCategoryParams();
+    const params = await getTopicParams();
 
     expect(params).toEqual([{ slug: 'engineering' }, { slug: 'design' }]);
   });
 
-  it('returns an empty array when there are no categories', async () => {
+  it('returns an empty array when there are no topics', async () => {
     mockRun.mockResolvedValue([]);
 
-    const params = await getCategoryParams();
+    const params = await getTopicParams();
 
     expect(params).toEqual([]);
   });

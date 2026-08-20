@@ -1,29 +1,29 @@
-import { makeRawCategory } from '@blog/service/testing/entities/fixtures';
+import { makeRawTopic } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawArchivePostCard } from '@blog/service/testing/pages/fixtures';
 
-import { getCategoryPage } from './loader';
+import { getTopicPage } from './loader';
 
 vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
 }));
 
-describe('getCategoryPage', () => {
-  it('returns null when the category is not found', async () => {
+describe('getTopicPage', () => {
+  it('returns null when the topic is not found', async () => {
     mockRun
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce({ posts: [], total: 0 });
 
-    const result = await getCategoryPage('missing', { itemsPerPage: 9 });
+    const result = await getTopicPage('missing', { itemsPerPage: 9 });
 
     expect(result).toBeNull();
   });
 
-  it('maps the category and its posts into a page object', async () => {
+  it('maps the topic and its posts into a page object', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawCategory({ _id: 'cat-abc', title: 'Design' }),
+        makeRawTopic({ _id: 'topic-abc', title: 'Design' }),
       )
       .mockResolvedValueOnce({
         posts: [
@@ -33,37 +33,37 @@ describe('getCategoryPage', () => {
         total: 2,
       });
 
-    const result = await getCategoryPage('design', { itemsPerPage: 9 });
+    const result = await getTopicPage('design', { itemsPerPage: 9 });
 
     expect(result).not.toBeNull();
-    expect(result?.category.id).toBe('cat-abc');
-    expect(result?.category.title).toBe('Design');
+    expect(result?.topic.id).toBe('topic-abc');
+    expect(result?.topic.title).toBe('Design');
     expect(result?.posts).toHaveLength(2);
   });
 
-  it('returns an empty posts list when no posts belong to the category', async () => {
+  it('returns an empty posts list when no posts belong to the topic', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawCategory())
+      .mockResolvedValueOnce(makeRawTopic())
       .mockResolvedValueOnce({ posts: [], total: 0 });
 
-    const result = await getCategoryPage('engineering', { itemsPerPage: 9 });
+    const result = await getTopicPage('engineering', { itemsPerPage: 9 });
 
     expect(result?.posts).toEqual([]);
   });
 
   it('defaults to page 1 and returns pagination metadata when called without a page', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawCategory())
+      .mockResolvedValueOnce(makeRawTopic())
       .mockResolvedValueOnce({ posts: [makeRawArchivePostCard()], total: 1 });
 
-    const result = await getCategoryPage('engineering', { itemsPerPage: 9 });
+    const result = await getTopicPage('engineering', { itemsPerPage: 9 });
 
     expect(result?.currentPage).toBe(1);
     expect(result?.totalPages).toBe(1);
   });
 
   it('returns the sliced page window with pagination metadata when a page is given', async () => {
-    mockRun.mockResolvedValueOnce(makeRawCategory()).mockResolvedValueOnce({
+    mockRun.mockResolvedValueOnce(makeRawTopic()).mockResolvedValueOnce({
       posts: [
         makeRawArchivePostCard({ _id: 'a' }),
         makeRawArchivePostCard({ _id: 'b' }),
@@ -71,7 +71,7 @@ describe('getCategoryPage', () => {
       total: 20,
     });
 
-    const result = await getCategoryPage('engineering', {
+    const result = await getTopicPage('engineering', {
       page: 2,
       itemsPerPage: 5,
     });
@@ -81,12 +81,12 @@ describe('getCategoryPage', () => {
     expect(result?.totalPages).toBe(4);
   });
 
-  it('returns null for a paginated request when the category is not found', async () => {
+  it('returns null for a paginated request when the topic is not found', async () => {
     mockRun
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce({ posts: [], total: 0 });
 
-    const result = await getCategoryPage('missing', {
+    const result = await getTopicPage('missing', {
       page: 2,
       itemsPerPage: 9,
     });
@@ -94,18 +94,18 @@ describe('getCategoryPage', () => {
     expect(result).toBeNull();
   });
 
-  it('tags the posts query with category alongside posts', async () => {
+  it('tags the posts query with topic alongside posts', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawCategory())
+      .mockResolvedValueOnce(makeRawTopic())
       .mockResolvedValueOnce({ posts: [], total: 0 });
 
-    await getCategoryPage('engineering', { itemsPerPage: 9 });
+    await getTopicPage('engineering', { itemsPerPage: 9 });
 
     expect(mockRun).toHaveBeenNthCalledWith(
       2,
       expect.anything(),
       expect.objectContaining({
-        next: expect.objectContaining({ tags: ['posts', 'category'] }),
+        next: expect.objectContaining({ tags: ['posts', 'topic'] }),
       }),
     );
   });

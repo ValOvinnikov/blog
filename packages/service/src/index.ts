@@ -15,11 +15,11 @@ import { createNewsletterModuleService } from './features/modules/newsletter';
 import { createPostListModuleService } from './features/modules/post-list';
 import { createAuthorService } from './features/pages/author';
 import { createBlogService } from './features/pages/blog';
-import { createCategoryService } from './features/pages/category';
 import { createGenericPageService } from './features/pages/generic';
 import { createHomeService } from './features/pages/home';
 import { createPostService } from './features/pages/post';
 import { createTagService } from './features/pages/tag';
+import { createTopicService } from './features/pages/topic';
 
 export const service = {
   editorial: {
@@ -30,7 +30,7 @@ export const service = {
     generic: createGenericPageService(),
     blog: createBlogService(),
     post: createPostService(),
-    category: createCategoryService(),
+    topic: createTopicService(),
     tag: createTagService(),
     author: createAuthorService(),
   },
@@ -71,7 +71,6 @@ export type { TNewsletterModule } from './features/modules/newsletter';
 export type { TPostListModule } from './features/modules/post-list';
 export type { TAuthorDetail, TAuthorPage } from './features/pages/author';
 export type { TBlogIndexPage, TGetIndexPageArgs } from './features/pages/blog';
-export type { TCategoryPage } from './features/pages/category';
 export type { TGenericPage } from './features/pages/generic';
 export type { THomePage } from './features/pages/home';
 export type {
@@ -80,18 +79,19 @@ export type {
   TPostSkim,
 } from './features/pages/post';
 export type { TTagPage } from './features/pages/tag';
+export type { TTopicPage } from './features/pages/topic';
 export { urlForImage } from './sanity/image';
 export type { TTenantSanityContext } from './sanity/query';
 export { buildImageUrl } from './shared/transformers/build-image-url';
 export type { TRawImage } from './shared/transformers/build-image-url';
 export type { TArchivePostCard } from './shared/transformers/to-archive-post-card';
-export type { TCategory } from './shared/transformers/to-category';
 export type { TModule } from './shared/transformers/to-module';
 export type {
   TPostCard,
   TPostCardAuthor,
-  TPostCardCategory,
+  TPostCardTopic,
 } from './shared/transformers/to-post-card';
 export type { TSeoResolved } from './shared/transformers/resolve-seo';
 export type { TSocialLink } from './shared/transformers/to-social-link';
 export type { TTag } from './shared/transformers/to-tag';
+export type { TTopic } from './shared/transformers/to-topic';

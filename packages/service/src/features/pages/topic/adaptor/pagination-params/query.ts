@@ -4,12 +4,12 @@ import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-po
 // `perspective: 'published'` (sanity/client.ts) already excludes drafts, so a
 // plain reference count plus `PUBLISHED_POST_FILTER` (excluding future-dated
 // posts) is the published-post count. `^._id` (GROQ's parent-scope operator)
-// correlates each `blog_post` back to the enclosing category document within
-// this per-item projection — one round-trip for every category's slug + post
+// correlates each `blog_post` back to the enclosing topic document within
+// this per-item projection — one round-trip for every topic's slug + post
 // count, no per-slug fan-out (mirrors
-// packages/service/src/features/entities/categories/adaptor/query.ts, #751).
-export const categoryPaginationParamsQuery = q.star
-  .filterByType('blog_category')
+// packages/service/src/features/entities/topics/adaptor/query.ts).
+export const topicPaginationParamsQuery = q.star
+  .filterByType('blog_topic')
   .project((sub) => ({
     slug: sub.field('slug.current').notNull(),
     postCount: sub
