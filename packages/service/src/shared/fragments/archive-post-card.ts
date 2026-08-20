@@ -4,7 +4,7 @@ import { topicFragment } from './topic';
 import { WORD_COUNT_EXPRESSION, wordCountParser } from './word-count';
 
 /**
- * Archive-listing cards render text-only (decision #624) — unlike
+ * Archive-listing cards render text-only — unlike
  * `postCardFragment`, which the post-detail "related posts" feature still
  * needs in full, this fragment skips `heroImage`/`featured`/`author`
  * entirely rather than fetching fields no archive card renders. `wordCount`

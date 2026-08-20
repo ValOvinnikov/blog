@@ -8,9 +8,9 @@ type TGetAuthorPageArgs = Parameters<typeof getAuthorPage>[1];
 export function createAuthorService() {
   return {
     v1: {
-      // Loader still returns `TAuthorPage | null` for "author not found";
-      // safeAsync only wraps arbitrary query failures, so callers check
-      // `.ok` first, then `.data !== null` (see #713).
+      // Loader still returns `TAuthorPage | null` for "author not
+      // found"; safeAsync only wraps arbitrary query failures, so callers
+      // check `.ok` first, then `.data !== null`.
       getAuthorPage: safeAsync((slug: string, args: TGetAuthorPageArgs) =>
         getAuthorPage(slug, args),
       ),

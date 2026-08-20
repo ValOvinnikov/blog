@@ -15,15 +15,10 @@ vi.mock('./client', () => ({ getClient: getClientMock }));
 /**
  * `.notNull()` fragment fields on a `slice(0)` query make groqd's
  * `builder.parse()` throw — not resolve `null` — when Sanity genuinely
- * returns `null` for "no document matched" (the real shape of a `[0]`-sliced
- * GROQ query with no match). `makeSafeQueryRunner` (groqd) has no try/catch
- * around that `.parse()` call, so `runQuery` propagates the throw.
- *
- * A loader's `if (!raw) return null` guard is therefore unreachable for a
- * genuinely-missing document — `runQuery` throws before it — and only
- * catches a fetch that resolves to `null`/`undefined` for some other reason.
- * The real "not found" signal a loader's caller must handle is the throw
- * itself (via `safeAsync` at the `application/service.ts` boundary, #889).
+ * returns `null` for "no document matched". A loader's `if (!raw) return
+ * null` guard is therefore unreachable for a genuinely-missing document;
+ * `runQuery` throws before it, and `safeAsync` at the service boundary is
+ * what turns that throw into a clean `ok: false`.
  */
 describe(runQuery, () => {
   it('rejects, rather than resolving to a falsy value, when the fetch resolves null for a slice(0)+notNull query', async () => {

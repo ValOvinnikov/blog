@@ -39,8 +39,8 @@ export function makeRawPostCard(
   };
 }
 
-// Archive-listing cards render text-only (decision #624) — no
-// heroImage/featured/author fields to override, unlike `makeRawPostCard`.
+// Archive-listing cards render text-only — no heroImage/featured/author
+// fields to override, unlike `makeRawPostCard`.
 export function makeRawArchivePostCard(
   overrides: Partial<TRawArchivePostCard> = {},
 ): TRawArchivePostCard {
