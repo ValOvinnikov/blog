@@ -229,45 +229,24 @@ Sanity document action, and the seeded-migration route was chosen.
 `blog_category` fixtures — it needs the same rename and the same page-document
 seeding, or every newly provisioned tenant ships broken archives.
 
-## Redirects
+## Old URLs are not redirected
 
-Permanent (301) redirects, added regardless of whether the old URLs were ever
-indexed — the table costs nothing to maintain and makes the question moot:
+`/category/{slug}`, `/tag/{slug}`, `/tag/{slug}/rss.xml` and `/author/{slug}`
+all simply **404** after their epics land. No redirect table, and no
+`redirects()` block is added to `apps/web/next.config.ts` (which today has a
+`headers()` block and no redirects).
 
-- `/category/{slug}` → `/topics/{slug}`
-- `/category/{slug}/page/{n}` → `/topics/{slug}/page/{n}`
-- `/tag/{slug}` → `/tags/{slug}`
-- `/tag/{slug}/page/{n}` → `/tags/{slug}/page/{n}`
-- `/tag/{slug}/rss.xml` → `/tags/{slug}/rss.xml`
+This is a deliberate call, not an omission. Exposure is minimal: `noindex`
+applies outside production (SPEC §10) and `robots.ts` advertises the sitemap
+only in production, so only the production deployment was ever indexable, and
+it is a personal test blog with 12 posts. The cost of being wrong is broken
+inbound links, not lost ranking.
 
-`/author/{slug}` gets **no redirect** — it 404s. A per-author redirect would
-need a Sanity lookup (see below), and with one author and effectively no
-inbound links that machinery is not worth retaining.
-
-Note that `noindex` applies outside production (SPEC §10) and `robots.ts` only
-advertises the sitemap in production, so only the production deployment was
-ever indexable.
-
-### Where the redirects live
-
-Two homes, because the table is not uniform.
-
-**Static 1:1 path rewrites → `apps/web/next.config.ts`.** The config has a
-`headers()` block but **no `redirects()`** today; this adds one. Next runs
-`next.config` redirects _before_ middleware, so `/category/foo` is answered
-with a 308 without ever reaching `proxy.ts`'s tenant resolution. next-intl is
-locale-prefix-free here, so source patterns match the public URL directly and
-need no locale segment:
-
-- `/category/:slug*` → `/topics/:slug*`
-- `/tag/:slug*` → `/tags/:slug*`
-- `/tag/:slug/rss.xml` → `/tags/:slug/rss.xml`
-
-**Nothing content-dependent.** A `/author/{slug}` → profile-page redirect was
-considered and rejected: it would need a Sanity lookup, so a route would have
-to survive purely to fetch the author and `permanentRedirect`, which in turn
-would force `blog_author.slug` and an author-by-slug service loader to be
-retained. Letting those paths 404 keeps E9 a clean deletion.
+**Not to be confused with pagination canonicalisation.** The existing
+`/{path}/page/1` → `/{path}` 308 redirects are a different mechanism, internal
+to each archive route, and they **stay** — every new paginated page epic
+carries one, matching what `/blog/page/[page]` and the category/tag routes do
+today.
 
 ### `RESERVED_SLUGS` must be updated
 
@@ -275,15 +254,13 @@ retained. Letting those paths 404 keeps E9 a clean deletion.
 with real routes. It is currently
 `blog, category, tag, author, api, page, topics`.
 
-- **Add `tags`** — the new index route.
-- **Keep `category` and `tag`** even though those routes go away — the
-  redirects still occupy those paths, and a generic page claiming slug
-  `category` would shadow them.
-- **`author` may be released.** Nothing occupies that path once the routes are
-  deleted and no redirect replaces them. Releasing it is optional; keeping it
-  costs nothing.
-
-This is a config sub-issue of E1 (for `tags` it is E7's).
+- **Add `tags`** — the new index route. This is a config sub-issue of E7.
+- **`category`, `tag` and `author` may all be released** once their routes are
+  gone, since nothing occupies those paths and no redirect replaces them.
+  Keeping them costs nothing and stops an editor publishing a confusingly
+  named page at `/category`; releasing them is equally defensible. Either way
+  it is a judgement call for the epic that removes the route, not a
+  correctness issue.
 
 ## Out of scope
 
@@ -343,8 +320,8 @@ flip it to required.
 ### Foundation epics
 
 **E1 — rename `category` to `topic`.** `blog_category` → `blog_topic`, the post
-field, `/category/{slug}` → `/topics/{slug}`, redirects, and the rename
-migration. Touches config, cms, service, web, db fixtures, ui story fixtures.
+field, `/category/{slug}` → `/topics/{slug}`, and the rename migration. Old
+`/category/*` URLs 404 — no redirects. Touches config, cms, service, web, db fixtures, ui story fixtures.
 **Single PR** (constraint 1). Behaviour-neutral — no page documents yet,
 archives still render from the existing hardcoded grids. First, so every later
 epic is written in the final vocabulary.
@@ -385,7 +362,7 @@ service → web, plus the seeding migration for the 1 existing topic.
 — nothing exists today. Sub-issues: cms → service → web.
 
 **E8 — `/tags/{slug}` page.** `page_tag`, the `/tag/` → `/tags/` URL move, the
-`/tags/{slug}/rss.xml` feed move, redirects, and the seeding migration for
+`/tags/{slug}/rss.xml` feed move, and the seeding migration for
 **15 tags** (30 documents, per Migration above). Retires `TAG_ITEMS_PER_PAGE`
 and the hardcoded tag grid. Sub-issues: config (routes helper) → cms → service
 → web. The largest page epic, because of the seeding.
