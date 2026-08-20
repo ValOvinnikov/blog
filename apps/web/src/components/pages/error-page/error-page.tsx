@@ -31,7 +31,8 @@ export function ErrorPage({ error, reset }: TErrorPageProps) {
     // Written after mount, not on first paint — a live region that's
     // already populated when it enters the DOM is unreliably announced.
     if (announcementRef.current) {
-      announcementRef.current.textContent = 'Something went wrong';
+      announcementRef.current.textContent =
+        'Something went wrong. You can try again, or go home.';
     }
     mainRef.current?.focus();
   }, [error]);
