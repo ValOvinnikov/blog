@@ -143,7 +143,7 @@ and the post detail page. Removing it therefore touches:
 - `packages/service` — drop `slug` from `authorCardFragment` and
   `authorDetailFragment`, and from the view-model types.
 - `apps/web` — `blog-post-page.tsx:189` builds `author.href` from
-  `routes.author(author.slug)`; it reads the profile-page reference instead.
+  `routes.author(author.slug)`; it reads the `profilePage` reference instead.
 - The migration — removing a field from live documents. Additive-only rules do
   not apply here.
 
@@ -231,11 +231,51 @@ indexed — the table costs nothing to maintain and makes the question moot:
 - `/tag/{slug}` → `/tags/{slug}`
 - `/tag/{slug}/page/{n}` → `/tags/{slug}/page/{n}`
 - `/tag/{slug}/rss.xml` → `/tags/{slug}/rss.xml`
-- `/author/{slug}` → the author's referenced generic page, or `/blog` when unset
+
+`/author/{slug}` gets **no redirect** — it 404s. A per-author redirect would
+need a Sanity lookup (see below), and with one author and effectively no
+inbound links that machinery is not worth retaining.
 
 Note that `noindex` applies outside production (SPEC §10) and `robots.ts` only
 advertises the sitemap in production, so only the production deployment was
 ever indexable.
+
+### Where the redirects live
+
+Two homes, because the table is not uniform.
+
+**Static 1:1 path rewrites → `apps/web/next.config.ts`.** The config has a
+`headers()` block but **no `redirects()`** today; this adds one. Next runs
+`next.config` redirects _before_ middleware, so `/category/foo` is answered
+with a 308 without ever reaching `proxy.ts`'s tenant resolution. next-intl is
+locale-prefix-free here, so source patterns match the public URL directly and
+need no locale segment:
+
+- `/category/:slug*` → `/topics/:slug*`
+- `/tag/:slug*` → `/tags/:slug*`
+- `/tag/:slug/rss.xml` → `/tags/:slug/rss.xml`
+
+**Nothing content-dependent.** A `/author/{slug}` → profile-page redirect was
+considered and rejected: it would need a Sanity lookup, so a route would have
+to survive purely to fetch the author and `permanentRedirect`, which in turn
+would force `blog_author.slug` and an author-by-slug service loader to be
+retained. Letting those paths 404 keeps E9 a clean deletion.
+
+### `RESERVED_SLUGS` must be updated
+
+`@blog/config`'s `RESERVED_SLUGS` guards `page_generic` slugs against colliding
+with real routes. It is currently
+`blog, category, tag, author, api, page, topics`.
+
+- **Add `tags`** — the new index route.
+- **Keep `category` and `tag`** even though those routes go away — the
+  redirects still occupy those paths, and a generic page claiming slug
+  `category` would shadow them.
+- **`author` may be released.** Nothing occupies that path once the routes are
+  deleted and no redirect replaces them. Releasing it is optional; keeping it
+  costs nothing.
+
+This is a config sub-issue of E1 (for `tags` it is E7's).
 
 ## Out of scope
 
@@ -342,15 +382,16 @@ service → web, plus the seeding migration for the 1 existing topic.
 and the hardcoded tag grid. Sub-issues: config (routes helper) → cms → service
 → web. The largest page epic, because of the seeding.
 
-**E9 — remove `/author/{slug}`.** Delete the author routes, `AuthorPage`, the
-metadata builder, `packages/service/src/features/pages/author/`,
-`routes.author()`, `AUTHOR_ITEMS_PER_PAGE`, and the sitemap entries; add
-`blog_author`'s optional `profilePage` reference and point bylines at it; then
-remove the now-dead `slug` field from `blog_author` and both author fragments
-(see "The `blog_author` schema changes too" above — this reaches into every
-post card, so it is not a local deletion). Sub-issues: config → cms → service →
-web, plus a migration that drops the field. **Independent of E2–E8** — can run
-in parallel at any point after E1.
+**E9 — remove `/author/{slug}`.** Delete **both** author route files,
+`AuthorPage`, the metadata builder,
+`packages/service/src/features/pages/author/`, `routes.author()`,
+`AUTHOR_ITEMS_PER_PAGE`, and the sitemap entries — those paths 404, with no
+redirect. Add `blog_author`'s optional `profilePage` reference and point
+bylines at it; then remove the now-dead `slug` field from `blog_author` and
+both author fragments (see "The `blog_author` schema changes too" above — this
+reaches into every post card, so it is not a local deletion). Sub-issues:
+config → cms → service → web, plus a migration that drops the field.
+**Independent of E2–E8** — can run in parallel at any point after E1.
 
 **E10 — `/{slug}` generic pages may host a post list.** Adds `module_postList`
 to `page_generic`'s allowed `modules[]` types. Sub-issues: cms → web. Smallest
