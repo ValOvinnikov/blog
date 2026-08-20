@@ -3,6 +3,7 @@ import { titleField } from '@cms/schema-types/helpers/title-field';
 import { ctaSchema } from '@cms/schema-types/modules/module-cta';
 import { heroSchema } from '@cms/schema-types/modules/module-hero';
 import { newsletterSchema } from '@cms/schema-types/modules/module-newsletter';
+import { postLatestSchema } from '@cms/schema-types/modules/module-post-latest';
 import { postListSchema } from '@cms/schema-types/modules/module-post-list';
 import { seoSchema } from '@cms/schema-types/objects/seo';
 import { House } from 'lucide-react';
@@ -35,7 +36,12 @@ export const homePageSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     defineModulesField({
-      allow: [postListSchema.name, ctaSchema.name, newsletterSchema.name],
+      allow: [
+        postListSchema.name,
+        postLatestSchema.name,
+        ctaSchema.name,
+        newsletterSchema.name,
+      ],
     }),
     defineField({
       name: 'seo',

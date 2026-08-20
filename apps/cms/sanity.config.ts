@@ -16,6 +16,7 @@ import { contentSchema } from '@cms/schema-types/modules/module-content';
 import { ctaSchema } from '@cms/schema-types/modules/module-cta';
 import { heroSchema } from '@cms/schema-types/modules/module-hero';
 import { newsletterSchema } from '@cms/schema-types/modules/module-newsletter';
+import { postLatestSchema } from '@cms/schema-types/modules/module-post-latest';
 import { postListSchema } from '@cms/schema-types/modules/module-post-list';
 import { codeInput } from '@sanity/code-input';
 import { visionTool } from '@sanity/vision';
@@ -109,6 +110,9 @@ export default defineConfig({
                       .icon(Sparkles),
                     S.documentTypeListItem(postListSchema.name)
                       .title('Post Lists')
+                      .icon(List),
+                    S.documentTypeListItem(postLatestSchema.name)
+                      .title('Post Latest')
                       .icon(List),
                     S.documentTypeListItem(contentSchema.name)
                       .title('Content')
