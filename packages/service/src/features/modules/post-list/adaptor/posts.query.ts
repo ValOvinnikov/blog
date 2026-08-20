@@ -1,15 +1,11 @@
 import { MODULE_PAGE_CONTEXT, type TModulePageContext } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
+import { TAG_SCOPE_FILTER } from '@blog/service/shared/filters/tag-scope';
+import { TOPIC_SCOPE_FILTER } from '@blog/service/shared/filters/topic-scope';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 type TPostListModuleParams = { slug?: string };
-
-// Mirrors `topic/adaptor/detail-page/posts.query.ts` and
-// `tag/adaptor/detail-page/posts.query.ts` — dereferenced paths aren't
-// covered by groqd's `filterBy` typing, so both go through `filterRaw`.
-const TOPIC_SCOPE_FILTER = 'topic->slug.current == $slug';
-const TAG_SCOPE_FILTER = '$slug in tags[]->slug.current';
 
 function scopedPosts(context?: TModulePageContext) {
   const base = q
@@ -28,12 +24,10 @@ function scopedPosts(context?: TModulePageContext) {
 
 /**
  * Newest posts for a post-list module, optionally scoped by page context.
- * Built per-request so `limit` is applied in GROQ — Sanity returns at most
- * `limit` documents instead of the whole `blog_post` collection.
- * `.slice(0, limit)` is end-exclusive, so it yields indices `0..limit-1`.
- *
- * Omitting `context` (or passing a HOME/BLOG/GENERIC one) filters nothing
- * beyond publish status — same query as an unscoped module.
+ * Built per-request so `limit` bounds the results in GROQ (end-exclusive
+ * `.slice(0, limit)`) rather than fetching the whole `blog_post` collection
+ * to slice in JS; omitting `context`, or passing HOME/BLOG/GENERIC, filters
+ * nothing beyond publish status.
  */
 export const postListModulePostsQuery = (
   limit: number,

@@ -1,14 +1,12 @@
 import { q, type TSlugParams } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
+import { TAG_SCOPE_FILTER } from '@blog/service/shared/filters/tag-scope';
 import { archivePostCardFragment } from '@blog/service/shared/fragments/archive-post-card';
 
-// `filterBy`'s strong typing only covers simple equality/comparison
-// expressions; the `in` operator across a dereferenced array isn't
-// supported, so this stays a `filterRaw` call.
 const tagPosts = q
   .parameters<TSlugParams>()
   .star.filterByType('blog_post')
-  .filterRaw('$slug in tags[]->slug.current')
+  .filterRaw(TAG_SCOPE_FILTER)
   .filterRaw(PUBLISHED_POST_FILTER);
 
 export const buildTagPostsPageQuery = (start: number, end: number) =>
