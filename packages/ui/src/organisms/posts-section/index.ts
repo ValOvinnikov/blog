@@ -1,5 +1,5 @@
 export type {
-  IPostCardCategoryData,
+  IPostCardTopicData,
   IPostCardData,
   TPostsSectionProps,
 } from './posts-section';

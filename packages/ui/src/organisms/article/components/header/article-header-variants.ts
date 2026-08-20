@@ -4,7 +4,7 @@ export const articleHeaderVariants = tv({
   slots: {
     root: ['w-full'],
     headingGroup: ['max-w-[800px] mx-auto'],
-    category: ['mb-2'],
+    topic: ['mb-2'],
     title: ['mt-3'],
     lead: ['mt-4 max-w-measure'],
     meta: ['mt-4'],

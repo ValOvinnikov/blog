@@ -13,7 +13,7 @@ const makePost = (): IPostCardData => ({
   excerpt: faker.lorem.paragraph(),
   publishedAt: faker.date.past().toISOString(),
   formattedDate: faker.date.past().toLocaleDateString(),
-  category: { title: faker.lorem.word() },
+  topic: { title: faker.lorem.word() },
 });
 
 const posts = faker.helpers.multiple(makePost, { count: 3 });
@@ -84,19 +84,19 @@ describe(`<${PostsSection.name}/>`, () => {
     expect(screen.getByTestId('latest-posts-section')).toBeVisible();
   });
 
-  it('renders each post category lowercased in the footer', () => {
+  it('renders each post topic lowercased in the footer', () => {
     setup();
 
     for (const post of posts) {
       expect(
-        screen.getByText(post.category.title.toLowerCase(), {
+        screen.getByText(post.topic.title.toLowerCase(), {
           exact: false,
         }),
       ).toBeVisible();
     }
   });
 
-  it('renders a trailing arrow icon in each post category footer', () => {
+  it('renders a trailing arrow icon in each post topic footer', () => {
     setup();
 
     expect(screen.getAllByTestId('post-card-footer-arrow')).toHaveLength(

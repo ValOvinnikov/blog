@@ -14,7 +14,7 @@ import {
   type TPostsSectionVariants,
 } from './posts-section-variants';
 
-export interface IPostCardCategoryData {
+export interface IPostCardTopicData {
   title: string;
 }
 
@@ -26,7 +26,7 @@ export interface IPostCardData {
   publishedAt: string;
   formattedDate: string;
   readingTime?: string;
-  category: IPostCardCategoryData;
+  topic: IPostCardTopicData;
 }
 
 export type TPostsSectionProps = IWithClassName &
@@ -67,7 +67,7 @@ export type TPostsSectionProps = IWithClassName &
 /**
  * PostsSection — labeled section rendering a set of posts in a responsive
  * grid, generic enough to reuse for other post listings (e.g. related posts,
- * category pages).
+ * topic pages).
  */
 export const PostsSection = ({
   posts,
@@ -119,7 +119,7 @@ export const PostsSection = ({
                 </Component>
               </PostCard.Title>
               <PostCard.Footer
-                category={post.category.title}
+                topic={post.topic.title}
                 trailingIcon={
                   <Icon
                     name={ICONS.ARROW}

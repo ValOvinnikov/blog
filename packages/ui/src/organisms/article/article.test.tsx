@@ -35,7 +35,7 @@ describe(`<${Article.name}/>`, () => {
     expect(screen.getByText('Post body content.')).toBeVisible();
   });
 
-  it('renders no category eyebrow when category is omitted', () => {
+  it('renders no topic eyebrow when topic is omitted', () => {
     renderElement(
       <Article>
         <Article.Header title="Building a Design System" meta={meta} />
@@ -47,12 +47,12 @@ describe(`<${Article.name}/>`, () => {
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it('renders the category eyebrow as non-heading text when no href is given', () => {
+  it('renders the topic eyebrow as non-heading text when no href is given', () => {
     renderElement(
       <Article>
         <Article.Header
           title="Building a Design System"
-          category={{ label: 'Engineering' }}
+          topic={{ label: 'Engineering' }}
           meta={meta}
         />
         <Article.Body>
@@ -69,12 +69,12 @@ describe(`<${Article.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders the category eyebrow as a link when href is given', () => {
+  it('renders the topic eyebrow as a link when href is given', () => {
     renderElement(
       <Article>
         <Article.Header
           title="Building a Design System"
-          category={{ label: 'Engineering', href: '/topics/engineering' }}
+          topic={{ label: 'Engineering', href: '/topics/engineering' }}
           meta={meta}
         />
         <Article.Body>
@@ -88,12 +88,12 @@ describe(`<${Article.name}/>`, () => {
     );
   });
 
-  it('renders exactly one h1 — the post title — when a category eyebrow is present', () => {
+  it('renders exactly one h1 — the post title — when a topic eyebrow is present', () => {
     renderElement(
       <Article>
         <Article.Header
           title="Building a Design System"
-          category={{ label: 'Engineering', href: '/topics/engineering' }}
+          topic={{ label: 'Engineering', href: '/topics/engineering' }}
           meta={meta}
         />
         <Article.Body>

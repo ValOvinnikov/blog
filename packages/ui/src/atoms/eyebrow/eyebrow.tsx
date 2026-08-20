@@ -14,9 +14,9 @@ export type TEyebrowProps = TEyebrowOwnProps &
 
 /**
  * Eyebrow atom — small uppercase label displayed above a heading to provide
- * contextual category or section context. Renders as a plain `<p>` by
+ * contextual topic or section context. Renders as a plain `<p>` by
  * default; pass `href` (and optionally `linkAs`, defaulting to `'a'`) to
- * render it as a link to the category route instead.
+ * render it as a link to the topic route instead.
  */
 export const Eyebrow = ({
   href,

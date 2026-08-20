@@ -3,7 +3,7 @@ export type {
   TArticleFooterProps,
 } from './components/footer/article-footer';
 export type {
-  IArticleHeaderCategory,
+  IArticleHeaderTopic,
   TArticleHeaderProps,
 } from './components/header/article-header';
 export type { TArticleProps } from './article';

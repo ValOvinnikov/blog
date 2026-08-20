@@ -28,7 +28,7 @@ export type TBreadcrumbsProps = IWithClassName &
 const s = breadcrumbsVariants();
 
 /**
- * Breadcrumbs — page-chrome navigation trail (e.g. `Home › Category ›
+ * Breadcrumbs — page-chrome navigation trail (e.g. `Home › Topic ›
  * Post title`). Every item except the last renders as a link; the last item
  * is the current page, rendered as plain text with `aria-current="page"`.
  * The trail stays on a single line at every viewport width; earlier items
