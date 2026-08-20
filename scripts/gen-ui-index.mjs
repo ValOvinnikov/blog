@@ -41,6 +41,7 @@ const uiSrc = join(uiRoot, 'src');
 const outFile = join(uiRoot, 'COMPONENTS.md');
 const LAYERS = ['atoms', 'molecules', 'organisms'];
 const TYPE_MAX = 64; // truncate over-long prop type text to keep the manifest lean
+const POLYMORPHIC_WRAPPER = 'TPolymorphicProps'; // the Level-2 props helper
 
 const collapse = (s) => s.replace(/\s+/g, ' ').trim();
 
@@ -145,11 +146,16 @@ const findPropsType = (sf, name) => {
 // sibling type by exact name so a caller can fall through to it instead of
 // documenting an empty props list.
 const findOwnPropsType = (sf, name) => {
-  const ownNames = [`I${name}OwnProps`, `T${name}OwnProps`];
+  const preferredNames = [`I${name}OwnProps`, `T${name}OwnProps`];
+  const candidates = [];
   for (const stmt of sf.statements) {
     if (ts.isInterfaceDeclaration(stmt) || ts.isTypeAliasDeclaration(stmt)) {
-      if (ownNames.includes(stmt.name.text)) return stmt;
+      if (preferredNames.includes(stmt.name.text)) candidates.push(stmt);
     }
+  }
+  for (const preferred of preferredNames) {
+    const match = candidates.find((c) => c.name.text === preferred);
+    if (match) return match;
   }
   return null;
 };
@@ -307,7 +313,19 @@ const describeComponent = (sf, file, name) => {
     const ownPropsType = findOwnPropsType(sf, name);
     if (ownPropsType) {
       const own = extractProps(ownPropsType, sf);
-      if (own.props.length) ({ props, extendsList } = own);
+      if (own.props.length) {
+        // Drop only the wrapper — a bare `<Name>OwnProps`, or the
+        // `TPolymorphicProps<…>` around it (prefix-matched, since a long
+        // reference is truncated) — so sibling mixins survive. Match the name
+        // exactly: `Omit<…, keyof <Name>OwnProps>` merely mentions it.
+        const ownName = ownPropsType.name.text;
+        const inherited = extendsList.filter(
+          (ref) =>
+            ref !== ownName && !ref.startsWith(`${POLYMORPHIC_WRAPPER}<`),
+        );
+        props = own.props;
+        extendsList = [...new Set([...own.extendsList, ...inherited])];
+      }
     }
   }
   const variantsFile = file.replace(/\.tsx?$/, '-variants.ts');

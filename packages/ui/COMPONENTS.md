@@ -50,7 +50,7 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### Eyebrow — `atoms/eyebrow/eyebrow.tsx`
 
 Eyebrow atom — small uppercase label displayed above a heading to provide contextual category or section context.
-Props: href?: string · linkAs?: TAnchorElementType _(extends IWithDataTestId)_
+Props: href?: string · linkAs?: TAnchorElementType _(extends IWithDataTestId, Omit<HTMLAttributes<HTMLElement>, keyof TEyebro…)_
 Variants: hasHref: (boolean)
 
 ### Heading — `atoms/heading/heading.tsx`
@@ -209,7 +209,7 @@ Slots:
 
 - **PopoverMenu.Trigger** — icon-button that opens/closes a `PopoverMenu.Panel`. Props: ariaLabel: string · isOpen: boolean · panelId: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · variant?: TIconButtonVariants['variant'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, IWithDataTestId)_
 - **PopoverMenu.Panel** — the non-modal menu surface (`role="menu"`) a `PopoverMenu.Trigger` opens. Props: id: string · isOpen: boolean · ariaLabel?: string · children?: ReactNode · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
-- **PopoverMenu.Item** — a single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). Props: className?: string · icon?: ReactNode _(extends TPopoverMenuItemVariants)_ · Variants: variant: bordered
+- **PopoverMenu.Item** — a single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). Props: className?: string · icon?: ReactNode _(extends TPopoverMenuItemVariants, IWithDataTestId)_ · Variants: variant: bordered
 - **PopoverMenu.Separator** — a thin hairline dividing groups of `PopoverMenu.Item`s inside a `PopoverMenu.Panel` (e.g. a "Copy link" action from a list of social-share links). Props: className?: string _(extends IWithDataTestId)_
 
 ### PostCard — `molecules/post-card/post-card.tsx`
