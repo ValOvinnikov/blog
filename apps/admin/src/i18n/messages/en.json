@@ -282,18 +282,14 @@
     "confirmButton": "Deprovision",
     "confirmingButton": "Dispatching…",
     "archivedBadge": "Deprovisioned",
-    "archivedAt": "Deprovisioned {date}"
-  },
-  "deleteTenantControl": {
-    "heading": "Delete tenant",
-    "description": "Permanently removes this tenant and every dependent row (memberships, subscribers, bookmarks, domains, site config) from the database. This cannot be undone, and releases the slug for reuse.",
-    "triggerButton": "Delete tenant permanently",
-    "dialogTitle": "Delete {name}",
-    "dialogDescription": "This permanently deletes the tenant row and everything that depends on it. Type the tenant's name to confirm.",
-    "confirmLabel": "Type \"{name}\" to confirm",
-    "confirmHint": "Must match the tenant's name exactly.",
-    "cancelButton": "Cancel",
-    "confirmButton": "Delete",
-    "confirmingButton": "Deleting…"
+    "archivedAt": "Deprovisioned {date}",
+    "deleteDescription": "Permanently removes this tenant and every dependent row (memberships, subscribers, bookmarks, domains, site config) from the database. This cannot be undone, and releases the slug for reuse.",
+    "deleteTriggerButton": "Delete tenant permanently",
+    "deleteDialogTitle": "Delete {name}",
+    "deleteDialogDescription": "This permanently deletes the tenant row and everything that depends on it. Type the tenant's name to confirm.",
+    "deleteConfirmLabel": "Type \"{name}\" to confirm",
+    "deleteConfirmHint": "Must match the tenant's name exactly.",
+    "deleteConfirmButton": "Delete",
+    "deleteConfirmingButton": "Deleting…"
   }
 }

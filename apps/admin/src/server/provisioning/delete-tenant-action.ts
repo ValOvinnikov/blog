@@ -1,7 +1,7 @@
 'use server';
 
 import { recordAuditEvent } from '@admin/server/audit/record-audit-event';
-import { requireSuperAdmin } from '@admin/server/auth/require-super-admin';
+import { requireAdmin } from '@admin/server/auth/require-admin';
 import { logger } from '@admin/utils/logger/logger';
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
@@ -16,17 +16,18 @@ export type TDeleteTenantInput = z.input<typeof deleteTenantInputSchema>;
 export type TDeleteTenantResult = { ok: true } | { ok: false; error: string };
 
 /**
- * The tenant status page's hard-delete control. Only offered for a tenant
- * already archived (`deprovisionedAt` set) — deleting the row first would
- * orphan any Sanity/Vercel infrastructure deprovisioning would otherwise
- * have torn down, so this re-checks that precondition independently of the
- * client, which should never render the trigger for a live tenant at all.
+ * The tenant status page's hard-delete control. Fetches the tenant to
+ * validate `confirm` against its live name (not trusting the client) and to
+ * carry `name`/`slug` into the audit record; the archived precondition
+ * itself is left to `queries.tenants.deleteTenant`'s own typed refusal
+ * rather than re-checked here, since re-fetching just to duplicate a check
+ * the mutation already makes atomically would only widen the race window.
  */
 export async function deleteTenantAction(
   tenantId: string,
   input: TDeleteTenantInput,
 ): Promise<TDeleteTenantResult> {
-  await requireSuperAdmin();
+  await requireAdmin();
 
   const parsed = deleteTenantInputSchema.safeParse(input);
   if (!parsed.success) {
@@ -41,23 +42,28 @@ export async function deleteTenantAction(
     return { ok: false, error: 'Tenant not found.' };
   }
 
-  if (!tenant.deprovisionedAt) {
-    return {
-      ok: false,
-      error: 'This tenant must be archived before it can be deleted.',
-    };
-  }
-
   const { confirm } = parsed.data;
   if (confirm !== tenant.name) {
     return { ok: false, error: "Doesn't match the tenant's name." };
   }
 
+  let result;
   try {
-    await queries.tenants.deleteTenant(tenantId);
+    result = await queries.tenants.deleteTenant(tenantId);
   } catch (error) {
     logger.error('tenants.delete_failed', { tenantId, error });
     return { ok: false, error: "Couldn't delete the tenant — try again." };
+  }
+
+  if (result.outcome === 'not-found') {
+    return { ok: false, error: 'Tenant not found.' };
+  }
+
+  if (result.outcome === 'not-archived') {
+    return {
+      ok: false,
+      error: 'This tenant must be archived before it can be deleted.',
+    };
   }
 
   await recordAuditEvent({

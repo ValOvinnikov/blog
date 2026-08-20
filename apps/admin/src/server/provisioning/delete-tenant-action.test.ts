@@ -1,14 +1,14 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 
 const {
-  requireSuperAdminMock,
+  requireAdminMock,
   authMock,
   listTenantsByIdsMock,
   deleteTenantMock,
   insertAuditEventMock,
   loggerErrorMock,
 } = vi.hoisted(() => ({
-  requireSuperAdminMock: vi.fn(),
+  requireAdminMock: vi.fn(),
   authMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   deleteTenantMock: vi.fn(),
@@ -16,8 +16,8 @@ const {
   loggerErrorMock: vi.fn(),
 }));
 
-vi.mock('@admin/server/auth/require-super-admin', () => ({
-  requireSuperAdmin: requireSuperAdminMock,
+vi.mock('@admin/server/auth/require-admin', () => ({
+  requireAdmin: requireAdminMock,
 }));
 
 vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
@@ -45,11 +45,8 @@ const tenant = {
 
 describe('deleteTenantAction', () => {
   beforeEach(() => {
-    requireSuperAdminMock.mockReset();
-    requireSuperAdminMock.mockResolvedValue({
-      id: 'admin-1',
-      role: 'SUPERADMIN',
-    });
+    requireAdminMock.mockReset();
+    requireAdminMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     authMock.mockReset();
     authMock.mockResolvedValue({
       user: { id: 'operator-1', email: 'operator@example.com' },
@@ -57,14 +54,14 @@ describe('deleteTenantAction', () => {
     listTenantsByIdsMock.mockReset();
     listTenantsByIdsMock.mockResolvedValue([tenant]);
     deleteTenantMock.mockReset();
-    deleteTenantMock.mockResolvedValue(undefined);
+    deleteTenantMock.mockResolvedValue({ outcome: 'deleted' });
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
   });
 
-  it('requires a super-admin session before deleting', async () => {
-    requireSuperAdminMock.mockImplementation(() => {
+  it('requires an admin session before deleting', async () => {
+    requireAdminMock.mockImplementation(() => {
       throw new Error('NEXT_REDIRECT');
     });
     const { deleteTenantAction } = await import('./delete-tenant-action');
@@ -87,20 +84,6 @@ describe('deleteTenantAction', () => {
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });
 
-  it('returns an error when the tenant is not yet archived', async () => {
-    listTenantsByIdsMock.mockResolvedValue([
-      { ...tenant, deprovisionedAt: null },
-    ]);
-    const { deleteTenantAction } = await import('./delete-tenant-action');
-
-    const result = await deleteTenantAction('tenant-1', {
-      confirm: 'Acme Inc.',
-    });
-
-    expect(result).toEqual({ ok: false, error: expect.any(String) });
-    expect(deleteTenantMock).not.toHaveBeenCalled();
-  });
-
   it('returns an error when confirm does not match the tenant name', async () => {
     const { deleteTenantAction } = await import('./delete-tenant-action');
 
@@ -110,6 +93,30 @@ describe('deleteTenantAction', () => {
 
     expect(result).toEqual({ ok: false, error: expect.any(String) });
     expect(deleteTenantMock).not.toHaveBeenCalled();
+  });
+
+  it('returns an error and records no audit event when the mutation refuses a non-archived tenant', async () => {
+    deleteTenantMock.mockResolvedValue({ outcome: 'not-archived' });
+    const { deleteTenantAction } = await import('./delete-tenant-action');
+
+    const result = await deleteTenantAction('tenant-1', {
+      confirm: 'Acme Inc.',
+    });
+
+    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  it('returns an error and records no audit event when the mutation reports the tenant gone', async () => {
+    deleteTenantMock.mockResolvedValue({ outcome: 'not-found' });
+    const { deleteTenantAction } = await import('./delete-tenant-action');
+
+    const result = await deleteTenantAction('tenant-1', {
+      confirm: 'Acme Inc.',
+    });
+
+    expect(result).toEqual({ ok: false, error: expect.any(String) });
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('deletes the tenant and records a DELETED audit event when confirm matches the live name', async () => {

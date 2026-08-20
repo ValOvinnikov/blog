@@ -1,4 +1,3 @@
-import { DeleteTenantControl } from '@admin/components/delete-tenant-control';
 import { DeprovisionTenantControl } from '@admin/components/deprovision-tenant-control';
 import { ProvisioningStatusView } from '@admin/components/provisioning-status-view';
 import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
@@ -30,7 +29,6 @@ export function TenantStatusView({
         domainVerificationStatus={domainVerificationStatus}
       />
       <DeprovisionTenantControl tenant={tenant} />
-      {tenant.deprovisionedAt && <DeleteTenantControl tenant={tenant} />}
     </div>
   );
 }
