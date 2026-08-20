@@ -37,7 +37,7 @@ describe('Sanity client module loading', () => {
     getClient();
 
     // Next's tagged data cache is the sole caching layer — a CDN read after a
-    // tag purge can re-cache stale content (#316).
+    // tag purge can re-cache stale content.
     expect(createClientMock).toHaveBeenCalledWith(
       expect.objectContaining({ useCdn: false }),
     );

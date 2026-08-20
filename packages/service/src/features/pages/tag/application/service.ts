@@ -8,9 +8,9 @@ type TGetTagPageArgs = Parameters<typeof getTagPage>[1];
 export function createTagService() {
   return {
     v1: {
-      // Loader still returns `TTagPage | null` for "tag not found";
-      // safeAsync only wraps arbitrary query failures, so callers check
-      // `.ok` first, then `.data !== null` (see #713).
+      // Loader still returns `TTagPage | null` for "tag not
+      // found"; safeAsync only wraps arbitrary query failures, so callers
+      // check `.ok` first, then `.data !== null`.
       getTagPage: safeAsync((slug: string, args: TGetTagPageArgs) =>
         getTagPage(slug, args),
       ),
