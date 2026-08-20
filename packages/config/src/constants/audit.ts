@@ -16,6 +16,7 @@ export const AUDIT_ACTION = {
   ARCHIVED: 'ARCHIVED',
   DEPROVISIONED: 'DEPROVISIONED',
   SETTINGS_UPDATED: 'SETTINGS_UPDATED',
+  DELETED: 'DELETED',
 } as const;
 
 export type TAuditAction = TValueOf<typeof AUDIT_ACTION>;

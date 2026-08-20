@@ -17,6 +17,10 @@ vi.mock('@admin/server/provisioning/deprovision-tenant-action', () => ({
   deprovisionTenantAction: vi.fn(),
 }));
 
+vi.mock('@admin/server/provisioning/delete-tenant-action', () => ({
+  deleteTenantAction: vi.fn(),
+}));
+
 vi.mock(
   '@admin/server/provisioning/get-tenant-provisioning-status-action',
   () => ({
@@ -51,9 +55,12 @@ describe(TenantStatusView, () => {
     expect(
       screen.getByRole('button', { name: 'Deprovision tenant' }),
     ).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Delete tenant permanently' }),
+    ).not.toBeInTheDocument();
   });
 
-  it('shows the archived state instead of the trigger for a deprovisioned tenant', () => {
+  it('shows the archived state and the delete control for a deprovisioned tenant', () => {
     const tenant = makeTenant({
       deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
     });
@@ -68,5 +75,8 @@ describe(TenantStatusView, () => {
     expect(
       screen.queryByRole('button', { name: 'Deprovision tenant' }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Delete tenant permanently' }),
+    ).toBeVisible();
   });
 });

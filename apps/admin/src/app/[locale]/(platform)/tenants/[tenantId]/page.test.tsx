@@ -28,6 +28,10 @@ vi.mock('@admin/server/provisioning/deprovision-tenant-action', () => ({
   deprovisionTenantAction: vi.fn(),
 }));
 
+vi.mock('@admin/server/provisioning/delete-tenant-action', () => ({
+  deleteTenantAction: vi.fn(),
+}));
+
 vi.mock(
   '@admin/server/provisioning/get-tenant-provisioning-status-action',
   () => ({
