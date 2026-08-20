@@ -30,6 +30,12 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
+  it('maps the post-latest teaser module to its ISR tag plus the per-document tag', () => {
+    expect(
+      getRevalidateTagsForType('module_postLatest', 'post-latest-1'),
+    ).toEqual(['modules:postLatest', 'module:post-latest-1']);
+  });
+
   it('maps the newsletter module to its ISR tag plus the per-document tag', () => {
     expect(
       getRevalidateTagsForType('module_newsletter', 'newsletter-1'),
