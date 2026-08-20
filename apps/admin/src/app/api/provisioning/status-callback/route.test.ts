@@ -1,14 +1,11 @@
-export {};
+import { mockDbConstants } from '@admin/testing/mock-db-constants';
 
 const { updateProvisioningStepMock } = vi.hoisted(() => ({
   updateProvisioningStepMock: vi.fn(),
 }));
 
-// Mocks only `queries` — spreading the real `@blog/db` barrel here would
-// also load its Neon/Drizzle client, so the provisioning-step constants
-// come from the lighter constants-only module instead.
 vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+  ...(await mockDbConstants()),
   queries: { tenants: { updateProvisioningStep: updateProvisioningStepMock } },
 }));
 

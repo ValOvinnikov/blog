@@ -1,4 +1,5 @@
 import { customRenderAsync, screen } from '@admin/testing/custom-render';
+import { mockDbConstants } from '@admin/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
 
 import DashboardLookPage from './page';
@@ -18,7 +19,7 @@ const {
 vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
 
 vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+  ...(await mockDbConstants()),
   queries: {
     memberships: { listMembershipsForUser: listMembershipsForUserMock },
     tenants: { listTenantsByIds: listTenantsByIdsMock },
