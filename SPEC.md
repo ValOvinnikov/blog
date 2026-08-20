@@ -27,23 +27,25 @@ frontend if a consumer is out of date.
 
 **Primary surfaces** (status as of 2026-07-23):
 
-| Surface  | Route                            | Status                                                                                                         |
-| -------- | -------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Home     | `/`                              | ✅ Built — modules-as-documents (hero + `modules[]`)                                                           |
-| Blog     | `/blog` + `/blog/page/N`         | ✅ Built — paginated index (#75)                                                                               |
-| Post     | `/blog/[slug]`                   | ✅ Built — post detail page + JSON-LD (#76)                                                                    |
-| Category | `/category/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589)                                                      |
-| Tag      | `/tag/[slug]` (+ `/page/N`)      | ✅ Built — unpaginated + paginated tag archives, shared-tag related posts, per-tag RSS (#674)                  |
-| Author   | `/author/[slug]` (+ `/page/N`)   | ✅ Built — profile + posts by author, paginated (#327/#593-595/#744)                                           |
-| Topics   | `/topics`                        | ✅ Built — hub listing every category with post counts, links to archives (#750/#751/#752)                     |
-| Page     | `/[slug]`                        | ✅ Built — generic page route (#285), slug space guarded by `RESERVED_SLUGS` (#328)                            |
-| Feeds    | sitemap/robots/RSS               | ✅ Built — Phase 3 (#92), generic pages listed in the sitemap (#285); tag archives + per-tag RSS added in #674 |
+| Surface | Route                          | Status                                                                                                         |
+| ------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| Home    | `/`                            | ✅ Built — modules-as-documents (hero + `modules[]`)                                                           |
+| Blog    | `/blog` + `/blog/page/N`       | ✅ Built — paginated index (#75)                                                                               |
+| Post    | `/blog/[slug]`                 | ✅ Built — post detail page + JSON-LD (#76)                                                                    |
+| Topic   | `/topics/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589); renamed from `category` in #1812                    |
+| Tag     | `/tag/[slug]` (+ `/page/N`)    | ✅ Built — unpaginated + paginated tag archives, shared-tag related posts, per-tag RSS (#674)                  |
+| Author  | `/author/[slug]` (+ `/page/N`) | ✅ Built — profile + posts by author, paginated (#327/#593-595/#744)                                           |
+| Topics  | `/topics`                      | ✅ Built — hub listing every topic with post counts, links to archives (#750/#751/#752)                        |
+| Page    | `/[slug]`                      | ✅ Built — generic page route (#285), slug space guarded by `RESERVED_SLUGS` (#328)                            |
+| Feeds   | sitemap/robots/RSS             | ✅ Built — Phase 3 (#92), generic pages listed in the sitemap (#285); tag archives + per-tag RSS added in #674 |
 
 Phase 3 (Blog core) is fully closed as of 2026-07-21 — every primary surface
-built in that phase is merged. Post taxonomy (category `max: 4` cap + the
+built in that phase is merged. Post taxonomy (topic `max: 4` cap + the
 `/tag/*` axis above) shipped as milestone M3 (#674) on 2026-07-23; the
-category cap was narrowed to a single required reference in #809 on
-2026-07-24 (see §6 Content model).
+topic cap was narrowed to a single required reference in #809 on
+2026-07-24 (see §6 Content model). The whole axis was renamed from
+`category` to `topic` — `_type`, post field and URLs — in #1812; `/category/*`
+is **not** redirected and simply 404s.
 
 Both environments are **live** (§13): merging to `main` deploys development;
 a `vX.Y.Z` tag promotes to production.
@@ -165,7 +167,7 @@ no faked defaults), the module-registry mechanism, and the editorial write path:
 ## 6. Content model
 
 Source of truth: `apps/cms/src/schema-types/` — documents (`post`, `author`,
-`category`, `tag`, page documents, singletons), standalone `module_*`
+`topic`, `tag`, page documents, singletons), standalone `module_*`
 page-builder documents, and shared objects (`link`, `imageWithAlt`, `bodyImage`,
 `seo`, `aside`, `skim`, …). Naming convention `{group}_{name}` is being applied
 incrementally (#251).
