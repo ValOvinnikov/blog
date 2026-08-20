@@ -1,7 +1,7 @@
 import { q } from '@blog/service/sanity/query';
 
-export const categoryFragment = q
-  .fragmentForType<'blog_category'>()
+export const topicFragment = q
+  .fragmentForType<'blog_topic'>()
   .project((sub) => ({
     _id: true,
     title: sub.field('title').notNull(),

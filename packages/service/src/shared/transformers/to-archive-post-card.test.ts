@@ -13,11 +13,11 @@ describe(toArchivePostCard, () => {
     expect(result.publishedAt).toBe('2026-01-15T00:00:00Z');
   });
 
-  it('maps the category', () => {
+  it('maps the topic', () => {
     const result = toArchivePostCard(makeRawArchivePostCard());
 
-    expect(result.category).toEqual({
-      id: 'cat-1',
+    expect(result.topic).toEqual({
+      id: 'topic-1',
       title: 'Engineering',
       slug: 'engineering',
     });

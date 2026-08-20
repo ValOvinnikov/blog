@@ -1,4 +1,4 @@
-import { relatedByCategoryQuery, relatedByTagsQuery } from './query';
+import { relatedByTagsQuery, relatedByTopicQuery } from './query';
 
 describe('relatedByTagsQuery', () => {
   it('excludes posts whose publishedAt is in the future', () => {
@@ -6,8 +6,8 @@ describe('relatedByTagsQuery', () => {
   });
 });
 
-describe('relatedByCategoryQuery', () => {
+describe('relatedByTopicQuery', () => {
   it('excludes posts whose publishedAt is in the future', () => {
-    expect(relatedByCategoryQuery.query).toContain('publishedAt <= now()');
+    expect(relatedByTopicQuery.query).toContain('publishedAt <= now()');
   });
 });

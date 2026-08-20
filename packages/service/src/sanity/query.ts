@@ -18,7 +18,7 @@ type TSchemaConfig = {
 
 export const q = createGroqBuilder<TSchemaConfig>();
 
-/** Shared `.parameters<T>()` shape for the slug-lookup queries (post, category, author, generic page). */
+/** Shared `.parameters<T>()` shape for the slug-lookup queries (post, topic, author, generic page). */
 export type TSlugParams = { slug: string };
 
 type TNextFetchOptions = {
@@ -39,7 +39,7 @@ export const runQuery = makeSafeQueryRunner<TNextFetchOptions>(
  * Tag-scope contract: a loader's `isr(...)` call must cover every document
  * `_type` its query can read, not just the `_type` the query is filtered on.
  * If a query's fragment `.deref()`s another document (a post's `author`/
- * `category`, a `link`'s `internalReference`, …), the loader's tags must
+ * `topic`, a `link`'s `internalReference`, …), the loader's tags must
  * include that dereferenced type's tag too — resolve the exact tag string
  * from `REVALIDATE_TAGS` in `apps/web/src/utils/revalidate-tags.ts` (the
  * webhook's source of truth for `_type` → tag), never invent a new one. This

@@ -110,7 +110,7 @@ describe('getPost', () => {
     );
   });
 
-  it('tags the query with author/category alongside post', async () => {
+  it('tags the query with author/topic alongside post', async () => {
     mockRun
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce(makeRawSiteSettings());
@@ -121,7 +121,7 @@ describe('getPost', () => {
       expect.anything(),
       expect.objectContaining({
         next: expect.objectContaining({
-          tags: ['post', 'author', 'category'],
+          tags: ['post', 'author', 'topic'],
         }),
       }),
     );
@@ -260,14 +260,14 @@ describe('getPost', () => {
     expect(result?.relatedPosts.map((post) => post.id)).toEqual(['related-1']);
   });
 
-  it('calls getRelatedPosts with the post id, tag ids, and category id', async () => {
+  it('calls getRelatedPosts with the post id, tag ids, and topic id', async () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostDetail({
           _id: 'post-abc',
           tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
-          category: {
-            _id: 'cat-1',
+          topic: {
+            _id: 'topic-1',
             title: 'Engineering',
             slug: 'engineering',
             description: null,
@@ -281,7 +281,7 @@ describe('getPost', () => {
     expect(mockGetRelatedPosts).toHaveBeenCalledWith(
       'post-abc',
       ['tag-1'],
-      'cat-1',
+      'topic-1',
     );
   });
 

@@ -2,8 +2,8 @@ import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 
 import {
   toRelatedPosts,
-  type TRawRelatedByCategory,
   type TRawRelatedByTags,
+  type TRawRelatedByTopic,
 } from './transformer';
 
 function byTagsPost(
@@ -18,9 +18,9 @@ function byTagsPost(
   };
 }
 
-function byCategoryPost(
-  overrides: Partial<TRawRelatedByCategory[number]> = {},
-): TRawRelatedByCategory[number] {
+function byTopicPost(
+  overrides: Partial<TRawRelatedByTopic[number]> = {},
+): TRawRelatedByTopic[number] {
   return makeRawPostCard(overrides);
 }
 
@@ -73,44 +73,40 @@ describe(toRelatedPosts, () => {
     expect(result.map((post) => post.id)).not.toContain('current');
   });
 
-  it('backfills remaining slots from the primary-category pool when fewer than 3 share a tag', () => {
+  it('backfills remaining slots from the primary-topic pool when fewer than 3 share a tag', () => {
     const shared = byTagsPost({ _id: 'shared', tagIds: [{ _id: 'tag-a' }] });
-    const categoryOnlyA = byCategoryPost({ _id: 'category-a' });
-    const categoryOnlyB = byCategoryPost({ _id: 'category-b' });
+    const topicOnlyA = byTopicPost({ _id: 'topic-a' });
+    const topicOnlyB = byTopicPost({ _id: 'topic-b' });
 
     const result = toRelatedPosts(
       [shared],
-      [categoryOnlyA, categoryOnlyB],
+      [topicOnlyA, topicOnlyB],
       ['tag-a'],
     );
 
     expect(result.map((post) => post.id)).toEqual([
       'shared',
-      'category-a',
-      'category-b',
+      'topic-a',
+      'topic-b',
     ]);
   });
 
-  it('excludes posts from the category backfill that were already tag-ranked', () => {
+  it('excludes posts from the topic backfill that were already tag-ranked', () => {
     const shared = byTagsPost({ _id: 'shared', tagIds: [{ _id: 'tag-a' }] });
-    const duplicate = byCategoryPost({ _id: 'shared' });
-    const categoryOnly = byCategoryPost({ _id: 'category-only' });
+    const duplicate = byTopicPost({ _id: 'shared' });
+    const topicOnly = byTopicPost({ _id: 'topic-only' });
 
-    const result = toRelatedPosts(
-      [shared],
-      [duplicate, categoryOnly],
-      ['tag-a'],
-    );
+    const result = toRelatedPosts([shared], [duplicate, topicOnly], ['tag-a']);
 
-    expect(result.map((post) => post.id)).toEqual(['shared', 'category-only']);
+    expect(result.map((post) => post.id)).toEqual(['shared', 'topic-only']);
   });
 
-  it('fills entirely from the category pool when the post has no tags', () => {
-    const categoryOnlyA = byCategoryPost({ _id: 'category-a' });
-    const categoryOnlyB = byCategoryPost({ _id: 'category-b' });
+  it('fills entirely from the topic pool when the post has no tags', () => {
+    const topicOnlyA = byTopicPost({ _id: 'topic-a' });
+    const topicOnlyB = byTopicPost({ _id: 'topic-b' });
 
-    const result = toRelatedPosts([], [categoryOnlyA, categoryOnlyB], []);
+    const result = toRelatedPosts([], [topicOnlyA, topicOnlyB], []);
 
-    expect(result.map((post) => post.id)).toEqual(['category-a', 'category-b']);
+    expect(result.map((post) => post.id)).toEqual(['topic-a', 'topic-b']);
   });
 });

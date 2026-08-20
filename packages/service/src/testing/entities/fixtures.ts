@@ -1,14 +1,12 @@
-import type { TRawCategoryWithPostCount } from '@blog/service/features/entities/categories/adaptor/transformer';
+import type { TRawTopicWithPostCount } from '@blog/service/features/entities/topics/adaptor/transformer';
 import type { TRawAuthor } from '@blog/service/features/pages/author/adaptor/detail-page/transformer';
-import type { TRawCategory } from '@blog/service/shared/transformers/to-category';
 import type { TRawTag } from '@blog/service/shared/transformers/to-tag';
+import type { TRawTopic } from '@blog/service/shared/transformers/to-topic';
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 
-export function makeRawCategory(
-  overrides: Partial<TRawCategory> = {},
-): TRawCategory {
+export function makeRawTopic(overrides: Partial<TRawTopic> = {}): TRawTopic {
   return {
-    _id: 'cat-1',
+    _id: 'topic-1',
     title: 'Engineering',
     slug: 'engineering',
     description: 'Engineering posts',
@@ -16,11 +14,11 @@ export function makeRawCategory(
   };
 }
 
-export function makeRawCategoryWithPostCount(
-  overrides: Partial<TRawCategoryWithPostCount> = {},
-): TRawCategoryWithPostCount {
+export function makeRawTopicWithPostCount(
+  overrides: Partial<TRawTopicWithPostCount> = {},
+): TRawTopicWithPostCount {
   return {
-    ...makeRawCategory(),
+    ...makeRawTopic(),
     postCount: 0,
     ...overrides,
   };

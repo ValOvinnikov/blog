@@ -6,9 +6,9 @@ import { toHeroModule } from './transformer';
 import type { THeroModule } from './types';
 
 // `heroModuleQuery` dereferences `featuredPost` (via `postCardFragment`,
-// which further derefs `author`/`category`) and `secondaryAction` (via
+// which further derefs `author`/`topic`) and `secondaryAction` (via
 // `linkFragment`, whose `internalReference` can resolve to `blog_post`/
-// `blog_category`/`page_generic`/`page_blog`) — every one of those types'
+// `blog_topic`/`page_generic`/`page_blog`) — every one of those types'
 // tags must be included alongside the module's own tags (tag-scope
 // contract, `sanity/query.ts`).
 export async function getHero(id: string): Promise<THeroModule> {
@@ -20,16 +20,13 @@ export async function getHero(id: string): Promise<THeroModule> {
         `module:${id}`,
         'posts',
         'author',
-        'category',
+        'topic',
         'post',
         'page_generic',
         'page_blog',
       ]),
     }),
-    runQuery(
-      heroFallbackFeaturedPostQuery,
-      isr(['posts', 'author', 'category']),
-    ),
+    runQuery(heroFallbackFeaturedPostQuery, isr(['posts', 'author', 'topic'])),
   ]);
 
   return toHeroModule(raw, rawFallbackPost);

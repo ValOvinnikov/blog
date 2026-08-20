@@ -7,18 +7,18 @@ import { toPostDetail } from './transformer';
 import type { TPostDetail } from './types';
 
 export async function getPost(slug: string): Promise<TPostDetail | null> {
-  // `postDetailFragment` derefs `author`/`category` — both tags must ride
+  // `postDetailFragment` derefs `author`/`topic` — both tags must ride
   // alongside `post` (tag-scope contract, `sanity/query.ts`).
   const raw = await runQuery(postDetailQuery, {
     parameters: { slug },
-    ...isr(['post', 'author', 'category']),
+    ...isr(['post', 'author', 'topic']),
   });
   if (!raw) return null;
 
   const tagIds = (raw.tags ?? []).map((tag) => tag._id);
   const [settings, relatedPosts] = await Promise.all([
     getSiteSettings(),
-    getRelatedPosts(raw._id, tagIds, raw.category._id),
+    getRelatedPosts(raw._id, tagIds, raw.topic._id),
   ]);
 
   return toPostDetail(raw, settings, relatedPosts);

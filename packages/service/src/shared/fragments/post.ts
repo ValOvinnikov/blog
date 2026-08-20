@@ -1,10 +1,10 @@
 import { q } from '@blog/service/sanity/query';
 
 import { authorCardFragment, authorDetailFragment } from './author';
-import { categoryFragment } from './category';
 import { imageWithAltFragment, sanityImageFragment } from './image';
 import { seoFragment } from './seo';
 import { tagFragment } from './tag';
+import { topicFragment } from './topic';
 import { WORD_COUNT_EXPRESSION, wordCountParser } from './word-count';
 
 // `skim` carries no `.required()` validation in the schema — the whole
@@ -33,7 +33,7 @@ export const postCardFragment = q
       .nullable(true),
     featured: sub.field('featured').nullable(true),
     author: sub.field('author').deref().project(authorCardFragment).notNull(),
-    category: sub.field('category').deref().project(categoryFragment).notNull(),
+    topic: sub.field('topic').deref().project(topicFragment).notNull(),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));
 
@@ -59,7 +59,7 @@ export const postDetailFragment = q
     skim: sub.field('skim').project(skimFragment).nullable(true),
     seo: sub.field('seo').project(seoFragment).nullable(true),
     author: sub.field('author').deref().project(authorDetailFragment).notNull(),
-    category: sub.field('category').deref().project(categoryFragment).notNull(),
+    topic: sub.field('topic').deref().project(topicFragment).notNull(),
     tags: sub.field('tags[]').deref().project(tagFragment).nullable(true),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));

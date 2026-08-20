@@ -1,7 +1,7 @@
 import type { archivePostCardFragment } from '@blog/service/shared/fragments/archive-post-card';
 import {
-  toPostCardCategory,
-  type TPostCardCategory,
+  toPostCardTopic,
+  type TPostCardTopic,
 } from '@blog/service/shared/transformers/to-post-card';
 import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferFragmentType } from 'groqd';
@@ -16,7 +16,7 @@ export type TArchivePostCard = {
   slug: string;
   excerpt: string;
   publishedAt: string;
-  category: TPostCardCategory;
+  topic: TPostCardTopic;
   readingTimeMinutes: number;
 };
 
@@ -27,7 +27,7 @@ export function toArchivePostCard(raw: TRawArchivePostCard): TArchivePostCard {
     slug: raw.slug,
     excerpt: raw.excerpt,
     publishedAt: raw.publishedAt,
-    category: toPostCardCategory(raw.category),
+    topic: toPostCardTopic(raw.topic),
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };
 }

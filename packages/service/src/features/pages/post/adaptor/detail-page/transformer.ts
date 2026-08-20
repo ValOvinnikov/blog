@@ -1,11 +1,11 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
-import { toCategory } from '@blog/service/shared/transformers/to-category';
 import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toSocialLink } from '@blog/service/shared/transformers/to-social-link';
 import { toTag } from '@blog/service/shared/transformers/to-tag';
+import { toTopic } from '@blog/service/shared/transformers/to-topic';
 import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferResultType } from 'groqd';
 
@@ -77,7 +77,7 @@ export function toPostDetail(
       },
     ),
     author: toPostDetailAuthor(raw.author),
-    category: toCategory(raw.category),
+    topic: toTopic(raw.topic),
     tags: (raw.tags ?? []).map(toTag),
     relatedPosts,
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),

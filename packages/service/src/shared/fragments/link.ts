@@ -15,7 +15,7 @@ export const linkFragment = q.fragmentForType<'link'>().project((sub) => ({
       // schema requires the field.
       slug: ref.selectByType({
         blog_post: (s) => s.field('slug.current').notNull(),
-        blog_category: (s) => s.field('slug.current').notNull(),
+        blog_topic: (s) => s.field('slug.current').notNull(),
         page_generic: (s) => s.field('slug.current').notNull(),
       }),
     }))

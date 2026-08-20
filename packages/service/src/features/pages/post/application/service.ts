@@ -13,7 +13,7 @@ export function createPostService() {
       // resolve — `getPost`'s own `if (!raw) return null` never actually
       // runs in that case, so unwrapped, this throw reached the page
       // uncaught and crashed the render (a broken 500 instead of a clean
-      // 404, #889). category/tag/author already wrapped their loaders the
+      // 404, #889). topic/tag/author already wrapped their loaders the
       // same way; post was the one exception.
       getPost: safeAsync((slug: string) => getPost(slug)),
       getPostParams: safeAsync(() => getPostParams()),

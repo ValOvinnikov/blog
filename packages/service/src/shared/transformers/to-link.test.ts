@@ -66,15 +66,15 @@ describe('toLink', () => {
     expect(result?.href).toBe('/blog/hello-world');
   });
 
-  it('resolves an internal blog_category reference to its category route', () => {
+  it('resolves an internal blog_topic reference to its topic route', () => {
     const result = toLink(
       makeRawLink({
         linkType: TLINK_TYPE.INTERNAL,
-        internalReference: { _type: 'blog_category', slug: 'engineering' },
+        internalReference: { _type: 'blog_topic', slug: 'engineering' },
       }),
     );
 
-    expect(result?.href).toBe('/category/engineering');
+    expect(result?.href).toBe('/topics/engineering');
   });
 
   it('resolves an internal page_generic reference to its generic-page route', () => {

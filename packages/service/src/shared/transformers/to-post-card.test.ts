@@ -39,11 +39,11 @@ describe('toPostCard', () => {
     });
   });
 
-  it('maps the category', () => {
+  it('maps the topic', () => {
     const result = toPostCard(makeRawPostCard());
 
-    expect(result.category).toEqual({
-      id: 'cat-1',
+    expect(result.topic).toEqual({
+      id: 'topic-1',
       title: 'Engineering',
       slug: 'engineering',
     });

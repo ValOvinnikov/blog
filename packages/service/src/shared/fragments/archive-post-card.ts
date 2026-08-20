@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 
-import { categoryFragment } from './category';
+import { topicFragment } from './topic';
 import { WORD_COUNT_EXPRESSION, wordCountParser } from './word-count';
 
 /**
@@ -19,6 +19,6 @@ export const archivePostCardFragment = q
     slug: sub.field('slug.current').notNull(),
     excerpt: sub.field('excerpt').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
-    category: sub.field('category').deref().project(categoryFragment).notNull(),
+    topic: sub.field('topic').deref().project(topicFragment).notNull(),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));
