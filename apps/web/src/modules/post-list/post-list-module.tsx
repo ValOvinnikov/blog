@@ -10,7 +10,7 @@ export interface IPostListModuleProps {
 
 /**
  * PostListModule — fetches `module_postList` data and hands it to
- * `PostListModuleView`. The only place this module's service and ui meet.
+ * `PostListModuleView`.
  */
 export async function PostListModule({ id }: IPostListModuleProps) {
   const result = await service.modules.postList.v1.getPostList(id);

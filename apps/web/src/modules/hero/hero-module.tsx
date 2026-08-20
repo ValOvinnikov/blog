@@ -10,7 +10,6 @@ export interface IHeroModuleProps {
 
 /**
  * HeroModule — fetches `module_hero` data and hands it to `HeroModuleView`.
- * The only place this module's service and ui meet.
  */
 export async function HeroModule({ id }: IHeroModuleProps) {
   const result = await service.modules.hero.v1.getHero(id);

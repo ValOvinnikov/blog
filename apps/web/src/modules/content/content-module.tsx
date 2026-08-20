@@ -9,7 +9,7 @@ export interface IContentModuleProps {
 
 /**
  * ContentModule — fetches `module_content` data and hands it to
- * `ContentModuleView`. The only place this module's service and ui meet.
+ * `ContentModuleView`.
  */
 export async function ContentModule({ id }: IContentModuleProps) {
   const result = await service.modules.content.v1.getContent(id);
