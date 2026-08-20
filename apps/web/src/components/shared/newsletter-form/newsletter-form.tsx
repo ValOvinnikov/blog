@@ -12,7 +12,7 @@ import { subscribeToNewsletterAction } from '@web/server/newsletter/newsletter-a
 import { hasNewsletterSubscribedCookie } from '@web/utils/has-newsletter-subscribed-cookie';
 import { isValidEmail } from '@web/utils/is-valid-email';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 
 type TNewsletterFormProps = {
   /** `full` (Blog index page-builder module) vs `compact` (post page foot) — see `NewsletterSignup`'s two densities. */
@@ -59,6 +59,7 @@ export function NewsletterForm({
   );
   const [mounted, setMounted] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const errorMessageId = useId();
 
   useEffect(() => {
     // Reads DOM state (`document.cookie`) set by a prior visit's successful
@@ -104,6 +105,7 @@ export function NewsletterForm({
     heading,
     headingId,
     errorMessage,
+    errorMessageId,
     successMessage: t('successMessage'),
     submitLabel: t('submitLabel'),
     emailAriaLabel: t('emailAriaLabel'),

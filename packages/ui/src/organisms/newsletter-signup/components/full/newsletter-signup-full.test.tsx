@@ -169,6 +169,26 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
+  it('associates the email field with the error message via its accessible description', () => {
+    const errorMessage = 'That email is already subscribed.';
+    setup({
+      status: 'error',
+      errorMessage,
+      errorMessageId: 'newsletter-full-error',
+    });
+
+    expect(screen.getByRole('textbox')).toHaveAccessibleDescription(
+      errorMessage,
+    );
+  });
+
+  it('has no accessible description or aria-describedby when there is no error', () => {
+    setup({ errorMessageId: 'newsletter-full-error' });
+
+    expect(screen.getByRole('textbox')).not.toHaveAttribute('aria-describedby');
+    expect(screen.getByRole('textbox')).toHaveAccessibleDescription('');
+  });
+
   it('forwards dataTestId to the root element', () => {
     setup({ dataTestId: 'newsletter-signup-full' });
     expect(screen.getByTestId('newsletter-signup-full')).toBeVisible();

@@ -19,6 +19,7 @@ export type TAlertProps = IWithClassName &
   IWithDataTestId & {
     type: NonNullable<TAlertVariants['type']>;
     message: string;
+    id?: string;
   };
 
 /**
@@ -32,11 +33,13 @@ export const Alert = ({
   message,
   className,
   dataTestId,
+  id,
 }: TAlertProps) => {
   const role = type === ALERT_TYPE.ERROR ? 'alert' : 'status';
 
   return (
     <div
+      id={id}
       role={role}
       data-testid={dataTestId}
       className={alertVariants({ type, class: className })}

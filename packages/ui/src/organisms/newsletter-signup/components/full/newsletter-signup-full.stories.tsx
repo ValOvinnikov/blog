@@ -66,6 +66,7 @@ export const Error: TStory = {
     status: 'error',
     email: 'not-an-email',
     errorMessage: 'That email is already subscribed.',
+    errorMessageId: 'newsletter-signup-full-error',
   },
 };
 

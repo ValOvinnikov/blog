@@ -23,6 +23,8 @@ export type TNewsletterSignupCompactProps = IWithClassName &
     /** Decorative glyph or icon rendered ahead of `heading`, e.g. a `$` prompt — rendered as-is; the caller owns its wrapper, styling, and accessibility. */
     prefix?: ReactNode;
     errorMessage?: string;
+    /** Caller-generated so two instances on one page never collide. */
+    errorMessageId?: string;
     successMessage?: string;
     submitLabel: string;
     emailAriaLabel: string;
@@ -45,6 +47,7 @@ export const NewsletterSignupCompact = ({
   headingId,
   prefix,
   errorMessage,
+  errorMessageId,
   successMessage,
   submitLabel,
   emailAriaLabel,
@@ -76,6 +79,7 @@ export const NewsletterSignupCompact = ({
           onSubmit={onSubmit}
           status={status}
           errorMessage={errorMessage}
+          errorMessageId={errorMessageId}
           submitLabel={submitLabel}
           emailAriaLabel={emailAriaLabel}
           placeholder={placeholder}

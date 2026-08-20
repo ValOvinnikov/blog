@@ -1,5 +1,10 @@
 import userEvent from '@testing-library/user-event';
-import { customRender, screen, waitFor } from '@web/testing/custom-render';
+import {
+  customRender,
+  renderElement,
+  screen,
+  waitFor,
+} from '@web/testing/custom-render';
 
 import { NewsletterForm } from './newsletter-form';
 
@@ -80,6 +85,55 @@ describe(`<${NewsletterForm.name}/>`, () => {
       'Enter a valid email address.',
     );
     expect(subscribeToNewsletterActionMock).not.toHaveBeenCalled();
+  });
+
+  it('associates the rendered error with the email field via its accessible description', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await typeAndSubmit(user, 'not-an-email');
+
+    await screen.findByRole('alert');
+    expect(screen.getByRole('textbox')).toHaveAccessibleDescription(
+      'Enter a valid email address.',
+    );
+  });
+
+  it('gives each rendered instance its own errorMessageId, so two forms on one page never collide', async () => {
+    const user = userEvent.setup();
+    renderElement(
+      <>
+        <NewsletterForm variant="full" heading="First newsletter" />
+        <NewsletterForm variant="full" heading="Second newsletter" />
+      </>,
+    );
+
+    const [firstInput, secondInput] = screen.getAllByRole('textbox', {
+      name: 'Email address',
+    });
+    const [firstButton, secondButton] = screen.getAllByRole('button', {
+      name: 'Subscribe',
+    });
+    if (!firstInput || !secondInput || !firstButton || !secondButton) {
+      throw new Error('Expected two rendered email fields and buttons.');
+    }
+
+    await user.type(firstInput, 'not-an-email');
+    await user.click(firstButton);
+    await user.type(secondInput, 'also-not-an-email');
+    await user.click(secondButton);
+
+    const alerts = await screen.findAllByRole('alert');
+    expect(alerts).toHaveLength(2);
+    expect(firstInput).toHaveAccessibleDescription(
+      'Enter a valid email address.',
+    );
+    expect(secondInput).toHaveAccessibleDescription(
+      'Enter a valid email address.',
+    );
+    expect(firstInput.getAttribute('aria-describedby')).not.toBe(
+      secondInput.getAttribute('aria-describedby'),
+    );
   });
 
   it('marks the button busy while the server action is in flight', async () => {
