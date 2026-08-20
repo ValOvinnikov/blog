@@ -64,6 +64,10 @@ Thumbs.db
 # Claude Code — share project config, ignore local overrides
 .claude/settings.local.json
 .claude/worktrees/
+# Subagent -> orchestrator transfer buffers: a working copy of an agent's diff,
+# duplicated into git the moment the work is assembled onto a branch.
+.claude/scratchpad/
+.claude/scratchpads/
 
 # superpowers subagent-driven-development scratch (progress ledger, task
 # briefs, review packages) — local coordination state, never committed
