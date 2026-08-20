@@ -17,6 +17,7 @@ export const tenantDetailsFormVariants = tv({
     hint: ['text-xs text-text-subtle'],
     fieldError: ['text-xs text-error'],
     actions: ['mt-2 flex items-center justify-end'],
+    planControl: ['self-start'],
   },
   variants: {
     pending: {

@@ -15,5 +15,6 @@ export const tenantDetailsPanelVariants = tv({
     lockedValue: ['break-words font-mono text-copy text-text'],
     actions: ['mt-2 flex items-center justify-end'],
     lockAnnouncementLive: ['sr-only'],
+    planControl: ['self-start'],
   },
 });

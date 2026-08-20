@@ -61,6 +61,7 @@ export function TenantDetailsForm() {
     hint,
     fieldError,
     actions,
+    planControl,
   } = tenantDetailsFormVariants({ pending: isPending });
 
   function updateField<K extends keyof TFormValues>(
@@ -156,6 +157,7 @@ export function TenantDetailsForm() {
                 options={planOptions}
                 value={values.plan}
                 onChange={(plan) => updateField('plan', plan)}
+                className={planControl()}
               />
             </div>
 
