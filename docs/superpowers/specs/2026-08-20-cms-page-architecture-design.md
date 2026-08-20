@@ -95,18 +95,36 @@ case, so a latest-N list on a topic page still scopes to that topic.
 
 ### Vocabulary and URL alignment
 
-`category` becomes `topic` end to end — `blog_category` → `blog_topic`, the
+`category` became `topic` end to end — `blog_category` → `blog_topic`, the
 `category` reference on `blog_post` → `topic`, and `/category/{slug}` →
 `/topics/{slug}`. Tags follow the same nesting: `/tags` index with
 `/tags/{slug}` children, and the feed moves to `/tags/{slug}/rss.xml`.
 
-Rename surface: ~61 files across six workspaces, plus ~25 test/story files.
-No Postgres involvement — "category" is not a stored value, a `pgEnum`, or a
-column anywhere in `@blog/db`, so **no DB migration is needed**. `@blog/db` is
-still touched in one place: `scripts/provision-tenant/steps/starter-content.ts`
-seeds Sanity fixtures that name `blog_category`. `packages/ui` is untouched
-except story fixture data; no UI component names "category"
-(`PostCard.Footer`'s prop is already generic).
+**Shipped in #1812 / PR #1837** — 215 files across seven workspaces. Three
+claims in the original estimate proved wrong and are corrected here so later
+epics are not planned against them:
+
+- **`packages/ui` was not fixture-only.** It exported three `category` props —
+  `PostCardFooter.category`, `ArticleHeader.category` (plus
+  `IArticleHeaderCategory`), and `PostsSection`'s `IPostCardCategoryData` /
+  `IPostCardData.category`. All were renamed to `topic`; `COMPONENTS.md`
+  regenerated.
+- **A third vocabulary existed beyond the `_type` and the identifiers:** the
+  ISR cache-tag strings passed to `isr([...])`, across 13 service loaders and
+  mirrored in `apps/web`'s `REVALIDATE_TAGS`. Nothing type-checks those two
+  sides against each other, so a partial rename would have silently stopped
+  revalidation. Renamed to `'topic'` / `'topics'` on both sides together.
+- **Raw GROQ escapes the compiler.** A `filterRaw('category._ref == …')` in
+  related-posts type-checked fine and would have failed at runtime.
+
+No Postgres involvement — "category" was not a stored value, a `pgEnum`, or a
+column anywhere in `@blog/db`, so no DB migration was needed. `@blog/db` was
+touched in one place: `scripts/provision-tenant/steps/starter-content.ts`.
+
+Two stored, category-named values were deliberately left behind and are tracked
+in #1835: the `categoryEmpty` voice override (stored in both Sanity and a
+Postgres JSONB column) and `HERO_FIELD_MODE.POST_CATEGORY` (stored in
+`module_hero` documents). Both need content migrations of their own.
 
 Because a `_type` rename reds `type-check` until every layer lands, the rename
 **cannot** be split into per-layer PRs. It ships as one PR.
