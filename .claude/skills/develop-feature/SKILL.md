@@ -304,8 +304,28 @@ red check.
 
 ## 8. Remove the subagent worktrees you created
 
-Once the PR is open, each subagent's worktree has served its purpose — its
-commits are landed on the `feat/` branch and pushed. Remove it: nothing else
+**When: as soon as the worktree's commits exist on the remote.** That is the
+whole safety condition — `git cherry origin/<feat-branch>` passing _is_ the
+proof the push landed, and a pushed branch stays recoverable whatever happens
+to the local directory. So the trigger is the **push (Gate 6)**, not the PR;
+opening the PR adds nothing a removal was waiting for. (Same anchor the
+scratchpad buffers below use, for the same reason.)
+
+Two kinds of worktree, two timings:
+
+- **Layer-agent worktrees (`agent-<id>`)** — removable once the agent's patch
+  is captured and landed on the `feat/` branch, which happens when its
+  completion notification arrives, well before the push. Waiting longer buys
+  nothing: the worktree already holds no unique work. Do not remove one while
+  its agent may still be resumed via `SendMessage` — harness teardown of an
+  idle agent preserves the work and recreates it on resume, but
+  `git worktree remove` is permanent.
+- **The session's own feature worktree** (`EnterWorktree`-created, holding the
+  `feat/` branch itself) — safe from the push onward, but **keep it until CI is
+  green**. A Gate 5a CI fix is made on that branch; removing it at push just
+  means re-creating a worktree to make the fix in.
+
+Remove them: nothing else
 will. The harness only auto-sweeps worktrees that have **no uncommitted
 changes, no untracked files, and no unpushed commits** — and a
 `worktree-agent-*` branch is never pushed under its own name, so these
@@ -362,6 +382,7 @@ For each worktree **you created for this task**, and that the ownership check
 above cleared:
 
 ```bash
+git fetch origin                                  # stale refs answer the wrong question
 branch=$(git -C <worktree> branch --show-current)
 git -C <worktree> status --porcelain              # must be EMPTY
 git cherry origin/<feat-branch> "$branch"         # must print no '+' lines
@@ -370,8 +391,11 @@ git worktree remove <worktree>                    # never --force
 
 - **All three checks must pass** — unlocked, clean, landed — and only then
   remove.
+- **`git fetch origin` first, every time.** Both the `git cherry` check and the
+  post-merge check below read a remote-tracking ref; against a stale one they
+  answer the wrong question.
 - **Compare against the pushed `feat/` branch — NOT `origin/main`.** At this
-  point the PR is open but unmerged, so the agent's commits are on `feat/…`,
+  point the branch is pushed but unmerged, so the commits are on `feat/…`,
   not yet on `main`; checking `origin/main` reports every commit as unmerged
   and you would never clean anything up. Using `origin/<feat-branch>` also
   proves the work reached the remote, which is what makes deleting the local
@@ -390,13 +414,40 @@ git worktree remove <worktree>                    # never --force
   that flag, on a worktree you own that you were already mid-way through
   removing, and still never `-f -f` on a locked one. Shared-deps worktrees
   (root `node_modules` is a symlink) remove in seconds.
-- If a worktree still exists after its PR merged, the same checks work against
-  `origin/main`.
 - **Leftovers from earlier sessions are not yours to sweep on your own
   initiative.** Unlocked `agent-*` worktrees with no live owner do accumulate,
   but clearing them is a separate, explicitly requested cleanup — not part of
   this gate. When asked to do it, apply the same three checks to each one
   individually, and still skip every locked path.
+
+### After the PR merged
+
+A worktree that outlived its PR takes the same three checks, comparing against
+`origin/main` — GitHub deletes the `feat/` branch on merge, so
+`origin/<feat-branch>` no longer resolves.
+
+- **A "removing will discard N commits" refusal is usually false.** The
+  `ExitWorktree`/cleanup guard counts commits against your **local** `main`,
+  and local `main` does not move when a PR merges on GitHub — so every branch
+  you ever merged still looks unmerged, and N grows with each merge. Do not
+  take the number at face value, and do not reflexively answer it with
+  `discard_changes: true`. Settle it with the authoritative test:
+
+  ```bash
+  git fetch origin
+  git merge-base --is-ancestor <branch> origin/main && echo MERGED || echo NOT-MERGED
+  ```
+
+  `MERGED` means the commits are in `origin/main` and discarding loses nothing.
+  `NOT-MERGED` means the guard is right — keep the worktree and tell the user
+  what is in it. (Seen on `fix/1788-storybook-fonts`: the guard claimed 22
+  commits at risk; the branch was an ancestor of `origin/main` with zero
+  unique commits.)
+
+- **Fix the cause, not just the symptom.** The refusal recurs after every merge
+  until local `main` is synced. Fast-forward it once the working tree is clean
+  — `git merge --ff-only origin/main` — and the guard stops firing on
+  already-merged branches.
 
 ### Remove the scratchpad transfer buffers too
 
