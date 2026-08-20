@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { NewsletterModuleView } from './newsletter-module-view';
 
 const meta = {
-  title: 'Modules/NewsletterModuleView',
+  title: 'Modules/NewsletterModule',
   component: NewsletterModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },

@@ -5,7 +5,7 @@ import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixture
 import { ContentModuleView } from './content-module-view';
 
 const meta = {
-  title: 'Modules/ContentModuleView',
+  title: 'Modules/ContentModule',
   component: ContentModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },

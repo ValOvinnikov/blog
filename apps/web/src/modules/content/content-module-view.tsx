@@ -14,12 +14,12 @@ export interface IContentModuleViewProps extends TContentModule {
  * this module renders no heading of its own (its rich-text `body` supplies
  * any in-content headings), so the landmark has no unique element to label.
  */
-export function ContentModuleView({
+export const ContentModuleView = ({
   id,
   brandVariant,
   body,
   layout,
-}: IContentModuleViewProps) {
+}: IContentModuleViewProps) => {
   return (
     <Section
       brandVariant={brandVariant}
@@ -31,4 +31,4 @@ export function ContentModuleView({
       </ContentModuleUi>
     </Section>
   );
-}
+};

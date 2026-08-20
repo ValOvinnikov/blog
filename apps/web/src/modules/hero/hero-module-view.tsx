@@ -20,7 +20,7 @@ export interface IHeroModuleViewProps extends Omit<THeroModule, 'title'> {
  * CMS-authored `brandVariant`/`layout`, `SmartLink`-composed CTAs, the
  * `SanityImage` bridge, and the visually-hidden CTA label suffix.
  */
-export function HeroModuleView({
+export const HeroModuleView = ({
   id,
   brandVariant,
   eyebrow,
@@ -32,7 +32,7 @@ export function HeroModuleView({
   layout,
   projectId,
   dataset,
-}: IHeroModuleViewProps) {
+}: IHeroModuleViewProps) => {
   const titleId = `hero-${id}`;
 
   return (
@@ -105,4 +105,4 @@ export function HeroModuleView({
       </Hero>
     </Section>
   );
-}
+};

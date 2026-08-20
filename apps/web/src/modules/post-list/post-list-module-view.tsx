@@ -18,13 +18,13 @@ export interface IPostListModuleViewProps extends Omit<
  * content-validity guard skips rendering this view entirely when no posts
  * resolve.
  */
-export function PostListModuleView({
+export const PostListModuleView = ({
   id,
   brandVariant,
   sectionHeader,
   items,
   layout,
-}: IPostListModuleViewProps) {
+}: IPostListModuleViewProps) => {
   const titleId = `latest-posts-${id}`;
 
   return (
@@ -45,4 +45,4 @@ export function PostListModuleView({
       />
     </Section>
   );
-}
+};

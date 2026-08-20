@@ -11,12 +11,12 @@ export interface INewsletterModuleViewProps extends TNewsletterModule {
  * wrapping the `NewsletterForm` client island (`full` density) as its direct
  * child, with no extra wrapping element in between.
  */
-export function NewsletterModuleView({
+export const NewsletterModuleView = ({
   id,
   brandVariant,
   sectionHeader,
   layout,
-}: INewsletterModuleViewProps) {
+}: INewsletterModuleViewProps) => {
   const titleId = `newsletter-${id}`;
 
   return (
@@ -35,4 +35,4 @@ export function NewsletterModuleView({
       />
     </Section>
   );
-}
+};

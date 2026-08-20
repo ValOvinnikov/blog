@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { CtaModuleView } from './cta-module-view';
 
 const meta = {
-  title: 'Modules/CtaModuleView',
+  title: 'Modules/CtaModule',
   component: CtaModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },

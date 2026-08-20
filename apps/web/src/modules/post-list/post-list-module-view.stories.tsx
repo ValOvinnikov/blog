@@ -23,7 +23,7 @@ const items = [
 ];
 
 const meta = {
-  title: 'Modules/PostListModuleView',
+  title: 'Modules/PostListModule',
   component: PostListModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },

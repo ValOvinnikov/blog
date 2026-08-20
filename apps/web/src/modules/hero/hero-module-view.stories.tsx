@@ -5,7 +5,7 @@ import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { HeroModuleView } from './hero-module-view';
 
 const meta = {
-  title: 'Modules/HeroModuleView',
+  title: 'Modules/HeroModule',
   component: HeroModuleView,
   tags: ['autodocs'],
   args: {

@@ -11,13 +11,13 @@ export interface ICtaModuleViewProps extends TCtaModule {
  * Pure view for `CtaModule` — the `Section` full-bleed landmark around the
  * `CtaModule` organism, with the action link built from a `SmartLink`.
  */
-export function CtaModuleView({
+export const CtaModuleView = ({
   id,
   brandVariant,
   sectionHeader,
   action,
   layout,
-}: ICtaModuleViewProps) {
+}: ICtaModuleViewProps) => {
   const titleId = `cta-${id}`;
 
   return (
@@ -43,4 +43,4 @@ export function CtaModuleView({
       />
     </Section>
   );
-}
+};
