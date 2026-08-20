@@ -58,16 +58,45 @@ describe('TModulePageContext narrowing', () => {
     if (home.type === 'HOME') {
       // @ts-expect-error `topicSlug` does not exist on the HOME context
       expect(home.topicSlug).toBeUndefined();
+      // @ts-expect-error `tagSlug` does not exist on the HOME context
+      expect(home.tagSlug).toBeUndefined();
     }
 
     if (blog.type === 'BLOG') {
       // @ts-expect-error `topicSlug` does not exist on the BLOG context
       expect(blog.topicSlug).toBeUndefined();
+      // @ts-expect-error `tagSlug` does not exist on the BLOG context
+      expect(blog.tagSlug).toBeUndefined();
     }
 
     if (generic.type === 'GENERIC') {
       // @ts-expect-error `topicSlug` does not exist on the GENERIC context
       expect(generic.topicSlug).toBeUndefined();
+      // @ts-expect-error `tagSlug` does not exist on the GENERIC context
+      expect(generic.tagSlug).toBeUndefined();
+    }
+  });
+
+  it('makes topicSlug/tagSlug compile errors on the other scoped context', () => {
+    const topic: TModulePageContext = {
+      type: 'TOPIC',
+      topicSlug: 'engineering',
+      isPaginated: false,
+    };
+    const tag: TModulePageContext = {
+      type: 'TAG',
+      tagSlug: 'react',
+      isPaginated: false,
+    };
+
+    if (topic.type === 'TOPIC') {
+      // @ts-expect-error `tagSlug` does not exist on the TOPIC context
+      expect(topic.tagSlug).toBeUndefined();
+    }
+
+    if (tag.type === 'TAG') {
+      // @ts-expect-error `topicSlug` does not exist on the TAG context
+      expect(tag.topicSlug).toBeUndefined();
     }
   });
 });
