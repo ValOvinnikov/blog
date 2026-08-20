@@ -1,3 +1,4 @@
+import { mockDbConstants } from '@admin/testing/mock-db-constants';
 import { makeTenant } from '@admin/testing/tenants/fixtures';
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 
@@ -26,7 +27,7 @@ vi.mock('@admin/utils/logger/logger', () => ({
 }));
 
 vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+  ...(await mockDbConstants()),
   queries: {
     tenants: { updateTenantDetails: updateTenantDetailsMock },
     auditEvents: { insertAuditEvent: insertAuditEventMock },

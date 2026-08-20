@@ -3,6 +3,7 @@ import {
   screen,
   within,
 } from '@admin/testing/custom-render';
+import { mockDbConstants } from '@admin/testing/mock-db-constants';
 
 import TenantsPage from './page';
 
@@ -11,7 +12,7 @@ const { listTenantsMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+  ...(await mockDbConstants()),
   queries: { tenants: { listTenants: listTenantsMock } },
 }));
 

@@ -1,3 +1,4 @@
+import { mockDbConstants } from '@admin/testing/mock-db-constants';
 import { makeTenant } from '@admin/testing/tenants/fixtures';
 
 const {
@@ -15,7 +16,7 @@ vi.mock('@admin/server/auth/require-admin', () => ({
 }));
 
 vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+  ...(await mockDbConstants()),
   queries: { tenants: { listTenantsByIds: listTenantsByIdsMock } },
 }));
 
