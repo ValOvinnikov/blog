@@ -51,6 +51,7 @@
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
     "@blog/vitest-config": "workspace:*",
+    "@faker-js/faker": "^10.5.0",
     "@playwright/test": "^1.61.1",
     "@storybook/addon-docs": "^10.5.3",
     "@storybook/nextjs-vite": "10.5.3",

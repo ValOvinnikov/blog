@@ -45,6 +45,12 @@ const config: StorybookConfig = {
       '@web/server/newsletter/newsletter-actions': fileURLToPath(
         new URL('./mocks/newsletter-actions.ts', import.meta.url),
       ),
+      // `ErrorPage`/`LocaleErrorPage`/`GlobalErrorPage` call this on mount,
+      // which POSTs to `/api/client-log` via `sendBeacon`/`fetch` — aliasing
+      // it keeps their stories from firing a real network request.
+      '@web/utils/report-client-error': fileURLToPath(
+        new URL('./mocks/report-client-error.ts', import.meta.url),
+      ),
     };
     // web stories compose @blog/ui components (from source, per the pnpm
     // workspace link), so any story pulling in @blog/ui's icon registry

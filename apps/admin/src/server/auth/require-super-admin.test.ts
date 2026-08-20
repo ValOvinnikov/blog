@@ -1,3 +1,4 @@
+import { mockDbConstants } from '@admin/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
 
 import { requireSuperAdmin } from './require-super-admin';
@@ -10,7 +11,7 @@ const { authMock, getAdminByUserIdMock } = vi.hoisted(() => ({
 vi.mock('./auth', () => ({ auth: authMock }));
 
 vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+  ...(await mockDbConstants()),
   queries: {
     admins: { getAdminByUserId: getAdminByUserIdMock },
   },

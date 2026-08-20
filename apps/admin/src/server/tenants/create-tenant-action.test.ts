@@ -1,3 +1,4 @@
+import { mockDbConstants } from '@admin/testing/mock-db-constants';
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { redirect } from 'next/navigation';
 
@@ -40,7 +41,7 @@ vi.mock('@admin/utils/logger/logger', () => ({
 }));
 
 vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+  ...(await mockDbConstants()),
   queries: {
     users: { getUserByEmail: getUserByEmailMock },
     tenants: {

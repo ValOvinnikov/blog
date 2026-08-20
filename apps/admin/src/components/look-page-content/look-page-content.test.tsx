@@ -1,4 +1,5 @@
 import { customRenderAsync, screen } from '@admin/testing/custom-render';
+import { mockDbConstants } from '@admin/testing/mock-db-constants';
 import { PRESET_ID } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
@@ -14,7 +15,7 @@ const { getSiteConfigMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@blog/db', async () => ({
-  ...(await import('@blog/db/constants')),
+  ...(await mockDbConstants()),
   queries: { siteConfig: { getSiteConfig: getSiteConfigMock } },
 }));
 
