@@ -56,4 +56,11 @@ export const WithDividerAndLargeSpacing: TStory = {
       dividerBottom: true,
     },
   },
+  decorators: [
+    (Story) => (
+      <div className="py-section">
+        <Story />
+      </div>
+    ),
+  ],
 };
