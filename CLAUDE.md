@@ -589,6 +589,14 @@ tree` is that guard working, so never answer it with `-f -f` or
    `git worktree unlock`: forcing it destroys a live session's uncommitted
    work (it already cost #669's config agent its work once).
 
+   **The same pass clears the scratchpad transfer buffers** the agents
+   exported into (`.claude/scratchpad*/`, gitignored) — after the push, not
+   before it, since that export can be an agent's only surviving copy until
+   the work reaches the remote. Delete the exact directories this session
+   created. Parallel jobs share that tree too, and unlike a worktree a
+   scratchpad has **no lock file**: a wildcard `rm -rf` destroys another
+   running job's in-flight buffer with no error and no warning.
+
 **Broad instructions ("go ahead", "keep going", "pick the next issue") authorize the work and commits — never the push or PR.** Those two gates always require fresh, explicit confirmation.
 
 **Board reconciliation (not a gate — no approval needed).** After step 7 opens

@@ -398,6 +398,36 @@ git worktree remove <worktree>                    # never --force
   this gate. When asked to do it, apply the same three checks to each one
   individually, and still skip every locked path.
 
+### Remove the scratchpad transfer buffers too
+
+The `.claude/scratchpad*/` directory an agent exported its diff into is a
+**transfer buffer**, not a record. Once the assembled work is committed and
+pushed, git holds it and the copy is pure duplication — delete it in the same
+pass as the worktrees, and for the same reason.
+
+**Do not delete it before the push.** Between an agent finishing and its work
+reaching the remote, that export can be the only surviving copy: idle agent
+worktrees get torn down, taking their uncommitted files with them. Push is the
+line that makes the copy redundant.
+
+**Delete the exact paths you created — never a wildcard.** Parallel jobs share
+`.claude/scratchpad*/` the same way they share `.claude/worktrees/`, but with
+one critical difference: **a scratchpad has no lock file**. Nothing refuses the
+operation, nothing prints a `fatal:` — `rm -rf .claude/scratchpads/*` silently
+destroys another running job's in-flight transfer buffer, and the first sign of
+trouble is that job's assembly step finding an empty directory. The issue-keyed
+names are not sufficient ownership either: the same issue accumulates variants
+across sessions (`1786/` and `1786-tests/`, `1754-focus-lock/`,
+`1754-focus-conditional/`, `1754-focus-final/`), so even
+`rm -rf .claude/scratchpads/1786*` can reach outside your own work. Remove the
+specific directories from your dispatch record, one at a time.
+
+Leftovers from earlier sessions are the same story as orphan worktrees — real,
+but somebody else's to authorize. They are cheap (the whole tree was ~1 MB
+across 10 directories when this was written), so clearing them is a separate
+explicitly-requested cleanup, and one that has to confirm no live job is still
+writing to a directory before touching it.
+
 ## 9. Deploy — human-gated, never automatic
 
 - `sanity deploy` (cms) and Vercel deploys are **manual, human-run** steps. Do
