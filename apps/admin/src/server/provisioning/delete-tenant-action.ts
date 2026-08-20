@@ -1,7 +1,7 @@
 'use server';
 
 import { recordAuditEvent } from '@admin/server/audit/record-audit-event';
-import { requireAdmin } from '@admin/server/auth/require-admin';
+import { requireSuperAdmin } from '@admin/server/auth/require-super-admin';
 import { logger } from '@admin/utils/logger/logger';
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
@@ -27,7 +27,7 @@ export async function deleteTenantAction(
   tenantId: string,
   input: TDeleteTenantInput,
 ): Promise<TDeleteTenantResult> {
-  await requireAdmin();
+  await requireSuperAdmin();
 
   const parsed = deleteTenantInputSchema.safeParse(input);
   if (!parsed.success) {
