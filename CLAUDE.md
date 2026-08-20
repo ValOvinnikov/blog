@@ -574,8 +574,13 @@ Every issue follows this exact order. **Committing is free (no approval needed);
    else will: the harness never auto-sweeps them because `worktree-agent-*`
    branches are never pushed. Worktrees share the main checkout's
    `node_modules` (`docs/context/claude-code.md`), but they still pile
-   up. See `develop-feature` step 8 for the safety checks — never delete
-   uncommitted work.
+   up. **The trigger is the push at step 6, not the PR** — a pushed branch is
+   recoverable, which is the entire safety condition; a layer-agent worktree
+   goes even earlier, once its patch is landed on the `feat/` branch, while the
+   session's own feature worktree stays until CI is green so a Gate 5a fix has
+   somewhere to happen. See `develop-feature` step 8 for the safety checks, and
+   for why a post-merge "will discard N commits" refusal is usually a stale
+   local `main` rather than real work — never delete uncommitted work.
 
    **Only the ones _this session_ created.** Several Claude jobs run in
    parallel on this machine and share `.claude/worktrees/`, so
