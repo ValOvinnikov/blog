@@ -10,12 +10,14 @@ const meta = {
   tags: ['autodocs'],
   args: {
     id: 'hero-1',
-    brandVariant: BRAND_VARIANT.PRIMARY,
+    brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
     eyebrow: 'Architecture',
     title: 'Building a Design System from Scratch',
     subtitle:
       'A deep dive into Atomic Design principles, Tailwind CSS v4, and class-variance-authority — all working together in a portable component library.',
-    sanityImage: undefined,
+    // `SanityImage` bakes a hotspot-aware 16:9 crop into the source URL at
+    // render time, rather than relying on CSS `object-fit` alone.
+    sanityImage: makeSanityImage(),
     primaryAction: {
       label: 'Read more',
       href: '/blog/building-a-design-system',
@@ -35,23 +37,6 @@ type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
 
-/**
- * A custom, already-descriptive label renders with no visually-hidden
- * suffix — `heroHiddenLabelVariants` only appends one for the generic
- * fallback label.
- */
-export const CustomCtaLabel: TStory = {
-  args: {
-    primaryAction: {
-      label: 'Explore our latest stories',
-      href: '/blog',
-      target: undefined,
-      platform: undefined,
-      hiddenLabelSuffix: undefined,
-    },
-  },
-};
-
 export const WithSecondaryAction: TStory = {
   args: {
     secondaryAction: {
@@ -64,17 +49,13 @@ export const WithSecondaryAction: TStory = {
   },
 };
 
-/**
- * `SanityImage` bakes a hotspot-aware 16:9 crop into the source URL at
- * render time, rather than relying on CSS `object-fit` alone.
- */
-export const WithImage: TStory = {
+export const Primary: TStory = {
   args: {
-    sanityImage: makeSanityImage(),
+    brandVariant: BRAND_VARIANT.PRIMARY,
   },
 };
 
-export const BrandSecondary: TStory = {
+export const Secondary: TStory = {
   args: {
     brandVariant: BRAND_VARIANT.SECONDARY,
   },

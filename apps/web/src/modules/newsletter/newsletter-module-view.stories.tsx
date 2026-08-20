@@ -25,6 +25,6 @@ type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
 
-export const BrandSecondary: TStory = {
+export const Secondary: TStory = {
   args: { brandVariant: BRAND_VARIANT.SECONDARY },
 };

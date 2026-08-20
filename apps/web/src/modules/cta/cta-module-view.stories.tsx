@@ -41,6 +41,6 @@ export const WithoutAction: TStory = {
   args: { action: undefined },
 };
 
-export const BrandSecondary: TStory = {
+export const Secondary: TStory = {
   args: { brandVariant: BRAND_VARIANT.SECONDARY },
 };
