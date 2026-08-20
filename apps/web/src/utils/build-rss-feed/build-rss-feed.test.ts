@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { buildRssFeed, type TRssItem } from './build-rss-feed';
 
 const channel = {
