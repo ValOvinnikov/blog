@@ -36,7 +36,29 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
       ),
     ).toBeVisible();
     expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Go home' })).toBeVisible();
+  });
+
+  it('renders "Go home" as a real link, not a button', () => {
+    setup();
+
+    const goHomeLink = screen.getByRole('link', { name: 'Go home' });
+    expect(goHomeLink).toBeVisible();
+    expect(goHomeLink).toHaveAttribute('href', '/');
+  });
+
+  it('announces the error to assistive technology after mount', () => {
+    const { container } = setup();
+
+    const liveRegion = container.querySelector('[aria-live="assertive"]');
+    expect(liveRegion).not.toBeNull();
+    expect(liveRegion).toHaveTextContent('Something went wrong');
+  });
+
+  it('sets aria-atomic on the live region', () => {
+    const { container } = setup();
+
+    const liveRegion = container.querySelector('[aria-live="assertive"]');
+    expect(liveRegion).toHaveAttribute('aria-atomic', 'true');
   });
 
   it('reports the error exactly once on mount, with its digest', () => {
@@ -65,5 +87,11 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: 'Try again' }));
 
     expect(reset).toHaveBeenCalledTimes(1);
+  });
+
+  it('moves focus to the page container on mount', () => {
+    setup();
+
+    expect(screen.getByRole('main')).toHaveFocus();
   });
 });

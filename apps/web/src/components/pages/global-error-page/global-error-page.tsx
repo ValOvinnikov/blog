@@ -1,9 +1,11 @@
 'use client';
 
+import { routes } from '@blog/config';
 import { Button, Heading, Text } from '@blog/ui/atoms';
+import { LinkButton } from '@blog/ui/molecules';
 import { errorPageLayoutVariants } from '@web/components/shared/error-page-layout';
 import { reportClientError } from '@web/utils/report-client-error';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export type TGlobalErrorPageProps = {
   error: Error & { digest?: string };
@@ -15,19 +17,33 @@ const s = errorPageLayoutVariants();
 /**
  * The content rendered inside `app/global-error.tsx`'s own `<html>`/`<body>`
  * — this boundary replaces the root layout entirely, so like `ErrorPage` it
- * stays self-contained and hardcoded-English rather than depending on
- * `NextIntlClientProvider`, which is set up further down the tree than a
- * root-layout failure can reach.
+ * can't assume `NextIntlClientProvider`, staying hardcoded English with a
+ * plain anchor for "Go home" instead of `SmartLink`.
  */
 export function GlobalErrorPage({ error, reset }: TGlobalErrorPageProps) {
+  const announcementRef = useRef<HTMLSpanElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     reportClientError('global_error_boundary.render_failed', error, {
       digest: error.digest,
     });
+    // Written after mount, not on first paint — a live region that's
+    // already populated when it enters the DOM is unreliably announced.
+    if (announcementRef.current) {
+      announcementRef.current.textContent = 'Something went wrong';
+    }
+    mainRef.current?.focus();
   }, [error]);
 
   return (
-    <main className={s.root()}>
+    <main ref={mainRef} tabIndex={-1} className={s.root()}>
+      <span
+        ref={announcementRef}
+        aria-live="assertive"
+        aria-atomic="true"
+        className={s.announcement()}
+      />
       <Heading level={1} visual="hero">
         Something went wrong
       </Heading>
@@ -36,6 +52,9 @@ export function GlobalErrorPage({ error, reset }: TGlobalErrorPageProps) {
       </Text>
       <div className={s.actions()}>
         <Button onClick={reset}>Try again</Button>
+        <LinkButton href={routes.home()} variant="ghost">
+          Go home
+        </LinkButton>
       </div>
     </main>
   );
