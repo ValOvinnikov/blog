@@ -5,7 +5,10 @@ export const tenantDetailsPanelVariants = tv({
     root: [
       'flex flex-col gap-4 rounded-md border border-border bg-surface p-6',
     ],
-    fields: ['flex flex-col gap-5'],
+    fields: [
+      'flex flex-col gap-5',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+    ],
     field: ['flex flex-col gap-1.5'],
     fieldLabel: ['text-sm font-medium text-text'],
     fieldError: ['text-xs text-error'],

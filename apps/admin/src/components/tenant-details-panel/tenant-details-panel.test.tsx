@@ -9,7 +9,10 @@ import { useRouter } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactElement } from 'react';
 
-import { TenantDetailsPanel } from './tenant-details-panel';
+import {
+  TenantDetailsPanel,
+  type TTenantDetailsPanelProps,
+} from './tenant-details-panel';
 
 const render = renderWithIntl;
 
@@ -20,6 +23,18 @@ function withIntl(ui: ReactElement) {
     <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
       {ui}
     </NextIntlClientProvider>
+  );
+}
+
+// A sibling control outside the panel entirely, standing in for an unrelated
+// field or the adjacent steps list that a background poll must not steal
+// focus from.
+function PanelWithOutsideControl(props: TTenantDetailsPanelProps) {
+  return (
+    <>
+      <button type="button">Outside control</button>
+      <TenantDetailsPanel {...props} />
+    </>
   );
 }
 
@@ -283,22 +298,121 @@ describe(TenantDetailsPanel, () => {
         'Tenant details unlocked and editable again.',
       );
     });
+  });
 
-    it('keeps the announcement visually hidden rather than displayed in the panel', () => {
+  describe('focus management on the lock transition', () => {
+    it('does not move focus away from document.body on mount', () => {
       const tenant = makeTenant();
-      const { container, rerender } = rtlRender(
+      rtlRender(
         withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
       );
+
+      expect(document.activeElement).toBe(document.body);
+    });
+
+    it('moves focus to the locked container when the panel locks while focus was inside it', () => {
+      const tenant = makeTenant({ name: 'Acme Inc.' });
+      const { rerender } = rtlRender(
+        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
+      );
+
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      nameInput.focus();
+      expect(document.activeElement).toBe(nameInput);
 
       rerender(
         withIntl(<TenantDetailsPanel tenant={tenant} isEditable={false} />),
       );
 
-      const liveRegion = container.querySelector('[aria-live="assertive"]');
-      expect(liveRegion).toHaveTextContent(
-        'Tenant details locked while provisioning runs.',
+      const lockedContainer = screen.getByText('Name').closest('dl');
+      expect(lockedContainer).not.toBeNull();
+      expect(document.activeElement).toBe(lockedContainer);
+      expect(document.activeElement).not.toBe(document.body);
+    });
+
+    it('moves focus to the now-editable container when the panel unlocks while focus was inside it', () => {
+      const tenant = makeTenant({ name: 'Acme Inc.' });
+      const { rerender } = rtlRender(
+        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={false} />),
       );
-      expect(liveRegion).toHaveClass('sr-only');
+
+      const lockedContainer = screen.getByText('Name').closest('dl');
+      lockedContainer?.focus();
+      expect(document.activeElement).toBe(lockedContainer);
+
+      rerender(
+        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
+      );
+
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      const editableContainer = nameInput.closest('[tabindex="-1"]');
+      expect(editableContainer).not.toBeNull();
+      expect(document.activeElement).toBe(editableContainer);
+      expect(document.activeElement).not.toBe(document.body);
+    });
+
+    it('does not move focus on an unrelated re-render while isEditable stays the same', () => {
+      const tenant = makeTenant({ name: 'Acme Inc.' });
+      const { rerender } = rtlRender(
+        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
+      );
+
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      nameInput.focus();
+      expect(document.activeElement).toBe(nameInput);
+
+      rerender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={makeTenant({ name: 'Acme Renamed' })}
+            isEditable={true}
+          />,
+        ),
+      );
+
+      expect(document.activeElement).toBe(nameInput);
+    });
+
+    it('does not steal focus into the locked container when the lock transition fires while focus was outside the panel', () => {
+      const tenant = makeTenant({ name: 'Acme Inc.' });
+      const { rerender } = rtlRender(
+        withIntl(<PanelWithOutsideControl tenant={tenant} isEditable={true} />),
+      );
+
+      const outsideControl = screen.getByRole('button', {
+        name: 'Outside control',
+      });
+      outsideControl.focus();
+      expect(document.activeElement).toBe(outsideControl);
+
+      rerender(
+        withIntl(
+          <PanelWithOutsideControl tenant={tenant} isEditable={false} />,
+        ),
+      );
+
+      expect(document.activeElement).toBe(outsideControl);
+    });
+
+    it('does not steal focus into the editable container when the unlock transition fires while focus was outside the panel', () => {
+      const tenant = makeTenant({ name: 'Acme Inc.' });
+      const { rerender } = rtlRender(
+        withIntl(
+          <PanelWithOutsideControl tenant={tenant} isEditable={false} />,
+        ),
+      );
+
+      const outsideControl = screen.getByRole('button', {
+        name: 'Outside control',
+      });
+      outsideControl.focus();
+      expect(document.activeElement).toBe(outsideControl);
+
+      rerender(
+        withIntl(<PanelWithOutsideControl tenant={tenant} isEditable={true} />),
+      );
+
+      expect(document.activeElement).toBe(outsideControl);
     });
   });
 });
