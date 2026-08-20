@@ -84,6 +84,38 @@ describe('create-module-post-latest-from-post-list migration', () => {
       ]);
     });
 
+    it('repoints every module_postList item when modules[] has more than one', () => {
+      const page = {
+        ...baseDoc,
+        _id: 'page_home',
+        _type: 'page_home',
+        modules: [
+          { _key: 'key1', _type: 'module_postList', _ref: 'abc123' },
+          { _key: 'key2', _type: 'module_cta', _ref: 'cta-1' },
+          { _key: 'key3', _type: 'module_postList', _ref: 'def456' },
+        ],
+      };
+
+      expect(migration.migrate.document(page)).toEqual([
+        at(
+          ['modules', { _key: 'key1' }],
+          set({
+            _key: 'key1',
+            _type: 'module_postLatest',
+            _ref: toPostLatestId('abc123'),
+          }),
+        ),
+        at(
+          ['modules', { _key: 'key3' }],
+          set({
+            _key: 'key3',
+            _type: 'module_postLatest',
+            _ref: toPostLatestId('def456'),
+          }),
+        ),
+      ]);
+    });
+
     it('produces no patches for a page_home with no module_postList item', () => {
       const page = {
         ...baseDoc,
