@@ -19,7 +19,7 @@ export const postListSchema = defineType({
       title: 'Limit',
       type: 'number',
       description: 'Maximum number of posts to show.',
-      validation: (rule) => rule.required().integer().min(1).max(12),
+      validation: (rule) => rule.required().integer().min(1).max(24),
     }),
     layoutField,
   ],
