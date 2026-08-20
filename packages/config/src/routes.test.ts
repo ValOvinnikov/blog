@@ -15,22 +15,22 @@ describe('routes', () => {
     expect(routes.blogIndex(10)).toBe('/blog/page/10');
   });
 
-  it('builds post, category, author, topics, and generic-page paths', () => {
+  it('builds post, topic, author, topics, and generic-page paths', () => {
     expect(routes.post('my-post')).toBe('/blog/my-post');
-    expect(routes.category('design')).toBe('/category/design');
+    expect(routes.topic('design')).toBe('/topics/design');
     expect(routes.author('jane-doe')).toBe('/author/jane-doe');
     expect(routes.topics()).toBe('/topics');
     expect(routes.genericPage('about')).toBe('/about');
   });
 
-  it('builds page 1 of a category without a page segment', () => {
-    expect(routes.category('design')).toBe('/category/design');
-    expect(routes.category('design', 1)).toBe('/category/design');
+  it('builds page 1 of a topic without a page segment', () => {
+    expect(routes.topic('design')).toBe('/topics/design');
+    expect(routes.topic('design', 1)).toBe('/topics/design');
   });
 
-  it('builds page N of a category under /category/{slug}/page/', () => {
-    expect(routes.category('design', 2)).toBe('/category/design/page/2');
-    expect(routes.category('design', 10)).toBe('/category/design/page/10');
+  it('builds page N of a topic under /topics/{slug}/page/', () => {
+    expect(routes.topic('design', 2)).toBe('/topics/design/page/2');
+    expect(routes.topic('design', 10)).toBe('/topics/design/page/10');
   });
 
   it('builds page 1 of a tag without a page segment', () => {
