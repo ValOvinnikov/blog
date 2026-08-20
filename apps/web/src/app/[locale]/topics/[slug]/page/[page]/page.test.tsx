@@ -113,7 +113,7 @@ describe('TopicNumberedPage', () => {
         ok: true,
         data: {
           topic: {
-            id: 'cat-1',
+            id: 'topic-1',
             title: 'Engineering',
             slug: 'engineering',
             description: 'Posts about building things.',

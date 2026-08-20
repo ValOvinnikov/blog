@@ -5,7 +5,7 @@ export function makePostCardTopic(
   overrides: Partial<TPostCardTopic> = {},
 ): TPostCardTopic {
   return {
-    id: 'cat-1',
+    id: 'topic-1',
     title: 'News',
     slug: 'news',
     ...overrides,

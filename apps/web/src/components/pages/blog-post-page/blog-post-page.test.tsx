@@ -468,7 +468,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
               imageUrl: undefined,
             },
             topic: {
-              id: 'cat-2',
+              id: 'topic-2',
               title: 'Design',
               slug: 'design',
             },

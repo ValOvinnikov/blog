@@ -14,7 +14,7 @@ describe('getTopicsSafely', () => {
   it('returns the topics from the service on success', async () => {
     const topics = [
       {
-        id: 'cat-1',
+        id: 'topic-1',
         title: 'Engineering',
         slug: 'engineering',
         description: undefined,

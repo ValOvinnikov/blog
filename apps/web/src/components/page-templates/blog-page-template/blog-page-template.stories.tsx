@@ -42,32 +42,32 @@ const posts = [
     title: 'How we ship reviews faster',
     slug: 'how-we-ship-reviews-faster',
     publishedAt: '2026-03-04T00:00:00.000Z',
-    topic: makePostCardTopic({ id: 'cat-1', title: 'Engineering' }),
+    topic: makePostCardTopic({ id: 'topic-1', title: 'Engineering' }),
   }),
   makePostCard({
     id: 'post-2',
     title: 'A tour of the new editor',
     slug: 'a-tour-of-the-new-editor',
     publishedAt: '2026-02-18T00:00:00.000Z',
-    topic: makePostCardTopic({ id: 'cat-2', title: 'Product' }),
+    topic: makePostCardTopic({ id: 'topic-2', title: 'Product' }),
   }),
   makePostCard({
     id: 'post-3',
     title: 'Notes from our first year',
     slug: 'notes-from-our-first-year',
     publishedAt: '2026-01-09T00:00:00.000Z',
-    topic: makePostCardTopic({ id: 'cat-3', title: 'News' }),
+    topic: makePostCardTopic({ id: 'topic-3', title: 'News' }),
   }),
 ].map(toCardData);
 
 const topics = [
   makeTopicWithPostCount({
-    id: 'cat-1',
+    id: 'topic-1',
     title: 'Engineering',
     slug: 'engineering',
   }),
-  makeTopicWithPostCount({ id: 'cat-2', title: 'Product', slug: 'product' }),
-  makeTopicWithPostCount({ id: 'cat-3', title: 'News', slug: 'news' }),
+  makeTopicWithPostCount({ id: 'topic-2', title: 'Product', slug: 'product' }),
+  makeTopicWithPostCount({ id: 'topic-3', title: 'News', slug: 'news' }),
 ];
 
 const author = makeAuthor({

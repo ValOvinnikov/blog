@@ -19,14 +19,14 @@ vi.mock('@web/components/shared/smart-link', () => ({
 
 const topics = [
   {
-    id: 'cat-1',
+    id: 'topic-1',
     title: 'Engineering',
     slug: 'engineering',
     description: undefined,
     postCount: 3,
   },
   {
-    id: 'cat-2',
+    id: 'topic-2',
     title: 'Design',
     slug: 'design',
     description: undefined,

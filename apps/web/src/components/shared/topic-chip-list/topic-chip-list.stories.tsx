@@ -5,12 +5,12 @@ import { TopicChipList } from './topic-chip-list';
 
 const topics = [
   makeTopicWithPostCount({
-    id: 'cat-1',
+    id: 'topic-1',
     title: 'Engineering',
     slug: 'engineering',
   }),
-  makeTopicWithPostCount({ id: 'cat-2', title: 'Design', slug: 'design' }),
-  makeTopicWithPostCount({ id: 'cat-3', title: 'Product', slug: 'product' }),
+  makeTopicWithPostCount({ id: 'topic-2', title: 'Design', slug: 'design' }),
+  makeTopicWithPostCount({ id: 'topic-3', title: 'Product', slug: 'product' }),
 ];
 
 const meta = {

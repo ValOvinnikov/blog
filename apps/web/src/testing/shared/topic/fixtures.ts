@@ -2,7 +2,7 @@ import type { TTopic, TTopicWithPostCount } from '@blog/service';
 
 export function makeTopic(overrides: Partial<TTopic> = {}): TTopic {
   return {
-    id: 'cat-1',
+    id: 'topic-1',
     title: 'Engineering',
     slug: 'engineering',
     description: 'Posts about building things.',

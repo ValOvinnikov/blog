@@ -72,7 +72,7 @@ describe(`<${TopicPage.name}/>`, () => {
           postCount: 1,
         }),
         makeTopicWithPostCount({
-          id: 'cat-2',
+          id: 'topic-2',
           title: 'Design',
           slug: 'design',
           postCount: 2,

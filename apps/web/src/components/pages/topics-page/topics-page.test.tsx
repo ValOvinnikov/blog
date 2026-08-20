@@ -51,7 +51,7 @@ describe(`<${TopicsPage.name}/>`, () => {
       ok: true,
       data: [
         {
-          id: 'cat-1',
+          id: 'topic-1',
           title: 'Engineering',
           slug: 'engineering',
           description: 'Posts about building things.',
@@ -73,7 +73,7 @@ describe(`<${TopicsPage.name}/>`, () => {
       ok: true,
       data: [
         {
-          id: 'cat-1',
+          id: 'topic-1',
           title: 'Engineering',
           slug: 'engineering',
           description: undefined,
@@ -94,7 +94,7 @@ describe(`<${TopicsPage.name}/>`, () => {
       ok: true,
       data: [
         {
-          id: 'cat-1',
+          id: 'topic-1',
           title: 'Engineering',
           slug: 'engineering',
           description: undefined,
