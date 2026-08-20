@@ -1,9 +1,20 @@
 import '../index.css';
 
+import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
 import type { Decorator, Preview } from '@storybook/nextjs-vite';
+import { resolveFontVariableClassName } from '@web/config/fonts';
 import { NextIntlClientProvider } from 'next-intl';
 
 import messages from '../src/i18n/messages/en.json';
+
+// Must go on the root element, not a wrapper div: the `--font-*-family`
+// custom properties are read on `body`, which doesn't inherit them from a
+// descendant.
+const { headingFont, bodyFont } =
+  PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
+document.documentElement.classList.add(
+  ...resolveFontVariableClassName(headingFont, bodyFont).split(' '),
+);
 
 // `SmartLink` (the app's one link component — used directly by, or composed
 // into, most `apps/web` components: `PortableTextRenderer`'s link mark,
