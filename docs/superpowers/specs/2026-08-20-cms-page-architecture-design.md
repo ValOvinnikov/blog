@@ -233,43 +233,122 @@ ever indexable.
 | 404 on missing page document                       | Runtime fallback to a default archive                                                                     | Keeps a single code path; guarded by two Studio validation rules                                                                |
 | `limit` widened to 1–24                            | Keeping 1–12                                                                                              | 12 would silently cap the blog index below the 24 `itemsPerPage` already allowed                                                |
 
-## Delivery phasing
+## Delivery — one epic per page surface
 
-Too large for one epic's worth of PRs. Four phases, each merging to `main`
-green on its own; within a phase the usual `config → cms → service → ui → web`
-order applies.
+Ten epics, each a parent issue with **one sub-issue per layer** and **one PR
+per layer**, in the usual `config → cms → service → ui → web` order. No epic
+reviews more than one page surface, and no PR spans more than one package
+except where a hard type-level coupling makes splitting impossible — the three
+such cases are named explicitly below.
 
-**Phase 1 — the rename.** `blog_category` → `blog_topic`, the post field, and
-the `/category/{slug}` → `/topics/{slug}` URLs, with redirects. One
-non-splittable PR (a `_type` rename reds `type-check` until every layer lands),
-plus its migration. Behaviour-neutral: no page documents yet, archives still
-render from the existing hardcoded grids. Doing this first means every later
-phase is written in the final vocabulary.
+Every epic must merge to `main` green on its own.
 
-**Phase 2 — the slot mechanic.** `module_postList` gains its paginated mode and
-the widened 1–24 `limit`; `page_blog` gains its required `postList` slot and
-`BlogListPage`'s hardcoded grid is removed. Proves the whole design on the one
-page that already has a document, before any new document types exist.
+### Where splitting is impossible, and why
 
-**Phase 3 — topic and tag pages.** `page_topic`, `page_tag`, `page_topicIndex`,
-`page_tagIndex`, `module_taxonomyList`, the `@blog/ui` taxonomy card/grid, both
-Studio validation rules, the `/tags` URL move, and the seeding migration.
-Retires `CATEGORY_ITEMS_PER_PAGE` / `TAG_ITEMS_PER_PAGE` and the hardcoded
-category/tag grids.
+Two verified constraints. Both are type-level, not stylistic — the split
+genuinely does not compile.
 
-**Phase 4 — author removal.** Delete the author routes, component, metadata
-builder, service feature folder, and `routes.author()`; add `blog_author`'s
-optional `page_generic` reference and point bylines at it. Retires
-`AUTHOR_ITEMS_PER_PAGE`. Independent of phases 2–3 — could run in parallel.
+1. **A `_type` rename** reds `type-check` in every downstream package until all
+   of them land. Epic 1 is therefore a single PR.
+2. **Introducing any new `module_*` type** reds `apps/web`. `MODULE_MAP` is
+   typed `Record<Exclude<TModuleType, 'module_hero'>, …>` and is deliberately
+   exhaustive — its own doc comment states that "adding a module type without
+   registering it here is a compile error". The moment the cms schema lands and
+   typegen widens `TModuleType`, `apps/web` stops compiling. So the cms schema
+   PR and the `apps/web` registration PR for a new module must land **together**
+   (epic 5). Note that `module_taxonomyList` follows the `module_hero`
+   precedent — rendered via a dedicated slot, never through `ModuleRenderer` —
+   so its registration is an addition to that `Exclude`, not a new `MODULE_MAP`
+   entry. Either way the same PR must carry it.
 
-`@blog/db`'s `starter-content.ts` update is a sibling to the cms work in each
-phase that changes fixtures (1 and 3).
+A third, softer one: **a field cannot be made required before the migration
+that populates it**, or the existing singleton shows as invalid in Studio.
+Where an epic makes a slot required on a document that already exists, the
+ordering within it is: add the field optional → run the seeding migration →
+flip it to required.
+
+### Foundation epics
+
+**E1 — rename `category` to `topic`.** `blog_category` → `blog_topic`, the post
+field, `/category/{slug}` → `/topics/{slug}`, redirects, and the rename
+migration. Touches config, cms, service, web, db fixtures, ui story fixtures.
+**Single PR** (constraint 1). Behaviour-neutral — no page documents yet,
+archives still render from the existing hardcoded grids. First, so every later
+epic is written in the final vocabulary.
+
+**E2 — post-list module gains its paginated mode.** The slot mechanic itself,
+dormant until a page uses it. Sub-issues: config (page-context contract, as
+#1333 specified) → cms (`limit` widened to 1–24) → service
+(`getPostList(id, context?)` scoping plus a total for pagination) → ui
+(`PostsSection` pagination props, if #1807 has not already covered it) → web
+(`PostListModule` renders paginated when given pagination context). Fully
+splittable; every PR additive.
+
+**E3 — `module_taxonomyList` and the taxonomy card UI.** New module document
+plus the `@blog/ui` card and grid that `/topics` currently hand-rolls. Check
+`packages/ui/COMPONENTS.md` for something extendable first. Sub-issues: cms +
+web **combined** (constraint 2) → service (taxonomy entries with post counts) →
+ui (card, grid, stories). Ships before the two index-page epics that consume it.
+
+### Page epics
+
+**E4 — `/blog` moves to the required slot.** `page_blog` gains its required
+`postList` reference; `BlogListPage`'s hardcoded grid is removed;
+`itemsPerPage` retires. Sub-issues: cms → service → web, plus the migration
+seeding `page_blog`'s module. Subject to the required-field ordering rule
+above. Proves the design on the one page that already has a document.
+
+**E5 — `/topics` index page.** `page_topicIndex` singleton with its required
+`taxonomyList` slot; replaces the hardcoded `TopicsPage` and moves its heading
+and intro copy out of i18n keys into content. Sub-issues: cms → service → web.
+
+**E6 — `/topics/{slug}` page.** `page_topic` with its required `postList` slot
+and `topic` reference; retires `CATEGORY_ITEMS_PER_PAGE` and the hardcoded
+category grid; adds both Studio validation rules (uniqueness of the reference,
+and the missing-page warning on the taxonomy document). Sub-issues: cms →
+service → web, plus the seeding migration for the 1 existing topic.
+
+**E7 — `/tags` index page.** `page_tagIndex` singleton, mirroring E5. New route
+— nothing exists today. Sub-issues: cms → service → web.
+
+**E8 — `/tags/{slug}` page.** `page_tag`, the `/tag/` → `/tags/` URL move, the
+`/tags/{slug}/rss.xml` feed move, redirects, and the seeding migration for
+**15 tags** (30 documents, per Migration above). Retires `TAG_ITEMS_PER_PAGE`
+and the hardcoded tag grid. Sub-issues: config (routes helper) → cms → service
+→ web. The largest page epic, because of the seeding.
+
+**E9 — remove `/author/{slug}`.** Delete the author routes, `AuthorPage`, the
+metadata builder, `packages/service/src/features/pages/author/`,
+`routes.author()`, `AUTHOR_ITEMS_PER_PAGE`, and the sitemap entries; add
+`blog_author`'s optional `page_generic` reference and point bylines at it.
+Sub-issues: config → cms → service → web. **Independent of E2–E8** — can run in
+parallel at any point after E1.
+
+**E10 — `/{slug}` generic pages may host a post list.** Adds `module_postList`
+to `page_generic`'s allowed `modules[]` types. Sub-issues: cms → web. Smallest
+epic; depends only on E2.
+
+### Order
+
+`E1 → E2 → E3 → E4 → (E5, E6) → (E7, E8) → E10`, with **E9 parallel** any time
+after E1. E5/E6 and E7/E8 are each an index-and-children pair and are best
+reviewed together in sequence, though either merges green alone.
+
+`@blog/db`'s `starter-content.ts` is a sibling sub-issue in every epic that
+changes Sanity fixtures — E1, E6, and E8.
 
 ## Board actions
 
 - Close #1333–#1336 and epic #1332 as superseded by this design. Its page-context
-  contract survives — it is what scopes a `modules[]` post list — but its
-  premise (`modules[]` on the taxonomy documents, grid untouched) does not.
+  contract survives — it is what scopes a `modules[]` post list, and it is E2's
+  first sub-issue — but its premise (`modules[]` on the taxonomy documents, grid
+  untouched) does not.
+- Create ten parent issues, E1–E10 above, each with one sub-issue per layer.
+  Gather every sub-issue's title, body and labels up front and dispatch
+  `board-keeper` once per epic with the whole set, rather than issue by issue.
+  Label each sub-issue with its `layer:*` label; E1's single non-splittable PR
+  still gets one issue per layer for tracking, with the PR referencing all of
+  them.
 - `SPEC.md` §6 (content model) and `docs/context/surfaces-and-routing.md`,
   `content-model.md`, `data-flow.md`, `seo-accessibility.md` all need syncing as
-  each phase lands.
+  each epic lands.
