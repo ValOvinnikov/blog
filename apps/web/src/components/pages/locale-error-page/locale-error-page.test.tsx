@@ -1,5 +1,7 @@
 import userEvent from '@testing-library/user-event';
-import { customRender, screen } from '@web/testing/custom-render';
+import messages from '@web/i18n/messages/en.json';
+import { customRender, render, screen } from '@web/testing/custom-render';
+import { NextIntlClientProvider } from 'next-intl';
 
 import { LocaleErrorPage } from './locale-error-page';
 
@@ -76,6 +78,26 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
     const { rerender } = setup();
 
     rerender(<LocaleErrorPage error={error} reset={reset} />);
+
+    expect(reportClientErrorMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not re-report when `t`'s identity changes but the error does not", () => {
+    // `NextIntlClientProvider` memoizes `t` on its `messages` prop identity
+    // (among other things) — a fresh object with the same content forces a
+    // genuinely new `t` reference on the next render, independent of the
+    // app's current (incidental) provider stability.
+    const { rerender } = render(
+      <NextIntlClientProvider locale="en" messages={{ ...messages }}>
+        <LocaleErrorPage error={error} reset={reset} />
+      </NextIntlClientProvider>,
+    );
+
+    rerender(
+      <NextIntlClientProvider locale="en" messages={{ ...messages }}>
+        <LocaleErrorPage error={error} reset={reset} />
+      </NextIntlClientProvider>,
+    );
 
     expect(reportClientErrorMock).toHaveBeenCalledTimes(1);
   });
