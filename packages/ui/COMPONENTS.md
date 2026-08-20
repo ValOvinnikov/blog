@@ -360,7 +360,7 @@ Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### PostsSection — `organisms/posts-section/posts-section.tsx`
 
 labeled section rendering a set of posts in a responsive grid, generic enough to reuse for other post listings (e.g. related posts, category pages).
-Props: posts: IPostCardData[] · title: string · titleId: string · linkAs?: TAnchorElementType · supportingText?: string · align?: TPostsSectionVariants['align'] · emptyMessage?: string · isTinted?: TPostsSectionVariants['tinted'] · isWrapped?: TPostsSectionVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
+Props: posts: IPostCardData[] · title?: string · titleId?: string · titleFallback?: string · linkAs?: TAnchorElementType · supportingText?: string · align?: TPostsSectionVariants['align'] · emptyMessage?: string · isTinted?: TPostsSectionVariants['tinted'] · isWrapped?: TPostsSectionVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
 Variants: tinted: (boolean) · wrapped: (boolean) · align: HEADING_ALIGN.LEFT|HEADING_ALIGN.CENTER|HEADING_ALIGN.RIGHT
 
 ### ToastViewport — `organisms/toast-viewport/toast-viewport.tsx`

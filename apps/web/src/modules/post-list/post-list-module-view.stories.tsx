@@ -37,6 +37,7 @@ const meta = {
     },
     items,
     layout: undefined,
+    titleFallback: 'Latest posts',
   },
 } satisfies Meta<typeof PostListModuleView>;
 

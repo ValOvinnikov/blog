@@ -163,4 +163,99 @@ describe(`<${PostsSection.name}/>`, () => {
       ).toBeVisible();
     }
   });
+
+  it('renders no heading when title and titleFallback are both omitted', () => {
+    setup({ title: undefined, titleId: undefined });
+
+    expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
+  });
+
+  it('still renders supportingText, the grid, and each post when title and titleFallback are both omitted', () => {
+    const supportingText = faker.lorem.sentence();
+
+    setup({ title: undefined, titleId: undefined, supportingText });
+
+    expect(screen.getByText(supportingText)).toBeVisible();
+    for (const post of posts) {
+      expect(
+        screen.getByRole('heading', { level: 3, name: post.title }),
+      ).toBeVisible();
+      expect(screen.getByRole('link', { name: post.title })).toHaveAttribute(
+        'href',
+        post.href,
+      );
+    }
+  });
+
+  it('renders the empty message without a heading when title and titleFallback are both omitted and posts is empty', () => {
+    const emptyMessage = faker.lorem.sentence();
+
+    setup({ title: undefined, titleId: undefined, posts: [], emptyMessage });
+
+    expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
+    expect(screen.getByText(emptyMessage)).toBeVisible();
+  });
+
+  it('renders the grid without a heading when title and titleFallback are both omitted and isTinted', () => {
+    setup({ title: undefined, titleId: undefined, isTinted: true });
+
+    expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
+    for (const post of posts) {
+      expect(
+        screen.getByRole('heading', { level: 3, name: post.title }),
+      ).toBeVisible();
+    }
+  });
+
+  it('renders a visually-hidden heading from titleFallback when title is omitted', () => {
+    const titleFallback = faker.lorem.sentence();
+
+    setup({ title: undefined, titleId: 'fallback-heading', titleFallback });
+
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: titleFallback,
+    });
+    // `sr-only` is the sole observable that distinguishes the visually-hidden
+    // fallback heading from a normally rendered title.
+    expect(heading).toHaveClass('sr-only');
+    expect(heading).toHaveAttribute('id', 'fallback-heading');
+  });
+
+  it('falls back to titleFallback when title is an empty string', () => {
+    const titleFallback = faker.lorem.sentence();
+
+    setup({ title: '', titleId: 'fallback-heading', titleFallback });
+
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: titleFallback,
+    });
+    // `sr-only` is the sole observable that distinguishes the visually-hidden
+    // fallback heading from a normally rendered title.
+    expect(heading).toHaveClass('sr-only');
+    expect(heading).toHaveAttribute('id', 'fallback-heading');
+  });
+
+  it('falls back to titleFallback when title is whitespace-only', () => {
+    const titleFallback = faker.lorem.sentence();
+
+    setup({ title: '   ', titleId: 'fallback-heading', titleFallback });
+
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: titleFallback,
+    });
+    expect(heading).toHaveClass('sr-only');
+  });
+
+  it('prefers title over titleFallback when both are provided', () => {
+    const titleFallback = faker.lorem.sentence();
+
+    setup({ titleFallback });
+
+    const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
+    expect(heading).not.toHaveClass('sr-only');
+    expect(screen.queryByText(titleFallback)).not.toBeInTheDocument();
+  });
 });

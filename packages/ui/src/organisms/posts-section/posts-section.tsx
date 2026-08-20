@@ -32,8 +32,16 @@ export interface IPostCardData {
 export type TPostsSectionProps = IWithClassName &
   IWithDataTestId & {
     posts: IPostCardData[];
-    title: string;
-    titleId: string;
+    /** Omit or leave blank to fall back to `titleFallback`, or to render no heading at all if that's also omitted. */
+    title?: string;
+    titleId?: string;
+    /**
+     * Accessible heading text used when `title` is empty or blank, so the
+     * section keeps a landmark name and the page's heading outline stays
+     * intact. Rendered visually hidden — pass an i18n string, never invent
+     * one here.
+     */
+    titleFallback?: string;
     /** Component each card's title link renders as — defaults to a plain `<a>`. Pass the app router's Link to get client-side navigation. */
     linkAs?: TAnchorElementType;
     /** Optional supporting copy rendered under the heading. */
@@ -65,6 +73,7 @@ export const PostsSection = ({
   posts,
   title,
   titleId,
+  titleFallback,
   className,
   dataTestId,
   linkAs,
@@ -82,12 +91,16 @@ export const PostsSection = ({
     wrapped: isWrapped,
     align,
   });
+  const hasTitle = Boolean(title?.trim());
+  const accessibleTitle = hasTitle ? title : titleFallback;
 
   const content = (
     <>
-      <h2 id={titleId} className={s.label()}>
-        {title}
-      </h2>
+      {accessibleTitle && (
+        <h2 id={titleId} className={hasTitle ? s.label() : s.labelFallback()}>
+          {accessibleTitle}
+        </h2>
+      )}
       {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
       {isEmpty ? (
         <p className={s.emptyMessage()}>{emptyMessage}</p>
