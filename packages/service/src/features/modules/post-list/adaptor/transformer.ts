@@ -15,6 +15,7 @@ export type TRawPostListModulePosts = InferResultType<
 export function toPostListModule(
   raw: TRawPostListModule,
   rawPosts: TRawPostListModulePosts,
+  total?: number,
 ): TPostListModule {
   return {
     brandVariant: raw.brandVariant,
@@ -23,5 +24,6 @@ export function toPostListModule(
       : { heading: undefined, supportingText: undefined, align: undefined },
     posts: rawPosts.map(toPostCard),
     layout: toLayout(raw.layout),
+    total,
   };
 }
