@@ -6,14 +6,12 @@ import {
   type RichText as TPortableText,
   type TAsideKind,
 } from '@blog/config';
-import {
-  Heading,
-  InlineCode,
-  Prose,
-  ProseLink,
-  QuoteBlock,
-} from '@blog/ui/atoms';
-import { ImageWithCaption } from '@blog/ui/molecules';
+import { Heading } from '@blog/ui/atoms/heading';
+import { InlineCode } from '@blog/ui/atoms/inline-code';
+import { Prose } from '@blog/ui/atoms/prose';
+import { ProseLink } from '@blog/ui/atoms/prose-link';
+import { QuoteBlock } from '@blog/ui/atoms/quote-block';
+import { ImageWithCaption } from '@blog/ui/molecules/image-with-caption';
 import {
   PortableText,
   type PortableTextBlockComponent,

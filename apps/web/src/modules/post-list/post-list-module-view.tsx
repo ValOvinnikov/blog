@@ -1,9 +1,9 @@
 import type { TPostListModule } from '@blog/service';
+import { Pagination } from '@blog/ui/organisms/pagination';
 import {
-  Pagination,
-  PostsSection,
   type IPostCardData,
-} from '@blog/ui/organisms';
+  PostsSection,
+} from '@blog/ui/organisms/posts-section';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
 

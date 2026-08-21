@@ -1,9 +1,13 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
 import { service } from '@blog/service';
-import { Heading, Text } from '@blog/ui/atoms';
-import { WindowChrome } from '@blog/ui/molecules';
-import { BookmarksList, type IBookmarkRow } from '@blog/ui/organisms';
+import { Heading } from '@blog/ui/atoms/heading';
+import { Text } from '@blog/ui/atoms/text';
+import { WindowChrome } from '@blog/ui/molecules/window-chrome';
+import {
+  BookmarksList,
+  type IBookmarkRow,
+} from '@blog/ui/organisms/bookmarks-list';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { auth } from '@web/server/auth/auth';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';

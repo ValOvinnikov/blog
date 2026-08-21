@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@blog/ui/atoms';
+import { Button } from '@blog/ui/atoms/button';
 import { useToast } from '@web/context/toast-provider';
 import {
   resendConfirmationAction,

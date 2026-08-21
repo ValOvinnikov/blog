@@ -7,8 +7,8 @@ import {
 } from '@admin/utils/tenant-badges/tenant-badges';
 import { Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { StatusBadge } from '@blog/ui/atoms';
-import { LinkButton } from '@blog/ui/molecules';
+import { StatusBadge } from '@blog/ui/atoms/status-badge';
+import { LinkButton } from '@blog/ui/molecules/link-button';
 import { useTranslations } from 'next-intl';
 
 import { tenantsTableVariants } from './tenants-table-variants';

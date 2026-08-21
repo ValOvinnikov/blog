@@ -1,8 +1,12 @@
 import { ASIDE_KIND, ICONS, Size, type TAsideKind, routes } from '@blog/config';
 import { service } from '@blog/service';
-import { Icon } from '@blog/ui/atoms';
-import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
-import { Article, PostsSection } from '@blog/ui/organisms';
+import { Icon } from '@blog/ui/atoms/icon';
+import {
+  Breadcrumbs,
+  type IBreadcrumbItem,
+} from '@blog/ui/molecules/breadcrumbs';
+import { Article } from '@blog/ui/organisms/article';
+import { PostsSection } from '@blog/ui/organisms/posts-section';
 import { BackToTopButton } from '@web/components/shared/back-to-top-button';
 import { BookmarkButton } from '@web/components/shared/bookmark-button';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';

@@ -4,8 +4,8 @@ import { Link } from '@admin/i18n/navigation';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import { Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { Heading } from '@blog/ui/atoms';
-import { LinkButton } from '@blog/ui/molecules';
+import { Heading } from '@blog/ui/atoms/heading';
+import { LinkButton } from '@blog/ui/molecules/link-button';
 import { useTranslations } from 'next-intl';
 
 import { tenantsViewVariants } from './tenants-view-variants';

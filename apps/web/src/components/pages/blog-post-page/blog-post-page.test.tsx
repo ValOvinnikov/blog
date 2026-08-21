@@ -5,7 +5,7 @@ import {
   type RichText,
   Size,
 } from '@blog/config';
-import { Icon } from '@blog/ui/atoms';
+import { Icon } from '@blog/ui/atoms/icon';
 import userEvent from '@testing-library/user-event';
 import {
   customRenderAsync,

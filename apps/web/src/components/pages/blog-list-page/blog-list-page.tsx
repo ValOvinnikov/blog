@@ -1,6 +1,9 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
-import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
+import {
+  Breadcrumbs,
+  type IBreadcrumbItem,
+} from '@blog/ui/molecules/breadcrumbs';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';

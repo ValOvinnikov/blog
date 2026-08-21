@@ -1,7 +1,10 @@
 import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { Heading } from '@blog/ui/atoms';
-import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
+import { Heading } from '@blog/ui/atoms/heading';
+import {
+  Breadcrumbs,
+  type IBreadcrumbItem,
+} from '@blog/ui/molecules/breadcrumbs';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';

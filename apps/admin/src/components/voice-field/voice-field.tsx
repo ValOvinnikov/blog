@@ -1,5 +1,6 @@
 import type { TVoiceOverrideKey } from '@admin/utils/voice-fields/voice-fields';
-import { TextInput, Textarea } from '@blog/ui/atoms';
+import { TextInput } from '@blog/ui/atoms/text-input';
+import { Textarea } from '@blog/ui/atoms/textarea';
 
 import { voiceFieldVariants } from './voice-field-variants';
 

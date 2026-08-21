@@ -1,7 +1,7 @@
 'use client';
 
 import { DEPTH } from '@blog/config';
-import { Button } from '@blog/ui/atoms';
+import { Button } from '@blog/ui/atoms/button';
 import { useDepth } from '@web/context/depth-provider';
 
 export interface ISwitchToReadButtonProps {

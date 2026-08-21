@@ -1,8 +1,10 @@
 'use client';
 
 import { routes } from '@blog/config';
-import { Button, Heading, Text } from '@blog/ui/atoms';
-import { LinkButton } from '@blog/ui/molecules';
+import { Button } from '@blog/ui/atoms/button';
+import { Heading } from '@blog/ui/atoms/heading';
+import { Text } from '@blog/ui/atoms/text';
+import { LinkButton } from '@blog/ui/molecules/link-button';
 import { errorPageLayoutVariants } from '@web/components/shared/error-page-layout';
 import { reportClientError } from '@web/utils/report-client-error';
 import { useEffect, useRef } from 'react';

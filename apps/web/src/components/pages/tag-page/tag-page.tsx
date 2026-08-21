@@ -1,7 +1,11 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
-import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
-import { Pagination, PostsSection } from '@blog/ui/organisms';
+import {
+  Breadcrumbs,
+  type IBreadcrumbItem,
+} from '@blog/ui/molecules/breadcrumbs';
+import { Pagination } from '@blog/ui/organisms/pagination';
+import { PostsSection } from '@blog/ui/organisms/posts-section';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';

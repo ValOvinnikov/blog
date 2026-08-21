@@ -1,7 +1,7 @@
 'use client';
 
 import { routes } from '@blog/config';
-import { Button } from '@blog/ui/atoms';
+import { Button } from '@blog/ui/atoms/button';
 import { useToast } from '@web/context/toast-provider';
 import {
   unlinkProviderAction,

@@ -1,7 +1,10 @@
 'use client';
 
 import { DEPTH, type TDepth } from '@blog/config';
-import { SegmentedControl, type ISegmentedControlOption } from '@blog/ui/atoms';
+import {
+  SegmentedControl,
+  type ISegmentedControlOption,
+} from '@blog/ui/atoms/segmented-control';
 import { useDepth } from '@web/context/depth-provider';
 
 export interface IDepthToggleLabels {

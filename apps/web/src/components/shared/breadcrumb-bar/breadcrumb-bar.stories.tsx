@@ -1,4 +1,4 @@
-import { Breadcrumbs } from '@blog/ui/molecules';
+import { Breadcrumbs } from '@blog/ui/molecules/breadcrumbs';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { SmartLink } from '@web/components/shared/smart-link';
 
