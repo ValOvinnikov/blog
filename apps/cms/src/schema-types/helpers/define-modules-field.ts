@@ -11,8 +11,8 @@ import { defineArrayMember, defineField, type ArrayRule } from 'sanity';
  * `ctaSchema.name` directly. Sanity validates the referenced type names exist
  * at `schema extract` time regardless.
  *
- * `validateCustom`, when given, receives the rule after `.unique()` and
- * returns it further chained — for page-specific constraints across the
+ * `validateCustom`, when given, receives the rule after `.unique().error(...)`
+ * and returns it further chained — for page-specific constraints across the
  * whole array (e.g. home-page's blank-heading check) without every caller
  * paying for it.
  */

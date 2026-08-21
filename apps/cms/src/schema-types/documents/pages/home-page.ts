@@ -15,10 +15,9 @@ type TModuleReference = { _type?: string; _ref?: string };
 /**
  * More than one `module_postLatest` reference on the home page falls back to
  * the same "Latest posts" heading when its own `sectionHeader.heading` is
- * blank — duplicate landmark names/`<h2>`s for assistive tech. Cheap
- * early-out for 0–1 candidates; otherwise dereferences the candidates
- * (`perspective: 'drafts'` since a module can still be an unpublished draft
- * while the page is being edited) and flags a second blank heading.
+ * blank — duplicate landmark names/`<h2>`s for assistive tech.
+ * `perspective: 'drafts'` because a module can still be an unpublished draft
+ * while the page is being edited.
  */
 async function validateSinglePostLatestWithoutHeading(
   modules: TModuleReference[] | undefined,
