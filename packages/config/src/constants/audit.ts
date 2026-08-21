@@ -3,6 +3,7 @@ import type { TValueOf } from '@blog/config/utils';
 export const AUDIT_TARGET_TYPE = {
   TENANT: 'TENANT',
   SITE_CONFIG: 'SITE_CONFIG',
+  SETTINGS_FEATURES: 'SETTINGS_FEATURES',
 } as const;
 
 export type TAuditTargetType = TValueOf<typeof AUDIT_TARGET_TYPE>;
