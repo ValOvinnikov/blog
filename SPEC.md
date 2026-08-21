@@ -27,17 +27,17 @@ frontend if a consumer is out of date.
 
 **Primary surfaces** (status as of 2026-07-23):
 
-| Surface | Route                          | Status                                                                                                         |
-| ------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| Home    | `/`                            | ✅ Built — modules-as-documents (hero + `modules[]`)                                                           |
-| Blog    | `/blog` + `/blog/page/N`       | ✅ Built — paginated index (#75)                                                                               |
-| Post    | `/blog/[slug]`                 | ✅ Built — post detail page + JSON-LD (#76)                                                                    |
-| Topic   | `/topics/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589); renamed from `category` in #1812                    |
-| Tag     | `/tag/[slug]` (+ `/page/N`)    | ✅ Built — unpaginated + paginated tag archives, shared-tag related posts, per-tag RSS (#674)                  |
-| Author  | `/author/[slug]` (+ `/page/N`) | ✅ Built — profile + posts by author, paginated (#327/#593-595/#744)                                           |
-| Topics  | `/topics`                      | ✅ Built — hub listing every topic with post counts, links to archives (#750/#751/#752)                        |
-| Page    | `/[slug]`                      | ✅ Built — generic page route (#285), slug space guarded by `RESERVED_SLUGS` (#328)                            |
-| Feeds   | sitemap/robots/RSS             | ✅ Built — Phase 3 (#92), generic pages listed in the sitemap (#285); tag archives + per-tag RSS added in #674 |
+| Surface | Route                          | Status                                                                                                                                               |
+| ------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Home    | `/`                            | ✅ Built — modules-as-documents (hero + `modules[]`)                                                                                                 |
+| Blog    | `/blog` + `/blog/page/N`       | ✅ Built — paginated index (#75)                                                                                                                     |
+| Post    | `/blog/[slug]`                 | ✅ Built — post detail page + JSON-LD (#76)                                                                                                          |
+| Topic   | `/topics/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589); renamed from `category` in #1812                                                          |
+| Tag     | `/tag/[slug]` (+ `/page/N`)    | ✅ Built — unpaginated + paginated tag archives, shared-tag related posts, per-tag RSS (#674)                                                        |
+| Author  | `/author/[slug]` (+ `/page/N`) | ✅ Built — profile + posts by author, paginated (#327/#593-595/#744)                                                                                 |
+| Topics  | `/topics`                      | ✅ Built — hub listing every topic with post counts, links to archives (#750/#751/#752); CMS-authored via the `page_topicIndex` document since #1894 |
+| Page    | `/[slug]`                      | ✅ Built — generic page route (#285), slug space guarded by `RESERVED_SLUGS` (#328)                                                                  |
+| Feeds   | sitemap/robots/RSS             | ✅ Built — Phase 3 (#92), generic pages listed in the sitemap (#285); tag archives + per-tag RSS added in #674                                       |
 
 Phase 3 (Blog core) is fully closed as of 2026-07-21 — every primary surface
 built in that phase is merged. Post taxonomy (topic `max: 4` cap + the
@@ -193,14 +193,16 @@ structured heading field would just be a second way to do the same thing.
 `module_hero` has no `sectionHeader` either — its heading fields are its
 own dedicated schema, unrelated to this shared shape.
 
-`module_taxonomyList` exists as a document type and is excluded from
-`MODULE_MAP`, so it never reaches `ModuleRenderer`; it still carries a
-`REVALIDATE_TAGS` entry, which every module type requires regardless of how it
-is rendered. Nothing renders it yet — the taxonomy index pages that will hold
-it, and the card UI it will render through, do not exist. When they do, which
-taxonomy it lists will be inferred from which index page's required slot holds
-it, rather than from an authored field — the same inference-by-slot rule the
-post list uses.
+`module_taxonomyList` is excluded from `MODULE_MAP`, so it never reaches
+`ModuleRenderer`; it still carries a `REVALIDATE_TAGS` entry, which every
+module type requires regardless of how it is rendered. It renders through a
+taxonomy index page's own required slot — `page_topicIndex.taxonomyList` on
+`/topics`; `page_tagIndex` on `/tags` follows the same shape. Which taxonomy it
+lists is not an authored field: it is inferred from which index page's slot
+holds the module — the same inference-by-slot rule the post list uses — and the
+page passes that kind to
+`service.modules.taxonomyList.v1.getTaxonomyList(id, taxonomy)` rather than the
+loader querying upward for its parent page.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
@@ -209,9 +211,10 @@ schema allows), `layout` as `TLayout | undefined`, and (where applicable)
 either: unset stays unset end to end. In `apps/web`, every module component
 that renders a `@blog/ui` organism — including those reached through a
 dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
-(§5 above): `module_hero` via the home template's `hero` slot and
-`module_postList` via `page_blog`'s `postList` reference, both still
-styled the same way as every other module — no exception — wraps it in `apps/web`'s own
+(§5 above): `module_hero` via the home template's `hero` slot,
+`module_postList` via `page_blog`'s `postList` reference, and
+`module_taxonomyList` via `page_topicIndex`'s `taxonomyList` reference, all
+still styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated
 from `packages/ui`), passing `brandVariant` and `layout` straight through,
 plus an optional `titleId` (the module's heading element id, when it has

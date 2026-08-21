@@ -1,29 +1,23 @@
 import { routes } from '@blog/config';
+import { service } from '@blog/service';
 import { toMetadata } from '@web/metadata/to-metadata';
+import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
 
 /**
- * Metadata for the static `/topics` hub. Unlike `buildTopicMetadata` /
- * `buildAuthorMetadata`, this needs no per-slug fetch — the page lists every
- * topic, so its title/description are fixed copy rather than derived from
- * a single document. Shares the `topicsPage` message namespace with
- * `TopicsPage` itself — the `<h1>`/intro copy and the metadata title/
- * description are the same strings.
+ * Metadata for the `/topics` hub, sourced from `page_topicIndex`'s resolved
+ * `seo` — mirrors `buildBlogListMetadata`. Reuses `getIndexPage` (also
+ * called by `TopicsPage`), so this adds no extra round-trip.
  */
 export const buildTopicsMetadata = async (): Promise<Metadata> => {
-  const t = await getTranslations('topicsPage');
-  const title = t('title');
-  const description = t('intro');
+  const result = await service.pages.topicIndex.v1.getIndexPage();
 
-  return toMetadata(
-    {
-      title,
-      description,
-      ogTitle: title,
-      ogDescription: description,
-      ogImageUrl: undefined,
-    },
-    { canonical: routes.topics(), ogType: 'website' },
-  );
+  if (!result.ok) {
+    logger.error('topics_metadata.fetch_failed', { error: result.error });
+    return {};
+  }
+
+  const { seo } = result.data;
+
+  return toMetadata(seo, { canonical: routes.topics(), ogType: 'website' });
 };
