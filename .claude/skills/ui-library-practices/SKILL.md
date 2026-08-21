@@ -92,9 +92,15 @@ src/atoms/theme-toggle/
   `Intl.DateTimeFormat`/Next helpers). The `<time>` renders only when **both**
   are present: `{publishedAt && formattedDate && <time dateTime={publishedAt}>{formattedDate}</time>}`.
 
-- **Card/post title slots must render a heading element.** `PostCard.Title` is
-  an `<h2>` wrapper (not `<div>`) so the card title joins the document outline;
-  the consumer passes the link as `children` (`<h2><a href>Post title</a></h2>`).
+- **Card title slots must render a heading element, not a `<div>`**, so the
+  title joins the document outline. Two patterns exist, and new components
+  should prefer the second:
+  - `PostCard.Title` hardcodes `<h3>`; the consumer passes the link as
+    `children` (`<h3><a href>Post title</a></h3>`). Every consumer is therefore
+    locked to `h3` regardless of where the card sits in the page outline.
+  - `TaxonomyCard` instead takes a required `headingLevel` prop and renders
+    through the `Heading` atom, letting the caller pick the level that fits its
+    own outline. Prefer this for new cards.
 
 - **Also:** semantic elements first (`button`, `nav`, `article`, `time`);
   interactive atoms expose `focus-visible` styles (global via `tokens.css`);
