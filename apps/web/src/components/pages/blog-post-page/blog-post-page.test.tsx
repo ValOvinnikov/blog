@@ -28,11 +28,13 @@ const {
   useSessionMock,
   getBookmarkStatusMock,
   getNewsletterSettingsMock,
+  isCapabilityEnabledMock,
 } = vi.hoisted(() => ({
   getPostMock: vi.fn(),
   useSessionMock: vi.fn(),
   getBookmarkStatusMock: vi.fn(),
   getNewsletterSettingsMock: vi.fn(),
+  isCapabilityEnabledMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -68,6 +70,10 @@ vi.mock('next-auth/react', () => ({ useSession: useSessionMock }));
 vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
   getBookmarkStatus: getBookmarkStatusMock,
   setBookmarkStatus: vi.fn(),
+}));
+
+vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
+  isCapabilityEnabled: isCapabilityEnabledMock,
 }));
 
 // `BookmarkButton` calls `useToast()` unconditionally (it's a hook), so any
@@ -115,6 +121,8 @@ describe(`<${BlogPostPage.name}/>`, () => {
       ok: true,
       data: { heading: 'Get new posts by email', description: undefined },
     });
+    isCapabilityEnabledMock.mockReset();
+    isCapabilityEnabledMock.mockResolvedValue(true);
   });
 
   afterEach(() => {
@@ -190,6 +198,26 @@ describe(`<${BlogPostPage.name}/>`, () => {
     });
     expect(bookmarkButton).toHaveAttribute('aria-pressed', 'true');
     expect(getBookmarkStatusMock).toHaveBeenCalledWith(mockPostDetail.id);
+  });
+
+  it('renders no BookmarkButton at all, signed in or not, when the BOOKMARKS capability is not entitled/enabled', async () => {
+    isCapabilityEnabledMock.mockResolvedValue(false);
+    useSessionMock.mockReturnValue({
+      data: { user: { id: 'user-1' } },
+      status: 'authenticated',
+    });
+    getBookmarkStatusMock.mockResolvedValue(true);
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+
+    await setup();
+
+    expect(
+      screen.queryByRole('button', { name: 'Save post' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Remove bookmark' }),
+    ).not.toBeInTheDocument();
+    expect(getBookmarkStatusMock).not.toHaveBeenCalled();
   });
 
   it('renders the X icon on the X share link and the LinkedIn icon on the LinkedIn share link, not the generic external-link glyph', async () => {

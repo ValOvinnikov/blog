@@ -3,9 +3,16 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import RootLayout from './layout';
 
-const { listTenantsMock, getSiteConfigMock } = vi.hoisted(() => ({
+const {
+  listTenantsMock,
+  listTenantsByIdsMock,
+  getSiteConfigMock,
+  getSettingsFeaturesMock,
+} = vi.hoisted(() => ({
   listTenantsMock: vi.fn(),
+  listTenantsByIdsMock: vi.fn(),
   getSiteConfigMock: vi.fn(),
+  getSettingsFeaturesMock: vi.fn(),
 }));
 
 const { envMock } = vi.hoisted(() => ({
@@ -14,8 +21,19 @@ const { envMock } = vi.hoisted(() => ({
 
 vi.mock('@blog/db', () => ({
   queries: {
-    tenants: { listTenants: listTenantsMock },
+    tenants: {
+      listTenants: listTenantsMock,
+      listTenantsByIds: listTenantsByIdsMock,
+    },
     siteConfig: { getSiteConfig: getSiteConfigMock },
+    settingsFeatures: { getSettingsFeatures: getSettingsFeaturesMock },
+  },
+  // Mirrors `@blog/db`'s real `PLAN_REGISTRY` (GROWTH entitles every
+  // capability, FREE excludes NEWSLETTER/ANALYTICS) — hardcoded rather than
+  // imported, since `vi.mock` replaces the whole module.
+  PLAN_REGISTRY: {
+    FREE: ['COMMENTS', 'RATINGS', 'BOOKMARKS'],
+    GROWTH: ['COMMENTS', 'RATINGS', 'BOOKMARKS', 'NEWSLETTER', 'ANALYTICS'],
   },
 }));
 
@@ -48,6 +66,14 @@ describe(`<${RootLayout.name}/>`, () => {
     envMock.WEB_ANALYTICS_ENABLED = undefined;
     listTenantsMock.mockResolvedValue([TENANT]);
     getSiteConfigMock.mockResolvedValue(CONSOLE_SITE_CONFIG_ROW);
+    listTenantsByIdsMock.mockResolvedValue([{ ...TENANT, plan: 'GROWTH' }]);
+    getSettingsFeaturesMock.mockResolvedValue({
+      commentsEnabled: true,
+      ratingsEnabled: true,
+      bookmarksEnabled: true,
+      newsletterEnabled: true,
+      analyticsEnabled: true,
+    });
   });
 
   it('mounts children in the body', async () => {
@@ -146,5 +172,26 @@ describe(`<${RootLayout.name}/>`, () => {
         (child: React.ReactElement) => child?.type === SpeedInsights,
       ),
     ).toBe(true);
+  });
+
+  it('omits Analytics and SpeedInsights when WEB_ANALYTICS_ENABLED is "true" but the ANALYTICS capability is not entitled/enabled', async () => {
+    envMock.WEB_ANALYTICS_ENABLED = 'true';
+    listTenantsByIdsMock.mockResolvedValue([{ ...TENANT, plan: 'FREE' }]);
+
+    const html = await RootLayout({ children: <div>content</div> });
+
+    const [, body] = html.props.children;
+    const bodyChildren = [body.props.children].flat();
+
+    expect(
+      bodyChildren.some(
+        (child: React.ReactElement) => child?.type === Analytics,
+      ),
+    ).toBe(false);
+    expect(
+      bodyChildren.some(
+        (child: React.ReactElement) => child?.type === SpeedInsights,
+      ),
+    ).toBe(false);
   });
 });

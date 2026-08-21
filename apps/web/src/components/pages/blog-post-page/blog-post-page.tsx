@@ -1,4 +1,11 @@
-import { ASIDE_KIND, ICONS, Size, type TAsideKind, routes } from '@blog/config';
+import {
+  ASIDE_KIND,
+  CAPABILITY,
+  ICONS,
+  Size,
+  type TAsideKind,
+  routes,
+} from '@blog/config';
 import { getSanityImageBaseUrl, service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms/icon';
 import {
@@ -20,6 +27,7 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import { SkimPanel } from '@web/components/shared/skim-panel';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { DepthProvider } from '@web/context/depth-provider';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { buildShareLinks } from '@web/utils/build-share-links';
@@ -99,14 +107,21 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
       />
     ),
   }));
-  const [format, t, blogPostT, relatedPostItems, newsletterSettingsResult] =
-    await Promise.all([
-      getFormatter(),
-      getTranslations('breadcrumbs'),
-      getTranslations('blogPostPage'),
-      toPostListItems(relatedPosts),
-      service.global.newsletterSettings.v1.getNewsletterSettings(),
-    ]);
+  const [
+    format,
+    t,
+    blogPostT,
+    relatedPostItems,
+    newsletterSettingsResult,
+    isBookmarksEnabled,
+  ] = await Promise.all([
+    getFormatter(),
+    getTranslations('breadcrumbs'),
+    getTranslations('blogPostPage'),
+    toPostListItems(relatedPosts),
+    service.global.newsletterSettings.v1.getNewsletterSettings(),
+    isCapabilityEnabled(CAPABILITY.BOOKMARKS),
+  ]);
 
   // Per-post opt-out (`newsletterEnabled`) gates the compact signup on this
   // page; its heading is always CMS-sourced from the `settings_newsletter`
@@ -201,7 +216,7 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
                 linkAs: SmartLink,
                 share: (
                   <div className={s.metaActions()}>
-                    <BookmarkButton postId={id} />
+                    {isBookmarksEnabled && <BookmarkButton postId={id} />}
                     <PostShare url={url} title={title} links={shareLinks} />
                   </div>
                 ),

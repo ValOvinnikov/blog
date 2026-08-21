@@ -1,4 +1,6 @@
+import { CAPABILITY } from '@blog/config';
 import { service } from '@blog/service';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 
 import { NewsletterModuleView } from './newsletter-module-view';
 
@@ -14,8 +16,15 @@ export interface INewsletterModuleProps {
  * the module there, no hardcoded mount point. `sectionHeader.heading` is a
  * CMS-required field for this module (`requireHeading: true`), so it's
  * always a non-empty string here.
+ *
+ * Renders nothing when the tenant isn't entitled to (or hasn't enabled) the
+ * `NEWSLETTER` capability — same silent-omission fallback `ModuleRenderer`
+ * uses for an unrecognized module type.
  */
 export const NewsletterModule = async ({ id }: INewsletterModuleProps) => {
+  const isEnabled = await isCapabilityEnabled(CAPABILITY.NEWSLETTER);
+  if (!isEnabled) return null;
+
   const result = await service.modules.newsletter.v1.getNewsletter(id);
 
   if (!result.ok) return null;

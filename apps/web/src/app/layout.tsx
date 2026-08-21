@@ -1,10 +1,11 @@
 import '../../index.css';
 
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { CAPABILITY, LOCALE_ISO_CODES } from '@blog/config';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { resolveFontVariableClassName } from '@web/config/fonts';
 import { themeBootstrapScript } from '@web/config/theme-script';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 import { buildThemeStyleBlock } from '@web/utils/build-theme-style-block';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';
 import { isWebAnalyticsEnabled } from '@web/utils/is-web-analytics-enabled';
@@ -35,9 +36,13 @@ const SANITY_IMAGE_CDN_ORIGIN = 'https://cdn.sanity.io';
  * itself, so it must always render.
  */
 export default async function RootLayout({ children }: TProps) {
-  const themeTokens = await getThemeTokens();
+  const [themeTokens, isAnalyticsCapabilityEnabled] = await Promise.all([
+    getThemeTokens(),
+    isCapabilityEnabled(CAPABILITY.ANALYTICS),
+  ]);
 
-  const analyticsEnabled = isWebAnalyticsEnabled();
+  const analyticsEnabled =
+    isWebAnalyticsEnabled() && isAnalyticsCapabilityEnabled;
   const fontVariableClassName = resolveFontVariableClassName(
     themeTokens.headingFont,
     themeTokens.bodyFont,
@@ -72,7 +77,9 @@ export default async function RootLayout({ children }: TProps) {
             feature is enabled for the deploying project — gated behind
             `isWebAnalyticsEnabled()` (env var, not `VERCEL_ENV`; see its
             own comment) so a project without Speed Insights/Web Analytics
-            turned on doesn't 404 on that path. */}
+            turned on doesn't 404 on that path, AND the tenant's `ANALYTICS`
+            capability (`isCapabilityEnabled`) — plan entitlement and the
+            tenant's own toggle, on top of the env gate. */}
         {analyticsEnabled && <SpeedInsights />}
         {analyticsEnabled && <Analytics />}
       </body>
