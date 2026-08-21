@@ -13,7 +13,7 @@ export const postListModuleQuery = q
       .field('sectionHeader')
       .project(sectionHeaderFragment)
       .nullable(true),
-    limit: sub.field('limit').notNull(),
+    pageSize: sub.field('pageSize').notNull(),
     layout: sub.field('layout').project(layoutFragment).nullable(true),
   }))
   .notNull();

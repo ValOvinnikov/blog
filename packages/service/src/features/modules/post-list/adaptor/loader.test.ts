@@ -11,7 +11,7 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
 }));
 
 describe('getPostList', () => {
-  it('bounds the posts query by the module limit and maps the result', async () => {
+  it('bounds the posts query by the module pageSize and maps the result', async () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawPostListModule({
@@ -20,14 +20,14 @@ describe('getPostList', () => {
             supportingText: null,
             align: null,
           },
-          limit: 3,
+          pageSize: 3,
         }),
       )
       .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
 
     const postList = await getPostList('post-list-1');
 
-    // The module's `limit` is threaded into the GROQ posts query's slice bound.
+    // The module's `pageSize` is threaded into the GROQ posts query's slice bound.
     expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[0...3]');
     expect(postList.sectionHeader.heading).toBe('Recent writing');
     expect(postList.posts.map((p) => p.id)).toEqual(['a']);
@@ -41,7 +41,7 @@ describe('getPostList', () => {
 
   it('tags the posts query with author/topic alongside posts', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawPostListModule({ limit: 3 }))
+      .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
       .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
 
     await getPostList('post-list-1');
@@ -65,14 +65,14 @@ describe('getPostList', () => {
     'emits the same query and output for a %s context as when omitted',
     async (type) => {
       mockRun
-        .mockResolvedValueOnce(makeRawPostListModule({ limit: 3 }))
+        .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
         .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
 
       const withoutContext = await getPostList('post-list-1');
       const withoutContextQuery = mockRun.mock.calls[1]?.[0]?.query;
 
       mockRun
-        .mockResolvedValueOnce(makeRawPostListModule({ limit: 3 }))
+        .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
         .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
 
       const withContext = await getPostList('post-list-1', {
@@ -88,7 +88,7 @@ describe('getPostList', () => {
 
   it('scopes the posts query by topicSlug for a TOPIC context', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawPostListModule({ limit: 3 }))
+      .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
       .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
 
     await getPostList('post-list-1', {
@@ -107,7 +107,7 @@ describe('getPostList', () => {
 
   it('scopes the posts query by tagSlug for a TAG context', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawPostListModule({ limit: 3 }))
+      .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
       .mockResolvedValueOnce([makeRawPostCard({ _id: 'a' })]);
 
     await getPostList('post-list-1', {
@@ -126,7 +126,7 @@ describe('getPostList', () => {
 
   it('windows by page/pageSize and returns the total for a paginated context', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawPostListModule({ limit: 3 }))
+      .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
       .mockResolvedValueOnce({
         posts: [makeRawPostCard({ _id: 'a' })],
         total: 25,

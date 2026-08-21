@@ -12,6 +12,17 @@ describe('blogPageQuery', () => {
 
     expect(() => blogPageQuery.parse(raw)).not.toThrow();
   });
+
+  it('parses a blog page with no postList slot set', () => {
+    const raw = makeRawBlogPage({ postList: null });
+
+    expect(() => blogPageQuery.parse(raw)).not.toThrow();
+  });
+
+  it('projects the archive pageSize through the postList slot, not the retired itemsPerPage field', () => {
+    expect(blogPageQuery.query).toContain('pageSize');
+    expect(blogPageQuery.query).not.toContain('itemsPerPage');
+  });
 });
 
 describe('buildIndexPageQuery', () => {

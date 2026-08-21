@@ -12,6 +12,12 @@ export const indexPageParamsQuery = q.star
         )
         .notNull(true),
     })),
-    itemsPerPage: page.field('itemsPerPage').notNull(),
+    postList: page
+      .field('postList')
+      .deref()
+      .project((archive) => ({
+        pageSize: archive.field('pageSize').notNull(),
+      }))
+      .nullable(true),
   }))
   .notNull();

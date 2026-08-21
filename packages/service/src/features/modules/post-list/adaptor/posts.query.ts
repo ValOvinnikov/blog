@@ -24,18 +24,18 @@ function scopedPosts(context?: TModulePageContext) {
 
 /**
  * Newest posts for a post-list module, optionally scoped by page context.
- * Built per-request so `limit` bounds the results in GROQ (end-exclusive
- * `.slice(0, limit)`) rather than fetching the whole `blog_post` collection
- * to slice in JS; omitting `context`, or passing HOME/BLOG/GENERIC, filters
- * nothing beyond publish status.
+ * Built per-request so `pageSize` bounds the results in GROQ (end-exclusive
+ * `.slice(0, pageSize)`) rather than fetching the whole `blog_post`
+ * collection to slice in JS; omitting `context`, or passing
+ * HOME/BLOG/GENERIC, filters nothing beyond publish status.
  */
 export function postListModulePostsQuery(
-  limit: number,
+  pageSize: number,
   context?: TModulePageContext,
 ) {
   return scopedPosts(context)
     .order('publishedAt desc')
-    .slice(0, limit)
+    .slice(0, pageSize)
     .project(postCardFragment);
 }
 

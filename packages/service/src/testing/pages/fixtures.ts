@@ -119,7 +119,7 @@ export function makeRawBlogPage(
   return {
     heading: 'The Blog',
     supportingText: 'Notes on building things.',
-    itemsPerPage: 9,
+    postList: { pageSize: 9 },
     modules: [],
     seo: null,
     ...overrides,
