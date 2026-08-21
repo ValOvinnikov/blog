@@ -14,16 +14,21 @@ export type TModuleComponentProps = {
 /**
  * Registry mapping every generic page-builder module `_type` to the
  * per-module Server Component that fetches and renders it. Typed as
- * `Record<Exclude<TModuleType, 'module_hero' | 'module_postList'>, …>` so
- * adding a module type without registering it here is a compile error.
- * `module_hero` and `module_postList` are both excluded: neither is ever a
- * member of a page's `modules[]` array — `module_hero` renders through the
- * home page template's dedicated `hero` slot, and `module_postList` renders
- * through the `postList` slot on `page_blog` (see `PostListModule`) — so
- * neither reaches this generic `ModuleRenderer` pipeline.
+ * `Record<Exclude<TModuleType, 'module_hero' | 'module_postList' |
+ * 'module_taxonomyList'>, …>` so adding a module type without registering
+ * it here is a compile error. `module_hero`, `module_postList`, and
+ * `module_taxonomyList` are all excluded: none is ever a member of a page's
+ * `modules[]` array — `module_hero` renders through the home page
+ * template's dedicated `hero` slot, `module_postList` renders through the
+ * `postList` slot on `page_blog` (see `PostListModule`), and
+ * `module_taxonomyList` renders through a dedicated slot on the taxonomy
+ * index pages — so none reaches this generic `ModuleRenderer` pipeline.
  */
 export const MODULE_MAP: Record<
-  Exclude<TModuleType, 'module_hero' | 'module_postList'>,
+  Exclude<
+    TModuleType,
+    'module_hero' | 'module_postList' | 'module_taxonomyList'
+  >,
   (props: TModuleComponentProps) => Promise<ReactNode>
 > = {
   module_postLatest: PostLatestModule,

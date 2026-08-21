@@ -15,10 +15,11 @@ export interface IModuleRendererProps {
  * the module's `_id` (a page can't reference the same module twice — enforced
  * by a CMS uniqueness rule). Unknown module types render nothing and log a
  * warning rather than failing the whole page. `MODULE_MAP` deliberately
- * excludes `module_hero`/`module_postList` from its key type (see
- * `module-map.ts`), so the lookup below casts to `keyof typeof MODULE_MAP` —
- * if either type somehow reached here (schema-prevented in practice), it
- * would still hit the "unknown module type" fallback rather than type-error.
+ * excludes `module_hero`/`module_postList`/`module_taxonomyList` from its key
+ * type (see `module-map.ts`), so the lookup below casts to
+ * `keyof typeof MODULE_MAP` — if any of those types somehow reached here
+ * (schema-prevented in practice), it would still hit the "unknown module
+ * type" fallback rather than type-error.
  */
 export const ModuleRenderer = async ({
   modules,

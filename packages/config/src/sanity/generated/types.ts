@@ -142,6 +142,25 @@ export type RichText = Array<
     } & Aside)
 >;
 
+export type Module_taxonomyList = {
+  _id: string;
+  _type: 'module_taxonomyList';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  sectionHeader?: SectionHeader;
+  layout?: Layout;
+};
+
+export type SectionHeader = {
+  _type: 'sectionHeader';
+  heading?: string;
+  supportingText?: string;
+  align?: 'LEFT' | 'CENTER' | 'RIGHT';
+};
+
 export type Module_postLatest = {
   _id: string;
   _type: 'module_postLatest';
@@ -153,13 +172,6 @@ export type Module_postLatest = {
   sectionHeader?: SectionHeader;
   limit?: number;
   layout?: Layout;
-};
-
-export type SectionHeader = {
-  _type: 'sectionHeader';
-  heading?: string;
-  supportingText?: string;
-  align?: 'LEFT' | 'CENTER' | 'RIGHT';
 };
 
 export type Skim = {
@@ -739,8 +751,9 @@ export type AllSanitySchemaTypes =
   | Link
   | Module_content
   | RichText
-  | Module_postLatest
+  | Module_taxonomyList
   | SectionHeader
+  | Module_postLatest
   | Skim
   | Brand
   | SpecLine
