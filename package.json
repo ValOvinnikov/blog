@@ -18,6 +18,7 @@
     "typegen": "turbo run typegen",
     "gen:ui-index": "node scripts/gen-ui-index.mjs",
     "gen:ui-index:check": "node scripts/gen-ui-index.mjs --verify",
+    "gen:ui-index:test": "node --test scripts/gen-ui-index.test.mjs",
     "knip": "knip",
     "format": "turbo run format",
     "prepare": "husky"

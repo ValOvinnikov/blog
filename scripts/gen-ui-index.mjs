@@ -29,7 +29,13 @@
 //                 guards and exit 1 (block the commit) if either fails. Fast
 //                 no-op otherwise (the pre-commit path).
 import { execFileSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  writeFileSync,
+} from 'node:fs';
 import { basename, dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
@@ -52,14 +58,18 @@ const toPascal = (dir) =>
     .map((p) => p[0].toUpperCase() + p.slice(1))
     .join('');
 
-const parse = (file) =>
+// Exported so the helper tests can build a source file from an inline fixture
+// instead of a file on disk.
+export const parseSource = (file, text) =>
   ts.createSourceFile(
     file,
-    readFileSync(file, 'utf8'),
+    text,
     ts.ScriptTarget.Latest,
     /* setParentNodes */ true,
     ts.ScriptKind.TSX,
   );
+
+const parse = (file) => parseSource(file, readFileSync(file, 'utf8'));
 
 const isExported = (node) =>
   !!node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword);
@@ -123,7 +133,7 @@ const findComponent = (sf, name) => {
 // since a file with multiple `*Props` declarations, e.g. a compound
 // component's own props plus a nested slot-config props type, would
 // otherwise pick whichever happens to be declared first).
-const findPropsType = (sf, name) => {
+export const findPropsType = (sf, name) => {
   const preferredNames = [`I${name}Props`, `T${name}Props`];
   const candidates = [];
   for (const stmt of sf.statements) {
@@ -145,7 +155,7 @@ const findPropsType = (sf, name) => {
 // surface lives on the local `<Name>OwnProps` type it wraps. Resolves that
 // sibling type by exact name so a caller can fall through to it instead of
 // documenting an empty props list.
-const findOwnPropsType = (sf, name) => {
+export const findOwnPropsType = (sf, name) => {
   const preferredNames = [`I${name}OwnProps`, `T${name}OwnProps`];
   const candidates = [];
   for (const stmt of sf.statements) {
@@ -174,7 +184,7 @@ const collectType = (typeNode, sf, members, refs) => {
   }
 };
 
-const extractProps = (typeNode, sf) => {
+export const extractProps = (typeNode, sf) => {
   const members = [];
   const refs = [];
   if (ts.isInterfaceDeclaration(typeNode)) {
@@ -303,7 +313,7 @@ const componentParamType = (node) => {
   return fn?.parameters?.[0]?.type ?? null;
 };
 
-const describeComponent = (sf, file, name) => {
+export const describeComponent = (sf, file, name) => {
   const comp = findComponent(sf, name);
   const propsType = findPropsType(sf, name) ?? componentParamType(comp?.node);
   let { props, extendsList } = propsType
@@ -744,4 +754,10 @@ const main = () => {
   }
 };
 
-main();
+// Only run when invoked as a script — the helper tests import this module.
+if (
+  process.argv[1] &&
+  realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
+  main();
+}
