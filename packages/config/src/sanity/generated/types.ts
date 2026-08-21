@@ -399,7 +399,6 @@ export type Module_taxonomyList = {
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   sectionHeader?: SectionHeader;
-  emptyMessage?: string;
   layout?: Layout;
 };
 

@@ -2527,13 +2527,6 @@
         },
         "optional": true
       },
-      "emptyMessage": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
       "layout": {
         "type": "objectAttribute",
         "value": {
