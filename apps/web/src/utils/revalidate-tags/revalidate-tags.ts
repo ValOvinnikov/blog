@@ -28,6 +28,7 @@ const REVALIDATE_TAGS = {
   page_generic: ['page_generic'],
   module_hero: ['modules:hero'],
   module_postList: ['modules:postList'],
+  module_postLatest: ['modules:postLatest'],
   module_content: ['modules:content'],
   module_cta: ['modules:cta'],
   module_newsletter: ['modules:newsletter'],

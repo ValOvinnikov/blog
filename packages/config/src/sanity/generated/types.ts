@@ -142,6 +142,26 @@ export type RichText = Array<
     } & Aside)
 >;
 
+export type Module_postLatest = {
+  _id: string;
+  _type: 'module_postLatest';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  sectionHeader?: SectionHeader;
+  limit?: number;
+  layout?: Layout;
+};
+
+export type SectionHeader = {
+  _type: 'sectionHeader';
+  heading?: string;
+  supportingText?: string;
+  align?: 'LEFT' | 'CENTER' | 'RIGHT';
+};
+
 export type Module_postList = {
   _id: string;
   _type: 'module_postList';
@@ -162,13 +182,6 @@ export type Layout = {
   containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
   dividerTop?: boolean;
   dividerBottom?: boolean;
-};
-
-export type SectionHeader = {
-  _type: 'sectionHeader';
-  heading?: string;
-  supportingText?: string;
-  align?: 'LEFT' | 'CENTER' | 'RIGHT';
 };
 
 export type Skim = {
@@ -422,6 +435,13 @@ export type Module_heroReference = {
   [internalGroqTypeReferenceTo]?: 'module_hero';
 };
 
+export type Module_postLatestReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_postLatest';
+};
+
 export type Page_home = {
   _id: string;
   _type: 'page_home';
@@ -433,7 +453,7 @@ export type Page_home = {
   modules?: Array<
     | ({
         _key: string;
-      } & Module_postListReference)
+      } & Module_postLatestReference)
     | ({
         _key: string;
       } & Module_ctaReference)
@@ -719,9 +739,10 @@ export type AllSanitySchemaTypes =
   | Link
   | Module_content
   | RichText
+  | Module_postLatest
+  | SectionHeader
   | Module_postList
   | Layout
-  | SectionHeader
   | Skim
   | Brand
   | SpecLine
@@ -745,6 +766,7 @@ export type AllSanitySchemaTypes =
   | Module_newsletterReference
   | Page_blog
   | Module_heroReference
+  | Module_postLatestReference
   | Page_home
   | Module_hero
   | Module_contentReference
