@@ -74,6 +74,20 @@ describe(`<${RootLayout.name}/>`, () => {
     );
   });
 
+  it('preconnects to the Sanity image CDN without crossorigin', async () => {
+    const html = await RootLayout({ children: <div>content</div> });
+
+    const [head] = html.props.children;
+    const headChildren = [head.props.children].flat();
+    const preconnect = headChildren.find(
+      (child: React.ReactElement<{ rel?: string }>) =>
+        child?.type === 'link' && child.props.rel === 'preconnect',
+    );
+
+    expect(preconnect.props.href).toBe('https://cdn.sanity.io');
+    expect(preconnect.props.crossOrigin).toBeUndefined();
+  });
+
   it('falls back to the Console preset tokens when the site config fetch fails', async () => {
     listTenantsMock.mockRejectedValue(new Error('boom'));
     const consoleErrorSpy = vi
