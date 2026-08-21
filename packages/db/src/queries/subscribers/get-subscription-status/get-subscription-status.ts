@@ -16,9 +16,10 @@ export type TSubscriptionStatusResult =
 // their account email — `active`/`pending` mirror `subscribers.status`
 // directly; `not-subscribed` covers "no `users` row", "the user has no
 // email on file yet" (e.g. a fresh OAuth sign-in before a provider returns
-// one), and "no `subscribers` row for that (tenantId, email) pair" as one
-// terminal state. `tenantId` is required because the same account email can
-// hold a subscription on more than one tenant.
+// one), and "no `subscribers` row for that (tenantId, email) pair" — these
+// collapse into one terminal state since the caller (the `/account` page)
+// renders nothing for any of them. `tenantId` is required because the same
+// account email can hold a subscription on more than one tenant.
 //
 // `users.email` is compared case-insensitively/trimmed against
 // `subscribers.email` (normalized at write time in create-pending-subscriber)

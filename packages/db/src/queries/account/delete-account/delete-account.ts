@@ -8,9 +8,10 @@ import { eq } from 'drizzle-orm';
 // reference `users.id` — erases those rows automatically; no manual
 // per-table deletes needed for what exists today.
 //
-// TODO(#1040): once comments exist, add a pre-delete tombstone step ahead
-// of this call — a hard FK cascade would be wrong there, since a comment
-// thread's shape must be preserved via soft-delete, not erased.
+// TODO: once comments exist, add a pre-delete tombstone step ahead of this
+// call — a hard FK cascade would be wrong there, since a comment thread's
+// shape must be preserved via soft-delete, not erased. Do not add a
+// comments cascade or `onDelete` assumption here ahead of that (#1040).
 //
 // A no-op (not an error) if `userId` doesn't match a `users` row, matching
 // this package's other delete-style mutations (see `removeBookmark`).

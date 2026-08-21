@@ -32,9 +32,9 @@ export type TAccountDataExport = {
 // for the `/account` "export my data" download. Scoped to the two tables
 // that exist today (`users`, `bookmarks`).
 //
-// TODO(#1040, #1041, #1044): extend this function to fold in comments,
-// ratings, and newsletter subscription once each lands; don't add those
-// tables ahead of that.
+// TODO: extend this function to fold in comments, ratings, and newsletter
+// subscription once each lands; don't add those tables ahead of that
+// (#1040, #1041, #1044).
 //
 // `bookmarks` carries a `tenantId`, so the export is scoped to the tenant
 // the "export my data" action was invoked from, not every tenant the user
