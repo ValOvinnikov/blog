@@ -19,13 +19,22 @@ export type TAuthorPagePagination = {
   totalPages: number;
 };
 
+// Avatar renders at Size.LG (56px, `avatar-variants.ts`) — 112px covers a
+// 2x DPR display without serving the source asset's full natural resolution.
+const AUTHOR_AVATAR_SIZE_PX = 112;
+
 function toAuthorDetail(raw: TRawAuthor): TAuthorDetail {
   return {
     id: raw._id,
     name: raw.name,
     slug: raw.slug,
     role: raw.role ?? undefined,
-    imageUrl: buildImageUrl(raw.image),
+    imageUrl: buildImageUrl(raw.image, {
+      width: AUTHOR_AVATAR_SIZE_PX,
+      height: AUTHOR_AVATAR_SIZE_PX,
+      fit: 'crop',
+      quality: 75,
+    }),
     bio: raw.bio ?? undefined,
     socialLinks: (raw.socialLinks ?? []).map(toSocialLink),
   };

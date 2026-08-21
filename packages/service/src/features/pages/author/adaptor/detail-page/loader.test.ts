@@ -1,12 +1,19 @@
 import { makeRawAuthor } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawArchivePostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 
 import { getAuthorPage } from './loader';
 
 vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
   runQuery: vi.fn(),
+}));
+
+vi.mock('@blog/service/sanity/image', () => ({
+  urlForImage: vi.fn(
+    () => 'https://cdn.sanity.io/images/proj/dataset/avatar-112x112.jpg',
+  ),
 }));
 
 describe('getAuthorPage', () => {
@@ -39,6 +46,23 @@ describe('getAuthorPage', () => {
     expect(result?.author.id).toBe('author-abc');
     expect(result?.author.name).toBe('John Smith');
     expect(result?.posts).toHaveLength(2);
+  });
+
+  it('requests a right-sized author avatar instead of the full-resolution asset', async () => {
+    const { urlForImage } = await import('@blog/service/sanity/image');
+    const authorImage = makeRawImage('Jane avatar');
+    mockRun
+      .mockResolvedValueOnce(makeRawAuthor({ image: authorImage }))
+      .mockResolvedValueOnce({ posts: [], total: 0 });
+
+    await getAuthorPage('jane-doe', { itemsPerPage: 9 });
+
+    expect(urlForImage).toHaveBeenCalledWith(authorImage, {
+      width: 112,
+      height: 112,
+      fit: 'crop',
+      quality: 75,
+    });
   });
 
   it('returns an empty posts array when the author has no posts', async () => {
