@@ -326,6 +326,26 @@ describe(`<${BlogPostPage.name}/>`, () => {
     ).toHaveAttribute('fetchpriority', 'high');
   });
 
+  it('resolves baseUrl via getSanityImageBaseUrl and forwards it into the rendered hero image src', async () => {
+    const heroImageSanity: ISanityImage = {
+      assetId: 'image-abc123-1600x1200-jpg',
+      alt: 'A scenic mountain range',
+      hotspot: { x: 0.5, y: 0.5, width: 1, height: 1 },
+      crop: undefined,
+      lqip: undefined,
+      dimensions: { width: 1600, height: 1200, aspectRatio: 1600 / 1200 },
+    };
+    getPostMock.mockResolvedValue({
+      ok: true,
+      data: { ...mockPostDetail, heroImageSanity },
+    });
+
+    await setup();
+
+    const img = screen.getByRole('img', { name: mockPostDetail.heroImageAlt });
+    expect(img.getAttribute('src')).toContain('test-project/test-dataset');
+  });
+
   it('renders no PostContentsRail (and stays single-column) when the body has fewer than 3 H2 headings', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 

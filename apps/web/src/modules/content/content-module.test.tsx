@@ -1,4 +1,5 @@
-import { customRenderAsync } from '@web/testing/custom-render';
+import { BRAND_VARIANT, type RichText } from '@blog/config';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { ContentModule } from './content-module';
 
@@ -32,5 +33,32 @@ describe(ContentModule, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("resolves baseUrl via getSanityImageBaseUrl and forwards it into a rendered body image's src", async () => {
+    const body: RichText = [
+      {
+        _type: 'bodyImage',
+        _key: 'image-1',
+        asset: {
+          _ref: 'image-abc123-800x600-jpg',
+          _type: 'reference',
+        },
+        alt: 'A scenic mountain range',
+      },
+    ];
+    getContentMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        body,
+        layout: undefined,
+      },
+    });
+
+    await setup();
+
+    const img = screen.getByRole('img', { name: 'A scenic mountain range' });
+    expect(img.getAttribute('src')).toContain('test-project/test-dataset');
   });
 });
