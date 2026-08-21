@@ -193,12 +193,14 @@ structured heading field would just be a second way to do the same thing.
 `module_hero` has no `sectionHeader` either — its heading fields are its
 own dedicated schema, unrelated to this shared shape.
 
-`module_taxonomyList` lists taxonomy entries as cards. Which taxonomy it lists
-is not an authored field — it is inferred from which index page's required slot
-holds it, the same inference-by-slot rule the post list uses. Like `module_hero`
-and `module_postList` it is excluded from `MODULE_MAP` and reached through a
-dedicated slot, never `ModuleRenderer`; it still carries a `REVALIDATE_TAGS`
-entry, which is required for every module type regardless.
+`module_taxonomyList` exists as a document type and is excluded from
+`MODULE_MAP`, so it never reaches `ModuleRenderer`; it still carries a
+`REVALIDATE_TAGS` entry, which every module type requires regardless of how it
+is rendered. Nothing renders it yet — the taxonomy index pages that will hold
+it, and the card UI it will render through, do not exist. When they do, which
+taxonomy it lists will be inferred from which index page's required slot holds
+it, rather than from an authored field — the same inference-by-slot rule the
+post list uses.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its

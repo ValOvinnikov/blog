@@ -73,8 +73,7 @@ apps/web
   which is typed `Record<TModuleType, readonly string[]> &
 Partial<Record<TSanityType, …>>` — every module type needs a purge-tag entry,
   with no escape hatch. A module type registered without one fails
-  `type-check`; before that guard existed it would have rendered fine and
-  silently never purged from the CDN.
+  `type-check`.
   `module-renderer.tsx`'s `ModuleRenderer` walks a page's
   `modules: TModule[]`, resolves each entry through `MODULE_MAP` (cast to
   `keyof typeof MODULE_MAP`, since the raw `TModuleType` still includes the
