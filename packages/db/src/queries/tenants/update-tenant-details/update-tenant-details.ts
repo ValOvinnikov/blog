@@ -18,11 +18,13 @@ export type TUpdateTenantDetailsInput = {
 export type TUpdateTenantDetailsResult =
   | { outcome: 'updated'; tenant: TTenant }
   | { outcome: 'slug-taken' }
+  | { outcome: 'domain-taken' }
   | { outcome: 'provisioning-started' };
 
-// Pre-checked rather than caught off the `slug_unique` constraint: a typed
-// `slug-taken` outcome the caller can map straight onto a field error,
-// instead of an unhandled Postgres throw.
+// Pre-checked rather than caught off the `slug_unique`/`tenant_domains.domain`
+// unique constraints: a typed outcome the caller can map straight onto a
+// field error, instead of an unhandled Postgres throw. First match wins:
+// provisioning-started, then slug-taken, then domain-taken.
 export async function updateTenantDetails(
   tenantId: string,
   input: TUpdateTenantDetailsInput,
@@ -57,6 +59,17 @@ export async function updateTenantDetails(
 
   if (slugConflict) {
     return { outcome: 'slug-taken' };
+  }
+
+  if (input.primaryDomain !== existing.primaryDomain) {
+    const [domainConflict] = await db
+      .select({ id: tenantDomains.id })
+      .from(tenantDomains)
+      .where(eq(tenantDomains.domain, input.primaryDomain));
+
+    if (domainConflict) {
+      return { outcome: 'domain-taken' };
+    }
   }
 
   const [tenant] = await db

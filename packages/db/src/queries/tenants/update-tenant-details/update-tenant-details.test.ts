@@ -146,6 +146,109 @@ describe(updateTenantDetails, () => {
     expect(row?.slug).toBe('globex');
   });
 
+  it('returns a handled domain-taken outcome instead of throwing on a domain collision', async () => {
+    await insertTenantWithDomain({
+      slug: 'acme',
+      domain: 'acme.example.com',
+    });
+    const secondTenantId = await insertTenantWithDomain({
+      slug: 'globex',
+      domain: 'globex.example.com',
+    });
+
+    const result = await updateTenantDetails(secondTenantId, {
+      ...validInput,
+      slug: 'globex',
+      primaryDomain: 'acme.example.com',
+    });
+
+    expect(result).toEqual({ outcome: 'domain-taken' });
+
+    const [row] = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, secondTenantId));
+    expect(row).toMatchObject({
+      name: 'Acme',
+      slug: 'globex',
+      primaryDomain: 'globex.example.com',
+      plan: TENANT_PLAN.FREE,
+      locale: 'en',
+    });
+
+    const domainRows = await db
+      .select()
+      .from(tenantDomains)
+      .where(eq(tenantDomains.tenantId, secondTenantId));
+    expect(domainRows).toHaveLength(1);
+    expect(domainRows[0]).toMatchObject({ domain: 'globex.example.com' });
+  });
+
+  it("still updates when the domain is unchanged and only the tenant's own tenant_domains row holds it", async () => {
+    const tenantId = await insertTenantWithDomain({
+      slug: 'acme',
+      domain: 'acme.example.com',
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+      name: 'New Name',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { name: 'New Name', primaryDomain: 'acme.example.com' },
+    });
+  });
+
+  it('returns provisioning-started over domain-taken when both apply', async () => {
+    await insertTenantWithDomain({
+      slug: 'acme',
+      domain: 'acme.example.com',
+    });
+    const secondTenantId = await insertTenantWithDomain({
+      slug: 'globex',
+      domain: 'globex.example.com',
+      provisioningSteps: {
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.RUNNING },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.IDLE },
+      },
+    });
+
+    const result = await updateTenantDetails(secondTenantId, {
+      ...validInput,
+      slug: 'globex',
+      primaryDomain: 'acme.example.com',
+    });
+
+    expect(result).toEqual({ outcome: 'provisioning-started' });
+  });
+
+  it('returns slug-taken over domain-taken when both apply', async () => {
+    await insertTenantWithDomain({
+      slug: 'acme',
+      domain: 'acme.example.com',
+    });
+    const secondTenantId = await insertTenantWithDomain({
+      slug: 'globex',
+      domain: 'globex.example.com',
+    });
+
+    const result = await updateTenantDetails(secondTenantId, {
+      ...validInput,
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+    });
+
+    expect(result).toEqual({ outcome: 'slug-taken' });
+  });
+
   it('leaves provisioning artifact columns untouched by an update', async () => {
     const tenantId = await insertTenantWithDomain({
       sanityProjectId: 'abc123',
