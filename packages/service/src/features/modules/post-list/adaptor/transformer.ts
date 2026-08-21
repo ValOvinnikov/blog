@@ -29,6 +29,7 @@ export function toPostListModule(
       : { heading: undefined, supportingText: undefined, align: undefined },
     posts: rawPosts.map(toPostCard),
     layout: toLayout(raw.layout),
+    emptyMessage: raw.emptyMessage?.trim() ? raw.emptyMessage : undefined,
     currentPage: pagination.currentPage,
     totalPages: pagination.totalPages,
   };
