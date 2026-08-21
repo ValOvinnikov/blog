@@ -31,10 +31,9 @@ export interface IPostListModuleViewProps extends Omit<
 /**
  * PostListModuleView — shared render shell for the archive (`PostListModule`)
  * and the teaser (`PostLatestModule`): a labeled `Section` wrapping
- * `PostsSection` plus an optional `Pagination`. Callers own `titleId`,
- * `dataTestId`, and `titleFallback`, since the accessible name and test id
- * differ per module. `sectionHeader.heading` is optional; when absent,
- * `PostsSection` renders a visually hidden `<h2>` from `titleFallback`.
+ * `PostsSection` plus an optional `Pagination`. `titleId`/`dataTestId`/
+ * `titleFallback` are caller-supplied since the accessible name and test id
+ * differ per module.
  */
 export const PostListModuleView = ({
   brandVariant,

@@ -13,7 +13,7 @@ import {
 export interface IPostListModuleProps {
   id: string;
   locale: string;
-  page?: number;
+  page: number;
 }
 
 /**
@@ -53,8 +53,8 @@ export const PostListModule = async ({ id, page }: IPostListModuleProps) => {
 
   // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
   // soft-404 or a redirect to the last page (spec SEO rules). Page 1 of an
-  // empty archive is `totalPages === 1`, so an omitted `page` never 404s.
-  if (page !== undefined && page > totalPages) {
+  // empty archive is `totalPages === 1`, so page 1 never 404s.
+  if (page > totalPages) {
     notFound();
   }
 

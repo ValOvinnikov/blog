@@ -34,6 +34,7 @@ vi.mock('@web/components/shared/smart-link', () => ({
 const setup = customRenderAsync(PostListModule, {
   id: 'post-list-1',
   locale: 'en',
+  page: 1,
 });
 
 describe(PostListModule, () => {
@@ -221,7 +222,7 @@ describe(PostListModule, () => {
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
-  it('does not 404 page 1 of an empty archive when no explicit page is given', async () => {
+  it('does not 404 page 1 of an empty archive, and renders the derived empty message', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
@@ -239,7 +240,7 @@ describe(PostListModule, () => {
       },
     });
 
-    await setup({ page: undefined });
+    await setup({ page: 1 });
 
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
     expect(screen.getByText('No posts yet.')).toBeInTheDocument();
