@@ -49,11 +49,11 @@ describe(`<${CodeBlock.name}/>`, () => {
     expect(lines[1]).toHaveClass('bg-brand-primary-muted');
   });
 
-  // #862 — the syntax highlighter must not paint its own hard-coded
-  // background over the theme-aware `bg-surface-2` on the wrapping
-  // `<figure>`, and its token colors must reference the theme-aware CSS
-  // custom properties (`--code-*`, defined for both `:root` and `.dark` in
-  // `index.css`) rather than oneDark's literal, always-dark HSL values.
+  // The syntax highlighter must not paint its own hard-coded background over
+  // the theme-aware `bg-surface-2` on the wrapping `<figure>`, and its token
+  // colors must reference the theme-aware CSS custom properties (`--code-*`,
+  // defined for both `:root` and `.dark` in `index.css`) rather than
+  // oneDark's literal, always-dark HSL values.
   it('renders the code content with a transparent background so the theme-aware figure surface shows through', () => {
     setup();
 

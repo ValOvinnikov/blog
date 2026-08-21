@@ -41,9 +41,9 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   revalidateTag(SITE_CONFIG_CACHE_TAG, { expire: 0 });
-  // Tag expiry alone has not been invalidating prerendered route entries on
-  // Vercel (#318) — purge the root layout's path too, same fallback the
-  // Sanity publish webhook (`/api/revalidate`) already relies on.
+  // Tag expiry alone does not invalidate prerendered route entries on
+  // Vercel — purge the root layout's path too, same fallback the Sanity
+  // publish webhook (`/api/revalidate`) already relies on.
   revalidatePath('/', 'layout');
 
   return NextResponse.json(

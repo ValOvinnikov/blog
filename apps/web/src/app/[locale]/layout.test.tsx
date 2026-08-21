@@ -63,10 +63,10 @@ vi.mock('next-intl/server', () => ({
 }));
 
 // `LocaleLayout`'s resolved tree renders a real `SessionProvider` (`AuthMenu`
-// reads the session client-side — #1107). Mocked here (not just
-// `useSession`) so mounting it under `render()` never fires next-auth's real
-// session fetch — a plain pass-through, the same stance `auth-menu.test.tsx`
-// takes on this module.
+// reads the session client-side). Mocked here (not just `useSession`) so
+// mounting it under `render()` never fires next-auth's real session fetch —
+// a plain pass-through, the same stance `auth-menu.test.tsx` takes on this
+// module.
 vi.mock('next-auth/react', () => ({
   useSession: useSessionMock,
   signIn: vi.fn(),

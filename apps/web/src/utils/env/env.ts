@@ -7,8 +7,8 @@ import { z } from 'zod';
 // client bundle.
 export const env = createEnv({
   server: {
-    // The on-demand revalidation route (issue #93) isn't built yet; optional
-    // until it exists so the module doesn't force an unused required var.
+    // Feature-flag-by-absence: the on-demand revalidation route
+    // (`/api/revalidate`) 500s without it instead of revalidating.
     SANITY_REVALIDATE_SECRET: z.string().min(1).optional(),
     // Verifies `apps/admin`'s Look/Voice-save revalidation call
     // (`/api/revalidate-site-config`), same feature-flag-by-absence stance
@@ -27,7 +27,7 @@ export const env = createEnv({
     // (`/_vercel/insights/script.js` / `/_vercel/speed-insights/script.js`)
     // that Vercel's edge only proxies when the matching feature is turned on
     // for that project in the dashboard — off, the request falls through to
-    // the app's own 404 page (console MIME-type error, issue #1072).
+    // the app's own 404 page (a console MIME-type error).
     // `VERCEL_ENV` can't tell "real production" apart from blog-dev's own
     // production target (both report `production`), so this is an explicit
     // opt-in set only on the Vercel project(s) where those dashboard

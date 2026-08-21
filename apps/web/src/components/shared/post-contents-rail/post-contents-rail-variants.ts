@@ -10,7 +10,7 @@ export const postContentsRailVariants = tv({
     // Header (`shadow-md` alone reads flush against it). `headingAnchor`'s
     // mobile `scroll-mt-44` (in `portable-text-renderer-variants.ts`) tracks
     // this offset plus this bar's own rendered height, so a TOC jump never
-    // lands a heading under it (#1006).
+    // lands a heading under it.
     root: [
       'w-full min-w-0',
       'sticky top-20 z-10',
@@ -25,7 +25,7 @@ export const postContentsRailVariants = tv({
     // overlays it directly rather than depending on `root`'s box.
     // `shadow-md` — this bar shares `Header`'s exact `bg-primary`/`border-border`,
     // so the hairline border alone doesn't read as a seam once it's sticky
-    // flush beneath it (#981).
+    // flush beneath it.
     mobile: [
       'relative',
       'bg-primary border-b border-border shadow-md',
@@ -67,7 +67,7 @@ export const postContentsRailVariants = tv({
     ],
     // Absolute against `mobile`'s `relative` box so it overlays the article
     // body instead of pushing it down. `p-4` matches the nav-menu and
-    // share-post popover panels so all three read as one system (#1005).
+    // share-post popover panels so all three read as one system.
     panel: [
       'absolute inset-x-0 top-full',
       'bg-primary border-b border-border shadow-lg',

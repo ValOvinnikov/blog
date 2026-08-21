@@ -60,9 +60,9 @@ describe(`<${AccountPage.name}/>`, () => {
     expect(identitySection).toBeVisible();
     expect(newsletterSection).toBeVisible();
     expect(privacySection).toBeVisible();
-    // #1158/#1162's page-ordering decision: 6c "connected accounts" renders
-    // first, then 6b "email & newsletter preferences", then 6a "privacy &
-    // data" last — each must precede the next in document order.
+    // "Connected accounts" renders first, then "email & newsletter
+    // preferences", then "privacy & data" last — each must precede the next
+    // in document order.
     expect(
       identitySection.compareDocumentPosition(newsletterSection) &
         Node.DOCUMENT_POSITION_FOLLOWING,
