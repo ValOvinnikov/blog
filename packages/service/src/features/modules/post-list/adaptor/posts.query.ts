@@ -29,22 +29,23 @@ function scopedPosts(context?: TModulePageContext) {
  * to slice in JS; omitting `context`, or passing HOME/BLOG/GENERIC, filters
  * nothing beyond publish status.
  */
-export const postListModulePostsQuery = (
+export function postListModulePostsQuery(
   limit: number,
   context?: TModulePageContext,
-) =>
-  scopedPosts(context)
+) {
+  return scopedPosts(context)
     .order('publishedAt desc')
     .slice(0, limit)
     .project(postCardFragment);
+}
 
 /**
  * Windowed posts for a paginated post-list placement, alongside the total
  * match count so the caller can compute total pages.
  */
-export const postListModulePaginatedPostsQuery = (
+export function postListModulePaginatedPostsQuery(
   context: TModulePageContext & { isPaginated: true },
-) => {
+) {
   const start = (context.page - 1) * context.pageSize;
   const end = start + context.pageSize;
   const posts = scopedPosts(context);
@@ -60,4 +61,4 @@ export const postListModulePaginatedPostsQuery = (
       total: sub.count(posts).notNull(true),
     }))
     .notNull(true);
-};
+}

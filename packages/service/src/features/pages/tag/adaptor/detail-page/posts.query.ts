@@ -9,8 +9,8 @@ const tagPosts = q
   .filterRaw(TAG_SCOPE_FILTER)
   .filterRaw(PUBLISHED_POST_FILTER);
 
-export const buildTagPostsPageQuery = (start: number, end: number) =>
-  q
+export function buildTagPostsPageQuery(start: number, end: number) {
+  return q
     .parameters<TSlugParams>()
     .project((sub) => ({
       posts: tagPosts
@@ -21,3 +21,4 @@ export const buildTagPostsPageQuery = (start: number, end: number) =>
       total: sub.count(tagPosts).notNull(true),
     }))
     .notNull(true);
+}
