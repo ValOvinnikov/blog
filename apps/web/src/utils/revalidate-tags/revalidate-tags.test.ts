@@ -23,6 +23,12 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
+  it('maps the topic-index singleton to its ISR tag', () => {
+    expect(
+      getRevalidateTagsForType('page_topicIndex', 'page_topicIndex'),
+    ).toEqual(['page_topicIndex']);
+  });
+
   it('includes the per-document tag for module types', () => {
     expect(getRevalidateTagsForType('module_hero', 'hero-1')).toEqual([
       'modules:hero',

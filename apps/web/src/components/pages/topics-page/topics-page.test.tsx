@@ -1,17 +1,48 @@
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { notFound } from 'next/navigation';
 
 import { TopicsPage } from './topics-page';
 
-const { getTopicsMock } = vi.hoisted(() => ({
-  getTopicsMock: vi.fn(),
+const { getIndexPageMock, taxonomyListModuleMock } = vi.hoisted(() => ({
+  getIndexPageMock: vi.fn(),
+  // `TaxonomyListModule` is an async Server Component — real RSC async-
+  // component nesting isn't renderable through `@testing-library/react`'s
+  // client renderer. Stubbed as a plain sync component so this suite can
+  // assert `TopicsPage` passes the right props through without needing a
+  // real async render; its own fetch/render logic is covered by
+  // `taxonomy-list-module.test.tsx`.
+  taxonomyListModuleMock: vi.fn(
+    ({
+      id,
+      titleFallback,
+      emptyMessage,
+      buildHref,
+      formatPostCount,
+    }: {
+      id: string;
+      titleFallback: string;
+      emptyMessage: string;
+      buildHref: (slug: string) => string;
+      formatPostCount: (count: number) => string;
+    }) => (
+      <div data-testid="taxonomy-list-module-stub">
+        {id}:{titleFallback}:{emptyMessage}:{buildHref('engineering')}:
+        {formatPostCount(5)}
+      </div>
+    ),
+  ),
 }));
 
 vi.mock('@blog/service', () => ({
   service: {
-    entities: {
-      topics: { v1: { getTopics: getTopicsMock } },
+    pages: {
+      topicIndex: { v1: { getIndexPage: getIndexPageMock } },
     },
   },
+}));
+
+vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
+  TaxonomyListModule: taxonomyListModuleMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -33,109 +64,81 @@ const setup = customRenderAsync(TopicsPage, {});
 
 describe(`<${TopicsPage.name}/>`, () => {
   beforeEach(() => {
-    getTopicsMock.mockReset();
+    getIndexPageMock.mockReset();
+    taxonomyListModuleMock.mockClear();
   });
 
-  it('renders the page heading', async () => {
-    getTopicsMock.mockResolvedValue({ ok: true, data: [] });
+  it('calls notFound() when the fetch fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getIndexPageMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+
+    errorSpy.mockRestore();
+  });
+
+  it('renders the h1 and supporting text from the fetched page document', async () => {
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Topics',
+        supportingText: 'Browse every post by topic.',
+        seo: {},
+        taxonomyListId: 'topic-list-1',
+      },
+    });
 
     await setup();
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'Topics' }),
     ).toBeVisible();
+    expect(screen.getByText('Browse every post by topic.')).toBeVisible();
+    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders a card per topic, linking to its topic archive', async () => {
-    getTopicsMock.mockResolvedValue({
+  it('passes the taxonomyListId, TOPICS kind, page heading as titleFallback, the empty-state copy, and the href/postcount builders through to TaxonomyListModule', async () => {
+    getIndexPageMock.mockResolvedValue({
       ok: true,
-      data: [
-        {
-          id: 'topic-1',
-          title: 'Engineering',
-          slug: 'engineering',
-          description: 'Posts about building things.',
-          postCount: 5,
-        },
-      ],
+      data: {
+        heading: 'Topics',
+        supportingText: 'Browse every post by topic.',
+        seo: {},
+        taxonomyListId: 'topic-list-1',
+      },
     });
 
     await setup();
 
-    const link = screen.getByRole('link', { name: 'Engineering' });
-    expect(link).toHaveAttribute('href', '/topics/engineering');
-    expect(screen.getByText('Posts about building things.')).toBeVisible();
-    expect(screen.getByText('5 posts')).toBeVisible();
-  });
-
-  it('omits the description when the topic has none', async () => {
-    getTopicsMock.mockResolvedValue({
-      ok: true,
-      data: [
-        {
-          id: 'topic-1',
-          title: 'Engineering',
-          slug: 'engineering',
-          description: undefined,
-          postCount: 5,
-        },
-      ],
-    });
-
-    await setup();
-
-    expect(
-      screen.queryByText('Posts about building things.'),
-    ).not.toBeInTheDocument();
-  });
-
-  it('renders singular "1 post" for a topic with exactly one post', async () => {
-    getTopicsMock.mockResolvedValue({
-      ok: true,
-      data: [
-        {
-          id: 'topic-1',
-          title: 'Engineering',
-          slug: 'engineering',
-          description: undefined,
-          postCount: 1,
-        },
-      ],
-    });
-
-    await setup();
-
-    expect(screen.getByText('1 post')).toBeVisible();
-  });
-
-  it('renders an empty-state message when there are no topics', async () => {
-    getTopicsMock.mockResolvedValue({ ok: true, data: [] });
-
-    await setup();
-
-    expect(screen.getByText('No topics yet.')).toBeVisible();
-    // Only the breadcrumb "Home" link renders — no topic cards.
-    expect(screen.getAllByRole('link')).toHaveLength(1);
-  });
-
-  it('renders the empty state instead of crashing when the fetch resolves to a failure result', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getTopicsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('Configuration must contain `projectId`'),
-    });
-
-    await setup();
-
-    expect(screen.getByText('No topics yet.')).toBeVisible();
-    // Only the breadcrumb "Home" link renders — no topic cards.
-    expect(screen.getAllByRole('link')).toHaveLength(1);
-
-    errorSpy.mockRestore();
+    expect(taxonomyListModuleMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'topic-list-1',
+        taxonomy: 'TOPICS',
+        titleFallback: 'Topics',
+        emptyMessage: 'No topics yet.',
+      }),
+      undefined,
+    );
+    expect(screen.getByTestId('taxonomy-list-module-stub')).toHaveTextContent(
+      'topic-list-1:Topics:No topics yet.:/topics/engineering:5 posts',
+    );
   });
 
   it('renders the Home › Topics breadcrumbs trail', async () => {
-    getTopicsMock.mockResolvedValue({ ok: true, data: [] });
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Topics',
+        supportingText: 'Browse every post by topic.',
+        seo: {},
+        taxonomyListId: 'topic-list-1',
+      },
+    });
 
     await setup();
 
@@ -150,7 +153,15 @@ describe(`<${TopicsPage.name}/>`, () => {
   });
 
   it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
-    getTopicsMock.mockResolvedValue({ ok: true, data: [] });
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Topics',
+        supportingText: 'Browse every post by topic.',
+        seo: {},
+        taxonomyListId: 'topic-list-1',
+      },
+    });
 
     await setup();
 
@@ -164,7 +175,15 @@ describe(`<${TopicsPage.name}/>`, () => {
   });
 
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    getTopicsMock.mockResolvedValue({ ok: true, data: [] });
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        heading: 'Topics',
+        supportingText: 'Browse every post by topic.',
+        seo: {},
+        taxonomyListId: 'topic-list-1',
+      },
+    });
 
     const { container } = await setup();
 
