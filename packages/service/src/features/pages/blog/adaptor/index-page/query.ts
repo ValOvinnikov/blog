@@ -33,8 +33,8 @@ export const blogPageQuery = q.star
   }))
   .notNull();
 
-export const buildIndexPageQuery = (start: number, end: number) =>
-  q
+export function buildIndexPageQuery(start: number, end: number) {
+  return q
     .project((sub) => ({
       posts: blogPosts
         .order('publishedAt desc')
@@ -44,3 +44,4 @@ export const buildIndexPageQuery = (start: number, end: number) =>
       total: sub.count(blogPosts).notNull(true),
     }))
     .notNull(true);
+}

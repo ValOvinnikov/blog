@@ -13,8 +13,8 @@ const authorPosts = q
   .filterRaw('author->slug.current == $slug')
   .filterRaw(PUBLISHED_POST_FILTER);
 
-export const buildAuthorPostsPageQuery = (start: number, end: number) =>
-  q
+export function buildAuthorPostsPageQuery(start: number, end: number) {
+  return q
     .parameters<TSlugParams>()
     .project((sub) => ({
       posts: authorPosts
@@ -25,3 +25,4 @@ export const buildAuthorPostsPageQuery = (start: number, end: number) =>
       total: sub.count(authorPosts).notNull(true),
     }))
     .notNull(true);
+}

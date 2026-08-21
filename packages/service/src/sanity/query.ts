@@ -54,10 +54,10 @@ export const runQuery = makeSafeQueryRunner<TNextFetchOptions>(
  * publish, so this is forward-compatible with loaders migrating one at a
  * time, no webhook change required per loader.
  */
-export const isr = (
+export function isr(
   tag: string | string[],
   scopeProjectId?: string,
-): TNextFetchOptions => {
+): TNextFetchOptions {
   const tags = Array.isArray(tag) ? tag : [tag];
 
   return {
@@ -66,4 +66,4 @@ export const isr = (
       tags: scopeProjectId ? tags.map((t) => `t:${scopeProjectId}:${t}`) : tags,
     },
   };
-};
+}

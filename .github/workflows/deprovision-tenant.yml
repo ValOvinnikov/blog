@@ -84,6 +84,10 @@ jobs:
         # `${{ }}` expression directly into a `run:` shell script (template
         # injection); pass them through `env` and reference the shell
         # variables instead.
+        # `GITHUB_ACTOR`/`GITHUB_RUN_ID` need no entry here — Actions sets
+        # them as default env vars on every step already, and the script
+        # reads them straight from `process.env` to attribute the archive
+        # audit event to the dispatching user.
         env:
           TENANT_ID: ${{ inputs.tenantId }}
           CONFIRM: ${{ inputs.confirm }}

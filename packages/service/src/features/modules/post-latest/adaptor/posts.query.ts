@@ -8,10 +8,11 @@ import { postCardFragment } from '@blog/service/shared/fragments/post';
  * (end-exclusive `.slice(0, limit)`) rather than fetching the whole
  * `blog_post` collection to slice in JS.
  */
-export const postLatestModulePostsQuery = (limit: number) =>
-  q.star
+export function postLatestModulePostsQuery(limit: number) {
+  return q.star
     .filterByType('blog_post')
     .filterRaw(PUBLISHED_POST_FILTER)
     .order('publishedAt desc')
     .slice(0, limit)
     .project(postCardFragment);
+}
