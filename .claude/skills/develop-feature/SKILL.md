@@ -109,6 +109,18 @@ Hand each layer's work to its agent (use the Agent tool, or state which agent
 owns it). Do them in dependency order; later steps depend on earlier output.
 **Skip any agent whose layer has no changes** — don't invoke it at all.
 
+**Land each agent's commit onto your current local branch before dispatching
+the next one.** Every layer agent carries `isolation: worktree`, and
+`worktree.baseRef: "head"` in `.claude/settings.json` means the _next_
+dispatched agent's worktree branches from _your_ local `HEAD` — so it only
+sees a prior agent's work once that commit is actually on your branch:
+`git merge --ff-only <sha>` when the next agent branches from the same tip,
+`git cherry-pick <sha>` if `HEAD` has moved since (parallel agents, an
+intervening `pnpm typegen` commit). See `docs/context/claude-code.md`'s
+"Sequential agent worktrees compose" note for the full mechanism, and step 4
+below for why this discipline matters just as much before dispatching
+`test-writer`.
+
 | Layer / work                                                 | Agent       | Skill it should apply                                                               |
 | ------------------------------------------------------------ | ----------- | ----------------------------------------------------------------------------------- |
 | Constants, `routes`, shared types, `configs/*`, alias wiring | `config`    | —                                                                                   |
@@ -147,8 +159,18 @@ agent rules and skill.
 
 ## 4. Test
 
+- **Land every layer agent's commit onto your current local branch before
+  dispatching `test-writer`** (#1796) — `worktree.baseRef: "head"` in
+  `.claude/settings.json` means `test-writer`'s own worktree branches from
+  _your_ local `HEAD`, exactly like chaining two layer agents (see
+  `docs/context/claude-code.md`'s "Sequential agent worktrees" note). If a
+  layer agent's product change still lives only on its own
+  `worktree-agent-<id>` branch when `test-writer` is dispatched, its worktree
+  won't contain it — the fix is landing the commit first (`git merge --ff-only`
+  or `git cherry-pick`, same as step 3), never a manual copy/race into the
+  freshly-created worktree.
 - Dispatch the **`test-writer` subagent** (`.claude/agents/test-writer.md`)
-  once the layer agents have finished implementing. Give it the same
+  once every layer agent's commit is landed. Give it the same
   context-handoff package as step 3 (issue summary, acceptance criteria) plus
   a diff summary and the new exports/components/types each layer agent
   produced — it starts cold like any subagent. It applies `testing-practices`
@@ -159,6 +181,22 @@ agent rules and skill.
 - Tests run once per layer when implementation is complete — not after each
   file.
 - New routes/metadata: sanity-check `sitemap`/RSS.
+- **Land `test-writer`'s own commit too**, same as any other subagent, before
+  moving to step 5.
+- **The fail-without-the-fix check (`feedback_test_must_fail_without_the_fix`)
+  is the orchestrator's job, not `test-writer`'s** (#1796) — `test-writer`
+  cannot make or revert a product-code change under any tool, so it cannot
+  perform this check itself. After landing its tests, for each regression
+  test written specifically to cover a fix: temporarily back out _only_ the
+  product-code file(s) it targets — `git checkout <parent-sha> -- <file>`,
+  never the test file (by this point the fix is already committed on your
+  local branch per the landing step above, so `git stash` has nothing
+  uncommitted to stash and silently no-ops instead of reverting anything) —
+  run that one test and confirm it fails, then restore the file
+  (`git checkout HEAD -- <file>`) and confirm the suite is green again before
+  continuing. Skip this for tests that aren't regression tests for a specific
+  fix (new-feature coverage with no "should have failed before" claim doesn't
+  need it).
 
 ## 5. Verify
 

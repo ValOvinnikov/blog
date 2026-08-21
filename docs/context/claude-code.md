@@ -98,7 +98,12 @@ contracts:
     bypass that would otherwise move or overwrite a file outside the
     Edit/Write check entirely. A needed product-code change comes back as a
     finding for the orchestrator to route, never a fix this agent makes
-    itself.
+    itself. Sees the product change it's covering via the same "Sequential
+    agent worktrees compose" mechanism below (#1796) rather than any seeding
+    step of its own — the orchestrator must land the layer agent's commit
+    first. The fail-without-the-fix check for a regression test is likewise
+    the orchestrator's job: `test-writer` cannot revert product code under
+    any tool, so it cannot run that check itself (`develop-feature` §4).
   - `seo-auditor` — read-only SEO/metadata audit of the full diff, dispatched
     alongside `reviewer` (never instead of it) whenever a change touches
     `apps/web` routes, metadata, structured data, or feeds. Applies the
@@ -369,6 +374,29 @@ contracts:
     silently building stale code. The `post-checkout` hook produces the
     farm copies the pnpm layout needs, covers manually created worktrees
     too, and keeps a single mechanism in charge.
+- **Sequential agent worktrees compose via `worktree.baseRef: "head"`**
+  (`.claude/settings.json`) — every layer-agent and `test-writer` dispatch
+  carries `isolation: worktree` in its own frontmatter, and this setting means
+  each new worktree branches from the **orchestrator's current local `HEAD`**,
+  not from `origin/<default-branch>`. So dispatching agent B after agent A only
+  sees A's work if A's commit was landed onto the orchestrator's local branch
+  first (`git merge --ff-only <sha>` when B branches from the same tip A did,
+  `git cherry-pick` if `HEAD` moved since — e.g. parallel agents, or an
+  intervening `pnpm typegen` commit) — a bare "agent A's turn finished" is not
+  enough. This is what makes `test-writer` (`develop-feature` §4) able to see
+  the product change it was dispatched to cover without any seeding step of
+  its own: it has no sanctioned way to pull in a file itself (`cp`/`mv` are
+  denied, and the mutating `git` subcommands it would need are either on
+  `read-only-agent-guard.sh`'s deny list or absent from `permissions.allow`
+  entirely, so `permissionMode: dontAsk` fails closed on them) — the
+  orchestrator landing the commit first is the only mechanism, not a
+  workaround for one (#1796; the earlier workaround — racing a `cp` into the
+  worktree before the agent's first turn read the files — was timing-dependent
+  and has been retired). Cleanup after push:
+  `git cherry origin/<feat-branch> <agent-branch>` (patch-id based, not
+  `rev-list --count`, since a rebase changes SHAs but not patches) confirms an
+  agent's worktree branch is fully landed before it's removed
+  (`develop-feature` §8).
 - **Worktree ownership across parallel sessions** — `.claude/worktrees/` is
   shared by every Claude job running against this checkout, so
   `git worktree list` mixes one session's worktrees with other jobs' live
