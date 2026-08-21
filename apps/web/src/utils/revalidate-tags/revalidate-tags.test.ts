@@ -52,6 +52,24 @@ describe('getRevalidateTagsForType', () => {
     expect(getRevalidateTagsForType('nope', 'x')).toEqual([]);
   });
 
+  // Defence in depth for the type-level exhaustiveness guard on
+  // `REVALIDATE_TAGS` (a `Record<TModuleType, …>` intersection) — this
+  // hardcoded list can't itself catch a missing entry (both would go stale
+  // together), but it does confirm every currently-registered module type
+  // resolves to a non-empty tag list plus the per-document `module:<id>` tag.
+  it.each([
+    'module_hero',
+    'module_postList',
+    'module_postLatest',
+    'module_content',
+    'module_cta',
+    'module_newsletter',
+  ])('resolves a non-empty tag list plus module:<id> for %s', (type) => {
+    const tags = getRevalidateTagsForType(type, 'doc-1');
+    expect(tags.length).toBeGreaterThan(0);
+    expect(tags).toContain('module:doc-1');
+  });
+
   // Security: the type comes from the webhook body. The `switch` must return no
   // tags for these prototype/method names — never dispatch to an inherited
   // function (CodeQL js/unvalidated-dynamic-method-call).
