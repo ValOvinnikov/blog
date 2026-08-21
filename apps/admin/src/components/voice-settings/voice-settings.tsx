@@ -10,7 +10,10 @@ import {
 } from '@admin/utils/voice-fields/voice-fields';
 import { ALERT_TYPE, ICONS, Size } from '@blog/config';
 import type { TVoicePack } from '@blog/config/constants';
-import { Alert, Button, Heading, Icon } from '@blog/ui/atoms';
+import { Alert } from '@blog/ui/atoms/alert';
+import { Button } from '@blog/ui/atoms/button';
+import { Heading } from '@blog/ui/atoms/heading';
+import { Icon } from '@blog/ui/atoms/icon';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState, useTransition } from 'react';
