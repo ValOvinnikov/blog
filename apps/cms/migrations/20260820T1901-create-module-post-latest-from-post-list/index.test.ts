@@ -37,6 +37,28 @@ describe('create-module-post-latest-from-post-list migration', () => {
       ]);
     });
 
+    it("clamps limit to the target schema's max when the source exceeds it", () => {
+      const postList = {
+        ...baseDoc,
+        _id: 'abc123',
+        _type: 'module_postList',
+        title: 'Latest Posts',
+        limit: 24,
+      };
+
+      expect(migration.migrate.document(postList)).toEqual([
+        createIfNotExists({
+          _id: toPostLatestId(postList._id),
+          _type: 'module_postLatest',
+          title: postList.title,
+          brandVariant: undefined,
+          sectionHeader: undefined,
+          limit: 12,
+          layout: undefined,
+        }),
+      ]);
+    });
+
     it('lands a draft module_postList on the draft module_postLatest sibling', () => {
       const postList = {
         ...baseDoc,

@@ -1,19 +1,10 @@
 /**
- * Creates a `module_postLatest` document from each `module_postList` (the
- * teaser role, now split into its own type) under a deterministic id, then
- * repoints any `page_home.modules[]` reference at it. `_type` is immutable in
- * Sanity, so this is create + repoint, not a patch — the legacy
- * `module_postList` document is left in place and removed by a separate
- * follow-up migration once every reference has moved.
- *
- * Workflow (see ../README.md for the full guardrails):
- *   1. `pnpm --filter cms dataset:export -- migrations/backups/production-<date>.tar.gz`
- *   2. `pnpm --filter cms migrate:dry` — inspect the diff
- *   3. `pnpm --filter cms migrate:run` — human-gated, mutates `production`
- *
- * Run this before the delete-legacy-module-post-list migration, against the
- * same dataset — a document with incoming strong references cannot be
- * deleted.
+ * Creates a `module_postLatest` document from each `module_postList` under a
+ * deterministic id, then repoints any `page_home.modules[]` reference at it.
+ * `_type` is immutable in Sanity, so this is create + repoint, not a patch —
+ * the legacy `module_postList` document is left in place; delete it with the
+ * separate delete-legacy-module-post-list migration, run only after this one
+ * has completed against the same dataset.
  */
 import { at, createIfNotExists, defineMigration, set } from 'sanity/migrate';
 
@@ -39,6 +30,18 @@ type THomePageDoc = {
   modules?: TModuleReferenceItem[];
 };
 
+/** Must match `module_postLatest`'s `limit` field `.max()` in the schema. */
+const POST_LATEST_LIMIT_MAX = 12;
+
+/**
+ * `module_postList.limit` currently allows up to 24 (E2), wider than the new
+ * `module_postLatest.limit` (1-12) — clamp rather than copy verbatim, or a
+ * source document above 12 would produce a target document its own schema
+ * rejects, blocking the editor from publishing it.
+ */
+const clampToPostLatestLimit = (limit?: number): number | undefined =>
+  limit === undefined ? undefined : Math.min(limit, POST_LATEST_LIMIT_MAX);
+
 export default defineMigration({
   title:
     'Create module_postLatest documents from module_postList and repoint page_home.modules[]',
@@ -56,7 +59,7 @@ export default defineMigration({
             title: postList.title,
             brandVariant: postList.brandVariant,
             sectionHeader: postList.sectionHeader,
-            limit: postList.limit,
+            limit: clampToPostLatestLimit(postList.limit),
             layout: postList.layout,
           }),
         ];
