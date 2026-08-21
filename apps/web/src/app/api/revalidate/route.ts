@@ -1,3 +1,4 @@
+import { queries } from '@blog/db';
 import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
@@ -11,6 +12,15 @@ export const runtime = 'nodejs';
 // Sent by Sanity on every webhook request automatically — not exported by
 // any Sanity SDK, so this is the single source of truth for the literal.
 export const SANITY_PROJECT_ID_HEADER = 'sanity-project-id';
+
+// Sent by Sanity on every webhook request automatically, one of
+// 'create' | 'update' | 'delete' — not exported by any Sanity SDK. Unpublish
+// deletes the published document and spawns a draft, so 'delete' covers both
+// true deletion and unpublish; 'create'/'update' can never reach cleanup.
+export const SANITY_OPERATION_HEADER = 'sanity-operation';
+
+const BLOG_POST_TYPE = 'blog_post';
+const DELETE_OPERATION = 'delete';
 
 interface IRevalidateWebhookBody {
   _type: string;
@@ -103,8 +113,33 @@ export async function POST(request: Request): Promise<NextResponse> {
     revalidatePath('/', 'layout');
   }
 
+  let bookmarksRemoved = 0;
+  const operation = request.headers.get(SANITY_OPERATION_HEADER);
+  if (operation === DELETE_OPERATION && type === BLOG_POST_TYPE) {
+    try {
+      // No sole-tenant fallback here (unlike resolve-tenant-id.ts) — this is
+      // a destructive delete, so an unresolvable tenant must skip cleanup
+      // rather than guess.
+      const tenantId = tenantProjectId
+        ? await queries.tenants.getTenantIdBySanityProjectId(tenantProjectId)
+        : undefined;
+      if (tenantId) {
+        bookmarksRemoved = await queries.bookmarks.removeBookmarksForPost(
+          tenantId,
+          id,
+        );
+      }
+    } catch (error) {
+      logger.error('revalidate.bookmark_cleanup_failed', {
+        type,
+        id,
+        error,
+      });
+    }
+  }
+
   return NextResponse.json(
-    { revalidated, pathPurged, type, id },
+    { revalidated, pathPurged, type, id, bookmarksRemoved },
     { status: 200 },
   );
 }
