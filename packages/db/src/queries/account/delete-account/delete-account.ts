@@ -3,17 +3,14 @@ import { users } from '@blog/db/schema/auth';
 import { eq } from 'drizzle-orm';
 
 // Deletes the `users` row for `userId` — the `/account` "delete account"
-// action (Epic #1151, D15 §4.6/6a). Existing FK `onDelete: 'cascade'` on
-// `accounts`, `sessions` (schema/auth.ts) and `bookmarks`
-// (schema/bookmarks.ts) — all of which reference `users.id` — erases those
-// rows automatically; no manual per-table deletes needed for what exists
-// today.
+// action. Existing FK `onDelete: 'cascade'` on `accounts`, `sessions`
+// (schema/auth.ts) and `bookmarks` (schema/bookmarks.ts) — all of which
+// reference `users.id` — erases those rows automatically; no manual
+// per-table deletes needed for what exists today.
 //
-// #1040 will need to add its own pre-delete tombstone step ahead of this
-// call once comments exist (a hard FK cascade would be wrong there — a
-// comment thread's shape must be preserved via soft-delete, not erased).
-// Do not add a `comments` cascade or `onDelete` assumption to this function
-// ahead of that landing.
+// TODO(#1040): once comments exist, add a pre-delete tombstone step ahead
+// of this call — a hard FK cascade would be wrong there, since a comment
+// thread's shape must be preserved via soft-delete, not erased.
 //
 // A no-op (not an error) if `userId` doesn't match a `users` row, matching
 // this package's other delete-style mutations (see `removeBookmark`).

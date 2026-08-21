@@ -2,8 +2,8 @@ import { getDb } from '@blog/db/client';
 import { accounts, users } from '@blog/db/schema/auth';
 import { eq } from 'drizzle-orm';
 
-// The `/account` hub's 6c "connected accounts" section (Epic #1159) needs
-// the linked status of all three sign-in methods this repo ships (per
+// The `/account` hub's "connected accounts" section needs the linked
+// status of all three sign-in methods this repo ships (per
 // schema/auth.ts's own comment: GitHub, Google, email magic link). GitHub
 // and Google each show up as a row in `accounts` keyed by `provider`; the
 // email magic-link method has no `accounts` row at all — its signal is

@@ -29,11 +29,12 @@ export type TAccountDataExport = {
 };
 
 // Aggregates a user's profile + bookmarks into one JSON-serializable shape
-// for the `/account` "export my data" download (Epic #1151, D15 §4.6/6a).
-// Scoped to the two tables that exist today (`users`, `bookmarks`) — comments
-// (#1040), ratings (#1041), and newsletter subscription (#1044) each extend
-// this function to fold in their own table once they land; don't add those
-// tables here ahead of that.
+// for the `/account` "export my data" download. Scoped to the two tables
+// that exist today (`users`, `bookmarks`).
+//
+// TODO(#1040, #1041, #1044): extend this function to fold in comments,
+// ratings, and newsletter subscription once each lands; don't add those
+// tables ahead of that.
 //
 // `bookmarks` carries a `tenantId`, so the export is scoped to the tenant
 // the "export my data" action was invoked from, not every tenant the user
