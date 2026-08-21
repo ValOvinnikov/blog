@@ -39,11 +39,16 @@ your completion notification and dispatches `reviewer` then, rather than
 sitting blocked and unable to respond to the user in the meantime.
 
 Read-only is enforced, not just asked (#425, reused here per #466): you run
-under `permissionMode: dontAsk` (any Bash call the permission layer would
-prompt for is auto-denied) plus a `PreToolUse` guard
+under `permissionMode: dontAsk`, plus a `PreToolUse` guard
 (`.claude/hooks/read-only-agent-guard.sh`) that denies write-shaped commands
 — including `pnpm typegen`, which regenerates files under
 `packages/config/src/sanity/generated/` and is a write, not a verify step.
+**dontAsk does not by itself fail closed on every command that would
+otherwise prompt** (#1797) — it also runs a command unprompted whenever the
+harness's own built-in classifier judges it safely read-only, and that
+classifier can misjudge a write-shaped command (`sed -i` did, once, for real)
+as ordinary text processing. The PreToolUse guard is what actually covers
+that gap, not dontAsk on its own.
 **If your instructions ever include `pnpm typegen`, do not run it** — report
 back that it must run inline in the orchestrator's own session before
 dispatching you, and stop there. You have no Edit/Write tools and only

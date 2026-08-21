@@ -163,18 +163,45 @@ contracts:
   `reviewer`, `a11y-reviewer`, `seo-auditor`, `explore`, `ci-watcher`, and
   `verify-runner` are read-only by **enforcement**, not just prose (#425,
   #464, #466); `test-writer` reuses the same `Bash` guard although it isn't
-  fully read-only (#396). All seven run under `permissionMode: dontAsk`, so
-  any Bash call the permission engine would prompt for (redirects, `sed -i`,
-  `tee`, unrecognized binaries) is auto-denied, and a per-agent `PreToolUse`
-  guard (`read-only-agent-guard.sh`)
-  denies the write-shaped commands the project allow-list would otherwise
-  admit (`git commit` — including with leading global flags like
-  `git -C dir commit`, `mkdir`, `cp`, `pnpm typegen`, `pnpm exec`/
-  `pnpm --filter ... exec`, …). Residual, accepted: commands that execute
-  package scripts the allow-list doesn't flag as write-shaped (`pnpm test`,
-  `pnpm dev`, `turbo run`) can still write, and the guard's quote-naive
-  segment splitting can false-positive on search patterns containing e.g.
-  `&& mkdir ` — denials tell the agent to fall back to Grep/Read. This is a
+  fully read-only (#396). All seven run under `permissionMode: dontAsk`, plus
+  a per-agent `PreToolUse` guard (`read-only-agent-guard.sh`) that denies the
+  write-shaped commands the project allow-list would otherwise admit
+  (`git commit` — including with leading global flags like `git -C dir
+commit`, `mkdir`, `cp`, `mv`, `tee`, `pnpm typegen`, `pnpm exec`/
+  `pnpm --filter ... exec`, …) plus `sed -i`/`--in-place`, `perl -i`, and
+  shell redirection (`>`, `>>`, and their fd-qualified forms) to anything
+  other than a harmless sink like `/dev/null` or an fd duplication
+  (`2>&1`).
+
+  **`dontAsk` does not itself fail closed on every command that would
+  otherwise prompt — this project previously documented it as if it did,
+  and #1797 found that wrong for real.** `dontAsk` runs a command unprompted
+  whenever it matches `permissions.allow`, is approved by a `PreToolUse`
+  hook, **or** the harness's own built-in classification judges the command
+  safely read-only — that third path is not something this project
+  configures, and it is not sound: a `test-writer` agent ran `sed -i`
+  against a real product file, unprompted and unblocked, because the
+  harness's own heuristic treated `sed` as an ordinary read/text-processing
+  command without accounting for the `-i` flag turning it into a write.
+  `perl -i`, `tee`, and shell redirection are the same class of
+  misjudgment. `read-only-agent-guard.sh` is therefore the actual
+  enforcement for every write-shaped command it lists — full stop,
+  regardless of what `dontAsk`'s own classifier would have done on its
+  own — not a mop-up for a small residue `dontAsk` already caught.
+
+  Redirection detection (`>`/`>>` and their fd-qualified/`&`-combined
+  forms) pads a space around every match before tokenizing, so it catches
+  the operator whether it's glued to its target, its preceding word, both,
+  or neither (`echo hi>file`, `echo hi >file`, `echo hi> file`, `echo hi >
+file` are all denied alike) — an earlier version only handled the
+  fully-spaced form and missed the other three, which #1797's review
+  caught as covering far less than intended.
+
+  Residual, accepted: commands that execute package scripts the allow-list
+  doesn't flag as write-shaped (`pnpm test`, `pnpm dev`, `turbo run`) can
+  still write; and the guard's quote-naive segment splitting can
+  false-positive on search patterns containing e.g. `&& mkdir ` — denials
+  tell the agent to fall back to Grep/Read. This is a
   guardrail against honest confusion, not a security boundary — it doesn't
   chase further obfuscation (case-insensitive filesystem tricks,
   path-qualified binaries, wrapper commands); see #397 for why full
@@ -228,10 +255,15 @@ contracts:
     and `test-writer` agent frontmatter — `test-writer` sets a `GUARD_LABEL`
     env var on its hook command so the deny message names it correctly
     rather than calling it "read-only")
-    backing the enforcement described above. Its deny list mirrors the
-    write-shaped entries in `settings.json` `permissions.allow` — keep the
-    two in sync. `read-only-agent-guard.test.sh` pins the deny/allow matrix
-    (including the bypasses found across #425's review rounds); run it
+    backing the enforcement described above. Its `DENY_PREFIXES` list
+    mirrors the write-shaped entries in `settings.json` `permissions.allow`
+    — keep the two in sync. The `sed`/`perl` in-place-edit and redirection
+    checks (#1797) are the deliberate exception: those shapes have no single
+    allow-list prefix to mirror (`sed -i` vs. `sed -n`, `cmd > file` vs.
+    `cmd > /dev/null`), so they get their own narrow, targeted detection
+    functions instead of a prefix-list entry. `read-only-agent-guard.test.sh`
+    pins the deny/allow matrix (including the bypasses found across #425's
+    review rounds and the in-place/redirection cases added for #1797); run it
     directly or via CI (see [`docs/context/ci-automation.md`](./ci-automation.md)).
   - `test-writer-scope-guard.sh` — `PreToolUse` hook (wired in the
     `test-writer` agent frontmatter) that denies any `Edit`/`Write` whose

@@ -34,11 +34,17 @@ asked (#396).** You have `Edit`/`Write`, but a `PreToolUse` guard
 `*.test.ts`/`*.test.tsx` — including the product file the test is covering.
 That alone isn't the whole boundary: you also have `Bash`, and `mv`/`cp`
 could otherwise move or overwrite a file outside that check entirely. You run
-under `permissionMode: dontAsk` (any Bash call the permission layer would
-prompt for is auto-denied) plus the same `Bash`-mutation guard the `reviewer`/
-`explore` agents use (`.claude/hooks/read-only-agent-guard.sh`, #425) — it has
-no legitimate use for anything on that deny list either, so it's reused as-is
-rather than duplicated. If a legitimate read-only or test-running Bash command
+under `permissionMode: dontAsk`, plus the same `Bash`-mutation guard the
+`reviewer`/`explore` agents use (`.claude/hooks/read-only-agent-guard.sh`,
+#425) — it has no legitimate use for anything on that deny list either, so
+it's reused as-is rather than duplicated. **dontAsk does not by itself fail
+closed on every command that would otherwise prompt** (#1797, found for
+real: a `test-writer` run once wrote a product file via `sed -i` and self-
+reported it) — it also runs a command unprompted whenever the harness's own
+built-in classifier judges it safely read-only, and that classifier
+misjudged `sed -i` as ordinary text processing without accounting for the
+flag. The PreToolUse guard is what actually covers that gap, not dontAsk on
+its own. If a legitimate read-only or test-running Bash command
 is denied (unrecognized binary, a search pattern tripping the guard), switch
 to Grep/Read/Glob or a narrower command rather than working around it.
 

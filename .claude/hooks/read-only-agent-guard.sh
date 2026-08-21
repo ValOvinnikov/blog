@@ -5,22 +5,33 @@
 #
 # Wired in each agent's frontmatter, so it fires ONLY for that agent's Bash
 # calls. It works together with `permissionMode: dontAsk` in the same
-# frontmatter:
+# frontmatter — but #1797 found that combination was documented wrong:
 #
-#   - dontAsk makes the harness's own permission engine fail CLOSED: any Bash
-#     call it would prompt for (redirects, sed -i, tee, unrecognized binaries,
-#     obfuscated forms) is auto-denied. That engine — not this script — is the
-#     enforcement layer.
-#   - This script only subtracts the write-shaped commands that the project
-#     allow-list (.claude/settings.json permissions.allow) would otherwise
-#     wave through without a prompt. That is a finite, plainly-written set,
-#     because anything not matching an allow rule's literal prefix is already
-#     denied by dontAsk.
+#   - dontAsk does NOT fail closed on every command that would otherwise
+#     prompt. It runs a command unprompted if it matches `permissions.allow`,
+#     is approved by a PreToolUse hook, OR the harness's own built-in
+#     classification judges the command safely read-only — that third path
+#     isn't this project's to configure, and it is NOT sound: `sed -i`
+#     against a real product file ran unprompted and unblocked under
+#     dontAsk in #1797, because the harness's own heuristic treated `sed` as
+#     an ordinary read/text-processing command without accounting for the
+#     `-i` flag turning it into a write. `perl -i`, `tee`, and shell
+#     redirection are the same class of misjudgment.
+#   - This script is therefore not just "subtracting the allow-list's
+#     write-shaped entries" — it is the actual enforcement for every
+#     write-shaped command below, full stop, regardless of what dontAsk's
+#     own classifier would have done on its own.
 #
 # Deliberately NOT a general write-detector: #397 established that text
 # analysis of shell commands cannot be made sound and its false positives on
-# honest commands cost more than they protect. Keep this list a mirror of the
+# honest commands cost more than they protect. DENY_PREFIXES mirrors the
 # write-shaped permissions.allow entries — update it when that list changes.
+# The in-place-editor/redirection checks below (#1797) are the one
+# deliberate exception to "mirror the allow-list": those shapes have no
+# single allow-list prefix to mirror (`sed -i` vs. `sed -n`, `cmd > file` vs.
+# `cmd > /dev/null`), so they get their own narrow, targeted detection
+# instead of a blanket "any redirection" ban that would also deny harmless
+# forms like `>/dev/null`.
 #
 # `test-writer` has no legitimate need for any command on the deny list
 # either, even though it isn't read-only overall (it writes `*.test.ts(x)`
@@ -60,6 +71,7 @@ DENY_PREFIXES=(
   "touch"
   "cp"
   "mv"
+  "tee"
   "pnpm add"
   "pnpm install"
   "pnpm create"
@@ -146,6 +158,114 @@ pnpm_exec_denied() {
   return 1
 }
 
+# True if TOKEN (a single dash followed by a cluster of combined short
+# flags, e.g. "-npi") activates in-place editing: scans left to right and
+# denies the moment it sees the letter `i` (in-place), UNLESS it first hits
+# one of STOPCHARS — a flag that consumes the *rest* of the token as its own
+# value (a script, a module name, an include path, a backup suffix already
+# spoken for) rather than more flag letters, at which point anything after
+# it — including a stray `i` — belongs to that value, not to a new switch.
+# Shared by sed_inplace_denied and perl_inplace_denied below; each passes its
+# own binary's value-consuming letters as STOPCHARS.
+inplace_cluster_denied() {
+  local body="${1:1}" stopchars="$2" j c
+  for ((j = 0; j < ${#body}; j++)); do
+    c="${body:j:1}"
+    [ "$c" = "i" ] && return 0
+    case "$stopchars" in
+    *"$c"*) return 1 ;;
+    esac
+  done
+  return 1
+}
+
+# True if $1 is a `sed` invocation carrying an in-place-edit flag: `-i`,
+# `-i<suffix>` (the mandatory-argument form, e.g. `-i.bak`, `-i''`),
+# `--in-place`/`--in-place=<suffix>`, or `-i` combined into a cluster with
+# other boolean flags (`-ni`, `-Ei`, `-li.bak`, …) — both GNU and BSD/macOS
+# sed accept `-i` anywhere in such a cluster, not just leading it. Only
+# `-e`/`-f` consume the rest of their token as a value (a script/file), so
+# `inplace_cluster_denied` stops scanning at those. `-l` is deliberately
+# NOT a stopchar here even though GNU sed's `-l N` takes a numeric
+# argument: this guard runs on the agents' actual runtime, BSD/macOS sed
+# (`man sed`: "-l Make output line buffered" — no argument at all), where
+# `-l` is a plain boolean and a real bypass (`sed -li.bak '...' file`)
+# went undetected when `l` was treated as a stopchar (#1797 review).
+sed_inplace_denied() {
+  tokenize "$1"
+  [ "${TOKENS[0]:-}" = "sed" ] || return 1
+  local t
+  for t in "${TOKENS[@]:1}"; do
+    case "$t" in
+    --in-place | --in-place=*) return 0 ;;
+    --*) continue ;;
+    -*) inplace_cluster_denied "$t" "ef" && return 0 ;;
+    esac
+  done
+  return 1
+}
+
+# True if $1 is a `perl` invocation carrying an in-place-edit flag. Unlike
+# `sed`, perl's boolean short options combine into one dash-prefixed cluster
+# (`-pi`, `-npi -e`, …), so `-i` can appear anywhere inside a single-dash
+# token, not just at the start. A naive "does this token contain the letter
+# i" check is unsound here: `-M`/`-I`/`-e`/`-E`/`-m` each consume the *rest*
+# of their token as a value (a module name, an include path, inline code),
+# so `-Mstrict`/`-Ilib` are common, entirely unrelated flags whose value
+# happens to contain the letter i — `inplace_cluster_denied` stops scanning
+# at those instead of misreading the value as more flags.
+perl_inplace_denied() {
+  tokenize "$1"
+  [ "${TOKENS[0]:-}" = "perl" ] || return 1
+  local t
+  for t in "${TOKENS[@]:1}"; do
+    case "$t" in
+    --* | [!-]*) continue ;;
+    esac
+    inplace_cluster_denied "$t" "MIeEm" && return 0
+  done
+  return 1
+}
+
+# True if $1 contains shell output redirection to something other than a
+# harmless sink (/dev/null, /dev/stderr, /dev/stdout, or duplicating one
+# stream onto another via `>&1`/`>&2`) — `>`, `>>`, and their fd-qualified
+# forms (`2>`, `1>>`, `&>`, `&>>`) all create or overwrite a file.
+#
+# The operator is frequently NOT its own whitespace-separated token — any of
+# `echo hi>file`, `echo hi >file`, `echo hi> file` are equally normal ways to
+# type a redirect, and only the fully-spaced form tokenizes as isolated
+# operator/target words on its own (#1797 review: an earlier version here
+# only handled that fully-spaced case, missing the single most common
+# one-sided-space idiom entirely). So the operator is isolated by padding a
+# space on both sides of every match BEFORE tokenizing, rather than by
+# scanning already-produced tokens — this also subsumes the fd-duplication
+# case (`2>&1` pads to `2> &1`, and `&1`/`&2` are themselves on the safe-sink
+# list below, so no separate "operator+fd-dup fused in one token" branch is
+# needed). `tokenize()`'s xargs-based quote-awareness keeps this safe against
+# a literal `>` inside a quoted search pattern (`rg "a>b"` pads to
+# `rg "a > b"`, which still tokenizes as one quoted argument, not three
+# words) — same accepted quote-naive posture as the rest of this guard
+# (#397) for an *unquoted* one.
+redirection_denied() {
+  local padded
+  padded=$(printf '%s' "$1" | sed -E 's/[0-9]*&?>{1,2}/ & /g')
+  tokenize "$padded"
+  local i=0
+  while [ "$i" -lt "${#TOKENS[@]}" ]; do
+    local tok="${TOKENS[$i]}"
+    if [[ "$tok" =~ ^[0-9]*\&?\>{1,2}$ ]]; then
+      local target="${TOKENS[$((i + 1))]:-}"
+      case "$target" in
+      /dev/null | /dev/stderr | /dev/stdout | '&1' | '&2') ;;
+      *) return 0 ;;
+      esac
+    fi
+    i=$((i + 1))
+  done
+  return 1
+}
+
 # Check each command segment (split on &&, ||, ;, |, newline) against the
 # rules above, mirroring the allow-list's literal-prefix matching. Splitting
 # is quote-naive on purpose: a quoted "&& mkdir " inside e.g. an rg pattern
@@ -163,6 +283,15 @@ while IFS= read -r segment; do
   fi
   if pnpm_exec_denied "$segment"; then
     deny "$GUARD_LABEL: 'pnpm exec'/'--filter ... exec' runs an arbitrary command and can mutate the tree. Report the change you wanted to make instead of applying it."
+  fi
+  if sed_inplace_denied "$segment"; then
+    deny "$GUARD_LABEL: 'sed -i'/'--in-place' overwrites the target file. Report the change you wanted to make instead of applying it; for searching, prefer the Grep/Read tools."
+  fi
+  if perl_inplace_denied "$segment"; then
+    deny "$GUARD_LABEL: 'perl -i' overwrites the target file. Report the change you wanted to make instead of applying it; for searching, prefer the Grep/Read tools."
+  fi
+  if redirection_denied "$segment"; then
+    deny "$GUARD_LABEL: this command redirects output to a file, which creates or overwrites it. Report the change you wanted to make instead of applying it; for searching, prefer the Grep/Read tools."
   fi
   for prefix in "${DENY_PREFIXES[@]}"; do
     case "$segment" in

@@ -137,10 +137,15 @@ change, describe the change and where it goes; the orchestrator decides and
 delegates it to the layer's owning agent.
 
 This is also enforced, not just asked (#425): you run under
-`permissionMode: dontAsk`, so any Bash call the permission layer would prompt
-for is auto-denied, and a PreToolUse guard
+`permissionMode: dontAsk`, and a PreToolUse guard
 (`.claude/hooks/read-only-agent-guard.sh`) denies the write-shaped commands
-the project allow-list would otherwise admit. If a read-only command of yours
+the project allow-list would otherwise admit. **dontAsk does not by itself
+fail closed on every command that would otherwise prompt** (#1797) — it also
+runs a command unprompted whenever the harness's own built-in classifier
+judges it safely read-only, and that classifier can misjudge a write-shaped
+command (`sed -i` did, once, for real) as ordinary text processing. The
+PreToolUse guard is what actually covers that gap, not dontAsk on its own.
+If a read-only command of yours
 gets denied anyway (unrecognized binary, or a search pattern that trips the
 guard's quote-naive splitting), don't fight it — use Grep/Read/Glob for the
 same answer.
