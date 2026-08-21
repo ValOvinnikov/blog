@@ -13,7 +13,7 @@ type TSlugValue = {
 
 export const genericSchema = defineType({
   name: 'page_generic',
-  title: 'Page',
+  title: 'Landing Page',
   type: 'document',
   icon: FileText,
   preview: {
