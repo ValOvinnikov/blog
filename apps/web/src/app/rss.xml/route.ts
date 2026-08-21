@@ -1,11 +1,11 @@
 import { routes } from '@blog/config';
-import { service, type TArchivePostCard } from '@blog/service';
+import { service, type TPostCard } from '@blog/service';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { getTranslations } from 'next-intl/server';
 
-const toRssItem = (post: TArchivePostCard, siteUrl: string): TRssItem => {
+const toRssItem = (post: TPostCard, siteUrl: string): TRssItem => {
   return {
     title: post.title,
     link: `${siteUrl}${routes.post(post.slug)}`,
@@ -14,10 +14,23 @@ const toRssItem = (post: TArchivePostCard, siteUrl: string): TRssItem => {
   };
 };
 
-const getAllPublishedPosts = async (): Promise<TArchivePostCard[]> => {
-  const firstPageResult = await service.pages.blog.v1.getIndexPage({ page: 1 });
-  if (!firstPageResult.ok) {
+const getAllPublishedPosts = async (): Promise<TPostCard[]> => {
+  const indexPageResult = await service.pages.blog.v1.getIndexPage();
+  if (!indexPageResult.ok) {
     logger.error('rss.index_page_fetch_failed', {
+      error: indexPageResult.error,
+    });
+    return [];
+  }
+
+  const { postListId } = indexPageResult.data;
+
+  const firstPageResult = await service.modules.postList.v1.getPostList(
+    postListId,
+    1,
+  );
+  if (!firstPageResult.ok) {
+    logger.error('rss.first_page_fetch_failed', {
       error: firstPageResult.error,
     });
     return [];
@@ -31,7 +44,9 @@ const getAllPublishedPosts = async (): Promise<TArchivePostCard[]> => {
     (_, i) => i + 2,
   );
   const restResults = await Promise.all(
-    restPageNumbers.map((page) => service.pages.blog.v1.getIndexPage({ page })),
+    restPageNumbers.map((page) =>
+      service.modules.postList.v1.getPostList(postListId, page),
+    ),
   );
 
   const restPosts = restResults.flatMap((result) => {
@@ -47,7 +62,7 @@ const getAllPublishedPosts = async (): Promise<TArchivePostCard[]> => {
 
 /**
  * RSS 2.0 feed of every published post, newest posts first (the order the
- * blog index already returns them in). Falls back to a generic channel
+ * blog archive already returns them in). Falls back to a generic channel
  * title/description when site settings fail to load — a broken feed must
  * never break because of an unrelated global-content fetch failure.
  */

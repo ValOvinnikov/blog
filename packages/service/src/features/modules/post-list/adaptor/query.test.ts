@@ -10,4 +10,8 @@ describe('postListModuleQuery', () => {
     expect(postListModuleQuery.query).toContain('pageSize');
     expect(postListModuleQuery.query).not.toContain('limit');
   });
+
+  it('projects the empty-state message', () => {
+    expect(postListModuleQuery.query).toContain('emptyMessage');
+  });
 });

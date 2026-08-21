@@ -1,8 +1,4 @@
-import {
-  MODULE_PAGE_CONTEXT,
-  routes,
-  type ILocalizedParams,
-} from '@blog/config';
+import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { Heading } from '@blog/ui/atoms/heading';
 import {
@@ -72,11 +68,7 @@ export const GenericPage = async ({ slug, locale }: TGenericPageProps) => {
         <Heading level={1} visual="section" className={s.heading()}>
           {title}
         </Heading>
-        <ModuleRenderer
-          modules={modules}
-          locale={locale}
-          context={{ type: MODULE_PAGE_CONTEXT.GENERIC, isPaginated: false }}
-        />
+        <ModuleRenderer modules={modules} locale={locale} />
       </main>
     </>
   );

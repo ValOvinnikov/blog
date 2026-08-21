@@ -28,7 +28,6 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   args: {
-    id: 'post-list-1',
     brandVariant: BRAND_VARIANT.PRIMARY,
     sectionHeader: {
       heading: 'Latest posts',
@@ -37,6 +36,8 @@ const meta = {
     },
     items,
     layout: undefined,
+    titleId: 'post-list-title',
+    dataTestId: 'post-list-module-post-list-1',
     titleFallback: 'Latest posts',
   },
 } satisfies Meta<typeof PostListModuleView>;

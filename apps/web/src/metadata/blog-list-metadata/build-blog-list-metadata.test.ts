@@ -29,10 +29,8 @@ describe('buildBlogListMetadata', () => {
       data: {
         heading: 'Blog',
         seo,
-        posts: [],
-        currentPage: 1,
-        totalPages: 3,
-        total: 20,
+        modules: [],
+        postListId: 'post-list-1',
       },
     });
 
@@ -57,10 +55,8 @@ describe('buildBlogListMetadata', () => {
       data: {
         heading: 'Blog',
         seo,
-        posts: [],
-        currentPage: 2,
-        totalPages: 3,
-        total: 20,
+        modules: [],
+        postListId: 'post-list-1',
       },
     });
 
