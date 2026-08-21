@@ -177,7 +177,7 @@ describe(updateFeaturesAction, () => {
       actorId: 'operator-1',
       actorEmail: 'operator@example.com',
       action: AUDIT_ACTION.SETTINGS_UPDATED,
-      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+      targetType: AUDIT_TARGET_TYPE.SETTINGS_FEATURES,
       targetId: 'tenant-1',
       details: VALID_INPUT,
     });

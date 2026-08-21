@@ -60,7 +60,7 @@ export const updateFeaturesAction = async (
     await recordAuditEvent({
       logEvent: 'settings_features.update_audit_failed',
       action: AUDIT_ACTION.SETTINGS_UPDATED,
-      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+      targetType: AUDIT_TARGET_TYPE.SETTINGS_FEATURES,
       targetId: tenant.id,
       details: parsed.data,
     });
