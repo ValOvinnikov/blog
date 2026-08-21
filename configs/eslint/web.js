@@ -78,10 +78,4 @@ export default [
       'func-style': 'off',
     },
   },
-  {
-    // A story's mock <img> is never served to a user, so the LCP/bandwidth
-    // guard this rule enforces on shipped pages has nothing to protect here.
-    files: ['**/*.stories.tsx'],
-    rules: { '@next/next/no-img-element': 'off' },
-  },
 ];

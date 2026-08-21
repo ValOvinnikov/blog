@@ -1,20 +1,12 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { LinkButton } from '@blog/ui/molecules';
-import { Hero } from '@blog/ui/organisms';
-import { en, Faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { SmartLink } from '@web/components/shared/smart-link';
 import { ContentModuleView } from '@web/modules/content/content-module-view';
 import { CtaModuleView } from '@web/modules/cta/cta-module-view';
+import { HeroModuleView } from '@web/modules/hero/hero-module-view';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixtures';
 
 import { HomePageTemplate } from './home-page-template';
-
-// A private, seeded Faker instance keeps this value stable across runs
-// without touching the global `faker` singleton other suites rely on.
-const fixtureFaker = new Faker({ locale: [en] });
-fixtureFaker.seed(123);
-const heroMediaImageUrl = fixtureFaker.image.url({ width: 1200, height: 675 });
 
 const meta = {
   title: 'Page Templates/HomePageTemplate',
@@ -22,21 +14,25 @@ const meta = {
   tags: ['autodocs'],
   args: {
     hero: (
-      <Hero
+      <HeroModuleView
+        id="hero-1"
+        brandVariant={BRAND_VARIANT.BRAND_PRIMARY}
         eyebrow="Welcome"
         title="Notes on building things"
-        titleId="hero-title"
-        excerpt="Essays and notes from the team, published as we ship."
-      >
-        <Hero.Media>
-          <img src={heroMediaImageUrl} alt="Placeholder hero image" />
-        </Hero.Media>
-        <Hero.Cta>
-          <LinkButton as={SmartLink} href="/blog">
-            Read the blog
-          </LinkButton>
-        </Hero.Cta>
-      </Hero>
+        subtitle="Essays and notes from the team, published as we ship."
+        sanityImage={makeSanityImage()}
+        primaryAction={{
+          label: 'Read the blog',
+          href: '/blog',
+          target: undefined,
+          platform: undefined,
+          hiddenLabelSuffix: undefined,
+        }}
+        secondaryAction={undefined}
+        layout={undefined}
+        projectId="demo-project"
+        dataset="demo-dataset"
+      />
     ),
     modules: (
       <>
@@ -77,11 +73,18 @@ export const Default: TStory = {};
 export const MinimalSlots: TStory = {
   args: {
     hero: (
-      <Hero
+      <HeroModuleView
+        id="hero-1"
+        brandVariant={BRAND_VARIANT.BRAND_PRIMARY}
         eyebrow="Welcome"
         title="Notes on building things"
-        titleId="hero-title"
-        excerpt="Essays and notes from the team, published as we ship."
+        subtitle="Essays and notes from the team, published as we ship."
+        sanityImage={undefined}
+        primaryAction={undefined}
+        secondaryAction={undefined}
+        layout={undefined}
+        projectId="demo-project"
+        dataset="demo-dataset"
       />
     ),
     modules: (
