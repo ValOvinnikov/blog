@@ -23,7 +23,7 @@ describe('getSanityImageBaseUrl', () => {
     process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'env-dataset';
     vi.resetModules();
 
-    const { getSanityImageBaseUrl } = await import('./image');
+    const { getSanityImageBaseUrl } = await import('./image-base-url');
 
     expect(getSanityImageBaseUrl()).toBe(
       'https://cdn.sanity.io/images/env-project/env-dataset/',
@@ -35,7 +35,7 @@ describe('getSanityImageBaseUrl', () => {
     process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'env-dataset';
     vi.resetModules();
 
-    const { getSanityImageBaseUrl } = await import('./image');
+    const { getSanityImageBaseUrl } = await import('./image-base-url');
 
     expect(
       getSanityImageBaseUrl({
