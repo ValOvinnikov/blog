@@ -370,6 +370,57 @@ export type Settings_site = {
   defaultOgImage?: ImageWithAlt;
 };
 
+export type Module_postListReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_postList';
+};
+
+export type Module_postLatestReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_postLatest';
+};
+
+export type Module_ctaReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_cta';
+};
+
+export type Module_newsletterReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_newsletter';
+};
+
+export type Page_topic = {
+  _id: string;
+  _type: 'page_topic';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  topic?: Blog_topicReference;
+  postList?: Module_postListReference;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_postLatestReference)
+    | ({
+        _key: string;
+      } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
+  >;
+  seo?: Seo;
+};
+
 export type Module_taxonomyListReference = {
   _ref: string;
   _type: 'reference';
@@ -400,27 +451,6 @@ export type Module_taxonomyList = {
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   sectionHeader?: SectionHeader;
   layout?: Layout;
-};
-
-export type Module_postListReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_postList';
-};
-
-export type Module_ctaReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_cta';
-};
-
-export type Module_newsletterReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_newsletter';
 };
 
 export type Page_blog = {
@@ -465,13 +495,6 @@ export type Module_heroReference = {
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'module_hero';
-};
-
-export type Module_postLatestReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_postLatest';
 };
 
 export type Page_home = {
@@ -792,16 +815,17 @@ export type AllSanitySchemaTypes =
   | Settings_footer
   | Settings_navigation
   | Settings_site
+  | Module_postListReference
+  | Module_postLatestReference
+  | Module_ctaReference
+  | Module_newsletterReference
+  | Page_topic
   | Module_taxonomyListReference
   | Page_topicIndex
   | Module_taxonomyList
-  | Module_postListReference
-  | Module_ctaReference
-  | Module_newsletterReference
   | Page_blog
   | Module_postList
   | Module_heroReference
-  | Module_postLatestReference
   | Page_home
   | Module_hero
   | Module_contentReference
