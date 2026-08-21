@@ -95,6 +95,23 @@ check 'echo hi >> file.tsx' deny ">> redirect (append) to a file"
 check 'echo hi 2> err.log' deny "2> redirect (stderr) to a file"
 check 'echo hi &> both.log' deny "&> redirect to a file"
 
+# --- deny: -l is a plain boolean on BSD/macOS sed (this guard's actual
+# runtime), NOT a value-consuming flag like GNU sed's numeric -l N — a real
+# bypass found in #1797 review: treating -l as a stopchar let the scan give
+# up before ever reaching a real -i later in the same cluster ---
+check "sed -li.bak 's/hello/BYE/' file.tsx" deny "sed -li.bak (real BSD/macOS bypass from #1797 review)"
+check "sed -l5i 's/hello/BYE/' file.tsx" deny "sed -l5i"
+
+# --- deny: redirection operator glued to its target and/or its preceding
+# word, with no surrounding whitespace on one or both sides — #1797 review
+# found the original spaced-tokens-only check missed every one of these,
+# which are at least as common a way to type a redirect as the spaced form ---
+check 'echo hi>file.txt' deny "> glued on both sides"
+check 'echo hi >file.txt' deny "> glued after only (space before)"
+check 'echo hi> file.txt' deny "> glued before only (space after)"
+check 'echo hi 2>file.log' deny "2> glued after only (fd-qualified)"
+check 'echo hi&>file.txt' deny "&> glued (no spaces)"
+
 # --- deny: a denied command hiding in a compound segment ---
 check 'git status && mkdir foo' deny "compound && with denied second segment"
 check 'git diff; mkdir foo' deny "compound ; with denied second segment"
@@ -127,6 +144,8 @@ check 'turbo run lint' allow "turbo run lint"
 # in a value-consuming flag's argument, not a real -i (#1797) ---
 check 'sed -ne "p" file.tsx' allow "sed -ne (no -i present)"
 check 'sed -n "p" file.tsx' allow "sed -n (read only)"
+check "sed -e 's/i/x/' file.tsx" allow "sed -e (script text contains 'i', stdout only — exercises the -e stopchar, not just 'no i at all')"
+check "sed -f init.sed file.tsx" allow "sed -f (script filename contains 'i', exercises the -f stopchar)"
 check "perl -Mstrict -e 'print 1'" allow "perl -Mstrict (module name contains 'i', not a flag)"
 check "perl -Ilib -e 'print 1'" allow "perl -Ilib (include path, not a flag)"
 check "perl -e 's/i/x/g' file.tsx" allow "perl -e (script text contains 'i', stdout only)"

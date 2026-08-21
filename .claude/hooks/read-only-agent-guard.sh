@@ -182,10 +182,15 @@ inplace_cluster_denied() {
 # True if $1 is a `sed` invocation carrying an in-place-edit flag: `-i`,
 # `-i<suffix>` (the mandatory-argument form, e.g. `-i.bak`, `-i''`),
 # `--in-place`/`--in-place=<suffix>`, or `-i` combined into a cluster with
-# other boolean flags (`-ni`, `-Ei`, …) — GNU sed accepts `-i` anywhere in
-# such a cluster, not just leading it. `-e`/`-f`/`-l` each consume the rest
-# of their token as a script/file/number, so `inplace_cluster_denied` stops
-# scanning at those rather than misreading their value as more flags.
+# other boolean flags (`-ni`, `-Ei`, `-li.bak`, …) — both GNU and BSD/macOS
+# sed accept `-i` anywhere in such a cluster, not just leading it. Only
+# `-e`/`-f` consume the rest of their token as a value (a script/file), so
+# `inplace_cluster_denied` stops scanning at those. `-l` is deliberately
+# NOT a stopchar here even though GNU sed's `-l N` takes a numeric
+# argument: this guard runs on the agents' actual runtime, BSD/macOS sed
+# (`man sed`: "-l Make output line buffered" — no argument at all), where
+# `-l` is a plain boolean and a real bypass (`sed -li.bak '...' file`)
+# went undetected when `l` was treated as a stopchar (#1797 review).
 sed_inplace_denied() {
   tokenize "$1"
   [ "${TOKENS[0]:-}" = "sed" ] || return 1
@@ -194,7 +199,7 @@ sed_inplace_denied() {
     case "$t" in
     --in-place | --in-place=*) return 0 ;;
     --*) continue ;;
-    -*) inplace_cluster_denied "$t" "efl" && return 0 ;;
+    -*) inplace_cluster_denied "$t" "ef" && return 0 ;;
     esac
   done
   return 1
@@ -225,24 +230,36 @@ perl_inplace_denied() {
 # True if $1 contains shell output redirection to something other than a
 # harmless sink (/dev/null, /dev/stderr, /dev/stdout, or duplicating one
 # stream onto another via `>&1`/`>&2`) — `>`, `>>`, and their fd-qualified
-# forms (`2>`, `1>>`, `&>`, `&>>`) all create or overwrite a file. Only
-# detects the operator as its own whitespace-separated token (or immediately
-# followed by a fd-dup target in the same token, e.g. `2>&1`) — an operator
-# glued to its target with no surrounding space (`echo hi>file`) is a known,
-# accepted gap, same posture as the rest of this guard (#397).
+# forms (`2>`, `1>>`, `&>`, `&>>`) all create or overwrite a file.
+#
+# The operator is frequently NOT its own whitespace-separated token — any of
+# `echo hi>file`, `echo hi >file`, `echo hi> file` are equally normal ways to
+# type a redirect, and only the fully-spaced form tokenizes as isolated
+# operator/target words on its own (#1797 review: an earlier version here
+# only handled that fully-spaced case, missing the single most common
+# one-sided-space idiom entirely). So the operator is isolated by padding a
+# space on both sides of every match BEFORE tokenizing, rather than by
+# scanning already-produced tokens — this also subsumes the fd-duplication
+# case (`2>&1` pads to `2> &1`, and `&1`/`&2` are themselves on the safe-sink
+# list below, so no separate "operator+fd-dup fused in one token" branch is
+# needed). `tokenize()`'s xargs-based quote-awareness keeps this safe against
+# a literal `>` inside a quoted search pattern (`rg "a>b"` pads to
+# `rg "a > b"`, which still tokenizes as one quoted argument, not three
+# words) — same accepted quote-naive posture as the rest of this guard
+# (#397) for an *unquoted* one.
 redirection_denied() {
-  tokenize "$1"
+  local padded
+  padded=$(printf '%s' "$1" | sed -E 's/[0-9]*&?>{1,2}/ & /g')
+  tokenize "$padded"
   local i=0
   while [ "$i" -lt "${#TOKENS[@]}" ]; do
     local tok="${TOKENS[$i]}"
-    if [[ "$tok" =~ ^[0-9]*(\>\>?|\&\>\>?)$ ]]; then
+    if [[ "$tok" =~ ^[0-9]*\&?\>{1,2}$ ]]; then
       local target="${TOKENS[$((i + 1))]:-}"
       case "$target" in
       /dev/null | /dev/stderr | /dev/stdout | '&1' | '&2') ;;
       *) return 0 ;;
       esac
-    elif [[ "$tok" =~ ^[0-9]*\>\>?\&[0-9]+$ ]]; then
-      : # fd duplication as one token (e.g. "2>&1", "1>>&2") — not a file write
     fi
     i=$((i + 1))
   done

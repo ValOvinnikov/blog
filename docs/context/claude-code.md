@@ -184,12 +184,19 @@ commit`, `mkdir`, `cp`, `mv`, `tee`, `pnpm typegen`, `pnpm exec`/
   regardless of what `dontAsk`'s own classifier would have done on its
   own — not a mop-up for a small residue `dontAsk` already caught.
 
+  Redirection detection (`>`/`>>` and their fd-qualified/`&`-combined
+  forms) pads a space around every match before tokenizing, so it catches
+  the operator whether it's glued to its target, its preceding word, both,
+  or neither (`echo hi>file`, `echo hi >file`, `echo hi> file`, `echo hi >
+file` are all denied alike) — an earlier version only handled the
+  fully-spaced form and missed the other three, which #1797's review
+  caught as covering far less than intended.
+
   Residual, accepted: commands that execute package scripts the allow-list
   doesn't flag as write-shaped (`pnpm test`, `pnpm dev`, `turbo run`) can
-  still write; an operator glued to its target with no surrounding
-  whitespace (`echo hi>file`) isn't detected; and the guard's quote-naive
-  segment splitting can false-positive on search patterns containing e.g.
-  `&& mkdir ` — denials tell the agent to fall back to Grep/Read. This is a
+  still write; and the guard's quote-naive segment splitting can
+  false-positive on search patterns containing e.g. `&& mkdir ` — denials
+  tell the agent to fall back to Grep/Read. This is a
   guardrail against honest confusion, not a security boundary — it doesn't
   chase further obfuscation (case-insensitive filesystem tricks,
   path-qualified binaries, wrapper commands); see #397 for why full
