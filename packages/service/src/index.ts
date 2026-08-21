@@ -2,6 +2,7 @@
 
 import { createSkimService } from './features/editorial/skim';
 import { createPostsService } from './features/entities/posts';
+import { createTagsService } from './features/entities/tags';
 import { createTopicsService } from './features/entities/topics';
 import { createFooterService } from './features/global/footer';
 import { createNavigationService } from './features/global/navigation';
@@ -45,6 +46,7 @@ export const service = {
   },
   entities: {
     topics: createTopicsService(),
+    tags: createTagsService(),
     posts: createPostsService(),
   },
   global: {
@@ -57,6 +59,7 @@ export const service = {
 };
 
 export type { TPostBody, TSaveSkimDraftInput } from './features/editorial/skim';
+export type { TTagsList, TTagWithPostCount } from './features/entities/tags';
 export type {
   TTopicsList,
   TTopicWithPostCount,

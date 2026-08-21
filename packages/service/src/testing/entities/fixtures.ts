@@ -1,3 +1,4 @@
+import type { TRawTagWithPostCount } from '@blog/service/features/entities/tags/adaptor/transformer';
 import type { TRawTopicWithPostCount } from '@blog/service/features/entities/topics/adaptor/transformer';
 import type { TRawAuthor } from '@blog/service/features/pages/author/adaptor/detail-page/transformer';
 import type { TRawTag } from '@blog/service/shared/transformers/to-tag';
@@ -29,6 +30,16 @@ export function makeRawTag(overrides: Partial<TRawTag> = {}): TRawTag {
     _id: 'tag-1',
     title: 'TypeScript',
     slug: 'typescript',
+    ...overrides,
+  };
+}
+
+export function makeRawTagWithPostCount(
+  overrides: Partial<TRawTagWithPostCount> = {},
+): TRawTagWithPostCount {
+  return {
+    ...makeRawTag(),
+    postCount: 0,
     ...overrides,
   };
 }
