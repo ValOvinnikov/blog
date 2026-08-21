@@ -35,6 +35,9 @@ function toAuthorDetail(raw: TRawAuthor): TAuthorDetail {
       fit: 'crop',
       quality: 75,
     }),
+    // Untransformed URL for the author page's OG/Twitter card — the social
+    // card is not the on-page avatar, so it keeps its own, unsized source.
+    ogImageUrl: buildImageUrl(raw.image),
     bio: raw.bio ?? undefined,
     socialLinks: (raw.socialLinks ?? []).map(toSocialLink),
   };

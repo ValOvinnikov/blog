@@ -65,6 +65,18 @@ describe('getAuthorPage', () => {
     });
   });
 
+  it('requests the OG image URL unsized, independently of the sized avatar', async () => {
+    const { urlForImage } = await import('@blog/service/sanity/image');
+    const authorImage = makeRawImage('Jane avatar');
+    mockRun
+      .mockResolvedValueOnce(makeRawAuthor({ image: authorImage }))
+      .mockResolvedValueOnce({ posts: [], total: 0 });
+
+    await getAuthorPage('jane-doe', { itemsPerPage: 9 });
+
+    expect(urlForImage).toHaveBeenCalledWith(authorImage, undefined);
+  });
+
   it('returns an empty posts array when the author has no posts', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawAuthor())
