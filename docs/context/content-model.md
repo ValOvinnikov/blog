@@ -15,14 +15,19 @@ name.
 **Modules are documents, not embedded objects** — pages reference them by
 `_ref`, so a module is independently listable, previewable, and reusable
 across pages (Studio's built-in **Incoming references** view shows which
-pages use a given module before it's edited or deleted). `MODULE_TYPE`
+pages use a given module before it's edited or deleted). `TModuleType`
 (`packages/config/src/constants/module.ts`) is the single source of truth for
-the module type registry; every layer (cms schema list, `service.modules`
-namespace, web `MODULE_MAP`) derives from it, so omitting a type from one is a
-compile error or an obvious gap, not a silent drift — `MODULE_MAP`'s one
-intentional exception is `module_hero` (see [`data-flow.md`](./data-flow.md)),
-excluded because it's schema-forbidden from ever appearing in a `modules[]`
-array.
+the module type registry — a **type-only** union derived from the generated
+Sanity types, not a runtime const. Every layer derives from it, so omitting a
+type is a compile error rather than silent drift, in two separate places:
+web's `MODULE_MAP`, and `REVALIDATE_TAGS`' required
+`Record<TModuleType, …>` half (see [`data-flow.md`](./data-flow.md)).
+
+`MODULE_MAP` excludes three types — `module_hero`, `module_postList` and
+`module_taxonomyList` — each rendered through a dedicated page slot rather
+than a `modules[]` array, so none can reach `ModuleRenderer`. Exclusion there
+does **not** exempt them from `REVALIDATE_TAGS`, which requires an entry for
+every module type.
 
 **Module documents** (`apps/cms/src/schema-types/modules/`)
 
@@ -33,8 +38,20 @@ array.
   UPPERCASE `HERO_FIELD_MODE` const (`CUSTOM`/`NONE`/`POST_CATEGORY`/
   `POST_TITLE`/`POST_EXCERPT`/`POST_IMAGE`), `primaryActionLabel`,
   `secondaryAction` (`link`).
-- `module_postList` (`postListSchema`) — internal `title`, `sectionHeader`
-  (optional — see below), `limit` (posts to fetch, 1–12).
+- `module_postList` (`postListSchema`) — the **paginated archive**: internal
+  `title`, `sectionHeader` (optional — see below), `pageSize` (posts per page,
+  1–24, required), `emptyMessage` (optional override for the "no posts" copy;
+  the app supplies a default when blank), and a vestigial `limit` awaiting
+  removal alongside `page_blog.itemsPerPage`.
+- `module_postLatest` (`postLatestSchema`) — the **latest-N teaser**: internal
+  `title`, `sectionHeader` (optional), `limit` (posts to fetch, 1–12). Split
+  from `module_postList` so one type is never both a teaser and an archive;
+  which mode you get is settled by the type, not by page context.
+- `module_taxonomyList` (`taxonomyListSchema`) — internal `title`,
+  `sectionHeader` (optional), `emptyMessage` (optional). Lists taxonomy
+  entries as cards. It carries **no "topics or tags" field** — which taxonomy
+  it lists is inferred from which index page's required slot holds it, the
+  same inference-by-slot rule the post list uses.
 - `module_content` (`contentSchema`) — internal `title`, `body` (portable
   text). No `sectionHeader` — its rich-text `body` supplies any in-content
   headings, so a separate structured heading field would just be a second
@@ -66,19 +83,26 @@ also gets an optional `layout` field via the shared `layoutField`/
   (single **required**
   reference to a `module_hero`, kept
   separate from the module list — it always renders first), `modules` (array of
-  references via `defineModulesField({ allow: [MODULE_TYPE.POST_LIST,
-MODULE_TYPE.CTA, MODULE_TYPE.NEWSLETTER] })`), `seo`.
+  references via `defineModulesField({ allow: [postLatest, cta, newsletter] })`
+  — the teaser, not the archive), `seo`.
 - `page_generic` (`genericSchema`) — `title`, `slug` (source: title),
-  `modules` (array of references via `defineModulesField({ allow:
-[MODULE_TYPE.CONTENT, MODULE_TYPE.CTA] })`), `seo`.
+  `modules` (array of references via `defineModulesField({ allow: [content,
+cta] })`), `seo`.
 - `page_blog` (`blogPageSchema`, singleton) — the `/blog` index page config:
   `titleField` (internal Studio label; `preview.prepare` falls back to the
   generic "Unknown" when unset), `heading` (the page `<h1>`), `supportingText`
-  (optional line under it), `itemsPerPage` (number, 1–24, drives the
-  pagination window size), `modules` (array of references via
-  `defineModulesField({ allow: [MODULE_TYPE.POST_LIST, MODULE_TYPE.CTA,
-MODULE_TYPE.NEWSLETTER] })`, optional — editors opt a newsletter-signup
-  module (or others) into this page rather than it being hardcoded), `seo`.
+  (optional line under it), `postList` (singular reference to the
+  `module_postList` that renders the archive — the module's own `pageSize`
+  drives the pagination window), `modules` (array of references via
+  `defineModulesField({ allow: [cta, newsletter] })`, optional — editors opt a
+  newsletter-signup module into this page rather than it being hardcoded),
+  `seo`. `itemsPerPage` survives on the document but no longer drives
+  anything; it goes with `module_postList.limit`.
+- `page_topicIndex` (`topicIndexPageSchema`, singleton) — the `/topics` index:
+  `titleField` (internal Studio label), `heading` (the page `<h1>`),
+  `supportingText` (optional), `taxonomyList` (**required** singular reference
+  to a `module_taxonomyList`), `seo`. No `modules[]` array — one required slot
+  and nothing else.
 
 `defineModulesField({ allow, description? })`
 (`schema-types/helpers/define-modules-field.ts`) builds the `modules` array
