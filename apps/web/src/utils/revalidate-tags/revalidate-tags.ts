@@ -8,13 +8,16 @@ type TSanityType = Extract<AllSanitySchemaTypes, { _type: string }>['_type'];
  * webhook. Module types additionally purge a per-document `module:<id>` tag
  * (appended in the resolver).
  *
- * The `satisfies` clause is split: every `module_*` `_type` is **required**
- * (`Record<TModuleType, …>`), so a new module registered elsewhere without an
- * entry here fails `type-check` — while other document `_type`s stay
- * `Partial`, since several legitimately purge nothing. The tag strings
- * themselves are the literals passed to `isr(...)` in `@blog/service` loaders
- * (a few predate a `{group}_{name}` rename, e.g. the `page_home` document
- * invalidates the `homePage` tag) — keep them in sync with `packages/service/src`.
+ * The `satisfies` clause is split: every `module_*` `_type` in the
+ * schema-derived `TModuleType` union is **required**
+ * (`Record<TModuleType, …>`), so a schema addition without a matching entry
+ * here fails `type-check` — regardless of whether that type is ever added to
+ * `MODULE_MAP` (`module_hero` and `module_postList` never are). Other
+ * document `_type`s stay `Partial`, since several legitimately purge
+ * nothing. The tag strings themselves are the literals passed to `isr(...)`
+ * in `@blog/service` loaders (a few predate a `{group}_{name}` rename, e.g.
+ * the `page_home` document invalidates the `homePage` tag) — keep them in
+ * sync with `packages/service/src`.
  */
 const REVALIDATE_TAGS = {
   blog_post: ['post', 'posts', 'homePage'],

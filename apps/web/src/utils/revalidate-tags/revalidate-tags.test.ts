@@ -52,11 +52,10 @@ describe('getRevalidateTagsForType', () => {
     expect(getRevalidateTagsForType('nope', 'x')).toEqual([]);
   });
 
-  // Defence in depth for the type-level exhaustiveness guard on
-  // `REVALIDATE_TAGS` (a `Record<TModuleType, …>` intersection) — this
-  // hardcoded list can't itself catch a missing entry (both would go stale
-  // together), but it does confirm every currently-registered module type
-  // resolves to a non-empty tag list plus the per-document `module:<id>` tag.
+  // Deliberately covers all module types, including three with dedicated
+  // exact-tag assertions above — this loop's job isn't to duplicate those,
+  // it's to confirm the `module:<id>` append fires for *every* module key,
+  // which no single test above checks across the full set.
   it.each([
     'module_hero',
     'module_postList',
