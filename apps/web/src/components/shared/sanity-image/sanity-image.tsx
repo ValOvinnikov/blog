@@ -7,8 +7,7 @@ import { SanityImage as SanityImageBase } from 'sanity-image';
 
 export interface ISanityImageProps {
   image: ISanityImage;
-  projectId: string;
-  dataset: string;
+  baseUrl: string;
   width: number;
   height?: number;
   mode?: 'cover' | 'contain';
@@ -26,10 +25,10 @@ export interface ISanityImageProps {
 
 /**
  * Framework-coupled bridge between the service layer's `ISanityImage`
- * view-model and the `sanity-image` package. `projectId`/`dataset` are
- * plain props resolved by the caller from the validated env module — this
- * component stays free of any env/validation import so it doesn't pull that
- * cost into the client bundle.
+ * view-model and the `sanity-image` package. `baseUrl` is a plain prop
+ * resolved by the caller via `@blog/service`'s `getSanityImageBaseUrl` —
+ * this component stays free of any env/service import so it doesn't pull
+ * that cost into the client bundle.
  *
  * `preview` (the LQIP blur-up placeholder) is withheld when `priority` is
  * set. When a `preview` is passed, the underlying package renders the real
@@ -41,12 +40,11 @@ export interface ISanityImageProps {
  * its final `<img>` with no hydration-gated placeholder swap.
  *
  * @example
- * <SanityImage image={hero.sanityImage} projectId={projectId} dataset={dataset} width={960} height={720} mode="cover" />
+ * <SanityImage image={hero.sanityImage} baseUrl={baseUrl} width={960} height={720} mode="cover" />
  */
 export const SanityImage = ({
   image,
-  projectId,
-  dataset,
+  baseUrl,
   width,
   height,
   mode = 'cover',
@@ -58,8 +56,7 @@ export const SanityImage = ({
 }: ISanityImageProps) => (
   <SanityImageBase
     id={image.assetId}
-    projectId={projectId}
-    dataset={dataset}
+    baseUrl={baseUrl}
     hotspot={image.hotspot}
     crop={image.crop}
     preview={priority ? undefined : image.lqip}

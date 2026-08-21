@@ -36,6 +36,8 @@ const {
 }));
 
 vi.mock('@blog/service', () => ({
+  getSanityImageBaseUrl: () =>
+    'https://cdn.sanity.io/images/test-project/test-dataset/',
   service: {
     pages: {
       post: { v1: { getPost: getPostMock } },

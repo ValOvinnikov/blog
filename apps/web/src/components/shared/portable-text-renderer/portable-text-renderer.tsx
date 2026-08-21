@@ -23,7 +23,6 @@ import {
 import { DeepAside } from '@web/components/shared/deep-aside';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { env } from '@web/utils/env/env';
 import type { TPostHeading } from '@web/utils/extract-post-headings/extract-post-headings';
 import { segmentPortableTextBody } from '@web/utils/segment-portable-text-body';
 import { toPortableTextImage } from '@web/utils/to-portable-text-image';
@@ -34,6 +33,8 @@ import { portableTextRendererVariants } from './portable-text-renderer-variants'
 
 export interface IPortableTextRendererProps {
   value: TPortableText;
+  /** Sanity CDN origin for the `sanity-image` package, sourced from `@blog/service`'s `getSanityImageBaseUrl`. */
+  baseUrl: string;
   /**
    * The precomputed `extractPostHeadings(value)` outline; when passed, each
    * matching h2/h3 renders with that heading's `id` so anchor links resolve.
@@ -107,14 +108,15 @@ const headingBlockComponents = (
  *
  * @example
  * <ContentModule title={title}>
- *   <PortableTextRenderer value={body} />
+ *   <PortableTextRenderer value={body} baseUrl={baseUrl} />
  * </ContentModule>
  *
  * @example
- * <PortableTextRenderer value={body} headings={extractPostHeadings(body)} />
+ * <PortableTextRenderer value={body} baseUrl={baseUrl} headings={extractPostHeadings(body)} />
  */
 export const PortableTextRenderer = ({
   value,
+  baseUrl,
   headings,
   asideKindLabels,
 }: IPortableTextRendererProps) => {
@@ -126,8 +128,7 @@ export const PortableTextRenderer = ({
       <ImageWithCaption layout={imageValue.layout}>
         <SanityImage
           image={image}
-          projectId={env.NEXT_PUBLIC_SANITY_PROJECT_ID}
-          dataset={env.NEXT_PUBLIC_SANITY_DATASET}
+          baseUrl={baseUrl}
           width={1200}
           sizes="(min-width: 1024px) 800px, 100vw"
           loading="lazy"

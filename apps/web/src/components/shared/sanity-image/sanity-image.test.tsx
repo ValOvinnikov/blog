@@ -14,8 +14,7 @@ const image: ISanityImage = {
 
 const setup = customRender(SanityImage, {
   image,
-  projectId: 'test-project',
-  dataset: 'test-dataset',
+  baseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
   width: 960,
   height: 720,
 });

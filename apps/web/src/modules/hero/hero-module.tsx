@@ -1,5 +1,4 @@
-import { service } from '@blog/service';
-import { env } from '@web/utils/env/env';
+import { getSanityImageBaseUrl, service } from '@blog/service';
 
 import { HeroModuleView } from './hero-module-view';
 
@@ -27,8 +26,7 @@ export const HeroModule = async ({ id }: IHeroModuleProps) => {
       id={id}
       {...result.data}
       title={title}
-      projectId={env.NEXT_PUBLIC_SANITY_PROJECT_ID}
-      dataset={env.NEXT_PUBLIC_SANITY_DATASET}
+      baseUrl={getSanityImageBaseUrl()}
     />
   );
 };

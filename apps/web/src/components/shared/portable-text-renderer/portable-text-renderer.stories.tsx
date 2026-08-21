@@ -8,7 +8,10 @@ const meta = {
   component: PortableTextRenderer,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
-  args: { value: richTextDemo },
+  args: {
+    value: richTextDemo,
+    baseUrl: 'https://cdn.sanity.io/images/demo-project/demo-dataset/',
+  },
 } satisfies Meta<typeof PortableTextRenderer>;
 
 export default meta;

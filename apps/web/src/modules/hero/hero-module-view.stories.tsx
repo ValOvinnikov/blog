@@ -27,8 +27,7 @@ const meta = {
     },
     secondaryAction: undefined,
     layout: undefined,
-    projectId: 'demo-project',
-    dataset: 'demo-dataset',
+    baseUrl: 'https://cdn.sanity.io/images/demo-project/demo-dataset/',
   },
 } satisfies Meta<typeof HeroModuleView>;
 

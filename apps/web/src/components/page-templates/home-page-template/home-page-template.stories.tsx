@@ -30,8 +30,7 @@ const meta = {
         }}
         secondaryAction={undefined}
         layout={undefined}
-        projectId="demo-project"
-        dataset="demo-dataset"
+        baseUrl="https://cdn.sanity.io/images/demo-project/demo-dataset/"
       />
     ),
     modules: (
@@ -41,6 +40,7 @@ const meta = {
           brandVariant={BRAND_VARIANT.PRIMARY}
           body={richTextDemo}
           layout={undefined}
+          baseUrl="https://cdn.sanity.io/images/demo-project/demo-dataset/"
         />
         <CtaModuleView
           id="cta-1"
@@ -83,8 +83,7 @@ export const MinimalSlots: TStory = {
         primaryAction={undefined}
         secondaryAction={undefined}
         layout={undefined}
-        projectId="demo-project"
-        dataset="demo-dataset"
+        baseUrl="https://cdn.sanity.io/images/demo-project/demo-dataset/"
       />
     ),
     modules: (

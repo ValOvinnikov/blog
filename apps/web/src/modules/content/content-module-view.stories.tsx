@@ -14,6 +14,7 @@ const meta = {
     brandVariant: BRAND_VARIANT.PRIMARY,
     body: richTextDemo,
     layout: undefined,
+    baseUrl: 'https://cdn.sanity.io/images/demo-project/demo-dataset/',
   },
   decorators: [
     (Story) => (
