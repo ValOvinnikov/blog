@@ -152,6 +152,15 @@ jobs:
       - name: UI index (verify current, complete + documented)
         run: pnpm gen:ui-index:check
 
+      # Fixture-based unit tests for the generator's props-resolution helpers
+      # (#1763). The drift guard above only catches a regression while the real
+      # component tree still happens to contain a component of each shape;
+      # these pin the behaviour against inline sources instead. They live in
+      # this job rather than hooks.yml because they import the repo's
+      # typescript, which only the pnpm-install jobs have.
+      - name: UI index (helper unit tests)
+        run: pnpm gen:ui-index:test
+
   migrations:
     name: Migrations
     runs-on: ubuntu-latest
