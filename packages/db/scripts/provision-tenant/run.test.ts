@@ -99,7 +99,7 @@ describe(runSteps, () => {
     createTenantSanityProjectMock.mockResolvedValue({});
     createTenantStudioMock.mockResolvedValue({});
 
-    const result = await runSteps('tenant-1', baseTenant, env);
+    const result = await runSteps('tenant-1', env);
 
     expect(result).toEqual({ ok: true });
     expect(createTenantSanityProjectMock).toHaveBeenCalledTimes(1);
@@ -173,7 +173,7 @@ describe(runSteps, () => {
       studioVercelProjectId: 'studio-abc',
     });
 
-    await runSteps('tenant-1', baseTenant, env);
+    await runSteps('tenant-1', env);
 
     const [tenantSeenBySeed] = seedTenantContentMock.mock.calls[0] as [TTenant];
     expect(tenantSeenBySeed).toMatchObject({ sanityProjectId: 'proj-abc' });
@@ -190,7 +190,7 @@ describe(runSteps, () => {
     createTenantSanityProjectMock.mockResolvedValue({});
     seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
 
-    const result = await runSteps('tenant-1', baseTenant, env);
+    const result = await runSteps('tenant-1', env);
 
     expect(result).toEqual({ ok: false });
     expect(createTenantStudioMock).not.toHaveBeenCalled();
@@ -225,7 +225,7 @@ describe(runSteps, () => {
     createTenantSanityProjectMock.mockResolvedValue({});
     createTenantStudioMock.mockResolvedValue({});
 
-    const result = await runSteps('tenant-1', archivedTenant, env);
+    const result = await runSteps('tenant-1', env);
 
     expect(result).toEqual({ ok: true });
     expect(reactivateTenantMock).toHaveBeenCalledWith('tenant-1');
@@ -242,7 +242,7 @@ describe(runSteps, () => {
       error: ERROR_CODE.DB_NOT_FOUND,
     });
 
-    const result = await runSteps('tenant-1', baseTenant, env);
+    const result = await runSteps('tenant-1', env);
 
     expect(result).toEqual({ ok: false });
     expect(createTenantSanityProjectMock).not.toHaveBeenCalled();
