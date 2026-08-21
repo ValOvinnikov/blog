@@ -61,7 +61,7 @@ export const buildAuthorMetadata = async (
       description,
       ogTitle: title,
       ogDescription: description,
-      ogImageUrl: author.imageUrl,
+      ogImageUrl: author.ogImageUrl,
     },
     {
       canonical: routes.author(slug, pageNumber),
