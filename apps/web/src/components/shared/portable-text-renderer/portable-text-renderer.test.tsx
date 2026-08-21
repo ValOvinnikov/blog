@@ -14,29 +14,22 @@ import type { ReactNode } from 'react';
 
 import { PortableTextRenderer } from './portable-text-renderer';
 
-// Only `ImageWithCaption` is faked (the renderer also pulls `Aside` from
-// `@blog/ui/molecules` via `DeepAside`, so this must stay a partial mock).
-// Faking it keeps the `layout` pass-through assertion behavioural (a
-// `data-layout` attribute) rather than a CSS-class assertion on the real
-// component's `tv()` output.
-vi.mock('@blog/ui/molecules', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@blog/ui/molecules')>();
-
-  return {
-    ...actual,
-    ImageWithCaption: ({
-      layout,
-      children,
-    }: {
-      layout?: string;
-      children?: ReactNode;
-    }) => (
-      <div data-testid="image-with-caption" data-layout={layout}>
-        {children}
-      </div>
-    ),
-  };
-});
+// Faking `ImageWithCaption` keeps the `layout` pass-through assertion
+// behavioural (a `data-layout` attribute) rather than a CSS-class assertion
+// on the real component's `tv()` output.
+vi.mock('@blog/ui/molecules/image-with-caption', () => ({
+  ImageWithCaption: ({
+    layout,
+    children,
+  }: {
+    layout?: string;
+    children?: ReactNode;
+  }) => (
+    <div data-testid="image-with-caption" data-layout={layout}>
+      {children}
+    </div>
+  ),
+}));
 
 const setup = customRender(PortableTextRenderer, {
   value: [],

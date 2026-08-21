@@ -1,7 +1,9 @@
 import { ICONS, type ILocalizedParams, routes, Size } from '@blog/config';
 import { service } from '@blog/service';
-import { Icon, NavLink } from '@blog/ui/atoms';
-import { Footer, Header } from '@blog/ui/organisms';
+import { Icon } from '@blog/ui/atoms/icon';
+import { NavLink } from '@blog/ui/atoms/nav-link';
+import { Footer } from '@blog/ui/organisms/footer';
+import { Header } from '@blog/ui/organisms/header';
 import { AuthMenu } from '@web/components/shared/auth-menu';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { SiteNavigation } from '@web/components/shared/site-navigation';

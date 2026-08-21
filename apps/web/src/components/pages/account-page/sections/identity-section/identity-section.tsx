@@ -1,7 +1,9 @@
 import { ICONS, Size } from '@blog/config';
 import { queries } from '@blog/db';
-import { Heading, Icon } from '@blog/ui/atoms';
-import { SettingRow, WindowChrome } from '@blog/ui/molecules';
+import { Heading } from '@blog/ui/atoms/heading';
+import { Icon } from '@blog/ui/atoms/icon';
+import { SettingRow } from '@blog/ui/molecules/setting-row';
+import { WindowChrome } from '@blog/ui/molecules/window-chrome';
 import { DisplayNameControl } from '@web/components/shared/display-name-control';
 import { PlainSection } from '@web/components/shared/plain-section';
 import { ProviderLinkControl } from '@web/components/shared/provider-link-control';

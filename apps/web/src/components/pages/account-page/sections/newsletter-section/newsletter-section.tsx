@@ -1,6 +1,7 @@
 import { queries } from '@blog/db';
-import { StatusBadge } from '@blog/ui/atoms';
-import { SettingRow, WindowChrome } from '@blog/ui/molecules';
+import { StatusBadge } from '@blog/ui/atoms/status-badge';
+import { SettingRow } from '@blog/ui/molecules/setting-row';
+import { WindowChrome } from '@blog/ui/molecules/window-chrome';
 import { NewsletterSubscriptionControl } from '@web/components/shared/newsletter-subscription-control';
 import { PlainSection } from '@web/components/shared/plain-section';
 import { auth } from '@web/server/auth/auth';

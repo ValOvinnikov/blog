@@ -1,5 +1,5 @@
 import { routes } from '@blog/config';
-import { Heading } from '@blog/ui/atoms';
+import { Heading } from '@blog/ui/atoms/heading';
 import { auth } from '@web/server/auth/auth';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';

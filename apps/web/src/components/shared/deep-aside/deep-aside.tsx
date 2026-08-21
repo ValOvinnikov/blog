@@ -1,5 +1,5 @@
 import type { TAsideKind } from '@blog/config';
-import { Aside } from '@blog/ui/molecules';
+import { Aside } from '@blog/ui/molecules/aside';
 import type { ReactNode } from 'react';
 
 import { deepAsideVariants } from './deep-aside-variants';

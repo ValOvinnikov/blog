@@ -1,6 +1,8 @@
 import { ICONS } from '@blog/config';
-import { Heading, Icon, Text } from '@blog/ui/atoms';
-import { TerminalChip } from '@blog/ui/molecules';
+import { Heading } from '@blog/ui/atoms/heading';
+import { Icon } from '@blog/ui/atoms/icon';
+import { Text } from '@blog/ui/atoms/text';
+import { TerminalChip } from '@blog/ui/molecules/terminal-chip';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 

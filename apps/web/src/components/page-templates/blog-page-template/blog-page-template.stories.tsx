@@ -1,12 +1,15 @@
 import { Size, routes } from '@blog/config';
 import type { TPostCard } from '@blog/service';
-import { Avatar, Eyebrow, Icon } from '@blog/ui/atoms';
-import { ActionList, ShareLink } from '@blog/ui/molecules';
+import { Avatar } from '@blog/ui/atoms/avatar';
+import { Eyebrow } from '@blog/ui/atoms/eyebrow';
+import { Icon } from '@blog/ui/atoms/icon';
+import { ActionList } from '@blog/ui/molecules/action-list';
+import { ShareLink } from '@blog/ui/molecules/share-link';
+import { Pagination } from '@blog/ui/organisms/pagination';
 import {
-  Pagination,
-  PostsSection,
   type IPostCardData,
-} from '@blog/ui/organisms';
+  PostsSection,
+} from '@blog/ui/organisms/posts-section';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { TopicChipList } from '@web/components/shared/topic-chip-list';

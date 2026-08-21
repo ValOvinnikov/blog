@@ -1,8 +1,9 @@
 'use client';
 
 import { ICONS, Size } from '@blog/config';
-import { Icon } from '@blog/ui/atoms';
-import { type IShareLinkItem, PopoverMenu } from '@blog/ui/molecules';
+import { Icon } from '@blog/ui/atoms/icon';
+import { PopoverMenu } from '@blog/ui/molecules/popover-menu';
+import { type IShareLinkItem } from '@blog/ui/molecules/share-link';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useCopyToClipboard } from '@web/hooks/use-copy-to-clipboard';
 import { usePopover } from '@web/hooks/use-popover';

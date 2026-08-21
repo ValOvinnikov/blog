@@ -7,7 +7,7 @@ import {
   type TFormStatus,
 } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
-import { NewsletterSignup } from '@blog/ui/organisms';
+import { NewsletterSignup } from '@blog/ui/organisms/newsletter-signup';
 import { subscribeToNewsletterAction } from '@web/server/newsletter/newsletter-actions';
 import { hasNewsletterSubscribedCookie } from '@web/utils/has-newsletter-subscribed-cookie';
 import { isValidEmail } from '@web/utils/is-valid-email';

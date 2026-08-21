@@ -1,5 +1,5 @@
 import type { TBrand } from '@blog/service';
-import { BrandLockup } from '@blog/ui/molecules';
+import { BrandLockup } from '@blog/ui/molecules/brand-lockup';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 

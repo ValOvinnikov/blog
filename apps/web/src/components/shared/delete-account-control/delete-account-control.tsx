@@ -1,7 +1,8 @@
 'use client';
 
 import { routes } from '@blog/config';
-import { Button, TextInput } from '@blog/ui/atoms';
+import { Button } from '@blog/ui/atoms/button';
+import { TextInput } from '@blog/ui/atoms/text-input';
 import { useToast } from '@web/context/toast-provider';
 import { deleteAccountAction } from '@web/server/account/account-actions';
 import { signOut } from 'next-auth/react';

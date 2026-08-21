@@ -1,4 +1,4 @@
-import type { IShareLinkItem } from '@blog/ui/molecules';
+import type { IShareLinkItem } from '@blog/ui/molecules/share-link';
 
 /** Platform identifier per share link — matches the keys `toSocialIconName`
  * (`apps/web/src/utils/to-social-icon-name.ts`) already understands, so a

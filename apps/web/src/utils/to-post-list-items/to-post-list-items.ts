@@ -1,6 +1,6 @@
 import { routes } from '@blog/config';
 import type { TPostCardTopic } from '@blog/service';
-import type { IPostCardData } from '@blog/ui/organisms';
+import type { IPostCardData } from '@blog/ui/organisms/posts-section';
 import { getFormatter } from 'next-intl/server';
 
 /**
