@@ -13,7 +13,7 @@ export interface IPostLatestModuleProps {
  * PostLatestModule — fetches `module_postLatest` data (a latest-N teaser,
  * never paginated) and hands it to the shared `PostListModuleView`.
  */
-export async function PostLatestModule({ id }: IPostLatestModuleProps) {
+export const PostLatestModule = async ({ id }: IPostLatestModuleProps) => {
   const [result, t] = await Promise.all([
     service.modules.postLatest.v1.getPostLatest(id),
     getTranslations('postLatestModule'),
@@ -37,4 +37,4 @@ export async function PostLatestModule({ id }: IPostLatestModuleProps) {
       titleFallback={t('fallbackHeading')}
     />
   );
-}
+};
