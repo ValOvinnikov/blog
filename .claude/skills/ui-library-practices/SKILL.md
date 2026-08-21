@@ -90,9 +90,13 @@ src/atoms/theme-toggle/
   `ariaLabel` prop that _replaces_ the name can't be validated by types or
   tests, so a caller can pass a string that omits the visible text and it will
   type-check, render, and silently fail WCAG 2.5.3 for speech-input users.
-  Prefer building the name internally (visible text + a visually-hidden `span`
-  appending the rest, see `Avatar`) from props already required — both source
+  Prefer building the name internally from props already required — both source
   strings still come from the app; the component only contributes punctuation.
+  Put the **whole** name in one visually-hidden `span` and `aria-hidden` the
+  visible copy, rather than appending a hidden suffix beside visible text: name
+  computation trims at each element boundary, so a separator starting with
+  whitespace silently loses it. `NavLink` (`hasLabel={false}`) is the precedent
+  — a real link whose entire name comes from one `sr-only` span.
 
 - **Never format dates inside a UI component.** Date display is locale-dependent
   and the UI layer has no access to the user's locale. Pass two props:
