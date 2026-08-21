@@ -3,6 +3,7 @@ import type { TRawGenericPage } from '@blog/service/features/pages/generic/adapt
 import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
 import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
 import type { TRawTagPageTag } from '@blog/service/features/pages/tag/adaptor/detail-page/transformer';
+import type { TRawTopicIndexPage } from '@blog/service/features/pages/topic-index/adaptor/transformer';
 import type { TRawArchivePostCard } from '@blog/service/shared/transformers/to-archive-post-card';
 import type { TRawPostCard } from '@blog/service/shared/transformers/to-post-card';
 import {
@@ -121,6 +122,18 @@ export function makeRawBlogPage(
     supportingText: 'Notes on building things.',
     postList: { _id: 'post-list-1' },
     modules: [],
+    seo: null,
+    ...overrides,
+  };
+}
+
+export function makeRawTopicIndexPage(
+  overrides: Partial<NonNullable<TRawTopicIndexPage>> = {},
+): NonNullable<TRawTopicIndexPage> {
+  return {
+    heading: 'Browse by topic',
+    supportingText: 'Find posts by subject.',
+    taxonomyList: { _id: 'taxonomy-list-1' },
     seo: null,
     ...overrides,
   };

@@ -15,6 +15,7 @@ import { createHeroModuleService } from './features/modules/hero';
 import { createNewsletterModuleService } from './features/modules/newsletter';
 import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
+import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
 import { createAuthorService } from './features/pages/author';
 import { createBlogService } from './features/pages/blog';
 import { createGenericPageService } from './features/pages/generic';
@@ -22,6 +23,7 @@ import { createHomeService } from './features/pages/home';
 import { createPostService } from './features/pages/post';
 import { createTagService } from './features/pages/tag';
 import { createTopicService } from './features/pages/topic';
+import { createTopicIndexService } from './features/pages/topic-index';
 
 export const service = {
   editorial: {
@@ -33,6 +35,7 @@ export const service = {
     blog: createBlogService(),
     post: createPostService(),
     topic: createTopicService(),
+    topicIndex: createTopicIndexService(),
     tag: createTagService(),
     author: createAuthorService(),
   },
@@ -43,6 +46,7 @@ export const service = {
     content: createContentModuleService(),
     cta: createCtaModuleService(),
     newsletter: createNewsletterModuleService(),
+    taxonomyList: createTaxonomyListModuleService(),
   },
   entities: {
     topics: createTopicsService(),
@@ -75,6 +79,10 @@ export type { THeroModule } from './features/modules/hero';
 export type { TNewsletterModule } from './features/modules/newsletter';
 export type { TPostLatestModule } from './features/modules/post-latest';
 export type { TPostListModule } from './features/modules/post-list';
+export type {
+  TTaxonomyEntry,
+  TTaxonomyListModule,
+} from './features/modules/taxonomy-list';
 export type { TAuthorDetail, TAuthorPage } from './features/pages/author';
 export type { TBlogIndexPage } from './features/pages/blog';
 export type { TGenericPage } from './features/pages/generic';
@@ -86,6 +94,7 @@ export type {
 } from './features/pages/post';
 export type { TTagPage } from './features/pages/tag';
 export type { TTopicPage } from './features/pages/topic';
+export type { TTopicIndexPage } from './features/pages/topic-index';
 export { getSanityImageBaseUrl } from './sanity/image-base-url';
 export { urlForImage } from './sanity/image';
 export type { TTenantSanityContext } from './sanity/query';
