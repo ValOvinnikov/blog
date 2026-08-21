@@ -114,6 +114,19 @@ describe('updateTenantDetailsAction', () => {
     });
   });
 
+  it('maps a domain-taken outcome onto a primaryDomain field error', async () => {
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-taken' });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', validInput);
+
+    expect(result).toEqual({
+      ok: false,
+      fieldErrors: { primaryDomain: expect.any(String) },
+    });
+  });
+
   it('maps a provisioning-started outcome onto a form-level error, without a successful update', async () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: 'provisioning-started',
@@ -195,8 +208,18 @@ describe('updateTenantDetailsAction', () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
+  it('does not record an audit event for a domain-taken outcome', async () => {
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-taken' });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    await updateTenantDetailsAction('tenant-1', validInput);
+
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
   it('returns a generic error when the mutation throws', async () => {
-    updateTenantDetailsMock.mockRejectedValue(new Error('unique violation'));
+    updateTenantDetailsMock.mockRejectedValue(new Error('connection lost'));
     const { updateTenantDetailsAction } =
       await import('./update-tenant-details-action');
 

@@ -88,6 +88,11 @@ export const updateTenantDetailsAction = async (
           ok: false,
           fieldErrors: { slug: 'This slug is already in use.' },
         };
+      case 'domain-taken':
+        return {
+          ok: false,
+          fieldErrors: { primaryDomain: 'This domain is already in use.' },
+        };
       case 'provisioning-started': {
         const t = await getTranslations('tenantDetailsPanel');
         return { ok: false, error: t('provisioningStartedError') };
