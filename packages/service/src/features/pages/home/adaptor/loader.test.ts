@@ -29,7 +29,7 @@ describe('getHomePage', () => {
       type: 'module_hero',
     });
     expect(page.modules).toEqual([
-      { id: 'post-list-1', type: 'module_postList' },
+      { id: 'post-latest-1', type: 'module_postLatest' },
       { id: 'cta-1', type: 'module_cta' },
     ]);
   });
