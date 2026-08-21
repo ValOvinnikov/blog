@@ -16,12 +16,22 @@ export type TRawPostDetail = NonNullable<
   InferResultType<typeof postDetailQuery>
 >;
 
+// PostMeta renders the author avatar at Size.SM (32px, `avatar-variants.ts`)
+// — 64px covers a 2x DPR display without serving the source asset's full
+// natural resolution.
+const AUTHOR_AVATAR_SIZE_PX = 64;
+
 function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
   return {
     id: raw._id,
     name: raw.name,
     slug: raw.slug,
-    imageUrl: buildImageUrl(raw.image),
+    imageUrl: buildImageUrl(raw.image, {
+      width: AUTHOR_AVATAR_SIZE_PX,
+      height: AUTHOR_AVATAR_SIZE_PX,
+      fit: 'crop',
+      quality: 75,
+    }),
     role: raw.role ?? undefined,
     bio: raw.bio ?? undefined,
     socialLinks: (raw.socialLinks ?? []).map(toSocialLink),
