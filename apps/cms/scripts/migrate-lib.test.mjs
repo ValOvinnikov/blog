@@ -70,9 +70,7 @@ describe(compareMigrationIds, () => {
   });
 
   it('orders two timestamped ids chronologically', () => {
-    expect(
-      compareMigrationIds('20260101T0000-a', '20260710T1200-b'),
-    ).toBe(-1);
+    expect(compareMigrationIds('20260101T0000-a', '20260710T1200-b')).toBe(-1);
   });
 
   it('orders two legacy ids lexicographically', () => {
@@ -115,7 +113,11 @@ describe(appliedIdsFromLedger, () => {
       _type: 'migrationState',
       applied: [
         { id: 'legacy-a', runAt: '2026-01-01T00:00:00.000Z', sha: 'abc' },
-        { id: '20260710T1200-unify-links', runAt: '2026-07-10T12:05:00.000Z', sha: 'def' },
+        {
+          id: '20260710T1200-unify-links',
+          runAt: '2026-07-10T12:05:00.000Z',
+          sha: 'def',
+        },
       ],
     };
 

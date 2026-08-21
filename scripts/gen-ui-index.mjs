@@ -192,7 +192,9 @@ const extractProps = (typeNode, sf) => {
   for (const m of members) {
     if (!ts.isPropertySignature(m) || !m.name) continue;
     const optional = m.questionToken ? '?' : '';
-    const type = m.type ? truncate(collapse(m.type.getText(sf)), TYPE_MAX) : 'unknown';
+    const type = m.type
+      ? truncate(collapse(m.type.getText(sf)), TYPE_MAX)
+      : 'unknown';
     props.push(`${m.name.getText(sf)}${optional}: ${type}`);
   }
   return { props, extendsList: [...new Set(refs)] };
@@ -266,7 +268,8 @@ const resolveModule = (fromFile, spec) => {
   let base;
   if (spec.startsWith('.')) base = join(dirname(fromFile), spec);
   else if (spec === '@blog/ui') base = join(uiSrc, 'index');
-  else if (spec.startsWith('@blog/ui/')) base = join(uiSrc, spec.slice('@blog/ui/'.length));
+  else if (spec.startsWith('@blog/ui/'))
+    base = join(uiSrc, spec.slice('@blog/ui/'.length));
   else return null;
 
   return (
@@ -372,9 +375,15 @@ const collectSlots = (obj, sf, seen = new Set()) => {
   for (const prop of obj.properties) {
     if (ts.isShorthandPropertyAssignment(prop)) {
       out.push({ accessor: prop.name.text, ref: prop.name.text });
-    } else if (ts.isPropertyAssignment(prop) && ts.isIdentifier(prop.initializer)) {
+    } else if (
+      ts.isPropertyAssignment(prop) &&
+      ts.isIdentifier(prop.initializer)
+    ) {
       out.push({ accessor: prop.name.getText(sf), ref: prop.initializer.text });
-    } else if (ts.isSpreadAssignment(prop) && ts.isIdentifier(prop.expression)) {
+    } else if (
+      ts.isSpreadAssignment(prop) &&
+      ts.isIdentifier(prop.expression)
+    ) {
       const name = prop.expression.text;
       if (seen.has(name)) continue;
       seen.add(name);
@@ -383,13 +392,16 @@ const collectSlots = (obj, sf, seen = new Set()) => {
     }
   }
   const byAccessor = new Map();
-  for (const s of out) if (!byAccessor.has(s.accessor)) byAccessor.set(s.accessor, s);
+  for (const s of out)
+    if (!byAccessor.has(s.accessor)) byAccessor.set(s.accessor, s);
   return [...byAccessor.values()];
 };
 
 const describeSlots = (slots, imports, mainFile, name) =>
   slots.map(({ accessor, ref }) => {
-    const resolved = imports[ref] ? resolveModule(mainFile, imports[ref]) : null;
+    const resolved = imports[ref]
+      ? resolveModule(mainFile, imports[ref])
+      : null;
     if (!resolved) {
       // Import couldn't be followed — the slot exists but the parser can't see
       // its source. Flag it so the completeness guard fails loudly.
@@ -437,7 +449,12 @@ const describeCompound = (sf, mainFile, name, base) => {
     else if (partsArg && ts.isObjectLiteralExpression(unwrap(partsArg)))
       partsObj = unwrap(partsArg);
     if (!partsObj) return null;
-    const list = describeSlots(collectSlots(partsObj, sf), imports, mainFile, name);
+    const list = describeSlots(
+      collectSlots(partsObj, sf),
+      imports,
+      mainFile,
+      name,
+    );
     return list.length ? { kind: 'slots', list, rootPurpose } : null;
   }
 
@@ -491,7 +508,8 @@ const collectLayer = (layer) => {
         name,
         path: relative(uiSrc, mainFile),
         purpose: stripNamePrefix(
-          base.purpose || (compound?.kind === 'slots' ? compound.rootPurpose : ''),
+          base.purpose ||
+            (compound?.kind === 'slots' ? compound.rootPurpose : ''),
           name,
         ),
         props: isMembers ? [] : base.props,
@@ -508,7 +526,9 @@ const collectLayer = (layer) => {
 };
 
 const propsFragment = (props, extendsList) => {
-  const extend = extendsList.length ? `_(extends ${extendsList.join(', ')})_` : '';
+  const extend = extendsList.length
+    ? `_(extends ${extendsList.join(', ')})_`
+    : '';
   if (props.length) return `${props.join(' · ')}${extend ? ` ${extend}` : ''}`;
   return extend;
 };
@@ -565,7 +585,9 @@ const structuralIssues = (layers, skipped) => {
     for (const e of entries) {
       for (const s of [...(e.members ?? []), ...(e.slots ?? [])]) {
         if (s.unresolved)
-          issues.push(`${s.accessor} — compound slot import could not be resolved`);
+          issues.push(
+            `${s.accessor} — compound slot import could not be resolved`,
+          );
       }
     }
   }
@@ -709,7 +731,9 @@ const main = () => {
   writeFileSync(outFile, content);
 
   if (args.has('--if-staged')) {
-    execFileSync('git', ['add', relative(repoRoot, outFile)], { cwd: repoRoot });
+    execFileSync('git', ['add', relative(repoRoot, outFile)], {
+      cwd: repoRoot,
+    });
     // Just regenerated, so drift can't happen — but a new/changed component can
     // still be undocumented or unindexable. Block the commit if so.
     const problems = collectProblems(layers, skipped, { checkDrift: false });
