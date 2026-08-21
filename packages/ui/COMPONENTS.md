@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_56 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_57 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -250,6 +250,11 @@ Props: as?: TAnchorElementType _(extends IShareLinkItem, IWithClassName, IWithDa
 
 renders a row of `Tag`s from a mixed list of plain labels and `{ label, href }` links; pass `linkAs` (e.g. the app router's `Link`) for client-side navigation on the linked ones.
 Props: tags: (string | ITagListItem)[] · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
+
+### TaxonomyCard — `molecules/taxonomy-card/taxonomy-card.tsx`
+
+summary card for a taxonomy entry (topic or tag) in a listing: title, optional description, and post count, linking to the entry's archive.
+Props: title: string · description?: string · postCountLabel: string · href: string · headingLevel: THeadingLevel · accessibleNameSeparator?: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
 ### TerminalChip — `molecules/terminal-chip/terminal-chip.tsx`
 
