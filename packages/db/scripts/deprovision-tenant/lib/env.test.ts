@@ -13,8 +13,10 @@ beforeEach(() => {
     originalEnv[key] = process.env[key];
     process.env[key] = REQUIRED_ENV[key];
   }
-  originalEnv['VERCEL_TEAM_ID'] = process.env['VERCEL_TEAM_ID'];
-  delete process.env['VERCEL_TEAM_ID'];
+  for (const key of ['VERCEL_TEAM_ID', 'GITHUB_ACTOR', 'GITHUB_RUN_ID']) {
+    originalEnv[key] = process.env[key];
+    delete process.env[key];
+  }
 });
 
 afterEach(() => {
@@ -37,6 +39,8 @@ describe(loadDeprovisionEnv, () => {
       vercelTeamId: undefined,
       vercelWebProjectId: 'proj-1',
       dryRun: true,
+      githubActor: undefined,
+      githubRunId: undefined,
     });
   });
 
@@ -47,6 +51,20 @@ describe(loadDeprovisionEnv, () => {
 
     expect(env.vercelTeamId).toBe('team-1');
     expect(env.dryRun).toBe(false);
+  });
+
+  it('carries through GITHUB_ACTOR/GITHUB_RUN_ID when set, without requiring them', () => {
+    process.env['GITHUB_ACTOR'] = 'octocat';
+    process.env['GITHUB_RUN_ID'] = 'run-42';
+
+    const env = loadDeprovisionEnv(true);
+
+    expect(env.githubActor).toBe('octocat');
+    expect(env.githubRunId).toBe('run-42');
+  });
+
+  it('does not throw when GITHUB_ACTOR/GITHUB_RUN_ID are unset', () => {
+    expect(() => loadDeprovisionEnv(true)).not.toThrow();
   });
 
   it.each(Object.keys(REQUIRED_ENV))(

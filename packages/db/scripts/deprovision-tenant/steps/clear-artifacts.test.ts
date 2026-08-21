@@ -18,6 +18,8 @@ const env: TDeprovisionEnv = {
   vercelTeamId: undefined,
   vercelWebProjectId: 'prj_web',
   dryRun: false,
+  githubActor: 'octocat',
+  githubRunId: 'run-42',
 };
 
 function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
