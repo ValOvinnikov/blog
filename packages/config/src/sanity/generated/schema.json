@@ -897,199 +897,6 @@
     }
   },
   {
-    "name": "module_postList",
-    "type": "document",
-    "attributes": {
-      "_id": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "_type": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string",
-          "value": "module_postList"
-        }
-      },
-      "_createdAt": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "_updatedAt": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "_rev": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "title": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "brandVariant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "SECONDARY"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "sectionHeader": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "sectionHeader"
-        },
-        "optional": true
-      },
-      "limit": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "number"
-        },
-        "optional": true
-      },
-      "layout": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "layout"
-        },
-        "optional": true
-      }
-    }
-  },
-  {
-    "name": "layout",
-    "type": "type",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "layout"
-          }
-        },
-        "spacingTop": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "NONE"
-              },
-              {
-                "type": "string",
-                "value": "SM"
-              },
-              {
-                "type": "string",
-                "value": "MD"
-              },
-              {
-                "type": "string",
-                "value": "LG"
-              },
-              {
-                "type": "string",
-                "value": "XL"
-              }
-            ]
-          },
-          "optional": true
-        },
-        "spacingBottom": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "NONE"
-              },
-              {
-                "type": "string",
-                "value": "SM"
-              },
-              {
-                "type": "string",
-                "value": "MD"
-              },
-              {
-                "type": "string",
-                "value": "LG"
-              },
-              {
-                "type": "string",
-                "value": "XL"
-              }
-            ]
-          },
-          "optional": true
-        },
-        "containerWidth": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "NARROW"
-              },
-              {
-                "type": "string",
-                "value": "WIDE"
-              },
-              {
-                "type": "string",
-                "value": "FULL"
-              }
-            ]
-          },
-          "optional": true
-        },
-        "dividerTop": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        },
-        "dividerBottom": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      }
-    }
-  },
-  {
     "name": "skim",
     "type": "type",
     "value": {
@@ -1795,6 +1602,115 @@
               {
                 "type": "string",
                 "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "dividerTop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        },
+        "dividerBottom": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "layout",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "layout"
+          }
+        },
+        "spacingTop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "spacingBottom": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "containerWidth": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NARROW"
+              },
+              {
+                "type": "string",
+                "value": "WIDE"
+              },
+              {
+                "type": "string",
+                "value": "FULL"
               }
             ]
           },
@@ -2593,6 +2509,14 @@
         },
         "optional": true
       },
+      "postList": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "module_postList.reference"
+        },
+        "optional": true
+      },
       "modules": {
         "type": "objectAttribute",
         "value": {
@@ -2600,21 +2524,6 @@
           "of": {
             "type": "union",
             "of": [
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
-                  "name": "module_postList.reference"
-                }
-              },
               {
                 "type": "object",
                 "attributes": {
@@ -2655,6 +2564,104 @@
         "value": {
           "type": "inline",
           "name": "seo"
+        },
+        "optional": true
+      }
+    }
+  },
+  {
+    "name": "module_postList",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "module_postList"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "title": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "sectionHeader": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "sectionHeader"
+        },
+        "optional": true
+      },
+      "limit": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "number"
+        },
+        "optional": true
+      },
+      "pageSize": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "number"
+        },
+        "optional": true
+      },
+      "emptyMessage": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "layout": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "layout"
         },
         "optional": true
       }

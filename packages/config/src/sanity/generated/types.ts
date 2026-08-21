@@ -162,28 +162,6 @@ export type SectionHeader = {
   align?: 'LEFT' | 'CENTER' | 'RIGHT';
 };
 
-export type Module_postList = {
-  _id: string;
-  _type: 'module_postList';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
-  sectionHeader?: SectionHeader;
-  limit?: number;
-  layout?: Layout;
-};
-
-export type Layout = {
-  _type: 'layout';
-  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
-  dividerTop?: boolean;
-  dividerBottom?: boolean;
-};
-
 export type Skim = {
   _type: 'skim';
   takeaways?: Array<string>;
@@ -280,6 +258,15 @@ export type HeroLayout = {
   _type: 'heroLayout';
   spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  dividerTop?: boolean;
+  dividerBottom?: boolean;
+};
+
+export type Layout = {
+  _type: 'layout';
+  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
   dividerTop?: boolean;
   dividerBottom?: boolean;
 };
@@ -414,10 +401,8 @@ export type Page_blog = {
   heading?: string;
   supportingText?: string;
   itemsPerPage?: number;
+  postList?: Module_postListReference;
   modules?: Array<
-    | ({
-        _key: string;
-      } & Module_postListReference)
     | ({
         _key: string;
       } & Module_ctaReference)
@@ -426,6 +411,21 @@ export type Page_blog = {
       } & Module_newsletterReference)
   >;
   seo?: Seo;
+};
+
+export type Module_postList = {
+  _id: string;
+  _type: 'module_postList';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  sectionHeader?: SectionHeader;
+  limit?: number;
+  pageSize?: number;
+  emptyMessage?: string;
+  layout?: Layout;
 };
 
 export type Module_heroReference = {
@@ -741,8 +741,6 @@ export type AllSanitySchemaTypes =
   | RichText
   | Module_postLatest
   | SectionHeader
-  | Module_postList
-  | Layout
   | Skim
   | Brand
   | SpecLine
@@ -755,6 +753,7 @@ export type AllSanitySchemaTypes =
   | BodyImage
   | ImageWithAlt
   | HeroLayout
+  | Layout
   | Settings_voice
   | Settings_theme
   | Settings_newsletter
@@ -765,6 +764,7 @@ export type AllSanitySchemaTypes =
   | Module_ctaReference
   | Module_newsletterReference
   | Page_blog
+  | Module_postList
   | Module_heroReference
   | Module_postLatestReference
   | Page_home
