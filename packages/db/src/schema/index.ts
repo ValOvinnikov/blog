@@ -8,6 +8,7 @@ export * from './audit-events';
 export * from './auth';
 export * from './bookmarks';
 export * from './memberships';
+export * from './settings-features';
 export * from './site-config';
 export * from './subscribers';
 export * from './tenant-domains';
