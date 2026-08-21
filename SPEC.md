@@ -198,10 +198,11 @@ own dedicated schema, unrelated to this shared shape.
 schema allows), `layout` as `TLayout | undefined`, and (where applicable)
 `sectionHeader` as `TSectionHeader | undefined` — with no faked defaults on
 either: unset stays unset end to end. In `apps/web`, every module component
-that renders a `@blog/ui` organism — including `module_hero` (rendered via
-its own dedicated template slot, outside `MODULE_MAP`'s generic
-`ModuleRenderer` pipeline (§5 above) — but still styled the same way as
-every other module now), no exception — wraps it in `apps/web`'s own
+that renders a `@blog/ui` organism — including the two rendered through a
+dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
+(§5 above): `module_hero` via the home template's `hero` slot, and
+`module_postList` via `page_blog`'s `postList` reference, both still
+styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated
 from `packages/ui`), passing `brandVariant` and `layout` straight through,
 plus an optional `titleId` (the module's heading element id, when it has
