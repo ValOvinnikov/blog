@@ -86,26 +86,8 @@ export default defineConfig({
                           .schemaType(homePageSchema.name)
                           .documentId(homePageSchema.name),
                       ),
-                    S.listItem()
-                      .title('Blog Page')
-                      .id(blogPageSchema.name)
-                      .icon(Newspaper)
-                      .child(
-                        S.document()
-                          .schemaType(blogPageSchema.name)
-                          .documentId(blogPageSchema.name),
-                      ),
-                    S.listItem()
-                      .title('Topic Index Page')
-                      .id(topicIndexPageSchema.name)
-                      .icon(Tags)
-                      .child(
-                        S.document()
-                          .schemaType(topicIndexPageSchema.name)
-                          .documentId(topicIndexPageSchema.name),
-                      ),
                     S.documentTypeListItem(genericSchema.name)
-                      .title('Generic Pages')
+                      .title('Landing Page')
                       .icon(FileText),
                   ]),
               ),
@@ -148,15 +130,53 @@ export default defineConfig({
                 S.list()
                   .title('Blog')
                   .items([
+                    S.listItem()
+                      .title('Blog Page')
+                      .id(blogPageSchema.name)
+                      .icon(Newspaper)
+                      .child(
+                        S.document()
+                          .schemaType(blogPageSchema.name)
+                          .documentId(blogPageSchema.name),
+                      ),
+                    S.listItem()
+                      .title('Topics')
+                      .id('blog-topics')
+                      .icon(Tags)
+                      .child(
+                        S.list()
+                          .title('Topics')
+                          .items([
+                            S.listItem()
+                              .title('Topic Index Page')
+                              .id(topicIndexPageSchema.name)
+                              .icon(Tags)
+                              .child(
+                                S.document()
+                                  .schemaType(topicIndexPageSchema.name)
+                                  .documentId(topicIndexPageSchema.name),
+                              ),
+                            S.documentTypeListItem(topicSchema.name)
+                              .title('Topics')
+                              .icon(Tags),
+                          ]),
+                      ),
+                    S.listItem()
+                      .title('Tags')
+                      .id('blog-tags')
+                      .icon(Tag)
+                      .child(
+                        S.list()
+                          .title('Tags')
+                          .items([
+                            S.documentTypeListItem(tagSchema.name)
+                              .title('Tags')
+                              .icon(Tag),
+                          ]),
+                      ),
                     S.documentTypeListItem(postSchema.name)
                       .title('Posts')
                       .icon(Newspaper),
-                    S.documentTypeListItem(topicSchema.name)
-                      .title('Topics')
-                      .icon(Tags),
-                    S.documentTypeListItem(tagSchema.name)
-                      .title('Tags')
-                      .icon(Tag),
                     S.documentTypeListItem(authorSchema.name)
                       .title('Authors')
                       .icon(UserRound),
