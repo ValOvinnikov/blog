@@ -6,7 +6,50 @@ import { newsletterSchema } from '@cms/schema-types/modules/module-newsletter';
 import { postLatestSchema } from '@cms/schema-types/modules/module-post-latest';
 import { seoSchema } from '@cms/schema-types/objects/seo';
 import { House } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineField, defineType, type ValidationContext } from 'sanity';
+
+const MODULES_VALIDATION_API_VERSION = '2024-01-01';
+
+type TModuleReference = { _type?: string; _ref?: string };
+
+/**
+ * More than one `module_postLatest` reference on the home page falls back to
+ * the same "Latest posts" heading when its own `sectionHeader.heading` is
+ * blank — duplicate landmark names/`<h2>`s for assistive tech. Cheap
+ * early-out for 0–1 candidates; otherwise dereferences the candidates
+ * (`perspective: 'drafts'` since a module can still be an unpublished draft
+ * while the page is being edited) and flags a second blank heading.
+ */
+async function validateSinglePostLatestWithoutHeading(
+  modules: TModuleReference[] | undefined,
+  context: ValidationContext,
+): Promise<string | true> {
+  const postLatestIds = (modules ?? [])
+    .filter(
+      (module): module is TModuleReference & { _ref: string } =>
+        module._type === postLatestSchema.name && Boolean(module._ref),
+    )
+    .map((module) => module._ref);
+
+  if (postLatestIds.length < 2) return true;
+
+  const client = context
+    .getClient({ apiVersion: MODULES_VALIDATION_API_VERSION })
+    .withConfig({ perspective: 'drafts' });
+
+  const candidates = await client.fetch<{ heading?: string | null }[]>(
+    `*[_id in $ids]{ "heading": sectionHeader.heading }`,
+    { ids: postLatestIds },
+  );
+
+  const blankCount = candidates.filter(
+    (candidate) => !candidate.heading?.trim(),
+  ).length;
+
+  return blankCount > 1
+    ? 'Only one Post Latest module without its own heading is allowed per page — give this one a heading or remove the duplicate.'
+    : true;
+}
 
 export const homePageSchema = defineType({
   name: 'page_home',
@@ -36,6 +79,8 @@ export const homePageSchema = defineType({
     }),
     defineModulesField({
       allow: [postLatestSchema.name, ctaSchema.name, newsletterSchema.name],
+      validateCustom: (rule) =>
+        rule.custom(validateSinglePostLatestWithoutHeading),
     }),
     defineField({
       name: 'seo',
