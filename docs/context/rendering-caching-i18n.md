@@ -24,7 +24,18 @@
   revalidate profile) from a Sanity publish webhook. Tag expiry alone does not
   invalidate prerendered route entries on Vercel (#318), so the route also
   calls `revalidatePath('/', 'layout')` when a registered type matched —
-  purging every page per publish (acceptable blast radius for a blog).
+  purging every page per publish (acceptable blast radius for a blog). The
+  same route also cleans up orphaned `bookmarks` rows (`@blog/db`) when the
+  webhook's `sanity-operation` header reads `delete` for a `blog_post` —
+  unpublish fires the same trigger as true deletion, so one check covers
+  both. Detection is header-only, never a re-query against Sanity: a
+  re-query result can't distinguish "post deleted" from "Sanity temporarily
+  unreachable" once it passes through the service layer's `safeAsync`
+  wrapper, so a transient failure could otherwise wipe live bookmarks.
+  Cleanup is tenant-scoped (resolved from the `sanity-project-id` header,
+  skipped rather than guessed if unresolvable) and best-effort — a failure
+  is logged but never turns the response into a non-2xx, since Sanity would
+  retry the whole revalidation.
 - **`site_config` on-demand revalidation:** `POST /api/revalidate-site-config`
   (`apps/web`) mirrors `/api/revalidate`'s cache-purge shape
   (`revalidateTag('site-config', { expire: 0 })` +

@@ -348,7 +348,11 @@ Full mechanics:
 
 Cache tags can be tenant-scoped (`t:<projectId>:<tag>`, alongside the legacy
 unprefixed form); the revalidation webhook purges both per publish, keyed off
-Sanity's own `sanity-project-id` webhook header. `@blog/service`'s
+Sanity's own `sanity-project-id` webhook header. The same webhook also cleans
+up orphaned `@blog/db` `bookmarks` rows when it receives a `blog_post` delete
+(Sanity's `sanity-operation` header — unpublish fires the same trigger as
+true deletion), scoped to the tenant resolved from that project-id header.
+`@blog/service`'s
 `getClient()`/`runQuery()`/`isr()` all take an optional tenant context —
 called with none, they behave exactly as before (legacy single-tenant client,
 unprefixed tags), which is what keeps every not-yet-migrated `service.*`
