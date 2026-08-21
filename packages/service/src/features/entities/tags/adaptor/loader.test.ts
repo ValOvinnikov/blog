@@ -33,6 +33,24 @@ describe(getTags, () => {
     expect(result[1]?.postCount).toBe(0);
   });
 
+  it('carries a tag description through when authored', async () => {
+    mockRun.mockResolvedValue([
+      makeRawTagWithPostCount({ description: 'All things TypeScript' }),
+    ]);
+
+    const result = await getTags();
+
+    expect(result[0]?.description).toBe('All things TypeScript');
+  });
+
+  it('normalises a missing description to undefined', async () => {
+    mockRun.mockResolvedValue([makeRawTagWithPostCount({ description: null })]);
+
+    const result = await getTags();
+
+    expect(result[0]?.description).toBeUndefined();
+  });
+
   it('returns an empty list when there are no tags', async () => {
     mockRun.mockResolvedValue([]);
 

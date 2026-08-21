@@ -9,6 +9,16 @@ describe('tagsQuery', () => {
     expect(() => tagsQuery.parse(raw)).not.toThrow();
   });
 
+  it('parses a tag with no description', () => {
+    const raw = [makeRawTagWithPostCount({ description: null, postCount: 5 })];
+
+    expect(() => tagsQuery.parse(raw)).not.toThrow();
+  });
+
+  it('projects the tag description', () => {
+    expect(tagsQuery.query).toContain('description,');
+  });
+
   it('correlates the post count to the enclosing tag document', () => {
     expect(tagsQuery.query).toContain('references(^._id)');
   });

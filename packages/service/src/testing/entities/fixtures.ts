@@ -39,6 +39,7 @@ export function makeRawTagWithPostCount(
 ): TRawTagWithPostCount {
   return {
     ...makeRawTag(),
+    description: 'TypeScript posts',
     postCount: 0,
     ...overrides,
   };

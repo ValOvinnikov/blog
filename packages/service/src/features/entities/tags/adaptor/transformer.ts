@@ -9,6 +9,7 @@ export type TRawTagWithPostCount = InferResultType<typeof tagsQuery>[number];
 function toTagWithPostCount(raw: TRawTagWithPostCount): TTagWithPostCount {
   return {
     ...toTag(raw),
+    description: raw.description ?? undefined,
     postCount: raw.postCount,
   };
 }

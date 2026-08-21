@@ -7,6 +7,7 @@ export const tagsQuery = q.star
   .order('title asc')
   .project((sub) => ({
     ...tagFragment,
+    description: sub.field('description').nullable(true),
     // `references(^._id)` matches regardless of whether the referencing field
     // is a single reference or (as `blog_post.tags` is) an array of them.
     postCount: sub
