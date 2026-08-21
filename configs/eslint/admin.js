@@ -59,7 +59,7 @@ export default [
     // Next.js reserved exports stay as declarations: every Next.js doc,
     // example and codemod emits them that way, so an arrow here reads
     // as a deviation.
-    files: ['**/page.tsx', '**/layout.tsx', '**/route.ts', 'src/middleware.ts'],
+    files: ['**/page.tsx', '**/layout.tsx', '**/route.ts', 'src/proxy.ts'],
     rules: {
       'func-style': 'off',
     },
