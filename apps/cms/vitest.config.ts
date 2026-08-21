@@ -3,11 +3,13 @@ import { fileURLToPath } from 'node:url';
 import preset from '@blog/vitest-config/preset';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
-// Tests here cover the pure migration-tooling helpers (scripts/migrate-lib.mjs),
-// individual migrations' transform functions (migrations/**/index.test.ts),
-// and schema-level validation logic co-located under src/** (e.g. a custom
-// `rule.custom()` validator) — so the include pattern lists all three
-// instead of relying on the preset's default `src/**` alone.
+// Split into two projects because only schema tests (src/**) import `sanity`
+// directly (for `defineType`/`defineField`), whose main entry unconditionally
+// imports a `.css` file that Node's native loader can't parse — inlining it
+// routes the import through Vite's transform pipeline instead, where the
+// shared preset's `css: false` strips it. Migration/script tests import
+// `sanity/migrate`, which has no such CSS side effect, so paying to re-run
+// the whole `sanity` graph through Vite per fork would be pure overhead.
 export default mergeConfig(
   preset,
   defineConfig({
@@ -25,23 +27,34 @@ export default mergeConfig(
     },
     test: {
       environment: 'node',
-      include: [
-        'src/**/*.{test,spec}.ts',
-        'scripts/**/*.{test,spec}.mjs',
-        'migrations/**/*.{test,spec}.ts',
-      ],
-      // `sanity`'s main entry point (imported by every schema file for
-      // `defineType`/`defineField`) unconditionally imports a `.css` file as
-      // a side effect. By default vitest externalizes node_modules deps to
-      // Node's native loader, which can't parse `.css` and throws
-      // `Unknown file extension ".css"`. Inlining `sanity` routes it through
-      // Vite's transform pipeline instead, where the shared preset's
-      // `css: false` already strips CSS imports.
-      server: {
-        deps: {
-          inline: ['sanity'],
+      projects: [
+        {
+          extends: true,
+          test: {
+            name: 'schema',
+            include: ['src/**/*.{test,spec}.ts'],
+            server: {
+              deps: {
+                inline: ['sanity'],
+              },
+            },
+          },
         },
-      },
+        {
+          extends: true,
+          test: {
+            name: 'migrations',
+            include: [
+              'migrations/**/*.{test,spec}.ts',
+              'scripts/**/*.{test,spec}.mjs',
+            ],
+            // `extends: true` concatenates `include` with the inherited
+            // `src/**` pattern rather than replacing it; exclude src here so
+            // schema tests don't also run (and pay the sanity inline) twice.
+            exclude: ['src/**'],
+          },
+        },
+      ],
     },
   }),
 );
