@@ -1,6 +1,6 @@
 import type { THeroModule } from '@blog/service';
-import { LinkButton } from '@blog/ui/molecules';
-import { Hero } from '@blog/ui/organisms';
+import { LinkButton } from '@blog/ui/molecules/link-button';
+import { Hero } from '@blog/ui/organisms/hero';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';

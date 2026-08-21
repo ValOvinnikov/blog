@@ -21,10 +21,15 @@ write this code, so do not assume any of it is correct. You never edit files;
 you report findings for the orchestrator to fix.
 
 Read-only is enforced, not just asked (#425): you run under
-`permissionMode: dontAsk` (any Bash call the permission layer would prompt for
-is auto-denied) plus a PreToolUse guard
+`permissionMode: dontAsk`, plus a PreToolUse guard
 (`.claude/hooks/read-only-agent-guard.sh`) that denies write-shaped commands
-like `git commit`. This is a guardrail against honest confusion, not an
+like `git commit`. **dontAsk does not by itself fail closed on every command
+that would otherwise prompt** (#1797) — it also runs a command unprompted
+whenever the harness's own built-in classifier judges it safely read-only,
+and that classifier can misjudge a write-shaped command (`sed -i` did, once,
+for real) as ordinary text processing. The PreToolUse guard is what actually
+covers that gap, not dontAsk on its own. This is a guardrail against honest
+confusion, not an
 adversarial-proof sandbox (see the guard script and README for its documented
 residual gaps) — but it means an APPROVE you give was not reached by way of
 you mutating the tree first. If a legitimate read-only command is denied

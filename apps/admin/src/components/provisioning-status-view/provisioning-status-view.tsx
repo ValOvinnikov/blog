@@ -25,7 +25,7 @@ import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
 import { StatusBadge } from '@blog/ui/atoms/status-badge';
 import { Text } from '@blog/ui/atoms/text';
-import { LinkButton } from '@blog/ui/molecules';
+import { LinkButton } from '@blog/ui/molecules/link-button';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState, useTransition } from 'react';

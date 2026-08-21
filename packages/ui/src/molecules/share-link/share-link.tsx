@@ -36,7 +36,7 @@ export const ShareLink = ({
   // union (no `rel`) would otherwise reject the `rel` prop below. The clean
   // fix is adding `rel` to `TAnchorElementType`
   // (packages/config/src/react/polymorphic.ts), but that's a config-layer
-  // change out of scope for this ticket (#581) — left as a follow-up.
+  // change left as a follow-up.
   const asElement = as as ElementType | undefined;
 
   return (

@@ -63,8 +63,7 @@ const resolveMessages = async (): Promise<unknown> => {
   return config.messages;
 };
 
-// [message path, original pre-#1420 wording, #1420 neutralized wording] —
-// the full 64-row classification table from #1420's issue body.
+// [message path, original terminal-flavored wording, neutralized wording].
 const CLASSIFICATION_TABLE: Array<[string[], string, string]> = [
   [['notFound', 'commandNotFound'], 'command not found', 'Not found'],
   [

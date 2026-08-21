@@ -1,6 +1,6 @@
 'use client';
 
-import { BookmarkToggle } from '@blog/ui/atoms';
+import { BookmarkToggle } from '@blog/ui/atoms/bookmark-toggle';
 import { useToast } from '@web/context/toast-provider';
 import {
   getBookmarkStatus,

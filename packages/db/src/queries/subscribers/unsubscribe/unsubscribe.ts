@@ -3,11 +3,10 @@ import { users } from '@blog/db/schema/auth';
 import { subscribers } from '@blog/db/schema/subscribers';
 import { and, eq } from 'drizzle-orm';
 
-// The `/account` 6b section's "unsubscribe" action (#1155/#1157/#1158).
 // `subscribers.status` only has `pending`/`active` — there is no
 // `unsubscribed` value, and adding one would need a schema migration for a
-// table with live rows (post-#1101). So unsubscribing **deletes** the row
-// for the user's account email instead of flipping a status; a subsequent
+// table with live rows. So unsubscribing **deletes** the row for the user's
+// account email instead of flipping a status; a subsequent
 // `getSubscriptionStatus` call then naturally reports `not-subscribed` with
 // no schema change needed.
 //

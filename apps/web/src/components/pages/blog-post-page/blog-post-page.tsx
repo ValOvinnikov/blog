@@ -1,8 +1,12 @@
 import { ASIDE_KIND, ICONS, Size, type TAsideKind, routes } from '@blog/config';
 import { getSanityImageBaseUrl, service } from '@blog/service';
-import { Icon } from '@blog/ui/atoms';
-import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
-import { Article, PostsSection } from '@blog/ui/organisms';
+import { Icon } from '@blog/ui/atoms/icon';
+import {
+  Breadcrumbs,
+  type IBreadcrumbItem,
+} from '@blog/ui/molecules/breadcrumbs';
+import { Article } from '@blog/ui/organisms/article';
+import { PostsSection } from '@blog/ui/organisms/posts-section';
 import { BackToTopButton } from '@web/components/shared/back-to-top-button';
 import { BookmarkButton } from '@web/components/shared/bookmark-button';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
@@ -106,10 +110,9 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
 
   // Per-post opt-out (`newsletterEnabled`) gates the compact signup on this
   // page; its heading is always CMS-sourced from the `settings_newsletter`
-  // singleton (never the page-builder module, never an i18n fallback —
-  // #1200). A failed settings fetch is optional/global data (SPEC.md's
-  // fetch-error stance): logged, and the signup is simply omitted rather
-  // than guessed at.
+  // singleton (never the page-builder module, never an i18n fallback). A
+  // failed settings fetch is optional/global data (SPEC.md's fetch-error
+  // stance): logged, and the signup is simply omitted rather than guessed at.
   if (!newsletterSettingsResult.ok) {
     logger.error('blog_post_page.newsletter_settings_fetch_failed', {
       error: newsletterSettingsResult.error,
@@ -135,10 +138,10 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
     [ASIDE_KIND.CONTEXT]: blogPostT('asideKind.CONTEXT'),
   };
 
-  // Both render as `Article.Body`'s own last children (#1307) — genuine
-  // article content sharing the article's real content column, not a
-  // page-level sibling mimicking its width from outside. Hoisted so the
-  // rail/no-rail branches below can't drift.
+  // Both render as `Article.Body`'s own last children — genuine article
+  // content sharing the article's real content column, not a page-level
+  // sibling mimicking its width from outside. Hoisted so the rail/no-rail
+  // branches below can't drift.
   const footer = (
     <Article.Footer
       className={hasContentsRail ? s.footerInRail() : s.footer()}

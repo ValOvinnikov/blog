@@ -1,7 +1,7 @@
 'use client';
 
 import type { ILink } from '@blog/config';
-import { PrimaryNavigation } from '@blog/ui/molecules';
+import { PrimaryNavigation } from '@blog/ui/molecules/primary-navigation';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useMobileNavToggle } from '@web/hooks/use-mobile-nav-toggle';
 import { usePathname } from '@web/i18n/navigation';

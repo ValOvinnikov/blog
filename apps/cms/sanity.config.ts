@@ -6,6 +6,7 @@ import { topicSchema } from '@cms/schema-types/documents/blog/topic';
 import { blogPageSchema } from '@cms/schema-types/documents/pages/blog-page';
 import { homePageSchema } from '@cms/schema-types/documents/pages/home-page';
 import { genericSchema } from '@cms/schema-types/documents/pages/page';
+import { topicIndexPageSchema } from '@cms/schema-types/documents/pages/topic-index-page';
 import { footerSchema } from '@cms/schema-types/documents/settings/footer';
 import { navigationSchema } from '@cms/schema-types/documents/settings/navigation';
 import { newsletterSettingsSchema } from '@cms/schema-types/documents/settings/newsletter';
@@ -18,6 +19,7 @@ import { heroSchema } from '@cms/schema-types/modules/module-hero';
 import { newsletterSchema } from '@cms/schema-types/modules/module-newsletter';
 import { postLatestSchema } from '@cms/schema-types/modules/module-post-latest';
 import { postListSchema } from '@cms/schema-types/modules/module-post-list';
+import { taxonomyListSchema } from '@cms/schema-types/modules/module-taxonomy-list';
 import { codeInput } from '@sanity/code-input';
 import { visionTool } from '@sanity/vision';
 import {
@@ -25,6 +27,7 @@ import {
   Files,
   FileText,
   House,
+  LayoutGrid,
   List,
   Mail,
   Megaphone,
@@ -92,6 +95,15 @@ export default defineConfig({
                           .schemaType(blogPageSchema.name)
                           .documentId(blogPageSchema.name),
                       ),
+                    S.listItem()
+                      .title('Topic Index Page')
+                      .id(topicIndexPageSchema.name)
+                      .icon(Tags)
+                      .child(
+                        S.document()
+                          .schemaType(topicIndexPageSchema.name)
+                          .documentId(topicIndexPageSchema.name),
+                      ),
                     S.documentTypeListItem(genericSchema.name)
                       .title('Generic Pages')
                       .icon(FileText),
@@ -114,6 +126,9 @@ export default defineConfig({
                     S.documentTypeListItem(postLatestSchema.name)
                       .title('Post Latest')
                       .icon(List),
+                    S.documentTypeListItem(taxonomyListSchema.name)
+                      .title('Taxonomy Lists')
+                      .icon(LayoutGrid),
                     S.documentTypeListItem(contentSchema.name)
                       .title('Content')
                       .icon(FileText),

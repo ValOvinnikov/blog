@@ -15,8 +15,8 @@ export type TUnlinkProviderResult =
   { outcome: 'unlinked' } | { outcome: 'last-method' };
 
 // Deletes the `accounts` row for (userId, provider) — the `/account` hub's
-// 6c "connected accounts" disconnect action (Epic #1159). Rejects (without
-// touching the row) if `provider` is currently linked AND is the user's last
+// "connected accounts" disconnect action. Rejects (without touching the
+// row) if `provider` is currently linked AND is the user's last
 // remaining sign-in method (counted across all three methods this repo
 // supports: the other `accounts` rows plus `users.emailVerified`) — losing
 // every sign-in method would permanently lock the user out of their account.

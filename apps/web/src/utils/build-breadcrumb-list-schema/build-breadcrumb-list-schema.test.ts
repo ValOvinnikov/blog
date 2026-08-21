@@ -1,4 +1,4 @@
-import type { IBreadcrumbItem } from '@blog/ui/molecules';
+import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 
 import { buildBreadcrumbListSchema } from './build-breadcrumb-list-schema';
 

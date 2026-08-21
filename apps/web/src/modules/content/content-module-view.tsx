@@ -1,5 +1,5 @@
 import type { TContentModule } from '@blog/service';
-import { ContentModule as ContentModuleUi } from '@blog/ui/organisms';
+import { ContentModule as ContentModuleUi } from '@blog/ui/organisms/content-module';
 import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 import { Section } from '@web/components/shared/section';
 

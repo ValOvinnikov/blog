@@ -1,11 +1,10 @@
-import {
-  MODULE_PAGE_CONTEXT,
-  routes,
-  type ILocalizedParams,
-} from '@blog/config';
+import { routes, type ILocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
-import { Heading } from '@blog/ui/atoms';
-import { Breadcrumbs, type IBreadcrumbItem } from '@blog/ui/molecules';
+import { Heading } from '@blog/ui/atoms/heading';
+import {
+  Breadcrumbs,
+  type IBreadcrumbItem,
+} from '@blog/ui/molecules/breadcrumbs';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -69,11 +68,7 @@ export const GenericPage = async ({ slug, locale }: TGenericPageProps) => {
         <Heading level={1} visual="section" className={s.heading()}>
           {title}
         </Heading>
-        <ModuleRenderer
-          modules={modules}
-          locale={locale}
-          context={{ type: MODULE_PAGE_CONTEXT.GENERIC, isPaginated: false }}
-        />
+        <ModuleRenderer modules={modules} locale={locale} />
       </main>
     </>
   );

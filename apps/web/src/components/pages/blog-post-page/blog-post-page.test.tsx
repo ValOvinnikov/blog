@@ -5,7 +5,7 @@ import {
   type RichText,
   Size,
 } from '@blog/config';
-import { Icon } from '@blog/ui/atoms';
+import { Icon } from '@blog/ui/atoms/icon';
 import userEvent from '@testing-library/user-event';
 import {
   customRenderAsync,
@@ -59,7 +59,7 @@ vi.mock('@web/server/newsletter/newsletter-actions', () => ({
   subscribeToNewsletterAction: vi.fn(),
 }));
 
-// `BookmarkButton` (article header meta strip, #1109) renders nothing for a
+// `BookmarkButton` (article header meta strip) renders nothing for a
 // signed-out session — the default here — so every existing assertion below
 // (none of which concerns bookmarking) is unaffected; the "authenticated"
 // describe block further down opts in per-test.

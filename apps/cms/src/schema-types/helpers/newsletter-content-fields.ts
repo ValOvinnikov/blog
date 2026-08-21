@@ -6,9 +6,8 @@ import { defineField } from 'sanity';
  * singleton. Both are flat top-level fields (not a nested object) — `service`
  * queries/transformers and the generated types depend on that shape.
  *
- * `heading` is required: #1200 removed all i18n fallback copy, so there is no
- * default to fall back to if it's left empty. `description` stays optional
- * supporting copy.
+ * `heading` is required: there is no i18n fallback copy to fall back to if
+ * it's left empty. `description` stays optional supporting copy.
  */
 export const newsletterContentFields = () => [
   defineField({

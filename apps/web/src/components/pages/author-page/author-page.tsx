@@ -1,13 +1,16 @@
 import { Size, routes } from '@blog/config';
 import { service } from '@blog/service';
-import { Avatar, Eyebrow, Icon } from '@blog/ui/atoms';
+import { Avatar } from '@blog/ui/atoms/avatar';
+import { Eyebrow } from '@blog/ui/atoms/eyebrow';
+import { Icon } from '@blog/ui/atoms/icon';
+import { ActionList } from '@blog/ui/molecules/action-list';
 import {
-  ActionList,
   Breadcrumbs,
-  ShareLink,
   type IBreadcrumbItem,
-} from '@blog/ui/molecules';
-import { Pagination, PostsSection } from '@blog/ui/organisms';
+} from '@blog/ui/molecules/breadcrumbs';
+import { ShareLink } from '@blog/ui/molecules/share-link';
+import { Pagination } from '@blog/ui/organisms/pagination';
+import { PostsSection } from '@blog/ui/organisms/posts-section';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';

@@ -1,5 +1,7 @@
 import { routes } from '@blog/config';
-import { LinkButton, SettingRow, WindowChrome } from '@blog/ui/molecules';
+import { LinkButton } from '@blog/ui/molecules/link-button';
+import { SettingRow } from '@blog/ui/molecules/setting-row';
+import { WindowChrome } from '@blog/ui/molecules/window-chrome';
 import { DeleteAccountControl } from '@web/components/shared/delete-account-control';
 import { PlainSection } from '@web/components/shared/plain-section';
 import { SmartLink } from '@web/components/shared/smart-link';

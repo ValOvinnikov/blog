@@ -1,4 +1,3 @@
-import type { TModulePageContext } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 
 import { ModuleRenderer } from './module-renderer';
@@ -11,7 +10,6 @@ const { ctaModuleMock } = vi.hoisted(() => ({
 
 vi.mock('./module-map', () => ({
   MODULE_MAP: {
-    module_postList: undefined,
     module_content: undefined,
     module_cta: ctaModuleMock,
   },
@@ -33,25 +31,12 @@ describe('ModuleRenderer', () => {
     expect(screen.getByTestId('stub-cta')).toHaveTextContent('cta-doc-id');
   });
 
-  it('forwards the page context to every module component', async () => {
-    const context: TModulePageContext = { type: 'BLOG', isPaginated: false };
-
-    await setup({ context });
-
-    expect(ctaModuleMock).toHaveBeenCalledWith({
-      id: 'cta-doc-id',
-      locale: 'en',
-      context,
-    });
-  });
-
-  it('renders modules with an undefined context when the caller omits one', async () => {
+  it('forwards id and locale to every module component', async () => {
     await setup();
 
     expect(ctaModuleMock).toHaveBeenCalledWith({
       id: 'cta-doc-id',
       locale: 'en',
-      context: undefined,
     });
   });
 

@@ -1,10 +1,7 @@
 import { MissingPostListError } from '@blog/service/features/pages/blog/adaptor/missing-post-list-error';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import {
-  makeRawArchivePostCard,
-  makeRawBlogPage,
-} from '@blog/service/testing/pages/fixtures';
+import { makeRawBlogPage } from '@blog/service/testing/pages/fixtures';
 
 import { getIndexPage } from './loader';
 
@@ -20,26 +17,19 @@ vi.mock('@blog/service/sanity/image', () => ({
 }));
 
 describe('getIndexPage', () => {
-  it('returns the page window with page math for a full corpus', async () => {
+  it('exposes the postList module id from page_blog.postList', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawBlogPage({ postList: { pageSize: 9 } }))
-      .mockResolvedValueOnce(makeRawSiteSettings())
-      .mockResolvedValueOnce({
-        posts: [
-          makeRawArchivePostCard({ _id: 'a' }),
-          makeRawArchivePostCard({ _id: 'b' }),
-        ],
-        total: 20,
-      });
+      .mockResolvedValueOnce(
+        makeRawBlogPage({ postList: { _id: 'post-list-1' } }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getIndexPage({ page: 2 });
+    const result = await getIndexPage();
 
-    expect(result.posts.map((p) => p.id)).toEqual(['a', 'b']);
-    expect(result.currentPage).toBe(2);
-    expect(result.totalPages).toBe(3); // ceil(20 / 9)
+    expect(result.postListId).toBe('post-list-1');
   });
 
-  it('takes heading/supportingText from the page_blog singleton and defaults to page 1', async () => {
+  it('takes heading/supportingText from the page_blog singleton', async () => {
     mockRun
       .mockResolvedValueOnce(
         makeRawBlogPage({
@@ -52,16 +42,10 @@ describe('getIndexPage', () => {
           },
         }),
       )
-      .mockResolvedValueOnce(makeRawSiteSettings())
-      .mockResolvedValueOnce({
-        posts: [makeRawArchivePostCard({ _id: 'a' })],
-        total: 1,
-      });
+      .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getIndexPage();
 
-    expect(result.currentPage).toBe(1);
-    expect(result.totalPages).toBe(1);
     expect(result.heading).toBe('Latest posts');
     expect(result.supportingText).toBe('Fresh from the team.');
     expect(result.seo).toEqual({
@@ -80,11 +64,7 @@ describe('getIndexPage', () => {
       )
       .mockResolvedValueOnce(
         makeRawSiteSettings({ description: 'Notes on building things.' }),
-      )
-      .mockResolvedValueOnce({
-        posts: [],
-        total: 0,
-      });
+      );
 
     const result = await getIndexPage();
 
@@ -104,8 +84,7 @@ describe('getIndexPage', () => {
           modules: [{ _id: 'newsletter-1', _type: 'module_newsletter' }],
         }),
       )
-      .mockResolvedValueOnce(makeRawSiteSettings())
-      .mockResolvedValueOnce({ posts: [], total: 0 });
+      .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getIndexPage();
 
@@ -117,36 +96,17 @@ describe('getIndexPage', () => {
   it('defaults modules to an empty array when the page has none', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawBlogPage({ modules: null }))
-      .mockResolvedValueOnce(makeRawSiteSettings())
-      .mockResolvedValueOnce({ posts: [], total: 0 });
+      .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getIndexPage();
 
     expect(result.modules).toEqual([]);
   });
 
-  it('tags the posts query with topic alongside posts', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawBlogPage())
-      .mockResolvedValueOnce(makeRawSiteSettings())
-      .mockResolvedValueOnce({ posts: [], total: 0 });
-
-    await getIndexPage();
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      3,
-      expect.anything(),
-      expect.objectContaining({
-        next: expect.objectContaining({ tags: ['posts', 'topic'] }),
-      }),
-    );
-  });
-
   it('tags the page_blog query with modules:postList alongside page_blog', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawBlogPage())
-      .mockResolvedValueOnce(makeRawSiteSettings())
-      .mockResolvedValueOnce({ posts: [], total: 0 });
+      .mockResolvedValueOnce(makeRawSiteSettings());
 
     await getIndexPage();
 
@@ -162,9 +122,9 @@ describe('getIndexPage', () => {
   });
 
   // Regression guard for the decision that a missing slot is a loud failure,
-  // never a substituted default: this must reject, not resolve with an
-  // invented page size or an empty grid.
-  it('rejects with MissingPostListError when page_blog.postList is unset, without fetching posts', async () => {
+  // never a substituted default: this must reject rather than resolve with
+  // an invented module id.
+  it('rejects with MissingPostListError when page_blog.postList is unset', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawBlogPage({ postList: null }))
       .mockResolvedValueOnce(makeRawSiteSettings());

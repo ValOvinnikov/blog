@@ -5,7 +5,8 @@ import { adminRoutes } from '@admin/utils/routes/routes';
 import { Menu } from '@base-ui/react/menu';
 import { ICONS, Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { Avatar, Icon } from '@blog/ui/atoms';
+import { Avatar } from '@blog/ui/atoms/avatar';
+import { Icon } from '@blog/ui/atoms/icon';
 
 import { tenantSwitcherVariants } from './tenant-switcher-variants';
 

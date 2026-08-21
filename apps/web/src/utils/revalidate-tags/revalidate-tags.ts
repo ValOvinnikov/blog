@@ -1,4 +1,4 @@
-import type { AllSanitySchemaTypes } from '@blog/config';
+import type { AllSanitySchemaTypes, TModuleType } from '@blog/config';
 
 /** Every document/object `_type` string the generated schema defines. */
 type TSanityType = Extract<AllSanitySchemaTypes, { _type: string }>['_type'];
@@ -8,10 +8,14 @@ type TSanityType = Extract<AllSanitySchemaTypes, { _type: string }>['_type'];
  * webhook. Module types additionally purge a per-document `module:<id>` tag
  * (appended in the resolver).
  *
- * Keyed by the generated schema `_type` union via `satisfies` — renaming a
- * document `_type` in the CMS becomes a **compile error** here, so this table
- * can't silently drift from the schema. The tag strings themselves are the
- * literals passed to `isr(...)` in `@blog/service` loaders (a few predate a
+ * The `satisfies` clause is split: every `module_*` `_type` in the
+ * schema-derived `TModuleType` union is **required**
+ * (`Record<TModuleType, …>`), so a schema addition without a matching entry
+ * here fails `type-check` — regardless of whether that type is ever added to
+ * `MODULE_MAP` (`module_hero`, `module_postList`, and `module_taxonomyList`
+ * never are). Other document `_type`s stay `Partial`, since several
+ * legitimately purge nothing. The tag strings themselves are the literals
+ * passed to `isr(...)` in `@blog/service` loaders (a few predate a
  * `{group}_{name}` rename, e.g. the `page_home` document invalidates the
  * `homePage` tag) — keep them in sync with `packages/service/src`.
  */
@@ -28,11 +32,13 @@ const REVALIDATE_TAGS = {
   page_generic: ['page_generic'],
   module_hero: ['modules:hero'],
   module_postList: ['modules:postList'],
+  module_taxonomyList: ['modules:taxonomyList'],
   module_postLatest: ['modules:postLatest'],
   module_content: ['modules:content'],
   module_cta: ['modules:cta'],
   module_newsletter: ['modules:newsletter'],
-} as const satisfies Partial<Record<TSanityType, readonly string[]>>;
+} as const satisfies Record<TModuleType, readonly string[]> &
+  Partial<Record<TSanityType, readonly string[]>>;
 
 /**
  * Resolves the ISR tags affected by a change to a document of the given

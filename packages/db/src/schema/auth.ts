@@ -9,16 +9,16 @@ import {
 // Auth.js (NextAuth v5) Drizzle adapter tables — the exact column shape
 // `@auth/drizzle-adapter`'s Postgres adapter (`PostgresDrizzleAdapter`)
 // requires at runtime (verified against its `src/lib/pg.ts` `defineTables`
-// default schema, package v1.11.3). #1107 (web) wires the adapter itself,
+// default schema, package v1.11.3). `apps/web` wires the adapter itself,
 // passing this schema in (`DrizzleAdapter(db, { usersTable: schema.users,
 // accountsTable: schema.accounts, sessionsTable: schema.sessions,
 // verificationTokensTable: schema.verificationTokens })`) — column names are
 // load-bearing (the adapter reads them by these exact keys), so they are not
 // renamed/reshaped to this repo's usual conventions.
 //
-// `authenticator` (WebAuthn/passkey) is intentionally omitted — M5.1 (#1039,
-// D13) ships exactly three sign-in methods (GitHub, Google, email magic
-// link), none of which need it.
+// `authenticator` (WebAuthn/passkey) is intentionally omitted — this repo
+// ships exactly three sign-in methods (GitHub, Google, email magic link),
+// none of which need it.
 export const users = pgTable('users', {
   id: text('id')
     .primaryKey()

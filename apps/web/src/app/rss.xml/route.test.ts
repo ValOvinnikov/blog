@@ -3,14 +3,18 @@
  */
 import { makePostCard } from '@web/testing/shared/post/fixtures';
 
-const { getIndexPageMock, getSiteSettingsMock } = vi.hoisted(() => ({
-  getIndexPageMock: vi.fn(),
-  getSiteSettingsMock: vi.fn(),
-}));
+const { getIndexPageMock, getPostListMock, getSiteSettingsMock } = vi.hoisted(
+  () => ({
+    getIndexPageMock: vi.fn(),
+    getPostListMock: vi.fn(),
+    getSiteSettingsMock: vi.fn(),
+  }),
+);
 
 vi.mock('@blog/service', () => ({
   service: {
     pages: { blog: { v1: { getIndexPage: getIndexPageMock } } },
+    modules: { postList: { v1: { getPostList: getPostListMock } } },
     global: { siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } } },
   },
 }));
@@ -26,13 +30,18 @@ describe('GET /rss.xml', () => {
   afterEach(() => {
     vi.resetModules();
     getIndexPageMock.mockReset();
+    getPostListMock.mockReset();
     getSiteSettingsMock.mockReset();
   });
 
   it('returns a valid RSS 2.0 feed with the correct content type', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
-      data: { posts: [post], currentPage: 1, totalPages: 1, total: 1 },
+      data: { postListId: 'post-list-1' },
+    });
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: { posts: [post], currentPage: 1, totalPages: 1 },
     });
     getSiteSettingsMock.mockResolvedValue({
       ok: true,
@@ -70,17 +79,16 @@ describe('GET /rss.xml', () => {
     );
   });
 
-  it('aggregates posts across every blog index page', async () => {
-    getIndexPageMock.mockImplementation(({ page = 1 } = {}) => {
+  it('aggregates posts across every archive page', async () => {
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: { postListId: 'post-list-1' },
+    });
+    getPostListMock.mockImplementation((_id: string, page = 1) => {
       if (page === 1) {
         return Promise.resolve({
           ok: true,
-          data: {
-            posts: [post],
-            currentPage: 1,
-            totalPages: 2,
-            total: 2,
-          },
+          data: { posts: [post], currentPage: 1, totalPages: 2 },
         });
       }
       return Promise.resolve({
@@ -89,7 +97,6 @@ describe('GET /rss.xml', () => {
           posts: [{ ...post, slug: 'second-post', title: 'Second post' }],
           currentPage: 2,
           totalPages: 2,
-          total: 2,
         },
       });
     });
@@ -104,13 +111,17 @@ describe('GET /rss.xml', () => {
     const doc = new DOMParser().parseFromString(xml, 'application/xml');
 
     expect(doc.querySelectorAll('item')).toHaveLength(2);
-    expect(getIndexPageMock).toHaveBeenCalledTimes(2);
+    expect(getPostListMock).toHaveBeenCalledTimes(2);
   });
 
   it('falls back to a generic channel title/description when site settings fail', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
-      data: { posts: [], currentPage: 1, totalPages: 1, total: 0 },
+      data: { postListId: 'post-list-1' },
+    });
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: { posts: [], currentPage: 1, totalPages: 1 },
     });
     getSiteSettingsMock.mockResolvedValue({
       ok: false,
@@ -130,6 +141,29 @@ describe('GET /rss.xml', () => {
 
   it('returns an empty feed (no items) when the blog index fetch fails', async () => {
     getIndexPageMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+    getSiteSettingsMock.mockResolvedValue({
+      ok: true,
+      data: { brand: { name: 'My Blog' }, description: 'desc' },
+    });
+    const { GET } = await import('./route');
+
+    const response = await GET();
+    const xml = await response.text();
+    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+
+    expect(doc.querySelectorAll('item')).toHaveLength(0);
+    expect(getPostListMock).not.toHaveBeenCalled();
+  });
+
+  it('returns an empty feed (no items) when the first archive page fetch fails', async () => {
+    getIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: { postListId: 'post-list-1' },
+    });
+    getPostListMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });

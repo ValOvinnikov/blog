@@ -43,10 +43,9 @@ describe(`<${PostShare.name}/>`, () => {
     // Guards apps/web's `vitest.config.ts` SVGR setup: compiling this
     // `@blog/ui` icon through apps/web's own Vitest bundling pipeline must
     // keep `viewBox`, or the icon would render cropped once `Icon` resizes
-    // it via CSS to anything other than its native 24x24 (see issue #913).
-    // The equivalent for the Turbopack rule in `next.config.ts` — the
-    // pipeline actually used by `next dev`/`next build`, and the one this
-    // bug was reported against — isn't practically unit-testable at this
+    // it via CSS to anything other than its native 24x24. The equivalent for
+    // the Turbopack rule in `next.config.ts` — the pipeline actually used by
+    // `next dev`/`next build` — isn't practically unit-testable at this
     // layer; that fix is verified by a live dev-server check instead.
     expect(trigger.querySelector('svg')).toHaveAttribute(
       'viewBox',

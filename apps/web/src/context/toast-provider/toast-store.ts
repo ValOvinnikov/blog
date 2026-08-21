@@ -1,5 +1,5 @@
 import { TOAST_TYPE, type TToastType } from '@blog/config';
-import type { IToastAction } from '@blog/ui/molecules';
+import type { IToastAction } from '@blog/ui/molecules/toast';
 import type { ReactNode } from 'react';
 
 /** Visible-slot cap (§9) — a 5th toast evicts the oldest non-error toast. */

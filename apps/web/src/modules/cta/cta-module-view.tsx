@@ -1,5 +1,5 @@
 import type { TCtaModule } from '@blog/service';
-import { CtaModule as CtaModuleUi } from '@blog/ui/organisms';
+import { CtaModule as CtaModuleUi } from '@blog/ui/organisms/cta-module';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
 

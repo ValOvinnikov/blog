@@ -26,7 +26,7 @@ type TFakeMobileToggle = {
 // The fake also mirrors the real `mobileToggle` markup (a toggle button
 // linked to a panel via `aria-controls`/`id`) closely enough to exercise
 // `SiteNavigation`'s own open/close wiring end-to-end.
-vi.mock('@blog/ui/molecules', () => ({
+vi.mock('@blog/ui/molecules/primary-navigation', () => ({
   PrimaryNavigation: ({
     links,
     actions,

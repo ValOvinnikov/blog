@@ -1,6 +1,6 @@
 'use client';
 
-import { BackToTop } from '@blog/ui/atoms';
+import { BackToTop } from '@blog/ui/atoms/back-to-top';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 

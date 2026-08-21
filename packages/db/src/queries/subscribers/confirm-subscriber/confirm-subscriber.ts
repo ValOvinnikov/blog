@@ -8,8 +8,8 @@ export type TConfirmSubscriberResult =
   | { outcome: 'not-found' };
 
 // Flips a subscriber from `pending` to `active` by their confirmation
-// token — the confirm-email link's route handler (#1104,
-// `/newsletter/confirm?token=...`).
+// token — the confirm-email link's route handler
+// (`/newsletter/confirm?token=...`).
 //
 // Idempotent-safe by design, not by accident: a second hit on the same
 // link (double-click, browser link-prefetch, a user revisiting an old

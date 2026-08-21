@@ -20,7 +20,7 @@ export const buildBlogListMetadata = async (
   page: number,
 ): Promise<Metadata> => {
   const [result, t] = await Promise.all([
-    service.pages.blog.v1.getIndexPage({ page }),
+    service.pages.blog.v1.getIndexPage(),
     getTranslations('pagination'),
   ]);
 

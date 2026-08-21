@@ -1,5 +1,5 @@
 import { ICONS, Size } from '@blog/config';
-import { Icon } from '@blog/ui/atoms';
+import { Icon } from '@blog/ui/atoms/icon';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { buildShareLinks } from '@web/utils/build-share-links';
 import { toSocialIconName } from '@web/utils/to-social-icon-name';

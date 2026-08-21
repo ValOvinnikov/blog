@@ -1,12 +1,15 @@
 import { Size, routes } from '@blog/config';
 import type { TPostCard } from '@blog/service';
-import { Avatar, Eyebrow, Icon } from '@blog/ui/atoms';
-import { ActionList, ShareLink } from '@blog/ui/molecules';
+import { Avatar } from '@blog/ui/atoms/avatar';
+import { Eyebrow } from '@blog/ui/atoms/eyebrow';
+import { Icon } from '@blog/ui/atoms/icon';
+import { ActionList } from '@blog/ui/molecules/action-list';
+import { ShareLink } from '@blog/ui/molecules/share-link';
+import { Pagination } from '@blog/ui/organisms/pagination';
 import {
-  Pagination,
-  PostsSection,
   type IPostCardData,
-} from '@blog/ui/organisms';
+  PostsSection,
+} from '@blog/ui/organisms/posts-section';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { TopicChipList } from '@web/components/shared/topic-chip-list';
@@ -102,25 +105,19 @@ type TStory = StoryObj<typeof meta>;
 /** The bare shell — only `heading` and `posts`, no optional slots. */
 export const Minimal: TStory = {};
 
-/** `/blog` — topic chips, pagination, and a page-builder module below the shell. */
+/**
+ * `/blog` — the archive itself renders through `PostListModule` in the
+ * `modules` position, not the `posts`/`pagination` slots, so this story
+ * leaves both unset.
+ */
 export const BlogIndex: TStory = {
   args: {
+    posts: undefined,
     supportingText: 'Essays and notes on building this site.',
     topicChips: <TopicChipList topics={topics} />,
-    pagination: (
-      <Pagination
-        currentPage={1}
-        totalPages={4}
-        createHref={(page) => `/blog/page/${page}`}
-        ariaLabel="Blog pagination"
-        previousLabel="Previous"
-        nextLabel="Next"
-        linkAs={SmartLink}
-      />
-    ),
     modules: (
       <div className="px-gutter py-section text-muted text-center">
-        Page-builder modules render here
+        The post-list archive and any page-builder modules render here
       </div>
     ),
   },

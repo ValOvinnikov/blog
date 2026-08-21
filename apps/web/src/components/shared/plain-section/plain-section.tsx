@@ -1,5 +1,5 @@
 import { type IWithDataTestId, Size } from '@blog/config';
-import { Heading } from '@blog/ui/atoms';
+import { Heading } from '@blog/ui/atoms/heading';
 import type { THeadingLevel } from '@blog/ui/lib/react';
 import type { ReactNode } from 'react';
 

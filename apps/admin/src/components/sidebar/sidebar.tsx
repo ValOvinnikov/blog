@@ -1,10 +1,10 @@
 import { Size, type TIconName } from '@blog/config';
+import { Avatar } from '@blog/ui/atoms/avatar';
+import { Icon } from '@blog/ui/atoms/icon';
 import {
-  Avatar,
-  Icon,
   StatusBadge,
   type TStatusBadgeProps,
-} from '@blog/ui/atoms';
+} from '@blog/ui/atoms/status-badge';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 

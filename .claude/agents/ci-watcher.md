@@ -26,9 +26,14 @@ pass/fail data back. You never decide why something failed, and you never
 suggest a fix — diagnosis and remediation stay with the orchestrator.
 
 Read-only is enforced, not just asked (#425, reused here per #464): you run
-under `permissionMode: dontAsk` (any Bash call the permission layer would
-prompt for is auto-denied) plus a PreToolUse guard
+under `permissionMode: dontAsk`, plus a PreToolUse guard
 (`.claude/hooks/read-only-agent-guard.sh`) that denies write-shaped commands.
+**dontAsk does not by itself fail closed on every command that would
+otherwise prompt** (#1797) — it also runs a command unprompted whenever the
+harness's own built-in classifier judges it safely read-only, and that
+classifier can misjudge a write-shaped command (`sed -i` did, once, for real)
+as ordinary text processing. The PreToolUse guard is what actually covers
+that gap, not dontAsk on its own.
 You have no Edit/Write tools; `Bash` is exclusively for `gh` read commands. If
 a legitimate read-only command is denied, that is a signal you're reaching for
 the wrong command, not something to route around. The PreToolUse guard only

@@ -58,8 +58,8 @@ export const blogPostPageVariants = tv({
       'lg:col-start-2 lg:row-start-2 lg:mx-0',
       'group-data-[depth=SKIM]/depth:hidden',
     ],
-    // Both `footer` and `newsletter` (below) now render as `Article.Body`'s
-    // own last children (#1307) — `body`'s base slot already applies
+    // Both `footer` and `newsletter` (below) render as `Article.Body`'s own
+    // last children — `body`'s base slot already applies
     // `mx-auto`/`px-gutter`/`max-w-measure`, so neither needs its own width
     // cap here, only the SKIM-depth gate.
     footer: ['group-data-[depth=SKIM]/depth:hidden'],
@@ -73,7 +73,7 @@ export const blogPostPageVariants = tv({
     // The end-of-article `NewsletterForm` (`compact`) strip, nested inside
     // `Article.Body` right after `footer` — genuine article content sharing
     // the article's real content column, not a page-level sibling mimicking
-    // its width from outside (#1307). `mt-6` gives it its own gap under the
+    // its width from outside. `mt-6` gives it its own gap under the
     // tags footer above. Unlike `footer`, deliberately NOT gated under SKIM
     // depth — it stayed visible at every depth before this move and still
     // should.

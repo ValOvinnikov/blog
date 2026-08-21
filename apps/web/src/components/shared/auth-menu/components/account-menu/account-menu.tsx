@@ -1,8 +1,10 @@
 'use client';
 
 import { ICONS, routes, Size } from '@blog/config';
-import { Avatar, Icon } from '@blog/ui/atoms';
-import { PopoverMenu, WindowChrome } from '@blog/ui/molecules';
+import { Avatar } from '@blog/ui/atoms/avatar';
+import { Icon } from '@blog/ui/atoms/icon';
+import { PopoverMenu } from '@blog/ui/molecules/popover-menu';
+import { WindowChrome } from '@blog/ui/molecules/window-chrome';
 import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { toSessionUsername } from '@web/utils/to-session-username';

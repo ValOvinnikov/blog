@@ -52,6 +52,24 @@ describe('getRevalidateTagsForType', () => {
     expect(getRevalidateTagsForType('nope', 'x')).toEqual([]);
   });
 
+  // Deliberately covers all module types, including three with dedicated
+  // exact-tag assertions above — this loop's job isn't to duplicate those,
+  // it's to confirm the `module:<id>` append fires for *every* module key,
+  // which no single test above checks across the full set.
+  it.each([
+    'module_hero',
+    'module_postList',
+    'module_taxonomyList',
+    'module_postLatest',
+    'module_content',
+    'module_cta',
+    'module_newsletter',
+  ])('resolves a non-empty tag list plus module:<id> for %s', (type) => {
+    const tags = getRevalidateTagsForType(type, 'doc-1');
+    expect(tags.length).toBeGreaterThan(0);
+    expect(tags).toContain('module:doc-1');
+  });
+
   // Security: the type comes from the webhook body. The `switch` must return no
   // tags for these prototype/method names — never dispatch to an inherited
   // function (CodeQL js/unvalidated-dynamic-method-call).

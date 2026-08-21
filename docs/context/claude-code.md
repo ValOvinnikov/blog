@@ -98,7 +98,12 @@ contracts:
     bypass that would otherwise move or overwrite a file outside the
     Edit/Write check entirely. A needed product-code change comes back as a
     finding for the orchestrator to route, never a fix this agent makes
-    itself.
+    itself. Sees the product change it's covering via the same "Sequential
+    agent worktrees compose" mechanism below (#1796) rather than any seeding
+    step of its own — the orchestrator must land the layer agent's commit
+    first. The fail-without-the-fix check for a regression test is likewise
+    the orchestrator's job: `test-writer` cannot revert product code under
+    any tool, so it cannot run that check itself (`develop-feature` §4).
   - `seo-auditor` — read-only SEO/metadata audit of the full diff, dispatched
     alongside `reviewer` (never instead of it) whenever a change touches
     `apps/web` routes, metadata, structured data, or feeds. Applies the
@@ -158,18 +163,45 @@ contracts:
   `reviewer`, `a11y-reviewer`, `seo-auditor`, `explore`, `ci-watcher`, and
   `verify-runner` are read-only by **enforcement**, not just prose (#425,
   #464, #466); `test-writer` reuses the same `Bash` guard although it isn't
-  fully read-only (#396). All seven run under `permissionMode: dontAsk`, so
-  any Bash call the permission engine would prompt for (redirects, `sed -i`,
-  `tee`, unrecognized binaries) is auto-denied, and a per-agent `PreToolUse`
-  guard (`read-only-agent-guard.sh`)
-  denies the write-shaped commands the project allow-list would otherwise
-  admit (`git commit` — including with leading global flags like
-  `git -C dir commit`, `mkdir`, `cp`, `pnpm typegen`, `pnpm exec`/
-  `pnpm --filter ... exec`, …). Residual, accepted: commands that execute
-  package scripts the allow-list doesn't flag as write-shaped (`pnpm test`,
-  `pnpm dev`, `turbo run`) can still write, and the guard's quote-naive
-  segment splitting can false-positive on search patterns containing e.g.
-  `&& mkdir ` — denials tell the agent to fall back to Grep/Read. This is a
+  fully read-only (#396). All seven run under `permissionMode: dontAsk`, plus
+  a per-agent `PreToolUse` guard (`read-only-agent-guard.sh`) that denies the
+  write-shaped commands the project allow-list would otherwise admit
+  (`git commit` — including with leading global flags like `git -C dir
+commit`, `mkdir`, `cp`, `mv`, `tee`, `pnpm typegen`, `pnpm exec`/
+  `pnpm --filter ... exec`, …) plus `sed -i`/`--in-place`, `perl -i`, and
+  shell redirection (`>`, `>>`, and their fd-qualified forms) to anything
+  other than a harmless sink like `/dev/null` or an fd duplication
+  (`2>&1`).
+
+  **`dontAsk` does not itself fail closed on every command that would
+  otherwise prompt — this project previously documented it as if it did,
+  and #1797 found that wrong for real.** `dontAsk` runs a command unprompted
+  whenever it matches `permissions.allow`, is approved by a `PreToolUse`
+  hook, **or** the harness's own built-in classification judges the command
+  safely read-only — that third path is not something this project
+  configures, and it is not sound: a `test-writer` agent ran `sed -i`
+  against a real product file, unprompted and unblocked, because the
+  harness's own heuristic treated `sed` as an ordinary read/text-processing
+  command without accounting for the `-i` flag turning it into a write.
+  `perl -i`, `tee`, and shell redirection are the same class of
+  misjudgment. `read-only-agent-guard.sh` is therefore the actual
+  enforcement for every write-shaped command it lists — full stop,
+  regardless of what `dontAsk`'s own classifier would have done on its
+  own — not a mop-up for a small residue `dontAsk` already caught.
+
+  Redirection detection (`>`/`>>` and their fd-qualified/`&`-combined
+  forms) pads a space around every match before tokenizing, so it catches
+  the operator whether it's glued to its target, its preceding word, both,
+  or neither (`echo hi>file`, `echo hi >file`, `echo hi> file`, `echo hi >
+file` are all denied alike) — an earlier version only handled the
+  fully-spaced form and missed the other three, which #1797's review
+  caught as covering far less than intended.
+
+  Residual, accepted: commands that execute package scripts the allow-list
+  doesn't flag as write-shaped (`pnpm test`, `pnpm dev`, `turbo run`) can
+  still write; and the guard's quote-naive segment splitting can
+  false-positive on search patterns containing e.g. `&& mkdir ` — denials
+  tell the agent to fall back to Grep/Read. This is a
   guardrail against honest confusion, not a security boundary — it doesn't
   chase further obfuscation (case-insensitive filesystem tricks,
   path-qualified binaries, wrapper commands); see #397 for why full
@@ -223,10 +255,15 @@ contracts:
     and `test-writer` agent frontmatter — `test-writer` sets a `GUARD_LABEL`
     env var on its hook command so the deny message names it correctly
     rather than calling it "read-only")
-    backing the enforcement described above. Its deny list mirrors the
-    write-shaped entries in `settings.json` `permissions.allow` — keep the
-    two in sync. `read-only-agent-guard.test.sh` pins the deny/allow matrix
-    (including the bypasses found across #425's review rounds); run it
+    backing the enforcement described above. Its `DENY_PREFIXES` list
+    mirrors the write-shaped entries in `settings.json` `permissions.allow`
+    — keep the two in sync. The `sed`/`perl` in-place-edit and redirection
+    checks (#1797) are the deliberate exception: those shapes have no single
+    allow-list prefix to mirror (`sed -i` vs. `sed -n`, `cmd > file` vs.
+    `cmd > /dev/null`), so they get their own narrow, targeted detection
+    functions instead of a prefix-list entry. `read-only-agent-guard.test.sh`
+    pins the deny/allow matrix (including the bypasses found across #425's
+    review rounds and the in-place/redirection cases added for #1797); run it
     directly or via CI (see [`docs/context/ci-automation.md`](./ci-automation.md)).
   - `test-writer-scope-guard.sh` — `PreToolUse` hook (wired in the
     `test-writer` agent frontmatter) that denies any `Edit`/`Write` whose
@@ -369,6 +406,29 @@ contracts:
     silently building stale code. The `post-checkout` hook produces the
     farm copies the pnpm layout needs, covers manually created worktrees
     too, and keeps a single mechanism in charge.
+- **Sequential agent worktrees compose via `worktree.baseRef: "head"`**
+  (`.claude/settings.json`) — every layer-agent and `test-writer` dispatch
+  carries `isolation: worktree` in its own frontmatter, and this setting means
+  each new worktree branches from the **orchestrator's current local `HEAD`**,
+  not from `origin/<default-branch>`. So dispatching agent B after agent A only
+  sees A's work if A's commit was landed onto the orchestrator's local branch
+  first (`git merge --ff-only <sha>` when B branches from the same tip A did,
+  `git cherry-pick` if `HEAD` moved since — e.g. parallel agents, or an
+  intervening `pnpm typegen` commit) — a bare "agent A's turn finished" is not
+  enough. This is what makes `test-writer` (`develop-feature` §4) able to see
+  the product change it was dispatched to cover without any seeding step of
+  its own: it has no sanctioned way to pull in a file itself (`cp`/`mv` are
+  denied, and the mutating `git` subcommands it would need are either on
+  `read-only-agent-guard.sh`'s deny list or absent from `permissions.allow`
+  entirely, so `permissionMode: dontAsk` fails closed on them) — the
+  orchestrator landing the commit first is the only mechanism, not a
+  workaround for one (#1796; the earlier workaround — racing a `cp` into the
+  worktree before the agent's first turn read the files — was timing-dependent
+  and has been retired). Cleanup after push:
+  `git cherry origin/<feat-branch> <agent-branch>` (patch-id based, not
+  `rev-list --count`, since a rebase changes SHAs but not patches) confirms an
+  agent's worktree branch is fully landed before it's removed
+  (`develop-feature` §8).
 - **Worktree ownership across parallel sessions** — `.claude/worktrees/` is
   shared by every Claude job running against this checkout, so
   `git worktree list` mixes one session's worktrees with other jobs' live

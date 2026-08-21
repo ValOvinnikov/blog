@@ -4,21 +4,20 @@ import { subscribers, type TSubscriber } from '@blog/db/schema/subscribers';
 import type { TResult } from '@blog/utils';
 import { and, eq } from 'drizzle-orm';
 
-// The three shapes `NewsletterForm`'s server action (#1104) needs to
+// The three shapes a newsletter signup form's submit action needs to
 // distinguish: a brand-new signup, a re-submission while a confirmation
-// email is still unconfirmed, and the design doc's "already subscribed"
-// inline error state (Feature 5's Error states) for an email that's already
-// `active`. All three carry the row itself so the caller (e.g. to re-send
-// the confirmation email via Resend using the existing token) doesn't need
-// a second read.
+// email is still unconfirmed, and an "already subscribed" inline error for
+// an email that's already `active`. All three carry the row itself so the
+// caller (e.g. to re-send the confirmation email using the existing token)
+// doesn't need a second read.
 export type TCreatePendingSubscriberResult =
   | { outcome: 'created'; subscriber: TSubscriber }
   | { outcome: 'already-pending'; subscriber: TSubscriber }
   | { outcome: 'already-active'; subscriber: TSubscriber };
 
 // Creates a pending subscriber row for `email` — the newsletter signup
-// form's submit action (Feature 5 / #1044, double opt-in per D9). `email`
-// is normalized (trimmed, lower-cased) before every insert/lookup, so
+// form's submit action (double opt-in). `email` is normalized (trimmed,
+// lower-cased) before every insert/lookup, so
 // `Foo@Example.com` and `foo@example.com` collide on the same row rather
 // than the table's `unique` constraint on `email` depending on Postgres's
 // (case-sensitive) `text` comparison to catch it.

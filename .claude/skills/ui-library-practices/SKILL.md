@@ -85,6 +85,19 @@ src/atoms/theme-toggle/
   <nav aria-label={ariaLabel} />             <nav aria-label="Site navigation" />
   ```
 
+  **Exception — compose, don't accept an override, when the accessible name is
+  just the component's own visible text plus values it already receives.** An
+  `ariaLabel` prop that _replaces_ the name can't be validated by types or
+  tests, so a caller can pass a string that omits the visible text and it will
+  type-check, render, and silently fail WCAG 2.5.3 for speech-input users.
+  Prefer building the name internally from props already required — both source
+  strings still come from the app; the component only contributes punctuation.
+  Put the **whole** name in one visually-hidden `span` and `aria-hidden` the
+  visible copy, rather than appending a hidden suffix beside visible text: name
+  computation trims at each element boundary, so a separator starting with
+  whitespace silently loses it. `NavLink` (`hasLabel={false}`) is the precedent
+  — a real link whose entire name comes from one `sr-only` span.
+
 - **Never format dates inside a UI component.** Date display is locale-dependent
   and the UI layer has no access to the user's locale. Pass two props:
   `publishedAt?: string` (ISO 8601, for `<time dateTime>`) and
@@ -92,9 +105,15 @@ src/atoms/theme-toggle/
   `Intl.DateTimeFormat`/Next helpers). The `<time>` renders only when **both**
   are present: `{publishedAt && formattedDate && <time dateTime={publishedAt}>{formattedDate}</time>}`.
 
-- **Card/post title slots must render a heading element.** `PostCard.Title` is
-  an `<h2>` wrapper (not `<div>`) so the card title joins the document outline;
-  the consumer passes the link as `children` (`<h2><a href>Post title</a></h2>`).
+- **Card title slots must render a heading element, not a `<div>`**, so the
+  title joins the document outline. Two patterns exist, and new components
+  should prefer the second:
+  - `PostCard.Title` hardcodes `<h3>`; the consumer passes the link as
+    `children` (`<h3><a href>Post title</a></h3>`). Every consumer is therefore
+    locked to `h3` regardless of where the card sits in the page outline.
+  - `TaxonomyCard` instead takes a required `headingLevel` prop and renders
+    through the `Heading` atom, letting the caller pick the level that fits its
+    own outline. Prefer this for new cards.
 
 - **Also:** semantic elements first (`button`, `nav`, `article`, `time`);
   interactive atoms expose `focus-visible` styles (global via `tokens.css`);
