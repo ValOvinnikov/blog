@@ -17,6 +17,12 @@ export type TDeprovisionEnv = {
   // Every step checks this first and, when true, only logs what it would do
   // — never calls a delete API or writes to the `tenants` row.
   dryRun: boolean;
+  // Set automatically by Actions for every workflow run; absent for a local
+  // run outside Actions. Deliberately not `requireEnv`'d — a missing actor
+  // is an audit-write failure to log and skip, not a reason to abort the
+  // whole script before it does anything.
+  githubActor: string | undefined;
+  githubRunId: string | undefined;
 };
 
 export function loadDeprovisionEnv(dryRun: boolean): TDeprovisionEnv {
@@ -26,5 +32,7 @@ export function loadDeprovisionEnv(dryRun: boolean): TDeprovisionEnv {
     vercelTeamId: process.env['VERCEL_TEAM_ID'],
     vercelWebProjectId: requireEnv('VERCEL_PROJECT_ID'),
     dryRun,
+    githubActor: process.env['GITHUB_ACTOR'],
+    githubRunId: process.env['GITHUB_RUN_ID'],
   };
 }

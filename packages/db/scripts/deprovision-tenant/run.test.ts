@@ -41,6 +41,8 @@ const env = {
   vercelTeamId: undefined,
   vercelWebProjectId: 'proj-1',
   dryRun: false,
+  githubActor: 'octocat',
+  githubRunId: 'run-42',
 };
 
 beforeEach(() => {
