@@ -11,12 +11,12 @@ Sanity Studio (apps/cms)
 packages/config/src/sanity/generated/{schema.json,types.ts}   (committed)
       ▼
 @blog/service
-  ├─ service.pages.<page>   ──thin query──►  { title, hero?, modules[]: TModuleRef, seo }
+  ├─ service.pages.<page>   ──thin query──►  { title, hero?, modules[]: TModule, seo }
   └─ service.modules.<type> ──runQuery + groqd, keyed by module id──►  typed module view-model
       ▼
 apps/web
   ├─ page.tsx           fetches service.pages.<page>, checks result.ok
-  ├─ ModuleRenderer      maps each TModuleRef → MODULE_MAP[type]({ id, locale })
+  ├─ ModuleRenderer      maps each TModule → MODULE_MAP[type]({ id, locale })
   └─ per-module component  fetches service.modules.<type>, maps view-model ──plain typed props──►  @blog/ui organism
 ```
 
@@ -37,8 +37,8 @@ apps/web
   before touching `result.data`** and owns the failure decision (`notFound()`,
   fallback, or early return).
 - **Page queries are thin.** `page_home`/`page_generic` project only page
-  fields plus lightweight module descriptors (`TModuleRef = { key, type, id }`,
-  from `to-module-ref.ts`) — no module internals, no `conditionalByType`. Each
+  fields plus lightweight module descriptors (`TModule = { id, type }`, from
+  `to-module.ts`) — no module internals, no `conditionalByType`. Each
   module type owns its own fetcher (`service.modules.<type>.v1.get<Type>(id)`)
   under `packages/service/src/features/modules/<type>/`, with its own GROQ,
   transformer, and `T | undefined` view-model (`THeroModule`,
@@ -58,19 +58,28 @@ apps/web
   render. A human still reviews and publishes the draft in Studio before it
   goes live — the write path only stages content, it never publishes.
 - **Web renders modules generically.** `apps/web/src/modules/module-map.ts`
-  registers `MODULE_MAP: Record<Exclude<TModuleType, 'module_hero'>, (props) =>
-ReactNode>` — typed exhaustively over every module type in
-  `TModuleType`/`MODULE_TYPE` (`@blog/config`) **except** `module_hero`, so
-  omitting any other module type from the map is a compile error.
-  `module_hero` is deliberately excluded: the CMS schema never allows a
-  `module_hero` entry inside any page's `modules[]` array (`page_generic`
-  allows only `content`/`cta`; `page_home` allows only `postList`/`cta`), so
-  it can never reach `ModuleRenderer` — see the home-route note below.
+  registers `MODULE_MAP: Record<Exclude<TModuleType, 'module_hero' |
+'module_postList' | 'module_taxonomyList'>, (props) => ReactNode>` — typed
+  exhaustively over `TModuleType` (`@blog/config`) minus those three, so
+  omitting any other module type from the map is a compile error. The three
+  are excluded because each is reached through a **dedicated slot** rather
+  than a page's `modules[]` array, so none can ever reach `ModuleRenderer`:
+  `module_hero` via the home template's `hero` prop, `module_postList` via
+  `page_blog`'s `postList` reference, and `module_taxonomyList` by the same
+  rule once the taxonomy index pages that hold it exist.
+
+  Exclusion from `MODULE_MAP` does **not** exempt a module from
+  `REVALIDATE_TAGS` (`apps/web/src/utils/revalidate-tags/revalidate-tags.ts`),
+  which is typed `Record<TModuleType, readonly string[]> &
+Partial<Record<TSanityType, …>>` — every module type needs a purge-tag entry,
+  with no escape hatch. A module type registered without one fails
+  `type-check`; before that guard existed it would have rendered fine and
+  silently never purged from the CDN.
   `module-renderer.tsx`'s `ModuleRenderer` walks a page's
-  `modules: TModuleRef[]`, resolves each entry through `MODULE_MAP` (cast to
-  `keyof typeof MODULE_MAP`, since the raw `TModuleType` still includes
-  `module_hero`), and renders the result keyed by the module's stable `_key`;
-  an unrecognized type — including a `module_hero` if the schema constraint
+  `modules: TModule[]`, resolves each entry through `MODULE_MAP` (cast to
+  `keyof typeof MODULE_MAP`, since the raw `TModuleType` still includes the
+  three excluded types), and renders the result keyed by the module's `id`;
+  an unrecognized type — including one of those three, if a schema constraint
   were ever loosened — renders nothing and logs a warning rather than failing
   the page. Each per-module component
   (`apps/web/src/modules/<type>/<type>-module.tsx`) is an async Server

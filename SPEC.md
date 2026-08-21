@@ -175,17 +175,17 @@ incrementally (#251).
 Every `module_*` document also carries a **required** `brandVariant` field
 (stored values from `@blog/config`'s `BRAND_VARIANT` const —
 `PRIMARY`/`SECONDARY` for `module_content`/`module_cta`/`module_newsletter`/
-`module_postList`/`module_postLatest`; `module_hero`'s schema additionally allows
-`BRAND_PRIMARY`), plus an optional, all-remaining-fields-optional `layout`
+`module_postList`/`module_postLatest`/`module_taxonomyList`; `module_hero`'s
+schema additionally allows `BRAND_PRIMARY`), plus an optional, all-remaining-fields-optional `layout`
 object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
 `module_hero`, which uses the leaner `heroLayout` type), `dividerTop`,
 `dividerBottom` — stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`
 consts; there is no `align` field on `layout` — see `SectionHeader` below
 for heading alignment).
-`module_cta`/`module_postList`/`module_postLatest`/`module_newsletter`
+`module_cta`/`module_postList`/`module_postLatest`/`module_taxonomyList`/`module_newsletter`
 additionally carry a `sectionHeader` object (`heading`, `supportingText`,
 `align` — stored values from `HEADING_ALIGN`; all optional on
-`module_postList`/`module_postLatest`, `heading` required on
+`module_postList`/`module_postLatest`/`module_taxonomyList`, `heading` required on
 `module_cta`/`module_newsletter` via a per-module `requireHeading` override
 on the shared `sectionHeaderField()` helper). `module_content` has no `sectionHeader` —
 its rich-text `body` supplies any in-content headings, so a separate
@@ -193,14 +193,21 @@ structured heading field would just be a second way to do the same thing.
 `module_hero` has no `sectionHeader` either — its heading fields are its
 own dedicated schema, unrelated to this shared shape.
 
+`module_taxonomyList` lists taxonomy entries as cards. Which taxonomy it lists
+is not an authored field — it is inferred from which index page's required slot
+holds it, the same inference-by-slot rule the post list uses. Like `module_hero`
+and `module_postList` it is excluded from `MODULE_MAP` and reached through a
+dedicated slot, never `ModuleRenderer`; it still carries a `REVALIDATE_TAGS`
+entry, which is required for every module type regardless.
+
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
 schema allows), `layout` as `TLayout | undefined`, and (where applicable)
 `sectionHeader` as `TSectionHeader | undefined` — with no faked defaults on
 either: unset stays unset end to end. In `apps/web`, every module component
-that renders a `@blog/ui` organism — including the two rendered through a
+that renders a `@blog/ui` organism — including those reached through a
 dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
-(§5 above): `module_hero` via the home template's `hero` slot, and
+(§5 above): `module_hero` via the home template's `hero` slot and
 `module_postList` via `page_blog`'s `postList` reference, both still
 styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated
