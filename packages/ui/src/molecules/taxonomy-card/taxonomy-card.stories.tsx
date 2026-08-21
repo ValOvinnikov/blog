@@ -13,7 +13,6 @@ const meta = {
     href: '/topics/engineering',
     headingLevel: 2,
     postCountLabel: '12 posts',
-    ariaLabel: 'Engineering, 12 posts',
   },
 } satisfies Meta<typeof TaxonomyCard>;
 
@@ -32,7 +31,6 @@ export const WithoutDescription: TStory = {
     title: 'react',
     href: '/tags/react',
     postCountLabel: '1 post',
-    ariaLabel: 'react, 1 post',
   },
 };
 
@@ -45,7 +43,6 @@ export const Grid: TStory = {
         headingLevel={2}
         description="Posts about building things — architecture, tooling, and the craft of software."
         postCountLabel="12 posts"
-        ariaLabel="Engineering, 12 posts"
       />
       <TaxonomyCard
         title="Design"
@@ -53,14 +50,12 @@ export const Grid: TStory = {
         headingLevel={2}
         description="Visual and interaction design notes."
         postCountLabel="3 posts"
-        ariaLabel="Design, 3 posts"
       />
       <TaxonomyCard
         title="react"
         href="/tags/react"
         headingLevel={2}
         postCountLabel="1 post"
-        ariaLabel="react, 1 post"
       />
     </PostGrid>
   ),

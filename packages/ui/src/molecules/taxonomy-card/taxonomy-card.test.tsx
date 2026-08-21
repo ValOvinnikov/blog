@@ -11,17 +11,16 @@ const setup = customRender(TaxonomyCard, {
   href: `/topics/${faker.lorem.slug()}`,
   postCountLabel: '5 posts',
   headingLevel: 2 as const,
-  ariaLabel: 'Engineering, 5 posts',
 });
 
 describe(`<${TaxonomyCard.name}/>`, () => {
   it('renders the title as a heading at the given level, linking to href', () => {
     const title = faker.lorem.words(3);
     const href = `/topics/${faker.lorem.slug()}`;
-    setup({ title, href, headingLevel: 3, ariaLabel: title });
+    setup({ title, href, headingLevel: 3 });
 
-    const heading = screen.getByRole('heading', { level: 3, name: title });
-    const link = screen.getByRole('link', { name: title });
+    const heading = screen.getByRole('heading', { level: 3 });
+    const link = screen.getByRole('link');
     expect(heading).toContainElement(link);
     expect(link).toHaveAttribute('href', href);
   });
@@ -36,15 +35,25 @@ describe(`<${TaxonomyCard.name}/>`, () => {
     expect(screen.queryByText(/posts about/i)).not.toBeInTheDocument();
   });
 
-  it('renders the pre-formatted post count label', () => {
+  it('renders the pre-formatted post count label as visible text', () => {
     setup({ postCountLabel: '1 post' });
     expect(screen.getByText('1 post')).toBeVisible();
   });
 
-  it("overrides the link's accessible name with the ariaLabel prop", () => {
-    setup({ title: 'Engineering', ariaLabel: 'Engineering, 5 posts' });
+  it("composes the link's accessible name from the visible title followed by the post count", () => {
+    setup({ title: 'Engineering', postCountLabel: '5 posts' });
+    const link = screen.getByRole('link');
+    expect(link).toHaveAccessibleName('Engineering, 5 posts');
+  });
+
+  it('honours a custom accessibleNameSeparator when composing the accessible name', () => {
+    setup({
+      title: 'Engineering',
+      postCountLabel: '5 posts',
+      accessibleNameSeparator: ' — ',
+    });
     expect(
-      screen.getByRole('link', { name: 'Engineering, 5 posts' }),
+      screen.getByRole('link', { name: 'Engineering — 5 posts' }),
     ).toBeVisible();
   });
 

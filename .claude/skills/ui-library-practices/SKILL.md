@@ -85,6 +85,15 @@ src/atoms/theme-toggle/
   <nav aria-label={ariaLabel} />             <nav aria-label="Site navigation" />
   ```
 
+  **Exception — compose, don't accept an override, when the accessible name is
+  just the component's own visible text plus values it already receives.** An
+  `ariaLabel` prop that _replaces_ the name can't be validated by types or
+  tests, so a caller can pass a string that omits the visible text and it will
+  type-check, render, and silently fail WCAG 2.5.3 for speech-input users.
+  Prefer building the name internally (visible text + a visually-hidden `span`
+  appending the rest, see `Avatar`) from props already required — both source
+  strings still come from the app; the component only contributes punctuation.
+
 - **Never format dates inside a UI component.** Date display is locale-dependent
   and the UI layer has no access to the user's locale. Pass two props:
   `publishedAt?: string` (ISO 8601, for `<time dateTime>`) and

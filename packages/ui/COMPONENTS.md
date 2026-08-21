@@ -254,7 +254,7 @@ Props: tags: (string | ITagListItem)[] · linkAs?: TAnchorElementType _(extends 
 ### TaxonomyCard — `molecules/taxonomy-card/taxonomy-card.tsx`
 
 summary card for a taxonomy entry (topic or tag) in a listing: title, optional description, and post count, linking to the entry's archive.
-Props: title: string · description?: string · postCountLabel: string · href: string · headingLevel: THeadingLevel · ariaLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
+Props: title: string · description?: string · postCountLabel: string · href: string · headingLevel: THeadingLevel · accessibleNameSeparator?: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
 ### TerminalChip — `molecules/terminal-chip/terminal-chip.tsx`
 

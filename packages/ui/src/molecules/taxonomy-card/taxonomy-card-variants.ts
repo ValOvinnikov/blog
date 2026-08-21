@@ -11,6 +11,7 @@ export const taxonomyCardVariants = tv({
       'motion-reduce:transition-none',
     ],
     link: ['before:absolute before:inset-0'],
+    accessibleName: ['sr-only'],
     description: ['text-prose leading-[1.55]', 'text-muted line-clamp-2'],
     count: ['font-mono text-label', 'text-subtle'],
   },

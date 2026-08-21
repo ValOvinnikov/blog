@@ -15,8 +15,8 @@ export type TTaxonomyCardProps = IWithClassName &
     href: string;
     /** Heading depth for `title` — the caller decides based on where the card sits in the page outline. */
     headingLevel: THeadingLevel;
-    /** Accessible name for the card's link, e.g. combining `title` and `postCountLabel` so the count is announced too. */
-    ariaLabel: string;
+    /** Joins `title` and `postCountLabel` in the link's accessible name. Defaults to `', '`; override for scripts where that punctuation reads wrong. */
+    accessibleNameSeparator?: string;
     /** Component the card's link renders as — pass the app router's Link for client-side navigation. Defaults to a plain `<a>`. */
     linkAs?: TAnchorElementType;
   };
@@ -33,7 +33,7 @@ export const TaxonomyCard = ({
   postCountLabel,
   href,
   headingLevel,
-  ariaLabel,
+  accessibleNameSeparator = ', ',
   linkAs,
   className,
   dataTestId,
@@ -43,8 +43,13 @@ export const TaxonomyCard = ({
   return (
     <article className={s.root({ class: className })} data-testid={dataTestId}>
       <Heading level={headingLevel} visual="card">
-        <LinkComponent href={href} aria-label={ariaLabel} className={s.link()}>
-          {title}
+        <LinkComponent href={href} className={s.link()}>
+          <span aria-hidden="true">{title}</span>
+          <span className={s.accessibleName()}>
+            {title}
+            {accessibleNameSeparator}
+            {postCountLabel}
+          </span>
         </LinkComponent>
       </Heading>
       {description && <p className={s.description()}>{description}</p>}
