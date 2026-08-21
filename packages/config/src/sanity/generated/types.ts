@@ -453,9 +453,6 @@ export type Page_home = {
   modules?: Array<
     | ({
         _key: string;
-      } & Module_postListReference)
-    | ({
-        _key: string;
       } & Module_postLatestReference)
     | ({
         _key: string;

@@ -2789,21 +2789,6 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_postList.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
                   "name": "module_postLatest.reference"
                 }
               },
