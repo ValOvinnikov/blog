@@ -142,25 +142,6 @@ export type RichText = Array<
     } & Aside)
 >;
 
-export type Module_taxonomyList = {
-  _id: string;
-  _type: 'module_taxonomyList';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
-  sectionHeader?: SectionHeader;
-  layout?: Layout;
-};
-
-export type SectionHeader = {
-  _type: 'sectionHeader';
-  heading?: string;
-  supportingText?: string;
-  align?: 'LEFT' | 'CENTER' | 'RIGHT';
-};
-
 export type Module_postLatest = {
   _id: string;
   _type: 'module_postLatest';
@@ -172,6 +153,13 @@ export type Module_postLatest = {
   sectionHeader?: SectionHeader;
   limit?: number;
   layout?: Layout;
+};
+
+export type SectionHeader = {
+  _type: 'sectionHeader';
+  heading?: string;
+  supportingText?: string;
+  align?: 'LEFT' | 'CENTER' | 'RIGHT';
 };
 
 export type Skim = {
@@ -380,6 +368,39 @@ export type Settings_site = {
   description?: string;
   tagline?: string;
   defaultOgImage?: ImageWithAlt;
+};
+
+export type Module_taxonomyListReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_taxonomyList';
+};
+
+export type Page_topicIndex = {
+  _id: string;
+  _type: 'page_topicIndex';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  heading?: string;
+  supportingText?: string;
+  taxonomyList?: Module_taxonomyListReference;
+  seo?: Seo;
+};
+
+export type Module_taxonomyList = {
+  _id: string;
+  _type: 'module_taxonomyList';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  sectionHeader?: SectionHeader;
+  emptyMessage?: string;
+  layout?: Layout;
 };
 
 export type Module_postListReference = {
@@ -751,9 +772,8 @@ export type AllSanitySchemaTypes =
   | Link
   | Module_content
   | RichText
-  | Module_taxonomyList
-  | SectionHeader
   | Module_postLatest
+  | SectionHeader
   | Skim
   | Brand
   | SpecLine
@@ -773,6 +793,9 @@ export type AllSanitySchemaTypes =
   | Settings_footer
   | Settings_navigation
   | Settings_site
+  | Module_taxonomyListReference
+  | Page_topicIndex
+  | Module_taxonomyList
   | Module_postListReference
   | Module_ctaReference
   | Module_newsletterReference
