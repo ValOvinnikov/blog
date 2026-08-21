@@ -1,5 +1,6 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
+import { logger } from '@web/utils/logger/logger';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -19,8 +20,10 @@ export interface IPostListModuleProps {
  * PostListModule — the `/blog` archive: fetches the `page_blog.postList`
  * slot's `module_postList` document for the given page and hands it to
  * `PostListModuleView`. Unlike every other module, it always renders — an
- * archive must say something even with zero posts — and 404s when an
- * explicit page number exceeds the corpus's page count.
+ * archive must say something even with zero posts — and 404s (after logging)
+ * both when the fetch fails and when an explicit page number exceeds the
+ * corpus's page count, since either would otherwise render the page's
+ * primary content as silently missing.
  */
 export const PostListModule = async ({ id, page }: IPostListModuleProps) => {
   const [result, blogListT, paginationT] = await Promise.all([
@@ -29,7 +32,14 @@ export const PostListModule = async ({ id, page }: IPostListModuleProps) => {
     getTranslations('pagination'),
   ]);
 
-  if (!result.ok) return null;
+  if (!result.ok) {
+    logger.error('post_list_module.fetch_failed', {
+      id,
+      page,
+      error: result.error,
+    });
+    notFound();
+  }
 
   const {
     brandVariant,

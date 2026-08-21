@@ -41,12 +41,19 @@ describe(PostListModule, () => {
     getPostListMock.mockReset();
   });
 
-  it('renders nothing when the fetch fails', async () => {
-    getPostListMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+  it('logs and calls notFound() when the fetch fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const error = new Error('boom');
+    getPostListMock.mockResolvedValue({ ok: false, error });
 
-    const { container } = await setup();
+    await expect(setup({ page: 2 })).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(container).toBeEmptyDOMElement();
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('post_list_module.fetch_failed'),
+    );
+
+    errorSpy.mockRestore();
   });
 
   it('calls getPostList with the module id and page', async () => {
