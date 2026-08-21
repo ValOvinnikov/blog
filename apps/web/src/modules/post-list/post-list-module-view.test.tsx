@@ -22,7 +22,6 @@ vi.mock('@web/components/shared/smart-link', () => ({
 const post = makePostListItem();
 
 const setup = customRender(PostListModuleView, {
-  id: 'post-list-1',
   brandVariant: BRAND_VARIANT.PRIMARY,
   sectionHeader: {
     heading: 'Latest posts',
@@ -31,30 +30,33 @@ const setup = customRender(PostListModuleView, {
   },
   items: [post],
   layout: undefined,
+  titleId: 'posts-title',
+  dataTestId: 'post-list-module-post-list-1',
   titleFallback: 'Posts',
 });
 
 describe(PostListModuleView, () => {
-  it('labels the section with a unique id derived from the module id', () => {
+  it('labels the section with the given titleId', () => {
     setup();
 
     const label = screen.getByText('Latest posts');
-    expect(label).toHaveAttribute('id', 'latest-posts-post-list-1');
+    expect(label).toHaveAttribute('id', 'posts-title');
 
     const section = label.closest('section');
-    expect(section).toHaveAttribute(
-      'aria-labelledby',
-      'latest-posts-post-list-1',
-    );
+    expect(section).toHaveAttribute('aria-labelledby', 'posts-title');
     expect(section).not.toHaveAttribute('aria-label');
+    expect(section).toHaveAttribute(
+      'data-testid',
+      'post-list-module-post-list-1',
+    );
     expect(
       screen.getByRole('region', { name: 'Latest posts' }),
     ).toBeInTheDocument();
   });
 
-  it('derives a different section id for a different module id, avoiding duplicate DOM ids', () => {
+  it('derives a different section id when given a different titleId, avoiding duplicate DOM ids', () => {
     setup({
-      id: 'post-list-2',
+      titleId: 'other-posts-title',
       sectionHeader: {
         heading: 'More posts',
         supportingText: undefined,
@@ -64,7 +66,7 @@ describe(PostListModuleView, () => {
 
     expect(screen.getByText('More posts')).toHaveAttribute(
       'id',
-      'latest-posts-post-list-2',
+      'other-posts-title',
     );
   });
 
@@ -79,13 +81,10 @@ describe(PostListModuleView, () => {
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Posts' });
     expect(heading).toHaveClass('sr-only');
-    expect(heading).toHaveAttribute('id', 'latest-posts-post-list-1');
+    expect(heading).toHaveAttribute('id', 'posts-title');
 
     const region = screen.getByRole('region', { name: 'Posts' });
-    expect(region).toHaveAttribute(
-      'aria-labelledby',
-      'latest-posts-post-list-1',
-    );
+    expect(region).toHaveAttribute('aria-labelledby', 'posts-title');
     expect(region).not.toHaveAttribute('aria-label');
   });
 
@@ -120,5 +119,11 @@ describe(PostListModuleView, () => {
     expect(previousLink).toHaveAttribute('href', '/topics/engineering/page/1');
     const nextLink = screen.getByRole('link', { name: 'Next' });
     expect(nextLink).toHaveAttribute('href', '/topics/engineering/page/3');
+  });
+
+  it('renders the empty message when items is empty and emptyMessage is provided', () => {
+    setup({ items: [], emptyMessage: 'No posts yet.' });
+
+    expect(screen.getByText('No posts yet.')).toBeInTheDocument();
   });
 });

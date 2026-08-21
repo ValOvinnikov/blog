@@ -220,9 +220,14 @@ Because every archive document is created fresh by the E4/E6/E8 seeding
 migrations, `pageSize` can be defined as a new field with no legacy documents
 to migrate.
 
-`MODULE_PAGE_CONTEXT`'s `isPaginated` half retires with this split. The page-kind
-half survives for `module_content`/`module_cta`, which still care which page
-kind they render on — that is all the contract ever claimed to be for.
+`MODULE_PAGE_CONTEXT` retires **entirely** with this split, not just its
+`isPaginated` half. Earlier revisions of this document claimed the page-kind
+half survived for `module_content`/`module_cta`. That was wrong, and #1829
+verified it: `content`, `cta`, `hero`, `newsletter` and `post-latest` never
+read `context` at all, every context ever constructed passed
+`isPaginated: false`, and no `TOPIC`/`TAG` context was built anywhere. The
+page-kind half had zero readers, so `packages/config/src/constants/page-context.ts`
+is deleted outright.
 
 ### Missing page documents 404
 
@@ -449,7 +454,7 @@ is the first epic where both modes coexist and the one that breaks without it:
 under the pre-split contract the same `BLOG` page context would have to mean
 both "unpaginated `modules[]` teaser" and "paginated required slot" on the same
 page. Scope moves to resolving from the parent page document, and
-`MODULE_PAGE_CONTEXT` loses its `isPaginated` half.
+`MODULE_PAGE_CONTEXT` is deleted outright.
 
 Sub-issues: cms + web **combined** for `module_postLatest` (constraint 2 — a
 new `module_*` type reds `apps/web` until `MODULE_MAP` registers it) → service
@@ -501,9 +506,10 @@ framing it as an implementation accident; it is a deliberate content-model
 boundary. `page_generic` already permits only `module_content` and
 `module_cta`, so nothing needs undoing.
 
-`GENERIC` remains in `MODULE_PAGE_CONTEXT` — generic pages still render their
-content and CTA modules through `ModuleRenderer`, so the page kind is still
-meaningful context. Only the _post-list_ module will never receive it.
+Generic pages still render their content and CTA modules through
+`ModuleRenderer`, but those modules never read the page kind, so nothing
+survives for them to receive — `MODULE_PAGE_CONTEXT` goes away with the rest of
+the contract.
 
 ### Order
 
@@ -517,12 +523,11 @@ changes Sanity fixtures — E1, E6, and E8.
 ## Board actions
 
 - Close #1333–#1336 and epic #1332 as superseded by this design. Its
-  page-context contract shipped as E2's first sub-issue and survives in reduced
-  form — the page-kind half still tells `module_content`/`module_cta` which page
-  they render on — but it does **not** scope post lists: that resolves from the
-  parent page document, and the contract's `isPaginated` half retires with the
-  two-module split. #1332's own premise (`modules[]` on the taxonomy documents,
-  grid untouched) does not survive either.
+  page-context contract shipped as E2's first sub-issue and is **deleted**
+  by E4 (#1829): it never scoped post lists — that resolves from the parent
+  page document — and its page-kind half turned out to have no readers at all.
+  #1332's own premise (`modules[]` on the taxonomy documents, grid untouched)
+  does not survive either.
 - Create ten board entries for E1–E10 above (E10 has since been dropped). Gather every sub-issue's title,
   body and labels up front and dispatch `board-keeper` once per epic with the
   whole set, rather than issue by issue. Label each sub-issue with its

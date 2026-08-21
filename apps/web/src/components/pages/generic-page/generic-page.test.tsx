@@ -103,7 +103,7 @@ describe(`<${GenericPage.name}/>`, () => {
     );
   });
 
-  it('passes an unpaginated GENERIC page context to ModuleRenderer', async () => {
+  it('passes the fetched modules and locale to ModuleRenderer', async () => {
     getPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -122,9 +122,7 @@ describe(`<${GenericPage.name}/>`, () => {
     await setup();
 
     expect(moduleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        context: { type: 'GENERIC', isPaginated: false },
-      }),
+      { modules: [], locale: 'EN' },
       undefined,
     );
   });

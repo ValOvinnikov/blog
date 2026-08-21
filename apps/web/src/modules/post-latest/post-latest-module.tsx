@@ -29,11 +29,12 @@ export const PostLatestModule = async ({ id }: IPostLatestModuleProps) => {
 
   return (
     <PostListModuleView
-      id={id}
       brandVariant={brandVariant}
       sectionHeader={sectionHeader}
       items={items}
       layout={layout}
+      titleId={`latest-posts-${id}`}
+      dataTestId={`post-latest-module-${id}`}
       titleFallback={t('fallbackHeading')}
     />
   );

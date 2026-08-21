@@ -73,7 +73,7 @@ export type { TNewsletterModule } from './features/modules/newsletter';
 export type { TPostLatestModule } from './features/modules/post-latest';
 export type { TPostListModule } from './features/modules/post-list';
 export type { TAuthorDetail, TAuthorPage } from './features/pages/author';
-export type { TBlogIndexPage, TGetIndexPageArgs } from './features/pages/blog';
+export type { TBlogIndexPage } from './features/pages/blog';
 export type { TGenericPage } from './features/pages/generic';
 export type { THomePage } from './features/pages/home';
 export type {
