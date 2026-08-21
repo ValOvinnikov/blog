@@ -9,8 +9,8 @@ const topicPosts = q
   .filterRaw(TOPIC_SCOPE_FILTER)
   .filterRaw(PUBLISHED_POST_FILTER);
 
-export const buildTopicPostsPageQuery = (start: number, end: number) =>
-  q
+export function buildTopicPostsPageQuery(start: number, end: number) {
+  return q
     .parameters<TSlugParams>()
     .project((sub) => ({
       posts: topicPosts
@@ -21,3 +21,4 @@ export const buildTopicPostsPageQuery = (start: number, end: number) =>
       total: sub.count(topicPosts).notNull(true),
     }))
     .notNull(true);
+}

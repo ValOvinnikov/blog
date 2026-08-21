@@ -7,6 +7,9 @@ export default [
   {
     files: ['**/*.{ts,tsx}'],
     rules: {
+      // db exports operations (getSiteConfig), not React values — the opposite
+      // of the React presets' 'expression' setting; do not unify the two.
+      'func-style': ['error', 'declaration'],
       'no-restricted-syntax': [
         'error',
         {
