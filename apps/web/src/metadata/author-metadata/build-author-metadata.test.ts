@@ -1,4 +1,8 @@
-import { makeAuthor } from '@web/testing/shared/author/fixtures';
+import {
+  AUTHOR_IMAGE_URL,
+  AUTHOR_OG_IMAGE_URL,
+  makeAuthor,
+} from '@web/testing/shared/author/fixtures';
 
 import { buildAuthorMetadata } from './build-author-metadata';
 
@@ -40,6 +44,26 @@ describe('buildAuthorMetadata', () => {
       page: undefined,
       itemsPerPage: 9,
     });
+  });
+
+  it('uses the unsized ogImageUrl for the social card, not the sized avatar imageUrl', async () => {
+    getAuthorPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        author,
+        posts: [],
+        currentPage: 1,
+        totalPages: 1,
+        total: 0,
+      },
+    });
+
+    const metadata = await buildAuthorMetadata('jane-doe');
+
+    expect(metadata.openGraph?.images).toEqual([{ url: AUTHOR_OG_IMAGE_URL }]);
+    expect(metadata.twitter?.images).toEqual([AUTHOR_OG_IMAGE_URL]);
+    expect(metadata.openGraph?.images).not.toEqual([{ url: AUTHOR_IMAGE_URL }]);
+    expect(metadata.twitter?.images).not.toEqual([AUTHOR_IMAGE_URL]);
   });
 
   it('falls back to the plain name when no role is authored', async () => {

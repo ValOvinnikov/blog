@@ -8,6 +8,7 @@ export type TAuthorDetail = {
   slug: string;
   role: TMaybeUndefined<string>;
   imageUrl: TMaybeUndefined<string>;
+  ogImageUrl: TMaybeUndefined<string>;
   bio: TMaybeUndefined<BlockText>;
   socialLinks: TSocialLink[];
 };
