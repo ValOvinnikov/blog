@@ -1,6 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { LinkButton } from '@blog/ui/molecules';
 import { Hero } from '@blog/ui/organisms';
+import { en, Faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { ContentModuleView } from '@web/modules/content/content-module-view';
@@ -8,6 +9,12 @@ import { CtaModuleView } from '@web/modules/cta/cta-module-view';
 import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixtures';
 
 import { HomePageTemplate } from './home-page-template';
+
+// A private, seeded Faker instance keeps this value stable across runs
+// without touching the global `faker` singleton other suites rely on.
+const fixtureFaker = new Faker({ locale: [en] });
+fixtureFaker.seed(123);
+const heroMediaImageUrl = fixtureFaker.image.url({ width: 1200, height: 675 });
 
 const meta = {
   title: 'Page Templates/HomePageTemplate',
@@ -22,10 +29,7 @@ const meta = {
         excerpt="Essays and notes from the team, published as we ship."
       >
         <Hero.Media>
-          <img
-            src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=675&fit=crop"
-            alt="Code editor showing component code"
-          />
+          <img src={heroMediaImageUrl} alt="Placeholder hero image" />
         </Hero.Media>
         <Hero.Cta>
           <LinkButton as={SmartLink} href="/blog">
