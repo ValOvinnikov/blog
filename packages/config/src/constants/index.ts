@@ -14,5 +14,6 @@ export * from './preset';
 export * from './reserved-slug';
 export * from './size';
 export * from './spec-line';
+export * from './taxonomy';
 export * from './toast';
 export * from './voice-pack';
