@@ -12,12 +12,12 @@ type TSanityType = Extract<AllSanitySchemaTypes, { _type: string }>['_type'];
  * schema-derived `TModuleType` union is **required**
  * (`Record<TModuleType, …>`), so a schema addition without a matching entry
  * here fails `type-check` — regardless of whether that type is ever added to
- * `MODULE_MAP` (`module_hero` and `module_postList` never are). Other
- * document `_type`s stay `Partial`, since several legitimately purge
- * nothing. The tag strings themselves are the literals passed to `isr(...)`
- * in `@blog/service` loaders (a few predate a `{group}_{name}` rename, e.g.
- * the `page_home` document invalidates the `homePage` tag) — keep them in
- * sync with `packages/service/src`.
+ * `MODULE_MAP` (`module_hero`, `module_postList`, and `module_taxonomyList`
+ * never are). Other document `_type`s stay `Partial`, since several
+ * legitimately purge nothing. The tag strings themselves are the literals
+ * passed to `isr(...)` in `@blog/service` loaders (a few predate a
+ * `{group}_{name}` rename, e.g. the `page_home` document invalidates the
+ * `homePage` tag) — keep them in sync with `packages/service/src`.
  */
 const REVALIDATE_TAGS = {
   blog_post: ['post', 'posts', 'homePage'],
@@ -32,6 +32,7 @@ const REVALIDATE_TAGS = {
   page_generic: ['page_generic'],
   module_hero: ['modules:hero'],
   module_postList: ['modules:postList'],
+  module_taxonomyList: ['modules:taxonomyList'],
   module_postLatest: ['modules:postLatest'],
   module_content: ['modules:content'],
   module_cta: ['modules:cta'],

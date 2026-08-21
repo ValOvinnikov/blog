@@ -59,6 +59,7 @@ describe('getRevalidateTagsForType', () => {
   it.each([
     'module_hero',
     'module_postList',
+    'module_taxonomyList',
     'module_postLatest',
     'module_content',
     'module_cta',
