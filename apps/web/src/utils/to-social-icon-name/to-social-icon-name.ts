@@ -24,6 +24,6 @@ const SOCIAL_ICON_NAME_BY_PLATFORM: Record<string, TIconName> = {
  * toSocialIconName('GitHub') // ICONS.GITHUB
  * toSocialIconName('Mastodon') // undefined
  */
-export function toSocialIconName(platform: string): TIconName | undefined {
+export const toSocialIconName = (platform: string): TIconName | undefined => {
   return SOCIAL_ICON_NAME_BY_PLATFORM[platform.trim().toLowerCase()];
-}
+};

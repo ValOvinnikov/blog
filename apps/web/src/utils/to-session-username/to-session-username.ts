@@ -9,10 +9,10 @@
  * empty-local-part email (`@example.com`) or a whitespace-only `name`
  * transform to `''`, which must fall through rather than render blank.
  */
-export function toSessionUsername(
+export const toSessionUsername = (
   name?: string | null,
   email?: string | null,
-): string {
+): string => {
   const emailLocalPart = email?.split('@')[0]?.trim() ?? '';
   if (emailLocalPart.length > 0) {
     return emailLocalPart;
@@ -24,4 +24,4 @@ export function toSessionUsername(
   }
 
   return 'user';
-}
+};

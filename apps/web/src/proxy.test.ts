@@ -23,18 +23,18 @@ vi.mock('./utils/is-production-environment', () => ({
 
 const { config, default: proxy } = await import('./proxy');
 
-function buildRequest(
+const buildRequest = (
   host: string | null,
   extraHeaders?: Record<string, string>,
-): NextRequest {
+): NextRequest => {
   const headers = new Headers(extraHeaders);
   if (host) headers.set('host', host);
   return new NextRequest('https://example.com/blog', { headers });
-}
+};
 
-function buildMatcherRegExp() {
+const buildMatcherRegExp = () => {
   return new RegExp(`^${config.matcher}$`);
-}
+};
 
 describe('proxy matcher', () => {
   it('excludes root-level Next.js metadata-file routes from locale rewriting', () => {

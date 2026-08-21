@@ -8,7 +8,7 @@ import { getTranslations } from 'next-intl/server';
  * content) and `robots: noindex` regardless of environment, since account
  * settings should never surface in search results.
  */
-export async function buildAccountMetadata(): Promise<Metadata> {
+export const buildAccountMetadata = async (): Promise<Metadata> => {
   const t = await getTranslations('accountPage');
 
   return {
@@ -17,4 +17,4 @@ export async function buildAccountMetadata(): Promise<Metadata> {
     alternates: { canonical: routes.account() },
     robots: { index: false, follow: false },
   };
-}
+};

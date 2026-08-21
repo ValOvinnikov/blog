@@ -23,7 +23,7 @@ export type TResendConfirmationActionResult = { ok: true } | { ok: false };
  * `subscribeToNewsletterAction` set at signup time keeps hiding
  * `NewsletterForm` for a reader who just unsubscribed.
  */
-export async function unsubscribeAction(): Promise<TUnsubscribeResult> {
+export const unsubscribeAction = async (): Promise<TUnsubscribeResult> => {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return { ok: false };
@@ -39,7 +39,7 @@ export async function unsubscribeAction(): Promise<TUnsubscribeResult> {
     logger.error('newsletter.unsubscribe_failed', { error });
     return { ok: false };
   }
-}
+};
 
 /**
  * clearNewsletterSubscribedCookieSafely — wraps
@@ -50,13 +50,13 @@ export async function unsubscribeAction(): Promise<TUnsubscribeResult> {
  * `{ ok: false }`, it should just mean this one reader doesn't see the form
  * again until the cookie expires. Logged, never rethrown.
  */
-async function clearNewsletterSubscribedCookieSafely(): Promise<void> {
+const clearNewsletterSubscribedCookieSafely = async (): Promise<void> => {
   try {
     await clearNewsletterSubscribedCookie();
   } catch (error) {
     logger.error('newsletter.subscribed_cookie_clear_failed', { error });
   }
-}
+};
 
 /**
  * `NewsletterSubscriptionControl`'s "resend confirmation" server write.
@@ -66,35 +66,36 @@ async function clearNewsletterSubscribedCookieSafely(): Promise<void> {
  * `subscribeToNewsletterAction`'s email-sending block. The session's own
  * `email` is the `to` address since `resendConfirmation` doesn't return one.
  */
-export async function resendConfirmationAction(): Promise<TResendConfirmationActionResult> {
-  const session = await auth();
-  const userId = session?.user?.id;
-  const email = session?.user?.email;
-  if (!userId || !email) return { ok: false };
+export const resendConfirmationAction =
+  async (): Promise<TResendConfirmationActionResult> => {
+    const session = await auth();
+    const userId = session?.user?.id;
+    const email = session?.user?.email;
+    if (!userId || !email) return { ok: false };
 
-  const tenantId = await getRequestTenantId();
-  if (!tenantId) return { ok: false };
+    const tenantId = await getRequestTenantId();
+    if (!tenantId) return { ok: false };
 
-  try {
-    const result = await queries.subscribers.resendConfirmation(
-      tenantId,
-      userId,
-    );
-    if (result.outcome === 'not-pending') return { ok: false };
+    try {
+      const result = await queries.subscribers.resendConfirmation(
+        tenantId,
+        userId,
+      );
+      if (result.outcome === 'not-pending') return { ok: false };
 
-    const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
-    const confirmationUrl = `${siteUrl}/api/newsletter/confirm?token=${result.confirmationToken}`;
-    const { subject, html } = buildNewsletterConfirmationEmail({
-      confirmationUrl,
-    });
-    const fromAddress = resolveNewsletterFromAddress(
-      env.NEWSLETTER_FROM_ADDRESS,
-    );
+      const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
+      const confirmationUrl = `${siteUrl}/api/newsletter/confirm?token=${result.confirmationToken}`;
+      const { subject, html } = buildNewsletterConfirmationEmail({
+        confirmationUrl,
+      });
+      const fromAddress = resolveNewsletterFromAddress(
+        env.NEWSLETTER_FROM_ADDRESS,
+      );
 
-    await sendEmail({ to: email, from: fromAddress, subject, html });
-    return { ok: true };
-  } catch (error) {
-    logger.error('newsletter.confirmation_resend_failed', { error });
-    return { ok: false };
-  }
-}
+      await sendEmail({ to: email, from: fromAddress, subject, html });
+      return { ok: true };
+    } catch (error) {
+      logger.error('newsletter.confirmation_resend_failed', { error });
+      return { ok: false };
+    }
+  };

@@ -11,7 +11,7 @@ import { getTranslations } from 'next-intl/server';
  * `TopicsPage` itself — the `<h1>`/intro copy and the metadata title/
  * description are the same strings.
  */
-export async function buildTopicsMetadata(): Promise<Metadata> {
+export const buildTopicsMetadata = async (): Promise<Metadata> => {
   const t = await getTranslations('topicsPage');
   const title = t('title');
   const description = t('intro');
@@ -26,4 +26,4 @@ export async function buildTopicsMetadata(): Promise<Metadata> {
     },
     { canonical: routes.topics(), ogType: 'website' },
   );
-}
+};

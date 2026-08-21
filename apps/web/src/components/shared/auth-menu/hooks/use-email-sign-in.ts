@@ -13,7 +13,7 @@ export type TEmailStep = 'collapsed' | 'expanded' | 'submitting' | 'sent';
  * rather than read here, since it's owned by `AuthMenu`'s single
  * `usePopover()` call, not by this hook.
  */
-export function useEmailSignIn(open: boolean) {
+export const useEmailSignIn = (open: boolean) => {
   const [emailStep, setEmailStep] = useState<TEmailStep>('collapsed');
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState(false);
@@ -71,4 +71,4 @@ export function useEmailSignIn(open: boolean) {
     emailFormRef,
     handleEmailSubmit,
   };
-}
+};

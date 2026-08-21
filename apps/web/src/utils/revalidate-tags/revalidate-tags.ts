@@ -45,7 +45,10 @@ const REVALIDATE_TAGS = {
  * @example
  * getRevalidateTagsForType('blog_post', 'post-123') // ['post', 'posts', 'homePage']
  */
-export function getRevalidateTagsForType(type: string, id: string): string[] {
+export const getRevalidateTagsForType = (
+  type: string,
+  id: string,
+): string[] => {
   if (!Object.hasOwn(REVALIDATE_TAGS, type)) return [];
 
   const tags: string[] = [
@@ -53,4 +56,4 @@ export function getRevalidateTagsForType(type: string, id: string): string[] {
   ];
   if (type.startsWith('module_')) tags.push(`module:${id}`);
   return tags;
-}
+};

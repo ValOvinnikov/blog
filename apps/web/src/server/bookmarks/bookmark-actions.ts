@@ -14,7 +14,7 @@ export type TSetBookmarkResult = { ok: true } | { ok: false };
  * resolves `false`) so the caller doesn't need its own auth branch before
  * calling this.
  */
-export async function getBookmarkStatus(postId: string): Promise<boolean> {
+export const getBookmarkStatus = async (postId: string): Promise<boolean> => {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return false;
@@ -23,7 +23,7 @@ export async function getBookmarkStatus(postId: string): Promise<boolean> {
   if (!tenantId) return false;
 
   return queries.bookmarks.isBookmarked(tenantId, userId, postId);
-}
+};
 
 /**
  * setBookmarkStatus — the session-gated bookmark write `BookmarkButton`
@@ -34,10 +34,10 @@ export async function getBookmarkStatus(postId: string): Promise<boolean> {
  * session, or the write throws) tells the caller to roll the toggle back
  * and show a transient error.
  */
-export async function setBookmarkStatus(
+export const setBookmarkStatus = async (
   postId: string,
   isBookmarked: boolean,
-): Promise<TSetBookmarkResult> {
+): Promise<TSetBookmarkResult> => {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return { ok: false };
@@ -67,4 +67,4 @@ export async function setBookmarkStatus(
     logger.error('bookmark.update_failed', { postId, error });
     return { ok: false };
   }
-}
+};

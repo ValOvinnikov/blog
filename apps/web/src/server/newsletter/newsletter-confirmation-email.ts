@@ -13,9 +13,9 @@ export type TNewsletterConfirmationEmailContent = {
  * `subscribeToNewsletterAction`. Pure and framework-free so it's testable
  * without mocking Resend, mirroring `buildMagicLinkEmail`'s shape.
  */
-export function buildNewsletterConfirmationEmail({
+export const buildNewsletterConfirmationEmail = ({
   confirmationUrl,
-}: TNewsletterConfirmationEmailInput): TNewsletterConfirmationEmailContent {
+}: TNewsletterConfirmationEmailInput): TNewsletterConfirmationEmailContent => {
   return {
     subject: 'Confirm your subscription',
     html: [
@@ -24,4 +24,4 @@ export function buildNewsletterConfirmationEmail({
       `<p>If you did not request this, you can safely ignore this email.</p>`,
     ].join(''),
   };
-}
+};

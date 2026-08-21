@@ -9,9 +9,9 @@ import type { TSubscribeResult } from '@web/server/newsletter/newsletter-actions
  * resolves `success` after a short delay so the `submitting` state is
  * visible.
  */
-export async function subscribeToNewsletterAction(
+export const subscribeToNewsletterAction = async (
   email: string,
-): Promise<TSubscribeResult> {
+): Promise<TSubscribeResult> => {
   await new Promise((resolve) => setTimeout(resolve, 400));
 
   if (email.includes('fail')) {
@@ -19,4 +19,4 @@ export async function subscribeToNewsletterAction(
   }
 
   return { outcome: 'success' };
-}
+};

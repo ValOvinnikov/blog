@@ -15,9 +15,9 @@ const HTML_ESCAPES: Record<string, string> = {
 
 const UNSAFE_CHARS = /[&><]/g;
 
-function escapeJsonForScript(json: string): string {
+const escapeJsonForScript = (json: string): string => {
   return json.replace(UNSAFE_CHARS, (char) => HTML_ESCAPES[char] ?? char);
-}
+};
 
 /**
  * JsonLd — renders a schema.org object as a `<script type="application/ld+json">`
@@ -33,7 +33,7 @@ function escapeJsonForScript(json: string): string {
  * @example
  * <JsonLd schema={buildBlogPostingSchema(post, siteUrl)} />
  */
-export function JsonLd({ schema }: TJsonLdProps) {
+export const JsonLd = ({ schema }: TJsonLdProps) => {
   const serialized = escapeJsonForScript(JSON.stringify(schema));
 
   return (
@@ -42,4 +42,4 @@ export function JsonLd({ schema }: TJsonLdProps) {
       dangerouslySetInnerHTML={{ __html: serialized }}
     />
   );
-}
+};

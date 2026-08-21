@@ -15,10 +15,10 @@ export interface INewsletterModuleProps {
  * CMS-required field for this module (`requireHeading: true`), so it's
  * always a non-empty string here.
  */
-export async function NewsletterModule({ id }: INewsletterModuleProps) {
+export const NewsletterModule = async ({ id }: INewsletterModuleProps) => {
   const result = await service.modules.newsletter.v1.getNewsletter(id);
 
   if (!result.ok) return null;
 
   return <NewsletterModuleView id={id} {...result.data} />;
-}
+};

@@ -5,14 +5,14 @@ export {};
 
 const originalPathname = window.location.pathname;
 
-async function freshModule() {
+const freshModule = async () => {
   vi.resetModules();
   return import('./report-client-error');
-}
+};
 
-function setPathname(pathname: string) {
+const setPathname = (pathname: string) => {
   window.history.replaceState(null, '', pathname);
-}
+};
 
 describe('reportClientError', () => {
   let sendBeacon: ReturnType<typeof vi.fn>;

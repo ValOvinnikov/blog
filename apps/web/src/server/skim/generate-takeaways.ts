@@ -16,7 +16,7 @@ const takeawaysSchema = z.object({
 });
 
 /** Flattens a post body's text-bearing blocks to plain text for the generation prompt — code/image/aside blocks are skipped, they carry no prose to summarize. */
-function bodyToPlainText(body: RichText): string {
+const bodyToPlainText = (body: RichText): string => {
   return body
     .filter((block) => block._type === 'block')
     .map((block) =>
@@ -24,9 +24,9 @@ function bodyToPlainText(body: RichText): string {
     )
     .filter((text) => text.trim().length > 0)
     .join('\n\n');
-}
+};
 
-function buildPrompt(plainText: string): string {
+const buildPrompt = (plainText: string): string => {
   return [
     'Summarize the following blog post into 3 to 7 short takeaways for a',
     '"30-second skim" mode. Each takeaway must be a single, self-contained',
@@ -37,7 +37,7 @@ function buildPrompt(plainText: string): string {
     plainText,
     '---',
   ].join('\n');
-}
+};
 
 /**
  * Calls Claude (`SKIM_GENERATION_MODEL`) to draft 3–7 takeaways for a post's
@@ -47,10 +47,10 @@ function buildPrompt(plainText: string): string {
  * 422 and never calls the write path). No AI call happens on the reader
  * path — this only ever runs from the publish-time pipeline route.
  */
-export async function generateTakeaways(
+export const generateTakeaways = async (
   body: RichText,
   apiKey: string,
-): Promise<string[]> {
+): Promise<string[]> => {
   const client = new Anthropic({ apiKey });
 
   const message = await client.messages.parse({
@@ -66,4 +66,4 @@ export async function generateTakeaways(
   }
 
   return message.parsed_output.takeaways;
-}
+};

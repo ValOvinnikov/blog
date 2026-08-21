@@ -383,6 +383,18 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   — otherwise type-check/test/build fail. Unique per-workspace prefixes resolve
   cleanly in tsc (`Bundler`), Next/Turbopack, Sanity's esbuild extract, and vitest.
 - TypeScript `strict`; no `any`. Server Components by default.
+- **Function style is decided per layer kind, and enforced by ESLint per
+  workspace.** The React layers export _values_ — a component is a const
+  holding a function — so `apps/web` and `packages/ui` use **arrow-function
+  consts** (`func-style: ['error', 'expression', { allowArrowFunctions: true }]`
+  in `configs/eslint/web.js`). `@blog/service` and `@blog/db` export
+  _operations_, where `export function getPostBySlug()` is the ordinary
+  Node/TypeScript idiom, so they keep **declarations**. The rule codifies what
+  the repo already looks like rather than imposing something new. Only
+  `apps/web`'s half is wired today; `apps/admin` (arrow) and `service`/`db`
+  (declaration) are tracked separately, so don't read an unenforced workspace
+  as licence to drift. The exceptions and the Next.js reserved-export carve-out
+  live in `.claude/agents/web.md` § "Function style".
 - **Key/value-pair consts are always both UPPERCASE** (key === uppercase value),
   `as const`, and live in `@blog/config` (`constants/`). e.g.
   `export const TLINK_TYPE = { INTERNAL: 'INTERNAL', EXTERNAL: 'EXTERNAL' } as const;`

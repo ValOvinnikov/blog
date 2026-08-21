@@ -11,8 +11,8 @@ const DEFAULT_NEWSLETTER_FROM_ADDRESS = 'Newsletter <onboarding@resend.dev>';
  * testable without mocking `env`/Resend — `newsletter-actions.ts` is the only
  * caller.
  */
-export function resolveNewsletterFromAddress(
+export const resolveNewsletterFromAddress = (
   configuredFromAddress: string | undefined,
-): string {
+): string => {
   return configuredFromAddress ?? DEFAULT_NEWSLETTER_FROM_ADDRESS;
-}
+};

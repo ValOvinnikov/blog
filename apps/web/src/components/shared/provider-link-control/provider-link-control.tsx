@@ -34,10 +34,10 @@ export type TProviderLinkControlProps = {
  * check between render and click), so the error toast's message
  * distinguishes `reason: 'last-method'` from any other failure.
  */
-export function ProviderLinkControl({
+export const ProviderLinkControl = ({
   provider,
   action,
-}: TProviderLinkControlProps) {
+}: TProviderLinkControlProps) => {
   const t = useTranslations('accountPage.identity');
   const toast = useToast();
   const router = useRouter();
@@ -99,4 +99,4 @@ export function ProviderLinkControl({
       {isLink ? t('linkButton') : t('unlinkButton')}
     </Button>
   );
-}
+};

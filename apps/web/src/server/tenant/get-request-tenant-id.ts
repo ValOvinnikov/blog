@@ -8,7 +8,7 @@ import { TENANT_ID_HEADER } from './tenant-id-header';
  * couldn't resolve a tenant (only possible outside production — an
  * unmatched host in production never reaches here, proxy.ts 404s first).
  */
-export async function getRequestTenantId(): Promise<string | undefined> {
+export const getRequestTenantId = async (): Promise<string | undefined> => {
   const headersList = await headers();
   return headersList.get(TENANT_ID_HEADER) ?? undefined;
-}
+};

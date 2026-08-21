@@ -26,13 +26,13 @@ const isProtocolRelative = (href: string) => href.startsWith('//');
  *   {action.label}
  * </LinkButton>
  */
-export function SmartLink({
+export const SmartLink = ({
   href,
   target,
   prefetch,
   children,
   ...rest
-}: TSmartLinkProps) {
+}: TSmartLinkProps) => {
   const rel = target === '_blank' ? 'noopener noreferrer' : undefined;
 
   if (isProtocolRelative(href)) {
@@ -48,4 +48,4 @@ export function SmartLink({
       {children}
     </Link>
   );
-}
+};

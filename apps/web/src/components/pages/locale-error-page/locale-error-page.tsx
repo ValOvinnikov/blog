@@ -25,7 +25,7 @@ const s = errorPageLayoutVariants();
  * handles the narrower case of `[locale]/layout.tsx` itself throwing, which
  * a boundary nested inside that layout can't reach.
  */
-export function LocaleErrorPage({ error, reset }: TLocaleErrorPageProps) {
+export const LocaleErrorPage = ({ error, reset }: TLocaleErrorPageProps) => {
   const t = useTranslations('localeErrorPage');
   const announcementRef = useRef<HTMLSpanElement>(null);
   const mainRef = useRef<HTMLElement>(null);
@@ -69,4 +69,4 @@ export function LocaleErrorPage({ error, reset }: TLocaleErrorPageProps) {
       </div>
     </main>
   );
-}
+};

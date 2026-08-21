@@ -29,11 +29,11 @@ const VOICE_OVERRIDE_PATHS: Record<string, readonly string[]> = {
   bookmarksEmpty: ['bookmarksPage', 'empty'],
 };
 
-function setAtPath(
+const setAtPath = (
   target: Record<string, unknown>,
   path: readonly string[],
   value: string,
-): Record<string, unknown> {
+): Record<string, unknown> => {
   const [key, ...rest] = path;
   if (key === undefined) return target;
 
@@ -48,7 +48,7 @@ function setAtPath(
       : {};
 
   return { ...target, [key]: setAtPath(childObject, rest, value) };
-}
+};
 
 /**
  * Applies `site_config.voiceOverrides`' flat curated keys onto the merged
@@ -56,10 +56,10 @@ function setAtPath(
  * namespaces keep referencing the cached messages module instead of being
  * mutated in place.
  */
-export function applyVoiceOverrides(
+export const applyVoiceOverrides = (
   messages: Record<string, unknown>,
   overrides: Record<string, string>,
-): Record<string, unknown> {
+): Record<string, unknown> => {
   let result = messages;
 
   for (const [key, value] of Object.entries(overrides)) {
@@ -69,4 +69,4 @@ export function applyVoiceOverrides(
   }
 
   return result;
-}
+};

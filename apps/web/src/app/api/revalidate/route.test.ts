@@ -23,11 +23,11 @@ vi.mock('@web/utils/env/env', () => ({
   env: { SANITY_REVALIDATE_SECRET: 'test-secret' },
 }));
 
-function makeRequest(
+const makeRequest = (
   body: unknown,
   signature?: string,
   extraHeaders?: Record<string, string>,
-): Request {
+): Request => {
   const headers = new Headers(extraHeaders);
   if (signature !== undefined) {
     headers.set('sanity-webhook-signature', signature);
@@ -37,7 +37,7 @@ function makeRequest(
     headers,
     body: JSON.stringify(body),
   });
-}
+};
 
 describe('POST /api/revalidate', () => {
   beforeEach(() => {

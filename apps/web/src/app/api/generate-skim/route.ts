@@ -17,13 +17,13 @@ const requestBodySchema = z.object({ _id: z.string().min(1) });
 
 const WRITE_CLIENT_UNCONFIGURED_MARKER = 'SANITY_API_WRITE_TOKEN is not set';
 
-/** `saveSkimDraft`'s write client throws this exact substring when `SANITY_API_WRITE_TOKEN` is absent — the one signal this route has for "unconfigured" vs. a genuine write failure, since that env var lives in `@blog/service`, not here. */
-function isWriteClientUnconfiguredError(error: unknown): boolean {
+/** `saveSkimDraft`'s write client throws this exact substring when `SANITY_API_WRITE_TOKEN` is absent — the one signal this route has for "unconfigured" vs. a genuine write failure. */
+const isWriteClientUnconfiguredError = (error: unknown): boolean => {
   return (
     error instanceof Error &&
     error.message.includes(WRITE_CLIENT_UNCONFIGURED_MARKER)
   );
-}
+};
 
 /**
  * POST /api/generate-skim?secret=… — the publish-time skim-generation

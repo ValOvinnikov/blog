@@ -12,9 +12,9 @@ type TPaginatedModulePageContext = Extract<
  * (neither page kind's CMS schema allows a `postList` slot/module to
  * paginate), so hitting either branch is a real bug, not a URL to guess at.
  */
-export function toPostListPaginationHref(
+export const toPostListPaginationHref = (
   context: TPaginatedModulePageContext,
-): (page: number) => string {
+): ((page: number) => string) => {
   switch (context.type) {
     case 'TOPIC':
       return (page) => routes.topic(context.topicSlug, page);
@@ -28,4 +28,4 @@ export function toPostListPaginationHref(
         `PostListModule cannot paginate a ${context.type} page context — no paginated route exists for it.`,
       );
   }
-}
+};

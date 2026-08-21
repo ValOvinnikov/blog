@@ -29,7 +29,7 @@ const s = identitySectionVariants();
  * step larger than Google's/email's glyphs to read as visually equal —
  * the octocat SVG carries more internal padding than the others.
  */
-export async function IdentitySection() {
+export const IdentitySection = async () => {
   const session = await auth();
   if (!session?.user?.id) return null;
 
@@ -135,4 +135,4 @@ export async function IdentitySection() {
       <WindowChrome.Body>{bodyContent}</WindowChrome.Body>
     </WindowChrome>
   );
-}
+};

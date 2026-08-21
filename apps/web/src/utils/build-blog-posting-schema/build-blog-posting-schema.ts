@@ -37,10 +37,10 @@ export type TBlogPostingSchema = {
  * const schema = buildBlogPostingSchema(post, env.NEXT_PUBLIC_SITE_URL ?? '');
  * return schema ? <JsonLd schema={schema} /> : null;
  */
-export function buildBlogPostingSchema(
+export const buildBlogPostingSchema = (
   post: TPostDetail,
   siteUrl: string,
-): TBlogPostingSchema | undefined {
+): TBlogPostingSchema | undefined => {
   if (!siteUrl) return undefined;
 
   return {
@@ -58,4 +58,4 @@ export function buildBlogPostingSchema(
         ? post.tags.map((tag) => tag.title).join(', ')
         : undefined,
   };
-}
+};

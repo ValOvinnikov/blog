@@ -13,11 +13,11 @@ export type TSendEmailInput = {
 let resendClient: Resend | undefined;
 
 /** Lazy singleton — mirrors `@blog/db`'s `getDb()`, avoids constructing a client until the first send. */
-function getResendClient(): Resend {
+const getResendClient = (): Resend => {
   resendClient ??= new Resend(env.RESEND_API_KEY);
 
   return resendClient;
-}
+};
 
 /**
  * The shared Resend "send email" helper — deliberately generic
@@ -26,12 +26,12 @@ function getResendClient(): Resend {
  * confirmation email can share it without either reshaping it around the
  * other's needs.
  */
-export async function sendEmail({
+export const sendEmail = async ({
   to,
   from,
   subject,
   html,
-}: TSendEmailInput): Promise<void> {
+}: TSendEmailInput): Promise<void> => {
   const { error } = await getResendClient().emails.send({
     to,
     from,
@@ -42,4 +42,4 @@ export async function sendEmail({
   if (error) {
     throw new Error(`Failed to send email via Resend: ${error.message}`);
   }
-}
+};

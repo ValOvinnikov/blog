@@ -1,8 +1,8 @@
 import type { IPostCardData } from '@blog/ui/organisms';
 
-export function makePostListItem(
+export const makePostListItem = (
   overrides: Partial<IPostCardData> = {},
-): IPostCardData {
+): IPostCardData => {
   return {
     id: 'post-1',
     href: '/blog/first-post',
@@ -14,4 +14,4 @@ export function makePostListItem(
     topic: { title: 'News' },
     ...overrides,
   };
-}
+};

@@ -9,7 +9,7 @@ import { getTranslations } from 'next-intl/server';
  * `robots: noindex` regardless of environment, since it's account content
  * that should never surface in search results even in production.
  */
-export async function buildBookmarksMetadata(): Promise<Metadata> {
+export const buildBookmarksMetadata = async (): Promise<Metadata> => {
   const t = await getTranslations('bookmarksPage');
 
   return {
@@ -18,4 +18,4 @@ export async function buildBookmarksMetadata(): Promise<Metadata> {
     alternates: { canonical: routes.bookmarks() },
     robots: { index: false, follow: false },
   };
-}
+};

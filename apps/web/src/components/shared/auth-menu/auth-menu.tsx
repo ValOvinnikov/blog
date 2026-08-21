@@ -25,7 +25,7 @@ export interface IAuthMenuProps {
   isPlain?: boolean;
 }
 
-export function AuthMenu({ isPlain = false }: IAuthMenuProps) {
+export const AuthMenu = ({ isPlain = false }: IAuthMenuProps) => {
   const sessionResult = useSession();
   const oauthError = useOAuthErrorParam();
   const t = useTranslations('authMenu');
@@ -73,4 +73,4 @@ export function AuthMenu({ isPlain = false }: IAuthMenuProps) {
       isPlain={isPlain}
     />
   );
-}
+};

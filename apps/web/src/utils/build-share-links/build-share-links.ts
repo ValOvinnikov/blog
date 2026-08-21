@@ -24,13 +24,13 @@ type TShareLinkItem = IShareLinkItem & { platform: TShareLinkPlatform };
  * const links = buildShareLinks({ url: 'https://example.com/post', title: 'My post' });
  * return <PostShare url={url} title={title} links={links} />;
  */
-export function buildShareLinks({
+export const buildShareLinks = ({
   url,
   title,
 }: {
   url: string;
   title: string;
-}): TShareLinkItem[] {
+}): TShareLinkItem[] => {
   return [
     {
       platform: 'x',
@@ -43,14 +43,14 @@ export function buildShareLinks({
       label: 'Share on LinkedIn',
     },
   ];
-}
+};
 
-function buildTwitterShareUrl(url: string, title: string): string {
+const buildTwitterShareUrl = (url: string, title: string): string => {
   const params = new URLSearchParams({ text: title, url });
   return `https://twitter.com/intent/tweet?${params.toString()}`;
-}
+};
 
-function buildLinkedInShareUrl(url: string): string {
+const buildLinkedInShareUrl = (url: string): string => {
   const params = new URLSearchParams({ url });
   return `https://www.linkedin.com/sharing/share-offsite/?${params.toString()}`;
-}
+};

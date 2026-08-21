@@ -6,7 +6,7 @@ import type { Page } from '@playwright/test';
  * next navigation is missed — read the returned array once that navigation
  * settles.
  */
-export function collectConsoleErrors(page: Page): string[] {
+export const collectConsoleErrors = (page: Page): string[] => {
   const errors: string[] = [];
 
   page.on('console', (message) => {
@@ -16,4 +16,4 @@ export function collectConsoleErrors(page: Page): string[] {
   });
 
   return errors;
-}
+};

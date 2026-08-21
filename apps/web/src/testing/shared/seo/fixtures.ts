@@ -1,6 +1,8 @@
 import type { TSeoResolved } from '@blog/service';
 
-export function makeSeo(overrides: Partial<TSeoResolved> = {}): TSeoResolved {
+export const makeSeo = (
+  overrides: Partial<TSeoResolved> = {},
+): TSeoResolved => {
   return {
     title: 'Example Title',
     description: 'Example description.',
@@ -9,4 +11,4 @@ export function makeSeo(overrides: Partial<TSeoResolved> = {}): TSeoResolved {
     ogImageUrl: undefined,
     ...overrides,
   };
-}
+};

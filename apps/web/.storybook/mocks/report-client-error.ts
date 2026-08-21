@@ -8,10 +8,10 @@ import { action } from 'storybook/actions';
  * Logs to the Actions panel instead, so a story still demonstrates that a
  * report *would* fire without ever issuing one.
  */
-export function reportClientError(
+export const reportClientError = (
   event: string,
   error: unknown,
   extra?: { digest?: string },
-): void {
+): void => {
   action('reportClientError')(event, error, extra);
-}
+};

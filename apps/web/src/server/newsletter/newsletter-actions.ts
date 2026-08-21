@@ -30,9 +30,9 @@ export type TSubscribeResult =
  * A thrown error is caught and logged rather than left to reject the server
  * action — `NewsletterForm` only branches on the returned `outcome`.
  */
-export async function subscribeToNewsletterAction(
+export const subscribeToNewsletterAction = async (
   email: string,
-): Promise<TSubscribeResult> {
+): Promise<TSubscribeResult> => {
   if (!isValidEmail(email)) {
     return { outcome: 'invalid' };
   }
@@ -86,7 +86,7 @@ export async function subscribeToNewsletterAction(
     logger.error('newsletter.subscribe_failed', { error });
     return { outcome: 'server-error' };
   }
-}
+};
 
 /**
  * markNewsletterSubscribedSafely — wraps `markNewsletterSubscribed` in its
@@ -98,10 +98,10 @@ export async function subscribeToNewsletterAction(
  * one reader sees the form again on their next visit. Logged, never
  * rethrown.
  */
-async function markNewsletterSubscribedSafely(): Promise<void> {
+const markNewsletterSubscribedSafely = async (): Promise<void> => {
   try {
     await markNewsletterSubscribed();
   } catch (error) {
     logger.error('newsletter.subscribed_cookie_set_failed', { error });
   }
-}
+};

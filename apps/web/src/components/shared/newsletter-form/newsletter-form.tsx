@@ -43,14 +43,14 @@ type TNewsletterFormProps = {
  * nothing until a mount effect resolves the cookie client-side, matching
  * server and first-client render so there's no hydration mismatch.
  */
-export function NewsletterForm({
+export const NewsletterForm = ({
   variant,
   heading,
   headingId,
   supportingText,
   align,
   className,
-}: TNewsletterFormProps) {
+}: TNewsletterFormProps) => {
   const t = useTranslations('newsletterForm');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<TFormStatus>('idle');
@@ -136,4 +136,4 @@ export function NewsletterForm({
       align={align}
     />
   );
-}
+};

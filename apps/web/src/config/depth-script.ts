@@ -16,13 +16,13 @@ export interface IDepthAvailability {
  * strand the reader on a post with no skim and no way back to `READ` (the
  * `DepthToggle` itself would render nothing, since neither option applies).
  */
-function allowedDepths({ hasSkim, hasDeep }: IDepthAvailability): TDepth[] {
+const allowedDepths = ({ hasSkim, hasDeep }: IDepthAvailability): TDepth[] => {
   return [
     DEPTH.READ,
     ...(hasSkim ? [DEPTH.SKIM] : []),
     ...(hasDeep ? [DEPTH.DEEP] : []),
   ];
-}
+};
 
 /**
  * Builds the inline reading-depth bootstrap script, run before hydration to
@@ -39,9 +39,9 @@ function allowedDepths({ hasSkim, hasDeep }: IDepthAvailability): TDepth[] {
  * support it is treated the same as no stored value at all (falls back to
  * `READ`) rather than stamped onto this post's DOM.
  */
-export function buildDepthBootstrapScript(
+export const buildDepthBootstrapScript = (
   availability: IDepthAvailability,
-): string {
+): string => {
   const valid = JSON.stringify(allowedDepths(availability));
 
   return (
@@ -50,7 +50,7 @@ export function buildDepthBootstrapScript(
     `if(s&&valid.indexOf(s)!==-1){var el=document.currentScript&&document.currentScript.parentElement;` +
     `if(el)el.setAttribute('data-depth',s)}}catch(e){}})()`
   );
-}
+};
 
 /**
  * Reads the persisted depth choice and clamps it to what the current post
@@ -58,7 +58,7 @@ export function buildDepthBootstrapScript(
  * pre-hydration, re-applied here so `useDepth()` consumers (state, not just
  * the DOM attribute) never end up on an unsupported depth either.
  */
-export function readStoredDepth(availability: IDepthAvailability): TDepth {
+export const readStoredDepth = (availability: IDepthAvailability): TDepth => {
   try {
     const stored = localStorage.getItem(DEPTH_STORAGE_KEY);
     const valid = allowedDepths(availability) as string[];
@@ -69,4 +69,4 @@ export function readStoredDepth(availability: IDepthAvailability): TDepth {
     // localStorage can throw in private browsing — fall back to the default.
     return DEPTH.READ;
   }
-}
+};
