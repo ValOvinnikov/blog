@@ -1,3 +1,4 @@
+import { getSanityImageBaseUrl } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixtures';
 
@@ -10,7 +11,7 @@ const meta = {
   parameters: { layout: 'padded' },
   args: {
     value: richTextDemo,
-    baseUrl: 'https://cdn.sanity.io/images/demo-project/demo-dataset/',
+    baseUrl: getSanityImageBaseUrl(),
   },
 } satisfies Meta<typeof PortableTextRenderer>;
 

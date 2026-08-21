@@ -4,7 +4,7 @@ export const makeSanityImage = (
   overrides: Partial<ISanityImage> = {},
 ): ISanityImage => {
   return {
-    assetId: 'image-abc123-1600x1200-jpg',
+    assetId: 'image-6205dacc42424f7a83d8e20a7000d895f7cdc7dd-2400x1260-png',
     alt: 'A scenic mountain range',
     hotspot: { x: 0.5, y: 0.5, width: 1, height: 1 },
     crop: undefined,

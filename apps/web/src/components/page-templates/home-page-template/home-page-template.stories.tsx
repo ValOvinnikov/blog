@@ -1,4 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { getSanityImageBaseUrl } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ContentModuleView } from '@web/modules/content/content-module-view';
 import { CtaModuleView } from '@web/modules/cta/cta-module-view';
@@ -30,7 +31,7 @@ const meta = {
         }}
         secondaryAction={undefined}
         layout={undefined}
-        baseUrl="https://cdn.sanity.io/images/demo-project/demo-dataset/"
+        baseUrl={getSanityImageBaseUrl()}
       />
     ),
     modules: (
@@ -40,7 +41,7 @@ const meta = {
           brandVariant={BRAND_VARIANT.PRIMARY}
           body={richTextDemo}
           layout={undefined}
-          baseUrl="https://cdn.sanity.io/images/demo-project/demo-dataset/"
+          baseUrl={getSanityImageBaseUrl()}
         />
         <CtaModuleView
           id="cta-1"
@@ -83,7 +84,7 @@ export const MinimalSlots: TStory = {
         primaryAction={undefined}
         secondaryAction={undefined}
         layout={undefined}
-        baseUrl="https://cdn.sanity.io/images/demo-project/demo-dataset/"
+        baseUrl={getSanityImageBaseUrl()}
       />
     ),
     modules: (
