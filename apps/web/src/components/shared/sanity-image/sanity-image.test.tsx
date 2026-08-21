@@ -14,8 +14,7 @@ const image: ISanityImage = {
 
 const setup = customRender(SanityImage, {
   image,
-  projectId: 'test-project',
-  dataset: 'test-dataset',
+  baseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
   width: 960,
   height: 720,
 });
@@ -30,6 +29,16 @@ describe('SanityImage', () => {
       expect.stringContaining('https://cdn.sanity.io'),
     );
     expect(img.getAttribute('srcset')).toContain('cdn.sanity.io');
+  });
+
+  it('forwards the given baseUrl to the rendered src/srcset, not a hardcoded origin', () => {
+    setup({
+      baseUrl: 'https://cdn.sanity.io/images/other-project/other-dataset/',
+    });
+
+    const img = screen.getByRole('img', { name: image.alt });
+    expect(img.getAttribute('src')).toContain('other-project/other-dataset');
+    expect(img.getAttribute('srcset')).toContain('other-project/other-dataset');
   });
 
   it('falls back to the image alt text when no override is provided', () => {

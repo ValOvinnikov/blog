@@ -33,6 +33,7 @@ vi.mock('@blog/ui/molecules/image-with-caption', () => ({
 
 const setup = customRender(PortableTextRenderer, {
   value: [],
+  baseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
 });
 
 describe(`<${PortableTextRenderer.name}/>`, () => {
@@ -250,10 +251,16 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
     ];
 
     const { container: firstContainer } = renderElement(
-      <PortableTextRenderer value={firstModuleBody} />,
+      <PortableTextRenderer
+        value={firstModuleBody}
+        baseUrl="https://cdn.sanity.io/images/test-project/test-dataset/"
+      />,
     );
     const { container: secondContainer } = renderElement(
-      <PortableTextRenderer value={secondModuleBody} />,
+      <PortableTextRenderer
+        value={secondModuleBody}
+        baseUrl="https://cdn.sanity.io/images/test-project/test-dataset/"
+      />,
     );
 
     const firstIds = Array.from(firstContainer.querySelectorAll('h2')).map(

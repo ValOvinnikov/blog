@@ -10,8 +10,7 @@ import { heroHiddenLabelVariants } from './hero-module-variants';
 export interface IHeroModuleViewProps extends Omit<THeroModule, 'title'> {
   id: string;
   title: string;
-  projectId: string;
-  dataset: string;
+  baseUrl: string;
 }
 
 /**
@@ -30,8 +29,7 @@ export const HeroModuleView = ({
   primaryAction,
   secondaryAction,
   layout,
-  projectId,
-  dataset,
+  baseUrl,
 }: IHeroModuleViewProps) => {
   const titleId = `hero-${id}`;
 
@@ -92,8 +90,7 @@ export const HeroModuleView = ({
             */}
             <SanityImage
               image={sanityImage}
-              projectId={projectId}
-              dataset={dataset}
+              baseUrl={baseUrl}
               width={1200}
               height={675}
               sizes="(min-width: 1024px) 50vw, 100vw"

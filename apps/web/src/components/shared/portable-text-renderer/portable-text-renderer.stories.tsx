@@ -1,3 +1,4 @@
+import { getSanityImageBaseUrl } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixtures';
 
@@ -8,7 +9,10 @@ const meta = {
   component: PortableTextRenderer,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
-  args: { value: richTextDemo },
+  args: {
+    value: richTextDemo,
+    baseUrl: getSanityImageBaseUrl(),
+  },
 } satisfies Meta<typeof PortableTextRenderer>;
 
 export default meta;

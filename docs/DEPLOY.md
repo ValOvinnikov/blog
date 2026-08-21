@@ -677,10 +677,17 @@ main web app — a second reason not to root it there.)
 - [ ] Settings → Domains → add `web-storybook.{your_hosting}` (production
       deployment only); add the DNS record at whatever registrar/DNS host
       manages `{your_hosting}`.
-- [ ] No env vars, no CORS, no tokens — `apps/web`'s stories are
-      component-level (no full-page compositions that would fetch live
-      Sanity content), so this needs nothing the `packages/ui` project
-      above doesn't already skip.
+- [ ] No CORS, no tokens — this project never talks to Sanity's API at
+      request time, so it needs none of the read-token/CORS-origin dance the
+      rest of this doc walks through.
+- [ ] **`NEXT_PUBLIC_SANITY_PROJECT_ID` / `NEXT_PUBLIC_SANITY_DATASET`** (dev
+      project's values) **are** set as env vars on this project — the one
+      deliberate exception to "no env vars" above. `SanityImage` (wrapping the
+      `sanity-image` package) needs a real CDN base URL to render an actual
+      image in the hero/portable-text stories rather than a broken one; both
+      values are public (`NEXT_PUBLIC_*`, no secret token involved) and only
+      resolve a dedicated placeholder asset uploaded to the dev dataset for
+      this purpose (unreferenced by any real content). Added 2026-08-21 (#1779).
 
 ### Deploy-skip behaviour and the Vercel build rate limit
 

@@ -8,6 +8,7 @@ const setup = customRender(ContentModuleView, {
   brandVariant: BRAND_VARIANT.PRIMARY,
   body: [],
   layout: undefined,
+  baseUrl: 'https://cdn.sanity.io/images/test-project/test-dataset/',
 });
 
 describe(ContentModuleView, () => {

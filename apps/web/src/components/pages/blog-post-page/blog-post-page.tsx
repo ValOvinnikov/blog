@@ -1,5 +1,5 @@
 import { ASIDE_KIND, ICONS, Size, type TAsideKind, routes } from '@blog/config';
-import { service } from '@blog/service';
+import { getSanityImageBaseUrl, service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms/icon';
 import {
   Breadcrumbs,
@@ -87,6 +87,7 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
   }));
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
+  const imageBaseUrl = getSanityImageBaseUrl();
   const url = `${siteUrl}${routes.post(slug)}`;
   const schema = buildBlogPostingSchema(post, siteUrl);
   const shareLinks = buildShareLinks({ url, title }).map((link) => ({
@@ -209,8 +210,7 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
                 heroImageSanity ? (
                   <SanityImage
                     image={heroImageSanity}
-                    projectId={env.NEXT_PUBLIC_SANITY_PROJECT_ID}
-                    dataset={env.NEXT_PUBLIC_SANITY_DATASET}
+                    baseUrl={imageBaseUrl}
                     width={1200}
                     height={675}
                     sizes="(min-width: 1024px) 800px, 100vw"
@@ -229,6 +229,7 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
                   <div className={s.content({ withRail: true })}>
                     <PortableTextRenderer
                       value={body}
+                      baseUrl={imageBaseUrl}
                       headings={headings}
                       asideKindLabels={asideKindLabels}
                     />
@@ -237,6 +238,7 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
               ) : (
                 <PortableTextRenderer
                   value={body}
+                  baseUrl={imageBaseUrl}
                   headings={headings}
                   asideKindLabels={asideKindLabels}
                 />

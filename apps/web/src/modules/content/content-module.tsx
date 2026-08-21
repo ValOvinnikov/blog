@@ -1,4 +1,4 @@
-import { service } from '@blog/service';
+import { getSanityImageBaseUrl, service } from '@blog/service';
 
 import { ContentModuleView } from './content-module-view';
 
@@ -16,5 +16,11 @@ export const ContentModule = async ({ id }: IContentModuleProps) => {
 
   if (!result.ok) return null;
 
-  return <ContentModuleView id={id} {...result.data} />;
+  return (
+    <ContentModuleView
+      id={id}
+      {...result.data}
+      baseUrl={getSanityImageBaseUrl()}
+    />
+  );
 };

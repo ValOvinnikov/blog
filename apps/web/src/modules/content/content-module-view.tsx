@@ -5,6 +5,7 @@ import { Section } from '@web/components/shared/section';
 
 export interface IContentModuleViewProps extends TContentModule {
   id: string;
+  baseUrl: string;
 }
 
 /**
@@ -19,6 +20,7 @@ export const ContentModuleView = ({
   brandVariant,
   body,
   layout,
+  baseUrl,
 }: IContentModuleViewProps) => {
   return (
     <Section
@@ -27,7 +29,7 @@ export const ContentModuleView = ({
       dataTestId={`content-module-${id}`}
     >
       <ContentModuleUi isWrapped={true}>
-        <PortableTextRenderer value={body} />
+        <PortableTextRenderer value={body} baseUrl={baseUrl} />
       </ContentModuleUi>
     </Section>
   );

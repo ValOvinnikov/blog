@@ -82,7 +82,10 @@ export const richTextDemo: RichText = [
   {
     _type: 'bodyImage',
     _key: nextKey('image'),
-    asset: { _ref: 'image-abc123-1600x900-jpg', _type: 'reference' },
+    asset: {
+      _ref: 'image-6205dacc42424f7a83d8e20a7000d895f7cdc7dd-2400x1260-png',
+      _type: 'reference',
+    },
     alt: 'A scenic mountain range at sunset',
     // A non-default layout (rather than the more common INLINE) so this
     // fixture also exercises the floated width/wrap treatment, not just the
