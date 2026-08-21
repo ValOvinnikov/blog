@@ -5,6 +5,7 @@ import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor
 import type { TRawNewsletterModule } from '@blog/service/features/modules/newsletter/adaptor/transformer';
 import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
+import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
@@ -89,6 +90,17 @@ export function makeRawCtaModule(
       platform: null,
       accessibleLabel: null,
     },
+    layout: null,
+    ...overrides,
+  };
+}
+
+export function makeRawTaxonomyListModule(
+  overrides: Partial<TRawTaxonomyListModule> = {},
+): TRawTaxonomyListModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    sectionHeader: { heading: 'Topics', supportingText: null, align: null },
     layout: null,
     ...overrides,
   };
