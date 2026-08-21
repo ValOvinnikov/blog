@@ -29,12 +29,12 @@ const BODY_FONTS: Partial<Record<TFontChoice, TFontModule>> = {
  * @example
  * resolveFontVariableClassName('FRAUNCES', 'INTER') // '--font-display-family --font-body-family --font-mono-family' classes
  */
-export function resolveFontVariableClassName(
+export const resolveFontVariableClassName = (
   headingFont: TFontChoice,
   bodyFont: TFontChoice,
-): string {
+): string => {
   const heading = HEADING_FONTS[headingFont] ?? spaceGrotesk;
   const body = BODY_FONTS[bodyFont] ?? newsreader;
 
   return `${heading.variable} ${body.variable} ${jetbrainsMono.variable}`;
-}
+};

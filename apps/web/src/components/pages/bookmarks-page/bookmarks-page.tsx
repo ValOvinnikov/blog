@@ -34,7 +34,7 @@ const s = bookmarksPageVariants();
  * ids that failed to resolve are silently dropped), not the raw
  * bookmark-row count.
  */
-export async function BookmarksPage() {
+export const BookmarksPage = async () => {
   const session = await auth();
   const userId = session?.user?.id;
 
@@ -156,4 +156,4 @@ export async function BookmarksPage() {
       )}
     </main>
   );
-}
+};

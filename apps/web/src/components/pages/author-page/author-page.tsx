@@ -41,7 +41,7 @@ const s = authorPageVariants();
  * `Breadcrumbs` trail (plus its `BreadcrumbList` JSON-LD) inside a
  * `BreadcrumbBar` sibling before `<main>`.
  */
-export async function AuthorPage({ slug, page }: TAuthorPageProps) {
+export const AuthorPage = async ({ slug, page }: TAuthorPageProps) => {
   const [result, t, breadcrumbsT, authorPageT] = await Promise.all([
     service.pages.author.v1.getAuthorPage(slug, {
       page,
@@ -152,4 +152,4 @@ export async function AuthorPage({ slug, page }: TAuthorPageProps) {
       />
     </>
   );
-}
+};

@@ -40,11 +40,11 @@ const FONT_CACHE_SECONDS = 60 * 60 * 24 * 365; // 1 year
  * user-agent makes Google's `css2` endpoint return a `truetype`/`opentype`
  * source Satori can parse directly (its default `woff2` response can't be).
  */
-async function loadGoogleFont(
+const loadGoogleFont = async (
   family: string,
   weight: number,
   text: string,
-): Promise<ArrayBuffer> {
+): Promise<ArrayBuffer> => {
   const cssUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&text=${encodeURIComponent(text)}`;
   const cssResponse = await fetch(cssUrl, {
     next: { revalidate: FONT_CACHE_SECONDS },
@@ -68,7 +68,7 @@ async function loadGoogleFont(
   }
 
   return response.arrayBuffer();
-}
+};
 
 const mark = (
   <svg width="96" height="96" viewBox="0 0 24 24">
@@ -78,7 +78,7 @@ const mark = (
   </svg>
 );
 
-function renderMarkOnly(): ImageResponse {
+const renderMarkOnly = (): ImageResponse => {
   return new ImageResponse(
     <div
       style={{
@@ -94,7 +94,7 @@ function renderMarkOnly(): ImageResponse {
     </div>,
     size,
   );
-}
+};
 
 export type TBuildDefaultSocialImageOptions = {
   brandName?: string;
@@ -113,10 +113,10 @@ export type TBuildDefaultSocialImageOptions = {
  * fails; either way this must still return a valid image rather than let the
  * route throw, since it's the site's last-resort fallback image.
  */
-export async function buildDefaultSocialImage({
+export const buildDefaultSocialImage = async ({
   brandName,
   tagline,
-}: TBuildDefaultSocialImageOptions): Promise<ImageResponse> {
+}: TBuildDefaultSocialImageOptions): Promise<ImageResponse> => {
   if (!brandName) {
     return renderMarkOnly();
   }
@@ -185,7 +185,7 @@ export async function buildDefaultSocialImage({
       ],
     },
   );
-}
+};
 
 /**
  * Fetches `siteSettings` for `buildDefaultSocialImage` — shared by
@@ -193,9 +193,9 @@ export async function buildDefaultSocialImage({
  * logic (and its error logging) lives in one place. `routeName` is only used
  * to identify the caller in the logged error.
  */
-export async function resolveDefaultSocialImageProps(
+export const resolveDefaultSocialImageProps = async (
   routeName: string,
-): Promise<TBuildDefaultSocialImageOptions> {
+): Promise<TBuildDefaultSocialImageOptions> => {
   const result = await service.global.siteSettings.v1.getSiteSettings();
 
   if (!result.ok) {
@@ -209,4 +209,4 @@ export async function resolveDefaultSocialImageProps(
   const { brand, tagline } = result.data;
 
   return { brandName: brand.name, tagline };
-}
+};

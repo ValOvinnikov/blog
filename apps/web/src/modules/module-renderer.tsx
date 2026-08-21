@@ -22,11 +22,11 @@ export interface IModuleRendererProps {
  * somehow reached here (schema-prevented in practice), it would still hit
  * the "unknown module type" fallback rather than type-error.
  */
-export async function ModuleRenderer({
+export const ModuleRenderer = async ({
   modules,
   locale,
   context,
-}: IModuleRendererProps): Promise<ReactNode> {
+}: IModuleRendererProps): Promise<ReactNode> => {
   const rendered = await Promise.all(
     modules.map(async (module) => {
       const Component = MODULE_MAP[module.type as keyof typeof MODULE_MAP];
@@ -52,4 +52,4 @@ export async function ModuleRenderer({
       )}
     </>
   );
-}
+};

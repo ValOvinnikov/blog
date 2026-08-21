@@ -5,16 +5,16 @@ import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { getTranslations } from 'next-intl/server';
 
-function toRssItem(post: TArchivePostCard, siteUrl: string): TRssItem {
+const toRssItem = (post: TArchivePostCard, siteUrl: string): TRssItem => {
   return {
     title: post.title,
     link: `${siteUrl}${routes.post(post.slug)}`,
     description: post.excerpt,
     publishedAt: post.publishedAt,
   };
-}
+};
 
-async function getAllPublishedPosts(): Promise<TArchivePostCard[]> {
+const getAllPublishedPosts = async (): Promise<TArchivePostCard[]> => {
   const firstPageResult = await service.pages.blog.v1.getIndexPage({ page: 1 });
   if (!firstPageResult.ok) {
     logger.error('rss.index_page_fetch_failed', {
@@ -43,7 +43,7 @@ async function getAllPublishedPosts(): Promise<TArchivePostCard[]> {
   });
 
   return [...posts, ...restPosts];
-}
+};
 
 /**
  * RSS 2.0 feed of every published post, newest posts first (the order the

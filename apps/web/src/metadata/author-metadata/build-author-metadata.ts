@@ -18,10 +18,10 @@ import { getTranslations } from 'next-intl/server';
  * Reuses `getAuthorPage` (also called by `AuthorPage`) — Next dedupes the
  * fetch per request, so this adds no extra round-trip.
  */
-export async function buildAuthorMetadata(
+export const buildAuthorMetadata = async (
   slug: string,
   pageNumber?: number,
-): Promise<Metadata> {
+): Promise<Metadata> => {
   const [result, t, authorMetadataT] = await Promise.all([
     service.pages.author.v1.getAuthorPage(slug, {
       page: pageNumber,
@@ -68,4 +68,4 @@ export async function buildAuthorMetadata(
       ogType: 'website',
     },
   );
-}
+};

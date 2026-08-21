@@ -12,6 +12,6 @@ const XML_ESCAPES: Record<string, string> = {
  * caller building XML by hand — no templating library does this for you —
  * must run untrusted/CMS-authored strings through this first.
  */
-export function escapeXml(value: string): string {
+export const escapeXml = (value: string): string => {
   return value.replace(/[&<>"']/g, (char) => XML_ESCAPES[char] ?? char);
-}
+};

@@ -30,7 +30,12 @@ export type TPostShareProps = {
  * @example
  * <PostMeta author={post.author} share={<PostShare url={url} title={post.title} links={shareLinks} />} />
  */
-export function PostShare({ url, title, links, className }: TPostShareProps) {
+export const PostShare = ({
+  url,
+  title,
+  links,
+  className,
+}: TPostShareProps) => {
   const t = useTranslations('postShare');
   const panelId = useId();
   const { open, toggle, triggerRef, panelRef } = usePopover();
@@ -87,4 +92,4 @@ export function PostShare({ url, title, links, className }: TPostShareProps) {
       </span>
     </PopoverMenu>
   );
-}
+};

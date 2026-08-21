@@ -199,6 +199,53 @@ When invoked, before writing any code:
   variable class names to `<html>` (the one permitted inline exception). No font
   definitions inside layout files.
 
+## Function style (do not violate)
+
+`apps/web` uses **arrow-function consts** for every module-level function —
+components, hooks, helpers, metadata builders, test fixtures. Enforced by
+`func-style: ['error', 'expression', { allowArrowFunctions: true }]` in
+`configs/eslint/web.js`.
+
+```ts
+export const buildAuthorMetadata = (author: TAuthorDetail): Metadata => { ... };
+export const ShareButton = ({ url }: TShareButtonProps) => { ... };
+```
+
+A `function` declaration is correct in exactly these four cases:
+
+1. **Generator functions** — `function*` has no arrow form.
+2. **TypeScript overload signatures** — an arrow const cannot carry multiple
+   call signatures declared that way.
+3. **A genuine `this` binding** — an arrow captures `this` lexically, so
+   converting changes behaviour. (Class methods are not function declarations;
+   they are unaffected by this rule.)
+4. **Next.js reserved exports** — framework API surface. Every Next.js doc,
+   example, and codemod emits a declaration for these, so an arrow reads as a
+   deviation to anyone who knows the framework, and future scaffolding keeps
+   reintroducing the declaration:
+   - the **default** export of `page.tsx`, `layout.tsx`, `not-found.tsx`,
+     `error.tsx`, `global-error.tsx`, `loading.tsx`, `template.tsx`,
+     `sitemap.ts`, `robots.ts`, `icon.tsx`, `opengraph-image.tsx`,
+     `twitter-image.tsx`, and `proxy.ts` (Next.js 16's renamed `middleware`);
+   - the **named** exports `generateMetadata`, `generateStaticParams`, and the
+     route-handler verbs `GET`/`POST`/`PUT`/`PATCH`/`DELETE`/`HEAD`/`OPTIONS`.
+
+   `func-style` cannot exempt by export name, so the override is glob-scoped
+   (`**/page.tsx`, `**/layout.tsx`, `**/route.ts`, `**/not-found.tsx`) and
+   silences those files entirely. That is a linter limitation, not licence: a
+   **non-reserved local helper living inside one of those files still uses an
+   arrow const.**
+
+Hoisting is **not** an exception. A declaration is hoisted and an arrow const is
+not, so a helper invoked at module-evaluation time above its own definition
+becomes a TDZ `ReferenceError` that `type-check` will not catch. Move the
+definition above its first use rather than reaching for a declaration.
+
+`packages/ui` already follows this rule, tests and stories included.
+`@blog/service` and `@blog/db` deliberately go the other way — they export
+_operations_, where `export function getPostBySlug()` is the ordinary
+Node/TypeScript idiom — so never "fix" a declaration you see there.
+
 ## Component patterns
 
 - Follow the same component conventions as `@blog/ui` (see the
@@ -351,6 +398,7 @@ Run these checks **once, after all work is complete**:
   (`ci.yml`) and is not part of local verify.
 - No direct Sanity import; no GROQ; no raw `next/link` import outside the
   `SmartLink` wrapper; no inline presentation that belongs in `ui`.
+- No `function` declaration outside the four exceptions in "Function style".
 - Routes have metadata; feeds present; ISR/revalidation wired.
 
 **Report back to the orchestrator** with:

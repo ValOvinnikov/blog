@@ -30,7 +30,7 @@ export type TSignInMenuProps = {
  * `useEmailSignIn`; open/close state and refs come from the parent's single
  * `usePopover()` call — this component never calls `usePopover()` itself.
  */
-export function SignInMenu({
+export const SignInMenu = ({
   panelId,
   isOpen,
   toggle,
@@ -38,7 +38,7 @@ export function SignInMenu({
   panelRef,
   oauthError,
   isPlain = false,
-}: TSignInMenuProps) {
+}: TSignInMenuProps) => {
   const t = useTranslations('authMenu');
   const {
     emailStep,
@@ -209,4 +209,4 @@ export function SignInMenu({
       )}
     </PopoverMenu>
   );
-}
+};

@@ -35,9 +35,9 @@ export const clientLogSchema = z
 
 export type TClientLogPayload = z.infer<typeof clientLogSchema>;
 
-function stripQueryString(url: string): string {
+const stripQueryString = (url: string): string => {
   return (url.split('#')[0] ?? '').split('?')[0] ?? '';
-}
+};
 
 /**
  * Runs every string field through `sanitizeLogMessage` (strips control
@@ -47,9 +47,9 @@ function stripQueryString(url: string): string {
  * it must not trust a request that skipped the browser-side reporter
  * entirely and posted here directly.
  */
-export function sanitizeClientLogPayload(
+export const sanitizeClientLogPayload = (
   payload: TClientLogPayload,
-): TClientLogPayload {
+): TClientLogPayload => {
   return {
     event: payload.event,
     message: sanitizeLogMessage(payload.message),
@@ -62,4 +62,4 @@ export function sanitizeClientLogPayload(
       ? { userAgent: sanitizeLogMessage(payload.userAgent) }
       : {}),
   };
-}
+};

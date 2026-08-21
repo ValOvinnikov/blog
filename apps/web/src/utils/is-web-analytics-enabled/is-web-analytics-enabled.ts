@@ -9,6 +9,6 @@ import { env } from '@web/utils/env/env';
  * @example
  * isWebAnalyticsEnabled() // true only when WEB_ANALYTICS_ENABLED === 'true'
  */
-export function isWebAnalyticsEnabled(): boolean {
+export const isWebAnalyticsEnabled = (): boolean => {
   return env.WEB_ANALYTICS_ENABLED === 'true';
-}
+};

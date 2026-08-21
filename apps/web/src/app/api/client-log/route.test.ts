@@ -18,10 +18,10 @@ const validPayload = {
   message: 'clipboard write denied',
 };
 
-function postRequest(
+const postRequest = (
   body: unknown,
   init?: { headers?: Record<string, string>; raw?: string },
-) {
+) => {
   const rawBody = init?.raw ?? JSON.stringify(body);
 
   return new Request('https://example.com/api/client-log', {
@@ -29,13 +29,13 @@ function postRequest(
     headers: { 'Content-Type': 'application/json', ...init?.headers },
     body: rawBody,
   });
-}
+};
 
 // Simulates a genuine chunked-transfer request: a `ReadableStream` body has
 // no synchronously-known length, so unlike `postRequest`'s plain string
 // body, the runtime never populates a `content-length` header for it at
 // all — this is the shape the pre-read byte-cap enforcement exists for.
-function postStreamRequest(byteLength: number) {
+const postStreamRequest = (byteLength: number) => {
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
       controller.enqueue(new Uint8Array(byteLength).fill(97));
@@ -49,12 +49,12 @@ function postStreamRequest(byteLength: number) {
     body: stream,
     duplex: 'half',
   } as RequestInit);
-}
+};
 
-async function freshRoute() {
+const freshRoute = async () => {
   vi.resetModules();
   return import('./route');
-}
+};
 
 describe('POST /api/client-log', () => {
   beforeEach(() => {

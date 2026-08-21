@@ -14,31 +14,31 @@ type TWindowEntry = { count: number; windowStart: number };
 
 const requestCounts = new Map<string, TWindowEntry>();
 
-function isExpired(entry: TWindowEntry, now: number): boolean {
+const isExpired = (entry: TWindowEntry, now: number): boolean => {
   return now - entry.windowStart >= WINDOW_MS;
-}
+};
 
 // O(n) over currently-tracked clients, run on every call — cheap enough for
 // a single lightweight endpoint's limiter. Frees an expired entry
 // immediately rather than leaving it to linger until evicted for space.
-function sweepExpiredEntries(now: number): void {
+const sweepExpiredEntries = (now: number): void => {
   for (const [key, entry] of requestCounts) {
     if (isExpired(entry, now)) {
       requestCounts.delete(key);
     }
   }
-}
+};
 
 // `Map` iterates in insertion order and a repeat hit never re-inserts an
 // existing key (see `isClientLogRateLimited` below), so the first key here
 // is the oldest still-tracked client — a simple FIFO choice once the cap
 // is reached.
-function evictOldestEntry(): void {
+const evictOldestEntry = (): void => {
   const oldestKey = requestCounts.keys().next().value;
   if (oldestKey !== undefined) {
     requestCounts.delete(oldestKey);
   }
-}
+};
 
 /**
  * Fixed-window, per-client-key limiter backed by a module-level `Map` — the
@@ -56,7 +56,7 @@ function evictOldestEntry(): void {
  * High-cost for an attacker and acceptable for v1 — but a real limitation,
  * not just a caveat.
  */
-export function isClientLogRateLimited(clientKey: string): boolean {
+export const isClientLogRateLimited = (clientKey: string): boolean => {
   const now = Date.now();
   sweepExpiredEntries(now);
 
@@ -71,12 +71,12 @@ export function isClientLogRateLimited(clientKey: string): boolean {
   }
   requestCounts.set(clientKey, { count: 1, windowStart: now });
   return false;
-}
+};
 
 // Test-only: the raw tracked-client count, exposed because it's the only
 // way to unambiguously prove the sweep frees Map capacity on its own,
 // independent of `MAX_TRACKED_CLIENTS` eviction (see the rate-limiter test
 // suite for why the boolean return value alone can't distinguish the two).
-export function getTrackedClientCountForTests(): number {
+export const getTrackedClientCountForTests = (): number => {
   return requestCounts.size;
-}
+};

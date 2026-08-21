@@ -23,7 +23,9 @@ export type TDeleteAccountControlProps = {
  * returns a `Result` so it's wrapped to throw for `toast.promise`'s error branch, and only
  * the success path signs the reader out.
  */
-export function DeleteAccountControl({ handle }: TDeleteAccountControlProps) {
+export const DeleteAccountControl = ({
+  handle,
+}: TDeleteAccountControlProps) => {
   const t = useTranslations('accountPage.privacy');
   const toast = useToast();
   const [typed, setTyped] = useState('');
@@ -87,4 +89,4 @@ export function DeleteAccountControl({ handle }: TDeleteAccountControlProps) {
       </Button>
     </>
   );
-}
+};

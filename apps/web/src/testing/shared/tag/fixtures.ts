@@ -3,7 +3,7 @@ import { makeSeo } from '@web/testing/shared/seo/fixtures';
 
 type TTagPageTag = TTagPage['tag'];
 
-export function makeTag(overrides: Partial<TTagPageTag> = {}): TTagPageTag {
+export const makeTag = (overrides: Partial<TTagPageTag> = {}): TTagPageTag => {
   return {
     id: 'tag-1',
     title: 'TypeScript',
@@ -17,4 +17,4 @@ export function makeTag(overrides: Partial<TTagPageTag> = {}): TTagPageTag {
     }),
     ...overrides,
   };
-}
+};

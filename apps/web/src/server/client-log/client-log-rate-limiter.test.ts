@@ -1,9 +1,9 @@
 export {};
 
-async function freshModule() {
+const freshModule = async () => {
   vi.resetModules();
   return import('./client-log-rate-limiter');
-}
+};
 
 describe('isClientLogRateLimited', () => {
   beforeEach(() => {

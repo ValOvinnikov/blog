@@ -38,6 +38,7 @@ export default [
     },
     rules: {
       'blog/boolean-prop-prefix': 'error',
+      'func-style': ['error', 'expression', { allowArrowFunctions: true }],
       'no-restricted-imports': [
         'error',
         {
@@ -67,6 +68,14 @@ export default [
     files: ['e2e/**/*.{ts,tsx}'],
     rules: {
       'no-console': 'off',
+    },
+  },
+  {
+    // Next.js reserved exports (generateMetadata, route verbs, ...) stay as
+    // function declarations — framework API surface, not app code.
+    files: ['**/page.tsx', '**/layout.tsx', '**/route.ts', '**/not-found.tsx'],
+    rules: {
+      'func-style': 'off',
     },
   },
 ];

@@ -1,8 +1,8 @@
 import type { ISanityImage } from '@blog/config';
 
-export function makeSanityImage(
+export const makeSanityImage = (
   overrides: Partial<ISanityImage> = {},
-): ISanityImage {
+): ISanityImage => {
   return {
     assetId: 'image-abc123-1600x1200-jpg',
     alt: 'A scenic mountain range',
@@ -12,4 +12,4 @@ export function makeSanityImage(
     dimensions: { width: 1600, height: 1200, aspectRatio: 1600 / 1200 },
     ...overrides,
   };
-}
+};

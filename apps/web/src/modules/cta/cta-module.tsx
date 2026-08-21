@@ -10,10 +10,10 @@ export interface ICtaModuleProps {
 /**
  * CtaModule — fetches `module_cta` data and hands it to `CtaModuleView`.
  */
-export async function CtaModule({ id }: ICtaModuleProps) {
+export const CtaModule = async ({ id }: ICtaModuleProps) => {
   const result = await service.modules.cta.v1.getCta(id);
 
   if (!result.ok) return null;
 
   return <CtaModuleView id={id} {...result.data} />;
-}
+};

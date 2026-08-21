@@ -21,9 +21,9 @@ const FALLBACK_MARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="80" he
   <polygon class="l3" points="40,12 66,21 40,30 14,21"/>
 </svg>`;
 
-async function fetchLogoIcon(
+const fetchLogoIcon = async (
   logoAsset: TRawImage,
-): Promise<Response | undefined> {
+): Promise<Response | undefined> => {
   const iconUrl = buildImageUrl(logoAsset, {
     width: FAVICON_SIZE,
     height: FAVICON_SIZE,
@@ -42,13 +42,13 @@ async function fetchLogoIcon(
   }
 
   return response;
-}
+};
 
-function buildFallbackResponse(): Response {
+const buildFallbackResponse = (): Response => {
   return new Response(FALLBACK_MARK_SVG, {
     headers: { 'Content-Type': contentType },
   });
-}
+};
 
 /**
  * Dynamic favicon route (Next.js's code-generated `icon` file convention) —

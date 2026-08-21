@@ -27,7 +27,7 @@ const s = accountPageVariants();
  * *last* as a fixed danger-zone anchor at the bottom of the page, and
  * `IdentitySection` always renders *first*.
  */
-export async function AccountPage() {
+export const AccountPage = async () => {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -48,4 +48,4 @@ export async function AccountPage() {
       </div>
     </main>
   );
-}
+};

@@ -27,7 +27,7 @@ type TBlogListPageProps = { page: number; locale: string };
  * (`page_blog.modules`) render last, through the same `ModuleRenderer` the
  * home page uses — no hardcoded placement.
  */
-export async function BlogListPage({ page, locale }: TBlogListPageProps) {
+export const BlogListPage = async ({ page, locale }: TBlogListPageProps) => {
   const [result, topics, t, breadcrumbsT, blogListT] = await Promise.all([
     service.pages.blog.v1.getIndexPage({ page }),
     getTopicsSafely(),
@@ -105,4 +105,4 @@ export async function BlogListPage({ page, locale }: TBlogListPageProps) {
       />
     </>
   );
-}
+};

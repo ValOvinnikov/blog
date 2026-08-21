@@ -32,10 +32,10 @@ vi.mock('next/cache', () => ({
 
 const TENANT = { id: 'tenant-1' };
 
-function siteConfigRow(
+const siteConfigRow = (
   preset: string,
   voiceOverrides: Record<string, string> = {},
-) {
+) => {
   return {
     preset,
     accentHue: 250,
@@ -45,23 +45,23 @@ function siteConfigRow(
     density: 'DEFAULT',
     voiceOverrides,
   };
-}
+};
 
-function getAtPath(source: unknown, path: readonly string[]): unknown {
+const getAtPath = (source: unknown, path: readonly string[]): unknown => {
   return path.reduce<unknown>((acc, key) => {
     if (acc && typeof acc === 'object') {
       return (acc as Record<string, unknown>)[key];
     }
     return undefined;
   }, source);
-}
+};
 
-async function resolveMessages(): Promise<unknown> {
+const resolveMessages = async (): Promise<unknown> => {
   const config = await requestConfig({
     requestLocale: Promise.resolve('EN'),
   });
   return config.messages;
-}
+};
 
 // [message path, original pre-#1420 wording, #1420 neutralized wording] —
 // the full 64-row classification table from #1420's issue body.
@@ -111,11 +111,7 @@ const CLASSIFICATION_TABLE: Array<[string[], string, string]> = [
     'Unsubscribe anytime',
   ],
   [['accountPage', 'privacy', 'promptHost'], '~$', ''],
-  [
-    ['accountPage', 'privacy', 'promptCommand'],
-    'account --privacy',
-    'Privacy',
-  ],
+  [['accountPage', 'privacy', 'promptCommand'], 'account --privacy', 'Privacy'],
   [['accountPage', 'privacy', 'promptTag'], 'data', ''],
   [
     ['accountPage', 'privacy', 'exportButton'],
@@ -143,11 +139,7 @@ const CLASSIFICATION_TABLE: Array<[string[], string, string]> = [
     'deleting',
     'Deleting',
   ],
-  [
-    ['accountPage', 'privacy', 'deleteToastSuccessState'],
-    'deleted',
-    'Deleted',
-  ],
+  [['accountPage', 'privacy', 'deleteToastSuccessState'], 'deleted', 'Deleted'],
   [['accountPage', 'privacy', 'deleteToastErrorState'], 'failed', 'Failed'],
   [['accountPage', 'newsletter', 'promptHost'], '~$', ''],
   [
@@ -155,11 +147,7 @@ const CLASSIFICATION_TABLE: Array<[string[], string, string]> = [
     'account --email',
     'Newsletter',
   ],
-  [
-    ['accountPage', 'newsletter', 'activeBadge'],
-    'subscribed',
-    'Subscribed',
-  ],
+  [['accountPage', 'newsletter', 'activeBadge'], 'subscribed', 'Subscribed'],
   [
     ['accountPage', 'newsletter', 'unsubscribeButton'],
     'unsubscribe',
@@ -210,11 +198,7 @@ const CLASSIFICATION_TABLE: Array<[string[], string, string]> = [
     'resent',
     'Resent',
   ],
-  [
-    ['accountPage', 'newsletter', 'resendToastErrorState'],
-    'failed',
-    'Failed',
-  ],
+  [['accountPage', 'newsletter', 'resendToastErrorState'], 'failed', 'Failed'],
   [['accountPage', 'identity', 'promptHost'], '~$', ''],
   [
     ['accountPage', 'identity', 'promptCommand'],
@@ -229,11 +213,7 @@ const CLASSIFICATION_TABLE: Array<[string[], string, string]> = [
     "last remaining method — can't unlink",
     "Last remaining method — can't unlink",
   ],
-  [
-    ['accountPage', 'identity', 'unlinkToastCommand'],
-    'identity',
-    'Identity',
-  ],
+  [['accountPage', 'identity', 'unlinkToastCommand'], 'identity', 'Identity'],
   [
     ['accountPage', 'identity', 'unlinkToastLoadingState'],
     'unlinking',
@@ -247,16 +227,8 @@ const CLASSIFICATION_TABLE: Array<[string[], string, string]> = [
   [['accountPage', 'identity', 'unlinkToastErrorState'], 'failed', 'Failed'],
   [['accountPage', 'identity', 'saveButton'], 'save', 'Save'],
   [['accountPage', 'identity', 'saveToastCommand'], 'identity', 'Identity'],
-  [
-    ['accountPage', 'identity', 'saveToastLoadingState'],
-    'saving',
-    'Saving',
-  ],
-  [
-    ['accountPage', 'identity', 'saveToastSuccessState'],
-    'saved',
-    'Saved',
-  ],
+  [['accountPage', 'identity', 'saveToastLoadingState'], 'saving', 'Saving'],
+  [['accountPage', 'identity', 'saveToastSuccessState'], 'saved', 'Saved'],
   [['accountPage', 'identity', 'saveToastErrorState'], 'failed', 'Failed'],
 ];
 

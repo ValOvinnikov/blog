@@ -15,10 +15,10 @@ const SITE_CONFIG_REVALIDATE_SECONDS = 3600;
  * TODO: fold this into `resolveTenantId()`/`getRequestTenantId()` once
  * `site_config` reads have a tenant-scoped caching story (#1527).
  */
-async function resolveSiteConfigTenantId(): Promise<string | undefined> {
+const resolveSiteConfigTenantId = async (): Promise<string | undefined> => {
   const [tenant] = await queries.tenants.listTenants();
   return tenant?.id;
-}
+};
 
 // `apps/admin`'s Look/Voice saves write `site_config` directly via
 // `@blog/db`, then call `/api/revalidate-site-config` (a separate Vercel

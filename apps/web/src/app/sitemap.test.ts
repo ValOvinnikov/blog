@@ -55,7 +55,7 @@ vi.mock('@web/utils/env/env', () => ({
 }));
 
 /** Resolves every params mock to an empty result; tests override as needed. */
-function mockAllEmpty() {
+const mockAllEmpty = () => {
   getPostParamsMock.mockResolvedValue({ ok: true, data: [] });
   getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
   getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
@@ -65,7 +65,7 @@ function mockAllEmpty() {
   getAuthorPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
   getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
   getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
-}
+};
 
 describe('sitemap', () => {
   afterEach(() => {

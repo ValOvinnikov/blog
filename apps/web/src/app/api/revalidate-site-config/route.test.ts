@@ -14,7 +14,7 @@ vi.mock('@web/utils/env/env', () => ({
   env: { SITE_CONFIG_REVALIDATE_SECRET: 'test-secret' },
 }));
 
-function makeRequest(authorization?: string): Request {
+const makeRequest = (authorization?: string): Request => {
   const headers = new Headers();
   if (authorization !== undefined) {
     headers.set('authorization', authorization);
@@ -23,7 +23,7 @@ function makeRequest(authorization?: string): Request {
     method: 'POST',
     headers,
   });
-}
+};
 
 describe('POST /api/revalidate-site-config', () => {
   beforeEach(() => {

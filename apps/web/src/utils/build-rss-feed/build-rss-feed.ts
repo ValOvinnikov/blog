@@ -14,7 +14,7 @@ export type TRssItem = {
   publishedAt: string;
 };
 
-function toRssItemXml(item: TRssItem): string {
+const toRssItemXml = (item: TRssItem): string => {
   const pubDate = new Date(item.publishedAt).toUTCString();
 
   return `    <item>
@@ -24,14 +24,17 @@ function toRssItemXml(item: TRssItem): string {
       <description>${escapeXml(item.description)}</description>
       <pubDate>${pubDate}</pubDate>
     </item>`;
-}
+};
 
 /**
  * Builds a valid RSS 2.0 XML string from a channel + its items. Every text
  * field is XML-escaped — callers pass raw CMS-authored strings (titles,
  * excerpts) straight through without pre-escaping.
  */
-export function buildRssFeed(channel: TRssChannel, items: TRssItem[]): string {
+export const buildRssFeed = (
+  channel: TRssChannel,
+  items: TRssItem[],
+): string => {
   const itemsXml = items.map(toRssItemXml).join('\n');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -43,4 +46,4 @@ export function buildRssFeed(channel: TRssChannel, items: TRssItem[]): string {
 ${itemsXml}
   </channel>
 </rss>`;
-}
+};

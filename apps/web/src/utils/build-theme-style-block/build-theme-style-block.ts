@@ -7,7 +7,7 @@ import type { TThemeTokens } from '@blog/config';
  * contract"). `--brand-primary-contrast` is achromatic by design and never
  * varies with hue.
  */
-function buildAccentTokens(hue: number, isDark: boolean): string {
+const buildAccentTokens = (hue: number, isDark: boolean): string => {
   if (isDark) {
     return [
       `--brand-primary: oklch(0.7 0.16 ${hue});`,
@@ -27,9 +27,9 @@ function buildAccentTokens(hue: number, isDark: boolean): string {
     `--brand-primary-solid: oklch(0.55 0.17 ${hue});`,
     `--brand-primary-solid-hover: oklch(0.49 0.17 ${hue});`,
   ].join('\n    ');
-}
+};
 
-function buildLogoTokens(hue: number, isDark: boolean): string {
+const buildLogoTokens = (hue: number, isDark: boolean): string => {
   if (isDark) {
     return [
       `--logo-1: oklch(0.58 0.17 ${hue});`,
@@ -43,7 +43,7 @@ function buildLogoTokens(hue: number, isDark: boolean): string {
     `--logo-2: oklch(0.63 0.16 ${hue});`,
     `--logo-3: oklch(0.73 0.13 ${hue});`,
   ].join('\n    ');
-}
+};
 
 /**
  * Builds the server-rendered `<style>` block content injecting the resolved
@@ -61,10 +61,10 @@ function buildLogoTokens(hue: number, isDark: boolean): string {
  * @example
  * buildThemeStyleBlock({ accentHue: 250, logoHue: 250, ... }) // ':root { --brand-primary: oklch(...); ... }\n.dark { ... }'
  */
-export function buildThemeStyleBlock({
+export const buildThemeStyleBlock = ({
   accentHue,
   logoHue,
-}: TThemeTokens): string {
+}: TThemeTokens): string => {
   const resolvedLogoHue = logoHue ?? accentHue;
 
   return `:root {
@@ -76,4 +76,4 @@ export function buildThemeStyleBlock({
     ${buildAccentTokens(accentHue, true)}
     ${buildLogoTokens(resolvedLogoHue, true)}
 }`;
-}
+};

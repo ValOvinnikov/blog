@@ -27,7 +27,7 @@ const s = newsletterSectionVariants();
  * section's whole job — subscribing is the separate `NewsletterForm`
  * module's job.
  */
-export async function NewsletterSection() {
+export const NewsletterSection = async () => {
   const session = await auth();
   if (!session?.user?.id) return null;
 
@@ -99,4 +99,4 @@ export async function NewsletterSection() {
       <WindowChrome.Body>{settingRow}</WindowChrome.Body>
     </WindowChrome>
   );
-}
+};

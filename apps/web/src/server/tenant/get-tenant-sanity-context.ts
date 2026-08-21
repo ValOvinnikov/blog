@@ -9,11 +9,11 @@ import { getRequestTenantId } from './get-request-tenant-id';
  * argument — `undefined` (no resolved tenant, or a tenant with no token set
  * yet) means "use the legacy single-tenant client."
  */
-export async function getTenantSanityContext(): Promise<
+export const getTenantSanityContext = async (): Promise<
   TTenantSanityContext | undefined
-> {
+> => {
   const tenantId = await getRequestTenantId();
   if (!tenantId) return undefined;
 
   return queries.tenants.getTenantSanityCredentials(tenantId);
-}
+};

@@ -20,9 +20,9 @@ const LINKABLE_PROVIDERS: readonly TLinkableProvider[] = ['github', 'google'];
 // Re-validating here, before `provider` is used anywhere, means every
 // downstream use — logged or passed to the db call — operates on a value
 // that's actually one of the two known literals.
-function isLinkableProvider(value: string): value is TLinkableProvider {
+const isLinkableProvider = (value: string): value is TLinkableProvider => {
   return (LINKABLE_PROVIDERS as readonly string[]).includes(value);
-}
+};
 
 export type TUnlinkProviderResult =
   { ok: true } | { ok: false; reason: 'last-method' | 'unknown' };
@@ -38,9 +38,9 @@ export type TUpdateDisplayNameResult = { ok: true } | { ok: false };
  * so the client can show a specific error even if the UI's own last-method
  * guard raced a concurrent unlink from another tab.
  */
-export async function unlinkProviderAction(
+export const unlinkProviderAction = async (
   provider: TLinkableProvider,
-): Promise<TUnlinkProviderResult> {
+): Promise<TUnlinkProviderResult> => {
   if (!isLinkableProvider(provider)) return { ok: false, reason: 'unknown' };
 
   const session = await auth();
@@ -57,7 +57,7 @@ export async function unlinkProviderAction(
     logger.error('account.provider_unlink_failed', { provider, error });
     return { ok: false, reason: 'unknown' };
   }
-}
+};
 
 /**
  * `DisplayNameControl`'s server write. Reads the session itself rather than
@@ -65,9 +65,9 @@ export async function unlinkProviderAction(
  * performs no validation of its own, so this trims `name` and rejects an
  * empty result before ever reaching the database.
  */
-export async function updateDisplayNameAction(
+export const updateDisplayNameAction = async (
   name: string,
-): Promise<TUpdateDisplayNameResult> {
+): Promise<TUpdateDisplayNameResult> => {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return { ok: false };
@@ -82,4 +82,4 @@ export async function updateDisplayNameAction(
     logger.error('account.display_name_update_failed', { error });
     return { ok: false };
   }
-}
+};

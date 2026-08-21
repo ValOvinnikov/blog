@@ -11,7 +11,7 @@ export interface IHeroModuleProps {
 /**
  * HeroModule — fetches `module_hero` data and hands it to `HeroModuleView`.
  */
-export async function HeroModule({ id }: IHeroModuleProps) {
+export const HeroModule = async ({ id }: IHeroModuleProps) => {
   const result = await service.modules.hero.v1.getHero(id);
 
   if (!result.ok) return null;
@@ -31,4 +31,4 @@ export async function HeroModule({ id }: IHeroModuleProps) {
       dataset={env.NEXT_PUBLIC_SANITY_DATASET}
     />
   );
-}
+};

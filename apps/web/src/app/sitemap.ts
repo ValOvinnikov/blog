@@ -10,11 +10,11 @@ import type { MetadataRoute } from 'next';
 
 // Only `getPostParams()` projects a `publishedAt` field, so `lastModified`
 // stays unset for topic/tag/author/generic-page entries.
-function toEntry(
+const toEntry = (
   path: string,
   siteUrl: string,
   lastModified?: Date | string,
-): MetadataRoute.Sitemap[number] {
+): MetadataRoute.Sitemap[number] => {
   return {
     url: `${siteUrl}${path}`,
     ...(lastModified ? { lastModified } : {}),
@@ -27,7 +27,7 @@ function toEntry(
       ),
     },
   };
-}
+};
 
 /**
  * Site-wide sitemap covering every static and archive route, including

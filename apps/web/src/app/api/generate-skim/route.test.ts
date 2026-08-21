@@ -32,14 +32,14 @@ vi.mock('@web/utils/env/env', () => ({
   },
 }));
 
-function makeRequest(body: unknown, secret = 'test-secret'): Request {
+const makeRequest = (body: unknown, secret = 'test-secret'): Request => {
   const url = new URL('https://example.com/api/generate-skim');
   if (secret !== undefined) url.searchParams.set('secret', secret);
   return new Request(url, {
     method: 'POST',
     body: body === undefined ? undefined : JSON.stringify(body),
   });
-}
+};
 
 describe('POST /api/generate-skim', () => {
   beforeEach(() => {

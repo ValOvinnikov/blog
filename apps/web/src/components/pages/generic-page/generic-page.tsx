@@ -34,7 +34,7 @@ const s = genericPageVariants();
  * `<main>` here is otherwise an unconstrained root. `Header`/`Footer` stay
  * owned by `[locale]/layout.tsx`.
  */
-export async function GenericPage({ slug, locale }: TGenericPageProps) {
+export const GenericPage = async ({ slug, locale }: TGenericPageProps) => {
   const [result, breadcrumbsT] = await Promise.all([
     service.pages.generic.v1.getPage(slug),
     getTranslations('breadcrumbs'),
@@ -77,4 +77,4 @@ export async function GenericPage({ slug, locale }: TGenericPageProps) {
       </main>
     </>
   );
-}
+};

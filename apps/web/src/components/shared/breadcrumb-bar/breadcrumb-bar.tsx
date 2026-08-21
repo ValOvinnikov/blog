@@ -16,7 +16,7 @@ type TBreadcrumbBarProps = {
  *   <Breadcrumbs items={trail} ariaLabel={t('ariaLabel')} linkAs={SmartLink} />
  * </BreadcrumbBar>
  */
-export function BreadcrumbBar({ children }: TBreadcrumbBarProps) {
+export const BreadcrumbBar = ({ children }: TBreadcrumbBarProps) => {
   const { root, inner } = breadcrumbBarVariants();
 
   return (
@@ -24,4 +24,4 @@ export function BreadcrumbBar({ children }: TBreadcrumbBarProps) {
       <div className={inner()}>{children}</div>
     </div>
   );
-}
+};

@@ -18,16 +18,16 @@ interface IRevalidateWebhookBody {
   slug?: string;
 }
 
-function isRevalidateWebhookBody(
+const isRevalidateWebhookBody = (
   value: unknown,
-): value is IRevalidateWebhookBody {
+): value is IRevalidateWebhookBody => {
   return (
     typeof value === 'object' &&
     value !== null &&
     typeof (value as Record<string, unknown>)['_type'] === 'string' &&
     typeof (value as Record<string, unknown>)['_id'] === 'string'
   );
-}
+};
 
 /**
  * On-demand ISR revalidation webhook. Sanity Studio POSTs here on

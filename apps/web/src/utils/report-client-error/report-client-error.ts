@@ -29,30 +29,30 @@ type TClientLogPayload = {
   userAgent?: string;
 };
 
-function resolveMessage(error: unknown): string {
+const resolveMessage = (error: unknown): string => {
   return error instanceof Error ? error.message : String(error);
-}
+};
 
 // Strips anything from a `?` onward on every line — source-map/asset URLs
 // inside a stack frequently carry cache-busting or session query strings
 // that must never leave the browser, and truncates to a bounded size so one
 // giant stack can't itself blow the endpoint's payload cap.
-function sanitizeStack(stack: string): string {
+const sanitizeStack = (stack: string): string => {
   return stack
     .split('\n')
     .slice(0, MAX_STACK_LINES)
     .join('\n')
     .replace(/\?[^\s)]*/g, '')
     .slice(0, MAX_STACK_LENGTH);
-}
+};
 
-function resolveUrl(): string | undefined {
+const resolveUrl = (): string | undefined => {
   if (typeof window === 'undefined') return undefined;
 
   return window.location.pathname;
-}
+};
 
-function send(payload: TClientLogPayload): void {
+const send = (payload: TClientLogPayload): void => {
   const body = JSON.stringify(payload);
 
   if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
@@ -72,7 +72,7 @@ function send(payload: TClientLogPayload): void {
     body,
     keepalive: true,
   }).catch(() => {});
-}
+};
 
 /**
  * The browser-side counterpart to the shared `logger` — call it alongside
@@ -81,11 +81,11 @@ function send(payload: TClientLogPayload): void {
  * Deduplicates by `event`+message fingerprint and hard-stops after
  * `MAX_REPORTS_PER_PAGE_LOAD` reports, both scoped to the current page load.
  */
-export function reportClientError(
+export const reportClientError = (
   event: string,
   error: unknown,
   extra?: { digest?: string },
-): void {
+): void => {
   if (typeof window === 'undefined') return;
   if (reportCount >= MAX_REPORTS_PER_PAGE_LOAD) return;
 
@@ -114,4 +114,4 @@ export function reportClientError(
     ...(extra?.digest ? { digest: extra.digest } : {}),
     ...(userAgent ? { userAgent } : {}),
   });
-}
+};

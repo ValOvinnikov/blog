@@ -44,7 +44,7 @@ const s = blogPostPageVariants();
  * "Related reading" section when related posts exist. Site chrome
  * (`Header`/`Footer`) stays owned by `[locale]/layout.tsx`.
  */
-export async function BlogPostPage({ slug }: TBlogPostPageProps) {
+export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
   const result = await service.pages.post.v1.getPost(slug);
 
   if (!result.ok) {
@@ -264,4 +264,4 @@ export async function BlogPostPage({ slug }: TBlogPostPageProps) {
       <BackToTopButton />
     </>
   );
-}
+};

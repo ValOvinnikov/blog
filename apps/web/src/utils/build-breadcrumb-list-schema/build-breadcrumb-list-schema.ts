@@ -32,10 +32,10 @@ export type TBreadcrumbListSchema = {
  * const schema = buildBreadcrumbListSchema(trail, env.NEXT_PUBLIC_SITE_URL ?? '');
  * return schema ? <JsonLd schema={schema} /> : null;
  */
-export function buildBreadcrumbListSchema(
+export const buildBreadcrumbListSchema = (
   items: IBreadcrumbItem[],
   siteUrl: string,
-): TBreadcrumbListSchema | undefined {
+): TBreadcrumbListSchema | undefined => {
   if (!siteUrl) return undefined;
 
   return {
@@ -48,4 +48,4 @@ export function buildBreadcrumbListSchema(
       item: `${siteUrl}${item.href}`,
     })),
   };
-}
+};

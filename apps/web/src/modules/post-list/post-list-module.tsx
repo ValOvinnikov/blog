@@ -29,7 +29,7 @@ const PAGE_TYPE_LABEL: Record<TModulePageContextType, string> = {
  * `context`, and hands it to `PostListModuleView`. Every other module in
  * `MODULE_MAP` ignores `context`; this is the only consumer.
  */
-export async function PostListModule({ id, context }: IPostListModuleProps) {
+export const PostListModule = async ({ id, context }: IPostListModuleProps) => {
   const [result, t, paginationT] = await Promise.all([
     service.modules.postList.v1.getPostList(id, context),
     getTranslations('postListModule'),
@@ -74,4 +74,4 @@ export async function PostListModule({ id, context }: IPostListModuleProps) {
       pagination={pagination}
     />
   );
-}
+};

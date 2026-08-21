@@ -12,6 +12,6 @@ import { env } from '@web/utils/env/env';
  * @example
  * isProductionEnvironment() // true only when NEXT_PUBLIC_SANITY_DATASET === 'production'
  */
-export function isProductionEnvironment(): boolean {
+export const isProductionEnvironment = (): boolean => {
   return env.NEXT_PUBLIC_SANITY_DATASET === 'production';
-}
+};
