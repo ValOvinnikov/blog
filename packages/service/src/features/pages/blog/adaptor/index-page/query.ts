@@ -1,12 +1,6 @@
 import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
-import { archivePostCardFragment } from '@blog/service/shared/fragments/archive-post-card';
 import { moduleFragment } from '@blog/service/shared/fragments/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo';
-
-const blogPosts = q.star
-  .filterByType('blog_post')
-  .filterRaw(PUBLISHED_POST_FILTER);
 
 export const blogPageQuery = q.star
   .filterByType('page_blog')
@@ -17,8 +11,8 @@ export const blogPageQuery = q.star
     postList: sub
       .field('postList')
       .deref()
-      .project((archive) => ({
-        pageSize: archive.field('pageSize').notNull(),
+      .project(() => ({
+        _id: true,
       }))
       .nullable(true),
     // Page-builder placement (`cta`/`newsletter`), mirroring
@@ -32,16 +26,3 @@ export const blogPageQuery = q.star
     seo: sub.field('seo').project(seoFragment).nullable(true),
   }))
   .notNull();
-
-export function buildIndexPageQuery(start: number, end: number) {
-  return q
-    .project((sub) => ({
-      posts: blogPosts
-        .order('publishedAt desc')
-        .slice(start, end)
-        .project(archivePostCardFragment)
-        .notNull(true),
-      total: sub.count(blogPosts).notNull(true),
-    }))
-    .notNull(true);
-}

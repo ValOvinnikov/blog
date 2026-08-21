@@ -9,7 +9,7 @@ describe('toPostListModule', () => {
   it('maps sectionHeader straight through', () => {
     const raw = makeRawPostListModule();
 
-    const module = toPostListModule(raw, rawPosts);
+    const module = toPostListModule(raw, rawPosts, 0);
 
     expect(module.sectionHeader).toEqual({
       heading: 'Latest',
@@ -23,7 +23,7 @@ describe('toPostListModule', () => {
       brandVariant: BRAND_VARIANT.SECONDARY,
     });
 
-    const module = toPostListModule(raw, rawPosts);
+    const module = toPostListModule(raw, rawPosts, 0);
 
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
@@ -31,7 +31,7 @@ describe('toPostListModule', () => {
   it('leaves every sectionHeader field undefined when the field itself is unset (no faked default)', () => {
     const raw = makeRawPostListModule({ sectionHeader: null });
 
-    const module = toPostListModule(raw, rawPosts);
+    const module = toPostListModule(raw, rawPosts, 0);
 
     expect(module.sectionHeader).toEqual({
       heading: undefined,
@@ -49,7 +49,7 @@ describe('toPostListModule', () => {
       },
     });
 
-    const module = toPostListModule(raw, rawPosts);
+    const module = toPostListModule(raw, rawPosts, 0);
 
     expect(module.sectionHeader.align).toBe(HEADING_ALIGN.RIGHT);
   });
@@ -65,7 +65,7 @@ describe('toPostListModule', () => {
       },
     });
 
-    const module = toPostListModule(raw, rawPosts);
+    const module = toPostListModule(raw, rawPosts, 0);
 
     expect(module.layout).toEqual({
       spacingTop: 'MD',
@@ -79,7 +79,7 @@ describe('toPostListModule', () => {
   it('leaves layout undefined when the field is unset (no faked default)', () => {
     const raw = makeRawPostListModule({ layout: null });
 
-    const module = toPostListModule(raw, rawPosts);
+    const module = toPostListModule(raw, rawPosts, 0);
 
     expect(module.layout).toBeUndefined();
   });
@@ -87,20 +87,20 @@ describe('toPostListModule', () => {
   it('maps posts through toPostCard', () => {
     const raw = makeRawPostListModule();
 
-    const module = toPostListModule(raw, rawPosts);
+    const module = toPostListModule(raw, rawPosts, 0);
 
     expect(module.posts).toEqual([]);
   });
 
-  it('leaves total undefined when omitted (unpaginated context)', () => {
-    const raw = makeRawPostListModule();
+  it('maps pageSize straight through', () => {
+    const raw = makeRawPostListModule({ pageSize: 9 });
 
-    const module = toPostListModule(raw, rawPosts);
+    const module = toPostListModule(raw, rawPosts, 0);
 
-    expect(module.total).toBeUndefined();
+    expect(module.pageSize).toBe(9);
   });
 
-  it('maps total straight through when given (paginated context)', () => {
+  it('maps total straight through', () => {
     const raw = makeRawPostListModule();
 
     const module = toPostListModule(raw, rawPosts, 42);

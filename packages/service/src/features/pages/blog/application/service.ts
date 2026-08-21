@@ -1,15 +1,12 @@
-import {
-  getIndexPage,
-  type TGetIndexPageArgs,
-} from '@blog/service/features/pages/blog/adaptor/index-page/loader';
+import { getIndexPage } from '@blog/service/features/pages/blog/adaptor/index-page/loader';
 import { getIndexPageParams } from '@blog/service/features/pages/blog/adaptor/index-page-params/loader';
 import { safeAsync } from '@blog/utils';
 
 export function createBlogService() {
   return {
     v1: {
-      getIndexPage: safeAsync((args?: TGetIndexPageArgs) => getIndexPage(args)),
-      getIndexPageParams: safeAsync(() => getIndexPageParams()),
+      getIndexPage: safeAsync(getIndexPage),
+      getIndexPageParams: safeAsync(getIndexPageParams),
     },
   };
 }

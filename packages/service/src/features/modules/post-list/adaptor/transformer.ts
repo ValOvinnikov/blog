@@ -3,19 +3,19 @@ import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { toSectionHeader } from '@blog/service/shared/transformers/to-section-header';
 import type { InferResultType } from 'groqd';
 
-import type { postListModulePostsQuery } from './posts.query';
+import type { postListModulePaginatedPostsQuery } from './posts.query';
 import type { postListModuleQuery } from './query';
 import type { TPostListModule } from './types';
 
 export type TRawPostListModule = InferResultType<typeof postListModuleQuery>;
 export type TRawPostListModulePosts = InferResultType<
-  ReturnType<typeof postListModulePostsQuery>
->;
+  ReturnType<typeof postListModulePaginatedPostsQuery>
+>['posts'];
 
 export function toPostListModule(
   raw: TRawPostListModule,
   rawPosts: TRawPostListModulePosts,
-  total?: number,
+  total: number,
 ): TPostListModule {
   return {
     brandVariant: raw.brandVariant,
@@ -24,6 +24,7 @@ export function toPostListModule(
       : { heading: undefined, supportingText: undefined, align: undefined },
     posts: rawPosts.map(toPostCard),
     layout: toLayout(raw.layout),
+    pageSize: raw.pageSize,
     total,
   };
 }
