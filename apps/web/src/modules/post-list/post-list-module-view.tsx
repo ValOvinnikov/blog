@@ -23,7 +23,7 @@ export interface IPostListModuleViewProps extends Omit<
   items: IPostCardData[];
   titleId: string;
   dataTestId: string;
-  titleFallback: string;
+  accessibleTitle: string;
   emptyMessage?: string;
   pagination?: IPostListModulePagination;
 }
@@ -32,7 +32,7 @@ export interface IPostListModuleViewProps extends Omit<
  * PostListModuleView — shared render shell for the archive (`PostListModule`)
  * and the teaser (`PostLatestModule`): a labeled `Section` wrapping
  * `PostsSection` plus an optional `Pagination`. `titleId`/`dataTestId`/
- * `titleFallback` are caller-supplied since the accessible name and test id
+ * `accessibleTitle` are caller-supplied since the accessible name and test id
  * differ per module.
  */
 export const PostListModuleView = ({
@@ -42,7 +42,7 @@ export const PostListModuleView = ({
   layout,
   titleId,
   dataTestId,
-  titleFallback,
+  accessibleTitle,
   emptyMessage,
   pagination,
 }: IPostListModuleViewProps) => {
@@ -59,7 +59,7 @@ export const PostListModuleView = ({
         posts={items}
         title={heading}
         titleId={titleId}
-        titleFallback={titleFallback}
+        accessibleTitle={accessibleTitle}
         supportingText={supportingText}
         align={align}
         linkAs={SmartLink}

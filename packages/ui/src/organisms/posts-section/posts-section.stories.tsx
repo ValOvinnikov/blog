@@ -116,7 +116,7 @@ export const VisuallyHiddenTitle: TStory = {
   args: {
     title: undefined,
     titleId: 'latest-posts-fallback',
-    titleFallback: 'Latest posts',
+    accessibleTitle: 'Latest posts',
   },
 };
 
