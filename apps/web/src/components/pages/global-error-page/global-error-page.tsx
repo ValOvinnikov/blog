@@ -5,6 +5,7 @@ import { Button } from '@blog/ui/atoms/button';
 import { Heading } from '@blog/ui/atoms/heading';
 import { Text } from '@blog/ui/atoms/text';
 import { LinkButton } from '@blog/ui/molecules/link-button';
+import { errorBoundaryCopy } from '@web/components/shared/error-boundary-copy';
 import { errorPageLayoutVariants } from '@web/components/shared/error-page-layout';
 import { reportClientError } from '@web/utils/report-client-error';
 import { useEffect, useRef } from 'react';
@@ -33,8 +34,7 @@ export const GlobalErrorPage = ({ error, reset }: TGlobalErrorPageProps) => {
     // Written after mount, not on first paint — a live region that's
     // already populated when it enters the DOM is unreliably announced.
     if (announcementRef.current) {
-      announcementRef.current.textContent =
-        'Something went wrong. You can try again, or go home.';
+      announcementRef.current.textContent = errorBoundaryCopy.announcement;
     }
     mainRef.current?.focus();
   }, [error]);
@@ -48,15 +48,15 @@ export const GlobalErrorPage = ({ error, reset }: TGlobalErrorPageProps) => {
         className={s.announcement()}
       />
       <Heading level={1} visual="hero">
-        Something went wrong
+        {errorBoundaryCopy.heading}
       </Heading>
       <Text className={s.copy()}>
         An unexpected error occurred. Try reloading the page.
       </Text>
       <div className={s.actions()}>
-        <Button onClick={reset}>Try again</Button>
+        <Button onClick={reset}>{errorBoundaryCopy.tryAgain}</Button>
         <LinkButton href={routes.home()} variant="ghost">
-          Go home
+          {errorBoundaryCopy.goHome}
         </LinkButton>
       </div>
     </main>
