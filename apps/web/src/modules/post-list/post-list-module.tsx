@@ -1,8 +1,7 @@
-import type { TModulePageContext, TModulePageContextType } from '@blog/config';
+import { routes } from '@blog/config';
 import { service } from '@blog/service';
-import { toTotalPages } from '@blog/utils';
 import { toPostListItems } from '@web/utils/to-post-list-items';
-import { toPostListPaginationHref } from '@web/utils/to-post-list-pagination-href';
+import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 import {
@@ -13,64 +12,63 @@ import {
 export interface IPostListModuleProps {
   id: string;
   locale: string;
-  context?: TModulePageContext;
+  page?: number;
 }
 
-const PAGE_TYPE_LABEL: Record<TModulePageContextType, string> = {
-  HOME: 'Home',
-  BLOG: 'Blog',
-  GENERIC: 'Generic',
-  TOPIC: 'Topic',
-  TAG: 'Tag',
-};
-
 /**
- * PostListModule — fetches `module_postList` data, scoped/paginated by
- * `context`, and hands it to `PostListModuleView`. Every other module in
- * `MODULE_MAP` ignores `context`; this is the only consumer.
+ * PostListModule — the `/blog` archive: fetches the `page_blog.postList`
+ * slot's `module_postList` document for the given page and hands it to
+ * `PostListModuleView`. Unlike every other module, it always renders — an
+ * archive must say something even with zero posts — and 404s when an
+ * explicit page number exceeds the corpus's page count.
  */
-export const PostListModule = async ({ id, context }: IPostListModuleProps) => {
-  const [result, t, paginationT] = await Promise.all([
-    service.modules.postList.v1.getPostList(id, context),
-    getTranslations('postListModule'),
+export const PostListModule = async ({ id, page }: IPostListModuleProps) => {
+  const [result, blogListT, paginationT] = await Promise.all([
+    service.modules.postList.v1.getPostList(id, page),
+    getTranslations('blogListPage'),
     getTranslations('pagination'),
   ]);
 
   if (!result.ok) return null;
 
-  const { brandVariant, sectionHeader, posts, layout, total } = result.data;
+  const {
+    brandVariant,
+    sectionHeader,
+    posts,
+    layout,
+    emptyMessage,
+    currentPage,
+    totalPages,
+  } = result.data;
+
+  // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
+  // soft-404 or a redirect to the last page (spec SEO rules). Page 1 of an
+  // empty archive is `totalPages === 1`, so an omitted `page` never 404s.
+  if (page !== undefined && page > totalPages) {
+    notFound();
+  }
 
   const items = await toPostListItems(posts);
 
-  // No posts resolved (e.g. the referenced/latest posts are unpublished or
-  // filtered to zero) — `PostsSection` renders nothing without an
-  // `emptyMessage`, so skip the view entirely rather than emit a landmark
-  // whose `aria-labelledby` points at a heading id that never renders.
-  if (items.length === 0) return null;
-
-  let pagination: IPostListModulePagination | undefined;
-
-  if (context?.isPaginated) {
-    pagination = {
-      currentPage: context.page,
-      totalPages: toTotalPages(total ?? 0, context.pageSize),
-      createHref: toPostListPaginationHref(context),
-      ariaLabel: paginationT('ariaLabel', {
-        pageType: PAGE_TYPE_LABEL[context.type],
-      }),
-      previousLabel: paginationT('previous'),
-      nextLabel: paginationT('next'),
-    };
-  }
+  const pagination: IPostListModulePagination = {
+    currentPage,
+    totalPages,
+    createHref: routes.blogIndex,
+    ariaLabel: blogListT('paginationAriaLabel'),
+    previousLabel: paginationT('previous'),
+    nextLabel: paginationT('next'),
+  };
 
   return (
     <PostListModuleView
-      id={id}
       brandVariant={brandVariant}
       sectionHeader={sectionHeader}
       items={items}
       layout={layout}
-      titleFallback={t('fallbackHeading')}
+      titleId="blog-posts-title"
+      dataTestId={`post-list-module-${id}`}
+      titleFallback={blogListT('title')}
+      emptyMessage={emptyMessage ?? blogListT('empty')}
       pagination={pagination}
     />
   );

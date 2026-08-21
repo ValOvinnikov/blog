@@ -1,4 +1,3 @@
-import type { TModulePageContext } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { logger } from '@web/utils/logger/logger';
 import { Fragment, type ReactNode } from 'react';
@@ -8,7 +7,6 @@ import { MODULE_MAP } from './module-map';
 export interface IModuleRendererProps {
   modules: TModule[];
   locale: string;
-  context?: TModulePageContext;
 }
 
 /**
@@ -17,15 +15,14 @@ export interface IModuleRendererProps {
  * the module's `_id` (a page can't reference the same module twice — enforced
  * by a CMS uniqueness rule). Unknown module types render nothing and log a
  * warning rather than failing the whole page. `MODULE_MAP` deliberately
- * excludes `module_hero` from its key type (see `module-map.ts`), so the
- * lookup below casts to `keyof typeof MODULE_MAP` — if a `module_hero`
- * somehow reached here (schema-prevented in practice), it would still hit
- * the "unknown module type" fallback rather than type-error.
+ * excludes `module_hero`/`module_postList` from its key type (see
+ * `module-map.ts`), so the lookup below casts to `keyof typeof MODULE_MAP` —
+ * if either type somehow reached here (schema-prevented in practice), it
+ * would still hit the "unknown module type" fallback rather than type-error.
  */
 export const ModuleRenderer = async ({
   modules,
   locale,
-  context,
 }: IModuleRendererProps): Promise<ReactNode> => {
   const rendered = await Promise.all(
     modules.map(async (module) => {
@@ -40,7 +37,7 @@ export const ModuleRenderer = async ({
 
       return {
         key: module.id,
-        node: await Component({ id: module.id, locale, context }),
+        node: await Component({ id: module.id, locale }),
       };
     }),
   );

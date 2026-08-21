@@ -1,5 +1,6 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { notFound } from 'next/navigation';
 
 import { PostListModule } from './post-list-module';
 
@@ -48,28 +49,30 @@ describe(PostListModule, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders nothing when no posts resolve, never an empty landmark with a dangling aria-labelledby', async () => {
+  it('calls getPostList with the module id and page', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
         sectionHeader: {
-          heading: 'Latest posts',
+          heading: 'Blog',
           supportingText: undefined,
           align: undefined,
         },
         posts: [],
         layout: undefined,
+        emptyMessage: undefined,
+        currentPage: 2,
+        totalPages: 2,
       },
     });
 
-    const { container } = await setup();
+    await setup({ page: 2 });
 
-    expect(container).toBeEmptyDOMElement();
-    expect(container.querySelector('section')).not.toBeInTheDocument();
+    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', 2);
   });
 
-  it("resolves the module's own translated fallback heading (never a hardcoded string) when sectionHeader.heading is undefined", async () => {
+  it('renders an archive-appropriate accessible heading (never "Latest posts")', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
@@ -79,18 +82,11 @@ describe(PostListModule, () => {
           supportingText: undefined,
           align: undefined,
         },
-        posts: [
-          {
-            id: 'post-1',
-            slug: 'first-post',
-            title: 'First post',
-            excerpt: 'An excerpt',
-            publishedAt: '2026-01-01T00:00:00.000Z',
-            topic: { id: 'topic-1', title: 'News', slug: 'news' },
-            readingTimeMinutes: 2,
-          },
-        ],
+        posts: [],
         layout: undefined,
+        emptyMessage: undefined,
+        currentPage: 1,
+        totalPages: 1,
       },
     });
 
@@ -98,74 +94,70 @@ describe(PostListModule, () => {
 
     const heading = screen.getByRole('heading', {
       level: 2,
-      name: 'Latest posts',
+      name: 'All posts',
     });
     expect(heading).toHaveClass('sr-only');
     expect(
-      screen.getByRole('region', { name: 'Latest posts' }),
+      screen.getByRole('region', { name: 'All posts' }),
     ).toBeInTheDocument();
   });
 
-  it('passes the given context straight through to getPostList', async () => {
+  it('renders the derived empty message when zero posts resolve and the CMS field is blank', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
         sectionHeader: {
-          heading: 'Latest posts',
+          heading: 'Blog',
           supportingText: undefined,
           align: undefined,
         },
         posts: [],
         layout: undefined,
-      },
-    });
-
-    const context = { type: 'HOME' as const, isPaginated: false as const };
-
-    await setup({ context });
-
-    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', context);
-  });
-
-  it('calls getPostList with an undefined context when the caller omits one, and renders no pagination nav', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: 'Latest posts',
-          supportingText: undefined,
-          align: undefined,
-        },
-        posts: [
-          {
-            id: 'post-1',
-            slug: 'first-post',
-            title: 'First post',
-            excerpt: 'An excerpt',
-            publishedAt: '2026-01-01T00:00:00.000Z',
-            topic: { id: 'topic-1', title: 'News', slug: 'news' },
-            readingTimeMinutes: 2,
-          },
-        ],
-        layout: undefined,
+        emptyMessage: undefined,
+        currentPage: 1,
+        totalPages: 1,
       },
     });
 
     await setup();
 
-    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', undefined);
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.getByText('No posts yet.')).toBeInTheDocument();
   });
 
-  it('renders a pager with correct hrefs for a paginated topic context', async () => {
+  it('renders the authored emptyMessage override instead of the derived default', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: BRAND_VARIANT.PRIMARY,
         sectionHeader: {
-          heading: 'Latest posts',
+          heading: 'Blog',
+          supportingText: undefined,
+          align: undefined,
+        },
+        posts: [],
+        layout: undefined,
+        emptyMessage: 'Nothing published yet — check back soon.',
+        currentPage: 1,
+        totalPages: 1,
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.getByText('Nothing published yet — check back soon.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('No posts yet.')).not.toBeInTheDocument();
+  });
+
+  it('renders a pager with a fully translated aria-label and correct hrefs', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'Blog',
           supportingText: undefined,
           align: undefined,
         },
@@ -181,27 +173,68 @@ describe(PostListModule, () => {
           },
         ],
         layout: undefined,
-        total: 30,
+        emptyMessage: undefined,
+        currentPage: 2,
+        totalPages: 3,
       },
     });
 
-    await setup({
-      context: {
-        type: 'TOPIC',
-        topicSlug: 'engineering',
-        isPaginated: true,
-        page: 2,
-        pageSize: 12,
-      },
-    });
+    await setup({ page: 2 });
 
-    const nav = screen.getByRole('navigation', { name: 'Topic pages' });
+    const nav = screen.getByRole('navigation', { name: 'Blog pages' });
     expect(nav).toBeInTheDocument();
 
     const previousLink = screen.getByRole('link', { name: 'Previous' });
-    expect(previousLink).toHaveAttribute('href', '/topics/engineering');
+    expect(previousLink).toHaveAttribute('href', '/blog');
 
     const nextLink = screen.getByRole('link', { name: 'Next' });
-    expect(nextLink).toHaveAttribute('href', '/topics/engineering/page/3');
+    expect(nextLink).toHaveAttribute('href', '/blog/page/3');
+  });
+
+  it('calls notFound() when an explicit page exceeds totalPages', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'Blog',
+          supportingText: undefined,
+          align: undefined,
+        },
+        posts: [],
+        layout: undefined,
+        emptyMessage: undefined,
+        currentPage: 5,
+        totalPages: 1,
+      },
+    });
+
+    await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not 404 page 1 of an empty archive when no explicit page is given', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'Blog',
+          supportingText: undefined,
+          align: undefined,
+        },
+        posts: [],
+        layout: undefined,
+        emptyMessage: undefined,
+        currentPage: 1,
+        totalPages: 1,
+      },
+    });
+
+    await setup({ page: undefined });
+
+    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+    expect(screen.getByText('No posts yet.')).toBeInTheDocument();
   });
 });

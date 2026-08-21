@@ -102,25 +102,19 @@ type TStory = StoryObj<typeof meta>;
 /** The bare shell — only `heading` and `posts`, no optional slots. */
 export const Minimal: TStory = {};
 
-/** `/blog` — topic chips, pagination, and a page-builder module below the shell. */
+/**
+ * `/blog` — the archive itself renders through `PostListModule` in the
+ * `modules` position, not the `posts`/`pagination` slots, so this story
+ * leaves both unset.
+ */
 export const BlogIndex: TStory = {
   args: {
+    posts: undefined,
     supportingText: 'Essays and notes on building this site.',
     topicChips: <TopicChipList topics={topics} />,
-    pagination: (
-      <Pagination
-        currentPage={1}
-        totalPages={4}
-        createHref={(page) => `/blog/page/${page}`}
-        ariaLabel="Blog pagination"
-        previousLabel="Previous"
-        nextLabel="Next"
-        linkAs={SmartLink}
-      />
-    ),
     modules: (
       <div className="px-gutter py-section text-muted text-center">
-        Page-builder modules render here
+        The post-list archive and any page-builder modules render here
       </div>
     ),
   },

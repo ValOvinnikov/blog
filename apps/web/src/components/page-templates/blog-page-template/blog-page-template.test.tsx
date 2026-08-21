@@ -25,6 +25,13 @@ describe(`<${BlogPageTemplate.name}/>`, () => {
     expect(screen.getByTestId('posts-slot')).toBeInTheDocument();
   });
 
+  it('renders without a posts slot', () => {
+    setup({ posts: undefined });
+
+    expect(screen.queryByTestId('posts-slot')).not.toBeInTheDocument();
+    expect(screen.getByRole('main')).toBeVisible();
+  });
+
   it('renders supportingText under the h1 when passed', () => {
     setup({
       supportingText: 'Essays and notes on building this site.',

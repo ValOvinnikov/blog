@@ -18,40 +18,43 @@ export interface IPostListModulePagination {
 
 export interface IPostListModuleViewProps extends Omit<
   TPostListModule,
-  'posts' | 'total'
+  'posts' | 'currentPage' | 'totalPages' | 'emptyMessage'
 > {
-  id: string;
   items: IPostCardData[];
+  titleId: string;
+  dataTestId: string;
   titleFallback: string;
+  emptyMessage?: string;
   pagination?: IPostListModulePagination;
 }
 
 /**
- * `items` is always non-empty here — the wrapper's content-validity guard
- * skips rendering this view entirely when no posts resolve.
- * `sectionHeader.heading` is optional; when absent, `PostsSection` renders a
- * visually hidden `<h2>` from `titleFallback`, keeping the landmark and
- * heading outline intact. `pagination`, when present, renders `Pagination`
- * as a sibling of `PostsSection` inside the same `Section` landmark.
+ * PostListModuleView — shared render shell for the archive (`PostListModule`)
+ * and the teaser (`PostLatestModule`): a labeled `Section` wrapping
+ * `PostsSection` plus an optional `Pagination`. Callers own `titleId`,
+ * `dataTestId`, and `titleFallback`, since the accessible name and test id
+ * differ per module. `sectionHeader.heading` is optional; when absent,
+ * `PostsSection` renders a visually hidden `<h2>` from `titleFallback`.
  */
 export const PostListModuleView = ({
-  id,
   brandVariant,
   sectionHeader,
   items,
   layout,
+  titleId,
+  dataTestId,
   titleFallback,
+  emptyMessage,
   pagination,
 }: IPostListModuleViewProps) => {
   const { heading, supportingText, align } = sectionHeader;
-  const titleId = `latest-posts-${id}`;
 
   return (
     <Section
       brandVariant={brandVariant}
       layout={layout}
       titleId={titleId}
-      dataTestId={`post-list-module-${id}`}
+      dataTestId={dataTestId}
     >
       <PostsSection
         posts={items}
@@ -62,6 +65,7 @@ export const PostListModuleView = ({
         align={align}
         linkAs={SmartLink}
         isWrapped={true}
+        emptyMessage={emptyMessage}
       />
       {pagination ? (
         <Pagination

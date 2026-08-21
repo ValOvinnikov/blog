@@ -8,7 +8,7 @@ export interface IBlogPageTemplateProps {
   supportingText?: string;
   topicChips?: ReactNode;
   socialLinks?: ReactNode;
-  posts: ReactNode;
+  posts?: ReactNode;
   pagination?: ReactNode;
   modules?: ReactNode;
 }
@@ -16,8 +16,8 @@ export interface IBlogPageTemplateProps {
 const s = blogPageTemplateVariants();
 
 /**
- * BlogPageTemplate — the shared archive page-level shell (h1 + posts +
- * optional pagination), reused by the blog index, topic, tag, and author
+ * BlogPageTemplate — the shared archive page-level shell (h1 + optional
+ * posts/pagination), reused by the blog index, topic, tag, and author
  * archives. The breadcrumb trail is page chrome, not shell content — callers
  * render it via `BreadcrumbBar` as a sibling before this template, not
  * through it. `introHeader` renders before the `<h1>` (e.g. an author's role
@@ -26,11 +26,11 @@ const s = blogPageTemplateVariants();
  * topic chip nav row), then `socialLinks` (e.g. an author's social
  * links). The archive's own furniture (everything but `modules`) renders
  * inside a constrained container; `modules` renders as a sibling outside it,
- * directly under `<main>` — the Blog index page's own optional page-builder
- * placement (`page_blog.modules`, rendered through `ModuleRenderer`, each
- * module owning its own full-bleed background via `Section`); every other
- * archive using this template simply never passes it. `Header`/`Footer` stay
- * owned by `layout.tsx`, matching `HomePageTemplate`.
+ * directly under `<main>`, each module owning its own full-bleed background
+ * via `Section`. `posts`/`pagination` are optional: the blog index renders
+ * its archive through its own full-bleed `Section` in the `modules`
+ * position instead, so it never fills them; topic/tag/author still do.
+ * `Header`/`Footer` stay owned by `layout.tsx`, matching `HomePageTemplate`.
  */
 export const BlogPageTemplate = ({
   heading,

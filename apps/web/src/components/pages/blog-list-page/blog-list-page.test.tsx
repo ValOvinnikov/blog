@@ -1,35 +1,39 @@
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import {
-  makePostCard,
-  makePostCardTopic,
-} from '@web/testing/shared/post/fixtures';
 import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 import { notFound } from 'next/navigation';
 
 import { BlogListPage } from './blog-list-page';
 
-const { getIndexPageMock, getTopicsMock, moduleRendererMock } = vi.hoisted(
-  () => ({
-    getIndexPageMock: vi.fn(),
-    getTopicsMock: vi.fn(),
-    // `ModuleRenderer` (and every module it dispatches to) is an async
-    // Server Component — real RSC async-component nesting isn't
-    // renderable through `@testing-library/react`'s client renderer (only
-    // Next's own RSC pipeline supports it, the same reason the home route's
-    // `page.tsx` composition has no test of its own). Stubbed as a plain
-    // sync component so this suite can assert BlogListPage passes the
-    // right `modules`/`locale` through without needing a real async render;
-    // `ModuleRenderer`'s own dispatch logic is covered by
-    // `module-renderer.test.tsx`.
-    moduleRendererMock: vi.fn(
-      ({ modules }: { modules: { id: string; type: string }[] }) => (
-        <div data-testid="module-renderer-stub">
-          {modules.map((module) => module.type).join(',')}
-        </div>
-      ),
+const {
+  getIndexPageMock,
+  getTopicsMock,
+  moduleRendererMock,
+  postListModuleMock,
+} = vi.hoisted(() => ({
+  getIndexPageMock: vi.fn(),
+  getTopicsMock: vi.fn(),
+  // Both `ModuleRenderer` and `PostListModule` are async Server Components —
+  // real RSC async-component nesting isn't renderable through
+  // `@testing-library/react`'s client renderer. Stubbed as plain sync
+  // components so this suite can assert `BlogListPage` passes the right
+  // props through without needing a real async render; their own dispatch
+  // logic is covered by `module-renderer.test.tsx` and
+  // `post-list-module.test.tsx`.
+  moduleRendererMock: vi.fn(
+    ({ modules }: { modules: { id: string; type: string }[] }) => (
+      <div data-testid="module-renderer-stub">
+        {modules.map((module) => module.type).join(',')}
+      </div>
     ),
-  }),
-);
+  ),
+  postListModuleMock: vi.fn(
+    ({ id, page }: { id: string; locale: string; page: number }) => (
+      <div data-testid="post-list-module-stub">
+        {id}:{page}
+      </div>
+    ),
+  ),
+}));
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -44,6 +48,10 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/modules/module-renderer', () => ({
   ModuleRenderer: moduleRendererMock,
+}));
+
+vi.mock('@web/modules/post-list/post-list-module', () => ({
+  PostListModule: postListModuleMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -61,13 +69,6 @@ vi.mock('@web/components/shared/smart-link', () => ({
   ),
 }));
 
-const post = makePostCard({
-  title: 'My Post Title',
-  slug: 'my-post-slug',
-  publishedAt: '2026-01-01T00:00:00.000Z',
-  topic: makePostCardTopic(),
-});
-
 const setup = customRenderAsync(BlogListPage, { page: 1, locale: 'en' });
 
 describe(`<${BlogListPage.name}/>`, () => {
@@ -75,6 +76,7 @@ describe(`<${BlogListPage.name}/>`, () => {
     getIndexPageMock.mockReset();
     getTopicsMock.mockReset();
     moduleRendererMock.mockClear();
+    postListModuleMock.mockClear();
     getTopicsMock.mockResolvedValue({
       ok: true,
       data: [
@@ -85,23 +87,6 @@ describe(`<${BlogListPage.name}/>`, () => {
         }),
       ],
     });
-  });
-
-  it('calls notFound() when the requested page is beyond totalPages', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        posts: [post],
-        modules: [],
-        currentPage: 5,
-        totalPages: 1,
-        total: 1,
-      },
-    });
-
-    await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
   it('calls notFound() when the fetch fails', async () => {
@@ -118,17 +103,14 @@ describe(`<${BlogListPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('renders the posts for a page within range', async () => {
+  it('renders the h1 and supporting text from the fetched page shell', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
         modules: [],
-        posts: [post],
-        currentPage: 1,
-        totalPages: 3,
-        total: 20,
+        postListId: 'post-list-1',
       },
     });
 
@@ -138,83 +120,24 @@ describe(`<${BlogListPage.name}/>`, () => {
       screen.getByRole('heading', { level: 1, name: 'Blog' }),
     ).toBeVisible();
     expect(screen.getByText('Essays and notes.')).toBeVisible();
-
-    const link = screen.getByRole('link', { name: 'My Post Title' });
-    expect(link).toBeVisible();
-    expect(link).toHaveAttribute('href', '/blog/my-post-slug');
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders the empty-state message when there are no posts', async () => {
+  it('passes the postList id, locale, and page through to PostListModule', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
         modules: [],
-        posts: [],
-        currentPage: 1,
-        totalPages: 1,
-        total: 0,
-      },
-    });
-
-    await setup();
-
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'All posts' }),
-    ).toBeVisible();
-    expect(screen.getByText('No posts yet.')).toBeVisible();
-    expect(
-      screen.queryByRole('link', { name: 'My Post Title' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('renders pagination with the translated aria-label, previous, and next labels', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
-        modules: [],
-        posts: [post],
-        currentPage: 2,
-        totalPages: 3,
-        total: 20,
+        postListId: 'post-list-1',
       },
     });
 
     await setup({ page: 2 });
 
-    expect(
-      screen.getByRole('navigation', { name: 'Blog pages' }),
-    ).toBeVisible();
-    const nextLink = screen.getByRole('link', { name: 'Next' });
-    expect(nextLink).toHaveAttribute('href', '/blog/page/3');
-    const previousLink = screen.getByRole('link', { name: 'Previous' });
-    expect(previousLink).toHaveAttribute('href', '/blog');
-  });
-
-  it('passes an unpaginated BLOG page context to ModuleRenderer', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
-        modules: [],
-        posts: [post],
-        currentPage: 1,
-        totalPages: 3,
-        total: 20,
-      },
-    });
-
-    await setup();
-
-    expect(moduleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        context: { type: 'BLOG', isPaginated: false },
-      }),
+    expect(postListModuleMock).toHaveBeenCalledWith(
+      { id: 'post-list-1', locale: 'en', page: 2 },
       undefined,
     );
   });
@@ -226,10 +149,7 @@ describe(`<${BlogListPage.name}/>`, () => {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
         modules: [],
-        posts: [post],
-        currentPage: 1,
-        totalPages: 3,
-        total: 20,
+        postListId: 'post-list-1',
       },
     });
 
@@ -253,10 +173,7 @@ describe(`<${BlogListPage.name}/>`, () => {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
         modules: [],
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
+        postListId: 'post-list-1',
       },
     });
 
@@ -279,10 +196,7 @@ describe(`<${BlogListPage.name}/>`, () => {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
         modules: [],
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
+        postListId: 'post-list-1',
       },
     });
 
@@ -304,10 +218,7 @@ describe(`<${BlogListPage.name}/>`, () => {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
         modules: [],
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
+        postListId: 'post-list-1',
       },
     });
 
@@ -332,10 +243,7 @@ describe(`<${BlogListPage.name}/>`, () => {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
         modules: [],
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
+        postListId: 'post-list-1',
       },
     });
 
@@ -354,10 +262,7 @@ describe(`<${BlogListPage.name}/>`, () => {
         heading: 'Blog',
         supportingText: 'Essays and notes.',
         modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
+        postListId: 'post-list-1',
       },
     });
 
