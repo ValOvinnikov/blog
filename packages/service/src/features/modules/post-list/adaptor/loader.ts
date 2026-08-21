@@ -19,8 +19,8 @@ export async function getPostList(
   id: string,
   context?: TModulePageContext,
 ): Promise<TPostListModule> {
-  // Read the module document first so its `limit` can bound the posts query in
-  // GROQ (avoids fetching the entire post collection to slice it in JS).
+  // Read the module document first so its `pageSize` can bound the posts
+  // query in GROQ (avoids fetching the entire post collection to slice it in JS).
   const raw = await runQuery(postListModuleQuery, {
     parameters: { id },
     ...isr(['modules:postList', `module:${id}`]),
@@ -43,7 +43,7 @@ export async function getPostList(
   }
 
   const rawPosts = await runQuery(
-    postListModulePostsQuery(raw.limit, context),
+    postListModulePostsQuery(raw.pageSize, context),
     {
       parameters,
       ...postsIsr,

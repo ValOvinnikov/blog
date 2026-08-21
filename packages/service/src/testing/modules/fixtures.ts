@@ -33,7 +33,7 @@ export function makeRawPostListModule(
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
     sectionHeader: { heading: 'Latest', supportingText: null, align: null },
-    limit: 6,
+    pageSize: 6,
     layout: null,
     ...overrides,
   };

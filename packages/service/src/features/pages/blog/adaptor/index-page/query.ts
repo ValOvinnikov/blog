@@ -14,8 +14,14 @@ export const blogPageQuery = q.star
   .project((sub) => ({
     heading: sub.field('heading').notNull(),
     supportingText: sub.field('supportingText').nullable(true),
-    itemsPerPage: sub.field('itemsPerPage').notNull(),
-    // Page-builder placement (`postList`/`cta`/`newsletter`), mirroring
+    postList: sub
+      .field('postList')
+      .deref()
+      .project((archive) => ({
+        pageSize: archive.field('pageSize').notNull(),
+      }))
+      .nullable(true),
+    // Page-builder placement (`cta`/`newsletter`), mirroring
     // `page_home`/`page_generic`'s own thin `modules[]` ref projection —
     // resolved to a real component by `ModuleRenderer` (`apps/web`).
     modules: sub
