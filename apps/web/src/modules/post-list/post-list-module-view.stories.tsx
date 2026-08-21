@@ -38,7 +38,7 @@ const meta = {
     layout: undefined,
     titleId: 'post-list-title',
     dataTestId: 'post-list-module-post-list-1',
-    titleFallback: 'Latest posts',
+    accessibleTitle: 'Latest posts',
   },
 } satisfies Meta<typeof PostListModuleView>;
 

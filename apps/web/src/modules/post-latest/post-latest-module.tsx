@@ -35,7 +35,7 @@ export const PostLatestModule = async ({ id }: IPostLatestModuleProps) => {
       layout={layout}
       titleId={`latest-posts-${id}`}
       dataTestId={`post-latest-module-${id}`}
-      titleFallback={t('fallbackHeading')}
+      accessibleTitle={t('fallbackHeading')}
     />
   );
 };

@@ -77,7 +77,7 @@ export const PostListModule = async ({ id, page }: IPostListModuleProps) => {
       layout={layout}
       titleId="blog-posts-title"
       dataTestId={`post-list-module-${id}`}
-      titleFallback={blogListT('title')}
+      accessibleTitle={blogListT('title')}
       emptyMessage={emptyMessage ?? blogListT('empty')}
       pagination={pagination}
     />

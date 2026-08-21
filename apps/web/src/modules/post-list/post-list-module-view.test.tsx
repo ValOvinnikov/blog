@@ -32,7 +32,7 @@ const setup = customRender(PostListModuleView, {
   layout: undefined,
   titleId: 'posts-title',
   dataTestId: 'post-list-module-post-list-1',
-  titleFallback: 'Posts',
+  accessibleTitle: 'Posts',
 });
 
 describe(PostListModuleView, () => {
@@ -70,7 +70,7 @@ describe(PostListModuleView, () => {
     );
   });
 
-  it('renders a visually hidden heading from titleFallback and labels the section via aria-labelledby when sectionHeader.heading is undefined', () => {
+  it('renders a visually hidden heading from accessibleTitle and labels the section via aria-labelledby when sectionHeader.heading is undefined', () => {
     setup({
       sectionHeader: {
         heading: undefined,
