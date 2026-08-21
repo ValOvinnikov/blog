@@ -49,6 +49,22 @@ the suggested fix; the orchestrator routes it to the owning layer agent. This
 split matters even when the fix looks trivial — the layer agent owns that
 file's conventions and is the one whose diff review covers it.
 
+**Your worktree should already contain the product change you're covering**
+(#1796) — the orchestrator lands each layer agent's commit onto its local
+branch before dispatching you, and `worktree.baseRef: "head"` in
+`.claude/settings.json` branches your worktree from that same local `HEAD`.
+You never need to seed, copy, or race anything in yourself; if the
+exports/components/types your brief describes genuinely aren't present, that
+is a dispatch-ordering problem, not something to work around: report it back
+rather than reaching for `cp`/`git checkout <ref> -- <path>` (both denied
+anyway).
+
+**You do not run the fail-without-the-fix check
+(`feedback_test_must_fail_without_the_fix`)** for a regression test — that
+requires temporarily reverting the product-code file you cannot touch under
+any tool. The orchestrator performs that check itself after landing your
+tests (`develop-feature` §4).
+
 ## Start here
 
 Before writing anything:
