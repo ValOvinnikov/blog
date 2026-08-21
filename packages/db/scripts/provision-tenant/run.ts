@@ -22,7 +22,6 @@ import { reactivateTenant } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import { loadProvisionEnv, type TProvisionEnv } from './lib/env';
-import { getTenantRow } from './lib/get-tenant-row';
 import { sanitizeLogMessage } from './lib/sanitize-log-message';
 import { reportStepStatus } from './lib/status-callback';
 import { createTenantRevalidateWebhook } from './steps/create-revalidate-webhook';
@@ -72,10 +71,9 @@ const STEPS: TStep[] = [
 ];
 
 // Exported for direct testing of the step sequencing without also exercising
-// argv parsing / env loading / the tenant-row fetch `main()` wraps it in.
+// argv parsing / env loading.
 export async function runSteps(
   tenantId: string,
-  initialTenant: TTenant,
   env: TProvisionEnv,
 ): Promise<{ ok: boolean }> {
   // Un-archives a re-provisioned tenant before any step runs, so it stays
@@ -140,9 +138,8 @@ export async function runSteps(
 async function main(): Promise<void> {
   const tenantId = parseTenantId(process.argv.slice(2));
   const env = loadProvisionEnv();
-  const tenant = await getTenantRow(tenantId);
 
-  const { ok } = await runSteps(tenantId, tenant, env);
+  const { ok } = await runSteps(tenantId, env);
   if (!ok) {
     process.exitCode = 1;
   }
