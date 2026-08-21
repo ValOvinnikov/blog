@@ -1,3 +1,4 @@
+import { MissingPostListError } from '@blog/service/features/pages/blog/adaptor/missing-post-list-error';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
@@ -21,7 +22,7 @@ vi.mock('@blog/service/sanity/image', () => ({
 describe('getIndexPage', () => {
   it('returns the page window with page math for a full corpus', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawBlogPage({ itemsPerPage: 9 }))
+      .mockResolvedValueOnce(makeRawBlogPage({ postList: { pageSize: 9 } }))
       .mockResolvedValueOnce(makeRawSiteSettings())
       .mockResolvedValueOnce({
         posts: [
@@ -139,5 +140,36 @@ describe('getIndexPage', () => {
         next: expect.objectContaining({ tags: ['posts', 'topic'] }),
       }),
     );
+  });
+
+  it('tags the page_blog query with modules:postList alongside page_blog', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawBlogPage())
+      .mockResolvedValueOnce(makeRawSiteSettings())
+      .mockResolvedValueOnce({ posts: [], total: 0 });
+
+    await getIndexPage();
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({
+        next: expect.objectContaining({
+          tags: ['page_blog', 'modules:postList'],
+        }),
+      }),
+    );
+  });
+
+  // Regression guard for the decision that a missing slot is a loud failure,
+  // never a substituted default: this must reject, not resolve with an
+  // invented page size or an empty grid.
+  it('rejects with MissingPostListError when page_blog.postList is unset, without fetching posts', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawBlogPage({ postList: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    await expect(getIndexPage()).rejects.toThrow(MissingPostListError);
+    expect(mockRun).toHaveBeenCalledTimes(2);
   });
 });

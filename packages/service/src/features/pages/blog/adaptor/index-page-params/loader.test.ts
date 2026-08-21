@@ -14,11 +14,29 @@ describe('getIndexPageParams', () => {
   it('delegates the raw query result to the pagination transformer', async () => {
     mockRun.mockResolvedValueOnce({
       blogPosts: { total: 20 },
-      itemsPerPage: 9,
+      postList: { pageSize: 9 },
     });
 
     const params = await getIndexPageParams();
 
     expect(params).toEqual([{ page: '2' }, { page: '3' }]);
+  });
+
+  it('tags the query with modules:postList alongside posts/page_blog', async () => {
+    mockRun.mockResolvedValueOnce({
+      blogPosts: { total: 0 },
+      postList: { pageSize: 9 },
+    });
+
+    await getIndexPageParams();
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        next: expect.objectContaining({
+          tags: ['posts', 'page_blog', 'modules:postList'],
+        }),
+      }),
+    );
   });
 });
