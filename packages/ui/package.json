@@ -4,10 +4,6 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./atoms": "./src/atoms/index.ts",
-    "./molecules": "./src/molecules/index.ts",
-    "./organisms": "./src/organisms/index.ts",
     "./*": "./src/*"
   },
   "scripts": {
