@@ -13,7 +13,7 @@ vi.mock('@admin/server/tenants/create-tenant-action', () => ({
   createTenantAction: createTenantActionMock,
 }));
 
-async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
+const fillValidForm = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.type(screen.getByRole('textbox', { name: 'Tenant name' }), 'Acme');
   await user.type(screen.getByRole('textbox', { name: 'Slug' }), 'acme');
   await user.type(
@@ -24,7 +24,7 @@ async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
     screen.getByRole('textbox', { name: 'Owner email' }),
     'owner@example.com',
   );
-}
+};
 
 describe(TenantDetailsForm, () => {
   beforeEach(() => {

@@ -20,13 +20,13 @@ export type TRecordAuditEventInput = {
  * back the mutation it describes, because the runtime `neon-http` driver has
  * no multi-statement transactions to couple the two writes atomically.
  */
-export async function recordAuditEvent({
+export const recordAuditEvent = async ({
   logEvent,
   action,
   targetType,
   targetId,
   details,
-}: TRecordAuditEventInput): Promise<void> {
+}: TRecordAuditEventInput): Promise<void> => {
   try {
     const session = await auth();
     const actorId = session?.user?.id;
@@ -49,4 +49,4 @@ export async function recordAuditEvent({
   } catch (error) {
     logger.error(logEvent, { action, targetType, targetId, error });
   }
-}
+};

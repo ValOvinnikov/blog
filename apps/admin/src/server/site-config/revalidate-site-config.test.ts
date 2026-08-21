@@ -13,15 +13,15 @@ vi.mock('@admin/utils/env/env', () => ({
   },
 }));
 
-function loggedEvent(
+const loggedEvent = (
   spy: ReturnType<typeof vi.spyOn>,
-): Record<string, unknown> {
+): Record<string, unknown> => {
   const call = spy.mock.calls.at(-1) as [string] | undefined;
   if (!call) {
     throw new Error('console.error was not called');
   }
   return JSON.parse(call[0]) as Record<string, unknown>;
-}
+};
 
 describe(revalidateSiteConfig, () => {
   const fetchMock = vi.fn();

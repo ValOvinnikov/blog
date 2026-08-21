@@ -48,9 +48,9 @@ export type TCreateTenantResult = {
  * function can return normally, so every value this resolves to is a
  * failure the Details form should show inline.
  */
-export async function createTenantAction(
+export const createTenantAction = async (
   input: TCreateTenantInput,
-): Promise<TCreateTenantResult> {
+): Promise<TCreateTenantResult> => {
   await requireAdmin();
 
   const parsed = createTenantInputSchema.safeParse(input);
@@ -137,4 +137,4 @@ export async function createTenantAction(
   await dispatchProvisioningWorkflow(tenantId);
 
   redirect(adminRoutes.tenantStatus(tenantId));
-}
+};

@@ -51,10 +51,10 @@ export type TUpdateLookResult = { ok: true } | { ok: false };
  * too — the page's own gate proves nothing about who actually invoked this
  * endpoint.
  */
-export async function updateLookAction(
+export const updateLookAction = async (
   tenantSlug: string,
   input: TUpdateLookInput,
-): Promise<TUpdateLookResult> {
+): Promise<TUpdateLookResult> => {
   const parsed = updateLookInputSchema.safeParse(input);
   if (!parsed.success) return { ok: false };
 
@@ -78,4 +78,4 @@ export async function updateLookAction(
     });
     return { ok: false };
   }
-}
+};

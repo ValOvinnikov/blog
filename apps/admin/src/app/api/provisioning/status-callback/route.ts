@@ -41,10 +41,10 @@ const statusCallbackSchema = z.object({
 // failed, since a mid-sequence failure is resumable (the admin UI's Retry
 // button re-dispatches the workflow, which resumes past whatever already
 // succeeded).
-function overallStatusFor(
+const overallStatusFor = (
   step: TTenantProvisioningStep,
   status: TTenantProvisioningStepStatus,
-): TTenantProvisioningStatus | undefined {
+): TTenantProvisioningStatus | undefined => {
   if (step !== TENANT_PROVISIONING_STEP.CREATE_WEBHOOK) return undefined;
   if (status === TENANT_PROVISIONING_STEP_STATUS.DONE) {
     return TENANT_PROVISIONING_STATUS.READY;
@@ -53,7 +53,7 @@ function overallStatusFor(
     return TENANT_PROVISIONING_STATUS.FAILED;
   }
   return undefined;
-}
+};
 
 /**
  * `POST /api/provisioning/status-callback` — called by the (CI-run)

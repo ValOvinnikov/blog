@@ -42,7 +42,7 @@ const TEXT_FIELD_ID: Record<TTextFieldKey, string> = {
 
 const PLAN_FIELD_ID = 'tenant-detail-plan';
 
-function valuesFromTenant(tenant: TTenant): TFormValues {
+const valuesFromTenant = (tenant: TTenant): TFormValues => {
   return {
     name: tenant.name,
     slug: tenant.slug,
@@ -50,15 +50,15 @@ function valuesFromTenant(tenant: TTenant): TFormValues {
     plan: tenant.plan,
     locale: tenant.locale,
   };
-}
+};
 
 /**
  * Renders form controls when editable, plain text when locked.
  */
-export function TenantDetailsPanel({
+export const TenantDetailsPanel = ({
   tenant,
   isEditable,
-}: TTenantDetailsPanelProps) {
+}: TTenantDetailsPanelProps) => {
   const t = useTranslations('tenantDetailsPanel');
   const router = useRouter();
   const panelId = useId();
@@ -133,14 +133,14 @@ export function TenantDetailsPanel({
     planControl,
   } = tenantDetailsPanelVariants();
 
-  function updateField<K extends keyof TFormValues>(
+  const updateField = <K extends keyof TFormValues>(
     key: K,
     nextValue: TFormValues[K],
-  ) {
+  ) => {
     setValues((prev) => ({ ...prev, [key]: nextValue }));
-  }
+  };
 
-  function handleSave() {
+  const handleSave = () => {
     setFormError(undefined);
     setFieldErrors({});
 
@@ -153,7 +153,7 @@ export function TenantDetailsPanel({
       }
       router.refresh();
     });
-  }
+  };
 
   const planOptions = [
     { value: TENANT_PLAN.FREE, label: t('planOptionFree') },
@@ -256,4 +256,4 @@ export function TenantDetailsPanel({
       )}
     </div>
   );
-}
+};

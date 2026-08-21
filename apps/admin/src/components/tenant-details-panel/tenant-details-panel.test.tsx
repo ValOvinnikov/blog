@@ -18,25 +18,25 @@ const render = renderWithIntl;
 
 // Applies the same wrapper on mount and on every `rerender()` call, so the
 // live region's node identity is preserved across rerenders.
-function withIntl(ui: ReactElement) {
+const withIntl = (ui: ReactElement) => {
   return (
     <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
       {ui}
     </NextIntlClientProvider>
   );
-}
+};
 
 // A sibling control outside the panel entirely, standing in for an unrelated
 // field or the adjacent steps list that a background poll must not steal
 // focus from.
-function PanelWithOutsideControl(props: TTenantDetailsPanelProps) {
+const PanelWithOutsideControl = (props: TTenantDetailsPanelProps) => {
   return (
     <>
       <button type="button">Outside control</button>
       <TenantDetailsPanel {...props} />
     </>
   );
-}
+};
 
 const { updateTenantDetailsActionMock } = vi.hoisted(() => ({
   updateTenantDetailsActionMock: vi.fn(),
@@ -63,13 +63,13 @@ describe(TenantDetailsPanel, () => {
   });
 
   describe('locked (isEditable=false)', () => {
-    function getLockedValue(labelText: string) {
+    const getLockedValue = (labelText: string) => {
       const term = screen.getByText(labelText);
       expect(term.tagName).toBe('DT');
       const value = term.nextElementSibling;
       expect(value?.tagName).toBe('DD');
       return value as HTMLElement;
-    }
+    };
 
     it('renders every field, including plan, as selectable text carrying its label — not a disabled input', () => {
       const tenant = makeTenant({

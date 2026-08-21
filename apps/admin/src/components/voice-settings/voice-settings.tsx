@@ -28,15 +28,15 @@ export type TVoiceSettingsProps = {
   ) => Promise<{ ok: boolean }>;
 };
 
-function buildInitialValues(
+const buildInitialValues = (
   initialOverrides: Record<string, string>,
-): TVoiceOverrides {
+): TVoiceOverrides => {
   const values = {} as TVoiceOverrides;
   for (const key of VOICE_OVERRIDE_KEYS) {
     values[key] = initialOverrides[key] ?? '';
   }
   return values;
-}
+};
 
 /**
  * The Voice tab: Basic is deliberately empty (the preset already decides the
@@ -46,12 +46,12 @@ function buildInitialValues(
  * `upsertSiteConfig`'s own Zod schema is what turns a blank entry into an
  * absent JSONB key rather than a stored empty string.
  */
-export function VoiceSettings({
+export const VoiceSettings = ({
   tenantSlug,
   voicePack,
   initialOverrides,
   saveAction,
-}: TVoiceSettingsProps) {
+}: TVoiceSettingsProps) => {
   const t = useTranslations('voiceSettings');
   const tGroups = useTranslations('voiceFieldGroups');
   const tLabels = useTranslations('voiceFieldLabels');
@@ -164,4 +164,4 @@ export function VoiceSettings({
       </details>
     </div>
   );
-}
+};

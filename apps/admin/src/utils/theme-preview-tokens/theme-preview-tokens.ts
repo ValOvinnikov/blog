@@ -24,10 +24,10 @@ const HUE_GRADIENT_STEP = 20;
  * actually render, not an approximation. `--brand-primary-contrast` is
  * achromatic by design and never varies with hue.
  */
-export function buildAccentPreviewTokens(
+export const buildAccentPreviewTokens = (
   hue: number,
   isDark: boolean,
-): TAccentPreviewTokens {
+): TAccentPreviewTokens => {
   if (isDark) {
     return {
       '--brand-primary': `oklch(0.7 0.16 ${hue})`,
@@ -47,13 +47,13 @@ export function buildAccentPreviewTokens(
     '--brand-primary-solid': `oklch(0.55 0.17 ${hue})`,
     '--brand-primary-solid-hover': `oklch(0.49 0.17 ${hue})`,
   };
-}
+};
 
 /** Same source ramp as `buildAccentPreviewTokens`, for `--logo-1/2/3` only. */
-export function buildLogoPreviewTokens(
+export const buildLogoPreviewTokens = (
   hue: number,
   isDark: boolean,
-): TLogoPreviewTokens {
+): TLogoPreviewTokens => {
   if (isDark) {
     return {
       '--logo-1': `oklch(0.58 0.17 ${hue})`,
@@ -67,7 +67,7 @@ export function buildLogoPreviewTokens(
     '--logo-2': `oklch(0.63 0.16 ${hue})`,
     '--logo-3': `oklch(0.73 0.13 ${hue})`,
   };
-}
+};
 
 /**
  * The accent-hue slider's track gradient, sampled from the same light-mode
@@ -75,7 +75,7 @@ export function buildLogoPreviewTokens(
  * slider can actually select, independent of the preview panel's own
  * light/dark toggle.
  */
-export function accentHueGradient(): string {
+export const accentHueGradient = (): string => {
   const stops: string[] = [];
 
   for (let hue = HUE_MIN; hue <= HUE_MAX; hue += HUE_GRADIENT_STEP) {
@@ -83,4 +83,4 @@ export function accentHueGradient(): string {
   }
 
   return `linear-gradient(90deg, ${stops.join(', ')})`;
-}
+};

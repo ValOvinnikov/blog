@@ -21,9 +21,9 @@ export type TTenantMembershipContext = {
  * protected by existing there, never by a per-page check someone could
  * forget to add.
  */
-export async function requireTenantMembership(
+export const requireTenantMembership = async (
   tenantSlug: string,
-): Promise<TTenantMembershipContext> {
+): Promise<TTenantMembershipContext> => {
   const session = await auth();
   const userId = session?.user?.id;
 
@@ -44,4 +44,4 @@ export async function requireTenantMembership(
   }
 
   return { tenant, membership };
-}
+};

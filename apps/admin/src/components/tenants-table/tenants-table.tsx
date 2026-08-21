@@ -21,7 +21,7 @@ export type TTenantsTableProps = {
  * Every tenant on the platform, with status and plan visible at a glance.
  * Purely presentational — the page fetching `listTenants()` owns the data.
  */
-export function TenantsTable({ tenants }: TTenantsTableProps) {
+export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
   const t = useTranslations('tenantsTable');
   const { wrapper, table, head, row, cell, name, domain, empty } =
     tenantsTableVariants();
@@ -89,4 +89,4 @@ export function TenantsTable({ tenants }: TTenantsTableProps) {
       </table>
     </div>
   );
-}
+};

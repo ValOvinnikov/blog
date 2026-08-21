@@ -21,14 +21,14 @@ export type TVoiceFieldGroupProps = {
  * One curated-voice card: a group heading (matching the CMS schema's
  * fieldset titles) over its member fields.
  */
-export function VoiceFieldGroup({
+export const VoiceFieldGroup = ({
   title,
   fields,
   values,
   placeholders,
   onFieldChange,
   isDisabled = false,
-}: TVoiceFieldGroupProps) {
+}: TVoiceFieldGroupProps) => {
   const t = useTranslations('voiceFieldGroup');
   const {
     root,
@@ -62,4 +62,4 @@ export function VoiceFieldGroup({
       </div>
     </div>
   );
-}
+};

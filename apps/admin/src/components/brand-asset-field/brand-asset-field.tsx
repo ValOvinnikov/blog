@@ -33,14 +33,14 @@ export type TBrandAssetFieldProps = {
  * away. On failure `onChange` is never called, so the previously saved
  * value (and its thumbnail) stays displayed.
  */
-export function BrandAssetField({
+export const BrandAssetField = ({
   tenantSlug,
   kind,
   label,
   hint,
   currentUrl,
   onChange,
-}: TBrandAssetFieldProps) {
+}: TBrandAssetFieldProps) => {
   const t = useTranslations('brandAssetField');
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -58,7 +58,7 @@ export function BrandAssetField({
     input,
   } = brandAssetFieldVariants();
 
-  function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = '';
     if (!file) return;
@@ -92,9 +92,9 @@ export function BrandAssetField({
         setError(t('unexpectedError'));
       }
     });
-  }
+  };
 
-  function handleRemove() {
+  const handleRemove = () => {
     setError(undefined);
     startTransition(async () => {
       try {
@@ -109,7 +109,7 @@ export function BrandAssetField({
         setError(t('unexpectedError'));
       }
     });
-  }
+  };
 
   const lowerLabel = label.toLowerCase();
 
@@ -178,4 +178,4 @@ export function BrandAssetField({
       {error && <Alert type={ALERT_TYPE.ERROR} message={error} />}
     </div>
   );
-}
+};

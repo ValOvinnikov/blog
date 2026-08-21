@@ -13,9 +13,9 @@ import { VoicePageContent } from './voice-page-content';
 
 const ADVANCED_SUMMARY = 'Advanced — 20 curated strings, 4 groups';
 
-async function openAdvanced() {
+const openAdvanced = async () => {
   await userEvent.setup().click(screen.getByText(ADVANCED_SUMMARY));
-}
+};
 
 const { getSiteConfigMock } = vi.hoisted(() => ({
   getSiteConfigMock: vi.fn(),

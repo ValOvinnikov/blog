@@ -18,9 +18,9 @@ import {
  * reaches Vercel's API is always resolved from the tenant's own database
  * row here, never taken directly from the caller.
  */
-export async function getDomainVerificationStatusAction(
+export const getDomainVerificationStatusAction = async (
   tenantId: string,
-): Promise<TDomainVerificationStatus> {
+): Promise<TDomainVerificationStatus> => {
   await requireAdmin();
 
   const [tenant] = await queries.tenants.listTenantsByIds([tenantId]);
@@ -30,4 +30,4 @@ export async function getDomainVerificationStatusAction(
   }
 
   return getDomainVerificationStatus(tenant.primaryDomain);
-}
+};

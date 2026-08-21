@@ -7,7 +7,7 @@ export type TTopbarProps = {
   roleLabel: string;
 };
 
-export function Topbar({ crumb, roleLabel }: TTopbarProps) {
+export const Topbar = ({ crumb, roleLabel }: TTopbarProps) => {
   const { root, crumb: crumbClass, role } = topbarVariants();
 
   return (
@@ -16,4 +16,4 @@ export function Topbar({ crumb, roleLabel }: TTopbarProps) {
       <span className={role()}>{roleLabel}</span>
     </header>
   );
-}
+};

@@ -12,7 +12,7 @@ const SITE_CONFIG_REVALIDATE_TIMEOUT_MS = 5000;
  * swallowed, since the calling save has already succeeded and that fallback
  * window remains the safety net either way.
  */
-export async function revalidateSiteConfig(): Promise<void> {
+export const revalidateSiteConfig = async (): Promise<void> => {
   const { WEB_APP_URL: webAppUrl, SITE_CONFIG_REVALIDATE_SECRET: secret } = env;
 
   if (!webAppUrl || !secret) {
@@ -35,4 +35,4 @@ export async function revalidateSiteConfig(): Promise<void> {
   } catch (error) {
     logger.error('site_config.revalidate_error', { error });
   }
-}
+};

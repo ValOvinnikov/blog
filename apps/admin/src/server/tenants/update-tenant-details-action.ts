@@ -48,10 +48,10 @@ export type TUpdateTenantDetailsActionResult =
  * (every provisioning step `IDLE`), a condition enforced client-side since
  * it's a UX state, not an authorization boundary.
  */
-export async function updateTenantDetailsAction(
+export const updateTenantDetailsAction = async (
   tenantId: string,
   input: TUpdateTenantDetailsActionInput,
-): Promise<TUpdateTenantDetailsActionResult> {
+): Promise<TUpdateTenantDetailsActionResult> => {
   await requireAdmin();
 
   const parsed = updateTenantDetailsInputSchema.safeParse(input);
@@ -103,4 +103,4 @@ export async function updateTenantDetailsAction(
     logger.error('tenants.update_details_failed', { tenantId, error });
     return { ok: false, error: "Couldn't save tenant details — try again." };
   }
-}
+};

@@ -22,10 +22,10 @@ export type TClearBrandAssetResult =
  * uploaded. Idempotent: clearing an already-empty field is a no-op success,
  * not an error, so a stale "Remove" click can't fail.
  */
-export async function clearBrandAssetAction(
+export const clearBrandAssetAction = async (
   tenantSlug: string,
   kind: TBrandAssetKind,
-): Promise<TClearBrandAssetResult> {
+): Promise<TClearBrandAssetResult> => {
   const { tenant } = await requireTenantMembership(tenantSlug);
 
   const parsedKind = brandAssetKindSchema.safeParse(kind);
@@ -88,4 +88,4 @@ export async function clearBrandAssetAction(
       error: `Couldn't remove the ${targetKind} — try again.`,
     };
   }
-}
+};

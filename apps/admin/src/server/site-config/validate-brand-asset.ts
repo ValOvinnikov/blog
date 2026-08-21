@@ -41,11 +41,11 @@ const UNREADABLE_IMAGE_ERROR = "That file isn't a readable image.";
  * so it's the right proxy for "is this square", even though it isn't a
  * literal pixel count the way a PNG's IHDR chunk is.
  */
-function validateSvgAsset(
+const validateSvgAsset = (
   buffer: Buffer,
   kind: TBrandAssetKind,
   format: { contentType: string; extension: string },
-): TBrandAssetValidationResult {
+): TBrandAssetValidationResult => {
   const sanitized = sanitizeSvgMarkup(buffer.toString('utf-8'));
   if (!sanitized) {
     return { ok: false, error: UNREADABLE_IMAGE_ERROR };
@@ -75,7 +75,7 @@ function validateSvgAsset(
       extension: format.extension,
     },
   };
-}
+};
 
 /**
  * The authoritative upload gate — a browser-reported `File.type`/`.size` is
@@ -95,10 +95,10 @@ function validateSvgAsset(
  * on-the-fly transforms, so whatever passes this check is exactly what a
  * browser tab renders at 16–32px.
  */
-export async function validateBrandAssetUpload(
+export const validateBrandAssetUpload = async (
   file: File,
   kind: TBrandAssetKind,
-): Promise<TBrandAssetValidationResult> {
+): Promise<TBrandAssetValidationResult> => {
   if (file.size === 0) {
     return { ok: false, error: 'Choose a file to upload.' };
   }
@@ -160,4 +160,4 @@ export async function validateBrandAssetUpload(
       extension: format.extension,
     },
   };
-}
+};

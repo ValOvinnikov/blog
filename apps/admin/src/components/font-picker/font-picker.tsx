@@ -17,7 +17,11 @@ export type TFontPickerProps = {
  * Renders the closed set of five `FONT_CHOICE` options, each in its own
  * loaded webfont — reused for both the heading and body pickers.
  */
-export function FontPicker({ ariaLabel, value, onChange }: TFontPickerProps) {
+export const FontPicker = ({
+  ariaLabel,
+  value,
+  onChange,
+}: TFontPickerProps) => {
   const { root, option, radioRoot, radioIndicator, name } =
     fontPickerVariants();
 
@@ -40,4 +44,4 @@ export function FontPicker({ ariaLabel, value, onChange }: TFontPickerProps) {
       ))}
     </RadioGroup>
   );
-}
+};

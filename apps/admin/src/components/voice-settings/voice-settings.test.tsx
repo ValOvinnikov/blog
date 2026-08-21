@@ -24,9 +24,9 @@ const ADVANCED_SUMMARY = 'Advanced — 20 curated strings, 4 groups';
 // Advanced starts collapsed (matching the Look tab) — every test that reads
 // or interacts with a curated field opens it first, same as a real user
 // would have to.
-async function openAdvanced(user: ReturnType<typeof userEvent.setup>) {
+const openAdvanced = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.click(screen.getByText(ADVANCED_SUMMARY));
-}
+};
 
 describe(VoiceSettings, () => {
   it('renders Basic empty, with a stated reason', () => {

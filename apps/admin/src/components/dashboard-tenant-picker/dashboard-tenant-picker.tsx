@@ -18,9 +18,9 @@ export type TDashboardTenantPickerProps = {
  * pointing at the cookie-setting `/api/dashboard/select-tenant` endpoint
  * instead of the slug-routed `/t/{slug}`.
  */
-export function DashboardTenantPicker({
+export const DashboardTenantPicker = ({
   tenants,
-}: TDashboardTenantPickerProps) {
+}: TDashboardTenantPickerProps) => {
   const t = useTranslations('dashboardTenantPicker');
   const { root, description } = dashboardTenantPickerVariants();
 
@@ -41,4 +41,4 @@ export function DashboardTenantPicker({
       />
     </div>
   );
-}
+};

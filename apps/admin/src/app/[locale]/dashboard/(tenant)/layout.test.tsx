@@ -51,11 +51,11 @@ const membership2 = {
   role: 'OWNER',
 };
 
-function mockCookie(value: string | undefined) {
+const mockCookie = (value: string | undefined) => {
   cookiesMock.mockResolvedValue({
     get: vi.fn(() => (value === undefined ? undefined : { value })),
   });
-}
+};
 
 const setup = customRenderAsync(DashboardTenantLayout, {
   children: <div>dashboard content</div>,

@@ -25,14 +25,14 @@ vi.mock('@admin/server/site-config/clear-brand-asset-action', () => ({
 // this simulates the one path that can still reach the handler with a
 // mismatched type (e.g. drag-and-drop), which `quickClientImageCheck`
 // exists to catch.
-function selectFile(container: HTMLElement, file: File) {
+const selectFile = (container: HTMLElement, file: File) => {
   const input = container.querySelector('input[type="file"]');
   if (!(input instanceof HTMLInputElement)) {
     throw new Error('file input not found');
   }
   const user = userEvent.setup({ applyAccept: false });
   return user.upload(input, file);
-}
+};
 
 describe(BrandAssetField, () => {
   beforeEach(() => {

@@ -23,12 +23,12 @@ export type TLogoHueFieldProps = {
  * the accent value would be indistinguishable from a tenant who deliberately
  * chose that same hue, so this toggles the field itself rather than a value.
  */
-export function LogoHueField({
+export const LogoHueField = ({
   accentHue,
   logoHue,
   onChange,
   isDark,
-}: TLogoHueFieldProps) {
+}: TLogoHueFieldProps) => {
   const t = useTranslations('logoHueField');
   const follows = logoHue === undefined;
   const resolvedHue = logoHue ?? accentHue;
@@ -80,4 +80,4 @@ export function LogoHueField({
       </div>
     </div>
   );
-}
+};

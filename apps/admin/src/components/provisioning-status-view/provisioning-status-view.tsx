@@ -52,20 +52,20 @@ const STEP_POLL_INTERVAL_MS = 4000;
 // overlapping in-flight requests.
 const DOMAIN_POLL_INTERVAL_MS = 10000;
 
-function isTerminalProvisioningStatus(
+const isTerminalProvisioningStatus = (
   status: TTenantProvisioningStatus | null,
-): boolean {
+): boolean => {
   return (
     status === TENANT_PROVISIONING_STATUS.READY ||
     status === TENANT_PROVISIONING_STATUS.FAILED
   );
-}
+};
 
-function isTerminalDomainVerificationStatus(
+const isTerminalDomainVerificationStatus = (
   status: TDomainVerificationStatus,
-): boolean {
+): boolean => {
   return status === 'VERIFIED' || status === 'NOT_CONFIGURED';
-}
+};
 
 const DNS_TONE: Record<TDomainVerificationStatus, 'ok' | 'warn' | 'neutral'> = {
   NOT_CONFIGURED: 'neutral',
@@ -89,10 +89,10 @@ type TProvisioningStatusViewProps = {
  * status; the domain verification badge polls on its own, slower interval
  * so a slow or failed Vercel lookup can never stall step polling.
  */
-export function ProvisioningStatusView({
+export const ProvisioningStatusView = ({
   tenant,
   domainVerificationStatus,
-}: TProvisioningStatusViewProps) {
+}: TProvisioningStatusViewProps) => {
   const t = useTranslations('provisioningStatusView');
   const router = useRouter();
   const [retryingStep, setRetryingStep] =
@@ -201,23 +201,23 @@ export function ProvisioningStatusView({
     return status === TENANT_PROVISIONING_STEP_STATUS.IDLE;
   });
 
-  function handleRetry(stepKey: TTenantProvisioningStep) {
+  const handleRetry = (stepKey: TTenantProvisioningStep) => {
     setRetryingStep(stepKey);
     startTransition(async () => {
       await retryProvisioningStepAction(tenant.id);
       router.refresh();
       setRetryingStep(null);
     });
-  }
+  };
 
-  function handleStart() {
+  const handleStart = () => {
     setIsStarting(true);
     startTransition(async () => {
       await retryProvisioningStepAction(tenant.id);
       router.refresh();
       setIsStarting(false);
     });
-  }
+  };
 
   return (
     <div className={root()}>
@@ -337,4 +337,4 @@ export function ProvisioningStatusView({
       </div>
     </div>
   );
-}
+};

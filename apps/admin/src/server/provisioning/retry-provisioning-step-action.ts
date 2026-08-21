@@ -11,9 +11,9 @@ import { dispatchProvisioningWorkflow } from './dispatch-provisioning-workflow';
  * idempotent: only the failed-or-later steps actually do work, everything
  * already `done` is skipped via its own persisted-state check.
  */
-export async function retryProvisioningStepAction(
+export const retryProvisioningStepAction = async (
   tenantId: string,
-): Promise<void> {
+): Promise<void> => {
   await requireSuperAdmin();
   await dispatchProvisioningWorkflow(tenantId);
-}
+};

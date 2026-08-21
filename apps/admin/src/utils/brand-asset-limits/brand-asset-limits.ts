@@ -32,9 +32,9 @@ export const DIMENSION_BOUNDS_PX: Record<
   favicon: { min: 16, max: 512 },
 };
 
-export function maxUploadMbLabel(kind: TBrandAssetKind): string {
+export const maxUploadMbLabel = (kind: TBrandAssetKind): string => {
   return `${(MAX_UPLOAD_BYTES[kind] / MB).toFixed(1)} MB`;
-}
+};
 
 /**
  * Client-side convenience only — catches an obviously wrong file (wrong
@@ -43,10 +43,10 @@ export function maxUploadMbLabel(kind: TBrandAssetKind): string {
  * favicon square-ness, neither of which a browser-reported `File.type`/
  * `.size` can prove.
  */
-export function quickClientImageCheck(
+export const quickClientImageCheck = (
   file: File,
   kind: TBrandAssetKind,
-): string | undefined {
+): string | undefined => {
   if (
     !ACCEPTED_IMAGE_MIME_TYPES.includes(file.type as TAcceptedImageMimeType)
   ) {
@@ -58,4 +58,4 @@ export function quickClientImageCheck(
   }
 
   return undefined;
-}
+};
