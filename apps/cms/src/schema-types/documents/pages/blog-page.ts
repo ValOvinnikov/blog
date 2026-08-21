@@ -46,8 +46,15 @@ export const blogPageSchema = defineType({
       initialValue: 9,
       validation: (rule) => rule.required().min(1).max(24).integer(),
     }),
+    defineField({
+      name: 'postList',
+      title: 'Post List',
+      type: 'reference',
+      description: 'The paginated post archive rendered on this page.',
+      to: [{ type: postListSchema.name }],
+    }),
     defineModulesField({
-      allow: [postListSchema.name, ctaSchema.name, newsletterSchema.name],
+      allow: [ctaSchema.name, newsletterSchema.name],
     }),
     defineField({
       name: 'seo',
