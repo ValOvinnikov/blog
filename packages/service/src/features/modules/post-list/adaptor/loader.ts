@@ -1,4 +1,5 @@
 import { isr, runQuery } from '@blog/service/sanity/query';
+import { toTotalPages } from '@blog/utils';
 
 import { postListModulePaginatedPostsQuery } from './posts.query';
 import { postListModuleQuery } from './query';
@@ -23,5 +24,8 @@ export async function getPostList(
     isr(['posts', 'author', 'topic']),
   );
 
-  return toPostListModule(raw, rawPosts.posts, rawPosts.total);
+  return toPostListModule(raw, rawPosts.posts, {
+    currentPage: page,
+    totalPages: toTotalPages(rawPosts.total, raw.pageSize),
+  });
 }

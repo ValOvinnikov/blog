@@ -12,10 +12,15 @@ export type TRawPostListModulePosts = InferResultType<
   ReturnType<typeof postListModulePaginatedPostsQuery>
 >['posts'];
 
+export type TPostListModulePagination = {
+  currentPage: number;
+  totalPages: number;
+};
+
 export function toPostListModule(
   raw: TRawPostListModule,
   rawPosts: TRawPostListModulePosts,
-  total: number,
+  pagination: TPostListModulePagination,
 ): TPostListModule {
   return {
     brandVariant: raw.brandVariant,
@@ -24,7 +29,7 @@ export function toPostListModule(
       : { heading: undefined, supportingText: undefined, align: undefined },
     posts: rawPosts.map(toPostCard),
     layout: toLayout(raw.layout),
-    pageSize: raw.pageSize,
-    total,
+    currentPage: pagination.currentPage,
+    totalPages: pagination.totalPages,
   };
 }

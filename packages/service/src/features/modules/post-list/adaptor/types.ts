@@ -11,6 +11,6 @@ export type TPostListModule = {
   sectionHeader: TSectionHeader;
   posts: TPostCard[];
   layout: TMaybeUndefined<TLayout>;
-  pageSize: number;
-  total: number;
+  currentPage: number;
+  totalPages: number;
 };

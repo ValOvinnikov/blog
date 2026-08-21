@@ -70,12 +70,14 @@ describe('getPostList', () => {
         total: 20,
       });
 
-    await getPostList('post-list-1');
+    const postList = await getPostList('post-list-1');
 
     expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[0...9]');
+    expect(postList.currentPage).toBe(1);
+    expect(postList.totalPages).toBe(3);
   });
 
-  it('windows by an explicit page number and returns the total', async () => {
+  it('windows by an explicit page number and derives totalPages from the total match count', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 9 }))
       .mockResolvedValueOnce({
@@ -87,6 +89,7 @@ describe('getPostList', () => {
 
     expect(mockRun.mock.calls[1]?.[0]?.query).toContain('[9...18]');
     expect(postList.posts.map((p) => p.id)).toEqual(['a']);
-    expect(postList.total).toBe(25);
+    expect(postList.currentPage).toBe(2);
+    expect(postList.totalPages).toBe(3); // ceil(25 / 9)
   });
 });
