@@ -101,9 +101,9 @@ export async function POST(request: Request): Promise<NextResponse> {
     revalidateTag(tag, { expire: 0 });
   }
 
-  // Tag expiry alone has not been invalidating prerendered route entries on
-  // Vercel (#318) — pages kept serving stale content indefinitely. Purging
-  // the root layout's path invalidates every page; publishes are infrequent
+  // Tag expiry alone does not invalidate prerendered route entries on
+  // Vercel — pages would otherwise keep serving stale content indefinitely.
+  // Purging the root layout's path invalidates every page; publishes are infrequent
   // on a blog, so the whole-site blast radius is acceptable. Verified against
   // next@16.2.10 internals: every rendered route carries the implicit
   // `_N_T_/layout` tag, which `revalidatePath('/', 'layout')` expires — so

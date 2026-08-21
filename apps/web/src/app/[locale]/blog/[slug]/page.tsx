@@ -25,12 +25,11 @@ export async function generateStaticParams() {
 
   // A successful (non-throwing) query that resolves to zero posts is not a
   // legitimate "no content yet" case in a real build — `blog_post` documents
-  // exist in production. It previously meant `SANITY_API_READ_TOKEN` wasn't
-  // available at build time (e.g. a Vercel "Sensitive" env var, redacted
-  // during `vercel build`), so the anonymous client silently returned an
-  // empty array instead of throwing (#889). That shipped zero prebuilt paths
-  // and broke every non-existent-slug `/blog/[slug]` request in production
-  // with a broken 500 fallback instead of a clean 404. This check is separate
+  // exist in production. It can mean `SANITY_API_READ_TOKEN` wasn't available
+  // at build time (e.g. a Vercel "Sensitive" env var, redacted during
+  // `vercel build`), so the anonymous client silently returns an empty array
+  // instead of throwing — shipping zero prebuilt paths and a broken 500
+  // fallback instead of a clean 404 for every slug. This check is separate
   // from the `if (!result.ok)` guard above, which only catches a genuine
   // connection/config error — a successful-but-empty result needs its own
   // check here.

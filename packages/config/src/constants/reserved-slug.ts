@@ -1,7 +1,7 @@
 /**
  * Path segments claimed by static routes in `apps/web`, listed below every
  * static route in Next.js route priority (static > dynamic > catch-all).
- * A generic content page (routed by the planned `/[slug]` catch-all, see #285)
+ * A generic content page (routed by the `/[slug]` catch-all)
  * slugged with one of these values would be silently unreachable, so both
  * `apps/cms` (slug validation) and `apps/web` (route-subset coverage) consume
  * this as the single source of truth.

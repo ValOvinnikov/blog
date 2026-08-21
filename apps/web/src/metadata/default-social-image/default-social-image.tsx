@@ -9,11 +9,11 @@ export const contentType = 'image/png';
 // Satori (the `next/og` renderer) needs literal hex colours — it can't read
 // the site's OKLCH design tokens (`--logo-1/2/3`, `--bg`, `--text*` in
 // `configs/tailwind/theme.css`). These are derived via `oklchToHex` from that
-// dark-mode palette's OKLCH triples (Console brand variant only — no
-// Indigo-variant OG image, out of scope for #490). The dark palette is used
-// regardless of the visitor's system theme: this is a single static asset
-// shared by every share surface, so it can't itself respond to
-// `prefers-color-scheme` the way the favicon route (`icon.tsx`) does.
+// dark-mode palette's OKLCH triples (Console brand variant only). The dark
+// palette is used regardless of the visitor's system theme: this is a
+// single static asset shared by every share surface, so it can't itself
+// respond to `prefers-color-scheme` the way the favicon route (`icon.tsx`)
+// does.
 const COLORS = {
   bg: oklchToHex(0.17, 0.006, 250),
   logo1: oklchToHex(0.58, 0.17, 250),

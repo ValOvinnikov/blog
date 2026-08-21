@@ -9,10 +9,8 @@ import {
 import { users } from './auth';
 import { tenants } from './tenants';
 
-// Feature 4 (#1043) — private "save for later" rows. Per the accepted design
-// decision (docs/superpowers/specs/2026-08-03-engagement-ui-design.md,
-// Feature 4 / Decision D6: bookmarks only, not likes — ratings (#1041)
-// already own the public appreciation signal), a bookmark is a private
+// Private "save for later" rows — bookmarks only, not likes, since ratings
+// already own the public appreciation signal. A bookmark is a private
 // (userId, postId) pair with no public count.
 //
 // `postId` holds a Sanity document `_id` as plain text, not a Postgres FK —

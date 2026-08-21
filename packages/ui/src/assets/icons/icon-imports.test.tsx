@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import SunIcon from './sun.svg';
 import sunIconUrl from './sun.svg?url';
 
-// Smoke test for the build-tooling contract #878's icon registry depends on:
+// Smoke test for the build-tooling contract the icon registry depends on:
 // a bare `.svg` import resolves to an SVGR React component, and the `?url`
 // suffix resolves to the emitted asset URL — see packages/ui/vitest.config.ts,
 // packages/ui/.storybook/main.ts, and apps/web/next.config.ts for the

@@ -72,7 +72,7 @@ export default async function RootLayout({ children }: TProps) {
             feature is enabled for the deploying project — gated behind
             `isWebAnalyticsEnabled()` (env var, not `VERCEL_ENV`; see its
             own comment) so a project without Speed Insights/Web Analytics
-            turned on doesn't 404 on that path (issue #1072). */}
+            turned on doesn't 404 on that path. */}
         {analyticsEnabled && <SpeedInsights />}
         {analyticsEnabled && <Analytics />}
       </body>
