@@ -7,7 +7,8 @@
     "voice": "Voice · Admin",
     "selectTenant": "Choose a workspace · Admin",
     "addTenant": "Add tenant · Admin",
-    "tenantStatus": "Tenant status · Admin"
+    "tenantStatus": "Tenant status · Admin",
+    "features": "Features · Admin"
   },
   "unauthorizedPage": {
     "heading": "Not authorized",
@@ -32,7 +33,8 @@
     "team": "Team",
     "dangerZone": "Danger zone",
     "badgeLater": "later",
-    "badgeThisMilestone": "this milestone"
+    "badgeThisMilestone": "this milestone",
+    "features": "Features"
   },
   "platformLayout": {
     "crumb": "Platform",
@@ -291,5 +293,30 @@
     "deleteConfirmHint": "Must match the tenant's name exactly.",
     "deleteConfirmButton": "Delete",
     "deleteConfirmingButton": "Deleting…"
+  },
+  "featuresSettings": {
+    "heading": "Features",
+    "description": "Turn tenant-facing capabilities on or off. Locked toggles require the Growth plan.",
+    "saveButton": "Save changes",
+    "savingButton": "Saving…",
+    "alertSuccess": "Features saved.",
+    "alertError": "Couldn't save — try again.",
+    "planLockedBadge": "Growth plan",
+    "switchOn": "On",
+    "switchOff": "Off",
+    "toggleLabel": {
+      "COMMENTS": "Comments",
+      "RATINGS": "Ratings",
+      "BOOKMARKS": "Bookmarks",
+      "NEWSLETTER": "Newsletter",
+      "ANALYTICS": "Analytics"
+    },
+    "toggleDescription": {
+      "COMMENTS": "Let readers leave comments on posts.",
+      "RATINGS": "Let readers rate posts.",
+      "BOOKMARKS": "Let readers save posts to read later.",
+      "NEWSLETTER": "Show the newsletter signup form on the site.",
+      "ANALYTICS": "Enable on-site analytics tracking."
+    }
   }
 }

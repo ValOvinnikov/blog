@@ -10,9 +10,11 @@ export const adminRoutes = {
   tenant: (tenantSlug: string) => `/t/${tenantSlug}`,
   look: (tenantSlug: string) => `/t/${tenantSlug}/look`,
   voice: (tenantSlug: string) => `/t/${tenantSlug}/voice`,
+  features: (tenantSlug: string) => `/t/${tenantSlug}/features`,
   dashboard: () => '/dashboard',
   dashboardLook: () => '/dashboard/look',
   dashboardVoice: () => '/dashboard/voice',
+  dashboardFeatures: () => '/dashboard/features',
   dashboardSelectTenant: () => '/dashboard/select-tenant',
   /** The picker's link target — verifies `tenantId` against the session's own `memberships` before setting the "active tenant" cookie. */
   dashboardSelectTenantHref: (tenantId: string) =>
