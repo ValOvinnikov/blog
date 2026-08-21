@@ -15,7 +15,7 @@ export type TLookPageContentProps = {
  * the slug-free `/dashboard/look` — both resolve a `TTenant` however fits
  * their own routing (URL param vs. session membership) and hand it here.
  */
-export async function LookPageContent({ tenant }: TLookPageContentProps) {
+export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
   const siteConfig = await queries.siteConfig.getSiteConfig(tenant.id);
 
   const initialValues = siteConfig
@@ -23,4 +23,4 @@ export async function LookPageContent({ tenant }: TLookPageContentProps) {
     : defaultLookFormValues();
 
   return <LookForm tenantSlug={tenant.slug} initialValues={initialValues} />;
-}
+};

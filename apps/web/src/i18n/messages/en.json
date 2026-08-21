@@ -50,6 +50,9 @@
   "postListModule": {
     "fallbackHeading": "Latest posts"
   },
+  "postLatestModule": {
+    "fallbackHeading": "Latest posts"
+  },
   "blogPostPage": {
     "relatedReading": "Related reading",
     "depthToggle": {

@@ -49,15 +49,15 @@ const s = depthProviderVariants();
 // while `getBootstrapScriptServerSnapshot` (`true`) keeps the script present
 // for the server markup and the matching hydration render, letting the
 // browser's HTML parser run it before React hydrates.
-function subscribeToNothing() {
+const subscribeToNothing = () => {
   return () => {};
-}
-function getBootstrapScriptClientSnapshot() {
+};
+const getBootstrapScriptClientSnapshot = () => {
   return false;
-}
-function getBootstrapScriptServerSnapshot() {
+};
+const getBootstrapScriptServerSnapshot = () => {
   return true;
-}
+};
 
 /**
  * DepthProvider — owns the reader's chosen article depth (30s skim / read /
@@ -156,10 +156,10 @@ export const DepthProvider = ({
 };
 
 /** Reads the current reading depth and its setter — throws outside a `DepthProvider`. */
-export function useDepth(): IDepthContextValue {
+export const useDepth = (): IDepthContextValue => {
   const context = useContext(DepthContext);
   if (!context) {
     throw new Error('useDepth must be used within a DepthProvider');
   }
   return context;
-}
+};

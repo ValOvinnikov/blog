@@ -15,9 +15,9 @@ import { isProductionEnvironment } from '@web/utils/is-production-environment';
  * tell the live `blog-dev` deployment apart from real production (see that
  * function's own docs).
  */
-export async function resolveTenantId(
+export const resolveTenantId = async (
   host: string | null,
-): Promise<string | undefined> {
+): Promise<string | undefined> => {
   const tenant = host
     ? await queries.tenantDomains.getTenantByDomain(host)
     : undefined;
@@ -26,9 +26,9 @@ export async function resolveTenantId(
   if (isProductionEnvironment()) return undefined;
 
   return resolveSoleTenantId();
-}
+};
 
-async function resolveSoleTenantId(): Promise<string | undefined> {
+const resolveSoleTenantId = async (): Promise<string | undefined> => {
   const tenants = await queries.tenants.listTenants();
   return tenants.length === 1 ? tenants[0]?.id : undefined;
-}
+};

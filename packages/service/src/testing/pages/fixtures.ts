@@ -105,7 +105,7 @@ export function makeRawHomePage(
     title: 'Home Page',
     hero: { _id: 'hero-1', _type: 'module_hero' },
     modules: [
-      { _id: 'post-list-1', _type: 'module_postList' },
+      { _id: 'post-latest-1', _type: 'module_postLatest' },
       { _id: 'cta-1', _type: 'module_cta' },
     ],
     seo: null,

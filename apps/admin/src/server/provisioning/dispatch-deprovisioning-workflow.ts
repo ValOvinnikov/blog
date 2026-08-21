@@ -22,11 +22,11 @@ export type TDispatchDeprovisioningWorkflowInput = {
  * independently — this dispatch is a convenience trigger, not the safety
  * boundary.
  */
-export async function dispatchDeprovisioningWorkflow({
+export const dispatchDeprovisioningWorkflow = async ({
   tenantId,
   confirm,
   dryRun,
-}: TDispatchDeprovisioningWorkflowInput): Promise<boolean> {
+}: TDispatchDeprovisioningWorkflowInput): Promise<boolean> => {
   const token = env.TENANT_PROVISIONING_GITHUB_TOKEN;
   const repo = parseTenantProvisioningRepo(env.TENANT_PROVISIONING_GITHUB_REPO);
 
@@ -70,4 +70,4 @@ export async function dispatchDeprovisioningWorkflow({
     });
     return false;
   }
-}
+};

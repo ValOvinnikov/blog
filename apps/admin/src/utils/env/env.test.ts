@@ -19,7 +19,7 @@ const originalEnv = Object.fromEntries(
   ENV_KEYS.map((key) => [key, process.env[key]]),
 ) as Record<(typeof ENV_KEYS)[number], string | undefined>;
 
-function restoreEnv(): void {
+const restoreEnv = (): void => {
   for (const key of ENV_KEYS) {
     const value = originalEnv[key];
     if (value === undefined) {
@@ -28,21 +28,21 @@ function restoreEnv(): void {
       process.env[key] = value;
     }
   }
-}
+};
 
 // `env.ts` validates eagerly on import (createEnv runs at module evaluation),
 // so each case needs a fresh module instance via resetModules + dynamic import.
-async function importEnv(): Promise<typeof import('./env')> {
+const importEnv = async (): Promise<typeof import('./env')> => {
   vi.resetModules();
   return import('./env');
-}
+};
 
 // The test environment is jsdom (a `window` global is present), so
 // `env-nextjs` treats the module as running on the client and throws for
 // server-only keys — this is the server/client boundary working as intended.
 // `isServer` is decided once, at `createEnv()` (i.e. at import time), so
 // simulating a server context requires removing `window` before importing.
-async function importEnvOnServer(): Promise<typeof import('./env')> {
+const importEnvOnServer = async (): Promise<typeof import('./env')> => {
   const originalWindow = globalThis.window;
   // @ts-expect-error -- simulate a server (non-browser) runtime for this import
   delete globalThis.window;
@@ -51,7 +51,7 @@ async function importEnvOnServer(): Promise<typeof import('./env')> {
   } finally {
     globalThis.window = originalWindow;
   }
-}
+};
 
 describe('env', () => {
   afterEach(() => {

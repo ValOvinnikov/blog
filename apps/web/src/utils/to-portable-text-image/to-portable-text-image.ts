@@ -5,7 +5,9 @@ import type {
   ISanityImageHotspot,
 } from '@blog/config';
 
-function toHotspot(raw: BodyImage['hotspot']): ISanityImageHotspot | undefined {
+const toHotspot = (
+  raw: BodyImage['hotspot'],
+): ISanityImageHotspot | undefined => {
   if (
     !raw ||
     raw.x == null ||
@@ -17,9 +19,9 @@ function toHotspot(raw: BodyImage['hotspot']): ISanityImageHotspot | undefined {
   }
 
   return { x: raw.x, y: raw.y, height: raw.height, width: raw.width };
-}
+};
 
-function toCrop(raw: BodyImage['crop']): ISanityImageCrop | undefined {
+const toCrop = (raw: BodyImage['crop']): ISanityImageCrop | undefined => {
   if (
     !raw ||
     raw.top == null ||
@@ -31,7 +33,7 @@ function toCrop(raw: BodyImage['crop']): ISanityImageCrop | undefined {
   }
 
   return { top: raw.top, bottom: raw.bottom, left: raw.left, right: raw.right };
-}
+};
 
 /**
  * toPortableTextImage — converts a raw `bodyImage` Portable Text body
@@ -48,9 +50,9 @@ function toCrop(raw: BodyImage['crop']): ISanityImageCrop | undefined {
  * `undefined` here: `SanityImage` renders fine without them (no blur-up
  * placeholder; explicit `width`/`height` props still apply).
  */
-export function toPortableTextImage(
+export const toPortableTextImage = (
   block: BodyImage,
-): ISanityImage | undefined {
+): ISanityImage | undefined => {
   const assetId = block.asset?._ref;
   if (!assetId) return undefined;
 
@@ -62,4 +64,4 @@ export function toPortableTextImage(
     lqip: undefined,
     dimensions: undefined,
   };
-}
+};

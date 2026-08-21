@@ -1,6 +1,6 @@
 import type { TTopic, TTopicWithPostCount } from '@blog/service';
 
-export function makeTopic(overrides: Partial<TTopic> = {}): TTopic {
+export const makeTopic = (overrides: Partial<TTopic> = {}): TTopic => {
   return {
     id: 'topic-1',
     title: 'Engineering',
@@ -8,14 +8,14 @@ export function makeTopic(overrides: Partial<TTopic> = {}): TTopic {
     description: 'Posts about building things.',
     ...overrides,
   };
-}
+};
 
-export function makeTopicWithPostCount(
+export const makeTopicWithPostCount = (
   overrides: Partial<TTopicWithPostCount> = {},
-): TTopicWithPostCount {
+): TTopicWithPostCount => {
   return {
     ...makeTopic(),
     postCount: 0,
     ...overrides,
   };
-}
+};

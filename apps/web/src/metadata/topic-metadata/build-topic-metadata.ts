@@ -17,10 +17,10 @@ import { getTranslations } from 'next-intl/server';
  * Reuses `getTopicPage` (also called by `TopicPage`) — Next dedupes
  * the fetch per request, so this adds no extra round-trip.
  */
-export async function buildTopicMetadata(
+export const buildTopicMetadata = async (
   slug: string,
   pageNumber?: number,
-): Promise<Metadata> {
+): Promise<Metadata> => {
   const [result, t] = await Promise.all([
     service.pages.topic.v1.getTopicPage(slug, {
       page: pageNumber,
@@ -60,4 +60,4 @@ export async function buildTopicMetadata(
       ogType: 'website',
     },
   );
-}
+};

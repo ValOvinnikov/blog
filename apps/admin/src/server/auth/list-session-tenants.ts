@@ -22,7 +22,7 @@ export type TSessionTenants = {
  * `/dashboard/select-tenant` picker page calls this directly since it needs
  * to render on the membership count itself, before any tenant is chosen.
  */
-export async function listSessionTenants(): Promise<TSessionTenants> {
+export const listSessionTenants = async (): Promise<TSessionTenants> => {
   const session = await auth();
   const userId = session?.user?.id;
 
@@ -41,4 +41,4 @@ export async function listSessionTenants(): Promise<TSessionTenants> {
   );
 
   return { userId, memberships, tenants };
-}
+};

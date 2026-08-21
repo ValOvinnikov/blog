@@ -189,7 +189,7 @@ export const createToastStore = () => {
     if (isVisible(id)) startTimer(id, durationMs);
   };
 
-  function leave(id: string) {
+  const leave = (id: string) => {
     clearTimer(id);
     if (!isVisible(id)) return;
 
@@ -200,9 +200,9 @@ export const createToastStore = () => {
       TOAST_EXIT_ANIMATION_MS,
     );
     removalTimers.set(id, removalTimeoutId);
-  }
+  };
 
-  function remove(id: string) {
+  const remove = (id: string) => {
     removalTimers.delete(id);
     const nextVisible = state.visible.filter((t) => t.id !== id);
     if (nextVisible.length === state.visible.length) return;
@@ -224,7 +224,7 @@ export const createToastStore = () => {
     }
 
     setState({ visible: nextVisible, pending: nextPending });
-  }
+  };
 
   const enqueue = (record: IToastRecord) => {
     if (state.visible.length < TOAST_QUEUE_CAP) {

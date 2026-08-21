@@ -11,9 +11,9 @@ import type { BlockText } from '@blog/config';
  * const bio = blockTextToPlain(author.bio);
  * return <BlogPageTemplate heading={author.name} supportingText={bio} posts={posts} />;
  */
-export function blockTextToPlain(
+export const blockTextToPlain = (
   blocks: BlockText | undefined,
-): string | undefined {
+): string | undefined => {
   if (!blocks || blocks.length === 0) return undefined;
 
   const text = blocks
@@ -24,4 +24,4 @@ export function blockTextToPlain(
     .join(' ');
 
   return text.length > 0 ? text : undefined;
-}
+};

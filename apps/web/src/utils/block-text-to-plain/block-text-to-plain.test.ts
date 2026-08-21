@@ -2,14 +2,14 @@ import type { BlockText } from '@blog/config';
 
 import { blockTextToPlain } from './block-text-to-plain';
 
-function block(text: string): BlockText[number] {
+const block = (text: string): BlockText[number] => {
   return {
     _type: 'block',
     _key: 'k1',
     style: 'normal',
     children: [{ _type: 'span', _key: 'c1', text }],
   };
-}
+};
 
 describe(blockTextToPlain, () => {
   it('returns undefined for undefined input', () => {

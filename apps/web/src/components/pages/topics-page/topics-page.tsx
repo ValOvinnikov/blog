@@ -28,7 +28,7 @@ const s = topicsPageVariants();
  * critical page content, so a fetch failure here must never crash the
  * whole page (or, at build time, the whole static export).
  */
-export async function TopicsPage() {
+export const TopicsPage = async () => {
   const [topics, breadcrumbsT, t] = await Promise.all([
     getTopicsSafely(),
     getTranslations('breadcrumbs'),
@@ -86,4 +86,4 @@ export async function TopicsPage() {
       </main>
     </>
   );
-}
+};

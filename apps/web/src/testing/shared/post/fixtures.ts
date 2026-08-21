@@ -1,18 +1,18 @@
 import type { TPostCard, TPostCardTopic } from '@blog/service';
 import { makePostCardAuthor } from '@web/testing/shared/author/fixtures';
 
-export function makePostCardTopic(
+export const makePostCardTopic = (
   overrides: Partial<TPostCardTopic> = {},
-): TPostCardTopic {
+): TPostCardTopic => {
   return {
     id: 'topic-1',
     title: 'News',
     slug: 'news',
     ...overrides,
   };
-}
+};
 
-export function makePostCard(overrides: Partial<TPostCard> = {}): TPostCard {
+export const makePostCard = (overrides: Partial<TPostCard> = {}): TPostCard => {
   return {
     id: 'post-1',
     title: 'My Post Title',
@@ -28,4 +28,4 @@ export function makePostCard(overrides: Partial<TPostCard> = {}): TPostCard {
     readingTimeMinutes: 2,
     ...overrides,
   };
-}
+};

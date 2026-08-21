@@ -23,10 +23,10 @@ export type TDeleteTenantResult = { ok: true } | { ok: false; error: string };
  * rather than re-checked here, since re-fetching just to duplicate a check
  * the mutation already makes atomically would only widen the race window.
  */
-export async function deleteTenantAction(
+export const deleteTenantAction = async (
   tenantId: string,
   input: TDeleteTenantInput,
-): Promise<TDeleteTenantResult> {
+): Promise<TDeleteTenantResult> => {
   await requireSuperAdmin();
 
   const parsed = deleteTenantInputSchema.safeParse(input);
@@ -75,4 +75,4 @@ export async function deleteTenantAction(
   });
 
   return { ok: true };
-}
+};

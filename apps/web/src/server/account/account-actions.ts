@@ -12,7 +12,7 @@ export type TDeleteAccountResult = { ok: true } | { ok: false };
  * itself rather than trusting a caller-supplied `userId`, so this can never
  * be called to delete a different account than the one making the request.
  */
-export async function deleteAccountAction(): Promise<TDeleteAccountResult> {
+export const deleteAccountAction = async (): Promise<TDeleteAccountResult> => {
   const session = await auth();
   const userId = session?.user?.id;
   if (!userId) return { ok: false };
@@ -24,4 +24,4 @@ export async function deleteAccountAction(): Promise<TDeleteAccountResult> {
     logger.error('account.delete_failed', { error });
     return { ok: false };
   }
-}
+};

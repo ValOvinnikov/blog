@@ -32,7 +32,7 @@ export type TAccountMenuProps = {
  * state and refs come from the parent's single `usePopover()` call — this
  * component never calls `usePopover()` itself.
  */
-export function AccountMenu({
+export const AccountMenu = ({
   panelId,
   isOpen,
   toggle,
@@ -42,7 +42,7 @@ export function AccountMenu({
   email,
   image,
   isPlain = false,
-}: TAccountMenuProps) {
+}: TAccountMenuProps) => {
   const t = useTranslations('authMenu');
   const { panel, window: windowSize } = authMenuVariants();
   const {
@@ -154,4 +154,4 @@ export function AccountMenu({
       </PopoverMenu.Panel>
     </PopoverMenu>
   );
-}
+};

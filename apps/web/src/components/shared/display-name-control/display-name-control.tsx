@@ -33,11 +33,11 @@ export type TDisplayNameControlProps = {
  * `Button` sits on its own full-width row below on mobile, inline at the end
  * of the row again from `md:` up.
  */
-export function DisplayNameControl({
+export const DisplayNameControl = ({
   initialName,
   email,
   image,
-}: TDisplayNameControlProps) {
+}: TDisplayNameControlProps) => {
   const t = useTranslations('accountPage.identity');
   const toast = useToast();
   const router = useRouter();
@@ -120,4 +120,4 @@ export function DisplayNameControl({
       </Button>
     </div>
   );
-}
+};

@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
  * via the shared `toMetadata` mapper. Returns empty metadata when the post
  * doesn't exist; the route itself calls `notFound()` for the actual 404.
  */
-export async function buildPostMetadata(slug: string): Promise<Metadata> {
+export const buildPostMetadata = async (slug: string): Promise<Metadata> => {
   const result = await service.pages.post.v1.getPost(slug);
 
   if (!result.ok) {
@@ -30,4 +30,4 @@ export async function buildPostMetadata(slug: string): Promise<Metadata> {
       authors: [author.name],
     },
   });
-}
+};

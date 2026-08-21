@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { ContentModule } from './content/content-module';
 import { CtaModule } from './cta/cta-module';
 import { NewsletterModule } from './newsletter/newsletter-module';
+import { PostLatestModule } from './post-latest/post-latest-module';
 import { PostListModule } from './post-list/post-list-module';
 
 export type TModuleComponentProps = {
@@ -30,6 +31,7 @@ export const MODULE_MAP: Record<
   (props: TModuleComponentProps) => Promise<ReactNode>
 > = {
   module_postList: PostListModule,
+  module_postLatest: PostLatestModule,
   module_content: ContentModule,
   module_cta: CtaModule,
   module_newsletter: NewsletterModule,

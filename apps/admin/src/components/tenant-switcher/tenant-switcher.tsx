@@ -28,11 +28,11 @@ export type TTenantSwitcherProps = {
  * correctly with a single tenant today; adding more is a matter of the
  * caller passing a longer `tenants` list, not a change to this component.
  */
-export function TenantSwitcher({
+export const TenantSwitcher = ({
   tenants,
   activeTenantId,
   hrefFor = (tenant) => adminRoutes.tenant(tenant.slug),
-}: TTenantSwitcherProps) {
+}: TTenantSwitcherProps) => {
   const active =
     tenants.find((tenant) => tenant.id === activeTenantId) ?? tenants[0];
 
@@ -76,4 +76,4 @@ export function TenantSwitcher({
       </Menu.Portal>
     </Menu.Root>
   );
-}
+};

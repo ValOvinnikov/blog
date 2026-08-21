@@ -33,9 +33,9 @@ export type TDeprovisionTenantControlProps = {
  * later refresh. An already-archived tenant instead gets a read-only status
  * row plus the hard-delete escape hatch, confirmed on name rather than slug.
  */
-export function DeprovisionTenantControl({
+export const DeprovisionTenantControl = ({
   tenant,
-}: TDeprovisionTenantControlProps) {
+}: TDeprovisionTenantControlProps) => {
   const t = useTranslations('deprovisionTenantControl');
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -60,16 +60,16 @@ export function DeprovisionTenantControl({
     actions,
   } = deprovisionTenantControlVariants();
 
-  function handleOpenChange(next: boolean) {
+  const handleOpenChange = (next: boolean) => {
     setOpen(next);
     if (!next) {
       setConfirm('');
       setDryRun(true);
       setError(undefined);
     }
-  }
+  };
 
-  function handleConfirm() {
+  const handleConfirm = () => {
     setError(undefined);
     startTransition(async () => {
       const result = await deprovisionTenantAction(tenant.id, {
@@ -83,7 +83,7 @@ export function DeprovisionTenantControl({
       handleOpenChange(false);
       router.refresh();
     });
-  }
+  };
 
   if (tenant.deprovisionedAt) {
     return (
@@ -171,7 +171,7 @@ export function DeprovisionTenantControl({
       </AlertDialog.Root>
     </div>
   );
-}
+};
 
 /**
  * The archived branch's own trigger + confirm dialog, kept as a sibling
@@ -179,7 +179,7 @@ export function DeprovisionTenantControl({
  * independent dialog/confirm state doesn't have to live alongside the
  * live-tenant dialog's.
  */
-function DeleteTenantPermanentlyControl({ tenant }: { tenant: TTenant }) {
+const DeleteTenantPermanentlyControl = ({ tenant }: { tenant: TTenant }) => {
   const t = useTranslations('deprovisionTenantControl');
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -198,15 +198,15 @@ function DeleteTenantPermanentlyControl({ tenant }: { tenant: TTenant }) {
     actions,
   } = deprovisionTenantControlVariants();
 
-  function handleOpenChange(next: boolean) {
+  const handleOpenChange = (next: boolean) => {
     setOpen(next);
     if (!next) {
       setConfirm('');
       setError(undefined);
     }
-  }
+  };
 
-  function handleConfirm() {
+  const handleConfirm = () => {
     setError(undefined);
     startTransition(async () => {
       const result = await deleteTenantAction(tenant.id, { confirm });
@@ -216,7 +216,7 @@ function DeleteTenantPermanentlyControl({ tenant }: { tenant: TTenant }) {
       }
       router.push(adminRoutes.tenants());
     });
-  }
+  };
 
   return (
     <AlertDialog.Root open={open} onOpenChange={handleOpenChange}>
@@ -269,4 +269,4 @@ function DeleteTenantPermanentlyControl({ tenant }: { tenant: TTenant }) {
       </AlertDialog.Portal>
     </AlertDialog.Root>
   );
-}
+};

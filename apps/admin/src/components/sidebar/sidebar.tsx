@@ -55,7 +55,7 @@ export type TSidebarProps = {
  * itself carries no authorization logic. Growing a section (e.g. adding a
  * built tab) is a matter of appending an item, not reshaping this component.
  */
-export function Sidebar({ sections, switcher }: TSidebarProps) {
+export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
   const t = useTranslations('sidebar');
   const {
     root,
@@ -142,4 +142,4 @@ export function Sidebar({ sections, switcher }: TSidebarProps) {
       ))}
     </aside>
   );
-}
+};

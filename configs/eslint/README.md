@@ -28,6 +28,12 @@
   at runtime but isn't caught, since the rule only inspects the syntactic
   annotation shape — flagging it would require type-aware linting, which
   this repo's ESLint setup doesn't run.
+- `func-style` — enforces arrow-function expressions (`'error', 'expression',
+{ allowArrowFunctions: true }`) over function declarations. Registered only
+  in `web.js`, scoped to `apps/web/**/*.{ts,tsx}`, with an override turning it
+  back off in `**/page.tsx`, `**/layout.tsx`, `**/route.ts`, and
+  `**/not-found.tsx` — Next.js reserved exports (`generateMetadata`, route
+  verbs, …) stay as declarations.
 - Per-layer subpaths that compose `base.js` (and, where relevant,
   `no-upstream-imports.js`) with that layer's own constraints — `./config`,
   `./utils`, `./insight`, `./service`, `./db`, `./ui`, `./web`, `./cms`,

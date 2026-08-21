@@ -16,7 +16,9 @@ import { getTranslations } from 'next-intl/server';
  * Reuses `getIndexPage` (also called by `BlogListPage`) — Next dedupes the
  * fetch per request, so this adds no extra round-trip.
  */
-export async function buildBlogListMetadata(page: number): Promise<Metadata> {
+export const buildBlogListMetadata = async (
+  page: number,
+): Promise<Metadata> => {
   const [result, t] = await Promise.all([
     service.pages.blog.v1.getIndexPage({ page }),
     getTranslations('pagination'),
@@ -45,4 +47,4 @@ export async function buildBlogListMetadata(page: number): Promise<Metadata> {
     ogType: 'website',
     feedUrl: routes.rssFeed(),
   });
-}
+};

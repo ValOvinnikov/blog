@@ -175,18 +175,19 @@ incrementally (#251).
 Every `module_*` document also carries a **required** `brandVariant` field
 (stored values from `@blog/config`'s `BRAND_VARIANT` const —
 `PRIMARY`/`SECONDARY` for `module_content`/`module_cta`/`module_newsletter`/
-`module_postList`; `module_hero`'s schema additionally allows
+`module_postList`/`module_postLatest`; `module_hero`'s schema additionally allows
 `BRAND_PRIMARY`), plus an optional, all-remaining-fields-optional `layout`
 object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
 `module_hero`, which uses the leaner `heroLayout` type), `dividerTop`,
 `dividerBottom` — stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`
 consts; there is no `align` field on `layout` — see `SectionHeader` below
-for heading alignment). `module_cta`/`module_postList`/`module_newsletter`
+for heading alignment).
+`module_cta`/`module_postList`/`module_postLatest`/`module_newsletter`
 additionally carry a `sectionHeader` object (`heading`, `supportingText`,
 `align` — stored values from `HEADING_ALIGN`; all optional on
-`module_postList`, `heading` required on `module_cta`/`module_newsletter`
-via a per-module `requireHeading` override on the shared
-`sectionHeaderField()` helper). `module_content` has no `sectionHeader` —
+`module_postList`/`module_postLatest`, `heading` required on
+`module_cta`/`module_newsletter` via a per-module `requireHeading` override
+on the shared `sectionHeaderField()` helper). `module_content` has no `sectionHeader` —
 its rich-text `body` supplies any in-content headings, so a separate
 structured heading field would just be a second way to do the same thing.
 `module_hero` has no `sectionHeader` either — its heading fields are its

@@ -35,7 +35,7 @@ export type TBookmarkButtonProps = {
  * carries a `retry` action (`performToggle` re-run with the same target
  * value that just failed).
  */
-export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
+export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
   const t = useTranslations('bookmarkButton');
   const toast = useToast();
   const sessionResult = useSession();
@@ -169,4 +169,4 @@ export function BookmarkButton({ postId, className }: TBookmarkButtonProps) {
       />
     </span>
   );
-}
+};

@@ -250,6 +250,47 @@ page-builder and no SEO surface to justify them. What carries over:
   group, named after its purpose.
 - Extract at the second repetition, never the third.
 
+## Function style
+
+**Default: arrow-function const.** `apps/admin` is a React app, and React
+layers export _values_ — a component is a const holding a function — so an
+arrow const is the ordinary form here:
+
+```ts
+export const TenantRow = ({ tenant }: TTenantRowProps) => { ... };
+export const updateTenantDetails = async (input: TInput): Promise<TResult> => { ... };
+```
+
+This is enforced mechanically by `func-style` in `configs/eslint/admin.js`, so
+a `function` declaration outside the exceptions below is a lint error, not a
+style preference. `packages/db` and `packages/service` go the other way and
+keep `function` declarations — they export _operations_, where
+`export function getTenantById()` is the ordinary Node/TypeScript idiom. Do not
+carry this app's rule across that boundary.
+
+A `function` declaration is correct only in these cases:
+
+1. **Generator functions** — `function*` has no arrow form.
+2. **TypeScript overload signatures** — an arrow const cannot carry multiple
+   call signatures declared the overload way.
+3. **A genuine need for `this` binding** — an arrow captures `this` lexically,
+   so converting changes behavior.
+4. **Hoisting is actually load-bearing** — the function is called above its own
+   definition and reordering would genuinely hurt readability. Prefer
+   reordering; use this sparingly and say why.
+5. **Next.js reserved exports** — framework API surface, which every Next.js
+   doc, example, and codemod emits as a declaration. Both the default-exported
+   `Page`/`Layout`/`NotFound` and the named `generateMetadata`,
+   `generateStaticParams`, and route handlers (`GET`/`POST`/…) stay
+   declarations. The lint rule already ignores `export default function`; the
+   named ones are exempted by a glob override on `**/page.tsx`,
+   `**/layout.tsx`, and `**/route.ts`.
+
+Server Actions convert normally. Next.js requires every export in a
+`'use server'` module to be an async function, and
+`export const action = async () => {}` satisfies that — the constraint is on
+the exported value, not on how it was written.
+
 ## Tailwind
 
 - Tokens come from `@blog/tailwind-config`, imported in CSS —

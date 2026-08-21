@@ -2,14 +2,14 @@ import type { BodyImage } from '@blog/config';
 
 import { toPortableTextImage } from './to-portable-text-image';
 
-function makeBlock(overrides: Partial<BodyImage> = {}): BodyImage {
+const makeBlock = (overrides: Partial<BodyImage> = {}): BodyImage => {
   return {
     _type: 'bodyImage',
     asset: { _ref: 'image-abc123-800x600-jpg', _type: 'reference' },
     alt: 'A scenic mountain range',
     ...overrides,
   };
-}
+};
 
 describe('toPortableTextImage', () => {
   it('maps the asset reference, alt text, hotspot and crop into an ISanityImage', () => {

@@ -16,17 +16,17 @@ type TTenantVisibility = 'active' | 'all';
  * navigation, so this toggle only ever drives the `?archived=1` query param
  * — there is no client-side list to filter.
  */
-export function ArchivedTenantsToggle({
+export const ArchivedTenantsToggle = ({
   shouldShowArchived,
-}: TArchivedTenantsToggleProps) {
+}: TArchivedTenantsToggleProps) => {
   const t = useTranslations('archivedTenantsToggle');
   const router = useRouter();
 
   const value: TTenantVisibility = shouldShowArchived ? 'all' : 'active';
 
-  function handleChange(next: TTenantVisibility) {
+  const handleChange = (next: TTenantVisibility) => {
     router.push(adminRoutes.tenants({ archived: next === 'all' }));
-  }
+  };
 
   return (
     <SegmentedControl<TTenantVisibility>
@@ -39,4 +39,4 @@ export function ArchivedTenantsToggle({
       onChange={handleChange}
     />
   );
-}
+};

@@ -27,7 +27,7 @@ type TTopicPageProps = { slug: string; page?: number };
  * organisms as `BlogListPage`. `getTopicPage` always windows — page 1
  * gets the same pagination metadata as any other page.
  */
-export async function TopicPage({ slug, page }: TTopicPageProps) {
+export const TopicPage = async ({ slug, page }: TTopicPageProps) => {
   const [result, topics, t, breadcrumbsT, topicPageT] = await Promise.all([
     service.pages.topic.v1.getTopicPage(slug, {
       page,
@@ -103,4 +103,4 @@ export async function TopicPage({ slug, page }: TTopicPageProps) {
       />
     </>
   );
-}
+};

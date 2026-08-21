@@ -37,10 +37,10 @@ const FALLBACK_TWITTER_IMAGE_PATH = '/twitter-image';
  * @example
  * return toMetadata(result.data.seo, { canonical: '/', ogType: 'website', titleAbsolute: true });
  */
-export function toMetadata(
+export const toMetadata = (
   seo: TSeoResolved,
   opts: TToMetadataOptions,
-): Metadata {
+): Metadata => {
   const { canonical, ogType, titleAbsolute, feedUrl, article } = opts;
   const ogImages = seo.ogImageUrl
     ? [{ url: seo.ogImageUrl }]
@@ -71,4 +71,4 @@ export function toMetadata(
       images: twitterImages,
     },
   };
-}
+};

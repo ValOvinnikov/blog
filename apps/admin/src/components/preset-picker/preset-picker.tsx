@@ -11,7 +11,7 @@ export type TPresetPickerProps = {
  * Choosing a preset re-applies every one of its `PRESET_REGISTRY` defaults —
  * the caller owns that reset, this component only reports the selection.
  */
-export function PresetPicker({ value, onChange }: TPresetPickerProps) {
+export const PresetPicker = ({ value, onChange }: TPresetPickerProps) => {
   const t = useTranslations('presetPicker');
 
   const presetOptions = [
@@ -27,4 +27,4 @@ export function PresetPicker({ value, onChange }: TPresetPickerProps) {
       onChange={onChange}
     />
   );
-}
+};

@@ -10,7 +10,7 @@ import { toThemeTokens } from '@web/utils/to-theme-tokens';
  * flipping the Look tab's preset) is visible everywhere the same way. Falls
  * back to the Console preset's own tokens on a fetch failure.
  */
-export async function getThemeTokens(): Promise<TThemeTokens> {
+export const getThemeTokens = async (): Promise<TThemeTokens> => {
   const result = await getSiteConfig();
 
   if (!result.ok) {
@@ -21,4 +21,4 @@ export async function getThemeTokens(): Promise<TThemeTokens> {
   }
 
   return toThemeTokens(result.data);
-}
+};

@@ -7,11 +7,11 @@ import { Resend } from 'resend';
 let resendClient: Resend | undefined;
 
 /** Lazy singleton — mirrors `@blog/db`'s `getDb()`, avoids constructing a client until the first send. */
-function getResendClient(): Resend {
+const getResendClient = (): Resend => {
   resendClient ??= new Resend(env.RESEND_API_KEY);
 
   return resendClient;
-}
+};
 
 /**
  * The magic-link email sender `buildAuthConfig` requires

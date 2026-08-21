@@ -12,6 +12,6 @@ const EMAIL_FORMAT_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * isValidEmail('reader@example.com') // true
  * isValidEmail('not-an-email') // false
  */
-export function isValidEmail(email: string): boolean {
+export const isValidEmail = (email: string): boolean => {
   return EMAIL_FORMAT_PATTERN.test(email.trim());
-}
+};

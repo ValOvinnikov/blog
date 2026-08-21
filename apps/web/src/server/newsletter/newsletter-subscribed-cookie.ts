@@ -19,7 +19,7 @@ const NEWSLETTER_SUBSCRIBED_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
  * no cross-site form posts to protect against), `secure` only in production
  * (so it still round-trips over plain HTTP in local dev).
  */
-export async function markNewsletterSubscribed(): Promise<void> {
+export const markNewsletterSubscribed = async (): Promise<void> => {
   const cookieStore = await cookies();
 
   cookieStore.set(NEWSLETTER_SUBSCRIBED_COOKIE_NAME, '1', {
@@ -28,15 +28,15 @@ export async function markNewsletterSubscribed(): Promise<void> {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: false,
   });
-}
+};
 
 /**
  * Counterpart to `markNewsletterSubscribed`. No options are passed to
  * `delete` — the setter above sets no explicit `path`/`domain` either, so
  * both default alike and this targets the exact cookie the setter created.
  */
-export async function clearNewsletterSubscribedCookie(): Promise<void> {
+export const clearNewsletterSubscribedCookie = async (): Promise<void> => {
   const cookieStore = await cookies();
 
   cookieStore.delete(NEWSLETTER_SUBSCRIBED_COOKIE_NAME);
-}
+};

@@ -21,6 +21,20 @@ export const postListSchema = defineType({
       description: 'Maximum number of posts to show.',
       validation: (rule) => rule.required().integer().min(1).max(24),
     }),
+    defineField({
+      name: 'pageSize',
+      title: 'Page Size',
+      type: 'number',
+      description: 'Posts shown per page of the archive.',
+      validation: (rule) => rule.required().integer().min(1).max(24),
+    }),
+    defineField({
+      name: 'emptyMessage',
+      title: 'Empty State Message',
+      type: 'text',
+      description:
+        'Optional message shown when the archive has no posts — overrides the page-derived default.',
+    }),
     layoutField,
   ],
   preview: {

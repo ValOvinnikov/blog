@@ -27,10 +27,10 @@ export type TDeprovisionTenantResult =
  * re-validates the same check independently before doing anything
  * destructive.
  */
-export async function deprovisionTenantAction(
+export const deprovisionTenantAction = async (
   tenantId: string,
   input: TDeprovisionTenantInput,
-): Promise<TDeprovisionTenantResult> {
+): Promise<TDeprovisionTenantResult> => {
   await requireSuperAdmin();
 
   const parsed = deprovisionTenantInputSchema.safeParse(input);
@@ -78,4 +78,4 @@ export async function deprovisionTenantAction(
   }
 
   return { ok: true };
-}
+};

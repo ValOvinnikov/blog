@@ -20,7 +20,7 @@ const s = errorPageLayoutVariants();
  * can't assume `NextIntlClientProvider`, staying hardcoded English with a
  * plain anchor for "Go home" instead of `SmartLink`.
  */
-export function GlobalErrorPage({ error, reset }: TGlobalErrorPageProps) {
+export const GlobalErrorPage = ({ error, reset }: TGlobalErrorPageProps) => {
   const announcementRef = useRef<HTMLSpanElement>(null);
   const mainRef = useRef<HTMLElement>(null);
 
@@ -59,4 +59,4 @@ export function GlobalErrorPage({ error, reset }: TGlobalErrorPageProps) {
       </div>
     </main>
   );
-}
+};

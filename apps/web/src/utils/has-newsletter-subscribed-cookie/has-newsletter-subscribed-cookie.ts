@@ -10,8 +10,10 @@ import { NEWSLETTER_SUBSCRIBED_COOKIE_NAME } from '@web/utils/newsletter-subscri
  * hasNewsletterSubscribedCookie('newsletter_subscribed=1; theme=dark') // true
  * hasNewsletterSubscribedCookie('theme=dark') // false
  */
-export function hasNewsletterSubscribedCookie(cookieString: string): boolean {
+export const hasNewsletterSubscribedCookie = (
+  cookieString: string,
+): boolean => {
   return cookieString
     .split('; ')
     .some((entry) => entry.startsWith(`${NEWSLETTER_SUBSCRIBED_COOKIE_NAME}=`));
-}
+};

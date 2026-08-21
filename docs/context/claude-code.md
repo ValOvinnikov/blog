@@ -321,6 +321,22 @@ contracts:
   matches `T*Props`/`I*Props`, so file path is irrelevant to it. Where it
   applies is decided purely by which presets register it.
 
+  That glob caveat is exactly what the third convention rule has to live with.
+  `func-style` is a **built-in** rule, not one of the hand-written pair, but it
+  reaches agents the same way — `web.js` registers
+  `['error', 'expression', { allowArrowFunctions: true }]`, so `post-edit-lint.sh`
+  flags a `function` declaration in `apps/web` in the same turn it is written.
+  It has one wrinkle the custom rules don't: it cannot exempt by export **name**,
+  and Next.js reserved exports (`generateMetadata`, `generateStaticParams`, the
+  route verbs) must stay declarations. So the carve-out is a glob-scoped
+  `func-style: 'off'` over `**/page.tsx`, `**/layout.tsx`, `**/route.ts`, and
+  `**/not-found.tsx` — which silences those files wholesale, including any
+  non-reserved local helper in them. The convention (`.claude/agents/web.md`
+  § "Function style") still requires those helpers to be arrows; the linter
+  simply cannot see them. `export default function` needs no carve-out at all:
+  `expression` mode does not flag default exports, which is why every `Page`
+  and `Layout` passes untouched.
+
 - **Shared `node_modules` in agent worktrees** — a full `pnpm install` per
   isolated worktree duplicated ~1.1 GB and minutes of setup each time, so
   `.husky/post-checkout` seeds every new linked worktree instead (issue #410):

@@ -10,14 +10,14 @@ type TProps = {
   params: Promise<{ slug: string }>;
 };
 
-function toRssItem(post: TArchivePostCard, siteUrl: string): TRssItem {
+const toRssItem = (post: TArchivePostCard, siteUrl: string): TRssItem => {
   return {
     title: post.title,
     link: `${siteUrl}${routes.post(post.slug)}`,
     description: post.excerpt,
     publishedAt: post.publishedAt,
   };
-}
+};
 
 /**
  * Fetches every published post tagged with `slug`, newest first —
@@ -27,7 +27,7 @@ function toRssItem(post: TArchivePostCard, siteUrl: string): TRssItem {
  * `getAllPublishedPosts` in `app/rss.xml/route.ts`. Returns `null` when the
  * tag itself doesn't exist or the fetch fails.
  */
-async function getAllTagPosts(slug: string): Promise<TTagPage | null> {
+const getAllTagPosts = async (slug: string): Promise<TTagPage | null> => {
   const firstPage = await service.pages.tag.v1.getTagPage(slug, {
     page: 1,
     itemsPerPage: TAG_ITEMS_PER_PAGE,
@@ -66,7 +66,7 @@ async function getAllTagPosts(slug: string): Promise<TTagPage | null> {
   });
 
   return { ...firstPage.data, posts: [...firstPage.data.posts, ...restPosts] };
-}
+};
 
 /**
  * RSS 2.0 feed of every published post tagged with the `[slug]` tag, newest

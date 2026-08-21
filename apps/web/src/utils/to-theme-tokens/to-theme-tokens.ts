@@ -26,7 +26,7 @@ const TEXT_DARK = { l: 0.95, c: 0.004, h: 250 };
 const BRAND_PRIMARY_MUTED_LIGHT_LC = { l: 0.95, c: 0.03 };
 const BRAND_PRIMARY_MUTED_DARK_LC = { l: 0.3, c: 0.06 };
 
-function isAccentHueAccessible(hue: number): boolean {
+const isAccentHueAccessible = (hue: number): boolean => {
   const light = wcagContrastRatio(TEXT_LIGHT, {
     ...BRAND_PRIMARY_MUTED_LIGHT_LC,
     h: hue,
@@ -36,7 +36,7 @@ function isAccentHueAccessible(hue: number): boolean {
     h: hue,
   });
   return light >= WCAG_AA_CONTRAST_MIN && dark >= WCAG_AA_CONTRAST_MIN;
-}
+};
 
 /**
  * Builds full theme tokens from a `site_config` row (or `undefined`, when no
@@ -44,7 +44,9 @@ function isAccentHueAccessible(hue: number): boolean {
  * `@blog/service`'s Sanity theme transformer, same fallback and WCAG-AA
  * accent-hue guard.
  */
-export function toThemeTokens(row: TThemeTokensRow | undefined): TThemeTokens {
+export const toThemeTokens = (
+  row: TThemeTokensRow | undefined,
+): TThemeTokens => {
   const preset = row?.preset ?? PRESET_ID.CONSOLE;
   const base = PRESET_REGISTRY[preset].themeTokens;
 
@@ -62,4 +64,4 @@ export function toThemeTokens(row: TThemeTokensRow | undefined): TThemeTokens {
     density: row?.density ?? base.density,
     chromeOn: base.chromeOn,
   };
-}
+};

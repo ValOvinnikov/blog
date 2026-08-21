@@ -9,9 +9,9 @@ import type { TTenantProvisioningStatusResult } from '@blog/db/queries/tenants/g
  * in progress — a lean re-query (status + step map only, not the full
  * tenant row) so a tight interval stays cheap.
  */
-export async function getTenantProvisioningStatusAction(
+export const getTenantProvisioningStatusAction = async (
   tenantId: string,
-): Promise<TTenantProvisioningStatusResult | undefined> {
+): Promise<TTenantProvisioningStatusResult | undefined> => {
   await requireAdmin();
   return queries.tenants.getTenantProvisioningStatus(tenantId);
-}
+};

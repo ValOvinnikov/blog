@@ -7,9 +7,9 @@ const fixtureFaker = new Faker({ locale: [en] });
 fixtureFaker.seed(123);
 export const AUTHOR_IMAGE_URL = fixtureFaker.image.avatarGitHub();
 
-export function makeAuthor(
+export const makeAuthor = (
   overrides: Partial<TAuthorDetail> = {},
-): TAuthorDetail {
+): TAuthorDetail => {
   return {
     id: 'author-1',
     name: 'Jane Doe',
@@ -26,11 +26,11 @@ export function makeAuthor(
     socialLinks: [],
     ...overrides,
   };
-}
+};
 
-export function makePostCardAuthor(
+export const makePostCardAuthor = (
   overrides: Partial<TPostCardAuthor> = {},
-): TPostCardAuthor {
+): TPostCardAuthor => {
   return {
     id: 'author-1',
     name: 'Jane Doe',
@@ -38,4 +38,4 @@ export function makePostCardAuthor(
     imageUrl: undefined,
     ...overrides,
   };
-}
+};

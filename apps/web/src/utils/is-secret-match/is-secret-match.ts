@@ -1,10 +1,10 @@
 import { timingSafeEqual } from 'node:crypto';
 
 /** Constant-time secret comparison — a plain `===` leaks timing information proportional to how many leading characters match. */
-export function isSecretMatch(
+export const isSecretMatch = (
   provided: string | null,
   expected: string,
-): boolean {
+): boolean => {
   if (!provided) return false;
 
   const providedBuffer = Buffer.from(provided);
@@ -12,4 +12,4 @@ export function isSecretMatch(
   if (providedBuffer.length !== expectedBuffer.length) return false;
 
   return timingSafeEqual(providedBuffer, expectedBuffer);
-}
+};

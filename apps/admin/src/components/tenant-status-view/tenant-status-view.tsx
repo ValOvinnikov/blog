@@ -16,10 +16,10 @@ export type TTenantStatusViewProps = {
  * `ProvisioningStatusView` itself since the two are independently testable
  * and the latter predates deprovisioning entirely.
  */
-export function TenantStatusView({
+export const TenantStatusView = ({
   tenant,
   domainVerificationStatus,
-}: TTenantStatusViewProps) {
+}: TTenantStatusViewProps) => {
   const { root } = tenantStatusViewVariants();
 
   return (
@@ -31,4 +31,4 @@ export function TenantStatusView({
       <DeprovisionTenantControl tenant={tenant} />
     </div>
   );
-}
+};

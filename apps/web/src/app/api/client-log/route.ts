@@ -11,7 +11,7 @@ import { NextResponse } from 'next/server';
 // report can carry a meaningfully large payload.
 const MAX_PAYLOAD_BYTES = 8 * 1024;
 
-function resolveClientKey(request: Request): string {
+const resolveClientKey = (request: Request): string => {
   // Vercel overwrites `x-forwarded-for` on every request it proxies and
   // does not forward an external caller's own value through, so this isn't
   // spoofable from the browser on this platform (outside an Enterprise
@@ -22,7 +22,7 @@ function resolveClientKey(request: Request): string {
   if (first) return first;
 
   return request.headers.get('x-real-ip') ?? 'unknown';
-}
+};
 
 /**
  * Reads the request body incrementally, aborting as soon as more than
@@ -33,10 +33,10 @@ function resolveClientKey(request: Request): string {
  * `request.text()` first would already have done the expensive read this
  * function exists to avoid.
  */
-async function readBodyWithinByteCap(
+const readBodyWithinByteCap = async (
   body: ReadableStream<Uint8Array> | null,
   maxBytes: number,
-): Promise<string | null> {
+): Promise<string | null> => {
   if (!body) return '';
 
   const reader = body.getReader();
@@ -60,7 +60,7 @@ async function readBodyWithinByteCap(
   }
 
   return Buffer.concat(chunks).toString('utf8');
-}
+};
 
 /**
  * `POST /api/client-log` — the browser-side error reporter's

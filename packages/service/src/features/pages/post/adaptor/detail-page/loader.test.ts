@@ -83,6 +83,35 @@ describe('getPost', () => {
     });
   });
 
+  it('requests a right-sized author avatar instead of the full-resolution asset', async () => {
+    const { urlForImage } = await import('@blog/service/sanity/image');
+    const authorImage = makeRawImage('Jane avatar');
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostDetail({
+          author: {
+            _id: 'author-9',
+            name: 'Jane Doe',
+            slug: 'jane-doe',
+            image: authorImage,
+            role: 'Editor',
+            bio: null,
+            socialLinks: null,
+          },
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    await getPost('hello-world');
+
+    expect(urlForImage).toHaveBeenCalledWith(authorImage, {
+      width: 64,
+      height: 64,
+      fit: 'crop',
+      quality: 75,
+    });
+  });
+
   it('maps a post with no heroImage to undefined image fields', async () => {
     mockRun
       .mockResolvedValueOnce(

@@ -12,6 +12,7 @@ import { createContentModuleService } from './features/modules/content';
 import { createCtaModuleService } from './features/modules/cta';
 import { createHeroModuleService } from './features/modules/hero';
 import { createNewsletterModuleService } from './features/modules/newsletter';
+import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
 import { createAuthorService } from './features/pages/author';
 import { createBlogService } from './features/pages/blog';
@@ -37,6 +38,7 @@ export const service = {
   modules: {
     hero: createHeroModuleService(),
     postList: createPostListModuleService(),
+    postLatest: createPostLatestModuleService(),
     content: createContentModuleService(),
     cta: createCtaModuleService(),
     newsletter: createNewsletterModuleService(),
@@ -68,6 +70,7 @@ export type { TContentModule } from './features/modules/content';
 export type { TCtaModule } from './features/modules/cta';
 export type { THeroModule } from './features/modules/hero';
 export type { TNewsletterModule } from './features/modules/newsletter';
+export type { TPostLatestModule } from './features/modules/post-latest';
 export type { TPostListModule } from './features/modules/post-list';
 export type { TAuthorDetail, TAuthorPage } from './features/pages/author';
 export type { TBlogIndexPage, TGetIndexPageArgs } from './features/pages/blog';

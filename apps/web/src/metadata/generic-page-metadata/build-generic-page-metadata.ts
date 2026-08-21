@@ -13,9 +13,9 @@ import type { Metadata } from 'next';
  * Reuses `getPage` (also called by `GenericPage`) — Next dedupes the fetch
  * per request, so this adds no extra round-trip.
  */
-export async function buildGenericPageMetadata(
+export const buildGenericPageMetadata = async (
   slug: string,
-): Promise<Metadata> {
+): Promise<Metadata> => {
   const result = await service.pages.generic.v1.getPage(slug);
 
   if (!result.ok) {
@@ -30,4 +30,4 @@ export async function buildGenericPageMetadata(
     canonical: routes.genericPage(slug),
     ogType: 'website',
   });
-}
+};

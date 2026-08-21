@@ -27,9 +27,9 @@ export type TNewsletterSubscriptionControlProps = {
  * `NewsletterSection`'s server-side `getSubscriptionStatus` call and the UI
  * reflects the new state.
  */
-export function NewsletterSubscriptionControl({
+export const NewsletterSubscriptionControl = ({
   action,
-}: TNewsletterSubscriptionControlProps) {
+}: TNewsletterSubscriptionControlProps) => {
   const t = useTranslations('accountPage.newsletter');
   const toast = useToast();
   const router = useRouter();
@@ -103,4 +103,4 @@ export function NewsletterSubscriptionControl({
       {isUnsubscribe ? t('unsubscribeButton') : t('resendButton')}
     </Button>
   );
-}
+};

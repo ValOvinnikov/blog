@@ -22,7 +22,7 @@ import { getTranslations } from 'next-intl/server';
  * `tone="danger"` "Delete account" row, whose typed-confirm interaction is
  * `DeleteAccountControl`.
  */
-export async function PrivacySection() {
+export const PrivacySection = async () => {
   const session = await auth();
   if (!session?.user?.id) return null;
 
@@ -75,4 +75,4 @@ export async function PrivacySection() {
       <WindowChrome.Body>{bodyContent}</WindowChrome.Body>
     </WindowChrome>
   );
-}
+};

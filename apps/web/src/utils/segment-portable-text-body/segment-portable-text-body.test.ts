@@ -6,7 +6,7 @@ import {
 
 import { segmentPortableTextBody } from './segment-portable-text-body';
 
-function fullBleedImage(key: string): RichText[number] {
+const fullBleedImage = (key: string): RichText[number] => {
   return {
     _type: 'bodyImage',
     _key: key,
@@ -14,7 +14,7 @@ function fullBleedImage(key: string): RichText[number] {
     alt: 'A scenic mountain range',
     layout: IMAGE_LAYOUT.FULL_BLEED,
   };
-}
+};
 
 describe('segmentPortableTextBody', () => {
   it('collapses a body with no FULL_BLEED image into a single PROSE segment holding every block, in order', () => {

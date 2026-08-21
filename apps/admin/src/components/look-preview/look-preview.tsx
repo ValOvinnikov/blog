@@ -35,14 +35,14 @@ export type TLookPreviewProps = {
  * independent of whichever preset is selected, so both ramps must be
  * previewable regardless of preset.
  */
-export function LookPreview({
+export const LookPreview = ({
   tenantSlug,
   accentHue,
   logoHue,
   headingFont,
   bodyFont,
   isChromeOn,
-}: TLookPreviewProps) {
+}: TLookPreviewProps) => {
   const t = useTranslations('lookPreview');
   const [mode, setMode] = useState<TPreviewMode>('light');
   const isDark = mode === 'dark';
@@ -174,4 +174,4 @@ export function LookPreview({
       </section>
     </div>
   );
-}
+};

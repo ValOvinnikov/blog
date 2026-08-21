@@ -21,7 +21,7 @@ export type TVoiceFieldProps = {
  * just means `value` becomes `''`) — the save path is what turns an empty
  * string into "no override stored," not this component.
  */
-export function VoiceField({
+export const VoiceField = ({
   fieldKey,
   label,
   value,
@@ -29,7 +29,7 @@ export function VoiceField({
   placeholder,
   isMultiline = false,
   isDisabled = false,
-}: TVoiceFieldProps) {
+}: TVoiceFieldProps) => {
   const {
     root,
     labelRow,
@@ -71,4 +71,4 @@ export function VoiceField({
       )}
     </div>
   );
-}
+};

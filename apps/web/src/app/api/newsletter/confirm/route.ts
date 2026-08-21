@@ -20,11 +20,11 @@ type TConfirmationPageCopy = {
  * `escapeXml` (already shared with `build-rss-feed.ts`) escapes the
  * translated copy before it's interpolated into markup.
  */
-function renderConfirmationPage({
+const renderConfirmationPage = ({
   title,
   message,
   returnHomeLabel,
-}: TConfirmationPageCopy): string {
+}: TConfirmationPageCopy): string => {
   const safeTitle = escapeXml(title);
   const safeMessage = escapeXml(message);
   const safeReturnHomeLabel = escapeXml(returnHomeLabel);
@@ -43,7 +43,7 @@ function renderConfirmationPage({
     <p><a href="${homeHref}">${safeReturnHomeLabel}</a></p>
   </body>
 </html>`;
-}
+};
 
 /**
  * `GET /api/newsletter/confirm?token=…` — the double opt-in confirmation link

@@ -25,7 +25,7 @@ type TTagPageProps = { slug: string; page?: number };
  * `TopicPage`. `getTagPage` always windows — page 1 gets the same
  * pagination metadata as any other page.
  */
-export async function TagPage({ slug, page }: TTagPageProps) {
+export const TagPage = async ({ slug, page }: TTagPageProps) => {
   const [result, t, breadcrumbsT, tagPageT] = await Promise.all([
     service.pages.tag.v1.getTagPage(slug, {
       page,
@@ -99,4 +99,4 @@ export async function TagPage({ slug, page }: TTagPageProps) {
       />
     </>
   );
-}
+};

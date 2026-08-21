@@ -22,10 +22,10 @@ import { getTranslations } from 'next-intl/server';
  * (`/tag/[slug]/rss.xml`) via `alternates.types['application/rss+xml']` —
  * the same feed regardless of which page of the tag's post list is showing.
  */
-export async function buildTagMetadata(
+export const buildTagMetadata = async (
   slug: string,
   pageNumber?: number,
-): Promise<Metadata> {
+): Promise<Metadata> => {
   const [result, t] = await Promise.all([
     service.pages.tag.v1.getTagPage(slug, {
       page: pageNumber,
@@ -60,4 +60,4 @@ export async function buildTagMetadata(
       feedUrl: routes.tagRssFeed(slug),
     },
   );
-}
+};

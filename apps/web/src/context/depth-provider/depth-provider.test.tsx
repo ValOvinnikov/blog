@@ -17,7 +17,7 @@ import { DepthProvider, useDepth } from './depth-provider';
  * Router client-side navigation into this route segment) rather than a
  * genuine hydration pass.
  */
-function renderHydrated(ui: ReactElement) {
+const renderHydrated = (ui: ReactElement) => {
   const wrapped = (
     <NextIntlClientProvider locale="en" messages={messages}>
       {ui}
@@ -28,7 +28,7 @@ function renderHydrated(ui: ReactElement) {
   document.body.appendChild(container);
 
   return renderElement(ui, { hydrate: true, container });
-}
+};
 
 const ReadDepth = () => {
   const { depth, setDepth } = useDepth();

@@ -28,7 +28,7 @@ export type TLookFormValues = {
  * Console defaults `build-theme-style-block.ts` falls back to when no theme
  * has been saved.
  */
-export function defaultLookFormValues(): TLookFormValues {
+export const defaultLookFormValues = (): TLookFormValues => {
   const consoleTokens = PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
 
   return {
@@ -43,16 +43,16 @@ export function defaultLookFormValues(): TLookFormValues {
     logoAssetUrl: undefined,
     faviconAssetUrl: undefined,
   };
-}
+};
 
 /**
  * `chromeOn` has no column on `site_config` — every load derives it fresh
  * from the saved preset's registry default rather than reading a stored
  * value, since none exists.
  */
-export function toLookFormValues(
+export const toLookFormValues = (
   siteConfig: TSiteConfigResult,
-): TLookFormValues {
+): TLookFormValues => {
   return {
     preset: siteConfig.preset,
     accentHue: siteConfig.accentHue,
@@ -65,4 +65,4 @@ export function toLookFormValues(
     logoAssetUrl: siteConfig.logoAssetUrl,
     faviconAssetUrl: siteConfig.faviconAssetUrl,
   };
-}
+};

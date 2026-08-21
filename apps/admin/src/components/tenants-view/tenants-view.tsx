@@ -20,10 +20,10 @@ export type TTenantsViewProps = {
  * tenant list. Ships from day one — with one tenant it's still a finished
  * page, not a placeholder.
  */
-export function TenantsView({
+export const TenantsView = ({
   tenants,
   shouldShowArchived,
-}: TTenantsViewProps) {
+}: TTenantsViewProps) => {
   const t = useTranslations('tenantsView');
   const { root, header, description, toolbar } = tenantsViewVariants();
 
@@ -48,4 +48,4 @@ export function TenantsView({
       <TenantsTable tenants={tenants} />
     </div>
   );
-}
+};
