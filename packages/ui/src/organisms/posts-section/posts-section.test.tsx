@@ -164,13 +164,13 @@ describe(`<${PostsSection.name}/>`, () => {
     }
   });
 
-  it('renders no heading when title and titleFallback are both omitted', () => {
+  it('renders no heading when title and accessibleTitle are both omitted', () => {
     setup({ title: undefined, titleId: undefined });
 
     expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
   });
 
-  it('still renders supportingText, the grid, and each post when title and titleFallback are both omitted', () => {
+  it('still renders supportingText, the grid, and each post when title and accessibleTitle are both omitted', () => {
     const supportingText = faker.lorem.sentence();
 
     setup({ title: undefined, titleId: undefined, supportingText });
@@ -187,7 +187,7 @@ describe(`<${PostsSection.name}/>`, () => {
     }
   });
 
-  it('renders the empty message without a heading when title and titleFallback are both omitted and posts is empty', () => {
+  it('renders the empty message without a heading when title and accessibleTitle are both omitted and posts is empty', () => {
     const emptyMessage = faker.lorem.sentence();
 
     setup({ title: undefined, titleId: undefined, posts: [], emptyMessage });
@@ -196,7 +196,7 @@ describe(`<${PostsSection.name}/>`, () => {
     expect(screen.getByText(emptyMessage)).toBeVisible();
   });
 
-  it('renders the grid without a heading when title and titleFallback are both omitted and isTinted', () => {
+  it('renders the grid without a heading when title and accessibleTitle are both omitted and isTinted', () => {
     setup({ title: undefined, titleId: undefined, isTinted: true });
 
     expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
@@ -207,14 +207,14 @@ describe(`<${PostsSection.name}/>`, () => {
     }
   });
 
-  it('renders a visually-hidden heading from titleFallback when title is omitted', () => {
-    const titleFallback = faker.lorem.sentence();
+  it('renders a visually-hidden heading from accessibleTitle when title is omitted', () => {
+    const accessibleTitle = faker.lorem.sentence();
 
-    setup({ title: undefined, titleId: 'fallback-heading', titleFallback });
+    setup({ title: undefined, titleId: 'fallback-heading', accessibleTitle });
 
     const heading = screen.getByRole('heading', {
       level: 2,
-      name: titleFallback,
+      name: accessibleTitle,
     });
     // `sr-only` is the sole observable that distinguishes the visually-hidden
     // fallback heading from a normally rendered title.
@@ -222,14 +222,14 @@ describe(`<${PostsSection.name}/>`, () => {
     expect(heading).toHaveAttribute('id', 'fallback-heading');
   });
 
-  it('falls back to titleFallback when title is an empty string', () => {
-    const titleFallback = faker.lorem.sentence();
+  it('falls back to accessibleTitle when title is an empty string', () => {
+    const accessibleTitle = faker.lorem.sentence();
 
-    setup({ title: '', titleId: 'fallback-heading', titleFallback });
+    setup({ title: '', titleId: 'fallback-heading', accessibleTitle });
 
     const heading = screen.getByRole('heading', {
       level: 2,
-      name: titleFallback,
+      name: accessibleTitle,
     });
     // `sr-only` is the sole observable that distinguishes the visually-hidden
     // fallback heading from a normally rendered title.
@@ -237,25 +237,25 @@ describe(`<${PostsSection.name}/>`, () => {
     expect(heading).toHaveAttribute('id', 'fallback-heading');
   });
 
-  it('falls back to titleFallback when title is whitespace-only', () => {
-    const titleFallback = faker.lorem.sentence();
+  it('falls back to accessibleTitle when title is whitespace-only', () => {
+    const accessibleTitle = faker.lorem.sentence();
 
-    setup({ title: '   ', titleId: 'fallback-heading', titleFallback });
+    setup({ title: '   ', titleId: 'fallback-heading', accessibleTitle });
 
     const heading = screen.getByRole('heading', {
       level: 2,
-      name: titleFallback,
+      name: accessibleTitle,
     });
     expect(heading).toHaveClass('sr-only');
   });
 
-  it('prefers title over titleFallback when both are provided', () => {
-    const titleFallback = faker.lorem.sentence();
+  it('prefers title over accessibleTitle when both are provided', () => {
+    const accessibleTitle = faker.lorem.sentence();
 
-    setup({ titleFallback });
+    setup({ accessibleTitle });
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Latest' });
     expect(heading).not.toHaveClass('sr-only');
-    expect(screen.queryByText(titleFallback)).not.toBeInTheDocument();
+    expect(screen.queryByText(accessibleTitle)).not.toBeInTheDocument();
   });
 });
