@@ -194,4 +194,35 @@ describe(`<${RootLayout.name}/>`, () => {
       ),
     ).toBe(false);
   });
+
+  it('omits Analytics and SpeedInsights when the plan entitles ANALYTICS but the tenant has toggled it off', async () => {
+    envMock.WEB_ANALYTICS_ENABLED = 'true';
+    // beforeEach already sets plan: 'GROWTH' (entitled) — only the toggle
+    // changes here, proving the tenant's own choice can block a
+    // plan-entitled capability (the mirror of the FREE-plan case above,
+    // where the plan ceiling blocks a tenant-enabled toggle).
+    getSettingsFeaturesMock.mockResolvedValue({
+      commentsEnabled: true,
+      ratingsEnabled: true,
+      bookmarksEnabled: true,
+      newsletterEnabled: true,
+      analyticsEnabled: false,
+    });
+
+    const html = await RootLayout({ children: <div>content</div> });
+
+    const [, body] = html.props.children;
+    const bodyChildren = [body.props.children].flat();
+
+    expect(
+      bodyChildren.some(
+        (child: React.ReactElement) => child?.type === Analytics,
+      ),
+    ).toBe(false);
+    expect(
+      bodyChildren.some(
+        (child: React.ReactElement) => child?.type === SpeedInsights,
+      ),
+    ).toBe(false);
+  });
 });
