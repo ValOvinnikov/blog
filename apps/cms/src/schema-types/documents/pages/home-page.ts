@@ -19,10 +19,10 @@ type TModuleReference = { _type?: string; _ref?: string };
  * `perspective: 'drafts'` because a module can still be an unpublished draft
  * while the page is being edited.
  */
-async function validateSinglePostLatestWithoutHeading(
+const validateSinglePostLatestWithoutHeading = async (
   modules: TModuleReference[] | undefined,
   context: ValidationContext,
-): Promise<string | true> {
+): Promise<string | true> => {
   const postLatestIds = (modules ?? [])
     .filter(
       (module): module is TModuleReference & { _ref: string } =>
@@ -48,7 +48,7 @@ async function validateSinglePostLatestWithoutHeading(
   return blankCount > 1
     ? 'Only one Post Latest module without its own heading is allowed per page — give this one a heading or remove the duplicate.'
     : true;
-}
+};
 
 export const homePageSchema = defineType({
   name: 'page_home',

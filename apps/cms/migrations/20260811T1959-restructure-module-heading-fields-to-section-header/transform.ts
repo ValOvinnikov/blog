@@ -19,9 +19,9 @@ export type TSectionHeaderValue = {
  * whichever is present. Exported so it's unit-testable without a live
  * dataset connection — see `./transform.test.ts`.
  */
-export function headingFieldsToSectionHeader(
+export const headingFieldsToSectionHeader = (
   doc: TLegacyHeadingSourceDoc,
-): TSectionHeaderValue | undefined {
+): TSectionHeaderValue | undefined => {
   if (doc.sectionHeader !== undefined) return undefined;
 
   const { heading, text, description } = doc;
@@ -32,7 +32,7 @@ export function headingFieldsToSectionHeader(
     ...(heading ? { heading } : {}),
     ...(supportingText ? { supportingText } : {}),
   };
-}
+};
 
 /** A `module_postList` document as it existed before this migration. */
 export type TLegacyPostListDoc = {
@@ -47,11 +47,11 @@ export type TLegacyPostListDoc = {
  * keeps `title` as a purely internal Studio label going forward, so the
  * value lives in both places after migration.
  */
-export function postListTitleToSectionHeader(
+export const postListTitleToSectionHeader = (
   doc: TLegacyPostListDoc,
-): TSectionHeaderValue | undefined {
+): TSectionHeaderValue | undefined => {
   if (doc.sectionHeader !== undefined) return undefined;
   if (!doc.title) return undefined;
 
   return { heading: doc.title };
-}
+};

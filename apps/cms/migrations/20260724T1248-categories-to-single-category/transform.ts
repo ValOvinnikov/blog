@@ -13,9 +13,9 @@ export type TLegacyPostDoc = { categories?: TLegacyCategoryRef[] };
  * the new single `category` reference value. Exported so it's unit-testable
  * without a live dataset connection — see `./transform.test.ts`.
  */
-export function categoriesToSingleCategory(
+export const categoriesToSingleCategory = (
   doc: TLegacyPostDoc,
-): { _type: 'reference'; _ref: string } | undefined {
+): { _type: 'reference'; _ref: string } | undefined => {
   const [first] = doc.categories ?? [];
   return first ? { _type: 'reference', _ref: first._ref } : undefined;
-}
+};
