@@ -9,7 +9,7 @@ import { defineField, defineType } from 'sanity';
 
 export const blogPageSchema = defineType({
   name: 'page_blog',
-  title: 'Blog Page',
+  title: 'Post Index Page',
   type: 'document',
   icon: Newspaper,
   preview: {
