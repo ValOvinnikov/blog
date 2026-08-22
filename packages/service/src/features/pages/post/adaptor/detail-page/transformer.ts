@@ -9,12 +9,11 @@ import { toTopic } from '@blog/service/shared/transformers/to-topic';
 import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferResultType } from 'groqd';
 
-import type { postDetailQuery } from './query';
+import type { postPageQuery } from './query';
 import type { TPostDetail, TPostDetailAuthor, TPostSkim } from './types';
 
-export type TRawPostDetail = NonNullable<
-  InferResultType<typeof postDetailQuery>
->;
+export type TRawPostPage = NonNullable<InferResultType<typeof postPageQuery>>;
+export type TRawPostDetail = TRawPostPage['post'];
 
 // PostMeta renders the author avatar at Size.SM (32px, `avatar-variants.ts`)
 // — 64px covers a 2x DPR display without serving the source asset's full
@@ -51,18 +50,21 @@ function toPostSkim(raw: TRawPostDetail['skim']): TPostSkim | undefined {
 }
 
 export function toPostDetail(
-  raw: TRawPostDetail,
+  rawPage: TRawPostPage,
   settings: TSiteSettings,
   relatedPosts: TPostCard[],
 ): TPostDetail {
+  const raw = rawPage.post;
   const heroImageUrl = buildImageUrl(raw.heroImage);
 
   return {
     id: raw._id,
     title: raw.title,
-    slug: raw.slug,
+    // `page_post`'s own slug/publishedAt, not `post`'s — that's the field
+    // this migration moves reads off of.
+    slug: rawPage.slug,
     excerpt: raw.excerpt,
-    publishedAt: raw.publishedAt,
+    publishedAt: rawPage.publishedAt,
     heroImageUrl,
     heroImageAlt: raw.heroImage?.alt,
     heroImageSanity: toSanityImage(raw.heroImageAsset),
@@ -78,8 +80,11 @@ export function toPostDetail(
     // matching how `.filterByType('blog_post')`/module queries elsewhere in
     // this package match against a document's own `_type` literal.
     hasAsides: raw.body.some((block) => block._type === 'aside'),
+    // `page_post.seo` is the override — mirrors `page_topic`/`page_blog`,
+    // whose own `.seo` overrides a content-derived fallback, not the wrapped
+    // entity's own `seo` field.
     seo: resolveSeo(
-      raw.seo ?? undefined,
+      rawPage.seo ?? undefined,
       { title: raw.title, description: raw.excerpt, imageUrl: heroImageUrl },
       {
         description: settings.description,

@@ -5,5 +5,5 @@ import { postParamsQuery } from './query';
 export async function getPostParams(): Promise<
   { slug: string; publishedAt: string }[]
 > {
-  return runQuery(postParamsQuery, isr('posts'));
+  return runQuery(postParamsQuery, isr('page_post'));
 }

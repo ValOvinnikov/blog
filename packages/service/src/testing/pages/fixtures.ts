@@ -1,7 +1,10 @@
 import type { TRawBlogPage } from '@blog/service/features/pages/blog/adaptor/index-page/transformer';
 import type { TRawGenericPage } from '@blog/service/features/pages/generic/adaptor/detail-page/transformer';
 import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
-import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
+import type {
+  TRawPostDetail,
+  TRawPostPage,
+} from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
 import type { TRawTagPageTag } from '@blog/service/features/pages/tag/adaptor/detail-page/transformer';
 import type { TRawTopicPage } from '@blog/service/features/pages/topic/adaptor/detail-page/transformer';
 import type { TRawTopicIndexPage } from '@blog/service/features/pages/topic-index/adaptor/transformer';
@@ -97,6 +100,18 @@ export function makeRawPostDetail(
     },
     tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
     wordCount: 400,
+    ...overrides,
+  };
+}
+
+export function makeRawPostPage(
+  overrides: Partial<TRawPostPage> = {},
+): TRawPostPage {
+  return {
+    slug: 'hello-world',
+    publishedAt: '2026-01-15T00:00:00Z',
+    seo: null,
+    post: makeRawPostDetail(),
     ...overrides,
   };
 }

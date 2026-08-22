@@ -1,3 +1,4 @@
+import { MissingPagePostError } from '@blog/service/features/pages/post/adaptor/missing-page-post-error';
 import { getRelatedPosts } from '@blog/service/features/pages/post/adaptor/related/loader';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
@@ -5,6 +6,7 @@ import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
   makeRawPostCard,
   makeRawPostDetail,
+  makeRawPostPage,
 } from '@blog/service/testing/pages/fixtures';
 import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 
@@ -28,51 +30,69 @@ vi.mock('@blog/service/features/pages/post/adaptor/related/loader', () => ({
 const mockGetRelatedPosts = vi.mocked(getRelatedPosts);
 
 describe('getPost', () => {
-  it('returns null when the post is not found', async () => {
-    mockRun
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(makeRawSiteSettings());
+  it('throws MissingPagePostError when no page_post matches the slug', async () => {
+    mockRun.mockResolvedValueOnce(null);
 
-    const result = await getPost('missing-slug');
-
-    expect(result).toBeNull();
+    await expect(getPost('missing-slug')).rejects.toThrow(MissingPagePostError);
   });
 
   it('maps the raw post into a domain detail object', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({ _id: 'post-abc', title: 'Test Post' }),
+        makeRawPostPage({
+          post: makeRawPostDetail({ _id: 'post-abc', title: 'Test Post' }),
+        }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('test-post');
 
-    expect(result).not.toBeNull();
-    expect(result?.id).toBe('post-abc');
-    expect(result?.title).toBe('Test Post');
-    expect(result?.slug).toBe('hello-world');
+    expect(result.id).toBe('post-abc');
+    expect(result.title).toBe('Test Post');
+  });
+
+  it('takes slug and publishedAt from page_post, not the wrapped post', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawPostPage({
+          slug: 'page-post-slug',
+          publishedAt: '2026-02-01T00:00:00Z',
+          post: makeRawPostDetail({
+            slug: 'wrapped-post-slug',
+            publishedAt: '2020-01-01T00:00:00Z',
+          }),
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getPost('page-post-slug');
+
+    expect(result.slug).toBe('page-post-slug');
+    expect(result.publishedAt).toBe('2026-02-01T00:00:00Z');
   });
 
   it('maps the required author onto the post detail', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({
-          author: {
-            _id: 'author-9',
-            name: 'Jane Doe',
-            slug: 'jane-doe',
-            image: makeRawImage('Jane avatar'),
-            role: 'Editor',
-            bio: null,
-            socialLinks: null,
-          },
+        makeRawPostPage({
+          post: makeRawPostDetail({
+            author: {
+              _id: 'author-9',
+              name: 'Jane Doe',
+              slug: 'jane-doe',
+              image: makeRawImage('Jane avatar'),
+              role: 'Editor',
+              bio: null,
+              socialLinks: null,
+            },
+          }),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.author).toEqual({
+    expect(result.author).toEqual({
       id: 'author-9',
       name: 'Jane Doe',
       slug: 'jane-doe',
@@ -88,16 +108,18 @@ describe('getPost', () => {
     const authorImage = makeRawImage('Jane avatar');
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({
-          author: {
-            _id: 'author-9',
-            name: 'Jane Doe',
-            slug: 'jane-doe',
-            image: authorImage,
-            role: 'Editor',
-            bio: null,
-            socialLinks: null,
-          },
+        makeRawPostPage({
+          post: makeRawPostDetail({
+            author: {
+              _id: 'author-9',
+              name: 'Jane Doe',
+              slug: 'jane-doe',
+              image: authorImage,
+              role: 'Editor',
+              bio: null,
+              socialLinks: null,
+            },
+          }),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
@@ -115,20 +137,22 @@ describe('getPost', () => {
   it('maps a post with no heroImage to undefined image fields', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({ heroImage: null, heroImageAsset: null }),
+        makeRawPostPage({
+          post: makeRawPostDetail({ heroImage: null, heroImageAsset: null }),
+        }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.heroImageUrl).toBeUndefined();
-    expect(result?.heroImageAlt).toBeUndefined();
-    expect(result?.heroImageSanity).toBeUndefined();
+    expect(result.heroImageUrl).toBeUndefined();
+    expect(result.heroImageAlt).toBeUndefined();
+    expect(result.heroImageSanity).toBeUndefined();
   });
 
   it('passes the slug as a query parameter', async () => {
     mockRun
-      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(makeRawPostPage())
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     await getPost('my-slug');
@@ -139,9 +163,9 @@ describe('getPost', () => {
     );
   });
 
-  it('tags the query with author/topic alongside post', async () => {
+  it('tags the query with post/author/topic alongside page_post', async () => {
     mockRun
-      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(makeRawPostPage())
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     await getPost('my-slug');
@@ -150,16 +174,16 @@ describe('getPost', () => {
       expect.anything(),
       expect.objectContaining({
         next: expect.objectContaining({
-          tags: ['post', 'author', 'topic'],
+          tags: ['page_post', 'post', 'author', 'topic'],
         }),
       }),
     );
   });
 
-  it('lets authored seo override the resolved defaults', async () => {
+  it('lets page_post.seo override the resolved defaults', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({
+        makeRawPostPage({
           seo: {
             metaTitle: 'Authored Title',
             metaDescription: 'Authored description',
@@ -171,33 +195,38 @@ describe('getPost', () => {
 
     const result = await getPost('hello-world');
 
-    expect(result?.seo.title).toBe('Authored Title');
-    expect(result?.seo.description).toBe('Authored description');
-    expect(result?.seo.ogTitle).toBe('Authored Title');
+    expect(result.seo.title).toBe('Authored Title');
+    expect(result.seo.description).toBe('Authored description');
+    expect(result.seo.ogTitle).toBe('Authored Title');
   });
 
   it('falls back to the post title, excerpt, and hero image when unauthored', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({
-          title: 'Fallback Post',
-          excerpt: 'Fallback excerpt',
+        makeRawPostPage({
           seo: null,
+          post: makeRawPostDetail({
+            title: 'Fallback Post',
+            excerpt: 'Fallback excerpt',
+          }),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.seo.title).toBe('Fallback Post');
-    expect(result?.seo.description).toBe('Fallback excerpt');
-    expect(result?.seo.ogImageUrl).toContain('sanity.io');
+    expect(result.seo.title).toBe('Fallback Post');
+    expect(result.seo.description).toBe('Fallback excerpt');
+    expect(result.seo.ogImageUrl).toContain('sanity.io');
   });
 
   it('falls back to the site settings default OG image when there is no hero image', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({ heroImage: null, heroImageAsset: null, seo: null }),
+        makeRawPostPage({
+          seo: null,
+          post: makeRawPostDetail({ heroImage: null, heroImageAsset: null }),
+        }),
       )
       .mockResolvedValueOnce(
         makeRawSiteSettings({
@@ -207,78 +236,96 @@ describe('getPost', () => {
 
     const result = await getPost('hello-world');
 
-    expect(result?.seo.ogImageUrl).toBeUndefined();
+    expect(result.seo.ogImageUrl).toBeUndefined();
   });
 
   it('maps tags from raw input', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({
-          tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
+        makeRawPostPage({
+          post: makeRawPostDetail({
+            tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
+          }),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.tags).toEqual([
+    expect(result.tags).toEqual([
       { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
     ]);
   });
 
   it('maps newsletterEnabled straight through from the raw post', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawPostDetail({ newsletterEnabled: false }))
+      .mockResolvedValueOnce(
+        makeRawPostPage({
+          post: makeRawPostDetail({ newsletterEnabled: false }),
+        }),
+      )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.newsletterEnabled).toBe(false);
+    expect(result.newsletterEnabled).toBe(false);
   });
 
   it('defaults newsletterEnabled to true when absent', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawPostDetail({ newsletterEnabled: null }))
+      .mockResolvedValueOnce(
+        makeRawPostPage({
+          post: makeRawPostDetail({ newsletterEnabled: null }),
+        }),
+      )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.newsletterEnabled).toBe(true);
+    expect(result.newsletterEnabled).toBe(true);
   });
 
   it('maps an absent tags field to an empty array', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawPostDetail({ tags: null }))
+      .mockResolvedValueOnce(
+        makeRawPostPage({ post: makeRawPostDetail({ tags: null }) }),
+      )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.tags).toEqual([]);
+    expect(result.tags).toEqual([]);
   });
 
   it('computes readingTimeMinutes from the server-computed word count', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawPostDetail({ wordCount: 401 }))
+      .mockResolvedValueOnce(
+        makeRawPostPage({ post: makeRawPostDetail({ wordCount: 401 }) }),
+      )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.readingTimeMinutes).toBe(3);
+    expect(result.readingTimeMinutes).toBe(3);
   });
 
   it('rounds a wordless post up to a 1-minute read', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawPostDetail({ wordCount: 0 }))
+      .mockResolvedValueOnce(
+        makeRawPostPage({ post: makeRawPostDetail({ wordCount: 0 }) }),
+      )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.readingTimeMinutes).toBe(1);
+    expect(result.readingTimeMinutes).toBe(1);
   });
 
   it('exposes relatedPosts from getRelatedPosts', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawPostDetail({ _id: 'post-abc' }))
+      .mockResolvedValueOnce(
+        makeRawPostPage({ post: makeRawPostDetail({ _id: 'post-abc' }) }),
+      )
       .mockResolvedValueOnce(makeRawSiteSettings());
     mockGetRelatedPosts.mockResolvedValueOnce([
       toPostCard(makeRawPostCard({ _id: 'related-1' })),
@@ -286,21 +333,23 @@ describe('getPost', () => {
 
     const result = await getPost('hello-world');
 
-    expect(result?.relatedPosts.map((post) => post.id)).toEqual(['related-1']);
+    expect(result.relatedPosts.map((post) => post.id)).toEqual(['related-1']);
   });
 
   it('calls getRelatedPosts with the post id, tag ids, and topic id', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({
-          _id: 'post-abc',
-          tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
-          topic: {
-            _id: 'topic-1',
-            title: 'Engineering',
-            slug: 'engineering',
-            description: null,
-          },
+        makeRawPostPage({
+          post: makeRawPostDetail({
+            _id: 'post-abc',
+            tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
+            topic: {
+              _id: 'topic-1',
+              title: 'Engineering',
+              slug: 'engineering',
+              description: null,
+            },
+          }),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
@@ -317,19 +366,21 @@ describe('getPost', () => {
   it('maps a skim with 3+ takeaways onto the post detail', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({
-          skim: {
-            takeaways: ['One', 'Two', 'Three'],
-            generatedAt: '2026-07-20T00:00:00Z',
-            model: 'claude-haiku-4-5',
-          },
+        makeRawPostPage({
+          post: makeRawPostDetail({
+            skim: {
+              takeaways: ['One', 'Two', 'Three'],
+              generatedAt: '2026-07-20T00:00:00Z',
+              model: 'claude-haiku-4-5',
+            },
+          }),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.skim).toEqual({
+    expect(result.skim).toEqual({
       takeaways: ['One', 'Two', 'Three'],
       generatedAt: '2026-07-20T00:00:00Z',
       model: 'claude-haiku-4-5',
@@ -338,79 +389,89 @@ describe('getPost', () => {
 
   it('treats an absent skim as undefined', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawPostDetail({ skim: null }))
+      .mockResolvedValueOnce(
+        makeRawPostPage({ post: makeRawPostDetail({ skim: null }) }),
+      )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.skim).toBeUndefined();
+    expect(result.skim).toBeUndefined();
   });
 
   it('treats a skim with fewer than 3 takeaways as undefined, mirroring the schema min(3) rule', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({
-          skim: {
-            takeaways: ['One', 'Two'],
-            generatedAt: null,
-            model: null,
-          },
+        makeRawPostPage({
+          post: makeRawPostDetail({
+            skim: {
+              takeaways: ['One', 'Two'],
+              generatedAt: null,
+              model: null,
+            },
+          }),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.skim).toBeUndefined();
+    expect(result.skim).toBeUndefined();
   });
 
   it('reports hasAsides true when the body contains an aside block', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({
-          body: [{ _type: 'aside', _key: 'a1', kind: 'WHY_NOT', body: [] }],
+        makeRawPostPage({
+          post: makeRawPostDetail({
+            body: [{ _type: 'aside', _key: 'a1', kind: 'WHY_NOT', body: [] }],
+          }),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.hasAsides).toBe(true);
+    expect(result.hasAsides).toBe(true);
   });
 
   it('reports hasAsides false when the body has no aside blocks', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawPostDetail({ body: [] }))
+      .mockResolvedValueOnce(
+        makeRawPostPage({ post: makeRawPostDetail({ body: [] }) }),
+      )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.hasAsides).toBe(false);
+    expect(result.hasAsides).toBe(false);
   });
 
   it('preserves the optional layout field on a bodyImage body block', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawPostDetail({
-          body: [
-            {
-              _type: 'bodyImage',
-              _key: 'image-1',
-              asset: undefined,
-              media: undefined,
-              hotspot: undefined,
-              crop: undefined,
-              alt: 'A diagram',
-              layout: 'FLOAT_RIGHT',
-            },
-          ],
+        makeRawPostPage({
+          post: makeRawPostDetail({
+            body: [
+              {
+                _type: 'bodyImage',
+                _key: 'image-1',
+                asset: undefined,
+                media: undefined,
+                hotspot: undefined,
+                crop: undefined,
+                alt: 'A diagram',
+                layout: 'FLOAT_RIGHT',
+              },
+            ],
+          }),
         }),
       )
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
 
-    expect(result?.body[0]).toMatchObject({
+    expect(result.body[0]).toMatchObject({
       _type: 'bodyImage',
       layout: 'FLOAT_RIGHT',
     });
