@@ -33,5 +33,5 @@ export default async function TopicDetailPage({ params }: TProps) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  return <TopicPage slug={slug} />;
+  return <TopicPage slug={slug} locale={locale} />;
 }

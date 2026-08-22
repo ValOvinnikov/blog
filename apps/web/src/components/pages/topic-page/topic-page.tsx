@@ -4,62 +4,50 @@ import {
   Breadcrumbs,
   type IBreadcrumbItem,
 } from '@blog/ui/molecules/breadcrumbs';
-import { Pagination } from '@blog/ui/organisms/pagination';
-import { PostsSection } from '@blog/ui/organisms/posts-section';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { TopicChipList } from '@web/components/shared/topic-chip-list';
+import { ModuleRenderer } from '@web/modules/module-renderer';
+import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { getTopicsSafely } from '@web/utils/get-topics-safely';
 import { logger } from '@web/utils/logger/logger';
-import { toPostListItems } from '@web/utils/to-post-list-items';
-import { TOPIC_ITEMS_PER_PAGE } from '@web/utils/topic-items-per-page';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
-type TTopicPageProps = { slug: string; page?: number };
+type TTopicPageProps = { slug: string; page?: number; locale: string };
 
 /**
  * TopicPage — shared composition for `/topics/[slug]` (page 1, `page`
  * omitted) and `/topics/[slug]/page/[page]` (pages ≥ 2, `page` provided):
- * fetches posts for the topic, renders a `Home › Topic` `Breadcrumbs`
- * trail (plus its `BreadcrumbList` JSON-LD) inside a `BreadcrumbBar` sibling
- * before `<main>`, then renders the posts through the same pure ui
- * organisms as `BlogListPage`. `getTopicPage` always windows — page 1
- * gets the same pagination metadata as any other page.
+ * fetches the `page_topic` shell via the topic service, renders a
+ * `Home › Topic` `Breadcrumbs` trail (plus its `BreadcrumbList` JSON-LD)
+ * inside a `BreadcrumbBar` sibling before `<main>`, then the archive itself
+ * — via `PostListModule`, reading `page_topic.postList` — as a sibling
+ * outside `BlogPageTemplate`'s constrained furniture, mirroring
+ * `BlogListPage`. `topic.title`/`topic.description` (from the deref'd
+ * `blog_topic`, not `page_topic`'s own CMS-label `title`) drive the heading
+ * and supporting text.
  */
-export const TopicPage = async ({ slug, page }: TTopicPageProps) => {
-  const [result, topics, t, breadcrumbsT, topicPageT] = await Promise.all([
-    service.pages.topic.v1.getTopicPage(slug, {
-      page,
-      itemsPerPage: TOPIC_ITEMS_PER_PAGE,
-    }),
-    getTopicsSafely(),
-    getTranslations('pagination'),
-    getTranslations('breadcrumbs'),
-    getTranslations('topicPage'),
-  ]);
+export const TopicPage = async ({ slug, page, locale }: TTopicPageProps) => {
+  const [result, topics, breadcrumbsT, topicPageT, paginationT] =
+    await Promise.all([
+      service.pages.topic.v1.getTopicPage(slug),
+      getTopicsSafely(),
+      getTranslations('breadcrumbs'),
+      getTranslations('topicPage'),
+      getTranslations('pagination'),
+    ]);
 
   if (!result.ok) {
     logger.error('topic_page.fetch_failed', { slug, error: result.error });
     notFound();
   }
-  if (result.data === null) {
-    notFound();
-  }
 
-  const { topic, posts, currentPage, totalPages } = result.data;
-
-  // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
-  // soft-404 or a redirect to the last page (spec SEO rules).
-  if (page !== undefined && page > totalPages) {
-    notFound();
-  }
-
-  const items = await toPostListItems(posts);
+  const { topic, modules, postListId } = result.data;
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
   const trail: IBreadcrumbItem[] = [
@@ -84,25 +72,20 @@ export const TopicPage = async ({ slug, page }: TTopicPageProps) => {
         heading={topic.title}
         supportingText={topic.description}
         topicChips={<TopicChipList topics={topics} activeSlug={slug} />}
-        posts={
-          <PostsSection
-            posts={items}
-            title={topicPageT('title', { name: topic.title })}
-            titleId="topic-posts-title"
-            linkAs={SmartLink}
-            emptyMessage={topicPageT('empty', { name: topic.title })}
-          />
-        }
-        pagination={
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            createHref={(pageNumber) => routes.topic(slug, pageNumber)}
-            ariaLabel={t('ariaLabel', { pageType: 'Topic' })}
-            previousLabel={t('previous')}
-            nextLabel={t('next')}
-            linkAs={SmartLink}
-          />
+        modules={
+          <>
+            <PostListModule
+              id={postListId}
+              locale={locale}
+              page={page ?? 1}
+              createHref={(pageNumber) => routes.topic(slug, pageNumber)}
+              ariaLabel={paginationT('ariaLabel', { pageType: 'Topic' })}
+              accessibleTitle={topicPageT('title', { name: topic.title })}
+              emptyMessageFallback={topicPageT('empty', { name: topic.title })}
+              titleId="topic-posts-title"
+            />
+            <ModuleRenderer modules={modules} locale={locale} />
+          </>
         }
       />
     </>

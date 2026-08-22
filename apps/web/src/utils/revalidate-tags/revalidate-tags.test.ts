@@ -23,6 +23,12 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
+  it('maps the topic page document to its ISR tag', () => {
+    expect(getRevalidateTagsForType('page_topic', 'page_topic-1')).toEqual([
+      'page_topic',
+    ]);
+  });
+
   it('maps the topic-index singleton to its ISR tag', () => {
     expect(
       getRevalidateTagsForType('page_topicIndex', 'page_topicIndex'),

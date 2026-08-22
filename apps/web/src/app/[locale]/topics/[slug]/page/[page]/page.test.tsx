@@ -65,7 +65,7 @@ describe('TopicNumberedPage', () => {
         { slug: 'engineering', page: '2' },
         { slug: 'design', page: '2' },
       ]);
-      expect(getTopicPaginationParamsMock).toHaveBeenCalledWith(9);
+      expect(getTopicPaginationParamsMock).toHaveBeenCalledWith();
     });
 
     it('returns an empty array when the fetch resolves to a failure result', async () => {
@@ -118,10 +118,15 @@ describe('TopicNumberedPage', () => {
             slug: 'engineering',
             description: 'Posts about building things.',
           },
-          posts: [],
-          currentPage: 2,
-          totalPages: 3,
-          total: 20,
+          modules: [],
+          seo: {
+            title: 'Engineering',
+            description: 'Posts about building things.',
+            ogTitle: 'Engineering',
+            ogDescription: 'Posts about building things.',
+            ogImageUrl: undefined,
+          },
+          postListId: 'post-list-1',
         },
       });
 
@@ -134,10 +139,7 @@ describe('TopicNumberedPage', () => {
       });
 
       expect(metadata.title).toBe('Engineering – Page 2');
-      expect(getTopicPageMock).toHaveBeenCalledWith('engineering', {
-        page: 2,
-        itemsPerPage: 9,
-      });
+      expect(getTopicPageMock).toHaveBeenCalledWith('engineering');
     });
   });
 
