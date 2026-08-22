@@ -245,4 +245,161 @@ describe(PostListModule, () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
     expect(screen.getByText('No posts yet.')).toBeInTheDocument();
   });
+
+  it('uses the caller-supplied ariaLabel for the pagination nav instead of the translated default', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'News',
+          supportingText: undefined,
+          align: undefined,
+        },
+        posts: [
+          {
+            id: 'post-1',
+            slug: 'first-post',
+            title: 'First post',
+            excerpt: 'An excerpt',
+            publishedAt: '2026-01-01T00:00:00.000Z',
+            topic: { id: 'topic-1', title: 'News', slug: 'news' },
+            readingTimeMinutes: 2,
+          },
+        ],
+        layout: undefined,
+        emptyMessage: undefined,
+        currentPage: 2,
+        totalPages: 3,
+      },
+    });
+
+    await setup({ page: 2, ariaLabel: 'News pages' });
+
+    expect(
+      screen.getByRole('navigation', { name: 'News pages' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('navigation', { name: 'Blog pages' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('uses the caller-supplied accessibleTitle as the fallback heading instead of the blog archive default', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: undefined,
+          supportingText: undefined,
+          align: undefined,
+        },
+        posts: [],
+        layout: undefined,
+        emptyMessage: undefined,
+        currentPage: 1,
+        totalPages: 1,
+      },
+    });
+
+    await setup({ accessibleTitle: 'News' });
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'News' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { level: 2, name: 'All posts' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the caller-supplied emptyMessageFallback when zero posts resolve and the CMS field is blank', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'News',
+          supportingText: undefined,
+          align: undefined,
+        },
+        posts: [],
+        layout: undefined,
+        emptyMessage: undefined,
+        currentPage: 1,
+        totalPages: 1,
+      },
+    });
+
+    await setup({ emptyMessageFallback: 'No posts in this topic yet.' });
+
+    expect(screen.getByText('No posts in this topic yet.')).toBeInTheDocument();
+    expect(screen.queryByText('No posts yet.')).not.toBeInTheDocument();
+  });
+
+  it('builds pagination links with the caller-supplied createHref instead of the blog index default', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'News',
+          supportingText: undefined,
+          align: undefined,
+        },
+        posts: [
+          {
+            id: 'post-1',
+            slug: 'first-post',
+            title: 'First post',
+            excerpt: 'An excerpt',
+            publishedAt: '2026-01-01T00:00:00.000Z',
+            topic: { id: 'topic-1', title: 'News', slug: 'news' },
+            readingTimeMinutes: 2,
+          },
+        ],
+        layout: undefined,
+        emptyMessage: undefined,
+        currentPage: 2,
+        totalPages: 3,
+      },
+    });
+
+    await setup({
+      page: 2,
+      createHref: (page: number) => `/topics/news/page/${page}`,
+    });
+
+    const previousLink = screen.getByRole('link', { name: 'Previous' });
+    expect(previousLink).toHaveAttribute('href', '/topics/news/page/1');
+
+    const nextLink = screen.getByRole('link', { name: 'Next' });
+    expect(nextLink).toHaveAttribute('href', '/topics/news/page/3');
+  });
+
+  it('wires the caller-supplied titleId to both the heading id and the section aria-labelledby', async () => {
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        sectionHeader: {
+          heading: 'News',
+          supportingText: undefined,
+          align: undefined,
+        },
+        posts: [],
+        layout: undefined,
+        emptyMessage: undefined,
+        currentPage: 1,
+        totalPages: 1,
+      },
+    });
+
+    await setup({ titleId: 'topic-news-title' });
+
+    const heading = screen.getByRole('heading', { level: 2, name: 'News' });
+    expect(heading).toHaveAttribute('id', 'topic-news-title');
+
+    const region = screen.getByRole('region', { name: 'News' });
+    expect(region).toHaveAttribute('aria-labelledby', 'topic-news-title');
+  });
 });
