@@ -5,13 +5,14 @@
  * `blog_topic.slug` itself is left untouched — it stays live until
  * `page_topic.slug` is read instead.
  *
- * Anchor: `documentTypes: ['blog_topic']`, not `settings_site` (the E5
- * precedent's anchor). This migration needs to read `blog_topic.slug` and
- * `.title` for the documents it creates, so anchoring on the type it must
- * already fetch avoids a second lookup — and `blog_topic` is exactly as
- * guaranteed to exist as `settings_site` for this migration's purpose: it's
- * the input data, so if it's absent there is nothing to seed and the
- * migration correctly visits zero documents.
+ * Anchor: `documentTypes: ['blog_topic']`, not `settings_site` — the same
+ * choice the `module_taxonomyList`/`page_topicIndex` seed migration made.
+ * This migration needs to read `blog_topic.slug` and `.title` for the
+ * documents it creates, so anchoring on the type it must already fetch
+ * avoids a second lookup — and `blog_topic` is exactly as guaranteed to
+ * exist as `settings_site` for this migration's purpose: it's the input
+ * data, so if it's absent there is nothing to seed and the migration
+ * correctly visits zero documents.
  *
  * Every field is set explicitly — migrations write raw documents through the
  * API, so Studio `initialValue`/required-field defaults never fire.
