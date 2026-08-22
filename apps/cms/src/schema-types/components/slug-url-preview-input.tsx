@@ -14,7 +14,7 @@ export function createSlugUrlPreviewInput(routePrefix: string) {
     return (
       <Stack space={2}>
         {props.renderDefault(props)}
-        <Card tone="transparent">
+        <Card tone="transparent" padding={3} radius={2}>
           <Text size={1} muted={true}>
             {buildSlugUrlPreviewPath(routePrefix, props.value?.current)}
           </Text>
