@@ -29,4 +29,17 @@ describe('getPostParams', () => {
 
     expect(params).toEqual([]);
   });
+
+  it('tags the query with page_post', async () => {
+    mockRun.mockResolvedValue([]);
+
+    await getPostParams();
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        next: expect.objectContaining({ tags: ['page_post'] }),
+      }),
+    );
+  });
 });
