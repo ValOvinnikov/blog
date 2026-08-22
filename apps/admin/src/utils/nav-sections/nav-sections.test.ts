@@ -29,16 +29,22 @@ describe('platformNavSections', () => {
 });
 
 describe('tenantNavSections', () => {
-  it('gives Look and Voice distinct real hrefs, badged "this milestone" in neutral tone', () => {
+  it('gives Look, Voice and Features distinct real hrefs, badged "this milestone" in neutral tone', () => {
     const [tenant] = tenantNavSections(t, 'acme');
     const look = tenant!.items.find((item) => item.label === 'Look');
     const voice = tenant!.items.find((item) => item.label === 'Voice');
+    const features = tenant!.items.find((item) => item.label === 'Features');
 
     expect(look?.href).toBe('/t/acme/look');
     expect(voice?.href).toBe('/t/acme/voice');
+    expect(features?.href).toBe('/t/acme/features');
     expect(look?.href).not.toBe(voice?.href);
     expect(look?.badge).toEqual({ label: 'this milestone', tone: 'neutral' });
     expect(voice?.badge).toEqual({ label: 'this milestone', tone: 'neutral' });
+    expect(features?.badge).toEqual({
+      label: 'this milestone',
+      tone: 'neutral',
+    });
   });
 
   it('badges the remaining six destinations "later" in warn tone, with no href', () => {
@@ -52,12 +58,13 @@ describe('tenantNavSections', () => {
     }
   });
 
-  it('lists all eight tenant destinations', () => {
+  it('lists all nine tenant destinations', () => {
     const [tenant] = tenantNavSections(t, 'acme');
 
     expect(tenant!.items.map((item) => item.label)).toEqual([
       'Look',
       'Voice',
+      'Features',
       'Domain',
       'Email',
       'Subscribers',
@@ -69,16 +76,18 @@ describe('tenantNavSections', () => {
 });
 
 describe('dashboardNavSections', () => {
-  it('gives Look and Voice their slug-free /dashboard hrefs', () => {
+  it('gives Look, Voice and Features their slug-free /dashboard hrefs', () => {
     const [dashboard] = dashboardNavSections(t);
     const look = dashboard!.items.find((item) => item.label === 'Look');
     const voice = dashboard!.items.find((item) => item.label === 'Voice');
+    const features = dashboard!.items.find((item) => item.label === 'Features');
 
     expect(look?.href).toBe('/dashboard/look');
     expect(voice?.href).toBe('/dashboard/voice');
+    expect(features?.href).toBe('/dashboard/features');
   });
 
-  it('lists the same eight destinations as tenantNavSections', () => {
+  it('lists the same nine destinations as tenantNavSections', () => {
     const [dashboard] = dashboardNavSections(t);
     const [tenant] = tenantNavSections(t, 'acme');
 

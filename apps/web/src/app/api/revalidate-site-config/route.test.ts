@@ -35,7 +35,7 @@ describe('POST /api/revalidate-site-config', () => {
     vi.resetModules();
   });
 
-  it('revalidates the site-config tag and purges the root layout for a valid bearer secret', async () => {
+  it('revalidates the site-config, settings-features, and tenant-plan tags and purges the root layout for a valid bearer secret', async () => {
     const { POST } = await import('./route');
 
     const request = makeRequest('Bearer test-secret');
@@ -43,11 +43,20 @@ describe('POST /api/revalidate-site-config', () => {
     const json = await response.json();
 
     expect(response.status).toBe(200);
-    expect(json).toEqual({ revalidated: ['site-config'], pathPurged: true });
+    expect(json).toEqual({
+      revalidated: ['site-config', 'settings-features', 'tenant-plan'],
+      pathPurged: true,
+    });
     expect(revalidateTagMock).toHaveBeenCalledWith('site-config', {
       expire: 0,
     });
-    expect(revalidateTagMock).toHaveBeenCalledTimes(1);
+    expect(revalidateTagMock).toHaveBeenCalledWith('settings-features', {
+      expire: 0,
+    });
+    expect(revalidateTagMock).toHaveBeenCalledWith('tenant-plan', {
+      expire: 0,
+    });
+    expect(revalidateTagMock).toHaveBeenCalledTimes(3);
     expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
     expect(revalidatePathMock).toHaveBeenCalledTimes(1);
   });

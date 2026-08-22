@@ -1,5 +1,6 @@
 import type { TValueOf } from '@blog/config/utils';
 
+import { type TCapability, CAPABILITY } from './capability';
 import {
   CONSOLE_VOICE_PACK,
   EDITORIAL_VOICE_PACK,
@@ -59,7 +60,7 @@ export type TThemeTokens = {
 export type TPresetBundle = {
   themeTokens: TThemeTokens;
   voicePack: TVoicePack;
-  featureDefaults: Record<string, never>;
+  featureDefaults: Record<TCapability, boolean>;
 };
 
 export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
@@ -73,7 +74,13 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
       chromeOn: true,
     },
     voicePack: CONSOLE_VOICE_PACK,
-    featureDefaults: {},
+    featureDefaults: {
+      [CAPABILITY.COMMENTS]: true,
+      [CAPABILITY.RATINGS]: true,
+      [CAPABILITY.BOOKMARKS]: true,
+      [CAPABILITY.NEWSLETTER]: false,
+      [CAPABILITY.ANALYTICS]: false,
+    },
   },
   [PRESET_ID.EDITORIAL]: {
     themeTokens: {
@@ -85,6 +92,12 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
       chromeOn: false,
     },
     voicePack: EDITORIAL_VOICE_PACK,
-    featureDefaults: {},
+    featureDefaults: {
+      [CAPABILITY.COMMENTS]: true,
+      [CAPABILITY.RATINGS]: true,
+      [CAPABILITY.BOOKMARKS]: true,
+      [CAPABILITY.NEWSLETTER]: false,
+      [CAPABILITY.ANALYTICS]: false,
+    },
   },
 };

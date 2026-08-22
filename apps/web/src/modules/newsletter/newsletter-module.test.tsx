@@ -1,3 +1,4 @@
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 import { customRenderAsync } from '@web/testing/custom-render';
 
 import { NewsletterModule } from './newsletter-module';
@@ -12,6 +13,10 @@ vi.mock('@blog/service', () => ({
       newsletter: { v1: { getNewsletter: getNewsletterMock } },
     },
   },
+}));
+
+vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
+  isCapabilityEnabled: vi.fn(),
 }));
 
 // `NewsletterModuleView` renders `NewsletterForm`, which imports
@@ -32,6 +37,8 @@ const setup = customRenderAsync(NewsletterModule, {
 describe(NewsletterModule, () => {
   beforeEach(() => {
     getNewsletterMock.mockReset();
+    vi.mocked(isCapabilityEnabled).mockReset();
+    vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
   });
 
   it('renders nothing when the fetch fails', async () => {
@@ -43,5 +50,14 @@ describe(NewsletterModule, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('renders nothing, without fetching the module, when the NEWSLETTER capability is not entitled/enabled', async () => {
+    vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
+
+    const { container } = await setup();
+
+    expect(container).toBeEmptyDOMElement();
+    expect(getNewsletterMock).not.toHaveBeenCalled();
   });
 });

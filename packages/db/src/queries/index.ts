@@ -7,6 +7,7 @@ export * as admins from './admins';
 export * as auditEvents from './audit-events';
 export * as bookmarks from './bookmarks';
 export * as memberships from './memberships';
+export * as settingsFeatures from './settings-features';
 export * as siteConfig from './site-config';
 export * as subscribers from './subscribers';
 export * as tenantDomains from './tenant-domains';
