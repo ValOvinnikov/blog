@@ -1,25 +1,29 @@
 import { getSiteSettings } from '@blog/service/features/global/site-settings/adaptor/loader';
+import { MissingPagePostError } from '@blog/service/features/pages/post/adaptor/missing-page-post-error';
 import { getRelatedPosts } from '@blog/service/features/pages/post/adaptor/related/loader';
 import { isr, runQuery } from '@blog/service/sanity/query';
 
-import { postDetailQuery } from './query';
+import { postPageQuery } from './query';
 import { toPostDetail } from './transformer';
 import type { TPostDetail } from './types';
 
-export async function getPost(slug: string): Promise<TPostDetail | null> {
-  // `postDetailFragment` derefs `author`/`topic` — both tags must ride
-  // alongside `post` (tag-scope contract, `sanity/query.ts`).
-  const raw = await runQuery(postDetailQuery, {
+export async function getPost(slug: string): Promise<TPostDetail> {
+  // `postPageQuery` derefs `post`, which itself derefs `author`/`topic` —
+  // all three tags must ride alongside `page_post` (tag-scope contract,
+  // `sanity/query.ts`).
+  const rawPage = await runQuery(postPageQuery, {
     parameters: { slug },
-    ...isr(['post', 'author', 'topic']),
+    ...isr(['page_post', 'post', 'author', 'topic']),
   });
-  if (!raw) return null;
+  if (!rawPage) {
+    throw new MissingPagePostError(slug);
+  }
 
-  const tagIds = (raw.tags ?? []).map((tag) => tag._id);
+  const tagIds = (rawPage.post.tags ?? []).map((tag) => tag._id);
   const [settings, relatedPosts] = await Promise.all([
     getSiteSettings(),
-    getRelatedPosts(raw._id, tagIds, raw.topic._id),
+    getRelatedPosts(rawPage.post._id, tagIds, rawPage.post.topic._id),
   ]);
 
-  return toPostDetail(raw, settings, relatedPosts);
+  return toPostDetail(rawPage, settings, relatedPosts);
 }
