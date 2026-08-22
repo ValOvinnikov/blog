@@ -21,6 +21,7 @@ import { newsletterSchema } from '@cms/schema-types/modules/module-newsletter';
 import { postLatestSchema } from '@cms/schema-types/modules/module-post-latest';
 import { postListSchema } from '@cms/schema-types/modules/module-post-list';
 import { taxonomyListSchema } from '@cms/schema-types/modules/module-taxonomy-list';
+import { groupedList } from '@cms/structure/grouped-list';
 import { codeInput } from '@sanity/code-input';
 import { visionTool } from '@sanity/vision';
 import {
@@ -75,79 +76,106 @@ export default defineConfig({
               .id('pages')
               .icon(Files)
               .child(
-                S.list()
-                  .title('Pages')
-                  .items([
-                    S.listItem()
-                      .title('Home Page')
-                      .id(homePageSchema.name)
-                      .icon(House)
-                      .child(
-                        S.document()
-                          .schemaType(homePageSchema.name)
-                          .documentId(homePageSchema.name),
-                      ),
-                    S.divider(),
-                    S.listItem()
-                      .title('Post Index Page')
-                      .id(blogPageSchema.name)
-                      .icon(Newspaper)
-                      .child(
-                        S.document()
-                          .schemaType(blogPageSchema.name)
-                          .documentId(blogPageSchema.name),
-                      ),
-                    S.documentTypeListItem(postSchema.name)
-                      .title('Post Pages')
-                      .icon(Newspaper),
-                    S.listItem()
-                      .title('Topic Index Page')
-                      .id(topicIndexPageSchema.name)
-                      .icon(Tags)
-                      .child(
-                        S.document()
-                          .schemaType(topicIndexPageSchema.name)
-                          .documentId(topicIndexPageSchema.name),
-                      ),
-                    S.documentTypeListItem(pageTopicSchema.name)
-                      .title('Topic Pages')
-                      .icon(Tags),
-                    S.divider(),
-                    S.documentTypeListItem(genericSchema.name)
-                      .title('Landing Page')
-                      .icon(FileText),
-                  ]),
+                groupedList(S, {
+                  id: 'pages',
+                  title: 'Pages',
+                  groups: [
+                    {
+                      title: 'Home Page',
+                      items: [
+                        S.listItem()
+                          .title('Home Page')
+                          .id(homePageSchema.name)
+                          .icon(House)
+                          .child(
+                            S.document()
+                              .schemaType(homePageSchema.name)
+                              .documentId(homePageSchema.name),
+                          ),
+                      ],
+                    },
+                    {
+                      title: 'Blog',
+                      items: [
+                        S.listItem()
+                          .title('Post Index Page')
+                          .id(blogPageSchema.name)
+                          .icon(Newspaper)
+                          .child(
+                            S.document()
+                              .schemaType(blogPageSchema.name)
+                              .documentId(blogPageSchema.name),
+                          ),
+                        S.documentTypeListItem(postSchema.name)
+                          .title('Post Pages')
+                          .icon(Newspaper),
+                        S.listItem()
+                          .title('Topic Index Page')
+                          .id(topicIndexPageSchema.name)
+                          .icon(Tags)
+                          .child(
+                            S.document()
+                              .schemaType(topicIndexPageSchema.name)
+                              .documentId(topicIndexPageSchema.name),
+                          ),
+                        S.documentTypeListItem(pageTopicSchema.name)
+                          .title('Topic Pages')
+                          .icon(Tags),
+                      ],
+                    },
+                    {
+                      title: 'General',
+                      items: [
+                        S.documentTypeListItem(genericSchema.name)
+                          .title('Landing Page')
+                          .icon(FileText),
+                      ],
+                    },
+                  ],
+                }),
               ),
             S.listItem()
               .title('Modules')
               .id('modules')
               .icon(Blocks)
               .child(
-                S.list()
-                  .title('Modules')
-                  .items([
-                    S.documentTypeListItem(heroSchema.name)
-                      .title('Heroes')
-                      .icon(Sparkles),
-                    S.documentTypeListItem(postListSchema.name)
-                      .title('Post Lists')
-                      .icon(List),
-                    S.documentTypeListItem(postLatestSchema.name)
-                      .title('Post Latest')
-                      .icon(List),
-                    S.documentTypeListItem(taxonomyListSchema.name)
-                      .title('Taxonomy Lists')
-                      .icon(LayoutGrid),
-                    S.documentTypeListItem(contentSchema.name)
-                      .title('Content')
-                      .icon(FileText),
-                    S.documentTypeListItem(ctaSchema.name)
-                      .title('CTAs')
-                      .icon(Megaphone),
-                    S.documentTypeListItem(newsletterSchema.name)
-                      .title('Newsletter Signups')
-                      .icon(Mail),
-                  ]),
+                groupedList(S, {
+                  id: 'modules',
+                  title: 'Modules',
+                  groups: [
+                    {
+                      title: 'Post modules',
+                      items: [
+                        S.documentTypeListItem(postListSchema.name)
+                          .title('Post Lists')
+                          .icon(List),
+                        S.documentTypeListItem(postLatestSchema.name)
+                          .title('Post Latest')
+                          .icon(List),
+                        S.documentTypeListItem(taxonomyListSchema.name)
+                          .title('Taxonomy Lists')
+                          .icon(LayoutGrid),
+                      ],
+                    },
+                    {
+                      title: 'Content modules',
+                      items: [
+                        S.documentTypeListItem(heroSchema.name)
+                          .title('Heroes')
+                          .icon(Sparkles),
+                        S.documentTypeListItem(contentSchema.name)
+                          .title('Content')
+                          .icon(FileText),
+                        S.documentTypeListItem(ctaSchema.name)
+                          .title('CTAs')
+                          .icon(Megaphone),
+                        S.documentTypeListItem(newsletterSchema.name)
+                          .title('Newsletter Signups')
+                          .icon(Mail),
+                      ],
+                    },
+                  ],
+                }),
               ),
             S.listItem()
               .title('Blog')
