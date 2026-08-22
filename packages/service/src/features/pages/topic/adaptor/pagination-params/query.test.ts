@@ -19,9 +19,9 @@ describe('topicPaginationParamsQuery', () => {
     expect(topicPaginationParamsQuery.query).toContain('publishedAt <= now()');
   });
 
-  it('correlates the post count to the enclosing topic page by slug', () => {
+  it('correlates the post count to the enclosing topic page by reference', () => {
     expect(topicPaginationParamsQuery.query).toContain(
-      'topic->slug.current == ^.slug.current',
+      'references(^.topic._ref)',
     );
   });
 });

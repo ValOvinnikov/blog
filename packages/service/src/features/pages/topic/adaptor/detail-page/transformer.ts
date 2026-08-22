@@ -21,7 +21,7 @@ export function toTopicDetailPage(
     modules: (rawPage.modules ?? []).map(toModule),
     seo: resolveSeo(
       rawPage.seo ?? undefined,
-      { title: topic.title },
+      { title: topic.title, description: topic.description },
       {
         description: settings.description,
         defaultOgImageUrl: settings.defaultOgImageUrl,

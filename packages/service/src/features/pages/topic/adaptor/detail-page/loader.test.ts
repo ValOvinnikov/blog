@@ -82,6 +82,28 @@ describe('getTopicPage', () => {
     });
   });
 
+  it('resolves seo description from the topic description before falling back to site settings', async () => {
+    mockRun
+      .mockResolvedValueOnce(
+        makeRawTopicPage({
+          topic: {
+            _id: 'topic-1',
+            title: 'Engineering',
+            slug: 'engineering',
+            description: 'Notes on building things.',
+          },
+          seo: null,
+        }),
+      )
+      .mockResolvedValueOnce(
+        makeRawSiteSettings({ description: 'Site default description' }),
+      );
+
+    const result = await getTopicPage('engineering');
+
+    expect(result.seo.description).toBe('Notes on building things.');
+  });
+
   it('tags the page_topic query with topic and modules:postList alongside page_topic', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawTopicPage())

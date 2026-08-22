@@ -1,12 +1,13 @@
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
 
-// `^.slug.current` (GROQ's parent-scope operator) correlates each `blog_post`
-// back to the enclosing `page_topic` document's own slug within this
-// per-item projection — one round-trip for every topic page's slug, post
-// count, and archive page size, no per-slug fan-out. Matching by slug (not
-// `topic._ref`) mirrors `TOPIC_SCOPE_FILTER`, since `page_topic.slug` is
-// seeded from `blog_topic.slug` unchanged.
+// `^.topic._ref` (GROQ's parent-scope operator) correlates each `blog_post`
+// back to the enclosing `page_topic` document's own topic reference within
+// this per-item projection — one round-trip for every topic page's slug,
+// post count, and archive page size, no per-slug fan-out. Matching by
+// reference identity (`references(...)`), not slug, avoids reading the
+// deprecated `blog_topic.slug` and stays correct even if `page_topic.slug`
+// (independently editable) drifts from the referenced topic's slug.
 export const topicPaginationParamsQuery = q.star
   .filterByType('page_topic')
   .project((sub) => ({
@@ -22,7 +23,7 @@ export const topicPaginationParamsQuery = q.star
       .count(
         sub.star
           .filterByType('blog_post')
-          .filterRaw('topic->slug.current == ^.slug.current')
+          .filterRaw('references(^.topic._ref)')
           .filterRaw(PUBLISHED_POST_FILTER),
       )
       .notNull(true),
