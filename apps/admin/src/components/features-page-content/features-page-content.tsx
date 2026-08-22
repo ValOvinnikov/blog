@@ -1,6 +1,7 @@
 import { FeaturesSettings } from '@admin/components/features-settings';
 import { getSettingsFeaturesOrDefaults } from '@admin/server/settings-features/settings-features-or-defaults';
 import { updateFeaturesAction } from '@admin/server/settings-features/update-features-action';
+import { clampToEntitlement } from '@admin/utils/settings-features-fields/settings-features-fields';
 import { PLAN_REGISTRY } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
@@ -16,12 +17,19 @@ export type TFeaturesPageContentProps = {
 export const FeaturesPageContent = async ({
   tenant,
 }: TFeaturesPageContentProps) => {
-  const initialValues = await getSettingsFeaturesOrDefaults(tenant.id);
+  const entitledCapabilities = PLAN_REGISTRY[tenant.plan];
+  const rawInitialValues = await getSettingsFeaturesOrDefaults(tenant.id);
+  // A plan downgrade can leave a stale `true` for a now-unentitled
+  // capability in the saved row — clamp it before the form ever renders it.
+  const initialValues = clampToEntitlement(
+    rawInitialValues,
+    entitledCapabilities,
+  );
 
   return (
     <FeaturesSettings
       tenantSlug={tenant.slug}
-      entitledCapabilities={PLAN_REGISTRY[tenant.plan]}
+      entitledCapabilities={entitledCapabilities}
       initialValues={initialValues}
       saveAction={updateFeaturesAction}
     />

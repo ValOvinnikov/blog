@@ -6,8 +6,11 @@ export const featuresSettingsVariants = tv({
     pagehead: ['flex flex-wrap items-start justify-between gap-4'],
     description: ['mt-1 max-w-md text-sm text-text-muted'],
     alert: ['w-fit'],
+    section: ['flex flex-col gap-3'],
+    sectionHeading: [],
     card: ['rounded-lg border border-border bg-surface shadow-sm'],
     toggleRow: ['flex flex-wrap items-center gap-3'],
+    lockReason: ['contents'],
     switchTrack: [
       'relative h-5 w-9 shrink-0 cursor-pointer rounded-full bg-secondary',
       'transition-colors duration-base ease-console',

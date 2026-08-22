@@ -2,6 +2,7 @@ import { CAPABILITY } from '@blog/config';
 
 import {
   CAPABILITY_TOGGLES,
+  clampToEntitlement,
   featureDefaultsToValues,
 } from './settings-features-fields';
 
@@ -34,5 +35,51 @@ describe(featureDefaultsToValues, () => {
       newsletterEnabled: false,
       analyticsEnabled: true,
     });
+  });
+});
+
+describe(clampToEntitlement, () => {
+  it('forces every out-of-plan capability to false, leaving entitled ones untouched', () => {
+    const values = {
+      commentsEnabled: true,
+      ratingsEnabled: true,
+      bookmarksEnabled: true,
+      newsletterEnabled: true,
+      analyticsEnabled: true,
+    };
+
+    expect(
+      clampToEntitlement(values, [
+        CAPABILITY.COMMENTS,
+        CAPABILITY.RATINGS,
+        CAPABILITY.BOOKMARKS,
+      ]),
+    ).toEqual({
+      commentsEnabled: true,
+      ratingsEnabled: true,
+      bookmarksEnabled: true,
+      newsletterEnabled: false,
+      analyticsEnabled: false,
+    });
+  });
+
+  it('is a no-op when every capability is entitled', () => {
+    const values = {
+      commentsEnabled: true,
+      ratingsEnabled: false,
+      bookmarksEnabled: true,
+      newsletterEnabled: true,
+      analyticsEnabled: false,
+    };
+
+    expect(
+      clampToEntitlement(values, [
+        CAPABILITY.COMMENTS,
+        CAPABILITY.RATINGS,
+        CAPABILITY.BOOKMARKS,
+        CAPABILITY.NEWSLETTER,
+        CAPABILITY.ANALYTICS,
+      ]),
+    ).toEqual(values);
   });
 });

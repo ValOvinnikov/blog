@@ -129,6 +129,31 @@ describe(updateFeaturesAction, () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
+  it('is not tripped by a stale-then-clamped out-of-plan field: a FREE tenant saving only an entitled-field change succeeds', async () => {
+    requireTenantMembershipMock.mockResolvedValue({
+      tenant: FREE_TENANT,
+      membership: { role: 'OWNER' },
+    });
+    upsertSettingsFeaturesMock.mockResolvedValue({});
+
+    // Simulates the post-downgrade payload: `newsletterEnabled` was a
+    // stale `true` from when the tenant was GROWTH, but the client clamps
+    // it to `false` before this action ever sees it (see
+    // `clampToEntitlement`) — only `commentsEnabled` was actually changed.
+    const result = await updateFeaturesAction('acme', {
+      ...VALID_INPUT,
+      commentsEnabled: false,
+      newsletterEnabled: false,
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1', {
+      ...VALID_INPUT,
+      commentsEnabled: false,
+      newsletterEnabled: false,
+    });
+  });
+
   it('allows a GROWTH tenant to enable the same capability', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: GROWTH_TENANT,

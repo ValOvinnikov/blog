@@ -42,3 +42,24 @@ export const featureDefaultsToValues = (
   }
   return values;
 };
+
+/**
+ * Forces every capability outside `entitledCapabilities` to `false` before
+ * the values ever reach the form. A stale `true` left over from a plan
+ * downgrade would otherwise render a locked toggle checked-but-disabled and
+ * ride along in every subsequent save payload, permanently tripping
+ * `updateFeaturesAction`'s reject-whole-save check even when the operator
+ * only touches an entitled field.
+ */
+export const clampToEntitlement = (
+  values: TSettingsFeaturesValues,
+  entitledCapabilities: TCapability[],
+): TSettingsFeaturesValues => {
+  const clamped = { ...values };
+  for (const { capability, field } of CAPABILITY_TOGGLES) {
+    if (!entitledCapabilities.includes(capability)) {
+      clamped[field] = false;
+    }
+  }
+  return clamped;
+};

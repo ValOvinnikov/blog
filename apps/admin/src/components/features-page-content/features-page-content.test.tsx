@@ -162,6 +162,28 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     );
   });
 
+  it('clamps a stale out-of-plan value to unchecked+disabled after a downgrade from GROWTH to FREE', async () => {
+    getSettingsFeaturesMock.mockResolvedValue({
+      id: 'row-1',
+      tenantId: 'tenant-1',
+      commentsEnabled: true,
+      ratingsEnabled: true,
+      bookmarksEnabled: true,
+      newsletterEnabled: true,
+      analyticsEnabled: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    await setup({ tenant: buildTenant('FREE') });
+
+    const newsletterSwitch = screen.getByRole('switch', {
+      name: 'Newsletter',
+    });
+    expect(newsletterSwitch).toHaveAttribute('data-unchecked', '');
+    expect(newsletterSwitch).toHaveAttribute('data-disabled', '');
+  });
+
   it('enables every toggle for a GROWTH-plan tenant', async () => {
     getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue(undefined);

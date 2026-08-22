@@ -51,11 +51,14 @@ export const FeaturesSettings = ({
     pagehead,
     description,
     alert,
+    section,
+    sectionHeading,
     card,
     toggleRow,
     switchTrack,
     switchThumb,
     switchLabel,
+    lockReason,
   } = featuresSettingsVariants();
 
   const handleToggle = (
@@ -108,37 +111,48 @@ export const FeaturesSettings = ({
         />
       )}
 
-      <div className={card()}>
-        {CAPABILITY_TOGGLES.map(({ capability, field }) => {
-          const isLocked = !entitledCapabilities.includes(capability);
-          const label = t(`toggleLabel.${capability}`);
+      <div className={section()}>
+        <Heading level={2} size={Size.XS} className={sectionHeading()}>
+          {t('capabilitiesHeading')}
+        </Heading>
+        <div className={card()}>
+          {CAPABILITY_TOGGLES.map(({ capability, field }) => {
+            const isLocked = !entitledCapabilities.includes(capability);
+            const label = t(`toggleLabel.${capability}`);
+            const reasonId = `features-settings-lock-reason-${capability}`;
 
-          return (
-            <SettingRow
-              key={capability}
-              label={label}
-              description={t(`toggleDescription.${capability}`)}
-            >
-              <div className={toggleRow()}>
-                <Switch.Root
-                  checked={values[field]}
-                  onCheckedChange={(checked) => handleToggle(field, checked)}
-                  disabled={isLocked || isPending}
-                  aria-label={label}
-                  className={switchTrack()}
-                >
-                  <Switch.Thumb className={switchThumb()} />
-                </Switch.Root>
-                <span className={switchLabel()}>
-                  {values[field] ? t('switchOn') : t('switchOff')}
-                </span>
-                {isLocked && (
-                  <StatusBadge tone="warn">{t('planLockedBadge')}</StatusBadge>
-                )}
-              </div>
-            </SettingRow>
-          );
-        })}
+            return (
+              <SettingRow
+                key={capability}
+                label={label}
+                description={t(`toggleDescription.${capability}`)}
+              >
+                <div className={toggleRow()}>
+                  <Switch.Root
+                    checked={values[field]}
+                    onCheckedChange={(checked) => handleToggle(field, checked)}
+                    disabled={isLocked || isPending}
+                    aria-label={label}
+                    aria-describedby={isLocked ? reasonId : undefined}
+                    className={switchTrack()}
+                  >
+                    <Switch.Thumb className={switchThumb()} />
+                  </Switch.Root>
+                  <span className={switchLabel()}>
+                    {values[field] ? t('switchOn') : t('switchOff')}
+                  </span>
+                  {isLocked && (
+                    <span id={reasonId} className={lockReason()}>
+                      <StatusBadge tone="warn">
+                        {t('planLockedBadge')}
+                      </StatusBadge>
+                    </span>
+                  )}
+                </div>
+              </SettingRow>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

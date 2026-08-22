@@ -85,6 +85,49 @@ describe(FeaturesSettings, () => {
     expect(screen.getAllByText('Growth plan')).toHaveLength(2);
   });
 
+  it('links a locked toggle to its "Growth plan" reason via aria-describedby, and leaves an entitled toggle undescribed', () => {
+    render(
+      <FeaturesSettings
+        tenantSlug="acme"
+        entitledCapabilities={FREE_ENTITLED}
+        initialValues={INITIAL_VALUES}
+        saveAction={vi.fn()}
+      />,
+    );
+
+    const lockedSwitch = screen.getByRole('switch', { name: 'Newsletter' });
+    const describedById = lockedSwitch.getAttribute('aria-describedby');
+
+    expect(describedById).toBeTruthy();
+    expect(document.getElementById(describedById as string)).toHaveTextContent(
+      'Growth plan',
+    );
+    expect(
+      screen.getByRole('switch', { name: 'Comments' }),
+    ).not.toHaveAttribute('aria-describedby');
+  });
+
+  it('renders the page heading, a section heading, and each toggle row heading without skipping a level', () => {
+    render(
+      <FeaturesSettings
+        tenantSlug="acme"
+        entitledCapabilities={ALL_ENTITLED}
+        initialValues={INITIAL_VALUES}
+        saveAction={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Features' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Capabilities' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Comments' }),
+    ).toBeVisible();
+  });
+
   it('toggles an entitled capability on click', async () => {
     const user = userEvent.setup();
     render(
