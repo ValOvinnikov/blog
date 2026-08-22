@@ -1,19 +1,56 @@
+import { PAGE_POST_TYPE } from '@cms/schema-types/documents/pages/page-post-type';
 import { imageWithAltSchema } from '@cms/schema-types/objects/image-with-alt';
 import { richTextSchema } from '@cms/schema-types/objects/rich-text';
 import { seoSchema } from '@cms/schema-types/objects/seo';
 import { skimSchema } from '@cms/schema-types/objects/skim';
 import { Newspaper } from 'lucide-react';
-import { defineArrayMember, defineField, defineType } from 'sanity';
+import {
+  defineArrayMember,
+  defineField,
+  defineType,
+  type SanityDocument,
+  type ValidationContext,
+} from 'sanity';
 
 import { authorSchema } from './author';
 import { tagSchema } from './tag';
 import { topicSchema } from './topic';
+
+const HAS_PAGE_POST_API_VERSION = '2024-01-01';
+
+/**
+ * Warns (does not block publishing) when no `page_post` references this
+ * post — `/blog/{slug}` 404s with no runtime fallback in that state, so
+ * the editor should see the gap on the document they'd fix it from.
+ */
+async function validateHasPagePost(
+  document: SanityDocument | undefined,
+  context: ValidationContext,
+): Promise<string | true> {
+  const publishedId = document?._id.replace(/^drafts\./, '');
+
+  if (!publishedId) return true;
+
+  const client = context
+    .getClient({ apiVersion: HAS_PAGE_POST_API_VERSION })
+    .withConfig({ perspective: 'drafts' });
+
+  const referencingCount = await client.fetch<number>(
+    `count(*[_type == $type && post._ref == $postId])`,
+    { type: PAGE_POST_TYPE, postId: publishedId },
+  );
+
+  return referencingCount > 0
+    ? true
+    : 'No Post Page references this post yet — /blog/{slug} will 404 until one is created.';
+}
 
 export const postSchema = defineType({
   name: 'blog_post',
   title: 'Post',
   type: 'document',
   icon: Newspaper,
+  validation: (rule) => rule.custom(validateHasPagePost).warning(),
   fields: [
     defineField({
       name: 'title',
