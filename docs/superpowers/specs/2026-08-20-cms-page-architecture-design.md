@@ -62,14 +62,27 @@ admitted by its own kind of slot.
 | `page_home`       | singleton  | `hero`                   | `modules[]`          | `/`                          |
 | `page_blog`       | singleton  | `postList`               | `modules[]`          | `/blog`, `/blog/page/N`      |
 | `page_topicIndex` | singleton  | `taxonomyList`           | `modules[]`          | `/topics`                    |
-| `page_topic`      | per-entity | `postList` + `topic` ref | `modules[]`          | `/topics/{slug}`, `…/page/N` |
+| `page_topic`      | per-entity | `postList` + `topic` ref | `slug` + `modules[]` | `/topics/{slug}`, `…/page/N` |
 | `page_tagIndex`   | singleton  | `taxonomyList`           | `modules[]`          | `/tags`                      |
-| `page_tag`        | per-entity | `postList` + `tag` ref   | `modules[]`          | `/tags/{slug}`, `…/page/N`   |
+| `page_tag`        | per-entity | `postList` + `tag` ref   | `slug` + `modules[]` | `/tags/{slug}`, `…/page/N`   |
 | `page_generic`    | per-entity | —                        | `slug` + `modules[]` | `/{slug}`                    |
 
-Per-entity pages take their URL slug from the **referenced taxonomy document**,
-never from a slug field of their own — one source of truth, no way for the two
-to drift.
+Per-entity pages own their URL slug directly — `page_topic.slug` /
+`page_tag.slug`, sourced from the page document's own `title`, same mechanics
+as `page_generic.slug` already uses. This is a **revision** of the original
+design (which put the slug on the referenced taxonomy document instead — see
+"Decisions taken" below): the page is what actually defines the route, so the
+routing concern belongs there, not on the taxonomy entity it describes.
+`blog_topic`/`blog_tag` carry no slug of their own once each epic's migration
+retires it — still one source of truth, now living on the page side.
+
+**E6 shipped partway through this revision** (#1912): `page_topic` gains its
+own `slug`, but `blog_topic.slug` is not removed in the same change — it stays
+live (deprecated) until the `service`/`web` sub-issues of E6 have moved their
+reads onto `page_topic.slug`, then a follow-up migration retires it. E8 has
+not started yet, so it applies the revised design from the start: `page_tag`
+is built with its own `slug` and `blog_tag.slug` is retired in the same epic,
+no deprecation window needed.
 
 Every "required slot" above is a **reference to a standalone `module_*`
 document**, exactly as `page_home.hero` already references a `module_hero`.
@@ -297,13 +310,22 @@ dataset first:
    it, then delete the original in a _separate_ follow-up migration once the
    reference has moved.
 5. Create `page_topic` ×1 and `page_tag` ×15, each with its own
-   `module_postList`, plus the `page_topicIndex` and `page_tagIndex`
-   singletons with their `module_taxonomyList`.
+   `module_postList` and its `slug` copied from the corresponding
+   `blog_topic.slug` / `blog_tag.slug` (see the slug-ownership revision
+   above — this preserves today's URLs unchanged), plus the `page_topicIndex`
+   and `page_tagIndex` singletons with their `module_taxonomyList`.
+6. **Retire `blog_topic.slug`.** A follow-up migration, run only after E6's
+   `service`/`web` sub-issues have moved their reads onto `page_topic.slug` —
+   unsets the now-dead field on the 1 existing `blog_topic` document. There is
+   no equivalent follow-up for `blog_tag.slug`: E8 hasn't shipped anything
+   yet, so it retires `blog_tag.slug` as part of its own migration (step 5's
+   `page_tag` seeding) rather than needing a second pass.
 
 Steps 1–2 belong to E1 and steps 3–4 to E4. Step 5 splits four ways: the
 `page_topic` seeding to E6 and `page_tag` to E8, with the `page_topicIndex`
 and `page_tagIndex` singletons and their `module_taxonomyList` belonging to
-the index-page epics that introduce them, E5 and E7.
+the index-page epics that introduce them, E5 and E7. Step 6 belongs to E6,
+sequenced after that epic's `service`/`web` sub-issues.
 
 **Deploy ordering:** run steps 1–2 against `production` _before_ deploying the
 web code that reads `topic`, so no window exists where live documents have
@@ -372,6 +394,7 @@ with real routes. It is currently
 | Author pages removed                                      | Converting them to `page_author` documents                                                                | An author profile is an ordinary page; the byline link is already optional and JSON-LD emits no author URL                                                                                                       |
 | 404 on missing page document                              | Runtime fallback to a default archive                                                                     | Keeps a single code path; guarded by two Studio validation rules                                                                                                                                                 |
 | `pageSize` widened to 1–24                                | Keeping the teaser's 1–12 for both                                                                        | 12 would silently cap the blog index below the 24 `itemsPerPage` already allowed                                                                                                                                 |
+| `page_topic`/`page_tag` own their `slug`                  | Slug lives on the referenced taxonomy document (`blog_topic`/`blog_tag`), the page has none of its own    | Superseded mid-E6 (see the slug-ownership revision above): the page document is what defines the route, so the routing concern belongs there — the taxonomy document stays pure content, not a URL source        |
 
 ## Delivery — one epic per page surface
 
@@ -468,11 +491,16 @@ and intro copy out of i18n keys into content. Sub-issues: cms → service → we
 plus the migration seeding the singleton and its `module_taxonomyList`
 (migration step 5 above).
 
-**E6 — `/topics/{slug}` page.** `page_topic` with its required `postList` slot
-and `topic` reference; retires `CATEGORY_ITEMS_PER_PAGE` and the hardcoded
-category grid; adds both Studio validation rules (uniqueness of the reference,
-and the missing-page warning on the taxonomy document). Sub-issues: cms →
-service → web, plus the seeding migration for the 1 existing topic.
+**E6 — `/topics/{slug}` page.** `page_topic` with its required `postList` slot,
+`topic` reference, and its own `slug` (see the slug-ownership revision above);
+retires `CATEGORY_ITEMS_PER_PAGE` and the hardcoded category grid; adds both
+Studio validation rules (uniqueness of the reference, and the missing-page
+warning on the taxonomy document). Sub-issues: cms → service → web, plus the
+seeding migration for the 1 existing topic — which now also copies
+`blog_topic.slug` onto the new `page_topic.slug`, preserving today's URL.
+`blog_topic.slug` itself is **not** removed by this epic; it stays live until
+`service`/`web` have moved their reads onto `page_topic.slug`, then a
+follow-up migration retires it.
 
 **E7 — `/tags` index page.** `page_tagIndex` singleton, mirroring E5. New route
 — nothing exists today. Sub-issues: cms → service → web, plus the same
@@ -480,7 +508,11 @@ singleton-seeding migration as E5.
 
 **E8 — `/tags/{slug}` page.** `page_tag`, the `/tag/` → `/tags/` URL move, the
 `/tags/{slug}/rss.xml` feed move, and the seeding migration for
-**15 tags** (30 documents, per Migration above). Retires `TAG_ITEMS_PER_PAGE`
+**15 tags** (30 documents, per Migration above). `page_tag` is built with its
+own `slug` from the start (unlike E6, this epic has not shipped anything yet,
+so there is no deprecation window) — the seeding migration sets it from each
+`blog_tag.slug`, and `blog_tag.slug` is removed in the same epic once
+`service`/`web` land, not as a later follow-up. Retires `TAG_ITEMS_PER_PAGE`
 and the hardcoded tag grid. Sub-issues: config (routes helper) → cms → service
 → web. The largest page epic, because of the seeding.
 
