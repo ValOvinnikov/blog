@@ -46,6 +46,13 @@ export const findGroupedListItem = (
  * Delegates child-pane resolution to whichever item's id matches the clicked
  * row — the lookup a stock `S.list()` pane gets for free from its `.items()`,
  * reimplemented here because an `S.component()` pane gets none of that.
+ *
+ * Sanity's own `documentTypeListItem` child resolver reads its title
+ * override off `childContext.parent` via an `isList(parent)` check
+ * (`parent.type === 'list'`), then `parent.items.find(...)`. The
+ * `GroupedListPane` component node is never a `type: 'list'` node, so a
+ * matched item's child resolver must be handed a synthesized stand-in that
+ * satisfies that shape instead of the untouched `options.parent`.
  */
 export const resolveGroupedListChild =
   (groups: TGroupedListGroup[]): ChildResolver =>
@@ -54,7 +61,19 @@ export const resolveGroupedListChild =
     if (!item) return undefined;
 
     const child = item.getChild();
-    return typeof child === 'function' ? child(itemId, options) : child;
+    if (typeof child !== 'function') return child;
+
+    const listLikeParent = {
+      type: 'list' as const,
+      items: groups
+        .flatMap((group) => group.items)
+        .map((groupItem) => ({
+          id: groupItem.getId(),
+          title: groupItem.getTitle(),
+        })),
+    };
+
+    return child(itemId, { ...options, parent: listLikeParent });
   };
 
 /**

@@ -60,7 +60,7 @@ describe('resolveGroupedListChild', () => {
     expect(resolve('page_home', childResolverOptions)).toBe(staticChild);
   });
 
-  it('invokes a child resolver function with the itemId and options', () => {
+  it('invokes a child resolver function with the itemId and a synthesized parent', () => {
     const resolvedChild = { type: 'documentTypeList' };
     const childResolverFn = vi.fn(() => resolvedChild);
     const groups: TGroupedListGroup[] = [
@@ -78,8 +78,60 @@ describe('resolveGroupedListChild', () => {
     const resolve = resolveGroupedListChild(groups);
     const result = resolve('post', childResolverOptions);
 
-    expect(childResolverFn).toHaveBeenCalledWith('post', childResolverOptions);
+    expect(childResolverFn).toHaveBeenCalledWith(
+      'post',
+      expect.objectContaining({
+        ...childResolverOptions,
+        parent: expect.objectContaining({ type: 'list' }),
+      }),
+    );
     expect(result).toBe(resolvedChild);
+  });
+
+  it('synthesizes a parent that satisfies isList so a documentTypeListItem title override survives', () => {
+    // Mirrors sanity's own getDocumentTypeListItem child resolver
+    // (StructureToolProvider-bqgHqZki.js): it only honours a title override
+    // when `isList(childContext.parent)` — `parent.type === 'list'` — is
+    // true, and looks the override up via `parent.items.find(...)`.
+    const isList = (
+      collection: unknown,
+    ): collection is { items: { id: string; title?: string }[] } =>
+      typeof collection === 'object' &&
+      collection !== null &&
+      (collection as { type?: unknown }).type === 'list';
+
+    const documentTypeListItemChild = vi.fn(
+      (id: string, childContext: ChildResolverOptions) => {
+        const { parent } = childContext;
+        const parentItem = isList(parent)
+          ? parent.items.find((candidate) => candidate.id === id)
+          : null;
+        return {
+          type: 'documentTypeList',
+          title: parentItem?.title ?? 'Call to Action',
+        };
+      },
+    );
+
+    const groups: TGroupedListGroup[] = [
+      {
+        title: 'Modules',
+        items: [
+          createItem({
+            getId: () => 'module_cta',
+            getTitle: () => 'CTAs',
+            getChild: () => documentTypeListItemChild as never,
+          }),
+        ],
+      },
+    ];
+
+    const resolve = resolveGroupedListChild(groups);
+    const result = resolve('module_cta', childResolverOptions);
+
+    const parentArg = documentTypeListItemChild.mock.calls[0]?.[1].parent;
+    expect(isList(parentArg)).toBe(true);
+    expect(result).toEqual({ type: 'documentTypeList', title: 'CTAs' });
   });
 
   it('returns undefined when no item matches the clicked id', () => {
