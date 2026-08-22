@@ -14,18 +14,37 @@ export interface IPostListModuleProps {
   id: string;
   locale: string;
   page: number;
+  /** Pagination href builder. Defaults to `routes.blogIndex` for `/blog`; archive callers other than `/blog` must supply their own. */
+  createHref?: (page: number) => string;
+  /** Pagination nav `aria-label`. Defaults to the blog archive's own copy. */
+  ariaLabel?: string;
+  /** Fallback heading for screen readers when the CMS `sectionHeader.heading` is blank. Defaults to the blog archive's own copy. */
+  accessibleTitle?: string;
+  /** Fallback empty-state copy when the CMS `emptyMessage` is blank. Defaults to the blog archive's own copy. */
+  emptyMessageFallback?: string;
+  titleId?: string;
 }
 
 /**
- * PostListModule — the `/blog` archive: fetches the `page_blog.postList`
- * slot's `module_postList` document for the given page and hands it to
- * `PostListModuleView`. Unlike every other module, it always renders — an
- * archive must say something even with zero posts — and 404s (after logging)
- * both when the fetch fails and when an explicit page number exceeds the
- * corpus's page count, since either would otherwise render the page's
- * primary content as silently missing.
+ * PostListModule — an archive's post list: fetches the `postList` slot's
+ * `module_postList` document for the given page and hands it to
+ * `PostListModuleView`. Reused by both `/blog` (no overrides — its own
+ * copy/href are the defaults) and `/topics/{slug}` (which supplies its own
+ * `createHref`/`ariaLabel`/`accessibleTitle`/`emptyMessageFallback`). Unlike
+ * every other module, it always renders — an archive must say something even
+ * with zero posts — and 404s (after logging) both when the fetch fails and
+ * when an explicit page number exceeds the corpus's page count, since either
+ * would otherwise render the page's primary content as silently missing.
  */
-export const PostListModule = async ({ id, page }: IPostListModuleProps) => {
+export const PostListModule = async ({
+  id,
+  page,
+  createHref = routes.blogIndex,
+  ariaLabel,
+  accessibleTitle,
+  emptyMessageFallback,
+  titleId = 'blog-posts-title',
+}: IPostListModuleProps) => {
   const [result, blogListT, paginationT] = await Promise.all([
     service.modules.postList.v1.getPostList(id, page),
     getTranslations('blogListPage'),
@@ -63,8 +82,8 @@ export const PostListModule = async ({ id, page }: IPostListModuleProps) => {
   const pagination: IPostListModulePagination = {
     currentPage,
     totalPages,
-    createHref: routes.blogIndex,
-    ariaLabel: blogListT('paginationAriaLabel'),
+    createHref,
+    ariaLabel: ariaLabel ?? blogListT('paginationAriaLabel'),
     previousLabel: paginationT('previous'),
     nextLabel: paginationT('next'),
   };
@@ -75,10 +94,10 @@ export const PostListModule = async ({ id, page }: IPostListModuleProps) => {
       sectionHeader={sectionHeader}
       items={items}
       layout={layout}
-      titleId="blog-posts-title"
+      titleId={titleId}
       dataTestId={`post-list-module-${id}`}
-      accessibleTitle={blogListT('title')}
-      emptyMessage={emptyMessage ?? blogListT('empty')}
+      accessibleTitle={accessibleTitle ?? blogListT('title')}
+      emptyMessage={emptyMessage ?? emptyMessageFallback ?? blogListT('empty')}
       pagination={pagination}
     />
   );

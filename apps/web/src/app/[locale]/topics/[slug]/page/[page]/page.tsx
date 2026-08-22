@@ -5,7 +5,6 @@ import { permanentRedirect } from '@web/i18n/navigation';
 import { buildTopicMetadata } from '@web/metadata/topic-metadata';
 import { logger } from '@web/utils/logger/logger';
 import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
-import { TOPIC_ITEMS_PER_PAGE } from '@web/utils/topic-items-per-page';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
@@ -20,8 +19,7 @@ type TProps = {
 // on demand via ISR — correctness rides on the explicit range check in
 // `TopicPage`, not on this list.
 export async function generateStaticParams() {
-  const result =
-    await service.pages.topic.v1.getTopicPaginationParams(TOPIC_ITEMS_PER_PAGE);
+  const result = await service.pages.topic.v1.getTopicPaginationParams();
 
   if (!result.ok) {
     logger.error('topic_pagination.params_fetch_failed', {
@@ -56,5 +54,5 @@ export default async function TopicNumberedPage({ params }: TProps) {
     permanentRedirect({ href: routes.topic(slug, 1), locale });
   }
 
-  return <TopicPage slug={slug} page={page} />;
+  return <TopicPage slug={slug} page={page} locale={locale} />;
 }

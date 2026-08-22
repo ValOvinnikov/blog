@@ -93,7 +93,7 @@ export type {
   TPostSkim,
 } from './features/pages/post';
 export type { TTagPage } from './features/pages/tag';
-export type { TTopicPage } from './features/pages/topic';
+export type { TTopicDetailPage } from './features/pages/topic';
 export type { TTopicIndexPage } from './features/pages/topic-index';
 export { getSanityImageBaseUrl } from './sanity/image-base-url';
 export { urlForImage } from './sanity/image';

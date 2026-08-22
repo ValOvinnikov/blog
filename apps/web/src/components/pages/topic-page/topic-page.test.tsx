@@ -1,9 +1,5 @@
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import {
-  makePostCard,
-  makePostCardTopic,
-} from '@web/testing/shared/post/fixtures';
-import {
   makeTopic,
   makeTopicWithPostCount,
 } from '@web/testing/shared/topic/fixtures';
@@ -11,9 +7,36 @@ import { notFound } from 'next/navigation';
 
 import { TopicPage } from './topic-page';
 
-const { getTopicPageMock, getTopicsMock } = vi.hoisted(() => ({
+const {
+  getTopicPageMock,
+  getTopicsMock,
+  moduleRendererMock,
+  postListModuleMock,
+} = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
   getTopicsMock: vi.fn(),
+  moduleRendererMock: vi.fn(
+    ({ modules }: { modules: { id: string; type: string }[] }) => (
+      <div data-testid="module-renderer-stub">
+        {modules.map((module) => module.type).join(',')}
+      </div>
+    ),
+  ),
+  postListModuleMock: vi.fn(
+    ({
+      id,
+      page,
+    }: {
+      id: string;
+      locale: string;
+      page: number;
+      createHref: (page: number) => string;
+    }) => (
+      <div data-testid="post-list-module-stub">
+        {id}:{page}
+      </div>
+    ),
+  ),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -25,6 +48,14 @@ vi.mock('@blog/service', () => ({
       topics: { v1: { getTopics: getTopicsMock } },
     },
   },
+}));
+
+vi.mock('@web/modules/module-renderer', () => ({
+  ModuleRenderer: moduleRendererMock,
+}));
+
+vi.mock('@web/modules/post-list/post-list-module', () => ({
+  PostListModule: postListModuleMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -42,35 +73,24 @@ vi.mock('@web/components/shared/smart-link', () => ({
   ),
 }));
 
-const post = makePostCard({
-  title: 'My Post Title',
-  slug: 'my-post-slug',
-  publishedAt: '2026-01-01T00:00:00.000Z',
-  topic: makePostCardTopic(),
-});
-
 const topic = makeTopic({
   title: 'News',
   slug: 'news',
   description: 'The latest updates.',
 });
 
-const setup = customRenderAsync(TopicPage, {
-  slug: 'news',
-});
+const setup = customRenderAsync(TopicPage, { slug: 'news', locale: 'en' });
 
 describe(`<${TopicPage.name}/>`, () => {
   beforeEach(() => {
     getTopicPageMock.mockReset();
     getTopicsMock.mockReset();
+    moduleRendererMock.mockClear();
+    postListModuleMock.mockClear();
     getTopicsMock.mockResolvedValue({
       ok: true,
       data: [
-        makeTopicWithPostCount({
-          title: 'News',
-          slug: 'news',
-          postCount: 1,
-        }),
+        makeTopicWithPostCount({ title: 'News', slug: 'news', postCount: 1 }),
         makeTopicWithPostCount({
           id: 'topic-2',
           title: 'Design',
@@ -79,14 +99,6 @@ describe(`<${TopicPage.name}/>`, () => {
         }),
       ],
     });
-  });
-
-  it('calls notFound() when the topic does not exist', async () => {
-    getTopicPageMock.mockResolvedValue({ ok: true, data: null });
-
-    await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
 
   it('calls notFound() when the fetch fails', async () => {
@@ -99,20 +111,17 @@ describe(`<${TopicPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('topic_page.fetch_failed'),
+    );
 
     errorSpy.mockRestore();
   });
 
-  it('renders the topic heading, description, and posts', async () => {
+  it('renders the h1 and supporting text from the referenced blog_topic, not page_topic.title', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        topic,
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
-      },
+      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
     });
 
     await setup();
@@ -121,49 +130,80 @@ describe(`<${TopicPage.name}/>`, () => {
       screen.getByRole('heading', { level: 1, name: 'News' }),
     ).toBeVisible();
     expect(screen.getByText('The latest updates.')).toBeVisible();
-
-    const link = screen.getByRole('link', { name: 'My Post Title' });
-    expect(link).toBeVisible();
-    expect(link).toHaveAttribute('href', '/blog/my-post-slug');
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders the empty-state message when the topic has no posts', async () => {
+  it('passes the postList id, locale, page, and topic-scoped copy through to PostListModule', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
+    });
+
+    await setup({ page: 2 });
+
+    expect(postListModuleMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'post-list-1',
+        locale: 'en',
+        page: 2,
+        ariaLabel: 'Topic pages',
+        accessibleTitle: 'Posts in News',
+        emptyMessageFallback: 'No posts in News yet.',
+        titleId: 'topic-posts-title',
+      }),
+      undefined,
+    );
+
+    const call = postListModuleMock.mock.calls[0];
+    if (!call) throw new Error('PostListModule was not called');
+    const { createHref } = call[0];
+    expect(createHref(1)).toBe('/topics/news');
+    expect(createHref(3)).toBe('/topics/news/page/3');
+  });
+
+  it('defaults to page 1 when no page is given', async () => {
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
+    });
+
+    await setup();
+
+    expect(postListModuleMock).toHaveBeenCalledWith(
+      expect.objectContaining({ page: 1 }),
+      undefined,
+    );
+  });
+
+  it('passes the page-builder modules through to ModuleRenderer', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
       data: {
         topic,
-        posts: [],
-        currentPage: 1,
-        totalPages: 1,
-        total: 0,
+        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
+        seo: {},
+        postListId: 'post-list-1',
       },
     });
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'News' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Posts in News' }),
-    ).toBeVisible();
-    expect(screen.getByText('No posts in News yet.')).toBeVisible();
-    expect(
-      screen.queryByRole('link', { name: 'My Post Title' }),
-    ).not.toBeInTheDocument();
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
+        locale: 'en',
+      }),
+      undefined,
+    );
+    expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
+      'module_newsletter',
+    );
   });
 
   it('renders the topic chip row with the current topic highlighted', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        topic,
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
-      },
+      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
     });
 
     await setup();
@@ -181,115 +221,10 @@ describe(`<${TopicPage.name}/>`, () => {
     );
   });
 
-  it('calls getTopicPage with the fixed itemsPerPage, page undefined, on page 1', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        topic,
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
-      },
-    });
-
-    await setup();
-
-    expect(getTopicPageMock).toHaveBeenCalledWith('news', {
-      page: undefined,
-      itemsPerPage: 9,
-    });
-  });
-
-  it('calls the paginated getTopicPage with the fixed itemsPerPage when a page is given', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        topic,
-        posts: [post],
-        currentPage: 2,
-        totalPages: 3,
-        total: 20,
-      },
-    });
-
-    await setup({ page: 2 });
-
-    expect(getTopicPageMock).toHaveBeenCalledWith('news', {
-      page: 2,
-      itemsPerPage: 9,
-    });
-  });
-
-  it('renders pagination on page 1 when there is more than one page', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        topic,
-        posts: [post],
-        currentPage: 1,
-        totalPages: 3,
-        total: 20,
-      },
-    });
-
-    await setup();
-
-    expect(
-      screen.getByRole('navigation', { name: 'Topic pages' }),
-    ).toBeVisible();
-  });
-
-  it('renders pagination wired to routes.topic(slug, page) when a page is given', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        topic,
-        posts: [post],
-        currentPage: 2,
-        totalPages: 3,
-        total: 20,
-      },
-    });
-
-    await setup({ page: 2 });
-
-    expect(
-      screen.getByRole('navigation', { name: 'Topic pages' }),
-    ).toBeVisible();
-    const nextLink = screen.getByRole('link', { name: 'Next' });
-    expect(nextLink).toHaveAttribute('href', '/topics/news/page/3');
-    const previousLink = screen.getByRole('link', { name: 'Previous' });
-    expect(previousLink).toHaveAttribute('href', '/topics/news');
-  });
-
-  it('calls notFound() when the requested page is beyond totalPages', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        topic,
-        posts: [],
-        currentPage: 5,
-        totalPages: 1,
-        total: 1,
-      },
-    });
-
-    await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-  });
-
   it('renders the Home › Topic breadcrumbs trail', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        topic,
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
-      },
+      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
     });
 
     await setup();
@@ -307,13 +242,7 @@ describe(`<${TopicPage.name}/>`, () => {
   it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        topic,
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
-      },
+      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
     });
 
     await setup();
@@ -330,13 +259,7 @@ describe(`<${TopicPage.name}/>`, () => {
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        topic,
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
-      },
+      data: { topic, modules: [], seo: {}, postListId: 'post-list-1' },
     });
 
     const { container } = await setup();

@@ -1,30 +1,32 @@
-import { toArchivePostCard } from '@blog/service/shared/transformers/to-archive-post-card';
+import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
+import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
+import { toModule } from '@blog/service/shared/transformers/to-module';
 import { toTopic } from '@blog/service/shared/transformers/to-topic';
 import type { InferResultType } from 'groqd';
 
-import type { buildTopicPostsPageQuery } from './posts.query';
-import type { topicPageTopicQuery } from './topic.query';
-import type { TTopicPage } from './types';
+import type { topicPageQuery } from './query';
+import type { TTopicDetailPage } from './types';
 
-type TRawTopic = NonNullable<InferResultType<typeof topicPageTopicQuery>>;
-type TRawPosts = InferResultType<
-  ReturnType<typeof buildTopicPostsPageQuery>
->['posts'];
+export type TRawTopicPage = InferResultType<typeof topicPageQuery>;
 
-export type TTopicPagePagination = {
-  currentPage: number;
-  totalPages: number;
-};
+export function toTopicDetailPage(
+  rawPage: TRawTopicPage,
+  settings: TSiteSettings,
+  postListId: string,
+): TTopicDetailPage {
+  const topic = toTopic(rawPage.topic);
 
-export function toTopicPage(
-  rawTopic: TRawTopic,
-  rawPosts: TRawPosts,
-  pagination: TTopicPagePagination,
-): TTopicPage {
   return {
-    topic: toTopic(rawTopic),
-    posts: rawPosts.map(toArchivePostCard),
-    currentPage: pagination.currentPage,
-    totalPages: pagination.totalPages,
+    topic,
+    modules: (rawPage.modules ?? []).map(toModule),
+    seo: resolveSeo(
+      rawPage.seo ?? undefined,
+      { title: topic.title, description: topic.description },
+      {
+        description: settings.description,
+        defaultOgImageUrl: settings.defaultOgImageUrl,
+      },
+    ),
+    postListId,
   };
 }

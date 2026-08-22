@@ -32,7 +32,7 @@ frontend if a consumer is out of date.
 | Home    | `/`                            | ✅ Built — modules-as-documents (hero + `modules[]`)                                                                                                 |
 | Blog    | `/blog` + `/blog/page/N`       | ✅ Built — paginated index (#75)                                                                                                                     |
 | Post    | `/blog/[slug]`                 | ✅ Built — post detail page + JSON-LD (#76)                                                                                                          |
-| Topic   | `/topics/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589); renamed from `category` in #1812                                                          |
+| Topic   | `/topics/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589); renamed from `category` in #1812; CMS-authored via the `page_topic` document since #1915  |
 | Tag     | `/tag/[slug]` (+ `/page/N`)    | ✅ Built — unpaginated + paginated tag archives, shared-tag related posts, per-tag RSS (#674)                                                        |
 | Author  | `/author/[slug]` (+ `/page/N`) | ✅ Built — profile + posts by author, paginated (#327/#593-595/#744)                                                                                 |
 | Topics  | `/topics`                      | ✅ Built — hub listing every topic with post counts, links to archives (#750/#751/#752); CMS-authored via the `page_topicIndex` document since #1894 |
@@ -212,7 +212,8 @@ either: unset stays unset end to end. In `apps/web`, every module component
 that renders a `@blog/ui` organism — including those reached through a
 dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
 (§5 above): `module_hero` via the home template's `hero` slot,
-`module_postList` via `page_blog`'s `postList` reference, and
+`module_postList` via `page_blog`'s `postList` reference (and, since #1915,
+`page_topic`'s own `postList` reference on `/topics/[slug]`), and
 `module_taxonomyList` via `page_topicIndex`'s `taxonomyList` reference, all
 still styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated

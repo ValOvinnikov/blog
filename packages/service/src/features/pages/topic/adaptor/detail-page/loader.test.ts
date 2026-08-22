@@ -1,6 +1,7 @@
-import { makeRawTopic } from '@blog/service/testing/entities/fixtures';
+import { MissingPostListError } from '@blog/service/features/pages/topic/adaptor/missing-post-list-error';
+import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawArchivePostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawTopicPage } from '@blog/service/testing/pages/fixtures';
 
 import { getTopicPage } from './loader';
 
@@ -9,104 +10,130 @@ vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
+vi.mock('@blog/service/sanity/image', () => ({
+  urlForImage: vi.fn(
+    () => 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
+  ),
+}));
+
 describe('getTopicPage', () => {
-  it('returns null when the topic is not found', async () => {
-    mockRun
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({ posts: [], total: 0 });
-
-    const result = await getTopicPage('missing', { itemsPerPage: 9 });
-
-    expect(result).toBeNull();
-  });
-
-  it('maps the topic and its posts into a page object', async () => {
+  it('exposes the postList module id from page_topic.postList', async () => {
     mockRun
       .mockResolvedValueOnce(
-        makeRawTopic({ _id: 'topic-abc', title: 'Design' }),
+        makeRawTopicPage({ postList: { _id: 'post-list-1' } }),
       )
-      .mockResolvedValueOnce({
-        posts: [
-          makeRawArchivePostCard(),
-          makeRawArchivePostCard({ _id: 'post-2' }),
-        ],
-        total: 2,
-      });
+      .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getTopicPage('design', { itemsPerPage: 9 });
+    const result = await getTopicPage('engineering');
 
-    expect(result).not.toBeNull();
-    expect(result?.topic.id).toBe('topic-abc');
-    expect(result?.topic.title).toBe('Design');
-    expect(result?.posts).toHaveLength(2);
+    expect(result.postListId).toBe('post-list-1');
   });
 
-  it('returns an empty posts list when no posts belong to the topic', async () => {
+  it('takes the heading/supporting text from the referenced topic, not page_topic.title', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawTopic())
-      .mockResolvedValueOnce({ posts: [], total: 0 });
+      .mockResolvedValueOnce(
+        makeRawTopicPage({
+          topic: {
+            _id: 'topic-1',
+            title: 'Engineering',
+            slug: 'engineering',
+            description: 'Notes on building things.',
+          },
+        }),
+      )
+      .mockResolvedValueOnce(makeRawSiteSettings());
 
-    const result = await getTopicPage('engineering', { itemsPerPage: 9 });
+    const result = await getTopicPage('engineering');
 
-    expect(result?.posts).toEqual([]);
-  });
-
-  it('defaults to page 1 and returns pagination metadata when called without a page', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawTopic())
-      .mockResolvedValueOnce({ posts: [makeRawArchivePostCard()], total: 1 });
-
-    const result = await getTopicPage('engineering', { itemsPerPage: 9 });
-
-    expect(result?.currentPage).toBe(1);
-    expect(result?.totalPages).toBe(1);
-  });
-
-  it('returns the sliced page window with pagination metadata when a page is given', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTopic()).mockResolvedValueOnce({
-      posts: [
-        makeRawArchivePostCard({ _id: 'a' }),
-        makeRawArchivePostCard({ _id: 'b' }),
-      ],
-      total: 20,
+    expect(result.topic).toEqual({
+      id: 'topic-1',
+      title: 'Engineering',
+      slug: 'engineering',
+      description: 'Notes on building things.',
     });
-
-    const result = await getTopicPage('engineering', {
-      page: 2,
-      itemsPerPage: 5,
-    });
-
-    expect(result?.posts.map((p) => p.id)).toEqual(['a', 'b']);
-    expect(result?.currentPage).toBe(2);
-    expect(result?.totalPages).toBe(4);
+    expect(result.seo.title).toBe('Engineering');
   });
 
-  it('returns null for a paginated request when the topic is not found', async () => {
+  it('resolves seo from the topic title and site settings when the page has no authored seo', async () => {
     mockRun
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({ posts: [], total: 0 });
+      .mockResolvedValueOnce(
+        makeRawTopicPage({
+          topic: {
+            _id: 'topic-1',
+            title: 'Engineering',
+            slug: 'engineering',
+            description: null,
+          },
+          seo: null,
+        }),
+      )
+      .mockResolvedValueOnce(
+        makeRawSiteSettings({ description: 'Notes on building things.' }),
+      );
 
-    const result = await getTopicPage('missing', {
-      page: 2,
-      itemsPerPage: 9,
+    const result = await getTopicPage('engineering');
+
+    expect(result.seo).toEqual({
+      title: 'Engineering',
+      description: 'Notes on building things.',
+      ogTitle: 'Engineering',
+      ogDescription: 'Notes on building things.',
+      ogImageUrl: expect.stringContaining('sanity.io'),
     });
-
-    expect(result).toBeNull();
   });
 
-  it('tags the posts query with topic alongside posts', async () => {
+  it('resolves seo description from the topic description before falling back to site settings', async () => {
     mockRun
-      .mockResolvedValueOnce(makeRawTopic())
-      .mockResolvedValueOnce({ posts: [], total: 0 });
+      .mockResolvedValueOnce(
+        makeRawTopicPage({
+          topic: {
+            _id: 'topic-1',
+            title: 'Engineering',
+            slug: 'engineering',
+            description: 'Notes on building things.',
+          },
+          seo: null,
+        }),
+      )
+      .mockResolvedValueOnce(
+        makeRawSiteSettings({ description: 'Site default description' }),
+      );
 
-    await getTopicPage('engineering', { itemsPerPage: 9 });
+    const result = await getTopicPage('engineering');
+
+    expect(result.seo.description).toBe('Notes on building things.');
+  });
+
+  it('tags the page_topic query with topic and modules:postList alongside page_topic', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawTopicPage())
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    await getTopicPage('engineering');
 
     expect(mockRun).toHaveBeenNthCalledWith(
-      2,
+      1,
       expect.anything(),
       expect.objectContaining({
-        next: expect.objectContaining({ tags: ['posts', 'topic'] }),
+        parameters: { slug: 'engineering' },
+        next: expect.objectContaining({
+          tags: ['page_topic', 'topic', 'modules:postList'],
+        }),
       }),
     );
+  });
+
+  // Regression guard for the decision that a missing slot is a loud failure,
+  // never a substituted default: this must reject rather than resolve with
+  // an invented module id.
+  it('rejects with MissingPostListError when page_topic.postList is unset', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawTopicPage({ postList: null }))
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    await expect(getTopicPage('engineering')).rejects.toThrow(
+      MissingPostListError,
+    );
+    expect(mockRun).toHaveBeenCalledTimes(2);
   });
 });
