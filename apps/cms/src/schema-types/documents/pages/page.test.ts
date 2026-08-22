@@ -87,4 +87,12 @@ describe('genericSchema slug validation', () => {
 
     expect(customFn(undefined)).toBe(true);
   });
+
+  it('renders the shared URL-preview input', () => {
+    const slugField = genericSchema.fields?.find(
+      (field) => field.name === 'slug',
+    ) as { components?: { input?: unknown } } | undefined;
+
+    expect(typeof slugField?.components?.input).toBe('function');
+  });
 });

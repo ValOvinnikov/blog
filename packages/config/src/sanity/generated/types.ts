@@ -405,6 +405,7 @@ export type Page_topic = {
   _updatedAt: string;
   _rev: string;
   title?: string;
+  slug?: Slug;
   topic?: Blog_topicReference;
   postList?: Module_postListReference;
   modules?: Array<
@@ -419,6 +420,12 @@ export type Page_topic = {
       } & Module_newsletterReference)
   >;
   seo?: Seo;
+};
+
+export type Slug = {
+  _type: 'slug';
+  current?: string;
+  source?: string;
 };
 
 export type Module_taxonomyListReference = {
@@ -565,12 +572,6 @@ export type Page_generic = {
       } & Module_ctaReference)
   >;
   seo?: Seo;
-};
-
-export type Slug = {
-  _type: 'slug';
-  current?: string;
-  source?: string;
 };
 
 export type Blog_tag = {
@@ -820,6 +821,7 @@ export type AllSanitySchemaTypes =
   | Module_ctaReference
   | Module_newsletterReference
   | Page_topic
+  | Slug
   | Module_taxonomyListReference
   | Page_topicIndex
   | Module_taxonomyList
@@ -830,7 +832,6 @@ export type AllSanitySchemaTypes =
   | Module_hero
   | Module_contentReference
   | Page_generic
-  | Slug
   | Blog_tag
   | Blog_authorReference
   | Blog_tagReference

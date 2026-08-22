@@ -1,3 +1,4 @@
+import { createSlugUrlPreviewInput } from '@cms/schema-types/components/slug-url-preview-input';
 import { topicSchema } from '@cms/schema-types/documents/blog/topic';
 import { PAGE_TOPIC_TYPE } from '@cms/schema-types/documents/pages/page-topic-type';
 import { defineModulesField } from '@cms/schema-types/helpers/define-modules-field';
@@ -11,6 +12,7 @@ import { Tags } from 'lucide-react';
 import { defineField, defineType, type ValidationContext } from 'sanity';
 
 const TOPIC_UNIQUENESS_API_VERSION = '2024-01-01';
+const topicSlugUrlPreviewInput = createSlugUrlPreviewInput('/topics/');
 
 type TTopicReferenceValue = { _ref?: string } | undefined;
 
@@ -50,12 +52,27 @@ export const pageTopicSchema = defineType({
   icon: Tags,
   fields: [
     titleField(),
+    // Sanity's default slug `isUnique` check — scoped to this document type
+    // — is exactly the scope this field needs: /topics/{slug} collisions
+    // only matter within page_topic itself, never against page_generic's
+    // /{slug}. No custom `isUnique` override is needed on top of it.
+    defineField({
+      name: 'slug',
+      title: 'Slug',
+      type: 'slug',
+      description: 'URL path segment — auto-generated from title.',
+      options: {
+        source: 'title',
+        maxLength: 96,
+      },
+      components: { input: topicSlugUrlPreviewInput },
+      validation: (rule) => rule.required(),
+    }),
     defineField({
       name: 'topic',
       title: 'Topic',
       type: 'reference',
-      description:
-        'The topic this page represents — its slug becomes the /topics/{slug} URL.',
+      description: 'The topic this page represents.',
       to: [{ type: topicSchema.name }],
       validation: (rule) =>
         rule.required().custom(validateUniqueTopicReference),

@@ -23,10 +23,6 @@ const getField = (name: string) =>
   pageTopicSchema.fields?.find((field) => field.name === name);
 
 describe('pageTopicSchema shape', () => {
-  it('has no slug field — the URL comes from the referenced topic', () => {
-    expect(getField('slug')).toBeUndefined();
-  });
-
   it('title is required via the shared titleField() helper', () => {
     const titleFieldDefinition = getField('title');
 
@@ -82,6 +78,72 @@ describe('pageTopicSchema shape', () => {
 
   it('seo stays optional — no validation() builder attached', () => {
     expect(getField('seo')?.validation).toBeUndefined();
+  });
+});
+
+type TSlugFieldDefinition = {
+  type: 'slug';
+  options?: {
+    source?: string;
+    maxLength?: number;
+    isUnique?: unknown;
+  };
+  components?: { input?: unknown };
+  validation?: unknown;
+};
+
+describe('pageTopicSchema slug field', () => {
+  const getSlugField = () =>
+    getField('slug') as TSlugFieldDefinition | undefined;
+
+  it('is sourced from title with a 96-char max', () => {
+    const slugField = getSlugField();
+
+    if (!slugField || slugField.type !== 'slug') {
+      throw new Error('Expected pageTopicSchema to define a slug field.');
+    }
+
+    expect(slugField.options?.source).toBe('title');
+    expect(slugField.options?.maxLength).toBe(96);
+  });
+
+  it('is required', () => {
+    const slugField = getSlugField();
+
+    if (!slugField?.validation) {
+      throw new Error(
+        'Expected pageTopicSchema slug field to define validation.',
+      );
+    }
+
+    let requiredCalled = false;
+    const rule: TValidationRule = {
+      required: () => {
+        requiredCalled = true;
+        return rule;
+      },
+      custom: () => rule,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (slugField.validation as any)(rule);
+
+    expect(requiredCalled).toBe(true);
+  });
+
+  it('relies on the default per-document-type isUnique scope rather than overriding it', () => {
+    // /topics/{slug} collisions only matter within page_topic itself, which
+    // is exactly Sanity's default slug uniqueness scope — no custom
+    // `isUnique` is needed on top of it.
+    const slugField = getSlugField();
+
+    expect(slugField?.options?.isUnique).toBeUndefined();
+  });
+
+  it('renders the shared URL-preview input', () => {
+    const slugField = getSlugField();
+
+    expect(typeof slugField?.components?.input).toBe('function');
   });
 });
 
