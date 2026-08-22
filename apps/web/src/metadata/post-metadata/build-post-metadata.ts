@@ -16,9 +16,6 @@ export const buildPostMetadata = async (slug: string): Promise<Metadata> => {
     logger.error('post_metadata.fetch_failed', { slug, error: result.error });
     return {};
   }
-  if (result.data === null) {
-    return {};
-  }
 
   const { seo, publishedAt, author } = result.data;
 

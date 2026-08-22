@@ -60,10 +60,12 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
   const result = await service.pages.post.v1.getPost(slug);
 
   if (!result.ok) {
+    // `getPost` resolves `ok: false` both for a genuine fetch failure and for
+    // an ordinary missing slug (bad link, bot, stale bookmark) — the service
+    // layer's public result type doesn't distinguish the two (its
+    // `MissingPagePostError` isn't part of the exported surface), so this
+    // still logs at `error` for both, same limitation topic-page.tsx has.
     logger.error('blog_post_page.fetch_failed', { slug, error: result.error });
-    notFound();
-  }
-  if (result.data === null) {
     notFound();
   }
 
