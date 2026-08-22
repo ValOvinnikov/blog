@@ -9,7 +9,7 @@ import type { SlugInputProps } from 'sanity';
  * schema — `components.input` receives no arguments beyond the field's own
  * props, so each schema gets its own bound instance via this factory.
  */
-export function createSlugUrlPreviewInput(routePrefix: string) {
+export const createSlugUrlPreviewInput = (routePrefix: string) => {
   return function SlugUrlPreviewInput(props: SlugInputProps) {
     return (
       <Stack space={2}>
@@ -22,4 +22,4 @@ export function createSlugUrlPreviewInput(routePrefix: string) {
       </Stack>
     );
   };
-}
+};

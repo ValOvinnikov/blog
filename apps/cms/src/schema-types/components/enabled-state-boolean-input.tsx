@@ -8,7 +8,7 @@ import { FormField, type BooleanInputProps } from 'sanity';
  * keeps the title as a normal field label and shows the current value
  * ("Enabled"/"Disabled") next to the switch instead.
  */
-export function EnabledStateBooleanInput(props: BooleanInputProps) {
+export const EnabledStateBooleanInput = (props: BooleanInputProps) => {
   const {
     schemaType,
     value,
@@ -49,4 +49,4 @@ export function EnabledStateBooleanInput(props: BooleanInputProps) {
       </Card>
     </FormField>
   );
-}
+};

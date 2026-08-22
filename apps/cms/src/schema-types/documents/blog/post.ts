@@ -23,10 +23,10 @@ const HAS_PAGE_POST_API_VERSION = '2024-01-01';
  * post — `/blog/{slug}` 404s with no runtime fallback in that state, so
  * the editor should see the gap on the document they'd fix it from.
  */
-async function validateHasPagePost(
+const validateHasPagePost = async (
   document: SanityDocument | undefined,
   context: ValidationContext,
-): Promise<string | true> {
+): Promise<string | true> => {
   const publishedId = document?._id.replace(/^drafts\./, '');
 
   if (!publishedId) return true;
@@ -43,7 +43,7 @@ async function validateHasPagePost(
   return referencingCount > 0
     ? true
     : 'No Post Page references this post yet — /blog/{slug} will 404 until one is created.';
-}
+};
 
 export const postSchema = defineType({
   name: 'blog_post',

@@ -16,10 +16,10 @@ type TPostReferenceValue = { _ref?: string } | undefined;
  * — `/blog/{slug}` would otherwise be ambiguous. `perspective: 'drafts'`
  * so an unpublished conflicting page still counts.
  */
-async function validateUniquePostReference(
+const validateUniquePostReference = async (
   value: TPostReferenceValue,
   context: ValidationContext,
-): Promise<string | true> {
+): Promise<string | true> => {
   if (!value?._ref) return true;
 
   const publishedId = context.document?._id.replace(/^drafts\./, '');
@@ -38,7 +38,7 @@ async function validateUniquePostReference(
   return conflictingCount > 0
     ? 'Another Post Page already references this post — each post can only back one Post Page.'
     : true;
-}
+};
 
 export const pagePostSchema = defineType({
   name: PAGE_POST_TYPE,

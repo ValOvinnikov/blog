@@ -21,10 +21,10 @@ type TTopicReferenceValue = { _ref?: string } | undefined;
  * — `/topics/{slug}` would otherwise be ambiguous. `perspective: 'drafts'`
  * so an unpublished conflicting page still counts.
  */
-async function validateUniqueTopicReference(
+const validateUniqueTopicReference = async (
   value: TTopicReferenceValue,
   context: ValidationContext,
-): Promise<string | true> {
+): Promise<string | true> => {
   if (!value?._ref) return true;
 
   const publishedId = context.document?._id.replace(/^drafts\./, '');
@@ -43,7 +43,7 @@ async function validateUniqueTopicReference(
   return conflictingCount > 0
     ? 'Another Topic Page already references this topic — each topic can only back one Topic Page.'
     : true;
-}
+};
 
 export const pageTopicSchema = defineType({
   name: PAGE_TOPIC_TYPE,
