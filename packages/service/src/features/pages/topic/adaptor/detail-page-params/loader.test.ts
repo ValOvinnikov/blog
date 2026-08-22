@@ -16,11 +16,24 @@ describe('getTopicParams', () => {
     expect(params).toEqual([{ slug: 'engineering' }, { slug: 'design' }]);
   });
 
-  it('returns an empty array when there are no topics', async () => {
+  it('returns an empty array when there are no topic pages', async () => {
     mockRun.mockResolvedValue([]);
 
     const params = await getTopicParams();
 
     expect(params).toEqual([]);
+  });
+
+  it('tags the query with page_topic', async () => {
+    mockRun.mockResolvedValue([]);
+
+    await getTopicParams();
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        next: expect.objectContaining({ tags: ['page_topic'] }),
+      }),
+    );
   });
 });

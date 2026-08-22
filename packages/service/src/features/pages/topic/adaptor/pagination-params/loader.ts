@@ -4,21 +4,17 @@ import { topicPaginationParamsQuery } from './query';
 import { toTopicPaginationParams } from './transformer';
 
 /**
- * Builds the `{ slug, page }` params for every topic's pages 2…N. A
- * single correlated query returns every topic's slug and post count in
- * one round-trip (see `./query.ts`) — no per-slug fan-out.
- *
- * `itemsPerPage` has no default here — topics have no CMS-authored
- * page-size field like `page_blog.itemsPerPage`, so the caller must pass
- * the same value it also passes to `getTopicPage`'s `itemsPerPage` arg,
- * or the two will disagree on how many pages exist.
+ * Builds the `{ slug, page }` params for every topic page's pages 2…N. A
+ * single correlated query returns every topic page's slug, post count, and
+ * archive page size in one round-trip (see `./query.ts`) — no per-slug
+ * fan-out.
  */
-export async function getTopicPaginationParams(
-  itemsPerPage: number,
-): Promise<{ slug: string; page: string }[]> {
-  const topics = await runQuery(
+export async function getTopicPaginationParams(): Promise<
+  { slug: string; page: string }[]
+> {
+  const topicPages = await runQuery(
     topicPaginationParamsQuery,
-    isr(['topics', 'posts']),
+    isr(['page_topic', 'modules:postList', 'posts', 'topic']),
   );
-  return toTopicPaginationParams(topics, itemsPerPage);
+  return toTopicPaginationParams(topicPages);
 }

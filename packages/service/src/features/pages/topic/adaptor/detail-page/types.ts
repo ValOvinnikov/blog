@@ -1,9 +1,10 @@
-import type { TArchivePostCard } from '@blog/service/shared/transformers/to-archive-post-card';
+import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo';
+import type { TModule } from '@blog/service/shared/transformers/to-module';
 import type { TTopic } from '@blog/service/shared/transformers/to-topic';
 
-export type TTopicPage = {
+export type TTopicDetailPage = {
   topic: TTopic;
-  posts: TArchivePostCard[];
-  currentPage: number;
-  totalPages: number;
+  modules: TModule[];
+  seo: TSeoResolved;
+  postListId: string;
 };
