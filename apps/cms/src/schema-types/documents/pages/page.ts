@@ -1,4 +1,5 @@
 import { RESERVED_SLUGS } from '@blog/config/constants';
+import { createSlugUrlPreviewInput } from '@cms/schema-types/components/slug-url-preview-input';
 import { defineModulesField } from '@cms/schema-types/helpers/define-modules-field';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { contentSchema } from '@cms/schema-types/modules/module-content';
@@ -10,6 +11,8 @@ import { defineField, defineType } from 'sanity';
 type TSlugValue = {
   current?: string;
 };
+
+const genericSlugUrlPreviewInput = createSlugUrlPreviewInput('/');
 
 export const genericSchema = defineType({
   name: 'page_generic',
@@ -32,6 +35,7 @@ export const genericSchema = defineType({
         source: 'title',
         maxLength: 96,
       },
+      components: { input: genericSlugUrlPreviewInput },
       validation: (rule) =>
         rule.required().custom((value: TSlugValue | undefined) => {
           const current = value?.current;

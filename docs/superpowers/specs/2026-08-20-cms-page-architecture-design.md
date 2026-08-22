@@ -31,6 +31,12 @@ records the starting point the design argued from.
 | `/topics`                       | none                 | category cards; copy from i18n keys  | —                               |
 | `/blog/[slug]`                  | none (post document) | —                                    | —                               |
 
+`/blog/[slug]` reads "none" as of this design's original approval — E11
+(added 2026-08-22) gives it `page_post`, moving `slug`/`publishedAt` off the
+`post` document onto it. The row above is left as originally written, per
+this section's own note that it "records the starting point the design
+argued from."
+
 Three further symptoms of the same gap:
 
 - Category/tag/author page size is a **web-layer constant**, not content. The
@@ -57,19 +63,54 @@ admitted by its own kind of slot.
 
 `page_home`'s required-`hero` shape is the template for all of them.
 
-| Document          | Kind       | Required slot            | Also                 | Route                        |
-| ----------------- | ---------- | ------------------------ | -------------------- | ---------------------------- |
-| `page_home`       | singleton  | `hero`                   | `modules[]`          | `/`                          |
-| `page_blog`       | singleton  | `postList`               | `modules[]`          | `/blog`, `/blog/page/N`      |
-| `page_topicIndex` | singleton  | `taxonomyList`           | `modules[]`          | `/topics`                    |
-| `page_topic`      | per-entity | `postList` + `topic` ref | `modules[]`          | `/topics/{slug}`, `…/page/N` |
-| `page_tagIndex`   | singleton  | `taxonomyList`           | `modules[]`          | `/tags`                      |
-| `page_tag`        | per-entity | `postList` + `tag` ref   | `modules[]`          | `/tags/{slug}`, `…/page/N`   |
-| `page_generic`    | per-entity | —                        | `slug` + `modules[]` | `/{slug}`                    |
+| Document          | Kind       | Required slot            | Also                         | Route                        |
+| ----------------- | ---------- | ------------------------ | ---------------------------- | ---------------------------- |
+| `page_home`       | singleton  | `hero`                   | `modules[]`                  | `/`                          |
+| `page_blog`       | singleton  | `postList`               | `modules[]`                  | `/blog`, `/blog/page/N`      |
+| `page_topicIndex` | singleton  | `taxonomyList`           | `modules[]`                  | `/topics`                    |
+| `page_topic`      | per-entity | `postList` + `topic` ref | `slug` + `modules[]`         | `/topics/{slug}`, `…/page/N` |
+| `page_tagIndex`   | singleton  | `taxonomyList`           | `modules[]`                  | `/tags`                      |
+| `page_tag`        | per-entity | `postList` + `tag` ref   | `slug` + `modules[]`         | `/tags/{slug}`, `…/page/N`   |
+| `page_generic`    | per-entity | —                        | `slug` + `modules[]`         | `/{slug}`                    |
+| `page_post`       | per-entity | `post` ref               | `slug`, `publishedAt`, `seo` | `/blog/{slug}`               |
 
-Per-entity pages take their URL slug from the **referenced taxonomy document**,
-never from a slug field of their own — one source of truth, no way for the two
-to drift.
+Per-entity pages own their URL slug directly — `page_topic.slug` /
+`page_tag.slug` / `page_post.slug`, sourced from the page document's own
+`title`, same mechanics as `page_generic.slug` already uses. This is a
+**revision** of the original design (which put the slug on the referenced
+taxonomy document instead — see "Decisions taken" below): the page is what
+actually defines the route, so the routing concern belongs there, not on the
+content entity it describes. `blog_topic`/`blog_tag`/`post` carry no slug of
+their own once each epic's migration retires it — still one source of truth,
+now living on the page side.
+
+**E6 shipped partway through this revision** (#1912): `page_topic` gains its
+own `slug`, but `blog_topic.slug` is not removed in the same change — it stays
+live (deprecated) until the `service`/`web` sub-issues of E6 have moved their
+reads onto `page_topic.slug`, then a follow-up migration retires it. E8 has
+not started yet, so it applies the revised design from the start: `page_tag`
+is built with its own `slug` and `blog_tag.slug` is retired in the same epic,
+no deprecation window needed. **E11** (new, see below) applies the same
+from-the-start treatment to posts: `page_post` owns `slug` **and**
+`publishedAt`, and `post.slug`/`post.publishedAt` retire in the same epic.
+
+`page_post` differs from `page_topic`/`page_tag` in shape: it has no
+`postList`/`modules[]` slot, because an individual post page isn't a
+composed archive — it renders the referenced `post`'s own body. Its required
+relationship is the reverse direction too: `post` is the thing being
+published, `page_post` is the publication record around it (slug +
+published-at), enforced one-to-one by the same uniqueness pattern as
+`page_topic`'s topic reference — a second `page_post` referencing an
+already-published `post` is rejected.
+
+### Slug fields show the resulting URL
+
+Every per-entity page's `slug` field (`page_topic`, `page_tag`, `page_post`,
+`page_generic`) gets a custom Studio input component rendering the full
+resulting path directly beneath the slug value — e.g. `/topics/my-slug` — so
+an editor sees the real URL while typing, not just the path segment. One
+shared component, parameterized by each schema's route prefix (`/topics/`,
+`/tags/`, `/blog/`, `/`), rather than four near-duplicate ones.
 
 Every "required slot" above is a **reference to a standalone `module_*`
 document**, exactly as `page_home.hero` already references a `module_hero`.
@@ -231,19 +272,22 @@ is deleted outright.
 
 ### Missing page documents 404
 
-A taxonomy entry with no page document has no archive — the route 404s. The
-page document is the source of truth, and no runtime fallback path exists.
+A taxonomy entry with no page document has no archive — the route 404s. A
+post with no `page_post` (E11) has no detail page, same rule. The page
+document is the source of truth, and no runtime fallback path exists.
 
-Two compensating guards:
+Two compensating guards, applied to every referenced-content type
+(`blog_topic`, `blog_tag`, `post`):
 
-- A **Studio validation warning** on the taxonomy document when nothing
+- A **Studio validation warning** on the content document when nothing
   references it, so the editor sees the problem where they would fix it.
 - A **Studio validation rule** rejecting a second page document that references
-  an already-covered taxonomy entry, so `/topics/{slug}` can never be
-  ambiguous.
+  an already-covered content document, so `/topics/{slug}` (or `/blog/{slug}`
+  for E11) can never be ambiguous.
 
-Accepted trade-off: every new tag needs its page document created, or its
-archive 404s. This was chosen with the cost visible (see Migration).
+Accepted trade-off: every new tag, topic, or post needs its page document
+created, or its route 404s. This was chosen with the cost visible (see
+Migration).
 
 ## New components
 
@@ -297,13 +341,32 @@ dataset first:
    it, then delete the original in a _separate_ follow-up migration once the
    reference has moved.
 5. Create `page_topic` ×1 and `page_tag` ×15, each with its own
-   `module_postList`, plus the `page_topicIndex` and `page_tagIndex`
-   singletons with their `module_taxonomyList`.
+   `module_postList` and its `slug` copied from the corresponding
+   `blog_topic.slug` / `blog_tag.slug` (see the slug-ownership revision
+   above — this preserves today's URLs unchanged), plus the `page_topicIndex`
+   and `page_tagIndex` singletons with their `module_taxonomyList`.
+6. **Retire `blog_topic.slug`.** A follow-up migration, run only after E6's
+   `service`/`web` sub-issues have moved their reads onto `page_topic.slug` —
+   unsets the now-dead field on the 1 existing `blog_topic` document. There is
+   no equivalent follow-up for `blog_tag.slug`: E8 hasn't shipped anything
+   yet, so it retires `blog_tag.slug` as part of its own migration (step 5's
+   `page_tag` seeding) rather than needing a second pass.
+7. **Create `page_post` ×12, one per existing `post`.** Each carries the
+   post's current `slug` and `publishedAt`, copied across so today's URLs and
+   publish dates are unchanged. Same create-first-remove-later shape as step
+   6, not step 5's tags/topics case: `page_post` is new work (E11), but
+   `/blog/{slug}` is a live route today, so it gets the deprecation window
+   rather than a same-epic cut.
+8. **Retire `post.slug` and `post.publishedAt`.** A follow-up migration, run
+   only after E11's `service`/`web` sub-issues have moved their reads onto
+   `page_post`. Unsets both now-dead fields on all 12 `post` documents.
 
 Steps 1–2 belong to E1 and steps 3–4 to E4. Step 5 splits four ways: the
 `page_topic` seeding to E6 and `page_tag` to E8, with the `page_topicIndex`
 and `page_tagIndex` singletons and their `module_taxonomyList` belonging to
-the index-page epics that introduce them, E5 and E7.
+the index-page epics that introduce them, E5 and E7. Step 6 belongs to E6,
+sequenced after that epic's `service`/`web` sub-issues. Steps 7–8 belong to
+E11, step 8 sequenced the same way as step 6.
 
 **Deploy ordering:** run steps 1–2 against `production` _before_ deploying the
 web code that reads `topic`, so no window exists where live documents have
@@ -363,15 +426,17 @@ with real routes. It is currently
 
 ## Decisions taken, with their rejected alternatives
 
-| Decision                                                  | Rejected alternative                                                                                      | Why                                                                                                                                                                                                              |
-| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Post list is a required slot                              | An item inside `modules[]` with a max-one validation rule                                                 | The field makes duplicates structurally impossible and a page can never render empty — no seeding fallback, no validation rule                                                                                   |
-| Two module types, `module_postList` + `module_postLatest` | One module with the mode inferred by slot; or an explicit editor mode field                               | The type is the mode: impossible combinations become unrepresentable in the Studio and in TypeScript, each type carries only its own fields, and the editor picks by intent rather than by where they dropped it |
-| Per-entity page documents referencing the taxonomy        | A per-kind singleton configuring all archives; or `modules[]` on the taxonomy document (#1332's approach) | Each entry gets its own composable page; the taxonomy document stays pure taxonomy rather than becoming page-shaped                                                                                              |
-| Rename to `topic` everywhere                              | URL-only rename keeping `blog_category`                                                                   | A lasting vocabulary mismatch between Studio and URLs is worse than one non-splittable PR                                                                                                                        |
-| Author pages removed                                      | Converting them to `page_author` documents                                                                | An author profile is an ordinary page; the byline link is already optional and JSON-LD emits no author URL                                                                                                       |
-| 404 on missing page document                              | Runtime fallback to a default archive                                                                     | Keeps a single code path; guarded by two Studio validation rules                                                                                                                                                 |
-| `pageSize` widened to 1–24                                | Keeping the teaser's 1–12 for both                                                                        | 12 would silently cap the blog index below the 24 `itemsPerPage` already allowed                                                                                                                                 |
+| Decision                                                  | Rejected alternative                                                                                         | Why                                                                                                                                                                                                              |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Post list is a required slot                              | An item inside `modules[]` with a max-one validation rule                                                    | The field makes duplicates structurally impossible and a page can never render empty — no seeding fallback, no validation rule                                                                                   |
+| Two module types, `module_postList` + `module_postLatest` | One module with the mode inferred by slot; or an explicit editor mode field                                  | The type is the mode: impossible combinations become unrepresentable in the Studio and in TypeScript, each type carries only its own fields, and the editor picks by intent rather than by where they dropped it |
+| Per-entity page documents referencing the taxonomy        | A per-kind singleton configuring all archives; or `modules[]` on the taxonomy document (#1332's approach)    | Each entry gets its own composable page; the taxonomy document stays pure taxonomy rather than becoming page-shaped                                                                                              |
+| Rename to `topic` everywhere                              | URL-only rename keeping `blog_category`                                                                      | A lasting vocabulary mismatch between Studio and URLs is worse than one non-splittable PR                                                                                                                        |
+| Author pages removed                                      | Converting them to `page_author` documents                                                                   | An author profile is an ordinary page; the byline link is already optional and JSON-LD emits no author URL                                                                                                       |
+| 404 on missing page document                              | Runtime fallback to a default archive                                                                        | Keeps a single code path; guarded by two Studio validation rules                                                                                                                                                 |
+| `pageSize` widened to 1–24                                | Keeping the teaser's 1–12 for both                                                                           | 12 would silently cap the blog index below the 24 `itemsPerPage` already allowed                                                                                                                                 |
+| `page_topic`/`page_tag`/`page_post` own their `slug`      | Slug lives on the referenced content document (`blog_topic`/`blog_tag`/`post`), the page has none of its own | Superseded mid-E6 (see the slug-ownership revision above): the page document is what defines the route, so the routing concern belongs there — the content document stays pure content, not a URL source         |
+| `page_post` also owns `publishedAt` (E11)                 | Leave `publishedAt` on `post`, only move `slug`                                                              | Same reasoning extended one field further: "when this is published as a page" is a page-level fact, not a property of the content itself — `post` keeps title/body/author, `page_post` keeps slug + publish date |
 
 ## Delivery — one epic per page surface
 
@@ -468,11 +533,16 @@ and intro copy out of i18n keys into content. Sub-issues: cms → service → we
 plus the migration seeding the singleton and its `module_taxonomyList`
 (migration step 5 above).
 
-**E6 — `/topics/{slug}` page.** `page_topic` with its required `postList` slot
-and `topic` reference; retires `CATEGORY_ITEMS_PER_PAGE` and the hardcoded
-category grid; adds both Studio validation rules (uniqueness of the reference,
-and the missing-page warning on the taxonomy document). Sub-issues: cms →
-service → web, plus the seeding migration for the 1 existing topic.
+**E6 — `/topics/{slug}` page.** `page_topic` with its required `postList` slot,
+`topic` reference, and its own `slug` (see the slug-ownership revision above);
+retires `CATEGORY_ITEMS_PER_PAGE` and the hardcoded category grid; adds both
+Studio validation rules (uniqueness of the reference, and the missing-page
+warning on the taxonomy document). Sub-issues: cms → service → web, plus the
+seeding migration for the 1 existing topic — which now also copies
+`blog_topic.slug` onto the new `page_topic.slug`, preserving today's URL.
+`blog_topic.slug` itself is **not** removed by this epic; it stays live until
+`service`/`web` have moved their reads onto `page_topic.slug`, then a
+follow-up migration retires it.
 
 **E7 — `/tags` index page.** `page_tagIndex` singleton, mirroring E5. New route
 — nothing exists today. Sub-issues: cms → service → web, plus the same
@@ -480,7 +550,11 @@ singleton-seeding migration as E5.
 
 **E8 — `/tags/{slug}` page.** `page_tag`, the `/tag/` → `/tags/` URL move, the
 `/tags/{slug}/rss.xml` feed move, and the seeding migration for
-**15 tags** (30 documents, per Migration above). Retires `TAG_ITEMS_PER_PAGE`
+**15 tags** (30 documents, per Migration above). `page_tag` is built with its
+own `slug` from the start (unlike E6, this epic has not shipped anything yet,
+so there is no deprecation window) — the seeding migration sets it from each
+`blog_tag.slug`, and `blog_tag.slug` is removed in the same epic once
+`service`/`web` land, not as a later follow-up. Retires `TAG_ITEMS_PER_PAGE`
 and the hardcoded tag grid. Sub-issues: config (routes helper) → cms → service
 → web. The largest page epic, because of the seeding.
 
@@ -511,14 +585,33 @@ Generic pages still render their content and CTA modules through
 survives for them to receive — `MODULE_PAGE_CONTEXT` goes away with the rest of
 the contract.
 
+**E11 — `/blog/{slug}` page (added 2026-08-22).** `page_post`: a required,
+unique reference to `post`, plus its own `slug` and `publishedAt` — moved off
+`post`, which keeps only its content fields (title, body, author, etc.). No
+`postList`/`modules[]` slot; a post page renders the referenced post's own
+body, it doesn't compose an archive. Two Studio validation rules, mirroring
+E6's: uniqueness (reject a second `page_post` referencing an already-published
+`post`) and a missing-page warning on `post` (consistent with this design's
+"404, no runtime fallback" policy — a warning, not a hard block, same
+reasoning as the other per-entity pages). Sub-issues: cms → service → web,
+plus a seeding migration creating one `page_post` per existing `post` (12 in
+production, per Migration above), copying `slug` and `publishedAt`; a
+follow-up migration then retires both fields from `post` once `service`/`web`
+have moved their reads onto `page_post`. Same deprecation-window shape as E6,
+not E8 — `/blog/{slug}` is a live, high-traffic detail route today, so the cut
+gets the same two-step care as `blog_topic.slug`. **Independent of E5–E9** —
+can run any time, though naturally sequenced after E4 since `/blog` itself
+already carries the page pattern this extends.
+
 ### Order
 
-`E1 → E2 → E3 → E4 → (E5, E6) → (E7, E8)`, with **E9 parallel** any time
-after E1. (E10 was dropped; it was a leaf, so nothing re-orders.) E5/E6 and E7/E8 are each an index-and-children pair and are best
-reviewed together in sequence, though either merges green alone.
+`E1 → E2 → E3 → E4 → (E5, E6) → (E7, E8)`, with **E9 and E11 parallel** any
+time after E1 (E11 more naturally after E4). (E10 was dropped; it was a leaf,
+so nothing re-orders.) E5/E6 and E7/E8 are each an index-and-children pair and
+are best reviewed together in sequence, though either merges green alone.
 
 `@blog/db`'s `starter-content.ts` is a sibling sub-issue in every epic that
-changes Sanity fixtures — E1, E6, and E8.
+changes Sanity fixtures — E1, E6, E8, and E11.
 
 ## Board actions
 
