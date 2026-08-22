@@ -6,6 +6,7 @@ import { topicSchema } from '@cms/schema-types/documents/blog/topic';
 import { blogPageSchema } from '@cms/schema-types/documents/pages/blog-page';
 import { homePageSchema } from '@cms/schema-types/documents/pages/home-page';
 import { genericSchema } from '@cms/schema-types/documents/pages/page';
+import { pagePostSchema } from '@cms/schema-types/documents/pages/page-post';
 import { pageTopicSchema } from '@cms/schema-types/documents/pages/page-topic';
 import { topicIndexPageSchema } from '@cms/schema-types/documents/pages/topic-index-page';
 import { footerSchema } from '@cms/schema-types/documents/settings/footer';
@@ -106,7 +107,7 @@ export default defineConfig({
                               .schemaType(blogPageSchema.name)
                               .documentId(blogPageSchema.name),
                           ),
-                        S.documentTypeListItem(postSchema.name)
+                        S.documentTypeListItem(pagePostSchema.name)
                           .title('Post Pages')
                           .icon(Newspaper),
                         S.listItem()

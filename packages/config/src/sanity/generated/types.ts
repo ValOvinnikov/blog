@@ -370,6 +370,25 @@ export type Settings_site = {
   defaultOgImage?: ImageWithAlt;
 };
 
+export type Page_post = {
+  _id: string;
+  _type: 'page_post';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  post?: Blog_postReference;
+  publishedAt?: string;
+  seo?: Seo;
+};
+
+export type Slug = {
+  _type: 'slug';
+  current?: string;
+  source?: string;
+};
+
 export type Module_postListReference = {
   _ref: string;
   _type: 'reference';
@@ -420,12 +439,6 @@ export type Page_topic = {
       } & Module_newsletterReference)
   >;
   seo?: Seo;
-};
-
-export type Slug = {
-  _type: 'slug';
-  current?: string;
-  source?: string;
 };
 
 export type Module_taxonomyListReference = {
@@ -816,12 +829,13 @@ export type AllSanitySchemaTypes =
   | Settings_footer
   | Settings_navigation
   | Settings_site
+  | Page_post
+  | Slug
   | Module_postListReference
   | Module_postLatestReference
   | Module_ctaReference
   | Module_newsletterReference
   | Page_topic
-  | Slug
   | Module_taxonomyListReference
   | Page_topicIndex
   | Module_taxonomyList
