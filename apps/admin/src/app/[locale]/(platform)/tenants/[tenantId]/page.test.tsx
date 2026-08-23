@@ -4,16 +4,22 @@ import { makeTenant } from '@admin/testing/tenants/fixtures';
 
 import TenantStatusPage from './page';
 
-const { listTenantsByIdsMock, getDomainVerificationStatusMock } = vi.hoisted(
-  () => ({
-    listTenantsByIdsMock: vi.fn(),
-    getDomainVerificationStatusMock: vi.fn(),
-  }),
-);
+const {
+  listTenantsByIdsMock,
+  getTenantOwnerEmailMock,
+  getDomainVerificationStatusMock,
+} = vi.hoisted(() => ({
+  listTenantsByIdsMock: vi.fn(),
+  getTenantOwnerEmailMock: vi.fn(),
+  getDomainVerificationStatusMock: vi.fn(),
+}));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
-  queries: { tenants: { listTenantsByIds: listTenantsByIdsMock } },
+  queries: {
+    tenants: { listTenantsByIds: listTenantsByIdsMock },
+    memberships: { getTenantOwnerEmail: getTenantOwnerEmailMock },
+  },
 }));
 
 vi.mock('@admin/server/provisioning/get-domain-verification-status', () => ({
@@ -57,6 +63,8 @@ const setup = customRenderAsync(TenantStatusPage, {
 describe(TenantStatusPage, () => {
   beforeEach(() => {
     listTenantsByIdsMock.mockReset();
+    getTenantOwnerEmailMock.mockReset();
+    getTenantOwnerEmailMock.mockResolvedValue('owner@example.com');
     getDomainVerificationStatusMock.mockReset();
     getDomainVerificationStatusMock.mockResolvedValue('NOT_CONFIGURED');
   });
@@ -68,6 +76,7 @@ describe(TenantStatusPage, () => {
     await setup();
 
     expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
+    expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(tenant.id);
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
       'acme.example.com',
     );
@@ -77,6 +86,16 @@ describe(TenantStatusPage, () => {
     expect(
       screen.getByRole('button', { name: 'Deprovision tenant' }),
     ).toBeVisible();
+  });
+
+  it("shows the invited-pending owner badge when the tenant's owner has not resolved to a real user yet", async () => {
+    const tenant = makeTenant();
+    listTenantsByIdsMock.mockResolvedValue([tenant]);
+    getTenantOwnerEmailMock.mockResolvedValue(undefined);
+
+    await setup();
+
+    expect(screen.getByText('Invited, pending')).toBeVisible();
   });
 
   it('404s for an unknown tenant id', async () => {

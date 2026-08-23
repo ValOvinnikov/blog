@@ -8,6 +8,7 @@ import { tenantStatusViewVariants } from './tenant-status-view-variants';
 export type TTenantStatusViewProps = {
   tenant: TTenant;
   domainVerificationStatus: TDomainVerificationStatus;
+  ownerEmail: string | undefined;
 };
 
 /**
@@ -19,6 +20,7 @@ export type TTenantStatusViewProps = {
 export const TenantStatusView = ({
   tenant,
   domainVerificationStatus,
+  ownerEmail,
 }: TTenantStatusViewProps) => {
   const { root } = tenantStatusViewVariants();
 
@@ -27,6 +29,7 @@ export const TenantStatusView = ({
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus={domainVerificationStatus}
+        ownerEmail={ownerEmail}
       />
       <DeprovisionTenantControl tenant={tenant} />
     </div>

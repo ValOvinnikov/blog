@@ -78,6 +78,11 @@ const DNS_TONE: Record<TDomainVerificationStatus, 'ok' | 'warn' | 'neutral'> = {
 type TProvisioningStatusViewProps = {
   tenant: TTenant;
   domainVerificationStatus: TDomainVerificationStatus;
+  // `undefined` means the tenant's OWNER row is still a pending
+  // `membershipInvites` entry rather than a real `memberships` row (see
+  // `queries.memberships.getTenantOwnerEmail`) — every tenant has exactly
+  // one of the two from the moment it's created.
+  ownerEmail: string | undefined;
 };
 
 /**
@@ -92,6 +97,7 @@ type TProvisioningStatusViewProps = {
 export const ProvisioningStatusView = ({
   tenant,
   domainVerificationStatus,
+  ownerEmail,
 }: TProvisioningStatusViewProps) => {
   const t = useTranslations('provisioningStatusView');
   const router = useRouter();
@@ -128,6 +134,7 @@ export const ProvisioningStatusView = ({
   const {
     root,
     header,
+    ownerRow,
     startAction,
     layout,
     steps,
@@ -227,6 +234,14 @@ export const ProvisioningStatusView = ({
           {tenant.name}
         </Heading>
         <Text variant="supporting">{t('description')}</Text>
+        {!ownerEmail && (
+          <div className={ownerRow()}>
+            <Text variant="hint">{t('ownerLabel')}</Text>
+            <StatusBadge tone="warn">
+              {t('ownerInvitedPendingBadge')}
+            </StatusBadge>
+          </div>
+        )}
       </div>
 
       {allIdle && (
