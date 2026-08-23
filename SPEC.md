@@ -350,6 +350,16 @@ plan, since a disabled client control is never the real gate. Validation
 limits and layout thresholds (mentioned in the original phase scope) were
 cut with no concrete values ever specified; tracked separately (#1920).
 
+**Curated UI copy lives in Voice, not on modules.** Empty-state and other
+curated UI strings have exactly one authorable home: `settings_voice`'s
+`emptyStates` group (`blogListEmpty`, `categoryEmpty`, `tagEmpty`, …), applied
+via the merge above. A module-level field for the same copy (e.g. a
+`module_postList.emptyMessage`, removed in #1899 for exactly this reason)
+creates a second, uncoordinated home that silently wins over the tenant's
+Voice override with no error or warning — the worst failure mode for a
+settings surface. Any future module needing curated copy renders the i18n
+key directly; it does not grow its own override field.
+
 Full schema reference (every document/object, field-by-field), naming and
 validation conventions, incl. the `layout`/`sectionHeader` objects' own
 field lists:
