@@ -118,6 +118,7 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/');
     expect(urls).toContain('https://example.com/blog');
     expect(urls).toContain('https://example.com/topics');
+    expect(urls).toContain('https://example.com/tags');
     expect(urls).toContain('https://example.com/blog/page/2');
     expect(urls).toContain('https://example.com/blog/page/3');
     expect(urls).toContain('https://example.com/blog/first-post');
