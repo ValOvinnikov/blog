@@ -325,6 +325,17 @@ only if you use its parts as documented — a `Dialog.Root` re-implemented with 
   not add one; if a ticket needs localized admin copy, report it back.
 - **No SEO surface.** No `generateMetadata` beyond a plain title, no sitemap,
   no robots, no feeds. This app should not be indexed.
+- **Voice settings mirror a curated subset of `apps/web`'s i18n keys.**
+  `src/utils/voice-fields/voice-fields.ts` (`TVoiceOverrideKey`,
+  `VOICE_FIELD_GROUPS`) is the Postgres-backed port of
+  `apps/cms/src/schema-types/documents/settings/voice.ts`'s field set — both
+  must stay in lockstep with `apps/web`'s
+  `src/utils/apply-voice-overrides/apply-voice-overrides.ts` mapping. When a
+  ticket adds a new tenant-customizable "voice" copy key (empty-states,
+  error/not-found messages, prompts, toasts — not nav labels or
+  `ariaLabel`s), add the field here and in the CMS schema alongside web's
+  i18n key. No `packages/db` migration is needed — `voiceOverrides` is an
+  open-ended JSONB column.
 - Per-role page access beyond the coarse split above is not fully settled — the
   design doc states the default assumption and flags it as open. Follow the
   ticket; if the ticket is silent, report the ambiguity rather than choosing.

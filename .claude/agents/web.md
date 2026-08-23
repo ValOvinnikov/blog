@@ -342,6 +342,19 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
   folder-naming rule (see `apps/web/eslint.config.js`) because Next.js uses
   `[dynamic]` and `(group)` folder conventions there.
 
+## New i18n keys that are tenant-customizable "voice" copy also need a Voice override
+
+A curated ~20-key subset of `src/i18n/messages/en.json` is tenant-overridable
+through `apps/admin`'s Voice settings tab (`packages/db`'s `voiceOverrides`
+JSONB column) — empty-states, not-found messages, terminal prompts, bookmark
+toasts. `src/utils/apply-voice-overrides/apply-voice-overrides.ts` maps each
+override key to its i18n path. When a new i18n key is genuinely that kind of
+copy (not a nav label, breadcrumb, or `ariaLabel` — those stay i18n-only),
+add its mapping there too, and coordinate the matching field in
+`apps/cms/src/schema-types/documents/settings/voice.ts` and
+`apps/admin/src/utils/voice-fields/voice-fields.ts` (`admin-app` owns that
+half). No `packages/db` migration is needed — the column is open-ended JSONB.
+
 ## SEO / feeds / a11y
 
 - **Follow the `seo-and-metadata` skill**
