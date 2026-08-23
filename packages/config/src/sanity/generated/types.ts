@@ -605,32 +605,6 @@ export type Module_hero = {
   layout?: HeroLayout;
 };
 
-export type Module_contentReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_content';
-};
-
-export type Page_generic = {
-  _id: string;
-  _type: 'page_generic';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  modules?: Array<
-    | ({
-        _key: string;
-      } & Module_contentReference)
-    | ({
-        _key: string;
-      } & Module_ctaReference)
-  >;
-  seo?: Seo;
-};
-
 export type Blog_tag = {
   _id: string;
   _type: 'blog_tag';
@@ -718,6 +692,33 @@ export type Blog_author = {
       _key: string;
     } & SocialLink
   >;
+  profilePage?: Page_genericReference;
+};
+
+export type Module_contentReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_content';
+};
+
+export type Page_generic = {
+  _id: string;
+  _type: 'page_generic';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_contentReference)
+    | ({
+        _key: string;
+      } & Module_ctaReference)
+  >;
+  seo?: Seo;
 };
 
 export type MediaTag = {
@@ -884,8 +885,6 @@ export type AllSanitySchemaTypes =
   | Module_heroReference
   | Page_home
   | Module_hero
-  | Module_contentReference
-  | Page_generic
   | Blog_tag
   | Blog_authorReference
   | Blog_post
@@ -893,6 +892,8 @@ export type AllSanitySchemaTypes =
   | SanityImageHotspot
   | Blog_topic
   | Blog_author
+  | Module_contentReference
+  | Page_generic
   | MediaTag
   | Code
   | SanityImagePaletteSwatch
