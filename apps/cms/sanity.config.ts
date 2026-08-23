@@ -7,6 +7,7 @@ import { blogPageSchema } from '@cms/schema-types/documents/pages/blog-page';
 import { homePageSchema } from '@cms/schema-types/documents/pages/home-page';
 import { genericSchema } from '@cms/schema-types/documents/pages/page';
 import { pagePostSchema } from '@cms/schema-types/documents/pages/page-post';
+import { pageTagSchema } from '@cms/schema-types/documents/pages/page-tag';
 import { pageTopicSchema } from '@cms/schema-types/documents/pages/page-topic';
 import { tagIndexPageSchema } from '@cms/schema-types/documents/pages/tag-index-page';
 import { topicIndexPageSchema } from '@cms/schema-types/documents/pages/topic-index-page';
@@ -132,6 +133,9 @@ export default defineConfig({
                               .schemaType(tagIndexPageSchema.name)
                               .documentId(tagIndexPageSchema.name),
                           ),
+                        S.documentTypeListItem(pageTagSchema.name)
+                          .title('Tag Pages')
+                          .icon(Tag),
                       ],
                     },
                     {
