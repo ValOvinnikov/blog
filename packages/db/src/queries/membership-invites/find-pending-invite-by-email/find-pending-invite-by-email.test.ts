@@ -67,6 +67,16 @@ describe(findPendingInviteByEmail, () => {
     expect(results[0]).toMatchObject({ tenantId, email: 'owner@example.com' });
   });
 
+  it('matches an email padded with leading/trailing whitespace', async () => {
+    const tenantId = await insertTenant('acme');
+    await insertInvite(tenantId, 'owner@example.com');
+
+    const results = await findPendingInviteByEmail('  owner@example.com  ');
+
+    expect(results).toHaveLength(1);
+    expect(results[0]).toMatchObject({ tenantId, email: 'owner@example.com' });
+  });
+
   it('excludes already-consumed invites', async () => {
     const tenantId = await insertTenant('acme');
     await insertInvite(tenantId, 'owner@example.com', true);

@@ -104,6 +104,25 @@ describe(createMembershipInvite, () => {
     expect(rows).toHaveLength(1);
   });
 
+  it('is idempotent (trimming whitespace) for a duplicate invite padded with leading/trailing spaces', async () => {
+    const tenantId = await insertTenant('acme');
+    await createMembershipInvite(
+      tenantId,
+      'owner@example.com',
+      MEMBERSHIP_ROLE.OWNER,
+    );
+
+    const result = await createMembershipInvite(
+      tenantId,
+      '  owner@example.com  ',
+      MEMBERSHIP_ROLE.OWNER,
+    );
+
+    expect(result.outcome).toBe('already-pending');
+    const rows = await db.select().from(schema.membershipInvites);
+    expect(rows).toHaveLength(1);
+  });
+
   it('reports already-consumed for a duplicate invite whose original was already consumed', async () => {
     const tenantId = await insertTenant('acme');
     const first = await createMembershipInvite(
