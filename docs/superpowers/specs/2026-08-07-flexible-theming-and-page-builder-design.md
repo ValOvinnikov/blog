@@ -160,9 +160,9 @@ ramp from a base lightness + neutral hue. Recorded as a follow-up, not v1.
 > **Superseded 2026-08-23 by
 > [`2026-08-23-module-and-page-type-portfolio-design.md`](./2026-08-23-module-and-page-type-portfolio-design.md)
 > — build from that doc, not this section.** These three features moved from
-> #1285 (a closed-set program) to #1919 (`feat: module & page-type
-portfolio`, an ongoing epic) because new-module and new-page-type work is
-> open-ended and keeps growing past any one phase. The full design (module
+> #1285 (a closed-set program) to #1919, an ongoing module & page-type
+> portfolio epic — new-module and new-page-type work is open-ended and keeps
+> growing past any one phase. The full design (module
 > catalogue, contact-form composition, portfolio content model/surfaces) now
 > lives in that doc, which stays live and grows with the catalogue instead of
 > being deleted once its first pass ships; this section is intentionally left

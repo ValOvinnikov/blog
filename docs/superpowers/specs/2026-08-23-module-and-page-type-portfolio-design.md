@@ -171,9 +171,8 @@ Whether `/work/{slug}` is a page document or a plain entity route is this
 strand's own call — the desk grouping holds either way.
 
 **Service / UI / Web.** A `service.pages.work.*` slice; reuse `PostsSection`
-/ `PostCard` where shapes align (or a thin `ProjectCard` variant); web routes
-
-- `generateMetadata` per `seo-and-metadata`.
+/ `PostCard` where shapes align (or a thin `ProjectCard` variant); web routes,
+plus `generateMetadata` per `seo-and-metadata`.
 
 **Migration.** None — new document type and new routes are additive.
 Existing posts are untouched.
