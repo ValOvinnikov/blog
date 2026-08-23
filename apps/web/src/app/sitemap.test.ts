@@ -183,7 +183,7 @@ describe('sitemap', () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
-    expect(urls).not.toContain('https://example.com/tag/typescript/page/2');
+    expect(urls).not.toContain('https://example.com/tags/typescript/page/2');
     expect(urls).toContain('https://example.com/');
   });
 
@@ -325,7 +325,7 @@ describe('sitemap', () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
-    expect(urls).not.toContain('https://example.com/tag/typescript');
+    expect(urls).not.toContain('https://example.com/tags/typescript');
     expect(urls).toContain('https://example.com/');
   });
 
