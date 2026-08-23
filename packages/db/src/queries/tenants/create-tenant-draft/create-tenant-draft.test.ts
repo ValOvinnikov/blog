@@ -22,7 +22,7 @@ const draftInput: TCreateTenantDraftInput = {
   domain: 'acme.example.com',
   locale: 'en',
   plan: TENANT_PLAN.FREE,
-  ownerUserId: 'user-1',
+  owner: { type: 'user', userId: 'user-1' },
 };
 
 async function insertUser(id: string): Promise<void> {
@@ -39,6 +39,7 @@ beforeEach(() => {
 
 afterEach(async () => {
   await db.delete(schema.memberships);
+  await db.delete(schema.membershipInvites);
   await db.delete(schema.tenantDomains);
   await db.delete(schema.tenants);
   await db.delete(schema.users);
@@ -107,6 +108,33 @@ describe(createTenantDraft, () => {
     });
   });
 
+  it('inserts a pending OWNER membershipInvites row instead of a membership when the owner has no resolved user yet', async () => {
+    const result = await createTenantDraft({
+      ...draftInput,
+      owner: { type: 'invite', email: 'Owner@Example.com' },
+    });
+
+    if (!result.ok) throw new Error('expected ok:true');
+
+    const [inviteRow] = await db
+      .select()
+      .from(schema.membershipInvites)
+      .where(eq(schema.membershipInvites.tenantId, result.data.id));
+
+    expect(inviteRow).toMatchObject({
+      tenantId: result.data.id,
+      email: 'owner@example.com',
+      role: 'OWNER',
+      consumedAt: null,
+    });
+
+    const membershipRows = await db
+      .select()
+      .from(schema.memberships)
+      .where(eq(schema.memberships.tenantId, result.data.id));
+    expect(membershipRows).toHaveLength(0);
+  });
+
   it('rejects when the owner user id does not exist, and leaves no orphaned tenant or domain row behind', async () => {
     await expect(createTenantDraft(draftInput)).rejects.toThrow();
 
@@ -132,7 +160,7 @@ describe(createTenantDraft, () => {
       createTenantDraft({
         ...draftInput,
         slug: 'acme-2',
-        ownerUserId: 'user-2',
+        owner: { type: 'user', userId: 'user-2' },
       }),
     ).rejects.toThrow();
 
@@ -157,6 +185,33 @@ describe(createTenantDraft, () => {
     expect(domainRows).toHaveLength(1);
   });
 
+  it('rejects on a colliding domain for an invite-email owner, and leaves the second tenant and its invite cleaned up', async () => {
+    await createTenantDraft({
+      ...draftInput,
+      owner: { type: 'invite', email: 'owner@example.com' },
+    });
+
+    await expect(
+      createTenantDraft({
+        ...draftInput,
+        slug: 'acme-2',
+        owner: { type: 'invite', email: 'owner-2@example.com' },
+      }),
+    ).rejects.toThrow();
+
+    const secondTenantRows = await db
+      .select()
+      .from(schema.tenants)
+      .where(eq(schema.tenants.slug, 'acme-2'));
+    expect(secondTenantRows).toHaveLength(0);
+
+    const secondInviteRows = await db
+      .select()
+      .from(schema.membershipInvites)
+      .where(eq(schema.membershipInvites.email, 'owner-2@example.com'));
+    expect(secondInviteRows).toHaveLength(0);
+  });
+
   it('returns DB_DUPLICATE_SLUG for a second draft with an already-used slug, without touching dependent rows', async () => {
     await insertUser('user-1');
     await insertUser('user-2');
@@ -165,7 +220,7 @@ describe(createTenantDraft, () => {
     const result = await createTenantDraft({
       ...draftInput,
       domain: 'other.example.com',
-      ownerUserId: 'user-2',
+      owner: { type: 'user', userId: 'user-2' },
     });
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_DUPLICATE_SLUG });
