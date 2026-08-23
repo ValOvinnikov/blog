@@ -1,5 +1,4 @@
-import { randomUUID } from 'node:crypto';
-import { unlink, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -37,12 +36,13 @@ export async function setup(
   const tarball = await client.dumpDataDir();
   await client.close();
 
-  const snapshotPath = join(tmpdir(), `blog-db-pglite-${randomUUID()}.tar.gz`);
+  const snapshotDir = await mkdtemp(join(tmpdir(), 'blog-db-pglite-'));
+  const snapshotPath = join(snapshotDir, 'snapshot.tar.gz');
   await writeFile(snapshotPath, Buffer.from(await tarball.arrayBuffer()));
 
   project.provide('pgliteMigratedSnapshotPath', snapshotPath);
 
   return async function teardown() {
-    await unlink(snapshotPath);
+    await rm(snapshotDir, { recursive: true, force: true });
   };
 }
