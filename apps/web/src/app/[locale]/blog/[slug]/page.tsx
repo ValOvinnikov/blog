@@ -10,9 +10,6 @@ type TProps = {
   params: Promise<ILocalizedParams & { slug: string }>;
 };
 
-// CI's build environment can't always construct the Sanity client; an
-// uncaught throw here would crash the entire `next build`. `dynamicParams`
-// stays default `true`, so a missed build-time slug still renders on demand.
 export async function generateStaticParams() {
   const result = await service.pages.post.v1.getPostParams();
 
@@ -24,7 +21,7 @@ export async function generateStaticParams() {
   const params = result.data;
 
   // A successful (non-throwing) query that resolves to zero posts is not a
-  // legitimate "no content yet" case in a real build — `blog_post` documents
+  // legitimate "no content yet" case in a real build — `page_post` documents
   // exist in production. It can mean `SANITY_API_READ_TOKEN` wasn't available
   // at build time (e.g. a Vercel "Sensitive" env var, redacted during
   // `vercel build`), so the anonymous client silently returns an empty array
@@ -35,7 +32,7 @@ export async function generateStaticParams() {
   // check here.
   if (params.length === 0 && !process.env.SKIP_ENV_VALIDATION) {
     throw new Error(
-      "generateStaticParams for blog/[slug] returned zero posts in a real build — this usually means SANITY_API_READ_TOKEN wasn't available at build time or blog_post documents aren't readable with it; set SKIP_ENV_VALIDATION=true if this build genuinely has no Sanity access.",
+      "generateStaticParams for blog/[slug] returned zero posts in a real build — this usually means SANITY_API_READ_TOKEN wasn't available at build time or page_post documents aren't readable with it; set SKIP_ENV_VALIDATION=true if this build genuinely has no Sanity access.",
     );
   }
 

@@ -23,6 +23,12 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
+  it('maps the post page document to its ISR tag', () => {
+    expect(getRevalidateTagsForType('page_post', 'page_post-1')).toEqual([
+      'page_post',
+    ]);
+  });
+
   it('maps the topic page document to its ISR tag', () => {
     expect(getRevalidateTagsForType('page_topic', 'page_topic-1')).toEqual([
       'page_topic',
