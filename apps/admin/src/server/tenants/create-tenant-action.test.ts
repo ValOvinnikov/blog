@@ -177,6 +177,27 @@ describe('createTenantAction', () => {
     expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
   });
 
+  it('logs at error level, but still redirects, when the owner-invite sign-in trigger throws', async () => {
+    getUserByEmailMock.mockResolvedValue(undefined);
+    signInMock.mockRejectedValue(new Error('network error'));
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    await expect(
+      createTenantAction({ ...validInput, confirmOwnerInvite: true }),
+    ).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'tenants.owner_invite_email_failed',
+      expect.objectContaining({
+        tenantId: 'tenant-1',
+        ownerEmail: 'owner@example.com',
+        error: expect.any(Error),
+      }),
+    );
+    expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+  });
+
   it('never triggers the owner-invite sign-in email on the found-owner path', async () => {
     const { createTenantAction } = await import('./create-tenant-action');
 
