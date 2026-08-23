@@ -161,6 +161,34 @@ jobs:
       - name: UI index (helper unit tests)
         run: pnpm gen:ui-index:test
 
+  voice-key-sync:
+    name: Voice key sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # The "voice" override vocabulary is hand-duplicated across the cms
+      # schema, the admin editor's field groups, and web's message-merge
+      # paths, with nothing else catching one drifting out of sync with the
+      # other two. Parses all three as a TypeScript AST and compares the
+      # extracted key sets. Read-only; nothing is committed.
+      - name: Voice-override keys (cms/admin/web in sync)
+        run: pnpm check:voice-sync
+
+      # Fixture-based unit tests for the extraction + comparison helpers, same
+      # rationale as the UI index job's helper tests above — they need the
+      # repo's typescript package, which only the pnpm-install jobs have.
+      - name: Voice key sync (helper unit tests)
+        run: pnpm check:voice-sync:test
+
   migrations:
     name: Migrations
     runs-on: ubuntu-latest

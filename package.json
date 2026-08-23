@@ -19,6 +19,8 @@
     "gen:ui-index": "node scripts/gen-ui-index.mjs",
     "gen:ui-index:check": "node scripts/gen-ui-index.mjs --verify",
     "gen:ui-index:test": "node --test scripts/gen-ui-index.test.mjs",
+    "check:voice-sync": "node scripts/check-voice-key-sync.mjs",
+    "check:voice-sync:test": "node --test scripts/check-voice-key-sync.test.mjs",
     "knip": "knip",
     "format": "turbo run format",
     "prepare": "husky"
