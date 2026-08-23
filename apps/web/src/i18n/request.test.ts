@@ -277,6 +277,20 @@ describe('i18n request config — voice ladder', () => {
     }
   });
 
+  it('a tenant blogListEmpty voice override reaches blogListPage.empty, with nothing left to shadow it (#1899)', async () => {
+    getSiteConfigMock.mockResolvedValue(
+      siteConfigRow(PRESET_ID.CONSOLE, {
+        blogListEmpty: 'Nothing published to ~/blog yet.',
+      }),
+    );
+
+    const messages = await resolveMessages();
+
+    expect(getAtPath(messages, ['blogListPage', 'empty'])).toBe(
+      'Nothing published to ~/blog yet.',
+    );
+  });
+
   it('falls back to the CONSOLE preset with no overrides when the site config fetch fails', async () => {
     getSiteConfigMock.mockRejectedValue(new Error('boom'));
     const consoleErrorSpy = vi
