@@ -26,7 +26,7 @@ toggle, share buttons, mobile nav), never on a whole page.
 
 - `src/app/` — route tree. Locale-prefixed pages live under
   `src/app/[locale]/` (`blog`, `blog/[slug]`, `category/[slug]`,
-  `tag/[slug]`, `author/[slug]`, `topics`, `account`, `bookmarks`, and the
+  `tags/[slug]`, `author/[slug]`, `topics`, `account`, `bookmarks`, and the
   catch-all `[slug]` for standalone pages); `src/app/api/` holds Route
   Handlers (`revalidate`, `revalidate-site-config`, `auth`, `newsletter`,
   `account/export`, `generate-skim`); `sitemap.ts`, `robots.ts`,

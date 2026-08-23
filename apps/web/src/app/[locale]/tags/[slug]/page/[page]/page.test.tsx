@@ -1,5 +1,4 @@
 import { customRenderAsync } from '@web/testing/custom-render';
-import { makeTag } from '@web/testing/shared/tag/fixtures';
 import { notFound } from 'next/navigation';
 
 import TagNumberedPage, {
@@ -66,7 +65,7 @@ describe('TagNumberedPage', () => {
         { slug: 'typescript', page: '2' },
         { slug: 'react', page: '2' },
       ]);
-      expect(getTagPaginationParamsMock).toHaveBeenCalledWith(9);
+      expect(getTagPaginationParamsMock).toHaveBeenCalledWith();
     });
 
     it('returns an empty array when the fetch resolves to a failure result', async () => {
@@ -113,11 +112,21 @@ describe('TagNumberedPage', () => {
       getTagPageMock.mockResolvedValue({
         ok: true,
         data: {
-          tag: makeTag(),
-          posts: [],
-          currentPage: 2,
-          totalPages: 3,
-          total: 20,
+          tag: {
+            id: 'tag-1',
+            title: 'TypeScript',
+            slug: 'typescript',
+            description: 'Posts about TypeScript.',
+          },
+          modules: [],
+          seo: {
+            title: 'TypeScript',
+            description: 'Posts about TypeScript.',
+            ogTitle: 'TypeScript',
+            ogDescription: 'Posts about TypeScript.',
+            ogImageUrl: undefined,
+          },
+          postListId: 'post-list-1',
         },
       });
 
@@ -130,14 +139,11 @@ describe('TagNumberedPage', () => {
       });
 
       expect(metadata.title).toBe('TypeScript – Page 2');
-      expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
-        page: 2,
-        itemsPerPage: 9,
-      });
+      expect(getTagPageMock).toHaveBeenCalledWith('typescript');
     });
   });
 
-  it('redirects /tag/[slug]/page/1 to /tags/[slug] (canonical page 1 has one URL)', async () => {
+  it('redirects /tags/[slug]/page/1 to /tags/[slug] (canonical page 1 has one URL)', async () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(permanentRedirectMock).toHaveBeenCalledWith({

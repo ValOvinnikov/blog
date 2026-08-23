@@ -94,7 +94,7 @@ export type {
   TPostDetailAuthor,
   TPostSkim,
 } from './features/pages/post';
-export type { TTagPage } from './features/pages/tag';
+export type { TTagDetailPage } from './features/pages/tag';
 export type { TTagIndexPage } from './features/pages/tag-index';
 export type { TTopicDetailPage } from './features/pages/topic';
 export type { TTopicIndexPage } from './features/pages/topic-index';

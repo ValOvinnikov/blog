@@ -16,11 +16,24 @@ describe('getTagParams', () => {
     expect(params).toEqual([{ slug: 'typescript' }, { slug: 'react' }]);
   });
 
-  it('returns an empty array when there are no tags', async () => {
+  it('returns an empty array when there are no tag pages', async () => {
     mockRun.mockResolvedValue([]);
 
     const params = await getTagParams();
 
     expect(params).toEqual([]);
+  });
+
+  it('tags the query with page_tag', async () => {
+    mockRun.mockResolvedValue([]);
+
+    await getTagParams();
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        next: expect.objectContaining({ tags: ['page_tag'] }),
+      }),
+    );
   });
 });

@@ -4,7 +4,6 @@ import { routing } from '@web/i18n/routing';
 import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
-import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import type { MetadataRoute } from 'next';
 
 // Only `getPostParams()` projects a `publishedAt` field, so `lastModified`
@@ -61,7 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     service.pages.tag.v1.getTagParams(),
     service.pages.author.v1.getAuthorParams(),
     service.pages.topic.v1.getTopicPaginationParams(),
-    service.pages.tag.v1.getTagPaginationParams(TAG_ITEMS_PER_PAGE),
+    service.pages.tag.v1.getTagPaginationParams(),
     service.pages.author.v1.getAuthorPaginationParams(AUTHOR_ITEMS_PER_PAGE),
     service.pages.blog.v1.getIndexPageParams(),
     service.pages.generic.v1.getPageSlugs(),

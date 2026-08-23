@@ -192,7 +192,7 @@ export const Author: TStory = {
   },
 };
 
-/** `/tag/[slug]` — supporting text and pagination only, no chips or intro header. */
+/** `/tags/[slug]` — supporting text and pagination only, no chips or intro header. */
 export const Tag: TStory = {
   args: {
     heading: 'TypeScript',
@@ -201,7 +201,7 @@ export const Tag: TStory = {
       <Pagination
         currentPage={1}
         totalPages={2}
-        createHref={(page) => `/tag/typescript/page/${page}`}
+        createHref={(page) => `/tags/typescript/page/${page}`}
         ariaLabel="Tag pagination"
         previousLabel="Previous"
         nextLabel="Next"

@@ -1,59 +1,41 @@
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
-import { toArchivePostCard } from '@blog/service/shared/transformers/to-archive-post-card';
+import { toModule } from '@blog/service/shared/transformers/to-module';
 import type { InferResultType } from 'groqd';
 
-import type { buildTagPostsPageQuery } from './posts.query';
-import type { tagPageTagQuery } from './tag.query';
-import type { TTagPage, TTagPageTag } from './types';
+import type { tagPageQuery } from './query';
+import type { TTagDetailPage, TTagDetailPageTag } from './types';
 
-export type TRawTagPageTag = NonNullable<
-  InferResultType<typeof tagPageTagQuery>
->;
-type TRawPosts = InferResultType<
-  ReturnType<typeof buildTagPostsPageQuery>
->['posts'];
+export type TRawTagPage = InferResultType<typeof tagPageQuery>;
+type TRawTagDetailPageTag = TRawTagPage['tag'];
 
-export type TTagPagePagination = {
-  currentPage: number;
-  totalPages: number;
-};
-
-function toTagPageTag(
-  raw: TRawTagPageTag,
-  settings: TSiteSettings,
-): TTagPageTag {
-  const description = raw.description ?? undefined;
-
+function toTagDetailPageTag(raw: TRawTagDetailPageTag): TTagDetailPageTag {
   return {
     id: raw._id,
     title: raw.title,
     slug: raw.slug,
-    description,
-    // The blog_tag schema has no image field, so the content-derived tier
-    // only supplies title/description; the OG image falls through to the
-    // site default — same fallback shape as `pages/generic`.
+    description: raw.description ?? undefined,
+  };
+}
+
+export function toTagDetailPage(
+  rawPage: TRawTagPage,
+  settings: TSiteSettings,
+  postListId: string,
+): TTagDetailPage {
+  const tag = toTagDetailPageTag(rawPage.tag);
+
+  return {
+    tag,
+    modules: (rawPage.modules ?? []).map(toModule),
     seo: resolveSeo(
-      raw.seo ?? undefined,
-      { title: raw.title, description },
+      rawPage.seo ?? undefined,
+      { title: tag.title, description: tag.description },
       {
         description: settings.description,
         defaultOgImageUrl: settings.defaultOgImageUrl,
       },
     ),
-  };
-}
-
-export function toTagPage(
-  rawTag: TRawTagPageTag,
-  rawPosts: TRawPosts,
-  settings: TSiteSettings,
-  pagination: TTagPagePagination,
-): TTagPage {
-  return {
-    tag: toTagPageTag(rawTag, settings),
-    posts: rawPosts.map(toArchivePostCard),
-    currentPage: pagination.currentPage,
-    totalPages: pagination.totalPages,
+    postListId,
   };
 }

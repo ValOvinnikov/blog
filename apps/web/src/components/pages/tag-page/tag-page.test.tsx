@@ -1,17 +1,36 @@
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import {
-  makePostCard,
-  makePostCardTopic,
-} from '@web/testing/shared/post/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTag } from '@web/testing/shared/tag/fixtures';
 import { notFound } from 'next/navigation';
 
 import { TagPage } from './tag-page';
 
-const { getTagPageMock } = vi.hoisted(() => ({
-  getTagPageMock: vi.fn(),
-}));
+const { getTagPageMock, moduleRendererMock, postListModuleMock } = vi.hoisted(
+  () => ({
+    getTagPageMock: vi.fn(),
+    moduleRendererMock: vi.fn(
+      ({ modules }: { modules: { id: string; type: string }[] }) => (
+        <div data-testid="module-renderer-stub">
+          {modules.map((module) => module.type).join(',')}
+        </div>
+      ),
+    ),
+    postListModuleMock: vi.fn(
+      ({
+        id,
+        page,
+      }: {
+        id: string;
+        locale: string;
+        page: number;
+        createHref: (page: number) => string;
+      }) => (
+        <div data-testid="post-list-module-stub">
+          {id}:{page}
+        </div>
+      ),
+    ),
+  }),
+);
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -19,6 +38,14 @@ vi.mock('@blog/service', () => ({
       tag: { v1: { getTagPage: getTagPageMock } },
     },
   },
+}));
+
+vi.mock('@web/modules/module-renderer', () => ({
+  ModuleRenderer: moduleRendererMock,
+}));
+
+vi.mock('@web/modules/post-list/post-list-module', () => ({
+  PostListModule: postListModuleMock,
 }));
 
 vi.mock('@web/components/shared/smart-link', () => ({
@@ -37,37 +64,18 @@ vi.mock('@web/components/shared/smart-link', () => ({
 }));
 
 const tag = makeTag({
-  description: 'The latest TypeScript posts.',
-  seo: makeSeo({
-    title: 'TypeScript',
-    description: 'The latest TypeScript posts.',
-    ogTitle: 'TypeScript',
-    ogDescription: 'The latest TypeScript posts.',
-  }),
-});
-
-const post = makePostCard({
-  title: 'My Post Title',
-  slug: 'my-post-slug',
-  publishedAt: '2026-01-01T00:00:00.000Z',
-  topic: makePostCardTopic(),
-});
-
-const setup = customRenderAsync(TagPage, {
+  title: 'TypeScript',
   slug: 'typescript',
+  description: 'Posts about TypeScript.',
 });
+
+const setup = customRenderAsync(TagPage, { slug: 'typescript', locale: 'en' });
 
 describe(`<${TagPage.name}/>`, () => {
   beforeEach(() => {
     getTagPageMock.mockReset();
-  });
-
-  it('calls notFound() when the tag does not exist', async () => {
-    getTagPageMock.mockResolvedValue({ ok: true, data: null });
-
-    await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    moduleRendererMock.mockClear();
+    postListModuleMock.mockClear();
   });
 
   it('calls notFound() when the fetch fails', async () => {
@@ -80,20 +88,17 @@ describe(`<${TagPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('tag_page.fetch_failed'),
+    );
 
     errorSpy.mockRestore();
   });
 
-  it('renders the tag heading, description, and posts', async () => {
+  it('renders the h1 and supporting text from the tag', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        tag,
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
-      },
+      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
     });
 
     await setup();
@@ -101,148 +106,81 @@ describe(`<${TagPage.name}/>`, () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'TypeScript' }),
     ).toBeVisible();
-    expect(screen.getByText('The latest TypeScript posts.')).toBeVisible();
-
-    const link = screen.getByRole('link', { name: 'My Post Title' });
-    expect(link).toBeVisible();
-    expect(link).toHaveAttribute('href', '/blog/my-post-slug');
+    expect(screen.getByText('Posts about TypeScript.')).toBeVisible();
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders the empty-state message when the tag has no posts', async () => {
+  it('passes the postList id, locale, page, and tag-scoped copy through to PostListModule', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        tag,
-        posts: [],
-        currentPage: 1,
-        totalPages: 1,
-        total: 0,
-      },
+      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
     });
 
-    await setup();
+    await setup({ page: 2 });
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'TypeScript' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', {
-        level: 2,
-        name: 'Posts tagged TypeScript',
+    expect(postListModuleMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'post-list-1',
+        locale: 'en',
+        page: 2,
+        ariaLabel: 'Tag pages',
+        accessibleTitle: 'Posts tagged TypeScript',
+        emptyMessageFallback: 'No posts tagged TypeScript yet.',
+        titleId: 'tag-posts-title',
       }),
-    ).toBeVisible();
-    expect(screen.getByText('No posts tagged TypeScript yet.')).toBeVisible();
-    expect(
-      screen.queryByRole('link', { name: 'My Post Title' }),
-    ).not.toBeInTheDocument();
+      undefined,
+    );
+
+    const call = postListModuleMock.mock.calls[0];
+    if (!call) throw new Error('PostListModule was not called');
+    const { createHref } = call[0];
+    expect(createHref(1)).toBe('/tags/typescript');
+    expect(createHref(3)).toBe('/tags/typescript/page/3');
   });
 
-  it('calls getTagPage with the fixed itemsPerPage, page undefined, on page 1', async () => {
+  it('defaults to page 1 when no page is given', async () => {
+    getTagPageMock.mockResolvedValue({
+      ok: true,
+      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
+    });
+
+    await setup();
+
+    expect(postListModuleMock).toHaveBeenCalledWith(
+      expect.objectContaining({ page: 1 }),
+      undefined,
+    );
+  });
+
+  it('passes the page-builder modules through to ModuleRenderer', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
         tag,
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
+        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
+        seo: {},
+        postListId: 'post-list-1',
       },
     });
 
     await setup();
 
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
-      page: undefined,
-      itemsPerPage: 9,
-    });
-  });
-
-  it('calls the paginated getTagPage with the fixed itemsPerPage when a page is given', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        tag,
-        posts: [post],
-        currentPage: 2,
-        totalPages: 3,
-        total: 20,
-      },
-    });
-
-    await setup({ page: 2 });
-
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
-      page: 2,
-      itemsPerPage: 9,
-    });
-  });
-
-  it('renders pagination on page 1 when there is more than one page', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        tag,
-        posts: [post],
-        currentPage: 1,
-        totalPages: 3,
-        total: 20,
-      },
-    });
-
-    await setup();
-
-    expect(screen.getByRole('navigation', { name: 'Tag pages' })).toBeVisible();
-  });
-
-  it('renders pagination wired to routes.tag(slug, page) when a page is given', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        tag,
-        posts: [post],
-        currentPage: 2,
-        totalPages: 3,
-        total: 20,
-      },
-    });
-
-    await setup({ page: 2 });
-
-    expect(screen.getByRole('navigation', { name: 'Tag pages' })).toBeVisible();
-    const nextLink = screen.getByRole('link', { name: 'Next' });
-    expect(nextLink).toHaveAttribute('href', '/tags/typescript/page/3');
-    const previousLink = screen.getByRole('link', { name: 'Previous' });
-    expect(previousLink).toHaveAttribute('href', '/tags/typescript');
-  });
-
-  it('calls notFound() when the requested page is beyond totalPages', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        tag,
-        posts: [],
-        currentPage: 5,
-        totalPages: 1,
-        total: 1,
-      },
-    });
-
-    await expect(setup({ page: 5 })).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
+        locale: 'en',
+      }),
+      undefined,
+    );
+    expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
+      'module_newsletter',
+    );
   });
 
   it('renders the Home › Tag breadcrumbs trail', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        tag,
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
-      },
+      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
     });
 
     await setup();
@@ -260,13 +198,7 @@ describe(`<${TagPage.name}/>`, () => {
   it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        tag,
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
-      },
+      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
     });
 
     await setup();
@@ -283,13 +215,7 @@ describe(`<${TagPage.name}/>`, () => {
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        tag,
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
-      },
+      data: { tag, modules: [], seo: {}, postListId: 'post-list-1' },
     });
 
     const { container } = await setup();

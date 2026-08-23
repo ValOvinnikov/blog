@@ -27,17 +27,17 @@ frontend if a consumer is out of date.
 
 **Primary surfaces** (status as of 2026-07-23):
 
-| Surface | Route                          | Status                                                                                                                                               |
-| ------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Home    | `/`                            | ✅ Built — modules-as-documents (hero + `modules[]`)                                                                                                 |
-| Blog    | `/blog` + `/blog/page/N`       | ✅ Built — paginated index (#75)                                                                                                                     |
-| Post    | `/blog/[slug]`                 | ✅ Built — post detail page + JSON-LD (#76)                                                                                                          |
-| Topic   | `/topics/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589); renamed from `category` in #1812; CMS-authored via the `page_topic` document since #1915  |
-| Tag     | `/tag/[slug]` (+ `/page/N`)    | ✅ Built — unpaginated + paginated tag archives, shared-tag related posts, per-tag RSS (#674)                                                        |
-| Author  | `/author/[slug]` (+ `/page/N`) | ✅ Built — profile + posts by author, paginated (#327/#593-595/#744)                                                                                 |
-| Topics  | `/topics`                      | ✅ Built — hub listing every topic with post counts, links to archives (#750/#751/#752); CMS-authored via the `page_topicIndex` document since #1894 |
-| Page    | `/[slug]`                      | ✅ Built — generic page route (#285), slug space guarded by `RESERVED_SLUGS` (#328)                                                                  |
-| Feeds   | sitemap/robots/RSS             | ✅ Built — Phase 3 (#92), generic pages listed in the sitemap (#285); tag archives + per-tag RSS added in #674                                       |
+| Surface | Route                          | Status                                                                                                                                                                           |
+| ------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Home    | `/`                            | ✅ Built — modules-as-documents (hero + `modules[]`)                                                                                                                             |
+| Blog    | `/blog` + `/blog/page/N`       | ✅ Built — paginated index (#75)                                                                                                                                                 |
+| Post    | `/blog/[slug]`                 | ✅ Built — post detail page + JSON-LD (#76)                                                                                                                                      |
+| Topic   | `/topics/[slug]` (+ `/page/N`) | ✅ Built — unpaginated + paginated routes (#91/#588/#589); renamed from `category` in #1812; CMS-authored via the `page_topic` document since #1915                              |
+| Tag     | `/tags/[slug]` (+ `/page/N`)   | ✅ Built — unpaginated + paginated tag archives, shared-tag related posts, per-tag RSS (#674); moved from `/tag/[slug]` and CMS-authored via the `page_tag` document since #1964 |
+| Author  | `/author/[slug]` (+ `/page/N`) | ✅ Built — profile + posts by author, paginated (#327/#593-595/#744)                                                                                                             |
+| Topics  | `/topics`                      | ✅ Built — hub listing every topic with post counts, links to archives (#750/#751/#752); CMS-authored via the `page_topicIndex` document since #1894                             |
+| Page    | `/[slug]`                      | ✅ Built — generic page route (#285), slug space guarded by `RESERVED_SLUGS` (#328)                                                                                              |
+| Feeds   | sitemap/robots/RSS             | ✅ Built — Phase 3 (#92), generic pages listed in the sitemap (#285); tag archives + per-tag RSS added in #674                                                                   |
 
 Phase 3 (Blog core) is fully closed as of 2026-07-21 — every primary surface
 built in that phase is merged. Post taxonomy (topic `max: 4` cap + the
@@ -217,7 +217,8 @@ that renders a `@blog/ui` organism — including those reached through a
 dedicated slot rather than `MODULE_MAP`'s generic `ModuleRenderer` pipeline
 (§5 above): `module_hero` via the home template's `hero` slot,
 `module_postList` via `page_blog`'s `postList` reference (and, since #1915,
-`page_topic`'s own `postList` reference on `/topics/[slug]`), and
+`page_topic`'s own `postList` reference on `/topics/[slug]`, and since #1964,
+`page_tag`'s own `postList` reference on `/tags/[slug]`), and
 `module_taxonomyList` via `page_topicIndex`'s `taxonomyList` reference, all
 still styled the same way as every other module — no exception — wraps it in `apps/web`'s own
 `Section` component (`apps/web/src/components/shared/section`, relocated
