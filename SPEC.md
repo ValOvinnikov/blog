@@ -85,10 +85,13 @@ reading, page canvas elevation) are documented in full in
 - **Neon Postgres + Drizzle ORM** (`packages/db`) — the non-Sanity relational
   store for the engagement layer (Auth.js, comments, ratings, bookmarks,
   subscribers); scaffolded in #984, see §4 and §15
-- **Auth.js v5** (`next-auth@beta` + `@auth/drizzle-adapter`) in `apps/web` —
-  GitHub, Google, and email-magic-link sign-in against `@blog/db`'s adapter
-  tables (database session strategy); the magic-link email and a shared
-  Resend "send email" helper live in `apps/web/src/server/` (#1107)
+- **Auth.js v5** (`next-auth@beta` + `@auth/drizzle-adapter`), configured once
+  in `@blog/auth` and consumed by both apps — GitHub, Google, and
+  email-magic-link sign-in against `@blog/db`'s adapter tables (database
+  session strategy). The magic-link provider (`sendVerificationRequest` and
+  its email-copy builders) lives in `@blog/auth`; each app supplies only the
+  low-level Resend send transport (`apps/web/src/server/email/send-email.ts`,
+  #1107), injected as `buildAuthConfig({ sendEmail })`
 - **Vitest + Testing Library**; **Storybook** in `packages/ui` and `apps/web`
 - **Turborepo + pnpm** workspaces; Node ≥ 20.19 (CI runs 22), pnpm 11.21
 
