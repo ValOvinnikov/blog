@@ -11,5 +11,6 @@ describe('RESERVED_SLUGS', () => {
     expect(RESERVED_SLUGS).toContain('api');
     expect(RESERVED_SLUGS).toContain('page');
     expect(RESERVED_SLUGS).toContain('topics');
+    expect(RESERVED_SLUGS).toContain('tags');
   });
 });

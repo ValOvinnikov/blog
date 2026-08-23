@@ -19,6 +19,7 @@ export const routes = {
   author: (slug: string, page = 1) =>
     page === 1 ? `/author/${slug}` : `/author/${slug}/page/${page}`,
   topics: () => '/topics',
+  tags: () => '/tags',
   /** Auth-gated "My bookmarks" listing — no slug/pagination, one static path per reader. */
   bookmarks: () => '/bookmarks',
   /** Auth-gated account hub — one static path per reader; additional `WindowChrome` sections mount here without a new route. */

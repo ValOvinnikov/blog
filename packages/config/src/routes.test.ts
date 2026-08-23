@@ -33,6 +33,10 @@ describe('routes', () => {
     expect(routes.topic('design', 10)).toBe('/topics/design/page/10');
   });
 
+  it('builds the tags path', () => {
+    expect(routes.tags()).toBe('/tags');
+  });
+
   it('builds page 1 of a tag without a page segment', () => {
     expect(routes.tag('typescript')).toBe('/tag/typescript');
     expect(routes.tag('typescript', 1)).toBe('/tag/typescript');
