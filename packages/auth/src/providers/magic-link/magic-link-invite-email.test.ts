@@ -47,4 +47,17 @@ describe(buildInviteMagicLinkEmail, () => {
       'href="https://example.com/api/auth/callback/email?token=abc"',
     );
   });
+
+  it('escapes HTML-unsafe characters in an operator-entered tenant name', () => {
+    const { html } = buildInviteMagicLinkEmail({
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      host: 'example.com',
+      tenantNames: [`<script>alert(1)</script> & "quoted" 'name'`],
+    });
+
+    expect(html).not.toContain('<script>alert(1)</script>');
+    expect(html).toContain(
+      '&lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;quoted&quot; &#39;name&#39;',
+    );
+  });
 });
