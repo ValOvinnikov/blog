@@ -348,4 +348,26 @@ describe(createTenantSanityProject, () => {
       sanityDataset: 'test-dataset',
     });
   });
+
+  it('propagates an invite API failure the same way a CORS API failure propagates', async () => {
+    const tenant = baseTenant();
+    createSanityProjectInviteMock.mockImplementation(async () => {
+      callOrder.push('createSanityProjectInvite');
+      throw new Error('Access API is down');
+    });
+
+    await expect(createTenantSanityProject(tenant, env)).rejects.toThrow(
+      /Access API is down/,
+    );
+
+    // The project, dataset, and CORS work already landed before the invite
+    // call — a retry must not re-do that work, matching the CORS-failure
+    // test's expectation for the steps before it.
+    expect(setTenantSanityProjectMock).toHaveBeenCalledWith('tenant-1', {
+      sanityProjectId: 'proj456',
+      sanityDataset: 'test-dataset',
+    });
+    expect(createSanityDatasetMock).toHaveBeenCalled();
+    expect(addSanityCorsOriginMock).toHaveBeenCalled();
+  });
 });

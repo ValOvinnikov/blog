@@ -331,6 +331,19 @@ describe(createSanityProjectInvite, () => {
       role: 'editor',
     });
   });
+
+  it('throws with the response status and body on failure', async () => {
+    fetchMock.mockResolvedValue(new Response('nope', { status: 402 }));
+
+    await expect(
+      createSanityProjectInvite({
+        token: 'tok',
+        projectId: 'proj123',
+        email: 'owner@example.com',
+        role: 'editor',
+      }),
+    ).rejects.toThrow(/402/);
+  });
 });
 
 describe(listSanityWebhooks, () => {
