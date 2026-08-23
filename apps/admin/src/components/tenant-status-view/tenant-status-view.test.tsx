@@ -46,6 +46,7 @@ describe(TenantStatusView, () => {
       <TenantStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -68,6 +69,7 @@ describe(TenantStatusView, () => {
       <TenantStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 

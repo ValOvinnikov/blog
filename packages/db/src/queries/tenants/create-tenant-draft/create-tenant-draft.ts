@@ -9,6 +9,7 @@ import {
   type TTenantPlan,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
+import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import {
@@ -20,13 +21,21 @@ import {
 import type { TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
+// Either a resolved user (the found-owner path, inserting a real
+// `memberships` row) or an email with no resolved user yet (the
+// not-found-owner path, inserting a `membershipInvites` row instead —
+// consumed into a real membership once that email signs in for the first
+// time, see `consumeMembershipInvite`).
+export type TDraftOwner =
+  { type: 'user'; userId: string } | { type: 'invite'; email: string };
+
 export type TCreateTenantDraftInput = {
   name: string;
   slug: string;
   domain: string;
   locale: string;
   plan: TTenantPlan;
-  ownerUserId: string;
+  owner: TDraftOwner;
 };
 
 // Every step starts idle — the admin UI's per-step wizard view has
@@ -50,11 +59,12 @@ function buildIdleProvisioningSteps(): TTenantProvisioningSteps {
 // real, unsuspended account mid-setup, not a special account state of its
 // own; `sanityProjectId`/`sanityDataset` genuinely null until provisioning
 // step 1 creates them), its first `tenant_domains` row, and the owner's
-// `memberships` row. The owner-email-to-user-id lookup is a separate
-// concern the caller resolves before calling this — it takes an
-// already-resolved `ownerUserId`. `locale` is likewise an explicit required
-// input rather than a hardcoded default: this layer never guesses a value
-// the caller hasn't actually supplied.
+// grant — a `memberships` row when `owner` resolved to a real user, or a
+// `membershipInvites` row when it didn't (the owner-email-to-user-id lookup
+// is a separate concern the caller resolves before calling this; `owner`
+// carries whichever outcome that lookup reached). `locale` is likewise an
+// explicit required input rather than a hardcoded default: this layer never
+// guesses a value the caller hasn't actually supplied.
 //
 // The initial insert uses the same atomic `onConflictDoNothing()` +
 // follow-up read pattern as `createTenant`/`addTenantDomain` — a duplicate
@@ -96,20 +106,36 @@ export async function createTenantDraft(
     : await resolveSlugConflict(db, input.slug);
   if (!tenant.ok) return tenant;
 
+  const ownerInsert =
+    input.owner.type === 'user'
+      ? db
+          .insert(memberships)
+          .values({
+            tenantId: tenant.data.id,
+            userId: input.owner.userId,
+            role: MEMBERSHIP_ROLE.OWNER,
+          })
+          .returning()
+      : // A plain insert, not `createMembershipInvite`'s idempotent
+        // conflict-handling: `tenant.data.id` is brand new, so the
+        // (tenantId, email) unique constraint can't already have a row to
+        // collide with.
+        db
+          .insert(membershipInvites)
+          .values({
+            tenantId: tenant.data.id,
+            email: input.owner.email.trim().toLowerCase(),
+            role: MEMBERSHIP_ROLE.OWNER,
+          })
+          .returning();
+
   try {
-    const [domainRow, membershipRow] = await Promise.all([
+    const [domainRow, ownerRow] = await Promise.all([
       db
         .insert(tenantDomains)
         .values({ tenantId: tenant.data.id, domain: input.domain })
         .returning(),
-      db
-        .insert(memberships)
-        .values({
-          tenantId: tenant.data.id,
-          userId: input.ownerUserId,
-          role: MEMBERSHIP_ROLE.OWNER,
-        })
-        .returning(),
+      ownerInsert,
     ]);
 
     if (!domainRow[0]) {
@@ -118,9 +144,11 @@ export async function createTenantDraft(
       );
     }
 
-    if (!membershipRow[0]) {
+    if (!ownerRow[0]) {
+      const table =
+        input.owner.type === 'user' ? 'memberships' : 'membership_invites';
       throw new Error(
-        `createTenantDraft: memberships insert for tenant "${tenant.data.id}" returned no row.`,
+        `createTenantDraft: ${table} insert for tenant "${tenant.data.id}" returned no row.`,
       );
     }
   } catch (error) {

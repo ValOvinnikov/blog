@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 const {
   requireAdminMock,
   authMock,
+  signInMock,
   dispatchProvisioningWorkflowMock,
   getUserByEmailMock,
   getTenantBySlugMock,
@@ -16,6 +17,7 @@ const {
 } = vi.hoisted(() => ({
   requireAdminMock: vi.fn(),
   authMock: vi.fn(),
+  signInMock: vi.fn(),
   dispatchProvisioningWorkflowMock: vi.fn(),
   getUserByEmailMock: vi.fn(),
   getTenantBySlugMock: vi.fn(),
@@ -30,7 +32,10 @@ vi.mock('@admin/server/auth/require-admin', () => ({
   requireAdmin: requireAdminMock,
 }));
 
-vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@admin/server/auth/auth', () => ({
+  auth: authMock,
+  signIn: signInMock,
+}));
 
 vi.mock('@admin/server/provisioning/dispatch-provisioning-workflow', () => ({
   dispatchProvisioningWorkflow: dispatchProvisioningWorkflowMock,
@@ -71,6 +76,8 @@ describe('createTenantAction', () => {
     });
     dispatchProvisioningWorkflowMock.mockReset();
     dispatchProvisioningWorkflowMock.mockResolvedValue(undefined);
+    signInMock.mockReset();
+    signInMock.mockResolvedValue({ ok: true });
     getUserByEmailMock.mockReset();
     getUserByEmailMock.mockResolvedValue({
       id: 'user-1',
@@ -108,7 +115,7 @@ describe('createTenantAction', () => {
     expect(createTenantDraftMock).not.toHaveBeenCalled();
   });
 
-  it('returns a field error when the owner email matches no registered user', async () => {
+  it('returns a soft owner-invite confirmation (not a field error) when the owner email matches no registered user', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
     const { createTenantAction } = await import('./create-tenant-action');
 
@@ -116,9 +123,89 @@ describe('createTenantAction', () => {
 
     expect(result).toEqual({
       ok: false,
-      fieldErrors: { ownerEmail: expect.any(String) },
+      ownerInviteConfirmation: {
+        email: 'owner@example.com',
+        message: expect.any(String),
+      },
     });
+    expect(result.fieldErrors).toBeUndefined();
     expect(createTenantDraftMock).not.toHaveBeenCalled();
+    expect(signInMock).not.toHaveBeenCalled();
+  });
+
+  it('proceeds down the invite path once confirmOwnerInvite is set for an unregistered email', async () => {
+    getUserByEmailMock.mockResolvedValue(undefined);
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    await expect(
+      createTenantAction({ ...validInput, confirmOwnerInvite: true }),
+    ).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(createTenantDraftMock).toHaveBeenCalledWith({
+      name: 'Acme',
+      slug: 'acme',
+      domain: 'acme.example.com',
+      locale: 'EN',
+      plan: 'FREE',
+      owner: { type: 'invite', email: 'owner@example.com' },
+    });
+    expect(signInMock).toHaveBeenCalledWith('email', {
+      email: 'owner@example.com',
+      redirect: false,
+    });
+    expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+  });
+
+  it('logs at error level, but still redirects, when the owner-invite sign-in email fails to send', async () => {
+    getUserByEmailMock.mockResolvedValue(undefined);
+    signInMock.mockResolvedValue({ ok: false, error: 'EmailSignInError' });
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    await expect(
+      createTenantAction({ ...validInput, confirmOwnerInvite: true }),
+    ).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'tenants.owner_invite_email_failed',
+      expect.objectContaining({
+        tenantId: 'tenant-1',
+        ownerEmail: 'owner@example.com',
+      }),
+    );
+    expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+  });
+
+  it('logs at error level, but still redirects, when the owner-invite sign-in trigger throws', async () => {
+    getUserByEmailMock.mockResolvedValue(undefined);
+    signInMock.mockRejectedValue(new Error('network error'));
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    await expect(
+      createTenantAction({ ...validInput, confirmOwnerInvite: true }),
+    ).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'tenants.owner_invite_email_failed',
+      expect.objectContaining({
+        tenantId: 'tenant-1',
+        ownerEmail: 'owner@example.com',
+        error: expect.any(Error),
+      }),
+    );
+    expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+  });
+
+  it('never triggers the owner-invite sign-in email on the found-owner path', async () => {
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    await expect(createTenantAction(validInput)).rejects.toThrow(
+      'NEXT_REDIRECT',
+    );
+
+    expect(signInMock).not.toHaveBeenCalled();
   });
 
   it('returns a field error when the slug is already taken', async () => {
@@ -225,7 +312,7 @@ describe('createTenantAction', () => {
       domain: 'acme.example.com',
       locale: 'EN',
       plan: 'FREE',
-      ownerUserId: 'user-1',
+      owner: { type: 'user', userId: 'user-1' },
     });
   });
 

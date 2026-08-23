@@ -4,6 +4,7 @@ export const provisioningStatusViewVariants = tv({
   slots: {
     root: ['flex flex-col gap-6'],
     header: ['flex flex-col gap-1'],
+    ownerRow: ['flex flex-wrap items-center gap-2'],
     startAction: ['flex'],
     layout: [
       'flex flex-col gap-6',

@@ -74,6 +74,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -83,12 +84,40 @@ describe(ProvisioningStatusView, () => {
     ).toBeVisible();
   });
 
+  it('shows the invited-pending owner badge when the tenant has no resolved owner email', () => {
+    const tenant = makeTenant();
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail={undefined}
+      />,
+    );
+
+    expect(screen.getByText('Owner')).toBeVisible();
+    expect(screen.getByText('Invited, pending')).toBeVisible();
+  });
+
+  it('hides the invited-pending owner badge once the tenant has a resolved owner email', () => {
+    const tenant = makeTenant();
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+      />,
+    );
+
+    expect(screen.queryByText('Invited, pending')).not.toBeInTheDocument();
+  });
+
   it('renders the steps column as a semantic aside landmark', () => {
     const tenant = makeTenant();
     render(
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -101,6 +130,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -129,6 +159,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -148,6 +179,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -185,6 +217,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -223,6 +256,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -245,6 +279,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -275,6 +310,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -297,6 +333,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -313,6 +350,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="VERIFIED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -329,6 +367,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -349,6 +388,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -370,6 +410,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -385,6 +426,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -406,6 +448,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -422,6 +465,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
       />,
     );
 
@@ -462,6 +506,7 @@ describe(ProvisioningStatusView, () => {
         <ProvisioningStatusView
           tenant={tenant}
           domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
         />,
       );
 
@@ -501,6 +546,7 @@ describe(ProvisioningStatusView, () => {
         <ProvisioningStatusView
           tenant={tenant}
           domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
         />,
       );
 
@@ -534,6 +580,7 @@ describe(ProvisioningStatusView, () => {
         <ProvisioningStatusView
           tenant={tenant}
           domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
         />,
       );
 
@@ -557,6 +604,7 @@ describe(ProvisioningStatusView, () => {
         <ProvisioningStatusView
           tenant={tenant}
           domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
         />,
       );
 
@@ -579,6 +627,7 @@ describe(ProvisioningStatusView, () => {
         <ProvisioningStatusView
           tenant={tenant}
           domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
         />,
       );
 
@@ -608,6 +657,7 @@ describe(ProvisioningStatusView, () => {
         <ProvisioningStatusView
           tenant={tenant}
           domainVerificationStatus="PENDING"
+          ownerEmail="owner@example.com"
         />,
       );
 
@@ -630,6 +680,7 @@ describe(ProvisioningStatusView, () => {
         <ProvisioningStatusView
           tenant={tenant}
           domainVerificationStatus="PENDING"
+          ownerEmail="owner@example.com"
         />,
       );
 
@@ -655,6 +706,7 @@ describe(ProvisioningStatusView, () => {
         <ProvisioningStatusView
           tenant={tenant}
           domainVerificationStatus="PENDING"
+          ownerEmail="owner@example.com"
         />,
       );
 
@@ -675,6 +727,7 @@ describe(ProvisioningStatusView, () => {
         <ProvisioningStatusView
           tenant={tenant}
           domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
         />,
       );
 
@@ -694,6 +747,7 @@ describe(ProvisioningStatusView, () => {
         <ProvisioningStatusView
           tenant={tenant}
           domainVerificationStatus="PENDING"
+          ownerEmail="owner@example.com"
         />,
       );
 
@@ -724,6 +778,7 @@ describe(ProvisioningStatusView, () => {
         <ProvisioningStatusView
           tenant={tenant}
           domainVerificationStatus="PENDING"
+          ownerEmail="owner@example.com"
         />,
       );
 

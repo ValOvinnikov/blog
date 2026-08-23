@@ -23,14 +23,16 @@ export default async function TenantStatusPage({ params }: TProps) {
     notFound();
   }
 
-  const domainVerificationStatus = await getDomainVerificationStatus(
-    tenant.primaryDomain,
-  );
+  const [domainVerificationStatus, ownerEmail] = await Promise.all([
+    getDomainVerificationStatus(tenant.primaryDomain),
+    queries.memberships.getTenantOwnerEmail(tenant.id),
+  ]);
 
   return (
     <TenantStatusView
       tenant={tenant}
       domainVerificationStatus={domainVerificationStatus}
+      ownerEmail={ownerEmail}
     />
   );
 }

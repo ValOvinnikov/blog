@@ -34,6 +34,8 @@ const INITIAL_VALUES: TFormValues = {
   ownerEmail: '',
 };
 
+type TOwnerInviteConfirmation = { email: string; message: string };
+
 /**
  * The wizard's Details step — the one part of tenant creation an operator
  * fills in by hand. Submitting calls `createTenantAction`, which redirects
@@ -46,6 +48,8 @@ export const TenantDetailsForm = () => {
   const [values, setValues] = useState<TFormValues>(INITIAL_VALUES);
   const [fieldErrors, setFieldErrors] = useState<TCreateTenantFieldErrors>({});
   const [formError, setFormError] = useState<string | undefined>(undefined);
+  const [ownerInviteConfirmation, setOwnerInviteConfirmation] =
+    useState<TOwnerInviteConfirmation | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const {
@@ -69,16 +73,34 @@ export const TenantDetailsForm = () => {
     value: TFormValues[K],
   ) => {
     setValues((prev) => ({ ...prev, [key]: value }));
+    // A changed owner email invalidates whatever confirmation was shown for
+    // the previous one — resubmitting now must re-check the new address
+    // rather than silently reuse an unrelated confirmation.
+    if (key === 'ownerEmail') {
+      setOwnerInviteConfirmation(null);
+    }
   };
 
   const handleSubmit = () => {
     setFormError(undefined);
     setFieldErrors({});
 
+    // Only counts as confirmed when the operator hasn't edited the email
+    // since seeing the confirmation — this second submit is what actually
+    // proceeds down the invite path. `ownerInviteConfirmation.email` comes
+    // back already normalized by the server's `z.string().trim().toLowerCase()`,
+    // so the raw form value must be normalized the same way before comparing.
+    const confirmOwnerInvite =
+      ownerInviteConfirmation?.email === values.ownerEmail.trim().toLowerCase();
+
     startTransition(async () => {
-      const result = await createTenantAction(values);
+      const result = await createTenantAction({
+        ...values,
+        confirmOwnerInvite,
+      });
       setFieldErrors(result.fieldErrors ?? {});
       setFormError(result.error);
+      setOwnerInviteConfirmation(result.ownerInviteConfirmation ?? null);
     });
   };
 
@@ -176,12 +198,22 @@ export const TenantDetailsForm = () => {
               {fieldErrors.ownerEmail && (
                 <span className={fieldError()}>{fieldErrors.ownerEmail}</span>
               )}
+              {ownerInviteConfirmation && (
+                <Alert
+                  type={ALERT_TYPE.INFO}
+                  message={ownerInviteConfirmation.message}
+                />
+              )}
             </div>
           </div>
 
           <div className={actions()}>
             <Button type="button" onClick={handleSubmit} isDisabled={isPending}>
-              {isPending ? t('submittingButton') : t('submitButton')}
+              {isPending
+                ? t('submittingButton')
+                : ownerInviteConfirmation
+                  ? t('confirmOwnerInviteButton')
+                  : t('submitButton')}
             </Button>
           </div>
         </div>

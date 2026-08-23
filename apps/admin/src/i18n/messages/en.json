@@ -215,8 +215,9 @@
     "planOptionFree": "Free",
     "planOptionGrowth": "Growth",
     "ownerEmailLabel": "Owner email",
-    "ownerEmailHint": "Must match an existing registered user — seeds the first membership as OWNER.",
+    "ownerEmailHint": "An existing user is granted OWNER access immediately; an unregistered email is sent an invite to sign in and become OWNER.",
     "submitButton": "Begin provisioning →",
+    "confirmOwnerInviteButton": "Confirm & invite owner →",
     "submittingButton": "Creating…"
   },
   "provisioningStatusView": {
@@ -249,7 +250,9 @@
       "ERROR": "Couldn't check"
     },
     "dnsNotConfiguredHint": "The Vercel integration isn't configured on this deployment, so domain verification can't run — this isn't specific to this tenant.",
-    "goToTenantButton": "Go to tenant →"
+    "goToTenantButton": "Go to tenant →",
+    "ownerLabel": "Owner",
+    "ownerInvitedPendingBadge": "Invited, pending"
   },
   "tenantDetailsPanel": {
     "heading": "Tenant details",
