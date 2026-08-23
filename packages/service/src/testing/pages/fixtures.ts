@@ -5,13 +5,16 @@ import type {
   TRawPostDetail,
   TRawPostPage,
 } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
-import type { TRawTagPageTag } from '@blog/service/features/pages/tag/adaptor/detail-page/transformer';
+import type { TRawTagPage } from '@blog/service/features/pages/tag/adaptor/detail-page/transformer';
 import type { TRawTagIndexPage } from '@blog/service/features/pages/tag-index/adaptor/transformer';
 import type { TRawTopicPage } from '@blog/service/features/pages/topic/adaptor/detail-page/transformer';
 import type { TRawTopicIndexPage } from '@blog/service/features/pages/topic-index/adaptor/transformer';
 import type { TRawArchivePostCard } from '@blog/service/shared/transformers/to-archive-post-card';
 import type { TRawPostCard } from '@blog/service/shared/transformers/to-post-card';
-import { makeRawTopic } from '@blog/service/testing/entities/fixtures';
+import {
+  makeRawTag,
+  makeRawTopic,
+} from '@blog/service/testing/entities/fixtures';
 import {
   makeRawImage,
   makeRawSanityImage,
@@ -181,14 +184,13 @@ export function makeRawTopicPage(
   };
 }
 
-export function makeRawTagPageTag(
-  overrides: Partial<TRawTagPageTag> = {},
-): TRawTagPageTag {
+export function makeRawTagPage(
+  overrides: Partial<TRawTagPage> = {},
+): TRawTagPage {
   return {
-    _id: 'tag-1',
-    title: 'TypeScript',
-    slug: 'typescript',
-    description: 'Posts about TypeScript.',
+    tag: { ...makeRawTag(), description: 'Posts about TypeScript.' },
+    postList: { _id: 'post-list-1' },
+    modules: [],
     seo: null,
     ...overrides,
   };
