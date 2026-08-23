@@ -211,9 +211,9 @@ describe(`<${TagPage.name}/>`, () => {
 
     expect(screen.getByRole('navigation', { name: 'Tag pages' })).toBeVisible();
     const nextLink = screen.getByRole('link', { name: 'Next' });
-    expect(nextLink).toHaveAttribute('href', '/tag/typescript/page/3');
+    expect(nextLink).toHaveAttribute('href', '/tags/typescript/page/3');
     const previousLink = screen.getByRole('link', { name: 'Previous' });
-    expect(previousLink).toHaveAttribute('href', '/tag/typescript');
+    expect(previousLink).toHaveAttribute('href', '/tags/typescript');
   });
 
   it('calls notFound() when the requested page is beyond totalPages', async () => {
@@ -302,7 +302,7 @@ describe(`<${TagPage.name}/>`, () => {
     );
     expect(breadcrumbScript).toBeDefined();
     expect(breadcrumbScript?.textContent).toContain(
-      '"item":"https://example.com/tag/typescript"',
+      '"item":"https://example.com/tags/typescript"',
     );
   });
 });

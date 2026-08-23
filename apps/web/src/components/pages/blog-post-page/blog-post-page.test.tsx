@@ -430,7 +430,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'TypeScript' })).toHaveAttribute(
       'href',
-      '/tag/typescript',
+      '/tags/typescript',
     );
   });
 
@@ -479,11 +479,11 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     expect(screen.getByRole('link', { name: 'TypeScript' })).toHaveAttribute(
       'href',
-      '/tag/typescript',
+      '/tags/typescript',
     );
     expect(screen.getByRole('link', { name: 'React' })).toHaveAttribute(
       'href',
-      '/tag/react',
+      '/tags/react',
     );
   });
 
