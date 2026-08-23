@@ -14,6 +14,7 @@ export const RESERVED_SLUGS = [
   'api',
   'page',
   'topics',
+  'tags',
 ] as const;
 
 export type TReservedSlug = (typeof RESERVED_SLUGS)[number];
