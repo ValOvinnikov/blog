@@ -29,7 +29,10 @@ migrations, the free-tier ceiling, and the layer-contract impact.
   different with **zero `@blog/ui` change**; a hard prerequisite for
   per-tenant branding.
 - **M5 engagement tables** (comments, ratings, bookmarks, subscribers) + the
-  Feature 4 `leads` table — the tables that gain `tenantId`.
+  `leads` table (contact form module, tracked under #1919's
+  [`2026-08-23-module-and-page-type-portfolio-design.md`](./2026-08-23-module-and-page-type-portfolio-design.md)
+  — moved out of this program's own #1285 in 2026-08-23) — the tables that
+  gain `tenantId`.
 
 ## Purpose & what is already decided
 
@@ -152,11 +155,12 @@ One Neon database. Add:
 - `memberships` — `(userId, tenantId, role)`, `role` ∈ `OWNER`/`EDITOR`/
   `READER` (UPPERCASE const per repo convention). This is the app-facing RBAC.
 - **`tenantId` FK on every engagement table** — `comments`, `ratings`,
-  `bookmarks`, `subscribers`, and `leads`. Every `@blog/db` query is scoped by
-  `tenantId`. **Note:** `bookmarks` and `subscribers` already ship in `@blog/db`
-  today; `comments`/`ratings`/`leads` do not yet exist. For the two that exist,
-  adding `tenantId` is only additive while they hold no rows — otherwise it is a
-  backfill (see §Sequencing epic 3 and the timing note).
+  `bookmarks`, `subscribers`, and `leads` (the last from the contact form
+  module, tracked under #1919, not this program). Every `@blog/db` query is
+  scoped by `tenantId`. **Note:** `bookmarks` and `subscribers` already ship
+  in `@blog/db` today; `comments`/`ratings`/`leads` do not yet exist. For the
+  two that exist, adding `tenantId` is only additive while they hold no rows
+  — otherwise it is a backfill (see §Sequencing epic 3 and the timing note).
 
 **Enforcement — a tenant-bound accessor, not raw queries.** To make "forgot the
 `WHERE tenantId`" structurally impossible, `@blog/db` exposes a

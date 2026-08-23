@@ -32,14 +32,11 @@ its own dedicated design doc + brainstorm (see Feature 6).
   Newsreader / JetBrains Mono) — the font-loading path Feature 2 makes
   CMS-selectable.
 - **`@blog/db` (Neon + Drizzle)** — the engagement persistence layer (#984
-  bootstrap). Feature 4 (leads) adds a table here; Feature 6's leaning
-  multi-tenant shape would add `tenantId` to the engagement tables plus
-  `tenants` / `memberships` tables (open — see Feature 6). `service` stays
-  Sanity-only; `db` is the sibling layer `web` consumes.
-- **M5 engagement foundations** (`docs/BACKLOG.md`) — Feature 4 reuses the
-  `TextInput`/`Textarea` atoms (#1091), status tokens (#1093, `--ok/--warn/
---danger`), and the shared Resend send-email helper (#1107). Build after
-  those land, not before.
+  bootstrap). The contact form module's `leads` table (moved to #1919, see
+  Features 3–5 below) adds a table here; Feature 6's leaning multi-tenant
+  shape would add `tenantId` to the engagement tables plus `tenants` /
+  `memberships` tables (open — see Feature 6). `service` stays Sanity-only;
+  `db` is the sibling layer `web` consumes.
 
 ## Purpose of this pass
 
@@ -69,6 +66,11 @@ independent of each other and of the spine (they inherit it for free). Feature
 6 is not a build in this doc — it records the multi-tenant decisions reached
 and hands off to a dedicated design doc + `superpowers:brainstorming` pass
 before any code.
+
+**2026-08-23 update:** Features 3–5 moved to their own doc and epic (#1919,
+milestone M9 — Portfolio) — see the superseded-section note under "Features
+3–5" below. This list stays as the original build-dependency record; treat
+items 3–5 as historical context here, not a live spec.
 
 ## Constraints that shape the design (not decoration)
 
@@ -153,99 +155,21 @@ ramp from a base lightness + neutral hue. Recorded as a follow-up, not v1.
 
 ---
 
-## Feature 3 — New page-builder modules
+## Features 3–5 — New page-builder modules, contact form, portfolio content type
 
-**Goal:** enough module types to compose a full marketing/portfolio landing
-page with zero bespoke code. Each is one `MODULE_TYPE` entry threaded through
-all five layers — the established, type-checked pattern.
+> **Superseded 2026-08-23 by
+> [`2026-08-23-module-and-page-type-portfolio-design.md`](./2026-08-23-module-and-page-type-portfolio-design.md)
+> — build from that doc, not this section.** These three features moved from
+> #1285 (a closed-set program) to #1919, an ongoing module & page-type
+> portfolio epic — new-module and new-page-type work is open-ended and keeps
+> growing past any one phase. The full design (module
+> catalogue, contact-form composition, portfolio content model/surfaces) now
+> lives in that doc, which stays live and grows with the catalogue instead of
+> being deleted once its first pass ships; this section is intentionally left
+> trimmed to avoid two driftable copies.
 
-Catalogue, ordered by portfolio/client value:
-
-- `module_projectGrid` — project / case-study cards (the portfolio showcase;
-  fetches from the Feature 5 `project` type).
-- `module_gallery` — image/media grid with lightbox.
-- `module_featureGrid` — icon + title + text grid (services / skills).
-- `module_testimonial` — quote + attribution.
-- `module_logoWall` — client / tech logos.
-- `module_stats` — metric figures ("40% faster", "3M users").
-- `module_faq` — accordion (interactive; the disclosure lives in a `web`
-  client leaf per `web-component-practices`, the organism stays pure).
-- `module_embed` — video / oEmbed (YouTube, Loom, CodePen).
-- `module_contactForm` — Feature 4 (has a write path; specced separately).
-- Second wave: `module_pricing`, `module_timeline`.
-
-**Per module, the same steps** (dependency order `cms → service → ui → web` —
-**no config-const step**, since a module's `_type` is derived from its schema,
-not declared in `@blog/config`): add the cms `module_*` document schema
-(`titleField` + display fields + Feature 1 `appearance`) and add it to the
-relevant pages' `defineModulesField({ allow })`; run `pnpm typegen` so
-`TModuleType` picks up the new `_type`; add `service.modules.<type>.v1` (query +
-transformer + view-model + cache tags); add a pure `@blog/ui` organism (+
-stories + tests); register the web component in `MODULE_MAP` (the
-`Record<Exclude<TModuleType, 'module_hero'>, …>` makes a missing registration a
-compile error).
-
-**Migration.** None — new module types and widening `allow` lists are additive.
-
-**Ticketing.** Each module is small enough to be **one issue** (single-ish layer
-chain), _not_ a multi-layer epic — but the batch of them should share a tracking
-epic so the catalogue is one coherent unit of work.
-
----
-
-## Feature 4 — Contact form / lead capture
-
-**Goal:** the module clients most want — and the only one in the catalogue with
-a write path. Deliberately assembles pieces the M5 engagement phase already
-builds.
-
-**Composition (mostly reuse):**
-
-- **db** — a new `leads` table in `@blog/db` (name, email, message, sourcePage,
-  createdAt; sibling to `subscribers`). New table → `drizzle-kit generate`
-  schema migration, dev-free / prod-gated per `SPEC.md` §8.
-- **ui** — a `ContactForm` organism built on the existing `TextInput` /
-  `Textarea` atoms (#1091), states bound to status tokens (#1093).
-- **web** — a client-island form + server action writing via `@blog/db`, plus a
-  notification email through the shared Resend helper (#1107). Spam mitigation
-  (honeypot / the Feature-... rate-limit follow-up #1042 pattern) applied here.
-- **cms** — the `module_contactForm` document (heading, intro, recipient/label
-  config), placeable in the page builder like any module.
-
-**Depends on:** #984 (db), #1091 (atoms), #1093 (tokens), #1107 (Resend). Do not
-start before those land.
-
-**Non-goal:** a CRM / inbox UI for leads — v1 stores rows and emails a
-notification; managing them is a later concern (mirrors the newsletter
-"signup only, no campaign UI" boundary).
-
----
-
-## Feature 5 — Portfolio content type
-
-**Goal:** turn "a blog" into "a portfolio site that also blogs" by mirroring the
-proven `post` pattern rather than bolting portfolio onto posts.
-
-**Content model.** A new `project` (or `caseStudy`) document: title, slug,
-client, role, stack (tags), year, `outcomeMetrics` (repeatable label+value),
-`heroImage`, `gallery`, `body` (richText), `seo`, `featured`. Reuses the
-existing `category` / `tag` taxonomy, the `seo` object + fallback ladder, and
-`imageWithAlt`.
-
-**Surfaces.** New routes `/work` (+ `/work/page/N`) and `/work/[slug]`, cloning
-the blog-index / post-detail composition, feeds (sitemap + optional RSS), and
-JSON-LD (`CreativeWork`). Add `work` and `work/*` to `RESERVED_SLUGS` so the
-generic `/[slug]` route doesn't collide.
-
-**Service / UI / Web.** A `service.pages.work.*` slice; reuse `PostsSection` /
-`PostCard` where shapes align (or a thin `ProjectCard` variant); web routes +
-`generateMetadata` per `seo-and-metadata`.
-
-**Migration.** None — new document type and new routes are additive. Existing
-posts are untouched.
-
-**Ticketing.** Multi-layer feature → epic + per-layer sub-issues
-(`config → cms → service → ui → web`), like reading-depth (#957).
+**Migration.** None for any of the three — all additive (new module types,
+new table, new document type + routes).
 
 ---
 
@@ -364,13 +288,17 @@ records the Sanity-ToS verification outcome, from which epics are then filed.
 
 ```
 config  →  BACKGROUND_TONE/SPACING/CONTAINER_WIDTH/ALIGN + RADIUS/DENSITY/FONT_CHOICE consts
-           (no module-type const — a module's _type derives from its cms schema via typegen)
-cms     →  module_* schemas + appearance object + settings_theme singleton + project type
-service →  service.modules.<type>.v1 (+ appearance)   service.settings.theme.v1   service.pages.work.*
-db      →  leads table   (+ tenantId + tenants/memberships IF the shared-app multi-tenant shape is confirmed — Feature 6, open)
-ui      →  Section wrapper + new module organisms + ContactForm (all pure, token-only)
-web     →  <style> theme injector (:root + .dark) + next/font wiring + MODULE_MAP entries + /work routes + lint guard
+cms     →  appearance object (on every module) + settings_theme singleton
+service →  appearance projected on every service.modules.<type>.v1   service.settings.theme.v1
+db      →  tenantId + tenants/memberships IF the shared-app multi-tenant shape is confirmed — Feature 6, open
+ui      →  Section wrapper (all pure, token-only)
+web     →  <style> theme injector (:root + .dark) + next/font wiring + lint guard
 ```
+
+The module catalogue / contact form / portfolio layer flow (module_\* schemas,
+leads table, new organisms, MODULE_MAP entries, `/work` routes) moved to
+[`2026-08-23-module-and-page-type-portfolio-design.md`](./2026-08-23-module-and-page-type-portfolio-design.md)'s
+own diagram.
 
 `@blog/ui` never imports `service`/`db`/`sanity`; `web` is the only meeting
 point; the graph stays acyclic.
@@ -420,12 +348,12 @@ point; the graph stays acyclic.
 - Arbitrary per-client font upload (D4) — follow-up only.
 - Editor-repaintable neutral/background ramp + the contrast-validation engine it
   needs (D5) — follow-up only.
-- A leads/CRM management UI (Feature 4) — store + notify only.
 - The multi-tenant **implementation** — tenant resolution, frontend topology,
   Neon tenant-scoping, provisioning automation. The direction is decided
   (Feature 6); the build gets its own design doc, so it stays out of _this_
   doc's epics.
-- Per-module bespoke visuals beyond what the appearance object + tokens express.
+- Module catalogue growth, contact-form/leads scope, and portfolio scope —
+  moved to #1919's own doc; its non-goals live there, not here.
 
 ## How this should be ticketed (recommendation)
 
@@ -434,20 +362,19 @@ point; the graph stays acyclic.
 - **Feature 2 (theme-as-content)** — multi-layer epic (config consts → cms
   singleton → service fetcher → web injector + font wiring + lint guard); build
   second.
-- **Feature 3 (modules)** — one tracking epic; each module is a single issue
-  under it (they inherit Features 1–2 for free).
-- **Feature 4 (contact form)** — multi-layer epic; gated on M5 foundations
-  (#984/#1091/#1093/#1107).
-- **Feature 5 (portfolio)** — multi-layer epic (`config → cms → service → ui →
-web`), independent.
+- **Features 3–5 (modules, contact form, portfolio)** — not ticketed from this
+  doc; see
+  [`2026-08-23-module-and-page-type-portfolio-design.md`](./2026-08-23-module-and-page-type-portfolio-design.md)'s
+  own ticketing section, under epic #1919.
 - **Feature 6 (multi-tenant)** — not ticketed from this doc. Next step is a
   dedicated multi-tenant design doc + `superpowers:brainstorming` pass covering
   frontend topology, Neon tenant-scoping, provisioning automation, and the
   Sanity-ToS verification; epics come from _that_ doc. Note in `SPEC.md` §15
   that multi-tenant is now an active direction (Sanity project-per-tenant).
 
-**Spec sync when built:** Features 1–3 update `SPEC.md` §6 + `docs/context/
+**Spec sync when built:** Features 1–2 update `SPEC.md` §6 + `docs/context/
 content-model.md`; Feature 2 also updates §9 (rendering) and §4 if the injector
-changes the layer picture; Feature 5 updates §1 surfaces; Feature 6 updates
-§15. Per repo rules, this design doc is deleted once its features ship and
-`SPEC.md` reflects them.
+changes the layer picture; Feature 6 updates §15. Per repo rules, this design
+doc is deleted once Features 1–2 and 6 ship and `SPEC.md` reflects them —
+Features 3–5 no longer gate that, since they moved to their own doc under
+#1919.
