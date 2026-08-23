@@ -137,11 +137,11 @@ describe('TagNumberedPage', () => {
     });
   });
 
-  it('redirects /tag/[slug]/page/1 to /tag/[slug] (canonical page 1 has one URL)', async () => {
+  it('redirects /tag/[slug]/page/1 to /tags/[slug] (canonical page 1 has one URL)', async () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(permanentRedirectMock).toHaveBeenCalledWith({
-      href: '/tag/typescript',
+      href: '/tags/typescript',
       locale: 'EN',
     });
   });

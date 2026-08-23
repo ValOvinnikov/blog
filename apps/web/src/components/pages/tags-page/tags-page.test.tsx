@@ -125,7 +125,7 @@ describe(`<${TagsPage.name}/>`, () => {
       undefined,
     );
     expect(screen.getByTestId('taxonomy-list-module-stub')).toHaveTextContent(
-      'tag-list-1:Tags:No tags yet.:/tag/typescript:5 posts',
+      'tag-list-1:Tags:No tags yet.:/tags/typescript:5 posts',
     );
   });
 

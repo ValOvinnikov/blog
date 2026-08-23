@@ -124,7 +124,7 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/blog/first-post');
     expect(urls).toContain('https://example.com/blog/second-post');
     expect(urls).toContain('https://example.com/topics/news');
-    expect(urls).toContain('https://example.com/tag/typescript');
+    expect(urls).toContain('https://example.com/tags/typescript');
     expect(urls).toContain('https://example.com/author/jane-doe');
     expect(urls).toContain('https://example.com/about');
   });
@@ -152,8 +152,8 @@ describe('sitemap', () => {
     const urls = entries.map((entry) => entry.url);
 
     expect(urls).toContain('https://example.com/topics/news/page/2');
-    expect(urls).toContain('https://example.com/tag/typescript/page/2');
-    expect(urls).toContain('https://example.com/tag/typescript/page/3');
+    expect(urls).toContain('https://example.com/tags/typescript/page/2');
+    expect(urls).toContain('https://example.com/tags/typescript/page/3');
     expect(urls).toContain('https://example.com/author/jane-doe/page/2');
   });
 
@@ -183,7 +183,7 @@ describe('sitemap', () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
-    expect(urls).not.toContain('https://example.com/tag/typescript/page/2');
+    expect(urls).not.toContain('https://example.com/tags/typescript/page/2');
     expect(urls).toContain('https://example.com/');
   });
 
@@ -325,7 +325,7 @@ describe('sitemap', () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
-    expect(urls).not.toContain('https://example.com/tag/typescript');
+    expect(urls).not.toContain('https://example.com/tags/typescript');
     expect(urls).toContain('https://example.com/');
   });
 

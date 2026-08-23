@@ -38,13 +38,13 @@ describe('routes', () => {
   });
 
   it('builds page 1 of a tag without a page segment', () => {
-    expect(routes.tag('typescript')).toBe('/tag/typescript');
-    expect(routes.tag('typescript', 1)).toBe('/tag/typescript');
+    expect(routes.tag('typescript')).toBe('/tags/typescript');
+    expect(routes.tag('typescript', 1)).toBe('/tags/typescript');
   });
 
-  it('builds page N of a tag under /tag/{slug}/page/', () => {
-    expect(routes.tag('typescript', 2)).toBe('/tag/typescript/page/2');
-    expect(routes.tag('typescript', 10)).toBe('/tag/typescript/page/10');
+  it('builds page N of a tag under /tags/{slug}/page/', () => {
+    expect(routes.tag('typescript', 2)).toBe('/tags/typescript/page/2');
+    expect(routes.tag('typescript', 10)).toBe('/tags/typescript/page/10');
   });
 
   it('builds page 1 of an author archive without a page segment', () => {
@@ -71,6 +71,6 @@ describe('routes', () => {
   });
 
   it('builds a per-tag RSS feed path off the tag base path, regardless of page', () => {
-    expect(routes.tagRssFeed('typescript')).toBe('/tag/typescript/rss.xml');
+    expect(routes.tagRssFeed('typescript')).toBe('/tags/typescript/rss.xml');
   });
 });

@@ -26,7 +26,7 @@ const tag = makeTag({
 });
 
 describe('buildTagMetadata', () => {
-  it('builds metadata from the tag resolved seo, self-canonical to /tag/[slug]', async () => {
+  it('builds metadata from the tag resolved seo, self-canonical to /tags/[slug]', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -42,9 +42,9 @@ describe('buildTagMetadata', () => {
 
     expect(metadata.title).toBe('TypeScript');
     expect(metadata.description).toBe('Posts about TypeScript.');
-    expect(metadata.alternates?.canonical).toBe('/tag/typescript');
+    expect(metadata.alternates?.canonical).toBe('/tags/typescript');
     expect(metadata.alternates?.types).toEqual({
-      'application/rss+xml': '/tag/typescript/rss.xml',
+      'application/rss+xml': '/tags/typescript/rss.xml',
     });
     expect(metadata.openGraph?.title).toBe('TypeScript');
     expect(metadata.openGraph?.description).toBe('Posts about TypeScript.');
@@ -73,7 +73,7 @@ describe('buildTagMetadata', () => {
     expect(metadata).toEqual({});
   });
 
-  it('builds page-N metadata with a "– Page N" suffix, self-canonical to /tag/[slug]/page/N — never /tag/[slug]', async () => {
+  it('builds page-N metadata with a "– Page N" suffix, self-canonical to /tags/[slug]/page/N — never /tags/[slug]', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -89,10 +89,10 @@ describe('buildTagMetadata', () => {
 
     expect(metadata.title).toBe('TypeScript – Page 2');
     expect(metadata.openGraph?.title).toBe('TypeScript – Page 2');
-    expect(metadata.alternates?.canonical).toBe('/tag/typescript/page/2');
-    expect(metadata.alternates?.canonical).not.toBe('/tag/typescript');
+    expect(metadata.alternates?.canonical).toBe('/tags/typescript/page/2');
+    expect(metadata.alternates?.canonical).not.toBe('/tags/typescript');
     expect(metadata.alternates?.types).toEqual({
-      'application/rss+xml': '/tag/typescript/rss.xml',
+      'application/rss+xml': '/tags/typescript/rss.xml',
     });
     expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
       page: 2,
