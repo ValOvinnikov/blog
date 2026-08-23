@@ -140,10 +140,11 @@ Full contract and migration mechanism: `.claude/agents/db.md`.
 `packages/db/scripts/provision-tenant/` talks to Sanity's Management API
 directly (via `@sanity/client` for content seeding, raw `fetch` for the
 project/dataset/CORS/webhook management calls) to create a new tenant's
-Sanity project/dataset/CORS entry, seed its starter content, and create a
-revalidation webhook (pointing at `apps/web`'s shared, already tenant-aware
-revalidate endpoint) during provisioning — the one place in this package
-that talks to Sanity rather than Neon.
+Sanity project/dataset/CORS entry, invite the tenant owner (resolved from
+their OWNER `memberships` row) as an Editor project member, seed its starter
+content, and create a revalidation webhook (pointing at `apps/web`'s shared,
+already tenant-aware revalidate endpoint) during provisioning — the one
+place in this package that talks to Sanity rather than Neon.
 Enforced by a dedicated `configs/eslint/db.js` override scoped to that
 directory; every other path in
 `@blog/db` keeps the blanket prohibition.

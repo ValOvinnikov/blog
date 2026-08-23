@@ -194,6 +194,49 @@ export async function deleteSanityRobotToken(input: {
   );
 }
 
+export type TSanityProjectMemberRole = 'administrator' | 'editor' | 'viewer';
+
+export type TSanityInvite = { email?: string; status?: string };
+
+// Lists both pending and already-accepted invites — an accepted invite
+// means the invitee is already a project member, so a retry must still
+// recognize them as "already invited" even once `status` is no longer
+// `pending`.
+export async function listSanityProjectInvites(input: {
+  token: string;
+  projectId: string;
+}): Promise<TSanityInvite[]> {
+  const result = await sanityAccessRequest<
+    | { items?: Array<{ email?: string; status?: string }> }
+    | Array<{ email?: string; status?: string }>
+  >(
+    `/access/project/${input.projectId}/invites?status=pending&status=accepted`,
+    input.token,
+  );
+
+  const items = Array.isArray(result) ? result : (result.items ?? []);
+  return items.map((item) => ({ email: item.email, status: item.status }));
+}
+
+// Invites a human by email to join the project as a member — distinct from
+// `createSanityRobotToken`, which mints a non-human API token. The invitee
+// receives an email from Sanity and must accept it before they can sign in.
+export async function createSanityProjectInvite(input: {
+  token: string;
+  projectId: string;
+  email: string;
+  role: TSanityProjectMemberRole;
+}): Promise<void> {
+  await sanityAccessRequest(
+    `/access/project/${input.projectId}/invites`,
+    input.token,
+    {
+      method: 'POST',
+      body: JSON.stringify({ email: input.email, role: input.role }),
+    },
+  );
+}
+
 // Webhooks are documented against the project-scoped host
 // (`{projectId}.api.sanity.io`), unlike every endpoint above, which all work
 // against the generic `api.sanity.io` host — see

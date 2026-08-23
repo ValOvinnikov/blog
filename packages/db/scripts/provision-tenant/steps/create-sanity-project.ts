@@ -1,3 +1,4 @@
+import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { setTenantSanityProject } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
@@ -6,8 +7,10 @@ import {
   addSanityCorsOrigin,
   createSanityDataset,
   createSanityProject,
+  createSanityProjectInvite,
   listSanityCorsOrigins,
   listSanityDatasets,
+  listSanityProjectInvites,
 } from '../lib/sanity-management-client';
 
 export type TCreateSanityProjectResult = {
@@ -15,9 +18,17 @@ export type TCreateSanityProjectResult = {
   sanityDataset: string;
 };
 
+// `editor` can author/publish content but can't change project settings or
+// manage members — the platform (via `SANITY_MANAGEMENT_TOKEN`) keeps sole
+// control over the project itself, not the tenant owner.
+const OWNER_INVITE_ROLE = 'editor';
+
 /**
  * Step 1 — creates the tenant's own Sanity project, its dataset (named per
- * `env.tenantSanityDataset`), and a CORS entry for the admin app's origin.
+ * `env.tenantSanityDataset`), a CORS entry for the admin app's origin, and
+ * invites the tenant owner (resolved from their OWNER `memberships` row) as
+ * a project member — Sanity Studio's login flow requires project
+ * membership, so without this no one could sign into the deployed Studio.
  *
  * The project id is persisted the moment it's minted, before the dataset/CORS
  * calls: Sanity has no delete-project API to clean up an orphan, so a retry
@@ -69,6 +80,26 @@ export async function createTenantSanityProject(
       origin: env.adminAppBaseUrl,
       allowCredentials: true,
     });
+  }
+
+  const ownerEmail = await getTenantOwnerEmail(tenant.id);
+  if (ownerEmail) {
+    const invites = await listSanityProjectInvites({
+      token: env.sanityManagementToken,
+      projectId,
+    });
+    const alreadyInvited = invites.some(
+      (invite) => invite.email?.toLowerCase() === ownerEmail.toLowerCase(),
+    );
+
+    if (!alreadyInvited) {
+      await createSanityProjectInvite({
+        token: env.sanityManagementToken,
+        projectId,
+        email: ownerEmail,
+        role: OWNER_INVITE_ROLE,
+      });
+    }
   }
 
   return { sanityProjectId: projectId, sanityDataset: env.tenantSanityDataset };
