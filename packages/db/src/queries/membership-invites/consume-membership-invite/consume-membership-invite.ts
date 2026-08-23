@@ -1,6 +1,7 @@
 import { getDb } from '@blog/db/client';
+import { createMembership } from '@blog/db/queries/memberships';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
-import { memberships, type TMembership } from '@blog/db/schema/memberships';
+import type { TMembership } from '@blog/db/schema/memberships';
 import { and, eq, isNull } from 'drizzle-orm';
 
 // Not a `db.transaction()` — the runtime `neon-http` driver has no
@@ -42,25 +43,7 @@ export async function consumeMembershipInvite(
   if (!claimed) return undefined;
 
   try {
-    const [inserted] = await db
-      .insert(memberships)
-      .values({ userId, tenantId: claimed.tenantId, role: claimed.role })
-      .onConflictDoNothing()
-      .returning();
-
-    if (inserted) return inserted;
-
-    const [existing] = await db
-      .select()
-      .from(memberships)
-      .where(
-        and(
-          eq(memberships.userId, userId),
-          eq(memberships.tenantId, claimed.tenantId),
-        ),
-      );
-
-    return existing;
+    return await createMembership(userId, claimed.tenantId, claimed.role);
   } catch (error) {
     await db
       .update(membershipInvites)
