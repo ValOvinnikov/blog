@@ -144,6 +144,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     toEntry(routes.home(), siteUrl),
     toEntry(routes.blogIndex(), siteUrl),
     toEntry(routes.topics(), siteUrl),
+    toEntry(routes.tags(), siteUrl),
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
     ...posts.map(({ slug, publishedAt }) =>
       toEntry(routes.post(slug), siteUrl, publishedAt),
