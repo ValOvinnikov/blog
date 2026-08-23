@@ -370,6 +370,26 @@ export type Settings_site = {
   defaultOgImage?: ImageWithAlt;
 };
 
+export type Module_taxonomyListReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_taxonomyList';
+};
+
+export type Page_tagIndex = {
+  _id: string;
+  _type: 'page_tagIndex';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  heading?: string;
+  supportingText?: string;
+  taxonomyList?: Module_taxonomyListReference;
+  seo?: Seo;
+};
+
 export type Page_post = {
   _id: string;
   _type: 'page_post';
@@ -439,13 +459,6 @@ export type Page_topic = {
       } & Module_newsletterReference)
   >;
   seo?: Seo;
-};
-
-export type Module_taxonomyListReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_taxonomyList';
 };
 
 export type Page_topicIndex = {
@@ -829,6 +842,8 @@ export type AllSanitySchemaTypes =
   | Settings_footer
   | Settings_navigation
   | Settings_site
+  | Module_taxonomyListReference
+  | Page_tagIndex
   | Page_post
   | Slug
   | Module_postListReference
@@ -836,7 +851,6 @@ export type AllSanitySchemaTypes =
   | Module_ctaReference
   | Module_newsletterReference
   | Page_topic
-  | Module_taxonomyListReference
   | Page_topicIndex
   | Module_taxonomyList
   | Page_blog
