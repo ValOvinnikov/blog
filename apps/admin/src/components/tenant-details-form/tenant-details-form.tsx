@@ -87,9 +87,11 @@ export const TenantDetailsForm = () => {
 
     // Only counts as confirmed when the operator hasn't edited the email
     // since seeing the confirmation — this second submit is what actually
-    // proceeds down the invite path.
+    // proceeds down the invite path. `ownerInviteConfirmation.email` comes
+    // back already normalized by the server's `z.string().trim().toLowerCase()`,
+    // so the raw form value must be normalized the same way before comparing.
     const confirmOwnerInvite =
-      ownerInviteConfirmation?.email === values.ownerEmail;
+      ownerInviteConfirmation?.email === values.ownerEmail.trim().toLowerCase();
 
     startTransition(async () => {
       const result = await createTenantAction({

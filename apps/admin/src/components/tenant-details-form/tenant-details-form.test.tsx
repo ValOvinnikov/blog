@@ -176,6 +176,48 @@ describe(TenantDetailsForm, () => {
     );
   });
 
+  it('resubmits with confirmOwnerInvite set when the owner email only differs from the server-normalized form by case or whitespace', async () => {
+    createTenantActionMock.mockResolvedValueOnce({
+      ok: false,
+      ownerInviteConfirmation: {
+        email: 'john.doe@example.com',
+        message: 'No account found for john.doe@example.com.',
+      },
+    });
+    createTenantActionMock.mockResolvedValueOnce({ ok: false });
+    const user = userEvent.setup();
+    render(<TenantDetailsForm />);
+
+    await user.type(
+      screen.getByRole('textbox', { name: 'Tenant name' }),
+      'Acme',
+    );
+    await user.type(screen.getByRole('textbox', { name: 'Slug' }), 'acme');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Domain' }),
+      'acme.example.com',
+    );
+    await user.type(
+      screen.getByRole('textbox', { name: 'Owner email' }),
+      'John.Doe@Example.com',
+    );
+    await user.click(
+      screen.getByRole('button', { name: /begin provisioning/i }),
+    );
+    await screen.findByText('No account found for john.doe@example.com.');
+
+    await user.click(
+      screen.getByRole('button', { name: /confirm & invite owner/i }),
+    );
+
+    expect(createTenantActionMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        ownerEmail: 'John.Doe@Example.com',
+        confirmOwnerInvite: true,
+      }),
+    );
+  });
+
   it('drops the stale confirmation and re-requires a fresh confirm once the owner email is edited', async () => {
     createTenantActionMock.mockResolvedValueOnce({
       ok: false,
