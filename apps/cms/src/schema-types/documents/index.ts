@@ -6,6 +6,7 @@ import { blogPageSchema } from './pages/blog-page';
 import { homePageSchema } from './pages/home-page';
 import { genericSchema } from './pages/page';
 import { pagePostSchema } from './pages/page-post';
+import { pageTagSchema } from './pages/page-tag';
 import { pageTopicSchema } from './pages/page-topic';
 import { tagIndexPageSchema } from './pages/tag-index-page';
 import { topicIndexPageSchema } from './pages/topic-index-page';
@@ -28,6 +29,7 @@ export const documents = [
   pageTopicSchema,
   pagePostSchema,
   tagIndexPageSchema,
+  pageTagSchema,
   siteSchema,
   navigationSchema,
   footerSchema,
