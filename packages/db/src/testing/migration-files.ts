@@ -9,6 +9,12 @@ const migrationsDir = fileURLToPath(
   new URL('../../migrations', import.meta.url),
 );
 
+// Tests that replay migrations from scratch (building their own PGlite
+// instance and running real migration SQL, rather than restoring the
+// pre-built snapshot) can't share that snapshot's speed — give them enough
+// headroom to survive a machine under heavy concurrent load.
+export const MIGRATION_REPLAY_TEST_TIMEOUT_MS = 120_000;
+
 // pglite (Postgres compiled to WASM) doesn't ship the `pgvector` extension,
 // so the bootstrap migration that turns it on for a future embeddings
 // column can't run here. No feature table depends on it yet, so it's safe to
