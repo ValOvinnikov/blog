@@ -18,7 +18,7 @@ export interface IPostListModulePagination {
 
 export interface IPostListModuleViewProps extends Omit<
   TPostListModule,
-  'posts' | 'currentPage' | 'totalPages' | 'emptyMessage'
+  'posts' | 'currentPage' | 'totalPages'
 > {
   items: IPostCardData[];
   titleId: string;

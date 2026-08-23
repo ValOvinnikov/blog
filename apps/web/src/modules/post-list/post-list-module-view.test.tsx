@@ -33,6 +33,7 @@ const setup = customRender(PostListModuleView, {
   titleId: 'posts-title',
   dataTestId: 'post-list-module-post-list-1',
   accessibleTitle: 'Posts',
+  emptyMessage: 'No posts yet.',
 });
 
 describe(PostListModuleView, () => {
@@ -121,8 +122,8 @@ describe(PostListModuleView, () => {
     expect(nextLink).toHaveAttribute('href', '/topics/engineering/page/3');
   });
 
-  it('renders the empty message when items is empty and emptyMessage is provided', () => {
-    setup({ items: [], emptyMessage: 'No posts yet.' });
+  it('renders the resolved i18n empty message when items is empty', () => {
+    setup({ items: [] });
 
     expect(screen.getByText('No posts yet.')).toBeInTheDocument();
   });

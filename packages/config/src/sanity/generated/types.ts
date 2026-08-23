@@ -550,7 +550,6 @@ export type Module_postList = {
   sectionHeader?: SectionHeader;
   limit?: number;
   pageSize?: number;
-  emptyMessage?: string;
   layout?: Layout;
 };
 

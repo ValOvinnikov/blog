@@ -20,7 +20,7 @@ export interface IPostListModuleProps {
   ariaLabel?: string;
   /** Fallback heading for screen readers when the CMS `sectionHeader.heading` is blank. Defaults to the blog archive's own copy. */
   accessibleTitle?: string;
-  /** Fallback empty-state copy when the CMS `emptyMessage` is blank. Defaults to the blog archive's own copy. */
+  /** Empty-state copy for this archive. Defaults to the blog archive's own copy. */
   emptyMessageFallback?: string;
   titleId?: string;
 }
@@ -65,7 +65,6 @@ export const PostListModule = async ({
     sectionHeader,
     posts,
     layout,
-    emptyMessage,
     currentPage,
     totalPages,
   } = result.data;
@@ -97,7 +96,7 @@ export const PostListModule = async ({
       titleId={titleId}
       dataTestId={`post-list-module-${id}`}
       accessibleTitle={accessibleTitle ?? blogListT('title')}
-      emptyMessage={emptyMessage ?? emptyMessageFallback ?? blogListT('empty')}
+      emptyMessage={emptyMessageFallback ?? blogListT('empty')}
       pagination={pagination}
     />
   );

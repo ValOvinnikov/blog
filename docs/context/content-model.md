@@ -40,10 +40,10 @@ every module type.
   `secondaryAction` (`link`).
 - `module_postList` (`postListSchema`) — the **paginated archive**: internal
   `title`, `sectionHeader` (optional — see below), `pageSize` (posts per page,
-  1–24, required), a vestigial `limit` awaiting removal alongside
-  `page_blog.itemsPerPage`, and an `emptyMessage` that **should not exist** —
-  it duplicates Voice's `blogListEmpty` and silently overrides it. Slated for
-  removal; do not copy it onto new modules.
+  1–24, required), and a vestigial `limit` awaiting removal alongside
+  `page_blog.itemsPerPage`. It carries **no `emptyMessage`** (removed in
+  #1899) — empty-state copy belongs to Voice (`settings_voice.emptyStates`),
+  same as every other module below.
 - `module_postLatest` (`postLatestSchema`) — the **latest-N teaser**: internal
   `title`, `sectionHeader` (optional), `limit` (posts to fetch, 1–12). Split
   from `module_postList` so one type is never both a teaser and an archive;
@@ -54,9 +54,8 @@ every module type.
   which index page's required slot holds it, the same inference-by-slot rule
   the post list uses. It also carries **no `emptyMessage`**: empty-state copy
   belongs to Voice (`settings_voice.emptyStates`, surfaced in the admin
-  panel's Voice section and overridable per tenant), not to modules.
-  `module_postList` still has such a field and should not — it silently beats
-  the tenant's Voice setting, tracked as a bug rather than a pattern to copy.
+  panel's Voice section and overridable per tenant), not to modules — same
+  as `module_postList` since #1899.
 - `module_content` (`contentSchema`) — internal `title`, `body` (portable
   text). No `sectionHeader` — its rich-text `body` supplies any in-content
   headings, so a separate structured heading field would just be a second
