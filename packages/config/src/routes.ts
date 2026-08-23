@@ -12,9 +12,9 @@ export const routes = {
   /** Page 1 lives at /topics/{slug} only; pages ≥ 2 under the static `page/` segment. */
   topic: (slug: string, page = 1) =>
     page === 1 ? `/topics/${slug}` : `/topics/${slug}/page/${page}`,
-  /** Page 1 lives at /tag/{slug} only; pages ≥ 2 under the static `page/` segment. */
+  /** Page 1 lives at /tags/{slug} only; pages ≥ 2 under the static `page/` segment. */
   tag: (slug: string, page = 1) =>
-    page === 1 ? `/tag/${slug}` : `/tag/${slug}/page/${page}`,
+    page === 1 ? `/tags/${slug}` : `/tags/${slug}/page/${page}`,
   /** Page 1 lives at /author/{slug} only; pages ≥ 2 under the static `page/` segment. */
   author: (slug: string, page = 1) =>
     page === 1 ? `/author/${slug}` : `/author/${slug}/page/${page}`,
