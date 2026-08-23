@@ -4,59 +4,44 @@ import {
   Breadcrumbs,
   type IBreadcrumbItem,
 } from '@blog/ui/molecules/breadcrumbs';
-import { Pagination } from '@blog/ui/organisms/pagination';
-import { PostsSection } from '@blog/ui/organisms/posts-section';
 import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { ModuleRenderer } from '@web/modules/module-renderer';
+import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
-import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
-import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
-type TTagPageProps = { slug: string; page?: number };
+type TTagPageProps = { slug: string; page?: number; locale: string };
 
 /**
- * TagPage — shared composition for `/tag/[slug]` (page 1, `page` omitted)
- * and `/tag/[slug]/page/[page]` (pages ≥ 2, `page` provided): fetches posts
- * for the tag, renders a `Home › Tag: {name}` `Breadcrumbs` trail (plus its
- * `BreadcrumbList` JSON-LD) inside a `BreadcrumbBar` sibling before `<main>`,
- * then renders the posts through the same pure ui organisms as
- * `TopicPage`. `getTagPage` always windows — page 1 gets the same
- * pagination metadata as any other page.
+ * TagPage — shared composition for `/tags/[slug]` (page 1, `page`
+ * omitted) and `/tags/[slug]/page/[page]` (pages ≥ 2, `page` provided):
+ * fetches the `page_tag` shell via the tag service, renders a
+ * `Home › Tag: {name}` `Breadcrumbs` trail (plus its `BreadcrumbList`
+ * JSON-LD) inside a `BreadcrumbBar` sibling before `<main>`, then the
+ * archive itself — via `PostListModule`, reading `page_tag.postList` — as a
+ * sibling outside `BlogPageTemplate`'s constrained furniture, mirroring
+ * `TopicPage`.
  */
-export const TagPage = async ({ slug, page }: TTagPageProps) => {
-  const [result, t, breadcrumbsT, tagPageT] = await Promise.all([
-    service.pages.tag.v1.getTagPage(slug, {
-      page,
-      itemsPerPage: TAG_ITEMS_PER_PAGE,
-    }),
-    getTranslations('pagination'),
+export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
+  const [result, breadcrumbsT, tagPageT, paginationT] = await Promise.all([
+    service.pages.tag.v1.getTagPage(slug),
     getTranslations('breadcrumbs'),
     getTranslations('tagPage'),
+    getTranslations('pagination'),
   ]);
 
   if (!result.ok) {
     logger.error('tag_page.fetch_failed', { slug, error: result.error });
     notFound();
   }
-  if (result.data === null) {
-    notFound();
-  }
 
-  const { tag, posts, currentPage, totalPages } = result.data;
-
-  // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
-  // soft-404 or a redirect to the last page (spec SEO rules).
-  if (page !== undefined && page > totalPages) {
-    notFound();
-  }
-
-  const items = await toPostListItems(posts);
+  const { tag, modules, postListId } = result.data;
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
   const trail: IBreadcrumbItem[] = [
@@ -80,25 +65,20 @@ export const TagPage = async ({ slug, page }: TTagPageProps) => {
       <BlogPageTemplate
         heading={tag.title}
         supportingText={tag.description}
-        posts={
-          <PostsSection
-            posts={items}
-            title={tagPageT('title', { name: tag.title })}
-            titleId="tag-posts-title"
-            linkAs={SmartLink}
-            emptyMessage={tagPageT('empty', { name: tag.title })}
-          />
-        }
-        pagination={
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            createHref={(pageNumber) => routes.tag(slug, pageNumber)}
-            ariaLabel={t('ariaLabel', { pageType: 'Tag' })}
-            previousLabel={t('previous')}
-            nextLabel={t('next')}
-            linkAs={SmartLink}
-          />
+        modules={
+          <>
+            <PostListModule
+              id={postListId}
+              locale={locale}
+              page={page ?? 1}
+              createHref={(pageNumber) => routes.tag(slug, pageNumber)}
+              ariaLabel={paginationT('ariaLabel', { pageType: 'Tag' })}
+              accessibleTitle={tagPageT('title', { name: tag.title })}
+              emptyMessageFallback={tagPageT('empty', { name: tag.title })}
+              titleId="tag-posts-title"
+            />
+            <ModuleRenderer modules={modules} locale={locale} />
+          </>
         }
       />
     </>

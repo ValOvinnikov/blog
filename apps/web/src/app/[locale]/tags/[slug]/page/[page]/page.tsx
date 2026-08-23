@@ -5,7 +5,6 @@ import { permanentRedirect } from '@web/i18n/navigation';
 import { buildTagMetadata } from '@web/metadata/tag-metadata';
 import { logger } from '@web/utils/logger/logger';
 import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
-import { TAG_ITEMS_PER_PAGE } from '@web/utils/tag-items-per-page';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
@@ -20,8 +19,7 @@ type TProps = {
 // on demand via ISR — correctness rides on the explicit range check in
 // `TagPage`, not on this list.
 export async function generateStaticParams() {
-  const result =
-    await service.pages.tag.v1.getTagPaginationParams(TAG_ITEMS_PER_PAGE);
+  const result = await service.pages.tag.v1.getTagPaginationParams();
 
   if (!result.ok) {
     logger.error('tag_pagination.params_fetch_failed', {
@@ -51,10 +49,10 @@ export default async function TagNumberedPage({ params }: TProps) {
     notFound();
   }
 
-  // Page 1 has exactly one URL: /tag/{slug}. 308 — SEO-equivalent to a 301.
+  // Page 1 has exactly one URL: /tags/{slug}. 308 — SEO-equivalent to a 301.
   if (page === 1) {
     permanentRedirect({ href: routes.tag(slug, 1), locale });
   }
 
-  return <TagPage slug={slug} page={page} />;
+  return <TagPage slug={slug} page={page} locale={locale} />;
 }

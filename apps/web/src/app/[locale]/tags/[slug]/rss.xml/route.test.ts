@@ -2,17 +2,18 @@
  * @vitest-environment jsdom
  */
 import { makePostCard } from '@web/testing/shared/post/fixtures';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
-import { makeTag } from '@web/testing/shared/tag/fixtures';
+import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import { notFound } from 'next/navigation';
 
-const { getTagPageMock } = vi.hoisted(() => ({
+const { getTagPageMock, getPostListMock } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
+  getPostListMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
   service: {
     pages: { tag: { v1: { getTagPage: getTagPageMock } } },
+    modules: { postList: { v1: { getPostList: getPostListMock } } },
   },
 }));
 
@@ -25,30 +26,28 @@ const post = makePostCard({
 
 const params = Promise.resolve({ slug: 'typescript' });
 
-describe('GET /tag/[slug]/rss.xml', () => {
+describe('GET /tags/[slug]/rss.xml', () => {
   afterEach(() => {
     vi.resetModules();
     getTagPageMock.mockReset();
+    getPostListMock.mockReset();
   });
 
   it('returns a valid RSS 2.0 feed scoped to the tag with the correct content type', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        tag: makeTag({
+      data: makeTagDetailPage({
+        tag: {
+          id: 'tag-1',
+          title: 'TypeScript',
+          slug: 'typescript',
           description: 'The latest TypeScript posts.',
-          seo: makeSeo({
-            title: 'TypeScript',
-            description: 'The latest TypeScript posts.',
-            ogTitle: 'TypeScript',
-            ogDescription: 'The latest TypeScript posts.',
-          }),
-        }),
-        posts: [post],
-        currentPage: 1,
-        totalPages: 1,
-        total: 1,
-      },
+        },
+      }),
+    });
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: { posts: [post], currentPage: 1, totalPages: 1 },
     });
     const { GET } = await import('./route');
 
@@ -73,30 +72,25 @@ describe('GET /tag/[slug]/rss.xml', () => {
     expect(doc.querySelector('item > link')?.textContent).toBe(
       'https://example.com/blog/hello-welcome',
     );
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
-      page: 1,
-      itemsPerPage: 9,
-    });
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript');
+    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', 1);
   });
 
   it('falls back to the tag title as the channel description when none is authored', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        tag: makeTag({
+      data: makeTagDetailPage({
+        tag: {
+          id: 'tag-1',
+          title: 'TypeScript',
+          slug: 'typescript',
           description: undefined,
-          seo: makeSeo({
-            title: 'TypeScript',
-            description: 'TypeScript',
-            ogTitle: 'TypeScript',
-            ogDescription: 'TypeScript',
-          }),
-        }),
-        posts: [],
-        currentPage: 1,
-        totalPages: 1,
-        total: 0,
-      },
+        },
+      }),
+    });
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: { posts: [], currentPage: 1, totalPages: 1 },
     });
     const { GET } = await import('./route');
 
@@ -109,37 +103,31 @@ describe('GET /tag/[slug]/rss.xml', () => {
     );
   });
 
-  it('aggregates posts across every windowed tag page', async () => {
-    const tag = makeTag({
-      description: 'The latest TypeScript posts.',
-      seo: makeSeo({
-        title: 'TypeScript',
-        description: 'The latest TypeScript posts.',
-        ogTitle: 'TypeScript',
-        ogDescription: 'The latest TypeScript posts.',
+  it('aggregates posts across every windowed post-list page', async () => {
+    getTagPageMock.mockResolvedValue({
+      ok: true,
+      data: makeTagDetailPage({
+        tag: {
+          id: 'tag-1',
+          title: 'TypeScript',
+          slug: 'typescript',
+          description: 'The latest TypeScript posts.',
+        },
       }),
     });
-    getTagPageMock.mockImplementation(({ page }: { page: number }) => {
+    getPostListMock.mockImplementation((_id: string, page: number) => {
       if (page === 1) {
         return Promise.resolve({
           ok: true,
-          data: {
-            tag,
-            posts: [post],
-            currentPage: 1,
-            totalPages: 2,
-            total: 2,
-          },
+          data: { posts: [post], currentPage: 1, totalPages: 2 },
         });
       }
       return Promise.resolve({
         ok: true,
         data: {
-          tag,
           posts: [{ ...post, slug: 'second-post', title: 'Second post' }],
           currentPage: 2,
           totalPages: 2,
-          total: 2,
         },
       });
     });
@@ -150,11 +138,12 @@ describe('GET /tag/[slug]/rss.xml', () => {
     const doc = new DOMParser().parseFromString(xml, 'application/xml');
 
     expect(doc.querySelectorAll('item')).toHaveLength(2);
-    expect(getTagPageMock).toHaveBeenCalledTimes(2);
+    expect(getPostListMock).toHaveBeenCalledTimes(2);
   });
 
-  it('calls notFound() when the tag does not exist', async () => {
-    getTagPageMock.mockResolvedValue({ ok: true, data: null });
+  it('calls notFound() when the tag fetch fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getTagPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
     const { GET } = await import('./route');
 
     await expect(
@@ -162,11 +151,21 @@ describe('GET /tag/[slug]/rss.xml', () => {
     ).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    expect(getPostListMock).not.toHaveBeenCalled();
+
+    errorSpy.mockRestore();
   });
 
-  it('calls notFound() when the tag fetch fails', async () => {
+  it('calls notFound() when the first post-list page fetch fails', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getTagPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+    getTagPageMock.mockResolvedValue({
+      ok: true,
+      data: makeTagDetailPage(),
+    });
+    getPostListMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
     const { GET } = await import('./route');
 
     await expect(

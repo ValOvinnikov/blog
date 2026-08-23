@@ -29,6 +29,12 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
+  it('maps the tag page document to its ISR tag', () => {
+    expect(getRevalidateTagsForType('page_tag', 'page_tag-1')).toEqual([
+      'page_tag',
+    ]);
+  });
+
   it('maps the topic page document to its ISR tag', () => {
     expect(getRevalidateTagsForType('page_topic', 'page_topic-1')).toEqual([
       'page_topic',

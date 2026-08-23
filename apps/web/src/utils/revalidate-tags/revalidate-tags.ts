@@ -31,6 +31,7 @@ const REVALIDATE_TAGS = {
   page_blog: ['page_blog'],
   page_generic: ['page_generic'],
   page_post: ['page_post'],
+  page_tag: ['page_tag'],
   page_topic: ['page_topic'],
   page_topicIndex: ['page_topicIndex'],
   module_hero: ['modules:hero'],
