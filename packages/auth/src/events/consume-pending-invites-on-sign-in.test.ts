@@ -44,6 +44,35 @@ describe(consumePendingInvitesOnSignIn, () => {
     );
   });
 
+  it('consumes every matched invite even when an earlier one was already consumed', async () => {
+    findPendingInviteByEmailMock.mockResolvedValue([
+      { id: 'invite-1', tenantId: 'tenant-1' },
+      { id: 'invite-2', tenantId: 'tenant-2' },
+    ]);
+    // Simulates a race where invite-1 was already consumed elsewhere:
+    // `consumeMembershipInvite` resolves to `undefined` for it.
+    consumeMembershipInviteMock.mockImplementation((inviteId: string) =>
+      Promise.resolve(
+        inviteId === 'invite-1'
+          ? undefined
+          : { id: 'invite-2', tenantId: 'tenant-2' },
+      ),
+    );
+
+    await consumePendingInvitesOnSignIn({
+      user: { id: 'user-1', email: 'owner@example.com' },
+    });
+
+    expect(consumeMembershipInviteMock).toHaveBeenCalledWith(
+      'invite-1',
+      'user-1',
+    );
+    expect(consumeMembershipInviteMock).toHaveBeenCalledWith(
+      'invite-2',
+      'user-1',
+    );
+  });
+
   it('is a no-op when there are no pending invites', async () => {
     findPendingInviteByEmailMock.mockResolvedValue([]);
 
