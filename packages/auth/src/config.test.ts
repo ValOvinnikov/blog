@@ -10,6 +10,14 @@ vi.mock('@auth/drizzle-adapter', () => ({
   DrizzleAdapter: vi.fn(() => ({})),
 }));
 
+const { consumePendingInvitesOnSignInMock } = vi.hoisted(() => ({
+  consumePendingInvitesOnSignInMock: vi.fn(),
+}));
+
+vi.mock('@blog/auth/events/consume-pending-invites-on-sign-in', () => ({
+  consumePendingInvitesOnSignIn: consumePendingInvitesOnSignInMock,
+}));
+
 // `env.ts` validates AUTH_SECRET eagerly on import, so the one test that
 // changes it needs a fresh module instance via resetModules + dynamic import
 // (same pattern as utils/env/env.test.ts).
@@ -73,5 +81,14 @@ describe(buildAuthConfig, () => {
     const config = buildAuthConfig({ sendEmail: vi.fn() });
 
     expect(config.callbacks?.session).toEqual(expect.any(Function));
+  });
+
+  it('exposes a signIn event that consumes pending membership invites', async () => {
+    const config = buildAuthConfig({ sendEmail: vi.fn() });
+    const user = { id: 'user-1', email: 'owner@example.com' };
+
+    await config.events?.signIn?.({ user });
+
+    expect(consumePendingInvitesOnSignInMock).toHaveBeenCalledWith({ user });
   });
 });

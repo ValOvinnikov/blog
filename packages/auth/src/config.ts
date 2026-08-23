@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
+import { consumePendingInvitesOnSignIn } from '@blog/auth/events/consume-pending-invites-on-sign-in';
 import {
   buildMagicLinkProvider,
   type TSendEmail,
@@ -60,6 +61,9 @@ export function buildAuthConfig({
         ...session,
         user: { ...session.user, id: user.id },
       }),
+    },
+    events: {
+      signIn: ({ user }) => consumePendingInvitesOnSignIn({ user }),
     },
     providers: [
       GitHub({
