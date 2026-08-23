@@ -39,7 +39,15 @@ export function buildMagicLinkProvider(sendEmail: TSendEmail): EmailConfig {
     from,
     async sendVerificationRequest({ identifier, url }) {
       const { host } = new URL(url);
-      const tenantNames = await findPendingInviteTenantNames(identifier);
+      let tenantNames: string[] = [];
+      try {
+        tenantNames = await findPendingInviteTenantNames(identifier);
+      } catch {
+        // Best-effort: a failed lookup falls back to the generic copy below,
+        // same as finding no pending invite — never blocks delivery of the
+        // magic-link email itself. Never console.*, this package never logs
+        // (see CLAUDE.md).
+      }
       const { subject, html } =
         tenantNames.length > 0
           ? buildInviteMagicLinkEmail({ url, host, tenantNames })

@@ -98,4 +98,27 @@ describe(consumePendingInvitesOnSignIn, () => {
     expect(findPendingInviteByEmailMock).not.toHaveBeenCalled();
     expect(consumeMembershipInviteMock).not.toHaveBeenCalled();
   });
+
+  it('resolves without rethrowing when findPendingInviteByEmail throws', async () => {
+    findPendingInviteByEmailMock.mockRejectedValue(new Error('db error'));
+
+    await expect(
+      consumePendingInvitesOnSignIn({
+        user: { id: 'user-1', email: 'owner@example.com' },
+      }),
+    ).resolves.toBeUndefined();
+  });
+
+  it('resolves without rethrowing when consumeMembershipInvite throws', async () => {
+    findPendingInviteByEmailMock.mockResolvedValue([
+      { id: 'invite-1', tenantId: 'tenant-1' },
+    ]);
+    consumeMembershipInviteMock.mockRejectedValue(new Error('db error'));
+
+    await expect(
+      consumePendingInvitesOnSignIn({
+        user: { id: 'user-1', email: 'owner@example.com' },
+      }),
+    ).resolves.toBeUndefined();
+  });
 });

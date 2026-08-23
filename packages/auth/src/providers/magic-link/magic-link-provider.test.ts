@@ -95,4 +95,29 @@ describe(buildMagicLinkProvider, () => {
       html: expect.stringContaining('<strong>Acme Blog</strong>'),
     });
   });
+
+  it('falls back to the generic copy and still delivers when the invite lookup throws', async () => {
+    findPendingInviteByEmailMock.mockRejectedValue(new Error('db error'));
+    const sendEmail = vi.fn().mockResolvedValue(undefined);
+    const provider = buildMagicLinkProvider(sendEmail);
+
+    await provider.sendVerificationRequest({
+      identifier: 'jane@example.com',
+      url: 'https://example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://example.com'),
+    });
+
+    expect(sendEmail).toHaveBeenCalledWith({
+      to: 'jane@example.com',
+      from: 'Sign in <onboarding@resend.dev>',
+      subject: 'Sign in to example.com',
+      html: expect.stringContaining(
+        'href="https://example.com/api/auth/callback/email?token=abc"',
+      ),
+    });
+  });
 });
