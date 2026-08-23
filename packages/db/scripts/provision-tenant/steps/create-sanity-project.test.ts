@@ -6,21 +6,27 @@ import { createTenantSanityProject } from './create-sanity-project';
 
 const {
   setTenantSanityProjectMock,
+  getTenantOwnerEmailMock,
   createSanityProjectMock,
   createSanityDatasetMock,
   addSanityCorsOriginMock,
+  createSanityProjectInviteMock,
   listSanityDatasetsMock,
   listSanityCorsOriginsMock,
+  listSanityProjectInvitesMock,
   callOrder,
 } = vi.hoisted(() => {
   const callOrder: string[] = [];
   return {
     setTenantSanityProjectMock: vi.fn(),
+    getTenantOwnerEmailMock: vi.fn(),
     createSanityProjectMock: vi.fn(),
     createSanityDatasetMock: vi.fn(),
     addSanityCorsOriginMock: vi.fn(),
+    createSanityProjectInviteMock: vi.fn(),
     listSanityDatasetsMock: vi.fn(),
     listSanityCorsOriginsMock: vi.fn(),
+    listSanityProjectInvitesMock: vi.fn(),
     callOrder,
   };
 });
@@ -29,12 +35,18 @@ vi.mock('@blog/db/queries/tenants', () => ({
   setTenantSanityProject: setTenantSanityProjectMock,
 }));
 
+vi.mock('@blog/db/queries/memberships', () => ({
+  getTenantOwnerEmail: getTenantOwnerEmailMock,
+}));
+
 vi.mock('../lib/sanity-management-client', () => ({
   createSanityProject: createSanityProjectMock,
   createSanityDataset: createSanityDatasetMock,
   addSanityCorsOrigin: addSanityCorsOriginMock,
+  createSanityProjectInvite: createSanityProjectInviteMock,
   listSanityDatasets: listSanityDatasetsMock,
   listSanityCorsOrigins: listSanityCorsOriginsMock,
+  listSanityProjectInvites: listSanityProjectInvitesMock,
 }));
 
 const env: TProvisionEnv = {
@@ -79,14 +91,21 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
 beforeEach(() => {
   callOrder.length = 0;
   setTenantSanityProjectMock.mockReset();
+  getTenantOwnerEmailMock.mockReset();
   createSanityProjectMock.mockReset();
   createSanityDatasetMock.mockReset();
   addSanityCorsOriginMock.mockReset();
+  createSanityProjectInviteMock.mockReset();
   listSanityDatasetsMock.mockReset();
   listSanityCorsOriginsMock.mockReset();
+  listSanityProjectInvitesMock.mockReset();
 
   setTenantSanityProjectMock.mockImplementation(async () => {
     callOrder.push('setTenantSanityProject');
+  });
+  getTenantOwnerEmailMock.mockImplementation(async () => {
+    callOrder.push('getTenantOwnerEmail');
+    return 'owner@example.com';
   });
   createSanityProjectMock.mockImplementation(async () => {
     callOrder.push('createSanityProject');
@@ -98,6 +117,9 @@ beforeEach(() => {
   addSanityCorsOriginMock.mockImplementation(async () => {
     callOrder.push('addSanityCorsOrigin');
   });
+  createSanityProjectInviteMock.mockImplementation(async () => {
+    callOrder.push('createSanityProjectInvite');
+  });
   listSanityDatasetsMock.mockImplementation(async () => {
     callOrder.push('listSanityDatasets');
     return [];
@@ -106,10 +128,14 @@ beforeEach(() => {
     callOrder.push('listSanityCorsOrigins');
     return [];
   });
+  listSanityProjectInvitesMock.mockImplementation(async () => {
+    callOrder.push('listSanityProjectInvites');
+    return [];
+  });
 });
 
 describe(createTenantSanityProject, () => {
-  it('creates nothing when the project, dataset, and CORS entry all already exist', async () => {
+  it('creates nothing when the project, dataset, CORS entry, and owner invite all already exist', async () => {
     const tenant = baseTenant({
       sanityProjectId: 'proj123',
       sanityDataset: 'test-dataset',
@@ -122,6 +148,10 @@ describe(createTenantSanityProject, () => {
       callOrder.push('listSanityCorsOrigins');
       return [{ id: 'cors1', origin: 'https://admin.example.com' }];
     });
+    listSanityProjectInvitesMock.mockImplementation(async () => {
+      callOrder.push('listSanityProjectInvites');
+      return [{ email: 'owner@example.com', status: 'pending' }];
+    });
 
     const result = await createTenantSanityProject(tenant, env);
 
@@ -133,6 +163,7 @@ describe(createTenantSanityProject, () => {
     expect(setTenantSanityProjectMock).not.toHaveBeenCalled();
     expect(createSanityDatasetMock).not.toHaveBeenCalled();
     expect(addSanityCorsOriginMock).not.toHaveBeenCalled();
+    expect(createSanityProjectInviteMock).not.toHaveBeenCalled();
     expect(listSanityDatasetsMock).toHaveBeenCalledWith({
       token: 'mgmt-token',
       projectId: 'proj123',
@@ -258,5 +289,93 @@ describe(createTenantSanityProject, () => {
       sanityProjectId: 'proj123',
       sanityDataset: 'test-dataset',
     });
+  });
+
+  it('resolves the tenant owner email and invites them as an editor when not already invited', async () => {
+    const tenant = baseTenant();
+
+    await createTenantSanityProject(tenant, env);
+
+    expect(getTenantOwnerEmailMock).toHaveBeenCalledWith('tenant-1');
+    expect(listSanityProjectInvitesMock).toHaveBeenCalledWith({
+      token: 'mgmt-token',
+      projectId: 'proj456',
+    });
+    expect(createSanityProjectInviteMock).toHaveBeenCalledWith({
+      token: 'mgmt-token',
+      projectId: 'proj456',
+      email: 'owner@example.com',
+      role: 'editor',
+    });
+  });
+
+  it('does not re-invite an owner who already has a pending or accepted invite', async () => {
+    const tenant = baseTenant({
+      sanityProjectId: 'proj123',
+      sanityDataset: 'test-dataset',
+    });
+    listSanityDatasetsMock.mockImplementation(async () => {
+      callOrder.push('listSanityDatasets');
+      return [{ name: 'test-dataset' }];
+    });
+    listSanityCorsOriginsMock.mockImplementation(async () => {
+      callOrder.push('listSanityCorsOrigins');
+      return [{ id: 'cors1', origin: 'https://admin.example.com' }];
+    });
+    listSanityProjectInvitesMock.mockImplementation(async () => {
+      callOrder.push('listSanityProjectInvites');
+      return [{ email: 'Owner@Example.com', status: 'accepted' }];
+    });
+
+    await createTenantSanityProject(tenant, env);
+
+    expect(createSanityProjectInviteMock).not.toHaveBeenCalled();
+  });
+
+  it('skips inviting when the tenant has no resolvable owner email, logging the gap', async () => {
+    const tenant = baseTenant();
+    getTenantOwnerEmailMock.mockImplementation(async () => {
+      callOrder.push('getTenantOwnerEmail');
+      return undefined;
+    });
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    const result = await createTenantSanityProject(tenant, env);
+
+    expect(listSanityProjectInvitesMock).not.toHaveBeenCalled();
+    expect(createSanityProjectInviteMock).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      sanityProjectId: 'proj456',
+      sanityDataset: 'test-dataset',
+    });
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('tenant-1'),
+    );
+
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('propagates an invite API failure the same way a CORS API failure propagates', async () => {
+    const tenant = baseTenant();
+    createSanityProjectInviteMock.mockImplementation(async () => {
+      callOrder.push('createSanityProjectInvite');
+      throw new Error('Access API is down');
+    });
+
+    await expect(createTenantSanityProject(tenant, env)).rejects.toThrow(
+      /Access API is down/,
+    );
+
+    // The project, dataset, and CORS work already landed before the invite
+    // call — a retry must not re-do that work, matching the CORS-failure
+    // test's expectation for the steps before it.
+    expect(setTenantSanityProjectMock).toHaveBeenCalledWith('tenant-1', {
+      sanityProjectId: 'proj456',
+      sanityDataset: 'test-dataset',
+    });
+    expect(createSanityDatasetMock).toHaveBeenCalled();
+    expect(addSanityCorsOriginMock).toHaveBeenCalled();
   });
 });

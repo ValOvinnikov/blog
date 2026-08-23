@@ -2,11 +2,13 @@ import {
   addSanityCorsOrigin,
   createSanityDataset,
   createSanityProject,
+  createSanityProjectInvite,
   createSanityRobotToken,
   createSanityWebhook,
   deleteSanityRobotToken,
   listSanityCorsOrigins,
   listSanityDatasets,
+  listSanityProjectInvites,
   listSanityWebhooks,
 } from './sanity-management-client';
 
@@ -258,6 +260,89 @@ describe(deleteSanityRobotToken, () => {
       'https://api.sanity.io/v2026-07-10/access/project/proj123/robots/robot1',
     );
     expect(init.method).toBe('DELETE');
+  });
+});
+
+describe(listSanityProjectInvites, () => {
+  it('GETs the project-scoped invites endpoint filtered to pending and accepted, unwrapping an items envelope', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          items: [{ email: 'owner@example.com', status: 'pending' }],
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const result = await listSanityProjectInvites({
+      token: 'tok',
+      projectId: 'proj123',
+    });
+
+    expect(result).toEqual([{ email: 'owner@example.com', status: 'pending' }]);
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(
+      'https://api.sanity.io/v2026-07-10/access/project/proj123/invites?status=pending&status=accepted',
+    );
+    expect(init.method ?? 'GET').toBe('GET');
+  });
+
+  it('accepts a bare array response with no items envelope', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify([{ email: 'owner@example.com', status: 'accepted' }]),
+        { status: 200 },
+      ),
+    );
+
+    const result = await listSanityProjectInvites({
+      token: 'tok',
+      projectId: 'proj123',
+    });
+
+    expect(result).toEqual([
+      { email: 'owner@example.com', status: 'accepted' },
+    ]);
+  });
+});
+
+describe(createSanityProjectInvite, () => {
+  it('POSTs the email + role to the project-scoped invites endpoint', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ id: 'invite1', status: 'pending' }), {
+        status: 200,
+      }),
+    );
+
+    await createSanityProjectInvite({
+      token: 'tok',
+      projectId: 'proj123',
+      email: 'owner@example.com',
+      role: 'editor',
+    });
+
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(
+      'https://api.sanity.io/v2026-07-10/access/project/proj123/invites',
+    );
+    expect(init.method).toBe('POST');
+    expect(JSON.parse(init.body as string)).toEqual({
+      email: 'owner@example.com',
+      role: 'editor',
+    });
+  });
+
+  it('throws with the response status and body on failure', async () => {
+    fetchMock.mockResolvedValue(new Response('nope', { status: 402 }));
+
+    await expect(
+      createSanityProjectInvite({
+        token: 'tok',
+        projectId: 'proj123',
+        email: 'owner@example.com',
+        role: 'editor',
+      }),
+    ).rejects.toThrow(/402/);
   });
 });
 
