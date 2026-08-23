@@ -100,6 +100,14 @@ export async function createTenantSanityProject(
         role: OWNER_INVITE_ROLE,
       });
     }
+  } else {
+    // Tenant creation always inserts an OWNER membership, so this should
+    // only happen on a genuine data anomaly. Provisioning must still
+    // complete — logging is the only trace an operator gets that the
+    // tenant's owner has no Sanity Studio invite and needs one by hand.
+    console.error(
+      `create-sanity-project: no resolvable owner email for tenant "${tenant.id}" — skipping Sanity Studio invite.`,
+    );
   }
 
   return { sanityProjectId: projectId, sanityDataset: env.tenantSanityDataset };

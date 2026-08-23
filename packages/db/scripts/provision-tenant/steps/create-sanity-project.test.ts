@@ -332,12 +332,15 @@ describe(createTenantSanityProject, () => {
     expect(createSanityProjectInviteMock).not.toHaveBeenCalled();
   });
 
-  it('skips inviting when the tenant has no resolvable owner email', async () => {
+  it('skips inviting when the tenant has no resolvable owner email, logging the gap', async () => {
     const tenant = baseTenant();
     getTenantOwnerEmailMock.mockImplementation(async () => {
       callOrder.push('getTenantOwnerEmail');
       return undefined;
     });
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
 
     const result = await createTenantSanityProject(tenant, env);
 
@@ -347,6 +350,11 @@ describe(createTenantSanityProject, () => {
       sanityProjectId: 'proj456',
       sanityDataset: 'test-dataset',
     });
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('tenant-1'),
+    );
+
+    consoleErrorSpy.mockRestore();
   });
 
   it('propagates an invite API failure the same way a CORS API failure propagates', async () => {
