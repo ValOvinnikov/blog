@@ -8,6 +8,7 @@ import { homePageSchema } from '@cms/schema-types/documents/pages/home-page';
 import { genericSchema } from '@cms/schema-types/documents/pages/page';
 import { pagePostSchema } from '@cms/schema-types/documents/pages/page-post';
 import { pageTopicSchema } from '@cms/schema-types/documents/pages/page-topic';
+import { tagIndexPageSchema } from '@cms/schema-types/documents/pages/tag-index-page';
 import { topicIndexPageSchema } from '@cms/schema-types/documents/pages/topic-index-page';
 import { footerSchema } from '@cms/schema-types/documents/settings/footer';
 import { navigationSchema } from '@cms/schema-types/documents/settings/navigation';
@@ -122,6 +123,15 @@ export default defineConfig({
                         S.documentTypeListItem(pageTopicSchema.name)
                           .title('Topic Pages')
                           .icon(Tags),
+                        S.listItem()
+                          .title('Tag Index Page')
+                          .id(tagIndexPageSchema.name)
+                          .icon(Tags)
+                          .child(
+                            S.document()
+                              .schemaType(tagIndexPageSchema.name)
+                              .documentId(tagIndexPageSchema.name),
+                          ),
                       ],
                     },
                     {
