@@ -72,6 +72,15 @@ reusable module documents `module_hero`, `module_postList`, `module_content`,
   `@sanity/code-input`).
 - Singleton documents enforced through desk structure.
 
+## `settings_voice` mirrors a curated subset of `apps/web`'s i18n keys
+
+`settings_voice.ts` defines the tenant-overridable "voice" copy fields
+(empty-states, error/not-found messages, prompts, toasts) — not nav labels
+or `ariaLabel`s, those stay i18n-only. It is hand-duplicated against
+`apps/admin`'s `voice-fields.ts` and `apps/web`'s `apply-voice-overrides.ts`
+mapping; a new field here needs a matching entry in both. See `web.md`/
+`admin-app.md` for the other two legs.
+
 ## Typegen contract (critical)
 
 - Typegen is configured in `apps/cms/sanity.cli.ts` (not `sanity-typegen.json`,
