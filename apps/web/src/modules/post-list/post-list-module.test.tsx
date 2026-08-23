@@ -69,7 +69,6 @@ describe(PostListModule, () => {
         },
         posts: [],
         layout: undefined,
-        emptyMessage: undefined,
         currentPage: 2,
         totalPages: 2,
       },
@@ -92,7 +91,6 @@ describe(PostListModule, () => {
         },
         posts: [],
         layout: undefined,
-        emptyMessage: undefined,
         currentPage: 1,
         totalPages: 1,
       },
@@ -110,7 +108,7 @@ describe(PostListModule, () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the derived empty message when zero posts resolve and the CMS field is blank', async () => {
+  it('renders the i18n default empty message when zero posts resolve, unconditionally', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
@@ -122,7 +120,6 @@ describe(PostListModule, () => {
         },
         posts: [],
         layout: undefined,
-        emptyMessage: undefined,
         currentPage: 1,
         totalPages: 1,
       },
@@ -131,32 +128,6 @@ describe(PostListModule, () => {
     await setup();
 
     expect(screen.getByText('No posts yet.')).toBeInTheDocument();
-  });
-
-  it('renders the authored emptyMessage override instead of the derived default', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        sectionHeader: {
-          heading: 'Blog',
-          supportingText: undefined,
-          align: undefined,
-        },
-        posts: [],
-        layout: undefined,
-        emptyMessage: 'Nothing published yet — check back soon.',
-        currentPage: 1,
-        totalPages: 1,
-      },
-    });
-
-    await setup();
-
-    expect(
-      screen.getByText('Nothing published yet — check back soon.'),
-    ).toBeInTheDocument();
-    expect(screen.queryByText('No posts yet.')).not.toBeInTheDocument();
   });
 
   it('renders a pager with a fully translated aria-label and correct hrefs', async () => {
@@ -181,7 +152,6 @@ describe(PostListModule, () => {
           },
         ],
         layout: undefined,
-        emptyMessage: undefined,
         currentPage: 2,
         totalPages: 3,
       },
@@ -211,7 +181,6 @@ describe(PostListModule, () => {
         },
         posts: [],
         layout: undefined,
-        emptyMessage: undefined,
         currentPage: 5,
         totalPages: 1,
       },
@@ -234,7 +203,6 @@ describe(PostListModule, () => {
         },
         posts: [],
         layout: undefined,
-        emptyMessage: undefined,
         currentPage: 1,
         totalPages: 1,
       },
@@ -268,7 +236,6 @@ describe(PostListModule, () => {
           },
         ],
         layout: undefined,
-        emptyMessage: undefined,
         currentPage: 2,
         totalPages: 3,
       },
@@ -296,7 +263,6 @@ describe(PostListModule, () => {
         },
         posts: [],
         layout: undefined,
-        emptyMessage: undefined,
         currentPage: 1,
         totalPages: 1,
       },
@@ -312,7 +278,7 @@ describe(PostListModule, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders the caller-supplied emptyMessageFallback when zero posts resolve and the CMS field is blank', async () => {
+  it('renders the caller-supplied emptyMessageFallback when zero posts resolve, instead of the blog archive default', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
@@ -324,7 +290,6 @@ describe(PostListModule, () => {
         },
         posts: [],
         layout: undefined,
-        emptyMessage: undefined,
         currentPage: 1,
         totalPages: 1,
       },
@@ -358,7 +323,6 @@ describe(PostListModule, () => {
           },
         ],
         layout: undefined,
-        emptyMessage: undefined,
         currentPage: 2,
         totalPages: 3,
       },
@@ -388,7 +352,6 @@ describe(PostListModule, () => {
         },
         posts: [],
         layout: undefined,
-        emptyMessage: undefined,
         currentPage: 1,
         totalPages: 1,
       },
