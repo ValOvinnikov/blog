@@ -10,9 +10,6 @@ type TProps = {
   params: Promise<ILocalizedParams & { slug: string }>;
 };
 
-// CI's build environment can't always construct the Sanity client; an
-// uncaught throw here would crash the entire `next build`. `dynamicParams`
-// stays default `true`, so a missed build-time slug still renders on demand.
 export async function generateStaticParams() {
   const result = await service.pages.post.v1.getPostParams();
 

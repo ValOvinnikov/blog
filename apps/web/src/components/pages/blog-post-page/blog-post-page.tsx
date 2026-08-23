@@ -49,22 +49,15 @@ type TBlogPostPageProps = { slug: string };
 const s = blogPostPageVariants();
 
 /**
- * BlogPostPage — `/blog/{slug}` composition: fetches the post via
- * `service.pages.post.v1.getPost` and renders it as an `Article` compound
- * with a `Home › Topic › Post` breadcrumb trail, `BlogPosting` JSON-LD,
- * an optional `PostContentsRail` once the body has enough headings, and a
- * "Related reading" section when related posts exist. Site chrome
- * (`Header`/`Footer`) stays owned by `[locale]/layout.tsx`.
+ * `/blog/{slug}` composition. Site chrome (`Header`/`Footer`) stays owned by
+ * `[locale]/layout.tsx`, not this component.
  */
 export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
   const result = await service.pages.post.v1.getPost(slug);
 
   if (!result.ok) {
-    // `getPost` resolves `ok: false` both for a genuine fetch failure and for
-    // an ordinary missing slug (bad link, bot, stale bookmark) — the service
-    // layer's public result type doesn't distinguish the two (its
-    // `MissingPagePostError` isn't part of the exported surface), so this
-    // still logs at `error` for both, same limitation topic-page.tsx has.
+    // ok: false covers both a real fetch failure and an ordinary missing
+    // slug — no public way to tell them apart, so this always logs error.
     logger.error('blog_post_page.fetch_failed', { slug, error: result.error });
     notFound();
   }
