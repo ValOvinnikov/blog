@@ -74,4 +74,10 @@ describe(buildAuthConfig, () => {
 
     expect(config.callbacks?.session).toEqual(expect.any(Function));
   });
+
+  it('exposes a signIn event that consumes pending membership invites', () => {
+    const config = buildAuthConfig({ sendEmail: vi.fn() });
+
+    expect(config.events?.signIn).toEqual(expect.any(Function));
+  });
 });
