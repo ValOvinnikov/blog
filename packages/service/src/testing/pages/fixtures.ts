@@ -6,6 +6,7 @@ import type {
   TRawPostPage,
 } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
 import type { TRawTagPageTag } from '@blog/service/features/pages/tag/adaptor/detail-page/transformer';
+import type { TRawTagIndexPage } from '@blog/service/features/pages/tag-index/adaptor/transformer';
 import type { TRawTopicPage } from '@blog/service/features/pages/topic/adaptor/detail-page/transformer';
 import type { TRawTopicIndexPage } from '@blog/service/features/pages/topic-index/adaptor/transformer';
 import type { TRawArchivePostCard } from '@blog/service/shared/transformers/to-archive-post-card';
@@ -150,6 +151,18 @@ export function makeRawTopicIndexPage(
   return {
     heading: 'Browse by topic',
     supportingText: 'Find posts by subject.',
+    taxonomyList: { _id: 'taxonomy-list-1' },
+    seo: null,
+    ...overrides,
+  };
+}
+
+export function makeRawTagIndexPage(
+  overrides: Partial<NonNullable<TRawTagIndexPage>> = {},
+): NonNullable<TRawTagIndexPage> {
+  return {
+    heading: 'Browse by tag',
+    supportingText: 'Find posts by keyword.',
     taxonomyList: { _id: 'taxonomy-list-1' },
     seo: null,
     ...overrides,

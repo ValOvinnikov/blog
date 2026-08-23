@@ -22,6 +22,7 @@ import { createGenericPageService } from './features/pages/generic';
 import { createHomeService } from './features/pages/home';
 import { createPostService } from './features/pages/post';
 import { createTagService } from './features/pages/tag';
+import { createTagIndexService } from './features/pages/tag-index';
 import { createTopicService } from './features/pages/topic';
 import { createTopicIndexService } from './features/pages/topic-index';
 
@@ -37,6 +38,7 @@ export const service = {
     topic: createTopicService(),
     topicIndex: createTopicIndexService(),
     tag: createTagService(),
+    tagIndex: createTagIndexService(),
     author: createAuthorService(),
   },
   modules: {
@@ -93,6 +95,7 @@ export type {
   TPostSkim,
 } from './features/pages/post';
 export type { TTagPage } from './features/pages/tag';
+export type { TTagIndexPage } from './features/pages/tag-index';
 export type { TTopicDetailPage } from './features/pages/topic';
 export type { TTopicIndexPage } from './features/pages/topic-index';
 export { getSanityImageBaseUrl } from './sanity/image-base-url';
