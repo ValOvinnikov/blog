@@ -41,7 +41,7 @@ describe('getPostList', () => {
     await expect(getPostList('missing')).rejects.toThrow();
   });
 
-  it('tags the posts query with author/topic alongside posts', async () => {
+  it('tags the posts query with author/topic/page_tag/tag alongside posts', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
       .mockResolvedValueOnce({
@@ -56,8 +56,27 @@ describe('getPostList', () => {
       expect.anything(),
       expect.objectContaining({
         next: expect.objectContaining({
-          tags: ['posts', 'author', 'topic'],
+          tags: ['posts', 'author', 'topic', 'page_tag', 'tag'],
         }),
+      }),
+    );
+  });
+
+  it('passes the module id as a posts-query parameter', async () => {
+    mockRun
+      .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
+      .mockResolvedValueOnce({
+        posts: [makeRawPostCard({ _id: 'a' })],
+        total: 1,
+      });
+
+    await getPostList('post-list-1');
+
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({
+        parameters: { id: 'post-list-1' },
       }),
     );
   });
