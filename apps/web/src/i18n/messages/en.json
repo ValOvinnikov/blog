@@ -8,7 +8,6 @@
   "breadcrumbs": {
     "home": "Home",
     "ariaLabel": "Breadcrumb",
-    "authorPrefix": "Author: {name}",
     "topics": "Topics",
     "tags": "Tags",
     "blog": "Blog"
@@ -101,9 +100,6 @@
     "fallbackTitle": "Blog",
     "fallbackDescription": "Latest posts",
     "feedLinkLabel": "RSS feed"
-  },
-  "authorMetadata": {
-    "nameWithRole": "{name} — {role}"
   },
   "authMenu": {
     "signIn": "Sign in",

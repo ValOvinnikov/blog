@@ -24,7 +24,7 @@ function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
   return {
     id: raw._id,
     name: raw.name,
-    slug: raw.slug,
+    profilePageSlug: raw.profilePage?.slug ?? undefined,
     imageUrl: buildImageUrl(raw.image, {
       width: AUTHOR_AVATAR_SIZE_PX,
       height: AUTHOR_AVATAR_SIZE_PX,

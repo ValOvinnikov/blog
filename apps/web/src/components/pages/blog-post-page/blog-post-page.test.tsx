@@ -263,15 +263,32 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(screen.getByText('January 15, 2026')).toBeVisible();
   });
 
-  it('links the author name to routes.author(slug)', async () => {
+  it('links the author name to routes.genericPage(profilePageSlug)', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     await setup();
 
     expect(screen.getByRole('link', { name: 'Jane Doe' })).toHaveAttribute(
       'href',
-      '/author/jane-doe',
+      '/jane-doe',
     );
+  });
+
+  it('renders the author name as plain text when profilePageSlug is absent', async () => {
+    getPostMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockPostDetail,
+        author: { ...mockPostDetail.author, profilePageSlug: undefined },
+      },
+    });
+
+    await setup();
+
+    expect(
+      screen.queryByRole('link', { name: 'Jane Doe' }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('Jane Doe')).toBeVisible();
   });
 
   it('renders the Home › Topic › Post breadcrumbs trail', async () => {
@@ -519,7 +536,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
             author: {
               id: 'author-1',
               name: 'Jane Doe',
-              slug: 'jane-doe',
+              profilePageSlug: 'jane-doe',
               imageUrl: undefined,
             },
             topic: {

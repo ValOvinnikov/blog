@@ -1,10 +1,8 @@
 import type { TRawFeedPost } from '@blog/service/features/entities/posts/adaptor/all-published.transformer';
 import type { TRawTagWithPostCount } from '@blog/service/features/entities/tags/adaptor/transformer';
 import type { TRawTopicWithPostCount } from '@blog/service/features/entities/topics/adaptor/transformer';
-import type { TRawAuthor } from '@blog/service/features/pages/author/adaptor/detail-page/transformer';
 import type { TRawTag } from '@blog/service/shared/transformers/to-tag';
 import type { TRawTopic } from '@blog/service/shared/transformers/to-topic';
-import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 
 export function makeRawTopic(overrides: Partial<TRawTopic> = {}): TRawTopic {
   return {
@@ -54,19 +52,6 @@ export function makeRawFeedPost(
     slug: 'hello-world',
     excerpt: 'A sufficiently long excerpt for the card.',
     publishedAt: '2026-01-15T00:00:00Z',
-    ...overrides,
-  };
-}
-
-export function makeRawAuthor(overrides: Partial<TRawAuthor> = {}): TRawAuthor {
-  return {
-    _id: 'author-1',
-    name: 'Jane Doe',
-    slug: 'jane-doe',
-    image: makeRawImage('Jane avatar'),
-    role: 'Writer',
-    bio: null,
-    socialLinks: null,
     ...overrides,
   };
 }

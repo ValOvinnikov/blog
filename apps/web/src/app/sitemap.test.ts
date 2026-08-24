@@ -6,8 +6,6 @@ const {
   getTopicPaginationParamsMock,
   getTagParamsMock,
   getTagPaginationParamsMock,
-  getAuthorParamsMock,
-  getAuthorPaginationParamsMock,
   getIndexPageParamsMock,
   getPageSlugsMock,
   getTopicIndexPageMock,
@@ -17,8 +15,6 @@ const {
   getTopicPaginationParamsMock: vi.fn(),
   getTagParamsMock: vi.fn(),
   getTagPaginationParamsMock: vi.fn(),
-  getAuthorParamsMock: vi.fn(),
-  getAuthorPaginationParamsMock: vi.fn(),
   getIndexPageParamsMock: vi.fn(),
   getPageSlugsMock: vi.fn(),
   getTopicIndexPageMock: vi.fn(),
@@ -42,12 +38,6 @@ vi.mock('@blog/service', () => ({
       },
       blog: { v1: { getIndexPageParams: getIndexPageParamsMock } },
       generic: { v1: { getPageSlugs: getPageSlugsMock } },
-      author: {
-        v1: {
-          getAuthorParams: getAuthorParamsMock,
-          getAuthorPaginationParams: getAuthorPaginationParamsMock,
-        },
-      },
       topicIndex: { v1: { getIndexPage: getTopicIndexPageMock } },
     },
   },
@@ -64,8 +54,6 @@ const mockAllEmpty = () => {
   getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
   getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
   getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
-  getAuthorParamsMock.mockResolvedValue({ ok: true, data: [] });
-  getAuthorPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
   getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
   getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
   getTopicIndexPageMock.mockResolvedValue({ ok: true, data: {} });
@@ -79,14 +67,12 @@ describe('sitemap', () => {
     getTopicPaginationParamsMock.mockReset();
     getTagParamsMock.mockReset();
     getTagPaginationParamsMock.mockReset();
-    getAuthorParamsMock.mockReset();
-    getAuthorPaginationParamsMock.mockReset();
     getIndexPageParamsMock.mockReset();
     getPageSlugsMock.mockReset();
     getTopicIndexPageMock.mockReset();
   });
 
-  it('includes home, blog index, topics hub, post, topic, tag, author, blog page and generic page entries', async () => {
+  it('includes home, blog index, topics hub, post, topic, tag, blog page and generic page entries', async () => {
     mockAllEmpty();
     getPostParamsMock.mockResolvedValue({
       ok: true,
@@ -102,10 +88,6 @@ describe('sitemap', () => {
     getTagParamsMock.mockResolvedValue({
       ok: true,
       data: [{ slug: 'typescript' }],
-    });
-    getAuthorParamsMock.mockResolvedValue({
-      ok: true,
-      data: [{ slug: 'jane-doe' }],
     });
     getIndexPageParamsMock.mockResolvedValue({
       ok: true,
@@ -130,11 +112,10 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/blog/second-post');
     expect(urls).toContain('https://example.com/topics/news');
     expect(urls).toContain('https://example.com/tags/typescript');
-    expect(urls).toContain('https://example.com/author/jane-doe');
     expect(urls).toContain('https://example.com/about');
   });
 
-  it('includes numbered topic, tag and author pagination pages', async () => {
+  it('includes numbered topic and tag pagination pages', async () => {
     mockAllEmpty();
     getTopicPaginationParamsMock.mockResolvedValue({
       ok: true,
@@ -147,10 +128,6 @@ describe('sitemap', () => {
         { slug: 'typescript', page: '3' },
       ],
     });
-    getAuthorPaginationParamsMock.mockResolvedValue({
-      ok: true,
-      data: [{ slug: 'jane-doe', page: '2' }],
-    });
     const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
@@ -159,7 +136,6 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/topics/news/page/2');
     expect(urls).toContain('https://example.com/tags/typescript/page/2');
     expect(urls).toContain('https://example.com/tags/typescript/page/3');
-    expect(urls).toContain('https://example.com/author/jane-doe/page/2');
   });
 
   it('omits topic pagination pages when the fetch resolves to a failure result', async () => {
@@ -189,36 +165,6 @@ describe('sitemap', () => {
     const urls = entries.map((entry) => entry.url);
 
     expect(urls).not.toContain('https://example.com/tags/typescript/page/2');
-    expect(urls).toContain('https://example.com/');
-  });
-
-  it('omits authors when the author params fetch resolves to a failure result', async () => {
-    mockAllEmpty();
-    getAuthorParamsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).not.toContain('https://example.com/author/jane-doe');
-    expect(urls).toContain('https://example.com/');
-  });
-
-  it('omits author pagination pages when the fetch resolves to a failure result', async () => {
-    mockAllEmpty();
-    getAuthorPaginationParamsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-    const urls = entries.map((entry) => entry.url);
-
-    expect(urls).not.toContain('https://example.com/author/jane-doe/page/2');
     expect(urls).toContain('https://example.com/');
   });
 

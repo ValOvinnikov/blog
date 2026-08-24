@@ -32,7 +32,7 @@ export const mockPostDetail: TPostDetail = {
   author: {
     id: 'author-1',
     name: 'Jane Doe',
-    slug: 'jane-doe',
+    profilePageSlug: 'jane-doe',
     imageUrl: AUTHOR_IMAGE_URL,
     role: 'Writer',
     bio: [
