@@ -141,6 +141,51 @@ describe('createTenantAction', () => {
     expect(signInMock).not.toHaveBeenCalled();
   });
 
+  it('rejects a confirming submit whose token was issued for a different email, and re-issues a fresh confirmation for the current one', async () => {
+    getUserByEmailMock.mockResolvedValue(undefined);
+    const { createTenantAction } = await import('./create-tenant-action');
+    const tokenForOtherEmail = createOwnerInviteToken('other@example.com');
+
+    const result = await createTenantAction({
+      ...validInput,
+      confirmOwnerInvite: true,
+      confirmOwnerInviteToken: tokenForOtherEmail,
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      ownerInviteConfirmation: {
+        email: 'owner@example.com',
+        token: expect.any(String),
+        message: expect.any(String),
+      },
+    });
+    expect(createTenantDraftMock).not.toHaveBeenCalled();
+    expect(signInMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a confirming submit with an invalid/garbage token, and re-issues a fresh confirmation', async () => {
+    getUserByEmailMock.mockResolvedValue(undefined);
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    const result = await createTenantAction({
+      ...validInput,
+      confirmOwnerInvite: true,
+      confirmOwnerInviteToken: 'not-a-real-token',
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      ownerInviteConfirmation: {
+        email: 'owner@example.com',
+        token: expect.any(String),
+        message: expect.any(String),
+      },
+    });
+    expect(createTenantDraftMock).not.toHaveBeenCalled();
+    expect(signInMock).not.toHaveBeenCalled();
+  });
+
   it('proceeds down the invite path once confirmOwnerInvite is set for an unregistered email', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
     const { createTenantAction } = await import('./create-tenant-action');
