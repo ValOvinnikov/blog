@@ -1,3 +1,4 @@
+import type { TRawFeedPost } from '@blog/service/features/entities/posts/adaptor/all-published.transformer';
 import type { TRawTagWithPostCount } from '@blog/service/features/entities/tags/adaptor/transformer';
 import type { TRawTopicWithPostCount } from '@blog/service/features/entities/topics/adaptor/transformer';
 import type { TRawAuthor } from '@blog/service/features/pages/author/adaptor/detail-page/transformer';
@@ -41,6 +42,18 @@ export function makeRawTagWithPostCount(
     ...makeRawTag(),
     description: 'TypeScript posts',
     postCount: 0,
+    ...overrides,
+  };
+}
+
+export function makeRawFeedPost(
+  overrides: Partial<TRawFeedPost> = {},
+): TRawFeedPost {
+  return {
+    title: 'Hello World',
+    slug: 'hello-world',
+    excerpt: 'A sufficiently long excerpt for the card.',
+    publishedAt: '2026-01-15T00:00:00Z',
     ...overrides,
   };
 }
