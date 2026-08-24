@@ -8,7 +8,6 @@
   "breadcrumbs": {
     "home": "Home",
     "ariaLabel": "Breadcrumb",
-    "authorPrefix": "Author: {name}",
     "topics": "Topics",
     "tags": "Tags",
     "blog": "Blog"
@@ -85,10 +84,6 @@
     "title": "Posts tagged {name}",
     "empty": "No posts tagged {name} yet."
   },
-  "authorPage": {
-    "title": "Posts by {name}",
-    "empty": "{name} hasn't published any posts yet."
-  },
   "topicsPage": {
     "empty": "No topics yet.",
     "postsCount": "{count, plural, one {1 post} other {{count} posts}}"
@@ -101,9 +96,6 @@
     "fallbackTitle": "Blog",
     "fallbackDescription": "Latest posts",
     "feedLinkLabel": "RSS feed"
-  },
-  "authorMetadata": {
-    "nameWithRole": "{name} — {role}"
   },
   "authMenu": {
     "signIn": "Sign in",

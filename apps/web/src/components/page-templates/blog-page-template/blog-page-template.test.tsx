@@ -50,21 +50,6 @@ describe(`<${BlogPageTemplate.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders introHeader before the h1 when passed', () => {
-    setup({ introHeader: <div data-testid="intro-header-slot" /> });
-
-    expect(screen.getByTestId('intro-header-slot')).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Blog' }),
-    ).toBeVisible();
-  });
-
-  it('omits introHeader when not passed', () => {
-    setup();
-
-    expect(screen.queryByTestId('intro-header-slot')).not.toBeInTheDocument();
-  });
-
   it('renders topicChips after supportingText and before posts when passed', () => {
     setup({ topicChips: <div data-testid="topic-chips-slot" /> });
 
@@ -76,19 +61,6 @@ describe(`<${BlogPageTemplate.name}/>`, () => {
     setup();
 
     expect(screen.queryByTestId('topic-chips-slot')).not.toBeInTheDocument();
-  });
-
-  it('renders socialLinks after supportingText and before posts when passed', () => {
-    setup({ socialLinks: <div data-testid="social-links-slot" /> });
-
-    expect(screen.getByTestId('social-links-slot')).toBeInTheDocument();
-    expect(screen.getByTestId('posts-slot')).toBeInTheDocument();
-  });
-
-  it('omits socialLinks when not passed', () => {
-    setup();
-
-    expect(screen.queryByTestId('social-links-slot')).not.toBeInTheDocument();
   });
 
   it('renders modules after posts/pagination when passed', () => {

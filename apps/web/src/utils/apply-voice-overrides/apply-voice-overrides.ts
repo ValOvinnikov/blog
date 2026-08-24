@@ -24,7 +24,6 @@ const VOICE_OVERRIDE_PATHS: Record<string, readonly string[]> = {
   blogListEmpty: ['blogListPage', 'empty'],
   categoryEmpty: ['topicPage', 'empty'],
   tagEmpty: ['tagPage', 'empty'],
-  authorEmpty: ['authorPage', 'empty'],
   topicsEmpty: ['topicsPage', 'empty'],
   bookmarksEmpty: ['bookmarksPage', 'empty'],
 };
