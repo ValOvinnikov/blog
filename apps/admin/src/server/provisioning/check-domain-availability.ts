@@ -7,6 +7,22 @@ export type TDomainAvailability =
 
 const VERCEL_TIMEOUT_MS = 5000;
 
+// Every tenant domain on this platform lives under the same shared apex
+// (map-domain.ts attaches all of them to the one shared apps/web Vercel
+// project), so this apex's project-domains list grows by at least one
+// entry per tenant and will genuinely paginate as the platform grows. Caps
+// the round trips a single tenant-creation submission can incur: if a
+// conclusive answer (a conflict, or the last page) isn't reached within
+// this many pages, the check returns 'ERROR' rather than guessing
+// 'AVAILABLE' — a false "no conflict" is worse than an inconclusive one,
+// since 'ERROR' still just degrades to "can't tell, let creation proceed."
+const MAX_PROJECT_DOMAINS_PAGES = 5;
+
+type TProjectDomainsPage = {
+  projectDomains?: { name: string; projectId: string }[];
+  pagination?: { next: number | null };
+};
+
 /**
  * Vercel's project-domains-by-apex endpoint takes the registrable ("apex")
  * domain, not the full hostname — `blog-dev.valstack.dev` must be queried
@@ -20,6 +36,25 @@ const VERCEL_TIMEOUT_MS = 5000;
 const deriveApexDomain = (domain: string): string => {
   const labels = domain.split('.');
   return labels.slice(-2).join('.');
+};
+
+// Vercel's own casing/trailing-dot normalization for a returned domain name
+// isn't documented, so both sides are normalized the same way before
+// comparing rather than assuming an exact match.
+const normalizeDomainName = (name: string): string =>
+  name.toLowerCase().replace(/\.$/, '');
+
+const buildProjectDomainsUrl = (
+  apexDomain: string,
+  teamId: string | undefined,
+  until: number | undefined,
+): URL => {
+  const url = new URL(
+    `https://api.vercel.com/v1/domains/${encodeURIComponent(apexDomain)}/project-domains`,
+  );
+  if (teamId) url.searchParams.set('teamId', teamId);
+  if (until !== undefined) url.searchParams.set('until', String(until));
+  return url;
 };
 
 /**
@@ -49,42 +84,52 @@ export const checkDomainAvailability = async (
   }
 
   const apexDomain = deriveApexDomain(domain);
+  const normalizedDomain = normalizeDomainName(domain);
 
-  const url = new URL(
-    `https://api.vercel.com/v1/domains/${encodeURIComponent(apexDomain)}/project-domains`,
-  );
-  if (teamId) url.searchParams.set('teamId', teamId);
+  let until: number | undefined;
 
   try {
-    const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
-      signal: AbortSignal.timeout(VERCEL_TIMEOUT_MS),
-    });
+    for (let page = 0; page < MAX_PROJECT_DOMAINS_PAGES; page++) {
+      const url = buildProjectDomainsUrl(apexDomain, teamId, until);
 
-    // A 404 means the apex itself is unknown to the team's Vercel account —
-    // no project can have a domain registered under an apex the account
-    // doesn't hold, so no conflict is possible.
-    if (response.status === 404) return 'AVAILABLE';
-
-    if (!response.ok) {
-      logger.error('tenants.domain_availability_check_failed', {
-        domain,
-        responseStatus: response.status,
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: AbortSignal.timeout(VERCEL_TIMEOUT_MS),
       });
-      return 'ERROR';
+
+      // A 404 means the apex itself is unknown to the team's Vercel
+      // account — no project can have a domain registered under an apex
+      // the account doesn't hold, so no conflict is possible.
+      if (response.status === 404) return 'AVAILABLE';
+
+      if (!response.ok) {
+        logger.error('tenants.domain_availability_check_failed', {
+          domain,
+          responseStatus: response.status,
+        });
+        return 'ERROR';
+      }
+
+      const data = (await response.json()) as TProjectDomainsPage;
+
+      const attachedElsewhere = data.projectDomains?.some(
+        (projectDomain) =>
+          normalizeDomainName(projectDomain.name) === normalizedDomain &&
+          projectDomain.projectId !== webProjectId,
+      );
+
+      if (attachedElsewhere) return 'IN_USE';
+
+      if (!data.pagination?.next) return 'AVAILABLE';
+
+      until = data.pagination.next;
     }
 
-    const data = (await response.json()) as {
-      projectDomains?: { name: string; projectId: string }[];
-    };
-
-    const attachedElsewhere = data.projectDomains?.some(
-      (projectDomain) =>
-        projectDomain.name === domain &&
-        projectDomain.projectId !== webProjectId,
-    );
-
-    return attachedElsewhere ? 'IN_USE' : 'AVAILABLE';
+    logger.warn('tenants.domain_availability_check_pagination_exhausted', {
+      domain,
+      maxPages: MAX_PROJECT_DOMAINS_PAGES,
+    });
+    return 'ERROR';
   } catch (error) {
     logger.error('tenants.domain_availability_check_error', {
       domain,
