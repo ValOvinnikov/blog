@@ -1,5 +1,6 @@
 import {
   act,
+  fireEvent,
   renderWithIntl,
   screen,
   waitFor,
@@ -740,6 +741,133 @@ describe(ProvisioningStatusView, () => {
       });
 
       expect(getTenantProvisioningStatusActionMock).not.toHaveBeenCalled();
+    });
+
+    it('stops polling once an early step fails with nothing else running, even though provisioningStatus stays non-terminal', async () => {
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        },
+      });
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        // `provisioningStatus` only ever settles on the *last* step, so a
+        // step 1 failure genuinely leaves it non-terminal — this is the bug
+        // this test guards against regressing.
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'fetch failed',
+          },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(1);
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 3);
+      });
+
+      // No further calls — the action is not called again once the failure
+      // with nothing running has been observed.
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps polling, unchanged, while a step is RUNNING', async () => {
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        },
+      });
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 3);
+      });
+
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(3);
+    });
+
+    it('resumes polling when Retry is pressed after polling has stopped', async () => {
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error: 'fetch failed',
+          },
+        },
+      });
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      // Confirm it's genuinely stopped on mount — a step already failed with
+      // nothing running must never schedule a poll in the first place.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 2);
+      });
+      expect(getTenantProvisioningStatusActionMock).not.toHaveBeenCalled();
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+      });
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
+        'tenant-1',
+      );
     });
 
     it('stops polling once the component unmounts', async () => {

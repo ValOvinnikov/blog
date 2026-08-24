@@ -75,6 +75,33 @@ const isTerminalProvisioningStatus = (
   );
 };
 
+const shouldContinuePolling = (
+  status: TTenantProvisioningStatus | null,
+  steps: TTenantProvisioningSteps | null,
+): boolean => {
+  if (isTerminalProvisioningStatus(status)) {
+    return false;
+  }
+
+  const statuses = STEP_ORDER.map(
+    (stepKey) =>
+      steps?.[stepKey]?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE,
+  );
+  const hasRunningStep = statuses.includes(
+    TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+  );
+  const hasFailedStep = statuses.includes(
+    TENANT_PROVISIONING_STEP_STATUS.FAILED,
+  );
+
+  // A failed step with nothing else running means the run is stuck and
+  // nothing further will happen until an operator retries —
+  // `provisioningStatus` never reflects this on its own (it only settles to
+  // FAILED once the *last* step fails), so it has to be read off the steps
+  // directly rather than off the column.
+  return !(hasFailedStep && !hasRunningStep);
+};
+
 const isTerminalDomainVerificationStatus = (
   status: TDomainVerificationStatus,
 ): boolean => {
@@ -123,6 +150,16 @@ export const ProvisioningStatusView = ({
     useState<TTenantProvisioningStatus | null>(tenant.provisioningStatus);
   const [provisioningSteps, setProvisioningSteps] =
     useState<TTenantProvisioningSteps | null>(tenant.provisioningSteps);
+  // Distinct from `provisioningStatus`/`provisioningSteps` above: this is
+  // the poll loop's own on/off switch, not a copy of server data. It can
+  // only ever be turned off by a poll tick's own fresh read (see the effect
+  // below) — a stale `tenant` prop refresh (e.g. right after Retry, before
+  // the re-dispatched workflow has actually started) is never allowed to
+  // turn it off, only ever on, or a retry immediately after a stop would
+  // silently fail to resume watching.
+  const [isPollingActive, setIsPollingActive] = useState(() =>
+    shouldContinuePolling(tenant.provisioningStatus, tenant.provisioningSteps),
+  );
   const [renderedDomainStatus, setRenderedDomainStatus] = useState(
     domainVerificationStatus,
   );
@@ -138,6 +175,14 @@ export const ProvisioningStatusView = ({
     setRenderedTenant(tenant);
     setProvisioningStatus(tenant.provisioningStatus);
     setProvisioningSteps(tenant.provisioningSteps);
+    setIsPollingActive(
+      (prev) =>
+        prev ||
+        shouldContinuePolling(
+          tenant.provisioningStatus,
+          tenant.provisioningSteps,
+        ),
+    );
   }
   if (domainVerificationStatus !== renderedDomainStatus) {
     setRenderedDomainStatus(domainVerificationStatus);
@@ -177,7 +222,7 @@ export const ProvisioningStatusView = ({
   } = provisioningStatusViewVariants();
 
   useEffect(() => {
-    if (isTerminalProvisioningStatus(provisioningStatus)) {
+    if (!isPollingActive) {
       return;
     }
 
@@ -190,6 +235,12 @@ export const ProvisioningStatusView = ({
         }
         setProvisioningStatus(result.provisioningStatus);
         setProvisioningSteps(result.provisioningSteps);
+        setIsPollingActive(
+          shouldContinuePolling(
+            result.provisioningStatus,
+            result.provisioningSteps,
+          ),
+        );
       });
     }, STEP_POLL_INTERVAL_MS);
 
@@ -197,7 +248,7 @@ export const ProvisioningStatusView = ({
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [tenant.id, provisioningStatus]);
+  }, [tenant.id, isPollingActive]);
 
   useEffect(() => {
     if (isTerminalDomainVerificationStatus(domainStatus)) {
@@ -247,6 +298,10 @@ export const ProvisioningStatusView = ({
 
   const handleRetry = () => {
     setIsRetrying(true);
+    // Force polling back on immediately — the re-dispatched workflow hasn't
+    // actually started yet, so the derived steps/status still look exactly
+    // like the stopped state this button is meant to escape.
+    setIsPollingActive(true);
     startTransition(async () => {
       await retryProvisioningStepAction(tenant.id);
       router.refresh();
@@ -256,6 +311,7 @@ export const ProvisioningStatusView = ({
 
   const handleStart = () => {
     setIsStarting(true);
+    setIsPollingActive(true);
     startTransition(async () => {
       await retryProvisioningStepAction(tenant.id);
       router.refresh();
