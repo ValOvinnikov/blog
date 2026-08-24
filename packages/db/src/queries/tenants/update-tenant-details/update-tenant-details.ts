@@ -32,11 +32,11 @@ export type TUpdateTenantDetailsResult =
   | { outcome: 'owner-already-joined' }
   | { outcome: 'owner-email-taken' };
 
-// Provisioning never revisits a step once it moves past it (`run.ts` stops
-// the whole workflow at the first failure), so at most one step is ever
-// FAILED at a time and every step after it stays IDLE — a single FAILED
-// entry reliably marks "provisioning stopped here, fix and retry" rather
-// than "provisioning is mid-flight" or "provisioning finished".
+// A retry re-runs `run.ts` from `STEPS[0]`, so a stale FAILED entry can
+// sit alongside DONE entries for later-indexed steps left over from a prior
+// run — this only classifies the tenant as FAILED vs RUNNING/SUCCEEDED;
+// which field is actually locked is decided per-step in `lockedFieldOutcome`,
+// never by position in the sequence.
 type TProvisioningState = 'IDLE' | 'RUNNING' | 'FAILED' | 'SUCCEEDED';
 
 function deriveProvisioningState(
@@ -72,13 +72,8 @@ function deriveProvisioningState(
   return 'RUNNING';
 }
 
-// Only these two fields get baked into an external resource by a completed
-// step — `slug` names the Studio's Vercel project/domain (`DEPLOY_STUDIO`)
-// and `primaryDomain` is registered on the shared web project (`MAP_DOMAIN`).
-// `name`/`plan`/`locale` never gate on step completion: `name` only ever
-// seeds display text (a Sanity project's display name, starter-content
-// copy) that can be edited after the fact, `plan` is DB-only, and
-// `SEED_CONTENT` never reads `locale`.
+// Only slug (`DEPLOY_STUDIO`) and primaryDomain (`MAP_DOMAIN`) get baked
+// into an external resource by a completed step; name/plan/locale never lock.
 function lockedFieldOutcome(
   input: TUpdateTenantDetailsInput,
   existing: TTenant,

@@ -618,6 +618,54 @@ describe(updateTenantDetails, () => {
     });
   });
 
+  it('keeps primaryDomain editable when MAP_DOMAIN is FAILED even though a later-indexed step (CREATE_WEBHOOK) is stale-DONE from a prior run', async () => {
+    const tenantId = await insertTenantWithDomain({
+      domain: 'acme.example.com',
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      primaryDomain: 'acme-fixed.example.com',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { primaryDomain: 'acme-fixed.example.com' },
+    });
+  });
+
+  it('still locks primaryDomain via a stale-DONE MAP_DOMAIN even though an earlier-indexed step (PERSIST_TOKEN) is FAILED', async () => {
+    const tenantId = await insertTenantWithDomain({
+      domain: 'acme.example.com',
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      primaryDomain: 'acme-new.example.com',
+    });
+
+    expect(result).toEqual({
+      outcome: 'domain-locked',
+      blockingStep: 'MAP_DOMAIN',
+    });
+  });
+
   it('throws for a tenant id that does not exist', async () => {
     const missingId = '00000000-0000-0000-0000-000000000000';
 
