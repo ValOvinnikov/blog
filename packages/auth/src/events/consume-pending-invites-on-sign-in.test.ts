@@ -21,7 +21,7 @@ describe(consumePendingInvitesOnSignIn, () => {
     consumeMembershipInviteMock.mockReset();
   });
 
-  it("consumes every pending invite for the signed-in user's verified email", async () => {
+  it("consumes every pending invite for the signed-in user's email", async () => {
     findPendingInviteByEmailMock.mockResolvedValue([
       { id: 'invite-1', tenantId: 'tenant-1' },
       { id: 'invite-2', tenantId: 'tenant-2' },
@@ -92,7 +92,7 @@ describe(consumePendingInvitesOnSignIn, () => {
     expect(consumeMembershipInviteMock).not.toHaveBeenCalled();
   });
 
-  it('is a no-op without looking up invites when the user has no verified email', async () => {
+  it('is a no-op without looking up invites when the user has no email', async () => {
     await consumePendingInvitesOnSignIn({ user: { id: 'user-1' } });
 
     expect(findPendingInviteByEmailMock).not.toHaveBeenCalled();
