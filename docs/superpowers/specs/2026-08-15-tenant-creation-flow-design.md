@@ -21,7 +21,7 @@ domain mapping — triggered from `apps/admin`, executed by CI, with per-step
 resumable retry. Excludes self-serve signup, billing, cross-tenant admin
 analytics (all explicit non-goals in the parent spec, unchanged here), and the
 **per-project migration runner** (a day-2 tool for pushing schema/content
-changes to every *existing* tenant, not part of creating a new one — tracked
+changes to every _existing_ tenant, not part of creating a new one — tracked
 as its own future ticket).
 
 ## Conflicts with the existing mock — resolved
@@ -48,7 +48,7 @@ initial design pass or by review afterward:
 3. **DNS verification gating "Finish."** The mock's step 6 log sequence ends
    on "Waiting for verification" before the wizard can finish. Resolved:
    don't block — the tenant reaches provisioning-`READY` once the domain is
-   *added* to the shared web app's Vercel project; DNS verification is a
+   _added_ to the shared web app's Vercel project; DNS verification is a
    separate, non-blocking status the tenant detail page shows independently
    (DNS propagation is tenant-controlled and can take hours). Shown via a
    live Vercel API call (domain verification status) on each render of the
@@ -80,10 +80,10 @@ tenant name, slug (Studio hostname only, per §1), domain, plan, and owner
 email — all client-side, fast. Submitting it is a Server Action that:
 
 1. Resolves the owner email to an existing registered user (`@blog/db` user
-   lookup) — the operator picks an *existing* user, no invite-email flow (a
+   lookup) — the operator picks an _existing_ user, no invite-email flow (a
    non-goal, matches the parent spec's admin-first framing).
 2. Inserts `tenants` (with `primaryDomain` from the form, `provisioningStatus:
-   PENDING`, an empty per-step status map — see Data model — `sanityProjectId`/
+PENDING`, an empty per-step status map — see Data model — `sanityProjectId`/
    `sanityDataset` left null until provisioning creates them, and `locale`
    defaulted to the platform's default locale — no per-tenant locale choice at
    creation), `tenant_domains`, and the owner's `memberships` row
@@ -98,7 +98,7 @@ email — all client-side, fast. Submitting it is a Server Action that:
 The `apps/admin` Server Action holds a narrowly-scoped GitHub PAT
 (`actions: write` only) to trigger it via `workflow_dispatch` — that's a
 real, deliberate exception, distinct from this repo's actual deploy-token
-rule: the *deploy* credentials (Vercel/Sanity Projects API tokens) never
+rule: the _deploy_ credentials (Vercel/Sanity Projects API tokens) never
 leave the CI environment, staying CI-owned like every other deploy in this
 repo (`SPEC.md` §13 — Vercel CLI runs inside GitHub Actions, never from
 application code). Only the trigger crosses that boundary; the provisioning
@@ -110,14 +110,14 @@ the same workflow for the same tenant id resumes rather than repeats:
    CORS + a minted read token. Idempotency check: does `tenants.sanityProjectId`
    already have a value? If so, skip creation and reuse it.
 2. **Seed content** — a fixed starter template (singletons + one starter post
-   + initial navigation — same content every new tenant gets, no per-tenant
-   customization at creation time), via a new dedicated seed script
-   (`@sanity/client`-based, creating documents directly against the empty
-   dataset). `apps/cms/migrations`' existing tooling doesn't fit this: it
-   transforms *existing* documents in an already-populated dataset (defaults
-   to `production`, human-gated for real datasets) — a brand-new empty
-   dataset needs document creation, not migration. Idempotency check: a
-   `seededAt` timestamp on the tenant row.
+   - initial navigation — same content every new tenant gets, no per-tenant
+     customization at creation time), via a new dedicated seed script
+     (`@sanity/client`-based, creating documents directly against the empty
+     dataset). `apps/cms/migrations`' existing tooling doesn't fit this: it
+     transforms _existing_ documents in an already-populated dataset (defaults
+     to `production`, human-gated for real datasets) — a brand-new empty
+     dataset needs document creation, not migration. Idempotency check: a
+     `seededAt` timestamp on the tenant row.
 3. **Deploy Studio** — creates the tenant's own Vercel project (Studio is
    per-tenant deployed, per the parent spec's resolved shape (a)), builds
    `sanity build`, deploys to `studio-<slug>.valstack.dev`. Idempotency
@@ -129,11 +129,11 @@ the same workflow for the same tenant id resumes rather than repeats:
    tenant resolution already works via the existing `tenant_domains` +
    `resolveTenantId` read path (epic 1), so there's nothing new to wire up
    here. Idempotency check: is `sanityReadTokenEncrypted` already set?
-5. **Map domain** — adds the tenant's custom domain to the *shared* web app's
+5. **Map domain** — adds the tenant's custom domain to the _shared_ web app's
    existing Vercel project (not a new project — frontend topology is shared
    app) via Vercel's Domains API. Idempotency check: is the domain already
    registered on the project? DNS verification is checked but never blocks —
-   the step completes once the domain is *added*, regardless of verification
+   the step completes once the domain is _added_, regardless of verification
    state.
 
 Each step reports its own status back via the callback route below —
@@ -193,14 +193,17 @@ per this repo's convention.
   `getTenantProvisioningStatus`).
 - **`apps/admin`** — the wizard UI (Details form + per-step status/retry
   view, matching the mock's visual shape with corrected slug copy), the
-  Server Action, the status-callback API route.
+  Server Action.
 - **New GitHub Actions workflow** — the actual provisioning logic (Sanity
   Projects API, content seed, Studio Vercel project + deploy, domain add on
-  the shared web project). Not owned by any of the eight code layers; CI
-  config, same bucket as this repo's other deploy workflows.
+  the shared web project), and each step's status report — a direct
+  `updateProvisioningStep` write to Postgres from the script itself, not an
+  `apps/admin` API route (revised post-launch; the route silently dropped
+  updates on any network failure, see #2002). Not owned by any of the eight
+  code layers; CI config, same bucket as this repo's other deploy workflows.
 - **`@blog/service`, `@blog/ui`, `apps/web`, `@blog/auth`** — untouched. No
   new Sanity read paths beyond what epic 2a already built; the provisioning
-  workflow talks to Sanity's *management* API (Projects), not the read client
+  workflow talks to Sanity's _management_ API (Projects), not the read client
   `@blog/service` owns.
 - Graph stays acyclic.
 
@@ -215,8 +218,8 @@ completed work. No automatic rollback of partially-created external resources
 operator gives up entirely, but that's an explicit non-goal for this design —
 resumability handles the common case of "retry until it works").
 
-Testing: `db` query unit tests for the new queries and idempotency-check
-logic; `admin-app` Server Action and status-callback route tests (mocked
+Testing: `db` query unit tests for the new queries, idempotency-check logic,
+and the direct-write status report; `admin-app` Server Action tests (mocked
 GitHub API dispatch, mocked db). The GitHub Actions workflow's actual
 external-API logic is validated by a dry-run/staging execution rather than
 unit tests, matching how this repo already treats its deploy workflows — no
