@@ -53,12 +53,13 @@ beforeEach(() => {
 
 describe(deleteTenantSanityProject, () => {
   it('deletes the Sanity project when one is set', async () => {
-    await deleteTenantSanityProject(baseTenant(), env);
+    const result = await deleteTenantSanityProject(baseTenant(), env);
 
     expect(deleteSanityProjectMock).toHaveBeenCalledWith({
       token: 'mgmt-token',
       projectId: 'proj123',
     });
+    expect(result).toBeUndefined();
   });
 
   it('skips when no Sanity project id is set', async () => {
@@ -73,15 +74,15 @@ describe(deleteTenantSanityProject, () => {
     expect(deleteSanityProjectMock).not.toHaveBeenCalled();
   });
 
-  it('does not throw when deletion is blocked by org billing permission', async () => {
+  it('reports keepSanityProjectId when deletion is blocked by org billing permission', async () => {
     deleteSanityProjectMock.mockResolvedValue({
       alreadyGone: false,
       blockedByBillingPermission: true,
     });
 
-    await expect(
-      deleteTenantSanityProject(baseTenant(), env),
-    ).resolves.toBeUndefined();
+    await expect(deleteTenantSanityProject(baseTenant(), env)).resolves.toEqual(
+      { keepSanityProjectId: true },
+    );
   });
 
   it('still throws on a non-billing-permission failure', async () => {

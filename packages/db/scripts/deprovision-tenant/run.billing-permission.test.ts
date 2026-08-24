@@ -88,4 +88,14 @@ describe(runSteps, () => {
     expect(clearTenantArtifactsMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
   });
+
+  it('tells clear-artifacts to keep sanityProjectId populated as the manual-deletion signal', async () => {
+    await runSteps(tenant, env);
+
+    expect(clearTenantArtifactsMock).toHaveBeenCalledWith(
+      tenant,
+      env,
+      expect.objectContaining({ keepSanityProjectId: true }),
+    );
+  });
 });
