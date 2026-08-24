@@ -1,5 +1,5 @@
 import { routes } from '@blog/config';
-import { service, type TPostCard } from '@blog/service';
+import { service, type TFeedPost } from '@blog/service';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
@@ -12,10 +12,10 @@ type TProps = {
 type TTagFeed = {
   title: string;
   description: string;
-  posts: TPostCard[];
+  posts: TFeedPost[];
 };
 
-const toRssItem = (post: TPostCard, siteUrl: string): TRssItem => {
+const toRssItem = (post: TFeedPost, siteUrl: string): TRssItem => {
   return {
     title: post.title,
     link: `${siteUrl}${routes.post(post.slug)}`,
@@ -25,15 +25,10 @@ const toRssItem = (post: TPostCard, siteUrl: string): TRssItem => {
 };
 
 /**
- * Fetches every published post tagged with `slug`, newest first. First
- * resolves the tag itself (for the channel title/description and the
- * `page_tag.postList` module id), then fetches every windowed page of that
- * module — page 1 for the total, the remaining pages in parallel — and
- * concatenates, mirroring the site-wide `getAllPublishedPosts` in
- * `app/rss.xml/route.ts`. Returns `null` when the tag itself or its first
- * page of posts can't be loaded — a broken tag lookup 404s instead of
- * silently falling back to a generic channel (unlike the site-wide feed,
- * there is no meaningful generic fallback for "posts tagged X").
+ * Resolves the tag itself (for the channel title/description) and every
+ * published post, newest first. The post set is site-wide rather than
+ * tag-scoped today — existing behavior, not new. Returns `null` when the tag
+ * lookup or the post fetch fails, which the `GET` handler 404s.
  */
 const getAllTagPosts = async (slug: string): Promise<TTagFeed | null> => {
   const tagResult = await service.pages.tag.v1.getTagPage(slug);
@@ -45,55 +40,26 @@ const getAllTagPosts = async (slug: string): Promise<TTagFeed | null> => {
     return null;
   }
 
-  const { tag, postListId } = tagResult.data;
+  const { tag } = tagResult.data;
+  const description = tag.description ?? tag.title;
 
-  const firstPageResult = await service.modules.postList.v1.getPostList(
-    postListId,
-    1,
-  );
-  if (!firstPageResult.ok) {
-    logger.error('tag_rss.first_page_fetch_failed', {
+  const postsResult = await service.entities.posts.v1.getAllPublishedPosts();
+  if (!postsResult.ok) {
+    logger.error('tag_rss.posts_fetch_failed', {
       slug,
-      error: firstPageResult.error,
+      error: postsResult.error,
     });
     return null;
   }
 
-  const { posts, totalPages } = firstPageResult.data;
-  const description = tag.description ?? tag.title;
-
-  if (totalPages <= 1) {
-    return { title: tag.title, description, posts };
-  }
-
-  const restPageNumbers = Array.from(
-    { length: totalPages - 1 },
-    (_, i) => i + 2,
-  );
-  const restResults = await Promise.all(
-    restPageNumbers.map((page) =>
-      service.modules.postList.v1.getPostList(postListId, page),
-    ),
-  );
-
-  const restPosts = restResults.flatMap((page) => {
-    if (!page.ok) {
-      logger.error('tag_rss.page_fetch_failed', { slug, error: page.error });
-      return [];
-    }
-    return page.data.posts;
-  });
-
-  return { title: tag.title, description, posts: [...posts, ...restPosts] };
+  return { title: tag.title, description, posts: postsResult.data };
 };
 
 /**
- * RSS 2.0 feed of every published post tagged with the `[slug]` tag, newest
- * posts first (the order the post-list module's windowed pages already
- * return them in). Mirrors the site-wide `rss.xml` route, scoped to a
- * single tag — the channel title/description come from the tag itself
- * rather than site settings, so a broken tag or post-list lookup 404s
- * instead of silently falling back to a generic channel.
+ * RSS 2.0 feed of every published post, scoped by the `[slug]` tag's own
+ * channel title/description. Mirrors the site-wide `rss.xml` route; a broken
+ * tag or post fetch 404s instead of silently falling back to a generic
+ * channel.
  */
 export async function GET(
   _request: Request,
