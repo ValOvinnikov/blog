@@ -29,4 +29,16 @@ describe('postListModulePaginatedPostsQuery', () => {
       '"total": count(',
     );
   });
+
+  it('scopes posts to the enclosing page_tag when one references this module as its postList', () => {
+    expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
+      '*[_type == "page_tag" && postList._ref == $id][0].tag._ref',
+    );
+  });
+
+  it('stays unscoped when no page_tag references this module', () => {
+    expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
+      '!defined(*[_type == "page_tag" && postList._ref == $id][0]._id)',
+    );
+  });
 });

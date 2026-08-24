@@ -5,16 +5,18 @@ import type { TFeedPost } from '@blog/service';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import { notFound } from 'next/navigation';
 
-const { getTagPageMock, getAllPublishedPostsMock } = vi.hoisted(() => ({
+const { getTagPageMock, getPublishedPostsByTagMock } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
-  getAllPublishedPostsMock: vi.fn(),
+  getPublishedPostsByTagMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
   service: {
     pages: { tag: { v1: { getTagPage: getTagPageMock } } },
     entities: {
-      posts: { v1: { getAllPublishedPosts: getAllPublishedPostsMock } },
+      posts: {
+        v1: { getPublishedPostsByTag: getPublishedPostsByTagMock },
+      },
     },
   },
 }));
@@ -32,7 +34,7 @@ describe('GET /tags/[slug]/rss.xml', () => {
   afterEach(() => {
     vi.resetModules();
     getTagPageMock.mockReset();
-    getAllPublishedPostsMock.mockReset();
+    getPublishedPostsByTagMock.mockReset();
   });
 
   it('returns a valid RSS 2.0 feed scoped to the tag with the correct content type', async () => {
@@ -47,7 +49,7 @@ describe('GET /tags/[slug]/rss.xml', () => {
         },
       }),
     });
-    getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [post] });
+    getPublishedPostsByTagMock.mockResolvedValue({ ok: true, data: [post] });
     const { GET } = await import('./route');
 
     const response = await GET(new Request('https://example.com'), { params });
@@ -72,6 +74,7 @@ describe('GET /tags/[slug]/rss.xml', () => {
       'https://example.com/blog/hello-welcome',
     );
     expect(getTagPageMock).toHaveBeenCalledWith('typescript');
+    expect(getPublishedPostsByTagMock).toHaveBeenCalledWith('tag-1');
   });
 
   it('falls back to the tag title as the channel description when none is authored', async () => {
@@ -86,7 +89,7 @@ describe('GET /tags/[slug]/rss.xml', () => {
         },
       }),
     });
-    getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [] });
+    getPublishedPostsByTagMock.mockResolvedValue({ ok: true, data: [] });
     const { GET } = await import('./route');
 
     const response = await GET(new Request('https://example.com'), { params });
@@ -108,7 +111,7 @@ describe('GET /tags/[slug]/rss.xml', () => {
     ).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(getAllPublishedPostsMock).not.toHaveBeenCalled();
+    expect(getPublishedPostsByTagMock).not.toHaveBeenCalled();
 
     errorSpy.mockRestore();
   });
@@ -119,7 +122,7 @@ describe('GET /tags/[slug]/rss.xml', () => {
       ok: true,
       data: makeTagDetailPage(),
     });
-    getAllPublishedPostsMock.mockResolvedValue({
+    getPublishedPostsByTagMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });

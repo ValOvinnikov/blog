@@ -18,10 +18,16 @@ export async function getPostList(
   });
 
   // `postCardFragment` derefs `author`/`topic` — both tags must ride
-  // alongside `posts` (tag-scope contract, `sanity/query.ts`).
+  // alongside `posts` (tag-scope contract, `sanity/query.ts`). The query
+  // also reads `page_tag` to correlate posts to a tag page's own tag when
+  // this module is used as one, so `page_tag` (and, mirroring
+  // `tagPaginationParamsQuery`'s own ISR list, `tag`) rides along too.
   const rawPosts = await runQuery(
     postListModulePaginatedPostsQuery(page, raw.pageSize),
-    isr(['posts', 'author', 'topic']),
+    {
+      parameters: { id },
+      ...isr(['posts', 'author', 'topic', 'page_tag', 'tag']),
+    },
   );
 
   return toPostListModule(raw, rawPosts.posts, {
