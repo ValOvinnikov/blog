@@ -23,6 +23,7 @@ const REVALIDATE_TAGS = {
   blog_post: ['post', 'posts', 'homePage'],
   blog_author: ['author', 'posts'],
   blog_topic: ['topic', 'topics', 'posts'],
+  blog_tag: ['tag', 'tags', 'posts'],
   settings_site: ['site-settings'],
   settings_navigation: ['navigation'],
   settings_footer: ['footer'],

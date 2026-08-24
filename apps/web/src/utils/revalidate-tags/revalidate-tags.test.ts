@@ -9,6 +9,14 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
+  it('maps the tag document type to its ISR tags', () => {
+    expect(getRevalidateTagsForType('blog_tag', 'tag-1')).toEqual([
+      'tag',
+      'tags',
+      'posts',
+    ]);
+  });
+
   it('maps a known document type to its ISR tags', () => {
     expect(getRevalidateTagsForType('blog_post', 'post-1')).toEqual([
       'post',
