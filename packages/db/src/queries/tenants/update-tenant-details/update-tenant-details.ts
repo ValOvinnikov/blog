@@ -1,11 +1,14 @@
 import { getDb } from '@blog/db/client';
 import {
+  MEMBERSHIP_ROLE,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantPlan,
 } from '@blog/db/constants';
+import { membershipInvites } from '@blog/db/schema/membership-invites';
+import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { and, eq, ne } from 'drizzle-orm';
+import { and, eq, isNull, ne } from 'drizzle-orm';
 
 export type TUpdateTenantDetailsInput = {
   name: string;
@@ -13,18 +16,22 @@ export type TUpdateTenantDetailsInput = {
   primaryDomain: string;
   plan: TTenantPlan;
   locale: string;
+  ownerEmail?: string;
 };
 
 export type TUpdateTenantDetailsResult =
   | { outcome: 'updated'; tenant: TTenant }
   | { outcome: 'slug-taken' }
   | { outcome: 'domain-taken' }
-  | { outcome: 'provisioning-started' };
+  | { outcome: 'provisioning-started' }
+  | { outcome: 'owner-already-joined' }
+  | { outcome: 'owner-email-taken' };
 
 // Pre-checked rather than caught off the `slug_unique`/`tenant_domains.domain`
 // unique constraints: a typed outcome the caller can map straight onto a
 // field error, instead of an unhandled Postgres throw. First match wins:
-// provisioning-started, then slug-taken, then domain-taken.
+// provisioning-started, then slug-taken, then domain-taken, then (when
+// `ownerEmail` is supplied) owner-already-joined / owner-email-taken.
 export async function updateTenantDetails(
   tenantId: string,
   input: TUpdateTenantDetailsInput,
@@ -72,6 +79,68 @@ export async function updateTenantDetails(
     }
   }
 
+  // `ownerEmail` targets the tenant's pending OWNER `membershipInvites` row
+  // (see `createTenantDraft`'s `TDraftOwner` union) — not gated by
+  // provisioning state, an invited owner can already have signed in and
+  // been consumed into a real `memberships` row (see
+  // `consumeMembershipInvite`/`getTenantOwnerEmail`). Once that's happened,
+  // "editing the email" would silently transfer ownership to someone else,
+  // so it's refused as a distinct outcome instead.
+  let normalizedOwnerEmail: string | undefined;
+  let ownerInviteId: string | undefined;
+
+  if (input.ownerEmail !== undefined) {
+    normalizedOwnerEmail = input.ownerEmail.trim().toLowerCase();
+
+    const [joinedOwner] = await db
+      .select({ id: memberships.id })
+      .from(memberships)
+      .where(
+        and(
+          eq(memberships.tenantId, tenantId),
+          eq(memberships.role, MEMBERSHIP_ROLE.OWNER),
+        ),
+      );
+
+    if (joinedOwner) {
+      return { outcome: 'owner-already-joined' };
+    }
+
+    const [pendingInvite] = await db
+      .select({ id: membershipInvites.id })
+      .from(membershipInvites)
+      .where(
+        and(
+          eq(membershipInvites.tenantId, tenantId),
+          eq(membershipInvites.role, MEMBERSHIP_ROLE.OWNER),
+          isNull(membershipInvites.consumedAt),
+        ),
+      );
+
+    if (!pendingInvite) {
+      throw new Error(
+        `updateTenantDetails: no pending owner invite found for tenant "${tenantId}".`,
+      );
+    }
+
+    const [emailConflict] = await db
+      .select({ id: membershipInvites.id })
+      .from(membershipInvites)
+      .where(
+        and(
+          eq(membershipInvites.tenantId, tenantId),
+          eq(membershipInvites.email, normalizedOwnerEmail),
+          ne(membershipInvites.id, pendingInvite.id),
+        ),
+      );
+
+    if (emailConflict) {
+      return { outcome: 'owner-email-taken' };
+    }
+
+    ownerInviteId = pendingInvite.id;
+  }
+
   const [tenant] = await db
     .update(tenants)
     .set({
@@ -90,12 +159,27 @@ export async function updateTenantDetails(
     );
   }
 
+  async function restoreTenantRow(original: TTenant): Promise<void> {
+    await db
+      .update(tenants)
+      .set({
+        name: original.name,
+        slug: original.slug,
+        primaryDomain: original.primaryDomain,
+        plan: original.plan,
+        locale: original.locale,
+      })
+      .where(eq(tenants.id, tenantId));
+  }
+
   // No multi-statement transaction on the runtime `neon-http` driver (see
-  // `createTenantDraft`), so a changed `primaryDomain` is synced onto
-  // `tenant_domains` as a second statement, with a manual compensating
-  // rollback of the `tenants` row on failure — otherwise the two tables
-  // could silently diverge.
-  if (input.primaryDomain !== existing.primaryDomain) {
+  // `createTenantDraft`), so each dependent write below is a separate
+  // statement with a manual compensating rollback on failure — otherwise a
+  // failure partway through could leave `tenants`, `tenant_domains`, and
+  // `membership_invites` silently diverged.
+  const domainChanged = input.primaryDomain !== existing.primaryDomain;
+
+  if (domainChanged) {
     try {
       const domainRows = await db
         .update(tenantDomains)
@@ -114,16 +198,37 @@ export async function updateTenantDetails(
         );
       }
     } catch (error) {
-      await db
-        .update(tenants)
-        .set({
-          name: existing.name,
-          slug: existing.slug,
-          primaryDomain: existing.primaryDomain,
-          plan: existing.plan,
-          locale: existing.locale,
-        })
-        .where(eq(tenants.id, tenantId));
+      await restoreTenantRow(existing);
+      throw error;
+    }
+  }
+
+  if (ownerInviteId) {
+    try {
+      const [inviteRow] = await db
+        .update(membershipInvites)
+        .set({ email: normalizedOwnerEmail })
+        .where(eq(membershipInvites.id, ownerInviteId))
+        .returning();
+
+      if (!inviteRow) {
+        throw new Error(
+          `updateTenantDetails: owner invite update for tenant "${tenantId}" returned no row.`,
+        );
+      }
+    } catch (error) {
+      if (domainChanged) {
+        await db
+          .update(tenantDomains)
+          .set({ domain: existing.primaryDomain })
+          .where(
+            and(
+              eq(tenantDomains.tenantId, tenantId),
+              eq(tenantDomains.domain, input.primaryDomain),
+            ),
+          );
+      }
+      await restoreTenantRow(existing);
       throw error;
     }
   }
