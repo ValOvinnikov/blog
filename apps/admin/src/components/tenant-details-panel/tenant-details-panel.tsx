@@ -5,6 +5,11 @@ import {
   type TUpdateTenantDetailsActionInput,
   type TUpdateTenantDetailsFieldErrors,
 } from '@admin/server/tenants/update-tenant-details-action';
+import type {
+  TTenantFieldKey,
+  TTenantFieldLockReason,
+  TTenantFieldLocks,
+} from '@admin/utils/tenant-field-locks/tenant-field-locks';
 import { ALERT_TYPE, Size } from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -21,7 +26,7 @@ import { tenantDetailsPanelVariants } from './tenant-details-panel-variants';
 
 export type TTenantDetailsPanelProps = {
   tenant: TTenant;
-  isEditable: boolean;
+  fieldLocks: TTenantFieldLocks;
   ownerEmail: string | undefined;
 };
 
@@ -65,15 +70,25 @@ const valuesFromProps = (
   };
 };
 
+const lockedFieldKeysOf = (
+  fieldLocks: TTenantFieldLocks,
+): TTenantFieldKey[] => {
+  return Object.keys(fieldLocks) as TTenantFieldKey[];
+};
+
 /**
- * Renders form controls when editable, plain text when locked.
+ * Renders every field as a control at all times, disabling only the ones a
+ * completed provisioning step has already baked into an external resource —
+ * so a field that caused a provisioning failure stays correctable instead of
+ * the whole panel locking as a unit.
  */
 export const TenantDetailsPanel = ({
   tenant,
-  isEditable,
+  fieldLocks,
   ownerEmail,
 }: TTenantDetailsPanelProps) => {
   const t = useTranslations('tenantDetailsPanel');
+  const tSteps = useTranslations('provisioningStatusView');
   const router = useRouter();
   const panelId = useId();
   const [renderedTenant, setRenderedTenant] = useState(tenant);
@@ -86,12 +101,14 @@ export const TenantDetailsPanel = ({
   const [formError, setFormError] = useState<string | undefined>(undefined);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [wasEditable, setWasEditable] = useState(isEditable);
   const [lockAnnouncement, setLockAnnouncement] = useState('');
   const [shouldMoveFocusOnTransition, setShouldMoveFocusOnTransition] =
     useState(false);
-  const editableContainerRef = useRef<HTMLDivElement>(null);
-  const lockedContainerRef = useRef<HTMLDListElement>(null);
+  const lockedFieldKeys = lockedFieldKeysOf(fieldLocks);
+  const [renderedLockedFieldsKey, setRenderedLockedFieldsKey] = useState(() =>
+    [...lockedFieldKeys].sort().join(','),
+  );
+  const fieldsContainerRef = useRef<HTMLDivElement>(null);
   const isMountRef = useRef(true);
 
   // A fresh `tenant`/`ownerEmail` prop (a successful save's own
@@ -104,17 +121,24 @@ export const TenantDetailsPanel = ({
     setValues(valuesFromProps(tenant, ownerEmail));
   }
 
-  // Same derived-during-render pattern: only an actual `isEditable`
-  // transition updates the announcement, never an unrelated re-render. The
-  // transition is driven by a background poll, not user action, so whether
-  // to move focus is decided here too — `document.activeElement` still
-  // reflects the pre-transition DOM at this point, before React commits the
-  // branch swap and any focused descendant auto-blurs to the body.
-  if (isEditable !== wasEditable) {
-    setWasEditable(isEditable);
-    setLockAnnouncement(
-      isEditable ? t('unlockedAnnouncement') : t('lockedAnnouncement'),
-    );
+  // Same derived-during-render pattern: only an actual change to which
+  // fields are locked updates the announcement, never an unrelated
+  // re-render. The transition is driven by a background poll, not user
+  // action, so whether to move focus is decided here too —
+  // `document.activeElement` still reflects the pre-transition DOM at this
+  // point, before React commits the disabled-state swap and any focused
+  // descendant auto-blurs to the body.
+  const nextLockedFieldsKey = [...lockedFieldKeys].sort().join(',');
+  if (nextLockedFieldsKey !== renderedLockedFieldsKey) {
+    const previousLockedCount = renderedLockedFieldsKey
+      ? renderedLockedFieldsKey.split(',').length
+      : 0;
+    setRenderedLockedFieldsKey(nextLockedFieldsKey);
+    if (lockedFieldKeys.length > previousLockedCount) {
+      setLockAnnouncement(t('lockedAnnouncement'));
+    } else if (lockedFieldKeys.length < previousLockedCount) {
+      setLockAnnouncement(t('unlockedAnnouncement'));
+    }
     setShouldMoveFocusOnTransition(
       Boolean(
         document.activeElement?.closest(
@@ -135,9 +159,8 @@ export const TenantDetailsPanel = ({
     if (!shouldMoveFocusOnTransition) {
       return;
     }
-    const target = editableContainerRef.current ?? lockedContainerRef.current;
-    target?.focus();
-  }, [wasEditable, shouldMoveFocusOnTransition]);
+    fieldsContainerRef.current?.focus();
+  }, [renderedLockedFieldsKey, shouldMoveFocusOnTransition]);
 
   const {
     root,
@@ -145,6 +168,7 @@ export const TenantDetailsPanel = ({
     field,
     fieldLabel,
     fieldError,
+    fieldLockReason,
     lockedValue,
     actions,
     lockAnnouncementLive,
@@ -198,6 +222,18 @@ export const TenantDetailsPanel = ({
     });
   };
 
+  const lockReasonText = (reason: TTenantFieldLockReason): string => {
+    if (reason.kind === 'step') {
+      return t('fieldLockedReasonStep', {
+        step: tSteps(`stepLabel.${reason.step}`),
+      });
+    }
+    if (reason.kind === 'succeeded') {
+      return t('fieldLockedReasonSucceeded');
+    }
+    return t('fieldLockedReasonRunning');
+  };
+
   const planOptions = [
     { value: TENANT_PLAN.FREE, label: t('planOptionFree') },
     { value: TENANT_PLAN.GROWTH, label: t('planOptionGrowth') },
@@ -214,6 +250,8 @@ export const TenantDetailsPanel = ({
     { key: 'ownerEmail', label: t('ownerEmailLabel') },
   ];
 
+  const planLock = fieldLocks.plan;
+
   return (
     <div className={root()} data-tenant-details-panel={panelId}>
       <Heading level={2} size={Size.XS}>
@@ -224,88 +262,99 @@ export const TenantDetailsPanel = ({
         {lockAnnouncement}
       </span>
 
-      {isEditable && showSaveSuccess && (
+      {showSaveSuccess && (
         <Alert type={ALERT_TYPE.SUCCESS} message={t('alertSuccess')} />
       )}
-      {isEditable && formError && (
-        <Alert type={ALERT_TYPE.ERROR} message={formError} />
-      )}
+      {formError && <Alert type={ALERT_TYPE.ERROR} message={formError} />}
 
-      {isEditable ? (
-        <div className={fields()} ref={editableContainerRef} tabIndex={-1}>
-          {textFields.map(({ key, label: labelText }) => {
-            const id = TEXT_FIELD_ID[key];
-            const errorId = `${id}-error`;
-            const errorMessage = fieldErrors[key];
+      <div className={fields()} ref={fieldsContainerRef} tabIndex={-1}>
+        {textFields.map(({ key, label: labelText }) => {
+          const id = TEXT_FIELD_ID[key];
+          const errorId = `${id}-error`;
+          const reasonId = `${id}-lock-reason`;
+          const errorMessage = fieldErrors[key];
+          const lock = fieldLocks[key];
+          const describedBy =
+            [lock ? reasonId : null, errorMessage ? errorId : null]
+              .filter(Boolean)
+              .join(' ') || undefined;
 
-            return (
-              <div className={field()} key={key}>
-                <label className={fieldLabel()} htmlFor={id}>
-                  {labelText}
-                </label>
-                <TextInput
-                  id={id}
-                  type={TEXT_FIELD_TYPE[key]}
-                  ariaLabel={labelText}
-                  value={values[key]}
-                  onChange={(nextValue) => updateField(key, nextValue)}
-                  isInvalid={Boolean(errorMessage)}
-                  aria-describedby={errorMessage ? errorId : undefined}
-                />
-                {errorMessage && (
-                  <span id={errorId} className={fieldError()}>
-                    {errorMessage}
-                  </span>
-                )}
-              </div>
-            );
-          })}
-
-          <div className={field()}>
-            <label className={fieldLabel()} htmlFor={PLAN_FIELD_ID}>
-              {t('planLabel')}
-            </label>
-            <SegmentedControl<TTenantPlan>
-              ariaLabel={t('planLabel')}
-              options={planOptions}
-              value={values.plan}
-              onChange={(plan) => updateField('plan', plan)}
-              className={planControl()}
-            />
-          </div>
-        </div>
-      ) : (
-        <dl
-          className={fields()}
-          ref={lockedContainerRef}
-          tabIndex={-1}
-          role="group"
-        >
-          {textFields.map(({ key, label: labelText }) => (
+          return (
             <div className={field()} key={key}>
-              <dt className={fieldLabel()}>{labelText}</dt>
-              <dd className={lockedValue()}>{values[key]}</dd>
+              <label className={fieldLabel()} htmlFor={id}>
+                {labelText}
+              </label>
+              <TextInput
+                id={id}
+                type={TEXT_FIELD_TYPE[key]}
+                ariaLabel={labelText}
+                value={values[key]}
+                onChange={(nextValue) => updateField(key, nextValue)}
+                isInvalid={Boolean(errorMessage)}
+                isDisabled={Boolean(lock)}
+                aria-describedby={describedBy}
+              />
+              {lock && (
+                <span id={reasonId} className={fieldLockReason()}>
+                  {lockReasonText(lock)}
+                </span>
+              )}
+              {errorMessage && (
+                <span id={errorId} className={fieldError()}>
+                  {errorMessage}
+                </span>
+              )}
             </div>
-          ))}
+          );
+        })}
 
-          <div className={field()}>
-            <dt className={fieldLabel()}>{t('planLabel')}</dt>
-            <dd className={lockedValue()}>{planLabel}</dd>
-          </div>
-        </dl>
-      )}
-
-      {isEditable && (
-        <div className={actions()}>
-          <Button
-            type="button"
-            onClick={handleSave}
-            isDisabled={isPending || !isDirty}
-          >
-            {isPending ? t('savingButton') : t('saveButton')}
-          </Button>
+        <div className={field()}>
+          {planLock ? (
+            <>
+              <span className={fieldLabel()} id={`${PLAN_FIELD_ID}-label`}>
+                {t('planLabel')}
+              </span>
+              <p
+                className={lockedValue()}
+                role="group"
+                aria-labelledby={`${PLAN_FIELD_ID}-label`}
+                aria-describedby={`${PLAN_FIELD_ID}-lock-reason`}
+              >
+                {planLabel}
+              </p>
+              <span
+                id={`${PLAN_FIELD_ID}-lock-reason`}
+                className={fieldLockReason()}
+              >
+                {lockReasonText(planLock)}
+              </span>
+            </>
+          ) : (
+            <>
+              <label className={fieldLabel()} htmlFor={PLAN_FIELD_ID}>
+                {t('planLabel')}
+              </label>
+              <SegmentedControl<TTenantPlan>
+                ariaLabel={t('planLabel')}
+                options={planOptions}
+                value={values.plan}
+                onChange={(plan) => updateField('plan', plan)}
+                className={planControl()}
+              />
+            </>
+          )}
         </div>
-      )}
+      </div>
+
+      <div className={actions()}>
+        <Button
+          type="button"
+          onClick={handleSave}
+          isDisabled={isPending || !isDirty}
+        >
+          {isPending ? t('savingButton') : t('saveButton')}
+        </Button>
+      </div>
     </div>
   );
 };

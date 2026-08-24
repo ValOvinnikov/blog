@@ -99,6 +99,30 @@ export const updateTenantDetailsAction = async (
           ok: false,
           fieldErrors: { primaryDomain: 'This domain is already in use.' },
         };
+      case 'slug-locked': {
+        const t = await getTranslations('tenantDetailsPanel');
+        const tSteps = await getTranslations('provisioningStatusView');
+        return {
+          ok: false,
+          fieldErrors: {
+            slug: t('fieldLockedReasonStep', {
+              step: tSteps(`stepLabel.${result.blockingStep}`),
+            }),
+          },
+        };
+      }
+      case 'domain-locked': {
+        const t = await getTranslations('tenantDetailsPanel');
+        const tSteps = await getTranslations('provisioningStatusView');
+        return {
+          ok: false,
+          fieldErrors: {
+            primaryDomain: t('fieldLockedReasonStep', {
+              step: tSteps(`stepLabel.${result.blockingStep}`),
+            }),
+          },
+        };
+      }
       case 'provisioning-started': {
         const t = await getTranslations('tenantDetailsPanel');
         return { ok: false, error: t('provisioningStartedError') };
