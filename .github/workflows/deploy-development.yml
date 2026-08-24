@@ -1,13 +1,14 @@
 name: Deploy Development
 
-# The dev Studio and dev web app deploy from here on merge to `main` — but only
-# the app(s) whose turbo graph the merge actually touched (see the `changes`
-# job), and ONLY after the `verify` gate (type-check/lint/test/build on the
-# merged commit) passes. Vercel's native Git integration is disabled for both
-# projects declaratively via apps/web/vercel.json's git.deploymentEnabled:
-# false (#445) so nothing deploys pre-merge or ungated — every dev deploy goes
-# through this workflow. Mirrors deploy-production.yml, which deploys both
-# apps unconditionally (a tag is a deliberate full release).
+# The dev Studio, dev web app and dev admin panel deploy from here on merge to
+# `main` — but only the app(s) whose turbo graph the merge actually touched (see
+# the `changes` job), and ONLY after the `verify` gate (type-check/lint/test/build
+# on the merged commit) passes. Vercel's native Git integration is disabled for
+# all three projects declaratively via each app's own vercel.json
+# `git.deploymentEnabled: false` (#445) so nothing deploys pre-merge or ungated —
+# every dev deploy goes through this workflow. Mirrors deploy-production.yml,
+# which deploys all three apps unconditionally (a tag is a deliberate full
+# release).
 on:
   push:
     branches: [main]
@@ -65,6 +66,7 @@ jobs:
     outputs:
       cms: ${{ steps.cms.outputs.changed }}
       web: ${{ steps.web.outputs.changed }}
+      admin: ${{ steps.admin.outputs.changed }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -91,16 +93,27 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Is admin affected?
+        id: admin
+        run: |
+          set -uo pipefail
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" admin --fallback=HEAD^1; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
   # Gate: re-run the full suite on the exact merged commit before any deploy.
   # Deploy jobs `needs: verify`, so a dev deploy only happens after checks pass.
-  # Skipped entirely (along with both deploys) when neither app is affected.
+  # Skipped entirely (along with every deploy) when no app is affected.
   verify:
     name: Verify
     needs: changes
     if: >-
       github.event_name == 'workflow_dispatch' ||
       needs.changes.outputs.cms == 'true' ||
-      needs.changes.outputs.web == 'true'
+      needs.changes.outputs.web == 'true' ||
+      needs.changes.outputs.admin == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     concurrency:
@@ -129,9 +142,12 @@ jobs:
   # schema+migration merge can't leave dev's data behind its code (the #355
   # failure mode). No artifact backup here — dev is the disposable staging line
   # (also refreshed from prod by #363); prod keeps the backup + approval gate.
-  # `if:` matches `verify` so migrate is never skipped out from under a deploy
-  # that `needs` it; migrate:deploy is a no-op when nothing is pending, and every
-  # step is guarded on the token so the job is inert until it's configured.
+  # Gated on cms||web — the union of the jobs that `needs` it — rather than on
+  # `verify`'s wider condition, so an admin-only merge doesn't run a Sanity
+  # migration for an app that never touches Sanity; migrate is still never
+  # skipped out from under a deploy that depends on it. migrate:deploy is a
+  # no-op when nothing is pending, and every step is guarded on the token so
+  # the job is inert until it's configured.
   migrate:
     name: Migrate dev content
     needs: [changes, verify]
@@ -173,11 +189,11 @@ jobs:
   # serves new code — the same "code never ships ahead of a pending
   # migration" discipline as the content `migrate` job above, for the
   # separate relational store (`packages/db`, see .claude/agents/db.md's
-  # "Migrations" section). Only `deploy-web` depends on `@blog/db` (apps/cms
-  # never touches Postgres), so this is gated on `web` alone, not `cms`, and
-  # only `deploy-web` (not `deploy-studio`) needs it below. No artifact
-  # backup here — dev is the disposable staging line, same stance as the
-  # content migrate job. `drizzle-kit migrate` is a no-op when nothing is
+  # "Migrations" section). `deploy-web` and `deploy-admin` both depend on
+  # `@blog/db` (apps/cms never touches Postgres), so this is gated on
+  # web||admin, not `cms`, and only those two (not `deploy-studio`) need it
+  # below. No artifact backup here — dev is the disposable staging line, same
+  # stance as the content migrate job. `drizzle-kit migrate` is a no-op when nothing is
   # pending, and the apply step is guarded on DATABASE_URL_UNPOOLED so the
   # job is inert until that secret is configured. No approval gate on dev,
   # same as the content migrate job.
@@ -186,7 +202,8 @@ jobs:
     needs: [changes, verify]
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.web == 'true'
+      needs.changes.outputs.web == 'true' ||
+      needs.changes.outputs.admin == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     # Same reasoning as `migrate` above (#409) — never cancel a running
@@ -310,6 +327,57 @@ jobs:
           # matches the directory name — fail loudly instead.
           : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the development environment}"
           : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID Variable on the development environment}"
+          # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
+          # green; the package is cached after the first resolution.
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+  deploy-admin:
+    name: Deploy dev admin
+    needs: [changes, verify, migrate-db]
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.admin == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: deploy-dev-admin
+      cancel-in-progress: true
+    environment: development
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      # Org/project ids are not sensitive — they live as environment-scoped
+      # Variables (not Secrets) so they stay inspectable in run logs.
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      # Distinct GitHub Environment variable from deploy-web's VERCEL_PROJECT_ID
+      # (admin-dev is its own Vercel project, rooted at apps/admin) — mapped to
+      # the local name the Vercel CLI actually reads.
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_ADMIN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # pnpm + node on PATH so `vercel build` can install the workspace deps
+      # (Vercel detects pnpm-lock.yaml and shells out to `pnpm`).
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Deploys `admin-dev` via the Vercel CLI (its Git auto-deploy is disabled,
+      # same as web and cms). For `admin-dev`, Vercel "production" = main, so
+      # --prod targets its main URL. Guarded on VERCEL_PROJECT_ID (not
+      # VERCEL_TOKEN, which deploy-web already has configured) so this stays a
+      # true no-op until the admin-dev Vercel project exists and
+      # VERCEL_PROJECT_ID_ADMIN is set.
+      - name: Deploy to Vercel (admin-dev)
+        if: ${{ env.VERCEL_PROJECT_ID != '' }}
+        run: |
+          set -euo pipefail
+          : "${VERCEL_TOKEN:?empty — set the VERCEL_TOKEN secret on the development environment}"
+          : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the development environment}"
           # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
           # green; the package is cached after the first resolution.
           npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"

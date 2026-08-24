@@ -113,9 +113,9 @@ jobs:
   # reuses the SAME required-reviewer gate as every other production job —
   # no second approval mechanism. Every step is guarded on
   # DATABASE_URL_UNPOOLED so the whole job is a no-op until that secret is
-  # configured — safe to land ahead of the console setup. Only `deploy-web`
-  # depends on `@blog/db` (apps/cms never touches Postgres), so only it
-  # `needs` this job below.
+  # configured — safe to land ahead of the console setup. `deploy-web` and
+  # `deploy-admin` both depend on `@blog/db` (apps/cms never touches
+  # Postgres), so only those two `need` this job below.
   migrate-db:
     name: Migrate prod database
     needs: verify
@@ -256,6 +256,49 @@ jobs:
           # matches the directory name — fail loudly instead.
           : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the production environment}"
           : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID Variable on the production environment}"
+          # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
+          # green; the package is cached after the first resolution.
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
+          npx --yes "vercel@${VERCEL_CLI_VERSION}" deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+  deploy-admin:
+    name: Deploy prod admin
+    needs: [verify, migrate-db]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      # Org/project ids are not sensitive — they live as environment-scoped
+      # Variables (not Secrets) so they stay inspectable in run logs.
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      # Distinct GitHub Environment variable from deploy-web's VERCEL_PROJECT_ID
+      # (admin-prod is its own Vercel project, rooted at apps/admin) — mapped to
+      # the local name the Vercel CLI actually reads.
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_ADMIN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # pnpm + node on PATH so `vercel build` can install the workspace deps
+      # (Vercel detects pnpm-lock.yaml and shells out to `pnpm`).
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      # Vercel CLI runs its own `next build` with the project's Production env
+      # vars pulled from Vercel (root directory apps/admin is stored on the
+      # project, so build resolves the monorepo workspaces correctly). Guarded
+      # on VERCEL_PROJECT_ID (not VERCEL_TOKEN, which deploy-web already has
+      # configured) so this stays a true no-op until the admin-prod Vercel
+      # project exists and VERCEL_PROJECT_ID_ADMIN is set.
+      - name: Deploy to Vercel (admin-prod)
+        if: ${{ env.VERCEL_PROJECT_ID != '' }}
+        run: |
+          set -euo pipefail
+          : "${VERCEL_TOKEN:?empty — set the VERCEL_TOKEN secret on the production environment}"
+          : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the production environment}"
           # npx (not `npm install -g`) keeps zizmor's ad-hoc-install audit
           # green; the package is cached after the first resolution.
           npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"

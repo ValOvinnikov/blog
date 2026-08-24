@@ -29,6 +29,7 @@ async function importBuildAuthConfig(): Promise<typeof buildAuthConfig> {
 describe(buildAuthConfig, () => {
   afterEach(() => {
     delete process.env['AUTH_SECRET'];
+    delete process.env['AUTH_COOKIE_DOMAIN'];
   });
 
   it('uses the database session strategy', () => {
@@ -52,6 +53,25 @@ describe(buildAuthConfig, () => {
     const config = buildAuthConfig({ sendEmail: vi.fn() });
 
     expect(config.cookies).toBeUndefined();
+  });
+
+  it('scopes the session cookie to AUTH_COOKIE_DOMAIN when it is set', async () => {
+    process.env['AUTH_SECRET'] = 'test-secret';
+    process.env['AUTH_COOKIE_DOMAIN'] = '.example.com';
+    const freshBuildAuthConfig = await importBuildAuthConfig();
+
+    const config = freshBuildAuthConfig({ sendEmail: vi.fn() });
+
+    expect(config.cookies?.sessionToken).toEqual({
+      name: '__Secure-authjs.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: true,
+        domain: '.example.com',
+      },
+    });
   });
 
   it('reads the secret from AUTH_SECRET', async () => {

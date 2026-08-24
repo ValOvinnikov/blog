@@ -48,6 +48,26 @@ export function buildAuthConfig({
     // table (`@blog/db`'s schema) only exists to back that strategy.
     session: { strategy: 'database' },
     secret: env.AUTH_SECRET,
+    // Unset (the default), Auth.js picks its own per-origin cookie — each app
+    // gets its own session. Set, both apps must be subdomains of that domain
+    // for the browser to accept it; scoping the cookie there is what makes one
+    // sign-in cover both. Overriding `sessionToken` means we now own its name
+    // and every option Auth.js would otherwise derive (see `defaultCookies` in
+    // `@auth/core`), not just `domain` — reproduced here rather than changed.
+    ...(env.AUTH_COOKIE_DOMAIN && {
+      cookies: {
+        sessionToken: {
+          name: '__Secure-authjs.session-token',
+          options: {
+            httpOnly: true,
+            sameSite: 'lax',
+            path: '/',
+            secure: true,
+            domain: env.AUTH_COOKIE_DOMAIN,
+          },
+        },
+      },
+    }),
     callbacks: {
       // The default database-strategy `session` callback (`@auth/core`'s
       // `defaultCallbacks.session`) only copies `name`/`email`/`image` onto

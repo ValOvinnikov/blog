@@ -7,6 +7,7 @@ const ENV_KEYS = [
   'AUTH_GOOGLE_ID',
   'AUTH_GOOGLE_SECRET',
   'MAGIC_LINK_FROM_ADDRESS',
+  'AUTH_COOKIE_DOMAIN',
   'SKIP_ENV_VALIDATION',
 ] as const;
 
@@ -51,6 +52,7 @@ describe('env', () => {
     expect(env.AUTH_GOOGLE_ID).toBeUndefined();
     expect(env.AUTH_GOOGLE_SECRET).toBeUndefined();
     expect(env.MAGIC_LINK_FROM_ADDRESS).toBeUndefined();
+    expect(env.AUTH_COOKIE_DOMAIN).toBeUndefined();
   });
 
   describe('validation failure', () => {
@@ -91,6 +93,7 @@ describe('env', () => {
     process.env['AUTH_GOOGLE_ID'] = 'google-id';
     process.env['AUTH_GOOGLE_SECRET'] = 'google-secret';
     process.env['MAGIC_LINK_FROM_ADDRESS'] = 'Sign in <sign-in@example.com>';
+    process.env['AUTH_COOKIE_DOMAIN'] = '.example.com';
 
     const { env } = await importEnv();
 
@@ -100,6 +103,7 @@ describe('env', () => {
     expect(env.AUTH_GOOGLE_ID).toBe('google-id');
     expect(env.AUTH_GOOGLE_SECRET).toBe('google-secret');
     expect(env.MAGIC_LINK_FROM_ADDRESS).toBe('Sign in <sign-in@example.com>');
+    expect(env.AUTH_COOKIE_DOMAIN).toBe('.example.com');
   });
 
   it('skips validation when SKIP_ENV_VALIDATION is set', async () => {
