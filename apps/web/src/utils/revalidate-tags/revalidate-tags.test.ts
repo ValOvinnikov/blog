@@ -55,6 +55,18 @@ describe('getRevalidateTagsForType', () => {
     ).toEqual(['page_topicIndex']);
   });
 
+  it('maps the tag-index singleton to its ISR tag', () => {
+    expect(getRevalidateTagsForType('page_tagIndex', 'page_tagIndex')).toEqual([
+      'page_tagIndex',
+    ]);
+  });
+
+  it('maps the theme settings singleton to its ISR tag', () => {
+    expect(
+      getRevalidateTagsForType('settings_theme', 'settings-theme'),
+    ).toEqual(['theme-settings']);
+  });
+
   it('includes the per-document tag for module types', () => {
     expect(getRevalidateTagsForType('module_hero', 'hero-1')).toEqual([
       'modules:hero',

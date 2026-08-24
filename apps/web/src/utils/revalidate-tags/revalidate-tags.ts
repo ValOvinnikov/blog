@@ -4,20 +4,54 @@ import type { AllSanitySchemaTypes, TModuleType } from '@blog/config';
 type TSanityType = Extract<AllSanitySchemaTypes, { _type: string }>['_type'];
 
 /**
+ * Every non-module document `_type` that at least one `@blog/service` loader's
+ * `isr(...)` call actually depends on. Kept in sync by hand against
+ * `packages/service/src` — required (like `TModuleType`) so a removed or
+ * typo'd entry fails `type-check` instead of silently purging nothing.
+ *
+ * This does not catch the opposite mistake: adding a brand-new `isr(...)` tag
+ * for a type not yet listed here still relies on a human adding it — the
+ * union only guards against entries disappearing, not new ones being missed.
+ *
+ * `settings_voice` is deliberately excluded: audited via
+ * `grep -rln "voice" packages/service/src` (excluding tests) with zero hits —
+ * it's Sanity Studio-only config, read by nothing that caches, so it
+ * correctly has no entry below.
+ */
+type TCachedDocumentType =
+  | 'page_tag'
+  | 'page_topic'
+  | 'page_tagIndex'
+  | 'page_topicIndex'
+  | 'page_blog'
+  | 'page_generic'
+  | 'page_post'
+  | 'page_home'
+  | 'blog_post'
+  | 'blog_author'
+  | 'blog_topic'
+  | 'blog_tag'
+  | 'settings_site'
+  | 'settings_navigation'
+  | 'settings_footer'
+  | 'settings_newsletter'
+  | 'settings_theme';
+
+/**
  * Base ISR tags to revalidate per Sanity document `_type`, for the revalidation
  * webhook. Module types additionally purge a per-document `module:<id>` tag
  * (appended in the resolver).
  *
- * The `satisfies` clause is split: every `module_*` `_type` in the
- * schema-derived `TModuleType` union is **required**
- * (`Record<TModuleType, …>`), so a schema addition without a matching entry
- * here fails `type-check` — regardless of whether that type is ever added to
- * `MODULE_MAP` (`module_hero`, `module_postList`, and `module_taxonomyList`
- * never are). Other document `_type`s stay `Partial`, since several
- * legitimately purge nothing. The tag strings themselves are the literals
- * passed to `isr(...)` in `@blog/service` loaders (a few predate a
- * `{group}_{name}` rename, e.g. the `page_home` document invalidates the
- * `homePage` tag) — keep them in sync with `packages/service/src`.
+ * The `satisfies` clause requires both `TModuleType` and `TCachedDocumentType`
+ * (`Record<TModuleType | TCachedDocumentType, …>`), so a schema addition to
+ * either union without a matching entry here fails `type-check` —
+ * regardless of whether that module type is ever added to `MODULE_MAP`
+ * (`module_hero`, `module_postList`, and `module_taxonomyList` never are).
+ * Every other document/object `_type` stays `Partial`, since it legitimately
+ * purges nothing. The tag strings themselves are the literals passed to
+ * `isr(...)` in `@blog/service` loaders (a few predate a `{group}_{name}`
+ * rename, e.g. the `page_home` document invalidates the `homePage` tag) —
+ * keep them in sync with `packages/service/src`.
  */
 const REVALIDATE_TAGS = {
   blog_post: ['post', 'posts', 'homePage'],
@@ -28,6 +62,7 @@ const REVALIDATE_TAGS = {
   settings_navigation: ['navigation'],
   settings_footer: ['footer'],
   settings_newsletter: ['newsletter-settings'],
+  settings_theme: ['theme-settings'],
   page_home: ['homePage'],
   page_blog: ['page_blog'],
   page_generic: ['page_generic'],
@@ -35,6 +70,7 @@ const REVALIDATE_TAGS = {
   page_tag: ['page_tag'],
   page_topic: ['page_topic'],
   page_topicIndex: ['page_topicIndex'],
+  page_tagIndex: ['page_tagIndex'],
   module_hero: ['modules:hero'],
   module_postList: ['modules:postList'],
   module_taxonomyList: ['modules:taxonomyList'],
@@ -42,7 +78,10 @@ const REVALIDATE_TAGS = {
   module_content: ['modules:content'],
   module_cta: ['modules:cta'],
   module_newsletter: ['modules:newsletter'],
-} as const satisfies Record<TModuleType, readonly string[]> &
+} as const satisfies Record<
+  TModuleType | TCachedDocumentType,
+  readonly string[]
+> &
   Partial<Record<TSanityType, readonly string[]>>;
 
 /**
