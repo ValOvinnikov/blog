@@ -75,10 +75,10 @@ afterEach(async () => {
 });
 
 describe(clearTenantProvisioningArtifacts, () => {
-  it('nulls every provisioning column, including sanityProjectId, when keepSanityProjectId is false', async () => {
+  it('nulls every provisioning column except sanityProjectId/sanityDataset — the archived project still exists', async () => {
     const tenantId = await insertProvisionedTenant();
 
-    await clearTenantProvisioningArtifacts(tenantId, false);
+    await clearTenantProvisioningArtifacts(tenantId);
 
     const [row] = await db
       .select()
@@ -86,28 +86,8 @@ describe(clearTenantProvisioningArtifacts, () => {
       .where(eq(tenants.id, tenantId));
 
     expect(row).toMatchObject({
-      sanityProjectId: null,
-      sanityDataset: null,
-      sanityReadTokenEncrypted: null,
-      studioVercelProjectId: null,
-      provisioningStatus: null,
-      provisioningSteps: null,
-    });
-  });
-
-  it('leaves sanityProjectId populated as the manual-deletion signal when keepSanityProjectId is true', async () => {
-    const tenantId = await insertProvisionedTenant();
-
-    await clearTenantProvisioningArtifacts(tenantId, true);
-
-    const [row] = await db
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-
-    expect(row?.sanityProjectId).toBe('proj123');
-    expect(row).toMatchObject({
-      sanityDataset: null,
+      sanityProjectId: 'proj123',
+      sanityDataset: 'production',
       sanityReadTokenEncrypted: null,
       studioVercelProjectId: null,
       provisioningStatus: null,
@@ -118,7 +98,7 @@ describe(clearTenantProvisioningArtifacts, () => {
   it('leaves identity columns untouched', async () => {
     const tenantId = await insertProvisionedTenant();
 
-    await clearTenantProvisioningArtifacts(tenantId, false);
+    await clearTenantProvisioningArtifacts(tenantId);
 
     const [row] = await db
       .select()
@@ -135,9 +115,9 @@ describe(clearTenantProvisioningArtifacts, () => {
   it('is safe to call again once already cleared', async () => {
     const tenantId = await insertProvisionedTenant();
 
-    await clearTenantProvisioningArtifacts(tenantId, false);
+    await clearTenantProvisioningArtifacts(tenantId);
     await expect(
-      clearTenantProvisioningArtifacts(tenantId, false),
+      clearTenantProvisioningArtifacts(tenantId),
     ).resolves.toBeUndefined();
   });
 });

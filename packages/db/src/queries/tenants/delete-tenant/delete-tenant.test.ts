@@ -19,9 +19,13 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 let db: PgliteDatabase<typeof schema>;
 
 async function insertTenant(
-  options: { archived?: boolean; slug?: string } = {},
+  options: {
+    archived?: boolean;
+    slug?: string;
+    sanityProjectId?: string;
+  } = {},
 ): Promise<string> {
-  const { archived = true, slug = 'acme' } = options;
+  const { archived = true, slug = 'acme', sanityProjectId } = options;
 
   const [tenant] = await db
     .insert(schema.tenants)
@@ -33,6 +37,7 @@ async function insertTenant(
       plan: TENANT_PLAN.FREE,
       status: archived ? TENANT_STATUS.ARCHIVED : TENANT_STATUS.ACTIVE,
       deprovisionedAt: archived ? new Date() : undefined,
+      sanityProjectId,
     })
     .returning();
 
@@ -65,7 +70,7 @@ describe(deleteTenant, () => {
 
     const result = await deleteTenant(tenantId);
 
-    expect(result).toEqual({ outcome: 'deleted' });
+    expect(result).toEqual({ outcome: 'deleted', sanityProject: 'no-project' });
 
     const remaining = await db
       .select()
@@ -191,5 +196,99 @@ describe(deleteTenant, () => {
       .returning();
 
     expect(newTenant?.slug).toBe('acme');
+  });
+});
+
+describe('deleteTenant — Sanity project deletion', () => {
+  const fetchMock = vi.fn();
+
+  beforeEach(() => {
+    vi.stubGlobal('fetch', fetchMock);
+    fetchMock.mockReset();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('does not attempt Sanity deletion when no token is supplied', async () => {
+    const tenantId = await insertTenant({
+      archived: true,
+      sanityProjectId: 'proj123',
+    });
+
+    const result = await deleteTenant(tenantId);
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      outcome: 'deleted',
+      sanityProject: 'skipped-no-token',
+    });
+  });
+
+  it('reports no-project when the tenant never had one, even with a token supplied', async () => {
+    const tenantId = await insertTenant({ archived: true });
+
+    const result = await deleteTenant(tenantId, 'mgmt-token');
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(result).toEqual({ outcome: 'deleted', sanityProject: 'no-project' });
+  });
+
+  it('deletes the Sanity project when a token is supplied and the API succeeds', async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
+    const tenantId = await insertTenant({
+      archived: true,
+      sanityProjectId: 'proj123',
+    });
+
+    const result = await deleteTenant(tenantId, 'mgmt-token');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('https://api.sanity.io/v2021-06-07/projects/proj123');
+    expect(init.method).toBe('DELETE');
+    expect(result).toEqual({ outcome: 'deleted', sanityProject: 'deleted' });
+  });
+
+  it('still hard-deletes the row and reports left-archived on the org-billing 401', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          code: 401,
+          status: 'Unauthorized',
+          message:
+            'Cancellation of project "proj123" requires billing permission on organization "org1"',
+        }),
+        { status: 401 },
+      ),
+    );
+    const tenantId = await insertTenant({
+      archived: true,
+      sanityProjectId: 'proj123',
+    });
+
+    const result = await deleteTenant(tenantId, 'mgmt-token');
+
+    expect(result).toEqual({
+      outcome: 'deleted',
+      sanityProject: 'left-archived',
+    });
+
+    const remaining = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(remaining).toEqual([]);
+  });
+
+  it('still throws on a Sanity failure unrelated to billing permission', async () => {
+    fetchMock.mockResolvedValue(new Response('forbidden', { status: 403 }));
+    const tenantId = await insertTenant({
+      archived: true,
+      sanityProjectId: 'proj123',
+    });
+
+    await expect(deleteTenant(tenantId, 'mgmt-token')).rejects.toThrow(/403/);
   });
 });
