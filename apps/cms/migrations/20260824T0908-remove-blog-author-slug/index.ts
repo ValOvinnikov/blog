@@ -1,5 +1,5 @@
 /**
- * Removes `blog_author.slug` (#1975) — the author-page slug is dead now that
+ * Removes `blog_author.slug` — the author-page slug is dead now that
  * bylines link out via `profilePage` instead.
  *
  * Idempotency guard: skips documents where `slug` is already absent — a doc
