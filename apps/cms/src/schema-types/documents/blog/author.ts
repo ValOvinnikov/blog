@@ -57,6 +57,16 @@ export const authorSchema = defineType({
       description: 'Links to social profiles shown on the author page.',
       of: [defineArrayMember({ type: socialLinkSchema.name })],
     }),
+    defineField({
+      name: 'profilePage',
+      title: 'Profile Page',
+      type: 'reference',
+      description: "Optional page this author's byline links to.",
+      // Literal (not `genericSchema.name`): importing page.ts here closes a
+      // circular import (page → module-cta → link → post → author) —
+      // typegen fails otherwise.
+      to: [{ type: 'page_generic' }],
+    }),
   ],
   preview: {
     select: {
