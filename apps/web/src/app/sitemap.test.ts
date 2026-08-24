@@ -10,6 +10,7 @@ const {
   getAuthorPaginationParamsMock,
   getIndexPageParamsMock,
   getPageSlugsMock,
+  getTopicIndexPageMock,
 } = vi.hoisted(() => ({
   getPostParamsMock: vi.fn(),
   getTopicParamsMock: vi.fn(),
@@ -20,6 +21,7 @@ const {
   getAuthorPaginationParamsMock: vi.fn(),
   getIndexPageParamsMock: vi.fn(),
   getPageSlugsMock: vi.fn(),
+  getTopicIndexPageMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -46,6 +48,7 @@ vi.mock('@blog/service', () => ({
           getAuthorPaginationParams: getAuthorPaginationParamsMock,
         },
       },
+      topicIndex: { v1: { getIndexPage: getTopicIndexPageMock } },
     },
   },
 }));
@@ -65,6 +68,7 @@ const mockAllEmpty = () => {
   getAuthorPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
   getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
   getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
+  getTopicIndexPageMock.mockResolvedValue({ ok: true, data: {} });
 };
 
 describe('sitemap', () => {
@@ -79,6 +83,7 @@ describe('sitemap', () => {
     getAuthorPaginationParamsMock.mockReset();
     getIndexPageParamsMock.mockReset();
     getPageSlugsMock.mockReset();
+    getTopicIndexPageMock.mockReset();
   });
 
   it('includes home, blog index, topics hub, post, topic, tag, author, blog page and generic page entries', async () => {
@@ -252,7 +257,7 @@ describe('sitemap', () => {
     });
   });
 
-  it('omits numbered blog pages when the params fetch fails', async () => {
+  it('omits the /blog entry and numbered blog pages when the params fetch fails', async () => {
     mockAllEmpty();
     getIndexPageParamsMock.mockResolvedValue({
       ok: false,
@@ -265,7 +270,22 @@ describe('sitemap', () => {
 
     expect(urls).not.toContain('https://example.com/blog/page/2');
     expect(urls).toContain('https://example.com/');
-    expect(urls).toContain('https://example.com/blog');
+    expect(urls).not.toContain('https://example.com/blog');
+  });
+
+  it('omits the /topics entry when the topic index page fetch resolves to a failure result', async () => {
+    mockAllEmpty();
+    getTopicIndexPageMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+    const urls = entries.map((entry) => entry.url);
+
+    expect(urls).not.toContain('https://example.com/topics');
+    expect(urls).toContain('https://example.com/');
   });
 
   it('omits generic pages when the slugs fetch fails', async () => {

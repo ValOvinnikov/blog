@@ -54,6 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     authorPaginationParamsResult,
     blogParamsResult,
     genericPageSlugsResult,
+    topicIndexPageResult,
   ] = await Promise.all([
     service.pages.post.v1.getPostParams(),
     service.pages.topic.v1.getTopicParams(),
@@ -64,6 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     service.pages.author.v1.getAuthorPaginationParams(AUTHOR_ITEMS_PER_PAGE),
     service.pages.blog.v1.getIndexPageParams(),
     service.pages.generic.v1.getPageSlugs(),
+    service.pages.topicIndex.v1.getIndexPage(),
   ]);
 
   if (!postParamsResult.ok) {
@@ -139,10 +141,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ? genericPageSlugsResult.data
     : [];
 
+  if (!topicIndexPageResult.ok) {
+    logger.error('sitemap.topic_index_page_fetch_failed', {
+      error: topicIndexPageResult.error,
+    });
+  }
+
   return [
     toEntry(routes.home(), siteUrl),
-    toEntry(routes.blogIndex(), siteUrl),
-    toEntry(routes.topics(), siteUrl),
+    ...(blogParamsResult.ok ? [toEntry(routes.blogIndex(), siteUrl)] : []),
+    ...(topicIndexPageResult.ok ? [toEntry(routes.topics(), siteUrl)] : []),
     toEntry(routes.tags(), siteUrl),
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
     ...posts.map(({ slug, publishedAt }) =>
