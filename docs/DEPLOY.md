@@ -307,6 +307,14 @@ few secrets/vars nothing else in this repo has needed yet:
       against the GitHub API from `apps/admin` itself, not from a CI job, so
       there's no `GITHUB_REPOSITORY`-style var to infer this from. See
       `docs/context/environment-variables.md`.
+- [ ] Optional: `apps/admin`'s own Vercel project can also set env var
+      `TENANT_PROVISIONING_DATASET` (`development` or `production`) to pick
+      which dataset that deployment's provisioning runs create in — a
+      manually-set, per-deployment opt-in, same posture as `apps/web`'s
+      `WEB_ANALYTICS_ENABLED`, since `VERCEL_ENV` can't reliably tell a dev
+      deployment apart from real production. Left unset, provisioning falls
+      back to this GitHub Environment's `TENANT_SANITY_DATASET`, unchanged
+      from today. See `docs/context/environment-variables.md`.
 - [ ] `VERCEL_TOKEN` / `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` above are reused
       as-is: `VERCEL_TOKEN` needs project-creation scope (not just deploy
       scope) for this workflow to create each tenant's Studio Vercel project;
