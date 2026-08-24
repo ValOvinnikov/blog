@@ -19,11 +19,12 @@ export type TCreateSanityProjectResult = {
   sanityDataset: string;
 };
 
-// `editor` can author/publish content but can't change project settings or
-// manage members — the platform (via `SANITY_MANAGEMENT_TOKEN`) keeps sole
-// control over the project itself, not the tenant owner or the platform
-// superadmin invited alongside them.
-const TENANT_INVITE_ROLE = 'editor';
+// Sanity's Free plan (which every tenant project is provisioned on) exposes
+// only `administrator` and `viewer` project-member roles — the granular
+// roles (editor/developer/custom) are a paid-plan feature and don't exist on
+// these projects. `viewer` can't author content, so both the tenant owner
+// and the platform superadmin are invited as `administrator`.
+const TENANT_PROJECT_MEMBER_ROLE = 'administrator';
 
 /**
  * Step 1 — creates the tenant's own Sanity project, its dataset (named per
@@ -104,9 +105,9 @@ export async function createTenantSanityProject(
   }
 
   if (superadminEmail) {
-    // Sanity rejects a second invite for the same email+role, and a
-    // superadmin who is also this tenant's owner is already covered by the
-    // invite above.
+    // A superadmin who is also this tenant's owner is already covered by
+    // the invite above — inviting them again would duplicate an
+    // already-pending invite for the same email.
     const superadminIsOwner =
       !!ownerEmail &&
       superadminEmail.toLowerCase() === ownerEmail.toLowerCase();
@@ -140,7 +141,7 @@ export async function createTenantSanityProject(
         token: env.sanityManagementToken,
         projectId,
         email,
-        role: TENANT_INVITE_ROLE,
+        role: TENANT_PROJECT_MEMBER_ROLE,
       });
     }
   }

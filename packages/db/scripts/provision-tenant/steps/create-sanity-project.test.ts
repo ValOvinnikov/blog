@@ -305,7 +305,7 @@ describe(createTenantSanityProject, () => {
     });
   });
 
-  it('resolves the tenant owner email and invites them as an editor when not already invited', async () => {
+  it('resolves the tenant owner email and invites them as an administrator when not already invited', async () => {
     const tenant = baseTenant();
 
     await createTenantSanityProject(tenant, env);
@@ -319,7 +319,27 @@ describe(createTenantSanityProject, () => {
       token: 'mgmt-token',
       projectId: 'proj456',
       email: 'owner@example.com',
-      role: 'editor',
+      role: 'administrator',
+    });
+  });
+
+  it('invites both the owner and the superadmin as administrator when they are distinct emails', async () => {
+    const tenant = baseTenant();
+
+    await createTenantSanityProject(tenant, env);
+
+    expect(createSanityProjectInviteMock).toHaveBeenCalledTimes(2);
+    expect(createSanityProjectInviteMock).toHaveBeenNthCalledWith(1, {
+      token: 'mgmt-token',
+      projectId: 'proj456',
+      email: 'owner@example.com',
+      role: 'administrator',
+    });
+    expect(createSanityProjectInviteMock).toHaveBeenNthCalledWith(2, {
+      token: 'mgmt-token',
+      projectId: 'proj456',
+      email: 'superadmin@example.com',
+      role: 'administrator',
     });
   });
 
@@ -445,13 +465,13 @@ describe(createTenantSanityProject, () => {
       token: 'mgmt-token',
       projectId: 'proj456',
       email: 'superadmin@example.com',
-      role: 'editor',
+      role: 'administrator',
     });
 
     consoleErrorSpy.mockRestore();
   });
 
-  it('resolves the platform superadmin email and invites them as an editor when not already invited', async () => {
+  it('resolves the platform superadmin email and invites them as an administrator when not already invited', async () => {
     const tenant = baseTenant();
 
     await createTenantSanityProject(tenant, env);
@@ -461,7 +481,7 @@ describe(createTenantSanityProject, () => {
       token: 'mgmt-token',
       projectId: 'proj456',
       email: 'superadmin@example.com',
-      role: 'editor',
+      role: 'administrator',
     });
   });
 
@@ -514,7 +534,7 @@ describe(createTenantSanityProject, () => {
       token: 'mgmt-token',
       projectId: 'proj456',
       email: 'owner@example.com',
-      role: 'editor',
+      role: 'administrator',
     });
     expect(result).toEqual({
       sanityProjectId: 'proj456',
@@ -541,7 +561,7 @@ describe(createTenantSanityProject, () => {
       token: 'mgmt-token',
       projectId: 'proj456',
       email: 'owner@example.com',
-      role: 'editor',
+      role: 'administrator',
     });
   });
 
