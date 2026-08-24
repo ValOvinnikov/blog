@@ -5,6 +5,10 @@ import { recordAuditEvent } from '@admin/server/audit/record-audit-event';
 import { signIn } from '@admin/server/auth/auth';
 import { requireAdmin } from '@admin/server/auth/require-admin';
 import { dispatchProvisioningWorkflow } from '@admin/server/provisioning/dispatch-provisioning-workflow';
+import {
+  createOwnerInviteToken,
+  verifyOwnerInviteToken,
+} from '@admin/server/tenants/owner-invite-token';
 import { logger } from '@admin/utils/logger/logger';
 import { DOMAIN_PATTERN, SLUG_PATTERN } from '@admin/utils/path/path';
 import { adminRoutes } from '@admin/utils/routes/routes';
@@ -27,11 +31,16 @@ const createTenantInputSchema = z.object({
     .regex(DOMAIN_PATTERN, 'Enter a valid domain.'),
   plan: z.enum(Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]]),
   ownerEmail: z.string().trim().toLowerCase().email('Enter a valid email.'),
-  // Set once the operator has already seen and accepted
-  // `ownerInviteConfirmation` for this exact email — the Details form
-  // re-submits with this flag on a second click rather than the not-found
-  // branch below ever needing its own separate "confirm" endpoint.
+  // Kept for readability alongside `confirmOwnerInviteToken` below, but the
+  // guarantee that actually gates the not-found-owner branch is the token —
+  // this flag alone proves nothing server-side.
   confirmOwnerInvite: z.boolean().optional().default(false),
+  // Echoed back from the `ownerInviteConfirmation` the Details form was
+  // previously shown — verified server-side (HMAC over the exact
+  // `ownerEmail`) before the not-found-owner branch is allowed to proceed,
+  // so a request can't skip that confirmation by supplying the boolean
+  // above alone.
+  confirmOwnerInviteToken: z.string().optional(),
 });
 
 export type TCreateTenantInput = z.input<typeof createTenantInputSchema>;
@@ -46,8 +55,10 @@ export type TCreateTenantResult = {
   fieldErrors?: TCreateTenantFieldErrors;
   // Present only for the not-yet-confirmed not-found-owner case: the Details
   // form shows this message and lets the operator resubmit (unchanged
-  // email) to actually proceed down the invite path.
-  ownerInviteConfirmation?: { email: string; message: string };
+  // email) to actually proceed down the invite path. `token` must be echoed
+  // back unchanged on that resubmit — it's what proves the confirmation was
+  // actually issued for this exact email.
+  ownerInviteConfirmation?: { email: string; message: string; token: string };
 };
 
 /**
@@ -77,15 +88,16 @@ export const createTenantAction = async (
     return { ok: false, fieldErrors };
   }
 
-  const { name, slug, domain, plan, ownerEmail, confirmOwnerInvite } =
+  const { name, slug, domain, plan, ownerEmail, confirmOwnerInviteToken } =
     parsed.data;
 
   const owner = await queries.users.getUserByEmail(ownerEmail);
-  if (!owner && !confirmOwnerInvite) {
+  if (!owner && !verifyOwnerInviteToken(ownerEmail, confirmOwnerInviteToken)) {
     return {
       ok: false,
       ownerInviteConfirmation: {
         email: ownerEmail,
+        token: createOwnerInviteToken(ownerEmail),
         message: `No account found for ${ownerEmail} — they'll be sent an invite to sign in and manage this tenant as owner.`,
       },
     };

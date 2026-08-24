@@ -77,6 +77,12 @@ export const env = createEnv({
     // API requires it as a query param in that case). Optional even when
     // VERCEL_API_TOKEN is set — a personal-account token needs no team id.
     VERCEL_TEAM_ID: z.string().min(1).optional(),
+    // Shared Auth.js signing secret — required for this app's session to
+    // function at all, byte-identical with `apps/web`'s. Funneled through
+    // this module because it's also reused to sign the owner-invite
+    // soft-confirmation token (`owner-invite-token.ts`), not only for
+    // Auth.js sessions.
+    AUTH_SECRET: z.string().min(1),
   },
   runtimeEnv: {
     RESEND_API_KEY: process.env.RESEND_API_KEY,
@@ -94,6 +100,7 @@ export const env = createEnv({
     VERCEL_API_TOKEN: process.env.VERCEL_API_TOKEN,
     VERCEL_WEB_PROJECT_ID: process.env.VERCEL_WEB_PROJECT_ID,
     VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
+    AUTH_SECRET: process.env.AUTH_SECRET,
   },
   emptyStringAsUndefined: true,
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
