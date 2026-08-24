@@ -14,19 +14,19 @@ const { getIndexPageMock, taxonomyListModuleMock } = vi.hoisted(() => ({
   taxonomyListModuleMock: vi.fn(
     ({
       id,
-      titleFallback,
+      accessibleTitle,
       emptyMessage,
       buildHref,
       formatPostCount,
     }: {
       id: string;
-      titleFallback: string;
+      accessibleTitle: string;
       emptyMessage: string;
       buildHref: (slug: string) => string;
       formatPostCount: (count: number) => string;
     }) => (
       <div data-testid="taxonomy-list-module-stub">
-        {id}:{titleFallback}:{emptyMessage}:{buildHref('typescript')}:
+        {id}:{accessibleTitle}:{emptyMessage}:{buildHref('typescript')}:
         {formatPostCount(5)}
       </div>
     ),
@@ -102,7 +102,7 @@ describe(`<${TagsPage.name}/>`, () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('passes the taxonomyListId, TAGS kind, page heading as titleFallback, the empty-state copy, and the href/postcount builders through to TaxonomyListModule', async () => {
+  it('passes the taxonomyListId, TAGS kind, page heading as accessibleTitle, the empty-state copy, and the href/postcount builders through to TaxonomyListModule', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -119,7 +119,7 @@ describe(`<${TagsPage.name}/>`, () => {
       expect.objectContaining({
         id: 'tag-list-1',
         taxonomy: 'TAGS',
-        titleFallback: 'Tags',
+        accessibleTitle: 'Tags',
         emptyMessage: 'No tags yet.',
       }),
       undefined,
