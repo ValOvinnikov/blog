@@ -82,12 +82,12 @@ email — all client-side, fast. Submitting it is a Server Action that:
 1. Resolves the owner email to an existing registered user (`@blog/db` user
    lookup) — the operator picks an _existing_ user, no invite-email flow (a
    non-goal, matches the parent spec's admin-first framing).
-2. Inserts `tenants` (with `primaryDomain` from the form, `provisioningStatus:
-PENDING`, an empty per-step status map — see Data model — `sanityProjectId`/
-   `sanityDataset` left null until provisioning creates them, and `locale`
-   defaulted to the platform's default locale — no per-tenant locale choice at
-   creation), `tenant_domains`, and the owner's `memberships` row
-   (`role: OWNER`).
+2. Inserts `tenants` (with `primaryDomain` from the form, a `PENDING`
+   provisioning status, an empty per-step status map — see Data model —
+   `sanityProjectId`/`sanityDataset` left null until provisioning creates
+   them, and `locale` defaulted to the platform's default locale — no
+   per-tenant locale choice at creation), `tenant_domains`, and the owner's
+   `memberships` row (`role: OWNER`).
 3. Dispatches the provisioning GitHub Actions workflow
    (`workflow_dispatch` via the GitHub API) with the new tenant's id as
    input.
@@ -109,15 +109,15 @@ the same workflow for the same tenant id resumes rather than repeats:
 1. **Create Sanity project** — Projects API: project + `production` dataset +
    CORS + a minted read token. Idempotency check: does `tenants.sanityProjectId`
    already have a value? If so, skip creation and reuse it.
-2. **Seed content** — a fixed starter template (singletons + one starter post
-   - initial navigation — same content every new tenant gets, no per-tenant
-     customization at creation time), via a new dedicated seed script
-     (`@sanity/client`-based, creating documents directly against the empty
-     dataset). `apps/cms/migrations`' existing tooling doesn't fit this: it
-     transforms _existing_ documents in an already-populated dataset (defaults
-     to `production`, human-gated for real datasets) — a brand-new empty
-     dataset needs document creation, not migration. Idempotency check: a
-     `seededAt` timestamp on the tenant row.
+2. **Seed content** — a fixed starter template (singletons, one starter post,
+   and initial navigation — same content every new tenant gets, no per-tenant
+   customization at creation time), via a new dedicated seed script
+   (`@sanity/client`-based, creating documents directly against the empty
+   dataset). `apps/cms/migrations`' existing tooling doesn't fit this: it
+   transforms _existing_ documents in an already-populated dataset (defaults
+   to `production`, human-gated for real datasets) — a brand-new empty
+   dataset needs document creation, not migration. Idempotency check: a
+   `seededAt` timestamp on the tenant row.
 3. **Deploy Studio** — creates the tenant's own Vercel project (Studio is
    per-tenant deployed, per the parent spec's resolved shape (a)), builds
    `sanity build`, deploys to `studio-<slug>.valstack.dev`. Idempotency
