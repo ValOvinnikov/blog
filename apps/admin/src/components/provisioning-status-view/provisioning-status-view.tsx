@@ -320,7 +320,11 @@ export const ProvisioningStatusView = ({
         </aside>
 
         <div className={detailsColumn()}>
-          <TenantDetailsPanel tenant={tenant} isEditable={allIdle} />
+          <TenantDetailsPanel
+            tenant={tenant}
+            isEditable={allIdle}
+            ownerEmail={ownerEmail}
+          />
           {provisioningStatus === TENANT_PROVISIONING_STATUS.READY && (
             <LinkButton
               as={Link}

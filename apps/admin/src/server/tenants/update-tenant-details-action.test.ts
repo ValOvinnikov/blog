@@ -101,6 +101,54 @@ describe('updateTenantDetailsAction', () => {
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
 
+  it('returns a field error for an invalid owner email, without touching the database', async () => {
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', {
+      ...validInput,
+      ownerEmail: 'not-an-email',
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      fieldErrors: { ownerEmail: expect.any(String) },
+    });
+    expect(updateTenantDetailsMock).not.toHaveBeenCalled();
+  });
+
+  it('passes a supplied ownerEmail through to updateTenantDetails and returns the updated tenant', async () => {
+    const tenant = makeTenant({ name: 'Acme' });
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'updated', tenant });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', {
+      ...validInput,
+      ownerEmail: 'New-Owner@Example.com',
+    });
+
+    expect(result).toEqual({ ok: true, tenant });
+    expect(updateTenantDetailsMock).toHaveBeenCalledWith('tenant-1', {
+      ...validInput,
+      ownerEmail: 'new-owner@example.com',
+    });
+  });
+
+  it('does not forward an ownerEmail key when the input omits it', async () => {
+    const tenant = makeTenant({ name: 'Acme' });
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'updated', tenant });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    await updateTenantDetailsAction('tenant-1', validInput);
+
+    expect(updateTenantDetailsMock).toHaveBeenCalledWith(
+      'tenant-1',
+      expect.not.objectContaining({ ownerEmail: expect.anything() }),
+    );
+  });
+
   it('maps a slug-taken outcome onto a slug field error', async () => {
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'slug-taken' });
     const { updateTenantDetailsAction } =
@@ -141,6 +189,77 @@ describe('updateTenantDetailsAction', () => {
       error:
         "This tenant's provisioning has already started; its details can no longer be edited.",
     });
+  });
+
+  it('maps an owner-email-taken outcome onto an ownerEmail field error', async () => {
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'owner-email-taken' });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', {
+      ...validInput,
+      ownerEmail: 'new-owner@example.com',
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      fieldErrors: { ownerEmail: expect.any(String) },
+    });
+  });
+
+  it('maps an owner-already-joined outcome onto a distinct form-level error, without a successful update', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: 'owner-already-joined',
+    });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', {
+      ...validInput,
+      ownerEmail: 'new-owner@example.com',
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      error:
+        "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
+    });
+    // Distinct from the generic couldn't-save message thrown errors map to
+    // below — never the same string.
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).not.toBe(
+        "Couldn't save tenant details — try again.",
+      );
+    }
+  });
+
+  it('does not record an audit event for an owner-email-taken outcome', async () => {
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'owner-email-taken' });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    await updateTenantDetailsAction('tenant-1', {
+      ...validInput,
+      ownerEmail: 'new-owner@example.com',
+    });
+
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  it('does not record an audit event for an owner-already-joined outcome', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: 'owner-already-joined',
+    });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    await updateTenantDetailsAction('tenant-1', {
+      ...validInput,
+      ownerEmail: 'new-owner@example.com',
+    });
+
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
   it('returns the updated tenant on success', async () => {

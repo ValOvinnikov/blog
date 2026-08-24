@@ -2,6 +2,7 @@
 
 import {
   updateTenantDetailsAction,
+  type TUpdateTenantDetailsActionInput,
   type TUpdateTenantDetailsFieldErrors,
 } from '@admin/server/tenants/update-tenant-details-action';
 import { ALERT_TYPE, Size } from '@blog/config';
@@ -21,6 +22,10 @@ import { tenantDetailsPanelVariants } from './tenant-details-panel-variants';
 export type TTenantDetailsPanelProps = {
   tenant: TTenant;
   isEditable: boolean;
+  // `undefined` means the tenant's OWNER row is still a pending
+  // `membershipInvites` entry rather than a real `memberships` row — see
+  // `queries.memberships.getTenantOwnerEmail`.
+  ownerEmail: string | undefined;
 };
 
 type TFormValues = {
@@ -29,26 +34,37 @@ type TFormValues = {
   primaryDomain: string;
   plan: TTenantPlan;
   locale: string;
+  ownerEmail: string;
 };
 
-type TTextFieldKey = 'name' | 'slug' | 'primaryDomain' | 'locale';
+type TTextFieldKey =
+  'name' | 'slug' | 'primaryDomain' | 'locale' | 'ownerEmail';
 
 const TEXT_FIELD_ID: Record<TTextFieldKey, string> = {
   name: 'tenant-detail-name',
   slug: 'tenant-detail-slug',
   primaryDomain: 'tenant-detail-domain',
   locale: 'tenant-detail-locale',
+  ownerEmail: 'tenant-detail-owner-email',
+};
+
+const TEXT_FIELD_TYPE: Partial<Record<TTextFieldKey, string>> = {
+  ownerEmail: 'email',
 };
 
 const PLAN_FIELD_ID = 'tenant-detail-plan';
 
-const valuesFromTenant = (tenant: TTenant): TFormValues => {
+const valuesFromProps = (
+  tenant: TTenant,
+  ownerEmail: string | undefined,
+): TFormValues => {
   return {
     name: tenant.name,
     slug: tenant.slug,
     primaryDomain: tenant.primaryDomain,
     plan: tenant.plan,
     locale: tenant.locale,
+    ownerEmail: ownerEmail ?? '',
   };
 };
 
@@ -58,13 +74,15 @@ const valuesFromTenant = (tenant: TTenant): TFormValues => {
 export const TenantDetailsPanel = ({
   tenant,
   isEditable,
+  ownerEmail,
 }: TTenantDetailsPanelProps) => {
   const t = useTranslations('tenantDetailsPanel');
   const router = useRouter();
   const panelId = useId();
   const [renderedTenant, setRenderedTenant] = useState(tenant);
+  const [renderedOwnerEmail, setRenderedOwnerEmail] = useState(ownerEmail);
   const [values, setValues] = useState<TFormValues>(() =>
-    valuesFromTenant(tenant),
+    valuesFromProps(tenant, ownerEmail),
   );
   const [fieldErrors, setFieldErrors] =
     useState<TUpdateTenantDetailsFieldErrors>({});
@@ -78,12 +96,14 @@ export const TenantDetailsPanel = ({
   const lockedContainerRef = useRef<HTMLDListElement>(null);
   const isMountRef = useRef(true);
 
-  // A fresh `tenant` prop (a successful save's own `router.refresh()`)
-  // should replace whatever the form last held — adjusted during render,
-  // per React's guidance for state derived from props.
-  if (tenant !== renderedTenant) {
+  // A fresh `tenant`/`ownerEmail` prop (a successful save's own
+  // `router.refresh()`) should replace whatever the form last held —
+  // adjusted during render, per React's guidance for state derived from
+  // props.
+  if (tenant !== renderedTenant || ownerEmail !== renderedOwnerEmail) {
     setRenderedTenant(tenant);
-    setValues(valuesFromTenant(tenant));
+    setRenderedOwnerEmail(ownerEmail);
+    setValues(valuesFromProps(tenant, ownerEmail));
   }
 
   // Same derived-during-render pattern: only an actual `isEditable`
@@ -133,6 +153,19 @@ export const TenantDetailsPanel = ({
     planControl,
   } = tenantDetailsPanelVariants();
 
+  // `tenant`/`ownerEmail` are the baseline: whenever a fresh pair of props
+  // lands, the render-phase adjustment above resets `values` to match in the
+  // same pass, so the two stay in lockstep without any extra state to track
+  // a "saved" copy.
+  const baselineValues = valuesFromProps(tenant, ownerEmail);
+  const isDirty =
+    values.name !== baselineValues.name ||
+    values.slug !== baselineValues.slug ||
+    values.primaryDomain !== baselineValues.primaryDomain ||
+    values.plan !== baselineValues.plan ||
+    values.locale !== baselineValues.locale ||
+    values.ownerEmail !== baselineValues.ownerEmail;
+
   const updateField = <K extends keyof TFormValues>(
     key: K,
     nextValue: TFormValues[K],
@@ -144,8 +177,23 @@ export const TenantDetailsPanel = ({
     setFormError(undefined);
     setFieldErrors({});
 
+    const payload: TUpdateTenantDetailsActionInput = {
+      name: values.name,
+      slug: values.slug,
+      primaryDomain: values.primaryDomain,
+      plan: values.plan,
+      locale: values.locale,
+    };
+    // Sent only when actually edited — the db layer treats this key's mere
+    // presence as an ownership-change attempt regardless of value, so
+    // including it unconditionally would block an unrelated field edit
+    // (e.g. renaming the tenant) once the owner has already joined.
+    if (values.ownerEmail !== baselineValues.ownerEmail) {
+      payload.ownerEmail = values.ownerEmail;
+    }
+
     startTransition(async () => {
-      const result = await updateTenantDetailsAction(tenant.id, values);
+      const result = await updateTenantDetailsAction(tenant.id, payload);
       if (!result.ok) {
         setFieldErrors(result.fieldErrors ?? {});
         setFormError(result.error);
@@ -168,6 +216,7 @@ export const TenantDetailsPanel = ({
     { key: 'slug', label: t('slugLabel') },
     { key: 'primaryDomain', label: t('domainLabel') },
     { key: 'locale', label: t('localeLabel') },
+    { key: 'ownerEmail', label: t('ownerEmailLabel') },
   ];
 
   return (
@@ -198,6 +247,7 @@ export const TenantDetailsPanel = ({
                 </label>
                 <TextInput
                   id={id}
+                  type={TEXT_FIELD_TYPE[key]}
                   ariaLabel={labelText}
                   value={values[key]}
                   onChange={(nextValue) => updateField(key, nextValue)}
@@ -249,7 +299,11 @@ export const TenantDetailsPanel = ({
 
       {isEditable && (
         <div className={actions()}>
-          <Button type="button" onClick={handleSave} isDisabled={isPending}>
+          <Button
+            type="button"
+            onClick={handleSave}
+            isDisabled={isPending || !isDirty}
+          >
             {isPending ? t('savingButton') : t('saveButton')}
           </Button>
         </div>

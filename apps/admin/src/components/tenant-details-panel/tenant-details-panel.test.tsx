@@ -71,7 +71,7 @@ describe(TenantDetailsPanel, () => {
       return value as HTMLElement;
     };
 
-    it('renders every field, including plan, as selectable text carrying its label — not a disabled input', () => {
+    it('renders every field, including plan and owner email, as selectable text carrying its label — not a disabled input', () => {
       const tenant = makeTenant({
         name: 'Acme Inc.',
         slug: 'acme',
@@ -79,7 +79,13 @@ describe(TenantDetailsPanel, () => {
         plan: TENANT_PLAN.GROWTH,
         locale: 'EN',
       });
-      render(<TenantDetailsPanel tenant={tenant} isEditable={false} />);
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          isEditable={false}
+          ownerEmail="owner@example.com"
+        />,
+      );
 
       expect(screen.getByText('Tenant details')).toBeVisible();
 
@@ -97,6 +103,9 @@ describe(TenantDetailsPanel, () => {
         'acme.example.com',
       );
       expect(getLockedValue('Locale')).toHaveTextContent('EN');
+      expect(getLockedValue('Owner email')).toHaveTextContent(
+        'owner@example.com',
+      );
 
       // The human-readable plan label, not the raw TENANT_PLAN constant.
       const planValue = getLockedValue('Plan');
@@ -106,7 +115,13 @@ describe(TenantDetailsPanel, () => {
 
     it('renders no enabled editing affordances — no Save button, no editable plan control', () => {
       const tenant = makeTenant();
-      render(<TenantDetailsPanel tenant={tenant} isEditable={false} />);
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          isEditable={false}
+          ownerEmail="owner@example.com"
+        />,
+      );
 
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
       expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
@@ -116,7 +131,7 @@ describe(TenantDetailsPanel, () => {
   });
 
   describe('editable (isEditable=true)', () => {
-    it('renders every field as an editable, enabled control, pre-filled from the tenant', () => {
+    it('renders every field, including owner email, as an editable, enabled control, pre-filled from props — and starts with Save disabled', () => {
       const tenant = makeTenant({
         name: 'Acme Inc.',
         slug: 'acme',
@@ -124,7 +139,13 @@ describe(TenantDetailsPanel, () => {
         plan: TENANT_PLAN.FREE,
         locale: 'EN',
       });
-      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          isEditable={true}
+          ownerEmail="owner@example.com"
+        />,
+      );
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
       expect(nameInput).toHaveValue('Acme Inc.');
@@ -139,19 +160,59 @@ describe(TenantDetailsPanel, () => {
         'true',
       );
       expect(screen.getByRole('textbox', { name: 'Locale' })).toHaveValue('EN');
+
+      const ownerEmailInput = screen.getByRole('textbox', {
+        name: 'Owner email',
+      });
+      expect(ownerEmailInput).toHaveValue('owner@example.com');
+      expect(ownerEmailInput).toHaveAttribute('type', 'email');
+
+      // Nothing has been edited yet, so Save has nothing to submit.
       expect(
         screen.getByRole('button', { name: 'Save changes' }),
-      ).toBeVisible();
+      ).toBeDisabled();
     });
 
-    it('saves the edited values and refreshes on success', async () => {
+    it('enables Save when only the owner email is edited', async () => {
+      const user = userEvent.setup();
+      const tenant = makeTenant();
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          isEditable={true}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Save changes' }),
+      ).toBeDisabled();
+
+      await user.clear(screen.getByRole('textbox', { name: 'Owner email' }));
+      await user.type(
+        screen.getByRole('textbox', { name: 'Owner email' }),
+        'new-owner@example.com',
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Save changes' }),
+      ).toBeEnabled();
+    });
+
+    it('saves the edited values and refreshes on success, without submitting an untouched owner email', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: true,
         tenant: makeTenant({ name: 'Acme Renamed' }),
       });
       const user = userEvent.setup();
       const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
-      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          isEditable={true}
+          ownerEmail="owner@example.com"
+        />,
+      );
 
       await user.clear(screen.getByRole('textbox', { name: 'Name' }));
       await user.type(
@@ -166,7 +227,40 @@ describe(TenantDetailsPanel, () => {
           expect.objectContaining({ name: 'Acme Renamed' }),
         );
       });
+      expect(
+        updateTenantDetailsActionMock.mock.calls[0]?.[1],
+      ).not.toHaveProperty('ownerEmail');
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
+    });
+
+    it('submits the new owner email only when it was actually edited', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: true,
+        tenant: makeTenant(),
+      });
+      const user = userEvent.setup();
+      const tenant = makeTenant({ id: 'tenant-1' });
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          isEditable={true}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      await user.clear(screen.getByRole('textbox', { name: 'Owner email' }));
+      await user.type(
+        screen.getByRole('textbox', { name: 'Owner email' }),
+        'new-owner@example.com',
+      );
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() => {
+        expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
+          'tenant-1',
+          expect.objectContaining({ ownerEmail: 'new-owner@example.com' }),
+        );
+      });
     });
 
     it('shows a field error and does not refresh when saving fails', async () => {
@@ -176,8 +270,16 @@ describe(TenantDetailsPanel, () => {
       });
       const user = userEvent.setup();
       const tenant = makeTenant();
-      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          isEditable={true}
+          ownerEmail="owner@example.com"
+        />,
+      );
 
+      await user.clear(screen.getByRole('textbox', { name: 'Slug' }));
+      await user.type(screen.getByRole('textbox', { name: 'Slug' }), 'acme-2');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
       expect(
@@ -196,8 +298,15 @@ describe(TenantDetailsPanel, () => {
       });
       const user = userEvent.setup();
       const tenant = makeTenant();
-      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          isEditable={true}
+          ownerEmail="owner@example.com"
+        />,
+      );
 
+      await user.type(screen.getByRole('textbox', { name: 'Name' }), '!');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
       await screen.findByText('Enter a tenant name.');
 
@@ -225,8 +334,15 @@ describe(TenantDetailsPanel, () => {
       });
       const user = userEvent.setup();
       const tenant = makeTenant();
-      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          isEditable={true}
+          ownerEmail="owner@example.com"
+        />,
+      );
 
+      await user.type(screen.getByRole('textbox', { name: 'Name' }), '!');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
       expect(
@@ -236,13 +352,86 @@ describe(TenantDetailsPanel, () => {
       ).toBeVisible();
       expect(refreshMock).not.toHaveBeenCalled();
     });
+
+    it('shows a distinct, non-generic message when the owner has already joined, and does not refresh', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: false,
+        error:
+          "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
+      });
+      const user = userEvent.setup();
+      const tenant = makeTenant({ id: 'tenant-1' });
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          isEditable={true}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      await user.clear(screen.getByRole('textbox', { name: 'Owner email' }));
+      await user.type(
+        screen.getByRole('textbox', { name: 'Owner email' }),
+        'new-owner@example.com',
+      );
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      const message = await screen.findByText(
+        "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
+      );
+      expect(message).toBeVisible();
+      // Distinct from the generic "couldn't save, try again" copy — it
+      // never appears alongside the specific explanation.
+      expect(screen.queryByText(/couldn.?t save/i)).not.toBeInTheDocument();
+      expect(refreshMock).not.toHaveBeenCalled();
+    });
+
+    it('shows a field-level error on owner email when the new address already has a pending invite', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: false,
+        fieldErrors: {
+          ownerEmail: 'This email already has a pending invite on this tenant.',
+        },
+      });
+      const user = userEvent.setup();
+      const tenant = makeTenant();
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          isEditable={true}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      await user.clear(screen.getByRole('textbox', { name: 'Owner email' }));
+      await user.type(
+        screen.getByRole('textbox', { name: 'Owner email' }),
+        'taken@example.com',
+      );
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      const ownerEmailInput = await screen.findByRole('textbox', {
+        name: 'Owner email',
+      });
+      expect(ownerEmailInput).toBeInvalid();
+      expect(ownerEmailInput).toHaveAccessibleDescription(
+        'This email already has a pending invite on this tenant.',
+      );
+      expect(refreshMock).not.toHaveBeenCalled();
+    });
   });
 
   describe('lock transition announcement', () => {
     it('announces the lock transition once — not on mount, not on an unrelated re-render', () => {
       const tenant = makeTenant();
       const { container, rerender } = rtlRender(
-        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            isEditable={true}
+            ownerEmail="owner@example.com"
+          />,
+        ),
       );
 
       const liveRegion = container.querySelector('[aria-live="assertive"]');
@@ -256,13 +445,20 @@ describe(TenantDetailsPanel, () => {
           <TenantDetailsPanel
             tenant={makeTenant({ name: 'Acme Renamed' })}
             isEditable={true}
+            ownerEmail="owner@example.com"
           />,
         ),
       );
       expect(liveRegion).toHaveTextContent('');
 
       rerender(
-        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={false} />),
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            isEditable={false}
+            ownerEmail="owner@example.com"
+          />,
+        ),
       );
       expect(liveRegion).toHaveTextContent(
         'Tenant details locked while provisioning runs.',
@@ -274,6 +470,7 @@ describe(TenantDetailsPanel, () => {
           <TenantDetailsPanel
             tenant={makeTenant({ name: 'Acme Again' })}
             isEditable={false}
+            ownerEmail="owner@example.com"
           />,
         ),
       );
@@ -285,14 +482,26 @@ describe(TenantDetailsPanel, () => {
     it('announces the unlock transition once provisioning finishes', () => {
       const tenant = makeTenant();
       const { container, rerender } = rtlRender(
-        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={false} />),
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            isEditable={false}
+            ownerEmail="owner@example.com"
+          />,
+        ),
       );
 
       const liveRegion = container.querySelector('[aria-live="assertive"]');
       expect(liveRegion).toHaveTextContent('');
 
       rerender(
-        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            isEditable={true}
+            ownerEmail="owner@example.com"
+          />,
+        ),
       );
       expect(liveRegion).toHaveTextContent(
         'Tenant details unlocked and editable again.',
@@ -304,7 +513,13 @@ describe(TenantDetailsPanel, () => {
     it('does not move focus away from document.body on mount', () => {
       const tenant = makeTenant();
       rtlRender(
-        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            isEditable={true}
+            ownerEmail="owner@example.com"
+          />,
+        ),
       );
 
       expect(document.activeElement).toBe(document.body);
@@ -313,7 +528,13 @@ describe(TenantDetailsPanel, () => {
     it('moves focus to the locked container when the panel locks while focus was inside it', () => {
       const tenant = makeTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
-        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            isEditable={true}
+            ownerEmail="owner@example.com"
+          />,
+        ),
       );
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
@@ -321,7 +542,13 @@ describe(TenantDetailsPanel, () => {
       expect(document.activeElement).toBe(nameInput);
 
       rerender(
-        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={false} />),
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            isEditable={false}
+            ownerEmail="owner@example.com"
+          />,
+        ),
       );
 
       const lockedContainer = screen.getByText('Name').closest('dl');
@@ -333,7 +560,13 @@ describe(TenantDetailsPanel, () => {
     it('moves focus to the now-editable container when the panel unlocks while focus was inside it', () => {
       const tenant = makeTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
-        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={false} />),
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            isEditable={false}
+            ownerEmail="owner@example.com"
+          />,
+        ),
       );
 
       const lockedContainer = screen.getByText('Name').closest('dl');
@@ -341,7 +574,13 @@ describe(TenantDetailsPanel, () => {
       expect(document.activeElement).toBe(lockedContainer);
 
       rerender(
-        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            isEditable={true}
+            ownerEmail="owner@example.com"
+          />,
+        ),
       );
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
@@ -354,7 +593,13 @@ describe(TenantDetailsPanel, () => {
     it('does not move focus on an unrelated re-render while isEditable stays the same', () => {
       const tenant = makeTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
-        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            isEditable={true}
+            ownerEmail="owner@example.com"
+          />,
+        ),
       );
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
@@ -366,6 +611,7 @@ describe(TenantDetailsPanel, () => {
           <TenantDetailsPanel
             tenant={makeTenant({ name: 'Acme Renamed' })}
             isEditable={true}
+            ownerEmail="owner@example.com"
           />,
         ),
       );
@@ -376,7 +622,13 @@ describe(TenantDetailsPanel, () => {
     it('does not steal focus into the locked container when the lock transition fires while focus was outside the panel', () => {
       const tenant = makeTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
-        withIntl(<PanelWithOutsideControl tenant={tenant} isEditable={true} />),
+        withIntl(
+          <PanelWithOutsideControl
+            tenant={tenant}
+            isEditable={true}
+            ownerEmail="owner@example.com"
+          />,
+        ),
       );
 
       const outsideControl = screen.getByRole('button', {
@@ -387,7 +639,11 @@ describe(TenantDetailsPanel, () => {
 
       rerender(
         withIntl(
-          <PanelWithOutsideControl tenant={tenant} isEditable={false} />,
+          <PanelWithOutsideControl
+            tenant={tenant}
+            isEditable={false}
+            ownerEmail="owner@example.com"
+          />,
         ),
       );
 
@@ -398,7 +654,11 @@ describe(TenantDetailsPanel, () => {
       const tenant = makeTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
         withIntl(
-          <PanelWithOutsideControl tenant={tenant} isEditable={false} />,
+          <PanelWithOutsideControl
+            tenant={tenant}
+            isEditable={false}
+            ownerEmail="owner@example.com"
+          />,
         ),
       );
 
@@ -409,7 +669,13 @@ describe(TenantDetailsPanel, () => {
       expect(document.activeElement).toBe(outsideControl);
 
       rerender(
-        withIntl(<PanelWithOutsideControl tenant={tenant} isEditable={true} />),
+        withIntl(
+          <PanelWithOutsideControl
+            tenant={tenant}
+            isEditable={true}
+            ownerEmail="owner@example.com"
+          />,
+        ),
       );
 
       expect(document.activeElement).toBe(outsideControl);

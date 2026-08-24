@@ -24,6 +24,16 @@ const updateTenantDetailsInputSchema = z.object({
     .regex(DOMAIN_PATTERN, 'Enter a valid domain.'),
   plan: z.enum(Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]]),
   locale: z.string().trim().min(1, 'Enter a locale.'),
+  // Present only when the operator actually edited the owner email — the
+  // panel omits this key entirely when it's unchanged, since the db layer
+  // treats its mere presence as "attempt to change ownership" regardless of
+  // value and refuses it once the owner has already joined.
+  ownerEmail: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email('Enter a valid email.')
+    .optional(),
 });
 
 export type TUpdateTenantDetailsActionInput = z.input<
@@ -96,6 +106,17 @@ export const updateTenantDetailsAction = async (
       case 'provisioning-started': {
         const t = await getTranslations('tenantDetailsPanel');
         return { ok: false, error: t('provisioningStartedError') };
+      }
+      case 'owner-email-taken': {
+        const t = await getTranslations('tenantDetailsPanel');
+        return {
+          ok: false,
+          fieldErrors: { ownerEmail: t('ownerEmailTakenError') },
+        };
+      }
+      case 'owner-already-joined': {
+        const t = await getTranslations('tenantDetailsPanel');
+        return { ok: false, error: t('ownerAlreadyJoinedError') };
       }
       default: {
         const unhandledOutcome: never = result;
