@@ -1,3 +1,4 @@
+import messages from '@admin/i18n/messages/en.json';
 import {
   act,
   fireEvent,
@@ -10,16 +11,31 @@ import {
   idleProvisioningSteps,
   makeTenant,
 } from '@admin/testing/tenants/fixtures';
+import { LOCALE_ISO_CODES } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
 import userEvent from '@testing-library/user-event';
+import { NextIntlClientProvider } from 'next-intl';
+import type { ReactElement } from 'react';
 
 import { ProvisioningStatusView } from './provisioning-status-view';
 
 const render = renderWithIntl;
+
+// `rerender()` replaces the entire previously-rendered tree, so a rerender
+// that needs to keep going through `useTranslations` context has to
+// re-supply this wrapper itself — `renderWithIntl`'s own wrapping only
+// covers the initial render.
+const withIntl = (ui: ReactElement) => {
+  return (
+    <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
+      {ui}
+    </NextIntlClientProvider>
+  );
+};
 
 const STEP_POLL_INTERVAL_MS = 4000;
 const DOMAIN_POLL_INTERVAL_MS = 10000;
@@ -349,57 +365,41 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('lets the operator correct the failing domain and Retry re-runs provisioning with the new value', async () => {
+    const correctedProvisioningSteps = {
+      ...idleProvisioningSteps(),
+      [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+      },
+      [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+      },
+      [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+      },
+      [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+      },
+      [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+        error: 'Vercel deploy failed: 409 domain_already_in_use',
+      },
+    };
+    const correctedTenant = makeTenant({
+      id: 'tenant-1',
+      primaryDomain: 'new-domain.example.com',
+      provisioningSteps: correctedProvisioningSteps,
+    });
     updateTenantDetailsActionMock.mockResolvedValue({
       ok: true,
-      tenant: makeTenant({
-        id: 'tenant-1',
-        primaryDomain: 'new-domain.example.com',
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-          [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-          [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-          [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-          },
-          [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'Vercel deploy failed: 409 domain_already_in_use',
-          },
-        },
-      }),
+      tenant: correctedTenant,
     });
     const user = userEvent.setup();
     const tenant = makeTenant({
       id: 'tenant-1',
       primaryDomain: 'taken-domain.example.com',
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'Vercel deploy failed: 409 domain_already_in_use',
-        },
-      },
+      provisioningSteps: correctedProvisioningSteps,
     });
-    render(
+    const { rerender } = render(
       <ProvisioningStatusView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
@@ -423,8 +423,26 @@ describe(ProvisioningStatusView, () => {
       );
     });
 
+    // Stands in for `router.refresh()` causing the parent Server Component
+    // to re-fetch and pass down the now-persisted tenant — proving the
+    // corrected value actually reached the tenant row before Retry runs,
+    // rather than merely that Save and Retry were each clicked in order.
+    rerender(
+      withIntl(
+        <ProvisioningStatusView
+          tenant={correctedTenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
+        />,
+      ),
+    );
+
+    expect(
+      await screen.findByRole('textbox', { name: 'Primary domain' }),
+    ).toHaveValue('new-domain.example.com');
+
     await user.click(
-      await screen.findByRole('button', { name: 'Retry provisioning' }),
+      screen.getByRole('button', { name: 'Retry provisioning' }),
     );
 
     await waitFor(() => {

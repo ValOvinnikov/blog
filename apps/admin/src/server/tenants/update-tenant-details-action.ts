@@ -50,9 +50,12 @@ export type TUpdateTenantDetailsActionResult =
 
 /**
  * The provisioning status page's editable-details save handler — reachable
- * only while the panel that calls it is still showing its editable form
- * (every provisioning step `IDLE`), a condition enforced client-side since
- * it's a UX state, not an authorization boundary.
+ * whenever the panel that calls it shows any editable field: every step
+ * `IDLE`, or FAILED with a field an already-completed step hasn't locked.
+ * The client only ever submits a locked field's unchanged value, but that's
+ * a UX affordance, not an authorization boundary — the `slug-locked`/
+ * `domain-locked` outcomes below are the real enforcement, re-checked here
+ * against the current db row regardless of what the client sends.
  */
 export const updateTenantDetailsAction = async (
   tenantId: string,

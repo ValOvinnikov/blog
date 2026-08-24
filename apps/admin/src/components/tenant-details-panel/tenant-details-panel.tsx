@@ -76,6 +76,17 @@ const lockedFieldKeysOf = (
   return Object.keys(fieldLocks) as TTenantFieldKey[];
 };
 
+// A plain `next[key] = baseline[key]` inside a loop over a union-typed key
+// loses the correlation between the two sides (TS widens each indexed
+// access independently) — a generic per-call keeps `K` fixed for both.
+const resetFieldToBaseline = <K extends TTenantFieldKey>(
+  target: TFormValues,
+  baseline: TFormValues,
+  key: K,
+): void => {
+  target[key] = baseline[key];
+};
+
 /**
  * Renders every field as a control at all times, disabling only the ones a
  * completed provisioning step has already baked into an external resource —
@@ -130,9 +141,13 @@ export const TenantDetailsPanel = ({
   // descendant auto-blurs to the body.
   const nextLockedFieldsKey = [...lockedFieldKeys].sort().join(',');
   if (nextLockedFieldsKey !== renderedLockedFieldsKey) {
-    const previousLockedCount = renderedLockedFieldsKey
-      ? renderedLockedFieldsKey.split(',').length
-      : 0;
+    const previousLockedKeys = new Set(
+      renderedLockedFieldsKey ? renderedLockedFieldsKey.split(',') : [],
+    );
+    const previousLockedCount = previousLockedKeys.size;
+    const newlyLockedKeys = lockedFieldKeys.filter(
+      (key) => !previousLockedKeys.has(key),
+    );
     setRenderedLockedFieldsKey(nextLockedFieldsKey);
     if (lockedFieldKeys.length > previousLockedCount) {
       setLockAnnouncement(t('lockedAnnouncement'));
@@ -146,6 +161,21 @@ export const TenantDetailsPanel = ({
         ),
       ),
     );
+    // A field that just locked (e.g. a background poll catching up to a
+    // step another operator retried) may still hold an unsaved edit —
+    // discard it back to the server value rather than leave a disabled
+    // control displaying input that was never saved and can no longer be
+    // submitted.
+    if (newlyLockedKeys.length > 0) {
+      const baseline = valuesFromProps(tenant, ownerEmail);
+      setValues((prev) => {
+        const next = { ...prev };
+        for (const key of newlyLockedKeys) {
+          resetFieldToBaseline(next, baseline, key);
+        }
+        return next;
+      });
+    }
   }
 
   // A layout effect commits after the live-region text mutation above and

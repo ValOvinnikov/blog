@@ -599,6 +599,76 @@ describe(TenantDetailsPanel, () => {
     });
   });
 
+  describe('mid-edit lock transition', () => {
+    it('discards an unsaved edit and reverts to the server value when the field being edited newly locks', async () => {
+      const user = userEvent.setup();
+      const tenant = makeTenant({ slug: 'acme' });
+      const { rerender } = rtlRender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={NO_LOCKS}
+            ownerEmail="owner@example.com"
+          />,
+        ),
+      );
+
+      const slugInput = screen.getByRole('textbox', { name: 'Slug' });
+      await user.clear(slugInput);
+      await user.type(slugInput, 'acme-unsaved-edit');
+      expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue(
+        'acme-unsaved-edit',
+      );
+
+      // A background poll discovers DEPLOY_STUDIO has completed, locking
+      // slug — while the operator's unsaved edit above is still showing.
+      rerender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={SLUG_LOCKED}
+            ownerEmail="owner@example.com"
+          />,
+        ),
+      );
+
+      expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('acme');
+      expect(screen.getByRole('textbox', { name: 'Slug' })).toBeDisabled();
+    });
+
+    it('leaves an unrelated field’s unsaved edit alone when a different field newly locks', async () => {
+      const user = userEvent.setup();
+      const tenant = makeTenant({ name: 'Acme Inc.' });
+      const { rerender } = rtlRender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={NO_LOCKS}
+            ownerEmail="owner@example.com"
+          />,
+        ),
+      );
+
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      await user.clear(nameInput);
+      await user.type(nameInput, 'Acme Renamed (unsaved)');
+
+      rerender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={SLUG_LOCKED}
+            ownerEmail="owner@example.com"
+          />,
+        ),
+      );
+
+      expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
+        'Acme Renamed (unsaved)',
+      );
+    });
+  });
+
   describe('Save button dirty-state gating', () => {
     it('is disabled when the form is pristine', () => {
       const tenant = makeTenant();
