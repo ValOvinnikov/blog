@@ -21,7 +21,6 @@ const env: TProvisionEnv = {
   vercelWebProjectId: 'prj_web',
   vercelCliVersion: '48.0.0',
   adminAppBaseUrl: 'https://admin.example.com',
-  callbackSecret: 'shh',
   platformDomain: 'example.com',
   tenantSanityDataset: 'test-dataset',
   webAppBaseUrl: 'https://example.com',

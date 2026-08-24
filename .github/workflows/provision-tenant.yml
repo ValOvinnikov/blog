@@ -88,7 +88,6 @@ jobs:
       # with this same secret so `apps/web`'s route can verify it.
       WEB_APP_URL: ${{ vars.WEB_APP_URL }}
       SANITY_REVALIDATE_SECRET: ${{ secrets.SANITY_REVALIDATE_SECRET }}
-      TENANT_PROVISIONING_CALLBACK_SECRET: ${{ secrets.TENANT_PROVISIONING_CALLBACK_SECRET }}
       TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
       # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
       # specifically — mapped here from the existing `DATABASE_URL_UNPOOLED`
