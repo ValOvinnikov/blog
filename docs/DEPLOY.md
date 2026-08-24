@@ -313,8 +313,8 @@ few secrets/vars nothing else in this repo has needed yet:
       manually-set, per-deployment opt-in, same posture as `apps/web`'s
       `WEB_ANALYTICS_ENABLED`, since `VERCEL_ENV` can't reliably tell a dev
       deployment apart from real production. Left unset, provisioning falls
-      back to this GitHub Environment's `TENANT_SANITY_DATASET` above,
-      unchanged from today. See `docs/context/environment-variables.md`.
+      back to this GitHub Environment's `TENANT_SANITY_DATASET`, unchanged
+      from today. See `docs/context/environment-variables.md`.
 - [ ] `VERCEL_TOKEN` / `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` above are reused
       as-is: `VERCEL_TOKEN` needs project-creation scope (not just deploy
       scope) for this workflow to create each tenant's Studio Vercel project;
