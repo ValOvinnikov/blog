@@ -5,15 +5,14 @@ import { postCardFragment } from '@blog/service/shared/fragments/post';
 /**
  * Scopes posts to the enclosing `page_tag`/`page_topic`'s own tag/topic when
  * one references this module as its `postList` (a no-op otherwise, e.g. the
- * blog index's own `postList`). Can't reach the parent via GROQ's `^` here —
- * unlike `tagPaginationParamsQuery`/`topicPaginationParamsQuery`, this query
- * isn't nested inside a `page_tag`/`page_topic` projection — so it looks
- * each up by this module's `$id` instead, then matches by reference
- * identity (not slug), same drift-safety reasoning as those queries. A
- * `postList` is only ever referenced by one page (tag, topic, or neither),
- * so at most one clause is ever non-trivial; combining them with `&&` means
- * that if both somehow matched, a post would need to satisfy both scopes
- * rather than the query throwing.
+ * blog index's own `postList`) — since this query isn't nested inside a
+ * `page_tag`/`page_topic` projection, it can't reach the parent via GROQ's
+ * `^` like `tagPaginationParamsQuery`/`topicPaginationParamsQuery` do, so it
+ * looks each up by this module's `$id` and matches by reference identity
+ * (not slug), same drift-safety reasoning as those queries. The two clauses
+ * are `&&`-combined rather than `||`, so if a `postList` were ever
+ * referenced by both a `page_tag` and a `page_topic` at once, a post would
+ * need to satisfy both scopes instead of the query throwing.
  */
 const SCOPE_FILTER =
   '(!defined(*[_type == "page_tag" && postList._ref == $id][0]._id) || references(*[_type == "page_tag" && postList._ref == $id][0].tag._ref))' +
