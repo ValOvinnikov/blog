@@ -283,13 +283,6 @@ few secrets/vars nothing else in this repo has needed yet:
       `organizationId` in the Management API's `POST /projects` body;
       without it the project is silently created in whichever org the
       token's owner defaults to, not necessarily this one.
-- [ ] Secret `TENANT_PROVISIONING_CALLBACK_SECRET` — a shared secret
-      (`openssl rand -hex 32`), **byte-identical** to `apps/admin`'s own
-      `TENANT_PROVISIONING_CALLBACK_SECRET` env var. The workflow sends it as
-      `Authorization: Bearer <secret>` on every call to
-      `POST /api/provisioning/status-callback`; a mismatch makes every
-      callback 401 (the tenant row still gets provisioned, but the admin
-      wizard's live per-step status never updates).
 - [ ] Secret `TENANT_TOKEN_ENCRYPTION_KEY` — the **same** value already set
       as the `blog-prod`/`cms-prod`-adjacent Vercel env var of the same name
       (see the `@blog/db` env vars table above). `setTenantSanityToken`
