@@ -219,6 +219,48 @@ describe(TenantDetailsPanel, () => {
       expect(slugInput).toHaveAccessibleDescription('');
     });
 
+    it('shows a success alert after a successful save, and clears it once editing resumes', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: true,
+        tenant: makeTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
+      });
+      const user = userEvent.setup();
+      const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
+      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
+
+      await user.clear(screen.getByRole('textbox', { name: 'Name' }));
+      await user.type(
+        screen.getByRole('textbox', { name: 'Name' }),
+        'Acme Renamed',
+      );
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(await screen.findByRole('status')).toHaveTextContent(
+        'Tenant details saved.',
+      );
+
+      await user.type(screen.getByRole('textbox', { name: 'Name' }), ' again');
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
+
+    it('does not show a success alert when saving fails', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: false,
+        fieldErrors: { slug: 'This slug is already in use.' },
+      });
+      const user = userEvent.setup();
+      const tenant = makeTenant();
+      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
+
+      await user.type(screen.getByRole('textbox', { name: 'Name' }), '!');
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(
+        await screen.findByText('This slug is already in use.'),
+      ).toBeVisible();
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
+
     it('shows the form-level provisioning-started error and does not refresh, without a successful save', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,
