@@ -6,14 +6,14 @@ import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-d
 import { getDomainVerificationStatusAction } from '@admin/server/provisioning/get-domain-verification-status-action';
 import { getTenantProvisioningStatusAction } from '@admin/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@admin/server/provisioning/retry-provisioning-step-action';
+import { classifyProvisioningError } from '@admin/utils/provisioning-error/provisioning-error';
 import { adminRoutes } from '@admin/utils/routes/routes';
-import { Size } from '@blog/config';
+import { ICONS, Size } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStatus,
-  type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
 import type {
@@ -23,6 +23,7 @@ import type {
 import { Button } from '@blog/ui/atoms/button';
 import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
+import { Icon } from '@blog/ui/atoms/icon';
 import { StatusBadge } from '@blog/ui/atoms/status-badge';
 import { Text } from '@blog/ui/atoms/text';
 import { LinkButton } from '@blog/ui/molecules/link-button';
@@ -45,6 +46,19 @@ const STEP_TONE: Record<
   DONE: 'ok',
 };
 
+// Highest-priority status wins: any FAILED step outranks a RUNNING one, which
+// outranks a still-IDLE one, so the header badge always reflects the most
+// urgent thing happening across the whole run rather than the last step
+// polled. `provisioningStatus` itself can't be used for this — the DB column
+// only settles to READY/FAILED once the *last* step finishes, so a failure
+// partway through the sequence would otherwise never surface here.
+const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
+  TENANT_PROVISIONING_STEP_STATUS.FAILED,
+  TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+  TENANT_PROVISIONING_STEP_STATUS.IDLE,
+  TENANT_PROVISIONING_STEP_STATUS.DONE,
+];
+
 const STEP_POLL_INTERVAL_MS = 4000;
 // The domain check makes a live Vercel API call with its own 5s timeout —
 // slower and less urgent than step polling — so it runs on a longer,
@@ -60,6 +74,43 @@ const isTerminalProvisioningStatus = (
     status === TENANT_PROVISIONING_STATUS.FAILED
   );
 };
+
+const shouldContinuePolling = (
+  status: TTenantProvisioningStatus | null,
+  steps: TTenantProvisioningSteps | null,
+): boolean => {
+  if (isTerminalProvisioningStatus(status)) {
+    return false;
+  }
+
+  const statuses = stepStatusesFor(steps);
+  const hasRunningStep = statuses.includes(
+    TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+  );
+  const hasFailedStep = statuses.includes(
+    TENANT_PROVISIONING_STEP_STATUS.FAILED,
+  );
+
+  // A failed step with nothing else running means the run is stuck and
+  // nothing further will happen until an operator retries —
+  // `provisioningStatus` never reflects this on its own (it only settles to
+  // FAILED once the *last* step fails), so it has to be read off the steps
+  // directly rather than off the column.
+  return !(hasFailedStep && !hasRunningStep);
+};
+
+const stepStatusesFor = (
+  steps: TTenantProvisioningSteps | null,
+): TTenantProvisioningStepStatus[] =>
+  STEP_ORDER.map(
+    (stepKey) =>
+      steps?.[stepKey]?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE,
+  );
+
+const stepStatusesEqual = (
+  a: TTenantProvisioningStepStatus[],
+  b: TTenantProvisioningStepStatus[],
+): boolean => a.length === b.length && a.every((status, i) => status === b[i]);
 
 const isTerminalDomainVerificationStatus = (
   status: TDomainVerificationStatus,
@@ -101,8 +152,7 @@ export const ProvisioningStatusView = ({
 }: TProvisioningStatusViewProps) => {
   const t = useTranslations('provisioningStatusView');
   const router = useRouter();
-  const [retryingStep, setRetryingStep] =
-    useState<TTenantProvisioningStep | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [, startTransition] = useTransition();
   const [renderedTenant, setRenderedTenant] = useState(tenant);
@@ -110,6 +160,21 @@ export const ProvisioningStatusView = ({
     useState<TTenantProvisioningStatus | null>(tenant.provisioningStatus);
   const [provisioningSteps, setProvisioningSteps] =
     useState<TTenantProvisioningSteps | null>(tenant.provisioningSteps);
+  // The poll loop's own on/off switch — only a poll tick may turn it off.
+  const [isPollingActive, setIsPollingActive] = useState(() =>
+    shouldContinuePolling(tenant.provisioningStatus, tenant.provisioningSteps),
+  );
+  // Non-null while waiting to see the retried/started workflow actually take
+  // effect: the snapshot of step statuses as of the moment Retry/Start was
+  // pressed. A dispatch only acknowledges GitHub's receipt of the request,
+  // not a runner picking it up — often well past one poll interval — so the
+  // very next tick usually still reflects this same pre-retry snapshot. The
+  // poll tick keeps polling active against an unchanged snapshot and only
+  // resumes normal stop/continue decisions once the fetched steps genuinely
+  // differ from it.
+  const [pendingRetryBaseline, setPendingRetryBaseline] = useState<
+    TTenantProvisioningStepStatus[] | null
+  >(null);
   const [renderedDomainStatus, setRenderedDomainStatus] = useState(
     domainVerificationStatus,
   );
@@ -125,6 +190,14 @@ export const ProvisioningStatusView = ({
     setRenderedTenant(tenant);
     setProvisioningStatus(tenant.provisioningStatus);
     setProvisioningSteps(tenant.provisioningSteps);
+    setIsPollingActive(
+      (prev) =>
+        prev ||
+        shouldContinuePolling(
+          tenant.provisioningStatus,
+          tenant.provisioningSteps,
+        ),
+    );
   }
   if (domainVerificationStatus !== renderedDomainStatus) {
     setRenderedDomainStatus(domainVerificationStatus);
@@ -145,11 +218,18 @@ export const ProvisioningStatusView = ({
     connector,
     stepBody,
     stepTitle,
-    stepError,
-    trailing,
     stepStatusLive,
+    visuallyHidden,
     failedBadge,
     detailsColumn,
+    detailsHeader,
+    overallStatusLive,
+    errorCard,
+    errorHeadingRow,
+    errorIcon,
+    errorDetails,
+    errorDetailsSummary,
+    errorDetailsText,
     goToTenantButton,
     dnsCard,
     dnsRow,
@@ -157,7 +237,7 @@ export const ProvisioningStatusView = ({
   } = provisioningStatusViewVariants();
 
   useEffect(() => {
-    if (isTerminalProvisioningStatus(provisioningStatus)) {
+    if (!isPollingActive) {
       return;
     }
 
@@ -170,6 +250,27 @@ export const ProvisioningStatusView = ({
         }
         setProvisioningStatus(result.provisioningStatus);
         setProvisioningSteps(result.provisioningSteps);
+
+        const freshStatuses = stepStatusesFor(result.provisioningSteps);
+        if (
+          pendingRetryBaseline &&
+          stepStatusesEqual(freshStatuses, pendingRetryBaseline)
+        ) {
+          // Unchanged since Retry/Start was pressed — the dispatch only
+          // confirms GitHub received the request, not that a runner has
+          // picked it up yet, so this read alone can't tell "never" apart
+          // from "not yet". Keep watching rather than stop on a snapshot
+          // that predates the retry.
+          return;
+        }
+
+        setPendingRetryBaseline(null);
+        setIsPollingActive(
+          shouldContinuePolling(
+            result.provisioningStatus,
+            result.provisioningSteps,
+          ),
+        );
       });
     }, STEP_POLL_INTERVAL_MS);
 
@@ -177,7 +278,7 @@ export const ProvisioningStatusView = ({
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [tenant.id, provisioningStatus]);
+  }, [tenant.id, isPollingActive, pendingRetryBaseline]);
 
   useEffect(() => {
     if (isTerminalDomainVerificationStatus(domainStatus)) {
@@ -201,24 +302,46 @@ export const ProvisioningStatusView = ({
     };
   }, [tenant.id, domainStatus]);
 
-  const allIdle = STEP_ORDER.every((stepKey) => {
-    const status =
-      provisioningSteps?.[stepKey]?.status ??
-      TENANT_PROVISIONING_STEP_STATUS.IDLE;
-    return status === TENANT_PROVISIONING_STEP_STATUS.IDLE;
-  });
+  const stepStatuses = stepStatusesFor(provisioningSteps);
+  const allIdle = stepStatuses.every(
+    (status) => status === TENANT_PROVISIONING_STEP_STATUS.IDLE,
+  );
+  // `OVERALL_STATUS_PRIORITY` covers every possible step status, so this
+  // always matches — there is no real "not found" case to fall back from.
+  const overallStepStatus = OVERALL_STATUS_PRIORITY.find((candidate) =>
+    stepStatuses.includes(candidate),
+  ) as TTenantProvisioningStepStatus;
+  const isOverallFailed =
+    overallStepStatus === TENANT_PROVISIONING_STEP_STATUS.FAILED;
+  const failedStepError = isOverallFailed
+    ? STEP_ORDER.map((stepKey) => provisioningSteps?.[stepKey]).find(
+        (stepState) =>
+          stepState?.status === TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      )?.error
+    : undefined;
+  const errorKind = isOverallFailed
+    ? classifyProvisioningError(failedStepError)
+    : undefined;
 
-  const handleRetry = (stepKey: TTenantProvisioningStep) => {
-    setRetryingStep(stepKey);
+  const handleRetry = () => {
+    setIsRetrying(true);
+    // Force polling back on immediately, and record what the steps look
+    // like right now — the re-dispatched workflow hasn't actually started
+    // yet, so the poll tick needs this snapshot to recognise "no change
+    // observed yet" and keep watching instead of stopping again on it.
+    setIsPollingActive(true);
+    setPendingRetryBaseline(stepStatuses);
     startTransition(async () => {
       await retryProvisioningStepAction(tenant.id);
       router.refresh();
-      setRetryingStep(null);
+      setIsRetrying(false);
     });
   };
 
   const handleStart = () => {
     setIsStarting(true);
+    setIsPollingActive(true);
+    setPendingRetryBaseline(stepStatuses);
     startTransition(async () => {
       await retryProvisioningStepAction(tenant.id);
       router.refresh();
@@ -261,13 +384,11 @@ export const ProvisioningStatusView = ({
         <aside className={steps()}>
           <div className={list()}>
             {STEP_ORDER.map((stepKey, index) => {
-              const stepState = provisioningSteps?.[stepKey];
               const status =
-                stepState?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
+                stepStatuses[index] ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
               const isFailed =
                 status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
               const isDone = status === TENANT_PROVISIONING_STEP_STATUS.DONE;
-              const isRetrying = retryingStep === stepKey;
               const isLast = index === STEP_ORDER.length - 1;
               const title = t(`stepLabel.${stepKey}`);
 
@@ -286,32 +407,17 @@ export const ProvisioningStatusView = ({
                   </div>
                   <div className={stepBody()}>
                     <span className={stepTitle()}>{title}</span>
-                    {isFailed && stepState?.error && (
-                      <span className={stepError()}>{stepState.error}</span>
-                    )}
-                  </div>
-                  <div className={trailing()}>
+                    {/* The circle glyph is decorative (`aria-hidden`), so
+                        this text — visually hidden, not removed — is what
+                        actually carries each step's status to assistive
+                        tech; the live region still announces it on change
+                        even though the sighted badge that used to sit here
+                        is gone. */}
                     <span className={stepStatusLive()} aria-live="polite">
-                      {isFailed ? (
-                        <span className={failedBadge()}>
-                          {t(`statusLabel.${status}`)}
-                        </span>
-                      ) : (
-                        <StatusBadge tone={STEP_TONE[status]}>
-                          {t(`statusLabel.${status}`)}
-                        </StatusBadge>
-                      )}
+                      <span className={visuallyHidden()}>
+                        {t(`statusLabel.${status}`)}
+                      </span>
                     </span>
-                    {isFailed && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => handleRetry(stepKey)}
-                        isDisabled={isRetrying}
-                      >
-                        {isRetrying ? t('retryingButton') : t('retryButton')}
-                      </Button>
-                    )}
                   </div>
                 </div>
               );
@@ -320,6 +426,55 @@ export const ProvisioningStatusView = ({
         </aside>
 
         <div className={detailsColumn()}>
+          {!allIdle && (
+            <div className={detailsHeader()}>
+              <span className={overallStatusLive()} aria-live="polite">
+                {isOverallFailed ? (
+                  <span className={failedBadge()}>
+                    {t(`statusLabel.${overallStepStatus}`)}
+                  </span>
+                ) : (
+                  <StatusBadge tone={STEP_TONE[overallStepStatus]}>
+                    {t(`statusLabel.${overallStepStatus}`)}
+                  </StatusBadge>
+                )}
+              </span>
+              {isOverallFailed && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleRetry}
+                  isDisabled={isRetrying}
+                >
+                  {isRetrying ? t('retryingButton') : t('retryButton')}
+                </Button>
+              )}
+            </div>
+          )}
+
+          {isOverallFailed && errorKind && (
+            <div className={errorCard()} role="alert">
+              <div className={errorHeadingRow()}>
+                <Icon name={ICONS.WARNING} className={errorIcon()} />
+                <Heading level={2} size={Size.XS}>
+                  {t(`errorKind.${errorKind}.headline`)}
+                </Heading>
+              </div>
+              <Text variant="supporting">
+                {t(`errorKind.${errorKind}.body`)}
+              </Text>
+              <Text variant="hint">{t(`errorKind.${errorKind}.nextStep`)}</Text>
+              {failedStepError && (
+                <details className={errorDetails()}>
+                  <summary className={errorDetailsSummary()}>
+                    {t('technicalDetailsToggle')}
+                  </summary>
+                  <pre className={errorDetailsText()}>{failedStepError}</pre>
+                </details>
+              )}
+            </div>
+          )}
+
           <TenantDetailsPanel
             tenant={tenant}
             isEditable={allIdle}
