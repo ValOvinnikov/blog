@@ -2,6 +2,7 @@ import * as schema from '@blog/db/schema';
 import {
   applyMigrationFile,
   listMigrationFiles,
+  MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
 import { PGlite } from '@electric-sql/pglite';
 import { sql } from 'drizzle-orm';
@@ -20,26 +21,28 @@ const BACKFILL_MIGRATION = '0009_quick_jazinda.sql';
 // nullable-add -> backfill -> SET NOT NULL sequence derives every
 // pre-existing row's name from its slug via SQL, not a hardcoded value.
 describe('0009_quick_jazinda (tenants name backfill)', () => {
-  it('backfills pre-existing tenant rows to a title-cased version of their slug', async () => {
-    const client = new PGlite();
-    const db = drizzle(client, { schema });
+  it(
+    'backfills pre-existing tenant rows to a title-cased version of their slug',
+    async () => {
+      const client = new PGlite();
+      const db = drizzle(client, { schema });
 
-    const migrationFiles = listMigrationFiles();
-    const priorMigrations = migrationFiles.filter(
-      (file) => file < BACKFILL_MIGRATION,
-    );
-    const laterMigrations = migrationFiles.filter(
-      (file) => file > BACKFILL_MIGRATION,
-    );
+      const migrationFiles = listMigrationFiles();
+      const priorMigrations = migrationFiles.filter(
+        (file) => file < BACKFILL_MIGRATION,
+      );
+      const laterMigrations = migrationFiles.filter(
+        (file) => file > BACKFILL_MIGRATION,
+      );
 
-    for (const file of priorMigrations) {
-      await applyMigrationFile(db, file);
-    }
+      for (const file of priorMigrations) {
+        await applyMigrationFile(db, file);
+      }
 
-    // The `tenants` shape before this migration: no `name` column yet,
-    // matching rows created before this migration ever ran.
-    await db.execute(
-      sql.raw(`
+      // The `tenants` shape before this migration: no `name` column yet,
+      // matching rows created before this migration ever ran.
+      await db.execute(
+        sql.raw(`
         insert into "tenants"
           ("slug", "primary_domain", "sanity_project_id", "sanity_dataset", "locale", "plan", "status")
         values
@@ -47,41 +50,47 @@ describe('0009_quick_jazinda (tenants name backfill)', () => {
           ('acme-corp', 'acme-corp.example.com', 'p2', 'production', 'en', 'FREE', 'ACTIVE'),
           ('foo_bar', 'foo-bar.example.com', 'p3', 'production', 'en', 'FREE', 'ACTIVE')
       `),
-    );
+      );
 
-    await applyMigrationFile(db, BACKFILL_MIGRATION);
+      await applyMigrationFile(db, BACKFILL_MIGRATION);
 
-    // Every migration after the one under test still needs applying too —
-    // the typed `tenants` table below reflects the current schema code, not
-    // just the state as of BACKFILL_MIGRATION, so a later additive column
-    // (e.g. the encrypted Sanity token) must exist in this test db as well
-    // for the select to succeed.
-    for (const file of laterMigrations) {
-      await applyMigrationFile(db, file);
-    }
+      // Every migration after the one under test still needs applying too —
+      // the typed `tenants` table below reflects the current schema code, not
+      // just the state as of BACKFILL_MIGRATION, so a later additive column
+      // (e.g. the encrypted Sanity token) must exist in this test db as well
+      // for the select to succeed.
+      for (const file of laterMigrations) {
+        await applyMigrationFile(db, file);
+      }
 
-    const rows = await db.select().from(tenants).orderBy(tenants.slug);
-    const namesBySlug = Object.fromEntries(
-      rows.map((row) => [row.slug, row.name]),
-    );
+      const rows = await db.select().from(tenants).orderBy(tenants.slug);
+      const namesBySlug = Object.fromEntries(
+        rows.map((row) => [row.slug, row.name]),
+      );
 
-    expect(namesBySlug).toEqual({
-      acme: 'Acme',
-      'acme-corp': 'Acme Corp',
-      foo_bar: 'Foo Bar',
-    });
-  }, 30_000);
+      expect(namesBySlug).toEqual({
+        acme: 'Acme',
+        'acme-corp': 'Acme Corp',
+        foo_bar: 'Foo Bar',
+      });
+    },
+    MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+  );
 
-  it('still applies cleanly against an empty tenants table', async () => {
-    const client = new PGlite();
-    const db = drizzle(client, { schema });
+  it(
+    'still applies cleanly against an empty tenants table',
+    async () => {
+      const client = new PGlite();
+      const db = drizzle(client, { schema });
 
-    for (const file of listMigrationFiles()) {
-      await applyMigrationFile(db, file);
-    }
+      for (const file of listMigrationFiles()) {
+        await applyMigrationFile(db, file);
+      }
 
-    const rows = await db.select().from(tenants);
+      const rows = await db.select().from(tenants);
 
-    expect(rows).toHaveLength(0);
-  }, 30_000);
+      expect(rows).toHaveLength(0);
+    },
+    MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+  );
 });

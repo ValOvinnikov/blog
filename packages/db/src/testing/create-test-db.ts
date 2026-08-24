@@ -1,22 +1,21 @@
+import { readFile } from 'node:fs/promises';
+
 import * as schema from '@blog/db/schema';
 import { PGlite } from '@electric-sql/pglite';
 import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
+import { inject } from 'vitest';
 
-import { applyMigrationFile, listMigrationFiles } from './migration-files';
-
-// Builds a fresh, isolated, in-memory Postgres database with every
-// committed migration applied — the real generated SQL, not a hand-rolled
-// stand-in, so a query/mutation test exercises the actual constraints
-// (unique/foreign-key) drizzle-kit generated. Call once per test (or
-// `beforeEach`) for full isolation between tests; each call gets its own
-// in-memory instance.
+// Restores a fresh, isolated, in-memory Postgres database from the snapshot
+// `global-setup.ts` builds once per vitest process (every committed
+// migration applied — the real generated SQL, not a hand-rolled stand-in, so
+// a query/mutation test exercises the actual constraints drizzle-kit
+// generated) instead of replaying every migration file itself. Call once per
+// test file (or `beforeEach`) for full isolation between tests; each call
+// still gets its own private in-memory instance.
 export async function createTestDb(): Promise<PgliteDatabase<typeof schema>> {
-  const client = new PGlite();
-  const db = drizzle(client, { schema });
+  const snapshotPath = inject('pgliteMigratedSnapshotPath');
+  const snapshot = await readFile(snapshotPath);
+  const client = await PGlite.create({ loadDataDir: new Blob([snapshot]) });
 
-  for (const file of listMigrationFiles()) {
-    await applyMigrationFile(db, file);
-  }
-
-  return db;
+  return drizzle(client, { schema });
 }

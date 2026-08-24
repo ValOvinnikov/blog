@@ -16,6 +16,10 @@ export default mergeConfig(
       // query-layer `src/`), but its request-shape and idempotency-skip
       // logic still gets the same unit-test coverage.
       include: ['src/**/*.{test,spec}.ts', 'scripts/**/*.{test,spec}.ts'],
+      // Builds one migrated PGlite snapshot per vitest process; every query
+      // test's `createTestDb()` restores from it instead of replaying all
+      // migrations itself (see `src/testing/global-setup.ts`).
+      globalSetup: ['./src/testing/global-setup.ts'],
       env: {
         // `env.ts` validates at import time; SKIP_ENV_VALIDATION lets tests
         // import client/env modules without a real Neon connection string.
