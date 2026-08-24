@@ -6,8 +6,10 @@ name: Deprovision Tenant
 # persisted Sanity credentials, and archives (never hard-deletes) the
 # `tenants` row. The Sanity project is archived rather than deleted because
 # deleting one needs an org billing permission this token deliberately
-# lacks; the project and its dataset survive for a later permanent delete. Dispatched by hand from the Actions UI by an operator; there
-# is no wizard triggering this automatically.
+# lacks; the project and its dataset survive for a later permanent delete.
+#
+# Dispatched by hand from the Actions UI by an operator; there is no wizard
+# triggering this automatically.
 #
 # Destructive, so `workflow_dispatch` alone is not enough: `confirm` must
 # match the tenant's live slug (checked before any deletion) and `dryRun`
