@@ -1,3 +1,4 @@
+import { escapeHtml } from './escape-html';
 import type { TMagicLinkEmailContent } from './magic-link-email';
 
 export type TMagicLinkInviteEmailInput = {
@@ -36,15 +37,4 @@ function formatTenantNames(names: string[]): string {
   if (names.length === 2) return `${names[0]} and ${names[1]}`;
 
   return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`;
-}
-
-// Tenant names are operator-entered (Add Tenant wizard) and unsanitized upstream;
-// this email is the only place they're interpolated into HTML.
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 }
