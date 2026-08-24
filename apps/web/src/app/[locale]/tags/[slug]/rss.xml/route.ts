@@ -26,8 +26,7 @@ const toRssItem = (post: TFeedPost, siteUrl: string): TRssItem => {
 
 /**
  * Resolves the tag itself (for the channel title/description) and every
- * published post, newest first. The post set is site-wide rather than
- * tag-scoped today — existing behavior, not new. Returns `null` when the tag
+ * published post tagged with it, newest first. Returns `null` when the tag
  * lookup or the post fetch fails, which the `GET` handler 404s.
  */
 const getAllTagPosts = async (slug: string): Promise<TTagFeed | null> => {
@@ -43,7 +42,9 @@ const getAllTagPosts = async (slug: string): Promise<TTagFeed | null> => {
   const { tag } = tagResult.data;
   const description = tag.description ?? tag.title;
 
-  const postsResult = await service.entities.posts.v1.getAllPublishedPosts();
+  const postsResult = await service.entities.posts.v1.getPublishedPostsByTag(
+    tag.id,
+  );
   if (!postsResult.ok) {
     logger.error('tag_rss.posts_fetch_failed', {
       slug,
