@@ -140,6 +140,18 @@ export const TenantDetailsPanel = ({
     setValues((prev) => ({ ...prev, [key]: nextValue }));
   };
 
+  // `tenant` is the baseline: whenever a fresh prop lands (a successful
+  // save's `router.refresh()`, or a background poll), the render-phase
+  // adjustment above resets `values` to match it in the same pass, so the
+  // two stay in lockstep without any extra state to track a "saved" copy.
+  const baselineValues = valuesFromTenant(tenant);
+  const isDirty =
+    values.name !== baselineValues.name ||
+    values.slug !== baselineValues.slug ||
+    values.primaryDomain !== baselineValues.primaryDomain ||
+    values.plan !== baselineValues.plan ||
+    values.locale !== baselineValues.locale;
+
   const handleSave = () => {
     setFormError(undefined);
     setFieldErrors({});
@@ -249,7 +261,11 @@ export const TenantDetailsPanel = ({
 
       {isEditable && (
         <div className={actions()}>
-          <Button type="button" onClick={handleSave} isDisabled={isPending}>
+          <Button
+            type="button"
+            onClick={handleSave}
+            isDisabled={isPending || !isDirty}
+          >
             {isPending ? t('savingButton') : t('saveButton')}
           </Button>
         </div>
