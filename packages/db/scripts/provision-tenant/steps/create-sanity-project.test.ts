@@ -332,6 +332,50 @@ describe(createTenantSanityProject, () => {
     expect(createSanityProjectInviteMock).not.toHaveBeenCalled();
   });
 
+  it('does not re-invite when a retry finds the owner still pending, exercising the real invite-list parsing against a mocked fetch', async () => {
+    const actual = await vi.importActual<
+      typeof import('../lib/sanity-management-client')
+    >('../lib/sanity-management-client');
+    listSanityProjectInvitesMock.mockImplementation(
+      actual.listSanityProjectInvites,
+    );
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: [{ email: 'owner@example.com', status: 'pending' }],
+          nextCursor: null,
+        }),
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const tenant = baseTenant({
+      sanityProjectId: 'proj123',
+      sanityDataset: 'test-dataset',
+    });
+    listSanityDatasetsMock.mockImplementation(async () => {
+      callOrder.push('listSanityDatasets');
+      return [{ name: 'test-dataset' }];
+    });
+    listSanityCorsOriginsMock.mockImplementation(async () => {
+      callOrder.push('listSanityCorsOrigins');
+      return [{ id: 'cors1', origin: 'https://admin.example.com' }];
+    });
+
+    try {
+      await createTenantSanityProject(tenant, env);
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.sanity.io/v2026-07-10/access/project/proj123/invites?status=pending&status=accepted',
+        expect.anything(),
+      );
+      expect(createSanityProjectInviteMock).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('skips inviting when the tenant has no resolvable owner email, logging the gap', async () => {
     const tenant = baseTenant();
     getTenantOwnerEmailMock.mockImplementation(async () => {

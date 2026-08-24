@@ -264,11 +264,12 @@ describe(deleteSanityRobotToken, () => {
 });
 
 describe(listSanityProjectInvites, () => {
-  it('GETs the project-scoped invites endpoint filtered to pending and accepted, unwrapping an items envelope', async () => {
+  it('GETs the project-scoped invites endpoint filtered to pending and accepted, unwrapping the documented `data` envelope', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
-          items: [{ email: 'owner@example.com', status: 'pending' }],
+          data: [{ email: 'owner@example.com', status: 'pending' }],
+          nextCursor: null,
         }),
         { status: 200 },
       ),
@@ -287,7 +288,7 @@ describe(listSanityProjectInvites, () => {
     expect(init.method ?? 'GET').toBe('GET');
   });
 
-  it('accepts a bare array response with no items envelope', async () => {
+  it('accepts a bare array response with no envelope', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify([{ email: 'owner@example.com', status: 'accepted' }]),
