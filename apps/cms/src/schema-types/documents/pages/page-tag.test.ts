@@ -45,7 +45,7 @@ describe('pageTagSchema shape', () => {
     expect(requiredCalled).toBe(true);
   });
 
-  it('postList references module_postList and stays optional', () => {
+  it('postList references module_postList and stays optional but has custom uniqueness validation', () => {
     const postListField = getField('postList') as
       TReferenceFieldDefinition | undefined;
 
@@ -58,7 +58,7 @@ describe('pageTagSchema shape', () => {
     expect(postListField.to?.map((target) => target.type)).toEqual([
       postListSchema.name,
     ]);
-    expect(postListField.validation).toBeUndefined();
+    expect(postListField.validation).toBeDefined();
   });
 
   it('modules allows module_postLatest, module_cta, and module_newsletter', () => {
@@ -192,21 +192,25 @@ type TCustomFn = (
   context: ValidationContext,
 ) => Promise<string | true>;
 
-const UNIQUENESS_ERROR =
+const TAG_UNIQUENESS_ERROR =
   'Another Tag Page already references this tag — each tag can only back one Tag Page.';
+const POST_LIST_UNIQUENESS_ERROR =
+  'Another Tag Page already references this Post List — each Post List can only back one Tag Page.';
 
 /**
- * `validateUniqueTagReference` is private to page-tag.ts; the `tag` field's
- * `validation` builder registers it via `rule.custom(fn)`, so a minimal
- * chainable mock rule captures it the same way home-page.test.ts captures
- * its modules-field custom validator — no export needed.
+ * Both `tag` and `postList` register their uniqueness validator as a private
+ * `page-tag.ts` closure via `rule.custom(fn)`, so a minimal chainable mock
+ * rule captures it the same way home-page.test.ts captures its modules-field
+ * custom validator — no export needed.
  */
-const getUniqueTagValidator = (): TCustomFn => {
-  const tagField = pageTagSchema.fields?.find((field) => field.name === 'tag');
+const getCustomValidator = (fieldName: string): TCustomFn => {
+  const field = pageTagSchema.fields?.find(
+    (schemaField) => schemaField.name === fieldName,
+  );
 
-  if (!tagField?.validation) {
+  if (!field?.validation) {
     throw new Error(
-      'Expected pageTagSchema to define a tag field with validation.',
+      `Expected pageTagSchema to define a ${fieldName} field with validation.`,
     );
   }
 
@@ -221,10 +225,12 @@ const getUniqueTagValidator = (): TCustomFn => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  (tagField.validation as any)(rule);
+  (field.validation as any)(rule);
 
   if (!customFn) {
-    throw new Error('Expected tag field validation to register custom().');
+    throw new Error(
+      `Expected ${fieldName} field validation to register custom().`,
+    );
   }
 
   return customFn;
@@ -260,7 +266,7 @@ const createMockContext = (
 
 describe('validateUniqueTagReference', () => {
   it('passes without querying when no reference is set', async () => {
-    const validate = getUniqueTagValidator();
+    const validate = getCustomValidator('tag');
     const { context, fetchCalls } = createMockContext(0);
 
     await expect(validate(undefined, context)).resolves.toBe(true);
@@ -268,23 +274,23 @@ describe('validateUniqueTagReference', () => {
   });
 
   it('passes when no other page_tag references the same tag', async () => {
-    const validate = getUniqueTagValidator();
+    const validate = getCustomValidator('tag');
     const { context } = createMockContext(0);
 
     await expect(validate({ _ref: 'tag-1' }, context)).resolves.toBe(true);
   });
 
   it('flags a conflicting page_tag referencing the same tag', async () => {
-    const validate = getUniqueTagValidator();
+    const validate = getCustomValidator('tag');
     const { context } = createMockContext(1);
 
     await expect(validate({ _ref: 'tag-1' }, context)).resolves.toBe(
-      UNIQUENESS_ERROR,
+      TAG_UNIQUENESS_ERROR,
     );
   });
 
   it('excludes both the draft and published id of the current document', async () => {
-    const validate = getUniqueTagValidator();
+    const validate = getCustomValidator('tag');
     const { context, fetchCalls } = createMockContext(0, 'drafts.page-tag-1');
 
     await validate({ _ref: 'tag-1' }, context);
@@ -297,10 +303,72 @@ describe('validateUniqueTagReference', () => {
   });
 
   it('requests the drafts perspective so an unpublished conflict still counts', async () => {
-    const validate = getUniqueTagValidator();
+    const validate = getCustomValidator('tag');
     const { context, withConfigCalls } = createMockContext(0);
 
     await validate({ _ref: 'tag-1' }, context);
+
+    expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
+  });
+});
+
+describe('validateUniquePostListReference', () => {
+  it('passes without querying when no reference is set', async () => {
+    const validate = getCustomValidator('postList');
+    const { context, fetchCalls } = createMockContext(0);
+
+    await expect(validate(undefined, context)).resolves.toBe(true);
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it('passes when no other page_tag references the same postList', async () => {
+    const validate = getCustomValidator('postList');
+    const { context } = createMockContext(0);
+
+    await expect(validate({ _ref: 'post-list-1' }, context)).resolves.toBe(
+      true,
+    );
+  });
+
+  it('flags a conflicting page_tag referencing the same postList', async () => {
+    const validate = getCustomValidator('postList');
+    const { context } = createMockContext(1);
+
+    await expect(validate({ _ref: 'post-list-1' }, context)).resolves.toBe(
+      POST_LIST_UNIQUENESS_ERROR,
+    );
+  });
+
+  it('allows a document to reference its own already-used postList (self-reference)', async () => {
+    // conflictingCount is 0 because the mock query already excludes the
+    // current document's published/draft ids — this asserts that exclusion
+    // is what makes editing an existing page_tag safe, not a coincidence.
+    const validate = getCustomValidator('postList');
+    const { context } = createMockContext(0, 'drafts.page-tag-1');
+
+    await expect(validate({ _ref: 'post-list-1' }, context)).resolves.toBe(
+      true,
+    );
+  });
+
+  it('excludes both the draft and published id of the current document', async () => {
+    const validate = getCustomValidator('postList');
+    const { context, fetchCalls } = createMockContext(0, 'drafts.page-tag-1');
+
+    await validate({ _ref: 'post-list-1' }, context);
+
+    expect(fetchCalls[0]?.params).toEqual({
+      type: 'page_tag',
+      postListId: 'post-list-1',
+      publishedId: 'page-tag-1',
+    });
+  });
+
+  it('requests the drafts perspective so an unpublished conflict still counts', async () => {
+    const validate = getCustomValidator('postList');
+    const { context, withConfigCalls } = createMockContext(0);
+
+    await validate({ _ref: 'post-list-1' }, context);
 
     expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
   });
