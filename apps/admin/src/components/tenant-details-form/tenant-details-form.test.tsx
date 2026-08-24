@@ -259,6 +259,74 @@ describe(TenantDetailsForm, () => {
     );
   });
 
+  it('echoes the confirmation token back once the operator confirms an unchanged owner email', async () => {
+    createTenantActionMock.mockResolvedValueOnce({
+      ok: false,
+      ownerInviteConfirmation: {
+        email: 'owner@example.com',
+        token: 'confirmation-token-for-owner-example-com',
+        message: 'No account found for owner@example.com.',
+      },
+    });
+    createTenantActionMock.mockResolvedValueOnce({ ok: false });
+    const user = userEvent.setup();
+    render(<TenantDetailsForm />);
+
+    await fillValidForm(user);
+    await user.click(
+      screen.getByRole('button', { name: /begin provisioning/i }),
+    );
+    await screen.findByText('No account found for owner@example.com.');
+
+    await user.click(
+      screen.getByRole('button', { name: /confirm & invite owner/i }),
+    );
+
+    expect(createTenantActionMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        ownerEmail: 'owner@example.com',
+        confirmOwnerInvite: true,
+        confirmOwnerInviteToken: 'confirmation-token-for-owner-example-com',
+      }),
+    );
+  });
+
+  it('drops the stale token along with the stale confirmation once the owner email is edited', async () => {
+    createTenantActionMock.mockResolvedValueOnce({
+      ok: false,
+      ownerInviteConfirmation: {
+        email: 'owner@example.com',
+        token: 'confirmation-token-for-owner-example-com',
+        message: 'No account found for owner@example.com.',
+      },
+    });
+    createTenantActionMock.mockResolvedValueOnce({ ok: false });
+    const user = userEvent.setup();
+    render(<TenantDetailsForm />);
+
+    await fillValidForm(user);
+    await user.click(
+      screen.getByRole('button', { name: /begin provisioning/i }),
+    );
+    await screen.findByText('No account found for owner@example.com.');
+
+    await user.type(
+      screen.getByRole('textbox', { name: 'Owner email' }),
+      '.uk',
+    );
+    await user.click(
+      screen.getByRole('button', { name: /begin provisioning/i }),
+    );
+
+    expect(createTenantActionMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        ownerEmail: 'owner@example.com.uk',
+        confirmOwnerInvite: false,
+        confirmOwnerInviteToken: undefined,
+      }),
+    );
+  });
+
   it('shows a general error returned from the Server Action', async () => {
     createTenantActionMock.mockResolvedValue({
       ok: false,

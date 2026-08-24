@@ -1,6 +1,9 @@
+import { createOwnerInviteToken } from '@admin/server/tenants/owner-invite-token';
 import { mockDbConstants } from '@admin/testing/mock-db-constants';
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { redirect } from 'next/navigation';
+
+const validOwnerInviteToken = createOwnerInviteToken('owner@example.com');
 
 const {
   requireAdminMock,
@@ -43,6 +46,10 @@ vi.mock('@admin/server/provisioning/dispatch-provisioning-workflow', () => ({
 
 vi.mock('@admin/utils/logger/logger', () => ({
   logger: { error: loggerErrorMock, warn: loggerWarnMock },
+}));
+
+vi.mock('@admin/utils/env/env', () => ({
+  env: { AUTH_SECRET: 'test-auth-secret' },
 }));
 
 vi.mock('@blog/db', async () => ({
@@ -125,10 +132,56 @@ describe('createTenantAction', () => {
       ok: false,
       ownerInviteConfirmation: {
         email: 'owner@example.com',
+        token: expect.any(String),
         message: expect.any(String),
       },
     });
     expect(result.fieldErrors).toBeUndefined();
+    expect(createTenantDraftMock).not.toHaveBeenCalled();
+    expect(signInMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a confirming submit whose token was issued for a different email, and re-issues a fresh confirmation for the current one', async () => {
+    getUserByEmailMock.mockResolvedValue(undefined);
+    const { createTenantAction } = await import('./create-tenant-action');
+    const tokenForOtherEmail = createOwnerInviteToken('other@example.com');
+
+    const result = await createTenantAction({
+      ...validInput,
+      confirmOwnerInvite: true,
+      confirmOwnerInviteToken: tokenForOtherEmail,
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      ownerInviteConfirmation: {
+        email: 'owner@example.com',
+        token: expect.any(String),
+        message: expect.any(String),
+      },
+    });
+    expect(createTenantDraftMock).not.toHaveBeenCalled();
+    expect(signInMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a confirming submit with an invalid/garbage token, and re-issues a fresh confirmation', async () => {
+    getUserByEmailMock.mockResolvedValue(undefined);
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    const result = await createTenantAction({
+      ...validInput,
+      confirmOwnerInvite: true,
+      confirmOwnerInviteToken: 'not-a-real-token',
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      ownerInviteConfirmation: {
+        email: 'owner@example.com',
+        token: expect.any(String),
+        message: expect.any(String),
+      },
+    });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
     expect(signInMock).not.toHaveBeenCalled();
   });
@@ -138,7 +191,11 @@ describe('createTenantAction', () => {
     const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(
-      createTenantAction({ ...validInput, confirmOwnerInvite: true }),
+      createTenantAction({
+        ...validInput,
+        confirmOwnerInvite: true,
+        confirmOwnerInviteToken: validOwnerInviteToken,
+      }),
     ).rejects.toThrow('NEXT_REDIRECT');
 
     expect(createTenantDraftMock).toHaveBeenCalledWith({
@@ -163,7 +220,11 @@ describe('createTenantAction', () => {
     const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(
-      createTenantAction({ ...validInput, confirmOwnerInvite: true }),
+      createTenantAction({
+        ...validInput,
+        confirmOwnerInvite: true,
+        confirmOwnerInviteToken: validOwnerInviteToken,
+      }),
     ).rejects.toThrow('NEXT_REDIRECT');
 
     expect(loggerErrorMock).toHaveBeenCalledWith(
@@ -183,7 +244,11 @@ describe('createTenantAction', () => {
     const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(
-      createTenantAction({ ...validInput, confirmOwnerInvite: true }),
+      createTenantAction({
+        ...validInput,
+        confirmOwnerInvite: true,
+        confirmOwnerInviteToken: validOwnerInviteToken,
+      }),
     ).rejects.toThrow('NEXT_REDIRECT');
 
     expect(loggerErrorMock).toHaveBeenCalledWith(

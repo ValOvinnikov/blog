@@ -13,6 +13,7 @@ const ENV_KEYS = [
   'VERCEL_WEB_PROJECT_ID',
   'VERCEL_TEAM_ID',
   'SKIP_ENV_VALIDATION',
+  'AUTH_SECRET',
 ] as const;
 
 const originalEnv = Object.fromEntries(
@@ -54,6 +55,12 @@ const importEnvOnServer = async (): Promise<typeof import('./env')> => {
 };
 
 describe('env', () => {
+  // Required regardless of which optional var a given case exercises — set
+  // once here so every case below stays focused on the var it names.
+  beforeEach(() => {
+    process.env['AUTH_SECRET'] = 'test-auth-secret';
+  });
+
   afterEach(() => {
     restoreEnv();
   });

@@ -34,7 +34,11 @@ const INITIAL_VALUES: TFormValues = {
   ownerEmail: '',
 };
 
-type TOwnerInviteConfirmation = { email: string; message: string };
+type TOwnerInviteConfirmation = {
+  email: string;
+  message: string;
+  token: string;
+};
 
 /**
  * The wizard's Details step — the one part of tenant creation an operator
@@ -90,13 +94,20 @@ export const TenantDetailsForm = () => {
     // proceeds down the invite path. `ownerInviteConfirmation.email` comes
     // back already normalized by the server's `z.string().trim().toLowerCase()`,
     // so the raw form value must be normalized the same way before comparing.
-    const confirmOwnerInvite =
-      ownerInviteConfirmation?.email === values.ownerEmail.trim().toLowerCase();
+    // The token itself is only echoed back when the email still matches —
+    // the server re-verifies it against `ownerEmail`, so a stale token for a
+    // different email is worthless to submit anyway.
+    const normalizedOwnerEmail = values.ownerEmail.trim().toLowerCase();
+    const confirmedInvite =
+      ownerInviteConfirmation?.email === normalizedOwnerEmail
+        ? ownerInviteConfirmation
+        : undefined;
 
     startTransition(async () => {
       const result = await createTenantAction({
         ...values,
-        confirmOwnerInvite,
+        confirmOwnerInvite: !!confirmedInvite,
+        confirmOwnerInviteToken: confirmedInvite?.token,
       });
       setFieldErrors(result.fieldErrors ?? {});
       setFormError(result.error);
