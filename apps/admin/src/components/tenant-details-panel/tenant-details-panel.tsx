@@ -84,6 +84,7 @@ export const TenantDetailsPanel = ({
   const [fieldErrors, setFieldErrors] =
     useState<TUpdateTenantDetailsFieldErrors>({});
   const [formError, setFormError] = useState<string | undefined>(undefined);
+  const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [wasEditable, setWasEditable] = useState(isEditable);
   const [lockAnnouncement, setLockAnnouncement] = useState('');
@@ -168,11 +169,13 @@ export const TenantDetailsPanel = ({
     nextValue: TFormValues[K],
   ) => {
     setValues((prev) => ({ ...prev, [key]: nextValue }));
+    setShowSaveSuccess(false);
   };
 
   const handleSave = () => {
     setFormError(undefined);
     setFieldErrors({});
+    setShowSaveSuccess(false);
 
     const payload: TUpdateTenantDetailsActionInput = {
       name: values.name,
@@ -190,6 +193,7 @@ export const TenantDetailsPanel = ({
         setFormError(result.error);
         return;
       }
+      setShowSaveSuccess(true);
       router.refresh();
     });
   };
@@ -220,6 +224,9 @@ export const TenantDetailsPanel = ({
         {lockAnnouncement}
       </span>
 
+      {isEditable && showSaveSuccess && (
+        <Alert type={ALERT_TYPE.SUCCESS} message={t('alertSuccess')} />
+      )}
       {isEditable && formError && (
         <Alert type={ALERT_TYPE.ERROR} message={formError} />
       )}
