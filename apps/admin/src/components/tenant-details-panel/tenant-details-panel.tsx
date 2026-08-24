@@ -69,6 +69,7 @@ export const TenantDetailsPanel = ({
   const [fieldErrors, setFieldErrors] =
     useState<TUpdateTenantDetailsFieldErrors>({});
   const [formError, setFormError] = useState<string | undefined>(undefined);
+  const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [wasEditable, setWasEditable] = useState(isEditable);
   const [lockAnnouncement, setLockAnnouncement] = useState('');
@@ -138,11 +139,25 @@ export const TenantDetailsPanel = ({
     nextValue: TFormValues[K],
   ) => {
     setValues((prev) => ({ ...prev, [key]: nextValue }));
+    setShowSaveSuccess(false);
   };
+
+  // `tenant` is the baseline: whenever a fresh prop lands (a successful
+  // save's `router.refresh()`, or a background poll), the render-phase
+  // adjustment above resets `values` to match it in the same pass, so the
+  // two stay in lockstep without any extra state to track a "saved" copy.
+  const baselineValues = valuesFromTenant(tenant);
+  const isDirty =
+    values.name !== baselineValues.name ||
+    values.slug !== baselineValues.slug ||
+    values.primaryDomain !== baselineValues.primaryDomain ||
+    values.plan !== baselineValues.plan ||
+    values.locale !== baselineValues.locale;
 
   const handleSave = () => {
     setFormError(undefined);
     setFieldErrors({});
+    setShowSaveSuccess(false);
 
     startTransition(async () => {
       const result = await updateTenantDetailsAction(tenant.id, values);
@@ -151,6 +166,7 @@ export const TenantDetailsPanel = ({
         setFormError(result.error);
         return;
       }
+      setShowSaveSuccess(true);
       router.refresh();
     });
   };
@@ -180,6 +196,9 @@ export const TenantDetailsPanel = ({
         {lockAnnouncement}
       </span>
 
+      {isEditable && showSaveSuccess && (
+        <Alert type={ALERT_TYPE.SUCCESS} message={t('alertSuccess')} />
+      )}
       {isEditable && formError && (
         <Alert type={ALERT_TYPE.ERROR} message={formError} />
       )}
@@ -249,7 +268,11 @@ export const TenantDetailsPanel = ({
 
       {isEditable && (
         <div className={actions()}>
-          <Button type="button" onClick={handleSave} isDisabled={isPending}>
+          <Button
+            type="button"
+            onClick={handleSave}
+            isDisabled={isPending || !isDirty}
+          >
             {isPending ? t('savingButton') : t('saveButton')}
           </Button>
         </div>

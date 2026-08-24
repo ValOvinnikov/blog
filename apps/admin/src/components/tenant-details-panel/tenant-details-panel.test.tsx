@@ -178,6 +178,7 @@ describe(TenantDetailsPanel, () => {
       const tenant = makeTenant();
       render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
 
+      await user.type(screen.getByRole('textbox', { name: 'Name' }), '!');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
       expect(
@@ -198,6 +199,7 @@ describe(TenantDetailsPanel, () => {
       const tenant = makeTenant();
       render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
 
+      await user.type(screen.getByRole('textbox', { name: 'Name' }), '!');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
       await screen.findByText('Enter a tenant name.');
 
@@ -217,6 +219,48 @@ describe(TenantDetailsPanel, () => {
       expect(slugInput).toHaveAccessibleDescription('');
     });
 
+    it('shows a success alert after a successful save, and clears it once editing resumes', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: true,
+        tenant: makeTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
+      });
+      const user = userEvent.setup();
+      const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
+      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
+
+      await user.clear(screen.getByRole('textbox', { name: 'Name' }));
+      await user.type(
+        screen.getByRole('textbox', { name: 'Name' }),
+        'Acme Renamed',
+      );
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(await screen.findByRole('status')).toHaveTextContent(
+        'Tenant details saved.',
+      );
+
+      await user.type(screen.getByRole('textbox', { name: 'Name' }), ' again');
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
+
+    it('does not show a success alert when saving fails', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: false,
+        fieldErrors: { slug: 'This slug is already in use.' },
+      });
+      const user = userEvent.setup();
+      const tenant = makeTenant();
+      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
+
+      await user.type(screen.getByRole('textbox', { name: 'Name' }), '!');
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(
+        await screen.findByText('This slug is already in use.'),
+      ).toBeVisible();
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
+
     it('shows the form-level provisioning-started error and does not refresh, without a successful save', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,
@@ -227,6 +271,7 @@ describe(TenantDetailsPanel, () => {
       const tenant = makeTenant();
       render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
 
+      await user.type(screen.getByRole('textbox', { name: 'Name' }), '!');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
       expect(
@@ -235,6 +280,106 @@ describe(TenantDetailsPanel, () => {
         ),
       ).toBeVisible();
       expect(refreshMock).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Save button dirty-state gating', () => {
+    it('is disabled when the form is pristine', () => {
+      const tenant = makeTenant();
+      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
+
+      expect(
+        screen.getByRole('button', { name: 'Save changes' }),
+      ).toBeDisabled();
+    });
+
+    it('enables once a field is edited, and disables again once edited back to the original value', async () => {
+      const user = userEvent.setup();
+      const tenant = makeTenant({ name: 'Acme Inc.' });
+      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
+
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+
+      await user.clear(nameInput);
+      await user.type(nameInput, 'Acme Renamed');
+      expect(
+        screen.getByRole('button', { name: 'Save changes' }),
+      ).toBeEnabled();
+
+      await user.clear(nameInput);
+      await user.type(nameInput, 'Acme Inc.');
+      expect(
+        screen.getByRole('button', { name: 'Save changes' }),
+      ).toBeDisabled();
+    });
+
+    it('stays disabled while a save is in flight, even with dirty values', async () => {
+      let resolveAction: (value: {
+        ok: true;
+        tenant: ReturnType<typeof makeTenant>;
+      }) => void = () => {};
+      updateTenantDetailsActionMock.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveAction = resolve;
+          }),
+      );
+      const user = userEvent.setup();
+      const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
+      render(<TenantDetailsPanel tenant={tenant} isEditable={true} />);
+
+      await user.clear(screen.getByRole('textbox', { name: 'Name' }));
+      await user.type(
+        screen.getByRole('textbox', { name: 'Name' }),
+        'Acme Renamed',
+      );
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(
+        await screen.findByRole('button', { name: 'Saving…' }),
+      ).toBeDisabled();
+
+      resolveAction({
+        ok: true,
+        tenant: makeTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
+      });
+      await waitFor(() => expect(refreshMock).toHaveBeenCalled());
+    });
+
+    it('returns to disabled after a successful save applies the refreshed tenant', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: true,
+        tenant: makeTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
+      });
+      const user = userEvent.setup();
+      const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
+      const { rerender } = rtlRender(
+        withIntl(<TenantDetailsPanel tenant={tenant} isEditable={true} />),
+      );
+
+      await user.clear(screen.getByRole('textbox', { name: 'Name' }));
+      await user.type(
+        screen.getByRole('textbox', { name: 'Name' }),
+        'Acme Renamed',
+      );
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() => expect(refreshMock).toHaveBeenCalled());
+
+      // Stands in for `router.refresh()` causing the parent Server Component
+      // to re-fetch and pass down the now-persisted tenant.
+      rerender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={makeTenant({ id: 'tenant-1', name: 'Acme Renamed' })}
+            isEditable={true}
+          />,
+        ),
+      );
+
+      expect(
+        await screen.findByRole('button', { name: 'Save changes' }),
+      ).toBeDisabled();
     });
   });
 
