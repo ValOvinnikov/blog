@@ -316,10 +316,12 @@ describe(ProvisioningStatusView, () => {
       />,
     );
 
-    expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1);
+    expect(
+      screen.getAllByRole('button', { name: 'Retry provisioning' }),
+    ).toHaveLength(1);
     expect(
       within(screen.getByRole('complementary')).queryByRole('button', {
-        name: 'Retry',
+        name: 'Retry provisioning',
       }),
     ).not.toBeInTheDocument();
     // One "Failed" per the DEPLOY_STUDIO step's visually-hidden sidebar
@@ -463,7 +465,9 @@ describe(ProvisioningStatusView, () => {
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Retry provisioning' }),
+    );
 
     await waitFor(() => {
       expect(retryProvisioningStepActionMock).toHaveBeenCalledWith('tenant-1');
@@ -822,25 +826,17 @@ describe(ProvisioningStatusView, () => {
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(3);
     });
 
-    it('resumes polling when Retry is pressed after polling has stopped', async () => {
+    it('keeps polling across a Retry even when the first post-retry tick still reflects the pre-retry snapshot', async () => {
+      const failedSteps = {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+          error: 'fetch failed',
+        },
+      };
       const tenant = makeTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'fetch failed',
-          },
-        },
-      });
-      getTenantProvisioningStatusActionMock.mockResolvedValue({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
+        provisioningSteps: failedSteps,
       });
       render(
         <ProvisioningStatusView
@@ -857,17 +853,47 @@ describe(ProvisioningStatusView, () => {
       });
       expect(getTenantProvisioningStatusActionMock).not.toHaveBeenCalled();
 
-      await act(async () => {
-        fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+      // A real GitHub Actions dispatch only acknowledges GitHub's receipt of
+      // the request — it does not wait for a runner to actually pick up the
+      // job, which routinely takes longer than one poll interval. Model
+      // that: the very next tick after Retry still reports the exact same
+      // failed-and-nothing-running snapshot as before the click.
+      getTenantProvisioningStatusActionMock.mockResolvedValueOnce({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningSteps: failedSteps,
+      });
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        },
       });
 
+      await act(async () => {
+        fireEvent.click(
+          screen.getByRole('button', { name: 'Retry provisioning' }),
+        );
+      });
+
+      // First tick after Retry: still the stale, unchanged snapshot.
+      // Polling must NOT stop on this — it hasn't yet observed the retry
+      // taking effect.
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(1);
 
-      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
-        'tenant-1',
-      );
+      // Second tick: the retried workflow has now actually started —
+      // polling picks up the change.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(2);
+      const sidebar = screen.getByRole('complementary');
+      expect(within(sidebar).getByText('Running…')).toBeVisible();
     });
 
     it('stops polling once the component unmounts', async () => {

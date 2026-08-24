@@ -237,8 +237,8 @@
       "DONE": "Done",
       "FAILED": "Failed"
     },
-    "retryButton": "Retry",
-    "retryingButton": "Retrying…",
+    "retryButton": "Retry provisioning",
+    "retryingButton": "Retrying provisioning…",
     "startButton": "Start provisioning",
     "startingButton": "Starting…",
     "errorKind": {

@@ -83,10 +83,7 @@ const shouldContinuePolling = (
     return false;
   }
 
-  const statuses = STEP_ORDER.map(
-    (stepKey) =>
-      steps?.[stepKey]?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE,
-  );
+  const statuses = stepStatusesFor(steps);
   const hasRunningStep = statuses.includes(
     TENANT_PROVISIONING_STEP_STATUS.RUNNING,
   );
@@ -101,6 +98,19 @@ const shouldContinuePolling = (
   // directly rather than off the column.
   return !(hasFailedStep && !hasRunningStep);
 };
+
+const stepStatusesFor = (
+  steps: TTenantProvisioningSteps | null,
+): TTenantProvisioningStepStatus[] =>
+  STEP_ORDER.map(
+    (stepKey) =>
+      steps?.[stepKey]?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE,
+  );
+
+const stepStatusesEqual = (
+  a: TTenantProvisioningStepStatus[],
+  b: TTenantProvisioningStepStatus[],
+): boolean => a.length === b.length && a.every((status, i) => status === b[i]);
 
 const isTerminalDomainVerificationStatus = (
   status: TDomainVerificationStatus,
@@ -150,16 +160,21 @@ export const ProvisioningStatusView = ({
     useState<TTenantProvisioningStatus | null>(tenant.provisioningStatus);
   const [provisioningSteps, setProvisioningSteps] =
     useState<TTenantProvisioningSteps | null>(tenant.provisioningSteps);
-  // Distinct from `provisioningStatus`/`provisioningSteps` above: this is
-  // the poll loop's own on/off switch, not a copy of server data. It can
-  // only ever be turned off by a poll tick's own fresh read (see the effect
-  // below) — a stale `tenant` prop refresh (e.g. right after Retry, before
-  // the re-dispatched workflow has actually started) is never allowed to
-  // turn it off, only ever on, or a retry immediately after a stop would
-  // silently fail to resume watching.
+  // The poll loop's own on/off switch — only a poll tick may turn it off.
   const [isPollingActive, setIsPollingActive] = useState(() =>
     shouldContinuePolling(tenant.provisioningStatus, tenant.provisioningSteps),
   );
+  // Non-null while waiting to see the retried/started workflow actually take
+  // effect: the snapshot of step statuses as of the moment Retry/Start was
+  // pressed. A dispatch only acknowledges GitHub's receipt of the request,
+  // not a runner picking it up — often well past one poll interval — so the
+  // very next tick usually still reflects this same pre-retry snapshot. The
+  // poll tick keeps polling active against an unchanged snapshot and only
+  // resumes normal stop/continue decisions once the fetched steps genuinely
+  // differ from it.
+  const [pendingRetryBaseline, setPendingRetryBaseline] = useState<
+    TTenantProvisioningStepStatus[] | null
+  >(null);
   const [renderedDomainStatus, setRenderedDomainStatus] = useState(
     domainVerificationStatus,
   );
@@ -235,6 +250,21 @@ export const ProvisioningStatusView = ({
         }
         setProvisioningStatus(result.provisioningStatus);
         setProvisioningSteps(result.provisioningSteps);
+
+        const freshStatuses = stepStatusesFor(result.provisioningSteps);
+        if (
+          pendingRetryBaseline &&
+          stepStatusesEqual(freshStatuses, pendingRetryBaseline)
+        ) {
+          // Unchanged since Retry/Start was pressed — the dispatch only
+          // confirms GitHub received the request, not that a runner has
+          // picked it up yet, so this read alone can't tell "never" apart
+          // from "not yet". Keep watching rather than stop on a snapshot
+          // that predates the retry.
+          return;
+        }
+
+        setPendingRetryBaseline(null);
         setIsPollingActive(
           shouldContinuePolling(
             result.provisioningStatus,
@@ -248,7 +278,7 @@ export const ProvisioningStatusView = ({
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [tenant.id, isPollingActive]);
+  }, [tenant.id, isPollingActive, pendingRetryBaseline]);
 
   useEffect(() => {
     if (isTerminalDomainVerificationStatus(domainStatus)) {
@@ -272,18 +302,15 @@ export const ProvisioningStatusView = ({
     };
   }, [tenant.id, domainStatus]);
 
-  const stepStatuses = STEP_ORDER.map(
-    (stepKey) =>
-      provisioningSteps?.[stepKey]?.status ??
-      TENANT_PROVISIONING_STEP_STATUS.IDLE,
-  );
+  const stepStatuses = stepStatusesFor(provisioningSteps);
   const allIdle = stepStatuses.every(
     (status) => status === TENANT_PROVISIONING_STEP_STATUS.IDLE,
   );
-  const overallStepStatus =
-    OVERALL_STATUS_PRIORITY.find((candidate) =>
-      stepStatuses.includes(candidate),
-    ) ?? TENANT_PROVISIONING_STEP_STATUS.DONE;
+  // `OVERALL_STATUS_PRIORITY` covers every possible step status, so this
+  // always matches — there is no real "not found" case to fall back from.
+  const overallStepStatus = OVERALL_STATUS_PRIORITY.find((candidate) =>
+    stepStatuses.includes(candidate),
+  ) as TTenantProvisioningStepStatus;
   const isOverallFailed =
     overallStepStatus === TENANT_PROVISIONING_STEP_STATUS.FAILED;
   const failedStepError = isOverallFailed
@@ -298,10 +325,12 @@ export const ProvisioningStatusView = ({
 
   const handleRetry = () => {
     setIsRetrying(true);
-    // Force polling back on immediately — the re-dispatched workflow hasn't
-    // actually started yet, so the derived steps/status still look exactly
-    // like the stopped state this button is meant to escape.
+    // Force polling back on immediately, and record what the steps look
+    // like right now — the re-dispatched workflow hasn't actually started
+    // yet, so the poll tick needs this snapshot to recognise "no change
+    // observed yet" and keep watching instead of stopping again on it.
     setIsPollingActive(true);
+    setPendingRetryBaseline(stepStatuses);
     startTransition(async () => {
       await retryProvisioningStepAction(tenant.id);
       router.refresh();
@@ -312,6 +341,7 @@ export const ProvisioningStatusView = ({
   const handleStart = () => {
     setIsStarting(true);
     setIsPollingActive(true);
+    setPendingRetryBaseline(stepStatuses);
     startTransition(async () => {
       await retryProvisioningStepAction(tenant.id);
       router.refresh();
