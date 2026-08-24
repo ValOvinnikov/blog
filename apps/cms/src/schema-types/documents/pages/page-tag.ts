@@ -14,7 +14,7 @@ import { defineField, defineType, type ValidationContext } from 'sanity';
 const TAG_UNIQUENESS_API_VERSION = '2024-01-01';
 const tagSlugUrlPreviewInput = createSlugUrlPreviewInput('/tags/');
 
-type TTagReferenceValue = { _ref?: string } | undefined;
+type TReferenceValue = { _ref?: string } | undefined;
 
 /**
  * Rejects a second `page_tag` referencing an already-covered `blog_tag` —
@@ -22,7 +22,7 @@ type TTagReferenceValue = { _ref?: string } | undefined;
  * unpublished conflicting page still counts.
  */
 const validateUniqueTagReference = async (
-  value: TTagReferenceValue,
+  value: TReferenceValue,
   context: ValidationContext,
 ): Promise<string | true> => {
   if (!value?._ref) return true;
@@ -42,6 +42,36 @@ const validateUniqueTagReference = async (
 
   return conflictingCount > 0
     ? 'Another Tag Page already references this tag — each tag can only back one Tag Page.'
+    : true;
+};
+
+/**
+ * Rejects a second `page_tag` referencing an already-used `module_postList`
+ * — `posts.query.ts` correlates a postList back to its owning page_tag via
+ * an unindexed lookup, which would pick an arbitrary owner if two pages
+ * shared one list. Mirrors `validateUniqueTagReference` exactly.
+ */
+const validateUniquePostListReference = async (
+  value: TReferenceValue,
+  context: ValidationContext,
+): Promise<string | true> => {
+  if (!value?._ref) return true;
+
+  const publishedId = context.document?._id.replace(/^drafts\./, '');
+
+  if (!publishedId) return true;
+
+  const client = context
+    .getClient({ apiVersion: TAG_UNIQUENESS_API_VERSION })
+    .withConfig({ perspective: 'drafts' });
+
+  const conflictingCount = await client.fetch<number>(
+    `count(*[_type == $type && postList._ref == $postListId && !(_id in [$publishedId, "drafts." + $publishedId])])`,
+    { type: PAGE_TAG_TYPE, postListId: value._ref, publishedId },
+  );
+
+  return conflictingCount > 0
+    ? 'Another Tag Page already references this Post List — each Post List can only back one Tag Page.'
     : true;
 };
 
@@ -83,6 +113,7 @@ export const pageTagSchema = defineType({
       description:
         'The paginated post archive, scoped to this tag, rendered on this page.',
       to: [{ type: postListSchema.name }],
+      validation: (rule) => rule.custom(validateUniquePostListReference),
     }),
     defineModulesField({
       allow: [postLatestSchema.name, ctaSchema.name, newsletterSchema.name],
