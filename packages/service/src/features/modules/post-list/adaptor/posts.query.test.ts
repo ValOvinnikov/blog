@@ -41,4 +41,16 @@ describe('postListModulePaginatedPostsQuery', () => {
       '!defined(*[_type == "page_tag" && postList._ref == $id][0]._id)',
     );
   });
+
+  it('scopes posts to the enclosing page_topic when one references this module as its postList', () => {
+    expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
+      '*[_type == "page_topic" && postList._ref == $id][0].topic._ref',
+    );
+  });
+
+  it('stays unscoped when no page_topic references this module', () => {
+    expect(postListModulePaginatedPostsQuery(1, 9).query).toContain(
+      '!defined(*[_type == "page_topic" && postList._ref == $id][0]._id)',
+    );
+  });
 });
