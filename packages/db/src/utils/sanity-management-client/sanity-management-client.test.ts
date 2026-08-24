@@ -1,6 +1,7 @@
 import {
   archiveSanityProject,
   deleteSanityProject,
+  unarchiveSanityProject,
 } from './sanity-management-client';
 
 const fetchMock = vi.fn();
@@ -23,7 +24,7 @@ describe(deleteSanityProject, () => {
       projectId: 'proj123',
     });
 
-    expect(result).toEqual({ alreadyGone: false });
+    expect(result).toEqual({ outcome: 'deleted' });
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(url).toBe('https://api.sanity.io/v2021-06-07/projects/proj123');
     expect(init.method).toBe('DELETE');
@@ -37,7 +38,7 @@ describe(deleteSanityProject, () => {
       projectId: 'proj123',
     });
 
-    expect(result).toEqual({ alreadyGone: true });
+    expect(result).toEqual({ outcome: 'already-gone' });
   });
 
   it('throws with the response status and body on failure', async () => {
@@ -48,7 +49,7 @@ describe(deleteSanityProject, () => {
     ).rejects.toThrow(/403/);
   });
 
-  it('reports blockedByBillingPermission on the org-billing 401, without throwing', async () => {
+  it('reports blocked-by-billing-permission on the org-billing 401, without throwing', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -66,10 +67,7 @@ describe(deleteSanityProject, () => {
       projectId: 'proj123',
     });
 
-    expect(result).toEqual({
-      alreadyGone: false,
-      blockedByBillingPermission: true,
-    });
+    expect(result).toEqual({ outcome: 'blocked-by-billing-permission' });
   });
 
   it('still throws on a 401 unrelated to billing permission', async () => {
@@ -158,6 +156,76 @@ describe(archiveSanityProject, () => {
 
     await expect(
       archiveSanityProject({ token: 'mgmt-token', projectId: 'proj123' }),
+    ).rejects.toThrow(/500/);
+  });
+});
+
+describe(unarchiveSanityProject, () => {
+  it('GETs the project, then PATCHes isDisabledByUser to false when currently archived', async () => {
+    fetchMock
+      .mockResolvedValueOnce(projectResponse(true))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ isDisabledByUser: false }), {
+          status: 200,
+        }),
+      );
+
+    const result = await unarchiveSanityProject({
+      token: 'mgmt-token',
+      projectId: 'proj123',
+    });
+
+    expect(result).toEqual({ outcome: 'unarchived' });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    const [patchUrl, patchInit] = fetchMock.mock.calls[1] as [
+      string,
+      RequestInit,
+    ];
+    expect(patchUrl).toBe('https://api.sanity.io/v2021-06-07/projects/proj123');
+    expect(patchInit.method).toBe('PATCH');
+    expect(patchInit.body).toBe(JSON.stringify({ isDisabledByUser: false }));
+  });
+
+  it('is idempotent — skips the PATCH when the project is already active', async () => {
+    fetchMock.mockResolvedValueOnce(projectResponse(false));
+
+    const result = await unarchiveSanityProject({
+      token: 'mgmt-token',
+      projectId: 'proj123',
+    });
+
+    expect(result).toEqual({ outcome: 'already-active' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('treats a 404 on the GET as already gone rather than an error', async () => {
+    fetchMock.mockResolvedValueOnce(new Response('not found', { status: 404 }));
+
+    const result = await unarchiveSanityProject({
+      token: 'mgmt-token',
+      projectId: 'proj123',
+    });
+
+    expect(result).toEqual({ outcome: 'already-gone' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('throws when the GET fails for a reason other than 404', async () => {
+    fetchMock.mockResolvedValueOnce(new Response('forbidden', { status: 403 }));
+
+    await expect(
+      unarchiveSanityProject({ token: 'mgmt-token', projectId: 'proj123' }),
+    ).rejects.toThrow(/403/);
+  });
+
+  it('throws when the PATCH fails', async () => {
+    fetchMock
+      .mockResolvedValueOnce(projectResponse(true))
+      .mockResolvedValueOnce(new Response('server error', { status: 500 }));
+
+    await expect(
+      unarchiveSanityProject({ token: 'mgmt-token', projectId: 'proj123' }),
     ).rejects.toThrow(/500/);
   });
 });

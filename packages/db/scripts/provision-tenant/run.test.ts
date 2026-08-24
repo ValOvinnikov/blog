@@ -11,6 +11,9 @@ import { runSteps } from './run';
 const { reactivateTenantMock } = vi.hoisted(() => ({
   reactivateTenantMock: vi.fn(),
 }));
+const { unarchiveSanityProjectMock } = vi.hoisted(() => ({
+  unarchiveSanityProjectMock: vi.fn(),
+}));
 const { reportStepStatusMock } = vi.hoisted(() => ({
   reportStepStatusMock: vi.fn(),
 }));
@@ -36,6 +39,12 @@ const { createTenantRevalidateWebhookMock } = vi.hoisted(() => ({
 vi.mock('@blog/db/queries/tenants', () => ({
   reactivateTenant: reactivateTenantMock,
 }));
+vi.mock(
+  '@blog/db/utils/sanity-management-client/sanity-management-client',
+  () => ({
+    unarchiveSanityProject: unarchiveSanityProjectMock,
+  }),
+);
 vi.mock('./lib/report-step-status', () => ({
   reportStepStatus: reportStepStatusMock,
 }));
@@ -84,6 +93,9 @@ beforeEach(() => {
   reactivateTenantMock
     .mockReset()
     .mockResolvedValue({ ok: true, data: baseTenant });
+  unarchiveSanityProjectMock
+    .mockReset()
+    .mockResolvedValue({ outcome: 'unarchived' });
   reportStepStatusMock.mockReset().mockResolvedValue(undefined);
   createTenantSanityProjectMock.mockReset();
   seedTenantContentMock.mockReset().mockResolvedValue(undefined);
@@ -233,6 +245,54 @@ describe(runSteps, () => {
       .calls[0] as [TTenant];
     expect(tenantSeenBySanityProject.status).toBe(TENANT_STATUS.ACTIVE);
     expect(tenantSeenBySanityProject.deprovisionedAt).toBeNull();
+  });
+
+  it("un-archives a re-provisioned tenant's existing Sanity project before any step runs", async () => {
+    reactivateTenantMock.mockResolvedValue({
+      ok: true,
+      data: { ...baseTenant, sanityProjectId: 'proj-abc' },
+    });
+    createTenantSanityProjectMock.mockResolvedValue({});
+    createTenantStudioMock.mockResolvedValue({});
+
+    const result = await runSteps('tenant-1', env);
+
+    expect(result).toEqual({ ok: true });
+    expect(unarchiveSanityProjectMock).toHaveBeenCalledWith({
+      token: 'sanity-token',
+      projectId: 'proj-abc',
+    });
+    // Un-archiving happens before the first step reports RUNNING.
+    const [unarchiveCallOrder] =
+      unarchiveSanityProjectMock.mock.invocationCallOrder;
+    const [firstReportCallOrder] =
+      reportStepStatusMock.mock.invocationCallOrder;
+    expect(unarchiveCallOrder).toBeDefined();
+    expect(firstReportCallOrder).toBeDefined();
+    expect(unarchiveCallOrder).toBeLessThan(firstReportCallOrder as number);
+  });
+
+  it('does not attempt to un-archive a first-time provision with no existing Sanity project', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+    createTenantStudioMock.mockResolvedValue({});
+
+    await runSteps('tenant-1', env);
+
+    expect(unarchiveSanityProjectMock).not.toHaveBeenCalled();
+  });
+
+  it('stops before any step when un-archiving the Sanity project fails', async () => {
+    reactivateTenantMock.mockResolvedValue({
+      ok: true,
+      data: { ...baseTenant, sanityProjectId: 'proj-abc' },
+    });
+    unarchiveSanityProjectMock.mockRejectedValue(new Error('network error'));
+
+    const result = await runSteps('tenant-1', env);
+
+    expect(result).toEqual({ ok: false });
+    expect(createTenantSanityProjectMock).not.toHaveBeenCalled();
+    expect(reportStepStatusMock).not.toHaveBeenCalled();
   });
 
   it('stops before any step when reactivateTenant fails', async () => {

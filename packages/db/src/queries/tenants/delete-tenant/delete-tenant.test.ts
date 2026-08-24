@@ -251,6 +251,27 @@ describe('deleteTenant — Sanity project deletion', () => {
     expect(result).toEqual({ outcome: 'deleted', sanityProject: 'deleted' });
   });
 
+  it('reports already-gone (not deleted) and still hard-deletes the row on a 404', async () => {
+    fetchMock.mockResolvedValue(new Response('not found', { status: 404 }));
+    const tenantId = await insertTenant({
+      archived: true,
+      sanityProjectId: 'proj123',
+    });
+
+    const result = await deleteTenant(tenantId, 'mgmt-token');
+
+    expect(result).toEqual({
+      outcome: 'deleted',
+      sanityProject: 'already-gone',
+    });
+
+    const remaining = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(remaining).toEqual([]);
+  });
+
   it('still hard-deletes the row and reports left-archived on the org-billing 401', async () => {
     fetchMock.mockResolvedValue(
       new Response(
@@ -282,7 +303,7 @@ describe('deleteTenant — Sanity project deletion', () => {
     expect(remaining).toEqual([]);
   });
 
-  it('still throws on a Sanity failure unrelated to billing permission', async () => {
+  it('still throws on a Sanity failure unrelated to billing permission, and leaves the row untouched', async () => {
     fetchMock.mockResolvedValue(new Response('forbidden', { status: 403 }));
     const tenantId = await insertTenant({
       archived: true,
@@ -290,5 +311,11 @@ describe('deleteTenant — Sanity project deletion', () => {
     });
 
     await expect(deleteTenant(tenantId, 'mgmt-token')).rejects.toThrow(/403/);
+
+    const remaining = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(remaining).toHaveLength(1);
   });
 });

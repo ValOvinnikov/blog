@@ -4,15 +4,20 @@ import { deleteSanityProject } from '@blog/db/utils/sanity-management-client/san
 import { eq } from 'drizzle-orm';
 
 // What happened to the tenant's still-existing (archived by deprovisioning)
-// Sanity project during a permanent delete. `deleted` and `left-archived`
-// only differ in whether Sanity's org-billing-permission gate blocked the
-// call — both are reachable, non-exceptional outcomes, never conflated with
-// each other by the type. `no-project` covers a tenant that never had one
-// (or was already fully deleted). `skipped-no-token` is what happens on
-// every call today: no caller currently supplies `sanityManagementToken`,
-// so the archived project is left exactly as deprovisioning left it.
+// Sanity project during a permanent delete. `deleted` and `already-gone`
+// (a 404 — nothing left to delete) are kept distinct rather than folded
+// together, same as `left-archived` is kept distinct from both — none of
+// the three is "as good as deleted" from a caller's point of view.
+// `no-project` covers a tenant that never had one. `skipped-no-token` is
+// what happens on every call today: no caller currently supplies
+// `sanityManagementToken`, so the archived project is left exactly as
+// deprovisioning left it.
 export type TDeleteTenantSanityProjectOutcome =
-  'deleted' | 'left-archived' | 'no-project' | 'skipped-no-token';
+  | 'deleted'
+  | 'already-gone'
+  | 'left-archived'
+  | 'no-project'
+  | 'skipped-no-token';
 
 export type TDeleteTenantResult =
   | { outcome: 'deleted'; sanityProject: TDeleteTenantSanityProjectOutcome }
@@ -61,9 +66,10 @@ export async function deleteTenant(
         token: sanityManagementToken,
         projectId: existing.sanityProjectId,
       });
-      sanityProject = result.blockedByBillingPermission
-        ? 'left-archived'
-        : 'deleted';
+      sanityProject =
+        result.outcome === 'blocked-by-billing-permission'
+          ? 'left-archived'
+          : result.outcome;
     } else {
       sanityProject = 'skipped-no-token';
     }

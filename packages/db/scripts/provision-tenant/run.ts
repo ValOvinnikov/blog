@@ -20,6 +20,7 @@ import {
 } from '@blog/db/constants';
 import { reactivateTenant } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-management-client';
 
 import { loadProvisionEnv, type TProvisionEnv } from './lib/env';
 import { reportStepStatus } from './lib/report-step-status';
@@ -76,8 +77,8 @@ export async function runSteps(
   tenantId: string,
   env: TProvisionEnv,
 ): Promise<{ ok: boolean }> {
-  // Un-archives a re-provisioned tenant before any step runs, so it stays
-  // deprovisionable and slug-resolvable once this run succeeds — see
+  // Reactivates a re-provisioned tenant's row before any step runs, so it
+  // stays deprovisionable and slug-resolvable once this run succeeds — see
   // `reactivateTenant` for why a SUSPENDED tenant is left untouched.
   const reactivateResult = await reactivateTenant(tenantId);
   if (!reactivateResult.ok) {
@@ -88,6 +89,25 @@ export async function runSteps(
   }
 
   let tenant = reactivateResult.data;
+
+  // A re-provisioned tenant already has a `sanityProjectId` from its first
+  // run — deprovisioning archived that project (blocking its API/CDN
+  // access) rather than deleting it, so without this the tenant row now
+  // reads ACTIVE while its content API is still blocked. Idempotent, and a
+  // no-op for a first-time provision (no project yet).
+  if (tenant.sanityProjectId) {
+    try {
+      await unarchiveSanityProject({
+        token: env.sanityManagementToken,
+        projectId: tenant.sanityProjectId,
+      });
+    } catch (error) {
+      console.error(
+        `provision-tenant: failed to un-archive Sanity project "${tenant.sanityProjectId}" for tenant "${tenantId}": ${sanitizeLogMessage(error)}`,
+      );
+      return { ok: false };
+    }
+  }
 
   for (const step of STEPS) {
     await reportStepStatus({

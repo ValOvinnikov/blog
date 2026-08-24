@@ -4,11 +4,13 @@
 const SANITY_MANAGEMENT_API_BASE = 'https://api.sanity.io/v2021-06-07';
 
 export type TSanityDeleteResult = {
-  alreadyGone: boolean;
-  // True when Sanity rejected the deletion specifically because it requires
-  // org billing permission — a permission scope `SANITY_MANAGEMENT_TOKEN`
-  // deliberately doesn't have. Every other failure still throws.
-  blockedByBillingPermission?: boolean;
+  outcome:
+    | 'deleted'
+    | 'already-gone'
+    // Sanity rejected the deletion specifically because it requires org
+    // billing permission — a permission scope `SANITY_MANAGEMENT_TOKEN`
+    // deliberately doesn't have. Every other failure still throws.
+    | 'blocked-by-billing-permission';
 };
 
 export async function deleteSanityProject(input: {
@@ -24,13 +26,13 @@ export async function deleteSanityProject(input: {
   );
 
   if (response.status === 404) {
-    return { alreadyGone: true };
+    return { outcome: 'already-gone' };
   }
 
   if (response.status === 401) {
     const body = await response.text().catch(() => '');
     if (body.toLowerCase().includes('billing permission')) {
-      return { alreadyGone: false, blockedByBillingPermission: true };
+      return { outcome: 'blocked-by-billing-permission' };
     }
     throw new Error(
       `Sanity Management API DELETE /projects/${input.projectId} failed: ${response.status} ${body}`,
@@ -44,30 +46,28 @@ export async function deleteSanityProject(input: {
     );
   }
 
-  return { alreadyGone: false };
+  return { outcome: 'deleted' };
 }
-
-export type TSanityArchiveResult = {
-  outcome: 'archived' | 'already-archived' | 'already-gone';
-};
 
 // `isDisabledByUser` is the archive flag Sanity's Manage UI itself writes —
 // confirmed against the live API (a project it lists as Archived reads
 // `isDisabledByUser: true`, `isDisabled: false`). Unlike project deletion,
-// PATCHing it does not require org billing permission, so archiving is not
-// tolerant of that failure the way `deleteSanityProject` is — any non-2xx
-// here throws.
-export async function archiveSanityProject(input: {
+// PATCHing it does not require org billing permission, so neither direction
+// tolerates that failure the way `deleteSanityProject` does — any non-2xx
+// here throws. Shared by `archiveSanityProject`/`unarchiveSanityProject`,
+// which only differ in the target value and how they label the outcome.
+async function setSanityProjectDisabledByUser(input: {
   token: string;
   projectId: string;
-}): Promise<TSanityArchiveResult> {
+  disabled: boolean;
+}): Promise<'changed' | 'already-in-state' | 'already-gone'> {
   const getResponse = await fetch(
     `${SANITY_MANAGEMENT_API_BASE}/projects/${input.projectId}`,
     { headers: { Authorization: `Bearer ${input.token}` } },
   );
 
   if (getResponse.status === 404) {
-    return { outcome: 'already-gone' };
+    return 'already-gone';
   }
 
   if (!getResponse.ok) {
@@ -78,8 +78,8 @@ export async function archiveSanityProject(input: {
   }
 
   const project = (await getResponse.json()) as { isDisabledByUser?: boolean };
-  if (project.isDisabledByUser) {
-    return { outcome: 'already-archived' };
+  if (Boolean(project.isDisabledByUser) === input.disabled) {
+    return 'already-in-state';
   }
 
   const patchResponse = await fetch(
@@ -90,7 +90,7 @@ export async function archiveSanityProject(input: {
         Authorization: `Bearer ${input.token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ isDisabledByUser: true }),
+      body: JSON.stringify({ isDisabledByUser: input.disabled }),
     },
   );
 
@@ -101,5 +101,45 @@ export async function archiveSanityProject(input: {
     );
   }
 
+  return 'changed';
+}
+
+export type TSanityArchiveResult = {
+  outcome: 'archived' | 'already-archived' | 'already-gone';
+};
+
+export async function archiveSanityProject(input: {
+  token: string;
+  projectId: string;
+}): Promise<TSanityArchiveResult> {
+  const result = await setSanityProjectDisabledByUser({
+    ...input,
+    disabled: true,
+  });
+
+  if (result === 'already-gone') return { outcome: 'already-gone' };
+  if (result === 'already-in-state') return { outcome: 'already-archived' };
   return { outcome: 'archived' };
+}
+
+export type TSanityUnarchiveResult = {
+  outcome: 'unarchived' | 'already-active' | 'already-gone';
+};
+
+// Reverses `archiveSanityProject` for a re-provisioned tenant — see
+// `provision-tenant/run.ts`, called right after `reactivateTenant` flips the
+// `tenants` row back to ACTIVE, since without this the project's API/CDN
+// access stays blocked even though the row now reads active.
+export async function unarchiveSanityProject(input: {
+  token: string;
+  projectId: string;
+}): Promise<TSanityUnarchiveResult> {
+  const result = await setSanityProjectDisabledByUser({
+    ...input,
+    disabled: false,
+  });
+
+  if (result === 'already-gone') return { outcome: 'already-gone' };
+  if (result === 'already-in-state') return { outcome: 'already-active' };
+  return { outcome: 'unarchived' };
 }
