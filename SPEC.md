@@ -142,11 +142,16 @@ Full contract and migration mechanism: `.claude/agents/db.md`.
 `packages/db/scripts/provision-tenant/` talks to Sanity's Management API
 directly (via `@sanity/client` for content seeding, raw `fetch` for the
 project/dataset/CORS/webhook management calls) to create a new tenant's
-Sanity project/dataset/CORS entry, invite the tenant owner (resolved from
-their OWNER `memberships` row) as an Editor project member, seed its starter
+Sanity project/dataset/CORS entry, invite both the tenant owner (resolved
+from their OWNER `memberships` row, falling back to a pending OWNER
+`membership_invites` row) and the platform superadmin (the earliest-created
+`admins` row) as `administrator` project members, seed its starter
 content, and create a revalidation webhook (pointing at `apps/web`'s shared,
 already tenant-aware revalidate endpoint) during provisioning — the one
-place in this package that talks to Sanity rather than Neon.
+place in this package that talks to Sanity rather than Neon. Both invitees
+get `administrator` because the Free plan these projects run on exposes only
+`administrator` and `viewer` — the granular roles are paid-plan-only, and
+`viewer` cannot author content.
 Enforced by a dedicated `configs/eslint/db.js` override scoped to that
 directory; every other path in
 `@blog/db` keeps the blanket prohibition.

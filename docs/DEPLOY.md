@@ -283,12 +283,6 @@ few secrets/vars nothing else in this repo has needed yet:
       `organizationId` in the Management API's `POST /projects` body;
       without it the project is silently created in whichever org the
       token's owner defaults to, not necessarily this one.
-- [ ] Secret `TENANT_PROVISIONING_CALLBACK_SECRET` — a shared secret
-      (`openssl rand -hex 32`), **byte-identical** to `apps/admin`'s own
-      `TENANT_PROVISIONING_CALLBACK_SECRET` env var, only if `apps/admin`'s
-      `/api/provisioning/status-callback` route is still in use — the CI
-      provisioning script itself now writes each step's status directly to
-      Postgres and no longer calls that route.
 - [ ] Secret `TENANT_TOKEN_ENCRYPTION_KEY` — the **same** value already set
       as the `blog-prod`/`cms-prod`-adjacent Vercel env var of the same name
       (see the `@blog/db` env vars table above). `setTenantSanityToken`
