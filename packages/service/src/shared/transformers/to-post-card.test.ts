@@ -1,4 +1,5 @@
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { makeRawImage } from '@blog/service/testing/shared/fixtures';
 
 import { toPostCard } from './to-post-card';
 
@@ -29,14 +30,29 @@ describe('toPostCard', () => {
   });
 
   it('maps the author sub-object', () => {
-    const result = toPostCard(makeRawPostCard());
+    const result = toPostCard(
+      makeRawPostCard({
+        author: {
+          _id: 'author-1',
+          name: 'Jane Doe',
+          image: makeRawImage('Jane avatar'),
+          profilePage: { slug: 'jane-doe' },
+        },
+      }),
+    );
 
     expect(result.author).toEqual({
       id: 'author-1',
       name: 'Jane Doe',
-      slug: 'jane-doe',
+      profilePageSlug: 'jane-doe',
       imageUrl: expect.stringContaining('sanity.io'),
     });
+  });
+
+  it('maps a missing profilePage reference to an undefined profilePageSlug', () => {
+    const result = toPostCard(makeRawPostCard());
+
+    expect(result.author.profilePageSlug).toBeUndefined();
   });
 
   it('maps the topic', () => {

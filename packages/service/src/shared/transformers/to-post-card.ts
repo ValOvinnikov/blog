@@ -10,7 +10,7 @@ export type TRawPostCard = InferFragmentType<typeof postCardFragment>;
 export type TPostCardAuthor = {
   id: string;
   name: string;
-  slug: string;
+  profilePageSlug: TMaybeUndefined<string>;
   imageUrl: TMaybeUndefined<string>;
 };
 
@@ -39,7 +39,7 @@ function toPostCardAuthor(raw: TRawPostCard['author']): TPostCardAuthor {
   return {
     id: raw._id,
     name: raw.name,
-    slug: raw.slug,
+    profilePageSlug: raw.profilePage?.slug ?? undefined,
     imageUrl: buildImageUrl(raw.image),
   };
 }

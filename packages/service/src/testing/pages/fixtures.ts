@@ -20,6 +20,21 @@ import {
   makeRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
 
+export function makeRawAuthor(
+  overrides: Partial<TRawPostDetail['author']> = {},
+): TRawPostDetail['author'] {
+  return {
+    _id: 'author-1',
+    name: 'Jane Doe',
+    image: makeRawImage('Jane avatar'),
+    profilePage: null,
+    role: 'Writer',
+    bio: null,
+    socialLinks: null,
+    ...overrides,
+  };
+}
+
 export function makeRawPostCard(
   overrides: Partial<TRawPostCard> = {},
 ): TRawPostCard {
@@ -35,8 +50,8 @@ export function makeRawPostCard(
     author: {
       _id: 'author-1',
       name: 'Jane Doe',
-      slug: 'jane-doe',
       image: makeRawImage('Jane avatar'),
+      profilePage: null,
     },
     topic: {
       _id: 'topic-1',
@@ -87,15 +102,7 @@ export function makeRawPostDetail(
     body: [],
     skim: null,
     seo: null,
-    author: {
-      _id: 'author-1',
-      name: 'Jane Doe',
-      slug: 'jane-doe',
-      image: makeRawImage('Jane avatar'),
-      role: 'Writer',
-      bio: null,
-      socialLinks: null,
-    },
+    author: makeRawAuthor(),
     topic: {
       _id: 'topic-1',
       title: 'Engineering',

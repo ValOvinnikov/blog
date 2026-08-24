@@ -1,8 +1,6 @@
+import { makeRawTopic } from '@blog/service/testing/entities/fixtures';
 import {
   makeRawAuthor,
-  makeRawTopic,
-} from '@blog/service/testing/entities/fixtures';
-import {
   makeRawPostDetail,
   makeRawPostPage,
 } from '@blog/service/testing/pages/fixtures';

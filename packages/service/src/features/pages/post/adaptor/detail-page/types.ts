@@ -8,7 +8,7 @@ import type { TTopic } from '@blog/service/shared/transformers/to-topic';
 export type TPostDetailAuthor = {
   id: string;
   name: string;
-  slug: string;
+  profilePageSlug: TMaybeUndefined<string>;
   imageUrl: TMaybeUndefined<string>;
   role: TMaybeUndefined<string>;
   bio: TMaybeUndefined<BlockText>;

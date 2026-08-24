@@ -16,7 +16,6 @@ import { createNewsletterModuleService } from './features/modules/newsletter';
 import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
-import { createAuthorService } from './features/pages/author';
 import { createBlogService } from './features/pages/blog';
 import { createGenericPageService } from './features/pages/generic';
 import { createHomeService } from './features/pages/home';
@@ -39,7 +38,6 @@ export const service = {
     topicIndex: createTopicIndexService(),
     tag: createTagService(),
     tagIndex: createTagIndexService(),
-    author: createAuthorService(),
   },
   modules: {
     hero: createHeroModuleService(),
@@ -85,7 +83,6 @@ export type {
   TTaxonomyEntry,
   TTaxonomyListModule,
 } from './features/modules/taxonomy-list';
-export type { TAuthorDetail, TAuthorPage } from './features/pages/author';
 export type { TBlogIndexPage } from './features/pages/blog';
 export type { TGenericPage } from './features/pages/generic';
 export type { THomePage } from './features/pages/home';

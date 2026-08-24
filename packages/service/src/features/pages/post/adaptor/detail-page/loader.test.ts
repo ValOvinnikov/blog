@@ -79,8 +79,8 @@ describe('getPost', () => {
             author: {
               _id: 'author-9',
               name: 'Jane Doe',
-              slug: 'jane-doe',
               image: makeRawImage('Jane avatar'),
+              profilePage: { slug: 'jane-doe' },
               role: 'Editor',
               bio: null,
               socialLinks: null,
@@ -95,7 +95,7 @@ describe('getPost', () => {
     expect(result.author).toEqual({
       id: 'author-9',
       name: 'Jane Doe',
-      slug: 'jane-doe',
+      profilePageSlug: 'jane-doe',
       imageUrl: 'https://cdn.sanity.io/images/proj/dataset/og-800x600.jpg',
       role: 'Editor',
       bio: undefined,
@@ -113,8 +113,8 @@ describe('getPost', () => {
             author: {
               _id: 'author-9',
               name: 'Jane Doe',
-              slug: 'jane-doe',
               image: authorImage,
+              profilePage: { slug: 'jane-doe' },
               role: 'Editor',
               bio: null,
               socialLinks: null,
