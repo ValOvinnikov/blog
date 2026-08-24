@@ -3,7 +3,14 @@
 // robot tokens minted under it — nothing further to clean up separately.
 const SANITY_MANAGEMENT_API_BASE = 'https://api.sanity.io/v2021-06-07';
 
-export type TSanityDeleteResult = { alreadyGone: boolean };
+export type TSanityDeleteResult = {
+  alreadyGone: boolean;
+  // True when Sanity rejected the deletion specifically because it requires
+  // org billing permission — a permission scope `SANITY_MANAGEMENT_TOKEN`
+  // deliberately doesn't have (see `delete-sanity-project.ts`). Every other
+  // failure still throws.
+  blockedByBillingPermission?: boolean;
+};
 
 export async function deleteSanityProject(input: {
   token: string;
@@ -19,6 +26,16 @@ export async function deleteSanityProject(input: {
 
   if (response.status === 404) {
     return { alreadyGone: true };
+  }
+
+  if (response.status === 401) {
+    const body = await response.text().catch(() => '');
+    if (body.toLowerCase().includes('billing permission')) {
+      return { alreadyGone: false, blockedByBillingPermission: true };
+    }
+    throw new Error(
+      `Sanity Management API DELETE /projects/${input.projectId} failed: ${response.status} ${body}`,
+    );
   }
 
   if (!response.ok) {

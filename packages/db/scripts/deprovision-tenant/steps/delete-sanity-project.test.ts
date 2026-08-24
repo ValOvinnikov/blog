@@ -72,4 +72,23 @@ describe(deleteTenantSanityProject, () => {
 
     expect(deleteSanityProjectMock).not.toHaveBeenCalled();
   });
+
+  it('does not throw when deletion is blocked by org billing permission', async () => {
+    deleteSanityProjectMock.mockResolvedValue({
+      alreadyGone: false,
+      blockedByBillingPermission: true,
+    });
+
+    await expect(
+      deleteTenantSanityProject(baseTenant(), env),
+    ).resolves.toBeUndefined();
+  });
+
+  it('still throws on a non-billing-permission failure', async () => {
+    deleteSanityProjectMock.mockRejectedValue(new Error('network error'));
+
+    await expect(deleteTenantSanityProject(baseTenant(), env)).rejects.toThrow(
+      'network error',
+    );
+  });
 });

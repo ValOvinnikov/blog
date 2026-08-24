@@ -75,7 +75,7 @@ afterEach(async () => {
 });
 
 describe(clearTenantProvisioningArtifacts, () => {
-  it('nulls every Sanity/Studio provisioning column', async () => {
+  it('nulls every provisioning column except sanityProjectId', async () => {
     const tenantId = await insertProvisionedTenant();
 
     await clearTenantProvisioningArtifacts(tenantId);
@@ -86,13 +86,25 @@ describe(clearTenantProvisioningArtifacts, () => {
       .where(eq(tenants.id, tenantId));
 
     expect(row).toMatchObject({
-      sanityProjectId: null,
       sanityDataset: null,
       sanityReadTokenEncrypted: null,
       studioVercelProjectId: null,
       provisioningStatus: null,
       provisioningSteps: null,
     });
+  });
+
+  it('leaves sanityProjectId populated as the manual-deletion signal', async () => {
+    const tenantId = await insertProvisionedTenant();
+
+    await clearTenantProvisioningArtifacts(tenantId);
+
+    const [row] = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+
+    expect(row?.sanityProjectId).toBe('proj123');
   });
 
   it('leaves identity columns untouched', async () => {
