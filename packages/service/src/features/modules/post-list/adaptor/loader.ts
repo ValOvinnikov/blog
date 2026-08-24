@@ -23,7 +23,7 @@ export async function getPostList(
   // this module is used as one, so `page_tag` (and, mirroring
   // `tagPaginationParamsQuery`'s own ISR list, `tag`) rides along too.
   const rawPosts = await runQuery(
-    postListModulePaginatedPostsQuery(id, page, raw.pageSize),
+    postListModulePaginatedPostsQuery(page, raw.pageSize),
     {
       parameters: { id },
       ...isr(['posts', 'author', 'topic', 'page_tag', 'tag']),

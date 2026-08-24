@@ -3,15 +3,13 @@ import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-po
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 /**
- * Correlates posts back to the enclosing `page_tag`, given only the
- * `module_postList` document's own `$id` (unlike `tagPaginationParamsQuery`,
- * this query isn't nested inside a `page_tag` projection, so it can't reach
- * the parent via `^`). Looks up the `page_tag` (if any) whose `postList`
- * references this module: when none exists (the blog index's own
- * `postList`, or any other non-tag usage), the clause is a no-op and posts
- * stay unscoped; when one does, posts are scoped to that `page_tag`'s
- * `tag._ref`, matched by reference identity in `tags[]` — not slug, for the
- * same drift-safety reason as `tagPaginationParamsQuery`.
+ * Scopes posts to the enclosing `page_tag`'s tag when one references this
+ * module as its `postList` (a no-op otherwise, e.g. the blog index's own
+ * `postList`). Can't reach the parent via GROQ's `^` here — unlike
+ * `tagPaginationParamsQuery`, this query isn't nested inside a `page_tag`
+ * projection — so it looks the `page_tag` up by this module's `$id`
+ * instead, then matches by reference identity (not slug), same drift-safety
+ * reasoning as `tagPaginationParamsQuery`.
  */
 const TAG_SCOPE_FILTER =
   '(!defined(*[_type == "page_tag" && postList._ref == $id][0]._id) || references(*[_type == "page_tag" && postList._ref == $id][0].tag._ref))';
@@ -25,12 +23,11 @@ const posts = q.star
  * Windowed posts for the post-list archive, alongside the total match count
  * so the caller can compute total pages. Built per-request so `pageSize`
  * bounds the results in GROQ (end-exclusive `.slice(start, end)`) rather
- * than fetching the whole `blog_post` collection to slice in JS. `id` is the
- * `module_postList` document's own id, bound to `TAG_SCOPE_FILTER`'s `$id`
- * via the caller's `runQuery({ parameters: { id } })`.
+ * than fetching the whole `blog_post` collection to slice in JS. The
+ * `module_postList` document's own id binds `TAG_SCOPE_FILTER`'s `$id` via
+ * the caller's `runQuery(query, { parameters: { id } })`.
  */
 export function postListModulePaginatedPostsQuery(
-  id: string,
   page: number,
   pageSize: number,
 ) {

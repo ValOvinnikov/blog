@@ -1,5 +1,6 @@
 import { getAllPublishedPosts } from '@blog/service/features/entities/posts/adaptor/all-published.loader';
 import { getPostsByIds } from '@blog/service/features/entities/posts/adaptor/loader';
+import { getPublishedPostsByTag } from '@blog/service/features/entities/posts/adaptor/tag-scoped-published.loader';
 
 import { createPostsService } from './service';
 
@@ -14,6 +15,13 @@ vi.mock(
   }),
 );
 
+vi.mock(
+  '@blog/service/features/entities/posts/adaptor/tag-scoped-published.loader',
+  () => ({
+    getPublishedPostsByTag: vi.fn(),
+  }),
+);
+
 describe(createPostsService, () => {
   it('exposes v1.getPostsByIds as a function', () => {
     const svc = createPostsService();
@@ -23,6 +31,11 @@ describe(createPostsService, () => {
   it('exposes v1.getAllPublishedPosts as a function', () => {
     const svc = createPostsService();
     expect(typeof svc.v1.getAllPublishedPosts).toBe('function');
+  });
+
+  it('exposes v1.getPublishedPostsByTag as a function', () => {
+    const svc = createPostsService();
+    expect(typeof svc.v1.getPublishedPostsByTag).toBe('function');
   });
 
   it('calls the loader with no arguments', async () => {
@@ -44,5 +57,13 @@ describe(createPostsService, () => {
     await createPostsService().v1.getPostsByIds(['a'], tenant);
 
     expect(getPostsByIds).toHaveBeenCalledWith(['a'], tenant);
+  });
+
+  it('threads the tag id through to the tag-scoped loader', async () => {
+    vi.mocked(getPublishedPostsByTag).mockResolvedValue([]);
+
+    await createPostsService().v1.getPublishedPostsByTag('tag-1');
+
+    expect(getPublishedPostsByTag).toHaveBeenCalledWith('tag-1');
   });
 });
