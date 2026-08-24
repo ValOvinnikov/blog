@@ -4,6 +4,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantPlan,
 } from '@blog/db/constants';
+import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
@@ -83,62 +84,70 @@ export async function updateTenantDetails(
   // (see `createTenantDraft`'s `TDraftOwner` union) — not gated by
   // provisioning state, an invited owner can already have signed in and
   // been consumed into a real `memberships` row (see
-  // `consumeMembershipInvite`/`getTenantOwnerEmail`). Once that's happened,
-  // "editing the email" would silently transfer ownership to someone else,
-  // so it's refused as a distinct outcome instead.
+  // `consumeMembershipInvite`/`getTenantOwnerEmail`). A submitted email that
+  // matches the current owner (e.g. an unrelated name/slug edit resubmitting
+  // the same value) is a no-op for this concern; only a genuine change is
+  // treated as an ownership-transfer attempt and, once a real owner has
+  // joined, refused as a distinct outcome instead of silently reassigning it.
   let normalizedOwnerEmail: string | undefined;
   let ownerInviteId: string | undefined;
 
   if (input.ownerEmail !== undefined) {
     normalizedOwnerEmail = input.ownerEmail.trim().toLowerCase();
 
-    const [joinedOwner] = await db
-      .select({ id: memberships.id })
-      .from(memberships)
-      .where(
-        and(
-          eq(memberships.tenantId, tenantId),
-          eq(memberships.role, MEMBERSHIP_ROLE.OWNER),
-        ),
-      );
+    const currentOwnerEmail = await getTenantOwnerEmail(tenantId);
+    const ownerEmailChanged =
+      currentOwnerEmail?.trim().toLowerCase() !== normalizedOwnerEmail;
 
-    if (joinedOwner) {
-      return { outcome: 'owner-already-joined' };
+    if (ownerEmailChanged) {
+      const [joinedOwner] = await db
+        .select({ id: memberships.id })
+        .from(memberships)
+        .where(
+          and(
+            eq(memberships.tenantId, tenantId),
+            eq(memberships.role, MEMBERSHIP_ROLE.OWNER),
+          ),
+        );
+
+      if (joinedOwner) {
+        return { outcome: 'owner-already-joined' };
+      }
+
+      const [pendingInvite] = await db
+        .select({ id: membershipInvites.id })
+        .from(membershipInvites)
+        .where(
+          and(
+            eq(membershipInvites.tenantId, tenantId),
+            eq(membershipInvites.role, MEMBERSHIP_ROLE.OWNER),
+            isNull(membershipInvites.consumedAt),
+          ),
+        );
+
+      if (!pendingInvite) {
+        throw new Error(
+          `updateTenantDetails: no pending owner invite found for tenant "${tenantId}".`,
+        );
+      }
+
+      const [emailConflict] = await db
+        .select({ id: membershipInvites.id })
+        .from(membershipInvites)
+        .where(
+          and(
+            eq(membershipInvites.tenantId, tenantId),
+            eq(membershipInvites.email, normalizedOwnerEmail),
+            ne(membershipInvites.id, pendingInvite.id),
+          ),
+        );
+
+      if (emailConflict) {
+        return { outcome: 'owner-email-taken' };
+      }
+
+      ownerInviteId = pendingInvite.id;
     }
-
-    const [pendingInvite] = await db
-      .select({ id: membershipInvites.id })
-      .from(membershipInvites)
-      .where(
-        and(
-          eq(membershipInvites.tenantId, tenantId),
-          eq(membershipInvites.role, MEMBERSHIP_ROLE.OWNER),
-          isNull(membershipInvites.consumedAt),
-        ),
-      );
-
-    if (!pendingInvite) {
-      throw new Error(
-        `updateTenantDetails: no pending owner invite found for tenant "${tenantId}".`,
-      );
-    }
-
-    const [emailConflict] = await db
-      .select({ id: membershipInvites.id })
-      .from(membershipInvites)
-      .where(
-        and(
-          eq(membershipInvites.tenantId, tenantId),
-          eq(membershipInvites.email, normalizedOwnerEmail),
-          ne(membershipInvites.id, pendingInvite.id),
-        ),
-      );
-
-    if (emailConflict) {
-      return { outcome: 'owner-email-taken' };
-    }
-
-    ownerInviteId = pendingInvite.id;
   }
 
   const [tenant] = await db

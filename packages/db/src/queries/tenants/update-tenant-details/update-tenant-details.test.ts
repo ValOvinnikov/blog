@@ -84,8 +84,11 @@ async function insertOwnerInvite(
   return invite.id;
 }
 
-async function insertJoinedOwner(tenantId: string): Promise<void> {
-  const [user] = await db.insert(users).values({}).returning();
+async function insertJoinedOwner(
+  tenantId: string,
+  email?: string,
+): Promise<void> {
+  const [user] = await db.insert(users).values({ email }).returning();
   if (!user) throw new Error('setup: user insert returned no row.');
 
   await db
@@ -501,5 +504,78 @@ describe(updateTenantDetails, () => {
         ),
       );
     expect(ownerInvite?.email).toBe('owner@example.com');
+  });
+
+  it("applies the rest of the update instead of returning owner-already-joined when ownerEmail resubmits the joined owner's unchanged email", async () => {
+    const tenantId = await insertTenantWithDomain();
+    await insertJoinedOwner(tenantId, 'owner@example.com');
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      name: 'New Name',
+      ownerEmail: 'owner@example.com',
+    });
+
+    if (result.outcome !== 'updated') {
+      throw new Error(`expected 'updated', got '${result.outcome}'`);
+    }
+    expect(result.tenant.name).toBe('New Name');
+  });
+
+  it("treats a case/whitespace-only difference from the joined owner's email as unchanged and applies the update", async () => {
+    const tenantId = await insertTenantWithDomain();
+    await insertJoinedOwner(tenantId, 'owner@example.com');
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      name: 'New Name',
+      ownerEmail: '  Owner@Example.COM  ',
+    });
+
+    if (result.outcome !== 'updated') {
+      throw new Error(`expected 'updated', got '${result.outcome}'`);
+    }
+    expect(result.tenant.name).toBe('New Name');
+  });
+
+  it('leaves the pending invite untouched when ownerEmail resubmits its unchanged email', async () => {
+    const tenantId = await insertTenantWithDomain();
+    await insertOwnerInvite(tenantId, 'owner@example.com');
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      name: 'New Name',
+      ownerEmail: 'owner@example.com',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { name: 'New Name' },
+    });
+
+    const [invite] = await db
+      .select()
+      .from(membershipInvites)
+      .where(eq(membershipInvites.tenantId, tenantId));
+    expect(invite?.email).toBe('owner@example.com');
+  });
+
+  it("still returns owner-already-joined and applies no changes when ownerEmail differs from the joined owner's email", async () => {
+    const tenantId = await insertTenantWithDomain();
+    await insertJoinedOwner(tenantId, 'owner@example.com');
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      name: 'New Name',
+      ownerEmail: 'someone-else@example.com',
+    });
+
+    expect(result).toEqual({ outcome: 'owner-already-joined' });
+
+    const [row] = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(row?.name).toBe('Acme');
   });
 });
