@@ -7,6 +7,7 @@ import { createTenantSanityProject } from './create-sanity-project';
 const {
   setTenantSanityProjectMock,
   getTenantOwnerEmailMock,
+  getFirstAdminEmailMock,
   createSanityProjectMock,
   createSanityDatasetMock,
   addSanityCorsOriginMock,
@@ -20,6 +21,7 @@ const {
   return {
     setTenantSanityProjectMock: vi.fn(),
     getTenantOwnerEmailMock: vi.fn(),
+    getFirstAdminEmailMock: vi.fn(),
     createSanityProjectMock: vi.fn(),
     createSanityDatasetMock: vi.fn(),
     addSanityCorsOriginMock: vi.fn(),
@@ -37,6 +39,10 @@ vi.mock('@blog/db/queries/tenants', () => ({
 
 vi.mock('@blog/db/queries/memberships', () => ({
   getTenantOwnerEmail: getTenantOwnerEmailMock,
+}));
+
+vi.mock('@blog/db/queries/admins', () => ({
+  getFirstAdminEmail: getFirstAdminEmailMock,
 }));
 
 vi.mock('../lib/sanity-management-client', () => ({
@@ -92,6 +98,7 @@ beforeEach(() => {
   callOrder.length = 0;
   setTenantSanityProjectMock.mockReset();
   getTenantOwnerEmailMock.mockReset();
+  getFirstAdminEmailMock.mockReset();
   createSanityProjectMock.mockReset();
   createSanityDatasetMock.mockReset();
   addSanityCorsOriginMock.mockReset();
@@ -106,6 +113,10 @@ beforeEach(() => {
   getTenantOwnerEmailMock.mockImplementation(async () => {
     callOrder.push('getTenantOwnerEmail');
     return 'owner@example.com';
+  });
+  getFirstAdminEmailMock.mockImplementation(async () => {
+    callOrder.push('getFirstAdminEmail');
+    return 'superadmin@example.com';
   });
   createSanityProjectMock.mockImplementation(async () => {
     callOrder.push('createSanityProject');
@@ -135,7 +146,7 @@ beforeEach(() => {
 });
 
 describe(createTenantSanityProject, () => {
-  it('creates nothing when the project, dataset, CORS entry, and owner invite all already exist', async () => {
+  it('creates nothing when the project, dataset, CORS entry, and owner/superadmin invites all already exist', async () => {
     const tenant = baseTenant({
       sanityProjectId: 'proj123',
       sanityDataset: 'test-dataset',
@@ -150,7 +161,10 @@ describe(createTenantSanityProject, () => {
     });
     listSanityProjectInvitesMock.mockImplementation(async () => {
       callOrder.push('listSanityProjectInvites');
-      return [{ email: 'owner@example.com', status: 'pending' }];
+      return [
+        { email: 'owner@example.com', status: 'pending' },
+        { email: 'superadmin@example.com', status: 'pending' },
+      ];
     });
 
     const result = await createTenantSanityProject(tenant, env);
@@ -314,6 +328,10 @@ describe(createTenantSanityProject, () => {
       sanityProjectId: 'proj123',
       sanityDataset: 'test-dataset',
     });
+    getFirstAdminEmailMock.mockImplementation(async () => {
+      callOrder.push('getFirstAdminEmail');
+      return undefined;
+    });
     listSanityDatasetsMock.mockImplementation(async () => {
       callOrder.push('listSanityDatasets');
       return [{ name: 'test-dataset' }];
@@ -339,6 +357,10 @@ describe(createTenantSanityProject, () => {
     listSanityProjectInvitesMock.mockImplementation(
       actual.listSanityProjectInvites,
     );
+    getFirstAdminEmailMock.mockImplementation(async () => {
+      callOrder.push('getFirstAdminEmail');
+      return undefined;
+    });
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -376,10 +398,14 @@ describe(createTenantSanityProject, () => {
     }
   });
 
-  it('skips inviting when the tenant has no resolvable owner email, logging the gap', async () => {
+  it('skips inviting when the tenant has no resolvable owner email or admins row, logging both gaps', async () => {
     const tenant = baseTenant();
     getTenantOwnerEmailMock.mockImplementation(async () => {
       callOrder.push('getTenantOwnerEmail');
+      return undefined;
+    });
+    getFirstAdminEmailMock.mockImplementation(async () => {
+      callOrder.push('getFirstAdminEmail');
       return undefined;
     });
     const consoleErrorSpy = vi
@@ -397,8 +423,138 @@ describe(createTenantSanityProject, () => {
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       expect.stringContaining('tenant-1'),
     );
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
 
     consoleErrorSpy.mockRestore();
+  });
+
+  it('still invites the superadmin when the tenant has no resolvable owner email', async () => {
+    const tenant = baseTenant();
+    getTenantOwnerEmailMock.mockImplementation(async () => {
+      callOrder.push('getTenantOwnerEmail');
+      return undefined;
+    });
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    await createTenantSanityProject(tenant, env);
+
+    expect(createSanityProjectInviteMock).toHaveBeenCalledTimes(1);
+    expect(createSanityProjectInviteMock).toHaveBeenCalledWith({
+      token: 'mgmt-token',
+      projectId: 'proj456',
+      email: 'superadmin@example.com',
+      role: 'editor',
+    });
+
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('resolves the platform superadmin email and invites them as an editor when not already invited', async () => {
+    const tenant = baseTenant();
+
+    await createTenantSanityProject(tenant, env);
+
+    expect(getFirstAdminEmailMock).toHaveBeenCalled();
+    expect(createSanityProjectInviteMock).toHaveBeenCalledWith({
+      token: 'mgmt-token',
+      projectId: 'proj456',
+      email: 'superadmin@example.com',
+      role: 'editor',
+    });
+  });
+
+  it('does not re-invite a superadmin who already has a pending or accepted invite', async () => {
+    const tenant = baseTenant({
+      sanityProjectId: 'proj123',
+      sanityDataset: 'test-dataset',
+    });
+    getTenantOwnerEmailMock.mockImplementation(async () => {
+      callOrder.push('getTenantOwnerEmail');
+      return undefined;
+    });
+    listSanityDatasetsMock.mockImplementation(async () => {
+      callOrder.push('listSanityDatasets');
+      return [{ name: 'test-dataset' }];
+    });
+    listSanityCorsOriginsMock.mockImplementation(async () => {
+      callOrder.push('listSanityCorsOrigins');
+      return [{ id: 'cors1', origin: 'https://admin.example.com' }];
+    });
+    listSanityProjectInvitesMock.mockImplementation(async () => {
+      callOrder.push('listSanityProjectInvites');
+      return [{ email: 'Superadmin@Example.com', status: 'accepted' }];
+    });
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    await createTenantSanityProject(tenant, env);
+
+    expect(createSanityProjectInviteMock).not.toHaveBeenCalled();
+
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('skips inviting when there is no admins row at all, without crashing the step', async () => {
+    const tenant = baseTenant();
+    getFirstAdminEmailMock.mockImplementation(async () => {
+      callOrder.push('getFirstAdminEmail');
+      return undefined;
+    });
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    const result = await createTenantSanityProject(tenant, env);
+
+    expect(createSanityProjectInviteMock).toHaveBeenCalledTimes(1);
+    expect(createSanityProjectInviteMock).toHaveBeenCalledWith({
+      token: 'mgmt-token',
+      projectId: 'proj456',
+      email: 'owner@example.com',
+      role: 'editor',
+    });
+    expect(result).toEqual({
+      sanityProjectId: 'proj456',
+      sanityDataset: 'test-dataset',
+    });
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('no admins row found'),
+    );
+
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('invites the owner and superadmin only once when they resolve to the same email, avoiding a duplicate-invite 400', async () => {
+    const tenant = baseTenant();
+    getFirstAdminEmailMock.mockImplementation(async () => {
+      callOrder.push('getFirstAdminEmail');
+      return 'owner@example.com';
+    });
+
+    await createTenantSanityProject(tenant, env);
+
+    expect(createSanityProjectInviteMock).toHaveBeenCalledTimes(1);
+    expect(createSanityProjectInviteMock).toHaveBeenCalledWith({
+      token: 'mgmt-token',
+      projectId: 'proj456',
+      email: 'owner@example.com',
+      role: 'editor',
+    });
+  });
+
+  it('treats the owner/superadmin email match case-insensitively', async () => {
+    const tenant = baseTenant();
+    getFirstAdminEmailMock.mockImplementation(async () => {
+      callOrder.push('getFirstAdminEmail');
+      return 'Owner@Example.com';
+    });
+
+    await createTenantSanityProject(tenant, env);
+
+    expect(createSanityProjectInviteMock).toHaveBeenCalledTimes(1);
   });
 
   it('propagates an invite API failure the same way a CORS API failure propagates', async () => {

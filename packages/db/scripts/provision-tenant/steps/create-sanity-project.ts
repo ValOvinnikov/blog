@@ -1,3 +1,4 @@
+import { getFirstAdminEmail } from '@blog/db/queries/admins';
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { setTenantSanityProject } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -20,15 +21,18 @@ export type TCreateSanityProjectResult = {
 
 // `editor` can author/publish content but can't change project settings or
 // manage members — the platform (via `SANITY_MANAGEMENT_TOKEN`) keeps sole
-// control over the project itself, not the tenant owner.
-const OWNER_INVITE_ROLE = 'editor';
+// control over the project itself, not the tenant owner or the platform
+// superadmin invited alongside them.
+const TENANT_INVITE_ROLE = 'editor';
 
 /**
  * Step 1 — creates the tenant's own Sanity project, its dataset (named per
  * `env.tenantSanityDataset`), a CORS entry for the admin app's origin, and
- * invites the tenant owner (resolved from their OWNER `memberships` row) as
- * a project member — Sanity Studio's login flow requires project
- * membership, so without this no one could sign into the deployed Studio.
+ * invites both the tenant owner (resolved from their OWNER `memberships`
+ * row) and the platform superadmin (the earliest-created `admins` row) as
+ * project members — Sanity Studio's login flow requires project
+ * membership, so without this no one could sign into the deployed Studio,
+ * and the superadmin couldn't get in to debug it either.
  *
  * The project id is persisted the moment it's minted, before the dataset/CORS
  * calls: Sanity has no delete-project API to clean up an orphan, so a retry
@@ -83,23 +87,12 @@ export async function createTenantSanityProject(
   }
 
   const ownerEmail = await getTenantOwnerEmail(tenant.id);
-  if (ownerEmail) {
-    const invites = await listSanityProjectInvites({
-      token: env.sanityManagementToken,
-      projectId,
-    });
-    const alreadyInvited = invites.some(
-      (invite) => invite.email?.toLowerCase() === ownerEmail.toLowerCase(),
-    );
+  const superadminEmail = await getFirstAdminEmail();
 
-    if (!alreadyInvited) {
-      await createSanityProjectInvite({
-        token: env.sanityManagementToken,
-        projectId,
-        email: ownerEmail,
-        role: OWNER_INVITE_ROLE,
-      });
-    }
+  const emailsToInvite: string[] = [];
+
+  if (ownerEmail) {
+    emailsToInvite.push(ownerEmail);
   } else {
     // Tenant creation always inserts an OWNER membership, so this should
     // only happen on a genuine data anomaly. Provisioning must still
@@ -108,6 +101,48 @@ export async function createTenantSanityProject(
     console.error(
       `create-sanity-project: no resolvable owner email for tenant "${tenant.id}" — skipping Sanity Studio invite.`,
     );
+  }
+
+  if (superadminEmail) {
+    // Sanity rejects a second invite for the same email+role, and a
+    // superadmin who is also this tenant's owner is already covered by the
+    // invite above.
+    const superadminIsOwner =
+      !!ownerEmail &&
+      superadminEmail.toLowerCase() === ownerEmail.toLowerCase();
+    if (!superadminIsOwner) {
+      emailsToInvite.push(superadminEmail);
+    }
+  } else {
+    // A brand-new platform install with no `admins` row yet is a normal,
+    // expected state — provisioning must still complete without a
+    // superadmin invite.
+    console.error(
+      `create-sanity-project: no admins row found — skipping the platform superadmin's Sanity Studio invite for tenant "${tenant.id}".`,
+    );
+  }
+
+  if (emailsToInvite.length > 0) {
+    const invites = await listSanityProjectInvites({
+      token: env.sanityManagementToken,
+      projectId,
+    });
+    const alreadyInvitedEmails = new Set(
+      invites
+        .map((invite) => invite.email?.toLowerCase())
+        .filter((email): email is string => Boolean(email)),
+    );
+
+    for (const email of emailsToInvite) {
+      if (alreadyInvitedEmails.has(email.toLowerCase())) continue;
+
+      await createSanityProjectInvite({
+        token: env.sanityManagementToken,
+        projectId,
+        email,
+        role: TENANT_INVITE_ROLE,
+      });
+    }
   }
 
   return { sanityProjectId: projectId, sanityDataset: env.tenantSanityDataset };
