@@ -18,18 +18,6 @@ export const authorSchema = defineType({
       validation: (rule) => rule.required().max(100),
     }),
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      description:
-        'URL path segment for the author page — auto-generated from name.',
-      options: {
-        source: 'name',
-        maxLength: 96,
-      },
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
       name: 'image',
       title: 'Image',
       type: imageWithAltSchema.name,

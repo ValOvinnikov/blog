@@ -682,7 +682,6 @@ export type Blog_author = {
   _updatedAt: string;
   _rev: string;
   name?: string;
-  slug?: Slug;
   image?: ImageWithAlt;
   bio?: BlockText;
   role?: string;
