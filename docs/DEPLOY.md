@@ -288,11 +288,11 @@ few secrets/vars nothing else in this repo has needed yet:
       (see the `@blog/db` env vars table above). `setTenantSanityToken`
       throws without it.
 - [ ] Variable `ADMIN_APP_BASE_URL` — the deployed `apps/admin` origin (no
-      trailing slash/path), e.g. `https://admin.{your-hosting}`. Used both as
-      the status-callback target and as the CORS origin step 1 adds to each
-      new tenant's Sanity project. `apps/admin` has no deploy workflow of its
-      own yet (not in `docs/DEPLOY.md`'s environment matrix), so there's no
-      existing convention to reuse here — this is a new variable.
+      trailing slash/path), e.g. `https://admin.{your-hosting}`. Used as the
+      CORS origin step 1 adds to each new tenant's Sanity project.
+      `apps/admin` has no deploy workflow of its own yet (not in
+      `docs/DEPLOY.md`'s environment matrix), so there's no existing
+      convention to reuse here — this is a new variable.
 - [ ] Variable `VERCEL_TEAM_ID` — only needed if the Vercel account is
       team-owned; omit otherwise.
 - [ ] Variable `PLATFORM_DOMAIN` — the platform domain each tenant's Studio
