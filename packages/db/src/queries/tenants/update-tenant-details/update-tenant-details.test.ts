@@ -550,6 +550,31 @@ describe(updateTenantDetails, () => {
     expect(row?.primaryDomain).toBe('acme.example.com');
   });
 
+  it('applies the rest of the update instead of domain-locked when the resubmitted primaryDomain is unchanged, even though MAP_DOMAIN has completed', async () => {
+    const tenantId = await insertTenantWithDomain({
+      domain: 'acme.example.com',
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      primaryDomain: 'acme.example.com',
+      name: 'New Name',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { name: 'New Name', primaryDomain: 'acme.example.com' },
+    });
+  });
+
   it('keeps name, plan and locale editable on a FAILED tenant even once every earlier step has completed', async () => {
     const tenantId = await insertTenantWithDomain({
       slug: 'acme',
