@@ -48,14 +48,6 @@ export const env = createEnv({
       .string()
       .regex(/^[^/\s]+\/[^/\s]+$/, 'Expected "owner/repo".')
       .optional(),
-    // Shared secret the provisioning workflow sends as
-    // `Authorization: Bearer <secret>` when it calls this app's status-callback
-    // route after each step — compared with a constant-time check, not an HMAC
-    // signature, since this callback only ever originates from CI holding a
-    // repo secret (a narrower trust boundary than the Sanity revalidation
-    // webhook's signed-payload verification). Optional: absent, the route
-    // responds 500 rather than accepting an unauthenticated call.
-    TENANT_PROVISIONING_CALLBACK_SECRET: z.string().min(1).optional(),
     // Local-dev-only escape hatch forwarded as the `adminAppBaseUrl`
     // workflow_dispatch input, letting a developer point a manual
     // provisioning run at a tunneled local `apps/admin` (e.g. a Tailscale
@@ -93,8 +85,6 @@ export const env = createEnv({
       process.env.TENANT_PROVISIONING_GITHUB_TOKEN,
     TENANT_PROVISIONING_GITHUB_REPO:
       process.env.TENANT_PROVISIONING_GITHUB_REPO,
-    TENANT_PROVISIONING_CALLBACK_SECRET:
-      process.env.TENANT_PROVISIONING_CALLBACK_SECRET,
     TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE:
       process.env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE,
     VERCEL_API_TOKEN: process.env.VERCEL_API_TOKEN,

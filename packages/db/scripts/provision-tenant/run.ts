@@ -1,7 +1,7 @@
 /**
  * Provisioning workflow entrypoint — runs the six independently-idempotent
- * steps in order for one tenant, reporting each step's status back to
- * `apps/admin`'s status-callback route both on success and failure.
+ * steps in order for one tenant, writing each step's status directly to
+ * Postgres (via `reportStepStatus`) both on success and failure.
  *
  * Invoked only by `.github/workflows/provision-tenant.yml` via
  * `pnpm --filter @blog/db db:provision-tenant -- --tenant-id=<uuid>` — never
@@ -22,8 +22,8 @@ import { reactivateTenant } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import { loadProvisionEnv, type TProvisionEnv } from './lib/env';
+import { reportStepStatus } from './lib/report-step-status';
 import { sanitizeLogMessage } from './lib/sanitize-log-message';
-import { reportStepStatus } from './lib/status-callback';
 import { createTenantRevalidateWebhook } from './steps/create-revalidate-webhook';
 import { createTenantSanityProject } from './steps/create-sanity-project';
 import { createTenantStudio } from './steps/create-studio-vercel-project';
@@ -91,8 +91,6 @@ export async function runSteps(
 
   for (const step of STEPS) {
     await reportStepStatus({
-      baseUrl: env.adminAppBaseUrl,
-      secret: env.callbackSecret,
       tenantId,
       step: step.key,
       status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
@@ -105,8 +103,6 @@ export async function runSteps(
       }
 
       await reportStepStatus({
-        baseUrl: env.adminAppBaseUrl,
-        secret: env.callbackSecret,
         tenantId,
         step: step.key,
         status: TENANT_PROVISIONING_STEP_STATUS.DONE,
@@ -116,8 +112,6 @@ export async function runSteps(
       console.error(`provision-tenant: step "${step.key}" failed: ${message}`);
 
       await reportStepStatus({
-        baseUrl: env.adminAppBaseUrl,
-        secret: env.callbackSecret,
         tenantId,
         step: step.key,
         status: TENANT_PROVISIONING_STEP_STATUS.FAILED,

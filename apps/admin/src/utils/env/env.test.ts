@@ -7,7 +7,6 @@ const ENV_KEYS = [
   'SITE_CONFIG_REVALIDATE_SECRET',
   'TENANT_PROVISIONING_GITHUB_TOKEN',
   'TENANT_PROVISIONING_GITHUB_REPO',
-  'TENANT_PROVISIONING_CALLBACK_SECRET',
   'TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE',
   'VERCEL_API_TOKEN',
   'VERCEL_WEB_PROJECT_ID',
@@ -193,24 +192,6 @@ describe('env', () => {
     process.env['TENANT_PROVISIONING_GITHUB_REPO'] = 'acme-repo';
 
     await expect(importEnvOnServer()).rejects.toThrow();
-  });
-
-  it('parses a valid TENANT_PROVISIONING_CALLBACK_SECRET and exposes it typed', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['TENANT_PROVISIONING_CALLBACK_SECRET'] = 'callback-secret';
-
-    const { env } = await importEnvOnServer();
-
-    expect(env.TENANT_PROVISIONING_CALLBACK_SECRET).toBe('callback-secret');
-  });
-
-  it('leaves TENANT_PROVISIONING_CALLBACK_SECRET undefined when absent (the callback route 500s)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    delete process.env['TENANT_PROVISIONING_CALLBACK_SECRET'];
-
-    const { env } = await importEnvOnServer();
-
-    expect(env.TENANT_PROVISIONING_CALLBACK_SECRET).toBeUndefined();
   });
 
   it('parses a valid TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE and exposes it typed', async () => {
