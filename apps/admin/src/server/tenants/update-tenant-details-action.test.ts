@@ -207,6 +207,26 @@ describe('updateTenantDetailsAction', () => {
     });
   });
 
+  it('succeeds on a rename-only submit that resends the current owner email, even once the owner has already joined', async () => {
+    const tenant = makeTenant({ name: 'Acme Renamed' });
+    updateTenantDetailsMock.mockResolvedValue({ outcome: 'updated', tenant });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', {
+      ...validInput,
+      name: 'Acme Renamed',
+      ownerEmail: 'owner@example.com',
+    });
+
+    expect(result).toEqual({ ok: true, tenant });
+    expect(updateTenantDetailsMock).toHaveBeenCalledWith('tenant-1', {
+      ...validInput,
+      name: 'Acme Renamed',
+      ownerEmail: 'owner@example.com',
+    });
+  });
+
   it('maps an owner-already-joined outcome onto a distinct form-level error, without a successful update', async () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: 'owner-already-joined',

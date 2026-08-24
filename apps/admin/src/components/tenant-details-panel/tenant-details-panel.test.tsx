@@ -199,7 +199,7 @@ describe(TenantDetailsPanel, () => {
       ).toBeEnabled();
     });
 
-    it('saves the edited values and refreshes on success, without submitting an untouched owner email', async () => {
+    it('saves the edited values and refreshes on success, sending the unchanged owner email as an ordinary field', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: true,
         tenant: makeTenant({ name: 'Acme Renamed' }),
@@ -224,16 +224,16 @@ describe(TenantDetailsPanel, () => {
       await waitFor(() => {
         expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
           'tenant-1',
-          expect.objectContaining({ name: 'Acme Renamed' }),
+          expect.objectContaining({
+            name: 'Acme Renamed',
+            ownerEmail: 'owner@example.com',
+          }),
         );
       });
-      expect(
-        updateTenantDetailsActionMock.mock.calls[0]?.[1],
-      ).not.toHaveProperty('ownerEmail');
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
     });
 
-    it('submits the new owner email only when it was actually edited', async () => {
+    it('submits the edited owner email value', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: true,
         tenant: makeTenant(),

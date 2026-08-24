@@ -183,14 +183,8 @@ export const TenantDetailsPanel = ({
       primaryDomain: values.primaryDomain,
       plan: values.plan,
       locale: values.locale,
+      ownerEmail: values.ownerEmail,
     };
-    // Sent only when actually edited — the db layer treats this key's mere
-    // presence as an ownership-change attempt regardless of value, so
-    // including it unconditionally would block an unrelated field edit
-    // (e.g. renaming the tenant) once the owner has already joined.
-    if (values.ownerEmail !== baselineValues.ownerEmail) {
-      payload.ownerEmail = values.ownerEmail;
-    }
 
     startTransition(async () => {
       const result = await updateTenantDetailsAction(tenant.id, payload);
