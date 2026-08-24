@@ -53,12 +53,13 @@ beforeEach(() => {
 
 describe(deleteTenantSanityProject, () => {
   it('deletes the Sanity project when one is set', async () => {
-    await deleteTenantSanityProject(baseTenant(), env);
+    const result = await deleteTenantSanityProject(baseTenant(), env);
 
     expect(deleteSanityProjectMock).toHaveBeenCalledWith({
       token: 'mgmt-token',
       projectId: 'proj123',
     });
+    expect(result).toBeUndefined();
   });
 
   it('skips when no Sanity project id is set', async () => {
@@ -71,5 +72,24 @@ describe(deleteTenantSanityProject, () => {
     await deleteTenantSanityProject(baseTenant(), { ...env, dryRun: true });
 
     expect(deleteSanityProjectMock).not.toHaveBeenCalled();
+  });
+
+  it('reports keepSanityProjectId when deletion is blocked by org billing permission', async () => {
+    deleteSanityProjectMock.mockResolvedValue({
+      alreadyGone: false,
+      blockedByBillingPermission: true,
+    });
+
+    await expect(deleteTenantSanityProject(baseTenant(), env)).resolves.toEqual(
+      { keepSanityProjectId: true },
+    );
+  });
+
+  it('still throws on a non-billing-permission failure', async () => {
+    deleteSanityProjectMock.mockRejectedValue(new Error('network error'));
+
+    await expect(deleteTenantSanityProject(baseTenant(), env)).rejects.toThrow(
+      'network error',
+    );
   });
 });

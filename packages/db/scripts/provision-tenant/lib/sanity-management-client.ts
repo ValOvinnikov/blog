@@ -201,20 +201,24 @@ export type TSanityInvite = { email?: string; status?: string };
 // Lists both pending and already-accepted invites — an accepted invite
 // means the invitee is already a project member, so a retry must still
 // recognize them as "already invited" even once `status` is no longer
-// `pending`.
+// `pending`. Repeating `status=` is the documented way to request multiple
+// statuses (https://www.sanity.io/docs/http-reference/access-api); the
+// envelope key is `data`, not `items` — unwrapping the wrong key silently
+// produced an empty list on every call, so the step never recognized a prior
+// invite and kept retrying `createSanityProjectInvite` into a 400.
 export async function listSanityProjectInvites(input: {
   token: string;
   projectId: string;
 }): Promise<TSanityInvite[]> {
   const result = await sanityAccessRequest<
-    | { items?: Array<{ email?: string; status?: string }> }
+    | { data?: Array<{ email?: string; status?: string }> }
     | Array<{ email?: string; status?: string }>
   >(
     `/access/project/${input.projectId}/invites?status=pending&status=accepted`,
     input.token,
   );
 
-  const items = Array.isArray(result) ? result : (result.items ?? []);
+  const items = Array.isArray(result) ? result : (result.data ?? []);
   return items.map((item) => ({ email: item.email, status: item.status }));
 }
 

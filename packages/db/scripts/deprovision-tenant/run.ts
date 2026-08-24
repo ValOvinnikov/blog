@@ -21,6 +21,10 @@ import { pathToFileURL } from 'node:url';
 
 import type { TTenant } from '@blog/db/schema/tenants';
 
+import {
+  INITIAL_DEPROVISION_CONTEXT,
+  type TDeprovisionContext,
+} from './lib/context';
 import { loadDeprovisionEnv, type TDeprovisionEnv } from './lib/env';
 import { getTenantRow } from './lib/get-tenant-row';
 import { sanitizeLogMessage } from './lib/sanitize-log-message';
@@ -39,7 +43,8 @@ function parseFlagValue(argv: string[], flag: string): string | undefined {
 }
 
 function parseTenantId(argv: string[]): string {
-  const value = parseFlagValue(argv, TENANT_ID_FLAG) ?? process.env['TENANT_ID'];
+  const value =
+    parseFlagValue(argv, TENANT_ID_FLAG) ?? process.env['TENANT_ID'];
   if (!value) {
     throw new Error(
       'deprovision-tenant: missing required --tenant-id=<uuid> (or TENANT_ID env var).',
@@ -67,7 +72,11 @@ function parseDryRun(argv: string[]): boolean {
 
 type TStep = {
   name: string;
-  run: (tenant: TTenant, env: TDeprovisionEnv) => Promise<void>;
+  run: (
+    tenant: TTenant,
+    env: TDeprovisionEnv,
+    context: TDeprovisionContext,
+  ) => Promise<Partial<TDeprovisionContext> | void>;
 };
 
 const STEPS: TStep[] = [
@@ -85,11 +94,20 @@ export async function runSteps(
   tenant: TTenant,
   env: TDeprovisionEnv,
 ): Promise<{ ok: boolean }> {
+  // Accumulates across steps the same way `provision-tenant/run.ts` folds
+  // each step's partial result back in — `delete-sanity-project`'s
+  // `keepSanityProjectId` is the only value threaded today, read by
+  // `clear-artifacts` two steps later.
+  let context = INITIAL_DEPROVISION_CONTEXT;
+
   for (const step of STEPS) {
     console.warn(`deprovision-tenant: running step "${step.name}"...`);
 
     try {
-      await step.run(tenant, env);
+      const result = await step.run(tenant, env, context);
+      if (result) {
+        context = { ...context, ...result };
+      }
       console.warn(`deprovision-tenant: step "${step.name}" done.`);
     } catch (error) {
       console.error(

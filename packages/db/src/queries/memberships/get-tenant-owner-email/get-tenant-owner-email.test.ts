@@ -46,6 +46,7 @@ beforeEach(() => {
 
 afterEach(async () => {
   await db.delete(schema.memberships);
+  await db.delete(schema.membershipInvites);
   await db.delete(schema.tenants);
   await db.delete(schema.users);
 });
@@ -79,8 +80,67 @@ describe(getTenantOwnerEmail, () => {
     expect(result).toBeUndefined();
   });
 
-  it('returns undefined when the tenant has no OWNER membership', async () => {
+  it('returns undefined when the tenant has no OWNER membership or invite', async () => {
     const tenantId = await insertTenant('acme');
+
+    const result = await getTenantOwnerEmail(tenantId);
+
+    expect(result).toBeUndefined();
+  });
+
+  it('falls back to a still-pending OWNER membershipInvite when no memberships row exists yet', async () => {
+    const tenantId = await insertTenant('acme');
+    await db.insert(schema.membershipInvites).values({
+      tenantId,
+      email: 'owner@example.com',
+      role: MEMBERSHIP_ROLE.OWNER,
+    });
+
+    const result = await getTenantOwnerEmail(tenantId);
+
+    expect(result).toBe('owner@example.com');
+  });
+
+  it('prefers a real OWNER membership over a still-pending invite for the same tenant', async () => {
+    await insertUser('user-1', 'signed-in-owner@example.com');
+    const tenantId = await insertTenant('acme');
+    await db.insert(schema.memberships).values({
+      userId: 'user-1',
+      tenantId,
+      role: MEMBERSHIP_ROLE.OWNER,
+    });
+    await db.insert(schema.membershipInvites).values({
+      tenantId,
+      email: 'stale-invite@example.com',
+      role: MEMBERSHIP_ROLE.OWNER,
+    });
+
+    const result = await getTenantOwnerEmail(tenantId);
+
+    expect(result).toBe('signed-in-owner@example.com');
+  });
+
+  it('ignores an already-consumed OWNER invite', async () => {
+    const tenantId = await insertTenant('acme');
+    await db.insert(schema.membershipInvites).values({
+      tenantId,
+      email: 'owner@example.com',
+      role: MEMBERSHIP_ROLE.OWNER,
+      consumedAt: new Date(),
+    });
+
+    const result = await getTenantOwnerEmail(tenantId);
+
+    expect(result).toBeUndefined();
+  });
+
+  it('ignores a non-OWNER invite on the same tenant', async () => {
+    const tenantId = await insertTenant('acme');
+    await db.insert(schema.membershipInvites).values({
+      tenantId,
+      email: 'editor@example.com',
+      role: MEMBERSHIP_ROLE.EDITOR,
+    });
 
     const result = await getTenantOwnerEmail(tenantId);
 

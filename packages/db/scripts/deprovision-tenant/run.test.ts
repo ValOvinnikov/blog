@@ -78,7 +78,7 @@ describe(runSteps, () => {
     expect(archiveTenantRowMock).not.toHaveBeenCalled();
   });
 
-  it('passes the same tenant row and env through to every step', async () => {
+  it('passes the same tenant row, env, and starting context through to every step', async () => {
     await runSteps(baseTenant, env);
 
     for (const mock of [
@@ -88,8 +88,25 @@ describe(runSteps, () => {
       clearTenantArtifactsMock,
       archiveTenantRowMock,
     ]) {
-      expect(mock).toHaveBeenCalledWith(baseTenant, env);
+      expect(mock).toHaveBeenCalledWith(baseTenant, env, {
+        keepSanityProjectId: false,
+      });
     }
+  });
+
+  it('threads keepSanityProjectId into clear-artifacts when delete-sanity-project reports it was blocked', async () => {
+    deleteTenantSanityProjectMock.mockResolvedValue({
+      keepSanityProjectId: true,
+    });
+
+    await runSteps(baseTenant, env);
+
+    expect(clearTenantArtifactsMock).toHaveBeenCalledWith(baseTenant, env, {
+      keepSanityProjectId: true,
+    });
+    expect(archiveTenantRowMock).toHaveBeenCalledWith(baseTenant, env, {
+      keepSanityProjectId: true,
+    });
   });
 });
 
