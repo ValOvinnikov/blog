@@ -1,48 +1,38 @@
 /**
  * @vitest-environment jsdom
  */
-import { makePostCard } from '@web/testing/shared/post/fixtures';
+import type { TFeedPost } from '@blog/service';
 
-const { getIndexPageMock, getPostListMock, getSiteSettingsMock } = vi.hoisted(
-  () => ({
-    getIndexPageMock: vi.fn(),
-    getPostListMock: vi.fn(),
-    getSiteSettingsMock: vi.fn(),
-  }),
-);
+const { getAllPublishedPostsMock, getSiteSettingsMock } = vi.hoisted(() => ({
+  getAllPublishedPostsMock: vi.fn(),
+  getSiteSettingsMock: vi.fn(),
+}));
 
 vi.mock('@blog/service', () => ({
   service: {
-    pages: { blog: { v1: { getIndexPage: getIndexPageMock } } },
-    modules: { postList: { v1: { getPostList: getPostListMock } } },
+    entities: {
+      posts: { v1: { getAllPublishedPosts: getAllPublishedPostsMock } },
+    },
     global: { siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } } },
   },
 }));
 
-const post = makePostCard({
+const post: TFeedPost = {
   title: 'Hello & Welcome',
   slug: 'hello-welcome',
   excerpt: 'A <first> post.',
   publishedAt: '2026-01-15T00:00:00Z',
-});
+};
 
 describe('GET /rss.xml', () => {
   afterEach(() => {
     vi.resetModules();
-    getIndexPageMock.mockReset();
-    getPostListMock.mockReset();
+    getAllPublishedPostsMock.mockReset();
     getSiteSettingsMock.mockReset();
   });
 
   it('returns a valid RSS 2.0 feed with the correct content type', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: { postListId: 'post-list-1' },
-    });
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: { posts: [post], currentPage: 1, totalPages: 1 },
-    });
+    getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [post] });
     getSiteSettingsMock.mockResolvedValue({
       ok: true,
       data: {
@@ -79,50 +69,8 @@ describe('GET /rss.xml', () => {
     );
   });
 
-  it('aggregates posts across every archive page', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: { postListId: 'post-list-1' },
-    });
-    getPostListMock.mockImplementation((_id: string, page = 1) => {
-      if (page === 1) {
-        return Promise.resolve({
-          ok: true,
-          data: { posts: [post], currentPage: 1, totalPages: 2 },
-        });
-      }
-      return Promise.resolve({
-        ok: true,
-        data: {
-          posts: [{ ...post, slug: 'second-post', title: 'Second post' }],
-          currentPage: 2,
-          totalPages: 2,
-        },
-      });
-    });
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { brand: { name: 'My Blog' }, description: 'desc' },
-    });
-    const { GET } = await import('./route');
-
-    const response = await GET();
-    const xml = await response.text();
-    const doc = new DOMParser().parseFromString(xml, 'application/xml');
-
-    expect(doc.querySelectorAll('item')).toHaveLength(2);
-    expect(getPostListMock).toHaveBeenCalledTimes(2);
-  });
-
   it('falls back to a generic channel title/description when site settings fail', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: { postListId: 'post-list-1' },
-    });
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: { posts: [], currentPage: 1, totalPages: 1 },
-    });
+    getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [] });
     getSiteSettingsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
@@ -139,31 +87,8 @@ describe('GET /rss.xml', () => {
     );
   });
 
-  it('returns an empty feed (no items) when the blog index fetch fails', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    getSiteSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { brand: { name: 'My Blog' }, description: 'desc' },
-    });
-    const { GET } = await import('./route');
-
-    const response = await GET();
-    const xml = await response.text();
-    const doc = new DOMParser().parseFromString(xml, 'application/xml');
-
-    expect(doc.querySelectorAll('item')).toHaveLength(0);
-    expect(getPostListMock).not.toHaveBeenCalled();
-  });
-
-  it('returns an empty feed (no items) when the first archive page fetch fails', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: { postListId: 'post-list-1' },
-    });
-    getPostListMock.mockResolvedValue({
+  it('returns an empty feed (no items) when the posts fetch fails', async () => {
+    getAllPublishedPostsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
