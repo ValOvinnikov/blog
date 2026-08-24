@@ -136,22 +136,21 @@ the same workflow for the same tenant id resumes rather than repeats:
    the step completes once the domain is _added_, regardless of verification
    state.
 
-Each step reports its own status back via the callback route below —
-`idle → running → done`/`failed` — so the admin UI's per-step Retry button
-re-dispatches the same workflow and only the failed-or-later steps actually do
-work.
+Each step reports its own status — `idle → running → done`/`failed` — so the
+admin UI's per-step Retry button re-dispatches the same workflow and only the
+failed-or-later steps actually do work.
 
-**Status callback — new `apps/admin` API route,** authenticated by a bearer
-token compared against a GitHub Actions secret — a simpler mechanism than the
-existing Sanity revalidation webhook (`apps/web/src/app/api/revalidate/route.ts`),
-which verifies an HMAC signature over the raw request body via `@sanity/webhook`'s
-`isValidSignature` because it accepts calls from Sanity's own infrastructure. This
-callback only ever originates from our own CI runner holding a repo secret, so a
-direct bearer-token comparison is sufficient — not the same pattern, a
-deliberately lighter one for a narrower trust boundary. The workflow calls it
-after every step with `{ tenantId, step, status, error? }`; the route updates
-the tenant's per-step status map and (on the last step) the overall
-`provisioningStatus`.
+**Status report — a direct `updateProvisioningStep` write to Postgres from
+the script itself** (revised post-launch, #2002), reusing the same
+`DATABASE_URL` connection the workflow already holds for `reactivateTenant`.
+Originally designed as a separate `apps/admin` API route, bearer-token
+authenticated against a GitHub Actions secret — a lighter mechanism than the
+Sanity revalidation webhook's HMAC verification (`apps/web/src/app/api/revalidate/route.ts`),
+since this call only ever originated from our own CI runner holding a repo
+secret. That route silently dropped a step's status update on any network
+failure between the CI runner and `apps/admin`, so a tenant's provisioning
+could fail with no trace in the admin UI at all. The direct write removes
+that failure class entirely — there's no network hop left to drop.
 
 ## Data model
 
