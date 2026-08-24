@@ -259,6 +259,7 @@
     "nameLabel": "Name",
     "slugLabel": "Slug",
     "domainLabel": "Primary domain",
+    "ownerEmailLabel": "Owner email",
     "planLabel": "Plan",
     "planOptionFree": "Free",
     "planOptionGrowth": "Growth",
@@ -267,6 +268,8 @@
     "savingButton": "Saving…",
     "alertSuccess": "Tenant details saved.",
     "provisioningStartedError": "This tenant's provisioning has already started; its details can no longer be edited.",
+    "ownerAlreadyJoinedError": "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
+    "ownerEmailTakenError": "This email already has a pending invite on this tenant.",
     "lockedAnnouncement": "Tenant details locked while provisioning runs.",
     "unlockedAnnouncement": "Tenant details unlocked and editable again."
   },
