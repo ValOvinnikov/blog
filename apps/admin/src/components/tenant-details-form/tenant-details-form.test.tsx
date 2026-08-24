@@ -137,12 +137,12 @@ describe(TenantDetailsForm, () => {
     );
 
     expect(
-      await screen.findByText(
-        "No account found for owner@example.com — they'll be sent an invite to sign in and manage this tenant as owner.",
-      ),
+      await screen.findByRole('button', { name: /confirm & invite owner/i }),
     ).toBeVisible();
     expect(
-      screen.getByRole('button', { name: /confirm & invite owner/i }),
+      screen.getByText(
+        "No account found for owner@example.com — they'll be sent an invite to sign in and manage this tenant as owner.",
+      ),
     ).toBeVisible();
   });
 
@@ -162,10 +162,9 @@ describe(TenantDetailsForm, () => {
     await user.click(
       screen.getByRole('button', { name: /begin provisioning/i }),
     );
-    await screen.findByText('No account found for owner@example.com.');
 
     await user.click(
-      screen.getByRole('button', { name: /confirm & invite owner/i }),
+      await screen.findByRole('button', { name: /confirm & invite owner/i }),
     );
 
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
@@ -204,10 +203,9 @@ describe(TenantDetailsForm, () => {
     await user.click(
       screen.getByRole('button', { name: /begin provisioning/i }),
     );
-    await screen.findByText('No account found for john.doe@example.com.');
 
     await user.click(
-      screen.getByRole('button', { name: /confirm & invite owner/i }),
+      await screen.findByRole('button', { name: /confirm & invite owner/i }),
     );
 
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
@@ -276,10 +274,9 @@ describe(TenantDetailsForm, () => {
     await user.click(
       screen.getByRole('button', { name: /begin provisioning/i }),
     );
-    await screen.findByText('No account found for owner@example.com.');
 
     await user.click(
-      screen.getByRole('button', { name: /confirm & invite owner/i }),
+      await screen.findByRole('button', { name: /confirm & invite owner/i }),
     );
 
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
