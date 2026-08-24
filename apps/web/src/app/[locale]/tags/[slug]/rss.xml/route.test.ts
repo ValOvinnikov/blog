@@ -1,28 +1,30 @@
 /**
  * @vitest-environment jsdom
  */
-import { makePostCard } from '@web/testing/shared/post/fixtures';
+import type { TFeedPost } from '@blog/service';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import { notFound } from 'next/navigation';
 
-const { getTagPageMock, getPostListMock } = vi.hoisted(() => ({
+const { getTagPageMock, getAllPublishedPostsMock } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
-  getPostListMock: vi.fn(),
+  getAllPublishedPostsMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
   service: {
     pages: { tag: { v1: { getTagPage: getTagPageMock } } },
-    modules: { postList: { v1: { getPostList: getPostListMock } } },
+    entities: {
+      posts: { v1: { getAllPublishedPosts: getAllPublishedPostsMock } },
+    },
   },
 }));
 
-const post = makePostCard({
+const post: TFeedPost = {
   title: 'Hello & Welcome',
   slug: 'hello-welcome',
   excerpt: 'A <first> post.',
   publishedAt: '2026-01-15T00:00:00Z',
-});
+};
 
 const params = Promise.resolve({ slug: 'typescript' });
 
@@ -30,7 +32,7 @@ describe('GET /tags/[slug]/rss.xml', () => {
   afterEach(() => {
     vi.resetModules();
     getTagPageMock.mockReset();
-    getPostListMock.mockReset();
+    getAllPublishedPostsMock.mockReset();
   });
 
   it('returns a valid RSS 2.0 feed scoped to the tag with the correct content type', async () => {
@@ -45,10 +47,7 @@ describe('GET /tags/[slug]/rss.xml', () => {
         },
       }),
     });
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: { posts: [post], currentPage: 1, totalPages: 1 },
-    });
+    getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [post] });
     const { GET } = await import('./route');
 
     const response = await GET(new Request('https://example.com'), { params });
@@ -73,7 +72,6 @@ describe('GET /tags/[slug]/rss.xml', () => {
       'https://example.com/blog/hello-welcome',
     );
     expect(getTagPageMock).toHaveBeenCalledWith('typescript');
-    expect(getPostListMock).toHaveBeenCalledWith('post-list-1', 1);
   });
 
   it('falls back to the tag title as the channel description when none is authored', async () => {
@@ -88,10 +86,7 @@ describe('GET /tags/[slug]/rss.xml', () => {
         },
       }),
     });
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: { posts: [], currentPage: 1, totalPages: 1 },
-    });
+    getAllPublishedPostsMock.mockResolvedValue({ ok: true, data: [] });
     const { GET } = await import('./route');
 
     const response = await GET(new Request('https://example.com'), { params });
@@ -101,44 +96,6 @@ describe('GET /tags/[slug]/rss.xml', () => {
     expect(doc.querySelector('channel > description')?.textContent).toBe(
       'TypeScript',
     );
-  });
-
-  it('aggregates posts across every windowed post-list page', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTagDetailPage({
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: 'The latest TypeScript posts.',
-        },
-      }),
-    });
-    getPostListMock.mockImplementation((_id: string, page: number) => {
-      if (page === 1) {
-        return Promise.resolve({
-          ok: true,
-          data: { posts: [post], currentPage: 1, totalPages: 2 },
-        });
-      }
-      return Promise.resolve({
-        ok: true,
-        data: {
-          posts: [{ ...post, slug: 'second-post', title: 'Second post' }],
-          currentPage: 2,
-          totalPages: 2,
-        },
-      });
-    });
-    const { GET } = await import('./route');
-
-    const response = await GET(new Request('https://example.com'), { params });
-    const xml = await response.text();
-    const doc = new DOMParser().parseFromString(xml, 'application/xml');
-
-    expect(doc.querySelectorAll('item')).toHaveLength(2);
-    expect(getPostListMock).toHaveBeenCalledTimes(2);
   });
 
   it('calls notFound() when the tag fetch fails', async () => {
@@ -151,18 +108,18 @@ describe('GET /tags/[slug]/rss.xml', () => {
     ).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(getPostListMock).not.toHaveBeenCalled();
+    expect(getAllPublishedPostsMock).not.toHaveBeenCalled();
 
     errorSpy.mockRestore();
   });
 
-  it('calls notFound() when the first post-list page fetch fails', async () => {
+  it('calls notFound() when the posts fetch fails', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: makeTagDetailPage(),
     });
-    getPostListMock.mockResolvedValue({
+    getAllPublishedPostsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
