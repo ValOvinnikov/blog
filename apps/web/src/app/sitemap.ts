@@ -1,13 +1,12 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
 import { routing } from '@web/i18n/routing';
-import { AUTHOR_ITEMS_PER_PAGE } from '@web/utils/author-items-per-page';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import type { MetadataRoute } from 'next';
 
 // Only `getPostParams()` projects a `publishedAt` field, so `lastModified`
-// stays unset for topic/tag/author/generic-page entries.
+// stays unset for topic/tag/generic-page entries.
 const toEntry = (
   path: string,
   siteUrl: string,
@@ -48,20 +47,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     postParamsResult,
     topicParamsResult,
     tagParamsResult,
-    authorParamsResult,
     topicPaginationParamsResult,
     tagPaginationParamsResult,
-    authorPaginationParamsResult,
     blogParamsResult,
     genericPageSlugsResult,
   ] = await Promise.all([
     service.pages.post.v1.getPostParams(),
     service.pages.topic.v1.getTopicParams(),
     service.pages.tag.v1.getTagParams(),
-    service.pages.author.v1.getAuthorParams(),
     service.pages.topic.v1.getTopicPaginationParams(),
     service.pages.tag.v1.getTagPaginationParams(),
-    service.pages.author.v1.getAuthorPaginationParams(AUTHOR_ITEMS_PER_PAGE),
     service.pages.blog.v1.getIndexPageParams(),
     service.pages.generic.v1.getPageSlugs(),
   ]);
@@ -87,13 +82,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
   const tags = tagParamsResult.ok ? tagParamsResult.data : [];
 
-  if (!authorParamsResult.ok) {
-    logger.error('sitemap.author_params_fetch_failed', {
-      error: authorParamsResult.error,
-    });
-  }
-  const authors = authorParamsResult.ok ? authorParamsResult.data : [];
-
   if (!topicPaginationParamsResult.ok) {
     logger.error('sitemap.topic_pagination_params_fetch_failed', {
       error: topicPaginationParamsResult.error,
@@ -110,15 +98,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
   const tagPages = tagPaginationParamsResult.ok
     ? tagPaginationParamsResult.data
-    : [];
-
-  if (!authorPaginationParamsResult.ok) {
-    logger.error('sitemap.author_pagination_params_fetch_failed', {
-      error: authorPaginationParamsResult.error,
-    });
-  }
-  const authorPages = authorPaginationParamsResult.ok
-    ? authorPaginationParamsResult.data
     : [];
 
   if (!blogParamsResult.ok) {
@@ -155,10 +134,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...tags.map(({ slug }) => toEntry(routes.tag(slug), siteUrl)),
     ...tagPages.map(({ slug, page }) =>
       toEntry(routes.tag(slug, Number(page)), siteUrl),
-    ),
-    ...authors.map(({ slug }) => toEntry(routes.author(slug), siteUrl)),
-    ...authorPages.map(({ slug, page }) =>
-      toEntry(routes.author(slug, Number(page)), siteUrl),
     ),
     ...genericPageSlugs.map(({ slug }) =>
       toEntry(routes.genericPage(slug), siteUrl),

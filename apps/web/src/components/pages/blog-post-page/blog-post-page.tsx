@@ -200,7 +200,12 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
               }}
               lead={excerpt}
               meta={{
-                author: { ...author, href: routes.author(author.slug) },
+                author: {
+                  ...author,
+                  href: author.profilePageSlug
+                    ? routes.genericPage(author.profilePageSlug)
+                    : undefined,
+                },
                 publishedAt,
                 formattedDate: format.dateTime(new Date(publishedAt), {
                   year: 'numeric',

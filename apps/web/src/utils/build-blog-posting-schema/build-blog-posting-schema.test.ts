@@ -26,7 +26,7 @@ const post: TPostDetail = {
   author: {
     id: 'author-1',
     name: 'Jane Doe',
-    slug: 'jane-doe',
+    profilePageSlug: 'jane-doe',
     imageUrl: undefined,
     role: undefined,
     bio: undefined,

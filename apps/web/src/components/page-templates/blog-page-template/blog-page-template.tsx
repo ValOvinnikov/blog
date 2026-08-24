@@ -15,23 +15,22 @@ export interface IBlogPageTemplateProps {
 
 /**
  * BlogPageTemplate — the shared archive page-level shell (h1 + optional
- * posts/pagination), reused by the blog index, topic, tag, and author
- * archives. The breadcrumb trail is page chrome, not shell content — callers
- * render it via `BreadcrumbBar` as a sibling before this template, not
- * through it. `introHeader` renders before the `<h1>` (e.g. an author's role
- * eyebrow and avatar); `topicChips` and `socialLinks` both render after
- * `supportingText`, before `posts` — `topicChips` first (e.g. the
- * topic chip nav row), then `socialLinks` (e.g. an author's social
- * links). The archive's own furniture (everything but `modules`) renders
- * inside a constrained container; `modules` renders as a sibling outside it,
- * directly under `<main>`, each module owning its own full-bleed background
- * via `Section`. `posts`/`pagination` are optional: the blog index renders
- * its archive through its own full-bleed `Section` in the `modules`
- * position instead, so it never fills them; topic/tag/author still do. When
- * `modules` is present, the furniture drops its own bottom padding and the
- * trailing margin of whichever furniture child renders last, so the
- * following module's own `layout.spacingTop` is the only gap between them.
- * `Header`/`Footer` stay owned by `layout.tsx`, matching `HomePageTemplate`.
+ * posts/pagination), reused by the blog index, topic, and tag archives. The
+ * breadcrumb trail is page chrome, not shell content — callers render it via
+ * `BreadcrumbBar` as a sibling before this template, not through it.
+ * `introHeader` renders before the `<h1>`; `topicChips` and `socialLinks`
+ * both render after `supportingText`, before `posts` — `topicChips` first
+ * (e.g. the topic chip nav row), then `socialLinks`. The archive's own
+ * furniture (everything but `modules`) renders inside a constrained
+ * container; `modules` renders as a sibling outside it, directly under
+ * `<main>`, each module owning its own full-bleed background via `Section`.
+ * `posts`/`pagination` are optional: the blog index renders its archive
+ * through its own full-bleed `Section` in the `modules` position instead, so
+ * it never fills them; topic/tag still do. When `modules` is present, the
+ * furniture drops its own bottom padding and the trailing margin of
+ * whichever furniture child renders last, so the following module's own
+ * `layout.spacingTop` is the only gap between them. `Header`/`Footer` stay
+ * owned by `layout.tsx`, matching `HomePageTemplate`.
  */
 export const BlogPageTemplate = ({
   heading,
