@@ -33,24 +33,7 @@ describe('authorSchema profilePage field', () => {
 });
 
 describe('authorSchema slug field', () => {
-  it('remains required — untouched by the profilePage addition', () => {
-    const slugField = getField('slug');
-
-    if (!slugField?.validation) {
-      throw new Error('Expected authorSchema to define a slug field.');
-    }
-
-    let requiredCalled = false;
-    const rule = {
-      required: () => {
-        requiredCalled = true;
-        return rule;
-      },
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-    (slugField.validation as any)(rule);
-
-    expect(requiredCalled).toBe(true);
+  it('is not defined — removed in favor of profilePage', () => {
+    expect(getField('slug')).toBeUndefined();
   });
 });
