@@ -6,14 +6,14 @@ import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-d
 import { getDomainVerificationStatusAction } from '@admin/server/provisioning/get-domain-verification-status-action';
 import { getTenantProvisioningStatusAction } from '@admin/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@admin/server/provisioning/retry-provisioning-step-action';
+import { classifyProvisioningError } from '@admin/utils/provisioning-error/provisioning-error';
 import { adminRoutes } from '@admin/utils/routes/routes';
-import { Size } from '@blog/config';
+import { ICONS, Size } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStatus,
-  type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
 import type {
@@ -23,6 +23,7 @@ import type {
 import { Button } from '@blog/ui/atoms/button';
 import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
+import { Icon } from '@blog/ui/atoms/icon';
 import { StatusBadge } from '@blog/ui/atoms/status-badge';
 import { Text } from '@blog/ui/atoms/text';
 import { LinkButton } from '@blog/ui/molecules/link-button';
@@ -44,6 +45,19 @@ const STEP_TONE: Record<
   RUNNING: 'warn',
   DONE: 'ok',
 };
+
+// Highest-priority status wins: any FAILED step outranks a RUNNING one, which
+// outranks a still-IDLE one, so the header badge always reflects the most
+// urgent thing happening across the whole run rather than the last step
+// polled. `provisioningStatus` itself can't be used for this — the DB column
+// only settles to READY/FAILED once the *last* step finishes, so a failure
+// partway through the sequence would otherwise never surface here.
+const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
+  TENANT_PROVISIONING_STEP_STATUS.FAILED,
+  TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+  TENANT_PROVISIONING_STEP_STATUS.IDLE,
+  TENANT_PROVISIONING_STEP_STATUS.DONE,
+];
 
 const STEP_POLL_INTERVAL_MS = 4000;
 // The domain check makes a live Vercel API call with its own 5s timeout —
@@ -101,8 +115,7 @@ export const ProvisioningStatusView = ({
 }: TProvisioningStatusViewProps) => {
   const t = useTranslations('provisioningStatusView');
   const router = useRouter();
-  const [retryingStep, setRetryingStep] =
-    useState<TTenantProvisioningStep | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [, startTransition] = useTransition();
   const [renderedTenant, setRenderedTenant] = useState(tenant);
@@ -145,11 +158,18 @@ export const ProvisioningStatusView = ({
     connector,
     stepBody,
     stepTitle,
-    stepError,
-    trailing,
     stepStatusLive,
+    visuallyHidden,
     failedBadge,
     detailsColumn,
+    detailsHeader,
+    overallStatusLive,
+    errorCard,
+    errorHeadingRow,
+    errorIcon,
+    errorDetails,
+    errorDetailsSummary,
+    errorDetailsText,
     goToTenantButton,
     dnsCard,
     dnsRow,
@@ -201,19 +221,36 @@ export const ProvisioningStatusView = ({
     };
   }, [tenant.id, domainStatus]);
 
-  const allIdle = STEP_ORDER.every((stepKey) => {
-    const status =
+  const stepStatuses = STEP_ORDER.map(
+    (stepKey) =>
       provisioningSteps?.[stepKey]?.status ??
-      TENANT_PROVISIONING_STEP_STATUS.IDLE;
-    return status === TENANT_PROVISIONING_STEP_STATUS.IDLE;
-  });
+      TENANT_PROVISIONING_STEP_STATUS.IDLE,
+  );
+  const allIdle = stepStatuses.every(
+    (status) => status === TENANT_PROVISIONING_STEP_STATUS.IDLE,
+  );
+  const overallStepStatus =
+    OVERALL_STATUS_PRIORITY.find((candidate) =>
+      stepStatuses.includes(candidate),
+    ) ?? TENANT_PROVISIONING_STEP_STATUS.DONE;
+  const isOverallFailed =
+    overallStepStatus === TENANT_PROVISIONING_STEP_STATUS.FAILED;
+  const failedStepError = isOverallFailed
+    ? STEP_ORDER.map((stepKey) => provisioningSteps?.[stepKey]).find(
+        (stepState) =>
+          stepState?.status === TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      )?.error
+    : undefined;
+  const errorKind = isOverallFailed
+    ? classifyProvisioningError(failedStepError)
+    : undefined;
 
-  const handleRetry = (stepKey: TTenantProvisioningStep) => {
-    setRetryingStep(stepKey);
+  const handleRetry = () => {
+    setIsRetrying(true);
     startTransition(async () => {
       await retryProvisioningStepAction(tenant.id);
       router.refresh();
-      setRetryingStep(null);
+      setIsRetrying(false);
     });
   };
 
@@ -261,13 +298,11 @@ export const ProvisioningStatusView = ({
         <aside className={steps()}>
           <div className={list()}>
             {STEP_ORDER.map((stepKey, index) => {
-              const stepState = provisioningSteps?.[stepKey];
               const status =
-                stepState?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
+                stepStatuses[index] ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
               const isFailed =
                 status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
               const isDone = status === TENANT_PROVISIONING_STEP_STATUS.DONE;
-              const isRetrying = retryingStep === stepKey;
               const isLast = index === STEP_ORDER.length - 1;
               const title = t(`stepLabel.${stepKey}`);
 
@@ -286,32 +321,17 @@ export const ProvisioningStatusView = ({
                   </div>
                   <div className={stepBody()}>
                     <span className={stepTitle()}>{title}</span>
-                    {isFailed && stepState?.error && (
-                      <span className={stepError()}>{stepState.error}</span>
-                    )}
-                  </div>
-                  <div className={trailing()}>
+                    {/* The circle glyph is decorative (`aria-hidden`), so
+                        this text — visually hidden, not removed — is what
+                        actually carries each step's status to assistive
+                        tech; the live region still announces it on change
+                        even though the sighted badge that used to sit here
+                        is gone. */}
                     <span className={stepStatusLive()} aria-live="polite">
-                      {isFailed ? (
-                        <span className={failedBadge()}>
-                          {t(`statusLabel.${status}`)}
-                        </span>
-                      ) : (
-                        <StatusBadge tone={STEP_TONE[status]}>
-                          {t(`statusLabel.${status}`)}
-                        </StatusBadge>
-                      )}
+                      <span className={visuallyHidden()}>
+                        {t(`statusLabel.${status}`)}
+                      </span>
                     </span>
-                    {isFailed && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => handleRetry(stepKey)}
-                        isDisabled={isRetrying}
-                      >
-                        {isRetrying ? t('retryingButton') : t('retryButton')}
-                      </Button>
-                    )}
                   </div>
                 </div>
               );
@@ -320,6 +340,55 @@ export const ProvisioningStatusView = ({
         </aside>
 
         <div className={detailsColumn()}>
+          {!allIdle && (
+            <div className={detailsHeader()}>
+              <span className={overallStatusLive()} aria-live="polite">
+                {isOverallFailed ? (
+                  <span className={failedBadge()}>
+                    {t(`statusLabel.${overallStepStatus}`)}
+                  </span>
+                ) : (
+                  <StatusBadge tone={STEP_TONE[overallStepStatus]}>
+                    {t(`statusLabel.${overallStepStatus}`)}
+                  </StatusBadge>
+                )}
+              </span>
+              {isOverallFailed && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleRetry}
+                  isDisabled={isRetrying}
+                >
+                  {isRetrying ? t('retryingButton') : t('retryButton')}
+                </Button>
+              )}
+            </div>
+          )}
+
+          {isOverallFailed && errorKind && (
+            <div className={errorCard()} role="alert">
+              <div className={errorHeadingRow()}>
+                <Icon name={ICONS.WARNING} className={errorIcon()} />
+                <Heading level={2} size={Size.XS}>
+                  {t(`errorKind.${errorKind}.headline`)}
+                </Heading>
+              </div>
+              <Text variant="supporting">
+                {t(`errorKind.${errorKind}.body`)}
+              </Text>
+              <Text variant="hint">{t(`errorKind.${errorKind}.nextStep`)}</Text>
+              {failedStepError && (
+                <details className={errorDetails()}>
+                  <summary className={errorDetailsSummary()}>
+                    {t('technicalDetailsToggle')}
+                  </summary>
+                  <pre className={errorDetailsText()}>{failedStepError}</pre>
+                </details>
+              )}
+            </div>
+          )}
+
           <TenantDetailsPanel
             tenant={tenant}
             isEditable={allIdle}

@@ -124,7 +124,7 @@ describe(ProvisioningStatusView, () => {
     expect(screen.getByRole('complementary')).toBeInTheDocument();
   });
 
-  it('lists all five provisioning steps in order', () => {
+  it('lists all six provisioning steps in order, in operator language', () => {
     const tenant = makeTenant();
     render(
       <ProvisioningStatusView
@@ -135,11 +135,12 @@ describe(ProvisioningStatusView, () => {
     );
 
     const headings = [
-      'Create Sanity project',
-      'Seed content',
-      'Deploy Studio',
-      'Persist read token',
-      'Map domain',
+      'Create the content workspace',
+      'Add starter content',
+      'Deploy the content editor',
+      'Connect the site to its content',
+      'Connect the custom domain',
+      'Wire up the CMS to the site',
     ];
     for (const heading of headings) {
       expect(screen.getByText(heading)).toBeVisible();
@@ -296,7 +297,7 @@ describe(ProvisioningStatusView, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('shows the error message and a Retry button for a failed step, with no Retry for others', () => {
+  it('shows a single overall status badge and a single Retry button in the tenant details header for a failed step, with no per-step Retry buttons in the sidebar', () => {
     const tenant = makeTenant({
       provisioningSteps: {
         ...idleProvisioningSteps(),
@@ -314,8 +315,132 @@ describe(ProvisioningStatusView, () => {
       />,
     );
 
-    expect(screen.getByText('Vercel deploy failed: build error')).toBeVisible();
     expect(screen.getAllByRole('button', { name: 'Retry' })).toHaveLength(1);
+    expect(
+      within(screen.getByRole('complementary')).queryByRole('button', {
+        name: 'Retry',
+      }),
+    ).not.toBeInTheDocument();
+    // One "Failed" per the DEPLOY_STUDIO step's visually-hidden sidebar
+    // announcement, one for the header's single overall status badge.
+    expect(screen.getAllByText('Failed')).toHaveLength(2);
+  });
+
+  it("no longer renders a step's raw error text inline in the sidebar", () => {
+    const tenant = makeTenant({
+      provisioningSteps: {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+          error: 'Vercel deploy failed: build error',
+        },
+      },
+    });
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+      />,
+    );
+
+    expect(
+      within(screen.getByRole('complementary')).queryByText(
+        'Vercel deploy failed: build error',
+      ),
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not render a parsed error card when no step has failed', () => {
+    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+      />,
+    );
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  describe('parsed error at the top of the tenant details panel', () => {
+    const renderFailed = (error: string) => {
+      const tenant = makeTenant({
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+            error,
+          },
+        },
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
+        />,
+      );
+    };
+
+    it('maps a 403 permission failure to a friendly headline and next step, with the raw text under Technical details', () => {
+      const rawError =
+        'Sanity Access API POST /access/project/d8ui85m2/invites failed: 403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to invite administrators."}';
+      renderFailed(rawError);
+
+      expect(
+        screen.getByRole('heading', {
+          name: 'Missing permission to complete this step',
+        }),
+      ).toBeVisible();
+      expect(
+        screen.getByText('Grant the missing permission, then retry.'),
+      ).toBeVisible();
+      expect(screen.getByText('Technical details')).toBeVisible();
+      expect(screen.getByText(rawError)).toBeInTheDocument();
+    });
+
+    it('maps a 400 duplicate/already-in-use failure to a friendly headline and next step', () => {
+      const rawError =
+        'Sanity Access API POST /access/project/d8ui85m2/invites failed: 400 {"statusCode":400,"error":"Bad Request","message":"This email is already a member of another project."}';
+      renderFailed(rawError);
+
+      expect(
+        screen.getByRole('heading', {
+          name: 'Already in use by another tenant',
+        }),
+      ).toBeVisible();
+      expect(
+        screen.getByText('Resolve the conflict, then retry.'),
+      ).toBeVisible();
+    });
+
+    it('maps a network/timeout failure to a friendly headline and next step', () => {
+      renderFailed('fetch failed');
+
+      expect(
+        screen.getByRole('heading', {
+          name: "Couldn't reach the provisioning service",
+        }),
+      ).toBeVisible();
+      expect(screen.getByText('Wait a moment, then retry.')).toBeVisible();
+    });
+
+    it('falls back to a generic friendly headline and preserved raw text for an unrecognised failure shape', () => {
+      const rawError = 'CORS API is down';
+      renderFailed(rawError);
+
+      expect(
+        screen.getByRole('heading', { name: 'This step failed' }),
+      ).toBeVisible();
+      expect(
+        screen.getByText(
+          'Retry, or check the technical details before asking for help.',
+        ),
+      ).toBeVisible();
+      expect(screen.getByText(rawError)).toBeInTheDocument();
+    });
   });
 
   it('re-dispatches the workflow for this tenant when Retry is clicked', async () => {
@@ -510,7 +635,8 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(screen.getByText('Running…')).toBeVisible();
+      const sidebar = screen.getByRole('complementary');
+      expect(within(sidebar).getByText('Running…')).toBeVisible();
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
@@ -519,8 +645,8 @@ describe(ProvisioningStatusView, () => {
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
         'tenant-1',
       );
-      expect(screen.getByText('Done')).toBeVisible();
-      expect(screen.queryByText('Running…')).not.toBeInTheDocument();
+      expect(within(sidebar).getByText('Done')).toBeVisible();
+      expect(within(sidebar).queryByText('Running…')).not.toBeInTheDocument();
     });
 
     it('announces a polled step-status transition through a stable aria-live region', async () => {
@@ -550,7 +676,8 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      const liveRegionBefore = screen
+      const sidebar = screen.getByRole('complementary');
+      const liveRegionBefore = within(sidebar)
         .getByText('Running…')
         .closest('[aria-live="polite"]');
       expect(liveRegionBefore).not.toBeNull();
@@ -562,7 +689,7 @@ describe(ProvisioningStatusView, () => {
       // The new status text is announced by the same live region — not a
       // freshly mounted one, which some screen readers announce on mount
       // regardless of content, defeating the point of a targeted update.
-      const liveRegionAfter = screen
+      const liveRegionAfter = within(sidebar)
         .getByText('Done')
         .closest('[aria-live="polite"]');
       expect(liveRegionAfter).toBe(liveRegionBefore);

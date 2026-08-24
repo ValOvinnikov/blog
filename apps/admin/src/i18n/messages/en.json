@@ -224,12 +224,12 @@
     "eyebrow": "Provisioning status",
     "description": "Each step is independently resumable — a failed step's Retry re-dispatches the workflow, which skips whatever already succeeded.",
     "stepLabel": {
-      "SANITY_PROJECT": "Create Sanity project",
-      "SEED_CONTENT": "Seed content",
-      "DEPLOY_STUDIO": "Deploy Studio",
-      "PERSIST_TOKEN": "Persist read token",
-      "MAP_DOMAIN": "Map domain",
-      "CREATE_WEBHOOK": "Create revalidation webhook"
+      "SANITY_PROJECT": "Create the content workspace",
+      "SEED_CONTENT": "Add starter content",
+      "DEPLOY_STUDIO": "Deploy the content editor",
+      "PERSIST_TOKEN": "Connect the site to its content",
+      "MAP_DOMAIN": "Connect the custom domain",
+      "CREATE_WEBHOOK": "Wire up the CMS to the site"
     },
     "statusLabel": {
       "IDLE": "Not started",
@@ -241,6 +241,29 @@
     "retryingButton": "Retrying…",
     "startButton": "Start provisioning",
     "startingButton": "Starting…",
+    "errorKind": {
+      "permission": {
+        "headline": "Missing permission to complete this step",
+        "body": "The provisioning credentials aren't allowed to do what this step needs — often inviting a project member or granting access. It may need to be finished manually in the Sanity Manage or Vercel dashboard.",
+        "nextStep": "Grant the missing permission, then retry."
+      },
+      "duplicate": {
+        "headline": "Already in use by another tenant",
+        "body": "Something this step is trying to create — a project handle, an email invite, or a domain — is already claimed elsewhere.",
+        "nextStep": "Resolve the conflict, then retry."
+      },
+      "network": {
+        "headline": "Couldn't reach the provisioning service",
+        "body": "The request to Sanity or Vercel timed out or the connection dropped before finishing. This is often temporary.",
+        "nextStep": "Wait a moment, then retry."
+      },
+      "unknown": {
+        "headline": "This step failed",
+        "body": "Provisioning hit an error that isn't recognized yet. The technical details below may help diagnose it.",
+        "nextStep": "Retry, or check the technical details before asking for help."
+      }
+    },
+    "technicalDetailsToggle": "Technical details",
     "dnsHeading": "Domain verification",
     "dnsStatus": {
       "NOT_CONFIGURED": "Unavailable",
