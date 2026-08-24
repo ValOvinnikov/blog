@@ -36,7 +36,7 @@ const { createTenantRevalidateWebhookMock } = vi.hoisted(() => ({
 vi.mock('@blog/db/queries/tenants', () => ({
   reactivateTenant: reactivateTenantMock,
 }));
-vi.mock('./lib/status-callback', () => ({
+vi.mock('./lib/report-step-status', () => ({
   reportStepStatus: reportStepStatusMock,
 }));
 vi.mock('./steps/create-sanity-project', () => ({
@@ -73,7 +73,6 @@ const env = {
   vercelWebProjectId: 'proj-1',
   vercelCliVersion: '48.0.0',
   adminAppBaseUrl: 'https://admin.example.com',
-  callbackSecret: 'shh',
   platformDomain: 'example.com',
   tenantSanityDataset: 'test-dataset',
   webAppBaseUrl: 'https://example.com',

@@ -285,19 +285,18 @@ few secrets/vars nothing else in this repo has needed yet:
       token's owner defaults to, not necessarily this one.
 - [ ] Secret `TENANT_PROVISIONING_CALLBACK_SECRET` — a shared secret
       (`openssl rand -hex 32`), **byte-identical** to `apps/admin`'s own
-      `TENANT_PROVISIONING_CALLBACK_SECRET` env var. The workflow sends it as
-      `Authorization: Bearer <secret>` on every call to
-      `POST /api/provisioning/status-callback`; a mismatch makes every
-      callback 401 (the tenant row still gets provisioned, but the admin
-      wizard's live per-step status never updates).
+      `TENANT_PROVISIONING_CALLBACK_SECRET` env var, only if `apps/admin`'s
+      `/api/provisioning/status-callback` route is still in use — the CI
+      provisioning script itself now writes each step's status directly to
+      Postgres and no longer calls that route.
 - [ ] Secret `TENANT_TOKEN_ENCRYPTION_KEY` — the **same** value already set
       as the `blog-prod`/`cms-prod`-adjacent Vercel env var of the same name
       (see the `@blog/db` env vars table above). `setTenantSanityToken`
       throws without it.
 - [ ] Variable `ADMIN_APP_BASE_URL` — the deployed `apps/admin` origin (no
-      trailing slash/path), e.g. `https://admin.{your-hosting}`. Used both as
-      the status-callback target and as the CORS origin step 1 adds to each
-      new tenant's Sanity project. `apps/admin` has no deploy workflow of its
+      trailing slash/path), e.g. `https://admin.{your-hosting}`. Used as the
+      CORS origin step 1 adds to each new tenant's Sanity project. `apps/admin`
+      has no deploy workflow of its
       own yet (not in `docs/DEPLOY.md`'s environment matrix), so there's no
       existing convention to reuse here — this is a new variable.
 - [ ] Variable `VERCEL_TEAM_ID` — only needed if the Vercel account is

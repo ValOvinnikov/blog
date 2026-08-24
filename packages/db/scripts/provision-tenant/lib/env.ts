@@ -23,9 +23,8 @@ export type TProvisionEnv = {
   vercelWebProjectId: string;
   vercelCliVersion: string;
   // Base origin of the deployed `apps/admin` app (no trailing slash/path) —
-  // both the status-callback target and the Sanity CORS origin step 1 adds.
+  // the Sanity CORS origin step 1 adds.
   adminAppBaseUrl: string;
-  callbackSecret: string;
   // Platform domain each tenant's Studio subdomain is minted under
   // (`studio-<slug>.<platformDomain>`) — see `studioDomainForSlug`.
   platformDomain: string;
@@ -58,7 +57,6 @@ export function loadProvisionEnv(): TProvisionEnv {
     vercelCliVersion:
       process.env['VERCEL_CLI_VERSION'] ?? DEFAULT_VERCEL_CLI_VERSION,
     adminAppBaseUrl: requireEnv('ADMIN_APP_BASE_URL'),
-    callbackSecret: requireEnv('TENANT_PROVISIONING_CALLBACK_SECRET'),
     platformDomain: requireEnv('PLATFORM_DOMAIN'),
     tenantSanityDataset: requireEnv('TENANT_SANITY_DATASET'),
     webAppBaseUrl: requireEnv('WEB_APP_URL'),

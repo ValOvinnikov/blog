@@ -3,7 +3,7 @@
  * reaches a log line — a raw `Error`/`unknown` catch value logged verbatim
  * lets an attacker-influenced message inject `\r`/`\n`/control sequences into
  * log output and forge fake log entries. Always run a caught value through
- * this before logging or sending it in a status-callback payload.
+ * this before logging it or persisting it as a step's error message.
  */
 export function sanitizeLogMessage(value: unknown): string {
   const raw = value instanceof Error ? value.message : String(value);
