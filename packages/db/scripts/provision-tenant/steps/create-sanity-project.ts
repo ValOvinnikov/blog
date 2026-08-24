@@ -1,9 +1,9 @@
-import { getFirstAdminEmail } from '@blog/db/queries/admins';
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { setTenantSanityProject } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import type { TProvisionEnv } from '../lib/env';
+import { sanitizeLogMessage } from '../lib/sanitize-log-message';
 import {
   addSanityCorsOrigin,
   createSanityDataset,
@@ -19,21 +19,22 @@ export type TCreateSanityProjectResult = {
   sanityDataset: string;
 };
 
-// Sanity's Free plan (which every tenant project is provisioned on) exposes
-// only `administrator` and `viewer` project-member roles — the granular
-// roles (editor/developer/custom) are a paid-plan feature and don't exist on
-// these projects. `viewer` can't author content, so both the tenant owner
-// and the platform superadmin are invited as `administrator`.
-const TENANT_PROJECT_MEMBER_ROLE = 'administrator';
+// `viewer` is the only project-member role `SANITY_MANAGEMENT_TOKEN` (an
+// org-level "create project" token) has permission to grant — attempting
+// `administrator` 403s. Do not "correct" this back; an operator upgrades an
+// invitee to administrator by hand in the Sanity Manage UI after they accept.
+const TENANT_PROJECT_MEMBER_ROLE = 'viewer';
 
 /**
  * Step 1 — creates the tenant's own Sanity project, its dataset (named per
  * `env.tenantSanityDataset`), a CORS entry for the admin app's origin, and
- * invites both the tenant owner (resolved from their OWNER `memberships`
- * row) and the platform superadmin (the earliest-created `admins` row) as
- * project members — Sanity Studio's login flow requires project
- * membership, so without this no one could sign into the deployed Studio,
- * and the superadmin couldn't get in to debug it either.
+ * invites the tenant owner (resolved from their OWNER `memberships` row) as
+ * a project member — Sanity Studio's login flow requires project
+ * membership, so without this the owner could never sign into the deployed
+ * Studio. The platform superadmin is not invited here: unlike the owner,
+ * they're already in the Sanity organization and can add themselves to any
+ * tenant project as administrator via the Sanity Manage UI, so a `viewer`
+ * invite for them would only cost a Free-plan seat for no benefit.
  *
  * The project id is persisted the moment it's minted, before the dataset/CORS
  * calls: Sanity has no delete-project API to clean up an orphan, so a retry
@@ -88,13 +89,8 @@ export async function createTenantSanityProject(
   }
 
   const ownerEmail = await getTenantOwnerEmail(tenant.id);
-  const superadminEmail = await getFirstAdminEmail();
 
-  const emailsToInvite: string[] = [];
-
-  if (ownerEmail) {
-    emailsToInvite.push(ownerEmail);
-  } else {
+  if (!ownerEmail) {
     // Tenant creation always inserts an OWNER membership, so this should
     // only happen on a genuine data anomaly. Provisioning must still
     // complete — logging is the only trace an operator gets that the
@@ -102,47 +98,44 @@ export async function createTenantSanityProject(
     console.error(
       `create-sanity-project: no resolvable owner email for tenant "${tenant.id}" — skipping Sanity Studio invite.`,
     );
-  }
-
-  if (superadminEmail) {
-    // A superadmin who is also this tenant's owner is already covered by
-    // the invite above — inviting them again would duplicate an
-    // already-pending invite for the same email.
-    const superadminIsOwner =
-      !!ownerEmail &&
-      superadminEmail.toLowerCase() === ownerEmail.toLowerCase();
-    if (!superadminIsOwner) {
-      emailsToInvite.push(superadminEmail);
-    }
   } else {
-    // A brand-new platform install with no `admins` row yet is a normal,
-    // expected state — provisioning must still complete without a
-    // superadmin invite.
-    console.error(
-      `create-sanity-project: no admins row found — skipping the platform superadmin's Sanity Studio invite for tenant "${tenant.id}".`,
-    );
-  }
-
-  if (emailsToInvite.length > 0) {
-    const invites = await listSanityProjectInvites({
-      token: env.sanityManagementToken,
-      projectId,
-    });
-    const alreadyInvitedEmails = new Set(
-      invites
-        .map((invite) => invite.email?.toLowerCase())
-        .filter((email): email is string => Boolean(email)),
-    );
-
-    for (const email of emailsToInvite) {
-      if (alreadyInvitedEmails.has(email.toLowerCase())) continue;
-
-      await createSanityProjectInvite({
+    // Listing invites can fail the same way inviting can (a token permission
+    // gap, a transient Access API error). Without it there's no reliable way
+    // to tell whether the owner is already invited, so the invite is skipped
+    // for this run rather than risking duplicate-invite noise — a later
+    // retry re-lists and catches up.
+    let alreadyInvited: boolean | undefined;
+    try {
+      const invites = await listSanityProjectInvites({
         token: env.sanityManagementToken,
         projectId,
-        email,
-        role: TENANT_PROJECT_MEMBER_ROLE,
       });
+      alreadyInvited = invites.some(
+        (invite) => invite.email?.toLowerCase() === ownerEmail.toLowerCase(),
+      );
+    } catch (error) {
+      console.error(
+        `create-sanity-project: failed to list existing Sanity project invites for tenant "${tenant.id}" — skipping the owner's Sanity Studio invite this run: ${sanitizeLogMessage(error)}`,
+      );
+    }
+
+    if (alreadyInvited === false) {
+      // Sanity Studio's login flow requires project membership, but a
+      // failed invite must not block the rest of provisioning (dataset
+      // seeding, the read-only token, domain mapping, the webhook) — an
+      // operator can always send the invite by hand afterward.
+      try {
+        await createSanityProjectInvite({
+          token: env.sanityManagementToken,
+          projectId,
+          email: ownerEmail,
+          role: TENANT_PROJECT_MEMBER_ROLE,
+        });
+      } catch (error) {
+        console.error(
+          `create-sanity-project: failed to invite the owner to tenant "${tenant.id}"'s Sanity project "${projectId}" — needs a manual invite: ${sanitizeLogMessage(error)}`,
+        );
+      }
     }
   }
 
