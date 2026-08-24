@@ -279,6 +279,7 @@
   },
   "tenantDetailsPanel": {
     "heading": "Tenant details",
+    "fieldsGroupLabel": "Tenant detail fields",
     "nameLabel": "Name",
     "slugLabel": "Slug",
     "domainLabel": "Primary domain",

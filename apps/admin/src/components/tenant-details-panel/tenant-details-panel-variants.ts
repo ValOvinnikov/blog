@@ -13,7 +13,6 @@ export const tenantDetailsPanelVariants = tv({
     fieldLabel: ['text-sm font-medium text-text'],
     fieldError: ['text-xs text-error'],
     fieldLockReason: ['text-xs text-text-muted'],
-    lockedValue: ['break-words font-mono text-copy text-text'],
     actions: ['mt-2 flex items-center justify-end'],
     lockAnnouncementLive: ['sr-only'],
     planControl: ['self-start'],

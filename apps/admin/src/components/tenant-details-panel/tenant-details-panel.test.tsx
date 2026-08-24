@@ -523,12 +523,15 @@ describe(TenantDetailsPanel, () => {
         />,
       );
 
-      expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
-      const planValue = screen.getByRole('group', { name: 'Plan' });
-      expect(planValue).toHaveTextContent('Growth');
-      expect(planValue).toHaveAccessibleDescription(
+      const planGroup = screen.getByRole('radiogroup', { name: 'Plan' });
+      expect(planGroup).toHaveAttribute('aria-disabled', 'true');
+      expect(planGroup).toHaveAccessibleDescription(
         'Locked — provisioning has already finished.',
       );
+
+      const growthOption = screen.getByRole('radio', { name: 'Growth' });
+      expect(growthOption).toBeDisabled();
+      expect(growthOption).toHaveAttribute('aria-checked', 'true');
     });
 
     it('surfaces a mismatched server-side lock as a field error on the still-enabled input', async () => {
@@ -593,9 +596,27 @@ describe(TenantDetailsPanel, () => {
       expect(
         screen.getByRole('textbox', { name: 'Owner email' }),
       ).toBeDisabled();
+      expect(screen.getByRole('radio', { name: 'Growth' })).toBeDisabled();
       expect(
         screen.getByRole('button', { name: 'Save changes' }),
       ).toBeDisabled();
+    });
+  });
+
+  describe('fields container', () => {
+    it('exposes a group role with an accessible name, so a forced-focus landing announces something', () => {
+      const tenant = makeTenant();
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={NO_LOCKS}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(
+        screen.getByRole('group', { name: 'Tenant detail fields' }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -879,6 +900,41 @@ describe(TenantDetailsPanel, () => {
       );
       expect(liveRegion).toHaveTextContent(
         'More tenant detail fields are now editable.',
+      );
+    });
+
+    it('announces a lock, not nothing, when a same-count swap changes which field is locked', () => {
+      const NAME_LOCKED: TTenantFieldLocks = {
+        name: { kind: 'step', step: TENANT_PROVISIONING_STEP.SANITY_PROJECT },
+      };
+      const tenant = makeTenant();
+      const { container, rerender } = rtlRender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={SLUG_LOCKED}
+            ownerEmail="owner@example.com"
+          />,
+        ),
+      );
+
+      const liveRegion = container.querySelector('[aria-live="assertive"]');
+      expect(liveRegion).toHaveTextContent('');
+
+      // slug unlocks as name locks, in the same render — the locked-field
+      // count stays 1, but the set genuinely changed.
+      rerender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={NAME_LOCKED}
+            ownerEmail="owner@example.com"
+          />,
+        ),
+      );
+
+      expect(liveRegion).toHaveTextContent(
+        'Some tenant detail fields are now locked.',
       );
     });
   });

@@ -142,16 +142,24 @@ export const TenantDetailsPanel = ({
   const nextLockedFieldsKey = [...lockedFieldKeys].sort().join(',');
   if (nextLockedFieldsKey !== renderedLockedFieldsKey) {
     const previousLockedKeys = new Set(
-      renderedLockedFieldsKey ? renderedLockedFieldsKey.split(',') : [],
+      renderedLockedFieldsKey
+        ? (renderedLockedFieldsKey.split(',') as TTenantFieldKey[])
+        : [],
     );
-    const previousLockedCount = previousLockedKeys.size;
+    const currentLockedKeys = new Set(lockedFieldKeys);
     const newlyLockedKeys = lockedFieldKeys.filter(
       (key) => !previousLockedKeys.has(key),
     );
+    const newlyUnlockedKeys = [...previousLockedKeys].filter(
+      (key) => !currentLockedKeys.has(key),
+    );
     setRenderedLockedFieldsKey(nextLockedFieldsKey);
-    if (lockedFieldKeys.length > previousLockedCount) {
+    // Set-based, not count-based: a same-count swap (one field locks as
+    // another unlocks) must still announce the lock rather than cancel out
+    // to nothing.
+    if (newlyLockedKeys.length > 0) {
       setLockAnnouncement(t('lockedAnnouncement'));
-    } else if (lockedFieldKeys.length < previousLockedCount) {
+    } else if (newlyUnlockedKeys.length > 0) {
       setLockAnnouncement(t('unlockedAnnouncement'));
     }
     setShouldMoveFocusOnTransition(
@@ -199,7 +207,6 @@ export const TenantDetailsPanel = ({
     fieldLabel,
     fieldError,
     fieldLockReason,
-    lockedValue,
     actions,
     lockAnnouncementLive,
     planControl,
@@ -268,9 +275,6 @@ export const TenantDetailsPanel = ({
     { value: TENANT_PLAN.FREE, label: t('planOptionFree') },
     { value: TENANT_PLAN.GROWTH, label: t('planOptionGrowth') },
   ];
-  const planLabel =
-    planOptions.find((option) => option.value === values.plan)?.label ??
-    values.plan;
 
   const textFields: { key: TTextFieldKey; label: string }[] = [
     { key: 'name', label: t('nameLabel') },
@@ -297,7 +301,13 @@ export const TenantDetailsPanel = ({
       )}
       {formError && <Alert type={ALERT_TYPE.ERROR} message={formError} />}
 
-      <div className={fields()} ref={fieldsContainerRef} tabIndex={-1}>
+      <div
+        className={fields()}
+        ref={fieldsContainerRef}
+        tabIndex={-1}
+        role="group"
+        aria-label={t('fieldsGroupLabel')}
+      >
         {textFields.map(({ key, label: labelText }) => {
           const id = TEXT_FIELD_ID[key];
           const errorId = `${id}-error`;
@@ -339,39 +349,27 @@ export const TenantDetailsPanel = ({
         })}
 
         <div className={field()}>
-          {planLock ? (
-            <>
-              <span className={fieldLabel()} id={`${PLAN_FIELD_ID}-label`}>
-                {t('planLabel')}
-              </span>
-              <p
-                className={lockedValue()}
-                role="group"
-                aria-labelledby={`${PLAN_FIELD_ID}-label`}
-                aria-describedby={`${PLAN_FIELD_ID}-lock-reason`}
-              >
-                {planLabel}
-              </p>
-              <span
-                id={`${PLAN_FIELD_ID}-lock-reason`}
-                className={fieldLockReason()}
-              >
-                {lockReasonText(planLock)}
-              </span>
-            </>
-          ) : (
-            <>
-              <label className={fieldLabel()} htmlFor={PLAN_FIELD_ID}>
-                {t('planLabel')}
-              </label>
-              <SegmentedControl<TTenantPlan>
-                ariaLabel={t('planLabel')}
-                options={planOptions}
-                value={values.plan}
-                onChange={(plan) => updateField('plan', plan)}
-                className={planControl()}
-              />
-            </>
+          <label className={fieldLabel()} htmlFor={PLAN_FIELD_ID}>
+            {t('planLabel')}
+          </label>
+          <SegmentedControl<TTenantPlan>
+            ariaLabel={t('planLabel')}
+            options={planOptions}
+            value={values.plan}
+            onChange={(plan) => updateField('plan', plan)}
+            className={planControl()}
+            isDisabled={Boolean(planLock)}
+            aria-describedby={
+              planLock ? `${PLAN_FIELD_ID}-lock-reason` : undefined
+            }
+          />
+          {planLock && (
+            <span
+              id={`${PLAN_FIELD_ID}-lock-reason`}
+              className={fieldLockReason()}
+            >
+              {lockReasonText(planLock)}
+            </span>
           )}
         </div>
       </div>
