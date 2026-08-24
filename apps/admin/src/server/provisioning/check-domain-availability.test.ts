@@ -76,6 +76,52 @@ describe(checkDomainAvailability, () => {
     expect(result).toBe('IN_USE');
   });
 
+  it('requests the apex domain, not the full subdomain, and matches the full domain in the response', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ projectDomains: [] }), { status: 200 }),
+    );
+
+    await checkDomainAvailability('blog-dev.valstack.dev');
+
+    const [calledUrl] = fetchMock.mock.calls[0] as [URL];
+    expect(calledUrl.pathname).toBe('/v1/domains/valstack.dev/project-domains');
+  });
+
+  it('returns IN_USE for a subdomain attached to a different project under the same apex', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          projectDomains: [
+            { name: 'blog-dev.valstack.dev', projectId: 'prj_other' },
+            { name: 'other-tenant.valstack.dev', projectId: 'prj_unrelated' },
+          ],
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const result = await checkDomainAvailability('blog-dev.valstack.dev');
+
+    expect(result).toBe('IN_USE');
+  });
+
+  it('returns AVAILABLE for a subdomain already attached to the shared web project (own, on retry)', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          projectDomains: [
+            { name: 'blog-dev.valstack.dev', projectId: 'prj_web' },
+          ],
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const result = await checkDomainAvailability('blog-dev.valstack.dev');
+
+    expect(result).toBe('AVAILABLE');
+  });
+
   it('returns AVAILABLE when returned project domains do not include the exact requested name', async () => {
     fetchMock.mockResolvedValue(
       new Response(

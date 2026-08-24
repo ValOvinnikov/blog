@@ -8,6 +8,21 @@ export type TDomainAvailability =
 const VERCEL_TIMEOUT_MS = 5000;
 
 /**
+ * Vercel's project-domains-by-apex endpoint takes the registrable ("apex")
+ * domain, not the full hostname — `blog-dev.valstack.dev` must be queried
+ * as `valstack.dev`. This is a last-two-labels heuristic, not a public
+ * suffix list lookup: it is wrong for a domain under a multi-part public
+ * suffix (`example.co.uk` would derive `co.uk`, not `example.co.uk`).
+ * Acceptable here because the check is advisory and every failure mode
+ * (including a wrong apex returning no match) degrades to "can't tell, let
+ * creation proceed" rather than a false block.
+ */
+const deriveApexDomain = (domain: string): string => {
+  const labels = domain.split('.');
+  return labels.slice(-2).join('.');
+};
+
+/**
  * Advisory pre-check run at tenant-creation time, before provisioning ever
  * starts. Mirrors the rule `mapTenantDomain` (`packages/db`) enforces at
  * provisioning step 5: every tenant domain is added to the one shared
@@ -33,8 +48,10 @@ export const checkDomainAvailability = async (
     return 'ERROR';
   }
 
+  const apexDomain = deriveApexDomain(domain);
+
   const url = new URL(
-    `https://api.vercel.com/v1/domains/${encodeURIComponent(domain)}/project-domains`,
+    `https://api.vercel.com/v1/domains/${encodeURIComponent(apexDomain)}/project-domains`,
   );
   if (teamId) url.searchParams.set('teamId', teamId);
 
@@ -44,6 +61,9 @@ export const checkDomainAvailability = async (
       signal: AbortSignal.timeout(VERCEL_TIMEOUT_MS),
     });
 
+    // A 404 means the apex itself is unknown to the team's Vercel account —
+    // no project can have a domain registered under an apex the account
+    // doesn't hold, so no conflict is possible.
     if (response.status === 404) return 'AVAILABLE';
 
     if (!response.ok) {
