@@ -1,18 +1,23 @@
 import type { TGroupedListGroup } from '@cms/structure/grouped-list';
 import { Box, Card, Flex, Stack, Text } from '@sanity/ui';
+import { isValidElement, type ComponentType, type ReactNode } from 'react';
 import {
   usePaneRouter,
   type PartialListItem,
   type UserComponent,
 } from 'sanity/structure';
 
-const renderIcon = (icon: PartialListItem['icon']) => {
+/**
+ * `icon` may be an already-rendered node (element/string) or a component
+ * reference to instantiate — including a `forwardRef`/`memo` component,
+ * which is an object (`{ $$typeof, render }`), not a function, so
+ * `typeof icon === 'function'` alone misses it (e.g. every lucide-react icon).
+ */
+export const renderIcon = (icon: PartialListItem['icon']): ReactNode => {
   if (!icon) return null;
-  if (typeof icon === 'function') {
-    const Icon = icon;
-    return <Icon />;
-  }
-  return icon;
+  if (isValidElement(icon) || typeof icon === 'string') return icon;
+  const Icon = icon as ComponentType;
+  return <Icon />;
 };
 
 /**
