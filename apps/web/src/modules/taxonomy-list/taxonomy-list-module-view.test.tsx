@@ -37,7 +37,7 @@ const setup = customRender(TaxonomyListModuleView, {
   layout: undefined,
   titleId: 'topic-list-title',
   dataTestId: 'taxonomy-list-module-topic-list-1',
-  titleFallback: 'Topics',
+  accessibleTitle: 'Topics',
   emptyMessage: 'No topics yet.',
 });
 
@@ -59,7 +59,7 @@ describe(TaxonomyListModuleView, () => {
     ).toBeInTheDocument();
   });
 
-  it('renders a visually hidden heading from titleFallback when sectionHeader.heading is undefined', () => {
+  it('renders a visually hidden heading from accessibleTitle when sectionHeader.heading is undefined', () => {
     setup({
       sectionHeader: {
         heading: undefined,
