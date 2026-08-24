@@ -1,8 +1,10 @@
 import { getDb } from '@blog/db/client';
 import {
   MEMBERSHIP_ROLE,
+  TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantPlan,
+  type TTenantProvisioningStep,
 } from '@blog/db/constants';
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
@@ -24,15 +26,102 @@ export type TUpdateTenantDetailsResult =
   | { outcome: 'updated'; tenant: TTenant }
   | { outcome: 'slug-taken' }
   | { outcome: 'domain-taken' }
+  | { outcome: 'slug-locked'; blockingStep: TTenantProvisioningStep }
+  | { outcome: 'domain-locked'; blockingStep: TTenantProvisioningStep }
   | { outcome: 'provisioning-started' }
   | { outcome: 'owner-already-joined' }
   | { outcome: 'owner-email-taken' };
 
+// Provisioning never revisits a step once it moves past it (`run.ts` stops
+// the whole workflow at the first failure), so at most one step is ever
+// FAILED at a time and every step after it stays IDLE — a single FAILED
+// entry reliably marks "provisioning stopped here, fix and retry" rather
+// than "provisioning is mid-flight" or "provisioning finished".
+type TProvisioningState = 'IDLE' | 'RUNNING' | 'FAILED' | 'SUCCEEDED';
+
+function deriveProvisioningState(
+  steps: TTenant['provisioningSteps'],
+): TProvisioningState {
+  const stepStates = Object.values(steps ?? {});
+
+  if (
+    stepStates.length === 0 ||
+    stepStates.every(
+      (step) => step.status === TENANT_PROVISIONING_STEP_STATUS.IDLE,
+    )
+  ) {
+    return 'IDLE';
+  }
+
+  if (
+    stepStates.some(
+      (step) => step.status === TENANT_PROVISIONING_STEP_STATUS.FAILED,
+    )
+  ) {
+    return 'FAILED';
+  }
+
+  if (
+    stepStates.every(
+      (step) => step.status === TENANT_PROVISIONING_STEP_STATUS.DONE,
+    )
+  ) {
+    return 'SUCCEEDED';
+  }
+
+  return 'RUNNING';
+}
+
+// Only these two fields get baked into an external resource by a completed
+// step — `slug` names the Studio's Vercel project/domain (`DEPLOY_STUDIO`)
+// and `primaryDomain` is registered on the shared web project (`MAP_DOMAIN`).
+// `name`/`plan`/`locale` never gate on step completion: `name` only ever
+// seeds display text (a Sanity project's display name, starter-content
+// copy) that can be edited after the fact, `plan` is DB-only, and
+// `SEED_CONTENT` never reads `locale`.
+function lockedFieldOutcome(
+  input: TUpdateTenantDetailsInput,
+  existing: TTenant,
+):
+  | Extract<
+      TUpdateTenantDetailsResult,
+      { outcome: 'slug-locked' | 'domain-locked' }
+    >
+  | undefined {
+  const steps = existing.provisioningSteps;
+
+  if (
+    input.slug !== existing.slug &&
+    steps?.[TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]?.status ===
+      TENANT_PROVISIONING_STEP_STATUS.DONE
+  ) {
+    return {
+      outcome: 'slug-locked',
+      blockingStep: TENANT_PROVISIONING_STEP.DEPLOY_STUDIO,
+    };
+  }
+
+  if (
+    input.primaryDomain !== existing.primaryDomain &&
+    steps?.[TENANT_PROVISIONING_STEP.MAP_DOMAIN]?.status ===
+      TENANT_PROVISIONING_STEP_STATUS.DONE
+  ) {
+    return {
+      outcome: 'domain-locked',
+      blockingStep: TENANT_PROVISIONING_STEP.MAP_DOMAIN,
+    };
+  }
+
+  return undefined;
+}
+
 // Pre-checked rather than caught off the `slug_unique`/`tenant_domains.domain`
 // unique constraints: a typed outcome the caller can map straight onto a
 // field error, instead of an unhandled Postgres throw. First match wins:
-// provisioning-started, then slug-taken, then domain-taken, then (when
-// `ownerEmail` is supplied) owner-already-joined / owner-email-taken.
+// provisioning-started (RUNNING/SUCCEEDED), then slug-locked/domain-locked
+// (FAILED, only for a field a completed step already consumed), then
+// slug-taken, then domain-taken, then (when `ownerEmail` is supplied)
+// owner-already-joined / owner-email-taken.
 export async function updateTenantDetails(
   tenantId: string,
   input: TUpdateTenantDetailsInput,
@@ -50,14 +139,17 @@ export async function updateTenantDetails(
     );
   }
 
-  // Editing slug/primaryDomain after any step has moved past IDLE would
-  // desync the row from Vercel/Sanity resources provisioning already created.
-  const hasStartedProvisioning = Object.values(
-    existing.provisioningSteps ?? {},
-  ).some((step) => step.status !== TENANT_PROVISIONING_STEP_STATUS.IDLE);
+  const provisioningState = deriveProvisioningState(existing.provisioningSteps);
 
-  if (hasStartedProvisioning) {
+  if (provisioningState === 'RUNNING' || provisioningState === 'SUCCEEDED') {
     return { outcome: 'provisioning-started' };
+  }
+
+  if (provisioningState === 'FAILED') {
+    const lockedField = lockedFieldOutcome(input, existing);
+    if (lockedField) {
+      return lockedField;
+    }
   }
 
   const [slugConflict] = await db
