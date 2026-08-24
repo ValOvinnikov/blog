@@ -242,7 +242,7 @@ describe(TenantDetailsForm, () => {
       screen.queryByText('No account found for owner@example.com.'),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /begin provisioning/i }),
+      await screen.findByRole('button', { name: /begin provisioning/i }),
     ).toBeVisible();
 
     await user.click(
@@ -312,7 +312,7 @@ describe(TenantDetailsForm, () => {
       '.uk',
     );
     await user.click(
-      screen.getByRole('button', { name: /begin provisioning/i }),
+      await screen.findByRole('button', { name: /begin provisioning/i }),
     );
 
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
