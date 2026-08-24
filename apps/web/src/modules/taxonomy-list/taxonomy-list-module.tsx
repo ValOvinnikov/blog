@@ -13,7 +13,7 @@ export interface ITaxonomyListModuleProps {
   taxonomy: TTaxonomyKind;
   titleId: string;
   dataTestId: string;
-  titleFallback: string;
+  accessibleTitle: string;
   emptyMessage: string;
   buildHref: (slug: string) => string;
   formatPostCount: (count: number) => string;
@@ -32,7 +32,7 @@ export const TaxonomyListModule = async ({
   taxonomy,
   titleId,
   dataTestId,
-  titleFallback,
+  accessibleTitle,
   emptyMessage,
   buildHref,
   formatPostCount,
@@ -69,7 +69,7 @@ export const TaxonomyListModule = async ({
       layout={layout}
       titleId={titleId}
       dataTestId={dataTestId}
-      titleFallback={titleFallback}
+      accessibleTitle={accessibleTitle}
       emptyMessage={emptyMessage}
     />
   );

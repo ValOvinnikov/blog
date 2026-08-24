@@ -21,7 +21,13 @@ export interface ITaxonomyListModuleViewProps extends Omit<
   items: ITaxonomyListModuleItem[];
   titleId: string;
   dataTestId: string;
-  titleFallback: string;
+  /**
+   * Accessible heading text used when `sectionHeader.heading` is empty or
+   * blank, so the section keeps a landmark name and the page's heading
+   * outline stays intact. Rendered visually hidden — pass an i18n string,
+   * never invent one here.
+   */
+  accessibleTitle: string;
   emptyMessage: string;
 }
 
@@ -38,12 +44,12 @@ export const TaxonomyListModuleView = ({
   layout,
   titleId,
   dataTestId,
-  titleFallback,
+  accessibleTitle,
   emptyMessage,
 }: ITaxonomyListModuleViewProps) => {
   const { heading, supportingText, align } = sectionHeader;
   const hasHeading = Boolean(heading?.trim());
-  const accessibleTitle = hasHeading ? heading : titleFallback;
+  const resolvedTitle = hasHeading ? heading : accessibleTitle;
   const isEmpty = items.length === 0;
   const s = taxonomyListModuleViewVariants({ align });
 
@@ -55,7 +61,7 @@ export const TaxonomyListModuleView = ({
       dataTestId={dataTestId}
     >
       <h2 id={titleId} className={hasHeading ? s.label() : s.labelFallback()}>
-        {accessibleTitle}
+        {resolvedTitle}
       </h2>
       {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
       {isEmpty ? (

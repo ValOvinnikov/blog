@@ -36,7 +36,7 @@ const meta = {
     layout: undefined,
     titleId: 'topic-list-title',
     dataTestId: 'taxonomy-list-module-topic-list-1',
-    titleFallback: 'Topics',
+    accessibleTitle: 'Topics',
     emptyMessage: 'No topics yet.',
   },
 } satisfies Meta<typeof TaxonomyListModuleView>;

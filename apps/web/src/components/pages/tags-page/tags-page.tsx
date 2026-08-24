@@ -66,7 +66,7 @@ export const TagsPage = async () => {
             taxonomy={TAXONOMY_KIND.TAGS}
             titleId="tag-list-title"
             dataTestId={`taxonomy-list-module-${taxonomyListId}`}
-            titleFallback={heading}
+            accessibleTitle={heading}
             emptyMessage={t('empty')}
             buildHref={(slug) => routes.tag(slug)}
             formatPostCount={(count) => t('postsCount', { count })}

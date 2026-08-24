@@ -70,7 +70,7 @@ export const TopicsPage = async () => {
             taxonomy={TAXONOMY_KIND.TOPICS}
             titleId="topic-list-title"
             dataTestId={`taxonomy-list-module-${taxonomyListId}`}
-            titleFallback={heading}
+            accessibleTitle={heading}
             emptyMessage={t('empty')}
             buildHref={(slug) => routes.topic(slug)}
             formatPostCount={(count) => t('postsCount', { count })}
