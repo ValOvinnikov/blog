@@ -56,6 +56,18 @@ export const env = createEnv({
     // entirely and CI falls back to the production `ADMIN_APP_BASE_URL`
     // Environment variable, unchanged from today.
     TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE: z.string().url().optional(),
+    // Forwarded as `provision-tenant.yml`'s `tenantSanityDataset`
+    // workflow_dispatch input, letting this deployment pick which dataset
+    // new tenants' Sanity projects get created in — same posture as
+    // `WEB_ANALYTICS_ENABLED` (`apps/web/src/utils/env/env.ts`): `VERCEL_ENV`
+    // can't reliably tell a dev deployment apart from real production, so
+    // this is an explicit opt-in set by hand per Vercel project. Optional:
+    // absent, the input is omitted and CI falls back to the
+    // `TENANT_SANITY_DATASET` GitHub Environment default. Always overridden
+    // by `TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE` above when that is set.
+    TENANT_PROVISIONING_DATASET: z
+      .enum(['development', 'production'])
+      .optional(),
     // Read-scoped Vercel API token the tenant status page uses to check a
     // custom domain's live DNS verification state (Vercel's Domains API) on
     // each render — informational only, never blocks provisioning. Optional:
@@ -87,6 +99,7 @@ export const env = createEnv({
       process.env.TENANT_PROVISIONING_GITHUB_REPO,
     TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE:
       process.env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE,
+    TENANT_PROVISIONING_DATASET: process.env.TENANT_PROVISIONING_DATASET,
     VERCEL_API_TOKEN: process.env.VERCEL_API_TOKEN,
     VERCEL_WEB_PROJECT_ID: process.env.VERCEL_WEB_PROJECT_ID,
     VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,

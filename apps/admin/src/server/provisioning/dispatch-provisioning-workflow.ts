@@ -34,6 +34,13 @@ export const dispatchProvisioningWorkflow = async (
   const adminAppBaseUrlOverride =
     env.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE;
 
+  // The base-url override always implies a local test run, so it forces
+  // `development` regardless of TENANT_PROVISIONING_DATASET — a safety net
+  // against ever creating a `production`-dataset Sanity project by accident.
+  const tenantSanityDataset = adminAppBaseUrlOverride
+    ? 'development'
+    : env.TENANT_PROVISIONING_DATASET;
+
   try {
     const response = await fetch(
       `https://api.github.com/repos/${repo.owner}/${repo.repo}/actions/workflows/${WORKFLOW_FILE}/dispatches`,
@@ -52,6 +59,7 @@ export const dispatchProvisioningWorkflow = async (
             ...(adminAppBaseUrlOverride && {
               adminAppBaseUrl: adminAppBaseUrlOverride,
             }),
+            ...(tenantSanityDataset && { tenantSanityDataset }),
           },
         }),
         signal: AbortSignal.timeout(DISPATCH_TIMEOUT_MS),
