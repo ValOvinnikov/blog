@@ -44,4 +44,36 @@ describe(deleteSanityProject, () => {
       deleteSanityProject({ token: 'mgmt-token', projectId: 'proj123' }),
     ).rejects.toThrow(/403/);
   });
+
+  it('reports blockedByBillingPermission on the org-billing 401, without throwing', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          code: 401,
+          status: 'Unauthorized',
+          message:
+            'Cancellation of project "proj123" requires billing permission on organization "org1"',
+        }),
+        { status: 401 },
+      ),
+    );
+
+    const result = await deleteSanityProject({
+      token: 'mgmt-token',
+      projectId: 'proj123',
+    });
+
+    expect(result).toEqual({
+      alreadyGone: false,
+      blockedByBillingPermission: true,
+    });
+  });
+
+  it('still throws on a 401 unrelated to billing permission', async () => {
+    fetchMock.mockResolvedValue(new Response('invalid token', { status: 401 }));
+
+    await expect(
+      deleteSanityProject({ token: 'mgmt-token', projectId: 'proj123' }),
+    ).rejects.toThrow(/401/);
+  });
 });
