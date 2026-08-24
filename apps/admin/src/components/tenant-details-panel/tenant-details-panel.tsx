@@ -22,9 +22,6 @@ import { tenantDetailsPanelVariants } from './tenant-details-panel-variants';
 export type TTenantDetailsPanelProps = {
   tenant: TTenant;
   isEditable: boolean;
-  // `undefined` means the tenant's OWNER row is still a pending
-  // `membershipInvites` entry rather than a real `memberships` row — see
-  // `queries.memberships.getTenantOwnerEmail`.
   ownerEmail: string | undefined;
 };
 
