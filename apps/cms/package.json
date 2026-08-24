@@ -46,6 +46,7 @@
     "@blog/vitest-config": "workspace:*",
     "@sanity/cli": "^7.7.1",
     "@sanity/client": "^7.23.0",
+    "@types/react": "^19",
     "eslint": "catalog:",
     "groq-js": "^1.30.3",
     "prettier": "catalog:",
