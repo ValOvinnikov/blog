@@ -4,6 +4,7 @@ import { routing } from '@admin/i18n/routing';
 import { recordAuditEvent } from '@admin/server/audit/record-audit-event';
 import { signIn } from '@admin/server/auth/auth';
 import { requireAdmin } from '@admin/server/auth/require-admin';
+import { checkDomainAvailability } from '@admin/server/provisioning/check-domain-availability';
 import { dispatchProvisioningWorkflow } from '@admin/server/provisioning/dispatch-provisioning-workflow';
 import {
   createOwnerInviteToken,
@@ -103,9 +104,10 @@ export const createTenantAction = async (
     };
   }
 
-  const [existingSlug, existingDomain] = await Promise.all([
+  const [existingSlug, existingDomain, domainAvailability] = await Promise.all([
     queries.tenants.getTenantBySlug(slug, { includeArchived: true }),
     queries.tenantDomains.getTenantByDomain(domain),
+    checkDomainAvailability(domain),
   ]);
 
   if (existingSlug) {
@@ -119,6 +121,19 @@ export const createTenantAction = async (
     return {
       ok: false,
       fieldErrors: { domain: 'This domain is already in use.' },
+    };
+  }
+
+  // Advisory only — 'NOT_CONFIGURED' and 'ERROR' both mean "can't tell",
+  // and creation proceeds unchecked exactly as it did before this check
+  // existed.
+  if (domainAvailability === 'IN_USE') {
+    return {
+      ok: false,
+      fieldErrors: {
+        domain:
+          'This domain is already attached to a different Vercel project — free it up there, or use a different domain.',
+      },
     };
   }
 

@@ -17,6 +17,7 @@ const {
   insertAuditEventMock,
   loggerErrorMock,
   loggerWarnMock,
+  checkDomainAvailabilityMock,
 } = vi.hoisted(() => ({
   requireAdminMock: vi.fn(),
   authMock: vi.fn(),
@@ -29,6 +30,7 @@ const {
   insertAuditEventMock: vi.fn(),
   loggerErrorMock: vi.fn(),
   loggerWarnMock: vi.fn(),
+  checkDomainAvailabilityMock: vi.fn(),
 }));
 
 vi.mock('@admin/server/auth/require-admin', () => ({
@@ -42,6 +44,10 @@ vi.mock('@admin/server/auth/auth', () => ({
 
 vi.mock('@admin/server/provisioning/dispatch-provisioning-workflow', () => ({
   dispatchProvisioningWorkflow: dispatchProvisioningWorkflowMock,
+}));
+
+vi.mock('@admin/server/provisioning/check-domain-availability', () => ({
+  checkDomainAvailability: checkDomainAvailabilityMock,
 }));
 
 vi.mock('@admin/utils/logger/logger', () => ({
@@ -94,6 +100,8 @@ describe('createTenantAction', () => {
     getTenantBySlugMock.mockResolvedValue(undefined);
     getTenantByDomainMock.mockReset();
     getTenantByDomainMock.mockResolvedValue(undefined);
+    checkDomainAvailabilityMock.mockReset();
+    checkDomainAvailabilityMock.mockResolvedValue('AVAILABLE');
     createTenantDraftMock.mockReset();
     createTenantDraftMock.mockResolvedValue({
       ok: true,
@@ -309,6 +317,52 @@ describe('createTenantAction', () => {
       fieldErrors: { domain: expect.any(String) },
     });
     expect(createTenantDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('returns a field error and blocks creation when the domain is already in use by another Vercel project', async () => {
+    checkDomainAvailabilityMock.mockResolvedValue('IN_USE');
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    const result = await createTenantAction(validInput);
+
+    expect(result).toEqual({
+      ok: false,
+      fieldErrors: { domain: expect.any(String) },
+    });
+    expect(createTenantDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('proceeds with creation when the domain is free', async () => {
+    checkDomainAvailabilityMock.mockResolvedValue('AVAILABLE');
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    await expect(createTenantAction(validInput)).rejects.toThrow(
+      'NEXT_REDIRECT',
+    );
+
+    expect(createTenantDraftMock).toHaveBeenCalled();
+  });
+
+  it('proceeds with creation unchecked when Vercel credentials are absent', async () => {
+    checkDomainAvailabilityMock.mockResolvedValue('NOT_CONFIGURED');
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    await expect(createTenantAction(validInput)).rejects.toThrow(
+      'NEXT_REDIRECT',
+    );
+
+    expect(createTenantDraftMock).toHaveBeenCalled();
+  });
+
+  it('proceeds with creation when the domain-availability check errors or times out', async () => {
+    checkDomainAvailabilityMock.mockResolvedValue('ERROR');
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    await expect(createTenantAction(validInput)).rejects.toThrow(
+      'NEXT_REDIRECT',
+    );
+
+    expect(createTenantDraftMock).toHaveBeenCalled();
   });
 
   it('returns a generic error and logs at error level when createTenantDraft throws', async () => {
