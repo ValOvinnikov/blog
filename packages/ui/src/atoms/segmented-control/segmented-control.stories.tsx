@@ -36,6 +36,10 @@ export const Deep: TStory = {
   args: { value: DEPTH.DEEP },
 };
 
+export const Disabled: TStory = {
+  args: { value: DEPTH.READ, isDisabled: true },
+};
+
 const InteractiveDemo = () => {
   const [value, setValue] = useState<(typeof options)[number]['value']>(
     DEPTH.READ,
