@@ -153,7 +153,7 @@ When invoked, before writing any code:
     fetching, consumed by one or more `pages/` components (or, for the home
     route, by `page.tsx` directly) to render shared layout. Named with a
     `*-template` suffix, e.g. `blog-page-template/` (the shared archive shell
-    consumed by `blog-list-page`, `category-page`, `tag-page`, `author-page`),
+    consumed by `blog-list-page`, `category-page`, `tag-page`),
     `home-page-template/`. A component belongs here only if something
     delegates rendering to it — a page with no shared shell has no
     `*-template` counterpart, and that's fine.
