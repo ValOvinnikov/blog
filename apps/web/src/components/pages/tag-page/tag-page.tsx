@@ -41,6 +41,10 @@ export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
     notFound();
   }
 
+  if (!result.data) {
+    notFound();
+  }
+
   const { tag, modules, postListId } = result.data;
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';

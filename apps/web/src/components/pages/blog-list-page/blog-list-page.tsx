@@ -42,6 +42,10 @@ export const BlogListPage = async ({ page, locale }: TBlogListPageProps) => {
     notFound();
   }
 
+  if (!result.data) {
+    notFound();
+  }
+
   const { heading, supportingText, modules, postListId } = result.data;
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';

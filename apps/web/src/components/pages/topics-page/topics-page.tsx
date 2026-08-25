@@ -40,6 +40,10 @@ export const TopicsPage = async () => {
     notFound();
   }
 
+  if (!result.data) {
+    notFound();
+  }
+
   const { heading, supportingText, taxonomyListId } = result.data;
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';

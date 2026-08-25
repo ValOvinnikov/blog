@@ -77,4 +77,15 @@ describe('buildTopicMetadata', () => {
 
     expect(metadata).toEqual({});
   });
+
+  it('returns empty metadata without logging when the topic simply does not exist', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getTopicPageMock.mockResolvedValue({ ok: true, data: undefined });
+
+    const metadata = await buildTopicMetadata('missing');
+
+    expect(metadata).toEqual({});
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
 });

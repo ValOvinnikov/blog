@@ -116,6 +116,22 @@ describe('GET /tags/[slug]/rss.xml', () => {
     errorSpy.mockRestore();
   });
 
+  it('calls notFound() without logging when the tag simply does not exist', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
+    const { GET } = await import('./route');
+
+    await expect(
+      GET(new Request('https://example.com'), { params }),
+    ).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    expect(getPublishedPostsByTagMock).not.toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
+
+    errorSpy.mockRestore();
+  });
+
   it('calls notFound() when the posts fetch fails', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTagPageMock.mockResolvedValue({

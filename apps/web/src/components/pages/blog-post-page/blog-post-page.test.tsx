@@ -132,16 +132,14 @@ describe(`<${BlogPostPage.name}/>`, () => {
       'newsletter_subscribed=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
   });
 
-  it('calls notFound() when no page_post matches the slug', async () => {
+  it('calls notFound() without logging when no page_post matches the slug', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostMock.mockResolvedValue({
-      ok: false,
-      error: new Error('No page_post found for slug "missing"'),
-    });
+    getPostMock.mockResolvedValue({ ok: true, data: undefined });
 
     await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    expect(errorSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();
   });
 

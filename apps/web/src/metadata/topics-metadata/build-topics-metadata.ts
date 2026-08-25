@@ -17,6 +17,10 @@ export const buildTopicsMetadata = async (): Promise<Metadata> => {
     return {};
   }
 
+  if (!result.data) {
+    return {};
+  }
+
   const { seo } = result.data;
 
   return toMetadata(seo, { canonical: routes.topics(), ogType: 'website' });

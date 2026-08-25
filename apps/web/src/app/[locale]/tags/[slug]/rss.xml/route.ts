@@ -39,6 +39,10 @@ const getAllTagPosts = async (slug: string): Promise<TTagFeed | null> => {
     return null;
   }
 
+  if (!tagResult.data) {
+    return null;
+  }
+
   const { tag } = tagResult.data;
   const description = tag.description ?? tag.title;
 
