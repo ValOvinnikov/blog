@@ -14,6 +14,8 @@ const {
   getTenantBySlugMock,
   getTenantByDomainMock,
   createTenantDraftMock,
+  beginTenantProvisioningMock,
+  setTenantProvisioningStatusMock,
   insertAuditEventMock,
   loggerErrorMock,
   loggerWarnMock,
@@ -27,6 +29,8 @@ const {
   getTenantBySlugMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
   createTenantDraftMock: vi.fn(),
+  beginTenantProvisioningMock: vi.fn(),
+  setTenantProvisioningStatusMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
   loggerErrorMock: vi.fn(),
   loggerWarnMock: vi.fn(),
@@ -65,6 +69,8 @@ vi.mock('@blog/db', async () => ({
     tenants: {
       getTenantBySlug: getTenantBySlugMock,
       createTenantDraft: createTenantDraftMock,
+      beginTenantProvisioning: beginTenantProvisioningMock,
+      setTenantProvisioningStatus: setTenantProvisioningStatusMock,
     },
     tenantDomains: { getTenantByDomain: getTenantByDomainMock },
     auditEvents: { insertAuditEvent: insertAuditEventMock },
@@ -88,7 +94,17 @@ describe('createTenantAction', () => {
       user: { id: 'operator-1', email: 'operator@example.com' },
     });
     dispatchProvisioningWorkflowMock.mockReset();
-    dispatchProvisioningWorkflowMock.mockResolvedValue(undefined);
+    dispatchProvisioningWorkflowMock.mockResolvedValue(true);
+    beginTenantProvisioningMock.mockReset();
+    beginTenantProvisioningMock.mockResolvedValue({
+      ok: true,
+      data: { tenant: { id: 'tenant-1' }, previousProvisioningStatus: null },
+    });
+    setTenantProvisioningStatusMock.mockReset();
+    setTenantProvisioningStatusMock.mockResolvedValue({
+      ok: true,
+      data: { id: 'tenant-1' },
+    });
     signInMock.mockReset();
     signInMock.mockResolvedValue({ ok: true });
     getUserByEmailMock.mockReset();
@@ -435,14 +451,55 @@ describe('createTenantAction', () => {
     });
   });
 
-  it('dispatches the provisioning workflow and redirects to the status page on success', async () => {
+  it('begins provisioning before dispatching the workflow, then redirects to the status page on success', async () => {
     const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
     );
 
+    expect(beginTenantProvisioningMock).toHaveBeenCalledWith('tenant-1');
     expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
+    expect(setTenantProvisioningStatusMock).not.toHaveBeenCalled();
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+  });
+
+  it('reverts the PROVISIONING transition, but still redirects, when the GitHub dispatch fails', async () => {
+    beginTenantProvisioningMock.mockResolvedValue({
+      ok: true,
+      data: { tenant: { id: 'tenant-1' }, previousProvisioningStatus: null },
+    });
+    dispatchProvisioningWorkflowMock.mockResolvedValue(false);
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    await expect(createTenantAction(validInput)).rejects.toThrow(
+      'NEXT_REDIRECT',
+    );
+
+    expect(setTenantProvisioningStatusMock).toHaveBeenCalledWith(
+      'tenant-1',
+      null,
+    );
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+  });
+
+  it('does not dispatch, and still redirects, when the atomic guard reports a concurrent dispatch', async () => {
+    beginTenantProvisioningMock.mockResolvedValue({
+      ok: false,
+      error: 'DB_ALREADY_PROVISIONING',
+    });
+    const { createTenantAction } = await import('./create-tenant-action');
+
+    await expect(createTenantAction(validInput)).rejects.toThrow(
+      'NEXT_REDIRECT',
+    );
+
+    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(setTenantProvisioningStatusMock).not.toHaveBeenCalled();
+    expect(loggerErrorMock).not.toHaveBeenCalledWith(
+      'provisioning.begin_failed',
+      expect.anything(),
+    );
     expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
   });
 

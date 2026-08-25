@@ -206,7 +206,37 @@ export const createTenantAction = async (
     }
   }
 
-  await dispatchProvisioningWorkflow(tenantId);
+  // `beginTenantProvisioning`'s atomic guard is the same one
+  // `retryProvisioningStepAction` uses — a hit here would be unexpected this
+  // soon after `createTenantDraft`, but it's still a legitimate no-op rather
+  // than an error, and the operator lands on the status page either way. If
+  // the guard succeeds but the GitHub dispatch itself fails, the
+  // `PROVISIONING` transition is reverted so the status page reflects reality
+  // instead of showing a workflow that never actually started.
+  const began = await queries.tenants.beginTenantProvisioning(tenantId);
+
+  if (!began.ok && began.error !== ERROR_CODE.DB_ALREADY_PROVISIONING) {
+    logger.error('provisioning.begin_failed', {
+      tenantId,
+      error: began.error,
+    });
+  } else if (began.ok) {
+    const dispatched = await dispatchProvisioningWorkflow(tenantId);
+
+    if (!dispatched) {
+      const reverted = await queries.tenants.setTenantProvisioningStatus(
+        tenantId,
+        began.data.previousProvisioningStatus,
+      );
+
+      if (!reverted.ok) {
+        logger.error('provisioning.revert_failed', {
+          tenantId,
+          error: reverted.error,
+        });
+      }
+    }
+  }
 
   redirect(adminRoutes.tenantStatus(tenantId));
 };
