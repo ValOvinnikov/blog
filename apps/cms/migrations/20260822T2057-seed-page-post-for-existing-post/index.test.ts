@@ -1,3 +1,5 @@
+import { pagePostSchema } from '@cms/schema-types/documents/pages/page-post';
+import { assertSatisfiesRequiredFields } from '@cms/testing/assert-satisfies-required-fields';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { toPagePostId } from './id';
@@ -23,15 +25,19 @@ describe('seed-page-post-for-existing-post migration', () => {
   it('creates a page_post referencing the post and copying its slug/publishedAt', () => {
     const pagePostId = toPagePostId(postDoc._id);
 
+    const pagePostPayload = {
+      _id: pagePostId,
+      _type: 'page_post',
+      title: 'Understanding GROQ Post Page',
+      slug: { _type: 'slug', current: 'understanding-groq' },
+      post: { _type: 'reference', _ref: postDoc._id },
+      publishedAt: '2026-02-01T09:00:00Z',
+    };
+
+    assertSatisfiesRequiredFields(pagePostSchema, pagePostPayload);
+
     expect(migration.migrate.document(postDoc)).toEqual([
-      createIfNotExists({
-        _id: pagePostId,
-        _type: 'page_post',
-        title: 'Understanding GROQ Post Page',
-        slug: { _type: 'slug', current: 'understanding-groq' },
-        post: { _type: 'reference', _ref: postDoc._id },
-        publishedAt: '2026-02-01T09:00:00Z',
-      }),
+      createIfNotExists(pagePostPayload),
     ]);
   });
 
@@ -58,15 +64,17 @@ describe('seed-page-post-for-existing-post migration', () => {
 
     const [mutation] = migration.migrate.document(otherDoc)!;
 
-    expect(mutation).toEqual(
-      createIfNotExists({
-        _id: toPagePostId(otherDoc._id),
-        _type: 'page_post',
-        title: 'Advanced TypeScript Post Page',
-        slug: { _type: 'slug', current: 'advanced-typescript' },
-        post: { _type: 'reference', _ref: otherDoc._id },
-        publishedAt: '2026-03-15T12:30:00Z',
-      }),
-    );
+    const pagePostPayload = {
+      _id: toPagePostId(otherDoc._id),
+      _type: 'page_post',
+      title: 'Advanced TypeScript Post Page',
+      slug: { _type: 'slug', current: 'advanced-typescript' },
+      post: { _type: 'reference', _ref: otherDoc._id },
+      publishedAt: '2026-03-15T12:30:00Z',
+    };
+
+    assertSatisfiesRequiredFields(pagePostSchema, pagePostPayload);
+
+    expect(mutation).toEqual(createIfNotExists(pagePostPayload));
   });
 });

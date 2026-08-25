@@ -1,3 +1,6 @@
+import { pageTopicSchema } from '@cms/schema-types/documents/pages/page-topic';
+import { postListSchema } from '@cms/schema-types/modules/module-post-list';
+import { assertSatisfiesRequiredFields } from '@cms/testing/assert-satisfies-required-fields';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { toPageTopicId, toTopicPostListId } from './id';
@@ -23,23 +26,29 @@ describe('seed-page-topic-for-existing-topic migration', () => {
     const postListId = toTopicPostListId(topicDoc._id);
     const pageTopicId = toPageTopicId(topicDoc._id);
 
+    const postListPayload = {
+      _id: postListId,
+      _type: 'module_postList',
+      title: 'React Archive',
+      brandVariant: 'PRIMARY',
+      limit: 9,
+      pageSize: 9,
+    };
+    const pageTopicPayload = {
+      _id: pageTopicId,
+      _type: 'page_topic',
+      title: 'React Topic Page',
+      slug: { _type: 'slug', current: 'react' },
+      topic: { _type: 'reference', _ref: topicDoc._id },
+      postList: { _type: 'reference', _ref: postListId },
+    };
+
+    assertSatisfiesRequiredFields(postListSchema, postListPayload);
+    assertSatisfiesRequiredFields(pageTopicSchema, pageTopicPayload);
+
     expect(migration.migrate.document(topicDoc)).toEqual([
-      createIfNotExists({
-        _id: postListId,
-        _type: 'module_postList',
-        title: 'React Archive',
-        brandVariant: 'PRIMARY',
-        limit: 9,
-        pageSize: 9,
-      }),
-      createIfNotExists({
-        _id: pageTopicId,
-        _type: 'page_topic',
-        title: 'React Topic Page',
-        slug: { _type: 'slug', current: 'react' },
-        topic: { _type: 'reference', _ref: topicDoc._id },
-        postList: { _type: 'reference', _ref: postListId },
-      }),
+      createIfNotExists(postListPayload),
+      createIfNotExists(pageTopicPayload),
     ]);
   });
 
@@ -65,18 +74,20 @@ describe('seed-page-topic-for-existing-topic migration', () => {
 
     const [, pageTopicMutation] = migration.migrate.document(otherSlugDoc)!;
 
-    expect(pageTopicMutation).toEqual(
-      createIfNotExists({
-        _id: toPageTopicId(otherSlugDoc._id),
-        _type: 'page_topic',
-        title: 'TypeScript Topic Page',
-        slug: { _type: 'slug', current: 'typescript' },
-        topic: { _type: 'reference', _ref: otherSlugDoc._id },
-        postList: {
-          _type: 'reference',
-          _ref: toTopicPostListId(otherSlugDoc._id),
-        },
-      }),
-    );
+    const pageTopicPayload = {
+      _id: toPageTopicId(otherSlugDoc._id),
+      _type: 'page_topic',
+      title: 'TypeScript Topic Page',
+      slug: { _type: 'slug', current: 'typescript' },
+      topic: { _type: 'reference', _ref: otherSlugDoc._id },
+      postList: {
+        _type: 'reference',
+        _ref: toTopicPostListId(otherSlugDoc._id),
+      },
+    };
+
+    assertSatisfiesRequiredFields(pageTopicSchema, pageTopicPayload);
+
+    expect(pageTopicMutation).toEqual(createIfNotExists(pageTopicPayload));
   });
 });
