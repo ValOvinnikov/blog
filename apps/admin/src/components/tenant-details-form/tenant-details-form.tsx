@@ -1,5 +1,6 @@
 'use client';
 
+import { FormField } from '@admin/components/form-field';
 import {
   createTenantAction,
   type TCreateTenantFieldErrors,
@@ -64,10 +65,7 @@ export const TenantDetailsForm = () => {
     card,
     overlay,
     fields,
-    field,
-    label,
     hint,
-    fieldError,
     actions,
     planControl,
   } = tenantDetailsFormVariants({ pending: isPending });
@@ -136,55 +134,48 @@ export const TenantDetailsForm = () => {
       <div className={cardWrap()}>
         <div className={card()} inert={isPending}>
           <div className={fields()}>
-            <div className={field()}>
-              <label className={label()} htmlFor="tenant-name">
-                {t('nameLabel')}
-              </label>
+            <FormField
+              label={t('nameLabel')}
+              htmlFor="tenant-name"
+              error={fieldErrors.name}
+            >
               <TextInput
                 id="tenant-name"
                 ariaLabel={t('nameLabel')}
                 value={values.name}
                 onChange={(value) => updateField('name', value)}
               />
-              {fieldErrors.name && (
-                <span className={fieldError()}>{fieldErrors.name}</span>
-              )}
-            </div>
+            </FormField>
 
-            <div className={field()}>
-              <label className={label()} htmlFor="tenant-slug">
-                {t('slugLabel')}
-              </label>
+            <FormField
+              label={t('slugLabel')}
+              htmlFor="tenant-slug"
+              hint={<span className={hint()}>{t('slugHint')}</span>}
+              error={fieldErrors.slug}
+            >
               <TextInput
                 id="tenant-slug"
                 ariaLabel={t('slugLabel')}
                 value={values.slug}
                 onChange={(value) => updateField('slug', value)}
               />
-              <span className={hint()}>{t('slugHint')}</span>
-              {fieldErrors.slug && (
-                <span className={fieldError()}>{fieldErrors.slug}</span>
-              )}
-            </div>
+            </FormField>
 
-            <div className={field()}>
-              <label className={label()} htmlFor="tenant-domain">
-                {t('domainLabel')}
-              </label>
+            <FormField
+              label={t('domainLabel')}
+              htmlFor="tenant-domain"
+              hint={<span className={hint()}>{t('domainHint')}</span>}
+              error={fieldErrors.domain}
+            >
               <TextInput
                 id="tenant-domain"
                 ariaLabel={t('domainLabel')}
                 value={values.domain}
                 onChange={(value) => updateField('domain', value)}
               />
-              <span className={hint()}>{t('domainHint')}</span>
-              {fieldErrors.domain && (
-                <span className={fieldError()}>{fieldErrors.domain}</span>
-              )}
-            </div>
+            </FormField>
 
-            <div className={field()}>
-              <span className={label()}>{t('planLabel')}</span>
+            <FormField label={t('planLabel')}>
               <SegmentedControl<TTenantPlan>
                 ariaLabel={t('planLabel')}
                 options={planOptions}
@@ -192,12 +183,22 @@ export const TenantDetailsForm = () => {
                 onChange={(plan) => updateField('plan', plan)}
                 className={planControl()}
               />
-            </div>
+            </FormField>
 
-            <div className={field()}>
-              <label className={label()} htmlFor="tenant-owner-email">
-                {t('ownerEmailLabel')}
-              </label>
+            <FormField
+              label={t('ownerEmailLabel')}
+              htmlFor="tenant-owner-email"
+              hint={<span className={hint()}>{t('ownerEmailHint')}</span>}
+              error={fieldErrors.ownerEmail}
+              footer={
+                ownerInviteConfirmation && (
+                  <Alert
+                    type={ALERT_TYPE.INFO}
+                    message={ownerInviteConfirmation.message}
+                  />
+                )
+              }
+            >
               <TextInput
                 id="tenant-owner-email"
                 type="email"
@@ -205,17 +206,7 @@ export const TenantDetailsForm = () => {
                 value={values.ownerEmail}
                 onChange={(value) => updateField('ownerEmail', value)}
               />
-              <span className={hint()}>{t('ownerEmailHint')}</span>
-              {fieldErrors.ownerEmail && (
-                <span className={fieldError()}>{fieldErrors.ownerEmail}</span>
-              )}
-              {ownerInviteConfirmation && (
-                <Alert
-                  type={ALERT_TYPE.INFO}
-                  message={ownerInviteConfirmation.message}
-                />
-              )}
-            </div>
+            </FormField>
           </div>
 
           <div className={actions()}>
