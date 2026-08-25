@@ -250,19 +250,81 @@ scope as the five keys above:
 #### Neon Postgres — one project, per-branch environments
 
 Unlike Sanity (a separate **project** per environment), Neon uses one project
-with **branches**: a `development` branch backs `blog-dev`, a `production`
-branch backs `blog-prod`. This repo's Neon project already exists and is
-connected to both Vercel web projects (dev + prod) — provisioning notes for
-recreating this from scratch:
+with **branches**. This repo's Neon project has two today: `main` (the
+project's original/default branch, backing production) and `development`
+(branched off `main` on 2026-08-25, backing `blog-dev`). Before that date only
+`main` existed and both environments read it — `development`'s data started as
+whatever `main` held at branch time, not a synced or continuously-refreshed
+copy (that's a separate, Sanity-only workflow — see "Refreshing development
+from production" further down, which does not touch Neon at all).
 
-- [ ] Neon console → create a project; add a `development` branch (or use
-      the project's default branch as prod and branch `development` off it).
+**Which secret targets which branch — verify this, don't assume it.** The
+two-branch split is recent and the secret wiring has not fully caught up:
+
+- `deploy-development.yml`'s `migrate-db` job reads the `development`
+  Environment's own `DATABASE_URL_UNPOOLED`. Whether that secret was
+  repointed at the new `development` branch (rather than left over from when
+  only `main` existed) can't be confirmed by reading the secret back — GitHub
+  never allows that — but the job now guards against the dangerous case
+  going forward: it fails loudly if this secret ever resolves to the
+  production branch's host, once `PRODUCTION_DB_HOST` is set (#2057 — see
+  "Repo level — production-target guard for `migrate-db`" further down).
+- `deploy-production.yml`'s `migrate-db` job reads the `production`
+  Environment's `DATABASE_URL_UNPOOLED` — the `main` branch. The tenant
+  lifecycle workflows (`provision-tenant.yml`, `deprovision-tenant.yml`) run in
+  the same `production` Environment but read their **own**
+  `TENANT_REGISTRY_DATABASE_URL_DEV`/`_PROD` secrets instead (§4 below), so a
+  tenant-registry dispatch can no longer silently repoint a production
+  migration. That split (#2056, merged 2026-08-25) fixed a real incident: the
+  two purposes used to share one secret, and pointing it at `development` to
+  unblock tenant provisioning from `admin-dev` had silently repointed a
+  production tag's `migrate-db` step at `development` too, leaving `main`
+  unmigrated while reporting success.
+- `blog-dev`'s Vercel `DATABASE_URL` may be scoped to Preview+Development
+  rather than Production; `deploy-development.yml` builds via
+  `vercel pull --environment=production`, which would not read a
+  Preview+Development-scoped value. Unconfirmed whether this breaks any live
+  route on `blog-dev` — tracked in #2058.
+
+**Pooled vs. unpooled — the distinction that caused confusion during setup.**
+Neon gives each branch two connection strings from **Connection details**: a
+**pooled** one (host ends `-pooler`, routed through PgBouncer) and a
+**direct/unpooled** one. They are not interchangeable:
+
+- `DATABASE_URL` (pooled) is what the deployed app reads at runtime via
+  `@blog/db`'s `drizzle-orm/neon-http` client — a serverless function opens
+  many short-lived connections, and only the pooler tolerates that load.
+- `DATABASE_URL_UNPOOLED` (direct) is what `drizzle-kit`
+  (`db:generate`/`db:migrate`/`db:studio`) and `pg_dump` need — a migration or
+  dump needs a session-level connection the pooler doesn't provide.
+
+Pointing a migration job at the pooled string, or the runtime client at the
+unpooled one, fails outright or degrades silently under load. That is a
+different axis of confusion than the branch mix-up above, but the two compound
+easily during setup — always confirm **both** which branch and which
+connection mode a value came from before pasting it into a secret.
+
+Provisioning notes for recreating this from scratch:
+
+- [ ] Neon console → create a project; add a `development` branch off the
+      project's default branch (which becomes production — Neon doesn't
+      require it to be named `main` or `production`, but this repo's default
+      branch is in fact named `main`).
 - [ ] Each branch → **Connection Details** gives both strings above: the
       pooled one (host ends `-pooler`) → `DATABASE_URL`, the direct one →
       `DATABASE_URL_UNPOOLED`.
 - [ ] Wire them into the matching Vercel project's env vars (table above) —
       either by hand, or via Neon's Vercel integration (Vercel → Integrations
-      → Neon), which can inject both automatically per Vercel environment.
+      → Neon), which can inject both automatically per Vercel environment. Set
+      each at **Production** scope (see the note under the web env var table
+      above) and re-check the scope after saving — it has silently defaulted
+      to Preview+Development before (#2058).
+- [ ] Wire the same two branches' connection strings into the matching GitHub
+      Environment secrets (§4 below) — `development` Environment's
+      `DATABASE_URL_UNPOOLED` → the `development` branch, `production`
+      Environment's → the `main` branch. Confirm each by running a migration
+      against the branch you think you're targeting and checking its row
+      counts/timestamps, not by trusting the secret's name.
 - [ ] Enable `pgvector` (needed by M3.4 semantic search) once per branch —
       this repo's own migration does it
       (`packages/db/migrations/0000_enable_pgvector_extension.sql`); running
@@ -380,7 +442,9 @@ job resolves its own project's id + token:
 - [ ] Secret `SANITY_MIGRATE_TOKEN` = `<DEV_MIGRATE_TOKEN>` (Editor — the migrate job)
 - [ ] Secret `DATABASE_URL_UNPOOLED` = `<DEV_DATABASE_URL_UNPOOLED>` (the `development`
       Neon branch's direct connection string — the `migrate-db` job's
-      `drizzle-kit migrate`; same value as the Vercel env var above)
+      `drizzle-kit migrate`; same value as the Vercel env var above). **Confirm
+      it actually points at the `development` branch** — see the Neon
+      Postgres section above and #2057.
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-dev**)
@@ -392,13 +456,14 @@ job resolves its own project's id + token:
 
 - [ ] Variable `SANITY_STUDIO_PROJECT_ID` = `<PRD_PROJECT_ID>`
 - [ ] Secret `SANITY_MIGRATE_TOKEN` = `<PRD_MIGRATE_TOKEN>` (Editor — the migrate job)
-- [ ] Secret `DATABASE_URL_UNPOOLED` = `<PRD_DATABASE_URL_UNPOOLED>` (the `production`
+- [ ] Secret `DATABASE_URL_UNPOOLED` = `<PRD_DATABASE_URL_UNPOOLED>` (the `main`
       Neon branch's direct connection string — the `migrate-db` job's
       `pg_dump` backup + `drizzle-kit migrate`; same value as the Vercel env
       var above). **Not** read by `provision-tenant.yml`/`deprovision-tenant.yml`
       — those use their own `TENANT_REGISTRY_DATABASE_URL_DEV`/`_PROD` secrets
       below, deliberately, so repointing the tenant registry at a different
-      Neon branch can never silently repoint this deploy job too (#2056).
+      Neon branch can never silently repoint this deploy job too (#2056 — see
+      the Neon Postgres section above for the incident that motivated it).
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-prod**)

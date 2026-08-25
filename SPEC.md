@@ -514,11 +514,25 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   Sanity ones, via their own `migrate-db` job in both deploy workflows (dev:
   automatic; prod: backed up via `pg_dump`, gated behind the same required-
   reviewer approval) — see `docs/DEPLOY.md` and `.claude/agents/db.md`'s
-  "Migrations" section. The dev `migrate-db` job also guards against a
-  mis-set secret: it compares its resolved connection host against the
-  production branch's host (mirrored into a repo Variable, since a job
-  scoped to one GitHub Environment can't read another's secrets) and refuses
-  to migrate if they match.
+  "Migrations" section.
+- **Neon Postgres is one project with two branches, not a project-per-environment
+  split like Sanity**: `main` backs production, `development` (branched off
+  `main` on 2026-08-25) backs development. Before that date only `main`
+  existed and both environments read it. `deploy-production.yml`'s
+  `migrate-db` job reads the `production` Environment's own
+  `DATABASE_URL_UNPOOLED` (`main`); the tenant-provisioning workflows
+  (`provision-tenant.yml`/`deprovision-tenant.yml`) read their own
+  `TENANT_REGISTRY_DATABASE_URL_DEV`/`_PROD` secrets instead (#2056, merged
+  2026-08-25) — before that split, both purposes shared one secret, and
+  pointing it at `development` for tenant provisioning had silently
+  repointed production migrations at `development` too. The dev `migrate-db`
+  job now guards against the same class of mistake for its own secret: it
+  compares its resolved connection host against the production branch's
+  host (mirrored into a repo Variable, since a job scoped to one GitHub
+  Environment can't read another's secrets) and refuses to migrate if they
+  match (#2057). Whether `blog-dev`'s Vercel `DATABASE_URL` scope is correct
+  is still open (#2058). See `docs/DEPLOY.md`'s Neon Postgres section for the
+  full state and open items.
 - **Each environment is a separate Sanity project** with its own env-driven,
   never-committed project id and tokens; **six fully isolated Vercel
   projects** (a web project, a Studio project and an admin-panel project per
