@@ -314,9 +314,6 @@ scope the idea, not the design.
 - **Filed:** epic #957 → #958 (config) · #959 (cms) · #960 (service) ·
   #961 (ui) · #962 (web) — all closed 2026-08-01.
 
-> Design: `docs/superpowers/specs/2026-07-12-reading-depth-design.md` ·
-> Plan: `docs/superpowers/plans/2026-07-12-reading-depth-plan.md`.
-
 - **Labels:** `layer:cms`, `layer:service`, `layer:ui`, `layer:web`
 - **Depends on:** #250 (modules[] page-builder), M3.2 (generated summaries)
 - **Body:** Every post renders at three depths — 30-second skim / standard /
