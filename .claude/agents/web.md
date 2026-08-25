@@ -362,7 +362,7 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
 
 ## New i18n keys that are tenant-customizable "voice" copy also need a Voice override
 
-A curated ~20-key subset of `src/i18n/messages/en.json` is tenant-overridable
+A curated ~19-key subset of `src/i18n/messages/en.json` is tenant-overridable
 through `apps/admin`'s Voice settings tab (`packages/db`'s `voiceOverrides`
 JSONB column) — empty-states, not-found messages, terminal prompts, bookmark
 toasts. `src/utils/apply-voice-overrides/apply-voice-overrides.ts` maps each
