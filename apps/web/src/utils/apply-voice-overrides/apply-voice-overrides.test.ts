@@ -1,6 +1,48 @@
 import { applyVoiceOverrides } from './apply-voice-overrides';
 
+const CURATED_KEY_PATHS: Record<string, readonly string[]> = {
+  notFoundMetaTitle: ['notFound', 'metaTitle'],
+  notFoundMetaDescription: ['notFound', 'metaDescription'],
+  notFoundCommandNotFound: ['notFound', 'commandNotFound'],
+  notFoundDescription: ['notFound', 'description'],
+  notFoundReturnHome: ['notFound', 'returnHome'],
+  terminalPromptHost: ['authMenu', 'promptHost'],
+  authPromptCommandSignIn: ['authMenu', 'promptCommandSignIn'],
+  authPromptCommandAccount: ['authMenu', 'promptCommandAccount'],
+  bookmarksPromptCommand: ['bookmarksPage', 'promptCommand'],
+  accountPrivacyPromptCommand: ['accountPage', 'privacy', 'promptCommand'],
+  accountNewsletterPromptCommand: [
+    'accountPage',
+    'newsletter',
+    'promptCommand',
+  ],
+  accountIdentityPromptCommand: ['accountPage', 'identity', 'promptCommand'],
+  bookmarkToastSavedMessage: ['bookmarkButton', 'toastSavedMessage'],
+  bookmarkToastRemovedMessage: ['bookmarkButton', 'toastRemovedMessage'],
+  blogListEmpty: ['blogListPage', 'empty'],
+  topicEmpty: ['topicPage', 'empty'],
+  tagEmpty: ['tagPage', 'empty'],
+  authorEmpty: ['authorPage', 'empty'],
+  topicsEmpty: ['topicsPage', 'empty'],
+  bookmarksEmpty: ['bookmarksPage', 'empty'],
+};
+
 describe(applyVoiceOverrides, () => {
+  it.each(Object.entries(CURATED_KEY_PATHS))(
+    'resolves %s to its documented message path',
+    (key, path) => {
+      const result = applyVoiceOverrides({}, { [key]: 'override value' });
+
+      let node: unknown = result;
+      for (const segment of path) {
+        expect(node).toBeTypeOf('object');
+        node = (node as Record<string, unknown>)[segment];
+      }
+
+      expect(node).toBe('override value');
+    },
+  );
+
   it('sets a nested path without touching its siblings', () => {
     const messages = {
       notFound: { commandNotFound: 'Not found', description: 'desc' },
