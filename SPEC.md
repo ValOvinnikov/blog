@@ -490,20 +490,21 @@ the gate sequence (also in `CLAUDE.md` — the operational source of truth):
 Two long-lived environments, deployed by trigger. The full click-by-click setup
 and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the shape.
 
-| Concern                 | Development                       | Production                         |
-| ----------------------- | --------------------------------- | ---------------------------------- |
-| Sanity project          | separate dev project (id via env) | separate prod project (id via env) |
-| Sanity dataset          | `development`                     | `production`                       |
-| Studio hostname         | `studio-dev{your_hosting}`        | `studio.{your-hosting}`            |
-| Vercel project (web)    | `blog-dev`                        | `blog-prod`                        |
-| Vercel project (studio) | `cms-dev`                         | `cms-prod`                         |
-| Vercel project (admin)  | `admin-dev`                       | `admin-prod`                       |
-| Admin hostname          | `admin-dev.{your-hosting}`        | `admin.{your-hosting}`             |
-| Deploy trigger          | push/merge to `main`              | push git tag `v*`                  |
-| Web deploy mechanism    | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
-| Studio deploy mechanism | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
-| Admin deploy mechanism  | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
-| Revalidation webhook    | dev webhook → dev site            | prod webhook → prod site           |
+| Concern                  | Development                       | Production                         |
+| ------------------------ | --------------------------------- | ---------------------------------- |
+| Sanity project           | separate dev project (id via env) | separate prod project (id via env) |
+| Sanity dataset           | `development`                     | `production`                       |
+| Neon branch (`@blog/db`) | `development`                     | `production`                       |
+| Studio hostname          | `studio-dev{your_hosting}`        | `studio.{your-hosting}`            |
+| Vercel project (web)     | `blog-dev`                        | `blog-prod`                        |
+| Vercel project (studio)  | `cms-dev`                         | `cms-prod`                         |
+| Vercel project (admin)   | `admin-dev`                       | `admin-prod`                       |
+| Admin hostname           | `admin-dev.{your-hosting}`        | `admin.{your-hosting}`             |
+| Deploy trigger           | push/merge to `main`              | push git tag `v*`                  |
+| Web deploy mechanism     | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
+| Studio deploy mechanism  | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
+| Admin deploy mechanism   | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
+| Revalidation webhook     | dev webhook → dev site            | prod webhook → prod site           |
 
 - `main` is a continuous **staging line** (auto-deploys to development, which is
   also the local-dev dataset); a **`vMAJOR.MINOR.PATCH` git tag** promotes that
@@ -524,11 +525,14 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   `TENANT_REGISTRY_DATABASE_URL_DEV`/`_PROD` secrets instead (#2056, merged
   2026-08-25) — before that split, both purposes shared one secret, and
   pointing it at `development` for tenant provisioning had silently
-  repointed production migrations at `development` too. Whether the
-  `development` Environment's own `DATABASE_URL_UNPOOLED` is confirmed
-  pointed at the `development` branch is still open (#2057), as is whether
-  `blog-dev`'s Vercel `DATABASE_URL` scope is correct (#2058). See
-  `docs/DEPLOY.md`'s Neon Postgres section for the full state and open items.
+  repointed production migrations at `development` too. The dev `migrate-db`
+  job now guards against the same class of mistake for its own secret: it
+  compares its resolved connection host against the production branch's
+  host (mirrored into a repo Variable, since a job scoped to one GitHub
+  Environment can't read another's secrets) and refuses to migrate if they
+  match (#2057). Whether `blog-dev`'s Vercel `DATABASE_URL` scope is correct
+  is still open (#2058). See `docs/DEPLOY.md`'s Neon Postgres section for the
+  full state and open items.
 - **Each environment is a separate Sanity project** with its own env-driven,
   never-committed project id and tokens; **six fully isolated Vercel
   projects** (a web project, a Studio project and an admin-panel project per

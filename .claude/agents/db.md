@@ -189,7 +189,12 @@ generate`) diffs the schema against the last migration and writes a new
    `web` having turbo-ignore-detected changes (apps/cms never touches
    Postgres) and `needs`-ed by `deploy-web` (not `deploy-studio`) — so code
    never ships ahead of a pending dev schema change. A local apply is still
-   fine/normal for iterating before a merge.
+   fine/normal for iterating before a merge. The job opens with a guard step
+   that fails loudly if `DATABASE_URL_UNPOOLED` resolves to the production
+   Neon branch's host (compared against the repo Variable
+   `PRODUCTION_DB_HOST`) — inert until that Variable is set. See
+   `docs/DEPLOY.md`'s "Repo level — production-target guard for
+   `migrate-db`".
 4. **Back up before applying to the shared/production branch.** The
    production CI job (below) does this automatically via `pg_dump` against
    `DATABASE_URL_UNPOOLED`, uploaded as a 30-day CI artifact, mirroring

@@ -214,10 +214,37 @@ jobs:
     environment: development
     env:
       DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+      # Non-secret: a Neon connection host alone can't authenticate anything,
+      # so this is safe as a plain repo Variable. One-time setup in
+      # docs/DEPLOY.md; unset it stays a no-op below, same as every other
+      # secret-gated step in this file.
+      PRODUCTION_DB_HOST: ${{ vars.PRODUCTION_DB_HOST }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # A job's `environment:` scopes it to that environment's own secrets —
+      # this job can never see production's DATABASE_URL_UNPOOLED to compare
+      # directly, so the production host is mirrored into a repo Variable
+      # instead (see PRODUCTION_DB_HOST above). Runs before setup/migrate so a
+      # mis-set secret fails loudly and fast, before anything touches the db.
+      # Uses `node`'s URL parser (preinstalled on GitHub-hosted runners, ahead
+      # of our own pinned setup step) rather than a regex, so a literal `@` or
+      # `:` in the password can't fool the host extraction — and an
+      # unparseable connection string fails the job instead of silently
+      # skipping the check.
+      - name: Guard against a mis-set production target
+        if: ${{ env.DATABASE_URL_UNPOOLED != '' && env.PRODUCTION_DB_HOST != '' }}
+        run: |
+          set -euo pipefail
+          host=$(node -e "console.log(new URL(process.env.DATABASE_URL_UNPOOLED).hostname)") || {
+            echo "::error::could not parse a host out of DATABASE_URL_UNPOOLED — check the development Environment's secret is a valid connection string." >&2
+            exit 1
+          }
+          if [ "$host" = "$PRODUCTION_DB_HOST" ]; then
+            echo "::error::development migrate-db resolved to the PRODUCTION Neon branch host ($host) — refusing to migrate. Check the development Environment's DATABASE_URL_UNPOOLED secret." >&2
+            exit 1
+          fi
       - uses: ./.github/actions/setup
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
