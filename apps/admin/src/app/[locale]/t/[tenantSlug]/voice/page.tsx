@@ -1,23 +1,24 @@
 import { VoicePageContent } from '@admin/components/voice-page-content';
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
+import {
+  renderTenantScopedPage,
+  tenantPageMetadata,
+} from '@admin/server/tenant-pages/render-tenant-scoped-page';
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
 
 type TProps = {
   params: Promise<{ tenantSlug: string }>;
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('pageMetadata');
-  return { title: t('voice') };
+  return tenantPageMetadata('voice');
 }
 
 export default async function VoicePage({ params }: TProps) {
   const { tenantSlug } = await params;
-  const { tenant } = await requireTenantMembership(tenantSlug);
 
-  // Called directly (not `<VoicePageContent tenant={tenant} />`) — an async
-  // component nested via JSX only resolves under React's real RSC renderer,
-  // which this repo's `customRenderAsync` test helper doesn't emulate.
-  return await VoicePageContent({ tenant });
+  return renderTenantScopedPage(
+    () => requireTenantMembership(tenantSlug),
+    VoicePageContent,
+  );
 }

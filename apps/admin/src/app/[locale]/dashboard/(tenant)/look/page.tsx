@@ -1,18 +1,15 @@
 import { LookPageContent } from '@admin/components/look-page-content';
 import { resolveDashboardTenant } from '@admin/server/auth/resolve-dashboard-tenant';
+import {
+  renderTenantScopedPage,
+  tenantPageMetadata,
+} from '@admin/server/tenant-pages/render-tenant-scoped-page';
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('pageMetadata');
-  return { title: t('look') };
+  return tenantPageMetadata('look');
 }
 
 export default async function DashboardLookPage() {
-  const { tenant } = await resolveDashboardTenant();
-
-  // Called directly (not `<LookPageContent tenant={tenant} />`) — an async
-  // component nested via JSX only resolves under React's real RSC renderer,
-  // which this repo's `customRenderAsync` test helper doesn't emulate.
-  return await LookPageContent({ tenant });
+  return renderTenantScopedPage(resolveDashboardTenant, LookPageContent);
 }
