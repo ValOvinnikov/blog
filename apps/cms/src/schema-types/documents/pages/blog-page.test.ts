@@ -50,9 +50,9 @@ describe('blogPageSchema postList field', () => {
     ]);
   });
 
-  it('stays optional — no validation() builder attached', () => {
+  it('is required — has a validation() builder attached', () => {
     const postListField = getPostListField();
 
-    expect(postListField?.validation).toBeUndefined();
+    expect(postListField?.validation).toBeDefined();
   });
 });
