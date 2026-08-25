@@ -402,6 +402,26 @@ describe(updateTenantDetails, () => {
     expect(result).toEqual({ outcome: 'provisioning-started' });
   });
 
+  it('refuses with provisioning-started when provisioningStatus is PROVISIONING even though every step is still IDLE', async () => {
+    const tenantId = await insertTenantWithDomain({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+      provisioningSteps: stepsWith({}),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      name: 'New Name',
+    });
+
+    expect(result).toEqual({ outcome: 'provisioning-started' });
+
+    const [row] = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(row?.name).toBe('Acme');
+  });
+
   it('still updates when every step is IDLE', async () => {
     const tenantId = await insertTenantWithDomain({
       provisioningSteps: {

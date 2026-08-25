@@ -1,6 +1,7 @@
 import { getDb } from '@blog/db/client';
 import {
   MEMBERSHIP_ROLE,
+  TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantPlan,
@@ -40,8 +41,18 @@ export type TUpdateTenantDetailsResult =
 type TProvisioningState = 'IDLE' | 'RUNNING' | 'FAILED' | 'SUCCEEDED';
 
 function deriveProvisioningState(
+  provisioningStatus: TTenant['provisioningStatus'],
   steps: TTenant['provisioningSteps'],
 ): TProvisioningState {
+  // A workflow can be dispatched (`provisioningStatus` moved to
+  // PROVISIONING by `beginTenantProvisioning`) before its runner reports its
+  // first step — every step is still IDLE for that whole window, so the
+  // column, not the steps map, is the only signal a workflow is already
+  // running.
+  if (provisioningStatus === TENANT_PROVISIONING_STATUS.PROVISIONING) {
+    return 'RUNNING';
+  }
+
   const stepStates = Object.values(steps ?? {});
 
   if (
@@ -134,7 +145,10 @@ export async function updateTenantDetails(
     );
   }
 
-  const provisioningState = deriveProvisioningState(existing.provisioningSteps);
+  const provisioningState = deriveProvisioningState(
+    existing.provisioningStatus,
+    existing.provisioningSteps,
+  );
 
   if (provisioningState === 'RUNNING' || provisioningState === 'SUCCEEDED') {
     return { outcome: 'provisioning-started' };
