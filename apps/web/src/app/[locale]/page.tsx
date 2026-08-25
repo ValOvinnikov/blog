@@ -21,6 +21,10 @@ export async function generateMetadata(): Promise<Metadata> {
     return {};
   }
 
+  if (!result.data) {
+    return {};
+  }
+
   return toMetadata(result.data.seo, {
     canonical: '/',
     ogType: 'website',
@@ -36,6 +40,10 @@ export default async function HomePage({ params }: TProps) {
 
   if (!result.ok) {
     logger.error('home_page.fetch_failed', { error: result.error });
+    notFound();
+  }
+
+  if (!result.data) {
     notFound();
   }
 
