@@ -1,5 +1,5 @@
 /** A `module_hero`/`module_newsletter` document's legacy `appearance` shape. */
-export type TLegacyAppearance = {
+type TLegacyAppearance = {
   spacingTop?: string;
   spacingBottom?: string;
   containerWidth?: string;
