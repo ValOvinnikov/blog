@@ -1,4 +1,5 @@
 import { PAGE_TOPIC_TYPE } from '@cms/schema-types/documents/pages/page-topic-type';
+import { getDraftsClient } from '@cms/schema-types/helpers/get-drafts-client';
 import { Tags } from 'lucide-react';
 import {
   defineField,
@@ -6,8 +7,6 @@ import {
   type SanityDocument,
   type ValidationContext,
 } from 'sanity';
-
-const HAS_PAGE_TOPIC_API_VERSION = '2024-01-01';
 
 /**
  * Warns (does not block publishing) when no `page_topic` references this
@@ -22,9 +21,7 @@ const validateHasPageTopic = async (
 
   if (!publishedId) return true;
 
-  const client = context
-    .getClient({ apiVersion: HAS_PAGE_TOPIC_API_VERSION })
-    .withConfig({ perspective: 'drafts' });
+  const client = getDraftsClient(context);
 
   const referencingCount = await client.fetch<number>(
     `count(*[_type == $type && topic._ref == $topicId])`,

@@ -1,4 +1,5 @@
 import { PAGE_POST_TYPE } from '@cms/schema-types/documents/pages/page-post-type';
+import { getDraftsClient } from '@cms/schema-types/helpers/get-drafts-client';
 import { imageWithAltSchema } from '@cms/schema-types/objects/image-with-alt';
 import { richTextSchema } from '@cms/schema-types/objects/rich-text';
 import { seoSchema } from '@cms/schema-types/objects/seo';
@@ -16,8 +17,6 @@ import { authorSchema } from './author';
 import { tagSchema } from './tag';
 import { topicSchema } from './topic';
 
-const HAS_PAGE_POST_API_VERSION = '2024-01-01';
-
 /**
  * Warns (does not block publishing) when no `page_post` references this
  * post — `/blog/{slug}` 404s with no runtime fallback in that state, so
@@ -31,9 +30,7 @@ const validateHasPagePost = async (
 
   if (!publishedId) return true;
 
-  const client = context
-    .getClient({ apiVersion: HAS_PAGE_POST_API_VERSION })
-    .withConfig({ perspective: 'drafts' });
+  const client = getDraftsClient(context);
 
   const referencingCount = await client.fetch<number>(
     `count(*[_type == $type && post._ref == $postId])`,
