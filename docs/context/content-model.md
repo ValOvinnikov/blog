@@ -252,7 +252,8 @@ changing a schema does **not** change existing documents.
   idempotent.
 - **`migrate:deploy`** runs only the migrations not yet recorded in a
   per-dataset `migrationState` ledger document (`_id: 'migrationState'`, a
-  system doc — not a Studio schema type, never part of typegen), in order:
+  declared but Studio-hidden schema type — no create/edit/delete actions,
+  excluded from the new-document menu), in order:
   dry-run → run (`--no-dry-run --no-confirm`) → append `{id, runAt, sha}` to
   the ledger, stopping on first failure. A second run with nothing new is a
   no-op. `migrate:backfill` records the currently-pending folder migrations as
