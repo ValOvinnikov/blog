@@ -1,5 +1,6 @@
 'use client';
 
+import { FormField } from '@admin/components/form-field';
 import {
   updateTenantDetailsAction,
   type TUpdateTenantDetailsActionInput,
@@ -203,9 +204,6 @@ export const TenantDetailsPanel = ({
   const {
     root,
     fields,
-    field,
-    fieldLabel,
-    fieldError,
     fieldLockReason,
     actions,
     lockAnnouncementLive,
@@ -320,10 +318,19 @@ export const TenantDetailsPanel = ({
               .join(' ') || undefined;
 
           return (
-            <div className={field()} key={key}>
-              <label className={fieldLabel()} htmlFor={id}>
-                {labelText}
-              </label>
+            <FormField
+              key={key}
+              label={labelText}
+              htmlFor={id}
+              hint={
+                lock && (
+                  <span id={reasonId} className={fieldLockReason()}>
+                    {lockReasonText(lock)}
+                  </span>
+                )
+              }
+              error={errorMessage}
+            >
               <TextInput
                 id={id}
                 type={TEXT_FIELD_TYPE[key]}
@@ -334,24 +341,24 @@ export const TenantDetailsPanel = ({
                 isDisabled={Boolean(lock)}
                 aria-describedby={describedBy}
               />
-              {lock && (
-                <span id={reasonId} className={fieldLockReason()}>
-                  {lockReasonText(lock)}
-                </span>
-              )}
-              {errorMessage && (
-                <span id={errorId} className={fieldError()}>
-                  {errorMessage}
-                </span>
-              )}
-            </div>
+            </FormField>
           );
         })}
 
-        <div className={field()}>
-          <label className={fieldLabel()} htmlFor={PLAN_FIELD_ID}>
-            {t('planLabel')}
-          </label>
+        <FormField
+          label={t('planLabel')}
+          htmlFor={PLAN_FIELD_ID}
+          hint={
+            planLock && (
+              <span
+                id={`${PLAN_FIELD_ID}-lock-reason`}
+                className={fieldLockReason()}
+              >
+                {lockReasonText(planLock)}
+              </span>
+            )
+          }
+        >
           <SegmentedControl<TTenantPlan>
             ariaLabel={t('planLabel')}
             options={planOptions}
@@ -363,15 +370,7 @@ export const TenantDetailsPanel = ({
               planLock ? `${PLAN_FIELD_ID}-lock-reason` : undefined
             }
           />
-          {planLock && (
-            <span
-              id={`${PLAN_FIELD_ID}-lock-reason`}
-              className={fieldLockReason()}
-            >
-              {lockReasonText(planLock)}
-            </span>
-          )}
-        </div>
+        </FormField>
       </div>
 
       <div className={actions()}>
