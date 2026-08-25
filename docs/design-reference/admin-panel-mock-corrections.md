@@ -134,7 +134,7 @@ over unchanged). Use these groupings and names:
 
 **Bookmarks** (2) — `bookmarkToastSavedMessage`, `bookmarkToastRemovedMessage`
 
-**Empty states** (6) — `blogListEmpty`, `categoryEmpty`, `tagEmpty`,
+**Empty states** (6) — `blogListEmpty`, `topicEmpty`, `tagEmpty`,
 `authorEmpty`, `topicsEmpty`, `bookmarksEmpty`
 
 Pull human-readable labels from that schema file's `title` properties rather
