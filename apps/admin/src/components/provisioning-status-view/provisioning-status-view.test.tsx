@@ -1214,6 +1214,46 @@ describe(ProvisioningStatusView, () => {
       );
     });
 
+    it('stops polling once the retry-baseline wait is exhausted after Start, when every step stays idle', async () => {
+      // Models pressing Start (not Retry) whose dispatched workflow never
+      // actually starts — every tick reports the same all-idle snapshot
+      // forever, so `shouldContinuePolling` alone would never stop it.
+      const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningSteps: idleProvisioningSteps(),
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      await act(async () => {
+        fireEvent.click(
+          screen.getByRole('button', { name: 'Start provisioning' }),
+        );
+      });
+
+      // Advance well past the cap, one tick's worth of real time at a time
+      // (rather than in a single large jump) so each tick's resulting state
+      // change — including the interval being torn down once the cap
+      // fires — is actually committed before the next tick is simulated.
+      for (let tick = 0; tick < RETRY_BASELINE_MAX_TICKS + 5; tick += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+        });
+      }
+
+      // Polling must have stopped once the cap was reached — it never grew
+      // past that regardless of how much further time was simulated.
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(
+        RETRY_BASELINE_MAX_TICKS,
+      );
+    });
+
     it('clears the retry baseline as soon as a real transition arrives, without waiting for the cap', async () => {
       const failedSteps = {
         ...idleProvisioningSteps(),

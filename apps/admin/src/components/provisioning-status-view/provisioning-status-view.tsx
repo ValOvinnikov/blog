@@ -289,9 +289,14 @@ export const ProvisioningStatusView = ({
               // snapshot that predates the retry, up to the cap above.
               return;
             }
-            // Cap reached — the retried workflow never visibly took effect.
-            // Stop waiting on this stale snapshot and fall through to the
-            // normal stop/continue decision below.
+            // Cap reached — that alone is proof nothing is happening, so
+            // stop unconditionally rather than deferring to
+            // `shouldContinuePolling`, which never stops on an all-IDLE
+            // snapshot (the pre-Start case) and would otherwise poll
+            // forever.
+            setPendingRetryBaseline(null);
+            setIsPollingActive(false);
+            return;
           }
 
           setPendingRetryBaseline(null);
