@@ -192,9 +192,14 @@ linking + domains remain:
 
 #### Vercel env vars
 
-**Web** (`blog-dev` / `blog-prod`, Production scope) — same five
-keys per project; each project points at its **own** Sanity project, so the
-id / dataset / URL / tokens all differ:
+**Web** (`blog-dev` / `blog-prod`, Production scope — `deploy-development.yml`
+and `deploy-production.yml` both run `vercel pull --environment=production`
+before `vercel build`, so a var scoped only to Preview/Development is never
+pulled, and — for a required key like `DATABASE_URL` — the app fails at its
+eager `@blog/db` validation rather than silently degrading; same reasoning as
+the Studio scope note below) — same five keys per project; each project
+points at its **own** Sanity project, so the id / dataset / URL / tokens all
+differ:
 
 | Key                             | `blog-dev` value          | `blog-prod` value         |
 | ------------------------------- | ------------------------- | ------------------------- |
