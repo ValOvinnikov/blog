@@ -80,7 +80,12 @@ vi.mock('@admin/server/tenants/update-tenant-details-action', () => ({
 }));
 
 describe(ProvisioningStatusView, () => {
+  // Most tests render a non-terminal `provisioningStatus`, which starts a
+  // real `setInterval` poll loop that can outlive this test's cleanup under
+  // `pool: 'forks'` load and fire against a torn-down file. Faking
+  // setInterval/clearInterval closes that off.
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     retryProvisioningStepActionMock.mockReset();
     retryProvisioningStepActionMock.mockResolvedValue({
       outcome: 'dispatched',
@@ -90,6 +95,29 @@ describe(ProvisioningStatusView, () => {
     getDomainVerificationStatusActionMock.mockReset();
     getDomainVerificationStatusActionMock.mockResolvedValue('NOT_CONFIGURED');
     updateTenantDetailsActionMock.mockReset();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('never lets a rendered poll loop schedule a real setInterval, even for a test that never advances timers', () => {
+    const tenant = makeTenant();
+    expect(vi.getTimerCount()).toBe(0);
+
+    const { unmount } = render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+      />,
+    );
+
+    expect(vi.isFakeTimers()).toBe(true);
+    expect(vi.getTimerCount()).toBeGreaterThan(0);
+
+    unmount();
+    expect(vi.getTimerCount()).toBe(0);
   });
 
   it('splits the heading into an eyebrow and the tenant name', () => {
