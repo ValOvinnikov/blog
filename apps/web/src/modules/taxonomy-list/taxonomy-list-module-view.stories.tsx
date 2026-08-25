@@ -36,6 +36,7 @@ const meta = {
     layout: undefined,
     titleId: 'topic-list-title',
     dataTestId: 'taxonomy-list-module-topic-list-1',
+    headingLevel: 2,
     accessibleTitle: 'Topics',
     emptyMessage: 'No topics yet.',
   },

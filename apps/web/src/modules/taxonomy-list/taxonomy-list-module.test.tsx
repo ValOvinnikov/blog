@@ -36,6 +36,7 @@ const setup = customRenderAsync(TaxonomyListModule, {
   taxonomy: TAXONOMY_KIND.TOPICS,
   titleId: 'topic-list-title',
   dataTestId: 'taxonomy-list-module-topic-list-1',
+  headingLevel: 2,
   accessibleTitle: 'Topics',
   emptyMessage: 'No topics yet.',
   buildHref: (slug: string) => `/topics/${slug}`,

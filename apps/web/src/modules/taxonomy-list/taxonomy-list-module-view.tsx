@@ -1,4 +1,6 @@
 import type { TTaxonomyListModule } from '@blog/service';
+import { Heading } from '@blog/ui/atoms/heading';
+import type { THeadingLevel } from '@blog/ui/lib/react';
 import { TaxonomyCard } from '@blog/ui/molecules/taxonomy-card';
 import { PostGrid } from '@blog/ui/organisms/post-grid';
 import { Section } from '@web/components/shared/section';
@@ -21,6 +23,8 @@ export interface ITaxonomyListModuleViewProps extends Omit<
   items: ITaxonomyListModuleItem[];
   titleId: string;
   dataTestId: string;
+  /** Heading depth for the section title — the caller decides based on where the module sits in the page outline. */
+  headingLevel: THeadingLevel;
   /**
    * Accessible heading text used when `sectionHeader.heading` is empty or
    * blank, so the section keeps a landmark name and the page's heading
@@ -44,6 +48,7 @@ export const TaxonomyListModuleView = ({
   layout,
   titleId,
   dataTestId,
+  headingLevel,
   accessibleTitle,
   emptyMessage,
 }: ITaxonomyListModuleViewProps) => {
@@ -60,9 +65,13 @@ export const TaxonomyListModuleView = ({
       titleId={titleId}
       dataTestId={dataTestId}
     >
-      <h2 id={titleId} className={hasHeading ? s.label() : s.labelFallback()}>
+      <Heading
+        level={headingLevel}
+        id={titleId}
+        className={hasHeading ? s.label() : s.labelFallback()}
+      >
         {resolvedTitle}
-      </h2>
+      </Heading>
       {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
       {isEmpty ? (
         <p className={s.emptyMessage()}>{emptyMessage}</p>

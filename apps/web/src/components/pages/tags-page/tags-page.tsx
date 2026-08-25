@@ -70,6 +70,7 @@ export const TagsPage = async () => {
             taxonomy={TAXONOMY_KIND.TAGS}
             titleId="tag-list-title"
             dataTestId={`taxonomy-list-module-${taxonomyListId}`}
+            headingLevel={2}
             accessibleTitle={heading}
             emptyMessage={t('empty')}
             buildHref={(slug) => routes.tag(slug)}

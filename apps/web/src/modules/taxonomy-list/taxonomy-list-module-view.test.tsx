@@ -37,6 +37,7 @@ const setup = customRender(TaxonomyListModuleView, {
   layout: undefined,
   titleId: 'topic-list-title',
   dataTestId: 'taxonomy-list-module-topic-list-1',
+  headingLevel: 2,
   accessibleTitle: 'Topics',
   emptyMessage: 'No topics yet.',
 });
@@ -57,6 +58,20 @@ describe(TaxonomyListModuleView, () => {
     expect(
       screen.getByRole('region', { name: 'Browse by topic' }),
     ).toBeInTheDocument();
+  });
+
+  it('renders the section heading as an h2 by default', () => {
+    setup();
+
+    const label = screen.getByText('Browse by topic');
+    expect(label.tagName).toBe('H2');
+  });
+
+  it('renders the section heading at the given headingLevel', () => {
+    setup({ headingLevel: 3 });
+
+    const label = screen.getByText('Browse by topic');
+    expect(label.tagName).toBe('H3');
   });
 
   it('renders a visually hidden heading from accessibleTitle when sectionHeader.heading is undefined', () => {
