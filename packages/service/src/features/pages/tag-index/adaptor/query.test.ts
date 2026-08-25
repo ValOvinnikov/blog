@@ -18,4 +18,8 @@ describe('tagIndexPageQuery', () => {
 
     expect(() => tagIndexPageQuery.parse(raw)).not.toThrow();
   });
+
+  it('parses null as no matching page_tagIndex document, rather than throwing', () => {
+    expect(tagIndexPageQuery.parse(null)).toBeNull();
+  });
 });

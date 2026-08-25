@@ -20,4 +20,7 @@ export const postPageQuery = q
     publishedAt: sub.field('publishedAt').notNull(),
     seo: sub.field('seo').project(seoFragment).nullable(true),
     post: sub.field('post').deref().project(postDetailFragment).notNull(),
-  }));
+  }))
+  // Nullable, not `.notNull()`: no matching `page_post` is an ordinary
+  // not-found, not a parse failure — the loader turns `null` into `undefined`.
+  .nullable(true);

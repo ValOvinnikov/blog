@@ -63,6 +63,10 @@ describe('postPageQuery', () => {
     });
   });
 
+  it('parses null as no matching page_post document, rather than throwing', () => {
+    expect(postPageQuery.parse(null)).toBeNull();
+  });
+
   it('allows a bodyImage body block with no layout', () => {
     const raw = makeRawPostPage({
       post: makeRawPostDetail({

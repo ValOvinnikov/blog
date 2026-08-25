@@ -6,13 +6,14 @@ import { blogPageQuery } from './query';
 import { toIndexPage } from './transformer';
 import type { TBlogIndexPage } from './types';
 
-export async function getIndexPage(): Promise<TBlogIndexPage> {
+export async function getIndexPage(): Promise<TBlogIndexPage | undefined> {
   // `blogPageQuery` derefs `postList` — that tag must ride alongside
   // `page_blog` (tag-scope contract, `sanity/query.ts`).
   const [rawPage, settings] = await Promise.all([
     runQuery(blogPageQuery, isr(['page_blog', 'modules:postList'])),
     getSiteSettings(),
   ]);
+  if (!rawPage) return undefined;
   if (!rawPage.postList) {
     throw new MissingPostListError();
   }

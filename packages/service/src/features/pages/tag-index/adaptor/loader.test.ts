@@ -25,6 +25,7 @@ describe('getIndexPage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getIndexPage();
+    if (!result) throw new Error('expected a tag index page');
 
     expect(result.taxonomyListId).toBe('taxonomy-list-1');
   });
@@ -45,6 +46,7 @@ describe('getIndexPage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getIndexPage();
+    if (!result) throw new Error('expected a tag index page');
 
     expect(result.heading).toBe('Browse by tag');
     expect(result.supportingText).toBe('Find posts by keyword.');
@@ -67,6 +69,7 @@ describe('getIndexPage', () => {
       );
 
     const result = await getIndexPage();
+    if (!result) throw new Error('expected a tag index page');
 
     expect(result.seo).toEqual({
       title: 'Tags',
@@ -105,5 +108,15 @@ describe('getIndexPage', () => {
 
     await expect(getIndexPage()).rejects.toThrow(MissingTaxonomyListError);
     expect(mockRun).toHaveBeenCalledTimes(2);
+  });
+
+  it('resolves undefined, rather than rejecting, when no page_tagIndex document exists', async () => {
+    mockRun
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getIndexPage();
+
+    expect(result).toBeUndefined();
   });
 });

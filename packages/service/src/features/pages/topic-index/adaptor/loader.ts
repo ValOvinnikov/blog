@@ -6,7 +6,7 @@ import { topicIndexPageQuery } from './query';
 import { toTopicIndexPage } from './transformer';
 import type { TTopicIndexPage } from './types';
 
-export async function getIndexPage(): Promise<TTopicIndexPage> {
+export async function getIndexPage(): Promise<TTopicIndexPage | undefined> {
   // `topicIndexPageQuery` derefs `taxonomyList` — that tag must ride
   // alongside `page_topicIndex` (tag-scope contract, `sanity/query.ts`).
   const [rawPage, settings] = await Promise.all([
@@ -16,6 +16,7 @@ export async function getIndexPage(): Promise<TTopicIndexPage> {
     ),
     getSiteSettings(),
   ]);
+  if (!rawPage) return undefined;
   if (!rawPage.taxonomyList) {
     throw new MissingTaxonomyListError();
   }

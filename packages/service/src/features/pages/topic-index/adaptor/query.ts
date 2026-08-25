@@ -16,4 +16,7 @@ export const topicIndexPageQuery = q.star
       .nullable(true),
     seo: sub.field('seo').project(seoFragment).nullable(true),
   }))
-  .notNull();
+  // Nullable, not `.notNull()`: no `page_topicIndex` document is an
+  // ordinary not-found, not a parse failure — the loader turns `null` into
+  // `undefined`.
+  .nullable(true);

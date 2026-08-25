@@ -6,7 +6,9 @@ import { tagPageQuery } from './query';
 import { toTagDetailPage } from './transformer';
 import type { TTagDetailPage } from './types';
 
-export async function getTagPage(slug: string): Promise<TTagDetailPage> {
+export async function getTagPage(
+  slug: string,
+): Promise<TTagDetailPage | undefined> {
   // `tagPageQuery` derefs `tag` and `postList` — both tags must ride
   // alongside `page_tag` (tag-scope contract, `sanity/query.ts`).
   const [rawPage, settings] = await Promise.all([
@@ -16,6 +18,7 @@ export async function getTagPage(slug: string): Promise<TTagDetailPage> {
     }),
     getSiteSettings(),
   ]);
+  if (!rawPage) return undefined;
   if (!rawPage.postList) {
     throw new MissingPostListError();
   }

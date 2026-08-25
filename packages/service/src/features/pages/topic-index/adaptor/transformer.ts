@@ -5,7 +5,9 @@ import type { InferResultType } from 'groqd';
 import type { topicIndexPageQuery } from './query';
 import type { TTopicIndexPage } from './types';
 
-export type TRawTopicIndexPage = InferResultType<typeof topicIndexPageQuery>;
+export type TRawTopicIndexPage = NonNullable<
+  InferResultType<typeof topicIndexPageQuery>
+>;
 
 export function toTopicIndexPage(
   rawPage: TRawTopicIndexPage,

@@ -6,7 +6,7 @@ import type { InferResultType } from 'groqd';
 import type { tagPageQuery } from './query';
 import type { TTagDetailPage, TTagDetailPageTag } from './types';
 
-export type TRawTagPage = InferResultType<typeof tagPageQuery>;
+export type TRawTagPage = NonNullable<InferResultType<typeof tagPageQuery>>;
 type TRawTagDetailPageTag = TRawTagPage['tag'];
 
 function toTagDetailPageTag(raw: TRawTagDetailPageTag): TTagDetailPageTag {
