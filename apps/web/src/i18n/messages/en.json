@@ -2,7 +2,6 @@
   "pagination": {
     "previous": "Previous",
     "next": "Next",
-    "ariaLabel": "{pageType} pages",
     "pageSuffix": "– Page {page}"
   },
   "breadcrumbs": {
@@ -77,12 +76,14 @@
   },
   "topicPage": {
     "title": "Posts in {name}",
-    "empty": "No posts in {name} yet."
+    "empty": "No posts in {name} yet.",
+    "paginationAriaLabel": "Topic pages"
   },
   "tagPage": {
     "label": "Tag: {name}",
     "title": "Posts tagged {name}",
-    "empty": "No posts tagged {name} yet."
+    "empty": "No posts tagged {name} yet.",
+    "paginationAriaLabel": "Tag pages"
   },
   "authorPage": {
     "title": "Posts by {name}",

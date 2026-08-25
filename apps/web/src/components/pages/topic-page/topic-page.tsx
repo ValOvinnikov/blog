@@ -33,14 +33,12 @@ type TTopicPageProps = { slug: string; page?: number; locale: string };
  * and supporting text.
  */
 export const TopicPage = async ({ slug, page, locale }: TTopicPageProps) => {
-  const [result, topics, breadcrumbsT, topicPageT, paginationT] =
-    await Promise.all([
-      service.pages.topic.v1.getTopicPage(slug),
-      getTopicsSafely(),
-      getTranslations('breadcrumbs'),
-      getTranslations('topicPage'),
-      getTranslations('pagination'),
-    ]);
+  const [result, topics, breadcrumbsT, topicPageT] = await Promise.all([
+    service.pages.topic.v1.getTopicPage(slug),
+    getTopicsSafely(),
+    getTranslations('breadcrumbs'),
+    getTranslations('topicPage'),
+  ]);
 
   if (!result.ok) {
     logger.error('topic_page.fetch_failed', { slug, error: result.error });
@@ -79,7 +77,7 @@ export const TopicPage = async ({ slug, page, locale }: TTopicPageProps) => {
               locale={locale}
               page={page ?? 1}
               createHref={(pageNumber) => routes.topic(slug, pageNumber)}
-              ariaLabel={paginationT('ariaLabel', { pageType: 'Topic' })}
+              ariaLabel={topicPageT('paginationAriaLabel')}
               accessibleTitle={topicPageT('title', { name: topic.title })}
               emptyMessageFallback={topicPageT('empty', { name: topic.title })}
               titleId="topic-posts-title"
