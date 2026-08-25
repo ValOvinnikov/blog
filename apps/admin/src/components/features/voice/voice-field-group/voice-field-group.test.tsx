@@ -37,6 +37,33 @@ describe(VoiceFieldGroup, () => {
     ).toBeVisible();
   });
 
+  it('nests field labels one heading level below the group title', () => {
+    render(
+      <VoiceFieldGroup
+        title="Terminal prompts"
+        fields={fields}
+        values={
+          { terminalPromptHost: '', authPromptCommandSignIn: '' } as never
+        }
+        placeholders={{}}
+        onFieldChange={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Terminal prompts' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 4, name: /Terminal Prompt Host/ }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', {
+        level: 4,
+        name: /Auth Prompt Command — Sign In/,
+      }),
+    ).toBeVisible();
+  });
+
   it('shows each field storage key next to its label', () => {
     render(
       <VoiceFieldGroup

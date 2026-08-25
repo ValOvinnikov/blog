@@ -58,6 +58,7 @@ export const VoiceFieldGroup = ({
                 <code className={fieldKey()}>{field.key}</code>
               </>
             }
+            labelLevel={4}
             canControlGrow={true}
           >
             <VoiceField
