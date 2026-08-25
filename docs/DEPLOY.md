@@ -490,6 +490,15 @@ row a given run reads/writes) is a separate axis, picked per-dispatch by
 each workflow's `environment` input (`development`/`production`, default
 `production`) — see the two secrets below:
 
+> **These two must be created as Secrets, not Variables.** GitHub Environments
+> keep Secrets and Variables in separate namespaces — `secrets.NAME` and
+> `vars.NAME` never see each other's values. `provision-tenant.yml`/
+> `deprovision-tenant.yml` read `secrets.TENANT_REGISTRY_DATABASE_URL_DEV`/
+> `_PROD` specifically; creating either one as a Variable by mistake leaves
+> the secret unset, and the workflow's `:?` check fails every dispatch with
+> `empty — set the TENANT_REGISTRY_DATABASE_URL_DEV secret on the production
+environment` rather than silently falling through to the wrong branch.
+
 - [ ] Secret `TENANT_REGISTRY_DATABASE_URL_DEV` = `<DEV_DATABASE_URL_UNPOOLED>`
       (the same value as the `development` environment's own
       `DATABASE_URL_UNPOOLED` above) — used when a dispatch's `environment`
@@ -499,7 +508,7 @@ each workflow's `environment` input (`development`/`production`, default
       above) — used when a dispatch's `environment` input is `production`
       (the default). Deliberately a **different secret name** from
       `DATABASE_URL_UNPOOLED`, even though the value is identical here — see
-      that bullet's note above (#2056).
+      that bullet's note above.
 - [ ] Secret `SANITY_MANAGEMENT_TOKEN` — an **organization-level** Sanity
       token with "create project" permission (broader than `SANITY_MIGRATE_TOKEN`,
       which is scoped to one already-existing project). Mint it at
