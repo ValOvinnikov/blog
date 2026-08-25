@@ -186,10 +186,18 @@ No Postgres involvement — "category" was not a stored value, a `pgEnum`, or a
 column anywhere in `@blog/db`, so no DB migration was needed. `@blog/db` was
 touched in one place: `scripts/provision-tenant/steps/starter-content.ts`.
 
-Two stored, category-named values were deliberately left behind and are tracked
-in #1835: the `categoryEmpty` voice override (stored in both Sanity and a
-Postgres JSONB column) and `HERO_FIELD_MODE.POST_CATEGORY` (stored in
-`module_hero` documents). Both need content migrations of their own.
+Two stored, category-named values were deliberately left behind and tracked in
+#1835: the `categoryEmpty` voice override (a key inside `site_config`'s
+`voice_overrides` JSONB column, plus a field on the dead Sanity `settings_voice`
+schema) and `HERO_FIELD_MODE.POST_CATEGORY` (stored in `module_hero`
+documents). **Both were renamed in #1835** — to `topicEmpty` and `POST_TOPIC`
+respectively — so nothing category-named remains stored.
+
+Only one of them needed a content migration in the end. `module_hero`
+documents genuinely carried `'POST_CATEGORY'` and were patched. The
+`categoryEmpty` side needed a Postgres JSONB rekey migration for
+`site_config`, but **no** Sanity migration: `settings_voice` has no read path
+and holds no value for that field in either dataset.
 
 Because a `_type` rename reds `type-check` until every layer lands, the rename
 **cannot** be split into per-layer PRs. It ships as one PR.

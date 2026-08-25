@@ -49,7 +49,7 @@ const overrides = {
   bookmarkToastSavedMessage: '',
   bookmarkToastRemovedMessage: '',
   blogListEmpty: '',
-  categoryEmpty: '',
+  topicEmpty: '',
   tagEmpty: '',
   authorEmpty: '',
   topicsEmpty: '',

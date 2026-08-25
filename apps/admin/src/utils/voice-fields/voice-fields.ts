@@ -22,7 +22,7 @@ export type TVoiceOverrideKey =
   | 'bookmarkToastSavedMessage'
   | 'bookmarkToastRemovedMessage'
   | 'blogListEmpty'
-  | 'categoryEmpty'
+  | 'topicEmpty'
   | 'tagEmpty'
   | 'authorEmpty'
   | 'topicsEmpty'
@@ -78,7 +78,7 @@ export const VOICE_FIELD_GROUPS: TVoiceFieldGroup[] = [
     groupKey: 'emptyStates',
     fields: [
       { key: 'blogListEmpty', multiline: true },
-      { key: 'categoryEmpty', multiline: true },
+      { key: 'topicEmpty', multiline: true },
       { key: 'tagEmpty', multiline: true },
       { key: 'authorEmpty', multiline: true },
       { key: 'topicsEmpty', multiline: true },

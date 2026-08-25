@@ -54,7 +54,7 @@ export const voiceOverridesSchema = z
     bookmarkToastSavedMessage: overrideField(TOAST_MESSAGE_MAX),
     bookmarkToastRemovedMessage: overrideField(TOAST_MESSAGE_MAX),
     blogListEmpty: overrideField(LONG_COPY_MAX),
-    categoryEmpty: overrideField(LONG_COPY_MAX),
+    topicEmpty: overrideField(LONG_COPY_MAX),
     tagEmpty: overrideField(LONG_COPY_MAX),
     authorEmpty: overrideField(LONG_COPY_MAX),
     topicsEmpty: overrideField(LONG_COPY_MAX),

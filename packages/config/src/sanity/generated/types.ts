@@ -293,7 +293,7 @@ export type Settings_voice = {
   bookmarkToastSavedMessage?: string;
   bookmarkToastRemovedMessage?: string;
   blogListEmpty?: string;
-  categoryEmpty?: string;
+  topicEmpty?: string;
   tagEmpty?: string;
   authorEmpty?: string;
   topicsEmpty?: string;
@@ -589,7 +589,7 @@ export type Module_hero = {
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   featuredPost?: Blog_postReference;
-  heroEyebrowMode?: 'POST_CATEGORY' | 'CUSTOM';
+  heroEyebrowMode?: 'POST_TOPIC' | 'CUSTOM';
   heroEyebrow?: string;
   heroTitleMode?: 'POST_TITLE' | 'CUSTOM';
   heroTitle?: string;
