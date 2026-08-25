@@ -514,6 +514,19 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   automatic; prod: backed up via `pg_dump`, gated behind the same required-
   reviewer approval) — see `docs/DEPLOY.md` and `.claude/agents/db.md`'s
   "Migrations" section.
+- **Neon Postgres is one project with two branches, not a project-per-environment
+  split like Sanity**: `main` backs production, `development` (branched off
+  `main` on 2026-08-25) backs development. Before that date only `main`
+  existed and both environments read it — the two-branch split is recent and
+  not yet fully wired: `deploy-production.yml`'s `migrate-db` job and the
+  tenant-provisioning workflows (`provision-tenant.yml`/`deprovision-tenant.yml`)
+  all share the `production` Environment's single `DATABASE_URL_UNPOOLED`
+  secret for two different purposes, and as of 2026-08-25 that secret points at
+  `development`, not `main` — a production tag's `migrate-db` step currently
+  targets the wrong branch. **Do not cut a production tag until this is fixed**
+  (#2056). Whether the `development` Environment's own secret is confirmed
+  pointed at the `development` branch is tracked separately (#2057). See
+  `docs/DEPLOY.md`'s Neon Postgres section for the full state and open items.
 - **Each environment is a separate Sanity project** with its own env-driven,
   never-committed project id and tokens; **six fully isolated Vercel
   projects** (a web project, a Studio project and an admin-panel project per
