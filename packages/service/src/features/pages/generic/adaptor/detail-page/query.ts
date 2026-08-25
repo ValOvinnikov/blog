@@ -17,4 +17,6 @@ export const genericPageQuery = q
       .nullable(true),
     seo: sub.field('seo').project(seoFragment).nullable(true),
   }))
-  .notNull();
+  // Nullable, not `.notNull()`: no matching `page_generic` is an ordinary
+  // not-found, not a parse failure — the loader turns `null` into `undefined`.
+  .nullable(true);

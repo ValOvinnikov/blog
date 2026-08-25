@@ -14,4 +14,8 @@ describe('homePageQuery', () => {
 
     expect(() => homePageQuery.parse(raw)).not.toThrow();
   });
+
+  it('parses null as no matching page_home document, rather than throwing', () => {
+    expect(homePageQuery.parse(null)).toBeNull();
+  });
 });

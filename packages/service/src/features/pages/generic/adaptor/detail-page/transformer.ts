@@ -6,7 +6,9 @@ import type { InferResultType } from 'groqd';
 import type { genericPageQuery } from './query';
 import type { TGenericPage } from './types';
 
-export type TRawGenericPage = InferResultType<typeof genericPageQuery>;
+export type TRawGenericPage = NonNullable<
+  InferResultType<typeof genericPageQuery>
+>;
 
 export function toGenericPage(
   raw: TRawGenericPage,

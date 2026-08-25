@@ -22,6 +22,7 @@ describe('getPage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const page = await getPage('about');
+    if (!page) throw new Error('expected a generic page');
 
     expect(page.title).toBe('About');
     expect(page.slug).toBe('about');
@@ -41,6 +42,7 @@ describe('getPage', () => {
       );
 
     const page = await getPage('about');
+    if (!page) throw new Error('expected a generic page');
 
     expect(page.seo.title).toBe('About');
     expect(page.seo.description).toBe('Settings description');
@@ -61,14 +63,19 @@ describe('getPage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const page = await getPage('about');
+    if (!page) throw new Error('expected a generic page');
 
     expect(page.seo.title).toBe('About Us');
     expect(page.seo.ogTitle).toBe('About Us');
   });
 
-  it('propagates when the page document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+  it('resolves undefined, rather than rejecting, when no page_generic matches the slug', async () => {
+    mockRun
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(makeRawSiteSettings());
 
-    await expect(getPage('missing')).rejects.toThrow();
+    const page = await getPage('missing');
+
+    expect(page).toBeUndefined();
   });
 });
