@@ -1,4 +1,5 @@
 import { customRenderAsync, screen } from '@admin/testing/custom-render';
+import { mockDbConstants } from '@admin/testing/mock-db-constants';
 import userEvent from '@testing-library/user-event';
 import { redirect } from 'next/navigation';
 
@@ -11,20 +12,28 @@ const openAdvanced = async () => {
   await userEvent.setup().click(screen.getByText(ADVANCED_SUMMARY));
 };
 
-const { authMock, getTenantBySlugMock, getMembershipMock, getSiteConfigMock } =
-  vi.hoisted(() => ({
-    authMock: vi.fn(),
-    getTenantBySlugMock: vi.fn(),
-    getMembershipMock: vi.fn(),
-    getSiteConfigMock: vi.fn(),
-  }));
+const {
+  authMock,
+  getTenantBySlugMock,
+  getMembershipMock,
+  getAdminByUserIdMock,
+  getSiteConfigMock,
+} = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  getTenantBySlugMock: vi.fn(),
+  getMembershipMock: vi.fn(),
+  getAdminByUserIdMock: vi.fn(),
+  getSiteConfigMock: vi.fn(),
+}));
 
 vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await mockDbConstants()),
   queries: {
     tenants: { getTenantBySlug: getTenantBySlugMock },
     memberships: { getMembership: getMembershipMock },
+    admins: { getAdminByUserId: getAdminByUserIdMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));
@@ -38,11 +47,13 @@ describe(`<${VoicePage.name}/>`, () => {
     authMock.mockReset();
     getTenantBySlugMock.mockReset();
     getMembershipMock.mockReset();
+    getAdminByUserIdMock.mockReset();
     getSiteConfigMock.mockReset();
     vi.mocked(redirect).mockClear();
 
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getTenantBySlugMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
+    getAdminByUserIdMock.mockResolvedValue(undefined);
     getMembershipMock.mockResolvedValue({
       id: 'membership-1',
       userId: 'user-1',

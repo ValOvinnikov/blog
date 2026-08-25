@@ -1,22 +1,31 @@
 import { customRenderAsync, screen } from '@admin/testing/custom-render';
+import { mockDbConstants } from '@admin/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
 
 import LookPage from './page';
 
-const { authMock, getTenantBySlugMock, getMembershipMock, getSiteConfigMock } =
-  vi.hoisted(() => ({
-    authMock: vi.fn(),
-    getTenantBySlugMock: vi.fn(),
-    getMembershipMock: vi.fn(),
-    getSiteConfigMock: vi.fn(),
-  }));
+const {
+  authMock,
+  getTenantBySlugMock,
+  getMembershipMock,
+  getAdminByUserIdMock,
+  getSiteConfigMock,
+} = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  getTenantBySlugMock: vi.fn(),
+  getMembershipMock: vi.fn(),
+  getAdminByUserIdMock: vi.fn(),
+  getSiteConfigMock: vi.fn(),
+}));
 
 vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await mockDbConstants()),
   queries: {
     tenants: { getTenantBySlug: getTenantBySlugMock },
     memberships: { getMembership: getMembershipMock },
+    admins: { getAdminByUserId: getAdminByUserIdMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));
@@ -30,6 +39,8 @@ describe(`<${LookPage.name}/>`, () => {
     authMock.mockReset();
     getTenantBySlugMock.mockReset();
     getMembershipMock.mockReset();
+    getAdminByUserIdMock.mockReset();
+    getAdminByUserIdMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockReset();
     vi.mocked(redirect).mockClear();
   });

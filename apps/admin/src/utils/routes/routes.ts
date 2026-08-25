@@ -18,7 +18,7 @@ export const adminRoutes = {
   dashboardVoice: () => '/dashboard/voice',
   dashboardFeatures: () => '/dashboard/features',
   dashboardSelectTenant: () => '/dashboard/select-tenant',
-  /** The picker's link target — verifies `tenantId` against the session's own `memberships` before setting the "active tenant" cookie. */
+  /** The picker's link target — verifies `tenantId` against the session's own `memberships` (or, for a SUPERADMIN, that the tenant exists) before setting the "active tenant" cookie. */
   dashboardSelectTenantHref: (tenantId: string) =>
     `/api/dashboard/select-tenant?tenantId=${tenantId}`,
 } as const;

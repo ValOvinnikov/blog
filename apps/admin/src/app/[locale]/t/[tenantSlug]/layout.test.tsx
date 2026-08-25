@@ -1,20 +1,29 @@
 import { customRenderAsync, screen } from '@admin/testing/custom-render';
+import { mockDbConstants } from '@admin/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
 
 import TenantLayout from './layout';
 
-const { authMock, getTenantBySlugMock, getMembershipMock } = vi.hoisted(() => ({
+const {
+  authMock,
+  getTenantBySlugMock,
+  getMembershipMock,
+  getAdminByUserIdMock,
+} = vi.hoisted(() => ({
   authMock: vi.fn(),
   getTenantBySlugMock: vi.fn(),
   getMembershipMock: vi.fn(),
+  getAdminByUserIdMock: vi.fn(),
 }));
 
 vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await mockDbConstants()),
   queries: {
     tenants: { getTenantBySlug: getTenantBySlugMock },
     memberships: { getMembership: getMembershipMock },
+    admins: { getAdminByUserId: getAdminByUserIdMock },
   },
 }));
 
@@ -28,6 +37,8 @@ describe(`<${TenantLayout.name}/>`, () => {
     authMock.mockReset();
     getTenantBySlugMock.mockReset();
     getMembershipMock.mockReset();
+    getAdminByUserIdMock.mockReset();
+    getAdminByUserIdMock.mockResolvedValue(undefined);
     vi.mocked(redirect).mockClear();
   });
 
