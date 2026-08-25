@@ -279,6 +279,7 @@
   },
   "tenantDetailsPanel": {
     "heading": "Tenant details",
+    "fieldsGroupLabel": "Tenant detail fields",
     "nameLabel": "Name",
     "slugLabel": "Slug",
     "domainLabel": "Primary domain",
@@ -293,8 +294,11 @@
     "provisioningStartedError": "This tenant's provisioning has already started; its details can no longer be edited.",
     "ownerAlreadyJoinedError": "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
     "ownerEmailTakenError": "This email already has a pending invite on this tenant.",
-    "lockedAnnouncement": "Tenant details locked while provisioning runs.",
-    "unlockedAnnouncement": "Tenant details unlocked and editable again."
+    "lockedAnnouncement": "Some tenant detail fields are now locked.",
+    "unlockedAnnouncement": "More tenant detail fields are now editable.",
+    "fieldLockedReasonStep": "Locked — the \"{step}\" step has already completed and used this value.",
+    "fieldLockedReasonRunning": "Locked while provisioning is running.",
+    "fieldLockedReasonSucceeded": "Locked — provisioning has already finished."
   },
   "archivedTenantsToggle": {
     "ariaLabel": "Tenant visibility",

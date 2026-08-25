@@ -112,7 +112,7 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### SegmentedControl — `atoms/segmented-control/segmented-control.tsx`
 
 a fully controlled switch between a small, mutually exclusive set of views (e.g. a reader's chosen depth for an article).
-Props: options: ISegmentedControlOption<TValue>[] · value: TValue · onChange: (value: TValue) => void · ariaLabel: string _(extends IWithClassName, IWithDataTestId)_
+Props: options: ISegmentedControlOption<TValue>[] · value: TValue · onChange: (value: TValue) => void · ariaLabel: string · isDisabled?: boolean · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
 Variants: selected: (boolean)
 
 ### Spinner — `atoms/spinner/spinner.tsx`

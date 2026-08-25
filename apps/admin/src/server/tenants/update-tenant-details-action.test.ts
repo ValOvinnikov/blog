@@ -175,6 +175,45 @@ describe('updateTenantDetailsAction', () => {
     });
   });
 
+  it('maps a slug-locked outcome onto a slug field error naming the blocking step, without touching the mutation result', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: 'slug-locked',
+      blockingStep: 'DEPLOY_STUDIO',
+    });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', validInput);
+
+    expect(result).toEqual({
+      ok: false,
+      fieldErrors: {
+        slug: 'Locked — the "Deploy the content editor" step has already completed and used this value.',
+      },
+    });
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  it('maps a domain-locked outcome onto a primaryDomain field error naming the blocking step', async () => {
+    updateTenantDetailsMock.mockResolvedValue({
+      outcome: 'domain-locked',
+      blockingStep: 'MAP_DOMAIN',
+    });
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', validInput);
+
+    expect(result).toEqual({
+      ok: false,
+      fieldErrors: {
+        primaryDomain:
+          'Locked — the "Connect the custom domain" step has already completed and used this value.',
+      },
+    });
+    expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
   it('maps a provisioning-started outcome onto a form-level error, without a successful update', async () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: 'provisioning-started',

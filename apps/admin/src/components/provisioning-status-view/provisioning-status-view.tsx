@@ -8,6 +8,7 @@ import { getTenantProvisioningStatusAction } from '@admin/server/provisioning/ge
 import { retryProvisioningStepAction } from '@admin/server/provisioning/retry-provisioning-step-action';
 import { classifyProvisioningError } from '@admin/utils/provisioning-error/provisioning-error';
 import { adminRoutes } from '@admin/utils/routes/routes';
+import { computeTenantFieldLocks } from '@admin/utils/tenant-field-locks/tenant-field-locks';
 import { ICONS, Size } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
@@ -477,7 +478,7 @@ export const ProvisioningStatusView = ({
 
           <TenantDetailsPanel
             tenant={tenant}
-            isEditable={allIdle}
+            fieldLocks={computeTenantFieldLocks(provisioningSteps)}
             ownerEmail={ownerEmail}
           />
           {provisioningStatus === TENANT_PROVISIONING_STATUS.READY && (

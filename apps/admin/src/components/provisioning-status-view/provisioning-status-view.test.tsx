@@ -1,3 +1,4 @@
+import messages from '@admin/i18n/messages/en.json';
 import {
   act,
   fireEvent,
@@ -10,16 +11,31 @@ import {
   idleProvisioningSteps,
   makeTenant,
 } from '@admin/testing/tenants/fixtures';
+import { LOCALE_ISO_CODES } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
 import userEvent from '@testing-library/user-event';
+import { NextIntlClientProvider } from 'next-intl';
+import type { ReactElement } from 'react';
 
 import { ProvisioningStatusView } from './provisioning-status-view';
 
 const render = renderWithIntl;
+
+// `rerender()` replaces the entire previously-rendered tree, so a rerender
+// that needs to keep going through `useTranslations` context has to
+// re-supply this wrapper itself — `renderWithIntl`'s own wrapping only
+// covers the initial render.
+const withIntl = (ui: ReactElement) => {
+  return (
+    <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
+      {ui}
+    </NextIntlClientProvider>
+  );
+};
 
 const STEP_POLL_INTERVAL_MS = 4000;
 const DOMAIN_POLL_INTERVAL_MS = 10000;
@@ -28,10 +44,12 @@ const {
   retryProvisioningStepActionMock,
   getTenantProvisioningStatusActionMock,
   getDomainVerificationStatusActionMock,
+  updateTenantDetailsActionMock,
 } = vi.hoisted(() => ({
   retryProvisioningStepActionMock: vi.fn(),
   getTenantProvisioningStatusActionMock: vi.fn(),
   getDomainVerificationStatusActionMock: vi.fn(),
+  updateTenantDetailsActionMock: vi.fn(),
 }));
 
 vi.mock('@admin/server/provisioning/retry-provisioning-step-action', () => ({
@@ -56,7 +74,7 @@ vi.mock(
 // transitively pulls in Auth.js via `requireAdmin`, mocked out purely to
 // keep this render test from loading that chain.
 vi.mock('@admin/server/tenants/update-tenant-details-action', () => ({
-  updateTenantDetailsAction: vi.fn(),
+  updateTenantDetailsAction: updateTenantDetailsActionMock,
 }));
 
 describe(ProvisioningStatusView, () => {
@@ -67,6 +85,7 @@ describe(ProvisioningStatusView, () => {
     getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
     getDomainVerificationStatusActionMock.mockReset();
     getDomainVerificationStatusActionMock.mockResolvedValue('NOT_CONFIGURED');
+    updateTenantDetailsActionMock.mockReset();
   });
 
   it('splits the heading into an eyebrow and the tenant name', () => {
@@ -266,7 +285,7 @@ describe(ProvisioningStatusView, () => {
     expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('acme');
   });
 
-  it('locks the tenant details panel to static content once any step has progressed past idle', () => {
+  it('locks every tenant details field while a step is running, stating why', () => {
     const tenant = makeTenant({
       name: 'Acme Inc.',
       slug: 'acme',
@@ -287,15 +306,148 @@ describe(ProvisioningStatusView, () => {
 
     expect(screen.getByText('Tenant details')).toBeVisible();
 
+    const slugInput = screen.getByRole('textbox', { name: 'Slug' });
+    expect(slugInput).toHaveValue('acme');
+    expect(slugInput).toBeDisabled();
+    expect(slugInput).toHaveAccessibleDescription(
+      'Locked while provisioning is running.',
+    );
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+  });
+
+  it('locks only the field a completed step already consumed once provisioning has FAILED, leaving the field that caused the failure editable', () => {
+    // Mirrors the real 409 case: DEPLOY_STUDIO completed (locking slug), but
+    // MAP_DOMAIN itself failed — so primaryDomain, the field that actually
+    // caused the failure, stays editable.
+    const tenant = makeTenant({
+      name: 'Acme Inc.',
+      slug: 'acme',
+      primaryDomain: 'taken-domain.example.com',
+      provisioningSteps: {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+          error: 'Vercel deploy failed: 409 domain_already_in_use',
+        },
+      },
+    });
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+      />,
+    );
+
+    const slugInput = screen.getByRole('textbox', { name: 'Slug' });
+    expect(slugInput).toBeDisabled();
+    expect(slugInput).toHaveAccessibleDescription(
+      'Locked — the "Deploy the content editor" step has already completed and used this value.',
+    );
+
+    const domainInput = screen.getByRole('textbox', {
+      name: 'Primary domain',
+    });
+    expect(domainInput).not.toBeDisabled();
+    expect(screen.getByRole('textbox', { name: 'Name' })).not.toBeDisabled();
+  });
+
+  it('lets the operator correct the failing domain and Retry re-runs provisioning with the new value', async () => {
+    const correctedProvisioningSteps = {
+      ...idleProvisioningSteps(),
+      [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+      },
+      [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+      },
+      [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+      },
+      [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+      },
+      [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+        error: 'Vercel deploy failed: 409 domain_already_in_use',
+      },
+    };
+    const correctedTenant = makeTenant({
+      id: 'tenant-1',
+      primaryDomain: 'new-domain.example.com',
+      provisioningSteps: correctedProvisioningSteps,
+    });
+    updateTenantDetailsActionMock.mockResolvedValue({
+      ok: true,
+      tenant: correctedTenant,
+    });
+    const user = userEvent.setup();
+    const tenant = makeTenant({
+      id: 'tenant-1',
+      primaryDomain: 'taken-domain.example.com',
+      provisioningSteps: correctedProvisioningSteps,
+    });
+    const { rerender } = render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+      />,
+    );
+
+    await user.clear(screen.getByRole('textbox', { name: 'Primary domain' }));
+    await user.type(
+      screen.getByRole('textbox', { name: 'Primary domain' }),
+      'new-domain.example.com',
+    );
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => {
+      expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
+        'tenant-1',
+        expect.objectContaining({
+          primaryDomain: 'new-domain.example.com',
+        }),
+      );
+    });
+
+    // Stands in for `router.refresh()` causing the parent Server Component
+    // to re-fetch and pass down the now-persisted tenant — proving the
+    // corrected value actually reached the tenant row before Retry runs,
+    // rather than merely that Save and Retry were each clicked in order.
+    rerender(
+      withIntl(
+        <ProvisioningStatusView
+          tenant={correctedTenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
+        />,
+      ),
+    );
+
     expect(
-      screen.queryByRole('textbox', { name: 'Slug' }),
-    ).not.toBeInTheDocument();
-    const slugTerm = screen.getByText('Slug');
-    expect(slugTerm.tagName).toBe('DT');
-    expect(slugTerm.nextElementSibling).toHaveTextContent('acme');
-    expect(
-      screen.queryByRole('button', { name: 'Save changes' }),
-    ).not.toBeInTheDocument();
+      await screen.findByRole('textbox', { name: 'Primary domain' }),
+    ).toHaveValue('new-domain.example.com');
+
+    await user.click(
+      screen.getByRole('button', { name: 'Retry provisioning' }),
+    );
+
+    await waitFor(() => {
+      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith('tenant-1');
+    });
   });
 
   it('shows a single overall status badge and a single Retry button in the tenant details header for a failed step, with no per-step Retry buttons in the sidebar', () => {
