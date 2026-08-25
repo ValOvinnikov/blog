@@ -75,7 +75,9 @@ export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
               locale={locale}
               page={page ?? 1}
               createHref={(pageNumber) => routes.tag(slug, pageNumber)}
-              ariaLabel={tagPageT('paginationAriaLabel')}
+              ariaLabel={tagPageT('paginationAriaLabel', {
+                name: tag.title,
+              })}
               accessibleTitle={tagPageT('title', { name: tag.title })}
               emptyMessageFallback={tagPageT('empty', { name: tag.title })}
               titleId="tag-posts-title"
