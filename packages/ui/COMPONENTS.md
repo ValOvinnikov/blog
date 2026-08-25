@@ -221,7 +221,7 @@ Slots:
 
 - **PostCard.Media** — the media region at the top of a `PostCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PostCard.Meta** — compact metadata row for post cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
-- **PostCard.Title** — the post heading inside a `PostCard`, rendered as a styled `<h3>`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **PostCard.Title** — the post heading inside a `PostCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PostCard.Footer** — the byline row at the bottom of a `PostCard`: optional author avatar and name, published date, and a topic tag. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### PostMeta — `molecules/post-meta/post-meta.tsx`
@@ -365,7 +365,7 @@ Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### PostsSection — `organisms/posts-section/posts-section.tsx`
 
 labeled section rendering a set of posts in a responsive grid, generic enough to reuse for other post listings (e.g. related posts, topic pages).
-Props: posts: IPostCardData[] · title?: string · titleId?: string · accessibleTitle?: string · linkAs?: TAnchorElementType · supportingText?: string · align?: TPostsSectionVariants['align'] · emptyMessage?: string · isTinted?: TPostsSectionVariants['tinted'] · isWrapped?: TPostsSectionVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
+Props: posts: IPostCardData[] · title?: string · titleId?: string · accessibleTitle?: string · linkAs?: TAnchorElementType · cardHeadingLevel?: THeadingLevel · supportingText?: string · align?: TPostsSectionVariants['align'] · emptyMessage?: string · isTinted?: TPostsSectionVariants['tinted'] · isWrapped?: TPostsSectionVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
 Variants: tinted: (boolean) · wrapped: (boolean) · align: HEADING_ALIGN.LEFT|HEADING_ALIGN.CENTER|HEADING_ALIGN.RIGHT
 
 ### ToastViewport — `organisms/toast-viewport/toast-viewport.tsx`

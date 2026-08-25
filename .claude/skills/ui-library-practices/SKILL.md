@@ -105,15 +105,41 @@ src/atoms/theme-toggle/
   `Intl.DateTimeFormat`/Next helpers). The `<time>` renders only when **both**
   are present: `{publishedAt && formattedDate && <time dateTime={publishedAt}>{formattedDate}</time>}`.
 
-- **Card title slots must render a heading element, not a `<div>`**, so the
-  title joins the document outline. Two patterns exist, and new components
-  should prefer the second:
-  - `PostCard.Title` hardcodes `<h3>`; the consumer passes the link as
-    `children` (`<h3><a href>Post title</a></h3>`). Every consumer is therefore
-    locked to `h3` regardless of where the card sits in the page outline.
-  - `TaxonomyCard` instead takes a required `headingLevel` prop and renders
-    through the `Heading` atom, letting the caller pick the level that fits its
-    own outline. Prefer this for new cards.
+- **Card title slots must render a heading element, not a `<div>`**, and must
+  let the caller pick the level, so the title joins the page's real outline.
+  Render through the `Heading` atom — never a literal `<h3>` and never a
+  second bespoke tag map. `PostCard.Title`, `TaxonomyCard` and `PostsSection`
+  all do this; there is one pattern here, not a choice.
+
+  ```tsx
+  <Heading
+    level={level}
+    visual="card"
+    className={cardTitleVariants({ class: className })}
+  >
+    {children}
+  </Heading>
+  ```
+
+  The link stays the caller's `children` (`<PostCard.Title level={3}><a href>…</a></PostCard.Title>`),
+  so the heading wraps the anchor rather than the other way round.
+
+  - **Name the prop for what the component is.** A component that _is_ the
+    heading takes `level`, mirroring `Heading` itself (`PostCard.Title`). A
+    component that merely _contains_ one among other content takes
+    `headingLevel`, so the name says which of its parts it governs
+    (`TaxonomyCard`, `WindowChrome.Bar`). A component owning two heading
+    depths qualifies the subordinate one (`PostsSection.cardHeadingLevel`).
+  - **Required in the library, optional at the app-facing edge.** Slot-level
+    components take the level as a **required** prop, so composing one is a
+    deliberate outline decision. An organism with many call sites may default
+    it (`PostsSection` defaults `cardHeadingLevel` to `3`) — document the
+    default in the prop's doc comment.
+  - **Let `visual` carry the typography, not the variants file.** Once a title
+    renders through `Heading`, its own `tv()` keeps only what `Heading` cannot
+    express — interaction state such as `hover:`/`transition-colors`. Font
+    family, size, leading and tracking come from the `visual` (`card` for card
+    titles). Duplicating them in both places is what let the two drift apart.
 
 - **Also:** semantic elements first (`button`, `nav`, `article`, `time`);
   interactive atoms expose `focus-visible` styles (global via `tokens.css`);

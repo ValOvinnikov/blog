@@ -51,4 +51,21 @@ describe(tv, () => {
     const styles = tv({ base: 'py-section px-gutter' });
     expect(styles({ class: 'py-0' })).toBe('px-gutter py-0');
   });
+
+  // Guards the same class of bug as the padding cases above: without the
+  // custom `tracking` classGroup registration, a base `tracking-tight` and a
+  // caller-supplied `tracking-label` were classified as non-conflicting and
+  // both landed on the element, leaving the winner up to stylesheet order
+  // instead of tv()'s override intent.
+  it('resolves a conflicting custom tracking-<token> utility so the last one wins', () => {
+    const styles = tv({ base: 'tracking-tight' });
+    expect(styles({ class: 'tracking-label' })).toBe('tracking-label');
+  });
+
+  it('resolves conflicts across all custom tracking utilities', () => {
+    const styles = tv({ base: 'tracking-eyebrow' });
+    expect(styles({ class: 'tracking-tight-card' })).toBe(
+      'tracking-tight-card',
+    );
+  });
 });
