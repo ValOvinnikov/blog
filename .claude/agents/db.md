@@ -192,7 +192,8 @@ generate`) diffs the schema against the last migration and writes a new
    fine/normal for iterating before a merge. The job opens with a guard step
    that fails loudly if `DATABASE_URL_UNPOOLED` resolves to the production
    Neon branch's host (compared against the repo Variable
-   `PRODUCTION_DB_HOST`) — inert until that Variable is set. See
+   `PRODUCTION_DB_HOST`), and fails loudly too if that Variable is unset or
+   malformed — it can no longer be left silently inert. See
    `docs/DEPLOY.md`'s "Repo level — production-target guard for
    `migrate-db`".
 4. **Back up before applying to the shared/production branch.** The

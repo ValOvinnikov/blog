@@ -1,3 +1,6 @@
+import { pageTagSchema } from '@cms/schema-types/documents/pages/page-tag';
+import { postListSchema } from '@cms/schema-types/modules/module-post-list';
+import { assertSatisfiesRequiredFields } from '@cms/testing/assert-satisfies-required-fields';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { toPageTagId, toTagPostListId } from './id';
@@ -23,23 +26,29 @@ describe('seed-page-tag-for-existing-tags migration', () => {
     const postListId = toTagPostListId(tagDoc._id);
     const pageTagId = toPageTagId(tagDoc._id);
 
+    const postListPayload = {
+      _id: postListId,
+      _type: 'module_postList',
+      title: 'React Archive',
+      brandVariant: 'SECONDARY',
+      limit: 9,
+      pageSize: 9,
+    };
+    const pageTagPayload = {
+      _id: pageTagId,
+      _type: 'page_tag',
+      title: 'React Tag Page',
+      slug: { _type: 'slug', current: 'react' },
+      tag: { _type: 'reference', _ref: tagDoc._id },
+      postList: { _type: 'reference', _ref: postListId },
+    };
+
+    assertSatisfiesRequiredFields(postListSchema, postListPayload);
+    assertSatisfiesRequiredFields(pageTagSchema, pageTagPayload);
+
     expect(migration.migrate.document(tagDoc)).toEqual([
-      createIfNotExists({
-        _id: postListId,
-        _type: 'module_postList',
-        title: 'React Archive',
-        brandVariant: 'SECONDARY',
-        limit: 9,
-        pageSize: 9,
-      }),
-      createIfNotExists({
-        _id: pageTagId,
-        _type: 'page_tag',
-        title: 'React Tag Page',
-        slug: { _type: 'slug', current: 'react' },
-        tag: { _type: 'reference', _ref: tagDoc._id },
-        postList: { _type: 'reference', _ref: postListId },
-      }),
+      createIfNotExists(postListPayload),
+      createIfNotExists(pageTagPayload),
     ]);
   });
 
@@ -65,18 +74,20 @@ describe('seed-page-tag-for-existing-tags migration', () => {
 
     const [, pageTagMutation] = migration.migrate.document(otherSlugDoc)!;
 
-    expect(pageTagMutation).toEqual(
-      createIfNotExists({
-        _id: toPageTagId(otherSlugDoc._id),
-        _type: 'page_tag',
-        title: 'TypeScript Tag Page',
-        slug: { _type: 'slug', current: 'typescript' },
-        tag: { _type: 'reference', _ref: otherSlugDoc._id },
-        postList: {
-          _type: 'reference',
-          _ref: toTagPostListId(otherSlugDoc._id),
-        },
-      }),
-    );
+    const pageTagPayload = {
+      _id: toPageTagId(otherSlugDoc._id),
+      _type: 'page_tag',
+      title: 'TypeScript Tag Page',
+      slug: { _type: 'slug', current: 'typescript' },
+      tag: { _type: 'reference', _ref: otherSlugDoc._id },
+      postList: {
+        _type: 'reference',
+        _ref: toTagPostListId(otherSlugDoc._id),
+      },
+    };
+
+    assertSatisfiesRequiredFields(pageTagSchema, pageTagPayload);
+
+    expect(pageTagMutation).toEqual(createIfNotExists(pageTagPayload));
   });
 });

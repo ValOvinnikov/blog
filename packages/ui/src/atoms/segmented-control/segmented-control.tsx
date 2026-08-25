@@ -36,6 +36,9 @@ const s = segmentedControlVariants();
  * a genuine disabled radio (still exposed by role, just unavailable) rather
  * than falling back to static text — pair it with `aria-describedby`
  * pointing at an explanatory element when the caller has a reason to give.
+ * The root is a `div[role="radiogroup"]`, not a labelable element, so it
+ * must never be paired with `<label htmlFor>` — the accessible name comes
+ * entirely from the required `ariaLabel` prop.
  *
  * @example
  * <SegmentedControl

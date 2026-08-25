@@ -129,22 +129,26 @@ describe('getIndexPage', () => {
   // Regression guard for the decision that a missing slot is a loud failure,
   // never a substituted default: this must reject rather than resolve with
   // an invented module id.
-  it('rejects with MissingPostListError when page_blog.postList is unset', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawBlogPage({ postList: null }))
-      .mockResolvedValueOnce(makeRawSiteSettings());
+  it('rejects with MissingPostListError when page_blog.postList is unset, without fetching site settings', async () => {
+    mockRun.mockResolvedValueOnce(makeRawBlogPage({ postList: null }));
 
     await expect(getIndexPage()).rejects.toThrow(MissingPostListError);
-    expect(mockRun).toHaveBeenCalledTimes(2);
+    expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
   it('resolves undefined, rather than rejecting, when no page_blog document exists', async () => {
-    mockRun
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(makeRawSiteSettings());
+    mockRun.mockResolvedValueOnce(null);
 
     const result = await getIndexPage();
 
     expect(result).toBeUndefined();
+  });
+
+  it('does not fetch site settings when no page_blog document exists', async () => {
+    mockRun.mockResolvedValueOnce(null);
+
+    await getIndexPage();
+
+    expect(mockRun).toHaveBeenCalledTimes(1);
   });
 });

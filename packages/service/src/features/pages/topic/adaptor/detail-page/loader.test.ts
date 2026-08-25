@@ -130,24 +130,28 @@ describe('getTopicPage', () => {
   // Regression guard for the decision that a missing slot is a loud failure,
   // never a substituted default: this must reject rather than resolve with
   // an invented module id.
-  it('rejects with MissingPostListError when page_topic.postList is unset', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawTopicPage({ postList: null }))
-      .mockResolvedValueOnce(makeRawSiteSettings());
+  it('rejects with MissingPostListError when page_topic.postList is unset, without fetching site settings', async () => {
+    mockRun.mockResolvedValueOnce(makeRawTopicPage({ postList: null }));
 
     await expect(getTopicPage('engineering')).rejects.toThrow(
       MissingPostListError,
     );
-    expect(mockRun).toHaveBeenCalledTimes(2);
+    expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
   it('resolves undefined, rather than rejecting, when no page_topic matches the slug', async () => {
-    mockRun
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(makeRawSiteSettings());
+    mockRun.mockResolvedValueOnce(null);
 
     const result = await getTopicPage('nonexistent');
 
     expect(result).toBeUndefined();
+  });
+
+  it('does not fetch site settings when no page_topic matches the slug', async () => {
+    mockRun.mockResolvedValueOnce(null);
+
+    await getTopicPage('nonexistent');
+
+    expect(mockRun).toHaveBeenCalledTimes(1);
   });
 });

@@ -12,6 +12,7 @@ import {
   compareKeySets,
   extractAdminKeys,
   extractCmsKeys,
+  extractDbKeys,
   extractWebKeys,
   parseSource,
   SOURCES,
@@ -51,6 +52,21 @@ const WEB_FIXTURE = `
   };
 `;
 
+const DB_FIXTURE = `
+  import { z } from 'zod';
+
+  function overrideField(max) {
+    return z.string().trim().max(max).optional();
+  }
+
+  export const voiceOverridesSchema = z
+    .object({
+      notFoundMetaTitle: overrideField(100),
+      notFoundMetaDescription: overrideField(300),
+    })
+    .transform((overrides) => overrides);
+`;
+
 describe('extractCmsKeys', () => {
   it('reads every defineField name, ignoring titleField()', () => {
     const sf = parseSource('/virtual/voice.ts', CMS_FIXTURE);
@@ -75,6 +91,16 @@ describe('extractWebKeys', () => {
   it('reads the top-level keys of VOICE_OVERRIDE_PATHS', () => {
     const sf = parseSource('/virtual/apply-voice-overrides.ts', WEB_FIXTURE);
     assert.deepEqual(extractWebKeys(sf), [
+      'notFoundMetaTitle',
+      'notFoundMetaDescription',
+    ]);
+  });
+});
+
+describe('extractDbKeys', () => {
+  it('reads the property names of the z.object({...}) passed to .transform()', () => {
+    const sf = parseSource('/virtual/upsert-site-config.ts', DB_FIXTURE);
+    assert.deepEqual(extractDbKeys(sf), [
       'notFoundMetaTitle',
       'notFoundMetaDescription',
     ]);
@@ -110,6 +136,35 @@ describe('compareKeySets', () => {
     ]);
     assert.equal(result.inSync, false);
     assert.deepEqual(result.missing, { cms: ['extra'], web: ['extra'] });
+  });
+
+  it('detects a db source renamed out of sync with cms/admin/web (4-source drift)', () => {
+    const cmsSf = parseSource('/virtual/voice.ts', CMS_FIXTURE);
+    const adminSf = parseSource('/virtual/voice-fields.ts', ADMIN_FIXTURE);
+    const webSf = parseSource('/virtual/apply-voice-overrides.ts', WEB_FIXTURE);
+    const driftedDbFixture = DB_FIXTURE.replace(
+      'notFoundMetaDescription',
+      'notFoundMetaDescriptionRenamed',
+    );
+    const dbSf = parseSource(
+      '/virtual/upsert-site-config.ts',
+      driftedDbFixture,
+    );
+
+    const result = compareKeySets([
+      { label: 'cms', keys: extractCmsKeys(cmsSf) },
+      { label: 'admin', keys: extractAdminKeys(adminSf) },
+      { label: 'web', keys: extractWebKeys(webSf) },
+      { label: 'db', keys: extractDbKeys(dbSf) },
+    ]);
+
+    assert.equal(result.inSync, false);
+    assert.deepEqual(result.missing, {
+      db: ['notFoundMetaDescription'],
+      cms: ['notFoundMetaDescriptionRenamed'],
+      admin: ['notFoundMetaDescriptionRenamed'],
+      web: ['notFoundMetaDescriptionRenamed'],
+    });
   });
 });
 

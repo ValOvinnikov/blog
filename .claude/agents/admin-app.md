@@ -237,11 +237,27 @@ page-builder and no SEO surface to justify them. What carries over:
 
 - **Pages and layouts stay clean** — no inline component definitions, no helper
   functions in `page.tsx`/`layout.tsx`. Extract everything.
-- **Components** live in `src/components/`, one folder per component containing
-  the component file, its `*-variants.ts`, a co-located test, and an `index.ts`
-  barrel re-exporting only the component. Consumers import the folder, never the
-  file. Only re-export a prop type once something outside the folder imports it
-  by name — `knip` fails CI on an export nothing consumes.
+- **Components** live in `src/components/`, grouped by who consumes them, one
+  folder per component containing the component file, its `*-variants.ts`, a
+  co-located test, and an `index.ts` barrel re-exporting only the component.
+  Consumers import the folder, never the file. Only re-export a prop type once
+  something outside the folder imports it by name — `knip` fails CI on an
+  export nothing consumes.
+  - `src/components/shared/<component>/` — a generic, feature-agnostic
+    primitive with no domain of its own (`form-field`, `confirm-dialog`,
+    `hue-slider`, `font-picker`, `preset-picker`). This is about what the
+    component _is_, not how many domains currently import it — several of
+    these have only one consumer today but belong here because nothing about
+    them is `tenants`/`look`/`voice`-specific.
+  - `src/components/features/<domain>/<component>/` — scoped to one domain's
+    pages. Current domains: `layout` (shell/nav/topbar/tenant-switcher),
+    `tenants`, `look`, `voice`, `capabilities` (the Features tab — named
+    `capabilities` rather than `features` to avoid a `features/features/`
+    path). Add a new domain folder when a page area gains its second
+    domain-scoped component; don't pre-create one for a single component.
+  - A component moves from a domain folder into `shared/` once a second domain
+    starts consuming it, even if it isn't feature-agnostic in the sense above
+    — actual reuse always qualifies, regardless of the component's nature.
 - **Server Actions** live in their own module next to the feature that calls
   them, never inline in a page file. Every action re-checks authorization and
   validates its input with the Zod schemas the design doc specifies — an action

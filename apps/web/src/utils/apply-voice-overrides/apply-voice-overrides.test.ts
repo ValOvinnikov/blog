@@ -24,7 +24,6 @@ const CURATED_KEY_PATHS: Record<string, readonly string[]> = {
   blogListEmpty: ['blogListPage', 'empty'],
   topicEmpty: ['topicPage', 'empty'],
   tagEmpty: ['tagPage', 'empty'],
-  authorEmpty: ['authorPage', 'empty'],
   topicsEmpty: ['topicsPage', 'empty'],
   bookmarksEmpty: ['bookmarksPage', 'empty'],
 };

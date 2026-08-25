@@ -1,4 +1,4 @@
-import { AdminShell } from '@admin/components/admin-shell';
+import { AdminShell } from '@admin/components/features/layout/admin-shell';
 import { requireAdmin } from '@admin/server/auth/require-admin';
 import {
   platformNavSections,

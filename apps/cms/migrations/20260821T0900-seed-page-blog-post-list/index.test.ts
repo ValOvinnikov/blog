@@ -4,6 +4,13 @@ import { toBlogPostListId } from './id';
 
 import migration from './index';
 
+// This migration's own createIfNotExists payload is missing the
+// module_postList `title`/`brandVariant` required fields — already applied
+// to a live dataset, so the fix landed as a separate backfill migration
+// (../20260821T1000-backfill-module-postlist-required-fields) rather than by
+// editing this one. Asserting required-fields here would just re-fail on a
+// known, already-remediated gap.
+
 const baseDoc = {
   _createdAt: '2026-01-01T00:00:00Z',
   _updatedAt: '2026-01-01T00:00:00Z',

@@ -295,7 +295,7 @@ request's `next-intl` messages as a three-layer merge — the neutral base
 `deepMergePartial`) ← the tenant's `site_config.voiceOverrides`. The
 `preset` and `voiceOverrides` come from the same `site_config` row and the
 same cached read as theme (`get-site-config.ts`, tag `site-config`) — one
-row backs both. `voiceOverrides` stores its 20 curated fields as flat
+row backs both. `voiceOverrides` stores its 19 curated fields as flat
 camelCase keys (e.g. `notFoundCommandNotFound`), matching `apps/admin`'s
 Voice tab (`apps/admin/src/utils/voice-fields/voice-fields.ts`);
 `apps/web/src/utils/apply-voice-overrides.ts` maps each flat key back to its

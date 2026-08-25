@@ -181,14 +181,6 @@ export const voiceSchema = defineType({
       fieldset: 'emptyStates',
     }),
     defineField({
-      name: 'authorEmpty',
-      title: 'Author Empty',
-      type: 'string',
-      description:
-        "Overrides the author page's empty-state message. Leave blank to use the preset's own wording.",
-      fieldset: 'emptyStates',
-    }),
-    defineField({
       name: 'topicsEmpty',
       title: 'Topics Empty',
       type: 'string',

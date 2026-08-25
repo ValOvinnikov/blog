@@ -153,7 +153,7 @@ When invoked, before writing any code:
     fetching, consumed by one or more `pages/` components (or, for the home
     route, by `page.tsx` directly) to render shared layout. Named with a
     `*-template` suffix, e.g. `blog-page-template/` (the shared archive shell
-    consumed by `blog-list-page`, `category-page`, `tag-page`, `author-page`),
+    consumed by `blog-list-page`, `category-page`, `tag-page`),
     `home-page-template/`. A component belongs here only if something
     delegates rendering to it — a page with no shared shell has no
     `*-template` counterpart, and that's fine.
@@ -362,7 +362,7 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
 
 ## New i18n keys that are tenant-customizable "voice" copy also need a Voice override
 
-A curated ~20-key subset of `src/i18n/messages/en.json` is tenant-overridable
+A curated ~19-key subset of `src/i18n/messages/en.json` is tenant-overridable
 through `apps/admin`'s Voice settings tab (`packages/db`'s `voiceOverrides`
 JSONB column) — empty-states, not-found messages, terminal prompts, bookmark
 toasts. `src/utils/apply-voice-overrides/apply-voice-overrides.ts` maps each

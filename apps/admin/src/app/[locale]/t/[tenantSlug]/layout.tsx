@@ -1,5 +1,5 @@
-import { AdminShell } from '@admin/components/admin-shell';
-import { TenantSwitcher } from '@admin/components/tenant-switcher';
+import { AdminShell } from '@admin/components/features/layout/admin-shell';
+import { TenantSwitcher } from '@admin/components/features/layout/tenant-switcher';
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
 import {
   platformNavSections,

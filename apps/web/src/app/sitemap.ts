@@ -52,6 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     blogParamsResult,
     genericPageSlugsResult,
     topicIndexPageResult,
+    tagIndexPageResult,
   ] = await Promise.all([
     service.pages.post.v1.getPostParams(),
     service.pages.topic.v1.getTopicParams(),
@@ -61,6 +62,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     service.pages.blog.v1.getIndexPageParams(),
     service.pages.generic.v1.getPageSlugs(),
     service.pages.topicIndex.v1.getIndexPage(),
+    service.pages.tagIndex.v1.getIndexPage(),
   ]);
 
   if (!postParamsResult.ok) {
@@ -126,6 +128,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
+  if (!tagIndexPageResult.ok) {
+    logger.error('sitemap.tag_index_page_fetch_failed', {
+      error: tagIndexPageResult.error,
+    });
+  }
+
   return [
     toEntry(routes.home(), siteUrl),
     ...(blogParamsResult.ok ? [toEntry(routes.blogIndex(), siteUrl)] : []),
@@ -133,7 +141,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...(topicIndexPageResult.ok && topicIndexPageResult.data
       ? [toEntry(routes.topics(), siteUrl)]
       : []),
-    toEntry(routes.tags(), siteUrl),
+    ...(tagIndexPageResult.ok && tagIndexPageResult.data
+      ? [toEntry(routes.tags(), siteUrl)]
+      : []),
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
     ...posts.map(({ slug, publishedAt }) =>
       toEntry(routes.post(slug), siteUrl, publishedAt),

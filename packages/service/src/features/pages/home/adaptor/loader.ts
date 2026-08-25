@@ -7,11 +7,9 @@ import { toHomePage } from './transformer';
 import type { THomePage } from './types';
 
 export async function getHomePage(): Promise<TMaybeUndefined<THomePage>> {
-  const [raw, settings] = await Promise.all([
-    runQuery(homePageQuery, isr('homePage')),
-    getSiteSettings(),
-  ]);
+  const raw = await runQuery(homePageQuery, isr('homePage'));
   if (!raw) return undefined;
 
+  const settings = await getSiteSettings();
   return toHomePage(raw, settings);
 }

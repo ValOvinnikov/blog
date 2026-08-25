@@ -32,15 +32,9 @@ const createTenantInputSchema = z.object({
     .regex(DOMAIN_PATTERN, 'Enter a valid domain.'),
   plan: z.enum(Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]]),
   ownerEmail: z.string().trim().toLowerCase().email('Enter a valid email.'),
-  // Kept for readability alongside `confirmOwnerInviteToken` below, but the
-  // guarantee that actually gates the not-found-owner branch is the token —
-  // this flag alone proves nothing server-side.
-  confirmOwnerInvite: z.boolean().optional().default(false),
   // Echoed back from the `ownerInviteConfirmation` the Details form was
   // previously shown — verified server-side (HMAC over the exact
-  // `ownerEmail`) before the not-found-owner branch is allowed to proceed,
-  // so a request can't skip that confirmation by supplying the boolean
-  // above alone.
+  // `ownerEmail`) before the not-found-owner branch is allowed to proceed.
   confirmOwnerInviteToken: z.string().optional(),
 });
 

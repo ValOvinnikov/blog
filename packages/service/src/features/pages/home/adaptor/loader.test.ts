@@ -69,12 +69,18 @@ describe('getHomePage', () => {
   });
 
   it('resolves undefined, rather than rejecting, when no page_home document exists', async () => {
-    mockRun
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(makeRawSiteSettings());
+    mockRun.mockResolvedValueOnce(null);
 
     const page = await getHomePage();
 
     expect(page).toBeUndefined();
+  });
+
+  it('does not fetch site settings when no page_home document exists', async () => {
+    mockRun.mockResolvedValueOnce(null);
+
+    await getHomePage();
+
+    expect(mockRun).toHaveBeenCalledTimes(1);
   });
 });

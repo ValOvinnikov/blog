@@ -12,16 +12,15 @@ export async function getTopicPage(
 ): Promise<TMaybeUndefined<TTopicDetailPage>> {
   // `topicPageQuery` derefs `topic` and `postList` — both tags must ride
   // alongside `page_topic` (tag-scope contract, `sanity/query.ts`).
-  const [rawPage, settings] = await Promise.all([
-    runQuery(topicPageQuery, {
-      parameters: { slug },
-      ...isr(['page_topic', 'topic', 'modules:postList']),
-    }),
-    getSiteSettings(),
-  ]);
+  const rawPage = await runQuery(topicPageQuery, {
+    parameters: { slug },
+    ...isr(['page_topic', 'topic', 'modules:postList']),
+  });
   if (!rawPage) return undefined;
   if (!rawPage.postList) {
     throw new MissingPostListError();
   }
+
+  const settings = await getSiteSettings();
   return toTopicDetailPage(rawPage, settings, rawPage.postList._id);
 }

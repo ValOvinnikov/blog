@@ -1,4 +1,4 @@
-// Checks that the "voice" override vocabulary stays in sync across the three
+// Checks that the "voice" override vocabulary stays in sync across the four
 // places that hand-duplicate it:
 //   - apps/cms/src/schema-types/documents/settings/voice.ts
 //     (the Sanity `settings_voice` schema's `defineField({ name: '...' })` calls)
@@ -6,8 +6,10 @@
 //     (`VOICE_FIELD_GROUPS`' field `key`s)
 //   - apps/web/src/utils/apply-voice-overrides/apply-voice-overrides.ts
 //     (`VOICE_OVERRIDE_PATHS`' object keys)
+//   - packages/db/src/queries/site-config/upsert-site-config/upsert-site-config.ts
+//     (`voiceOverridesSchema`'s `z.object({...})` property names)
 //
-// Nothing else catches one file drifting out of sync with the other two, so
+// Nothing else catches one file drifting out of sync with the others, so
 // this parses each as a TypeScript AST (the `typescript` package already in
 // the repo — no new dep) and compares the extracted key sets.
 //
@@ -31,6 +33,10 @@ const ADMIN_FILE = join(
 const WEB_FILE = join(
   repoRoot,
   'apps/web/src/utils/apply-voice-overrides/apply-voice-overrides.ts',
+);
+const DB_FILE = join(
+  repoRoot,
+  'packages/db/src/queries/site-config/upsert-site-config/upsert-site-config.ts',
 );
 
 // Exported so the fixture tests can build a source file from an inline string
@@ -136,6 +142,40 @@ export const extractWebKeys = (sf) => {
   return keys;
 };
 
+// Property names of the object literal passed to `z.object({...})` in
+// `voiceOverridesSchema = z.object({...}).transform(fn)`.
+export const extractDbKeys = (sf) => {
+  const init = findLocalDeclaration(sf, 'voiceOverridesSchema')?.initializer;
+  if (!init || !ts.isCallExpression(init)) return [];
+  if (
+    !ts.isPropertyAccessExpression(init.expression) ||
+    init.expression.name.text !== 'transform'
+  )
+    return [];
+
+  const objectCall = init.expression.expression;
+  if (
+    !ts.isCallExpression(objectCall) ||
+    !ts.isPropertyAccessExpression(objectCall.expression) ||
+    objectCall.expression.name.text !== 'object' ||
+    !objectCall.arguments[0] ||
+    !ts.isObjectLiteralExpression(objectCall.arguments[0])
+  )
+    return [];
+
+  const keys = [];
+  for (const prop of objectCall.arguments[0].properties) {
+    if (
+      !ts.isPropertyAssignment(prop) &&
+      !ts.isShorthandPropertyAssignment(prop)
+    )
+      continue;
+    const name = prop.name;
+    if (ts.isIdentifier(name) || ts.isStringLiteral(name)) keys.push(name.text);
+  }
+  return keys;
+};
+
 // Compares N labelled key lists and reports, per label, which keys present in
 // at least one other list are missing from it.
 export const compareKeySets = (sources) => {
@@ -159,7 +199,7 @@ const formatReport = (missing, sources) => {
   }
   lines.push(
     '',
-    'Every voice-override key must exist in all three files:',
+    'Every voice-override key must exist in all files:',
     ...sources.map((s) => `  - ${relative(repoRoot, s.file)}`),
   );
   return lines.join('\n');
@@ -169,6 +209,7 @@ export const SOURCES = [
   { label: 'cms', file: CMS_FILE, extract: extractCmsKeys },
   { label: 'admin', file: ADMIN_FILE, extract: extractAdminKeys },
   { label: 'web', file: WEB_FILE, extract: extractWebKeys },
+  { label: 'db', file: DB_FILE, extract: extractDbKeys },
 ];
 
 const main = () => {
@@ -186,7 +227,7 @@ const main = () => {
   }
 
   console.log(
-    `Voice-override keys are in sync across cms/admin/web (${allKeys.size} keys).`,
+    `Voice-override keys are in sync across cms/admin/web/db (${allKeys.size} keys).`,
   );
 };
 

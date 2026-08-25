@@ -1,4 +1,4 @@
-import type { TSidebarNavSection } from '@admin/components/sidebar';
+import type { TSidebarNavSection } from '@admin/components/features/layout/sidebar';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import { ICONS } from '@blog/config';
 
