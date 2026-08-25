@@ -77,13 +77,13 @@
   "topicPage": {
     "title": "Posts in {name}",
     "empty": "No posts in {name} yet.",
-    "paginationAriaLabel": "Topic pages"
+    "paginationAriaLabel": "{name} pages"
   },
   "tagPage": {
     "label": "Tag: {name}",
     "title": "Posts tagged {name}",
     "empty": "No posts tagged {name} yet.",
-    "paginationAriaLabel": "Tag pages"
+    "paginationAriaLabel": "{name} pages"
   },
   "authorPage": {
     "title": "Posts by {name}",

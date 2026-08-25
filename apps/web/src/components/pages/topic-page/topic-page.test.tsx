@@ -158,7 +158,7 @@ describe(`<${TopicPage.name}/>`, () => {
         id: 'post-list-1',
         locale: 'en',
         page: 2,
-        ariaLabel: 'Topic pages',
+        ariaLabel: 'News pages',
         accessibleTitle: 'Posts in News',
         emptyMessageFallback: 'No posts in News yet.',
         titleId: 'topic-posts-title',

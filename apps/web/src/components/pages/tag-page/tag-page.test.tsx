@@ -135,7 +135,7 @@ describe(`<${TagPage.name}/>`, () => {
         id: 'post-list-1',
         locale: 'en',
         page: 2,
-        ariaLabel: 'Tag pages',
+        ariaLabel: 'TypeScript pages',
         accessibleTitle: 'Posts tagged TypeScript',
         emptyMessageFallback: 'No posts tagged TypeScript yet.',
         titleId: 'tag-posts-title',

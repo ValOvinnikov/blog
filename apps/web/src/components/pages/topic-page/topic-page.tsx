@@ -81,7 +81,9 @@ export const TopicPage = async ({ slug, page, locale }: TTopicPageProps) => {
               locale={locale}
               page={page ?? 1}
               createHref={(pageNumber) => routes.topic(slug, pageNumber)}
-              ariaLabel={topicPageT('paginationAriaLabel')}
+              ariaLabel={topicPageT('paginationAriaLabel', {
+                name: topic.title,
+              })}
               accessibleTitle={topicPageT('title', { name: topic.title })}
               emptyMessageFallback={topicPageT('empty', { name: topic.title })}
               titleId="topic-posts-title"

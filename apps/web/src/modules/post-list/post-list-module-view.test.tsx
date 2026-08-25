@@ -101,14 +101,14 @@ describe(PostListModuleView, () => {
         currentPage: 2,
         totalPages: 3,
         createHref: (page: number) => `/topics/engineering/page/${page}`,
-        ariaLabel: 'Topic pages',
+        ariaLabel: 'Engineering pages',
         previousLabel: 'Previous',
         nextLabel: 'Next',
       },
     });
 
     const heading = screen.getByRole('heading', { name: 'Latest posts' });
-    const nav = screen.getByRole('navigation', { name: 'Topic pages' });
+    const nav = screen.getByRole('navigation', { name: 'Engineering pages' });
 
     // `PostsSection` renders its own root wrapper around the heading —
     // asserting `nav` sits outside it proves it's a sibling, not nested.
