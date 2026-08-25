@@ -21,9 +21,10 @@ import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
 import { TextInput } from '@blog/ui/atoms/text-input';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useId, useLayoutEffect, useRef, useState, useTransition } from 'react';
+import { useId, useState, useTransition } from 'react';
 
 import { tenantDetailsPanelVariants } from './tenant-details-panel-variants';
+import { useLockStateChange } from './use-lock-state-change';
 
 export type TTenantDetailsPanelProps = {
   tenant: TTenant;
@@ -71,12 +72,6 @@ const valuesFromProps = (
   };
 };
 
-const lockedFieldKeysOf = (
-  fieldLocks: TTenantFieldLocks,
-): TTenantFieldKey[] => {
-  return Object.keys(fieldLocks) as TTenantFieldKey[];
-};
-
 // A plain `next[key] = baseline[key]` inside a loop over a union-typed key
 // loses the correlation between the two sides (TS widens each indexed
 // access independently) — a generic per-call keeps `K` fixed for both.
@@ -113,15 +108,6 @@ export const TenantDetailsPanel = ({
   const [formError, setFormError] = useState<string | undefined>(undefined);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [lockAnnouncement, setLockAnnouncement] = useState('');
-  const [shouldMoveFocusOnTransition, setShouldMoveFocusOnTransition] =
-    useState(false);
-  const lockedFieldKeys = lockedFieldKeysOf(fieldLocks);
-  const [renderedLockedFieldsKey, setRenderedLockedFieldsKey] = useState(() =>
-    [...lockedFieldKeys].sort().join(','),
-  );
-  const fieldsContainerRef = useRef<HTMLDivElement>(null);
-  const isMountRef = useRef(true);
 
   // A fresh `tenant`/`ownerEmail` prop (a successful save's own
   // `router.refresh()`) should replace whatever the form last held —
@@ -133,49 +119,17 @@ export const TenantDetailsPanel = ({
     setValues(valuesFromProps(tenant, ownerEmail));
   }
 
-  // Same derived-during-render pattern: only an actual change to which
-  // fields are locked updates the announcement, never an unrelated
-  // re-render. The transition is driven by a background poll, not user
-  // action, so whether to move focus is decided here too —
-  // `document.activeElement` still reflects the pre-transition DOM at this
-  // point, before React commits the disabled-state swap and any focused
-  // descendant auto-blurs to the body.
-  const nextLockedFieldsKey = [...lockedFieldKeys].sort().join(',');
-  if (nextLockedFieldsKey !== renderedLockedFieldsKey) {
-    const previousLockedKeys = new Set(
-      renderedLockedFieldsKey
-        ? (renderedLockedFieldsKey.split(',') as TTenantFieldKey[])
-        : [],
-    );
-    const currentLockedKeys = new Set(lockedFieldKeys);
-    const newlyLockedKeys = lockedFieldKeys.filter(
-      (key) => !previousLockedKeys.has(key),
-    );
-    const newlyUnlockedKeys = [...previousLockedKeys].filter(
-      (key) => !currentLockedKeys.has(key),
-    );
-    setRenderedLockedFieldsKey(nextLockedFieldsKey);
-    // Set-based, not count-based: a same-count swap (one field locks as
-    // another unlocks) must still announce the lock rather than cancel out
-    // to nothing.
-    if (newlyLockedKeys.length > 0) {
-      setLockAnnouncement(t('lockedAnnouncement'));
-    } else if (newlyUnlockedKeys.length > 0) {
-      setLockAnnouncement(t('unlockedAnnouncement'));
-    }
-    setShouldMoveFocusOnTransition(
-      Boolean(
-        document.activeElement?.closest(
-          `[data-tenant-details-panel="${panelId}"]`,
-        ),
-      ),
-    );
+  const { lockAnnouncement, fieldsContainerRef } = useLockStateChange({
+    panelId,
+    fieldLocks,
+    lockedAnnouncement: t('lockedAnnouncement'),
+    unlockedAnnouncement: t('unlockedAnnouncement'),
     // A field that just locked (e.g. a background poll catching up to a
     // step another operator retried) may still hold an unsaved edit —
     // discard it back to the server value rather than leave a disabled
     // control displaying input that was never saved and can no longer be
     // submitted.
-    if (newlyLockedKeys.length > 0) {
+    onFieldsLocked: (newlyLockedKeys) => {
       const baseline = valuesFromProps(tenant, ownerEmail);
       setValues((prev) => {
         const next = { ...prev };
@@ -184,22 +138,8 @@ export const TenantDetailsPanel = ({
         }
         return next;
       });
-    }
-  }
-
-  // A layout effect commits after the live-region text mutation above and
-  // before paint, so the focus move lands after that text is in the DOM
-  // rather than racing it.
-  useLayoutEffect(() => {
-    if (isMountRef.current) {
-      isMountRef.current = false;
-      return;
-    }
-    if (!shouldMoveFocusOnTransition) {
-      return;
-    }
-    fieldsContainerRef.current?.focus();
-  }, [renderedLockedFieldsKey, shouldMoveFocusOnTransition]);
+    },
+  });
 
   const {
     root,
