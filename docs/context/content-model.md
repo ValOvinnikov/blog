@@ -35,7 +35,7 @@ every module type.
   `post`, warning-only — falls back to the newest featured post), four
   mode/custom field pairs (`heroEyebrow`, `heroTitle`, `heroSubtitle`,
   `heroImage`) built via the `defineModeFieldPair` helper and driven by the
-  UPPERCASE `HERO_FIELD_MODE` const (`CUSTOM`/`NONE`/`POST_CATEGORY`/
+  UPPERCASE `HERO_FIELD_MODE` const (`CUSTOM`/`NONE`/`POST_TOPIC`/
   `POST_TITLE`/`POST_EXCERPT`/`POST_IMAGE`), `primaryActionLabel`,
   `secondaryAction` (`link`).
 - `module_postList` (`postListSchema`) — the **paginated archive**: internal
@@ -157,7 +157,7 @@ separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
   `accountPrivacyPromptCommand`/`accountNewsletterPromptCommand`/
   `accountIdentityPromptCommand`), bookmarks
   (`bookmarkToastSavedMessage`/`bookmarkToastRemovedMessage`), and empty
-  states (`blogListEmpty`/`categoryEmpty`/`tagEmpty`/`authorEmpty`/
+  states (`blogListEmpty`/`topicEmpty`/`tagEmpty`/`authorEmpty`/
   `topicsEmpty`/`bookmarksEmpty`) — each blank falls through to the active
   preset's own wording, then the neutral base; part of the Phase 3
   voice-as-content epic (#1288).

@@ -362,7 +362,7 @@ cut with no concrete values ever specified; tracked separately (#1920).
 
 **Curated UI copy lives in Voice, not on modules.** Empty-state and other
 curated UI strings have exactly one authorable home: `settings_voice`'s
-`emptyStates` group (`blogListEmpty`, `categoryEmpty`, `tagEmpty`, …), applied
+`emptyStates` group (`blogListEmpty`, `topicEmpty`, `tagEmpty`, …), applied
 via the merge above. A module-level field for the same copy (e.g. a
 `module_postList.emptyMessage`, removed in #1899 for exactly this reason)
 creates a second, uncoordinated home that silently wins over the tenant's
