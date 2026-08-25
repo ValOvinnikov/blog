@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { adminRoutes } from '@admin/utils/routes/routes';
 import { queries } from '@blog/db';
 import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -27,13 +28,13 @@ export const listSessionTenants = async (): Promise<TSessionTenants> => {
   const userId = session?.user?.id;
 
   if (!userId) {
-    redirect('/api/auth/signin');
+    redirect(adminRoutes.signIn());
   }
 
   const memberships = await queries.memberships.listMembershipsForUser(userId);
 
   if (memberships.length === 0) {
-    redirect('/unauthorized');
+    redirect(adminRoutes.unauthorized());
   }
 
   const tenants = await queries.tenants.listTenantsByIds(

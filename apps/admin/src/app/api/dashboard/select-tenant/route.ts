@@ -22,7 +22,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   const userId = session?.user?.id;
 
   if (!userId) {
-    return NextResponse.redirect(new URL('/api/auth/signin', url));
+    return NextResponse.redirect(new URL(adminRoutes.signIn(), url));
   }
 
   const tenantId = url.searchParams.get('tenantId');
@@ -36,7 +36,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   const membership = await queries.memberships.getMembership(userId, tenantId);
 
   if (!membership) {
-    return NextResponse.redirect(new URL('/unauthorized', url));
+    return NextResponse.redirect(new URL(adminRoutes.unauthorized(), url));
   }
 
   const response = NextResponse.redirect(new URL(adminRoutes.dashboard(), url));

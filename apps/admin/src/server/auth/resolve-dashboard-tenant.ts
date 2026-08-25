@@ -36,7 +36,7 @@ export const resolveDashboardTenant =
       const tenant = tenantById.get(membership.tenantId);
 
       if (!tenant) {
-        redirect('/unauthorized');
+        redirect(adminRoutes.unauthorized());
       }
 
       return { tenant, membership, tenants };

@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { adminRoutes } from '@admin/utils/routes/routes';
 import { queries } from '@blog/db';
 import type { TAdmin } from '@blog/db/schema/admins';
 import { redirect } from 'next/navigation';
@@ -17,13 +18,13 @@ export const requireAdmin = async (): Promise<TAdmin> => {
   const userId = session?.user?.id;
 
   if (!userId) {
-    redirect('/api/auth/signin');
+    redirect(adminRoutes.signIn());
   }
 
   const admin = await queries.admins.getAdminByUserId(userId);
 
   if (!admin) {
-    redirect('/unauthorized');
+    redirect(adminRoutes.unauthorized());
   }
 
   return admin;

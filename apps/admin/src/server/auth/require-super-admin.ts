@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { adminRoutes } from '@admin/utils/routes/routes';
 import { ADMIN_ROLE } from '@blog/db';
 import type { TAdmin } from '@blog/db/schema/admins';
 import { redirect } from 'next/navigation';
@@ -16,7 +17,7 @@ export const requireSuperAdmin = async (): Promise<TAdmin> => {
   const admin = await requireAdmin();
 
   if (admin.role !== ADMIN_ROLE.SUPERADMIN) {
-    redirect('/unauthorized');
+    redirect(adminRoutes.unauthorized());
   }
 
   return admin;

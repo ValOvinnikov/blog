@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { adminRoutes } from '@admin/utils/routes/routes';
 import { queries } from '@blog/db';
 import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -28,7 +29,7 @@ export const requireTenantMembership = async (
   const userId = session?.user?.id;
 
   if (!userId) {
-    redirect('/api/auth/signin');
+    redirect(adminRoutes.signIn());
   }
 
   const tenant = await queries.tenants.getTenantBySlug(tenantSlug);
@@ -40,7 +41,7 @@ export const requireTenantMembership = async (
   const membership = await queries.memberships.getMembership(userId, tenant.id);
 
   if (!membership) {
-    redirect('/unauthorized');
+    redirect(adminRoutes.unauthorized());
   }
 
   return { tenant, membership };
