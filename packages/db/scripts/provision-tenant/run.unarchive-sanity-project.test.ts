@@ -142,18 +142,16 @@ describe(runSteps, () => {
   });
 
   it('does not PATCH again when the project is already un-archived', async () => {
-    fetchMock
-      .mockReset()
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            id: 'proj123',
-            isDisabled: false,
-            isDisabledByUser: false,
-          }),
-          { status: 200 },
-        ),
-      );
+    fetchMock.mockReset().mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          id: 'proj123',
+          isDisabled: false,
+          isDisabledByUser: false,
+        }),
+        { status: 200 },
+      ),
+    );
 
     const result = await runSteps('tenant-1', env);
 

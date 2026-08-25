@@ -100,18 +100,16 @@ describe(runSteps, () => {
   });
 
   it('does not call PATCH again when the project is already archived', async () => {
-    fetchMock
-      .mockReset()
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            id: 'proj123',
-            isDisabled: false,
-            isDisabledByUser: true,
-          }),
-          { status: 200 },
-        ),
-      );
+    fetchMock.mockReset().mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          id: 'proj123',
+          isDisabled: false,
+          isDisabledByUser: true,
+        }),
+        { status: 200 },
+      ),
+    );
 
     const result = await runSteps(tenant, env);
 
