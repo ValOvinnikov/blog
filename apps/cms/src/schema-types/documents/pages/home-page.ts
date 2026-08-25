@@ -1,4 +1,5 @@
 import { defineModulesField } from '@cms/schema-types/helpers/define-modules-field';
+import { getDraftsClient } from '@cms/schema-types/helpers/get-drafts-client';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { ctaSchema } from '@cms/schema-types/modules/module-cta';
 import { heroSchema } from '@cms/schema-types/modules/module-hero';
@@ -8,16 +9,12 @@ import { seoSchema } from '@cms/schema-types/objects/seo';
 import { House } from 'lucide-react';
 import { defineField, defineType, type ValidationContext } from 'sanity';
 
-const MODULES_VALIDATION_API_VERSION = '2024-01-01';
-
 type TModuleReference = { _type?: string; _ref?: string };
 
 /**
  * More than one `module_postLatest` reference on the home page falls back to
  * the same "Latest posts" heading when its own `sectionHeader.heading` is
  * blank — duplicate landmark names/`<h2>`s for assistive tech.
- * `perspective: 'drafts'` because a module can still be an unpublished draft
- * while the page is being edited.
  */
 const validateSinglePostLatestWithoutHeading = async (
   modules: TModuleReference[] | undefined,
@@ -32,9 +29,7 @@ const validateSinglePostLatestWithoutHeading = async (
 
   if (postLatestIds.length < 2) return true;
 
-  const client = context
-    .getClient({ apiVersion: MODULES_VALIDATION_API_VERSION })
-    .withConfig({ perspective: 'drafts' });
+  const client = getDraftsClient(context);
 
   const candidates = await client.fetch<{ heading?: string | null }[]>(
     `*[_id in $ids]{ "heading": sectionHeader.heading }`,

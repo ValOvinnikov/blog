@@ -1,4 +1,5 @@
 import { PAGE_TAG_TYPE } from '@cms/schema-types/documents/pages/page-tag-type';
+import { getDraftsClient } from '@cms/schema-types/helpers/get-drafts-client';
 import { seoSchema } from '@cms/schema-types/objects/seo';
 import { Tag } from 'lucide-react';
 import {
@@ -7,8 +8,6 @@ import {
   type SanityDocument,
   type ValidationContext,
 } from 'sanity';
-
-const HAS_PAGE_TAG_API_VERSION = '2024-01-01';
 
 /**
  * Warns (does not block publishing) when no `page_tag` references this tag
@@ -23,9 +22,7 @@ const validateHasPageTag = async (
 
   if (!publishedId) return true;
 
-  const client = context
-    .getClient({ apiVersion: HAS_PAGE_TAG_API_VERSION })
-    .withConfig({ perspective: 'drafts' });
+  const client = getDraftsClient(context);
 
   const referencingCount = await client.fetch<number>(
     `count(*[_type == $type && tag._ref == $tagId])`,
