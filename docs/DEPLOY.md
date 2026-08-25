@@ -272,8 +272,10 @@ two-branch split is recent and the secret wiring has not fully caught up:
   only `main` existed) can't be confirmed by reading the secret back — GitHub
   never allows that — but the job now guards against the dangerous case
   going forward: it fails loudly if this secret ever resolves to the
-  production branch's host, once `PRODUCTION_DB_HOST` is set (#2057 — see
-  "Repo level — production-target guard for `migrate-db`" further down).
+  production branch's host, and fails loudly too if `PRODUCTION_DB_HOST`
+  itself is unset or malformed — it's no longer possible to leave the guard
+  silently inert (see "Repo level — production-target guard for
+  `migrate-db`" further down).
 - `deploy-production.yml`'s `migrate-db` job reads the `production`
   Environment's `DATABASE_URL_UNPOOLED` — the `main` branch. The tenant
   lifecycle workflows (`provision-tenant.yml`, `deprovision-tenant.yml`) run in
@@ -609,17 +611,22 @@ isolate secrets per environment), so the production host is mirrored into a
 plain repo Variable instead — not a Secret, since a hostname alone can't
 authenticate anything.
 
-- [ ] (Recommended) Variable `PRODUCTION_DB_HOST` = the hostname portion of
-      the **production** Neon branch's own **`DATABASE_URL_UNPOOLED`** value
-      specifically (the direct connection string — the part between `@` and
-      `:5432/...`), **not** the pooled `DATABASE_URL`. The guard step only
-      ever parses `DATABASE_URL_UNPOOLED` — a pooled-connection host (Neon
-      suffixes it `-pooler`) never matches, so pasting the wrong one leaves
-      the guard silently inert.
+- [ ] Variable `PRODUCTION_DB_HOST` = **the bare hostname only** (e.g.
+      `ep-xxxx.us-east-2.aws.neon.tech`) — no `postgresql://` scheme,
+      credentials, port, path, or query string. It must be the hostname
+      portion of the **production** Neon branch's own
+      **`DATABASE_URL_UNPOOLED`** value specifically (the direct connection
+      string — the part between `@` and `:5432/...`), **not** the pooled
+      `DATABASE_URL`. The guard step only ever parses `DATABASE_URL_UNPOOLED`
+      — a pooled-connection host (Neon suffixes it `-pooler`) never matches,
+      so pasting the wrong one leaves the guard unable to catch a real
+      mis-set target.
 
-Until this is set, the guard step in `migrate-db` no-ops, same as every other
-secret-gated step in these workflows — safe to leave unset, but it also means
-the guard provides no protection until it's filled in.
+The guard step now **fails the job** if this Variable is unset, or if its
+value doesn't look like a bare hostname (a scheme, `@`, `:`, or `/` trips a
+loud, explicit error) — it no longer silently no-ops. Set it correctly before
+`migrate-db` first runs with a real `DATABASE_URL_UNPOOLED`, or every dev
+deploy touching `@blog/db` will fail at this step.
 
 Until both exist the workflows fall back to the local `.turbo` cache — nothing
 breaks.
@@ -731,8 +738,9 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    applying, a guard step compares the resolved connection host against the
    repo Variable `PRODUCTION_DB_HOST` and fails the job loudly if they match
    — see "Repo level — production-target guard for `migrate-db`" above; the
-   guard itself is inert until that Variable is set. **No approval gate on
-   dev.** See `.claude/agents/db.md`'s "Migrations" section.
+   guard step itself fails the job (not silently skips) if that Variable is
+   unset or malformed. **No approval gate on dev.** See
+   `.claude/agents/db.md`'s "Migrations" section.
 5. **`deploy-studio`** → `cms-dev` via the Vercel CLI (`studio-dev.{your-hosting}`),
    same mechanism as `deploy-web`.
 6. **`deploy-web`** → `blog-dev` via the Vercel CLI
