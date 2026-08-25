@@ -2,6 +2,7 @@
 
 import { VoiceFieldGroup } from '@admin/components/features/voice/voice-field-group';
 import { inheritedVoiceValue } from '@admin/utils/inherited-voice-value/inherited-voice-value';
+import { useFormSubmission } from '@admin/utils/use-form-submission/use-form-submission';
 import {
   VOICE_FIELD_GROUPS,
   VOICE_OVERRIDE_KEYS,
@@ -16,7 +17,7 @@ import { Heading } from '@blog/ui/atoms/heading';
 import { Icon } from '@blog/ui/atoms/icon';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useMemo, useState, useTransition } from 'react';
+import { useMemo } from 'react';
 
 import { voiceSettingsVariants } from './voice-settings-variants';
 
@@ -59,11 +60,12 @@ export const VoiceSettings = ({
   const tGroups = useTranslations('voiceFieldGroups');
   const tLabels = useTranslations('voiceFieldLabels');
   const router = useRouter();
-  const [values, setValues] = useState<TVoiceOverrides>(() =>
-    buildInitialValues(initialOverrides),
-  );
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [isPending, startTransition] = useTransition();
+  const { values, setValues, status, isPending, handleSubmit } =
+    useFormSubmission<TVoiceOverrides, { ok: boolean }>({
+      initialValues: () => buildInitialValues(initialOverrides),
+      onSubmit: (vals) => saveAction(tenantSlug, vals),
+      onSuccess: () => router.refresh(),
+    });
 
   const placeholders = useMemo(() => {
     const result: Partial<Record<TVoiceOverrideKey, string>> = {};
@@ -86,15 +88,6 @@ export const VoiceSettings = ({
 
   const handleFieldChange = (key: TVoiceOverrideKey, value: string) => {
     setValues((prev) => ({ ...prev, [key]: value }));
-    setStatus('idle');
-  };
-
-  const handleSave = () => {
-    startTransition(async () => {
-      const result = await saveAction(tenantSlug, values);
-      setStatus(result.ok ? 'success' : 'error');
-      if (result.ok) router.refresh();
-    });
   };
 
   return (
@@ -108,7 +101,7 @@ export const VoiceSettings = ({
         </div>
         <Button
           variant="primary"
-          onClick={handleSave}
+          onClick={handleSubmit}
           isDisabled={isPending}
           aria-busy={isPending}
         >

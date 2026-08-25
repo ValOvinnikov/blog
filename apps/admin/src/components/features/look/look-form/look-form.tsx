@@ -3,6 +3,7 @@
 import { LookPreview } from '@admin/components/features/look/look-preview';
 import { updateLookAction } from '@admin/server/site-config/update-look-action';
 import type { TLookFormValues } from '@admin/utils/default-look-values/default-look-values';
+import { useFormSubmission } from '@admin/utils/use-form-submission/use-form-submission';
 import {
   ALERT_TYPE,
   ICONS,
@@ -16,7 +17,7 @@ import { Heading } from '@blog/ui/atoms/heading';
 import { Icon } from '@blog/ui/atoms/icon';
 import { Text } from '@blog/ui/atoms/text';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 
 import { LookFormAdvancedSection } from './look-form-advanced-section';
 import { LookFormBasicSection } from './look-form-basic-section';
@@ -76,17 +77,27 @@ const valuesEqual = (a: TLookFormValues, b: TLookFormValues): boolean => {
 };
 
 export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
-  const [values, setValues] = useState<TLookFormValues>(initialValues);
-  // The last known-persisted state: `handleSave`'s own fields on a
-  // successful save, plus the two brand-asset URLs the instant their own
+  // The last known-persisted state: the submitted fields on a successful
+  // save, plus the two brand-asset URLs the instant their own
   // (independently persisted) upload/remove action succeeds — everything
   // `isDirty` compares `values` against.
   const [savedValues, setSavedValues] =
     useState<TLookFormValues>(initialValues);
-  const [isPending, startTransition] = useTransition();
-  const [saveResult, setSaveResult] = useState<'idle' | 'success' | 'error'>(
-    'idle',
-  );
+  const { values, setValues, status, isPending, handleSubmit } =
+    useFormSubmission<TLookFormValues, { ok: boolean }>({
+      initialValues,
+      onSubmit: (vals) =>
+        updateLookAction(tenantSlug, {
+          preset: vals.preset,
+          accentHue: vals.accentHue,
+          logoHue: vals.logoHue ?? null,
+          headingFont: vals.headingFont,
+          bodyFont: vals.bodyFont,
+          radiusScale: vals.radiusScale,
+          density: vals.density,
+        }),
+      onSuccess: (submittedValues) => setSavedValues(submittedValues),
+    });
 
   const isDirty = !valuesEqual(values, savedValues);
 
@@ -95,33 +106,14 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
     if (key === 'logoAssetUrl' || key === 'faviconAssetUrl') {
       setSavedValues((prev) => ({ ...prev, [key]: value }));
     }
-    setSaveResult('idle');
   };
 
   const handlePresetChange = (preset: TPresetId) => {
     setValues((prev) => applyPresetDefaults(preset, prev));
-    setSaveResult('idle');
   };
 
   const handleReset = () => {
     setValues((prev) => applyPresetDefaults(prev.preset, prev));
-    setSaveResult('idle');
-  };
-
-  const handleSave = () => {
-    startTransition(async () => {
-      const result = await updateLookAction(tenantSlug, {
-        preset: values.preset,
-        accentHue: values.accentHue,
-        logoHue: values.logoHue ?? null,
-        headingFont: values.headingFont,
-        bodyFont: values.bodyFont,
-        radiusScale: values.radiusScale,
-        density: values.density,
-      });
-      setSaveResult(result.ok ? 'success' : 'error');
-      if (result.ok) setSavedValues(values);
-    });
   };
 
   const t = useTranslations('lookForm');
@@ -164,7 +156,7 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
           </Button>
           <Button
             type="button"
-            onClick={handleSave}
+            onClick={handleSubmit}
             isDisabled={isPending || !isDirty}
           >
             {isPending ? t('savingButton') : t('saveButton')}
@@ -172,10 +164,10 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
         </div>
       </div>
 
-      {saveResult === 'success' && (
+      {status === 'success' && (
         <Alert type={ALERT_TYPE.SUCCESS} message={t('alertSuccess')} />
       )}
-      {saveResult === 'error' && (
+      {status === 'error' && (
         <Alert type={ALERT_TYPE.ERROR} message={t('alertError')} />
       )}
 
