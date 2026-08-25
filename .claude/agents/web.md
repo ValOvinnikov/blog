@@ -56,6 +56,23 @@ When invoked, before writing any code:
     `if (!result.ok) return` (render nothing).
   - Optional/global data (site settings in layout): log the error and apply
     fallbacks — or return early if a fallback is not possible.
+- **For a page-document loader, `ok` is not enough — check the data too.**
+  Those loaders return `TMaybeUndefined<TViewModel>`, so "no document matched
+  that slug" arrives as `ok: true` with `data: undefined`, not as a failure.
+  The branch is three-way:
+  - `!result.ok` → genuine failure → `logger.error(...)`, then `notFound()`.
+  - `result.ok && !result.data` → ordinary 404 → `notFound()` with **no log**
+    (`SPEC.md` §17: a stale link is self-explanatory, and logging it at
+    `error` fires alerts nobody can act on).
+  - otherwise → destructure and render.
+
+  This applies to every consumer, not just page components — metadata
+  builders, feed routes and `sitemap.ts` all read the same results. **A
+  `.ok`-only check in a non-rendering consumer is the dangerous case**:
+  `type-check` cannot catch it, because `.ok` is a valid boolean access
+  whether or not the loader is nullable. A sitemap gated on `.ok` alone
+  shipped advertising a URL whose route 404s.
+
   ```ts
   import { logger } from '@web/utils/logger/logger';
 
@@ -66,6 +83,7 @@ When invoked, before writing any code:
   }
   const { title, navigation } = result.data;
   ```
+
 - **Log through the shared logger — never bare `console.*`, and never call
   `createLogger` yourself.** This app has one logger at
   `src/utils/logger/logger.ts` (`createLogger({ service: 'web' })`); import it

@@ -31,11 +31,24 @@ apps/web
   spelled `TMaybeUndefined<T>` (the `@blog/config` alias) for a value that may
   be absent, distinct from property optionality (`field?:`) — and **no faked
   defaults**: absence handling belongs to `apps/web`.
-- Service loaders return `Promise<TViewModel>` and throw on missing data;
+- Service loaders return `Promise<TViewModel>` and throw on missing data, so
   `safeAsync` in each feature's `application/service.ts` converts throws into
-  `AsyncResult<T>` (`{ ok: false, error }`). **Web must check `result.ok`
-  before touching `result.data`** and owns the failure decision (`notFound()`,
-  fallback, or early return).
+  `AsyncResult<T>` (`{ ok: false, error }`). **Page-document loaders are the
+  exception**: a document looked up by a user-supplied slug (or a singleton
+  that may not be authored yet) treats absence as an ordinary outcome, so its
+  outer query is `.nullable(true)` and it returns
+  `Promise<TMaybeUndefined<TViewModel>>` instead of throwing. A page that
+  exists but has a required module slot unset still throws — that is a real
+  data-integrity failure, not an absence.
+- The contract `apps/web` sees is therefore three-way: `ok: true` with data
+  (render), `ok: true` with `undefined` data (ordinary 404 — **no log**, per
+  [`SPEC.md` §17](../../SPEC.md)), `ok: false` (genuine failure — log at
+  `error`, then 404). Web owns the failure decision (`notFound()`, fallback,
+  or early return).
+- **Check the data, not just `ok`.** For a nullable loader, `result.ok` alone
+  no longer means "the document exists", and `type-check` cannot catch a
+  consumer that still assumes it does — `.ok` stays a valid boolean access
+  either way. Gate on `result.ok && result.data`.
 - **Page queries are thin.** `page_home`/`page_generic` project only page
   fields plus lightweight module descriptors (`TModule = { id, type }`, from
   `to-module.ts`) — no module internals, no `conditionalByType`. Each
