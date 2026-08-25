@@ -172,7 +172,6 @@ describe('createTenantAction', () => {
 
     const result = await createTenantAction({
       ...validInput,
-      confirmOwnerInvite: true,
       confirmOwnerInviteToken: tokenForOtherEmail,
     });
 
@@ -194,7 +193,6 @@ describe('createTenantAction', () => {
 
     const result = await createTenantAction({
       ...validInput,
-      confirmOwnerInvite: true,
       confirmOwnerInviteToken: 'not-a-real-token',
     });
 
@@ -210,14 +208,13 @@ describe('createTenantAction', () => {
     expect(signInMock).not.toHaveBeenCalled();
   });
 
-  it('proceeds down the invite path once confirmOwnerInvite is set for an unregistered email', async () => {
+  it('proceeds down the invite path once confirmOwnerInviteToken is verified for an unregistered email', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
     const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(
       createTenantAction({
         ...validInput,
-        confirmOwnerInvite: true,
         confirmOwnerInviteToken: validOwnerInviteToken,
       }),
     ).rejects.toThrow('NEXT_REDIRECT');
@@ -246,7 +243,6 @@ describe('createTenantAction', () => {
     await expect(
       createTenantAction({
         ...validInput,
-        confirmOwnerInvite: true,
         confirmOwnerInviteToken: validOwnerInviteToken,
       }),
     ).rejects.toThrow('NEXT_REDIRECT');
@@ -270,7 +266,6 @@ describe('createTenantAction', () => {
     await expect(
       createTenantAction({
         ...validInput,
-        confirmOwnerInvite: true,
         confirmOwnerInviteToken: validOwnerInviteToken,
       }),
     ).rejects.toThrow('NEXT_REDIRECT');

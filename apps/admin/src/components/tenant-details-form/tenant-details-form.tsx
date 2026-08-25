@@ -104,7 +104,6 @@ export const TenantDetailsForm = () => {
     startTransition(async () => {
       const result = await createTenantAction({
         ...values,
-        confirmOwnerInvite: !!confirmedInvite,
         confirmOwnerInviteToken: confirmedInvite?.token,
       });
       setFieldErrors(result.fieldErrors ?? {});
