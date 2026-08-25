@@ -45,6 +45,10 @@ export const TopicPage = async ({ slug, page, locale }: TTopicPageProps) => {
     notFound();
   }
 
+  if (!result.data) {
+    notFound();
+  }
+
   const { topic, modules, postListId } = result.data;
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';

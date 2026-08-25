@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import type { TSiteSettings } from '@blog/service/features/global/site-settings/adaptor/types';
 import { buildImageUrl } from '@blog/service/shared/transformers/build-image-url';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
@@ -39,7 +40,7 @@ function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
 
 // Mirrors the schema's own `min(3)` takeaways rule (`skim.ts`) — fewer than
 // 3 takeaways is treated the same as no `skim` at all, never a partial list.
-function toPostSkim(raw: TRawPostDetail['skim']): TPostSkim | undefined {
+function toPostSkim(raw: TRawPostDetail['skim']): TMaybeUndefined<TPostSkim> {
   if (!raw?.takeaways || raw.takeaways.length < 3) return undefined;
 
   return {

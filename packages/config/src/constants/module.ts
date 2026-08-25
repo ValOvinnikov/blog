@@ -14,14 +14,11 @@ export type TModuleType = Extract<
 /**
  * Source-mode values for the hero module's mode/custom field pairs
  * (`heroEyebrowMode`, `heroTitleMode`, `heroSubtitleMode`, `heroImageMode`).
- *
- * UPPERCASE key/value per convention; datasets are clean so no migration
- * needed.
  */
 export const HERO_FIELD_MODE = {
   CUSTOM: 'CUSTOM',
   NONE: 'NONE',
-  POST_CATEGORY: 'POST_CATEGORY',
+  POST_TOPIC: 'POST_TOPIC',
   POST_TITLE: 'POST_TITLE',
   POST_EXCERPT: 'POST_EXCERPT',
   POST_IMAGE: 'POST_IMAGE',

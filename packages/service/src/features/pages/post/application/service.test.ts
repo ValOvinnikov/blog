@@ -1,6 +1,5 @@
 import { getPost } from '@blog/service/features/pages/post/adaptor/detail-page/loader';
 import type { TPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/types';
-import { MissingPagePostError } from '@blog/service/features/pages/post/adaptor/missing-page-post-error';
 
 import { createPostService } from './service';
 
@@ -29,13 +28,12 @@ describe('createPostService', () => {
       expect(result).toEqual({ ok: true, data: post });
     });
 
-    it('resolves ok:false with MissingPagePostError when no page_post matches the slug', async () => {
-      const error = new MissingPagePostError('missing');
-      mockGetPost.mockRejectedValue(error);
+    it('resolves ok:true with undefined data when no page_post matches the slug', async () => {
+      mockGetPost.mockResolvedValue(undefined);
 
       const result = await createPostService().v1.getPost('missing');
 
-      expect(result).toEqual({ ok: false, error });
+      expect(result).toEqual({ ok: true, data: undefined });
     });
 
     it('resolves ok:false with the error when the loader throws', async () => {

@@ -1,4 +1,9 @@
-import { routes, TLINK_TYPE, type ILink } from '@blog/config';
+import {
+  routes,
+  TLINK_TYPE,
+  type ILink,
+  type TMaybeUndefined,
+} from '@blog/config';
 import type { linkFragment } from '@blog/service/shared/fragments/link';
 import type { InferFragmentType } from 'groqd';
 
@@ -15,7 +20,7 @@ type TInternalReference = NonNullable<TRawLink['internalReference']>;
 // building a broken href.
 const INTERNAL_HREF_BUILDERS: Record<
   TInternalReference['_type'],
-  (slug: string | null) => string | undefined
+  (slug: string | null) => TMaybeUndefined<string>
 > = {
   blog_post: (slug) => (slug ? routes.post(slug) : undefined),
   blog_topic: (slug) => (slug ? routes.topic(slug) : undefined),
@@ -23,7 +28,7 @@ const INTERNAL_HREF_BUILDERS: Record<
   page_blog: () => routes.blogIndex(),
 };
 
-function toInternalHref(raw: TInternalReference): string | undefined {
+function toInternalHref(raw: TInternalReference): TMaybeUndefined<string> {
   // `_type` is typed as the reference union, but it comes from Sanity at
   // runtime and could fall outside it (unexpected reference target / schema
   // drift) — return undefined rather than crash, mirroring the old switch's
@@ -33,7 +38,9 @@ function toInternalHref(raw: TInternalReference): string | undefined {
   return build?.(raw.slug);
 }
 
-export function toLink(raw: TRawLink | null | undefined): ILink | undefined {
+export function toLink(
+  raw: TRawLink | null | undefined,
+): TMaybeUndefined<ILink> {
   if (!raw) return undefined;
 
   const href =

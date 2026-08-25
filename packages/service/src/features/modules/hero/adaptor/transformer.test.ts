@@ -89,6 +89,17 @@ describe('toHeroModule', () => {
     });
   });
 
+  it('falls back to the featured post topic title when eyebrow mode is POST_TOPIC', () => {
+    const raw = makeRawHeroModule({
+      featuredPost: makeRawPostCard({ _id: 'featured-ref' }),
+      heroEyebrowMode: HERO_FIELD_MODE.POST_TOPIC,
+    });
+
+    const hero = toHeroModule(raw, null);
+
+    expect(hero.eyebrow).toBe('Engineering');
+  });
+
   it('hides the image when the mode is NONE, even with a fallback post', () => {
     const raw = makeRawHeroModule({
       featuredPost: null,

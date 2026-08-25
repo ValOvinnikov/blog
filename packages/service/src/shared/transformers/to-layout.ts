@@ -1,4 +1,4 @@
-import type { TLayout } from '@blog/config';
+import type { TLayout, TMaybeUndefined } from '@blog/config';
 import type {
   heroLayoutFragment,
   layoutFragment,
@@ -10,7 +10,7 @@ export type TRawHeroLayout = InferFragmentType<typeof heroLayoutFragment>;
 
 export function toLayout(
   raw: TRawLayout | TRawHeroLayout | null | undefined,
-): TLayout | undefined {
+): TMaybeUndefined<TLayout> {
   if (!raw) return undefined;
 
   return {

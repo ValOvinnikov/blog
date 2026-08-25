@@ -33,7 +33,7 @@ describe('VOICE_FIELD_GROUPS', () => {
       'bookmarkToastSavedMessage',
       'bookmarkToastRemovedMessage',
       'blogListEmpty',
-      'categoryEmpty',
+      'topicEmpty',
       'tagEmpty',
       'authorEmpty',
       'topicsEmpty',

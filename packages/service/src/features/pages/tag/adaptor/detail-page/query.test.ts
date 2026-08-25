@@ -22,4 +22,8 @@ describe('tagPageQuery', () => {
 
     expect(() => tagPageQuery.parse(raw)).not.toThrow();
   });
+
+  it('parses null as no matching page_tag document, rather than throwing', () => {
+    expect(tagPageQuery.parse(null)).toBeNull();
+  });
 });

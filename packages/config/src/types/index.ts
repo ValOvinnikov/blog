@@ -6,6 +6,12 @@ import type { TLocaleIsoCode } from '@blog/config/constants';
  * can be absent, e.g. `heroImageUrl: TMaybeUndefined<string>`. Distinct from
  * property optionality (`field?:`), which means the property itself may be
  * missing.
+ *
+ * Also valid as a return type for a lookup that may legitimately find
+ * nothing, e.g. `Promise<TMaybeUndefined<TPost>>` for a fetch by a
+ * user-supplied slug. There it signals an expected absence, not a failure —
+ * a failure is still a thrown error that `safeAsync` converts to
+ * `{ ok: false }`.
  */
 export type TMaybeUndefined<T> = T | undefined;
 

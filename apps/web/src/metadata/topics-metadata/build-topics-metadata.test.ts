@@ -57,4 +57,15 @@ describe('buildTopicsMetadata', () => {
 
     expect(metadata).toEqual({});
   });
+
+  it('returns empty metadata without logging when the index page simply does not exist', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+
+    const metadata = await buildTopicsMetadata();
+
+    expect(metadata).toEqual({});
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
 });

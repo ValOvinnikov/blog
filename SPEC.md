@@ -362,7 +362,7 @@ cut with no concrete values ever specified; tracked separately (#1920).
 
 **Curated UI copy lives in Voice, not on modules.** Empty-state and other
 curated UI strings have exactly one authorable home: `settings_voice`'s
-`emptyStates` group (`blogListEmpty`, `categoryEmpty`, `tagEmpty`, …), applied
+`emptyStates` group (`blogListEmpty`, `topicEmpty`, `tagEmpty`, …), applied
 via the merge above. A module-level field for the same copy (e.g. a
 `module_postList.emptyMessage`, removed in #1899 for exactly this reason)
 creates a second, uncoordinated home that silently wins over the tenant's
@@ -638,6 +638,23 @@ failures became values rather than exceptions, the instinct to log every
 `!result.ok` uniformly is the main way routine input errors reach the error
 rate. Branch on the `ERROR_CODE` first; log only the branches a human would do
 something about.
+
+`ERROR_CODE` is not the only discriminator. Where a "not found" is an ordinary
+outcome rather than a failure — a page document looked up by a user-supplied
+slug — the loader models it as a **successful result carrying no data**
+(`ok: true`, `data: undefined`) instead of a coded failure, and `ok: false` is
+left to mean a genuine failure. The page loaders in `@blog/service` work this
+way: their outer GROQ query is nullable, so a missing document returns
+`undefined` rather than throwing, and the app 404s without logging. A document
+that exists but is misconfigured — a required module slot left unset — still
+throws, still surfaces as `ok: false`, and still logs. The rule underneath is
+unchanged: a stale link is the reader's whole truth and needs no line; a broken
+page is not.
+
+**A consumer that treats `ok` as a proxy for "the document exists" is a
+migration hazard.** When a loader moves from throwing to returning `undefined`,
+every `result.ok`-only check silently flips meaning, and `type-check` cannot
+see it because `.ok` is still a valid boolean. Gate on the data.
 
 ### Logging is not auditing
 

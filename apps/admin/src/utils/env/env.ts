@@ -58,7 +58,9 @@ export const env = createEnv({
     TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE: z.string().url().optional(),
     // Forwarded as `provision-tenant.yml`'s `tenantSanityDataset`
     // workflow_dispatch input, letting this deployment pick which dataset
-    // new tenants' Sanity projects get created in — same posture as
+    // new tenants' Sanity projects get created in; also forwarded as the
+    // `environment` input to both `provision-tenant.yml` and
+    // `deprovision-tenant.yml` — same posture as
     // `WEB_ANALYTICS_ENABLED` (`apps/web/src/utils/env/env.ts`): `VERCEL_ENV`
     // can't reliably tell a dev deployment apart from real production, so
     // this is an explicit opt-in set by hand per Vercel project. Optional:

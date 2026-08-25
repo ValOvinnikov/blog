@@ -13,7 +13,7 @@ export function makeRawHeroModule(
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
     featuredPost: null,
-    heroEyebrowMode: HERO_FIELD_MODE.POST_CATEGORY,
+    heroEyebrowMode: HERO_FIELD_MODE.POST_TOPIC,
     heroEyebrow: null,
     heroTitleMode: HERO_FIELD_MODE.POST_TITLE,
     heroTitle: null,

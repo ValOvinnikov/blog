@@ -6,7 +6,7 @@ import type { InferResultType } from 'groqd';
 import type { blogPageQuery } from './query';
 import type { TBlogIndexPage } from './types';
 
-export type TRawBlogPage = InferResultType<typeof blogPageQuery>;
+export type TRawBlogPage = NonNullable<InferResultType<typeof blogPageQuery>>;
 
 export function toIndexPage(
   rawPage: TRawBlogPage,

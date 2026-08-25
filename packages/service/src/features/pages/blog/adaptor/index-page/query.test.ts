@@ -19,4 +19,8 @@ describe('blogPageQuery', () => {
     expect(blogPageQuery.query).toContain('postList');
     expect(blogPageQuery.query).not.toContain('itemsPerPage');
   });
+
+  it('parses null as no matching page_blog document, rather than throwing', () => {
+    expect(blogPageQuery.parse(null)).toBeNull();
+  });
 });

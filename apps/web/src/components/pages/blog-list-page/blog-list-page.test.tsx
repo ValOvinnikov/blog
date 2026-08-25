@@ -103,6 +103,18 @@ describe(`<${BlogListPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
+  it('calls notFound() without logging when the index page simply does not exist', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    expect(errorSpy).not.toHaveBeenCalled();
+
+    errorSpy.mockRestore();
+  });
+
   it('renders the h1 and supporting text from the fetched page shell', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,

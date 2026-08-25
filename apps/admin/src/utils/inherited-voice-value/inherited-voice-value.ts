@@ -6,7 +6,7 @@ import type { TVoicePack } from '@blog/config/constants';
  * blank — the placeholder shown in its input. `TVoicePack`'s shape predates
  * the 20-key curated field set (it's nested by feature area, e.g.
  * `notFound.commandNotFound`, not flat); this maps each curated key to its
- * pack path. The 6 empty-state keys (`blogListEmpty`, `categoryEmpty`,
+ * pack path. The 6 empty-state keys (`blogListEmpty`, `topicEmpty`,
  * `tagEmpty`, `authorEmpty`, `topicsEmpty`, `bookmarksEmpty`) have no `case`
  * here because `TVoicePack` has no corresponding field for them at all —
  * their input renders with no placeholder, which is accurate (there is

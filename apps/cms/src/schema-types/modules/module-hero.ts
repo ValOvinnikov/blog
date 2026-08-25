@@ -42,9 +42,9 @@ export const heroSchema = defineType({
       name: 'heroEyebrow',
       title: 'Hero Eyebrow',
       description:
-        'Use the selected/fallback featured post category or provide custom text.',
+        'Use the selected/fallback featured post topic or provide custom text.',
       modeOptions: [
-        { title: 'Use post category', value: HERO_FIELD_MODE.POST_CATEGORY },
+        { title: 'Use post topic', value: HERO_FIELD_MODE.POST_TOPIC },
         { title: 'Custom', value: HERO_FIELD_MODE.CUSTOM },
       ],
     }),

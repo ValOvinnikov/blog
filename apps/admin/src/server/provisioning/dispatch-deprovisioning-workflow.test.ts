@@ -4,6 +4,8 @@ const { envMock } = vi.hoisted(() => ({
   envMock: {
     TENANT_PROVISIONING_GITHUB_TOKEN: undefined as string | undefined,
     TENANT_PROVISIONING_GITHUB_REPO: undefined as string | undefined,
+    TENANT_PROVISIONING_DATASET: undefined as
+      'development' | 'production' | undefined,
   },
 }));
 
@@ -17,6 +19,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
     vi.stubGlobal('fetch', fetchMock);
     envMock.TENANT_PROVISIONING_GITHUB_TOKEN = 'ghp_token';
     envMock.TENANT_PROVISIONING_GITHUB_REPO = 'acme-org/acme-repo';
+    envMock.TENANT_PROVISIONING_DATASET = undefined;
   });
 
   it('skips the dispatch call and returns false when no token is configured', async () => {
@@ -68,6 +71,52 @@ describe(dispatchDeprovisioningWorkflow, () => {
       }),
     );
     expect(result).toBe(true);
+  });
+
+  it('omits environment from the dispatch body when TENANT_PROVISIONING_DATASET is not configured', async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+
+    await dispatchDeprovisioningWorkflow({
+      tenantId: 'tenant-1',
+      confirm: 'acme',
+      dryRun: true,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        body: JSON.stringify({
+          ref: 'main',
+          inputs: { tenantId: 'tenant-1', confirm: 'acme', dryRun: 'true' },
+        }),
+      }),
+    );
+  });
+
+  it('includes environment from TENANT_PROVISIONING_DATASET in the dispatch body when configured', async () => {
+    envMock.TENANT_PROVISIONING_DATASET = 'development';
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+
+    await dispatchDeprovisioningWorkflow({
+      tenantId: 'tenant-1',
+      confirm: 'acme',
+      dryRun: true,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        body: JSON.stringify({
+          ref: 'main',
+          inputs: {
+            tenantId: 'tenant-1',
+            confirm: 'acme',
+            dryRun: 'true',
+            environment: 'development',
+          },
+        }),
+      }),
+    );
   });
 
   it('never throws, and returns false, when the dispatch call responds with a non-2xx status', async () => {
