@@ -17,6 +17,7 @@ import { newsletterSettingsSchema } from '@cms/schema-types/documents/settings/n
 import { siteSchema } from '@cms/schema-types/documents/settings/site-settings';
 import { themeSchema } from '@cms/schema-types/documents/settings/theme';
 import { voiceSchema } from '@cms/schema-types/documents/settings/voice';
+import { migrationStateSchema } from '@cms/schema-types/documents/system/migration-state';
 import { contentSchema } from '@cms/schema-types/modules/module-content';
 import { ctaSchema } from '@cms/schema-types/modules/module-cta';
 import { heroSchema } from '@cms/schema-types/modules/module-hero';
@@ -300,5 +301,14 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
+  },
+
+  // migrationState is a system ledger, not authorable content — never
+  // creatable/editable and never listed in the new-document menu.
+  document: {
+    actions: (prev, { schemaType }) =>
+      schemaType === migrationStateSchema.name ? [] : prev,
+    newDocumentOptions: (prev) =>
+      prev.filter((item) => item.templateId !== migrationStateSchema.name),
   },
 });
