@@ -22,12 +22,9 @@ export type TLayoutValue = {
 
 /**
  * Pure transform: builds the new `layout`/`heroLayout` object value from a
- * doc's legacy `appearance`. `containerWidth` only carries over for
- * `module_newsletter` — `heroLayoutSchema` has no such field by design.
- * `appearance.align` is confirmed dead (no downstream reader, and its old
- * START/END vocabulary doesn't match the `HEADING_ALIGN` enum used
- * elsewhere) and is never copied. Exported so it's unit-testable without a
- * live dataset connection — see `./transform.test.ts`.
+ * doc's legacy `appearance`. `appearance.align` is confirmed dead and is
+ * never copied — no downstream reader, and its START/END vocabulary doesn't
+ * match the `HEADING_ALIGN` enum used elsewhere.
  */
 export const appearanceToLayout = (
   doc: TLegacyAppearanceDoc,
