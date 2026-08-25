@@ -1,5 +1,7 @@
 import { applyVoiceOverrides } from './apply-voice-overrides';
 
+// Mirrors the source file's private VOICE_OVERRIDE_PATHS map — it isn't
+// exported, so the two must be kept in sync by hand.
 const CURATED_KEY_PATHS: Record<string, readonly string[]> = {
   notFoundMetaTitle: ['notFound', 'metaTitle'],
   notFoundMetaDescription: ['notFound', 'metaDescription'],
