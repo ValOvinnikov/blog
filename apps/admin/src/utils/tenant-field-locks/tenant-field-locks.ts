@@ -1,6 +1,8 @@
 import {
+  TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
+  type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
 import type { TTenantProvisioningSteps } from '@blog/db/schema/tenants';
@@ -28,10 +30,20 @@ const ALL_FIELD_KEYS: TTenantFieldKey[] = [
 
 // Mirrors `packages/db`'s own (unexported) `deriveProvisioningState` —
 // provisioning never revisits a step once it moves past it, so at most one
-// step is ever FAILED at a time and every step after it stays IDLE.
+// step is ever FAILED at a time and every step after it stays IDLE. A
+// workflow can be dispatched (`provisioningStatus` moved to PROVISIONING by
+// `beginTenantProvisioning`) before its runner reports its first step —
+// every step is still IDLE for that whole window, so the column, not the
+// steps map, is the only signal a workflow is already running; first match
+// wins, same as the db-side function.
 const deriveProvisioningState = (
+  provisioningStatus: TTenantProvisioningStatus | null,
   steps: TTenantProvisioningSteps | null,
 ): 'IDLE' | 'RUNNING' | 'FAILED' | 'SUCCEEDED' => {
+  if (provisioningStatus === TENANT_PROVISIONING_STATUS.PROVISIONING) {
+    return 'RUNNING';
+  }
+
   const stepStates = Object.values(steps ?? {});
 
   if (
@@ -72,8 +84,9 @@ const deriveProvisioningState = (
  */
 export const computeTenantFieldLocks = (
   steps: TTenantProvisioningSteps | null,
+  provisioningStatus: TTenantProvisioningStatus | null,
 ): TTenantFieldLocks => {
-  const state = deriveProvisioningState(steps);
+  const state = deriveProvisioningState(provisioningStatus, steps);
 
   if (state === 'IDLE') {
     return {};

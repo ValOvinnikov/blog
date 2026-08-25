@@ -80,7 +80,9 @@ vi.mock('@admin/server/tenants/update-tenant-details-action', () => ({
 describe(ProvisioningStatusView, () => {
   beforeEach(() => {
     retryProvisioningStepActionMock.mockReset();
-    retryProvisioningStepActionMock.mockResolvedValue(undefined);
+    retryProvisioningStepActionMock.mockResolvedValue({
+      outcome: 'dispatched',
+    });
     getTenantProvisioningStatusActionMock.mockReset();
     getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
     getDomainVerificationStatusActionMock.mockReset();
@@ -721,6 +723,118 @@ describe(ProvisioningStatusView, () => {
     });
   });
 
+  it('immediately hides Start, shows the running badge, and locks tenant fields before the dispatch resolves', async () => {
+    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    let resolveDispatch:
+      ((result: { outcome: 'dispatched' }) => void) | undefined;
+    retryProvisioningStepActionMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveDispatch = resolve;
+      }),
+    );
+    const user = userEvent.setup();
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+      />,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Start provisioning' }),
+    );
+
+    // Still pending — the dispatch promise hasn't resolved yet, but the
+    // operator already sees it's running rather than a frozen page.
+    expect(
+      screen.queryByRole('button', { name: 'Start provisioning' }),
+    ).not.toBeInTheDocument();
+    expect(screen.getAllByText('Running…').length).toBeGreaterThan(0);
+    expect(screen.getByRole('textbox', { name: 'Slug' })).toBeDisabled();
+
+    await act(async () => {
+      resolveDispatch?.({ outcome: 'dispatched' });
+      await Promise.resolve();
+    });
+  });
+
+  it('shows a distinguishable error and re-enables Start when the dispatch fails, reverting the optimistic running state', async () => {
+    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    retryProvisioningStepActionMock.mockResolvedValue({
+      outcome: 'dispatch-error',
+    });
+    const user = userEvent.setup();
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+      />,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Start provisioning' }),
+    );
+
+    expect(
+      await screen.findByText("Couldn't start provisioning — try again."),
+    ).toBeVisible();
+    expect(
+      await screen.findByRole('button', { name: 'Start provisioning' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Slug' })).not.toBeDisabled();
+  });
+
+  it('shows a not-found-specific error when the tenant no longer exists server-side', async () => {
+    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    retryProvisioningStepActionMock.mockResolvedValue({
+      outcome: 'not-found',
+    });
+    const user = userEvent.setup();
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+      />,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Start provisioning' }),
+    );
+
+    expect(
+      await screen.findByText(
+        "Couldn't find this tenant — refresh the page and try again.",
+      ),
+    ).toBeVisible();
+  });
+
+  it('treats "already-in-progress" as a no-op — no error shown, dispatch still reported', async () => {
+    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    retryProvisioningStepActionMock.mockResolvedValue({
+      outcome: 'already-in-progress',
+    });
+    const user = userEvent.setup();
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+      />,
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Start provisioning' }),
+    );
+
+    await waitFor(() => {
+      expect(retryProvisioningStepActionMock).toHaveBeenCalledWith('tenant-1');
+    });
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
   it('shows a Go to tenant button linking to the tenant admin area once provisioning is READY', () => {
     const tenant = makeTenant({
       slug: 'acme',
@@ -1071,6 +1185,65 @@ describe(ProvisioningStatusView, () => {
       });
 
       expect(getTenantProvisioningStatusActionMock).not.toHaveBeenCalled();
+    });
+
+    it('surfaces a stalled-poll indicator, keeps the last-known state visible, and keeps retrying when a poll tick rejects', async () => {
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        },
+      });
+      getTenantProvisioningStatusActionMock.mockRejectedValueOnce(
+        new Error('NEXT_REDIRECT'),
+      );
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      const sidebar = screen.getByRole('complementary');
+      expect(within(sidebar).getByText('Running…')).toBeVisible();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+
+      // Last-known state stays visible — a rejected tick never clears it.
+      expect(within(sidebar).getByText('Running…')).toBeVisible();
+      expect(
+        screen.getByText(
+          "Couldn't refresh the latest status — retrying automatically.",
+        ),
+      ).toBeVisible();
+
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+          },
+        },
+      });
+
+      // The interval never stopped — the very next tick succeeds on its own.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+
+      expect(
+        screen.queryByText(
+          "Couldn't refresh the latest status — retrying automatically.",
+        ),
+      ).not.toBeInTheDocument();
+      expect(within(sidebar).getByText('Done')).toBeVisible();
     });
   });
 

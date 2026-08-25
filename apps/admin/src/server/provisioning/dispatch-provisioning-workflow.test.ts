@@ -25,27 +25,30 @@ describe(dispatchProvisioningWorkflow, () => {
     envMock.TENANT_PROVISIONING_DATASET = undefined;
   });
 
-  it('skips the dispatch call when no token is configured', async () => {
+  it('skips the dispatch call and returns false when no token is configured', async () => {
     envMock.TENANT_PROVISIONING_GITHUB_TOKEN = undefined;
 
-    await dispatchProvisioningWorkflow('tenant-1');
+    const result = await dispatchProvisioningWorkflow('tenant-1');
 
     expect(fetchMock).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('skips the dispatch call when no repo is configured', async () => {
+  it('skips the dispatch call and returns false when no repo is configured', async () => {
     envMock.TENANT_PROVISIONING_GITHUB_REPO = undefined;
 
-    await dispatchProvisioningWorkflow('tenant-1');
+    const result = await dispatchProvisioningWorkflow('tenant-1');
 
     expect(fetchMock).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('POSTs a workflow_dispatch request with the tenant id as an input', async () => {
+  it('POSTs a workflow_dispatch request with the tenant id as an input, and returns true', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
-    await dispatchProvisioningWorkflow('tenant-1');
+    const result = await dispatchProvisioningWorkflow('tenant-1');
 
+    expect(result).toBe(true);
     expect(fetchMock).toHaveBeenCalledWith(
       'https://api.github.com/repos/acme-org/acme-repo/actions/workflows/provision-tenant.yml/dispatches',
       expect.objectContaining({
@@ -146,19 +149,15 @@ describe(dispatchProvisioningWorkflow, () => {
     );
   });
 
-  it('never throws when the dispatch call responds with a non-2xx status (e.g. the workflow not existing yet)', async () => {
+  it('never throws, and returns false, when the dispatch call responds with a non-2xx status (e.g. the workflow not existing yet)', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 404 }));
 
-    await expect(
-      dispatchProvisioningWorkflow('tenant-1'),
-    ).resolves.toBeUndefined();
+    await expect(dispatchProvisioningWorkflow('tenant-1')).resolves.toBe(false);
   });
 
-  it('never throws when the request itself fails', async () => {
+  it('never throws, and returns false, when the request itself fails', async () => {
     fetchMock.mockRejectedValue(new Error('network down'));
 
-    await expect(
-      dispatchProvisioningWorkflow('tenant-1'),
-    ).resolves.toBeUndefined();
+    await expect(dispatchProvisioningWorkflow('tenant-1')).resolves.toBe(false);
   });
 });
