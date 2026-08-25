@@ -36,6 +36,12 @@ on:
         required: true
         type: boolean
         default: true
+      environment:
+        description: 'Which Neon branch the tenant registry (the tenants row this run reads/writes) lives in'
+        required: true
+        type: choice
+        options: [development, production]
+        default: production
 
 permissions:
   contents: read
@@ -59,8 +65,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     # Same `production` GitHub Environment (and required-reviewer gate, if
-    # configured) `provision-tenant.yml` uses — one tenant registry, one
-    # Neon database, not a per-environment one.
+    # configured) `provision-tenant.yml` uses — the Sanity/Vercel credentials
+    # this job needs are singleton (one org, one team) regardless of which
+    # Neon branch the tenant registry targets. The registry itself (which
+    # branch holds the `tenants` row this run reads/writes) is selected
+    # per-dispatch by the `environment` input below, via DATABASE_URL — see
+    # that mapping's own comment.
     environment: production
     env:
       SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
@@ -70,10 +80,13 @@ jobs:
       # domain from this one project, never a per-tenant project.
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
       # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
-      # specifically — mapped here from the existing `DATABASE_URL_UNPOOLED`
-      # secret rather than provisioning a brand-new one, same as
-      # `provision-tenant.yml`.
-      DATABASE_URL: ${{ secrets.DATABASE_URL_UNPOOLED }}
+      # specifically. Deliberately its OWN secrets, distinct from
+      # `DATABASE_URL_UNPOOLED` (which `deploy-production.yml`'s `migrate-db`
+      # job reads, from this same `production` GitHub Environment) — same
+      # decoupling as `provision-tenant.yml`, see its DATABASE_URL comment
+      # (#2056). `inputs.environment` selects which branch's tenant registry
+      # this run targets.
+      DATABASE_URL: ${{ inputs.environment == 'development' && secrets.TENANT_REGISTRY_DATABASE_URL_DEV || secrets.TENANT_REGISTRY_DATABASE_URL_PROD }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
