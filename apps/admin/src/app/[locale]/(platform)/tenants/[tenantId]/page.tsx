@@ -1,4 +1,4 @@
-import { TenantStatusView } from '@admin/components/tenant-status-view';
+import { TenantStatusView } from '@admin/components/features/tenants/tenant-status-view';
 import { getDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
 import { queries } from '@blog/db';
 import type { Metadata } from 'next';

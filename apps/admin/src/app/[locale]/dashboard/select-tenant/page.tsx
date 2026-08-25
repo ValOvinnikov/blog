@@ -1,4 +1,4 @@
-import { DashboardTenantPicker } from '@admin/components/dashboard-tenant-picker';
+import { DashboardTenantPicker } from '@admin/components/features/layout/dashboard-tenant-picker';
 import { listSessionTenants } from '@admin/server/auth/list-session-tenants';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import type { Metadata } from 'next';

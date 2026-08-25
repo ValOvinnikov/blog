@@ -1,4 +1,4 @@
-import { FeaturesPageContent } from '@admin/components/features-page-content';
+import { FeaturesPageContent } from '@admin/components/features/capabilities/features-page-content';
 import { resolveDashboardTenant } from '@admin/server/auth/resolve-dashboard-tenant';
 import {
   renderTenantScopedPage,

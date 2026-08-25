@@ -1,4 +1,4 @@
-import { TenantDetailsForm } from '@admin/components/tenant-details-form';
+import { TenantDetailsForm } from '@admin/components/features/tenants/tenant-details-form';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 

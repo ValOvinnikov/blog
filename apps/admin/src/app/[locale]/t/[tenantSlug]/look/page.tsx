@@ -1,4 +1,4 @@
-import { LookPageContent } from '@admin/components/look-page-content';
+import { LookPageContent } from '@admin/components/features/look/look-page-content';
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
 import {
   renderTenantScopedPage,
