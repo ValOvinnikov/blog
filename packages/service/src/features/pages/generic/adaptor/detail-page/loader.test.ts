@@ -70,12 +70,18 @@ describe('getPage', () => {
   });
 
   it('resolves undefined, rather than rejecting, when no page_generic matches the slug', async () => {
-    mockRun
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(makeRawSiteSettings());
+    mockRun.mockResolvedValueOnce(null);
 
     const page = await getPage('missing');
 
     expect(page).toBeUndefined();
+  });
+
+  it('does not fetch site settings when no page_generic matches the slug', async () => {
+    mockRun.mockResolvedValueOnce(null);
+
+    await getPage('missing');
+
+    expect(mockRun).toHaveBeenCalledTimes(1);
   });
 });
