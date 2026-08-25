@@ -347,7 +347,6 @@ export const TenantDetailsPanel = ({
 
         <FormField
           label={t('planLabel')}
-          htmlFor={PLAN_FIELD_ID}
           hint={
             planLock && (
               <span

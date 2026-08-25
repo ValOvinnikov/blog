@@ -120,6 +120,29 @@ describe(TenantDetailsPanel, () => {
       ).toBeDisabled();
     });
 
+    it('renders the plan field label as a plain span, not a <label htmlFor> pointing nowhere, while still exposing the accessible name via ariaLabel', () => {
+      const tenant = makeTenant({ plan: TENANT_PLAN.FREE });
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={NO_LOCKS}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      // SegmentedControl's root has no id a `for` could ever reference, so
+      // the "Plan" label text must render as a plain span rather than a
+      // <label htmlFor> — a <label for="tenant-detail-plan"> here would
+      // never associate with anything and is the regression this guards.
+      const planLabelText = screen.getByText('Plan');
+      expect(planLabelText.tagName).toBe('SPAN');
+      expect(planLabelText).not.toHaveAttribute('for');
+
+      // The accessible name still resolves correctly — via SegmentedControl's
+      // own required `ariaLabel` prop, not a label association.
+      expect(screen.getByRole('radiogroup', { name: 'Plan' })).toBeVisible();
+    });
+
     it('enables Save when only the owner email is edited', async () => {
       const user = userEvent.setup();
       const tenant = makeTenant();
