@@ -18,6 +18,9 @@
     "brandName": "Valstack",
     "brandTagline": "admin"
   },
+  "topbarNavMenu": {
+    "triggerLabel": "Menu"
+  },
   "navSections": {
     "platformLabel": "Platform",
     "tenants": "Tenants",

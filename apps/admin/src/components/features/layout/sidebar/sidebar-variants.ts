@@ -6,8 +6,10 @@ export const sidebarVariants = tv({
       // Deliberate dark island: the rail stays dark against an otherwise
       // light admin panel, so it carries its own flipped token context
       // rather than the app-wide `.dark` class.
-      'dark flex w-full shrink-0 flex-col border-b border-border bg-primary',
-      'md:min-h-dvh md:w-64 md:border-r md:border-b-0',
+      // Hidden below `md:` — mobile nav lives in Topbar's compact menu
+      // instead (TopbarNavMenu), never this unbounded full-height stack.
+      'dark hidden w-full shrink-0 flex-col border-b border-border bg-primary',
+      'md:flex md:min-h-dvh md:w-64 md:border-r md:border-b-0',
       'md:sticky md:top-0 md:self-start',
     ],
     brand: ['flex items-center gap-2.5 border-b border-border px-3 py-4'],

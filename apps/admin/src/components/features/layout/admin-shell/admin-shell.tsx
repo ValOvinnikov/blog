@@ -34,7 +34,12 @@ export const AdminShell = ({
     <div className={root()}>
       <Sidebar sections={sections} switcher={switcher} />
       <div className={main()}>
-        <Topbar crumb={crumb} roleLabel={roleLabel} />
+        <Topbar
+          crumb={crumb}
+          roleLabel={roleLabel}
+          sections={sections}
+          switcher={switcher}
+        />
         <main className={content()}>{children}</main>
       </div>
     </div>
