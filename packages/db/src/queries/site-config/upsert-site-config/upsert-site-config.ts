@@ -56,7 +56,6 @@ export const voiceOverridesSchema = z
     blogListEmpty: overrideField(LONG_COPY_MAX),
     topicEmpty: overrideField(LONG_COPY_MAX),
     tagEmpty: overrideField(LONG_COPY_MAX),
-    authorEmpty: overrideField(LONG_COPY_MAX),
     topicsEmpty: overrideField(LONG_COPY_MAX),
     bookmarksEmpty: overrideField(LONG_COPY_MAX),
   })
