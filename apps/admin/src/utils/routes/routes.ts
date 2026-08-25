@@ -3,6 +3,8 @@
  * these paths inline elsewhere.
  */
 export const adminRoutes = {
+  signIn: () => '/api/auth/signin',
+  unauthorized: () => '/unauthorized',
   tenants: (options?: { archived?: boolean }) =>
     options?.archived ? '/tenants?archived=1' : '/tenants',
   addTenant: () => '/add-tenant',
