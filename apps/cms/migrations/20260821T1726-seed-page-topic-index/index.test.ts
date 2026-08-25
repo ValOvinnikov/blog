@@ -1,3 +1,6 @@
+import { topicIndexPageSchema } from '@cms/schema-types/documents/pages/topic-index-page';
+import { taxonomyListSchema } from '@cms/schema-types/modules/module-taxonomy-list';
+import { assertSatisfiesRequiredFields } from '@cms/testing/assert-satisfies-required-fields';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { PAGE_TOPIC_INDEX_ID, TAXONOMY_LIST_TOPICS_ID } from './ids';
@@ -12,25 +15,31 @@ const anchorDoc = {
   _rev: 'rev-1',
 };
 
+const taxonomyListPayload = {
+  _id: TAXONOMY_LIST_TOPICS_ID,
+  _type: 'module_taxonomyList',
+  title: 'Topic Index List',
+  brandVariant: 'PRIMARY',
+};
+const pageTopicIndexPayload = {
+  _id: PAGE_TOPIC_INDEX_ID,
+  _type: 'page_topicIndex',
+  title: 'Topic Index Page',
+  heading: 'Topics',
+  supportingText: 'Browse every post by topic.',
+  taxonomyList: { _type: 'reference', _ref: TAXONOMY_LIST_TOPICS_ID },
+};
+
 const expectedMutations = [
-  createIfNotExists({
-    _id: TAXONOMY_LIST_TOPICS_ID,
-    _type: 'module_taxonomyList',
-    title: 'Topic Index List',
-    brandVariant: 'PRIMARY',
-  }),
-  createIfNotExists({
-    _id: PAGE_TOPIC_INDEX_ID,
-    _type: 'page_topicIndex',
-    title: 'Topic Index Page',
-    heading: 'Topics',
-    supportingText: 'Browse every post by topic.',
-    taxonomyList: { _type: 'reference', _ref: TAXONOMY_LIST_TOPICS_ID },
-  }),
+  createIfNotExists(taxonomyListPayload),
+  createIfNotExists(pageTopicIndexPayload),
 ];
 
 describe('seed-page-topic-index migration', () => {
   it('creates module_taxonomyList and page_topicIndex from a settings_site anchor', () => {
+    assertSatisfiesRequiredFields(taxonomyListSchema, taxonomyListPayload);
+    assertSatisfiesRequiredFields(topicIndexPageSchema, pageTopicIndexPayload);
+
     expect(migration.migrate.document(anchorDoc)).toEqual(expectedMutations);
   });
 
