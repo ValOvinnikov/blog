@@ -1,6 +1,27 @@
-import { render, screen } from '@testing-library/react';
+import { renderWithIntl, screen, within } from '@admin/testing/custom-render';
+import { ICONS } from '@blog/config';
+import userEvent from '@testing-library/user-event';
+import type { ComponentPropsWithoutRef } from 'react';
 
 import { Topbar } from './topbar';
+
+// `TopbarNavMenu` (rendered when `sections` is passed) resolves its active
+// link via `@admin/i18n/navigation`'s `usePathname` and links through its
+// `Link` — mocked the same way as `sidebar.test.tsx`/`topbar-nav-menu.test.tsx`.
+vi.mock('@admin/i18n/navigation', () => ({
+  usePathname: () => '/',
+  Link: ({
+    href,
+    children,
+    ...rest
+  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
+}));
+
+const render = renderWithIntl;
 
 describe(Topbar, () => {
   it('renders the crumb and role label', () => {
@@ -8,5 +29,64 @@ describe(Topbar, () => {
 
     expect(screen.getByText('Platform')).toBeVisible();
     expect(screen.getByText('ADMIN')).toBeVisible();
+  });
+
+  it('renders no nav menu trigger when no sections are passed', () => {
+    render(<Topbar crumb="Platform" roleLabel="ADMIN" />);
+
+    expect(
+      screen.queryByRole('button', { name: 'Menu' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders a nav menu trigger that opens the passed sections when sections are provided', async () => {
+    const user = userEvent.setup();
+    render(
+      <Topbar
+        crumb="Platform"
+        roleLabel="ADMIN"
+        sections={[
+          {
+            label: 'Platform',
+            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
+          },
+        ]}
+      />,
+    );
+
+    const trigger = screen.getByRole('button', { name: 'Menu' });
+    expect(trigger).toBeVisible();
+
+    await user.click(trigger);
+    const menu = await screen.findByRole('menu');
+    expect(
+      within(menu).getByRole('menuitem', { name: 'Tenants' }),
+    ).toBeVisible();
+  });
+
+  it('renders the switcher slot above the section items inside the opened nav menu', async () => {
+    const user = userEvent.setup();
+    render(
+      <Topbar
+        crumb="Platform"
+        roleLabel="ADMIN"
+        switcher={<div>Tenant switcher</div>}
+        sections={[
+          {
+            label: 'Platform',
+            items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
+          },
+        ]}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Menu' }));
+    const menu = await screen.findByRole('menu');
+    const text = menu.textContent ?? '';
+
+    expect(within(menu).getByText('Tenant switcher')).toBeVisible();
+    expect(text.indexOf('Tenant switcher')).toBeLessThan(
+      text.indexOf('Platform'),
+    );
   });
 });
