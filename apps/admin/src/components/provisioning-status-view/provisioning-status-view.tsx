@@ -31,7 +31,7 @@ import { Text } from '@blog/ui/atoms/text';
 import { LinkButton } from '@blog/ui/molecules/link-button';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
 
@@ -67,6 +67,12 @@ const STEP_POLL_INTERVAL_MS = 4000;
 // independent interval rather than sharing the step interval and risking
 // overlapping in-flight requests.
 const DOMAIN_POLL_INTERVAL_MS = 10000;
+// A GitHub Actions dispatch-to-runner-pickup normally resolves in well under
+// a minute, but during an outage, a disabled workflow, or a permissions
+// failure it may never resolve at all — this caps how long a retry/start
+// keeps polling against an unchanged pre-retry snapshot before giving up on
+// it, comfortably exceeding realistic pickup latency.
+const RETRY_BASELINE_MAX_TICKS = 75; // ~5 minutes at STEP_POLL_INTERVAL_MS
 
 const isTerminalProvisioningStatus = (
   status: TTenantProvisioningStatus | null,
@@ -186,6 +192,11 @@ export const ProvisioningStatusView = ({
   const [pendingRetryBaseline, setPendingRetryBaseline] = useState<
     TTenantProvisioningStepStatus[] | null
   >(null);
+  // Consecutive poll ticks that have matched `pendingRetryBaseline` so far —
+  // a ref rather than state because it must not itself trigger a re-render
+  // or reset the poll interval; it only gates whether the cap below has
+  // been reached. Reset whenever a fresh baseline is recorded.
+  const pendingRetryTicksRef = useRef(0);
   const [renderedDomainStatus, setRenderedDomainStatus] = useState(
     domainVerificationStatus,
   );
@@ -269,12 +280,18 @@ export const ProvisioningStatusView = ({
             pendingRetryBaseline &&
             stepStatusesEqual(freshStatuses, pendingRetryBaseline)
           ) {
-            // Unchanged since Retry/Start was pressed — the dispatch only
-            // confirms GitHub received the request, not that a runner has
-            // picked it up yet, so this read alone can't tell "never" apart
-            // from "not yet". Keep watching rather than stop on a snapshot
-            // that predates the retry.
-            return;
+            pendingRetryTicksRef.current += 1;
+            if (pendingRetryTicksRef.current < RETRY_BASELINE_MAX_TICKS) {
+              // Unchanged since Retry/Start was pressed — the dispatch only
+              // confirms GitHub received the request, not that a runner has
+              // picked it up yet, so this read alone can't tell "never"
+              // apart from "not yet". Keep watching rather than stop on a
+              // snapshot that predates the retry, up to the cap above.
+              return;
+            }
+            // Cap reached — the retried workflow never visibly took effect.
+            // Stop waiting on this stale snapshot and fall through to the
+            // normal stop/continue decision below.
           }
 
           setPendingRetryBaseline(null);
@@ -380,6 +397,7 @@ export const ProvisioningStatusView = ({
     // observed yet" and keep watching instead of stopping again on it.
     setIsPollingActive(true);
     setPendingRetryBaseline(stepStatuses);
+    pendingRetryTicksRef.current = 0;
     startTransition(async () => {
       const result = await retryProvisioningStepAction(tenant.id);
 

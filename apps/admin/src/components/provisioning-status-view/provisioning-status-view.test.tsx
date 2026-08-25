@@ -39,6 +39,8 @@ const withIntl = (ui: ReactElement) => {
 
 const STEP_POLL_INTERVAL_MS = 4000;
 const DOMAIN_POLL_INTERVAL_MS = 10000;
+// Mirrors the component's own `RETRY_BASELINE_MAX_TICKS`.
+const RETRY_BASELINE_MAX_TICKS = 75;
 
 const {
   retryProvisioningStepActionMock,
@@ -1160,6 +1162,121 @@ describe(ProvisioningStatusView, () => {
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(2);
       const sidebar = screen.getByRole('complementary');
       expect(within(sidebar).getByText('Running…')).toBeVisible();
+    });
+
+    it('stops polling once the retry-baseline wait is exhausted, even though the fetched steps never change', async () => {
+      const failedSteps = {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+          error: 'fetch failed',
+        },
+      };
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningSteps: failedSteps,
+      });
+      // Models a retry whose dispatched workflow never actually starts —
+      // every tick reports the exact same failed-and-nothing-running
+      // snapshot forever.
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningSteps: failedSteps,
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      await act(async () => {
+        fireEvent.click(
+          screen.getByRole('button', { name: 'Retry provisioning' }),
+        );
+      });
+
+      // Advance well past the cap, one tick's worth of real time at a time
+      // (rather than in a single large jump) so each tick's resulting state
+      // change — including the interval being torn down once the cap
+      // fires — is actually committed before the next tick is simulated.
+      for (let tick = 0; tick < RETRY_BASELINE_MAX_TICKS + 5; tick += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+        });
+      }
+
+      // Polling must have stopped once the cap was reached — it never grew
+      // past that regardless of how much further time was simulated.
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(
+        RETRY_BASELINE_MAX_TICKS,
+      );
+    });
+
+    it('clears the retry baseline as soon as a real transition arrives, without waiting for the cap', async () => {
+      const failedSteps = {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+          error: 'fetch failed',
+        },
+      };
+      const tenant = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningSteps: failedSteps,
+      });
+      render(
+        <ProvisioningStatusView
+          tenant={tenant}
+          domainVerificationStatus="NOT_CONFIGURED"
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      // A handful of stale ticks first — still well short of the cap — then
+      // the workflow genuinely starts.
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningSteps: failedSteps,
+      });
+
+      await act(async () => {
+        fireEvent.click(
+          screen.getByRole('button', { name: 'Retry provisioning' }),
+        );
+      });
+
+      for (let tick = 0; tick < 3; tick += 1) {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+        });
+      }
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(3);
+
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        },
+      });
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+
+      const sidebar = screen.getByRole('complementary');
+      expect(within(sidebar).getByText('Running…')).toBeVisible();
+
+      // Polling keeps going normally past the transition — it wasn't
+      // waiting on the cap to notice the change.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 2);
+      });
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(6);
     });
 
     it('stops polling once the component unmounts', async () => {
