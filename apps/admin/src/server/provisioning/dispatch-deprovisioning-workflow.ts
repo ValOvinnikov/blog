@@ -35,6 +35,8 @@ export const dispatchDeprovisioningWorkflow = async ({
     return false;
   }
 
+  const environment = env.TENANT_PROVISIONING_DATASET;
+
   try {
     const response = await fetch(
       `https://api.github.com/repos/${repo.owner}/${repo.repo}/actions/workflows/${WORKFLOW_FILE}/dispatches`,
@@ -48,7 +50,12 @@ export const dispatchDeprovisioningWorkflow = async ({
         },
         body: JSON.stringify({
           ref: WORKFLOW_REF,
-          inputs: { tenantId, confirm, dryRun: String(dryRun) },
+          inputs: {
+            tenantId,
+            confirm,
+            dryRun: String(dryRun),
+            ...(environment && { environment }),
+          },
         }),
         signal: AbortSignal.timeout(DISPATCH_TIMEOUT_MS),
       },

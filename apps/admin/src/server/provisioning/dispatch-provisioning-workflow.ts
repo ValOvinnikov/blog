@@ -37,6 +37,8 @@ export const dispatchProvisioningWorkflow = async (
   // The base-url override always implies a local test run, so it forces
   // `development` regardless of TENANT_PROVISIONING_DATASET — a safety net
   // against ever creating a `production`-dataset Sanity project by accident.
+  // Also forwarded as the workflow's `environment` input so the tenant
+  // registry it dispatches against always matches this Sanity dataset.
   const tenantSanityDataset = adminAppBaseUrlOverride
     ? 'development'
     : env.TENANT_PROVISIONING_DATASET;
@@ -60,6 +62,7 @@ export const dispatchProvisioningWorkflow = async (
               adminAppBaseUrl: adminAppBaseUrlOverride,
             }),
             ...(tenantSanityDataset && { tenantSanityDataset }),
+            ...(tenantSanityDataset && { environment: tenantSanityDataset }),
           },
         }),
         signal: AbortSignal.timeout(DISPATCH_TIMEOUT_MS),
