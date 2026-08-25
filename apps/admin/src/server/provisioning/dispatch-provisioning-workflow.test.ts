@@ -87,13 +87,14 @@ describe(dispatchProvisioningWorkflow, () => {
             tenantId: 'tenant-1',
             adminAppBaseUrl: 'https://tenant-dev.tailnet.ts.net',
             tenantSanityDataset: 'development',
+            environment: 'development',
           },
         }),
       }),
     );
   });
 
-  it('omits tenantSanityDataset from the dispatch body when neither the override nor the dataset var is configured', async () => {
+  it('omits tenantSanityDataset and environment from the dispatch body when neither the override nor the dataset var is configured', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
     await dispatchProvisioningWorkflow('tenant-1');
@@ -106,7 +107,7 @@ describe(dispatchProvisioningWorkflow, () => {
     );
   });
 
-  it('sends tenantSanityDataset from TENANT_PROVISIONING_DATASET when the base-url override is not configured', async () => {
+  it('sends tenantSanityDataset and environment from TENANT_PROVISIONING_DATASET when the base-url override is not configured', async () => {
     envMock.TENANT_PROVISIONING_DATASET = 'production';
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
@@ -117,13 +118,17 @@ describe(dispatchProvisioningWorkflow, () => {
       expect.objectContaining({
         body: JSON.stringify({
           ref: 'main',
-          inputs: { tenantId: 'tenant-1', tenantSanityDataset: 'production' },
+          inputs: {
+            tenantId: 'tenant-1',
+            tenantSanityDataset: 'production',
+            environment: 'production',
+          },
         }),
       }),
     );
   });
 
-  it('always sends tenantSanityDataset "development" when the base-url override is configured, even if TENANT_PROVISIONING_DATASET is set to production', async () => {
+  it('always sends tenantSanityDataset and environment "development" when the base-url override is configured, even if TENANT_PROVISIONING_DATASET is set to production', async () => {
     envMock.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE =
       'https://tenant-dev.tailnet.ts.net';
     envMock.TENANT_PROVISIONING_DATASET = 'production';
@@ -140,6 +145,7 @@ describe(dispatchProvisioningWorkflow, () => {
             tenantId: 'tenant-1',
             adminAppBaseUrl: 'https://tenant-dev.tailnet.ts.net',
             tenantSanityDataset: 'development',
+            environment: 'development',
           },
         }),
       }),

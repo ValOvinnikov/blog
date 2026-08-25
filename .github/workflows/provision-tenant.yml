@@ -27,6 +27,12 @@ on:
         description: 'Override TENANT_SANITY_DATASET for this run only — leave blank to use the production Environment value'
         required: false
         type: string
+      environment:
+        description: 'Which Neon branch the tenant registry (the tenants row this run reads/writes) lives in — independent of tenantSanityDataset, which picks the new tenant''s OWN Sanity dataset'
+        required: true
+        type: choice
+        options: [development, production]
+        default: production
 
 permissions:
   contents: read
@@ -51,11 +57,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     # Reuses the same `production` GitHub Environment (and required-reviewer
-    # gate, if configured) every other prod-affecting job in this repo uses
-    # — there is only one tenant registry (one Neon database), not a
-    # per-environment one, so this isn't a new environment, just the same
-    # production credentials store gaining a few more secrets/vars. See
-    # docs/DEPLOY.md's "One-time setup" for what's new here.
+    # gate, if configured) every other prod-affecting job in this repo uses —
+    # the Sanity/Vercel credentials this job needs are singleton (one org,
+    # one team) regardless of which Neon branch the tenant registry targets,
+    # so this isn't a new environment, just the same production credentials
+    # store gaining a few more secrets/vars. See docs/DEPLOY.md's "One-time
+    # setup" for what's new here. The tenant registry itself (which Neon
+    # branch holds the `tenants` row this run reads/writes) is selected
+    # per-dispatch by the `environment` input below — see the "Select tenant
+    # registry database URL" step.
     environment: production
     env:
       SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
@@ -89,12 +99,6 @@ jobs:
       WEB_APP_URL: ${{ vars.WEB_APP_URL }}
       SANITY_REVALIDATE_SECRET: ${{ secrets.SANITY_REVALIDATE_SECRET }}
       TENANT_TOKEN_ENCRYPTION_KEY: ${{ secrets.TENANT_TOKEN_ENCRYPTION_KEY }}
-      # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
-      # specifically — mapped here from the existing `DATABASE_URL_UNPOOLED`
-      # secret rather than provisioning a brand-new one: a short-lived CI
-      # script is exactly the direct-connection use case that secret is
-      # already scoped for (same reasoning `migrate-db` already relies on).
-      DATABASE_URL: ${{ secrets.DATABASE_URL_UNPOOLED }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -106,6 +110,37 @@ jobs:
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
+      # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
+      # specifically. Deliberately its OWN secrets, distinct from
+      # `DATABASE_URL_UNPOOLED` (which `deploy-production.yml`'s `migrate-db`
+      # job reads, from this same `production` GitHub Environment) — the
+      # tenant registry and the application database are two different
+      # purposes that used to collide on one secret (#2056): repointing this
+      # value at the `development` Neon branch to fix a dev-registry lookup
+      # silently repointed prod migrations too. Both source secrets live here
+      # in `production` because there's still only one credentials store,
+      # just two named connection strings in it now. A shell `if`, not the
+      # `${{ A && B || C }}` expression idiom used elsewhere in this repo —
+      # that idiom returns the FALSE branch whenever B itself is falsy, and a
+      # not-yet-configured secret evaluates to `''` (falsy), which would
+      # silently fall through to the production connection string instead of
+      # failing. `:?` hard-fails on empty-or-unset, not just unset.
+      - name: Select tenant registry database URL
+        env:
+          TARGET_ENVIRONMENT: ${{ inputs.environment }}
+          DEV_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL_DEV }}
+          PROD_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL_PROD }}
+        run: |
+          set -euo pipefail
+          if [ "$TARGET_ENVIRONMENT" = development ]; then
+            SELECTED="$DEV_URL"
+            SELECTED_NAME=TENANT_REGISTRY_DATABASE_URL_DEV
+          else
+            SELECTED="$PROD_URL"
+            SELECTED_NAME=TENANT_REGISTRY_DATABASE_URL_PROD
+          fi
+          : "${SELECTED:?empty — set the $SELECTED_NAME secret on the production environment}"
+          echo "DATABASE_URL=$SELECTED" >> "$GITHUB_ENV"
       - name: Run provisioning steps
         # `inputs.tenantId` is attacker-influenceable (any repo collaborator
         # who can trigger workflow_dispatch controls it) — never interpolate
