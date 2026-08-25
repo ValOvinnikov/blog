@@ -2,11 +2,9 @@ import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-d
 import {
   TENANT_PLAN,
   TENANT_STATUS,
+  TENANT_PROVISIONING_STEP_STATUS,
   type TTenantPlan,
   type TTenantStatus,
-} from '@blog/db';
-import {
-  TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
 
