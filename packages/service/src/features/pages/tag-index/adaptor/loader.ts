@@ -10,13 +10,15 @@ import type { TTagIndexPage } from './types';
 export async function getIndexPage(): Promise<TMaybeUndefined<TTagIndexPage>> {
   // `tagIndexPageQuery` derefs `taxonomyList` — that tag must ride
   // alongside `page_tagIndex` (tag-scope contract, `sanity/query.ts`).
-  const [rawPage, settings] = await Promise.all([
-    runQuery(tagIndexPageQuery, isr(['page_tagIndex', 'modules:taxonomyList'])),
-    getSiteSettings(),
-  ]);
+  const rawPage = await runQuery(
+    tagIndexPageQuery,
+    isr(['page_tagIndex', 'modules:taxonomyList']),
+  );
   if (!rawPage) return undefined;
   if (!rawPage.taxonomyList) {
     throw new MissingTaxonomyListError();
   }
+
+  const settings = await getSiteSettings();
   return toTagIndexPage(rawPage, settings, rawPage.taxonomyList._id);
 }
