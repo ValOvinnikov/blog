@@ -29,11 +29,10 @@ type TTagPageProps = { slug: string; page?: number; locale: string };
  * `TopicPage`.
  */
 export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
-  const [result, breadcrumbsT, tagPageT, paginationT] = await Promise.all([
+  const [result, breadcrumbsT, tagPageT] = await Promise.all([
     service.pages.tag.v1.getTagPage(slug),
     getTranslations('breadcrumbs'),
     getTranslations('tagPage'),
-    getTranslations('pagination'),
   ]);
 
   if (!result.ok) {
@@ -72,7 +71,7 @@ export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
               locale={locale}
               page={page ?? 1}
               createHref={(pageNumber) => routes.tag(slug, pageNumber)}
-              ariaLabel={paginationT('ariaLabel', { pageType: 'Tag' })}
+              ariaLabel={tagPageT('paginationAriaLabel')}
               accessibleTitle={tagPageT('title', { name: tag.title })}
               emptyMessageFallback={tagPageT('empty', { name: tag.title })}
               titleId="tag-posts-title"
