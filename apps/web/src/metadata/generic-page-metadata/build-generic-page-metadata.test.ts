@@ -41,13 +41,27 @@ describe('buildGenericPageMetadata', () => {
     ]);
   });
 
-  it('returns empty metadata when the page fetch fails', async () => {
+  it('returns empty metadata and logs when the page fetch fails', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
 
     const metadata = await buildGenericPageMetadata('missing');
 
     expect(metadata).toEqual({});
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('generic_page_metadata.fetch_failed'),
+    );
+    errorSpy.mockRestore();
+  });
+
+  it('returns empty metadata without logging when the page simply does not exist', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getPageMock.mockResolvedValue({ ok: true, data: undefined });
+
+    const metadata = await buildGenericPageMetadata('missing');
+
+    expect(metadata).toEqual({});
+    expect(errorSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();
   });
 });

@@ -6,7 +6,7 @@ import type { InferResultType } from 'groqd';
 import type { homePageQuery } from './query';
 import type { THomePage } from './types';
 
-export type TRawHomePage = InferResultType<typeof homePageQuery>;
+export type TRawHomePage = NonNullable<InferResultType<typeof homePageQuery>>;
 
 export function toHomePage(
   raw: TRawHomePage,

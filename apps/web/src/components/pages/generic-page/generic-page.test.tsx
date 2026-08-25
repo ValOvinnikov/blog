@@ -49,12 +49,30 @@ describe(`<${GenericPage.name}/>`, () => {
     moduleRendererMock.mockClear();
   });
 
-  it('calls notFound() when the page does not exist', async () => {
+  it('calls notFound() and logs when the fetch fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
 
     await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('generic_page.fetch_failed'),
+    );
+
+    errorSpy.mockRestore();
+  });
+
+  it('calls notFound() without logging when the page simply does not exist', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getPageMock.mockResolvedValue({ ok: true, data: undefined });
+
+    await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    expect(errorSpy).not.toHaveBeenCalled();
+
+    errorSpy.mockRestore();
   });
 
   it('renders the page title as the h1', async () => {

@@ -26,6 +26,10 @@ export const buildGenericPageMetadata = async (
     return {};
   }
 
+  if (!result.data) {
+    return {};
+  }
+
   return toMetadata(result.data.seo, {
     canonical: routes.genericPage(slug),
     ogType: 'website',

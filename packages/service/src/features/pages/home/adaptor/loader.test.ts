@@ -22,6 +22,7 @@ describe('getHomePage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const page = await getHomePage();
+    if (!page) throw new Error('expected a home page');
 
     expect(page.title).toBe('Home Page');
     expect(page.hero).toEqual({
@@ -44,6 +45,7 @@ describe('getHomePage', () => {
       );
 
     const page = await getHomePage();
+    if (!page) throw new Error('expected a home page');
 
     expect(page.seo.title).toBe('My Blog');
     expect(page.seo.description).toBe('Settings description');
@@ -60,14 +62,19 @@ describe('getHomePage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const page = await getHomePage();
+    if (!page) throw new Error('expected a home page');
 
     expect(page.seo.title).toBe('Home');
     expect(page.seo.ogTitle).toBe('Home');
   });
 
-  it('propagates when the home page document is missing', async () => {
-    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
+  it('resolves undefined, rather than rejecting, when no page_home document exists', async () => {
+    mockRun
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(makeRawSiteSettings());
 
-    await expect(getHomePage()).rejects.toThrow();
+    const page = await getHomePage();
+
+    expect(page).toBeUndefined();
   });
 });

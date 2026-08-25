@@ -11,6 +11,7 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
+import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
@@ -40,6 +41,11 @@ export const GenericPage = async ({ slug, locale }: TGenericPageProps) => {
   ]);
 
   if (!result.ok) {
+    logger.error('generic_page.fetch_failed', { slug, error: result.error });
+    notFound();
+  }
+
+  if (!result.data) {
     notFound();
   }
 
