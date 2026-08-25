@@ -33,6 +33,10 @@ export const buildTopicMetadata = async (
     return {};
   }
 
+  if (!result.data) {
+    return {};
+  }
+
   const { seo } = result.data;
   const resolvedSeo =
     pageNumber === undefined

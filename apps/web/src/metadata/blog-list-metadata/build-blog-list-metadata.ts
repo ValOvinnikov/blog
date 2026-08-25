@@ -32,6 +32,10 @@ export const buildBlogListMetadata = async (
     return {};
   }
 
+  if (!result.data) {
+    return {};
+  }
+
   const { seo } = result.data;
   const resolvedSeo =
     page === 1

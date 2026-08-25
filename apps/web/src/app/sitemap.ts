@@ -129,7 +129,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     toEntry(routes.home(), siteUrl),
     ...(blogParamsResult.ok ? [toEntry(routes.blogIndex(), siteUrl)] : []),
-    ...(topicIndexPageResult.ok ? [toEntry(routes.topics(), siteUrl)] : []),
+    // `ok: true` alone doesn't mean the document exists — the loader is nullable.
+    ...(topicIndexPageResult.ok && topicIndexPageResult.data
+      ? [toEntry(routes.topics(), siteUrl)]
+      : []),
     toEntry(routes.tags(), siteUrl),
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
     ...posts.map(({ slug, publishedAt }) =>

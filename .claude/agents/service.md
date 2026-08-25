@@ -102,12 +102,36 @@ relative paths only within a single slice (`./query`, `./types`).
     so its loader is `getIndexPage`, not `getBlogPage`. **One query per file** —
     a slice composing two queries has two files (e.g. category `detail-page/`
     has `category.query.ts` + `posts.query.ts`).
-    **Loader return type is always `Promise<TViewModel>` — never nullable.**
-    Do not add null checks, `| null` return types, or try/catch in loaders.
-    If a document is missing, groqd throws (e.g. `ValidationErrors`) — let it
-    propagate. `safeAsync` in `application/service.ts` catches all throws and
-    converts them to `{ ok: false, error }`. The web layer is responsible for
-    deciding what to do (`notFound()`, fallback UI, or early return).
+    **Loader return type depends on whether absence is expected.**
+
+    - **A page document looked up by a user-supplied key** (a slug from the
+      URL, or a singleton that may not be authored yet) — absence is an
+      ordinary outcome, not a failure. The outer query is `.nullable(true)`,
+      the loader guards `if (!raw) return undefined;`, and the return type is
+      `Promise<TMaybeUndefined<TViewModel>>` (the `@blog/config` alias; never
+      a raw `T | undefined`, never `| null`).
+    - **Everything else** — modules, entities, globals, params slices — keeps
+      `Promise<TViewModel>` and stays non-nullable. A missing document there
+      is a data-integrity problem, so let groqd throw (e.g.
+      `ValidationErrors`) and let it propagate.
+
+    A page that _does_ exist but is misconfigured — a required module slot
+    unset — still throws (`MissingPostListError` and friends), because that is
+    a genuine failure someone must fix. Only "no such document" is an absence.
+
+    Never add try/catch in a loader. `safeAsync` in `application/service.ts`
+    catches all throws and converts them to `{ ok: false, error }`, so the
+    contract the web layer sees is three-way: `ok: true` with data (render),
+    `ok: true` with `undefined` data (ordinary 404 — **no log**), `ok: false`
+    (genuine failure — log at `error`, then 404). The web layer owns that
+    decision (`notFound()`, fallback UI, or early return).
+
+    **Web must check the data, not just `ok`.** Once a loader can return
+    `undefined`, `result.ok` alone no longer means "the document exists", and
+    `type-check` cannot catch a consumer that still assumes it does — `.ok` is
+    a valid boolean access either way. That exact gap shipped a sitemap
+    advertising a URL whose route 404s.
+
   - **`application/service.ts`** — a `createXService()` **factory** returning the
     versioned facade `{ v1: { …actions } }`. Version is an object key, never in
     the import path. `src/index.ts` calls each factory (`createPostService()`, …)
@@ -184,7 +208,9 @@ every field** (`.notNull()` or `.nullable(true)`).
   non-null, so assign directly: `title: raw.title`.
 - **Never fake absent values.** For optional fields use `raw.field ?? undefined`
   — never `?? ''`, `?? 0`, or any sentinel that hides absence; never `?? null`
-  either (view-models use `T | undefined`, not `T | null`). Exceptions where a
+  either. View-models spell absence as `TMaybeUndefined<T>` — the
+  `@blog/config` alias for `T | undefined` — never a raw union and never
+  `T | null`. Exceptions where a
   default is genuinely the value: `?? false` for boolean flags, `?? []` for
   arrays. Callers in `apps/web` own missing-value handling (`notFound()`,
   conditional render, fallback UI).

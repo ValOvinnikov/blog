@@ -22,4 +22,8 @@ describe('topicPageQuery', () => {
 
     expect(() => topicPageQuery.parse(raw)).not.toThrow();
   });
+
+  it('parses null as no matching page_topic document, rather than throwing', () => {
+    expect(topicPageQuery.parse(null)).toBeNull();
+  });
 });

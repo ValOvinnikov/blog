@@ -82,4 +82,15 @@ describe('buildTagMetadata', () => {
 
     expect(metadata).toEqual({});
   });
+
+  it('returns empty metadata without logging when the tag simply does not exist', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
+
+    const metadata = await buildTagMetadata('missing');
+
+    expect(metadata).toEqual({});
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
 });

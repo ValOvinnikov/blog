@@ -56,9 +56,11 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
   const result = await service.pages.post.v1.getPost(slug);
 
   if (!result.ok) {
-    // ok: false covers both a real fetch failure and an ordinary missing
-    // slug — no public way to tell them apart, so this always logs error.
     logger.error('blog_post_page.fetch_failed', { slug, error: result.error });
+    notFound();
+  }
+
+  if (!result.data) {
     notFound();
   }
 

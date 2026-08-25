@@ -18,4 +18,8 @@ describe('topicIndexPageQuery', () => {
 
     expect(() => topicIndexPageQuery.parse(raw)).not.toThrow();
   });
+
+  it('parses null as no matching page_topicIndex document, rather than throwing', () => {
+    expect(topicIndexPageQuery.parse(null)).toBeNull();
+  });
 });

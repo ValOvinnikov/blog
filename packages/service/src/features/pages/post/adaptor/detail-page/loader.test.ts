@@ -1,4 +1,3 @@
-import { MissingPagePostError } from '@blog/service/features/pages/post/adaptor/missing-page-post-error';
 import { getRelatedPosts } from '@blog/service/features/pages/post/adaptor/related/loader';
 import { toPostCard } from '@blog/service/shared/transformers/to-post-card';
 import { makeRawSiteSettings } from '@blog/service/testing/global/fixtures';
@@ -30,10 +29,12 @@ vi.mock('@blog/service/features/pages/post/adaptor/related/loader', () => ({
 const mockGetRelatedPosts = vi.mocked(getRelatedPosts);
 
 describe('getPost', () => {
-  it('throws MissingPagePostError when no page_post matches the slug', async () => {
+  it('resolves undefined, rather than rejecting, when no page_post matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    await expect(getPost('missing-slug')).rejects.toThrow(MissingPagePostError);
+    const result = await getPost('missing-slug');
+
+    expect(result).toBeUndefined();
   });
 
   it('maps the raw post into a domain detail object', async () => {
@@ -46,6 +47,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('test-post');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.id).toBe('post-abc');
     expect(result.title).toBe('Test Post');
@@ -66,6 +68,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('page-post-slug');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.slug).toBe('page-post-slug');
     expect(result.publishedAt).toBe('2026-02-01T00:00:00Z');
@@ -91,6 +94,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.author).toEqual({
       id: 'author-9',
@@ -144,6 +148,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.heroImageUrl).toBeUndefined();
     expect(result.heroImageAlt).toBeUndefined();
@@ -194,6 +199,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.seo.title).toBe('Authored Title');
     expect(result.seo.description).toBe('Authored description');
@@ -214,6 +220,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.seo.title).toBe('Fallback Post');
     expect(result.seo.description).toBe('Fallback excerpt');
@@ -235,6 +242,7 @@ describe('getPost', () => {
       );
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.seo.ogImageUrl).toBeUndefined();
   });
@@ -251,6 +259,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.tags).toEqual([
       { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
@@ -267,6 +276,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.newsletterEnabled).toBe(false);
   });
@@ -281,6 +291,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.newsletterEnabled).toBe(true);
   });
@@ -293,6 +304,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.tags).toEqual([]);
   });
@@ -305,6 +317,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.readingTimeMinutes).toBe(3);
   });
@@ -317,6 +330,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.readingTimeMinutes).toBe(1);
   });
@@ -332,6 +346,7 @@ describe('getPost', () => {
     ]);
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.relatedPosts.map((post) => post.id)).toEqual(['related-1']);
   });
@@ -379,6 +394,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.skim).toEqual({
       takeaways: ['One', 'Two', 'Three'],
@@ -395,6 +411,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.skim).toBeUndefined();
   });
@@ -415,6 +432,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.skim).toBeUndefined();
   });
@@ -431,6 +449,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.hasAsides).toBe(true);
   });
@@ -443,6 +462,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.hasAsides).toBe(false);
   });
@@ -470,6 +490,7 @@ describe('getPost', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getPost('hello-world');
+    if (!result) throw new Error('expected a post detail');
 
     expect(result.body[0]).toMatchObject({
       _type: 'bodyImage',

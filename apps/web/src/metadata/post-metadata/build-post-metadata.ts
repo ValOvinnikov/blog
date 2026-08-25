@@ -17,6 +17,10 @@ export const buildPostMetadata = async (slug: string): Promise<Metadata> => {
     return {};
   }
 
+  if (!result.data) {
+    return {};
+  }
+
   const { seo, publishedAt, author } = result.data;
 
   return toMetadata(seo, {

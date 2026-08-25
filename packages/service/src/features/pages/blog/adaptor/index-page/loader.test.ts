@@ -25,6 +25,7 @@ describe('getIndexPage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getIndexPage();
+    if (!result) throw new Error('expected a blog index page');
 
     expect(result.postListId).toBe('post-list-1');
   });
@@ -45,6 +46,7 @@ describe('getIndexPage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getIndexPage();
+    if (!result) throw new Error('expected a blog index page');
 
     expect(result.heading).toBe('Latest posts');
     expect(result.supportingText).toBe('Fresh from the team.');
@@ -67,6 +69,7 @@ describe('getIndexPage', () => {
       );
 
     const result = await getIndexPage();
+    if (!result) throw new Error('expected a blog index page');
 
     expect(result.seo).toEqual({
       title: 'The Blog',
@@ -87,6 +90,7 @@ describe('getIndexPage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getIndexPage();
+    if (!result) throw new Error('expected a blog index page');
 
     expect(result.modules).toEqual([
       { id: 'newsletter-1', type: 'module_newsletter' },
@@ -99,6 +103,7 @@ describe('getIndexPage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getIndexPage();
+    if (!result) throw new Error('expected a blog index page');
 
     expect(result.modules).toEqual([]);
   });
@@ -131,5 +136,15 @@ describe('getIndexPage', () => {
 
     await expect(getIndexPage()).rejects.toThrow(MissingPostListError);
     expect(mockRun).toHaveBeenCalledTimes(2);
+  });
+
+  it('resolves undefined, rather than rejecting, when no page_blog document exists', async () => {
+    mockRun
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getIndexPage();
+
+    expect(result).toBeUndefined();
   });
 });

@@ -57,16 +57,14 @@ const basePost: TPostDetail = {
 };
 
 describe('buildPostMetadata', () => {
-  it('returns empty metadata when no page_post matches the slug', async () => {
+  it('returns empty metadata without logging when no page_post matches the slug', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostMock.mockResolvedValue({
-      ok: false,
-      error: new Error('No page_post found for slug "missing"'),
-    });
+    getPostMock.mockResolvedValue({ ok: true, data: undefined });
 
     const metadata = await buildPostMetadata('missing');
 
     expect(metadata).toEqual({});
+    expect(errorSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();
   });
 

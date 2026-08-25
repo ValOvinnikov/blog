@@ -25,6 +25,7 @@ describe('getTopicPage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getTopicPage('engineering');
+    if (!result) throw new Error('expected a topic page');
 
     expect(result.postListId).toBe('post-list-1');
   });
@@ -44,6 +45,7 @@ describe('getTopicPage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getTopicPage('engineering');
+    if (!result) throw new Error('expected a topic page');
 
     expect(result.topic).toEqual({
       id: 'topic-1',
@@ -72,6 +74,7 @@ describe('getTopicPage', () => {
       );
 
     const result = await getTopicPage('engineering');
+    if (!result) throw new Error('expected a topic page');
 
     expect(result.seo).toEqual({
       title: 'Engineering',
@@ -100,6 +103,7 @@ describe('getTopicPage', () => {
       );
 
     const result = await getTopicPage('engineering');
+    if (!result) throw new Error('expected a topic page');
 
     expect(result.seo.description).toBe('Notes on building things.');
   });
@@ -135,5 +139,15 @@ describe('getTopicPage', () => {
       MissingPostListError,
     );
     expect(mockRun).toHaveBeenCalledTimes(2);
+  });
+
+  it('resolves undefined, rather than rejecting, when no page_topic matches the slug', async () => {
+    mockRun
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getTopicPage('nonexistent');
+
+    expect(result).toBeUndefined();
   });
 });

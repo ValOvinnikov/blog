@@ -25,6 +25,7 @@ describe('getTagPage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getTagPage('typescript');
+    if (!result) throw new Error('expected a tag page');
 
     expect(result.postListId).toBe('post-list-1');
   });
@@ -44,6 +45,7 @@ describe('getTagPage', () => {
       .mockResolvedValueOnce(makeRawSiteSettings());
 
     const result = await getTagPage('typescript');
+    if (!result) throw new Error('expected a tag page');
 
     expect(result.tag).toEqual({
       id: 'tag-1',
@@ -72,6 +74,7 @@ describe('getTagPage', () => {
       );
 
     const result = await getTagPage('typescript');
+    if (!result) throw new Error('expected a tag page');
 
     expect(result.seo).toEqual({
       title: 'TypeScript',
@@ -100,6 +103,7 @@ describe('getTagPage', () => {
       );
 
     const result = await getTagPage('typescript');
+    if (!result) throw new Error('expected a tag page');
 
     expect(result.seo.description).toBe('Posts about TypeScript.');
   });
@@ -135,5 +139,15 @@ describe('getTagPage', () => {
       MissingPostListError,
     );
     expect(mockRun).toHaveBeenCalledTimes(2);
+  });
+
+  it('resolves undefined, rather than rejecting, when no page_tag matches the slug', async () => {
+    mockRun
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(makeRawSiteSettings());
+
+    const result = await getTagPage('nonexistent');
+
+    expect(result).toBeUndefined();
   });
 });
