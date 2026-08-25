@@ -9,6 +9,7 @@ const {
   getIndexPageParamsMock,
   getPageSlugsMock,
   getTopicIndexPageMock,
+  getTagIndexPageMock,
 } = vi.hoisted(() => ({
   getPostParamsMock: vi.fn(),
   getTopicParamsMock: vi.fn(),
@@ -18,6 +19,7 @@ const {
   getIndexPageParamsMock: vi.fn(),
   getPageSlugsMock: vi.fn(),
   getTopicIndexPageMock: vi.fn(),
+  getTagIndexPageMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -39,6 +41,7 @@ vi.mock('@blog/service', () => ({
       blog: { v1: { getIndexPageParams: getIndexPageParamsMock } },
       generic: { v1: { getPageSlugs: getPageSlugsMock } },
       topicIndex: { v1: { getIndexPage: getTopicIndexPageMock } },
+      tagIndex: { v1: { getIndexPage: getTagIndexPageMock } },
     },
   },
 }));
@@ -57,6 +60,7 @@ const mockAllEmpty = () => {
   getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
   getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
   getTopicIndexPageMock.mockResolvedValue({ ok: true, data: {} });
+  getTagIndexPageMock.mockResolvedValue({ ok: true, data: {} });
 };
 
 describe('sitemap', () => {
@@ -70,6 +74,7 @@ describe('sitemap', () => {
     getIndexPageParamsMock.mockReset();
     getPageSlugsMock.mockReset();
     getTopicIndexPageMock.mockReset();
+    getTagIndexPageMock.mockReset();
   });
 
   it('includes home, blog index, topics hub, post, topic, tag, blog page and generic page entries', async () => {
@@ -243,6 +248,33 @@ describe('sitemap', () => {
     const urls = entries.map((entry) => entry.url);
 
     expect(urls).not.toContain('https://example.com/topics');
+    expect(urls).toContain('https://example.com/');
+  });
+
+  it('omits the /tags entry when the tag index page fetch resolves to a failure result', async () => {
+    mockAllEmpty();
+    getTagIndexPageMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+    const urls = entries.map((entry) => entry.url);
+
+    expect(urls).not.toContain('https://example.com/tags');
+    expect(urls).toContain('https://example.com/');
+  });
+
+  it('omits the /tags entry when the tag index page fetch resolves ok with no document', async () => {
+    mockAllEmpty();
+    getTagIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+    const urls = entries.map((entry) => entry.url);
+
+    expect(urls).not.toContain('https://example.com/tags');
     expect(urls).toContain('https://example.com/');
   });
 
