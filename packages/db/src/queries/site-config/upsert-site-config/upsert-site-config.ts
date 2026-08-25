@@ -17,8 +17,8 @@ import { toSiteConfigResult, type TSiteConfigResult } from '../get-site-config';
 const HUE_MIN = 0;
 const HUE_MAX = 360;
 
-// Caps sized to each field's role, not one flat limit for all 20 — a prompt
-// command reads nothing like a 404 description.
+// Caps sized to each field's role, not one flat limit for all of them — a
+// prompt command reads nothing like a 404 description.
 const SHORT_LABEL_MAX = 100;
 const TOAST_MESSAGE_MAX = 150;
 const LONG_COPY_MAX = 300;
