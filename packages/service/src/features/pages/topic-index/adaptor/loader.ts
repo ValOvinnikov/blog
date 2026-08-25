@@ -12,16 +12,15 @@ export async function getIndexPage(): Promise<
 > {
   // `topicIndexPageQuery` derefs `taxonomyList` — that tag must ride
   // alongside `page_topicIndex` (tag-scope contract, `sanity/query.ts`).
-  const [rawPage, settings] = await Promise.all([
-    runQuery(
-      topicIndexPageQuery,
-      isr(['page_topicIndex', 'modules:taxonomyList']),
-    ),
-    getSiteSettings(),
-  ]);
+  const rawPage = await runQuery(
+    topicIndexPageQuery,
+    isr(['page_topicIndex', 'modules:taxonomyList']),
+  );
   if (!rawPage) return undefined;
   if (!rawPage.taxonomyList) {
     throw new MissingTaxonomyListError();
   }
+
+  const settings = await getSiteSettings();
   return toTopicIndexPage(rawPage, settings, rawPage.taxonomyList._id);
 }
