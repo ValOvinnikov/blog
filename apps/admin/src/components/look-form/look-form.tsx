@@ -1,45 +1,37 @@
 'use client';
 
-import { BrandAssetField } from '@admin/components/brand-asset-field';
-import { FontPicker } from '@admin/components/font-picker';
-import { HueSlider } from '@admin/components/hue-slider';
-import { LogoHueField } from '@admin/components/logo-hue-field';
 import { LookPreview } from '@admin/components/look-preview';
-import { PresetPicker } from '@admin/components/preset-picker';
 import { updateLookAction } from '@admin/server/site-config/update-look-action';
 import type { TLookFormValues } from '@admin/utils/default-look-values/default-look-values';
 import {
-  accentHueGradient,
-  buildAccentPreviewTokens,
-} from '@admin/utils/theme-preview-tokens/theme-preview-tokens';
-import { Switch } from '@base-ui/react/switch';
-import {
   ALERT_TYPE,
-  DENSITY,
   ICONS,
   PRESET_REGISTRY,
-  RADIUS_SCALE,
   Size,
-  type TDensity,
   type TPresetId,
-  type TRadiusScale,
 } from '@blog/config';
 import { Alert } from '@blog/ui/atoms/alert';
 import { Button } from '@blog/ui/atoms/button';
 import { Heading } from '@blog/ui/atoms/heading';
 import { Icon } from '@blog/ui/atoms/icon';
-import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
 import { Text } from '@blog/ui/atoms/text';
-import { SettingRow } from '@blog/ui/molecules/setting-row';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 
+import { LookFormAdvancedSection } from './look-form-advanced-section';
+import { LookFormBasicSection } from './look-form-basic-section';
+import { LookFormImagesSection } from './look-form-images-section';
 import { lookFormVariants } from './look-form-variants';
 
 export type TLookFormProps = {
   tenantSlug: string;
   initialValues: TLookFormValues;
 };
+
+export type TLookFormFieldSetter = <K extends keyof TLookFormValues>(
+  key: K,
+  value: TLookFormValues[K],
+) => void;
 
 /**
  * Applying a preset (via the picker or "Reset to preset") re-seeds every
@@ -98,10 +90,7 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
 
   const isDirty = !valuesEqual(values, savedValues);
 
-  const updateField = <K extends keyof TLookFormValues>(
-    key: K,
-    value: TLookFormValues[K],
-  ) => {
+  const updateField: TLookFormFieldSetter = (key, value) => {
     setValues((prev) => ({ ...prev, [key]: value }));
     if (key === 'logoAssetUrl' || key === 'faviconAssetUrl') {
       setSavedValues((prev) => ({ ...prev, [key]: value }));
@@ -137,23 +126,6 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
 
   const t = useTranslations('lookForm');
 
-  const radiusOptions = Object.values(RADIUS_SCALE).map((scale) => ({
-    value: scale,
-    label: t(`radiusScaleOptionLabel.${scale}`),
-  }));
-
-  const densityOptions = Object.values(DENSITY).map((density) => ({
-    value: density,
-    label: t(`densityOptionLabel.${density}`),
-  }));
-
-  const accentHueLabel = t('accentHueLabel');
-  const headingFontLabel = t('headingFontLabel');
-  const bodyFontLabel = t('bodyFontLabel');
-  const radiusScaleLabel = t('radiusScaleLabel');
-  const densityLabel = t('densityLabel');
-  const terminalChromeLabel = t('terminalChromeLabel');
-
   const {
     root,
     pageHead,
@@ -169,19 +141,8 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
     summary,
     summaryIcon,
     disclosureBody,
-    hueField,
-    swatch,
-    hueValue,
-    switchRow,
-    switchTrack,
-    switchThumb,
     note,
-    uploads,
   } = lookFormVariants();
-
-  const swatchColor = buildAccentPreviewTokens(values.accentHue, false)[
-    '--brand-primary'
-  ];
 
   return (
     <div className={root()}>
@@ -228,73 +189,19 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
               <span className={cardHeadDesc()}>{t('basicDescription')}</span>
             </header>
             <div className={cardBody()}>
-              <SettingRow
-                label={t('presetLabel')}
-                description={t('presetDescription')}
-              >
-                <PresetPicker
-                  value={values.preset}
-                  onChange={handlePresetChange}
-                />
-              </SettingRow>
-
-              <SettingRow
-                label={accentHueLabel}
-                description={t('accentHueDescription')}
-                canControlGrow={true}
-              >
-                <div className={hueField()}>
-                  <span
-                    className={swatch()}
-                    aria-hidden="true"
-                    style={{ background: swatchColor }}
-                  />
-                  <HueSlider
-                    ariaLabel={accentHueLabel}
-                    value={values.accentHue}
-                    onChange={(value) => updateField('accentHue', value)}
-                    trackStyle={{ background: accentHueGradient() }}
-                  />
-                  <span className={hueValue()}>{values.accentHue}°</span>
-                </div>
-              </SettingRow>
-
-              <SettingRow
-                label={t('logoHueLabel')}
-                description={t('logoHueDescription')}
-                canControlGrow={true}
-              >
-                <LogoHueField
-                  accentHue={values.accentHue}
-                  logoHue={values.logoHue}
-                  onChange={(logoHue) => updateField('logoHue', logoHue)}
-                  isDark={false}
-                />
-              </SettingRow>
-
-              <SettingRow
-                label={t('brandImagesLabel')}
-                description={t('brandImagesDescription')}
-              >
-                <div className={uploads()}>
-                  <BrandAssetField
-                    tenantSlug={tenantSlug}
-                    kind="logo"
-                    label={t('logoFieldLabel')}
-                    hint={t('logoFieldHint')}
-                    currentUrl={values.logoAssetUrl}
-                    onChange={(url) => updateField('logoAssetUrl', url)}
-                  />
-                  <BrandAssetField
-                    tenantSlug={tenantSlug}
-                    kind="favicon"
-                    label={t('faviconFieldLabel')}
-                    hint={t('faviconFieldHint')}
-                    currentUrl={values.faviconAssetUrl}
-                    onChange={(url) => updateField('faviconAssetUrl', url)}
-                  />
-                </div>
-              </SettingRow>
+              <LookFormBasicSection
+                preset={values.preset}
+                onPresetChange={handlePresetChange}
+                accentHue={values.accentHue}
+                logoHue={values.logoHue}
+                onFieldChange={updateField}
+              />
+              <LookFormImagesSection
+                tenantSlug={tenantSlug}
+                logoAssetUrl={values.logoAssetUrl}
+                faviconAssetUrl={values.faviconAssetUrl}
+                onFieldChange={updateField}
+              />
             </div>
           </section>
 
@@ -308,69 +215,14 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
               {t('advancedSummary')}
             </summary>
             <div className={disclosureBody()}>
-              <SettingRow
-                label={terminalChromeLabel}
-                description={t('terminalChromeDescription')}
-              >
-                <div className={switchRow()}>
-                  <Switch.Root
-                    checked={values.chromeOn}
-                    onCheckedChange={(checked) =>
-                      updateField('chromeOn', checked)
-                    }
-                    aria-label={terminalChromeLabel}
-                    className={switchTrack()}
-                  >
-                    <Switch.Thumb className={switchThumb()} />
-                  </Switch.Root>
-                  <span>
-                    {values.chromeOn ? t('switchOn') : t('switchOff')}
-                  </span>
-                </div>
-              </SettingRow>
-
-              <SettingRow
-                label={headingFontLabel}
-                description={t('headingFontDescription')}
-              >
-                <FontPicker
-                  ariaLabel={headingFontLabel}
-                  value={values.headingFont}
-                  onChange={(font) => updateField('headingFont', font)}
-                />
-              </SettingRow>
-
-              <SettingRow label={bodyFontLabel}>
-                <FontPicker
-                  ariaLabel={bodyFontLabel}
-                  value={values.bodyFont}
-                  onChange={(font) => updateField('bodyFont', font)}
-                />
-              </SettingRow>
-
-              <SettingRow
-                label={radiusScaleLabel}
-                description={t('radiusScaleDescription')}
-              >
-                <SegmentedControl<TRadiusScale>
-                  ariaLabel={radiusScaleLabel}
-                  options={radiusOptions}
-                  value={values.radiusScale}
-                  onChange={(scale) => updateField('radiusScale', scale)}
-                />
-              </SettingRow>
-
-              <SettingRow
-                label={densityLabel}
-                description={t('densityDescription')}
-              >
-                <SegmentedControl<TDensity>
-                  ariaLabel={densityLabel}
-                  options={densityOptions}
-                  value={values.density}
-                  onChange={(density) => updateField('density', density)}
-                />
-              </SettingRow>
+              <LookFormAdvancedSection
+                isChromeOn={values.chromeOn}
+                headingFont={values.headingFont}
+                bodyFont={values.bodyFont}
+                radiusScale={values.radiusScale}
+                density={values.density}
+                onFieldChange={updateField}
+              />
             </div>
           </details>
 
