@@ -4,7 +4,7 @@ import { adminRoutes } from '@admin/utils/routes/routes';
 import {
   tenantPlanTone,
   tenantStatusTone,
-} from '@admin/utils/tenant-badges/tenant-badges';
+} from '@admin/utils/status-tone/status-tone';
 import { Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { StatusBadge } from '@blog/ui/atoms/status-badge';
