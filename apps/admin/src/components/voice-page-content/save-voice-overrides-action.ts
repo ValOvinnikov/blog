@@ -10,7 +10,7 @@ import { queries } from '@blog/db';
 export type TSaveVoiceOverridesResult = { ok: true } | { ok: false };
 
 /**
- * Persists the Voice tab's 20 curated overrides for the routed tenant.
+ * Persists the Voice tab's 19 curated overrides for the routed tenant.
  * Re-derives the tenant and re-checks membership from the session itself
  * via `requireTenantMembership` — never trusts a client-supplied tenant id.
  * Shared by both `/t/[tenantSlug]/voice` and the slug-free `/dashboard/voice`

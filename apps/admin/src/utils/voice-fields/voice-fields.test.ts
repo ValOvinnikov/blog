@@ -10,9 +10,9 @@ describe('VOICE_FIELD_GROUPS', () => {
     ]);
   });
 
-  it('groups fields per the corrections brief field counts (5/7/2/6)', () => {
+  it('groups fields per the corrections brief field counts (5/7/2/5)', () => {
     expect(VOICE_FIELD_GROUPS.map((group) => group.fields.length)).toEqual([
-      5, 7, 2, 6,
+      5, 7, 2, 5,
     ]);
   });
 
@@ -35,7 +35,6 @@ describe('VOICE_FIELD_GROUPS', () => {
       'blogListEmpty',
       'topicEmpty',
       'tagEmpty',
-      'authorEmpty',
       'topicsEmpty',
       'bookmarksEmpty',
     ]);

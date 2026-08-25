@@ -51,7 +51,6 @@ const overrides = {
   blogListEmpty: '',
   topicEmpty: '',
   tagEmpty: '',
-  authorEmpty: '',
   topicsEmpty: '',
   bookmarksEmpty: '',
 };

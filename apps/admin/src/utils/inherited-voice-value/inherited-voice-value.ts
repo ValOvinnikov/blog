@@ -4,10 +4,10 @@ import type { TVoicePack } from '@blog/config/constants';
 /**
  * Resolves the text a curated voice field falls back to when its override is
  * blank — the placeholder shown in its input. `TVoicePack`'s shape predates
- * the 20-key curated field set (it's nested by feature area, e.g.
+ * the 19-key curated field set (it's nested by feature area, e.g.
  * `notFound.commandNotFound`, not flat); this maps each curated key to its
- * pack path. The 6 empty-state keys (`blogListEmpty`, `topicEmpty`,
- * `tagEmpty`, `authorEmpty`, `topicsEmpty`, `bookmarksEmpty`) have no `case`
+ * pack path. The 5 empty-state keys (`blogListEmpty`, `topicEmpty`,
+ * `tagEmpty`, `topicsEmpty`, `bookmarksEmpty`) have no `case`
  * here because `TVoicePack` has no corresponding field for them at all —
  * their input renders with no placeholder, which is accurate (there is
  * genuinely nothing to inherit), not a bug in this mapping.
