@@ -69,17 +69,4 @@ describe(VoiceField, () => {
 
     expect(onChange).toHaveBeenLastCalledWith('');
   });
-
-  it('shows the storage key next to the label', () => {
-    render(
-      <VoiceField
-        fieldKey="terminalPromptHost"
-        label="Terminal Prompt Host"
-        value=""
-        onChange={vi.fn()}
-      />,
-    );
-
-    expect(screen.getByText('terminalPromptHost')).toBeVisible();
-  });
 });

@@ -4,6 +4,9 @@ import type {
   TVoiceOverrideKey,
   TVoiceOverrides,
 } from '@admin/utils/voice-fields/voice-fields';
+import { Size } from '@blog/config';
+import { Heading } from '@blog/ui/atoms/heading';
+import { SettingRow } from '@blog/ui/molecules/setting-row';
 import { useTranslations } from 'next-intl';
 
 import { voiceFieldGroupVariants } from './voice-field-group-variants';
@@ -19,7 +22,9 @@ export type TVoiceFieldGroupProps = {
 
 /**
  * One curated-voice card: a group heading (matching the CMS schema's
- * fieldset titles) over its member fields.
+ * fieldset titles) over its member fields, each rendered as a `SettingRow`
+ * to match the label + description + control scaffold `look-form` and
+ * `features-settings` already use.
  */
 export const VoiceFieldGroup = ({
   title,
@@ -30,36 +35,43 @@ export const VoiceFieldGroup = ({
   isDisabled = false,
 }: TVoiceFieldGroupProps) => {
   const t = useTranslations('voiceFieldGroup');
-  const {
-    root,
-    header,
-    title: titleSlot,
-    count,
-    body,
-  } = voiceFieldGroupVariants();
+  const { root, header, headerDescription, body, fieldKey } =
+    voiceFieldGroupVariants();
 
   return (
-    <div className={root()}>
-      <div className={header()}>
-        <h3 className={titleSlot()}>{title}</h3>
-        <span className={count()}>
+    <section className={root()}>
+      <header className={header()}>
+        <Heading level={3} size={Size.XS}>
+          {title}
+        </Heading>
+        <span className={headerDescription()}>
           {t('fieldCount', { count: fields.length })}
         </span>
-      </div>
+      </header>
       <div className={body()}>
         {fields.map((field) => (
-          <VoiceField
+          <SettingRow
             key={field.key}
-            fieldKey={field.key}
-            label={field.label}
-            value={values[field.key]}
-            onChange={(value) => onFieldChange(field.key, value)}
-            placeholder={placeholders[field.key]}
-            isMultiline={field.multiline}
-            isDisabled={isDisabled}
-          />
+            label={
+              <>
+                {field.label}
+                <code className={fieldKey()}>{field.key}</code>
+              </>
+            }
+            canControlGrow={true}
+          >
+            <VoiceField
+              fieldKey={field.key}
+              label={field.label}
+              value={values[field.key]}
+              onChange={(value) => onFieldChange(field.key, value)}
+              placeholder={placeholders[field.key]}
+              isMultiline={field.multiline}
+              isDisabled={isDisabled}
+            />
+          </SettingRow>
         ))}
       </div>
-    </div>
+    </section>
   );
 };

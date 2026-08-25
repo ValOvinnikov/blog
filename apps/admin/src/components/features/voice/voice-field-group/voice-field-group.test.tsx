@@ -37,6 +37,23 @@ describe(VoiceFieldGroup, () => {
     ).toBeVisible();
   });
 
+  it('shows each field storage key next to its label', () => {
+    render(
+      <VoiceFieldGroup
+        title="Terminal prompts"
+        fields={fields}
+        values={
+          { terminalPromptHost: '', authPromptCommandSignIn: '' } as never
+        }
+        placeholders={{}}
+        onFieldChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('terminalPromptHost')).toBeVisible();
+    expect(screen.getByText('authPromptCommandSignIn')).toBeVisible();
+  });
+
   it('forwards a field change with its own key', async () => {
     const user = userEvent.setup();
     const onFieldChange = vi.fn();

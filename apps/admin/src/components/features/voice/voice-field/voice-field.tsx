@@ -2,8 +2,6 @@ import type { TVoiceOverrideKey } from '@admin/utils/voice-fields/voice-fields';
 import { TextInput } from '@blog/ui/atoms/text-input';
 import { Textarea } from '@blog/ui/atoms/textarea';
 
-import { voiceFieldVariants } from './voice-field-variants';
-
 export type TVoiceFieldProps = {
   fieldKey: TVoiceOverrideKey;
   label: string;
@@ -16,11 +14,12 @@ export type TVoiceFieldProps = {
 };
 
 /**
- * One curated voice-override row: a visible label + its storage key, and a
- * controlled text field whose placeholder is the inherited preset value.
- * Clearing the field back to empty is handled entirely by the caller (it
- * just means `value` becomes `''`) — the save path is what turns an empty
- * string into "no override stored," not this component.
+ * One curated voice-override control: a controlled text field whose
+ * placeholder is the inherited preset value. Clearing the field back to
+ * empty is handled entirely by the caller (it just means `value` becomes
+ * `''`) — the save path is what turns an empty string into "no override
+ * stored," not this component. The visible label lives in the enclosing
+ * `SettingRow`; `label` here only supplies the input's accessible name.
  */
 export const VoiceField = ({
   fieldKey,
@@ -31,45 +30,30 @@ export const VoiceField = ({
   isMultiline = false,
   isDisabled = false,
 }: TVoiceFieldProps) => {
-  const {
-    root,
-    labelRow,
-    label: labelSlot,
-    keyBadge,
-    control,
-  } = voiceFieldVariants();
   const inputId = `voice-field-${fieldKey}`;
 
+  if (isMultiline) {
+    return (
+      <Textarea
+        id={inputId}
+        ariaLabel={label}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        isDisabled={isDisabled}
+        rows={3}
+      />
+    );
+  }
+
   return (
-    <div className={root()}>
-      <div className={labelRow()}>
-        <label htmlFor={inputId} className={labelSlot()}>
-          {label}
-        </label>
-        <code className={keyBadge()}>{fieldKey}</code>
-      </div>
-      {isMultiline ? (
-        <Textarea
-          id={inputId}
-          ariaLabel={label}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          isDisabled={isDisabled}
-          rows={3}
-          className={control()}
-        />
-      ) : (
-        <TextInput
-          id={inputId}
-          ariaLabel={label}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          isDisabled={isDisabled}
-          className={control()}
-        />
-      )}
-    </div>
+    <TextInput
+      id={inputId}
+      ariaLabel={label}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      isDisabled={isDisabled}
+    />
   );
 };
