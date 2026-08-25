@@ -50,23 +50,11 @@ beforeEach(() => {
 });
 
 describe(clearTenantArtifacts, () => {
-  it('clears the persisted provisioning columns, not keeping sanityProjectId, by default', async () => {
+  it('clears the persisted provisioning columns for the tenant', async () => {
     await clearTenantArtifacts(baseTenant(), env);
 
     expect(clearTenantProvisioningArtifactsMock).toHaveBeenCalledWith(
       'tenant-1',
-      false,
-    );
-  });
-
-  it('tells the query to keep sanityProjectId when the context says deletion was blocked', async () => {
-    await clearTenantArtifacts(baseTenant(), env, {
-      keepSanityProjectId: true,
-    });
-
-    expect(clearTenantProvisioningArtifactsMock).toHaveBeenCalledWith(
-      'tenant-1',
-      true,
     );
   });
 

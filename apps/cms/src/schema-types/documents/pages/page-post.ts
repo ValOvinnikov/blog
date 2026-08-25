@@ -1,12 +1,12 @@
 import { createSlugUrlPreviewInput } from '@cms/schema-types/components/slug-url-preview-input';
 import { postSchema } from '@cms/schema-types/documents/blog/post';
 import { PAGE_POST_TYPE } from '@cms/schema-types/documents/pages/page-post-type';
+import { getDraftsClient } from '@cms/schema-types/helpers/get-drafts-client';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { seoSchema } from '@cms/schema-types/objects/seo';
 import { Newspaper } from 'lucide-react';
 import { defineField, defineType, type ValidationContext } from 'sanity';
 
-const POST_UNIQUENESS_API_VERSION = '2024-01-01';
 const postSlugUrlPreviewInput = createSlugUrlPreviewInput('/blog/');
 
 type TPostReferenceValue = { _ref?: string } | undefined;
@@ -26,9 +26,7 @@ const validateUniquePostReference = async (
 
   if (!publishedId) return true;
 
-  const client = context
-    .getClient({ apiVersion: POST_UNIQUENESS_API_VERSION })
-    .withConfig({ perspective: 'drafts' });
+  const client = getDraftsClient(context);
 
   const conflictingCount = await client.fetch<number>(
     `count(*[_type == $type && post._ref == $postId && !(_id in [$publishedId, "drafts." + $publishedId])])`,

@@ -1,8 +1,9 @@
 import messages from '@admin/i18n/messages/en.json';
 import { renderWithIntl, screen, waitFor } from '@admin/testing/custom-render';
 import { makeTenant } from '@admin/testing/tenants/fixtures';
+import type { TTenantFieldLocks } from '@admin/utils/tenant-field-locks/tenant-field-locks';
 import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db';
+import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db';
 import { render as rtlRender } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRouter } from 'next/navigation';
@@ -15,6 +16,19 @@ import {
 } from './tenant-details-panel';
 
 const render = renderWithIntl;
+
+const NO_LOCKS: TTenantFieldLocks = {};
+const ALL_LOCKED_RUNNING: TTenantFieldLocks = {
+  name: { kind: 'running' },
+  slug: { kind: 'running' },
+  primaryDomain: { kind: 'running' },
+  plan: { kind: 'running' },
+  locale: { kind: 'running' },
+  ownerEmail: { kind: 'running' },
+};
+const SLUG_LOCKED: TTenantFieldLocks = {
+  slug: { kind: 'step', step: TENANT_PROVISIONING_STEP.DEPLOY_STUDIO },
+};
 
 // Applies the same wrapper on mount and on every `rerender()` call, so the
 // live region's node identity is preserved across rerenders.
@@ -62,75 +76,7 @@ describe(TenantDetailsPanel, () => {
     });
   });
 
-  describe('locked (isEditable=false)', () => {
-    const getLockedValue = (labelText: string) => {
-      const term = screen.getByText(labelText);
-      expect(term.tagName).toBe('DT');
-      const value = term.nextElementSibling;
-      expect(value?.tagName).toBe('DD');
-      return value as HTMLElement;
-    };
-
-    it('renders every field, including plan and owner email, as selectable text carrying its label — not a disabled input', () => {
-      const tenant = makeTenant({
-        name: 'Acme Inc.',
-        slug: 'acme',
-        primaryDomain: 'acme.example.com',
-        plan: TENANT_PLAN.GROWTH,
-        locale: 'EN',
-      });
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          isEditable={false}
-          ownerEmail="owner@example.com"
-        />,
-      );
-
-      expect(screen.getByText('Tenant details')).toBeVisible();
-
-      // No disabled inputs remain in the accessibility tree at all — a
-      // regression to disabled TextInputs would still surface here, since
-      // getByRole finds disabled controls unless they're aria-hidden.
-      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
-
-      const nameValue = getLockedValue('Name');
-      expect(nameValue).toHaveTextContent('Acme Inc.');
-      expect(nameValue.closest('dl')).toBeInTheDocument();
-
-      expect(getLockedValue('Slug')).toHaveTextContent('acme');
-      expect(getLockedValue('Primary domain')).toHaveTextContent(
-        'acme.example.com',
-      );
-      expect(getLockedValue('Locale')).toHaveTextContent('EN');
-      expect(getLockedValue('Owner email')).toHaveTextContent(
-        'owner@example.com',
-      );
-
-      // The human-readable plan label, not the raw TENANT_PLAN constant.
-      const planValue = getLockedValue('Plan');
-      expect(planValue).toHaveTextContent('Growth');
-      expect(planValue).not.toHaveTextContent('GROWTH');
-    });
-
-    it('renders no enabled editing affordances — no Save button, no editable plan control', () => {
-      const tenant = makeTenant();
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          isEditable={false}
-          ownerEmail="owner@example.com"
-        />,
-      );
-
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
-      expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
-      expect(screen.queryByRole('radio')).not.toBeInTheDocument();
-      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('editable (isEditable=true)', () => {
+  describe('every field unlocked (fieldLocks={})', () => {
     it('renders every field, including owner email, as an editable, enabled control, pre-filled from props — and starts with Save disabled', () => {
       const tenant = makeTenant({
         name: 'Acme Inc.',
@@ -142,7 +88,7 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -152,6 +98,7 @@ describe(TenantDetailsPanel, () => {
       expect(nameInput).not.toBeDisabled();
 
       expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('acme');
+      expect(screen.getByRole('textbox', { name: 'Slug' })).not.toBeDisabled();
       expect(
         screen.getByRole('textbox', { name: 'Primary domain' }),
       ).toHaveValue('acme.example.com');
@@ -179,7 +126,7 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -209,7 +156,7 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -243,7 +190,7 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -273,7 +220,7 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -301,7 +248,7 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -336,7 +283,7 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -366,7 +313,7 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -391,7 +338,7 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -418,7 +365,7 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -452,7 +399,7 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -475,13 +422,281 @@ describe(TenantDetailsPanel, () => {
     });
   });
 
+  describe('per-field locking', () => {
+    it('renders a field whose consuming step already completed as disabled, stating why', () => {
+      const tenant = makeTenant({ slug: 'acme' });
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={SLUG_LOCKED}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      const slugInput = screen.getByRole('textbox', { name: 'Slug' });
+      expect(slugInput).toHaveValue('acme');
+      expect(slugInput).toBeDisabled();
+      expect(slugInput).toHaveAccessibleDescription(
+        'Locked — the "Deploy the content editor" step has already completed and used this value.',
+      );
+    });
+
+    it('renders every other field, including the one that actually caused the failure, as editable', () => {
+      // Mirrors the real 409 case: MAP_DOMAIN itself failed, so
+      // primaryDomain — the field that caused the failure — stays editable
+      // even though slug (an earlier, completed step) is locked.
+      const tenant = makeTenant({
+        name: 'Acme Inc.',
+        primaryDomain: 'acme.example.com',
+        plan: TENANT_PLAN.FREE,
+        locale: 'EN',
+      });
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={SLUG_LOCKED}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(screen.getByRole('textbox', { name: 'Name' })).not.toBeDisabled();
+      expect(
+        screen.getByRole('textbox', { name: 'Primary domain' }),
+      ).not.toBeDisabled();
+      expect(screen.getByRole('radio', { name: 'Free' })).not.toBeDisabled();
+      expect(
+        screen.getByRole('textbox', { name: 'Locale' }),
+      ).not.toBeDisabled();
+      expect(
+        screen.getByRole('textbox', { name: 'Owner email' }),
+      ).not.toBeDisabled();
+    });
+
+    it('lets the operator correct the unlocked field that caused the failure and save it', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: true,
+        tenant: makeTenant({
+          id: 'tenant-1',
+          primaryDomain: 'new-domain.example.com',
+        }),
+      });
+      const user = userEvent.setup();
+      const tenant = makeTenant({
+        id: 'tenant-1',
+        primaryDomain: 'taken-domain.example.com',
+      });
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={SLUG_LOCKED}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      await user.clear(screen.getByRole('textbox', { name: 'Primary domain' }));
+      await user.type(
+        screen.getByRole('textbox', { name: 'Primary domain' }),
+        'new-domain.example.com',
+      );
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() => {
+        expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
+          'tenant-1',
+          expect.objectContaining({
+            primaryDomain: 'new-domain.example.com',
+            // The locked field's original value is submitted unchanged.
+            slug: tenant.slug,
+          }),
+        );
+      });
+      await waitFor(() => expect(refreshMock).toHaveBeenCalled());
+    });
+
+    it('renders the plan control locked with a "provisioning succeeded" reason once every step is DONE', () => {
+      const tenant = makeTenant({ plan: TENANT_PLAN.GROWTH });
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={{ plan: { kind: 'succeeded' } }}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      const planGroup = screen.getByRole('radiogroup', { name: 'Plan' });
+      expect(planGroup).toHaveAttribute('aria-disabled', 'true');
+      expect(planGroup).toHaveAccessibleDescription(
+        'Locked — provisioning has already finished.',
+      );
+
+      const growthOption = screen.getByRole('radio', { name: 'Growth' });
+      expect(growthOption).toBeDisabled();
+      expect(growthOption).toHaveAttribute('aria-checked', 'true');
+    });
+
+    it('surfaces a mismatched server-side lock as a field error on the still-enabled input', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: false,
+        fieldErrors: {
+          primaryDomain:
+            'Locked — the "Connect the custom domain" step has already completed and used this value.',
+        },
+      });
+      const user = userEvent.setup();
+      const tenant = makeTenant({ id: 'tenant-1' });
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={NO_LOCKS}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      await user.clear(screen.getByRole('textbox', { name: 'Primary domain' }));
+      await user.type(
+        screen.getByRole('textbox', { name: 'Primary domain' }),
+        'new-domain.example.com',
+      );
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      const domainInput = await screen.findByRole('textbox', {
+        name: 'Primary domain',
+      });
+      expect(domainInput).toBeInvalid();
+      expect(domainInput).toHaveAccessibleDescription(
+        'Locked — the "Connect the custom domain" step has already completed and used this value.',
+      );
+      expect(refreshMock).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('every field locked (RUNNING/SUCCEEDED)', () => {
+    it('disables every control and disables Save, since nothing can become dirty', () => {
+      const tenant = makeTenant({
+        name: 'Acme Inc.',
+        slug: 'acme',
+        primaryDomain: 'acme.example.com',
+        plan: TENANT_PLAN.GROWTH,
+        locale: 'EN',
+      });
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={ALL_LOCKED_RUNNING}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
+      expect(screen.getByRole('textbox', { name: 'Slug' })).toBeDisabled();
+      expect(
+        screen.getByRole('textbox', { name: 'Primary domain' }),
+      ).toBeDisabled();
+      expect(screen.getByRole('textbox', { name: 'Locale' })).toBeDisabled();
+      expect(
+        screen.getByRole('textbox', { name: 'Owner email' }),
+      ).toBeDisabled();
+      expect(screen.getByRole('radio', { name: 'Growth' })).toBeDisabled();
+      expect(
+        screen.getByRole('button', { name: 'Save changes' }),
+      ).toBeDisabled();
+    });
+  });
+
+  describe('fields container', () => {
+    it('exposes a group role with an accessible name, so a forced-focus landing announces something', () => {
+      const tenant = makeTenant();
+      render(
+        <TenantDetailsPanel
+          tenant={tenant}
+          fieldLocks={NO_LOCKS}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      expect(
+        screen.getByRole('group', { name: 'Tenant detail fields' }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe('mid-edit lock transition', () => {
+    it('discards an unsaved edit and reverts to the server value when the field being edited newly locks', async () => {
+      const user = userEvent.setup();
+      const tenant = makeTenant({ slug: 'acme' });
+      const { rerender } = rtlRender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={NO_LOCKS}
+            ownerEmail="owner@example.com"
+          />,
+        ),
+      );
+
+      const slugInput = screen.getByRole('textbox', { name: 'Slug' });
+      await user.clear(slugInput);
+      await user.type(slugInput, 'acme-unsaved-edit');
+      expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue(
+        'acme-unsaved-edit',
+      );
+
+      // A background poll discovers DEPLOY_STUDIO has completed, locking
+      // slug — while the operator's unsaved edit above is still showing.
+      rerender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={SLUG_LOCKED}
+            ownerEmail="owner@example.com"
+          />,
+        ),
+      );
+
+      expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('acme');
+      expect(screen.getByRole('textbox', { name: 'Slug' })).toBeDisabled();
+    });
+
+    it('leaves an unrelated field’s unsaved edit alone when a different field newly locks', async () => {
+      const user = userEvent.setup();
+      const tenant = makeTenant({ name: 'Acme Inc.' });
+      const { rerender } = rtlRender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={NO_LOCKS}
+            ownerEmail="owner@example.com"
+          />,
+        ),
+      );
+
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      await user.clear(nameInput);
+      await user.type(nameInput, 'Acme Renamed (unsaved)');
+
+      rerender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={SLUG_LOCKED}
+            ownerEmail="owner@example.com"
+          />,
+        ),
+      );
+
+      expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
+        'Acme Renamed (unsaved)',
+      );
+    });
+  });
+
   describe('Save button dirty-state gating', () => {
     it('is disabled when the form is pristine', () => {
       const tenant = makeTenant();
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -497,7 +712,7 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -533,7 +748,7 @@ describe(TenantDetailsPanel, () => {
       render(
         <TenantDetailsPanel
           tenant={tenant}
-          isEditable={true}
+          fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
       );
@@ -567,7 +782,7 @@ describe(TenantDetailsPanel, () => {
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            isEditable={true}
+            fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />,
         ),
@@ -588,7 +803,7 @@ describe(TenantDetailsPanel, () => {
         withIntl(
           <TenantDetailsPanel
             tenant={makeTenant({ id: 'tenant-1', name: 'Acme Renamed' })}
-            isEditable={true}
+            fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />,
         ),
@@ -601,13 +816,13 @@ describe(TenantDetailsPanel, () => {
   });
 
   describe('lock transition announcement', () => {
-    it('announces the lock transition once — not on mount, not on an unrelated re-render', () => {
+    it('announces a lock once a field newly locks — not on mount, not on an unrelated re-render', () => {
       const tenant = makeTenant();
       const { container, rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            isEditable={true}
+            fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />,
         ),
@@ -617,13 +832,14 @@ describe(TenantDetailsPanel, () => {
       expect(liveRegion).not.toBeNull();
       expect(liveRegion).toHaveTextContent('');
 
-      // A re-render that leaves `isEditable` unchanged (e.g. a fresh tenant
-      // reference from an unrelated prop update) must not fire it.
+      // A re-render that leaves the locked field set unchanged (e.g. a
+      // fresh tenant reference from an unrelated prop update) must not fire
+      // it.
       rerender(
         withIntl(
           <TenantDetailsPanel
             tenant={makeTenant({ name: 'Acme Renamed' })}
-            isEditable={true}
+            fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />,
         ),
@@ -634,37 +850,37 @@ describe(TenantDetailsPanel, () => {
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            isEditable={false}
+            fieldLocks={SLUG_LOCKED}
             ownerEmail="owner@example.com"
           />,
         ),
       );
       expect(liveRegion).toHaveTextContent(
-        'Tenant details locked while provisioning runs.',
+        'Some tenant detail fields are now locked.',
       );
 
-      // A further re-render still locked must not re-fire the announcement.
+      // A further re-render with the same locked set must not re-fire it.
       rerender(
         withIntl(
           <TenantDetailsPanel
             tenant={makeTenant({ name: 'Acme Again' })}
-            isEditable={false}
+            fieldLocks={SLUG_LOCKED}
             ownerEmail="owner@example.com"
           />,
         ),
       );
       expect(liveRegion).toHaveTextContent(
-        'Tenant details locked while provisioning runs.',
+        'Some tenant detail fields are now locked.',
       );
     });
 
-    it('announces the unlock transition once provisioning finishes', () => {
+    it('announces an unlock once a field becomes editable again', () => {
       const tenant = makeTenant();
       const { container, rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            isEditable={false}
+            fieldLocks={SLUG_LOCKED}
             ownerEmail="owner@example.com"
           />,
         ),
@@ -677,25 +893,60 @@ describe(TenantDetailsPanel, () => {
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            isEditable={true}
+            fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />,
         ),
       );
       expect(liveRegion).toHaveTextContent(
-        'Tenant details unlocked and editable again.',
+        'More tenant detail fields are now editable.',
+      );
+    });
+
+    it('announces a lock, not nothing, when a same-count swap changes which field is locked', () => {
+      const NAME_LOCKED: TTenantFieldLocks = {
+        name: { kind: 'step', step: TENANT_PROVISIONING_STEP.SANITY_PROJECT },
+      };
+      const tenant = makeTenant();
+      const { container, rerender } = rtlRender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={SLUG_LOCKED}
+            ownerEmail="owner@example.com"
+          />,
+        ),
+      );
+
+      const liveRegion = container.querySelector('[aria-live="assertive"]');
+      expect(liveRegion).toHaveTextContent('');
+
+      // slug unlocks as name locks, in the same render — the locked-field
+      // count stays 1, but the set genuinely changed.
+      rerender(
+        withIntl(
+          <TenantDetailsPanel
+            tenant={tenant}
+            fieldLocks={NAME_LOCKED}
+            ownerEmail="owner@example.com"
+          />,
+        ),
+      );
+
+      expect(liveRegion).toHaveTextContent(
+        'Some tenant detail fields are now locked.',
       );
     });
   });
 
-  describe('focus management on the lock transition', () => {
+  describe('focus management on a locking transition', () => {
     it('does not move focus away from document.body on mount', () => {
       const tenant = makeTenant();
       rtlRender(
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            isEditable={true}
+            fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />,
         ),
@@ -704,13 +955,13 @@ describe(TenantDetailsPanel, () => {
       expect(document.activeElement).toBe(document.body);
     });
 
-    it('moves focus to the locked container when the panel locks while focus was inside it', () => {
+    it('moves focus to the fields container when a field newly locks while focus was inside the panel', () => {
       const tenant = makeTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            isEditable={true}
+            fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />,
         ),
@@ -724,58 +975,58 @@ describe(TenantDetailsPanel, () => {
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            isEditable={false}
+            fieldLocks={ALL_LOCKED_RUNNING}
             ownerEmail="owner@example.com"
           />,
         ),
       );
 
-      const lockedContainer = screen.getByText('Name').closest('dl');
-      expect(lockedContainer).not.toBeNull();
-      expect(document.activeElement).toBe(lockedContainer);
+      const fieldsContainer = screen
+        .getByRole('textbox', { name: 'Name' })
+        .closest('[tabindex="-1"]');
+      expect(fieldsContainer).not.toBeNull();
+      expect(document.activeElement).toBe(fieldsContainer);
       expect(document.activeElement).not.toBe(document.body);
     });
 
-    it('moves focus to the now-editable container when the panel unlocks while focus was inside it', () => {
+    it('does not steal focus when a locking transition fires while focus was outside the panel', () => {
       const tenant = makeTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
         withIntl(
-          <TenantDetailsPanel
+          <PanelWithOutsideControl
             tenant={tenant}
-            isEditable={false}
+            fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />,
         ),
       );
 
-      const lockedContainer = screen.getByText('Name').closest('dl');
-      lockedContainer?.focus();
-      expect(document.activeElement).toBe(lockedContainer);
+      const outsideControl = screen.getByRole('button', {
+        name: 'Outside control',
+      });
+      outsideControl.focus();
+      expect(document.activeElement).toBe(outsideControl);
 
       rerender(
         withIntl(
-          <TenantDetailsPanel
+          <PanelWithOutsideControl
             tenant={tenant}
-            isEditable={true}
+            fieldLocks={ALL_LOCKED_RUNNING}
             ownerEmail="owner@example.com"
           />,
         ),
       );
 
-      const nameInput = screen.getByRole('textbox', { name: 'Name' });
-      const editableContainer = nameInput.closest('[tabindex="-1"]');
-      expect(editableContainer).not.toBeNull();
-      expect(document.activeElement).toBe(editableContainer);
-      expect(document.activeElement).not.toBe(document.body);
+      expect(document.activeElement).toBe(outsideControl);
     });
 
-    it('does not move focus on an unrelated re-render while isEditable stays the same', () => {
+    it('does not move focus on an unrelated re-render while the locked field set stays the same', () => {
       const tenant = makeTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
-            isEditable={true}
+            fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />,
         ),
@@ -789,75 +1040,13 @@ describe(TenantDetailsPanel, () => {
         withIntl(
           <TenantDetailsPanel
             tenant={makeTenant({ name: 'Acme Renamed' })}
-            isEditable={true}
+            fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />,
         ),
       );
 
       expect(document.activeElement).toBe(nameInput);
-    });
-
-    it('does not steal focus into the locked container when the lock transition fires while focus was outside the panel', () => {
-      const tenant = makeTenant({ name: 'Acme Inc.' });
-      const { rerender } = rtlRender(
-        withIntl(
-          <PanelWithOutsideControl
-            tenant={tenant}
-            isEditable={true}
-            ownerEmail="owner@example.com"
-          />,
-        ),
-      );
-
-      const outsideControl = screen.getByRole('button', {
-        name: 'Outside control',
-      });
-      outsideControl.focus();
-      expect(document.activeElement).toBe(outsideControl);
-
-      rerender(
-        withIntl(
-          <PanelWithOutsideControl
-            tenant={tenant}
-            isEditable={false}
-            ownerEmail="owner@example.com"
-          />,
-        ),
-      );
-
-      expect(document.activeElement).toBe(outsideControl);
-    });
-
-    it('does not steal focus into the editable container when the unlock transition fires while focus was outside the panel', () => {
-      const tenant = makeTenant({ name: 'Acme Inc.' });
-      const { rerender } = rtlRender(
-        withIntl(
-          <PanelWithOutsideControl
-            tenant={tenant}
-            isEditable={false}
-            ownerEmail="owner@example.com"
-          />,
-        ),
-      );
-
-      const outsideControl = screen.getByRole('button', {
-        name: 'Outside control',
-      });
-      outsideControl.focus();
-      expect(document.activeElement).toBe(outsideControl);
-
-      rerender(
-        withIntl(
-          <PanelWithOutsideControl
-            tenant={tenant}
-            isEditable={true}
-            ownerEmail="owner@example.com"
-          />,
-        ),
-      );
-
-      expect(document.activeElement).toBe(outsideControl);
     });
   });
 });

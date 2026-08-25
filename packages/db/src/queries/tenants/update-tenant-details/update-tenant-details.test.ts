@@ -96,6 +96,21 @@ async function insertJoinedOwner(
     .values({ tenantId, userId: user.id, role: MEMBERSHIP_ROLE.OWNER });
 }
 
+function stepsWith(
+  overrides: Partial<TTenantProvisioningSteps>,
+): TTenantProvisioningSteps {
+  const idle = { status: TENANT_PROVISIONING_STEP_STATUS.IDLE };
+  return {
+    SANITY_PROJECT: idle,
+    SEED_CONTENT: idle,
+    DEPLOY_STUDIO: idle,
+    PERSIST_TOKEN: idle,
+    MAP_DOMAIN: idle,
+    CREATE_WEBHOOK: idle,
+    ...overrides,
+  };
+}
+
 beforeAll(async () => {
   db = await createTestDb();
 }, 30_000);
@@ -379,6 +394,300 @@ describe(updateTenantDetails, () => {
     expect(result).toMatchObject({
       outcome: 'updated',
       tenant: { name: 'New Name' },
+    });
+  });
+
+  it('refuses with provisioning-started when every step has succeeded', async () => {
+    const tenantId = await insertTenantWithDomain({
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      name: 'New Name',
+    });
+
+    expect(result).toEqual({ outcome: 'provisioning-started' });
+
+    const [row] = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(row?.name).toBe('Acme');
+  });
+
+  it('updates a changed slug when provisioning failed before DEPLOY_STUDIO completed', async () => {
+    const tenantId = await insertTenantWithDomain({
+      slug: 'acme',
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      slug: 'acme-fixed',
+      primaryDomain: 'acme.example.com',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { slug: 'acme-fixed' },
+    });
+  });
+
+  it('refuses a changed slug with slug-locked once DEPLOY_STUDIO has completed, and leaves the row unchanged', async () => {
+    const tenantId = await insertTenantWithDomain({
+      slug: 'acme',
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      slug: 'acme-new',
+      primaryDomain: 'acme.example.com',
+    });
+
+    expect(result).toEqual({
+      outcome: 'slug-locked',
+      blockingStep: 'DEPLOY_STUDIO',
+    });
+
+    const [row] = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(row?.slug).toBe('acme');
+  });
+
+  it('applies the rest of the update instead of slug-locked when the resubmitted slug is unchanged, even though DEPLOY_STUDIO has completed', async () => {
+    const tenantId = await insertTenantWithDomain({
+      slug: 'acme',
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+      name: 'New Name',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { name: 'New Name', slug: 'acme' },
+    });
+  });
+
+  it('updates a changed primaryDomain when provisioning failed before MAP_DOMAIN completed', async () => {
+    const tenantId = await insertTenantWithDomain({
+      domain: 'acme.example.com',
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      primaryDomain: 'acme-fixed.example.com',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { primaryDomain: 'acme-fixed.example.com' },
+    });
+  });
+
+  it('refuses a changed primaryDomain with domain-locked once MAP_DOMAIN has completed, and leaves the row unchanged', async () => {
+    const tenantId = await insertTenantWithDomain({
+      domain: 'acme.example.com',
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      primaryDomain: 'acme-new.example.com',
+    });
+
+    expect(result).toEqual({
+      outcome: 'domain-locked',
+      blockingStep: 'MAP_DOMAIN',
+    });
+
+    const [row] = await db
+      .select()
+      .from(tenants)
+      .where(eq(tenants.id, tenantId));
+    expect(row?.primaryDomain).toBe('acme.example.com');
+  });
+
+  it('applies the rest of the update instead of domain-locked when the resubmitted primaryDomain is unchanged, even though MAP_DOMAIN has completed', async () => {
+    const tenantId = await insertTenantWithDomain({
+      domain: 'acme.example.com',
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      primaryDomain: 'acme.example.com',
+      name: 'New Name',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { name: 'New Name', primaryDomain: 'acme.example.com' },
+    });
+  });
+
+  it('keeps name, plan and locale editable on a FAILED tenant even once every earlier step has completed', async () => {
+    const tenantId = await insertTenantWithDomain({
+      slug: 'acme',
+      domain: 'acme.example.com',
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      slug: 'acme',
+      primaryDomain: 'acme.example.com',
+      name: 'New Name',
+      plan: TENANT_PLAN.GROWTH,
+      locale: 'fr',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { name: 'New Name', plan: TENANT_PLAN.GROWTH, locale: 'fr' },
+    });
+  });
+
+  it('keeps locale editable on a FAILED tenant even though SEED_CONTENT has completed', async () => {
+    const tenantId = await insertTenantWithDomain({
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      locale: 'fr',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { locale: 'fr' },
+    });
+  });
+
+  it('keeps name editable on a FAILED tenant even though SANITY_PROJECT (which used it as the Sanity project display name) has completed', async () => {
+    const tenantId = await insertTenantWithDomain({
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      name: 'New Name',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { name: 'New Name' },
+    });
+  });
+
+  it('keeps primaryDomain editable when MAP_DOMAIN is FAILED even though a later-indexed step (CREATE_WEBHOOK) is stale-DONE from a prior run', async () => {
+    const tenantId = await insertTenantWithDomain({
+      domain: 'acme.example.com',
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      primaryDomain: 'acme-fixed.example.com',
+    });
+
+    expect(result).toMatchObject({
+      outcome: 'updated',
+      tenant: { primaryDomain: 'acme-fixed.example.com' },
+    });
+  });
+
+  it('still locks primaryDomain via a stale-DONE MAP_DOMAIN even though an earlier-indexed step (PERSIST_TOKEN) is FAILED', async () => {
+    const tenantId = await insertTenantWithDomain({
+      domain: 'acme.example.com',
+      provisioningSteps: stepsWith({
+        SANITY_PROJECT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        SEED_CONTENT: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        DEPLOY_STUDIO: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        PERSIST_TOKEN: { status: TENANT_PROVISIONING_STEP_STATUS.FAILED },
+        MAP_DOMAIN: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        CREATE_WEBHOOK: { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+      }),
+    });
+
+    const result = await updateTenantDetails(tenantId, {
+      ...validInput,
+      primaryDomain: 'acme-new.example.com',
+    });
+
+    expect(result).toEqual({
+      outcome: 'domain-locked',
+      blockingStep: 'MAP_DOMAIN',
     });
   });
 

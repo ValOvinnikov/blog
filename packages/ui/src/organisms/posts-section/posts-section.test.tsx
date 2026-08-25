@@ -60,6 +60,17 @@ describe(`<${PostsSection.name}/>`, () => {
     }
   });
 
+  it('renders each PostCard title at the caller-specified cardHeadingLevel', () => {
+    setup({ cardHeadingLevel: 2 });
+
+    for (const post of posts) {
+      expect(
+        screen.getByRole('heading', { level: 2, name: post.title }),
+      ).toBeVisible();
+    }
+    expect(screen.queryByRole('heading', { level: 3 })).not.toBeInTheDocument();
+  });
+
   it('returns null when posts is empty and no emptyMessage is provided', () => {
     const { container } = setup({ posts: [] });
 

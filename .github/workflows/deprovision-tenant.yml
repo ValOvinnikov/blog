@@ -2,10 +2,14 @@ name: Deprovision Tenant
 
 # Reverses `provision-tenant.yml` for one tenant — removes its custom domain
 # from the shared `apps/web` Vercel project, deletes its Studio Vercel
-# project and its Sanity project (dataset/CORS/tokens go with it), clears
-# its persisted Sanity credentials, and archives (never hard-deletes) the
-# `tenants` row. Dispatched by hand from the Actions UI by an operator; there
-# is no wizard triggering this automatically.
+# project, archives its Sanity project so it stops billing, clears its
+# persisted Sanity credentials, and archives (never hard-deletes) the
+# `tenants` row. The Sanity project is archived rather than deleted because
+# deleting one needs an org billing permission this token deliberately
+# lacks; the project and its dataset survive for a later permanent delete.
+#
+# Dispatched by hand from the Actions UI by an operator; there is no wizard
+# triggering this automatically.
 #
 # Destructive, so `workflow_dispatch` alone is not enough: `confirm` must
 # match the tenant's live slug (checked before any deletion) and `dryRun`
@@ -28,7 +32,7 @@ on:
         required: true
         type: string
       dryRun:
-        description: 'Preview only — logs what would be deleted without deleting anything. Set to false to actually deprovision.'
+        description: 'Preview only — logs what would change without changing anything. Set to false to actually deprovision.'
         required: true
         type: boolean
         default: true

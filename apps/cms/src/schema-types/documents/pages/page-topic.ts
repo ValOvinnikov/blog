@@ -2,6 +2,7 @@ import { createSlugUrlPreviewInput } from '@cms/schema-types/components/slug-url
 import { topicSchema } from '@cms/schema-types/documents/blog/topic';
 import { PAGE_TOPIC_TYPE } from '@cms/schema-types/documents/pages/page-topic-type';
 import { defineModulesField } from '@cms/schema-types/helpers/define-modules-field';
+import { getDraftsClient } from '@cms/schema-types/helpers/get-drafts-client';
 import { titleField } from '@cms/schema-types/helpers/title-field';
 import { ctaSchema } from '@cms/schema-types/modules/module-cta';
 import { newsletterSchema } from '@cms/schema-types/modules/module-newsletter';
@@ -11,7 +12,6 @@ import { seoSchema } from '@cms/schema-types/objects/seo';
 import { Tags } from 'lucide-react';
 import { defineField, defineType, type ValidationContext } from 'sanity';
 
-const TOPIC_UNIQUENESS_API_VERSION = '2024-01-01';
 const topicSlugUrlPreviewInput = createSlugUrlPreviewInput('/topics/');
 
 type TTopicReferenceValue = { _ref?: string } | undefined;
@@ -31,9 +31,7 @@ const validateUniqueTopicReference = async (
 
   if (!publishedId) return true;
 
-  const client = context
-    .getClient({ apiVersion: TOPIC_UNIQUENESS_API_VERSION })
-    .withConfig({ perspective: 'drafts' });
+  const client = getDraftsClient(context);
 
   const conflictingCount = await client.fetch<number>(
     `count(*[_type == $type && topic._ref == $topicId && !(_id in [$publishedId, "drafts." + $publishedId])])`,

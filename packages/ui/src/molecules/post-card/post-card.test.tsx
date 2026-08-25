@@ -3,10 +3,10 @@ import { renderElement, screen } from '@blog/ui/testing/custom-render';
 import { PostCard } from './post-card';
 
 describe(`<${PostCard.name}/>`, () => {
-  it('renders PostCard.Title as an h3 heading', () => {
+  it('renders PostCard.Title at the caller-specified heading level', () => {
     renderElement(
       <PostCard>
-        <PostCard.Title>
+        <PostCard.Title level={3}>
           <a href="/posts/hello-world">Hello World</a>
         </PostCard.Title>
       </PostCard>,
@@ -16,6 +16,18 @@ describe(`<${PostCard.name}/>`, () => {
       'href',
       '/posts/hello-world',
     );
+  });
+
+  it('renders PostCard.Title at a different caller-specified heading level', () => {
+    renderElement(
+      <PostCard>
+        <PostCard.Title level={2}>
+          <a href="/posts/hello-world">Hello World</a>
+        </PostCard.Title>
+      </PostCard>,
+    );
+    expect(screen.getByRole('heading', { level: 2 })).toBeVisible();
+    expect(screen.queryByRole('heading', { level: 3 })).not.toBeInTheDocument();
   });
 
   it('renders PostCard.Media content', () => {
@@ -32,7 +44,7 @@ describe(`<${PostCard.name}/>`, () => {
   it('does not render media when PostCard.Media is omitted', () => {
     renderElement(
       <PostCard>
-        <PostCard.Title>
+        <PostCard.Title level={3}>
           <a href="/posts/hello-world">Hello World</a>
         </PostCard.Title>
       </PostCard>,

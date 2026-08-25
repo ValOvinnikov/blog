@@ -39,19 +39,12 @@ export const blogPageSchema = defineType({
       description: 'Optional line shown under the heading.',
     }),
     defineField({
-      name: 'itemsPerPage',
-      title: 'Items Per Page',
-      type: 'number',
-      description: 'Posts shown per page.',
-      initialValue: 9,
-      validation: (rule) => rule.required().min(1).max(24).integer(),
-    }),
-    defineField({
       name: 'postList',
       title: 'Post List',
       type: 'reference',
       description: 'The paginated post archive rendered on this page.',
       to: [{ type: postListSchema.name }],
+      validation: (rule) => rule.required(),
     }),
     defineModulesField({
       allow: [ctaSchema.name, newsletterSchema.name],

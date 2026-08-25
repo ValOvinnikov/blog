@@ -12,6 +12,11 @@ type TReferenceFieldDefinition = {
   validation?: unknown;
 };
 
+type TValidationRule = {
+  required: () => TValidationRule;
+  custom: (fn: unknown) => TValidationRule;
+};
+
 describe('blogPageSchema modules allow-list', () => {
   it('permits module_cta and module_newsletter, and excludes module_postList', () => {
     const modulesField = blogPageSchema.fields?.find(
@@ -50,9 +55,27 @@ describe('blogPageSchema postList field', () => {
     ]);
   });
 
-  it('stays optional — no validation() builder attached', () => {
+  it('is required', () => {
     const postListField = getPostListField();
 
-    expect(postListField?.validation).toBeUndefined();
+    if (!postListField?.validation) {
+      throw new Error(
+        'Expected blogPageSchema postList field to define validation.',
+      );
+    }
+
+    let requiredCalled = false;
+    const rule: TValidationRule = {
+      required: () => {
+        requiredCalled = true;
+        return rule;
+      },
+      custom: () => rule,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
+    (postListField.validation as any)(rule);
+
+    expect(requiredCalled).toBe(true);
   });
 });

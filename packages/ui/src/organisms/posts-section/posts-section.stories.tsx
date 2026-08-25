@@ -126,3 +126,9 @@ export const NoTitle: TStory = {
     titleId: undefined,
   },
 };
+
+export const CardsAsSecondLevelHeadings: TStory = {
+  args: {
+    cardHeadingLevel: 2,
+  },
+};
