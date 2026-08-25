@@ -8,12 +8,14 @@ const {
   authMock,
   getTenantBySlugMock,
   getMembershipMock,
+  getAdminByUserIdMock,
   getSettingsFeaturesMock,
   getSiteConfigMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   getTenantBySlugMock: vi.fn(),
   getMembershipMock: vi.fn(),
+  getAdminByUserIdMock: vi.fn(),
   getSettingsFeaturesMock: vi.fn(),
   getSiteConfigMock: vi.fn(),
 }));
@@ -25,6 +27,7 @@ vi.mock('@blog/db', async () => ({
   queries: {
     tenants: { getTenantBySlug: getTenantBySlugMock },
     memberships: { getMembership: getMembershipMock },
+    admins: { getAdminByUserId: getAdminByUserIdMock },
     settingsFeatures: { getSettingsFeatures: getSettingsFeaturesMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
@@ -39,6 +42,8 @@ describe(`<${FeaturesPage.name}/>`, () => {
     authMock.mockReset();
     getTenantBySlugMock.mockReset();
     getMembershipMock.mockReset();
+    getAdminByUserIdMock.mockReset();
+    getAdminByUserIdMock.mockResolvedValue(undefined);
     getSettingsFeaturesMock.mockReset();
     getSiteConfigMock.mockReset();
     vi.mocked(redirect).mockClear();

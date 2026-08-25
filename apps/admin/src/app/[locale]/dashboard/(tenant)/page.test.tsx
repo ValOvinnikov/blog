@@ -1,4 +1,5 @@
 import { customRenderAsync, screen } from '@admin/testing/custom-render';
+import { mockDbConstants } from '@admin/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
 
 import DashboardOverviewPage from './page';
@@ -7,20 +8,24 @@ const {
   authMock,
   listMembershipsForUserMock,
   listTenantsByIdsMock,
+  getAdminByUserIdMock,
   cookiesMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   listMembershipsForUserMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
+  getAdminByUserIdMock: vi.fn(),
   cookiesMock: vi.fn(),
 }));
 
 vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
+  ...(await mockDbConstants()),
   queries: {
     memberships: { listMembershipsForUser: listMembershipsForUserMock },
     tenants: { listTenantsByIds: listTenantsByIdsMock },
+    admins: { getAdminByUserId: getAdminByUserIdMock },
   },
 }));
 
@@ -33,6 +38,8 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
     authMock.mockReset();
     listMembershipsForUserMock.mockReset();
     listTenantsByIdsMock.mockReset();
+    getAdminByUserIdMock.mockReset();
+    getAdminByUserIdMock.mockResolvedValue(undefined);
     cookiesMock.mockReset();
     vi.mocked(redirect).mockClear();
   });

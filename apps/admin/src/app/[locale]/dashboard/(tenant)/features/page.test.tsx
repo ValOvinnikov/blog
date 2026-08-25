@@ -8,12 +8,14 @@ const {
   authMock,
   listMembershipsForUserMock,
   listTenantsByIdsMock,
+  getAdminByUserIdMock,
   getSettingsFeaturesMock,
   getSiteConfigMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   listMembershipsForUserMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
+  getAdminByUserIdMock: vi.fn(),
   getSettingsFeaturesMock: vi.fn(),
   getSiteConfigMock: vi.fn(),
 }));
@@ -25,6 +27,7 @@ vi.mock('@blog/db', async () => ({
   queries: {
     memberships: { listMembershipsForUser: listMembershipsForUserMock },
     tenants: { listTenantsByIds: listTenantsByIdsMock },
+    admins: { getAdminByUserId: getAdminByUserIdMock },
     settingsFeatures: { getSettingsFeatures: getSettingsFeaturesMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
@@ -37,11 +40,13 @@ describe(`<${DashboardFeaturesPage.name}/>`, () => {
     authMock.mockReset();
     listMembershipsForUserMock.mockReset();
     listTenantsByIdsMock.mockReset();
+    getAdminByUserIdMock.mockReset();
     getSettingsFeaturesMock.mockReset();
     getSiteConfigMock.mockReset();
     vi.mocked(redirect).mockClear();
 
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getAdminByUserIdMock.mockResolvedValue(undefined);
     listMembershipsForUserMock.mockResolvedValue([
       { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
     ]);
