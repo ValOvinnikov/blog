@@ -490,20 +490,21 @@ the gate sequence (also in `CLAUDE.md` — the operational source of truth):
 Two long-lived environments, deployed by trigger. The full click-by-click setup
 and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the shape.
 
-| Concern                 | Development                       | Production                         |
-| ----------------------- | --------------------------------- | ---------------------------------- |
-| Sanity project          | separate dev project (id via env) | separate prod project (id via env) |
-| Sanity dataset          | `development`                     | `production`                       |
-| Studio hostname         | `studio-dev{your_hosting}`        | `studio.{your-hosting}`            |
-| Vercel project (web)    | `blog-dev`                        | `blog-prod`                        |
-| Vercel project (studio) | `cms-dev`                         | `cms-prod`                         |
-| Vercel project (admin)  | `admin-dev`                       | `admin-prod`                       |
-| Admin hostname          | `admin-dev.{your-hosting}`        | `admin.{your-hosting}`             |
-| Deploy trigger          | push/merge to `main`              | push git tag `v*`                  |
-| Web deploy mechanism    | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
-| Studio deploy mechanism | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
-| Admin deploy mechanism  | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
-| Revalidation webhook    | dev webhook → dev site            | prod webhook → prod site           |
+| Concern                  | Development                       | Production                         |
+| ------------------------ | --------------------------------- | ---------------------------------- |
+| Sanity project           | separate dev project (id via env) | separate prod project (id via env) |
+| Sanity dataset           | `development`                     | `production`                       |
+| Neon branch (`@blog/db`) | `development`                     | `production`                       |
+| Studio hostname          | `studio-dev{your_hosting}`        | `studio.{your-hosting}`            |
+| Vercel project (web)     | `blog-dev`                        | `blog-prod`                        |
+| Vercel project (studio)  | `cms-dev`                         | `cms-prod`                         |
+| Vercel project (admin)   | `admin-dev`                       | `admin-prod`                       |
+| Admin hostname           | `admin-dev.{your-hosting}`        | `admin.{your-hosting}`             |
+| Deploy trigger           | push/merge to `main`              | push git tag `v*`                  |
+| Web deploy mechanism     | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
+| Studio deploy mechanism  | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
+| Admin deploy mechanism   | Vercel CLI in GitHub Actions      | Vercel CLI in GitHub Actions       |
+| Revalidation webhook     | dev webhook → dev site            | prod webhook → prod site           |
 
 - `main` is a continuous **staging line** (auto-deploys to development, which is
   also the local-dev dataset); a **`vMAJOR.MINOR.PATCH` git tag** promotes that
@@ -513,7 +514,11 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   Sanity ones, via their own `migrate-db` job in both deploy workflows (dev:
   automatic; prod: backed up via `pg_dump`, gated behind the same required-
   reviewer approval) — see `docs/DEPLOY.md` and `.claude/agents/db.md`'s
-  "Migrations" section.
+  "Migrations" section. The dev `migrate-db` job also guards against a
+  mis-set secret: it compares its resolved connection host against the
+  production branch's host (mirrored into a repo Variable, since a job
+  scoped to one GitHub Environment can't read another's secrets) and refuses
+  to migrate if they match.
 - **Each environment is a separate Sanity project** with its own env-driven,
   never-committed project id and tokens; **six fully isolated Vercel
   projects** (a web project, a Studio project and an admin-panel project per

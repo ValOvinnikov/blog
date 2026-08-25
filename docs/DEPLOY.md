@@ -269,6 +269,15 @@ recreating this from scratch:
       `pnpm --filter @blog/db db:migrate` against a fresh branch (with
       `DATABASE_URL_UNPOOLED` sourced into the shell first) is sufficient, no
       manual `CREATE EXTENSION` step needed.
+- [ ] Double-check each GitHub Environment's `DATABASE_URL_UNPOOLED` secret
+      (§4 below) actually points at that environment's own branch —
+      `development`'s at the `development` branch, `production`'s at the
+      `production` branch. GitHub never lets you read a secret back once set,
+      so this only catches a copy-paste swap by re-pasting from the Neon
+      console at set time, or by setting `PRODUCTION_DB_HOST` (see the "Repo
+      level — production-target guard" checklist further down) so a mis-set
+      `development` secret fails the `migrate-db` job loudly instead of
+      silently migrating production.
 
 **Studio** (`cms-dev` / `cms-prod`, Production scope — `vercel pull
 --environment=production` in CI only reads that scope): `sanity build`
@@ -499,6 +508,29 @@ Vercel dashboard → Account/Team Settings → Tokens), then:
 - [ ] Secret `TURBO_TOKEN` = `<VERCEL_ACCESS_TOKEN>`
 - [ ] Variable `TURBO_TEAM` = `<VERCEL_TEAM_SLUG>`
 
+**Repo level — production-target guard for `migrate-db`**
+
+`deploy-development.yml`'s `migrate-db` job runs unreviewed on every merge to
+`main`; a `development`-environment secret accidentally left pointing at the
+production Neon branch would migrate production with no backup and no
+approval. A job scoped to `environment: development` can never read
+production's `DATABASE_URL_UNPOOLED` to compare directly (GitHub Environments
+isolate secrets per environment), so the production host is mirrored into a
+plain repo Variable instead — not a Secret, since a hostname alone can't
+authenticate anything.
+
+- [ ] (Recommended) Variable `PRODUCTION_DB_HOST` = the hostname portion of
+      the **production** Neon branch's own **`DATABASE_URL_UNPOOLED`** value
+      specifically (the direct connection string — the part between `@` and
+      `:5432/...`), **not** the pooled `DATABASE_URL`. The guard step only
+      ever parses `DATABASE_URL_UNPOOLED` — a pooled-connection host (Neon
+      suffixes it `-pooler`) never matches, so pasting the wrong one leaves
+      the guard silently inert.
+
+Until this is set, the guard step in `migrate-db` no-ops, same as every other
+secret-gated step in these workflows — safe to leave unset, but it also means
+the guard provides no protection until it's filled in.
+
 Until both exist the workflows fall back to the local `.turbo` cache — nothing
 breaks.
 
@@ -605,8 +637,12 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    Postgres, so a cms-only change doesn't trigger it); `deploy-web` and
    `deploy-admin` `need` it, `deploy-studio` doesn't. No artifact backup here,
    same disposable-staging-line stance as `migrate`; guarded on
-   `DATABASE_URL_UNPOOLED`, so it's inert until that secret exists. **No
-   approval gate on dev.** See `.claude/agents/db.md`'s "Migrations" section.
+   `DATABASE_URL_UNPOOLED`, so it's inert until that secret exists. Before
+   applying, a guard step compares the resolved connection host against the
+   repo Variable `PRODUCTION_DB_HOST` and fails the job loudly if they match
+   — see "Repo level — production-target guard for `migrate-db`" above; the
+   guard itself is inert until that Variable is set. **No approval gate on
+   dev.** See `.claude/agents/db.md`'s "Migrations" section.
 5. **`deploy-studio`** → `cms-dev` via the Vercel CLI (`studio-dev.{your-hosting}`),
    same mechanism as `deploy-web`.
 6. **`deploy-web`** → `blog-dev` via the Vercel CLI
