@@ -265,24 +265,22 @@ two-branch split is recent and the secret wiring has not fully caught up:
   Environment's own `DATABASE_URL_UNPOOLED`. Whether that secret was
   repointed at the new `development` branch (rather than left over from when
   only `main` existed) has not been confirmed — tracked in #2057.
-- `deploy-production.yml`'s `migrate-db` job and the tenant lifecycle
-  workflows (`provision-tenant.yml`, `deprovision-tenant.yml`) all run in the
-  `production` GitHub Environment and currently read the **same**
-  `DATABASE_URL_UNPOOLED` secret for two unrelated purposes — production
-  schema migrations, and the tenant registry those workflows read/write. One
-  secret can only point at one branch: as of 2026-08-25 it points at
-  `development` (to unblock tenant provisioning from `admin-dev`, which had
-  been failing against `main`), which means a `vX.Y.Z` production tag's
-  `migrate-db` step currently targets the **wrong branch** — it would
-  `pg_dump` and migrate `development` while reporting success, leaving `main`
-  unmigrated. **Do not cut a production tag until this is fixed** — tracked in
-  #2056, which also covers giving tenant provisioning its own secret so it
-  stops sharing with production migrations.
-- `blog-web-dev`'s Vercel `DATABASE_URL` may be scoped to Preview+Development
+- `deploy-production.yml`'s `migrate-db` job reads the `production`
+  Environment's `DATABASE_URL_UNPOOLED` — the `main` branch. The tenant
+  lifecycle workflows (`provision-tenant.yml`, `deprovision-tenant.yml`) run in
+  the same `production` Environment but read their **own**
+  `TENANT_REGISTRY_DATABASE_URL_DEV`/`_PROD` secrets instead (§4 below), so a
+  tenant-registry dispatch can no longer silently repoint a production
+  migration. That split (#2056, merged 2026-08-25) fixed a real incident: the
+  two purposes used to share one secret, and pointing it at `development` to
+  unblock tenant provisioning from `admin-dev` had silently repointed a
+  production tag's `migrate-db` step at `development` too, leaving `main`
+  unmigrated while reporting success.
+- `blog-dev`'s Vercel `DATABASE_URL` may be scoped to Preview+Development
   rather than Production; `deploy-development.yml` builds via
   `vercel pull --environment=production`, which would not read a
   Preview+Development-scoped value. Unconfirmed whether this breaks any live
-  route on `blog-web-dev` — tracked in #2058.
+  route on `blog-dev` — tracked in #2058.
 
 **Pooled vs. unpooled — the distinction that caused confusion during setup.**
 Neon gives each branch two connection strings from **Connection details**: a
@@ -448,11 +446,11 @@ job resolves its own project's id + token:
 - [ ] Secret `DATABASE_URL_UNPOOLED` = `<PRD_DATABASE_URL_UNPOOLED>` (the `main`
       Neon branch's direct connection string — the `migrate-db` job's
       `pg_dump` backup + `drizzle-kit migrate`; same value as the Vercel env
-      var above; `provision-tenant.yml` also reuses this same secret, mapped
-      to `DATABASE_URL`, the env var name `@blog/db`'s runtime client
-      actually reads — see below). **As of 2026-08-25 this secret is pointed
-      at `development`, not `main`** — unsafe for a production tag until
-      #2056 ships; see the Neon Postgres section above.
+      var above). **Not** read by `provision-tenant.yml`/`deprovision-tenant.yml`
+      — those use their own `TENANT_REGISTRY_DATABASE_URL_DEV`/`_PROD` secrets
+      below, deliberately, so repointing the tenant registry at a different
+      Neon branch can never silently repoint this deploy job too (#2056 — see
+      the Neon Postgres section above for the incident that motivated it).
 - [ ] Secret `VERCEL_TOKEN` = `<VERCEL_TOKEN>`
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID` = `<VERCEL_PROJECT_ID>` (**blog-prod**)
@@ -462,17 +460,26 @@ job resolves its own project's id + token:
 - [ ] (Optional) require a reviewer on `production` for a manual gate before prod
       deploys run.
 
-`.github/workflows/provision-tenant.yml` (`workflow_dispatch` only, triggered
-from `apps/admin`'s "Add tenant" wizard) also runs in this same `production`
-environment and, as shipped, reuses that environment's `DATABASE_URL_UNPOOLED`
-for the tenant registry too — not a deliberate single-registry design, just
-the two purposes never having been split onto their own secrets. See the Neon
-Postgres section above and #2056: until that ships, this is the same secret
-`deploy-production.yml`'s `migrate-db` job reads, so pointing it at whichever
-branch tenant provisioning currently needs silently redirects production
-migrations as well. It also needs a few secrets/vars nothing else in this
-repo has needed yet:
+`.github/workflows/provision-tenant.yml`/`deprovision-tenant.yml`
+(`workflow_dispatch` only, the former triggered from `apps/admin`'s "Add
+tenant" wizard) also run in this same `production` environment — the
+Sanity/Vercel credentials below are singleton (one org, one Vercel team), so
+this isn't a new environment, just the same store gaining a few more
+secrets/vars. The **tenant registry** (which Neon branch holds the `tenants`
+row a given run reads/writes) is a separate axis, picked per-dispatch by
+each workflow's `environment` input (`development`/`production`, default
+`production`) — see the two secrets below:
 
+- [ ] Secret `TENANT_REGISTRY_DATABASE_URL_DEV` = `<DEV_DATABASE_URL_UNPOOLED>`
+      (the same value as the `development` environment's own
+      `DATABASE_URL_UNPOOLED` above) — used when a dispatch's `environment`
+      input is `development`.
+- [ ] Secret `TENANT_REGISTRY_DATABASE_URL_PROD` = `<PRD_DATABASE_URL_UNPOOLED>`
+      (the same value as this environment's own `DATABASE_URL_UNPOOLED`
+      above) — used when a dispatch's `environment` input is `production`
+      (the default). Deliberately a **different secret name** from
+      `DATABASE_URL_UNPOOLED`, even though the value is identical here — see
+      that bullet's note above (#2056).
 - [ ] Secret `SANITY_MANAGEMENT_TOKEN` — an **organization-level** Sanity
       token with "create project" permission (broader than `SANITY_MIGRATE_TOKEN`,
       which is scoped to one already-existing project). Mint it at
@@ -514,7 +521,11 @@ repo has needed yet:
       `WEB_ANALYTICS_ENABLED`, since `VERCEL_ENV` can't reliably tell a dev
       deployment apart from real production. Left unset, provisioning falls
       back to this GitHub Environment's `TENANT_SANITY_DATASET`, unchanged
-      from today. See `docs/context/environment-variables.md`.
+      from today. The same value is also forwarded as both workflows'
+      `environment` input (§ above) — an `admin-dev` deployment setting this
+      to `development` now points its provisioning/deprovisioning dispatches
+      at the `development` tenant registry too, not just the Sanity dataset.
+      See `docs/context/environment-variables.md`.
 - [ ] `VERCEL_TOKEN` / `VERCEL_ORG_ID` / `VERCEL_PROJECT_ID` above are reused
       as-is: `VERCEL_TOKEN` needs project-creation scope (not just deploy
       scope) for this workflow to create each tenant's Studio Vercel project;

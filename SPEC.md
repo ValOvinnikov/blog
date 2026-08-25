@@ -517,15 +517,17 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
 - **Neon Postgres is one project with two branches, not a project-per-environment
   split like Sanity**: `main` backs production, `development` (branched off
   `main` on 2026-08-25) backs development. Before that date only `main`
-  existed and both environments read it — the two-branch split is recent and
-  not yet fully wired: `deploy-production.yml`'s `migrate-db` job and the
-  tenant-provisioning workflows (`provision-tenant.yml`/`deprovision-tenant.yml`)
-  all share the `production` Environment's single `DATABASE_URL_UNPOOLED`
-  secret for two different purposes, and as of 2026-08-25 that secret points at
-  `development`, not `main` — a production tag's `migrate-db` step currently
-  targets the wrong branch. **Do not cut a production tag until this is fixed**
-  (#2056). Whether the `development` Environment's own secret is confirmed
-  pointed at the `development` branch is tracked separately (#2057). See
+  existed and both environments read it. `deploy-production.yml`'s
+  `migrate-db` job reads the `production` Environment's own
+  `DATABASE_URL_UNPOOLED` (`main`); the tenant-provisioning workflows
+  (`provision-tenant.yml`/`deprovision-tenant.yml`) read their own
+  `TENANT_REGISTRY_DATABASE_URL_DEV`/`_PROD` secrets instead (#2056, merged
+  2026-08-25) — before that split, both purposes shared one secret, and
+  pointing it at `development` for tenant provisioning had silently
+  repointed production migrations at `development` too. Whether the
+  `development` Environment's own `DATABASE_URL_UNPOOLED` is confirmed
+  pointed at the `development` branch is still open (#2057), as is whether
+  `blog-dev`'s Vercel `DATABASE_URL` scope is correct (#2058). See
   `docs/DEPLOY.md`'s Neon Postgres section for the full state and open items.
 - **Each environment is a separate Sanity project** with its own env-driven,
   never-committed project id and tokens; **six fully isolated Vercel
