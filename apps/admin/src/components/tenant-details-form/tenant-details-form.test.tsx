@@ -67,7 +67,6 @@ describe(TenantDetailsForm, () => {
       domain: 'acme.example.com',
       plan: 'GROWTH',
       ownerEmail: 'owner@example.com',
-      confirmOwnerInvite: false,
     });
   });
 
@@ -146,7 +145,7 @@ describe(TenantDetailsForm, () => {
     ).toBeVisible();
   });
 
-  it('resubmits with confirmOwnerInvite set once the operator confirms an unchanged owner email', async () => {
+  it('resubmits with confirmOwnerInviteToken set once the operator confirms an unchanged owner email', async () => {
     createTenantActionMock.mockResolvedValueOnce({
       ok: false,
       ownerInviteConfirmation: {
@@ -170,12 +169,11 @@ describe(TenantDetailsForm, () => {
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
         ownerEmail: 'owner@example.com',
-        confirmOwnerInvite: true,
       }),
     );
   });
 
-  it('resubmits with confirmOwnerInvite set when the owner email only differs from the server-normalized form by case or whitespace', async () => {
+  it('resubmits with confirmOwnerInviteToken set when the owner email only differs from the server-normalized form by case or whitespace', async () => {
     createTenantActionMock.mockResolvedValueOnce({
       ok: false,
       ownerInviteConfirmation: {
@@ -211,7 +209,6 @@ describe(TenantDetailsForm, () => {
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
         ownerEmail: 'John.Doe@Example.com',
-        confirmOwnerInvite: true,
       }),
     );
   });
@@ -252,7 +249,6 @@ describe(TenantDetailsForm, () => {
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
         ownerEmail: 'owner@example.com.uk',
-        confirmOwnerInvite: false,
       }),
     );
   });
@@ -282,7 +278,6 @@ describe(TenantDetailsForm, () => {
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
         ownerEmail: 'owner@example.com',
-        confirmOwnerInvite: true,
         confirmOwnerInviteToken: 'confirmation-token-for-owner-example-com',
       }),
     );
@@ -318,7 +313,6 @@ describe(TenantDetailsForm, () => {
     expect(createTenantActionMock).toHaveBeenLastCalledWith(
       expect.objectContaining({
         ownerEmail: 'owner@example.com.uk',
-        confirmOwnerInvite: false,
         confirmOwnerInviteToken: undefined,
       }),
     );
