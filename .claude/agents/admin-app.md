@@ -264,6 +264,12 @@ page-builder and no SEO surface to justify them. What carries over:
   is a public HTTP endpoint, and the form that called it proves nothing.
 - **Helpers** live in `src/utils/`, one file per function or closely related
   group, named after its purpose.
+- **A hook extracted from a component** (`use-<name>.ts`) is co-located in
+  that component's own folder, not `src/utils/`, when it's stateful and has
+  exactly one consumer — `src/utils/` is for pure, reusable functions, and a
+  hook that owns polling/effects/Server Action calls for one component is
+  neither. Move it to `src/utils/` (or a `shared/` component's folder) only
+  once a second component actually consumes it.
 - Extract at the second repetition, never the third.
 
 ## Function style
