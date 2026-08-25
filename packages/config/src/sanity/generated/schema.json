@@ -1880,7 +1880,7 @@
         },
         "optional": true
       },
-      "categoryEmpty": {
+      "topicEmpty": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
@@ -3557,7 +3557,7 @@
           "of": [
             {
               "type": "string",
-              "value": "POST_CATEGORY"
+              "value": "POST_TOPIC"
             },
             {
               "type": "string",
