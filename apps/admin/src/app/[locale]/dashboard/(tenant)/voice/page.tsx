@@ -1,4 +1,4 @@
-import { VoicePageContent } from '@admin/components/voice-page-content';
+import { VoicePageContent } from '@admin/components/features/voice/voice-page-content';
 import { resolveDashboardTenant } from '@admin/server/auth/resolve-dashboard-tenant';
 import {
   renderTenantScopedPage,

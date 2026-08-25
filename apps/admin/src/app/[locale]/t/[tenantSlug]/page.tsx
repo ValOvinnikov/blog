@@ -1,4 +1,4 @@
-import { TenantOverview } from '@admin/components/tenant-overview';
+import { TenantOverview } from '@admin/components/features/tenants/tenant-overview';
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';

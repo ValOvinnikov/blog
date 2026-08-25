@@ -1,4 +1,4 @@
-import { LookPageContent } from '@admin/components/look-page-content';
+import { LookPageContent } from '@admin/components/features/look/look-page-content';
 import { resolveDashboardTenant } from '@admin/server/auth/resolve-dashboard-tenant';
 import {
   renderTenantScopedPage,

@@ -1,4 +1,4 @@
-import { FeaturesPageContent } from '@admin/components/features-page-content';
+import { FeaturesPageContent } from '@admin/components/features/capabilities/features-page-content';
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
 import {
   renderTenantScopedPage,

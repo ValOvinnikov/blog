@@ -1,4 +1,4 @@
-import { VoicePageContent } from '@admin/components/voice-page-content';
+import { VoicePageContent } from '@admin/components/features/voice/voice-page-content';
 import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
 import {
   renderTenantScopedPage,

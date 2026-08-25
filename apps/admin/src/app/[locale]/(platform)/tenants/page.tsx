@@ -1,4 +1,4 @@
-import { TenantsView } from '@admin/components/tenants-view';
+import { TenantsView } from '@admin/components/features/tenants/tenants-view';
 import { queries } from '@blog/db';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
