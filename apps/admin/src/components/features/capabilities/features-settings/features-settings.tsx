@@ -4,6 +4,7 @@ import {
   CAPABILITY_TOGGLES,
   type TSettingsFeaturesValues,
 } from '@admin/utils/settings-features-fields/settings-features-fields';
+import { useFormSubmission } from '@admin/utils/use-form-submission/use-form-submission';
 import { Switch } from '@base-ui/react/switch';
 import { ALERT_TYPE, Size, type TCapability } from '@blog/config';
 import { Alert } from '@blog/ui/atoms/alert';
@@ -13,7 +14,6 @@ import { StatusBadge } from '@blog/ui/atoms/status-badge';
 import { SettingRow } from '@blog/ui/molecules/setting-row';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
 
 import { featuresSettingsVariants } from './features-settings-variants';
 
@@ -42,9 +42,12 @@ export const FeaturesSettings = ({
 }: TFeaturesSettingsProps) => {
   const t = useTranslations('featuresSettings');
   const router = useRouter();
-  const [values, setValues] = useState<TSettingsFeaturesValues>(initialValues);
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [isPending, startTransition] = useTransition();
+  const { values, setValues, status, isPending, handleSubmit } =
+    useFormSubmission<TSettingsFeaturesValues, { ok: boolean }>({
+      initialValues,
+      onSubmit: (vals) => saveAction(tenantSlug, vals),
+      onSuccess: () => router.refresh(),
+    });
 
   const {
     root,
@@ -66,15 +69,6 @@ export const FeaturesSettings = ({
     checked: boolean,
   ) => {
     setValues((prev) => ({ ...prev, [field]: checked }));
-    setStatus('idle');
-  };
-
-  const handleSave = () => {
-    startTransition(async () => {
-      const result = await saveAction(tenantSlug, values);
-      setStatus(result.ok ? 'success' : 'error');
-      if (result.ok) router.refresh();
-    });
   };
 
   return (
@@ -88,7 +82,7 @@ export const FeaturesSettings = ({
         </div>
         <Button
           variant="primary"
-          onClick={handleSave}
+          onClick={handleSubmit}
           isDisabled={isPending}
           aria-busy={isPending}
         >
