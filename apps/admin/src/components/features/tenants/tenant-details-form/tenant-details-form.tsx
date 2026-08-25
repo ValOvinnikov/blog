@@ -1,6 +1,7 @@
 'use client';
 
 import { FormField } from '@admin/components/shared/form-field';
+import { FormTextInput } from '@admin/components/shared/form-text-input';
 import {
   createTenantAction,
   type TCreateTenantFieldErrors,
@@ -13,7 +14,6 @@ import { Heading } from '@blog/ui/atoms/heading';
 import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
 import { Spinner } from '@blog/ui/atoms/spinner';
 import { Text } from '@blog/ui/atoms/text';
-import { TextInput } from '@blog/ui/atoms/text-input';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 
@@ -133,46 +133,31 @@ export const TenantDetailsForm = () => {
       <div className={cardWrap()}>
         <div className={card()} inert={isPending}>
           <div className={fields()}>
-            <FormField
+            <FormTextInput
               label={t('nameLabel')}
               htmlFor="tenant-name"
               error={fieldErrors.name}
-            >
-              <TextInput
-                id="tenant-name"
-                ariaLabel={t('nameLabel')}
-                value={values.name}
-                onChange={(value) => updateField('name', value)}
-              />
-            </FormField>
+              value={values.name}
+              onChange={(value) => updateField('name', value)}
+            />
 
-            <FormField
+            <FormTextInput
               label={t('slugLabel')}
               htmlFor="tenant-slug"
               hint={<span className={hint()}>{t('slugHint')}</span>}
               error={fieldErrors.slug}
-            >
-              <TextInput
-                id="tenant-slug"
-                ariaLabel={t('slugLabel')}
-                value={values.slug}
-                onChange={(value) => updateField('slug', value)}
-              />
-            </FormField>
+              value={values.slug}
+              onChange={(value) => updateField('slug', value)}
+            />
 
-            <FormField
+            <FormTextInput
               label={t('domainLabel')}
               htmlFor="tenant-domain"
               hint={<span className={hint()}>{t('domainHint')}</span>}
               error={fieldErrors.domain}
-            >
-              <TextInput
-                id="tenant-domain"
-                ariaLabel={t('domainLabel')}
-                value={values.domain}
-                onChange={(value) => updateField('domain', value)}
-              />
-            </FormField>
+              value={values.domain}
+              onChange={(value) => updateField('domain', value)}
+            />
 
             <FormField label={t('planLabel')}>
               <SegmentedControl<TTenantPlan>
@@ -184,7 +169,7 @@ export const TenantDetailsForm = () => {
               />
             </FormField>
 
-            <FormField
+            <FormTextInput
               label={t('ownerEmailLabel')}
               htmlFor="tenant-owner-email"
               hint={<span className={hint()}>{t('ownerEmailHint')}</span>}
@@ -197,15 +182,10 @@ export const TenantDetailsForm = () => {
                   />
                 )
               }
-            >
-              <TextInput
-                id="tenant-owner-email"
-                type="email"
-                ariaLabel={t('ownerEmailLabel')}
-                value={values.ownerEmail}
-                onChange={(value) => updateField('ownerEmail', value)}
-              />
-            </FormField>
+              type="email"
+              value={values.ownerEmail}
+              onChange={(value) => updateField('ownerEmail', value)}
+            />
           </div>
 
           <div className={actions()}>

@@ -1,6 +1,7 @@
 'use client';
 
 import { FormField } from '@admin/components/shared/form-field';
+import { FormTextInput } from '@admin/components/shared/form-text-input';
 import {
   updateTenantDetailsAction,
   type TUpdateTenantDetailsActionInput,
@@ -18,7 +19,6 @@ import { Alert } from '@blog/ui/atoms/alert';
 import { Button } from '@blog/ui/atoms/button';
 import { Heading } from '@blog/ui/atoms/heading';
 import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
-import { TextInput } from '@blog/ui/atoms/text-input';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useId, useState, useTransition } from 'react';
@@ -258,7 +258,7 @@ export const TenantDetailsPanel = ({
               .join(' ') || undefined;
 
           return (
-            <FormField
+            <FormTextInput
               key={key}
               label={labelText}
               htmlFor={id}
@@ -270,18 +270,13 @@ export const TenantDetailsPanel = ({
                 )
               }
               error={errorMessage}
-            >
-              <TextInput
-                id={id}
-                type={TEXT_FIELD_TYPE[key]}
-                ariaLabel={labelText}
-                value={values[key]}
-                onChange={(nextValue) => updateField(key, nextValue)}
-                isInvalid={Boolean(errorMessage)}
-                isDisabled={Boolean(lock)}
-                aria-describedby={describedBy}
-              />
-            </FormField>
+              type={TEXT_FIELD_TYPE[key]}
+              value={values[key]}
+              onChange={(nextValue) => updateField(key, nextValue)}
+              isInvalid={Boolean(errorMessage)}
+              isDisabled={Boolean(lock)}
+              aria-describedby={describedBy}
+            />
           );
         })}
 
