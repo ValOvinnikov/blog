@@ -54,7 +54,7 @@ const meta = {
         authorName,
       }) => (
         <PostCard key={href} excerpt={excerpt} tags={tags}>
-          <PostCard.Title>
+          <PostCard.Title level={3}>
             <a href={href}>{title}</a>
           </PostCard.Title>
           <PostCard.Footer
@@ -88,7 +88,7 @@ export const TwoColumn: TStory = {
           authorName,
         }) => (
           <PostCard key={href} excerpt={excerpt} tags={tags}>
-            <PostCard.Title>
+            <PostCard.Title level={3}>
               <a href={href}>{title}</a>
             </PostCard.Title>
             <PostCard.Footer

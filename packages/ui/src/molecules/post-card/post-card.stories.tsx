@@ -26,7 +26,7 @@ const meta = {
           dateLabel="March 10, 2024"
           readingTime="9 min"
         />
-        <PostCard.Title>
+        <PostCard.Title level={3}>
           <a href="/posts/building-a-design-system">
             Building a Design System from Scratch
           </a>
@@ -50,7 +50,7 @@ export const Minimal: TStory = {
     excerpt: undefined,
     tags: undefined,
     children: (
-      <PostCard.Title>
+      <PostCard.Title level={3}>
         <a href="/posts/minimal">A Minimal Post</a>
       </PostCard.Title>
     ),
@@ -66,7 +66,7 @@ export const WithoutFooter: TStory = {
           dateLabel="March 10, 2024"
           readingTime="9 min"
         />
-        <PostCard.Title>
+        <PostCard.Title level={3}>
           <a href="/posts/building-a-design-system">
             Building a Design System from Scratch
           </a>
@@ -83,7 +83,7 @@ export const WithTags: TStory = {
     tags: ['typescript', 'javascript', 'tips'],
     children: (
       <>
-        <PostCard.Title>
+        <PostCard.Title level={3}>
           <a href="/posts/typescript-tips">TypeScript Tips for 2024</a>
         </PostCard.Title>
         <PostCard.Footer
@@ -102,7 +102,7 @@ export const WithFooterLeadingIcon: TStory = {
     tags: ['typescript', 'javascript', 'tips'],
     children: (
       <>
-        <PostCard.Title>
+        <PostCard.Title level={3}>
           <a href="/posts/typescript-tips">TypeScript Tips for 2024</a>
         </PostCard.Title>
         <PostCard.Footer
@@ -115,11 +115,29 @@ export const WithFooterLeadingIcon: TStory = {
   },
 };
 
+export const AsSecondLevelHeading: TStory = {
+  args: {
+    children: (
+      <>
+        <PostCard.Title level={2}>
+          <a href="/posts/building-a-design-system">
+            Building a Design System from Scratch
+          </a>
+        </PostCard.Title>
+        <PostCard.Footer
+          topic="design-system"
+          trailingIcon={<Icon name={ICONS.ARROW} size={Size.SM} />}
+        />
+      </>
+    ),
+  },
+};
+
 export const WithAuthorFooter: TStory = {
   args: {
     children: (
       <>
-        <PostCard.Title>
+        <PostCard.Title level={3}>
           <a href="/posts/building-a-design-system">
             Building a Design System from Scratch
           </a>

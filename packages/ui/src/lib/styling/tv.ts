@@ -37,6 +37,15 @@ import { createTV } from 'tailwind-variants';
  * so `py-section` and `py-0` were classified as non-conflicting and both
  * landed on the element (`CtaModule`'s `wrapped` variant), leaving the
  * winner up to stylesheet order instead of `tv()`'s override intent.
+ *
+ * The custom `--tracking-*` tokens (`tight-display`, `tight-hero`,
+ * `tight-card`, `label`, `eyebrow`, `section`, defined in `theme.css`) are
+ * registered against the `tracking` classGroup for the same reason as
+ * padding: without it, a caller-supplied `tracking-label` and a base
+ * `tracking-tight` both survive on the same element (no catch-all,
+ * unrecognized names don't conflict), leaving the winner to stylesheet
+ * order instead of `tv()`'s override intent — surfaced by `Heading`
+ * consumers overriding its default letter-spacing via `className`.
  */
 const SPACING_TOKENS = [
   'gutter',
@@ -46,6 +55,15 @@ const SPACING_TOKENS = [
   'site-y',
   'card-x',
   'card-y',
+];
+
+const TRACKING_TOKENS = [
+  'tight-display',
+  'tight-hero',
+  'tight-card',
+  'label',
+  'eyebrow',
+  'section',
 ];
 
 export const tv = createTV({
@@ -78,6 +96,7 @@ export const tv = createTV({
             font: ['display', 'body', 'read', 'mono'],
           },
         ],
+        tracking: [{ tracking: TRACKING_TOKENS }],
         p: [{ p: SPACING_TOKENS }],
         px: [{ px: SPACING_TOKENS }],
         py: [{ py: SPACING_TOKENS }],

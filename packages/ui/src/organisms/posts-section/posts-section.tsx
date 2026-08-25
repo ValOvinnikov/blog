@@ -5,7 +5,9 @@ import {
   type IWithDataTestId,
 } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
+import { Heading } from '@blog/ui/atoms/heading';
 import { Icon } from '@blog/ui/atoms/icon';
+import type { THeadingLevel } from '@blog/ui/lib/react';
 import { PostCard } from '@blog/ui/molecules/post-card';
 import type { ElementType } from 'react';
 
@@ -44,6 +46,8 @@ export type TPostsSectionProps = IWithClassName &
     accessibleTitle?: string;
     /** Component each card's title link renders as — defaults to a plain `<a>`. Pass the app router's Link to get client-side navigation. */
     linkAs?: TAnchorElementType;
+    /** Heading depth for each card's title — the caller decides based on where the grid sits in the page outline. Defaults to `3`. */
+    cardHeadingLevel?: THeadingLevel;
     /** Optional supporting copy rendered under the heading. */
     supportingText?: string;
     /** Horizontal alignment of the heading and supporting text. Defaults to left. */
@@ -77,6 +81,7 @@ export const PostsSection = ({
   className,
   dataTestId,
   linkAs,
+  cardHeadingLevel = 3,
   supportingText,
   align,
   emptyMessage,
@@ -97,9 +102,13 @@ export const PostsSection = ({
   const content = (
     <>
       {resolvedTitle && (
-        <h2 id={titleId} className={hasTitle ? s.label() : s.labelFallback()}>
+        <Heading
+          level={2}
+          id={titleId}
+          className={hasTitle ? s.label() : s.labelFallback()}
+        >
           {resolvedTitle}
-        </h2>
+        </Heading>
       )}
       {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
       {isEmpty ? (
@@ -113,7 +122,7 @@ export const PostsSection = ({
                 dateLabel={post.formattedDate}
                 readingTime={post.readingTime}
               />
-              <PostCard.Title>
+              <PostCard.Title level={cardHeadingLevel}>
                 <Component href={post.href} className={s.titleLink()}>
                   {post.title}
                 </Component>
