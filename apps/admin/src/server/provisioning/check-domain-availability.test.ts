@@ -1,20 +1,26 @@
 import { checkDomainAvailability } from './check-domain-availability';
 
-const { envMock } = vi.hoisted(() => ({
+const { envMock, loggerErrorMock } = vi.hoisted(() => ({
   envMock: {
     VERCEL_API_TOKEN: undefined as string | undefined,
     VERCEL_WEB_PROJECT_ID: undefined as string | undefined,
     VERCEL_TEAM_ID: undefined as string | undefined,
   },
+  loggerErrorMock: vi.fn(),
 }));
 
 vi.mock('@admin/utils/env/env', () => ({ env: envMock }));
+
+vi.mock('@admin/utils/logger/logger', () => ({
+  logger: { error: loggerErrorMock, warn: vi.fn() },
+}));
 
 describe(checkDomainAvailability, () => {
   const fetchMock = vi.fn();
 
   beforeEach(() => {
     fetchMock.mockReset();
+    loggerErrorMock.mockReset();
     vi.stubGlobal('fetch', fetchMock);
     envMock.VERCEL_API_TOKEN = 'vercel-token';
     envMock.VERCEL_WEB_PROJECT_ID = 'prj_web';
@@ -115,11 +121,26 @@ describe(checkDomainAvailability, () => {
     );
   });
 
-  it('returns ERROR without making a request when the apex domain cannot be determined', async () => {
+  it('returns ERROR without making a request when the apex domain cannot be determined, and logs the specific event', async () => {
     const result = await checkDomainAvailability('co.uk');
 
     expect(result).toBe('ERROR');
     expect(fetchMock).not.toHaveBeenCalled();
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'tenants.domain_availability_apex_undetermined',
+      { domain: 'co.uk' },
+    );
+  });
+
+  it('returns ERROR without making a request for an IP-literal host (passes the domain pattern but has no registrable apex)', async () => {
+    const result = await checkDomainAvailability('1.2.3.4');
+
+    expect(result).toBe('ERROR');
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'tenants.domain_availability_apex_undetermined',
+      { domain: '1.2.3.4' },
+    );
   });
 
   it('returns IN_USE for a subdomain attached to a different project under the same apex, requested against the apex', async () => {
