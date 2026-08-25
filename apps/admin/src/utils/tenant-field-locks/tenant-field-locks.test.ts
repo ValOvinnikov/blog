@@ -1,5 +1,6 @@
 import { idleProvisioningSteps } from '@admin/testing/tenants/fixtures';
 import {
+  TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
@@ -7,12 +8,17 @@ import {
 import { computeTenantFieldLocks } from './tenant-field-locks';
 
 describe(computeTenantFieldLocks, () => {
-  it('locks nothing while every step is IDLE', () => {
-    expect(computeTenantFieldLocks(idleProvisioningSteps())).toEqual({});
+  it('locks nothing while every step is IDLE and provisioningStatus is not PROVISIONING', () => {
+    expect(
+      computeTenantFieldLocks(
+        idleProvisioningSteps(),
+        TENANT_PROVISIONING_STATUS.PENDING,
+      ),
+    ).toEqual({});
   });
 
-  it('locks nothing when provisioningSteps is null', () => {
-    expect(computeTenantFieldLocks(null)).toEqual({});
+  it('locks nothing when provisioningSteps is null and provisioningStatus is null', () => {
+    expect(computeTenantFieldLocks(null, null)).toEqual({});
   });
 
   it('locks slug once DEPLOY_STUDIO is DONE, leaving primaryDomain editable, when a later step failed', () => {
@@ -33,7 +39,9 @@ describe(computeTenantFieldLocks, () => {
       },
     };
 
-    expect(computeTenantFieldLocks(steps)).toEqual({
+    expect(
+      computeTenantFieldLocks(steps, TENANT_PROVISIONING_STATUS.FAILED),
+    ).toEqual({
       slug: { kind: 'step', step: TENANT_PROVISIONING_STEP.DEPLOY_STUDIO },
     });
   });
@@ -54,7 +62,12 @@ describe(computeTenantFieldLocks, () => {
 
     // slug is locked (DEPLOY_STUDIO is DONE) but primaryDomain — the field
     // that actually caused the failure — stays editable.
-    expect(computeTenantFieldLocks(failedAtMapDomain)).toEqual({
+    expect(
+      computeTenantFieldLocks(
+        failedAtMapDomain,
+        TENANT_PROVISIONING_STATUS.FAILED,
+      ),
+    ).toEqual({
       slug: { kind: 'step', step: TENANT_PROVISIONING_STEP.DEPLOY_STUDIO },
     });
   });
@@ -83,7 +96,9 @@ describe(computeTenantFieldLocks, () => {
       },
     };
 
-    expect(computeTenantFieldLocks(steps)).toEqual({
+    expect(
+      computeTenantFieldLocks(steps, TENANT_PROVISIONING_STATUS.FAILED),
+    ).toEqual({
       slug: { kind: 'step', step: TENANT_PROVISIONING_STEP.DEPLOY_STUDIO },
       primaryDomain: {
         kind: 'step',
@@ -100,7 +115,9 @@ describe(computeTenantFieldLocks, () => {
       },
     };
 
-    expect(computeTenantFieldLocks(steps)).toEqual({
+    expect(
+      computeTenantFieldLocks(steps, TENANT_PROVISIONING_STATUS.PROVISIONING),
+    ).toEqual({
       name: { kind: 'running' },
       slug: { kind: 'running' },
       primaryDomain: { kind: 'running' },
@@ -121,13 +138,35 @@ describe(computeTenantFieldLocks, () => {
       [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,
     };
 
-    expect(computeTenantFieldLocks(steps)).toEqual({
+    expect(
+      computeTenantFieldLocks(steps, TENANT_PROVISIONING_STATUS.READY),
+    ).toEqual({
       name: { kind: 'succeeded' },
       slug: { kind: 'succeeded' },
       primaryDomain: { kind: 'succeeded' },
       plan: { kind: 'succeeded' },
       locale: { kind: 'succeeded' },
       ownerEmail: { kind: 'succeeded' },
+    });
+  });
+
+  it('locks every field with a "running" reason once provisioningStatus is PROVISIONING, even while every step is still IDLE', () => {
+    // This is the actual regression: `beginTenantProvisioning` moves the
+    // column to PROVISIONING before its runner reports any step, so the
+    // steps map alone can't be trusted to decide whether provisioning is
+    // in flight.
+    expect(
+      computeTenantFieldLocks(
+        idleProvisioningSteps(),
+        TENANT_PROVISIONING_STATUS.PROVISIONING,
+      ),
+    ).toEqual({
+      name: { kind: 'running' },
+      slug: { kind: 'running' },
+      primaryDomain: { kind: 'running' },
+      plan: { kind: 'running' },
+      locale: { kind: 'running' },
+      ownerEmail: { kind: 'running' },
     });
   });
 });

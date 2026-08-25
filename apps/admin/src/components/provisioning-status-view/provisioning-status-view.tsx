@@ -9,7 +9,7 @@ import { retryProvisioningStepAction } from '@admin/server/provisioning/retry-pr
 import { classifyProvisioningError } from '@admin/utils/provisioning-error/provisioning-error';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import { computeTenantFieldLocks } from '@admin/utils/tenant-field-locks/tenant-field-locks';
-import { ICONS, Size } from '@blog/config';
+import { ALERT_TYPE, ICONS, Size } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -21,6 +21,7 @@ import type {
   TTenant,
   TTenantProvisioningSteps,
 } from '@blog/db/schema/tenants';
+import { Alert } from '@blog/ui/atoms/alert';
 import { Button } from '@blog/ui/atoms/button';
 import { Eyebrow } from '@blog/ui/atoms/eyebrow';
 import { Heading } from '@blog/ui/atoms/heading';
@@ -155,6 +156,15 @@ export const ProvisioningStatusView = ({
   const router = useRouter();
   const [isRetrying, setIsRetrying] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
+  // A string message means "show it"; distinct from `undefined` so a stale
+  // error from a previous attempt never lingers into a fresh one.
+  const [dispatchError, setDispatchError] = useState<string | undefined>(
+    undefined,
+  );
+  // True while the most recent poll tick rejected (e.g. an expired-session
+  // redirect thrown by `requireAdmin()`) — the interval keeps retrying on
+  // its own; this only drives the operator-visible indicator.
+  const [pollError, setPollError] = useState(false);
   const [, startTransition] = useTransition();
   const [renderedTenant, setRenderedTenant] = useState(tenant);
   const [provisioningStatus, setProvisioningStatus] =
@@ -245,34 +255,47 @@ export const ProvisioningStatusView = ({
     let cancelled = false;
 
     const intervalId = setInterval(() => {
-      void getTenantProvisioningStatusAction(tenant.id).then((result) => {
-        if (cancelled || !result) {
-          return;
-        }
-        setProvisioningStatus(result.provisioningStatus);
-        setProvisioningSteps(result.provisioningSteps);
+      void getTenantProvisioningStatusAction(tenant.id)
+        .then((result) => {
+          if (cancelled || !result) {
+            return;
+          }
+          setPollError(false);
+          setProvisioningStatus(result.provisioningStatus);
+          setProvisioningSteps(result.provisioningSteps);
 
-        const freshStatuses = stepStatusesFor(result.provisioningSteps);
-        if (
-          pendingRetryBaseline &&
-          stepStatusesEqual(freshStatuses, pendingRetryBaseline)
-        ) {
-          // Unchanged since Retry/Start was pressed — the dispatch only
-          // confirms GitHub received the request, not that a runner has
-          // picked it up yet, so this read alone can't tell "never" apart
-          // from "not yet". Keep watching rather than stop on a snapshot
-          // that predates the retry.
-          return;
-        }
+          const freshStatuses = stepStatusesFor(result.provisioningSteps);
+          if (
+            pendingRetryBaseline &&
+            stepStatusesEqual(freshStatuses, pendingRetryBaseline)
+          ) {
+            // Unchanged since Retry/Start was pressed — the dispatch only
+            // confirms GitHub received the request, not that a runner has
+            // picked it up yet, so this read alone can't tell "never" apart
+            // from "not yet". Keep watching rather than stop on a snapshot
+            // that predates the retry.
+            return;
+          }
 
-        setPendingRetryBaseline(null);
-        setIsPollingActive(
-          shouldContinuePolling(
-            result.provisioningStatus,
-            result.provisioningSteps,
-          ),
-        );
-      });
+          setPendingRetryBaseline(null);
+          setIsPollingActive(
+            shouldContinuePolling(
+              result.provisioningStatus,
+              result.provisioningSteps,
+            ),
+          );
+        })
+        .catch(() => {
+          // A rejected tick (e.g. an expired-session redirect thrown by
+          // `requireAdmin()`) must not silently kill polling — the interval
+          // itself already retries on its own next tick; this only makes
+          // the stall visible instead of leaving the last-known state
+          // looking current.
+          if (cancelled) {
+            return;
+          }
+          setPollError(true);
+        });
     }, STEP_POLL_INTERVAL_MS);
 
     return () => {
@@ -324,8 +347,33 @@ export const ProvisioningStatusView = ({
     ? classifyProvisioningError(failedStepError)
     : undefined;
 
-  const handleRetry = () => {
-    setIsRetrying(true);
+  // A dispatch has been requested but the runner hasn't reported a step yet
+  // — `provisioningStatus` itself won't reflect this until the Server
+  // Action's own `beginTenantProvisioning` call resolves and a refresh (or
+  // poll) picks it up, which can lag a slow GitHub dispatch by seconds.
+  // Treating the in-flight click itself as "running" is what makes the
+  // badge, the field locks, and the Start button react immediately instead
+  // of only once the round trip completes.
+  const isDispatchPending = isStarting || isRetrying;
+  const effectiveProvisioningStatus = isDispatchPending
+    ? TENANT_PROVISIONING_STATUS.PROVISIONING
+    : provisioningStatus;
+  const isProvisioningRunning =
+    effectiveProvisioningStatus === TENANT_PROVISIONING_STATUS.PROVISIONING;
+  // The real per-step statuses drive `overallStepStatus`/`isOverallFailed`
+  // above unchanged; this is only what the header badge displays while
+  // every step is still IDLE but a dispatch is nonetheless in flight. Only
+  // ever rendered from the `!isOverallFailed` branch below, where
+  // `overallStepStatus` is never FAILED either way.
+  const displayOverallStatus = (
+    allIdle && isProvisioningRunning
+      ? TENANT_PROVISIONING_STEP_STATUS.RUNNING
+      : overallStepStatus
+  ) as Exclude<TTenantProvisioningStepStatus, 'FAILED'>;
+
+  const runProvisioningDispatch = (setPending: (pending: boolean) => void) => {
+    setDispatchError(undefined);
+    setPending(true);
     // Force polling back on immediately, and record what the steps look
     // like right now — the re-dispatched workflow hasn't actually started
     // yet, so the poll tick needs this snapshot to recognise "no change
@@ -333,22 +381,31 @@ export const ProvisioningStatusView = ({
     setIsPollingActive(true);
     setPendingRetryBaseline(stepStatuses);
     startTransition(async () => {
-      await retryProvisioningStepAction(tenant.id);
-      router.refresh();
-      setIsRetrying(false);
+      const result = await retryProvisioningStepAction(tenant.id);
+
+      if (
+        result.outcome === 'dispatched' ||
+        result.outcome === 'already-in-progress'
+      ) {
+        router.refresh();
+      } else {
+        // Nothing was actually dispatched (or it was reverted server-side)
+        // — stop waiting for a change that predates a retry that never
+        // took effect, and let the operator see and act on the failure.
+        setPendingRetryBaseline(null);
+        setDispatchError(
+          result.outcome === 'not-found'
+            ? t('startErrorNotFound')
+            : t('startError'),
+        );
+      }
+
+      setPending(false);
     });
   };
 
-  const handleStart = () => {
-    setIsStarting(true);
-    setIsPollingActive(true);
-    setPendingRetryBaseline(stepStatuses);
-    startTransition(async () => {
-      await retryProvisioningStepAction(tenant.id);
-      router.refresh();
-      setIsStarting(false);
-    });
-  };
+  const handleRetry = () => runProvisioningDispatch(setIsRetrying);
+  const handleStart = () => runProvisioningDispatch(setIsStarting);
 
   return (
     <div className={root()}>
@@ -368,7 +425,15 @@ export const ProvisioningStatusView = ({
         )}
       </div>
 
-      {allIdle && (
+      {pollError && (
+        <Alert type={ALERT_TYPE.WARNING} message={t('pollErrorWarning')} />
+      )}
+
+      {dispatchError && (
+        <Alert type={ALERT_TYPE.ERROR} message={dispatchError} />
+      )}
+
+      {allIdle && !isProvisioningRunning && (
         <div className={startAction()}>
           <Button
             type="button"
@@ -427,7 +492,7 @@ export const ProvisioningStatusView = ({
         </aside>
 
         <div className={detailsColumn()}>
-          {!allIdle && (
+          {(!allIdle || isProvisioningRunning) && (
             <div className={detailsHeader()}>
               <span className={overallStatusLive()} aria-live="polite">
                 {isOverallFailed ? (
@@ -435,8 +500,8 @@ export const ProvisioningStatusView = ({
                     {t(`statusLabel.${overallStepStatus}`)}
                   </span>
                 ) : (
-                  <StatusBadge tone={STEP_TONE[overallStepStatus]}>
-                    {t(`statusLabel.${overallStepStatus}`)}
+                  <StatusBadge tone={STEP_TONE[displayOverallStatus]}>
+                    {t(`statusLabel.${displayOverallStatus}`)}
                   </StatusBadge>
                 )}
               </span>
@@ -478,7 +543,10 @@ export const ProvisioningStatusView = ({
 
           <TenantDetailsPanel
             tenant={tenant}
-            fieldLocks={computeTenantFieldLocks(provisioningSteps)}
+            fieldLocks={computeTenantFieldLocks(
+              provisioningSteps,
+              effectiveProvisioningStatus,
+            )}
             ownerEmail={ownerEmail}
           />
           {provisioningStatus === TENANT_PROVISIONING_STATUS.READY && (

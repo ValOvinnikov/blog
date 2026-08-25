@@ -241,6 +241,9 @@
     "retryingButton": "Retrying provisioning…",
     "startButton": "Start provisioning",
     "startingButton": "Starting…",
+    "startError": "Couldn't start provisioning — try again.",
+    "startErrorNotFound": "Couldn't find this tenant — refresh the page and try again.",
+    "pollErrorWarning": "Couldn't refresh the latest status — retrying automatically.",
     "errorKind": {
       "permission": {
         "headline": "Missing permission to complete this step",
