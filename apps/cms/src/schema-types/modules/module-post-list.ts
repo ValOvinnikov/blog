@@ -15,13 +15,6 @@ export const postListSchema = defineType({
     brandVariantField(),
     sectionHeaderField(),
     defineField({
-      name: 'limit',
-      title: 'Limit',
-      type: 'number',
-      description: 'Maximum number of posts to show.',
-      validation: (rule) => rule.required().integer().min(1).max(24),
-    }),
-    defineField({
       name: 'pageSize',
       title: 'Page Size',
       type: 'number',
@@ -33,12 +26,12 @@ export const postListSchema = defineType({
   preview: {
     select: {
       title: 'title',
-      limit: 'limit',
+      pageSize: 'pageSize',
     },
-    prepare({ title, limit }) {
+    prepare({ title, pageSize }) {
       return {
         title: title ?? 'Unknown',
-        subtitle: limit ? `Limit: ${String(limit)}` : undefined,
+        subtitle: pageSize ? `Page size: ${String(pageSize)}` : undefined,
       };
     },
   },

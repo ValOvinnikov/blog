@@ -526,7 +526,6 @@ export type Page_blog = {
   title?: string;
   heading?: string;
   supportingText?: string;
-  itemsPerPage?: number;
   postList?: Module_postListReference;
   modules?: Array<
     | ({
@@ -548,7 +547,6 @@ export type Module_postList = {
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
   sectionHeader?: SectionHeader;
-  limit?: number;
   pageSize?: number;
   layout?: Layout;
 };
