@@ -234,6 +234,18 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/');
   });
 
+  it('omits the /topics entry when the topic index page fetch resolves ok with no document', async () => {
+    mockAllEmpty();
+    getTopicIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+    const urls = entries.map((entry) => entry.url);
+
+    expect(urls).not.toContain('https://example.com/topics');
+    expect(urls).toContain('https://example.com/');
+  });
+
   it('omits generic pages when the slugs fetch fails', async () => {
     mockAllEmpty();
     getPageSlugsMock.mockResolvedValue({
