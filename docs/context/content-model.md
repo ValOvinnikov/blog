@@ -149,7 +149,7 @@ separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
   tenant-level theme override resolved against `PRESET_REGISTRY` in
   `@blog/config`; part of the Phase 2 configurability epic (#1285).
 - `settings_voice` (singleton, `voiceSchema`) — `titleField` (bare; see
-  helper note below), 20 optional string overrides grouped into 4 fieldsets:
+  helper note below), 19 optional string overrides grouped into 4 fieldsets:
   404 page (`notFoundMetaTitle`/`notFoundMetaDescription`/
   `notFoundCommandNotFound`/`notFoundDescription`/`notFoundReturnHome`),
   terminal prompts (`terminalPromptHost`, `authPromptCommandSignIn`/
@@ -157,8 +157,8 @@ separator: SPEC_LINE_SEPARATORS }`, replacing a plain string so the
   `accountPrivacyPromptCommand`/`accountNewsletterPromptCommand`/
   `accountIdentityPromptCommand`), bookmarks
   (`bookmarkToastSavedMessage`/`bookmarkToastRemovedMessage`), and empty
-  states (`blogListEmpty`/`topicEmpty`/`tagEmpty`/`authorEmpty`/
-  `topicsEmpty`/`bookmarksEmpty`) — each blank falls through to the active
+  states (`blogListEmpty`/`topicEmpty`/`tagEmpty`/`topicsEmpty`/
+  `bookmarksEmpty`) — each blank falls through to the active
   preset's own wording, then the neutral base; part of the Phase 3
   voice-as-content epic (#1288).
 - `settings_navigation` (singleton) — `titleField` (bare; see helper note
