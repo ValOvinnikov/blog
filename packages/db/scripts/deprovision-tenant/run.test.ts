@@ -8,8 +8,8 @@ const { removeTenantDomainMock } = vi.hoisted(() => ({
 const { deleteTenantStudioProjectMock } = vi.hoisted(() => ({
   deleteTenantStudioProjectMock: vi.fn(),
 }));
-const { deleteTenantSanityProjectMock } = vi.hoisted(() => ({
-  deleteTenantSanityProjectMock: vi.fn(),
+const { archiveTenantSanityProjectMock } = vi.hoisted(() => ({
+  archiveTenantSanityProjectMock: vi.fn(),
 }));
 const { clearTenantArtifactsMock } = vi.hoisted(() => ({
   clearTenantArtifactsMock: vi.fn(),
@@ -24,8 +24,8 @@ vi.mock('./steps/remove-domain', () => ({
 vi.mock('./steps/delete-studio-project', () => ({
   deleteTenantStudioProject: deleteTenantStudioProjectMock,
 }));
-vi.mock('./steps/delete-sanity-project', () => ({
-  deleteTenantSanityProject: deleteTenantSanityProjectMock,
+vi.mock('./steps/archive-sanity-project', () => ({
+  archiveTenantSanityProject: archiveTenantSanityProjectMock,
 }));
 vi.mock('./steps/clear-artifacts', () => ({
   clearTenantArtifacts: clearTenantArtifactsMock,
@@ -48,7 +48,7 @@ const env = {
 beforeEach(() => {
   removeTenantDomainMock.mockReset().mockResolvedValue(undefined);
   deleteTenantStudioProjectMock.mockReset().mockResolvedValue(undefined);
-  deleteTenantSanityProjectMock.mockReset().mockResolvedValue(undefined);
+  archiveTenantSanityProjectMock.mockReset().mockResolvedValue(undefined);
   clearTenantArtifactsMock.mockReset().mockResolvedValue(undefined);
   archiveTenantRowMock.mockReset().mockResolvedValue(undefined);
 });
@@ -60,53 +60,36 @@ describe(runSteps, () => {
     expect(result).toEqual({ ok: true });
     expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
     expect(deleteTenantStudioProjectMock).toHaveBeenCalledTimes(1);
-    expect(deleteTenantSanityProjectMock).toHaveBeenCalledTimes(1);
+    expect(archiveTenantSanityProjectMock).toHaveBeenCalledTimes(1);
     expect(clearTenantArtifactsMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
   });
 
   it('stops at the first failing step and never runs later steps', async () => {
-    deleteTenantSanityProjectMock.mockRejectedValue(new Error('boom'));
+    archiveTenantSanityProjectMock.mockRejectedValue(new Error('boom'));
 
     const result = await runSteps(baseTenant, env);
 
     expect(result).toEqual({ ok: false });
     expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
     expect(deleteTenantStudioProjectMock).toHaveBeenCalledTimes(1);
-    expect(deleteTenantSanityProjectMock).toHaveBeenCalledTimes(1);
+    expect(archiveTenantSanityProjectMock).toHaveBeenCalledTimes(1);
     expect(clearTenantArtifactsMock).not.toHaveBeenCalled();
     expect(archiveTenantRowMock).not.toHaveBeenCalled();
   });
 
-  it('passes the same tenant row, env, and starting context through to every step', async () => {
+  it('passes the same tenant row and env through to every step', async () => {
     await runSteps(baseTenant, env);
 
     for (const mock of [
       removeTenantDomainMock,
       deleteTenantStudioProjectMock,
-      deleteTenantSanityProjectMock,
+      archiveTenantSanityProjectMock,
       clearTenantArtifactsMock,
       archiveTenantRowMock,
     ]) {
-      expect(mock).toHaveBeenCalledWith(baseTenant, env, {
-        keepSanityProjectId: false,
-      });
+      expect(mock).toHaveBeenCalledWith(baseTenant, env);
     }
-  });
-
-  it('threads keepSanityProjectId into clear-artifacts when delete-sanity-project reports it was blocked', async () => {
-    deleteTenantSanityProjectMock.mockResolvedValue({
-      keepSanityProjectId: true,
-    });
-
-    await runSteps(baseTenant, env);
-
-    expect(clearTenantArtifactsMock).toHaveBeenCalledWith(baseTenant, env, {
-      keepSanityProjectId: true,
-    });
-    expect(archiveTenantRowMock).toHaveBeenCalledWith(baseTenant, env, {
-      keepSanityProjectId: true,
-    });
   });
 });
 
@@ -120,7 +103,7 @@ describe(runDeprovisioning, () => {
 
     expect(removeTenantDomainMock).not.toHaveBeenCalled();
     expect(deleteTenantStudioProjectMock).not.toHaveBeenCalled();
-    expect(deleteTenantSanityProjectMock).not.toHaveBeenCalled();
+    expect(archiveTenantSanityProjectMock).not.toHaveBeenCalled();
     expect(clearTenantArtifactsMock).not.toHaveBeenCalled();
     expect(archiveTenantRowMock).not.toHaveBeenCalled();
   });

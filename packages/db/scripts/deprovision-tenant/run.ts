@@ -1,9 +1,9 @@
 /**
  * Deprovisioning workflow entrypoint — reverses `provision-tenant`'s five
  * steps for one tenant: removes its domain from the shared web project,
- * deletes its Studio Vercel project and Sanity project, clears the
- * provisioning-artifact columns, then archives (never hard-deletes) the
- * `tenants` row.
+ * deletes its Studio Vercel project, archives (never deletes) its Sanity
+ * project, clears the provisioning-artifact columns, then archives (never
+ * hard-deletes) the `tenants` row.
  *
  * Invoked only by `.github/workflows/deprovision-tenant.yml` via
  * `pnpm --filter @blog/db db:deprovision-tenant -- --tenant-id=<uuid>
@@ -21,16 +21,12 @@ import { pathToFileURL } from 'node:url';
 
 import type { TTenant } from '@blog/db/schema/tenants';
 
-import {
-  INITIAL_DEPROVISION_CONTEXT,
-  type TDeprovisionContext,
-} from './lib/context';
 import { loadDeprovisionEnv, type TDeprovisionEnv } from './lib/env';
 import { getTenantRow } from './lib/get-tenant-row';
 import { sanitizeLogMessage } from './lib/sanitize-log-message';
+import { archiveTenantSanityProject } from './steps/archive-sanity-project';
 import { archiveTenantRow } from './steps/archive-tenant';
 import { clearTenantArtifacts } from './steps/clear-artifacts';
-import { deleteTenantSanityProject } from './steps/delete-sanity-project';
 import { deleteTenantStudioProject } from './steps/delete-studio-project';
 import { removeTenantDomain } from './steps/remove-domain';
 
@@ -72,17 +68,13 @@ function parseDryRun(argv: string[]): boolean {
 
 type TStep = {
   name: string;
-  run: (
-    tenant: TTenant,
-    env: TDeprovisionEnv,
-    context: TDeprovisionContext,
-  ) => Promise<Partial<TDeprovisionContext> | void>;
+  run: (tenant: TTenant, env: TDeprovisionEnv) => Promise<void>;
 };
 
 const STEPS: TStep[] = [
   { name: 'remove-domain', run: removeTenantDomain },
   { name: 'delete-studio-project', run: deleteTenantStudioProject },
-  { name: 'delete-sanity-project', run: deleteTenantSanityProject },
+  { name: 'archive-sanity-project', run: archiveTenantSanityProject },
   { name: 'clear-artifacts', run: clearTenantArtifacts },
   { name: 'archive-tenant', run: archiveTenantRow },
 ];
@@ -94,20 +86,11 @@ export async function runSteps(
   tenant: TTenant,
   env: TDeprovisionEnv,
 ): Promise<{ ok: boolean }> {
-  // Accumulates across steps the same way `provision-tenant/run.ts` folds
-  // each step's partial result back in — `delete-sanity-project`'s
-  // `keepSanityProjectId` is the only value threaded today, read by
-  // `clear-artifacts` two steps later.
-  let context = INITIAL_DEPROVISION_CONTEXT;
-
   for (const step of STEPS) {
     console.warn(`deprovision-tenant: running step "${step.name}"...`);
 
     try {
-      const result = await step.run(tenant, env, context);
-      if (result) {
-        context = { ...context, ...result };
-      }
+      await step.run(tenant, env);
       console.warn(`deprovision-tenant: step "${step.name}" done.`);
     } catch (error) {
       console.error(
