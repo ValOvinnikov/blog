@@ -1,5 +1,6 @@
 import type { TTaxonomyKind } from '@blog/config';
 import { service } from '@blog/service';
+import type { THeadingLevel } from '@blog/ui/lib/react';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -13,6 +14,7 @@ export interface ITaxonomyListModuleProps {
   taxonomy: TTaxonomyKind;
   titleId: string;
   dataTestId: string;
+  headingLevel: THeadingLevel;
   accessibleTitle: string;
   emptyMessage: string;
   buildHref: (slug: string) => string;
@@ -32,6 +34,7 @@ export const TaxonomyListModule = async ({
   taxonomy,
   titleId,
   dataTestId,
+  headingLevel,
   accessibleTitle,
   emptyMessage,
   buildHref,
@@ -69,6 +72,7 @@ export const TaxonomyListModule = async ({
       layout={layout}
       titleId={titleId}
       dataTestId={dataTestId}
+      headingLevel={headingLevel}
       accessibleTitle={accessibleTitle}
       emptyMessage={emptyMessage}
     />
