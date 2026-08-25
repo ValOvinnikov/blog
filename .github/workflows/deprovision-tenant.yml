@@ -69,8 +69,8 @@ jobs:
     # this job needs are singleton (one org, one team) regardless of which
     # Neon branch the tenant registry targets. The registry itself (which
     # branch holds the `tenants` row this run reads/writes) is selected
-    # per-dispatch by the `environment` input below, via DATABASE_URL — see
-    # that mapping's own comment.
+    # per-dispatch by the `environment` input below — see the "Select tenant
+    # registry database URL" step.
     environment: production
     env:
       SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
@@ -79,14 +79,6 @@ jobs:
       # The *shared* apps/web Vercel project — step 1 removes the tenant's
       # domain from this one project, never a per-tenant project.
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
-      # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
-      # specifically. Deliberately its OWN secrets, distinct from
-      # `DATABASE_URL_UNPOOLED` (which `deploy-production.yml`'s `migrate-db`
-      # job reads, from this same `production` GitHub Environment) — same
-      # decoupling as `provision-tenant.yml`, see its DATABASE_URL comment
-      # (#2056). `inputs.environment` selects which branch's tenant registry
-      # this run targets.
-      DATABASE_URL: ${{ inputs.environment == 'development' && secrets.TENANT_REGISTRY_DATABASE_URL_DEV || secrets.TENANT_REGISTRY_DATABASE_URL_PROD }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -95,6 +87,29 @@ jobs:
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
+      # `getDb()` (via `packages/db/src/utils/env/env.ts`) reads `DATABASE_URL`
+      # specifically. Deliberately its OWN secrets, distinct from
+      # `DATABASE_URL_UNPOOLED` (which `deploy-production.yml`'s `migrate-db`
+      # job reads, from this same `production` GitHub Environment) — same
+      # decoupling as `provision-tenant.yml`, see its own "Select tenant
+      # registry database URL" step comment for why this is a shell `if`
+      # rather than the `${{ A && B || C }}` expression idiom (#2056).
+      - name: Select tenant registry database URL
+        env:
+          TARGET_ENVIRONMENT: ${{ inputs.environment }}
+          DEV_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL_DEV }}
+          PROD_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL_PROD }}
+        run: |
+          set -euo pipefail
+          if [ "$TARGET_ENVIRONMENT" = development ]; then
+            SELECTED="$DEV_URL"
+            SELECTED_NAME=TENANT_REGISTRY_DATABASE_URL_DEV
+          else
+            SELECTED="$PROD_URL"
+            SELECTED_NAME=TENANT_REGISTRY_DATABASE_URL_PROD
+          fi
+          : "${SELECTED:?empty — set the $SELECTED_NAME secret on the production environment}"
+          echo "DATABASE_URL=$SELECTED" >> "$GITHUB_ENV"
       - name: Run deprovisioning steps
         # `inputs.*` are attacker-influenceable (any repo collaborator who
         # can trigger workflow_dispatch controls them) — never interpolate a
