@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 
 import VoicePage from './page';
 
-const ADVANCED_SUMMARY = 'Advanced — 20 curated strings, 4 groups';
+const ADVANCED_SUMMARY = 'Advanced — 19 curated strings, 4 groups';
 
 // Advanced starts collapsed — open it before reading any curated field.
 const openAdvanced = async () => {

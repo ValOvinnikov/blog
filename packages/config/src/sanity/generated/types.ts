@@ -295,7 +295,6 @@ export type Settings_voice = {
   blogListEmpty?: string;
   topicEmpty?: string;
   tagEmpty?: string;
-  authorEmpty?: string;
   topicsEmpty?: string;
   bookmarksEmpty?: string;
 };

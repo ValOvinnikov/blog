@@ -1,5 +1,5 @@
 /**
- * The 20 curated voice-override fields, grouped exactly as
+ * The 19 curated voice-override fields, grouped exactly as
  * `apps/cms/src/schema-types/documents/settings/voice.ts` defines them
  * (fieldset `title`s for groups, field `title`s for labels) — this is the
  * Postgres-backed port of that schema's field set, not a redesign of it.
@@ -24,7 +24,6 @@ export type TVoiceOverrideKey =
   | 'blogListEmpty'
   | 'topicEmpty'
   | 'tagEmpty'
-  | 'authorEmpty'
   | 'topicsEmpty'
   | 'bookmarksEmpty';
 
@@ -80,7 +79,6 @@ export const VOICE_FIELD_GROUPS: TVoiceFieldGroup[] = [
       { key: 'blogListEmpty', multiline: true },
       { key: 'topicEmpty', multiline: true },
       { key: 'tagEmpty', multiline: true },
-      { key: 'authorEmpty', multiline: true },
       { key: 'topicsEmpty', multiline: true },
       { key: 'bookmarksEmpty', multiline: true },
     ],

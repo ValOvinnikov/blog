@@ -19,7 +19,7 @@ vi.mocked(useRouter).mockReturnValue({
   refresh: vi.fn(),
 } as unknown as ReturnType<typeof useRouter>);
 
-const ADVANCED_SUMMARY = 'Advanced — 20 curated strings, 4 groups';
+const ADVANCED_SUMMARY = 'Advanced — 19 curated strings, 4 groups';
 
 // Advanced starts collapsed (matching the Look tab) — every test that reads
 // or interacts with a curated field opens it first, same as a real user
@@ -98,7 +98,7 @@ describe(VoiceSettings, () => {
     expect(screen.getByText('404 page')).toBeVisible();
   });
 
-  it('renders all 20 fields across the 4 named groups, with none invented, once expanded', async () => {
+  it('renders all 19 fields across the 4 named groups, with none invented, once expanded', async () => {
     const user = userEvent.setup();
     render(
       <VoiceSettings
@@ -111,7 +111,7 @@ describe(VoiceSettings, () => {
 
     await openAdvanced(user);
 
-    expect(screen.getAllByRole('textbox')).toHaveLength(20);
+    expect(screen.getAllByRole('textbox')).toHaveLength(19);
     expect(screen.getByText('404 page')).toBeVisible();
     expect(screen.getByText('Terminal prompts')).toBeVisible();
     expect(screen.getByText('Bookmarks')).toBeVisible();

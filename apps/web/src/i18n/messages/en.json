@@ -85,10 +85,6 @@
     "empty": "No posts tagged {name} yet.",
     "paginationAriaLabel": "{name} pages"
   },
-  "authorPage": {
-    "title": "Posts by {name}",
-    "empty": "{name} hasn't published any posts yet."
-  },
   "topicsPage": {
     "empty": "No topics yet.",
     "postsCount": "{count, plural, one {1 post} other {{count} posts}}"
