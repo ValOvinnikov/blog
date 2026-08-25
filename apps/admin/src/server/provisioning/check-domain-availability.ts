@@ -1,6 +1,7 @@
 import { env } from '@admin/utils/env/env';
 import { logger } from '@admin/utils/logger/logger';
 import { DOMAIN_PATTERN } from '@admin/utils/path/path';
+import { getDomain } from 'tldts';
 
 export type TDomainAvailability =
   'NOT_CONFIGURED' | 'AVAILABLE' | 'IN_USE' | 'ERROR';
@@ -26,17 +27,13 @@ type TProjectDomainsPage = {
 /**
  * Vercel's project-domains-by-apex endpoint takes the registrable ("apex")
  * domain, not the full hostname — `blog-dev.valstack.dev` must be queried
- * as `valstack.dev`. This is a last-two-labels heuristic, not a public
- * suffix list lookup: it is wrong for a domain under a multi-part public
- * suffix (`example.co.uk` would derive `co.uk`, not `example.co.uk`).
- * Acceptable here because the check is advisory and every failure mode
- * (including a wrong apex returning no match) degrades to "can't tell, let
- * creation proceed" rather than a false block.
+ * as `valstack.dev`, and `blog.example.co.uk` as `example.co.uk`. Derived via
+ * the public suffix list (`tldts`) rather than a labels-count heuristic,
+ * since the suffix itself can be multi-part. Returns `null` when no
+ * registrable domain can be determined (e.g. the input is itself a bare
+ * public suffix).
  */
-const deriveApexDomain = (domain: string): string => {
-  const labels = domain.split('.');
-  return labels.slice(-2).join('.');
-};
+const deriveApexDomain = (domain: string): string | null => getDomain(domain);
 
 // Vercel's own casing/trailing-dot normalization for a returned domain name
 // isn't documented, so both sides are normalized the same way before
@@ -84,6 +81,12 @@ export const checkDomainAvailability = async (
   }
 
   const apexDomain = deriveApexDomain(domain);
+
+  if (!apexDomain) {
+    logger.error('tenants.domain_availability_apex_undetermined', { domain });
+    return 'ERROR';
+  }
+
   const normalizedDomain = normalizeDomainName(domain);
 
   let until: number | undefined;

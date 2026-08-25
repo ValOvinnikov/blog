@@ -102,6 +102,26 @@ describe(checkDomainAvailability, () => {
     expect(calledUrl.pathname).toBe('/v1/domains/valstack.dev/project-domains');
   });
 
+  it('requests the registrable domain under a multi-part public suffix, not the last two labels', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ projectDomains: [] }), { status: 200 }),
+    );
+
+    await checkDomainAvailability('blog.example.co.uk');
+
+    const [calledUrl] = fetchMock.mock.calls[0] as [URL];
+    expect(calledUrl.pathname).toBe(
+      '/v1/domains/example.co.uk/project-domains',
+    );
+  });
+
+  it('returns ERROR without making a request when the apex domain cannot be determined', async () => {
+    const result = await checkDomainAvailability('co.uk');
+
+    expect(result).toBe('ERROR');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('returns IN_USE for a subdomain attached to a different project under the same apex, requested against the apex', async () => {
     fetchMock.mockResolvedValue(
       new Response(
