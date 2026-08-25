@@ -36,7 +36,7 @@ live document (independent of any given PR's diff) can't fail a required
 check — same reasoning as Lighthouse CI / Playwright smoke below.
 
 **Document validation runs clean, including on `migrationState`.**
-`migrationState` (`apps/cms/scripts/migrate-lib.mjs`'s single fixed-`_id`
+`migrationState` (`apps/cms/scripts/migrate.mjs`'s single fixed-`_id`
 migration ledger document) has a declared Studio schema type
 (`apps/cms/src/schema-types/documents/system/migration-state.ts`) so
 `sanity documents validate` recognizes it, while `sanity.config.ts` disables
