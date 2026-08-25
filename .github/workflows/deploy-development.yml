@@ -214,10 +214,11 @@ jobs:
     environment: development
     env:
       DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
-      # Non-secret: a Neon connection host alone can't authenticate anything,
-      # so this is safe as a plain repo Variable. One-time setup in
-      # docs/DEPLOY.md; unset it stays a no-op below, same as every other
-      # secret-gated step in this file.
+      # Non-secret: a bare Neon connection host alone can't authenticate
+      # anything, so this is safe as a plain repo Variable — but it must be
+      # a HOSTNAME ONLY (e.g. ep-xxxx.us-east-2.aws.neon.tech), never a full
+      # `postgresql://...` connection string. The guard step below fails the
+      # job outright if it's unset or malformed, rather than silently skipping.
       PRODUCTION_DB_HOST: ${{ vars.PRODUCTION_DB_HOST }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -234,9 +235,19 @@ jobs:
       # unparseable connection string fails the job instead of silently
       # skipping the check.
       - name: Guard against a mis-set production target
-        if: ${{ env.DATABASE_URL_UNPOOLED != '' && env.PRODUCTION_DB_HOST != '' }}
+        if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
         run: |
           set -euo pipefail
+          if [ -z "${PRODUCTION_DB_HOST:-}" ]; then
+            echo "::error::PRODUCTION_DB_HOST is unset — refusing to migrate without the production-host guard in place. Set it as a Variable on the development Environment (see docs/DEPLOY.md)." >&2
+            exit 1
+          fi
+          # A bare hostname is letters/digits/dots/hyphens only — a scheme,
+          # '@', ':', or '/' means someone pasted a full connection string.
+          if ! [[ "$PRODUCTION_DB_HOST" =~ ^[A-Za-z0-9.-]+$ ]]; then
+            echo "::error::PRODUCTION_DB_HOST does not look like a bare hostname — it may hold a full connection string. Expected only the host portion (e.g. ep-xxxx.us-east-2.aws.neon.tech). Check the development Environment's Variable." >&2
+            exit 1
+          fi
           host=$(node -e "console.log(new URL(process.env.DATABASE_URL_UNPOOLED).hostname)") || {
             echo "::error::could not parse a host out of DATABASE_URL_UNPOOLED — check the development Environment's secret is a valid connection string." >&2
             exit 1
