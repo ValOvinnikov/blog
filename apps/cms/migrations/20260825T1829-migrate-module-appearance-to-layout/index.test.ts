@@ -70,6 +70,18 @@ describe(migrateModuleAppearanceToLayout, () => {
     expect(result).toBeUndefined();
   });
 
+  it('treats an explicit layout: null as not yet migrated and still produces a patch', () => {
+    const result = migrateModuleAppearanceToLayout('module_hero', {
+      appearance: { spacingTop: 'LG' },
+      layout: null,
+    });
+
+    expect(result).toEqual([
+      at('layout', setIfMissing({ spacingTop: 'LG' })),
+      at('appearance', unset()),
+    ]);
+  });
+
   it('returns undefined for a doc with no appearance', () => {
     const result = migrateModuleAppearanceToLayout('module_newsletter', {});
 

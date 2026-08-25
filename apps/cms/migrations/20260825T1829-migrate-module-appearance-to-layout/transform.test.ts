@@ -74,4 +74,16 @@ describe(appearanceToLayout, () => {
 
     expect(result).toBeUndefined();
   });
+
+  it('treats an explicit layout: null as not yet migrated', () => {
+    const result = appearanceToLayout(
+      {
+        appearance: { spacingTop: 'LG' },
+        layout: null,
+      },
+      { includeContainerWidth: false },
+    );
+
+    expect(result).toEqual({ spacingTop: 'LG' });
+  });
 });

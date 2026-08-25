@@ -21,7 +21,8 @@ export type TLayoutValue = {
 };
 
 /**
- * Pure transform: builds the new `layout`/`heroLayout` object value from a
+ * Pure transform: builds the new `layout` field's object value (registered
+ * as `heroLayout` on `module_hero`, `layout` on `module_newsletter`) from a
  * doc's legacy `appearance`. `appearance.align` is confirmed dead and is
  * never copied — no downstream reader, and its START/END vocabulary doesn't
  * match the `HEADING_ALIGN` enum used elsewhere.
@@ -30,7 +31,7 @@ export const appearanceToLayout = (
   doc: TLegacyAppearanceDoc,
   { includeContainerWidth }: { includeContainerWidth: boolean },
 ): TLayoutValue | undefined => {
-  if (doc.layout !== undefined) return undefined;
+  if (doc.layout != null) return undefined;
 
   const { appearance } = doc;
   if (!appearance) return undefined;
