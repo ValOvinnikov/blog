@@ -50,6 +50,19 @@ origins at [manage.sanity.io](https://manage.sanity.io).
 Scope to one workspace with `pnpm --filter <name>`, e.g.
 `pnpm --filter web dev` or `pnpm --filter @blog/ui test`.
 
+## Dev ports
+
+Each dev server binds an explicit, fixed port so `pnpm dev` can run every app
+at once without one silently falling back to a different port:
+
+| App / tool                | Port   |
+| ------------------------- | ------ |
+| `apps/web` (`next dev`)   | `3000` |
+| `apps/admin` (`next dev`) | `3001` |
+| `apps/cms` (`sanity dev`) | `3333` |
+| `packages/ui` Storybook   | `6006` |
+| `apps/web` Storybook      | `6007` |
+
 ## Shared dependency versions (pnpm catalogs)
 
 Dependencies pinned to the same version across every workspace live once in
