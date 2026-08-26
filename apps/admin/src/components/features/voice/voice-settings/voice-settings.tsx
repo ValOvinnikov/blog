@@ -1,6 +1,11 @@
 'use client';
 
 import { VoiceFieldGroup } from '@admin/components/features/voice/voice-field-group';
+import { Alert } from '@admin/components/shared/alert';
+import { Button } from '@admin/components/shared/button';
+import { Card } from '@admin/components/shared/card';
+import { Disclosure } from '@admin/components/shared/disclosure';
+import { PageHeader } from '@admin/components/shared/page-header';
 import { inheritedVoiceValue } from '@admin/utils/inherited-voice-value/inherited-voice-value';
 import { useFormSubmission } from '@admin/utils/use-form-submission/use-form-submission';
 import {
@@ -9,12 +14,8 @@ import {
   type TVoiceOverrideKey,
   type TVoiceOverrides,
 } from '@admin/utils/voice-fields/voice-fields';
-import { ALERT_TYPE, ICONS, Size } from '@blog/config';
+import { ALERT_TYPE } from '@blog/config';
 import type { TVoicePack } from '@blog/config/constants';
-import { Alert } from '@blog/ui/atoms/alert';
-import { Button } from '@blog/ui/atoms/button';
-import { Heading } from '@blog/ui/atoms/heading';
-import { Icon } from '@blog/ui/atoms/icon';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
@@ -75,16 +76,7 @@ export const VoiceSettings = ({
     return result;
   }, [voicePack]);
 
-  const {
-    root,
-    pagehead,
-    description,
-    basicCard,
-    advanced,
-    advancedSummary,
-    advancedBody,
-    alert,
-  } = voiceSettingsVariants();
+  const { root, alert, advancedBody } = voiceSettingsVariants();
 
   const handleFieldChange = (key: TVoiceOverrideKey, value: string) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -92,56 +84,45 @@ export const VoiceSettings = ({
 
   return (
     <div className={root()}>
-      <div className={pagehead()}>
-        <div>
-          <Heading level={1} size={Size.MD}>
-            {t('heading')}
-          </Heading>
-          <p className={description()}>{t('description')}</p>
-        </div>
-        <Button
-          variant="primary"
-          onClick={handleSubmit}
-          isDisabled={isPending}
-          aria-busy={isPending}
-        >
-          {t('saveButton')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('heading')}
+        description={t('description')}
+        actions={
+          <Button
+            variant="primary"
+            onClick={handleSubmit}
+            isDisabled={isPending}
+          >
+            {t('saveButton')}
+          </Button>
+        }
+      />
 
       {status === 'success' && (
         <Alert
           type={ALERT_TYPE.SUCCESS}
-          message={t('alertSuccess')}
+          title={t('alertSuccess')}
           className={alert()}
         />
       )}
       {status === 'error' && (
         <Alert
           type={ALERT_TYPE.ERROR}
-          message={t('alertError')}
+          title={t('alertError')}
           className={alert()}
         />
       )}
 
-      <div className={basicCard()}>
-        <Heading level={2} size={Size.XS}>
-          {t('basicHeading')}
-        </Heading>
-        <Alert type={ALERT_TYPE.INFO} message={t('basicAlert')} />
-      </div>
+      <Card>
+        <Card.Header title={t('basicHeading')} />
+        <Card.Body>
+          <Alert type={ALERT_TYPE.INFO} title={t('basicAlert')} />
+        </Card.Body>
+      </Card>
 
-      <details className={advanced()}>
-        <summary className={advancedSummary()}>
-          <Icon
-            name={ICONS.CHEVRON_RIGHT}
-            variant="chevronOpen"
-            aria-hidden="true"
-          />
-          {t('advancedSummary')}
-        </summary>
+      <Disclosure summary={t('advancedSummary')}>
         <div className={advancedBody()}>
-          <Alert type={ALERT_TYPE.INFO} message={t('advancedOverrideInfo')} />
+          <Alert type={ALERT_TYPE.INFO} title={t('advancedOverrideInfo')} />
           {VOICE_FIELD_GROUPS.map((group) => (
             <VoiceFieldGroup
               key={group.groupKey}
@@ -157,7 +138,7 @@ export const VoiceSettings = ({
             />
           ))}
         </div>
-      </details>
+      </Disclosure>
     </div>
   );
 };

@@ -85,7 +85,7 @@ describe(FeaturesSettings, () => {
     expect(screen.getAllByText('Growth plan')).toHaveLength(2);
   });
 
-  it('links a locked toggle to its "Growth plan" reason via aria-describedby, and leaves an entitled toggle undescribed', () => {
+  it('makes a locked toggle inert (unreachable and unclickable) while leaving an entitled toggle interactive, same as a provisioning-locked field', () => {
     render(
       <FeaturesSettings
         tenantSlug="acme"
@@ -96,18 +96,15 @@ describe(FeaturesSettings, () => {
     );
 
     const lockedSwitch = screen.getByRole('switch', { name: 'Newsletter' });
-    const describedById = lockedSwitch.getAttribute('aria-describedby');
+    const lockedWrapper = lockedSwitch.closest('div');
+    expect(lockedWrapper?.getAttribute('inert')).toBe('');
 
-    expect(describedById).toBeTruthy();
-    expect(document.getElementById(describedById as string)).toHaveTextContent(
-      'Growth plan',
-    );
-    expect(
-      screen.getByRole('switch', { name: 'Comments' }),
-    ).not.toHaveAttribute('aria-describedby');
+    const entitledSwitch = screen.getByRole('switch', { name: 'Comments' });
+    const entitledWrapper = entitledSwitch.closest('div');
+    expect(entitledWrapper?.hasAttribute('inert')).toBe(false);
   });
 
-  it('renders the page heading, a section heading, and each toggle row heading without skipping a level', () => {
+  it('renders the page heading and a section heading without skipping a level; toggle rows are labelled rows, not further headings', () => {
     render(
       <FeaturesSettings
         tenantSlug="acme"
@@ -121,11 +118,9 @@ describe(FeaturesSettings, () => {
       screen.getByRole('heading', { level: 1, name: 'Features' }),
     ).toBeVisible();
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Capabilities' }),
+      screen.getByRole('heading', { level: 3, name: 'Capabilities' }),
     ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'Comments' }),
-    ).toBeVisible();
+    expect(screen.getByText('Comments')).toBeVisible();
   });
 
   it('toggles an entitled capability on click', async () => {

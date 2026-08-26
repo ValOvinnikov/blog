@@ -1,6 +1,6 @@
+import { TextInput } from '@admin/components/shared/text-input';
+import { Textarea } from '@admin/components/shared/textarea';
 import type { TVoiceOverrideKey } from '@admin/utils/voice-fields/voice-fields';
-import { TextInput } from '@blog/ui/atoms/text-input';
-import { Textarea } from '@blog/ui/atoms/textarea';
 
 export type TVoiceFieldProps = {
   fieldKey: TVoiceOverrideKey;
@@ -19,7 +19,8 @@ export type TVoiceFieldProps = {
  * empty is handled entirely by the caller (it just means `value` becomes
  * `''`) — the save path is what turns an empty string into "no override
  * stored," not this component. The visible label lives in the enclosing
- * `SettingRow`; `label` here only supplies the input's accessible name.
+ * `VoiceFieldGroup` row; `label` here only supplies the input's accessible
+ * name.
  */
 export const VoiceField = ({
   fieldKey,

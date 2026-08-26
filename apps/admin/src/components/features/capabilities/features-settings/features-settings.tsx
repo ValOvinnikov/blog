@@ -1,17 +1,17 @@
 'use client';
 
+import { Alert } from '@admin/components/shared/alert';
+import { Button } from '@admin/components/shared/button';
+import { Card } from '@admin/components/shared/card';
+import { PageHeader } from '@admin/components/shared/page-header';
+import { SettingRow } from '@admin/components/shared/setting-row';
 import {
   CAPABILITY_TOGGLES,
   type TSettingsFeaturesValues,
 } from '@admin/utils/settings-features-fields/settings-features-fields';
 import { useFormSubmission } from '@admin/utils/use-form-submission/use-form-submission';
 import { Switch } from '@base-ui/react/switch';
-import { ALERT_TYPE, Size, type TCapability } from '@blog/config';
-import { Alert } from '@blog/ui/atoms/alert';
-import { Button } from '@blog/ui/atoms/button';
-import { Heading } from '@blog/ui/atoms/heading';
-import { StatusBadge } from '@blog/ui/atoms/status-badge';
-import { SettingRow } from '@blog/ui/molecules/setting-row';
+import { ALERT_TYPE, type TCapability } from '@blog/config';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
@@ -30,9 +30,10 @@ export type TFeaturesSettingsProps = {
 
 /**
  * The Features tab: one toggle per `settings_features` column. A capability
- * outside `entitledCapabilities` renders disabled with a "Growth plan"
- * badge rather than hidden, so the tenant knows it exists — the client-side
- * `disabled` is a courtesy, the Server Action re-checks entitlement itself.
+ * outside `entitledCapabilities` renders through `SettingRow`'s locked
+ * treatment rather than hidden, so the tenant knows it exists — the
+ * client-side `disabled` is a courtesy, the Server Action re-checks
+ * entitlement itself.
  */
 export const FeaturesSettings = ({
   tenantSlug,
@@ -49,20 +50,8 @@ export const FeaturesSettings = ({
       onSuccess: () => router.refresh(),
     });
 
-  const {
-    root,
-    pagehead,
-    description,
-    alert,
-    section,
-    sectionHeading,
-    card,
-    toggleRow,
-    switchTrack,
-    switchThumb,
-    switchLabel,
-    lockReason,
-  } = featuresSettingsVariants();
+  const { root, alert, switchTrack, switchThumb, switchLabel } =
+    featuresSettingsVariants();
 
   const handleToggle = (
     field: keyof TSettingsFeaturesValues,
@@ -73,81 +62,67 @@ export const FeaturesSettings = ({
 
   return (
     <div className={root()}>
-      <div className={pagehead()}>
-        <div>
-          <Heading level={1} size={Size.MD}>
-            {t('heading')}
-          </Heading>
-          <p className={description()}>{t('description')}</p>
-        </div>
-        <Button
-          variant="primary"
-          onClick={handleSubmit}
-          isDisabled={isPending}
-          aria-busy={isPending}
-        >
-          {isPending ? t('savingButton') : t('saveButton')}
-        </Button>
-      </div>
+      <PageHeader
+        title={t('heading')}
+        description={t('description')}
+        actions={
+          <Button
+            variant="primary"
+            onClick={handleSubmit}
+            isDisabled={isPending}
+          >
+            {isPending ? t('savingButton') : t('saveButton')}
+          </Button>
+        }
+      />
 
       {status === 'success' && (
         <Alert
           type={ALERT_TYPE.SUCCESS}
-          message={t('alertSuccess')}
+          title={t('alertSuccess')}
           className={alert()}
         />
       )}
       {status === 'error' && (
         <Alert
           type={ALERT_TYPE.ERROR}
-          message={t('alertError')}
+          title={t('alertError')}
           className={alert()}
         />
       )}
 
-      <div className={section()}>
-        <Heading level={2} size={Size.XS} className={sectionHeading()}>
-          {t('capabilitiesHeading')}
-        </Heading>
-        <div className={card()}>
+      <Card>
+        <Card.Header title={t('capabilitiesHeading')} />
+        <Card.Body>
           {CAPABILITY_TOGGLES.map(({ capability, field }) => {
             const isLocked = !entitledCapabilities.includes(capability);
             const label = t(`toggleLabel.${capability}`);
-            const reasonId = `features-settings-lock-reason-${capability}`;
 
             return (
               <SettingRow
                 key={capability}
                 label={label}
                 description={t(`toggleDescription.${capability}`)}
+                isLocked={isLocked}
+                lockedReason={isLocked ? t('planLockedBadge') : undefined}
               >
-                <div className={toggleRow()}>
-                  <Switch.Root
-                    checked={values[field]}
-                    onCheckedChange={(checked) => handleToggle(field, checked)}
-                    disabled={isLocked || isPending}
-                    aria-label={label}
-                    aria-describedby={isLocked ? reasonId : undefined}
-                    className={switchTrack()}
-                  >
-                    <Switch.Thumb className={switchThumb()} />
-                  </Switch.Root>
-                  <span className={switchLabel()}>
-                    {values[field] ? t('switchOn') : t('switchOff')}
-                  </span>
-                  {isLocked && (
-                    <span id={reasonId} className={lockReason()}>
-                      <StatusBadge tone="warn">
-                        {t('planLockedBadge')}
-                      </StatusBadge>
-                    </span>
-                  )}
-                </div>
+                <Switch.Root
+                  checked={values[field]}
+                  onCheckedChange={(checked) => handleToggle(field, checked)}
+                  disabled={isLocked || isPending}
+                  aria-label={label}
+                  className={switchTrack()}
+                >
+                  <Switch.Thumb className={switchThumb()} />
+                </Switch.Root>
+                <span className={switchLabel()}>
+                  {values[field] ? t('switchOn') : t('switchOff')}
+                </span>
               </SettingRow>
             );
           })}
-        </div>
-      </div>
+        </Card.Body>
+      </Card>
     </div>
   );
 };
