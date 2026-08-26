@@ -1,12 +1,12 @@
 'use client';
 
+import { Avatar } from '@admin/components/shared/avatar';
+import { Icon } from '@admin/components/shared/icon';
 import { Link } from '@admin/i18n/navigation';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import { Menu } from '@base-ui/react/menu';
 import { ICONS, Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { Avatar } from '@blog/ui/atoms/avatar';
-import { Icon } from '@blog/ui/atoms/icon';
 
 import { tenantSwitcherVariants } from './tenant-switcher-variants';
 
@@ -37,8 +37,17 @@ export const TenantSwitcher = ({
   const active =
     tenants.find((tenant) => tenant.id === activeTenantId) ?? tenants[0];
 
-  const { trigger, meta, name, domain, popup, item, itemName, itemDomain } =
-    tenantSwitcherVariants();
+  const {
+    trigger,
+    meta,
+    name,
+    domain,
+    chev,
+    popup,
+    item,
+    itemName,
+    itemDomain,
+  } = tenantSwitcherVariants();
 
   if (!active) {
     return null;
@@ -47,14 +56,12 @@ export const TenantSwitcher = ({
   return (
     <Menu.Root>
       <Menu.Trigger className={trigger()}>
-        <span aria-hidden="true">
-          <Avatar name={active.name} alt={active.name} size={Size.SM} />
-        </span>
+        <Avatar name={active.name} variant="switcher" />
         <span className={meta()}>
           <span className={name()}>{active.name}</span>
           <span className={domain()}>{active.primaryDomain}</span>
         </span>
-        <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} variant="chevronDown" />
+        <Icon name={ICONS.CHEVRON_RIGHT} size={Size.SM} className={chev()} />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner sideOffset={6} align="start">

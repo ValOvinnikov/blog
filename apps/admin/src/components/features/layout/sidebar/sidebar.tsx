@@ -1,10 +1,10 @@
-import { Size, type TIconName } from '@blog/config';
-import { Avatar } from '@blog/ui/atoms/avatar';
-import { Icon } from '@blog/ui/atoms/icon';
+import { BrandMark } from '@admin/components/shared/brand-mark';
+import { Icon } from '@admin/components/shared/icon';
 import {
   StatusBadge,
   type TStatusBadgeProps,
-} from '@blog/ui/atoms/status-badge';
+} from '@admin/components/shared/status-badge';
+import { Size, type TIconName } from '@blog/config';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -68,6 +68,7 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
     sectionLabel,
     list,
     row,
+    rowIcon,
     rowBody,
     rowLabel,
     rowReason,
@@ -78,9 +79,7 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
   return (
     <aside className={root()}>
       <div className={brand()}>
-        <span aria-hidden="true">
-          <Avatar name={t('brandName')} alt={t('brandName')} size={Size.SM} />
-        </span>
+        <BrandMark />
         <div className={brandMeta()}>
           <span className={brandName()}>{t('brandName')}</span>
           <span className={brandTagline()}>{t('brandTagline')}</span>
@@ -106,7 +105,11 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
                     return (
                       <li key={item.label}>
                         <SidebarNavLink href={item.href}>
-                          <Icon name={item.icon} size={Size.SM} />
+                          <Icon
+                            name={item.icon}
+                            size={Size.SM}
+                            className={rowIcon()}
+                          />
                           <span className={rowBody()}>
                             <span className={rowLabel()}>{item.label}</span>
                           </span>
@@ -119,7 +122,11 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
                   return (
                     <li key={item.label}>
                       <div className={row({ state: 'inert' })}>
-                        <Icon name={item.icon} size={Size.SM} />
+                        <Icon
+                          name={item.icon}
+                          size={Size.SM}
+                          className={rowIcon()}
+                        />
                         <span className={rowBody()}>
                           <span className={rowLabel()}>{item.label}</span>
                           {item.disabledReason && (
