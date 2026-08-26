@@ -323,6 +323,11 @@ the exported value, not on how it was written.
   a co-located `{component-name}-variants.ts` using `tailwind-variants` (`tv`),
   classes grouped by concern in `base` arrays. Pass `class: className` into the
   `tv()` call — never wrap with `cn()`.
+- **In `slots`-based `tv()` calls, every slot value is an array of strings** —
+  never a bare string, even a single class, even in a `variants`/
+  `compoundVariants` override. (Non-slot `base`/`variants` calls in
+  single-element components may use bare strings.) See
+  `packages/ui/src/molecules/toast/toast-variants.ts` for the pattern.
 - Base UI's `data-*` state selectors belong in those variant files like any
   other class, not scattered inline.
 - Responsive classes are mobile-first with `md:`/`lg:` as the two tiers. This
