@@ -49,9 +49,8 @@ When invoked, before writing any code:
    criteria.
 2. Read `SPEC.md` §4 (workspace map & layer contracts) — your row is the
    contract every future consumer relies on.
-3. Read the existing files in `packages/utils/src/log/` (`sanitize-log-message.ts`
-   and its test) before writing your own copy — see "Sanitizer duplication"
-   below for why it's a copy, not an import.
+3. Read the existing `packages/insight/src/utils/sanitize-log-message/`
+   implementation and its test before changing it — see "Sanitizer" below.
 4. Read `packages/utils/package.json`/`tsconfig.json`/`eslint.config.js`/
    `vitest.config.ts` as your structural template — mirror its shape exactly
    (same preset composition, same `configs/*` dependencies), swap only the
@@ -72,19 +71,12 @@ Record<string, unknown>) => void`. Emits one JSON object per call
   package (not `@blog/config`) — document the exception briefly: sourcing it
   from `@blog/config` would give this base-of-graph package a dependency,
   inverting nothing but adding one where none is needed.
-- **Sanitizer duplication (temporary, deliberate).** `@blog/utils` already
-  exports `sanitizeLogMessage` — the CodeQL-recognized log-injection
-  sanitizing barrier, consumed today by ~20 existing call sites across
-  `apps/web`/`apps/admin`. Rather than importing it (which would give this
-  package a dependency) or moving it (which would break those ~20 call sites
-  until they migrate), **copy it into `packages/insight/src/` unchanged** —
-  same implementation, same behavior. `@blog/utils`'s copy is removed once
-  every one of those call sites has migrated onto `@blog/insight` instead —
-  that removal is separate follow-up work, not yours to do here, and not
-  something to attempt until it's genuinely true. Keep both copies
-  byte-identical while they coexist; if you find a bug in the sanitizer, fix
-  your copy and report the same fix is needed in `@blog/utils`'s, don't
-  silently diverge them.
+- **Sanitizer.** `sanitizeLogMessage` — the CodeQL-recognized log-injection
+  sanitizing barrier — is `@blog/insight`'s sole canonical implementation.
+  `@blog/db`'s standalone `provision-tenant`/`deprovision-tenant` CLI scripts
+  import it directly (they sit outside the request-handling path other
+  layers use their shared logger for); every other consumer goes through
+  `createLogger`.
 - **Stack-trace capping.** Vercel truncates individual log lines at a few KB;
   a truncated JSON line is unparseable. Cap the serialized stack trace length
   before it's included in the emitted JSON, with a clear truncation marker.
@@ -97,8 +89,6 @@ Record<string, unknown>) => void`. Emits one JSON object per call
   migrate anyone onto it — that's `web`/`admin-app`'s work, dispatched
   separately, only when migrating call sites is itself the scope of the task
   at hand.
-- `@blog/utils`'s existing `sanitizeLogMessage` — read it for reference, copy
-  it, never edit it from here.
 
 ## Comments
 
@@ -131,8 +121,6 @@ block — it points at open work rather than narrating closed work.
 - `pnpm --filter @blog/insight type-check`, `lint`, and `test` pass.
 - No new dependency in `packages/insight/package.json`. No `@blog/config` or
   sibling-package import anywhere in `src/`.
-- Your `sanitizeLogMessage` copy behaves identically to `@blog/utils`'s
-  (byte-identical implementation unless you found and reported a bug).
 
 **Report back to the orchestrator** with:
 

@@ -50,13 +50,11 @@ graph is acyclic
   Base UI, styled in-app; nothing is added to `@blog/ui` for it. See
   `.claude/agents/admin-app.md`.
 - `@blog/insight` (`packages/insight`) holds the structured logger core —
-  `createLogger`, `LOG_LEVEL`, and its own copy of `sanitizeLogMessage`. Sits
-  at the base of the dependency graph alongside `config`/`utils` — depends on
-  nothing. The `sanitizeLogMessage` copy is a **deliberate, temporary
-  duplication** of `@blog/utils`'s existing copy (not an import — `insight`
-  stays dependency-free) — `@blog/utils`'s copy is removed once every call
-  site has migrated off it onto `@blog/insight` instead, tracked as its own
-  follow-up. Both apps consume it: `apps/web` and `apps/admin` each expose one
+  `createLogger`, `LOG_LEVEL`, and `sanitizeLogMessage`. Sits at the base of
+  the dependency graph alongside `config`/`utils` — depends on nothing.
+  `sanitizeLogMessage` is `@blog/insight`'s sole canonical implementation —
+  `@blog/utils`'s former copy was removed once every call site migrated onto
+  this package instead. Both apps consume it: `apps/web` and `apps/admin` each expose one
   shared logger at `src/utils/logger/logger.ts` carrying their own `service`
   value, and import that rather than calling `createLogger` per module.
   `service`, `db` and `auth` never log at all — failures reach the caller and
@@ -166,7 +164,7 @@ do not route its controls through the `ui` agent. See
 `.claude/agents/admin-app.md`.
 
 `insight` (`packages/insight`, the structured logger core — `createLogger`,
-`LOG_LEVEL`, and its own temporary copy of `sanitizeLogMessage`) is
+`LOG_LEVEL`, and `sanitizeLogMessage`, its sole canonical implementation) is
 **independent, like `config`/`utils`** — depends on nothing, not a step in
 any chain. Both apps consume it through their own shared logger module, so
 dispatch `insight` only for changes to the logger core itself — a change to
