@@ -78,7 +78,7 @@ relative paths only within a single slice (`./schema`, `./queries/comments`).
   above them to log through — import `@blog/insight`'s `sanitizeLogMessage`
   (the sanitizer only, never `createLogger`) directly, rather than keeping
   their own copy of it. Enforced the same way as the `@sanity/client`
-  exception below: a `configs/eslint/db.js` override scoped to those two
+  exception above: a `configs/eslint/db.js` override scoped to those two
   directories.
 - Depend only on `@blog/config` and `@blog/utils` (types, constants, framework-
   free helpers) plus Drizzle/Neon SDKs (`drizzle-orm`, `drizzle-kit`,
