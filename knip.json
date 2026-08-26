@@ -81,7 +81,7 @@
       // built ahead of its call sites as part of a bottom-up migration off
       // @blog/ui. Mark it an entry for the same reason as the navigation
       // helpers above.
-      "entry": ["src/i18n/navigation.ts", "src/components/ui/icon/index.ts"]
+      "entry": ["src/i18n/navigation.ts", "src/components/shared/icon/index.ts"]
     }
   }
 }
