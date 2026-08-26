@@ -12,6 +12,10 @@ export const avatarVariants = tv({
         'size-5.5 rounded-full text-xs font-semibold',
         'bg-admin-line-2 text-admin-muted',
       ],
+      switcher: [
+        'size-[22px] rounded-[6px] text-[11px] font-semibold',
+        'bg-admin-side-raised text-admin-side-text',
+      ],
     },
   },
 });

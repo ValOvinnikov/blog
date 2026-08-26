@@ -41,12 +41,15 @@ describe(Avatar, () => {
     );
   });
 
-  it('renders both variants without throwing', () => {
+  it('renders every variant without throwing', () => {
     expect(() =>
       render(<Avatar name="Jane Doe" variant="table" />),
     ).not.toThrow();
     expect(() =>
       render(<Avatar name="Jane Doe" variant="chip" />),
+    ).not.toThrow();
+    expect(() =>
+      render(<Avatar name="Jane Doe" variant="switcher" />),
     ).not.toThrow();
   });
 });
