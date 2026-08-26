@@ -6,7 +6,7 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "sanity dev",
+    "dev": "sanity dev --port 3333",
     "build": "sanity build",
     "deploy": "sanity deploy",
     "typegen": "node scripts/typegen.mjs",
