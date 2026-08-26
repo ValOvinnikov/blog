@@ -77,11 +77,16 @@
       // component. Mark it an entry so its exports aren't reported unused;
       // the Next.js plugin still contributes the app-router entries.
       //
-      // src/components/ui/icon/index.ts: the admin-owned icon primitive,
-      // built ahead of its call sites as part of a bottom-up migration off
-      // @blog/ui. Mark it an entry for the same reason as the navigation
-      // helpers above.
-      "entry": ["src/i18n/navigation.ts", "src/components/shared/icon/index.ts"]
+      // src/components/shared/{icon,text,button}/index.ts: admin-owned
+      // primitives, each built ahead of its call sites as part of a
+      // bottom-up migration off @blog/ui. Mark each an entry for the same
+      // reason as the navigation helpers above.
+      "entry": [
+        "src/i18n/navigation.ts",
+        "src/components/shared/icon/index.ts",
+        "src/components/shared/text/index.ts",
+        "src/components/shared/button/index.ts"
+      ]
     }
   }
 }
