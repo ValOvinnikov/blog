@@ -53,6 +53,11 @@ export default [
               message:
                 '@blog/db must not import @blog/service or any Sanity SDK — db and service are sibling data layers that never reference each other; a feature needing both joins them in apps/web.',
             },
+            {
+              group: ['@blog/auth', '@blog/auth/*'],
+              message:
+                "@blog/db must not import @blog/auth — auth sits above db and binds the Drizzle adapter to db's own tables; the dependency only flows one way.",
+            },
           ],
         },
       ],
@@ -96,6 +101,11 @@ export default [
               ],
               message:
                 '@blog/db must not import @blog/service or the Studio SDKs — a feature needing both joins them in apps/web. `@sanity/client` is the one exception here.',
+            },
+            {
+              group: ['@blog/auth', '@blog/auth/*'],
+              message:
+                "@blog/db must not import @blog/auth — auth sits above db and binds the Drizzle adapter to db's own tables; the dependency only flows one way.",
             },
           ],
         },
