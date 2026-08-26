@@ -76,7 +76,12 @@
       // mirror apps/web's i18n/navigation.ts but not yet consumed by any
       // component. Mark it an entry so its exports aren't reported unused;
       // the Next.js plugin still contributes the app-router entries.
-      "entry": ["src/i18n/navigation.ts"]
+      //
+      // src/components/ui/icon/index.ts: the admin-owned icon primitive,
+      // built ahead of its call sites as part of a bottom-up migration off
+      // @blog/ui. Mark it an entry for the same reason as the navigation
+      // helpers above.
+      "entry": ["src/i18n/navigation.ts", "src/components/ui/icon/index.ts"]
     }
   }
 }
