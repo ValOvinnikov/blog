@@ -62,8 +62,8 @@ Variants: visual: hero|post|card|section|prose-h2|prose-h3|prose-h4|preview|copy
 ### Icon — `atoms/icon/icon.tsx`
 
 renders any icon from the bespoke icon set by name.
-Props: name: TIconName · size?: TIconVariants['size'] · variant?: TIconVariants['variant'] · 'aria-label'?: AriaAttributes['aria-label'] · 'aria-hidden'?: AriaAttributes['aria-hidden'] _(extends IWithClassName, IWithDataTestId)_
-Variants: size: Size.SM|Size.MD|Size.LG · variant: chevronDown|chevronOpen
+Props: name: TIconName · size?: TIconVariants['size'] · 'aria-label'?: AriaAttributes['aria-label'] · 'aria-hidden'?: AriaAttributes['aria-hidden'] _(extends IWithClassName, IWithDataTestId)_
+Variants: size: Size.SM|Size.MD|Size.LG
 
 ### IconButton — `atoms/icon-button/icon-button.tsx`
 
@@ -112,7 +112,7 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### SegmentedControl — `atoms/segmented-control/segmented-control.tsx`
 
 a fully controlled switch between a small, mutually exclusive set of views (e.g. a reader's chosen depth for an article).
-Props: options: ISegmentedControlOption<TValue>[] · value: TValue · onChange: (value: TValue) => void · ariaLabel: string · isDisabled?: boolean · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
+Props: options: ISegmentedControlOption<TValue>[] · value: TValue · onChange: (value: TValue) => void · ariaLabel: string _(extends IWithClassName, IWithDataTestId)_
 Variants: selected: (boolean)
 
 ### Spinner — `atoms/spinner/spinner.tsx`
@@ -142,7 +142,7 @@ Props: text: string · hasCursor?: boolean _(extends IWithClassName, IWithDataTe
 
 the body-copy paragraph primitive: applies a `variant` from the type scale to a `<p>`.
 Props: style?: CSSProperties · children?: ReactNode _(extends IWithClassName, TTextVariants, IWithDataTestId)_
-Variants: variant: lead|muted|hero|card|supporting|hint|statement|meta|emphasis
+Variants: variant: lead|muted|hero|card|supporting|statement|meta|emphasis
 
 ### TextInput — `atoms/text-input/text-input.tsx`
 
@@ -232,8 +232,8 @@ Variants: collapsible: (boolean)
 ### SettingRow — `molecules/setting-row/setting-row.tsx`
 
 a label + description + control-slot row shared by every `/account` section (privacy & data, email preferences, connected accounts).
-Props: label: ReactNode · labelLevel?: THeadingProps['level'] · description?: ReactNode · tone?: TSettingRowVariants['tone'] · canControlGrow?: TSettingRowVariants['controlGrows'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: tone: default|danger · controlGrows: (boolean)
+Props: label: ReactNode · labelLevel?: THeadingProps['level'] · description?: ReactNode · tone?: TSettingRowVariants['tone'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Variants: tone: default|danger
 
 ### ShareLink — `molecules/share-link/share-link.tsx`
 

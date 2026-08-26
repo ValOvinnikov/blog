@@ -41,14 +41,8 @@ export const settingRowVariants = tv({
         ],
       },
     },
-    controlGrows: {
-      true: {
-        content: ['md:flex-none'],
-        control: ['md:w-full md:flex-1'],
-      },
-    },
   },
-  defaultVariants: { tone: 'default', controlGrows: false },
+  defaultVariants: { tone: 'default' },
 });
 
 export type TSettingRowVariants = VariantProps<typeof settingRowVariants>;

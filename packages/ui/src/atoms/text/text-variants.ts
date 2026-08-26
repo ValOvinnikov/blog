@@ -11,7 +11,6 @@ export const textVariants = tv(
         hero: ['text-base leading-[1.6]', 'text-muted'],
         card: ['text-card-copy leading-[1.55]', 'text-muted'],
         supporting: ['text-sm', 'text-text-muted'],
-        hint: ['text-xs', 'text-text-muted'],
         statement: ['text-lg font-medium', 'text-text'],
         meta: ['text-meta', 'text-subtle'],
         emphasis: ['text-card-copy leading-[1.55] font-semibold', 'text-text'],
