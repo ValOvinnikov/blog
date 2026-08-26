@@ -1,12 +1,5 @@
-import { getTranslations } from 'next-intl/server';
+import { UnauthorizedView } from '@admin/components/features/layout/unauthorized-view';
 
-export default async function UnauthorizedPage() {
-  const t = await getTranslations('unauthorizedPage');
-
-  return (
-    <main>
-      <h1>{t('heading')}</h1>
-      <p>{t('description')}</p>
-    </main>
-  );
+export default function UnauthorizedPage() {
+  return <UnauthorizedView />;
 }

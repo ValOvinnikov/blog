@@ -1,10 +1,11 @@
 'use client';
 
+import { Alert } from '@admin/components/shared/alert';
+import { Button } from '@admin/components/shared/button';
+import { FormField } from '@admin/components/shared/form-field';
+import { TextInput } from '@admin/components/shared/text-input';
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { ALERT_TYPE } from '@blog/config';
-import { Alert } from '@blog/ui/atoms/alert';
-import { Button } from '@blog/ui/atoms/button';
-import { TextInput } from '@blog/ui/atoms/text-input';
 import type { ReactNode } from 'react';
 
 import { confirmDialogVariants } from './confirm-dialog-variants';
@@ -57,8 +58,6 @@ export const ConfirmDialog = ({
     popup,
     title: titleSlot,
     description: descriptionSlot,
-    field,
-    label,
     hint,
     actions,
   } = confirmDialogVariants();
@@ -76,20 +75,20 @@ export const ConfirmDialog = ({
             {description}
           </AlertDialog.Description>
 
-          {error && <Alert type={ALERT_TYPE.ERROR} message={error} />}
+          {error && <Alert type={ALERT_TYPE.ERROR} title={error} />}
 
-          <div className={field()}>
-            <label className={label()} htmlFor={confirmFieldId}>
-              {confirmLabel}
-            </label>
+          <FormField
+            label={confirmLabel}
+            htmlFor={confirmFieldId}
+            hint={<span className={hint()}>{confirmHint}</span>}
+          >
             <TextInput
               id={confirmFieldId}
               ariaLabel={confirmLabel}
               value={confirmValue}
               onChange={onConfirmValueChange}
             />
-            <span className={hint()}>{confirmHint}</span>
-          </div>
+          </FormField>
 
           {children}
 

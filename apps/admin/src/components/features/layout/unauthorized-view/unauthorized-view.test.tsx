@@ -1,10 +1,10 @@
 import { renderWithIntl, screen } from '@admin/testing/custom-render';
 
-import UnauthorizedPage from './page';
+import { UnauthorizedView } from './unauthorized-view';
 
-describe(UnauthorizedPage, () => {
+describe(UnauthorizedView, () => {
   it('renders the heading and description from the messages file', () => {
-    renderWithIntl(<UnauthorizedPage />);
+    renderWithIntl(<UnauthorizedView />);
 
     expect(
       screen.getByRole('heading', { name: 'Not authorized' }),
