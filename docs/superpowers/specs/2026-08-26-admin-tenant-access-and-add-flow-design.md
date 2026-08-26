@@ -277,38 +277,70 @@ together at the bottom of the tenant nav, below the tenant-facing sections and
 separated by a rule — rather than Provisioning sitting second, above pages an
 owner uses daily.
 
-## §8 — `apps/admin` owns its own presentational primitives
+## §8 — `apps/admin` separates from `@blog/ui` entirely
 
 `CLAUDE.md` already says admin's **interactive** primitives come from Base UI,
 styled in-app, and that nothing is added to `@blog/ui` for it. In practice admin
-also imports 16 `@blog/ui` presentational components across 68 sites, and they
-carry the public site's design language rather than an operator tool's.
+imports 16 `@blog/ui` components across 68 sites, and they carry the public
+site's design language rather than an operator tool's.
 
-`StatusBadge` is the clearest case:
+`StatusBadge` is the worked example:
 
 ```
 'rounded-sm border px-2 py-0.5',
 'font-mono text-label font-medium uppercase tracking-label',
 ```
 
-Square, monospace, uppercase — the Console preset's terminal aesthetic. It is
-correct on a reader-facing site whose whole visual idea is a terminal. It is
-wrong on an admin panel, where a status pill should be a quiet, rounded,
-sentence-case chip with a tone dot (as in the mock).
+Square, monospace, uppercase — the Console preset's terminal aesthetic. Correct
+on a reader-facing site whose whole visual idea is a terminal; wrong on an admin
+panel, where a status pill should be a quiet, rounded, sentence-case chip with a
+tone dot.
 
-**Decision: admin builds its own presentational primitives, in-app, on Base UI
-plus its own Tailwind — extending the existing interactive-primitives rule to
-presentation.** `@blog/ui` remains the source for genuinely cross-surface
-identity (`BrandMark`), never for chrome that should look different in an
-operator tool than on a reader's site.
+**Decision: `apps/admin` drops its `@blog/ui` dependency completely** and owns
+every primitive it renders, built in-app on Base UI plus its own theme. The
+layer contract becomes:
 
-This is not a licence to fork `@blog/ui` wholesale. The test is whether the two
-surfaces genuinely want the same thing: a brand mark does, a status pill
-demonstrably does not.
+```
+admin → db, auth, config, utils        (was: admin → ui, db, auth, config, utils)
+```
 
-**Migration scope is deliberately left open** — see Open questions. Recording
-the decision does not settle whether all 68 import sites move now or as each
-surface is touched.
+### What separation actually costs
+
+- **13 icons.** `Icon` resolves 35 SVGs from `@blog/ui/assets/icons` via SVGR.
+  The _names_ (`ICONS`) already live in `@blog/config`, which admin keeps. Admin
+  copies only the 13 glyphs it uses — `CHEVRON_RIGHT`, `COMMENT`, `GLOBE`,
+  `GRID`, `MAIL`, `MENU`, `MENU_ROWS`, `PALETTE`, `PLUS`, `QUOTE`, `SETTINGS`,
+  `USERS`, `WARNING` — into `apps/admin/src/assets/icons` with its own registry.
+  No new workspace package. Admin's `vitest.config.ts` and `next.config.ts`
+  already carry the SVGR plumbing (they had to, to consume `@blog/ui` source),
+  so that wiring is repointed rather than written.
+- **Its own theme.** `apps/admin/index.css` is four lines: import
+  `@blog/tailwind-config/theme.css` and `@source`-scan `packages/ui`. That
+  shared theme declares itself "the only source of Tailwind theme tokens and
+  global base styling," with a narrow carve-out for workspace-specific tokens.
+  Admin needs a **broader** exception: its own token layer, so the mock's
+  surface/line/tone palette is what admin renders rather than the site's Console
+  preset. This is a deliberate widening of that rule and must be recorded in
+  `configs/tailwind/theme.css`'s own header and in `SPEC.md`.
+- **One component dies.** `Textarea` has exactly one consumer in the entire
+  repo — admin's `voice-field`. It becomes dead code the moment admin stops
+  importing it, and is **deleted from `@blog/ui`** (with `pnpm gen:ui-index`
+  re-run to drop its `COMPONENTS.md` entry).
+
+### What does _not_ get deleted
+
+Every other component admin imports has genuine `apps/web` or internal
+`packages/ui` consumers, verified by reference count — `StatusBadge`,
+`SegmentedControl` and `SettingRow` back the account page; `Alert` backs
+newsletter signup; `Eyebrow` backs aside/hero/article; `BrandMark` backs
+`BrandLockup`. None of those were built for admin, and none may be removed on
+the strength of admin no longer importing them.
+
+### Sequencing consequence
+
+This lands **before** the route and page work, not after. Building the new
+overview, provisioning, danger and owner pages against `@blog/ui` and then
+migrating them would build every surface twice.
 
 ## Delivery
 
@@ -356,9 +388,11 @@ redesign — it can ship ahead of the route work if wanted.
   a super admin is never labelled OWNER.
 - **The sidebar tenant switcher is dropped from the platform tree** (it was
   non-functional there) and kept, unchanged, in the owner tree.
-- **`apps/admin` owns its presentational primitives** (§8), built in-app on
-  Base UI — not only its interactive ones. `@blog/ui`'s `StatusBadge` is the
-  worked example of why.
+- **`apps/admin` drops `@blog/ui` entirely** (§8) and owns every primitive it
+  renders. It copies the 13 icons it uses rather than adding a shared package,
+  gains its own Tailwind token layer, and `Textarea` — dead once admin stops
+  importing it — is deleted from `@blog/ui`. This lands before the route work,
+  or every surface gets built twice.
 
 ## Open questions
 
@@ -366,6 +400,3 @@ redesign — it can ship ahead of the route work if wanted.
   resolves them against every tenant. Proposed: redirect to `/tenants`, unless
   they hold a real `memberships` row, in which case it is genuinely their own
   tenant. Not yet confirmed.
-- **How far the §8 primitive migration goes in this work.** Admin imports 16
-  `@blog/ui` components across 68 sites. Migrating all of them is a much larger
-  change than the surfaces this design touches. Not yet decided.
