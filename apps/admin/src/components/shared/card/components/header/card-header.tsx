@@ -5,7 +5,7 @@ import { cardVariants } from '../../card-variants';
 
 export type TCardHeaderProps = {
   title: ReactNode;
-  description?: ReactNode;
+  supportingText?: ReactNode;
   /** Right-aligned, e.g. a button or menu trigger. */
   actions?: ReactNode;
   className?: string;
@@ -13,7 +13,7 @@ export type TCardHeaderProps = {
 
 export const CardHeader = ({
   title,
-  description,
+  supportingText,
   actions,
   className,
 }: TCardHeaderProps) => {
@@ -26,8 +26,8 @@ export const CardHeader = ({
         <Heading level={3} size="cardTitle">
           {title}
         </Heading>
-        {description && (
-          <span className={headerDescription()}>{description}</span>
+        {supportingText && (
+          <span className={headerDescription()}>{supportingText}</span>
         )}
       </div>
       {actions && <div className={headerActions()}>{actions}</div>}
