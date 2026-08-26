@@ -6,6 +6,7 @@ export const headingVariants = tv({
     size: {
       pageTitle: ['text-[22px]', 'font-bold', 'tracking-[-0.01em]'],
       cardTitle: ['text-[15px]', '[font-weight:650]'],
+      fieldLabel: ['text-[13px]', 'font-semibold'],
     },
   },
 });
