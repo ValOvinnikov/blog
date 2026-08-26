@@ -17,12 +17,18 @@ describe(StatusBadge, () => {
     }
   });
 
+  it('renders the tone dot by default', () => {
+    const { container } = render(<StatusBadge tone="ok">Active</StatusBadge>);
+    expect(container.querySelector('span[aria-hidden="true"]')).not.toBeNull();
+  });
+
   it('omits the tone dot when hasDot is false', () => {
-    render(
+    const { container } = render(
       <StatusBadge tone="plan" hasDot={false}>
         Pro plan
       </StatusBadge>,
     );
     expect(screen.getByText('Pro plan')).toBeVisible();
+    expect(container.querySelector('span[aria-hidden="true"]')).toBeNull();
   });
 });
