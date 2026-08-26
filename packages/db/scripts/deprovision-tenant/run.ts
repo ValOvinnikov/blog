@@ -20,10 +20,10 @@
 import { pathToFileURL } from 'node:url';
 
 import type { TTenant } from '@blog/db/schema/tenants';
+import { sanitizeLogMessage } from '@blog/insight';
 
 import { loadDeprovisionEnv, type TDeprovisionEnv } from './lib/env';
 import { getTenantRow } from './lib/get-tenant-row';
-import { sanitizeLogMessage } from './lib/sanitize-log-message';
 import { archiveTenantSanityProject } from './steps/archive-sanity-project';
 import { archiveTenantRow } from './steps/archive-tenant';
 import { clearTenantArtifacts } from './steps/clear-artifacts';
