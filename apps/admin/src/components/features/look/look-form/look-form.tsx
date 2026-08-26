@@ -153,7 +153,7 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
           <Card>
             <Card.Header
               title={t('basicHeading')}
-              description={t('basicDescription')}
+              supportingText={t('basicDescription')}
             />
             <Card.Body>
               <LookFormBasicSection

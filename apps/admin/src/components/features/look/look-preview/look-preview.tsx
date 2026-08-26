@@ -79,7 +79,7 @@ export const LookPreview = ({
       <Card>
         <Card.Header
           title={t('livePreviewHeading')}
-          description={t('livePreviewDescription')}
+          supportingText={t('livePreviewDescription')}
           actions={
             <SegmentedControl
               ariaLabel={t('previewColorSchemeAriaLabel')}
@@ -105,7 +105,7 @@ export const LookPreview = ({
       <Card>
         <Card.Header
           title={t('fullPagePreviewHeading')}
-          description={t('fullPagePreviewDescription')}
+          supportingText={t('fullPagePreviewDescription')}
         />
         <Card.Body>
           <div className={deviceBar()}>
