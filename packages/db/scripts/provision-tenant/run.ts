@@ -21,10 +21,10 @@ import {
 import { reactivateTenant } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { unarchiveSanityProject } from '@blog/db/utils/sanity-management-client/sanity-management-client';
+import { sanitizeLogMessage } from '@blog/insight';
 
 import { loadProvisionEnv, type TProvisionEnv } from './lib/env';
 import { reportStepStatus } from './lib/report-step-status';
-import { sanitizeLogMessage } from './lib/sanitize-log-message';
 import { createTenantRevalidateWebhook } from './steps/create-revalidate-webhook';
 import { createTenantSanityProject } from './steps/create-sanity-project';
 import { createTenantStudio } from './steps/create-studio-vercel-project';
