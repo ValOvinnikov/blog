@@ -84,7 +84,13 @@
   "presetPicker": {
     "ariaLabel": "Preset",
     "console": "Console",
-    "editorial": "Editorial"
+    "consoleDescription": "Mono, terminal chrome. Today's identity.",
+    "consoleMiniPrimary": "~$ ./publish",
+    "consoleMiniSecondary": "› post shipped",
+    "editorial": "Editorial",
+    "editorialDescription": "Serif, de-consoled. Warm and magazine-like.",
+    "editorialMiniPrimary": "Field Notes",
+    "editorialMiniSecondary": "Dispatches from the coast"
   },
   "logoHueField": {
     "followAccentHue": "Follow accent hue",
@@ -115,6 +121,7 @@
     "faviconFieldLabel": "Favicon",
     "faviconFieldHint": "Pre-cropped square, please — Blob can't crop it for you (an SVG's viewBox counts as its shape). Non-square uploads are rejected.",
     "advancedSummary": "Advanced",
+    "optionalTag": "optional",
     "terminalChromeLabel": "Terminal chrome",
     "terminalChromeDescription": "Window frame + terminal prompt around the site — the single most defining console-vs-editorial switch. Defaults from your preset. Not saved yet — site_config has no column for this field.",
     "switchOn": "On",

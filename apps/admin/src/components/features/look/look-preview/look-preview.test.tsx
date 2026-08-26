@@ -16,7 +16,7 @@ const BASE_PROPS = {
 };
 
 describe(LookPreview, () => {
-  it('renders the tenant slug, a heading sample, and a @blog/ui Button primitive', () => {
+  it('renders the tenant slug and a real site Button primitive from the preview sample', () => {
     render(<LookPreview {...BASE_PROPS} />);
 
     expect(screen.getAllByText('acme').length).toBeGreaterThan(0);
@@ -58,7 +58,7 @@ describe(LookPreview, () => {
     const user = userEvent.setup();
     render(<LookPreview {...BASE_PROPS} accentHue={28} />);
 
-    await user.click(screen.getByRole('radio', { name: 'Dark' }));
+    await user.click(screen.getByRole('button', { name: 'Dark' }));
 
     const button = screen.getByRole('button', { name: 'Subscribe' });
     const previewSurface = button.closest('[style*="--brand-primary"]');
