@@ -272,6 +272,34 @@ page-builder and no SEO surface to justify them. What carries over:
   once a second component actually consumes it.
 - Extract at the second repetition, never the third.
 
+## Compound components
+
+A component with more than one exported part (`Card.Header`/`Card.Body`/
+`Card.Footer`, a future `Tabs.Trigger`/`Tabs.Panel`, …) follows `@blog/ui`'s
+split, not one crowded file — see `packages/ui/src/molecules/window-chrome/`
+for the reference shape (read it with Read before building the next one):
+
+- **Each part lives in its own file**, `components/<part>/<component>-<part>.tsx`
+  (e.g. `components/header/card-header.tsx`). The root file (`card.tsx`) only
+  imports each part, defines the `<X>Parts` map, and composes
+  `Card = Object.assign(CardRoot, CardParts)` — it is not where a part's JSX
+  or props type lives.
+- **The slot-matching logic is never hand-rolled per component.** `@blog/ui`
+  centralizes its order-independent, first-match-wins resolution (unmatched
+  children wrapped in keyed `Fragment`s) as `mapCompoundSlots` in
+  `packages/ui/src/lib/react/compound.tsx`. This app cannot import that (no
+  `@blog/ui` import, ever) — the _first_ admin compound component creates its
+  own equivalent at `apps/admin/src/lib/react/compound.ts`, and every
+  compound component after it imports that one instead of reimplementing
+  slot-matching from scratch. Check whether that file already exists before
+  assuming you're the first.
+- **Variants stay wherever the ticket's own acceptance criteria pin them
+  down.** A component whose ticket requires "one variants file is the single
+  source of the treatment" (e.g. Card) keeps one shared
+  `<component>-variants.ts` for every part, not one per part. Where the ticket
+  says nothing, follow `WindowChrome`'s default: a part with its own visual
+  identity (e.g. `window-chrome-body-variants.ts`) gets its own variants file.
+
 ## Function style
 
 **Default: arrow-function const.** `apps/admin` is a React app, and React
