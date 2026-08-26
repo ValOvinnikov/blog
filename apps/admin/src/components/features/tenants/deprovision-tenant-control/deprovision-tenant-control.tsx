@@ -1,16 +1,15 @@
 'use client';
 
 import { ConfirmDialog } from '@admin/components/shared/confirm-dialog';
+import { Heading } from '@admin/components/shared/heading';
+import { StatusBadge } from '@admin/components/shared/status-badge';
+import { Text } from '@admin/components/shared/text';
 import { deleteTenantAction } from '@admin/server/provisioning/delete-tenant-action';
 import { deprovisionTenantAction } from '@admin/server/provisioning/deprovision-tenant-action';
 import { formatDate } from '@admin/utils/format-date/format-date';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import { Switch } from '@base-ui/react/switch';
-import { Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { Heading } from '@blog/ui/atoms/heading';
-import { StatusBadge } from '@blog/ui/atoms/status-badge';
-import { Text } from '@blog/ui/atoms/text';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
@@ -41,7 +40,7 @@ export const DeprovisionTenantControl = ({
   const [error, setError] = useState<string | undefined>(undefined);
   const [isPending, startTransition] = useTransition();
 
-  const { card, archivedRow, switchRow, switchTrack, switchThumb } =
+  const { card, heading, archivedRow, switchRow, switchTrack, switchThumb } =
     deprovisionTenantControlVariants();
 
   const handleOpenChange = (next: boolean) => {
@@ -72,7 +71,7 @@ export const DeprovisionTenantControl = ({
   if (tenant.deprovisionedAt) {
     return (
       <div className={card()}>
-        <Heading level={2} size={Size.XS}>
+        <Heading level={2} size="cardTitle" className={heading()}>
           {t('heading')}
         </Heading>
         <div className={archivedRow()}>
@@ -89,7 +88,7 @@ export const DeprovisionTenantControl = ({
 
   return (
     <div className={card()}>
-      <Heading level={2} size={Size.XS}>
+      <Heading level={2} size="cardTitle">
         {t('heading')}
       </Heading>
       <Text variant="supporting">{t('description')}</Text>

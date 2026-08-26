@@ -1,19 +1,24 @@
 'use client';
 
+import { Alert } from '@admin/components/shared/alert';
+import { Button } from '@admin/components/shared/button';
+import { Card } from '@admin/components/shared/card';
 import { FormField } from '@admin/components/shared/form-field';
 import { FormTextInput } from '@admin/components/shared/form-text-input';
+import { PageHeader } from '@admin/components/shared/page-header';
+import { Spinner } from '@admin/components/shared/spinner';
 import {
   createTenantAction,
   type TCreateTenantFieldErrors,
 } from '@admin/server/tenants/create-tenant-action';
 import { ALERT_TYPE, Size } from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
-import { Alert } from '@blog/ui/atoms/alert';
-import { Button } from '@blog/ui/atoms/button';
-import { Heading } from '@blog/ui/atoms/heading';
+// `@blog/ui`'s SegmentedControl is kept here deliberately — it exposes
+// `role="radiogroup"`/`role="radio"` (matching the untouched `tenant-details-panel`
+// tests), while admin's own SegmentedControl is built on Base UI's Toggle
+// Group (`role="group"` + `aria-pressed` buttons). Swapping would change the
+// accessible shape of this control, which is behaviour, not styling.
 import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
-import { Spinner } from '@blog/ui/atoms/spinner';
-import { Text } from '@blog/ui/atoms/text';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 
@@ -57,18 +62,8 @@ export const TenantDetailsForm = () => {
     useState<TOwnerInviteConfirmation | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const {
-    root,
-    header,
-    description,
-    cardWrap,
-    card,
-    overlay,
-    fields,
-    hint,
-    actions,
-    planControl,
-  } = tenantDetailsFormVariants({ pending: isPending });
+  const { root, cardWrap, cardInert, overlay, fields, hint, planControl } =
+    tenantDetailsFormVariants({ pending: isPending });
 
   const updateField = <K extends keyof TFormValues>(
     key: K,
@@ -119,84 +114,85 @@ export const TenantDetailsForm = () => {
 
   return (
     <div className={root()}>
-      <div className={header()}>
-        <Heading level={1} size={Size.MD}>
-          {t('heading')}
-        </Heading>
-        <Text variant="muted" className={description()}>
-          {t('description')}
-        </Text>
-      </div>
+      <PageHeader title={t('heading')} description={t('description')} />
 
-      {formError && <Alert type={ALERT_TYPE.ERROR} message={formError} />}
+      {formError && <Alert type={ALERT_TYPE.ERROR} title={formError} />}
 
       <div className={cardWrap()}>
-        <div className={card()} inert={isPending}>
-          <div className={fields()}>
-            <FormTextInput
-              label={t('nameLabel')}
-              htmlFor="tenant-name"
-              error={fieldErrors.name}
-              value={values.name}
-              onChange={(value) => updateField('name', value)}
-            />
+        <div className={cardInert()} inert={isPending}>
+          <Card>
+            <Card.Body>
+              <div className={fields()}>
+                <FormTextInput
+                  label={t('nameLabel')}
+                  htmlFor="tenant-name"
+                  error={fieldErrors.name}
+                  value={values.name}
+                  onChange={(value) => updateField('name', value)}
+                />
 
-            <FormTextInput
-              label={t('slugLabel')}
-              htmlFor="tenant-slug"
-              hint={<span className={hint()}>{t('slugHint')}</span>}
-              error={fieldErrors.slug}
-              value={values.slug}
-              onChange={(value) => updateField('slug', value)}
-            />
+                <FormTextInput
+                  label={t('slugLabel')}
+                  htmlFor="tenant-slug"
+                  hint={<span className={hint()}>{t('slugHint')}</span>}
+                  error={fieldErrors.slug}
+                  value={values.slug}
+                  onChange={(value) => updateField('slug', value)}
+                />
 
-            <FormTextInput
-              label={t('domainLabel')}
-              htmlFor="tenant-domain"
-              hint={<span className={hint()}>{t('domainHint')}</span>}
-              error={fieldErrors.domain}
-              value={values.domain}
-              onChange={(value) => updateField('domain', value)}
-            />
+                <FormTextInput
+                  label={t('domainLabel')}
+                  htmlFor="tenant-domain"
+                  hint={<span className={hint()}>{t('domainHint')}</span>}
+                  error={fieldErrors.domain}
+                  value={values.domain}
+                  onChange={(value) => updateField('domain', value)}
+                />
 
-            <FormField label={t('planLabel')}>
-              <SegmentedControl<TTenantPlan>
-                ariaLabel={t('planLabel')}
-                options={planOptions}
-                value={values.plan}
-                onChange={(plan) => updateField('plan', plan)}
-                className={planControl()}
-              />
-            </FormField>
-
-            <FormTextInput
-              label={t('ownerEmailLabel')}
-              htmlFor="tenant-owner-email"
-              hint={<span className={hint()}>{t('ownerEmailHint')}</span>}
-              error={fieldErrors.ownerEmail}
-              footer={
-                ownerInviteConfirmation && (
-                  <Alert
-                    type={ALERT_TYPE.INFO}
-                    message={ownerInviteConfirmation.message}
+                <FormField label={t('planLabel')}>
+                  <SegmentedControl<TTenantPlan>
+                    ariaLabel={t('planLabel')}
+                    options={planOptions}
+                    value={values.plan}
+                    onChange={(plan) => updateField('plan', plan)}
+                    className={planControl()}
                   />
-                )
-              }
-              type="email"
-              value={values.ownerEmail}
-              onChange={(value) => updateField('ownerEmail', value)}
-            />
-          </div>
+                </FormField>
 
-          <div className={actions()}>
-            <Button type="button" onClick={handleSubmit} isDisabled={isPending}>
-              {isPending
-                ? t('submittingButton')
-                : ownerInviteConfirmation
-                  ? t('confirmOwnerInviteButton')
-                  : t('submitButton')}
-            </Button>
-          </div>
+                <FormTextInput
+                  label={t('ownerEmailLabel')}
+                  htmlFor="tenant-owner-email"
+                  hint={<span className={hint()}>{t('ownerEmailHint')}</span>}
+                  error={fieldErrors.ownerEmail}
+                  footer={
+                    ownerInviteConfirmation && (
+                      <Alert
+                        type={ALERT_TYPE.INFO}
+                        title={ownerInviteConfirmation.message}
+                      />
+                    )
+                  }
+                  type="email"
+                  value={values.ownerEmail}
+                  onChange={(value) => updateField('ownerEmail', value)}
+                />
+              </div>
+            </Card.Body>
+            <Card.Footer>
+              <Button
+                type="button"
+                variant="primary"
+                onClick={handleSubmit}
+                isDisabled={isPending}
+              >
+                {isPending
+                  ? t('submittingButton')
+                  : ownerInviteConfirmation
+                    ? t('confirmOwnerInviteButton')
+                    : t('submitButton')}
+              </Button>
+            </Card.Footer>
+          </Card>
         </div>
 
         {isPending && (

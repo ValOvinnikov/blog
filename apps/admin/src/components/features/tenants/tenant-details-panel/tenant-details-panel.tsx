@@ -1,5 +1,8 @@
 'use client';
 
+import { Alert } from '@admin/components/shared/alert';
+import { Button } from '@admin/components/shared/button';
+import { Card } from '@admin/components/shared/card';
 import { FormField } from '@admin/components/shared/form-field';
 import { FormTextInput } from '@admin/components/shared/form-text-input';
 import {
@@ -12,12 +15,13 @@ import type {
   TTenantFieldLockReason,
   TTenantFieldLocks,
 } from '@admin/utils/tenant-field-locks/tenant-field-locks';
-import { ALERT_TYPE, Size } from '@blog/config';
+import { ALERT_TYPE } from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { Alert } from '@blog/ui/atoms/alert';
-import { Button } from '@blog/ui/atoms/button';
-import { Heading } from '@blog/ui/atoms/heading';
+// `@blog/ui`'s SegmentedControl is kept here deliberately — see the same note
+// in `tenant-details-form.tsx`. This component's own test suite hard-asserts
+// `role="radiogroup"`/`role="radio"`, which admin's Toggle-Group-based
+// SegmentedControl does not expose.
 import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -142,10 +146,9 @@ export const TenantDetailsPanel = ({
   });
 
   const {
-    root,
+    bodyStack,
     fields,
     fieldLockReason,
-    actions,
     lockAnnouncementLive,
     planControl,
   } = tenantDetailsPanelVariants();
@@ -225,97 +228,101 @@ export const TenantDetailsPanel = ({
   const planLock = fieldLocks.plan;
 
   return (
-    <div className={root()} data-tenant-details-panel={panelId}>
-      <Heading level={2} size={Size.XS}>
-        {t('heading')}
-      </Heading>
+    <div data-tenant-details-panel={panelId}>
+      <Card>
+        <Card.Header title={t('heading')} />
+        <Card.Body>
+          <div className={bodyStack()}>
+            <span className={lockAnnouncementLive()} aria-live="assertive">
+              {lockAnnouncement}
+            </span>
 
-      <span className={lockAnnouncementLive()} aria-live="assertive">
-        {lockAnnouncement}
-      </span>
+            {showSaveSuccess && (
+              <Alert type={ALERT_TYPE.SUCCESS} title={t('alertSuccess')} />
+            )}
+            {formError && <Alert type={ALERT_TYPE.ERROR} title={formError} />}
 
-      {showSaveSuccess && (
-        <Alert type={ALERT_TYPE.SUCCESS} message={t('alertSuccess')} />
-      )}
-      {formError && <Alert type={ALERT_TYPE.ERROR} message={formError} />}
+            <div
+              className={fields()}
+              ref={fieldsContainerRef}
+              tabIndex={-1}
+              role="group"
+              aria-label={t('fieldsGroupLabel')}
+            >
+              {textFields.map(({ key, label: labelText }) => {
+                const id = TEXT_FIELD_ID[key];
+                const errorId = `${id}-error`;
+                const reasonId = `${id}-lock-reason`;
+                const errorMessage = fieldErrors[key];
+                const lock = fieldLocks[key];
+                const describedBy =
+                  [lock ? reasonId : null, errorMessage ? errorId : null]
+                    .filter(Boolean)
+                    .join(' ') || undefined;
 
-      <div
-        className={fields()}
-        ref={fieldsContainerRef}
-        tabIndex={-1}
-        role="group"
-        aria-label={t('fieldsGroupLabel')}
-      >
-        {textFields.map(({ key, label: labelText }) => {
-          const id = TEXT_FIELD_ID[key];
-          const errorId = `${id}-error`;
-          const reasonId = `${id}-lock-reason`;
-          const errorMessage = fieldErrors[key];
-          const lock = fieldLocks[key];
-          const describedBy =
-            [lock ? reasonId : null, errorMessage ? errorId : null]
-              .filter(Boolean)
-              .join(' ') || undefined;
+                return (
+                  <FormTextInput
+                    key={key}
+                    label={labelText}
+                    htmlFor={id}
+                    hint={
+                      lock && (
+                        <span id={reasonId} className={fieldLockReason()}>
+                          {lockReasonText(lock)}
+                        </span>
+                      )
+                    }
+                    error={errorMessage}
+                    type={TEXT_FIELD_TYPE[key]}
+                    value={values[key]}
+                    onChange={(nextValue) => updateField(key, nextValue)}
+                    isInvalid={Boolean(errorMessage)}
+                    isDisabled={Boolean(lock)}
+                    aria-describedby={describedBy}
+                  />
+                );
+              })}
 
-          return (
-            <FormTextInput
-              key={key}
-              label={labelText}
-              htmlFor={id}
-              hint={
-                lock && (
-                  <span id={reasonId} className={fieldLockReason()}>
-                    {lockReasonText(lock)}
-                  </span>
-                )
-              }
-              error={errorMessage}
-              type={TEXT_FIELD_TYPE[key]}
-              value={values[key]}
-              onChange={(nextValue) => updateField(key, nextValue)}
-              isInvalid={Boolean(errorMessage)}
-              isDisabled={Boolean(lock)}
-              aria-describedby={describedBy}
-            />
-          );
-        })}
-
-        <FormField
-          label={t('planLabel')}
-          hint={
-            planLock && (
-              <span
-                id={`${PLAN_FIELD_ID}-lock-reason`}
-                className={fieldLockReason()}
+              <FormField
+                label={t('planLabel')}
+                hint={
+                  planLock && (
+                    <span
+                      id={`${PLAN_FIELD_ID}-lock-reason`}
+                      className={fieldLockReason()}
+                    >
+                      {lockReasonText(planLock)}
+                    </span>
+                  )
+                }
               >
-                {lockReasonText(planLock)}
-              </span>
-            )
-          }
-        >
-          <SegmentedControl<TTenantPlan>
-            ariaLabel={t('planLabel')}
-            options={planOptions}
-            value={values.plan}
-            onChange={(plan) => updateField('plan', plan)}
-            className={planControl()}
-            isDisabled={Boolean(planLock)}
-            aria-describedby={
-              planLock ? `${PLAN_FIELD_ID}-lock-reason` : undefined
-            }
-          />
-        </FormField>
-      </div>
+                <SegmentedControl<TTenantPlan>
+                  ariaLabel={t('planLabel')}
+                  options={planOptions}
+                  value={values.plan}
+                  onChange={(plan) => updateField('plan', plan)}
+                  className={planControl()}
+                  isDisabled={Boolean(planLock)}
+                  aria-describedby={
+                    planLock ? `${PLAN_FIELD_ID}-lock-reason` : undefined
+                  }
+                />
+              </FormField>
+            </div>
+          </div>
+        </Card.Body>
 
-      <div className={actions()}>
-        <Button
-          type="button"
-          onClick={handleSave}
-          isDisabled={isPending || !isDirty}
-        >
-          {isPending ? t('savingButton') : t('saveButton')}
-        </Button>
-      </div>
+        <Card.Footer>
+          <Button
+            type="button"
+            variant="primary"
+            onClick={handleSave}
+            isDisabled={isPending || !isDirty}
+          >
+            {isPending ? t('savingButton') : t('saveButton')}
+          </Button>
+        </Card.Footer>
+      </Card>
     </div>
   );
 };

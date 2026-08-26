@@ -1,5 +1,5 @@
 import { FormField } from '@admin/components/shared/form-field';
-import { TextInput } from '@blog/ui/atoms/text-input';
+import { TextInput } from '@admin/components/shared/text-input';
 import type { AriaAttributes, ReactNode } from 'react';
 
 export type TFormTextInputProps = {

@@ -1,6 +1,13 @@
 'use client';
 
 import { TenantDetailsPanel } from '@admin/components/features/tenants/tenant-details-panel';
+import { Alert } from '@admin/components/shared/alert';
+import { Button } from '@admin/components/shared/button';
+import { Heading } from '@admin/components/shared/heading';
+import { Icon } from '@admin/components/shared/icon';
+import { LinkButton } from '@admin/components/shared/link-button';
+import { StatusBadge } from '@admin/components/shared/status-badge';
+import { Text } from '@admin/components/shared/text';
 import { Link } from '@admin/i18n/navigation';
 import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
 import { adminRoutes } from '@admin/utils/routes/routes';
@@ -9,20 +16,12 @@ import {
   provisioningStepTone,
 } from '@admin/utils/status-tone/status-tone';
 import { computeTenantFieldLocks } from '@admin/utils/tenant-field-locks/tenant-field-locks';
-import { ALERT_TYPE, ICONS, Size } from '@blog/config';
+import { ALERT_TYPE, ICONS } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { Alert } from '@blog/ui/atoms/alert';
-import { Button } from '@blog/ui/atoms/button';
-import { Eyebrow } from '@blog/ui/atoms/eyebrow';
-import { Heading } from '@blog/ui/atoms/heading';
-import { Icon } from '@blog/ui/atoms/icon';
-import { StatusBadge } from '@blog/ui/atoms/status-badge';
-import { Text } from '@blog/ui/atoms/text';
-import { LinkButton } from '@blog/ui/molecules/link-button';
 import { useTranslations } from 'next-intl';
 
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
@@ -76,6 +75,7 @@ export const ProvisioningStatusView = ({
   const {
     root,
     header,
+    eyebrow,
     ownerRow,
     startAction,
     layout,
@@ -89,12 +89,12 @@ export const ProvisioningStatusView = ({
     stepTitle,
     stepStatusLive,
     visuallyHidden,
-    failedBadge,
     detailsColumn,
     detailsHeader,
     overallStatusLive,
     errorCard,
     errorHeadingRow,
+    errorHeadline,
     errorIcon,
     errorDetails,
     errorDetailsSummary,
@@ -102,14 +102,15 @@ export const ProvisioningStatusView = ({
     goToTenantButton,
     dnsCard,
     dnsRow,
+    dnsValue,
     dnsStatusLive,
   } = provisioningStatusViewVariants();
 
   return (
     <div className={root()}>
       <div className={header()}>
-        <Eyebrow>{t('eyebrow')}</Eyebrow>
-        <Heading level={1} size={Size.MD}>
+        <span className={eyebrow()}>{t('eyebrow')}</span>
+        <Heading level={1} size="pageTitle">
           {tenant.name}
         </Heading>
         <Text variant="supporting">{t('description')}</Text>
@@ -124,13 +125,13 @@ export const ProvisioningStatusView = ({
       </div>
 
       {pollError && (
-        <Alert type={ALERT_TYPE.WARNING} message={t('pollErrorWarning')} />
+        <Alert type={ALERT_TYPE.WARNING} title={t('pollErrorWarning')} />
       )}
 
       {dispatchError && (
         <Alert
           type={ALERT_TYPE.ERROR}
-          message={
+          title={
             dispatchError === 'not-found'
               ? t('startErrorNotFound')
               : t('startError')
@@ -201,9 +202,9 @@ export const ProvisioningStatusView = ({
             <div className={detailsHeader()}>
               <span className={overallStatusLive()} aria-live="polite">
                 {isOverallFailed ? (
-                  <span className={failedBadge()}>
+                  <StatusBadge tone="bad">
                     {t(`statusLabel.${overallStepStatus}`)}
-                  </span>
+                  </StatusBadge>
                 ) : (
                   <StatusBadge
                     tone={provisioningStepTone(displayOverallStatus)}
@@ -229,7 +230,7 @@ export const ProvisioningStatusView = ({
             <div className={errorCard()} role="alert">
               <div className={errorHeadingRow()}>
                 <Icon name={ICONS.WARNING} className={errorIcon()} />
-                <Heading level={2} size={Size.XS}>
+                <Heading level={2} size="cardTitle" className={errorHeadline()}>
                   {t(`errorKind.${errorKind}.headline`)}
                 </Heading>
               </div>
@@ -270,11 +271,11 @@ export const ProvisioningStatusView = ({
       </div>
 
       <div className={dnsCard()}>
-        <Heading level={2} size={Size.XS}>
+        <Heading level={2} size="cardTitle">
           {t('dnsHeading')}
         </Heading>
         <div className={dnsRow()}>
-          <Text>{tenant.primaryDomain}</Text>
+          <Text className={dnsValue()}>{tenant.primaryDomain}</Text>
           <span className={dnsStatusLive()} aria-live="polite">
             <StatusBadge tone={domainVerificationTone(domainStatus)}>
               {t(`dnsStatus.${domainStatus}`)}
