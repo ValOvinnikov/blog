@@ -41,10 +41,13 @@ export const SettingRow = ({
           <span className={descriptionSlot()}>{description}</span>
         )}
         {isLocked && lockedReason && (
-          <span className={reason()}>{lockedReason}</span>
+          <span className={reason()}>
+            <span aria-hidden="true">🔒</span>
+            <span>{lockedReason}</span>
+          </span>
         )}
       </div>
-      <div className={control()} aria-disabled={isLocked || undefined}>
+      <div className={control()} inert={isLocked || undefined}>
         {children}
       </div>
     </div>

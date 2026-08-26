@@ -70,18 +70,27 @@ describe(SettingRow, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('honours the disabled state by marking the control slot inert', () => {
+  it('omits the reason row when locked but no reason is given', () => {
+    render(
+      <SettingRow label="Custom domains" isLocked={true}>
+        <button type="button">Upgrade</button>
+      </SettingRow>,
+    );
+
+    expect(screen.queryByText('🔒')).not.toBeInTheDocument();
+  });
+
+  it('honours the locked state by making the control slot inert', () => {
     render(
       <SettingRow label="Custom domains" isLocked={true} lockedReason="Locked">
         <button type="button">Upgrade</button>
       </SettingRow>,
     );
 
-    expect(
-      screen
-        .getByRole('button', { name: 'Upgrade' })
-        .closest('[aria-disabled="true"]'),
-    ).not.toBeNull();
+    const button = screen.getByRole('button', { name: 'Upgrade' });
+    const wrapper = button.closest('div');
+
+    expect(wrapper?.getAttribute('inert')).toBe('');
   });
 
   it('does not mark the control slot inert when not locked', () => {
@@ -91,10 +100,9 @@ describe(SettingRow, () => {
       </SettingRow>,
     );
 
-    expect(
-      screen
-        .getByRole('button', { name: 'Upgrade' })
-        .closest('[aria-disabled="true"]'),
-    ).toBeNull();
+    const button = screen.getByRole('button', { name: 'Upgrade' });
+    const wrapper = button.closest('div');
+
+    expect(wrapper?.hasAttribute('inert')).toBe(false);
   });
 });
