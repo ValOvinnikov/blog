@@ -5,12 +5,12 @@ export const avatarVariants = tv({
   variants: {
     variant: {
       table: [
-        'size-7.5 rounded-md text-xs font-bold',
-        'bg-brand-primary-solid text-brand-primary-contrast',
+        'size-7.5 rounded-admin-sm text-xs font-bold',
+        'bg-admin-brand text-white',
       ],
       chip: [
         'size-5.5 rounded-full text-xs font-semibold',
-        'bg-surface-2 text-text-muted',
+        'bg-admin-line-2 text-admin-muted',
       ],
     },
   },
