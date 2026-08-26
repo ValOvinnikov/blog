@@ -1,21 +1,15 @@
 'use client';
 
 import { LookPreview } from '@admin/components/features/look/look-preview';
+import { Alert } from '@admin/components/shared/alert';
+import { Button } from '@admin/components/shared/button';
+import { Card } from '@admin/components/shared/card';
+import { Disclosure } from '@admin/components/shared/disclosure';
+import { PageHeader } from '@admin/components/shared/page-header';
 import { updateLookAction } from '@admin/server/site-config/update-look-action';
 import type { TLookFormValues } from '@admin/utils/default-look-values/default-look-values';
 import { useFormSubmission } from '@admin/utils/use-form-submission/use-form-submission';
-import {
-  ALERT_TYPE,
-  ICONS,
-  PRESET_REGISTRY,
-  Size,
-  type TPresetId,
-} from '@blog/config';
-import { Alert } from '@blog/ui/atoms/alert';
-import { Button } from '@blog/ui/atoms/button';
-import { Heading } from '@blog/ui/atoms/heading';
-import { Icon } from '@blog/ui/atoms/icon';
-import { Text } from '@blog/ui/atoms/text';
+import { ALERT_TYPE, PRESET_REGISTRY, type TPresetId } from '@blog/config';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -118,69 +112,50 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
 
   const t = useTranslations('lookForm');
 
-  const {
-    root,
-    pageHead,
-    pageHeadText,
-    actions,
-    grid,
-    stack,
-    card,
-    cardHead,
-    cardHeadDesc,
-    cardBody,
-    disclosure,
-    summary,
-    summaryIcon,
-    disclosureBody,
-    note,
-  } = lookFormVariants();
+  const { root, grid, stack, tagSecondary, note } = lookFormVariants();
 
   return (
     <div className={root()}>
-      <div className={pageHead()}>
-        <div className={pageHeadText()}>
-          <Heading level={1} size={Size.MD}>
-            {t('heading')}
-          </Heading>
-          <Text variant="muted">{t('subtitle')}</Text>
-        </div>
-        <div className={actions()}>
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleReset}
-            isDisabled={!isDirty}
-          >
-            {t('resetButton')}
-          </Button>
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            isDisabled={isPending || !isDirty}
-          >
-            {isPending ? t('savingButton') : t('saveButton')}
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title={t('heading')}
+        description={t('subtitle')}
+        actions={
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleReset}
+              isDisabled={!isDirty}
+            >
+              {t('resetButton')}
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              onClick={handleSubmit}
+              isDisabled={isPending || !isDirty}
+            >
+              {isPending ? t('savingButton') : t('saveButton')}
+            </Button>
+          </>
+        }
+      />
 
       {status === 'success' && (
-        <Alert type={ALERT_TYPE.SUCCESS} message={t('alertSuccess')} />
+        <Alert type={ALERT_TYPE.SUCCESS} title={t('alertSuccess')} />
       )}
       {status === 'error' && (
-        <Alert type={ALERT_TYPE.ERROR} message={t('alertError')} />
+        <Alert type={ALERT_TYPE.ERROR} title={t('alertError')} />
       )}
 
       <div className={grid()}>
         <div className={stack()}>
-          <section className={card()}>
-            <header className={cardHead()}>
-              <Heading level={2} size={Size.XS}>
-                {t('basicHeading')}
-              </Heading>
-              <span className={cardHeadDesc()}>{t('basicDescription')}</span>
-            </header>
-            <div className={cardBody()}>
+          <Card>
+            <Card.Header
+              title={t('basicHeading')}
+              supportingText={t('basicDescription')}
+            />
+            <Card.Body>
               <LookFormBasicSection
                 preset={values.preset}
                 onPresetChange={handlePresetChange}
@@ -194,29 +169,26 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
                 faviconAssetUrl={values.faviconAssetUrl}
                 onFieldChange={updateField}
               />
-            </div>
-          </section>
+            </Card.Body>
+          </Card>
 
-          <details className={disclosure()}>
-            <summary className={summary()}>
-              <Icon
-                name={ICONS.CHEVRON_RIGHT}
-                className={summaryIcon()}
-                aria-hidden="true"
-              />
-              {t('advancedSummary')}
-            </summary>
-            <div className={disclosureBody()}>
-              <LookFormAdvancedSection
-                isChromeOn={values.chromeOn}
-                headingFont={values.headingFont}
-                bodyFont={values.bodyFont}
-                radiusScale={values.radiusScale}
-                density={values.density}
-                onFieldChange={updateField}
-              />
-            </div>
-          </details>
+          <Disclosure
+            summary={
+              <>
+                {t('advancedSummary')}
+                <span className={tagSecondary()}>{t('optionalTag')}</span>
+              </>
+            }
+          >
+            <LookFormAdvancedSection
+              isChromeOn={values.chromeOn}
+              headingFont={values.headingFont}
+              bodyFont={values.bodyFont}
+              radiusScale={values.radiusScale}
+              density={values.density}
+              onFieldChange={updateField}
+            />
+          </Disclosure>
 
           <p className={note()}>{t('footerNote')}</p>
         </div>

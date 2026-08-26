@@ -1,6 +1,7 @@
 'use client';
 
 import { FontPicker } from '@admin/components/shared/font-picker';
+import { SegmentedControl } from '@admin/components/shared/segmented-control';
 import { Switch } from '@base-ui/react/switch';
 import {
   DENSITY,
@@ -9,8 +10,6 @@ import {
   type TFontChoice,
   type TRadiusScale,
 } from '@blog/config';
-import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
-import { SettingRow } from '@blog/ui/molecules/setting-row';
 import { useTranslations } from 'next-intl';
 
 import type { TLookFormFieldSetter } from './look-form';
@@ -35,7 +34,8 @@ export const LookFormAdvancedSection = ({
   onFieldChange,
 }: TLookFormAdvancedSectionProps) => {
   const t = useTranslations('lookForm');
-  const { switchRow, switchTrack, switchThumb } = lookFormVariants();
+  const { field, fieldLabel, fieldHint, switchRow, switchTrack, switchThumb } =
+    lookFormVariants();
 
   const radiusOptions = Object.values(RADIUS_SCALE).map((scale) => ({
     value: scale,
@@ -55,10 +55,9 @@ export const LookFormAdvancedSection = ({
 
   return (
     <>
-      <SettingRow
-        label={terminalChromeLabel}
-        description={t('terminalChromeDescription')}
-      >
+      <div className={field()}>
+        <span className={fieldLabel()}>{terminalChromeLabel}</span>
+        <p className={fieldHint()}>{t('terminalChromeDescription')}</p>
         <div className={switchRow()}>
           <Switch.Root
             checked={isChromeOn}
@@ -70,47 +69,48 @@ export const LookFormAdvancedSection = ({
           </Switch.Root>
           <span>{isChromeOn ? t('switchOn') : t('switchOff')}</span>
         </div>
-      </SettingRow>
+      </div>
 
-      <SettingRow
-        label={headingFontLabel}
-        description={t('headingFontDescription')}
-      >
+      <div className={field()}>
+        <span className={fieldLabel()}>{headingFontLabel}</span>
+        <p className={fieldHint()}>{t('headingFontDescription')}</p>
         <FontPicker
           ariaLabel={headingFontLabel}
           value={headingFont}
           onChange={(font) => onFieldChange('headingFont', font)}
         />
-      </SettingRow>
+      </div>
 
-      <SettingRow label={bodyFontLabel}>
+      <div className={field()}>
+        <span className={fieldLabel()}>{bodyFontLabel}</span>
         <FontPicker
           ariaLabel={bodyFontLabel}
           value={bodyFont}
           onChange={(font) => onFieldChange('bodyFont', font)}
         />
-      </SettingRow>
+      </div>
 
-      <SettingRow
-        label={radiusScaleLabel}
-        description={t('radiusScaleDescription')}
-      >
+      <div className={field()}>
+        <span className={fieldLabel()}>{radiusScaleLabel}</span>
+        <p className={fieldHint()}>{t('radiusScaleDescription')}</p>
         <SegmentedControl<TRadiusScale>
           ariaLabel={radiusScaleLabel}
           options={radiusOptions}
           value={radiusScale}
           onChange={(scale) => onFieldChange('radiusScale', scale)}
         />
-      </SettingRow>
+      </div>
 
-      <SettingRow label={densityLabel} description={t('densityDescription')}>
+      <div className={field()}>
+        <span className={fieldLabel()}>{densityLabel}</span>
+        <p className={fieldHint()}>{t('densityDescription')}</p>
         <SegmentedControl<TDensity>
           ariaLabel={densityLabel}
           options={densityOptions}
           value={density}
           onChange={(option) => onFieldChange('density', option)}
         />
-      </SettingRow>
+      </div>
     </>
   );
 };
