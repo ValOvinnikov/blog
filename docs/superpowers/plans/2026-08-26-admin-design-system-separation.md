@@ -15,7 +15,7 @@ the _tenant's_ components or the preview stops telling the truth.
 
 **Architecture:** Admin gains its own Tailwind token layer (currently it imports
 the site's shared theme wholesale, which is why it looks like the public site),
-its own icon registry over 13 copied SVGs, and its own `src/components/ui/*`
+its own icon registry over 13 copied SVGs, and its own `src/components/shared/*`
 primitives. Migration is bottom-up — tokens, then icons, then primitives, then
 call sites — so the app compiles at every commit. The `@blog/ui` dependency is
 removed last, once nothing imports it.
@@ -94,30 +94,33 @@ afterwards would build each of them twice.
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `src/styles/admin-theme.css`                                | The `--admin-*` token layer + `@theme inline` mappings. The one place a token value is written.                    |
 | `src/assets/icons/*.svg`                                    | 13 copied glyphs. Static assets, no logic.                                                                         |
-| `src/components/ui/icon/`                                   | `Icon` + `ICON_REGISTRY` over the 13 glyphs.                                                                       |
-| `src/components/ui/text/`                                   | `Text` — body/muted/supporting/hint variants.                                                                      |
-| `src/components/ui/heading/`                                | `Heading` — levels 1–4, size variants.                                                                             |
-| `src/components/ui/button/`                                 | `Button` — primary/secondary/ghost/danger, sizes.                                                                  |
-| `src/components/ui/link-button/`                            | `LinkButton` — polymorphic `as`, shares Button's variants.                                                         |
-| `src/components/ui/status-badge/`                           | `StatusBadge` — rounded pill + tone dot. The component that motivated this work.                                   |
-| `src/components/ui/text-input/`                             | `TextInput`, controlled.                                                                                           |
-| `src/components/ui/textarea/`                               | `Textarea`, controlled. Replaces the `@blog/ui` atom being deleted.                                                |
-| `src/components/ui/segmented-control/`                      | `SegmentedControl` on Base UI `Toggle Group`.                                                                      |
-| `src/components/ui/alert/`                                  | `Alert` — info/warning/error/success.                                                                              |
-| `src/components/ui/spinner/`                                | `Spinner`.                                                                                                         |
-| `src/components/ui/avatar/`                                 | `Avatar` — initials.                                                                                               |
-| `src/components/ui/eyebrow/`                                | `Eyebrow`.                                                                                                         |
-| `src/components/ui/setting-row/`                            | `SettingRow` — label/description/control row.                                                                      |
-| `src/components/ui/brand-mark/`                             | `BrandMark` — admin's own sidebar logo.                                                                            |
-| `src/components/ui/card/`                                   | `Card` with `Card.Header`/`Card.Body`/`Card.Footer`. Replaces 17 hand-rolled surfaces.                             |
-| `src/components/ui/page-header/`                            | `PageHeader` — title, description, badges, actions slot.                                                           |
-| `src/components/ui/disclosure/`                             | `Disclosure` — the "Advanced" `<details>` pattern, re-implemented per page today.                                  |
-| `src/components/ui/index.ts`                                | Barrel. Import sites use `@admin/components/ui/<name>`.                                                            |
+| `src/components/shared/icon/`                               | `Icon` + `ICON_REGISTRY` over the 13 glyphs.                                                                       |
+| `src/components/shared/text/`                               | `Text` — body/muted/supporting/hint variants.                                                                      |
+| `src/components/shared/heading/`                            | `Heading` — levels 1–4, size variants.                                                                             |
+| `src/components/shared/button/`                             | `Button` — primary/secondary/ghost/danger, sizes.                                                                  |
+| `src/components/shared/link-button/`                        | `LinkButton` — polymorphic `as`, shares Button's variants.                                                         |
+| `src/components/shared/status-badge/`                       | `StatusBadge` — rounded pill + tone dot. The component that motivated this work.                                   |
+| `src/components/shared/text-input/`                         | `TextInput`, controlled.                                                                                           |
+| `src/components/shared/textarea/`                           | `Textarea`, controlled. Replaces the `@blog/ui` atom being deleted.                                                |
+| `src/components/shared/segmented-control/`                  | `SegmentedControl` on Base UI `Toggle Group`.                                                                      |
+| `src/components/shared/alert/`                              | `Alert` — info/warning/error/success.                                                                              |
+| `src/components/shared/spinner/`                            | `Spinner`.                                                                                                         |
+| `src/components/shared/avatar/`                             | `Avatar` — initials.                                                                                               |
+| `src/components/shared/eyebrow/`                            | `Eyebrow`.                                                                                                         |
+| `src/components/shared/setting-row/`                        | `SettingRow` — label/description/control row.                                                                      |
+| `src/components/shared/brand-mark/`                         | `BrandMark` — admin's own sidebar logo.                                                                            |
+| `src/components/shared/card/`                               | `Card` with `Card.Header`/`Card.Body`/`Card.Footer`. Replaces 17 hand-rolled surfaces.                             |
+| `src/components/shared/page-header/`                        | `PageHeader` — title, description, badges, actions slot.                                                           |
+| `src/components/shared/disclosure/`                         | `Disclosure` — the "Advanced" `<details>` pattern, re-implemented per page today.                                  |
 | `src/components/features/look/look-preview/preview-sample/` | The simulated tenant site, extracted from `look-preview.tsx`. **The only directory allowed to import `@blog/ui`.** |
 
-Each component directory follows the existing admin convention already used by
-`src/components/shared/*`: `<name>.tsx`, `<name>-variants.ts`, `<name>.test.tsx`,
-`index.ts`.
+These join the six primitives `src/components/shared/*` already holds
+(`confirm-dialog`, `font-picker`, `form-field`, `form-text-input`,
+`hue-slider`, `preset-picker`) rather than a separate top-level folder — same
+directory, same per-component shape: `<name>.tsx`, `<name>-variants.ts`,
+`<name>.test.tsx`, `index.ts`. No folder-wide barrel; call sites import each
+component directly, `@admin/components/shared/<name>`, matching how the six
+existing ones are already imported today.
 
 **Modified:**
 
@@ -266,7 +269,7 @@ git commit -m "feat(admin): add admin-owned Tailwind token layer"
 **Files:**
 
 - Create: `apps/admin/src/assets/icons/{chevron-right,comment,globe,grid,mail,menu,menu-rows,palette,plus,quote,settings,users,warning}.svg`
-- Create: `apps/admin/src/components/ui/icon/{icon.tsx,icon-variants.ts,icon-registry.ts,icon.test.tsx,index.ts}`
+- Create: `apps/admin/src/components/shared/icon/{icon.tsx,icon-variants.ts,icon-registry.ts,icon.test.tsx,index.ts}`
 - Modify: `apps/admin/next.config.ts` (SVGR include path)
 
 **Interfaces:**
@@ -289,7 +292,7 @@ ls apps/admin/src/assets/icons | wc -l   # expect 13
 
 - [ ] **Step 2: Write the failing test**
 
-`apps/admin/src/components/ui/icon/icon.test.tsx`:
+`apps/admin/src/components/shared/icon/icon.test.tsx`:
 
 ```tsx
 import { render, screen } from '@admin/testing/custom-render';
@@ -428,7 +431,7 @@ Expected: PASS, 3 tests.
 - [ ] **Step 7: Commit**
 
 ```bash
-git add apps/admin/src/assets/icons apps/admin/src/components/ui/icon apps/admin/next.config.ts
+git add apps/admin/src/assets/icons apps/admin/src/components/shared/icon apps/admin/next.config.ts
 git commit -m "feat(admin): add admin-owned icon registry over copied glyphs"
 ```
 
@@ -441,7 +444,7 @@ visual difference is provable early.
 
 **Files:**
 
-- Create: `apps/admin/src/components/ui/status-badge/{status-badge.tsx,status-badge-variants.ts,status-badge.test.tsx,index.ts}`
+- Create: `apps/admin/src/components/shared/status-badge/{status-badge.tsx,status-badge-variants.ts,status-badge.test.tsx,index.ts}`
 
 **Interfaces:**
 
@@ -554,7 +557,7 @@ Expected: PASS, 3 tests.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/admin/src/components/ui/status-badge
+git add apps/admin/src/components/shared/status-badge
 git commit -m "feat(admin): add admin-owned StatusBadge pill"
 ```
 
@@ -597,9 +600,9 @@ page author remembering.
 
 **Files:**
 
-- Create: `apps/admin/src/components/ui/card/{card.tsx,card-variants.ts,card.test.tsx,index.ts}`
-- Create: `apps/admin/src/components/ui/page-header/{page-header.tsx,page-header-variants.ts,page-header.test.tsx,index.ts}`
-- Create: `apps/admin/src/components/ui/disclosure/{disclosure.tsx,disclosure-variants.ts,disclosure.test.tsx,index.ts}`
+- Create: `apps/admin/src/components/shared/card/{card.tsx,card-variants.ts,card.test.tsx,index.ts}`
+- Create: `apps/admin/src/components/shared/page-header/{page-header.tsx,page-header-variants.ts,page-header.test.tsx,index.ts}`
+- Create: `apps/admin/src/components/shared/disclosure/{disclosure.tsx,disclosure-variants.ts,disclosure.test.tsx,index.ts}`
 
 **Interfaces:**
 
@@ -702,7 +705,7 @@ replacing the `advanced`/`advancedSummary`/`advancedBody` slots that
 - [ ] **Step 6: Commit**
 
 ```bash
-git add apps/admin/src/components/ui/card apps/admin/src/components/ui/page-header apps/admin/src/components/ui/disclosure
+git add apps/admin/src/components/shared/card apps/admin/src/components/shared/page-header apps/admin/src/components/shared/disclosure
 git commit -m "feat(admin): add Card, PageHeader and Disclosure composition primitives"
 ```
 
