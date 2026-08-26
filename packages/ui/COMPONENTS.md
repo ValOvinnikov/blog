@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_57 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_56 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -149,12 +149,6 @@ Variants: variant: lead|muted|hero|card|supporting|hint|statement|meta|emphasis
 TextInput atom — a pure, controlled single-line field.
 Props: value: string · onChange: (value: string) => void · ariaLabel: string · isInvalid?: TTextInputVariants['invalid'] · leadingIcon?: ReactNode · trailingIcon?: ReactNode · id?: string · type?: string · placeholder?: string · isRequired?: boolean · isDisabled?: boolean · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
 Variants: invalid: (boolean) · hasLeadingIcon: (boolean) · hasTrailingIcon: (boolean)
-
-### Textarea — `atoms/textarea/textarea.tsx`
-
-Textarea atom — a pure, controlled multi-line field.
-Props: value: string · onChange: (value: string) => void · ariaLabel: string · isInvalid?: TTextareaVariants['invalid'] · prompt?: string · id?: string · placeholder?: string · rows?: number · maxLength?: number · isDisabled?: boolean _(extends IWithClassName, IWithDataTestId)_
-Variants: invalid: (boolean) · hasPrompt: (boolean)
 
 ### ThemeToggle — `atoms/theme-toggle/theme-toggle.tsx`
 

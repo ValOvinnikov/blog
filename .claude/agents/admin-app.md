@@ -59,11 +59,16 @@ When invoked, before writing any code:
    detail that a correction flags as wrong is **not** a spec to reproduce —
    check the brief before treating anything you see as intended.
 
-4. Read `packages/ui/COMPONENTS.md` before building any component — it is the
-   generated index of every `@blog/ui` component, its props, and its compound
-   slots. `SegmentedControl`, `TextInput`/`Textarea`, `Button`/`IconButton`,
-   `PopoverMenu`, `SettingRow`, `StatusBadge`, `ActionList`, `Alert`,
-   `Spinner`, and `Toast` already exist. Do not rebuild them.
+4. Read the index of admin's own primitives under
+   `apps/admin/src/components/shared/` before building any component —
+   `SegmentedControl`, `TextInput`/`Textarea`, `Button`/`LinkButton`,
+   `Card`, `SettingRow`, `StatusBadge`, `Alert`, `Spinner`, `Avatar`,
+   `Disclosure`, `BrandMark`, `PageHeader`, `Icon`, `Text`, and `Heading`
+   already exist. Do not rebuild them, and do not reach for `@blog/ui`'s
+   equivalents — this app's dependency on `@blog/ui` is confined by an
+   ESLint guard to `look-preview/preview-sample/` (which renders the
+   tenant's real site for live-preview fidelity, not a component to reuse
+   elsewhere); an import anywhere else fails lint.
 5. If a `db` or `config` change your work depends on (a new query, a constant,
    an alias) is supposed to have landed already, verify it before writing code
    against it.
@@ -126,8 +131,12 @@ When invoked, before writing any code:
     return { ok: false, error: "Couldn't create the tenant — try again." };
   }
   ```
-- Depend on `@blog/db`, `@blog/auth`, `@blog/config`, `@blog/ui`, and
-  `@blog/insight` only.
+- Depend on `@blog/db`, `@blog/auth`, `@blog/config`, and `@blog/insight`
+  only — `@blog/ui` is **not** an ordinary dependency here; it's confined by
+  an ESLint guard to `look-preview/preview-sample/` (the one directory that
+  renders the tenant's real site for live-preview fidelity). Reach for this
+  app's own primitives under `apps/admin/src/components/shared/` everywhere
+  else.
   Whenever this app starts consuming a new workspace package, its alias must be
   added to `tsconfig.json` `paths` **and** `vitest.config.ts` `resolve.alias` —
   that wiring is the `config` agent's, so report it rather than editing shared
@@ -166,12 +175,13 @@ because this app is almost entirely forms.
   `tailwind-variants` tokens. A `vercel:shadcn` skill exists in this
   environment; it is not applicable here.
 
-**What `@blog/ui` still gives you** is the token vocabulary — the same theme
-tokens its components use (`brand-primary-solid`, `border`, `duration-base`, …)
-are what you style Base UI with, so both apps speak one design language without
-a component layer in between. And where a `@blog/ui` component already fits
-(the list above), compose it directly rather than restyling a Base UI part to
-match it.
+**This app owns its own token layer** (`apps/admin/src/styles/admin-theme.css`)
+rather than styling from `@blog/ui`'s tokens — its design system is
+deliberately separate. Style Base UI parts from admin's own tokens
+(`admin-*` custom properties), and where one of admin's own primitives
+already fits (the list above), compose it directly rather than restyling a
+Base UI part to match it. `@blog/ui` itself is off-limits outside
+`look-preview/preview-sample/` — see the dependency rule above.
 
 ## Auth and access
 

@@ -2,6 +2,7 @@
 
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
+import type { AriaAttributes } from 'react';
 
 import { segmentedControlVariants } from './segmented-control-variants';
 
@@ -17,6 +18,7 @@ export type TSegmentedControlProps<TValue extends string> = {
   ariaLabel: string;
   isDisabled?: boolean;
   className?: string;
+  'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
 /**
@@ -33,6 +35,7 @@ export const SegmentedControl = <TValue extends string>({
   ariaLabel,
   isDisabled = false,
   className,
+  'aria-describedby': ariaDescribedBy,
 }: TSegmentedControlProps<TValue>) => {
   const { root, option } = segmentedControlVariants();
 
@@ -47,6 +50,7 @@ export const SegmentedControl = <TValue extends string>({
       }}
       disabled={isDisabled}
       aria-label={ariaLabel}
+      aria-describedby={ariaDescribedBy}
       className={root({ class: className })}
     >
       {options.map((opt) => (

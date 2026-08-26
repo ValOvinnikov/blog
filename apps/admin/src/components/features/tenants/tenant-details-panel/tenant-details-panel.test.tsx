@@ -102,8 +102,8 @@ describe(TenantDetailsPanel, () => {
       expect(
         screen.getByRole('textbox', { name: 'Primary domain' }),
       ).toHaveValue('acme.example.com');
-      expect(screen.getByRole('radio', { name: 'Free' })).toHaveAttribute(
-        'aria-checked',
+      expect(screen.getByRole('button', { name: 'Free' })).toHaveAttribute(
+        'aria-pressed',
         'true',
       );
       expect(screen.getByRole('textbox', { name: 'Locale' })).toHaveValue('EN');
@@ -140,7 +140,7 @@ describe(TenantDetailsPanel, () => {
 
       // The accessible name still resolves correctly — via SegmentedControl's
       // own required `ariaLabel` prop, not a label association.
-      expect(screen.getByRole('radiogroup', { name: 'Plan' })).toBeVisible();
+      expect(screen.getByRole('group', { name: 'Plan' })).toBeVisible();
     });
 
     it('enables Save when only the owner email is edited', async () => {
@@ -486,7 +486,7 @@ describe(TenantDetailsPanel, () => {
       expect(
         screen.getByRole('textbox', { name: 'Primary domain' }),
       ).not.toBeDisabled();
-      expect(screen.getByRole('radio', { name: 'Free' })).not.toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Free' })).not.toBeDisabled();
       expect(
         screen.getByRole('textbox', { name: 'Locale' }),
       ).not.toBeDisabled();
@@ -546,15 +546,15 @@ describe(TenantDetailsPanel, () => {
         />,
       );
 
-      const planGroup = screen.getByRole('radiogroup', { name: 'Plan' });
-      expect(planGroup).toHaveAttribute('aria-disabled', 'true');
+      const planGroup = screen.getByRole('group', { name: 'Plan' });
+      expect(planGroup).toHaveAttribute('data-disabled');
       expect(planGroup).toHaveAccessibleDescription(
         'Locked — provisioning has already finished.',
       );
 
-      const growthOption = screen.getByRole('radio', { name: 'Growth' });
+      const growthOption = screen.getByRole('button', { name: 'Growth' });
       expect(growthOption).toBeDisabled();
-      expect(growthOption).toHaveAttribute('aria-checked', 'true');
+      expect(growthOption).toHaveAttribute('aria-pressed', 'true');
     });
 
     it('surfaces a mismatched server-side lock as a field error on the still-enabled input', async () => {
@@ -619,7 +619,7 @@ describe(TenantDetailsPanel, () => {
       expect(
         screen.getByRole('textbox', { name: 'Owner email' }),
       ).toBeDisabled();
-      expect(screen.getByRole('radio', { name: 'Growth' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Growth' })).toBeDisabled();
       expect(
         screen.getByRole('button', { name: 'Save changes' }),
       ).toBeDisabled();
