@@ -14,14 +14,16 @@ export async function getRelatedPosts(
   tagIds: string[],
   topicId: string | undefined,
 ): Promise<TPostCard[]> {
-  // Both queries project `postCardFragment`, which derefs `author`/
-  // `topic` — both tags must ride alongside `posts` (tag-scope
-  // contract, `sanity/query.ts`).
+  // Both queries project `postCardFragment`, which derefs `author`/`topic`
+  // — both tags must ride alongside `posts` (tag-scope contract,
+  // `sanity/query.ts`). `relatedByTagsQuery` additionally derefs `tags[]`
+  // via its own extra `tagIds` projection, so its `isr` call also needs
+  // `tag`; `relatedByTopicQuery` does not deref tags and stays without it.
   const [byTags, byTopic] = await Promise.all([
     tagIds.length > 0
       ? runQuery(relatedByTagsQuery, {
           parameters: { currentId, tagIds },
-          ...isr(['posts', 'author', 'topic']),
+          ...isr(['posts', 'author', 'topic', 'tag']),
         })
       : Promise.resolve([]),
     topicId
