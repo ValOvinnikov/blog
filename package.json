@@ -16,6 +16,7 @@
     "test:watch": "turbo run test:watch",
     "storybook:build": "turbo run storybook:build",
     "typegen": "turbo run typegen",
+    "db:studio": "set -a && source apps/web/.env.local && set +a && pnpm --filter @blog/db db:studio",
     "gen:ui-index": "node scripts/gen-ui-index.mjs",
     "gen:ui-index:check": "node scripts/gen-ui-index.mjs --verify",
     "gen:ui-index:test": "node --test scripts/gen-ui-index.test.mjs",
