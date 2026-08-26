@@ -511,11 +511,11 @@ export const statusBadgeVariants = tv({
   },
   variants: {
     tone: {
-      ok: { root: 'text-admin-ok bg-admin-ok-weak' },
-      warn: { root: 'text-admin-warn bg-admin-warn-weak' },
-      bad: { root: 'text-admin-bad bg-admin-bad-weak' },
-      neutral: { root: 'text-admin-muted bg-admin-line-2' },
-      plan: { root: 'text-indigo-800 bg-admin-brand-weak' },
+      ok: { root: ['text-admin-ok bg-admin-ok-weak'] },
+      warn: { root: ['text-admin-warn bg-admin-warn-weak'] },
+      bad: { root: ['text-admin-bad bg-admin-bad-weak'] },
+      neutral: { root: ['text-admin-muted bg-admin-line-2'] },
+      plan: { root: ['text-indigo-800 bg-admin-brand-weak'] },
     },
   },
   defaultVariants: { tone: 'neutral' },
@@ -671,15 +671,19 @@ import { tv } from 'tailwind-variants';
 
 export const cardVariants = tv({
   slots: {
-    root: 'bg-admin-surface border-admin-line rounded-admin shadow-admin border',
-    header:
+    root: [
+      'bg-admin-surface border-admin-line rounded-admin shadow-admin border',
+    ],
+    header: [
       'border-admin-line-2 flex flex-wrap items-center gap-2.5 border-b px-[18px] py-[14px]',
-    title: 'm-0 text-[15px] font-semibold',
-    description: 'text-admin-muted text-[12.5px]',
-    actions: 'ml-auto flex items-center gap-2',
-    body: 'p-[18px]',
-    footer:
+    ],
+    title: ['m-0 text-[15px] font-semibold'],
+    description: ['text-admin-muted text-[12.5px]'],
+    actions: ['ml-auto flex items-center gap-2'],
+    body: ['p-[18px]'],
+    footer: [
       'border-admin-line-2 bg-admin-surface-2 rounded-b-admin flex items-center gap-2.5 border-t px-[18px] py-[13px]',
+    ],
   },
 });
 ```
