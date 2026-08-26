@@ -77,7 +77,7 @@
       // component. Mark it an entry so its exports aren't reported unused;
       // the Next.js plugin still contributes the app-router entries.
       //
-      // src/components/shared/{icon,text,button,status-badge}/index.ts:
+      // src/components/shared/{icon,text,button,status-badge,text-input}/index.ts:
       // admin-owned primitives, each built ahead of its call sites as part
       // of a bottom-up migration off @blog/ui. Mark each an entry for the
       // same reason as the navigation helpers above.
@@ -86,7 +86,8 @@
         "src/components/shared/icon/index.ts",
         "src/components/shared/text/index.ts",
         "src/components/shared/button/index.ts",
-        "src/components/shared/status-badge/index.ts"
+        "src/components/shared/status-badge/index.ts",
+        "src/components/shared/text-input/index.ts"
       ]
     }
   }
