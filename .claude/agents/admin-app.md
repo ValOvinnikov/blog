@@ -323,6 +323,11 @@ the exported value, not on how it was written.
   a co-located `{component-name}-variants.ts` using `tailwind-variants` (`tv`),
   classes grouped by concern in `base` arrays. Pass `class: className` into the
   `tv()` call — never wrap with `cn()`.
+- **In `slots`-based `tv()` calls, every slot value is an array of strings** —
+  never a bare string, even a single class, even in a `variants`/
+  `compoundVariants` override. (Non-slot `base`/`variants` calls in
+  single-element components may use bare strings.) See
+  `packages/ui/src/molecules/toast/toast-variants.ts` for the pattern.
 - Base UI's `data-*` state selectors belong in those variant files like any
   other class, not scattered inline.
 - Responsive classes are mobile-first with `md:`/`lg:` as the two tiers. This
@@ -389,6 +394,15 @@ block — it points at open work rather than narrating closed work.
 
 - Vitest + Testing Library (jsdom), co-located `*.test.tsx`. See the
   `testing-practices` skill (`.claude/skills/testing-practices/SKILL.md`).
+- **Never assert a Tailwind/CSS utility class for presentation — REQUIRED, not
+  a preference.** No `toHaveClass` / `className` `toContain` on a class whose
+  only job is appearance (layout, color, typography, radius, shadow), **even
+  when it toggles with a prop/variant** — this has been the single most
+  repeated review-rejection reason building this design system's primitives.
+  Assert the semantic/behavioral outcome instead (rendered text, ARIA state,
+  disabled/focus behavior, a callback firing with the right value) or, for a
+  purely-visual variant with no such outcome, a no-throw smoke test across
+  every variant value.
 - Mock `@blog/db` query/mutation functions; assert that fetched data renders and
   that a form submission calls the action with the values the user entered.
 - **A mutation that records an audit event gets a test that it is _not_
