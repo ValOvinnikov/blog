@@ -189,6 +189,35 @@ jobs:
       - name: Voice key sync (helper unit tests)
         run: pnpm check:voice-sync:test
 
+  turbo-env-sync:
+    name: Turbo env sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Turbo strict env mode strips any var not in the "build" task's "env"
+      # allowlist before running the build, so a var declared in an app's or
+      # a dependency package's env.ts but missing from turbo.json silently
+      # disappears at build time. Parses every relevant env.ts as a
+      # TypeScript AST and compares the declared keys against the allowlist.
+      # Read-only; nothing is committed.
+      - name: Turbo build env allowlist (web/admin in sync)
+        run: pnpm check:turbo-env-sync
+
+      # Fixture-based unit tests for the extraction + comparison helpers, same
+      # rationale as the UI index/voice key sync jobs above — they need the
+      # repo's typescript package, which only the pnpm-install jobs have.
+      - name: Turbo env sync (helper unit tests)
+        run: pnpm check:turbo-env-sync:test
+
   migrations:
     name: Migrations
     runs-on: ubuntu-latest

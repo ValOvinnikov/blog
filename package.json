@@ -21,6 +21,8 @@
     "gen:ui-index:test": "node --test scripts/gen-ui-index.test.mjs",
     "check:voice-sync": "node scripts/check-voice-key-sync.mjs",
     "check:voice-sync:test": "node --test scripts/check-voice-key-sync.test.mjs",
+    "check:turbo-env-sync": "node scripts/check-turbo-env-sync.mjs",
+    "check:turbo-env-sync:test": "node --test scripts/check-turbo-env-sync.test.mjs",
     "knip": "knip",
     "format": "turbo run format",
     "prepare": "husky"
