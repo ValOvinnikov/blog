@@ -4,11 +4,11 @@ import {
   sidebarVariants,
   type TSidebarNavSection,
 } from '@admin/components/features/layout/sidebar';
+import { Icon } from '@admin/components/shared/icon';
+import { StatusBadge } from '@admin/components/shared/status-badge';
 import { Link, usePathname } from '@admin/i18n/navigation';
 import { Menu } from '@base-ui/react/menu';
 import { ICONS, Size } from '@blog/config';
-import { Icon } from '@blog/ui/atoms/icon';
-import { StatusBadge } from '@blog/ui/atoms/status-badge';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -37,6 +37,7 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
     section,
     sectionLabel,
     row,
+    rowIcon,
     rowBody,
     rowLabel,
     rowReason,
@@ -91,7 +92,11 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
                               state: isActive ? 'active' : 'resting',
                             })}
                           >
-                            <Icon name={item.icon} size={Size.SM} />
+                            <Icon
+                              name={item.icon}
+                              size={Size.SM}
+                              className={rowIcon()}
+                            />
                             <span className={rowBody()}>
                               <span className={rowLabel()}>{item.label}</span>
                             </span>
@@ -105,7 +110,11 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
                           key={item.label}
                           className={row({ state: 'inert' })}
                         >
-                          <Icon name={item.icon} size={Size.SM} />
+                          <Icon
+                            name={item.icon}
+                            size={Size.SM}
+                            className={rowIcon()}
+                          />
                           <span className={rowBody()}>
                             <span className={rowLabel()}>{item.label}</span>
                             {item.disabledReason && (

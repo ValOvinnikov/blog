@@ -1,1 +1,1 @@
-export { StatusBadge } from './status-badge';
+export { StatusBadge, type TStatusBadgeProps } from './status-badge';

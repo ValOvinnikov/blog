@@ -21,13 +21,16 @@ export const Topbar = ({
   sections,
   switcher,
 }: TTopbarProps) => {
-  const { root, crumb: crumbClass, role } = topbarVariants();
+  const { root, crumb: crumbClass, role, roleDot } = topbarVariants();
 
   return (
     <header className={root()}>
       {sections && <TopbarNavMenu sections={sections} switcher={switcher} />}
       <p className={crumbClass()}>{crumb}</p>
-      <span className={role()}>{roleLabel}</span>
+      <span className={role()}>
+        <span aria-hidden="true" className={roleDot()} />
+        {roleLabel}
+      </span>
     </header>
   );
 };
