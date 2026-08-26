@@ -7,9 +7,11 @@
 > respectively — the orchestrator dispatches, it does not hand-author them.
 > Only `SPEC.md`, `CLAUDE.md` and `docs/**` are orchestrator-owned.
 
-**Goal:** Sever `apps/admin` from `@blog/ui` completely, replacing all 16
-imported components across 68 sites with admin-owned primitives built on Base UI
-and an admin-specific token layer that matches the design reference exactly.
+**Goal:** Give `apps/admin` its own design system — admin-owned primitives on
+Base UI plus an admin-specific token layer matching the design reference exactly
+— replacing all 16 `@blog/ui` components across 68 sites, save one deliberate
+exception: the Look preview's simulated-site sample, which must keep rendering
+the _tenant's_ components or the preview stops telling the truth.
 
 **Architecture:** Admin gains its own Tailwind token layer (currently it imports
 the site's shared theme wholesale, which is why it looks like the public site),
@@ -69,10 +71,18 @@ afterwards would build each of them twice.
   18px body padding, 14px/18px header padding, hairline `--admin-line-2`
   divider. Every card renders through the `Card` primitive after this plan; no
   page re-declares a surface.
-- **No site tokens survive under `apps/admin/src`.** There are ~165 references
-  today (`border-border` x36, `text-text` x27, `bg-surface` x27, ...). The
-  finishing check is `grep -rE '(text|bg|border|ring)-(text|surface|border|primary|brand)' apps/admin/src`
-  returning nothing but the one documented `look-preview` exemption.
+- **No site tokens survive under `apps/admin/src`**, and **no `@blog/ui` imports**
+  — outside one allowlisted directory. There are ~165 site-token references today
+  (`border-border` x36, `text-text` x27, `bg-surface` x27, ...). The finishing
+  checks both exclude
+  `apps/admin/src/components/features/look/look-preview/preview-sample/`
+  and must otherwise return nothing.
+- **`preview-sample/` is the single allowlisted directory.** It renders the
+  tenant's site as it will actually look — `WindowChrome`, `BrandMark`, `Text`,
+  `Button` from `@blog/ui`. Copying those into admin would produce a second copy
+  that drifts from the real site, so the preview would eventually lie. Nothing
+  else under `apps/admin` may import `@blog/ui`, and a path-scoped guard enforces
+  it — an unenforced exception is how the current 68 sites accumulated.
 - **Every commit must leave `pnpm type-check`, `pnpm lint`, `pnpm test` green.**
   Migration is bottom-up specifically so this holds.
 
@@ -80,28 +90,29 @@ afterwards would build each of them twice.
 
 **Created in `apps/admin`:**
 
-| Path                                       | Responsibility                                                                                  |
-| ------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| `src/styles/admin-theme.css`               | The `--admin-*` token layer + `@theme inline` mappings. The one place a token value is written. |
-| `src/assets/icons/*.svg`                   | 13 copied glyphs. Static assets, no logic.                                                      |
-| `src/components/shared/icon/`              | `Icon` + `ICON_REGISTRY` over the 13 glyphs.                                                    |
-| `src/components/shared/text/`              | `Text` — body/muted/supporting/hint variants.                                                   |
-| `src/components/shared/heading/`           | `Heading` — levels 1–4, size variants.                                                          |
-| `src/components/shared/button/`            | `Button` — primary/secondary/ghost/danger, sizes.                                               |
-| `src/components/shared/link-button/`       | `LinkButton` — polymorphic `as`, shares Button's variants.                                      |
-| `src/components/shared/status-badge/`      | `StatusBadge` — rounded pill + tone dot. The component that motivated this work.                |
-| `src/components/shared/text-input/`        | `TextInput`, controlled.                                                                        |
-| `src/components/shared/textarea/`          | `Textarea`, controlled. Replaces the `@blog/ui` atom being deleted.                             |
-| `src/components/shared/segmented-control/` | `SegmentedControl` on Base UI `Toggle Group`.                                                   |
-| `src/components/shared/alert/`             | `Alert` — info/warning/error/success.                                                           |
-| `src/components/shared/spinner/`           | `Spinner`.                                                                                      |
-| `src/components/shared/avatar/`            | `Avatar` — initials.                                                                            |
-| `src/components/shared/eyebrow/`           | `Eyebrow`.                                                                                      |
-| `src/components/shared/setting-row/`       | `SettingRow` — label/description/control row.                                                   |
-| `src/components/shared/brand-mark/`        | `BrandMark` — admin's own sidebar logo.                                                         |
-| `src/components/shared/card/`              | `Card` with `Card.Header`/`Card.Body`/`Card.Footer`. Replaces 17 hand-rolled surfaces.          |
-| `src/components/shared/page-header/`       | `PageHeader` — title, description, badges, actions slot.                                        |
-| `src/components/shared/disclosure/`        | `Disclosure` — the "Advanced" `<details>` pattern, re-implemented per page today.               |
+| Path                                                        | Responsibility                                                                                                     |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `src/styles/admin-theme.css`                                | The `--admin-*` token layer + `@theme inline` mappings. The one place a token value is written.                    |
+| `src/assets/icons/*.svg`                                    | 13 copied glyphs. Static assets, no logic.                                                                         |
+| `src/components/shared/icon/`                               | `Icon` + `ICON_REGISTRY` over the 13 glyphs.                                                                       |
+| `src/components/shared/text/`                               | `Text` — body/muted/supporting/hint variants.                                                                      |
+| `src/components/shared/heading/`                            | `Heading` — levels 1–4, size variants.                                                                             |
+| `src/components/shared/button/`                             | `Button` — primary/secondary/ghost/danger, sizes.                                                                  |
+| `src/components/shared/link-button/`                        | `LinkButton` — polymorphic `as`, shares Button's variants.                                                         |
+| `src/components/shared/status-badge/`                       | `StatusBadge` — rounded pill + tone dot. The component that motivated this work.                                   |
+| `src/components/shared/text-input/`                         | `TextInput`, controlled.                                                                                           |
+| `src/components/shared/textarea/`                           | `Textarea`, controlled. Replaces the `@blog/ui` atom being deleted.                                                |
+| `src/components/shared/segmented-control/`                  | `SegmentedControl` on Base UI `Toggle Group`.                                                                      |
+| `src/components/shared/alert/`                              | `Alert` — info/warning/error/success.                                                                              |
+| `src/components/shared/spinner/`                            | `Spinner`.                                                                                                         |
+| `src/components/shared/avatar/`                             | `Avatar` — initials.                                                                                               |
+| `src/components/shared/eyebrow/`                            | `Eyebrow`.                                                                                                         |
+| `src/components/shared/setting-row/`                        | `SettingRow` — label/description/control row.                                                                      |
+| `src/components/shared/brand-mark/`                         | `BrandMark` — admin's own sidebar logo.                                                                            |
+| `src/components/shared/card/`                               | `Card` with `Card.Header`/`Card.Body`/`Card.Footer`. Replaces 17 hand-rolled surfaces.                             |
+| `src/components/shared/page-header/`                        | `PageHeader` — title, description, badges, actions slot.                                                           |
+| `src/components/shared/disclosure/`                         | `Disclosure` — the "Advanced" `<details>` pattern, re-implemented per page today.                                  |
+| `src/components/features/look/look-preview/preview-sample/` | The simulated tenant site, extracted from `look-preview.tsx`. **The only directory allowed to import `@blog/ui`.** |
 
 These join the six primitives `src/components/shared/*` already holds
 (`confirm-dialog`, `font-picker`, `form-field`, `form-text-input`,
@@ -804,8 +815,11 @@ The largest surface, and the one carrying the highest-risk component.
 - [ ] Run all 8 checklist items above.
 - [ ] **Extra step: verify the preview survived.**
       Run: `pnpm --filter @blog/admin test look-preview` — Expected: PASS.
-      Then load the page and confirm the preview still renders both the light and
-      dark tenant ramps.
+      Then load the page and confirm the preview still renders both light and dark
+      tenant ramps, and that `chromeOn` still produces the terminal frame.
+- [ ] **Extra step: confirm the exception is exactly one directory.**
+      Run: `grep -rln "@blog/ui" apps/admin/src/components/features/look`
+      Expected: only paths under `look-preview/preview-sample/`.
 
 ---
 
@@ -911,7 +925,7 @@ the two plans have to land in order — not a reason to restyle the file.
 
 ---
 
-### Task 19: Cut the dependency and delete the dead atom
+### Task 19: Confine the dependency, add the guard, delete the dead atom
 
 **Files:**
 
@@ -927,34 +941,38 @@ the two plans have to land in order — not a reason to restyle the file.
 - Consumes: Tasks 11–18 (no importers remain).
 - Produces: the layer contract `admin → db, auth, config, utils`.
 
-- [ ] **Step 1: Confirm nothing is left**
+- [ ] **Step 1: Confirm the only remaining reach is the allowlisted directory**
 
 ```bash
-grep -rn "@blog/ui" apps/admin/src
-grep -rnE "(text|bg|border|ring)-(text|surface|border|primary|brand)" apps/admin/src | grep -v look-preview
+grep -rln "@blog/ui" apps/admin/src | grep -v "look-preview/preview-sample/"
+grep -rnE "(text|bg|border|ring)-(text|surface|border|primary|brand)" apps/admin/src | grep -v "look-preview/preview-sample/"
 ```
 
-Expected: no output from either. The `look-preview` exclusion is the one
-deliberate exemption (Task 13).
+Expected: no output from either. Anything else printed is a surface that was
+missed, not a second exception.
 
-- [ ] **Step 2: Remove the wiring**
+- [ ] **Step 2: Add the path-scoped guard**
 
-- `package.json` — drop `"@blog/ui": "workspace:*"`.
-- `tsconfig.json` — drop the `"@blog/ui/*"` path.
-- `vitest.config.ts` — drop the `@blog/ui` alias.
-- `next.config.ts` — drop `transpilePackages: ['@blog/ui']` and the `@blog/ui`
-  branch of the SVGR rule.
-- `index.css` — drop `@source '../../packages/ui/src/**/*.{ts,tsx}'`. Keep the
-  `@blog/tailwind-config/theme.css` import only if `look-preview` still needs the
-  site token vocabulary; if you keep it, say why in a comment.
+The dependency **stays** — `preview-sample/` imports it, so `package.json`, the
+`tsconfig` path, the vitest alias, `transpilePackages` and the shared-theme
+import all remain. Removing them is not the goal; confining the reach is.
 
-Then: `pnpm install`
+An unenforced exception is exactly how 68 import sites accumulated, so add an
+ESLint rule in `configs/eslint/` restricting `@blog/ui` imports under
+`apps/admin` to `look-preview/preview-sample/` — `no-restricted-imports` with a
+`files` override for the allowlisted path. Remember `files` globs resolve against
+the consuming workspace, not the repo root; verify with `eslint --print-config`
+on a file inside and a file outside the directory.
+
+Add a comment on the retained `index.css` theme import naming the reason, so the
+next reader does not "clean it up".
 
 - [ ] **Step 3: Verify the boundary holds**
 
 Run: `pnpm type-check && pnpm lint && pnpm --filter @blog/admin test`
-Expected: PASS. A leftover import now fails to resolve rather than silently
-working — which is why the alias goes as well as the dependency.
+Expected: PASS. Then prove the guard bites: add a throwaway `@blog/ui` import to
+an admin file outside `preview-sample/`, re-run `pnpm lint`, confirm it errors,
+and remove it. A guard nobody has seen fail is not known to work.
 
 - [ ] **Step 4: Delete the dead atom**
 
@@ -1042,8 +1060,10 @@ Task 10 and referenced by those names throughout Tasks 11–18.
 
 1. Task 1's token prefix is load-bearing — the tenant preview renders site tokens
    in the same document. Verified at Task 1 Step 3, Task 13, and Task 19 Step 1.
-2. `look-preview` is the one surface deliberately exempt from the no-site-tokens
-   rule. Tasks 13 and 19 both call it out; a mechanical sweep that ignores the
-   exemption breaks the live preview.
+2. `preview-sample/` is the one directory exempt from BOTH the no-`@blog/ui` and
+   no-site-tokens rules, because it reproduces the tenant's site rather than
+   admin's own chrome. Tasks 13 and 19 both call it out. A mechanical sweep that
+   ignores it breaks the live preview; an exception left unenforced re-grows into
+   the app, which is how the current 68 sites happened.
 3. Task 14 gates Task 19's deletion — `voice-field` is the last `Textarea`
    consumer in the repo.
