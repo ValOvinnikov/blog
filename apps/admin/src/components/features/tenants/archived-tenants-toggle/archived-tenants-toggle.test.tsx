@@ -19,8 +19,8 @@ describe(ArchivedTenantsToggle, () => {
   it('shows Active selected by default', () => {
     render(<ArchivedTenantsToggle shouldShowArchived={false} />);
 
-    expect(screen.getByRole('radio', { name: 'Active' })).toHaveAttribute(
-      'aria-checked',
+    expect(screen.getByRole('button', { name: 'Active' })).toHaveAttribute(
+      'aria-pressed',
       'true',
     );
   });
@@ -28,8 +28,8 @@ describe(ArchivedTenantsToggle, () => {
   it('shows All selected when shouldShowArchived is true', () => {
     render(<ArchivedTenantsToggle shouldShowArchived={true} />);
 
-    expect(screen.getByRole('radio', { name: 'All' })).toHaveAttribute(
-      'aria-checked',
+    expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute(
+      'aria-pressed',
       'true',
     );
   });
@@ -38,7 +38,7 @@ describe(ArchivedTenantsToggle, () => {
     const user = userEvent.setup();
     render(<ArchivedTenantsToggle shouldShowArchived={false} />);
 
-    await user.click(screen.getByRole('radio', { name: 'All' }));
+    await user.click(screen.getByRole('button', { name: 'All' }));
 
     expect(pushMock).toHaveBeenCalledWith('/tenants?archived=1');
   });
@@ -47,7 +47,7 @@ describe(ArchivedTenantsToggle, () => {
     const user = userEvent.setup();
     render(<ArchivedTenantsToggle shouldShowArchived={true} />);
 
-    await user.click(screen.getByRole('radio', { name: 'Active' }));
+    await user.click(screen.getByRole('button', { name: 'Active' }));
 
     expect(pushMock).toHaveBeenCalledWith('/tenants');
   });

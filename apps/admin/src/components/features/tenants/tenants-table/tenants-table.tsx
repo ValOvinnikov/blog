@@ -1,14 +1,12 @@
-import { Link } from '@admin/i18n/navigation';
+import { Avatar } from '@admin/components/shared/avatar';
+import { Card } from '@admin/components/shared/card';
+import { LinkButton } from '@admin/components/shared/link-button';
+import { StatusBadge } from '@admin/components/shared/status-badge';
 import { formatDate } from '@admin/utils/format-date/format-date';
 import { adminRoutes } from '@admin/utils/routes/routes';
-import {
-  tenantPlanTone,
-  tenantStatusTone,
-} from '@admin/utils/status-tone/status-tone';
+import { tenantStatusTone } from '@admin/utils/status-tone/status-tone';
 import { Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { StatusBadge } from '@blog/ui/atoms/status-badge';
-import { LinkButton } from '@blog/ui/molecules/link-button';
 import { useTranslations } from 'next-intl';
 
 import { tenantsTableVariants } from './tenants-table-variants';
@@ -23,19 +21,21 @@ export type TTenantsTableProps = {
  */
 export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
   const t = useTranslations('tenantsTable');
-  const { wrapper, table, head, row, cell, name, domain, empty } =
+  const { card, table, head, row, cell, tname, name, domain, empty } =
     tenantsTableVariants();
 
   if (tenants.length === 0) {
     return (
-      <div className={wrapper()}>
-        <p className={empty()}>{t('empty')}</p>
-      </div>
+      <Card className={card()}>
+        <Card.Body>
+          <p className={empty()}>{t('empty')}</p>
+        </Card.Body>
+      </Card>
     );
   }
 
   return (
-    <div className={wrapper()}>
+    <Card className={card()}>
       <table className={table()}>
         <thead>
           <tr>
@@ -58,11 +58,16 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
           {tenants.map((tenant) => (
             <tr className={row()} key={tenant.id}>
               <td className={cell()}>
-                <p className={name()}>{tenant.name}</p>
-                <p className={domain()}>{tenant.primaryDomain}</p>
+                <div className={tname()}>
+                  <Avatar name={tenant.name} variant="table" />
+                  <div>
+                    <div className={name()}>{tenant.name}</div>
+                    <div className={domain()}>{tenant.primaryDomain}</div>
+                  </div>
+                </div>
               </td>
               <td className={cell()}>
-                <StatusBadge tone={tenantPlanTone(tenant.plan)}>
+                <StatusBadge tone="plan" hasDot={false}>
                   {t(`plan.${tenant.plan}`)}
                 </StatusBadge>
               </td>
@@ -74,11 +79,10 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
               <td className={cell()}>{formatDate(tenant.createdAt)}</td>
               <td className={cell()}>
                 <LinkButton
-                  as={Link}
                   href={adminRoutes.tenantStatus(tenant.id)}
                   variant="ghost"
                   size={Size.SM}
-                  aria-label={t('manageAriaLabel', { tenantName: tenant.name })}
+                  ariaLabel={t('manageAriaLabel', { tenantName: tenant.name })}
                 >
                   {t('manage')}
                 </LinkButton>
@@ -87,6 +91,6 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
           ))}
         </tbody>
       </table>
-    </div>
+    </Card>
   );
 };

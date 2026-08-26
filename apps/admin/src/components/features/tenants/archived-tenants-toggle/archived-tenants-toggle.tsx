@@ -1,8 +1,8 @@
 'use client';
 
+import { SegmentedControl } from '@admin/components/shared/segmented-control';
 import { useRouter } from '@admin/i18n/navigation';
 import { adminRoutes } from '@admin/utils/routes/routes';
-import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
 import { useTranslations } from 'next-intl';
 
 export type TArchivedTenantsToggleProps = {

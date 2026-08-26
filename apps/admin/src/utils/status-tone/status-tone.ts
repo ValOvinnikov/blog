@@ -1,9 +1,7 @@
 import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
 import {
-  TENANT_PLAN,
   TENANT_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
-  type TTenantPlan,
   type TTenantStatus,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
@@ -17,11 +15,6 @@ const TENANT_STATUS_TONE: Record<TTenantStatus, TBadgeTone> = {
   [TENANT_STATUS.ACTIVE]: 'ok',
   [TENANT_STATUS.SUSPENDED]: 'warn',
   [TENANT_STATUS.ARCHIVED]: 'neutral',
-};
-
-const TENANT_PLAN_TONE: Record<TTenantPlan, TBadgeTone> = {
-  [TENANT_PLAN.FREE]: 'neutral',
-  [TENANT_PLAN.GROWTH]: 'ok',
 };
 
 const PROVISIONING_STEP_TONE: Record<
@@ -44,8 +37,6 @@ const DOMAIN_VERIFICATION_TONE: Record<TDomainVerificationStatus, TBadgeTone> =
 
 export const tenantStatusTone = (status: TTenantStatus) =>
   TENANT_STATUS_TONE[status];
-
-export const tenantPlanTone = (plan: TTenantPlan) => TENANT_PLAN_TONE[plan];
 
 export const provisioningStepTone = (
   status: Exclude<TTenantProvisioningStepStatus, 'FAILED'>,
