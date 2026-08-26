@@ -598,6 +598,9 @@ importers:
       '@blog/config':
         specifier: workspace:*
         version: link:../config
+      '@blog/insight':
+        specifier: workspace:*
+        version: link:../insight
       '@blog/utils':
         specifier: workspace:*
         version: link:../utils

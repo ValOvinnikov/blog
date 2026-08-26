@@ -29,7 +29,13 @@ graph is acyclic
   Sanity SDK, and
   never imports/is imported by `@blog/service` (siblings, not dependents — see
   `.claude/agents/db.md`). **Imported only by the two apps and `@blog/auth`**,
-  which binds the Auth.js adapter to its tables.
+  which binds the Auth.js adapter to its tables. Its `src/` library code never
+  imports `@blog/insight` either — that stays the two apps' job, same as any
+  other log call. The one exception is scoped to
+  `packages/db/scripts/provision-tenant/` and
+  `packages/db/scripts/deprovision-tenant/`, standalone CLI tools outside the
+  request-handling path: they import `@blog/insight`'s `sanitizeLogMessage`
+  directly rather than keeping their own drifted copy. Full rationale: `SPEC.md` §4.
 - `apps/web` is the only place `ui` and `service` (and `db`) meet (Server
   Components fetch, pass typed props to `ui`).
 - `@blog/auth` holds the Auth.js configuration both apps pass to their own
@@ -54,8 +60,10 @@ graph is acyclic
   shared logger at `src/utils/logger/logger.ts` carrying their own `service`
   value, and import that rather than calling `createLogger` per module.
   `service`, `db` and `auth` never log at all — failures reach the caller and
-  the app layer logs them once, with request context. See
-  `.claude/agents/insight.md`.
+  the app layer logs them once, with request context. The one exception is
+  `@blog/db`'s standalone `provision-tenant`/`deprovision-tenant` CLI
+  scripts, which import `sanitizeLogMessage` (not the logger) directly — see
+  the `@blog/db` bullet above and `SPEC.md` §4. See `.claude/agents/insight.md`.
 - Content shapes come from the generated Sanity types in `@blog/config`
   (`packages/config/src/sanity/generated/types.ts`, produced by typegen) —
   never hand-redeclared.

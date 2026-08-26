@@ -66,16 +66,26 @@ relative paths only within a single slice (`./schema`, `./queries/comments`).
   `apps/web`. Enforced by a `configs/eslint/db.js` override scoped to that one
   directory; every other path in this package keeps the blanket prohibition.
 - **Never log — let the failure reach the caller.** This layer does not call
-  `console.*`, and does not take a `@blog/insight` dependency. Query and
-  mutation functions currently `throw` on failure and return `Promise<T>`;
-  whichever app calls them catches and logs through its own shared logger,
-  once, with the request context attached. Logging here as well would put the
-  same failure into the pipeline twice, and this layer's copy would be the one
-  lacking the route/request context that makes it actionable.
+  `console.*`, and its `src/` library code does not take a `@blog/insight`
+  dependency. Query and mutation functions currently `throw` on failure and
+  return `Promise<T>`; whichever app calls them catches and logs through its
+  own shared logger, once, with the request context attached. Logging here as
+  well would put the same failure into the pipeline twice, and this layer's
+  copy would be the one lacking the route/request context that makes it
+  actionable. **A second scoped exception (#2120):** the standalone
+  `scripts/provision-tenant/` and `scripts/deprovision-tenant/` CLI tools —
+  outside the request-handling path this rule targets, with no app layer
+  above them to log through — import `@blog/insight`'s `sanitizeLogMessage`
+  (the sanitizer only, never `createLogger`) directly, rather than keeping
+  their own copy of it. Enforced the same way as the `@sanity/client`
+  exception above: a `configs/eslint/db.js` override scoped to those two
+  directories.
 - Depend only on `@blog/config` and `@blog/utils` (types, constants, framework-
   free helpers) plus Drizzle/Neon SDKs (`drizzle-orm`, `drizzle-kit`,
   `@neondatabase/serverless`, the Auth.js Drizzle adapter) — plus `@sanity/client`,
-  scoped to `scripts/provision-tenant/` per the exception above. The dependency
+  scoped to `scripts/provision-tenant/`, and `@blog/insight`'s
+  `sanitizeLogMessage`, scoped to `scripts/provision-tenant/` and
+  `scripts/deprovision-tenant/`, per the exceptions above. The dependency
   graph stays acyclic: `db → config, utils`, nothing more.
 - **Three things import `@blog/db`** — `apps/web`, `apps/admin` (the
   operator/tenant admin panel, owned by the `admin-app` agent), and

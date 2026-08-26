@@ -1,8 +1,8 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config/constants';
 import { insertAuditEvent } from '@blog/db/queries/audit-events';
+import { sanitizeLogMessage } from '@blog/insight';
 
 import type { TDeprovisionEnv } from './env';
-import { sanitizeLogMessage } from './sanitize-log-message';
 
 /**
  * Records exactly one `ARCHIVED`/`TENANT` audit event after a real archive.

@@ -10,7 +10,8 @@
     "types": ["node", "vitest/globals"],
     "paths": {
       "@blog/db/*": ["./src/*"],
-      "@blog/config/*": ["../../packages/config/src/*"]
+      "@blog/config/*": ["../../packages/config/src/*"],
+      "@blog/insight/*": ["../../packages/insight/src/*"]
     }
   },
   "include": ["src", "scripts", "drizzle.config.ts"]
