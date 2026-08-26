@@ -10,6 +10,7 @@ type TLinkComponentProps = {
   href: string;
   className?: string;
   children?: ReactNode;
+  'aria-label'?: string;
 };
 
 export type TLinkButtonProps = {
@@ -19,6 +20,7 @@ export type TLinkButtonProps = {
   size?: TButtonVariants['size'];
   children?: ReactNode;
   className?: string;
+  ariaLabel?: string;
 };
 
 export const LinkButton = ({
@@ -28,11 +30,13 @@ export const LinkButton = ({
   size,
   children,
   className,
+  ariaLabel,
 }: TLinkButtonProps) => {
   return (
     <Component
       href={href}
       className={buttonVariants({ variant, size, class: className })}
+      aria-label={ariaLabel}
     >
       {children}
     </Component>

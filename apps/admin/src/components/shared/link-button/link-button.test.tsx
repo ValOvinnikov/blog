@@ -46,6 +46,18 @@ describe(LinkButton, () => {
     });
   });
 
+  it('applies the given ariaLabel as the accessible name', () => {
+    render(
+      <LinkButton href="/tenants" ariaLabel="Manage Acme Inc.">
+        Manage →
+      </LinkButton>,
+    );
+
+    expect(
+      screen.getByRole('link', { name: 'Manage Acme Inc.' }),
+    ).toHaveAttribute('href', '/tenants');
+  });
+
   it('renders through a custom `as` component', () => {
     const StubLink = ({
       href,
