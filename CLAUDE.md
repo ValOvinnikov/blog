@@ -14,7 +14,7 @@ content; a Next.js 16 App Router site renders it; types flow end-to-end.
 
 ```
 web → ui, service, db, auth, config, utils   service → config, utils (no React)
-admin → ui, db, auth, config, utils         cms → config (types via typegen)
+admin → db, auth, config, utils             cms → config (types via typegen)
 ui → config (no Sanity/fetch)               configs/* → consumed by all
 db → config, utils (no React/Sanity)        auth → db, config, utils
 insight → nothing (base of graph, like config/utils)
@@ -45,9 +45,16 @@ graph is acyclic
   two independently maintained configs drift silently. See
   `.claude/agents/auth.md`.
 - `apps/admin` is a separate Next.js app (its own deployment and domain) for
-  the operator/tenant admin panel — it consumes `db`, `auth`, `ui`, `config`,
-  and `utils`, and **never Sanity or `@blog/service`**. Its interactive primitives come from
-  Base UI, styled in-app; nothing is added to `@blog/ui` for it. See
+  the operator/tenant admin panel — it consumes `db`, `auth`, `config`, and
+  `utils`, and **never Sanity or `@blog/service`**. It owns its own
+  presentational primitives (Text, Card, Icon, Button, …) as well as its
+  interactive ones, all built on Base UI and styled in-app; nothing is added
+  to `@blog/ui` for it. The one exception is
+  `apps/admin/src/components/features/look/look-preview/preview-sample/`,
+  which renders the tenant's real site (WindowChrome, BrandMark, Text,
+  Button) so the live theme preview doesn't drift from what `apps/web`
+  actually looks like — an ESLint `no-restricted-imports` guard confines
+  `@blog/ui` imports under `apps/admin` to that one directory. See
   `.claude/agents/admin-app.md`.
 - `@blog/insight` (`packages/insight`) holds the structured logger core —
   `createLogger`, `LOG_LEVEL`, and its own copy of `sanitizeLogMessage`. Sits
@@ -159,11 +166,14 @@ whether a signed-in user may see a page is each app's decision, made against an
 
 `admin-app` (`apps/admin`, the operator/tenant admin panel — a separate Next.js
 app, its own deployment and domain) is a **sibling to `web`, not a step in the
-chain either**. Its only upstreams are `config`, `db`, `auth`, and `ui`, so its
+chain either**. Its only upstreams are `config`, `db`, and `auth`, so its
 dispatch order is `config → db → auth → admin-app`; it never waits on
-`cms`/`service`, which it does not consume. Base UI is installed and styled inside that app —
-do not route its controls through the `ui` agent. See
-`.claude/agents/admin-app.md`.
+`cms`/`service`, which it does not consume. Base UI is installed and styled inside that app,
+and it owns its own presentational primitives too — do not route its
+components through the `ui` agent. The one exception is
+`look-preview/preview-sample/`, an ESLint-guarded directory allowed to
+import `@blog/ui` directly so the live theme preview renders the site's
+real components. See `.claude/agents/admin-app.md`.
 
 `insight` (`packages/insight`, the structured logger core — `createLogger`,
 `LOG_LEVEL`, and its own temporary copy of `sanitizeLogMessage`) is
