@@ -62,6 +62,17 @@ afterwards would build each of them twice.
   accessible names come from an `ariaLabel` prop, never a hardcoded string;
   `className` is layout-only. Prop types are closed and enumerated — no native
   prop spreading.
+- **One card treatment, not seventeen.** Admin currently hand-rolls a card
+  surface in 17 separate `*-variants.ts` files, using three different radii
+  (`rounded-md` x22, `rounded-lg` x7, `rounded-sm` x4) and four different
+  paddings. The design reference has exactly one card: `--admin-radius` (12px),
+  18px body padding, 14px/18px header padding, hairline `--admin-line-2`
+  divider. Every card renders through the `Card` primitive after this plan; no
+  page re-declares a surface.
+- **No site tokens survive under `apps/admin/src`.** There are ~165 references
+  today (`border-border` x36, `text-text` x27, `bg-surface` x27, ...). The
+  finishing check is `grep -rE '(text|bg|border|ring)-(text|surface|border|primary|brand)' apps/admin/src`
+  returning nothing but the one documented `look-preview` exemption.
 - **Every commit must leave `pnpm type-check`, `pnpm lint`, `pnpm test` green.**
   Migration is bottom-up specifically so this holds.
 
@@ -88,6 +99,9 @@ afterwards would build each of them twice.
 | `src/components/ui/eyebrow/`           | `Eyebrow`.                                                                                      |
 | `src/components/ui/setting-row/`       | `SettingRow` — label/description/control row.                                                   |
 | `src/components/ui/brand-mark/`        | `BrandMark` — admin's own sidebar logo.                                                         |
+| `src/components/ui/card/`              | `Card` with `Card.Header`/`Card.Body`/`Card.Footer`. Replaces 17 hand-rolled surfaces.          |
+| `src/components/ui/page-header/`       | `PageHeader` — title, description, badges, actions slot.                                        |
+| `src/components/ui/disclosure/`        | `Disclosure` — the "Advanced" `<details>` pattern, re-implemented per page today.               |
 | `src/components/ui/index.ts`           | Barrel. Import sites use `@admin/components/ui/<name>`.                                         |
 
 Each component directory follows the existing admin convention already used by
@@ -562,53 +576,339 @@ Expected: PASS. Nothing consumes these yet, so no existing test may change.
 
 ---
 
-### Task 10: Migrate the 68 call sites
+### Task 10: Composition primitives
+
+This task is why a 1:1 import swap is not enough. Swapping `Heading` for an
+admin-owned `Heading` leaves 17 hand-rolled card surfaces, three radii and four
+paddings exactly where they are — the pages would still not match the reference.
+These three primitives make conformance mechanical rather than a matter of each
+page author remembering.
 
 **Files:**
 
-- Modify: every file under `apps/admin/src` importing `@blog/ui/*`
-- Create: `apps/admin/src/components/ui/index.ts`
+- Create: `apps/admin/src/components/ui/card/{card.tsx,card-variants.ts,card.test.tsx,index.ts}`
+- Create: `apps/admin/src/components/ui/page-header/{page-header.tsx,page-header-variants.ts,page-header.test.tsx,index.ts}`
+- Create: `apps/admin/src/components/ui/disclosure/{disclosure.tsx,disclosure-variants.ts,disclosure.test.tsx,index.ts}`
 
 **Interfaces:**
 
-- Consumes: Tasks 2–9.
-- Produces: zero `@blog/ui` imports under `apps/admin/src`.
+- Consumes: Task 1's tokens, Task 2's `Icon`, Task 4's `Heading`/`Text`.
+- Produces:
+  - `<Card>` with compound slots `Card.Header`, `Card.Body`, `Card.Footer`.
+    `Card.Header` takes `title: string`, optional `description: string`, and
+    optional `actions: ReactNode` rendered right-aligned.
+  - `<PageHeader title={...} description={...} badges={...} actions={...} />`.
+  - `<Disclosure summary={...} isDefaultOpen?={boolean}>{children}</Disclosure>`.
 
-- [ ] **Step 1: Enumerate the work**
+- [ ] **Step 1: Write the failing Card test**
 
-```bash
-grep -rl "@blog/ui" apps/admin/src | sort
-grep -rho "@blog/ui/[a-z]*/[a-z0-9-]*" apps/admin/src | sort | uniq -c | sort -rn
+```tsx
+import { render, screen } from '@admin/testing/custom-render';
+
+import { Card } from './card';
+
+describe(Card, () => {
+  it('renders a titled header with its actions', () => {
+    render(
+      <Card>
+        <Card.Header title="Tenant details" actions={<button>Edit</button>} />
+        <Card.Body>body</Card.Body>
+      </Card>,
+    );
+    expect(
+      screen.getByRole('heading', { name: 'Tenant details' }),
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Edit' })).toBeVisible();
+    expect(screen.getByText('body')).toBeVisible();
+  });
+
+  it('renders without a header', () => {
+    render(
+      <Card>
+        <Card.Body>only a body</Card.Body>
+      </Card>,
+    );
+    expect(screen.getByText('only a body')).toBeVisible();
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+  });
+
+  it('applies exactly one radius token to every card', () => {
+    const { container } = render(
+      <Card>
+        <Card.Body>x</Card.Body>
+      </Card>,
+    );
+    expect(container.firstChild).toHaveClass('rounded-admin');
+  });
+});
 ```
 
-Expected at start: 16 distinct components. Expected at the end of this task: no output.
+- [ ] **Step 2: Run it to confirm it fails**
 
-- [ ] **Step 2: Migrate one component's call sites at a time**
+Run: `pnpm --filter @blog/admin test card`
+Expected: FAIL — cannot find module `./card`.
 
-Work component-by-component, not file-by-file — `heading` first (10 sites), then
-`button` (9), and so on down the frequency list. After each component:
+- [ ] **Step 3: Implement Card**
 
-Run: `pnpm --filter @blog/admin test && pnpm type-check`
-Expected: PASS. A component whose migration reds the suite is a prop-contract
-mismatch, not a flake — fix the primitive's API, don't loosen the test.
+`card-variants.ts` is the single source of the card treatment. Values from the
+design reference's `.card`, `.card .hd`, `.card .bd`, `.card .ft`:
 
-- [ ] **Step 3: Commit per component**
+```ts
+import { tv } from 'tailwind-variants';
 
-```bash
-git commit -m "refactor(admin): migrate Heading call sites to the admin primitive"
+export const cardVariants = tv({
+  slots: {
+    root: 'bg-admin-surface border-admin-line rounded-admin shadow-admin border',
+    header:
+      'border-admin-line-2 flex flex-wrap items-center gap-2.5 border-b px-[18px] py-[14px]',
+    title: 'm-0 text-[15px] font-semibold',
+    description: 'text-admin-muted text-[12.5px]',
+    actions: 'ml-auto flex items-center gap-2',
+    body: 'p-[18px]',
+    footer:
+      'border-admin-line-2 bg-admin-surface-2 rounded-b-admin flex items-center gap-2.5 border-t px-[18px] py-[13px]',
+  },
+});
 ```
 
-Twelve or so small commits, each independently revertible, beats one 68-file
-commit nobody can review.
+`card.tsx` uses this repo's compound-slot pattern (`Card.Header`, not a `header`
+prop), matching how `@blog/ui` organisms compose so it reads as familiar.
 
-- [ ] **Step 4: Confirm nothing is left**
+- [ ] **Step 4: Run the Card tests**
 
-Run: `grep -rn "@blog/ui" apps/admin/src`
-Expected: no output.
+Run: `pnpm --filter @blog/admin test card`
+Expected: PASS, 3 tests.
+
+- [ ] **Step 5: Repeat the cycle for PageHeader and Disclosure**
+
+Same five steps each. `PageHeader` renders an `h1` through `Heading`, an optional
+description, an optional badge row beside the title, and a right-aligned actions
+slot — matching `.pagehead` in the reference. `Disclosure` wraps `<details>` with
+the reference's `.disclosure` treatment and a rotating chevron via `Icon`,
+replacing the `advanced`/`advancedSummary`/`advancedBody` slots that
+`voice-settings` and `look-form` each declare separately today.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add apps/admin/src/components/ui/card apps/admin/src/components/ui/page-header apps/admin/src/components/ui/disclosure
+git commit -m "feat(admin): add Card, PageHeader and Disclosure composition primitives"
+```
 
 ---
 
-### Task 11: Cut the dependency and delete the dead atom
+## The per-surface conformance checklist
+
+Tasks 11–18 each take one admin surface and bring it fully onto admin's own
+design system. **Every one of them runs this identical checklist.** It is the
+definition of "the design is implemented correctly" for that surface:
+
+1. **Imports.** No `@blog/ui` import remains in the surface's files.
+2. **Tokens.** No site token (`bg-surface`, `text-text*`, `border-border*`,
+   `ring-brand-primary`, `bg-primary`, `border-brand-primary`) remains. Only
+   `*-admin-*` utilities.
+3. **Surfaces.** Every card-like box renders through `Card`. The surface's own
+   `*-variants.ts` declares **no** `rounded-*` on a panel, no `bg-admin-surface`
+   box, no `border border-admin-line` box. Layout-only classes — flex, grid,
+   gap, max-width — stay.
+4. **Page header.** If the surface is a page, its title/description/actions
+   render through `PageHeader`, not hand-rolled `Heading` + `<p>`.
+5. **Disclosure.** Any `<details>`/advanced section renders through `Disclosure`.
+6. **Visual diff.** Open the page beside its governing reference section and
+   compare radius, padding, hairline colour, type scale, badge shape, button
+   weight and focus ring. Differences are bugs in the surface, not acceptable
+   drift.
+7. **Tests.** The surface's existing tests pass unchanged. If a test asserted on
+   a `@blog/ui` class name, rewrite that assertion against behaviour or role —
+   never delete it.
+8. **Commit** as `refactor(admin): bring <surface> onto admin's design system`.
+
+**Governing reference per surface** — the authority when two disagree:
+
+| Surface                                                 | Reference                                                              |
+| ------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Shell, tenants list, Look, Voice, Features              | `docs/design-reference/admin-panel-mock.html` (+ its correction brief) |
+| Overview, provisioning, danger, owner dashboard, domain | `docs/design-reference/admin-tenant-access-mock.html`                  |
+| Add-tenant wizard                                       | `admin-panel-mock.html:404-422` (step rail + `Add tenant` H1)          |
+
+Where a surface has no reference (`/unauthorized`, `/dashboard/select-tenant`),
+checklist items 1–5 still apply and item 6 is satisfied by matching the nearest
+analogous surface's treatment.
+
+---
+
+### Task 11: The shell
+
+**Files:** `src/components/features/layout/{admin-shell,sidebar,topbar,tenant-switcher}/**`
+
+Do the shell first — every page renders inside it, so a shell still on site
+tokens makes every later visual diff unreadable.
+
+**Surface specifics:**
+
+- The sidebar uses `--admin-side*` tokens, not the generic surface tokens. It is
+  intentionally dark; that is a component treatment, not a dark theme.
+- `Topbar` takes `crumb: string` today. **Leave that contract alone** — real
+  breadcrumbs are the companion plan's work. Restyle only.
+- `TenantSwitcher` is restyled, not removed. Its removal from the platform tree
+  is the companion plan's routing change.
+- `TopbarNavMenu` is already Base UI `Menu`; only its classes change.
+
+- [ ] Run all 8 checklist items above.
+
+---
+
+### Task 12: Tenants list
+
+**Files:** `src/components/features/tenants/{tenants-view,tenants-table,archived-tenants-toggle}/**`
+
+**Surface specifics:**
+
+- The table's header row, hairlines and row hover come from the reference's
+  `table.tt` block, not from a card body's padding.
+- Plan and status chips use Task 3's `StatusBadge`. The plan chip is
+  `tone="plan" hasDot={false}` — a plan is not a state, so it takes no tone dot.
+- `TenantsView`'s description renders `t.rich` with a `<code>` chunk. Keep the
+  rich-text call; restyle the `code` treatment.
+
+- [ ] Run all 8 checklist items above.
+
+---
+
+### Task 13: Look
+
+**Files:** `src/components/features/look/{look-page-content,look-form,look-preview,brand-asset-field,logo-hue-field}/**`, `src/components/shared/{preset-picker,font-picker,hue-slider}/**`
+
+The largest surface, and the one carrying the highest-risk component.
+
+**Surface specifics:**
+
+- **`look-preview` is exempt from checklist item 2.** It renders the _tenant's_
+  site theme via `build-theme-style-block` and must keep the site token
+  vocabulary inside the preview frame. Only the panel chrome around it moves to
+  admin tokens. Getting this wrong silently breaks the live preview, which is the
+  entire point of the Look page.
+- `look-form` declares its own card slots and an advanced-section disclosure;
+  both move to `Card` and `Disclosure`.
+- `PresetPicker`, `FontPicker` and `HueSlider` keep their behaviour and prop
+  contracts exactly; only classes change.
+- The correction brief's §1–§7 govern this page's _content_ — OKLCH ramps,
+  `RADIUS_SCALE` labels, two densities, five fonts, the `chromeOn` toggle.
+  Verify each is still correctly implemented while you are in here, and **report
+  any that are not rather than fixing them silently** — those are content bugs,
+  not styling, and they need their own ticket.
+
+- [ ] Run all 8 checklist items above.
+- [ ] **Extra step: verify the preview survived.**
+      Run: `pnpm --filter @blog/admin test look-preview` — Expected: PASS.
+      Then load the page and confirm the preview still renders both the light and
+      dark tenant ramps.
+
+---
+
+### Task 14: Voice
+
+**Files:** `src/components/features/voice/{voice-page-content,voice-settings,voice-field-group,voice-field}/**`
+
+**Surface specifics:**
+
+- `voice-settings-variants.ts` is the clearest instance of the problem this plan
+  exists to fix: it declares `basicCard` at `rounded-md` and `advanced` at
+  `rounded-lg` in the same file. Both become `Card`.
+- The advanced section becomes `Disclosure`.
+- `voice-field` renders a `Textarea` — repoint it at Task 6's admin primitive.
+  This is the **last consumer of `@blog/ui`'s `Textarea` anywhere in the repo**,
+  so finishing this task is what makes Task 19's deletion safe.
+- Each field is an **override**: empty means "inherit from the preset's voice
+  pack". The inherited value must stay visible as a placeholder, and clearing a
+  field must still read as "revert to preset". Verify that survives restyling —
+  it is carried by placeholder styling, which is easy to flatten by accident.
+
+- [ ] Run all 8 checklist items above.
+
+---
+
+### Task 15: Features
+
+**Files:** `src/components/features/capabilities/{features-page-content,features-settings}/**`
+
+**Surface specifics:**
+
+- Uses `SettingRow` (Task 9's admin version). The label/description/control
+  rhythm must match the reference, not `@blog/ui`'s account-page spacing.
+- Capability rows disabled by plan entitlement get the same locked treatment as a
+  locked tenant-details field: `bg-admin-line-2`, `text-admin-faint`, reason text
+  beside them. Consistency between "locked by plan" and "locked by provisioning"
+  is deliberate — both mean "you cannot change this right now, and here is why."
+
+- [ ] Run all 8 checklist items above.
+
+---
+
+### Task 16: Add-tenant wizard
+
+**Files:** `src/components/features/tenants/tenant-details-form/**`
+
+**Surface specifics:**
+
+- **Restyle only.** The wizard chrome (`Add tenant` H1, six-step rail) and the
+  copy fixes belong to the companion plan; doing them here would mix a visual
+  migration with a behavioural change in one commit.
+- The full-form pending overlay must keep `role="status"` with its label — an
+  existing test asserts `getByRole('status', { name: 'Creating…' })`.
+
+- [ ] Run all 8 checklist items above.
+
+---
+
+### Task 17: Provisioning, tenant details panel, danger zone
+
+**Files:** `src/components/features/tenants/{provisioning-status-view,tenant-details-panel,tenant-status-view,deprovision-tenant-control}/**`
+
+**Surface specifics:**
+
+- The step rail's indicator circles, connectors and tone colours come from
+  `admin-tenant-access-mock.html`'s `.step` block.
+- **The details panel's four-state lock model is behaviour, not styling. Do not
+  touch `computeTenantFieldLocks` or the panel's lock logic.** Restyle the locked
+  field treatment only: disabled input on `bg-admin-line-2`, reason text at
+  `text-admin-faint` beside it. A `FAILED` run must still leave the field that
+  caused the failure editable.
+- `ConfirmDialog` (Base UI) in `deprovision-tenant-control` is restyled here.
+
+- [ ] Run all 8 checklist items above.
+- [ ] **Extra step: verify the lock matrix is unchanged.**
+      Run: `pnpm --filter @blog/admin test tenant-details-panel tenant-field-locks`
+      Expected: PASS, with no test edits.
+
+---
+
+### Task 18: Owner dashboard and remaining pages
+
+**Files:** `src/components/features/layout/dashboard-tenant-picker/**`, `src/app/[locale]/unauthorized/page.tsx`, `src/app/[locale]/(platform)/page.tsx`, `src/components/shared/{form-field,confirm-dialog}/**`
+
+**Surface specifics:**
+
+- `/unauthorized` is currently bare `<main><h1><p>` with no styling at all. It
+  renders **outside** `AdminShell`, so it cannot inherit the shell background —
+  give it a self-contained centred treatment.
+- `FormField` is admin's existing shared field wrapper. Align its label, hint,
+  error and footer slots to the reference's `.field` block; it becomes the single
+  field treatment every admin form uses.
+
+- [ ] Run all 8 checklist items above.
+
+**Deliberately not covered by any task:**
+`src/components/features/tenants/tenant-overview/` — the `/t/{slug}` landing
+stub. The companion plan **deletes** it along with the whole slug tree, so
+restyling it is wasted work. If you reach it and the companion plan has not run
+yet, leave it exactly as it is; it will still be importing `@blog/ui`, and Task
+19 Step 1's grep will flag it. That flag is expected, and it is the signal that
+the two plans have to land in order — not a reason to restyle the file.
+
+---
+
+### Task 19: Cut the dependency and delete the dead atom
 
 **Files:**
 
@@ -616,40 +916,52 @@ Expected: no output.
   `apps/admin/vitest.config.ts`, `apps/admin/next.config.ts`, `apps/admin/index.css`
 - Delete: `packages/ui/src/atoms/textarea/`
 - Modify: `packages/ui/COMPONENTS.md` (regenerated, never hand-edited)
-- Modify: `SPEC.md`, `CLAUDE.md`, `configs/tailwind/theme.css` header
+- Modify: `SPEC.md`, `CLAUDE.md`, `configs/tailwind/theme.css` header,
+  `docs/context/frontend-conventions.md`
 
 **Interfaces:**
 
-- Consumes: Task 10 (no importers remain).
+- Consumes: Tasks 11–18 (no importers remain).
 - Produces: the layer contract `admin → db, auth, config, utils`.
 
-- [ ] **Step 1: Remove the wiring**
+- [ ] **Step 1: Confirm nothing is left**
+
+```bash
+grep -rn "@blog/ui" apps/admin/src
+grep -rnE "(text|bg|border|ring)-(text|surface|border|primary|brand)" apps/admin/src | grep -v look-preview
+```
+
+Expected: no output from either. The `look-preview` exclusion is the one
+deliberate exemption (Task 13).
+
+- [ ] **Step 2: Remove the wiring**
 
 - `package.json` — drop `"@blog/ui": "workspace:*"`.
 - `tsconfig.json` — drop the `"@blog/ui/*"` path.
 - `vitest.config.ts` — drop the `@blog/ui` alias.
 - `next.config.ts` — drop `transpilePackages: ['@blog/ui']` and the `@blog/ui`
-  asset branch of the SVGR rule.
-- `index.css` — drop the `@source '../../packages/ui/src/**/*.{ts,tsx}'` line.
+  branch of the SVGR rule.
+- `index.css` — drop `@source '../../packages/ui/src/**/*.{ts,tsx}'`. Keep the
+  `@blog/tailwind-config/theme.css` import only if `look-preview` still needs the
+  site token vocabulary; if you keep it, say why in a comment.
 
 Then: `pnpm install`
 
-- [ ] **Step 2: Verify the boundary actually holds**
+- [ ] **Step 3: Verify the boundary holds**
 
 Run: `pnpm type-check && pnpm lint && pnpm --filter @blog/admin test`
 Expected: PASS. A leftover import now fails to resolve rather than silently
-working — that is the point of removing the alias as well as the dependency.
+working — which is why the alias goes as well as the dependency.
 
-- [ ] **Step 3: Delete the dead atom**
-
-`Textarea` had exactly one consumer repo-wide, admin's `voice-field`, which
-Task 6 replaced.
+- [ ] **Step 4: Delete the dead atom**
 
 ```bash
-grep -rn "atoms/textarea" apps packages --exclude-dir=node_modules   # expect no output
+grep -rn "atoms/textarea" apps packages --exclude-dir=node_modules
 rm -rf packages/ui/src/atoms/textarea
 pnpm gen:ui-index
 ```
+
+The grep must print nothing before you delete.
 
 Run: `pnpm gen:ui-index:check && pnpm --filter @blog/ui test`
 Expected: PASS, and `COMPONENTS.md` no longer lists Textarea.
@@ -659,36 +971,32 @@ Expected: PASS, and `COMPONENTS.md` no longer lists Textarea.
 `packages/ui` consumers, verified by reference count. Admin no longer importing
 them is not evidence they are unused.
 
-- [ ] **Step 4: Update the governing docs**
+- [ ] **Step 5: Update the governing docs**
 
-These are orchestrator-owned, not layer-agent files:
+Orchestrator-owned files, not layer-agent ones:
 
-- `CLAUDE.md` — layer contract line becomes
-  `admin → db, auth, config, utils`; the `apps/admin` bullet drops `ui` and
-  states admin owns its presentational primitives, not only its interactive ones.
-- `SPEC.md` — same contract change, plus the admin token layer.
+- `CLAUDE.md` — contract becomes `admin → db, auth, config, utils`; the
+  `apps/admin` bullet drops `ui` and states admin owns its presentational
+  primitives, not only its interactive ones.
+- `SPEC.md` — the same contract change, plus the admin token layer.
 - `configs/tailwind/theme.css` header — its "only source of Tailwind theme
-  tokens" claim gains `apps/admin`'s own layer as a named exception, alongside
-  the existing `--code-*` carve-out.
+  tokens" claim gains `apps/admin`'s layer as a named exception, alongside the
+  existing `--code-*` carve-out.
 - `docs/context/frontend-conventions.md` — dependency rules.
 
-- [ ] **Step 5: Full verification**
+- [ ] **Step 6: Full verification**
 
 Run: `pnpm type-check && pnpm lint && pnpm test`
 Expected: PASS across every workspace.
 
-Then verify by eye against the design reference — the sidebar, a status pill, a
-card, and a locked form field. Pixel differences here are bugs in the token
-layer, not acceptable drift.
+- [ ] **Step 7: Whole-app visual pass**
 
-- [ ] **Step 6: Confirm the tenant preview still works**
+Walk every admin surface against its governing reference: shell, tenants list,
+add-tenant, tenant overview, provisioning, danger, Look, Voice, Features, owner
+dashboard, select-tenant, unauthorized. Confirm one radius, one card treatment,
+one field treatment and one badge shape throughout.
 
-Run: `pnpm --filter @blog/admin test look-preview`
-Expected: PASS. Then load the Look page and confirm the preview still renders
-both light and dark tenant ramps — it uses the site's token vocabulary, which
-admin no longer imports globally.
-
-- [ ] **Step 7: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
 git add -A
@@ -699,24 +1007,40 @@ git commit -m "refactor(admin): drop the @blog/ui dependency entirely"
 
 ## Self-Review
 
-**Spec coverage.** §8 requires: full separation (Tasks 10–11), 13 copied icons
-and no new package (Task 2), an admin token layer (Task 1), `Textarea` deleted
-(Task 11 Step 3), nothing else deleted (Task 11 Step 3's explicit guard), and
-the layer-contract doc sync (Task 11 Step 4). §1–§7 are the companion plan and
-deliberately out of scope here.
+**Spec coverage.** §8 requires full separation (Tasks 11–19), 13 copied icons and
+no new package (Task 2), an admin token layer (Task 1), `Textarea` deleted (Task
+19 Step 4), nothing else deleted (Task 19 Step 4's explicit guard), and the
+layer-contract doc sync (Task 19 Step 5). Spec §1–§7 are the companion plan and
+deliberately out of scope — Tasks 11 and 16 both name where a behavioural change
+belongs instead.
+
+**Surface coverage.** Every admin surface has an owning task: shell (11), tenants
+list (12), Look (13), Voice (14), Features (15), add-tenant (16), provisioning /
+details panel / danger zone (17), owner dashboard / unauthorized / platform root /
+shared field + dialog (18). Exactly one directory is deliberately excluded —
+`tenant-overview`, which the companion plan deletes — and Task 18 says so
+explicitly rather than leaving it silently unclaimed. Nothing else under
+`apps/admin/src/components` is unaccounted for; verified by enumerating every
+component directory against this plan.
 
 **Placeholder scan.** No TBD/TODO. Every code step carries real code; every run
-step carries a real command and an expected result. Tasks 4–9 are tabulated
-rather than expanded because each is a verbatim repeat of Task 3's five steps
-against a different component — the table carries the per-component specifics
-that differ, which is the part an executor cannot infer.
+step carries a real command and an expected result. Tasks 11–18 reference one
+fully-specified checklist rather than restating it eight times, and each carries
+its own specifics for what differs — the part an executor cannot infer.
 
-**Type consistency.** `Icon` takes `ariaLabel` (not `aria-label`) throughout,
-matching the repo's a11y convention and used consistently in Tasks 2 and 4–9.
-`StatusBadge`'s tones are `ok`/`warn`/`bad`/`neutral`/`plan` in both the variants
-file and the test. `TextInput`/`Textarea` both take `onChange(value: string)`,
-matching the existing admin call sites that already pass a value-taking handler.
+**Type consistency.** `Icon` takes `ariaLabel` throughout (Tasks 2, 4–10).
+`StatusBadge`'s tones are `ok`/`warn`/`bad`/`neutral`/`plan` in the variants file,
+its test and Task 12's usage; `hasDot` is the documented opt-out and Task 12 uses
+exactly that name. `Card`'s slots are `Card.Header`/`Card.Body`/`Card.Footer` in
+Task 10 and referenced by those names throughout Tasks 11–18.
+`TextInput`/`Textarea` both take `onChange(value: string)`.
 
-**Known risk.** Task 1's token prefix is load-bearing: the tenant theme preview
-renders site tokens in the same document. It is verified at Task 1 Step 3 and
-again at Task 11 Step 6.
+**Known risks.**
+
+1. Task 1's token prefix is load-bearing — the tenant preview renders site tokens
+   in the same document. Verified at Task 1 Step 3, Task 13, and Task 19 Step 1.
+2. `look-preview` is the one surface deliberately exempt from the no-site-tokens
+   rule. Tasks 13 and 19 both call it out; a mechanical sweep that ignores the
+   exemption breaks the live preview.
+3. Task 14 gates Task 19's deletion — `voice-field` is the last `Textarea`
+   consumer in the repo.

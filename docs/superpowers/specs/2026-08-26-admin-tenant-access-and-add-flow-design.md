@@ -336,6 +336,21 @@ newsletter signup; `Eyebrow` backs aside/hero/article; `BrandMark` backs
 `BrandLockup`. None of those were built for admin, and none may be removed on
 the strength of admin no longer importing them.
 
+### Separation is not an import swap
+
+Measured, not assumed: admin hand-rolls a card surface in **17 separate
+`*-variants.ts` files**, across **three different radii** (`rounded-md` x22,
+`rounded-lg` x7, `rounded-sm` x4) and four different paddings, over **~165 site
+token references**. `voice-settings-variants.ts` declares one card at
+`rounded-md` and another at `rounded-lg` in the same file.
+
+Swapping imports one-for-one would leave every one of those in place. So the
+work includes `Card`, `PageHeader` and `Disclosure` composition primitives and a
+per-surface conformance pass over **every** admin page — shell, tenants list,
+add-tenant, provisioning, danger zone, Look, Voice, Features, owner dashboard,
+and the entirely unstyled `/unauthorized` — not only the pages this design
+introduces.
+
 ### Sequencing consequence
 
 This lands **before** the route and page work, not after. Building the new
