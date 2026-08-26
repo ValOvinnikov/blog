@@ -5,6 +5,7 @@ import { Button } from '@admin/components/shared/button';
 import { Card } from '@admin/components/shared/card';
 import { FormField } from '@admin/components/shared/form-field';
 import { FormTextInput } from '@admin/components/shared/form-text-input';
+import { SegmentedControl } from '@admin/components/shared/segmented-control';
 import {
   updateTenantDetailsAction,
   type TUpdateTenantDetailsActionInput,
@@ -18,11 +19,6 @@ import type {
 import { ALERT_TYPE } from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-// `@blog/ui`'s SegmentedControl is kept here deliberately — see the same note
-// in `tenant-details-form.tsx`. This component's own test suite hard-asserts
-// `role="radiogroup"`/`role="radio"`, which admin's Toggle-Group-based
-// SegmentedControl does not expose.
-import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useId, useState, useTransition } from 'react';

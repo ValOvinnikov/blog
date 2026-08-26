@@ -6,6 +6,7 @@ import { Card } from '@admin/components/shared/card';
 import { FormField } from '@admin/components/shared/form-field';
 import { FormTextInput } from '@admin/components/shared/form-text-input';
 import { PageHeader } from '@admin/components/shared/page-header';
+import { SegmentedControl } from '@admin/components/shared/segmented-control';
 import { Spinner } from '@admin/components/shared/spinner';
 import {
   createTenantAction,
@@ -13,12 +14,6 @@ import {
 } from '@admin/server/tenants/create-tenant-action';
 import { ALERT_TYPE, Size } from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
-// `@blog/ui`'s SegmentedControl is kept here deliberately — it exposes
-// `role="radiogroup"`/`role="radio"` (matching the untouched `tenant-details-panel`
-// tests), while admin's own SegmentedControl is built on Base UI's Toggle
-// Group (`role="group"` + `aria-pressed` buttons). Swapping would change the
-// accessible shape of this control, which is behaviour, not styling.
-import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
 

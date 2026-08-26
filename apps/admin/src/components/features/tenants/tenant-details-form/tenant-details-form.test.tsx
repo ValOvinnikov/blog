@@ -38,15 +38,15 @@ describe(TenantDetailsForm, () => {
     expect(screen.getByRole('textbox', { name: 'Tenant name' })).toBeVisible();
     expect(screen.getByRole('textbox', { name: 'Slug' })).toBeVisible();
     expect(screen.getByRole('textbox', { name: 'Domain' })).toBeVisible();
-    expect(screen.getByRole('radiogroup', { name: 'Plan' })).toBeVisible();
+    expect(screen.getByRole('group', { name: 'Plan' })).toBeVisible();
     expect(screen.getByRole('textbox', { name: 'Owner email' })).toBeVisible();
   });
 
   it('defaults the plan to Free', () => {
     render(<TenantDetailsForm />);
 
-    expect(screen.getByRole('radio', { name: 'Free' })).toHaveAttribute(
-      'aria-checked',
+    expect(screen.getByRole('button', { name: 'Free' })).toHaveAttribute(
+      'aria-pressed',
       'true',
     );
   });
@@ -56,7 +56,7 @@ describe(TenantDetailsForm, () => {
     render(<TenantDetailsForm />);
 
     await fillValidForm(user);
-    await user.click(screen.getByRole('radio', { name: 'Growth' }));
+    await user.click(screen.getByRole('button', { name: 'Growth' }));
     await user.click(
       screen.getByRole('button', { name: /begin provisioning/i }),
     );

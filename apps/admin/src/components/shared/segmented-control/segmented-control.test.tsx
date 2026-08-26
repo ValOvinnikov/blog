@@ -26,6 +26,25 @@ describe(SegmentedControl, () => {
     expect(screen.getByRole('button', { name: 'Comfortable' })).toBeVisible();
   });
 
+  it('forwards aria-describedby to the group', () => {
+    render(
+      <div>
+        <span id="density-hint">Locked — see policy</span>
+        <SegmentedControl<TDensity>
+          ariaLabel="Density"
+          options={options}
+          value="compact"
+          onChange={vi.fn()}
+          aria-describedby="density-hint"
+        />
+      </div>,
+    );
+
+    expect(
+      screen.getByRole('group', { name: 'Density' }),
+    ).toHaveAccessibleDescription('Locked — see policy');
+  });
+
   it('marks the option matching value as pressed, and the rest as not pressed', () => {
     render(
       <SegmentedControl<TDensity>
