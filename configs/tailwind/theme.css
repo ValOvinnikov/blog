@@ -19,9 +19,9 @@
  * token layer (`apps/admin/src/styles/admin-theme.css`) rather than
  * consuming this file's tokens, since its design system is deliberately
  * separate from `packages/ui`'s. It still imports this file for the base
- * Tailwind reset and the one directory (`look-preview/preview-sample/`)
- * that renders real `@blog/ui` components needs this file's tokens to
- * render them correctly.
+ * Tailwind reset, and because its one `@blog/ui`-importing directory
+ * (`look-preview/preview-sample/`) needs this file's tokens to render
+ * those components correctly.
  */
 
 @custom-variant dark (&:where(.dark, .dark *));

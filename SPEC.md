@@ -138,14 +138,6 @@ configuration they share — that sharing is what keeps one sign-in valid across
 both, so the two must never maintain it separately.
 Full contract and migration mechanism: `.claude/agents/db.md`.
 
-³ `apps/admin`'s `@blog/ui` prohibition has one scoped exception:
-`apps/admin/src/components/features/look/look-preview/preview-sample/`
-renders the tenant's real site (`WindowChrome`, `BrandMark`, `Text`,
-`Button`) so the live theme preview doesn't drift from what `apps/web`
-actually looks like. An ESLint `no-restricted-imports` override in
-`configs/eslint/admin.js` confines `@blog/ui` imports under `apps/admin` to
-that one directory; every other admin surface uses admin's own primitives.
-
 ¹ `@blog/db`'s Sanity-SDK prohibition has one scoped exception:
 `packages/db/scripts/provision-tenant/` talks to Sanity's Management API
 directly (via `@sanity/client` for content seeding, raw `fetch` for the
@@ -175,6 +167,14 @@ Dependency-graph enforcement details and SVG/type-flow wiring:
 `createLogger`) directly, rather than keeping their own copy of it. The rest
 of `@blog/db` (its `src/` library code, consumed by `apps/web`/`apps/admin`
 at request time) is unaffected and still never imports `@blog/insight`.
+
+³ `apps/admin`'s `@blog/ui` prohibition has one scoped exception:
+`apps/admin/src/components/features/look/look-preview/preview-sample/`
+renders the tenant's real site (`WindowChrome`, `BrandMark`, `Text`,
+`Button`) so the live theme preview doesn't drift from what `apps/web`
+actually looks like. An ESLint `no-restricted-imports` override in
+`configs/eslint/admin.js` confines `@blog/ui` imports under `apps/admin` to
+that one directory; every other admin surface uses admin's own primitives.
 
 ## 5. Data flow & typegen
 
