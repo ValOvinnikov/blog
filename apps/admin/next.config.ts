@@ -76,9 +76,10 @@ const config: NextConfig = {
   turbopack: {
     root: turbopackRoot,
     rules: {
-      // @blog/ui's icon assets (packages/ui/src/assets/icons) ship from
-      // source (transpilePackages below), so Turbopack sees their raw .svg
-      // imports directly:
+      // The glob below applies to any .svg import project-wide, so it
+      // covers both @blog/ui's icon assets (packages/ui/src/assets/icons,
+      // which ship from source via transpilePackages below) and admin's own
+      // (src/assets/icons):
       //   import Sun from '.../sun.svg'        -> SVGR React component
       //   import SunUrl from '.../sun.svg?url' -> emitted asset URL
       // The two rules are disjoint on the `?url` query so exactly one
@@ -87,10 +88,10 @@ const config: NextConfig = {
       //
       // SVGO's default `preset-default` includes `removeViewBox`, which
       // strips `viewBox` whenever it's numerically identical to the source
-      // file's own `width`/`height` (true of every icon in
-      // packages/ui/src/assets/icons — they all ship `24x24`). That's not
-      // actually redundant: `@blog/ui`'s `<Icon>` resizes the compiled
-      // `<svg>` via CSS (`size-4`/`size-4.5`/`size-6`), and without a
+      // file's own `width`/`height` (true of every icon in both asset
+      // directories — they all ship `24x24`). That's not actually
+      // redundant: `Icon` resizes the compiled `<svg>` via CSS
+      // (`size-4`/`size-4.5`/`size-6`), and without a
       // `viewBox` the browser can't rescale the internal `<path>`
       // coordinates into the new box, so icons render cropped at every size
       // but 24px. `@svgr/webpack`'s loader `options` map straight onto

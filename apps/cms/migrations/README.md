@@ -90,10 +90,15 @@ timestamped one — see `scripts/migrate-lib.mjs` for the ordering rules.
 
 Steps 1–5 above walk through **one** migration at a time. `migrate:deploy`
 automates running **every migration not yet applied** to a dataset, in order,
-and records what ran so a second call is a no-op — this is the mechanism a
-future gated deploy workflow will call post-merge (see `SPEC.md` §8; not wired
-up yet — **today these are manual, local-only commands**, same human-gated
-posture as `migrate:run`/`sanity deploy`).
+and records what ran so a second call is a no-op. `deploy-development.yml`
+runs `migrate:deploy --yes` against `development` on merges to `main` that
+touch `cms` or `web` (or a manual `workflow_dispatch`) — an admin-only merge
+skips the job entirely. `deploy-production.yml` runs it unconditionally on
+every `vX.Y.Z` tag push, gated by the `production` GitHub Environment's
+required-reviewer approval, the same gate `sanity deploy`/`deploy-studio` uses.
+Running `migrate:deploy`/`migrate:run` manually is still supported (e.g. to
+rehearse against `development`, or to backfill ad-hoc) — the automation just
+means it's no longer the only way these run.
 
 It tracks what has already run in a per-dataset ledger document
 (`_id: 'migrationState'`, `_type: 'migrationState'`) written via

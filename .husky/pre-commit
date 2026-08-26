@@ -1,6 +1,10 @@
-pnpm exec lint-staged
+# A large staged set can run long; whatever wraps this hook in its own
+# timeout — an unattended CI-style runner, an agent's Bash timeout, or an
+# interactive shell's own patience — should size it generously, since this
+# hook can't influence a wrapping timeout from inside.
+pnpm exec lint-staged || exit 1
 
 # When a ui component source is staged: regenerate packages/ui/COMPONENTS.md,
 # stage it, and verify it (structure + descriptions). Blocks the commit if a
 # component is undocumented or unindexable. Fast no-op for every other commit.
-node scripts/gen-ui-index.mjs --if-staged
+node scripts/gen-ui-index.mjs --if-staged || exit 1

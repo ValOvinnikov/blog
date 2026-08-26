@@ -277,7 +277,7 @@ together at the bottom of the tenant nav, below the tenant-facing sections and
 separated by a rule — rather than Provisioning sitting second, above pages an
 owner uses daily.
 
-## §8 — `apps/admin` separates from `@blog/ui` entirely
+## §8 — `apps/admin` owns its own design system
 
 `CLAUDE.md` already says admin's **interactive** primitives come from Base UI,
 styled in-app, and that nothing is added to `@blog/ui` for it. In practice admin
@@ -296,13 +296,37 @@ on a reader-facing site whose whole visual idea is a terminal; wrong on an admin
 panel, where a status pill should be a quiet, rounded, sentence-case chip with a
 tone dot.
 
-**Decision: `apps/admin` drops its `@blog/ui` dependency completely** and owns
-every primitive it renders, built in-app on Base UI plus its own theme. The
-layer contract becomes:
+**Decision: `apps/admin` owns every primitive it renders**, built in-app on Base
+UI plus its own theme, and stops importing `@blog/ui` for its own chrome.
 
-```
-admin → db, auth, config, utils        (was: admin → ui, db, auth, config, utils)
-```
+**With one deliberate exception, and it is not a compromise.** The Look tab's
+live preview renders _the tenant's site as it will actually look_ — including
+`WindowChrome`, the terminal frame `chromeOn` produces. That is the site's
+component by definition. Copying it into admin would create a second copy that
+silently drifts from the real thing, and a preview that lies is worse than no
+preview. So the preview's simulated-site content keeps importing `@blog/ui`.
+
+The layer contract is therefore **unchanged** — `admin → ui, db, auth, config,
+utils` — but `ui`'s reach shrinks from 68 import sites across the whole app to a
+single directory that exists to render the other app's appearance.
+
+### The exception is a directory, not a file
+
+`look-preview.tsx` today mixes two things that must be separated before the
+exception can be enforced:
+
+- **Panel chrome** — the "Live preview" / "Full page preview" card headings,
+  their descriptions, and the light/dark mode toggle. This is _admin's_ UI and
+  gets admin's primitives like every other surface.
+- **Simulated site** — `WindowChrome` and the `sample` fragment inside it
+  (`BrandMark`, `Text`, `Button`) that portray the tenant's site. This is the
+  exception.
+
+So the sample is extracted to
+`apps/admin/src/components/features/look/look-preview/preview-sample/`, and
+**that directory is the only place under `apps/admin` where a `@blog/ui` import
+is allowed.** A path-scoped guard enforces it, so the exception cannot quietly
+widen back into the app — which is exactly how the current 68 sites accumulated.
 
 ### What separation actually costs
 
@@ -326,6 +350,11 @@ admin → db, auth, config, utils        (was: admin → ui, db, auth, config, u
   repo — admin's `voice-field`. It becomes dead code the moment admin stops
   importing it, and is **deleted from `@blog/ui`** (with `pnpm gen:ui-index`
   re-run to drop its `COMPONENTS.md` entry).
+- **The `@blog/ui` dependency stays in `package.json`.** It cannot be removed
+  while the preview sample imports it, and neither can the `tsconfig` path, the
+  vitest alias, `transpilePackages`, or the shared-theme import the preview's
+  own tokens need. The measure of success is not a removed dependency; it is
+  `@blog/ui` reaching exactly one directory instead of the whole app.
 
 ### What does _not_ get deleted
 
@@ -350,6 +379,45 @@ per-surface conformance pass over **every** admin page — shell, tenants list,
 add-tenant, provisioning, danger zone, Look, Voice, Features, owner dashboard,
 and the entirely unstyled `/unauthorized` — not only the pages this design
 introduces.
+
+### `@blog/ui` is reverted to a web-only design system
+
+Separation runs both ways. `@blog/ui` has accumulated API that exists **only**
+because admin consumes it, and once admin stops, that API is dead weight in a
+library whose sole remaining audience is `apps/web`. Audited against git history
+and current call sites:
+
+**Dead already — no consumer at all, including admin:**
+
+- `SettingRow`'s `canControlGrow` prop and its `controlGrows` variant
+  (`6ddaf33b`), added so admin's Look page could widen HueSlider rows. The
+  follow-up admin dispatch never opted in. Only the Storybook story exercises it.
+  This is removable today, independent of everything else here.
+
+**Admin-only — dead the moment admin migrates:**
+
+- `Text`'s `supporting` variant — 5 call sites, every one in `apps/admin`.
+- `Text`'s `hint` variant — 3 call sites, all in `provisioning-status-view`.
+- The `Textarea` atom in full (already covered above).
+
+**Stays — genuine `apps/web` consumers, do not touch:**
+
+- `Text`'s `statement` variant (`not-found-page`).
+- `IconButton`'s `bordered` and `avatar` variants (the auth menus).
+
+**One judgement call, deliberately not auto-reverted:** `eca0e700` replaced
+`disabled:opacity-50` on `TextInput`/`Textarea` with explicit tokens, raising
+disabled text from 3.46:1 to 6.6:1. Its stated motivation was admin's locked
+fields, and `apps/web` never renders a disabled `TextInput` — so by a strict
+reading it is admin-driven. It should nonetheless be **kept**: it is a WCAG AA
+correction that is right on its own terms, it costs `apps/web` nothing, and
+reverting it would knowingly return a shipped component to below-AA contrast.
+Reverting _accommodations_ is the goal; reverting _accessibility fixes that
+happened to be found via admin_ is not.
+
+The sweep is not only historical. Whoever does this re-runs it by call-site
+count per exported variant and prop, so anything the git history missed is
+caught by present usage.
 
 ### Sequencing consequence
 
@@ -403,8 +471,10 @@ redesign — it can ship ahead of the route work if wanted.
   a super admin is never labelled OWNER.
 - **The sidebar tenant switcher is dropped from the platform tree** (it was
   non-functional there) and kept, unchanged, in the owner tree.
-- **`apps/admin` drops `@blog/ui` entirely** (§8) and owns every primitive it
-  renders. It copies the 13 icons it uses rather than adding a shared package,
+- **`apps/admin` owns every primitive it renders** (§8), with `@blog/ui`
+  confined to the Look preview's simulated-site sample — the tenant's own
+  appearance, where a copy would drift from the real site and make the preview
+  lie. The dependency stays; its reach shrinks from 68 sites to one directory. It copies the 13 icons it uses rather than adding a shared package,
   gains its own Tailwind token layer, and `Textarea` — dead once admin stops
   importing it — is deleted from `@blog/ui`. This lands before the route work,
   or every surface gets built twice.

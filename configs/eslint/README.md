@@ -9,7 +9,13 @@
   kebab-case filename enforcement.
 - `no-upstream-imports.js` — the `no-restricted-imports` rule that enforces
   the dependency graph (e.g. blocking `@blog/config`/`@blog/utils` from
-  importing `@blog/service`/`@blog/ui`).
+  importing `@blog/service`/`@blog/ui`). It's generic and unscoped by file
+  path, so it only covers bans that apply everywhere it's spread in. The
+  `@blog/db` → `@blog/auth` layering (db must never import auth; auth
+  legitimately imports db, so it's one-directional, not mutual) is
+  package-specific and lives directly in `db.js` instead — with
+  `db.test.js` covering the ban and `auth.test.js` covering that the
+  reverse import stays unrestricted.
 - `no-prop-spread.js` — bans `{...rest}`/`{...props}` spread onto a JSX
   element in `@blog/ui` component source, with an explicit file allowlist
   for polymorphic components that forward props to a caller-chosen `as`

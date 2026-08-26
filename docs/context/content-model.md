@@ -259,14 +259,17 @@ changing a schema does **not** change existing documents.
   no-op. `migrate:backfill` records the currently-pending folder migrations as
   applied **without** running them (one-time, per dataset, for migrations that
   predate the ledger). Both need a write token (`SANITY_AUTH_TOKEN` /
-  `SANITY_DEPLOY_TOKEN`) and remain **manual, local-only commands today** — no
-  CI workflow invokes them yet.
+  `SANITY_DEPLOY_TOKEN`).
 - CI (`Migrations` job) validates every migration loads and — with a read
   token — dry-runs each one read-only. It never mutates data.
-- Future: a gated post-merge workflow that runs `migrate:deploy` against
-  `production` automatically (write token, durable backup, release ordering
-  vs. the Vercel web deploy) — designed in
-  `docs/superpowers/specs/2026-07-10-migration-deployment-automation-design.md`
-  (#261, rollout steps 4–5); steps 1–3 (timestamped ids, the ledger,
-  `migrate:deploy`/`migrate:backfill`) are implemented and usable locally
-  today, e.g. `SANITY_STUDIO_DATASET=development pnpm --filter cms migrate:deploy`.
+- `migrate:deploy --yes` is automated as part of the deploy pipeline: dev runs
+  it via `deploy-development.yml`'s `migrate` job on merges to `main` that
+  touch `cms` or `web` (an admin-only merge skips it, since neither changed —
+  this condition is broader than `deploy-studio`'s `cms`-only gate, since a
+  web-only change also needs the migration), production runs it
+  unconditionally via `deploy-production.yml` on a `vX.Y.Z` tag push, after a
+  dataset export backup and behind the `production` Environment's
+  required-reviewer gate, same as `sanity deploy`. Both commands remain
+  available to run manually (e.g.
+  `SANITY_STUDIO_DATASET=development pnpm --filter cms migrate:deploy`) for
+  local rehearsal or backfilling a dataset outside the pipeline.

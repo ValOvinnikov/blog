@@ -50,7 +50,7 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 ### Eyebrow — `atoms/eyebrow/eyebrow.tsx`
 
 Eyebrow atom — small uppercase label displayed above a heading to provide contextual topic or section context.
-Props: href?: string · linkAs?: TAnchorElementType _(extends IWithDataTestId, Omit<HTMLAttributes<HTMLElement>, keyof TEyebro…)_
+Props: href?: string · linkAs?: TAnchorElementType · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: hasHref: (boolean)
 
 ### Heading — `atoms/heading/heading.tsx`

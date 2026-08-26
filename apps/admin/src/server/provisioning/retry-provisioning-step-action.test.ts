@@ -1,4 +1,5 @@
-export {};
+import { adminRoutes } from '@admin/utils/routes/routes';
+import { redirect } from 'next/navigation';
 
 const {
   requireSuperAdminMock,
@@ -36,6 +37,7 @@ describe('retryProvisioningStepAction', () => {
       id: 'admin-1',
       role: 'SUPERADMIN',
     });
+    vi.mocked(redirect).mockClear();
     dispatchProvisioningWorkflowMock.mockReset();
     dispatchProvisioningWorkflowMock.mockResolvedValue(true);
     beginTenantProvisioningMock.mockReset();
@@ -63,6 +65,22 @@ describe('retryProvisioningStepAction', () => {
     await expect(retryProvisioningStepAction('tenant-1')).rejects.toThrow(
       'NEXT_REDIRECT',
     );
+    expect(beginTenantProvisioningMock).not.toHaveBeenCalled();
+    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects an ADMIN-role caller via requireSuperAdmin's /unauthorized redirect, before touching provisioning", async () => {
+    requireSuperAdminMock.mockImplementation(() => {
+      redirect(adminRoutes.unauthorized());
+    });
+    const { retryProvisioningStepAction } =
+      await import('./retry-provisioning-step-action');
+
+    await expect(retryProvisioningStepAction('tenant-1')).rejects.toThrow(
+      'NEXT_REDIRECT',
+    );
+
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.unauthorized());
     expect(beginTenantProvisioningMock).not.toHaveBeenCalled();
     expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
   });
