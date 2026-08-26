@@ -4,12 +4,15 @@ import { TenantDetailsPanel } from '@admin/components/features/tenants/tenant-de
 import { Link } from '@admin/i18n/navigation';
 import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
 import { adminRoutes } from '@admin/utils/routes/routes';
+import {
+  domainVerificationTone,
+  provisioningStepTone,
+} from '@admin/utils/status-tone/status-tone';
 import { computeTenantFieldLocks } from '@admin/utils/tenant-field-locks/tenant-field-locks';
 import { ALERT_TYPE, ICONS, Size } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
-  type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Alert } from '@blog/ui/atoms/alert';
@@ -24,23 +27,6 @@ import { useTranslations } from 'next-intl';
 
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
 import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
-
-const STEP_TONE: Record<
-  Exclude<TTenantProvisioningStepStatus, 'FAILED'>,
-  'ok' | 'warn' | 'neutral'
-> = {
-  IDLE: 'neutral',
-  RUNNING: 'warn',
-  DONE: 'ok',
-};
-
-const DNS_TONE: Record<TDomainVerificationStatus, 'ok' | 'warn' | 'neutral'> = {
-  NOT_CONFIGURED: 'neutral',
-  NOT_ADDED: 'neutral',
-  PENDING: 'warn',
-  VERIFIED: 'ok',
-  ERROR: 'warn',
-};
 
 type TProvisioningStatusViewProps = {
   tenant: TTenant;
@@ -219,7 +205,9 @@ export const ProvisioningStatusView = ({
                     {t(`statusLabel.${overallStepStatus}`)}
                   </span>
                 ) : (
-                  <StatusBadge tone={STEP_TONE[displayOverallStatus]}>
+                  <StatusBadge
+                    tone={provisioningStepTone(displayOverallStatus)}
+                  >
                     {t(`statusLabel.${displayOverallStatus}`)}
                   </StatusBadge>
                 )}
@@ -288,7 +276,7 @@ export const ProvisioningStatusView = ({
         <div className={dnsRow()}>
           <Text>{tenant.primaryDomain}</Text>
           <span className={dnsStatusLive()} aria-live="polite">
-            <StatusBadge tone={DNS_TONE[domainStatus]}>
+            <StatusBadge tone={domainVerificationTone(domainStatus)}>
               {t(`dnsStatus.${domainStatus}`)}
             </StatusBadge>
           </span>
