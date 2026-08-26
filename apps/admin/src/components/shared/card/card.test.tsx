@@ -19,7 +19,7 @@ describe(Card, () => {
       <Card>
         <Card.Header
           title="Tenant details"
-          description="Core identity and status."
+          supportingText="Core identity and status."
         />
       </Card>,
     );
