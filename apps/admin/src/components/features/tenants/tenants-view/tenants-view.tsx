@@ -1,11 +1,9 @@
 import { ArchivedTenantsToggle } from '@admin/components/features/tenants/archived-tenants-toggle';
 import { TenantsTable } from '@admin/components/features/tenants/tenants-table';
-import { Link } from '@admin/i18n/navigation';
+import { LinkButton } from '@admin/components/shared/link-button';
+import { PageHeader } from '@admin/components/shared/page-header';
 import { adminRoutes } from '@admin/utils/routes/routes';
-import { Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { Heading } from '@blog/ui/atoms/heading';
-import { LinkButton } from '@blog/ui/molecules/link-button';
 import { useTranslations } from 'next-intl';
 
 import { tenantsViewVariants } from './tenants-view-variants';
@@ -25,23 +23,21 @@ export const TenantsView = ({
   shouldShowArchived,
 }: TTenantsViewProps) => {
   const t = useTranslations('tenantsView');
-  const { root, header, description, toolbar } = tenantsViewVariants();
+  const { root, toolbar, codeChunk } = tenantsViewVariants();
 
   return (
     <div className={root()}>
-      <div className={header()}>
-        <div>
-          <Heading level={1} size={Size.MD}>
-            {t('title')}
-          </Heading>
-          <p className={description()}>
-            {t.rich('description', { code: (chunks) => <code>{chunks}</code> })}
-          </p>
-        </div>
-        <LinkButton as={Link} href={adminRoutes.addTenant()} variant="primary">
-          {t('addTenant')}
-        </LinkButton>
-      </div>
+      <PageHeader
+        title={t('title')}
+        description={t.rich('description', {
+          code: (chunks) => <code className={codeChunk()}>{chunks}</code>,
+        })}
+        actions={
+          <LinkButton href={adminRoutes.addTenant()} variant="primary">
+            {t('addTenant')}
+          </LinkButton>
+        }
+      />
       <div className={toolbar()}>
         <ArchivedTenantsToggle shouldShowArchived={shouldShowArchived} />
       </div>

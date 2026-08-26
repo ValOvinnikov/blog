@@ -15,6 +15,13 @@ describe(TenantsView, () => {
     expect(screen.getByText('Acme Inc.')).toBeVisible();
   });
 
+  it("renders the description's code chunk as a real <code> element", () => {
+    render(<TenantsView tenants={[tenant]} shouldShowArchived={false} />);
+
+    const code = screen.getByText('tenants', { selector: 'code' });
+    expect(code.tagName).toBe('CODE');
+  });
+
   it('links add-tenant to the wizard', () => {
     render(<TenantsView tenants={[tenant]} shouldShowArchived={false} />);
 
@@ -25,8 +32,8 @@ describe(TenantsView, () => {
   it('shows the archived-tenants toggle set to Active by default', () => {
     render(<TenantsView tenants={[tenant]} shouldShowArchived={false} />);
 
-    expect(screen.getByRole('radio', { name: 'Active' })).toHaveAttribute(
-      'aria-checked',
+    expect(screen.getByRole('button', { name: 'Active' })).toHaveAttribute(
+      'aria-pressed',
       'true',
     );
   });
@@ -34,8 +41,8 @@ describe(TenantsView, () => {
   it('shows the archived-tenants toggle set to All when shouldShowArchived is true', () => {
     render(<TenantsView tenants={[tenant]} shouldShowArchived={true} />);
 
-    expect(screen.getByRole('radio', { name: 'All' })).toHaveAttribute(
-      'aria-checked',
+    expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute(
+      'aria-pressed',
       'true',
     );
   });
