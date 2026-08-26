@@ -1,5 +1,7 @@
 'use client';
 
+import { Alert } from '@admin/components/shared/alert';
+import { Button } from '@admin/components/shared/button';
 import { clearBrandAssetAction } from '@admin/server/site-config/clear-brand-asset-action';
 import { uploadBrandAssetAction } from '@admin/server/site-config/upload-brand-asset-action';
 import {
@@ -8,8 +10,6 @@ import {
   type TBrandAssetKind,
 } from '@admin/utils/brand-asset-limits/brand-asset-limits';
 import { ALERT_TYPE, Size } from '@blog/config';
-import { Alert } from '@blog/ui/atoms/alert';
-import { Button } from '@blog/ui/atoms/button';
 import Image from 'next/image';
 import { unstable_rethrow } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -56,7 +56,7 @@ export const BrandAssetField = ({
     hint: hintSlot,
     actions,
     input,
-  } = brandAssetFieldVariants();
+  } = brandAssetFieldVariants({ kind });
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -175,7 +175,7 @@ export const BrandAssetField = ({
         )}
       </div>
 
-      {error && <Alert type={ALERT_TYPE.ERROR} message={error} />}
+      {error && <Alert type={ALERT_TYPE.ERROR} title={error} />}
     </div>
   );
 };

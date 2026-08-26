@@ -8,7 +8,6 @@ import {
   buildAccentPreviewTokens,
 } from '@admin/utils/theme-preview-tokens/theme-preview-tokens';
 import type { TPresetId } from '@blog/config';
-import { SettingRow } from '@blog/ui/molecules/setting-row';
 import { useTranslations } from 'next-intl';
 
 import type { TLookFormFieldSetter } from './look-form';
@@ -31,7 +30,15 @@ export const LookFormBasicSection = ({
   onFieldChange,
 }: TLookFormBasicSectionProps) => {
   const t = useTranslations('lookForm');
-  const { hueField, swatch, hueValue } = lookFormVariants();
+  const {
+    field,
+    fieldLabel,
+    fieldHint,
+    tagSecondary,
+    hueField,
+    swatch,
+    hueValue,
+  } = lookFormVariants();
 
   const accentHueLabel = t('accentHueLabel');
   const swatchColor = buildAccentPreviewTokens(accentHue, false)[
@@ -40,15 +47,15 @@ export const LookFormBasicSection = ({
 
   return (
     <>
-      <SettingRow label={t('presetLabel')} description={t('presetDescription')}>
+      <div className={field()}>
+        <span className={fieldLabel()}>{t('presetLabel')}</span>
+        <p className={fieldHint()}>{t('presetDescription')}</p>
         <PresetPicker value={preset} onChange={onPresetChange} />
-      </SettingRow>
+      </div>
 
-      <SettingRow
-        label={accentHueLabel}
-        description={t('accentHueDescription')}
-        canControlGrow={true}
-      >
+      <div className={field()}>
+        <span className={fieldLabel()}>{accentHueLabel}</span>
+        <p className={fieldHint()}>{t('accentHueDescription')}</p>
         <div className={hueField()}>
           <span
             className={swatch()}
@@ -63,20 +70,21 @@ export const LookFormBasicSection = ({
           />
           <span className={hueValue()}>{accentHue}°</span>
         </div>
-      </SettingRow>
+      </div>
 
-      <SettingRow
-        label={t('logoHueLabel')}
-        description={t('logoHueDescription')}
-        canControlGrow={true}
-      >
+      <div className={field()}>
+        <span className={fieldLabel()}>
+          {t('logoHueLabel')}
+          <span className={tagSecondary()}>{t('optionalTag')}</span>
+        </span>
+        <p className={fieldHint()}>{t('logoHueDescription')}</p>
         <LogoHueField
           accentHue={accentHue}
           logoHue={logoHue}
           onChange={(hue) => onFieldChange('logoHue', hue)}
           isDark={false}
         />
-      </SettingRow>
+      </div>
     </>
   );
 };

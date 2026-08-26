@@ -3,18 +3,27 @@ import { tv } from 'tailwind-variants';
 export const brandAssetFieldVariants = tv({
   slots: {
     root: [
-      'flex flex-col gap-3 rounded-lg border-2 border-dashed border-border bg-surface-2 p-3.5',
+      'flex flex-col rounded-admin border-[1.5px] border-dashed border-admin-line bg-admin-surface-2 p-[14px]',
     ],
     top: ['flex items-center gap-3'],
     thumb: [
-      'relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md',
-      'border border-border bg-surface text-meta text-text-subtle',
+      'relative flex shrink-0 items-center justify-center overflow-hidden',
+      'border border-admin-line bg-admin-surface text-[10px] text-admin-faint',
     ],
     thumbImage: ['object-contain'],
     text: ['min-w-0'],
-    title: ['text-sm font-semibold text-text'],
-    hint: ['text-xs text-text-subtle'],
-    actions: ['flex flex-wrap items-center gap-2'],
+    title: ['text-[13px] font-semibold text-admin-text'],
+    hint: ['mt-0.5 text-[11.5px] text-admin-muted'],
+    actions: ['mt-[11px] flex flex-wrap items-center gap-2'],
     input: ['sr-only'],
+  },
+  variants: {
+    kind: {
+      logo: { thumb: ['size-12 rounded-[10px]'] },
+      favicon: { thumb: ['size-10 rounded-[8px]'] },
+    },
+  },
+  defaultVariants: {
+    kind: 'logo',
   },
 });

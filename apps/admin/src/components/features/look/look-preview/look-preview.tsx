@@ -1,21 +1,18 @@
 'use client';
 
+import { Card } from '@admin/components/shared/card';
+import { SegmentedControl } from '@admin/components/shared/segmented-control';
 import { FONT_OPTIONS } from '@admin/config/fonts';
 import {
   buildAccentPreviewTokens,
   buildLogoPreviewTokens,
 } from '@admin/utils/theme-preview-tokens/theme-preview-tokens';
-import { Size, type TFontChoice } from '@blog/config';
-import { BrandMark } from '@blog/ui/atoms/brand-mark';
-import { Button } from '@blog/ui/atoms/button';
-import { Heading } from '@blog/ui/atoms/heading';
-import { SegmentedControl } from '@blog/ui/atoms/segmented-control';
-import { Text } from '@blog/ui/atoms/text';
-import { WindowChrome } from '@blog/ui/molecules/window-chrome';
+import type { TFontChoice } from '@blog/config';
 import { useTranslations } from 'next-intl';
 import { type CSSProperties, useState } from 'react';
 
 import { lookPreviewVariants } from './look-preview-variants';
+import { PreviewSample } from './preview-sample';
 
 type TPreviewMode = 'light' | 'dark';
 
@@ -30,10 +27,15 @@ export type TLookPreviewProps = {
 
 /**
  * Tier 1 (inline, this component) and tier 2 (the reserved full-page panel
- * below it) of the Look tab's live preview. Light/dark is this preview's own
- * toggle, not tenant config — a reader's `prefers-color-scheme` choice,
- * independent of whichever preset is selected, so both ramps must be
- * previewable regardless of preset.
+ * below it) of the Look tab's live preview. The panel chrome here (the
+ * cards, headers, mode toggle, and reserved full-page panel) is admin's own
+ * design system — but `PreviewSample` inside it renders the *tenant's* site
+ * theme through real site primitives and site tokens, since it must
+ * show what the site will actually look like, not an admin-styled
+ * approximation. Light/dark is this preview's own toggle, not tenant
+ * config — a reader's `prefers-color-scheme` choice, independent of
+ * whichever preset is selected, so both ramps must be previewable
+ * regardless of preset.
  */
 export const LookPreview = ({
   tenantSlug,
@@ -63,16 +65,6 @@ export const LookPreview = ({
 
   const {
     root,
-    card,
-    cardHead,
-    cardHeadText,
-    cardBody,
-    previewBox,
-    previewSurface,
-    brandRow,
-    brandName,
-    actionsRow,
-    chip,
     note,
     deviceBar,
     deviceDots,
@@ -80,83 +72,42 @@ export const LookPreview = ({
     deviceUrl,
     frame,
     framePlaceholder,
-  } = lookPreviewVariants({ isDark });
-
-  const sample = (
-    <>
-      <div className={brandRow()}>
-        <BrandMark size={Size.SM} title={tenantSlug} />
-        <span
-          className={brandName()}
-          style={{ fontFamily: heading.fontFamily }}
-        >
-          {tenantSlug}
-        </span>
-      </div>
-      <Heading
-        level={3}
-        visual="preview"
-        style={{ fontFamily: heading.fontFamily }}
-      >
-        {t('sampleHeading')}
-      </Heading>
-      <Text variant="supporting" style={{ fontFamily: body.fontFamily }}>
-        {t('samplePara')}
-      </Text>
-      <div className={actionsRow()}>
-        <Button type="button" size={Size.SM}>
-          {t('subscribeButton')}
-        </Button>
-        <Button type="button" variant="ghost" size={Size.SM}>
-          {t('readMoreButton')}
-        </Button>
-        <span className={chip()}>{t('readTimeChip')}</span>
-      </div>
-    </>
-  );
+  } = lookPreviewVariants();
 
   return (
     <div className={root()}>
-      <section className={card()}>
-        <header className={cardHead()}>
-          <div className={cardHeadText()}>
-            <Heading level={2} size={Size.XS}>
-              {t('livePreviewHeading')}
-            </Heading>
-            <Text variant="muted">{t('livePreviewDescription')}</Text>
-          </div>
-          <SegmentedControl
-            ariaLabel={t('previewColorSchemeAriaLabel')}
-            options={modeOptions}
-            value={mode}
-            onChange={setMode}
+      <Card>
+        <Card.Header
+          title={t('livePreviewHeading')}
+          supportingText={t('livePreviewDescription')}
+          actions={
+            <SegmentedControl
+              ariaLabel={t('previewColorSchemeAriaLabel')}
+              options={modeOptions}
+              value={mode}
+              onChange={setMode}
+            />
+          }
+        />
+        <Card.Body>
+          <PreviewSample
+            tenantSlug={tenantSlug}
+            tokenStyle={tokenStyle}
+            isDark={isDark}
+            headingFontFamily={heading.fontFamily}
+            bodyFontFamily={body.fontFamily}
+            isChromeOn={isChromeOn}
           />
-        </header>
-        <div className={cardBody()} style={tokenStyle}>
-          {isChromeOn ? (
-            <WindowChrome className={previewSurface()}>
-              <WindowChrome.Bar>
-                <WindowChrome.Prompt>{t('terminalPrompt')}</WindowChrome.Prompt>
-              </WindowChrome.Bar>
-              <WindowChrome.Body>{sample}</WindowChrome.Body>
-            </WindowChrome>
-          ) : (
-            <div className={previewBox()}>{sample}</div>
-          )}
           <p className={note()}>{t('previewNote')}</p>
-        </div>
-      </section>
+        </Card.Body>
+      </Card>
 
-      <section className={card()}>
-        <header className={cardHead()}>
-          <div className={cardHeadText()}>
-            <Heading level={2} size={Size.XS}>
-              {t('fullPagePreviewHeading')}
-            </Heading>
-            <Text variant="muted">{t('fullPagePreviewDescription')}</Text>
-          </div>
-        </header>
-        <div className={cardBody()}>
+      <Card>
+        <Card.Header
+          title={t('fullPagePreviewHeading')}
+          supportingText={t('fullPagePreviewDescription')}
+        />
+        <Card.Body>
           <div className={deviceBar()}>
             <span className={deviceDots()} aria-hidden="true">
               <span className={deviceDot()} />
@@ -170,8 +121,8 @@ export const LookPreview = ({
           <div className={frame()}>
             <p className={framePlaceholder()}>{t('framePlaceholder')}</p>
           </div>
-        </div>
-      </section>
+        </Card.Body>
+      </Card>
     </div>
   );
 };

@@ -1,7 +1,6 @@
 'use client';
 
 import { BrandAssetField } from '@admin/components/features/look/brand-asset-field';
-import { SettingRow } from '@blog/ui/molecules/setting-row';
 import { useTranslations } from 'next-intl';
 
 import type { TLookFormFieldSetter } from './look-form';
@@ -22,13 +21,12 @@ export const LookFormImagesSection = ({
   onFieldChange,
 }: TLookFormImagesSectionProps) => {
   const t = useTranslations('lookForm');
-  const { uploads } = lookFormVariants();
+  const { field, fieldLabel, fieldHint, uploads } = lookFormVariants();
 
   return (
-    <SettingRow
-      label={t('brandImagesLabel')}
-      description={t('brandImagesDescription')}
-    >
+    <div className={field()}>
+      <span className={fieldLabel()}>{t('brandImagesLabel')}</span>
+      <p className={fieldHint()}>{t('brandImagesDescription')}</p>
       <div className={uploads()}>
         <BrandAssetField
           tenantSlug={tenantSlug}
@@ -47,6 +45,6 @@ export const LookFormImagesSection = ({
           onChange={(url) => onFieldChange('faviconAssetUrl', url)}
         />
       </div>
-    </SettingRow>
+    </div>
   );
 };
