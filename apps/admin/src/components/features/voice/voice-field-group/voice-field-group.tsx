@@ -39,7 +39,7 @@ export const VoiceFieldGroup = ({
     <Card>
       <Card.Header
         title={title}
-        description={t('fieldCount', { count: fields.length })}
+        supportingText={t('fieldCount', { count: fields.length })}
       />
       <Card.Body className={body()}>
         {fields.map((field) => (
