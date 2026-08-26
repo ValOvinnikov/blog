@@ -12,7 +12,9 @@ prop inference, or when an organism builds an anchor to hand into a slot.
 > element the component doesn't choose, so it cannot enumerate them. That
 > reasoning does not extend to a component that renders a fixed element:
 > "consumers might want to pass `aria-*`" is not a reason to reopen the
-> surface, it's a reason to name the prop.
+> surface, it's a reason to name the prop. `Eyebrow` (`atoms/eyebrow`) chooses
+> its own element (`<p>` or `linkAs`-configured link) rather than exposing
+> `as`, so it's closed like any other atom, not part of this carve-out.
 
 ## Level 2 — fully polymorphic (element-specific prop inference)
 
