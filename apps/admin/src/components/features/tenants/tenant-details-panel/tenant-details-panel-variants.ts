@@ -2,15 +2,12 @@ import { tv } from 'tailwind-variants';
 
 export const tenantDetailsPanelVariants = tv({
   slots: {
-    root: [
-      'flex flex-col gap-4 rounded-md border border-border bg-surface p-6',
-    ],
+    bodyStack: ['flex flex-col gap-4'],
     fields: [
       'flex flex-col gap-5',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-brand',
     ],
-    fieldLockReason: ['text-xs text-text-muted'],
-    actions: ['mt-2 flex items-center justify-end'],
+    fieldLockReason: ['text-[11.5px] text-admin-faint'],
     lockAnnouncementLive: ['sr-only'],
     planControl: ['self-start'],
   },

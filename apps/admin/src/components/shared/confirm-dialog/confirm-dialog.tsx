@@ -1,10 +1,10 @@
 'use client';
 
+import { Alert } from '@admin/components/shared/alert';
+import { Button } from '@admin/components/shared/button';
+import { TextInput } from '@admin/components/shared/text-input';
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { ALERT_TYPE } from '@blog/config';
-import { Alert } from '@blog/ui/atoms/alert';
-import { Button } from '@blog/ui/atoms/button';
-import { TextInput } from '@blog/ui/atoms/text-input';
 import type { ReactNode } from 'react';
 
 import { confirmDialogVariants } from './confirm-dialog-variants';
@@ -76,7 +76,7 @@ export const ConfirmDialog = ({
             {description}
           </AlertDialog.Description>
 
-          {error && <Alert type={ALERT_TYPE.ERROR} message={error} />}
+          {error && <Alert type={ALERT_TYPE.ERROR} title={error} />}
 
           <div className={field()}>
             <label className={label()} htmlFor={confirmFieldId}>
