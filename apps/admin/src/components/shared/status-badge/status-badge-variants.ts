@@ -7,7 +7,7 @@ export const statusBadgeVariants = tv({
       'rounded-full px-2.5 py-0.5',
       'text-[11.5px] font-semibold whitespace-nowrap',
     ],
-    dot: 'size-1.5 rounded-full bg-current',
+    dot: ['size-1.5 rounded-full bg-current'],
   },
   variants: {
     tone: {

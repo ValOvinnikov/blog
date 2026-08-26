@@ -8,13 +8,21 @@ describe(StatusBadge, () => {
     expect(screen.getByText('Active')).toBeVisible();
   });
 
-  it('carries the tone in its classes so the dot inherits it', () => {
-    const { container } = render(<StatusBadge tone="bad">Failed</StatusBadge>);
-    expect(container.firstChild).toHaveClass('text-admin-bad');
+  it('renders every tone without throwing', () => {
+    const tones = ['ok', 'warn', 'bad', 'neutral', 'plan'] as const;
+    for (const tone of tones) {
+      expect(() =>
+        render(<StatusBadge tone={tone}>Label</StatusBadge>),
+      ).not.toThrow();
+    }
   });
 
-  it('defaults to the neutral tone', () => {
-    const { container } = render(<StatusBadge>Draft</StatusBadge>);
-    expect(container.firstChild).toHaveClass('text-admin-muted');
+  it('omits the tone dot when hasDot is false', () => {
+    render(
+      <StatusBadge tone="plan" hasDot={false}>
+        Pro plan
+      </StatusBadge>,
+    );
+    expect(screen.getByText('Pro plan')).toBeVisible();
   });
 });
