@@ -114,13 +114,13 @@ toggle in the whole theme (it's what makes the site look like a terminal). The
 mock only implies it via preset choice. Add an explicit toggle in Advanced,
 labelled around "terminal chrome", defaulting from the chosen preset.
 
-## 8. Voice tab — 8 fields shown, 20 exist; two are invented
+## 8. Voice tab — 8 fields shown, 19 exist; two are invented
 
 The mock invents **"Publish confirmation"** (`:555`) and **"No search
 results"** (`:569`). Remove both — the second is especially misleading because
 **there is no search feature on the site**.
 
-The real set is 20 fields in 4 groups (source: `apps/cms/src/schema-types/
+The real set is 19 fields in 4 groups (source: `apps/cms/src/schema-types/
 documents/settings/voice.ts`, being ported to Postgres — the field set carries
 over unchanged). Use these groupings and names:
 
@@ -134,8 +134,12 @@ over unchanged). Use these groupings and names:
 
 **Bookmarks** (2) — `bookmarkToastSavedMessage`, `bookmarkToastRemovedMessage`
 
-**Empty states** (6) — `blogListEmpty`, `topicEmpty`, `tagEmpty`,
-`authorEmpty`, `topicsEmpty`, `bookmarksEmpty`
+**Empty states** (5) — `blogListEmpty`, `topicEmpty`, `tagEmpty`,
+`topicsEmpty`, `bookmarksEmpty`
+
+(An earlier revision of this brief also listed `authorEmpty` — dropped:
+`apps/web/src/app` has no author-listing route, only a byline field on
+individual posts, so there is no empty state for it to back. #2200.)
 
 Pull human-readable labels from that schema file's `title` properties rather
 than inventing new ones. Each field is an **override**: empty means "inherit
