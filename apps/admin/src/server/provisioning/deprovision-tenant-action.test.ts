@@ -1,4 +1,6 @@
+import { adminRoutes } from '@admin/utils/routes/routes';
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { redirect } from 'next/navigation';
 
 const {
   requireSuperAdminMock,
@@ -50,6 +52,7 @@ describe('deprovisionTenantAction', () => {
       id: 'admin-1',
       role: 'SUPERADMIN',
     });
+    vi.mocked(redirect).mockClear();
     authMock.mockReset();
     authMock.mockResolvedValue({
       user: { id: 'operator-1', email: 'operator@example.com' },
@@ -73,6 +76,22 @@ describe('deprovisionTenantAction', () => {
     await expect(
       deprovisionTenantAction('tenant-1', { confirm: 'acme', dryRun: true }),
     ).rejects.toThrow('NEXT_REDIRECT');
+    expect(dispatchDeprovisioningWorkflowMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects an ADMIN-role caller via requireSuperAdmin's /unauthorized redirect, before touching the tenant", async () => {
+    requireSuperAdminMock.mockImplementation(() => {
+      redirect(adminRoutes.unauthorized());
+    });
+    const { deprovisionTenantAction } =
+      await import('./deprovision-tenant-action');
+
+    await expect(
+      deprovisionTenantAction('tenant-1', { confirm: 'acme', dryRun: true }),
+    ).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(redirect).toHaveBeenCalledWith(adminRoutes.unauthorized());
+    expect(listTenantsByIdsMock).not.toHaveBeenCalled();
     expect(dispatchDeprovisioningWorkflowMock).not.toHaveBeenCalled();
   });
 
