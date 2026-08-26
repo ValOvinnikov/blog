@@ -389,6 +389,15 @@ block — it points at open work rather than narrating closed work.
 
 - Vitest + Testing Library (jsdom), co-located `*.test.tsx`. See the
   `testing-practices` skill (`.claude/skills/testing-practices/SKILL.md`).
+- **Never assert a Tailwind/CSS utility class for presentation — REQUIRED, not
+  a preference.** No `toHaveClass` / `className` `toContain` on a class whose
+  only job is appearance (layout, color, typography, radius, shadow), **even
+  when it toggles with a prop/variant** — this has been the single most
+  repeated review-rejection reason building this design system's primitives.
+  Assert the semantic/behavioral outcome instead (rendered text, ARIA state,
+  disabled/focus behavior, a callback firing with the right value) or, for a
+  purely-visual variant with no such outcome, a no-throw smoke test across
+  every variant value.
 - Mock `@blog/db` query/mutation functions; assert that fetched data renders and
   that a form submission calls the action with the values the user entered.
 - **A mutation that records an audit event gets a test that it is _not_
