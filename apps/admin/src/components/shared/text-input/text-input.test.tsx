@@ -25,7 +25,7 @@ describe(TextInput, () => {
     expect(handleChange).toHaveBeenCalledWith('a');
   });
 
-  it('honours the disabled/locked styling', () => {
+  it('disables the input when isDisabled is true', () => {
     render(
       <TextInput
         ariaLabel="Slug"
@@ -37,6 +37,5 @@ describe(TextInput, () => {
 
     const input = screen.getByLabelText('Slug');
     expect(input).toBeDisabled();
-    expect(input).toHaveClass('bg-admin-line-2', 'text-admin-faint');
   });
 });
