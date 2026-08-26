@@ -66,17 +66,28 @@ describe(getRelatedPosts, () => {
     expect(result).toEqual([]);
   });
 
-  it('tags both queries with author/topic alongside posts', async () => {
+  it('tags both queries with author/topic alongside posts, plus tag on the byTags query only', async () => {
     mockRun.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
 
     await getRelatedPosts('current-id', ['tag-a'], 'topic-1');
 
-    const expectedTags = expect.objectContaining({
-      next: expect.objectContaining({
-        tags: ['posts', 'author', 'topic'],
+    expect(mockRun).toHaveBeenNthCalledWith(
+      1,
+      expect.anything(),
+      expect.objectContaining({
+        next: expect.objectContaining({
+          tags: ['posts', 'author', 'topic', 'tag'],
+        }),
       }),
-    });
-    expect(mockRun).toHaveBeenNthCalledWith(1, expect.anything(), expectedTags);
-    expect(mockRun).toHaveBeenNthCalledWith(2, expect.anything(), expectedTags);
+    );
+    expect(mockRun).toHaveBeenNthCalledWith(
+      2,
+      expect.anything(),
+      expect.objectContaining({
+        next: expect.objectContaining({
+          tags: ['posts', 'author', 'topic'],
+        }),
+      }),
+    );
   });
 });

@@ -168,7 +168,7 @@ describe('getPost', () => {
     );
   });
 
-  it('tags the query with post/author/topic alongside page_post', async () => {
+  it('tags the query with post/author/topic/tag alongside page_post', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawPostPage())
       .mockResolvedValueOnce(makeRawSiteSettings());
@@ -179,7 +179,7 @@ describe('getPost', () => {
       expect.anything(),
       expect.objectContaining({
         next: expect.objectContaining({
-          tags: ['page_post', 'post', 'author', 'topic'],
+          tags: ['page_post', 'post', 'author', 'topic', 'tag'],
         }),
       }),
     );
