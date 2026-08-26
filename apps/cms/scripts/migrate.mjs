@@ -36,8 +36,10 @@
  * `migrationState` ledger document via `@sanity/client`, authenticated with
  * `SANITY_AUTH_TOKEN` (falls back to `SANITY_DEPLOY_TOKEN`) — a write token,
  * unlike the read-only CLI login session `dry`/`run`/`export` rely on. That
- * ledger is a system document, not a Studio schema type — it is never part of
- * typegen.
+ * ledger has a declared schema type (`migrationState`) so `validate`/typegen
+ * see it, but it stays inaccessible to editors — Studio document actions are
+ * disabled and it's excluded from the desk structure and the new-document
+ * menu.
  */
 import { createClient } from '@sanity/client';
 import { execFileSync } from 'node:child_process';

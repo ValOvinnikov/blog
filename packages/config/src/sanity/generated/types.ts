@@ -271,6 +271,21 @@ export type Layout = {
   dividerBottom?: boolean;
 };
 
+export type MigrationState = {
+  _id: string;
+  _type: 'migrationState';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  applied?: Array<{
+    id?: string;
+    runAt?: string;
+    sha?: string;
+    _type: 'appliedMigration';
+    _key: string;
+  }>;
+};
+
 export type Settings_voice = {
   _id: string;
   _type: 'settings_voice';
@@ -856,6 +871,7 @@ export type AllSanitySchemaTypes =
   | ImageWithAlt
   | HeroLayout
   | Layout
+  | MigrationState
   | Settings_voice
   | Settings_theme
   | Settings_newsletter

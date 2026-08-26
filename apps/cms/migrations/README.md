@@ -31,8 +31,6 @@ apps/cms/migrations/
   README.md          # this file
 ```
 
-This directory currently holds **no migrations** — the datasets were recreated
-clean, so the previously-applied transforms were removed. The tooling stays.
 `migrate:new` scaffolds a new `<timestamp>-<slug>/index.ts` from a built-in
 template (see the `template()` in `scripts/migrate.mjs`), which shows the
 `defineMigration` / `at` / `set` / `unset` API shape from `sanity/migrate`.
@@ -99,8 +97,10 @@ posture as `migrate:run`/`sanity deploy`).
 
 It tracks what has already run in a per-dataset ledger document
 (`_id: 'migrationState'`, `_type: 'migrationState'`) written via
-`@sanity/client` — a system document, not a Studio schema type, so it's never
-part of typegen and never shows up in the desk structure.
+`@sanity/client`. It has a declared schema type (`migrationState`) so
+`validate`/typegen see it, but it stays inaccessible to editors — Studio
+document actions are disabled and it's excluded from the desk structure and
+the new-document menu.
 
 ```sh
 pnpm --filter cms migrate:deploy          # prompts for confirmation, then:
