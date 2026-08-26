@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>apps/admin — Tenant pages, before and after provisioning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+/* Tokens mirrored verbatim from admin-panel-mock.html so the two mocks read
+   as one system. Do not re-derive; copy if they change there. */
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --surface-2:#fbfbfd; --line:#e5e7eb; --line-2:#eef0f3;
+  --text:#12141a; --muted:#5b6472; --faint:#8a93a3;
+  --brand:#4f46e5; --brand-weak:#eef2ff;
+  --ok:#16794d; --ok-weak:#e7f6ee; --warn:#9a6a00; --warn-weak:#fbf3df; --bad:#b42318; --bad-weak:#fdeceb;
+  --radius:12px; --radius-sm:8px; --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  --shadow-lg:0 12px 40px rgba(16,24,40,.14);
+  --ui:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--ui);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select{font-family:inherit}
+a{color:inherit}
+code{font-family:var(--mono);font-size:.92em;background:var(--line-2);padding:1px 5px;border-radius:5px}
+
+/* ---------- Mock control bar (not product UI) ---------- */
+.rolebar{background:#0f1115;color:#c9cfda;padding:9px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px;position:sticky;top:0;z-index:20}
+.rolebar b{color:#fff}
+.rolebar .seg{display:inline-flex;background:#1c1f26;border-radius:9px;padding:3px;gap:3px}
+.rolebar .seg button{border:0;background:transparent;padding:6px 13px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;color:#8a93a3}
+.rolebar .seg button.on{background:#2b2f3a;color:#fff}
+.rolebar .note{color:#6b7280;font-size:12px;margin-left:auto}
+.rolebar .url{font-family:var(--mono);font-size:12px;color:#a5b4fc;background:#171b23;padding:3px 9px;border-radius:6px}
+
+.app{display:grid;grid-template-columns:264px 1fr;min-height:100vh}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{position:static!important;height:auto!important}}
+
+/* ---------- Sidebar ---------- */
+.side{background:#0f1115;color:#c9cfda;border-right:1px solid #1c1f26;display:flex;flex-direction:column;position:sticky;top:40px;height:calc(100vh - 40px);overflow:auto}
+.side .brand{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid #1c1f26}
+.side .brand .logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#6366f1,#a855f7);display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
+.side .brand b{color:#fff;font-size:14px;letter-spacing:.2px}
+.side .brand span{color:#6b7280;font-size:12px}
+.switcher{margin:12px 12px 4px;padding:8px 10px;background:#161922;border:1px solid #232734;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:9px}
+.switcher .av{width:22px;height:22px;border-radius:6px;background:#2b2f3a;display:grid;place-items:center;font-size:11px;color:#e5e7eb;font-weight:600}
+.switcher .meta{flex:1;min-width:0}
+.switcher .meta b{display:block;color:#eef1f6;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.switcher .meta small{color:#6b7280;font-size:11px}
+.switcher .chev{color:#6b7280}
+.navgroup{padding:14px 12px 6px}
+.navgroup .lbl{color:#5a6373;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:0 10px 6px}
+.nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:#c9cfda;text-decoration:none;font-size:13px;cursor:pointer;margin-bottom:1px}
+.nav a .ic{width:16px;text-align:center;opacity:.75}
+.nav a .pill{margin-left:auto;background:#232734;color:#aab2c0;font-size:10px;padding:1px 7px;border-radius:999px}
+.nav a.soon{opacity:.55;cursor:default}
+.nav a.soon .pill{background:#3a2a12;color:#d9a441}
+.nav a.plat .pill{background:#2a1f3a;color:#c4a5fc}
+.nav a:hover{background:#171b23}
+.nav a.active{background:#20242e;color:#fff}
+.nav a.active .ic{opacity:1;color:#a5b4fc}
+.navsep{height:1px;background:#1c1f26;margin:9px 10px}
+.side .foot{margin-top:auto;padding:12px 16px;border-top:1px solid #1c1f26;color:#6b7280;font-size:11.5px;line-height:1.6}
+.side .foot code{background:#1c1f26;color:#8a93a3}
+
+/* ---------- Topbar + breadcrumbs ---------- */
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{position:sticky;top:40px;z-index:5;background:rgba(246,247,249,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:11px 26px;display:flex;align-items:center;gap:14px}
+.bc{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);flex-wrap:wrap;min-width:0}
+.bc a{text-decoration:none;color:var(--muted);border-radius:5px;padding:1px 4px;cursor:pointer}
+.bc a:hover{color:var(--text);background:var(--line-2)}
+.bc .sep{color:var(--faint);font-size:12px}
+.bc .cur{color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px}
+.topbar .role{margin-left:auto;display:flex;align-items:center;gap:10px}
+.rolechip{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 11px 4px 6px;font-size:12px;box-shadow:var(--shadow);white-space:nowrap}
+.rolechip .dot{width:7px;height:7px;border-radius:999px;background:var(--ok)}
+.rolechip .who{width:22px;height:22px;border-radius:999px;background:#dfe3ea;display:grid;place-items:center;font-size:11px;font-weight:600;color:#3a4150}
+.rolechip .scope{color:var(--faint)}
+
+.content{padding:26px;max-width:1180px;width:100%;margin:0 auto}
+.page{display:none;animation:fade .18s ease}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.h1{font-size:22px;font-weight:700;letter-spacing:-.01em;margin:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sub{color:var(--muted);margin:4px 0 0;font-size:13.5px}
+.pagehead{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.pagehead .actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+
+/* ---------- Primitives ---------- */
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:9px;padding:8px 13px;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:7px;box-shadow:var(--shadow);text-decoration:none}
+.btn:hover{background:var(--surface-2)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.ghost{box-shadow:none;background:transparent;border-color:transparent}
+.btn.ghost:hover{background:var(--line-2)}
+.btn.danger{color:var(--bad);border-color:#f2c9c5;background:var(--bad-weak)}
+.btn.sm{padding:5px 9px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:disabled:hover{background:var(--surface)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card .hd{padding:14px 18px;border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.card .hd h3{margin:0;font-size:15px;font-weight:650}
+.card .hd .desc{color:var(--muted);font-size:12.5px}
+.card .hd .right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.card .bd{padding:18px}
+.card .ft{padding:13px 18px;border-top:1px solid var(--line-2);display:flex;align-items:center;gap:10px;background:var(--surface-2);border-radius:0 0 var(--radius) var(--radius)}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+@media(max-width:1000px){.cards{grid-template-columns:1fr}}
+.stack{display:flex;flex-direction:column;gap:18px}
+.mb18{margin-bottom:18px}
+
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+.badge .d{width:6px;height:6px;border-radius:999px;background:currentColor}
+.b-ok{color:var(--ok);background:var(--ok-weak)}
+.b-warn{color:var(--warn);background:var(--warn-weak)}
+.b-bad{color:var(--bad);background:var(--bad-weak)}
+.b-neutral{color:var(--muted);background:var(--line-2)}
+.b-plan{color:#3730a3;background:#eef2ff}
+
+/* definition rows (read-only) */
+.dl{display:grid;grid-template-columns:132px 1fr;gap:10px 14px;font-size:13.5px;align-items:baseline}
+.dl dt{color:var(--muted);font-size:12.5px}
+.dl dd{margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.dl dd .v{overflow:hidden;text-overflow:ellipsis}
+.mono{font-family:var(--mono);font-size:12.5px}
+
+/* ---------- Tenant details form ---------- */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px 18px}
+@media(max-width:720px){.fgrid{grid-template-columns:1fr}}
+.field label{display:flex;align-items:center;gap:7px;font-weight:600;font-size:13px;margin-bottom:5px}
+.inp{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13.5px;background:var(--surface);color:var(--text)}
+.inp:focus{outline:2px solid var(--brand-weak);border-color:var(--brand)}
+.inp.mono{font-family:var(--mono);font-size:12.5px}
+.field.locked .inp{background:var(--line-2);color:var(--faint);cursor:not-allowed;border-color:var(--line-2)}
+.field .why{font-size:11.5px;color:var(--faint);margin-top:5px;display:none;align-items:flex-start;gap:5px;line-height:1.45}
+.field.locked .why{display:flex}
+.field .hint{font-size:11.5px;color:var(--muted);margin-top:5px}
+.lockicon{font-size:10.5px;color:var(--faint);display:none}
+.field.locked .lockicon{display:inline}
+.seg{display:inline-flex;background:var(--line-2);border-radius:10px;padding:3px;gap:3px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.field.locked .seg{opacity:.55}
+.field.locked .seg button{cursor:not-allowed}
+
+/* ---------- Banner ---------- */
+.banner{border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:13px;margin-bottom:18px;border:1px solid transparent;box-shadow:var(--shadow);flex-wrap:wrap}
+.banner .i{font-size:16px;flex:none}
+.banner .tx{flex:1;min-width:200px}
+.banner .tx b{display:block;font-size:13.5px}
+.banner .tx span{color:var(--muted);font-size:12.5px}
+.banner.ok{background:var(--ok-weak);border-color:#bfe3d0}   .banner.ok .i{color:var(--ok)}
+.banner.warn{background:var(--warn-weak);border-color:#ecdcb4} .banner.warn .i{color:var(--warn)}
+.banner.bad{background:var(--bad-weak);border-color:#f2c9c5}  .banner.bad .i{color:var(--bad)}
+.banner.info{background:var(--brand-weak);border-color:#c9d0fb} .banner.info .i{color:var(--brand)}
+.banner.idle{background:var(--surface);border-color:var(--line)} .banner.idle .i{color:var(--faint)}
+
+/* ---------- Provisioning steps ---------- */
+.steps{display:flex;flex-direction:column}
+.step{display:flex;gap:12px;padding:10px 0;position:relative;align-items:flex-start}
+.step .n{width:24px;height:24px;border-radius:999px;flex:none;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--line-2);color:var(--muted);z-index:1}
+.step.done .n{background:var(--ok);color:#fff}
+.step.running .n{background:var(--warn);color:#fff}
+.step.failed .n{background:var(--bad);color:#fff}
+.step:not(:last-child)::after{content:"";position:absolute;left:11.5px;top:32px;bottom:-6px;width:2px;background:var(--line-2)}
+.step.done:not(:last-child)::after{background:var(--ok)}
+.step .t{font-size:13.5px;font-weight:600}
+.step .s{font-size:12px;color:var(--faint)}
+.step .when{margin-left:auto;font-size:11.5px;color:var(--faint);font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
+
+/* ---------- DNS ---------- */
+.dns{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px}
+.dns th{text-align:left;font-family:var(--ui);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--line-2)}
+.dns td{padding:9px 10px;border-bottom:1px solid var(--line-2);word-break:break-all}
+.dns tr:last-child td{border-bottom:none}
+
+/* ---------- Tenants table ---------- */
+table.tt{width:100%;border-collapse:collapse}
+table.tt th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:700;padding:10px 14px;border-bottom:1px solid var(--line-2)}
+table.tt td{padding:12px 14px;border-bottom:1px solid var(--line-2);font-size:13.5px;vertical-align:middle}
+table.tt tr:last-child td{border-bottom:none}
+table.tt tbody tr:hover{background:var(--surface-2)}
+.tname{display:flex;align-items:center;gap:10px}
+.tav{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:700;font-size:12px;color:#fff;flex:none}
+.rowsub{color:var(--faint);font-size:12px}
+
+/* ---------- Activity ---------- */
+.act{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid var(--line-2);font-size:13px;align-items:flex-start}
+.act:last-child{border-bottom:none}
+.act .ai{width:26px;height:26px;border-radius:7px;background:var(--line-2);display:grid;place-items:center;font-size:12px;color:var(--muted);flex:none}
+.act .aw{margin-left:auto;color:var(--faint);font-size:11.5px;white-space:nowrap;padding-left:10px}
+
+/* ---------- Tiles ---------- */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:760px){.tiles{grid-template-columns:1fr}}
+.tile{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--surface);cursor:pointer;box-shadow:var(--shadow)}
+.tile:hover{background:var(--surface-2);border-color:#c9d0fb}
+.tile .ti{font-size:17px}
+.tile .tt2{font-weight:650;font-size:14px;margin-top:7px}
+.tile .td{color:var(--muted);font-size:12px;margin-top:2px}
+
+/* ---------- Toasts ---------- */
+.toastwrap{position:fixed;right:20px;bottom:20px;z-index:50;display:flex;flex-direction:column;gap:9px;align-items:flex-end}
+.toast{background:#12141a;color:#fff;border-radius:10px;padding:11px 14px;font-size:13px;display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-lg);max-width:400px}
+.toast.warn .ti{color:#f5c451}
+.toast .x{margin-left:6px;opacity:.55;cursor:pointer}
+
+/* ---------- Mock annotations ---------- */
+.anno{border-left:3px solid var(--brand);background:var(--brand-weak);padding:11px 14px;border-radius:0 9px 9px 0;font-size:12.5px;color:#31356b;margin-bottom:18px}
+.anno b{color:#1e2154}
+.anno code{background:rgba(255,255,255,.6)}
+.statebar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:16px;font-size:12.5px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:9px 13px}
+.statebar .seg button{padding:5px 11px;font-size:12px;font-weight:600}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- ============ MOCK CONTROL BAR (not part of the product UI) ============ -->
+<div class="rolebar">
+  <b>Viewing as</b>
+  <div class="seg">
+    <button id="rb-super" class="on" onclick="setRole('super')">Super admin</button>
+    <button id="rb-owner" onclick="setRole('owner')">Tenant owner</button>
+  </div>
+  <span class="url" id="urlbar">/tenants/9f3c…a71</span>
+  <span class="note">Design reference · tenant pages before &amp; after provisioning · 2026-08-26</span>
+</div>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="side">
+    <div class="brand">
+      <div class="logo">V</div>
+      <div><b>Valstack</b><br><span>admin · admin.valstack.dev</span></div>
+    </div>
+
+    <div class="switcher" id="switcher" title="Owner tree only, and only when the owner holds more than one membership">
+      <div class="av">NF</div>
+      <div class="meta"><b>Northwind Field Notes</b><small>switch site · 2 of yours</small></div>
+      <div class="chev">⌄</div>
+    </div>
+
+    <div class="navgroup" id="grp-platform">
+      <div class="lbl">Platform</div>
+      <nav class="nav">
+        <a data-page="tenants"><span class="ic">▤</span> Tenants</a>
+        <a data-page="new"><span class="ic">＋</span> Add tenant</a>
+      </nav>
+    </div>
+
+    <div class="navgroup">
+      <div class="lbl" id="grp-tenant-lbl">Tenant · Northwind</div>
+      <nav class="nav" id="nav-tenant">
+        <a data-page="home" class="active"><span class="ic">◈</span> Overview</a>
+        <a data-page="look"><span class="ic">◑</span> Look</a>
+        <a data-page="voice"><span class="ic">❝</span> Voice</a>
+        <a data-page="features"><span class="ic">⚑</span> Features</a>
+        <a data-page="domainpending"><span class="ic">⌗</span> Domain</a>
+        <a class="soon"><span class="ic">✉</span> Email <span class="pill">later</span></a>
+        <a class="soon"><span class="ic">☰</span> Subscribers <span class="pill">later</span></a>
+        <a class="soon"><span class="ic">❐</span> Comments <span class="pill">later</span></a>
+        <a class="soon"><span class="ic">◍</span> Team <span class="pill">later</span></a>
+        <div class="navsep" data-super="1"></div>
+        <a data-page="provisioning" class="plat" data-super="1"><span class="ic">⚙</span> Provisioning <span class="pill">platform</span></a>
+        <a data-page="danger" class="plat" data-super="1"><span class="ic">⚠</span> Danger zone <span class="pill">platform</span></a>
+      </nav>
+    </div>
+
+    <div class="foot" id="sidefoot"></div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <div class="topbar">
+      <nav class="bc" id="bc" aria-label="Breadcrumb"></nav>
+      <div class="role">
+        <span class="rolechip" id="rolechip"></span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ===================== TENANTS LIST ===================== -->
+      <section class="page" id="page-tenants">
+        <div class="pagehead">
+          <div>
+            <h1 class="h1">Tenants</h1>
+            <p class="sub">Every site on the platform. Gated by the <code>admins</code> row.</p>
+          </div>
+          <div class="actions"><button class="btn pri" onclick="go('new')">＋ Add tenant</button></div>
+        </div>
+
+        <div class="anno"><b>This table replaces the sidebar tenant switcher.</b> The switcher in the platform tree was hardcoded to a one-element list and could never switch anything; a dropdown is also the wrong shape for a list spanning the whole platform. It is dropped here and survives only in the owner tree, where it renders solely for an owner holding more than one membership.</div>
+
+        <div class="anno"><b>Item 8 — what <code>Manage →</code> does now.</b> It routes on <code>provisioningStatus</code>: <code>READY</code> opens the tenant overview, anything else opens that tenant's provisioning page. It never lands on the provisioning screen for a finished tenant.</div>
+
+        <div class="card">
+          <table class="tt">
+            <thead><tr><th>Tenant</th><th>Plan</th><th>Status</th><th>Created</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td><div class="tname"><div class="tav" style="background:#4f46e5">NF</div><div><div>Northwind Field Notes</div><div class="rowsub">northwind.dev</div></div></div></td>
+                <td><span class="badge b-plan">Growth</span></td>
+                <td><span class="badge b-ok"><span class="d"></span>Active</span></td>
+                <td>12 Aug 2026</td>
+                <td><button class="btn sm ghost" onclick="setProvState('ready');go('home')">Manage →</button></td>
+              </tr>
+              <tr>
+                <td><div class="tname"><div class="tav" style="background:#0891b2">HB</div><div><div>Harbour Books</div><div class="rowsub">harbourbooks.co</div></div></div></td>
+                <td><span class="badge b-plan">Free</span></td>
+                <td><span class="badge b-warn"><span class="d"></span>Provisioning</span></td>
+                <td>26 Aug 2026</td>
+                <td><button class="btn sm ghost" onclick="setProvState('running');go('provisioning')">Manage →</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== TENANT OVERVIEW ===================== -->
+      <section class="page active" id="page-home">
+        <div class="pagehead">
+          <div>
+            <h1 class="h1"><span id="home-name">Northwind Field Notes</span>
+              <span class="badge" id="home-status"></span>
+              <span class="badge b-plan">Growth</span>
+            </h1>
+            <p class="sub" id="home-sub"></p>
+          </div>
+          <div class="actions">
+            <a class="btn" href="#" onclick="return false">Open site ↗</a>
+            <a class="btn" href="#" onclick="return false" data-super="1">Open Studio ↗</a>
+          </div>
+        </div>
+
+        <div class="statebar">
+          <b style="color:var(--text)">Mock control</b>
+          <span>· provisioning state:</span>
+          <div class="seg" id="stateseg">
+            <button data-st="idle" onclick="setProvState('idle')">Not started</button>
+            <button data-st="running" onclick="setProvState('running')">Provisioning</button>
+            <button data-st="failed" onclick="setProvState('failed')">Failed</button>
+            <button data-st="ready" class="on" onclick="setProvState('ready')">Ready</button>
+          </div>
+          <span style="color:var(--faint)">drives the banner <em>and</em> the field locks below</span>
+        </div>
+
+        <!-- provisioning banners -->
+        <div class="banner idle hide" id="bn-idle">
+          <span class="i">○</span>
+          <div class="tx"><b>Not provisioned yet</b><span>Details are still fully editable. Provisioning locks them as each step completes.</span></div>
+          <button class="btn pri sm" data-super="1" onclick="setProvState('running')">Start provisioning</button>
+        </div>
+        <div class="banner warn hide" id="bn-running">
+          <span class="i">◐</span>
+          <div class="tx"><b>Provisioning — step 3 of 6</b><span>Deploying the content editor. This page updates on its own.</span></div>
+          <button class="btn sm" data-super="1" onclick="go('provisioning')">View steps →</button>
+        </div>
+        <div class="banner bad hide" id="bn-failed">
+          <span class="i">!</span>
+          <div class="tx"><b>Provisioning failed at step 5 of 6</b><span>Connect the custom domain — already in use by another tenant.</span></div>
+          <button class="btn sm" data-super="1" onclick="go('provisioning')">View steps →</button>
+        </div>
+        <div class="banner ok" id="bn-ready">
+          <span class="i">✓</span>
+          <div class="tx"><b>Provisioned</b><span>All six steps completed 12 Aug 2026, 14:22.</span></div>
+          <button class="btn sm" data-super="1" onclick="go('provisioning')">View steps →</button>
+        </div>
+
+        <!-- ---------- TENANT DETAILS: editable form (super admin) ---------- -->
+        <div class="card mb18" data-super="1">
+          <div class="hd">
+            <h3>Tenant details</h3>
+            <div class="right"><span class="badge b-neutral" id="lockcount"></span></div>
+          </div>
+          <div class="bd">
+            <div class="anno" style="margin-bottom:18px" id="lockexplain"></div>
+            <div class="fgrid">
+              <div class="field" id="f-name">
+                <label for="d-name">Name <span class="lockicon">🔒</span></label>
+                <input class="inp" id="d-name" value="Northwind Field Notes" />
+                <div class="why"><span>🔒</span><span class="whytx"></span></div>
+              </div>
+              <div class="field" id="f-slug">
+                <label for="d-slug">Slug <span class="lockicon">🔒</span></label>
+                <input class="inp mono" id="d-slug" value="northwind" />
+                <div class="hint">Studio hostname only — <code>studio-northwind.valstack.dev</code>. Never the public address.</div>
+                <div class="why"><span>🔒</span><span class="whytx"></span></div>
+              </div>
+              <div class="field" id="f-domain">
+                <label for="d-domain">Primary domain <span class="lockicon">🔒</span></label>
+                <input class="inp mono" id="d-domain" value="northwind.dev" />
+                <div class="why"><span>🔒</span><span class="whytx"></span></div>
+              </div>
+              <div class="field" id="f-owner">
+                <label for="d-owner">Owner email <span class="lockicon">🔒</span></label>
+                <input class="inp mono" id="d-owner" value="sam@northwind.dev" />
+                <div class="why"><span>🔒</span><span class="whytx"></span></div>
+              </div>
+              <div class="field" id="f-plan">
+                <label>Plan <span class="lockicon">🔒</span></label>
+                <div class="seg" id="planseg">
+                  <button>Free</button><button class="on">Growth</button>
+                </div>
+                <div class="why"><span>🔒</span><span class="whytx"></span></div>
+              </div>
+              <div class="field" id="f-locale">
+                <label for="d-locale">Locale <span class="lockicon">🔒</span></label>
+                <input class="inp mono" id="d-locale" value="en" />
+                <div class="why"><span>🔒</span><span class="whytx"></span></div>
+              </div>
+            </div>
+          </div>
+          <div class="ft">
+            <button class="btn pri" id="savebtn" onclick="toast('Tenant details saved.')">Save changes</button>
+            <span style="color:var(--faint);font-size:12px" id="savenote"></span>
+          </div>
+        </div>
+
+        <!-- ---------- TENANT DETAILS: read-only (owner) ---------- -->
+        <div class="card mb18" data-owner="1">
+          <div class="hd"><h3>Your site</h3><div class="right"><span class="badge b-neutral">read-only</span></div></div>
+          <div class="bd">
+            <dl class="dl">
+              <dt>Name</dt><dd><span class="v">Northwind Field Notes</span></dd>
+              <dt>Public domain</dt><dd><span class="v mono">northwind.dev</span><a class="btn sm ghost" href="#" onclick="return false">↗</a></dd>
+              <dt>Plan</dt><dd><span class="badge b-plan">Growth</span></dd>
+              <dt>Locale</dt><dd><span class="v">en</span></dd>
+            </dl>
+            <p style="color:var(--faint);font-size:12px;margin:14px 0 0">Need one of these changed? Ask your platform contact — these values are wired into your site's hosting.</p>
+          </div>
+        </div>
+
+        <div class="cards">
+          <div class="stack">
+            <div class="card">
+              <div class="hd"><h3>Domain</h3><div class="right"><span class="badge b-ok" id="dnsbadge"><span class="d"></span>Verified</span><button class="btn sm ghost" onclick="go('domainpending')">DNS →</button></div></div>
+              <div class="bd">
+                <dl class="dl">
+                  <dt>Public domain</dt><dd><span class="v mono">northwind.dev</span></dd>
+                  <dt>Last checked</dt><dd><span class="v">2 minutes ago</span></dd>
+                </dl>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="hd"><h3>Owner</h3><div class="right" data-super="1"><button class="btn sm ghost">Manage access</button></div></div>
+              <div class="bd">
+                <dl class="dl">
+                  <dt>Email</dt><dd><span class="v mono">sam@northwind.dev</span></dd>
+                  <dt>Role</dt><dd><span class="badge b-neutral">OWNER</span></dd>
+                  <dt>Joined</dt><dd><span class="v">12 Aug 2026</span></dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+
+          <div class="stack">
+            <div class="card" data-super="1">
+              <div class="hd"><h3>Content workspace</h3><div class="right"><span class="badge b-neutral">platform</span></div></div>
+              <div class="bd">
+                <dl class="dl">
+                  <dt>Sanity project</dt><dd><span class="v mono">7fq2zx01</span></dd>
+                  <dt>Dataset</dt><dd><span class="v mono">production</span></dd>
+                  <dt>Studio</dt><dd><span class="v mono">studio-northwind.valstack.dev</span></dd>
+                  <dt>Read token</dt><dd><span class="badge b-ok"><span class="d"></span>Stored</span></dd>
+                  <dt>Revalidate hook</dt><dd><span class="badge b-ok"><span class="d"></span>Active</span></dd>
+                </dl>
+              </div>
+            </div>
+
+            <div class="card" data-super="1">
+              <div class="hd"><h3>Recent activity</h3><div class="right"><span class="desc">audit_events</span></div></div>
+              <div class="bd" style="padding-top:6px;padding-bottom:6px">
+                <div class="act"><div class="ai">◑</div><div><div>Look settings updated</div><div class="rowsub">sam@northwind.dev</div></div><div class="aw">2h ago</div></div>
+                <div class="act"><div class="ai">✓</div><div><div>Provisioning completed</div><div class="rowsub">github:ValOvinnikov</div></div><div class="aw">12 Aug</div></div>
+                <div class="act"><div class="ai">＋</div><div><div>Tenant created</div><div class="rowsub">vo@valstack.dev</div></div><div class="aw">12 Aug</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div data-owner="1" style="margin-top:18px">
+          <div class="card">
+            <div class="hd"><h3>Make it yours</h3><div class="right"><span class="desc">changes go live immediately</span></div></div>
+            <div class="bd">
+              <div class="tiles">
+                <div class="tile" onclick="go('look')"><div class="ti">◑</div><div class="tt2">Look</div><div class="td">Colours, fonts, logo, density</div></div>
+                <div class="tile" onclick="go('voice')"><div class="ti">❝</div><div class="tt2">Voice</div><div class="td">The words your site uses</div></div>
+                <div class="tile" onclick="go('features')"><div class="ti">⚑</div><div class="tt2">Features</div><div class="td">Comments, bookmarks, newsletter</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== PROVISIONING ===================== -->
+      <section class="page" id="page-provisioning">
+        <div class="pagehead">
+          <div>
+            <h1 class="h1">Provisioning <span class="badge" id="prov-badge"></span></h1>
+            <p class="sub">Northwind Field Notes · each step is independently resumable.</p>
+          </div>
+          <div class="actions"><button class="btn ghost" onclick="go('home')">← Back to tenant</button></div>
+        </div>
+
+        <div class="anno"><b>Provisioning only.</b> The editable tenant-details panel moved to the Overview, the deprovisioning controls moved to Danger zone, and the duplicate domain-verification card is gone. This is no longer where <code>Manage →</code> lands for a finished tenant.</div>
+
+        <div class="cards" style="grid-template-columns:1fr 340px">
+          <div class="card">
+            <div class="hd"><h3>Steps</h3><div class="right"><span class="badge" id="stepcount"></span></div></div>
+            <div class="bd">
+              <div class="steps" id="steplist"></div>
+            </div>
+          </div>
+
+          <div class="stack">
+            <div class="card">
+              <div class="hd"><h3>Run</h3></div>
+              <div class="bd">
+                <dl class="dl" style="grid-template-columns:104px 1fr">
+                  <dt>Started</dt><dd><span class="v">12 Aug, 14:18</span></dd>
+                  <dt>Finished</dt><dd><span class="v" id="run-finished">12 Aug, 14:22</span></dd>
+                  <dt>Registry</dt><dd><span class="badge b-neutral">production</span></dd>
+                </dl>
+                <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="btn sm" id="rerunbtn">Re-run</button>
+                  <a class="btn sm ghost" href="#" onclick="return false">Workflow log ↗</a>
+                </div>
+              </div>
+            </div>
+            <div class="card hide" id="errcard" style="border-color:#f2c9c5">
+              <div class="hd" style="border-bottom-color:#f7dedb"><h3 style="color:var(--bad)">Already in use by another tenant</h3></div>
+              <div class="bd">
+                <p style="margin:0 0 10px;color:var(--muted);font-size:13px">Something this step is trying to create — a project handle, an email invite, or a domain — is already claimed elsewhere.</p>
+                <p style="margin:0;color:var(--faint);font-size:12.5px">Resolve the conflict, then retry. The domain field on the Overview stays editable while a run is failed, so it can be corrected here.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== DANGER ZONE ===================== -->
+      <section class="page" id="page-danger">
+        <div class="pagehead">
+          <div>
+            <h1 class="h1">Danger zone</h1>
+            <p class="sub">Northwind Field Notes · <code>requireSuperAdmin</code>, stricter than the rest of this section.</p>
+          </div>
+        </div>
+
+        <div class="anno"><b>Moved, and tightened.</b> Deprovisioning used to sit permanently below the provisioning steps on a <code>requireAdmin</code> page — visible on every visit to a healthy tenant. It now has its own route, gated to SUPERADMIN.</div>
+
+        <div class="card" style="border-color:#f2c9c5">
+          <div class="hd" style="border-bottom-color:#f7dedb"><h3 style="color:var(--bad)">Deprovision this tenant</h3></div>
+          <div class="bd">
+            <p style="margin:0 0 14px;color:var(--muted);font-size:13px">Removes the custom domain, deletes the Studio project, and archives the Sanity project. The <code>tenants</code> row is archived, never hard-deleted — the slug stays claimed.</p>
+            <div class="field" style="max-width:280px">
+              <label for="d-confirm">Type <code>northwind</code> to confirm</label>
+              <input class="inp mono" id="d-confirm" placeholder="slug" />
+            </div>
+            <div style="margin-top:14px"><button class="btn danger" disabled>Deprovision tenant</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== DOMAIN ===================== -->
+      <section class="page" id="page-domainpending">
+        <div class="pagehead">
+          <div><h1 class="h1">Domain <span class="badge b-warn"><span class="d"></span>Awaiting DNS</span></h1>
+          <p class="sub">The one piece of setup that is genuinely yours to finish.</p></div>
+        </div>
+        <div class="card">
+          <div class="hd"><h3>Point northwind.dev at us</h3><div class="right"><span class="desc">checked 30s ago</span></div></div>
+          <div class="bd">
+            <p style="margin:0 0 14px;color:var(--muted);font-size:13px">Add these records at your DNS provider. Verification usually completes within an hour.</p>
+            <table class="dns">
+              <thead><tr><th>Type</th><th>Name</th><th>Value</th></tr></thead>
+              <tbody>
+                <tr><td>A</td><td>@</td><td>76.76.21.21</td></tr>
+                <tr><td>CNAME</td><td>www</td><td>cname.vercel-dns.com</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== SHARED / ELSEWHERE ===================== -->
+      <section class="page" id="page-look">
+        <div class="pagehead"><div><h1 class="h1">Look</h1><p class="sub">Unchanged by this design.</p></div></div>
+        <div class="banner info"><span class="i">i</span><div class="tx"><b>Same page, both roles.</b><span>Look, Voice and Features render the identical component in either tree — only the resolver in front of them differs. Full design in <code>admin-panel-mock.html</code>.</span></div></div>
+      </section>
+      <section class="page" id="page-voice">
+        <div class="pagehead"><div><h1 class="h1">Voice</h1><p class="sub">Unchanged by this design.</p></div></div>
+        <div class="banner info"><span class="i">i</span><div class="tx"><b>Same page, both roles.</b><span>20 override fields in 4 groups — see <code>admin-panel-mock.html</code>.</span></div></div>
+      </section>
+      <section class="page" id="page-features">
+        <div class="pagehead"><div><h1 class="h1">Features</h1><p class="sub">Unchanged by this design.</p></div></div>
+        <div class="banner info"><span class="i">i</span><div class="tx"><b>Same page, both roles.</b><span>Comments, bookmarks, ratings, newsletter toggles.</span></div></div>
+      </section>
+      <section class="page" id="page-new">
+        <div class="pagehead"><div><h1 class="h1">Add tenant</h1><p class="sub">Moves from <code>/add-tenant</code> to <code>/tenants/new</code>.</p></div></div>
+        <div class="banner info"><span class="i">i</span><div class="tx"><b>Covered separately.</b><span>The wizard chrome and copy fixes restore the step rail from <code>admin-panel-mock.html:404</code>. Not re-mocked here.</span></div></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="toastwrap" id="toasts"></div>
+
+<script>
+/* =========================================================
+   State
+   ========================================================= */
+var role = 'super';
+var page = 'home';
+var prov = 'ready';   /* idle | running | failed | ready */
+
+var TENANT = 'Northwind Field Notes';
+
+/* Breadcrumb trails. Each entry: [{label, page}] — last is current. */
+function trail(p){
+  if(role === 'owner'){
+    var own = {
+      home:         [{l:'Your site'}],
+      look:         [{l:'Your site', p:'home'}, {l:'Look'}],
+      voice:        [{l:'Your site', p:'home'}, {l:'Voice'}],
+      features:     [{l:'Your site', p:'home'}, {l:'Features'}],
+      domainpending:[{l:'Your site', p:'home'}, {l:'Domain'}]
+    };
+    return own[p] || own.home;
+  }
+  var t = [{l:'Platform'}, {l:'Tenants', p:'tenants'}];
+  var leaf = {
+    tenants:      [{l:'Platform'}, {l:'Tenants'}],
+    new:          t.concat([{l:'Add tenant'}]),
+    home:         t.concat([{l:TENANT}]),
+    provisioning: t.concat([{l:TENANT, p:'home'}, {l:'Provisioning'}]),
+    danger:       t.concat([{l:TENANT, p:'home'}, {l:'Danger zone'}]),
+    look:         t.concat([{l:TENANT, p:'home'}, {l:'Look'}]),
+    voice:        t.concat([{l:TENANT, p:'home'}, {l:'Voice'}]),
+    features:     t.concat([{l:TENANT, p:'home'}, {l:'Features'}]),
+    domainpending:t.concat([{l:TENANT, p:'home'}, {l:'Domain'}])
+  };
+  return leaf[p] || leaf.home;
+}
+
+var URLS = {
+  tenants:'/tenants', new:'/tenants/new', home:'/tenants/9f3c…a71',
+  provisioning:'/tenants/9f3c…a71/provisioning', danger:'/tenants/9f3c…a71/danger',
+  look:'/tenants/9f3c…a71/look', voice:'/tenants/9f3c…a71/voice',
+  features:'/tenants/9f3c…a71/features', domainpending:'/tenants/9f3c…a71/domain'
+};
+var OWNER_URLS = {
+  home:'/dashboard', look:'/dashboard/look', voice:'/dashboard/voice',
+  features:'/dashboard/features', domainpending:'/dashboard/domain'
+};
+var OWNER_PAGES = ['home','look','voice','features','domainpending'];
+
+/* =========================================================
+   Field locks — mirrors computeTenantFieldLocks exactly.
+   IDLE      → nothing locked
+   RUNNING   → every field locked ("running")
+   FAILED    → only fields a COMPLETED step baked into an external
+               resource: slug once DEPLOY_STUDIO is DONE, domain once
+               MAP_DOMAIN is DONE. The field that caused the failure
+               stays editable — that is the entire point.
+   SUCCEEDED → every field locked ("succeeded")
+   ========================================================= */
+var FIELDS = ['name','slug','domain','owner','plan','locale'];
+var REASON = {
+  running:   'Locked while provisioning is running.',
+  succeeded: 'Locked — provisioning has already finished.',
+  studio:    'Locked — the "Deploy the content editor" step has already completed and used this value.',
+  mapdomain: 'Locked — the "Connect the custom domain" step has already completed and used this value.'
+};
+
+function locksFor(state){
+  if(state === 'idle') return {};
+  if(state === 'failed') return { slug: REASON.studio };  /* MAP_DOMAIN is the step that FAILED, so domain stays editable */
+  var r = state === 'ready' ? REASON.succeeded : REASON.running;
+  var out = {};
+  for(var i=0;i<FIELDS.length;i++) out[FIELDS[i]] = r;
+  return out;
+}
+
+var EXPLAIN = {
+  idle:    '<b>Nothing has run yet.</b> Every field is editable. Each provisioning step locks whatever it bakes into an external resource, so this is the last moment all six can be changed freely.',
+  running: '<b>A run is in progress.</b> All six fields are locked until it settles — a value changing mid-run would desync the tenant row from the resources being created.',
+  failed:  '<b>The run failed at "Connect the custom domain".</b> Only <code>slug</code> is locked, because the Studio was already deployed to it. The domain stays <em>editable</em> so the value that caused the failure can be corrected, then retried.',
+  ready:   '<b>Provisioning finished.</b> All six fields are locked — each one is now baked into a live Sanity project, Studio deployment, or domain mapping.'
+};
+
+var STATUS_BADGE = {
+  idle:    ['b-neutral','Draft'],
+  running: ['b-warn','Provisioning'],
+  failed:  ['b-bad','Failed'],
+  ready:   ['b-ok','Active']
+};
+
+var STEPS = [
+  ['Create the content workspace','Sanity project + production dataset','14:18'],
+  ['Add starter content','Singletons, one starter post, navigation','14:19'],
+  ['Deploy the content editor','studio-northwind.valstack.dev','14:21'],
+  ['Connect the site to its content','Read token encrypted and stored','14:21'],
+  ['Connect the custom domain','northwind.dev mapped to the web project','14:22'],
+  ['Wire up the CMS to the site','Publish webhook → /api/revalidate','14:22']
+];
+/* how many steps are DONE, and which (if any) is running/failed, per state */
+var STEP_PROGRESS = { idle:{done:0}, running:{done:2,running:2}, failed:{done:4,failed:4}, ready:{done:6} };
+
+/* =========================================================
+   Render
+   ========================================================= */
+function renderBreadcrumbs(){
+  var items = trail(page);
+  var html = '';
+  for(var i=0;i<items.length;i++){
+    if(i) html += '<span class="sep">›</span>';
+    var it = items[i];
+    html += (i === items.length - 1 || !it.p)
+      ? '<span class="cur">' + it.l + '</span>'
+      : '<a onclick="go(\'' + it.p + '\')">' + it.l + '</a>';
+  }
+  document.getElementById('bc').innerHTML = html;
+}
+
+function renderRoleChip(){
+  /* The platform tree reports the PLATFORM role from the `admins` row.
+     The owner tree reports the real `memberships` role. A super admin must
+     never be labelled OWNER just because the tenant gate handed back a
+     virtual OWNER-level membership — that is the live defect this fixes. */
+  var el = document.getElementById('rolechip');
+  el.innerHTML = role === 'super'
+    ? '<span class="who" style="background:#312e81;color:#c7d2fe">VO</span><span class="dot"></span> SUPERADMIN <span class="scope">· Platform</span>'
+    : '<span class="who">SN</span><span class="dot"></span> OWNER <span class="scope">· Northwind</span>';
+}
+
+function renderLocks(){
+  var locks = locksFor(prov);
+  var n = 0;
+  for(var i=0;i<FIELDS.length;i++){
+    var k = FIELDS[i];
+    var el = document.getElementById('f-' + k);
+    if(!el) continue;
+    var why = locks[k];
+    el.classList.toggle('locked', !!why);
+    var tx = el.querySelector('.whytx');
+    if(tx) tx.textContent = why || '';
+    var input = el.querySelector('input');
+    if(input) input.disabled = !!why;
+    var segBtns = el.querySelectorAll('.seg button');
+    for(var j=0;j<segBtns.length;j++) segBtns[j].disabled = !!why;
+    if(why) n++;
+  }
+  var all = n === FIELDS.length;
+  document.getElementById('savebtn').disabled = all;
+  document.getElementById('savenote').textContent = all
+    ? 'Nothing editable in this state.'
+    : (n ? (FIELDS.length - n) + ' of ' + FIELDS.length + ' fields editable' : 'All fields editable');
+  var lc = document.getElementById('lockcount');
+  lc.textContent = n ? n + ' of ' + FIELDS.length + ' locked' : 'fully editable';
+  lc.className = 'badge ' + (n === FIELDS.length ? 'b-neutral' : n ? 'b-warn' : 'b-ok');
+  document.getElementById('lockexplain').innerHTML = EXPLAIN[prov];
+}
+
+function renderBanners(){
+  var ids = ['idle','running','failed','ready'];
+  for(var i=0;i<ids.length;i++){
+    document.getElementById('bn-' + ids[i]).classList.toggle('hide', ids[i] !== prov);
+  }
+  var sb = STATUS_BADGE[prov];
+  var el = document.getElementById('home-status');
+  el.className = 'badge ' + sb[0];
+  el.innerHTML = '<span class="d"></span>' + sb[1];
+  document.getElementById('home-sub').innerHTML = role === 'super'
+    ? "The tenant's home in the Platform section. Everything below is read from its <code>tenants</code> row."
+    : 'Your site at a glance. Everything here is live.';
+  var dns = document.getElementById('dnsbadge');
+  if(prov === 'ready'){ dns.className = 'badge b-ok'; dns.innerHTML = '<span class="d"></span>Verified'; }
+  else if(prov === 'idle'){ dns.className = 'badge b-neutral'; dns.innerHTML = '<span class="d"></span>Not added yet'; }
+  else { dns.className = 'badge b-warn'; dns.innerHTML = '<span class="d"></span>Pending'; }
+}
+
+function renderSteps(){
+  var p = STEP_PROGRESS[prov];
+  var html = '';
+  for(var i=0;i<STEPS.length;i++){
+    var cls = '', glyph = String(i + 1), when = '';
+    if(i < p.done){ cls = 'done'; glyph = '✓'; when = STEPS[i][2]; }
+    else if(p.running === i){ cls = 'running'; glyph = '◐'; when = 'now'; }
+    else if(p.failed === i){ cls = 'failed'; glyph = '!'; when = 'failed'; }
+    html += '<div class="step ' + cls + '"><div class="n">' + glyph + '</div>' +
+            '<div><div class="t">' + STEPS[i][0] + '</div><div class="s">' + STEPS[i][1] + '</div></div>' +
+            '<div class="when">' + when + '</div></div>';
+  }
+  document.getElementById('steplist').innerHTML = html;
+
+  var sc = document.getElementById('stepcount');
+  sc.textContent = p.done + ' of ' + STEPS.length + ' done';
+  sc.className = 'badge ' + (prov === 'ready' ? 'b-ok' : prov === 'failed' ? 'b-bad' : 'b-neutral');
+
+  var pb = document.getElementById('prov-badge');
+  var sb = { idle:['b-neutral','Not started'], running:['b-warn','Running'], failed:['b-bad','Failed'], ready:['b-ok','Complete'] }[prov];
+  pb.className = 'badge ' + sb[0];
+  pb.innerHTML = '<span class="d"></span>' + sb[1];
+
+  document.getElementById('errcard').classList.toggle('hide', prov !== 'failed');
+  document.getElementById('run-finished').textContent = prov === 'ready' ? '12 Aug, 14:22' : '—';
+  var rb = document.getElementById('rerunbtn');
+  rb.textContent = prov === 'failed' ? '↻ Retry' : prov === 'idle' ? 'Start provisioning' : 'Re-run';
+  rb.className = 'btn sm' + (prov === 'failed' || prov === 'idle' ? ' pri' : '');
+}
+
+function renderAll(){
+  renderBreadcrumbs(); renderRoleChip(); renderLocks(); renderBanners(); renderSteps();
+}
+
+/* =========================================================
+   Navigation + role
+   ========================================================= */
+function go(p){
+  if(role === 'owner' && OWNER_PAGES.indexOf(p) === -1) return;
+  page = p;
+  var secs = document.querySelectorAll('.page');
+  for(var i=0;i<secs.length;i++) secs[i].classList.remove('active');
+  var el = document.getElementById('page-' + p);
+  if(el) el.classList.add('active');
+  var links = document.querySelectorAll('.nav a');
+  for(var j=0;j<links.length;j++) links[j].classList.toggle('active', links[j].dataset.page === p);
+  document.getElementById('urlbar').textContent = (role === 'owner' ? OWNER_URLS[p] : URLS[p]) || '';
+  renderAll();
+  window.scrollTo({top:0});
+}
+
+function setProvState(s){
+  prov = s;
+  var btns = document.querySelectorAll('#stateseg button');
+  for(var i=0;i<btns.length;i++) btns[i].classList.toggle('on', btns[i].dataset.st === s);
+  renderAll();
+}
+
+function setRole(r){
+  role = r;
+  var isSuper = r === 'super';
+  document.getElementById('rb-super').classList.toggle('on', isSuper);
+  document.getElementById('rb-owner').classList.toggle('on', !isSuper);
+
+  document.getElementById('grp-platform').classList.toggle('hide', !isSuper);
+  var sup = document.querySelectorAll('[data-super="1"]');
+  for(var i=0;i<sup.length;i++) sup[i].classList.toggle('hide', !isSuper);
+  var own = document.querySelectorAll('[data-owner="1"]');
+  for(var j=0;j<own.length;j++) own[j].classList.toggle('hide', isSuper);
+  var soon = document.querySelectorAll('.nav a.soon');
+  for(var k=0;k<soon.length;k++) soon[k].classList.toggle('hide', !isSuper);
+
+  document.getElementById('grp-tenant-lbl').textContent = isSuper ? 'Tenant · Northwind' : 'Your site';
+  /* Dropped from the platform tree: it was hardcoded to a single-element
+     list, so it could never switch anything, and `/tenants` is a better
+     switcher for a list that spans the whole platform. Survives only in the
+     owner tree, where the layout already renders it solely when
+     `tenants.length > 1`. */
+  document.getElementById('switcher').classList.toggle('hide', isSuper);
+  document.getElementById('sidefoot').innerHTML = isSuper
+    ? 'Super admin · <code>admins</code> gate<br>Routes under <code>/tenants/{id}</code>'
+    : 'Owner · <code>memberships</code> gate<br>Routes under <code>/dashboard</code>, slug-free';
+
+  if(role === 'owner' && OWNER_PAGES.indexOf(page) === -1) go('home'); else go(page);
+}
+
+/* =========================================================
+   Toasts (item 6)
+   ========================================================= */
+function toast(msg, kind){
+  var wrap = document.getElementById('toasts');
+  var el = document.createElement('div');
+  el.className = 'toast' + (kind ? ' ' + kind : '');
+  el.innerHTML = '<span class="ti">' + (kind === 'warn' ? '⚠' : '✓') + '</span><span>' + msg + '</span><span class="x">×</span>';
+  el.querySelector('.x').onclick = function(){ if(el.parentNode) wrap.removeChild(el); };
+  wrap.appendChild(el);
+  setTimeout(function(){ if(el.parentNode) wrap.removeChild(el); }, 4200);
+}
+
+var navLinks = document.querySelectorAll('.nav a');
+for(var n=0;n<navLinks.length;n++){
+  (function(a){
+    if(!a.dataset.page) return;
+    a.addEventListener('click', function(){ go(a.dataset.page); });
+  })(navLinks[n]);
+}
+
+setRole('super');
+setTimeout(function(){ toast("Couldn't refresh the latest status — retrying automatically.", 'warn'); }, 900);
+</script>
+</body>
+</html>
