@@ -1,11 +1,17 @@
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { notFound } from 'next/navigation';
 
 import { GenericPage } from './generic-page';
 
 const { getPageMock, moduleRendererMock } = vi.hoisted(() => ({
   getPageMock: vi.fn(),
+  // `ModuleRenderer` is an async Server Component — real RSC async-component
+  // nesting isn't renderable through `@testing-library/react`'s client
+  // renderer. Stubbed as a plain sync component so this suite can assert
+  // `GenericPage` passes the right props through without needing a real
+  // async render; its own dispatch logic is covered by
+  // `module-renderer.test.tsx`. `GenericPageView`'s own rendering (h1,
+  // breadcrumbs, JSON-LD) is covered by `generic-page-view.test.tsx`.
   moduleRendererMock: vi.fn(({ modules }: { modules: { id: string }[] }) => (
     <div data-testid="module-renderer">{modules.length} modules</div>
   )),
@@ -78,17 +84,7 @@ describe(`<${GenericPage.name}/>`, () => {
   it('renders the page title as the h1', async () => {
     getPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        title: 'About Us',
-        slug: 'about-us',
-        modules: [],
-        seo: makeSeo({
-          title: 'About Us',
-          description: 'Who we are.',
-          ogTitle: 'About Us',
-          ogDescription: 'Who we are.',
-        }),
-      },
+      data: { title: 'About Us', slug: 'about-us', modules: [] },
     });
 
     await setup();
@@ -98,43 +94,10 @@ describe(`<${GenericPage.name}/>`, () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the ModuleRenderer with the fetched modules', async () => {
+  it('passes an empty modules array to ModuleRenderer when the editor has not added any', async () => {
     getPageMock.mockResolvedValue({
       ok: true,
-      data: {
-        title: 'About Us',
-        slug: 'about-us',
-        modules: [{ id: 'module-1', type: 'module_content' }],
-        seo: makeSeo({
-          title: 'About Us',
-          description: 'Who we are.',
-          ogTitle: 'About Us',
-          ogDescription: 'Who we are.',
-        }),
-      },
-    });
-
-    await setup();
-
-    expect(screen.getByTestId('module-renderer')).toHaveTextContent(
-      '1 modules',
-    );
-  });
-
-  it('passes the fetched modules and locale to ModuleRenderer', async () => {
-    getPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        title: 'About Us',
-        slug: 'about-us',
-        modules: [],
-        seo: makeSeo({
-          title: 'About Us',
-          description: 'Who we are.',
-          ogTitle: 'About Us',
-          ogDescription: 'Who we are.',
-        }),
-      },
+      data: { title: 'About Us', slug: 'about-us', modules: [] },
     });
 
     await setup();
@@ -145,6 +108,30 @@ describe(`<${GenericPage.name}/>`, () => {
     );
   });
 
+  it('passes the fetched modules and locale through to ModuleRenderer when an editor has added some', async () => {
+    getPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        title: 'About Us',
+        slug: 'about-us',
+        modules: [{ id: 'module-1', type: 'module_content' }],
+      },
+    });
+
+    await setup();
+
+    expect(moduleRendererMock).toHaveBeenCalledWith(
+      {
+        modules: [{ id: 'module-1', type: 'module_content' }],
+        locale: 'EN',
+      },
+      undefined,
+    );
+    expect(screen.getByTestId('module-renderer')).toHaveTextContent(
+      '1 modules',
+    );
+  });
+
   it('renders ModuleRenderer as a direct child of main, with no constrained wrapper around it', async () => {
     getPageMock.mockResolvedValue({
       ok: true,
@@ -152,12 +139,6 @@ describe(`<${GenericPage.name}/>`, () => {
         title: 'About Us',
         slug: 'about-us',
         modules: [{ id: 'module-1', type: 'module_content' }],
-        seo: makeSeo({
-          title: 'About Us',
-          description: 'Who we are.',
-          ogTitle: 'About Us',
-          ogDescription: 'Who we are.',
-        }),
       },
     });
 
@@ -167,90 +148,5 @@ describe(`<${GenericPage.name}/>`, () => {
     const moduleRenderer = screen.getByTestId('module-renderer');
 
     expect(moduleRenderer.parentElement).toBe(main);
-  });
-
-  it('renders the Home › {title} breadcrumbs trail', async () => {
-    getPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        title: 'About Us',
-        slug: 'about-us',
-        modules: [],
-        seo: makeSeo({
-          title: 'About Us',
-          description: 'Who we are.',
-          ogTitle: 'About Us',
-          ogDescription: 'Who we are.',
-        }),
-      },
-    });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-
-    const homeLink = within(nav).getByRole('link', { name: 'Home' });
-    expect(homeLink).toHaveAttribute('href', '/');
-
-    const current = within(nav).getByText('About Us');
-    expect(current).toHaveAttribute('aria-current', 'page');
-    expect(current.tagName).not.toBe('A');
-  });
-
-  it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
-    getPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        title: 'About Us',
-        slug: 'about-us',
-        modules: [],
-        seo: makeSeo({
-          title: 'About Us',
-          description: 'Who we are.',
-          ogTitle: 'About Us',
-          ogDescription: 'Who we are.',
-        }),
-      },
-    });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-    const main = screen.getByRole('main');
-
-    expect(main.contains(nav)).toBe(false);
-    expect(
-      nav.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-  });
-
-  it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    getPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        title: 'About Us',
-        slug: 'about-us',
-        modules: [],
-        seo: makeSeo({
-          title: 'About Us',
-          description: 'Who we are.',
-          ogTitle: 'About Us',
-          ogDescription: 'Who we are.',
-        }),
-      },
-    });
-
-    const { container } = await setup();
-
-    const scripts = container.querySelectorAll(
-      'script[type="application/ld+json"]',
-    );
-    const breadcrumbScript = Array.from(scripts).find((script) =>
-      script.textContent?.includes('"@type":"BreadcrumbList"'),
-    );
-    expect(breadcrumbScript).toBeDefined();
-    expect(breadcrumbScript?.textContent).toContain(
-      '"item":"https://example.com/about-us"',
-    );
   });
 });
