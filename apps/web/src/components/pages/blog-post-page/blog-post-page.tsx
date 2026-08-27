@@ -8,25 +8,7 @@ import {
 } from '@blog/config';
 import { getSanityImageBaseUrl, service } from '@blog/service';
 import { Icon } from '@blog/ui/atoms/icon';
-import {
-  Breadcrumbs,
-  type IBreadcrumbItem,
-} from '@blog/ui/molecules/breadcrumbs';
-import { Article } from '@blog/ui/organisms/article';
-import { PostsSection } from '@blog/ui/organisms/posts-section';
-import { BackToTopButton } from '@web/components/shared/back-to-top-button';
-import { BookmarkButton } from '@web/components/shared/bookmark-button';
-import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
-import { DepthToggle } from '@web/components/shared/depth-toggle';
-import { JsonLd } from '@web/components/shared/json-ld';
-import { NewsletterForm } from '@web/components/shared/newsletter-form';
-import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
-import { PostContentsRail } from '@web/components/shared/post-contents-rail';
-import { PostShare } from '@web/components/shared/post-share';
-import { SanityImage } from '@web/components/shared/sanity-image';
-import { SkimPanel } from '@web/components/shared/skim-panel';
-import { SmartLink } from '@web/components/shared/smart-link';
-import { DepthProvider } from '@web/context/depth-provider';
+import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
@@ -42,15 +24,16 @@ import { toSocialIconName } from '@web/utils/to-social-icon-name';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
-import { blogPostPageVariants } from './blog-post-page-variants';
+import { BlogPostPageView } from './blog-post-page-view';
 
 type TBlogPostPageProps = { slug: string };
 
-const s = blogPostPageVariants();
-
 /**
  * `/blog/{slug}` composition. Site chrome (`Header`/`Footer`) stays owned by
- * `[locale]/layout.tsx`, not this component.
+ * `[locale]/layout.tsx`, not this component. Resolves every async concern
+ * (the post fetch, next-intl translations/formatting, the newsletter
+ * settings + bookmarks-capability checks) and hands the result to the pure
+ * `BlogPostPageView`.
  */
 export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
   const result = await service.pages.post.v1.getPost(slug);
@@ -85,16 +68,10 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
 
   const headings = extractPostHeadings(body);
   const hasContentsRail = headings.length >= MIN_H2_HEADINGS_FOR_RAIL;
-  const hasSkim = Boolean(skim);
-  const footerTags = tags.map((tag) => ({
-    label: tag.title,
-    href: routes.tag(tag.slug),
-  }));
-
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
   const imageBaseUrl = getSanityImageBaseUrl();
   const url = `${siteUrl}${routes.post(slug)}`;
-  const schema = buildBlogPostingSchema(post, siteUrl);
+  const blogPostingSchema = buildBlogPostingSchema(post, siteUrl);
   const shareLinks = buildShareLinks({ url, title }).map((link) => ({
     ...link,
     icon: (
@@ -130,13 +107,19 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
       error: newsletterSettingsResult.error,
     });
   }
+  const newsletterHeading = newsletterSettingsResult.ok
+    ? newsletterSettingsResult.data.heading
+    : undefined;
 
-  const trail: IBreadcrumbItem[] = [
+  const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: t('home'), href: routes.home() },
     { label: topic.title, href: routes.topic(topic.slug) },
     { label: title, href: routes.post(slug) },
   ];
-  const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
+  const breadcrumbListSchema = buildBreadcrumbListSchema(
+    breadcrumbTrail,
+    siteUrl,
+  );
 
   const depthToggleLabels = {
     skim: blogPostT('depthToggle.skim'),
@@ -149,141 +132,46 @@ export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
     [ASIDE_KIND.DIGRESSION]: blogPostT('asideKind.DIGRESSION'),
     [ASIDE_KIND.CONTEXT]: blogPostT('asideKind.CONTEXT'),
   };
-
-  // Both render as `Article.Body`'s own last children — genuine article
-  // content sharing the article's real content column, not a page-level
-  // sibling mimicking its width from outside. Hoisted so the rail/no-rail
-  // branches below can't drift.
-  const footer = (
-    <Article.Footer
-      className={hasContentsRail ? s.footerInRail() : s.footer()}
-      tags={footerTags}
-      linkAs={SmartLink}
-    />
-  );
-  const newsletterForm = newsletterEnabled && newsletterSettingsResult.ok && (
-    <NewsletterForm
-      variant="compact"
-      heading={newsletterSettingsResult.data.heading}
-      className={hasContentsRail ? s.newsletterInRail() : s.newsletter()}
-    />
-  );
+  const formattedDate = format.dateTime(new Date(publishedAt), {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 
   return (
-    <>
-      {schema && <JsonLd schema={schema} />}
-      {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
-
-      <BreadcrumbBar>
-        <Breadcrumbs
-          items={trail}
-          ariaLabel={t('ariaLabel')}
-          linkAs={SmartLink}
-        />
-      </BreadcrumbBar>
-
-      <main className={s.root()}>
-        <DepthProvider hasSkim={hasSkim} hasDeep={hasAsides}>
-          <DepthToggle
-            hasSkim={hasSkim}
-            hasDeep={hasAsides}
-            labels={depthToggleLabels}
-            className={s.depthToggle()}
-          />
-
-          <Article>
-            <Article.Header
-              className={s.hero()}
-              title={title}
-              topic={{
-                label: topic.title,
-                href: routes.topic(topic.slug),
-                linkAs: SmartLink,
-              }}
-              lead={excerpt}
-              meta={{
-                author: {
-                  ...author,
-                  href: author.profilePageSlug
-                    ? routes.genericPage(author.profilePageSlug)
-                    : undefined,
-                },
-                publishedAt,
-                formattedDate: format.dateTime(new Date(publishedAt), {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                }),
-                readingTimeMinutes,
-                linkAs: SmartLink,
-                share: (
-                  <div className={s.metaActions()}>
-                    {isBookmarksEnabled && <BookmarkButton postId={id} />}
-                    <PostShare url={url} title={title} links={shareLinks} />
-                  </div>
-                ),
-              }}
-              coverMedia={
-                heroImageSanity ? (
-                  <SanityImage
-                    image={heroImageSanity}
-                    baseUrl={imageBaseUrl}
-                    width={1200}
-                    height={675}
-                    sizes="(min-width: 1024px) 800px, 100vw"
-                    priority={true}
-                    alt={heroImageAlt}
-                    className={s.coverImage()}
-                  />
-                ) : undefined
-              }
-            />
-
-            <Article.Body className={s.body({ withRail: hasContentsRail })}>
-              {hasContentsRail ? (
-                <>
-                  <PostContentsRail className={s.rail()} headings={headings} />
-                  <div className={s.content({ withRail: true })}>
-                    <PortableTextRenderer
-                      value={body}
-                      baseUrl={imageBaseUrl}
-                      headings={headings}
-                      asideKindLabels={asideKindLabels}
-                    />
-                  </div>
-                </>
-              ) : (
-                <PortableTextRenderer
-                  value={body}
-                  baseUrl={imageBaseUrl}
-                  headings={headings}
-                  asideKindLabels={asideKindLabels}
-                />
-              )}
-              {footer}
-              {newsletterForm}
-            </Article.Body>
-          </Article>
-
-          <SkimPanel
-            skim={skim}
-            label={blogPostT('skimPanel.label')}
-            readFullArticleLabel={blogPostT('skimPanel.readFullArticle')}
-          />
-        </DepthProvider>
-
-        {relatedPostItems.length > 0 && (
-          <PostsSection
-            posts={relatedPostItems}
-            title={blogPostT('relatedReading')}
-            titleId="related-posts-title"
-            linkAs={SmartLink}
-            isTinted={true}
-          />
-        )}
-      </main>
-
-      <BackToTopButton />
-    </>
+    <BlogPostPageView
+      id={id}
+      title={title}
+      excerpt={excerpt}
+      topic={topic}
+      tags={tags}
+      body={body}
+      skim={skim}
+      hasAsides={hasAsides}
+      author={author}
+      publishedAt={publishedAt}
+      formattedDate={formattedDate}
+      readingTimeMinutes={readingTimeMinutes}
+      heroImageSanity={heroImageSanity}
+      heroImageAlt={heroImageAlt}
+      imageBaseUrl={imageBaseUrl}
+      headings={headings}
+      hasContentsRail={hasContentsRail}
+      url={url}
+      shareLinks={shareLinks}
+      isBookmarksEnabled={isBookmarksEnabled}
+      isNewsletterEnabled={newsletterEnabled}
+      newsletterHeading={newsletterHeading}
+      relatedPostItems={relatedPostItems}
+      relatedReadingLabel={blogPostT('relatedReading')}
+      breadcrumbTrail={breadcrumbTrail}
+      breadcrumbAriaLabel={t('ariaLabel')}
+      breadcrumbListSchema={breadcrumbListSchema}
+      blogPostingSchema={blogPostingSchema}
+      depthToggleLabels={depthToggleLabels}
+      asideKindLabels={asideKindLabels}
+      skimPanelLabel={blogPostT('skimPanel.label')}
+      skimPanelReadFullArticleLabel={blogPostT('skimPanel.readFullArticle')}
+    />
   );
 };

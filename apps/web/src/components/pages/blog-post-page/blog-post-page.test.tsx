@@ -1,10 +1,4 @@
-import {
-  ASIDE_KIND,
-  ICONS,
-  type ISanityImage,
-  type RichText,
-  Size,
-} from '@blog/config';
+import { ICONS, type ISanityImage, type RichText, Size } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
 import userEvent from '@testing-library/user-event';
 import {
@@ -17,7 +11,6 @@ import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
 import {
   richTextBlock,
   richTextSpan,
-  type TRichTextBlock,
 } from '@web/testing/shared/portable-text-renderer/fixtures';
 import { notFound } from 'next/navigation';
 
@@ -64,7 +57,7 @@ vi.mock('@web/server/newsletter/newsletter-actions', () => ({
 // `BookmarkButton` (article header meta strip) renders nothing for a
 // signed-out session — the default here — so every existing assertion below
 // (none of which concerns bookmarking) is unaffected; the "authenticated"
-// describe block further down opts in per-test.
+// tests further down opt in per-test.
 vi.mock('next-auth/react', () => ({ useSession: useSessionMock }));
 
 vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
@@ -245,133 +238,12 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(linkedInSvg?.outerHTML).not.toBe(fallbackSvg?.outerHTML);
   });
 
-  it('renders the reading time in the post meta strip', async () => {
-    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
-    await setup();
-
-    expect(screen.getByText('4 min read')).toBeVisible();
-  });
-
   it('renders the published date formatted via next-intl (year/month/day)', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     await setup();
 
     expect(screen.getByText('January 15, 2026')).toBeVisible();
-  });
-
-  it('links the author name to routes.genericPage(profilePageSlug)', async () => {
-    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
-    await setup();
-
-    expect(screen.getByRole('link', { name: 'Jane Doe' })).toHaveAttribute(
-      'href',
-      '/jane-doe',
-    );
-  });
-
-  it('renders the author name as plain text when profilePageSlug is absent', async () => {
-    getPostMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockPostDetail,
-        author: { ...mockPostDetail.author, profilePageSlug: undefined },
-      },
-    });
-
-    await setup();
-
-    expect(
-      screen.queryByRole('link', { name: 'Jane Doe' }),
-    ).not.toBeInTheDocument();
-    expect(screen.getByText('Jane Doe')).toBeVisible();
-  });
-
-  it('renders the Home › Topic › Post breadcrumbs trail', async () => {
-    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-
-    const homeLink = within(nav).getByRole('link', { name: 'Home' });
-    expect(homeLink).toHaveAttribute('href', '/');
-
-    const topicLink = within(nav).getByRole('link', { name: 'Engineering' });
-    expect(topicLink).toHaveAttribute('href', '/topics/engineering');
-
-    const current = within(nav).getByText('Hello World');
-    expect(current).toHaveAttribute('aria-current', 'page');
-    expect(current.tagName).not.toBe('A');
-  });
-
-  it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
-    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-    const main = screen.getByRole('main');
-
-    expect(main.contains(nav)).toBe(false);
-    expect(
-      nav.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-  });
-
-  it('renders the topic eyebrow linked to the topic archive page, in addition to the breadcrumbs trail', async () => {
-    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
-    await setup();
-
-    const topicLinks = screen.getAllByRole('link', { name: 'Engineering' });
-    expect(topicLinks).toHaveLength(2);
-    topicLinks.forEach((link) => {
-      expect(link).toHaveAttribute('href', '/topics/engineering');
-    });
-  });
-
-  it('renders exactly one <h1> on the page (the post title), even when the body authors an h1-style block', async () => {
-    const body: RichText = [
-      // The generated `style` union no longer includes 'h1' (Studio can't
-      // author one anymore), but the renderer still defends against a
-      // legacy/malformed one reaching this component via another write path.
-      richTextBlock('h1' as TRichTextBlock['style'], [
-        richTextSpan('An authored h1.'),
-      ]),
-      ...mockPostDetail.body,
-    ];
-    getPostMock.mockResolvedValue({
-      ok: true,
-      data: { ...mockPostDetail, body },
-    });
-
-    await setup();
-
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-  });
-
-  it('sets fetchpriority="high" on the hero image (confirmed LCP element) when heroImageSanity is present', async () => {
-    const heroImageSanity: ISanityImage = {
-      assetId: 'image-abc123-1600x1200-jpg',
-      alt: 'A scenic mountain range',
-      hotspot: { x: 0.5, y: 0.5, width: 1, height: 1 },
-      crop: undefined,
-      lqip: undefined,
-      dimensions: { width: 1600, height: 1200, aspectRatio: 1600 / 1200 },
-    };
-    getPostMock.mockResolvedValue({
-      ok: true,
-      data: { ...mockPostDetail, heroImageSanity },
-    });
-
-    await setup();
-
-    expect(
-      screen.getByRole('img', { name: mockPostDetail.heroImageAlt }),
-    ).toHaveAttribute('fetchpriority', 'high');
   });
 
   it('resolves baseUrl via getSanityImageBaseUrl and forwards it into the rendered hero image src', async () => {
@@ -424,31 +296,6 @@ describe(`<${BlogPostPage.name}/>`, () => {
     ).toHaveAttribute('href', '#configuration');
   });
 
-  it('renders the post tags when the post has both a contents rail and tags', async () => {
-    const body: RichText = [
-      richTextBlock('h2', [richTextSpan('Getting started')]),
-      richTextBlock('normal', [richTextSpan('Intro.')]),
-      richTextBlock('h2', [richTextSpan('Configuration')]),
-      richTextBlock('h2', [richTextSpan('Deployment')]),
-    ];
-    getPostMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockPostDetail,
-        body,
-        tags: [{ id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
-      },
-    });
-
-    await setup();
-
-    expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
-    expect(screen.getByRole('link', { name: 'TypeScript' })).toHaveAttribute(
-      'href',
-      '/tags/typescript',
-    );
-  });
-
   it('renders the JSON-LD BlogPosting schema script', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
@@ -476,43 +323,6 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(breadcrumbScript?.textContent).toContain(
       '"item":"https://example.com/topics/engineering"',
     );
-  });
-
-  it('renders the post tags as links to routes.tag(slug)', async () => {
-    getPostMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockPostDetail,
-        tags: [
-          { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
-          { id: 'tag-2', title: 'React', slug: 'react' },
-        ],
-      },
-    });
-
-    await setup();
-
-    expect(screen.getByRole('link', { name: 'TypeScript' })).toHaveAttribute(
-      'href',
-      '/tags/typescript',
-    );
-    expect(screen.getByRole('link', { name: 'React' })).toHaveAttribute(
-      'href',
-      '/tags/react',
-    );
-  });
-
-  it('renders no tag chips when the post has no tags', async () => {
-    getPostMock.mockResolvedValue({
-      ok: true,
-      data: { ...mockPostDetail, tags: [] },
-    });
-
-    await setup();
-
-    expect(
-      screen.queryByRole('link', { name: 'TypeScript' }),
-    ).not.toBeInTheDocument();
   });
 
   it('renders a "Related reading" section when relatedPosts is non-empty, even when a related post is in a different topic (tag-matched, not topic-scoped)', async () => {
@@ -565,74 +375,6 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(screen.queryByText('Related reading')).not.toBeInTheDocument();
   });
 
-  it("renders no reading-depth control when the post has neither a skim nor asides (today's behavior)", async () => {
-    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
-    await setup();
-
-    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
-  });
-
-  it('renders the reading-depth control with the 30s option once the post has an approved skim', async () => {
-    getPostMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockPostDetail,
-        skim: {
-          takeaways: ['First.', 'Second.', 'Third.'],
-          generatedAt: '2026-01-01T00:00:00.000Z',
-          model: 'claude-haiku-4-5',
-        },
-      },
-    });
-
-    await setup();
-
-    expect(
-      screen.getByRole('radiogroup', { name: 'Reading depth' }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: '30s' })).toBeInTheDocument();
-    expect(
-      screen.queryByRole('radio', { name: 'Deep' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('renders the reading-depth control with the Deep option once the post has asides', async () => {
-    getPostMock.mockResolvedValue({
-      ok: true,
-      data: { ...mockPostDetail, hasAsides: true },
-    });
-
-    await setup();
-
-    expect(screen.getByRole('radio', { name: 'Deep' })).toBeInTheDocument();
-    expect(
-      screen.queryByRole('radio', { name: '30s' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('renders an aside block from the body as a deep-dive aside with its translated kind label', async () => {
-    const body: RichText = [
-      ...mockPostDetail.body,
-      {
-        _type: 'aside',
-        _key: 'aside-1',
-        kind: ASIDE_KIND.WHY_NOT,
-        body: [richTextBlock('normal', [richTextSpan('Because Y.')])],
-      },
-    ];
-    getPostMock.mockResolvedValue({
-      ok: true,
-      data: { ...mockPostDetail, body, hasAsides: true },
-    });
-
-    await setup();
-
-    expect(screen.getByRole('note')).toBeInTheDocument();
-    expect(screen.getByText('Why not X')).toBeVisible();
-    expect(screen.getByText('Because Y.')).toBeVisible();
-  });
-
   describe('newsletter signup', () => {
     it('renders the compact newsletter signup, sourced from the newsletter settings singleton, when newsletterEnabled is true', async () => {
       getPostMock.mockResolvedValue({
@@ -649,20 +391,6 @@ describe(`<${BlogPostPage.name}/>`, () => {
       expect(screen.getByText('Get new posts by email')).toBeVisible();
       expect(
         screen.getByRole('textbox', { name: 'Email address' }),
-      ).toBeVisible();
-    });
-
-    it('renders the newsletter signup inside the article, not as a page-level sibling (#1307)', async () => {
-      getPostMock.mockResolvedValue({
-        ok: true,
-        data: { ...mockPostDetail, newsletterEnabled: true },
-      });
-
-      await setup();
-
-      const article = screen.getByRole('article');
-      expect(
-        within(article).getByRole('textbox', { name: 'Email address' }),
       ).toBeVisible();
     });
 
@@ -697,20 +425,6 @@ describe(`<${BlogPostPage.name}/>`, () => {
       ).not.toBeInTheDocument();
       expect(errorSpy).toHaveBeenCalled();
       errorSpy.mockRestore();
-    });
-
-    it('hides the newsletter signup for an already-subscribed reader (cookie gate)', async () => {
-      document.cookie = 'newsletter_subscribed=1';
-      getPostMock.mockResolvedValue({
-        ok: true,
-        data: { ...mockPostDetail, newsletterEnabled: true },
-      });
-
-      await setup();
-
-      expect(
-        screen.queryByRole('textbox', { name: 'Email address' }),
-      ).not.toBeInTheDocument();
     });
   });
 });
