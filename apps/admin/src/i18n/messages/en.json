@@ -296,6 +296,8 @@
   "provisioningStatusView": {
     "eyebrow": "Provisioning status",
     "description": "Each step is independently resumable — a failed step's Retry re-dispatches the workflow, which skips whatever already succeeded.",
+    "stepsCardTitle": "Steps",
+    "stepsCompletionBadge": "{done} of {total} done",
     "stepLabel": {
       "SANITY_PROJECT": "Create the content workspace",
       "SEED_CONTENT": "Add starter content",

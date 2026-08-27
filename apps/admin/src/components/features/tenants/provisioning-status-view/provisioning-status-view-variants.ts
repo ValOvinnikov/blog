@@ -13,10 +13,9 @@ export const provisioningStatusViewVariants = tv({
       'flex flex-col gap-6',
       'lg:grid lg:min-h-[420px] lg:grid-cols-[230px_minmax(0,1fr)]',
     ],
-    steps: [
-      'flex h-full flex-col',
-      'rounded-admin border border-admin-line bg-admin-surface p-[18px] shadow-admin',
-    ],
+    steps: ['flex h-full flex-col'],
+    stepsCard: ['flex flex-1 flex-col'],
+    stepsCardBody: ['flex flex-1 flex-col'],
     list: ['flex flex-1 flex-col'],
     step: ['flex flex-1 flex-wrap gap-3'],
     indicatorCol: ['flex flex-none flex-col items-center self-stretch'],

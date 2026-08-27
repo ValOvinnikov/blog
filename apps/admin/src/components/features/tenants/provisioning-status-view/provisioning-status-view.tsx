@@ -2,6 +2,7 @@
 
 import { Alert } from '@admin/components/shared/alert';
 import { Button } from '@admin/components/shared/button';
+import { Card } from '@admin/components/shared/card';
 import { Heading } from '@admin/components/shared/heading';
 import { Icon } from '@admin/components/shared/icon';
 import { LinkButton } from '@admin/components/shared/link-button';
@@ -60,6 +61,10 @@ export const ProvisioningStatusView = ({
     errorKind,
   } = useProvisioningPoll(tenant);
 
+  const doneStepCount = stepStatuses.filter(
+    (status) => status === TENANT_PROVISIONING_STEP_STATUS.DONE,
+  ).length;
+
   const {
     root,
     header,
@@ -68,6 +73,8 @@ export const ProvisioningStatusView = ({
     startAction,
     layout,
     steps,
+    stepsCard,
+    stepsCardBody,
     list,
     step,
     indicatorCol,
@@ -134,47 +141,64 @@ export const ProvisioningStatusView = ({
 
       <div className={layout()}>
         <aside className={steps()}>
-          <div className={list()}>
-            {STEP_ORDER.map((stepKey, index) => {
-              const status =
-                stepStatuses[index] ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
-              const isFailed =
-                status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
-              const isDone = status === TENANT_PROVISIONING_STEP_STATUS.DONE;
-              const isLast = index === STEP_ORDER.length - 1;
-              const title = t(`stepLabel.${stepKey}`);
+          <Card className={stepsCard()}>
+            <Card.Header
+              title={t('stepsCardTitle')}
+              headingLevel={2}
+              actions={
+                <StatusBadge tone="neutral">
+                  {t('stepsCompletionBadge', {
+                    done: doneStepCount,
+                    total: STEP_ORDER.length,
+                  })}
+                </StatusBadge>
+              }
+            />
+            <Card.Body className={stepsCardBody()}>
+              <div className={list()}>
+                {STEP_ORDER.map((stepKey, index) => {
+                  const status =
+                    stepStatuses[index] ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
+                  const isFailed =
+                    status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
+                  const isDone =
+                    status === TENANT_PROVISIONING_STEP_STATUS.DONE;
+                  const isLast = index === STEP_ORDER.length - 1;
+                  const title = t(`stepLabel.${stepKey}`);
 
-              return (
-                <div className={step()} key={stepKey}>
-                  <div className={indicatorCol()}>
-                    <span className={circle({ status })} aria-hidden="true">
-                      {isDone ? '✓' : isFailed ? '!' : index + 1}
-                    </span>
-                    {!isLast && (
-                      <span
-                        className={connector({ isDone })}
-                        aria-hidden="true"
-                      />
-                    )}
-                  </div>
-                  <div className={stepBody()}>
-                    <span className={stepTitle()}>{title}</span>
-                    {/* The circle glyph is decorative (`aria-hidden`), so
-                        this text — visually hidden, not removed — is what
-                        actually carries each step's status to assistive
-                        tech; the live region still announces it on change
-                        even though the sighted badge that used to sit here
-                        is gone. */}
-                    <span className={stepStatusLive()} aria-live="polite">
-                      <span className={visuallyHidden()}>
-                        {t(`statusLabel.${status}`)}
-                      </span>
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                  return (
+                    <div className={step()} key={stepKey}>
+                      <div className={indicatorCol()}>
+                        <span className={circle({ status })} aria-hidden="true">
+                          {isDone ? '✓' : isFailed ? '!' : index + 1}
+                        </span>
+                        {!isLast && (
+                          <span
+                            className={connector({ isDone })}
+                            aria-hidden="true"
+                          />
+                        )}
+                      </div>
+                      <div className={stepBody()}>
+                        <span className={stepTitle()}>{title}</span>
+                        {/* The circle glyph is decorative (`aria-hidden`), so
+                            this text — visually hidden, not removed — is what
+                            actually carries each step's status to assistive
+                            tech; the live region still announces it on change
+                            even though the sighted badge that used to sit here
+                            is gone. */}
+                        <span className={stepStatusLive()} aria-live="polite">
+                          <span className={visuallyHidden()}>
+                            {t(`statusLabel.${status}`)}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card.Body>
+          </Card>
         </aside>
 
         <div className={detailsColumn()}>
