@@ -10,7 +10,7 @@ type TTenantPageContent = (props: { tenant: TTenant }) => Promise<ReactNode>;
 /**
  * Shared body of a dashboard/tenant route page pair: resolve which tenant
  * is in scope (the dashboard route from the session's memberships, the
- * `/t/[tenantSlug]` route from the URL param) and hand it to the shared
+ * `/tenants/[tenantId]` route from the URL param) and hand it to the shared
  * `*PageContent` renderer both variants render. Called directly, not as
  * JSX — an async component nested via JSX only resolves under React's real
  * RSC renderer, which this repo's `customRenderAsync` test helper doesn't

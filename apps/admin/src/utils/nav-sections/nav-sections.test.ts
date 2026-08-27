@@ -30,14 +30,14 @@ describe('platformNavSections', () => {
 
 describe('tenantNavSections', () => {
   it('gives Look, Voice and Features distinct real hrefs, badged "this milestone" in neutral tone', () => {
-    const [tenant] = tenantNavSections(t, 'acme');
+    const [tenant] = tenantNavSections(t, 'tenant-1');
     const look = tenant!.items.find((item) => item.label === 'Look');
     const voice = tenant!.items.find((item) => item.label === 'Voice');
     const features = tenant!.items.find((item) => item.label === 'Features');
 
-    expect(look?.href).toBe('/t/acme/look');
-    expect(voice?.href).toBe('/t/acme/voice');
-    expect(features?.href).toBe('/t/acme/features');
+    expect(look?.href).toBe('/tenants/tenant-1/look');
+    expect(voice?.href).toBe('/tenants/tenant-1/voice');
+    expect(features?.href).toBe('/tenants/tenant-1/features');
     expect(look?.href).not.toBe(voice?.href);
     expect(look?.badge).toEqual({ label: 'this milestone', tone: 'neutral' });
     expect(voice?.badge).toEqual({ label: 'this milestone', tone: 'neutral' });
@@ -48,7 +48,7 @@ describe('tenantNavSections', () => {
   });
 
   it('badges the remaining six destinations "later" in warn tone, with no href', () => {
-    const [tenant] = tenantNavSections(t, 'acme');
+    const [tenant] = tenantNavSections(t, 'tenant-1');
     const later = tenant!.items.filter((item) => item.badge?.label === 'later');
 
     expect(later).toHaveLength(6);
@@ -59,7 +59,7 @@ describe('tenantNavSections', () => {
   });
 
   it('lists all nine tenant destinations', () => {
-    const [tenant] = tenantNavSections(t, 'acme');
+    const [tenant] = tenantNavSections(t, 'tenant-1');
 
     expect(tenant!.items.map((item) => item.label)).toEqual([
       'Look',
@@ -89,7 +89,7 @@ describe('dashboardNavSections', () => {
 
   it('lists the same nine destinations as tenantNavSections', () => {
     const [dashboard] = dashboardNavSections(t);
-    const [tenant] = tenantNavSections(t, 'acme');
+    const [tenant] = tenantNavSections(t, 'tenant-1');
 
     expect(dashboard!.items.map((item) => item.label)).toEqual(
       tenant!.items.map((item) => item.label),

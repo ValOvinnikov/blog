@@ -260,7 +260,7 @@ export const ProvisioningStatusView = ({
           {provisioningStatus === TENANT_PROVISIONING_STATUS.READY && (
             <LinkButton
               as={Link}
-              href={adminRoutes.tenant(tenant.slug)}
+              href={adminRoutes.look(tenant.id)}
               variant="primary"
               className={goToTenantButton()}
             >

@@ -15,10 +15,10 @@ type TProps = {
 /**
  * Gates page rendering for everything nested under this segment behind the
  * signed-in user's own `memberships` rows (`resolveDashboardTenant`) —
- * `/dashboard`'s slug-free counterpart to `/t/[tenantSlug]/layout.tsx`'s
+ * `/dashboard`'s slug-free counterpart to `/tenants/[tenantId]/layout.tsx`'s
  * `requireTenantMembership`, including the same platform SUPERADMIN
  * bypass. Deliberately omits the Platform nav section shown alongside
- * Tenant on `/t/{slug}`: this tree exists specifically so a tenant owner
+ * Tenant on `/tenants/{id}`: this tree exists specifically so a tenant owner
  * never sees that the platform is multi-tenant, and an ADMIN/MODERATOR
  * `admins` row grants no access here regardless.
  */

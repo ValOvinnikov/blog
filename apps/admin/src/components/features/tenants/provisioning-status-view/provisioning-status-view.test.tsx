@@ -880,7 +880,7 @@ describe(ProvisioningStatusView, () => {
 
     expect(
       screen.getByRole('link', { name: 'Go to tenant →' }),
-    ).toHaveAttribute('href', '/t/acme');
+    ).toHaveAttribute('href', '/tenants/tenant-1/look');
   });
 
   it('hides the Go to tenant button before provisioning reaches READY', () => {

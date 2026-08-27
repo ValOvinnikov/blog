@@ -6,16 +6,14 @@ import FeaturesPage from './page';
 
 const {
   authMock,
-  getTenantBySlugMock,
-  getMembershipMock,
   getAdminByUserIdMock,
+  getTenantByIdMock,
   getSettingsFeaturesMock,
   getSiteConfigMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
-  getTenantBySlugMock: vi.fn(),
-  getMembershipMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
+  getTenantByIdMock: vi.fn(),
   getSettingsFeaturesMock: vi.fn(),
   getSiteConfigMock: vi.fn(),
 }));
@@ -25,25 +23,22 @@ vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    tenants: { getTenantBySlug: getTenantBySlugMock },
-    memberships: { getMembership: getMembershipMock },
     admins: { getAdminByUserId: getAdminByUserIdMock },
+    tenants: { getTenantById: getTenantByIdMock },
     settingsFeatures: { getSettingsFeatures: getSettingsFeaturesMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));
 
 const setup = customRenderAsync(FeaturesPage, {
-  params: Promise.resolve({ tenantSlug: 'acme' }),
+  params: Promise.resolve({ tenantId: 'tenant-1' }),
 });
 
 describe(`<${FeaturesPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    getTenantBySlugMock.mockReset();
-    getMembershipMock.mockReset();
     getAdminByUserIdMock.mockReset();
-    getAdminByUserIdMock.mockResolvedValue(undefined);
+    getTenantByIdMock.mockReset();
     getSettingsFeaturesMock.mockReset();
     getSiteConfigMock.mockReset();
     vi.mocked(redirect).mockClear();
@@ -55,17 +50,12 @@ describe(`<${FeaturesPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
-    expect(getTenantBySlugMock).not.toHaveBeenCalled();
+    expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /unauthorized when the signed-in user has no membership on this tenant', async () => {
+  it('redirects to /unauthorized when the signed-in user has no admins row', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getTenantBySlugMock.mockResolvedValue({
-      id: 'tenant-1',
-      slug: 'acme',
-      plan: 'FREE',
-    });
-    getMembershipMock.mockResolvedValue(undefined);
+    getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
@@ -73,14 +63,14 @@ describe(`<${FeaturesPage.name}/>`, () => {
     expect(getSettingsFeaturesMock).not.toHaveBeenCalled();
   });
 
-  it('renders the preset featureDefaults for a member of the tenant with no settings_features row yet', async () => {
+  it('renders the preset featureDefaults for a platform operator with no settings_features row yet', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getTenantBySlugMock.mockResolvedValue({
+    getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
+    getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
       slug: 'acme',
       plan: 'FREE',
     });
-    getMembershipMock.mockResolvedValue({ id: 'm-1', role: 'OWNER' });
     getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue(undefined);
 
@@ -96,12 +86,12 @@ describe(`<${FeaturesPage.name}/>`, () => {
 
   it('renders the GROWTH-only toggles as locked for a FREE-plan tenant', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getTenantBySlugMock.mockResolvedValue({
+    getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
+    getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
       slug: 'acme',
       plan: 'FREE',
     });
-    getMembershipMock.mockResolvedValue({ id: 'm-1', role: 'OWNER' });
     getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue(undefined);
 

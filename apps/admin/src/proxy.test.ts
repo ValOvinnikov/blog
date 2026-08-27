@@ -16,7 +16,7 @@ describe('proxy matcher', () => {
 
     expect(matcher.test('/')).toBe(true);
     expect(matcher.test('/tenants')).toBe(true);
-    expect(matcher.test('/t/acme/look')).toBe(true);
+    expect(matcher.test('/tenants/tenant-1/look')).toBe(true);
     expect(matcher.test('/unauthorized')).toBe(true);
     expect(matcher.test('/dashboard')).toBe(true);
     expect(matcher.test('/dashboard/look')).toBe(true);

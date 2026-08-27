@@ -10,7 +10,7 @@ export type TFeaturesPageContentProps = {
 };
 
 /**
- * The Features tab's data-fetch + render, shared by `/t/[tenantSlug]/features`
+ * The Features tab's data-fetch + render, shared by `/tenants/[tenantId]/features`
  * and the slug-free `/dashboard/features` — both resolve a `TTenant` however
  * fits their own routing and hand it here.
  */

@@ -25,7 +25,7 @@
     "platformLabel": "Platform",
     "tenants": "Tenants",
     "addTenant": "Add tenant",
-    "tenantLabel": "Tenant · {tenantSlug}",
+    "tenantLabel": "Tenant · {tenantId}",
     "dashboardLabel": "Workspace",
     "look": "Look",
     "voice": "Voice",
