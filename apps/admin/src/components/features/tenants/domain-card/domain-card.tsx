@@ -33,7 +33,7 @@ export const DomainCard = ({
               {t(`dnsStatus.${domainVerificationStatus}`)}
             </StatusBadge>
             <LinkButton
-              href={adminRoutes.tenantProvisioning(tenant.id)}
+              href={adminRoutes.tenantDomain(tenant.id)}
               variant="ghost"
               size={Size.SM}
             >

@@ -10,6 +10,7 @@
     "tenantOverview": "Tenant overview · Admin",
     "tenantProvisioning": "Provisioning · Admin",
     "tenantDanger": "Danger zone · Admin",
+    "tenantDomain": "Domain · Admin",
     "features": "Features · Admin"
   },
   "unauthorizedPage": {
@@ -145,6 +146,24 @@
       "DEPROVISIONED": "Provisioning removed",
       "SETTINGS_UPDATED": "Settings updated",
       "DELETED": "Tenant deleted"
+    }
+  },
+  "tenantDomainPage": {
+    "subCopy": "The one piece of setup that is genuinely yours to finish.",
+    "cardTitle": "Point {domain} at us",
+    "checkedHint": "Checked just now",
+    "bodyCopy": "Add these records at your DNS provider. Verification usually completes within an hour.",
+    "columnType": "Type",
+    "columnName": "Name",
+    "columnValue": "Value",
+    "verifiedEmptyState": "This domain is verified — there's nothing left to configure.",
+    "unavailableState": "DNS records aren't available right now.",
+    "dnsStatus": {
+      "NOT_CONFIGURED": "Unavailable",
+      "NOT_ADDED": "Not added yet",
+      "PENDING": "Awaiting DNS",
+      "VERIFIED": "Verified",
+      "ERROR": "Couldn't check"
     }
   },
   "presetPicker": {
