@@ -8,7 +8,7 @@
     "selectTenant": "Choose a workspace · Admin",
     "addTenant": "Add tenant · Admin",
     "tenantOverview": "Tenant overview · Admin",
-    "tenantStatus": "Tenant status · Admin",
+    "tenantProvisioning": "Provisioning · Admin",
     "features": "Features · Admin"
   },
   "unauthorizedPage": {
@@ -98,10 +98,18 @@
     "publicDomainLabel": "Public domain",
     "lastCheckedLabel": "Last checked",
     "lastCheckedJustNow": "Just now",
+    "dnsStatus": {
+      "NOT_CONFIGURED": "Unavailable",
+      "NOT_ADDED": "Not added yet",
+      "PENDING": "Pending — awaiting DNS",
+      "VERIFIED": "Verified",
+      "ERROR": "Couldn't check"
+    },
     "ownerCardTitle": "Owner",
     "emailLabel": "Email",
     "roleLabel": "Role",
     "ownerRoleBadge": "OWNER",
+    "ownerInvitedPendingBadge": "Invited, pending",
     "joinedLabel": "Joined",
     "contentWorkspaceCardTitle": "Content workspace",
     "platformBadge": "platform",
@@ -118,6 +126,10 @@
     "recentActivityCardTitle": "Recent activity",
     "recentActivitySourceLabel": "audit_events",
     "activityEmpty": "No activity recorded yet.",
+    "relativeJustNow": "Just now",
+    "relativeMinutesAgo": "{minutes}m ago",
+    "relativeHoursAgo": "{hours}h ago",
+    "relativeDaysAgo": "{days}d ago",
     "activityAction": {
       "CREATED": "Tenant created",
       "ARCHIVED": "Tenant archived",

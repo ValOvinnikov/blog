@@ -1,4 +1,7 @@
+'use client';
+
 import { ProvisioningBanner } from '@admin/components/features/tenants/provisioning-banner';
+import { useProvisioningPoll } from '@admin/components/features/tenants/provisioning-status-view/use-provisioning-poll';
 import { TenantDetailsPanel } from '@admin/components/features/tenants/tenant-details-panel';
 import { Card } from '@admin/components/shared/card';
 import { DetailList } from '@admin/components/shared/detail-list';
@@ -32,9 +35,10 @@ export type TTenantOverviewViewProps = {
 /**
  * The platform operator's landing page for a single tenant: the
  * provisioning banner, the editable details panel (moved here from the
- * provisioning page), and four read-only fact cards. Only the details panel
- * and the banner carry any client behaviour — everything else here is a
- * plain server-rendered summary of what's already on the tenant row.
+ * provisioning page), and four read-only fact cards. A single
+ * `useProvisioningPoll` instance is lifted up here and shared by the banner
+ * and the details panel's field locks, so the two never disagree about
+ * provisioning status the way two independent poll instances could.
  */
 export const TenantOverviewView = ({
   tenant,
@@ -45,6 +49,15 @@ export const TenantOverviewView = ({
 }: TTenantOverviewViewProps) => {
   const tTenantsTable = useTranslations('tenantsTable');
   const { root, cardsGrid, cardsColumn } = tenantOverviewViewVariants();
+  const {
+    provisioningStatus,
+    provisioningSteps,
+    effectiveProvisioningStatus,
+    stepStatuses,
+    isOverallFailed,
+    isProvisioningRunning,
+    errorKind,
+  } = useProvisioningPoll(tenant, domainVerificationStatus);
 
   return (
     <div className={root()}>
@@ -63,15 +76,19 @@ export const TenantOverviewView = ({
       />
 
       <ProvisioningBanner
-        tenant={tenant}
-        domainVerificationStatus={domainVerificationStatus}
+        tenantId={tenant.id}
+        provisioningStatus={provisioningStatus}
+        stepStatuses={stepStatuses}
+        isOverallFailed={isOverallFailed}
+        isProvisioningRunning={isProvisioningRunning}
+        errorKind={errorKind}
       />
 
       <TenantDetailsPanel
         tenant={tenant}
         fieldLocks={computeTenantFieldLocks(
-          tenant.provisioningSteps,
-          tenant.provisioningStatus,
+          provisioningSteps,
+          effectiveProvisioningStatus,
         )}
         ownerEmail={ownerEmail}
       />
@@ -101,7 +118,6 @@ const DomainCard = ({
   domainVerificationStatus: TDomainVerificationStatus;
 }) => {
   const t = useTranslations('tenantOverviewPage');
-  const tProvisioning = useTranslations('provisioningStatusView');
 
   return (
     <Card>
@@ -112,7 +128,7 @@ const DomainCard = ({
             <StatusBadge
               tone={domainVerificationTone(domainVerificationStatus)}
             >
-              {tProvisioning(`dnsStatus.${domainVerificationStatus}`)}
+              {t(`dnsStatus.${domainVerificationStatus}`)}
             </StatusBadge>
             <LinkButton
               href={adminRoutes.tenantProvisioning(tenant.id)}
@@ -146,7 +162,6 @@ const OwnerCard = ({
   ownerJoinedAt: string | undefined;
 }) => {
   const t = useTranslations('tenantOverviewPage');
-  const tProvisioning = useTranslations('provisioningStatusView');
 
   return (
     <Card>
@@ -159,7 +174,7 @@ const OwnerCard = ({
             action={
               !ownerEmail && (
                 <StatusBadge tone="warn">
-                  {tProvisioning('ownerInvitedPendingBadge')}
+                  {t('ownerInvitedPendingBadge')}
                 </StatusBadge>
               )
             }
@@ -275,7 +290,7 @@ const RecentActivityCard = ({ events }: { events: TAuditEvent[] }) => {
                   <span className={activitySub()}>{event.actorEmail}</span>
                 </div>
                 <span className={activityTime()}>
-                  {formatRelativeTime(event.createdAt)}
+                  {formatRelativeTime(event.createdAt, t)}
                 </span>
               </div>
             ))}

@@ -1,57 +1,57 @@
 'use client';
 
 import { LinkButton } from '@admin/components/shared/link-button';
-import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
+import type { TProvisioningErrorKind } from '@admin/utils/provisioning-error/provisioning-error';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import { Size } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
+  type TTenantProvisioningStatus,
+  type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { useTranslations } from 'next-intl';
 
-import {
-  STEP_ORDER,
-  useProvisioningPoll,
-} from '../provisioning-status-view/use-provisioning-poll';
+import { STEP_ORDER } from '../provisioning-status-view/use-provisioning-poll';
 
 import { provisioningBannerVariants } from './provisioning-banner-variants';
 
 export type TProvisioningBannerProps = {
-  tenant: TTenant;
-  domainVerificationStatus: TDomainVerificationStatus;
+  tenantId: string;
+  provisioningStatus: TTenantProvisioningStatus | null;
+  stepStatuses: TTenantProvisioningStepStatus[];
+  isOverallFailed: boolean;
+  isProvisioningRunning: boolean;
+  errorKind: TProvisioningErrorKind | undefined;
 };
 
 const GLYPH = { ok: '✓', warn: '◐', bad: '!' } as const;
 
 /**
- * The overview page's own provisioning signal — reuses
- * `useProvisioningPoll` so it self-updates the same way the provisioning
- * page's step list does, without duplicating its polling logic. Renders
- * nothing for a tenant that hasn't started provisioning yet — that state
- * isn't reachable from this route in practice.
+ * The overview page's own provisioning signal — renders from the same
+ * `useProvisioningPoll` instance the page lifts up for the details panel,
+ * rather than polling independently, so the two never disagree about
+ * provisioning status. Renders nothing for a tenant that hasn't started
+ * provisioning yet — that state isn't reachable from this route in
+ * practice.
  */
 export const ProvisioningBanner = ({
-  tenant,
-  domainVerificationStatus,
+  tenantId,
+  provisioningStatus,
+  stepStatuses,
+  isOverallFailed,
+  isProvisioningRunning,
+  errorKind,
 }: TProvisioningBannerProps) => {
   const t = useTranslations('provisioningBanner');
   const tSteps = useTranslations('provisioningStatusView');
-  const {
-    provisioningStatus,
-    stepStatuses,
-    isOverallFailed,
-    isProvisioningRunning,
-    errorKind,
-  } = useProvisioningPoll(tenant, domainVerificationStatus);
 
   const { root, icon, textGroup, title, description } =
     provisioningBannerVariants();
 
   const viewStepsButton = (
     <LinkButton
-      href={adminRoutes.tenantProvisioning(tenant.id)}
+      href={adminRoutes.tenantProvisioning(tenantId)}
       variant="secondary"
       size={Size.SM}
     >

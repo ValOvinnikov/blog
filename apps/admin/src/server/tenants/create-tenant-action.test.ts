@@ -232,7 +232,7 @@ describe('createTenantAction', () => {
       redirect: false,
     });
     expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
-    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
   it('logs at error level, but still redirects, when the owner-invite sign-in email fails to send', async () => {
@@ -255,7 +255,7 @@ describe('createTenantAction', () => {
       }),
     );
     expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
-    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
   it('logs at error level, but still redirects, when the owner-invite sign-in trigger throws', async () => {
@@ -279,7 +279,7 @@ describe('createTenantAction', () => {
       }),
     );
     expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
-    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
   it('never triggers the owner-invite sign-in email on the found-owner path', async () => {
@@ -456,7 +456,7 @@ describe('createTenantAction', () => {
     expect(beginTenantProvisioningMock).toHaveBeenCalledWith('tenant-1');
     expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
     expect(setTenantProvisioningStatusMock).not.toHaveBeenCalled();
-    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
   it('reverts the PROVISIONING transition, but still redirects, when the GitHub dispatch fails', async () => {
@@ -475,7 +475,7 @@ describe('createTenantAction', () => {
       'tenant-1',
       null,
     );
-    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
   it('does not dispatch, and still redirects, when the atomic guard reports a concurrent dispatch', async () => {
@@ -495,7 +495,7 @@ describe('createTenantAction', () => {
       'provisioning.begin_failed',
       expect.anything(),
     );
-    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
   it('records a CREATED audit event for the new tenant, with the operator as actor', async () => {
@@ -530,7 +530,7 @@ describe('createTenantAction', () => {
     );
 
     expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
-    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1');
+    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.create_audit_failed',
       expect.objectContaining({

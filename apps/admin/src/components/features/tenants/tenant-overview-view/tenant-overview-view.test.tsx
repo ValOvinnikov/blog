@@ -1,5 +1,13 @@
-import { renderWithIntl, screen, within } from '@admin/testing/custom-render';
-import { makeTenant } from '@admin/testing/tenants/fixtures';
+import {
+  act,
+  renderWithIntl,
+  screen,
+  within,
+} from '@admin/testing/custom-render';
+import {
+  idleProvisioningSteps,
+  makeTenant,
+} from '@admin/testing/tenants/fixtures';
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
@@ -13,14 +21,24 @@ import { TenantOverviewView } from './tenant-overview-view';
 
 const render = renderWithIntl;
 
+const STEP_POLL_INTERVAL_MS = 4000;
+
+const {
+  retryProvisioningStepActionMock,
+  getTenantProvisioningStatusActionMock,
+} = vi.hoisted(() => ({
+  retryProvisioningStepActionMock: vi.fn(),
+  getTenantProvisioningStatusActionMock: vi.fn(),
+}));
+
 vi.mock('@admin/server/provisioning/retry-provisioning-step-action', () => ({
-  retryProvisioningStepAction: vi.fn(),
+  retryProvisioningStepAction: retryProvisioningStepActionMock,
 }));
 
 vi.mock(
   '@admin/server/provisioning/get-tenant-provisioning-status-action',
   () => ({
-    getTenantProvisioningStatusAction: vi.fn(),
+    getTenantProvisioningStatusAction: getTenantProvisioningStatusActionMock,
   }),
 );
 
@@ -48,6 +66,24 @@ const makeEvent = (overrides: Partial<TAuditEvent> = {}): TAuditEvent => ({
 });
 
 describe(TenantOverviewView, () => {
+  // Rendering a non-terminal `provisioningStatus` starts a real
+  // `setInterval` poll loop that can outlive a test's own cleanup under
+  // parallel load — faking setInterval/clearInterval closes that off, same
+  // as `provisioning-status-view.test.tsx`.
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+    retryProvisioningStepActionMock.mockReset();
+    retryProvisioningStepActionMock.mockResolvedValue({
+      outcome: 'dispatched',
+    });
+    getTenantProvisioningStatusActionMock.mockReset();
+    getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('renders the tenant name and status/plan badges', () => {
     const tenant = makeTenant({ name: 'Acme Inc.', status: 'ACTIVE' });
     render(
@@ -109,6 +145,160 @@ describe(TenantOverviewView, () => {
 
     expect(screen.getByText('Tenant details')).toBeVisible();
     expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveValue('acme');
+  });
+
+  it('locks every tenant details field while a step is running, stating why', () => {
+    const tenant = makeTenant({
+      provisioningSteps: {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+        },
+      },
+    });
+    render(
+      <TenantOverviewView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
+        auditEvents={[]}
+      />,
+    );
+
+    const slugInput = screen.getByRole('textbox', { name: 'Slug' });
+    expect(slugInput).toBeDisabled();
+    expect(slugInput).toHaveAccessibleDescription(
+      'Locked while provisioning is running.',
+    );
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+  });
+
+  it('locks only the field a completed step already consumed once provisioning has FAILED, leaving the field that caused the failure editable', () => {
+    // Mirrors the real 409 case: DEPLOY_STUDIO completed (locking slug), but
+    // MAP_DOMAIN itself failed — so primaryDomain, the field that actually
+    // caused the failure, stays editable.
+    const tenant = makeTenant({
+      primaryDomain: 'taken-domain.example.com',
+      provisioningSteps: {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+          error: 'Vercel deploy failed: 409 domain_already_in_use',
+        },
+      },
+    });
+    render(
+      <TenantOverviewView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
+        auditEvents={[]}
+      />,
+    );
+
+    const slugInput = screen.getByRole('textbox', { name: 'Slug' });
+    expect(slugInput).toBeDisabled();
+    expect(slugInput).toHaveAccessibleDescription(
+      'Locked — the "Deploy the content editor" step has already completed and used this value.',
+    );
+
+    const domainInput = screen.getByRole('textbox', {
+      name: 'Primary domain',
+    });
+    expect(domainInput).not.toBeDisabled();
+    expect(screen.getByRole('textbox', { name: 'Name' })).not.toBeDisabled();
+  });
+
+  it('locks every field immediately once a dispatch has begun, before any step has reported', () => {
+    // Provisioning was just (re)started — `provisioningStatus` already
+    // moved to PROVISIONING but every step is still IDLE, since a runner
+    // hasn't picked the workflow up yet.
+    const tenant = makeTenant({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+      provisioningSteps: idleProvisioningSteps(),
+    });
+    render(
+      <TenantOverviewView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
+        auditEvents={[]}
+      />,
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Slug' })).toBeDisabled();
+    expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
+    expect(
+      screen.getByRole('textbox', { name: 'Primary domain' }),
+    ).toBeDisabled();
+  });
+
+  it('keeps the provisioning banner and the details panel in sync off a single shared poll', async () => {
+    const tenant = makeTenant({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+      provisioningSteps: {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+        },
+      },
+    });
+    getTenantProvisioningStatusActionMock.mockResolvedValue({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+      provisioningSteps: Object.fromEntries(
+        Object.values(TENANT_PROVISIONING_STEP).map((step) => [
+          step,
+          { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
+        ]),
+      ) as TTenantProvisioningSteps,
+    });
+
+    render(
+      <TenantOverviewView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
+        auditEvents={[]}
+      />,
+    );
+
+    expect(screen.getByText('Provisioning — step 2 of 6')).toBeVisible();
+    expect(
+      screen.getByRole('textbox', { name: 'Slug' }),
+    ).toHaveAccessibleDescription('Locked while provisioning is running.');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+    });
+
+    // Both the banner and the details panel moved together off the same
+    // poll tick — neither is left showing a stale RUNNING state while the
+    // other has already caught up to READY/SUCCEEDED.
+    expect(screen.getByText('Provisioned')).toBeVisible();
+    expect(
+      screen.getByRole('textbox', { name: 'Slug' }),
+    ).toHaveAccessibleDescription(
+      'Locked — provisioning has already finished.',
+    );
   });
 
   it('shows the public domain and a link to the provisioning page for DNS', () => {

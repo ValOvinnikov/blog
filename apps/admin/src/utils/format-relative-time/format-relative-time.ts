@@ -7,28 +7,37 @@ const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
   day: 'numeric',
 };
 
+/** Structurally compatible with both `useTranslations`'s and `getTranslations`'s return type, without fighting next-intl's per-namespace literal-key generic. */
+export type TRelativeTimeTranslator = (
+  key: string,
+  values?: Record<string, string | number>,
+) => string;
+
 /**
  * Short relative time for recent events ("2h ago"), falling back to an
  * absolute short date (e.g. "Aug 12") once an event is more than a week
  * old — a relative label past that point stops being useful at a glance.
+ * The relative labels route through `t`; the absolute-date fallback keeps
+ * its own fixed `en-US` formatting (a separate, narrower concern).
  */
 export const formatRelativeTime = (
   date: Date,
+  t: TRelativeTimeTranslator,
   now: Date = new Date(),
 ): string => {
   const diffMs = now.getTime() - date.getTime();
 
   if (diffMs < MINUTE_MS) {
-    return 'Just now';
+    return t('relativeJustNow');
   }
   if (diffMs < HOUR_MS) {
-    return `${Math.floor(diffMs / MINUTE_MS)}m ago`;
+    return t('relativeMinutesAgo', { minutes: Math.floor(diffMs / MINUTE_MS) });
   }
   if (diffMs < DAY_MS) {
-    return `${Math.floor(diffMs / HOUR_MS)}h ago`;
+    return t('relativeHoursAgo', { hours: Math.floor(diffMs / HOUR_MS) });
   }
   if (diffMs < 7 * DAY_MS) {
-    return `${Math.floor(diffMs / DAY_MS)}d ago`;
+    return t('relativeDaysAgo', { days: Math.floor(diffMs / DAY_MS) });
   }
 
   return date.toLocaleDateString('en-US', DATE_FORMAT_OPTIONS);

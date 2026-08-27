@@ -2,7 +2,7 @@ import { customRenderAsync, screen } from '@admin/testing/custom-render';
 import { mockDbConstants } from '@admin/testing/mock-db-constants';
 import { makeTenant } from '@admin/testing/tenants/fixtures';
 
-import TenantStatusPage from './page';
+import TenantProvisioningPage from './page';
 
 const {
   listTenantsByIdsMock,
@@ -52,11 +52,11 @@ vi.mock(
   }),
 );
 
-const setup = customRenderAsync(TenantStatusPage, {
+const setup = customRenderAsync(TenantProvisioningPage, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),
 });
 
-describe(TenantStatusPage, () => {
+describe(TenantProvisioningPage, () => {
   beforeEach(() => {
     listTenantsByIdsMock.mockReset();
     getTenantOwnerEmailMock.mockReset();

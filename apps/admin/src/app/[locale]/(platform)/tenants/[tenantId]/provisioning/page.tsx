@@ -7,14 +7,14 @@ import { getTranslations } from 'next-intl/server';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('pageMetadata');
-  return { title: t('tenantStatus') };
+  return { title: t('tenantProvisioning') };
 }
 
 type TProps = {
   params: Promise<{ tenantId: string }>;
 };
 
-export default async function TenantStatusPage({ params }: TProps) {
+export default async function TenantProvisioningPage({ params }: TProps) {
   const { tenantId } = await params;
 
   const [tenant] = await queries.tenants.listTenantsByIds([tenantId]);

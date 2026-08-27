@@ -1,11 +1,6 @@
 import { renderWithIntl, screen } from '@admin/testing/custom-render';
 import {
-  idleProvisioningSteps,
-  makeTenant,
-} from '@admin/testing/tenants/fixtures';
-import {
   TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
 
@@ -13,6 +8,10 @@ import { ProvisioningBanner } from './provisioning-banner';
 
 const render = renderWithIntl;
 
+// `ProvisioningBanner` only imports `STEP_ORDER` from
+// `use-provisioning-poll`, but that module also imports these three Server
+// Actions at the top level — mocked out purely so this render test doesn't
+// transitively load the Auth.js chain behind them.
 vi.mock('@admin/server/provisioning/retry-provisioning-step-action', () => ({
   retryProvisioningStepAction: vi.fn(),
 }));
@@ -31,17 +30,19 @@ vi.mock(
   }),
 );
 
+const idleStepStatuses = () =>
+  Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.IDLE);
+
 describe(ProvisioningBanner, () => {
   it('renders nothing for a tenant that has not started provisioning', () => {
-    const tenant = makeTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-      provisioningSteps: idleProvisioningSteps(),
-    });
-
     const { container } = render(
       <ProvisioningBanner
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
+        tenantId="tenant-1"
+        provisioningStatus={TENANT_PROVISIONING_STATUS.PENDING}
+        stepStatuses={idleStepStatuses()}
+        isOverallFailed={false}
+        isProvisioningRunning={false}
+        errorKind={undefined}
       />,
     );
 
@@ -49,64 +50,51 @@ describe(ProvisioningBanner, () => {
   });
 
   it('shows the current step and a link to the provisioning page while running', () => {
-    const tenant = makeTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-        },
-      },
-    });
+    const stepStatuses = [
+      TENANT_PROVISIONING_STEP_STATUS.DONE,
+      TENANT_PROVISIONING_STEP_STATUS.DONE,
+      TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      TENANT_PROVISIONING_STEP_STATUS.IDLE,
+      TENANT_PROVISIONING_STEP_STATUS.IDLE,
+      TENANT_PROVISIONING_STEP_STATUS.IDLE,
+    ];
 
     render(
       <ProvisioningBanner
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
+        tenantId="tenant-1"
+        provisioningStatus={TENANT_PROVISIONING_STATUS.PROVISIONING}
+        stepStatuses={stepStatuses}
+        isOverallFailed={false}
+        isProvisioningRunning={true}
+        errorKind={undefined}
       />,
     );
 
     expect(screen.getByText('Provisioning — step 3 of 6')).toBeVisible();
     expect(screen.getByRole('link', { name: 'View steps →' })).toHaveAttribute(
       'href',
-      `/tenants/${tenant.id}/provisioning`,
+      '/tenants/tenant-1/provisioning',
     );
   });
 
   it('shows the failed step and its classified error while stuck', () => {
-    const tenant = makeTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps: {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-        },
-        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'Vercel Domains API failed: 400 domain already in use',
-        },
-      },
-    });
+    const stepStatuses = [
+      TENANT_PROVISIONING_STEP_STATUS.DONE,
+      TENANT_PROVISIONING_STEP_STATUS.DONE,
+      TENANT_PROVISIONING_STEP_STATUS.DONE,
+      TENANT_PROVISIONING_STEP_STATUS.DONE,
+      TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      TENANT_PROVISIONING_STEP_STATUS.IDLE,
+    ];
 
     render(
       <ProvisioningBanner
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
+        tenantId="tenant-1"
+        provisioningStatus={TENANT_PROVISIONING_STATUS.PROVISIONING}
+        stepStatuses={stepStatuses}
+        isOverallFailed={true}
+        isProvisioningRunning={false}
+        errorKind="duplicate"
       />,
     );
 
@@ -121,20 +109,14 @@ describe(ProvisioningBanner, () => {
   });
 
   it('shows a one-line confirmation and a link to the steps when ready', () => {
-    const tenant = makeTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-      provisioningSteps: Object.fromEntries(
-        Object.values(TENANT_PROVISIONING_STEP).map((step) => [
-          step,
-          { status: TENANT_PROVISIONING_STEP_STATUS.DONE },
-        ]),
-      ) as ReturnType<typeof idleProvisioningSteps>,
-    });
-
     render(
       <ProvisioningBanner
-        tenant={tenant}
-        domainVerificationStatus="VERIFIED"
+        tenantId="tenant-1"
+        provisioningStatus={TENANT_PROVISIONING_STATUS.READY}
+        stepStatuses={Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.DONE)}
+        isOverallFailed={false}
+        isProvisioningRunning={false}
+        errorKind={undefined}
       />,
     );
 

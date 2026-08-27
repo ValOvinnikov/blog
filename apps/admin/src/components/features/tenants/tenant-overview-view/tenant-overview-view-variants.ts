@@ -5,7 +5,6 @@ export const tenantOverviewViewVariants = tv({
     root: ['flex flex-col gap-6'],
     cardsGrid: ['grid grid-cols-1 items-start gap-[18px] lg:grid-cols-2'],
     cardsColumn: ['flex flex-col gap-[18px]'],
-    headerActions: ['flex items-center gap-2'],
     activityList: ['flex flex-col'],
     activityRow: [
       'flex items-center gap-3 py-2.5',
