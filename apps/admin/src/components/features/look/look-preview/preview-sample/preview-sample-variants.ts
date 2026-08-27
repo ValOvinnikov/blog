@@ -1,4 +1,4 @@
-import { tv } from 'tailwind-variants';
+import { tv } from '@admin/utils/tv/tv';
 
 /**
  * Every class here reads a SITE token (`--surface`, `--text`, `--border`,

@@ -1,4 +1,4 @@
-import { tv } from 'tailwind-variants';
+import { tv } from '@admin/utils/tv/tv';
 
 export const confirmDialogVariants = tv({
   slots: {
