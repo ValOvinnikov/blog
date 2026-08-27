@@ -1,7 +1,7 @@
 'use client';
 
+import { Card } from '@admin/components/shared/card';
 import { ConfirmDialog } from '@admin/components/shared/confirm-dialog';
-import { Heading } from '@admin/components/shared/heading';
 import { StatusBadge } from '@admin/components/shared/status-badge';
 import { Text } from '@admin/components/shared/text';
 import { deleteTenantAction } from '@admin/server/provisioning/delete-tenant-action';
@@ -40,8 +40,16 @@ export const DeprovisionTenantControl = ({
   const [error, setError] = useState<string | undefined>(undefined);
   const [isPending, startTransition] = useTransition();
 
-  const { card, heading, archivedRow, switchRow, switchTrack, switchThumb } =
-    deprovisionTenantControlVariants();
+  const {
+    cardBorder,
+    cardHeader,
+    cardTitle,
+    content,
+    archivedRow,
+    switchRow,
+    switchTrack,
+    switchThumb,
+  } = deprovisionTenantControlVariants();
 
   const handleOpenChange = (next: boolean) => {
     setOpen(next);
@@ -70,61 +78,73 @@ export const DeprovisionTenantControl = ({
 
   if (tenant.deprovisionedAt) {
     return (
-      <div className={card()}>
-        <Heading level={2} size="cardTitle" className={heading()}>
-          {t('heading')}
-        </Heading>
-        <div className={archivedRow()}>
-          <StatusBadge tone="neutral">{t('archivedBadge')}</StatusBadge>
-          <Text variant="muted">
-            {t('archivedAt', { date: formatDate(tenant.deprovisionedAt) })}
-          </Text>
-        </div>
-        <Text variant="supporting">{t('deleteDescription')}</Text>
-        <DeleteTenantPermanentlyControl tenant={tenant} />
-      </div>
+      <Card className={cardBorder()}>
+        <Card.Header
+          title={<span className={cardTitle()}>{t('cardTitle')}</span>}
+          headingLevel={2}
+          className={cardHeader()}
+        />
+        <Card.Body>
+          <div className={content()}>
+            <div className={archivedRow()}>
+              <StatusBadge tone="neutral">{t('archivedBadge')}</StatusBadge>
+              <Text variant="muted">
+                {t('archivedAt', { date: formatDate(tenant.deprovisionedAt) })}
+              </Text>
+            </div>
+            <Text variant="supporting">{t('deleteDescription')}</Text>
+            <DeleteTenantPermanentlyControl tenant={tenant} />
+          </div>
+        </Card.Body>
+      </Card>
     );
   }
 
   return (
-    <div className={card()}>
-      <Heading level={2} size="cardTitle">
-        {t('heading')}
-      </Heading>
-      <Text variant="supporting">{t('description')}</Text>
+    <Card className={cardBorder()}>
+      <Card.Header
+        title={<span className={cardTitle()}>{t('cardTitle')}</span>}
+        headingLevel={2}
+        className={cardHeader()}
+      />
+      <Card.Body>
+        <div className={content()}>
+          <Text variant="supporting">{t('description')}</Text>
 
-      <ConfirmDialog
-        isOpen={open}
-        onOpenChange={handleOpenChange}
-        triggerLabel={t('triggerButton')}
-        title={t('dialogTitle', { name: tenant.name })}
-        description={t('dialogDescription')}
-        error={error}
-        confirmFieldId="deprovision-confirm"
-        confirmLabel={t('confirmLabel', { slug: tenant.slug })}
-        confirmHint={t('confirmHint')}
-        confirmValue={confirm}
-        onConfirmValueChange={setConfirm}
-        expectedValue={tenant.slug}
-        onConfirm={handleConfirm}
-        isPending={isPending}
-        confirmButtonLabel={t('confirmButton')}
-        confirmingButtonLabel={t('confirmingButton')}
-        cancelLabel={t('cancelButton')}
-      >
-        <div className={switchRow()}>
-          <Switch.Root
-            checked={dryRun}
-            onCheckedChange={setDryRun}
-            aria-label={t('dryRunLabel')}
-            className={switchTrack()}
+          <ConfirmDialog
+            isOpen={open}
+            onOpenChange={handleOpenChange}
+            triggerLabel={t('triggerButton')}
+            title={t('dialogTitle', { name: tenant.name })}
+            description={t('dialogDescription')}
+            error={error}
+            confirmFieldId="deprovision-confirm"
+            confirmLabel={t('confirmLabel', { slug: tenant.slug })}
+            confirmHint={t('confirmHint')}
+            confirmValue={confirm}
+            onConfirmValueChange={setConfirm}
+            expectedValue={tenant.slug}
+            onConfirm={handleConfirm}
+            isPending={isPending}
+            confirmButtonLabel={t('confirmButton')}
+            confirmingButtonLabel={t('confirmingButton')}
+            cancelLabel={t('cancelButton')}
           >
-            <Switch.Thumb className={switchThumb()} />
-          </Switch.Root>
-          <span>{t('dryRunLabel')}</span>
+            <div className={switchRow()}>
+              <Switch.Root
+                checked={dryRun}
+                onCheckedChange={setDryRun}
+                aria-label={t('dryRunLabel')}
+                className={switchTrack()}
+              >
+                <Switch.Thumb className={switchThumb()} />
+              </Switch.Root>
+              <span>{t('dryRunLabel')}</span>
+            </div>
+          </ConfirmDialog>
         </div>
-      </ConfirmDialog>
-    </div>
+      </Card.Body>
+    </Card>
   );
 };
 

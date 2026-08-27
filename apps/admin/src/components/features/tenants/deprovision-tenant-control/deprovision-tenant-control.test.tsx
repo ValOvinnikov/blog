@@ -44,6 +44,39 @@ describe(DeprovisionTenantControl, () => {
     });
   });
 
+  it('titles the card "Deprovision this tenant" for a live tenant', () => {
+    const tenant = makeTenant({ deprovisionedAt: null });
+    render(<DeprovisionTenantControl tenant={tenant} />);
+
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'Deprovision this tenant',
+      }),
+    ).toBeVisible();
+  });
+
+  it('titles the card "Deprovision this tenant" for an already-deprovisioned tenant', () => {
+    const tenant = makeTenant({
+      deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
+    });
+    render(<DeprovisionTenantControl tenant={tenant} />);
+
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'Deprovision this tenant',
+      }),
+    ).toBeVisible();
+  });
+
+  it('does not duplicate a "Danger zone" heading inside the card', () => {
+    const tenant = makeTenant({ deprovisionedAt: null });
+    render(<DeprovisionTenantControl tenant={tenant} />);
+
+    expect(screen.queryByText('Danger zone')).not.toBeInTheDocument();
+  });
+
   it('shows an archived badge instead of the trigger for an already-deprovisioned tenant', () => {
     const tenant = makeTenant({
       deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
