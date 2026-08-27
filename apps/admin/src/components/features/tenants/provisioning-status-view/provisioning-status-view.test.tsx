@@ -131,11 +131,7 @@ describe(ProvisioningStatusView, () => {
   it('titles the steps card "Steps" and shows a 0-of-6-done badge when every step is idle', () => {
     const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     const sidebar = screen.getByRole('complementary');
@@ -158,11 +154,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(
