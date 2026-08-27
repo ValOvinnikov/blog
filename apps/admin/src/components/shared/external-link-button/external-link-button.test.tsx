@@ -52,4 +52,20 @@ describe(ExternalLinkButton, () => {
       screen.getByRole('link', { name: "Open Acme Inc.'s site" }),
     ).toHaveAttribute('href', 'https://acme.example.com');
   });
+
+  it('applies the given title attribute alongside an icon-only ariaLabel', () => {
+    render(
+      <ExternalLinkButton
+        href="https://acme.example.com"
+        ariaLabel="Open acme.example.com in a new tab"
+        title="Open acme.example.com in a new tab"
+      >
+        ↗
+      </ExternalLinkButton>,
+    );
+
+    expect(
+      screen.getByRole('link', { name: 'Open acme.example.com in a new tab' }),
+    ).toHaveAttribute('title', 'Open acme.example.com in a new tab');
+  });
 });

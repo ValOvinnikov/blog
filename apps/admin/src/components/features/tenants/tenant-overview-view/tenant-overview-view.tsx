@@ -11,6 +11,7 @@ import { ExternalLinkButton } from '@admin/components/shared/external-link-butto
 import { PageHeader } from '@admin/components/shared/page-header';
 import { StatusBadge } from '@admin/components/shared/status-badge';
 import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
+import { adminRoutes } from '@admin/utils/routes/routes';
 import { tenantStatusTone } from '@admin/utils/status-tone/status-tone';
 import { computeTenantFieldLocks } from '@admin/utils/tenant-field-locks/tenant-field-locks';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
@@ -112,6 +113,7 @@ export const TenantOverviewView = ({
           <DomainCard
             tenant={tenant}
             domainVerificationStatus={domainVerificationStatus}
+            dnsHref={adminRoutes.tenantDomain(tenant.id)}
           />
           <OwnerCard
             ownerEmail={ownerEmail}

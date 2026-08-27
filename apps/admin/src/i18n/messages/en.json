@@ -87,8 +87,24 @@
     "manage": "Manage →",
     "manageAriaLabel": "Manage {tenantName}"
   },
-  "tenantOverview": {
-    "description": "Look and Voice ship soon — this is where they'll live."
+  "ownerHomePage": {
+    "description": "Your site at a glance. Everything here is live.",
+    "yourSiteCardTitle": "Your site",
+    "readOnlyBadge": "read-only",
+    "nameLabel": "Name",
+    "publicDomainLabel": "Public domain",
+    "planLabel": "Plan",
+    "localeLabel": "Locale",
+    "openPublicDomainAriaLabel": "Open {domain} in a new tab",
+    "readOnlyHint": "Need one of these changed? Ask your platform contact — these values are wired into your site's hosting.",
+    "makeItYoursCardTitle": "Make it yours",
+    "makeItYoursSupportingText": "changes go live immediately",
+    "lookTileTitle": "Look",
+    "lookTileDescription": "Colours, fonts, logo, density",
+    "voiceTileTitle": "Voice",
+    "voiceTileDescription": "The words your site uses",
+    "featuresTileTitle": "Features",
+    "featuresTileDescription": "Comments, bookmarks, newsletter"
   },
   "provisioningBanner": {
     "readyTitle": "Provisioned",

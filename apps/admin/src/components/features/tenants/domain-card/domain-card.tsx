@@ -3,7 +3,6 @@ import { DetailList } from '@admin/components/shared/detail-list';
 import { LinkButton } from '@admin/components/shared/link-button';
 import { StatusBadge } from '@admin/components/shared/status-badge';
 import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
-import { adminRoutes } from '@admin/utils/routes/routes';
 import { domainVerificationTone } from '@admin/utils/status-tone/status-tone';
 import { Size } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -12,11 +11,14 @@ import { useTranslations } from 'next-intl';
 export type TDomainCardProps = {
   tenant: TTenant;
   domainVerificationStatus: TDomainVerificationStatus;
+  /** Where the "DNS →" link goes — `/tenants/{id}/domain` on the platform tree, `/dashboard/domain` on the owner tree. */
+  dnsHref: string;
 };
 
 export const DomainCard = ({
   tenant,
   domainVerificationStatus,
+  dnsHref,
 }: TDomainCardProps) => {
   const t = useTranslations('tenantOverviewPage');
 
@@ -32,11 +34,7 @@ export const DomainCard = ({
             >
               {t(`dnsStatus.${domainVerificationStatus}`)}
             </StatusBadge>
-            <LinkButton
-              href={adminRoutes.tenantDomain(tenant.id)}
-              variant="ghost"
-              size={Size.SM}
-            >
+            <LinkButton href={dnsHref} variant="ghost" size={Size.SM}>
               {t('dnsLinkButton')}
             </LinkButton>
           </>

@@ -12,6 +12,8 @@ export type TExternalLinkButtonProps = {
   children?: ReactNode;
   className?: string;
   ariaLabel?: string;
+  /** Only needed alongside `ariaLabel` when `children` is a bare glyph rather than descriptive text — an icon-only control needs both. */
+  title?: string;
 };
 
 /**
@@ -28,6 +30,7 @@ export const ExternalLinkButton = ({
   children,
   className,
   ariaLabel,
+  title,
 }: TExternalLinkButtonProps) => {
   return (
     <a
@@ -36,6 +39,7 @@ export const ExternalLinkButton = ({
       rel="noopener noreferrer"
       className={buttonVariants({ variant, size, class: className })}
       aria-label={ariaLabel}
+      title={title}
     >
       {children}
     </a>

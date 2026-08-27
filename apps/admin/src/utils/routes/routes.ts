@@ -16,6 +16,7 @@ export const adminRoutes = {
   voice: (tenantId: string) => `/tenants/${tenantId}/voice`,
   features: (tenantId: string) => `/tenants/${tenantId}/features`,
   dashboard: () => '/dashboard',
+  dashboardDomain: () => '/dashboard/domain',
   dashboardLook: () => '/dashboard/look',
   dashboardVoice: () => '/dashboard/voice',
   dashboardFeatures: () => '/dashboard/features',
