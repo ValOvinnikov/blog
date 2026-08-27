@@ -23,18 +23,15 @@ import { ProvisioningStatusView } from './provisioning-status-view';
 const render = renderWithIntl;
 
 const STEP_POLL_INTERVAL_MS = 4000;
-const DOMAIN_POLL_INTERVAL_MS = 10000;
 // Mirrors the component's own `RETRY_BASELINE_MAX_TICKS`.
 const RETRY_BASELINE_MAX_TICKS = 75;
 
 const {
   retryProvisioningStepActionMock,
   getTenantProvisioningStatusActionMock,
-  getDomainVerificationStatusActionMock,
 } = vi.hoisted(() => ({
   retryProvisioningStepActionMock: vi.fn(),
   getTenantProvisioningStatusActionMock: vi.fn(),
-  getDomainVerificationStatusActionMock: vi.fn(),
 }));
 
 vi.mock('@admin/server/provisioning/retry-provisioning-step-action', () => ({
@@ -48,10 +45,14 @@ vi.mock(
   }),
 );
 
+// `useProvisioningPoll` still imports this module for a caller that passes a
+// real domain status (`TenantOverviewView`) — mocked here purely to keep this
+// component's render test from loading that chain, same reasoning as
+// `deprovision-tenant-control.test.tsx` does for its own imports.
 vi.mock(
   '@admin/server/provisioning/get-domain-verification-status-action',
   () => ({
-    getDomainVerificationStatusAction: getDomainVerificationStatusActionMock,
+    getDomainVerificationStatusAction: vi.fn(),
   }),
 );
 
@@ -68,8 +69,6 @@ describe(ProvisioningStatusView, () => {
     });
     getTenantProvisioningStatusActionMock.mockReset();
     getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
-    getDomainVerificationStatusActionMock.mockReset();
-    getDomainVerificationStatusActionMock.mockResolvedValue('NOT_CONFIGURED');
   });
 
   afterEach(() => {
@@ -81,11 +80,7 @@ describe(ProvisioningStatusView, () => {
     expect(vi.getTimerCount()).toBe(0);
 
     const { unmount } = render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(vi.isFakeTimers()).toBe(true);
@@ -98,11 +93,7 @@ describe(ProvisioningStatusView, () => {
   it('splits the heading into an eyebrow and the tenant name', () => {
     const tenant = makeTenant({ name: 'Acme Inc.' });
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(screen.getByText('Provisioning status')).toBeVisible();
@@ -113,13 +104,7 @@ describe(ProvisioningStatusView, () => {
 
   it('shows the invited-pending owner badge when the tenant has no resolved owner email', () => {
     const tenant = makeTenant();
-    render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail={undefined}
-      />,
-    );
+    render(<ProvisioningStatusView tenant={tenant} ownerEmail={undefined} />);
 
     expect(screen.getByText('Owner')).toBeVisible();
     expect(screen.getByText('Invited, pending')).toBeVisible();
@@ -128,11 +113,7 @@ describe(ProvisioningStatusView, () => {
   it('hides the invited-pending owner badge once the tenant has a resolved owner email', () => {
     const tenant = makeTenant();
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(screen.queryByText('Invited, pending')).not.toBeInTheDocument();
@@ -141,11 +122,7 @@ describe(ProvisioningStatusView, () => {
   it('renders the steps column as a semantic aside landmark', () => {
     const tenant = makeTenant();
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(screen.getByRole('complementary')).toBeInTheDocument();
@@ -154,11 +131,7 @@ describe(ProvisioningStatusView, () => {
   it('lists all six provisioning steps in order, in operator language', () => {
     const tenant = makeTenant();
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     const headings = [
@@ -184,11 +157,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(screen.getAllByText('Running…')[0]).toBeVisible();
@@ -204,11 +173,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(screen.queryAllByRole('status')).toHaveLength(0);
@@ -242,11 +207,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     // No spinner anywhere — the badge text is the sole accessible source now.
@@ -285,11 +246,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(
@@ -316,11 +273,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(
@@ -333,11 +286,7 @@ describe(ProvisioningStatusView, () => {
   it('does not render a parsed error card when no step has failed', () => {
     const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
@@ -357,7 +306,6 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
           ownerEmail="owner@example.com"
         />,
       );
@@ -434,11 +382,7 @@ describe(ProvisioningStatusView, () => {
     });
     const user = userEvent.setup();
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     await user.click(
@@ -450,52 +394,10 @@ describe(ProvisioningStatusView, () => {
     });
   });
 
-  it('shows the live DNS verification status', () => {
-    const tenant = makeTenant();
-    render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="VERIFIED"
-        ownerEmail="owner@example.com"
-      />,
-    );
-
-    const dnsCard = screen.getByRole('heading', {
-      name: 'Domain verification',
-    }).parentElement as HTMLElement;
-    expect(within(dnsCard).getByText('acme.example.com')).toBeVisible();
-    expect(within(dnsCard).getByText('Verified')).toBeVisible();
-  });
-
-  it('keeps the NOT_CONFIGURED badge short and explains it in adjacent text, without naming env vars', () => {
-    const tenant = makeTenant();
-    render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
-    );
-
-    expect(screen.getByText('Unavailable')).toBeVisible();
-
-    const hint = screen.getByText(
-      "The Vercel integration isn't configured on this deployment, so domain verification can't run — this isn't specific to this tenant.",
-    );
-    expect(hint).toBeVisible();
-    expect(hint.textContent).not.toMatch(
-      /VERCEL_API_TOKEN|VERCEL_WEB_PROJECT_ID/,
-    );
-  });
-
   it('shows a Start provisioning action when every step is idle', () => {
     const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(
@@ -513,11 +415,7 @@ describe(ProvisioningStatusView, () => {
       },
     });
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(
@@ -529,11 +427,7 @@ describe(ProvisioningStatusView, () => {
     const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
     const user = userEvent.setup();
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     await user.click(
@@ -556,11 +450,7 @@ describe(ProvisioningStatusView, () => {
     );
     const user = userEvent.setup();
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     await user.click(
@@ -587,11 +477,7 @@ describe(ProvisioningStatusView, () => {
     });
     const user = userEvent.setup();
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     await user.click(
@@ -613,11 +499,7 @@ describe(ProvisioningStatusView, () => {
     });
     const user = userEvent.setup();
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     await user.click(
@@ -638,11 +520,7 @@ describe(ProvisioningStatusView, () => {
     });
     const user = userEvent.setup();
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     await user.click(
@@ -661,11 +539,7 @@ describe(ProvisioningStatusView, () => {
       provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
     });
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(
@@ -678,11 +552,7 @@ describe(ProvisioningStatusView, () => {
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
     });
     render(
-      <ProvisioningStatusView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-      />,
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
     expect(
@@ -721,7 +591,6 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
           ownerEmail="owner@example.com"
         />,
       );
@@ -762,7 +631,6 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
           ownerEmail="owner@example.com"
         />,
       );
@@ -797,7 +665,6 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
           ownerEmail="owner@example.com"
         />,
       );
@@ -821,7 +688,6 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
           ownerEmail="owner@example.com"
         />,
       );
@@ -859,7 +725,6 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
           ownerEmail="owner@example.com"
         />,
       );
@@ -900,7 +765,6 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
           ownerEmail="owner@example.com"
         />,
       );
@@ -927,7 +791,6 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
           ownerEmail="owner@example.com"
         />,
       );
@@ -1004,7 +867,6 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
           ownerEmail="owner@example.com"
         />,
       );
@@ -1044,7 +906,6 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
           ownerEmail="owner@example.com"
         />,
       );
@@ -1087,7 +948,6 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
           ownerEmail="owner@example.com"
         />,
       );
@@ -1148,7 +1008,6 @@ describe(ProvisioningStatusView, () => {
       const { unmount } = render(
         <ProvisioningStatusView
           tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
           ownerEmail="owner@example.com"
         />,
       );
@@ -1178,7 +1037,6 @@ describe(ProvisioningStatusView, () => {
       render(
         <ProvisioningStatusView
           tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
           ownerEmail="owner@example.com"
         />,
       );
@@ -1223,155 +1081,6 @@ describe(ProvisioningStatusView, () => {
         ),
       ).not.toBeInTheDocument();
       expect(within(sidebar).getByText('Done')).toBeVisible();
-    });
-  });
-
-  describe('domain verification polling', () => {
-    beforeEach(() => {
-      vi.useFakeTimers();
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
-    it('polls for fresh domain verification status on its own interval, and re-renders on a new result', async () => {
-      const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
-      getDomainVerificationStatusActionMock.mockResolvedValue('VERIFIED');
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          domainVerificationStatus="PENDING"
-          ownerEmail="owner@example.com"
-        />,
-      );
-
-      expect(screen.getByText('Pending — awaiting DNS')).toBeVisible();
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS);
-      });
-
-      expect(getDomainVerificationStatusActionMock).toHaveBeenCalledWith(
-        tenant.id,
-      );
-      expect(screen.getByText('Verified')).toBeVisible();
-    });
-
-    it('announces a polled DNS-status transition through a stable aria-live region', async () => {
-      const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
-      getDomainVerificationStatusActionMock.mockResolvedValue('VERIFIED');
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          domainVerificationStatus="PENDING"
-          ownerEmail="owner@example.com"
-        />,
-      );
-
-      const liveRegionBefore = screen
-        .getByText('Pending — awaiting DNS')
-        .closest('[aria-live="polite"]');
-      expect(liveRegionBefore).not.toBeNull();
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS);
-      });
-
-      const liveRegionAfter = screen
-        .getByText('Verified')
-        .closest('[aria-live="polite"]');
-      expect(liveRegionAfter).toBe(liveRegionBefore);
-    });
-
-    it('stops polling the domain once it reaches VERIFIED', async () => {
-      const tenant = makeTenant();
-      getDomainVerificationStatusActionMock.mockResolvedValue('VERIFIED');
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          domainVerificationStatus="PENDING"
-          ownerEmail="owner@example.com"
-        />,
-      );
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS);
-      });
-      expect(getDomainVerificationStatusActionMock).toHaveBeenCalledTimes(1);
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS * 2);
-      });
-      expect(getDomainVerificationStatusActionMock).toHaveBeenCalledTimes(1);
-    });
-
-    it('does not poll the domain at all when it is already NOT_CONFIGURED', async () => {
-      const tenant = makeTenant();
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          domainVerificationStatus="NOT_CONFIGURED"
-          ownerEmail="owner@example.com"
-        />,
-      );
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS * 2);
-      });
-
-      expect(getDomainVerificationStatusActionMock).not.toHaveBeenCalled();
-    });
-
-    it('keeps polling the domain after provisioning itself reaches a terminal status', async () => {
-      const tenant = makeTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-      });
-      getDomainVerificationStatusActionMock.mockResolvedValue('PENDING');
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          domainVerificationStatus="PENDING"
-          ownerEmail="owner@example.com"
-        />,
-      );
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS);
-      });
-
-      expect(getDomainVerificationStatusActionMock).toHaveBeenCalledWith(
-        tenant.id,
-      );
-      // Step polling never starts — provisioning was already terminal — so
-      // this is genuinely the domain check running on its own.
-      expect(getTenantProvisioningStatusActionMock).not.toHaveBeenCalled();
-    });
-
-    it('never delays step polling behind a slow or hanging domain check', async () => {
-      const tenant = makeTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      });
-      getDomainVerificationStatusActionMock.mockImplementation(
-        () => new Promise(() => {}),
-      );
-      getTenantProvisioningStatusActionMock.mockResolvedValue({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: idleProvisioningSteps(),
-      });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          domainVerificationStatus="PENDING"
-          ownerEmail="owner@example.com"
-        />,
-      );
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-      });
-
-      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(1);
     });
   });
 });

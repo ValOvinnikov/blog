@@ -14,10 +14,10 @@ export type TTenantBreadcrumbProps = {
 };
 
 /**
- * `tenants/[tenantId]/layout.tsx`'s breadcrumb — wraps the Look/Voice/
- * Features leaves; the tenant overview itself lives under a different
- * layout (`(platform)/tenants/[tenantId]/page.tsx`), so it's never the
- * current leaf here.
+ * `tenants/[tenantId]/layout.tsx`'s breadcrumb — wraps every page under it:
+ * the overview itself (tenant name is the current leaf, with no href), and
+ * Look/Voice/Features/Provisioning/Danger zone (an extra leaf beyond the
+ * linked tenant name).
  */
 export const TenantBreadcrumb = ({
   tenantId,
@@ -27,6 +27,8 @@ export const TenantBreadcrumb = ({
   const t = useTranslations('navSections');
   const tTopbar = useTranslations('topbar');
 
+  const isOverview = pathname === adminRoutes.tenantOverview(tenantId);
+
   const leafLabel = (() => {
     if (pathname === adminRoutes.look(tenantId)) {
       return t('look');
@@ -34,14 +36,22 @@ export const TenantBreadcrumb = ({
     if (pathname === adminRoutes.voice(tenantId)) {
       return t('voice');
     }
+    if (pathname === adminRoutes.tenantProvisioning(tenantId)) {
+      return t('provisioning');
+    }
+    if (pathname === adminRoutes.tenantDanger(tenantId)) {
+      return t('dangerZone');
+    }
     return t('features');
   })();
 
   const items: TBreadcrumbItem[] = [
     { label: t('platformLabel') },
     { label: t('tenants'), href: adminRoutes.tenants() },
-    { label: tenantName, href: adminRoutes.tenantOverview(tenantId) },
-    { label: leafLabel },
+    isOverview
+      ? { label: tenantName }
+      : { label: tenantName, href: adminRoutes.tenantOverview(tenantId) },
+    ...(isOverview ? [] : [{ label: leafLabel }]),
   ];
 
   return (

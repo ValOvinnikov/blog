@@ -4,14 +4,9 @@ import { makeTenant } from '@admin/testing/tenants/fixtures';
 
 import TenantProvisioningPage from './page';
 
-const {
-  listTenantsByIdsMock,
-  getTenantOwnerEmailMock,
-  getDomainVerificationStatusMock,
-} = vi.hoisted(() => ({
+const { listTenantsByIdsMock, getTenantOwnerEmailMock } = vi.hoisted(() => ({
   listTenantsByIdsMock: vi.fn(),
   getTenantOwnerEmailMock: vi.fn(),
-  getDomainVerificationStatusMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', async () => ({
@@ -22,20 +17,8 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@admin/server/provisioning/get-domain-verification-status', () => ({
-  getDomainVerificationStatus: getDomainVerificationStatusMock,
-}));
-
 vi.mock('@admin/server/provisioning/retry-provisioning-step-action', () => ({
   retryProvisioningStepAction: vi.fn(),
-}));
-
-vi.mock('@admin/server/provisioning/deprovision-tenant-action', () => ({
-  deprovisionTenantAction: vi.fn(),
-}));
-
-vi.mock('@admin/server/provisioning/delete-tenant-action', () => ({
-  deleteTenantAction: vi.fn(),
 }));
 
 vi.mock(
@@ -61,11 +44,9 @@ describe(TenantProvisioningPage, () => {
     listTenantsByIdsMock.mockReset();
     getTenantOwnerEmailMock.mockReset();
     getTenantOwnerEmailMock.mockResolvedValue('owner@example.com');
-    getDomainVerificationStatusMock.mockReset();
-    getDomainVerificationStatusMock.mockResolvedValue('NOT_CONFIGURED');
   });
 
-  it('renders the provisioning status view and the deprovisioning control for the resolved tenant', async () => {
+  it('renders the provisioning status view for the resolved tenant, with no deprovisioning control', async () => {
     const tenant = makeTenant();
     listTenantsByIdsMock.mockResolvedValue([tenant]);
 
@@ -73,15 +54,12 @@ describe(TenantProvisioningPage, () => {
 
     expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
     expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(tenant.id);
-    expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
-      'acme.example.com',
-    );
     expect(
       screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
     ).toBeVisible();
     expect(
-      screen.getByRole('button', { name: 'Deprovision tenant' }),
-    ).toBeVisible();
+      screen.queryByRole('button', { name: 'Deprovision tenant' }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows the invited-pending owner badge when the tenant's owner has not resolved to a real user yet", async () => {

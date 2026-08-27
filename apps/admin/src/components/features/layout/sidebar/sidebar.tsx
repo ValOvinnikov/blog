@@ -14,6 +14,8 @@ import { sidebarVariants } from './sidebar-variants';
 type TSidebarNavBadge = {
   label: string;
   tone: TStatusBadgeProps['tone'];
+  /** Suppress the tone dot for a badge that carries no state meaning — e.g. a "platform" scope marker rather than a status. */
+  hasDot?: boolean;
 };
 
 type TSidebarNavItemBase = {
@@ -96,7 +98,11 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
               <ul className={list()}>
                 {navSection.items.map((item) => {
                   const badge = item.badge && (
-                    <StatusBadge tone={item.badge.tone} className={badgeSlot()}>
+                    <StatusBadge
+                      tone={item.badge.tone}
+                      hasDot={item.badge.hasDot}
+                      className={badgeSlot()}
+                    >
                       {item.badge.label}
                     </StatusBadge>
                   );

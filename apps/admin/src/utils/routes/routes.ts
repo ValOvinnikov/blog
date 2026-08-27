@@ -10,6 +10,7 @@ export const adminRoutes = {
   addTenant: () => '/add-tenant',
   tenantOverview: (tenantId: string) => `/tenants/${tenantId}`,
   tenantProvisioning: (tenantId: string) => `/tenants/${tenantId}/provisioning`,
+  tenantDanger: (tenantId: string) => `/tenants/${tenantId}/danger`,
   look: (tenantId: string) => `/tenants/${tenantId}/look`,
   voice: (tenantId: string) => `/tenants/${tenantId}/voice`,
   features: (tenantId: string) => `/tenants/${tenantId}/features`,

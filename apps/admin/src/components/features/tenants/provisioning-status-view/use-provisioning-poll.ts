@@ -138,7 +138,11 @@ export type TUseProvisioningPollResult = {
  */
 export const useProvisioningPoll = (
   tenant: TTenant,
-  domainVerificationStatus: TDomainVerificationStatus,
+  // Optional for a caller with nothing to say about the domain (e.g.
+  // `ProvisioningStatusView`, which no longer renders a domain card) —
+  // `NOT_CONFIGURED` is a terminal status, so the domain poll effect below
+  // never actually starts for it.
+  domainVerificationStatus: TDomainVerificationStatus = 'NOT_CONFIGURED',
 ): TUseProvisioningPollResult => {
   const router = useRouter();
   const toast = useToast();

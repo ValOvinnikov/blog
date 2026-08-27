@@ -49,13 +49,6 @@ export const provisioningStatusViewVariants = tv({
       'font-mono text-xs text-admin-muted whitespace-pre-wrap break-words',
     ],
     goToTenantButton: ['self-start'],
-    dnsCard: [
-      'flex flex-col gap-3',
-      'rounded-admin border border-admin-line bg-admin-surface p-[18px] shadow-admin',
-    ],
-    dnsRow: ['flex flex-wrap items-center gap-3'],
-    dnsValue: ['font-mono text-[12.5px] text-admin-text'],
-    dnsStatusLive: ['inline-flex items-center'],
   },
   variants: {
     status: {

@@ -37,6 +37,15 @@ describe(TenantBreadcrumb, () => {
     );
   });
 
+  it('shows the tenant name as the unlinked current item on the overview route, with no extra leaf', () => {
+    vi.mocked(usePathname).mockReturnValue('/tenants/tenant-1');
+
+    render(<TenantBreadcrumb tenantId="tenant-1" tenantName="Acme Inc." />);
+
+    expect(screen.getByText('Acme Inc.')).toBeVisible();
+    expect(screen.queryByRole('link', { name: 'Acme Inc.' })).toBeNull();
+  });
+
   it('shows Look as the current item on the look route', () => {
     vi.mocked(usePathname).mockReturnValue('/tenants/tenant-1/look');
 
@@ -60,5 +69,23 @@ describe(TenantBreadcrumb, () => {
     render(<TenantBreadcrumb tenantId="tenant-1" tenantName="Acme Inc." />);
 
     expect(screen.getByText('Features')).toBeVisible();
+  });
+
+  it('shows Provisioning as the current item on the provisioning route', () => {
+    vi.mocked(usePathname).mockReturnValue('/tenants/tenant-1/provisioning');
+
+    render(<TenantBreadcrumb tenantId="tenant-1" tenantName="Acme Inc." />);
+
+    expect(screen.getByText('Provisioning')).toBeVisible();
+    expect(screen.queryByRole('link', { name: 'Provisioning' })).toBeNull();
+  });
+
+  it('shows Danger zone as the current item on the danger route', () => {
+    vi.mocked(usePathname).mockReturnValue('/tenants/tenant-1/danger');
+
+    render(<TenantBreadcrumb tenantId="tenant-1" tenantName="Acme Inc." />);
+
+    expect(screen.getByText('Danger zone')).toBeVisible();
+    expect(screen.queryByRole('link', { name: 'Danger zone' })).toBeNull();
   });
 });
