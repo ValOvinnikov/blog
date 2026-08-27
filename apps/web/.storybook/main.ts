@@ -3,6 +3,20 @@ import { fileURLToPath } from 'node:url';
 import type { StorybookConfig } from '@storybook/nextjs-vite';
 import svgr from 'vite-plugin-svgr';
 
+// `apps/web/src/i18n/request.ts` imports `deepMergePartial` from
+// `@blog/utils`'s root barrel, which also re-exports this Node-only module
+// (`import { createCipheriv } from 'node:crypto'` at module scope) — Vite's
+// browser-external stub for `node:crypto` throws the instant that import is
+// evaluated, so every story crashes via `experimentalRSC`'s App Router layout
+// chain. This is the one file that re-exports it under this relative
+// specifier, so `resolveId` below only intercepts imports of `./encrypt-secret`
+// from this exact importer, rather than matching the bare specifier text
+// globally the way `resolve.alias` would (`resolve.alias` matches on the
+// specifier string alone, with no way to also constrain by importer).
+const encryptionIndexPath = fileURLToPath(
+  new URL('../../../packages/utils/src/encryption/index.ts', import.meta.url),
+);
+
 const config: StorybookConfig = {
   stories: [
     '../src/components/**/*.stories.@(ts|tsx)',
@@ -51,6 +65,19 @@ const config: StorybookConfig = {
         new URL('./mocks/report-client-error.ts', import.meta.url),
       ),
     };
+    const encryptSecretMockPath = fileURLToPath(
+      new URL('./mocks/encrypt-secret.ts', import.meta.url),
+    );
+    config.plugins.push({
+      name: 'stub-encryption-module',
+      enforce: 'pre',
+      resolveId(source, importer) {
+        if (source === './encrypt-secret' && importer === encryptionIndexPath) {
+          return encryptSecretMockPath;
+        }
+        return null;
+      },
+    });
     // web stories compose @blog/ui components (from source, per the pnpm
     // workspace link), so any story pulling in @blog/ui's icon registry
     // needs the same `.svg` -> React component handling as packages/ui's
