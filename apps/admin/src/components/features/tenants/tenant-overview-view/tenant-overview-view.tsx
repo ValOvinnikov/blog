@@ -7,6 +7,7 @@ import { ProvisioningBanner } from '@admin/components/features/tenants/provision
 import { useProvisioningPoll } from '@admin/components/features/tenants/provisioning-status-view/use-provisioning-poll';
 import { RecentActivityCard } from '@admin/components/features/tenants/recent-activity-card';
 import { TenantDetailsPanel } from '@admin/components/features/tenants/tenant-details-panel';
+import { ExternalLinkButton } from '@admin/components/shared/external-link-button';
 import { PageHeader } from '@admin/components/shared/page-header';
 import { StatusBadge } from '@admin/components/shared/status-badge';
 import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
@@ -25,6 +26,7 @@ export type TTenantOverviewViewProps = {
   ownerJoinedAt: string | undefined;
   ownerJoinedAtIso: string | undefined;
   auditEvents: TAuditEvent[];
+  isSuperAdmin: boolean;
 };
 
 /**
@@ -42,8 +44,10 @@ export const TenantOverviewView = ({
   ownerJoinedAt,
   ownerJoinedAtIso,
   auditEvents,
+  isSuperAdmin,
 }: TTenantOverviewViewProps) => {
   const tTenantsTable = useTranslations('tenantsTable');
+  const t = useTranslations('tenantOverviewPage');
   const { root, cardsGrid, cardsColumn } = tenantOverviewViewVariants();
   const {
     provisioningStatus,
@@ -67,6 +71,20 @@ export const TenantOverviewView = ({
             <StatusBadge tone="plan" hasDot={false}>
               {tTenantsTable(`plan.${tenant.plan}`)}
             </StatusBadge>
+          </>
+        }
+        actions={
+          <>
+            <ExternalLinkButton href={`https://${tenant.primaryDomain}`}>
+              {t('openSiteAction')}
+            </ExternalLinkButton>
+            {isSuperAdmin && (
+              <ExternalLinkButton
+                href={`https://studio-${tenant.slug}.valstack.dev`}
+              >
+                {t('openStudioAction')}
+              </ExternalLinkButton>
+            )}
           </>
         }
       />

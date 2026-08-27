@@ -100,6 +100,8 @@
     "failedDescriptionFallback": "This step failed — view the steps to retry."
   },
   "tenantOverviewPage": {
+    "openSiteAction": "Open site ↗",
+    "openStudioAction": "Open Studio ↗",
     "domainCardTitle": "Domain",
     "dnsLinkButton": "DNS →",
     "publicDomainLabel": "Public domain",
