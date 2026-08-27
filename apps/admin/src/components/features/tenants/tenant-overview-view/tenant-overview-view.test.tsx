@@ -339,8 +339,14 @@ describe(TenantOverviewView, () => {
     );
   });
 
-  it('shows the public domain and a link to the provisioning page for DNS', () => {
-    const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
+  it('wires each of the four fact cards with the data passed into the view', () => {
+    // Each card's own rendering is covered by its own co-located test —
+    // this only confirms `TenantOverviewView` actually threads the right
+    // prop through to each one.
+    const tenant = makeTenant({
+      primaryDomain: 'acme.example.com',
+      sanityProjectId: 'proj-1',
+    });
     render(
       <TenantOverviewView
         tenant={tenant}
@@ -348,166 +354,13 @@ describe(TenantOverviewView, () => {
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
+        auditEvents={[makeEvent()]}
       />,
     );
 
     expect(screen.getByText('acme.example.com')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'DNS →' })).toHaveAttribute(
-      'href',
-      `/tenants/${tenant.id}/provisioning`,
-    );
-  });
-
-  it('shows the invited-pending badge when the owner has no resolved email', () => {
-    const tenant = makeTenant();
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail={undefined}
-        ownerJoinedAt={undefined}
-        ownerJoinedAtIso={undefined}
-        auditEvents={[]}
-      />,
-    );
-
-    expect(screen.getByText('Invited, pending')).toBeVisible();
-    expect(screen.queryByText('Joined')).not.toBeInTheDocument();
-  });
-
-  it('shows the Joined row with the formatted date once the owner has a real membership', () => {
-    const tenant = makeTenant();
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-      />,
-    );
-
-    expect(screen.getByText('Joined')).toBeVisible();
-    const joinedTime = screen.getByText('Aug 12, 2026');
-    expect(joinedTime).toBeVisible();
-    expect(joinedTime.tagName).toBe('TIME');
-    expect(joinedTime).toHaveAttribute('dateTime', '2026-08-12T00:00:00.000Z');
-  });
-
-  it("shows 'Not set' for content-workspace fields the tenant has not been provisioned with yet", () => {
-    const tenant = makeTenant({
-      sanityProjectId: null,
-      sanityDataset: null,
-      sanityReadTokenEncrypted: null,
-      webhookCreatedAt: null,
-    });
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-      />,
-    );
-
-    const notSetTexts = screen.getAllByText('Not set');
-    expect(notSetTexts.length).toBeGreaterThan(0);
-  });
-
-  it('shows Stored/Active badges once the token and webhook exist', () => {
-    // `status: 'SUSPENDED'` here only to avoid colliding with the page
-    // header's own tenant-status badge, which also reads "Active" by
-    // default — unrelated to what this test is checking.
-    const tenant = makeTenant({
-      status: 'SUSPENDED',
-      sanityProjectId: 'proj-1',
-      sanityDataset: 'production',
-      sanityReadTokenEncrypted: 'encrypted-value',
-      webhookCreatedAt: new Date('2026-04-02T00:00:00.000Z'),
-    });
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-      />,
-    );
-
-    expect(screen.getByText('Stored')).toBeVisible();
-    expect(screen.getByText('Active')).toBeVisible();
+    expect(screen.getByText('Aug 12, 2026')).toBeVisible();
     expect(screen.getByText('proj-1')).toBeVisible();
-  });
-
-  it('renders the studio hostname derived from the tenant slug', () => {
-    const tenant = makeTenant({ slug: 'northwind' });
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-      />,
-    );
-
-    expect(screen.getByText('studio-northwind.valstack.dev')).toBeVisible();
-  });
-
-  it('renders recent activity events with actor email and a generic per-action label', () => {
-    const tenant = makeTenant();
-    const { container } = render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[
-          makeEvent({ action: AUDIT_ACTION.SETTINGS_UPDATED }),
-          makeEvent({ id: 'event-2', action: AUDIT_ACTION.CREATED }),
-        ]}
-      />,
-    );
-
-    expect(screen.getByText('Settings updated')).toBeVisible();
-    expect(screen.getByText('Tenant created')).toBeVisible();
-    expect(screen.getAllByText('vo@valstack.dev')).toHaveLength(2);
-
-    // Each relative timestamp is a real `<time>` element carrying the
-    // lossless ISO instant, not just the lossy "2h ago"/"Aug 12" text.
-    // Scoped by dateTime rather than a bare `container.querySelectorAll`
-    // count, since the Owner card's own "Joined" `<time>` is also on this
-    // page with a different `dateTime`.
-    const activityTimeElements = Array.from(
-      container.querySelectorAll('time'),
-    ).filter(
-      (element) =>
-        element.getAttribute('dateTime') === '2026-08-24T12:00:00.000Z',
-    );
-    expect(activityTimeElements).toHaveLength(2);
-  });
-
-  it('shows an empty state when there is no recorded activity', () => {
-    const tenant = makeTenant();
-    render(
-      <TenantOverviewView
-        tenant={tenant}
-        domainVerificationStatus="NOT_CONFIGURED"
-        ownerEmail="owner@example.com"
-        ownerJoinedAt="Aug 12, 2026"
-        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
-        auditEvents={[]}
-      />,
-    );
-
-    expect(screen.getByText('No activity recorded yet.')).toBeVisible();
+    expect(screen.getByText('vo@valstack.dev')).toBeVisible();
   });
 });
