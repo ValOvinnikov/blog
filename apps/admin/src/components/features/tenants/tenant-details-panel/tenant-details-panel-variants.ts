@@ -10,5 +10,6 @@ export const tenantDetailsPanelVariants = tv({
     fieldLockReason: ['text-[11.5px] text-admin-faint'],
     lockAnnouncementLive: ['sr-only'],
     planControl: ['self-start'],
+    footerActions: ['ml-auto flex items-center gap-2.5'],
   },
 });

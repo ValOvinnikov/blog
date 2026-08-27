@@ -148,6 +148,7 @@ export const TenantDetailsPanel = ({
     fieldLockReason,
     lockAnnouncementLive,
     planControl,
+    footerActions,
   } = tenantDetailsPanelVariants();
 
   // `tenant`/`ownerEmail` are the baseline: whenever a fresh pair of props
@@ -309,14 +310,16 @@ export const TenantDetailsPanel = ({
         </Card.Body>
 
         <Card.Footer>
-          <Button
-            type="button"
-            variant="primary"
-            onClick={handleSave}
-            isDisabled={isPending || !isDirty}
-          >
-            {isPending ? t('savingButton') : t('saveButton')}
-          </Button>
+          <div className={footerActions()}>
+            <Button
+              type="button"
+              variant="primary"
+              onClick={handleSave}
+              isDisabled={isPending || !isDirty}
+            >
+              {isPending ? t('savingButton') : t('saveButton')}
+            </Button>
+          </div>
         </Card.Footer>
       </Card>
     </div>
