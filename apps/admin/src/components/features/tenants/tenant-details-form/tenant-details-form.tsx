@@ -5,7 +5,6 @@ import { Button } from '@admin/components/shared/button';
 import { Card } from '@admin/components/shared/card';
 import { FormField } from '@admin/components/shared/form-field';
 import { FormTextInput } from '@admin/components/shared/form-text-input';
-import { PageHeader } from '@admin/components/shared/page-header';
 import { SegmentedControl } from '@admin/components/shared/segmented-control';
 import { Spinner } from '@admin/components/shared/spinner';
 import {
@@ -73,23 +72,25 @@ export const TenantDetailsForm = () => {
     }
   };
 
+  // Only counts as confirmed when the operator hasn't edited the email since
+  // seeing the confirmation — this second submit is what actually proceeds
+  // down the invite path. `ownerInviteConfirmation.email` comes back already
+  // normalized by the server's `z.string().trim().toLowerCase()`, so the raw
+  // form value must be normalized the same way before comparing. The token
+  // itself is only echoed back when the email still matches — the server
+  // re-verifies it against `ownerEmail`, so a stale token for a different
+  // email is worthless to submit anyway. The form is `inert` for the whole
+  // pending window, so this stays stable for the duration of a submit and
+  // safely doubles as "which action is in flight" for the pending copy below.
+  const normalizedOwnerEmail = values.ownerEmail.trim().toLowerCase();
+  const confirmedInvite =
+    ownerInviteConfirmation?.email === normalizedOwnerEmail
+      ? ownerInviteConfirmation
+      : undefined;
+
   const handleSubmit = () => {
     setFormError(undefined);
     setFieldErrors({});
-
-    // Only counts as confirmed when the operator hasn't edited the email
-    // since seeing the confirmation — this second submit is what actually
-    // proceeds down the invite path. `ownerInviteConfirmation.email` comes
-    // back already normalized by the server's `z.string().trim().toLowerCase()`,
-    // so the raw form value must be normalized the same way before comparing.
-    // The token itself is only echoed back when the email still matches —
-    // the server re-verifies it against `ownerEmail`, so a stale token for a
-    // different email is worthless to submit anyway.
-    const normalizedOwnerEmail = values.ownerEmail.trim().toLowerCase();
-    const confirmedInvite =
-      ownerInviteConfirmation?.email === normalizedOwnerEmail
-        ? ownerInviteConfirmation
-        : undefined;
 
     startTransition(async () => {
       const result = await createTenantAction({
@@ -107,15 +108,21 @@ export const TenantDetailsForm = () => {
     { value: TENANT_PLAN.GROWTH, label: t('planOptionGrowth') },
   ];
 
+  const pendingLabel = confirmedInvite
+    ? t('submittingInviteButton')
+    : t('submittingBeginButton');
+
   return (
     <div className={root()}>
-      <PageHeader title={t('heading')} description={t('description')} />
-
       {formError && <Alert type={ALERT_TYPE.ERROR} title={formError} />}
 
       <div className={cardWrap()}>
         <div className={cardInert()} inert={isPending}>
           <Card>
+            <Card.Header
+              title={t('heading')}
+              supportingText={t('description')}
+            />
             <Card.Body>
               <div className={fields()}>
                 <FormTextInput
@@ -181,7 +188,7 @@ export const TenantDetailsForm = () => {
                 isDisabled={isPending}
               >
                 {isPending
-                  ? t('submittingButton')
+                  ? pendingLabel
                   : ownerInviteConfirmation
                     ? t('confirmOwnerInviteButton')
                     : t('submitButton')}
@@ -192,11 +199,7 @@ export const TenantDetailsForm = () => {
 
         {isPending && (
           <div className={overlay()}>
-            <Spinner
-              label={t('submittingButton')}
-              size={Size.LG}
-              hasLabel={true}
-            />
+            <Spinner label={pendingLabel} size={Size.LG} hasLabel={true} />
           </div>
         )}
       </div>

@@ -314,6 +314,33 @@
     "topicsEmpty": "Topics Empty",
     "bookmarksEmpty": "Bookmarks Empty"
   },
+  "addTenantWizard": {
+    "heading": "Add tenant",
+    "railAriaLabel": "Provisioning steps",
+    "steps": {
+      "details": { "title": "Details", "description": "Name, slug, plan" },
+      "sanityProject": {
+        "title": "Sanity project",
+        "description": "Create + configure"
+      },
+      "seedContent": {
+        "title": "Seed content",
+        "description": "Starter documents"
+      },
+      "deployStudio": {
+        "title": "Deploy Studio",
+        "description": "Vercel deploy"
+      },
+      "registryRows": {
+        "title": "Registry rows",
+        "description": "tenants + memberships"
+      },
+      "mapDomain": {
+        "title": "Map domain",
+        "description": "DNS + verification"
+      }
+    }
+  },
   "tenantDetailsForm": {
     "heading": "Tenant details",
     "description": "The fast part. Everything after this runs automatically, each step resumable on failure.",
@@ -326,10 +353,11 @@
     "planOptionFree": "Free",
     "planOptionGrowth": "Growth",
     "ownerEmailLabel": "Owner email",
-    "ownerEmailHint": "An existing user is granted OWNER access immediately; an unregistered email is sent an invite to sign in and become OWNER.",
+    "ownerEmailHint": "The person who'll manage this tenant. An existing account gets access immediately; a new address gets an email invite to sign in.",
     "submitButton": "Begin provisioning →",
     "confirmOwnerInviteButton": "Confirm & invite owner →",
-    "submittingButton": "Creating…"
+    "submittingBeginButton": "Beginning provisioning…",
+    "submittingInviteButton": "Inviting owner…"
   },
   "provisioningStatusView": {
     "pageTitle": "Provisioning",

@@ -10,7 +10,7 @@ import { useTranslations } from 'next-intl';
 
 /**
  * `(platform)/layout.tsx`'s breadcrumb — every route under that segment is
- * tenant-agnostic (`/tenants`, `/add-tenant`); a specific tenant's pages live
+ * tenant-agnostic (`/tenants`, `/tenants/new`); a specific tenant's pages live
  * under `tenants/[tenantId]/layout.tsx`'s own `TenantBreadcrumb` instead.
  */
 export const PlatformBreadcrumb = () => {
@@ -25,7 +25,7 @@ export const PlatformBreadcrumb = () => {
   };
 
   const items: TBreadcrumbItem[] =
-    pathname === adminRoutes.addTenant()
+    pathname === adminRoutes.newTenant()
       ? [platform, tenants, { label: t('addTenant') }]
       : [platform, { label: t('tenants') }];
 

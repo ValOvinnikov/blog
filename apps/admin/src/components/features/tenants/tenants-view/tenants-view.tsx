@@ -33,7 +33,7 @@ export const TenantsView = ({
           code: (chunks) => <code className={codeChunk()}>{chunks}</code>,
         })}
         actions={
-          <LinkButton href={adminRoutes.addTenant()} variant="primary">
+          <LinkButton href={adminRoutes.newTenant()} variant="primary">
             {t('addTenant')}
           </LinkButton>
         }

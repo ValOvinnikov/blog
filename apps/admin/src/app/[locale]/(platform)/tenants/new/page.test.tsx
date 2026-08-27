@@ -1,6 +1,6 @@
 import { renderWithIntl, screen } from '@admin/testing/custom-render';
 
-import AddTenantPage from './page';
+import NewTenantPage from './page';
 
 const render = renderWithIntl;
 
@@ -8,10 +8,13 @@ vi.mock('@admin/server/tenants/create-tenant-action', () => ({
   createTenantAction: vi.fn(),
 }));
 
-describe(AddTenantPage, () => {
-  it('renders the Details step form', () => {
-    render(<AddTenantPage />);
+describe(NewTenantPage, () => {
+  it('renders the Add tenant wizard with the Details step form', () => {
+    render(<NewTenantPage />);
 
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Add tenant' }),
+    ).toBeVisible();
     expect(
       screen.getByRole('heading', { name: 'Tenant details' }),
     ).toBeVisible();

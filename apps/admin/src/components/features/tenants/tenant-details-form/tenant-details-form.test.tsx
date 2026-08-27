@@ -88,7 +88,7 @@ describe(TenantDetailsForm, () => {
     ).toBeVisible();
   });
 
-  it('shows a full-form loading overlay while the create action is pending', async () => {
+  it('shows a full-form loading overlay with a "Beginning provisioning…" label for the initial submit', async () => {
     let resolveAction: (value: { ok: boolean }) => void = () => {};
     createTenantActionMock.mockImplementation(
       () =>
@@ -104,8 +104,12 @@ describe(TenantDetailsForm, () => {
       screen.getByRole('button', { name: /begin provisioning/i }),
     );
 
-    expect(screen.getByRole('status', { name: 'Creating…' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Creating…' })).toBeDisabled();
+    expect(
+      screen.getByRole('status', { name: 'Beginning provisioning…' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Beginning provisioning…' }),
+    ).toBeDisabled();
     expect(
       screen.getByRole('textbox', { name: 'Tenant name' }).closest('[inert]'),
     ).not.toBeNull();
@@ -113,7 +117,49 @@ describe(TenantDetailsForm, () => {
     resolveAction({ ok: false });
     await waitFor(() =>
       expect(
-        screen.queryByRole('status', { name: 'Creating…' }),
+        screen.queryByRole('status', { name: 'Beginning provisioning…' }),
+      ).not.toBeInTheDocument(),
+    );
+  });
+
+  it('shows an "Inviting owner…" pending label for the owner-invite confirmation submit', async () => {
+    let resolveAction: (value: { ok: boolean }) => void = () => {};
+    createTenantActionMock.mockResolvedValueOnce({
+      ok: false,
+      ownerInviteConfirmation: {
+        email: 'owner@example.com',
+        token: 'confirmation-token',
+        message: 'No account found for owner@example.com.',
+      },
+    });
+    createTenantActionMock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveAction = resolve;
+        }),
+    );
+    const user = userEvent.setup();
+    render(<TenantDetailsForm />);
+
+    await fillValidForm(user);
+    await user.click(
+      screen.getByRole('button', { name: /begin provisioning/i }),
+    );
+    await user.click(
+      await screen.findByRole('button', { name: /confirm & invite owner/i }),
+    );
+
+    expect(
+      screen.getByRole('status', { name: 'Inviting owner…' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Inviting owner…' }),
+    ).toBeDisabled();
+
+    resolveAction({ ok: false });
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('status', { name: 'Inviting owner…' }),
       ).not.toBeInTheDocument(),
     );
   });

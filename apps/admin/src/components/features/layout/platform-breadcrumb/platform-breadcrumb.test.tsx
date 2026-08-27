@@ -34,7 +34,7 @@ describe(PlatformBreadcrumb, () => {
   });
 
   it('renders a 3-segment trail with a linked Tenants on the add-tenant route', () => {
-    vi.mocked(usePathname).mockReturnValue('/add-tenant');
+    vi.mocked(usePathname).mockReturnValue('/tenants/new');
 
     render(<PlatformBreadcrumb />);
 
