@@ -1,4 +1,5 @@
-import { BRAND_VARIANT, HEADING_ALIGN } from '@blog/config';
+import { BRAND_VARIANT, HEADING_ALIGN, routes } from '@blog/config';
+import { Pagination } from '@blog/ui/organisms/pagination';
 import { PostsSection } from '@blog/ui/organisms/posts-section';
 import type { IBlogListPageViewProps } from '@web/components/pages/blog-list-page';
 import { Section } from '@web/components/shared/section';
@@ -57,6 +58,15 @@ export const makeBlogListPageView = (
           linkAs={SmartLink}
           isWrapped={true}
           emptyMessage="No posts yet."
+        />
+        <Pagination
+          currentPage={1}
+          totalPages={3}
+          createHref={routes.blogIndex}
+          ariaLabel="Blog pages"
+          previousLabel="Previous"
+          nextLabel="Next"
+          linkAs={SmartLink}
         />
       </Section>
     ),

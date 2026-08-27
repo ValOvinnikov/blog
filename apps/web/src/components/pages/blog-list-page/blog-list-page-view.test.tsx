@@ -91,4 +91,12 @@ describe(BlogListPageView, () => {
       within(screen.getByRole('main')).getByTestId('posts-content-stub'),
     ).toBeInTheDocument();
   });
+
+  it('renders the Pagination from the default fixture postsContent', () => {
+    setup();
+
+    expect(
+      screen.getByRole('navigation', { name: 'Blog pages' }),
+    ).toBeInTheDocument();
+  });
 });
