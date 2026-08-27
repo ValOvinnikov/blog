@@ -1,5 +1,7 @@
 import { AdminShell } from '@admin/components/features/layout/admin-shell';
+import { TenantBreadcrumb } from '@admin/components/features/layout/tenant-breadcrumb';
 import { TenantSwitcher } from '@admin/components/features/layout/tenant-switcher';
+import { auth } from '@admin/server/auth/auth';
 import { requireTenantById } from '@admin/server/auth/require-tenant-by-id';
 import {
   platformNavSections,
@@ -22,6 +24,7 @@ type TProps = {
 export default async function TenantByIdLayout({ children, params }: TProps) {
   const { tenantId } = await params;
   const { tenant, admin } = await requireTenantById(tenantId);
+  const session = await auth();
   const t = await getTranslations('tenantLayout');
   const tNavSections = (await getTranslations(
     'navSections',
@@ -36,8 +39,12 @@ export default async function TenantByIdLayout({ children, params }: TProps) {
       switcher={
         <TenantSwitcher tenants={[tenant]} activeTenantId={tenant.id} />
       }
-      crumb={t('crumb')}
-      roleLabel={t('roleLabel', { role: admin.role })}
+      crumb={<TenantBreadcrumb tenantId={tenant.id} tenantName={tenant.name} />}
+      roleChip={{
+        name: session?.user?.name ?? session?.user?.email ?? admin.role,
+        role: admin.role,
+        scope: t('scopeLabel'),
+      }}
     >
       {children}
     </AdminShell>

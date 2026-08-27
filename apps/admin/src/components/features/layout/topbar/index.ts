@@ -1,1 +1,1 @@
-export { Topbar } from './topbar';
+export { Topbar, type TRoleChipProps } from './topbar';

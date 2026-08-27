@@ -23,16 +23,19 @@ vi.mock('@admin/i18n/navigation', () => ({
 
 const render = renderWithIntl;
 
+const roleChip = { name: 'Val Ovinnikov', role: 'ADMIN', scope: 'Platform' };
+
 describe(Topbar, () => {
-  it('renders the crumb and role label', () => {
-    render(<Topbar crumb="Platform" roleLabel="ADMIN" />);
+  it('renders the given crumb node and the role chip', () => {
+    render(<Topbar crumb={<p>Platform</p>} roleChip={roleChip} />);
 
     expect(screen.getByText('Platform')).toBeVisible();
     expect(screen.getByText('ADMIN')).toBeVisible();
+    expect(screen.getByText('· Platform')).toBeVisible();
   });
 
   it('renders no nav menu trigger when no sections are passed', () => {
-    render(<Topbar crumb="Platform" roleLabel="ADMIN" />);
+    render(<Topbar crumb={<p>Platform</p>} roleChip={roleChip} />);
 
     expect(
       screen.queryByRole('button', { name: 'Menu' }),
@@ -43,8 +46,8 @@ describe(Topbar, () => {
     const user = userEvent.setup();
     render(
       <Topbar
-        crumb="Platform"
-        roleLabel="ADMIN"
+        crumb={<p>Platform</p>}
+        roleChip={roleChip}
         sections={[
           {
             label: 'Platform',
@@ -68,8 +71,8 @@ describe(Topbar, () => {
     const user = userEvent.setup();
     render(
       <Topbar
-        crumb="Platform"
-        roleLabel="ADMIN"
+        crumb={<p>Platform</p>}
+        roleChip={roleChip}
         switcher={<div>Tenant switcher</div>}
         sections={[
           {

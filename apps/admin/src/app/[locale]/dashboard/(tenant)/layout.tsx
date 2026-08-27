@@ -1,11 +1,15 @@
 import { AdminShell } from '@admin/components/features/layout/admin-shell';
+import { DashboardBreadcrumb } from '@admin/components/features/layout/dashboard-breadcrumb';
 import { TenantSwitcher } from '@admin/components/features/layout/tenant-switcher';
+import { auth } from '@admin/server/auth/auth';
+import { isVirtualAdminMembership } from '@admin/server/auth/build-virtual-admin-membership';
 import { resolveDashboardTenant } from '@admin/server/auth/resolve-dashboard-tenant';
 import {
   dashboardNavSections,
   type TNavTranslator,
 } from '@admin/utils/nav-sections/nav-sections';
 import { adminRoutes } from '@admin/utils/routes/routes';
+import { queries } from '@blog/db';
 import { getTranslations } from 'next-intl/server';
 
 type TProps = {
@@ -24,10 +28,18 @@ type TProps = {
  */
 export default async function DashboardTenantLayout({ children }: TProps) {
   const { tenant, membership, tenants } = await resolveDashboardTenant();
-  const t = await getTranslations('dashboardLayout');
+  const session = await auth();
   const tNavSections = (await getTranslations(
     'navSections',
   )) as unknown as TNavTranslator;
+
+  // A SUPERADMIN browsing here holds no real `memberships` row — `membership`
+  // is `buildVirtualAdminMembership`'s virtual, OWNER-level stand-in, correct
+  // for authorization but never a correct identity label.
+  const isVirtual = isVirtualAdminMembership(membership);
+  const admin = isVirtual
+    ? await queries.admins.getAdminByUserId(membership.userId)
+    : undefined;
 
   return (
     <AdminShell
@@ -43,8 +55,16 @@ export default async function DashboardTenantLayout({ children }: TProps) {
           />
         ) : undefined
       }
-      crumb={t('crumb')}
-      roleLabel={t('roleLabel', { role: membership.role })}
+      crumb={<DashboardBreadcrumb />}
+      roleChip={{
+        name:
+          session?.user?.name ??
+          session?.user?.email ??
+          admin?.role ??
+          membership.role,
+        role: admin?.role ?? membership.role,
+        scope: admin ? tNavSections('platformLabel') : tenant.name,
+      }}
     >
       {children}
     </AdminShell>
