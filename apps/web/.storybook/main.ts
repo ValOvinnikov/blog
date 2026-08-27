@@ -50,6 +50,17 @@ const config: StorybookConfig = {
       '@web/utils/report-client-error': fileURLToPath(
         new URL('./mocks/report-client-error.ts', import.meta.url),
       ),
+      // `apps/web/src/i18n/request.ts` imports `deepMergePartial` from
+      // `@blog/utils`'s root barrel, which also re-exports this Node-only
+      // module (`import { createCipheriv } from 'node:crypto'` at module
+      // scope) — Vite's browser-external stub for `node:crypto` throws the
+      // instant that import is evaluated, so every story crashes via
+      // `experimentalRSC`'s App Router layout chain. Aliasing the relative
+      // specifier the encryption barrel re-exports keeps the real,
+      // server-only file out of the browser build entirely.
+      './encrypt-secret': fileURLToPath(
+        new URL('./mocks/encrypt-secret.ts', import.meta.url),
+      ),
     };
     // web stories compose @blog/ui components (from source, per the pnpm
     // workspace link), so any story pulling in @blog/ui's icon registry
