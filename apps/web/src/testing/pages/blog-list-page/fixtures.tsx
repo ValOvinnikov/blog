@@ -1,5 +1,7 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { PostsSection } from '@blog/ui/organisms/posts-section';
 import type { IBlogListPageViewProps } from '@web/components/pages/blog-list-page';
+import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
 import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
@@ -35,19 +37,25 @@ export const makeBlogListPageView = (
       'https://example.com',
     ),
     postsContent: (
-      <PostsSection
-        posts={[
-          makePostListItem(),
-          makePostListItem({
-            id: 'post-2',
-            title: 'A tour of the new editor',
-            href: '/blog/a-tour-of-the-new-editor',
-          }),
-        ]}
-        title="Latest posts"
+      <Section
+        brandVariant={BRAND_VARIANT.PRIMARY}
         titleId="blog-posts-title"
-        linkAs={SmartLink}
-      />
+        dataTestId="post-list-module-post-list-1"
+      >
+        <PostsSection
+          posts={[
+            makePostListItem(),
+            makePostListItem({
+              id: 'post-2',
+              title: 'A tour of the new editor',
+              href: '/blog/a-tour-of-the-new-editor',
+            }),
+          ]}
+          title="Latest posts"
+          titleId="blog-posts-title"
+          linkAs={SmartLink}
+        />
+      </Section>
     ),
     ...overrides,
   };
