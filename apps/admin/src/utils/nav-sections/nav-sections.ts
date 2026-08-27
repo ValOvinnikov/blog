@@ -32,14 +32,12 @@ type TTenantNavHrefs = {
   look: string;
   voice: string;
   features: string;
-  /** Only the `/tenants/{id}` tree has a Domain page today — omitted for the slug-free `/dashboard` sidebar, which keeps the "later" badge. */
-  domain?: string;
+  domain: string;
 };
 
-/** The eight tenant-facing destinations, shared by the `/tenants/{id}` and slug-free `/dashboard` sidebars — only the Look/Voice/Features/Domain hrefs (and, via the caller, the section label) differ between them. Danger zone is deliberately excluded: it's platform-only and never appears in the owner-facing `/dashboard` tree. */
-const tenantFacingNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
+/** The four tenant-facing destinations that route somewhere today, shared by the `/tenants/{id}` and slug-free `/dashboard` sidebars — only the hrefs (and, via the caller, the section label) differ between them. Danger zone is deliberately excluded: it's platform-only and never appears in the owner-facing `/dashboard` tree. */
+const shippingTenantNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
   const shipping = { label: t('badgeThisMilestone'), tone: 'neutral' } as const;
-  const later = { label: t('badgeLater'), tone: 'warn' } as const;
 
   return [
     {
@@ -60,14 +58,20 @@ const tenantFacingNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
       href: hrefs.features,
       badge: shipping,
     },
-    hrefs.domain
-      ? {
-          label: t('domain'),
-          icon: ICONS.GLOBE,
-          href: hrefs.domain,
-          badge: shipping,
-        }
-      : { label: t('domain'), icon: ICONS.GLOBE, badge: later },
+    {
+      label: t('domain'),
+      icon: ICONS.GLOBE,
+      href: hrefs.domain,
+      badge: shipping,
+    },
+  ];
+};
+
+/** Tenant-facing destinations with no owner-actionable route yet — platform-only, and dropped from the owner-facing `/dashboard` tree entirely rather than shown as a permanently inert "later" badge. */
+const laterPlatformNavItems = (t: TNavTranslator) => {
+  const later = { label: t('badgeLater'), tone: 'warn' } as const;
+
+  return [
     { label: t('email'), icon: ICONS.MAIL, badge: later },
     { label: t('subscribers'), icon: ICONS.MENU_ROWS, badge: later },
     { label: t('comments'), icon: ICONS.COMMENT, badge: later },
@@ -95,12 +99,13 @@ export const tenantNavSections = (
           icon: ICONS.HOUSE,
           href: adminRoutes.tenantOverview(tenantId),
         },
-        ...tenantFacingNavItems(t, {
+        ...shippingTenantNavItems(t, {
           look: adminRoutes.look(tenantId),
           voice: adminRoutes.voice(tenantId),
           features: adminRoutes.features(tenantId),
           domain: adminRoutes.tenantDomain(tenantId),
         }),
+        ...laterPlatformNavItems(t),
       ],
     },
     {
@@ -123,16 +128,17 @@ export const tenantNavSections = (
   ];
 };
 
-/** The slug-free counterpart to `tenantNavSections`'s tenant-facing section — same eight destinations, routed under `/dashboard` instead of `/tenants/{id}`, labeled generically since the whole point of this tree is not naming the tenant in anything the URL-shy owner sees. Owners never get the Overview item (there's nothing at slug-free `/dashboard` distinct from the section itself) or the platform-only Provisioning/Danger zone section. */
+/** The slug-free counterpart to `tenantNavSections`'s tenant-facing section — same four shipping destinations, routed under `/dashboard` instead of `/tenants/{id}`, labeled generically since the whole point of this tree is not naming the tenant in anything the URL-shy owner sees. Owners never get the Overview item (there's nothing at slug-free `/dashboard` distinct from the section itself), the platform-only Provisioning/Danger zone section, or the four not-yet-owner-actionable items (Email, Subscribers, Comments, Team) — those are dropped entirely rather than shown as a permanently inert "later" badge. */
 export const dashboardNavSections = (
   t: TNavTranslator,
 ): TSidebarNavSection[] => [
   {
     label: t('dashboardLabel'),
-    items: tenantFacingNavItems(t, {
+    items: shippingTenantNavItems(t, {
       look: adminRoutes.dashboardLook(),
       voice: adminRoutes.dashboardVoice(),
       features: adminRoutes.dashboardFeatures(),
+      domain: adminRoutes.dashboardDomain(),
     }),
   },
 ];

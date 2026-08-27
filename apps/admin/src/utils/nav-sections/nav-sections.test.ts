@@ -121,15 +121,17 @@ describe('tenantNavSections', () => {
 });
 
 describe('dashboardNavSections', () => {
-  it('gives Look, Voice and Features their slug-free /dashboard hrefs', () => {
+  it('gives Look, Voice, Features and Domain their slug-free /dashboard hrefs', () => {
     const [dashboard] = dashboardNavSections(t);
     const look = dashboard!.items.find((item) => item.label === 'Look');
     const voice = dashboard!.items.find((item) => item.label === 'Voice');
     const features = dashboard!.items.find((item) => item.label === 'Features');
+    const domain = dashboard!.items.find((item) => item.label === 'Domain');
 
     expect(look?.href).toBe('/dashboard/look');
     expect(voice?.href).toBe('/dashboard/voice');
     expect(features?.href).toBe('/dashboard/features');
+    expect(domain?.href).toBe('/dashboard/domain');
   });
 
   it('never includes Overview, Provisioning or Danger zone — those are platform-only', () => {
@@ -141,22 +143,24 @@ describe('dashboardNavSections', () => {
     expect(labels).not.toContain('Danger zone');
   });
 
-  it('leaves Domain "later"-badged with no href, unlike tenantNavSections', () => {
+  it('drops Email, Subscribers, Comments and Team entirely — no owner-actionable route exists for them yet', () => {
     const [dashboard] = dashboardNavSections(t);
-    const domain = dashboard!.items.find((item) => item.label === 'Domain');
 
-    expect(domain?.href).toBeUndefined();
-    expect(domain?.badge).toEqual({ label: 'later', tone: 'warn' });
+    const labels = dashboard!.items.map((item) => item.label);
+    expect(labels).not.toContain('Email');
+    expect(labels).not.toContain('Subscribers');
+    expect(labels).not.toContain('Comments');
+    expect(labels).not.toContain('Team');
   });
 
-  it('lists the same eight tenant-facing destinations as tenantNavSections', () => {
+  it('lists exactly the four shipping tenant-facing destinations', () => {
     const [dashboard] = dashboardNavSections(t);
-    const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
 
-    expect(dashboard!.items.map((item) => item.label)).toEqual(
-      tenant!.items
-        .filter((item) => item.label !== 'Overview')
-        .map((item) => item.label),
-    );
+    expect(dashboard!.items.map((item) => item.label)).toEqual([
+      'Look',
+      'Voice',
+      'Features',
+      'Domain',
+    ]);
   });
 });
