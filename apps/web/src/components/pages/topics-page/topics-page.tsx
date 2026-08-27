@@ -1,13 +1,6 @@
 import { routes, TAXONOMY_KIND } from '@blog/config';
 import { service } from '@blog/service';
-import {
-  Breadcrumbs,
-  type IBreadcrumbItem,
-} from '@blog/ui/molecules/breadcrumbs';
-import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
-import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
-import { JsonLd } from '@web/components/shared/json-ld';
-import { SmartLink } from '@web/components/shared/smart-link';
+import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
@@ -15,18 +8,13 @@ import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
+import { TopicsPageView } from './topics-page-view';
+
 /**
  * TopicsPage — `/topics` composition: fetches the `page_topicIndex`
- * document via `service.pages.topicIndex.v1.getIndexPage()` and renders it
- * through `BlogPageTemplate` (heading + supporting text) with the
- * `taxonomyList` slot rendered by `TaxonomyListModule` as a full-bleed
- * `Section` sibling, matching `BlogListPage`. Renders a `Home › Topics`
- * `Breadcrumbs` trail (plus its `BreadcrumbList` JSON-LD) inside a
- * `BreadcrumbBar` sibling before `<main>`.
- *
- * Unlike the topic chip row (`getTopicsSafely`), this page's entire content
- * *is* the taxonomy list, so a fetch failure 404s rather than rendering
- * breadcrumbs and nothing else at a 200 — matching `BlogListPage`.
+ * document via `service.pages.topicIndex.v1.getIndexPage()`, then hands the
+ * resolved data — plus the pre-rendered `taxonomyList` slot content — to
+ * `TopicsPageView`.
  */
 export const TopicsPage = async () => {
   const [result, breadcrumbsT, t] = await Promise.all([
@@ -47,41 +35,35 @@ export const TopicsPage = async () => {
   const { heading, supportingText, taxonomyListId } = result.data;
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
-  const trail: IBreadcrumbItem[] = [
+  const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: breadcrumbsT('home'), href: routes.home() },
     { label: breadcrumbsT('topics'), href: routes.topics() },
   ];
-  const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
+  const breadcrumbListSchema = buildBreadcrumbListSchema(
+    breadcrumbTrail,
+    siteUrl,
+  );
 
   return (
-    <>
-      {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
-
-      <BreadcrumbBar>
-        <Breadcrumbs
-          items={trail}
-          ariaLabel={breadcrumbsT('ariaLabel')}
-          linkAs={SmartLink}
+    <TopicsPageView
+      heading={heading}
+      supportingText={supportingText}
+      breadcrumbTrail={breadcrumbTrail}
+      breadcrumbAriaLabel={breadcrumbsT('ariaLabel')}
+      breadcrumbListSchema={breadcrumbListSchema}
+      taxonomyListContent={
+        <TaxonomyListModule
+          id={taxonomyListId}
+          taxonomy={TAXONOMY_KIND.TOPICS}
+          titleId="topic-list-title"
+          dataTestId={`taxonomy-list-module-${taxonomyListId}`}
+          headingLevel={2}
+          accessibleTitle={heading}
+          emptyMessage={t('empty')}
+          buildHref={(slug) => routes.topic(slug)}
+          formatPostCount={(count) => t('postsCount', { count })}
         />
-      </BreadcrumbBar>
-
-      <BlogPageTemplate
-        heading={heading}
-        supportingText={supportingText}
-        modules={
-          <TaxonomyListModule
-            id={taxonomyListId}
-            taxonomy={TAXONOMY_KIND.TOPICS}
-            titleId="topic-list-title"
-            dataTestId={`taxonomy-list-module-${taxonomyListId}`}
-            headingLevel={2}
-            accessibleTitle={heading}
-            emptyMessage={t('empty')}
-            buildHref={(slug) => routes.topic(slug)}
-            formatPostCount={(count) => t('postsCount', { count })}
-          />
-        }
-      />
-    </>
+      }
+    />
   );
 };
