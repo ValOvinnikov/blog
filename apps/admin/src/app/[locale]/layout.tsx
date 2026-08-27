@@ -1,3 +1,4 @@
+import { ToastProvider } from '@admin/context/toast-provider';
 import { routing } from '@admin/i18n/routing';
 import type { ILocalizedParams } from '@blog/config';
 import { notFound } from 'next/navigation';
@@ -26,7 +27,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      {children}
+      <ToastProvider>{children}</ToastProvider>
     </NextIntlClientProvider>
   );
 }

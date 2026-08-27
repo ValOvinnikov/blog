@@ -35,7 +35,7 @@ const idleStepStatuses = () =>
 
 describe(ProvisioningBanner, () => {
   it('renders nothing for a tenant that has not started provisioning', () => {
-    const { container } = render(
+    render(
       <ProvisioningBanner
         tenantId="tenant-1"
         provisioningStatus={TENANT_PROVISIONING_STATUS.PENDING}
@@ -46,7 +46,12 @@ describe(ProvisioningBanner, () => {
       />,
     );
 
-    expect(container).toBeEmptyDOMElement();
+    // The shared render wrapper always mounts an (empty) toast viewport, so
+    // the container itself is never fully empty — assert the banner's own
+    // possible outputs are absent instead.
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('shows the current step and a link to the provisioning page while running', () => {

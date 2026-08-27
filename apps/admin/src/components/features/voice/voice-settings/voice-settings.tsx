@@ -6,6 +6,7 @@ import { Button } from '@admin/components/shared/button';
 import { Card } from '@admin/components/shared/card';
 import { Disclosure } from '@admin/components/shared/disclosure';
 import { PageHeader } from '@admin/components/shared/page-header';
+import { useToast } from '@admin/context/toast-provider';
 import { inheritedVoiceValue } from '@admin/utils/inherited-voice-value/inherited-voice-value';
 import { useFormSubmission } from '@admin/utils/use-form-submission/use-form-submission';
 import {
@@ -60,12 +61,20 @@ export const VoiceSettings = ({
   const t = useTranslations('voiceSettings');
   const tGroups = useTranslations('voiceFieldGroups');
   const tLabels = useTranslations('voiceFieldLabels');
+  const toast = useToast();
   const router = useRouter();
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TVoiceOverrides, { ok: boolean }>({
       initialValues: () => buildInitialValues(initialOverrides),
       onSubmit: (vals) => saveAction(tenantSlug, vals),
-      onSuccess: () => router.refresh(),
+      onSuccess: () => {
+        toast.success({
+          command: 'voice',
+          state: 'saved',
+          message: t('alertSuccess'),
+        });
+        router.refresh();
+      },
     });
 
   const placeholders = useMemo(() => {
@@ -98,13 +107,6 @@ export const VoiceSettings = ({
         }
       />
 
-      {status === 'success' && (
-        <Alert
-          type={ALERT_TYPE.SUCCESS}
-          title={t('alertSuccess')}
-          className={alert()}
-        />
-      )}
       {status === 'error' && (
         <Alert
           type={ALERT_TYPE.ERROR}

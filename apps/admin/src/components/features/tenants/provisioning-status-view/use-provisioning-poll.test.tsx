@@ -1,13 +1,26 @@
 import {
+  ToastProvider,
+  TOAST_EXIT_ANIMATION_MS,
+} from '@admin/context/toast-provider';
+import messages from '@admin/i18n/messages/en.json';
+import {
   idleProvisioningSteps,
   makeTenant,
 } from '@admin/testing/tenants/fixtures';
+import { LOCALE_ISO_CODES } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
-import { act, renderHook, waitFor } from '@testing-library/react';
+import {
+  act,
+  renderHook as rtlRenderHook,
+  screen,
+  waitFor,
+} from '@testing-library/react';
+import { NextIntlClientProvider } from 'next-intl';
+import type { ReactNode } from 'react';
 
 import { useProvisioningPoll } from './use-provisioning-poll';
 
@@ -15,6 +28,18 @@ const STEP_POLL_INTERVAL_MS = 4000;
 const DOMAIN_POLL_INTERVAL_MS = 10000;
 // Mirrors the hook's own `RETRY_BASELINE_MAX_TICKS`.
 const RETRY_BASELINE_MAX_TICKS = 75;
+
+// The hook reads `useTranslations`/`useToast` — every `renderHook` call
+// below needs both contexts, so this shadows the RTL import once rather
+// than passing `{ wrapper }` at each of its call sites.
+const Wrapper = ({ children }: { children: ReactNode }) => (
+  <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
+    <ToastProvider>{children}</ToastProvider>
+  </NextIntlClientProvider>
+);
+
+const renderHook: typeof rtlRenderHook = (callback, options) =>
+  rtlRenderHook(callback, { wrapper: Wrapper, ...options });
 
 const {
   retryProvisioningStepActionMock,
@@ -399,21 +424,23 @@ describe(useProvisioningPoll, () => {
       expect(getTenantProvisioningStatusActionMock).not.toHaveBeenCalled();
     });
 
-    it('surfaces a poll error and keeps retrying automatically when a tick rejects', async () => {
+    it('surfaces a poll-error toast and keeps retrying automatically when a tick rejects, dismissing it once a tick recovers', async () => {
       const tenant = makeTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       });
       getTenantProvisioningStatusActionMock.mockRejectedValueOnce(
         new Error('NEXT_REDIRECT'),
       );
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, 'NOT_CONFIGURED'),
-      );
+      renderHook(() => useProvisioningPoll(tenant, 'NOT_CONFIGURED'));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
-      expect(result.current.pollError).toBe(true);
+      expect(
+        screen.getByText(
+          "Couldn't refresh the latest status — retrying automatically.",
+        ),
+      ).toBeVisible();
 
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
@@ -421,9 +448,15 @@ describe(useProvisioningPoll, () => {
       });
 
       await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+        await vi.advanceTimersByTimeAsync(
+          STEP_POLL_INTERVAL_MS + TOAST_EXIT_ANIMATION_MS,
+        );
       });
-      expect(result.current.pollError).toBe(false);
+      expect(
+        screen.queryByText(
+          "Couldn't refresh the latest status — retrying automatically.",
+        ),
+      ).not.toBeInTheDocument();
     });
   });
 

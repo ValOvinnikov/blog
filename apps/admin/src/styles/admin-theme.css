@@ -24,6 +24,7 @@
   --admin-warn-weak: #fbf3df;
   --admin-bad: #b42318;
   --admin-bad-weak: #fdeceb;
+  --admin-warn-on-dark: #f5c451;
   --admin-side: #0f1115;
   --admin-side-line: #1c1f26;
   --admin-side-text: #c9cfda;
@@ -48,6 +49,7 @@
   --color-admin-warn-weak: var(--admin-warn-weak);
   --color-admin-bad: var(--admin-bad);
   --color-admin-bad-weak: var(--admin-bad-weak);
+  --color-admin-warn-on-dark: var(--admin-warn-on-dark);
   --color-admin-side: var(--admin-side);
   --color-admin-side-line: var(--admin-side-line);
   --color-admin-side-text: var(--admin-side-text);

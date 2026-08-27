@@ -163,7 +163,7 @@ describe(FeaturesSettings, () => {
     });
   });
 
-  it('shows a success alert and refreshes after a successful save', async () => {
+  it('shows a save-confirmation toast and refreshes after a successful save', async () => {
     const user = userEvent.setup();
     const refresh = vi.fn();
     vi.mocked(useRouter).mockReturnValue({
