@@ -377,8 +377,8 @@
     "allOption": "All"
   },
   "deprovisionTenantControl": {
-    "heading": "Danger zone",
-    "description": "Deprovisioning removes this tenant's domain, Studio project, and Sanity project, then archives the tenant row. This cannot be undone.",
+    "cardTitle": "Deprovision this tenant",
+    "description": "Removes the tenant's custom domain, deletes its Studio project, and archives its Sanity project so it stops billing rather than deleting it. The tenant row itself is archived, not deleted — its slug stays reserved. This cannot be undone.",
     "triggerButton": "Deprovision tenant",
     "dialogTitle": "Deprovision {name}",
     "dialogDescription": "This dispatches deprovision-tenant.yml, which tears down every provisioned resource for this tenant. Type the tenant's slug to confirm.",
