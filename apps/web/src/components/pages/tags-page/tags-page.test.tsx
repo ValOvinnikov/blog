@@ -10,7 +10,9 @@ const { getIndexPageMock, taxonomyListModuleMock } = vi.hoisted(() => ({
   // client renderer. Stubbed as a plain sync component so this suite can
   // assert `TagsPage` passes the right props through without needing a
   // real async render; its own fetch/render logic is covered by
-  // `taxonomy-list-module.test.tsx`.
+  // `taxonomy-list-module.test.tsx`. `TagsPageView`'s own rendering (h1,
+  // breadcrumbs, JSON-LD, composed content) is covered by
+  // `tags-page-view.test.tsx`.
   taxonomyListModuleMock: vi.fn(
     ({
       id,
@@ -162,28 +164,6 @@ describe(`<${TagsPage.name}/>`, () => {
     const current = within(nav).getByText('Tags');
     expect(current).toHaveAttribute('aria-current', 'page');
     expect(current.tagName).not.toBe('A');
-  });
-
-  it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        heading: 'Tags',
-        supportingText: 'Browse every post by tag.',
-        seo: {},
-        taxonomyListId: 'tag-list-1',
-      },
-    });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-    const main = screen.getByRole('main');
-
-    expect(main.contains(nav)).toBe(false);
-    expect(
-      nav.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
   });
 
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
