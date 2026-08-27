@@ -1,4 +1,4 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, HEADING_ALIGN } from '@blog/config';
 import { PostsSection } from '@blog/ui/organisms/posts-section';
 import type { IBlogListPageViewProps } from '@web/components/pages/blog-list-page';
 import { Section } from '@web/components/shared/section';
@@ -53,7 +53,11 @@ export const makeBlogListPageView = (
           ]}
           title="Latest posts"
           titleId="blog-posts-title"
+          accessibleTitle="Blog posts"
+          align={HEADING_ALIGN.LEFT}
           linkAs={SmartLink}
+          isWrapped={true}
+          emptyMessage="No posts yet."
         />
       </Section>
     ),
