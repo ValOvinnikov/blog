@@ -1,4 +1,5 @@
-import { tv, type VariantProps } from 'tailwind-variants';
+import { tv } from '@admin/utils/tv/tv';
+import type { VariantProps } from 'tailwind-variants';
 
 export const headingVariants = tv({
   base: ['text-admin-text', 'm-0'],

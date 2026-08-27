@@ -1,5 +1,6 @@
+import { tv } from '@admin/utils/tv/tv';
 import { Size } from '@blog/config';
-import { tv, type VariantProps } from 'tailwind-variants';
+import type { VariantProps } from 'tailwind-variants';
 
 export const buttonVariants = tv({
   base: [
