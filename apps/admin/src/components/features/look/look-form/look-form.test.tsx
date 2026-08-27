@@ -141,7 +141,7 @@ describe(LookForm, () => {
     });
   });
 
-  it('shows a success alert once the save resolves', async () => {
+  it('shows a save-confirmation toast once the save resolves', async () => {
     const user = userEvent.setup();
     render(
       <LookForm tenantSlug="acme" initialValues={defaultLookFormValues()} />,

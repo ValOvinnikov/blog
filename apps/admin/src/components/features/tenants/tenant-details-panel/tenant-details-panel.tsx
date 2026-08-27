@@ -6,6 +6,7 @@ import { Card } from '@admin/components/shared/card';
 import { FormField } from '@admin/components/shared/form-field';
 import { FormTextInput } from '@admin/components/shared/form-text-input';
 import { SegmentedControl } from '@admin/components/shared/segmented-control';
+import { useToast } from '@admin/context/toast-provider';
 import {
   updateTenantDetailsAction,
   type TUpdateTenantDetailsActionInput,
@@ -96,6 +97,7 @@ export const TenantDetailsPanel = ({
 }: TTenantDetailsPanelProps) => {
   const t = useTranslations('tenantDetailsPanel');
   const tSteps = useTranslations('provisioningStatusView');
+  const toast = useToast();
   const router = useRouter();
   const panelId = useId();
   const [renderedTenant, setRenderedTenant] = useState(tenant);
@@ -106,7 +108,6 @@ export const TenantDetailsPanel = ({
   const [fieldErrors, setFieldErrors] =
     useState<TUpdateTenantDetailsFieldErrors>({});
   const [formError, setFormError] = useState<string | undefined>(undefined);
-  const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   // A fresh `tenant`/`ownerEmail` prop (a successful save's own
@@ -167,13 +168,11 @@ export const TenantDetailsPanel = ({
     nextValue: TFormValues[K],
   ) => {
     setValues((prev) => ({ ...prev, [key]: nextValue }));
-    setShowSaveSuccess(false);
   };
 
   const handleSave = () => {
     setFormError(undefined);
     setFieldErrors({});
-    setShowSaveSuccess(false);
 
     const payload: TUpdateTenantDetailsActionInput = {
       name: values.name,
@@ -191,7 +190,11 @@ export const TenantDetailsPanel = ({
         setFormError(result.error);
         return;
       }
-      setShowSaveSuccess(true);
+      toast.success({
+        command: 'tenant.details',
+        state: 'saved',
+        message: t('alertSuccess'),
+      });
       router.refresh();
     });
   };
@@ -233,9 +236,6 @@ export const TenantDetailsPanel = ({
               {lockAnnouncement}
             </span>
 
-            {showSaveSuccess && (
-              <Alert type={ALERT_TYPE.SUCCESS} title={t('alertSuccess')} />
-            )}
             {formError && <Alert type={ALERT_TYPE.ERROR} title={formError} />}
 
             <div

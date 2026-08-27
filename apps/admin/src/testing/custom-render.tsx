@@ -1,3 +1,4 @@
+import { ToastProvider } from '@admin/context/toast-provider';
 import messages from '@admin/i18n/messages/en.json';
 import { LOCALE_ISO_CODES } from '@blog/config';
 import {
@@ -17,11 +18,13 @@ type TRenderOpts = Omit<RenderOptions, 'wrapper'>;
  * context, which Vitest's non-RSC environment never supplies on its own.
  * Every render helper below wraps with this so a rendered tree resolves the
  * same real `en.json` copy the app ships, regardless of how deep the first
- * `useTranslations` call sits.
+ * `useTranslations` call sits. `ToastProvider` nests inside it, mirroring the
+ * root layout, so a component reading `useToast` renders the same as it
+ * would live without every test file wiring its own provider.
  */
 const withIntl = (ui: ReactNode): ReactNode => (
   <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
-    {ui}
+    <ToastProvider>{ui}</ToastProvider>
   </NextIntlClientProvider>
 );
 

@@ -6,6 +6,7 @@ import { Button } from '@admin/components/shared/button';
 import { Card } from '@admin/components/shared/card';
 import { Disclosure } from '@admin/components/shared/disclosure';
 import { PageHeader } from '@admin/components/shared/page-header';
+import { useToast } from '@admin/context/toast-provider';
 import { updateLookAction } from '@admin/server/site-config/update-look-action';
 import type { TLookFormValues } from '@admin/utils/default-look-values/default-look-values';
 import { useFormSubmission } from '@admin/utils/use-form-submission/use-form-submission';
@@ -71,6 +72,8 @@ const valuesEqual = (a: TLookFormValues, b: TLookFormValues): boolean => {
 };
 
 export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
+  const toast = useToast();
+  const t = useTranslations('lookForm');
   // The last known-persisted state: the submitted fields on a successful
   // save, plus the two brand-asset URLs the instant their own
   // (independently persisted) upload/remove action succeeds — everything
@@ -90,7 +93,14 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
           radiusScale: vals.radiusScale,
           density: vals.density,
         }),
-      onSuccess: (submittedValues) => setSavedValues(submittedValues),
+      onSuccess: (submittedValues) => {
+        setSavedValues(submittedValues);
+        toast.success({
+          command: 'look',
+          state: 'saved',
+          message: t('alertSuccess'),
+        });
+      },
     });
 
   const isDirty = !valuesEqual(values, savedValues);
@@ -109,8 +119,6 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
   const handleReset = () => {
     setValues((prev) => applyPresetDefaults(prev.preset, prev));
   };
-
-  const t = useTranslations('lookForm');
 
   const { root, grid, stack, tagSecondary, note } = lookFormVariants();
 
@@ -141,9 +149,6 @@ export const LookForm = ({ tenantSlug, initialValues }: TLookFormProps) => {
         }
       />
 
-      {status === 'success' && (
-        <Alert type={ALERT_TYPE.SUCCESS} title={t('alertSuccess')} />
-      )}
       {status === 'error' && (
         <Alert type={ALERT_TYPE.ERROR} title={t('alertError')} />
       )}

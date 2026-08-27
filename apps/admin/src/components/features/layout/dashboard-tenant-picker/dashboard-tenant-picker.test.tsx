@@ -48,8 +48,12 @@ describe(DashboardTenantPicker, () => {
   });
 
   it('renders nothing for an empty tenant list', () => {
-    const { container } = render(<DashboardTenantPicker tenants={[]} />);
+    render(<DashboardTenantPicker tenants={[]} />);
 
-    expect(container).toBeEmptyDOMElement();
+    // Not `container` — `renderWithIntl` always mounts the app's
+    // `ToastProvider` alongside whatever the component under test renders,
+    // so an empty-render assertion has to target the component's own
+    // output, not the whole render tree.
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
   });
 });
