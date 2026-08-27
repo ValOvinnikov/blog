@@ -1,13 +1,6 @@
 import { routes } from '@blog/config';
 import { service } from '@blog/service';
-import {
-  Breadcrumbs,
-  type IBreadcrumbItem,
-} from '@blog/ui/molecules/breadcrumbs';
-import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
-import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
-import { JsonLd } from '@web/components/shared/json-ld';
-import { SmartLink } from '@web/components/shared/smart-link';
+import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { ModuleRenderer } from '@web/modules/module-renderer';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
@@ -16,17 +9,16 @@ import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
+import { TagPageView } from './tag-page-view';
+
 type TTagPageProps = { slug: string; page?: number; locale: string };
 
 /**
  * TagPage — shared composition for `/tags/[slug]` (page 1, `page`
  * omitted) and `/tags/[slug]/page/[page]` (pages ≥ 2, `page` provided):
- * fetches the `page_tag` shell via the tag service, renders a
- * `Home › Tag: {name}` `Breadcrumbs` trail (plus its `BreadcrumbList`
- * JSON-LD) inside a `BreadcrumbBar` sibling before `<main>`, then the
- * archive itself — via `PostListModule`, reading `page_tag.postList` — as a
- * sibling outside `BlogPageTemplate`'s constrained furniture, mirroring
- * `TopicPage`.
+ * fetches the `page_tag` shell via the tag service, then hands the resolved
+ * data — plus the pre-rendered archive/page-builder modules content — to
+ * `TagPageView`.
  */
 export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
   const [result, breadcrumbsT, tagPageT] = await Promise.all([
@@ -47,45 +39,39 @@ export const TagPage = async ({ slug, page, locale }: TTagPageProps) => {
   const { tag, modules, postListId } = result.data;
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
-  const trail: IBreadcrumbItem[] = [
+  const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: breadcrumbsT('home'), href: routes.home() },
     { label: tagPageT('label', { name: tag.title }), href: routes.tag(slug) },
   ];
-  const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
+  const breadcrumbListSchema = buildBreadcrumbListSchema(
+    breadcrumbTrail,
+    siteUrl,
+  );
 
   return (
-    <>
-      {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
-
-      <BreadcrumbBar>
-        <Breadcrumbs
-          items={trail}
-          ariaLabel={breadcrumbsT('ariaLabel')}
-          linkAs={SmartLink}
-        />
-      </BreadcrumbBar>
-
-      <BlogPageTemplate
-        heading={tag.title}
-        supportingText={tag.description}
-        modules={
-          <>
-            <PostListModule
-              id={postListId}
-              locale={locale}
-              page={page ?? 1}
-              createHref={(pageNumber) => routes.tag(slug, pageNumber)}
-              ariaLabel={tagPageT('paginationAriaLabel', {
-                name: tag.title,
-              })}
-              accessibleTitle={tagPageT('title', { name: tag.title })}
-              emptyMessageFallback={tagPageT('empty', { name: tag.title })}
-              titleId="tag-posts-title"
-            />
-            <ModuleRenderer modules={modules} locale={locale} />
-          </>
-        }
-      />
-    </>
+    <TagPageView
+      heading={tag.title}
+      supportingText={tag.description}
+      breadcrumbTrail={breadcrumbTrail}
+      breadcrumbAriaLabel={breadcrumbsT('ariaLabel')}
+      breadcrumbListSchema={breadcrumbListSchema}
+      postsContent={
+        <>
+          <PostListModule
+            id={postListId}
+            locale={locale}
+            page={page ?? 1}
+            createHref={(pageNumber) => routes.tag(slug, pageNumber)}
+            ariaLabel={tagPageT('paginationAriaLabel', {
+              name: tag.title,
+            })}
+            accessibleTitle={tagPageT('title', { name: tag.title })}
+            emptyMessageFallback={tagPageT('empty', { name: tag.title })}
+            titleId="tag-posts-title"
+          />
+          <ModuleRenderer modules={modules} locale={locale} />
+        </>
+      }
+    />
   );
 };
