@@ -14,7 +14,10 @@ import { useTranslations } from 'next-intl';
 
 import { STEP_ORDER } from '../provisioning-status-view/use-provisioning-poll';
 
-import { provisioningBannerVariants } from './provisioning-banner-variants';
+import {
+  provisioningBannerVariants,
+  type TProvisioningBannerVariants,
+} from './provisioning-banner-variants';
 
 export type TProvisioningBannerProps = {
   tenantId: string;
@@ -25,7 +28,10 @@ export type TProvisioningBannerProps = {
   errorKind: TProvisioningErrorKind | undefined;
 };
 
-const GLYPH = { ok: '✓', warn: '◐', bad: '!' } as const;
+const GLYPH: Record<
+  NonNullable<TProvisioningBannerVariants['tone']>,
+  string
+> = { ok: '✓', warn: '◐', bad: '!' };
 
 /**
  * The overview page's own provisioning signal — renders from the same
