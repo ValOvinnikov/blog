@@ -23,7 +23,7 @@ describe('platformNavSections', () => {
     );
 
     expect(tenants).toMatchObject({ href: '/tenants' });
-    expect(addTenant).toMatchObject({ href: '/add-tenant' });
+    expect(addTenant).toMatchObject({ href: '/tenants/new' });
     expect(addTenant?.badge).toBeUndefined();
   });
 });

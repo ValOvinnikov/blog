@@ -26,7 +26,7 @@ describe(TenantsView, () => {
     render(<TenantsView tenants={[tenant]} shouldShowArchived={false} />);
 
     const addTenant = screen.getByRole('link', { name: /add tenant/i });
-    expect(addTenant).toHaveAttribute('href', '/add-tenant');
+    expect(addTenant).toHaveAttribute('href', '/tenants/new');
   });
 
   it('shows the archived-tenants toggle set to Active by default', () => {
