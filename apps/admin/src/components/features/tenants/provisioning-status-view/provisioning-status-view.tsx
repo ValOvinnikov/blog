@@ -52,7 +52,6 @@ export const ProvisioningStatusView = ({
 }: TProvisioningStatusViewProps) => {
   const t = useTranslations('provisioningStatusView');
   const {
-    pollError,
     dispatchError,
     isStarting,
     isRetrying,
@@ -123,10 +122,6 @@ export const ProvisioningStatusView = ({
           </div>
         )}
       </div>
-
-      {pollError && (
-        <Alert type={ALERT_TYPE.WARNING} title={t('pollErrorWarning')} />
-      )}
 
       {dispatchError && (
         <Alert

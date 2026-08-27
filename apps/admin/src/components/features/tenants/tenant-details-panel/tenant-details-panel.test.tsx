@@ -1,3 +1,4 @@
+import { ToastProvider } from '@admin/context/toast-provider';
 import messages from '@admin/i18n/messages/en.json';
 import { renderWithIntl, screen, waitFor } from '@admin/testing/custom-render';
 import { makeTenant } from '@admin/testing/tenants/fixtures';
@@ -35,7 +36,7 @@ const SLUG_LOCKED: TTenantFieldLocks = {
 const withIntl = (ui: ReactElement) => {
   return (
     <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
-      {ui}
+      <ToastProvider>{ui}</ToastProvider>
     </NextIntlClientProvider>
   );
 };
@@ -296,7 +297,7 @@ describe(TenantDetailsPanel, () => {
       expect(slugInput).toHaveAccessibleDescription('');
     });
 
-    it('shows a success alert after a successful save, and clears it once editing resumes', async () => {
+    it('shows a save-confirmation toast after a successful save, independent of further edits', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: true,
         tenant: makeTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
@@ -322,8 +323,13 @@ describe(TenantDetailsPanel, () => {
         'Tenant details saved.',
       );
 
+      // Unlike the old inline alert (tied to `showSaveSuccess`, cleared on
+      // any edit), a toast's lifecycle is independent of the form — it must
+      // not disappear just because editing resumed.
       await user.type(screen.getByRole('textbox', { name: 'Name' }), ' again');
-      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveTextContent(
+        'Tenant details saved.',
+      );
     });
 
     it('does not show a success alert when saving fails', async () => {

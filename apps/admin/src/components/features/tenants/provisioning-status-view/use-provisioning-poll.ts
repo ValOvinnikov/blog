@@ -1,5 +1,6 @@
 'use client';
 
+import { useToast } from '@admin/context/toast-provider';
 import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
 import { getDomainVerificationStatusAction } from '@admin/server/provisioning/get-domain-verification-status-action';
 import { getTenantProvisioningStatusAction } from '@admin/server/provisioning/get-tenant-provisioning-status-action';
@@ -20,6 +21,7 @@ import type {
   TTenantProvisioningSteps,
 } from '@blog/db/schema/tenants';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useState, useEffect, useRef, useTransition } from 'react';
 
 // Object key insertion order matches the config-declared step sequence, so
@@ -107,8 +109,6 @@ const isTerminalDomainVerificationStatus = (
 type TDispatchErrorKind = 'not-found' | 'other';
 
 export type TUseProvisioningPollResult = {
-  /** True while the most recent step-status poll tick rejected. */
-  pollError: boolean;
   dispatchError: TDispatchErrorKind | undefined;
   isStarting: boolean;
   isRetrying: boolean;
@@ -141,12 +141,17 @@ export const useProvisioningPoll = (
   domainVerificationStatus: TDomainVerificationStatus,
 ): TUseProvisioningPollResult => {
   const router = useRouter();
+  const toast = useToast();
+  const t = useTranslations('provisioningStatusView');
+  // Non-null while the current pollErrorWarning toast is showing — lets a
+  // later recovering tick dismiss the exact toast a failing one raised,
+  // rather than leaving it to its own auto-dismiss timer.
+  const pollErrorToastIdRef = useRef<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [dispatchError, setDispatchError] = useState<
     TDispatchErrorKind | undefined
   >(undefined);
-  const [pollError, setPollError] = useState(false);
   const [, startTransition] = useTransition();
   const [renderedTenant, setRenderedTenant] = useState(tenant);
   const [provisioningStatus, setProvisioningStatus] =
@@ -215,7 +220,10 @@ export const useProvisioningPoll = (
           if (cancelled || !result) {
             return;
           }
-          setPollError(false);
+          if (pollErrorToastIdRef.current) {
+            toast.dismiss(pollErrorToastIdRef.current);
+            pollErrorToastIdRef.current = null;
+          }
           setProvisioningStatus(result.provisioningStatus);
           setProvisioningSteps(result.provisioningSteps);
 
@@ -256,11 +264,19 @@ export const useProvisioningPoll = (
           // `requireAdmin()`) must not silently kill polling — the interval
           // itself already retries on its own next tick; this only makes
           // the stall visible instead of leaving the last-known state
-          // looking current.
+          // looking current. A toast — not layout — carries this: it's
+          // transient and self-correcting, and one already showing isn't
+          // replaced by a repeat.
           if (cancelled) {
             return;
           }
-          setPollError(true);
+          if (!pollErrorToastIdRef.current) {
+            pollErrorToastIdRef.current = toast.warning({
+              command: 'tenant.provisioning_poll',
+              state: 'error',
+              message: t('pollErrorWarning'),
+            });
+          }
         });
     }, STEP_POLL_INTERVAL_MS);
 
@@ -268,7 +284,7 @@ export const useProvisioningPoll = (
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [tenant.id, isPollingActive, pendingRetryBaseline]);
+  }, [tenant.id, isPollingActive, pendingRetryBaseline, toast, t]);
 
   useEffect(() => {
     if (isTerminalDomainVerificationStatus(domainStatus)) {
@@ -371,7 +387,6 @@ export const useProvisioningPoll = (
   const handleStart = () => runProvisioningDispatch(setIsStarting);
 
   return {
-    pollError,
     dispatchError,
     isStarting,
     isRetrying,

@@ -18,6 +18,11 @@
     "brandName": "Valstack",
     "brandTagline": "admin"
   },
+  "toastProvider": {
+    "viewportAriaLabel": "Notifications",
+    "dismissLabel": "Dismiss notification",
+    "mergeCountSuffix": " ×{count}"
+  },
   "topbarNavMenu": {
     "triggerLabel": "Menu"
   },

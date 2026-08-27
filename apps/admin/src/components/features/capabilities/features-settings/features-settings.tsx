@@ -5,6 +5,7 @@ import { Button } from '@admin/components/shared/button';
 import { Card } from '@admin/components/shared/card';
 import { PageHeader } from '@admin/components/shared/page-header';
 import { SettingRow } from '@admin/components/shared/setting-row';
+import { useToast } from '@admin/context/toast-provider';
 import {
   CAPABILITY_TOGGLES,
   type TSettingsFeaturesValues,
@@ -42,12 +43,20 @@ export const FeaturesSettings = ({
   saveAction,
 }: TFeaturesSettingsProps) => {
   const t = useTranslations('featuresSettings');
+  const toast = useToast();
   const router = useRouter();
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TSettingsFeaturesValues, { ok: boolean }>({
       initialValues,
       onSubmit: (vals) => saveAction(tenantSlug, vals),
-      onSuccess: () => router.refresh(),
+      onSuccess: () => {
+        toast.success({
+          command: 'features',
+          state: 'saved',
+          message: t('alertSuccess'),
+        });
+        router.refresh();
+      },
     });
 
   const { root, alert, switchTrack, switchThumb, switchLabel } =
@@ -76,13 +85,6 @@ export const FeaturesSettings = ({
         }
       />
 
-      {status === 'success' && (
-        <Alert
-          type={ALERT_TYPE.SUCCESS}
-          title={t('alertSuccess')}
-          className={alert()}
-        />
-      )}
       {status === 'error' && (
         <Alert
           type={ALERT_TYPE.ERROR}

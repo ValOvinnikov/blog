@@ -1,3 +1,7 @@
+import {
+  ToastProvider,
+  TOAST_EXIT_ANIMATION_MS,
+} from '@admin/context/toast-provider';
 import messages from '@admin/i18n/messages/en.json';
 import {
   act,
@@ -26,13 +30,13 @@ import { ProvisioningStatusView } from './provisioning-status-view';
 const render = renderWithIntl;
 
 // `rerender()` replaces the entire previously-rendered tree, so a rerender
-// that needs to keep going through `useTranslations` context has to
-// re-supply this wrapper itself — `renderWithIntl`'s own wrapping only
+// that needs to keep going through `useTranslations`/`useToast` context has
+// to re-supply this wrapper itself — `renderWithIntl`'s own wrapping only
 // covers the initial render.
 const withIntl = (ui: ReactElement) => {
   return (
     <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
-      {ui}
+      <ToastProvider>{ui}</ToastProvider>
     </NextIntlClientProvider>
   );
 };
@@ -1418,9 +1422,13 @@ describe(ProvisioningStatusView, () => {
         },
       });
 
-      // The interval never stopped — the very next tick succeeds on its own.
+      // The interval never stopped — the very next tick succeeds on its own,
+      // which dismisses the warning toast (its own exit animation is what
+      // the extra advance below flushes).
       await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+        await vi.advanceTimersByTimeAsync(
+          STEP_POLL_INTERVAL_MS + TOAST_EXIT_ANIMATION_MS,
+        );
       });
 
       expect(
