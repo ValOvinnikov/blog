@@ -1,6 +1,6 @@
 import { tv, type VariantProps } from 'tailwind-variants';
 
-export const provisioningBannerVariants = tv({
+export const bannerStateVariants = tv({
   slots: {
     root: [
       'flex flex-wrap items-center gap-3.5',
@@ -29,6 +29,4 @@ export const provisioningBannerVariants = tv({
   },
 });
 
-export type TProvisioningBannerVariants = VariantProps<
-  typeof provisioningBannerVariants
->;
+export type TBannerStateVariants = VariantProps<typeof bannerStateVariants>;

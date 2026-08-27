@@ -11,14 +11,10 @@ import {
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
 import { useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
 
 import { STEP_ORDER } from '../provisioning-status-view/use-provisioning-poll';
 
-import {
-  provisioningBannerVariants,
-  type TProvisioningBannerVariants,
-} from './provisioning-banner-variants';
+import { BannerState } from './components/banner-state/banner-state';
 
 export type TProvisioningBannerProps = {
   tenantId: string;
@@ -27,48 +23,6 @@ export type TProvisioningBannerProps = {
   isOverallFailed: boolean;
   isProvisioningRunning: boolean;
   errorKind: TProvisioningErrorKind | undefined;
-};
-
-const GLYPH: Record<
-  NonNullable<TProvisioningBannerVariants['tone']>,
-  string
-> = { ok: '✓', warn: '◐', bad: '!' };
-
-type TBannerStateProps = {
-  tone: NonNullable<TProvisioningBannerVariants['tone']>;
-  role: 'status' | 'alert';
-  title: ReactNode;
-  description: ReactNode;
-  action: ReactNode;
-};
-
-const BannerState = ({
-  tone,
-  role,
-  title,
-  description,
-  action,
-}: TBannerStateProps) => {
-  const {
-    root,
-    icon,
-    textGroup,
-    title: titleClass,
-    description: descriptionClass,
-  } = provisioningBannerVariants();
-
-  return (
-    <div className={root({ tone })} role={role}>
-      <span className={icon()} aria-hidden="true">
-        {GLYPH[tone]}
-      </span>
-      <div className={textGroup()} aria-live="polite">
-        <strong className={titleClass()}>{title}</strong>
-        <span className={descriptionClass()}>{description}</span>
-      </div>
-      {action}
-    </div>
-  );
 };
 
 /**
