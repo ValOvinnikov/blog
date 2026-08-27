@@ -7,7 +7,7 @@ export type TWizardRailStep = {
   description: ReactNode;
 };
 
-export type TWizardRailProps = {
+type TWizardRailProps = {
   steps: TWizardRailStep[];
   /** Zero-based index of the step currently underway. */
   activeIndex: number;

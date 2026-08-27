@@ -1,6 +1,9 @@
 import { TenantDetailsForm } from '@admin/components/features/tenants/tenant-details-form';
 import { PageHeader } from '@admin/components/shared/page-header';
-import { WizardRail } from '@admin/components/shared/wizard-rail';
+import {
+  WizardRail,
+  type TWizardRailStep,
+} from '@admin/components/shared/wizard-rail';
 import { useTranslations } from 'next-intl';
 
 import { addTenantWizardVariants } from './add-tenant-wizard-variants';
@@ -15,7 +18,7 @@ export const AddTenantWizard = () => {
   const t = useTranslations('addTenantWizard');
   const { root, layout, body } = addTenantWizardVariants();
 
-  const steps = [
+  const steps: TWizardRailStep[] = [
     {
       title: t('steps.details.title'),
       description: t('steps.details.description'),

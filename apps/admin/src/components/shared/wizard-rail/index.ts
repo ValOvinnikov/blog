@@ -1,5 +1,1 @@
-export {
-  WizardRail,
-  type TWizardRailProps,
-  type TWizardRailStep,
-} from './wizard-rail';
+export { WizardRail, type TWizardRailStep } from './wizard-rail';
