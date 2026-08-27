@@ -17,12 +17,14 @@ describe(Icon, () => {
     expect(screen.getByLabelText('Warning')).toBeInTheDocument();
   });
 
-  it('renders every icon admin references without throwing', () => {
+  it('renders a glyph for every icon admin references', () => {
     const used = [
+      ICONS.CHECK_SHEET,
       ICONS.CHEVRON_RIGHT,
       ICONS.COMMENT,
       ICONS.GLOBE,
       ICONS.GRID,
+      ICONS.HOUSE,
       ICONS.MAIL,
       ICONS.MENU,
       ICONS.MENU_ROWS,
@@ -34,7 +36,9 @@ describe(Icon, () => {
       ICONS.WARNING,
     ];
     for (const name of used) {
-      expect(() => render(<Icon name={name} />)).not.toThrow();
+      const { container, unmount } = render(<Icon name={name} />);
+      expect(container.querySelector('svg')).not.toBeNull();
+      unmount();
     }
   });
 });

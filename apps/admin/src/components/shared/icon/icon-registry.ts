@@ -1,7 +1,9 @@
+import CheckSheet from '@admin/assets/icons/check-sheet.svg';
 import ChevronRight from '@admin/assets/icons/chevron-right.svg';
 import Comment from '@admin/assets/icons/comment.svg';
 import Globe from '@admin/assets/icons/globe.svg';
 import Grid from '@admin/assets/icons/grid.svg';
+import House from '@admin/assets/icons/house.svg';
 import Mail from '@admin/assets/icons/mail.svg';
 import MenuRows from '@admin/assets/icons/menu-rows.svg';
 import Menu from '@admin/assets/icons/menu.svg';
@@ -17,10 +19,12 @@ import type { FC, SVGProps } from 'react';
 type TGlyph = FC<SVGProps<SVGSVGElement>>;
 
 export const ICON_REGISTRY: Partial<Record<TIconName, TGlyph>> = {
+  [ICONS.CHECK_SHEET]: CheckSheet,
   [ICONS.CHEVRON_RIGHT]: ChevronRight,
   [ICONS.COMMENT]: Comment,
   [ICONS.GLOBE]: Globe,
   [ICONS.GRID]: Grid,
+  [ICONS.HOUSE]: House,
   [ICONS.MAIL]: Mail,
   [ICONS.MENU]: Menu,
   [ICONS.MENU_ROWS]: MenuRows,
