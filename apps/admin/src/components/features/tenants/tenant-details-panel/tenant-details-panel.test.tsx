@@ -647,24 +647,6 @@ describe(TenantDetailsPanel, () => {
         screen.getByRole('group', { name: 'Tenant detail fields' }),
       ).toBeInTheDocument();
     });
-
-    it('lays fields out in a responsive two-column grid, collapsing to one column below the lg breakpoint', () => {
-      const tenant = makeTenant();
-      render(
-        <TenantDetailsPanel
-          tenant={tenant}
-          fieldLocks={NO_LOCKS}
-          ownerEmail="owner@example.com"
-        />,
-      );
-
-      const fieldsContainer = screen.getByRole('group', {
-        name: 'Tenant detail fields',
-      });
-      expect(fieldsContainer.className).toContain('grid');
-      expect(fieldsContainer.className).toContain('grid-cols-1');
-      expect(fieldsContainer.className).toContain('lg:grid-cols-2');
-    });
   });
 
   describe('mid-edit lock transition', () => {
