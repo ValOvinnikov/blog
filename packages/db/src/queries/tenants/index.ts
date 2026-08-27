@@ -6,6 +6,7 @@ export * from './clear-tenant-provisioning-artifacts';
 export * from './create-tenant';
 export * from './create-tenant-draft';
 export * from './delete-tenant';
+export * from './get-tenant-by-id';
 export * from './get-tenant-by-slug';
 export * from './get-tenant-id-by-sanity-project-id';
 export * from './get-tenant-provisioning-status';
