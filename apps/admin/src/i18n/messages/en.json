@@ -149,6 +149,7 @@
     }
   },
   "tenantDomainPage": {
+    "pageTitle": "Domain",
     "subCopy": "The one piece of setup that is genuinely yours to finish.",
     "cardTitle": "Point {domain} at us",
     "checkedHint": "Checked just now",

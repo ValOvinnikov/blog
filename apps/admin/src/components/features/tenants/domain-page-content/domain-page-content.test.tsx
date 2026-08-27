@@ -6,7 +6,7 @@ import { DomainPageContent } from './domain-page-content';
 const render = renderWithIntl;
 
 describe(DomainPageContent, () => {
-  it("renders the tenant's domain as the page heading, with a live status badge", () => {
+  it('renders the literal "Domain" page heading, with a live status badge', () => {
     const tenant = makeTenant({ primaryDomain: 'northwind.dev' });
     render(
       <DomainPageContent
@@ -17,7 +17,7 @@ describe(DomainPageContent, () => {
     );
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'northwind.dev' }),
+      screen.getByRole('heading', { level: 1, name: 'Domain' }),
     ).toBeVisible();
     expect(screen.getByText('Awaiting DNS')).toBeVisible();
   });
@@ -35,12 +35,13 @@ describe(DomainPageContent, () => {
       />,
     );
 
-    expect(
-      screen.getByRole('heading', {
-        level: 2,
-        name: 'Point northwind.dev at us',
-      }),
-    ).toBeVisible();
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Point northwind.dev at us',
+    });
+    expect(heading).toBeVisible();
+    expect(screen.getByText('Checked just now')).toBeVisible();
+    expect(heading.textContent).not.toContain('Checked just now');
     expect(screen.getByRole('table')).toBeVisible();
     expect(screen.getByText('76.76.21.21')).toBeVisible();
     expect(screen.getByText('cname.vercel-dns.com')).toBeVisible();
