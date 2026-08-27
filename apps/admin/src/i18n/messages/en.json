@@ -315,8 +315,8 @@
     "submittingButton": "Creating…"
   },
   "provisioningStatusView": {
-    "eyebrow": "Provisioning status",
-    "description": "Each step is independently resumable — a failed step's Retry re-dispatches the workflow, which skips whatever already succeeded.",
+    "pageTitle": "Provisioning",
+    "description": "{tenantName} · each step is independently resumable.",
     "stepsCardTitle": "Steps",
     "stepsCompletionBadge": "{done} of {total} done",
     "stepLabel": {
@@ -330,7 +330,7 @@
     "statusLabel": {
       "IDLE": "Not started",
       "RUNNING": "Running…",
-      "DONE": "Done",
+      "DONE": "Complete",
       "FAILED": "Failed"
     },
     "retryButton": "Retry provisioning",
@@ -363,7 +363,7 @@
       }
     },
     "technicalDetailsToggle": "Technical details",
-    "goToTenantButton": "Go to tenant →",
+    "backToTenantAction": "← Back to tenant",
     "ownerLabel": "Owner",
     "ownerInvitedPendingBadge": "Invited, pending"
   },
