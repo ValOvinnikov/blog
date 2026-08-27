@@ -42,6 +42,7 @@ export const DomainPageContent = ({
         <Card.Header
           title={t('cardTitle', { domain: tenant.primaryDomain })}
           supportingText={t('checkedHint')}
+          headingLevel={2}
         />
         <Card.Body>
           {isVerified ? (

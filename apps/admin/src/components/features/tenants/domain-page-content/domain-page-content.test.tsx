@@ -37,7 +37,7 @@ describe(DomainPageContent, () => {
 
     expect(
       screen.getByRole('heading', {
-        level: 3,
+        level: 2,
         name: 'Point northwind.dev at us',
       }),
     ).toBeVisible();
