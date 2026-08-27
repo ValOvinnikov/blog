@@ -6,16 +6,14 @@ import { Card } from '@admin/components/shared/card';
 import { Heading } from '@admin/components/shared/heading';
 import { Icon } from '@admin/components/shared/icon';
 import { LinkButton } from '@admin/components/shared/link-button';
+import { PageHeader } from '@admin/components/shared/page-header';
 import { StatusBadge } from '@admin/components/shared/status-badge';
 import { Text } from '@admin/components/shared/text';
 import { Link } from '@admin/i18n/navigation';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import { provisioningStepTone } from '@admin/utils/status-tone/status-tone';
 import { ALERT_TYPE, ICONS } from '@blog/config';
-import {
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP_STATUS,
-} from '@blog/db/constants';
+import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { useTranslations } from 'next-intl';
 
@@ -50,7 +48,6 @@ export const ProvisioningStatusView = ({
     isRetrying,
     handleStart,
     handleRetry,
-    provisioningStatus,
     stepStatuses,
     allIdle,
     isProvisioningRunning,
@@ -67,8 +64,6 @@ export const ProvisioningStatusView = ({
 
   const {
     root,
-    header,
-    eyebrow,
     ownerRow,
     startAction,
     layout,
@@ -94,26 +89,41 @@ export const ProvisioningStatusView = ({
     errorDetails,
     errorDetailsSummary,
     errorDetailsText,
-    goToTenantButton,
   } = provisioningStatusViewVariants();
+
+  const overallStatusBadge = isOverallFailed ? (
+    <StatusBadge tone="bad">
+      {t(`statusLabel.${overallStepStatus}`)}
+    </StatusBadge>
+  ) : (
+    <StatusBadge tone={provisioningStepTone(displayOverallStatus)}>
+      {t(`statusLabel.${displayOverallStatus}`)}
+    </StatusBadge>
+  );
 
   return (
     <div className={root()}>
-      <div className={header()}>
-        <span className={eyebrow()}>{t('eyebrow')}</span>
-        <Heading level={1} size="pageTitle">
-          {tenant.name}
-        </Heading>
-        <Text variant="supporting">{t('description')}</Text>
-        {!ownerEmail && (
-          <div className={ownerRow()}>
-            <Text variant="hint">{t('ownerLabel')}</Text>
-            <StatusBadge tone="warn">
-              {t('ownerInvitedPendingBadge')}
-            </StatusBadge>
-          </div>
-        )}
-      </div>
+      <PageHeader
+        title={t('pageTitle')}
+        description={t('description', { tenantName: tenant.name })}
+        badges={overallStatusBadge}
+        actions={
+          <LinkButton
+            as={Link}
+            href={adminRoutes.tenantOverview(tenant.id)}
+            variant="ghost"
+          >
+            {t('backToTenantAction')}
+          </LinkButton>
+        }
+      />
+
+      {!ownerEmail && (
+        <div className={ownerRow()}>
+          <Text variant="hint">{t('ownerLabel')}</Text>
+          <StatusBadge tone="warn">{t('ownerInvitedPendingBadge')}</StatusBadge>
+        </div>
+      )}
 
       {dispatchError && (
         <Alert
@@ -205,17 +215,7 @@ export const ProvisioningStatusView = ({
           {(!allIdle || isProvisioningRunning) && (
             <div className={detailsHeader()}>
               <span className={overallStatusLive()} aria-live="polite">
-                {isOverallFailed ? (
-                  <StatusBadge tone="bad">
-                    {t(`statusLabel.${overallStepStatus}`)}
-                  </StatusBadge>
-                ) : (
-                  <StatusBadge
-                    tone={provisioningStepTone(displayOverallStatus)}
-                  >
-                    {t(`statusLabel.${displayOverallStatus}`)}
-                  </StatusBadge>
-                )}
+                {overallStatusBadge}
               </span>
               {isOverallFailed && (
                 <Button
@@ -251,17 +251,6 @@ export const ProvisioningStatusView = ({
                 </details>
               )}
             </div>
-          )}
-
-          {provisioningStatus === TENANT_PROVISIONING_STATUS.READY && (
-            <LinkButton
-              as={Link}
-              href={adminRoutes.look(tenant.id)}
-              variant="primary"
-              className={goToTenantButton()}
-            >
-              {t('goToTenantButton')}
-            </LinkButton>
           )}
         </div>
       </div>

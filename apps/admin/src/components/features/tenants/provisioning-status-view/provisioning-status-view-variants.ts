@@ -3,10 +3,6 @@ import { tv } from '@admin/utils/tv/tv';
 export const provisioningStatusViewVariants = tv({
   slots: {
     root: ['flex flex-col gap-6'],
-    header: ['flex flex-col gap-1'],
-    eyebrow: [
-      'text-[11px] font-bold tracking-[0.06em] text-admin-faint uppercase',
-    ],
     ownerRow: ['flex flex-wrap items-center gap-2'],
     startAction: ['flex'],
     layout: [
@@ -47,7 +43,6 @@ export const provisioningStatusViewVariants = tv({
       'mt-2 rounded-admin-sm bg-admin-surface-2 p-3',
       'font-mono text-xs text-admin-muted whitespace-pre-wrap break-words',
     ],
-    goToTenantButton: ['self-start'],
   },
   variants: {
     status: {
