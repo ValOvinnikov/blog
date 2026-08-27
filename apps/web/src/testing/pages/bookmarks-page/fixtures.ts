@@ -3,7 +3,7 @@ import type {
   IBookmarksPageViewProps,
 } from '@web/components/pages/bookmarks-page';
 
-export const makeBookmarkedPost = (
+const makeBookmarkedPost = (
   overrides: Partial<IBookmarkedPost> = {},
 ): IBookmarkedPost => {
   return {
