@@ -1,4 +1,4 @@
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { notFound } from 'next/navigation';
 
 import { TopicsPage } from './topics-page';
@@ -10,7 +10,9 @@ const { getIndexPageMock, taxonomyListModuleMock } = vi.hoisted(() => ({
   // client renderer. Stubbed as a plain sync component so this suite can
   // assert `TopicsPage` passes the right props through without needing a
   // real async render; its own fetch/render logic is covered by
-  // `taxonomy-list-module.test.tsx`.
+  // `taxonomy-list-module.test.tsx`. `TopicsPageView`'s own rendering (h1,
+  // breadcrumbs, JSON-LD, composed content) is covered by
+  // `topics-page-view.test.tsx`.
   taxonomyListModuleMock: vi.fn(
     ({
       id,
@@ -94,26 +96,6 @@ describe(`<${TopicsPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('renders the h1 and supporting text from the fetched page document', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        heading: 'Topics',
-        supportingText: 'Browse every post by topic.',
-        seo: {},
-        taxonomyListId: 'topic-list-1',
-      },
-    });
-
-    await setup();
-
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Topics' }),
-    ).toBeVisible();
-    expect(screen.getByText('Browse every post by topic.')).toBeVisible();
-    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-  });
-
   it('passes the taxonomyListId, TOPICS kind, page heading as accessibleTitle, the empty-state copy, and the href/postcount builders through to TaxonomyListModule', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
@@ -139,51 +121,6 @@ describe(`<${TopicsPage.name}/>`, () => {
     expect(screen.getByTestId('taxonomy-list-module-stub')).toHaveTextContent(
       'topic-list-1:Topics:No topics yet.:/topics/engineering:5 posts',
     );
-  });
-
-  it('renders the Home › Topics breadcrumbs trail', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        heading: 'Topics',
-        supportingText: 'Browse every post by topic.',
-        seo: {},
-        taxonomyListId: 'topic-list-1',
-      },
-    });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-
-    const homeLink = within(nav).getByRole('link', { name: 'Home' });
-    expect(homeLink).toHaveAttribute('href', '/');
-
-    const current = within(nav).getByText('Topics');
-    expect(current).toHaveAttribute('aria-current', 'page');
-    expect(current.tagName).not.toBe('A');
-  });
-
-  it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        heading: 'Topics',
-        supportingText: 'Browse every post by topic.',
-        seo: {},
-        taxonomyListId: 'topic-list-1',
-      },
-    });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-    const main = screen.getByRole('main');
-
-    expect(main.contains(nav)).toBe(false);
-    expect(
-      nav.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
   });
 
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
