@@ -3,15 +3,9 @@ import { createTV } from 'tailwind-variants';
 /**
  * Project-configured `tv`. Import this instead of `tv` from `tailwind-variants`.
  *
- * `tailwind-merge`'s default config doesn't know admin's custom `--text-*`
- * font-size scale (`text-label`, `text-meta`, …, defined in
- * `@blog/tailwind-config`'s `theme.css`), so it misclassifies a bare
- * `text-<size>` as a text-*color* utility and drops it when a real color
- * class lands in the same slot. See `packages/ui/src/lib/styling/tv.ts` for
- * the full history of this bug class in the sibling design system — admin
- * hit the same landmine after #2130 separated it from that wrapper.
- *
- * Keep these lists in sync with `@blog/tailwind-config`'s `theme.css`.
+ * Keep these lists in sync with `theme.css`'s custom `--text-*`/`--font-*`/
+ * `--tracking-*`/`--spacing-*` tokens, or `tailwind-merge` will misclassify
+ * or silently drop them again.
  */
 const FONT_SIZE_TOKENS = [
   'display',
