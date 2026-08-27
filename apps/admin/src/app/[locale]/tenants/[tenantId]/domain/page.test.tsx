@@ -75,7 +75,7 @@ describe(`<${TenantDomainPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
   });
 
-  it("renders the tenant's domain, live status, and DNS records table", async () => {
+  it('renders the domain page heading, live status, and DNS records table', async () => {
     const tenant = makeTenant({
       id: 'tenant-1',
       primaryDomain: 'northwind.dev',
@@ -89,7 +89,7 @@ describe(`<${TenantDomainPage.name}/>`, () => {
     );
     expect(getDomainDnsRecordsMock).toHaveBeenCalledWith('northwind.dev');
     expect(
-      screen.getByRole('heading', { level: 1, name: 'northwind.dev' }),
+      screen.getByRole('heading', { level: 1, name: 'Domain' }),
     ).toBeVisible();
     expect(screen.getByText('Awaiting DNS')).toBeVisible();
     expect(screen.getByRole('table')).toBeVisible();

@@ -29,7 +29,7 @@ export const DomainPageContent = ({
   return (
     <div className={root()}>
       <PageHeader
-        title={tenant.primaryDomain}
+        title={t('pageTitle')}
         description={t('subCopy')}
         badges={
           <StatusBadge tone={domainVerificationTone(domainVerificationStatus)}>
@@ -41,8 +41,12 @@ export const DomainPageContent = ({
       <Card>
         <Card.Header
           title={t('cardTitle', { domain: tenant.primaryDomain })}
-          supportingText={t('checkedHint')}
           headingLevel={2}
+          actions={
+            <Text variant="hint" as="span">
+              {t('checkedHint')}
+            </Text>
+          }
         />
         <Card.Body>
           {isVerified ? (

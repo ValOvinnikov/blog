@@ -90,16 +90,62 @@ describe(ProvisioningStatusView, () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
-  it('splits the heading into an eyebrow and the tenant name', () => {
+  it('titles the page "Provisioning" and names the tenant in the description', () => {
     const tenant = makeTenant({ name: 'Acme Inc.' });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(screen.getByText('Provisioning status')).toBeVisible();
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
+      screen.getByRole('heading', { level: 1, name: 'Provisioning' }),
     ).toBeVisible();
+    expect(
+      screen.getByText('Acme Inc. · each step is independently resumable.'),
+    ).toBeVisible();
+  });
+
+  it("keeps an overall status badge in the page header even before the body's own status row appears", () => {
+    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    render(
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+    );
+
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Provisioning',
+    });
+    expect(
+      within(heading.parentElement as HTMLElement).getByText('Not started'),
+    ).toBeVisible();
+  });
+
+  it('always shows a Back to tenant link to the tenant overview, regardless of provisioning status', () => {
+    const readyTenant = makeTenant({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+    });
+    const { unmount } = render(
+      <ProvisioningStatusView
+        tenant={readyTenant}
+        ownerEmail="owner@example.com"
+      />,
+    );
+    expect(
+      screen.getByRole('link', { name: '← Back to tenant' }),
+    ).toHaveAttribute('href', '/tenants/tenant-1');
+    unmount();
+
+    const provisioningTenant = makeTenant({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+    });
+    render(
+      <ProvisioningStatusView
+        tenant={provisioningTenant}
+        ownerEmail="owner@example.com"
+      />,
+    );
+    expect(
+      screen.getByRole('link', { name: '← Back to tenant' }),
+    ).toHaveAttribute('href', '/tenants/tenant-1');
   });
 
   it('shows the invited-pending owner badge when the tenant has no resolved owner email', () => {
@@ -247,7 +293,7 @@ describe(ProvisioningStatusView, () => {
     // No spinner anywhere — the badge text is the sole accessible source now.
     expect(screen.queryAllByRole('status')).toHaveLength(0);
 
-    for (const text of ['Not started', 'Running…', 'Done', 'Failed']) {
+    for (const text of ['Not started', 'Running…', 'Complete', 'Failed']) {
       for (const element of screen.getAllByText(text)) {
         expect(element).not.toHaveAttribute('aria-hidden');
       }
@@ -269,7 +315,7 @@ describe(ProvisioningStatusView, () => {
     ).toBeVisible();
   });
 
-  it('shows a single overall status badge and a single Retry button in the tenant details header for a failed step, with no per-step Retry buttons in the sidebar', () => {
+  it('shows a single Retry button in the tenant details header for a failed step, with no per-step Retry buttons in the sidebar', () => {
     const tenant = makeTenant({
       provisioningSteps: {
         ...idleProvisioningSteps(),
@@ -292,8 +338,9 @@ describe(ProvisioningStatusView, () => {
       }),
     ).not.toBeInTheDocument();
     // One "Failed" per the DEPLOY_STUDIO step's visually-hidden sidebar
-    // announcement, one for the header's single overall status badge.
-    expect(screen.getAllByText('Failed')).toHaveLength(2);
+    // announcement, one for the page header's overall status badge, and one
+    // for the tenant details header's own overall status badge.
+    expect(screen.getAllByText('Failed')).toHaveLength(3);
   });
 
   it("no longer renders a step's raw error text inline in the sidebar", () => {
@@ -567,33 +614,6 @@ describe(ProvisioningStatusView, () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  it('shows a Go to tenant button linking to the tenant admin area once provisioning is READY', () => {
-    const tenant = makeTenant({
-      slug: 'acme',
-      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
-    );
-
-    expect(
-      screen.getByRole('link', { name: 'Go to tenant →' }),
-    ).toHaveAttribute('href', '/tenants/tenant-1/look');
-  });
-
-  it('hides the Go to tenant button before provisioning reaches READY', () => {
-    const tenant = makeTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-    });
-    render(
-      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
-    );
-
-    expect(
-      screen.queryByRole('link', { name: 'Go to tenant →' }),
-    ).not.toBeInTheDocument();
-  });
-
   describe('live polling', () => {
     beforeEach(() => {
       vi.useFakeTimers();
@@ -639,7 +659,7 @@ describe(ProvisioningStatusView, () => {
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledWith(
         'tenant-1',
       );
-      expect(within(sidebar).getByText('Done')).toBeVisible();
+      expect(within(sidebar).getByText('Complete')).toBeVisible();
       expect(within(sidebar).queryByText('Running…')).not.toBeInTheDocument();
     });
 
@@ -683,7 +703,7 @@ describe(ProvisioningStatusView, () => {
       // freshly mounted one, which some screen readers announce on mount
       // regardless of content, defeating the point of a targeted update.
       const liveRegionAfter = within(sidebar)
-        .getByText('Done')
+        .getByText('Complete')
         .closest('[aria-live="polite"]');
       expect(liveRegionAfter).toBe(liveRegionBefore);
     });
@@ -1114,7 +1134,7 @@ describe(ProvisioningStatusView, () => {
           "Couldn't refresh the latest status — retrying automatically.",
         ),
       ).not.toBeInTheDocument();
-      expect(within(sidebar).getByText('Done')).toBeVisible();
+      expect(within(sidebar).getByText('Complete')).toBeVisible();
     });
   });
 });

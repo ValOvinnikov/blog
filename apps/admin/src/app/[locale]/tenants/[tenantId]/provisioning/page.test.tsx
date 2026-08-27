@@ -55,7 +55,7 @@ describe(TenantProvisioningPage, () => {
     expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
     expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(tenant.id);
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
+      screen.getByRole('heading', { level: 1, name: 'Provisioning' }),
     ).toBeVisible();
     expect(
       screen.queryByRole('button', { name: 'Deprovision tenant' }),
