@@ -9,7 +9,7 @@ const HEADING_TAGS = {
   4: 'h4',
 } as const;
 
-type THeadingLevel = keyof typeof HEADING_TAGS;
+export type THeadingLevel = keyof typeof HEADING_TAGS;
 
 export type THeadingProps = {
   /** Document-outline depth — picks the rendered `h1`–`h4` tag. */

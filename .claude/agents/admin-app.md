@@ -247,6 +247,17 @@ page-builder and no SEO surface to justify them. What carries over:
 
 - **Pages and layouts stay clean** — no inline component definitions, no helper
   functions in `page.tsx`/`layout.tsx`. Extract everything.
+- **One component per file, no exceptions.** A private sub-component with no
+  consumer outside its parent still gets its own `components/<child-name>/`
+  sub-folder (component + its own `*-variants.ts`, never importing the
+  parent's) next to the parent — mirroring `packages/ui`'s own
+  `ui-library-practices` convention (see `provisioning-banner/components/
+banner-state/` for this app's own instance). Never inline a second component
+  in the parent's file, however small or narrowly-scoped it looks. Note
+  `Card`'s compound slots (`Card.Header` etc.) are a different case — they're
+  exported parts a consumer writes directly, not private children, and
+  predate this rule; they aren't a model to copy for a new private
+  sub-component.
 - **Components** live in `src/components/`, grouped by who consumes them, one
   folder per component containing the component file, its `*-variants.ts`, a
   co-located test, and an `index.ts` barrel re-exporting only the component.

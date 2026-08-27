@@ -232,5 +232,5 @@ export const createTenantAction = async (
     }
   }
 
-  redirect(adminRoutes.tenantStatus(tenantId));
+  redirect(adminRoutes.tenantProvisioning(tenantId));
 };

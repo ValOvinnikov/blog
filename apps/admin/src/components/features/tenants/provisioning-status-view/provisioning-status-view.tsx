@@ -1,6 +1,5 @@
 'use client';
 
-import { TenantDetailsPanel } from '@admin/components/features/tenants/tenant-details-panel';
 import { Alert } from '@admin/components/shared/alert';
 import { Button } from '@admin/components/shared/button';
 import { Heading } from '@admin/components/shared/heading';
@@ -15,7 +14,6 @@ import {
   domainVerificationTone,
   provisioningStepTone,
 } from '@admin/utils/status-tone/status-tone';
-import { computeTenantFieldLocks } from '@admin/utils/tenant-field-locks/tenant-field-locks';
 import { ALERT_TYPE, ICONS } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
@@ -41,9 +39,9 @@ type TProvisioningStatusViewProps = {
  * The wizard's remaining-steps view — the provisioning steps (Sanity project
  * → seed content → deploy Studio → persist read token → map domain → create
  * webhook) read live from `tenant.provisioningSteps`, each independently
- * retryable, alongside an editable summary of the tenant row itself. The
- * live polling, retry dispatch, and status-derivation behind this all live
- * in `useProvisioningPoll` — this component only renders what it returns.
+ * retryable. The live polling, retry dispatch, and status-derivation behind
+ * this all live in `useProvisioningPoll` — this component only renders what
+ * it returns.
  */
 export const ProvisioningStatusView = ({
   tenant,
@@ -58,8 +56,6 @@ export const ProvisioningStatusView = ({
     handleStart,
     handleRetry,
     provisioningStatus,
-    provisioningSteps,
-    effectiveProvisioningStatus,
     stepStatuses,
     allIdle,
     isProvisioningRunning,
@@ -244,14 +240,6 @@ export const ProvisioningStatusView = ({
             </div>
           )}
 
-          <TenantDetailsPanel
-            tenant={tenant}
-            fieldLocks={computeTenantFieldLocks(
-              provisioningSteps,
-              effectiveProvisioningStatus,
-            )}
-            ownerEmail={ownerEmail}
-          />
           {provisioningStatus === TENANT_PROVISIONING_STATUS.READY && (
             <LinkButton
               as={Link}
