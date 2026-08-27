@@ -129,7 +129,7 @@
     "revalidateHookNotSet": "Not set",
     "notSetValue": "Not set",
     "recentActivityCardTitle": "Recent activity",
-    "recentActivitySourceLabel": "audit_events",
+    "recentActivitySourceLabel": "System log",
     "activityEmpty": "No activity recorded yet.",
     "relativeJustNow": "Just now",
     "relativeMinutesAgo": "{minutes}m ago",
