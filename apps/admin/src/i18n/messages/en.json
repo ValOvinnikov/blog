@@ -7,6 +7,7 @@
     "voice": "Voice · Admin",
     "selectTenant": "Choose a workspace · Admin",
     "addTenant": "Add tenant · Admin",
+    "tenantOverview": "Tenant overview · Admin",
     "tenantStatus": "Tenant status · Admin",
     "features": "Features · Admin"
   },
@@ -80,6 +81,49 @@
   },
   "tenantOverview": {
     "description": "Look and Voice ship soon — this is where they'll live."
+  },
+  "provisioningBanner": {
+    "readyTitle": "Provisioned",
+    "readyDescription": "All steps completed.",
+    "viewStepsButton": "View steps →",
+    "runningTitle": "Provisioning — step {step} of {total}",
+    "runningDescription": "This page updates on its own.",
+    "failedTitle": "Provisioning failed at step {step} of {total}",
+    "failedDescription": "{step} — {reason}",
+    "failedDescriptionFallback": "This step failed — view the steps to retry."
+  },
+  "tenantOverviewPage": {
+    "domainCardTitle": "Domain",
+    "dnsLinkButton": "DNS →",
+    "publicDomainLabel": "Public domain",
+    "lastCheckedLabel": "Last checked",
+    "lastCheckedJustNow": "Just now",
+    "ownerCardTitle": "Owner",
+    "emailLabel": "Email",
+    "roleLabel": "Role",
+    "ownerRoleBadge": "OWNER",
+    "contentWorkspaceCardTitle": "Content workspace",
+    "platformBadge": "platform",
+    "sanityProjectLabel": "Sanity project",
+    "datasetLabel": "Dataset",
+    "studioLabel": "Studio",
+    "readTokenLabel": "Read token",
+    "readTokenStored": "Stored",
+    "readTokenNotSet": "Not set",
+    "revalidateHookLabel": "Revalidate hook",
+    "revalidateHookActive": "Active",
+    "revalidateHookNotSet": "Not set",
+    "notSetValue": "Not set",
+    "recentActivityCardTitle": "Recent activity",
+    "recentActivitySourceLabel": "audit_events",
+    "activityEmpty": "No activity recorded yet.",
+    "activityAction": {
+      "CREATED": "Tenant created",
+      "ARCHIVED": "Tenant archived",
+      "DEPROVISIONED": "Provisioning removed",
+      "SETTINGS_UPDATED": "Settings updated",
+      "DELETED": "Tenant deleted"
+    }
   },
   "presetPicker": {
     "ariaLabel": "Preset",

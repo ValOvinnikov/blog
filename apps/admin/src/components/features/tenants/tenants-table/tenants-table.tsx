@@ -6,6 +6,7 @@ import { formatDate } from '@admin/utils/format-date/format-date';
 import { adminRoutes } from '@admin/utils/routes/routes';
 import { tenantStatusTone } from '@admin/utils/status-tone/status-tone';
 import { Size } from '@blog/config';
+import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { useTranslations } from 'next-intl';
 
@@ -14,6 +15,14 @@ import { tenantsTableVariants } from './tenants-table-variants';
 export type TTenantsTableProps = {
   tenants: TTenant[];
 };
+
+// A tenant only lands on its overview once provisioning has actually
+// finished — anything else (never started, still running, or stuck on a
+// failure) sends the operator straight to where they need to act instead.
+const manageHrefFor = (tenant: TTenant): string =>
+  tenant.provisioningStatus === TENANT_PROVISIONING_STATUS.READY
+    ? adminRoutes.tenantOverview(tenant.id)
+    : adminRoutes.tenantProvisioning(tenant.id);
 
 /**
  * Every tenant on the platform, with status and plan visible at a glance.
@@ -79,7 +88,7 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
               <td className={cell()}>{formatDate(tenant.createdAt)}</td>
               <td className={cell()}>
                 <LinkButton
-                  href={adminRoutes.tenantStatus(tenant.id)}
+                  href={manageHrefFor(tenant)}
                   variant="ghost"
                   size={Size.SM}
                   ariaLabel={t('manageAriaLabel', { tenantName: tenant.name })}

@@ -1,6 +1,5 @@
-import { TenantOverviewView } from '@admin/components/features/tenants/tenant-overview-view';
+import { TenantStatusView } from '@admin/components/features/tenants/tenant-status-view';
 import { getDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
-import { AUDIT_TARGET_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -8,14 +7,14 @@ import { getTranslations } from 'next-intl/server';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('pageMetadata');
-  return { title: t('tenantOverview') };
+  return { title: t('tenantStatus') };
 }
 
 type TProps = {
   params: Promise<{ tenantId: string }>;
 };
 
-export default async function TenantOverviewPage({ params }: TProps) {
+export default async function TenantStatusPage({ params }: TProps) {
   const { tenantId } = await params;
 
   const [tenant] = await queries.tenants.listTenantsByIds([tenantId]);
@@ -24,24 +23,16 @@ export default async function TenantOverviewPage({ params }: TProps) {
     notFound();
   }
 
-  const [domainVerificationStatus, ownerEmail, auditEvents] = await Promise.all(
-    [
-      getDomainVerificationStatus(tenant.primaryDomain),
-      queries.memberships.getTenantOwnerEmail(tenant.id),
-      queries.auditEvents.listAuditEventsForTarget(
-        AUDIT_TARGET_TYPE.TENANT,
-        tenant.id,
-        { limit: 5 },
-      ),
-    ],
-  );
+  const [domainVerificationStatus, ownerEmail] = await Promise.all([
+    getDomainVerificationStatus(tenant.primaryDomain),
+    queries.memberships.getTenantOwnerEmail(tenant.id),
+  ]);
 
   return (
-    <TenantOverviewView
+    <TenantStatusView
       tenant={tenant}
       domainVerificationStatus={domainVerificationStatus}
       ownerEmail={ownerEmail}
-      auditEvents={auditEvents}
     />
   );
 }

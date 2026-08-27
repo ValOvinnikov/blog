@@ -16,7 +16,7 @@ export type TTenantSwitcherProps = {
   activeTenantId: string;
   /**
    * Builds each list item's link target. Defaults to the id-routed
-   * `/tenants/{id}` tenant status page the sidebar's own switcher uses; the
+   * `/tenants/{id}` tenant overview page the sidebar's own switcher uses; the
    * slug-free `/dashboard` tree passes its own tenant-select endpoint
    * instead, reusing this same list-rendering rather than a second tenant
    * picker.
@@ -33,7 +33,7 @@ export type TTenantSwitcherProps = {
 export const TenantSwitcher = ({
   tenants,
   activeTenantId,
-  hrefFor = (tenant) => adminRoutes.tenantStatus(tenant.id),
+  hrefFor = (tenant) => adminRoutes.tenantOverview(tenant.id),
 }: TTenantSwitcherProps) => {
   const active =
     tenants.find((tenant) => tenant.id === activeTenantId) ?? tenants[0];
