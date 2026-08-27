@@ -11,6 +11,7 @@ import {
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
 import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
 
 import { STEP_ORDER } from '../provisioning-status-view/use-provisioning-poll';
 
@@ -33,6 +34,43 @@ const GLYPH: Record<
   string
 > = { ok: '✓', warn: '◐', bad: '!' };
 
+type TBannerStateProps = {
+  tone: NonNullable<TProvisioningBannerVariants['tone']>;
+  role: 'status' | 'alert';
+  title: ReactNode;
+  description: ReactNode;
+  action: ReactNode;
+};
+
+const BannerState = ({
+  tone,
+  role,
+  title,
+  description,
+  action,
+}: TBannerStateProps) => {
+  const {
+    root,
+    icon,
+    textGroup,
+    title: titleClass,
+    description: descriptionClass,
+  } = provisioningBannerVariants();
+
+  return (
+    <div className={root({ tone })} role={role}>
+      <span className={icon()} aria-hidden="true">
+        {GLYPH[tone]}
+      </span>
+      <div className={textGroup()} aria-live="polite">
+        <strong className={titleClass()}>{title}</strong>
+        <span className={descriptionClass()}>{description}</span>
+      </div>
+      {action}
+    </div>
+  );
+};
+
 /**
  * The overview page's own provisioning signal — renders from the same
  * `useProvisioningPoll` instance the page lifts up for the details panel,
@@ -52,9 +90,6 @@ export const ProvisioningBanner = ({
   const t = useTranslations('provisioningBanner');
   const tSteps = useTranslations('provisioningStatusView');
 
-  const { root, icon, textGroup, title, description } =
-    provisioningBannerVariants();
-
   const viewStepsButton = (
     <LinkButton
       href={adminRoutes.tenantProvisioning(tenantId)}
@@ -67,16 +102,13 @@ export const ProvisioningBanner = ({
 
   if (provisioningStatus === TENANT_PROVISIONING_STATUS.READY) {
     return (
-      <div className={root({ tone: 'ok' })} role="status">
-        <span className={icon()} aria-hidden="true">
-          {GLYPH.ok}
-        </span>
-        <div className={textGroup()} aria-live="polite">
-          <strong className={title()}>{t('readyTitle')}</strong>
-          <span className={description()}>{t('readyDescription')}</span>
-        </div>
-        {viewStepsButton}
-      </div>
+      <BannerState
+        tone="ok"
+        role="status"
+        title={t('readyTitle')}
+        description={t('readyDescription')}
+        action={viewStepsButton}
+      />
     );
   }
 
@@ -94,21 +126,16 @@ export const ProvisioningBanner = ({
         : t('failedDescriptionFallback');
 
     return (
-      <div className={root({ tone: 'bad' })} role="alert">
-        <span className={icon()} aria-hidden="true">
-          {GLYPH.bad}
-        </span>
-        <div className={textGroup()} aria-live="polite">
-          <strong className={title()}>
-            {t('failedTitle', {
-              step: failedIndex + 1,
-              total: STEP_ORDER.length,
-            })}
-          </strong>
-          <span className={description()}>{failedDescription}</span>
-        </div>
-        {viewStepsButton}
-      </div>
+      <BannerState
+        tone="bad"
+        role="alert"
+        title={t('failedTitle', {
+          step: failedIndex + 1,
+          total: STEP_ORDER.length,
+        })}
+        description={failedDescription}
+        action={viewStepsButton}
+      />
     );
   }
 
@@ -119,18 +146,16 @@ export const ProvisioningBanner = ({
     const currentStep = runningIndex === -1 ? 1 : runningIndex + 1;
 
     return (
-      <div className={root({ tone: 'warn' })} role="status">
-        <span className={icon()} aria-hidden="true">
-          {GLYPH.warn}
-        </span>
-        <div className={textGroup()} aria-live="polite">
-          <strong className={title()}>
-            {t('runningTitle', { step: currentStep, total: STEP_ORDER.length })}
-          </strong>
-          <span className={description()}>{t('runningDescription')}</span>
-        </div>
-        {viewStepsButton}
-      </div>
+      <BannerState
+        tone="warn"
+        role="status"
+        title={t('runningTitle', {
+          step: currentStep,
+          total: STEP_ORDER.length,
+        })}
+        description={t('runningDescription')}
+        action={viewStepsButton}
+      />
     );
   }
 
