@@ -72,16 +72,10 @@ export const TenantDetailsForm = () => {
     }
   };
 
-  // Only counts as confirmed when the operator hasn't edited the email since
-  // seeing the confirmation — this second submit is what actually proceeds
-  // down the invite path. `ownerInviteConfirmation.email` comes back already
-  // normalized by the server's `z.string().trim().toLowerCase()`, so the raw
-  // form value must be normalized the same way before comparing. The token
-  // itself is only echoed back when the email still matches — the server
-  // re-verifies it against `ownerEmail`, so a stale token for a different
-  // email is worthless to submit anyway. The form is `inert` for the whole
-  // pending window, so this stays stable for the duration of a submit and
-  // safely doubles as "which action is in flight" for the pending copy below.
+  // `ownerInviteConfirmation.email` comes back normalized by the server's
+  // `z.string().trim().toLowerCase()`, so the raw form value must be
+  // normalized the same way before comparing — an email edited since the
+  // confirmation was shown must not silently reuse a stale token.
   const normalizedOwnerEmail = values.ownerEmail.trim().toLowerCase();
   const confirmedInvite =
     ownerInviteConfirmation?.email === normalizedOwnerEmail
@@ -122,6 +116,7 @@ export const TenantDetailsForm = () => {
             <Card.Header
               title={t('heading')}
               supportingText={t('description')}
+              headingLevel={2}
             />
             <Card.Body>
               <div className={fields()}>

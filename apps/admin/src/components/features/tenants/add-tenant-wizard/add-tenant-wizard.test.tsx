@@ -16,7 +16,7 @@ describe(AddTenantWizard, () => {
       screen.getByRole('heading', { level: 1, name: 'Add tenant' }),
     ).toBeVisible();
     expect(
-      screen.getByRole('heading', { name: 'Tenant details' }),
+      screen.getByRole('heading', { level: 2, name: 'Tenant details' }),
     ).toBeVisible();
   });
 
