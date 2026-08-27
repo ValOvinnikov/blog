@@ -23,6 +23,8 @@ vi.mock('@admin/i18n/navigation', () => ({
 
 const render = renderWithIntl;
 
+const roleChip = { name: 'Val Ovinnikov', role: 'ADMIN', scope: 'Platform' };
+
 describe(AdminShell, () => {
   it('renders the sidebar, topbar and page content together', () => {
     render(
@@ -33,8 +35,8 @@ describe(AdminShell, () => {
             items: [{ label: 'Tenants', icon: ICONS.GRID, href: '/tenants' }],
           },
         ]}
-        crumb="Platform"
-        roleLabel="ADMIN"
+        crumb={<p>Platform</p>}
+        roleChip={roleChip}
       >
         <p>Tenants page</p>
       </AdminShell>,
@@ -58,8 +60,8 @@ describe(AdminShell, () => {
           },
         ]}
         switcher={<div>Tenant switcher</div>}
-        crumb="Platform"
-        roleLabel="ADMIN"
+        crumb={<p>Platform</p>}
+        roleChip={roleChip}
       >
         <p>Tenants page</p>
       </AdminShell>,

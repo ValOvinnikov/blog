@@ -8,12 +8,14 @@ const {
   authMock,
   listMembershipsForUserMock,
   listTenantsByIdsMock,
+  listTenantsMock,
   getAdminByUserIdMock,
   cookiesMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
   listMembershipsForUserMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
+  listTenantsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   cookiesMock: vi.fn(),
 }));
@@ -24,7 +26,10 @@ vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: { listMembershipsForUser: listMembershipsForUserMock },
-    tenants: { listTenantsByIds: listTenantsByIdsMock },
+    tenants: {
+      listTenantsByIds: listTenantsByIdsMock,
+      listTenants: listTenantsMock,
+    },
     admins: { getAdminByUserId: getAdminByUserIdMock },
   },
 }));
@@ -71,6 +76,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     authMock.mockReset();
     listMembershipsForUserMock.mockReset();
     listTenantsByIdsMock.mockReset();
+    listTenantsMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
     cookiesMock.mockReset();
@@ -144,5 +150,24 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
       '/dashboard/look',
     );
     expect(screen.queryByText('Platform')).not.toBeInTheDocument();
+  });
+
+  it('shows the real platform role, never OWNER, for a SUPERADMIN with no real memberships row', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getAdminByUserIdMock.mockResolvedValue({
+      id: 'admin-1',
+      userId: 'user-1',
+      role: 'SUPERADMIN',
+      createdAt: new Date(),
+    });
+    listTenantsMock.mockResolvedValue([tenant1]);
+
+    await setup();
+
+    expect(screen.getByText('dashboard content')).toBeVisible();
+    expect(listMembershipsForUserMock).not.toHaveBeenCalled();
+    expect(screen.getByText('SUPERADMIN')).toBeVisible();
+    expect(screen.queryByText('OWNER')).not.toBeInTheDocument();
+    expect(screen.getByText('· Platform')).toBeVisible();
   });
 });

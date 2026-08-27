@@ -21,3 +21,13 @@ export const buildVirtualAdminMembership = (
   role: MEMBERSHIP_ROLE.OWNER,
   createdAt: new Date(0),
 });
+
+/**
+ * `buildVirtualAdminMembership`'s virtual `id` is the correct authorization
+ * answer everywhere it's checked, but it is never a correct identity label —
+ * a caller that displays `membership.role` to the signed-in user (e.g. a
+ * role chip) must check this first, or a platform SUPERADMIN gets shown as
+ * the tenant's OWNER.
+ */
+export const isVirtualAdminMembership = (membership: TMembership): boolean =>
+  membership.id.startsWith('admin-virtual:');

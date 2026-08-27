@@ -27,6 +27,12 @@
   "topbarNavMenu": {
     "triggerLabel": "Menu"
   },
+  "topbar": {
+    "breadcrumbAriaLabel": "Breadcrumb"
+  },
+  "platformBreadcrumb": {
+    "provisioningLabel": "Provisioning"
+  },
   "navSections": {
     "platformLabel": "Platform",
     "tenants": "Tenants",
@@ -45,17 +51,11 @@
     "badgeThisMilestone": "this milestone",
     "features": "Features"
   },
-  "platformLayout": {
-    "crumb": "Platform",
-    "roleLabel": "{role} · Platform"
-  },
   "tenantLayout": {
-    "crumb": "Tenant",
-    "roleLabel": "{role} · Tenant"
+    "scopeLabel": "Tenant"
   },
   "dashboardLayout": {
-    "crumb": "Dashboard",
-    "roleLabel": "{role}"
+    "yourSiteLabel": "Your site"
   },
   "dashboardTenantPicker": {
     "heading": "Choose a workspace",
