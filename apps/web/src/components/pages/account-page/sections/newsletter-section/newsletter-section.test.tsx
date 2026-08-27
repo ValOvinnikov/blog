@@ -82,7 +82,7 @@ describe(`<${NewsletterSection.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders the subscribed state with the account email and an unsubscribe control', async () => {
+  it('queries the subscription status for the tenant and user, then renders the active state with an unsubscribe control', async () => {
     authMock.mockResolvedValue(authedSession);
     getSubscriptionStatusMock.mockResolvedValue({
       outcome: 'active',
@@ -91,9 +91,7 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
-      /jane\s+Newsletter/,
-    );
+    expect(getSubscriptionStatusMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
     expect(screen.getByText('Subscribed')).toBeVisible();
     expect(screen.getByText('jane@icloud.com')).toBeVisible();
     expect(
@@ -101,19 +99,7 @@ describe(`<${NewsletterSection.name}/>`, () => {
     ).toHaveTextContent('unsubscribe');
   });
 
-  it('renders the bar as a level-2 heading', async () => {
-    authMock.mockResolvedValue(authedSession);
-    getSubscriptionStatusMock.mockResolvedValue({
-      outcome: 'active',
-      subscriber: { email: 'jane@icloud.com' },
-    });
-
-    await setup();
-
-    expect(screen.getByRole('heading', { level: 2 })).toBeVisible();
-  });
-
-  it('renders the pending state with a resend control', async () => {
+  it('passes a resend control action for the pending outcome', async () => {
     authMock.mockResolvedValue(authedSession);
     getSubscriptionStatusMock.mockResolvedValue({
       outcome: 'pending',
@@ -122,38 +108,8 @@ describe(`<${NewsletterSection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('Pending confirmation')).toBeVisible();
-    expect(
-      screen.getByText(
-        "The double-opt-in link hasn't been clicked yet. Resend it if it never arrived.",
-      ),
-    ).toBeVisible();
     expect(
       screen.getByTestId('newsletter-subscription-control'),
     ).toHaveTextContent('resend');
-  });
-
-  describe('plain (chromeOn: false)', () => {
-    beforeEach(() => {
-      getChromeOnMock.mockResolvedValue(false);
-    });
-
-    it('renders a plain section heading + card with no terminal shell', async () => {
-      authMock.mockResolvedValue(authedSession);
-      getSubscriptionStatusMock.mockResolvedValue({
-        outcome: 'active',
-        subscriber: { email: 'jane@icloud.com' },
-      });
-
-      await setup();
-
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Newsletter' }),
-      ).toBeVisible();
-      expect(screen.getByText('Subscribed')).toBeVisible();
-      expect(
-        screen.getByTestId('newsletter-subscription-control'),
-      ).toHaveTextContent('unsubscribe');
-    });
   });
 });

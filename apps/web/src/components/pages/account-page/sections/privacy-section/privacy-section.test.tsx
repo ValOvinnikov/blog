@@ -1,17 +1,7 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { customRender, screen } from '@web/testing/custom-render';
+import { makePrivacySection } from '@web/testing/pages/account-page/privacy-section-fixtures';
 
 import { PrivacySection } from './privacy-section';
-
-const { authMock, getChromeOnMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  getChromeOnMock: vi.fn(),
-}));
-
-vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
-
-vi.mock('@web/utils/get-chrome-on', () => ({
-  getChromeOn: getChromeOnMock,
-}));
 
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: ({
@@ -34,66 +24,27 @@ vi.mock('@web/components/shared/delete-account-control', () => ({
   ),
 }));
 
-const setup = customRenderAsync(PrivacySection, {});
+const setup = customRender(PrivacySection, makePrivacySection());
 
-describe(`<${PrivacySection.name}/>`, () => {
-  beforeEach(() => {
-    authMock.mockReset();
-    getChromeOnMock.mockReset();
-    getChromeOnMock.mockResolvedValue(true);
+describe(PrivacySection, () => {
+  it('renders the bar as a level-2 heading with the resolved prompt copy', () => {
+    setup();
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: /Privacy/ }),
+    ).toBeVisible();
   });
 
-  it('renders nothing when there is no session', async () => {
-    authMock.mockResolvedValue(null);
+  it('renders the export-my-data row as a download link to the export route', () => {
+    setup();
 
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders the 6a privacy & data window', async () => {
-    authMock.mockResolvedValue({
-      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
-    });
-
-    await setup();
-
-    expect(screen.getByText(/Privacy/)).toBeVisible();
-    // The session's email local part ("jane") is the derived handle, shown
-    // both in the window's user segment and passed to the delete control.
-    expect(screen.getAllByText('jane').length).toBeGreaterThan(0);
-  });
-
-  it('renders the bar as a level-2 heading', async () => {
-    authMock.mockResolvedValue({
-      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
-    });
-
-    await setup();
-
-    expect(screen.getByRole('heading', { level: 2 })).toBeVisible();
-  });
-
-  it('renders the export-my-data row as a download link to the export route', async () => {
-    authMock.mockResolvedValue({
-      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
-    });
-
-    await setup();
-
-    const exportLink = screen.getByRole('link', {
-      name: 'Request export',
-    });
+    const exportLink = screen.getByRole('link', { name: 'Request export' });
     expect(exportLink).toHaveAttribute('href', '/api/account/export');
     expect(exportLink).toHaveAttribute('download');
   });
 
-  it('renders the delete-account row with the derived handle passed to the control', async () => {
-    authMock.mockResolvedValue({
-      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
-    });
-
-    await setup();
+  it('renders the delete-account row with the given handle passed to the control', () => {
+    setup();
 
     expect(screen.getByText('Delete account')).toBeVisible();
     expect(screen.getByTestId('delete-account-control')).toHaveTextContent(
@@ -101,17 +52,9 @@ describe(`<${PrivacySection.name}/>`, () => {
     );
   });
 
-  describe('plain (chromeOn: false)', () => {
-    beforeEach(() => {
-      getChromeOnMock.mockResolvedValue(false);
-    });
-
-    it('renders a plain section heading + card, dropping the WindowChrome.Tag pill', async () => {
-      authMock.mockResolvedValue({
-        user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
-      });
-
-      await setup();
+  describe('plain (isChromeOn: false)', () => {
+    it('renders a plain section heading + card, dropping the WindowChrome.Tag pill', () => {
+      setup({ isChromeOn: false });
 
       expect(
         screen.getByRole('heading', { level: 2, name: 'Privacy' }),

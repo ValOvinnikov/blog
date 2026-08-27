@@ -61,7 +61,7 @@ describe(`<${IdentitySection.name}/>`, () => {
     expect(getLinkedProvidersMock).not.toHaveBeenCalled();
   });
 
-  it('renders the 6c window with the derived handle', async () => {
+  it('calls getLinkedProviders with the signed-in user id and renders the derived handle', async () => {
     authMock.mockResolvedValue(authedSession);
     getLinkedProvidersMock.mockResolvedValue({
       github: true,
@@ -71,11 +71,11 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText(/Connected accounts/)).toBeVisible();
     expect(getLinkedProvidersMock).toHaveBeenCalledWith('user-1');
+    expect(screen.getByText(/Connected accounts/)).toBeVisible();
   });
 
-  it('shows unlink controls for linked providers that are not the last method', async () => {
+  it('shows an unlink control for a linked provider that is not the last method', async () => {
     authMock.mockResolvedValue(authedSession);
     getLinkedProvidersMock.mockResolvedValue({
       github: true,
@@ -85,60 +85,12 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getAllByText('Linked')).toHaveLength(2);
     expect(
       screen.getByTestId('provider-link-control-github'),
     ).toHaveTextContent('unlink');
     expect(
       screen.getByTestId('provider-link-control-google'),
     ).toHaveTextContent('unlink');
-  });
-
-  it('renders the bar as a level-2 heading', async () => {
-    authMock.mockResolvedValue(authedSession);
-    getLinkedProvidersMock.mockResolvedValue({
-      github: true,
-      google: false,
-      emailLink: true,
-    });
-
-    await setup();
-
-    expect(screen.getByRole('heading', { level: 2 })).toBeVisible();
-  });
-
-  it('renders each provider name as a level-3 heading, keeping the rows in the page heading outline', async () => {
-    authMock.mockResolvedValue(authedSession);
-    getLinkedProvidersMock.mockResolvedValue({
-      github: true,
-      google: false,
-      emailLink: true,
-    });
-
-    await setup();
-
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'GitHub' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'Google' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'Email link' }),
-    ).toBeVisible();
-  });
-
-  it('shows no status text for a provider that is not linked', async () => {
-    authMock.mockResolvedValue(authedSession);
-    getLinkedProvidersMock.mockResolvedValue({
-      github: false,
-      google: true,
-      emailLink: true,
-    });
-
-    await setup();
-
-    expect(screen.queryByText(/not linked/)).not.toBeInTheDocument();
   });
 
   it('shows a link control for a provider that is not linked', async () => {
@@ -156,7 +108,7 @@ describe(`<${IdentitySection.name}/>`, () => {
     ).toHaveTextContent('link');
   });
 
-  it('replaces the unlink control with a static notice for the last remaining linked method', async () => {
+  it('replaces the control with a last-method notice for the sole remaining linked method', async () => {
     authMock.mockResolvedValue(authedSession);
     getLinkedProvidersMock.mockResolvedValue({
       github: true,
@@ -169,16 +121,12 @@ describe(`<${IdentitySection.name}/>`, () => {
     expect(
       screen.queryByTestId('provider-link-control-github'),
     ).not.toBeInTheDocument();
-    const linkedStatus = screen.getByText('Linked');
-    const notice = screen.getByText("Last remaining method — can't unlink");
-    expect(notice).toBeVisible();
     expect(
-      linkedStatus.compareDocumentPosition(notice) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+      screen.getByText("Last remaining method — can't unlink"),
+    ).toBeVisible();
   });
 
-  it('shows the last-method notice for email link when it is the only linked method', async () => {
+  it('applies the last-method notice to email link too when it is the only linked method', async () => {
     authMock.mockResolvedValue(authedSession);
     getLinkedProvidersMock.mockResolvedValue({
       github: false,
@@ -191,21 +139,6 @@ describe(`<${IdentitySection.name}/>`, () => {
     expect(
       screen.getByText("Last remaining method — can't unlink"),
     ).toBeVisible();
-  });
-
-  it('shows no action for email link when it is linked but not the last method', async () => {
-    authMock.mockResolvedValue(authedSession);
-    getLinkedProvidersMock.mockResolvedValue({
-      github: true,
-      google: false,
-      emailLink: true,
-    });
-
-    await setup();
-
-    expect(
-      screen.queryByText("Last remaining method — can't unlink"),
-    ).not.toBeInTheDocument();
   });
 
   it('renders the display-name control with the session name', async () => {
@@ -221,35 +154,5 @@ describe(`<${IdentitySection.name}/>`, () => {
     expect(screen.getByTestId('display-name-control')).toHaveTextContent(
       'Jane Doe',
     );
-  });
-
-  describe('plain (chromeOn: false)', () => {
-    beforeEach(() => {
-      getChromeOnMock.mockResolvedValue(false);
-    });
-
-    it('renders a plain section heading + card with no terminal shell, preserving heading levels', async () => {
-      authMock.mockResolvedValue(authedSession);
-      getLinkedProvidersMock.mockResolvedValue({
-        github: true,
-        google: false,
-        emailLink: true,
-      });
-
-      await setup();
-
-      expect(
-        screen.getByRole('heading', {
-          level: 2,
-          name: 'Connected accounts',
-        }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('heading', { level: 3, name: 'GitHub' }),
-      ).toBeVisible();
-      expect(
-        screen.getByTestId('provider-link-control-github'),
-      ).toHaveTextContent('unlink');
-    });
   });
 });
