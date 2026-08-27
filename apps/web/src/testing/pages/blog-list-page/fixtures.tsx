@@ -51,7 +51,6 @@ export const makeBlogListPageView = (
               href: '/blog/a-tour-of-the-new-editor',
             }),
           ]}
-          title="Latest posts"
           titleId="blog-posts-title"
           accessibleTitle="Blog posts"
           align={HEADING_ALIGN.LEFT}
