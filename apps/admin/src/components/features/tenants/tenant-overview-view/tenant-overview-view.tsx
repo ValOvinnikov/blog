@@ -29,6 +29,7 @@ export type TTenantOverviewViewProps = {
   domainVerificationStatus: TDomainVerificationStatus;
   ownerEmail: string | undefined;
   ownerJoinedAt: string | undefined;
+  ownerJoinedAtIso: string | undefined;
   auditEvents: TAuditEvent[];
 };
 
@@ -45,6 +46,7 @@ export const TenantOverviewView = ({
   domainVerificationStatus,
   ownerEmail,
   ownerJoinedAt,
+  ownerJoinedAtIso,
   auditEvents,
 }: TTenantOverviewViewProps) => {
   const tTenantsTable = useTranslations('tenantsTable');
@@ -99,7 +101,11 @@ export const TenantOverviewView = ({
             tenant={tenant}
             domainVerificationStatus={domainVerificationStatus}
           />
-          <OwnerCard ownerEmail={ownerEmail} ownerJoinedAt={ownerJoinedAt} />
+          <OwnerCard
+            ownerEmail={ownerEmail}
+            ownerJoinedAt={ownerJoinedAt}
+            ownerJoinedAtIso={ownerJoinedAtIso}
+          />
         </div>
         <div className={cardsColumn()}>
           <ContentWorkspaceCard tenant={tenant} />
@@ -123,6 +129,7 @@ const DomainCard = ({
     <Card>
       <Card.Header
         title={t('domainCardTitle')}
+        headingLevel={2}
         actions={
           <>
             <StatusBadge
@@ -157,15 +164,17 @@ const DomainCard = ({
 const OwnerCard = ({
   ownerEmail,
   ownerJoinedAt,
+  ownerJoinedAtIso,
 }: {
   ownerEmail: string | undefined;
   ownerJoinedAt: string | undefined;
+  ownerJoinedAtIso: string | undefined;
 }) => {
   const t = useTranslations('tenantOverviewPage');
 
   return (
     <Card>
-      <Card.Header title={t('ownerCardTitle')} />
+      <Card.Header title={t('ownerCardTitle')} headingLevel={2} />
       <Card.Body>
         <DetailList>
           <DetailList.Row
@@ -184,9 +193,9 @@ const OwnerCard = ({
           <DetailList.Row label={t('roleLabel')}>
             <StatusBadge tone="neutral">{t('ownerRoleBadge')}</StatusBadge>
           </DetailList.Row>
-          {ownerJoinedAt && (
+          {ownerJoinedAt && ownerJoinedAtIso && (
             <DetailList.Row label={t('joinedLabel')}>
-              {ownerJoinedAt}
+              <time dateTime={ownerJoinedAtIso}>{ownerJoinedAt}</time>
             </DetailList.Row>
           )}
         </DetailList>
@@ -203,6 +212,7 @@ const ContentWorkspaceCard = ({ tenant }: { tenant: TTenant }) => {
     <Card>
       <Card.Header
         title={t('contentWorkspaceCardTitle')}
+        headingLevel={2}
         actions={
           <StatusBadge tone="neutral" hasDot={false}>
             {t('platformBadge')}
@@ -267,6 +277,7 @@ const RecentActivityCard = ({ events }: { events: TAuditEvent[] }) => {
     <Card>
       <Card.Header
         title={t('recentActivityCardTitle')}
+        headingLevel={2}
         actions={
           <Text variant="hint" as="span">
             {t('recentActivitySourceLabel')}
@@ -289,9 +300,12 @@ const RecentActivityCard = ({ events }: { events: TAuditEvent[] }) => {
                   </span>
                   <span className={activitySub()}>{event.actorEmail}</span>
                 </div>
-                <span className={activityTime()}>
+                <time
+                  dateTime={event.createdAt.toISOString()}
+                  className={activityTime()}
+                >
                   {formatRelativeTime(event.createdAt, t)}
-                </span>
+                </time>
               </div>
             ))}
           </div>

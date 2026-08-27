@@ -92,6 +92,7 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
       />,
     );
@@ -106,6 +107,37 @@ describe(TenantOverviewView, () => {
     const titleRow = heading.parentElement as HTMLElement;
     expect(within(titleRow).getByText('Active')).toBeVisible();
     expect(within(titleRow).getByText('Free')).toBeVisible();
+  });
+
+  it("nests every card's title one level under the page's own h1, with no h3 skip", () => {
+    const tenant = makeTenant();
+    render(
+      <TenantOverviewView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
+        auditEvents={[]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Tenant details' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Domain' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Owner' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Content workspace' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Recent activity' }),
+    ).toBeVisible();
+    expect(screen.queryByRole('heading', { level: 3 })).not.toBeInTheDocument();
   });
 
   it('renders the provisioning banner', () => {
@@ -124,6 +156,7 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="VERIFIED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
       />,
     );
@@ -139,6 +172,7 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
       />,
     );
@@ -162,6 +196,7 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
       />,
     );
@@ -206,6 +241,7 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
       />,
     );
@@ -237,6 +273,7 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
       />,
     );
@@ -277,6 +314,7 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
       />,
     );
@@ -309,6 +347,7 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="VERIFIED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
       />,
     );
@@ -328,6 +367,7 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail={undefined}
         ownerJoinedAt={undefined}
+        ownerJoinedAtIso={undefined}
         auditEvents={[]}
       />,
     );
@@ -344,12 +384,16 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
       />,
     );
 
     expect(screen.getByText('Joined')).toBeVisible();
-    expect(screen.getByText('Aug 12, 2026')).toBeVisible();
+    const joinedTime = screen.getByText('Aug 12, 2026');
+    expect(joinedTime).toBeVisible();
+    expect(joinedTime.tagName).toBe('TIME');
+    expect(joinedTime).toHaveAttribute('dateTime', '2026-08-12T00:00:00.000Z');
   });
 
   it("shows 'Not set' for content-workspace fields the tenant has not been provisioned with yet", () => {
@@ -365,6 +409,7 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
       />,
     );
@@ -390,6 +435,7 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
       />,
     );
@@ -407,6 +453,7 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
       />,
     );
@@ -416,12 +463,13 @@ describe(TenantOverviewView, () => {
 
   it('renders recent activity events with actor email and a generic per-action label', () => {
     const tenant = makeTenant();
-    render(
+    const { container } = render(
       <TenantOverviewView
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[
           makeEvent({ action: AUDIT_ACTION.SETTINGS_UPDATED }),
           makeEvent({ id: 'event-2', action: AUDIT_ACTION.CREATED }),
@@ -432,6 +480,19 @@ describe(TenantOverviewView, () => {
     expect(screen.getByText('Settings updated')).toBeVisible();
     expect(screen.getByText('Tenant created')).toBeVisible();
     expect(screen.getAllByText('vo@valstack.dev')).toHaveLength(2);
+
+    // Each relative timestamp is a real `<time>` element carrying the
+    // lossless ISO instant, not just the lossy "2h ago"/"Aug 12" text.
+    // Scoped by dateTime rather than a bare `container.querySelectorAll`
+    // count, since the Owner card's own "Joined" `<time>` is also on this
+    // page with a different `dateTime`.
+    const activityTimeElements = Array.from(
+      container.querySelectorAll('time'),
+    ).filter(
+      (element) =>
+        element.getAttribute('dateTime') === '2026-08-24T12:00:00.000Z',
+    );
+    expect(activityTimeElements).toHaveLength(2);
   });
 
   it('shows an empty state when there is no recorded activity', () => {
@@ -442,6 +503,7 @@ describe(TenantOverviewView, () => {
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
         ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
       />,
     );

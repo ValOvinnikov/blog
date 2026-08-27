@@ -106,7 +106,9 @@ describe(TenantOverviewPage, () => {
     await setup();
 
     expect(screen.getByText('Joined')).toBeVisible();
-    expect(screen.getByText('Aug 12, 2026')).toBeVisible();
+    const joinedTime = screen.getByText('Aug 12, 2026');
+    expect(joinedTime).toBeVisible();
+    expect(joinedTime).toHaveAttribute('dateTime', '2026-08-12T00:00:00.000Z');
   });
 
   it('omits the Joined row when the owner is still a pending invite', async () => {

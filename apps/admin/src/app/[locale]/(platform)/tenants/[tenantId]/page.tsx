@@ -45,6 +45,7 @@ export default async function TenantOverviewPage({ params }: TProps) {
       ownerJoinedAt={
         ownerMembership ? formatDate(ownerMembership.joinedAt) : undefined
       }
+      ownerJoinedAtIso={ownerMembership?.joinedAt.toISOString()}
       auditEvents={auditEvents}
     />
   );

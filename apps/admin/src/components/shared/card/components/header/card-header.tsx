@@ -1,4 +1,4 @@
-import { Heading } from '@admin/components/shared/heading';
+import { Heading, type THeadingLevel } from '@admin/components/shared/heading';
 import type { ReactNode } from 'react';
 
 import { cardVariants } from '../../card-variants';
@@ -8,6 +8,8 @@ export type TCardHeaderProps = {
   supportingText?: ReactNode;
   /** Right-aligned, e.g. a button or menu trigger. */
   actions?: ReactNode;
+  /** Document-outline depth for the title heading — defaults to 3, one level under a typical page h1/h2. */
+  headingLevel?: THeadingLevel;
   className?: string;
 };
 
@@ -15,6 +17,7 @@ export const CardHeader = ({
   title,
   supportingText,
   actions,
+  headingLevel = 3,
   className,
 }: TCardHeaderProps) => {
   const { header, headerTitleGroup, headerDescription, headerActions } =
@@ -23,7 +26,7 @@ export const CardHeader = ({
   return (
     <div className={header({ class: className })}>
       <div className={headerTitleGroup()}>
-        <Heading level={3} size="cardTitle">
+        <Heading level={headingLevel} size="cardTitle">
           {title}
         </Heading>
         {supportingText && (

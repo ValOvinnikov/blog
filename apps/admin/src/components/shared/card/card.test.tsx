@@ -14,6 +14,17 @@ describe(Card, () => {
     ).toBeVisible();
   });
 
+  it('renders the header title at a caller-supplied heading level', () => {
+    render(
+      <Card>
+        <Card.Header title="Tenant details" headingLevel={2} />
+      </Card>,
+    );
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Tenant details' }),
+    ).toBeVisible();
+  });
+
   it('renders a header description when provided', () => {
     render(
       <Card>
