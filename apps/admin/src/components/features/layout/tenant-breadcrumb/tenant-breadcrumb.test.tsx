@@ -71,6 +71,14 @@ describe(TenantBreadcrumb, () => {
     expect(screen.getByText('Features')).toBeVisible();
   });
 
+  it('shows Domain as the current item on the domain route', () => {
+    vi.mocked(usePathname).mockReturnValue('/tenants/tenant-1/domain');
+
+    render(<TenantBreadcrumb tenantId="tenant-1" tenantName="Acme Inc." />);
+
+    expect(screen.getByText('Domain')).toBeVisible();
+  });
+
   it('shows Provisioning as the current item on the provisioning route', () => {
     vi.mocked(usePathname).mockReturnValue('/tenants/tenant-1/provisioning');
 

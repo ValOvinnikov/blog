@@ -16,8 +16,8 @@ export type TTenantBreadcrumbProps = {
 /**
  * `tenants/[tenantId]/layout.tsx`'s breadcrumb — wraps every page under it:
  * the overview itself (tenant name is the current leaf, with no href), and
- * Look/Voice/Features/Provisioning/Danger zone (an extra leaf beyond the
- * linked tenant name).
+ * Look/Voice/Features/Domain/Provisioning/Danger zone (an extra leaf beyond
+ * the linked tenant name).
  */
 export const TenantBreadcrumb = ({
   tenantId,
@@ -35,6 +35,9 @@ export const TenantBreadcrumb = ({
     }
     if (pathname === adminRoutes.voice(tenantId)) {
       return t('voice');
+    }
+    if (pathname === adminRoutes.tenantDomain(tenantId)) {
+      return t('domain');
     }
     if (pathname === adminRoutes.tenantProvisioning(tenantId)) {
       return t('provisioning');

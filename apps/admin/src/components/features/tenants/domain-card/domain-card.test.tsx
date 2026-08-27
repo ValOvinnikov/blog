@@ -6,14 +6,14 @@ import { DomainCard } from './domain-card';
 const render = renderWithIntl;
 
 describe(DomainCard, () => {
-  it('shows the public domain and a link to the provisioning page for DNS', () => {
+  it('shows the public domain and a link to the domain page for DNS', () => {
     const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
     render(<DomainCard tenant={tenant} domainVerificationStatus="VERIFIED" />);
 
     expect(screen.getByText('acme.example.com')).toBeVisible();
     expect(screen.getByRole('link', { name: 'DNS →' })).toHaveAttribute(
       'href',
-      `/tenants/${tenant.id}/provisioning`,
+      `/tenants/${tenant.id}/domain`,
     );
   });
 

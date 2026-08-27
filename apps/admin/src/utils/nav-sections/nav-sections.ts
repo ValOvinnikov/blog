@@ -28,9 +28,15 @@ export const platformNavSections = (
   },
 ];
 
-type TTenantNavHrefs = { look: string; voice: string; features: string };
+type TTenantNavHrefs = {
+  look: string;
+  voice: string;
+  features: string;
+  /** Only the `/tenants/{id}` tree has a Domain page today — omitted for the slug-free `/dashboard` sidebar, which keeps the "later" badge. */
+  domain?: string;
+};
 
-/** The eight tenant-facing destinations, shared by the `/tenants/{id}` and slug-free `/dashboard` sidebars — only the Look/Voice/Features hrefs (and, via the caller, the section label) differ between them. Danger zone is deliberately excluded: it's platform-only and never appears in the owner-facing `/dashboard` tree. */
+/** The eight tenant-facing destinations, shared by the `/tenants/{id}` and slug-free `/dashboard` sidebars — only the Look/Voice/Features/Domain hrefs (and, via the caller, the section label) differ between them. Danger zone is deliberately excluded: it's platform-only and never appears in the owner-facing `/dashboard` tree. */
 const tenantFacingNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
   const shipping = { label: t('badgeThisMilestone'), tone: 'neutral' } as const;
   const later = { label: t('badgeLater'), tone: 'warn' } as const;
@@ -54,7 +60,14 @@ const tenantFacingNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
       href: hrefs.features,
       badge: shipping,
     },
-    { label: t('domain'), icon: ICONS.GLOBE, badge: later },
+    hrefs.domain
+      ? {
+          label: t('domain'),
+          icon: ICONS.GLOBE,
+          href: hrefs.domain,
+          badge: shipping,
+        }
+      : { label: t('domain'), icon: ICONS.GLOBE, badge: later },
     { label: t('email'), icon: ICONS.MAIL, badge: later },
     { label: t('subscribers'), icon: ICONS.MENU_ROWS, badge: later },
     { label: t('comments'), icon: ICONS.COMMENT, badge: later },
@@ -86,6 +99,7 @@ export const tenantNavSections = (
           look: adminRoutes.look(tenantId),
           voice: adminRoutes.voice(tenantId),
           features: adminRoutes.features(tenantId),
+          domain: adminRoutes.tenantDomain(tenantId),
         }),
       ],
     },

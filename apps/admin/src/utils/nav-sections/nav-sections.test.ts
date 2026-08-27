@@ -51,15 +51,17 @@ describe('tenantNavSections', () => {
     });
   });
 
-  it('gives Look, Voice and Features distinct real hrefs, badged "this milestone" in neutral tone', () => {
+  it('gives Look, Voice, Features and Domain distinct real hrefs, badged "this milestone" in neutral tone', () => {
     const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
     const look = tenant!.items.find((item) => item.label === 'Look');
     const voice = tenant!.items.find((item) => item.label === 'Voice');
     const features = tenant!.items.find((item) => item.label === 'Features');
+    const domain = tenant!.items.find((item) => item.label === 'Domain');
 
     expect(look?.href).toBe('/tenants/tenant-1/look');
     expect(voice?.href).toBe('/tenants/tenant-1/voice');
     expect(features?.href).toBe('/tenants/tenant-1/features');
+    expect(domain?.href).toBe('/tenants/tenant-1/domain');
     expect(look?.href).not.toBe(voice?.href);
     expect(look?.badge).toEqual({ label: 'this milestone', tone: 'neutral' });
     expect(voice?.badge).toEqual({ label: 'this milestone', tone: 'neutral' });
@@ -67,13 +69,17 @@ describe('tenantNavSections', () => {
       label: 'this milestone',
       tone: 'neutral',
     });
+    expect(domain?.badge).toEqual({
+      label: 'this milestone',
+      tone: 'neutral',
+    });
   });
 
-  it('badges the remaining five unbuilt destinations "later" in warn tone, with no href', () => {
+  it('badges the remaining four unbuilt destinations "later" in warn tone, with no href', () => {
     const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
     const later = tenant!.items.filter((item) => item.badge?.label === 'later');
 
-    expect(later).toHaveLength(5);
+    expect(later).toHaveLength(4);
     for (const item of later) {
       expect(item.href).toBeUndefined();
       expect(item.badge?.tone).toBe('warn');
@@ -133,6 +139,14 @@ describe('dashboardNavSections', () => {
     expect(labels).not.toContain('Overview');
     expect(labels).not.toContain('Provisioning');
     expect(labels).not.toContain('Danger zone');
+  });
+
+  it('leaves Domain "later"-badged with no href, unlike tenantNavSections', () => {
+    const [dashboard] = dashboardNavSections(t);
+    const domain = dashboard!.items.find((item) => item.label === 'Domain');
+
+    expect(domain?.href).toBeUndefined();
+    expect(domain?.badge).toEqual({ label: 'later', tone: 'warn' });
   });
 
   it('lists the same eight tenant-facing destinations as tenantNavSections', () => {

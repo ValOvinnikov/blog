@@ -11,6 +11,7 @@ export const adminRoutes = {
   tenantOverview: (tenantId: string) => `/tenants/${tenantId}`,
   tenantProvisioning: (tenantId: string) => `/tenants/${tenantId}/provisioning`,
   tenantDanger: (tenantId: string) => `/tenants/${tenantId}/danger`,
+  tenantDomain: (tenantId: string) => `/tenants/${tenantId}/domain`,
   look: (tenantId: string) => `/tenants/${tenantId}/look`,
   voice: (tenantId: string) => `/tenants/${tenantId}/voice`,
   features: (tenantId: string) => `/tenants/${tenantId}/features`,
