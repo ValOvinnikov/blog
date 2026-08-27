@@ -15,6 +15,15 @@ const {
 } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
   getTopicsMock: vi.fn(),
+  // `ModuleRenderer`/`PostListModule` are async Server Components — real
+  // RSC async-component nesting isn't renderable through
+  // `@testing-library/react`'s client renderer. Stubbed as plain sync
+  // components so this suite can assert `TopicPage` passes the right props
+  // through without needing a real async render; their own dispatch logic
+  // is covered by `module-renderer.test.tsx` and
+  // `post-list-module.test.tsx`. `TopicPageView`'s own rendering (h1,
+  // breadcrumbs, JSON-LD, topic chips, composed posts markup) is covered by
+  // `topic-page-view.test.tsx`.
   moduleRendererMock: vi.fn(
     ({ modules }: { modules: { id: string; type: string }[] }) => (
       <div data-testid="module-renderer-stub">
@@ -101,7 +110,7 @@ describe(`<${TopicPage.name}/>`, () => {
     });
   });
 
-  it('calls notFound() when the fetch fails', async () => {
+  it('calls notFound() and logs when the fetch fails', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTopicPageMock.mockResolvedValue({
       ok: false,
