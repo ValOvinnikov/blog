@@ -1,13 +1,6 @@
 import { routes, TAXONOMY_KIND } from '@blog/config';
 import { service } from '@blog/service';
-import {
-  Breadcrumbs,
-  type IBreadcrumbItem,
-} from '@blog/ui/molecules/breadcrumbs';
-import { BlogPageTemplate } from '@web/components/page-templates/blog-page-template';
-import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
-import { JsonLd } from '@web/components/shared/json-ld';
-import { SmartLink } from '@web/components/shared/smart-link';
+import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { env } from '@web/utils/env/env';
@@ -15,14 +8,12 @@ import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
+import { TagsPageView } from './tags-page-view';
+
 /**
  * TagsPage — `/tags` composition: fetches the `page_tagIndex` document via
- * `service.pages.tagIndex.v1.getIndexPage()` and renders it through
- * `BlogPageTemplate` (heading + supporting text) with the `taxonomyList`
- * slot rendered by `TaxonomyListModule` as a full-bleed `Section` sibling,
- * matching `TopicsPage`. Renders a `Home › Tags` `Breadcrumbs` trail (plus
- * its `BreadcrumbList` JSON-LD) inside a `BreadcrumbBar` sibling before
- * `<main>`.
+ * `service.pages.tagIndex.v1.getIndexPage()`, then hands the resolved data —
+ * plus the pre-rendered `taxonomyList` slot content — to `TagsPageView`.
  */
 export const TagsPage = async () => {
   const [result, breadcrumbsT, t] = await Promise.all([
@@ -43,41 +34,35 @@ export const TagsPage = async () => {
   const { heading, supportingText, taxonomyListId } = result.data;
 
   const siteUrl = env.NEXT_PUBLIC_SITE_URL ?? '';
-  const trail: IBreadcrumbItem[] = [
+  const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: breadcrumbsT('home'), href: routes.home() },
     { label: breadcrumbsT('tags'), href: routes.tags() },
   ];
-  const breadcrumbListSchema = buildBreadcrumbListSchema(trail, siteUrl);
+  const breadcrumbListSchema = buildBreadcrumbListSchema(
+    breadcrumbTrail,
+    siteUrl,
+  );
 
   return (
-    <>
-      {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
-
-      <BreadcrumbBar>
-        <Breadcrumbs
-          items={trail}
-          ariaLabel={breadcrumbsT('ariaLabel')}
-          linkAs={SmartLink}
+    <TagsPageView
+      heading={heading}
+      supportingText={supportingText}
+      breadcrumbTrail={breadcrumbTrail}
+      breadcrumbAriaLabel={breadcrumbsT('ariaLabel')}
+      breadcrumbListSchema={breadcrumbListSchema}
+      taxonomyListContent={
+        <TaxonomyListModule
+          id={taxonomyListId}
+          taxonomy={TAXONOMY_KIND.TAGS}
+          titleId="tag-list-title"
+          dataTestId={`taxonomy-list-module-${taxonomyListId}`}
+          headingLevel={2}
+          accessibleTitle={heading}
+          emptyMessage={t('empty')}
+          buildHref={(slug) => routes.tag(slug)}
+          formatPostCount={(count) => t('postsCount', { count })}
         />
-      </BreadcrumbBar>
-
-      <BlogPageTemplate
-        heading={heading}
-        supportingText={supportingText}
-        modules={
-          <TaxonomyListModule
-            id={taxonomyListId}
-            taxonomy={TAXONOMY_KIND.TAGS}
-            titleId="tag-list-title"
-            dataTestId={`taxonomy-list-module-${taxonomyListId}`}
-            headingLevel={2}
-            accessibleTitle={heading}
-            emptyMessage={t('empty')}
-            buildHref={(slug) => routes.tag(slug)}
-            formatPostCount={(count) => t('postsCount', { count })}
-          />
-        }
-      />
-    </>
+      }
+    />
   );
 };
