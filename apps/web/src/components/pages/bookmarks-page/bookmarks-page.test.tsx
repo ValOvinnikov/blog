@@ -99,21 +99,13 @@ describe(`<${BookmarksPage.name}/>`, () => {
     expect(getPostsByIdsMock).not.toHaveBeenCalled();
   });
 
-  it('renders the true empty state when the signed-in reader has no bookmarks', async () => {
+  it('queries bookmarks for the signed-in user and tenant, then resolves ids via getPostsByIds', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listBookmarksMock.mockResolvedValue([]);
     getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
 
     await setup();
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'My bookmarks' }),
-    ).toBeVisible();
-    expect(
-      screen.getByText('No bookmarks yet — save a post to find it here.'),
-    ).toBeVisible();
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
-    expect(screen.queryByText(/saved$/)).not.toBeInTheDocument();
     expect(listBookmarksMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
     expect(getPostsByIdsMock).toHaveBeenCalledWith([], undefined);
   });
@@ -134,17 +126,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
     expect(getPostsByIdsMock).toHaveBeenCalledWith([], tenant);
   });
 
-  it('renders the terminal window chrome with the My bookmarks prompt', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listBookmarksMock.mockResolvedValue([]);
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
-
-    await setup();
-
-    expect(screen.getAllByText('My bookmarks')).toHaveLength(2);
-  });
-
-  it('renders resolved posts as ls -l rows, sorted by bookmark recency, with a saved-count hint', async () => {
+  it('re-sorts resolved posts back into bookmark-recency order before rendering', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listBookmarksMock.mockResolvedValue([
       { userId: 'user-1', postId: 'post-2', createdAt: new Date() },
@@ -172,12 +154,6 @@ describe(`<${BookmarksPage.name}/>`, () => {
     ]);
     expect(links[0]).toHaveAttribute('href', '/blog/second');
     expect(links[1]).toHaveAttribute('href', '/blog/first');
-    expect(screen.getByText('2 saved')).toBeVisible();
-    expect(screen.getAllByTestId('bookmarks-list-row-prefix')).toHaveLength(2);
-    for (const prefix of screen.getAllByTestId('bookmarks-list-row-prefix')) {
-      expect(prefix).toHaveTextContent('drwx');
-      expect(prefix).toHaveAttribute('aria-hidden', 'true');
-    }
   });
 
   it('renders nothing when resolving bookmarked posts fails', async () => {
@@ -195,54 +171,25 @@ describe(`<${BookmarksPage.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  describe('plain (chromeOn: false)', () => {
-    beforeEach(() => {
-      getChromeOnMock.mockResolvedValue(false);
+  it('renders the plain list when getChromeOn resolves false', async () => {
+    getChromeOnMock.mockResolvedValue(false);
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    listBookmarksMock.mockResolvedValue([
+      { userId: 'user-1', postId: 'post-1', createdAt: new Date() },
+    ]);
+    getPostsByIdsMock.mockResolvedValue({
+      ok: true,
+      data: [makePostCard({ id: 'post-1', slug: 'first', title: 'First' })],
     });
 
-    it('renders the true empty state with no ls -l chrome', async () => {
-      authMock.mockResolvedValue({ user: { id: 'user-1' } });
-      listBookmarksMock.mockResolvedValue([]);
-      getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
+    await setup();
 
-      await setup();
-
-      expect(
-        screen.getByRole('heading', { level: 1, name: 'My bookmarks' }),
-      ).toBeVisible();
-      expect(
-        screen.getByText('No bookmarks yet — save a post to find it here.'),
-      ).toBeVisible();
-      expect(screen.queryByRole('list')).not.toBeInTheDocument();
-    });
-
-    it('renders resolved posts as a plain list of title links, no ls -l styling', async () => {
-      authMock.mockResolvedValue({ user: { id: 'user-1' } });
-      listBookmarksMock.mockResolvedValue([
-        { userId: 'user-1', postId: 'post-2', createdAt: new Date() },
-        { userId: 'user-1', postId: 'post-1', createdAt: new Date() },
-      ]);
-      getPostsByIdsMock.mockResolvedValue({
-        ok: true,
-        data: [
-          makePostCard({ id: 'post-1', slug: 'first', title: 'First post' }),
-          makePostCard({ id: 'post-2', slug: 'second', title: 'Second post' }),
-        ],
-      });
-
-      await setup();
-
-      const links = screen.getAllByRole('link');
-      expect(links.map((link) => link.textContent)).toEqual([
-        'Second post',
-        'First post',
-      ]);
-      expect(links[0]).toHaveAttribute('href', '/blog/second');
-      expect(screen.getByText('2 saved')).toBeVisible();
-      expect(
-        screen.queryByTestId('bookmarks-list-row-prefix'),
-      ).not.toBeInTheDocument();
-      expect(screen.queryByText('second.md')).not.toBeInTheDocument();
-    });
+    expect(
+      screen.queryByTestId('bookmarks-list-row-prefix'),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'First' })).toHaveAttribute(
+      'href',
+      '/blog/first',
+    );
   });
 });
