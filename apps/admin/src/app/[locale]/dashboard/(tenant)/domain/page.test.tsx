@@ -85,7 +85,13 @@ describe(`<${DashboardDomainPage.name}/>`, () => {
     );
     expect(getDomainDnsRecordsMock).toHaveBeenCalledWith('northwind.dev');
     expect(
-      screen.getByRole('heading', { level: 1, name: 'northwind.dev' }),
+      screen.getByRole('heading', { level: 1, name: 'Domain' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'Point northwind.dev at us',
+      }),
     ).toBeVisible();
     expect(screen.getByText('Awaiting DNS')).toBeVisible();
     expect(screen.getByRole('table')).toBeVisible();
