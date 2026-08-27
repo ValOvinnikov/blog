@@ -1,6 +1,6 @@
 import { AdminShell } from '@admin/components/features/layout/admin-shell';
 import { TenantSwitcher } from '@admin/components/features/layout/tenant-switcher';
-import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
+import { requireTenantById } from '@admin/server/auth/require-tenant-by-id';
 import {
   platformNavSections,
   tenantNavSections,
@@ -10,18 +10,18 @@ import { getTranslations } from 'next-intl/server';
 
 type TProps = {
   children: React.ReactNode;
-  params: Promise<{ tenantSlug: string }>;
+  params: Promise<{ tenantId: string }>;
 };
 
 /**
- * Gates page rendering for everything nested under this segment behind a
- * `memberships` row for the routed tenant (`requireTenantMembership`) — the
- * Tenant section, independent of the Platform `admins` gate, except that a
- * platform SUPERADMIN gets OWNER-level access to any tenant regardless.
+ * Gates page rendering for everything nested under this segment behind an
+ * `admins` row (`requireTenantById`) — the platform-operator counterpart to
+ * the tenant's own `memberships`-gated `requireTenantMembership`, keyed by
+ * tenant id rather than slug.
  */
-export default async function TenantLayout({ children, params }: TProps) {
-  const { tenantSlug } = await params;
-  const { tenant, membership } = await requireTenantMembership(tenantSlug);
+export default async function TenantByIdLayout({ children, params }: TProps) {
+  const { tenantId } = await params;
+  const { tenant, admin } = await requireTenantById(tenantId);
   const t = await getTranslations('tenantLayout');
   const tNavSections = (await getTranslations(
     'navSections',
@@ -31,13 +31,13 @@ export default async function TenantLayout({ children, params }: TProps) {
     <AdminShell
       sections={[
         ...platformNavSections(tNavSections),
-        ...tenantNavSections(tNavSections, tenant.slug),
+        ...tenantNavSections(tNavSections, tenant.id, tenant.name),
       ]}
       switcher={
         <TenantSwitcher tenants={[tenant]} activeTenantId={tenant.id} />
       }
       crumb={t('crumb')}
-      roleLabel={t('roleLabel', { role: membership.role })}
+      roleLabel={t('roleLabel', { role: admin.role })}
     >
       {children}
     </AdminShell>

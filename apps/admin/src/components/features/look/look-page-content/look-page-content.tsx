@@ -11,7 +11,7 @@ export type TLookPageContentProps = {
 };
 
 /**
- * The Look tab's data-fetch + render, shared by `/t/[tenantSlug]/look` and
+ * The Look tab's data-fetch + render, shared by `/tenants/[tenantId]/look` and
  * the slug-free `/dashboard/look` — both resolve a `TTenant` however fits
  * their own routing (URL param vs. session membership) and hand it here.
  */

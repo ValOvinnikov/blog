@@ -30,7 +30,7 @@ export const platformNavSections = (
 
 type TTenantNavHrefs = { look: string; voice: string; features: string };
 
-/** The nine Tenant-section destinations, shared by the `/t/{slug}` and slug-free `/dashboard` sidebars — only the Look/Voice/Features hrefs (and, via the caller, the section label) differ between them. */
+/** The nine Tenant-section destinations, shared by the `/tenants/{id}` and slug-free `/dashboard` sidebars — only the Look/Voice/Features hrefs (and, via the caller, the section label) differ between them. */
 const tenantNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
   const shipping = { label: t('badgeThisMilestone'), tone: 'neutral' } as const;
   const later = { label: t('badgeLater'), tone: 'warn' } as const;
@@ -65,19 +65,20 @@ const tenantNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
 
 export const tenantNavSections = (
   t: TNavTranslator,
-  tenantSlug: string,
+  tenantId: string,
+  tenantName: string,
 ): TSidebarNavSection[] => [
   {
-    label: t('tenantLabel', { tenantSlug }),
+    label: t('tenantLabel', { tenantName }),
     items: tenantNavItems(t, {
-      look: adminRoutes.look(tenantSlug),
-      voice: adminRoutes.voice(tenantSlug),
-      features: adminRoutes.features(tenantSlug),
+      look: adminRoutes.look(tenantId),
+      voice: adminRoutes.voice(tenantId),
+      features: adminRoutes.features(tenantId),
     }),
   },
 ];
 
-/** The slug-free counterpart to `tenantNavSections` — same nine destinations, routed under `/dashboard` instead of `/t/{slug}`, labeled generically since the whole point of this tree is not naming the tenant in anything the URL-shy owner sees. */
+/** The slug-free counterpart to `tenantNavSections` — same nine destinations, routed under `/dashboard` instead of `/tenants/{id}`, labeled generically since the whole point of this tree is not naming the tenant in anything the URL-shy owner sees. */
 export const dashboardNavSections = (
   t: TNavTranslator,
 ): TSidebarNavSection[] => [

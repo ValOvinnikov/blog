@@ -10,7 +10,7 @@ export type TVoicePageContentProps = {
 };
 
 /**
- * The Voice tab's data-fetch + render, shared by `/t/[tenantSlug]/voice` and
+ * The Voice tab's data-fetch + render, shared by `/tenants/[tenantId]/voice` and
  * the slug-free `/dashboard/voice` — both resolve a `TTenant` however fits
  * their own routing (URL param vs. session membership) and hand it here.
  */

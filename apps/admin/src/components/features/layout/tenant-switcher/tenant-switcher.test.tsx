@@ -83,10 +83,10 @@ describe(TenantSwitcher, () => {
 
     const menu = await screen.findByRole('menu', { name: /acme inc\./i });
     const link = within(menu).getByRole('menuitem', { name: /acme inc\./i });
-    expect(link).toHaveAttribute('href', '/t/acme');
+    expect(link).toHaveAttribute('href', '/tenants/tenant-1');
   });
 
-  it('links each tenant through a caller-supplied hrefFor instead of the default /t/{slug} route', async () => {
+  it('links each tenant through a caller-supplied hrefFor instead of the default /tenants/{id} route', async () => {
     const user = userEvent.setup();
     render(
       <TenantSwitcher

@@ -1,5 +1,5 @@
 import { LookPageContent } from '@admin/components/features/look/look-page-content';
-import { requireTenantMembership } from '@admin/server/auth/require-tenant-membership';
+import { requireTenantById } from '@admin/server/auth/require-tenant-by-id';
 import {
   renderTenantScopedPage,
   tenantPageMetadata,
@@ -7,7 +7,7 @@ import {
 import type { Metadata } from 'next';
 
 type TProps = {
-  params: Promise<{ tenantSlug: string }>;
+  params: Promise<{ tenantId: string }>;
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,10 +15,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function LookPage({ params }: TProps) {
-  const { tenantSlug } = await params;
+  const { tenantId } = await params;
 
   return renderTenantScopedPage(
-    () => requireTenantMembership(tenantSlug),
+    () => requireTenantById(tenantId),
     LookPageContent,
   );
 }

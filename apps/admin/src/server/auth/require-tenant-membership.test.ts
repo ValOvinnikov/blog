@@ -58,7 +58,7 @@ describe(requireTenantMembership, () => {
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /unauthorized when the signed-in user has no membership on that tenant and is not a SUPERADMIN', async () => {
+  it('redirects to /unauthorized when the signed-in user has no admins row and no membership on that tenant', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getTenantBySlugMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
     getAdminByUserIdMock.mockResolvedValue(undefined);
@@ -72,20 +72,21 @@ describe(requireTenantMembership, () => {
     expect(redirect).toHaveBeenCalledWith('/unauthorized');
   });
 
-  it.each(['ADMIN', 'MODERATOR'])(
-    'redirects to /unauthorized for a %s admins row with no membership on that tenant',
+  it.each(['ADMIN', 'MODERATOR', 'SUPERADMIN'])(
+    'grants a %s admins row OWNER-level access with no real membership on that tenant, without redirecting',
     async (role) => {
       authMock.mockResolvedValue({ user: { id: 'user-1' } });
       getTenantBySlugMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
       getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role });
-      getMembershipMock.mockResolvedValue(undefined);
 
-      await expect(requireTenantMembership('acme')).rejects.toThrow(
-        'NEXT_REDIRECT',
-      );
+      const result = await requireTenantMembership('acme');
 
-      expect(getMembershipMock).toHaveBeenCalledWith('user-1', 'tenant-1');
-      expect(redirect).toHaveBeenCalledWith('/unauthorized');
+      expect(result.tenant).toEqual({ id: 'tenant-1', slug: 'acme' });
+      expect(result.membership.role).toBe('OWNER');
+      expect(result.membership.userId).toBe('user-1');
+      expect(result.membership.tenantId).toBe('tenant-1');
+      expect(getMembershipMock).not.toHaveBeenCalled();
+      expect(redirect).not.toHaveBeenCalled();
     },
   );
 
@@ -108,24 +109,6 @@ describe(requireTenantMembership, () => {
       tenant: { id: 'tenant-1', slug: 'acme' },
       membership,
     });
-    expect(redirect).not.toHaveBeenCalled();
-  });
-
-  it('grants a SUPERADMIN with no membership row OWNER-level access, without redirecting', async () => {
-    authMock.mockResolvedValue({ user: { id: 'super-1' } });
-    getTenantBySlugMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      role: 'SUPERADMIN',
-    });
-
-    const result = await requireTenantMembership('acme');
-
-    expect(result.tenant).toEqual({ id: 'tenant-1', slug: 'acme' });
-    expect(result.membership.role).toBe('OWNER');
-    expect(result.membership.userId).toBe('super-1');
-    expect(result.membership.tenantId).toBe('tenant-1');
-    expect(getMembershipMock).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
   });
 });

@@ -4,43 +4,34 @@ import { redirect } from 'next/navigation';
 
 import LookPage from './page';
 
-const {
-  authMock,
-  getTenantBySlugMock,
-  getMembershipMock,
-  getAdminByUserIdMock,
-  getSiteConfigMock,
-} = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  getTenantBySlugMock: vi.fn(),
-  getMembershipMock: vi.fn(),
-  getAdminByUserIdMock: vi.fn(),
-  getSiteConfigMock: vi.fn(),
-}));
+const { authMock, getAdminByUserIdMock, getTenantByIdMock, getSiteConfigMock } =
+  vi.hoisted(() => ({
+    authMock: vi.fn(),
+    getAdminByUserIdMock: vi.fn(),
+    getTenantByIdMock: vi.fn(),
+    getSiteConfigMock: vi.fn(),
+  }));
 
 vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    tenants: { getTenantBySlug: getTenantBySlugMock },
-    memberships: { getMembership: getMembershipMock },
     admins: { getAdminByUserId: getAdminByUserIdMock },
+    tenants: { getTenantById: getTenantByIdMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));
 
 const setup = customRenderAsync(LookPage, {
-  params: Promise.resolve({ tenantSlug: 'acme' }),
+  params: Promise.resolve({ tenantId: 'tenant-1' }),
 });
 
 describe(`<${LookPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    getTenantBySlugMock.mockReset();
-    getMembershipMock.mockReset();
     getAdminByUserIdMock.mockReset();
-    getAdminByUserIdMock.mockResolvedValue(undefined);
+    getTenantByIdMock.mockReset();
     getSiteConfigMock.mockReset();
     vi.mocked(redirect).mockClear();
   });
@@ -51,13 +42,12 @@ describe(`<${LookPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
-    expect(getTenantBySlugMock).not.toHaveBeenCalled();
+    expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /unauthorized when the signed-in user has no membership on this tenant', async () => {
+  it('redirects to /unauthorized when the signed-in user has no admins row', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getTenantBySlugMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
-    getMembershipMock.mockResolvedValue(undefined);
+    getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
@@ -65,10 +55,10 @@ describe(`<${LookPage.name}/>`, () => {
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it('renders Console defaults for a member of the tenant with no saved site_config row yet', async () => {
+  it('renders Console defaults for a platform operator with no saved site_config row yet', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getTenantBySlugMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
-    getMembershipMock.mockResolvedValue({ id: 'm-1', role: 'OWNER' });
+    getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
+    getTenantByIdMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
     getSiteConfigMock.mockResolvedValue(undefined);
 
     await setup();

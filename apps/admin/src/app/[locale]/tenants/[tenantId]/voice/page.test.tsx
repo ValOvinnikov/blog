@@ -12,59 +12,44 @@ const openAdvanced = async () => {
   await userEvent.setup().click(screen.getByText(ADVANCED_SUMMARY));
 };
 
-const {
-  authMock,
-  getTenantBySlugMock,
-  getMembershipMock,
-  getAdminByUserIdMock,
-  getSiteConfigMock,
-} = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  getTenantBySlugMock: vi.fn(),
-  getMembershipMock: vi.fn(),
-  getAdminByUserIdMock: vi.fn(),
-  getSiteConfigMock: vi.fn(),
-}));
+const { authMock, getAdminByUserIdMock, getTenantByIdMock, getSiteConfigMock } =
+  vi.hoisted(() => ({
+    authMock: vi.fn(),
+    getAdminByUserIdMock: vi.fn(),
+    getTenantByIdMock: vi.fn(),
+    getSiteConfigMock: vi.fn(),
+  }));
 
 vi.mock('@admin/server/auth/auth', () => ({ auth: authMock }));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    tenants: { getTenantBySlug: getTenantBySlugMock },
-    memberships: { getMembership: getMembershipMock },
     admins: { getAdminByUserId: getAdminByUserIdMock },
+    tenants: { getTenantById: getTenantByIdMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));
 
 const setup = customRenderAsync(VoicePage, {
-  params: Promise.resolve({ tenantSlug: 'acme' }),
+  params: Promise.resolve({ tenantId: 'tenant-1' }),
 });
 
 describe(`<${VoicePage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    getTenantBySlugMock.mockReset();
-    getMembershipMock.mockReset();
     getAdminByUserIdMock.mockReset();
+    getTenantByIdMock.mockReset();
     getSiteConfigMock.mockReset();
     vi.mocked(redirect).mockClear();
 
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getTenantBySlugMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
-    getAdminByUserIdMock.mockResolvedValue(undefined);
-    getMembershipMock.mockResolvedValue({
-      id: 'membership-1',
-      userId: 'user-1',
-      tenantId: 'tenant-1',
-      role: 'OWNER',
-      createdAt: new Date(),
-    });
+    getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
+    getTenantByIdMock.mockResolvedValue({ id: 'tenant-1', slug: 'acme' });
   });
 
-  it('redirects to /unauthorized when the signed-in user has no membership on this tenant', async () => {
-    getMembershipMock.mockResolvedValue(undefined);
+  it('redirects to /unauthorized when the signed-in user has no admins row', async () => {
+    getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 

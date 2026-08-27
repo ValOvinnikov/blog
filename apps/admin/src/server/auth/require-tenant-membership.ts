@@ -7,8 +7,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { notFound, redirect } from 'next/navigation';
 
 import { auth } from './auth';
-import { buildSuperAdminMembership } from './build-super-admin-membership';
-import { isSuperAdmin } from './is-super-admin';
+import { buildVirtualAdminMembership } from './build-virtual-admin-membership';
 
 export type TTenantMembershipContext = {
   tenant: TTenant;
@@ -18,12 +17,13 @@ export type TTenantMembershipContext = {
 /**
  * The Tenant-section gate: no session redirects to sign-in, an unknown
  * tenant slug 404s, and a session with no `memberships` row for that tenant
- * redirects to `/unauthorized` — unless the session is a platform
- * SUPERADMIN, who gets a virtual OWNER-level membership on any existing
- * tenant instead, regardless of any real `memberships` row. ADMIN/MODERATOR
- * `admins` rows still grant no access here. Called from a layout (not a
- * page) so every route nested under a gated tenant segment is protected by
- * existing there, never by a per-page check someone could forget to add.
+ * redirects to `/unauthorized` — unless the session has any `admins` row,
+ * which gets a virtual OWNER-level membership on any existing tenant
+ * instead, regardless of any real `memberships` row or admin role. This
+ * matches `requireAdmin`'s own floor: any admin role can reverse an
+ * in-app-state edit. Called from a layout (not a page) so every route
+ * nested under a gated tenant segment is protected by existing there, never
+ * by a per-page check someone could forget to add.
  */
 export const requireTenantMembership = async (
   tenantSlug: string,
@@ -41,8 +41,13 @@ export const requireTenantMembership = async (
     notFound();
   }
 
-  if (await isSuperAdmin(userId)) {
-    return { tenant, membership: buildSuperAdminMembership(userId, tenant.id) };
+  const admin = await queries.admins.getAdminByUserId(userId);
+
+  if (admin) {
+    return {
+      tenant,
+      membership: buildVirtualAdminMembership(userId, tenant.id),
+    };
   }
 
   const membership = await queries.memberships.getMembership(userId, tenant.id);
