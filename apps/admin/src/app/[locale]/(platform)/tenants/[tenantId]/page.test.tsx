@@ -8,11 +8,13 @@ import TenantOverviewPage from './page';
 const {
   listTenantsByIdsMock,
   getTenantOwnerEmailMock,
+  getTenantOwnerMembershipMock,
   listAuditEventsForTargetMock,
   getDomainVerificationStatusMock,
 } = vi.hoisted(() => ({
   listTenantsByIdsMock: vi.fn(),
   getTenantOwnerEmailMock: vi.fn(),
+  getTenantOwnerMembershipMock: vi.fn(),
   listAuditEventsForTargetMock: vi.fn(),
   getDomainVerificationStatusMock: vi.fn(),
 }));
@@ -21,7 +23,10 @@ vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     tenants: { listTenantsByIds: listTenantsByIdsMock },
-    memberships: { getTenantOwnerEmail: getTenantOwnerEmailMock },
+    memberships: {
+      getTenantOwnerEmail: getTenantOwnerEmailMock,
+      getTenantOwnerMembership: getTenantOwnerMembershipMock,
+    },
     auditEvents: { listAuditEventsForTarget: listAuditEventsForTargetMock },
   },
 }));
@@ -61,6 +66,11 @@ describe(TenantOverviewPage, () => {
     listTenantsByIdsMock.mockReset();
     getTenantOwnerEmailMock.mockReset();
     getTenantOwnerEmailMock.mockResolvedValue('owner@example.com');
+    getTenantOwnerMembershipMock.mockReset();
+    getTenantOwnerMembershipMock.mockResolvedValue({
+      email: 'owner@example.com',
+      joinedAt: new Date('2026-08-12T00:00:00.000Z'),
+    });
     listAuditEventsForTargetMock.mockReset();
     listAuditEventsForTargetMock.mockResolvedValue([]);
     getDomainVerificationStatusMock.mockReset();
@@ -75,6 +85,7 @@ describe(TenantOverviewPage, () => {
 
     expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
     expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(tenant.id);
+    expect(getTenantOwnerMembershipMock).toHaveBeenCalledWith(tenant.id);
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
       'acme.example.com',
     );
@@ -86,6 +97,28 @@ describe(TenantOverviewPage, () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
     ).toBeVisible();
+  });
+
+  it('formats and passes the owner membership join date to the Joined row', async () => {
+    const tenant = makeTenant();
+    listTenantsByIdsMock.mockResolvedValue([tenant]);
+
+    await setup();
+
+    expect(screen.getByText('Joined')).toBeVisible();
+    expect(screen.getByText('Aug 12, 2026')).toBeVisible();
+  });
+
+  it('omits the Joined row when the owner is still a pending invite', async () => {
+    const tenant = makeTenant();
+    listTenantsByIdsMock.mockResolvedValue([tenant]);
+    getTenantOwnerEmailMock.mockResolvedValue(undefined);
+    getTenantOwnerMembershipMock.mockResolvedValue(undefined);
+
+    await setup();
+
+    expect(screen.queryByText('Joined')).not.toBeInTheDocument();
+    expect(screen.getByText('Invited, pending')).toBeVisible();
   });
 
   it('404s for an unknown tenant id', async () => {

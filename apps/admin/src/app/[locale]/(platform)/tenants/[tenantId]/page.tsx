@@ -1,5 +1,6 @@
 import { TenantOverviewView } from '@admin/components/features/tenants/tenant-overview-view';
 import { getDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
+import { formatDate } from '@admin/utils/format-date/format-date';
 import { AUDIT_TARGET_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
 import type { Metadata } from 'next';
@@ -24,23 +25,26 @@ export default async function TenantOverviewPage({ params }: TProps) {
     notFound();
   }
 
-  const [domainVerificationStatus, ownerEmail, auditEvents] = await Promise.all(
-    [
+  const [domainVerificationStatus, ownerEmail, ownerMembership, auditEvents] =
+    await Promise.all([
       getDomainVerificationStatus(tenant.primaryDomain),
       queries.memberships.getTenantOwnerEmail(tenant.id),
+      queries.memberships.getTenantOwnerMembership(tenant.id),
       queries.auditEvents.listAuditEventsForTarget(
         AUDIT_TARGET_TYPE.TENANT,
         tenant.id,
         { limit: 5 },
       ),
-    ],
-  );
+    ]);
 
   return (
     <TenantOverviewView
       tenant={tenant}
       domainVerificationStatus={domainVerificationStatus}
       ownerEmail={ownerEmail}
+      ownerJoinedAt={
+        ownerMembership ? formatDate(ownerMembership.joinedAt) : undefined
+      }
       auditEvents={auditEvents}
     />
   );

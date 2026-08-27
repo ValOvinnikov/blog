@@ -102,6 +102,7 @@
     "emailLabel": "Email",
     "roleLabel": "Role",
     "ownerRoleBadge": "OWNER",
+    "joinedLabel": "Joined",
     "contentWorkspaceCardTitle": "Content workspace",
     "platformBadge": "platform",
     "sanityProjectLabel": "Sanity project",

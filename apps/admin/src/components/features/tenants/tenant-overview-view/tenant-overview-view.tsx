@@ -25,6 +25,7 @@ export type TTenantOverviewViewProps = {
   tenant: TTenant;
   domainVerificationStatus: TDomainVerificationStatus;
   ownerEmail: string | undefined;
+  ownerJoinedAt: string | undefined;
   auditEvents: TAuditEvent[];
 };
 
@@ -39,6 +40,7 @@ export const TenantOverviewView = ({
   tenant,
   domainVerificationStatus,
   ownerEmail,
+  ownerJoinedAt,
   auditEvents,
 }: TTenantOverviewViewProps) => {
   const tTenantsTable = useTranslations('tenantsTable');
@@ -80,7 +82,7 @@ export const TenantOverviewView = ({
             tenant={tenant}
             domainVerificationStatus={domainVerificationStatus}
           />
-          <OwnerCard ownerEmail={ownerEmail} />
+          <OwnerCard ownerEmail={ownerEmail} ownerJoinedAt={ownerJoinedAt} />
         </div>
         <div className={cardsColumn()}>
           <ContentWorkspaceCard tenant={tenant} />
@@ -136,7 +138,13 @@ const DomainCard = ({
   );
 };
 
-const OwnerCard = ({ ownerEmail }: { ownerEmail: string | undefined }) => {
+const OwnerCard = ({
+  ownerEmail,
+  ownerJoinedAt,
+}: {
+  ownerEmail: string | undefined;
+  ownerJoinedAt: string | undefined;
+}) => {
   const t = useTranslations('tenantOverviewPage');
   const tProvisioning = useTranslations('provisioningStatusView');
 
@@ -161,6 +169,11 @@ const OwnerCard = ({ ownerEmail }: { ownerEmail: string | undefined }) => {
           <DetailList.Row label={t('roleLabel')}>
             <StatusBadge tone="neutral">{t('ownerRoleBadge')}</StatusBadge>
           </DetailList.Row>
+          {ownerJoinedAt && (
+            <DetailList.Row label={t('joinedLabel')}>
+              {ownerJoinedAt}
+            </DetailList.Row>
+          )}
         </DetailList>
       </Card.Body>
     </Card>

@@ -55,6 +55,7 @@ describe(TenantOverviewView, () => {
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
         auditEvents={[]}
       />,
     );
@@ -86,6 +87,7 @@ describe(TenantOverviewView, () => {
         tenant={tenant}
         domainVerificationStatus="VERIFIED"
         ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
         auditEvents={[]}
       />,
     );
@@ -100,6 +102,7 @@ describe(TenantOverviewView, () => {
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
         auditEvents={[]}
       />,
     );
@@ -115,6 +118,7 @@ describe(TenantOverviewView, () => {
         tenant={tenant}
         domainVerificationStatus="VERIFIED"
         ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
         auditEvents={[]}
       />,
     );
@@ -133,11 +137,29 @@ describe(TenantOverviewView, () => {
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail={undefined}
+        ownerJoinedAt={undefined}
         auditEvents={[]}
       />,
     );
 
     expect(screen.getByText('Invited, pending')).toBeVisible();
+    expect(screen.queryByText('Joined')).not.toBeInTheDocument();
+  });
+
+  it('shows the Joined row with the formatted date once the owner has a real membership', () => {
+    const tenant = makeTenant();
+    render(
+      <TenantOverviewView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
+        auditEvents={[]}
+      />,
+    );
+
+    expect(screen.getByText('Joined')).toBeVisible();
+    expect(screen.getByText('Aug 12, 2026')).toBeVisible();
   });
 
   it("shows 'Not set' for content-workspace fields the tenant has not been provisioned with yet", () => {
@@ -152,6 +174,7 @@ describe(TenantOverviewView, () => {
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
         auditEvents={[]}
       />,
     );
@@ -176,6 +199,7 @@ describe(TenantOverviewView, () => {
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
         auditEvents={[]}
       />,
     );
@@ -192,6 +216,7 @@ describe(TenantOverviewView, () => {
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
         auditEvents={[]}
       />,
     );
@@ -206,6 +231,7 @@ describe(TenantOverviewView, () => {
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
         auditEvents={[
           makeEvent({ action: AUDIT_ACTION.SETTINGS_UPDATED }),
           makeEvent({ id: 'event-2', action: AUDIT_ACTION.CREATED }),
@@ -225,6 +251,7 @@ describe(TenantOverviewView, () => {
         tenant={tenant}
         domainVerificationStatus="NOT_CONFIGURED"
         ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
         auditEvents={[]}
       />,
     );
