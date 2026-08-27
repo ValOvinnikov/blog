@@ -30,8 +30,8 @@ export const platformNavSections = (
 
 type TTenantNavHrefs = { look: string; voice: string; features: string };
 
-/** The nine Tenant-section destinations, shared by the `/tenants/{id}` and slug-free `/dashboard` sidebars — only the Look/Voice/Features hrefs (and, via the caller, the section label) differ between them. */
-const tenantNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
+/** The eight tenant-facing destinations, shared by the `/tenants/{id}` and slug-free `/dashboard` sidebars — only the Look/Voice/Features hrefs (and, via the caller, the section label) differ between them. Danger zone is deliberately excluded: it's platform-only and never appears in the owner-facing `/dashboard` tree. */
+const tenantFacingNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
   const shipping = { label: t('badgeThisMilestone'), tone: 'neutral' } as const;
   const later = { label: t('badgeLater'), tone: 'warn' } as const;
 
@@ -59,7 +59,6 @@ const tenantNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
     { label: t('subscribers'), icon: ICONS.MENU_ROWS, badge: later },
     { label: t('comments'), icon: ICONS.COMMENT, badge: later },
     { label: t('team'), icon: ICONS.USERS, badge: later },
-    { label: t('dangerZone'), icon: ICONS.WARNING, badge: later },
   ];
 };
 
@@ -67,24 +66,56 @@ export const tenantNavSections = (
   t: TNavTranslator,
   tenantId: string,
   tenantName: string,
-): TSidebarNavSection[] => [
-  {
-    label: t('tenantLabel', { tenantName }),
-    items: tenantNavItems(t, {
-      look: adminRoutes.look(tenantId),
-      voice: adminRoutes.voice(tenantId),
-      features: adminRoutes.features(tenantId),
-    }),
-  },
-];
+): TSidebarNavSection[] => {
+  const platform = {
+    label: t('badgePlatform'),
+    tone: 'neutral',
+    hasDot: false,
+  } as const;
 
-/** The slug-free counterpart to `tenantNavSections` — same nine destinations, routed under `/dashboard` instead of `/tenants/{id}`, labeled generically since the whole point of this tree is not naming the tenant in anything the URL-shy owner sees. */
+  return [
+    {
+      label: t('tenantLabel', { tenantName }),
+      items: [
+        {
+          label: t('overview'),
+          icon: ICONS.HOUSE,
+          href: adminRoutes.tenantOverview(tenantId),
+        },
+        ...tenantFacingNavItems(t, {
+          look: adminRoutes.look(tenantId),
+          voice: adminRoutes.voice(tenantId),
+          features: adminRoutes.features(tenantId),
+        }),
+      ],
+    },
+    {
+      label: t('platformSectionLabel'),
+      items: [
+        {
+          label: t('provisioning'),
+          icon: ICONS.CHECK_SHEET,
+          href: adminRoutes.tenantProvisioning(tenantId),
+          badge: platform,
+        },
+        {
+          label: t('dangerZone'),
+          icon: ICONS.WARNING,
+          href: adminRoutes.tenantDanger(tenantId),
+          badge: platform,
+        },
+      ],
+    },
+  ];
+};
+
+/** The slug-free counterpart to `tenantNavSections`'s tenant-facing section — same eight destinations, routed under `/dashboard` instead of `/tenants/{id}`, labeled generically since the whole point of this tree is not naming the tenant in anything the URL-shy owner sees. Owners never get the Overview item (there's nothing at slug-free `/dashboard` distinct from the section itself) or the platform-only Provisioning/Danger zone section. */
 export const dashboardNavSections = (
   t: TNavTranslator,
 ): TSidebarNavSection[] => [
   {
     label: t('dashboardLabel'),
-    items: tenantNavItems(t, {
+    items: tenantFacingNavItems(t, {
       look: adminRoutes.dashboardLook(),
       voice: adminRoutes.dashboardVoice(),
       features: adminRoutes.dashboardFeatures(),

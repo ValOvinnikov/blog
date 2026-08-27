@@ -8,12 +8,8 @@ import { LinkButton } from '@admin/components/shared/link-button';
 import { StatusBadge } from '@admin/components/shared/status-badge';
 import { Text } from '@admin/components/shared/text';
 import { Link } from '@admin/i18n/navigation';
-import type { TDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
 import { adminRoutes } from '@admin/utils/routes/routes';
-import {
-  domainVerificationTone,
-  provisioningStepTone,
-} from '@admin/utils/status-tone/status-tone';
+import { provisioningStepTone } from '@admin/utils/status-tone/status-tone';
 import { ALERT_TYPE, ICONS } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
@@ -27,7 +23,6 @@ import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
 
 type TProvisioningStatusViewProps = {
   tenant: TTenant;
-  domainVerificationStatus: TDomainVerificationStatus;
   // `undefined` means the tenant's OWNER row is still a pending
   // `membershipInvites` entry rather than a real `memberships` row (see
   // `queries.memberships.getTenantOwnerEmail`) — every tenant has exactly
@@ -45,7 +40,6 @@ type TProvisioningStatusViewProps = {
  */
 export const ProvisioningStatusView = ({
   tenant,
-  domainVerificationStatus,
   ownerEmail,
 }: TProvisioningStatusViewProps) => {
   const t = useTranslations('provisioningStatusView');
@@ -64,8 +58,7 @@ export const ProvisioningStatusView = ({
     displayOverallStatus,
     failedStepError,
     errorKind,
-    domainStatus,
-  } = useProvisioningPoll(tenant, domainVerificationStatus);
+  } = useProvisioningPoll(tenant);
 
   const {
     root,
@@ -95,10 +88,6 @@ export const ProvisioningStatusView = ({
     errorDetailsSummary,
     errorDetailsText,
     goToTenantButton,
-    dnsCard,
-    dnsRow,
-    dnsValue,
-    dnsStatusLive,
   } = provisioningStatusViewVariants();
 
   return (
@@ -251,23 +240,6 @@ export const ProvisioningStatusView = ({
             </LinkButton>
           )}
         </div>
-      </div>
-
-      <div className={dnsCard()}>
-        <Heading level={2} size="cardTitle">
-          {t('dnsHeading')}
-        </Heading>
-        <div className={dnsRow()}>
-          <Text className={dnsValue()}>{tenant.primaryDomain}</Text>
-          <span className={dnsStatusLive()} aria-live="polite">
-            <StatusBadge tone={domainVerificationTone(domainStatus)}>
-              {t(`dnsStatus.${domainStatus}`)}
-            </StatusBadge>
-          </span>
-        </div>
-        {domainStatus === 'NOT_CONFIGURED' && (
-          <Text variant="hint">{t('dnsNotConfiguredHint')}</Text>
-        )}
       </div>
     </div>
   );

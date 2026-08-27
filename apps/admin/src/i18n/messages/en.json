@@ -9,6 +9,7 @@
     "addTenant": "Add tenant · Admin",
     "tenantOverview": "Tenant overview · Admin",
     "tenantProvisioning": "Provisioning · Admin",
+    "tenantDanger": "Danger zone · Admin",
     "features": "Features · Admin"
   },
   "unauthorizedPage": {
@@ -30,15 +31,14 @@
   "topbar": {
     "breadcrumbAriaLabel": "Breadcrumb"
   },
-  "platformBreadcrumb": {
-    "provisioningLabel": "Provisioning"
-  },
   "navSections": {
     "platformLabel": "Platform",
+    "platformSectionLabel": "Platform actions",
     "tenants": "Tenants",
     "addTenant": "Add tenant",
     "tenantLabel": "Tenant · {tenantName}",
     "dashboardLabel": "Workspace",
+    "overview": "Overview",
     "look": "Look",
     "voice": "Voice",
     "domain": "Domain",
@@ -46,9 +46,11 @@
     "subscribers": "Subscribers",
     "comments": "Comments",
     "team": "Team",
+    "provisioning": "Provisioning",
     "dangerZone": "Danger zone",
     "badgeLater": "later",
     "badgeThisMilestone": "this milestone",
+    "badgePlatform": "platform",
     "features": "Features"
   },
   "tenantLayout": {
@@ -338,18 +340,13 @@
       }
     },
     "technicalDetailsToggle": "Technical details",
-    "dnsHeading": "Domain verification",
-    "dnsStatus": {
-      "NOT_CONFIGURED": "Unavailable",
-      "NOT_ADDED": "Not added yet",
-      "PENDING": "Pending — awaiting DNS",
-      "VERIFIED": "Verified",
-      "ERROR": "Couldn't check"
-    },
-    "dnsNotConfiguredHint": "The Vercel integration isn't configured on this deployment, so domain verification can't run — this isn't specific to this tenant.",
     "goToTenantButton": "Go to tenant →",
     "ownerLabel": "Owner",
     "ownerInvitedPendingBadge": "Invited, pending"
+  },
+  "tenantDangerPage": {
+    "title": "Danger zone",
+    "description": "Irreversible actions for this tenant. Restricted to superadmins."
   },
   "tenantDetailsPanel": {
     "heading": "Tenant details",

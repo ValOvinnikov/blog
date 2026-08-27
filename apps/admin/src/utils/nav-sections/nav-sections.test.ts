@@ -29,11 +29,26 @@ describe('platformNavSections', () => {
 });
 
 describe('tenantNavSections', () => {
-  it("labels the section with the tenant's name, not its id", () => {
+  it("labels the main section with the tenant's name, not its id", () => {
     const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
 
     expect(tenant!.label).toBe('Tenant · Acme Co');
     expect(tenant!.label).not.toContain('tenant-1');
+  });
+
+  it('gives the main and platform sections distinct labels', () => {
+    const [tenant, platform] = tenantNavSections(t, 'tenant-1', 'Acme Co');
+
+    expect(tenant!.label).not.toBe(platform!.label);
+  });
+
+  it('gives Overview a real href as the first item', () => {
+    const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
+
+    expect(tenant!.items[0]).toMatchObject({
+      label: 'Overview',
+      href: '/tenants/tenant-1',
+    });
   });
 
   it('gives Look, Voice and Features distinct real hrefs, badged "this milestone" in neutral tone', () => {
@@ -54,21 +69,22 @@ describe('tenantNavSections', () => {
     });
   });
 
-  it('badges the remaining six destinations "later" in warn tone, with no href', () => {
+  it('badges the remaining five unbuilt destinations "later" in warn tone, with no href', () => {
     const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
     const later = tenant!.items.filter((item) => item.badge?.label === 'later');
 
-    expect(later).toHaveLength(6);
+    expect(later).toHaveLength(5);
     for (const item of later) {
       expect(item.href).toBeUndefined();
       expect(item.badge?.tone).toBe('warn');
     }
   });
 
-  it('lists all nine tenant destinations', () => {
+  it('lists the nine main-section destinations, Overview first and no Danger zone', () => {
     const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
 
     expect(tenant!.items.map((item) => item.label)).toEqual([
+      'Overview',
       'Look',
       'Voice',
       'Features',
@@ -77,8 +93,24 @@ describe('tenantNavSections', () => {
       'Subscribers',
       'Comments',
       'Team',
+    ]);
+  });
+
+  it('gives Provisioning and Danger zone real hrefs in the second, platform-only section, each badged "platform"', () => {
+    const [, platform] = tenantNavSections(t, 'tenant-1', 'Acme Co');
+
+    expect(platform!.items.map((item) => item.label)).toEqual([
+      'Provisioning',
       'Danger zone',
     ]);
+    expect(platform!.items[0]).toMatchObject({
+      href: '/tenants/tenant-1/provisioning',
+      badge: { label: 'platform', tone: 'neutral', hasDot: false },
+    });
+    expect(platform!.items[1]).toMatchObject({
+      href: '/tenants/tenant-1/danger',
+      badge: { label: 'platform', tone: 'neutral', hasDot: false },
+    });
   });
 });
 
@@ -94,12 +126,23 @@ describe('dashboardNavSections', () => {
     expect(features?.href).toBe('/dashboard/features');
   });
 
-  it('lists the same nine destinations as tenantNavSections', () => {
+  it('never includes Overview, Provisioning or Danger zone — those are platform-only', () => {
+    const [dashboard] = dashboardNavSections(t);
+
+    const labels = dashboard!.items.map((item) => item.label);
+    expect(labels).not.toContain('Overview');
+    expect(labels).not.toContain('Provisioning');
+    expect(labels).not.toContain('Danger zone');
+  });
+
+  it('lists the same eight tenant-facing destinations as tenantNavSections', () => {
     const [dashboard] = dashboardNavSections(t);
     const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
 
     expect(dashboard!.items.map((item) => item.label)).toEqual(
-      tenant!.items.map((item) => item.label),
+      tenant!.items
+        .filter((item) => item.label !== 'Overview')
+        .map((item) => item.label),
     );
   });
 });
