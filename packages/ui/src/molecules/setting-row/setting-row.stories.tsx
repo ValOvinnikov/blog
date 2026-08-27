@@ -85,23 +85,6 @@ export const WideControlContent: TStory = {
   render: () => <WideControlDemo />,
 };
 
-export const ControlGrows: TStory = {
-  args: {
-    label: 'Accent hue',
-    description: 'Drag to pick the accent color used across the admin UI.',
-    canControlGrow: true,
-    children: (
-      <div
-        className="h-8 w-full rounded-sm"
-        style={{
-          background:
-            'linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red)',
-        }}
-      />
-    ),
-  },
-};
-
 export const Danger: TStory = {
   args: {
     tone: 'danger',

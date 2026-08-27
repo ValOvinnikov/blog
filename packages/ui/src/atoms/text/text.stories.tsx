@@ -56,13 +56,6 @@ export const Supporting: TStory = {
   },
 };
 
-export const Hint: TStory = {
-  args: {
-    variant: 'hint',
-    children: 'A small muted hint or note, smaller than Supporting.',
-  },
-};
-
 export const Statement: TStory = {
   args: {
     variant: 'statement',

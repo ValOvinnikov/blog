@@ -1,5 +1,5 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { AriaAttributes, KeyboardEvent } from 'react';
+import type { KeyboardEvent } from 'react';
 
 import { segmentedControlVariants } from './segmented-control-variants';
 
@@ -18,8 +18,6 @@ export type TSegmentedControlProps<TValue extends string = string> =
       value: TValue;
       onChange: (value: TValue) => void;
       ariaLabel: string;
-      isDisabled?: boolean;
-      'aria-describedby'?: AriaAttributes['aria-describedby'];
     };
 
 const s = segmentedControlVariants();
@@ -32,10 +30,7 @@ const s = segmentedControlVariants();
  * pattern — one exclusive choice among peers — rather than tabs, since the
  * component itself shows or hides no panel. Arrow keys move both focus and
  * the selection between options, wrapping at the ends, matching the ARIA
- * authoring practices for a radiogroup. `isDisabled` renders every option as
- * a genuine disabled radio (still exposed by role, just unavailable) rather
- * than falling back to static text — pair it with `aria-describedby`
- * pointing at an explanatory element when the caller has a reason to give.
+ * authoring practices for a radiogroup.
  * The root is a `div[role="radiogroup"]`, not a labelable element, so it
  * must never be paired with `<label htmlFor>` — the accessible name comes
  * entirely from the required `ariaLabel` prop.
@@ -59,12 +54,8 @@ export const SegmentedControl = <TValue extends string = string>({
   ariaLabel,
   className,
   dataTestId,
-  isDisabled = false,
-  'aria-describedby': ariaDescribedby,
 }: TSegmentedControlProps<TValue>) => {
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (isDisabled) return;
-
     const isNext = NEXT_OPTION_KEYS.has(event.key);
     const isPrevious = PREVIOUS_OPTION_KEYS.has(event.key);
     if (!isNext && !isPrevious) return;
@@ -89,8 +80,6 @@ export const SegmentedControl = <TValue extends string = string>({
     <div
       role="radiogroup"
       aria-label={ariaLabel}
-      aria-disabled={isDisabled}
-      aria-describedby={ariaDescribedby}
       onKeyDown={handleKeyDown}
       className={s.root({ class: className })}
       data-testid={dataTestId}
@@ -105,7 +94,6 @@ export const SegmentedControl = <TValue extends string = string>({
             role="radio"
             aria-checked={selected}
             tabIndex={selected ? 0 : -1}
-            disabled={isDisabled}
             onClick={() => onChange(option.value)}
             className={s.option({ selected })}
           >
