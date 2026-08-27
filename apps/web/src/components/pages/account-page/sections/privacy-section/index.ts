@@ -1,1 +1,1 @@
-export { PrivacySection } from './privacy-section';
+export { PrivacySection, type IPrivacySectionProps } from './privacy-section';

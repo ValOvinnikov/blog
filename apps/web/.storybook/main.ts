@@ -58,6 +58,14 @@ const config: StorybookConfig = {
       '@web/server/newsletter/newsletter-actions': fileURLToPath(
         new URL('./mocks/newsletter-actions.ts', import.meta.url),
       ),
+      // `IdentitySection`/`NewsletterSection` (the account-page section
+      // wrappers) import this. Their folder's barrel also re-exports the
+      // pure view alongside the wrapper, so any story that pulls the view
+      // in via the barrel (e.g. `AccountPageView`'s own fixtures) evaluates
+      // the wrapper too, dragging this module along with it.
+      '@web/server/auth/auth': fileURLToPath(
+        new URL('./mocks/auth.ts', import.meta.url),
+      ),
       // `ErrorPage`/`LocaleErrorPage`/`GlobalErrorPage` call this on mount,
       // which POSTs to `/api/client-log` via `sendBeacon`/`fetch` — aliasing
       // it keeps their stories from firing a real network request.

@@ -3,9 +3,17 @@ import { redirect } from 'next/navigation';
 
 import { AccountPage } from './account-page';
 
-const { authMock } = vi.hoisted(() => ({ authMock: vi.fn() }));
+const { authMock, getChromeOnMock, privacySectionMock } = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  getChromeOnMock: vi.fn(),
+  privacySectionMock: vi.fn(() => (
+    <div data-testid="privacy-section">privacy section</div>
+  )),
+}));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
+
+vi.mock('@web/utils/get-chrome-on', () => ({ getChromeOn: getChromeOnMock }));
 
 vi.mock('@web/components/pages/account-page/sections/identity-section', () => ({
   IdentitySection: () => (
@@ -23,16 +31,21 @@ vi.mock(
 );
 
 vi.mock('@web/components/pages/account-page/sections/privacy-section', () => ({
-  PrivacySection: () => (
-    <div data-testid="privacy-section">privacy section</div>
-  ),
+  PrivacySection: privacySectionMock,
 }));
 
 const setup = customRenderAsync(AccountPage, {});
 
+const authedSession = {
+  user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
+};
+
 describe(`<${AccountPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
+    getChromeOnMock.mockReset();
+    getChromeOnMock.mockResolvedValue(true);
+    privacySectionMock.mockClear();
   });
 
   it('redirects home when there is no session', async () => {
@@ -43,10 +56,8 @@ describe(`<${AccountPage.name}/>`, () => {
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
   });
 
-  it('renders the page heading and all three sections, in 6c/6b/6a order', async () => {
-    authMock.mockResolvedValue({
-      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
-    });
+  it('renders the page heading and all three sections, in identity/newsletter/privacy order', async () => {
+    authMock.mockResolvedValue(authedSession);
 
     await setup();
 
@@ -60,9 +71,6 @@ describe(`<${AccountPage.name}/>`, () => {
     expect(identitySection).toBeVisible();
     expect(newsletterSection).toBeVisible();
     expect(privacySection).toBeVisible();
-    // "Connected accounts" renders first, then "email & newsletter
-    // preferences", then "privacy & data" last — each must precede the next
-    // in document order.
     expect(
       identitySection.compareDocumentPosition(newsletterSection) &
         Node.DOCUMENT_POSITION_FOLLOWING,
@@ -71,5 +79,23 @@ describe(`<${AccountPage.name}/>`, () => {
       newsletterSection.compareDocumentPosition(privacySection) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
+  });
+
+  it('resolves the session handle and chrome flag into PrivacySection props', async () => {
+    authMock.mockResolvedValue(authedSession);
+    getChromeOnMock.mockResolvedValue(false);
+
+    await setup();
+
+    expect(privacySectionMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        handle: 'jane',
+        isChromeOn: false,
+        promptCommand: 'Privacy',
+        exportLabel: 'Export my data',
+        deleteLabel: 'Delete account',
+      }),
+      undefined,
+    );
   });
 });
