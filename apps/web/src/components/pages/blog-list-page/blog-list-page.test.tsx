@@ -1,4 +1,4 @@
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 import { notFound } from 'next/navigation';
 
@@ -18,7 +18,9 @@ const {
   // components so this suite can assert `BlogListPage` passes the right
   // props through without needing a real async render; their own dispatch
   // logic is covered by `module-renderer.test.tsx` and
-  // `post-list-module.test.tsx`.
+  // `post-list-module.test.tsx`. `BlogListPageView`'s own rendering (h1,
+  // breadcrumbs, topic chips, JSON-LD) is covered by
+  // `blog-list-page-view.test.tsx`.
   moduleRendererMock: vi.fn(
     ({ modules }: { modules: { id: string; type: string }[] }) => (
       <div data-testid="module-renderer-stub">
@@ -115,7 +117,7 @@ describe(`<${BlogListPage.name}/>`, () => {
     errorSpy.mockRestore();
   });
 
-  it('renders the h1 and supporting text from the fetched page shell', async () => {
+  it('renders the h1 from the fetched page shell', async () => {
     getIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -131,7 +133,6 @@ describe(`<${BlogListPage.name}/>`, () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Blog' }),
     ).toBeVisible();
-    expect(screen.getByText('Essays and notes.')).toBeVisible();
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
@@ -151,100 +152,6 @@ describe(`<${BlogListPage.name}/>`, () => {
     expect(postListModuleMock).toHaveBeenCalledWith(
       { id: 'post-list-1', locale: 'en', page: 2 },
       undefined,
-    );
-  });
-
-  it('renders the topic chip row', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
-        modules: [],
-        postListId: 'post-list-1',
-      },
-    });
-
-    await setup();
-
-    expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
-    expect(screen.getByRole('link', { name: 'All' })).toHaveAttribute(
-      'href',
-      '/blog',
-    );
-    expect(screen.getByRole('link', { name: 'News' })).toHaveAttribute(
-      'href',
-      '/topics/news',
-    );
-  });
-
-  it('renders the Home › Blog breadcrumbs trail', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
-        modules: [],
-        postListId: 'post-list-1',
-      },
-    });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-
-    const homeLink = within(nav).getByRole('link', { name: 'Home' });
-    expect(homeLink).toHaveAttribute('href', '/');
-
-    const current = within(nav).getByText('Blog');
-    expect(current).toHaveAttribute('aria-current', 'page');
-    expect(current.tagName).not.toBe('A');
-  });
-
-  it('renders the breadcrumb nav as a sibling before <main>, not nested inside it', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
-        modules: [],
-        postListId: 'post-list-1',
-      },
-    });
-
-    await setup();
-
-    const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-    const main = screen.getByRole('main');
-
-    expect(main.contains(nav)).toBe(false);
-    expect(
-      nav.compareDocumentPosition(main) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-  });
-
-  it('renders the JSON-LD BreadcrumbList schema script', async () => {
-    getIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        heading: 'Blog',
-        supportingText: 'Essays and notes.',
-        modules: [],
-        postListId: 'post-list-1',
-      },
-    });
-
-    const { container } = await setup();
-
-    const scripts = container.querySelectorAll(
-      'script[type="application/ld+json"]',
-    );
-    const breadcrumbScript = Array.from(scripts).find((script) =>
-      script.textContent?.includes('"@type":"BreadcrumbList"'),
-    );
-    expect(breadcrumbScript).toBeDefined();
-    expect(breadcrumbScript?.textContent).toContain(
-      '"item":"https://example.com/blog"',
     );
   });
 
