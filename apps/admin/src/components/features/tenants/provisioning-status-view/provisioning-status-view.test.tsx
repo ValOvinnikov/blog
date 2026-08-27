@@ -128,6 +128,48 @@ describe(ProvisioningStatusView, () => {
     expect(screen.getByRole('complementary')).toBeInTheDocument();
   });
 
+  it('titles the steps card "Steps" and shows a 0-of-6-done badge when every step is idle', () => {
+    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+      />,
+    );
+
+    const sidebar = screen.getByRole('complementary');
+    expect(
+      within(sidebar).getByRole('heading', { level: 2, name: 'Steps' }),
+    ).toBeVisible();
+    expect(within(sidebar).getByText('0 of 6 done')).toBeVisible();
+  });
+
+  it("reflects the steps card's completion badge count from the tenant's actual step statuses", () => {
+    const tenant = makeTenant({
+      provisioningSteps: {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+      },
+    });
+    render(
+      <ProvisioningStatusView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+      />,
+    );
+
+    expect(
+      within(screen.getByRole('complementary')).getByText('2 of 6 done'),
+    ).toBeVisible();
+  });
+
   it('lists all six provisioning steps in order, in operator language', () => {
     const tenant = makeTenant();
     render(
