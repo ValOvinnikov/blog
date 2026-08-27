@@ -95,7 +95,7 @@ describe(Sidebar, () => {
               {
                 label: 'Look',
                 icon: ICONS.PALETTE,
-                href: '/t/acme/look',
+                href: '/tenants/tenant-1/look',
                 badge: { label: 'this milestone', tone: 'neutral' },
               },
             ],
@@ -109,7 +109,7 @@ describe(Sidebar, () => {
   });
 
   it('marks the item matching the current pathname active, and no other', () => {
-    setPathname('/t/acme/look');
+    setPathname('/tenants/tenant-1/look');
 
     render(
       <Sidebar
@@ -117,8 +117,16 @@ describe(Sidebar, () => {
           {
             label: 'Tenant · acme',
             items: [
-              { label: 'Look', icon: ICONS.PALETTE, href: '/t/acme/look' },
-              { label: 'Voice', icon: ICONS.QUOTE, href: '/t/acme/voice' },
+              {
+                label: 'Look',
+                icon: ICONS.PALETTE,
+                href: '/tenants/tenant-1/look',
+              },
+              {
+                label: 'Voice',
+                icon: ICONS.QUOTE,
+                href: '/tenants/tenant-1/voice',
+              },
             ],
           },
         ]}
@@ -135,7 +143,7 @@ describe(Sidebar, () => {
   });
 
   it('switches which item is active when the route changes — the case a shared href could not express', () => {
-    setPathname('/t/acme/voice');
+    setPathname('/tenants/tenant-1/voice');
 
     render(
       <Sidebar
@@ -143,8 +151,16 @@ describe(Sidebar, () => {
           {
             label: 'Tenant · acme',
             items: [
-              { label: 'Look', icon: ICONS.PALETTE, href: '/t/acme/look' },
-              { label: 'Voice', icon: ICONS.QUOTE, href: '/t/acme/voice' },
+              {
+                label: 'Look',
+                icon: ICONS.PALETTE,
+                href: '/tenants/tenant-1/look',
+              },
+              {
+                label: 'Voice',
+                icon: ICONS.QUOTE,
+                href: '/tenants/tenant-1/voice',
+              },
             ],
           },
         ]}
@@ -161,7 +177,7 @@ describe(Sidebar, () => {
   });
 
   it('renders an unbuilt destination as an inert, non-navigable row carrying its badge as real text, and never as active even at its own path', () => {
-    setPathname('/t/acme/domain');
+    setPathname('/tenants/tenant-1/domain');
 
     render(
       <Sidebar

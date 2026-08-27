@@ -93,6 +93,6 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
     await setup();
 
     expect(screen.getByText('Platform')).toBeVisible();
-    expect(screen.getByText('Tenant · tenant-1')).toBeVisible();
+    expect(screen.getByText('Tenant · Acme Inc.')).toBeVisible();
   });
 });

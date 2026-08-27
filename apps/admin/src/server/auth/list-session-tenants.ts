@@ -7,7 +7,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { redirect } from 'next/navigation';
 
 import { auth } from './auth';
-import { buildSuperAdminMembership } from './build-super-admin-membership';
+import { buildVirtualAdminMembership } from './build-virtual-admin-membership';
 import { isSuperAdmin } from './is-super-admin';
 
 export type TSessionTenants = {
@@ -42,7 +42,7 @@ export const listSessionTenants = async (): Promise<TSessionTenants> => {
     return {
       userId,
       memberships: tenants.map((tenant) =>
-        buildSuperAdminMembership(userId, tenant.id),
+        buildVirtualAdminMembership(userId, tenant.id),
       ),
       tenants,
     };

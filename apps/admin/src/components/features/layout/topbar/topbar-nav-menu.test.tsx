@@ -81,7 +81,7 @@ describe(TopbarNavMenu, () => {
   });
 
   it('marks only the item matching the current pathname active', async () => {
-    setPathname('/t/acme/look');
+    setPathname('/tenants/tenant-1/look');
     const user = userEvent.setup();
     render(
       <TopbarNavMenu
@@ -89,8 +89,16 @@ describe(TopbarNavMenu, () => {
           {
             label: 'Tenant · acme',
             items: [
-              { label: 'Look', icon: ICONS.PALETTE, href: '/t/acme/look' },
-              { label: 'Voice', icon: ICONS.QUOTE, href: '/t/acme/voice' },
+              {
+                label: 'Look',
+                icon: ICONS.PALETTE,
+                href: '/tenants/tenant-1/look',
+              },
+              {
+                label: 'Voice',
+                icon: ICONS.QUOTE,
+                href: '/tenants/tenant-1/voice',
+              },
             ],
           },
         ]}
@@ -109,7 +117,7 @@ describe(TopbarNavMenu, () => {
   });
 
   it('renders an item with no href as an inert, non-interactive row that is never marked active', async () => {
-    setPathname('/t/acme/domain');
+    setPathname('/tenants/tenant-1/domain');
     const user = userEvent.setup();
     render(
       <TopbarNavMenu

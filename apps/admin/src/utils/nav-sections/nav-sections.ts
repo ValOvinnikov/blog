@@ -66,9 +66,10 @@ const tenantNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
 export const tenantNavSections = (
   t: TNavTranslator,
   tenantId: string,
+  tenantName: string,
 ): TSidebarNavSection[] => [
   {
-    label: t('tenantLabel', { tenantId }),
+    label: t('tenantLabel', { tenantName }),
     items: tenantNavItems(t, {
       look: adminRoutes.look(tenantId),
       voice: adminRoutes.voice(tenantId),

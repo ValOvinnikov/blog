@@ -29,8 +29,15 @@ describe('platformNavSections', () => {
 });
 
 describe('tenantNavSections', () => {
+  it("labels the section with the tenant's name, not its id", () => {
+    const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
+
+    expect(tenant!.label).toBe('Tenant · Acme Co');
+    expect(tenant!.label).not.toContain('tenant-1');
+  });
+
   it('gives Look, Voice and Features distinct real hrefs, badged "this milestone" in neutral tone', () => {
-    const [tenant] = tenantNavSections(t, 'tenant-1');
+    const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
     const look = tenant!.items.find((item) => item.label === 'Look');
     const voice = tenant!.items.find((item) => item.label === 'Voice');
     const features = tenant!.items.find((item) => item.label === 'Features');
@@ -48,7 +55,7 @@ describe('tenantNavSections', () => {
   });
 
   it('badges the remaining six destinations "later" in warn tone, with no href', () => {
-    const [tenant] = tenantNavSections(t, 'tenant-1');
+    const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
     const later = tenant!.items.filter((item) => item.badge?.label === 'later');
 
     expect(later).toHaveLength(6);
@@ -59,7 +66,7 @@ describe('tenantNavSections', () => {
   });
 
   it('lists all nine tenant destinations', () => {
-    const [tenant] = tenantNavSections(t, 'tenant-1');
+    const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
 
     expect(tenant!.items.map((item) => item.label)).toEqual([
       'Look',
@@ -89,7 +96,7 @@ describe('dashboardNavSections', () => {
 
   it('lists the same nine destinations as tenantNavSections', () => {
     const [dashboard] = dashboardNavSections(t);
-    const [tenant] = tenantNavSections(t, 'tenant-1');
+    const [tenant] = tenantNavSections(t, 'tenant-1', 'Acme Co');
 
     expect(dashboard!.items.map((item) => item.label)).toEqual(
       tenant!.items.map((item) => item.label),

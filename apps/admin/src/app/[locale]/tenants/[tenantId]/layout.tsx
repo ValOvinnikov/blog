@@ -31,7 +31,7 @@ export default async function TenantByIdLayout({ children, params }: TProps) {
     <AdminShell
       sections={[
         ...platformNavSections(tNavSections),
-        ...tenantNavSections(tNavSections, tenant.id),
+        ...tenantNavSections(tNavSections, tenant.id, tenant.name),
       ]}
       switcher={
         <TenantSwitcher tenants={[tenant]} activeTenantId={tenant.id} />
