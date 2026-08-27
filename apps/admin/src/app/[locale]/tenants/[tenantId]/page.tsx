@@ -1,4 +1,6 @@
 import { TenantOverviewView } from '@admin/components/features/tenants/tenant-overview-view';
+import { auth } from '@admin/server/auth/auth';
+import { isSuperAdmin } from '@admin/server/auth/is-super-admin';
 import { getDomainVerificationStatus } from '@admin/server/provisioning/get-domain-verification-status';
 import { formatDate } from '@admin/utils/format-date/format-date';
 import { AUDIT_TARGET_TYPE } from '@blog/config';
@@ -25,17 +27,25 @@ export default async function TenantOverviewPage({ params }: TProps) {
     notFound();
   }
 
-  const [domainVerificationStatus, ownerEmail, ownerMembership, auditEvents] =
-    await Promise.all([
-      getDomainVerificationStatus(tenant.primaryDomain),
-      queries.memberships.getTenantOwnerEmail(tenant.id),
-      queries.memberships.getTenantOwnerMembership(tenant.id),
-      queries.auditEvents.listAuditEventsForTarget(
-        AUDIT_TARGET_TYPE.TENANT,
-        tenant.id,
-        { limit: 5 },
-      ),
-    ]);
+  const session = await auth();
+
+  const [
+    domainVerificationStatus,
+    ownerEmail,
+    ownerMembership,
+    auditEvents,
+    isViewerSuperAdmin,
+  ] = await Promise.all([
+    getDomainVerificationStatus(tenant.primaryDomain),
+    queries.memberships.getTenantOwnerEmail(tenant.id),
+    queries.memberships.getTenantOwnerMembership(tenant.id),
+    queries.auditEvents.listAuditEventsForTarget(
+      AUDIT_TARGET_TYPE.TENANT,
+      tenant.id,
+      { limit: 5 },
+    ),
+    session?.user?.id ? isSuperAdmin(session.user.id) : false,
+  ]);
 
   return (
     <TenantOverviewView
@@ -47,6 +57,7 @@ export default async function TenantOverviewPage({ params }: TProps) {
       }
       ownerJoinedAtIso={ownerMembership?.joinedAt.toISOString()}
       auditEvents={auditEvents}
+      isSuperAdmin={isViewerSuperAdmin}
     />
   );
 }

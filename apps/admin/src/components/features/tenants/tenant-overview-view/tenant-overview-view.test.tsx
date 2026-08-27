@@ -94,6 +94,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        isSuperAdmin={false}
       />,
     );
 
@@ -119,6 +120,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        isSuperAdmin={false}
       />,
     );
 
@@ -158,6 +160,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        isSuperAdmin={false}
       />,
     );
 
@@ -174,6 +177,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        isSuperAdmin={false}
       />,
     );
 
@@ -198,6 +202,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        isSuperAdmin={false}
       />,
     );
 
@@ -243,6 +248,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        isSuperAdmin={false}
       />,
     );
 
@@ -275,6 +281,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        isSuperAdmin={false}
       />,
     );
 
@@ -316,6 +323,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[]}
+        isSuperAdmin={false}
       />,
     );
 
@@ -355,6 +363,7 @@ describe(TenantOverviewView, () => {
         ownerJoinedAt="Aug 12, 2026"
         ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
         auditEvents={[makeEvent()]}
+        isSuperAdmin={false}
       />,
     );
 
@@ -362,5 +371,63 @@ describe(TenantOverviewView, () => {
     expect(screen.getByText('Aug 12, 2026')).toBeVisible();
     expect(screen.getByText('proj-1')).toBeVisible();
     expect(screen.getByText('vo@valstack.dev')).toBeVisible();
+  });
+
+  it('always renders "Open site", linking to the tenant\'s live domain', () => {
+    const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
+    render(
+      <TenantOverviewView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
+        auditEvents={[]}
+        isSuperAdmin={false}
+      />,
+    );
+
+    const link = screen.getByRole('link', { name: 'Open site ↗' });
+    expect(link).toHaveAttribute('href', 'https://acme.example.com');
+    expect(link).toHaveAttribute('target', '_blank');
+  });
+
+  it('renders "Open Studio", linking to the tenant\'s Studio host, only for a super admin', () => {
+    const tenant = makeTenant({ slug: 'acme' });
+    render(
+      <TenantOverviewView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
+        auditEvents={[]}
+        isSuperAdmin={true}
+      />,
+    );
+
+    expect(screen.getByRole('link', { name: 'Open Studio ↗' })).toHaveAttribute(
+      'href',
+      'https://studio-acme.valstack.dev',
+    );
+  });
+
+  it('omits "Open Studio" for a non-super-admin viewer', () => {
+    const tenant = makeTenant({ slug: 'acme' });
+    render(
+      <TenantOverviewView
+        tenant={tenant}
+        domainVerificationStatus="NOT_CONFIGURED"
+        ownerEmail="owner@example.com"
+        ownerJoinedAt="Aug 12, 2026"
+        ownerJoinedAtIso="2026-08-12T00:00:00.000Z"
+        auditEvents={[]}
+        isSuperAdmin={false}
+      />,
+    );
+
+    expect(
+      screen.queryByRole('link', { name: 'Open Studio ↗' }),
+    ).not.toBeInTheDocument();
   });
 });
