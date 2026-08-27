@@ -5,7 +5,11 @@ items handed off from Feature 6 of
 [`2026-08-07-flexible-theming-and-page-builder-design.md`](./2026-08-07-flexible-theming-and-page-builder-design.md).
 Output feeds per-epic `superpowers:writing-plans` passes and `board-keeper`
 ticketing. **All 7 items in §Open decisions are resolved as of 2026-08-14** —
-see that section for the final call on each. Phase 0 (tenant registry) has
+see that section for the final call on each. **Two of them — 3 (Studio
+hosting) and 5 (URL scheme) — were reopened on 2026-08-28**, after a
+self-serve-provisioning requirement promoted two former Non-goals (self-serve
+signup, billing) into scope; three further decisions (8–10) were added the same
+day. Phase 0 (tenant registry) has
 already shipped; epic 2a (per-tenant content reads infrastructure) has
 shipped too, proven on one loader — epic 2b (migrating the remaining
 `service.*` loaders) is next and unblocked.
@@ -183,7 +187,7 @@ Only the domain tables do.
   site's Auth.js. A content editor and a site commenter are different identities
   by design.
 
-### 5. Studio per tenant — stays Vercel-hosted (decided)
+### 5. Studio per tenant — stays Vercel-hosted (shape REOPENED 2026-08-28)
 
 Keep the current model: a static `sanity build` export served from **Vercel**,
 **not `sanity deploy`** (`SPEC.md` §13's deliberate choice — no
@@ -207,6 +211,34 @@ Keep the current model: a static `sanity build` export served from **Vercel**,
 deployments become the
 bottleneck. Either way it is **Vercel, consistent with §13 — no `sanity
 deploy`.**
+
+**Reopened 2026-08-28.** Two findings, one factual and one of scope:
+
+- **Shape (a) was decided but never implemented.** It requires a fan-out
+  redeploy step, and none exists — `deploy-production.yml` deploys exactly one
+  Studio (`VERCEL_PROJECT_ID_CMS`). Every tenant's `studio-<slug>` project is
+  frozen at the commit that provisioned it. Since `apps/web` is a single shared
+  deployment that moves every release, the drift is asymmetric: web ships code
+  expecting schema fields no tenant editor can author. That is a correctness
+  problem, not the deployment-cost problem the 2026-08-14 note anticipated.
+- **Shape (a) is incompatible with self-serve provisioning.** Under (a) every
+  signup creates a Vercel project _and_ runs a full Studio build, so a signup
+  spike exhausts the account build quota. Shape (a) is also the only reason
+  provisioning lives in GitHub Actions: `create-studio-vercel-project.ts` is
+  the **one** provisioning step that shells out to a builder (`pnpm install` +
+  `vercel build`); every other step is pure API calls with injected `deps`.
+
+The per-tenant Studio exists solely because `projectId`/`dataset` are read from
+`SANITY_STUDIO_*` and inlined into the bundle at build time — nothing else
+about a tenant Studio differs. The free-tier driver applies to the per-tenant
+**Sanity project** (kept), not to the Studio deployment, so collapsing the
+Studio costs nothing on that axis.
+
+**Direction (not final): move to (b).** Gated on a spike — a Next-hosted Studio
+taking a per-request-resolved `projectId`/`dataset`. The static multi-workspace
+array (`defineConfig([...])`) is **not** viable: the list is fixed at build
+time, it leaks every tenant name into the bundle, and Sanity's docs state
+`hidden` is client-side UI only, never an access boundary.
 
 ### 6. Theming per tenant — no `@blog/ui` change
 
@@ -243,13 +275,20 @@ An admin/automation flow, not a hot path:
    Studio deployment (§5 shape (b)). No `sanity deploy`.
 4. **Insert registry rows** — `tenants` (+ `sanityProjectId`), the owner's
    `memberships` row, and `tenant_domains`.
-5. **Map the domain** in Vercel — custom domain only (resolved 2026-08-14,
-   §Open decision 5).
+5. **Map the domain** in Vercel — ~~custom domain only~~; superseded, see
+   §Open decision 5 (reopened 2026-08-28: wildcard platform subdomain at
+   signup, custom domain as a paid upgrade).
 6. **No Neon migration** — the shared DB is already migrated; a new tenant is
    rows, not schema. (This asymmetry is a key advantage — see below.)
 
 This flow is the main net-new tooling and should be scripted early; done by hand
 it is the bottleneck the ToS findings warn about.
+
+**Self-serve changes where this runs (2026-08-28).** It is scripted today, but
+as a CI `workflow_dispatch` an operator triggers from `apps/admin`. A public
+signup flow needs §Open decisions 8 (host), 9 (membership) and 10 (trial
+lifecycle) settled first. Step 3's shape-(a) branch and step 5's "custom domain
+only" are both superseded — see §5 and §Open decision 5.
 
 ## The migration story — a deliberate asymmetry
 
@@ -262,6 +301,17 @@ it is the bottleneck the ToS findings warn about.
   `migrate:deploy` per project with that project's token, stopping on first
   failure, recording per-project ledger state (the existing `migrationState`
   mechanism, `content-model.md`, now keyed per project).
+
+  **Do not run that fan-out inline in the release (added 2026-08-28).** Content
+  migrations are irreducibly per-project — the data lives in N projects — so an
+  inline step makes the release window O(N): the gap between "schema migrated"
+  and "every surface consistent" grows with tenant count, and collapsing the
+  Studio (§5) does **not** shrink it, since that only removes the _build_
+  fan-out. Run it instead as an idempotent per-tenant reconciler converging
+  behind the release, with drift visible in `apps/admin`. This requires schema
+  changes to be **expand/contract (additive-only)** so `apps/web` tolerates
+  both shapes during convergence — needed regardless, since there is no atomic
+  cutover across N independent Sanity projects.
 
 Naming this asymmetry up front sets expectations: the app's own data scales
 cleanly; the CMS side is where "many tenants" costs you, which is exactly why
@@ -328,15 +378,25 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    decrypting its registry row, not from a shared env var. Encryption-at-rest
    mechanism (KMS-backed vs. app-level) and rotation flow are epic-2
    implementation details, not further open decisions here.
-3. **Studio hosting — resolved 2026-08-14: shape (a), one Studio codebase
-   built + deployed per tenant.** Simple, provably isolated; revisit shape
-   (b) (single deployment, per-host dynamic config) only if per-tenant Studio
-   deployments become the operational bottleneck.
+3. **Studio hosting — REOPENED 2026-08-28.** (Was: resolved 2026-08-14 as
+   shape (a), one Studio codebase built + deployed per tenant.) Shape (a) was
+   never actually implemented — no fan-out redeploy step exists, so tenant
+   Studios are frozen at their provisioning commit — and it is incompatible
+   with self-serve provisioning. Direction is shape (b), pending the
+   Next-hosted-Studio spike. Full rationale in §5. **Needs sign-off.**
 4. **Postgres RLS — resolved 2026-08-14: yes.** Defense-in-depth on top of
    `forTenant(tenantId)` — a `tenant_id` session GUC + policies on every
    engagement table.
-5. **URL scheme — resolved 2026-08-14: custom domains only.** No platform
-   subdomain scheme; every tenant maps its own domain in `tenant_domains`.
+5. **URL scheme — REOPENED 2026-08-28.** (Was: resolved 2026-08-14 as custom
+   domains only, no platform subdomain scheme.) That call was sound while
+   self-serve signup was a Non-goal. It does not survive self-serve: a new
+   signup has no domain, and requiring DNS before the environment exists
+   breaks the funnel. Proposed replacement — a **wildcard platform domain**
+   (`*.<platform>`) on the shared web project, giving every tenant
+   `<slug>.<platform>` with **zero** per-tenant Vercel API calls at signup;
+   a custom domain becomes a paid upgrade running the existing `map-domain`
+   step on demand. Also sidesteps domains-per-project limits.
+   **Needs sign-off.**
 6. **Exact free-tier editor allowance — resolved 2026-08-14, verified against
    `sanity.io/pricing`.** Free plan: 20 total seats, but **only
    Administrator and Viewer roles are available — there is no scoped Editor
@@ -359,12 +419,83 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    Editorial presets. No arbitrary per-tenant font choice; revisit only if
    real tenant demand for custom fonts outgrows the catalogue.
 
+8. **Provisioning host — OPEN (raised 2026-08-28).** Provisioning runs today as
+   a `workflow_dispatch` on `provision-tenant.yml`, triggered by an operator
+   from `apps/admin`. Self-serve makes CI the wrong home: workflow latency,
+   Actions minutes per signup, and a public form able to cause CI runs. The
+   steps are already shaped for a durable job — `(tenant, env, deps)`
+   signatures, per-step idempotency checks, and a `TENANT_PROVISIONING_STEP`
+   jsonb ledger — so this is a re-host, not a rewrite, once decision 3 removes
+   the single step that needs a builder. Recommendation: keep the CI driver for
+   operator-initiated runs, add an in-app durable-job driver for self-serve.
+   **Needs sign-off.**
+
+9. **Tenant membership model — OPEN (raised 2026-08-28).** The owner is
+   currently invited to their Sanity project as `viewer`, because
+   `SANITY_MANAGEMENT_TOKEN` cannot grant `administrator`
+   (`403 Missing permission to invite administrators` — #2020), and an operator
+   bumps the role by hand in Sanity Manage afterwards. That is one human step
+   per signup and is incompatible with self-serve. Note the asymmetry: the same
+   token **can** mint `editor` _robot_ tokens (`seed-content.ts` already does),
+   so platform-side write automation is **not** blocked by #2020 — only the
+   human path is. Three options:
+   - **(a)** Elevate the token per #2020 (human console work). First confirm
+     whether the limit is the token's scope or the org role of whoever minted
+     it; #2020 assumes scope is adjustable and that assumption is untested.
+   - **(b)** Grant the role _after_ acceptance via the ACL endpoint
+     (`GET`/`DELETE /projects/{id}/acl/`), which is a different endpoint from
+     `/invites` and may carry a different permission check. Cheap to test and
+     unblocks with no console change if it works. Counter-evidence: Sanity's
+     own guide runs ACL scripts with `--with-user-token`, hinting these
+     operations may be user-authenticated rather than org-token-authenticated.
+   - **(c)** Drop Sanity human memberships entirely — a platform-hosted Studio
+     authenticating against Auth.js, with a server-side proxy holding the
+     per-tenant `editor` robot token. Removes both the operator step and the
+     second-account friction, and stops consuming Sanity seats; costs proxying
+     Sanity's whole API surface (realtime listeners, asset uploads, history),
+     which is framework-fighting and must be spiked, not assumed.
+
+   Note (a) and (b) fix the _operator_ burden only. A self-serve user still
+   needs a Sanity account and must accept a separate invite before writing —
+   two email round-trips in the funnel. Only (c) removes that.
+   **Test (b) first. Needs sign-off.**
+
+10. **Trial lifecycle & abandoned-tenant reclamation — OPEN (raised
+    2026-08-28).** Sanity imposes no project-count limit (confirmed by the
+    project owner, 2026-08-28), so trials need not conserve projects and a
+    no-card trial is viable. Recommendation: **one project per tenant from
+    signup, promoted in place** — trial and paid are the same project,
+    conversion is a `plan` flip. Explicitly **not** recommended:
+    - _Recycling a used project between customers._ Members and API tokens are
+      **project**-scoped, so deleting the dataset never clears them;
+      reassignment risks cross-tenant access. Teardown is scriptable
+      (`GET /projects/{id}/acl/` exposes every entry with an `isRobot` flag,
+      and removing all roles removes the member), but it trades several
+      must-never-miss invariants for a resource that is free and unlimited.
+    - _Copying trial content into a fresh project on conversion._ Asset
+      references are project-scoped, so this is an asset re-upload plus a ref
+      rewrite — a migration, not a copy — run at the exact moment a customer
+      pays, and it loses document history.
+
+    A pre-warmed pool of **virgin** (never-assigned) projects stays legitimate
+    purely as a signup-latency optimisation; measure end-to-end provisioning
+    time before building one. Still undecided: the retention window for a
+    lapsed tenant's data before deletion (a product promise and a GDPR-shaped
+    commitment), and the extra `TENANT_STATUS` members self-serve needs —
+    `TRIAL` and `PAST_DUE` are absent today (`ACTIVE | SUSPENDED | ARCHIVED`).
+    Both are `pgEnum`-backed, so a change needs a generated migration.
+    **Needs sign-off.**
+
 ## Non-goals (recorded so epics don't sprawl)
 
-- **Billing/subscription integration** (Stripe, plan enforcement UI) — the
-  registry carries a `plan` field as the hook; charging is a separate build.
-- **Self-serve signup UX** — onboarding is admin/automation first; a public
-  "create your site" flow is later.
+- ~~**Billing/subscription integration**~~ — **promoted to in-scope
+  2026-08-28.** The registry's `plan` field remains the hook. Provider not
+  chosen; run marketplace discovery before picking one. Lifecycle states and
+  what each does to the site and Studio are §Open decision 10.
+- ~~**Self-serve signup UX**~~ — **promoted to in-scope 2026-08-28.** A public
+  "create your site" flow is now a requirement, not a later nicety. This
+  promotion is what reopened decisions 3 and 5 and added 8–10: several calls
+  below were sound _because_ self-serve was out of scope.
 - **A cross-tenant super-admin analytics dashboard** — noted as a future need,
   not designed here.
 - **Migrating to Payload** — the escape hatch, not this doc's plan.
@@ -390,7 +521,8 @@ rules. **Gate on Feature 2 (theme-as-content) for per-tenant branding.**
 5. **Provisioning automation** — the onboarding script (Projects API, seed,
    registry, domain) + the per-project migration runner.
 6. **Studio-per-tenant** — per the §5 hosting decision.
-7. **Later:** billing hooks, self-serve signup, cross-tenant admin.
+7. **Self-serve signup + billing** — promoted from Non-goals 2026-08-28;
+   gated on §Open decisions 8–10. **Later:** cross-tenant admin.
 
 **Timing note vs. M5:** epic 3 wants the engagement tables empty. **`bookmarks`
 and `subscribers` already exist in `@blog/db`**, so that window may already be
