@@ -6,8 +6,10 @@ import {
   createSanityRobotToken,
   createSanityWebhook,
   deleteSanityRobotToken,
+  grantSanityProjectRole,
   listSanityCorsOrigins,
   listSanityDatasets,
+  listSanityProjectAcl,
   listSanityProjectInvites,
   listSanityWebhooks,
 } from './sanity-management-client';
@@ -344,6 +346,82 @@ describe(createSanityProjectInvite, () => {
         role: 'editor',
       }),
     ).rejects.toThrow(/402/);
+  });
+});
+
+describe(listSanityProjectAcl, () => {
+  it('GETs the project-scoped acl endpoint and returns the list', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          {
+            projectUserId: 'p123',
+            roles: [{ name: 'viewer' }],
+            isRobot: false,
+          },
+        ]),
+        { status: 200 },
+      ),
+    );
+
+    const result = await listSanityProjectAcl({
+      token: 'tok',
+      projectId: 'proj123',
+    });
+
+    expect(result).toEqual([
+      { projectUserId: 'p123', roles: [{ name: 'viewer' }], isRobot: false },
+    ]);
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('https://api.sanity.io/v2021-06-07/projects/proj123/acl/');
+    expect(init.method ?? 'GET').toBe('GET');
+  });
+
+  it('throws with the response status and body on failure', async () => {
+    fetchMock.mockResolvedValue(new Response('nope', { status: 403 }));
+
+    await expect(
+      listSanityProjectAcl({ token: 'tok', projectId: 'proj123' }),
+    ).rejects.toThrow(/403/);
+  });
+});
+
+describe(grantSanityProjectRole, () => {
+  it('PUTs the roleName to the project-scoped acl endpoint against v2021-06-07, keyed on projectUserId', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ projectUserId: 'p123' }), {
+        status: 201,
+      }),
+    );
+
+    await grantSanityProjectRole({
+      token: 'tok',
+      projectId: 'proj123',
+      projectUserId: 'p123',
+      role: 'administrator',
+    });
+
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(
+      'https://api.sanity.io/v2021-06-07/projects/proj123/acl/p123',
+    );
+    expect(init.method).toBe('PUT');
+    expect(JSON.parse(init.body as string)).toEqual({
+      roleName: 'administrator',
+    });
+  });
+
+  it('throws with the response status and body on failure', async () => {
+    fetchMock.mockResolvedValue(new Response('nope', { status: 403 }));
+
+    await expect(
+      grantSanityProjectRole({
+        token: 'tok',
+        projectId: 'proj123',
+        projectUserId: 'p123',
+        role: 'administrator',
+      }),
+    ).rejects.toThrow(/403/);
   });
 });
 

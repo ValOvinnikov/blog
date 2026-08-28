@@ -35,6 +35,9 @@ const { mapTenantDomainMock } = vi.hoisted(() => ({
 const { createTenantRevalidateWebhookMock } = vi.hoisted(() => ({
   createTenantRevalidateWebhookMock: vi.fn(),
 }));
+const { elevateTenantOwnerMock } = vi.hoisted(() => ({
+  elevateTenantOwnerMock: vi.fn(),
+}));
 
 vi.mock('@blog/db/queries/tenants', () => ({
   reactivateTenant: reactivateTenantMock,
@@ -65,6 +68,16 @@ vi.mock('./steps/map-domain', () => ({
 }));
 vi.mock('./steps/create-revalidate-webhook', () => ({
   createTenantRevalidateWebhook: createTenantRevalidateWebhookMock,
+}));
+vi.mock('./steps/elevate-tenant-owner', () => ({
+  ELEVATE_TENANT_OWNER_OUTCOME: {
+    ELEVATED: 'ELEVATED',
+    ALREADY_ADMINISTRATOR: 'ALREADY_ADMINISTRATOR',
+    PENDING_ACCEPTANCE: 'PENDING_ACCEPTANCE',
+    STALLED: 'STALLED',
+    AMBIGUOUS_MEMBERSHIP: 'AMBIGUOUS_MEMBERSHIP',
+  },
+  elevateTenantOwner: elevateTenantOwnerMock,
 }));
 
 const baseTenant = {
@@ -103,6 +116,7 @@ beforeEach(() => {
   persistTenantSanityTokenMock.mockReset().mockResolvedValue(undefined);
   mapTenantDomainMock.mockReset().mockResolvedValue(undefined);
   createTenantRevalidateWebhookMock.mockReset().mockResolvedValue(undefined);
+  elevateTenantOwnerMock.mockReset().mockResolvedValue('PENDING_ACCEPTANCE');
 });
 
 describe(runSteps, () => {
@@ -306,5 +320,57 @@ describe(runSteps, () => {
     expect(result).toEqual({ ok: false });
     expect(createTenantSanityProjectMock).not.toHaveBeenCalled();
     expect(reportStepStatusMock).not.toHaveBeenCalled();
+  });
+
+  it('elevates the tenant owner once every core step succeeds', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+    createTenantStudioMock.mockResolvedValue({});
+    elevateTenantOwnerMock.mockResolvedValue('ELEVATED');
+
+    const result = await runSteps('tenant-1', env);
+
+    expect(result).toEqual({ ok: true });
+    expect(elevateTenantOwnerMock).toHaveBeenCalledTimes(1);
+    const [tenantSeen] = elevateTenantOwnerMock.mock.calls[0] as [TTenant];
+    expect(tenantSeen.id).toBe('tenant-1');
+  });
+
+  it('still reports ok:true when the owner has not yet accepted (PENDING_ACCEPTANCE/STALLED)', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+    createTenantStudioMock.mockResolvedValue({});
+    elevateTenantOwnerMock.mockResolvedValue('STALLED');
+
+    const result = await runSteps('tenant-1', env);
+
+    expect(result).toEqual({ ok: true });
+  });
+
+  it('still reports ok:true when membership is ambiguous (more than one human member)', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+    createTenantStudioMock.mockResolvedValue({});
+    elevateTenantOwnerMock.mockResolvedValue('AMBIGUOUS_MEMBERSHIP');
+
+    const result = await runSteps('tenant-1', env);
+
+    expect(result).toEqual({ ok: true });
+  });
+
+  it('still reports ok:true when elevating the owner throws unexpectedly', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+    createTenantStudioMock.mockResolvedValue({});
+    elevateTenantOwnerMock.mockRejectedValue(new Error('acl fetch failed'));
+
+    const result = await runSteps('tenant-1', env);
+
+    expect(result).toEqual({ ok: true });
+  });
+
+  it('never elevates the owner when an earlier step fails', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+    seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
+
+    await runSteps('tenant-1', env);
+
+    expect(elevateTenantOwnerMock).not.toHaveBeenCalled();
   });
 });
