@@ -7,14 +7,17 @@ import { mockDbConstants } from '@platform/testing/mock-db-constants';
 
 import TenantsPage from './page';
 
-const { listTenantsMock } = vi.hoisted(() => ({
+const { listTenantsMock, envMock } = vi.hoisted(() => ({
   listTenantsMock: vi.fn(),
+  envMock: { RESEND_API_KEY: undefined as string | undefined },
 }));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: { tenants: { listTenants: listTenantsMock } },
 }));
+
+vi.mock('@platform/utils/env/env', () => ({ env: envMock }));
 
 const setup = customRenderAsync(TenantsPage, {
   searchParams: Promise.resolve({}),
@@ -23,6 +26,7 @@ const setup = customRenderAsync(TenantsPage, {
 describe(TenantsPage, () => {
   beforeEach(() => {
     listTenantsMock.mockReset();
+    envMock.RESEND_API_KEY = 'resend-key';
   });
 
   it('renders the real tenant rows from listTenants, excluding archived by default', async () => {
@@ -55,5 +59,24 @@ describe(TenantsPage, () => {
     await setup({ searchParams: Promise.resolve({ archived: '1' }) });
 
     expect(listTenantsMock).toHaveBeenCalledWith({ includeArchived: true });
+  });
+
+  it('does not show the email-alerts banner when RESEND_API_KEY is configured', async () => {
+    listTenantsMock.mockResolvedValue([]);
+
+    await setup();
+
+    expect(
+      screen.queryByText('Email alerts not configured'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the email-alerts banner when RESEND_API_KEY is unset', async () => {
+    envMock.RESEND_API_KEY = undefined;
+    listTenantsMock.mockResolvedValue([]);
+
+    await setup();
+
+    expect(screen.getByText('Email alerts not configured')).toBeVisible();
   });
 });

@@ -56,6 +56,10 @@ jobs:
     environment: production
     env:
       SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
+      # Optional — same shared secret name `apps/web`/`apps/platform` already
+      # use for their own Resend sends. Unset means the sweep still runs;
+      # only the operator-notification email is skipped, not the sweep.
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

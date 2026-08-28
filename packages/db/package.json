@@ -29,6 +29,7 @@
     "@sanity/client": "^7.23.0",
     "@t3-oss/env-core": "^0.13.11",
     "drizzle-orm": "^0.45.2",
+    "resend": "^6.18.1",
     "server-only": "^0.0.1",
     "zod": "catalog:"
   },

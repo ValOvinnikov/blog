@@ -69,6 +69,10 @@
     "description": "Every site on the platform, read from the real <code>tenants</code> table.",
     "addTenant": "+ Add tenant"
   },
+  "emailAlertsBanner": {
+    "title": "Email alerts not configured",
+    "description": "RESEND_API_KEY isn't set, so operators won't be emailed when a tenant needs attention — check this page manually."
+  },
   "tenantsTable": {
     "empty": "No tenants yet.",
     "columnTenant": "Tenant",

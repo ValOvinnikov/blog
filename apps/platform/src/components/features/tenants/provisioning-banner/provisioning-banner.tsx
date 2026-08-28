@@ -9,6 +9,7 @@ import {
   type TTenantProvisioningStatus,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
+import { BannerState } from '@platform/components/shared/banner-state';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import type { TProvisioningErrorKind } from '@platform/utils/provisioning-error/provisioning-error';
@@ -18,7 +19,6 @@ import { useTranslations } from 'next-intl';
 
 import { STEP_ORDER } from '../provisioning-status-view/use-provisioning-poll';
 
-import { BannerState } from './components/banner-state/banner-state';
 import { provisioningBannerVariants } from './provisioning-banner-variants';
 
 export type TProvisioningBannerProps = {

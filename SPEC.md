@@ -160,8 +160,9 @@ Dependency-graph enforcement details and SVG/type-flow wiring:
 [`docs/context/frontend-conventions.md`](./docs/context/frontend-conventions.md).
 
 ² `@blog/db`'s "never log" rule has one scoped exception, decided on
-#2120: `packages/db/scripts/provision-tenant/` and
-`packages/db/scripts/deprovision-tenant/` — standalone CLI tools run via
+#2120: `packages/db/scripts/provision-tenant/`,
+`packages/db/scripts/deprovision-tenant/`, and
+`packages/db/scripts/recheck-tenant-owners/` — standalone CLI tools run via
 `tsx`, outside the request-handling path the rule targets — import
 `@blog/insight`'s `sanitizeLogMessage` (the sanitizer only, not
 `createLogger`) directly, rather than keeping their own copy of it. The rest
