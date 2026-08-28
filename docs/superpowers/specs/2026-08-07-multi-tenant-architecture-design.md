@@ -491,6 +491,16 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    Growth, it's wanting _any_ non-admin editor at all — a tenant onboarding
    with more than one content-editing staffer who isn't meant to hold full
    project-admin rights needs Growth from day one.
+
+   **Amended 2026-08-28 (surfaced by spike #2259).** The 20 counts _billable_
+   seats, not members. Sanity's roles documentation states that the built-in
+   Viewer role is free and does not count toward a plan's available seats, and
+   that a viewer assigned any second role becomes billable. Read-only members
+   are therefore effectively unlimited, and the cap binds only on
+   Administrator (plus Growth's other non-viewer roles). This matters for the
+   elevation path in §Open decision 9: promoting an owner from `viewer` to
+   `administrator` is what consumes a seat, not inviting them.
+
 7. **Font selection per tenant — resolved 2026-08-14: fixed preset
    catalogue.** (Added 2026-08-12, from #1324/PR #1407 —
    `headingFont`/`bodyFont` can't join the rest of `TThemeTokens` in the
@@ -572,8 +582,8 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    Recommendation: keep the CI driver for operator-initiated runs, and add a
    non-public worker driver for self-serve. **Needs sign-off.**
 
-9. **Tenant membership model — mechanism settled 2026-08-28 by spike #2259;
-   the (b)-vs-(c) choice is still OPEN (raised 2026-08-28).** The owner is
+9. **Tenant membership model — OPEN (raised 2026-08-28; mechanism settled
+   2026-08-28 by spike #2259, the (b)-vs-(c) choice is not).** The owner is
    currently invited to their Sanity project as `viewer`, because the invites
    endpoint rejects `administrator`
    (`403 Missing permission to invite administrators` — #2020), and an operator
@@ -602,17 +612,24 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    - **(a) — dead as written.** `administrator` is `appliesToRobots=false` at
      both organization and project scope, so no token can ever hold it and
      #2020's step 1 is impossible. The only surviving candidate for a pure
-     invite-time fix is the `access-manager` / `access-manager-robot` role
-     (`appliesToRobots=true`, evidently purpose-built) — untested, and worth
-     testing only if (b) is rejected.
+     invite-time fix is the `access-manager` / `access-manager-robot` role,
+     which the same roles listing shows with `appliesToRobots=true` and which
+     looks purpose-built for delegating access management to a token. Its
+     existence is all the spike established — whether such a token may invite
+     administrators was **not** tested, and is worth testing only if (b) is
+     rejected.
    - **(b) — confirmed to work.** Grant the role after acceptance via the ACL
      endpoint: no console work, no new credential, no broadening of the token's
-     scope. A member appears in the ACL only once they accept, so polling that
-     list _is_ the acceptance signal — no separate mechanism needed. Two
-     implementation constraints: key the call on `projectUserId` (`p…`) from the
-     ACL listing rather than `sanityUserId` (`g…`), which `400`s; and roles are
-     additive, so decide whether to drop `viewer` after granting
-     `administrator` — a viewer holding any second role stops being a free seat.
+     scope. The spike measured that a **pending** invitee is absent from the ACL
+     listing, so presence in that list implies acceptance and polling it is the
+     acceptance signal — no separate mechanism needed. (Only the pending side
+     was measured; that an accepted member appears promptly is inferred, and is
+     what an implementation should assert first.) Two implementation
+     constraints: key the call on `projectUserId` (`p…`) from the ACL listing
+     rather than `sanityUserId` (`g…`), which `400`s; and roles are additive, so
+     decide whether to drop `viewer` after granting `administrator` — the
+     promotion is also what makes the member consume a billable seat (§Open
+     decision 6).
    - **(c)** Drop Sanity human memberships entirely — a platform-hosted Studio
      authenticating against Auth.js, with a server-side proxy holding the
      per-tenant `editor` robot token. Removes both the operator step and the
