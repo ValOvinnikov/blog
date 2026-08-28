@@ -6,23 +6,40 @@ items handed off from Feature 6 of
 Output feeds per-epic `superpowers:writing-plans` passes and `board-keeper`
 ticketing. **All 7 items in §Open decisions are resolved as of 2026-08-14** —
 see that section for the final call on each. **Two of them — 3 (Studio
-hosting) and 5 (URL scheme) — were reopened on 2026-08-28** (decision 3's
-gating spike has since completed and proved the single-deployment shape
-viable — §5; the sign-off itself is still open), after a
+hosting) and 5 (URL scheme) — were reopened on 2026-08-28**, after a
 self-serve-provisioning requirement promoted two former Non-goals (self-serve
 signup, billing) into scope; three further decisions (8–10) were added the same
-day, and decisions 11–12 plus a new §7 (platform app) on the same date.
-Phase 0 (tenant registry) has
-already shipped; epic 2a (per-tenant content reads infrastructure) has
-shipped too, proven on one loader — epic 2b (migrating the remaining
-`service.*` loaders) is next and unblocked.
-**Date:** 2026-08-07
-**Scope:** How the blog becomes a multi-tenant platform serving many client
-sites — each edited by that client's own staff, isolated, at the scale of
-_tens_ of tenants on a lean budget. Covers tenant resolution, per-tenant
-content reads, engagement data tenancy, auth/RBAC, Studio, provisioning,
-migrations, the free-tier ceiling, and the layer-contract impact.
-**Related / dependencies:**
+day, and decisions 11–12 plus a new §7 on the same date.
+
+> **State as of 2026-08-28: decisions 1–11 are all resolved.** One gap remains,
+> recorded deliberately rather than defaulted — the fate of the **production
+> pre-tenancy project** (decision 12, which must not be adopted or repointed
+> until settled). Decision 10 carries a **prerequisite** rather than a gap: its
+> retention policy cannot be honoured until a Sanity deletion path exists,
+> since deprovisioning archives rather than deletes today. Everything else is
+> ready for implementation epics.
+
+> **Naming note — this document uses post-rename names throughout.** Settled
+> 2026-08-28: the marketing workspace is **`apps/marketing`** (apex domain),
+> the admin workspace is renamed **`apps/admin` → `apps/platform`** and served
+> at **`platform.<domain>`**, and that app's `(platform)` route group is
+> renamed **`(operator)`** — it is an authorization boundary (`requireAdmin()`
+> against `admins`), not a product name, and leaving both meanings in play
+> would recreate exactly the drift #1647 is about. **Neither rename has been
+> executed yet**; the workspace rename is a cross-cutting change with a Vercel
+> Root-Directory console gate and is tracked separately. Read `apps/platform`
+> here as "the app that is `apps/admin` on disk today".
+> Phase 0 (tenant registry) has
+> already shipped; epic 2a (per-tenant content reads infrastructure) has
+> shipped too, proven on one loader — epic 2b (migrating the remaining
+> `service.*` loaders) is next and unblocked.
+> **Date:** 2026-08-07
+> **Scope:** How the blog becomes a multi-tenant platform serving many client
+> sites — each edited by that client's own staff, isolated, at the scale of
+> _tens_ of tenants on a lean budget. Covers tenant resolution, per-tenant
+> content reads, engagement data tenancy, auth/RBAC, Studio, provisioning,
+> migrations, the free-tier ceiling, and the layer-contract impact.
+> **Related / dependencies:**
 
 - **Feature 6 (the parent doc)** — settled the direction: content via **Sanity
   project-per-tenant, one org**; **no own CMS** (Payload is the "adopt, don't
@@ -190,7 +207,7 @@ Only the domain tables do.
   site's Auth.js. A content editor and a site commenter are different identities
   by design.
 
-### 5. Studio per tenant — stays Vercel-hosted (shape REOPENED 2026-08-28)
+### 5. Studio per tenant — shape RESOLVED 2026-08-28 (hosted in the admin app)
 
 Keep the current model: a static `sanity build` export served from **Vercel**,
 **not `sanity deploy`** (`SPEC.md` §13's deliberate choice — no
@@ -313,14 +330,51 @@ bundle. Left untouched and verified — `pnpm typegen` produced zero drift in
 `packages/config/src/sanity/generated/`, and `migrate:list` enumerated
 normally.
 
-**Open item this surfaces — a layer-contract decision, not yet made.** The
-spike's tenant registry is a server-only env-var stand-in. The real lookup is
-the `tenants` table in `@blog/db`, and `apps/cms` may today depend only on
-`@blog/config`. A production shape (b) therefore needs either a new `cms → db`
-edge (adding `cms` to `db`'s consumer list in `CLAUDE.md` and `SPEC.md` §4) or
-an HTTP lookup against `apps/admin` (no new package edge, but a service call
-in the hot path of every Studio page load). This belongs to the implementation
-epic and must amend the layer contract explicitly before code lands.
+**Open item RESOLVED 2026-08-28 — host the Studio inside the admin app.** The
+spike framed the tenant lookup as a choice between a new `cms → db` edge and an
+HTTP call to the admin app. A third option removes the question entirely: mount
+the Studio as **routes inside the admin app itself** (`next-sanity`'s
+`NextStudio`), which already consumes `@blog/db`, already resolves the tenant,
+and already authenticates the user.
+
+- **No new layer edge.** `CLAUDE.md` and `SPEC.md` §4 need no amendment — the
+  hosting app is already a `db` consumer. `apps/cms` keeps its
+  `config`-only contract and remains the source of schema, structure and
+  typegen.
+- **No service call in the hot path**, and no shared secret to mint, keep in
+  sync across two systems, and add to the naming surface #1647 already covers.
+- **No `DATABASE_URL` in a new deployment.** A standalone Studio deployment
+  would have had to hold Postgres credentials; it no longer exists. Same
+  credential-surface reasoning as §Open decision 8.
+- **CORS needs no change at all.** `create-sanity-project.ts` already adds
+  exactly one origin to every tenant project — `env.adminAppBaseUrl`. Serving
+  the Studio from that origin makes the entry provisioning _already_ creates
+  the one the Studio needs. The spike's path-based conclusion holds; the base
+  path simply nests under the admin app rather than a Studio-only host.
+- **No wildcard collision.** A `studio-<slug>.<domain>` host would sit inside
+  the `*.<domain>` tenant wildcard (§7's host map) and would need an explicit
+  per-tenant domain assignment to win precedence, for every tenant, forever. A
+  path needs none.
+
+**Routes.** The admin app already expresses the two audiences as separate
+trees, so the Studio fills in an existing grid rather than introducing a
+pattern:
+
+| Route                        | Audience           | Tenant resolved by           |
+| ---------------------------- | ------------------ | ---------------------------- |
+| `/dashboard/studio`          | the tenant's owner | session — no slug in the URL |
+| `/tenants/[tenantId]/studio` | platform operator  | the route param              |
+
+The owner route needs no slug because `/dashboard/*` is already session-scoped,
+with `/dashboard/select-tenant` as the switcher that already exists. The
+operator route is what lets a superadmin open a tenant's Studio without being
+its owner — a case session resolution alone cannot express.
+
+**Implementation wrinkle to prove early.** Routes are locale-prefixed, so the
+Studio mounts as `[locale]/dashboard/studio/[[...tool]]` — a catch-all nested
+under a dynamic segment. Studio does its own client-side routing and its
+`basePath` must match, locale included. This is the kind of thing that works in
+dev and breaks on a locale switch.
 
 ### 6. Theming per tenant — no `@blog/ui` change
 
@@ -343,23 +397,26 @@ per font (Console's stay `true`, Editorial's are `false`) — see Open
 decision 7 below for what this means once tenants (and their font choices)
 multiply.
 
-### 7. Platform app — marketing, signup, billing (decided 2026-08-28)
+### 7. Marketing app — marketing, signup, billing (decided 2026-08-28)
+
+> Names here are the post-rename ones — see the naming note at the top of this
+> document.
 
 The public face of the platform — company/marketing pages, pricing, and the
-signup/signin entry point — lives in a **new `apps/platform`**, not in
-`apps/web` or `apps/admin`.
+signup/signin entry point — lives in a **new `apps/marketing`**, not in
+`apps/web` or `apps/platform`.
 
 - **Not `apps/web`.** Its value in this architecture is that it renders
   _tenants, uniformly_. Platform-only routes (pricing backed by live plan data,
   signup, checkout) break that uniformity and put platform code in every tenant
   request path; a marketing bug would take every tenant site down with it.
-- **Not `apps/admin`.** Wrong on four axes at once: authenticated-only, an
+- **Not `apps/platform`.** Wrong on four axes at once: authenticated-only, an
   operator/owner audience rather than prospects, no SEO/metadata/OG/sitemap
   infrastructure, and an ESLint guard that deliberately confines it away from
   `@blog/ui`.
 
 Funnel: the **apex domain** — the company's main page belongs at the root, not
-on a subdomain — for marketing and signup, then `admin.<domain>` for the owner's
+on a subdomain — for marketing and signup, then `platform.<domain>` for the owner's
 dashboard. Cross-app session is already solved: `@blog/auth` plus
 `AUTH_COOKIE_DOMAIN` is exactly this case, and both existing apps already call
 their own `NextAuth()`.
@@ -368,13 +425,12 @@ their own `NextAuth()`.
 everything else is a subdomain — and the tenant wildcard has to coexist with
 them:
 
-| Host                  | Serves                                                                  |
-| --------------------- | ----------------------------------------------------------------------- |
-| `<domain>` (apex)     | `apps/platform` — marketing, pricing, signup                            |
-| `admin.<domain>`      | `apps/admin`                                                            |
-| `studio.<domain>`     | the shared Studio (§5, once collapsed)                                  |
-| `*.<domain>`          | `apps/web` — self-serve tenants at `<slug>.<domain>` (§Open decision 5) |
-| a tenant's own domain | `apps/web`, mapped on the custom-domain upgrade                         |
+| Host                  | Serves                                                                   |
+| --------------------- | ------------------------------------------------------------------------ |
+| `<domain>` (apex)     | `apps/marketing` — marketing, pricing, signup                            |
+| `platform.<domain>`   | `apps/platform` — operator surfaces, owner dashboard, **and the Studio** |
+| `*.<domain>`          | `apps/web` — self-serve tenants at `<slug>.<domain>` (§Open decision 5)  |
+| a tenant's own domain | `apps/web`, mapped on the custom-domain upgrade                          |
 
 Two consequences the wildcard proposal did not account for:
 
@@ -390,7 +446,7 @@ Two consequences the wildcard proposal did not account for:
   subdomain. This was not a requirement while tenants were custom-domain-only.
 
 **This displaces whatever holds the apex today.** The apex currently serves the
-existing blog (`apps/web`). Giving it to `apps/platform` means that blog moves
+existing blog (`apps/web`). Giving it to `apps/marketing` means that blog moves
 to a subdomain or its own domain regardless of how §Open decision 12 resolves —
 so the apex call constrains decision 12 rather than waiting on it.
 
@@ -401,7 +457,7 @@ the new row when this lands.
 **Marketing content is CMS-authored in its own Sanity project (decided
 2026-08-28)**, not hand-built pages — read through `@blog/service` with an
 env-configured project id, the single-project shape `apps/web` used before
-tenancy. `apps/platform` is genuinely single-site, so it does **not** need
+tenancy. `apps/marketing` is genuinely single-site, so it does **not** need
 tenant resolution. Once §5's shared Studio lands, this project is simply one
 more project that Studio serves; it needs no Studio of its own.
 
@@ -415,7 +471,7 @@ more project that Studio serves; it needs no Studio of its own.
 - It needs its own scoped subagent (`.claude/agents/platform-app.md`) per
   CLAUDE.md's delegation rule.
 - `NEXT_PUBLIC_SANITY_PROJECT_ID` would mean "the marketing project" in
-  `apps/platform` and "the pre-tenancy fallback project" in `apps/web` — one
+  `apps/marketing` and "the pre-tenancy fallback project" in `apps/web` — one
   name, two meanings, across apps. Feed this into the env-naming work (#1647)
   rather than letting it land unnoticed.
 - **Pricing drift.** The enforced entitlement ceiling is `PLAN_REGISTRY` in
@@ -448,7 +504,7 @@ This flow is the main net-new tooling and should be scripted early; done by hand
 it is the bottleneck the ToS findings warn about.
 
 **Self-serve changes where this runs (2026-08-28).** It is scripted today, but
-as a CI `workflow_dispatch` an operator triggers from `apps/admin`. A public
+as a CI `workflow_dispatch` an operator triggers from `apps/platform`. A public
 signup flow needs §Open decisions 8 (host), 9 (membership) and 10 (trial
 lifecycle) settled first. Step 3's shape-(a) branch and step 5's "custom domain
 only" are both superseded — see §5 and §Open decision 5.
@@ -471,7 +527,7 @@ only" are both superseded — see §5 and §Open decision 5.
   and "every surface consistent" grows with tenant count, and collapsing the
   Studio (§5) does **not** shrink it, since that only removes the _build_
   fan-out. Run it instead as an idempotent per-tenant reconciler converging
-  behind the release, with drift visible in `apps/admin`. This requires schema
+  behind the release, with drift visible in `apps/platform`. This requires schema
   changes to be **expand/contract (additive-only)** so `apps/web` tolerates
   both shapes during convergence — needed regardless, since there is no atomic
   cutover across N independent Sanity projects.
@@ -541,12 +597,15 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    decrypting its registry row, not from a shared env var. Encryption-at-rest
    mechanism (KMS-backed vs. app-level) and rotation flow are epic-2
    implementation details, not further open decisions here.
-3. **Studio hosting — REOPENED 2026-08-28.** (Was: resolved 2026-08-14 as
-   shape (a), one Studio codebase built + deployed per tenant.) Shape (a) was
-   never actually implemented — no fan-out redeploy step exists, so tenant
-   Studios are frozen at their provisioning commit — and it is incompatible
-   with self-serve provisioning. Direction is shape (b), pending the
-   Next-hosted-Studio spike. Full rationale in §5. **Needs sign-off.**
+3. **Studio hosting — RESOLVED 2026-08-28: shape (b), mounted as routes inside
+   the admin app.** Full rationale and the route table are in §5; the
+   resolution detail and its consequences are at the end of this item.
+
+   _History._ Resolved 2026-08-14 as shape (a) (one Studio codebase built and
+   deployed per tenant), then reopened 2026-08-28: shape (a) was never actually
+   implemented — no fan-out redeploy step exists, so tenant Studios are frozen
+   at their provisioning commit — and it is incompatible with self-serve
+   provisioning.
 
    **Spike done 2026-08-28 (#2260): shape (b) is proven — it still needs the
    sign-off.** One deployment served two real tenant projects, selected per
@@ -557,15 +616,42 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    which is a CORS/domain-management call rather than a code one and is
    entangled with §Open decision 5's reopened URL scheme; and (ii) the
    **layer-contract choice** for the tenant lookup (`cms → db` edge vs. an HTTP
-   call to `apps/admin`), which must be settled and written into `CLAUDE.md` /
+   call to `apps/platform`), which must be settled and written into `CLAUDE.md` /
    `SPEC.md` §4 before code lands. Adopting (b) also dissolves — rather than
    renames — the `VERCEL_PROJECT_ID` collision that #1647/#1648/#1649/#1650
    address for the Studio project, since the per-tenant Studio project ceases
    to exist.
+
+   **RESOLVED 2026-08-28: shape (b), mounted inside the admin app.** Both
+   remaining items are closed. (i) **Path-based**, as the spike recommended on
+   CORS grounds — and more decisively because a `studio-<slug>` host would sit
+   inside the `*.<domain>` tenant wildcard (§7) and need an explicit per-tenant
+   domain assignment to win precedence, forever. (ii) **No layer-contract
+   change is required**: the Studio is served from the admin app, which already
+   consumes `@blog/db` and already resolves the tenant, so neither a
+   `cms → db` edge nor an HTTP lookup is needed. Full rationale and the route
+   table are in §5.
+
+   Consequences to carry into the implementation epic:
+
+   - `create-studio-vercel-project.ts` is **deleted** — and with it the only
+     provisioning step needing a build machine (§Open decision 8) and the
+     `VERCEL_PROJECT_ID` collision (#1647).
+   - Per-tenant `studio-<slug>` Vercel projects cease to exist.
+     `tenants.studioVercelProjectId` becomes vestigial and needs a deprecation
+     path, as does the deprovision step that deletes those projects.
+   - `cms-dev`/`cms-prod` retire as deployment targets. `apps/cms` remains the
+     source of schema, desk structure and typegen — it stops being a
+     _deployed_ app, not a workspace.
+   - `PLATFORM_DOMAIN`'s studio-subdomain role
+     (`studio-<slug>.<PLATFORM_DOMAIN>`) disappears.
+
 4. **Postgres RLS — resolved 2026-08-14: yes.** Defense-in-depth on top of
    `forTenant(tenantId)` — a `tenant_id` session GUC + policies on every
    engagement table.
-5. **URL scheme — REOPENED 2026-08-28.** (Was: resolved 2026-08-14 as custom
+5. **URL scheme — RESOLVED 2026-08-28: wildcard platform subdomain for
+   self-serve tenants, custom domain as a paid upgrade.** (Was: resolved
+   2026-08-14 as custom
    domains only, no platform subdomain scheme.) That call was sound while
    self-serve signup was a Non-goal. It does not survive self-serve: a new
    signup has no domain, and requiring DNS before the environment exists
@@ -575,7 +661,22 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    a custom domain becomes a paid upgrade running the existing `map-domain`
    step on demand. Also sidesteps domains-per-project limits. Note the wildcard
    overlaps the platform's own subdomains and forces a reserved-slug list at
-   signup — see §7's host map for both. **Needs sign-off.**
+   signup — see §7's host map for both.
+
+   **Narrowed, then RESOLVED 2026-08-28.** Decision 3 put the Studio on a
+   _path_ inside the admin app, so this concerns **tenant sites only** — there
+   is no `studio.<domain>` or `studio-<slug>.<domain>` host left to reconcile
+   against the wildcard, which removed the sharpest edge of the collision.
+   **Signed off as proposed:** wildcard `*.<domain>` giving self-serve tenants
+   `<slug>.<domain>` with no per-tenant Vercel call at signup, and a custom
+   domain as a paid upgrade running the existing `map-domain` step on demand.
+
+   Two prerequisites the implementation must carry: a **reserved-slug list**
+   (`admin`, `platform`, `studio`, `www`, `api`, `app`, `mail`, `ui-library`,
+   `web-storybook`, and any future platform subdomain), and **verifying against
+   the live Vercel projects** that an explicitly-assigned domain wins
+   precedence over a wildcard held by another project — assumed, not proven.
+
 6. **Exact free-tier editor allowance — resolved 2026-08-14, verified against
    `sanity.io/pricing`.** Free plan: 20 total seats, but **only
    Administrator and Viewer roles are available — there is no scoped Editor
@@ -608,9 +709,10 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    Editorial presets. No arbitrary per-tenant font choice; revisit only if
    real tenant demand for custom fonts outgrows the catalogue.
 
-8. **Provisioning host — OPEN (raised 2026-08-28).** Provisioning runs today as
+8. **Provisioning host — RESOLVED 2026-08-28: a dedicated non-public
+   worker.** Provisioning runs today as
    a `workflow_dispatch` on `provision-tenant.yml`, triggered by an operator
-   from `apps/admin`. Self-serve makes CI the wrong home: workflow latency,
+   from `apps/platform`. Self-serve makes CI the wrong home: workflow latency,
    Actions minutes per signup, and a public form able to cause CI runs. The
    steps are already shaped for a durable job — `(tenant, env, deps)`
    signatures, per-step idempotency checks, and a `TENANT_PROVISIONING_STEP`
@@ -625,17 +727,17 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    just a runner. `docs/context/environment-variables.md` records
    `SANITY_MANAGEMENT_TOKEN` as "a `production`-scoped GitHub Environment
    secret; never set locally", and #2020's acceptance criteria keep it confined
-   there and out of `apps/admin`'s deployment env. That token can create
+   there and out of `apps/platform`'s deployment env. That token can create
    projects and datasets, add CORS origins, invite members, archive projects,
    and **mint `editor` robot tokens for any project in the org**;
    `VERCEL_TOKEN` can create and delete Vercel projects and mutate domains.
-   Today `apps/admin` holds only a narrowly-scoped `actions: write` PAT — it can
+   Today `apps/platform` holds only a narrowly-scoped `actions: write` PAT — it can
    _ask_ for provisioning but cannot perform it. That privilege separation is
    deliberate and must not be given up by accident.
 
    Consequently, **"use Vercel Functions" does not by itself answer the security
    question — which Vercel _project_ hosts them does.** A route inside
-   `apps/admin`/`apps/platform` puts the org token in a public-facing
+   `apps/platform`/`apps/marketing` puts the org token in a public-facing
    deployment; a separate project with no public routes and its own env scope
    keeps the boundary. Same code, different blast radius. Recommended shape: a
    **dedicated provisioning worker** in its own non-public Vercel project, which
@@ -676,10 +778,22 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    becomes request-path code; logging has to move to the app layer.
 
    Recommendation: keep the CI driver for operator-initiated runs, and add a
-   non-public worker driver for self-serve. **Needs sign-off.**
+   non-public worker driver for self-serve.
 
-9. **Tenant membership model — OPEN (raised 2026-08-28; mechanism settled
-   2026-08-28 by spike #2259, the (b)-vs-(c) choice is not).** The owner is
+   **RESOLVED 2026-08-28: a dedicated non-public worker.** The credential
+   boundary is the deciding factor, not latency or quota. Provisioning moves
+   out of CI, but **not** into a route inside a public-facing app — it runs in
+   its own deployment with no public routes and its own env scope, which the
+   apps enqueue to. Same code either way; different blast radius. Under
+   decision 5's wildcard scheme the signup path needs no `VERCEL_TOKEN` at all,
+   so only the Sanity org token has to move; custom-domain mapping stays a
+   lower-frequency authenticated operation that can live elsewhere. Start with
+   a plain function plus a retry — the steps already persist progress before
+   advancing — and adopt durable orchestration only when something forces it.
+   The CI driver stays for operator-initiated runs.
+
+9. **Tenant membership model — RESOLVED 2026-08-28: ship (b), the ACL grant,
+   with (c) retained as a hedge.** The owner is
    currently invited to their Sanity project as `viewer`, because the invites
    endpoint rejects `administrator`
    (`403 Missing permission to invite administrators` — #2020), and an operator
@@ -735,11 +849,53 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
 
    Note (a) and (b) fix the _operator_ burden only. A self-serve user still
    needs a Sanity account and must accept a separate invite before writing —
-   two email round-trips in the funnel. Only (c) removes that. **(b) is now the
-   cheap default; the (b)-vs-(c) call still needs sign-off.**
+   two email round-trips in the funnel. Only (c) removes that.
 
-10. **Trial lifecycle & abandoned-tenant reclamation — OPEN (raised
-    2026-08-28).** Sanity imposes no project-count limit (confirmed by the
+   **RESOLVED 2026-08-28: ship (b).** Proven, cheap, no console work;
+   implementation is #2266. **(c) is retained as a live hedge, not a rejected
+   alternative** — revisit it if the legacy endpoint is tightened, or if the
+   second-account friction measurably hurts signup conversion.
+
+   **The deprecation risk is survivable, and the fallback is the status quo.**
+   If Sanity closes the `v2021-06-07` gap, the grant starts failing and an
+   operator raises the role by hand in Sanity Manage — exactly what
+   `create-sanity-project.ts` documents today. Nothing breaks, no data is lost,
+   provisioning still completes. What changes is that it becomes **one human
+   step per signup**, which is tolerable at operator volume and is precisely
+   what self-serve exists to remove at scale.
+
+   **Therefore the grant step must be detectable, not log-and-continue.** The
+   existing invite deliberately logs failures and proceeds, so a membership
+   problem cannot cost the project. If the ACL grant inherits that stance, a
+   tightened endpoint means tenants provision "successfully" while their owners
+   quietly cannot edit. The grant must surface a visible provisioning-step
+   state that `apps/platform` renders, so the degradation is noticed the first
+   time rather than the tenth. This belongs in #2266.
+
+   **Detection must be stall-based, not failure-based.** Under (b), three
+   outcomes are indistinguishable from outside the system:
+
+   1. the owner accepts and the grant succeeds — fine;
+   2. the owner accepts and the grant is rejected (the endpoint was
+      tightened) — the tenant is provisioned, the owner cannot edit;
+   3. **the owner never accepts** — the tenant exists, may well be paying, the
+      owner cannot edit, and _nothing failed_.
+
+   An error-triggered alert catches (2) and misses (3) entirely, yet (3) is the
+   more likely of the two and looks identical to a quiet customer. The check
+   must therefore be **time-based** — "invited N days ago and still not an
+   administrator on their project" — which covers both cases with one
+   condition. `GET /projects/{id}/acl/` is already the acceptance signal (a
+   member only appears there once they have accepted), so this needs no new
+   mechanism, only a scheduled read.
+
+   The state itself is already captured: `reportStepStatus` writes each step's
+   status directly to Postgres and deliberately never throws. What is missing
+   is surfacing it (#2266) and pushing it to a human — tracked separately,
+   since operator notification is a new capability rather than part of the
+   grant.
+
+10. **Trial lifecycle & abandoned-tenant reclamation — RESOLVED 2026-08-28.** Sanity imposes no project-count limit (confirmed by the
     project owner, 2026-08-28), so trials need not conserve projects and a
     no-card trial is viable. Recommendation: **one project per tenant from
     signup, promoted in place** — trial and paid are the same project,
@@ -762,7 +918,53 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
     commitment), and the extra `TENANT_STATUS` members self-serve needs —
     `TRIAL` and `PAST_DUE` are absent today (`ACTIVE | SUSPENDED | ARCHIVED`).
     Both are `pgEnum`-backed, so a change needs a generated migration.
-    **Needs sign-off.**
+
+    **RESOLVED 2026-08-28.** Signed off as
+    recommended: **one project per tenant from signup, promoted in place** —
+    trial and paid are the same project and conversion is a `plan` flip; no
+    recycling of used projects and no trial→paid content copy; a lapsed
+    tenant's data is retained for a defined window and then deleted; and
+    `TENANT_STATUS` gains **`TRIAL`** and **`PAST_DUE`** alongside
+    `ACTIVE | SUSPENDED | ARCHIVED`.
+
+    **Retention — two clocks, not one (settled 2026-08-28).** A single number
+    left it ambiguous whether a lapsed tenant's site is still publicly serving
+    on day 20. The approved `TENANT_STATUS` values already imply the shape:
+
+    | Status      | Site     | Data   | Clock                          |
+    | ----------- | -------- | ------ | ------------------------------ |
+    | `PAST_DUE`  | still up | intact | ~14 days grace, dunning        |
+    | `SUSPENDED` | parked   | intact | **30 days**, then deletion     |
+    | `ARCHIVED`  | gone     | inert  | until the delete actually runs |
+
+    Taking a customer's site down the moment a card fails causes avoidable
+    churn; leaving a non-paying tenant publicly serving for thirty days gives
+    the product away. Splitting the clocks resolves both, and the window is
+    short enough that "I forgot to pay, let me come back" still works — which
+    is the revenue argument for having a retention window at all.
+
+    **Prerequisite — nothing currently deletes.** `deprovision-tenant`'s Sanity
+    step _archives_ (`PATCH isDisabledByUser: true`) and its own comment is
+    explicit that it does so **because** deletion needs an org billing
+    permission the token deliberately lacks. Today's real behaviour is
+    therefore "archived indefinitely", not "deleted after 30 days". A public
+    30-day deletion promise **cannot be honoured until a deletion path with an
+    elevated credential exists** — so either build that as part of this
+    lifecycle work, or state the policy as what is actually true ("archived and
+    inaccessible after 30 days; permanently deleted on request"). Publishing a
+    promise the system structurally cannot keep is worse than publishing a
+    vaguer one.
+
+    **Required regardless of the number:** GDPR obliges erasure _on demand_,
+    which is a shorter clock than 30 days, so a manual delete path is needed
+    whatever policy is chosen. It is the same mechanism as the automated one —
+    an argument for building it once, properly, rather than treating deletion
+    as a later problem.
+
+    Note the window is not cost-driven: Sanity projects are unlimited on the
+    free tier and an archived project stops billing, so retention costs
+    effectively nothing. Choose the number on customer-experience and legal
+    grounds only.
 
 11. **Marketing project schema — resolved 2026-08-28: reuse `apps/cms`'s
     schema.** One CMS serves the marketing project and every tenant project.
@@ -814,8 +1016,14 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
     the registry and half from the env var. Retire `SANITY_API_READ_TOKEN` for
     that site once the per-tenant encrypted token takes over, and verify the
     hand-created revalidate webhook matches what the idempotent `create-webhook`
-    step looks for — otherwise you end up with two. **Needs sign-off
-    (production half).**
+    step looks for — otherwise you end up with two.
+
+    **Still deferred 2026-08-28, deliberately.** One constraint has since
+    tightened, though: §7 gives the **apex domain to `apps/marketing`**, so the
+    production blog moves off the root regardless of which way this resolves.
+    The remaining question is only whether it stays live as tenant #1 or is
+    retired — not whether it keeps the apex. **Do not adopt or repoint it until
+    that is settled.**
 
 ## Non-goals (recorded so epics don't sprawl)
 
@@ -852,7 +1060,7 @@ rules. **Gate on Feature 2 (theme-as-content) for per-tenant branding.**
 5. **Provisioning automation** — the onboarding script (Projects API, seed,
    registry, domain) + the per-project migration runner.
 6. **Studio-per-tenant** — per the §5 hosting decision.
-7. **Platform app** — `apps/platform` (§7): marketing + pricing + signup,
+7. **Platform app** — `apps/marketing` (§7): marketing + pricing + signup,
    with its own Sanity project for content. Gated on nothing; can start
    independently.
 8. **Self-serve signup + billing** — promoted from Non-goals 2026-08-28;
