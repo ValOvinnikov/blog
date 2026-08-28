@@ -509,9 +509,68 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    steps are already shaped for a durable job — `(tenant, env, deps)`
    signatures, per-step idempotency checks, and a `TENANT_PROVISIONING_STEP`
    jsonb ledger — so this is a re-host, not a rewrite, once decision 3 removes
-   the single step that needs a builder. Recommendation: keep the CI driver for
-   operator-initiated runs, add an in-app durable-job driver for self-serve.
-   **Needs sign-off.**
+   the single step that needs a builder. Once it does, every remaining step is
+   HTTP plus a DB write: there is no filesystem dependency (`placeholderPngBuffer()`
+   generates its bytes in code) and the only `import.meta.url` is `run.ts`'s CLI
+   entry guard.
+
+   **The real question is not "CI or not" — it is where the org-level
+   credentials live.** CI is currently acting as a _credential boundary_, not
+   just a runner. `docs/context/environment-variables.md` records
+   `SANITY_MANAGEMENT_TOKEN` as "a `production`-scoped GitHub Environment
+   secret; never set locally", and #2020's acceptance criteria keep it confined
+   there and out of `apps/admin`'s deployment env. That token can create
+   projects and datasets, add CORS origins, invite members, archive projects,
+   and **mint `editor` robot tokens for any project in the org**;
+   `VERCEL_TOKEN` can create and delete Vercel projects and mutate domains.
+   Today `apps/admin` holds only a narrowly-scoped `actions: write` PAT — it can
+   _ask_ for provisioning but cannot perform it. That privilege separation is
+   deliberate and must not be given up by accident.
+
+   Consequently, **"use Vercel Functions" does not by itself answer the security
+   question — which Vercel _project_ hosts them does.** A route inside
+   `apps/admin`/`apps/platform` puts the org token in a public-facing
+   deployment; a separate project with no public routes and its own env scope
+   keeps the boundary. Same code, different blast radius. Recommended shape: a
+   **dedicated provisioning worker** in its own non-public Vercel project, which
+   the apps enqueue to. Note that under decision 5's wildcard scheme the signup
+   path needs **no** `VERCEL_TOKEN` at all (no domain mapping at signup), so
+   only the Sanity org token has to move; custom-domain mapping stays a
+   lower-frequency authenticated operation that can live anywhere.
+
+   **Runtime fit and staging.** Vercel Functions default to a 300s timeout on
+   Fluid Compute against a workload of roughly 10–20s of sequential API calls,
+   so a single invocation is ample. Because each step is already idempotent and
+   persists progress before advancing (`createTenantSanityProject` deliberately
+   persists the project id "the moment it's minted, before the dataset/CORS" —
+   crash-resume design), **a plain function plus a retry is safe to start
+   with**; heavier durable orchestration can wait until something forces it. The
+   `concurrency: group: provision-tenant-<id>` the workflow provides today still
+   needs an in-app equivalent, most likely an advisory lock on the tenant row.
+
+   If durability is wanted, Vercel's Workflow DevKit maps almost 1:1 — each
+   `steps/*.ts` becomes a `"use step"` (full Node access, automatic retry,
+   persisted results), `run.ts`'s loop becomes the `"use workflow"`
+   orchestrator, and `FatalError`/`RetryableError` express the distinction the
+   code already needs (a 403 on invite is fatal, a 429 is retryable). Its
+   `createHook()` primitive natively expresses decision 9 option (b)'s
+   "invite as viewer → wait for acceptance → grant administrator", which
+   otherwise needs a polling reconciler. Two cautions: `"use workflow"` bodies
+   run sandboxed (no `fetch`, no Node modules), so every API call must sit in a
+   step — `run.ts` currently logs and writes to the DB inline; and WDK persists
+   step results for replay, so the `TENANT_PROVISIONING_STEP` ledger must stay
+   the _product-visible_ state the admin UI renders rather than becoming a
+   second competing source of truth.
+
+   **One layer-contract consequence either way.** These steps carry 7 bare
+   `console.*` calls (`create-sanity-project.ts`, `run.ts`), ESLint-exempt only
+   under `db/scripts/**`, and CLAUDE.md's carve-out letting `@blog/db` scripts
+   import `@blog/insight` directly is explicitly scoped to "standalone CLI tools
+   outside the request-handling path". Both exemptions lapse the moment this
+   becomes request-path code; logging has to move to the app layer.
+
+   Recommendation: keep the CI driver for operator-initiated runs, and add a
+   non-public worker driver for self-serve. **Needs sign-off.**
 
 9. **Tenant membership model — OPEN (raised 2026-08-28).** The owner is
    currently invited to their Sanity project as `viewer`, because
