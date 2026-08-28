@@ -29,7 +29,7 @@ cost more context than it saved and failed, even if the content was correct.
 apps/
   cms        Sanity Studio: schemas, desk structure, migrations       (cms)
   web        Next.js frontend: routes, SEO, i18n, composition         (web)
-  admin      Next.js admin panel: separate deploy, no Sanity          (admin-app)
+  admin      Next.js admin panel: separate deploy, no Sanity          (platform-app)
 packages/
   config     Constants, generated Sanity types, routes builder        (@blog/config)
   service    Data access: Sanity client, groqd queries, transformers  (@blog/service)
@@ -43,7 +43,7 @@ SPEC.md      architecture — the durable reference
 ```
 
 Dependency order is `config → cms → service → ui → web`, with
-`config → db → auth → web` and `config → db → auth → admin` (`apps/admin`, the admin panel)
+`config → db → auth → web` and `config → db → auth → admin` (`apps/platform`, the admin panel)
 running alongside it rather than after it; the graph is acyclic. Source lives under `src/` in every workspace. Tests are co-located
 as `*.test.ts(x)`.
 

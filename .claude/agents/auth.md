@@ -5,7 +5,7 @@ description: >-
   configuration both Next.js apps pass to their own NextAuth() call: providers,
   the Drizzle adapter, session strategy, and cookie options. Sits above
   @blog/db, which owns the adapter tables; consumed only by apps/web and
-  apps/admin. Never imports React components, Sanity, or @blog/service.
+  apps/platform. Never imports React components, Sanity, or @blog/service.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
@@ -59,7 +59,7 @@ When invoked, before writing any code:
 - Depend only on `@blog/db`, `@blog/config`, `@blog/utils`, and the
   `next-auth`/`@auth/*` packages. The graph stays acyclic:
   `auth → db, config, utils`.
-- **Only `apps/web` and `apps/admin` consume this package.** `cms`, `service`,
+- **Only `apps/web` and `apps/platform` consume this package.** `cms`, `service`,
   `ui`, and `db` never do.
 - **Export configuration, not instances.** Each app calls `NextAuth()` itself
   with the config you export, so each keeps its own `auth`/`handlers` bound to
@@ -90,7 +90,7 @@ When invoked, before writing any code:
 ## What you do not own
 
 - Each app's own `auth.ts` and its `api/auth/[...nextauth]` route handler.
-  Those belong to the `web` and `admin-app` agents. You export the config; they
+  Those belong to the `web` and `platform-app` agents. You export the config; they
   wire it up. If an app's wiring needs to change, report what it must become.
 - Authorization. Whether a signed-in user may see a page is decided by the app
   (an `admins` row, a `memberships` row). You establish _who_ someone is;
@@ -162,7 +162,7 @@ Run these checks **once, after all work is complete**:
 
 - The exported surface — names, types, and what each piece configures
 - Exactly what each consuming app must now do to wire it up, precisely enough
-  that the `web` and `admin-app` agents can act without re-reading this layer
+  that the `web` and `platform-app` agents can act without re-reading this layer
 - Any behaviour that changed versus the configuration you generalized from,
   and why — "identical behaviour" is the bar, so a deviation is a finding to
   report, not a judgment call to make silently

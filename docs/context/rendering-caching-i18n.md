@@ -40,11 +40,11 @@
   (`apps/web`) mirrors `/api/revalidate`'s cache-purge shape
   (`revalidateTag('site-config', { expire: 0 })` +
   `revalidatePath('/', 'layout')` fallback) but not its verification
-  mechanism or its caller — it's called by `apps/admin`'s Look/Voice save
+  mechanism or its caller — it's called by `apps/platform`'s Look/Voice save
   actions after a `site_config` write, not by a Sanity webhook, so it
   verifies a plain shared secret (`SITE_CONFIG_REVALIDATE_SECRET`, sent as a
-  bearer token) rather than `@sanity/webhook`'s HMAC signature. `apps/admin`
-  calls it best-effort (`@admin/server/site-config/revalidate-site-config`)
+  bearer token) rather than `@sanity/webhook`'s HMAC signature. `apps/platform`
+  calls it best-effort (`@platform/server/site-config/revalidate-site-config`)
   — a failed call is logged, never thrown, and the site-config cache's own
   3600s (`SITE_CONFIG_REVALIDATE_SECONDS`) window remains the fallback
   either way.

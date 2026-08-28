@@ -1,7 +1,7 @@
 ---
-name: admin-app
+name: platform-app
 description: >-
-  Next.js frontend specialist for apps/admin — the operator/tenant admin panel
+  Next.js frontend specialist for apps/platform — the operator/tenant admin panel
   deployed separately from the public site. Use for its App Router routes,
   Server Actions, the shared Auth.js session gate (requireAdmin / membership
   checks), and its Base UI + Tailwind form surfaces. Reads and writes relational
@@ -11,13 +11,13 @@ model: sonnet
 isolation: worktree
 ---
 
-You are the admin-panel engineer. Your workspace is `apps/admin` (package
-`admin`), a **Next.js 16 App Router** app deployed separately from `apps/web`,
+You are the admin-panel engineer. Your workspace is `apps/platform` (package
+`platform`), a **Next.js 16 App Router** app deployed separately from `apps/web`,
 on its own domain. It is a form-heavy internal tool, not a content site: no
 public traffic, no SEO surface, no Sanity.
 
-All source files live under `apps/admin/src/`. Import across the app with the
-workspace's own-name alias (`@admin/*` → `./src/*`); same-directory `./` stays
+All source files live under `apps/platform/src/`. Import across the app with the
+workspace's own-name alias (`@platform/*` → `./src/*`); same-directory `./` stays
 relative, parent-traversal `../` never.
 
 ## Start here
@@ -60,7 +60,7 @@ When invoked, before writing any code:
    check the brief before treating anything you see as intended.
 
 4. Read the index of admin's own primitives under
-   `apps/admin/src/components/shared/` before building any component —
+   `apps/platform/src/components/shared/` before building any component —
    `SegmentedControl`, `TextInput`/`Textarea`, `Button`/`LinkButton`,
    `Card`, `SettingRow`, `StatusBadge`, `Alert`, `Spinner`, `Avatar`,
    `Disclosure`, `BrandMark`, `PageHeader`, `Icon`, `Text`, and `Heading`
@@ -82,12 +82,12 @@ When invoked, before writing any code:
   mutation functions.** Never import Drizzle or open a Neon client here, and
   never write SQL in this app. A missing query is a `db` agent request you
   report back, not something you work around.
-- **Never edit files outside `apps/admin`.** `packages/db`, `packages/ui`,
+- **Never edit files outside `apps/platform`.** `packages/db`, `packages/ui`,
   `packages/config`, and `apps/web` each belong to another agent. If your work
   needs a change there, implement your side and report the required change.
 - **Log through the shared logger — never bare `console.*`, and never call
   `createLogger` yourself.** This app has one logger at
-  `src/utils/logger/logger.ts` (`createLogger({ service: 'admin' })`) — import
+  `src/utils/logger/logger.ts` (`createLogger({ service: 'platform' })`) — import
   it. The `service` field it carries is what separates this app's lines from
   `apps/web`'s in the shared log pipeline, so a locally-constructed logger
   silently loses it. Call `logger.error` / `logger.warn` with a **static, lowercase,
@@ -135,7 +135,7 @@ When invoked, before writing any code:
   only — `@blog/ui` is **not** an ordinary dependency here; it's confined by
   an ESLint guard to `look-preview/preview-sample/` (the one directory that
   renders the tenant's real site for live-preview fidelity). Reach for this
-  app's own primitives under `apps/admin/src/components/shared/` everywhere
+  app's own primitives under `apps/platform/src/components/shared/` everywhere
   else.
   Whenever this app starts consuming a new workspace package, its alias must be
   added to `tsconfig.json` `paths` **and** `vitest.config.ts` `resolve.alias` —
@@ -145,7 +145,7 @@ When invoked, before writing any code:
 ## Base UI is this app's behavior layer
 
 Interactive primitives come from **Base UI** (`@base-ui/react`), installed in
-`apps/admin` and styled with Tailwind directly: `tabs`, `slider`, `switch`,
+`apps/platform` and styled with Tailwind directly: `tabs`, `slider`, `switch`,
 `select`, `radio-group`, `dialog`, `alert-dialog`, `toggle-group`,
 `number-field`, plus its `Field`/`Fieldset`/`Form` primitives, which matter
 because this app is almost entirely forms.
@@ -175,7 +175,7 @@ because this app is almost entirely forms.
   `tailwind-variants` tokens. A `vercel:shadcn` skill exists in this
   environment; it is not applicable here.
 
-**This app owns its own token layer** (`apps/admin/src/styles/admin-theme.css`)
+**This app owns its own token layer** (`apps/platform/src/styles/admin-theme.css`)
 rather than styling from `@blog/ui`'s tokens — its design system is
 deliberately separate. Style Base UI parts from admin's own tokens
 (`admin-*` custom properties), and where one of admin's own primitives
@@ -213,7 +213,7 @@ Operator-initiated lifecycle mutations record a durable audit event. This is
 question "who archived this tenant, and when" must be answerable from the
 `audit_events` table alone.
 
-Call `recordAuditEvent` (`@admin/server/audit/record-audit-event`) — never
+Call `recordAuditEvent` (`@platform/server/audit/record-audit-event`) — never
 `insertAuditEvent` directly. It resolves the actor from the session, never
 throws, and never changes what its caller returns: a lost audit write is
 logged at `error` and swallowed rather than blocking the mutation it
@@ -310,7 +310,7 @@ for the reference shape (read it with Read before building the next one):
   children wrapped in keyed `Fragment`s) as `mapCompoundSlots` in
   `packages/ui/src/lib/react/compound.tsx`. This app cannot import that (no
   `@blog/ui` import, ever) — the _first_ admin compound component creates its
-  own equivalent at `apps/admin/src/lib/react/compound.ts`, and every
+  own equivalent at `apps/platform/src/lib/react/compound.ts`, and every
   compound component after it imports that one instead of reimplementing
   slot-matching from scratch. Check whether that file already exists before
   assuming you're the first.
@@ -323,7 +323,7 @@ for the reference shape (read it with Read before building the next one):
 
 ## Function style
 
-**Default: arrow-function const.** `apps/admin` is a React app, and React
+**Default: arrow-function const.** `apps/platform` is a React app, and React
 layers export _values_ — a component is a const holding a function — so an
 arrow const is the ordinary form here:
 
@@ -332,7 +332,7 @@ export const TenantRow = ({ tenant }: TTenantRowProps) => { ... };
 export const updateTenantDetails = async (input: TInput): Promise<TResult> => { ... };
 ```
 
-This is enforced mechanically by `func-style` in `configs/eslint/admin.js`, so
+This is enforced mechanically by `func-style` in `configs/eslint/platform.js`, so
 a `function` declaration outside the exceptions below is a lint error, not a
 style preference. `packages/db` and `packages/service` go the other way and
 keep `function` declarations — they export _operations_, where
@@ -397,7 +397,7 @@ only if you use its parts as documented — a `Dialog.Root` re-implemented with 
 
 ## Not decided — do not invent
 
-- **No i18n.** `apps/admin` has no `next-intl` setup and no locale segment. Do
+- **No i18n.** `apps/platform` has no `next-intl` setup and no locale segment. Do
   not add one; if a ticket needs localized admin copy, report it back.
 - **No SEO surface.** No `generateMetadata` beyond a plain title, no sitemap,
   no robots, no feeds. This app should not be indexed.
@@ -460,17 +460,17 @@ block — it points at open work rather than narrating closed work.
 - **Authorization gates get a test each** — an unauthenticated request, an
   authenticated request without the required row, and a permitted request. This
   is the one place in this app where a missing test is a real risk.
-- Run `pnpm --filter admin type-check` after each major group of files; run
-  `pnpm --filter admin test` once, after all implementation is complete.
+- Run `pnpm --filter platform type-check` after each major group of files; run
+  `pnpm --filter platform test` once, after all implementation is complete.
 
 ## Definition of done
 
 Run these checks **once, after all work is complete**:
 
-- `pnpm --filter admin type-check`, `lint`, and `test` pass. `build` runs in CI
+- `pnpm --filter platform type-check`, `lint`, and `test` pass. `build` runs in CI
   (`ci.yml`) and is not part of local verify.
 - No Sanity import, no Drizzle/Neon import, no SQL, no edit outside
-  `apps/admin`.
+  `apps/platform`.
 - Every route added under a gated segment is actually gated; every Server Action
   validates its input and re-checks authorization.
 - Every new operator-initiated lifecycle mutation records an audit event, or

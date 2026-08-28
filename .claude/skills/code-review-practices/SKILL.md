@@ -26,7 +26,7 @@ BASE=main
 D() { git diff "$BASE"...HEAD; git diff; }
 
 # Debug artifacts — no bare console.* lands in app or package source.
-# apps/web and apps/admin log through their shared logger
+# apps/web and apps/platform log through their shared logger
 # (src/utils/logger/logger.ts, wrapping createLogger from @blog/insight);
 # service/db/auth never log at all — they return the error to the caller.
 # Exempt: packages/insight/src/** (the logger itself), <repo-root>/scripts/**,

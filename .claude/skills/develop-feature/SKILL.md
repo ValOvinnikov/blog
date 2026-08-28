@@ -121,23 +121,23 @@ intervening `pnpm typegen` commit). See `docs/context/claude-code.md`'s
 below for why this discipline matters just as much before dispatching
 `test-writer`.
 
-| Layer / work                                                 | Agent       | Skill it should apply                                                               |
-| ------------------------------------------------------------ | ----------- | ----------------------------------------------------------------------------------- |
-| Constants, `routes`, shared types, `configs/*`, alias wiring | `config`    | —                                                                                   |
-| Sanity schema + `pnpm typegen`                               | `cms`       | `cms-schema-practices`                                                              |
-| GROQ + typed fetcher                                         | `service`   | `add-content-type`, `testing-practices`                                             |
-| Drizzle schema, migrations, typed queries                    | `db`        | `testing-practices`                                                                 |
-| Shared Auth.js config (providers, adapter, session, cookies) | `auth`      | `testing-practices`                                                                 |
-| Components                                                   | `ui`        | `ui-library-practices`, `ui-storybook`, `testing-practices`                         |
-| Routes / metadata / feeds                                    | `web`       | `web-component-practices`, `seo-and-metadata`, `web-storybook`, `testing-practices` |
-| Admin-panel routes, Server Actions, Base UI forms            | `admin-app` | `testing-practices`                                                                 |
-| Structured logging (`createLogger`, log sanitization)        | `insight`   | `testing-practices`                                                                 |
+| Layer / work                                                 | Agent          | Skill it should apply                                                               |
+| ------------------------------------------------------------ | -------------- | ----------------------------------------------------------------------------------- |
+| Constants, `routes`, shared types, `configs/*`, alias wiring | `config`       | —                                                                                   |
+| Sanity schema + `pnpm typegen`                               | `cms`          | `cms-schema-practices`                                                              |
+| GROQ + typed fetcher                                         | `service`      | `add-content-type`, `testing-practices`                                             |
+| Drizzle schema, migrations, typed queries                    | `db`           | `testing-practices`                                                                 |
+| Shared Auth.js config (providers, adapter, session, cookies) | `auth`         | `testing-practices`                                                                 |
+| Components                                                   | `ui`           | `ui-library-practices`, `ui-storybook`, `testing-practices`                         |
+| Routes / metadata / feeds                                    | `web`          | `web-component-practices`, `seo-and-metadata`, `web-storybook`, `testing-practices` |
+| Admin-panel routes, Server Actions, Base UI forms            | `platform-app` | `testing-practices`                                                                 |
+| Structured logging (`createLogger`, log sanitization)        | `insight`      | `testing-practices`                                                                 |
 
-`db`, `auth`, `admin-app`, and `insight` are the rows that are **not** steps in
-that chain. `db` and `admin-app` are siblings to `service` and `web`
+`db`, `auth`, `platform-app`, and `insight` are the rows that are **not** steps in
+that chain. `db` and `platform-app` are siblings to `service` and `web`
 respectively, `auth` is a thin layer above `db`, `insight` is independent (like
 `config`/`utils`), and none of the four consumes Sanity.
-`config → db → auth → admin-app` runs in parallel to `cms → service → ui → web`,
+`config → db → auth → platform-app` runs in parallel to `cms → service → ui → web`,
 not after it. `insight` has no upstream and no downstream in this chain today
 — dispatch it standalone when the work is genuinely `packages/insight`'s.
 
@@ -273,7 +273,7 @@ red check.
   full diff (`main...HEAD` + working tree). It applies `code-review-practices`
   — mechanical scan, contract pass, general pass — with fresh eyes and reports
   a verdict.
-- **If the diff touches `packages/ui`, `apps/web`, or `apps/admin` components**, also dispatch
+- **If the diff touches `packages/ui`, `apps/web`, or `apps/platform` components**, also dispatch
   the **`a11y-reviewer` subagent** (`.claude/agents/a11y-reviewer.md`) over the
   same diff — it checks the `ui-library-practices` accessibility rules
   (`ariaLabel` prop convention, no in-component date formatting, real heading

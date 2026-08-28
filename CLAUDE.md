@@ -44,24 +44,24 @@ graph is acyclic
   never import it**. Sharing it is what keeps a session valid across both apps;
   two independently maintained configs drift silently. See
   `.claude/agents/auth.md`.
-- `apps/admin` is a separate Next.js app (its own deployment and domain) for
+- `apps/platform` is a separate Next.js app (its own deployment and domain) for
   the operator/tenant admin panel — it consumes `db`, `auth`, `config`, and
   `utils`, and **never Sanity or `@blog/service`**. It owns its own
   presentational primitives (Text, Card, Icon, Button, …) as well as its
   interactive ones, all built on Base UI and styled in-app; nothing is added
   to `@blog/ui` for it. The one exception is
-  `apps/admin/src/components/features/look/look-preview/preview-sample/`,
+  `apps/platform/src/components/features/look/look-preview/preview-sample/`,
   which renders the tenant's real site (WindowChrome, BrandMark, Text,
   Button) so the live theme preview doesn't drift from what `apps/web`
   actually looks like — an ESLint `no-restricted-imports` guard confines
-  `@blog/ui` imports under `apps/admin` to that one directory. See
-  `.claude/agents/admin-app.md`.
+  `@blog/ui` imports under `apps/platform` to that one directory. See
+  `.claude/agents/platform-app.md`.
 - `@blog/insight` (`packages/insight`) holds the structured logger core —
   `createLogger`, `LOG_LEVEL`, and `sanitizeLogMessage`. Sits at the base of
   the dependency graph alongside `config`/`utils` — depends on nothing.
   `sanitizeLogMessage` is `@blog/insight`'s sole canonical implementation —
   `@blog/utils`'s former copy was removed once every call site migrated onto
-  this package instead. Both apps consume it: `apps/web` and `apps/admin` each expose one
+  this package instead. Both apps consume it: `apps/web` and `apps/platform` each expose one
   shared logger at `src/utils/logger/logger.ts` carrying their own `service`
   value, and import that rather than calling `createLogger` per module.
   `service`, `db` and `auth` never log at all — failures reach the caller and
@@ -157,33 +157,33 @@ Neon-backed concern. See `.claude/agents/db.md`.
 
 `auth` (`packages/auth`, the shared Auth.js configuration — providers, the
 Drizzle adapter, session strategy, cookie options) is a **thin layer above
-`db`**, consumed only by the two apps: `config → db → auth → web`/`admin-app`.
+`db`**, consumed only by the two apps: `config → db → auth → web`/`platform-app`.
 Dispatch it when any of those change. Never dispatch it for authorization —
 whether a signed-in user may see a page is each app's decision, made against an
 `admins` or `memberships` row. See `.claude/agents/auth.md`.
 
-`admin-app` (`apps/admin`, the operator/tenant admin panel — a separate Next.js
+`platform-app` (`apps/platform`, the operator/tenant admin panel — a separate Next.js
 app, its own deployment and domain) is a **sibling to `web`, not a step in the
 chain either**. Its only upstreams are `config`, `db`, and `auth`, so its
-dispatch order is `config → db → auth → admin-app`; it never waits on
+dispatch order is `config → db → auth → platform-app`; it never waits on
 `cms`/`service`, which it does not consume. Base UI is installed and styled inside that app,
 and it owns its own presentational primitives too — do not route its
 components through the `ui` agent. The one exception is
 `look-preview/preview-sample/`, an ESLint-guarded directory allowed to
 import `@blog/ui` directly so the live theme preview renders the site's
-real components. See `.claude/agents/admin-app.md`.
+real components. See `.claude/agents/platform-app.md`.
 
 `insight` (`packages/insight`, the structured logger core — `createLogger`,
 `LOG_LEVEL`, and `sanitizeLogMessage`, its sole canonical implementation) is
 **independent, like `config`/`utils`** — depends on nothing, not a step in
 any chain. Both apps consume it through their own shared logger module, so
 dispatch `insight` only for changes to the logger core itself — a change to
-how an app _uses_ the logger belongs to `web`/`admin-app`. See
+how an app _uses_ the logger belongs to `web`/`platform-app`. See
 `.claude/agents/insight.md`.
 
 **Delegating in-scope work to its sub-agent is REQUIRED, not optional — for the
 whole lifecycle, not just the first draft.** Every file that lives in a
-sub-agent's domain (`config`/`cms`/`service`/`ui`/`web`/`db`/`admin-app`/`auth`/`insight` per the map above) is
+sub-agent's domain (`config`/`cms`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight` per the map above) is
 written, changed, fixed, renamed, and reworked **by that sub-agent** — the
 initial implementation, every review-remediation, every follow-up tweak, every
 "it's one line" edit. The orchestrator _orchestrates_; it does not hand-author
@@ -215,7 +215,7 @@ When a review turns up a blocking finding in a layer file, or a rename / knip /
 lint nit needs a two-line change, patching it inline _feels_ faster than
 re-dispatching the owning agent. That feeling is the rationalization this rule
 exists to stop: a two-line orchestrator edit to a `config`/`cms`/`service`/`ui`/
-`web`/`db`/`admin-app`/`auth` file is still the orchestrator doing a sub-agent's job. Route the fix to
+`web`/`db`/`platform-app`/`auth` file is still the orchestrator doing a sub-agent's job. Route the fix to
 the owning agent (dispatch, or `SendMessage` it), let it re-export, then
 re-verify and re-review. "Small", "mechanical", "the agent already did the hard
 part", and "it's a fix, not new code" are **not** exemptions — the only
@@ -407,7 +407,7 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   _operations_, where `export function getPostBySlug()` is the ordinary
   Node/TypeScript idiom, so they keep **declarations**. The rule codifies what
   the repo already looks like rather than imposing something new. Only
-  `apps/web`'s half is wired today; `apps/admin` (arrow) and `service`/`db`
+  `apps/web`'s half is wired today; `apps/platform` (arrow) and `service`/`db`
   (declaration) are tracked separately, so don't read an unenforced workspace
   as licence to drift. The exceptions and the Next.js reserved-export carve-out
   live in `.claude/agents/web.md` § "Function style".
@@ -434,7 +434,7 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   Backing a `pgEnum` neither qualifies a const nor disqualifies one.
 
   **`AUDIT_ACTION` / `AUDIT_TARGET_TYPE` are a deliberate exception** and stay
-  in `@blog/config`. Only `db` and `apps/admin` read them today, so by reach
+  in `@blog/config`. Only `db` and `apps/platform` read them today, so by reach
   alone they would move — but auditing is a cross-cutting concern whose
   vocabulary grows as more surfaces become auditable, and `audit_events`
   stores both as plain `text().$type<>()` precisely so a new action never
@@ -471,7 +471,7 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   one place instead of re-deriving or re-typing the same access path at every
   usage.
 - **No bare `console.*` — log through the app's shared logger.** `apps/web`
-  and `apps/admin` each own one logger at `src/utils/logger/logger.ts`
+  and `apps/platform` each own one logger at `src/utils/logger/logger.ts`
   (`createLogger({ service })` from `@blog/insight`); import it rather than
   calling `createLogger` per module, or the `service` field that separates the
   two apps' lines is lost. `service`, `db`, and `auth` never log at all —

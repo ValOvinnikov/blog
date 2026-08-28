@@ -29,7 +29,7 @@ contracts:
     context. Establishes identity only; authorization stays each app's call.
   - `ui` — building the pure, publishable `@blog/ui` design system.
   - `web` — App Router routes, SEO, composition of `ui` + `service` + `db`.
-  - `admin-app` — `apps/admin`, the operator/tenant admin panel: a second Next.js
+  - `platform-app` — `apps/platform`, the operator/tenant admin panel: a second Next.js
     app with its own deployment and domain, gated by the session `apps/web`
     already issues. A sibling to `web`, not a step after it — its upstreams are
     `config`, `db`, and `ui` only, so it never waits on `cms`/`service`, which
@@ -50,7 +50,7 @@ contracts:
     auditing is a separate concern from logging, and a false record is worse
     than a missing one.
   - Those nine layer agents (`config`, `cms`, `service`, `ui`, `web`, `db`,
-    `admin-app`, `auth`, `insight`) additionally carry the two context7 MCP tools
+    `platform-app`, `auth`, `insight`) additionally carry the two context7 MCP tools
     (`resolve-library-id`, `query-docs`) in their `tools:` frontmatter, so the
     `use-context7` skill is actually executable by the agent that hits an
     unfamiliar library API mid-implementation. Without them the instruction to
@@ -80,7 +80,7 @@ contracts:
     commit ask on an `APPROVE` verdict. Trusts `verify-runner`'s already-passed
     `type-check`/`lint`/`test` result rather than re-running it.
   - `a11y-reviewer` — read-only accessibility audit of
-    `packages/ui`/`apps/web`/`apps/admin` diffs against
+    `packages/ui`/`apps/web`/`apps/platform` diffs against
     `ui-library-practices`' non-negotiable rules; dispatched alongside
     `reviewer` whenever a diff touches those layers.
   - `explore` — read-only discovery scout (Haiku). Answers "where is X / how
@@ -272,7 +272,7 @@ file` are all denied alike) — an earlier version only handled the
   - `pre-agent-gate0-guard.sh` — `PreToolUse` hook on the **`Agent` tool**
     (wired in `settings.json`, not in agent frontmatter, since it must see
     dispatches before any agent starts). Denies dispatching a **layer agent**
-    (`config`/`cms`/`service`/`ui`/`web`/`db`/`admin-app`/`auth`/`insight`) to implement an issue that
+    (`config`/`cms`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight`) to implement an issue that
     isn't `In Progress` on the board — i.e. Gate 0 was skipped. The deny
     message names the fix (dispatch `board-keeper` with
     `"starting work on #<n>"`).

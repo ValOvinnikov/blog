@@ -23,13 +23,13 @@ feature needing both joins them in `web`. Internal packages ship raw
 TypeScript (Just-in-Time pattern) and are transpiled by the web app via
 `transpilePackages`.
 
-`admin` (`apps/admin`) never consumes `service` or Sanity — it owns its own
+`admin` (`apps/platform`) never consumes `service` or Sanity — it owns its own
 presentational and interactive primitives, styled from its own token layer
 rather than `@blog/ui`. The one exception is
-`apps/admin/src/components/features/look/look-preview/preview-sample/`,
+`apps/platform/src/components/features/look/look-preview/preview-sample/`,
 which renders the tenant's real site so the live theme preview doesn't
 drift from `apps/web`; an ESLint `no-restricted-imports` guard in
-`configs/eslint/admin.js` confines `@blog/ui` imports to that directory.
+`configs/eslint/platform.js` confines `@blog/ui` imports to that directory.
 
 ## Type flow
 
