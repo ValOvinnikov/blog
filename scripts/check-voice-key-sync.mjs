@@ -2,7 +2,7 @@
 // places that hand-duplicate it:
 //   - apps/cms/src/schema-types/documents/settings/voice.ts
 //     (the Sanity `settings_voice` schema's `defineField({ name: '...' })` calls)
-//   - apps/admin/src/utils/voice-fields/voice-fields.ts
+//   - apps/platform/src/utils/voice-fields/voice-fields.ts
 //     (`VOICE_FIELD_GROUPS`' field `key`s)
 //   - apps/web/src/utils/apply-voice-overrides/apply-voice-overrides.ts
 //     (`VOICE_OVERRIDE_PATHS`' object keys)
@@ -28,7 +28,7 @@ const CMS_FILE = join(
 );
 const ADMIN_FILE = join(
   repoRoot,
-  'apps/admin/src/utils/voice-fields/voice-fields.ts',
+  'apps/platform/src/utils/voice-fields/voice-fields.ts',
 );
 const WEB_FILE = join(
   repoRoot,
@@ -227,7 +227,7 @@ const main = () => {
   }
 
   console.log(
-    `Voice-override keys are in sync across cms/admin/web/db (${allKeys.size} keys).`,
+    `Voice-override keys are in sync across cms/platform/web/db (${allKeys.size} keys).`,
   );
 };
 

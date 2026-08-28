@@ -17,7 +17,7 @@ spec decisions — those conflicts and their resolutions are called out below.
 
 **Scope:** How a platform operator provisions a brand-new tenant end to end —
 Sanity project, seeded starter content, Studio deployment, registry rows, and
-domain mapping — triggered from `apps/admin`, executed by CI, with per-step
+domain mapping — triggered from `apps/platform`, executed by CI, with per-step
 resumable retry. Excludes self-serve signup, billing, cross-tenant admin
 analytics (all explicit non-goals in the parent spec, unchanged here), and the
 **per-project migration runner** (a day-2 tool for pushing schema/content
@@ -74,7 +74,7 @@ initial design pass or by review afterward:
 
 ## Architecture
 
-**Trigger — `apps/admin`'s "Add tenant" wizard, matching the mock's shape**
+**Trigger — `apps/platform`'s "Add tenant" wizard, matching the mock's shape**
 (with the domain field added per §5 above). Step 1 ("Details") collects
 tenant name, slug (Studio hostname only, per §1), domain, plan, and owner
 email — all client-side, fast. Submitting it is a Server Action that:
@@ -95,7 +95,7 @@ email — all client-side, fast. Submitting it is a Server Action that:
    polls the tenant row for live per-step status.
 
 **Provisioning workflow — new `.github/workflows/provision-tenant.yml`.**
-The `apps/admin` Server Action holds a narrowly-scoped GitHub PAT
+The `apps/platform` Server Action holds a narrowly-scoped GitHub PAT
 (`actions: write` only) to trigger it via `workflow_dispatch` — that's a
 real, deliberate exception, distinct from this repo's actual deploy-token
 rule: the _deploy_ credentials (Vercel/Sanity Projects API tokens) never
@@ -143,12 +143,12 @@ failed-or-later steps actually do work.
 **Status report — a direct `updateProvisioningStep` write to Postgres from
 the script itself** (revised post-launch, #2002), reusing the same
 `DATABASE_URL` connection the workflow already holds for `reactivateTenant`.
-Originally designed as a separate `apps/admin` API route, bearer-token
+Originally designed as a separate `apps/platform` API route, bearer-token
 authenticated against a GitHub Actions secret — a lighter mechanism than the
 Sanity revalidation webhook's HMAC verification (`apps/web/src/app/api/revalidate/route.ts`),
 since this call only ever originated from our own CI runner holding a repo
 secret. That route silently dropped a step's status update on any network
-failure between the CI runner and `apps/admin`, so a tenant's provisioning
+failure between the CI runner and `apps/platform`, so a tenant's provisioning
 could fail with no trace in the admin UI at all. The direct write removes
 that failure class entirely — there's no network hop left to drop.
 
@@ -190,14 +190,14 @@ per this repo's convention.
   to nullable (safe — no existing row loses data, see Data model); new
   queries (`createTenantDraft`, `updateProvisioningStep`,
   `getTenantProvisioningStatus`).
-- **`apps/admin`** — the wizard UI (Details form + per-step status/retry
+- **`apps/platform`** — the wizard UI (Details form + per-step status/retry
   view, matching the mock's visual shape with corrected slug copy), the
   Server Action.
 - **New GitHub Actions workflow** — the actual provisioning logic (Sanity
   Projects API, content seed, Studio Vercel project + deploy, domain add on
   the shared web project), and each step's status report — a direct
   `updateProvisioningStep` write to Postgres from the script itself, not an
-  `apps/admin` API route (revised post-launch; the route silently dropped
+  `apps/platform` API route (revised post-launch; the route silently dropped
   updates on any network failure, see #2002). Not owned by any of the eight
   code layers; CI config, same bucket as this repo's other deploy workflows.
 - **`@blog/service`, `@blog/ui`, `apps/web`, `@blog/auth`** — untouched. No
@@ -218,7 +218,7 @@ operator gives up entirely, but that's an explicit non-goal for this design —
 resumability handles the common case of "retry until it works").
 
 Testing: `db` query unit tests for the new queries, idempotency-check logic,
-and the direct-write status report; `admin-app` Server Action tests (mocked
+and the direct-write status report; `platform-app` Server Action tests (mocked
 GitHub API dispatch, mocked db). The GitHub Actions workflow's actual
 external-API logic is validated by a dry-run/staging execution rather than
 unit tests, matching how this repo already treats its deploy workflows — no
@@ -236,7 +236,7 @@ covers retry; full teardown is a manual operator action, not built here).
 
 - `SPEC.md` **§13** — provisioning joins the deployment topology
   (per-tenant Sanity project + Studio + domain mapping, CI-triggered from
-  `apps/admin`).
+  `apps/platform`).
 - The parent design doc (`2026-08-07-multi-tenant-architecture-design.md`)
   marks **both** epic 5 and epic 6 shipped once this lands (per the §4
   resolution above — epic 6 ships as a side effect, not separately) and notes

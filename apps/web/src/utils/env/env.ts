@@ -10,7 +10,7 @@ export const env = createEnv({
     // Feature-flag-by-absence: the on-demand revalidation route
     // (`/api/revalidate`) 500s without it instead of revalidating.
     SANITY_REVALIDATE_SECRET: z.string().min(1).optional(),
-    // Verifies `apps/admin`'s Look/Voice-save revalidation call
+    // Verifies `apps/platform`'s Look/Voice-save revalidation call
     // (`/api/revalidate-site-config`), same feature-flag-by-absence stance
     // as `SANITY_REVALIDATE_SECRET`: absent, the route 500s instead of
     // revalidating.

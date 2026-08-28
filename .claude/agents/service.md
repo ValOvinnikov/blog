@@ -48,7 +48,7 @@ relative paths only within a single slice (`./query`, `./types`).
 - **Never log — return the error to the caller.** This layer does not call
   `console.*`, and does not take a `@blog/insight` dependency. Failures
   propagate as a `TResult` via `safeAsync`; the app layer (`apps/web` /
-  `apps/admin`) logs them through its shared logger, once, with the request
+  `apps/platform`) logs them through its shared logger, once, with the request
   context attached. Logging here as well would put the same failure into the
   pipeline twice, and this layer's copy would be the one lacking the
   route/request context that makes it actionable.

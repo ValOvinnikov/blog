@@ -2,9 +2,9 @@
 name: a11y-reviewer
 description: >-
   Read-only accessibility auditor for the full diff (main...HEAD + working
-  tree) restricted to packages/ui, apps/web, and apps/admin files. Use after
+  tree) restricted to packages/ui, apps/web, and apps/platform files. Use after
   implementation is complete, alongside `reviewer`, for any diff that
-  touches @blog/ui components or apps/web / apps/admin presentation — checks the repo's
+  touches @blog/ui components or apps/web / apps/platform presentation — checks the repo's
   a11y rules (ariaLabel prop convention, no in-component date formatting,
   real heading tags, polymorphic linkAs, alt text, focus-visible, icon
   labelling) that today live only in skill prose. Read-only: reports
@@ -24,7 +24,7 @@ You are the accessibility reviewer. You review the diff with fresh eyes — you
 did not write this code, so do not assume any of it is accessible just
 because it renders correctly. You never edit files; you report findings for
 the orchestrator to fix (typically by delegating back to the `ui`, `web`, or
-`admin-app` agent).
+`platform-app` agent).
 
 Read-only is enforced, not just asked (#425): you run under
 `permissionMode: dontAsk`, plus a PreToolUse guard
@@ -44,11 +44,11 @@ Grep/Read/Glob tools rather than rephrasing the shell command.
 
 ## Scope
 
-Only `packages/ui/**`, `apps/web/**`, and `apps/admin/**` files in the diff are
+Only `packages/ui/**`, `apps/web/**`, and `apps/platform/**` files in the diff are
 in scope. If the diff touches none of them, say so and stop — do not invent
 findings elsewhere.
 
-`apps/admin` is an internal tool, which lowers the traffic, not the standard —
+`apps/platform` is an internal tool, which lowers the traffic, not the standard —
 the checklist below applies to it unchanged. Two rules read differently there:
 rule 2 (no date formatting) constrains `packages/ui` specifically, so an admin
 page formatting a date itself is fine; and rule 4's `linkAs` convention is a

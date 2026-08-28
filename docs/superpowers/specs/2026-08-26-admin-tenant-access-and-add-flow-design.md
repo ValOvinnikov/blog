@@ -193,7 +193,7 @@ that it starts provisioning — the URL is the only signal.
 - **Owner email hint** — the current string explains the flow rather than the
   field. Replace with a short statement of what to type and what follows.
   For the record, since the current wording raised the question: **the invite
-  is sent by `apps/admin` itself**, via Auth.js `signIn('email')` → Resend
+  is sent by `apps/platform` itself**, via Auth.js `signIn('email')` → Resend
   (`create-tenant-action.ts`). Not by Sanity.
 - **Pending-state copy** — `Begin provisioning →` must not resolve to
   `Creating…`. Pair each action with its own progress string
@@ -209,7 +209,7 @@ each failed tick pushes the page down and each recovery pulls it back.
 
 **Do not build a toast system.** `@blog/ui` already ships `Toast` and
 `ToastViewport`, and `apps/web` has a working provider at
-`src/context/toast-provider`. Port that provider into `apps/admin` and mount
+`src/context/toast-provider`. Port that provider into `apps/platform` and mount
 the viewport in `AdminShell`.
 
 The split is by message kind, not by convenience:
@@ -254,7 +254,7 @@ reports the **platform** role (`SUPERADMIN`/`ADMIN`) with a `Platform` scope;
 stays as-is — it is the correct authorization answer, just not a correct
 identity label.
 
-Worth noting for the fix's test: `apps/admin/src/app/[locale]/t/[tenantSlug]/layout.test.tsx`
+Worth noting for the fix's test: `apps/platform/src/app/[locale]/t/[tenantSlug]/layout.test.tsx`
 only ever exercises a real `OWNER` membership, never the virtual SUPERADMIN
 one, which is why this was never caught. The regression test must cover a
 SUPERADMIN with no `memberships` row.
@@ -277,7 +277,7 @@ together at the bottom of the tenant nav, below the tenant-facing sections and
 separated by a rule — rather than Provisioning sitting second, above pages an
 owner uses daily.
 
-## §8 — `apps/admin` owns its own design system
+## §8 — `apps/platform` owns its own design system
 
 `CLAUDE.md` already says admin's **interactive** primitives come from Base UI,
 styled in-app, and that nothing is added to `@blog/ui` for it. In practice admin
@@ -296,7 +296,7 @@ on a reader-facing site whose whole visual idea is a terminal; wrong on an admin
 panel, where a status pill should be a quiet, rounded, sentence-case chip with a
 tone dot.
 
-**Decision: `apps/admin` owns every primitive it renders**, built in-app on Base
+**Decision: `apps/platform` owns every primitive it renders**, built in-app on Base
 UI plus its own theme, and stops importing `@blog/ui` for its own chrome.
 
 **With one deliberate exception, and it is not a compromise.** The Look tab's
@@ -323,8 +323,8 @@ exception can be enforced:
   exception.
 
 So the sample is extracted to
-`apps/admin/src/components/features/look/look-preview/preview-sample/`, and
-**that directory is the only place under `apps/admin` where a `@blog/ui` import
+`apps/platform/src/components/features/look/look-preview/preview-sample/`, and
+**that directory is the only place under `apps/platform` where a `@blog/ui` import
 is allowed.** A path-scoped guard enforces it, so the exception cannot quietly
 widen back into the app — which is exactly how the current 68 sites accumulated.
 
@@ -334,11 +334,11 @@ widen back into the app — which is exactly how the current 68 sites accumulate
   The _names_ (`ICONS`) already live in `@blog/config`, which admin keeps. Admin
   copies only the 13 glyphs it uses — `CHEVRON_RIGHT`, `COMMENT`, `GLOBE`,
   `GRID`, `MAIL`, `MENU`, `MENU_ROWS`, `PALETTE`, `PLUS`, `QUOTE`, `SETTINGS`,
-  `USERS`, `WARNING` — into `apps/admin/src/assets/icons` with its own registry.
+  `USERS`, `WARNING` — into `apps/platform/src/assets/icons` with its own registry.
   No new workspace package. Admin's `vitest.config.ts` and `next.config.ts`
   already carry the SVGR plumbing (they had to, to consume `@blog/ui` source),
   so that wiring is repointed rather than written.
-- **Its own theme.** `apps/admin/index.css` is four lines: import
+- **Its own theme.** `apps/platform/index.css` is four lines: import
   `@blog/tailwind-config/theme.css` and `@source`-scan `packages/ui`. That
   shared theme declares itself "the only source of Tailwind theme tokens and
   global base styling," with a narrow carve-out for workspace-specific tokens.
@@ -396,7 +396,7 @@ and current call sites:
 
 **Admin-only — dead the moment admin migrates:**
 
-- `Text`'s `supporting` variant — 5 call sites, every one in `apps/admin`.
+- `Text`'s `supporting` variant — 5 call sites, every one in `apps/platform`.
 - `Text`'s `hint` variant — 3 call sites, all in `provisioning-status-view`.
 - The `Textarea` atom in full (already covered above).
 
@@ -427,7 +427,7 @@ migrating them would build every surface twice.
 
 ## Delivery
 
-An epic with per-layer sub-issues. All `layer:admin-app` except the first,
+An epic with per-layer sub-issues. All `layer:platform-app` except the first,
 which also touches `layer:config` for the `adminRoutes` builder.
 
 1. `refactor(admin)` — `/t/{slug}` → `/tenants/{id}`: add `requireTenantById`,
@@ -471,7 +471,7 @@ redesign — it can ship ahead of the route work if wanted.
   a super admin is never labelled OWNER.
 - **The sidebar tenant switcher is dropped from the platform tree** (it was
   non-functional there) and kept, unchanged, in the owner tree.
-- **`apps/admin` owns every primitive it renders** (§8), with `@blog/ui`
+- **`apps/platform` owns every primitive it renders** (§8), with `@blog/ui`
   confined to the Look preview's simulated-site sample — the tenant's own
   appearance, where a copy would drift from the real site and make the preview
   lie. The dependency stays; its reach shrinks from 68 sites to one directory. It copies the 13 icons it uses rather than adding a shared package,

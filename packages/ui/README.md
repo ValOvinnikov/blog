@@ -3,7 +3,7 @@
 > The design system: pure, prop-driven React components shared by both apps.
 
 This package holds every reusable UI building block — atoms, molecules, and
-organisms — used by `apps/web` and `apps/admin`. It exists so visual and
+organisms — used by `apps/web` and `apps/platform`. It exists so visual and
 interaction patterns are defined once, typed once, and stay portable: a
 component here takes plain typed props and renders markup, nothing more, so it
 could be published to npm without edits.
@@ -13,7 +13,7 @@ could be published to npm without edits.
 - **Depends on:** `@blog/config` (shared types and constants), `@blog/utils`,
   `@blog/tailwind-config` (design tokens, consumed via `theme.css`), and
   `tailwind-variants` for styling.
-- **Consumed by:** `apps/web` and `apps/admin`.
+- **Consumed by:** `apps/web` and `apps/platform`.
 - **Never imports:** `@blog/service`, `sanity`, `next-sanity`, `next/*`, or
   anything that fetches data. `'use client'` never appears in this package —
   components stay server-component-safe by default and accept

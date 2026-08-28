@@ -28,7 +28,7 @@
   syntactic rule (no type-aware linting) scoped by the enclosing type's
   name, which is what keeps it from ever touching a `Result` discriminant's
   `ok`. Allowlists `prefetch`/`priority` (third-party passthrough).
-  Registered in `ui.js`, `web.js`, and `admin.js`. Co-located
+  Registered in `ui.js`, `web.js`, and `platform.js`. Co-located
   `boolean-prop-prefix.test.js`. Known gap: a prop typed as an indexed
   access into a `tv()` variants type (e.g. `TFooVariants['bar']`) is boolean
   at runtime but isn't caught, since the rule only inspects the syntactic
@@ -43,7 +43,7 @@
 - Per-layer subpaths that compose `base.js` (and, where relevant,
   `no-upstream-imports.js`) with that layer's own constraints — `./config`,
   `./utils`, `./insight`, `./service`, `./db`, `./ui`, `./web`, `./cms`,
-  `./auth`, `./admin` — each imported by that workspace's own
+  `./auth`, `./platform` — each imported by that workspace's own
   `eslint.config.js`. `./insight` composes `./utils` and exempts its own
   `src/**` from the repo-wide `no-console` ban — `files` patterns resolve
   relative to the consuming workspace, so workspace-specific `no-console`
@@ -57,7 +57,7 @@
 Every package and app workspace, plus `configs/tailwind` and
 `configs/vitest`: `packages/config`, `packages/utils`, `packages/insight`,
 `packages/service`, `packages/db`, `packages/auth`, `packages/ui`,
-`apps/web`, `apps/cms`, `apps/admin`, `configs/tailwind`, `configs/vitest`.
+`apps/web`, `apps/cms`, `apps/platform`, `configs/tailwind`, `configs/vitest`.
 
 ## Further reading
 

@@ -8,7 +8,7 @@
 // Which env.ts files feed which app's declared-vars set is based on each
 // app's actual package.json dependencies, not a guess: `apps/web` depends on
 // `@blog/service` (Sanity), `@blog/db` and `@blog/auth` (Postgres/session);
-// `apps/admin` depends on `@blog/db` and `@blog/auth` but never
+// `apps/platform` depends on `@blog/db` and `@blog/auth` but never
 // `@blog/service` (it never talks to Sanity). See APPS below.
 //
 // A var legitimately read only inside a runtime request/Server Action code
@@ -28,7 +28,7 @@ const repoRoot = join(scriptDir, '..');
 const TURBO_JSON_FILE = join(repoRoot, 'turbo.json');
 
 const WEB_ENV_FILE = join(repoRoot, 'apps/web/src/utils/env/env.ts');
-const ADMIN_ENV_FILE = join(repoRoot, 'apps/admin/src/utils/env/env.ts');
+const PLATFORM_ENV_FILE = join(repoRoot, 'apps/platform/src/utils/env/env.ts');
 const SERVICE_ENV_FILE = join(
   repoRoot,
   'packages/service/src/utils/env/env.ts',
@@ -101,7 +101,7 @@ export const APPS = [
     label: 'web',
     files: [WEB_ENV_FILE, SERVICE_ENV_FILE, DB_ENV_FILE, AUTH_ENV_FILE],
   },
-  { label: 'admin', files: [ADMIN_ENV_FILE, DB_ENV_FILE, AUTH_ENV_FILE] },
+  { label: 'platform', files: [PLATFORM_ENV_FILE, DB_ENV_FILE, AUTH_ENV_FILE] },
 ];
 
 export const collectDeclaredVars = (files, parseFn = (f) => parse(f)) => {
@@ -167,7 +167,7 @@ const main = () => {
   }
 
   console.log(
-    "turbo.json's build env allowlist covers every declared build-time env var (web/admin).",
+    "turbo.json's build env allowlist covers every declared build-time env var (web/platform).",
   );
 };
 

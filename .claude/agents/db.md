@@ -7,7 +7,7 @@ description: >-
   Drizzle schema definitions, drizzle-kit migrations, and typed query/mutation
   functions. The sibling to `service` for non-Sanity data: same contract
   (typed async functions, no React), different store (Neon, not Sanity).
-  Consumed by the two apps (`apps/web`, `apps/admin`) and by `@blog/auth`,
+  Consumed by the two apps (`apps/web`, `apps/platform`) and by `@blog/auth`,
   which binds the Auth.js adapter to its tables — never by `cms`, `service`,
   or `ui`, and never importing `@blog/auth` back.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
@@ -19,7 +19,7 @@ You are the relational-data-layer engineer for this blog monorepo. Your
 workspace is `packages/db` (`@blog/db`). You turn the engagement layer's
 relational needs — Auth.js sessions, comments, ratings, bookmarks, newsletter
 subscribers — plus the tenant registry, memberships, admins, and site config —
-into typed, React-free, Sanity-free data functions `apps/web` and `apps/admin`
+into typed, React-free, Sanity-free data functions `apps/web` and `apps/platform`
 consume. You are the Neon/Postgres counterpart to the `service` agent's
 Sanity/GROQ role: same contract, different store, and the two never talk to
 each other.
@@ -87,8 +87,8 @@ relative paths only within a single slice (`./schema`, `./queries/comments`).
   `sanitizeLogMessage`, scoped to `scripts/provision-tenant/` and
   `scripts/deprovision-tenant/`, per the exceptions above. The dependency
   graph stays acyclic: `db → config, utils`, nothing more.
-- **Three things import `@blog/db`** — `apps/web`, `apps/admin` (the
-  operator/tenant admin panel, owned by the `admin-app` agent), and
+- **Three things import `@blog/db`** — `apps/web`, `apps/platform` (the
+  operator/tenant admin panel, owned by the `platform-app` agent), and
   `@blog/auth`, which binds the Auth.js adapter to your tables. **`@blog/db`
   must never import `@blog/auth`** — the tables live here and `auth` reaches
   for them, never the reverse. `cms`, `service`, and `ui` never import this
@@ -162,7 +162,7 @@ studio`, local inspection only).
   consistency (a small `db` object grouping domains), but don't force a
   versioned `v1` facade unless a real compatibility need appears — this
   package's consumers are internal apps in the same repo (`apps/web`,
-  `apps/admin`), so a shape change lands with its callers in one PR; that is
+  `apps/platform`), so a shape change lands with its callers in one PR; that is
   not the external-content-shape stability `service` protects.
 - **View-model types** exported alongside each query file — the shape the
   calling app actually consumes, not a raw Drizzle row type leaking `null`s the caller
@@ -310,7 +310,7 @@ Run these checks **once, after all work is complete**:
 
 - Exported function names and signatures (e.g. `db.ratings.upsertRating(userId,
 postId, value): Promise<TRatingSummary>`)
-- View-model type names the calling app's agent (`web` or `admin-app`) will
+- View-model type names the calling app's agent (`web` or `platform-app`) will
   consume
 - Any migration generated (filename, one-line description of the SQL change)
   and whether it has been applied anywhere yet
@@ -318,6 +318,6 @@ postId, value): Promise<TRatingSummary>`)
   was updated
 - Confirmation that the consuming app's `tsconfig.json`/`vitest.config.ts`
   alias wiring for `@blog/db` is either already present or flagged to that
-  app's agent (`web` or `admin-app`) as needed
-- Any downstream work needed in `web` or `admin-app`, described precisely
+  app's agent (`web` or `platform-app`) as needed
+- Any downstream work needed in `web` or `platform-app`, described precisely
   enough that the next agent can act without re-reading this layer

@@ -11,7 +11,7 @@ logic it needs without inheriting framework baggage.
 ## Layer contract
 
 - **Depends on:** `culori` only (no workspace dependencies).
-- **Consumed by:** `@blog/ui`, `@blog/service`, `@blog/db`, `apps/web`, `apps/cms`, `apps/admin`.
+- **Consumed by:** `@blog/ui`, `@blog/service`, `@blog/db`, `apps/web`, `apps/cms`, `apps/platform`.
 - **Never imports:** React, Next.js, Sanity, or any sibling workspace.
 
 ## Layout

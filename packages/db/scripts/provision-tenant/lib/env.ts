@@ -22,7 +22,7 @@ export type TProvisionEnv = {
   // custom domain to this one project, never a per-tenant project.
   vercelWebProjectId: string;
   vercelCliVersion: string;
-  // Base origin of the deployed `apps/admin` app (no trailing slash/path) —
+  // Base origin of the deployed `apps/platform` app (no trailing slash/path) —
   // the Sanity CORS origin step 1 adds.
   adminAppBaseUrl: string;
   // Platform domain each tenant's Studio subdomain is minted under

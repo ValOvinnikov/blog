@@ -20,7 +20,7 @@ const resolveSiteConfigTenantId = async (): Promise<string | undefined> => {
   return tenant?.id;
 };
 
-// `apps/admin`'s Look/Voice saves write `site_config` directly via
+// `apps/platform`'s Look/Voice saves write `site_config` directly via
 // `@blog/db`, then call `/api/revalidate-site-config` (a separate Vercel
 // deployment, so this is a cross-app HTTP call rather than a shared cache
 // reference) to expire this tag immediately. Absent that call, a save still
