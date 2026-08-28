@@ -1,5 +1,6 @@
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ArchivedTenantsToggle } from '@platform/components/features/tenants/archived-tenants-toggle';
+import { EmailAlertsBanner } from '@platform/components/features/tenants/email-alerts-banner';
 import { TenantsTable } from '@platform/components/features/tenants/tenants-table';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
@@ -11,6 +12,7 @@ import { tenantsViewVariants } from './tenants-view-variants';
 export type TTenantsViewProps = {
   tenants: TTenant[];
   shouldShowArchived: boolean;
+  isEmailAlertingConfigured: boolean;
 };
 
 /**
@@ -21,9 +23,10 @@ export type TTenantsViewProps = {
 export const TenantsView = ({
   tenants,
   shouldShowArchived,
+  isEmailAlertingConfigured,
 }: TTenantsViewProps) => {
   const t = useTranslations('tenantsView');
-  const { root, toolbar, codeChunk } = tenantsViewVariants();
+  const { root, toolbar, emailAlertsBanner, codeChunk } = tenantsViewVariants();
 
   return (
     <div className={root()}>
@@ -41,6 +44,11 @@ export const TenantsView = ({
       <div className={toolbar()}>
         <ArchivedTenantsToggle shouldShowArchived={shouldShowArchived} />
       </div>
+      {!isEmailAlertingConfigured && (
+        <div className={emailAlertsBanner()}>
+          <EmailAlertsBanner />
+        </div>
+      )}
       <TenantsTable tenants={tenants} />
     </div>
   );
