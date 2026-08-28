@@ -73,20 +73,22 @@ relative paths only within a single slice (`./schema`, `./queries/comments`).
   well would put the same failure into the pipeline twice, and this layer's
   copy would be the one lacking the route/request context that makes it
   actionable. **A second scoped exception (#2120):** the standalone
-  `scripts/provision-tenant/` and `scripts/deprovision-tenant/` CLI tools —
+  `scripts/provision-tenant/`, `scripts/deprovision-tenant/`, and
+  `scripts/recheck-tenant-owners/` CLI tools —
   outside the request-handling path this rule targets, with no app layer
   above them to log through — import `@blog/insight`'s `sanitizeLogMessage`
   (the sanitizer only, never `createLogger`) directly, rather than keeping
   their own copy of it. Enforced the same way as the `@sanity/client`
-  exception above: a `configs/eslint/db.js` override scoped to those two
+  exception above: a `configs/eslint/db.js` override scoped to those
   directories.
 - Depend only on `@blog/config` and `@blog/utils` (types, constants, framework-
   free helpers) plus Drizzle/Neon SDKs (`drizzle-orm`, `drizzle-kit`,
   `@neondatabase/serverless`, the Auth.js Drizzle adapter) — plus `@sanity/client`,
   scoped to `scripts/provision-tenant/`, and `@blog/insight`'s
-  `sanitizeLogMessage`, scoped to `scripts/provision-tenant/` and
-  `scripts/deprovision-tenant/`, per the exceptions above. The dependency
-  graph stays acyclic: `db → config, utils`, nothing more.
+  `sanitizeLogMessage`, scoped to `scripts/provision-tenant/`,
+  `scripts/deprovision-tenant/`, and `scripts/recheck-tenant-owners/`, per
+  the exceptions above. The dependency graph stays acyclic:
+  `db → config, utils`, nothing more.
 - **Three things import `@blog/db`** — `apps/web`, `apps/platform` (the
   operator/tenant admin panel, owned by the `platform-app` agent), and
   `@blog/auth`, which binds the Auth.js adapter to your tables. **`@blog/db`

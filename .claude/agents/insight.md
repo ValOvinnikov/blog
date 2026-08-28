@@ -73,10 +73,10 @@ Record<string, unknown>) => void`. Emits one JSON object per call
   inverting nothing but adding one where none is needed.
 - **Sanitizer.** `sanitizeLogMessage` — the CodeQL-recognized log-injection
   sanitizing barrier — is `@blog/insight`'s sole canonical implementation.
-  `@blog/db`'s standalone `provision-tenant`/`deprovision-tenant` CLI scripts
-  import it directly (they sit outside the request-handling path other
-  layers use their shared logger for); every other consumer goes through
-  `createLogger`.
+  `@blog/db`'s standalone `provision-tenant`/`deprovision-tenant`/
+  `recheck-tenant-owners` CLI scripts import it directly (they sit outside
+  the request-handling path other layers use their shared logger for); every
+  other consumer goes through `createLogger`.
 - **Stack-trace capping.** Vercel truncates individual log lines at a few KB;
   a truncated JSON line is unparseable. Cap the serialized stack trace length
   before it's included in the emitted JSON, with a clear truncation marker.
