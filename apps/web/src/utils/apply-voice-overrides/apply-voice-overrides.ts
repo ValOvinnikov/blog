@@ -1,6 +1,6 @@
 // Flat `site_config.voiceOverrides` key -> nested `en.json` message path,
-// mirroring `apps/admin`'s curated `TVoiceOverrideKey` field set
-// (`apps/admin/src/utils/voice-fields/voice-fields.ts`) one key at a time —
+// mirroring `apps/platform`'s curated `TVoiceOverrideKey` field set
+// (`apps/platform/src/utils/voice-fields/voice-fields.ts`) one key at a time —
 // that's the write side, this is the read side of the same curated fields.
 const VOICE_OVERRIDE_PATHS: Record<string, readonly string[]> = {
   notFoundMetaTitle: ['notFound', 'metaTitle'],

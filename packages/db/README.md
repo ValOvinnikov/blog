@@ -14,7 +14,7 @@ out" contract, a different store, and the two never reference each other.
 - **Depends on:** `@blog/config`, `@blog/utils`, plus the Drizzle/Neon SDKs
   (`drizzle-orm`, `drizzle-kit`, `@neondatabase/serverless`). `@sanity/client`
   is a dependency too, but scoped to one directory (see below).
-- **Consumed by:** `apps/web`, `apps/admin`, and `@blog/auth` (which binds the
+- **Consumed by:** `apps/web`, `apps/platform`, and `@blog/auth` (which binds the
   Auth.js Drizzle adapter to the tables in `src/schema/auth.ts`).
 - **Never imports:** React, any Sanity SDK, or `@blog/service` — this package
   and `service` are siblings, not dependents; a feature needing both Sanity
@@ -47,7 +47,7 @@ keeps the blanket Sanity-SDK prohibition.
   and the provisioning scripts read instead of raw `process.env`.
 - `scripts/` — human- or CI-invoked entrypoints that call the query layer
   directly (`seed-tenant.ts`, `seed-admin.ts`, `provision-tenant/`,
-  `deprovision-tenant/`); never imported by `apps/web`/`apps/admin`.
+  `deprovision-tenant/`); never imported by `apps/web`/`apps/platform`.
 - `migrations/` — the generated, committed SQL migration history plus
   drizzle-kit's snapshot metadata (`migrations/meta/`).
 

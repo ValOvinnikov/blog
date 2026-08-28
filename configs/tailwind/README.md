@@ -16,7 +16,7 @@
 
 `packages/ui` (`index.css`, and parsed at build time by
 `src/lib/design-tokens/token-registry.ts`), `apps/web` (`index.css`), and
-`apps/admin` (`index.css`).
+`apps/platform` (`index.css`).
 
 ## Scripts
 

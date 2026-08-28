@@ -65,11 +65,11 @@
       // `import ... from '@blog/db'` in apps/web.
       "ignoreDependencies": ["@svgr/webpack"]
     },
-    "apps/admin": {
+    "apps/platform": {
       // Referenced only as a Turbopack loader string (next.config.ts
       // `turbopack.rules['*.svg'].loaders: ['@svgr/webpack']`) — knip's
       // import graph can't see a bare string naming a package. Strict pnpm
-      // (no hoisting) still requires it as a real apps/admin devDependency so
+      // (no hoisting) still requires it as a real apps/platform devDependency so
       // Turbopack can resolve it.
       "ignoreDependencies": ["@svgr/webpack"],
       // next-intl navigation helpers (Link/usePathname), scaffolded to
@@ -78,7 +78,7 @@
       // the Next.js plugin still contributes the app-router entries.
       //
       // src/components/shared/{icon,text,button,link-button,status-badge,text-input,alert,heading,textarea,avatar,spinner,brand-mark,setting-row,page-header,disclosure,segmented-control,card}/index.ts:
-      // admin-owned primitives, each built ahead of its call sites as part
+      // platform-owned primitives, each built ahead of its call sites as part
       // of a bottom-up migration off @blog/ui. Mark each an entry for the
       // same reason as the navigation helpers above.
       "entry": [

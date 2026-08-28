@@ -274,7 +274,7 @@ jobs:
       # Variables (not Secrets) so they stay inspectable in run logs.
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
       # Distinct GitHub Environment variable from deploy-web's VERCEL_PROJECT_ID
-      # (admin-prod is its own Vercel project, rooted at apps/admin) — mapped to
+      # (admin-prod is its own Vercel project, rooted at apps/platform) — mapped to
       # the local name the Vercel CLI actually reads.
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_ADMIN }}
     steps:
@@ -288,7 +288,7 @@ jobs:
           pnpm-version: ${{ env.PNPM_VERSION }}
           node-version: ${{ env.NODE_VERSION }}
       # Vercel CLI runs its own `next build` with the project's Production env
-      # vars pulled from Vercel (root directory apps/admin is stored on the
+      # vars pulled from Vercel (root directory apps/platform is stored on the
       # project, so build resolves the monorepo workspaces correctly). Guarded
       # on VERCEL_PROJECT_ID (not VERCEL_TOKEN, which deploy-web already has
       # configured) so this stays a true no-op until the admin-prod Vercel

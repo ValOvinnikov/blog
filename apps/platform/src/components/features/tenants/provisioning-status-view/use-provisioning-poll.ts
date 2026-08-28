@@ -1,0 +1,412 @@
+'use client';
+
+import {
+  TENANT_PROVISIONING_STATUS,
+  TENANT_PROVISIONING_STEP,
+  TENANT_PROVISIONING_STEP_STATUS,
+  type TTenantProvisioningStatus,
+  type TTenantProvisioningStepStatus,
+} from '@blog/db/constants';
+import type {
+  TTenant,
+  TTenantProvisioningSteps,
+} from '@blog/db/schema/tenants';
+import { useToast } from '@platform/context/toast-provider';
+import type { TDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
+import { getDomainVerificationStatusAction } from '@platform/server/provisioning/get-domain-verification-status-action';
+import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
+import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
+import {
+  classifyProvisioningError,
+  type TProvisioningErrorKind,
+} from '@platform/utils/provisioning-error/provisioning-error';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { useState, useEffect, useRef, useTransition } from 'react';
+
+// Object key insertion order matches the config-declared step sequence, so
+// this can't drift if a step is ever reordered there.
+export const STEP_ORDER = Object.values(TENANT_PROVISIONING_STEP);
+
+// Highest-priority status wins: any FAILED step outranks a RUNNING one, which
+// outranks a still-IDLE one, so the overall status always reflects the most
+// urgent thing happening across the whole run rather than the last step
+// polled. `provisioningStatus` itself can't be used for this — the DB column
+// only settles to READY/FAILED once the *last* step finishes, so a failure
+// partway through the sequence would otherwise never surface here.
+const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
+  TENANT_PROVISIONING_STEP_STATUS.FAILED,
+  TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+  TENANT_PROVISIONING_STEP_STATUS.IDLE,
+  TENANT_PROVISIONING_STEP_STATUS.DONE,
+];
+
+const STEP_POLL_INTERVAL_MS = 4000;
+// The domain check makes a live Vercel API call with its own 5s timeout —
+// slower and less urgent than step polling — so it runs on a longer,
+// independent interval rather than sharing the step interval and risking
+// overlapping in-flight requests.
+const DOMAIN_POLL_INTERVAL_MS = 10000;
+// A GitHub Actions dispatch-to-runner-pickup normally resolves in well under
+// a minute, but during an outage, a disabled workflow, or a permissions
+// failure it may never resolve at all — this caps how long a retry/start
+// keeps polling against an unchanged pre-retry snapshot before giving up on
+// it, comfortably exceeding realistic pickup latency.
+const RETRY_BASELINE_MAX_TICKS = 75; // ~5 minutes at STEP_POLL_INTERVAL_MS
+
+const isTerminalProvisioningStatus = (
+  status: TTenantProvisioningStatus | null,
+): boolean => {
+  return (
+    status === TENANT_PROVISIONING_STATUS.READY ||
+    status === TENANT_PROVISIONING_STATUS.FAILED
+  );
+};
+
+const shouldContinuePolling = (
+  status: TTenantProvisioningStatus | null,
+  steps: TTenantProvisioningSteps | null,
+): boolean => {
+  if (isTerminalProvisioningStatus(status)) {
+    return false;
+  }
+
+  const statuses = stepStatusesFor(steps);
+  const hasRunningStep = statuses.includes(
+    TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+  );
+  const hasFailedStep = statuses.includes(
+    TENANT_PROVISIONING_STEP_STATUS.FAILED,
+  );
+
+  // A failed step with nothing else running means the run is stuck and
+  // nothing further will happen until an operator retries —
+  // `provisioningStatus` never reflects this on its own (it only settles to
+  // FAILED once the *last* step fails), so it has to be read off the steps
+  // directly rather than off the column.
+  return !(hasFailedStep && !hasRunningStep);
+};
+
+const stepStatusesFor = (
+  steps: TTenantProvisioningSteps | null,
+): TTenantProvisioningStepStatus[] =>
+  STEP_ORDER.map(
+    (stepKey) =>
+      steps?.[stepKey]?.status ?? TENANT_PROVISIONING_STEP_STATUS.IDLE,
+  );
+
+const stepStatusesEqual = (
+  a: TTenantProvisioningStepStatus[],
+  b: TTenantProvisioningStepStatus[],
+): boolean => a.length === b.length && a.every((status, i) => status === b[i]);
+
+const isTerminalDomainVerificationStatus = (
+  status: TDomainVerificationStatus,
+): boolean => {
+  return status === 'VERIFIED' || status === 'NOT_CONFIGURED';
+};
+
+type TDispatchErrorKind = 'not-found' | 'other';
+
+export type TUseProvisioningPollResult = {
+  dispatchError: TDispatchErrorKind | undefined;
+  isStarting: boolean;
+  isRetrying: boolean;
+  handleStart: () => void;
+  handleRetry: () => void;
+  provisioningStatus: TTenantProvisioningStatus | null;
+  provisioningSteps: TTenantProvisioningSteps | null;
+  /** `PROVISIONING` while a Start/Retry dispatch is in flight, whatever the last-polled status was. */
+  effectiveProvisioningStatus: TTenantProvisioningStatus | null;
+  stepStatuses: TTenantProvisioningStepStatus[];
+  allIdle: boolean;
+  isProvisioningRunning: boolean;
+  overallStepStatus: TTenantProvisioningStepStatus;
+  isOverallFailed: boolean;
+  displayOverallStatus: Exclude<TTenantProvisioningStepStatus, 'FAILED'>;
+  failedStepError: string | undefined;
+  errorKind: TProvisioningErrorKind | undefined;
+  domainStatus: TDomainVerificationStatus;
+};
+
+/**
+ * Owns the status page's live behaviour: step-status polling (with its own
+ * stop/continue rules), the slower independent domain-verification poll,
+ * the Start/Retry dispatch flow, and the derived overall-status/error-kind
+ * values every one of those feeds into. The component consuming this only
+ * renders what it returns.
+ */
+export const useProvisioningPoll = (
+  tenant: TTenant,
+  // Optional for a caller with nothing to say about the domain (e.g.
+  // `ProvisioningStatusView`, which no longer renders a domain card) —
+  // `NOT_CONFIGURED` is a terminal status, so the domain poll effect below
+  // never actually starts for it.
+  domainVerificationStatus: TDomainVerificationStatus = 'NOT_CONFIGURED',
+): TUseProvisioningPollResult => {
+  const router = useRouter();
+  const toast = useToast();
+  const t = useTranslations('provisioningStatusView');
+  // Non-null while the current pollErrorWarning toast is showing — lets a
+  // later recovering tick dismiss the exact toast a failing one raised,
+  // rather than leaving it to its own auto-dismiss timer.
+  const pollErrorToastIdRef = useRef<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
+  const [dispatchError, setDispatchError] = useState<
+    TDispatchErrorKind | undefined
+  >(undefined);
+  const [, startTransition] = useTransition();
+  const [renderedTenant, setRenderedTenant] = useState(tenant);
+  const [provisioningStatus, setProvisioningStatus] =
+    useState<TTenantProvisioningStatus | null>(tenant.provisioningStatus);
+  const [provisioningSteps, setProvisioningSteps] =
+    useState<TTenantProvisioningSteps | null>(tenant.provisioningSteps);
+  // The poll loop's own on/off switch — only a poll tick may turn it off.
+  const [isPollingActive, setIsPollingActive] = useState(() =>
+    shouldContinuePolling(tenant.provisioningStatus, tenant.provisioningSteps),
+  );
+  // Non-null while waiting to see the retried/started workflow actually take
+  // effect: the snapshot of step statuses as of the moment Retry/Start was
+  // pressed. A dispatch only acknowledges GitHub's receipt of the request,
+  // not a runner picking it up — often well past one poll interval — so the
+  // very next tick usually still reflects this same pre-retry snapshot. The
+  // poll tick keeps polling active against an unchanged snapshot and only
+  // resumes normal stop/continue decisions once the fetched steps genuinely
+  // differ from it.
+  const [pendingRetryBaseline, setPendingRetryBaseline] = useState<
+    TTenantProvisioningStepStatus[] | null
+  >(null);
+  // Consecutive poll ticks that have matched `pendingRetryBaseline` so far —
+  // a ref rather than state because it must not itself trigger a re-render
+  // or reset the poll interval; it only gates whether the cap below has
+  // been reached. Reset whenever a fresh baseline is recorded.
+  const pendingRetryTicksRef = useRef(0);
+  const [renderedDomainStatus, setRenderedDomainStatus] = useState(
+    domainVerificationStatus,
+  );
+  const [domainStatus, setDomainStatus] = useState<TDomainVerificationStatus>(
+    domainVerificationStatus,
+  );
+
+  // A fresh `tenant`/`domainVerificationStatus` argument (e.g. after a
+  // Retry, Start, or details save's own `router.refresh()`) should win over
+  // whatever polling last saw — adjusted during render, per React's
+  // guidance for state derived from props, rather than in an effect.
+  if (tenant !== renderedTenant) {
+    setRenderedTenant(tenant);
+    setProvisioningStatus(tenant.provisioningStatus);
+    setProvisioningSteps(tenant.provisioningSteps);
+    setIsPollingActive(
+      (prev) =>
+        prev ||
+        shouldContinuePolling(
+          tenant.provisioningStatus,
+          tenant.provisioningSteps,
+        ),
+    );
+  }
+  if (domainVerificationStatus !== renderedDomainStatus) {
+    setRenderedDomainStatus(domainVerificationStatus);
+    setDomainStatus(domainVerificationStatus);
+  }
+
+  useEffect(() => {
+    if (!isPollingActive) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const intervalId = setInterval(() => {
+      void getTenantProvisioningStatusAction(tenant.id)
+        .then((result) => {
+          if (cancelled || !result) {
+            return;
+          }
+          if (pollErrorToastIdRef.current) {
+            toast.dismiss(pollErrorToastIdRef.current);
+            pollErrorToastIdRef.current = null;
+          }
+          setProvisioningStatus(result.provisioningStatus);
+          setProvisioningSteps(result.provisioningSteps);
+
+          const freshStatuses = stepStatusesFor(result.provisioningSteps);
+          if (
+            pendingRetryBaseline &&
+            stepStatusesEqual(freshStatuses, pendingRetryBaseline)
+          ) {
+            pendingRetryTicksRef.current += 1;
+            if (pendingRetryTicksRef.current < RETRY_BASELINE_MAX_TICKS) {
+              // Unchanged since Retry/Start was pressed — the dispatch only
+              // confirms GitHub received the request, not that a runner has
+              // picked it up yet, so this read alone can't tell "never"
+              // apart from "not yet". Keep watching rather than stop on a
+              // snapshot that predates the retry, up to the cap above.
+              return;
+            }
+            // Cap reached — that alone is proof nothing is happening, so
+            // stop unconditionally rather than deferring to
+            // `shouldContinuePolling`, which never stops on an all-IDLE
+            // snapshot (the pre-Start case) and would otherwise poll
+            // forever.
+            setPendingRetryBaseline(null);
+            setIsPollingActive(false);
+            return;
+          }
+
+          setPendingRetryBaseline(null);
+          setIsPollingActive(
+            shouldContinuePolling(
+              result.provisioningStatus,
+              result.provisioningSteps,
+            ),
+          );
+        })
+        .catch(() => {
+          // A rejected tick (e.g. an expired-session redirect thrown by
+          // `requireAdmin()`) must not silently kill polling — the interval
+          // itself already retries on its own next tick; this only makes
+          // the stall visible instead of leaving the last-known state
+          // looking current. A toast — not layout — carries this: it's
+          // transient and self-correcting, and one already showing isn't
+          // replaced by a repeat.
+          if (cancelled) {
+            return;
+          }
+          if (!pollErrorToastIdRef.current) {
+            pollErrorToastIdRef.current = toast.warning({
+              command: 'tenant.provisioning_poll',
+              state: 'error',
+              message: t('pollErrorWarning'),
+            });
+          }
+        });
+    }, STEP_POLL_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(intervalId);
+    };
+  }, [tenant.id, isPollingActive, pendingRetryBaseline, toast, t]);
+
+  useEffect(() => {
+    if (isTerminalDomainVerificationStatus(domainStatus)) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const intervalId = setInterval(() => {
+      void getDomainVerificationStatusAction(tenant.id).then((result) => {
+        if (cancelled) {
+          return;
+        }
+        setDomainStatus(result);
+      });
+    }, DOMAIN_POLL_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      clearInterval(intervalId);
+    };
+  }, [tenant.id, domainStatus]);
+
+  const stepStatuses = stepStatusesFor(provisioningSteps);
+  const allIdle = stepStatuses.every(
+    (status) => status === TENANT_PROVISIONING_STEP_STATUS.IDLE,
+  );
+  // `OVERALL_STATUS_PRIORITY` covers every possible step status, so this
+  // always matches — there is no real "not found" case to fall back from.
+  const overallStepStatus = OVERALL_STATUS_PRIORITY.find((candidate) =>
+    stepStatuses.includes(candidate),
+  ) as TTenantProvisioningStepStatus;
+  const isOverallFailed =
+    overallStepStatus === TENANT_PROVISIONING_STEP_STATUS.FAILED;
+  const failedStepError = isOverallFailed
+    ? STEP_ORDER.map((stepKey) => provisioningSteps?.[stepKey]).find(
+        (stepState) =>
+          stepState?.status === TENANT_PROVISIONING_STEP_STATUS.FAILED,
+      )?.error
+    : undefined;
+  const errorKind = isOverallFailed
+    ? classifyProvisioningError(failedStepError)
+    : undefined;
+
+  // A dispatch has been requested but the runner hasn't reported a step yet
+  // — `provisioningStatus` itself won't reflect this until the Server
+  // Action's own `beginTenantProvisioning` call resolves and a refresh (or
+  // poll) picks it up, which can lag a slow GitHub dispatch by seconds.
+  // Treating the in-flight click itself as "running" is what makes the
+  // badge, the field locks, and the Start button react immediately instead
+  // of only once the round trip completes.
+  const isDispatchPending = isStarting || isRetrying;
+  const effectiveProvisioningStatus = isDispatchPending
+    ? TENANT_PROVISIONING_STATUS.PROVISIONING
+    : provisioningStatus;
+  const isProvisioningRunning =
+    effectiveProvisioningStatus === TENANT_PROVISIONING_STATUS.PROVISIONING;
+  // The real per-step statuses drive `overallStepStatus`/`isOverallFailed`
+  // above unchanged; this is only what the header badge displays while
+  // every step is still IDLE but a dispatch is nonetheless in flight.
+  const displayOverallStatus = (
+    allIdle && isProvisioningRunning
+      ? TENANT_PROVISIONING_STEP_STATUS.RUNNING
+      : overallStepStatus
+  ) as Exclude<TTenantProvisioningStepStatus, 'FAILED'>;
+
+  const runProvisioningDispatch = (setPending: (pending: boolean) => void) => {
+    setDispatchError(undefined);
+    setPending(true);
+    // Force polling back on immediately, and record what the steps look
+    // like right now — the re-dispatched workflow hasn't actually started
+    // yet, so the poll tick needs this snapshot to recognise "no change
+    // observed yet" and keep watching instead of stopping again on it.
+    setIsPollingActive(true);
+    setPendingRetryBaseline(stepStatuses);
+    pendingRetryTicksRef.current = 0;
+    startTransition(async () => {
+      const result = await retryProvisioningStepAction(tenant.id);
+
+      if (
+        result.outcome === 'dispatched' ||
+        result.outcome === 'already-in-progress'
+      ) {
+        router.refresh();
+      } else {
+        // Nothing was actually dispatched (or it was reverted server-side)
+        // — stop waiting for a change that predates a retry that never
+        // took effect, and let the operator see and act on the failure.
+        setPendingRetryBaseline(null);
+        setDispatchError(
+          result.outcome === 'not-found' ? 'not-found' : 'other',
+        );
+      }
+
+      setPending(false);
+    });
+  };
+
+  const handleRetry = () => runProvisioningDispatch(setIsRetrying);
+  const handleStart = () => runProvisioningDispatch(setIsStarting);
+
+  return {
+    dispatchError,
+    isStarting,
+    isRetrying,
+    handleStart,
+    handleRetry,
+    provisioningStatus,
+    provisioningSteps,
+    effectiveProvisioningStatus,
+    stepStatuses,
+    allIdle,
+    isProvisioningRunning,
+    overallStepStatus,
+    isOverallFailed,
+    displayOverallStatus,
+    failedStepError,
+    errorKind,
+    domainStatus,
+  };
+};

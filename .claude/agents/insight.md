@@ -85,8 +85,8 @@ Record<string, unknown>) => void`. Emits one JSON object per call
 
 ## What you do not own
 
-- Any `apps/web`/`apps/admin` call site. Standing up this package does not
-  migrate anyone onto it — that's `web`/`admin-app`'s work, dispatched
+- Any `apps/web`/`apps/platform` call site. Standing up this package does not
+  migrate anyone onto it — that's `web`/`platform-app`'s work, dispatched
   separately, only when migrating call sites is itself the scope of the task
   at hand.
 

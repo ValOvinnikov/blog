@@ -88,7 +88,7 @@ When invoked, before writing any code:
   `createLogger` yourself.** This app has one logger at
   `src/utils/logger/logger.ts` (`createLogger({ service: 'web' })`); import it
   as `import { logger } from '@web/utils/logger/logger';`. The `service` field
-  it carries is what separates this app's lines from `apps/admin`'s in the
+  it carries is what separates this app's lines from `apps/platform`'s in the
   shared log pipeline, so a locally-constructed logger silently loses it.
   Call `logger.error` / `logger.warn` with a **static, lowercase,
   dot-namespaced event name** and pass the error plus any identifiers as
@@ -363,14 +363,14 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
 ## New i18n keys that are tenant-customizable "voice" copy also need a Voice override
 
 A curated ~19-key subset of `src/i18n/messages/en.json` is tenant-overridable
-through `apps/admin`'s Voice settings tab (`packages/db`'s `voiceOverrides`
+through `apps/platform`'s Voice settings tab (`packages/db`'s `voiceOverrides`
 JSONB column) — empty-states, not-found messages, terminal prompts, bookmark
 toasts. `src/utils/apply-voice-overrides/apply-voice-overrides.ts` maps each
 override key to its i18n path. When a new i18n key is genuinely that kind of
 copy (not a nav label, breadcrumb, or `ariaLabel` — those stay i18n-only),
 add its mapping there too, and coordinate the matching field in
 `apps/cms/src/schema-types/documents/settings/voice.ts` and
-`apps/admin/src/utils/voice-fields/voice-fields.ts` (`admin-app` owns that
+`apps/platform/src/utils/voice-fields/voice-fields.ts` (`platform-app` owns that
 half). No `packages/db` migration is needed — the column is open-ended JSONB.
 
 ## SEO / feeds / a11y

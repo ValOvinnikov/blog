@@ -12,7 +12,7 @@ const SETTINGS_FEATURES_CACHE_TAG = 'settings-features';
 const TENANT_PLAN_CACHE_TAG = 'tenant-plan';
 
 /**
- * On-demand revalidation endpoint for `apps/admin`'s Look/Voice/Features
+ * On-demand revalidation endpoint for `apps/platform`'s Look/Voice/Features
  * saves — `@blog/db` writes there directly, with no wiring into this app's
  * cache, so without this call a save can take up to an hour to appear live
  * (see `@web/server/site-config/get-site-config`,

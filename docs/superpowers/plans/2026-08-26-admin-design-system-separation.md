@@ -1,13 +1,13 @@
-# apps/admin Design-System Separation — Implementation Plan
+# apps/platform Design-System Separation — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
-> **Layer ownership:** every file below lives in `apps/admin` or `packages/ui`.
-> Per `CLAUDE.md`, those belong to the `admin-app` and `ui` subagents
+> **Layer ownership:** every file below lives in `apps/platform` or `packages/ui`.
+> Per `CLAUDE.md`, those belong to the `platform-app` and `ui` subagents
 > respectively — the orchestrator dispatches, it does not hand-author them.
 > Only `SPEC.md`, `CLAUDE.md` and `docs/**` are orchestrator-owned.
 
-**Goal:** Give `apps/admin` its own design system — admin-owned primitives on
+**Goal:** Give `apps/platform` its own design system — admin-owned primitives on
 Base UI plus an admin-specific token layer matching the design reference exactly
 — replacing all 16 `@blog/ui` components across 68 sites, save one deliberate
 exception: the Look preview's simulated-site sample, which must keep rendering
@@ -55,7 +55,7 @@ afterwards would build each of them twice.
   at the end.
 - **Prefix every admin token `--admin-*`.** They coexist with the tenant preview's
   site tokens in the same document; an unprefixed `--surface` would collide.
-- **No new workspace package.** Icons are copied into `apps/admin/src/assets/icons`.
+- **No new workspace package.** Icons are copied into `apps/platform/src/assets/icons`.
 - **Never add anything to `@blog/ui` for admin.** That rule predates this plan
   (`CLAUDE.md`) and this plan is its enforcement.
 - **`func-style`:** admin is an arrow-function-const workspace. Components are
@@ -71,24 +71,24 @@ afterwards would build each of them twice.
   18px body padding, 14px/18px header padding, hairline `--admin-line-2`
   divider. Every card renders through the `Card` primitive after this plan; no
   page re-declares a surface.
-- **No site tokens survive under `apps/admin/src`**, and **no `@blog/ui` imports**
+- **No site tokens survive under `apps/platform/src`**, and **no `@blog/ui` imports**
   — outside one allowlisted directory. There are ~165 site-token references today
   (`border-border` x36, `text-text` x27, `bg-surface` x27, ...). The finishing
   checks both exclude
-  `apps/admin/src/components/features/look/look-preview/preview-sample/`
+  `apps/platform/src/components/features/look/look-preview/preview-sample/`
   and must otherwise return nothing.
 - **`preview-sample/` is the single allowlisted directory.** It renders the
   tenant's site as it will actually look — `WindowChrome`, `BrandMark`, `Text`,
   `Button` from `@blog/ui`. Copying those into admin would produce a second copy
   that drifts from the real site, so the preview would eventually lie. Nothing
-  else under `apps/admin` may import `@blog/ui`, and a path-scoped guard enforces
+  else under `apps/platform` may import `@blog/ui`, and a path-scoped guard enforces
   it — an unenforced exception is how the current 68 sites accumulated.
 - **Every commit must leave `pnpm type-check`, `pnpm lint`, `pnpm test` green.**
   Migration is bottom-up specifically so this holds.
 
 ## File Structure
 
-**Created in `apps/admin`:**
+**Created in `apps/platform`:**
 
 | Path                                                        | Responsibility                                                                                                     |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
@@ -119,19 +119,19 @@ These join the six primitives `src/components/shared/*` already holds
 `hue-slider`, `preset-picker`) rather than a separate top-level folder — same
 directory, same per-component shape: `<name>.tsx`, `<name>-variants.ts`,
 `<name>.test.tsx`, `index.ts`. No folder-wide barrel; call sites import each
-component directly, `@admin/components/shared/<name>`, matching how the six
+component directly, `@platform/components/shared/<name>`, matching how the six
 existing ones are already imported today.
 
 **Modified:**
 
-| Path                                 | Change                                                                      |
-| ------------------------------------ | --------------------------------------------------------------------------- |
-| `apps/admin/index.css`               | Import `admin-theme.css`; drop the `@source` scan of `packages/ui`.         |
-| `apps/admin/next.config.ts`          | Repoint SVGR at `src/assets/icons`; drop `transpilePackages: ['@blog/ui']`. |
-| `apps/admin/vitest.config.ts`        | Drop the `@blog/ui` alias.                                                  |
-| `apps/admin/tsconfig.json`           | Drop the `@blog/ui/*` path mapping.                                         |
-| `apps/admin/package.json`            | Drop the `@blog/ui` dependency.                                             |
-| 68 call sites under `apps/admin/src` | Repoint imports.                                                            |
+| Path                                    | Change                                                                      |
+| --------------------------------------- | --------------------------------------------------------------------------- |
+| `apps/platform/index.css`               | Import `admin-theme.css`; drop the `@source` scan of `packages/ui`.         |
+| `apps/platform/next.config.ts`          | Repoint SVGR at `src/assets/icons`; drop `transpilePackages: ['@blog/ui']`. |
+| `apps/platform/vitest.config.ts`        | Drop the `@blog/ui` alias.                                                  |
+| `apps/platform/tsconfig.json`           | Drop the `@blog/ui/*` path mapping.                                         |
+| `apps/platform/package.json`            | Drop the `@blog/ui` dependency.                                             |
+| 68 call sites under `apps/platform/src` | Repoint imports.                                                            |
 
 **Deleted:**
 
@@ -145,9 +145,9 @@ existing ones are already imported today.
 
 **Files:**
 
-- Create: `apps/admin/src/styles/admin-theme.css`
-- Modify: `apps/admin/index.css`
-- Test: manual visual + `apps/admin/src/components/features/look/look-preview/look-preview.test.tsx` (existing, must stay green)
+- Create: `apps/platform/src/styles/admin-theme.css`
+- Modify: `apps/platform/index.css`
+- Test: manual visual + `apps/platform/src/components/features/look/look-preview/look-preview.test.tsx` (existing, must stay green)
 
 **Interfaces:**
 
@@ -159,12 +159,12 @@ existing ones are already imported today.
 
 - [ ] **Step 1: Write the token layer**
 
-Create `apps/admin/src/styles/admin-theme.css`. Values verbatim from Global
+Create `apps/platform/src/styles/admin-theme.css`. Values verbatim from Global
 Constraints — this file is the only place they appear.
 
 ```css
 /*
- * apps/admin's own token layer. Admin is a separate deployment with a
+ * apps/platform's own token layer. Admin is a separate deployment with a
  * separate audience: an operator tool, not a reader-facing site. The shared
  * theme's Console preset is deliberately terminal-flavoured, which is wrong
  * here — see the design-system separation spec.
@@ -231,7 +231,7 @@ Constraints — this file is the only place they appear.
 
 - [ ] **Step 2: Wire it in**
 
-`apps/admin/index.css` — keep the shared theme import for now (primitives still
+`apps/platform/index.css` — keep the shared theme import for now (primitives still
 come from `@blog/ui` until Task 3+; removing it early breaks the build). The
 `@source` scan of `packages/ui` is dropped in Task 11, not here.
 
@@ -258,7 +258,7 @@ Expected: PASS, no change in behaviour — nothing consumes the new tokens yet.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/admin/src/styles/admin-theme.css apps/admin/index.css
+git add apps/platform/src/styles/admin-theme.css apps/platform/index.css
 git commit -m "feat(admin): add admin-owned Tailwind token layer"
 ```
 
@@ -268,9 +268,9 @@ git commit -m "feat(admin): add admin-owned Tailwind token layer"
 
 **Files:**
 
-- Create: `apps/admin/src/assets/icons/{chevron-right,comment,globe,grid,mail,menu,menu-rows,palette,plus,quote,settings,users,warning}.svg`
-- Create: `apps/admin/src/components/shared/icon/{icon.tsx,icon-variants.ts,icon-registry.ts,icon.test.tsx,index.ts}`
-- Modify: `apps/admin/next.config.ts` (SVGR include path)
+- Create: `apps/platform/src/assets/icons/{chevron-right,comment,globe,grid,mail,menu,menu-rows,palette,plus,quote,settings,users,warning}.svg`
+- Create: `apps/platform/src/components/shared/icon/{icon.tsx,icon-variants.ts,icon-registry.ts,icon.test.tsx,index.ts}`
+- Modify: `apps/platform/next.config.ts` (SVGR include path)
 
 **Interfaces:**
 
@@ -283,19 +283,19 @@ git commit -m "feat(admin): add admin-owned Tailwind token layer"
 
 ```bash
 cd /path/to/repo
-mkdir -p apps/admin/src/assets/icons
+mkdir -p apps/platform/src/assets/icons
 for i in chevron-right comment globe grid mail menu menu-rows palette plus quote settings users warning; do
-  cp "packages/ui/src/assets/icons/$i.svg" "apps/admin/src/assets/icons/$i.svg"
+  cp "packages/ui/src/assets/icons/$i.svg" "apps/platform/src/assets/icons/$i.svg"
 done
-ls apps/admin/src/assets/icons | wc -l   # expect 13
+ls apps/platform/src/assets/icons | wc -l   # expect 13
 ```
 
 - [ ] **Step 2: Write the failing test**
 
-`apps/admin/src/components/shared/icon/icon.test.tsx`:
+`apps/platform/src/components/shared/icon/icon.test.tsx`:
 
 ```tsx
-import { render, screen } from '@admin/testing/custom-render';
+import { render, screen } from '@platform/testing/custom-render';
 import { ICONS } from '@blog/config';
 
 import { Icon } from './icon';
@@ -351,19 +351,19 @@ registry it carries no `?url` exports — admin has no consumer for raw URLs.
 import { ICONS, type TIconName } from '@blog/config';
 import type { FC, SVGProps } from 'react';
 
-import ChevronRight from '@admin/assets/icons/chevron-right.svg';
-import Comment from '@admin/assets/icons/comment.svg';
-import Globe from '@admin/assets/icons/globe.svg';
-import Grid from '@admin/assets/icons/grid.svg';
-import Mail from '@admin/assets/icons/mail.svg';
-import Menu from '@admin/assets/icons/menu.svg';
-import MenuRows from '@admin/assets/icons/menu-rows.svg';
-import Palette from '@admin/assets/icons/palette.svg';
-import Plus from '@admin/assets/icons/plus.svg';
-import Quote from '@admin/assets/icons/quote.svg';
-import Settings from '@admin/assets/icons/settings.svg';
-import Users from '@admin/assets/icons/users.svg';
-import Warning from '@admin/assets/icons/warning.svg';
+import ChevronRight from '@platform/assets/icons/chevron-right.svg';
+import Comment from '@platform/assets/icons/comment.svg';
+import Globe from '@platform/assets/icons/globe.svg';
+import Grid from '@platform/assets/icons/grid.svg';
+import Mail from '@platform/assets/icons/mail.svg';
+import Menu from '@platform/assets/icons/menu.svg';
+import MenuRows from '@platform/assets/icons/menu-rows.svg';
+import Palette from '@platform/assets/icons/palette.svg';
+import Plus from '@platform/assets/icons/plus.svg';
+import Quote from '@platform/assets/icons/quote.svg';
+import Settings from '@platform/assets/icons/settings.svg';
+import Users from '@platform/assets/icons/users.svg';
+import Warning from '@platform/assets/icons/warning.svg';
 
 type TGlyph = FC<SVGProps<SVGSVGElement>>;
 
@@ -419,8 +419,8 @@ export const Icon = ({ name, size, ariaLabel, className }: TIconProps) => {
 
 - [ ] **Step 5: Repoint SVGR**
 
-In `apps/admin/next.config.ts`, the SVGR rule currently targets `@blog/ui`'s
-asset directory. Point it at `apps/admin/src/assets/icons` **in addition** for
+In `apps/platform/next.config.ts`, the SVGR rule currently targets `@blog/ui`'s
+asset directory. Point it at `apps/platform/src/assets/icons` **in addition** for
 now — `@blog/ui`'s registry is still loaded until Task 11.
 
 - [ ] **Step 6: Run the tests**
@@ -431,7 +431,7 @@ Expected: PASS, 3 tests.
 - [ ] **Step 7: Commit**
 
 ```bash
-git add apps/admin/src/assets/icons apps/admin/src/components/shared/icon apps/admin/next.config.ts
+git add apps/platform/src/assets/icons apps/platform/src/components/shared/icon apps/platform/next.config.ts
 git commit -m "feat(admin): add admin-owned icon registry over copied glyphs"
 ```
 
@@ -444,7 +444,7 @@ visual difference is provable early.
 
 **Files:**
 
-- Create: `apps/admin/src/components/shared/status-badge/{status-badge.tsx,status-badge-variants.ts,status-badge.test.tsx,index.ts}`
+- Create: `apps/platform/src/components/shared/status-badge/{status-badge.tsx,status-badge-variants.ts,status-badge.test.tsx,index.ts}`
 
 **Interfaces:**
 
@@ -456,7 +456,7 @@ visual difference is provable early.
 - [ ] **Step 1: Write the failing test**
 
 ```tsx
-import { render, screen } from '@admin/testing/custom-render';
+import { render, screen } from '@platform/testing/custom-render';
 
 import { StatusBadge } from './status-badge';
 
@@ -565,7 +565,7 @@ Expected: PASS, 3 tests.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/admin/src/components/shared/status-badge
+git add apps/platform/src/components/shared/status-badge
 git commit -m "feat(admin): add admin-owned StatusBadge pill"
 ```
 
@@ -608,9 +608,9 @@ page author remembering.
 
 **Files:**
 
-- Create: `apps/admin/src/components/shared/card/{card.tsx,card-variants.ts,card.test.tsx,index.ts}`
-- Create: `apps/admin/src/components/shared/page-header/{page-header.tsx,page-header-variants.ts,page-header.test.tsx,index.ts}`
-- Create: `apps/admin/src/components/shared/disclosure/{disclosure.tsx,disclosure-variants.ts,disclosure.test.tsx,index.ts}`
+- Create: `apps/platform/src/components/shared/card/{card.tsx,card-variants.ts,card.test.tsx,index.ts}`
+- Create: `apps/platform/src/components/shared/page-header/{page-header.tsx,page-header-variants.ts,page-header.test.tsx,index.ts}`
+- Create: `apps/platform/src/components/shared/disclosure/{disclosure.tsx,disclosure-variants.ts,disclosure.test.tsx,index.ts}`
 
 **Interfaces:**
 
@@ -625,7 +625,7 @@ page author remembering.
 - [ ] **Step 1: Write the failing Card test**
 
 ```tsx
-import { render, screen } from '@admin/testing/custom-render';
+import { render, screen } from '@platform/testing/custom-render';
 
 import { Card } from './card';
 
@@ -708,7 +708,7 @@ replacing the `advanced`/`advancedSummary`/`advancedBody` slots that
 - [ ] **Step 6: Commit**
 
 ```bash
-git add apps/admin/src/components/shared/card apps/admin/src/components/shared/page-header apps/admin/src/components/shared/disclosure
+git add apps/platform/src/components/shared/card apps/platform/src/components/shared/page-header apps/platform/src/components/shared/disclosure
 git commit -m "feat(admin): add Card, PageHeader and Disclosure composition primitives"
 ```
 
@@ -821,7 +821,7 @@ The largest surface, and the one carrying the highest-risk component.
       Then load the page and confirm the preview still renders both light and dark
       tenant ramps, and that `chromeOn` still produces the terminal frame.
 - [ ] **Extra step: confirm the exception is exactly one directory.**
-      Run: `grep -rln "@blog/ui" apps/admin/src/components/features/look`
+      Run: `grep -rln "@blog/ui" apps/platform/src/components/features/look`
       Expected: only paths under `look-preview/preview-sample/`.
 
 ---
@@ -932,8 +932,8 @@ the two plans have to land in order — not a reason to restyle the file.
 
 **Files:**
 
-- Modify: `apps/admin/package.json`, `apps/admin/tsconfig.json`,
-  `apps/admin/vitest.config.ts`, `apps/admin/next.config.ts`, `apps/admin/index.css`
+- Modify: `apps/platform/package.json`, `apps/platform/tsconfig.json`,
+  `apps/platform/vitest.config.ts`, `apps/platform/next.config.ts`, `apps/platform/index.css`
 - Delete: `packages/ui/src/atoms/textarea/`
 - Modify: `packages/ui/COMPONENTS.md` (regenerated, never hand-edited)
 - Modify: `SPEC.md`, `CLAUDE.md`, `configs/tailwind/theme.css` header,
@@ -947,8 +947,8 @@ the two plans have to land in order — not a reason to restyle the file.
 - [ ] **Step 1: Confirm the only remaining reach is the allowlisted directory**
 
 ```bash
-grep -rln "@blog/ui" apps/admin/src | grep -v "look-preview/preview-sample/"
-grep -rnE "(text|bg|border|ring)-(text|surface|border|primary|brand)" apps/admin/src | grep -v "look-preview/preview-sample/"
+grep -rln "@blog/ui" apps/platform/src | grep -v "look-preview/preview-sample/"
+grep -rnE "(text|bg|border|ring)-(text|surface|border|primary|brand)" apps/platform/src | grep -v "look-preview/preview-sample/"
 ```
 
 Expected: no output from either. Anything else printed is a surface that was
@@ -962,7 +962,7 @@ import all remain. Removing them is not the goal; confining the reach is.
 
 An unenforced exception is exactly how 68 import sites accumulated, so add an
 ESLint rule in `configs/eslint/` restricting `@blog/ui` imports under
-`apps/admin` to `look-preview/preview-sample/` — `no-restricted-imports` with a
+`apps/platform` to `look-preview/preview-sample/` — `no-restricted-imports` with a
 `files` override for the allowlisted path. Remember `files` globs resolve against
 the consuming workspace, not the repo root; verify with `eslint --print-config`
 on a file inside and a file outside the directory.
@@ -1000,11 +1000,11 @@ them is not evidence they are unused.
 Orchestrator-owned files, not layer-agent ones:
 
 - `CLAUDE.md` — contract becomes `admin → db, auth, config, utils`; the
-  `apps/admin` bullet drops `ui` and states admin owns its presentational
+  `apps/platform` bullet drops `ui` and states admin owns its presentational
   primitives, not only its interactive ones.
 - `SPEC.md` — the same contract change, plus the admin token layer.
 - `configs/tailwind/theme.css` header — its "only source of Tailwind theme
-  tokens" claim gains `apps/admin`'s layer as a named exception, alongside the
+  tokens" claim gains `apps/platform`'s layer as a named exception, alongside the
   existing `--code-*` carve-out.
 - `docs/context/frontend-conventions.md` — dependency rules.
 
@@ -1044,7 +1044,7 @@ details panel / danger zone (17), owner dashboard / unauthorized / platform root
 shared field + dialog (18). Exactly one directory is deliberately excluded —
 `tenant-overview`, which the companion plan deletes — and Task 18 says so
 explicitly rather than leaving it silently unclaimed. Nothing else under
-`apps/admin/src/components` is unaccounted for; verified by enumerating every
+`apps/platform/src/components` is unaccounted for; verified by enumerating every
 component directory against this plan.
 
 **Placeholder scan.** No TBD/TODO. Every code step carries real code; every run

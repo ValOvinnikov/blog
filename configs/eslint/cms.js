@@ -6,7 +6,7 @@ export default [
   ...react,
   ...noUpstreamImports,
   {
-    // Matches web/admin's React-component convention and the actual
+    // Matches web/platform's React-component convention and the actual
     // majority of existing cms code (arrow-const schema/structure helpers).
     files: ['**/*.{ts,tsx}'],
     rules: {

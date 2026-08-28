@@ -16,7 +16,7 @@ among others — without any `@blog/ui` change.
 neutral base`) resolved entirely in `apps/web`, applied uniformly to look
 (theme tokens + logo), voice (next-intl packs), and behavior (feature toggles).
 Presets are code-owned in `@blog/config`. Each tenant's preset + overrides live
-in tenant-scoped Postgres rows edited through `apps/admin`; Sanity keeps
+in tenant-scoped Postgres rows edited through `apps/platform`; Sanity keeps
 editorial content only. Phase 8 resolves the tenant by host. `@blog/ui` stays
 pure and ignorant throughout.
 
@@ -43,7 +43,7 @@ the final shape):**
   (**supersedes the storage decision in Phases 2–4**: theme/voice/feature
   config lives in Postgres, not Sanity; owns the Phase 0 split rationale)
 - `docs/superpowers/specs/2026-08-13-admin-panel-product-design.md`
-  (the `apps/admin` editing surface those phases now write through)
+  (the `apps/platform` editing surface those phases now write through)
 
 ---
 
@@ -97,7 +97,7 @@ Phase 0 (tenant registry) ──▶ Phase 2 (theme, Postgres) ──▶ Phase 3 
                                           │                        │
                                           ├──────▶ Phase 4 (behavior C)
                                           ▼
-                              apps/admin (editing surface for 2–4)
+                              apps/platform (editing surface for 2–4)
 
 Phase 1 (appearance object) ── independent; editorial content, stays in Sanity
 Phase 5 (modules: gallery → faq → …) inherits appearance+theme
@@ -126,7 +126,7 @@ always had — the split moved the cheap half forward, not the risky half.
 **Delivers:** the `tenants`, `tenant_domains`, and `memberships` tables plus
 one seed row for the existing site — the identity every later phase's config
 hangs off. **Nothing reads it at request time**: the public site keeps
-resolving Sanity from env vars, unchanged. The only consumer is `apps/admin`.
+resolving Sanity from env vars, unchanged. The only consumer is `apps/platform`.
 **Spec:** multi-tenant doc (registry half) + the tenant-config doc's
 § Sequencing. **Migration:** three new tables via `drizzle-kit generate`
 (dev-free / prod-gated); no existing table or row is touched.
@@ -429,6 +429,6 @@ For every epic above, at build time:
 - Multi-tenant doc → split across Phase 0 (registry tables) and Phase 8
   (resolution runtime), with every blocking decision left on Phase 8. ✔
 - Tenant-config doc → supersedes Phases 2–4's storage (Postgres, not Sanity)
-  and owns the Phase 0 rationale; admin-panel doc → the `apps/admin` surface
+  and owns the Phase 0 rationale; admin-panel doc → the `apps/platform` surface
   those phases write through. ✔
 - No orphan spec sections; no phase without an owning-layer breakdown.

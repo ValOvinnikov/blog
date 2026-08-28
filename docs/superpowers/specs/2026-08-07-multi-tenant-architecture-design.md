@@ -21,15 +21,15 @@ day, and decisions 11–12 plus a new §7 on the same date.
 
 > **Naming note — this document uses post-rename names throughout.** Settled
 > 2026-08-28: the marketing workspace is **`apps/marketing`** (apex domain),
-> the admin workspace is renamed **`apps/admin` → `apps/platform`** and served
+> the admin workspace is renamed **`apps/platform` → `apps/platform`** and served
 > at **`platform.<domain>`**, and that app's `(platform)` route group is
 > renamed **`(operator)`** — it is an authorization boundary (`requireAdmin()`
 > against `admins`), not a product name, and leaving both meanings in play
 > would recreate exactly the drift #1647 is about. **The route-group rename has
-> landed (#2270 Part 1); the workspace rename (`apps/admin` → `apps/platform`)
+> landed (#2270 Part 1); the workspace rename (`apps/platform` → `apps/platform`)
 > is still pending** — it is a cross-cutting change with a Vercel Root-Directory
 > console gate and is tracked separately (#2270 Part 2). Read `apps/platform`
-> here as "the app that is `apps/admin` on disk today".
+> here as "the app that is `apps/platform` on disk today".
 > Phase 0 (tenant registry) has
 > already shipped; epic 2a (per-tenant content reads infrastructure) has
 > shipped too, proven on one loader — epic 2b (migrating the remaining
@@ -900,7 +900,7 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    to the provisioning run's console. It is deliberately **not** persisted —
    routing the outcome through `reportStepStatus` needs a new
    `TENANT_PROVISIONING_STEP` member, and every such member crosses into
-   `apps/admin`, which is mid-rename.
+   `apps/platform`, which is mid-rename.
    Persisting the outcome and rendering it for an operator is therefore a
    follow-up, as is pushing it to a human, since operator notification is a
    new capability rather than part of the grant.

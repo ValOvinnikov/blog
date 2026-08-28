@@ -97,7 +97,7 @@ jobs:
         id: admin
         run: |
           set -uo pipefail
-          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" admin --fallback=HEAD^1; then
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" platform --fallback=HEAD^1; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -389,7 +389,7 @@ jobs:
       # Variables (not Secrets) so they stay inspectable in run logs.
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
       # Distinct GitHub Environment variable from deploy-web's VERCEL_PROJECT_ID
-      # (admin-dev is its own Vercel project, rooted at apps/admin) — mapped to
+      # (admin-dev is its own Vercel project, rooted at apps/platform) — mapped to
       # the local name the Vercel CLI actually reads.
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_ADMIN }}
     steps:

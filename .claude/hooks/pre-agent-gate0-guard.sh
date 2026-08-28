@@ -41,7 +41,7 @@ subagent=$(printf '%s' "$input" | jq -r '.tool_input.subagent_type // empty' 2>/
 # The agents that own repo source files (CLAUDE.md's layer map). Only these
 # implement issues; everything else is review, discovery, or orchestration.
 case "$subagent" in
-config | cms | service | ui | web | db | admin-app | auth | insight) ;;
+config | cms | service | ui | web | db | platform-app | auth | insight) ;;
 *) exit 0 ;;
 esac
 

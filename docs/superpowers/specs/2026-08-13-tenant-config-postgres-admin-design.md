@@ -194,7 +194,7 @@ in `apps/web/src/app/api/generate-skim/route.ts`, and in `env.ts`'s env-var
 schemas), but there's no existing max-length convention for text fields
 (`identity-actions.ts`'s `updateDisplayNameAction` trims and checks
 non-empty, never caps length) and **no file-upload handling anywhere in this
-repo yet** — `apps/admin`'s logo/favicon upload is the first. So text-field
+repo yet** — `apps/platform`'s logo/favicon upload is the first. So text-field
 limits follow the existing trim-then-validate shape; file upload validation
 is new ground, not a reused pattern.
 
@@ -224,7 +224,7 @@ client-only check for anything persisted.
 - Tenant slug: `.regex(/^[a-z0-9-]+$/)` (URL-safe, since it's usable as a
   platform subdomain per the multi-tenant doc) plus a uniqueness check
   against the `tenants` table (Phase 8) — not just a format check.
-- Team invite email: Zod's built-in `.email()` — `apps/admin` is a new
+- Team invite email: Zod's built-in `.email()` — `apps/platform` is a new
   codebase free to standardize on Zod throughout rather than mix in
   `apps/web`'s separate loose-regex `isValidEmail` helper.
 
@@ -287,12 +287,12 @@ code-owned preset defaults (`PRESET_REGISTRY`, `CONSOLE_VOICE_PACK`,
 `deepMergePartial`) are unaffected — they're config-layer, storage-agnostic,
 and already built correctly (#1419).
 
-## The admin app — `apps/admin`, a new workspace
+## The admin app — `apps/platform`, a new workspace
 
 Not a route group inside `apps/web`. A genuinely separate app, matching the
 precedent already in this repo: `apps/cms` (Sanity Studio) is already its own
 Vercel deployment, its own domain, "Vercel-hosted, not `sanity deploy`"
-(`SPEC.md` §13). `apps/admin` follows the same shape:
+(`SPEC.md` §13). `apps/platform` follows the same shape:
 
 - New workspace: `package.json`, `tsconfig.json`, `vitest.config.ts`, a
   Next.js app skeleton — **reconsidered back from Vite+React to Next.js**
@@ -329,7 +329,7 @@ this is a clean correction, not an undo of shipped work. `#1203` (the
 `admins` table) is unaffected — correct regardless of which app reads it.
 `#1204` (`requireAdmin()` + `/admin` route-group _inside_ `apps/web`) gets
 rescoped: the `requireAdmin()` logic is still right, it moves to
-`apps/admin`'s own root layout instead of an `apps/web` route group.
+`apps/platform`'s own root layout instead of an `apps/web` route group.
 
 ## Deployment topology (confirmed, not new — restated for this doc's scope)
 
@@ -346,7 +346,7 @@ rescoped: the `requireAdmin()` logic is still right, it moves to
   preview→production promotion gates, not from per-tenant deployments — and
   gets an extra lever once `settings_features`/Phase 4 lands: risky changes
   can be flag-gated per tenant as data, not deploy topology.
-- **`apps/admin` is a separate deployment from `apps/web`**, for the reasons
+- **`apps/platform` is a separate deployment from `apps/web`**, for the reasons
   in the previous section — this is a _second_ axis of blast-radius
   isolation (an admin-panel bug can't break the public site and vice versa),
   additive to Rolling Releases, not a replacement for the "no per-tenant
@@ -418,7 +418,7 @@ said project-per-tenant — this is additional grounding for why.
 
 ## Non-goals (recorded so this doesn't sprawl)
 
-- **Multi-tenant admin UX** (switching between tenants inside `apps/admin`,
+- **Multi-tenant admin UX** (switching between tenants inside `apps/platform`,
   per-tenant admin permission tiers beyond `OWNER`) — Phase 8's job, not this.
   This doc only makes the single-tenant-today shape _not_ need re-architecture
   when Phase 8 lands.
@@ -441,11 +441,11 @@ said project-per-tenant — this is additional grounding for why.
   Sanity project" to describe the shared-`@blog/db`, `tenantId`-scoped model.
 - `SPEC.md` §6 (content model) — `site_config` table, retirement of
   `settings_theme`/`settings_voice` from the Sanity content model.
-- ~~`SPEC.md` §4 (layer contracts) — `apps/admin` as a new workspace, its
+- ~~`SPEC.md` §4 (layer contracts) — `apps/platform` as a new workspace, its
   relationship to `@blog/db`/`@blog/config`/`@blog/ui`.~~ **Done early**
-  (#1453), because adding the `admin-app` subagent made `CLAUDE.md` assert
-  `apps/admin` as a `@blog/db` consumer, which §4 would otherwise have
-  contradicted. §13 (deployment topology) is still pending — `apps/admin` has
+  (#1453), because adding the `platform-app` subagent made `CLAUDE.md` assert
+  `apps/platform` as a `@blog/db` consumer, which §4 would otherwise have
+  contradicted. §13 (deployment topology) is still pending — `apps/platform` has
   no deploy job yet.
 - `docs/context/content-model.md` — remove the `settings_theme`/
   `settings_voice` entries this session added; document `site_config` instead.
