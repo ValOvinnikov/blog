@@ -397,7 +397,7 @@ describe(ProvisioningStatusView, () => {
 
     it('maps a 403 permission failure to a friendly headline and next step, with the raw text under Technical details', () => {
       const rawError =
-        'Sanity Access API POST /access/project/d8ui85m2/invites failed: 403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to invite administrators."}';
+        'Sanity Access API POST /access/project/xxxxx000/invites failed: 403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to invite administrators."}';
       renderFailed(rawError);
 
       expect(
@@ -414,7 +414,7 @@ describe(ProvisioningStatusView, () => {
 
     it('maps a 400 duplicate/already-in-use failure to a friendly headline and next step', () => {
       const rawError =
-        'Sanity Access API POST /access/project/d8ui85m2/invites failed: 400 {"statusCode":400,"error":"Bad Request","message":"This email is already a member of another project."}';
+        'Sanity Access API POST /access/project/xxxxx000/invites failed: 400 {"statusCode":400,"error":"Bad Request","message":"This email is already a member of another project."}';
       renderFailed(rawError);
 
       expect(
