@@ -4,7 +4,7 @@ import { TenantSwitcher } from '@admin/components/features/layout/tenant-switche
 import { auth } from '@admin/server/auth/auth';
 import { requireTenantById } from '@admin/server/auth/require-tenant-by-id';
 import {
-  platformNavSections,
+  operatorNavSections,
   tenantNavSections,
   type TNavTranslator,
 } from '@admin/utils/nav-sections/nav-sections';
@@ -33,7 +33,7 @@ export default async function TenantByIdLayout({ children, params }: TProps) {
   return (
     <AdminShell
       sections={[
-        ...platformNavSections(tNavSections),
+        ...operatorNavSections(tNavSections),
         ...tenantNavSections(tNavSections, tenant.id, tenant.name),
       ]}
       switcher={

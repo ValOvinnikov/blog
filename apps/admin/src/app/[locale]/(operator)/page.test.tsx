@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation';
 
-import PlatformIndexPage from './page';
+import OperatorIndexPage from './page';
 
-describe(PlatformIndexPage, () => {
+describe(OperatorIndexPage, () => {
   it('redirects to the tenant list', () => {
-    expect(() => PlatformIndexPage()).toThrow('NEXT_REDIRECT');
+    expect(() => OperatorIndexPage()).toThrow('NEXT_REDIRECT');
 
     expect(redirect).toHaveBeenCalledWith('/tenants');
   });

@@ -25,9 +25,10 @@ day, and decisions 11–12 plus a new §7 on the same date.
 > at **`platform.<domain>`**, and that app's `(platform)` route group is
 > renamed **`(operator)`** — it is an authorization boundary (`requireAdmin()`
 > against `admins`), not a product name, and leaving both meanings in play
-> would recreate exactly the drift #1647 is about. **Neither rename has been
-> executed yet**; the workspace rename is a cross-cutting change with a Vercel
-> Root-Directory console gate and is tracked separately. Read `apps/platform`
+> would recreate exactly the drift #1647 is about. **The route-group rename has
+> landed (#2270 Part 1); the workspace rename (`apps/admin` → `apps/platform`)
+> is still pending** — it is a cross-cutting change with a Vercel Root-Directory
+> console gate and is tracked separately (#2270 Part 2). Read `apps/platform`
 > here as "the app that is `apps/admin` on disk today".
 > Phase 0 (tenant registry) has
 > already shipped; epic 2a (per-tenant content reads infrastructure) has

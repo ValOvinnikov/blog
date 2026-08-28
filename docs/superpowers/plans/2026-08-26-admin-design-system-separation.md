@@ -905,7 +905,7 @@ The largest surface, and the one carrying the highest-risk component.
 
 ### Task 18: Owner dashboard and remaining pages
 
-**Files:** `src/components/features/layout/dashboard-tenant-picker/**`, `src/app/[locale]/unauthorized/page.tsx`, `src/app/[locale]/(platform)/page.tsx`, `src/components/shared/{form-field,confirm-dialog}/**`
+**Files:** `src/components/features/layout/dashboard-tenant-picker/**`, `src/app/[locale]/unauthorized/page.tsx`, `src/app/[locale]/(operator)/page.tsx`, `src/components/shared/{form-field,confirm-dialog}/**`
 
 **Surface specifics:**
 

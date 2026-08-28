@@ -1,9 +1,9 @@
 import { AdminShell } from '@admin/components/features/layout/admin-shell';
-import { PlatformBreadcrumb } from '@admin/components/features/layout/platform-breadcrumb';
+import { OperatorBreadcrumb } from '@admin/components/features/layout/operator-breadcrumb';
 import { auth } from '@admin/server/auth/auth';
 import { requireAdmin } from '@admin/server/auth/require-admin';
 import {
-  platformNavSections,
+  operatorNavSections,
   type TNavTranslator,
 } from '@admin/utils/nav-sections/nav-sections';
 import { getTranslations } from 'next-intl/server';
@@ -19,12 +19,12 @@ type TProps = {
  * placed under this segment are not covered by a layout and must call
  * `requireAdmin()` themselves.
  *
- * Its own directory path (`(platform)/layout.tsx`) has no dynamic segment —
+ * Its own directory path (`(operator)/layout.tsx`) has no dynamic segment —
  * `tenantId` belongs to routes several directories deeper — so it can't type
- * a `tenantId` param itself; `PlatformBreadcrumb` resolves that at runtime
+ * a `tenantId` param itself; `OperatorBreadcrumb` resolves that at runtime
  * instead via `useParams`.
  */
-export default async function PlatformLayout({ children }: TProps) {
+export default async function OperatorLayout({ children }: TProps) {
   const admin = await requireAdmin();
   const session = await auth();
   const tNavSections = (await getTranslations(
@@ -33,8 +33,8 @@ export default async function PlatformLayout({ children }: TProps) {
 
   return (
     <AdminShell
-      sections={platformNavSections(tNavSections)}
-      crumb={<PlatformBreadcrumb />}
+      sections={operatorNavSections(tNavSections)}
+      crumb={<OperatorBreadcrumb />}
       roleChip={{
         name: session?.user?.name ?? session?.user?.email ?? admin.role,
         role: admin.role,
