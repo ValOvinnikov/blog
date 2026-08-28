@@ -17,7 +17,7 @@ export type TReportStepStatusInput = {
  * Writes each provisioning step's status directly to Postgres via
  * `updateProvisioningStep` — the CI runner already holds a direct
  * connection (see `run.ts`'s `reactivateTenant` call), so this no longer
- * hops through `apps/admin` over HTTP. Never throws: a write failure here
+ * hops through `apps/platform` over HTTP. Never throws: a write failure here
  * must not mask the underlying step result the caller already logged and
  * is about to act on, so it's logged and swallowed instead.
  */
