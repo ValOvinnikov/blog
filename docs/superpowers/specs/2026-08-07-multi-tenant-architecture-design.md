@@ -277,10 +277,41 @@ signup/signin entry point — lives in a **new `apps/platform`**, not in
   infrastructure, and an ESLint guard that deliberately confines it away from
   `@blog/ui`.
 
-Funnel: `platform.<domain>` (marketing + signup) → `admin.<domain>` (the
-owner's dashboard). Cross-app session is already solved — `@blog/auth` plus
+Funnel: the **apex domain** — the company's main page belongs at the root, not
+on a subdomain — for marketing and signup, then `admin.<domain>` for the owner's
+dashboard. Cross-app session is already solved: `@blog/auth` plus
 `AUTH_COOKIE_DOMAIN` is exactly this case, and both existing apps already call
 their own `NextAuth()`.
+
+**Host map once this lands.** The apex is the platform's own front door, so
+everything else is a subdomain — and the tenant wildcard has to coexist with
+them:
+
+| Host                  | Serves                                                                  |
+| --------------------- | ----------------------------------------------------------------------- |
+| `<domain>` (apex)     | `apps/platform` — marketing, pricing, signup                            |
+| `admin.<domain>`      | `apps/admin`                                                            |
+| `studio.<domain>`     | the shared Studio (§5, once collapsed)                                  |
+| `*.<domain>`          | `apps/web` — self-serve tenants at `<slug>.<domain>` (§Open decision 5) |
+| a tenant's own domain | `apps/web`, mapped on the custom-domain upgrade                         |
+
+Two consequences the wildcard proposal did not account for:
+
+- **The wildcard overlaps every platform subdomain.** `admin.`, `studio.`,
+  `ui-library.` and `web-storybook.` all match `*.<domain>`. Vercel resolves an
+  explicitly-assigned domain ahead of a wildcard held by another project, but
+  that must be **verified against the live projects before the wildcard is
+  added**, never assumed — getting it wrong points the admin panel at a tenant
+  site.
+- **Slug registration needs a reserved list.** Once `<slug>.<domain>` is minted
+  at signup, a tenant must not be able to claim `admin`, `studio`, `www`, `api`,
+  `app`, `mail`, `ui-library`, `web-storybook`, or any future platform
+  subdomain. This was not a requirement while tenants were custom-domain-only.
+
+**This displaces whatever holds the apex today.** The apex currently serves the
+existing blog (`apps/web`). Giving it to `apps/platform` means that blog moves
+to a subdomain or its own domain regardless of how §Open decision 12 resolves —
+so the apex call constrains decision 12 rather than waiting on it.
 
 **Layer contract:** `platform → ui, service, db, auth, config, utils, insight`
 — identical to `apps/web`'s. `SPEC.md` §4 and CLAUDE.md's layer map both need
@@ -446,8 +477,9 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    (`*.<platform>`) on the shared web project, giving every tenant
    `<slug>.<platform>` with **zero** per-tenant Vercel API calls at signup;
    a custom domain becomes a paid upgrade running the existing `map-domain`
-   step on demand. Also sidesteps domains-per-project limits.
-   **Needs sign-off.**
+   step on demand. Also sidesteps domains-per-project limits. Note the wildcard
+   overlaps the platform's own subdomains and forces a reserved-slug list at
+   signup — see §7's host map for both. **Needs sign-off.**
 6. **Exact free-tier editor allowance — resolved 2026-08-14, verified against
    `sanity.io/pricing`.** Free plan: 20 total seats, but **only
    Administrator and Viewer roles are available — there is no scoped Editor
