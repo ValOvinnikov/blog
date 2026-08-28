@@ -15,7 +15,7 @@ pnpm install
 
 # Copy env templates and fill in your Sanity project values
 cp apps/web/.env.example apps/web/.env.local
-cp apps/cms/.env.example apps/cms/.env.local
+cp packages/studio/.env.example packages/studio/.env.local
 ```
 
 Local-dev environment variables (see each app's `.env.example` for the full,
@@ -55,13 +55,13 @@ Scope to one workspace with `pnpm --filter <name>`, e.g.
 Each dev server binds an explicit, fixed port so `pnpm dev` can run every app
 at once without one silently falling back to a different port:
 
-| App / tool                   | Port   |
-| ---------------------------- | ------ |
-| `apps/web` (`next dev`)      | `3000` |
-| `apps/platform` (`next dev`) | `3001` |
-| `apps/cms` (`sanity dev`)    | `3333` |
-| `packages/ui` Storybook      | `6006` |
-| `apps/web` Storybook         | `6007` |
+| App / tool                       | Port   |
+| -------------------------------- | ------ |
+| `apps/web` (`next dev`)          | `3000` |
+| `apps/platform` (`next dev`)     | `3001` |
+| `packages/studio` (`sanity dev`) | `3333` |
+| `packages/ui` Storybook          | `6006` |
+| `apps/web` Storybook             | `6007` |
 
 ## Shared dependency versions (pnpm catalogs)
 
@@ -95,7 +95,7 @@ changes `specifier` fields (not resolved `version` fields) — a version bump
 belongs in its own change, not bundled with a catalog migration.
 The `catalog:` protocol resolves identically in a `dependencies`,
 `devDependencies`, or `peerDependencies` block — `react`/`react-dom` (in
-`dependencies` for `apps/cms`/`apps/web`, `peerDependencies` for
+`dependencies` for `packages/studio`/`apps/web`, `peerDependencies` for
 `packages/ui`) confirmed this alongside the earlier `devDependencies`-only
 migrations.
 

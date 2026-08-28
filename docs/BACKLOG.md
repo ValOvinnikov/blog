@@ -154,7 +154,7 @@ doc isn't deciding; it's flagged here, not silently resolved either way.
 
 - **Filed:** #272 — ✅ closed
 - **Depends on:** M1.1
-- **Body:** From `apps/cms` with `SANITY_STUDIO_PROJECT_ID`/`_DATASET` set:
+- **Body:** From `packages/studio` with `SANITY_STUDIO_PROJECT_ID`/`_DATASET` set:
   `pnpm deploy` (human runs it — agents never deploy). Then add CORS origins
   in manage.sanity.io: the Studio URL and `http://localhost:3333` (with
   credentials).
@@ -298,7 +298,7 @@ scope the idea, not the design.
   only) shipped as part of M3.3's epic #957 (#958–962). The remaining piece
   — related-post suggestions via embeddings — is now tracked under M3.4's
   semantic search epic #1045 instead of here.
-- **Labels:** `layer:cms`, `layer:service`
+- **Labels:** `layer:studio`, `layer:service`
 - **Depends on:** M1.4 (webhook plumbing)
 - **Body (historical):** Generate once at publish instead of paying
   inference per reader: Sanity webhook → serverless function → Claude
@@ -314,7 +314,7 @@ scope the idea, not the design.
 - **Filed:** epic #957 → #958 (config) · #959 (cms) · #960 (service) ·
   #961 (ui) · #962 (web) — all closed 2026-08-01.
 
-- **Labels:** `layer:cms`, `layer:service`, `layer:ui`, `layer:web`
+- **Labels:** `layer:studio`, `layer:service`, `layer:ui`, `layer:web`
 - **Depends on:** #250 (modules[] page-builder), M3.2 (generated summaries)
 - **Body:** Every post renders at three depths — 30-second skim / standard /
   deep-dive — as a persistent reader control. Builds on the modules
@@ -336,7 +336,7 @@ scope the idea, not the design.
 
 ### M3.5 · `feat(cms): editorial voice assistant in the Studio`
 
-- **Labels:** `layer:cms`, `enhancement`
+- **Labels:** `layer:studio`, `enhancement`
 - **Body:** Phase 1 of "my own LLM," without training anything: (1) Sanity AI
   Assist plugin with schema-aware field instructions (excerpt, OG fields, alt
   text); (2) a distilled `voice.md` profile (one-time Claude pass over all
@@ -618,7 +618,7 @@ AuthMenu island` — provider config + session for all three methods; the
 ### M5.5 · Newsletter signup — epic **#1044**
 
 - **Milestone / labels:** GitHub `M5 — Engagement` (moved from M6 — see the
-  milestone note above) · sub-issues add `layer:db` / `layer:cms` /
+  milestone note above) · sub-issues add `layer:db` / `layer:studio` /
   `layer:ui` / `layer:web`. **Independent of auth for gating** (no sign-in
   required to subscribe) — but shares Resend send-email infra with auth's
   email magic-link (D13); see #1104 below.

@@ -13,8 +13,8 @@ this skill says how to _ship it for review_.
 
 ## Scope: prefer per-layer PRs
 
-Split a multi-layer feature into separate PRs per layer (`config → cms →
-service → ui → web` when config changes are involved, otherwise `cms →
+Split a multi-layer feature into separate PRs per layer (`config → studio →
+service → ui → web` when config changes are involved, otherwise `studio →
 service → ui → web`; dependency order) — smaller diffs review faster.
 **Split only when each layer's PR merges to `main` green on its own**
 (typically additive changes).
@@ -305,7 +305,7 @@ Do not manually set Done.
 
 ```
 ## Summary
-- <what changed, listed per layer: config / cms / service / db / auth / ui / web / admin>
+- <what changed, listed per layer: config / studio / service / db / auth / ui / web / platform>
 
 ## Test plan
 - [ ] pnpm typegen (if schema changed)

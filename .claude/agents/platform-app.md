@@ -404,7 +404,7 @@ only if you use its parts as documented — a `Dialog.Root` re-implemented with 
 - **Voice settings mirror a curated subset of `apps/web`'s i18n keys.**
   `src/utils/voice-fields/voice-fields.ts` (`TVoiceOverrideKey`,
   `VOICE_FIELD_GROUPS`) is the Postgres-backed port of
-  `apps/cms/src/schema-types/documents/settings/voice.ts`'s field set — both
+  `packages/studio/src/schema-types/documents/settings/voice.ts`'s field set — both
   must stay in lockstep with `apps/web`'s
   `src/utils/apply-voice-overrides/apply-voice-overrides.ts` mapping. When a
   ticket adds a new tenant-customizable "voice" copy key (empty-states,

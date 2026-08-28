@@ -1,14 +1,14 @@
 ---
-name: cms-schema-practices
+name: studio-schema-practices
 description: >-
-  Best practices for Sanity schema types and content migrations in apps/cms.
+  Best practices for Sanity schema types and content migrations in packages/studio.
   Use when adding or restructuring schema types, writing validation, building
-  desk structure, or authoring a migration. Complements the cms agent and the
-  add-content-type skill — this is the quality bar for how CMS code is
+  desk structure, or authoring a migration. Complements the studio agent and the
+  add-content-type skill — this is the quality bar for how Studio code is
   written, not just what it models.
 ---
 
-# CMS schema & migration practices
+# Studio schema & migration practices
 
 The schema layer is the source of truth for every downstream type, so
 sloppiness here multiplies through `service`/`ui`/`web`. These rules exist
@@ -61,7 +61,7 @@ export const defineModeFieldPair = ({
 ];
 ```
 
-Shared helpers live in `apps/cms/src/schema-types/helpers/` — schema-only
+Shared helpers live in `packages/studio/src/schema-types/helpers/` — schema-only
 utilities, never exported to other packages.
 
 ### No magic strings — every stored value is a constant
@@ -148,7 +148,7 @@ defineType(...)` (`heroSchema`, `postSchema`, `siteSchema`), never
 
 ## Definition of done additions
 
-Beyond the cms agent's checklist:
+Beyond the studio agent's checklist:
 
 - No copy-pasted field pattern that a helper should own.
 - No stored-value literal repeated across files.

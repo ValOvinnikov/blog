@@ -27,10 +27,10 @@ cost more context than it saved and failed, even if the content was correct.
 
 ```
 apps/
-  cms        Sanity Studio: schemas, desk structure, migrations       (cms)
   web        Next.js frontend: routes, SEO, i18n, composition         (web)
-  platform   Next.js admin panel: separate deploy, no Sanity          (platform-app)
+  platform   Next.js admin panel: separate deploy, mounts Studio      (platform-app)
 packages/
+  studio     Sanity Studio library: schema, desk, migrations          (@blog/studio)
   config     Constants, generated Sanity types, routes builder        (@blog/config)
   service    Data access: Sanity client, groqd queries, transformers  (@blog/service)
   db         Relational data: Neon Postgres via Drizzle               (@blog/db)
@@ -42,7 +42,7 @@ docs/        BACKLOG.md (roadmap), DEPLOY.md
 SPEC.md      architecture — the durable reference
 ```
 
-Dependency order is `config → cms → service → ui → web`, with
+Dependency order is `config → studio → service → ui → web`, with
 `config → db → auth → web` and `config → db → auth → platform` (`apps/platform`, the admin panel)
 running alongside it rather than after it; the graph is acyclic. Source lives under `src/` in every workspace. Tests are co-located
 as `*.test.ts(x)`.

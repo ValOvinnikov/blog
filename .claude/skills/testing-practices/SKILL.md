@@ -13,7 +13,7 @@ Stack: **Vitest** as the runner, **@testing-library/react** + **jest-dom** for
 components, **jsdom** for the DOM environment. Shared config lives in
 `@blog/config/vitest/preset`.
 
-**Two-tier, by design.** Each layer agent (`cms`/`service`/`ui`/`web`) still
+**Two-tier, by design.** Each layer agent (`studio`/`service`/`ui`/`web`) still
 writes tests for what it implements — that responsibility isn't removed. The
 `test-writer` subagent (`.claude/agents/test-writer.md`) runs afterward as a
 dedicated, fresh-context pass over the same diff, per `develop-feature` step
@@ -108,7 +108,7 @@ export default mergeConfig(
 - **`web`** — route/page components with `service` functions mocked; assert that
   the data renders and metadata is produced. Keep these light; prefer pushing
   logic down into `ui`/`service` where it's cheaper to test.
-- **`apps/cms/migrations/*`** (when one is authored — the directory currently
+- **`packages/studio/migrations/*`** (when one is authored — the directory currently
   holds only the tooling) — a migration's `document()` handler is a pure
   function (doc → mutations), so test it directly. Cover **transform correctness**
   (a legacy doc maps to the expected module/field shape) and **idempotency**

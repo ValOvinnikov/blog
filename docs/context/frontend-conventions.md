@@ -8,11 +8,11 @@
 
 ```
 web → ui, service, db, auth, config, utils
-platform → db, auth, config, utils   (+ @blog/ui, scoped to look-preview/preview-sample/)
+platform → db, auth, config, utils, studio   (+ @blog/ui, scoped to look-preview/preview-sample/)
 service → config, utils   (no React, ever)
 db → config, utils        (no React, no Sanity SDK — sibling to service, not a dependent)
 ui → config               (no Sanity, no data fetching — stays publishable)
-cms → config              (generates the types typegen ships into config)
+studio → config, utils    (generates the types typegen ships into config)
 configs/* → consumed by all
 ```
 
@@ -34,7 +34,7 @@ drift from `apps/web`; an ESLint `no-restricted-imports` guard in
 ## Type flow
 
 ```
-Sanity schema (cms) ──typegen──► @blog/config ──► @blog/service ──► web ──props──► @blog/ui
+Sanity schema (@blog/studio) ──typegen──► @blog/config ──► @blog/service ──► web ──props──► @blog/ui
 ```
 
 One source of truth: a schema change surfaces as a TypeScript error anywhere a

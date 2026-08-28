@@ -19,15 +19,15 @@ React-free data the web app can consume.
 When invoked, before writing any code:
 
 1. Read the context brief you were given: issue summary, acceptance criteria,
-   and what the CMS agent produced (new type names, field names).
+   and what the `studio` agent produced (new type names, field names).
 2. Verify the types you'll query actually exist in
    `packages/config/src/sanity/generated/types.ts` — do not write queries
    against types that haven't been generated yet.
-3. **To determine which fields need `.notNull()`**, use the CMS agent's report
+3. **To determine which fields need `.notNull()`**, use the `studio` agent's report
    as the primary source — it lists each field with its required/optional status.
    Generated types mark every field optional regardless of `.required()` validation
-   and cannot be trusted for this. If no CMS report was provided, read the schema
-   files in `apps/cms/src/schema-types/` directly.
+   and cannot be trusted for this. If no `studio` report was provided, read the schema
+   files in `packages/studio/src/schema-types/` directly.
 4. Read the existing service files in the relevant domain folder before creating
    anything new — understand current naming conventions. If existing files
    conflict with the Folder Structure spec below, follow the spec, not the files,
