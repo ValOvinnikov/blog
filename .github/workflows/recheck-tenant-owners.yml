@@ -1,0 +1,91 @@
+name: Recheck Tenant Owners
+
+# Sweeps every fully core-provisioned, active tenant and re-checks whether
+# its owner has accepted their Sanity invite, promoting them to
+# `administrator` once they have (see `packages/db/scripts/recheck-tenant-owners/`
+# and `elevateTenantOwner`). `provision-tenant.yml` only checks once, right
+# after provisioning — a human owner routinely accepts well after that
+# single check, so this scheduled sweep is the recurring re-check.
+#
+# Cron runs every 6 hours: ~12 checks within `elevateTenantOwner`'s existing
+# 3-day stall threshold (good resolution for detecting a stall promptly),
+# while also elevating a genuinely-accepted owner within a few hours rather
+# than up to a full day later.
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Which Neon branch the tenant registry lives in — leave default for the normal scheduled-sweep target'
+        required: false
+        type: choice
+        options: [development, production]
+        default: production
+
+permissions:
+  contents: read
+
+# One sweep of every tenant at a time — a scheduled run firing while a prior
+# one is still running should queue, not overlap (a Sanity role grant racing
+# on the same project would be undesirable), same reasoning as
+# provision-tenant.yml's per-tenant concurrency guard.
+concurrency:
+  group: recheck-tenant-owners
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 11.21.0
+  NODE_VERSION: '22'
+
+jobs:
+  recheck:
+    name: Recheck tenant owners
+    runs-on: ubuntu-latest
+    # Lighter work per tenant than Provision Tenant (one ACL read plus, at
+    # most, one role grant, no Sanity project creation or Vercel work) — 10
+    # minutes is ample even for a large tenant count.
+    timeout-minutes: 10
+    # Reuses the same production GitHub Environment every other prod-affecting
+    # job in this repo uses — see provision-tenant.yml's own comment on this.
+    # Unlike those, this job's trigger is `schedule:`, with no human present
+    # to satisfy a required-reviewer rule — if one is ever added to this
+    # shared environment, this workflow would silently stall forever rather
+    # than run unattended. Give this job its own environment first if that
+    # protection is ever configured.
+    environment: production
+    env:
+      SANITY_MANAGEMENT_TOKEN: ${{ secrets.SANITY_MANAGEMENT_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+      # `schedule`-triggered runs have a null `inputs` context, so every
+      # reference here falls back to 'production' rather than reading
+      # `inputs.environment` bare. Same `:?` hard-fail idiom as
+      # provision-tenant.yml's own "Select tenant registry database URL"
+      # step — a shell `if`, not the `${{ A && B || C }}` expression idiom,
+      # since that returns the FALSE branch whenever a not-yet-configured
+      # secret evaluates to `''` (falsy).
+      - name: Select tenant registry database URL
+        env:
+          TARGET_ENVIRONMENT: ${{ inputs.environment || 'production' }}
+          DEV_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL_DEV }}
+          PROD_URL: ${{ secrets.TENANT_REGISTRY_DATABASE_URL_PROD }}
+        run: |
+          set -euo pipefail
+          if [ "$TARGET_ENVIRONMENT" = development ]; then
+            SELECTED="$DEV_URL"
+            SELECTED_NAME=TENANT_REGISTRY_DATABASE_URL_DEV
+          else
+            SELECTED="$PROD_URL"
+            SELECTED_NAME=TENANT_REGISTRY_DATABASE_URL_PROD
+          fi
+          : "${SELECTED:?empty — set the $SELECTED_NAME secret on the production environment}"
+          echo "DATABASE_URL=$SELECTED" >> "$GITHUB_ENV"
+      - name: Run owner-elevation sweep
+        run: pnpm --filter @blog/db db:recheck-tenant-owners

@@ -905,6 +905,17 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    follow-up, as is pushing it to a human, since operator notification is a
    new capability rather than part of the grant.
 
+   **The scheduled read now exists (#2275).** `elevateTenantOwner` originally
+   ran once, synchronously, right after provisioning — the overwhelming
+   majority of real signups observed `PENDING_ACCEPTANCE` on that single run
+   and nothing ever re-checked. `.github/workflows/recheck-tenant-owners.yml`
+   sweeps every `ACTIVE`/`READY` tenant every 6 hours and re-runs
+   `elevateTenantOwner` per candidate — ~12 checks within the 3-day stall
+   threshold, cheap even for a tenant that never accepts (one ACL read,
+   no-op once already `administrator`). Still not persisted to the
+   `tenants` row or pushed to a human — #2274 and #2272 remain the
+   follow-ups for that.
+
 10. **Trial lifecycle & abandoned-tenant reclamation — RESOLVED 2026-08-28.** Sanity imposes no project-count limit (confirmed by the
     project owner, 2026-08-28), so trials need not conserve projects and a
     no-card trial is viable. Recommendation: **one project per tenant from
