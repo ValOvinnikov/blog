@@ -3,7 +3,7 @@
 > Shared Auth.js configuration for the two Next.js apps.
 
 Holds the Auth.js (`next-auth` v5) configuration that `apps/web` and
-`apps/admin` each pass to their own `NextAuth()` call — providers, the
+`apps/platform` each pass to their own `NextAuth()` call — providers, the
 Drizzle adapter binding, session strategy, and the `session` callback that
 puts `user.id` on `session.user`. It exists so both apps share one
 configuration rather than maintaining two independently: a difference in
@@ -19,7 +19,7 @@ logic does not belong here.
 
 - **Depends on:** `@blog/db` (the adapter tables — `users`, `accounts`,
   `sessions`, `verificationTokens`), `next-auth`, `@auth/drizzle-adapter`
-- **Consumed by:** `apps/web`, `apps/admin` — each constructs its own
+- **Consumed by:** `apps/web`, `apps/platform` — each constructs its own
   `NextAuth()` instance from `buildAuthConfig()` so it keeps its own
   `auth`/`handlers` bound to its own runtime
 - **Never imports:** React components, `@blog/ui`, `@blog/service`, or a
