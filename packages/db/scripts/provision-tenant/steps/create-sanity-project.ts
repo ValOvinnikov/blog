@@ -19,10 +19,9 @@ export type TCreateSanityProjectResult = {
   sanityDataset: string;
 };
 
-// `viewer` is the only project-member role `SANITY_MANAGEMENT_TOKEN` (an
-// org-level "create project" token) has permission to grant — attempting
-// `administrator` 403s. Do not "correct" this back; an operator upgrades an
-// invitee to administrator by hand in the Sanity Manage UI after they accept.
+// `viewer` is the only project-member role the invites endpoint accepts —
+// attempting `administrator` here 403s. It's still reachable after the
+// owner accepts, via the ACL endpoint — see `elevateTenantOwner`.
 const TENANT_PROJECT_MEMBER_ROLE = 'viewer';
 
 /**

@@ -1,7 +1,11 @@
 /**
  * Provisioning workflow entrypoint — runs the six independently-idempotent
  * steps in order for one tenant, writing each step's status directly to
- * Postgres (via `reportStepStatus`) both on success and failure.
+ * Postgres (via `reportStepStatus`) both on success and failure, then
+ * attempts to elevate the owner to Sanity `administrator` (see
+ * `elevateTenantOwner`) — an owner who hasn't yet accepted their invite
+ * never fails this run, since that step polls a live external event with no
+ * fixed timeline.
  *
  * Invoked only by `.github/workflows/provision-tenant.yml` via
  * `pnpm --filter @blog/db db:provision-tenant -- --tenant-id=<uuid>` — never
@@ -28,6 +32,10 @@ import { reportStepStatus } from './lib/report-step-status';
 import { createTenantRevalidateWebhook } from './steps/create-revalidate-webhook';
 import { createTenantSanityProject } from './steps/create-sanity-project';
 import { createTenantStudio } from './steps/create-studio-vercel-project';
+import {
+  ELEVATE_TENANT_OWNER_OUTCOME,
+  elevateTenantOwner,
+} from './steps/elevate-tenant-owner';
 import { mapTenantDomain } from './steps/map-domain';
 import { persistTenantSanityToken } from './steps/persist-sanity-token';
 import { seedTenantContent } from './steps/seed-content';
@@ -144,6 +152,27 @@ export async function runSteps(
       // its own idempotency check.
       return { ok: false };
     }
+  }
+
+  // Runs only once the tenant is fully provisioned and never affects this
+  // run's own result — the owner accepting their invite is outside this
+  // script's control, so PENDING_ACCEPTANCE/STALLED are expected, common
+  // outcomes, not failures.
+  try {
+    const outcome = await elevateTenantOwner(tenant, env);
+    if (outcome === ELEVATE_TENANT_OWNER_OUTCOME.STALLED) {
+      console.error(
+        `provision-tenant: tenant "${tenantId}"'s owner still hasn't accepted their Sanity invite — administrator grant is stalled, not failed.`,
+      );
+    } else if (outcome === ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP) {
+      console.error(
+        `provision-tenant: tenant "${tenantId}"'s Sanity project has more than one human member — cannot tell which is the owner, so no role was granted. Needs manual review.`,
+      );
+    }
+  } catch (error) {
+    console.error(
+      `provision-tenant: elevate-tenant-owner failed for tenant "${tenantId}": ${sanitizeLogMessage(error)}`,
+    );
   }
 
   return { ok: true };
