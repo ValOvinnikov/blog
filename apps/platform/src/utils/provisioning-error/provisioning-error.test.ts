@@ -3,14 +3,14 @@ import { classifyProvisioningError } from './provisioning-error';
 describe(classifyProvisioningError, () => {
   it('classifies a 403 permission failure', () => {
     const rawError =
-      'Sanity Access API POST /access/project/d8ui85m2/invites failed: 403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to invite administrators."}';
+      'Sanity Access API POST /access/project/xxxxx000/invites failed: 403 {"statusCode":403,"error":"Forbidden","message":"Missing permission to invite administrators."}';
 
     expect(classifyProvisioningError(rawError)).toBe('permission');
   });
 
   it('classifies a 400 duplicate/already-in-use failure', () => {
     const rawError =
-      'Sanity Access API POST /access/project/d8ui85m2/invites failed: 400 {"statusCode":400,"error":"Bad Request","message":"This email is already a member of another project."}';
+      'Sanity Access API POST /access/project/xxxxx000/invites failed: 400 {"statusCode":400,"error":"Bad Request","message":"This email is already a member of another project."}';
 
     expect(classifyProvisioningError(rawError)).toBe('duplicate');
   });
