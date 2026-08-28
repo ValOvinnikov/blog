@@ -64,7 +64,7 @@ jobs:
       group: deploy-dev-changes
       cancel-in-progress: true
     outputs:
-      cms: ${{ steps.cms.outputs.changed }}
+      studio: ${{ steps.studio.outputs.changed }}
       web: ${{ steps.web.outputs.changed }}
       admin: ${{ steps.admin.outputs.changed }}
     steps:
@@ -73,11 +73,11 @@ jobs:
           persist-credentials: false
           fetch-depth: 2
 
-      - name: Is cms affected?
-        id: cms
+      - name: Is studio affected?
+        id: studio
         run: |
           set -uo pipefail
-          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" cms --fallback=HEAD^1; then
+          if npx --yes "turbo-ignore@${TURBO_IGNORE_VERSION}" @blog/studio --fallback=HEAD^1; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -111,7 +111,7 @@ jobs:
     needs: changes
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.cms == 'true' ||
+      needs.changes.outputs.studio == 'true' ||
       needs.changes.outputs.web == 'true' ||
       needs.changes.outputs.admin == 'true'
     runs-on: ubuntu-latest
@@ -142,7 +142,7 @@ jobs:
   # schema+migration merge can't leave dev's data behind its code (the #355
   # failure mode). No artifact backup here — dev is the disposable staging line
   # (also refreshed from prod by #363); prod keeps the backup + approval gate.
-  # Gated on cms||web — the union of the jobs that `needs` it — rather than on
+  # Gated on studio||web — the union of the jobs that `needs` it — rather than on
   # `verify`'s wider condition, so an admin-only merge doesn't run a Sanity
   # migration for an app that never touches Sanity; migrate is still never
   # skipped out from under a deploy that depends on it. migrate:deploy is a
@@ -153,7 +153,7 @@ jobs:
     needs: [changes, verify]
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.cms == 'true' ||
+      needs.changes.outputs.studio == 'true' ||
       needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -182,7 +182,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
       - name: Apply pending migrations
         if: ${{ env.SANITY_AUTH_TOKEN != '' }}
-        working-directory: apps/cms
+        working-directory: packages/studio
         run: pnpm migrate:deploy --yes
 
   # Apply Drizzle/db schema migrations to the dev Neon branch BEFORE dev
@@ -190,8 +190,8 @@ jobs:
   # migration" discipline as the content `migrate` job above, for the
   # separate relational store (`packages/db`, see .claude/agents/db.md's
   # "Migrations" section). `deploy-web` and `deploy-admin` both depend on
-  # `@blog/db` (apps/cms never touches Postgres), so this is gated on
-  # web||admin, not `cms`, and only those two (not `deploy-studio`) need it
+  # `@blog/db` (the Studio never touches Postgres), so this is gated on
+  # web||admin, not `studio`, and only those two (not `deploy-studio`) need it
   # below. No artifact backup here — dev is the disposable staging line, same
   # stance as the content migrate job. `drizzle-kit migrate` is a no-op when nothing is
   # pending, and the apply step is guarded on DATABASE_URL_UNPOOLED so the
@@ -269,7 +269,7 @@ jobs:
     needs: [changes, verify, migrate]
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.cms == 'true'
+      needs.changes.outputs.studio == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     concurrency:

@@ -87,7 +87,7 @@ jobs:
       # recoverable.
       - name: Back up production dataset
         if: ${{ env.SANITY_AUTH_TOKEN != '' }}
-        working-directory: apps/cms
+        working-directory: packages/studio
         run: pnpm dataset:export "${RUNNER_TEMP}/prod-${GITHUB_REF_NAME}.tar.gz"
       - name: Upload backup artifact
         if: ${{ env.SANITY_AUTH_TOKEN != '' }}
@@ -103,7 +103,7 @@ jobs:
       # gate above is the real human check.
       - name: Apply pending migrations
         if: ${{ env.SANITY_AUTH_TOKEN != '' }}
-        working-directory: apps/cms
+        working-directory: packages/studio
         run: pnpm migrate:deploy --yes
 
   # Apply any un-applied Drizzle/db schema migrations to production BEFORE
@@ -114,7 +114,7 @@ jobs:
   # no second approval mechanism. Every step is guarded on
   # DATABASE_URL_UNPOOLED so the whole job is a no-op until that secret is
   # configured — safe to land ahead of the console setup. `deploy-web` and
-  # `deploy-admin` both depend on `@blog/db` (apps/cms never touches
+  # `deploy-admin` both depend on `@blog/db` (the Studio never touches
   # Postgres), so only those two `need` this job below.
   migrate-db:
     name: Migrate prod database

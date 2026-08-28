@@ -264,8 +264,8 @@ changing a schema does **not** change existing documents.
   token — dry-runs each one read-only. It never mutates data.
 - `migrate:deploy --yes` is automated as part of the deploy pipeline: dev runs
   it via `deploy-development.yml`'s `migrate` job on merges to `main` that
-  touch `cms` or `web` (an admin-only merge skips it, since neither changed —
-  this condition is broader than `deploy-studio`'s `cms`-only gate, since a
+  touch `studio` or `web` (an admin-only merge skips it, since neither changed —
+  this condition is broader than `deploy-studio`'s `studio`-only gate, since a
   web-only change also needs the migration), production runs it
   unconditionally via `deploy-production.yml` on a `vX.Y.Z` tag push, after a
   dataset export backup and behind the `production` Environment's

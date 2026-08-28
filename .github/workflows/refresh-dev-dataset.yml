@@ -7,7 +7,7 @@ name: Refresh Dev Dataset
 #
 # Run this ONLY after confirming that release's production migrations have
 # already finished (never in parallel with or before them) — see
-# apps/cms/migrations/README.md and docs/DEPLOY.md for the full release
+# packages/studio/migrations/README.md and docs/DEPLOY.md for the full release
 # sequence. `workflow_dispatch` is the ONLY trigger; this must never fire
 # automatically (no `push`/`schedule`).
 on:
@@ -58,5 +58,5 @@ jobs:
       # before any network call) if anything required is missing or the
       # source/target direction isn't exactly production -> development.
       - name: Refresh development dataset from production
-        working-directory: apps/cms
+        working-directory: packages/studio
         run: pnpm dataset:refresh-dev

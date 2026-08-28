@@ -113,7 +113,7 @@ jobs:
           set -euo pipefail
           generated=packages/config/src/sanity/generated
           for attempt in 1 2 3; do
-            (cd apps/cms && pnpm typegen)
+            (cd packages/studio && pnpm typegen)
             if [ -z "$(git status --porcelain -- "$generated")" ]; then
               echo "Committed typegen output is current (attempt ${attempt})."
               exit 0
@@ -247,12 +247,12 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Validate migrations load
-        working-directory: apps/cms
+        working-directory: packages/studio
         run: pnpm exec sanity migrations list
 
       - name: Dry-run migrations (read-only; requires SANITY_API_READ_TOKEN)
         if: ${{ env.SANITY_READ_TOKEN != '' }}
-        working-directory: apps/cms
+        working-directory: packages/studio
         env:
           # The Sanity CLI authenticates non-interactively from SANITY_AUTH_TOKEN.
           SANITY_AUTH_TOKEN: ${{ env.SANITY_READ_TOKEN }}
@@ -302,7 +302,7 @@ jobs:
       # has no TTY for.
       - name: Validate documents against schema (read-only; requires SANITY_API_READ_TOKEN)
         if: ${{ env.SANITY_READ_TOKEN != '' }}
-        working-directory: apps/cms
+        working-directory: packages/studio
         env:
           SANITY_AUTH_TOKEN: ${{ env.SANITY_READ_TOKEN }}
         run: pnpm exec sanity documents validate --yes
