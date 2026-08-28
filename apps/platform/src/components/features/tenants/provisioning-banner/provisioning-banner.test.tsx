@@ -43,6 +43,7 @@ describe(ProvisioningBanner, () => {
         isOverallFailed={false}
         isProvisioningRunning={false}
         errorKind={undefined}
+        ownerElevationOutcome={undefined}
       />,
     );
 
@@ -72,6 +73,7 @@ describe(ProvisioningBanner, () => {
         isOverallFailed={false}
         isProvisioningRunning={true}
         errorKind={undefined}
+        ownerElevationOutcome={undefined}
       />,
     );
 
@@ -100,6 +102,7 @@ describe(ProvisioningBanner, () => {
         isOverallFailed={true}
         isProvisioningRunning={false}
         errorKind="duplicate"
+        ownerElevationOutcome={undefined}
       />,
     );
 
@@ -122,6 +125,7 @@ describe(ProvisioningBanner, () => {
         isOverallFailed={false}
         isProvisioningRunning={false}
         errorKind={undefined}
+        ownerElevationOutcome={undefined}
       />,
     );
 

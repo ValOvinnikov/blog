@@ -58,6 +58,7 @@ export const TenantOverviewView = ({
     isOverallFailed,
     isProvisioningRunning,
     errorKind,
+    ownerElevationOutcome,
   } = useProvisioningPoll(tenant, domainVerificationStatus);
 
   return (
@@ -97,6 +98,7 @@ export const TenantOverviewView = ({
         isOverallFailed={isOverallFailed}
         isProvisioningRunning={isProvisioningRunning}
         errorKind={errorKind}
+        ownerElevationOutcome={ownerElevationOutcome}
       />
 
       <TenantDetailsPanel

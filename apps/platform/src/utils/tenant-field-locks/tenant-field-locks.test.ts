@@ -136,6 +136,9 @@ describe(computeTenantFieldLocks, () => {
       [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
       [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: done,
       [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,
+      [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+      },
     };
 
     expect(

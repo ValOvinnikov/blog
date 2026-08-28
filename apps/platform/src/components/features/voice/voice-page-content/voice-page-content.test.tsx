@@ -63,6 +63,9 @@ const tenant: TTenant = {
     [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
       status: TENANT_PROVISIONING_STEP_STATUS.DONE,
     },
+    [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
+      status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+    },
   },
   studioVercelProjectId: null,
   seededAt: new Date('2026-01-01T00:00:00.000Z'),

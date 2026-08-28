@@ -1,8 +1,10 @@
 import {
   TENANT_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
+  ELEVATE_TENANT_OWNER_OUTCOME,
   type TTenantStatus,
   type TTenantProvisioningStepStatus,
+  type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
 import type { TDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 
@@ -35,6 +37,17 @@ const DOMAIN_VERIFICATION_TONE: Record<TDomainVerificationStatus, TBadgeTone> =
     ERROR: 'warn',
   };
 
+// A stall or an ambiguous membership is a completed check that needs an
+// operator's attention, not a failure — provisioning succeeded and the
+// tenant is live. There is deliberately no 'bad' tone here.
+const OWNER_ELEVATION_TONE: Record<TElevateTenantOwnerOutcome, TBadgeTone> = {
+  [ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED]: 'ok',
+  [ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR]: 'ok',
+  [ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE]: 'neutral',
+  [ELEVATE_TENANT_OWNER_OUTCOME.STALLED]: 'warn',
+  [ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP]: 'warn',
+};
+
 export const tenantStatusTone = (status: TTenantStatus) =>
   TENANT_STATUS_TONE[status];
 
@@ -44,3 +57,6 @@ export const provisioningStepTone = (
 
 export const domainVerificationTone = (status: TDomainVerificationStatus) =>
   DOMAIN_VERIFICATION_TONE[status];
+
+export const ownerElevationTone = (outcome: TElevateTenantOwnerOutcome) =>
+  OWNER_ELEVATION_TONE[outcome];

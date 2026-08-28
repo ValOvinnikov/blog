@@ -114,7 +114,15 @@
     "runningDescription": "This page updates on its own.",
     "failedTitle": "Provisioning failed at step {step} of {total}",
     "failedDescription": "{step} — {reason}",
-    "failedDescriptionFallback": "This step failed — view the steps to retry."
+    "failedDescriptionFallback": "This step failed — view the steps to retry.",
+    "ownerElevationBadge": {
+      "STALLED": "Owner invite stalled",
+      "AMBIGUOUS_MEMBERSHIP": "Owner membership unclear"
+    },
+    "ownerElevationDescription": {
+      "STALLED": "The owner hasn't accepted their invite yet — nothing failed, but they can't edit their own content until they do.",
+      "AMBIGUOUS_MEMBERSHIP": "More than one membership matches this tenant's owner — resolve it manually in Sanity Manage."
+    }
   },
   "tenantOverviewPage": {
     "openSiteAction": "Open site ↗",
