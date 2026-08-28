@@ -537,16 +537,27 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
     Both are `pgEnum`-backed, so a change needs a generated migration.
     **Needs sign-off.**
 
-11. **Marketing project schema — OPEN (raised 2026-08-28).** Does the marketing
-    Sanity project (§7) reuse `apps/cms`'s existing schema, or get its own?
-    Recommendation: **reuse it.** Zero new schema work, it dogfoods the
-    page-builder module catalogue, and it keeps typegen single-output
-    (`packages/config/src/sanity/generated/types.ts` is generated from one
-    schema; a second schema means a second output and real complexity). The
-    cost is cosmetic — the marketing project's Studio lists blog document types
-    it will not use. If marketing genuinely outgrows the catalogue, that is
-    signal to extend the shared modules, which benefits tenants too.
-    **Needs sign-off.**
+11. **Marketing project schema — resolved 2026-08-28: reuse `apps/cms`'s
+    schema.** One CMS serves the marketing project and every tenant project.
+    Rationale (project owner, 2026-08-28): a single schema means a single place
+    for types, and nothing leaks from marketing into a tenant's UI — a tenant
+    site only renders documents that exist in its _own_ project's dataset, so an
+    unused document type in the shared schema is inert.
+
+    Two consequences worth holding:
+
+    - _Studio noise is solvable at the structure layer, not the schema layer._
+      `structureTool`'s desk structure and `document.newDocumentOptions` already
+      gate what is listed and what is creatable — `sanity.config.ts` does
+      exactly this today for `migrationState`. Under §5's per-host Studio
+      config that structure is computed per host, so marketing-only types can be
+      hidden from tenant Studios (and blog types from the marketing Studio) with
+      no second schema. The shared-Studio and shared-schema decisions reinforce
+      each other.
+    - _The marketing project joins the content-migration fan-out._ It is one
+      more project the per-tenant reconciler (§The migration story) has to
+      converge, and a newly-required field on a shared type turns it red until
+      migrated, exactly like any tenant. It is not exempt for being ours.
 
 12. **Incumbent (pre-tenancy) project adoption — PARTLY DEFERRED
     (2026-08-28).** Two Sanity projects predate tenancy, one per environment.
