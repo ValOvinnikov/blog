@@ -6,7 +6,9 @@ items handed off from Feature 6 of
 Output feeds per-epic `superpowers:writing-plans` passes and `board-keeper`
 ticketing. **All 7 items in §Open decisions are resolved as of 2026-08-14** —
 see that section for the final call on each. **Two of them — 3 (Studio
-hosting) and 5 (URL scheme) — were reopened on 2026-08-28**, after a
+hosting) and 5 (URL scheme) — were reopened on 2026-08-28** (decision 3's
+gating spike has since completed and proved the single-deployment shape
+viable — §5; the sign-off itself is still open), after a
 self-serve-provisioning requirement promoted two former Non-goals (self-serve
 signup, billing) into scope; three further decisions (8–10) were added the same
 day, and decisions 11–12 plus a new §7 (platform app) on the same date.
@@ -241,6 +243,85 @@ array (`defineConfig([...])`) is **not** viable: the list is fixed at build
 time, it leaks every tenant name into the bundle, and Sanity's docs state
 `hidden` is client-side UI only, never an access boundary.
 
+#### Spike outcome (#2260, 2026-08-28): shape (b) works
+
+The gating spike was built and run against two real tenant projects. **It
+works**, and the workspace-leak caveat in (b)'s description above does not
+arise, because the config is computed per request rather than being a static
+array.
+
+**Mechanism.** `SANITY_STUDIO_*` vars are _statically replaced_ at bundle
+time — the [Studio env-var docs](https://www.sanity.io/docs/studio/environment-variables)
+state that dynamic access like `process.env[key]` "will not work … in
+production" — which is exactly why a `sanity build` artifact is welded to one
+project. The documented way out is embedding the Studio as a route in a
+Next.js app via `next-sanity`'s `NextStudio`, where the config is an ordinary
+object built at request time; that same page names "moving from the default
+Vite-based bundler to … an embedded setup inside of Next.js" as a supported
+migration. The spike extracted the existing `sanity.config.ts` body into a
+`createStudioConfig({ projectId, dataset, name, title, basePath })` factory
+called from two places: the unchanged env-driven `sanity.config.ts` (inline
+`process.env.SANITY_STUDIO_*` preserved, so the Sanity bundler still inlines
+it) and a Server Component at `/studio/[tenant]/[[...tool]]` that resolves the
+tenant, `notFound()`s an unknown slug, and hands the values to a `'use client'`
+component rendering `<NextStudio>`.
+
+**Evidence — one running server, two projects differing in both projectId and
+dataset.** `/studio/tenant-a` and `/studio/tenant-b` each returned 200
+carrying only their own coordinates; `/studio/nope` 404'd. In a real browser
+each Studio booted, rendered a single workspace titled after its tenant with
+no workspace switcher, and issued credentialed calls to its _own_ project host
+(`<project-a>.api.sanity.io` and `<project-b>.api.sanity.io`, both 200).
+`next build`
+emitted the route as `ƒ` (server-rendered on demand) with **no tenant id
+anywhere in the build output**, client or server bundle. All four plugins
+(`structureTool`, `visionTool`, `codeInput`, `media`) bundled through Turbopack
+unmodified — the main technical risk did not materialise.
+
+**Isolation.** Per-request config is what makes this safe: a tenant's bundle
+never contains another tenant's identity, so there is no list to leak and
+nothing for `hidden` to fail to protect. Enforcement remains Sanity project
+membership — a user who guesses another slug gets a shell that cannot
+authenticate against that project.
+
+**CORS — one shared origin, and it is materially simpler.** Path-based
+selection serves every tenant Studio from a single origin, so each tenant
+project needs exactly _one_ CORS entry and it is the _same value_ for all of
+them. Provisioning already does precisely this for `ADMIN_APP_BASE_URL` (a
+platform-wide env var) in `create-sanity-project.ts`'s idempotent
+list-then-add block — the shared Studio origin is one more entry there, no new
+machinery. The spike confirmed credentialed cross-origin requests succeed
+under this model. A host-based variant (`studio-<slug>.<platform>`) instead
+needs a _distinct_ origin per project plus a Vercel domain mapping per tenant,
+or a wildcard origin that widens the allowed set to every platform subdomain.
+Host-based is otherwise a one-file change (read `Host` instead of the route
+param; `basePath` becomes a fixed `/studio`), so **CORS and domain management
+are the deciding factor, not the code** — and this interacts with the
+still-open URL-scheme call in §Open decision 5.
+
+**Cost — the `SPEC.md` §13 assessment.** §13 currently describes the Studio as
+a static `sanity build` export. Under (b) the ~8.8 MB / 319 JS chunks stay
+static CDN assets; only the HTML shell becomes a server invocation, once per
+Studio _page load_ — the Studio is an SPA, so in-app navigation and all
+content traffic still go browser-to-Sanity directly. Negligible at editor
+volumes. Against it: builds drop from one-per-tenant to one total, and the
+per-tenant Vercel project disappears entirely. **§13 is not amended until an
+implementation epic lands** — this is the assessment, not the change.
+
+**`sanity.cli.ts` is unaffected**, as predicted: it is CLI, not the browser
+bundle. Left untouched and verified — `pnpm typegen` produced zero drift in
+`packages/config/src/sanity/generated/`, and `migrate:list` enumerated
+normally.
+
+**Open item this surfaces — a layer-contract decision, not yet made.** The
+spike's tenant registry is a server-only env-var stand-in. The real lookup is
+the `tenants` table in `@blog/db`, and `apps/cms` may today depend only on
+`@blog/config`. A production shape (b) therefore needs either a new `cms → db`
+edge (adding `cms` to `db`'s consumer list in `CLAUDE.md` and `SPEC.md` §4) or
+an HTTP lookup against `apps/admin` (no new package edge, but a service call
+in the hot path of every Studio page load). This belongs to the implementation
+epic and must amend the layer contract explicitly before code lands.
+
 ### 6. Theming per tenant — no `@blog/ui` change
 
 Each tenant's `settings_theme` singleton (Feature 2) lives in _its own_ Sanity
@@ -466,6 +547,21 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    Studios are frozen at their provisioning commit — and it is incompatible
    with self-serve provisioning. Direction is shape (b), pending the
    Next-hosted-Studio spike. Full rationale in §5. **Needs sign-off.**
+
+   **Spike done 2026-08-28 (#2260): shape (b) is proven — it still needs the
+   sign-off.** One deployment served two real tenant projects, selected per
+   request, each Studio reaching only its own project; no tenant id ends up in
+   the build output; `sanity.cli.ts`, typegen and migrations are unaffected;
+   evidence and the cost assessment are in §5. Two things remain before an
+   implementation epic can be written: (i) **path- vs host-based selection**,
+   which is a CORS/domain-management call rather than a code one and is
+   entangled with §Open decision 5's reopened URL scheme; and (ii) the
+   **layer-contract choice** for the tenant lookup (`cms → db` edge vs. an HTTP
+   call to `apps/admin`), which must be settled and written into `CLAUDE.md` /
+   `SPEC.md` §4 before code lands. Adopting (b) also dissolves — rather than
+   renames — the `VERCEL_PROJECT_ID` collision that #1647/#1648/#1649/#1650
+   address for the Studio project, since the per-tenant Studio project ceases
+   to exist.
 4. **Postgres RLS — resolved 2026-08-14: yes.** Defense-in-depth on top of
    `forTenant(tenantId)` — a `tenant_id` session GUC + policies on every
    engagement table.
