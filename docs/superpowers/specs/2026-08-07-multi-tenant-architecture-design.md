@@ -572,24 +572,47 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    Recommendation: keep the CI driver for operator-initiated runs, and add a
    non-public worker driver for self-serve. **Needs sign-off.**
 
-9. **Tenant membership model — OPEN (raised 2026-08-28).** The owner is
-   currently invited to their Sanity project as `viewer`, because
-   `SANITY_MANAGEMENT_TOKEN` cannot grant `administrator`
+9. **Tenant membership model — mechanism settled 2026-08-28 by spike #2259;
+   the (b)-vs-(c) choice is still OPEN (raised 2026-08-28).** The owner is
+   currently invited to their Sanity project as `viewer`, because the invites
+   endpoint rejects `administrator`
    (`403 Missing permission to invite administrators` — #2020), and an operator
    bumps the role by hand in Sanity Manage afterwards. That is one human step
    per signup and is incompatible with self-serve. Note the asymmetry: the same
    token **can** mint `editor` _robot_ tokens (`seed-content.ts` already does),
    so platform-side write automation is **not** blocked by #2020 — only the
-   human path is. Three options:
-   - **(a)** Elevate the token per #2020 (human console work). First confirm
-     whether the limit is the token's scope or the org role of whoever minted
-     it; #2020 assumes scope is adjustable and that assumption is untested.
-   - **(b)** Grant the role _after_ acceptance via the ACL endpoint
-     (`GET`/`DELETE /projects/{id}/acl/`), which is a different endpoint from
-     `/invites` and may carry a different permission check. Cheap to test and
-     unblocks with no console change if it works. Counter-evidence: Sanity's
-     own guide runs ACL scripts with `--with-user-token`, hinting these
-     operations may be user-authenticated rather than org-token-authenticated.
+   human path is.
+
+   **What the spike established**, run against throwaway projects with an
+   organization token that reproduced the `403` baseline exactly:
+   - `GET /v2021-06-07/projects/{id}/acl/` authorises with that token — `200`.
+   - `PUT /v2021-06-07/projects/{id}/acl/{projectUserId}` with
+     `{"roleName":"administrator"}` returns `201` and the grant persists,
+     confirmed by reading the ACL back: `viewer` → `viewer+administrator`.
+   - Only the **legacy** Roles API permits it. The Access API equivalent
+     (`PUT /v2025-07-11/access/project/{id}/users/{sanityUserId}/roles/administrator`)
+     returns `403`, as does `/invites`. The `v2021-06-07` version is
+     load-bearing, not incidental.
+   - It works because creating a project makes the creating robot a project
+     administrator implicitly, satisfying Sanity's "only administrators may
+     assign roles with admin permissions" rule. The newer surfaces additionally
+     require a _human_ administrator, which a robot can never be.
+
+   Where that leaves the three options:
+   - **(a) — dead as written.** `administrator` is `appliesToRobots=false` at
+     both organization and project scope, so no token can ever hold it and
+     #2020's step 1 is impossible. The only surviving candidate for a pure
+     invite-time fix is the `access-manager` / `access-manager-robot` role
+     (`appliesToRobots=true`, evidently purpose-built) — untested, and worth
+     testing only if (b) is rejected.
+   - **(b) — confirmed to work.** Grant the role after acceptance via the ACL
+     endpoint: no console work, no new credential, no broadening of the token's
+     scope. A member appears in the ACL only once they accept, so polling that
+     list _is_ the acceptance signal — no separate mechanism needed. Two
+     implementation constraints: key the call on `projectUserId` (`p…`) from the
+     ACL listing rather than `sanityUserId` (`g…`), which `400`s; and roles are
+     additive, so decide whether to drop `viewer` after granting
+     `administrator` — a viewer holding any second role stops being a free seat.
    - **(c)** Drop Sanity human memberships entirely — a platform-hosted Studio
      authenticating against Auth.js, with a server-side proxy holding the
      per-tenant `editor` robot token. Removes both the operator step and the
@@ -599,8 +622,8 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
 
    Note (a) and (b) fix the _operator_ burden only. A self-serve user still
    needs a Sanity account and must accept a separate invite before writing —
-   two email round-trips in the funnel. Only (c) removes that.
-   **Test (b) first. Needs sign-off.**
+   two email round-trips in the funnel. Only (c) removes that. **(b) is now the
+   cheap default; the (b)-vs-(c) call still needs sign-off.**
 
 10. **Trial lifecycle & abandoned-tenant reclamation — OPEN (raised
     2026-08-28).** Sanity imposes no project-count limit (confirmed by the
