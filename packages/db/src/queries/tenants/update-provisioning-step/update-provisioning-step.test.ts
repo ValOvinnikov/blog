@@ -117,6 +117,38 @@ describe(updateProvisioningStep, () => {
     });
   });
 
+  it('stores the detail only when one is supplied', async () => {
+    const tenantId = await insertDraftTenant();
+
+    const result = await updateProvisioningStep({
+      tenantId,
+      step: 'OWNER_ELEVATION',
+      status: 'DONE',
+      detail: 'STALLED',
+    });
+
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.provisioningSteps?.['OWNER_ELEVATION']).toEqual({
+      status: 'DONE',
+      detail: 'STALLED',
+    });
+  });
+
+  it('omits detail entirely when not supplied, leaving prior step state unaffected', async () => {
+    const tenantId = await insertDraftTenant();
+
+    const result = await updateProvisioningStep({
+      tenantId,
+      step: 'SANITY_PROJECT',
+      status: 'DONE',
+    });
+
+    if (!result.ok) throw new Error('expected ok:true');
+    expect(result.data.provisioningSteps?.['SANITY_PROJECT']).toEqual({
+      status: 'DONE',
+    });
+  });
+
   it('leaves the overall provisioningStatus untouched when not supplied', async () => {
     const tenantId = await insertDraftTenant();
 

@@ -22,7 +22,7 @@ import {
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
 
-import { useProvisioningPoll } from './use-provisioning-poll';
+import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
 
 const STEP_POLL_INTERVAL_MS = 4000;
 const DOMAIN_POLL_INTERVAL_MS = 10000;
@@ -79,6 +79,115 @@ describe(useProvisioningPoll, () => {
     getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
     getDomainVerificationStatusActionMock.mockReset();
     getDomainVerificationStatusActionMock.mockResolvedValue('NOT_CONFIGURED');
+  });
+
+  describe('STEP_ORDER', () => {
+    it('is the six core provisioning steps, excluding OWNER_ELEVATION', () => {
+      expect(STEP_ORDER).toHaveLength(6);
+      expect(STEP_ORDER).not.toContain(
+        TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
+      );
+    });
+  });
+
+  describe('ownerElevationOutcome', () => {
+    it('is undefined when the OWNER_ELEVATION step has not reported yet', () => {
+      const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+      const { result } = renderHook(() =>
+        useProvisioningPoll(tenant, 'NOT_CONFIGURED'),
+      );
+
+      expect(result.current.ownerElevationOutcome).toBeUndefined();
+    });
+
+    it('is undefined when provisioningSteps itself is null', () => {
+      const tenant = makeTenant({ provisioningSteps: null });
+      const { result } = renderHook(() =>
+        useProvisioningPoll(tenant, 'NOT_CONFIGURED'),
+      );
+
+      expect(result.current.ownerElevationOutcome).toBeUndefined();
+    });
+
+    it('reads the detail off the OWNER_ELEVATION step once reported', () => {
+      const tenant = makeTenant({
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+            detail: 'STALLED',
+          },
+        },
+      });
+      const { result } = renderHook(() =>
+        useProvisioningPoll(tenant, 'NOT_CONFIGURED'),
+      );
+
+      expect(result.current.ownerElevationOutcome).toBe('STALLED');
+    });
+
+    it('never influences isProvisioningRunning/isOverallFailed/overallStepStatus/displayOverallStatus, regardless of its value', () => {
+      const allStepsDone = {
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.SEED_CONTENT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        },
+        [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+        },
+      };
+
+      const withoutOwnerElevation = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+        provisioningSteps: allStepsDone,
+      });
+      const { result: withoutResult } = renderHook(() =>
+        useProvisioningPoll(withoutOwnerElevation, 'NOT_CONFIGURED'),
+      );
+
+      const withStalledOwnerElevation = makeTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+        provisioningSteps: {
+          ...allStepsDone,
+          [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+            detail: 'STALLED',
+          },
+        },
+      });
+      const { result: withResult } = renderHook(() =>
+        useProvisioningPoll(withStalledOwnerElevation, 'NOT_CONFIGURED'),
+      );
+
+      expect(withResult.current.ownerElevationOutcome).toBe('STALLED');
+      expect(withResult.current.isOverallFailed).toBe(
+        withoutResult.current.isOverallFailed,
+      );
+      expect(withResult.current.isOverallFailed).toBe(false);
+      expect(withResult.current.isProvisioningRunning).toBe(
+        withoutResult.current.isProvisioningRunning,
+      );
+      expect(withResult.current.overallStepStatus).toBe(
+        withoutResult.current.overallStepStatus,
+      );
+      expect(withResult.current.displayOverallStatus).toBe(
+        withoutResult.current.displayOverallStatus,
+      );
+    });
   });
 
   describe('status derivation', () => {

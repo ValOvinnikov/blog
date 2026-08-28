@@ -153,6 +153,51 @@ describe(computeTenantFieldLocks, () => {
     });
   });
 
+  it('excludes OWNER_ELEVATION from the fold entirely — a 7th key never changes the result, even with a status the core sequence never produces', () => {
+    const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
+    const coreStepsDone = {
+      [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
+      [TENANT_PROVISIONING_STEP.SEED_CONTENT]: done,
+      [TENANT_PROVISIONING_STEP.DEPLOY_STUDIO]: done,
+      [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
+      [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: done,
+      [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,
+      [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
+        status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
+      },
+    };
+
+    const withoutOwnerElevation = computeTenantFieldLocks(
+      coreStepsDone,
+      TENANT_PROVISIONING_STATUS.READY,
+    );
+
+    // A hypothetical FAILED OWNER_ELEVATION entry is the strongest possible
+    // proof the allowlist truly excludes it — if this leaked into the fold
+    // (e.g. via `Object.values(steps ?? {})`), the state would flip to
+    // 'FAILED' and every field lock below would change.
+    const withFailedOwnerElevation = computeTenantFieldLocks(
+      {
+        ...coreStepsDone,
+        [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+          error: 'should never happen',
+        },
+      },
+      TENANT_PROVISIONING_STATUS.READY,
+    );
+
+    expect(withoutOwnerElevation).toEqual({
+      name: { kind: 'succeeded' },
+      slug: { kind: 'succeeded' },
+      primaryDomain: { kind: 'succeeded' },
+      plan: { kind: 'succeeded' },
+      locale: { kind: 'succeeded' },
+      ownerEmail: { kind: 'succeeded' },
+    });
+    expect(withFailedOwnerElevation).toEqual(withoutOwnerElevation);
+  });
+
   it('locks every field with a "running" reason once provisioningStatus is PROVISIONING, even while every step is still IDLE', () => {
     // This is the actual regression: `beginTenantProvisioning` moves the
     // column to PROVISIONING before its runner reports any step, so the

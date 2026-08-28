@@ -1,8 +1,10 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import {
+  ELEVATE_TENANT_OWNER_OUTCOME,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
+  type TElevateTenantOwnerOutcome,
 } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
@@ -369,5 +371,42 @@ describe(runSteps, () => {
     await runSteps('tenant-1', env);
 
     expect(elevateTenantOwnerMock).not.toHaveBeenCalled();
+    expect(reportStepStatusMock).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
+      }),
+    );
+  });
+
+  it.each(Object.values(ELEVATE_TENANT_OWNER_OUTCOME))(
+    'persists %s as the OWNER_ELEVATION step detail, always alongside DONE',
+    async (outcome: TElevateTenantOwnerOutcome) => {
+      createTenantSanityProjectMock.mockResolvedValue({});
+      createTenantStudioMock.mockResolvedValue({});
+      elevateTenantOwnerMock.mockResolvedValue(outcome);
+
+      await runSteps('tenant-1', env);
+
+      expect(reportStepStatusMock).toHaveBeenCalledWith({
+        tenantId: 'tenant-1',
+        step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
+        status: TENANT_PROVISIONING_STEP_STATUS.DONE,
+        detail: outcome,
+      });
+    },
+  );
+
+  it('never reports the OWNER_ELEVATION step when elevating the owner throws', async () => {
+    createTenantSanityProjectMock.mockResolvedValue({});
+    createTenantStudioMock.mockResolvedValue({});
+    elevateTenantOwnerMock.mockRejectedValue(new Error('acl fetch failed'));
+
+    await runSteps('tenant-1', env);
+
+    expect(reportStepStatusMock).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
+      }),
+    );
   });
 });

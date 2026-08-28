@@ -100,6 +100,32 @@ describe(runRecheck, () => {
     });
     expect(elevateTenantOwnerMock).toHaveBeenCalledTimes(5);
     expect(hasSystemicFailures(summary)).toBe(false);
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledTimes(5);
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
+      1,
+      't1',
+      'ELEVATED',
+    );
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
+      2,
+      't2',
+      'ALREADY_ADMINISTRATOR',
+    );
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
+      3,
+      't3',
+      'PENDING_ACCEPTANCE',
+    );
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
+      4,
+      't4',
+      'STALLED',
+    );
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenNthCalledWith(
+      5,
+      't5',
+      'AMBIGUOUS_MEMBERSHIP',
+    );
   });
 
   it('counts a thrown error without stopping the sweep for later candidates', async () => {
@@ -127,6 +153,21 @@ describe(runRecheck, () => {
     });
     expect(elevateTenantOwnerMock).toHaveBeenCalledTimes(3);
     expect(hasSystemicFailures(summary)).toBe(true);
+    // The throwing candidate (t2) never reaches `reportOwnerElevationOutcome`
+    // — only the two that resolved do.
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledTimes(2);
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledWith(
+      't1',
+      'ELEVATED',
+    );
+    expect(reportOwnerElevationOutcomeMock).toHaveBeenCalledWith(
+      't3',
+      'ALREADY_ADMINISTRATOR',
+    );
+    expect(reportOwnerElevationOutcomeMock).not.toHaveBeenCalledWith(
+      't2',
+      expect.anything(),
+    );
   });
 });
 
