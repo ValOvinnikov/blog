@@ -33,22 +33,22 @@ describe(requireSuperAdmin, () => {
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /unauthorized when the signed-in user has no admins row', async () => {
+  it('404s when the signed-in user has no admins row', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
-    await expect(requireSuperAdmin()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(requireSuperAdmin()).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(redirect).toHaveBeenCalledWith('/unauthorized');
+    expect(redirect).not.toHaveBeenCalled();
   });
 
-  it('redirects to /unauthorized when the admin row is below SUPERADMIN', async () => {
+  it('404s when the admin row is below SUPERADMIN', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
 
-    await expect(requireSuperAdmin()).rejects.toThrow('NEXT_REDIRECT');
+    await expect(requireSuperAdmin()).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(redirect).toHaveBeenCalledWith('/unauthorized');
+    expect(redirect).not.toHaveBeenCalled();
   });
 
   it('resolves to the admin row when the role is SUPERADMIN', async () => {

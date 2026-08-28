@@ -92,13 +92,13 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     expect(listMembershipsForUserMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /unauthorized when the signed-in user has zero memberships', async () => {
+  it('redirects to /workspace-pending when the signed-in user has zero memberships', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsForUserMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
-    expect(redirect).toHaveBeenCalledWith('/unauthorized');
+    expect(redirect).toHaveBeenCalledWith('/workspace-pending');
   });
 
   it('renders the gated content directly for a user with exactly one membership, with no switcher', async () => {

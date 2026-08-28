@@ -49,7 +49,7 @@ describe(`<${DashboardLookPage.name}/>`, () => {
     listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1', slug: 'acme' }]);
   });
 
-  it('redirects to /unauthorized without a session', async () => {
+  it('redirects to sign-in without a session', async () => {
     authMock.mockResolvedValue(null);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');

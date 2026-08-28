@@ -22,7 +22,7 @@ export const operatorNavSections = (
       {
         label: t('addTenant'),
         icon: ICONS.PLUS,
-        href: adminRoutes.addTenant(),
+        href: adminRoutes.newTenant(),
       },
     ],
   },

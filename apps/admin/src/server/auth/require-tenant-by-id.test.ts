@@ -41,16 +41,16 @@ describe(requireTenantById, () => {
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /unauthorized without querying the tenant when the signed-in user has no admins row', async () => {
+  it('404s without querying the tenant when the signed-in user has no admins row', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(requireTenantById('tenant-1')).rejects.toThrow(
-      'NEXT_REDIRECT',
+      'NEXT_NOT_FOUND',
     );
 
     expect(getAdminByUserIdMock).toHaveBeenCalledWith('user-1');
-    expect(redirect).toHaveBeenCalledWith('/unauthorized');
+    expect(redirect).not.toHaveBeenCalled();
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 

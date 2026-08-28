@@ -1,11 +1,7 @@
 import { ICONS, Size } from '@blog/config';
 import { queries } from '@blog/db';
-import { Heading } from '@blog/ui/atoms/heading';
 import { Icon } from '@blog/ui/atoms/icon';
-import { SettingRow } from '@blog/ui/molecules/setting-row';
-import { WindowChrome } from '@blog/ui/molecules/window-chrome';
 import { DisplayNameControl } from '@web/components/shared/display-name-control';
-import { PlainSection } from '@web/components/shared/plain-section';
 import { ProviderLinkControl } from '@web/components/shared/provider-link-control';
 import type { TLinkableProvider } from '@web/server/account/identity-actions';
 import { auth } from '@web/server/auth/auth';
@@ -15,21 +11,20 @@ import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
 import { identitySectionVariants } from './identity-section-variants';
+import {
+  IdentitySectionView,
+  type IIdentityProviderRow,
+} from './identity-section-view';
 
 const s = identitySectionVariants();
 
 /**
- * IdentitySection — the `/account` "connected accounts / identity"
- * `WindowChrome`. The three provider rows (GitHub/Google/email-link) are
- * plain flex-row markup rather than `SettingRow`: that component's
- * label(heading)+description+control model doesn't fit a single-line
- * icon+name+status+action row, so each row wraps its name in its own
- * `Heading level={3}` directly to keep the heading-outline navigation
- * `SettingRow` would otherwise provide. Email link has no `link`/`unlink`
- * action (`provider: null`) since it's tied to the account's own verified
- * email, not a linkable OAuth provider. GitHub's `Icon` renders one `Size`
- * step larger than Google's/email's glyphs to read as visually equal —
- * the octocat SVG carries more internal padding than the others.
+ * IdentitySection — the `/account` "connected accounts / identity" wrapper.
+ * Provider rows render as plain flex-row markup rather than `SettingRow`
+ * (its label+description+control model doesn't fit a single-line
+ * icon+name+status+action row). GitHub's `Icon` renders one `Size` step
+ * larger than Google's/email's glyphs since the octocat SVG carries more
+ * internal padding than the others.
  */
 export const IdentitySection = async () => {
   const session = await auth();
@@ -48,7 +43,7 @@ export const IdentitySection = async () => {
   ).length;
   const isLastMethod = (isLinked: boolean) => isLinked && linkedCount === 1;
 
-  const providerRows: {
+  const providerConfigs: {
     id: 'github' | 'google' | 'email';
     provider: TLinkableProvider | null;
     icon: ReactNode;
@@ -82,59 +77,40 @@ export const IdentitySection = async () => {
     },
   ];
 
-  const bodyContent = (
-    <>
-      {providerRows.map(({ id, provider, icon, label, isLinked }) => (
-        <div key={id} className={s.providerRow()}>
-          <Heading level={3} visual="copy" className={s.providerName()}>
-            {icon} {label}
-          </Heading>
-          <div className={s.providerStatus()}>
-            {isLinked && (
-              <span className={s.linkedStatus()}>{t('linkedStatus')}</span>
-            )}
-            {isLastMethod(isLinked) ? (
-              <span className={s.lastMethodNotice()}>
-                {t('lastMethodNotice')}
-              </span>
-            ) : provider ? (
-              <ProviderLinkControl
-                provider={provider}
-                action={isLinked ? 'unlink' : 'link'}
-              />
-            ) : null}
-          </div>
-        </div>
-      ))}
-      <SettingRow
-        label={t('displayNameLabel')}
-        description={t('displayNameDescription')}
-      >
+  const providerRows: IIdentityProviderRow[] = providerConfigs.map(
+    ({ id, provider, icon, label, isLinked }) => ({
+      id,
+      icon,
+      label,
+      isLinked,
+      isLastMethod: isLastMethod(isLinked),
+      linkedStatusLabel: t('linkedStatus'),
+      lastMethodNoticeLabel: t('lastMethodNotice'),
+      control: provider ? (
+        <ProviderLinkControl
+          provider={provider}
+          action={isLinked ? 'unlink' : 'link'}
+        />
+      ) : null,
+    }),
+  );
+
+  return (
+    <IdentitySectionView
+      isChromeOn={chromeOn}
+      handle={handle}
+      promptHost={t('promptHost')}
+      promptCommand={t('promptCommand')}
+      providerRows={providerRows}
+      displayNameLabel={t('displayNameLabel')}
+      displayNameDescription={t('displayNameDescription')}
+      displayNameControl={
         <DisplayNameControl
           initialName={name ?? ''}
           email={email}
           image={image}
         />
-      </SettingRow>
-    </>
-  );
-
-  if (!chromeOn) {
-    return (
-      <PlainSection heading={t('promptCommand')} headingLevel={2}>
-        {bodyContent}
-      </PlainSection>
-    );
-  }
-
-  return (
-    <WindowChrome>
-      <WindowChrome.Bar headingLevel={2}>
-        <WindowChrome.User>{handle}</WindowChrome.User>{' '}
-        <WindowChrome.Prompt>{t('promptHost')}</WindowChrome.Prompt>{' '}
-        {t('promptCommand')}
-      </WindowChrome.Bar>
-      <WindowChrome.Body>{bodyContent}</WindowChrome.Body>
-    </WindowChrome>
+      }
+    />
   );
 };

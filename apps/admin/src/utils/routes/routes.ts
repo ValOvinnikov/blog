@@ -4,10 +4,10 @@
  */
 export const adminRoutes = {
   signIn: () => '/api/auth/signin',
-  unauthorized: () => '/unauthorized',
+  workspacePending: () => '/workspace-pending',
   tenants: (options?: { archived?: boolean }) =>
     options?.archived ? '/tenants?archived=1' : '/tenants',
-  addTenant: () => '/add-tenant',
+  newTenant: () => '/tenants/new',
   tenantOverview: (tenantId: string) => `/tenants/${tenantId}`,
   tenantProvisioning: (tenantId: string) => `/tenants/${tenantId}/provisioning`,
   tenantDanger: (tenantId: string) => `/tenants/${tenantId}/danger`,

@@ -1,32 +1,15 @@
 import { routes } from '@blog/config';
-import { Heading } from '@blog/ui/atoms/heading';
 import { auth } from '@web/server/auth/auth';
+import { getChromeOn } from '@web/utils/get-chrome-on';
+import { toSessionUsername } from '@web/utils/to-session-username';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
-import { accountPageVariants } from './account-page-variants';
+import { AccountPageView } from './account-page-view';
 import { IdentitySection } from './sections/identity-section';
 import { NewsletterSection } from './sections/newsletter-section';
 import { PrivacySection } from './sections/privacy-section';
 
-const s = accountPageVariants();
-
-/**
- * `/account` composition: auth-gated (a signed-out reader is redirected
- * home; this app has no dedicated `/login` route). This is the *only* place
- * that guard lives — every section below trusts it rather than re-checking
- * the session itself.
- *
- * Renders the page's `h1` plus an ordered list of self-contained
- * `WindowChrome` section components; each reads its own
- * session/translations/data (`auth()` is deduped per-request via React
- * `cache`, so re-reading it costs nothing extra).
- *
- * **Ordering rule:** the fixed, final section order (top to bottom) is
- * identity, then newsletter, then privacy — `PrivacySection` always renders
- * *last* as a fixed danger-zone anchor at the bottom of the page, and
- * `IdentitySection` always renders *first*.
- */
 export const AccountPage = async () => {
   const session = await auth();
 
@@ -34,18 +17,34 @@ export const AccountPage = async () => {
     redirect(routes.home());
   }
 
-  const t = await getTranslations('accountPage');
+  const { name, email } = session.user;
+  const handle = toSessionUsername(name, email);
+
+  const [t, tPrivacy, chromeOn] = await Promise.all([
+    getTranslations('accountPage'),
+    getTranslations('accountPage.privacy'),
+    getChromeOn(),
+  ]);
 
   return (
-    <main className={s.root()}>
-      <Heading level={1} visual="section" className={s.heading()}>
-        {t('title')}
-      </Heading>
-      <div className={s.sections()}>
-        <IdentitySection />
-        <NewsletterSection />
-        <PrivacySection />
-      </div>
-    </main>
+    <AccountPageView
+      heading={t('title')}
+      identitySection={<IdentitySection />}
+      newsletterSection={<NewsletterSection />}
+      privacySection={
+        <PrivacySection
+          handle={handle}
+          isChromeOn={chromeOn}
+          promptHost={tPrivacy('promptHost')}
+          promptCommand={tPrivacy('promptCommand')}
+          promptTag={tPrivacy('promptTag')}
+          exportLabel={tPrivacy('exportLabel')}
+          exportDescription={tPrivacy('exportDescription')}
+          exportButton={tPrivacy('exportButton')}
+          deleteLabel={tPrivacy('deleteLabel')}
+          deleteDescription={tPrivacy('deleteDescription')}
+        />
+      }
+    />
   );
 };
