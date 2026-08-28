@@ -227,7 +227,7 @@ const main = () => {
   }
 
   console.log(
-    `Voice-override keys are in sync across cms/admin/web/db (${allKeys.size} keys).`,
+    `Voice-override keys are in sync across cms/platform/web/db (${allKeys.size} keys).`,
   );
 };
 
