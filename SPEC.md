@@ -548,9 +548,13 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   compares its resolved connection host against the production branch's
   host (mirrored into a repo Variable, since a job scoped to one GitHub
   Environment can't read another's secrets) and refuses to migrate if they
-  match (#2057). Whether `blog-dev`'s Vercel `DATABASE_URL` scope is correct
-  is still open (#2058). See `docs/DEPLOY.md`'s Neon Postgres section for the
-  full state and open items.
+  match (#2057). The prod `migrate-db` job carries the mirror-image guard
+  (#2264): it fails if its own resolved host does **not** match the same
+  repo Variable, so a mis-set production secret can no longer migrate the
+  wrong Neon branch — or nothing at all — while reporting success. Whether
+  `blog-dev`'s Vercel `DATABASE_URL` scope is correct is still open (#2058).
+  See `docs/DEPLOY.md`'s Neon Postgres section for the full state and open
+  items.
 - **Each environment is a separate Sanity project** with its own env-driven,
   never-committed project id and tokens; **six fully isolated Vercel
   projects** (a web project, a Studio project and an admin-panel project per

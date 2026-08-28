@@ -270,23 +270,29 @@ two-branch split is recent and the secret wiring has not fully caught up:
   Environment's own `DATABASE_URL_UNPOOLED`. Whether that secret was
   repointed at the new `development` branch (rather than left over from when
   only `main` existed) can't be confirmed by reading the secret back — GitHub
-  never allows that — but the job now guards against the dangerous case
-  going forward: it fails loudly if this secret ever resolves to the
-  production branch's host, and fails loudly too if `PRODUCTION_DB_HOST`
-  itself is unset or malformed — it's no longer possible to leave the guard
-  silently inert (see "Repo level — production-target guard for
-  `migrate-db`" further down).
+  never allows that — but the job guards against the dangerous case going
+  forward: it fails loudly if this secret ever resolves to the production
+  branch's host, and fails loudly too if `PRODUCTION_DB_HOST` itself is unset
+  or malformed — it's no longer possible to leave the guard silently inert
+  (see "Repo level — production-target guard for `migrate-db` (both
+  directions)" further down).
 - `deploy-production.yml`'s `migrate-db` job reads the `production`
-  Environment's `DATABASE_URL_UNPOOLED` — the `main` branch. The tenant
-  lifecycle workflows (`provision-tenant.yml`, `deprovision-tenant.yml`) run in
-  the same `production` Environment but read their **own**
+  Environment's `DATABASE_URL_UNPOOLED` — intended to be the `main` branch.
+  It carries the mirror-image guard (#2264): it fails loudly if this secret
+  ever resolves to anything **other than** `PRODUCTION_DB_HOST` — the earlier
+  asymmetry, where a mis-set production secret would migrate the wrong branch
+  with no backup and no failure, no longer exists. The tenant lifecycle
+  workflows (`provision-tenant.yml`, `deprovision-tenant.yml`) run in the same
+  `production` Environment but read their **own**
   `TENANT_REGISTRY_DATABASE_URL_DEV`/`_PROD` secrets instead (§4 below), so a
   tenant-registry dispatch can no longer silently repoint a production
   migration. That split (#2056, merged 2026-08-25) fixed a real incident: the
   two purposes used to share one secret, and pointing it at `development` to
   unblock tenant provisioning from `admin-dev` had silently repointed a
   production tag's `migrate-db` step at `development` too, leaving `main`
-  unmigrated while reporting success.
+  unmigrated while reporting success — the same silent-wrong-branch failure
+  mode #2264's guard now catches structurally, not just for this one
+  incident's specific cause.
 - `blog-dev`'s Vercel `DATABASE_URL` may be scoped to Preview+Development
   rather than Production; `deploy-development.yml` builds via
   `vercel pull --environment=production`, which would not read a
@@ -344,9 +350,11 @@ Provisioning notes for recreating this from scratch:
       `production` branch. GitHub never lets you read a secret back once set,
       so this only catches a copy-paste swap by re-pasting from the Neon
       console at set time, or by setting `PRODUCTION_DB_HOST` (see the "Repo
-      level — production-target guard" checklist further down) so a mis-set
-      `development` secret fails the `migrate-db` job loudly instead of
-      silently migrating production.
+      level — production-target guard for `migrate-db` (both directions)"
+      checklist further down) so a mis-set `development` secret fails the
+      `migrate-db` job loudly instead of silently migrating production, and a
+      mis-set `production` secret fails it loudly instead of silently
+      migrating the wrong branch (or nothing at all) while reporting success.
 
 **Studio** (`cms-dev` / `cms-prod`, Production scope — `vercel pull
 --environment=production` in CI only reads that scope): `sanity build`
@@ -609,36 +617,50 @@ Vercel dashboard → Account/Team Settings → Tokens), then:
 - [ ] Secret `TURBO_TOKEN` = `<VERCEL_ACCESS_TOKEN>`
 - [ ] Variable `TURBO_TEAM` = `<VERCEL_TEAM_SLUG>`
 
-**Repo level — production-target guard for `migrate-db`**
-
-`deploy-development.yml`'s `migrate-db` job runs unreviewed on every merge to
-`main`; a `development`-environment secret accidentally left pointing at the
-production Neon branch would migrate production with no backup and no
-approval. A job scoped to `environment: development` can never read
-production's `DATABASE_URL_UNPOOLED` to compare directly (GitHub Environments
-isolate secrets per environment), so the production host is mirrored into a
-plain repo Variable instead — not a Secret, since a hostname alone can't
-authenticate anything.
-
-- [ ] Variable `PRODUCTION_DB_HOST` = **the bare hostname only** (e.g.
-      `ep-xxxx.us-east-2.aws.neon.tech`) — no `postgresql://` scheme,
-      credentials, port, path, or query string. It must be the hostname
-      portion of the **production** Neon branch's own
-      **`DATABASE_URL_UNPOOLED`** value specifically (the direct connection
-      string — the part between `@` and `:5432/...`), **not** the pooled
-      `DATABASE_URL`. The guard step only ever parses `DATABASE_URL_UNPOOLED`
-      — a pooled-connection host (Neon suffixes it `-pooler`) never matches,
-      so pasting the wrong one leaves the guard unable to catch a real
-      mis-set target.
-
-The guard step now **fails the job** if this Variable is unset, or if its
-value doesn't look like a bare hostname (a scheme, `@`, `:`, or `/` trips a
-loud, explicit error) — it no longer silently no-ops. Set it correctly before
-`migrate-db` first runs with a real `DATABASE_URL_UNPOOLED`, or every dev
-deploy touching `@blog/db` will fail at this step.
-
 Until both exist the workflows fall back to the local `.turbo` cache — nothing
 breaks.
+
+**Repo level — production-target guard for `migrate-db` (both directions)**
+
+Both `deploy-development.yml`'s and `deploy-production.yml`'s `migrate-db`
+jobs run unreviewed against a live database — dev on every merge to `main`
+with no approval gate, prod behind the `production` Environment's required
+reviewer but with no independent check that the secret actually points where
+the tag says it should. A `development`-environment secret accidentally left
+pointing at the production Neon branch would migrate production with no
+backup; a `production`-environment secret accidentally left pointing at
+_anything else_ would silently skip migrating production while reporting
+success (#2264). Neither job can read the other's `DATABASE_URL_UNPOOLED`
+directly to compare (GitHub Environments isolate secrets per environment), so
+the production host is mirrored into one plain repo Variable instead — not a
+Secret, since a hostname alone can't authenticate anything — and **both**
+jobs' guard steps read that same repo-level Variable.
+
+- [ ] Variable `PRODUCTION_DB_HOST` = **the bare hostname only** (e.g.
+      `ep-xxxx.us-east-2.aws.neon.tech`), set **once, at repo level**
+      (Settings → Secrets and variables → Actions → Variables tab, not under
+      either Environment) — no `postgresql://` scheme, credentials, port,
+      path, or query string. It must be the hostname portion of the
+      **production** Neon branch's own **`DATABASE_URL_UNPOOLED`** value
+      specifically (the direct connection string — the part between `@` and
+      `:5432/...`), **not** the pooled `DATABASE_URL`. Both guard steps only
+      ever parse `DATABASE_URL_UNPOOLED` — a pooled-connection host (Neon
+      suffixes it `-pooler`) never matches, so pasting the wrong one leaves
+      the guard unable to catch a real mis-set target. An environment-scoped
+      Variable of the same name on either Environment would **shadow** this
+      repo-level one for jobs scoped to that Environment — don't create one;
+      if either Environment already has one, delete it so both jobs
+      genuinely read the same value.
+
+Each guard step **fails its job** if this Variable is unset, or if its value
+doesn't look like a bare hostname (a scheme, `@`, `:`, or `/` trips a loud,
+explicit error) — neither silently no-ops. The two directions are inverted:
+dev fails when its resolved host **matches** `PRODUCTION_DB_HOST` (it should
+never be touching production); prod fails when its resolved host
+**differs from** `PRODUCTION_DB_HOST` (a release must always touch
+production, and only production). Set the Variable correctly before either
+job first runs with a real `DATABASE_URL_UNPOOLED`, or every deploy touching
+`@blog/db` — dev on merge, prod on tag — will fail at this step.
 
 ### 5. Sanity — revalidation webhooks · API → Webhooks → Create webhook
 
@@ -746,9 +768,10 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    `DATABASE_URL_UNPOOLED`, so it's inert until that secret exists. Before
    applying, a guard step compares the resolved connection host against the
    repo Variable `PRODUCTION_DB_HOST` and fails the job loudly if they match
-   — see "Repo level — production-target guard for `migrate-db`" above; the
-   guard step itself fails the job (not silently skips) if that Variable is
-   unset or malformed. **No approval gate on dev.** See
+   — see "Repo level — production-target guard for `migrate-db` (both
+   directions)" above; the guard step itself fails the job (not silently
+   skips) if that Variable is unset or malformed. **No approval gate on
+   dev.** See
    `.claude/agents/db.md`'s "Migrations" section.
 5. **`deploy-studio`** → `cms-dev` via the Vercel CLI (`studio-dev.{your-hosting}`),
    same mechanism as `deploy-web`.
@@ -797,11 +820,16 @@ There are **no PR preview deployments** — deploys happen only on merge to `mai
    the un-applied schema migrations (tracked in drizzle-kit's own journal
    under `packages/db/migrations/meta`, idempotent). Reuses the **same**
    `production` Environment required-reviewer gate as every other prod job —
-   no second approval mechanism. Every step is guarded on
-   `DATABASE_URL_UNPOOLED`, so the job is a **no-op until that secret is
-   configured** — safe to ship ahead of setup. `deploy-web` and `deploy-admin`
-   `need` it (apps/cms never touches Postgres). See `.claude/agents/db.md`'s
-   "Migrations" section.
+   no second approval mechanism. Before backing up or migrating, a guard step
+   compares the resolved connection host against the repo Variable
+   `PRODUCTION_DB_HOST` and fails the job loudly if they **differ** — the
+   inverse of the dev guard, which fails on a match — see "Repo level —
+   production-target guard for `migrate-db` (both directions)" above; the
+   guard step itself fails the job (not silently skips) if that Variable is
+   unset or malformed. Every step is guarded on `DATABASE_URL_UNPOOLED`, so
+   the job is a **no-op until that secret is configured** — safe to ship
+   ahead of setup. `deploy-web` and `deploy-admin` `need` it (apps/cms never
+   touches Postgres). See `.claude/agents/db.md`'s "Migrations" section.
 4. **`deploy-studio`** → `cms-prod` via the Vercel CLI (`studio.{your-hosting}`),
    same mechanism as `deploy-web`.
 5. **`deploy-web`** → `blog-prod` via the Vercel CLI

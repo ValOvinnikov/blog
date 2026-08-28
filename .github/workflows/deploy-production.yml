@@ -124,10 +124,49 @@ jobs:
     environment: production
     env:
       DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
+      # Bare Neon connection host, repo-scoped so both this guard and the dev
+      # guard in deploy-development.yml read the same value (#2264) — a job
+      # scoped to `environment: production` falls through to the repo-level
+      # Variable exactly like the dev job's `environment: development` falls
+      # through when no environment-scoped variable of the same name shadows
+      # it. Never a full `postgresql://...` connection string.
+      PRODUCTION_DB_HOST: ${{ vars.PRODUCTION_DB_HOST }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # Inverse of deploy-development.yml's migrate-db guard (#2057): dev
+      # fails when its secret resolves to the PRODUCTION host, so this job
+      # fails when its own secret resolves to anything ELSE — a production
+      # release must never migrate the wrong Neon branch. Runs before
+      # setup/backup/migrate so a mis-set secret fails loudly and fast,
+      # before anything touches the db. Uses node's URL parser rather than a
+      # regex, same reasoning as the dev guard: a literal `@` or `:` in the
+      # password can't fool the host extraction, and an unparseable
+      # connection string fails the job instead of silently skipping the
+      # check.
+      - name: Guard against a mis-set production target
+        if: ${{ env.DATABASE_URL_UNPOOLED != '' }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PRODUCTION_DB_HOST:-}" ]; then
+            echo "::error::PRODUCTION_DB_HOST is unset — refusing to migrate without the production-host guard in place. Set it as a repo-level Variable (see docs/DEPLOY.md)." >&2
+            exit 1
+          fi
+          # A bare hostname is letters/digits/dots/hyphens only — a scheme,
+          # '@', ':', or '/' means someone pasted a full connection string.
+          if ! [[ "$PRODUCTION_DB_HOST" =~ ^[A-Za-z0-9.-]+$ ]]; then
+            echo "::error::PRODUCTION_DB_HOST does not look like a bare hostname — it may hold a full connection string. Expected only the host portion (e.g. ep-xxxx.us-east-2.aws.neon.tech). Check the repo-level Variable." >&2
+            exit 1
+          fi
+          host=$(node -e "console.log(new URL(process.env.DATABASE_URL_UNPOOLED).hostname)") || {
+            echo "::error::could not parse a host out of DATABASE_URL_UNPOOLED — check the production Environment's secret is a valid connection string." >&2
+            exit 1
+          }
+          if [ "$host" != "$PRODUCTION_DB_HOST" ]; then
+            echo "::error::production migrate-db resolved to a host ($host) that does NOT match the production Neon branch (${PRODUCTION_DB_HOST}) — refusing to migrate. Check the production Environment's DATABASE_URL_UNPOOLED secret." >&2
+            exit 1
+          fi
       - uses: ./.github/actions/setup
         with:
           pnpm-version: ${{ env.PNPM_VERSION }}
