@@ -29,9 +29,11 @@ import { codeInput } from '@sanity/code-input';
 import { visionTool } from '@sanity/vision';
 import {
   Blocks,
+  Clock,
   Files,
   FileText,
   House,
+  Layers,
   LayoutGrid,
   List,
   Mail,
@@ -85,6 +87,7 @@ export default defineConfig({
                     S.listItem()
                       .title('Home Page')
                       .id('home-page')
+                      .icon(House)
                       .child(
                         S.list()
                           .title('Home Page')
@@ -103,6 +106,7 @@ export default defineConfig({
                     S.listItem()
                       .title('Blog')
                       .id('pages-blog')
+                      .icon(Newspaper)
                       .child(
                         S.list()
                           .title('Blog')
@@ -118,11 +122,11 @@ export default defineConfig({
                               ),
                             S.documentTypeListItem(pagePostSchema.name)
                               .title('Post Pages')
-                              .icon(Newspaper),
+                              .icon(FileText),
                             S.listItem()
                               .title('Topic Index Page')
                               .id(topicIndexPageSchema.name)
-                              .icon(Tags)
+                              .icon(LayoutGrid)
                               .child(
                                 S.document()
                                   .schemaType(topicIndexPageSchema.name)
@@ -130,7 +134,7 @@ export default defineConfig({
                               ),
                             S.documentTypeListItem(pageTopicSchema.name)
                               .title('Topic Pages')
-                              .icon(Tags),
+                              .icon(Layers),
                             S.listItem()
                               .title('Tag Index Page')
                               .id(tagIndexPageSchema.name)
@@ -148,6 +152,7 @@ export default defineConfig({
                     S.listItem()
                       .title('General')
                       .id('pages-general')
+                      .icon(FileText)
                       .child(
                         S.list()
                           .title('General')
@@ -170,6 +175,7 @@ export default defineConfig({
                     S.listItem()
                       .title('Post modules')
                       .id('post-modules')
+                      .icon(List)
                       .child(
                         S.list()
                           .title('Post modules')
@@ -179,7 +185,7 @@ export default defineConfig({
                               .icon(List),
                             S.documentTypeListItem(postLatestSchema.name)
                               .title('Post Latest')
-                              .icon(List),
+                              .icon(Clock),
                             S.documentTypeListItem(taxonomyListSchema.name)
                               .title('Taxonomy Lists')
                               .icon(LayoutGrid),
@@ -188,6 +194,7 @@ export default defineConfig({
                     S.listItem()
                       .title('Content modules')
                       .id('content-modules')
+                      .icon(FileText)
                       .child(
                         S.list()
                           .title('Content modules')
