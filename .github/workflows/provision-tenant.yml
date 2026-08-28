@@ -2,8 +2,8 @@ name: Provision Tenant
 
 # Provisions one tenant end to end — Sanity project, seeded starter content,
 # Studio deployment, and domain mapping — for a `tenants` row already
-# inserted by `apps/admin`'s "Add tenant" wizard Server Action. Dispatched
-# via the GitHub API by `apps/admin/src/server/provisioning/dispatch-provisioning-workflow.ts`,
+# inserted by `apps/platform`'s "Add tenant" wizard Server Action. Dispatched
+# via the GitHub API by `apps/platform/src/server/provisioning/dispatch-provisioning-workflow.ts`,
 # never by hand from the Actions UI in normal operation (though a human can
 # always re-run it manually with the same `tenantId` to retry a failed step
 # — every step is independently idempotent, see `packages/db/scripts/provision-tenant/`).
@@ -77,7 +77,7 @@ jobs:
       # custom domain to this one project, never a per-tenant project.
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
       # Overridable per-dispatch via the adminAppBaseUrl input (e.g. a local
-      # tunnel URL) for manual testing — real dispatches from apps/admin's
+      # tunnel URL) for manual testing — real dispatches from apps/platform's
       # dispatch-provisioning-workflow.ts never set this input, so they
       # always fall back to the production Environment value unaffected.
       ADMIN_APP_BASE_URL: ${{ inputs.adminAppBaseUrl || vars.ADMIN_APP_BASE_URL }}
@@ -87,10 +87,10 @@ jobs:
       # rather than hardcoded in TS. Overridable per-dispatch via the
       # tenantSanityDataset input (e.g. for manual local testing), same
       # fallback pattern as ADMIN_APP_BASE_URL above — the real dispatch
-      # from apps/admin never sets this input, so it always falls back to
+      # from apps/platform never sets this input, so it always falls back to
       # the production Environment value unaffected.
       TENANT_SANITY_DATASET: ${{ inputs.tenantSanityDataset || vars.TENANT_SANITY_DATASET }}
-      # Reuses the same variable/secret names `apps/admin`/`apps/web` already
+      # Reuses the same variable/secret names `apps/platform`/`apps/web` already
       # use for the same values (not new var names) — see
       # docs/context/environment-variables.md's `WEB_APP_URL`/
       # `SANITY_REVALIDATE_SECRET` rows. Step 6 creates each new tenant's

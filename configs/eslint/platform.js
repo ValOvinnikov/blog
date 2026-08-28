@@ -18,7 +18,7 @@ const contentLayerRestrictedGroup = {
     'groqd/*',
   ],
   message:
-    'apps/admin has no content-layer concern — it must not import @blog/service or any Sanity SDK; read relational data through @blog/db.',
+    'apps/platform has no content-layer concern — it must not import @blog/service or any Sanity SDK; read relational data through @blog/db.',
 };
 
 const PREVIEW_SAMPLE_DIR =
@@ -58,7 +58,7 @@ export default [
             {
               group: ['@blog/ui', '@blog/ui/*'],
               message:
-                'apps/admin has dropped @blog/ui everywhere except look-preview/preview-sample (the sample renders real blog UI for the tenant preview) — build admin UI from in-app Base UI-based primitives instead.',
+                'apps/platform has dropped @blog/ui everywhere except look-preview/preview-sample (the sample renders real blog UI for the tenant preview) — build admin UI from in-app Base UI-based primitives instead.',
             },
           ],
         },
