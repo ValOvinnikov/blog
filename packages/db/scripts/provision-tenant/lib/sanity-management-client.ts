@@ -241,11 +241,9 @@ export async function createSanityProjectInvite(input: {
   );
 }
 
-export type TSanityAclRole = { name: string };
-
 export type TSanityAclEntry = {
   projectUserId: string;
-  roles: TSanityAclRole[];
+  roles: { name: string }[];
   isRobot: boolean;
 };
 
