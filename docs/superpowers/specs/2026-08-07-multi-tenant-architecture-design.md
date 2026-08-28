@@ -870,6 +870,29 @@ From Feature 6's 2026-08-07 research, carried here as hard design inputs:
    state that `apps/platform` renders, so the degradation is noticed the first
    time rather than the tenth. This belongs in #2266.
 
+   **Detection must be stall-based, not failure-based.** Under (b), three
+   outcomes are indistinguishable from outside the system:
+
+   1. the owner accepts and the grant succeeds — fine;
+   2. the owner accepts and the grant is rejected (the endpoint was
+      tightened) — the tenant is provisioned, the owner cannot edit;
+   3. **the owner never accepts** — the tenant exists, may well be paying, the
+      owner cannot edit, and _nothing failed_.
+
+   An error-triggered alert catches (2) and misses (3) entirely, yet (3) is the
+   more likely of the two and looks identical to a quiet customer. The check
+   must therefore be **time-based** — "invited N days ago and still not an
+   administrator on their project" — which covers both cases with one
+   condition. `GET /projects/{id}/acl/` is already the acceptance signal (a
+   member only appears there once they have accepted), so this needs no new
+   mechanism, only a scheduled read.
+
+   The state itself is already captured: `reportStepStatus` writes each step's
+   status directly to Postgres and deliberately never throws. What is missing
+   is surfacing it (#2266) and pushing it to a human — tracked separately,
+   since operator notification is a new capability rather than part of the
+   grant.
+
 10. **Trial lifecycle & abandoned-tenant reclamation — RESOLVED 2026-08-28,
     except the retention window.** Sanity imposes no project-count limit (confirmed by the
     project owner, 2026-08-28), so trials need not conserve projects and a
